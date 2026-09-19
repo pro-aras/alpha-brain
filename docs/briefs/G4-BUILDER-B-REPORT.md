@@ -289,9 +289,9 @@ and ownership as before; the standing safety constraint held throughout: `/data/
 live `creature.service`, running since 22:29) was never touched, `systemctl` was never run — every test
 in this wave builds its own temporary `Organism`/genome in-process, nothing reads or writes the live
 tree. HEAD after B13: `6eb291b`; HEAD after a first post-review fix pass (org.traits property, B13
-decontamination): `b001009`; a SECOND advisor pass then caught two more B13 framing defects and one
-untested TRAITS/THETA_N interaction, fixed in the commit that follows this report. Full suite
-(`python3 -m unittest discover -s tests/genome -t .`) at that final commit:
+decontamination): `b001009`; HEAD after a SECOND advisor pass (two more B13 framing defects, one
+untested TRAITS/THETA_N interaction), including this report: `51c434b`. Full suite
+(`python3 -m unittest discover -s tests/genome -t .`) at `51c434b`:
 **`Ran 124 tests in ~120s — OK (skipped=1, expected failures=9)`**, run twice, byte-identical pass/fail
 pattern both times. **The pin held at every commit** (`test_pin_skeleton`, part of every run, unchanged:
 `d4b5c6b8d5…`).
