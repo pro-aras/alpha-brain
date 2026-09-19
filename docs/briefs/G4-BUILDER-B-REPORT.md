@@ -175,3 +175,108 @@ future change to the retina/toy scale that clears them is caught as an "unexpect
 2. **B7**: two-arrival retention within 5pp WITH sleep — measured 47.5pp (down from 70pp without sleep;
    direction and monotonicity both robust, magnitude short of the bar).
 Every other clause in B0–B7 was met and is covered by a passing test.
+
+---
+
+# B8 — the two toys re-specified on the creature's own front (PREREG §9 Amendment 1)
+
+*edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 23:55 +0400. Worktree fast-forwarded to master
+`a023ded` (which merged `g4-genes`), continuing on branch `g4-genes`. B0–B7's readings above are
+unchanged and NOT re-graded — Amendment 1 (`docs/G4-PREREG.md` §9) says so explicitly: "these readings
+stand." B8 adds two NEW test files beside them, on the creature's real front. Commit `2f3bac4`. Full
+suite: **`Ran 63 tests in ~38s — OK (skipped=1, expected failures=3)`**, reproduced twice, byte-identical
+pass/fail pattern both times. **The pin held throughout** (`test_pin_skeleton`, part of every run,
+unchanged: `d4b5c6b8d5…`).
+
+## The front, and which "one glance" I used
+Both toys use `G4-skeleton.genome`'s real, calibrated RETINA (`thresh0.25 centre tower:eye-tower-g2
+sqrt unit`, THETA_N=0.955, THETA_M=0.9975 — gate G-a's own numbers on this exact front) over 32×32
+glances of `world.render_canvas` canvases at 128 (G1's world) — never the pool3/plain-render fronts
+B6/B7 used. Amendment 1 offered two ways to make "one glance per showing": the whole canvas resized to
+32×32 (`gaze.py`'s mode "one"), or the first surprise fixation. **I tried "one" first and rejected it**:
+`gate_ga.bands_feats` on circle/square/triangle's whole-canvas features read within-median 0.9934 vs
+between-p95 0.9950 — an OVERLAP (shrinking the WHOLE 128px canvas to 32px shrinks the 32px thing itself
+to ~8px, losing exactly the detail the sealed tower needs). **I used the first surprise fixation
+instead** (`gaze.glances(rgb, spec, gaze_gene, "surprise", pic_id)["feats"][0]`) — no overlap, see below.
+
+## B8(1) — MODULATION toy (`tests/genome/test_b8_modulation.py`)
+Test log (this file alone): `Ran 4 tests — OK (expected failures=1)`. Pin before/after: unchanged.
+
+**F, computed first, gate G-a's bands on this world+front (first-fixation features, 40/thing, circle/
+square/triangle, seed 100):** within-median **0.9690**, within-p5 0.8882, within-p95 0.9947;
+between-median 0.8756, between-p95 **0.9540**, max 0.9682. **Within-median (0.9690) > between-p95
+(0.9540) — NO OVERLAP.** **F = 1 − 0.9690 = 0.0310.**
+
+**Exact-repeat control (positive control, PASS, 3/3 seeds):** with zero jitter, error reaches exactly
+0.0 within the first few moments of each thing — well under F+0.01 = 0.0410, at all of seeds 9/10/11.
+
+**Null (picture order AND word labels shuffled TOGETHER, one arm, both perturbations at once — read
+that way from "the picture-AND-word-shuffled null"):** does not clear the bar at any seed (0/3),
+asserted `< 2` (not a majority) — PASS.
+
+**The design bar itself — RAISED, `expectedFailure`, 0/3 (not a majority):**
+| seed | first50 | last50 | last50−F | 0.3×(first50−F) | clears? |
+|---|---|---|---|---|---|
+| 9  | 0.0317 | 0.0484 | 0.0174 | 0.0002 | no |
+| 10 | 0.0532 | 0.0426 | 0.0116 | 0.0067 | no |
+| 11 | 0.0236 | 0.0473 | 0.0163 | −0.0022 | no |
+
+**Why, computed not guessed:** a single-canvas trace (seed 9) makes the shape visible —
+`[1.000, 0.048, 0.009, 0.003, 0.005, 0.062, 0.012, 0.003, 0.025, …]` — moment 0 is the organism's
+very first prediction ever (no cells exist, `expect()`→zeros, cos=0, e=1.0 by construction), and moment
+1 *already* reads 0.048, close to F=0.0310. Because the sealed tower is this good on this world,
+first50's median (0.0236–0.0532 across seeds) is *already* near F — seed 11 even reads BELOW F, a
+50-sample median-noise artifact around a true gap close to zero. The bar `(last50−F) ≤ 0.3×(first50−F)`
+implicitly assumes real headroom between first50 and F for a learning curve to close; here there is
+almost none left to measure. This is a DIFFERENT shape of finding than B6(a)'s pool3 reading (there:
+front too WEAK, ceiling above the bar; here: front so strong the window opens after convergence already
+happened).
+
+## B8(2) — SLEEP toy (`tests/genome/test_b8_sleep.py`)
+Test log (this file alone): `Ran 1 test — OK (skipped=1)`. Pin before/after: unchanged.
+
+**A/B, computed and named** (gate G-a's bands, this front, first-fixation features, 40/thing, all of
+`world.THINGS_11`, ranked by within-median minus between-median gap): top four pairs were
+square/dot (0.420), circle/dot (0.401), ring/dot (0.397), dot/diamond (0.391) — all four share "dot", a
+small simple mark unlike everything else on this front. The next pair DISJOINT from square/dot is
+ring/bar (0.309). **A = [square, dot]. B = [ring, bar].**
+
+**The no-sleep loss, measured FIRST as instructed, at three independent dev-seed pairs (held-out fixed
+at seed=2, `world.holdout_canvas`, as specified):**
+| dev_A seed | dev_B seed | Q1 base | Q1 final | loss (pp) |
+|---|---|---|---|---|
+| 1  | 2  | 0.875 | 0.875 | 0.0 |
+| 5  | 6  | 0.900 | 0.900 | 0.0 |
+| 11 | 12 | 0.900 | 0.900 | 0.0 |
+
+**Max loss over all three: 0.0 pp — well under the 10pp bar. NOT GRADABLE on this world**, per Amendment
+1's own words ("the G0b machinery retains without sleep: budget per arrival, no disuse decay — G0b (v)
+read +0"): my measurement confirms this exactly, at every seed pair tried, with zero exceptions. Skipped
+via `unittest.SkipTest` carrying the full readings table above (not just "not gradable" — the actual
+numbers), never manufactured. Since the loss never reached ≥10pp, the "ceiling = share of A's held-out
+answered by cells the replayed episodes light" computation was never needed (the amendment's branch for
+that only applies when the mark IS gradable). SLEEP's retention mark lives only in the 24h life's
+alternating windows (PREREG §5 TWINS no-sleep) — not reachable in a toy this short.
+
+**CYCLE's toy** (B7, `tests/genome/test_sleep.py::TestCycle`) stands as PASS unchanged, per Amendment 1's
+own instruction — not rerun: 27 = 0.9·30 reached, 0 births for 5 ticks, `cycle()` merges 25 sight cells,
+births resume with fresh ids the very next tick.
+
+**One fix needed to run the SLEEP toy at all (not a finding about SLEEP):** the skeleton's own
+`STAGE 2 meet moments 200..` never fires within one 80-showing (160-moment) arrival — every `recall`
+would read NOEDGE by construction (confirmed: Q1 read exactly 0.0 before the fix) since wiring never
+starts. `tests/genome/_creature_front.py`'s `skeleton_genome_immediate_meet()` keeps every other gene
+(RETINA, GAZE, BIRTH, BUDGET, NMAX, KWTA, HEBB, DELTA, PRUNE, MERGE, SCALE, RECALL, ABSTAIN — the front
+and every threshold) byte-for-byte identical and moves ONLY `STAGE 2 meet` to start at moment 0. This is
+an artifact of the toy's chosen LENGTH (160 moments < 200), not a property of the front or of SLEEP.
+
+## B8 summary
+Both toys ran on the creature's real, calibrated front. Both positive/negative controls behaved exactly
+as required (exact-repeat control PASSES for MODULATION; the null does not clear MODULATION's bar; the
+no-sleep loss for SLEEP was measured plainly and found genuinely under 10pp, not forced either way).
+Neither literal bar clears on this front — MODULATION for a front-too-strong reason (opposite of B6(a)'s
+front-too-weak reason), SLEEP because the mark is honestly NOT GRADABLE on this world at this toy's
+scale. Both are reported with every number, pinned so a future change is caught in either direction
+(`expectedFailure` for MODULATION's bar; a `self.fail(...)` sentinel in SLEEP's test for if the loss ever
+does reach ≥10pp, forcing that test to be rewritten with the ceiling-relative bar rather than silently
+staying skipped). The pin never moved.
