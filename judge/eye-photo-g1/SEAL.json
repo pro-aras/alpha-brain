@@ -1,0 +1,270 @@
+{
+ "component": "G2 eye-photo-g1: a 3-layer tower GROWN on Caltech-101's 92 held-in folders through the genome's own gaze road; the eleven rung-1 words never seen",
+ "seed": 20260919,
+ "source": "G2 (docs/G2-EYE-PREREG.md): E09c's trainer road mirrored in genome/train_eye.py",
+ "arrays": [
+  "W1",
+  "b1",
+  "W2",
+  "b2",
+  "W3",
+  "b3",
+  "Wh",
+  "bh"
+ ],
+ "shapes": {
+  "W1": [
+   16,
+   25
+  ],
+  "b1": [
+   16
+  ],
+  "W2": [
+   32,
+   144
+  ],
+  "b2": [
+   32
+  ],
+  "W3": [
+   48,
+   288
+  ],
+  "b3": [
+   48
+  ],
+  "Wh": [
+   768,
+   92
+  ],
+  "bh": [
+   92
+  ]
+ },
+ "n_params": 89676,
+ "arch": [
+  {
+   "type": "conv",
+   "f": 16,
+   "k": 5
+  },
+  {
+   "type": "max",
+   "p": 2
+  },
+  {
+   "type": "conv",
+   "f": 32,
+   "k": 3
+  },
+  {
+   "type": "max",
+   "p": 2
+  },
+  {
+   "type": "conv",
+   "f": 48,
+   "k": 3
+  },
+  {
+   "type": "mean",
+   "p": 4
+  }
+ ],
+ "input_side": 64,
+ "input": "64x64 grey in [0,1]: the gaze's 64-px window on a 128 canvas through INK border (G1 \u00a76)",
+ "labels": [
+  "BACKGROUND_Google",
+  "Faces",
+  "Faces_easy",
+  "Leopards",
+  "Motorbikes",
+  "accordion",
+  "airplanes",
+  "binocular",
+  "brontosaurus",
+  "butterfly",
+  "car_side",
+  "ceiling_fan",
+  "cellphone",
+  "chair",
+  "chandelier",
+  "cougar_body",
+  "cougar_face",
+  "crab",
+  "crayfish",
+  "crocodile",
+  "crocodile_head",
+  "cup",
+  "dalmatian",
+  "dollar_bill",
+  "dolphin",
+  "dragonfly",
+  "electric_guitar",
+  "elephant",
+  "emu",
+  "euphonium",
+  "ewer",
+  "ferry",
+  "flamingo",
+  "flamingo_head",
+  "garfield",
+  "gerenuk",
+  "gramophone",
+  "grand_piano",
+  "hawksbill",
+  "headphone",
+  "hedgehog",
+  "helicopter",
+  "ibis",
+  "inline_skate",
+  "joshua_tree",
+  "kangaroo",
+  "ketch",
+  "lamp",
+  "laptop",
+  "llama",
+  "lobster",
+  "lotus",
+  "mandolin",
+  "mayfly",
+  "menorah",
+  "metronome",
+  "minaret",
+  "nautilus",
+  "octopus",
+  "okapi",
+  "pagoda",
+  "panda",
+  "pigeon",
+  "pizza",
+  "platypus",
+  "pyramid",
+  "revolver",
+  "rhino",
+  "rooster",
+  "saxophone",
+  "schooner",
+  "scissors",
+  "scorpion",
+  "sea_horse",
+  "snoopy",
+  "soccer_ball",
+  "stapler",
+  "starfish",
+  "stegosaurus",
+  "stop_sign",
+  "strawberry",
+  "sunflower",
+  "tick",
+  "trilobite",
+  "umbrella",
+  "watch",
+  "water_lilly",
+  "wheelchair",
+  "wild_cat",
+  "windsor_chair",
+  "wrench",
+  "yin_yang"
+ ],
+ "tower_bin_sha256": "276db46130fd8d2be4b4687d1d91b5ca4e188d226380eeeb4644fa6d13e61b75",
+ "sealed_at": "2026-09-19 18:54 +0400",
+ "journal": {
+  "epochs": 12,
+  "batch": 64,
+  "lr0": 0.02,
+  "momentum": 0.9,
+  "seed": 20260919,
+  "history": [
+   {
+    "epoch": 1,
+    "loss": 3.66032,
+    "val_top1": 0.2925,
+    "lr": 0.02,
+    "seconds": 185.0
+   },
+   {
+    "epoch": 2,
+    "loss": 3.01434,
+    "val_top1": 0.3357,
+    "lr": 0.02,
+    "seconds": 369.1
+   },
+   {
+    "epoch": 3,
+    "loss": 2.67739,
+    "val_top1": 0.3886,
+    "lr": 0.02,
+    "seconds": 553.0
+   },
+   {
+    "epoch": 4,
+    "loss": 2.4163,
+    "val_top1": 0.4078,
+    "lr": 0.02,
+    "seconds": 734.6
+   },
+   {
+    "epoch": 5,
+    "loss": 2.1939,
+    "val_top1": 0.4144,
+    "lr": 0.02,
+    "seconds": 918.5
+   },
+   {
+    "epoch": 6,
+    "loss": 2.00916,
+    "val_top1": 0.4234,
+    "lr": 0.02,
+    "seconds": 1102.1
+   },
+   {
+    "epoch": 7,
+    "loss": 1.84162,
+    "val_top1": 0.433,
+    "lr": 0.02,
+    "seconds": 1285.8
+   },
+   {
+    "epoch": 8,
+    "loss": 1.53546,
+    "val_top1": 0.4468,
+    "lr": 0.01,
+    "seconds": 1469.6
+   },
+   {
+    "epoch": 9,
+    "loss": 1.44197,
+    "val_top1": 0.4468,
+    "lr": 0.01,
+    "seconds": 1653.4
+   },
+   {
+    "epoch": 10,
+    "loss": 1.35884,
+    "val_top1": 0.4468,
+    "lr": 0.01,
+    "seconds": 1837.1
+   },
+   {
+    "epoch": 11,
+    "loss": 1.17302,
+    "val_top1": 0.4577,
+    "lr": 0.005,
+    "seconds": 2020.9
+   },
+   {
+    "epoch": 12,
+    "loss": 1.11545,
+    "val_top1": 0.4571,
+    "lr": 0.005,
+    "seconds": 2204.2
+   }
+  ],
+  "seconds": 2204.2,
+  "threads": "8"
+ },
+ "G3_val_top1": 0.4571,
+ "G3_pass": true
+}
