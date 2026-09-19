@@ -3,6 +3,7 @@
 edit: Claude (Fable 5.1), 2026-09-19 16:0x +04 — G0 rung 0 (docs/G0-PREREG.md §1, §10).
 edit: Claude (Fable 5.1), 2026-09-19 16:09 +04 — §11: the retina as a list of fixed steps (gate G-a's finding); winners must resonate.
 edit: Claude (Fable 5.1), 2026-09-19 16:37 +04 — G0b: RETINA step tower:<sealed eye>; any square picture; every edge's birth and pruning logged by cell ids (no labels).
+edit: Claude (Fable 5.1), 2026-09-19 17:21 +0400 — G1: the GAZE gene (parsed; its work is done in gaze.py and the runner); recall_many/edge_many — the rung-0 recall summed over glances, pinned equal to recall/edge for one glance; save/load for the ask door (never touch state_hash).
 edit: Claude (Fable 5.1), 2026-09-19 16:14 +04 — §11 amendments 4–6 (from the toy): redundant error births refused; ABSTAIN's second is a competitor that answers back differently; a question lights the resonating winners, not one cell.
 
 Laws of this file:
@@ -56,6 +57,7 @@ class Genome:
     stages: List[Tuple[int, str, int, Optional[int]]]   # (index, name, from, to)
     recall_k: int
     abstain_ratio: float
+    gaze: Optional[Dict[str, object]] = None     # G1: GAZE surprise fixations F grid G canvas C glance L ink contrast (None = off)
     text: str = field(default="", repr=False)
 
     @property
@@ -154,6 +156,10 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"second/best > (" + _NUM + ")", a)
                 if not m: raise GenomeError(f"ABSTAIN: cannot read {a!r}")
                 g["abstain_ratio"] = float(m.group(1))
+            elif gene == "GAZE":
+                m = re.fullmatch(r"surprise fixations (\d+) grid (\d+) canvas (\d+) glance (\d+) ink (contrast)", a)
+                if not m: raise GenomeError(f"GAZE: cannot read {a!r} (G1 §1: surprise fixations F grid G canvas C glance L ink contrast)")
+                g["gaze"] = {"fixations": int(m.group(1)), "grid": int(m.group(2)), "canvas": int(m.group(3)), "glance": int(m.group(4)), "ink": m.group(5)}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:
@@ -539,6 +545,54 @@ class Organism:
             return {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l])}
         return {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l])}
 
+    def recall_many(self, side: str, xs: List[np.ndarray]) -> Dict[str, object]:
+        """G1 §1: RECALL over glances. Each glance lights its resonating winners as `recall` does; the evidence for a cell
+        on the other side is the SUM over glances of the strongest edge from that glance's lit cells to it; best/second/
+        abstain by the same rules over the union of the lit sets. For ONE glance this is `recall`, result for result
+        (pinned in tools/pin_g1.py). Never changes the organism."""
+        area, other = (self.sight, self.words) if side == "sight" else (self.words, self.sight)
+        lit_union: List[int] = []; cos_of: Dict[int, float] = {}; best_cos = 0.0
+        evidence: Dict[int, Tuple[float, int]] = {}                       # other cell -> (summed evidence, lit cell of its first strongest edge)
+        for x in xs:
+            lit, c = self._lit(area, x)
+            if len(c):
+                best_cos = max(best_cos, float(c.max()))
+            if not lit:
+                continue
+            for l in lit:
+                if l not in cos_of:
+                    lit_union.append(l); cos_of[l] = float(c[l])
+            per_j: Dict[int, Tuple[float, int]] = {}
+            for l in lit:
+                row = self.W[l] if side == "sight" else self.W[:, l]
+                m = (self.mask[l] if side == "sight" else self.mask[:, l]) == 1
+                m &= other.alive == 1
+                for j in np.flatnonzero(m):
+                    v = float(row[j]); j = int(j)
+                    if v > 0.0 and (j not in per_j or v > per_j[j][0]):
+                        per_j[j] = (v, l)
+            for j, (v, l) in per_j.items():
+                e = evidence.get(j)
+                evidence[j] = (v, l) if e is None else (e[0] + v, e[1])
+        if not lit_union:
+            return {"cell": None, "reason": "novel", "lit": None, "best": 0.0, "second": 0.0, "cos": best_cos}
+        if not evidence:
+            return {"cell": None, "reason": "noedge", "lit": lit_union[0], "best": 0.0, "second": 0.0, "cos": cos_of[lit_union[0]]}
+        cands = sorted(evidence.items(), key=lambda kv: (-kv[1][0], kv[0]))
+        best_id, (best, best_l) = cands[0]
+        lit_set = set(lit_union); second = 0.0
+        for j, (v, _l) in cands[1:]:
+            if self._answer_of(other, j) not in lit_set:
+                second = v
+                break
+        if second > 0.0 and second / best > self.g.abstain_ratio:
+            return {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l]}
+        return {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l]}
+
+    def edge_many(self, side: str, xs: List[np.ndarray], other_cell: int) -> float:
+        """G1 §1: Q3/Q4's edge summed over glances (one glance = `edge`)."""
+        return float(sum(self.edge(side, x, other_cell) for x in xs))
+
     def edge(self, side: str, x: np.ndarray, other_cell: int) -> float:
         """The strongest edge from the lit cells on `side` (none resonating → 0) to `other_cell` — Q3/Q4."""
         area = self.sight if side == "sight" else self.words
@@ -551,6 +605,36 @@ class Organism:
                 v = float(self.W[other_cell, l]) if self.mask[other_cell, l] else 0.0
             best = max(best, v)
         return best
+
+    # ------------------------------------------------------------------ the ask door (G1 §5 step 7): save / load, never in the hash
+    def save(self, path) -> None:
+        import pathlib as _pl
+        path = _pl.Path(path)
+        np.savez_compressed(path, sight_cells=self.sight.cells[: self.sight.n], sight_alive=self.sight.alive, sight_misfires=self.sight.misfires,
+                            words_cells=self.words.cells[: self.words.n], words_alive=self.words.alive, words_misfires=self.words.misfires,
+                            W=self.W, mask=self.mask, strikes=self.strikes)
+        meta = {"t": self.t, "budget_left": self.budget_left, "arrivals": self.arrivals, "c": self.c, "births": self.births, "merges": self.merges,
+                "edges_log": self.edges_log, "prunes_log": self.prunes_log, "refusals_by_arrival": self.refusals_by_arrival,
+                "sight_n": self.sight.n, "words_n": self.words.n, "genome_text": self.g.text, "state_hash": self.state_hash()}
+        path.with_suffix(".json").write_text(json.dumps(meta))
+
+    @classmethod
+    def load(cls, path, genome: "Genome") -> "Organism":
+        import pathlib as _pl
+        path = _pl.Path(path)
+        z = np.load(path.with_suffix(".npz")); meta = json.loads(path.with_suffix(".json").read_text())
+        o = cls(genome)
+        o.sight.n = int(meta["sight_n"]); o.words.n = int(meta["words_n"])
+        o.sight.cells[: o.sight.n] = z["sight_cells"]; o.sight.alive[:] = z["sight_alive"]; o.sight.misfires[:] = z["sight_misfires"]
+        o.words.cells[: o.words.n] = z["words_cells"]; o.words.alive[:] = z["words_alive"]; o.words.misfires[:] = z["words_misfires"]
+        o.W[:] = z["W"]; o.mask[:] = z["mask"]; o.strikes[:] = z["strikes"]
+        o.t = int(meta["t"]); o.budget_left = int(meta["budget_left"]); o.arrivals = int(meta["arrivals"]); o.c = dict(meta["c"])
+        o.births = [tuple(r) for r in meta["births"]]; o.merges = [tuple(r) for r in meta["merges"]]
+        o.edges_log = [tuple(r) for r in meta["edges_log"]]; o.prunes_log = [tuple(r) for r in meta["prunes_log"]]
+        o.refusals_by_arrival = list(meta["refusals_by_arrival"])
+        if o.state_hash() != meta["state_hash"]:
+            raise GenomeError(f"loaded organism's state_hash {o.state_hash()[:16]} is not the saved {meta['state_hash'][:16]}")
+        return o
 
     # ------------------------------------------------------------------ identity
     def state_hash(self) -> str:

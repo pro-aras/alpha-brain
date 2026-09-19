@@ -1,6 +1,7 @@
 """world.py — the rung-0 world: things drawn as 24×24 grey pictures, words as letters.
 
 edit: Claude (Fable 5.1), 2026-09-19 16:0x +04 — G0 rung 0 (docs/G0-PREREG.md §2, §10 clauses 10, 12, 14).
+edit: Claude (Fable 5.1), 2026-09-19 17:21 +0400 — G1: canvases (a 32-px rendering pasted on a 128×128 ground with three faint strokes, G1 §2); the truth (the thing's centroid cell) returned beside the canvas, never inside it.
 edit: Claude (Fable 5.1), 2026-09-19 16:37 +04 — G0b: the picture side is a parameter (32 for the sealed eye tower); «diamond», a designed near-pair to «square».
 
 The world is OUTSIDE the organism. It renders pictures, encodes words, and hands the
@@ -177,4 +178,62 @@ def assert_disjoint(dev: Sequence[Moment], held: Dict[str, List[np.ndarray]]) ->
             k += 1
             if p.tobytes() in seen:
                 raise AssertionError(f"held-out picture of {t!r} is byte-identical to a development picture")
+    return k
+
+
+# ----------------------------------------------------------------------------- canvases (G1 §2)
+CANVAS = 128
+GRID = 16
+THING_SIDE = 32
+CLUTTER_STROKES = 3
+CLUTTER_INK = 0.30
+
+Canvas = Tuple[str, np.ndarray, Dict[str, object]]     # (thing, rgb uint8 canvas×canvas×3, truth outside the organism)
+
+
+def render_canvas(thing: str, rng: np.random.Generator) -> Tuple[np.ndarray, Dict[str, object]]:
+    """G1 §2: the thing's G0b rendering at side 32 pasted with its top-left uniform in [0, CANVAS−32] px on a black
+    ground; three faint straight strokes (length 8–16, width 1, ink 0.30); noise σ 0.05 over the canvas; clipped.
+    Returns (rgb uint8 canvas, truth {top, left, centroid (cy, cx) px, cell (y, x)})."""
+    pic = render(thing, rng, THING_SIDE)
+    ty, tx = (int(v) for v in rng.integers(0, CANVAS - THING_SIDE + 1, size=2))
+    cv = np.zeros((CANVAS, CANVAS), dtype=np.float64)
+    cv[ty:ty + THING_SIDE, tx:tx + THING_SIDE] = pic
+    layer = Image.new("L", (CANVAS, CANVAS), 0); d = ImageDraw.Draw(layer)
+    for _ in range(CLUTTER_STROKES):
+        x0, y0 = rng.uniform(0, CANVAS, size=2); ang = rng.uniform(0, math.pi); L = rng.uniform(8, 16)
+        d.line([(x0, y0), (x0 + L * math.cos(ang), y0 + L * math.sin(ang))], fill=255, width=1)
+    cl = np.asarray(layer, dtype=np.float64) / 255.0 * CLUTTER_INK
+    cv = np.maximum(cv, cl)
+    cv = np.clip(cv + rng.normal(0.0, 0.05, size=cv.shape), 0.0, 1.0)
+    tot = pic.sum()
+    ys, xs = np.mgrid[0:THING_SIDE, 0:THING_SIDE]
+    cy = ty + ((ys * pic).sum() / tot if tot > 0 else THING_SIDE / 2); cx = tx + ((xs * pic).sum() / tot if tot > 0 else THING_SIDE / 2)
+    cell = (int(cy // (CANVAS / GRID)), int(cx // (CANVAS / GRID)))
+    u8 = np.clip(np.rint(cv * 255.0), 0, 255).astype(np.uint8)
+    rgb = np.repeat(u8[:, :, None], 3, axis=2)
+    return rgb, {"top": ty, "left": tx, "centroid": (float(cy), float(cx)), "cell": cell}
+
+
+def stream_canvas(things: Sequence[str], per_thing: int, rng: np.random.Generator) -> List[Canvas]:
+    rows: List[Canvas] = []
+    for t in things:
+        for _ in range(per_thing):
+            rgb, truth = render_canvas(t, rng); rows.append((t, rgb, truth))
+    order = rng.permutation(len(rows))
+    return [rows[i] for i in order]
+
+
+def holdout_canvas(things: Sequence[str], n: int, rng: np.random.Generator) -> Dict[str, List[Tuple[np.ndarray, Dict[str, object]]]]:
+    return {t: [render_canvas(t, rng) for _ in range(n)] for t in things}
+
+
+def assert_disjoint_canvas(dev: Sequence[Canvas], held: Dict[str, List[Tuple[np.ndarray, Dict[str, object]]]]) -> int:
+    seen = {rgb.tobytes() for _, rgb, _t in dev}
+    k = 0
+    for t, rows in held.items():
+        for rgb, _t in rows:
+            k += 1
+            if rgb.tobytes() in seen:
+                raise AssertionError(f"held-out canvas of {t!r} is byte-identical to a development canvas")
     return k
