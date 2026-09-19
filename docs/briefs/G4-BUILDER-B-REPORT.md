@@ -280,3 +280,190 @@ scale. Both are reported with every number, pinned so a future change is caught 
 (`expectedFailure` for MODULATION's bar; a `self.fail(...)` sentinel in SLEEP's test for if the loss ever
 does reach ≥10pp, forcing that test to be rewritten with the ceiling-relative bar rather than silently
 staying skipped). The pin never moved.
+
+# WAVE 2 — B9–B13 (docs/G4-PREREG.md §10 Amendment 2, §11)
+
+*edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 23:10 +0400. Worktree fast-forwarded to master
+`0cb21f7` (§10 Amendment 2 + §11's Wave 2 spec, merging B8), continuing on branch `g4-genes`. Same rules
+and ownership as before; the standing safety constraint held throughout: `/data/dev/genome/run` (the
+live `creature.service`, running since 22:29) was never touched, `systemctl` was never run — every test
+in this wave builds its own temporary `Organism`/genome in-process, nothing reads or writes the live
+tree. HEAD after B13: `6eb291b`. Full suite (`python3 -m unittest discover -s tests/genome -t .`):
+**`Ran 116 tests in ~70s — OK (skipped=1, expected failures=7)`**, run twice, byte-identical pass/fail
+pattern both times. **The pin held at every commit** (`test_pin_skeleton`, part of every run, unchanged:
+`d4b5c6b8d5…`).
+
+## B9 — the three parser genes (`genome/machinery.py`, `tests/genome/test_parse_g4_wave2.py`)
+Commit `b252759`. Test log (this file alone): `Ran 5 tests — OK`.
+
+Three strict `re.fullmatch` clauses added to `parse_genome`, the interface fixed for Builder A:
+`THINK every <n> canvases` → `declared["THINK"] == {"every": int}`; `EXAM every <n> canvases` →
+`declared["EXAM"] == {"every": int}`; `FROZEN after <n> cells` → `declared["FROZEN"] == {"after": int}`.
+Parsed only — nothing wired into `Organism` (`FROZEN` is a twin-only gene per §11.1 step 5;
+`Organism.__init__`'s existing `frozen_after` kwarg is untouched, read by the mind, not by the parser).
+Neither gene touches `self.c`; neither is in `required`; `G4-skeleton.genome` never declares any of the
+three, confirmed directly (`test_undeclared_means_absent`) and at full-suite scale (the pin, unchanged).
+
+## B10 — CURIOSITY (`genome/curiosity.py`, `tests/genome/test_curiosity.py`)
+Commit `9645fdc`. Test log (this file alone): `Ran 16 tests — OK`.
+
+`Interests(n, rng)`: `choose(pool, rng)` returns the highest-weight item (ties by `rng`, an unseen item
+born at weight 1.0); `update(item, outcome)` implements the four named operators — `"answered"` →
+generalize (+0.5 to every tracked item sharing that KIND, population-wide); `"parked"` → specialize
+(×0.5 on that one item); a new item whose key matches an already-known `"word"`-kind key → bridge
+(+0.25, applied at birth inside `choose`/`_weight_of`, not inside `update`); two items answered in the
+same sleep window → recombine (their weights set to the mean) — `sleep_boundary()` is a new method the
+mind calls once per SLEEP tick to close a window, so recombine only pairs answers within the SAME
+window. `"filed"`/`"scored"` carry no operator in the PREREG text and are accepted as documented no-ops
+(counted in `state()`, no weight change). `n` is read as a soft population cap (prune the lowest-weight
+entries beyond `n` after each `update`; no decay, per the PREREG). `choose_uniform(pool, rng)` is the
+free-function null twin.
+
+**The toy (§11.2), 3 seeds, a pool of 2 answerable (`"word"`-kind) + 8 park-only (`"sight"`-kind)
+items, 50 choices:**
+| seed | real (word picks/50) | null (word picks/50) | ratio |
+|---|---|---|---|
+| 9  | 46 | 7 | 6.57x |
+| 10 | 47 | 9 | 5.22x |
+| 11 | 50 | 9 | 5.56x |
+
+Pooled: real 143/150, null 25/150, ratio **5.72x** — every seed and the pooled ratio clear the ≥3x bar
+comfortably.
+
+## B11 — THINK's laws (`genome/think.py`, `tests/genome/test_think.py`)
+Commit `d98c252`. Test log (this file alone): `Ran 11 tests — OK`.
+
+`believe(word, cells, episode_ids, moment, path)` appends one row to `beliefs.jsonl` (append-only).
+`clash(new_row, old_rows, path)`: two belief rows about the SAME word with DISJOINT `"cells"` sets open
+a new `"clash"` row naming both rows' line numbers (never overwriting either); overlapping cells are not
+a clash (read as the same underlying belief, extended). `induce(episodes, k, org)`: for each word the
+organism itself resonates a word-cell for (via `org.recall`, no external ledger — the interface passes
+only `episodes`/`k`/`org`), cluster C = the alive sight cells whose strongest word edge
+(`Organism._answer_of`) IS that word cell; a rule fires when ≥k episodes' raw-nearest sight cell (by
+cosine, not RECALL's abstain-aware path) lands in C and none disagrees — returned FILE-ready.
+`deduce(beliefs)`: two DIFFERENT-word beliefs sharing a cell predict a co-resonance, routed at that
+cell; two SAME-word beliefs with DISJOINT cells (exactly `clash`'s own condition) are UNROUTABLE — no
+single cell names the route — filed with `route=""`, REFUSED BY NAME.
+
+**The three required toys, all first-try green:**
+- **induce, planted rule + counter-example:** 8 "zog" + 8 "bar" training moments (distinct sight
+  clusters), then 4 agreeing "zog" episodes → rule found (`agree=4, disagree=0, accepted=True`). A 5th
+  episode labelled "zog" but drawn from "bar"'s trained cluster → **0 rules** (the counter-example
+  blocks it, `disagree>0` refuses induction — "no counter" honored literally).
+- **clash, planted contradiction:** two "zog" beliefs, cells `[1,2]` and `[7,8]` (disjoint) →
+  `clash()` returns a row, `kind="clash"`, `clashes=[0,1]`; reading the file back shows all 3 rows —
+  both original belief rows byte-identical to what `believe()` wrote, never touched. Overlapping cells
+  (`[1,2,3]`/`[3,4]`) → `clash()` returns `None`.
+- **deduce, unroutable refused by name:** "zog"`[1,2]` + "bar"`[2,3]` (shared cell 2, different words)
+  → accepted, `route="recall(sight) at cell 2"`. "zog"`[1,2]` + "zog"`[7,8]` (disjoint, same word) →
+  **refused**, `refused=["route"]`, `row["route"]==""`.
+
+## B12 — TRAITS (`genome/traits.py`, `genome/machinery.py`'s `Area.cos`, `genome/fast.py`'s `x_s2`,
+`tests/genome/test_traits.py`)
+Commit `5d91547`. Test log (this file alone): `Ran 16 tests — OK (expected failures=2)`.
+
+`Traits(dim_in=112, dim_out=32, lr, rng)`: `H` (dim_out×dim_in) is a seeded random orthogonal
+projection at birth (QR-derived, rows orthonormal); `apply(x)` = `H@x` raw; `learn(episodes,
+steps<=20)` runs a hand-derived InfoNCE gradient (same-canvas glances near, other canvases far,
+τ=0.1 fixed) over the most recent ≤256 episodes carrying a second glance, bumping `version` once per
+call that actually stepped. `genome/fast.py`'s `Episodes.write` gained an optional `x_s2=None` +
+`has_s2` mask (save/load carry both; old saved files without them still load; nothing else reads it —
+kept out of the pin automatically, Episodes is never hashed). `genome/machinery.py`'s `Area` gained a
+`traits` attribute (`None` by default, words area never gets one — a "sight-only contrast head"
+decision, documented in `genome/traits.py`'s module docstring); `Organism.set_traits()` binds one to
+sight only; `Area.cos`'s untouched two-line path runs when `traits is None` (the pin's own path,
+byte-identical); when set, `cos(H·cell, H·x)` is computed with `H·cells` cached and invalidated by
+`(n, traits.version)`. `_misfire`/`_merge` keep reading raw dots — a documented choice, not silent.
+
+**Toy (a), 3-thing drawn world (circle/square/triangle, tower front, 40/thing):**
+RAW margin (within-median − between-p95) = **0.0091**. After ONE sleep (≤20 steps): margin **0.0691**
+(**7.6× raw** — PASSES, the mechanism works). After the PREREG's literal "5 sleeps" (5×`learn(steps=20)`
+= 100 gradient steps on the SAME 120-canvas/3-class batch): margin **−0.1161**, WORSE than raw —
+**RAISED**, `expectedFailure` (`test_bar_margin_after_5_sleeps_ge_raw_prereg_b12a`). Why, measured not
+guessed: InfoNCE's true training objective is canvas-INSTANCE discrimination (tell THIS canvas's pair
+apart from every OTHER canvas, same-thing negatives included) — at a mild dose it incidentally helps
+thing-level clustering too, but on a small (120-canvas, 3-class) batch, over-training collapses within-
+thing cohesion as the head specializes toward telling individual canvases apart. The single-sleep
+positive result is kept on the record in its own passing test
+(`test_single_sleep_clears_the_bar_by_a_wide_margin`).
+
+**Also reported, never gated (PREREG's own instruction) — the SAME toy-trained (single-sleep) head
+applied to 200 real Caltech photographs** (10 word folders under `/data/dev/genome/world/<word>/` —
+anchor/ant/barrel/bass/beaver/bonsai/brain/buddha/camera/cannon, 20 images/word; the master tree, read
+only, never written): BEFORE (raw front) margin **−0.0897** (the raw front itself already overlaps on
+real photos — within-median 0.8283, between-p95 0.9181); AFTER (toy-world-trained head) margin
+**−0.2915** — no generalization from synthetic line-drawings to real images. Both numbers on the
+record, no pass/fail asserted on their relationship.
+
+**Toy (b), the identity control.** `dim_out==dim_in==112`, `H=I`: `Area.cos` matches raw (untraited)
+cosine to float64 precision (`atol=1e-9`) — **PASSES**
+(`test_identity_control_dim_out_eq_dim_in_prereg_b12b`). The PREREG's own literal sentence — *"H = I
+(first 32 rows) reproduces raw cos exactly"* — is **RAISED**, `expectedFailure`
+(`test_first_32_rows_literal_prereg_text_cannot_reproduce_raw_cos`): measured max|diff| **0.2383**, far
+outside float precision — a 112→32 coordinate-DROPPING projection cannot reproduce a cosine that depends
+on all 112 dimensions, by construction; the clause is only true when `dim_out == dim_in`.
+
+**Toy (c), the pin control.** TRAITS undeclared → `Area.cos` byte-identical — confirmed directly
+(`test_untraited_area_cos_is_the_old_two_lines`, `test_organism_never_calling_set_traits_leaves_sight_
+traits_none`) and at full-suite scale (`test_pin_skeleton`, unchanged, run after every commit in this
+wave). PASSES.
+
+## B13 — MODULATION at arrival (`tests/genome/test_b13_modulation_arrival.py`, PREREG §10 Amendment 2)
+Commit `6eb291b`. Test log (this file alone): `Ran 5 tests — OK (expected failures=2)`.
+
+Stream: circle/square/triangle, 50 SHUFFLED/jittered showings each (150 total, the "previous window");
+then moon/house (`world.THINGS_ARRIVAL2[:2]`) interleaved, 15 showings each (30 total, the arrival); a
+no-new-things null (3 more old-thing showings ×10, 30 total); 3 seeds (9/10/11).
+
+**F and the ceiling, measured first (gate G-a's bands, this front, this world, printed beside every
+bar):** F = **0.0310** (circle/square/triangle within-median 0.9690, same reading as B8's — same front,
+same three things). Ceiling = 1 − between-p95 over all 5 things (circle/square/triangle/moon/house) =
+**0.0521** (between-p95 = 0.9479). **Ceiling (0.0521) < 3×F (0.0930)** — exactly the case the PREREG's
+own text names ("if the tower front's between-p95 makes a new thing look like an old one … the spike's
+ceiling is below 3× F"): the bar is reported against the ceiling ratio (0.0521/0.0310 = **1.68×**), not
+the literal 3×, per the PREREG's own instruction.
+
+**Measured at 3 seeds × 2 new things = 6 (seed, thing) pairs:**
+| seed | thing | spike (vs last-50 median) | vs 1.68× ceiling-ratio | e at showing 10 | settled (<F+0.05=0.0810)? |
+|---|---|---|---|---|---|
+| 9  | moon  | 1.818× | clears | 0.3601 | no |
+| 9  | house | 1.761× | clears | 0.1956 | no |
+| 10 | moon  | 2.650× | clears | 0.0549 | **yes** |
+| 10 | house | 1.971× | clears | 0.0144 | **yes** |
+| 11 | moon  | 0.595× | **misses** | 0.0793 | yes (barely) |
+| 11 | house | 2.415× | clears | 0.2821 | no |
+
+- **spike ≥ ceiling-ratio (1.68×): 5/6 — a majority — PASSES**
+  (`test_spike_vs_ceiling_majority_clears`). None of the 6 pairs reach the literal 3× (max 2.65×),
+  confirming the PREREG's own prediction that the ceiling, not 3×, is this front's real bar.
+- **settle (<F+0.05 by the thing's 10th showing): EXACTLY 3/6 — a TIE, not a majority — RAISED**,
+  `expectedFailure` (`test_settle_under_F_plus_005_within_10_showings`).
+- **the PREREG's own conjunctive bar (spike-vs-ceiling AND settle): 2/6 (seed 10's two new things
+  only) — not a majority — RAISED**, `expectedFailure` (`test_conjunctive_bar_prereg_b13`).
+- **no-new-things null (<1.5×), at 3 seeds:** seed 9 **1.674×** (misses), seed 10 1.131× (clears),
+  seed 11 0.557× (clears). **2/3 — a majority — PASSES**
+  (`test_null_majority_under_1_5x`). Seed 9's own miss shows the shuffled-old-things baseline is itself
+  noisy enough to occasionally read as its own "spike" with no arrival at all — the same noise that
+  makes the settle/conjunctive bars hard to clear on a toy this small (6 trials).
+
+Stream design decision (documented in the module docstring): the old-things phase is fully SHUFFLED
+(not per-thing blocks), so "the previous window's last-50 median" already reflects the ordinary noise of
+a mind that keeps mispredicting whenever the stream switches thing-identity mid-window — a genuine
+arrival then has to stand out above THAT baseline, not above an artificially clean F.
+
+## WAVE 2 summary
+All three new genes parse and stay pin-safe (B9). CURIOSITY's toy clears its bar cleanly at every seed
+(B10, 5.2–6.6× vs the ≥3× bar). THINK's three required toys all pass first-try, with genuine planted
+positives and negatives (B11). TRAITS (B12) is a real, working mechanism — the identity control passes
+exactly, and a single sleep lifts the toy-world margin 7.6× — but the PREREG's literal "5 sleeps" and
+literal "first 32 rows" clauses are both RAISED with measured, non-trivial evidence (the first an
+honest overfitting finding on a small toy, the second a dimensional impossibility the PREREG's own text
+cannot satisfy for dim_out<dim_in); the photograph report shows no generalization from drawn shapes to
+real images, recorded without gating. B13's re-specified MODULATION mark partially clears (the
+spike-vs-ceiling and no-new-things-null components each pass their own bar on a majority of seeds) but
+the settle requirement and the PREREG's own conjunctive "AND" do not reach majority on this small
+(6-trial) toy — both RAISED with every number. Nothing here was forced, tuned after the fact, or
+silently rounded toward a pass; every RAISED clause carries its measured numbers in the test's own
+docstring so a later change is judged against the same evidence. The pin (`d4b5c6b8d5…`) held at every
+single commit across all five tasks, confirmed by two full, byte-identical suite runs at HEAD
+(`6eb291b`): **`Ran 116 tests in ~70s — OK (skipped=1, expected failures=7)`**.
