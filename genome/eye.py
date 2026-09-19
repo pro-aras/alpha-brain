@@ -1,5 +1,8 @@
-"""eye.py — THE EYE GENE: Alpha 3's sealed eye tower, loaded from its seal and run in numpy.
+"""eye.py — THE EYE GENE: a sealed eye tower, loaded from its seal and run in numpy.
 
+edit: Claude (Fable 5.1), 2026-09-19 18:10 +0400 — G2 (docs/G2-EYE-PREREG.md §1): the forward reads the seal's LAYER LIST (`arch`, `input_side`);
+a seal without one is the glyph tower's shape (conv 8@5 → max2 → conv 7@3 → mean4 at 32 px), so `eye-tower-g2` replays
+byte-identical (the eye parity gate of run_g0 and pin_g1 (1) rerun). Towers are looked up in the estate's judge/ and the genome's own judge/.
 edit: Claude (Fable 5.1), 2026-09-19 16:4x +04 — G0b (docs/G0b-PREREG.md, gene EYE), on Ahmad's 16:27
 «You didn't put all the advancements from all the builds we had. Why?» and his 16:33 «Ok go».
 
@@ -19,12 +22,27 @@ import hashlib
 import json
 import struct
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 
 DEFAULT_DIR = Path("/data/dev/alpha3/judge/eye-tower-g2")
-KIN, K1, K2, POOL = 32, 5, 3, 4
+JUDGE_DIRS = [Path("/data/dev/alpha3/judge"), Path(__file__).resolve().parent.parent / "judge"]
+DEFAULT_ARCH = [{"type": "conv", "f": 8, "k": 5}, {"type": "max", "p": 2}, {"type": "conv", "f": 7, "k": 3}, {"type": "mean", "p": 4}]
+
+
+def read_tower_bin(raw: bytes, names: List[str]) -> Dict[str, np.ndarray]:
+    if raw[:6] != b"A3EYE1":
+        raise RuntimeError("eye tower refused: wrong magic")
+    at = 8; arrays = {}
+    for name in names:
+        (ndim,) = struct.unpack_from("<i", raw, at); at += 4
+        shape = []
+        for _ in range(ndim):
+            (dd,) = struct.unpack_from("<i", raw, at); at += 4; shape.append(dd)
+        n = int(np.prod(shape))
+        arrays[name] = np.frombuffer(raw, dtype="<f4", count=n, offset=at).reshape(shape).copy(); at += 4 * n
+    return arrays
 
 
 class EyeTower:
@@ -35,53 +53,55 @@ class EyeTower:
         self.sha = hashlib.sha256(raw).hexdigest()
         if self.sha != self.seal["tower_bin_sha256"]:
             raise RuntimeError(f"eye tower refused: tower.bin sha256 {self.sha[:16]}… is not the seal's {str(self.seal['tower_bin_sha256'])[:16]}…")
-        if raw[:6] != b"A3EYE1":
-            raise RuntimeError("eye tower refused: wrong magic")
-        at = 8                                  # 6-byte magic + 2 bytes, as the C++ loader reads it
-        arrays = {}
-        for name in ("W1", "b1", "W2", "b2", "Wh", "bh"):
-            (ndim,) = struct.unpack_from("<i", raw, at); at += 4
-            shape = []
-            for _ in range(ndim):
-                (dd,) = struct.unpack_from("<i", raw, at); at += 4; shape.append(dd)
-            n = int(np.prod(shape))
-            arrays[name] = np.frombuffer(raw, dtype="<f4", count=n, offset=at).reshape(shape).copy(); at += 4 * n
-            if list(shape) != list(self.seal["shapes"][name]):
-                raise RuntimeError(f"eye tower refused: {name} shape {shape} is not the seal's {self.seal['shapes'][name]}")
-        self.W1 = arrays["W1"]; self.b1 = arrays["b1"]; self.W2 = arrays["W2"]; self.b2 = arrays["b2"]
-        self.f1, self.f2 = int(self.W1.shape[0]), int(self.W2.shape[0])
-        self.n_feat = self.f2 * (KIN // 2 // POOL) ** 2
+        names = list(self.seal.get("arrays") or ("W1", "b1", "W2", "b2", "Wh", "bh"))
+        arrays = read_tower_bin(raw, names)
+        for name in names:
+            if list(arrays[name].shape) != list(self.seal["shapes"][name]):
+                raise RuntimeError(f"eye tower refused: {name} shape {list(arrays[name].shape)} is not the seal's {self.seal['shapes'][name]}")
+        self.arch: List[Dict[str, object]] = list(self.seal.get("arch") or DEFAULT_ARCH)
+        self.side = int(self.seal.get("input_side", 32))
+        self.convs: List[Tuple[np.ndarray, np.ndarray, int]] = []
+        i = 0
+        for layer in self.arch:
+            if layer["type"] == "conv":
+                i += 1; self.convs.append((arrays[f"W{i}"], arrays[f"b{i}"], int(layer["k"])))
+        side = self.side; f = 1
+        for layer in self.arch:
+            if layer["type"] == "conv": f = int(layer["f"])
+            else: side //= int(layer["p"])
+        self.n_feat = f * side * side
+        self.f1, self.f2 = int(self.convs[0][0].shape[0]), int(self.convs[-1][0].shape[0])
+
+    @staticmethod
+    def _conv(x: np.ndarray, W: np.ndarray, b: np.ndarray, k: int) -> np.ndarray:
+        """x (H, W, C) float32 → ReLU(conv) (H, W, F); pad k//2; column order (channel, ky, kx) as the C++ organ reads it."""
+        H, Wd, C = x.shape; p = k // 2
+        xp = np.zeros((H + 2 * p, Wd + 2 * p, C), dtype=np.float32); xp[p:p + H, p:p + Wd, :] = x
+        cols = np.empty((H * Wd, C * k * k), dtype=np.float32); i = 0
+        for c in range(C):
+            for ky in range(k):
+                for kx in range(k):
+                    cols[:, i] = xp[ky:ky + H, kx:kx + Wd, c].reshape(-1); i += 1
+        a = cols @ W.T + b
+        return np.maximum(a, np.float32(0.0)).reshape(H, Wd, W.shape[0])
 
     def features(self, frame_u8: np.ndarray) -> np.ndarray:
-        """frame: 32×32 uint8, ink high. Returns n_feat float32 features, the tower's own arithmetic."""
-        assert frame_u8.shape == (KIN, KIN) and frame_u8.dtype == np.uint8
-        x = frame_u8.astype(np.float32) / np.float32(255.0)
-        xp = np.zeros((KIN + 4, KIN + 4), dtype=np.float32); xp[2:-2, 2:-2] = x
-        # conv1: F1 @ 5x5, pad 2, via im2col in the C++ order (ky, kx)
-        cols = np.empty((KIN * KIN, K1 * K1), dtype=np.float32)
-        i = 0
-        for ky in range(K1):
-            for kx in range(K1):
-                cols[:, i] = xp[ky:ky + KIN, kx:kx + KIN].reshape(-1); i += 1
-        a1 = cols @ self.W1.T + self.b1                       # (1024, F1)
-        a1 = np.maximum(a1, np.float32(0.0)).reshape(KIN, KIN, self.f1)
-        # 2x2 max-pool -> (16, 16, F1)
-        h2 = KIN // 2
-        p = a1.reshape(h2, 2, h2, 2, self.f1).max(axis=(1, 3))
-        pp = np.zeros((h2 + 2, h2 + 2, self.f1), dtype=np.float32); pp[1:-1, 1:-1, :] = p
-        # conv2: F2 @ 3x3 over F1 channels, pad 1; column order (channel, ky, kx) as the C++ reads W2
-        cols2 = np.empty((h2 * h2, self.f1 * K2 * K2), dtype=np.float32)
-        i = 0
-        for c in range(self.f1):
-            for ky in range(K2):
-                for kx in range(K2):
-                    cols2[:, i] = pp[ky:ky + h2, kx:kx + h2, c].reshape(-1); i += 1
-        a2 = cols2 @ self.W2.T + self.b2                      # (256, F2)
-        a2 = np.maximum(a2, np.float32(0.0)).reshape(h2, h2, self.f2)
-        # 4x4 mean pool -> (4, 4, F2), flattened as (py*4 + px)*F2 + g
-        h3 = h2 // POOL
-        out = a2.reshape(h3, POOL, h3, POOL, self.f2).mean(axis=(1, 3)).reshape(-1)
-        return out.astype(np.float32)
+        """frame: side×side uint8, ink high. Returns n_feat float32 features, the tower's own arithmetic."""
+        assert frame_u8.shape == (self.side, self.side) and frame_u8.dtype == np.uint8
+        x = (frame_u8.astype(np.float32) / np.float32(255.0))[:, :, None]
+        ci = 0
+        for layer in self.arch:
+            if layer["type"] == "conv":
+                W, b, k = self.convs[ci]; ci += 1; x = self._conv(x, W, b, k)
+            elif layer["type"] == "max":
+                p = int(layer["p"]); H, Wd, C = x.shape
+                x = x.reshape(H // p, p, Wd // p, p, C).max(axis=(1, 3))
+            elif layer["type"] == "mean":
+                p = int(layer["p"]); H, Wd, C = x.shape
+                x = x.reshape(H // p, p, Wd // p, p, C).mean(axis=(1, 3))
+            else:
+                raise RuntimeError(f"eye tower: unknown layer {layer}")
+        return x.reshape(-1).astype(np.float32)          # (py*w + px)*F + g
 
 
 _CACHE: Dict[str, EyeTower] = {}
@@ -89,5 +109,9 @@ _CACHE: Dict[str, EyeTower] = {}
 
 def tower(name: str = "eye-tower-g2") -> EyeTower:
     if name not in _CACHE:
-        _CACHE[name] = EyeTower(DEFAULT_DIR.parent / name)
+        for root in JUDGE_DIRS:
+            if (root / name / "SEAL.json").exists():
+                _CACHE[name] = EyeTower(root / name); break
+        else:
+            raise RuntimeError(f"eye tower {name!r} not found under {[str(r) for r in JUDGE_DIRS]}")
     return _CACHE[name]

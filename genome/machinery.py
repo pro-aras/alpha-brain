@@ -1,5 +1,6 @@
 """machinery.py — the ribosome: reads a genome text and runs an organism by it.
 
+edit: Claude (Fable 5.1), 2026-09-19 18:10 +0400 — G2: the tower step asserts the tower's OWN input side (64 for the photograph eye).
 edit: Claude (Fable 5.1), 2026-09-19 16:0x +04 — G0 rung 0 (docs/G0-PREREG.md §1, §10).
 edit: Claude (Fable 5.1), 2026-09-19 16:09 +04 — §11: the retina as a list of fixed steps (gate G-a's finding); winners must resonate.
 edit: Claude (Fable 5.1), 2026-09-19 16:37 +04 — G0b: RETINA step tower:<sealed eye>; any square picture; every edge's birth and pruning logged by cell ids (no labels).
@@ -226,7 +227,7 @@ def retina(pic: np.ndarray, spec: Tuple[str, ...] = ("thresh0.25", "centre", "bl
         if step.startswith("tower:"):
             from .eye import tower as _tower
             t = _tower(step[6:])
-            assert pic.shape == (32, 32), "the sealed eye tower reads 32×32 frames (SENSE eye 32x32 grey)"
+            assert pic.shape == (t.side, t.side), f"the sealed eye tower {step[6:]} reads {t.side}×{t.side} frames (SENSE eye {t.side}x{t.side} grey)"
             frame = np.clip(np.rint(q * 255.0), 0, 255).astype(np.uint8)   # q: after the steps before it (thresh, centre)
             feats.append(_unit(t.features(frame).astype(np.float64)))
         elif step.startswith("thresh"):
