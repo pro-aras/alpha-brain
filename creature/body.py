@@ -21,6 +21,7 @@ import time
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
+from . import ask as ask_module
 from .mind import Mind
 from .tape import Tape, now_iso, read_tape
 
@@ -99,6 +100,7 @@ class Body:
         self.mind: Optional[Mind] = None
         self._mind_thread: Optional[threading.Thread] = None
         self._status_thread: Optional[threading.Thread] = None
+        self._ask_thread: Optional[threading.Thread] = None
         self._started = False
         self._stopped = False
 
@@ -145,6 +147,9 @@ class Body:
         self._mind_thread.start()
         self._status_thread = threading.Thread(target=self._status_loop, name="status", daemon=True)
         self._status_thread.start()
+        self._ask_thread = threading.Thread(target=ask_module.inbox_loop, args=(self.root, self.stop_event),
+                                             kwargs={"poll_period": 1.0}, name="ask", daemon=True)
+        self._ask_thread.start()
         for st in self.sense_threads:
             st.start()
         self._started = True
@@ -230,6 +235,8 @@ class Body:
             st.join(timeout=5.0)
         if self._mind_thread is not None:
             self._mind_thread.join(timeout=5.0)
+        if self._ask_thread is not None:
+            self._ask_thread.join(timeout=5.0)
         if self.mind is not None:
             prev_snap = self.mind.snapshot_count
             self.mind.close()
