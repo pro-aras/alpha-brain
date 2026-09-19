@@ -489,6 +489,19 @@ class Organism:
         None -> Area.cos's untouched two-line path -> the pin (test_pin_skeleton.py) is unaffected."""
         self.sight.traits = traits
 
+    @property
+    def traits(self):
+        """The coordinator's fixed interface names this `org.traits` (not `org.sight.traits`) — Builder
+        A's mind code reads/writes it under that exact name. A plain `self.traits = t` attribute would
+        shadow this property and silently leave `self.sight.traits` (what Area.cos actually reads) at
+        None — TRAITS would then be a no-op with every other link green (#180's class). This property
+        is the single source of truth; `set_traits()` above is kept as an equivalent explicit method."""
+        return self.sight.traits
+
+    @traits.setter
+    def traits(self, t) -> None:
+        self.sight.traits = t
+
     # ------------------------------------------------------------------ births
     def _birth(self, area: Area, x: np.ndarray, reason: str) -> Optional[int]:
         if self.frozen_after is not None and (self.sight.n + self.words.n) >= self.frozen_after:

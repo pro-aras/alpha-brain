@@ -288,8 +288,11 @@ staying skipped). The pin never moved.
 and ownership as before; the standing safety constraint held throughout: `/data/dev/genome/run` (the
 live `creature.service`, running since 22:29) was never touched, `systemctl` was never run — every test
 in this wave builds its own temporary `Organism`/genome in-process, nothing reads or writes the live
-tree. HEAD after B13: `6eb291b`. Full suite (`python3 -m unittest discover -s tests/genome -t .`):
-**`Ran 116 tests in ~70s — OK (skipped=1, expected failures=7)`**, run twice, byte-identical pass/fail
+tree. HEAD after B13: `6eb291b`; HEAD after a first post-review fix pass (org.traits property, B13
+decontamination): `b001009`; HEAD after a SECOND advisor pass (two more B13 framing defects, one
+untested TRAITS/THETA_N interaction), including this report: `51c434b`. Full suite
+(`python3 -m unittest discover -s tests/genome -t .`) at `51c434b`:
+**`Ran 124 tests in ~120s — OK (skipped=1, expected failures=9)`**, run twice, byte-identical pass/fail
 pattern both times. **The pin held at every commit** (`test_pin_skeleton`, part of every run, unchanged:
 `d4b5c6b8d5…`).
 
@@ -360,7 +363,8 @@ single cell names the route — filed with `route=""`, REFUSED BY NAME.
 
 ## B12 — TRAITS (`genome/traits.py`, `genome/machinery.py`'s `Area.cos`, `genome/fast.py`'s `x_s2`,
 `tests/genome/test_traits.py`)
-Commit `5d91547`. Test log (this file alone): `Ran 16 tests — OK (expected failures=2)`.
+Commit `5d91547` (+ the `org.traits` property fix, `b001009`; + the THETA_N interaction test, this
+pass). Test log (this file alone, current): `Ran 20 tests — OK (expected failures=2)`.
 
 `Traits(dim_in=112, dim_out=32, lr, rng)`: `H` (dim_out×dim_in) is a seeded random orthogonal
 projection at birth (QR-derived, rows orthonormal); `apply(x)` = `H@x` raw; `learn(episodes,
@@ -370,9 +374,15 @@ call that actually stepped. `genome/fast.py`'s `Episodes.write` gained an option
 `has_s2` mask (save/load carry both; old saved files without them still load; nothing else reads it —
 kept out of the pin automatically, Episodes is never hashed). `genome/machinery.py`'s `Area` gained a
 `traits` attribute (`None` by default, words area never gets one — a "sight-only contrast head"
-decision, documented in `genome/traits.py`'s module docstring); `Organism.set_traits()` binds one to
-sight only; `Area.cos`'s untouched two-line path runs when `traits is None` (the pin's own path,
-byte-identical); when set, `cos(H·cell, H·x)` is computed with `H·cells` cached and invalidated by
+decision, documented in `genome/traits.py`'s module docstring); `Organism` exposes this as a `traits`
+**property** (getter/setter reaching `self.sight.traits`, not just a `set_traits()` method) —
+**an advisor review caught that the coordinator's fixed interface names it `org.traits` verbatim, and
+Builder A codes against that exact name in parallel; without the property, `org.traits = t` would have
+silently created a dead plain attribute while `Area.cos` kept reading the untouched `None` off
+`self.sight.traits` — TRAITS would have been a live no-op with every other link green.** Fixed same
+commit (`b001009`), 3 new tests confirm `org.traits`/`org.set_traits()`/`org.sight.traits` are all one
+fact. `Area.cos`'s untouched two-line path runs when `traits is None` (the pin's own path, byte-
+identical); when set, `cos(H·cell, H·x)` is computed with `H·cells` cached and invalidated by
 `(n, traits.version)`. `_misfire`/`_merge` keep reading raw dots — a documented choice, not silent.
 
 **Toy (a), 3-thing drawn world (circle/square/triangle, tower front, 40/thing):**
@@ -409,47 +419,111 @@ traits_none`) and at full-suite scale (`test_pin_skeleton`, unchanged, run after
 wave). PASSES.
 
 ## B13 — MODULATION at arrival (`tests/genome/test_b13_modulation_arrival.py`, PREREG §10 Amendment 2)
-Commit `6eb291b`. Test log (this file alone): `Ran 5 tests — OK (expected failures=2)`.
+Commit `6eb291b`, revised at `b001009` (two instrument defects, below) and again in this pass (a second
+advisor review caught two FRAMING defects on top of those — also below). Test log (this file alone,
+current): `Ran 9 tests — OK (expected failures=4)`.
 
 Stream: circle/square/triangle, 50 SHUFFLED/jittered showings each (150 total, the "previous window");
 then moon/house (`world.THINGS_ARRIVAL2[:2]`) interleaved, 15 showings each (30 total, the arrival); a
 no-new-things null (3 more old-thing showings ×10, 30 total); 3 seeds (9/10/11).
 
+**Two defects an advisor review found in the first version, both fixed:**
+1. *Null-arm contamination.* The null arm was originally fed the SAME `(Organism, Predictor)` as the
+   real arm, AFTER the real arm's window had already shown moon/house — its predictor's "last winner"
+   was a new-thing cell going into the null window, an artifact, not a clean "no new things" measurement.
+   **Fixed:** the null arm now runs on its own fresh `(Organism, Predictor)` pair, fed the IDENTICAL w1
+   stream (deterministic replay) before `w2_null` — a new test
+   (`test_baselines_are_byte_identical_across_the_two_arms`) asserts the two arms' last-50 medians match
+   exactly, at every seed. The null numbers moved (below); the real arm's spike/settle numbers did NOT
+   move (they were never contaminated — the real arm ran first in the original code too).
+2. *The wrong ceiling.* The first version computed the ceiling as `1 − between-p95` pooled over ALL
+   FIVE things' pairwise combinations — dominated by whichever pair reads highest whether or not it
+   involves a new thing at all. **Fixed** to the PREREG's own two-part instruction: `ceiling_bands` =
+   `1 − ` the WORST (highest) p95 among OLD-vs-NEW pairs only (never old-old or new-new); `ceiling_direct`
+   = the PREREG's literal per-instance definition, measured LIVE at each new thing's actual arrival
+   (`1 − max(cos to every currently-alive sight cell)`, captured before that showing can birth/wire
+   anything). Both printed beside F; the bar itself uses `ceiling_bands`, per the PREREG's literal
+   "printed from the gate's bands" wording.
+
+**Two more defects a second advisor review found in the numbers above, both fixed:**
+3. *A pooled ceiling applied to both new things alike.* The PREREG's relaxation is CONDITIONAL, per new
+   thing — "if the tower front's between-p95 makes **A NEW THING** look like an old one … reported
+   against THAT ceiling" — not one shared number. Moon's OWN worst old-vs-new p95 (0.8181, its own trio
+   of pairs) gives `ceiling_moon`/F = 5.9× > 3×: the relaxation does NOT apply to moon, whose bar is the
+   LITERAL 3×. House's own worst pair (0.9515) gives 1.56× < 3×: the relaxation DOES apply to house.
+   **Fixed:** the pooled reading is kept as one named test (a legitimate single-number summary), and a
+   PER-THING test is added as the literal reading (below) — this is the one that should govern.
+4. *The null bar had no "majority" clause to lean on.* §10's own word is "must show no such spike
+   (< 1.5×)" — unlike B8's MODULATION null, which Amendment 1 explicitly said to read by majority, §10
+   says nothing of the kind here. **Fixed:** a literal "all 3 seeds" test is added alongside the
+   majority-reading test, which is now labelled as this file's own added leniency, not the PREREG's.
+
 **F and the ceiling, measured first (gate G-a's bands, this front, this world, printed beside every
-bar):** F = **0.0310** (circle/square/triangle within-median 0.9690, same reading as B8's — same front,
-same three things). Ceiling = 1 − between-p95 over all 5 things (circle/square/triangle/moon/house) =
-**0.0521** (between-p95 = 0.9479). **Ceiling (0.0521) < 3×F (0.0930)** — exactly the case the PREREG's
-own text names ("if the tower front's between-p95 makes a new thing look like an old one … the spike's
-ceiling is below 3× F"): the bar is reported against the ceiling ratio (0.0521/0.0310 = **1.68×**), not
-the literal 3×, per the PREREG's own instruction.
+bar):** F = **0.0310** (circle/square/triangle within-median 0.9690, same reading as B8's). Old-vs-new
+pair p95s: circle/moon 0.7263, circle/house 0.9514, square/moon 0.7428, square/house **0.9515** (the
+pooled worst), triangle/moon 0.8181 (moon's OWN worst), triangle/house 0.9169. Pooled `ceiling_bands` =
+1 − 0.9515 = **0.0485** (ratio 1.56×). Per-thing: `ceiling_house` = 0.0485 (ratio 1.56× — under 3×, the
+relaxation applies); `ceiling_moon` = 1 − 0.8181 = **0.1819** (ratio **5.9× > 3×** — the relaxation does
+NOT apply to moon; its bar is the literal 3×). **`ceiling_direct`, measured live at each new thing's
+actual arrival, confirms this split**: moon reads **0.195/0.252/0.217** across the three seeds (matches
+`ceiling_moon`'s order of magnitude, well above 3×F), house reads **0.067/0.053/0.056** (tracks
+`ceiling_bands`/`ceiling_house` closely — asserted, not just printed, in
+`test_ceiling_direct_is_thing_specific`).
 
-**Measured at 3 seeds × 2 new things = 6 (seed, thing) pairs:**
-| seed | thing | spike (vs last-50 median) | vs 1.68× ceiling-ratio | e at showing 10 | settled (<F+0.05=0.0810)? |
-|---|---|---|---|---|---|
-| 9  | moon  | 1.818× | clears | 0.3601 | no |
-| 9  | house | 1.761× | clears | 0.1956 | no |
-| 10 | moon  | 2.650× | clears | 0.0549 | **yes** |
-| 10 | house | 1.971× | clears | 0.0144 | **yes** |
-| 11 | moon  | 0.595× | **misses** | 0.0793 | yes (barely) |
-| 11 | house | 2.415× | clears | 0.2821 | no |
+**Measured at 3 seeds × 2 new things = 6 (seed, thing) pairs (real-arm numbers unchanged by any fix):**
+| seed | thing | spike (vs last-50 median) | vs POOLED 1.56× | vs PER-THING bar | e at showing 10 | settled (<0.0810)? |
+|---|---|---|---|---|---|---|
+| 9  | moon  | 1.818× | clears | **misses (bar 3.0×)** | 0.3601 | no |
+| 9  | house | 1.761× | clears | clears (bar 1.56×) | 0.1956 | no |
+| 10 | moon  | 2.650× | clears | **misses (bar 3.0×)** | 0.0549 | **yes** |
+| 10 | house | 1.971× | clears | clears (bar 1.56×) | 0.0144 | **yes** |
+| 11 | moon  | 0.595× | misses | **misses (bar 3.0×)** | 0.0793 | yes (barely) |
+| 11 | house | 2.415× | clears | clears (bar 1.56×) | 0.2821 | no |
 
-- **spike ≥ ceiling-ratio (1.68×): 5/6 — a majority — PASSES**
-  (`test_spike_vs_ceiling_majority_clears`). None of the 6 pairs reach the literal 3× (max 2.65×),
-  confirming the PREREG's own prediction that the ceiling, not 3×, is this front's real bar.
+- **spike ≥ POOLED ceiling-ratio (1.56×, one number for both new things): 5/6 — a majority — PASSES**
+  (`test_spike_vs_pooled_worst_case_ceiling_majority_clears`) — a legitimate single-number summary, kept
+  on the record, but not the PREREG's actual conditional.
+- **spike ≥ PER-THING ceiling (moon's own bar 3.0× literal, house's own bar 1.56×) — the PREREG's actual
+  conditional: moon 0/3, house 3/3, combined 3/6 — a TIE, not a majority — RAISED**, `expectedFailure`
+  (`test_spike_vs_per_thing_ceiling_prereg_conditional`) — **this is the reading that should govern the
+  live life.**
 - **settle (<F+0.05 by the thing's 10th showing): EXACTLY 3/6 — a TIE, not a majority — RAISED**,
   `expectedFailure` (`test_settle_under_F_plus_005_within_10_showings`).
-- **the PREREG's own conjunctive bar (spike-vs-ceiling AND settle): 2/6 (seed 10's two new things
-  only) — not a majority — RAISED**, `expectedFailure` (`test_conjunctive_bar_prereg_b13`).
-- **no-new-things null (<1.5×), at 3 seeds:** seed 9 **1.674×** (misses), seed 10 1.131× (clears),
-  seed 11 0.557× (clears). **2/3 — a majority — PASSES**
-  (`test_null_majority_under_1_5x`). Seed 9's own miss shows the shuffled-old-things baseline is itself
-  noisy enough to occasionally read as its own "spike" with no arrival at all — the same noise that
-  makes the settle/conjunctive bars hard to clear on a toy this small (6 trials).
+- **the PREREG's own conjunctive bar (PER-THING spike AND settle): moon 0/3 (never clears its own 3.0×
+  bar, so its conjunction is 0 regardless of settle), house 1/3 (clears spike every time, settles only
+  at seed 10) — combined 1/6 — RAISED**, `expectedFailure` (`test_conjunctive_bar_prereg_b13`).
+- **no-new-things null, MAJORITY reading (<1.5×, a leniency this file adds — §10 states no such
+  clause): seed 9 1.547× (misses, barely — just above 1.5), seed 10 0.516× (clears), seed 11 0.752×
+  (clears). 2/3 — PASSES** (`test_null_majority_under_1_5x`).
+- **no-new-things null, LITERAL reading ("must show no such spike (< 1.5×)", every seed): 2/3 is not
+  "no spike, ever" — seed 9 MISSES — RAISED**, `expectedFailure` (`test_null_all_seeds_under_1_5x_
+  literal_must`). Paired against that same seed's real arm (comparing matched pairs, not two unpaired
+  numbers): seed 9's real spikes (moon 1.818×, house 1.761×) sit within 0.3× of that SAME seed's own
+  null (1.547×) — its arrival is barely distinguishable from no arrival at all. At seed 11, moon's real
+  spike (0.595×) reads BELOW that seed's own null (0.752×) — the "new" thing spiked LESS than the "no
+  new things" control did.
 
-Stream design decision (documented in the module docstring): the old-things phase is fully SHUFFLED
-(not per-thing blocks), so "the previous window's last-50 median" already reflects the ordinary noise of
-a mind that keeps mispredicting whenever the stream switches thing-identity mid-window — a genuine
-arrival then has to stand out above THAT baseline, not above an artificially clean F.
+These null numbers are unchanged from the decontamination fix earlier in this pass (seed 9
+**1.547×** misses, barely — just above 1.5; seed 10 **0.516×** clears; seed 11 **0.752×** clears) — they
+moved once, from the contaminated first version (1.674/1.131/0.557), and seed 9's miss PERSISTED through
+that fix, confirming it is genuine baseline noise, not a contamination artifact.
+
+**Net effect of both review passes: only two readings clear a majority unqualified** (the pooled, not
+per-thing, ceiling reading; and the null under a majority, not literal, reading). **Every literal PREREG
+bar on this toy — the per-thing ceiling (the PREREG's actual conditional), the settle requirement, the
+conjunction, and the null's literal "must" — misses**, each RAISED with its numbers on the record.
+
+**Stream design decision, and its consequence, owned rather than hidden (module docstring has the
+full paragraph):** the old-things phase is fully SHUFFLED (not per-thing blocks), so "the previous
+window's last-50 median" reflects the ordinary noise of a mind that keeps mispredicting whenever the
+stream switches thing-identity mid-window — last50_med reads ~0.09–0.11 (≈3×F) under this choice. Under
+a BLOCKED old-things phase instead (same-thing runs, as B8's toy used), last50_med would sit near F
+(B8 measured 0.043–0.048 under blocking on this exact front/world), and the SAME new-thing first-3
+errors (~0.18–0.24, independent of window-1 ordering) would read roughly 4–6× that baseline instead of
+~2×. **This was NOT re-run under blocking to chase a cleaner number — that would be config-shopping.**
+The finding to carry forward: the spike verdict is sensitive to the window-1 ordering rule, which
+belongs to Builder A's `world_maker.py` (the maker schedules real arrivals) — the PREREG should say
+which ordering the live maker uses before this mark is read off the live 24h life.
 
 ## WAVE 2 summary
 All three new genes parse and stay pin-safe (B9). CURIOSITY's toy clears its bar cleanly at every seed
@@ -459,11 +533,54 @@ exactly, and a single sleep lifts the toy-world margin 7.6× — but the PREREG'
 literal "first 32 rows" clauses are both RAISED with measured, non-trivial evidence (the first an
 honest overfitting finding on a small toy, the second a dimensional impossibility the PREREG's own text
 cannot satisfy for dim_out<dim_in); the photograph report shows no generalization from drawn shapes to
-real images, recorded without gating. B13's re-specified MODULATION mark partially clears (the
-spike-vs-ceiling and no-new-things-null components each pass their own bar on a majority of seeds) but
-the settle requirement and the PREREG's own conjunctive "AND" do not reach majority on this small
-(6-trial) toy — both RAISED with every number. Nothing here was forced, tuned after the fact, or
-silently rounded toward a pass; every RAISED clause carries its measured numbers in the test's own
-docstring so a later change is judged against the same evidence. The pin (`d4b5c6b8d5…`) held at every
-single commit across all five tasks, confirmed by two full, byte-identical suite runs at HEAD
-(`6eb291b`): **`Ran 116 tests in ~70s — OK (skipped=1, expected failures=7)`**.
+real images, recorded without gating; and a fourth, previously-untested finding (coordinator note #4
+below) shows a single sleep's `learn()` can drag a well-resonating cell's projected cosine below
+THETA_N, turning `recall()` "novel" where the raw front answered cleanly. B13's re-specified MODULATION
+mark went through TWO rounds of advisor-caught corrections — a contaminated null and a mis-scoped
+pooled ceiling in the first pass, then a ceiling applied uniformly across two things with very different
+true ceilings and an unwarranted "majority" reading of a null the PREREG states as a flat "must" in the
+second — and after both fixes, only two readings clear a majority unqualified (the pooled-ceiling spike
+reading, and the null under a majority, not literal, reading); every genuinely LITERAL PREREG bar on
+this toy (the per-thing ceiling — the PREREG's actual conditional — the settle requirement, the
+conjunction, and the null's literal "must") misses, each RAISED with full numbers. Nothing here was
+forced, tuned after the fact, or silently rounded toward a pass; every RAISED clause carries its
+measured numbers in the test's own docstring so a later change is judged against the same evidence. The
+pin (`d4b5c6b8d5…`) held at every single commit across all five tasks and both review passes, confirmed
+by two full, byte-identical suite runs at HEAD: **`Ran 124 tests in ~120s — OK (skipped=1,
+expected failures=9)`**.
+
+## Five notes for the coordinator (not fixed here — outside this wave's interface, or another
+builder's territory; flagged rather than silently left)
+1. **A single `learn()` call can push `recall()` to "novel" where the raw front resonates cleanly**
+   (`tests/genome/test_traits.py::TestTraitsBreaksTheta`, an advisor-flagged gap none of the three
+   required toys exercised — they measure the MARGIN, a difference of cosines, never the LEVEL against
+   the live thresholds). THETA_N=0.955/THETA_M=0.9975 (`G4-skeleton.genome`) were calibrated by gate G-a
+   on RAW cosines. Measured: after ~50 warm-up moments on 3 things, a held-out feature of an already-
+   well-learned thing reads raw cos **0.964** (resonates cleanly, well above THETA_N). Attaching a
+   freshly-initialized `Traits` head (random orthogonal `H`) barely moves it (projected cos **0.965**
+   — orthogonal rows nearly preserve cosine at init, as expected). After ONE `learn(steps=20)` call, the
+   SAME held-out feature's projected cosine to its nearest alive cell drops to **0.701** — well below
+   THETA_N — so `_lit` returns nothing and `recall()` reads **"novel"**. If this happens in the live
+   life, the FIRST sleep that runs `traits.learn()` would make every subsequent moment birth rather than
+   resonate (`BIRTH novelty cos<0.955`) until gate G-a's thresholds are somehow re-derived in projected
+   space, or the head is scale-constrained. This is the coordinator's call, not this builder's interface
+   (TRAITS's three named functions were `learn`/`apply`/`H` only) — flagged with the exact numbers so it
+   is a known risk, not a live-life surprise.
+2. **`genome/traits.py`'s `Traits` has no `save`/`load`.** Builder A's mind snapshot (§11.1 step 1 saves
+   the predictor's state) will need to persist `H` (and `version`) too, or a resumed life's TRAITS head
+   is reborn random every restart — silently discarding every sleep's learning (and would ALSO reset
+   note #1's risk each restart, which might be the safer failure mode, but should be a decision, not an
+   accident). Not this wave's interface, but worth a line in whichever brief covers the snapshot/resume
+   path.
+3. **A belief row's own `"clashes"` field is always `[]` — forever** (append-only: `believe()` cannot
+   edit a row after writing it). The actual clash relationship lives ONLY in separate `kind=="clash"`
+   rows, each naming both sides' line numbers. Builder A's STATUS/reader must scan for `kind=="clash"`
+   rows specifically; reading a belief row's own `"clashes"` field will always report zero clashes.
+4. **`/data/dev/genome/world/ahmad/` exists** (6 images) alongside the ten Caltech folders — presumably
+   "his six" the PREREG references elsewhere. One folder of 6 cannot yield a between-thing band on its
+   own (no second class to compare against), so B12's photograph report used only the ten Caltech words;
+   `ahmad/` was read (confirmed present) but not included in any measurement, rather than silently
+   omitted without comment.
+5. **B13's spike verdict depends on the maker's within-window ordering rule** (shuffled vs. blocked —
+   see B13's own section): this toy chose shuffled and reported the consequence; the live 24h life's
+   real arrival mark should be read against whichever rule `creature/world_maker.py` actually uses.

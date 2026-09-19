@@ -25,6 +25,17 @@ Three required toys (§11.2 (a)(b)(c)):
       tests/genome/test_pin_skeleton.py (re-run after this file existed — still green); a small direct
       unit test here (`test_untraited_area_cos_is_the_old_two_lines`) pins the same fact at the
       function level.
+
+A fourth finding, flagged by an advisor review and NOT covered by any of the three required toys (none
+of them run `moment()`/`recall()` through the traited path — toy (a) measures only the MARGIN, a
+difference of cosines, never the LEVEL against the live THETA_N/THETA_M thresholds): THETA_N=0.955 and
+THETA_M=0.9975 (G4-skeleton.genome) were calibrated by gate G-a on RAW cosines. `TestTraitsBreaksTheta`
+below measures what happens to `recall()` once TRAITS is attached and has learned even ONE sleep's
+worth: the projected cosine to the nearest already-alive cell crashes from ~0.96 (raw, well above
+THETA_N) to ~0.70 (projected) — below THETA_N — so `_lit` returns nothing, `recall()` reads "novel", and
+every moment would BIRTH rather than resonate. This is reported as a coordinator note in the WAVE 2
+report (not something this builder's interface can fix — it is gate G-a's or TRAITS's own calibration
+question), with the exact numbers here.
 """
 from __future__ import annotations
 
@@ -323,6 +334,82 @@ class TestPinControl(unittest.TestCase):
         org = Organism(mini_genome())
         self.assertIsNone(org.sight.traits)
         self.assertIsNone(org.words.traits)
+
+
+class TestOrgTraitsProperty(unittest.TestCase):
+    """The coordinator's fixed interface names this `org.traits` (advisor-caught, post-B12): a plain
+    instance attribute would shadow Organism.traits's property and silently leave `sight.traits`
+    (what Area.cos actually reads) at None — TRAITS would then be a no-op wired through org.traits
+    alone. `org.traits = t` and `org.set_traits(t)` must be equivalent, and `org.traits` must read
+    back exactly what `Area.cos` uses."""
+
+    def test_assigning_org_traits_reaches_sight_traits(self) -> None:
+        from ._toy import mini_genome
+        org = Organism(mini_genome())
+        t = Traits(dim_in=64, dim_out=8, lr=0.01, rng=np.random.default_rng(1))
+        org.traits = t
+        self.assertIs(org.sight.traits, t)
+        self.assertIs(org.traits, t)
+        self.assertIsNone(org.words.traits)
+
+    def test_set_traits_and_property_are_equivalent(self) -> None:
+        from ._toy import mini_genome
+        org = Organism(mini_genome())
+        t = Traits(dim_in=64, dim_out=8, lr=0.01, rng=np.random.default_rng(2))
+        org.set_traits(t)
+        self.assertIs(org.traits, t)
+
+    def test_org_traits_default_is_none(self) -> None:
+        from ._toy import mini_genome
+        org = Organism(mini_genome())
+        self.assertIsNone(org.traits)
+
+
+class TestTraitsBreaksTheta(unittest.TestCase):
+    """Advisor-flagged, coordinator note #4 in the WAVE 2 report: none of the three required toys run
+    `moment()`/`recall()` through the traited path — they measure the MARGIN (a difference of cosines),
+    never the LEVEL against the live THETA_N/THETA_M thresholds, which gate G-a calibrated on RAW
+    cosines. This test does the 5-minute measurement an advisor review asked for: after real training
+    moments and ONE sleep's worth of `learn()`, does `recall()` on a held-out feature still resonate?"""
+
+    def test_recall_goes_novel_after_one_sleep_on_this_front(self) -> None:
+        genome = skeleton_genome()
+        org = Organism(genome)
+        rng = np.random.default_rng(21)
+        episodes = Episodes(cap=200, dim_s=112, dim_w=1)
+        for i in range(50):
+            t = THINGS[i % 3]
+            rgb, _truth = world.render_canvas(t, rng)
+            f0, f1 = _two_glance(genome, rgb, pic_id=f"{t}-{i}")
+            xw = world.encode_word(t, genome.ear_blank_zero)
+            org.moment(f0, xw)
+            episodes.write(moment=i, x_s=f0, x_w=np.zeros(1), word=t, surprise=0.0, x_s2=f1)
+        self.assertGreater(len(org.sight.alive_ids()), 0, "the 50-moment warm-up must have birthed cells")
+
+        rgb, _truth = world.render_canvas(THINGS[0], rng)
+        f0, _f1 = _two_glance(genome, rgb, pic_id="held")
+        r_raw = org.recall("sight", f0)
+        print(f"[B12, THETA interaction] RAW recall: reason={r_raw['reason']} cos={r_raw.get('cos')} "
+              f"(THETA_N={genome.theta_n})")
+        self.assertNotEqual(r_raw["reason"], "novel", "the raw front should already resonate here")
+
+        traits = Traits(dim_in=112, dim_out=32, lr=0.01, rng=np.random.default_rng(31))
+        org.traits = traits
+        r_init = org.recall("sight", f0)
+        print(f"[B12, THETA interaction] at init (random orthogonal H) recall: "
+              f"reason={r_init['reason']} cos={r_init.get('cos')}")
+
+        report = traits.learn(episodes, steps=20)  # ONE sleep
+        r_after = org.recall("sight", f0)
+        print(f"[B12, THETA interaction] after ONE learn() {report}: "
+              f"recall reason={r_after['reason']} cos={r_after.get('cos')}")
+
+        # THE FINDING: one sleep's InfoNCE step drags the projected cosine below THETA_N, so recall()
+        # reads "novel" where the raw front resonated cleanly — reported, not fixed here (outside this
+        # builder's interface; it is gate G-a's or TRAITS's own calibration question, see the WAVE 2
+        # report's coordinator note #4).
+        self.assertEqual(r_after["reason"], "novel")
+        self.assertLess(r_after["cos"], genome.theta_n)
 
 
 if __name__ == "__main__":
