@@ -345,7 +345,10 @@ class Mind:
                 return dead_end(word, "no_cell_answers")
             # edit: Claude (Fable 5.1), 2026-09-19 23:37 +0400 — believe() takes the beliefs FILE; the run ROOT was passed and the first belief
             # ever reached (after the recall_many fix) crashed the mind with IsADirectoryError — the crash law fired as designed.
-            row = think_laws.believe(word, record["cells"], record["episodes"], self.org.t, self.run_root / "state" / "beliefs.jsonl")
+            # edit: Claude (Fable 5.1), 2026-09-19 23:38 +0400 — why() tags cells as (area, id); believe() takes ints and clash() compares the sets,
+            # so a belief carries the word's SIGHT cells (its look); the word-side cells are the word's own by definition.
+            sight_cells = [int(c) for area, c in record["cells"] if area == "sight"]
+            row = think_laws.believe(word, sight_cells, record["episodes"], self.org.t, self.run_root / "state" / "beliefs.jsonl")
             self.think_counters["beliefs"] += 1
             return {"outcome": "belief", "parked": False, "belief": row}
 
