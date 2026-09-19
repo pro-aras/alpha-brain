@@ -2,6 +2,9 @@
 
 edit: Claude (Fable 5.1), 2026-09-19 19:33 +0400 — G3: a fourth abstain reason «close» (ABSTAIN margin) counted everywhere.
 edit: Claude (Fable 5.1), 2026-09-19 16:2x +04 — G0 rung 0 (docs/G0-PREREG.md §3, §10 clauses 1, 4, 5).
+edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 21:32 +0400 — B5 (docs/G4-PREREG.md §3): `why(org,
+ledgers, episodes, word)` — the record behind an answer. Reads only; changes nothing (a question never
+changes the organism, G0's law, extended to the episode store).
 
 The organism only ever returns a CELL (or abstains). The ledger — which thing each sight
 cell was born on, which word each word cell holds — is built by the runner from the
@@ -9,7 +12,7 @@ stream and lives here, never in the organism. Questions never change the organis
 """
 from __future__ import annotations
 
-from typing import Dict, List, Sequence, Set
+from typing import Dict, List, Sequence, Set, Tuple
 
 import numpy as np
 
@@ -204,3 +207,30 @@ def ask_plant_glances(org: Organism, ledgers: Dict[str, Ledger], word: str, rows
             a = "/".join(sorted(Lw.get(r["cell"], set()))); answered[a] = answered.get(a, 0) + 1
             if Lw.get(r["cell"], set()) == {word}: ok += 1
     return {"answered_rate": ok / len(rows) if rows else 0.0, "abstain_rate": (sum(abst.values()) / len(rows)) if rows else 0.0, "n": len(rows), "abstain": abst, "answered_as": answered}
+
+
+# ============================================================================ B5: «why» — the record behind an answer
+def why(org: Organism, ledgers: Dict[str, Ledger], episodes, word: str) -> Dict[str, object]:
+    """G4 §3 B5: the record behind an answer about `word` — not a new question to the organism, a
+    report ON the organism's own state. "cells": every alive cell (in either area) born on `word` alone,
+    as ("sight"|"words", cell_id) pairs; "episodes": every live FAST episode (genome/fast.py's Episodes)
+    whose own word is exactly `word`, ids ascending; "edges": every currently-alive edge between one of
+    those sight cells and one of those word cells, as (sight_cell, word_cell, weight) — the strongest
+    evidence a caller can show for "why does it say that". `episodes` may be None (no FAST store yet).
+    Never changes the organism or the episode store; a word never shown (no cell, no episode) returns
+    every list empty, never an error — "I do not know" has a why too: nothing."""
+    sight_cells = sorted(c for c, s in ledgers.get("sight", {}).items() if s == {word} and org.sight.alive[c])
+    words_cells = sorted(c for c, s in ledgers.get("words", {}).items() if s == {word} and org.words.alive[c])
+    cells: List[Tuple[str, int]] = [("sight", c) for c in sight_cells] + [("words", c) for c in words_cells]
+    ep_ids: List[int] = []
+    if episodes is not None:
+        for slot in range(len(episodes)):
+            if str(episodes.word[slot]) == word:
+                ep_ids.append(int(episodes.ids[slot]))
+        ep_ids.sort()
+    edges: List[Tuple[int, int, float]] = []
+    for s in sight_cells:
+        for t in words_cells:
+            if org.mask[s, t]:
+                edges.append((s, t, float(org.W[s, t])))
+    return {"cells": cells, "episodes": ep_ids, "edges": edges}

@@ -7,6 +7,14 @@ edit: Claude (Fable 5.1), 2026-09-19 16:09 +04 — §11: the retina as a list of
 edit: Claude (Fable 5.1), 2026-09-19 16:37 +04 — G0b: RETINA step tower:<sealed eye>; any square picture; every edge's birth and pruning logged by cell ids (no labels).
 edit: Claude (Fable 5.1), 2026-09-19 17:21 +0400 — G1: the GAZE gene (parsed; its work is done in gaze.py and the runner); recall_many/edge_many — the rung-0 recall summed over glances, pinned equal to recall/edge for one glance; save/load for the ask door (never touch state_hash).
 edit: Claude (Fable 5.1), 2026-09-19 16:14 +04 — §11 amendments 4–6 (from the toy): redundant error births refused; ABSTAIN's second is a competitor that answers back differently; a question lights the resonating winners, not one cell.
+edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 21:32 +0400 — B1 (docs/G4-PREREG.md §3): a `declared: Dict[str, dict]`
+field on Genome holding every G4 gene's own parsed sub-dict (BODY, TAPE, HEART, CRASH, TRAITS, SURPRISE, CYCLE, FAST,
+SLEEP, PREDICT, FILE, CURIOSITY, PARK, INDUCE, DEDUCE, BELIEF, SENTENCE, WORLD, HANDS, ASK); `AREA episodes from fast`
+allowed beside sight/words; `RECALL k=N` for any N >= 1 (k=1 byte-identical — the rung-0 restriction lifted). A gene
+the machinery cannot run is still a GenomeError; a placeholder value (THETA_N/THETA_M unwritten) still refuses.
+edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 22:07 +0400 — B2 `Organism.moment_sight`; B6 `moment(x_s, x_w,
+lr_scale=1.0)` now returns `(S, T)` (was None) and threads `lr_scale` into `_delta`'s lr (default 1.0 is exact,
+`x*1.0==x`, so the pin is untouched) for genome/predict.py's Predictor.
 
 Laws of this file:
 - The genome is text. A gene this machinery does not know REFUSES to start (GenomeError),
@@ -63,6 +71,7 @@ class Genome:
     theta_words: Optional[float] = None             # G3: the words area's own threshold (None = theta_n, the old law)
     abstain_margin: Optional[float] = None          # G3: ABSTAIN margin cos<M (None = off)
     gaze: Optional[Dict[str, object]] = None     # G1: GAZE surprise fixations F grid G canvas C glance L ink contrast (None = off)
+    declared: Dict[str, dict] = field(default_factory=dict)   # G4 §3 B1: every G4 gene's own parsed sub-dict (BODY, TAPE, HEART, …)
     text: str = field(default="", repr=False)
 
     @property
@@ -73,7 +82,7 @@ class Genome:
         raise GenomeError("no STAGE named meet")
 
     def sight_dim(self) -> int:
-        return retina_dim(self.retina)
+        return retina_dim(self.retina, self.eye[0])
 
     def words_dim(self) -> int:
         return self.ear_letters * (26 if self.ear_blank_zero else 27)
@@ -84,7 +93,7 @@ _NUM = r"[-+]?\d+(?:\.\d+)?"
 
 def parse_genome(text: str) -> Genome:
     """Parse the genome text. Unknown gene → GenomeError. Placeholder value → GenomeError."""
-    g: Dict[str, object] = {"areas": {}, "stages": [], "ear_blank_zero": False}
+    g: Dict[str, object] = {"areas": {}, "stages": [], "ear_blank_zero": False, "declared": {}}
     seen = set()
     for raw in text.splitlines():
         line = raw.split("#", 1)[0].strip()
@@ -172,6 +181,90 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"surprise fixations (\d+) grid (\d+) canvas (\d+) glance (\d+) ink (contrast|border)", a)
                 if not m: raise GenomeError(f"GAZE: cannot read {a!r} (G1 §1: surprise fixations F grid G canvas C glance L ink contrast)")
                 g["gaze"] = {"fixations": int(m.group(1)), "grid": int(m.group(2)), "canvas": int(m.group(3)), "glance": int(m.group(4)), "ink": m.group(5)}
+            # ======================================================================== G4 §3 B1: the new genes.
+            # Each is a strict re.fullmatch (a placeholder or a missing number refuses); the parsed sub-dict is
+            # stored under g["declared"][GENE] — a gene the machinery cannot run is a GenomeError, so nobody can
+            # "declare" a mechanism into existence (docs/G4-DESIGN.md §3). None of these are in `required`.
+            elif gene == "BODY":
+                m = re.fullmatch(r"service ([a-z][a-z0-9_]*) threads ([a-z]+(?: [a-z]+)*)", a)
+                if not m: raise GenomeError(f"BODY: cannot read {a!r} (G4 §2: service <name> threads <a> <b> …)")
+                g["declared"]["BODY"] = {"name": m.group(1), "threads": m.group(2).split()}
+            elif gene == "TAPE":
+                m = re.fullmatch(r"([A-Za-z0-9_./-]+)", a)
+                if not m: raise GenomeError(f"TAPE: cannot read {a!r} (G4 §2.1: TAPE <path>)")
+                g["declared"]["TAPE"] = {"path": m.group(1)}
+            elif gene == "HEART":
+                m = re.fullmatch(r"every (\d+) s", a)
+                if not m: raise GenomeError(f"HEART: cannot read {a!r} (G4 §2.5: HEART every <n> s)")
+                g["declared"]["HEART"] = {"every_s": int(m.group(1))}
+            elif gene == "CRASH":
+                m = re.fullmatch(r"sense restart journal; mind page", a)
+                if not m: raise GenomeError(f"CRASH: cannot read {a!r} (G4 §2.6: CRASH sense restart journal; mind page)")
+                g["declared"]["CRASH"] = {"sense": "restart journal", "mind": "page"}
+            elif gene == "TRAITS":
+                m = re.fullmatch(r"contrast head (\d+) lr (" + _NUM + r") at sleep", a)
+                if not m: raise GenomeError(f"TRAITS: cannot read {a!r} (row 2b: TRAITS contrast head <n> lr <f> at sleep)")
+                g["declared"]["TRAITS"] = {"head": int(m.group(1)), "lr": float(m.group(2)), "when": "sleep"}
+            elif gene == "SURPRISE":
+                m = re.fullmatch(r"floor (" + _NUM + r")", a)
+                if not m: raise GenomeError(f"SURPRISE: cannot read {a!r} (row 1c: SURPRISE floor <f>)")
+                g["declared"]["SURPRISE"] = {"floor": float(m.group(1))}
+            elif gene == "CYCLE":
+                m = re.fullmatch(r"grow to (" + _NUM + r") nmax then consolidate", a)
+                if not m: raise GenomeError(f"CYCLE: cannot read {a!r} (row 7: CYCLE grow to <f> nmax then consolidate)")
+                g["declared"]["CYCLE"] = {"grow_to": float(m.group(1))}
+            elif gene == "FAST":
+                m = re.fullmatch(r"episodes (\d+) keys sight words surprise", a)
+                if not m: raise GenomeError(f"FAST: cannot read {a!r} (B3: FAST episodes <n> keys sight words surprise)")
+                g["declared"]["FAST"] = {"episodes": int(m.group(1)), "keys": ["sight", "words", "surprise"]}
+            elif gene == "SLEEP":
+                m = re.fullmatch(r"every (\d+) moments replay (\d+) by surprise", a)
+                if not m: raise GenomeError(f"SLEEP: cannot read {a!r} (B7: SLEEP every <n> moments replay <m> by surprise)")
+                g["declared"]["SLEEP"] = {"every": int(m.group(1)), "replay": int(m.group(2))}
+            elif gene == "PREDICT":
+                m = re.fullmatch(r"next glance; error scales delta (" + _NUM + r")\.\.(" + _NUM + r"); ranks replay; grades act", a)
+                if not m: raise GenomeError(f"PREDICT: cannot read {a!r} (B6: PREDICT next glance; error scales delta <lo>..<hi>; ranks replay; grades act)")
+                g["declared"]["PREDICT"] = {"delta_lo": float(m.group(1)), "delta_hi": float(m.group(2))}
+            elif gene == "FILE":
+                m = re.fullmatch(r"claim route decider due", a)
+                if not m: raise GenomeError(f"FILE: cannot read {a!r} (B6: FILE claim route decider due)")
+                g["declared"]["FILE"] = {"fields": ["claim", "route", "decider", "due"]}
+            elif gene == "CURIOSITY":
+                m = re.fullmatch(r"interests (\d+) operators recombine generalize specialize bridge", a)
+                if not m: raise GenomeError(f"CURIOSITY: cannot read {a!r} (row 8: CURIOSITY interests <n> operators recombine generalize specialize bridge)")
+                g["declared"]["CURIOSITY"] = {"interests": int(m.group(1)), "operators": ["recombine", "generalize", "specialize", "bridge"]}
+            elif gene == "PARK":
+                m = re.fullmatch(r"after (\d+) identical dead-ends reopen on new-sense", a)
+                if not m: raise GenomeError(f"PARK: cannot read {a!r} (B4: PARK after <n> identical dead-ends reopen on new-sense)")
+                g["declared"]["PARK"] = {"after": int(m.group(1))}
+            elif gene == "INDUCE":
+                m = re.fullmatch(r"rule from (\d+) episodes no counter", a)
+                if not m: raise GenomeError(f"INDUCE: cannot read {a!r} (row 4d: INDUCE rule from <n> episodes no counter)")
+                g["declared"]["INDUCE"] = {"from_episodes": int(m.group(1))}
+            elif gene == "DEDUCE":
+                m = re.fullmatch(r"one step", a)
+                if not m: raise GenomeError(f"DEDUCE: cannot read {a!r} (row 4d: DEDUCE one step)")
+                g["declared"]["DEDUCE"] = {"steps": 1}
+            elif gene == "BELIEF":
+                m = re.fullmatch(r"clash opens never overwrites", a)
+                if not m: raise GenomeError(f"BELIEF: cannot read {a!r} (row 4b: BELIEF clash opens never overwrites)")
+                g["declared"]["BELIEF"] = {"clash": "opens", "overwrite": False}
+            elif gene == "SENTENCE":
+                m = re.fullmatch(r"two-word frames is near under-judge", a)
+                if not m: raise GenomeError(f"SENTENCE: cannot read {a!r} (row 5b: SENTENCE two-word frames is near under-judge)")
+                g["declared"]["SENTENCE"] = {"frames": ["is", "near"], "judged": True}
+            elif gene == "WORLD":
+                m = re.fullmatch(r"drawn every (\d+) s arrivals every (\d+) h; folder ([A-Za-z0-9_./-]+); web (\d+) per hour by curiosity", a)
+                if not m: raise GenomeError(f"WORLD: cannot read {a!r} (row 8: WORLD drawn every <n> s arrivals every <h> h; folder <p>; web <k> per hour by curiosity)")
+                g["declared"]["WORLD"] = {"drawn_every_s": int(m.group(1)), "arrival_every_h": int(m.group(2)), "folder": m.group(3), "web_per_hour": int(m.group(4))}
+            elif gene == "HANDS":
+                m = re.fullmatch(r"jail ([A-Za-z0-9_./-]+)", a)
+                if not m: raise GenomeError(f"HANDS: cannot read {a!r} (row 6: HANDS jail <path>)")
+                g["declared"]["HANDS"] = {"jail": m.group(1)}
+            elif gene == "ASK":
+                m = re.fullmatch(r"what-is show is which next why", a)
+                if not m: raise GenomeError(f"ASK: cannot read {a!r} (§2.7: ASK what-is show is which next why)")
+                g["declared"]["ASK"] = {"verbs": ["what-is", "show", "is", "which", "next", "why"]}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:
@@ -182,12 +275,12 @@ def parse_genome(text: str) -> Genome:
     missing = [k for k in required if k not in g]
     if missing:
         raise GenomeError(f"genome lacks {missing}")
-    if set(g["areas"].keys()) != {"sight", "words"}:
-        raise GenomeError(f"rung 0 needs AREA sight and AREA words, got {sorted(g['areas'])}")
+    if not {"sight", "words"} <= set(g["areas"].keys()) or set(g["areas"].keys()) - {"sight", "words", "episodes"}:
+        raise GenomeError(f"needs AREA sight and AREA words (G4 §3 B1: episodes from fast is also allowed), got {sorted(g['areas'])}")
     if not g["stages"]:
         raise GenomeError("no STAGE genes")
-    if g["recall_k"] != 1:
-        raise GenomeError("rung 0 machinery runs RECALL k=1 only")
+    if g["recall_k"] < 1:
+        raise GenomeError("RECALL k must be >= 1")
     return Genome(text=text, **g)  # type: ignore[arg-type]
 
 
@@ -195,16 +288,22 @@ def parse_genome(text: str) -> Genome:
 from scipy import ndimage as _ndi
 
 
-def retina_dim(spec: Tuple[str, ...]) -> int:
+def retina_dim(spec: Tuple[str, ...], side: int = 24) -> int:
+    """`side`: the eye's own SENSE side (default 24, rung 0's only value until G4 §3 B1's GAZE-fed
+    32x32 eye — edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 22:07 +0400: pool/hogcells sizing now
+    reads the genome's OWN `side` instead of a hardcoded 24, so a 32x32-eye genome's sight_dim() is
+    correct. Never exercised by the pin — G4-skeleton.genome's RETINA has no pool/hogcells step (its
+    only feature block is `tower:`, which was always computed correctly), so this fix touches no byte
+    the pin reads; a regression test pins the old default (side=24) unchanged too."""
     d = 0
     for step in spec:
         if step.startswith("tower:"):
             from .eye import tower as _tower                     # the sealed eye (G0b gene EYE); no labels are read
             d += _tower(step[6:]).n_feat
         elif step.startswith("pool"):
-            k = int(step[4:]); d += (24 // k) ** 2
+            k = int(step[4:]); d += (side // k) ** 2
         elif step.startswith("hogcells"):
-            k, nb = (int(v) for v in step[8:].split("x")); d += (24 // k) ** 2 * nb
+            k, nb = (int(v) for v in step[8:].split("x")); d += (side // k) ** 2 * nb
         elif step.startswith("hog"):
             d += int(step[3:])
     if d == 0:
@@ -323,6 +422,11 @@ class Organism:
         self.edges_log: List[Tuple[int, int, int]] = []        # (moment, sight cell, word cell) — every edge born
         self.prunes_log: List[Tuple[int, int, int]] = []       # (moment, sight cell, word cell) — every edge pruned
         self.refusals_by_arrival: List[int] = []
+        # G4 §3 B2: a plain attribute, NEVER a self.c key — state_hash hashes json.dumps(self.c), so a
+        # new self.c key would move the pin (d4b5c6b8…) even at value 0, for every genome that never
+        # calls moment_sight. Kept out of state_hash entirely; a life that DOES call moment_sight still
+        # gets a different hash, but only through the sight cells/W it actually touches.
+        self.moments_sight_only = 0
 
     # ------------------------------------------------------------------ arrivals & budget
     def new_arrival(self) -> None:
@@ -343,6 +447,19 @@ class Organism:
         if area.n >= area.nmax:
             self.c["births_refused_nmax"] += 1
             return None
+        if "CYCLE" in self.g.declared:
+            # G4 §3 B7: CYCLE's SOFT ceiling — refuse once ALIVE cells reach grow_to*NMAX, same counter
+            # as the hard cap. This does NOT reuse ids (advisor review: reusing a dead slot's id would
+            # corrupt questions.build_ledgers, which unions every id's birth history forever — a reborn
+            # id would inherit a retired cell's old "born on X" facts). cycle() (genome/sleep.py) lowers
+            # ALIVE count via a real merge pass, which reopens this gate with FRESH ids from here on;
+            # area.n (ever-born) never decreases, so the array's real NMAX ceiling is still the only
+            # hard limit, one-shot per id, exactly as it always was. A genome that never declares CYCLE
+            # (G1.genome, G4-skeleton.genome — the pin) never evaluates this branch at all.
+            ceiling = float(self.g.declared["CYCLE"]["grow_to"]) * self.g.nmax
+            if self.total_cells() >= ceiling:
+                self.c["births_refused_nmax"] += 1
+                return None
         if self.budget_left <= 0:
             self.c["births_refused_budget"] += 1
             return None
@@ -375,16 +492,37 @@ class Organism:
         return winners
 
     # ------------------------------------------------------------------ one moment
-    def moment(self, x_s: np.ndarray, x_w: np.ndarray) -> None:
+    def moment(self, x_s: np.ndarray, x_w: np.ndarray, lr_scale: float = 1.0) -> Tuple[List[int], List[int]]:
+        """G4 §3 B6: `lr_scale` (default 1.0, exact — `self.g.lr * 1.0 == self.g.lr` in IEEE754, so the
+        pin is untouched) scales DELTA's learning rate for this moment only (PREDICT's `modulate`, B6).
+        Returns (S, T), the final sight/words winners of this moment (after any misfire birth) — a NEW
+        return value (moment() returned None before this gene); every existing caller discards it as a
+        bare statement, so this is additive. genome/predict.py's Predictor reads S to know what to
+        expect next."""
         S = self._resonate(self.sight, x_s)
         T = self._resonate(self.words, x_w)
         if self.wire and self.t >= self.g.stage2_start and S and T:
             self._hebb(S, T)
-            self._delta(S, T)
+            self._delta(S, T, lr=self.g.lr * lr_scale)
             S, T = self._misfire(S, T, x_s, x_w)
             self._prune(S, T)
             self._merge(self.sight, S, axis=0)
             self._merge(self.words, T, axis=1)
+        self.t += 1
+        if self.t % self.g.scale_every == 0:
+            self._scale()
+        return S, T
+
+    def moment_sight(self, x_s: np.ndarray) -> None:
+        """G4 §3 B2 (docs/G4-PREREG.md, row 1a's BODY/tape: a sight-only moment — an eye row whose moment
+        has no matching ear row, §2.2 of the body contract). Resonance + novelty birth on sight ONLY: no
+        MEET (no HEBB, DELTA, misfire-birth, PRUNE or MERGE — those all compare sight winners against
+        word winners of the SAME moment, which a sight-only moment does not have). Mirrors moment()'s
+        tail exactly (t advances; SCALE fires at its own multiples of t) so a life mixing moment_sight
+        and moment stays on one homeostasis clock. Counted in `self.moments_sight_only` — see its
+        docstring in __init__ for why that counter is a plain attribute and not a self.c key."""
+        self._resonate(self.sight, x_s)
+        self.moments_sight_only += 1
         self.t += 1
         if self.t % self.g.scale_every == 0:
             self._scale()
@@ -399,8 +537,8 @@ class Organism:
                     self.c["edges_born"] += 1
                     self.edges_log.append((self.t, s, t))
 
-    def _delta(self, S: List[int], T: List[int]) -> None:
-        lr = self.g.lr
+    def _delta(self, S: List[int], T: List[int], lr: Optional[float] = None) -> None:
+        lr = self.g.lr if lr is None else lr
         tgt_w = np.zeros(self.g.nmax); tgt_w[T] = 1.0
         for s in S:
             idx = self.mask[s] == 1
@@ -528,16 +666,32 @@ class Organism:
         lit = [int(i) for i in order[: self.g.kwta] if area.alive[i] and c[i] >= th]
         return lit, c
 
-    def recall(self, side: str, x: np.ndarray) -> Dict[str, object]:
+    def recall(self, side: str, x: np.ndarray, k: int = 1) -> Dict[str, object]:
         """RECALL k=1 + ABSTAIN: light one side (its resonating winners, §11 am. 6; none → NOVEL), read
         the strongest edge from any lit cell to the other side (none positive → NOEDGE); ABSTAIN when the
         strongest COMPETING edge — to a cell whose own answer leads back outside the lit set (§11 am. 5) —
-        is within the ratio (→ RATIO). Otherwise the answer cell. Never changes the organism."""
+        is within the ratio (→ RATIO). Otherwise the answer cell. Never changes the organism.
+
+        G4 §3 B1 (RECALL k=N): k > 1 additionally returns "ranked", the top-k distinct answer cells by
+        their strongest edge from a lit cell (ties by cell id) — it never changes which cell/reason is
+        returned. k=1 (the default) is byte-identical to G1's recall: `ranked(...)` returns {} so the
+        returned dict carries exactly the same keys as before this gene existed."""
         area, other = (self.sight, self.words) if side == "sight" else (self.words, self.sight)
         lit, c = self._lit(area, x)
+
+        def ranked(cands: List[Tuple[float, int, int]]) -> Dict[str, object]:
+            if k <= 1:
+                return {}
+            best_per: Dict[int, float] = {}
+            for v, j, _l in cands:
+                if j not in best_per or v > best_per[j]:
+                    best_per[j] = v
+            top = sorted(best_per.items(), key=lambda kv: (-kv[1], kv[0]))[:k]
+            return {"ranked": [(int(j), float(v)) for j, v in top]}
+
         if not lit:
             best_cos = float(c.max()) if len(c) else 0.0
-            return {"cell": None, "reason": "novel", "lit": None, "best": 0.0, "second": 0.0, "cos": best_cos}
+            return {"cell": None, "reason": "novel", "lit": None, "best": 0.0, "second": 0.0, "cos": best_cos, **ranked([])}
         lit_set = set(lit)
         cands: List[Tuple[float, int, int]] = []          # (edge, other cell, lit cell)
         for l in lit:
@@ -549,7 +703,7 @@ class Organism:
                 if v > 0.0:
                     cands.append((v, int(j), l))
         if not cands:
-            return {"cell": None, "reason": "noedge", "lit": lit[0], "best": 0.0, "second": 0.0, "cos": float(c[lit[0]])}
+            return {"cell": None, "reason": "noedge", "lit": lit[0], "best": 0.0, "second": 0.0, "cos": float(c[lit[0]]), **ranked(cands)}
         cands.sort(key=lambda z: (-z[0], z[1], z[2]))
         best, best_id, best_l = cands[0]
         second = 0.0
@@ -560,11 +714,11 @@ class Organism:
                 second = v
                 break
         if second > 0.0 and second / best > self.g.abstain_ratio:
-            return {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l])}
+            return {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), **ranked(cands)}
         close = self._margin_close(side, other, best_id, {l: float(c[l]) for l in lit})
         if close is not None:
-            return {"cell": None, "reason": "close", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), "margin": close}
-        return {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l])}
+            return {"cell": None, "reason": "close", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), "margin": close, **ranked(cands)}
+        return {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), **ranked(cands)}
 
     def _margin_close(self, side: str, other: Area, best_id: int, cos_of: Dict[int, float]) -> Optional[float]:
         """G3 §1 ABSTAIN margin: on the sight side, the best-answering lit cell's cosine must beat the best lit cell of a
@@ -690,5 +844,5 @@ class Organism:
         return {
             "moments": self.t, "cells_sight": int(self.sight.alive.sum()), "cells_words": int(self.words.alive.sum()),
             "cells_born_sight": self.sight.n, "cells_born_words": self.words.n,
-            "edges_alive": int(self.mask.sum()), **self.c,
+            "edges_alive": int(self.mask.sum()), "moments_sight_only": self.moments_sight_only, **self.c,
         }
