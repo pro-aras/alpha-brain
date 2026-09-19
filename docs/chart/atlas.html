@@ -1,0 +1,564 @@
+<title>The Alpha Research Atlas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#f3f5f4; --ink:#17202b; --ink-2:#4b5560; --muted:#6f7a83; --line:#cfd6d3; --panel:#e9edeb;
+  --accent:#0e7a5c; --accent-ink:#0a5a44; --accent-soft:#d9efe6;
+  --pass:#2b6cb0; --pass-soft:#dbe8f7; --fail:#b3382e; --fail-soft:#f6dedb; --void:#8a6d1f; --void-soft:#f3ead0; --open:#6f7a83; --open-soft:#e6e9ec;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --disp:"Archivo","IBM Plex Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0f1416; --ink:#e6ebe8; --ink-2:#b9c2bd; --muted:#8e9993; --line:#2a3336; --panel:#171e21;
+  --accent:#3fbf94; --accent-ink:#7fdcbb; --accent-soft:#12312a;
+  --pass:#7fb2ea; --pass-soft:#14263a; --fail:#ef8a80; --fail-soft:#3a1a17; --void:#d9b45a; --void-soft:#33290f; --open:#aab3ae; --open-soft:#1f2629;
+}}
+:root[data-theme="dark"]{
+  --paper:#0f1416; --ink:#e6ebe8; --ink-2:#b9c2bd; --muted:#8e9993; --line:#2a3336; --panel:#171e21;
+  --accent:#3fbf94; --accent-ink:#7fdcbb; --accent-soft:#12312a;
+  --pass:#7fb2ea; --pass-soft:#14263a; --fail:#ef8a80; --fail-soft:#3a1a17; --void:#d9b45a; --void-soft:#33290f; --open:#aab3ae; --open-soft:#1f2629;
+}
+html,body{background:var(--paper);color:var(--ink)}
+body{margin:0;font-family:var(--sans);font-size:15px;line-height:1.55;padding-block:32px 72px;padding-inline:20px}
+.wrap{max-width:1000px;margin:0 auto}
+h1,h2,h3{font-family:var(--disp);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:34px;font-weight:800;letter-spacing:-.01em}
+h2{font-size:22px;font-weight:700;margin-top:48px;padding-top:18px;border-top:2px solid var(--ink)}
+h3{font-size:16px;font-weight:700;margin-top:26px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:17px;color:var(--ink-2);max-width:70ch;margin-top:10px}
+p{max-width:72ch;margin:10px 0}
+ul,ol{max-width:72ch;padding-left:22px}
+li{margin:4px 0}
+code{font-family:var(--mono);font-size:.92em;background:var(--panel);padding:1px 5px;border-radius:3px}
+pre{font-family:var(--mono);font-size:12.5px;line-height:1.5;background:var(--panel);border:1px solid var(--line);padding:14px 16px;overflow-x:auto;border-radius:4px}
+figure{margin:22px 0;padding:0}
+.fig{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--panel);padding:10px}
+svg{max-width:100%;height:auto;display:block;color:var(--ink);font-family:var(--sans)}
+figcaption{font-size:13.5px;color:var(--ink-2);margin-top:8px;max-width:80ch}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:14px 0}
+th,td{text-align:left;vertical-align:top;padding:7px 9px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tbl{overflow-x:auto}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:1px 7px;border-radius:3px;border:1px solid transparent;white-space:nowrap}
+.pass{background:var(--pass-soft);color:var(--pass)} .fail{background:var(--fail-soft);color:var(--fail)} .void{background:var(--void-soft);color:var(--void)} .open{background:var(--open-soft);color:var(--open)} .live{background:var(--accent-soft);color:var(--accent-ink)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.kv div{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+.kv b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:4px}
+.kv span{font-family:var(--disp);font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.decision{border-left:3px solid var(--accent);padding:6px 14px;margin:14px 0;background:var(--accent-soft);max-width:78ch}
+.note{border-left:3px solid var(--line);padding:6px 14px;margin:14px 0;color:var(--ink-2);max-width:78ch}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:12.5px;color:var(--ink-2);margin:6px 0 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:6px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<div class="eyebrow">Alpha 1 → Alpha 2 → Alpha 3 → the genome · written 2026-09-19 · every number read from the files that day</div>
+<h1>The Alpha Research Atlas</h1>
+<p class="lede">Every research input, synthesis, experiment and mechanism since Alpha 1, joined by what each rests on and what each proved or broke; where the organisms fail and why; the theory behind each failure and its fix; and the plan that follows. Built on Ahmad's word of 2026-09-19 14:52.</p>
+
+<h2 id="state">0 · The state the atlas was written from</h2>
+<div class="kv">
+<div><b>research inputs from Ahmad</b><span>≈ 31</span> 2026-08-13 → 09-19 (pastes, notes, diagrams, PDFs, his words in the seat)</div>
+<div><b>syntheses & reviews written from them</b><span>≈ 60</span> Alpha 1 (14 + 8), Alpha 2 (10 + 67 preregs), Alpha 3 (R1–R6, 5 reviews, 5 digests, 8 designs)</div>
+<div><b>Alpha 3 experiments (directories)</b><span>56</span> PASS 13 · FAIL 32 · VOID 3 · INCONCLUSIVE 3 · NOT RUN 5; 22 more queued with no directory</div>
+<div><b>Alpha 1 · Alpha 2 mechanisms judged</b><span>27 · 36</span> worked / partial / failed, each with its evidence file</div>
+</div>
+<p>Alpha 1 (08-17 → 09-12) was a self-improving trading brain: a frozen judge/generator split over a bounded genome. Alpha 2 (08-29 → 09-12) was a Python-scheduled, C++-bodied organism judged at every step by a frozen judiciary; on 09-07 it was rebuilt in one day as a whole creature (six laws) and folded back. Alpha 3 (09-12 → 09-19) is the creature carried forward under a byte-identity gate, with organs added at its edge. All three are closed today: Alpha 1 and 2 retired 09-12 on Ahmad's word; Alpha 3 stopped 09-19 14:44 on his word after a crash loop and two days on one question. Every claim below names the file it was read from; the six read-only sweeps that produced the catalogue are kept verbatim in <code>docs/atlas-sources/</code>.</p>
+
+<h2 id="map">1 · The connection map</h2>
+<p>Time runs left to right. His inputs are the top lane; each organism is a lane; the genome is the lane that starts today. Solid arrows carry a mechanism forward; red arrows carry a failure that recurred. Colour is the verdict, not the era.</p>
+<figure>
+<div class="fig">
+<svg viewBox="0 0 1400 700" role="img" aria-label="Connection map: Ahmad's research inputs across the top; Alpha 1, Alpha 2, the creature, Alpha 3 and the genome as lanes; nodes coloured by verdict; arrows carry mechanisms forward and mark failures that recurred across organisms.">
+<defs>
+<marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+<marker id="amr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#b3382e"/></marker>
+<marker id="amg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0e7a5c"/></marker>
+</defs>
+<g font-size="10.5" fill="currentColor">
+<!-- time axis -->
+<line x1="150" y1="34" x2="1380" y2="34" stroke="currentColor" opacity=".4"/>
+<g font-family="IBM Plex Mono, monospace" font-size="10" opacity=".8">
+<text x="190" y="28" text-anchor="middle">Aug 17</text><text x="330" y="28" text-anchor="middle">Aug 24</text><text x="470" y="28" text-anchor="middle">Aug 29</text><text x="610" y="28" text-anchor="middle">Sep 3</text><text x="750" y="28" text-anchor="middle">Sep 7</text><text x="890" y="28" text-anchor="middle">Sep 12</text><text x="1030" y="28" text-anchor="middle">Sep 15</text><text x="1170" y="28" text-anchor="middle">Sep 17</text><text x="1310" y="28" text-anchor="middle">Sep 19</text>
+</g>
+<!-- lane labels -->
+<g font-family="Archivo, sans-serif" font-weight="700" font-size="12">
+<text x="12" y="80">HIS INPUTS</text>
+<text x="12" y="205">ALPHA 1</text><text x="12" y="220" font-weight="400" font-size="10">trading brain</text>
+<text x="12" y="335">ALPHA 2</text><text x="12" y="350" font-weight="400" font-size="10">organism + creature</text>
+<text x="12" y="470">ALPHA 3</text><text x="12" y="485" font-weight="400" font-size="10">the creature grown</text>
+<text x="12" y="610" fill="#0e7a5c">THE GENOME</text><text x="12" y="625" font-weight="400" font-size="10">today</text>
+</g>
+<line x1="140" y1="130" x2="1380" y2="130" stroke="currentColor" opacity=".18"/>
+<line x1="140" y1="265" x2="1380" y2="265" stroke="currentColor" opacity=".18"/>
+<line x1="140" y1="400" x2="1380" y2="400" stroke="currentColor" opacity=".18"/>
+<line x1="140" y1="545" x2="1380" y2="545" stroke="currentColor" opacity=".18"/>
+<!-- HIS INPUTS -->
+<g>
+<rect x="175" y="52" width="110" height="44" rx="5" fill="none" stroke="currentColor"/><text x="230" y="70" text-anchor="middle">RSI / open-ended</text><text x="230" y="84" text-anchor="middle" opacity=".8">dump · 08-18</text>
+<rect x="300" y="52" width="120" height="44" rx="5" fill="none" stroke="currentColor"/><text x="360" y="70" text-anchor="middle">biocomputing +</text><text x="360" y="84" text-anchor="middle" opacity=".8">pruning study · 08-24</text>
+<rect x="560" y="52" width="110" height="44" rx="5" fill="none" stroke="currentColor"/><text x="615" y="70" text-anchor="middle">how humans</text><text x="615" y="84" text-anchor="middle" opacity=".8">speak · 09-03</text>
+<rect x="830" y="52" width="120" height="44" rx="5" fill="none" stroke="currentColor"/><text x="890" y="70" text-anchor="middle">AGI notes 2 + 3,</text><text x="890" y="84" text-anchor="middle" opacity=".8">his diagram · 09-11/12</text>
+<rect x="960" y="52" width="120" height="44" rx="5" fill="none" stroke="currentColor"/><text x="1020" y="70" text-anchor="middle">two failure syntheses;</text><text x="1020" y="84" text-anchor="middle" opacity=".8">looped, math, PC-ALM · 09-13/14</text>
+<rect x="1090" y="52" width="110" height="44" rx="5" fill="none" stroke="currentColor"/><text x="1145" y="70" text-anchor="middle">stream-first</text><text x="1145" y="84" text-anchor="middle" opacity=".8">language · 09-15</text>
+<rect x="1210" y="52" width="160" height="44" rx="5" fill="none" stroke="currentColor"/><text x="1290" y="66" text-anchor="middle">growing net · explorer · open</text><text x="1290" y="78" text-anchor="middle">world · body never stops ·</text><text x="1290" y="90" text-anchor="middle" opacity=".8">the AGI Q&amp;A, the genome · 09-16→19</text>
+</g>
+<!-- ALPHA 1 -->
+<g>
+<rect x="150" y="150" width="120" height="40" rx="5" fill="#dbe8f7" stroke="#2b6cb0"/><text x="210" y="167" text-anchor="middle" fill="#1a1a1a">judge / generator split</text><text x="210" y="181" text-anchor="middle" fill="#1a1a1a" opacity=".8">42 preregs, never failed</text>
+<rect x="150" y="205" width="120" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="210" y="222" text-anchor="middle" fill="#1a1a1a">readiness gate scored</text><text x="210" y="236" text-anchor="middle" fill="#1a1a1a" opacity=".8">0 trades as +0.007</text>
+<rect x="285" y="150" width="120" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="345" y="167" text-anchor="middle" fill="#1a1a1a">Teacher graded vs</text><text x="345" y="181" text-anchor="middle" fill="#1a1a1a" opacity=".8">its own lagging corpus</text>
+<rect x="285" y="205" width="120" height="40" rx="5" fill="#dbe8f7" stroke="#2b6cb0"/><text x="345" y="222" text-anchor="middle" fill="#1a1a1a">homeostasis 192/192;</text><text x="345" y="236" text-anchor="middle" fill="#1a1a1a" opacity=".8">pruning 0/32 vs random</text>
+<rect x="420" y="150" width="120" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="480" y="167" text-anchor="middle" fill="#1a1a1a">frontier organ built,</text><text x="480" y="181" text-anchor="middle" fill="#1a1a1a" opacity=".8">never read; senses 0/29</text>
+<rect x="420" y="205" width="120" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="480" y="222" text-anchor="middle" fill="#1a1a1a">LLM mutation never</text><text x="480" y="236" text-anchor="middle" fill="#1a1a1a" opacity=".8">beat random · 3/33 knobs</text>
+<rect x="555" y="150" width="120" height="40" rx="5" fill="#dbe8f7" stroke="#2b6cb0"/><text x="615" y="167" text-anchor="middle" fill="#1a1a1a">workshop jail; self-model;</text><text x="615" y="181" text-anchor="middle" fill="#1a1a1a" opacity=".8">gate_vitality; retirement</text>
+<rect x="830" y="180" width="110" height="34" rx="5" fill="none" stroke="currentColor" stroke-dasharray="4 3"/><text x="885" y="201" text-anchor="middle">retired 09-12</text>
+</g>
+<!-- ALPHA 2 -->
+<g>
+<rect x="450" y="285" width="120" height="40" rx="5" fill="#dbe8f7" stroke="#2b6cb0"/><text x="510" y="302" text-anchor="middle" fill="#1a1a1a">jail · lexicon 1.27M</text><text x="510" y="316" text-anchor="middle" fill="#1a1a1a" opacity=".8">senses · parity ports</text>
+<rect x="450" y="340" width="120" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="510" y="357" text-anchor="middle" fill="#1a1a1a">grounding_check: own</text><text x="510" y="371" text-anchor="middle" fill="#1a1a1a" opacity=".8">records as the witness</text>
+<rect x="585" y="285" width="120" height="40" rx="5" fill="#dbe8f7" stroke="#2b6cb0"/><text x="645" y="302" text-anchor="middle" fill="#1a1a1a">curiosity genome 7×</text><text x="645" y="316" text-anchor="middle" fill="#1a1a1a" opacity=".8">its null; retina/gaze 6.4×</text>
+<rect x="585" y="340" width="120" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="645" y="357" text-anchor="middle" fill="#1a1a1a">concept graph forgets</text><text x="645" y="371" text-anchor="middle" fill="#1a1a1a" opacity=".8">97–100 %; LIF+R-STDP 0/5</text>
+<rect x="720" y="285" width="120" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="780" y="302" text-anchor="middle" fill="#1a1a1a">corroboration 0.3 %;</text><text x="780" y="316" text-anchor="middle" fill="#1a1a1a" opacity=".8">starvation floor</text>
+<rect x="720" y="340" width="120" height="40" rx="5" fill="#d9efe6" stroke="#0e7a5c"/><text x="780" y="357" text-anchor="middle" fill="#1a1a1a">THE CREATURE 09-07</text><text x="780" y="371" text-anchor="middle" fill="#1a1a1a" opacity=".8">six laws; firmness .13→.59</text>
+<rect x="855" y="285" width="120" height="40" rx="5" fill="#f3ead0" stroke="#8a6d1f"/><text x="915" y="302" text-anchor="middle" fill="#1a1a1a">P12 C++ parity green —</text><text x="915" y="316" text-anchor="middle" fill="#1a1a1a" opacity=".8">"cannot hold a sentence"</text>
+<rect x="855" y="340" width="110" height="34" rx="5" fill="none" stroke="currentColor" stroke-dasharray="4 3"/><text x="910" y="361" text-anchor="middle">retired 09-12</text>
+</g>
+<!-- ALPHA 3 -->
+<g>
+<rect x="880" y="420" width="105" height="40" rx="5" fill="#dbe8f7" stroke="#2b6cb0"/><text x="932" y="437" text-anchor="middle" fill="#1a1a1a">P0 gate · E09d eye</text><text x="932" y="451" text-anchor="middle" fill="#1a1a1a" opacity=".8">E05b soup · E24b</text>
+<rect x="880" y="475" width="105" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="932" y="492" text-anchor="middle" fill="#1a1a1a">E29 developmental</text><text x="932" y="506" text-anchor="middle" fill="#1a1a1a" opacity=".8">encoding: random wins</text>
+<rect x="1000" y="420" width="105" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="1052" y="437" text-anchor="middle" fill="#1a1a1a">E43 stream · E44 ×4</text><text x="1052" y="451" text-anchor="middle" fill="#1a1a1a" opacity=".8">hearing · E46 ×3 labels</text>
+<rect x="1000" y="475" width="105" height="40" rx="5" fill="#dbe8f7" stroke="#2b6cb0"/><text x="1052" y="492" text-anchor="middle" fill="#1a1a1a">E46d context · E47</text><text x="1052" y="506" text-anchor="middle" fill="#1a1a1a" opacity=".8">known words · E12c judge</text>
+<rect x="1120" y="420" width="105" height="40" rx="5" fill="#d9efe6" stroke="#0e7a5c"/><text x="1172" y="437" text-anchor="middle" fill="#1a1a1a">E48b growing net</text><text x="1172" y="451" text-anchor="middle" fill="#1a1a1a" opacity=".8">ported LIVE; E52 ear G0</text>
+<rect x="1120" y="475" width="105" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="1172" y="492" text-anchor="middle" fill="#1a1a1a">E49 space · E51 not</text><text x="1172" y="506" text-anchor="middle" fill="#1a1a1a" opacity=".8">adopted · net at its cap</text>
+<rect x="1240" y="420" width="130" height="40" rx="5" fill="#f6dedb" stroke="#b3382e"/><text x="1305" y="437" text-anchor="middle" fill="#1a1a1a">2 days on one want;</text><text x="1305" y="451" text-anchor="middle" fill="#1a1a1a" opacity=".8">90 dumps on one glyph</text>
+<rect x="1240" y="475" width="130" height="40" rx="5" fill="none" stroke="currentColor" stroke-dasharray="4 3"/><text x="1305" y="492" text-anchor="middle">closed 09-19 14:44</text><text x="1305" y="506" text-anchor="middle" opacity=".8">body prereg: 0 built</text>
+</g>
+<!-- GENOME -->
+<g>
+<rect x="1240" y="565" width="130" height="60" rx="6" fill="#0e7a5c" opacity=".12"/><rect x="1240" y="565" width="130" height="60" rx="6" fill="none" stroke="#0e7a5c" stroke-width="1.8"/>
+<text x="1305" y="584" text-anchor="middle" font-weight="700" fill="#0e7a5c">G0 · rung 0</text><text x="1305" y="599" text-anchor="middle">rules, not structure;</text><text x="1305" y="613" text-anchor="middle">a word meets its picture</text>
+</g>
+<!-- carried-forward arrows (solid) -->
+<path d="M210 150 L210 120 L510 120 L510 285" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#am)"/><text x="360" y="114" text-anchor="middle" font-size="9.5">frozen judges → Alpha 2's judiciary → Alpha 3's laws</text>
+<path d="M345 205 L345 250 L780 250 L780 285" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#am)"/><text x="560" y="262" text-anchor="middle" font-size="9.5">homeostasis + the random-twin rule → every later twin</text>
+<path d="M510 325 L510 400 L932 400 L932 420" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#am)"/><text x="720" y="395" text-anchor="middle" font-size="9.5">jail → hands · lexicon → the dictionary road · retina/gaze → E09d · parity → P0</text>
+<path d="M1172 460 L1172 535 L1240 585" fill="none" stroke="#0e7a5c" stroke-width="1.6" marker-end="url(#amg)"/><text x="1200" y="548" text-anchor="middle" font-size="9.5" fill="#0e7a5c">E48b's rule = the first genes</text>
+<path d="M932 515 L932 540 L1240 610" fill="none" stroke="#0e7a5c" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#amg)"/><text x="1080" y="560" text-anchor="middle" font-size="9.5" fill="#0e7a5c">E29's lesson: never evolve a net's shape → rules only + a random-genome control</text>
+<!-- recurring failure arrows (red) -->
+<path d="M345 190 L345 140 L640 140 L640 340" fill="none" stroke="#b3382e" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#amr)"/><text x="500" y="136" text-anchor="middle" font-size="9.5" fill="#b3382e">F1 the closed loop over own records</text>
+<path d="M480 190 L480 270 L1305 270 L1305 420" fill="none" stroke="#b3382e" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#amr)"/><text x="900" y="280" text-anchor="middle" font-size="9.5" fill="#b3382e">F4 a computed "cannot" that nobody consumes</text>
+<path d="M645 380 L645 395 L1172 395 L1172 475" fill="none" stroke="#b3382e" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#amr)"/><text x="1010" y="409" text-anchor="middle" font-size="9.5" fill="#b3382e">F6 forgetting by disuse → growth that stops</text>
+</g>
+</svg>
+</div>
+<figcaption>Figure 0. The lineage. Blue = worked, red = failed, amber = green gates that proved nothing, green = the living thread. The three red arrows are the failures that crossed organisms without changing shape; §3 names all ten.</figcaption>
+</figure>
+<div class="legend"><span><i style="background:#dbe8f7;border:1px solid #2b6cb0"></i>worked / PASS</span><span><i style="background:#f6dedb;border:1px solid #b3382e"></i>failed</span><span><i style="background:#f3ead0;border:1px solid #8a6d1f"></i>green gates, no capability</span><span><i style="background:#d9efe6;border:1px solid #0e7a5c"></i>alive, carried forward</span></div>
+
+<h3>1.1 · His inputs (the sources everything rests on)</h3>
+<div class="tbl"><table>
+<tr><th>date</th><th>what he sent</th><th>what it became</th></tr>
+<tr><td>08-13 → 08-29</td><td>five research pastes (mutation spectrum, an HH+STDP C++ sketch, the Alpha 2 decision, an eight-part chat research); the RSI/open-endedness dump (08-18); the biocomputing summary and his own synaptic-pruning study (08-24); the neuron-function and other-organisms directives</td><td>Alpha 1's plasticity program (M1–M6), the frontier organ, the belief organ; Alpha 2's founding program; the 09-06 deep research §1 inventory (21 pastes)</td></tr>
+<tr><td>09-02 → 09-03</td><td>the T1–T13 research paste; «how humans speak»</td><td>P11 THE GROWTH PROGRAM (neural ladder, curriculum G0–G4); speech_v2's road; GROWTH-PROGRAM Addendum 3</td></tr>
+<tr><td>09-06 00:50</td><td>the deep-research order (brain, animals, verify live, experiment, plan)</td><td>ALPHA-2-DEEP-RESEARCH (90 KB): Physarum 5/5 exact, run-and-tumble, the concept graph forgets 97–100 %, shelf 0.29 s/book; the four waves; six decisions</td></tr>
+<tr><td>09-11 → 09-12</td><td>AGI notes part 2 (Quran 96:1–5, 2:31, 17:85; §A–I), part 3 + his diagram (a loop upstream of language), the fly tweets, Looped Flows</td><td>R1–R6 (six research files, 42 tests, the E-series queue), ALPHA-3-PLAN, the five digests of Alpha 1/2</td></tr>
+<tr><td>09-13 → 09-14</td><td>two failure-research syntheses (eight joins; eleven threads); looped reasoning + development (two images); candidate mathematical frameworks (PDF); PC-ALM (PDF); FlashREINFORCE</td><td>four REVIEWs: E18's unblock VOID, E24b PASS, E16c FAIL; Decisions 7/8; E27–E35 queued</td></tr>
+<tr><td>09-15 17:58</td><td>stream-first language (Saffran; the superior colliculus; McGurk)</td><td>the direction corrected: words come from the stream → E43/E43b/E44/E46 series; RESEARCH 09-16 on the failing organs</td></tr>
+<tr><td>09-16 → 09-17</td><td>«the growing and shrinking neural weights»; «let him be an explorer»; «the own record is caging a bird»; «eyes, ears, thinking never stop»; his 3-D-space idea</td><td>E48/E48b (the growing net, live), D30, BLUEPRINT ADDENDUM 1 (the open world), FUSED-SENSES-PREREG (the body), E49</td></tr>
+<tr><td>09-19</td><td>the AGI Q&amp;A (8 sections, 9 open theories); «close alpha 3»; «a small genome experiment in python»; «gather all the research»</td><td>the GAP MAP; this atlas; G0</td></tr>
+</table></div>
+
+<h3>1.2 · Alpha 3's experiments — every directory, with what each rests on and feeds</h3>
+<p>Fifty-six directories. Read the verdict column with the reason beside it: a FAIL here is a measured fact with a named cause, and thirteen of them named the mechanism the next experiment fixed.</p>
+<div class="tbl"><table>
+<tr><th>id</th><th>question</th><th>verdict</th><th>the number</th><th>rests on → feeds</th></tr>
+<tr><td>E01</td><td>independent corroboration on the shelf</td><td><span class="tag pass">PASS</span></td><td>1.28 % of 34,730 claims (twin 0.042 %); later 0/214 truly independent</td><td>→ E18-small, the corroboration bar</td></tr>
+<tr><td>E02</td><td>certificate or silence: 0 false accepts?</td><td><span class="tag fail">FAIL</span></td><td>15/40 false accepts; the gate byte-reproducible</td><td>R1 → E11, E18, E27</td></tr>
+<tr><td>E03</td><td>tropical trait ladder; VSA belief algebra</td><td><span class="tag fail">FAIL</span></td><td>ladder −37.4 pp; AUC 0.687 vs 0.75</td><td>R3 → E09a's gate, E31</td></tr>
+<tr><td>E05 → E05b</td><td>the BFF soup: self-replicators with no fitness</td><td><span class="tag void">VOID</span> → <span class="tag pass">PASS</span></td><td>0/15 on three port bugs → 8/20 transitioned; RAND 0/20</td><td>R4 → E10 (open-endedness)</td></tr>
+<tr><td>E06 · E06b</td><td>are his dispositions repeatable character?</td><td><span class="tag open">INCONCL.</span> · <span class="tag fail">FAIL</span></td><td>the most repeatable reading is a scheduler alternation</td><td>R2 → journal the eligible set</td></tr>
+<tr><td>E07a</td><td>Hopfield / HDC / NG-RC</td><td><span class="tag fail">FAIL</span> (HDC-B pass)</td><td>NG-RC diverges on the integrator, not α; HDC publisher recovery R 1.0</td><td>R3 → E17, E28, E31</td></tr>
+<tr><td>E08</td><td>a grown sentence realiser</td><td><span class="tag fail">FAIL</span></td><td>grammaticality 11.6 % vs 90; nonsense the checker passed</td><td>→ the meaning judge E12</td></tr>
+<tr><td>E09a/b/c/d</td><td>the eye: slowness; EWC vs rehearsal; the tower; the readout</td><td><span class="tag fail">F</span> <span class="tag pass">P</span> <span class="tag fail">F</span> <span class="tag pass">PASS</span></td><td>E09d: 84.5 / 80.8 at 7,725 params = the eye organ</td><td>R2 → E25, E29, E39, E46, E51</td></tr>
+<tr><td>E11</td><td>revise MEANING before rendering?</td><td><span class="tag fail">FAIL</span> conj. / <span class="tag pass">PASS</span> the claim</td><td>upstream beats downstream by 47.5 pp</td><td>his diagram → E27, E30</td></tr>
+<tr><td>E12 · 12b · 12c</td><td>a learned meaning judge</td><td><span class="tag fail">F</span> <span class="tag fail">F</span> <span class="tag pass">PASS</span></td><td>gates_only 7 clauses to 6 across three disjoint draws</td><td>→ E16, E36 (the live judge)</td></tr>
+<tr><td>E14 · E21</td><td>the desk: a shell from pixels; self- vs world-caused change</td><td><span class="tag pass">PASS</span> <span class="tag pass">PASS</span></td><td>18/18; AUC 1.0 at 57 % noise</td><td>→ E28, E42 (his own computer)</td></tr>
+<tr><td>E15 · E22</td><td>mushroom-body sparse expansion; its unrun arms</td><td><span class="tag fail">FAIL</span> · <span class="tag pass">PASS</span></td><td>dense beats sparse; verification-GATED plasticity necessary (+25.9 pp)</td><td>R5 → the tower is dense</td></tr>
+<tr><td>E16 · 16c ×3</td><td>can any embedding beat lexical overlap?</td><td><span class="tag fail">FAIL</span> ×4</td><td>from-scratch −10.9 pp vs Jaccard; MiniLM first to beat overlap (BA 0.941)</td><td>→ D11, D13, E36 (MiniLM sealed)</td></tr>
+<tr><td>E17 · 17b</td><td>random-feature readouts</td><td><span class="tag fail">F</span> · <span class="tag pass">PASS</span></td><td>return collapses after 16×; invariance from variety, not size</td><td>closes the line</td></tr>
+<tr><td>E18-small</td><td>an independent second witness?</td><td><span class="tag open">INCONCL.</span></td><td>0 of 214 claims</td><td>his syntheses → D12(b)</td></tr>
+<tr><td>E20</td><td>Tsetlin machine as explainer</td><td><span class="tag fail">FAIL</span> parity</td><td>clause stability 0.738 vs 0.051</td><td>his syntheses → E20b</td></tr>
+<tr><td>E24 · 24b</td><td>equation discovery on GoL, Lenia, klines</td><td><span class="tag open">INCONCL.</span> · <span class="tag pass">PASS</span></td><td>GoL exact 512/512; stability selection finds the plant 6/6, the 1-SE rule 0/6</td><td>his synthesis A → the estate's selection rule</td></tr>
+<tr><td>E25</td><td>keeping without an oracle</td><td><span class="tag pass">PASS</span></td><td>retention scales with rehearsal ROWS</td><td>→ E46/E48 buffers</td></tr>
+<tr><td>E27 · E28</td><td>a halting comparator; a stateful world organ</td><td><span class="tag fail">FAIL</span> <span class="tag fail">FAIL</span></td><td>depth buys cost, not accuracy; 97 params match 8,000</td><td>his looped-reasoning paste → E30; E21</td></tr>
+<tr><td><b>E29</b></td><td><b>a developmental encoding grows the eye tower</b></td><td><span class="tag fail">FAIL</span></td><td>grown 12.4 pp behind direct; <b>random θ beats evolved θ</b></td><td>his development paste → the precedent G0 is built against</td></tr>
+<tr><td>E36</td><td>seal the MiniLM judge</td><td><span class="tag fail">F</span> → sealed at option A</td><td>FA 5.19 % vs 5; recall 60 %</td><td>D13 → the live meaning organ</td></tr>
+<tr><td>E43 · 43b · <b>E47</b></td><td>the stream cuts itself</td><td><span class="tag fail">F</span> <span class="tag fail">F</span> <span class="tag pass">PASS</span></td><td>boundaries 2.08× twin but the wrong grain; known words + statistics 12.6× twin</td><td>his stream-first study → E52; not wired</td></tr>
+<tr><td>E44 ×4 → <b>E52</b></td><td>hearing tied to the word</td><td><span class="tag void">VOID</span> ×2 <span class="tag fail">F</span> ×2 → <span class="tag pass">G0 PASS</span></td><td>plants 0.91/0.88/0.93/0.84 under a 0.99 bar → 1.000 on 553 held-out; the gate exercises loudness only</td><td>→ G1 (CMUdict); the ear gene</td></tr>
+<tr><td>E46 · 46b · 46c → <b>E46d</b></td><td>the eye learns a second script without losing the first</td><td><span class="tag fail">F</span> ×3 → <span class="tag pass">PASS</span></td><td>the 18 shared glyphs were a LABEL CONFLICT; context cures it (g2 adopted)</td><td>his growth order → D31 → E48</td></tr>
+<tr><td>E48 · <b>E48b</b></td><td>the growing / shrinking net</td><td><span class="tag fail">F</span> · <span class="tag fail">F</span> (digits) — rule <span class="tag live">LIVE</span></td><td>decay ×0.064 and a least-used cap forgot Latin; budget + no decay retains; byte-exact port</td><td>his 18:53 word → the live organ → G0's genes</td></tr>
+<tr><td>E49 · E51</td><td>units in 3-D space; richer eye channels</td><td><span class="tag fail">FAIL</span> <span class="tag fail">FAIL</span></td><td>no sparsity, no modules, 2.3× cost; channels carry (1.000 vs 0.500) at 5.1× cost</td><td>his 3-D idea; his eye-traits word → a cheaper carrier</td></tr>
+<tr><td>E50 · B2 · D31 · D33</td><td>the web's regions; the index pin; the family answer set; a made name to the world</td><td><span class="tag open">NOT RUN</span> / live unscored</td><td>D31: digits .69→.79, handwritten .19→.66</td><td>—</td></tr>
+</table></div>
+
+<h3>1.3 · Alpha 1 and Alpha 2 — the mechanisms, judged</h3>
+<div class="tbl"><table>
+<tr><th>organism</th><th>worked (with the evidence)</th><th>failed (with the cause)</th></tr>
+<tr><td><b>Alpha 1</b><br><span class="eyebrow">27 judged</span></td><td>judge/generator split (42 preregs, never failed a control) · pre-registration with appended amendments · cluster-SE fix (FP 72.8 % → 5.7 %) · alias/support control (real vs shuffled 51×) · homeostasis M3 (192/192 runaways contained) · the random-twin rule on pruning · the frontier organ's exhaustion typing · a sandboxed own-build workshop (9/9 hostile drafts refused) · self-model (reflection only) · gate_vitality (a gate that can never pass) · taught-vs-verified curriculum · immune forward-attribution audit · the retirement pattern (seal, delete nothing)</td><td>the entry rules self-contradicted → 0 entries in 117,439 · the readiness gate scored 0 trades as +0.007 (won by abstaining) · the Teacher graded against a corpus 24 h behind its advice · mutation opened 3 of 33 knobs · the LLM mutation operator never beat random (16,371 trials, 0 promotions) · wants→senses unlocked 0 of 29 · the frontier organ never read by the proposer · the discovery pipeline's own FDR 83–89 % · usage-pruning 0/32 vs random · plasticity 0/63 arms (the ceiling was the FEATURE VECTOR)</td></tr>
+<tr><td><b>Alpha 2</b><br><span class="eyebrow">36 judged</span></td><td>the jail (Landlock + seccomp; Alpha 3's hands) · the parity/oracle port discipline (0 mismatches over 82 files) · lexicon (1.27 M senses; 1,483 of 2,064 bound) · curiosity genome (16,114 vs a null's 2,223 — "the one organ that beat its twin") · retina/gaze (6.4× random; unseen fonts 47.5 → 58.9 %) · speech_v2 under a frozen judge (clears its 4-gate bar; vocabulary thin) · scripture verbatim (every negative control refused) · the exam harness (9 held-out families) · the reader service (0.29 s/book; 719 windows, 0 fallbacks) · learned index · self-census · clock + interoception · boot survival · the C++ judiciary (2,120/2,120) · growth g0-g1 (866,813 headwords) · the creature (six laws; firmness .13 → .59; reads unseen fonts; a shelf+net world closed 33/108 questions vs 12/108 with none)</td><td>grounding_check verified a word by its own records (the witness was itself) · the concept graph retained 3.3 % / 0 % / 0 % after a shift under every rule · LIF+R-STDP 0/5 seeds, armed lost to frozen · local corroboration 0.300 % vs 1 % (one article per claim; 30 % fragments) · the starvation floor keyed per-candidate caused the starvation · the contradiction resolver admitted 0 pairs · 874 of the prediction ledger's rows were liveness pings · sleep never demoted a belief · exams F2/F3/F5/F6 (direction, calibration, arithmetic, code) — no faculty existed · a week of green P12 gates and a mind that could not hold a sentence</td></tr>
+</table></div>
+
+<h3>1.4 · The designs on paper today</h3>
+<div class="tbl"><table>
+<tr><th>design</th><th>what it fixes</th><th>status</th></tr>
+<tr><td>FUSED-SENSES-PREREG + ADDENDUM 1 (09-17)</td><td>F3 — eyes, ears, thinking never stop; attention over thoughts only; the replay gate before threads</td><td><span class="tag open">written only</span> · 0 commits</td></tr>
+<tr><td>THE THINKING ORGAN blueprint + ADDENDUM 1 THE OPEN WORLD (09-16/17); THINKING-RUNG1-PREREG</td><td>F1, F4 — sources HELD / REACHABLE / MAKEABLE; fetch and run; the five-adversary suite; a falsifiable prediction ledger</td><td><span class="tag open">rung 1 built, not wired</span> (branch unmerged)</td></tr>
+<tr><td>THE CHILD'S PATH (09-16)</td><td>F7 — a rendered page → the eye → words out of a stream → grammar by compression → speech → ears → fused streams</td><td><span class="tag open">written only</span></td></tr>
+<tr><td>NEURAL-PORT-PREREG (09-16)</td><td>F6 — the growing net as a withheld organ; parity byte-exact</td><td><span class="tag live">was live</span> · at its cap · closed 09-19</td></tr>
+<tr><td>P1-READER-PREREG; LANE-LAW; P0-GATE</td><td>reading whole documents; the discipline; identity</td><td>live until 09-19; the identity gate is on STATE (F9)</td></tr>
+<tr><td>G0-PREREG (today)</td><td>F1, F2, F3, F4, F5, F6, F7, F9 on the smallest world with known truth</td><td><span class="tag open">draft for his approval</span></td></tr>
+</table></div>
+
+<h2 id="worked">2 · What worked, and matches the need</h2>
+<p>The need: an organism that learns words tied to pictures and grows on its own. These are the mechanisms with a measured PASS that serve it directly, and the gene or step each becomes.</p>
+<div class="tbl"><table>
+<tr><th>mechanism (era)</th><th>evidence</th><th>in the genome</th></tr>
+<tr><td>E48b's growth rule (A3): prototypes born on novelty and error under a budget; delta rule; synaptic scaling; pruning under a floor; NO disuse decay</td><td>letters retained (−1.7 / +1.7 pp); Cyrillic 0.84–0.90; byte-exact C++ parity over 136,416 steps; live 3 days, 6,000 units</td><td>the GROW, WIRE, SHRINK genes verbatim</td></tr>
+<tr><td>Homeostasis M3 (A1 → A2 → A3)</td><td>192/192 runaways contained; reconfirmed in A2; the SCALE step in E48b</td><td>SCALE gene</td></tr>
+<tr><td>Context at the label (E46d, D31)</td><td>the 18-glyph conflict cured; digits .69 → .79; handwritten .19 → .66; g2 adopted</td><td>MEET: the word is the picture's context and the picture the word's</td></tr>
+<tr><td>The eye tower's fixed front (E09c/d; retina/gaze in A2)</td><td>at a budget the eye's declared readings beat PCA/box/random; gaze 6.4× random; unseen fonts</td><td>RETINA gene (fixed, not learned)</td></tr>
+<tr><td>Known words + statistics cut the stream (E47)</td><td>F1 0.487, 12.6× twin, 2.09× pure statistics — the one PASS on the stream road</td><td>the stream rung after G0</td></tr>
+<tr><td>The cochlear front (E52)</td><td>1.000 on 553 held-out; AGC and compression load-bearing</td><td>SENSE ear, later</td></tr>
+<tr><td>Curiosity genome (A2)</td><td>16,114 vs a null's 2,223 on every measurement</td><td>a WANT gene for rung 1 (what to look at next)</td></tr>
+<tr><td>The jail (A2 → A3's hands); the workshop (A1)</td><td>hostile drafts refused 9/9; 442 program runs</td><td>MAKEABLE sources in rung 2+</td></tr>
+<tr><td>The judge/generator split; frozen judges; the random-twin rule; pre-registration with appended amendments; the parity/oracle discipline; the P0 identity gate (A1 → A2 → A3)</td><td>never failed a control across 42 preregs; 0 mismatches over 82 files; every one of this atlas's numbers exists because of them</td><td>fixed machinery vs growing structure; twins each blind to one thing; the replay gate</td></tr>
+<tr><td>gate_vitality; the frontier's exhaustion types; the self-model (A1)</td><td>detected a gate that could never pass — and nothing consumed it</td><td>ABSTAIN + the dead-end census (D39)</td></tr>
+<tr><td>Retirement by sealing (A1); disposal archives before deletion (A2)</td><td>one reverted block restores an organ; nothing ever deleted</td><td>how Alpha 3 was closed today</td></tr>
+</table></div>
+
+<h2 id="fail">3 · Where we are failing, and why</h2>
+<p>Ten failure classes. Each crossed at least two organisms, which is what makes it a class rather than a bug. The instance column gives the number that proves it; the cause is the mechanism; the fix names the register that carries it and how G0 tests it.</p>
+<div class="tbl"><table>
+<tr><th>#</th><th>the failure</th><th>instances (Alpha 1 → 2 → 3)</th><th>root cause</th><th>theory</th><th>fix · in G0</th></tr>
+<tr><td>F1</td><td><b>The closed loop over its own records</b></td><td>Teacher graded vs its own lagging corpus (6/6 PENDING) → grounding_check's witness was itself; corroboration 0.3 % → 25,000 syllogisms «left me no richer»; 0 of 7,609 corroborated; «caging a bird»</td><td>no witness outside the writer: a system fed only its own output can find itself inconsistent, never wrong</td><td>Popper: knowledge is what something outside could refute; no supervision arises inside a closed loop</td><td>the open world (fetch/run), D12, an outcome he perceives · <b>G0:</b> the picture is the word's witness; truth scored outside him</td></tr>
+<tr><td>F2</td><td><b>The zero scored as success</b></td><td>0 trades scored +0.007 vs a losing null → QD promoted «abstain, 0 positions» → abstention 75 % by design</td><td>an objective that never charges inaction</td><td>Goodhart; a conjunctive scoreboard with a participation floor; a minimal criterion before ranking (MCC)</td><td><b>G0:</b> (i) must answer AND (vi) must abstain only on the unseen</td></tr>
+<tr><td>F3</td><td><b>A scheduler over the senses</b></td><td>the starvation floor starved the duties it protected (1,182 passes) → one duty per pass; 4× energy = 0.53× seeing; 09-18: 45 % wait, 41 % one question</td><td>perceiving was a chore that had to outrank asking</td><td>perception is continuous and predictive (Rao & Ballard; Friston); attention chooses among representations, never whether to perceive</td><td>the body prereg G8–G12 · <b>G0:</b> no scheduler exists; every moment is perceived</td></tr>
+<tr><td>F4</td><td><b>No consumer for «this cannot be answered»</b></td><td>the frontier organ unread; senses 0/29 unlocked; a never-passable gate flagged 3 weeks → two days on `skullcap~device`, then `con~gathering` within ten minutes of the restart</td><td>a computed value nobody consumes (SOLUTIONS #163/#180)</td><td>metacognition = monitoring PLUS control (Nelson & Narens); knowing you don't know must change the next act</td><td>D39 park rule, consumed by the drive · <b>G0:</b> ABSTAIN is an answer; the null plant and Q5 test it</td></tr>
+<tr><td>F5</td><td><b>One statistic, no context</b></td><td>F2/F3/F5/F6: no faculty to ask → E46 ×3 (18 shared glyphs read as forgetting), E43 (the wrong grain), nothing reads its own misses</td><td>P(label | shape) with nothing saying which world the shape is in</td><td>perception = expectation + evidence; the McGurk effect; context is half the likelihood</td><td>D31 (cured it) · <b>G0:</b> MEET makes each side the other's context</td></tr>
+<tr><td>F6</td><td><b>Forgetting by design, then growth that stops</b></td><td>plasticity 0/63; pruning 0/32 vs random; the ceiling was the feature vector → the concept graph 3.3 % / 0 % / 0 % → E48's cap ate the old; decay ×0.064; the live net at N_max, 1 % pruned</td><td>shrinking by DISUSE is forgetting; a cap is not a cycle; rules cannot learn what features do not carry</td><td>stability–plasticity (Grossberg; ART → GWR); loss of plasticity as a second failure (Dohare); NEAT: ablate growth, failure 0 → 80 %</td><td>prune the wrong and redundant; budget, never cap; a fixed retina · <b>G0:</b> those genes; marks (iv) (v); D41</td></tr>
+<tr><td>F7</td><td><b>The pre-cut word — a symbol with no body</b></td><td>1.27 M senses, own_perception 1 word of 20; «a dictionary reports what is distinctive, not what is true» → 27,664 words as counts; the eye and the reader never met; R1's gloss road overturned by his 09-15 study</td><td>language as symbol lookup; a word never beside the thing it names</td><td>symbol grounding (Harnad); statistical segmentation with the referent present (Saffran; fast mapping; mutual exclusivity); multisensory binding (Meredith & Stein)</td><td>the present · <b>G0 is this:</b> a picture and its word in one moment; later the stream and order</td></tr>
+<tr><td>F8</td><td><b>The instrument lied first</b></td><td>FDR 83–89 % from noise; cluster-SE 72.8 % false positives → E05's port bugs; E29's random θ; E44's plant shared with every negative; a twin blind to everything (#228)</td><td>measuring the thing before the instrument</td><td>pre-registration, negative controls, null twins, ceilings before bars — the 230-lesson corpus</td><td>carry it whole · <b>G0:</b> the toy first, gate G-a, twins, the plant with its own budget, the replay gate</td></tr>
+<tr><td>F9</td><td><b>Built before it could learn</b></td><td>«a week of green gates, a mind that could not hold a sentence» → P0 froze the life byte-for-byte; every learner lived at the edge under a withheld flag; «going to c++ with not working system is costing us»</td><td>an identity gate on STATE, not on RULES; ports before proof</td><td>a genome IS that separation: fixed machinery, growing structure; identity by replay, not by frozen state</td><td>Python first; C++ for what passed · <b>G0:</b> mark (vii)</td></tr>
+<tr><td>F10</td><td><b>Self-modification that recombines, never invents</b></td><td>3 of 33 knobs; the LLM mutator never beat random → E29's evolved encoding lost to 48 random draws; E49 bought nothing; «self-modification recombines an existing alphabet»</td><td>search over a fixed alphabet on a substrate that cannot learn; evolution before development</td><td>open-ended = novel AND learnable (R4); fixed-code systems cannot be open-ended (Banzhaf); NEAT grows with speciation, starting minimal; MCC</td><td>development first, a lineage only on a learning substrate; E29's control forever · <b>G0:</b> D-G1, mark (ix)</td></tr>
+</table></div>
+<p class="note">Two more facts belong beside the table. The organisms' method churned: Alpha 1 re-pivoted eleven times in thirteen days; Alpha 2's organ-by-organ body (200 organs, 737 commits in ten days) was retired after a week; Alpha 3 ran 56 experiment directories in seven days. And the box changed under the plan: on 09-12 it had no numpy, which is why every test was written in C++ — today it has Python 3.14 with numpy, PIL and scipy, which is why a Python genome is possible now.</p>
+
+<h2 id="theory">4 · The theoretical solution</h2>
+<p>An organism is a <b>genome</b> (rules, not structure) run by fixed <b>machinery</b>, living in a <b>world that answers back</b> (a present where a word meets its picture; questions scored outside it), with a <b>body that always perceives</b> (no scheduler over senses), a <b>mind that can say «I do not know»</b> (a consumer for every dead end), <b>growth that never eats</b> (a budget; prune the wrong and the redundant), and a <b>discipline that measures its own instrument first</b>. Each of the ten failures is the absence of one clause. G0 tests the first seven on the smallest world where the truth is known; the body's threads, the open world and the lineage are rungs on the same substrate, in that order, each behind its own gate.</p>
+<p>What would change this: a G0 organism that passes (i) and (ii) but fails (vi) would say the substrate learns and the metacognition gene is wrong, not the design; a G0 that fails (ii) — the shuffled twin reading above chance — would say the association is geometry, not co-occurrence, and the whole «present» clause is false for this world; a random genome in the top quartile (ix) would say E29 again, and the genome's numbers are decoration.</p>
+
+
+<h2 id="mech">5 · The whole working mechanism, as one loop</h2>
+<p>This is his research of 2026-09-19 (eight sections) drawn as one machine. The loop runs left to right and back; the genome and the grow/prune rules sit under everything because every box above is meant to be <em>grown</em>, not written. The coloured band names what exists in Alpha 3 today, so the gaps are visible in the same picture.</p>
+<figure>
+<div class="fig">
+<svg viewBox="0 0 1240 620" role="img" aria-label="The whole working mechanism as one loop: world, always-on senses, a surprise gate, the present, traits, fast and slow memory with replay, thinking with a belief ledger, language, voice and hands back to the world; a reward and prediction-error signal feeds learning; the genome and the grow, wire, shrink and stage rules are the substrate under every box.">
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+<marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0e7a5c"/></marker>
+</defs>
+<!-- childhood environment frame -->
+<rect x="14" y="14" width="1212" height="392" rx="10" fill="none" stroke="currentColor" stroke-dasharray="6 5" opacity=".55"/>
+<text x="28" y="36" font-size="12" font-family="IBM Plex Mono, monospace" fill="currentColor" opacity=".8">8 · THE CHILDHOOD ENVIRONMENT — a small world with tasks whose OUTCOMES he perceives (not a shelf he reads)</text>
+<!-- world -->
+<rect x="30" y="150" width="130" height="120" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="95" y="178" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">WORLD</text>
+<text x="95" y="198" text-anchor="middle" font-size="11.5" fill="currentColor">pictures · sound</text>
+<text x="95" y="214" text-anchor="middle" font-size="11.5" fill="currentColor">text · the internet</text>
+<text x="95" y="230" text-anchor="middle" font-size="11.5" fill="currentColor">and what his hands</text>
+<text x="95" y="246" text-anchor="middle" font-size="11.5" fill="currentColor">did to it</text>
+<!-- senses -->
+<rect x="190" y="130" width="150" height="160" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="265" y="156" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">1 · SENSES</text>
+<text x="265" y="174" text-anchor="middle" font-size="11.5" fill="currentColor">always on, own threads</text>
+<text x="265" y="196" text-anchor="middle" font-size="11.5" fill="currentColor">eye → retina (fixed)</text>
+<text x="265" y="212" text-anchor="middle" font-size="11.5" fill="currentColor">ear → cochlea (fixed)</text>
+<text x="265" y="228" text-anchor="middle" font-size="11.5" fill="currentColor">text → letters</text>
+<text x="265" y="252" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">each event stamped</text>
+<text x="265" y="266" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">with instant + modality</text>
+<!-- surprise gate -->
+<rect x="370" y="150" width="120" height="120" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="430" y="176" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">SURPRISE</text>
+<text x="430" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">GATE</text>
+<text x="430" y="214" text-anchor="middle" font-size="11.5" fill="currentColor">predict the input;</text>
+<text x="430" y="230" text-anchor="middle" font-size="11.5" fill="currentColor">publish only</text>
+<text x="430" y="246" text-anchor="middle" font-size="11.5" fill="currentColor">the error</text>
+<!-- present -->
+<rect x="520" y="150" width="120" height="120" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="580" y="178" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">THE PRESENT</text>
+<text x="580" y="200" text-anchor="middle" font-size="11.5" fill="currentColor">sight, sound and</text>
+<text x="580" y="216" text-anchor="middle" font-size="11.5" fill="currentColor">word of the SAME</text>
+<text x="580" y="232" text-anchor="middle" font-size="11.5" fill="currentColor">second, together</text>
+<text x="580" y="254" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">= where a word</text>
+<text x="580" y="268" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">meets a picture</text>
+<!-- traits -->
+<rect x="670" y="130" width="140" height="160" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="740" y="156" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">2 · TRAITS</text>
+<text x="740" y="176" text-anchor="middle" font-size="11.5" fill="currentColor">a learned space:</text>
+<text x="740" y="192" text-anchor="middle" font-size="11.5" fill="currentColor">the same thing lands</text>
+<text x="740" y="208" text-anchor="middle" font-size="11.5" fill="currentColor">near itself, a different</text>
+<text x="740" y="224" text-anchor="middle" font-size="11.5" fill="currentColor">thing far (contrastive)</text>
+<text x="740" y="248" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">invariance learned</text>
+<text x="740" y="262" text-anchor="middle" font-size="11" fill="currentColor" opacity=".75">deep, not at the sensor</text>
+<!-- memory -->
+<rect x="840" y="110" width="170" height="200" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="925" y="136" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">3 · MEMORY</text>
+<rect x="856" y="150" width="138" height="46" rx="5" fill="none" stroke="currentColor" opacity=".8"/>
+<text x="925" y="169" text-anchor="middle" font-size="11.5" fill="currentColor">FAST · episodes</text>
+<text x="925" y="185" text-anchor="middle" font-size="11" fill="currentColor" opacity=".8">one-shot, what happened</text>
+<rect x="856" y="236" width="138" height="46" rx="5" fill="none" stroke="currentColor" opacity=".8"/>
+<text x="925" y="255" text-anchor="middle" font-size="11.5" fill="currentColor">SLOW · consolidated</text>
+<text x="925" y="271" text-anchor="middle" font-size="11" fill="currentColor" opacity=".8">kinds, rules, words</text>
+<line x1="925" y1="196" x2="925" y2="236" stroke="currentColor" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<text x="936" y="220" font-size="10.5" fill="currentColor" opacity=".85">replay (sleep)</text>
+<text x="925" y="300" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".75">nearest neighbour over traits</text>
+<!-- thinking -->
+<rect x="1040" y="110" width="180" height="200" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="1130" y="136" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">4 · THINKING</text>
+<text x="1130" y="156" text-anchor="middle" font-size="11.5" fill="currentColor">predict → be wrong → file</text>
+<text x="1130" y="174" text-anchor="middle" font-size="11.5" fill="currentColor">deduce · induce · abduce</text>
+<text x="1130" y="190" text-anchor="middle" font-size="11.5" fill="currentColor">analogy · counterfactual</text>
+<rect x="1054" y="204" width="152" height="60" rx="5" fill="none" stroke="currentColor" opacity=".8"/>
+<text x="1130" y="222" text-anchor="middle" font-size="11.5" fill="currentColor">BELIEF LEDGER</text>
+<text x="1130" y="238" text-anchor="middle" font-size="11" fill="currentColor" opacity=".8">firmness · provenance</text>
+<text x="1130" y="254" text-anchor="middle" font-size="11" fill="currentColor" opacity=".8">a clash opens, never overwrites</text>
+<text x="1130" y="284" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".75">attention chooses only</text>
+<text x="1130" y="298" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".75">what to think about</text>
+<!-- language + voice/hands (below) -->
+<rect x="700" y="330" width="220" height="62" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="810" y="352" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">5 · LANGUAGE</text>
+<text x="810" y="370" text-anchor="middle" font-size="11.5" fill="currentColor">letters → words → sentences</text>
+<text x="810" y="384" text-anchor="middle" font-size="11" fill="currentColor" opacity=".8">the interface, not the destination</text>
+<rect x="440" y="330" width="220" height="62" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="550" y="352" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">VOICE + HANDS</text>
+<text x="550" y="370" text-anchor="middle" font-size="11.5" fill="currentColor">answer · ask · fetch · run</text>
+<text x="550" y="384" text-anchor="middle" font-size="11" fill="currentColor" opacity=".8">6 · grounded through his own acts</text>
+<!-- arrows along the loop -->
+<line x1="160" y1="210" x2="190" y2="210" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="175" y="200" text-anchor="middle" font-size="10" fill="currentColor">light, air</text>
+<line x1="340" y1="210" x2="370" y2="210" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="490" y1="210" x2="520" y2="210" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="505" y="200" text-anchor="middle" font-size="10" fill="currentColor">surprise</text>
+<line x1="640" y1="210" x2="670" y2="210" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="810" y1="210" x2="840" y2="210" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="825" y="200" text-anchor="middle" font-size="10" fill="currentColor">store</text>
+<line x1="1010" y1="210" x2="1040" y2="210" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<text x="1025" y="200" text-anchor="middle" font-size="10" fill="currentColor">recall</text>
+<path d="M1130 310 L1130 361 L920 361" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="1040" y="356" text-anchor="middle" font-size="10" fill="currentColor">what to say / do</text>
+<line x1="700" y1="361" x2="660" y2="361" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)"/>
+<path d="M440 361 L95 361 L95 270" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="270" y="352" text-anchor="middle" font-size="10" fill="currentColor">acts change the world; a question goes out</text>
+<!-- top-down prediction to organs -->
+<path d="M1130 110 L1130 70 L430 70 L430 150" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#ah)"/>
+<text x="780" y="62" text-anchor="middle" font-size="10.5" fill="currentColor">top-down: the mind sends its PREDICTION down; the gate answers with the error (active inference)</text>
+<!-- reward / prediction error -->
+<path d="M550 392 L550 430 L925 430 L925 310" fill="none" stroke="#0e7a5c" stroke-width="1.6" marker-end="url(#ahg)"/>
+<path d="M740 430 L740 290" fill="none" stroke="#0e7a5c" stroke-width="1.6" marker-end="url(#ahg)"/>
+<text x="740" y="448" text-anchor="middle" font-size="11" font-weight="600" fill="#0e7a5c">REWARD / PREDICTION ERROR — an outcome he perceived grades the act, the trait and the memory</text>
+<!-- substrate band -->
+<rect x="14" y="470" width="1212" height="136" rx="10" fill="#0e7a5c" opacity=".08"/>
+<rect x="14" y="470" width="1212" height="136" rx="10" fill="none" stroke="#0e7a5c" stroke-width="1.6"/>
+<text x="28" y="494" font-size="12" font-family="IBM Plex Mono, monospace" font-weight="600" fill="#0e7a5c">7 · THE SUBSTRATE — every box above is GROWN by these rules, never written</text>
+<rect x="30" y="510" width="150" height="80" rx="6" fill="none" stroke="#0e7a5c" stroke-width="1.4"/>
+<text x="105" y="534" text-anchor="middle" font-size="13" font-weight="700" fill="#0e7a5c">GENOME</text>
+<text x="105" y="552" text-anchor="middle" font-size="11" fill="currentColor">a readable text:</text>
+<text x="105" y="566" text-anchor="middle" font-size="11" fill="currentColor">the RULES, not</text>
+<text x="105" y="580" text-anchor="middle" font-size="11" fill="currentColor">the structure</text>
+<line x1="180" y1="550" x2="212" y2="550" stroke="#0e7a5c" stroke-width="1.5" marker-end="url(#ahg)"/>
+<text x="196" y="542" text-anchor="middle" font-size="9.5" fill="currentColor">read by</text>
+<rect x="212" y="510" width="130" height="80" rx="6" fill="none" stroke="#0e7a5c" stroke-width="1.4"/>
+<text x="277" y="534" text-anchor="middle" font-size="13" font-weight="700" fill="#0e7a5c">MACHINERY</text>
+<text x="277" y="552" text-anchor="middle" font-size="11" fill="currentColor">fixed, like a cell:</text>
+<text x="277" y="566" text-anchor="middle" font-size="11" fill="currentColor">expresses the genes</text>
+<text x="277" y="580" text-anchor="middle" font-size="11" fill="currentColor">every moment</text>
+<line x1="342" y1="550" x2="374" y2="550" stroke="#0e7a5c" stroke-width="1.5" marker-end="url(#ahg)"/>
+<g font-size="11" fill="currentColor">
+<rect x="374" y="510" width="160" height="80" rx="6" fill="none" stroke="#0e7a5c" stroke-width="1.4"/>
+<text x="454" y="532" text-anchor="middle" font-weight="700" fill="#0e7a5c">GROW</text>
+<text x="454" y="550" text-anchor="middle">a cell is born on novelty</text>
+<text x="454" y="564" text-anchor="middle">or on persistent error,</text>
+<text x="454" y="578" text-anchor="middle">under a budget (never a cap that eats)</text>
+<rect x="548" y="510" width="160" height="80" rx="6" fill="none" stroke="#0e7a5c" stroke-width="1.4"/>
+<text x="628" y="532" text-anchor="middle" font-weight="700" fill="#0e7a5c">WIRE</text>
+<text x="628" y="550" text-anchor="middle">cells active in the same</text>
+<text x="628" y="564" text-anchor="middle">moment get an edge;</text>
+<text x="628" y="578" text-anchor="middle">right strengthens, wrong weakens</text>
+<rect x="722" y="510" width="160" height="80" rx="6" fill="none" stroke="#0e7a5c" stroke-width="1.4"/>
+<text x="802" y="532" text-anchor="middle" font-weight="700" fill="#0e7a5c">SHRINK</text>
+<text x="802" y="550" text-anchor="middle">prune the WRONG,</text>
+<text x="802" y="564" text-anchor="middle">merge the REDUNDANT —</text>
+<text x="802" y="578" text-anchor="middle">never the merely unused</text>
+<rect x="896" y="510" width="160" height="80" rx="6" fill="none" stroke="#0e7a5c" stroke-width="1.4"/>
+<text x="976" y="532" text-anchor="middle" font-weight="700" fill="#0e7a5c">STAGES</text>
+<text x="976" y="550" text-anchor="middle">critical periods:</text>
+<text x="976" y="564" text-anchor="middle">senses first, then meeting,</text>
+<text x="976" y="578" text-anchor="middle">then answering</text>
+<rect x="1070" y="510" width="150" height="80" rx="6" fill="none" stroke="#0e7a5c" stroke-width="1.4"/>
+<text x="1145" y="532" text-anchor="middle" font-weight="700" fill="#0e7a5c">LINEAGE</text>
+<text x="1145" y="550" text-anchor="middle">later: mutate the</text>
+<text x="1145" y="564" text-anchor="middle">genome, select by</text>
+<text x="1145" y="578" text-anchor="middle">held-out marks (E29's control)</text>
+</g>
+</svg>
+</div>
+<figcaption>Figure A. The mechanism his research describes, as one loop. Numbers 1–8 are his research's sections. Green is the substrate the genome experiment builds first; the loop above it is what the substrate must be able to grow, rung by rung. The dashed top arrow is the one thing Alpha 3 never had: a prediction sent DOWN to an organ.</figcaption>
+</figure>
+
+<div class="tbl"><table>
+<tr><th>box in Figure A</th><th>Alpha 3 today (closed 09-19 14:44)</th><th>rung 0 of the genome</th><th>rung 1–2</th><th>later gene family</th></tr>
+<tr><td>senses always on</td><td>one thread, one duty per pass; the eye every 50 passes; ear not live</td><td>one stream, single process (deterministic)</td><td>rung 1: his pictures + words</td><td>SENSE ear (E52's cochlear front); threads under the replay gate</td></tr>
+<tr><td>surprise gate</td><td>none</td><td>BIRTH novelty is a gate on the LEARNER only</td><td>—</td><td>PREDICT gene: publish only the error</td></tr>
+<tr><td>the present</td><td>never: eye and reader never met</td><td><b>yes</b> — a picture and its word in one moment</td><td>rung 1: real pictures</td><td>sound in the same moment</td></tr>
+<tr><td>traits</td><td>a sealed tower + prototypes keyed to exam labels</td><td>prototypes born from the retina's features</td><td>—</td><td>a contrastive gene (same thing near, different far)</td></tr>
+<tr><td>memory fast / slow + replay</td><td>counts and verbatim ledgers; no replay</td><td>cells + edges (slow only)</td><td>—</td><td>EPISODE gene + SLEEP gene (replay)</td></tr>
+<tr><td>thinking + belief ledger</td><td>one syllogism, «left me no richer» ×25,000; predictions 0</td><td>RECALL + ABSTAIN («I do not know»)</td><td>—</td><td>PREDICT, CLASH, ANALOGY genes; the open world</td></tr>
+<tr><td>language</td><td>letters and word counts; no sentence</td><td>a word = letters (the ear for text)</td><td>—</td><td>ORDER gene (sentences)</td></tr>
+<tr><td>voice + hands, reward</td><td>frames; hands run programs; no outcome grades anything</td><td>answers scored OUTSIDE him</td><td>rung 1: his questions</td><td>REWARD gene: an outcome he perceives</td></tr>
+<tr><td>grow / prune</td><td>at its cap (6,000 units), 1 % pruned</td><td><b>yes</b> — the whole point</td><td>rung 2: lineage</td><td>MERGE + the grow/prune cycle</td></tr>
+<tr><td>childhood environment</td><td>a shelf he reads; exams sat by the seat</td><td>a world with known truth</td><td>rung 1: his world</td><td>tasks with consequences</td></tr>
+</table></div>
+
+<h2 id="plan">6 · The plan: the genome experiment, rung 0</h2>
+<p>How the experiment is performed. The full pre-registration with every bar is <code>docs/G0-PREREG.md</code>; this is the same thing drawn.</p>
+<figure>
+<div class="fig">
+<svg viewBox="0 0 1240 430" role="img" aria-label="The genome experiment: a readable genome is read by fixed machinery into an embryo; a stream of moments, each a picture with its word, grows cells and edges; questions are asked of the grown organism; the answers are marked against twins that lack one thing each; pass leads to his own pictures and then a lineage, fail leads back to the genome.">
+<defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+<marker id="ah2g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0e7a5c"/></marker></defs>
+<g font-size="11.5" fill="currentColor">
+<rect x="20" y="60" width="150" height="120" rx="8" fill="none" stroke="#0e7a5c" stroke-width="1.8"/>
+<text x="95" y="86" text-anchor="middle" font-size="13" font-weight="700" fill="#0e7a5c">GENOME</text>
+<text x="95" y="106" text-anchor="middle">one text file,</text>
+<text x="95" y="122" text-anchor="middle">one gene per line:</text>
+<text x="95" y="138" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5">BODY GROW WIRE</text>
+<text x="95" y="152" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5">SHRINK STAGE ANSWER</text>
+<text x="95" y="170" text-anchor="middle" opacity=".8">never changes in a life</text>
+<line x1="170" y1="120" x2="200" y2="120" stroke="#0e7a5c" stroke-width="1.6" marker-end="url(#ah2g)"/>
+<text x="185" y="110" text-anchor="middle" font-size="10">read</text>
+<rect x="200" y="60" width="140" height="120" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="270" y="86" text-anchor="middle" font-size="13" font-weight="700">MACHINERY</text>
+<text x="270" y="106" text-anchor="middle">fixed Python;</text>
+<text x="270" y="122" text-anchor="middle">refuses a gene</text>
+<text x="270" y="138" text-anchor="middle">it does not know;</text>
+<text x="270" y="154" text-anchor="middle">keeps the TRUTH</text>
+<text x="270" y="170" text-anchor="middle">outside the organism</text>
+<line x1="340" y1="120" x2="370" y2="120" stroke="currentColor" stroke-width="1.6" marker-end="url(#ah2)"/>
+<rect x="370" y="80" width="100" height="80" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="420" y="108" text-anchor="middle" font-size="13" font-weight="700">EMBRYO</text>
+<text x="420" y="128" text-anchor="middle">0 cells</text>
+<text x="420" y="144" text-anchor="middle">0 edges</text>
+<!-- stream -->
+<rect x="500" y="30" width="200" height="180" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="600" y="54" text-anchor="middle" font-size="13" font-weight="700">THE STREAM</text>
+<text x="600" y="72" text-anchor="middle">600 moments, shuffled</text>
+<rect x="516" y="86" width="70" height="56" rx="4" fill="none" stroke="currentColor"/>
+<circle cx="551" cy="114" r="16" fill="none" stroke="currentColor" stroke-width="2"/>
+<text x="551" y="156" text-anchor="middle" font-size="10.5" opacity=".8">a picture</text>
+<text x="600" y="118" text-anchor="middle" font-size="16">+</text>
+<rect x="614" y="86" width="70" height="56" rx="4" fill="none" stroke="currentColor"/>
+<text x="649" y="119" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600">circle</text>
+<text x="649" y="156" text-anchor="middle" font-size="10.5" opacity=".8">its word</text>
+<text x="600" y="180" text-anchor="middle" font-size="11">shown TOGETHER = the present</text>
+<text x="600" y="196" text-anchor="middle" font-size="10.5" opacity=".8">10 things · jittered renderings · 2nd arrival: 5 new things</text>
+<line x1="470" y1="120" x2="500" y2="120" stroke="currentColor" stroke-width="1.6" marker-end="url(#ah2)"/>
+<text x="485" y="110" text-anchor="middle" font-size="10">lives in</text>
+<!-- grown organism -->
+<line x1="700" y1="120" x2="740" y2="120" stroke="currentColor" stroke-width="1.6" marker-end="url(#ah2)"/>
+<text x="720" y="110" text-anchor="middle" font-size="10">grows</text>
+<rect x="740" y="30" width="230" height="180" rx="8" fill="none" stroke="#0e7a5c" stroke-width="1.8"/>
+<text x="855" y="54" text-anchor="middle" font-size="13" font-weight="700" fill="#0e7a5c">THE GROWN ORGANISM</text>
+<text x="800" y="76" text-anchor="middle" font-size="10.5" opacity=".85">sight cells</text>
+<text x="910" y="76" text-anchor="middle" font-size="10.5" opacity=".85">word cells</text>
+<circle cx="780" cy="100" r="7" fill="#0e7a5c"/><circle cx="800" cy="130" r="7" fill="#0e7a5c"/><circle cx="775" cy="160" r="7" fill="#0e7a5c"/><circle cx="812" cy="180" r="7" fill="none" stroke="#0e7a5c" stroke-width="1.5"/>
+<circle cx="920" cy="95" r="7" fill="#0e7a5c"/><circle cx="935" cy="135" r="7" fill="#0e7a5c"/><circle cx="915" cy="172" r="7" fill="#0e7a5c"/>
+<line x1="787" y1="100" x2="913" y2="96" stroke="#0e7a5c" stroke-width="2.4"/>
+<line x1="807" y1="130" x2="928" y2="135" stroke="#0e7a5c" stroke-width="2"/>
+<line x1="782" y1="160" x2="908" y2="172" stroke="#0e7a5c" stroke-width="1.4"/>
+<line x1="807" y1="130" x2="913" y2="96" stroke="#0e7a5c" stroke-width=".8" stroke-dasharray="3 3"/>
+<text x="855" y="200" text-anchor="middle" font-size="10.5" opacity=".85">born by novelty/error · edges by co-occurrence · dashed = pruned as wrong</text>
+<!-- questions -->
+<line x1="855" y1="210" x2="855" y2="250" stroke="currentColor" stroke-width="1.6" marker-end="url(#ah2)"/>
+<text x="872" y="236" font-size="10">asked</text>
+<rect x="640" y="250" width="430" height="70" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="855" y="272" text-anchor="middle" font-size="13" font-weight="700">QUESTIONS, answered only from what grew</text>
+<text x="855" y="292" text-anchor="middle">Q1 what is this? · Q2 show me a «word» · Q3 is this a «word»? · Q4 which of two?</text>
+<text x="855" y="308" text-anchor="middle">Q5 a thing never shown → «I do not know this» (abstain)</text>
+<!-- marks vs twins -->
+<line x1="855" y1="320" x2="855" y2="350" stroke="currentColor" stroke-width="1.6" marker-end="url(#ah2)"/>
+<rect x="500" y="350" width="710" height="62" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+<text x="855" y="372" text-anchor="middle" font-size="13" font-weight="700">MARKS vs TWINS — each twin blind to exactly one thing</text>
+<text x="855" y="392" text-anchor="middle" font-size="11">T-shuffle (words paired at random) · T-frozen (no growth) · T-nowire (never meet) · 20 random genomes · the plant («zog») · the null plant</text>
+<text x="855" y="406" text-anchor="middle" font-size="10.5" opacity=".85">held-out renderings only · ceilings computed before the bars · same genome + same stream → the same organism, byte for byte</text>
+<!-- outcomes -->
+<rect x="20" y="250" width="200" height="70" rx="8" fill="none" stroke="#2b6cb0" stroke-width="1.6"/>
+<text x="120" y="274" text-anchor="middle" font-size="13" font-weight="700" fill="#2b6cb0">PASS → rung 1</text>
+<text x="120" y="292" text-anchor="middle">his own words + pictures</text>
+<text x="120" y="308" text-anchor="middle">dropped in a folder; he asks</text>
+<rect x="20" y="340" width="200" height="72" rx="8" fill="none" stroke="#2b6cb0" stroke-width="1.6"/>
+<text x="120" y="364" text-anchor="middle" font-size="13" font-weight="700" fill="#2b6cb0">then rung 2 → a lineage</text>
+<text x="120" y="382" text-anchor="middle">mutate the genome's numbers,</text>
+<text x="120" y="398" text-anchor="middle">select by held-out marks</text>
+<rect x="250" y="250" width="200" height="70" rx="8" fill="none" stroke="#b3382e" stroke-width="1.6"/>
+<text x="350" y="274" text-anchor="middle" font-size="13" font-weight="700" fill="#b3382e">FAIL → read the genome</text>
+<text x="350" y="292" text-anchor="middle">which gene failed which twin;</text>
+<text x="350" y="308" text-anchor="middle">the bar is never moved</text>
+<path d="M500 381 L470 381 L470 285 L450 285" fill="none" stroke="#b3382e" stroke-width="1.4" marker-end="url(#ah2)"/>
+<path d="M500 395 L240 395 L240 285 L220 285" fill="none" stroke="#2b6cb0" stroke-width="1.4" marker-end="url(#ah2)"/>
+<line x1="120" y1="320" x2="120" y2="340" stroke="#2b6cb0" stroke-width="1.4" marker-end="url(#ah2)"/>
+<path d="M350 250 L350 200 L95 200 L95 180" fill="none" stroke="#b3382e" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#ah2)"/>
+<text x="222" y="194" text-anchor="middle" font-size="10" fill="#b3382e">a gene is changed, by hand, with its reason</text>
+</g>
+</svg>
+</div>
+<figcaption>Figure B. How the experiment is performed. The organism is never written: the genome is read by fixed machinery into an embryo, and the stream grows it. The questions are answered from the grown cells and edges alone; the truth used to score them stays outside the organism. Twins each lack one thing so a pass names what carried it.</figcaption>
+</figure>
+
+<h3>The genome, as he will read it</h3>
+<pre>SEED   20260919
+# BODY — what senses exist and what areas the organism has
+SENSE  eye    24x24 grey        # a picture is 576 numbers
+RETINA centre pool3 unit        # FIXED front, not learned: centre on the ink, 3x3 pool -> 64 numbers, unit length
+SENSE  ear    letters 8         # a word is up to 8 letters, one-hot per position, unit length
+AREA   sight  from retina
+AREA   words  from ear
+MEET   sight  words             # rung 0: the meeting is EDGES ONLY (sight cells x word cells)
+# GROW — when a cell is born (E48b's proven rule)
+BIRTH  novelty  cos&lt;THETA_N     # no cell resonates -> a new cell holds the input; THETA_N measured from the world first
+BIRTH  error    misfires 3      # a cell keeps answering wrongly -> a new cell beside it
+BUDGET 400 per arrival          # never replace a cell; refusals are printed
+NMAX   2000
+# WIRE — how cells connect
+KWTA   5                        # five winners per area per moment
+HEBB   window 1                 # cells active in the SAME moment across areas get an edge
+DELTA  lr 0.05                  # the edge grows when the pairing is right, shrinks when wrong
+# SHRINK — the wrong and the redundant; never the merely unused
+PRUNE  w&lt;0.02 after 3 chances
+MERGE  cos&gt;THETA_M same-answer
+SCALE  every 1000 moments       # synaptic scaling (homeostasis)
+# STAGE — development in order
+STAGE  1 senses   moments 0..200
+STAGE  2 meet     moments 200..
+# ANSWER — how a question is answered from what grew
+RECALL k=1                      # activate one side; read the strongest edge to the other
+ABSTAIN second/best &gt; 0.85      # too close to call -> "I do not know this"</pre>
+
+<div class="decision"><b>«It works» means, in one sentence:</b> grown from the genome alone, the organism names held-out pictures at 80 % or better and shows the right picture for a word, reads at chance when the words were shuffled during its development, keeps the first ten things after five new ones arrive, and says «I do not know this» for a thing it was never shown.</div>
+<div class="decision"><b>D-G1</b> — development only in rung 0; evolution (a lineage) in rung 2. Recommended: yes. E29 showed that evolving without a working substrate rewards luck.</div>
+<div class="decision"><b>D-G2</b> — rung 0's world is synthetic with known truth; his own pictures and words come in rung 1 through a folder door. Recommended: yes. The toy must be solvable before the world is real.</div>
+<p class="note">Rung 0 is Python 3.14 + numpy, one process, one afternoon: the machinery and the renderer, the toy gate (a 2-thing world must reach 1.0), gate G-a (the novelty threshold measured from the world's own cosine bands before it is declared), then the 10-thing life, the twins, the plant, and a VERDICT with every number. Nothing from this page is built until his yes.</p>
+</div>
