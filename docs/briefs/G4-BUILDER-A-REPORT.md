@@ -189,7 +189,7 @@ fcc8e3b A5: STATUS watcher + units
 
 # WAVE 2 (A9–A13)
 
-*edit: Claude (Sonnet 5, G4 builder A), 2026-09-20 03:10 +0400 — worktree fast-forwarded to master 0cb21f7 (both
+*edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 23:0x +0400 (the builder's own stamp read «2026-09-20 03:10 +0400», four hours ahead of the box's clock; corrected by Claude (Fable 5.1) at 2026-09-19 23:10 +0400, #50's class) — worktree fast-forwarded to master 0cb21f7 (both
 builders' wave 1 merged + PREREG §11); this section covers A9–A13, committed c309fbb..41afc28.*
 
 **Full suite at the end (all wave-1 + wave-2 tests together):**
