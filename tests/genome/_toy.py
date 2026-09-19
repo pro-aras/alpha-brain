@@ -12,12 +12,14 @@ import numpy as np
 from genome.machinery import Genome, parse_genome
 
 # SENSE eye 24x24 grey + RETINA pool3 unit -> sight_dim = (24//3)**2 = 64
-# SENSE ear letters 1 blank=zero -> words_dim = 1 * 26 = 26
+# SENSE ear letters 8 blank=zero -> words_dim = 8 * 26 = 208 (world.encode_word's WORD_SLOTS is fixed at
+# 8 regardless of the genome's own ear_letters — this genome's ear MUST say 8 to match world.encode_word's
+# actual output shape, or Organism._birth's shape assert fails the moment a words-area moment is fed).
 MINI_GENOME_TEXT = """\
 SEED 1
 SENSE eye 24x24 grey
 RETINA pool3 unit
-SENSE ear letters 1 blank=zero
+SENSE ear letters 8 blank=zero
 AREA sight from retina
 AREA words from ear
 MEET sight words
@@ -38,7 +40,7 @@ ABSTAIN second/best > 0.85
 """
 
 SIGHT_DIM = 64
-WORDS_DIM = 26
+WORDS_DIM = 8 * 26
 
 
 def mini_genome(**overrides) -> Genome:
