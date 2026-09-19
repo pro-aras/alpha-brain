@@ -26,7 +26,15 @@ class Episodes:
     `nearest(x_s, k)` (nearest-neighbour recall by cosine, ties by id); `most_surprising(n)` (top-n
     live episodes by their own surprise value, descending); `save(path)/load(path)` (npz, atomic via
     tmp+rename). `get(id)` is a small extension beyond the four named methods — a caller (B5's «why»,
-    B7's SLEEP) needs the record an id names, not only the id."""
+    B7's SLEEP) needs the record an id names, not only the id.
+
+    edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 21:xx +0400 — B12 (docs/G4-PREREG.md §11.2,
+    TRAITS): `write` gains an optional `x_s2` (default None) — a canvas's SECOND glance, alongside
+    `x_s`'s first, so genome/traits.py's InfoNCE has a same-canvas positive pair to train against.
+    Stored as `x_s2` (zeros where absent) + `has_s2` (a uint8 mask) so a reader can tell "no second
+    glance" from "a second glance that happened to be near zero". Nothing else reads it (`nearest`
+    ignores it, per the PREREG); Episodes is never hashed anywhere, so "kept out of the pin" is
+    automatic."""
 
     def __init__(self, cap: int, dim_s: int, dim_w: int):
         if cap < 1:
@@ -37,6 +45,8 @@ class Episodes:
         self.moment = np.full(cap, -1, dtype=np.int64)
         self.ids = np.full(cap, -1, dtype=np.int64)
         self.x_s = np.zeros((cap, dim_s), dtype=np.float64)
+        self.x_s2 = np.zeros((cap, dim_s), dtype=np.float64)
+        self.has_s2 = np.zeros(cap, dtype=np.uint8)
         self.x_w = np.zeros((cap, dim_w), dtype=np.float64)
         self.word = np.array([""] * cap, dtype="<U32")
         self.surprise = np.zeros(cap, dtype=np.float64)
@@ -48,9 +58,12 @@ class Episodes:
         return min(self.n_written, self.cap)
 
     # ------------------------------------------------------------------------------------- write
-    def write(self, moment: int, x_s: np.ndarray, x_w: np.ndarray, word: str, surprise: float) -> int:
+    def write(self, moment: int, x_s: np.ndarray, x_w: np.ndarray, word: str, surprise: float,
+               x_s2: Optional[np.ndarray] = None) -> int:
         """Writes one episode at the ring's next slot (the oldest, once the ring is full) and returns
-        its id (0, 1, 2, … — never reused; an overwritten episode's old id simply stops resolving)."""
+        its id (0, 1, 2, … — never reused; an overwritten episode's old id simply stops resolving).
+        `x_s2` (B12): the same canvas's second glance, if the caller has one; None (the default) marks
+        the slot's `has_s2` False and leaves `x_s2` zeroed there."""
         slot = self._next_slot
         old_id = int(self.ids[slot])
         if old_id != -1:
@@ -58,6 +71,12 @@ class Episodes:
         eid = self.n_written
         self.moment[slot] = int(moment)
         self.x_s[slot] = x_s
+        if x_s2 is not None:
+            self.x_s2[slot] = x_s2
+            self.has_s2[slot] = 1
+        else:
+            self.x_s2[slot] = 0.0
+            self.has_s2[slot] = 0
         self.x_w[slot] = x_w
         self.word[slot] = word
         self.surprise[slot] = float(surprise)
@@ -74,7 +93,8 @@ class Episodes:
         if slot is None:
             return None
         return {"id": eid, "moment": int(self.moment[slot]), "x_s": self.x_s[slot].copy(),
-                "x_w": self.x_w[slot].copy(), "word": str(self.word[slot]), "surprise": float(self.surprise[slot])}
+                "x_w": self.x_w[slot].copy(), "word": str(self.word[slot]), "surprise": float(self.surprise[slot]),
+                "x_s2": (self.x_s2[slot].copy() if self.has_s2[slot] else None)}
 
     def nearest(self, x_s: np.ndarray, k: int) -> List[Tuple[int, float]]:
         """The top-k live episodes by cosine of `x_s` to the episode's own x_s (best first, ties by the
@@ -106,7 +126,7 @@ class Episodes:
         meta = np.array([self.cap, self.dim_s, self.dim_w, self.n_written, self._next_slot], dtype=np.int64)
         with open(tmp, "wb") as f:
             np.savez_compressed(f, meta=meta, moment=self.moment, ids=self.ids, x_s=self.x_s, x_w=self.x_w,
-                                 word=self.word, surprise=self.surprise)
+                                 word=self.word, surprise=self.surprise, x_s2=self.x_s2, has_s2=self.has_s2)
         tmp.replace(path)
 
     @classmethod
@@ -118,6 +138,10 @@ class Episodes:
             ep = cls(int(meta[0]), int(meta[1]), int(meta[2]))
             ep.moment[:] = z["moment"]; ep.ids[:] = z["ids"]; ep.x_s[:] = z["x_s"]; ep.x_w[:] = z["x_w"]
             ep.word[:] = z["word"]; ep.surprise[:] = z["surprise"]
+            # B12: x_s2/has_s2 are absent from a file saved before this gene existed — default to "no
+            # second glance anywhere" rather than refusing to load an older store.
+            if "x_s2" in z.files:
+                ep.x_s2[:] = z["x_s2"]; ep.has_s2[:] = z["has_s2"]
             ep.n_written = int(meta[3]); ep._next_slot = int(meta[4])
         ep._id_to_slot = {int(ep.ids[s]): s for s in range(len(ep))}
         return ep
