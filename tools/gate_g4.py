@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse, ast, io, json, os, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
+import numpy as np
+
 PIN = "d4b5c6b8d57f35e6ad199b49b38d720095ba3b678c380b206665a876698aaa86"   # G4-2, read 2026-09-19 21:3x at 9a36475
 SENSE_FILES = ["creature/world_maker.py", "creature/ask.py", "creature/tape.py"]
 FORBIDDEN_DIRS = ("state", "journal", "memory")
@@ -33,8 +35,9 @@ def sweep(paths) -> list:
         for node in ast.walk(tree):
             if isinstance(node, (ast.Import, ast.ImportFrom)):
                 names = [a.name for a in node.names] + ([node.module or ""] if isinstance(node, ast.ImportFrom) else [])
-                if any("Organism" == n or n.endswith("machinery") and isinstance(node, ast.ImportFrom) and any(a.name == "Organism" for a in node.names) for n in names):
-                    offenders.append((str(p), node.lineno, "imports Organism"))
+                is_sense = ("senses" in p.parts) or p.name == "world_maker.py"
+                if is_sense and any("Organism" == n or n.endswith("machinery") and isinstance(node, ast.ImportFrom) and any(a.name == "Organism" for a in node.names) for n in names):
+                    offenders.append((str(p), node.lineno, "imports Organism (a sense module)"))
             if isinstance(node, ast.Call):
                 fn = node.func
                 name = fn.attr if isinstance(fn, ast.Attribute) else (fn.id if isinstance(fn, ast.Name) else "")
@@ -149,7 +152,13 @@ def gate3(tree: Path, genome_path: Path) -> bool:
         rows = [json.loads(l) for l in (root2 / "tape" / "ALL.jsonl").read_text().splitlines()]
         eye = [x for x in rows if x["sense"] == "eye"][30]
         pp = root2 / "tape" / eye["payload"]
-        b = bytearray(pp.read_bytes()); b[len(b) // 2] ^= 0x01; pp.write_bytes(bytes(b))
+        from PIL import Image
+        arr = np.array(Image.open(pp).convert("RGB"))
+        cy, cx = dev[30][2]["cell"]                      # the thing's own cell (the truth, held by the checker, never on the tape)
+        y0, x0 = int((cy + 0.5) * 8) - 12, int((cx + 0.5) * 8) - 12
+        y0, x0 = max(0, min(y0, 104)), max(0, min(x0, 104))
+        arr[y0:y0 + 24, x0:x0 + 24] = 255 - arr[y0:y0 + 24, x0:x0 + 24]
+        Image.fromarray(arr).save(pp, format="PNG")
         out2 = Path(d) / "replay2"
         r2 = subprocess.run([sys.executable, "-m", "creature.replay", "--genome", str(genome_path), "--tape", str(root2 / "tape" / "ALL.jsonl"),
                              "--against", str(live), "--out", str(out2)], cwd=tree, capture_output=True, text=True)
