@@ -1,0 +1,60 @@
+{
+ "eye-photo-g1 (trained)": {
+  "within_median": 0.49888455080798466,
+  "within_p5": 0.37052335904616485,
+  "between_median": 0.4804114741939055,
+  "between_p95": 0.6097629365143347,
+  "floor": 0.6097629365143347,
+  "margin": -0.11087838570635,
+  "met": false,
+  "closest_pair": {
+   "pair": "ahmad/buddha",
+   "p95": 0.6745258893781366
+  },
+  "ahmad_within_median": 0.5675470247259926,
+  "ahmad_between_p95": 0.6178079359674555,
+  "ahmad_separates": false,
+  "n_feat": 768
+ },
+ "untrained twin": {
+  "within_median": 0.9327385776846988,
+  "within_p5": 0.8071716644973077,
+  "between_median": 0.9268360150402636,
+  "between_p95": 0.9743295520248235,
+  "floor": 0.9743295520248235,
+  "margin": -0.04159097434012471,
+  "met": false,
+  "closest_pair": {
+   "pair": "bass/cannon",
+   "p95": 0.9803717861408382
+  },
+  "ahmad_within_median": 0.9363206099459785,
+  "ahmad_between_p95": 0.9727987988156809,
+  "ahmad_separates": false,
+  "n_feat": 768
+ },
+ "glyph eye (G1-his)": {
+  "within_median": 0.8337071521045215,
+  "within_p5": 0.6662882775303571,
+  "between_median": 0.8315493277448813,
+  "between_p95": 0.9200069967451245,
+  "floor": 0.9200069967451245,
+  "margin": -0.08629984464060303,
+  "met": false,
+  "closest_pair": {
+   "pair": "beaver/camera",
+   "p95": 0.9465695825046994
+  },
+  "ahmad_within_median": 0.8363687052060623,
+  "ahmad_between_p95": 0.9145881819313775,
+  "ahmad_separates": false,
+  "n_feat": 112
+ },
+ "G4": {
+  "pass": false,
+  "trained_margin": -0.11087838570635,
+  "untrained_margin": -0.04159097434012471,
+  "delta_vs_untrained": -0.0692874113662253,
+  "bar": "p95 rule met \u00b7 ahmad separates \u00b7 margin \u2212 untrained \u2265 0.05"
+ }
+}
