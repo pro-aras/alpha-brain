@@ -213,8 +213,9 @@ class TestTheLifeGenome(unittest.TestCase):
         g = parse_genome(G4_LIFE_PATH.read_text())
         self.assertAlmostEqual(g.theta_n, 0.952, places=3)
         self.assertAlmostEqual(g.theta_m, 0.9969, places=4)
-        self.assertEqual(sorted(g.declared), ["ASK", "BELIEF", "BODY", "CRASH", "CURIOSITY", "CYCLE", "DEDUCE", "EXAM", "FAST", "FILE",
-                                              "FROZEN", "HEART", "INDUCE", "PARK", "PREDICT", "SLEEP", "TAPE", "THINK", "WORLD"])
-        for off in ("TRAITS", "SURPRISE", "SENTENCE", "HANDS"):
+        # edit: Claude (Fable 5.1), 2026-09-20 00:38 +0400 — PREREG §14: INDUCE and DEDUCE declared OFF (no interpreter in the mind), so the life's set is 17 genes
+        self.assertEqual(sorted(g.declared), ["ASK", "BELIEF", "BODY", "CRASH", "CURIOSITY", "CYCLE", "EXAM", "FAST", "FILE",
+                                              "FROZEN", "HEART", "PARK", "PREDICT", "SLEEP", "TAPE", "THINK", "WORLD"])
+        for off in ("TRAITS", "SURPRISE", "SENTENCE", "HANDS", "INDUCE", "DEDUCE"):
             self.assertNotIn(off, g.declared)
         self.assertEqual(g.declared["THINK"], {"every": 10}); self.assertEqual(g.declared["EXAM"], {"every": 2000}); self.assertEqual(g.declared["FROZEN"], {"after": 50})
