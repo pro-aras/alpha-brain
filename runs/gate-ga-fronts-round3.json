@@ -1,0 +1,227 @@
+{
+ "N pool3 only (blur.8, subpixel centre)": {
+  "dim": 64,
+  "within_p5": 0.7364172899841901,
+  "within_med": 0.9644701146587398,
+  "between_p95": 0.9308847535172392,
+  "between_max": 0.9912691221337416,
+  "weakest": "ring",
+  "weakest_p5": 0.44654119633928235,
+  "top_pairs": [
+   [
+    "circle/square",
+    0.987
+   ],
+   [
+    "circle/star",
+    0.954
+   ],
+   [
+    "square/star",
+    0.949
+   ]
+  ],
+  "margin": -0.1944674635330491,
+  "pairs_above_within_med": 1
+ },
+ "O hog8 global only": {
+  "dim": 8,
+  "within_p5": 0.4598388415051208,
+  "within_med": 0.9783465066556929,
+  "between_p95": 0.9815627470306428,
+  "between_max": 0.9998929742336597,
+  "weakest": "bar",
+  "weakest_p5": 0.12735974881142378,
+  "top_pairs": [
+   [
+    "circle/ring",
+    0.997
+   ],
+   [
+    "circle/star",
+    0.996
+   ],
+   [
+    "ring/star",
+    0.991
+   ]
+  ],
+  "margin": -0.5217239055255221,
+  "pairs_above_within_med": 5
+ },
+ "P hogcells 3x3x6 only": {
+  "dim": 54,
+  "within_p5": 0.2263315829629823,
+  "within_med": 0.9283878739964583,
+  "between_p95": 0.7969520487337187,
+  "between_max": 0.9976460032156593,
+  "weakest": "bar",
+  "weakest_p5": 0.06997046618308973,
+  "top_pairs": [
+   [
+    "circle/ring",
+    0.989
+   ],
+   [
+    "circle/square",
+    0.899
+   ],
+   [
+    "square/ring",
+    0.869
+   ]
+  ],
+  "margin": -0.5706204657707364,
+  "pairs_above_within_med": 1
+ },
+ "Q pool3 + hog8": {
+  "dim": 72,
+  "within_p5": 0.6698196797094534,
+  "within_med": 0.964256500138987,
+  "between_p95": 0.8944398592013783,
+  "between_max": 0.9791428619768274,
+  "weakest": "bar",
+  "weakest_p5": 0.41468612194967147,
+  "top_pairs": [
+   [
+    "circle/star",
+    0.972
+   ],
+   [
+    "cross/star",
+    0.942
+   ],
+   [
+    "circle/ring",
+    0.931
+   ]
+  ],
+  "margin": -0.2246201794919248,
+  "pairs_above_within_med": 1
+ },
+ "R pool3 + hogcells": {
+  "dim": 118,
+  "within_p5": 0.5699328535362602,
+  "within_med": 0.9406612997139356,
+  "between_p95": 0.8158971045229714,
+  "between_max": 0.9665793126805837,
+  "weakest": "bar",
+  "weakest_p5": 0.3807470373397207,
+  "top_pairs": [
+   [
+    "circle/square",
+    0.941
+   ],
+   [
+    "circle/ring",
+    0.887
+   ],
+   [
+    "dot/star",
+    0.846
+   ]
+  ],
+  "margin": -0.24596425098671115,
+  "pairs_above_within_med": 1
+ },
+ "S pool3 + hog8 + hogcells": {
+  "dim": 126,
+  "within_p5": 0.5397077872829215,
+  "within_med": 0.9510816921436918,
+  "between_p95": 0.8274646646933171,
+  "between_max": 0.9294619577413641,
+  "weakest": "bar",
+  "weakest_p5": 0.29994982379498714,
+  "top_pairs": [
+   [
+    "circle/ring",
+    0.921
+   ],
+   [
+    "dot/star",
+    0.886
+   ],
+   [
+    "circle/square",
+    0.88
+   ]
+  ],
+  "margin": -0.2877568774103957,
+  "pairs_above_within_med": 0
+ },
+ "T pool2 + hog8 + hogcells": {
+  "dim": 206,
+  "within_p5": 0.5378402898056217,
+  "within_med": 0.9473819647798668,
+  "between_p95": 0.8187440937005378,
+  "between_max": 0.9183742114069335,
+  "weakest": "bar",
+  "weakest_p5": 0.30377774784511735,
+  "top_pairs": [
+   [
+    "circle/ring",
+    0.908
+   ],
+   [
+    "circle/square",
+    0.877
+   ],
+   [
+    "dot/star",
+    0.856
+   ]
+  ],
+  "margin": -0.2809038038949161,
+  "pairs_above_within_med": 0
+ },
+ "U pool3 + 1.5*hog8 + hogcells": {
+  "dim": 126,
+  "within_p5": 0.5152394036859272,
+  "within_med": 0.9568326252239848,
+  "between_p95": 0.843076764460979,
+  "between_max": 0.9491828895821603,
+  "weakest": "bar",
+  "weakest_p5": 0.2510448421908594,
+  "top_pairs": [
+   [
+    "circle/ring",
+    0.942
+   ],
+   [
+    "dot/star",
+    0.912
+   ],
+   [
+    "cross/star",
+    0.894
+   ]
+  ],
+  "margin": -0.32783736077505177,
+  "pairs_above_within_med": 0
+ },
+ "V pool3 + hog12": {
+  "dim": 76,
+  "within_p5": 0.5996732109328838,
+  "within_med": 0.9512461752880594,
+  "between_p95": 0.8796381548483408,
+  "between_max": 0.9756001190649085,
+  "weakest": "bar",
+  "weakest_p5": 0.42150816684912723,
+  "top_pairs": [
+   [
+    "circle/star",
+    0.962
+   ],
+   [
+    "circle/ring",
+    0.928
+   ],
+   [
+    "cross/star",
+    0.926
+   ]
+  ],
+  "margin": -0.279964943915457,
+  "pairs_above_within_med": 1
+ }
+}

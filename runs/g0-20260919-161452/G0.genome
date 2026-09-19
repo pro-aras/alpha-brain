@@ -1,0 +1,30 @@
+# G0.genome — the readable genome of rung 0 (docs/G0-PREREG.md §1). One gene per line; `#` starts a comment.
+# THETA_N and THETA_M are written by gate G-a (genome/gate_ga.py) from the world's own cosine bands — never typed by hand.
+SEED   20260919
+# BODY — what senses exist and what areas the organism has
+SENSE  eye    24x24 grey             # a picture is 576 numbers
+RETINA thresh0.25 centre blur0.8 pool3 hog8 hogcells8x6 unit   # FIXED front, not learned (§11): contrast floor, centroid to centre, blur, 8x8 pooled ink (64) + edge-orientation histogram (8) + per-cell orientation (54) = 126, unit length
+SENSE  ear    letters 8              # a word is up to 8 letters, one-hot per position (8 x 27 = 216), unit length
+AREA   sight  from retina
+AREA   words  from ear
+MEET   sight  words                  # rung 0: the meeting is EDGES ONLY
+# GROW — when a cell is born (E48b's arm-A1 rule, the one ported and lived)
+BIRTH  novelty  cos<0.951          # no cell in the area resonates -> a new cell holds the input (THETA_N set by gate G-a)
+BIRTH  error    misfires 3           # a cell keeps answering wrongly -> a new cell is born beside it
+BUDGET 400 per arrival               # per ARRIVAL, never per stage; births_refused printed beside every birth count; never replace a cell
+NMAX   2000
+# WIRE — how cells connect
+KWTA   5                             # five winners per area per moment
+HEBB   window 1                      # cells active in the SAME moment across areas get an edge
+DELTA  lr 0.05                       # the edge grows when the pairing is right, shrinks when wrong
+# SHRINK — what is removed (the wrong and the redundant; never the merely unused)
+PRUNE  w<0.02 after 3 chances
+MERGE  cos>0.9967 same-answer       # THETA_M set by gate G-a (above the within-thing 95th percentile)
+SCALE  every 1000 moments            # synaptic scaling (homeostasis)
+# STAGE — development in order (critical periods)
+STAGE  1 senses   moments 0..200     # sight and words grow; no cross-area wiring yet
+STAGE  2 meet     moments 200..      # cross-area wiring (HEBB) is permitted from here
+# ANSWER — how a question is answered from what grew
+RECALL k=1                           # activate one side; read the strongest edge to the other
+ABSTAIN second/best > 0.85           # too close to call -> "I do not know this"
+# gate G-a wrote THETA_N=0.951 THETA_M=0.9967 — §11 rule: THETA_N = within-median; floor (between-max, ear-max) 0.9295 · within-p5 0.5397 · within-p95 0.9934 · between-p95 0.8282 · seed 20260919 · 60/thing

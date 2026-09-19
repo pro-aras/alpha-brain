@@ -1,0 +1,129 @@
+{
+ "stamp": "20260919-161244",
+ "genome": {
+  "theta_n": 0.951,
+  "misfires": 3,
+  "budget": 400,
+  "kwta": 5,
+  "lr": 0.05,
+  "prune_floor": 0.02,
+  "theta_m": 0.9967,
+  "scale_every": 1000,
+  "stage1": 200,
+  "abstain_ratio": 0.85
+ },
+ "retina": [
+  "thresh0.25",
+  "centre",
+  "blur0.8",
+  "pool3",
+  "hog8",
+  "hogcells8x6",
+  "unit"
+ ],
+ "prereg": "docs/G0-PREREG.md \u00a71\u2013\u00a711",
+ "streams": {
+  "dev": 600,
+  "arr2": 300,
+  "plant": 5,
+  "held_checked_disjoint": 360,
+  "planted_copy_caught": true
+ },
+ "toy": {
+  "label": "toy",
+  "at_600": {
+   "moments": 300,
+   "cells_sight": 9,
+   "cells_words": 2,
+   "cells_born_sight": 9,
+   "cells_born_words": 4,
+   "edges_alive": 8,
+   "births_novelty_sight": 9,
+   "births_novelty_words": 2,
+   "births_error_sight": 0,
+   "births_error_words": 2,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "edges_born": 13,
+   "edges_pruned": 1,
+   "cells_merged_sight": 0,
+   "cells_merged_words": 2,
+   "scale_events": 0,
+   "removed_for_disuse": 0
+  },
+  "ask_600": {
+   "Q1": {
+    "acc": 0.975,
+    "n": 40,
+    "correct": 39,
+    "abstain": {
+     "novel": 0,
+     "noedge": 1,
+     "ratio": 0
+    },
+    "false_abstention": 0.025,
+    "per_thing": {
+     "circle": 1.0,
+     "bar": 0.95
+    },
+    "answers_from_multi_word_cells": 0
+   },
+   "Q2": {
+    "acc": 0.0,
+    "n": 2,
+    "correct": 0,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 2
+    },
+    "detail": {
+     "circle": "abstain:ratio",
+     "bar": "abstain:ratio"
+    }
+   },
+   "Q3": {
+    "acc": 0.525,
+    "n": 40,
+    "correct": 21,
+    "true_pairs_abstained": 0,
+    "ceiling": 0.9875
+   },
+   "Q4": {
+    "acc": 0.5,
+    "n": 40,
+    "correct": 20,
+    "ties": 20
+   },
+   "Q5": {
+    "spiral": {
+     "abstain_rate": 0.9,
+     "n": 20,
+     "abstain": {
+      "novel": 18,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "answered_as": {
+      "circle": 2
+     }
+    }
+   },
+   "composite": 0.5
+  },
+  "hash_600": "dbc973887623379c105b6f0be5ca40e52428e9ca422db28b27792feb78f585bc",
+  "refusals_by_arrival": [
+   0
+  ],
+  "hash_final": "dbc973887623379c105b6f0be5ca40e52428e9ca422db28b27792feb78f585bc",
+  "ledger_corruption_hash_unchanged": true,
+  "multi_thing_sight_cells": 0,
+  "cells_per_thing": {
+   "circle": 2,
+   "bar": 7
+  },
+  "seconds": 0.36
+ },
+ "toy_pass": false
+}
