@@ -69,18 +69,30 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
 
 def compare(got: Iterable[Dict[str, object]], want: Iterable[Dict[str, object]]) -> Optional[Tuple[int, str]]:
     """None iff every row matches field by field (as JSON objects, never as raw text/whitespace); else
-    the first (seq, field) that differs, seqs walked in order."""
-    by_seq_got = {int(r["seq"]): r for r in got}
-    by_seq_want = {int(r["seq"]): r for r in want}
+    the first (seq, field) that differs, seqs walked in order.
+
+    A9/A10 (PREREG §11.1 step 4): SLEEP journals a SECOND mind row sharing its triggering canvas's own
+    seq, so one seq can now carry more than one row — grouped into ORDERED lists (append order, which is
+    also seq-then-within-seq order for both a live run and a replay of the same tape) and compared
+    pairwise; a row-count mismatch at a seq is itself reported as a divergence at that seq."""
+    by_seq_got: Dict[int, List[Dict[str, object]]] = {}
+    by_seq_want: Dict[int, List[Dict[str, object]]] = {}
+    for r in got:
+        by_seq_got.setdefault(int(r["seq"]), []).append(r)
+    for r in want:
+        by_seq_want.setdefault(int(r["seq"]), []).append(r)
     for seq in sorted(set(by_seq_got) | set(by_seq_want)):
-        g, w = by_seq_got.get(seq), by_seq_want.get(seq)
-        if g is None:
+        gs, ws = by_seq_got.get(seq), by_seq_want.get(seq)
+        if gs is None:
             return seq, "<missing from replay>"
-        if w is None:
+        if ws is None:
             return seq, "<missing from --against>"
-        for key in sorted(set(g) | set(w)):
-            if g.get(key) != w.get(key):
-                return seq, key
+        if len(gs) != len(ws):
+            return seq, f"<row count: replay {len(gs)} vs --against {len(ws)}>"
+        for g, w in zip(gs, ws):
+            for key in sorted(set(g) | set(w)):
+                if g.get(key) != w.get(key):
+                    return seq, key
     return None
 
 
