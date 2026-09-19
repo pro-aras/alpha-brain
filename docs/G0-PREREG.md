@@ -6,7 +6,7 @@ edit: Claude (Fable 5.1), 2026-09-19 15:0x +04 — written on his 14:43 word: «
 ## 0 · Why this, and what the record already says
 - **His words:** Alpha 3 was fed words and does not understand; C++ before a working system was costing us; Python can be tested for something that works.
 - **What Alpha 3 lacked, measured 09-19:** words never met pictures (the eye read letters, the reader read text; one thread, one duty per pass); no cell ever tied a picture to a word; two days on one unanswerable question.
-- **E48b (PASS, byte-exact port):** a LOCAL, ONLINE growth rule works — prototypes born on novelty and on error under a BUDGET (never a cap that eats the least-used), a delta rule on grown edges, synaptic scaling, pruning under a floor, NO disuse decay (#227). That rule becomes the first genes.
+- **E48b (FAIL on its conjunction — the digits, a context defect D31 cured; its arm A1 ported byte-exact and alive three days):** a LOCAL, ONLINE growth rule works — prototypes born on novelty and on error under a BUDGET (never a cap that eats the least-used), a delta rule on grown edges, synaptic scaling, pruning under a floor, NO disuse decay (#227). That rule becomes the first genes.
 - **E29 (FAIL):** a genome that grows the SHAPE of a gradient-trained net lost to a hand-designed shape, and 48 random genomes beat the evolved one. **This genome never encodes a network's shape for backprop; it encodes the local rules an organism lives by.** The random-genome control stays (§4) so the same trap is visible if it recurs.
 
 ## 1 · The genome — one readable file, one gene per line
@@ -21,7 +21,7 @@ SENSE  ear    letters 8              # a word is up to 8 letters, one-hot per po
 AREA   sight  from retina
 AREA   words  from ear
 MEET   sight  words                  # rung 0: the meeting is EDGES ONLY — a weight matrix sight-cells x word-cells; no convergence cells yet
-# GROW — when a cell is born (E48b's rule, proven)
+# GROW — when a cell is born (E48b's arm-A1 rule, the one ported and lived)
 BIRTH  novelty  cos<THETA_N          # no cell in the area resonates -> a new cell holds the input. THETA_N is NOT 0.90 by habit:
                                      # it is set by gate G-a below from the world's own within-thing / between-thing cosine bands
 BIRTH  error    misfires 3           # a cell keeps answering wrongly -> a new cell is born beside it
