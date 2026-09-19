@@ -343,7 +343,9 @@ class Mind:
             r = self.org.recall_many("sight", xs)
             if r.get("cell") is None:
                 return dead_end(word, "no_cell_answers")
-            row = think_laws.believe(word, record["cells"], record["episodes"], self.org.t, str(self.run_root))
+            # edit: Claude (Fable 5.1), 2026-09-19 23:37 +0400 — believe() takes the beliefs FILE; the run ROOT was passed and the first belief
+            # ever reached (after the recall_many fix) crashed the mind with IsADirectoryError — the crash law fired as designed.
+            row = think_laws.believe(word, record["cells"], record["episodes"], self.org.t, self.run_root / "state" / "beliefs.jsonl")
             self.think_counters["beliefs"] += 1
             return {"outcome": "belief", "parked": False, "belief": row}
 
