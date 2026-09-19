@@ -184,3 +184,164 @@ fcc8e3b A5: STATUS watcher + units
 4cba3df A7: the ask door — voice thread wired into body.py
 13a9eab A8: the writer sweep — gate G4-1
 ```
+
+---
+
+# WAVE 2 (A9–A13)
+
+*edit: Claude (Sonnet 5, G4 builder A), 2026-09-20 03:10 +0400 — worktree fast-forwarded to master 0cb21f7 (both
+builders' wave 1 merged + PREREG §11); this section covers A9–A13, committed c309fbb..41afc28.*
+
+**Full suite at the end (all wave-1 + wave-2 tests together):**
+`Ran 60 tests in 447.030s — OK (skipped=2)` — `python3 -m unittest discover -s tests/creature -t .`.
+The 2 skips are both `unittest.skipUnless(importable)` on Builder B modules not on master at commit
+time (named below, per task). Gate G4-2's pin (`d4b5c6b8…`) and gate G4-1 (the writer sweep) were
+both re-verified green after every task; nothing outside `creature/`, `tests/creature/`,
+`docs/briefs/G4-BUILDER-A-REPORT.md` was touched, and `run/` (the live creature under
+`creature.service`, active throughout this work) was never written to, restarted, or read except
+by `systemctl --user is-active` (a status check, not a control action) and one benchmark that shared
+the same idle box CPU with it.
+
+## A9 — PREDICT + FAST in the mind (PREREG §11.1 steps 1–2)
+**Test log:** `Ran 5 tests in 36.661s — OK` (`tests/creature/test_wave2_predict_fast.py`) · **Commit:** `c309fbb`
+`err`/`lr`/`ep` now land on every eye-row mind row (0.0/1.0/`None` when the gene is absent or blind,
+still journaled, per the PREREG's own "still journaled" clause); sight-only canvases with FAST
+declared run `Organism.moment_sight` per glance (word `null`) instead of the skeleton's old
+skip-and-count row; `Mind.episodes`/`Mind.predictor` persist across snapshot/resume.
+`tests/creature/G4-wave2-test.genome` = `G4-skeleton.genome` + `PREDICT` + `FAST`. Gate G4-2 re-run
+as a regression on the untouched skeleton genome: still reaches the exact pin
+`d4b5c6b8d57f35e6ad199b49b38d720095ba3b678c380b206665a876698aaa86`; `mind.episodes`/`mind.predictor`
+are both `None` on that genome, so every new branch is provably dead code for it.
+**No clause unmet.** Two bugs caught before shipping (both fixed, both re-verified — see A9's own
+commit message for the full detail): `questions.build_ledgers` needs `moment_thing[m]` for every
+birth's moment, and a sight-only `moment_sight` glance can birth a cell with no `moment_word` entry
+recorded for it (`KeyError` on the first such birth); and `Mind.resume()` replacing `self.org` left
+the predictor's closure pointing at the pre-load organism (rebuilt after the load, before its
+persisted `last_winner` is restored).
+
+## A10 — SLEEP in the mind + the six blinds (PREREG §11.1 step 4)
+**Test log:** `Ran 6 tests in 144.720s — OK` (`tests/creature/test_wave2_sleep_and_blinds.py`) · **Commit:** `f55510f`
+SLEEP/`cycle`/(TRAITS when available) wired in `_maybe_sleep`; journaled as a SECOND mind row
+sharing its triggering canvas's own seq, which required `creature/replay.py`'s `compare()` to group
+mind rows by seq into ordered lists instead of a dict keyed by seq (a genuine format change, not
+scope creep — both changes shipped together in `c309fbb` since `_maybe_sleep` sits in the same
+per-canvas method as PREDICT/FAST). All six blinds (`gaze`, `sleep`, `predict`, `frozen`,
+`curiosity`, `park`) replay byte-identical to themselves; four (`gaze`, `sleep`, `predict`,
+`frozen`) are measured to differ from the unblinded journal; `curiosity`/`park` do **not** differ
+yet — asserted as an honest documented negative (`test_curiosity_and_park_blinds_currently_inert`),
+since THINK (A11) is their only mechanism and did not exist yet when this task ran.
+**No clause unmet.** Two bugs caught before shipping: `genome.sleep.sleep()` calls `org.moment()`
+once per replayed episode, advancing `org.t` and birthing cells my per-glance loops never saw
+(fixed by pre-recording `moment_word` via a second, read-only `Episodes.most_surprising(n)` call in
+the same order `sleep()` will replay); and `--blind frozen` showed **zero** observable divergence on
+a 60-canvas tape (only 28 total cells born, under the default-absent FROZEN threshold of 50 — a
+control that didn't control anything, #91's class) — fixed by growing the test tape to 150 canvases
+(measured: 60 total cells unblinded, 11 refusals blind).
+
+## A11 — THINK in the mind (PREREG §11.1 step 3)
+**Test log:** `Ran 10 tests in 10.807s — OK (skipped=2)` (`tests/creature/test_wave2_think.py`) · **Commit:** `867663d`
+**RAISED, not worked around:** THINK's own gene clause (`THINK every <n> canvases`) has no parser
+clause on `master` at commit time — confirmed, not assumed, by
+`test_think_gene_line_is_currently_unparseable` (a `GenomeError` on that exact line). No genome this
+worktree can parse ever sets `"THINK" in genome.declared`, so the gate the whole step lives behind
+can never fire end-to-end through a real genome file today. To still exercise the gated path, the
+tests mutate the **already-parsed** `Genome` object's `declared` dict in memory
+(`mind.genome.declared["THINK"] = {"every": N}`) — no file under `genome/` is touched, the same
+technique as building any other in-memory test fixture; documented at the top of the test module.
+**skipUnless-gated (2 tests, both skipped in this run):**
+- `TestThinkBeliefFormation.test_word_item_forms_a_belief_when_answered` — `skipUnless(_THINK_LAWS_AVAILABLE)`; `genome.think` (needed for kind "word" → `think.believe`) not on master.
+- `TestThinkCuriosityChoice.test_curiosity_declared_uses_interests_choose` — `skipUnless(_CURIOSITY_AVAILABLE)`; `genome.curiosity` not on master (the `CURIOSITY` gene ITSELF already parses, from wave 1's B1 — only the module is missing).
+
+Implemented and exercised without either missing module: the 3-part POOL (words of the last 200
+episodes whose `recall` abstains; episodes with word `""`; filed-and-due predictions),
+`_think_choose` (no `CURIOSITY` declared → first item; blind `curiosity` → a **genome-seeded** rng's
+uniform pick, `np.random.default_rng([genome.seed, 0x71494e4b])` — never wall clock or
+`os.urandom`, the determinism law holds and is re-pinned by `test_mind_has_no_clock`), kind (b)
+(sight → nearest word via `Episodes.nearest` → `FILE` a prediction) with PARK's dead-end wiring
+(`genome/park.py`, already on master), and kind (c)'s due-prediction scoring via `predict.score`.
+**Documented simplifications (interpretive choices, not violations — the PREREG's prose underspecifies
+the exact mechanics here):** kind (b)'s "nearest word by FAST's nearest over episodes with a word"
+searches the top-10 nearest OVERALL episodes for the first one carrying a word, since
+`Episodes.nearest()` has no word filter; a filed prediction's decider `"recall == word"` is evaluated
+via a fresh word-cell lookup (`questions.build_ledgers`) rather than a persisted per-edge index —
+correct, O(births) per score, acceptable at this life's scale, worth revisiting if THINK's cadence
+is ever high-frequency in the 24 h life.
+Also caught here: `--folder`'s canvas size was read from `body.mind.genome`, which does not exist
+until `start()` runs — fixed by parsing the genome file directly in `main()` before this ever ran live.
+
+## A12 — the folder door (PREREG §11.3)
+**Test log:** `Ran 1 test in 3.776s — OK` (`tests/creature/test_folder_door.py`); G4-1 re-verified green with the new module: `Ran 5 tests in 0.012s — OK` · **Commit:** `37ecedd`
+`creature/senses/folder.py` watches `world/<word>/` (a–z ≤ 8 letters, ≥ 1 picture) by **sha256**
+(never mtime alone — a touched-but-byte-unchanged file must not re-publish); ear (word = folder
+name) then eye, source `"folder"`, `meta.moment = "f" + sha[:12]`; `root/folder/SEEN.json` is
+written **after** the rows are durable on the tape (the cursor law, #230) — a crash between
+publishing and marking-seen safely re-publishes on restart, never silently drops a picture. Armed
+only by an explicit `--folder PATH` on `creature.body`, default OFF (`--folder-period`, default 30s).
+Verified directly, not assumed: two pictures → 4 rows (ear-then-eye per moment, ear seq < eye seq
+for both); a **second, fresh `Body` on the same root** (the restart the task asks for) publishes
+zero new rows for the same two pictures.
+**No clause unmet.**
+
+## A13 — the self-exam duty (PREREG §11.4)
+**Test log:** `Ran 4 tests in 30.624s — OK` (`tests/creature/test_exam.py`) · **Commit:** `41afc28`
+`creature/exam.py`'s `run_exam()` reuses `tools/self_exam.py`'s own `main()` (a scoped `sys.argv`
+swap, restored in a `finally` — never copying its orchestration) over the latest snapshot in a
+PRIVATE Organism; `run_and_journal()` adds the PREREG's `{"event":"exam","path","q1","cells"}` row.
+Measured directly, not assumed: the live mind's `org.state_hash()` is byte-identical before and
+after every exam, both through a direct `run_and_journal()` call and through the cadence-driven
+`voice_loop()` thread running concurrently with a live `Body`.
+Deliberately **not** walked by gate G4-1's writer sweep (scoped to `creature/senses/*.py`,
+`creature/world_maker.py`, `creature/ask.py`): `creature/exam.py` is neither a sense nor the voice's
+own core file, so its journal write sits outside that gate's fixed file list — a design choice
+recorded in the module's own docstring, not an oversight (§11.4 explicitly requires the journal
+write A8's sweep would otherwise have had to special-case around).
+`voice_loop()`'s cadence is read from the snapshot's own `"moments"` (`state/ledger.json`) divided
+by the genome's fixations-per-canvas — the voice never reads a live counter off the mind (§2.7's
+law: it never touches the mind's objects). **EXAM's own gene clause is not on master's parser at
+commit time** (same gap as THINK), so `Body`'s wiring (committed with A12, `37ecedd`, since its hunks
+sit interleaved with `--folder`'s in `main()`/`start()`/`stop()`) is gated on `"EXAM" in declared`
+and untested end-to-end through a real genome file; the direct `voice_loop()` test bypasses that
+gate the same way A11's THINK tests do, by starting the thread explicitly rather than through `Body`.
+**No clause unmet.**
+
+## Cost: ms per canvas, skeleton vs. every wave-2 step ON
+Measured fresh, this session, `OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1`, solo (no other creature
+threads in the SAME process) — but **not** an idle box: `creature.service` was live throughout
+(`systemctl --user is-active` → `active`, PID running since 22:29) and Builder B's own test suite
+ran concurrently for part of this session. 150 canvases each, 4 glances/canvas:
+
+| genome | median ms/canvas (eye row) | mean ms/canvas | n |
+|---|---|---|---|
+| `G4-skeleton.genome` (no wave-2 gene) | 37.98 | 39.38 | 150 |
+| `G4-wave2-sleep-test.genome` (PREDICT + FAST + SLEEP, mixed worded/sight-only) | 38.35 | 43.43 | 150 |
+
+**Ratio (mean, wave-2-on / skeleton): 1.10×.** RSS at the end of both runs in the same process: 170.3 MB.
+
+This does not match a cited skeleton baseline of 19 ms — flagged rather than quietly reconciled: A1–A8's
+own report (measured on an idle box, before the creature went live) read **39.3 ms median** for the
+skeleton, i.e. consistent with THIS session's 37.98 ms, not with 19 ms. The likely explanation is
+that the 19 ms figure was read on different hardware or under different load than either of my two
+measurements (both taken on this box, one before and one after `creature.service` went live) — but I
+have not independently reproduced 19 ms anywhere, so I am reporting what I measured rather than
+reconciling the discrepancy. G4-7 (cost at REAL concurrency, every thread running) is explicitly
+Claude's own gate, not mine, per the PREREG's Order section (§7) and A13's "the voice never touches
+the mind" boundary — these solo numbers are the input to that gate, not a substitute for it.
+
+## Ownership check (wave 2)
+`git status --short` was clean after every one of the 5 commits above. Touched only `creature/`
+(`mind.py`, `body.py`, `replay.py`, `exam.py`, `senses/folder.py`), `tests/creature/` (5 new test
+files + 3 new `.genome` fixtures), and this report. Never touched `genome/`, `docs/G4-PREREG.md`, or
+`/data/dev/genome` (the master tree, read-only via the worktree's own fast-forward). `run/` (the
+live creature) was never written to or restarted; the only interaction with it was one
+`systemctl --user is-active creature.service` status read while investigating the ms/canvas
+discrepancy above. No `systemctl enable/start/stop/restart` call anywhere in this session. Every
+test and manual run used `tempfile.mkdtemp()`.
+
+## Commits (g4-body, wave 2)
+```
+c309fbb A9: PREDICT + FAST in the mind — G4-8 skeleton hash unchanged
+f55510f A10: SLEEP in the mind + the six blinds
+867663d A11: THINK in the mind — pool/choose/work/park
+37ecedd A12: the folder door — armed by --folder, default OFF
+41afc28 A13: the self-exam duty — voice thread, journal EVENT row
+```
