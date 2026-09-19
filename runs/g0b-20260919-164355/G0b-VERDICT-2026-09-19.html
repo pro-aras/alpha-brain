@@ -13,14 +13,14 @@ b{font-weight:600}
 h2,h3{break-after:avoid}tr,pre,li{break-inside:avoid}
 </style>
 </head><body><h1>G0 rung 0 — VERDICT: <b>FAIL</b> (failed: iv_grows_alone; SCALE untested)</h1>
-<p>run <code>20260919-164355</code> · genome <code>/data/dev/genome/runs/g0b-20260919-164355/G0.genome</code> · PREREG docs/G0-PREREG.md §1–§11 · every number below is read from results.json</p>
+<p>run <code>20260919-164355</code> · genome <code>runs/g0b-20260919-164355/G0.genome</code> · PREREG docs/G0-PREREG.md §1–§11 · every number below is read from results.json</p>
 <h2>The nine marks, bars as written before the run (§5), predictions of §7 beside each</h2>
 <div class="tw"><table>
 <tr><th>mark</th><th>bar</th><th>read</th><th>pass</th><th>§7 predicted</th></tr>
 <tr><td>(i) it answers</td><td>Q1,Q2 ≥ .80 · Q3 ≥ .85 · Q4 ≥ .90</td><td>Q1 0.995 · Q2 1.00 · Q3 0.995 (ceiling 0.998) · Q4 0.995</td><td>True</td><td>likely PASS</td></tr>
 <tr><td>(ii) the meeting is real</td><td>T-shuffle, T-nowire Q1 ≤ .20</td><td>T-shuffle Q1 band [0.0, 0.132, 0.055] · T-nowire Q1 0.000 (abstain {&#x27;novel&#x27;: 1, &#x27;noedge&#x27;: 219, &#x27;ratio&#x27;: 0})</td><td>True</td><td>PASS</td></tr>
 <tr><td>(iii) growth matters</td><td>T-frozen ≥ 30 pp under (i)</td><td>T-frozen Q1 0.191 vs design 0.995</td><td>True</td><td>PASS</td></tr>
-<tr><td>(iv) it grows on its own</td><td>≥ 50 born · 0 refused · 5-thing &lt; 10-thing · ≥ 5 % pruned · 0 by disuse</td><td>born 86 · refused 0 · 5-thing 21 vs full world 43 at the end of development · pruned 1/72 = 1.4 % (cross-thing born 2, cross-thing pruned 1) · disuse 0</td><td>False</td><td>births 100–300; pruning may FAIL the 5 % bar</td></tr>
+<tr><td>(iv) it grows on its own</td><td>≥ 50 born · 0 refused · 5-thing &lt; full world · ≥ 5 % pruned · 0 by disuse</td><td>born 86 · refused 0 · 5-thing 21 vs full world 43 at the end of development · pruned 1/72 = 1.4 % (cross-thing born 2, cross-thing pruned 1) · disuse 0</td><td>False</td><td>births 100–300; pruning may FAIL the 5 % bar</td></tr>
 <tr><td>(v) it keeps what it learned</td><td>within 5 pp after arrival 2</td><td>Q1 first-10 at 600 0.995 → at 900 0.995 (+0.0 pp)</td><td>True</td><td>PASS</td></tr>
 <tr><td>(vi) it knows what it does not know</td><td>plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20</td><td>plant zog answered 0.55 (as {&#x27;zog&#x27;: 11}) · null vex abstains 0.90 · Q5 spiral abstains 1.00 (by {&#x27;novel&#x27;: 20, &#x27;noedge&#x27;: 0, &#x27;ratio&#x27;: 0}; answered as {}) · false abstention on seen 0.005 (by {&#x27;novel&#x27;: 1, &#x27;noedge&#x27;: 0, &#x27;ratio&#x27;: 0})</td><td>True</td><td>the uncertain one</td></tr>
 <tr><td>(vii) replay</td><td>two lives byte-identical</td><td>True (sha256 cfbc80b3231f8755…)</td><td>True</td><td>PASS by construction</td></tr>
@@ -50,7 +50,7 @@ h2,h3{break-after:avoid}tr,pre,li{break-inside:avoid}
 <li><b>T-shuffle-7</b>: Q1 0.055 (abstain {&#x27;novel&#x27;: 0, &#x27;noedge&#x27;: 0, &#x27;ratio&#x27;: 102}) · Q2 0.09 · Q3 0.514 · Q4 0.400 · cells 90+16 (error births 27/0, redundant refused 74) · edges alive 407 born 467 pruned 53 (11.3 %) · merged 7/0 · refused budget 0 frozen 0 · 1.91 s</li>
 <li><b>T-frozen</b>: Q1 0.191 (abstain {&#x27;novel&#x27;: 173, &#x27;noedge&#x27;: 0, &#x27;ratio&#x27;: 0}) · Q2 0.45 · Q3 0.591 · Q4 0.191 · cells 5+5 (error births 0/0, redundant refused 0) · edges alive 5 born 5 pruned 0 (0.0 %) · merged 0/0 · refused budget 0 frozen 1475 · 1.35 s</li>
 <li><b>T-nowire</b>: Q1 0.000 (abstain {&#x27;novel&#x27;: 1, &#x27;noedge&#x27;: 219, &#x27;ratio&#x27;: 0}) · Q2 0.00 · Q3 0.500 · Q4 0.000 · cells 70+16 (error births 0/0, redundant refused 0) · edges alive 0 born 0 pruned 0 (0.0 %) · merged 0/0 · refused budget 0 frozen 0 · 1.68 s</li>
-<li><b>five-thing life</b> (600 moments, 120/thing): cells born 21 vs the ten-thing life&#x27;s 43 at 600; Q1 1.000.</li>
+<li><b>five-thing life</b> (600 moments, 120/thing): cells born 21 vs the full world&#x27;s 43 at the end of development; Q1 1.000.</li>
 </ul>
 <h2>Twenty random genomes (§4, E29&#x27;s control) — composite = mean(Q1..Q4) at 900</h2>
 <div class="tw"><table>
@@ -77,14 +77,16 @@ h2,h3{break-after:avoid}tr,pre,li{break-inside:avoid}
 <tr><td>18</td><td>0.125</td><td>0.000</td><td>0.00</td><td>0.500</td><td>0.000</td><td>0.852</td><td>4</td><td>702</td><td>4</td><td>0.029</td><td>0.194</td><td>0.956</td><td>358</td><td>0.78</td><td>13</td><td>0</td></tr>
 </table></div>
 <p>The design genome&#x27;s composite 0.997 ranks 1 of 21; the best random genome is seed 19 at 0.959.</p>
-<h2>What did nothing in the design life, and why</h2>
+<h2>What the design life did and did not exercise, read from the numbers</h2>
 <ul>
-<li>Four genes had no measurable work: error births 0 (the road fired 27 times, every birth refused as redundant), merges 0 (THETA_M 0.9986 was never met between two winners with the same answer), pruned 1 of 72 edges, scale 0. This follows from THETA_N (0.968) sitting ABOVE the between-thing maximum (gate G-a, §11 amendment 2): no cross-thing edge is ever born, so nothing is wrong, redundant or weak. In T-shuffle-5, where the pairings are random, 506 edges were born and 56 pruned (11.1 %) — that number says whether the PRUNE gene works at all when there is something to prune.</li>
-<li>The same threshold surfaced twice more. The plant: «zog» shown 5 times birthed 3 cells, and 10 of 20 held-out zog renderings resonated with none of them (at THETA_N = the within-thing MEDIAN, half of same-thing renderings do not resonate with a given cell) — the plant reads 0.50 against a majority bar. Q5: the spiral abstains at exactly 0.80, its bar, with 4 of 20 read as «circle»; the spiral was never in gate G-a&#x27;s ten-thing measurement, so the threshold carries no guarantee for a never-shown thing — one more answered spiral fails (vi) a second way.</li>
+<li>Error births 0/0 (the road fired 27 times; every birth refused as redundant, §11 am. 4); merges 0/0 (THETA_M 0.9986); edges pruned 1 of 72; cross-thing edges born 2 of 75, cross-thing pruned 1; scale 0. THETA_N 0.968 against between-thing p95 0.903, max 0.970: 2 cross-thing edges were born and 1 of them pruned — the SHRINK genes had that much work and did it.</li>
+<li>In T-shuffle-5 (random pairings) 506 edges were born and 56 pruned (11.1 %), with 31 error births and 7 merges: the PRUNE, error-birth and MERGE genes work when there is something to prune, birth or merge; the design world gives them little.</li>
+<li>The plant: «zog» shown 5 times birthed 3 cells; 0.55 of its 20 held-out renderings were answered «zog», 0.45 abstained (by {&#x27;novel&#x27;: 9, &#x27;noedge&#x27;: 0, &#x27;ratio&#x27;: 0}); the gate&#x27;s within-thing share at THETA_N was 0.503 — the showings formula assumed independent cells, and same-thing cells are not independent.</li>
+<li>Q5: the spiral abstains at 1.00 (by {&#x27;novel&#x27;: 20, &#x27;noedge&#x27;: 0, &#x27;ratio&#x27;: 0}; answered as nothing) against its 0.80 bar; the spiral was never in gate G-a&#x27;s measurement, so the threshold carries no guarantee for a never-shown thing.</li>
 </ul>
 <h2>What this verdict does and does not say</h2>
 <ul>
 <li>The truth never entered the organism: <code>genome/machinery.py</code> imports neither <code>world</code> nor <code>questions</code> and carries no label field; the ledger is the runner&#x27;s, built from the stream (clause 12; the hash check proves only that the runner did not touch the organism).</li>
-<li>SCALE is untested here (0 events in 905 moments). §2&#x27;s strict gate rule was not met by any fixed front; §11&#x27;s amended rule was, at the price of several cells per thing — the cells-per-thing line above is that price, measured.</li>
+<li>SCALE is untested here (0 events in 965 moments). §2&#x27;s strict gate rule was not met; the amended rule was, at the price of several cells per thing — the cells-per-thing line above is that price, measured.</li>
 <li>No sentences, no reasoning, no reward, no sleep, no evolution (§6). Rung 1 is his pictures through the folder door; rung 2 a lineage, only after rung 1.</li>
 </ul></body></html>

@@ -1,6 +1,6 @@
 # G0 rung 0 — VERDICT: **FAIL** (failed: iv_grows_alone; SCALE untested)
 
-run `20260919-164355` · genome `/data/dev/genome/runs/g0b-20260919-164355/G0.genome` · PREREG docs/G0-PREREG.md §1–§11 · every number below is read from results.json
+run `20260919-164355` · genome `runs/g0b-20260919-164355/G0.genome` · PREREG docs/G0-PREREG.md §1–§11 · every number below is read from results.json
 
 ## The nine marks, bars as written before the run (§5), predictions of §7 beside each
 
@@ -9,7 +9,7 @@ run `20260919-164355` · genome `/data/dev/genome/runs/g0b-20260919-164355/G0.ge
 | (i) it answers | Q1,Q2 ≥ .80 · Q3 ≥ .85 · Q4 ≥ .90 | Q1 0.995 · Q2 1.00 · Q3 0.995 (ceiling 0.998) · Q4 0.995 | True | likely PASS |
 | (ii) the meeting is real | T-shuffle, T-nowire Q1 ≤ .20 | T-shuffle Q1 band [0.0, 0.132, 0.055] · T-nowire Q1 0.000 (abstain {'novel': 1, 'noedge': 219, 'ratio': 0}) | True | PASS |
 | (iii) growth matters | T-frozen ≥ 30 pp under (i) | T-frozen Q1 0.191 vs design 0.995 | True | PASS |
-| (iv) it grows on its own | ≥ 50 born · 0 refused · 5-thing < 10-thing · ≥ 5 % pruned · 0 by disuse | born 86 · refused 0 · 5-thing 21 vs full world 43 at the end of development · pruned 1/72 = 1.4 % (cross-thing born 2, cross-thing pruned 1) · disuse 0 | False | births 100–300; pruning may FAIL the 5 % bar |
+| (iv) it grows on its own | ≥ 50 born · 0 refused · 5-thing < full world · ≥ 5 % pruned · 0 by disuse | born 86 · refused 0 · 5-thing 21 vs full world 43 at the end of development · pruned 1/72 = 1.4 % (cross-thing born 2, cross-thing pruned 1) · disuse 0 | False | births 100–300; pruning may FAIL the 5 % bar |
 | (v) it keeps what it learned | within 5 pp after arrival 2 | Q1 first-10 at 600 0.995 → at 900 0.995 (+0.0 pp) | True | PASS |
 | (vi) it knows what it does not know | plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20 | plant zog answered 0.55 (as {'zog': 11}) · null vex abstains 0.90 · Q5 spiral abstains 1.00 (by {'novel': 20, 'noedge': 0, 'ratio': 0}; answered as {}) · false abstention on seen 0.005 (by {'novel': 1, 'noedge': 0, 'ratio': 0}) | True | the uncertain one |
 | (vii) replay | two lives byte-identical | True (sha256 cfbc80b3231f8755…) | True | PASS by construction |
@@ -39,7 +39,7 @@ run `20260919-164355` · genome `/data/dev/genome/runs/g0b-20260919-164355/G0.ge
 - **T-shuffle-7**: Q1 0.055 (abstain {'novel': 0, 'noedge': 0, 'ratio': 102}) · Q2 0.09 · Q3 0.514 · Q4 0.400 · cells 90+16 (error births 27/0, redundant refused 74) · edges alive 407 born 467 pruned 53 (11.3 %) · merged 7/0 · refused budget 0 frozen 0 · 1.91 s
 - **T-frozen**: Q1 0.191 (abstain {'novel': 173, 'noedge': 0, 'ratio': 0}) · Q2 0.45 · Q3 0.591 · Q4 0.191 · cells 5+5 (error births 0/0, redundant refused 0) · edges alive 5 born 5 pruned 0 (0.0 %) · merged 0/0 · refused budget 0 frozen 1475 · 1.35 s
 - **T-nowire**: Q1 0.000 (abstain {'novel': 1, 'noedge': 219, 'ratio': 0}) · Q2 0.00 · Q3 0.500 · Q4 0.000 · cells 70+16 (error births 0/0, redundant refused 0) · edges alive 0 born 0 pruned 0 (0.0 %) · merged 0/0 · refused budget 0 frozen 0 · 1.68 s
-- **five-thing life** (600 moments, 120/thing): cells born 21 vs the ten-thing life's 43 at 600; Q1 1.000.
+- **five-thing life** (600 moments, 120/thing): cells born 21 vs the full world's 43 at the end of development; Q1 1.000.
 
 ## Twenty random genomes (§4, E29's control) — composite = mean(Q1..Q4) at 900
 
@@ -68,13 +68,15 @@ run `20260919-164355` · genome `/data/dev/genome/runs/g0b-20260919-164355/G0.ge
 
 The design genome's composite 0.997 ranks 1 of 21; the best random genome is seed 19 at 0.959.
 
-## What did nothing in the design life, and why
+## What the design life did and did not exercise, read from the numbers
 
-- Four genes had no measurable work: error births 0 (the road fired 27 times, every birth refused as redundant), merges 0 (THETA_M 0.9986 was never met between two winners with the same answer), pruned 1 of 72 edges, scale 0. This follows from THETA_N (0.968) sitting ABOVE the between-thing maximum (gate G-a, §11 amendment 2): no cross-thing edge is ever born, so nothing is wrong, redundant or weak. In T-shuffle-5, where the pairings are random, 506 edges were born and 56 pruned (11.1 %) — that number says whether the PRUNE gene works at all when there is something to prune.
-- The same threshold surfaced twice more. The plant: «zog» shown 5 times birthed 3 cells, and 10 of 20 held-out zog renderings resonated with none of them (at THETA_N = the within-thing MEDIAN, half of same-thing renderings do not resonate with a given cell) — the plant reads 0.50 against a majority bar. Q5: the spiral abstains at exactly 0.80, its bar, with 4 of 20 read as «circle»; the spiral was never in gate G-a's ten-thing measurement, so the threshold carries no guarantee for a never-shown thing — one more answered spiral fails (vi) a second way.
+- Error births 0/0 (the road fired 27 times; every birth refused as redundant, §11 am. 4); merges 0/0 (THETA_M 0.9986); edges pruned 1 of 72; cross-thing edges born 2 of 75, cross-thing pruned 1; scale 0. THETA_N 0.968 against between-thing p95 0.903, max 0.970: 2 cross-thing edges were born and 1 of them pruned — the SHRINK genes had that much work and did it.
+- In T-shuffle-5 (random pairings) 506 edges were born and 56 pruned (11.1 %), with 31 error births and 7 merges: the PRUNE, error-birth and MERGE genes work when there is something to prune, birth or merge; the design world gives them little.
+- The plant: «zog» shown 5 times birthed 3 cells; 0.55 of its 20 held-out renderings were answered «zog», 0.45 abstained (by {'novel': 9, 'noedge': 0, 'ratio': 0}); the gate's within-thing share at THETA_N was 0.503 — the showings formula assumed independent cells, and same-thing cells are not independent.
+- Q5: the spiral abstains at 1.00 (by {'novel': 20, 'noedge': 0, 'ratio': 0}; answered as nothing) against its 0.80 bar; the spiral was never in gate G-a's measurement, so the threshold carries no guarantee for a never-shown thing.
 
 ## What this verdict does and does not say
 
 - The truth never entered the organism: `genome/machinery.py` imports neither `world` nor `questions` and carries no label field; the ledger is the runner's, built from the stream (clause 12; the hash check proves only that the runner did not touch the organism).
-- SCALE is untested here (0 events in 905 moments). §2's strict gate rule was not met by any fixed front; §11's amended rule was, at the price of several cells per thing — the cells-per-thing line above is that price, measured.
+- SCALE is untested here (0 events in 965 moments). §2's strict gate rule was not met; the amended rule was, at the price of several cells per thing — the cells-per-thing line above is that price, measured.
 - No sentences, no reasoning, no reward, no sleep, no evolution (§6). Rung 1 is his pictures through the folder door; rung 2 a lineage, only after rung 1.
