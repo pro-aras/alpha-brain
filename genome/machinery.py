@@ -413,6 +413,11 @@ class Organism:
         self.edges_log: List[Tuple[int, int, int]] = []        # (moment, sight cell, word cell) — every edge born
         self.prunes_log: List[Tuple[int, int, int]] = []       # (moment, sight cell, word cell) — every edge pruned
         self.refusals_by_arrival: List[int] = []
+        # G4 §3 B2: a plain attribute, NEVER a self.c key — state_hash hashes json.dumps(self.c), so a
+        # new self.c key would move the pin (d4b5c6b8…) even at value 0, for every genome that never
+        # calls moment_sight. Kept out of state_hash entirely; a life that DOES call moment_sight still
+        # gets a different hash, but only through the sight cells/W it actually touches.
+        self.moments_sight_only = 0
 
     # ------------------------------------------------------------------ arrivals & budget
     def new_arrival(self) -> None:
@@ -475,6 +480,20 @@ class Organism:
             self._prune(S, T)
             self._merge(self.sight, S, axis=0)
             self._merge(self.words, T, axis=1)
+        self.t += 1
+        if self.t % self.g.scale_every == 0:
+            self._scale()
+
+    def moment_sight(self, x_s: np.ndarray) -> None:
+        """G4 §3 B2 (docs/G4-PREREG.md, row 1a's BODY/tape: a sight-only moment — an eye row whose moment
+        has no matching ear row, §2.2 of the body contract). Resonance + novelty birth on sight ONLY: no
+        MEET (no HEBB, DELTA, misfire-birth, PRUNE or MERGE — those all compare sight winners against
+        word winners of the SAME moment, which a sight-only moment does not have). Mirrors moment()'s
+        tail exactly (t advances; SCALE fires at its own multiples of t) so a life mixing moment_sight
+        and moment stays on one homeostasis clock. Counted in `self.moments_sight_only` — see its
+        docstring in __init__ for why that counter is a plain attribute and not a self.c key."""
+        self._resonate(self.sight, x_s)
+        self.moments_sight_only += 1
         self.t += 1
         if self.t % self.g.scale_every == 0:
             self._scale()
@@ -796,5 +815,5 @@ class Organism:
         return {
             "moments": self.t, "cells_sight": int(self.sight.alive.sum()), "cells_words": int(self.words.alive.sum()),
             "cells_born_sight": self.sight.n, "cells_born_words": self.words.n,
-            "edges_alive": int(self.mask.sum()), **self.c,
+            "edges_alive": int(self.mask.sum()), "moments_sight_only": self.moments_sight_only, **self.c,
         }
