@@ -34,10 +34,28 @@ from PIL import Image
 from genome import gaze
 from genome.fast import Episodes
 from genome.machinery import Genome, Organism, parse_genome
-from genome.predict import Predictor
-from genome.questions import build_ledgers
+from genome.park import Park
+from genome.predict import Predictor, file as predict_file, score as predict_score
+from genome.questions import build_ledgers, why as questions_why
 from genome.sleep import cycle as run_cycle, sleep as run_sleep
 from genome.world import encode_word
+
+# A11 (PREREG §11.2): genome.curiosity / genome.think are not yet on master at the time this file was
+# written — imported defensively so creature/mind.py never breaks when they land, and never stubbed here
+# (Builder A owns creature/, not genome/; docs/briefs/G4-BUILDER-A-BODY.md's own instruction for this case).
+try:
+    from genome.curiosity import Interests
+    _CURIOSITY_AVAILABLE = True
+except ImportError:
+    Interests = None                    # type: ignore[assignment]
+    _CURIOSITY_AVAILABLE = False
+
+try:
+    from genome import think as think_laws
+    _THINK_LAWS_AVAILABLE = True
+except ImportError:
+    think_laws = None                   # type: ignore[assignment]
+    _THINK_LAWS_AVAILABLE = False
 
 try:                                    # TRAITS (PREREG §11.2) is not yet on master at the time of A9/A10;
     from genome.traits import Traits    # gated on BOTH "TRAITS" in declared AND this import having succeeded —
@@ -75,6 +93,20 @@ class Mind:
         )
         self.predictor: Optional[Predictor] = Predictor(self.org) if "PREDICT" in self.genome.declared else None
         self._last_sleep_at: int = 0        # org.t at the last SLEEP boundary crossed
+
+        # A11 (PREREG §11.1 step 3): THINK is gated on "THINK" in genome.declared, which requires a
+        # parser clause not yet on master at the time this was written (raised in the builder report,
+        # not worked around) -- park/curiosity are constructed whenever THEIR OWN genes are declared
+        # (both parse today), independent of whether THINK itself can ever fire in this genome.
+        self.park: Optional[Park] = Park(int(self.genome.declared["PARK"]["after"])) if "PARK" in self.genome.declared else None
+        self.interests: Optional["Interests"] = (
+            Interests(int(self.genome.declared["CURIOSITY"]["interests"]), np.random.default_rng(self.genome.seed))
+            if "CURIOSITY" in self.genome.declared and _CURIOSITY_AVAILABLE else None
+        )
+        self._think_rng = np.random.default_rng([int(self.genome.seed), 0x71494e4b])   # "THINK" bytes-ish, distinct from any other stream in this file
+        self._canvas_index: int = 0
+        self._filed_predictions: list = []          # [{"row": FILE's row dict, "due_canvas": int}, ...] awaiting the next showing of their word
+        self.think_counters: Dict[str, int] = {"thinks": 0, "parked": 0, "beliefs": 0, "predictions_filed": 0, "predictions_scored": 0}
 
         self.pending: Dict[str, str] = {}                 # ear-consumed, eye not yet arrived: moment -> word
         self.moment_word: Dict[int, str] = {}              # org.t (per GLANCE, before increment) -> word — build_ledgers' input
@@ -130,6 +162,7 @@ class Mind:
                 if predict_on:
                     self.predictor.note_winners(S)
             ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw, word=word, surprise=err) if fast_on else None
+            self._score_due_predictions(word, g["feats"][0] if g["feats"] else None)
             births = [[b[1], int(b[2]), b[3]] for b in self.org.births[births_before:]]
             edges_born = len(self.org.edges_log) - edges_before
             edges_pruned = len(self.org.prunes_log) - prunes_before
@@ -165,7 +198,9 @@ class Mind:
             self.sight_only_skipped += 1
             self._write_journal(row["at"], {"seq": row["seq"], "moment": moment, "sight_only": True})
 
+        self._canvas_index += 1
         self._maybe_sleep(row)
+        self._maybe_think(row)
 
     def _maybe_sleep(self, row: Dict[str, object]) -> None:
         """PREREG §11.1 step 4: every SLEEP.every MOMENTS (org.t, not canvases), after the canvas that
@@ -198,6 +233,153 @@ class Mind:
             self._write_journal(row["at"], {
                 "seq": row["seq"], "sleep": {**result, "cycle": cycled}, "hash": self.org.state_hash(),
             })
+
+    # ------------------------------------------------------------------ THINK (A11, PREREG §11.1 step 3)
+    def _score_due_predictions(self, word: str, first_glance: Optional[np.ndarray]) -> None:
+        """A prediction filed by THINK's kind-(b) work becomes scorable the next time ITS OWN word is
+        shown again — "the journal's err/recall on the next canvas with that word" (PREREG's own route
+        text). Simplification, documented in the report: the decider "recall == word" is evaluated by a
+        fresh word-cell lookup (questions.build_ledgers) rather than a persisted per-edge index — correct,
+        but O(births) per score, acceptable at this life's scale."""
+        if not self._filed_predictions or first_glance is None:
+            return
+        still_pending = []
+        ledgers = None
+        for entry in self._filed_predictions:
+            if entry["target_word"] == word and self._canvas_index >= entry["due_canvas"]:
+                if ledgers is None:
+                    ledgers = build_ledgers(self.org, self.moment_word)
+                r = self.org.recall("sight", first_glance)
+                Lw = ledgers["words"]
+                evidence = r["cell"] is not None and Lw.get(r["cell"], set()) == {word}
+                scored = predict_score(entry["row"], evidence)
+                predict_ledger_path = self.run_root / "state" / "predictions.jsonl"
+                predict_ledger_path.parent.mkdir(parents=True, exist_ok=True)
+                with predict_ledger_path.open("a") as f:
+                    f.write(json.dumps(scored, default=str) + "\n")
+                self.think_counters["predictions_scored"] += 1
+            else:
+                still_pending.append(entry)
+        self._filed_predictions = still_pending
+
+    def _think_pool(self) -> list:
+        """PREREG §11.1 step 3's POOL: (a) words of the last 200 episodes whose recall abstains; (b)
+        episodes with word ""; (c) filed predictions now due. Each item: {"kind", "key", "episode", "pred"}
+        (the shape the coordinator's interface message gives for genome.curiosity.Interests)."""
+        pool: list = []
+        if self.episodes is not None:
+            n_written = self.episodes.n_written
+            first_id = max(0, n_written - 200)
+            seen_words = set()
+            for eid in range(first_id, n_written):
+                rec = self.episodes.get(eid)
+                if rec is None or not rec["word"] or rec["word"] in seen_words:
+                    continue
+                r = self.org.recall("sight", rec["x_s"])
+                if r["cell"] is None:
+                    seen_words.add(rec["word"])
+                    pool.append({"kind": "word", "key": rec["word"], "episode": eid, "pred": None})
+            for eid in range(0, n_written):
+                rec = self.episodes.get(eid)
+                if rec is not None and rec["word"] == "":
+                    pool.append({"kind": "sight", "key": f"ep{eid}", "episode": eid, "pred": None})
+        now = self._canvas_index
+        for entry in self._filed_predictions:
+            if now >= entry["due_canvas"]:
+                pool.append({"kind": "due", "key": entry["target_word"], "episode": None, "pred": entry["row"]})
+        return pool
+
+    def _think_choose(self, pool: list):
+        if not pool:
+            return None
+        curiosity_on = self.interests is not None and "curiosity" not in self.blind
+        if curiosity_on:
+            return self.interests.choose(pool, self._think_rng)
+        if "curiosity" in self.blind and "CURIOSITY" in self.genome.declared:
+            return pool[int(self._think_rng.integers(0, len(pool)))]      # blind curiosity: the rng's uniform pick
+        return pool[0]                                                    # no CURIOSITY declared: the first item
+
+    def _think_work(self, item: dict) -> Dict[str, object]:
+        """Works one pool item; returns {"outcome", "parked", ...}. Every dead end goes to
+        park.answer(want, reason) when PARK is declared (PREREG: "every dead end goes to park.answer");
+        without PARK declared a dead end simply stays a dead end (nothing to park it with)."""
+        def dead_end(want: str, reason: str) -> Dict[str, object]:
+            parked = False
+            if self.park is not None:
+                parked = self.park.answer(want, reason) == "parked"
+                if parked:
+                    self.think_counters["parked"] += 1
+            return {"outcome": reason, "parked": parked}
+
+        if item["kind"] == "word":
+            word = item["key"]
+            if not _THINK_LAWS_AVAILABLE:
+                return dead_end(word, "think_laws_unavailable")
+            ledgers = build_ledgers(self.org, self.moment_word)
+            record = questions_why(self.org, ledgers, self.episodes, word)
+            rec = self.episodes.get(item["episode"]) if self.episodes is not None else None
+            if rec is None:
+                return dead_end(word, "episode_gone")
+            r = self.org.recall("sight", rec["x_s"])
+            if r["cell"] is None:
+                return dead_end(word, "no_cell_answers")
+            row = think_laws.believe(word, record["cells"], record["episodes"], self.org.t, str(self.run_root))
+            self.think_counters["beliefs"] += 1
+            return {"outcome": "belief", "parked": False, "belief": row}
+
+        if item["kind"] == "sight":
+            rec = self.episodes.get(item["episode"]) if self.episodes is not None else None
+            if rec is None:
+                return dead_end(item["key"], "episode_gone")
+            candidates = self.episodes.nearest(rec["x_s"], 10)
+            nearest_word = None
+            for eid, _cos in candidates:
+                other = self.episodes.get(eid)
+                if other is not None and other["word"]:
+                    nearest_word = other["word"]
+                    break
+            if nearest_word is None:
+                return dead_end(item["key"], "no_route")
+            filed = predict_file(
+                claim=f"the next showing of this sight resonates {nearest_word}'s cells",
+                route="the journal's err/recall on the next canvas with that word",
+                decider="recall == word", due="the next showing",
+            )
+            if not filed["accepted"]:
+                return dead_end(item["key"], "no_route")
+            self._filed_predictions.append({"row": filed, "target_word": nearest_word, "due_canvas": self._canvas_index + 1})
+            self.think_counters["predictions_filed"] += 1
+            return {"outcome": "filed", "parked": False, "route_word": nearest_word}
+
+        if item["kind"] == "due":
+            # already scored by _score_due_predictions when its word was next shown; if it is still in
+            # the pool here, its word has not recurred yet -- not yet answerable, not a dead end either.
+            return {"outcome": "not_yet_due", "parked": False}
+
+        return dead_end(str(item.get("key")), "unknown_kind")
+
+    def _maybe_think(self, row: Dict[str, object]) -> None:
+        """PREREG §11.1 step 3: every THINK.every canvases. THINK's own gene clause is not on master at
+        the time this was written (`"THINK" in self.genome.declared` is therefore never true today for
+        any genome this worktree can parse) — RAISED, not worked around; the step is fully wired against
+        the given interface names and exercised directly by the test (bypassing the gate) against every
+        piece that does not need genome.curiosity/genome.think."""
+        if "THINK" not in self.genome.declared:
+            return
+        every = int(self.genome.declared["THINK"]["every"])
+        if every <= 0 or self._canvas_index % every != 0:
+            return
+        pool = self._think_pool()
+        item = self._think_choose(pool)
+        self.think_counters["thinks"] += 1
+        if item is None:
+            self._write_journal(row["at"], {"seq": row["seq"], "think": {"item": None, "kind": None, "outcome": "empty_pool", "parked": False}})
+            return
+        result = self._think_work(item)
+        self._write_journal(row["at"], {
+            "seq": row["seq"],
+            "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": result.get("outcome"), "parked": bool(result.get("parked"))},
+        })
 
     def _write_journal(self, at: str, obj: Dict[str, object]) -> None:
         date = at[:10]
