@@ -1,5 +1,6 @@
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 22:52 +0400 — A5 (docs/G4-PREREG.md §2.10). A user unit;
 # install.sh copies and daemon-reloads only — Claude enables/starts, after the gates (PREREG §7).
+# edit: Claude (Fable 5.1), 2026-09-19 23:46 +0400 — the 24 h life runs genome/G4.genome (PREREG §12); the skeleton's life (G4-skeleton.genome, 22:29 → the restart) is kept at run-skeleton-20260919/.
 [Unit]
 Description=creature — the whole small creature (G4 walking skeleton)
 After=network-online.target
@@ -9,7 +10,7 @@ Type=simple
 WorkingDirectory=/data/dev/genome
 Environment=OPENBLAS_NUM_THREADS=1
 Environment=OMP_NUM_THREADS=1
-ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome/run --genome /data/dev/genome/genome/G4-skeleton.genome
+ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome/run --genome /data/dev/genome/genome/G4.genome
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30
