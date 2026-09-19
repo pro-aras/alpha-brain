@@ -1,5 +1,6 @@
 """questions.py — asks the five questions and scores them OUTSIDE the organism.
 
+edit: Claude (Fable 5.1), 2026-09-19 19:33 +0400 — G3: a fourth abstain reason «close» (ABSTAIN margin) counted everywhere.
 edit: Claude (Fable 5.1), 2026-09-19 16:2x +04 — G0 rung 0 (docs/G0-PREREG.md §3, §10 clauses 1, 4, 5).
 
 The organism only ever returns a CELL (or abstains). The ledger — which thing each sight
@@ -48,7 +49,7 @@ def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: 
     out: Dict[str, object] = {}
 
     # Q1 — what is this?  a held-out picture → the strongest edge from the lit sight cell into words
-    q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0}; per = {t: [0, 0] for t in things}
+    q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; per = {t: [0, 0] for t in things}
     multi = 0
     for t in things:
         for pic in held[t]:
@@ -64,7 +65,7 @@ def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: 
                  "answers_from_multi_word_cells": multi}
 
     # Q2 — show me a «word»  a word → the strongest edge from its cell into sight; scored by the cell's thing
-    q2_ok = 0; q2_abst = {"novel": 0, "noedge": 0, "ratio": 0}; q2_detail = {}
+    q2_ok = 0; q2_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; q2_detail = {}
     for t in things:
         r = org.recall("words", world.encode_word(t, blank_zero))
         if r["cell"] is None:
@@ -102,7 +103,7 @@ def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: 
     # Q5 — a thing never shown: must abstain
     q5 = {}
     for name, pics in never.items():
-        abst = {"novel": 0, "noedge": 0, "ratio": 0}; answered = {}
+        abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}
         for pic in pics:
             r = org.recall("sight", _feat(org, pic))
             if r["cell"] is None: abst[r["reason"]] += 1
@@ -116,7 +117,7 @@ def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: 
 
 def ask_plant(org: Organism, ledgers: Dict[str, Ledger], word: str, pics: List[np.ndarray]) -> Dict[str, object]:
     """The plant («zog», shown 5 times) must be ANSWERED; the null plant («vex», shown 0 times) must abstain."""
-    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0}; answered = {}
+    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}
     for pic in pics:
         r = org.recall("sight", _feat(org, pic))
         if r["cell"] is None: abst[r["reason"]] += 1
@@ -137,7 +138,7 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
     Ls, Lw = ledgers["sight"], ledgers["words"]
     n = len(things)
     out: Dict[str, object] = {}
-    q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0}; per = {t: [0, 0] for t in things}; multi = 0
+    q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; per = {t: [0, 0] for t in things}; multi = 0
     for t in things:
         for xs in held[t]:
             r = org.recall_many("sight", xs); q1_n += 1; per[t][1] += 1
@@ -150,7 +151,7 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
     out["Q1"] = {"acc": q1_ok / q1_n if q1_n else 0.0, "n": q1_n, "correct": q1_ok, "abstain": q1_abst,
                  "false_abstention": (sum(q1_abst.values()) / q1_n) if q1_n else 0.0, "per_thing": {t: (v[0] / v[1]) if v[1] else 0.0 for t, v in per.items()},
                  "answers_from_multi_word_cells": multi}
-    q2_ok = 0; q2_abst = {"novel": 0, "noedge": 0, "ratio": 0}; q2_detail = {}
+    q2_ok = 0; q2_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; q2_detail = {}
     for t in things:
         r = org.recall_many("words", [world.encode_word(t, blank_zero)])
         if r["cell"] is None:
@@ -182,7 +183,7 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
     out["Q4"] = {"acc": q4_ok / q4_n if q4_n else 0.0, "n": q4_n, "correct": q4_ok, "ties": q4_ties}
     q5 = {}
     for name, rows in never.items():
-        abst = {"novel": 0, "noedge": 0, "ratio": 0}; answered = {}
+        abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}
         for xs in rows:
             r = org.recall_many("sight", xs)
             if r["cell"] is None: abst[r["reason"]] += 1
@@ -195,7 +196,7 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
 
 
 def ask_plant_glances(org: Organism, ledgers: Dict[str, Ledger], word: str, rows: List[List[np.ndarray]]) -> Dict[str, object]:
-    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0}; answered = {}
+    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}
     for xs in rows:
         r = org.recall_many("sight", xs)
         if r["cell"] is None: abst[r["reason"]] += 1

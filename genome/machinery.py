@@ -1,5 +1,6 @@
 """machinery.py — the ribosome: reads a genome text and runs an organism by it.
 
+edit: Claude (Fable 5.1), 2026-09-19 19:33 +0400 — G3 (docs/G3-LAWS-PREREG.md): RESONATE sight nearest words cos>=T (a per-area threshold; the sight floor is THETA_N written by the gate as between-p5), ABSTAIN margin cos<M (reason «close»); absent genes = the old law, pinned.
 edit: Claude (Fable 5.1), 2026-09-19 18:10 +0400 — G2: the tower step asserts the tower's OWN input side (64 for the photograph eye).
 edit: Claude (Fable 5.1), 2026-09-19 16:0x +04 — G0 rung 0 (docs/G0-PREREG.md §1, §10).
 edit: Claude (Fable 5.1), 2026-09-19 16:09 +04 — §11: the retina as a list of fixed steps (gate G-a's finding); winners must resonate.
@@ -58,6 +59,9 @@ class Genome:
     stages: List[Tuple[int, str, int, Optional[int]]]   # (index, name, from, to)
     recall_k: int
     abstain_ratio: float
+    resonate: str = "threshold"                     # G3: "nearest" — sight winners = nearest KWTA at or above the FLOOR (theta_n)
+    theta_words: Optional[float] = None             # G3: the words area's own threshold (None = theta_n, the old law)
+    abstain_margin: Optional[float] = None          # G3: ABSTAIN margin cos<M (None = off)
     gaze: Optional[Dict[str, object]] = None     # G1: GAZE surprise fixations F grid G canvas C glance L ink contrast (None = off)
     text: str = field(default="", repr=False)
 
@@ -155,8 +159,15 @@ def parse_genome(text: str) -> Genome:
                 g["recall_k"] = int(m.group(1))
             elif gene == "ABSTAIN":
                 m = re.fullmatch(r"second/best > (" + _NUM + ")", a)
-                if not m: raise GenomeError(f"ABSTAIN: cannot read {a!r}")
-                g["abstain_ratio"] = float(m.group(1))
+                m2 = re.fullmatch(r"margin cos<(" + _NUM + ")", a)
+                if m: g["abstain_ratio"] = float(m.group(1))
+                elif m2: g["abstain_margin"] = float(m2.group(1))
+                elif re.fullmatch(r"margin cos<MARGIN", a): raise GenomeError("ABSTAIN margin: MARGIN not set (gate G-a writes it)")
+                else: raise GenomeError(f"ABSTAIN: cannot read {a!r}")
+            elif gene == "RESONATE":
+                m = re.fullmatch(r"sight nearest words cos>=(" + _NUM + ")", a)
+                if not m: raise GenomeError(f"RESONATE: cannot read {a!r} (G3 §1: sight nearest words cos>=T)")
+                g["resonate"] = "nearest"; g["theta_words"] = float(m.group(1))
             elif gene == "GAZE":
                 m = re.fullmatch(r"surprise fixations (\d+) grid (\d+) canvas (\d+) glance (\d+) ink (contrast|border)", a)
                 if not m: raise GenomeError(f"GAZE: cannot read {a!r} (G1 §1: surprise fixations F grid G canvas C glance L ink contrast)")
@@ -344,10 +355,14 @@ class Organism:
         self.births.append((self.t, area.name, cid, reason))
         return cid
 
+    def _theta(self, area: Area) -> float:
+        """G3 §1: the words area may carry its own threshold (RESONATE … words cos>=T); sight uses THETA_N (the floor under `nearest`)."""
+        return self.g.theta_words if (area is self.words and self.g.theta_words is not None) else self.g.theta_n
+
     def _resonate(self, area: Area, x: np.ndarray) -> List[int]:
         """BIRTH novelty + KWTA: births a cell if nothing resonates (cos < THETA_N), then returns
         the winners (top KWTA alive cells by cosine; a newborn is a winner in its birth moment)."""
-        if area.n == 0 or float(area.cos(x).max()) < self.g.theta_n:
+        if area.n == 0 or float(area.cos(x).max()) < self._theta(area):
             self._birth(area, x, "novelty")
         if area.n == 0:
             return []
@@ -355,7 +370,8 @@ class Organism:
         order = np.argsort(-c, kind="stable")
         # §11 clause 3: a winner must RESONATE (cos ≥ THETA_N) — up to KWTA of them; a cell that does not
         # resonate is not active and is never a delta-rule target (else the target marks every word right)
-        winners = [int(i) for i in order[: self.g.kwta] if area.alive[i] and c[i] >= self.g.theta_n]
+        th = self._theta(area)
+        winners = [int(i) for i in order[: self.g.kwta] if area.alive[i] and c[i] >= th]
         return winners
 
     # ------------------------------------------------------------------ one moment
@@ -508,7 +524,8 @@ class Organism:
             return [], np.zeros(0)
         c = area.cos(x)
         order = np.argsort(-c, kind="stable")
-        lit = [int(i) for i in order[: self.g.kwta] if area.alive[i] and c[i] >= self.g.theta_n]
+        th = self._theta(area)
+        lit = [int(i) for i in order[: self.g.kwta] if area.alive[i] and c[i] >= th]
         return lit, c
 
     def recall(self, side: str, x: np.ndarray) -> Dict[str, object]:
@@ -544,7 +561,22 @@ class Organism:
                 break
         if second > 0.0 and second / best > self.g.abstain_ratio:
             return {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l])}
+        close = self._margin_close(side, other, best_id, {l: float(c[l]) for l in lit})
+        if close is not None:
+            return {"cell": None, "reason": "close", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), "margin": close}
         return {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l])}
+
+    def _margin_close(self, side: str, other: Area, best_id: int, cos_of: Dict[int, float]) -> Optional[float]:
+        """G3 §1 ABSTAIN margin: on the sight side, the best-answering lit cell's cosine must beat the best lit cell of a
+        DIFFERENT answer by the margin; returns the gap when it is too small, else None. Off when the gene is absent or side is words."""
+        if self.g.abstain_margin is None or side != "sight":
+            return None
+        c_best = max([v for l, v in cos_of.items() if self._answer_of(self.sight, l) == best_id], default=None)
+        c_other = max([v for l, v in cos_of.items() if self._answer_of(self.sight, l) not in (None, best_id)], default=None)
+        if c_best is None or c_other is None:
+            return None
+        gap = c_best - c_other
+        return gap if gap < self.g.abstain_margin else None
 
     def recall_many(self, side: str, xs: List[np.ndarray]) -> Dict[str, object]:
         """G1 §1: RECALL over glances. Each glance lights its resonating winners as `recall` does; the evidence for a cell
@@ -588,6 +620,9 @@ class Organism:
                 break
         if second > 0.0 and second / best > self.g.abstain_ratio:
             return {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l]}
+        close = self._margin_close(side, other, best_id, cos_of)
+        if close is not None:
+            return {"cell": None, "reason": "close", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l], "margin": close}
         return {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l]}
 
     def edge_many(self, side: str, xs: List[np.ndarray], other_cell: int) -> float:

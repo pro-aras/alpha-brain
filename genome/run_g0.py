@@ -1,5 +1,6 @@
 """run_g0.py — G0 rung 0: the toy, the design life, the twins, the plant, the marks → VERDICT.
 
+edit: Claude (Fable 5.1), 2026-09-19 19:33 +0400 — G3: any genome whose name carries g0b runs G0b's world (T1).
 edit: Claude (Fable 5.1), 2026-09-19 16:49 +04 — the advisor's four: title from the genome file; predictions by tag; the five-thing life as long as the design life; the null plant's answers printed.
 edit: Claude (Fable 5.1), 2026-09-19 16:2x +04 — docs/G0-PREREG.md §2–§5, §7, §10–§11 are law here.
 edit: Claude (Fable 5.1), 2026-09-19 16:20 +04 — VERDICT: (ix) best RANDOM genome and the 20-genome quartile bar; twin prune counts; the what-did-nothing paragraph; the ledger sentence corrected.
@@ -173,7 +174,7 @@ def main(argv: List[str]) -> int:
             print(f"eye parity (arithmetic) vs the sealed E09d tower's own gate: max |diff| {dmax.max():.2e}, {int((dmax < 1e-4).sum())}/{n} frames within 1e-4, planted shifted frame {'CAUGHT' if planted > 1e-3 else 'NOT CAUGHT'}; the gene's tower {step[6:]} sha {gene_t.sha[:16]}… ({gene_t.n_feat} features)")
             if not (dmax.max() < 1e-3 and planted > 1e-3):
                 print("EYE PARITY FAILED — the numpy eye is not the sealed tower; stopping."); return 3
-    things = world.THINGS_11 if tag == "g0b" else world.THINGS_10
+    things = world.THINGS_11 if "g0b" in tag else world.THINGS_10          # G3-G0b runs G0b's world
     arr2 = world.THINGS_ARRIVAL2
     dev, held, a2, plant, shuffle_words, n_checked = make_streams(things, PER_THING, HELD_N, arr2, ARR2_PER_THING, world.THING_PLANT, world.THING_NULL, world.THING_NEVER, side=side, plant_showings=plant_showings)
     R["streams"] = {"dev": len(dev), "arr2": len(a2), "plant": len(plant), "held_checked_disjoint": n_checked, "planted_copy_caught": True, "things": list(things)}
@@ -279,7 +280,7 @@ def write_verdict(out: Path, R: Dict[str, object], genome: Genome) -> None:
     gname = R.get("genome_file", "G0.genome"); gtag = gname.replace(".genome", "")
     L.append(f"# {gtag} rung 0 — VERDICT: **{R['verdict']}** (failed: {', '.join(R['marks_failed']) or 'none'}; SCALE untested)\n")
     L.append(f"run `{R['stamp']}` · genome `{out / gname}` · PREREG {R.get('prereg', 'docs/G0-PREREG.md')} · every number below is read from results.json\n")
-    g0b = gtag.lower() == "g0b"
+    g0b = "g0b" in gtag.lower()
     P = ({"i": "PASS", "ii": "PASS", "iii": "PASS", "iv": "pruning FAILS the 5 % bar unless the near-pair conflates at THETA_N", "v": "PASS", "vi": "the plant PASSES (showings from the gate); Q5 uncertain", "vii": "PASS", "viii": "PASS", "ix": "unknown (E29)"} if g0b
          else {"i": "likely PASS", "ii": "PASS", "iii": "PASS", "iv": "births 100–300; pruning may FAIL the 5 % bar", "v": "PASS", "vi": "the uncertain one", "vii": "PASS by construction", "viii": "—", "ix": "unknown"})
     L.append(f"## The nine marks, bars as written before the run (§5), predictions of {'G0b §4' if g0b else '§7'} beside each\n")

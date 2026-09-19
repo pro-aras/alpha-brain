@@ -207,25 +207,25 @@ def main(argv: List[str]) -> int:
     his = "--his" in argv or "--gate-his" in argv
     gpath = Path(argv[argv.index("--genome") + 1]) if "--genome" in argv else (GENOME_HIS if his else GENOME_TOY)   # G2: --genome genome/G2-his.genome
     if "--gate-toy" in argv:
-        g = parse_genome(gpath.read_text().replace("cos<THETA_N", "cos<0.5").replace("cos>THETA_M", "cos>0.99"))   # the gate needs only the eye and the gaze
+        g = parse_genome(gpath.read_text().replace("cos<THETA_N", "cos<0.5").replace("cos>THETA_M", "cos>0.99").replace("cos<MARGIN", "cos<0.01"))   # the gate needs only the eye and the gaze
         rng = np.random.default_rng(20260919)
         rows = {t: [world.render_canvas(t, rng)[0] for _ in range(PER_THING)] for t in world.THINGS_11}
-        gate(gpath, first_glance_feats(rows, g), list(world.THINGS_11), ROOT / "runs" / "gate-ga-G1.json", "toy first-fixation glances")
+        gate(gpath, first_glance_feats(rows, g), list(world.THINGS_11), ROOT / "runs" / f"gate-ga-{gpath.stem}.json", f"toy first-fixation glances ({gpath.stem})")
         return 0
     if "--gate-his" in argv:
         if not gpath.exists():
             gpath.write_text(GENOME_TOY.read_text().replace("# G1.genome — G0b's genome with the GAZE gene switched ON", "# G1-his.genome — G1.genome with the thetas re-written by gate G-a on HIS pictures' glances (G1 §5 step 7)", 1))
             t = re.sub(r"cos<[0-9.]+", "cos<THETA_N", gpath.read_text()); t = re.sub(r"cos>[0-9.]+ same-answer", "cos>THETA_M same-answer", t); t = re.sub(r"\n# gate G-a wrote.*", "", t)
             gpath.write_text(t)
-        g = parse_genome(gpath.read_text().replace("cos<THETA_N", "cos<0.5").replace("cos>THETA_M", "cos>0.99"))
+        g = parse_genome(gpath.read_text().replace("cos<THETA_N", "cos<0.5").replace("cos>THETA_M", "cos>0.99").replace("cos<MARGIN", "cos<0.01"))
         H = load_his(g)
         rows = {w: [rgb for ww, rgb, _t in H["dev"] if ww == w] for w in H["things"]}
         gate(gpath, first_glance_feats(rows, g), H["things"], ROOT / "runs" / f"gate-ga-{gpath.stem}.json", f"his first-fixation glances ({gpath.stem})")
         return 0
 
-    tag = (gpath.stem.lower().replace("-his", "") + "-his") if his else "g1-toy"        # g1-his / g2-his
+    tag = (gpath.stem.lower().replace("-his", "") + "-his") if his else (gpath.stem.lower().replace("-toy", "") + "-toy")   # g1-his / g2-his / g3-toy
     stamp = time.strftime("%Y%m%d-%H%M%S"); out = ROOT / "runs" / f"{tag}-{stamp}"; out.mkdir(parents=True, exist_ok=True)
-    gate_path0 = ROOT / "runs" / (f"gate-ga-{gpath.stem}.json" if his else "gate-ga-G1.json")
+    gate_path0 = ROOT / "runs" / f"gate-ga-{gpath.stem}.json"
     if his and "cos<THETA_N" in gpath.read_text():
         # G1 §1: the bands overlap on his pictures → the run still reads, with the TOY's thetas carried, and the verdict says so
         rep0 = json.loads(gate_path0.read_text()) if gate_path0.exists() else {}

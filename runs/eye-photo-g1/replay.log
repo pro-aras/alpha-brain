@@ -1,0 +1,14 @@
+  ep  1/12 loss 3.6603 val top-1 0.2925 lr 0.02 (187 s)
+  ep  2/12 loss 3.0143 val top-1 0.3357 lr 0.02 (372 s)
+  ep  3/12 loss 2.6774 val top-1 0.3886 lr 0.02 (557 s)
+  ep  4/12 loss 2.4163 val top-1 0.4078 lr 0.02 (741 s)
+  ep  5/12 loss 2.1939 val top-1 0.4144 lr 0.02 (925 s)
+  ep  6/12 loss 2.0092 val top-1 0.4234 lr 0.02 (1110 s)
+  ep  7/12 loss 1.8416 val top-1 0.4330 lr 0.02 (1294 s)
+  ep  8/12 loss 1.5355 val top-1 0.4468 lr 0.01 (1479 s)
+  ep  9/12 loss 1.4420 val top-1 0.4468 lr 0.01 (1664 s)
+  ep 10/12 loss 1.3588 val top-1 0.4468 lr 0.01 (1849 s)
+  ep 11/12 loss 1.1730 val top-1 0.4577 lr 0.005 (2035 s)
+  ep 12/12 loss 1.1155 val top-1 0.4571 lr 0.005 (2222 s)
+G-5 replay: bytes identical True · journal identical to 5 dp True · agrees to 3 dp True → PASS
+exit 0
