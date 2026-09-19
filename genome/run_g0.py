@@ -1,6 +1,7 @@
 """run_g0.py — G0 rung 0: the toy, the design life, the twins, the plant, the marks → VERDICT.
 
 edit: Claude (Fable 5.1), 2026-09-19 16:2x +04 — docs/G0-PREREG.md §2–§5, §7, §10–§11 are law here.
+edit: Claude (Fable 5.1), 2026-09-19 16:20 +04 — VERDICT: (ix) best RANDOM genome and the 20-genome quartile bar; twin prune counts; the what-did-nothing paragraph; the ledger sentence corrected.
 
     OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m genome.run_g0 [--toy-only]
 
@@ -221,7 +222,7 @@ def main(argv: List[str]) -> int:
                              "false_abstention_seen": d9["Q1"]["false_abstention"], "false_abstention_by": d9["Q1"]["abstain"], "bars": "plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20"},
         "vii_replay": {"pass": R["replay_identical"], "hash": design["hash_final"][:16]},
         "viii_cost": {"pass": design["seconds"] <= 300, "seconds_design_life": design["seconds"], "bar": "≤ 300 s"},
-        "ix_not_luck": {"pass": rank <= 6, "rank_of_design": rank, "of": len(comps), "design_composite": d9["composite"], "best_random": comps[0], "bar": "top quartile (rank ≤ 6 of 21)"},
+        "ix_not_luck": {"pass": rank <= 5, "rank_of_design": rank, "of": len(comps), "design_composite": d9["composite"], "best_random": max(x["composite"] for x in rg), "best_random_seed": max(rg, key=lambda x: x["composite"])["seed"], "bar": "top quartile of the 20 random genomes (rank ≤ 5 of 21)"},
         "untested_SCALE": {"scale_events": s9["scale_events"], "note": "SCALE every 1000 fires 0 times in a 905-moment life — UNTESTED (§10 clause 7)"},
     }
     M["iv_grows_alone"]["pass"] = (M["iv_grows_alone"]["cells_born"] >= 50 and M["iv_grows_alone"]["births_refused_budget"] == 0 and l5["at_600"]["cells_born_sight"] < design["at_600"]["cells_born_sight"]
@@ -261,7 +262,7 @@ def write_verdict(out: Path, R: Dict[str, object], genome: Genome) -> None:
     L.append(f"- Gate G-a wrote THETA_N = {genome.theta_n}, THETA_M = {genome.theta_m}; retina `{' '.join(genome.retina)}` ({genome.sight_dim()} numbers); §2's strict rule NOT MET, §11's amended rule met (see the genome file's last line).")
     L.append(f"- Toy (circle, bar; 2 × 150 moments): Q1 {R['toy']['ask_600']['Q1']['acc']:.3f} → {'PASS' if R['toy_pass'] else 'FAIL'}.")
     L.append(f"- At 600: cells {d['at_600']['cells_sight']} sight + {d['at_600']['cells_words']} words; Q1 {d6['Q1']['acc']:.3f} Q2 {d6['Q2']['acc']:.2f} Q3 {d6['Q3']['acc']:.3f} Q4 {d6['Q4']['acc']:.3f}; abstain by {d6['Q1']['abstain']}.")
-    L.append(f"- At 900 (after arrival 2): cells {s9['cells_sight']} + {s9['cells_words']} (born novelty {s9['births_novelty_sight']}/{s9['births_novelty_words']}, error {s9['births_error_sight']}/{s9['births_error_words']}; refused by budget {s9['births_refused_budget']}, by arrival {d['refusals_by_arrival']}); edges alive {s9['edges_alive']}, born {s9['edges_born']}, pruned {s9['edges_pruned']}; merged cells {s9['cells_merged_sight']}/{s9['cells_merged_words']}; removed for disuse {s9['removed_for_disuse']}.")
+    L.append(f"- At 900 (after arrival 2): cells {s9['cells_sight']} + {s9['cells_words']} (born novelty {s9['births_novelty_sight']}/{s9['births_novelty_words']}, error {s9['births_error_sight']}/{s9['births_error_words']} — the error road FIRED {s9.get('births_refused_redundant', 0)} times and every birth was refused as redundant (§11 am. 4); refused by budget {s9['births_refused_budget']}, by arrival {d['refusals_by_arrival']}); edges alive {s9['edges_alive']}, born {s9['edges_born']}, pruned {s9['edges_pruned']}; merged cells {s9['cells_merged_sight']}/{s9['cells_merged_words']}; removed for disuse {s9['removed_for_disuse']}.")
     L.append(f"- Q1 per thing at 900: {json.dumps({k: round(v,2) for k,v in d9['Q1']['per_thing'].items()})}; arrival-2 things Q1 {d['ask_900_arr2']['Q1']['acc']:.3f} per thing {json.dumps({k: round(v,2) for k,v in d['ask_900_arr2']['Q1']['per_thing'].items()})}.")
     L.append(f"- Q2 detail (word → the thing of the cell it lit): {json.dumps(d9['Q2']['detail'])}.")
     L.append(f"- Cells per thing (alive, single-thing): {json.dumps(d['cells_per_thing'])}; multi-thing sight cells {d['multi_thing_sight_cells']}; answers from multi-word cells {d9['Q1']['answers_from_multi_word_cells']}.")
@@ -270,7 +271,7 @@ def write_verdict(out: Path, R: Dict[str, object], genome: Genome) -> None:
     L.append("## Twins (§4) — each blind to one thing\n")
     for k, v in R["twins"].items():
         a = v["ask_900"]; s = v["at_900"]
-        L.append(f"- **{k}**: Q1 {a['Q1']['acc']:.3f} (abstain {a['Q1']['abstain']}) · Q2 {a['Q2']['acc']:.2f} · Q3 {a['Q3']['acc']:.3f} · Q4 {a['Q4']['acc']:.3f} · cells {s['cells_sight']}+{s['cells_words']} · edges {s['edges_alive']} · refused budget {s['births_refused_budget']} frozen {s['births_refused_frozen']} · {v['seconds']} s")
+        L.append(f"- **{k}**: Q1 {a['Q1']['acc']:.3f} (abstain {a['Q1']['abstain']}) · Q2 {a['Q2']['acc']:.2f} · Q3 {a['Q3']['acc']:.3f} · Q4 {a['Q4']['acc']:.3f} · cells {s['cells_sight']}+{s['cells_words']} (error births {s['births_error_sight']}/{s['births_error_words']}, redundant refused {s.get('births_refused_redundant', 0)}) · edges alive {s['edges_alive']} born {s['edges_born']} pruned {s['edges_pruned']} ({(100*s['edges_pruned']/s['edges_born']) if s['edges_born'] else 0:.1f} %) · merged {s['cells_merged_sight']}/{s['cells_merged_words']} · refused budget {s['births_refused_budget']} frozen {s['births_refused_frozen']} · {v['seconds']} s")
     l5 = R["five_thing"]
     L.append(f"- **five-thing life** (600 moments, 120/thing): cells born {l5['at_600']['cells_born_sight']} vs the ten-thing life's {d['at_600']['cells_born_sight']} at 600; Q1 {l5['ask_600']['Q1']['acc']:.3f}.\n")
     L.append("## Twenty random genomes (§4, E29's control) — composite = mean(Q1..Q4) at 900\n")
@@ -278,9 +279,16 @@ def write_verdict(out: Path, R: Dict[str, object], genome: Genome) -> None:
     for x in sorted(R["random_genomes"], key=lambda z: -z["composite"]):
         g = x["genome"]
         L.append(f"| {x['seed']} | {x['composite']:.3f} | {x['Q1']:.3f} | {x['Q2']:.2f} | {x['Q3']:.3f} | {x['Q4']:.3f} | {g['theta_n']:.3f} | {g['misfires']} | {g['budget']} | {g['kwta']} | {g['lr']:.3f} | {g['prune_floor']:.3f} | {g['theta_m']:.3f} | {g['stage1']} | {g['abstain_ratio']:.2f} | {x['cells']} | {x['refused']} |")
-    L.append(f"\nThe design genome's composite {d9['composite']:.3f} ranks {M['ix_not_luck']['rank_of_design']} of {M['ix_not_luck']['of']}.\n")
+    L.append(f"\nThe design genome's composite {d9['composite']:.3f} ranks {M['ix_not_luck']['rank_of_design']} of {M['ix_not_luck']['of']}; the best random genome is seed {M['ix_not_luck'].get('best_random_seed', '?')} at {M['ix_not_luck']['best_random']:.3f}.\n")
+    # ---- what the design life did NOT exercise — the price of §11 amendment 2, stated
+    zog_cells = d["at_905"]["cells_born_sight"] - s9["cells_born_sight"]
+    sh = R["twins"]["T-shuffle-5"]["at_900"]
+    L.append("## What did nothing in the design life, and why\n")
+    L.append(f"- Four genes had no measurable work: error births 0 (the road fired {s9.get('births_refused_redundant', 0)} times, every birth refused as redundant), merges 0 (THETA_M {genome.theta_m} was never met between two winners with the same answer), pruned {s9['edges_pruned']} of {s9['edges_born']} edges, scale 0. This follows from THETA_N ({genome.theta_n}) sitting ABOVE the between-thing maximum (gate G-a, §11 amendment 2): no cross-thing edge is ever born, so nothing is wrong, redundant or weak. In T-shuffle-5, where the pairings are random, {sh['edges_born']} edges were born and {sh['edges_pruned']} pruned ({(100*sh['edges_pruned']/sh['edges_born']) if sh['edges_born'] else 0:.1f} %) — that number says whether the PRUNE gene works at all when there is something to prune.")
+    L.append(f"- The same threshold surfaced twice more. The plant: «zog» shown 5 times birthed {zog_cells} cells, and 10 of 20 held-out zog renderings resonated with none of them (at THETA_N = the within-thing MEDIAN, half of same-thing renderings do not resonate with a given cell) — the plant reads 0.50 against a majority bar. Q5: the spiral abstains at exactly 0.80, its bar, with 4 of 20 read as «circle»; the spiral was never in gate G-a's ten-thing measurement, so the threshold carries no guarantee for a never-shown thing — one more answered spiral fails (vi) a second way.")
+    L.append("")
     L.append("## What this verdict does and does not say\n")
-    L.append("- The truth never entered the organism: the ledger is the runner's, built from the stream; shuffling it left the organism's hash unchanged (clause 12).")
+    L.append("- The truth never entered the organism: `genome/machinery.py` imports neither `world` nor `questions` and carries no label field; the ledger is the runner's, built from the stream (clause 12; the hash check proves only that the runner did not touch the organism).")
     L.append("- SCALE is untested here (0 events in 905 moments). §2's strict gate rule was not met by any fixed front; §11's amended rule was, at the price of several cells per thing — the cells-per-thing line above is that price, measured.")
     L.append("- No sentences, no reasoning, no reward, no sleep, no evolution (§6). Rung 1 is his pictures through the folder door; rung 2 a lineage, only after rung 1.")
     (out / "VERDICT.md").write_text("\n".join(L) + "\n")

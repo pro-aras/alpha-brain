@@ -1,0 +1,34 @@
+streams: dev 600 · arrival-2 300 · plant 5 · held-out 360 pictures disjoint (planted copy caught)
+TOY  Q1 1.000 (abstain {'novel': 0, 'noedge': 0, 'ratio': 0}) Q2 1.00 Q3 1.000 Q4 1.000 Q5-spiral abstain 0.90 | cells 9+2 edges 8 born 9 pruned 1 | 0.36 s
+DESIGN @600 Q1 0.990 Q2 1.00 Q3 0.990 Q4 0.990 | @900 Q1 0.990 Q2 1.00 Q3 0.990 Q4 0.990 Q5 abstain 0.80 {'novel': 16, 'noedge': 0, 'ratio': 0} false-abst 0.010 {'novel': 1, 'noedge': 1, 'ratio': 0}
+       arrival-2 things @900 Q1 0.930 | plant zog answered 0.50 as {'zog': 10} | null vex abstain 1.00 | cells/thing {'circle': 2, 'square': 4, 'triangle': 10, 'cross': 7, 'ring': 3, 'bar': 4, 'dot': 2, 'star': 2, 'arrow': 6, 'wave': 10, 'moon': 2, 'house': 7, 'tree': 9, 'cup': 8, 'key': 5}
+       cells 81+15 (born 81+15: novelty 81/15 error 0/0) refused budget 0 by arrival [0, 0, 0] | edges alive 79 born 80 pruned 1 merged 0/0 scale 0 disuse 0 | 1.69 s
+REPLAY byte-identical: True
+T-SHUFFLE seed 5: Q1 0.075 abstain {'novel': 1, 'noedge': 1, 'ratio': 58} Q2 0.00 | refused budget 0 cells 103
+T-SHUFFLE seed 6: Q1 0.010 abstain {'novel': 1, 'noedge': 1, 'ratio': 76} Q2 0.20 | refused budget 0 cells 111
+T-SHUFFLE seed 7: Q1 0.130 abstain {'novel': 1, 'noedge': 1, 'ratio': 54} Q2 0.00 | refused budget 0 cells 98
+T-FROZEN: Q1 0.245 abstain {'novel': 151, 'noedge': 0, 'ratio': 0} cells 5+5 refused frozen 1347
+T-NOWIRE: Q1 0.000 abstain {'novel': 1, 'noedge': 199, 'ratio': 0} edges 0
+FIVE-THING @600: cells born 29 (10-thing @600: 50) Q1 1.000
+RANDOM  1: composite 0.858 Q1 0.785 Q2 1.00 Q3 0.860 Q4 0.785 | theta_n 0.966 kwta 2 lr 0.285 stage1 189 budget 76 | cells 69 | 1.04 s
+RANDOM  2: composite 0.376 Q1 0.000 Q2 0.20 Q3 0.500 Q4 0.805 | theta_n 0.646 kwta 10 lr 0.032 stage1 335 budget 360 | cells 78 | 1.37 s
+RANDOM  3: composite 0.227 Q1 0.000 Q2 0.10 Q3 0.495 Q4 0.315 | theta_n 0.616 kwta 10 lr 0.177 stage1 325 budget 186 | cells 48 | 1.44 s
+RANDOM  4: composite 0.557 Q1 0.105 Q2 0.70 Q3 0.550 Q4 0.875 | theta_n 0.751 kwta 12 lr 0.029 stage1 291 budget 756 | cells 20 | 1.07 s
+RANDOM  5: composite 0.959 Q1 0.900 Q2 1.00 Q3 0.945 Q4 0.990 | theta_n 0.896 kwta 7 lr 0.089 stage1 268 budget 402 | cells 43 | 1.02 s
+RANDOM  6: composite 0.125 Q1 0.000 Q2 0.00 Q3 0.500 Q4 0.000 | theta_n 0.668 kwta 5 lr 0.115 stage1 178 budget 760 | cells 11 | 1.13 s
+RANDOM  7: composite 0.986 Q1 0.980 Q2 1.00 Q3 0.985 Q4 0.980 | theta_n 0.940 kwta 10 lr 0.071 stage1 378 budget 484 | cells 73 | 1.0 s
+RANDOM  8: composite 0.666 Q1 0.465 Q2 1.00 Q3 0.735 Q4 0.465 | theta_n 0.984 kwta 4 lr 0.238 stage1 288 budget 182 | cells 185 | 1.06 s
+RANDOM  9: composite 0.125 Q1 0.000 Q2 0.00 Q3 0.500 Q4 0.000 | theta_n 0.641 kwta 8 lr 0.234 stage1 169 budget 135 | cells 8 | 1.1 s
+RANDOM 10: composite 0.168 Q1 0.100 Q2 0.00 Q3 0.530 Q4 0.040 | theta_n 0.602 kwta 10 lr 0.049 stage1 311 budget 645 | cells 6 | 1.0 s
+RANDOM 11: composite 0.730 Q1 0.490 Q2 0.70 Q3 0.730 Q4 1.000 | theta_n 0.745 kwta 8 lr 0.013 stage1 53 budget 493 | cells 168 | 1.4 s
+RANDOM 12: composite 0.834 Q1 0.745 Q2 1.00 Q3 0.845 Q4 0.745 | theta_n 0.964 kwta 3 lr 0.058 stage1 245 budget 98 | cells 61 | 1.01 s
+RANDOM 13: composite 0.981 Q1 0.965 Q2 1.00 Q3 0.975 Q4 0.985 | theta_n 0.919 kwta 10 lr 0.082 stage1 359 budget 102 | cells 55 | 0.99 s
+RANDOM 14: composite 0.125 Q1 0.000 Q2 0.00 Q3 0.500 Q4 0.000 | theta_n 0.677 kwta 9 lr 0.259 stage1 60 budget 116 | cells 11 | 1.14 s
+RANDOM 15: composite 0.371 Q1 0.235 Q2 0.40 Q3 0.615 Q4 0.235 | theta_n 0.900 kwta 5 lr 0.018 stage1 373 budget 231 | cells 44 | 0.98 s
+RANDOM 16: composite 0.277 Q1 0.050 Q2 0.30 Q3 0.515 Q4 0.245 | theta_n 0.711 kwta 2 lr 0.108 stage1 215 budget 625 | cells 15 | 1.05 s
+RANDOM 17: composite 0.161 Q1 0.100 Q2 0.00 Q3 0.520 Q4 0.025 | theta_n 0.579 kwta 7 lr 0.114 stage1 297 budget 393 | cells 5 | 0.99 s
+RANDOM 18: composite 0.346 Q1 0.235 Q2 0.30 Q3 0.625 Q4 0.225 | theta_n 0.852 kwta 4 lr 0.029 stage1 358 budget 702 | cells 29 | 1.01 s
+RANDOM 19: composite 0.975 Q1 0.965 Q2 1.00 Q3 0.970 Q4 0.965 | theta_n 0.954 kwta 4 lr 0.023 stage1 236 budget 334 | cells 83 | 1.03 s
+RANDOM 20: composite 0.318 Q1 0.150 Q2 0.20 Q3 0.565 Q4 0.355 | theta_n 0.726 kwta 2 lr 0.159 stage1 357 budget 722 | cells 16 | 1.02 s
+VERDICT FAIL — failed: ['iv_grows_alone', 'vi_knows_unknown'] — /data/dev/genome/runs/g0-20260919-161632
+rc=0
