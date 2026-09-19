@@ -1,0 +1,2305 @@
+{
+ "stamp": "20260919-193628",
+ "kind": "g3-his",
+ "genome_file": "G3-his.genome",
+ "genome": {
+  "theta_n": 0.36,
+  "misfires": 3,
+  "budget": 400,
+  "kwta": 5,
+  "lr": 0.05,
+  "prune_floor": 0.02,
+  "theta_m": 0.8278,
+  "scale_every": 1000,
+  "stage1": 200,
+  "abstain_ratio": 0.85
+ },
+ "gaze": {
+  "fixations": 4,
+  "grid": 16,
+  "canvas": 128,
+  "glance": 64,
+  "ink": "border"
+ },
+ "retina": [
+  "tower:eye-photo-g1",
+  "sqrt",
+  "unit"
+ ],
+ "prereg": "docs/G1-PREREG.md",
+ "gate": {
+  "choice": {
+   "strict": {
+    "lo": 0.6117541348009291,
+    "hi": 0.3657821465281855,
+    "met": false
+   },
+   "amended": {
+    "theta_n": 0.496,
+    "floor": 0.6117541348009291,
+    "rule": "p95",
+    "met": false,
+    "conflated_pairs": [
+     [
+      "ahmad/buddha",
+      0.6745258893781366
+     ],
+     [
+      "ahmad/bonsai",
+      0.6615651228892763
+     ],
+     [
+      "brain/camera",
+      0.6534826597234067
+     ],
+     [
+      "beaver/camera",
+      0.6471937322330625
+     ],
+     [
+      "beaver/bonsai",
+      0.6386857405783781
+     ],
+     [
+      "beaver/cannon",
+      0.637449453988184
+     ],
+     [
+      "bass/cannon",
+      0.6368585823394722
+     ],
+     [
+      "beaver/brain",
+      0.6305619322829288
+     ],
+     [
+      "bonsai/camera",
+      0.6274207375483778
+     ],
+     [
+      "bonsai/buddha",
+      0.6265698902261264
+     ],
+     [
+      "bonsai/brain",
+      0.6252122318836963
+     ],
+     [
+      "ant/beaver",
+      0.6226858350435656
+     ],
+     [
+      "ant/cannon",
+      0.6198870188087685
+     ],
+     [
+      "bass/beaver",
+      0.6155800126380019
+     ],
+     [
+      "ant/bass",
+      0.6116570205385501
+     ],
+     [
+      "bass/brain",
+      0.6113845532050163
+     ],
+     [
+      "ahmad/brain",
+      0.6095689405078352
+     ],
+     [
+      "brain/cannon",
+      0.6095460373593664
+     ],
+     [
+      "anchor/cannon",
+      0.6069579295756444
+     ],
+     [
+      "bonsai/cannon",
+      0.6052084572098575
+     ],
+     [
+      "buddha/camera",
+      0.604293117273903
+     ],
+     [
+      "ant/brain",
+      0.6017633411609734
+     ],
+     [
+      "ant/camera",
+      0.6016873266549537
+     ],
+     [
+      "anchor/beaver",
+      0.6015522874351058
+     ],
+     [
+      "beaver/buddha",
+      0.5988238910661842
+     ],
+     [
+      "ahmad/beaver",
+      0.5988007916586101
+     ],
+     [
+      "anchor/ant",
+      0.5984152481695942
+     ],
+     [
+      "ahmad/camera",
+      0.5984032388623499
+     ],
+     [
+      "bass/camera",
+      0.5981069400355497
+     ],
+     [
+      "camera/cannon",
+      0.5976921298734993
+     ],
+     [
+      "ant/bonsai",
+      0.5961547518589002
+     ],
+     [
+      "anchor/camera",
+      0.595801535025975
+     ],
+     [
+      "brain/buddha",
+      0.5953566143093537
+     ],
+     [
+      "ahmad/ant",
+      0.592978096561616
+     ],
+     [
+      "anchor/bass",
+      0.590926984158075
+     ],
+     [
+      "anchor/brain",
+      0.588577589018256
+     ],
+     [
+      "bass/bonsai",
+      0.5877206911054661
+     ],
+     [
+      "ahmad/bass",
+      0.5843123295921554
+     ],
+     [
+      "ahmad/cannon",
+      0.5815770526061423
+     ],
+     [
+      "ahmad/anchor",
+      0.5806349461835847
+     ],
+     [
+      "buddha/cannon",
+      0.5804117533136705
+     ],
+     [
+      "anchor/bonsai",
+      0.5771837871228849
+     ],
+     [
+      "anchor/buddha",
+      0.5698447544531006
+     ],
+     [
+      "ant/buddha",
+      0.568082662215639
+     ],
+     [
+      "bass/buddha",
+      0.5656923802947716
+     ]
+    ]
+   },
+   "rule": "floor",
+   "theta_n": 0.36,
+   "theta_m": 0.8278,
+   "margin": 0.0068,
+   "band_width": 0.13615197932623324,
+   "overlap": false
+  },
+  "plant": {
+   "p_res_at_theta_n": 0.958041958041958,
+   "showings": 5
+  },
+  "ear": {
+   "max_between": 0.49999999999999994,
+   "median_between": 0.37499999999999994
+  },
+  "label": "his first-fixation glances (G3-his)",
+  "bands": {
+   "within": {
+    "median": 0.4958655121994511,
+    "p5": 0.3657821465281855,
+    "p95": 0.655604433697383,
+    "n": 1716
+   },
+   "between": {
+    "median": 0.47968065883951533,
+    "p5": 0.35971353287321783,
+    "p95": 0.6117541348009291,
+    "max": 0.8029444595633528,
+    "n": 15120
+   },
+   "closest_pair": {
+    "pair": "ahmad/buddha",
+    "p95": 0.6745258893781366
+   }
+  }
+ },
+ "his": {
+  "words": [
+   "ahmad",
+   "anchor",
+   "ant",
+   "bass",
+   "beaver",
+   "bonsai",
+   "brain",
+   "buddha",
+   "camera",
+   "cannon"
+  ],
+  "withheld_for_Q5": "barrel",
+  "split": {
+   "ahmad": {
+    "dev": [
+     "ahmad_01.jpg",
+     "ahmad_02.jpg",
+     "ahmad_04.jpg",
+     "ahmad_05.png"
+    ],
+    "held": [
+     "ahmad_03.jpg",
+     "ahmad_06.jpg"
+    ]
+   },
+   "anchor": {
+    "dev": [
+     "image_0001.jpg",
+     "image_0002.jpg",
+     "image_0004.jpg",
+     "image_0005.jpg",
+     "image_0007.jpg",
+     "image_0008.jpg",
+     "image_0010.jpg",
+     "image_0011.jpg",
+     "image_0013.jpg",
+     "image_0014.jpg",
+     "image_0016.jpg",
+     "image_0017.jpg",
+     "image_0019.jpg",
+     "image_0020.jpg",
+     "image_0022.jpg",
+     "image_0023.jpg",
+     "image_0025.jpg",
+     "image_0026.jpg",
+     "image_0028.jpg",
+     "image_0029.jpg"
+    ],
+    "held": [
+     "image_0003.jpg",
+     "image_0006.jpg",
+     "image_0009.jpg",
+     "image_0012.jpg",
+     "image_0015.jpg",
+     "image_0018.jpg",
+     "image_0021.jpg",
+     "image_0024.jpg",
+     "image_0027.jpg",
+     "image_0030.jpg"
+    ]
+   },
+   "ant": {
+    "dev": [
+     "image_0001.jpg",
+     "image_0002.jpg",
+     "image_0004.jpg",
+     "image_0005.jpg",
+     "image_0007.jpg",
+     "image_0008.jpg",
+     "image_0010.jpg",
+     "image_0011.jpg",
+     "image_0013.jpg",
+     "image_0014.jpg",
+     "image_0016.jpg",
+     "image_0017.jpg",
+     "image_0019.jpg",
+     "image_0020.jpg",
+     "image_0022.jpg",
+     "image_0023.jpg",
+     "image_0025.jpg",
+     "image_0026.jpg",
+     "image_0028.jpg",
+     "image_0029.jpg"
+    ],
+    "held": [
+     "image_0003.jpg",
+     "image_0006.jpg",
+     "image_0009.jpg",
+     "image_0012.jpg",
+     "image_0015.jpg",
+     "image_0018.jpg",
+     "image_0021.jpg",
+     "image_0024.jpg",
+     "image_0027.jpg",
+     "image_0030.jpg"
+    ]
+   },
+   "bass": {
+    "dev": [
+     "image_0001.jpg",
+     "image_0002.jpg",
+     "image_0004.jpg",
+     "image_0005.jpg",
+     "image_0007.jpg",
+     "image_0008.jpg",
+     "image_0010.jpg",
+     "image_0011.jpg",
+     "image_0013.jpg",
+     "image_0014.jpg",
+     "image_0016.jpg",
+     "image_0017.jpg",
+     "image_0019.jpg",
+     "image_0020.jpg",
+     "image_0022.jpg",
+     "image_0023.jpg",
+     "image_0025.jpg",
+     "image_0026.jpg",
+     "image_0028.jpg",
+     "image_0029.jpg"
+    ],
+    "held": [
+     "image_0003.jpg",
+     "image_0006.jpg",
+     "image_0009.jpg",
+     "image_0012.jpg",
+     "image_0015.jpg",
+     "image_0018.jpg",
+     "image_0021.jpg",
+     "image_0024.jpg",
+     "image_0027.jpg",
+     "image_0030.jpg"
+    ]
+   },
+   "beaver": {
+    "dev": [
+     "image_0001.jpg",
+     "image_0002.jpg",
+     "image_0004.jpg",
+     "image_0005.jpg",
+     "image_0007.jpg",
+     "image_0008.jpg",
+     "image_0010.jpg",
+     "image_0011.jpg",
+     "image_0013.jpg",
+     "image_0014.jpg",
+     "image_0016.jpg",
+     "image_0017.jpg",
+     "image_0019.jpg",
+     "image_0020.jpg",
+     "image_0022.jpg",
+     "image_0023.jpg",
+     "image_0025.jpg",
+     "image_0026.jpg",
+     "image_0028.jpg",
+     "image_0029.jpg"
+    ],
+    "held": [
+     "image_0003.jpg",
+     "image_0006.jpg",
+     "image_0009.jpg",
+     "image_0012.jpg",
+     "image_0015.jpg",
+     "image_0018.jpg",
+     "image_0021.jpg",
+     "image_0024.jpg",
+     "image_0027.jpg",
+     "image_0030.jpg"
+    ]
+   },
+   "bonsai": {
+    "dev": [
+     "image_0001.jpg",
+     "image_0002.jpg",
+     "image_0004.jpg",
+     "image_0005.jpg",
+     "image_0007.jpg",
+     "image_0008.jpg",
+     "image_0010.jpg",
+     "image_0011.jpg",
+     "image_0013.jpg",
+     "image_0014.jpg",
+     "image_0016.jpg",
+     "image_0017.jpg",
+     "image_0019.jpg",
+     "image_0020.jpg",
+     "image_0022.jpg",
+     "image_0023.jpg",
+     "image_0025.jpg",
+     "image_0026.jpg",
+     "image_0028.jpg",
+     "image_0029.jpg"
+    ],
+    "held": [
+     "image_0003.jpg",
+     "image_0006.jpg",
+     "image_0009.jpg",
+     "image_0012.jpg",
+     "image_0015.jpg",
+     "image_0018.jpg",
+     "image_0021.jpg",
+     "image_0024.jpg",
+     "image_0027.jpg",
+     "image_0030.jpg"
+    ]
+   },
+   "brain": {
+    "dev": [
+     "image_0001.jpg",
+     "image_0002.jpg",
+     "image_0004.jpg",
+     "image_0005.jpg",
+     "image_0007.jpg",
+     "image_0008.jpg",
+     "image_0010.jpg",
+     "image_0011.jpg",
+     "image_0013.jpg",
+     "image_0014.jpg",
+     "image_0016.jpg",
+     "image_0017.jpg",
+     "image_0019.jpg",
+     "image_0020.jpg",
+     "image_0022.jpg",
+     "image_0023.jpg",
+     "image_0025.jpg",
+     "image_0026.jpg",
+     "image_0028.jpg",
+     "image_0029.jpg"
+    ],
+    "held": [
+     "image_0003.jpg",
+     "image_0006.jpg",
+     "image_0009.jpg",
+     "image_0012.jpg",
+     "image_0015.jpg",
+     "image_0018.jpg",
+     "image_0021.jpg",
+     "image_0024.jpg",
+     "image_0027.jpg",
+     "image_0030.jpg"
+    ]
+   },
+   "buddha": {
+    "dev": [
+     "image_0001.jpg",
+     "image_0002.jpg",
+     "image_0004.jpg",
+     "image_0005.jpg",
+     "image_0007.jpg",
+     "image_0008.jpg",
+     "image_0010.jpg",
+     "image_0011.jpg",
+     "image_0013.jpg",
+     "image_0014.jpg",
+     "image_0016.jpg",
+     "image_0017.jpg",
+     "image_0019.jpg",
+     "image_0020.jpg",
+     "image_0022.jpg",
+     "image_0023.jpg",
+     "image_0025.jpg",
+     "image_0026.jpg",
+     "image_0028.jpg",
+     "image_0029.jpg"
+    ],
+    "held": [
+     "image_0003.jpg",
+     "image_0006.jpg",
+     "image_0009.jpg",
+     "image_0012.jpg",
+     "image_0015.jpg",
+     "image_0018.jpg",
+     "image_0021.jpg",
+     "image_0024.jpg",
+     "image_0027.jpg",
+     "image_0030.jpg"
+    ]
+   },
+   "camera": {
+    "dev": [
+     "image_0001.jpg",
+     "image_0002.jpg",
+     "image_0004.jpg",
+     "image_0005.jpg",
+     "image_0007.jpg",
+     "image_0008.jpg",
+     "image_0010.jpg",
+     "image_0011.jpg",
+     "image_0013.jpg",
+     "image_0014.jpg",
+     "image_0016.jpg",
+     "image_0017.jpg",
+     "image_0019.jpg",
+     "image_0020.jpg",
+     "image_0022.jpg",
+     "image_0023.jpg",
+     "image_0025.jpg",
+     "image_0026.jpg",
+     "image_0028.jpg",
+     "image_0029.jpg"
+    ],
+    "held": [
+     "image_0003.jpg",
+     "image_0006.jpg",
+     "image_0009.jpg",
+     "image_0012.jpg",
+     "image_0015.jpg",
+     "image_0018.jpg",
+     "image_0021.jpg",
+     "image_0024.jpg",
+     "image_0027.jpg",
+     "image_0030.jpg"
+    ]
+   },
+   "cannon": {
+    "dev": [
+     "image_0001.jpg",
+     "image_0002.jpg",
+     "image_0004.jpg",
+     "image_0005.jpg",
+     "image_0007.jpg",
+     "image_0008.jpg",
+     "image_0010.jpg",
+     "image_0011.jpg",
+     "image_0013.jpg",
+     "image_0014.jpg",
+     "image_0016.jpg",
+     "image_0017.jpg",
+     "image_0019.jpg",
+     "image_0020.jpg",
+     "image_0022.jpg",
+     "image_0023.jpg",
+     "image_0025.jpg",
+     "image_0026.jpg",
+     "image_0028.jpg",
+     "image_0029.jpg"
+    ],
+    "held": [
+     "image_0003.jpg",
+     "image_0006.jpg",
+     "image_0009.jpg",
+     "image_0012.jpg",
+     "image_0015.jpg",
+     "image_0018.jpg",
+     "image_0021.jpg",
+     "image_0024.jpg",
+     "image_0027.jpg",
+     "image_0030.jpg"
+    ]
+   }
+  },
+  "folders_short": {},
+  "unreadable": [],
+  "dev_pictures": 184,
+  "held_pictures": {
+   "ahmad": 2,
+   "anchor": 10,
+   "ant": 10,
+   "bass": 10,
+   "beaver": 10,
+   "bonsai": 10,
+   "brain": 10,
+   "buddha": 10,
+   "camera": 10,
+   "cannon": 10,
+   "barrel": 30
+  }
+ },
+ "design": {
+  "label": "design",
+  "at_dev": {
+   "moments": 736,
+   "cells_sight": 161,
+   "cells_words": 10,
+   "cells_born_sight": 198,
+   "cells_born_words": 10,
+   "edges_alive": 618,
+   "births_novelty_sight": 2,
+   "births_novelty_words": 10,
+   "births_error_sight": 196,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 39,
+   "edges_born": 799,
+   "edges_pruned": 143,
+   "cells_merged_sight": 37,
+   "cells_merged_words": 0,
+   "scale_events": 0,
+   "removed_for_disuse": 0
+  },
+  "hash_dev": "c2d7030ff2c561afbcb1590e3bc0dc8732f7ce5f2122dbfd1acd4f2f1f0ba04b",
+  "ask_dev": {
+   "Q1": {
+    "acc": 0.08695652173913043,
+    "n": 92,
+    "correct": 8,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 36,
+     "close": 0
+    },
+    "false_abstention": 0.391304347826087,
+    "per_thing": {
+     "ahmad": 0.0,
+     "anchor": 0.0,
+     "ant": 0.0,
+     "bass": 0.0,
+     "beaver": 0.1,
+     "bonsai": 0.1,
+     "brain": 0.0,
+     "buddha": 0.4,
+     "camera": 0.2,
+     "cannon": 0.0
+    },
+    "answers_from_multi_word_cells": 0
+   },
+   "Q2": {
+    "acc": 0.4,
+    "n": 10,
+    "correct": 4,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 1,
+     "close": 0
+    },
+    "detail": {
+     "ahmad": "buddha",
+     "anchor": "brain",
+     "ant": "ant",
+     "bass": "beaver",
+     "beaver": "brain",
+     "bonsai": "bonsai",
+     "brain": "abstain:ratio",
+     "buddha": "camera",
+     "camera": "camera",
+     "cannon": "cannon"
+    }
+   },
+   "Q3": {
+    "acc": 0.5108695652173914,
+    "n": 92,
+    "correct": 47,
+    "true_pairs_abstained": 23,
+    "ceiling": 0.8043478260869565
+   },
+   "Q4": {
+    "acc": 0.6304347826086957,
+    "n": 92,
+    "correct": 58,
+    "ties": 0
+   },
+   "Q5": {
+    "barrel": {
+     "abstain_rate": 0.26666666666666666,
+     "n": 30,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 8,
+      "close": 0
+     },
+     "answered_as": {
+      "buddha": 6,
+      "bass": 2,
+      "cannon": 7,
+      "camera": 3,
+      "beaver": 3,
+      "ahmad": 1
+     }
+    }
+   },
+   "composite": 0.4070652173913044
+  },
+  "at_final": {
+   "moments": 736,
+   "cells_sight": 161,
+   "cells_words": 10,
+   "cells_born_sight": 198,
+   "cells_born_words": 10,
+   "edges_alive": 618,
+   "births_novelty_sight": 2,
+   "births_novelty_words": 10,
+   "births_error_sight": 196,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 39,
+   "edges_born": 799,
+   "edges_pruned": 143,
+   "cells_merged_sight": 37,
+   "cells_merged_words": 0,
+   "scale_events": 0,
+   "removed_for_disuse": 0
+  },
+  "refusals_by_arrival": [
+   0
+  ],
+  "hash_final": "c2d7030ff2c561afbcb1590e3bc0dc8732f7ce5f2122dbfd1acd4f2f1f0ba04b",
+  "ledger_corruption_hash_unchanged": true,
+  "multi_thing_sight_cells": 0,
+  "edges_cross": {
+   "born": 636,
+   "pruned": 127,
+   "born_total": 799,
+   "pruned_total": 143
+  },
+  "cells_per_thing": {
+   "ahmad": 3,
+   "anchor": 13,
+   "ant": 14,
+   "bass": 19,
+   "beaver": 16,
+   "bonsai": 24,
+   "brain": 16,
+   "buddha": 15,
+   "camera": 21,
+   "cannon": 20
+  },
+  "seconds": 0.53
+ },
+ "replay_identical": true,
+ "design_hash": "c2d7030ff2c561afbcb1590e3bc0dc8732f7ce5f2122dbfd1acd4f2f1f0ba04b",
+ "twins": {
+  "T-random-gaze": {
+   "label": "T-random-gaze",
+   "at_dev": {
+    "moments": 736,
+    "cells_sight": 162,
+    "cells_words": 10,
+    "cells_born_sight": 187,
+    "cells_born_words": 10,
+    "edges_alive": 724,
+    "births_novelty_sight": 3,
+    "births_novelty_words": 10,
+    "births_error_sight": 184,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 38,
+    "edges_born": 926,
+    "edges_pruned": 175,
+    "cells_merged_sight": 25,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "774dd3dccd6b2326b1872af1d94ac208936af8921fd135452b4dc2abdb79a045",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.10869565217391304,
+     "n": 92,
+     "correct": 10,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 37,
+      "close": 0
+     },
+     "false_abstention": 0.40217391304347827,
+     "per_thing": {
+      "ahmad": 0.0,
+      "anchor": 0.0,
+      "ant": 0.0,
+      "bass": 0.7,
+      "beaver": 0.0,
+      "bonsai": 0.0,
+      "brain": 0.0,
+      "buddha": 0.1,
+      "camera": 0.0,
+      "cannon": 0.2
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.3,
+     "n": 10,
+     "correct": 3,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 1,
+      "close": 0
+     },
+     "detail": {
+      "ahmad": "bonsai",
+      "anchor": "bonsai",
+      "ant": "abstain:ratio",
+      "bass": "camera",
+      "beaver": "ahmad",
+      "bonsai": "bonsai",
+      "brain": "ant",
+      "buddha": "buddha",
+      "camera": "bonsai",
+      "cannon": "cannon"
+     }
+    },
+    "Q3": {
+     "acc": 0.532608695652174,
+     "n": 92,
+     "correct": 49,
+     "true_pairs_abstained": 20,
+     "ceiling": 0.7989130434782609
+    },
+    "Q4": {
+     "acc": 0.6195652173913043,
+     "n": 92,
+     "correct": 57,
+     "ties": 0
+    },
+    "Q5": {
+     "barrel": {
+      "abstain_rate": 0.26666666666666666,
+      "n": 30,
+      "abstain": {
+       "novel": 0,
+       "noedge": 0,
+       "ratio": 8,
+       "close": 0
+      },
+      "answered_as": {
+       "camera": 2,
+       "ahmad": 4,
+       "anchor": 3,
+       "cannon": 2,
+       "bonsai": 5,
+       "beaver": 2,
+       "buddha": 3,
+       "bass": 1
+      }
+     }
+    },
+    "composite": 0.39021739130434785
+   },
+   "at_final": {
+    "moments": 736,
+    "cells_sight": 162,
+    "cells_words": 10,
+    "cells_born_sight": 187,
+    "cells_born_words": 10,
+    "edges_alive": 724,
+    "births_novelty_sight": 3,
+    "births_novelty_words": 10,
+    "births_error_sight": 184,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 38,
+    "edges_born": 926,
+    "edges_pruned": 175,
+    "cells_merged_sight": 25,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    0
+   ],
+   "hash_final": "774dd3dccd6b2326b1872af1d94ac208936af8921fd135452b4dc2abdb79a045",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 0,
+   "edges_cross": {
+    "born": 777,
+    "pruned": 159,
+    "born_total": 926,
+    "pruned_total": 175
+   },
+   "cells_per_thing": {
+    "ahmad": 4,
+    "anchor": 13,
+    "ant": 24,
+    "bass": 20,
+    "beaver": 15,
+    "bonsai": 23,
+    "brain": 13,
+    "buddha": 14,
+    "camera": 17,
+    "cannon": 19
+   },
+   "seconds": 0.49
+  },
+  "T-one-glance": {
+   "label": "T-one-glance",
+   "at_dev": {
+    "moments": 184,
+    "cells_sight": 1,
+    "cells_words": 10,
+    "cells_born_sight": 1,
+    "cells_born_words": 10,
+    "edges_alive": 0,
+    "births_novelty_sight": 1,
+    "births_novelty_words": 10,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 0,
+    "edges_born": 0,
+    "edges_pruned": 0,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "9d32c8bfe87cc2b13ab6148a08ee373811739ab9dba7150a07fef97eb1d27d7f",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.0,
+     "n": 92,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 92,
+      "ratio": 0,
+      "close": 0
+     },
+     "false_abstention": 1.0,
+     "per_thing": {
+      "ahmad": 0.0,
+      "anchor": 0.0,
+      "ant": 0.0,
+      "bass": 0.0,
+      "beaver": 0.0,
+      "bonsai": 0.0,
+      "brain": 0.0,
+      "buddha": 0.0,
+      "camera": 0.0,
+      "cannon": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.0,
+     "n": 10,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 10,
+      "ratio": 0,
+      "close": 0
+     },
+     "detail": {
+      "ahmad": "abstain:noedge",
+      "anchor": "abstain:noedge",
+      "ant": "abstain:noedge",
+      "bass": "abstain:noedge",
+      "beaver": "abstain:noedge",
+      "bonsai": "abstain:noedge",
+      "brain": "abstain:noedge",
+      "buddha": "abstain:noedge",
+      "camera": "abstain:noedge",
+      "cannon": "abstain:noedge"
+     }
+    },
+    "Q3": {
+     "acc": 0.5,
+     "n": 92,
+     "correct": 46,
+     "true_pairs_abstained": 46,
+     "ceiling": 0.5
+    },
+    "Q4": {
+     "acc": 0.0,
+     "n": 92,
+     "correct": 0,
+     "ties": 92
+    },
+    "Q5": {
+     "barrel": {
+      "abstain_rate": 1.0,
+      "n": 30,
+      "abstain": {
+       "novel": 0,
+       "noedge": 30,
+       "ratio": 0,
+       "close": 0
+      },
+      "answered_as": {}
+     }
+    },
+    "composite": 0.125
+   },
+   "at_final": {
+    "moments": 184,
+    "cells_sight": 1,
+    "cells_words": 10,
+    "cells_born_sight": 1,
+    "cells_born_words": 10,
+    "edges_alive": 0,
+    "births_novelty_sight": 1,
+    "births_novelty_words": 10,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 0,
+    "edges_born": 0,
+    "edges_pruned": 0,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    0
+   ],
+   "hash_final": "9d32c8bfe87cc2b13ab6148a08ee373811739ab9dba7150a07fef97eb1d27d7f",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 0,
+   "edges_cross": {
+    "born": 0,
+    "pruned": 0,
+    "born_total": 0,
+    "pruned_total": 0
+   },
+   "cells_per_thing": {
+    "ahmad": 0,
+    "anchor": 0,
+    "ant": 0,
+    "bass": 0,
+    "beaver": 0,
+    "bonsai": 1,
+    "brain": 0,
+    "buddha": 0,
+    "camera": 0,
+    "cannon": 0
+   },
+   "seconds": 0.12
+  },
+  "T-shuffle-5": {
+   "label": "T-shuffle-5",
+   "at_dev": {
+    "moments": 736,
+    "cells_sight": 159,
+    "cells_words": 10,
+    "cells_born_sight": 200,
+    "cells_born_words": 10,
+    "edges_alive": 736,
+    "births_novelty_sight": 2,
+    "births_novelty_words": 10,
+    "births_error_sight": 198,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 53,
+    "edges_born": 939,
+    "edges_pruned": 161,
+    "cells_merged_sight": 41,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "6aa222b412ddb161ff80c8e5ff9a7c5633337bc5b93348841d24e6913fc120e8",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.09782608695652174,
+     "n": 92,
+     "correct": 9,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 33,
+      "close": 0
+     },
+     "false_abstention": 0.358695652173913,
+     "per_thing": {
+      "ahmad": 0.0,
+      "anchor": 0.0,
+      "ant": 0.0,
+      "bass": 0.1,
+      "beaver": 0.0,
+      "bonsai": 0.3,
+      "brain": 0.2,
+      "buddha": 0.3,
+      "camera": 0.0,
+      "cannon": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.0,
+     "n": 10,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 1,
+      "close": 0
+     },
+     "detail": {
+      "ahmad": "camera",
+      "anchor": "beaver",
+      "ant": "buddha",
+      "bass": "camera",
+      "beaver": "abstain:ratio",
+      "bonsai": "cannon",
+      "brain": "bass",
+      "buddha": "ahmad",
+      "camera": "ant",
+      "cannon": "ant"
+     }
+    },
+    "Q3": {
+     "acc": 0.5217391304347826,
+     "n": 92,
+     "correct": 48,
+     "true_pairs_abstained": 18,
+     "ceiling": 0.8206521739130435
+    },
+    "Q4": {
+     "acc": 0.25,
+     "n": 92,
+     "correct": 23,
+     "ties": 52
+    },
+    "Q5": {
+     "barrel": {
+      "abstain_rate": 0.36666666666666664,
+      "n": 30,
+      "abstain": {
+       "novel": 0,
+       "noedge": 0,
+       "ratio": 11,
+       "close": 0
+      },
+      "answered_as": {
+       "bonsai": 9,
+       "buddha": 8,
+       "brain": 2
+      }
+     }
+    },
+    "composite": 0.21739130434782608
+   },
+   "at_final": {
+    "moments": 736,
+    "cells_sight": 159,
+    "cells_words": 10,
+    "cells_born_sight": 200,
+    "cells_born_words": 10,
+    "edges_alive": 736,
+    "births_novelty_sight": 2,
+    "births_novelty_words": 10,
+    "births_error_sight": 198,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 53,
+    "edges_born": 939,
+    "edges_pruned": 161,
+    "cells_merged_sight": 41,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    0
+   ],
+   "hash_final": "6aa222b412ddb161ff80c8e5ff9a7c5633337bc5b93348841d24e6913fc120e8",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 0,
+   "edges_cross": {
+    "born": 849,
+    "pruned": 145,
+    "born_total": 939,
+    "pruned_total": 161
+   },
+   "cells_per_thing": {
+    "ahmad": 5,
+    "anchor": 10,
+    "ant": 22,
+    "bass": 16,
+    "beaver": 18,
+    "bonsai": 17,
+    "brain": 12,
+    "buddha": 15,
+    "camera": 19,
+    "cannon": 25
+   },
+   "seconds": 0.5
+  },
+  "T-frozen": {
+   "label": "T-frozen",
+   "at_dev": {
+    "moments": 736,
+    "cells_sight": 2,
+    "cells_words": 8,
+    "cells_born_sight": 2,
+    "cells_born_words": 8,
+    "edges_alive": 13,
+    "births_novelty_sight": 2,
+    "births_novelty_words": 8,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 238,
+    "births_refused_redundant": 0,
+    "edges_born": 33,
+    "edges_pruned": 20,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "5edf223049e284ebbd34b3cf927b0fd4bfad6daa7357c195f3fa32025a7922a1",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.10869565217391304,
+     "n": 92,
+     "correct": 10,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 0,
+      "close": 0
+     },
+     "false_abstention": 0.0,
+     "per_thing": {
+      "ahmad": 0.0,
+      "anchor": 0.0,
+      "ant": 0.0,
+      "bass": 0.0,
+      "beaver": 1.0,
+      "bonsai": 0.0,
+      "brain": 0.0,
+      "buddha": 0.0,
+      "camera": 0.0,
+      "cannon": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.0,
+     "n": 10,
+     "correct": 0,
+     "abstain": {
+      "novel": 2,
+      "noedge": 1,
+      "ratio": 5,
+      "close": 0
+     },
+     "detail": {
+      "ahmad": "abstain:novel",
+      "anchor": "abstain:ratio",
+      "ant": "abstain:ratio",
+      "bass": "abstain:ratio",
+      "beaver": "bonsai",
+      "bonsai": "abstain:ratio",
+      "brain": "abstain:noedge",
+      "buddha": "anchor",
+      "camera": "abstain:ratio",
+      "cannon": "abstain:novel"
+     }
+    },
+    "Q3": {
+     "acc": 0.5108695652173914,
+     "n": 92,
+     "correct": 47,
+     "true_pairs_abstained": 0,
+     "ceiling": 1.0
+    },
+    "Q4": {
+     "acc": 0.15217391304347827,
+     "n": 92,
+     "correct": 14,
+     "ties": 71
+    },
+    "Q5": {
+     "barrel": {
+      "abstain_rate": 0.0,
+      "n": 30,
+      "abstain": {
+       "novel": 0,
+       "noedge": 0,
+       "ratio": 0,
+       "close": 0
+      },
+      "answered_as": {
+       "beaver": 30
+      }
+     }
+    },
+    "composite": 0.19293478260869568
+   },
+   "at_final": {
+    "moments": 736,
+    "cells_sight": 2,
+    "cells_words": 8,
+    "cells_born_sight": 2,
+    "cells_born_words": 8,
+    "edges_alive": 13,
+    "births_novelty_sight": 2,
+    "births_novelty_words": 8,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 238,
+    "births_refused_redundant": 0,
+    "edges_born": 33,
+    "edges_pruned": 20,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    0
+   ],
+   "hash_final": "5edf223049e284ebbd34b3cf927b0fd4bfad6daa7357c195f3fa32025a7922a1",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 0,
+   "edges_cross": {
+    "born": 29,
+    "pruned": 18,
+    "born_total": 33,
+    "pruned_total": 20
+   },
+   "cells_per_thing": {
+    "ahmad": 0,
+    "anchor": 1,
+    "ant": 0,
+    "bass": 0,
+    "beaver": 0,
+    "bonsai": 1,
+    "brain": 0,
+    "buddha": 0,
+    "camera": 0,
+    "cannon": 0
+   },
+   "seconds": 0.29
+  },
+  "T-nowire": {
+   "label": "T-nowire",
+   "at_dev": {
+    "moments": 736,
+    "cells_sight": 2,
+    "cells_words": 10,
+    "cells_born_sight": 2,
+    "cells_born_words": 10,
+    "edges_alive": 0,
+    "births_novelty_sight": 2,
+    "births_novelty_words": 10,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 0,
+    "edges_born": 0,
+    "edges_pruned": 0,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "41b4fc97867e34f844e344782e3ddd70cfda61831604ca901728f88e0b8ae5aa",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.0,
+     "n": 92,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 92,
+      "ratio": 0,
+      "close": 0
+     },
+     "false_abstention": 1.0,
+     "per_thing": {
+      "ahmad": 0.0,
+      "anchor": 0.0,
+      "ant": 0.0,
+      "bass": 0.0,
+      "beaver": 0.0,
+      "bonsai": 0.0,
+      "brain": 0.0,
+      "buddha": 0.0,
+      "camera": 0.0,
+      "cannon": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.0,
+     "n": 10,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 10,
+      "ratio": 0,
+      "close": 0
+     },
+     "detail": {
+      "ahmad": "abstain:noedge",
+      "anchor": "abstain:noedge",
+      "ant": "abstain:noedge",
+      "bass": "abstain:noedge",
+      "beaver": "abstain:noedge",
+      "bonsai": "abstain:noedge",
+      "brain": "abstain:noedge",
+      "buddha": "abstain:noedge",
+      "camera": "abstain:noedge",
+      "cannon": "abstain:noedge"
+     }
+    },
+    "Q3": {
+     "acc": 0.5,
+     "n": 92,
+     "correct": 46,
+     "true_pairs_abstained": 46,
+     "ceiling": 0.5
+    },
+    "Q4": {
+     "acc": 0.0,
+     "n": 92,
+     "correct": 0,
+     "ties": 92
+    },
+    "Q5": {
+     "barrel": {
+      "abstain_rate": 1.0,
+      "n": 30,
+      "abstain": {
+       "novel": 0,
+       "noedge": 30,
+       "ratio": 0,
+       "close": 0
+      },
+      "answered_as": {}
+     }
+    },
+    "composite": 0.125
+   },
+   "at_final": {
+    "moments": 736,
+    "cells_sight": 2,
+    "cells_words": 10,
+    "cells_born_sight": 2,
+    "cells_born_words": 10,
+    "edges_alive": 0,
+    "births_novelty_sight": 2,
+    "births_novelty_words": 10,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 0,
+    "edges_born": 0,
+    "edges_pruned": 0,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    0
+   ],
+   "hash_final": "41b4fc97867e34f844e344782e3ddd70cfda61831604ca901728f88e0b8ae5aa",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 0,
+   "edges_cross": {
+    "born": 0,
+    "pruned": 0,
+    "born_total": 0,
+    "pruned_total": 0
+   },
+   "cells_per_thing": {
+    "ahmad": 0,
+    "anchor": 1,
+    "ant": 0,
+    "bass": 0,
+    "beaver": 0,
+    "bonsai": 1,
+    "brain": 0,
+    "buddha": 0,
+    "camera": 0,
+    "cannon": 0
+   },
+   "seconds": 0.16
+  }
+ },
+ "smaller_life": {
+  "label": "smaller-life",
+  "at_dev": {
+   "moments": 336,
+   "cells_sight": 43,
+   "cells_words": 5,
+   "cells_born_sight": 53,
+   "cells_born_words": 5,
+   "edges_alive": 151,
+   "births_novelty_sight": 2,
+   "births_novelty_words": 5,
+   "births_error_sight": 51,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 4,
+   "edges_born": 161,
+   "edges_pruned": 0,
+   "cells_merged_sight": 10,
+   "cells_merged_words": 0,
+   "scale_events": 0,
+   "removed_for_disuse": 0
+  },
+  "hash_dev": "c95e848c16e04bdc366b691e22874289a6155bb837e5bcb4b100d745ceb321e5",
+  "ask_dev": {
+   "Q1": {
+    "acc": 0.30952380952380953,
+    "n": 42,
+    "correct": 13,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 4,
+     "close": 0
+    },
+    "false_abstention": 0.09523809523809523,
+    "per_thing": {
+     "ahmad": 0.0,
+     "anchor": 0.0,
+     "ant": 0.0,
+     "bass": 0.9,
+     "beaver": 0.4
+    },
+    "answers_from_multi_word_cells": 0
+   },
+   "Q2": {
+    "acc": 0.0,
+    "n": 5,
+    "correct": 0,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 1,
+     "close": 0
+    },
+    "detail": {
+     "ahmad": "ant",
+     "anchor": "abstain:ratio",
+     "ant": "bass",
+     "bass": "beaver",
+     "beaver": "ant"
+    }
+   },
+   "Q3": {
+    "acc": 0.5476190476190477,
+    "n": 42,
+    "correct": 23,
+    "true_pairs_abstained": 4,
+    "ceiling": 0.9523809523809523
+   },
+   "Q4": {
+    "acc": 0.5714285714285714,
+    "n": 42,
+    "correct": 24,
+    "ties": 0
+   },
+   "Q5": {
+    "barrel": {
+     "abstain_rate": 0.03333333333333333,
+     "n": 30,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 1,
+      "close": 0
+     },
+     "answered_as": {
+      "bass": 13,
+      "beaver": 16
+     }
+    }
+   },
+   "composite": 0.35714285714285715
+  },
+  "at_final": {
+   "moments": 336,
+   "cells_sight": 43,
+   "cells_words": 5,
+   "cells_born_sight": 53,
+   "cells_born_words": 5,
+   "edges_alive": 151,
+   "births_novelty_sight": 2,
+   "births_novelty_words": 5,
+   "births_error_sight": 51,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 4,
+   "edges_born": 161,
+   "edges_pruned": 0,
+   "cells_merged_sight": 10,
+   "cells_merged_words": 0,
+   "scale_events": 0,
+   "removed_for_disuse": 0
+  },
+  "refusals_by_arrival": [
+   0
+  ],
+  "hash_final": "c95e848c16e04bdc366b691e22874289a6155bb837e5bcb4b100d745ceb321e5",
+  "ledger_corruption_hash_unchanged": true,
+  "multi_thing_sight_cells": 0,
+  "edges_cross": {
+   "born": 109,
+   "pruned": 0,
+   "born_total": 161,
+   "pruned_total": 0
+  },
+  "cells_per_thing": {
+   "ahmad": 6,
+   "anchor": 9,
+   "ant": 9,
+   "bass": 12,
+   "beaver": 7
+  },
+  "seconds": 0.22
+ },
+ "smaller_life_things": [
+  "ahmad",
+  "anchor",
+  "ant",
+  "bass",
+  "beaver"
+ ],
+ "random_genomes": [
+  {
+   "seed": 1,
+   "genome": {
+    "theta_n": 0.9657272111997083,
+    "misfires": 5,
+    "budget": 76,
+    "kwta": 2,
+    "lr": 0.28485158690548695,
+    "prune_floor": 0.0630544589500866,
+    "theta_m": 0.941909318448285,
+    "scale_every": 1438,
+    "stage1": 189,
+    "abstain_ratio": 0.700507576820889
+   },
+   "composite": 0.125,
+   "Q1": 0.0,
+   "Q2": 0.0,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 68,
+   "refused": 761,
+   "seconds": 0.18
+  },
+  {
+   "seed": 2,
+   "genome": {
+    "theta_n": 0.6462606602729204,
+    "misfires": 3,
+    "budget": 360,
+    "kwta": 10,
+    "lr": 0.032115202929853585,
+    "prune_floor": 0.12042000466716515,
+    "theta_m": 0.9721274921543677,
+    "scale_every": 4965,
+    "stage1": 335,
+    "abstain_ratio": 0.5270218473932035
+   },
+   "composite": 0.25869565217391305,
+   "Q1": 0.09782608695652174,
+   "Q2": 0.1,
+   "Q3": 0.5217391304347826,
+   "Q4": 0.31521739130434784,
+   "cells": 193,
+   "refused": 0,
+   "seconds": 0.39
+  },
+  {
+   "seed": 3,
+   "genome": {
+    "theta_n": 0.6160371482320889,
+    "misfires": 1,
+    "budget": 186,
+    "kwta": 10,
+    "lr": 0.1767378006389885,
+    "prune_floor": 0.01973159980583944,
+    "theta_m": 0.9428795670834109,
+    "scale_every": 3144,
+    "stage1": 325,
+    "abstain_ratio": 0.5782720681721685
+   },
+   "composite": 0.3603260869565217,
+   "Q1": 0.03260869565217391,
+   "Q2": 0.3,
+   "Q3": 0.4891304347826087,
+   "Q4": 0.6195652173913043,
+   "cells": 139,
+   "refused": 102,
+   "seconds": 0.44
+  },
+  {
+   "seed": 4,
+   "genome": {
+    "theta_n": 0.7505505008790372,
+    "misfires": 8,
+    "budget": 756,
+    "kwta": 12,
+    "lr": 0.028846627049202645,
+    "prune_floor": 0.1218638105670109,
+    "theta_m": 0.93727217185335,
+    "scale_every": 3172,
+    "stage1": 291,
+    "abstain_ratio": 0.5855186299105739
+   },
+   "composite": 0.36630434782608695,
+   "Q1": 0.03260869565217391,
+   "Q2": 0.9,
+   "Q3": 0.5,
+   "Q4": 0.03260869565217391,
+   "cells": 448,
+   "refused": 0,
+   "seconds": 0.43
+  },
+  {
+   "seed": 5,
+   "genome": {
+    "theta_n": 0.895890986970882,
+    "misfires": 7,
+    "budget": 402,
+    "kwta": 7,
+    "lr": 0.08931140712600177,
+    "prune_floor": 0.01173220977394963,
+    "theta_m": 0.9379535191977664,
+    "scale_every": 2899,
+    "stage1": 268,
+    "abstain_ratio": 0.5221848450121981
+   },
+   "composite": 0.39130434782608703,
+   "Q1": 0.021739130434782608,
+   "Q2": 1.0,
+   "Q3": 0.5217391304347826,
+   "Q4": 0.021739130434782608,
+   "cells": 392,
+   "refused": 257,
+   "seconds": 0.35
+  },
+  {
+   "seed": 6,
+   "genome": {
+    "theta_n": 0.6682027262085358,
+    "misfires": 5,
+    "budget": 760,
+    "kwta": 5,
+    "lr": 0.1154765458484253,
+    "prune_floor": 0.19750155304710687,
+    "theta_m": 0.9626428709881074,
+    "scale_every": 2192,
+    "stage1": 178,
+    "abstain_ratio": 0.6616820931388746
+   },
+   "composite": 0.4135869565217391,
+   "Q1": 0.16304347826086957,
+   "Q2": 0.6,
+   "Q3": 0.5434782608695652,
+   "Q4": 0.34782608695652173,
+   "cells": 223,
+   "refused": 0,
+   "seconds": 0.4
+  },
+  {
+   "seed": 7,
+   "genome": {
+    "theta_n": 0.939634762475092,
+    "misfires": 6,
+    "budget": 484,
+    "kwta": 10,
+    "lr": 0.0714361210472246,
+    "prune_floor": 0.06073309069733387,
+    "theta_m": 0.98648179109423,
+    "scale_every": 4572,
+    "stage1": 378,
+    "abstain_ratio": 0.9024019250075554
+   },
+   "composite": 0.3831521739130435,
+   "Q1": 0.010869565217391304,
+   "Q2": 1.0,
+   "Q3": 0.5108695652173914,
+   "Q4": 0.010869565217391304,
+   "cells": 474,
+   "refused": 195,
+   "seconds": 0.37
+  },
+  {
+   "seed": 8,
+   "genome": {
+    "theta_n": 0.9837656532355835,
+    "misfires": 3,
+    "budget": 182,
+    "kwta": 4,
+    "lr": 0.23762193606690854,
+    "prune_floor": 0.174109405827547,
+    "theta_m": 0.9387173958473802,
+    "scale_every": 2911,
+    "stage1": 288,
+    "abstain_ratio": 0.682646962513783
+   },
+   "composite": 0.15,
+   "Q1": 0.0,
+   "Q2": 0.1,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 174,
+   "refused": 645,
+   "seconds": 0.22
+  },
+  {
+   "seed": 9,
+   "genome": {
+    "theta_n": 0.6405404324529022,
+    "misfires": 7,
+    "budget": 135,
+    "kwta": 8,
+    "lr": 0.23437255446145272,
+    "prune_floor": 0.1434988512911095,
+    "theta_m": 0.9906226319285603,
+    "scale_every": 4641,
+    "stage1": 169,
+    "abstain_ratio": 0.9499364382338935
+   },
+   "composite": 0.37445652173913047,
+   "Q1": 0.15217391304347827,
+   "Q2": 0.4,
+   "Q3": 0.5217391304347826,
+   "Q4": 0.42391304347826086,
+   "cells": 125,
+   "refused": 24,
+   "seconds": 0.38
+  },
+  {
+   "seed": 10,
+   "genome": {
+    "theta_n": 0.6017640869387819,
+    "misfires": 8,
+    "budget": 645,
+    "kwta": 10,
+    "lr": 0.04903822630919597,
+    "prune_floor": 0.1030481186708764,
+    "theta_m": 0.9134560407980302,
+    "scale_every": 2113,
+    "stage1": 311,
+    "abstain_ratio": 0.9124563849130167
+   },
+   "composite": 0.47282608695652173,
+   "Q1": 0.20652173913043478,
+   "Q2": 0.5,
+   "Q3": 0.5543478260869565,
+   "Q4": 0.6304347826086957,
+   "cells": 76,
+   "refused": 0,
+   "seconds": 0.36
+  },
+  {
+   "seed": 11,
+   "genome": {
+    "theta_n": 0.7446461525956564,
+    "misfires": 2,
+    "budget": 493,
+    "kwta": 8,
+    "lr": 0.013463257469723641,
+    "prune_floor": 0.030437290830913732,
+    "theta_m": 0.9918928912730766,
+    "scale_every": 2784,
+    "stage1": 53,
+    "abstain_ratio": 0.563589235205656
+   },
+   "composite": 0.3641304347826087,
+   "Q1": 0.15217391304347827,
+   "Q2": 0.5,
+   "Q3": 0.5543478260869565,
+   "Q4": 0.25,
+   "cells": 442,
+   "refused": 0,
+   "seconds": 0.47
+  },
+  {
+   "seed": 12,
+   "genome": {
+    "theta_n": 0.963908942001118,
+    "misfires": 3,
+    "budget": 98,
+    "kwta": 3,
+    "lr": 0.05789096607334173,
+    "prune_floor": 0.07062795887859555,
+    "theta_m": 0.9228235834124007,
+    "scale_every": 4763,
+    "stage1": 245,
+    "abstain_ratio": 0.5563888972404892
+   },
+   "composite": 0.125,
+   "Q1": 0.0,
+   "Q2": 0.0,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 90,
+   "refused": 738,
+   "seconds": 0.18
+  },
+  {
+   "seed": 13,
+   "genome": {
+    "theta_n": 0.919098232316709,
+    "misfires": 7,
+    "budget": 102,
+    "kwta": 10,
+    "lr": 0.08212667661786059,
+    "prune_floor": 0.01636269208596586,
+    "theta_m": 0.9937001122641602,
+    "scale_every": 3059,
+    "stage1": 359,
+    "abstain_ratio": 0.5012890692768869
+   },
+   "composite": 0.125,
+   "Q1": 0.0,
+   "Q2": 0.0,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 94,
+   "refused": 722,
+   "seconds": 0.19
+  },
+  {
+   "seed": 14,
+   "genome": {
+    "theta_n": 0.6768638667487857,
+    "misfires": 7,
+    "budget": 116,
+    "kwta": 9,
+    "lr": 0.25873504206251535,
+    "prune_floor": 0.12862217867684478,
+    "theta_m": 0.9542879576725181,
+    "scale_every": 459,
+    "stage1": 60,
+    "abstain_ratio": 0.8509940474936197
+   },
+   "composite": 0.37173913043478257,
+   "Q1": 0.21739130434782608,
+   "Q2": 0.4,
+   "Q3": 0.5869565217391305,
+   "Q4": 0.2826086956521739,
+   "cells": 107,
+   "refused": 263,
+   "seconds": 0.32
+  },
+  {
+   "seed": 15,
+   "genome": {
+    "theta_n": 0.8997503845546682,
+    "misfires": 6,
+    "budget": 231,
+    "kwta": 5,
+    "lr": 0.018227261828673548,
+    "prune_floor": 0.11474785414971247,
+    "theta_m": 0.9144782972456362,
+    "scale_every": 4908,
+    "stage1": 373,
+    "abstain_ratio": 0.6692246869971614
+   },
+   "composite": 0.15,
+   "Q1": 0.0,
+   "Q2": 0.1,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 222,
+   "refused": 478,
+   "seconds": 0.25
+  },
+  {
+   "seed": 16,
+   "genome": {
+    "theta_n": 0.7110646312901909,
+    "misfires": 5,
+    "budget": 625,
+    "kwta": 2,
+    "lr": 0.10768346737861867,
+    "prune_floor": 0.1246802986377552,
+    "theta_m": 0.9021438453150884,
+    "scale_every": 1564,
+    "stage1": 215,
+    "abstain_ratio": 0.9184842704482017
+   },
+   "composite": 0.44402173913043474,
+   "Q1": 0.21739130434782608,
+   "Q2": 0.7,
+   "Q3": 0.5760869565217391,
+   "Q4": 0.2826086956521739,
+   "cells": 358,
+   "refused": 0,
+   "seconds": 0.41
+  },
+  {
+   "seed": 17,
+   "genome": {
+    "theta_n": 0.5788768146728624,
+    "misfires": 7,
+    "budget": 393,
+    "kwta": 7,
+    "lr": 0.11358358279096002,
+    "prune_floor": 0.04377345074879192,
+    "theta_m": 0.9381965797213306,
+    "scale_every": 4585,
+    "stage1": 297,
+    "abstain_ratio": 0.7995581231645005
+   },
+   "composite": 0.32065217391304346,
+   "Q1": 0.11956521739130435,
+   "Q2": 0.0,
+   "Q3": 0.532608695652174,
+   "Q4": 0.6304347826086957,
+   "cells": 45,
+   "refused": 0,
+   "seconds": 0.35
+  },
+  {
+   "seed": 18,
+   "genome": {
+    "theta_n": 0.851533192851226,
+    "misfires": 4,
+    "budget": 702,
+    "kwta": 4,
+    "lr": 0.029403850809444316,
+    "prune_floor": 0.1939844925392791,
+    "theta_m": 0.9558287477914272,
+    "scale_every": 2878,
+    "stage1": 358,
+    "abstain_ratio": 0.7826670171162784
+   },
+   "composite": 0.375,
+   "Q1": 0.0,
+   "Q2": 1.0,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 564,
+   "refused": 0,
+   "seconds": 0.44
+  },
+  {
+   "seed": 19,
+   "genome": {
+    "theta_n": 0.9536759789601847,
+    "misfires": 4,
+    "budget": 334,
+    "kwta": 4,
+    "lr": 0.022714338216145366,
+    "prune_floor": 0.06279814820430928,
+    "theta_m": 0.9711003405293356,
+    "scale_every": 4981,
+    "stage1": 236,
+    "abstain_ratio": 0.7639629196790005
+   },
+   "composite": 0.35,
+   "Q1": 0.0,
+   "Q2": 0.9,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 325,
+   "refused": 386,
+   "seconds": 0.31
+  },
+  {
+   "seed": 20,
+   "genome": {
+    "theta_n": 0.7259618878034416,
+    "misfires": 3,
+    "budget": 722,
+    "kwta": 2,
+    "lr": 0.15916946375708507,
+    "prune_floor": 0.08242451334606678,
+    "theta_m": 0.9070923151732618,
+    "scale_every": 268,
+    "stage1": 357,
+    "abstain_ratio": 0.983281298343706
+   },
+   "composite": 0.4315217391304348,
+   "Q1": 0.13043478260869565,
+   "Q2": 0.9,
+   "Q3": 0.532608695652174,
+   "Q4": 0.16304347826086957,
+   "cells": 388,
+   "refused": 0,
+   "seconds": 0.38
+  }
+ ],
+ "marks": {
+  "i_answers": {
+   "pass": false,
+   "Q1": 0.08695652173913043,
+   "Q2": 0.4,
+   "Q3": 0.5108695652173914,
+   "Q3_ceiling": 0.8043478260869565,
+   "Q4": 0.6304347826086957,
+   "counts": {
+    "Q1": "8/92",
+    "Q2": "4/10",
+    "Q3": "47/92",
+    "Q4": "58/92"
+   },
+   "bars": "Q1,Q2 \u2265 .80 \u00b7 Q3 \u2265 .85 \u00b7 Q4 \u2265 .90"
+  },
+  "ii_meeting_real": {
+   "pass": true,
+   "T_shuffle_Q1": 0.09782608695652174,
+   "T_nowire_Q1": 0.0,
+   "T_nowire_abstain": {
+    "novel": 0,
+    "noedge": 92,
+    "ratio": 0,
+    "close": 0
+   },
+   "bar": "\u2264 .20"
+  },
+  "iii_growth_matters": {
+   "pass": false,
+   "T_frozen_Q1": 0.10869565217391304,
+   "design_Q1": 0.08695652173913043,
+   "bar": "\u2265 30 pp under"
+  },
+  "iv_grows_alone": {
+   "gating": true,
+   "cells_born": 208,
+   "births_refused_budget": 0,
+   "smaller_life_born": 53,
+   "full_world_born_at_dev": 198,
+   "edges_born": 799,
+   "edges_pruned": 143,
+   "pruned_share": 0.17897371714643304,
+   "removed_for_disuse": 0,
+   "edges_cross": {
+    "born": 636,
+    "pruned": 127,
+    "born_total": 799,
+    "pruned_total": 143
+   },
+   "births_by_glance": null,
+   "bars": "\u2265 50 born \u00b7 0 refused \u00b7 smaller life < full world \u00b7 \u2265 5 % pruned \u00b7 0 by disuse",
+   "pass": true
+  },
+  "v_keeps": {
+   "gradable": false,
+   "Q1_at_dev": 0.08695652173913043,
+   "Q1_after_arrival2": null,
+   "correct_at_dev": 8,
+   "correct_after_arrival2": null,
+   "n": 92,
+   "allowed_loss": 5,
+   "bar": "within 5 pp, read in COUNTS: lost \u2264 ceil(0.05 \u00b7 n)"
+  },
+  "vi_knows_unknown": {
+   "Q5_abstain": 0.26666666666666666,
+   "Q5_abstain_by": {
+    "novel": 0,
+    "noedge": 0,
+    "ratio": 8,
+    "close": 0
+   },
+   "Q5_answered_as": {
+    "buddha": 6,
+    "bass": 2,
+    "cannon": 7,
+    "camera": 3,
+    "beaver": 3,
+    "ahmad": 1
+   },
+   "Q5_n": 30,
+   "false_abstention_seen": 0.391304347826087,
+   "false_abstention_by": {
+    "novel": 0,
+    "noedge": 0,
+    "ratio": 36,
+    "close": 0
+   },
+   "bars": "plant majority answered \u00b7 null majority abstains \u00b7 Q5 \u2265 .80 \u00b7 false \u2264 .20",
+   "plant": "none on his pictures (G1 \u00a72)",
+   "null_vex_on_the_ear": "novel",
+   "pass": false
+  },
+  "vii_replay": {
+   "pass": true,
+   "hash": "c2d7030ff2c561af"
+  },
+  "viii_cost": {
+   "pass": true,
+   "seconds_design_life": 0.53,
+   "bar": "\u2264 600 s"
+  },
+  "ix_not_luck": {
+   "pass": true,
+   "rank_of_design": 5,
+   "of": 21,
+   "design_composite": 0.4070652173913044,
+   "best_random": 0.47282608695652173,
+   "best_random_seed": 10,
+   "bar": "rank \u2264 5 of 21"
+  },
+  "xi_gaze_earns_place": {
+   "pass": false,
+   "Q1_gaze": 0.08695652173913043,
+   "Q1_one_glance": 0.0,
+   "margin": 0.08695652173913043,
+   "bar": "\u2265 .10"
+  },
+  "untested_SCALE": {
+   "scale_events": 0,
+   "note": "SCALE every 1000 fired 0 times in a 736-moment life"
+  }
+ },
+ "gating_marks": [
+  "i_answers",
+  "ii_meeting_real",
+  "iii_growth_matters",
+  "iv_grows_alone",
+  "vi_knows_unknown",
+  "vii_replay",
+  "viii_cost",
+  "ix_not_luck",
+  "xi_gaze_earns_place"
+ ],
+ "verdict": "FAIL",
+ "marks_failed": [
+  "i_answers",
+  "iii_growth_matters",
+  "vi_knows_unknown",
+  "xi_gaze_earns_place"
+ ],
+ "seconds_total": 21.1
+}

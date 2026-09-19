@@ -1,0 +1,56 @@
+# G3-his.genome — G2-his.genome under G3's laws (T3: photographs through the photograph eye)
+# from G2-his.genome — G1-his.genome with the EYE FOR PHOTOGRAPHS (judge/eye-photo-g1, docs/G2-EYE-PREREG.md): SENSE eye 64x64, RETINA tower:eye-photo-g1 sqrt unit, GAZE glance 64 (docs/G1-PREREG.md, Ahmad's 17:10 «Ok go for it»)
+# built from G0b.genome, rewritten on Ahmad's 16:27 / 16:33 words so that EVERY gene names the
+# build it comes from and the proof it carries (docs/G0b-PREREG.md). One gene per line; `#` starts a comment.
+# Lines beginning `#OFF` are genes DECLARED for this genome but not switched on in this run: the machinery
+# does not run them yet; each is switched on in its own later run, one at a time (PREREG §1b).
+# THETA_N and THETA_M are written by gate G-a (genome/gate_ga.py) from the world's own cosine bands.
+SEED   20260919
+# BODY — the senses and the areas
+SENSE  eye    64x64 grey             # the sealed eye tower's frame: 32x32 grey, ink high (judge/eye-tower-g2/SEAL.json "input")
+RETINA tower:eye-photo-g1 sqrt unit   # EYE GENE = Alpha 3's SEALED EYE TOWER (E09d seed 20260913 → E46d arm (b) MERGED-1, adopted
+                                     #   2026-09-16 17:3x, /data/dev/alpha3/judge/eye-tower-g2, sha 6abc6d75…): conv 8@5x5 → ReLU → 2x2 max → conv 7@3x3
+                                     #   → ReLU → 4x4 mean → 112 features. FIXED during a life (never learned here). Before it: a contrast floor and the
+                                     #   ink's centroid to the centre (the tower was trained on centred glyphs; G0b §2b); after it: a fixed square root,
+                                     #   unit length. Proof: the C++ organ replays E09d's 2,356 held-out frames byte for byte; the numpy road is gated on
+                                     #   that seal's own features (genome/eye.py, run log).
+SENSE  ear    letters 8              # words on a page: 8 slots x 27 symbols = 216, unit length (Alpha 2 lexicon HEADWORDS reused the same letters)
+AREA   sight  from retina
+AREA   words  from ear
+MEET   sight  words                  # rung 0: the meeting is EDGES ONLY (the neural organ's W between two populations, E48b arm A1)
+# GROW — E48b's arm-A1 rule, ported byte-exact into Alpha 3's neural organ and alive three days (SOLUTIONS #227; NOTES 09-16 20:24)
+BIRTH  novelty  cos<0.36          # no cell resonates -> a new cell holds the input (GWR's novelty birth; THETA_N from gate G-a, never by habit)
+BIRTH  error    misfires 3           # a cell keeps answering wrongly -> a new cell is born beside it (E48b's error birth)
+BUDGET 400 per arrival               # a budget that REFUSES, never a cap that eats the least-used (E48 → E48b, #227); refusals printed
+NMAX   2000
+# WIRE — Hebb between co-active areas, a delta rule that shrinks what is WRONG (E48b; the neural organ)
+KWTA   5                             # five winners per area per moment (E48b's k-winners; a winner must resonate, G0 §11 am. 3)
+HEBB   window 1                      # cells active in the SAME moment across areas get an edge (his 09-16 18:46 «simultaneous inputs that MEET»)
+DELTA  lr 0.05                       # the edge grows when the pairing is right, shrinks when wrong (E48b's delta rule)
+# SHRINK — the wrong and the redundant, never the merely unused (#227: shrinking by disuse IS forgetting)
+PRUNE  w<0.02 after 3 chances        # E48b's floor
+MERGE  cos>0.8278 same-answer       # D41 (c): merge redundant units — shrinking that costs no retention
+SCALE  every 1000 moments            # HOMEOSTASIS = Alpha 1's plasticity program, M3 homeostasis 192/192 (the one plasticity primitive that carried)
+# STAGE — critical periods (his 09-16 18:46: reading → sentences → paragraphs; senses first)
+STAGE  1 senses   moments 0..200
+STAGE  2 meet     moments 200..
+# ANSWER — from the grown structure only; the truth stays outside (Alpha 2's belief-scope law)
+RECALL k=1                           # light one side as a moment does, read the strongest edge (G0 §11 am. 6)
+ABSTAIN second/best > 0.85           # «I do not know this» when a COMPETITOR is too close (G0 §11 am. 5); metacognition's first cell (F4)
+#
+# DECLARED, OFF IN THIS RUN — each is an estate organ with a proof; each gets its own run, one at a time (PREREG §1b):
+GAZE   surprise fixations 4 grid 16 canvas 128 glance 64 ink border     # GAZE GENE ON (G1 §1): Alpha 2 organs/retina.py + organs/gaze.py (V0.1, d772bf7, 2026-09-05) imported VERBATIM,
+                                     #   sha-pinned in genome/gaze.py; fixation 1 = the saliency peak, then the most surprising unvisited cell (residual saliency on a
+                                     #   first frame), inhibition of return, 4 per picture (12 was per page frame); a glance = a 32×32 window on the fixated cell; INK (§6 am. 1) =
+                                     #   |grey − median of the window's 2-px rim| / max (§6 amendment 1; the first run's |grey − mean| rule made filled shapes one shape); each glance is one moment with the same word. Proof: V0.1's 12 regions vs the random twin's 3–4.
+#OFF EAR-SOUND cochlear gammatone agc      # E52's cochlear front (Alpha 3, 09-17): the first hearing gate PASS at 1.000; its ablation says the loudness path carries — for the sound sense
+#OFF CONTEXT   family read-time            # D31 (Alpha 3, 09-16): the family as read-time context — digits 0.692 → 0.792, handwritten 0.193 → 0.660; here the WORD is the picture's context
+#OFF CURIOSITY interest-population         # Alpha 2 organs/curiosity_genome.py (L2, 09-01): content-free operators, beat its null twin every measurement (16,114.6 vs 2,223.3) — for when he chooses his own stream
+#OFF PREDICT   next-moment error           # his research (the AGI Q&A §predictive coding / active inference; R2): he says what comes next and files the miss — the error signal that closes no loop over his own records (F1)
+#OFF SENTENCE  compose under-judge         # Alpha 2 speech_v2 (L4, 09-02): sentences composed from his own record under a frozen judge, never next-token; his 09-12 12:38 «speaks as an organism»
+#OFF HANDS     jail landlock seccomp       # Alpha 2 core/jail (A2-R6), reused by Alpha 3's hands: the road to run what he writes; the open world (his 09-17 00:07)
+
+# G3 (docs/G3-LAWS-PREREG.md): two laws changed, one gene added — on Ahmad's 19:19 «Let's tweak some genome laws» / 19:30 «Ok go»
+RESONATE sight nearest words cos>=0.9   # sight winners = the nearest KWTA cells at or above the FLOOR (THETA_N := between-p5, gate G-a); words keep a strict threshold
+# (ABSTAIN margin withdrawn — G3 §6 amendment 1, after the machinery toy: 33/40 «close»)
+# gate G-a wrote THETA_N=0.36 THETA_M=0.8278 MARGIN=0.0068 — G3 floor rule [his first-fixation glances (G3-his)]: THETA_N = between-p5; MARGIN = 5 % of the band width 0.1362; within-median 0.4959 between-p95 0.6118; seed 20260919

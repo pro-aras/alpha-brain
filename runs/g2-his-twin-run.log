@@ -1,0 +1,36 @@
+gate G-a on his glances: bands OVERLAP — the toy's THETA_N=0.955 THETA_M=0.9975 carried into G2-his.genome (G1 §1)
+g2-his · 10 words shown ['ahmad', 'anchor', 'ant', 'bass', 'beaver', 'bonsai', 'brain', 'buddha', 'camera', 'cannon'] · withheld for Q5: barrel · dev 184 pictures · held-out 122 (every 3rd per word + all of barrel)
+glanced [surprise] in 4.1 s
+glanced [random] in 4.0 s
+glanced [one] in 0.7 s
+DESIGN Q1 0.000 Q2 0.90 Q3 0.500 Q4 0.000 Q5 barrel abstain 1.00 {'novel': 30, 'noedge': 0, 'ratio': 0, 'close': 0} false-abst 1.000 | 0.37 s
+       cells 391+9 born 391+9 (novelty 391 error 0 refused budget 316 redundant 19) edges born 212 pruned 0 merged 0+0 | cross {'born': 0, 'pruned': 0, 'born_total': 212, 'pruned_total': 0} | births by glance None
+REPLAY byte-identical: True
+T-RANDOM-GAZE: Q1 0.000 abstain {'novel': 91, 'noedge': 1, 'ratio': 0, 'close': 0} Q2 0.90 Q3 0.500 Q4 0.000 | cells 391 born 391 refused 354 | 0.35 s
+T-ONE-GLANCE: Q1 0.000 abstain {'novel': 88, 'noedge': 4, 'ratio': 0, 'close': 0} Q2 0.00 Q3 0.500 Q4 0.000 | cells 181 born 181 refused 0 | 0.14 s
+T-SHUFFLE-5: Q1 0.000 abstain {'novel': 92, 'noedge': 0, 'ratio': 0, 'close': 0} Q2 0.10 | cells 390 edges 214 refused 301
+T-FROZEN: Q1 0.000 abstain {'novel': 92, 'noedge': 0, 'ratio': 0, 'close': 0} Q2 0.00 | cells 8 edges 0 refused 0
+T-NOWIRE: Q1 0.000 abstain {'novel': 92, 'noedge': 0, 'ratio': 0, 'close': 0} Q2 0.00 | cells 391 edges 0 refused 316
+SMALLER LIFE (5 things, 84 showings): cells born 309 vs the full world's 391 at the end of development · Q1 0.024
+RANDOM  1: composite 0.125 Q1 0.000 Q2 0.00 Q3 0.500 Q4 0.000 | theta_n 0.966 kwta 2 lr 0.285 budget 76 | cells 68 | 0.18 s
+RANDOM  2: composite 0.259 Q1 0.098 Q2 0.10 Q3 0.522 Q4 0.315 | theta_n 0.646 kwta 10 lr 0.032 budget 360 | cells 193 | 0.38 s
+RANDOM  3: composite 0.360 Q1 0.033 Q2 0.30 Q3 0.489 Q4 0.620 | theta_n 0.616 kwta 10 lr 0.177 budget 186 | cells 139 | 0.43 s
+RANDOM  4: composite 0.366 Q1 0.033 Q2 0.90 Q3 0.500 Q4 0.033 | theta_n 0.751 kwta 12 lr 0.029 budget 756 | cells 448 | 0.42 s
+RANDOM  5: composite 0.391 Q1 0.022 Q2 1.00 Q3 0.522 Q4 0.022 | theta_n 0.896 kwta 7 lr 0.089 budget 402 | cells 392 | 0.34 s
+RANDOM  6: composite 0.414 Q1 0.163 Q2 0.60 Q3 0.543 Q4 0.348 | theta_n 0.668 kwta 5 lr 0.115 budget 760 | cells 223 | 0.38 s
+RANDOM  7: composite 0.383 Q1 0.011 Q2 1.00 Q3 0.511 Q4 0.011 | theta_n 0.940 kwta 10 lr 0.071 budget 484 | cells 474 | 0.36 s
+RANDOM  8: composite 0.150 Q1 0.000 Q2 0.10 Q3 0.500 Q4 0.000 | theta_n 0.984 kwta 4 lr 0.238 budget 182 | cells 174 | 0.23 s
+RANDOM  9: composite 0.374 Q1 0.152 Q2 0.40 Q3 0.522 Q4 0.424 | theta_n 0.641 kwta 8 lr 0.234 budget 135 | cells 125 | 0.37 s
+RANDOM 10: composite 0.473 Q1 0.207 Q2 0.50 Q3 0.554 Q4 0.630 | theta_n 0.602 kwta 10 lr 0.049 budget 645 | cells 76 | 0.35 s
+RANDOM 11: composite 0.364 Q1 0.152 Q2 0.50 Q3 0.554 Q4 0.250 | theta_n 0.745 kwta 8 lr 0.013 budget 493 | cells 442 | 0.46 s
+RANDOM 12: composite 0.125 Q1 0.000 Q2 0.00 Q3 0.500 Q4 0.000 | theta_n 0.964 kwta 3 lr 0.058 budget 98 | cells 90 | 0.18 s
+RANDOM 13: composite 0.125 Q1 0.000 Q2 0.00 Q3 0.500 Q4 0.000 | theta_n 0.919 kwta 10 lr 0.082 budget 102 | cells 94 | 0.19 s
+RANDOM 14: composite 0.372 Q1 0.217 Q2 0.40 Q3 0.587 Q4 0.283 | theta_n 0.677 kwta 9 lr 0.259 budget 116 | cells 107 | 0.31 s
+RANDOM 15: composite 0.150 Q1 0.000 Q2 0.10 Q3 0.500 Q4 0.000 | theta_n 0.900 kwta 5 lr 0.018 budget 231 | cells 222 | 0.25 s
+RANDOM 16: composite 0.444 Q1 0.217 Q2 0.70 Q3 0.576 Q4 0.283 | theta_n 0.711 kwta 2 lr 0.108 budget 625 | cells 358 | 0.4 s
+RANDOM 17: composite 0.321 Q1 0.120 Q2 0.00 Q3 0.533 Q4 0.630 | theta_n 0.579 kwta 7 lr 0.114 budget 393 | cells 45 | 0.34 s
+RANDOM 18: composite 0.375 Q1 0.000 Q2 1.00 Q3 0.500 Q4 0.000 | theta_n 0.852 kwta 4 lr 0.029 budget 702 | cells 564 | 0.43 s
+RANDOM 19: composite 0.350 Q1 0.000 Q2 0.90 Q3 0.500 Q4 0.000 | theta_n 0.954 kwta 4 lr 0.023 budget 334 | cells 325 | 0.31 s
+RANDOM 20: composite 0.432 Q1 0.130 Q2 0.90 Q3 0.533 Q4 0.163 | theta_n 0.726 kwta 2 lr 0.159 budget 722 | cells 388 | 0.37 s
+VERDICT FAIL — failed: ['i_answers', 'iii_growth_matters', 'iv_grows_alone', 'vi_knows_unknown', 'ix_not_luck', 'xi_gaze_earns_place'] — /data/dev/genome/runs/g2-his-20260919-193607 (20.5 s)
+exit 0

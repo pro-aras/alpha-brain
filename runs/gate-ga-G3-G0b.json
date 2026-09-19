@@ -1,0 +1,141 @@
+{
+ "things": [
+  "circle",
+  "square",
+  "triangle",
+  "cross",
+  "ring",
+  "bar",
+  "dot",
+  "star",
+  "arrow",
+  "wave",
+  "diamond"
+ ],
+ "per_thing": 60,
+ "seed": 20260919,
+ "retina_spec": [
+  "thresh0.25",
+  "centre",
+  "tower:eye-tower-g2",
+  "sqrt",
+  "unit"
+ ],
+ "retina": {
+  "within": {
+   "median": 0.9682918454491785,
+   "p5": 0.8626759138778229,
+   "p95": 0.9971531710130189,
+   "n": 19470
+  },
+  "between": {
+   "median": 0.7581774166437085,
+   "p5": 0.5522668040763766,
+   "p95": 0.9026805678217525,
+   "max": 0.9700307413399428,
+   "n": 30000
+  },
+  "per_thing_within_p5": {
+   "circle": 0.8706986852394247,
+   "square": 0.863978260462212,
+   "triangle": 0.8841140104917978,
+   "cross": 0.8476052003395003,
+   "ring": 0.790667425259725,
+   "bar": 0.8305099755291983,
+   "dot": 0.9732330222762575,
+   "star": 0.9341703584908468,
+   "arrow": 0.8477950910550369,
+   "wave": 0.8873124945446719,
+   "diamond": 0.8885332773699226
+  },
+  "pair_p95": {
+   "circle/square": 0.959207961778504,
+   "circle/triangle": 0.9013357287044201,
+   "circle/cross": 0.8675222371704595,
+   "circle/ring": 0.8482493430719639,
+   "circle/bar": 0.746948561134997,
+   "circle/dot": 0.698135107306808,
+   "circle/star": 0.8567043194545204,
+   "circle/arrow": 0.819870667187159,
+   "circle/wave": 0.7713634186835265,
+   "circle/diamond": 0.9631220857680122,
+   "square/triangle": 0.9028330672469194,
+   "square/cross": 0.8626331062732328,
+   "square/ring": 0.8080741705372079,
+   "square/bar": 0.7522175732988097,
+   "square/dot": 0.7164281591475735,
+   "square/star": 0.8838285075613045,
+   "square/arrow": 0.8124372878850499,
+   "square/wave": 0.753904985182025,
+   "square/diamond": 0.9121405442862374,
+   "triangle/cross": 0.8675537861969493,
+   "triangle/ring": 0.7616575758205613,
+   "triangle/bar": 0.7213905815142677,
+   "triangle/dot": 0.7920052735731895,
+   "triangle/star": 0.8707537722983889,
+   "triangle/arrow": 0.8059516606353653,
+   "triangle/wave": 0.8018790060402999,
+   "triangle/diamond": 0.8964331714121098,
+   "cross/ring": 0.7902927649121981,
+   "cross/bar": 0.8183296423731434,
+   "cross/dot": 0.7720482471765896,
+   "cross/star": 0.9257031920632781,
+   "cross/arrow": 0.8949606483591703,
+   "cross/wave": 0.829772052707763,
+   "cross/diamond": 0.9128049187477618,
+   "ring/bar": 0.6660118301139173,
+   "ring/dot": 0.6900234977857365,
+   "ring/star": 0.7563492276234716,
+   "ring/arrow": 0.7341473395719579,
+   "ring/wave": 0.8050537163401749,
+   "ring/diamond": 0.807419610022725,
+   "bar/dot": 0.7089363137907577,
+   "bar/star": 0.7761049468795423,
+   "bar/arrow": 0.939232416842459,
+   "bar/wave": 0.8029249659403638,
+   "bar/diamond": 0.7709200176051786,
+   "dot/star": 0.8344468749795391,
+   "dot/arrow": 0.7978374048440354,
+   "dot/wave": 0.7855749113751141,
+   "dot/diamond": 0.7006720362189681,
+   "star/arrow": 0.8545452359724532,
+   "star/wave": 0.8179157852207034,
+   "star/diamond": 0.884935034483864,
+   "arrow/wave": 0.8591601631539534,
+   "arrow/diamond": 0.8504227345822455,
+   "wave/diamond": 0.7773518579543851
+  },
+  "closest_pair": {
+   "pair": "circle/diamond",
+   "p95": 0.9631220857680122
+  }
+ },
+ "ear": {
+  "max_between": 0.6249999999999999,
+  "median_between": 0.24999999999999994
+ },
+ "choice": {
+  "strict": {
+   "lo": 0.9026805678217525,
+   "hi": 0.8626759138778229,
+   "met": false
+  },
+  "amended": {
+   "theta_n": 0.968,
+   "floor": 0.9026805678217525,
+   "rule": "p95",
+   "met": true,
+   "conflated_pairs": []
+  },
+  "theta_n": 0.552,
+  "theta_m": 0.9986,
+  "rule": "floor",
+  "margin": 0.0208,
+  "band_width": 0.41602504137280183,
+  "overlap": false
+ },
+ "plant": {
+  "p_res_at_theta_n": 1.0,
+  "showings": 5
+ }
+}
