@@ -17,7 +17,11 @@ import numpy as np
 from genome.machinery import Genome, GenomeError, Organism, parse_genome
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-G4_PATH = ROOT / "genome" / "G4.genome"
+# edit: Claude (Fable 5.1), 2026-09-19 23:31 +0400 — genome/G4.genome became THE LIFE's genome (PREREG §12: thetas written by gate G-a,
+# TRAITS/SURPRISE/SENTENCE/HANDS declared OFF, THINK/EXAM/FROZEN added); these tests pinned the DRAFT's shape, so they now read a
+# frozen copy of that draft (tests/genome/G4-draft.genome) and a new test pins the LIVE file's parsed shape instead.
+G4_PATH = ROOT / "tests" / "genome" / "G4-draft.genome"
+G4_LIFE_PATH = ROOT / "genome" / "G4.genome"
 SKELETON_PATH = ROOT / "genome" / "G4-skeleton.genome"
 G1_PATH = ROOT / "genome" / "G1.genome"
 
@@ -199,3 +203,18 @@ class TestParseG4(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTheLifeGenome(unittest.TestCase):
+    """The 24 h life's genome (PREREG §12): thetas WRITTEN, the declared set exactly as stamped, the OFF genes absent."""
+
+    def test_life_genome_parses_with_written_thetas_and_the_declared_set(self) -> None:
+        from genome.machinery import parse_genome
+        g = parse_genome(G4_LIFE_PATH.read_text())
+        self.assertAlmostEqual(g.theta_n, 0.952, places=3)
+        self.assertAlmostEqual(g.theta_m, 0.9969, places=4)
+        self.assertEqual(sorted(g.declared), ["ASK", "BELIEF", "BODY", "CRASH", "CURIOSITY", "CYCLE", "DEDUCE", "EXAM", "FAST", "FILE",
+                                              "FROZEN", "HEART", "INDUCE", "PARK", "PREDICT", "SLEEP", "TAPE", "THINK", "WORLD"])
+        for off in ("TRAITS", "SURPRISE", "SENTENCE", "HANDS"):
+            self.assertNotIn(off, g.declared)
+        self.assertEqual(g.declared["THINK"], {"every": 10}); self.assertEqual(g.declared["EXAM"], {"every": 2000}); self.assertEqual(g.declared["FROZEN"], {"after": 50})
