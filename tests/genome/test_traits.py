@@ -325,5 +325,34 @@ class TestPinControl(unittest.TestCase):
         self.assertIsNone(org.words.traits)
 
 
+class TestOrgTraitsProperty(unittest.TestCase):
+    """The coordinator's fixed interface names this `org.traits` (advisor-caught, post-B12): a plain
+    instance attribute would shadow Organism.traits's property and silently leave `sight.traits`
+    (what Area.cos actually reads) at None — TRAITS would then be a no-op wired through org.traits
+    alone. `org.traits = t` and `org.set_traits(t)` must be equivalent, and `org.traits` must read
+    back exactly what `Area.cos` uses."""
+
+    def test_assigning_org_traits_reaches_sight_traits(self) -> None:
+        from ._toy import mini_genome
+        org = Organism(mini_genome())
+        t = Traits(dim_in=64, dim_out=8, lr=0.01, rng=np.random.default_rng(1))
+        org.traits = t
+        self.assertIs(org.sight.traits, t)
+        self.assertIs(org.traits, t)
+        self.assertIsNone(org.words.traits)
+
+    def test_set_traits_and_property_are_equivalent(self) -> None:
+        from ._toy import mini_genome
+        org = Organism(mini_genome())
+        t = Traits(dim_in=64, dim_out=8, lr=0.01, rng=np.random.default_rng(2))
+        org.set_traits(t)
+        self.assertIs(org.traits, t)
+
+    def test_org_traits_default_is_none(self) -> None:
+        from ._toy import mini_genome
+        org = Organism(mini_genome())
+        self.assertIsNone(org.traits)
+
+
 if __name__ == "__main__":
     unittest.main()

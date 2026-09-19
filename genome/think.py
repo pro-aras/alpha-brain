@@ -75,6 +75,8 @@ def believe(word: str, cells: List[int], episode_ids: List[int], moment: int, pa
         "cells": sorted(set(int(c) for c in cells)),
         "episodes": sorted(set(int(e) for e in episode_ids)),
         "moment": int(moment),
+        "clashes": [],  # PREREG §11.2: a belief row carries "clashes" too, so a reader never KeyErrors
+                         # on it before any clash has ever opened against this row.
     }
     with open(p, "a") as f:
         f.write(json.dumps(row) + "\n")
