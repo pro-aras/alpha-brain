@@ -7,6 +7,11 @@ edit: Claude (Fable 5.1), 2026-09-19 16:09 +04 — §11: the retina as a list of
 edit: Claude (Fable 5.1), 2026-09-19 16:37 +04 — G0b: RETINA step tower:<sealed eye>; any square picture; every edge's birth and pruning logged by cell ids (no labels).
 edit: Claude (Fable 5.1), 2026-09-19 17:21 +0400 — G1: the GAZE gene (parsed; its work is done in gaze.py and the runner); recall_many/edge_many — the rung-0 recall summed over glances, pinned equal to recall/edge for one glance; save/load for the ask door (never touch state_hash).
 edit: Claude (Fable 5.1), 2026-09-19 16:14 +04 — §11 amendments 4–6 (from the toy): redundant error births refused; ABSTAIN's second is a competitor that answers back differently; a question lights the resonating winners, not one cell.
+edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 21:32 +0400 — B1 (docs/G4-PREREG.md §3): a `declared: Dict[str, dict]`
+field on Genome holding every G4 gene's own parsed sub-dict (BODY, TAPE, HEART, CRASH, TRAITS, SURPRISE, CYCLE, FAST,
+SLEEP, PREDICT, FILE, CURIOSITY, PARK, INDUCE, DEDUCE, BELIEF, SENTENCE, WORLD, HANDS, ASK); `AREA episodes from fast`
+allowed beside sight/words; `RECALL k=N` for any N >= 1 (k=1 byte-identical — the rung-0 restriction lifted). A gene
+the machinery cannot run is still a GenomeError; a placeholder value (THETA_N/THETA_M unwritten) still refuses.
 
 Laws of this file:
 - The genome is text. A gene this machinery does not know REFUSES to start (GenomeError),
@@ -63,6 +68,7 @@ class Genome:
     theta_words: Optional[float] = None             # G3: the words area's own threshold (None = theta_n, the old law)
     abstain_margin: Optional[float] = None          # G3: ABSTAIN margin cos<M (None = off)
     gaze: Optional[Dict[str, object]] = None     # G1: GAZE surprise fixations F grid G canvas C glance L ink contrast (None = off)
+    declared: Dict[str, dict] = field(default_factory=dict)   # G4 §3 B1: every G4 gene's own parsed sub-dict (BODY, TAPE, HEART, …)
     text: str = field(default="", repr=False)
 
     @property
@@ -84,7 +90,7 @@ _NUM = r"[-+]?\d+(?:\.\d+)?"
 
 def parse_genome(text: str) -> Genome:
     """Parse the genome text. Unknown gene → GenomeError. Placeholder value → GenomeError."""
-    g: Dict[str, object] = {"areas": {}, "stages": [], "ear_blank_zero": False}
+    g: Dict[str, object] = {"areas": {}, "stages": [], "ear_blank_zero": False, "declared": {}}
     seen = set()
     for raw in text.splitlines():
         line = raw.split("#", 1)[0].strip()
@@ -172,6 +178,90 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"surprise fixations (\d+) grid (\d+) canvas (\d+) glance (\d+) ink (contrast|border)", a)
                 if not m: raise GenomeError(f"GAZE: cannot read {a!r} (G1 §1: surprise fixations F grid G canvas C glance L ink contrast)")
                 g["gaze"] = {"fixations": int(m.group(1)), "grid": int(m.group(2)), "canvas": int(m.group(3)), "glance": int(m.group(4)), "ink": m.group(5)}
+            # ======================================================================== G4 §3 B1: the new genes.
+            # Each is a strict re.fullmatch (a placeholder or a missing number refuses); the parsed sub-dict is
+            # stored under g["declared"][GENE] — a gene the machinery cannot run is a GenomeError, so nobody can
+            # "declare" a mechanism into existence (docs/G4-DESIGN.md §3). None of these are in `required`.
+            elif gene == "BODY":
+                m = re.fullmatch(r"service ([a-z][a-z0-9_]*) threads ([a-z]+(?: [a-z]+)*)", a)
+                if not m: raise GenomeError(f"BODY: cannot read {a!r} (G4 §2: service <name> threads <a> <b> …)")
+                g["declared"]["BODY"] = {"name": m.group(1), "threads": m.group(2).split()}
+            elif gene == "TAPE":
+                m = re.fullmatch(r"([A-Za-z0-9_./-]+)", a)
+                if not m: raise GenomeError(f"TAPE: cannot read {a!r} (G4 §2.1: TAPE <path>)")
+                g["declared"]["TAPE"] = {"path": m.group(1)}
+            elif gene == "HEART":
+                m = re.fullmatch(r"every (\d+) s", a)
+                if not m: raise GenomeError(f"HEART: cannot read {a!r} (G4 §2.5: HEART every <n> s)")
+                g["declared"]["HEART"] = {"every_s": int(m.group(1))}
+            elif gene == "CRASH":
+                m = re.fullmatch(r"sense restart journal; mind page", a)
+                if not m: raise GenomeError(f"CRASH: cannot read {a!r} (G4 §2.6: CRASH sense restart journal; mind page)")
+                g["declared"]["CRASH"] = {"sense": "restart journal", "mind": "page"}
+            elif gene == "TRAITS":
+                m = re.fullmatch(r"contrast head (\d+) lr (" + _NUM + r") at sleep", a)
+                if not m: raise GenomeError(f"TRAITS: cannot read {a!r} (row 2b: TRAITS contrast head <n> lr <f> at sleep)")
+                g["declared"]["TRAITS"] = {"head": int(m.group(1)), "lr": float(m.group(2)), "when": "sleep"}
+            elif gene == "SURPRISE":
+                m = re.fullmatch(r"floor (" + _NUM + r")", a)
+                if not m: raise GenomeError(f"SURPRISE: cannot read {a!r} (row 1c: SURPRISE floor <f>)")
+                g["declared"]["SURPRISE"] = {"floor": float(m.group(1))}
+            elif gene == "CYCLE":
+                m = re.fullmatch(r"grow to (" + _NUM + r") nmax then consolidate", a)
+                if not m: raise GenomeError(f"CYCLE: cannot read {a!r} (row 7: CYCLE grow to <f> nmax then consolidate)")
+                g["declared"]["CYCLE"] = {"grow_to": float(m.group(1))}
+            elif gene == "FAST":
+                m = re.fullmatch(r"episodes (\d+) keys sight words surprise", a)
+                if not m: raise GenomeError(f"FAST: cannot read {a!r} (B3: FAST episodes <n> keys sight words surprise)")
+                g["declared"]["FAST"] = {"episodes": int(m.group(1)), "keys": ["sight", "words", "surprise"]}
+            elif gene == "SLEEP":
+                m = re.fullmatch(r"every (\d+) moments replay (\d+) by surprise", a)
+                if not m: raise GenomeError(f"SLEEP: cannot read {a!r} (B7: SLEEP every <n> moments replay <m> by surprise)")
+                g["declared"]["SLEEP"] = {"every": int(m.group(1)), "replay": int(m.group(2))}
+            elif gene == "PREDICT":
+                m = re.fullmatch(r"next glance; error scales delta (" + _NUM + r")\.\.(" + _NUM + r"); ranks replay; grades act", a)
+                if not m: raise GenomeError(f"PREDICT: cannot read {a!r} (B6: PREDICT next glance; error scales delta <lo>..<hi>; ranks replay; grades act)")
+                g["declared"]["PREDICT"] = {"delta_lo": float(m.group(1)), "delta_hi": float(m.group(2))}
+            elif gene == "FILE":
+                m = re.fullmatch(r"claim route decider due", a)
+                if not m: raise GenomeError(f"FILE: cannot read {a!r} (B6: FILE claim route decider due)")
+                g["declared"]["FILE"] = {"fields": ["claim", "route", "decider", "due"]}
+            elif gene == "CURIOSITY":
+                m = re.fullmatch(r"interests (\d+) operators recombine generalize specialize bridge", a)
+                if not m: raise GenomeError(f"CURIOSITY: cannot read {a!r} (row 8: CURIOSITY interests <n> operators recombine generalize specialize bridge)")
+                g["declared"]["CURIOSITY"] = {"interests": int(m.group(1)), "operators": ["recombine", "generalize", "specialize", "bridge"]}
+            elif gene == "PARK":
+                m = re.fullmatch(r"after (\d+) identical dead-ends reopen on new-sense", a)
+                if not m: raise GenomeError(f"PARK: cannot read {a!r} (B4: PARK after <n> identical dead-ends reopen on new-sense)")
+                g["declared"]["PARK"] = {"after": int(m.group(1))}
+            elif gene == "INDUCE":
+                m = re.fullmatch(r"rule from (\d+) episodes no counter", a)
+                if not m: raise GenomeError(f"INDUCE: cannot read {a!r} (row 4d: INDUCE rule from <n> episodes no counter)")
+                g["declared"]["INDUCE"] = {"from_episodes": int(m.group(1))}
+            elif gene == "DEDUCE":
+                m = re.fullmatch(r"one step", a)
+                if not m: raise GenomeError(f"DEDUCE: cannot read {a!r} (row 4d: DEDUCE one step)")
+                g["declared"]["DEDUCE"] = {"steps": 1}
+            elif gene == "BELIEF":
+                m = re.fullmatch(r"clash opens never overwrites", a)
+                if not m: raise GenomeError(f"BELIEF: cannot read {a!r} (row 4b: BELIEF clash opens never overwrites)")
+                g["declared"]["BELIEF"] = {"clash": "opens", "overwrite": False}
+            elif gene == "SENTENCE":
+                m = re.fullmatch(r"two-word frames is near under-judge", a)
+                if not m: raise GenomeError(f"SENTENCE: cannot read {a!r} (row 5b: SENTENCE two-word frames is near under-judge)")
+                g["declared"]["SENTENCE"] = {"frames": ["is", "near"], "judged": True}
+            elif gene == "WORLD":
+                m = re.fullmatch(r"drawn every (\d+) s arrivals every (\d+) h; folder ([A-Za-z0-9_./-]+); web (\d+) per hour by curiosity", a)
+                if not m: raise GenomeError(f"WORLD: cannot read {a!r} (row 8: WORLD drawn every <n> s arrivals every <h> h; folder <p>; web <k> per hour by curiosity)")
+                g["declared"]["WORLD"] = {"drawn_every_s": int(m.group(1)), "arrival_every_h": int(m.group(2)), "folder": m.group(3), "web_per_hour": int(m.group(4))}
+            elif gene == "HANDS":
+                m = re.fullmatch(r"jail ([A-Za-z0-9_./-]+)", a)
+                if not m: raise GenomeError(f"HANDS: cannot read {a!r} (row 6: HANDS jail <path>)")
+                g["declared"]["HANDS"] = {"jail": m.group(1)}
+            elif gene == "ASK":
+                m = re.fullmatch(r"what-is show is which next why", a)
+                if not m: raise GenomeError(f"ASK: cannot read {a!r} (§2.7: ASK what-is show is which next why)")
+                g["declared"]["ASK"] = {"verbs": ["what-is", "show", "is", "which", "next", "why"]}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:
@@ -182,12 +272,12 @@ def parse_genome(text: str) -> Genome:
     missing = [k for k in required if k not in g]
     if missing:
         raise GenomeError(f"genome lacks {missing}")
-    if set(g["areas"].keys()) != {"sight", "words"}:
-        raise GenomeError(f"rung 0 needs AREA sight and AREA words, got {sorted(g['areas'])}")
+    if not {"sight", "words"} <= set(g["areas"].keys()) or set(g["areas"].keys()) - {"sight", "words", "episodes"}:
+        raise GenomeError(f"needs AREA sight and AREA words (G4 §3 B1: episodes from fast is also allowed), got {sorted(g['areas'])}")
     if not g["stages"]:
         raise GenomeError("no STAGE genes")
-    if g["recall_k"] != 1:
-        raise GenomeError("rung 0 machinery runs RECALL k=1 only")
+    if g["recall_k"] < 1:
+        raise GenomeError("RECALL k must be >= 1")
     return Genome(text=text, **g)  # type: ignore[arg-type]
 
 
@@ -528,16 +618,32 @@ class Organism:
         lit = [int(i) for i in order[: self.g.kwta] if area.alive[i] and c[i] >= th]
         return lit, c
 
-    def recall(self, side: str, x: np.ndarray) -> Dict[str, object]:
+    def recall(self, side: str, x: np.ndarray, k: int = 1) -> Dict[str, object]:
         """RECALL k=1 + ABSTAIN: light one side (its resonating winners, §11 am. 6; none → NOVEL), read
         the strongest edge from any lit cell to the other side (none positive → NOEDGE); ABSTAIN when the
         strongest COMPETING edge — to a cell whose own answer leads back outside the lit set (§11 am. 5) —
-        is within the ratio (→ RATIO). Otherwise the answer cell. Never changes the organism."""
+        is within the ratio (→ RATIO). Otherwise the answer cell. Never changes the organism.
+
+        G4 §3 B1 (RECALL k=N): k > 1 additionally returns "ranked", the top-k distinct answer cells by
+        their strongest edge from a lit cell (ties by cell id) — it never changes which cell/reason is
+        returned. k=1 (the default) is byte-identical to G1's recall: `ranked(...)` returns {} so the
+        returned dict carries exactly the same keys as before this gene existed."""
         area, other = (self.sight, self.words) if side == "sight" else (self.words, self.sight)
         lit, c = self._lit(area, x)
+
+        def ranked(cands: List[Tuple[float, int, int]]) -> Dict[str, object]:
+            if k <= 1:
+                return {}
+            best_per: Dict[int, float] = {}
+            for v, j, _l in cands:
+                if j not in best_per or v > best_per[j]:
+                    best_per[j] = v
+            top = sorted(best_per.items(), key=lambda kv: (-kv[1], kv[0]))[:k]
+            return {"ranked": [(int(j), float(v)) for j, v in top]}
+
         if not lit:
             best_cos = float(c.max()) if len(c) else 0.0
-            return {"cell": None, "reason": "novel", "lit": None, "best": 0.0, "second": 0.0, "cos": best_cos}
+            return {"cell": None, "reason": "novel", "lit": None, "best": 0.0, "second": 0.0, "cos": best_cos, **ranked([])}
         lit_set = set(lit)
         cands: List[Tuple[float, int, int]] = []          # (edge, other cell, lit cell)
         for l in lit:
@@ -549,7 +655,7 @@ class Organism:
                 if v > 0.0:
                     cands.append((v, int(j), l))
         if not cands:
-            return {"cell": None, "reason": "noedge", "lit": lit[0], "best": 0.0, "second": 0.0, "cos": float(c[lit[0]])}
+            return {"cell": None, "reason": "noedge", "lit": lit[0], "best": 0.0, "second": 0.0, "cos": float(c[lit[0]]), **ranked(cands)}
         cands.sort(key=lambda z: (-z[0], z[1], z[2]))
         best, best_id, best_l = cands[0]
         second = 0.0
@@ -560,11 +666,11 @@ class Organism:
                 second = v
                 break
         if second > 0.0 and second / best > self.g.abstain_ratio:
-            return {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l])}
+            return {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), **ranked(cands)}
         close = self._margin_close(side, other, best_id, {l: float(c[l]) for l in lit})
         if close is not None:
-            return {"cell": None, "reason": "close", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), "margin": close}
-        return {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l])}
+            return {"cell": None, "reason": "close", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), "margin": close, **ranked(cands)}
+        return {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), **ranked(cands)}
 
     def _margin_close(self, side: str, other: Area, best_id: int, cos_of: Dict[int, float]) -> Optional[float]:
         """G3 §1 ABSTAIN margin: on the sight side, the best-answering lit cell's cosine must beat the best lit cell of a
