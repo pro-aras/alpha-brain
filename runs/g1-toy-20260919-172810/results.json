@@ -1,0 +1,3207 @@
+{
+ "stamp": "20260919-172810",
+ "kind": "g1-toy",
+ "genome_file": "G1.genome",
+ "genome": {
+  "theta_n": 0.95,
+  "misfires": 3,
+  "budget": 400,
+  "kwta": 5,
+  "lr": 0.05,
+  "prune_floor": 0.02,
+  "theta_m": 0.997,
+  "scale_every": 1000,
+  "stage1": 200,
+  "abstain_ratio": 0.85
+ },
+ "gaze": {
+  "fixations": 4,
+  "grid": 16,
+  "canvas": 128,
+  "glance": 32,
+  "ink": "contrast"
+ },
+ "retina": [
+  "thresh0.25",
+  "centre",
+  "tower:eye-tower-g2",
+  "sqrt",
+  "unit"
+ ],
+ "prereg": "docs/G1-PREREG.md",
+ "gate": {
+  "choice": {
+   "strict": {
+    "lo": 0.92879715457707,
+    "hi": 0.8168415933050929,
+    "met": false
+   },
+   "amended": {
+    "theta_n": 0.95,
+    "floor": 0.92879715457707,
+    "rule": "p95",
+    "met": true,
+    "conflated_pairs": [
+     [
+      "circle/diamond",
+      0.9901531064904757
+     ],
+     [
+      "circle/square",
+      0.986364526149083
+     ],
+     [
+      "square/diamond",
+      0.9821569103997234
+     ]
+    ]
+   },
+   "overlap": false,
+   "theta_n": 0.95,
+   "theta_m": 0.997
+  },
+  "plant": {
+   "p_res_at_theta_n": 0.5003081664098613,
+   "showings": 5
+  },
+  "ear": {
+   "max_between": 0.6249999999999999,
+   "median_between": 0.24999999999999994
+  },
+  "label": "toy first-fixation glances",
+  "bands": {
+   "within": {
+    "median": 0.950042730865748,
+    "p5": 0.8168415933050929,
+    "p95": 0.9940247589365604,
+    "n": 19470
+   },
+   "between": {
+    "median": 0.7035288753486375,
+    "p5": 0.4778453966580275,
+    "p95": 0.92879715457707,
+    "max": 0.9951859890056635,
+    "n": 30000
+   },
+   "closest_pair": {
+    "pair": "circle/diamond",
+    "p95": 0.9901531064904757
+   }
+  }
+ },
+ "streams": {
+  "dev": 660,
+  "arr2": 300,
+  "plant": 5,
+  "held_checked_disjoint": 380,
+  "planted_copy_caught": true,
+  "things": [
+   "circle",
+   "square",
+   "triangle",
+   "cross",
+   "ring",
+   "bar",
+   "dot",
+   "star",
+   "arrow",
+   "wave",
+   "diamond"
+  ]
+ },
+ "design": {
+  "label": "design",
+  "at_dev": {
+   "moments": 2640,
+   "cells_sight": 222,
+   "cells_words": 11,
+   "cells_born_sight": 230,
+   "cells_born_words": 11,
+   "edges_alive": 304,
+   "births_novelty_sight": 157,
+   "births_novelty_words": 11,
+   "births_error_sight": 73,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 178,
+   "edges_born": 601,
+   "edges_pruned": 289,
+   "cells_merged_sight": 8,
+   "cells_merged_words": 0,
+   "scale_events": 2,
+   "removed_for_disuse": 0
+  },
+  "hash_dev": "73ed625a84ac66ee39ff8efcac577d05b6ccb89de0df8f2705909108b92a65c7",
+  "ask_dev": {
+   "Q1": {
+    "acc": 0.8318181818181818,
+    "n": 220,
+    "correct": 183,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 20
+    },
+    "false_abstention": 0.09090909090909091,
+    "per_thing": {
+     "circle": 0.1,
+     "square": 0.3,
+     "triangle": 0.95,
+     "cross": 1.0,
+     "ring": 1.0,
+     "bar": 0.95,
+     "dot": 1.0,
+     "star": 1.0,
+     "arrow": 1.0,
+     "wave": 1.0,
+     "diamond": 0.85
+    },
+    "answers_from_multi_word_cells": 0
+   },
+   "Q2": {
+    "acc": 0.9090909090909091,
+    "n": 11,
+    "correct": 10,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 0
+    },
+    "detail": {
+     "circle": "circle",
+     "square": "square",
+     "triangle": "triangle",
+     "cross": "cross",
+     "ring": "ring",
+     "bar": "bar",
+     "dot": "dot",
+     "star": "star",
+     "arrow": "arrow",
+     "wave": "wave",
+     "diamond": "circle"
+    }
+   },
+   "Q3": {
+    "acc": 0.9136363636363637,
+    "n": 220,
+    "correct": 201,
+    "true_pairs_abstained": 11,
+    "ceiling": 0.9545454545454546
+   },
+   "Q4": {
+    "acc": 0.9863636363636363,
+    "n": 220,
+    "correct": 217,
+    "ties": 0
+   },
+   "Q5": {
+    "spiral": {
+     "abstain_rate": 0.95,
+     "n": 20,
+     "abstain": {
+      "novel": 19,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "answered_as": {
+      "ring": 1
+     }
+    }
+   },
+   "composite": 0.9102272727272727
+  },
+  "at_arr2": {
+   "moments": 3840,
+   "cells_sight": 348,
+   "cells_words": 16,
+   "cells_born_sight": 361,
+   "cells_born_words": 16,
+   "edges_alive": 460,
+   "births_novelty_sight": 237,
+   "births_novelty_words": 16,
+   "births_error_sight": 124,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 311,
+   "edges_born": 1053,
+   "edges_pruned": 580,
+   "cells_merged_sight": 13,
+   "cells_merged_words": 0,
+   "scale_events": 3,
+   "removed_for_disuse": 0
+  },
+  "ask_arr2": {
+   "Q1": {
+    "acc": 0.7772727272727272,
+    "n": 220,
+    "correct": 171,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 27
+    },
+    "false_abstention": 0.12272727272727273,
+    "per_thing": {
+     "circle": 0.05,
+     "square": 0.55,
+     "triangle": 0.6,
+     "cross": 1.0,
+     "ring": 1.0,
+     "bar": 0.95,
+     "dot": 1.0,
+     "star": 1.0,
+     "arrow": 1.0,
+     "wave": 1.0,
+     "diamond": 0.4
+    },
+    "answers_from_multi_word_cells": 0
+   },
+   "Q2": {
+    "acc": 0.8181818181818182,
+    "n": 11,
+    "correct": 9,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 1
+    },
+    "detail": {
+     "circle": "abstain:ratio",
+     "square": "square",
+     "triangle": "triangle",
+     "cross": "cross",
+     "ring": "ring",
+     "bar": "bar",
+     "dot": "dot",
+     "star": "star",
+     "arrow": "arrow",
+     "wave": "wave",
+     "diamond": "circle"
+    }
+   },
+   "Q3": {
+    "acc": 0.8909090909090909,
+    "n": 220,
+    "correct": 196,
+    "true_pairs_abstained": 13,
+    "ceiling": 0.9386363636363636
+   },
+   "Q4": {
+    "acc": 0.9863636363636363,
+    "n": 220,
+    "correct": 217,
+    "ties": 0
+   },
+   "Q5": {
+    "spiral": {
+     "abstain_rate": 0.95,
+     "n": 20,
+     "abstain": {
+      "novel": 19,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "answered_as": {
+      "ring": 1
+     }
+    }
+   },
+   "composite": 0.8681818181818182
+  },
+  "ask_arr2_new": {
+   "Q1": {
+    "acc": 0.87,
+    "n": 100,
+    "correct": 87,
+    "abstain": {
+     "novel": 0,
+     "noedge": 2,
+     "ratio": 7
+    },
+    "false_abstention": 0.09,
+    "per_thing": {
+     "moon": 1.0,
+     "house": 0.6,
+     "tree": 0.85,
+     "cup": 0.9,
+     "key": 1.0
+    },
+    "answers_from_multi_word_cells": 0
+   },
+   "Q2": {
+    "acc": 1.0,
+    "n": 5,
+    "correct": 5,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 0
+    },
+    "detail": {
+     "moon": "moon",
+     "house": "house",
+     "tree": "tree",
+     "cup": "cup",
+     "key": "key"
+    }
+   },
+   "Q3": {
+    "acc": 0.93,
+    "n": 100,
+    "correct": 93,
+    "true_pairs_abstained": 5,
+    "ceiling": 0.955
+   },
+   "Q4": {
+    "acc": 0.98,
+    "n": 100,
+    "correct": 98,
+    "ties": 2
+   },
+   "Q5": {
+    "spiral": {
+     "abstain_rate": 0.95,
+     "n": 20,
+     "abstain": {
+      "novel": 19,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "answered_as": {
+      "ring": 1
+     }
+    }
+   },
+   "composite": 0.9450000000000001
+  },
+  "hash_arr2": "c2244ea32779323b23edcfde2fcba5b9c03c0b66a4f919aa0c855e00c311baab",
+  "plant": {
+   "answered_rate": 0.6,
+   "abstain_rate": 0.4,
+   "n": 20,
+   "abstain": {
+    "novel": 8,
+    "noedge": 0,
+    "ratio": 0
+   },
+   "answered_as": {
+    "zog": 12
+   }
+  },
+  "null_plant": {
+   "answered_rate": 0.0,
+   "abstain_rate": 0.2,
+   "n": 20,
+   "abstain": {
+    "novel": 4,
+    "noedge": 0,
+    "ratio": 0
+   },
+   "answered_as": {
+    "ring": 16
+   }
+  },
+  "ask_final": {
+   "Q1": {
+    "acc": 0.7772727272727272,
+    "n": 220,
+    "correct": 171,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 27
+    },
+    "false_abstention": 0.12272727272727273,
+    "per_thing": {
+     "circle": 0.05,
+     "square": 0.55,
+     "triangle": 0.6,
+     "cross": 1.0,
+     "ring": 1.0,
+     "bar": 0.95,
+     "dot": 1.0,
+     "star": 1.0,
+     "arrow": 1.0,
+     "wave": 1.0,
+     "diamond": 0.4
+    },
+    "answers_from_multi_word_cells": 0
+   },
+   "Q2": {
+    "acc": 0.8181818181818182,
+    "n": 11,
+    "correct": 9,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 1
+    },
+    "detail": {
+     "circle": "abstain:ratio",
+     "square": "square",
+     "triangle": "triangle",
+     "cross": "cross",
+     "ring": "ring",
+     "bar": "bar",
+     "dot": "dot",
+     "star": "star",
+     "arrow": "arrow",
+     "wave": "wave",
+     "diamond": "circle"
+    }
+   },
+   "Q3": {
+    "acc": 0.8909090909090909,
+    "n": 220,
+    "correct": 196,
+    "true_pairs_abstained": 13,
+    "ceiling": 0.9386363636363636
+   },
+   "Q4": {
+    "acc": 0.9863636363636363,
+    "n": 220,
+    "correct": 217,
+    "ties": 0
+   },
+   "Q5": {
+    "spiral": {
+     "abstain_rate": 0.95,
+     "n": 20,
+     "abstain": {
+      "novel": 19,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "answered_as": {
+      "ring": 1
+     }
+    }
+   },
+   "composite": 0.8681818181818182
+  },
+  "at_final": {
+   "moments": 3860,
+   "cells_sight": 357,
+   "cells_words": 17,
+   "cells_born_sight": 370,
+   "cells_born_words": 17,
+   "edges_alive": 469,
+   "births_novelty_sight": 246,
+   "births_novelty_words": 17,
+   "births_error_sight": 124,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 313,
+   "edges_born": 1062,
+   "edges_pruned": 580,
+   "cells_merged_sight": 13,
+   "cells_merged_words": 0,
+   "scale_events": 3,
+   "removed_for_disuse": 0
+  },
+  "refusals_by_arrival": [
+   0,
+   0,
+   0
+  ],
+  "hash_final": "ecc09a70426e877a6cc8669a7a95d329e177a1109262fd3efe55f1e0269f36cf",
+  "ledger_corruption_hash_unchanged": true,
+  "multi_thing_sight_cells": 0,
+  "edges_cross": {
+   "born": 555,
+   "pruned": 368,
+   "born_total": 1062,
+   "pruned_total": 580
+  },
+  "cells_per_thing": {
+   "circle": 29,
+   "square": 37,
+   "triangle": 25,
+   "cross": 31,
+   "ring": 25,
+   "bar": 7,
+   "dot": 9,
+   "star": 15,
+   "arrow": 10,
+   "wave": 13,
+   "diamond": 21,
+   "moon": 7,
+   "house": 42,
+   "tree": 30,
+   "cup": 39,
+   "key": 8
+  },
+  "births_by_glance": {
+   "on_thing": 349,
+   "off_thing": 21,
+   "moments_on": 3738,
+   "moments_off": 122
+  },
+  "seconds": 1.91
+ },
+ "replay_identical": true,
+ "design_hash": "ecc09a70426e877a6cc8669a7a95d329e177a1109262fd3efe55f1e0269f36cf",
+ "twins": {
+  "T-random-gaze": {
+   "label": "T-random-gaze",
+   "at_dev": {
+    "moments": 2640,
+    "cells_sight": 389,
+    "cells_words": 11,
+    "cells_born_sight": 389,
+    "cells_born_words": 11,
+    "edges_alive": 339,
+    "births_novelty_sight": 389,
+    "births_novelty_words": 11,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 1962,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 33,
+    "edges_born": 409,
+    "edges_pruned": 70,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 2,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "945bcd7edb82bae42dce9a35c69208dc9b897d7331036a81647d5b17fcb6147f",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.1,
+     "n": 220,
+     "correct": 22,
+     "abstain": {
+      "novel": 143,
+      "noedge": 7,
+      "ratio": 12
+     },
+     "false_abstention": 0.7363636363636363,
+     "per_thing": {
+      "circle": 0.15,
+      "square": 0.1,
+      "triangle": 0.1,
+      "cross": 0.1,
+      "ring": 0.0,
+      "bar": 0.1,
+      "dot": 0.2,
+      "star": 0.1,
+      "arrow": 0.05,
+      "wave": 0.15,
+      "diamond": 0.05
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.45454545454545453,
+     "n": 11,
+     "correct": 5,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "detail": {
+      "circle": "square",
+      "square": "bar",
+      "triangle": "triangle",
+      "cross": "cross",
+      "ring": "bar",
+      "bar": "bar",
+      "dot": "dot",
+      "star": "star",
+      "arrow": "bar",
+      "wave": "star",
+      "diamond": "square"
+     }
+    },
+    "Q3": {
+     "acc": 0.5590909090909091,
+     "n": 220,
+     "correct": 123,
+     "true_pairs_abstained": 77,
+     "ceiling": 0.6318181818181818
+    },
+    "Q4": {
+     "acc": 0.25,
+     "n": 220,
+     "correct": 55,
+     "ties": 138
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.9,
+      "n": 20,
+      "abstain": {
+       "novel": 17,
+       "noedge": 0,
+       "ratio": 1
+      },
+      "answered_as": {
+       "wave": 1,
+       "star": 1
+      }
+     }
+    },
+    "composite": 0.34090909090909094
+   },
+   "at_arr2": {
+    "moments": 3840,
+    "cells_sight": 784,
+    "cells_words": 16,
+    "cells_born_sight": 784,
+    "cells_born_words": 16,
+    "edges_alive": 549,
+    "births_novelty_sight": 779,
+    "births_novelty_words": 16,
+    "births_error_sight": 5,
+    "births_error_words": 0,
+    "births_refused_budget": 2591,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 71,
+    "edges_born": 991,
+    "edges_pruned": 442,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 3,
+    "removed_for_disuse": 0
+   },
+   "ask_arr2": {
+    "Q1": {
+     "acc": 0.05909090909090909,
+     "n": 220,
+     "correct": 13,
+     "abstain": {
+      "novel": 115,
+      "noedge": 15,
+      "ratio": 22
+     },
+     "false_abstention": 0.6909090909090909,
+     "per_thing": {
+      "circle": 0.1,
+      "square": 0.0,
+      "triangle": 0.1,
+      "cross": 0.05,
+      "ring": 0.0,
+      "bar": 0.05,
+      "dot": 0.15,
+      "star": 0.1,
+      "arrow": 0.05,
+      "wave": 0.0,
+      "diamond": 0.05
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.36363636363636365,
+     "n": 11,
+     "correct": 4,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 1
+     },
+     "detail": {
+      "circle": "square",
+      "square": "bar",
+      "triangle": "triangle",
+      "cross": "cross",
+      "ring": "bar",
+      "bar": "bar",
+      "dot": "dot",
+      "star": "abstain:ratio",
+      "arrow": "bar",
+      "wave": "star",
+      "diamond": "square"
+     }
+    },
+    "Q3": {
+     "acc": 0.5318181818181819,
+     "n": 220,
+     "correct": 117,
+     "true_pairs_abstained": 70,
+     "ceiling": 0.6545454545454545
+    },
+    "Q4": {
+     "acc": 0.25,
+     "n": 220,
+     "correct": 55,
+     "ties": 140
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.75,
+      "n": 20,
+      "abstain": {
+       "novel": 13,
+       "noedge": 1,
+       "ratio": 1
+      },
+      "answered_as": {
+       "wave": 1,
+       "tree": 2,
+       "key": 1,
+       "house": 1
+      }
+     }
+    },
+    "composite": 0.30113636363636365
+   },
+   "ask_arr2_new": {
+    "Q1": {
+     "acc": 0.11,
+     "n": 100,
+     "correct": 11,
+     "abstain": {
+      "novel": 47,
+      "noedge": 4,
+      "ratio": 11
+     },
+     "false_abstention": 0.62,
+     "per_thing": {
+      "moon": 0.3,
+      "house": 0.05,
+      "tree": 0.1,
+      "cup": 0.0,
+      "key": 0.1
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.2,
+     "n": 5,
+     "correct": 1,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 1
+     },
+     "detail": {
+      "moon": "moon",
+      "house": "wave",
+      "tree": "abstain:ratio",
+      "cup": "circle",
+      "key": "wave"
+     }
+    },
+    "Q3": {
+     "acc": 0.54,
+     "n": 100,
+     "correct": 54,
+     "true_pairs_abstained": 28,
+     "ceiling": 0.69
+    },
+    "Q4": {
+     "acc": 0.28,
+     "n": 100,
+     "correct": 28,
+     "ties": 57
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.75,
+      "n": 20,
+      "abstain": {
+       "novel": 13,
+       "noedge": 1,
+       "ratio": 1
+      },
+      "answered_as": {
+       "wave": 1,
+       "tree": 2,
+       "key": 1,
+       "house": 1
+      }
+     }
+    },
+    "composite": 0.28250000000000003
+   },
+   "hash_arr2": "770b6c4882788bda1bccc8a1d386dc7bbe5aadccd2b3ea93cdd5ab5794b5ea5c",
+   "plant": {
+    "answered_rate": 0.0,
+    "abstain_rate": 0.65,
+    "n": 20,
+    "abstain": {
+     "novel": 11,
+     "noedge": 0,
+     "ratio": 2
+    },
+    "answered_as": {
+     "wave": 3,
+     "tree": 1,
+     "moon": 1,
+     "key": 1,
+     "bar": 1
+    }
+   },
+   "null_plant": {
+    "answered_rate": 0.0,
+    "abstain_rate": 0.65,
+    "n": 20,
+    "abstain": {
+     "novel": 10,
+     "noedge": 1,
+     "ratio": 2
+    },
+    "answered_as": {
+     "tree": 2,
+     "house": 2,
+     "moon": 1,
+     "triangle": 1,
+     "cup": 1
+    }
+   },
+   "ask_final": {
+    "Q1": {
+     "acc": 0.05909090909090909,
+     "n": 220,
+     "correct": 13,
+     "abstain": {
+      "novel": 113,
+      "noedge": 15,
+      "ratio": 22
+     },
+     "false_abstention": 0.6818181818181818,
+     "per_thing": {
+      "circle": 0.1,
+      "square": 0.0,
+      "triangle": 0.1,
+      "cross": 0.05,
+      "ring": 0.0,
+      "bar": 0.05,
+      "dot": 0.15,
+      "star": 0.1,
+      "arrow": 0.05,
+      "wave": 0.0,
+      "diamond": 0.05
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.36363636363636365,
+     "n": 11,
+     "correct": 4,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 1
+     },
+     "detail": {
+      "circle": "square",
+      "square": "bar",
+      "triangle": "triangle",
+      "cross": "cross",
+      "ring": "bar",
+      "bar": "bar",
+      "dot": "dot",
+      "star": "abstain:ratio",
+      "arrow": "bar",
+      "wave": "star",
+      "diamond": "square"
+     }
+    },
+    "Q3": {
+     "acc": 0.5318181818181819,
+     "n": 220,
+     "correct": 117,
+     "true_pairs_abstained": 69,
+     "ceiling": 0.6590909090909092
+    },
+    "Q4": {
+     "acc": 0.25,
+     "n": 220,
+     "correct": 55,
+     "ties": 140
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.75,
+      "n": 20,
+      "abstain": {
+       "novel": 13,
+       "noedge": 1,
+       "ratio": 1
+      },
+      "answered_as": {
+       "wave": 1,
+       "tree": 2,
+       "key": 1,
+       "house": 1
+      }
+     }
+    },
+    "composite": 0.30113636363636365
+   },
+   "at_final": {
+    "moments": 3860,
+    "cells_sight": 800,
+    "cells_words": 17,
+    "cells_born_sight": 800,
+    "cells_born_words": 17,
+    "edges_alive": 568,
+    "births_novelty_sight": 795,
+    "births_novelty_words": 17,
+    "births_error_sight": 5,
+    "births_error_words": 0,
+    "births_refused_budget": 2591,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 72,
+    "edges_born": 1010,
+    "edges_pruned": 442,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 3,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    1962,
+    629,
+    0
+   ],
+   "hash_final": "3ba27f7a0dcc21452d4a88ac71130a9a0f39e42b03fd660607e0ca8165502560",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 0,
+   "edges_cross": {
+    "born": 370,
+    "pruned": 60,
+    "born_total": 1010,
+    "pruned_total": 442
+   },
+   "cells_per_thing": {
+    "circle": 35,
+    "square": 56,
+    "triangle": 30,
+    "cross": 42,
+    "ring": 18,
+    "bar": 46,
+    "dot": 34,
+    "star": 36,
+    "arrow": 30,
+    "wave": 24,
+    "diamond": 38,
+    "moon": 76,
+    "house": 81,
+    "tree": 56,
+    "cup": 105,
+    "key": 77
+   },
+   "births_by_glance": {
+    "on_thing": 19,
+    "off_thing": 781,
+    "moments_on": 143,
+    "moments_off": 3717
+   },
+   "seconds": 1.52
+  },
+  "T-one-glance": {
+   "label": "T-one-glance",
+   "at_dev": {
+    "moments": 660,
+    "cells_sight": 54,
+    "cells_words": 11,
+    "cells_born_sight": 90,
+    "cells_born_words": 11,
+    "edges_alive": 157,
+    "births_novelty_sight": 4,
+    "births_novelty_words": 11,
+    "births_error_sight": 86,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 8,
+    "edges_born": 283,
+    "edges_pruned": 71,
+    "cells_merged_sight": 36,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "f4d1aebb25a34c8dc2c32e51dca39427d9f3e8a0b84706bbf0e1f812920102a1",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.6227272727272727,
+     "n": 220,
+     "correct": 137,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 27
+     },
+     "false_abstention": 0.12272727272727273,
+     "per_thing": {
+      "circle": 0.0,
+      "square": 1.0,
+      "triangle": 0.95,
+      "cross": 0.1,
+      "ring": 1.0,
+      "bar": 1.0,
+      "dot": 1.0,
+      "star": 0.75,
+      "arrow": 0.0,
+      "wave": 0.7,
+      "diamond": 0.35
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.7272727272727273,
+     "n": 11,
+     "correct": 8,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 1
+     },
+     "detail": {
+      "circle": "diamond",
+      "square": "square",
+      "triangle": "triangle",
+      "cross": "cross",
+      "ring": "ring",
+      "bar": "arrow",
+      "dot": "dot",
+      "star": "star",
+      "arrow": "abstain:ratio",
+      "wave": "wave",
+      "diamond": "diamond"
+     }
+    },
+    "Q3": {
+     "acc": 0.8,
+     "n": 220,
+     "correct": 176,
+     "true_pairs_abstained": 16,
+     "ceiling": 0.9386363636363636
+    },
+    "Q4": {
+     "acc": 0.9318181818181818,
+     "n": 220,
+     "correct": 205,
+     "ties": 13
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.0,
+      "n": 20,
+      "abstain": {
+       "novel": 0,
+       "noedge": 0,
+       "ratio": 0
+      },
+      "answered_as": {
+       "square": 15,
+       "ring": 3,
+       "diamond": 2
+      }
+     }
+    },
+    "composite": 0.7704545454545455
+   },
+   "at_arr2": {
+    "moments": 960,
+    "cells_sight": 85,
+    "cells_words": 16,
+    "cells_born_sight": 146,
+    "cells_born_words": 16,
+    "edges_alive": 230,
+    "births_novelty_sight": 4,
+    "births_novelty_words": 16,
+    "births_error_sight": 142,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 11,
+    "edges_born": 411,
+    "edges_pruned": 100,
+    "cells_merged_sight": 61,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "ask_arr2": {
+    "Q1": {
+     "acc": 0.30454545454545456,
+     "n": 220,
+     "correct": 67,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 38
+     },
+     "false_abstention": 0.17272727272727273,
+     "per_thing": {
+      "circle": 0.0,
+      "square": 0.25,
+      "triangle": 0.65,
+      "cross": 0.0,
+      "ring": 0.85,
+      "bar": 0.15,
+      "dot": 1.0,
+      "star": 0.05,
+      "arrow": 0.0,
+      "wave": 0.0,
+      "diamond": 0.4
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.9090909090909091,
+     "n": 11,
+     "correct": 10,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "detail": {
+      "circle": "diamond",
+      "square": "square",
+      "triangle": "triangle",
+      "cross": "cross",
+      "ring": "ring",
+      "bar": "bar",
+      "dot": "dot",
+      "star": "star",
+      "arrow": "arrow",
+      "wave": "wave",
+      "diamond": "diamond"
+     }
+    },
+    "Q3": {
+     "acc": 0.6454545454545455,
+     "n": 220,
+     "correct": 142,
+     "true_pairs_abstained": 21,
+     "ceiling": 0.9136363636363636
+    },
+    "Q4": {
+     "acc": 0.9454545454545454,
+     "n": 220,
+     "correct": 208,
+     "ties": 4
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.3,
+      "n": 20,
+      "abstain": {
+       "novel": 0,
+       "noedge": 0,
+       "ratio": 6
+      },
+      "answered_as": {
+       "square": 8,
+       "house": 3,
+       "diamond": 2,
+       "ring": 1
+      }
+     }
+    },
+    "composite": 0.7011363636363637
+   },
+   "ask_arr2_new": {
+    "Q1": {
+     "acc": 0.89,
+     "n": 100,
+     "correct": 89,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 6
+     },
+     "false_abstention": 0.06,
+     "per_thing": {
+      "moon": 1.0,
+      "house": 0.95,
+      "tree": 0.5,
+      "cup": 1.0,
+      "key": 1.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 1.0,
+     "n": 5,
+     "correct": 5,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "detail": {
+      "moon": "moon",
+      "house": "house",
+      "tree": "tree",
+      "cup": "cup",
+      "key": "key"
+     }
+    },
+    "Q3": {
+     "acc": 0.94,
+     "n": 100,
+     "correct": 94,
+     "true_pairs_abstained": 3,
+     "ceiling": 0.97
+    },
+    "Q4": {
+     "acc": 0.97,
+     "n": 100,
+     "correct": 97,
+     "ties": 2
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.3,
+      "n": 20,
+      "abstain": {
+       "novel": 0,
+       "noedge": 0,
+       "ratio": 6
+      },
+      "answered_as": {
+       "square": 8,
+       "house": 3,
+       "diamond": 2,
+       "ring": 1
+      }
+     }
+    },
+    "composite": 0.95
+   },
+   "hash_arr2": "f817bf919a3f07c1c4667e1ec13621adbad4c3ac17b2cd38a25028bf3c040bba",
+   "plant": {
+    "answered_rate": 0.0,
+    "abstain_rate": 0.1,
+    "n": 20,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 2
+    },
+    "answered_as": {
+     "star": 4,
+     "moon": 2,
+     "dot": 6,
+     "triangle": 5,
+     "key": 1
+    }
+   },
+   "null_plant": {
+    "answered_rate": 0.0,
+    "abstain_rate": 0.2,
+    "n": 20,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 4
+    },
+    "answered_as": {
+     "house": 4,
+     "ring": 9,
+     "diamond": 2,
+     "dot": 1
+    }
+   },
+   "ask_final": {
+    "Q1": {
+     "acc": 0.2909090909090909,
+     "n": 220,
+     "correct": 64,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 44
+     },
+     "false_abstention": 0.2,
+     "per_thing": {
+      "circle": 0.0,
+      "square": 0.25,
+      "triangle": 0.5,
+      "cross": 0.0,
+      "ring": 0.85,
+      "bar": 0.15,
+      "dot": 1.0,
+      "star": 0.05,
+      "arrow": 0.0,
+      "wave": 0.0,
+      "diamond": 0.4
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.9090909090909091,
+     "n": 11,
+     "correct": 10,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "detail": {
+      "circle": "diamond",
+      "square": "square",
+      "triangle": "triangle",
+      "cross": "cross",
+      "ring": "ring",
+      "bar": "bar",
+      "dot": "dot",
+      "star": "star",
+      "arrow": "arrow",
+      "wave": "wave",
+      "diamond": "diamond"
+     }
+    },
+    "Q3": {
+     "acc": 0.6409090909090909,
+     "n": 220,
+     "correct": 141,
+     "true_pairs_abstained": 24,
+     "ceiling": 0.9
+    },
+    "Q4": {
+     "acc": 0.9454545454545454,
+     "n": 220,
+     "correct": 208,
+     "ties": 4
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.3,
+      "n": 20,
+      "abstain": {
+       "novel": 0,
+       "noedge": 0,
+       "ratio": 6
+      },
+      "answered_as": {
+       "square": 8,
+       "house": 3,
+       "diamond": 2,
+       "ring": 1
+      }
+     }
+    },
+    "composite": 0.696590909090909
+   },
+   "at_final": {
+    "moments": 965,
+    "cells_sight": 87,
+    "cells_words": 17,
+    "cells_born_sight": 149,
+    "cells_born_words": 17,
+    "edges_alive": 245,
+    "births_novelty_sight": 4,
+    "births_novelty_words": 17,
+    "births_error_sight": 145,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 11,
+    "edges_born": 428,
+    "edges_pruned": 101,
+    "cells_merged_sight": 62,
+    "cells_merged_words": 0,
+    "scale_events": 0,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    0,
+    0,
+    0
+   ],
+   "hash_final": "5a1ba59d27a5b909baa6fd09de974dcf9d82dd2d84868a84ebb6e721c75cc2b7",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 1,
+   "edges_cross": {
+    "born": 293,
+    "pruned": 100,
+    "born_total": 428,
+    "pruned_total": 101
+   },
+   "cells_per_thing": {
+    "circle": 2,
+    "square": 3,
+    "triangle": 6,
+    "cross": 9,
+    "ring": 5,
+    "bar": 3,
+    "dot": 3,
+    "star": 3,
+    "arrow": 7,
+    "wave": 6,
+    "diamond": 5,
+    "moon": 4,
+    "house": 7,
+    "tree": 7,
+    "cup": 6,
+    "key": 8
+   },
+   "seconds": 0.67
+  },
+  "T-shuffle-5": {
+   "label": "T-shuffle-5",
+   "at_dev": {
+    "moments": 2640,
+    "cells_sight": 287,
+    "cells_words": 11,
+    "cells_born_sight": 389,
+    "cells_born_words": 11,
+    "edges_alive": 837,
+    "births_novelty_sight": 132,
+    "births_novelty_words": 11,
+    "births_error_sight": 257,
+    "births_error_words": 0,
+    "births_refused_budget": 121,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 416,
+    "edges_born": 3354,
+    "edges_pruned": 2409,
+    "cells_merged_sight": 102,
+    "cells_merged_words": 0,
+    "scale_events": 2,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "d9c8cd96709de6c4d316f49dfa6143371c46f9f34af8ddeb783d36c9f7a4f65b",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.045454545454545456,
+     "n": 220,
+     "correct": 10,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 51
+     },
+     "false_abstention": 0.2318181818181818,
+     "per_thing": {
+      "circle": 0.0,
+      "square": 0.3,
+      "triangle": 0.0,
+      "cross": 0.2,
+      "ring": 0.0,
+      "bar": 0.0,
+      "dot": 0.0,
+      "star": 0.0,
+      "arrow": 0.0,
+      "wave": 0.0,
+      "diamond": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.09090909090909091,
+     "n": 11,
+     "correct": 1,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 2
+     },
+     "detail": {
+      "circle": "triangle",
+      "square": "bar",
+      "triangle": "star",
+      "cross": "square",
+      "ring": "star",
+      "bar": "abstain:ratio",
+      "dot": "dot",
+      "star": "abstain:ratio",
+      "arrow": "circle",
+      "wave": "bar",
+      "diamond": "cross"
+     }
+    },
+    "Q3": {
+     "acc": 0.4909090909090909,
+     "n": 220,
+     "correct": 108,
+     "true_pairs_abstained": 29,
+     "ceiling": 0.884090909090909
+    },
+    "Q4": {
+     "acc": 0.3181818181818182,
+     "n": 220,
+     "correct": 70,
+     "ties": 75
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.95,
+      "n": 20,
+      "abstain": {
+       "novel": 19,
+       "noedge": 0,
+       "ratio": 0
+      },
+      "answered_as": {
+       "cross": 1
+      }
+     }
+    },
+    "composite": 0.23636363636363633
+   },
+   "at_arr2": {
+    "moments": 3840,
+    "cells_sight": 386,
+    "cells_words": 16,
+    "cells_born_sight": 491,
+    "cells_born_words": 16,
+    "edges_alive": 897,
+    "births_novelty_sight": 213,
+    "births_novelty_words": 16,
+    "births_error_sight": 278,
+    "births_error_words": 0,
+    "births_refused_budget": 121,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 544,
+    "edges_born": 3792,
+    "edges_pruned": 2784,
+    "cells_merged_sight": 105,
+    "cells_merged_words": 0,
+    "scale_events": 3,
+    "removed_for_disuse": 0
+   },
+   "ask_arr2": {
+    "Q1": {
+     "acc": 0.02727272727272727,
+     "n": 220,
+     "correct": 6,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 51
+     },
+     "false_abstention": 0.2318181818181818,
+     "per_thing": {
+      "circle": 0.0,
+      "square": 0.1,
+      "triangle": 0.0,
+      "cross": 0.2,
+      "ring": 0.0,
+      "bar": 0.0,
+      "dot": 0.0,
+      "star": 0.0,
+      "arrow": 0.0,
+      "wave": 0.0,
+      "diamond": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.09090909090909091,
+     "n": 11,
+     "correct": 1,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 3
+     },
+     "detail": {
+      "circle": "bar",
+      "square": "bar",
+      "triangle": "star",
+      "cross": "bar",
+      "ring": "star",
+      "bar": "abstain:ratio",
+      "dot": "dot",
+      "star": "abstain:ratio",
+      "arrow": "abstain:ratio",
+      "wave": "bar",
+      "diamond": "cross"
+     }
+    },
+    "Q3": {
+     "acc": 0.4863636363636364,
+     "n": 220,
+     "correct": 107,
+     "true_pairs_abstained": 23,
+     "ceiling": 0.884090909090909
+    },
+    "Q4": {
+     "acc": 0.32727272727272727,
+     "n": 220,
+     "correct": 72,
+     "ties": 78
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.95,
+      "n": 20,
+      "abstain": {
+       "novel": 19,
+       "noedge": 0,
+       "ratio": 0
+      },
+      "answered_as": {
+       "cross": 1
+      }
+     }
+    },
+    "composite": 0.23295454545454547
+   },
+   "ask_arr2_new": {
+    "Q1": {
+     "acc": 0.93,
+     "n": 100,
+     "correct": 93,
+     "abstain": {
+      "novel": 0,
+      "noedge": 2,
+      "ratio": 3
+     },
+     "false_abstention": 0.05,
+     "per_thing": {
+      "moon": 1.0,
+      "house": 0.8,
+      "tree": 0.95,
+      "cup": 0.9,
+      "key": 1.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 1.0,
+     "n": 5,
+     "correct": 5,
+     "abstain": {
+      "novel": 0,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "detail": {
+      "moon": "moon",
+      "house": "house",
+      "tree": "tree",
+      "cup": "cup",
+      "key": "key"
+     }
+    },
+    "Q3": {
+     "acc": 0.96,
+     "n": 100,
+     "correct": 96,
+     "true_pairs_abstained": 3,
+     "ceiling": 0.975
+    },
+    "Q4": {
+     "acc": 0.98,
+     "n": 100,
+     "correct": 98,
+     "ties": 2
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 0.95,
+      "n": 20,
+      "abstain": {
+       "novel": 19,
+       "noedge": 0,
+       "ratio": 0
+      },
+      "answered_as": {
+       "cross": 1
+      }
+     }
+    },
+    "composite": 0.9675
+   },
+   "hash_arr2": "af01ee6ae2ec7aee9bd6b977818d6cb3515496821df1f2866b6f0fbdf414e5f4",
+   "at_final": {
+    "moments": 3840,
+    "cells_sight": 386,
+    "cells_words": 16,
+    "cells_born_sight": 491,
+    "cells_born_words": 16,
+    "edges_alive": 897,
+    "births_novelty_sight": 213,
+    "births_novelty_words": 16,
+    "births_error_sight": 278,
+    "births_error_words": 0,
+    "births_refused_budget": 121,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 544,
+    "edges_born": 3792,
+    "edges_pruned": 2784,
+    "cells_merged_sight": 105,
+    "cells_merged_words": 0,
+    "scale_events": 3,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    121,
+    0
+   ],
+   "hash_final": "af01ee6ae2ec7aee9bd6b977818d6cb3515496821df1f2866b6f0fbdf414e5f4",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 0,
+   "edges_cross": {
+    "born": 3399,
+    "pruned": 2550,
+    "born_total": 3792,
+    "pruned_total": 2784
+   },
+   "cells_per_thing": {
+    "circle": 25,
+    "square": 31,
+    "triangle": 33,
+    "cross": 27,
+    "ring": 33,
+    "bar": 20,
+    "dot": 15,
+    "star": 28,
+    "arrow": 22,
+    "wave": 25,
+    "diamond": 28,
+    "moon": 7,
+    "house": 20,
+    "tree": 26,
+    "cup": 39,
+    "key": 7
+   },
+   "births_by_glance": {
+    "on_thing": 471,
+    "off_thing": 20,
+    "moments_on": 3720,
+    "moments_off": 120
+   },
+   "seconds": 2.12
+  },
+  "T-frozen": {
+   "label": "T-frozen",
+   "at_dev": {
+    "moments": 2640,
+    "cells_sight": 6,
+    "cells_words": 4,
+    "cells_born_sight": 6,
+    "cells_born_words": 4,
+    "edges_alive": 7,
+    "births_novelty_sight": 6,
+    "births_novelty_words": 4,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 3667,
+    "births_refused_redundant": 4,
+    "edges_born": 8,
+    "edges_pruned": 1,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 2,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "d5fcf7ae39a288f9ed73bfbd482f459f74e9398fb546468c91844d6b8abe9aa8",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.17272727272727273,
+     "n": 220,
+     "correct": 38,
+     "abstain": {
+      "novel": 146,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "false_abstention": 0.6636363636363637,
+     "per_thing": {
+      "circle": 0.0,
+      "square": 0.0,
+      "triangle": 0.0,
+      "cross": 0.0,
+      "ring": 0.0,
+      "bar": 0.7,
+      "dot": 0.0,
+      "star": 0.2,
+      "arrow": 0.5,
+      "wave": 0.0,
+      "diamond": 0.5
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.36363636363636365,
+     "n": 11,
+     "correct": 4,
+     "abstain": {
+      "novel": 7,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "detail": {
+      "circle": "abstain:novel",
+      "square": "abstain:novel",
+      "triangle": "abstain:novel",
+      "cross": "abstain:novel",
+      "ring": "abstain:novel",
+      "bar": "bar",
+      "dot": "abstain:novel",
+      "star": "star",
+      "arrow": "arrow",
+      "wave": "abstain:novel",
+      "diamond": "diamond"
+     }
+    },
+    "Q3": {
+     "acc": 0.5863636363636363,
+     "n": 220,
+     "correct": 129,
+     "true_pairs_abstained": 73,
+     "ceiling": 0.6681818181818182
+    },
+    "Q4": {
+     "acc": 0.17727272727272728,
+     "n": 220,
+     "correct": 39,
+     "ties": 178
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 1.0,
+      "n": 20,
+      "abstain": {
+       "novel": 20,
+       "noedge": 0,
+       "ratio": 0
+      },
+      "answered_as": {}
+     }
+    },
+    "composite": 0.32499999999999996
+   },
+   "at_arr2": {
+    "moments": 3840,
+    "cells_sight": 6,
+    "cells_words": 4,
+    "cells_born_sight": 6,
+    "cells_born_words": 4,
+    "edges_alive": 7,
+    "births_novelty_sight": 6,
+    "births_novelty_words": 4,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 5987,
+    "births_refused_redundant": 4,
+    "edges_born": 8,
+    "edges_pruned": 1,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 3,
+    "removed_for_disuse": 0
+   },
+   "ask_arr2": {
+    "Q1": {
+     "acc": 0.17272727272727273,
+     "n": 220,
+     "correct": 38,
+     "abstain": {
+      "novel": 146,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "false_abstention": 0.6636363636363637,
+     "per_thing": {
+      "circle": 0.0,
+      "square": 0.0,
+      "triangle": 0.0,
+      "cross": 0.0,
+      "ring": 0.0,
+      "bar": 0.7,
+      "dot": 0.0,
+      "star": 0.2,
+      "arrow": 0.5,
+      "wave": 0.0,
+      "diamond": 0.5
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.36363636363636365,
+     "n": 11,
+     "correct": 4,
+     "abstain": {
+      "novel": 7,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "detail": {
+      "circle": "abstain:novel",
+      "square": "abstain:novel",
+      "triangle": "abstain:novel",
+      "cross": "abstain:novel",
+      "ring": "abstain:novel",
+      "bar": "bar",
+      "dot": "abstain:novel",
+      "star": "star",
+      "arrow": "arrow",
+      "wave": "abstain:novel",
+      "diamond": "diamond"
+     }
+    },
+    "Q3": {
+     "acc": 0.5863636363636363,
+     "n": 220,
+     "correct": 129,
+     "true_pairs_abstained": 73,
+     "ceiling": 0.6681818181818182
+    },
+    "Q4": {
+     "acc": 0.17727272727272728,
+     "n": 220,
+     "correct": 39,
+     "ties": 178
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 1.0,
+      "n": 20,
+      "abstain": {
+       "novel": 20,
+       "noedge": 0,
+       "ratio": 0
+      },
+      "answered_as": {}
+     }
+    },
+    "composite": 0.32499999999999996
+   },
+   "ask_arr2_new": {
+    "Q1": {
+     "acc": 0.0,
+     "n": 100,
+     "correct": 0,
+     "abstain": {
+      "novel": 91,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "false_abstention": 0.91,
+     "per_thing": {
+      "moon": 0.0,
+      "house": 0.0,
+      "tree": 0.0,
+      "cup": 0.0,
+      "key": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.0,
+     "n": 5,
+     "correct": 0,
+     "abstain": {
+      "novel": 5,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "detail": {
+      "moon": "abstain:novel",
+      "house": "abstain:novel",
+      "tree": "abstain:novel",
+      "cup": "abstain:novel",
+      "key": "abstain:novel"
+     }
+    },
+    "Q3": {
+     "acc": 0.5,
+     "n": 100,
+     "correct": 50,
+     "true_pairs_abstained": 45,
+     "ceiling": 0.5449999999999999
+    },
+    "Q4": {
+     "acc": 0.0,
+     "n": 100,
+     "correct": 0,
+     "ties": 100
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 1.0,
+      "n": 20,
+      "abstain": {
+       "novel": 20,
+       "noedge": 0,
+       "ratio": 0
+      },
+      "answered_as": {}
+     }
+    },
+    "composite": 0.125
+   },
+   "hash_arr2": "e0c7ce9503c95b6c56af095f365e30c8380539e213a3672f36e7211e0fc2478f",
+   "at_final": {
+    "moments": 3840,
+    "cells_sight": 6,
+    "cells_words": 4,
+    "cells_born_sight": 6,
+    "cells_born_words": 4,
+    "edges_alive": 7,
+    "births_novelty_sight": 6,
+    "births_novelty_words": 4,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 5987,
+    "births_refused_redundant": 4,
+    "edges_born": 8,
+    "edges_pruned": 1,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 3,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    0,
+    0
+   ],
+   "hash_final": "e0c7ce9503c95b6c56af095f365e30c8380539e213a3672f36e7211e0fc2478f",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 0,
+   "edges_cross": {
+    "born": 2,
+    "pruned": 1,
+    "born_total": 8,
+    "pruned_total": 1
+   },
+   "cells_per_thing": {
+    "circle": 0,
+    "square": 0,
+    "triangle": 0,
+    "cross": 0,
+    "ring": 0,
+    "bar": 1,
+    "dot": 0,
+    "star": 2,
+    "arrow": 1,
+    "wave": 0,
+    "diamond": 2,
+    "moon": 0,
+    "house": 0,
+    "tree": 0,
+    "cup": 0,
+    "key": 0
+   },
+   "births_by_glance": {
+    "on_thing": 6,
+    "off_thing": 0,
+    "moments_on": 3720,
+    "moments_off": 120
+   },
+   "seconds": 0.42
+  },
+  "T-nowire": {
+   "label": "T-nowire",
+   "at_dev": {
+    "moments": 2640,
+    "cells_sight": 158,
+    "cells_words": 11,
+    "cells_born_sight": 158,
+    "cells_born_words": 11,
+    "edges_alive": 0,
+    "births_novelty_sight": 158,
+    "births_novelty_words": 11,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 0,
+    "edges_born": 0,
+    "edges_pruned": 0,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 2,
+    "removed_for_disuse": 0
+   },
+   "hash_dev": "3373a88e780c4835fba1b31f268af7e5525ab20179f5da719115ca7e4dc673a4",
+   "ask_dev": {
+    "Q1": {
+     "acc": 0.0,
+     "n": 220,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 220,
+      "ratio": 0
+     },
+     "false_abstention": 1.0,
+     "per_thing": {
+      "circle": 0.0,
+      "square": 0.0,
+      "triangle": 0.0,
+      "cross": 0.0,
+      "ring": 0.0,
+      "bar": 0.0,
+      "dot": 0.0,
+      "star": 0.0,
+      "arrow": 0.0,
+      "wave": 0.0,
+      "diamond": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.0,
+     "n": 11,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 11,
+      "ratio": 0
+     },
+     "detail": {
+      "circle": "abstain:noedge",
+      "square": "abstain:noedge",
+      "triangle": "abstain:noedge",
+      "cross": "abstain:noedge",
+      "ring": "abstain:noedge",
+      "bar": "abstain:noedge",
+      "dot": "abstain:noedge",
+      "star": "abstain:noedge",
+      "arrow": "abstain:noedge",
+      "wave": "abstain:noedge",
+      "diamond": "abstain:noedge"
+     }
+    },
+    "Q3": {
+     "acc": 0.5,
+     "n": 220,
+     "correct": 110,
+     "true_pairs_abstained": 110,
+     "ceiling": 0.5
+    },
+    "Q4": {
+     "acc": 0.0,
+     "n": 220,
+     "correct": 0,
+     "ties": 220
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 1.0,
+      "n": 20,
+      "abstain": {
+       "novel": 19,
+       "noedge": 1,
+       "ratio": 0
+      },
+      "answered_as": {}
+     }
+    },
+    "composite": 0.125
+   },
+   "at_arr2": {
+    "moments": 3840,
+    "cells_sight": 241,
+    "cells_words": 16,
+    "cells_born_sight": 241,
+    "cells_born_words": 16,
+    "edges_alive": 0,
+    "births_novelty_sight": 241,
+    "births_novelty_words": 16,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 0,
+    "edges_born": 0,
+    "edges_pruned": 0,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 3,
+    "removed_for_disuse": 0
+   },
+   "ask_arr2": {
+    "Q1": {
+     "acc": 0.0,
+     "n": 220,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 220,
+      "ratio": 0
+     },
+     "false_abstention": 1.0,
+     "per_thing": {
+      "circle": 0.0,
+      "square": 0.0,
+      "triangle": 0.0,
+      "cross": 0.0,
+      "ring": 0.0,
+      "bar": 0.0,
+      "dot": 0.0,
+      "star": 0.0,
+      "arrow": 0.0,
+      "wave": 0.0,
+      "diamond": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.0,
+     "n": 11,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 11,
+      "ratio": 0
+     },
+     "detail": {
+      "circle": "abstain:noedge",
+      "square": "abstain:noedge",
+      "triangle": "abstain:noedge",
+      "cross": "abstain:noedge",
+      "ring": "abstain:noedge",
+      "bar": "abstain:noedge",
+      "dot": "abstain:noedge",
+      "star": "abstain:noedge",
+      "arrow": "abstain:noedge",
+      "wave": "abstain:noedge",
+      "diamond": "abstain:noedge"
+     }
+    },
+    "Q3": {
+     "acc": 0.5,
+     "n": 220,
+     "correct": 110,
+     "true_pairs_abstained": 110,
+     "ceiling": 0.5
+    },
+    "Q4": {
+     "acc": 0.0,
+     "n": 220,
+     "correct": 0,
+     "ties": 220
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 1.0,
+      "n": 20,
+      "abstain": {
+       "novel": 19,
+       "noedge": 1,
+       "ratio": 0
+      },
+      "answered_as": {}
+     }
+    },
+    "composite": 0.125
+   },
+   "ask_arr2_new": {
+    "Q1": {
+     "acc": 0.0,
+     "n": 100,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 100,
+      "ratio": 0
+     },
+     "false_abstention": 1.0,
+     "per_thing": {
+      "moon": 0.0,
+      "house": 0.0,
+      "tree": 0.0,
+      "cup": 0.0,
+      "key": 0.0
+     },
+     "answers_from_multi_word_cells": 0
+    },
+    "Q2": {
+     "acc": 0.0,
+     "n": 5,
+     "correct": 0,
+     "abstain": {
+      "novel": 0,
+      "noedge": 5,
+      "ratio": 0
+     },
+     "detail": {
+      "moon": "abstain:noedge",
+      "house": "abstain:noedge",
+      "tree": "abstain:noedge",
+      "cup": "abstain:noedge",
+      "key": "abstain:noedge"
+     }
+    },
+    "Q3": {
+     "acc": 0.5,
+     "n": 100,
+     "correct": 50,
+     "true_pairs_abstained": 50,
+     "ceiling": 0.5
+    },
+    "Q4": {
+     "acc": 0.0,
+     "n": 100,
+     "correct": 0,
+     "ties": 100
+    },
+    "Q5": {
+     "spiral": {
+      "abstain_rate": 1.0,
+      "n": 20,
+      "abstain": {
+       "novel": 19,
+       "noedge": 1,
+       "ratio": 0
+      },
+      "answered_as": {}
+     }
+    },
+    "composite": 0.125
+   },
+   "hash_arr2": "96ca8618d81904e109b59df606d3eca17a8feb707570865f92427fe81dbd6cba",
+   "at_final": {
+    "moments": 3840,
+    "cells_sight": 241,
+    "cells_words": 16,
+    "cells_born_sight": 241,
+    "cells_born_words": 16,
+    "edges_alive": 0,
+    "births_novelty_sight": 241,
+    "births_novelty_words": 16,
+    "births_error_sight": 0,
+    "births_error_words": 0,
+    "births_refused_budget": 0,
+    "births_refused_nmax": 0,
+    "births_refused_frozen": 0,
+    "births_refused_redundant": 0,
+    "edges_born": 0,
+    "edges_pruned": 0,
+    "cells_merged_sight": 0,
+    "cells_merged_words": 0,
+    "scale_events": 3,
+    "removed_for_disuse": 0
+   },
+   "refusals_by_arrival": [
+    0,
+    0
+   ],
+   "hash_final": "96ca8618d81904e109b59df606d3eca17a8feb707570865f92427fe81dbd6cba",
+   "ledger_corruption_hash_unchanged": true,
+   "multi_thing_sight_cells": 0,
+   "edges_cross": {
+    "born": 0,
+    "pruned": 0,
+    "born_total": 0,
+    "pruned_total": 0
+   },
+   "cells_per_thing": {
+    "circle": 3,
+    "square": 16,
+    "triangle": 23,
+    "cross": 31,
+    "ring": 25,
+    "bar": 5,
+    "dot": 9,
+    "star": 15,
+    "arrow": 8,
+    "wave": 13,
+    "diamond": 10,
+    "moon": 7,
+    "house": 9,
+    "tree": 21,
+    "cup": 39,
+    "key": 7
+   },
+   "births_by_glance": {
+    "on_thing": 223,
+    "off_thing": 18,
+    "moments_on": 3720,
+    "moments_off": 120
+   },
+   "seconds": 0.56
+  }
+ },
+ "smaller_life": {
+  "label": "smaller-life",
+  "at_dev": {
+   "moments": 2640,
+   "cells_sight": 160,
+   "cells_words": 5,
+   "cells_born_sight": 164,
+   "cells_born_words": 5,
+   "edges_alive": 171,
+   "births_novelty_sight": 125,
+   "births_novelty_words": 5,
+   "births_error_sight": 39,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 267,
+   "edges_born": 629,
+   "edges_pruned": 454,
+   "cells_merged_sight": 4,
+   "cells_merged_words": 0,
+   "scale_events": 2,
+   "removed_for_disuse": 0
+  },
+  "hash_dev": "632adac79bc8cdaf032f44de727fa99640a9437da96876374301a1dad91b3756",
+  "ask_dev": {
+   "Q1": {
+    "acc": 0.78,
+    "n": 100,
+    "correct": 78,
+    "abstain": {
+     "novel": 0,
+     "noedge": 1,
+     "ratio": 12
+    },
+    "false_abstention": 0.13,
+    "per_thing": {
+     "circle": 0.6,
+     "square": 0.45,
+     "triangle": 0.9,
+     "cross": 0.95,
+     "ring": 1.0
+    },
+    "answers_from_multi_word_cells": 0
+   },
+   "Q2": {
+    "acc": 0.8,
+    "n": 5,
+    "correct": 4,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 0
+    },
+    "detail": {
+     "circle": "circle",
+     "square": "circle",
+     "triangle": "triangle",
+     "cross": "cross",
+     "ring": "ring"
+    }
+   },
+   "Q3": {
+    "acc": 0.87,
+    "n": 100,
+    "correct": 87,
+    "true_pairs_abstained": 8,
+    "ceiling": 0.935
+   },
+   "Q4": {
+    "acc": 0.94,
+    "n": 100,
+    "correct": 94,
+    "ties": 1
+   },
+   "Q5": {
+    "spiral": {
+     "abstain_rate": 1.0,
+     "n": 20,
+     "abstain": {
+      "novel": 20,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "answered_as": {}
+    }
+   },
+   "composite": 0.8475
+  },
+  "at_final": {
+   "moments": 2640,
+   "cells_sight": 160,
+   "cells_words": 5,
+   "cells_born_sight": 164,
+   "cells_born_words": 5,
+   "edges_alive": 171,
+   "births_novelty_sight": 125,
+   "births_novelty_words": 5,
+   "births_error_sight": 39,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 267,
+   "edges_born": 629,
+   "edges_pruned": 454,
+   "cells_merged_sight": 4,
+   "cells_merged_words": 0,
+   "scale_events": 2,
+   "removed_for_disuse": 0
+  },
+  "refusals_by_arrival": [
+   0
+  ],
+  "hash_final": "632adac79bc8cdaf032f44de727fa99640a9437da96876374301a1dad91b3756",
+  "ledger_corruption_hash_unchanged": true,
+  "multi_thing_sight_cells": 0,
+  "edges_cross": {
+   "born": 216,
+   "pruned": 155,
+   "born_total": 629,
+   "pruned_total": 454
+  },
+  "cells_per_thing": {
+   "circle": 19,
+   "square": 40,
+   "triangle": 30,
+   "cross": 43,
+   "ring": 28
+  },
+  "births_by_glance": {
+   "on_thing": 151,
+   "off_thing": 13,
+   "moments_on": 2497,
+   "moments_off": 143
+  },
+  "seconds": 0.96
+ },
+ "smaller_life_things": [
+  "circle",
+  "square",
+  "triangle",
+  "cross",
+  "ring"
+ ],
+ "random_genomes": [
+  {
+   "seed": 1,
+   "genome": {
+    "theta_n": 0.9657272111997083,
+    "misfires": 5,
+    "budget": 76,
+    "kwta": 2,
+    "lr": 0.28485158690548695,
+    "prune_floor": 0.0630544589500866,
+    "theta_m": 0.941909318448285,
+    "scale_every": 1438,
+    "stage1": 189,
+    "abstain_ratio": 0.700507576820889
+   },
+   "composite": 0.5488636363636363,
+   "Q1": 0.37727272727272726,
+   "Q2": 0.7272727272727273,
+   "Q3": 0.7,
+   "Q4": 0.39090909090909093,
+   "cells": 76,
+   "refused": 1385,
+   "seconds": 0.85
+  },
+  {
+   "seed": 2,
+   "genome": {
+    "theta_n": 0.6462606602729204,
+    "misfires": 3,
+    "budget": 360,
+    "kwta": 10,
+    "lr": 0.032115202929853585,
+    "prune_floor": 0.12042000466716515,
+    "theta_m": 0.9721274921543677,
+    "scale_every": 4965,
+    "stage1": 335,
+    "abstain_ratio": 0.5270218473932035
+   },
+   "composite": 0.38749999999999996,
+   "Q1": 0.0,
+   "Q2": 0.2727272727272727,
+   "Q3": 0.5,
+   "Q4": 0.7772727272727272,
+   "cells": 174,
+   "refused": 2142,
+   "seconds": 3.19
+  },
+  {
+   "seed": 3,
+   "genome": {
+    "theta_n": 0.6160371482320889,
+    "misfires": 1,
+    "budget": 186,
+    "kwta": 10,
+    "lr": 0.1767378006389885,
+    "prune_floor": 0.01973159980583944,
+    "theta_m": 0.9428795670834109,
+    "scale_every": 3144,
+    "stage1": 325,
+    "abstain_ratio": 0.5782720681721685
+   },
+   "composite": 0.14659090909090908,
+   "Q1": 0.004545454545454545,
+   "Q2": 0.0,
+   "Q3": 0.5045454545454545,
+   "Q4": 0.07727272727272727,
+   "cells": 40,
+   "refused": 6416,
+   "seconds": 3.09
+  },
+  {
+   "seed": 4,
+   "genome": {
+    "theta_n": 0.7505505008790372,
+    "misfires": 8,
+    "budget": 756,
+    "kwta": 12,
+    "lr": 0.028846627049202645,
+    "prune_floor": 0.1218638105670109,
+    "theta_m": 0.93727217185335,
+    "scale_every": 3172,
+    "stage1": 291,
+    "abstain_ratio": 0.5855186299105739
+   },
+   "composite": 0.2761363636363636,
+   "Q1": 0.0,
+   "Q2": 0.18181818181818182,
+   "Q3": 0.5,
+   "Q4": 0.42272727272727273,
+   "cells": 84,
+   "refused": 0,
+   "seconds": 3.44
+  },
+  {
+   "seed": 5,
+   "genome": {
+    "theta_n": 0.895890986970882,
+    "misfires": 7,
+    "budget": 402,
+    "kwta": 7,
+    "lr": 0.08931140712600177,
+    "prune_floor": 0.01173220977394963,
+    "theta_m": 0.9379535191977664,
+    "scale_every": 2899,
+    "stage1": 268,
+    "abstain_ratio": 0.5221848450121981
+   },
+   "composite": 0.4761363636363636,
+   "Q1": 0.2636363636363636,
+   "Q2": 0.36363636363636365,
+   "Q3": 0.6272727272727273,
+   "Q4": 0.65,
+   "cells": 69,
+   "refused": 0,
+   "seconds": 1.35
+  },
+  {
+   "seed": 6,
+   "genome": {
+    "theta_n": 0.6682027262085358,
+    "misfires": 5,
+    "budget": 760,
+    "kwta": 5,
+    "lr": 0.1154765458484253,
+    "prune_floor": 0.19750155304710687,
+    "theta_m": 0.9626428709881074,
+    "scale_every": 2192,
+    "stage1": 178,
+    "abstain_ratio": 0.6616820931388746
+   },
+   "composite": 0.1465909090909091,
+   "Q1": 0.0,
+   "Q2": 0.0,
+   "Q3": 0.5,
+   "Q4": 0.08636363636363636,
+   "cells": 31,
+   "refused": 0,
+   "seconds": 1.81
+  },
+  {
+   "seed": 7,
+   "genome": {
+    "theta_n": 0.939634762475092,
+    "misfires": 6,
+    "budget": 484,
+    "kwta": 10,
+    "lr": 0.0714361210472246,
+    "prune_floor": 0.06073309069733387,
+    "theta_m": 0.98648179109423,
+    "scale_every": 4572,
+    "stage1": 378,
+    "abstain_ratio": 0.9024019250075554
+   },
+   "composite": 0.7602272727272728,
+   "Q1": 0.6,
+   "Q2": 0.8181818181818182,
+   "Q3": 0.8045454545454546,
+   "Q4": 0.8181818181818182,
+   "cells": 194,
+   "refused": 0,
+   "seconds": 1.41
+  },
+  {
+   "seed": 8,
+   "genome": {
+    "theta_n": 0.9837656532355835,
+    "misfires": 3,
+    "budget": 182,
+    "kwta": 4,
+    "lr": 0.23762193606690854,
+    "prune_floor": 0.174109405827547,
+    "theta_m": 0.9387173958473802,
+    "scale_every": 2911,
+    "stage1": 288,
+    "abstain_ratio": 0.682646962513783
+   },
+   "composite": 0.5181818181818182,
+   "Q1": 0.2681818181818182,
+   "Q2": 0.8181818181818182,
+   "Q3": 0.6409090909090909,
+   "Q4": 0.34545454545454546,
+   "cells": 262,
+   "refused": 1881,
+   "seconds": 0.88
+  },
+  {
+   "seed": 9,
+   "genome": {
+    "theta_n": 0.6405404324529022,
+    "misfires": 7,
+    "budget": 135,
+    "kwta": 8,
+    "lr": 0.23437255446145272,
+    "prune_floor": 0.1434988512911095,
+    "theta_m": 0.9906226319285603,
+    "scale_every": 4641,
+    "stage1": 169,
+    "abstain_ratio": 0.9499364382338935
+   },
+   "composite": 0.125,
+   "Q1": 0.0,
+   "Q2": 0.0,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 5,
+   "refused": 0,
+   "seconds": 1.35
+  },
+  {
+   "seed": 10,
+   "genome": {
+    "theta_n": 0.6017640869387819,
+    "misfires": 8,
+    "budget": 645,
+    "kwta": 10,
+    "lr": 0.04903822630919597,
+    "prune_floor": 0.1030481186708764,
+    "theta_m": 0.9134560407980302,
+    "scale_every": 2113,
+    "stage1": 311,
+    "abstain_ratio": 0.9124563849130167
+   },
+   "composite": 0.23522727272727273,
+   "Q1": 0.09090909090909091,
+   "Q2": 0.18181818181818182,
+   "Q3": 0.5181818181818182,
+   "Q4": 0.15,
+   "cells": 39,
+   "refused": 0,
+   "seconds": 2.94
+  },
+  {
+   "seed": 11,
+   "genome": {
+    "theta_n": 0.7446461525956564,
+    "misfires": 2,
+    "budget": 493,
+    "kwta": 8,
+    "lr": 0.013463257469723641,
+    "prune_floor": 0.030437290830913732,
+    "theta_m": 0.9918928912730766,
+    "scale_every": 2784,
+    "stage1": 53,
+    "abstain_ratio": 0.563589235205656
+   },
+   "composite": 0.5738636363636364,
+   "Q1": 0.19545454545454546,
+   "Q2": 0.5454545454545454,
+   "Q3": 0.5863636363636363,
+   "Q4": 0.9681818181818181,
+   "cells": 409,
+   "refused": 1429,
+   "seconds": 2.91
+  },
+  {
+   "seed": 12,
+   "genome": {
+    "theta_n": 0.963908942001118,
+    "misfires": 3,
+    "budget": 98,
+    "kwta": 3,
+    "lr": 0.05789096607334173,
+    "prune_floor": 0.07062795887859555,
+    "theta_m": 0.9228235834124007,
+    "scale_every": 4763,
+    "stage1": 245,
+    "abstain_ratio": 0.5563888972404892
+   },
+   "composite": 0.5875,
+   "Q1": 0.41363636363636364,
+   "Q2": 0.7272727272727273,
+   "Q3": 0.7090909090909091,
+   "Q4": 0.5,
+   "cells": 84,
+   "refused": 1339,
+   "seconds": 0.84
+  },
+  {
+   "seed": 13,
+   "genome": {
+    "theta_n": 0.919098232316709,
+    "misfires": 7,
+    "budget": 102,
+    "kwta": 10,
+    "lr": 0.08212667661786059,
+    "prune_floor": 0.01636269208596586,
+    "theta_m": 0.9937001122641602,
+    "scale_every": 3059,
+    "stage1": 359,
+    "abstain_ratio": 0.5012890692768869
+   },
+   "composite": 0.5772727272727273,
+   "Q1": 0.39545454545454545,
+   "Q2": 0.45454545454545453,
+   "Q3": 0.7045454545454546,
+   "Q4": 0.7545454545454545,
+   "cells": 106,
+   "refused": 0,
+   "seconds": 1.32
+  },
+  {
+   "seed": 14,
+   "genome": {
+    "theta_n": 0.6768638667487857,
+    "misfires": 7,
+    "budget": 116,
+    "kwta": 9,
+    "lr": 0.25873504206251535,
+    "prune_floor": 0.12862217867684478,
+    "theta_m": 0.9542879576725181,
+    "scale_every": 459,
+    "stage1": 60,
+    "abstain_ratio": 0.8509940474936197
+   },
+   "composite": 0.125,
+   "Q1": 0.0,
+   "Q2": 0.0,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 7,
+   "refused": 0,
+   "seconds": 1.42
+  },
+  {
+   "seed": 15,
+   "genome": {
+    "theta_n": 0.8997503845546682,
+    "misfires": 6,
+    "budget": 231,
+    "kwta": 5,
+    "lr": 0.018227261828673548,
+    "prune_floor": 0.11474785414971247,
+    "theta_m": 0.9144782972456362,
+    "scale_every": 4908,
+    "stage1": 373,
+    "abstain_ratio": 0.6692246869971614
+   },
+   "composite": 0.125,
+   "Q1": 0.0,
+   "Q2": 0.0,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 69,
+   "refused": 0,
+   "seconds": 1.33
+  },
+  {
+   "seed": 16,
+   "genome": {
+    "theta_n": 0.7110646312901909,
+    "misfires": 5,
+    "budget": 625,
+    "kwta": 2,
+    "lr": 0.10768346737861867,
+    "prune_floor": 0.1246802986377552,
+    "theta_m": 0.9021438453150884,
+    "scale_every": 1564,
+    "stage1": 215,
+    "abstain_ratio": 0.9184842704482017
+   },
+   "composite": 0.25,
+   "Q1": 0.09090909090909091,
+   "Q2": 0.18181818181818182,
+   "Q3": 0.5454545454545454,
+   "Q4": 0.18181818181818182,
+   "cells": 15,
+   "refused": 0,
+   "seconds": 1.19
+  },
+  {
+   "seed": 17,
+   "genome": {
+    "theta_n": 0.5788768146728624,
+    "misfires": 7,
+    "budget": 393,
+    "kwta": 7,
+    "lr": 0.11358358279096002,
+    "prune_floor": 0.04377345074879192,
+    "theta_m": 0.9381965797213306,
+    "scale_every": 4585,
+    "stage1": 297,
+    "abstain_ratio": 0.7995581231645005
+   },
+   "composite": 0.15681818181818183,
+   "Q1": 0.0,
+   "Q2": 0.09090909090909091,
+   "Q3": 0.5,
+   "Q4": 0.03636363636363636,
+   "cells": 3,
+   "refused": 0,
+   "seconds": 1.16
+  },
+  {
+   "seed": 18,
+   "genome": {
+    "theta_n": 0.851533192851226,
+    "misfires": 4,
+    "budget": 702,
+    "kwta": 4,
+    "lr": 0.029403850809444316,
+    "prune_floor": 0.1939844925392791,
+    "theta_m": 0.9558287477914272,
+    "scale_every": 2878,
+    "stage1": 358,
+    "abstain_ratio": 0.7826670171162784
+   },
+   "composite": 0.125,
+   "Q1": 0.0,
+   "Q2": 0.0,
+   "Q3": 0.5,
+   "Q4": 0.0,
+   "cells": 30,
+   "refused": 0,
+   "seconds": 1.26
+  },
+  {
+   "seed": 19,
+   "genome": {
+    "theta_n": 0.9536759789601847,
+    "misfires": 4,
+    "budget": 334,
+    "kwta": 4,
+    "lr": 0.022714338216145366,
+    "prune_floor": 0.06279814820430928,
+    "theta_m": 0.9711003405293356,
+    "scale_every": 4981,
+    "stage1": 236,
+    "abstain_ratio": 0.7639629196790005
+   },
+   "composite": 0.8238636363636365,
+   "Q1": 0.6863636363636364,
+   "Q2": 0.8181818181818182,
+   "Q3": 0.8545454545454545,
+   "Q4": 0.9363636363636364,
+   "cells": 304,
+   "refused": 0,
+   "seconds": 1.42
+  },
+  {
+   "seed": 20,
+   "genome": {
+    "theta_n": 0.7259618878034416,
+    "misfires": 3,
+    "budget": 722,
+    "kwta": 2,
+    "lr": 0.15916946375708507,
+    "prune_floor": 0.08242451334606678,
+    "theta_m": 0.9070923151732618,
+    "scale_every": 268,
+    "stage1": 357,
+    "abstain_ratio": 0.983281298343706
+   },
+   "composite": 0.17045454545454547,
+   "Q1": 0.0,
+   "Q2": 0.09090909090909091,
+   "Q3": 0.5,
+   "Q4": 0.09090909090909091,
+   "cells": 21,
+   "refused": 0,
+   "seconds": 1.16
+  }
+ ],
+ "marks": {
+  "i_answers": {
+   "pass": false,
+   "Q1": 0.7772727272727272,
+   "Q2": 0.8181818181818182,
+   "Q3": 0.8909090909090909,
+   "Q3_ceiling": 0.9386363636363636,
+   "Q4": 0.9863636363636363,
+   "counts": {
+    "Q1": "171/220",
+    "Q2": "9/11",
+    "Q3": "196/220",
+    "Q4": "217/220"
+   },
+   "bars": "Q1,Q2 \u2265 .80 \u00b7 Q3 \u2265 .85 \u00b7 Q4 \u2265 .90"
+  },
+  "ii_meeting_real": {
+   "pass": true,
+   "T_shuffle_Q1": 0.02727272727272727,
+   "T_nowire_Q1": 0.0,
+   "T_nowire_abstain": {
+    "novel": 0,
+    "noedge": 220,
+    "ratio": 0
+   },
+   "bar": "\u2264 .20"
+  },
+  "iii_growth_matters": {
+   "pass": true,
+   "T_frozen_Q1": 0.17272727272727273,
+   "design_Q1": 0.7772727272727272,
+   "bar": "\u2265 30 pp under"
+  },
+  "iv_grows_alone": {
+   "gating": false,
+   "cells_born": 387,
+   "births_refused_budget": 0,
+   "smaller_life_born": 164,
+   "full_world_born_at_dev": 230,
+   "edges_born": 1062,
+   "edges_pruned": 580,
+   "pruned_share": 0.5461393596986818,
+   "removed_for_disuse": 0,
+   "edges_cross": {
+    "born": 555,
+    "pruned": 368,
+    "born_total": 1062,
+    "pruned_total": 580
+   },
+   "births_by_glance": {
+    "on_thing": 349,
+    "off_thing": 21,
+    "moments_on": 3738,
+    "moments_off": 122
+   },
+   "bars": "\u2265 50 born \u00b7 0 refused \u00b7 smaller life < full world \u00b7 \u2265 5 % pruned \u00b7 0 by disuse",
+   "pass": true
+  },
+  "v_keeps": {
+   "gradable": true,
+   "Q1_at_dev": 0.8318181818181818,
+   "Q1_after_arrival2": 0.7772727272727272,
+   "bar": "within 5 pp",
+   "pass": false
+  },
+  "vi_knows_unknown": {
+   "Q5_abstain": 0.95,
+   "Q5_abstain_by": {
+    "novel": 19,
+    "noedge": 0,
+    "ratio": 0
+   },
+   "Q5_answered_as": {
+    "ring": 1
+   },
+   "Q5_n": 20,
+   "false_abstention_seen": 0.12272727272727273,
+   "false_abstention_by": {
+    "novel": 0,
+    "noedge": 0,
+    "ratio": 27
+   },
+   "bars": "plant majority answered \u00b7 null majority abstains \u00b7 Q5 \u2265 .80 \u00b7 false \u2264 .20",
+   "plant_answered": 0.6,
+   "plant_answered_as": {
+    "zog": 12
+   },
+   "null_abstain": 0.2,
+   "null_answered_as": {
+    "ring": 16
+   },
+   "pass": false
+  },
+  "vii_replay": {
+   "pass": true,
+   "hash": "ecc09a70426e877a"
+  },
+  "viii_cost": {
+   "pass": true,
+   "seconds_design_life": 1.91,
+   "bar": "\u2264 600 s"
+  },
+  "ix_not_luck": {
+   "pass": true,
+   "rank_of_design": 1,
+   "of": 21,
+   "design_composite": 0.8681818181818182,
+   "best_random": 0.8238636363636365,
+   "best_random_seed": 19,
+   "bar": "rank \u2264 5 of 21"
+  },
+  "xi_gaze_earns_place": {
+   "pass": true,
+   "Q1_gaze": 0.7772727272727272,
+   "Q1_one_glance": 0.2909090909090909,
+   "margin": 0.48636363636363633,
+   "bar": "\u2265 .10"
+  },
+  "untested_SCALE": {
+   "scale_events": 3,
+   "note": "SCALE every 1000 fired 3 times in a 3860-moment life"
+  },
+  "x_gaze_finds_thing": {
+   "pass": true,
+   "gaze_rate": 1.0,
+   "gaze_hit": "220/220",
+   "random_rate": 0.11818181818181818,
+   "random_hit": "26/220",
+   "random_ceiling_expected": 0.0690765380859375,
+   "ratio": 8.461538461538462,
+   "per_thing": {
+    "circle": 1.0,
+    "square": 1.0,
+    "triangle": 1.0,
+    "cross": 1.0,
+    "ring": 1.0,
+    "bar": 1.0,
+    "dot": 1.0,
+    "star": 1.0,
+    "arrow": 1.0,
+    "wave": 1.0,
+    "diamond": 1.0
+   },
+   "bar": "\u2265 .90 within the first 2 fixations \u00b7 \u2265 1.5\u00d7 random"
+  }
+ },
+ "gating_marks": [
+  "i_answers",
+  "ii_meeting_real",
+  "iii_growth_matters",
+  "v_keeps",
+  "vi_knows_unknown",
+  "vii_replay",
+  "viii_cost",
+  "ix_not_luck",
+  "xi_gaze_earns_place",
+  "x_gaze_finds_thing"
+ ],
+ "verdict": "FAIL",
+ "marks_failed": [
+  "i_answers",
+  "v_keeps",
+  "vi_knows_unknown"
+ ],
+ "seconds_total": 72.9
+}

@@ -124,3 +124,82 @@ def ask_plant(org: Organism, ledgers: Dict[str, Ledger], word: str, pics: List[n
             a = "/".join(sorted(Lw.get(r["cell"], set()))); answered[a] = answered.get(a, 0) + 1
             if Lw.get(r["cell"], set()) == {word}: ok += 1
     return {"answered_rate": ok / len(pics), "abstain_rate": sum(abst.values()) / len(pics), "n": len(pics), "abstain": abst, "answered_as": answered}
+
+
+# ============================================================================ G1: questions over GLANCES
+# edit: Claude (Fable 5.1), 2026-09-19 17:24 +0400 — G1 §1: a picture is a LIST of glance features; recall_many/edge_many sum the
+# evidence over glances. With one glance per picture these are `ask`/`ask_plant` (pinned in tools/pin_g1.py).
+Held = Dict[str, List[List[np.ndarray]]]     # thing -> pictures -> glance features
+
+
+def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: Held, never: Held,
+                blank_zero: bool = False) -> Dict[str, object]:
+    Ls, Lw = ledgers["sight"], ledgers["words"]
+    n = len(things)
+    out: Dict[str, object] = {}
+    q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0}; per = {t: [0, 0] for t in things}; multi = 0
+    for t in things:
+        for xs in held[t]:
+            r = org.recall_many("sight", xs); q1_n += 1; per[t][1] += 1
+            if r["cell"] is None:
+                q1_abst[r["reason"]] += 1
+            else:
+                ans = Lw.get(r["cell"], set())
+                if len(ans) > 1: multi += 1
+                if ans == {t}: q1_ok += 1; per[t][0] += 1
+    out["Q1"] = {"acc": q1_ok / q1_n if q1_n else 0.0, "n": q1_n, "correct": q1_ok, "abstain": q1_abst,
+                 "false_abstention": (sum(q1_abst.values()) / q1_n) if q1_n else 0.0, "per_thing": {t: (v[0] / v[1]) if v[1] else 0.0 for t, v in per.items()},
+                 "answers_from_multi_word_cells": multi}
+    q2_ok = 0; q2_abst = {"novel": 0, "noedge": 0, "ratio": 0}; q2_detail = {}
+    for t in things:
+        r = org.recall_many("words", [world.encode_word(t, blank_zero)])
+        if r["cell"] is None:
+            q2_abst[r["reason"]] += 1; q2_detail[t] = f"abstain:{r['reason']}"
+        else:
+            born = Ls.get(r["cell"], set()); q2_detail[t] = "/".join(sorted(born))
+            if born == {t}: q2_ok += 1
+    out["Q2"] = {"acc": q2_ok / n if n else 0.0, "n": n, "correct": q2_ok, "abstain": q2_abst, "detail": q2_detail}
+    q3_ok = 0; q3_n = 0; q3_true_abstain = 0
+    for ti, t in enumerate(things):
+        for i, xs in enumerate(held[t]):
+            truth = (i % 2 == 0)
+            word = t if truth else things[(ti + 1 + (i % (n - 1))) % n]
+            r = org.recall_many("sight", xs)
+            yes = r["cell"] is not None and Lw.get(r["cell"], set()) == {word}
+            if truth and r["cell"] is None: q3_true_abstain += 1
+            q3_ok += int(yes == truth); q3_n += 1
+    out["Q3"] = {"acc": q3_ok / q3_n if q3_n else 0.0, "n": q3_n, "correct": q3_ok, "true_pairs_abstained": q3_true_abstain,
+                 "ceiling": 1.0 - 0.5 * out["Q1"]["false_abstention"]}
+    q4_ok = 0; q4_n = 0; q4_ties = 0
+    for ti, t in enumerate(things):
+        wc = word_cells(org, Lw, t)
+        for i, xs in enumerate(held[t]):
+            u = things[(ti + 1 + (i % (n - 1))) % n]; other = held[u][i % len(held[u])]
+            e_t = max([org.edge_many("sight", xs, c) for c in wc], default=0.0)
+            e_u = max([org.edge_many("sight", other, c) for c in wc], default=0.0)
+            if e_t == e_u: q4_ties += 1
+            q4_ok += int(e_t > e_u); q4_n += 1
+    out["Q4"] = {"acc": q4_ok / q4_n if q4_n else 0.0, "n": q4_n, "correct": q4_ok, "ties": q4_ties}
+    q5 = {}
+    for name, rows in never.items():
+        abst = {"novel": 0, "noedge": 0, "ratio": 0}; answered = {}
+        for xs in rows:
+            r = org.recall_many("sight", xs)
+            if r["cell"] is None: abst[r["reason"]] += 1
+            else:
+                a = "/".join(sorted(Lw.get(r["cell"], set()))); answered[a] = answered.get(a, 0) + 1
+        q5[name] = {"abstain_rate": (sum(abst.values()) / len(rows)) if rows else 0.0, "n": len(rows), "abstain": abst, "answered_as": answered}
+    out["Q5"] = q5
+    out["composite"] = float(np.mean([out["Q1"]["acc"], out["Q2"]["acc"], out["Q3"]["acc"], out["Q4"]["acc"]]))
+    return out
+
+
+def ask_plant_glances(org: Organism, ledgers: Dict[str, Ledger], word: str, rows: List[List[np.ndarray]]) -> Dict[str, object]:
+    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0}; answered = {}
+    for xs in rows:
+        r = org.recall_many("sight", xs)
+        if r["cell"] is None: abst[r["reason"]] += 1
+        else:
+            a = "/".join(sorted(Lw.get(r["cell"], set()))); answered[a] = answered.get(a, 0) + 1
+            if Lw.get(r["cell"], set()) == {word}: ok += 1
+    return {"answered_rate": ok / len(rows) if rows else 0.0, "abstain_rate": (sum(abst.values()) / len(rows)) if rows else 0.0, "n": len(rows), "abstain": abst, "answered_as": answered}

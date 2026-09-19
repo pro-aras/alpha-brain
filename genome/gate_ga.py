@@ -145,3 +145,55 @@ if __name__ == "__main__":
     gpath = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("genome/G0.genome")
     things = sys.argv[2].split(",") if len(sys.argv) > 2 else (world.THINGS_11 if "G0b" in gpath.name else world.THINGS_10)
     run(things, gpath, Path(f"runs/gate-ga-{gpath.stem}.json"), seed=20260919)
+
+
+# ============================================================================ G1: the gate over GLANCES
+# edit: Claude (Fable 5.1), 2026-09-19 17:24 +0400 — G1 §5 step 5/7: the bands are measured on precomputed glance features
+# (the FIRST fixation of each picture); the p95 rule chooses; thetas + the plant's showings written as for G0b.
+def bands_feats(feats: Dict[str, np.ndarray], rng: np.random.Generator, max_between: int = 30000) -> Dict[str, object]:
+    things = list(feats.keys())
+    within: List[float] = []
+    for t in things:
+        F = feats[t]; C = F @ F.T; iu = np.triu_indices(len(F), 1); within.extend(C[iu].tolist())
+    between: List[float] = []
+    for a, b in itertools.combinations(things, 2):
+        between.extend((feats[a] @ feats[b].T).ravel().tolist())
+    within_a, between_a = np.array(within), np.array(between)
+    if len(between_a) > max_between:
+        between_a = between_a[rng.permutation(len(between_a))[:max_between]]
+    q = lambda x, p: float(np.percentile(x, p))
+    pairs = {f"{a}/{b}": q((feats[a] @ feats[b].T).ravel(), 95) for a, b in itertools.combinations(things, 2)}
+    closest = max(pairs.items(), key=lambda kv: kv[1])
+    return {
+        "within": {"median": q(within_a, 50), "p5": q(within_a, 5), "p95": q(within_a, 95), "n": int(len(within_a)), "all": within_a},
+        "between": {"median": q(between_a, 50), "p5": q(between_a, 5), "p95": q(between_a, 95), "max": float(between_a.max()), "n": int(len(between_a))},
+        "per_thing_within_p5": {t: q((feats[t] @ feats[t].T)[np.triu_indices(len(feats[t]), 1)], 5) if len(feats[t]) > 1 else 1.0 for t in things},
+        "pair_p95": pairs, "closest_pair": {"pair": closest[0], "p95": closest[1]},
+    }
+
+
+def run_feats(feats: Dict[str, np.ndarray], words: Sequence[str], genome_path: Path, out_path: Path, seed: int, blank_zero: bool = False, label: str = "") -> Dict[str, object]:
+    """Gate G-a on precomputed glance features (G1). Writes THETA_N/THETA_M into the genome when the p95 rule is met;
+    returns the report either way (the run reads it and says so when the bands overlap — G1 §1)."""
+    rng = np.random.default_rng(seed)
+    b = bands_feats(feats, rng)
+    within_all = b["within"].pop("all")
+    ear = ear_band(list(words), blank_zero)
+    ch = choose(b, ear, rule="p95")
+    report = {"things": list(feats.keys()), "per_thing": {t: int(len(v)) for t, v in feats.items()}, "seed": seed, "label": label, "retina": b, "ear": ear, "choice": ch}
+    print(f"gate G-a [{label}] · within: median {b['within']['median']:.3f} p5 {b['within']['p5']:.3f} p95 {b['within']['p95']:.3f} (n {b['within']['n']}) · between: median {b['between']['median']:.3f} p95 {b['between']['p95']:.3f} max {b['between']['max']:.3f} · ear max {ear['max_between']:.3f}")
+    print(f"gate G-a [{label}] · closest pair {b['closest_pair']['pair']} p95 {b['closest_pair']['p95']:.3f} · weakest thing (within p5) {min(b['per_thing_within_p5'].items(), key=lambda kv: kv[1])}")
+    st = ch["strict"]
+    print(f"gate G-a [{label}] · §2 strict rule (between-p95 {st['lo']:.3f} < THETA_N < within-p5 {st['hi']:.3f}): {'MET' if st['met'] else 'NOT MET'}")
+    if ch["overlap"]:
+        print(f"gate G-a [{label}] · p95 rule NOT MET: within-median {ch['amended']['theta_n']:.3f} ≤ floor {ch['amended']['floor']:.3f} — the bands OVERLAP under the INK rule; thetas NOT written")
+        report["overlap"] = True
+        out_path.write_text(json.dumps(report, indent=1)); return report
+    p_res = float((within_all >= ch["theta_n"]).mean()); k = 5
+    while (1.0 - (1.0 - p_res) ** k) < 0.9 and k < 60: k += 1
+    report["plant"] = {"p_res_at_theta_n": p_res, "showings": int(k)}
+    print(f"gate G-a [{label}] · conflated pairs at THETA_N: {ch['amended']['conflated_pairs'] or 'none'} · within share ≥ THETA_N {p_res:.3f} → plant showings {k}")
+    note = f"G1 gate on glances [{label}]: THETA_N = within-median; floor (between-p95, ear-max) {ch['amended']['floor']:.4f} · within-p5 {b['within']['p5']:.4f} · within-p95 {b['within']['p95']:.4f} · seed {seed}"
+    write_thetas(genome_path, ch["theta_n"], ch["theta_m"], note)
+    print(f"gate G-a [{label}] · THETA_N={ch['theta_n']} THETA_M={ch['theta_m']} — written into {genome_path}")
+    out_path.write_text(json.dumps(report, indent=1)); return report
