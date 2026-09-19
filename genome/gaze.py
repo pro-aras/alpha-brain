@@ -1,5 +1,6 @@
 """gaze.py — THE GAZE GENE: Alpha 2's V0.1 retina + gaze organs, imported VERBATIM (docs/G1-PREREG.md §1).
 
+edit: Claude (Fable 5.1), 2026-09-19 17:35 +0400 — §6 amendment 1: the `border` INK rule (background from the window's rim); `contrast` kept as the first run's record.
 edit: Claude (Fable 5.1), 2026-09-19 17:21 +0400 — G1 rung 1, on Ahmad's 17:10 «Ok go for it» (D-G4 road (a)).
 
 Nothing of the saliency or the fixation rule is written here: `organs/retina.py` and `organs/gaze.py`
@@ -65,6 +66,18 @@ def ink_contrast(grey: np.ndarray) -> np.ndarray:
     return d / m if m > 0 else np.zeros_like(d)
 
 
+def ink_border(grey: np.ndarray, rim: int = 2) -> np.ndarray:
+    """INK border (G1 §6, amendment 1): |g − median of the window's 2-px BORDER| / max — the background read from the rim, so a
+    filled shape keeps its interior and a dark thing on a bright ground still becomes ink; a flat window is all zero."""
+    b = np.concatenate([grey[:rim].ravel(), grey[-rim:].ravel(), grey[:, :rim].ravel(), grey[:, -rim:].ravel()])
+    d = np.abs(grey - np.median(b))
+    m = d.max()
+    return d / m if m > 0 else np.zeros_like(d)
+
+
+INK_RULES = {"contrast": ink_contrast, "border": ink_border}
+
+
 def fixations(rgb: np.ndarray, F: int, mode: str = "surprise", pic_id: str = "") -> List[Tuple[int, int]]:
     """The organ's fixations over one canvas: (y, x) cells on its 16×16 grid. mode: surprise (the gene) | random (V0.1's twin)."""
     g, r = organs()
@@ -90,15 +103,16 @@ def glances(rgb: np.ndarray, spec: Sequence[str], gaze: Dict[str, object], mode:
     """One picture → its glance features. mode: surprise (the gene) | random (T-random-gaze) | one (T-one-glance: the whole
     canvas at glance×glance, one feature vector). Returns {"feats": [...], "fix": [(y, x), ...], "windows": [(top, left), ...]}."""
     F, grid, glance = int(gaze["fixations"]), int(gaze["grid"]), int(gaze["glance"])
+    ink_rule = INK_RULES[str(gaze.get("ink", "contrast"))]
     grey = luminance(rgb)
     if mode == "one":
         small = np.asarray(Image.fromarray(rgb).convert("L").resize((glance, glance), Image.BOX), dtype=np.float64) / 255.0
-        return {"feats": [retina(ink_contrast(small), tuple(spec))], "fix": [], "windows": []}
+        return {"feats": [retina(ink_rule(small), tuple(spec))], "fix": [], "windows": []}
     fix = fixations(rgb, F, mode, pic_id)
     feats, wins = [], []
     for cell in fix:
         win, tl = glance_window(grey, cell, grid, glance)
-        feats.append(retina(ink_contrast(win), tuple(spec))); wins.append(tl)
+        feats.append(retina(ink_rule(win), tuple(spec))); wins.append(tl)
     return {"feats": feats, "fix": fix, "windows": wins}
 
 

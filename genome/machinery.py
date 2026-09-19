@@ -157,7 +157,7 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"ABSTAIN: cannot read {a!r}")
                 g["abstain_ratio"] = float(m.group(1))
             elif gene == "GAZE":
-                m = re.fullmatch(r"surprise fixations (\d+) grid (\d+) canvas (\d+) glance (\d+) ink (contrast)", a)
+                m = re.fullmatch(r"surprise fixations (\d+) grid (\d+) canvas (\d+) glance (\d+) ink (contrast|border)", a)
                 if not m: raise GenomeError(f"GAZE: cannot read {a!r} (G1 §1: surprise fixations F grid G canvas C glance L ink contrast)")
                 g["gaze"] = {"fixations": int(m.group(1)), "grid": int(m.group(2)), "canvas": int(m.group(3)), "glance": int(m.group(4)), "ink": m.group(5)}
             else:
