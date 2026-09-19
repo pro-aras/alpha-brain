@@ -41,6 +41,7 @@ The payload bytes live at `run/tape/<payload>`. **Nothing that grades him is on 
 |---|---|---|---|
 | **G4-1 writer sweep** | AST over `creature/senses/*.py`, `creature/world_maker.py`, `creature/ask.py`: no `open(…, "w"/"a")` under `run/state`, `run/journal`, `run/memory`, no `Organism` import | 0 offenders | a planted offender module in a temp dir is CAUGHT |
 | **G4-2 mind parity** | the creature's Mind fed G1-toy's dev canvases as a tape (same order, same words) | `state_hash` == `run_g1.live`'s `hash_dev` for `G4-skeleton.genome` | one canvas swapped → hashes differ |
+| *(G4-2's pin, read by Claude in a fresh worktree at git 9a36475, 2026-09-19 21:26 +0400: `hash_dev` = `d4b5c6b8d57f35e6ad199b49b38d720095ba3b678c380b206665a876698aaa86` on toy_streams' 660 dev canvases, 2,640 moments, 9.9 s — the orchestrator's own checker, #214)* | | | |
 | **G4-3 replay** | 10 live minutes → `creature.replay --against` | exit 0, mind rows byte-identical | one payload byte flipped in a tape COPY → exit 1 naming the seq |
 | **G4-4 crash isolation** | `CREATURE_PLANT_EXCEPTION=eye:100` for 3 min | 1 `sense_restart` row; tape and moments keep moving after it | without the plant: 0 restarts |
 | **G4-5 alive 1 h** | under the unit, one sense thread (the maker) | NRestarts 0; `moments` and `tape_rows` moved in every 10-min window | the watcher pages on a STOPPED copy (a frozen STATUS) |
