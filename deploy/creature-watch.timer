@@ -1,0 +1,12 @@
+# edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 22:52 +0400 — A5 (docs/G4-PREREG.md §2.10): every 5 min.
+[Unit]
+Description=creature-watch, every 5 min
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30sec
+Persistent=true
+
+[Install]
+WantedBy=timers.target

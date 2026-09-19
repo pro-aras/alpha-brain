@@ -1,0 +1,10 @@
+# edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 22:52 +0400 — A5 (docs/G4-PREREG.md §2.5, §2.10). One-shot,
+# triggered by creature-watch.timer every 5 min. Never touches STATUS.json (the body's only writer) — writes
+# watch/last.json and PAGE.json, appends pages.jsonl (tools/creature_watch.py).
+[Unit]
+Description=creature-watch — pages when the creature's STATUS counters stop moving (#179, #230)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/data/dev/genome
+ExecStart=/usr/bin/python3 tools/creature_watch.py --root /data/dev/genome/run
