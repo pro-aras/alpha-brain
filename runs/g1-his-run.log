@@ -1,0 +1,35 @@
+gate G-a on his glances: bands OVERLAP — the toy's THETA_N=0.955 THETA_M=0.9975 carried into G1-his.genome (G1 §1)
+g1-his · 9 words shown ['anchor', 'ant', 'bass', 'beaver', 'bonsai', 'brain', 'buddha', 'camera', 'cannon'] · withheld for Q5: barrel · dev 180 pictures · held-out 120 (every 3rd per word + all of barrel)
+glanced [surprise] in 2.3 s
+glanced [random] in 2.2 s
+glanced [one] in 0.2 s
+DESIGN Q1 0.067 Q2 0.11 Q3 0.522 Q4 0.356 Q5 barrel abstain 0.63 {'novel': 18, 'noedge': 0, 'ratio': 1} false-abst 0.689 | 0.36 s
+       cells 391+9 born 391+9 (novelty 390 error 1 refused budget 182 redundant 38) edges born 337 pruned 7 merged 0+0 | cross {'born': 109, 'pruned': 2, 'born_total': 337, 'pruned_total': 7} | births by glance None
+REPLAY byte-identical: True
+T-RANDOM-GAZE: Q1 0.044 abstain {'novel': 54, 'noedge': 0, 'ratio': 15} Q2 0.44 Q3 0.500 Q4 0.189 | cells 391 born 391 refused 216 | 0.29 s
+T-ONE-GLANCE: Q1 0.000 abstain {'novel': 74, 'noedge': 16, 'ratio': 0} Q2 0.00 Q3 0.500 Q4 0.000 | cells 169 born 169 refused 0 | 0.13 s
+T-SHUFFLE-5: Q1 0.033 abstain {'novel': 45, 'noedge': 0, 'ratio': 15} Q2 0.00 | cells 391 edges 334 refused 185
+T-FROZEN: Q1 0.000 abstain {'novel': 74, 'noedge': 16, 'ratio': 0} Q2 0.00 | cells 8 edges 0 refused 0
+T-NOWIRE: Q1 0.000 abstain {'novel': 45, 'noedge': 45, 'ratio': 0} Q2 0.00 | cells 391 edges 0 refused 185
+SMALLER LIFE (5 things, 100 showings): cells born 321 vs the full world's 391 at the end of development · Q1 0.120
+RANDOM  1: composite 0.142 Q1 0.022 Q2 0.00 Q3 0.511 Q4 0.033 | theta_n 0.966 kwta 2 lr 0.285 budget 76 | cells 68 | 0.17 s
+RANDOM  2: composite 0.272 Q1 0.000 Q2 0.00 Q3 0.500 Q4 0.589 | theta_n 0.646 kwta 10 lr 0.032 budget 360 | cells 187 | 0.58 s
+RANDOM  3: composite 0.303 Q1 0.100 Q2 0.00 Q3 0.522 Q4 0.589 | theta_n 0.616 kwta 10 lr 0.177 budget 186 | cells 53 | 0.56 s
+RANDOM  4: composite 0.247 Q1 0.033 Q2 0.00 Q3 0.500 Q4 0.456 | theta_n 0.751 kwta 12 lr 0.029 budget 756 | cells 92 | 0.61 s
+RANDOM  5: composite 0.372 Q1 0.044 Q2 0.33 Q3 0.533 Q4 0.578 | theta_n 0.896 kwta 7 lr 0.089 budget 402 | cells 186 | 0.36 s
+RANDOM  6: composite 0.183 Q1 0.111 Q2 0.00 Q3 0.500 Q4 0.122 | theta_n 0.668 kwta 5 lr 0.115 budget 760 | cells 7 | 0.4 s
+RANDOM  7: composite 0.344 Q1 0.078 Q2 0.44 Q3 0.478 Q4 0.378 | theta_n 0.940 kwta 10 lr 0.071 budget 484 | cells 440 | 0.33 s
+RANDOM  8: composite 0.153 Q1 0.000 Q2 0.11 Q3 0.500 Q4 0.000 | theta_n 0.984 kwta 4 lr 0.238 budget 182 | cells 173 | 0.19 s
+RANDOM  9: composite 0.225 Q1 0.111 Q2 0.11 Q3 0.500 Q4 0.178 | theta_n 0.641 kwta 8 lr 0.234 budget 135 | cells 4 | 0.33 s
+RANDOM 10: composite 0.156 Q1 0.111 Q2 0.00 Q3 0.500 Q4 0.011 | theta_n 0.602 kwta 10 lr 0.049 budget 645 | cells 4 | 0.29 s
+RANDOM 11: composite 0.308 Q1 0.022 Q2 0.11 Q3 0.500 Q4 0.600 | theta_n 0.745 kwta 8 lr 0.013 budget 493 | cells 239 | 0.71 s
+RANDOM 12: composite 0.139 Q1 0.011 Q2 0.00 Q3 0.511 Q4 0.033 | theta_n 0.964 kwta 3 lr 0.058 budget 98 | cells 90 | 0.17 s
+RANDOM 13: composite 0.261 Q1 0.022 Q2 0.00 Q3 0.500 Q4 0.522 | theta_n 0.919 kwta 10 lr 0.082 budget 102 | cells 93 | 0.24 s
+RANDOM 14: composite 0.211 Q1 0.111 Q2 0.11 Q3 0.500 Q4 0.122 | theta_n 0.677 kwta 9 lr 0.259 budget 116 | cells 5 | 0.39 s
+RANDOM 15: composite 0.356 Q1 0.111 Q2 0.67 Q3 0.544 Q4 0.100 | theta_n 0.900 kwta 5 lr 0.018 budget 231 | cells 200 | 0.32 s
+RANDOM 16: composite 0.306 Q1 0.111 Q2 0.22 Q3 0.500 Q4 0.389 | theta_n 0.711 kwta 2 lr 0.108 budget 625 | cells 7 | 0.31 s
+RANDOM 17: composite 0.194 Q1 0.111 Q2 0.00 Q3 0.489 Q4 0.178 | theta_n 0.579 kwta 7 lr 0.114 budget 393 | cells 2 | 0.27 s
+RANDOM 18: composite 0.197 Q1 0.111 Q2 0.11 Q3 0.500 Q4 0.067 | theta_n 0.852 kwta 4 lr 0.029 budget 702 | cells 58 | 0.31 s
+RANDOM 19: composite 0.247 Q1 0.044 Q2 0.22 Q3 0.511 Q4 0.211 | theta_n 0.954 kwta 4 lr 0.023 budget 334 | cells 325 | 0.27 s
+RANDOM 20: composite 0.269 Q1 0.122 Q2 0.00 Q3 0.511 Q4 0.444 | theta_n 0.726 kwta 2 lr 0.159 budget 722 | cells 11 | 0.27 s
+VERDICT FAIL — failed: ['i_answers', 'iii_growth_matters', 'iv_grows_alone', 'vi_knows_unknown', 'ix_not_luck', 'xi_gaze_earns_place'] — /data/dev/genome/runs/g1-his-20260919-174825 (15.6 s)

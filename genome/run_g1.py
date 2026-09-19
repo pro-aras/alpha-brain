@@ -4,6 +4,7 @@
   python3 -m genome.run_g1 --gate-toy       gate G-a on the toy's first-fixation glances → writes G1.genome's thetas
   python3 -m genome.run_g1 --gate-his       gate G-a on his pictures' first-fixation glances → writes G1-his.genome's thetas
 
+edit: Claude (Fable 5.1), 2026-09-19 17:48 +0400 — §1's overlap clause: on his pictures the toy's thetas are carried when the gate finds the bands overlapping, stated on the page.
 edit: Claude (Fable 5.1), 2026-09-19 17:42 +0400 — after the advisor: (v) read in counts; the verdict page names the run kind and its own predictions (§4 first run, §6 amended); the cost row states what it excludes.
 edit: Claude (Fable 5.1), 2026-09-19 17:27 +0400 — on Ahmad's 17:10 «Ok go for it» (D-G4 road (a)). Every bar is G1 §3's, written before
 this file. A picture is gazed ONCE (its glances cached); each glance is one moment with the same word (§1).
@@ -219,6 +220,15 @@ def main(argv: List[str]) -> int:
 
     tag = "g1-his" if his else "g1-toy"
     stamp = time.strftime("%Y%m%d-%H%M%S"); out = ROOT / "runs" / f"{tag}-{stamp}"; out.mkdir(parents=True, exist_ok=True)
+    gate_path0 = ROOT / "runs" / ("gate-ga-G1-his.json" if his else "gate-ga-G1.json")
+    if his and "cos<THETA_N" in gpath.read_text():
+        # G1 §1: the bands overlap on his pictures → the run still reads, with the TOY's thetas carried, and the verdict says so
+        rep0 = json.loads(gate_path0.read_text()) if gate_path0.exists() else {}
+        if not rep0.get("overlap"):
+            raise GenomeError("G1-his.genome has placeholders and the gate did not report an overlap — run --gate-his first")
+        toy = parse_genome(GENOME_TOY.read_text())
+        gate_ga.write_thetas(gpath, toy.theta_n, toy.theta_m, f"G1 §1: gate G-a on his glances found the bands OVERLAPPING (within-median {rep0['retina']['within']['median']:.3f} ≤ floor {rep0['choice']['amended']['floor']:.3f}); the TOY's thetas are carried so the run can read; the verdict says so")
+        print(f"gate G-a on his glances: bands OVERLAP — the toy's THETA_N={toy.theta_n} THETA_M={toy.theta_m} carried into {gpath.name} (G1 §1)")
     genome_text = gpath.read_text(); genome = parse_genome(genome_text); (out / gpath.name).write_text(genome_text)
     if genome.gaze is None:
         raise GenomeError("G1 needs the GAZE gene ON")
