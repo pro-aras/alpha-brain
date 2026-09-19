@@ -12,6 +12,9 @@ field on Genome holding every G4 gene's own parsed sub-dict (BODY, TAPE, HEART, 
 SLEEP, PREDICT, FILE, CURIOSITY, PARK, INDUCE, DEDUCE, BELIEF, SENTENCE, WORLD, HANDS, ASK); `AREA episodes from fast`
 allowed beside sight/words; `RECALL k=N` for any N >= 1 (k=1 byte-identical — the rung-0 restriction lifted). A gene
 the machinery cannot run is still a GenomeError; a placeholder value (THETA_N/THETA_M unwritten) still refuses.
+edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 22:07 +0400 — B2 `Organism.moment_sight`; B6 `moment(x_s, x_w,
+lr_scale=1.0)` now returns `(S, T)` (was None) and threads `lr_scale` into `_delta`'s lr (default 1.0 is exact,
+`x*1.0==x`, so the pin is untouched) for genome/predict.py's Predictor.
 
 Laws of this file:
 - The genome is text. A gene this machinery does not know REFUSES to start (GenomeError),
@@ -79,7 +82,7 @@ class Genome:
         raise GenomeError("no STAGE named meet")
 
     def sight_dim(self) -> int:
-        return retina_dim(self.retina)
+        return retina_dim(self.retina, self.eye[0])
 
     def words_dim(self) -> int:
         return self.ear_letters * (26 if self.ear_blank_zero else 27)
@@ -285,16 +288,22 @@ def parse_genome(text: str) -> Genome:
 from scipy import ndimage as _ndi
 
 
-def retina_dim(spec: Tuple[str, ...]) -> int:
+def retina_dim(spec: Tuple[str, ...], side: int = 24) -> int:
+    """`side`: the eye's own SENSE side (default 24, rung 0's only value until G4 §3 B1's GAZE-fed
+    32x32 eye — edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 22:07 +0400: pool/hogcells sizing now
+    reads the genome's OWN `side` instead of a hardcoded 24, so a 32x32-eye genome's sight_dim() is
+    correct. Never exercised by the pin — G4-skeleton.genome's RETINA has no pool/hogcells step (its
+    only feature block is `tower:`, which was always computed correctly), so this fix touches no byte
+    the pin reads; a regression test pins the old default (side=24) unchanged too."""
     d = 0
     for step in spec:
         if step.startswith("tower:"):
             from .eye import tower as _tower                     # the sealed eye (G0b gene EYE); no labels are read
             d += _tower(step[6:]).n_feat
         elif step.startswith("pool"):
-            k = int(step[4:]); d += (24 // k) ** 2
+            k = int(step[4:]); d += (side // k) ** 2
         elif step.startswith("hogcells"):
-            k, nb = (int(v) for v in step[8:].split("x")); d += (24 // k) ** 2 * nb
+            k, nb = (int(v) for v in step[8:].split("x")); d += (side // k) ** 2 * nb
         elif step.startswith("hog"):
             d += int(step[3:])
     if d == 0:
@@ -470,12 +479,18 @@ class Organism:
         return winners
 
     # ------------------------------------------------------------------ one moment
-    def moment(self, x_s: np.ndarray, x_w: np.ndarray) -> None:
+    def moment(self, x_s: np.ndarray, x_w: np.ndarray, lr_scale: float = 1.0) -> Tuple[List[int], List[int]]:
+        """G4 §3 B6: `lr_scale` (default 1.0, exact — `self.g.lr * 1.0 == self.g.lr` in IEEE754, so the
+        pin is untouched) scales DELTA's learning rate for this moment only (PREDICT's `modulate`, B6).
+        Returns (S, T), the final sight/words winners of this moment (after any misfire birth) — a NEW
+        return value (moment() returned None before this gene); every existing caller discards it as a
+        bare statement, so this is additive. genome/predict.py's Predictor reads S to know what to
+        expect next."""
         S = self._resonate(self.sight, x_s)
         T = self._resonate(self.words, x_w)
         if self.wire and self.t >= self.g.stage2_start and S and T:
             self._hebb(S, T)
-            self._delta(S, T)
+            self._delta(S, T, lr=self.g.lr * lr_scale)
             S, T = self._misfire(S, T, x_s, x_w)
             self._prune(S, T)
             self._merge(self.sight, S, axis=0)
@@ -483,6 +498,7 @@ class Organism:
         self.t += 1
         if self.t % self.g.scale_every == 0:
             self._scale()
+        return S, T
 
     def moment_sight(self, x_s: np.ndarray) -> None:
         """G4 §3 B2 (docs/G4-PREREG.md, row 1a's BODY/tape: a sight-only moment — an eye row whose moment
@@ -508,8 +524,8 @@ class Organism:
                     self.c["edges_born"] += 1
                     self.edges_log.append((self.t, s, t))
 
-    def _delta(self, S: List[int], T: List[int]) -> None:
-        lr = self.g.lr
+    def _delta(self, S: List[int], T: List[int], lr: Optional[float] = None) -> None:
+        lr = self.g.lr if lr is None else lr
         tgt_w = np.zeros(self.g.nmax); tgt_w[T] = 1.0
         for s in S:
             idx = self.mask[s] == 1
