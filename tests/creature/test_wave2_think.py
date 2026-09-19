@@ -66,11 +66,14 @@ class TestGenomeParses(unittest.TestCase):
         self.assertIn("PARK", g.declared); self.assertIn("PREDICT", g.declared); self.assertIn("FAST", g.declared)
         self.assertNotIn("THINK", g.declared, "THINK's own gene clause is not yet parseable — confirmed here, not assumed")
 
-    def test_think_gene_line_is_currently_unparseable(self) -> None:
-        from genome.machinery import parse_genome, GenomeError
+    def test_think_gene_line_parses_since_b9(self) -> None:
+        # edit: Claude (Fable 5.1), 2026-09-19 23:21 +0400 — this test asserted the THINK line was UNPARSEABLE (true when A11 was written,
+        # before Builder B's B9 landed on master); after the merge its premise flipped and it failed. Inverted: the gene parses
+        # and lands in declared with its number (PREREG §11.2), so the step's gate can fire through a real genome file.
+        from genome.machinery import parse_genome
         text = GENOME_WITH_PARK.read_text() + "THINK    every 10 canvases\n"
-        with self.assertRaises(GenomeError):
-            parse_genome(text)
+        g = parse_genome(text)
+        self.assertEqual(g.declared.get("THINK"), {"every": 10})
 
 
 class TestThinkPoolAndChoose(unittest.TestCase):
