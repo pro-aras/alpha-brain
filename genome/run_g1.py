@@ -4,6 +4,7 @@
   python3 -m genome.run_g1 --gate-toy       gate G-a on the toy's first-fixation glances → writes G1.genome's thetas
   python3 -m genome.run_g1 --gate-his       gate G-a on his pictures' first-fixation glances → writes G1-his.genome's thetas
 
+edit: Claude (Fable 5.1), 2026-09-19 18:18 +0400 — G2: `--genome <path>` on the his road; the gate file and the run tag are named by the genome's stem.
 edit: Claude (Fable 5.1), 2026-09-19 17:54 +0400 — §7 addendum: the withheld word is drawn among rule-added words only (world/OWN-FOLDERS.txt).
 edit: Claude (Fable 5.1), 2026-09-19 17:48 +0400 — §1's overlap clause: on his pictures the toy's thetas are carried when the gate finds the bands overlapping, stated on the page.
 edit: Claude (Fable 5.1), 2026-09-19 17:42 +0400 — after the advisor: (v) read in counts; the verdict page names the run kind and its own predictions (§4 first run, §6 amended); the cost row states what it excludes.
@@ -204,7 +205,7 @@ def first_glance_feats(rows_by_thing: Dict[str, List[np.ndarray]], genome: Genom
 def main(argv: List[str]) -> int:
     assert os.environ.get("OPENBLAS_NUM_THREADS") == "1" and os.environ.get("OMP_NUM_THREADS") == "1", "G0 §10 clause 10: run with OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1"
     his = "--his" in argv or "--gate-his" in argv
-    gpath = GENOME_HIS if his else GENOME_TOY
+    gpath = Path(argv[argv.index("--genome") + 1]) if "--genome" in argv else (GENOME_HIS if his else GENOME_TOY)   # G2: --genome genome/G2-his.genome
     if "--gate-toy" in argv:
         g = parse_genome(gpath.read_text().replace("cos<THETA_N", "cos<0.5").replace("cos>THETA_M", "cos>0.99"))   # the gate needs only the eye and the gaze
         rng = np.random.default_rng(20260919)
@@ -219,12 +220,12 @@ def main(argv: List[str]) -> int:
         g = parse_genome(gpath.read_text().replace("cos<THETA_N", "cos<0.5").replace("cos>THETA_M", "cos>0.99"))
         H = load_his(g)
         rows = {w: [rgb for ww, rgb, _t in H["dev"] if ww == w] for w in H["things"]}
-        gate(gpath, first_glance_feats(rows, g), H["things"], ROOT / "runs" / "gate-ga-G1-his.json", "his first-fixation glances")
+        gate(gpath, first_glance_feats(rows, g), H["things"], ROOT / "runs" / f"gate-ga-{gpath.stem}.json", f"his first-fixation glances ({gpath.stem})")
         return 0
 
-    tag = "g1-his" if his else "g1-toy"
+    tag = (gpath.stem.lower().replace("-his", "") + "-his") if his else "g1-toy"        # g1-his / g2-his
     stamp = time.strftime("%Y%m%d-%H%M%S"); out = ROOT / "runs" / f"{tag}-{stamp}"; out.mkdir(parents=True, exist_ok=True)
-    gate_path0 = ROOT / "runs" / ("gate-ga-G1-his.json" if his else "gate-ga-G1.json")
+    gate_path0 = ROOT / "runs" / (f"gate-ga-{gpath.stem}.json" if his else "gate-ga-G1.json")
     if his and "cos<THETA_N" in gpath.read_text():
         # G1 §1: the bands overlap on his pictures → the run still reads, with the TOY's thetas carried, and the verdict says so
         rep0 = json.loads(gate_path0.read_text()) if gate_path0.exists() else {}
@@ -236,7 +237,7 @@ def main(argv: List[str]) -> int:
     genome_text = gpath.read_text(); genome = parse_genome(genome_text); (out / gpath.name).write_text(genome_text)
     if genome.gaze is None:
         raise GenomeError("G1 needs the GAZE gene ON")
-    gate_path = ROOT / "runs" / ("gate-ga-G1-his.json" if his else "gate-ga-G1.json")
+    gate_path = gate_path0
     gate_rep = json.loads(gate_path.read_text()) if gate_path.exists() else {}
     R: Dict[str, object] = {"stamp": stamp, "kind": tag, "genome_file": gpath.name, "genome": genome_numbers(genome), "gaze": genome.gaze, "retina": list(genome.retina),
                             "prereg": "docs/G1-PREREG.md", "gate": {k: gate_rep.get(k) for k in ("choice", "plant", "ear", "overlap", "label") if k in gate_rep}}
