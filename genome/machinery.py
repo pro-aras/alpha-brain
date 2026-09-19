@@ -400,13 +400,41 @@ class Area:
         self.alive = np.zeros(nmax, dtype=np.uint8)
         self.misfires = np.zeros(nmax, dtype=np.int64)
         self.n = 0                                  # cells ever born (ids 0..n-1)
+        # G4 §11 Wave 2 B12 (TRAITS): None until Organism.set_traits() binds a genome/traits.py Traits
+        # instance — words area never gets one (TRAITS is a SIGHT contrast head). TRAITS undeclared ->
+        # this stays None for the whole life -> cos()'s `if self.traits is None` branch below is the
+        # exact two lines this class had before B12 existed -> the pin is untouched by construction.
+        self.traits = None
+        self._traits_cache_version = None
+        self._traits_cache_n = None
+        self._traits_cache_Hc = None
 
     def alive_ids(self) -> np.ndarray:
         return np.flatnonzero(self.alive[: self.n])
 
     def cos(self, x: np.ndarray) -> np.ndarray:
-        """cosine of x to every cell ever born (dead cells read -1 so they never win)."""
-        c = self.cells[: self.n] @ x
+        """cosine of x to every cell ever born (dead cells read -1 so they never win). G4 §11 Wave 2
+        B12: when `self.traits` is set (sight area only, after Organism.set_traits()), both the cell
+        and the query are projected through the head's H before the cosine — cos(H·cell, H·x) — while
+        `self.cells` itself stays the RAW, untouched feature (a changing head strands no cell). H·cells
+        is cached and invalidated whenever the cell count changes (growth) or `traits.version` changes
+        (a fresh learn() call) — never silently stale."""
+        if self.traits is None:
+            c = self.cells[: self.n] @ x
+            c[self.alive[: self.n] == 0] = -1.0
+            return c
+        H = self.traits.H
+        if self._traits_cache_version != self.traits.version or self._traits_cache_n != self.n or self._traits_cache_Hc is None:
+            Hc = self.cells[: self.n] @ H.T
+            norms = np.linalg.norm(Hc, axis=1)
+            norms[norms == 0.0] = 1.0
+            self._traits_cache_Hc = Hc / norms[:, None]
+            self._traits_cache_version = self.traits.version
+            self._traits_cache_n = self.n
+        Hx = H @ x
+        nx = float(np.linalg.norm(Hx))
+        Hx = Hx / nx if nx > 0.0 else Hx
+        c = self._traits_cache_Hc @ Hx
         c[self.alive[: self.n] == 0] = -1.0
         return c
 
@@ -454,6 +482,12 @@ class Organism:
 
     def total_cells(self) -> int:
         return int(self.sight.alive.sum() + self.words.alive.sum())
+
+    def set_traits(self, traits) -> None:
+        """G4 §11 Wave 2 B12: bind a genome/traits.py Traits instance to the sight area only (words
+        never gets one — TRAITS is a visual contrast head). Never called -> self.sight.traits stays
+        None -> Area.cos's untouched two-line path -> the pin (test_pin_skeleton.py) is unaffected."""
+        self.sight.traits = traits
 
     # ------------------------------------------------------------------ births
     def _birth(self, area: Area, x: np.ndarray, reason: str) -> Optional[int]:
