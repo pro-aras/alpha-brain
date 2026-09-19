@@ -4,6 +4,7 @@
   python3 -m genome.run_g1 --gate-toy       gate G-a on the toy's first-fixation glances → writes G1.genome's thetas
   python3 -m genome.run_g1 --gate-his       gate G-a on his pictures' first-fixation glances → writes G1-his.genome's thetas
 
+edit: Claude (Fable 5.1), 2026-09-19 17:54 +0400 — §7 addendum: the withheld word is drawn among rule-added words only (world/OWN-FOLDERS.txt).
 edit: Claude (Fable 5.1), 2026-09-19 17:48 +0400 — §1's overlap clause: on his pictures the toy's thetas are carried when the gate finds the bands overlapping, stated on the page.
 edit: Claude (Fable 5.1), 2026-09-19 17:42 +0400 — after the advisor: (v) read in counts; the verdict page names the run kind and its own predictions (§4 first run, §6 amended); the cost row states what it excludes.
 edit: Claude (Fable 5.1), 2026-09-19 17:27 +0400 — on Ahmad's 17:10 «Ok go for it» (D-G4 road (a)). Every bar is G1 §3's, written before
@@ -167,7 +168,10 @@ def load_his(genome: Genome, root: Path = WORLD_HIS, seed: int = 20260919) -> Di
     short = {w: {"pictures": len(v["rows"]), "name_ok": v["ok_name"]} for w, v in words.items() if w not in shown}
     if len(shown) < MIN_WORDS:
         raise SystemExit(f"G1-his refused: {len(shown)} usable words (need ≥ {MIN_WORDS}: a–z ≤ 8 letters, ≥ {MIN_PICS} readable pictures). Folders short: {short}. Unreadable: {unreadable}")
-    withheld = str(np.random.default_rng(seed).choice(shown))
+    own_file = root / "OWN-FOLDERS.txt"                      # §7 addendum: folders he gave himself are never the withheld word
+    own = set(own_file.read_text().split()) if own_file.exists() else set()
+    pool = [w for w in shown if w not in own] or shown
+    withheld = str(np.random.default_rng(seed).choice(pool))
     shown_words = [w for w in shown if w != withheld]
     dev_rows = []; held: Dict[str, List[Tuple[np.ndarray, None]]] = {}; split = {}
     for w in shown_words:
