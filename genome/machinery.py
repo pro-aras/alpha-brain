@@ -447,6 +447,19 @@ class Organism:
         if area.n >= area.nmax:
             self.c["births_refused_nmax"] += 1
             return None
+        if "CYCLE" in self.g.declared:
+            # G4 §3 B7: CYCLE's SOFT ceiling — refuse once ALIVE cells reach grow_to*NMAX, same counter
+            # as the hard cap. This does NOT reuse ids (advisor review: reusing a dead slot's id would
+            # corrupt questions.build_ledgers, which unions every id's birth history forever — a reborn
+            # id would inherit a retired cell's old "born on X" facts). cycle() (genome/sleep.py) lowers
+            # ALIVE count via a real merge pass, which reopens this gate with FRESH ids from here on;
+            # area.n (ever-born) never decreases, so the array's real NMAX ceiling is still the only
+            # hard limit, one-shot per id, exactly as it always was. A genome that never declares CYCLE
+            # (G1.genome, G4-skeleton.genome — the pin) never evaluates this branch at all.
+            ceiling = float(self.g.declared["CYCLE"]["grow_to"]) * self.g.nmax
+            if self.total_cells() >= ceiling:
+                self.c["births_refused_nmax"] += 1
+                return None
         if self.budget_left <= 0:
             self.c["births_refused_budget"] += 1
             return None
