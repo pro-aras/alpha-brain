@@ -1,5 +1,6 @@
 """run_g0.py — G0 rung 0: the toy, the design life, the twins, the plant, the marks → VERDICT.
 
+edit: Claude (Fable 5.1), 2026-09-19 16:49 +04 — the advisor's four: title from the genome file; predictions by tag; the five-thing life as long as the design life; the null plant's answers printed.
 edit: Claude (Fable 5.1), 2026-09-19 16:2x +04 — docs/G0-PREREG.md §2–§5, §7, §10–§11 are law here.
 edit: Claude (Fable 5.1), 2026-09-19 16:20 +04 — VERDICT: (ix) best RANDOM genome and the 20-genome quartile bar; twin prune counts; the what-did-nothing paragraph; the ledger sentence corrected.
 edit: Claude (Fable 5.1), 2026-09-19 16:40 +04 — G0b: --genome, the eye's side from the genome, eleven things, the plant's showings from the gate, the eye parity gate, cross-thing edge diagnostics.
@@ -198,7 +199,7 @@ def main(argv: List[str]) -> int:
     R["design"] = design
     a9 = design["ask_900"]; a6 = design["ask_600"]
     print(f"DESIGN @600 Q1 {a6['Q1']['acc']:.3f} Q2 {a6['Q2']['acc']:.2f} Q3 {a6['Q3']['acc']:.3f} Q4 {a6['Q4']['acc']:.3f} | @900 Q1 {a9['Q1']['acc']:.3f} Q2 {a9['Q2']['acc']:.2f} Q3 {a9['Q3']['acc']:.3f} Q4 {a9['Q4']['acc']:.3f} Q5 abstain {a9['Q5'][world.THING_NEVER]['abstain_rate']:.2f} {a9['Q5'][world.THING_NEVER]['abstain']} false-abst {a9['Q1']['false_abstention']:.3f} {a9['Q1']['abstain']}")
-    print(f"       arrival-2 things @900 Q1 {design['ask_900_arr2']['Q1']['acc']:.3f} | plant zog answered {d['plant']['answered_rate']:.2f} as {d['plant']['answered_as']} | null vex abstain {design['null_plant']['abstain_rate']:.2f} | cells/thing {design['cells_per_thing']}")
+    print(f"       arrival-2 things @900 Q1 {design['ask_900_arr2']['Q1']['acc']:.3f} | plant zog answered {design['plant']['answered_rate']:.2f} as {design['plant']['answered_as']} | null vex abstain {design['null_plant']['abstain_rate']:.2f} | cells/thing {design['cells_per_thing']}")
     s9 = design["at_900"]
     print(f"       cells {s9['cells_sight']}+{s9['cells_words']} (born {s9['cells_born_sight']}+{s9['cells_born_words']}: novelty {s9['births_novelty_sight']}/{s9['births_novelty_words']} error {s9['births_error_sight']}/{s9['births_error_words']}) refused budget {s9['births_refused_budget']} by arrival {design['refusals_by_arrival']} | edges alive {s9['edges_alive']} born {s9['edges_born']} pruned {s9['edges_pruned']} merged {s9['cells_merged_sight']}/{s9['cells_merged_words']} scale {s9['scale_events']} disuse {s9['removed_for_disuse']} | {design['seconds']} s")
     replay = live(genome, dev, a2, plant, things, arr2, held, world.THING_NEVER, label="replay")
@@ -219,7 +220,8 @@ def main(argv: List[str]) -> int:
 
     # ---- the 5-thing life (§10 clause 6): 600 moments, 120 per thing
     five = list(things[:5])
-    dev5 = world.stream(five, 120, np.random.default_rng(21), side); held5 = world.holdout(five + [world.THING_NEVER], HELD_N, np.random.default_rng(22), side)
+    per5 = PER_THING * len(things) // 5          # §10 clause 6: the same stream LENGTH as the design life (600 for ten things, 660 for eleven)
+    dev5 = world.stream(five, per5, np.random.default_rng(21), side); held5 = world.holdout(five + [world.THING_NEVER], HELD_N, np.random.default_rng(22), side)
     l5 = live(genome, dev5, [], [], five, [], held5, world.THING_NEVER, with_arr2=False, with_plant=False, label="five-thing")
     R["five_thing"] = l5
     print(f"FIVE-THING @600: cells born {l5['at_600']['cells_born_sight']} (10-thing @600: {design['at_600']['cells_born_sight']}) Q1 {l5['ask_600']['Q1']['acc']:.3f}")
@@ -250,7 +252,7 @@ def main(argv: List[str]) -> int:
                            "edges_born": s9["edges_born"], "edges_pruned": s9["edges_pruned"], "pruned_share": (s9["edges_pruned"] / s9["edges_born"]) if s9["edges_born"] else 0.0,
                            "removed_for_disuse": s9["removed_for_disuse"], "bars": "≥ 50 born · 0 refused · 5-thing < 10-thing · ≥ 5 % pruned · 0 by disuse"},
         "v_keeps": {"Q1_first10_at_600": d6["Q1"]["acc"], "Q1_first10_at_900": d9["Q1"]["acc"], "drop_pp": 100 * (d9["Q1"]["acc"] - d6["Q1"]["acc"]), "bar": "within 5 pp"},
-        "vi_knows_unknown": {"plant_answered": design["plant"]["answered_rate"], "plant_answered_as": design["plant"]["answered_as"], "null_abstain": design["null_plant"]["abstain_rate"],
+        "vi_knows_unknown": {"plant_answered": design["plant"]["answered_rate"], "plant_answered_as": design["plant"]["answered_as"], "null_abstain": design["null_plant"]["abstain_rate"], "null_answered_as": design["null_plant"]["answered_as"],
                              "Q5_abstain": d9["Q5"][world.THING_NEVER]["abstain_rate"], "Q5_abstain_by": d9["Q5"][world.THING_NEVER]["abstain"], "Q5_answered_as": d9["Q5"][world.THING_NEVER]["answered_as"],
                              "false_abstention_seen": d9["Q1"]["false_abstention"], "false_abstention_by": d9["Q1"]["abstain"], "bars": "plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20"},
         "vii_replay": {"pass": R["replay_identical"], "hash": design["hash_final"][:16]},
@@ -274,22 +276,26 @@ def main(argv: List[str]) -> int:
 def write_verdict(out: Path, R: Dict[str, object], genome: Genome) -> None:
     M = R["marks"]; d = R["design"]; d9 = d["ask_900"]; d6 = d["ask_600"]; s9 = d["at_900"]
     L = []
-    L.append(f"# G0 rung 0 — VERDICT: **{R['verdict']}** (failed: {', '.join(R['marks_failed']) or 'none'}; SCALE untested)\n")
-    L.append(f"run `{R['stamp']}` · genome `{out / 'G0.genome'}` · PREREG docs/G0-PREREG.md §1–§11 · every number below is read from results.json\n")
-    L.append("## The nine marks, bars as written before the run (§5), predictions of §7 beside each\n")
-    L.append("| mark | bar | read | pass | §7 predicted |\n|---|---|---|---|---|")
-    L.append(f"| (i) it answers | {M['i_answers']['bars']} | Q1 {M['i_answers']['Q1']:.3f} · Q2 {M['i_answers']['Q2']:.2f} · Q3 {M['i_answers']['Q3']:.3f} (ceiling {M['i_answers']['Q3_ceiling']:.3f}) · Q4 {M['i_answers']['Q4']:.3f} | {M['i_answers']['pass']} | likely PASS |")
-    L.append(f"| (ii) the meeting is real | T-shuffle, T-nowire Q1 ≤ .20 | T-shuffle Q1 band {[round(x,3) for x in M['ii_meeting_real']['T_shuffle_Q1_band']]} · T-nowire Q1 {M['ii_meeting_real']['T_nowire_Q1']:.3f} (abstain {M['ii_meeting_real']['T_nowire_abstain']}) | {M['ii_meeting_real']['pass']} | PASS |")
-    L.append(f"| (iii) growth matters | T-frozen ≥ 30 pp under (i) | T-frozen Q1 {M['iii_growth_matters']['T_frozen_Q1']:.3f} vs design {M['iii_growth_matters']['design_Q1']:.3f} | {M['iii_growth_matters']['pass']} | PASS |")
+    gname = R.get("genome_file", "G0.genome"); gtag = gname.replace(".genome", "")
+    L.append(f"# {gtag} rung 0 — VERDICT: **{R['verdict']}** (failed: {', '.join(R['marks_failed']) or 'none'}; SCALE untested)\n")
+    L.append(f"run `{R['stamp']}` · genome `{out / gname}` · PREREG {R.get('prereg', 'docs/G0-PREREG.md')} · every number below is read from results.json\n")
+    g0b = gtag.lower() == "g0b"
+    P = ({"i": "PASS", "ii": "PASS", "iii": "PASS", "iv": "pruning FAILS the 5 % bar unless the near-pair conflates at THETA_N", "v": "PASS", "vi": "the plant PASSES (showings from the gate); Q5 uncertain", "vii": "PASS", "viii": "PASS", "ix": "unknown (E29)"} if g0b
+         else {"i": "likely PASS", "ii": "PASS", "iii": "PASS", "iv": "births 100–300; pruning may FAIL the 5 % bar", "v": "PASS", "vi": "the uncertain one", "vii": "PASS by construction", "viii": "—", "ix": "unknown"})
+    L.append(f"## The nine marks, bars as written before the run (§5), predictions of {'G0b §4' if g0b else '§7'} beside each\n")
+    L.append(f"| mark | bar | read | pass | {'G0b §4' if g0b else '§7'} predicted |\n|---|---|---|---|---|")
+    L.append(f"| (i) it answers | {M['i_answers']['bars']} | Q1 {M['i_answers']['Q1']:.3f} · Q2 {M['i_answers']['Q2']:.2f} · Q3 {M['i_answers']['Q3']:.3f} (ceiling {M['i_answers']['Q3_ceiling']:.3f}) · Q4 {M['i_answers']['Q4']:.3f} | {M['i_answers']['pass']} | {P['i']} |")
+    L.append(f"| (ii) the meeting is real | T-shuffle, T-nowire Q1 ≤ .20 | T-shuffle Q1 band {[round(x,3) for x in M['ii_meeting_real']['T_shuffle_Q1_band']]} · T-nowire Q1 {M['ii_meeting_real']['T_nowire_Q1']:.3f} (abstain {M['ii_meeting_real']['T_nowire_abstain']}) | {M['ii_meeting_real']['pass']} | {P['ii']} |")
+    L.append(f"| (iii) growth matters | T-frozen ≥ 30 pp under (i) | T-frozen Q1 {M['iii_growth_matters']['T_frozen_Q1']:.3f} vs design {M['iii_growth_matters']['design_Q1']:.3f} | {M['iii_growth_matters']['pass']} | {P['iii']} |")
     iv = M["iv_grows_alone"]
-    L.append(f"| (iv) it grows on its own | {iv['bars'].replace('5-thing < 10-thing', '5-thing < full world')} | born {iv['cells_born']} · refused {iv['births_refused_budget']} · 5-thing {iv['five_thing_born_600']} vs full world {iv['ten_thing_born_600']} at the end of development · pruned {iv['edges_pruned']}/{iv['edges_born']} = {100*iv['pruned_share']:.1f} % (cross-thing born {d.get('edges_cross', {}).get('born', 'n/a')}, cross-thing pruned {d.get('edges_cross', {}).get('pruned', 'n/a')}) · disuse {iv['removed_for_disuse']} | {iv['pass']} | births 100–300; pruning may FAIL the 5 % bar |")
-    L.append(f"| (v) it keeps what it learned | within 5 pp after arrival 2 | Q1 first-10 at 600 {M['v_keeps']['Q1_first10_at_600']:.3f} → at 900 {M['v_keeps']['Q1_first10_at_900']:.3f} ({M['v_keeps']['drop_pp']:+.1f} pp) | {M['v_keeps']['pass']} | PASS |")
+    L.append(f"| (iv) it grows on its own | {iv['bars'].replace('5-thing < 10-thing', '5-thing < full world')} | born {iv['cells_born']} · refused {iv['births_refused_budget']} · 5-thing {iv['five_thing_born_600']} vs full world {iv['ten_thing_born_600']} at the end of development · pruned {iv['edges_pruned']}/{iv['edges_born']} = {100*iv['pruned_share']:.1f} % (cross-thing born {d.get('edges_cross', {}).get('born', 'n/a')}, cross-thing pruned {d.get('edges_cross', {}).get('pruned', 'n/a')}) · disuse {iv['removed_for_disuse']} | {iv['pass']} | {P['iv']} |")
+    L.append(f"| (v) it keeps what it learned | within 5 pp after arrival 2 | Q1 first-10 at 600 {M['v_keeps']['Q1_first10_at_600']:.3f} → at 900 {M['v_keeps']['Q1_first10_at_900']:.3f} ({M['v_keeps']['drop_pp']:+.1f} pp) | {M['v_keeps']['pass']} | {P['v']} |")
     vi = M["vi_knows_unknown"]
-    L.append(f"| (vi) it knows what it does not know | {vi['bars']} | plant zog answered {vi['plant_answered']:.2f} (as {vi['plant_answered_as']}) · null vex abstains {vi['null_abstain']:.2f} · Q5 spiral abstains {vi['Q5_abstain']:.2f} (by {vi['Q5_abstain_by']}; answered as {vi['Q5_answered_as']}) · false abstention on seen {vi['false_abstention_seen']:.3f} (by {vi['false_abstention_by']}) | {vi['pass']} | the uncertain one |")
-    L.append(f"| (vii) replay | two lives byte-identical | {M['vii_replay']['pass']} (sha256 {M['vii_replay']['hash']}…) | {M['vii_replay']['pass']} | PASS by construction |")
-    L.append(f"| (viii) cost | ≤ 300 s, one process | {M['viii_cost']['seconds_design_life']} s | {M['viii_cost']['pass']} | — |")
+    L.append(f"| (vi) it knows what it does not know | {vi['bars']} | plant zog answered {vi['plant_answered']:.2f} (as {vi['plant_answered_as']}) · null vex abstains {vi['null_abstain']:.2f} (answered as {vi.get('null_answered_as') or 'nothing'}) · Q5 spiral abstains {vi['Q5_abstain']:.2f} (by {vi['Q5_abstain_by']}; answered as {vi['Q5_answered_as']}) · false abstention on seen {vi['false_abstention_seen']:.3f} (by {vi['false_abstention_by']}) | {vi['pass']} | {P['vi']} |")
+    L.append(f"| (vii) replay | two lives byte-identical | {M['vii_replay']['pass']} (sha256 {M['vii_replay']['hash']}…) | {M['vii_replay']['pass']} | {P['vii']} |")
+    L.append(f"| (viii) cost | ≤ 300 s, one process | {M['viii_cost']['seconds_design_life']} s | {M['viii_cost']['pass']} | {P['viii']} |")
     ix = M["ix_not_luck"]
-    L.append(f"| (ix) not luck | top quartile of 20 random genomes | design composite {ix['design_composite']:.3f} ranks {ix['rank_of_design']} of {ix['of']} (best random {ix['best_random']:.3f}) | {ix['pass']} | unknown |")
+    L.append(f"| (ix) not luck | top quartile of 20 random genomes | design composite {ix['design_composite']:.3f} ranks {ix['rank_of_design']} of {ix['of']} (best random {ix['best_random']:.3f}) | {ix['pass']} | {P['ix']} |")
     L.append(f"| SCALE | — | {M['untested_SCALE']['scale_events']} events | UNTESTED | — |\n")
     L.append("## The design life, every number\n")
     L.append(f"- Gate G-a wrote THETA_N = {genome.theta_n}, THETA_M = {genome.theta_m}; retina `{' '.join(genome.retina)}` ({genome.sight_dim()} numbers); §2's strict rule NOT MET, §11's amended rule met (see the genome file's last line).")
@@ -310,7 +316,7 @@ def write_verdict(out: Path, R: Dict[str, object], genome: Genome) -> None:
         a = v["ask_900"]; s = v["at_900"]
         L.append(f"- **{k}**: Q1 {a['Q1']['acc']:.3f} (abstain {a['Q1']['abstain']}) · Q2 {a['Q2']['acc']:.2f} · Q3 {a['Q3']['acc']:.3f} · Q4 {a['Q4']['acc']:.3f} · cells {s['cells_sight']}+{s['cells_words']} (error births {s['births_error_sight']}/{s['births_error_words']}, redundant refused {s.get('births_refused_redundant', 0)}) · edges alive {s['edges_alive']} born {s['edges_born']} pruned {s['edges_pruned']} ({(100*s['edges_pruned']/s['edges_born']) if s['edges_born'] else 0:.1f} %) · merged {s['cells_merged_sight']}/{s['cells_merged_words']} · refused budget {s['births_refused_budget']} frozen {s['births_refused_frozen']} · {v['seconds']} s")
     l5 = R["five_thing"]
-    L.append(f"- **five-thing life** (600 moments, 120/thing): cells born {l5['at_600']['cells_born_sight']} vs the full world's {d['at_600']['cells_born_sight']} at the end of development; Q1 {l5['ask_600']['Q1']['acc']:.3f}.\n")
+    L.append(f"- **five-thing life** ({l5['at_600']['moments']} moments, {l5['at_600']['moments'] // 5}/thing): cells born {l5['at_600']['cells_born_sight']} vs the full world's {d['at_600']['cells_born_sight']} at the end of development; Q1 {l5['ask_600']['Q1']['acc']:.3f}.\n")
     L.append("## Twenty random genomes (§4, E29's control) — composite = mean(Q1..Q4) at 900\n")
     L.append("| seed | composite | Q1 | Q2 | Q3 | Q4 | theta_n | misfires | budget | kwta | lr | prune | theta_m | stage1 | abstain | cells | refused |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for x in sorted(R["random_genomes"], key=lambda z: -z["composite"]):
