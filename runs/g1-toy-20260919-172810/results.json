@@ -3101,8 +3101,12 @@
    "gradable": true,
    "Q1_at_dev": 0.8318181818181818,
    "Q1_after_arrival2": 0.7772727272727272,
-   "bar": "within 5 pp",
-   "pass": false
+   "bar": "within 5 pp, read in COUNTS: lost \u2264 ceil(0.05 \u00b7 n)",
+   "pass": false,
+   "correct_at_dev": 183,
+   "correct_after_arrival2": 171,
+   "n": 220,
+   "allowed_loss": 11
   },
   "vi_knows_unknown": {
    "Q5_abstain": 0.95,

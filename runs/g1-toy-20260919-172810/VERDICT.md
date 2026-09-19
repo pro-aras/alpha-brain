@@ -1,4 +1,4 @@
-# G1 rung 1 — G1-toy (canvases, known truth) — VERDICT: **FAIL** (failed: i_answers, v_keeps, vi_knows_unknown; gating marks: i_answers, ii_meeting_real, iii_growth_matters, v_keeps, vi_knows_unknown, vii_replay, viii_cost, ix_not_luck, xi_gaze_earns_place, x_gaze_finds_thing)
+# G1 rung 1 — G1-toy (canvases, known truth; ink contrast — the first run) — VERDICT: **FAIL** (failed: i_answers, v_keeps, vi_knows_unknown; gating marks: i_answers, ii_meeting_real, iii_growth_matters, v_keeps, vi_knows_unknown, vii_replay, viii_cost, ix_not_luck, xi_gaze_earns_place, x_gaze_finds_thing)
 
 run `20260919-172810` · genome `G1.genome` · PREREG docs/G1-PREREG.md · GAZE {'fixations': 4, 'grid': 16, 'canvas': 128, 'glance': 32, 'ink': 'contrast'} · every number below is read from results.json
 
@@ -10,10 +10,10 @@ run `20260919-172810` · genome `G1.genome` · PREREG docs/G1-PREREG.md · GAZE 
 | (ii) the meeting is real | T-shuffle, T-nowire Q1 ≤ .20 | T-shuffle Q1 0.027 · T-nowire Q1 0.000 (abstains {'novel': 0, 'noedge': 220, 'ratio': 0}) | True | PASS |
 | (iii) growth matters | T-frozen ≥ 30 pp under (i) | T-frozen Q1 0.173 vs 0.777 | True | PASS |
 | (iv) it grows on its own | ≥ 50 born · 0 refused · smaller life < full world · ≥ 5 % pruned · 0 by disuse | born 387 · refused 0 · smaller life 164 vs full 230 · pruned 580/1062 = 54.6 % (cross-thing born 555, pruned 368) · disuse 0 · births by glance {'on_thing': 349, 'off_thing': 21, 'moments_on': 3738, 'moments_off': 122} | True (reported, not gating) | toy: births above G0b's 86, refusals possible, pruning under 5 % — REPORTED; his: GATING, unknown |
-| (v) it keeps what it learned | within 5 pp after arrival 2 | Q1 0.832 → 0.777 | False | PASS (toy); not gradable on his pictures |
+| (v) it keeps what it learned | within 5 pp, read in COUNTS: lost ≤ ceil(0.05 · n) | Q1 0.832 → 0.777 (183 → 171 of 220; lost 12, allowed 11) | False | PASS (toy); not gradable on his pictures |
 | (vi) it knows what it does not know | plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20 | plant answered 0.60 (as {'zog': 12}) · null abstains 0.20 (as {'ring': 16}) · Q5 abstains 0.95 of 20 (by {'novel': 19, 'noedge': 0, 'ratio': 0}; answered as {'ring': 1}) · false abstention 0.123 (by {'novel': 0, 'noedge': 0, 'ratio': 27}) | False | plant PASS, spiral uncertain (toy); his: unknown |
 | (vii) replay | two lives byte-identical | identical True (hash ecc09a70426e877a) | True | PASS |
-| (viii) cost | ≤ 600 s | 1.91 s a design life, one process | True | PASS |
+| (viii) cost | ≤ 600 s | 1.91 s a design life, one process — EXCLUDES the glancing (the gaze + the eye run ONCE per picture before any life: see the log's 'glanced' lines, ~10 s for all pictures); G0b's seconds included its retina | True | PASS |
 | (ix) not luck | rank ≤ 5 of 21 | rank 1 of 21 (design 0.868; best random 0.824, seed 19) | True | unknown |
 | (x) the gaze finds the thing | ≥ .90 within the first 2 fixations · ≥ 1.5× random | gaze 1.000 (220/220) · random twin 0.118 (26/220; expected ceiling 0.069) · ratio 8.5× | True | PASS: first fixation on the thing on > 95 %; random near 0.07 |
 | (xi) the gaze earns its place | Q1(gaze) − Q1(one glance) ≥ .10 | gaze 0.777 − one glance 0.291 = +0.486 | True | PASS: one glance leaves the thing at 8 px; T-one-glance Q1 under 0.6 |
@@ -59,4 +59,4 @@ within-thing: median 0.950 p5 0.817 p95 0.994 · between-thing: median 0.704 p95
 | 19 | 0.824 | 0.686 | 0.82 | 0.855 | 0.936 | 0.954 | 4 | 0.023 | 334 | 304 |
 | 20 | 0.170 | 0.000 | 0.09 | 0.500 | 0.091 | 0.726 | 2 | 0.159 | 722 | 21 |
 
-**Read as written.** G1-toy (canvases, known truth): FAIL; failed ['i_answers', 'v_keeps', 'vi_knows_unknown']. Whole run 72.9 s.
+**Read as written.** G1-toy (canvases, known truth; ink contrast — the first run): FAIL; failed ['i_answers', 'v_keeps', 'vi_knows_unknown']. Whole run 72.9 s.

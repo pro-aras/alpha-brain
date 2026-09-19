@@ -4,6 +4,7 @@
   python3 -m genome.run_g1 --gate-toy       gate G-a on the toy's first-fixation glances → writes G1.genome's thetas
   python3 -m genome.run_g1 --gate-his       gate G-a on his pictures' first-fixation glances → writes G1-his.genome's thetas
 
+edit: Claude (Fable 5.1), 2026-09-19 17:42 +0400 — after the advisor: (v) read in counts; the verdict page names the run kind and its own predictions (§4 first run, §6 amended); the cost row states what it excludes.
 edit: Claude (Fable 5.1), 2026-09-19 17:27 +0400 — on Ahmad's 17:10 «Ok go for it» (D-G4 road (a)). Every bar is G1 §3's, written before
 this file. A picture is gazed ONCE (its glances cached); each glance is one moment with the same word (§1).
 """
@@ -12,6 +13,7 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import json
+import math
 import os
 import re
 import sys
@@ -316,7 +318,9 @@ def main(argv: List[str]) -> int:
         "iv_grows_alone": {"gating": his, "cells_born": s["cells_born_sight"] + s["cells_born_words"], "births_refused_budget": s["births_refused_budget"], "smaller_life_born": l5["at_dev"]["cells_born_sight"], "full_world_born_at_dev": design["at_dev"]["cells_born_sight"],
                            "edges_born": s["edges_born"], "edges_pruned": s["edges_pruned"], "pruned_share": (s["edges_pruned"] / s["edges_born"]) if s["edges_born"] else 0.0, "removed_for_disuse": s["removed_for_disuse"],
                            "edges_cross": design["edges_cross"], "births_by_glance": design.get("births_by_glance"), "bars": "≥ 50 born · 0 refused · smaller life < full world · ≥ 5 % pruned · 0 by disuse"},
-        "v_keeps": {"gradable": bool(a2_rows), "Q1_at_dev": d_dev["Q1"]["acc"], "Q1_after_arrival2": design.get("ask_arr2", {}).get("Q1", {}).get("acc"), "bar": "within 5 pp"},
+        "v_keeps": {"gradable": bool(a2_rows), "Q1_at_dev": d_dev["Q1"]["acc"], "Q1_after_arrival2": design.get("ask_arr2", {}).get("Q1", {}).get("acc"),
+                    "correct_at_dev": d_dev["Q1"]["correct"], "correct_after_arrival2": design.get("ask_arr2", {}).get("Q1", {}).get("correct"), "n": d_dev["Q1"]["n"],
+                    "allowed_loss": int(math.ceil(0.05 * d_dev["Q1"]["n"])), "bar": "within 5 pp, read in COUNTS: lost ≤ ceil(0.05 · n)"},
         "vi_knows_unknown": {"Q5_abstain": D["Q5"].get(never, {}).get("abstain_rate"), "Q5_abstain_by": D["Q5"].get(never, {}).get("abstain"), "Q5_answered_as": D["Q5"].get(never, {}).get("answered_as"), "Q5_n": D["Q5"].get(never, {}).get("n"),
                              "false_abstention_seen": D["Q1"]["false_abstention"], "false_abstention_by": D["Q1"]["abstain"], "bars": "plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20"},
         "vii_replay": {"pass": R["replay_identical"], "hash": design["hash_final"][:16]},
@@ -327,7 +331,7 @@ def main(argv: List[str]) -> int:
     }
     M["iv_grows_alone"]["pass"] = (M["iv_grows_alone"]["cells_born"] >= 50 and s["births_refused_budget"] == 0 and l5["at_dev"]["cells_born_sight"] < design["at_dev"]["cells_born_sight"] and M["iv_grows_alone"]["pruned_share"] >= .05 and s["removed_for_disuse"] == 0)
     if a2_rows:
-        M["v_keeps"]["pass"] = design["ask_arr2"]["Q1"]["acc"] >= d_dev["Q1"]["acc"] - .05
+        M["v_keeps"]["pass"] = design["ask_arr2"]["Q1"]["correct"] >= d_dev["Q1"]["correct"] - M["v_keeps"]["allowed_loss"]   # counts, never a float tie
     if plant_rows:
         M["vi_knows_unknown"].update({"plant_answered": design["plant"]["answered_rate"], "plant_answered_as": design["plant"]["answered_as"], "null_abstain": design["null_plant"]["abstain_rate"], "null_answered_as": design["null_plant"]["answered_as"]})
         M["vi_knows_unknown"]["pass"] = design["plant"]["answered_rate"] > .5 and design["null_plant"]["abstain_rate"] > .5 and D["Q5"][never]["abstain_rate"] >= .80 and D["Q1"]["false_abstention"] <= .20
@@ -353,22 +357,26 @@ def main(argv: List[str]) -> int:
 
 # ----------------------------------------------------------------------------- the verdict page
 def write_verdict(out: Path, R: Dict[str, object], genome: Genome, his: bool) -> None:
-    M = R["marks"]; d = R["design"]; tw = R["twins"]; kind = "G1-his (his pictures)" if his else "G1-toy (canvases, known truth)"
-    P = {"i": "PASS on the toy; his: unknown", "ii": "PASS", "iii": "PASS", "iv": "toy: births above G0b's 86, refusals possible, pruning under 5 % — REPORTED; his: GATING, unknown", "v": "PASS (toy); not gradable on his pictures", "vi": "plant PASS, spiral uncertain (toy); his: unknown", "vii": "PASS", "viii": "PASS", "ix": "unknown", "x": "PASS: first fixation on the thing on > 95 %; random near 0.07", "xi": "PASS: one glance leaves the thing at 8 px; T-one-glance Q1 under 0.6"}
+    M = R["marks"]; d = R["design"]; tw = R["twins"]
+    amended = str(R.get("gaze", {}).get("ink")) == "border"
+    kind = "G1-his (his pictures)" if his else ("G1b-toy (canvases, known truth; §6 amendment 1, ink border)" if amended else "G1-toy (canvases, known truth; ink contrast — the first run)")
+    P6 = {"i": "§6: Q1 ≥ .80 (the trio separates; circle/diamond may stay close)", "ii": "PASS", "iii": "PASS", "iv": "§6: reported; §4 said under 5 % — MISSED on the first run (54.6 %)", "v": "§6: uncertain (triangle→tree, diamond→house are a context fact)", "vi": "§6: the null plant abstains ≥ .5", "vii": "PASS", "viii": "PASS", "ix": "unknown", "x": "PASS as before", "xi": "PASS as before"}
+    P = P6 if amended else {"i": "PASS on the toy; his: unknown", "ii": "PASS", "iii": "PASS", "iv": "toy: births above G0b's 86, refusals possible, pruning under 5 % — REPORTED; his: GATING, unknown", "v": "PASS (toy); not gradable on his pictures", "vi": "plant PASS, spiral uncertain (toy); his: unknown", "vii": "PASS", "viii": "PASS", "ix": "unknown", "x": "PASS: first fixation on the thing on > 95 %; random near 0.07", "xi": "PASS: one glance leaves the thing at 8 px; T-one-glance Q1 under 0.6"}
     def row(k, name, bar, read, pk):
         m = M[k]; p = m.get("pass"); g = k in R["gating_marks"]
         return f"| {name} | {bar} | {read} | {'—' if p is None else p}{'' if g else ' (reported, not gating)'} | {P[pk]} |"
+    pred_src = "§6" if amended else "§4"
     L = [f"# G1 rung 1 — {kind} — VERDICT: **{R['verdict']}** (failed: {', '.join(R['marks_failed']) or 'none'}; gating marks: {', '.join(R['gating_marks'])})\n",
          f"run `{R['stamp']}` · genome `{R['genome_file']}` · PREREG docs/G1-PREREG.md · GAZE {R['gaze']} · every number below is read from results.json\n",
-         "## The marks, bars as written before the run (G1 §3), predictions of §4 beside each\n", "| mark | bar | read | pass | §4 predicted |", "|---|---|---|---|---|"]
+         f"## The marks, bars as written before the run (G1 §3), predictions of {pred_src} beside each\n", f"| mark | bar | read | pass | {pred_src} predicted |", "|---|---|---|---|---|"]
     m = M["i_answers"]; L.append(row("i_answers", "(i) it answers", m["bars"], f"Q1 {m['Q1']:.3f} ({m['counts']['Q1']}) · Q2 {m['Q2']:.2f} ({m['counts']['Q2']}) · Q3 {m['Q3']:.3f} ({m['counts']['Q3']}; ceiling {m['Q3_ceiling']:.3f}) · Q4 {m['Q4']:.3f} ({m['counts']['Q4']})", "i"))
     m = M["ii_meeting_real"]; L.append(row("ii_meeting_real", "(ii) the meeting is real", "T-shuffle, T-nowire Q1 ≤ .20", f"T-shuffle Q1 {m['T_shuffle_Q1']:.3f} · T-nowire Q1 {m['T_nowire_Q1']:.3f} (abstains {m['T_nowire_abstain']})", "ii"))
     m = M["iii_growth_matters"]; L.append(row("iii_growth_matters", "(iii) growth matters", "T-frozen ≥ 30 pp under (i)", f"T-frozen Q1 {m['T_frozen_Q1']:.3f} vs {m['design_Q1']:.3f}", "iii"))
     m = M["iv_grows_alone"]; L.append(row("iv_grows_alone", "(iv) it grows on its own", m["bars"], f"born {m['cells_born']} · refused {m['births_refused_budget']} · smaller life {m['smaller_life_born']} vs full {m['full_world_born_at_dev']} · pruned {m['edges_pruned']}/{m['edges_born']} = {100 * m['pruned_share']:.1f} % (cross-thing born {m['edges_cross']['born']}, pruned {m['edges_cross']['pruned']}) · disuse {m['removed_for_disuse']} · births by glance {m['births_by_glance']}", "iv"))
-    m = M["v_keeps"]; L.append(row("v_keeps", "(v) it keeps what it learned", "within 5 pp after arrival 2", (f"Q1 {m['Q1_at_dev']:.3f} → {m['Q1_after_arrival2']:.3f}" if m["gradable"] else "not gradable (one arrival)"), "v"))
+    m = M["v_keeps"]; L.append(row("v_keeps", "(v) it keeps what it learned", m["bar"], (f"Q1 {m['Q1_at_dev']:.3f} → {m['Q1_after_arrival2']:.3f} ({m['correct_at_dev']} → {m['correct_after_arrival2']} of {m['n']}; lost {m['correct_at_dev'] - m['correct_after_arrival2']}, allowed {m['allowed_loss']})" if m["gradable"] else "not gradable (one arrival)"), "v"))
     m = M["vi_knows_unknown"]; L.append(row("vi_knows_unknown", "(vi) it knows what it does not know", m["bars"], (f"plant answered {m['plant_answered']:.2f} (as {m['plant_answered_as']}) · null abstains {m['null_abstain']:.2f} (as {m['null_answered_as']}) · " if "plant_answered" in m else f"{m.get('plant')} · «vex» on the ear: {m.get('null_vex_on_the_ear')} · ") + f"Q5 abstains {m['Q5_abstain']:.2f} of {m['Q5_n']} (by {m['Q5_abstain_by']}; answered as {m['Q5_answered_as']}) · false abstention {m['false_abstention_seen']:.3f} (by {m['false_abstention_by']})", "vi"))
     m = M["vii_replay"]; L.append(row("vii_replay", "(vii) replay", "two lives byte-identical", f"identical {m['pass']} (hash {m['hash']})", "vii"))
-    m = M["viii_cost"]; L.append(row("viii_cost", "(viii) cost", m["bar"], f"{m['seconds_design_life']} s a design life, one process", "viii"))
+    m = M["viii_cost"]; L.append(row("viii_cost", "(viii) cost", m["bar"], f"{m['seconds_design_life']} s a design life, one process — EXCLUDES the glancing (the gaze + the eye run ONCE per picture before any life: see the log's 'glanced' lines, ~10 s for all pictures); G0b's seconds included its retina", "viii"))
     m = M["ix_not_luck"]; L.append(row("ix_not_luck", "(ix) not luck", m["bar"], f"rank {m['rank_of_design']} of {m['of']} (design {m['design_composite']:.3f}; best random {m['best_random']:.3f}, seed {m['best_random_seed']})", "ix"))
     if "x_gaze_finds_thing" in M:
         m = M["x_gaze_finds_thing"]; L.append(row("x_gaze_finds_thing", "(x) the gaze finds the thing", m["bar"], f"gaze {m['gaze_rate']:.3f} ({m['gaze_hit']}) · random twin {m['random_rate']:.3f} ({m['random_hit']}; expected ceiling {m['random_ceiling_expected']:.3f}) · ratio {m['ratio']:.1f}×", "x"))
