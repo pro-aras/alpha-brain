@@ -1,0 +1,202 @@
+{
+ "stamp": "20260919-164341",
+ "genome_file": "G0b.genome",
+ "genome": {
+  "theta_n": 0.968,
+  "misfires": 3,
+  "budget": 400,
+  "kwta": 5,
+  "lr": 0.05,
+  "prune_floor": 0.02,
+  "theta_m": 0.9986,
+  "scale_every": 1000,
+  "stage1": 200,
+  "abstain_ratio": 0.85
+ },
+ "retina": [
+  "thresh0.25",
+  "centre",
+  "tower:eye-tower-g2",
+  "sqrt",
+  "unit"
+ ],
+ "side": 32,
+ "prereg": "docs/G0-PREREG.md \u00a71\u2013\u00a711 + docs/G0b-PREREG.md",
+ "plant_showings": 5,
+ "gate": {
+  "choice": {
+   "strict": {
+    "lo": 0.9026805678217525,
+    "hi": 0.8626759138778229,
+    "met": false
+   },
+   "amended": {
+    "theta_n": 0.968,
+    "floor": 0.9026805678217525,
+    "rule": "p95",
+    "met": true,
+    "conflated_pairs": []
+   },
+   "overlap": false,
+   "theta_n": 0.968,
+   "theta_m": 0.9986
+  },
+  "plant": {
+   "p_res_at_theta_n": 0.5028248587570622,
+   "showings": 5
+  },
+  "ear": {
+   "max_between": 0.6249999999999999,
+   "median_between": 0.24999999999999994
+  },
+  "closest_pair": {
+   "pair": "circle/diamond",
+   "p95": 0.9631220857680122
+  },
+  "within": {
+   "median": 0.9682918454491785,
+   "p5": 0.8626759138778229,
+   "p95": 0.9971531710130189,
+   "n": 19470
+  },
+  "between": {
+   "median": 0.7581774166437085,
+   "p5": 0.5522668040763766,
+   "p95": 0.9026805678217525,
+   "max": 0.9700307413399428,
+   "n": 30000
+  }
+ },
+ "eye_parity": {
+  "reference_tower": "eye-tower",
+  "n": 2356,
+  "max_diff": 0.0,
+  "frames_within_1e-4": 2356,
+  "planted_caught": true,
+  "gene_tower": "eye-tower-g2",
+  "gene_sha256": "6abc6d7553d8b8c7529b4b1802e6f6b5c758c89d4abc0be01a2e6299fbb301f6",
+  "gene_n_feat": 112
+ },
+ "streams": {
+  "dev": 660,
+  "arr2": 300,
+  "plant": 5,
+  "held_checked_disjoint": 380,
+  "planted_copy_caught": true,
+  "things": [
+   "circle",
+   "square",
+   "triangle",
+   "cross",
+   "ring",
+   "bar",
+   "dot",
+   "star",
+   "arrow",
+   "wave",
+   "diamond"
+  ]
+ },
+ "toy": {
+  "label": "toy",
+  "at_600": {
+   "moments": 300,
+   "cells_sight": 8,
+   "cells_words": 2,
+   "cells_born_sight": 8,
+   "cells_born_words": 2,
+   "edges_alive": 8,
+   "births_novelty_sight": 8,
+   "births_novelty_words": 2,
+   "births_error_sight": 0,
+   "births_error_words": 0,
+   "births_refused_budget": 0,
+   "births_refused_nmax": 0,
+   "births_refused_frozen": 0,
+   "births_refused_redundant": 1,
+   "edges_born": 8,
+   "edges_pruned": 0,
+   "cells_merged_sight": 0,
+   "cells_merged_words": 0,
+   "scale_events": 0,
+   "removed_for_disuse": 0
+  },
+  "ask_600": {
+   "Q1": {
+    "acc": 1.0,
+    "n": 40,
+    "correct": 40,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 0
+    },
+    "false_abstention": 0.0,
+    "per_thing": {
+     "circle": 1.0,
+     "bar": 1.0
+    },
+    "answers_from_multi_word_cells": 0
+   },
+   "Q2": {
+    "acc": 1.0,
+    "n": 2,
+    "correct": 2,
+    "abstain": {
+     "novel": 0,
+     "noedge": 0,
+     "ratio": 0
+    },
+    "detail": {
+     "circle": "circle",
+     "bar": "bar"
+    }
+   },
+   "Q3": {
+    "acc": 1.0,
+    "n": 40,
+    "correct": 40,
+    "true_pairs_abstained": 0,
+    "ceiling": 1.0
+   },
+   "Q4": {
+    "acc": 1.0,
+    "n": 40,
+    "correct": 40,
+    "ties": 0
+   },
+   "Q5": {
+    "spiral": {
+     "abstain_rate": 1.0,
+     "n": 20,
+     "abstain": {
+      "novel": 20,
+      "noedge": 0,
+      "ratio": 0
+     },
+     "answered_as": {}
+    }
+   },
+   "composite": 1.0
+  },
+  "hash_600": "5e5ab8bdc02dad20df0f4087b4cfb242fa9645150ce8e584cc09d044158cc131",
+  "refusals_by_arrival": [
+   0
+  ],
+  "hash_final": "5e5ab8bdc02dad20df0f4087b4cfb242fa9645150ce8e584cc09d044158cc131",
+  "ledger_corruption_hash_unchanged": true,
+  "multi_thing_sight_cells": 0,
+  "edges_cross": {
+   "born": 0,
+   "pruned": 0,
+   "born_total": 8,
+   "pruned_total": 0
+  },
+  "cells_per_thing": {
+   "circle": 2,
+   "bar": 6
+  },
+  "seconds": 0.4
+ },
+ "toy_pass": true
+}

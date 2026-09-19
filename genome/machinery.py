@@ -2,6 +2,7 @@
 
 edit: Claude (Fable 5.1), 2026-09-19 16:0x +04 — G0 rung 0 (docs/G0-PREREG.md §1, §10).
 edit: Claude (Fable 5.1), 2026-09-19 16:09 +04 — §11: the retina as a list of fixed steps (gate G-a's finding); winners must resonate.
+edit: Claude (Fable 5.1), 2026-09-19 16:37 +04 — G0b: RETINA step tower:<sealed eye>; any square picture; every edge's birth and pruning logged by cell ids (no labels).
 edit: Claude (Fable 5.1), 2026-09-19 16:14 +04 — §11 amendments 4–6 (from the toy): redundant error births refused; ABSTAIN's second is a competitor that answers back differently; a question lights the resonating winners, not one cell.
 
 Laws of this file:
@@ -99,7 +100,7 @@ def parse_genome(text: str) -> Genome:
                 g["ear_blank_zero"] = (m.group(2) == "zero")
             elif gene == "RETINA":
                 for step in args:
-                    if not re.fullmatch(r"thresh" + _NUM + r"|centre|blur" + _NUM + r"|pool\d+|hog\d+|hogcells\d+x\d+|unit", step):
+                    if not re.fullmatch(r"thresh" + _NUM + r"|centre|blur" + _NUM + r"|pool\d+|hog\d+|hogcells\d+x\d+|tower:[A-Za-z0-9_.-]+|sqrt|unit", step):
                         raise GenomeError(f"RETINA: unknown fixed step {step!r} in {a!r}")
                 if args[-1] != "unit": raise GenomeError("RETINA: the last step must be unit")
                 g["retina"] = tuple(args)
@@ -179,7 +180,10 @@ from scipy import ndimage as _ndi
 def retina_dim(spec: Tuple[str, ...]) -> int:
     d = 0
     for step in spec:
-        if step.startswith("pool"):
+        if step.startswith("tower:"):
+            from .eye import tower as _tower                     # the sealed eye (G0b gene EYE); no labels are read
+            d += _tower(step[6:]).n_feat
+        elif step.startswith("pool"):
             k = int(step[4:]); d += (24 // k) ** 2
         elif step.startswith("hogcells"):
             k, nb = (int(v) for v in step[8:].split("x")); d += (24 // k) ** 2 * nb
@@ -209,25 +213,31 @@ def retina(pic: np.ndarray, spec: Tuple[str, ...] = ("thresh0.25", "centre", "bl
     unit length · hog<n>: histogram of edge orientation over the whole picture, n bins, unit length ·
     hogcells<k>x<n>: the same per k×k cell · unit: the concatenation to unit length.
     Every feature block is unit length before concatenation so no block outweighs another by scale."""
-    assert pic.shape == (24, 24)
+    assert pic.ndim == 2 and pic.shape[0] == pic.shape[1]
     q = pic.astype(np.float64)
     feats = []
     for step in spec:
-        if step.startswith("thresh"):
+        if step.startswith("tower:"):
+            from .eye import tower as _tower
+            t = _tower(step[6:])
+            assert pic.shape == (32, 32), "the sealed eye tower reads 32×32 frames (SENSE eye 32x32 grey)"
+            frame = np.clip(np.rint(q * 255.0), 0, 255).astype(np.uint8)   # q: after the steps before it (thresh, centre)
+            feats.append(_unit(t.features(frame).astype(np.float64)))
+        elif step.startswith("thresh"):
             t = float(step[6:]); q = np.where(q >= t, q, 0.0)
         elif step == "centre":
-            total = q.sum()
+            total = q.sum(); n = q.shape[0]
             if total > 0:
-                ys, xs = np.mgrid[0:24, 0:24]
+                ys, xs = np.mgrid[0:n, 0:n]
                 cy, cx = (ys * q).sum() / total, (xs * q).sum() / total
-                q = _ndi.shift(q, (11.5 - cy, 11.5 - cx), order=1, mode="constant", cval=0.0)
+                q = _ndi.shift(q, ((n - 1) / 2 - cy, (n - 1) / 2 - cx), order=1, mode="constant", cval=0.0)
         elif step.startswith("blur"):
             q = _ndi.gaussian_filter(q, float(step[4:]))
         elif step.startswith("pool"):
-            k = int(step[4:]); n = 24 // k
+            k = int(step[4:]); n = q.shape[0] // k
             feats.append(_unit(q.reshape(n, k, n, k).mean(axis=(1, 3)).reshape(-1)))
         elif step.startswith("hogcells"):
-            k, nb = (int(v) for v in step[8:].split("x")); n = 24 // k
+            k, nb = (int(v) for v in step[8:].split("x")); n = q.shape[0] // k
             gx, gy = _grad(q); mag = np.hypot(gx, gy); b = ((np.arctan2(gy, gx) % np.pi) / np.pi * nb).astype(int) % nb
             out = np.zeros((n, n, nb))
             for i in range(n):
@@ -239,6 +249,9 @@ def retina(pic: np.ndarray, spec: Tuple[str, ...] = ("thresh0.25", "centre", "bl
             nb = int(step[3:])
             gx, gy = _grad(q); mag = np.hypot(gx, gy); b = ((np.arctan2(gy, gx) % np.pi) / np.pi * nb).astype(int) % nb
             feats.append(_unit(np.bincount(b.ravel(), weights=mag.ravel(), minlength=nb)))
+        elif step == "sqrt":
+            # a fixed nonlinearity on the last feature block (the tower's ReLU features are ≥ 0): square root, unit length
+            feats[-1] = _unit(np.sqrt(np.maximum(feats[-1], 0.0)))
         elif step == "unit":
             return _unit(np.concatenate(feats))
         else:
@@ -289,6 +302,8 @@ class Organism:
         }
         self.births: List[Tuple[int, str, int, str]] = []      # (moment, area, cell, reason) — nothing else
         self.merges: List[Tuple[int, str, int, int]] = []      # (moment, area, kept, dropped)
+        self.edges_log: List[Tuple[int, int, int]] = []        # (moment, sight cell, word cell) — every edge born
+        self.prunes_log: List[Tuple[int, int, int]] = []       # (moment, sight cell, word cell) — every edge pruned
         self.refusals_by_arrival: List[int] = []
 
     # ------------------------------------------------------------------ arrivals & budget
@@ -359,6 +374,7 @@ class Organism:
                     self.W[s, t] = self.g.lr                  # §10 clause 3: born at w = lr
                     self.strikes[s, t] = 0
                     self.c["edges_born"] += 1
+                    self.edges_log.append((self.t, s, t))
 
     def _delta(self, S: List[int], T: List[int]) -> None:
         lr = self.g.lr
@@ -420,6 +436,13 @@ class Organism:
             k = int(dead.sum())
             if k:
                 W = self.W[sel]; M = self.mask[sel]; ST = self.strikes[sel]
+                # log every pruned edge by its (sight, word) ids before it is erased
+                if isinstance(sel[0], slice):
+                    for r_, c_ in zip(*np.nonzero(dead)):
+                        self.prunes_log.append((self.t, int(r_), int(cols[c_])))
+                else:
+                    for r_, c_ in zip(*np.nonzero(dead)):
+                        self.prunes_log.append((self.t, int(rows[r_]), int(c_)))
                 W[dead] = 0.0; M[dead] = 0; ST[dead] = 0
                 self.W[sel] = W; self.mask[sel] = M; self.strikes[sel] = ST
                 self.c["edges_pruned"] += k
@@ -540,6 +563,7 @@ class Organism:
         h.update(np.int64(self.t).tobytes()); h.update(np.int64(self.budget_left).tobytes())
         h.update(json.dumps(self.c, sort_keys=True).encode())
         h.update(json.dumps(self.births).encode()); h.update(json.dumps(self.merges).encode())
+        h.update(json.dumps(self.edges_log).encode()); h.update(json.dumps(self.prunes_log).encode())
         return h.hexdigest()
 
     def summary(self) -> Dict[str, object]:

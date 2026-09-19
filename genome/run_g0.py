@@ -2,8 +2,9 @@
 
 edit: Claude (Fable 5.1), 2026-09-19 16:2x +04 — docs/G0-PREREG.md §2–§5, §7, §10–§11 are law here.
 edit: Claude (Fable 5.1), 2026-09-19 16:20 +04 — VERDICT: (ix) best RANDOM genome and the 20-genome quartile bar; twin prune counts; the what-did-nothing paragraph; the ledger sentence corrected.
+edit: Claude (Fable 5.1), 2026-09-19 16:40 +04 — G0b: --genome, the eye's side from the genome, eleven things, the plant's showings from the gate, the eye parity gate, cross-thing edge diagnostics.
 
-    OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m genome.run_g0 [--toy-only]
+    OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m genome.run_g0 [--toy-only] [--genome genome/G0b.genome]
 
 One process, lives sequential. Six RNG streams (§10 clause 10). Every number lands in
 runs/g0-<stamp>/results.json and VERDICT.md; nothing is summarised away.
@@ -40,12 +41,12 @@ RANDOM_BOUNDS = {"theta_n": (0.50, 0.99), "misfires": (1, 8), "budget": (50, 800
 
 # ----------------------------------------------------------------------------- streams
 def make_streams(things: Sequence[str], per_thing: int, held_n: int, arr2: Sequence[str], arr2_per: int,
-                 plant_word: str, null_word: str, never_word: str):
+                 plant_word: str, null_word: str, never_word: str, side: int = 24, plant_showings: int = PLANT_SHOWINGS):
     r_dev, r_held, r_arr2, r_plant, r_shuf = (np.random.default_rng(s) for s in (1, 2, 3, 4, 5))
-    dev = world.stream(things, per_thing, r_dev)
-    held = world.holdout(list(things) + list(arr2) + [never_word, plant_word, null_word], held_n, r_held)
-    a2 = world.stream(arr2, arr2_per, r_arr2)
-    plant = [(plant_word, world.render(plant_word, r_plant)) for _ in range(PLANT_SHOWINGS)]
+    dev = world.stream(things, per_thing, r_dev, side)
+    held = world.holdout(list(things) + list(arr2) + [never_word, plant_word, null_word], held_n, r_held, side)
+    a2 = world.stream(arr2, arr2_per, r_arr2, side)
+    plant = [(plant_word, world.render(plant_word, r_plant, side)) for _ in range(plant_showings)]
     n_checked = world.assert_disjoint(dev + a2 + plant, held)
     # planted control (§10 clause 12): a copy of a development picture in the held-out set MUST be caught
     bad = dict(held); bad[things[0]] = held[things[0]][:1] + [dev[0][1].copy()]
@@ -106,6 +107,10 @@ def live(genome: Genome, dev, a2, plant, things, arr2, held, never, *, wire=True
     rec["ledger_corruption_hash_unchanged"] = (org.state_hash() == rec["hash_final"])
     multi = sum(1 for s in L["sight"].values() if len(s) > 1)
     rec["multi_thing_sight_cells"] = multi
+    # G0b §3 diagnostics: an edge is cross-thing when the ledger's things for its two cells differ
+    def _cross(log):
+        return sum(1 for _m, sc, wc in log if L["sight"].get(sc, set()) != L["words"].get(wc, set()))
+    rec["edges_cross"] = {"born": _cross(org.edges_log), "pruned": _cross(org.prunes_log), "born_total": len(org.edges_log), "pruned_total": len(org.prunes_log)}
     rec["cells_per_thing"] = {t: sum(1 for c, s in L["sight"].items() if s == {t} and org.sight.alive[c]) for t in list(things) + list(arr2)}
     rec["seconds"] = round(time.perf_counter() - t0, 2)
     return rec
@@ -134,21 +139,49 @@ def genome_numbers(g: Genome) -> Dict[str, object]:
 def main(argv: List[str]) -> int:
     assert os.environ.get("OPENBLAS_NUM_THREADS") == "1" and os.environ.get("OMP_NUM_THREADS") == "1", "§10 clause 10: run with OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1"
     toy_only = "--toy-only" in argv
+    gpath = Path(argv[argv.index("--genome") + 1]) if "--genome" in argv else GENOME_PATH
+    tag = gpath.stem.lower()
     stamp = time.strftime("%Y%m%d-%H%M%S")
-    out = ROOT / "runs" / f"g0-{stamp}"; out.mkdir(parents=True, exist_ok=True)
-    genome_text = GENOME_PATH.read_text()
+    out = ROOT / "runs" / f"{tag}-{stamp}"; out.mkdir(parents=True, exist_ok=True)
+    genome_text = gpath.read_text()
     genome = parse_genome(genome_text)
-    (out / "G0.genome").write_text(genome_text)
-    R: Dict[str, object] = {"stamp": stamp, "genome": genome_numbers(genome), "retina": list(genome.retina), "prereg": "docs/G0-PREREG.md §1–§11"}
-    things, arr2 = world.THINGS_10, world.THINGS_ARRIVAL2
-    dev, held, a2, plant, shuffle_words, n_checked = make_streams(things, PER_THING, HELD_N, arr2, ARR2_PER_THING, world.THING_PLANT, world.THING_NULL, world.THING_NEVER)
-    R["streams"] = {"dev": len(dev), "arr2": len(a2), "plant": len(plant), "held_checked_disjoint": n_checked, "planted_copy_caught": True}
-    print(f"streams: dev {len(dev)} · arrival-2 {len(a2)} · plant {len(plant)} · held-out {n_checked} pictures disjoint (planted copy caught)")
+    (out / gpath.name).write_text(genome_text)
+    side = genome.eye[0]
+    gate_path = ROOT / "runs" / f"gate-ga-{gpath.stem}.json"
+    gate = json.loads(gate_path.read_text()) if gate_path.exists() else {}
+    plant_showings = int(gate.get("plant", {}).get("showings", PLANT_SHOWINGS))
+    R: Dict[str, object] = {"stamp": stamp, "genome_file": gpath.name, "genome": genome_numbers(genome), "retina": list(genome.retina), "side": side,
+                            "prereg": "docs/G0-PREREG.md §1–§11" + (" + docs/G0b-PREREG.md" if tag == "g0b" else ""), "plant_showings": plant_showings,
+                            "gate": {k: gate.get(k) for k in ("choice", "plant", "ear") if k in gate} | ({"closest_pair": gate["retina"]["closest_pair"], "within": gate["retina"]["within"], "between": gate["retina"]["between"]} if "retina" in gate else {})}
+    for step in genome.retina:
+        if step.startswith("tower:"):
+            # the eye parity gate: the numpy forward vs the sealed E09d tower's OWN 2,356-frame gate features
+            # (judge/eye-tower/gate/features_f32.npy — the same arithmetic, that seal's weights); the gene's tower
+            # (eye-tower-g2) carries no feature file, so its bytes are proved by its seal's sha-256 and its
+            # arithmetic by this gate. A planted 1-px-shifted frame must be caught.
+            from .eye import tower as _tower
+            gene_t = _tower(step[6:]); ref = _tower("eye-tower"); gd = ref.dir / "gate"
+            idx = json.loads((gd / "index.json").read_text()); n = idx["n"]
+            frames = np.frombuffer((gd / "frames.u8").read_bytes(), dtype=np.uint8).reshape(n, 32, 32)
+            F = np.load(gd / "features_f32.npy").astype(np.float64)
+            mine = np.stack([ref.features(fr) for fr in frames]).astype(np.float64)
+            dmax = np.abs(mine - F).max(axis=1)
+            planted = float(np.abs(ref.features(np.roll(frames[0], 1, axis=1)).astype(np.float64) - F[0]).max())
+            R["eye_parity"] = {"reference_tower": "eye-tower", "n": n, "max_diff": float(dmax.max()), "frames_within_1e-4": int((dmax < 1e-4).sum()),
+                               "planted_caught": planted > 1e-3, "gene_tower": step[6:], "gene_sha256": gene_t.sha, "gene_n_feat": gene_t.n_feat}
+            print(f"eye parity (arithmetic) vs the sealed E09d tower's own gate: max |diff| {dmax.max():.2e}, {int((dmax < 1e-4).sum())}/{n} frames within 1e-4, planted shifted frame {'CAUGHT' if planted > 1e-3 else 'NOT CAUGHT'}; the gene's tower {step[6:]} sha {gene_t.sha[:16]}… ({gene_t.n_feat} features)")
+            if not (dmax.max() < 1e-3 and planted > 1e-3):
+                print("EYE PARITY FAILED — the numpy eye is not the sealed tower; stopping."); return 3
+    things = world.THINGS_11 if tag == "g0b" else world.THINGS_10
+    arr2 = world.THINGS_ARRIVAL2
+    dev, held, a2, plant, shuffle_words, n_checked = make_streams(things, PER_THING, HELD_N, arr2, ARR2_PER_THING, world.THING_PLANT, world.THING_NULL, world.THING_NEVER, side=side, plant_showings=plant_showings)
+    R["streams"] = {"dev": len(dev), "arr2": len(a2), "plant": len(plant), "held_checked_disjoint": n_checked, "planted_copy_caught": True, "things": list(things)}
+    print(f"{tag} · {len(things)} things at {side}×{side} · streams: dev {len(dev)} · arrival-2 {len(a2)} · plant {len(plant)} (showings from the gate: {plant_showings}) · held-out {n_checked} pictures disjoint (planted copy caught)")
 
     # ---- the toy (§2, §11): 2 things must reach Q1 = 1.0 or the machinery is wrong
     toy_things = ["circle", "bar"]
     r_toy = np.random.default_rng(11); r_toy_h = np.random.default_rng(12)
-    toy_dev = world.stream(toy_things, TOY_PER_THING, r_toy); toy_held = world.holdout(toy_things + [world.THING_NEVER], HELD_N, r_toy_h)
+    toy_dev = world.stream(toy_things, TOY_PER_THING, r_toy, side); toy_held = world.holdout(toy_things + [world.THING_NEVER], HELD_N, r_toy_h, side)
     toy = live(genome, toy_dev, [], [], toy_things, [], toy_held, world.THING_NEVER, ask_at_600=True, with_arr2=False, with_plant=False, label="toy")
     q = toy["ask_600"]
     R["toy"] = toy
@@ -185,8 +218,8 @@ def main(argv: List[str]) -> int:
     R["twins"] = tw
 
     # ---- the 5-thing life (§10 clause 6): 600 moments, 120 per thing
-    five = things[:5]
-    dev5 = world.stream(five, 120, np.random.default_rng(21)); held5 = world.holdout(five + [world.THING_NEVER], HELD_N, np.random.default_rng(22))
+    five = list(things[:5])
+    dev5 = world.stream(five, 120, np.random.default_rng(21), side); held5 = world.holdout(five + [world.THING_NEVER], HELD_N, np.random.default_rng(22), side)
     l5 = live(genome, dev5, [], [], five, [], held5, world.THING_NEVER, with_arr2=False, with_plant=False, label="five-thing")
     R["five_thing"] = l5
     print(f"FIVE-THING @600: cells born {l5['at_600']['cells_born_sight']} (10-thing @600: {design['at_600']['cells_born_sight']}) Q1 {l5['ask_600']['Q1']['acc']:.3f}")
@@ -249,7 +282,7 @@ def write_verdict(out: Path, R: Dict[str, object], genome: Genome) -> None:
     L.append(f"| (ii) the meeting is real | T-shuffle, T-nowire Q1 ≤ .20 | T-shuffle Q1 band {[round(x,3) for x in M['ii_meeting_real']['T_shuffle_Q1_band']]} · T-nowire Q1 {M['ii_meeting_real']['T_nowire_Q1']:.3f} (abstain {M['ii_meeting_real']['T_nowire_abstain']}) | {M['ii_meeting_real']['pass']} | PASS |")
     L.append(f"| (iii) growth matters | T-frozen ≥ 30 pp under (i) | T-frozen Q1 {M['iii_growth_matters']['T_frozen_Q1']:.3f} vs design {M['iii_growth_matters']['design_Q1']:.3f} | {M['iii_growth_matters']['pass']} | PASS |")
     iv = M["iv_grows_alone"]
-    L.append(f"| (iv) it grows on its own | {iv['bars']} | born {iv['cells_born']} · refused {iv['births_refused_budget']} · 5-thing {iv['five_thing_born_600']} vs 10-thing {iv['ten_thing_born_600']} at 600 · pruned {iv['edges_pruned']}/{iv['edges_born']} = {100*iv['pruned_share']:.1f} % · disuse {iv['removed_for_disuse']} | {iv['pass']} | births 100–300; pruning may FAIL the 5 % bar |")
+    L.append(f"| (iv) it grows on its own | {iv['bars']} | born {iv['cells_born']} · refused {iv['births_refused_budget']} · 5-thing {iv['five_thing_born_600']} vs full world {iv['ten_thing_born_600']} at the end of development · pruned {iv['edges_pruned']}/{iv['edges_born']} = {100*iv['pruned_share']:.1f} % (cross-thing born {d['edges_cross']['born']}, cross-thing pruned {d['edges_cross']['pruned']}) · disuse {iv['removed_for_disuse']} | {iv['pass']} | births 100–300; pruning may FAIL the 5 % bar |")
     L.append(f"| (v) it keeps what it learned | within 5 pp after arrival 2 | Q1 first-10 at 600 {M['v_keeps']['Q1_first10_at_600']:.3f} → at 900 {M['v_keeps']['Q1_first10_at_900']:.3f} ({M['v_keeps']['drop_pp']:+.1f} pp) | {M['v_keeps']['pass']} | PASS |")
     vi = M["vi_knows_unknown"]
     L.append(f"| (vi) it knows what it does not know | {vi['bars']} | plant zog answered {vi['plant_answered']:.2f} (as {vi['plant_answered_as']}) · null vex abstains {vi['null_abstain']:.2f} · Q5 spiral abstains {vi['Q5_abstain']:.2f} (by {vi['Q5_abstain_by']}; answered as {vi['Q5_answered_as']}) · false abstention on seen {vi['false_abstention_seen']:.3f} (by {vi['false_abstention_by']}) | {vi['pass']} | the uncertain one |")
@@ -261,12 +294,16 @@ def write_verdict(out: Path, R: Dict[str, object], genome: Genome) -> None:
     L.append("## The design life, every number\n")
     L.append(f"- Gate G-a wrote THETA_N = {genome.theta_n}, THETA_M = {genome.theta_m}; retina `{' '.join(genome.retina)}` ({genome.sight_dim()} numbers); §2's strict rule NOT MET, §11's amended rule met (see the genome file's last line).")
     L.append(f"- Toy (circle, bar; 2 × 150 moments): Q1 {R['toy']['ask_600']['Q1']['acc']:.3f} → {'PASS' if R['toy_pass'] else 'FAIL'}.")
-    L.append(f"- At 600: cells {d['at_600']['cells_sight']} sight + {d['at_600']['cells_words']} words; Q1 {d6['Q1']['acc']:.3f} Q2 {d6['Q2']['acc']:.2f} Q3 {d6['Q3']['acc']:.3f} Q4 {d6['Q4']['acc']:.3f}; abstain by {d6['Q1']['abstain']}.")
-    L.append(f"- At 900 (after arrival 2): cells {s9['cells_sight']} + {s9['cells_words']} (born novelty {s9['births_novelty_sight']}/{s9['births_novelty_words']}, error {s9['births_error_sight']}/{s9['births_error_words']} — the error road FIRED {s9.get('births_refused_redundant', 0)} times and every birth was refused as redundant (§11 am. 4); refused by budget {s9['births_refused_budget']}, by arrival {d['refusals_by_arrival']}); edges alive {s9['edges_alive']}, born {s9['edges_born']}, pruned {s9['edges_pruned']}; merged cells {s9['cells_merged_sight']}/{s9['cells_merged_words']}; removed for disuse {s9['removed_for_disuse']}.")
+    if R.get("eye_parity"):
+        L.append(f"- The eye: the numpy forward vs the sealed E09d tower's own {R['eye_parity']['n']}-frame gate features — max |diff| {R['eye_parity']['max_diff']:.2e}, {R['eye_parity']['frames_within_1e-4']} of {R['eye_parity']['n']} within 1e-4, planted shifted frame caught {R['eye_parity']['planted_caught']}; the gene's tower {R['eye_parity']['gene_tower']} (sha {R['eye_parity']['gene_sha256'][:16]}…, {R['eye_parity']['gene_n_feat']} features) runs the same arithmetic on its seal-checked bytes.")
+    L.append(f"- Things: {', '.join(R['streams'].get('things', []))} at {R.get('side', 24)}×{R.get('side', 24)}; plant showings {R.get('plant_showings', 5)}" + (f" (gate: within-thing share ≥ THETA_N {R['gate']['plant']['p_res_at_theta_n']:.3f}); closest pair {R['gate']['closest_pair']['pair']} between-p95 {R['gate']['closest_pair']['p95']:.3f}" if R.get('gate', {}).get('plant') else "") + ".")
+    L.append(f"- At the end of development (moment {d['at_600']['moments']}): cells {d['at_600']['cells_sight']} sight + {d['at_600']['cells_words']} words; Q1 {d6['Q1']['acc']:.3f} Q2 {d6['Q2']['acc']:.2f} Q3 {d6['Q3']['acc']:.3f} Q4 {d6['Q4']['acc']:.3f}; abstain by {d6['Q1']['abstain']}.")
+    L.append(f"- Edges by the ledger's reading: cross-thing born {d['edges_cross']['born']} of {d['edges_cross']['born_total']}, cross-thing pruned {d['edges_cross']['pruned']} of {d['edges_cross']['pruned_total']} pruned in all (G0b §3 diagnostic; a same-thing edge is one whose two cells were born on the same thing).")
+    L.append(f"- At the end of arrival 2 (moment {s9['moments']}): cells {s9['cells_sight']} + {s9['cells_words']} (born novelty {s9['births_novelty_sight']}/{s9['births_novelty_words']}, error {s9['births_error_sight']}/{s9['births_error_words']} — the error road FIRED {s9.get('births_refused_redundant', 0)} times and every birth was refused as redundant (§11 am. 4); refused by budget {s9['births_refused_budget']}, by arrival {d['refusals_by_arrival']}); edges alive {s9['edges_alive']}, born {s9['edges_born']}, pruned {s9['edges_pruned']}; merged cells {s9['cells_merged_sight']}/{s9['cells_merged_words']}; removed for disuse {s9['removed_for_disuse']}.")
     L.append(f"- Q1 per thing at 900: {json.dumps({k: round(v,2) for k,v in d9['Q1']['per_thing'].items()})}; arrival-2 things Q1 {d['ask_900_arr2']['Q1']['acc']:.3f} per thing {json.dumps({k: round(v,2) for k,v in d['ask_900_arr2']['Q1']['per_thing'].items()})}.")
     L.append(f"- Q2 detail (word → the thing of the cell it lit): {json.dumps(d9['Q2']['detail'])}.")
     L.append(f"- Cells per thing (alive, single-thing): {json.dumps(d['cells_per_thing'])}; multi-thing sight cells {d['multi_thing_sight_cells']}; answers from multi-word cells {d9['Q1']['answers_from_multi_word_cells']}.")
-    L.append(f"- After the plant (905): Q1 on the first ten {d['ask_905']['Q1']['acc']:.3f}; ledger-corruption plant: hash unchanged {d['ledger_corruption_hash_unchanged']}.")
+    L.append(f"- After the plant (moment {d['at_905']['moments']}): Q1 on the first things {d['ask_905']['Q1']['acc']:.3f}; ledger-corruption plant: hash unchanged {d['ledger_corruption_hash_unchanged']}.")
     L.append(f"- Time: design life {d['seconds']} s; replay identical {R['replay_identical']}.\n")
     L.append("## Twins (§4) — each blind to one thing\n")
     for k, v in R["twins"].items():

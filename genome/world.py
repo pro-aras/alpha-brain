@@ -1,6 +1,7 @@
 """world.py — the rung-0 world: things drawn as 24×24 grey pictures, words as letters.
 
 edit: Claude (Fable 5.1), 2026-09-19 16:0x +04 — G0 rung 0 (docs/G0-PREREG.md §2, §10 clauses 10, 12, 14).
+edit: Claude (Fable 5.1), 2026-09-19 16:37 +04 — G0b: the picture side is a parameter (32 for the sealed eye tower); «diamond», a designed near-pair to «square».
 
 The world is OUTSIDE the organism. It renders pictures, encodes words, and hands the
 runner streams of (thing, picture, word) moments. The organism never imports this file.
@@ -19,7 +20,8 @@ LETTERS = "abcdefghijklmnopqrstuvwxyz"
 WORD_SLOTS = 8       # SENSE ear letters 8
 
 # §10 clause 14 — shapes with an orientation get the ±15° rotation jitter
-ORIENTED = {"triangle", "cross", "bar", "arrow", "wave", "house", "tree", "cup", "key", "spiral", "zog", "vex"}
+ORIENTED = {"triangle", "cross", "bar", "arrow", "wave", "house", "tree", "cup", "key", "spiral", "zog", "vex", "diamond"}
+THINGS_11 = ["circle", "square", "triangle", "cross", "ring", "bar", "dot", "star", "arrow", "wave", "diamond"]   # G0b: + the designed near-pair
 THINGS_10 = ["circle", "square", "triangle", "cross", "ring", "bar", "dot", "star", "arrow", "wave"]
 THINGS_ARRIVAL2 = ["moon", "house", "tree", "cup", "key"]
 THING_NEVER = "spiral"      # Q5: never shown
@@ -41,6 +43,8 @@ def _draw(thing: str, d: ImageDraw.ImageDraw, cx: float, cy: float, s: float, de
         r = 30 * s; d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=255)
     elif thing == "square":
         h = 26 * s; d.polygon(R([(cx - h, cy - h), (cx + h, cy - h), (cx + h, cy + h), (cx - h, cy + h)]), fill=255)
+    elif thing == "diamond":      # G0b's designed near-pair: the square turned 45°
+        h = 26 * s; d.polygon(_rot([(cx - h, cy - h), (cx + h, cy - h), (cx + h, cy + h), (cx - h, cy + h)], 45 + deg, cx, cy), fill=255)
     elif thing == "triangle":
         r = 34 * s
         pts = [(cx + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a))) for a in (-90, 30, 150)]
@@ -115,16 +119,17 @@ def _draw(thing: str, d: ImageDraw.ImageDraw, cx: float, cy: float, s: float, de
         raise KeyError(f"no such thing: {thing}")
 
 
-def render(thing: str, rng: np.random.Generator) -> np.ndarray:
-    """One jittered 24×24 grey picture of `thing` in [0, 1] (§2: position ±3 px, scale 0.8–1.2,
-    rotation ±15° where oriented, noise σ 0.05)."""
+def render(thing: str, rng: np.random.Generator, side: int = SIDE) -> np.ndarray:
+    """One jittered side×side grey picture of `thing` in [0, 1] (§2: position ±3 px, scale 0.8–1.2,
+    rotation ±15° where oriented, noise σ 0.05). The RNG draws are the same for every side."""
     img = Image.new("L", (HI, HI), 0)
     d = ImageDraw.Draw(img)
-    dx, dy = rng.uniform(-3, 3) * 4, rng.uniform(-3, 3) * 4          # ±3 px at 24 = ±12 at 96
+    k = HI / side
+    dx, dy = rng.uniform(-3, 3) * k, rng.uniform(-3, 3) * k          # ±3 px of the picture
     s = rng.uniform(0.8, 1.2)
     deg = rng.uniform(-15, 15) if thing in ORIENTED else 0.0
     _draw(thing, d, HI / 2 + dx, HI / 2 + dy, s, deg)
-    small = img.resize((SIDE, SIDE), Image.BOX)
+    small = img.resize((side, side), Image.BOX)
     pic = np.asarray(small, dtype=np.float64) / 255.0
     pic = pic + rng.normal(0.0, 0.05, size=pic.shape)
     return np.clip(pic, 0.0, 1.0)
@@ -152,15 +157,15 @@ def encode_word(word: str, blank_zero: bool = False) -> np.ndarray:
 Moment = Tuple[str, np.ndarray]     # (thing, picture) — the word is the thing's name
 
 
-def stream(things: Sequence[str], per_thing: int, rng: np.random.Generator) -> List[Moment]:
+def stream(things: Sequence[str], per_thing: int, rng: np.random.Generator, side: int = SIDE) -> List[Moment]:
     """A development stream: `per_thing` renderings of each thing, in a shuffled arrival order."""
-    moments: List[Moment] = [(t, render(t, rng)) for t in things for _ in range(per_thing)]
+    moments: List[Moment] = [(t, render(t, rng, side)) for t in things for _ in range(per_thing)]
     order = rng.permutation(len(moments))
     return [moments[i] for i in order]
 
 
-def holdout(things: Sequence[str], n: int, rng: np.random.Generator) -> Dict[str, List[np.ndarray]]:
-    return {t: [render(t, rng) for _ in range(n)] for t in things}
+def holdout(things: Sequence[str], n: int, rng: np.random.Generator, side: int = SIDE) -> Dict[str, List[np.ndarray]]:
+    return {t: [render(t, rng, side) for _ in range(n)] for t in things}
 
 
 def assert_disjoint(dev: Sequence[Moment], held: Dict[str, List[np.ndarray]]) -> int:
