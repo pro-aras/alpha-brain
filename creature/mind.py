@@ -266,6 +266,17 @@ class Mind:
                 still_pending.append(entry)
         self._filed_predictions = still_pending
 
+    def _recent_word_glances(self, word: str, n: int, fallback) -> list:
+        """The sight features of the word's last n live episodes (by moment), oldest first; the fallback alone if none."""
+        ep = self.episodes
+        if ep is None:
+            return [fallback]
+        live = np.flatnonzero((ep.ids >= 0) & (ep.word == word))
+        if live.size == 0:
+            return [fallback]
+        order = live[np.argsort(ep.moment[live], kind="stable")][-n:]
+        return [ep.x_s[i].copy() for i in order]
+
     def _think_pool(self) -> list:
         """PREREG §11.1 step 3's POOL: (a) words of the last 200 episodes whose recall abstains; (b)
         episodes with word ""; (c) filed predictions now due. Each item: {"kind", "key", "episode", "pred"}
@@ -324,8 +335,13 @@ class Mind:
             rec = self.episodes.get(item["episode"]) if self.episodes is not None else None
             if rec is None:
                 return dead_end(word, "episode_gone")
-            r = self.org.recall("sight", rec["x_s"])
-            if r["cell"] is None:
+            # edit: Claude (Fable 5.1), 2026-09-19 23:33 +0400 — PREREG §11.1 (a) as read in the first 30-min life: the pool admits a word whose
+            # LATEST glance abstains, and re-asking the SAME glance can only abstain again (172/172 dead ends). The work now asks over the
+            # word's last five episodes' glances (Organism.recall_many, G1's road) — a word known in general though this glance was not
+            # becomes a belief; a word unknown over five glances is a dead end (parkable after three).
+            xs = self._recent_word_glances(word, 5, fallback=rec["x_s"])
+            r = self.org.recall_many("sight", xs)
+            if r.get("cell") is None:
                 return dead_end(word, "no_cell_answers")
             row = think_laws.believe(word, record["cells"], record["episodes"], self.org.t, str(self.run_root))
             self.think_counters["beliefs"] += 1

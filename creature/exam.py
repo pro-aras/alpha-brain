@@ -31,7 +31,9 @@ def run_exam(root: Path, genome_path: Path, held: int = 10, check_tape: int = 40
         self_exam.main()
     finally:
         sys.argv = old_argv
-    exam_files = sorted((root / "exam").glob("*.json"))
+    # edit: Claude (Fable 5.1), 2026-09-19 23:33 +0400 — the voice's pointer LAST.json sorted AFTER every stamped file ("L" > "2"), so the
+    # event row read the pointer and journaled q1 null while the stamped file held Q1 .991 (#168's class: a sorted listing read wrong).
+    exam_files = sorted(p for p in (root / "exam").glob("*.json") if p.name[0].isdigit())
     if not exam_files:
         raise RuntimeError("self_exam.main() did not write a run/exam/*.json file")
     latest = exam_files[-1]
@@ -54,7 +56,7 @@ def run_and_journal(root: Path, genome_path: Path, held: int = 10, check_tape: i
     result = run_exam(root, genome_path, held=held, check_tape=check_tape)
     data = result["data"]
     ask_seen = data.get("ask_seen_words") or {}
-    q1 = ask_seen.get("Q1") if isinstance(ask_seen, dict) else None
+    q1 = (ask_seen.get("Q1") or {}).get("acc") if isinstance(ask_seen, dict) else None   # the NUMBER (#162: a .get that returns a dict or None is not a reading)
     _journal_event(Path(root), {"event": "exam", "path": result["path"], "q1": q1, "cells": data.get("cells")})
     return result
 
