@@ -265,6 +265,22 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"what-is show is which next why", a)
                 if not m: raise GenomeError(f"ASK: cannot read {a!r} (§2.7: ASK what-is show is which next why)")
                 g["declared"]["ASK"] = {"verbs": ["what-is", "show", "is", "which", "next", "why"]}
+            # ==================================================================== G4 §11 Wave 2 B9: THINK/EXAM/FROZEN.
+            # edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 21:xx +0400 — three new genes, parsed only (Wave 2 B9).
+            # Interface fixed for Builder A: declared["THINK"] == {"every": int}, declared["EXAM"] == {"every": int},
+            # declared["FROZEN"] == {"after": int}. None of these are in `required`; none touch self.c (the pin).
+            elif gene == "THINK":
+                m = re.fullmatch(r"every (\d+) canvases", a)
+                if not m: raise GenomeError(f"THINK: cannot read {a!r} (§11: THINK every <n> canvases)")
+                g["declared"]["THINK"] = {"every": int(m.group(1))}
+            elif gene == "EXAM":
+                m = re.fullmatch(r"every (\d+) canvases", a)
+                if not m: raise GenomeError(f"EXAM: cannot read {a!r} (§11: EXAM every <n> canvases)")
+                g["declared"]["EXAM"] = {"every": int(m.group(1))}
+            elif gene == "FROZEN":
+                m = re.fullmatch(r"after (\d+) cells", a)
+                if not m: raise GenomeError(f"FROZEN: cannot read {a!r} (§11: FROZEN after <n> cells)")
+                g["declared"]["FROZEN"] = {"after": int(m.group(1))}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:
