@@ -19,7 +19,7 @@ AREA   sight  from retina
 AREA   words  from ear
 MEET   sight  words                  # rung 0: the meeting is EDGES ONLY (the neural organ's W between two populations, E48b arm A1)
 # GROW — E48b's arm-A1 rule, ported byte-exact into Alpha 3's neural organ and alive three days (SOLUTIONS #227; NOTES 09-16 20:24)
-BIRTH  novelty  cos<THETA_N          # no cell resonates -> a new cell holds the input (GWR's novelty birth; THETA_N from gate G-a, never by habit)
+BIRTH  novelty  cos<0.36          # no cell resonates -> a new cell holds the input (GWR's novelty birth; THETA_N from gate G-a, never by habit)
 BIRTH  error    misfires 3           # a cell keeps answering wrongly -> a new cell is born beside it (E48b's error birth)
 BUDGET 400 per arrival               # a budget that REFUSES, never a cap that eats the least-used (E48 → E48b, #227); refusals printed
 NMAX   2000
@@ -29,7 +29,7 @@ HEBB   window 1                      # cells active in the SAME moment across ar
 DELTA  lr 0.05                       # the edge grows when the pairing is right, shrinks when wrong (E48b's delta rule)
 # SHRINK — the wrong and the redundant, never the merely unused (#227: shrinking by disuse IS forgetting)
 PRUNE  w<0.02 after 3 chances        # E48b's floor
-MERGE  cos>THETA_M same-answer       # D41 (c): merge redundant units — shrinking that costs no retention
+MERGE  cos>0.8278 same-answer       # D41 (c): merge redundant units — shrinking that costs no retention
 SCALE  every 1000 moments            # HOMEOSTASIS = Alpha 1's plasticity program, M3 homeostasis 192/192 (the one plasticity primitive that carried)
 # STAGE — critical periods (his 09-16 18:46: reading → sentences → paragraphs; senses first)
 STAGE  1 senses   moments 0..200
@@ -52,4 +52,5 @@ GAZE   surprise fixations 4 grid 16 canvas 128 glance 64 ink border     # GAZE G
 
 # G3 (docs/G3-LAWS-PREREG.md): two laws changed, one gene added — on Ahmad's 19:19 «Let's tweak some genome laws» / 19:30 «Ok go»
 RESONATE sight nearest words cos>=0.9   # sight winners = the nearest KWTA cells at or above the FLOOR (THETA_N := between-p5, gate G-a); words keep a strict threshold
-ABSTAIN  margin cos<MARGIN              # «close»: the best-answering lit cell must beat the best lit cell of a different answer by MARGIN (gate: 5 % of the band width)
+# (ABSTAIN margin withdrawn — G3 §6 amendment 1, after the machinery toy: 33/40 «close»)
+# gate G-a wrote THETA_N=0.36 THETA_M=0.8278 MARGIN=0.0068 — G3 floor rule [his first-fixation glances (G3-his)]: THETA_N = between-p5; MARGIN = 5 % of the band width 0.1362; within-median 0.4959 between-p95 0.6118; seed 20260919
