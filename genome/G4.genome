@@ -1,3 +1,4 @@
+# G4.genome — THE 24 h LIFE, assembled by Claude (Fable 5.1), 2026-09-19 23:14 +0400 (PREREG §12): B1's file + B9's genes; TRAITS/SURPRISE/SENTENCE/HANDS declared OFF with reasons; thetas by gate G-a below.
 # G4.genome — THE WHOLE SMALL CREATURE (docs/G4-DESIGN.md §9, docs/G4-PREREG.md §1: ONE correction —
 # GAZE surprise fixations 4 (the proven G1 value; 12 in the design draft was a slip). THETA_N/THETA_M
 # are left as the words gate G-a writes (genome/gate_ga.py); the machinery refuses to start until they
@@ -18,16 +19,16 @@ CRASH    sense restart journal; mind page          # a sense's error never kills
 SENSE    eye    32x32 grey                         # the sealed tower's frame (G0b)
 RETINA   thresh0.25 centre tower:eye-tower-g2 sqrt unit
 GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border   # G1 §6 (the proven value; PREREG §1 correction)
-TRAITS   contrast head 32 lr 0.01 at sleep         # NEW: a small head over the frozen tower, learned by contrast from replayed episodes
+#OFF TRAITS   contrast head 32 lr 0.01 at sleep         # NEW: a small head over the frozen tower, learned by contrast from replayed episodes   # OFF (PREREG §12): InfoNCE over canvas instances learns instance identity after 5 sleeps (margin −0.116 < raw 0.009); wave 3 = same-cell positives
 SENSE    ear    letters 8
-SURPRISE floor 0.05                                # a sense publishes when |actual − predicted| > floor (V0.1's rule on every sense)
+#OFF SURPRISE floor 0.05                                # a sense publishes when |actual − predicted| > floor (V0.1's rule on every sense)   # OFF (PREREG §12): no sense on the maker/folder streams needs it yet
 # AREAS + MEET (G0b)
 AREA     sight  from retina
 AREA     words  from ear
 AREA     episodes from fast
 MEET     sight  words
 # GROW / WIRE / SHRINK (G0b verbatim)
-BIRTH    novelty  cos<THETA_N
+BIRTH    novelty  cos<0.952
 BIRTH    error    misfires 3
 BUDGET   400 per arrival
 NMAX     2000
@@ -35,7 +36,7 @@ KWTA     5
 HEBB     window 1
 DELTA    lr 0.05
 PRUNE    w<0.02 after 3 chances
-MERGE    cos>THETA_M same-answer
+MERGE    cos>0.9969 same-answer
 SCALE    every 1000 moments
 CYCLE    grow to 0.9 nmax then consolidate         # NEW: the cap becomes a cycle (D41)
 # MEMORY, fast and slow
@@ -51,11 +52,14 @@ PARK     after 3 identical dead-ends reopen on new-sense                  # D39
 INDUCE   rule from 5 episodes no counter           # a rule is a prediction
 DEDUCE   one step                                  # two beliefs → a prediction
 BELIEF   clash opens never overwrites               # Alpha 2's scope law
+THINK    every 10 canvases                        # §11.1 step 3: the pool → CURIOSITY chooses → work → PARK/FILE
+EXAM     every 2000 canvases                      # §11.4: the self-exam from the voice, the key outside him
+FROZEN   after 50 cells                           # twin-only gene (§11.1 step 5): the frozen twin's ceiling
 # LANGUAGE
-SENTENCE two-word frames is near under-judge       # speech_v2's road, minimal; never next-token
+#OFF SENTENCE two-word frames is near under-judge       # speech_v2's road, minimal; never next-token   # OFF (PREREG §12): wave 3 — no interpreter yet; a declared gene the machinery does not run must refuse
 # HANDS + WORLD
 WORLD    drawn every 5 s arrivals every 6 h; folder world/; web 6 per hour by curiosity
-HANDS    jail alpha3/hands/jail_run                # switched on last
+#OFF HANDS    jail alpha3/hands/jail_run                # switched on last   # OFF (PREREG §12): wave 3
 # ANSWER
 RECALL   k=3
 ABSTAIN  second/best > 0.85
@@ -67,3 +71,4 @@ STAGE    2 meet     moments 200..
 #OFF AUDIENCE  listener-model                      # declared; «why» is its first cell
 #OFF EAR-SOUND cochlear gammatone agc               # E52's front (the loudness path proven, the frequency path untested)
 #OFF READ-EYE  words through the eye               # E43/E47
+# gate G-a wrote THETA_N=0.952 THETA_M=0.9969 — G1 gate on glances [G4-life: the makers world, first-fixation glances, 60/thing over THINGS_11 + THINGS_ARRIVAL2]: THETA_N = within-median; floor (between-p95, ear-max) 0.9113 · within-p5 0.8412 · within-p95 0.9939 · seed 20260920
