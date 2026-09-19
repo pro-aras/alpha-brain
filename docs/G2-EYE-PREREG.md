@@ -29,3 +29,7 @@ Caltech-101's **92 folders not used in rung 1** (8,510 pictures; `/data/datasets
 
 ## 5 · Order
 1. This file. 2. `genome/eye.py` generalised to a layer list (the glyph seal must replay byte-identical: the eye parity gate of run_g0 and pin_g1 (1) rerun). 3. `genome/train_eye.py`: gradient check → G-1 toy → G-2 probe → train → seal → untrained twin seal → G-3 → G-4 → G-5. 4. G2-his. 5. Registers; his word after the VERDICT.
+
+## 6 · Amendment 1 — the training views, stamped before training (edit: Claude (Fable 5.1), 2026-09-19 18:16 +0400)
+**The reading that forced it.** G-2's probe: 1.554 s a step at 8 views a picture (856 steps, 22.2 min an epoch) — no epoch count fits the 45-minute bar. The profile put ~90 % of a step in scipy's sparse col2im; replaced by k×k strided adds with no input-gradient for conv1 (the same gradients — gradcheck rerun, worst relative error 1.7e-7). Re-probed: 0.424 s a step at 8 threads (0.479 at 1 thread — the step is memory-bound), 6.0 min an epoch: 8 epochs = 48 min, still over the bar by 3 minutes.
+**The amendment (the world, not the bar):** §2's views become the FOUR gaze windows a picture, the horizontal mirrors dropped (4 views, 27,376 training views; the validation road unchanged). The cost bar stands at 45 minutes; the epoch rule stands and is filled by the re-run probe. Mirrors are augmentation the gaze does not produce in life; dropping them costs generalisation, stated. Prediction unchanged except G-3's floor: top-1 0.20–0.35.

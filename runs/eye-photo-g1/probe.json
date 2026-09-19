@@ -1,0 +1,1 @@
+{"s_per_step": 0.4206935634516412, "steps_per_epoch": 428, "s_per_epoch": 180.05684515730243, "threads": "8", "epochs_by_rule": 12, "choices": [8, 12, 16, 20], "cost_bar_s": 2700}

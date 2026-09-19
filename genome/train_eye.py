@@ -8,6 +8,7 @@
   python3 -m genome.train_eye gate        G-4: gate G-a on the eleven UNSEEN words through the new eye, the glyph eye, the untrained twin
   python3 -m genome.train_eye replay      G-5: a second run from the same seed → journal + bytes compared
 
+edit: Claude (Fable 5.1), 2026-09-19 18:15 +0400 — the probe read 1.55 s a step (22 min an epoch, no epoch count fits G-2's bar): the profile put ~90 % in scipy's sparse col2im; replaced by k×k strided adds and no input-gradient for conv1 — the SAME gradients (gradcheck rerun), less work. The bar was not widened.
 edit: Claude (Fable 5.1), 2026-09-19 18:10 +0400. Mirrors experiments/E09c-grounding-tower/code/conv.py layer for layer (im2col by a flat
 index + a sparse scatter for col2im, float32, momentum 0.9, the ×0.5 schedule at 60 % and 85 %); three conv layers, 64-px input,
 the layer list written into the seal. Nothing here touches the organism.
@@ -37,6 +38,7 @@ SIDE, CANVAS, GRID, GLANCE, FIX = 64, 128, 16, 64, 4
 ARCH = [{"type": "conv", "f": 16, "k": 5}, {"type": "max", "p": 2}, {"type": "conv", "f": 32, "k": 3}, {"type": "max", "p": 2}, {"type": "conv", "f": 48, "k": 3}, {"type": "mean", "p": 4}]
 BATCH, LR0, MOM = 64, 0.02, 0.9
 EPOCH_CHOICES, COST_BAR_S = (8, 12, 16, 20), 45 * 60
+MIRRORS = False          # §6 amendment 1: the four gaze windows only (the probe: 8 views did not fit the cost bar)
 GAZE = {"fixations": FIX, "grid": GRID, "canvas": CANVAS, "glance": GLANCE, "ink": "border"}
 DT = np.float32
 
@@ -121,9 +123,14 @@ class Net:
                 _t, i, C, H, k, pad, idx, S, Hp, Wp = g; cols, z = c[1], c[2]; F = z.shape[-1]
                 dz = np.ascontiguousarray((dx.reshape(n, H * H, F) * (z > 0)).astype(self.dt))
                 G[f"W{i}"] = dz.reshape(-1, F).T @ cols.reshape(-1, C * k * k); G[f"b{i}"] = dz.sum((0, 1))
-                dcols = dz @ self.params[f"W{i}"]                                    # (n, HW, Ckk)
-                dxp = (S @ dcols.reshape(n, -1).T).T.reshape(n, C, Hp, Wp)
-                dx = np.ascontiguousarray(dxp[:, :, pad:pad + H, pad:pad + H].transpose(0, 2, 3, 1))
+                if i == 1:
+                    continue                                                          # the input has no upstream: no dx for conv1 (same gradients, less work)
+                dcols = (dz @ self.params[f"W{i}"]).reshape(n, H, H, C, k, k)           # (n, H, W, C, ky, kx) — the column order (channel, ky, kx)
+                dxp = np.zeros((n, Hp, Wp, C), self.dt)
+                for ky in range(k):                                                   # col2im as k×k strided adds (the sparse scatter was 90 % of a step)
+                    for kx in range(k):
+                        dxp[:, ky:ky + H, kx:kx + H, :] += dcols[:, :, :, :, ky, kx]
+                dx = np.ascontiguousarray(dxp[:, pad:pad + H, pad:pad + H, :])
         return loss, G
 
     def step(self, X: np.ndarray, y: np.ndarray, lr: float) -> float:
@@ -241,11 +248,11 @@ def stage_views() -> None:
             if j % 5 == 4:
                 Xva.append(first_view_u8(rgb)); yva.append(li)
             else:
-                for v in views_of(rgb): Xtr.append(v); ytr.append(li)
+                for v in views_of(rgb, mirrors=MIRRORS): Xtr.append(v); ytr.append(li)
         if li % 10 == 0: print(f"  views: {li + 1}/92 folders, {len(Xtr)} train views, {len(Xva)} val, {time.perf_counter() - t0:.0f} s", flush=True)
     np.savez_compressed(OUT / "views.npz", Xtr=np.stack(Xtr), ytr=np.array(ytr, dtype=np.int32), Xva=np.stack(Xva), yva=np.array(yva, dtype=np.int32), labels=np.array(folders))
     (OUT / "views.json").write_text(json.dumps({"folders": folders, "n_train_views": len(Xtr), "n_val": len(Xva), "unreadable": unreadable, "seconds": round(time.perf_counter() - t0, 1)}))
-    print(f"views: {len(Xtr)} training views (8 per picture), {len(Xva)} validation pictures, {len(folders)} classes, unreadable {len(unreadable)}, {time.perf_counter() - t0:.0f} s")
+    print(f"views: {len(Xtr)} training views ({8 if MIRRORS else 4} per picture), {len(Xva)} validation pictures, {len(folders)} classes, unreadable {len(unreadable)}, {time.perf_counter() - t0:.0f} s")
 
 
 def _load_views():
