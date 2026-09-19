@@ -217,6 +217,11 @@ class Body:
             "sense_restarts": sense_restarts, "snapshots": self.mind.snapshot_count,
             "last_seq": self.mind.last_seq, "mind_ms_median_1min": (statistics.median(recent) if recent else None),
             "rss_mb": round(_rss_mb(), 2), "crash": crash,
+            # edit: Claude (Fable 5.1), 2026-09-19 23:17 +0400 — PREREG §11.1 step 3's STATUS fields, written on EVERY status write (#164):
+            # the mind computed them (think_counters) and nothing exported them (#163's class: computing and exporting differ).
+            **{k: int(v) for k, v in getattr(self.mind, "think_counters", {}).items()},
+            "episodes": int(self.mind.episodes.n_written) if getattr(self.mind, "episodes", None) is not None else 0,
+            "sleeps": int(getattr(self.mind, "sleep_count", 0)),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:

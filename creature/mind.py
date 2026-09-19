@@ -33,7 +33,7 @@ from PIL import Image
 
 from genome import gaze
 from genome.fast import Episodes
-from genome.machinery import Genome, Organism, parse_genome
+from genome.machinery import Genome, GenomeError, Organism, parse_genome
 from genome.park import Park
 from genome.predict import Predictor, file as predict_file, score as predict_score
 from genome.questions import build_ledgers, why as questions_why
@@ -114,6 +114,9 @@ class Mind:
         self.sight_only_skipped: int = 0
         self.journal_rows_written: int = 0
         self.snapshot_count: int = 0
+        self.sleep_count: int = 0                        # edit: Claude (Fable 5.1), 2026-09-19 23:17 +0400 — STATUS.sleeps (PREREG §11.1 step 4)
+        if "TRAITS" in self.genome.declared:             # edit: Claude (Fable 5.1), 2026-09-19 23:17 +0400 — a declared gene the machinery does not run must REFUSE at start (PREREG §3/§12): the
+            raise GenomeError("TRAITS is declared but the mind has no TRAITS interpreter yet (wave 3: same-cell positives) — the organism does not start")   # sleep step called Traits.learn on the CLASS; it would have crashed the mind at its first sleep
         self._last_snapshot_moments: int = 0
 
         (self.run_root / "journal").mkdir(parents=True, exist_ok=True)
@@ -227,6 +230,7 @@ class Mind:
                 if rec is not None:
                     self.moment_word[t0 + i] = rec["word"]
             result = run_sleep(self.org, self.episodes, n)
+            self.sleep_count += 1
             cycled = run_cycle(self.org)
             if "TRAITS" in self.genome.declared and _TRAITS_AVAILABLE:
                 Traits.learn(self.episodes)      # per the interface name given for wave 2; unexercised until genome/traits.py lands
