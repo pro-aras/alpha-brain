@@ -14,10 +14,22 @@ pair happens to read highest regardless of whether it involves a NEW thing at al
 own two-part instruction: (a) `ceiling_bands` = 1 - the MAX p95 among only the OLD-vs-NEW pairs (never
 old-old or new-new); (b) `ceiling_direct` = the PREREG's literal per-instance definition, measured live
 at each new thing's actual first showing in the real arm: `1 - max(cos to every currently-alive sight
-cell)`. Both are printed beside F; the bar itself uses `ceiling_bands` (the PREREG's literal "printed
-from the gate's bands" instruction), `ceiling_direct` is diagnostic. Neither fix changes the REAL arm's
-spike/settle numbers (they were never contaminated — the real arm ran before the null arm in the
-original code too); only F/ceiling and the null numbers move. See the numbers below.
+cell)`. Both are printed beside F. Neither fix changes the REAL arm's spike/settle numbers (they were
+never contaminated — the real arm ran before the null arm in the original code too); only F/ceiling and
+the null numbers move.
+edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 23:4x +0400 — a SECOND advisor pass on the same file
+caught that the pooled `ceiling_bands` from the first fix was itself applied uniformly to BOTH new
+things, when the PREREG's relaxation is explicitly CONDITIONAL, per new thing: "if the tower front's
+between-p95 makes A NEW THING look like an old one ... reported against THAT ceiling". Moon's own
+worst old-vs-new p95 (0.8181) gives ceiling_moon/F = 5.9x > 3x — the relaxation does NOT apply to moon,
+whose bar is therefore the LITERAL 3x (which it never reaches: max 2.65x, 0/3). House's worst pair
+(0.9515) gives 1.56x < 3x — the relaxation DOES apply to house (3/3). The POOLED reading (one ratio for
+both things, 5/6) is kept as a named, distinct test — a legitimate single-number summary — but the
+PER-THING reading (the PREREG's actual conditional, 3/6, a tie) is the one that should govern the live
+life; it is `@unittest.expectedFailure`. The same pass also found the null bar has no "majority" clause
+in SS10 (unlike B8's, which Amendment 1 explicitly said to read that way) — the literal "must show no
+such spike (< 1.5x)" is tested directly (all 3 seeds; seed 9 misses at 1.547, `expectedFailure`), with
+the majority reading kept as a clearly-labelled secondary leniency.
 
 PREREG §10 (verbatim, the mark): "at every window change that brings NEW things ..., the median error
 over the first 3 showings of each new thing >= 3x the median error over the previous window's last 50
@@ -64,22 +76,29 @@ new thing's actual arrival) confirms this is thing-SPECIFIC, not a single shared
 used to pick a per-thing bar — the bands ceiling is what the PREREG says to print beside the bar.
 
 **The honest finding, measured not guessed, at 3 seeds x 2 new things = 6 (seed, thing) pairs:**
-  spike >= ceiling_bands-ratio (1.56x): 5/6 clear (seed 9 moon 1.82x, house 1.76x; seed 10 moon 2.65x,
-    house 1.97x; seed 11 house 2.42x; seed 11 moon 0.59x is the one miss — its error actually fell).
-    A majority — PASSES. (Unchanged from the flawed 1.68x ratio — the corrected, smaller 1.56x ratio
-    does not flip any of the 6 verdicts.)
+  spike vs POOLED ceiling_bands-ratio (1.56x, applied to both new things alike): 5/6 clear — a
+    majority, PASSES (`test_spike_vs_pooled_worst_case_ceiling_majority_clears`).
+  spike vs PER-THING ceiling (the PREREG's actual conditional): moon's own bar is the literal 3x (its
+    ceiling, 0.1819, sits at 5.9xF > 3x, so the relaxation does not apply to it) — moon clears 0/3
+    (1.82x, 2.65x, 0.59x, none reach 3x). House's own bar is 1.56x (its ceiling DOES sit under 3xF) —
+    house clears 3/3. Combined: **3/6, a TIE, not a majority.** RAISED, `expectedFailure`
+    (`test_spike_vs_per_thing_ceiling_prereg_conditional`) — this is the reading that should govern.
   settle (< F+0.05=0.0810 by the thing's 10th showing): EXACTLY 3/6 (seed 10 both: 0.055, 0.014; seed
     11 moon 0.079, barely; the other three sit at 0.20-0.36, still elevated at showing 10) — a TIE, not
     a majority. RAISED, `expectedFailure`.
-  CONJUNCTIVE (spike-vs-ceiling AND settle, i.e. the PREREG's own "AND"): 2/6 — seed 10's two new
-    things only. NOT a majority. RAISED, `expectedFailure`.
-  null (< 1.5x, PREREG's own literal number, at 3 seeds, DECONTAMINATED — a separate (Organism,
-    Predictor) pair per arm): seed 9 **1.547x MISSES** (barely, just above 1.5), seed 10 **0.516x
-    clears**, seed 11 **0.752x clears**. 2/3 — a majority — PASSES. (These numbers moved from the first,
-    contaminated version — 1.674/1.131/0.557 — but the majority verdict is unchanged; seed 9's miss
-    persists after decontamination, so it is genuine baseline noise, not the contamination artifact.)
-Two components (spike-vs-ceiling, null-majority) individually clear their own bars; settle and the
-literal conjunction do not — reported honestly, not forced.
+  CONJUNCTIVE (per-thing spike AND settle, the PREREG's own "AND"): moon 0/3 (never clears its own
+    spike bar), house 1/3 (clears spike every time, settles only at seed 10) — combined **1/6**. NOT a
+    majority. RAISED, `expectedFailure`.
+  null, majority reading (a leniency this file adds, not SS10's own word): seed 9 **1.547x MISSES**
+    (barely, just above 1.5), seed 10 **0.516x clears**, seed 11 **0.752x clears**. 2/3 — PASSES.
+  null, LITERAL reading (SS10's actual word, "must show no such spike"): 2/3 is not "no spike, ever" —
+    seed 9 misses. RAISED, `expectedFailure`. Paired against that seed's own real arm (#215's
+    discipline — compare matched pairs): seed 9's real spikes (moon 1.82x, house 1.76x) sit within 0.3x
+    of that SAME seed's null (1.55x) — barely distinguishable from no arrival at all. At seed 11, moon's
+    real spike (0.60x) reads BELOW that seed's own null (0.75x).
+Only two readings clear a majority unqualified: the pooled (not per-thing) ceiling reading, and the
+null under a majority (not literal) reading. Every literal PREREG bar — per-thing ceiling, settle,
+the conjunction, and the null's literal "must" — misses on this toy. Reported honestly, not forced.
 """
 from __future__ import annotations
 
@@ -118,6 +137,17 @@ def _F_and_ceiling(seed: int = 100, per_thing: int = 40) -> Tuple[float, float, 
                     if (pair.split("/")[0] in OLD) != (pair.split("/")[1] in OLD)}
     ceiling_bands = 1.0 - max(old_new_p95.values())
     return F, ceiling_bands, b_old, {**b_all, "old_new_p95": old_new_p95}
+
+
+def _per_thing_ceiling_bands(new_thing: str, old_new_p95: Dict[str, float]) -> float:
+    """The PREREG's relaxation is CONDITIONAL, per new thing: 'if the tower front's between-p95 makes
+    A NEW THING look like an old one ... reported against THAT ceiling' — not a single pooled number
+    for every new thing at once (an advisor review caught this reading error in the first pass: a
+    pooled worst-case ceiling was applied to BOTH new things, when only one of them is actually close
+    to an old thing on this front). This returns 1 - the WORST (highest) old-vs-NEW-THING p95 among
+    pairs naming that one new thing."""
+    worst = max(p95 for pair, p95 in old_new_p95.items() if new_thing in pair.split("/"))
+    return 1.0 - worst
 
 
 def _window_stream(rng: np.random.Generator, things: List[str], per_thing: int) -> List[Tuple[str, np.ndarray]]:
@@ -209,33 +239,70 @@ class TestFAndCeiling(unittest.TestCase):
         self.assertAlmostEqual(F, 0.0310, delta=0.005)
         self.assertLess(ceiling, 3 * F, "expected this front's ceiling to sit below the literal 3x bar")
 
-    def test_ceiling_direct_matches_order_of_magnitude_and_is_thing_specific(self) -> None:
-        """Diagnostic, not gated: the PREREG's literal per-instance ceiling, measured live at each new
-        thing's actual arrival, confirms the bands estimate is thing-SPECIFIC (house tracks the bands
-        ceiling closely; moon reads much higher — it looks more distinct than the pooled worst case)."""
+    def test_ceiling_direct_is_thing_specific(self) -> None:
+        """The PREREG's literal per-instance ceiling, measured live at each new thing's actual arrival:
+        house tracks the pooled `ceiling_bands` closely (within 2x — it IS the pair driving that pooled
+        worst case); moon reads well above 3xF (it looks nothing like an old thing on this front) —
+        asserted, not just printed, so a future change that erases this gap is caught."""
+        F, ceiling_bands, _b_old, _b_all = _F_and_ceiling()
         results = _all_results()
         for r in results:
             print(f"[B13] seed={r['seed']} ceiling_direct={r['ceiling_direct']}")
         moon_vals = [r["ceiling_direct"]["moon"] for r in results]
         house_vals = [r["ceiling_direct"]["house"] for r in results]
-        print(f"[B13] ceiling_direct moon mean={np.mean(moon_vals):.4f} house mean={np.mean(house_vals):.4f}")
-        self.assertTrue(all(v is not None for v in moon_vals + house_vals))
+        moon_mean, house_mean = float(np.mean(moon_vals)), float(np.mean(house_vals))
+        print(f"[B13] ceiling_direct moon mean={moon_mean:.4f} house mean={house_mean:.4f} "
+              f"ceiling_bands={ceiling_bands:.4f} 3xF={3 * F:.4f}")
+        self.assertLess(house_mean, 2 * ceiling_bands, "house's direct ceiling should track the pooled bands ceiling")
+        self.assertGreater(moon_mean, 3 * F, "moon's direct ceiling should sit well above 3xF (it looks distinct)")
 
 
 class TestSpikeVsCeiling(unittest.TestCase):
-    def test_spike_vs_ceiling_majority_clears(self) -> None:
+    def test_spike_vs_pooled_worst_case_ceiling_majority_clears(self) -> None:
+        """The POOLED reading: one ceiling ratio (the worst old-vs-new pair across BOTH new things,
+        1.56x) applied to every (seed, thing) pair. A legitimate single-number reading, but not the
+        PREREG's actual conditional (see the per-thing test below, which is the literal one)."""
         F, ceiling, _b_old, _b_all = _F_and_ceiling()
-        bar_ratio = ceiling / F  # ~1.56x — the PREREG's own "report against the ceiling" instruction
+        bar_ratio = ceiling / F  # ~1.56x
         results = _all_results()
         pairs = []
         for r in results:
             for t in NEW:
                 pairs.append((r["seed"], t, r["real"][t]["spike"]))
         for seed, t, spike in pairs:
-            print(f"[B13] seed={seed} thing={t} spike={spike:.3f} vs ceiling-ratio={bar_ratio:.3f}")
+            print(f"[B13] seed={seed} thing={t} spike={spike:.3f} vs POOLED ceiling-ratio={bar_ratio:.3f}")
         cleared = sum(1 for _s, _t, sp in pairs if sp >= bar_ratio)
-        print(f"[B13] spike-vs-ceiling: {cleared}/{len(pairs)} clear")
-        self.assertGreater(cleared, len(pairs) / 2, f"spike-vs-ceiling not a majority: {pairs}")
+        print(f"[B13] spike-vs-pooled-ceiling: {cleared}/{len(pairs)} clear")
+        self.assertGreater(cleared, len(pairs) / 2, f"spike-vs-pooled-ceiling not a majority: {pairs}")
+
+    @unittest.expectedFailure
+    def test_spike_vs_per_thing_ceiling_prereg_conditional(self) -> None:
+        """The PREREG's actual conditional, read literally: 'if the tower front's between-p95 makes A
+        NEW THING look like an old one ... reported against THAT ceiling' — per new thing, not pooled.
+        Moon's own worst old-vs-new p95 (0.8181, the circle/moon-square/moon-triangle/moon trio) gives
+        ceiling_moon = 0.1819, ratio 5.9x > 3x — the relaxation does NOT apply to moon, so its bar is
+        the LITERAL 3x, which moon clears 0/3 (max 2.65x). House's worst pair (0.9515) gives ratio
+        1.56x < 3x — the relaxation DOES apply, and house clears 3/3. Combined: 3/6, a TIE, not a
+        majority. RAISED, expectedFailure — this is the reading that should govern the live life, not
+        the pooled test above."""
+        F, _ceiling, _b_old, b_all = _F_and_ceiling()
+        old_new_p95 = b_all["old_new_p95"]
+        results = _all_results()
+        outcomes = []
+        for r in results:
+            for t in NEW:
+                ceiling_t = _per_thing_ceiling_bands(t, old_new_p95)
+                # the relaxation ("report against the ceiling") applies only when that thing's OWN
+                # ceiling sits below the literal 3x bar; otherwise the literal 3x stands for it.
+                bar_ratio_t = (ceiling_t / F) if ceiling_t < 3 * F else 3.0
+                spike = r["real"][t]["spike"]
+                ok = spike >= bar_ratio_t
+                outcomes.append((r["seed"], t, spike, bar_ratio_t, ok))
+        for seed, t, spike, bar_ratio_t, ok in outcomes:
+            print(f"[B13] seed={seed} thing={t} spike={spike:.3f} vs PER-THING ceiling-ratio={bar_ratio_t:.3f} ok={ok}")
+        cleared = sum(1 for *_r, ok in outcomes if ok)
+        print(f"[B13] spike-vs-per-thing-ceiling: {cleared}/{len(outcomes)} clear")
+        self.assertGreater(cleared, len(outcomes) / 2, f"per-thing ceiling bar: {cleared}/{len(outcomes)}")
 
 
 class TestSettleAndConjunction(unittest.TestCase):
@@ -259,23 +326,26 @@ class TestSettleAndConjunction(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_conjunctive_bar_prereg_b13(self) -> None:
-        """The PREREG's literal "AND": spike >= ceiling-ratio AND settled by showing 10. Measured:
-        2 of 6 (seed, new-thing) pairs clear both — NOT a majority (module docstring has every number).
-        RAISED: the two component bars each individually clear on their own majority (spike-vs-ceiling
-        5/6, null 2/3) but rarely land on the SAME (seed, thing) pair as the settle requirement, on
-        this small a toy (3 seeds x 2 new things = 6 trials)."""
-        F, ceiling, _b_old, _b_all = _F_and_ceiling()
-        bar_ratio = ceiling / F
+        """The PREREG's literal "AND": spike >= ceiling-ratio (per-thing, the PREREG's actual
+        conditional — see TestSpikeVsCeiling's per-thing test) AND settled by showing 10. Measured:
+        moon never clears its own 3x bar (0/3), so moon's conjunction is 0/3 regardless of settle;
+        house clears its 1.56x bar every time (3/3) but only seed 10 also settles — house conjunction
+        1/3. Combined: 1/6 — NOT a majority. RAISED, expectedFailure."""
+        F, _ceiling, _b_old, b_all = _F_and_ceiling()
+        old_new_p95 = b_all["old_new_p95"]
         threshold = F + 0.05
         results = _all_results()
         both = []
         for r in results:
             for t in NEW:
+                ceiling_t = _per_thing_ceiling_bands(t, old_new_p95)
+                bar_ratio_t = (ceiling_t / F) if ceiling_t < 3 * F else 3.0
                 spike = r["real"][t]["spike"]
                 e10 = r["real"][t]["e_at_10"]
-                ok = spike >= bar_ratio and e10 is not None and e10 < threshold
+                ok = spike >= bar_ratio_t and e10 is not None and e10 < threshold
                 both.append(ok)
         cleared = sum(both)
+        print(f"[B13] conjunctive (per-thing ceiling): {cleared}/{len(both)}")
         self.assertGreater(cleared, len(both) / 2, f"conjunctive bar: {cleared}/{len(both)}")
 
 
@@ -289,12 +359,30 @@ class TestNoNewThingsNull(unittest.TestCase):
             self.assertTrue(r["baseline_identical"], f"seed {r['seed']}: baselines diverged")
 
     def test_null_majority_under_1_5x(self) -> None:
+        """A leniency this file adds, NOT something SS10 states (unlike B8's MODULATION null, which
+        Amendment 1 explicitly said to read by majority) — kept as a secondary, softer reading."""
         results = _all_results()
         for r in results:
             print(f"[B13] seed={r['seed']} null_spike={r['null_spike']:.3f} (bar < 1.5x)")
         cleared = sum(1 for r in results if r["null_spike"] < 1.5)
-        print(f"[B13] null under 1.5x: {cleared}/{len(results)}")
+        print(f"[B13] null under 1.5x (majority reading): {cleared}/{len(results)}")
         self.assertGreaterEqual(cleared, 2, f"null spikes: {[r['null_spike'] for r in results]}")
+
+    @unittest.expectedFailure
+    def test_null_all_seeds_under_1_5x_literal_must(self) -> None:
+        """SS10's own word is "must show no such spike (< 1.5x)" — not "a majority of seeds". Measured:
+        seed 9's null reads 1.547, just above 1.5 — MISSES under the literal "must". RAISED,
+        expectedFailure. Paired against the same seed's real arrivals (#215's discipline: compare
+        matched pairs, not two unpaired numbers): at seed 9 the real spikes (moon 1.818, house 1.761)
+        sit within 0.3x of that seed's OWN null (1.547) — this seed's arrival is barely distinguishable
+        from no arrival at all. At seed 11, moon's real spike (0.595) reads BELOW that seed's own null
+        (0.752) — the "new" thing spiked LESS than the "no new things" control did."""
+        results = _all_results()
+        misses = [r for r in results if r["null_spike"] >= 1.5]
+        for r in results:
+            print(f"[B13] seed={r['seed']} null_spike={r['null_spike']:.3f} (literal bar: must be < 1.5x)")
+        self.assertEqual(misses, [], f"seeds missing the literal <1.5x null bar: "
+                                      f"{[(r['seed'], r['null_spike']) for r in misses]}")
 
 
 if __name__ == "__main__":
