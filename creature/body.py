@@ -101,6 +101,7 @@ class Body:
         self._mind_thread: Optional[threading.Thread] = None
         self._status_thread: Optional[threading.Thread] = None
         self._ask_thread: Optional[threading.Thread] = None
+        self._exam_thread: Optional[threading.Thread] = None
         self._started = False
         self._stopped = False
 
@@ -150,6 +151,12 @@ class Body:
         self._ask_thread = threading.Thread(target=ask_module.inbox_loop, args=(self.root, self.stop_event),
                                              kwargs={"poll_period": 1.0}, name="ask", daemon=True)
         self._ask_thread.start()
+        if "EXAM" in self.mind.genome.declared:      # A13 (PREREG §11.4): never true through a real genome file
+            from . import exam as exam_module         # today (EXAM's own parser clause is not yet on master) — wired for when it lands.
+            every = int(self.mind.genome.declared["EXAM"]["every"])
+            self._exam_thread = threading.Thread(target=exam_module.voice_loop, args=(self.root, self.genome_path, self.stop_event),
+                                                  kwargs={"every_canvases": every, "poll_period": 5.0}, name="exam", daemon=True)
+            self._exam_thread.start()
         for st in self.sense_threads:
             st.start()
         self._started = True
@@ -237,6 +244,8 @@ class Body:
             self._mind_thread.join(timeout=5.0)
         if self._ask_thread is not None:
             self._ask_thread.join(timeout=5.0)
+        if self._exam_thread is not None:
+            self._exam_thread.join(timeout=5.0)
         if self.mind is not None:
             prev_snap = self.mind.snapshot_count
             self.mind.close()
@@ -254,6 +263,10 @@ def main(argv: List[str]) -> int:
     genome_path = Path(argv[argv.index("--genome") + 1])
     maker_period = float(argv[argv.index("--maker-period") + 1]) if "--maker-period" in argv else 5.0
     no_maker = "--no-maker" in argv
+    # A12 (PREREG §11.3): the folder door is armed only by an explicit --folder PATH, default OFF — it is
+    # only meant to be lit after G4-6 (a re-run of G4-3 with two senses on the tape), Claude's own gate.
+    folder_dir = Path(argv[argv.index("--folder") + 1]) if "--folder" in argv else None
+    folder_period = float(argv[argv.index("--folder-period") + 1]) if "--folder-period" in argv else 30.0
 
     body = Body(root, genome_path)
     if not no_maker:
@@ -262,6 +275,13 @@ def main(argv: List[str]) -> int:
         import functools
         fn = functools.partial(world_maker.sense, root=root, period=maker_period)
         body.add_sense("maker", fn, plant=plant)
+    if folder_dir is not None:
+        from .senses import folder as folder_sense   # lazily, same discipline as world_maker above
+        from genome.machinery import parse_genome
+        import functools
+        canvas = int(parse_genome(genome_path.read_text()).gaze["canvas"])   # body.mind does not exist until start(); read it straight from the genome file
+        ffn = functools.partial(folder_sense.sense, world_dir=folder_dir, root=root, canvas=canvas, period=folder_period)
+        body.add_sense("folder", ffn)
 
     body.start()
     stop_requested = threading.Event()
