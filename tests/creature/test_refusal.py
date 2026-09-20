@@ -1,0 +1,153 @@
+# edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — W3-0 (docs/G4-WAVE3-CLAUSES.md; docs/G4-PREREG.md
+# §14): THE GENERIC REFUSAL. Four toys: (a) the life's own genome starts; (b) a genome declaring a gene
+# with no interpreter (INDUCE) refuses naming it; (c) a planted, made-up key refuses naming it (the
+# instrument's negative control — SOLUTIONS #91); (d) every gene creature/genes.py's RUNS registry names
+# is a gene the parser itself recognises (pins the registry to the parser, never the other way round).
+from __future__ import annotations
+
+import tempfile
+import unittest
+from pathlib import Path
+from unittest import mock
+
+from creature import genes as genes_module
+from creature.mind import Mind
+from genome.machinery import GenomeError, parse_genome
+
+ROOT = Path(__file__).resolve().parents[2]
+G4_GENOME = ROOT / "genome" / "G4.genome"
+G4_SKELETON = ROOT / "genome" / "G4-skeleton.genome"
+G1_GENOME = ROOT / "genome" / "G1.genome"
+
+
+def _tmp() -> Path:
+    return Path(tempfile.mkdtemp())
+
+
+class TestPositiveControls(unittest.TestCase):
+    """(a): the life's own genome must start under the new refusal law — every gene G4.genome actively
+    declares (18 of them: ARRIVAL, ASK, BELIEF, BODY, CRASH, CURIOSITY, CYCLE, EXAM, FAST, FILE, FROZEN,
+    HEART, PARK, PREDICT, SLEEP, TAPE, THINK, WORLD) must have a RUNS entry, or the 24 h life this genome
+    is running from master could never restart."""
+
+    def test_g4_genome_starts(self) -> None:
+        mind = Mind(G4_GENOME, _tmp())
+        self.assertGreater(len(mind.genome.declared), 0, "G4.genome must actually declare new genes for this to be a real test")
+
+    def test_g4_genome_declares_exactly_the_expected_set(self) -> None:
+        """Not load-bearing for the refusal itself, but pins the fixture: if G4.genome's active gene set
+        ever changes, this test names the diff instead of a silent pass/fail elsewhere."""
+        genome = parse_genome(G4_GENOME.read_text())
+        expected = {"ARRIVAL", "ASK", "BELIEF", "BODY", "CRASH", "CURIOSITY", "CYCLE", "EXAM", "FAST",
+                    "FILE", "FROZEN", "HEART", "PARK", "PREDICT", "SLEEP", "TAPE", "THINK", "WORLD"}
+        self.assertEqual(set(genome.declared), expected)
+
+    def test_skeleton_and_g1_genomes_start(self) -> None:
+        """The walking skeleton and G1 declare NO new (G4 §3) genes at all -- unwired([]) is always [],
+        so these two must be completely untouched by this clause (the G4-8 pin's own precondition)."""
+        for path in (G4_SKELETON, G1_GENOME):
+            with self.subTest(genome=path.name):
+                mind = Mind(path, _tmp())
+                self.assertEqual(mind.genome.declared, {})
+
+
+class TestInduceRefusal(unittest.TestCase):
+    """(b): G4.genome plus an active INDUCE line -- INDUCE parses (the clause exists in machinery.py) but
+    no line anywhere calls think_laws.induce (PREREG §14: `grep -c think_laws.induce` reads 0) -- refuses,
+    naming INDUCE and nothing else."""
+
+    def test_induce_line_refuses_naming_induce(self) -> None:
+        root = _tmp()
+        text = G4_GENOME.read_text() + "INDUCE   rule from 5 episodes no counter\n"
+        genome_path = root / "G4-plus-induce.genome"
+        genome_path.write_text(text)
+        with self.assertRaises(GenomeError) as ctx:
+            Mind(genome_path, root / "run")
+        msg = str(ctx.exception)
+        self.assertIn("INDUCE", msg)
+        # every gene G4.genome ALREADY declares must still be considered wired -- only the new one is named
+        for other in ("BODY", "TAPE", "HEART", "CRASH", "FAST", "SLEEP", "PREDICT", "FILE", "CURIOSITY",
+                      "PARK", "BELIEF", "THINK", "EXAM", "FROZEN", "ARRIVAL", "CYCLE", "WORLD", "ASK"):
+            self.assertNotIn(other, msg, f"{other} was already wired on G4.genome; it must not appear in this refusal")
+
+    def test_induce_hash_off_line_alone_does_not_refuse(self) -> None:
+        """The SAME clause, commented (#OFF), as G4.genome already carries it today -- confirms the toy's
+        premise (INDUCE really is off in the life's own genome) rather than assuming it."""
+        genome = parse_genome(G4_GENOME.read_text())
+        self.assertNotIn("INDUCE", genome.declared, "G4.genome's own INDUCE line is #OFF -- must not parse")
+
+
+class TestPlantedControl(unittest.TestCase):
+    """(c): the instrument's own negative control (SOLUTIONS #91) -- a gene the PARSER never produces
+    (a typo, a future gene not yet in RUNS) must still refuse. Exercised through the real Mind.__init__
+    refusal path (not just the bare unwired() function) by wrapping parse_genome so the returned Genome's
+    `declared` carries one extra, made-up key -- the same technique test_wave2_think.py uses to exercise a
+    gated step whose own parser clause is not yet on master."""
+
+    def test_planted_key_refuses_naming_it(self) -> None:
+        import creature.mind as mind_module
+        real_parse_genome = mind_module.parse_genome
+
+        def _parse_with_plant(text: str):
+            g = real_parse_genome(text)
+            g.declared["PLANTED"] = {"nothing": "runs-this"}
+            return g
+
+        root = _tmp()
+        with mock.patch.object(mind_module, "parse_genome", side_effect=_parse_with_plant):
+            with self.assertRaises(GenomeError) as ctx:
+                Mind(G4_SKELETON, root)
+        self.assertIn("PLANTED", str(ctx.exception))
+
+    def test_bare_unwired_function_agrees(self) -> None:
+        """The same control, one layer down: unwired() alone (no Mind, no genome file) must name a
+        completely unknown key and leave a real wired gene out."""
+        self.assertEqual(genes_module.unwired({"PLANTED": {}, "FAST": {"episodes": 1}}), ["PLANTED"])
+
+
+class TestRegistryPinnedToParser(unittest.TestCase):
+    """(d): every gene named in creature/genes.py's RUNS registry (wired or explicitly refused, like
+    TRAITS) is a gene the parser itself recognises -- a one-line clause for each, fed alone (so the ONLY
+    possible GenomeError besides "unknown gene" is the unrelated "genome lacks [...] required" error that
+    firing at the end of parse_genome proves the gene's own line was read just fine)."""
+
+    SAMPLE_LINE = {
+        "CYCLE": "CYCLE    grow to 0.9 nmax then consolidate",
+        "EXAM": "EXAM     every 2000 canvases",
+        "BODY": "BODY     service creature threads eye ear door mind voice",
+        "TAPE": "TAPE     run/tape",
+        "HEART": "HEART    every 10 s",
+        "CRASH": "CRASH    sense restart journal; mind page",
+        "WORLD": "WORLD    drawn every 5 s arrivals every 6 h; folder world/; web 6 per hour by curiosity",
+        "ASK": "ASK      what-is show is which next why",
+        "FAST": "FAST     episodes 100 keys sight words surprise",
+        "PREDICT": "PREDICT  next glance; error scales delta 0.5..2.0; ranks replay; grades act",
+        "PARK": "PARK     after 3 identical dead-ends reopen on new-sense",
+        "CURIOSITY": "CURIOSITY interests 50 operators recombine generalize specialize bridge",
+        "ARRIVAL": "ARRIVAL  never-heard word",
+        "SLEEP": "SLEEP    every 40 moments replay 5 by surprise",
+        "THINK": "THINK    every 10 canvases",
+        "FROZEN": "FROZEN   after 50 cells",
+        "FILE": "FILE     claim route decider due",
+        "BELIEF": "BELIEF   clash opens never overwrites",
+        "TRAITS": "TRAITS   contrast head 32 lr 0.01 at sleep",
+    }
+
+    def test_every_runs_gene_parses(self) -> None:
+        all_genes = sorted({gene for layer in genes_module.RUNS.values() for gene in layer})
+        for gene in all_genes:
+            with self.subTest(gene=gene):
+                self.assertIn(gene, self.SAMPLE_LINE, f"add a sample clause for {gene!r} to this test")
+                try:
+                    parse_genome(self.SAMPLE_LINE[gene] + "\n")
+                except GenomeError as e:
+                    self.assertNotIn(f"unknown gene {gene!r}", str(e), f"{gene} not recognised by the parser: {e}")
+
+    def test_sample_line_set_is_exactly_the_registry(self) -> None:
+        """No stray fixture left behind if a gene is ever removed from RUNS."""
+        all_genes = {gene for layer in genes_module.RUNS.values() for gene in layer}
+        self.assertEqual(set(self.SAMPLE_LINE), all_genes)
+
+
+if __name__ == "__main__":
+    unittest.main()

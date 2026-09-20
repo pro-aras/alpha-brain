@@ -31,6 +31,7 @@ from typing import Dict, FrozenSet, Optional, Tuple
 import numpy as np
 from PIL import Image
 
+from creature import genes as genes_module
 from genome import gaze
 from genome.fast import Episodes
 from genome.machinery import Genome, GenomeError, Organism, parse_genome
@@ -79,6 +80,16 @@ class Mind:
         self.genome: Genome = parse_genome(self.genome_text)
         self.blind = frozenset(blind)
 
+        # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — W3-0 (docs/G4-WAVE3-CLAUSES.md):
+        # THE GENERIC REFUSAL, first — before any object is built from the genome (a refusal message must
+        # not be preceded by some other constructor's error). Every declared gene not in creature/genes.py's
+        # RUNS registry (a real call site) refuses the organism by name; TRAITS's row is `None` (no
+        # interpreter yet, PREREG §12/§14), which is why this single check now replaces that earlier
+        # standalone `raise` — one law, not two.
+        bad = genes_module.unwired(self.genome.declared)
+        if bad:
+            raise GenomeError(f"{', '.join(bad)} declared but nothing runs it (W3-0): the organism does not start")
+
         # PREREG §11.1 step 5: "frozen" is a TWIN-ONLY blind — it changes how the Organism itself is
         # built, not a per-step gate. FROZEN's own parser clause is not on master yet (A10); absent, its
         # "after" defaults to 50, exactly as the PREREG says.
@@ -119,8 +130,9 @@ class Mind:
         self.journal_rows_written: int = 0
         self.snapshot_count: int = 0
         self.sleep_count: int = 0                        # edit: Claude (Fable 5.1), 2026-09-19 23:17 +0400 — STATUS.sleeps (PREREG §11.1 step 4)
-        if "TRAITS" in self.genome.declared:             # edit: Claude (Fable 5.1), 2026-09-19 23:17 +0400 — a declared gene the machinery does not run must REFUSE at start (PREREG §3/§12): the
-            raise GenomeError("TRAITS is declared but the mind has no TRAITS interpreter yet (wave 3: same-cell positives) — the organism does not start")   # sleep step called Traits.learn on the CLASS; it would have crashed the mind at its first sleep
+        # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — the standalone TRAITS refusal that
+        # lived here is now one row of the generic refusal above (creature/genes.py RUNS["mind"]["TRAITS"] = None),
+        # checked immediately after parse_genome, before this point is ever reached.
         self._last_snapshot_moments: int = 0
 
         (self.run_root / "journal").mkdir(parents=True, exist_ok=True)
