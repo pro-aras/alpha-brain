@@ -23,6 +23,7 @@ alone) so a genome that declares nothing new is byte-for-byte the walking skelet
 """
 from __future__ import annotations
 
+import inspect
 import json
 import os
 from pathlib import Path
@@ -57,6 +58,19 @@ try:
 except ImportError:
     think_laws = None                   # type: ignore[assignment]
     _THINK_LAWS_AVAILABLE = False
+
+# edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:2x +0400 — D-G12/W3-1: Builder B's believe() gains
+# `ledgers=None, clash_enabled=True` on branch g4-wave3-b (genome-wt-e, commit 04a302a) — a different
+# worktree this branch must NOT include (creature/ is Builder A's, genome/ is Builder B's). Detected by
+# introspecting whatever `believe` this tree's genome/think.py actually defines, so the SAME call site
+# works unchanged before and after that branch merges: today (5 positional params only) it passes neither
+# kwarg -- byte-identical to the call before this edit; once merged, both are passed automatically.
+_BELIEVE_KWARGS: frozenset = frozenset()
+if _THINK_LAWS_AVAILABLE:
+    try:
+        _BELIEVE_KWARGS = frozenset(inspect.signature(think_laws.believe).parameters)
+    except (TypeError, ValueError):
+        _BELIEVE_KWARGS = frozenset()
 
 try:                                    # TRAITS (PREREG §11.2) is not yet on master at the time of A9/A10;
     from genome.traits import Traits    # gated on BOTH "TRAITS" in declared AND this import having succeeded —
@@ -117,7 +131,13 @@ class Mind:
         self._think_rng = np.random.default_rng([int(self.genome.seed), 0x71494e4b])   # "THINK" bytes-ish, distinct from any other stream in this file
         self._canvas_index: int = 0
         self._filed_predictions: list = []          # [{"row": FILE's row dict, "due_canvas": int}, ...] awaiting the next showing of their word
-        self.think_counters: Dict[str, int] = {"thinks": 0, "parked": 0, "beliefs": 0, "predictions_filed": 0, "predictions_scored": 0}
+        # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:05 +0400 — D-G12/W3-1 (docs/G4-WAVE3-CLAUSES.md):
+        # revisits/extensions/clashes, coded against Builder B's believe() "kind" interface before it lands
+        # (today believe() always returns kind="belief"; the mapping below already handles the other three).
+        self.think_counters: Dict[str, int] = {
+            "thinks": 0, "parked": 0, "beliefs": 0, "revisits": 0, "extensions": 0, "clashes": 0,
+            "predictions_filed": 0, "predictions_scored": 0,
+        }
         # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15: the words the ear has ever delivered to a met canvas
         # (sight-only "" never enters). A word not in it OPENS AN ARRIVAL when ARRIVAL is declared (below);
         # rebuilt at resume from the ledger's moment_word so a resumed mind and a replay agree.
@@ -380,8 +400,26 @@ class Mind:
             # edit: Claude (Fable 5.1), 2026-09-19 23:38 +0400 — why() tags cells as (area, id); believe() takes ints and clash() compares the sets,
             # so a belief carries the word's SIGHT cells (its look); the word-side cells are the word's own by definition.
             sight_cells = [int(c) for area, c in record["cells"] if area == "sight"]
-            row = think_laws.believe(word, sight_cells, record["episodes"], self.org.t, self.run_root / "state" / "beliefs.jsonl")
-            self.think_counters["beliefs"] += 1
+            # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:2x +0400 — D-G12/W3-1 (the coordinator's
+            # integration note on Builder B's landed interface, g4-wave3-b @ 04a302a): `ledgers` gives
+            # rule 4's ledger half a live caller; `clash_enabled` gates the clash half on BELIEF's OWN
+            # declared presence (PREREG §14: the clash half is a gene, not a side effect) -- both passed
+            # ONLY when this tree's believe() actually accepts them (_BELIEVE_KWARGS, module-level above),
+            # so the call is unchanged (and unbroken) against today's 5-parameter believe().
+            extra_kwargs = {}
+            if "ledgers" in _BELIEVE_KWARGS:
+                extra_kwargs["ledgers"] = ledgers
+            if "clash_enabled" in _BELIEVE_KWARGS:
+                extra_kwargs["clash_enabled"] = "BELIEF" in self.genome.declared
+            row = think_laws.believe(word, sight_cells, record["episodes"], self.org.t,
+                                      self.run_root / "state" / "beliefs.jsonl", **extra_kwargs)
+            # D-G12/W3-1: believe() returns a "kind" in {"belief","revisit","extension","clash"} once
+            # Builder B's dedupe lands; today it is always "belief" (plain append). Coded against the
+            # interface now: an absent/unknown kind (a stub, or today's shape) counts as "beliefs" and
+            # never crashes.
+            KIND_TO_COUNTER = {"belief": "beliefs", "revisit": "revisits", "extension": "extensions", "clash": "clashes"}
+            kind = row.get("kind", "belief") if isinstance(row, dict) else "belief"
+            self.think_counters[KIND_TO_COUNTER.get(kind, "beliefs")] += 1
             return {"outcome": "belief", "parked": False, "belief": row}
 
         if item["kind"] == "sight":

@@ -1,5 +1,14 @@
 # edit: Claude (Fable 5.1), 2026-09-19 23:38 +0400 — regression for the belief-path crash: a life long enough for THINK's word work to
 # ANSWER (recall_many over the word's last five episodes) must write state/beliefs.jsonl and never die on it.
+# edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:2x +0400 — D-G12/W3-1 (coordinator's integration note on
+# Builder B's g4-wave3-b @ 04a302a): a genuine CLASH writes TWO rows to beliefs.jsonl but believe() returns
+# ONE dict of kind "clash" -- so the old invariant len(rows) == counters["beliefs"] only ever held because
+# kind was always "belief" here. Generalised to len(rows) == beliefs + revisits + extensions + 2*clashes,
+# where each of those four counts is Mind's OWN think_counters (each _think_work call bumps exactly one,
+# read from the RETURNED dict's "kind" -- never re-derived by re-classifying the file's rows, which would
+# not distinguish "this row is the clash" from "this row is what it opened against"). In THIS worktree kind
+# is always "belief" today (clashes/revisits/extensions read 0), so this reduces to exactly the old check;
+# it stays correct once genome/think.py's dedupe lands and any of the three others starts firing.
 import json, tempfile, unittest
 from pathlib import Path
 
@@ -40,7 +49,10 @@ class TestBeliefPath(unittest.TestCase):
         self.assertTrue(beliefs.exists(), "state/beliefs.jsonl not written")
         rows = [json.loads(l) for l in beliefs.read_text().splitlines()]
         self.assertGreaterEqual(len(rows), 1)
-        self.assertEqual(len(rows), mind.think_counters["beliefs"])
+        c = mind.think_counters
+        expected_rows = c["beliefs"] + c["revisits"] + c["extensions"] + 2 * c["clashes"]
+        self.assertEqual(len(rows), expected_rows,
+                          f"beliefs.jsonl has {len(rows)} rows; think_counters says {c}")
 
 
 if __name__ == "__main__":
