@@ -5,9 +5,22 @@ edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 21:xx +0400 — new file, Wave
 The three required toys (§11.2): "a planted rule found and a planted counter-example blocks it"
 (induce); "a planted contradiction opens a clash row with both beliefs still readable" (clash); "an
 unroutable deduction is REFUSED by name (FILE's law)" (deduce).
+
+edit: Claude (Sonnet 5, W3 builder B), 2026-09-20 22:44 +0400 — Wave 3 W3-1 made believe() STATEFUL: a
+second believe() call for the SAME word now reads the standing belief first and returns a
+revisit/extension/clash row, never a second independent "belief" row. TestClash's two same-word tests
+(test_disjoint_same_word_..., test_overlapping_cells_same_word_is_not_a_clash) built their "old"/"new"
+fixtures by calling believe() twice for "zog" — under the new dedup contract the SECOND call is no
+longer a raw belief write, it is intercepted by rule 4 (disjoint/overlapping-after-removal both fall
+under "cells removed"). clash() itself is UNCHANGED by W3-1 (still a pure, stateless function tested in
+isolation); these two fixtures now use `_raw_belief`, a direct, unconditional append matching exactly
+what believe() used to do every time (and what it STILL does the FIRST time for any word) — so clash()
+is exercised the same way it always was, independent of believe()'s new stateful scope law. See
+tests/genome/test_believe_scope.py for the new dedup behaviour's own toys.
 """
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -25,6 +38,30 @@ from ._toy import SIGHT_DIM, WORDS_DIM, mini_genome, unit
 def _jitter(rng: np.random.Generator, v: np.ndarray, scale: float = 0.02) -> np.ndarray:
     j = v + rng.normal(scale=scale, size=v.shape)
     return j / np.linalg.norm(j)
+
+
+def _raw_belief(word, cells, episode_ids, moment, path) -> dict:
+    """Appends one belief row unconditionally, bypassing believe()'s W3-1 standing-belief lookup —
+    used only to build two INDEPENDENT belief-row fixtures for testing clash() in isolation (see the
+    2026-09-20 module docstring addendum above). Mirrors believe()'s own first-time write exactly."""
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    line_no = 0
+    if p.exists():
+        with open(p) as f:
+            line_no = sum(1 for _ in f)
+    row = {
+        "line": line_no,
+        "kind": "belief",
+        "word": word,
+        "cells": sorted(set(int(c) for c in cells)),
+        "episodes": sorted(set(int(e) for e in episode_ids)),
+        "moment": int(moment),
+        "clashes": [],
+    }
+    with open(p, "a") as f:
+        f.write(json.dumps(row) + "\n")
+    return row
 
 
 class TestBelieve(unittest.TestCase):
@@ -53,8 +90,8 @@ class TestClash(unittest.TestCase):
     def test_disjoint_same_word_opens_a_clash_row_both_beliefs_still_readable(self) -> None:
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "beliefs.jsonl"
-            old = believe("zog", [1, 2], [10], 5, path)
-            new = believe("zog", [7, 8], [20], 9, path)  # disjoint cells — a planted contradiction
+            old = _raw_belief("zog", [1, 2], [10], 5, path)
+            new = _raw_belief("zog", [7, 8], [20], 9, path)  # disjoint cells — a planted contradiction
             row = clash(new, [old], path)
             self.assertIsNotNone(row)
             self.assertEqual(row["kind"], "clash")
@@ -71,8 +108,8 @@ class TestClash(unittest.TestCase):
     def test_overlapping_cells_same_word_is_not_a_clash(self) -> None:
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "beliefs.jsonl"
-            old = believe("zog", [1, 2, 3], [10], 5, path)
-            new = believe("zog", [3, 4], [20], 9, path)  # shares cell 3 — same underlying belief
+            old = _raw_belief("zog", [1, 2, 3], [10], 5, path)
+            new = _raw_belief("zog", [3, 4], [20], 9, path)  # shares cell 3 — same underlying belief
             row = clash(new, [old], path)
             self.assertIsNone(row)
 
@@ -139,8 +176,8 @@ class TestDeduce(unittest.TestCase):
     def test_disjoint_same_word_deduction_is_unroutable_refused_by_name(self) -> None:
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "beliefs.jsonl"
-            a = believe("zog", [1, 2], [10], 5, path)
-            b = believe("zog", [7, 8], [20], 9, path)  # disjoint — same word (also a clash() pair)
+            a = _raw_belief("zog", [1, 2], [10], 5, path)
+            b = _raw_belief("zog", [7, 8], [20], 9, path)  # disjoint — same word (also a clash() pair)
             claims = deduce([a, b])
             self.assertEqual(len(claims), 1)
             row = claims[0]
@@ -158,8 +195,8 @@ class TestDeduce(unittest.TestCase):
     def test_overlapping_same_word_no_claim(self) -> None:
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "beliefs.jsonl"
-            a = believe("zog", [1, 2], [10], 5, path)
-            b = believe("zog", [2, 3], [11], 6, path)
+            a = _raw_belief("zog", [1, 2], [10], 5, path)
+            b = _raw_belief("zog", [2, 3], [11], 6, path)
             self.assertEqual(deduce([a, b]), [])
 
 
