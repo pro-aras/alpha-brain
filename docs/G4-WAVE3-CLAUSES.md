@@ -14,6 +14,14 @@ real tape; a failed toy is a finding, never a moved bar. The order at the end is
   `#OFF` starts (positive control); `G4.genome` starts (the life's own genome is the second positive control).
 - **Mark:** none — a law. **Control:** a planted gene name added to the parser and not to any table must refuse.
 
+- **W3-0b (owed; from Builder A's RUNS registry, 2026-09-20 23:4x):** eight declared genes have a call site but their VALUE is
+  never read — HEART's period, TAPE's path, WORLD's period and arrival hours, ASK's verbs, CRASH's policy, BODY's thread list,
+  FILE and BELIEF (called by THINK unconditionally). A genome line whose value changes nothing is a label, not a law. Clause: the
+  body and the mind read those values (STATUS period from HEART, the maker's period and window from WORLD, the tape path from
+  TAPE, the verbs from ASK, FILE/BELIEF gated on their own presence), each with a toy that CHANGES the value and reads the change
+  (a HEART line at 60 s must move the STATUS period to 60 s; a WORLD line at 2 s must move the maker). Until then `genes.py`
+  flags them «value read: no» and the refusal treats them as wired.
+
 ## W3-1 · D-G12 — BELIEF DEDUPE (Alpha 2's scope law: one belief per word; a change is an EXTENSION; a contradiction a CLASH)
 - **Reading of life 1:** 762 belief rows for 16 words in 11.5 h — every think pass that answered re-wrote the word's belief
   whole (`believe()` appends unconditionally). Alpha 2's law: a belief is one row per claim; new evidence is appended to it;
