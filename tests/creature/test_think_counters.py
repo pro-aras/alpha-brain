@@ -78,19 +78,23 @@ def _build_mind_with_a_belief_item() -> "tuple[Mind, dict]":
 
 
 class TestBackwardCompatibleWithTodaysBelieve(unittest.TestCase):
-    """believe() today takes exactly 5 positional parameters, always returns kind="belief". This is the
-    regression the plumbing must never break (test_wave2_belief_path.py exercises the same thing at
-    end-to-end scale; this is the narrow, single-item version)."""
+    """Written by Builder A against the pre-W3-1 believe() (5 positional parameters, always kind="belief");
+    reconciled at the staging merge — edit: Claude (Fable 5.1), 2026-09-20 23:56 +0400 — because Builder B's W3-1 (the
+    scope law, genome/think.py) makes a SECOND believe() of a word whose cells are unchanged a REVISIT, and a
+    changed cell set an EXTENSION: the plumbing's contract on the merged tree is that the think outcome is still
+    "belief" and exactly one of the kind counters moves (#232 addendum (c): a test that pins the absence of a
+    feature another lane is building is a merge-time failure by design)."""
 
-    def test_todays_call_still_works_and_counts_beliefs(self) -> None:
+    def test_rethinking_a_believed_word_moves_exactly_one_kind_counter(self) -> None:
         mind, item = _build_mind_with_a_belief_item()
         before = dict(mind.think_counters)
         result = mind._think_work(item)
         self.assertEqual(result["outcome"], "belief")
         after = mind.think_counters
-        self.assertEqual(after["beliefs"], before["beliefs"] + 1)
-        self.assertEqual((after["revisits"], after["extensions"], after["clashes"]),
-                          (before["revisits"], before["extensions"], before["clashes"]))
+        moved = {k: after[k] - before[k] for k in ("beliefs", "revisits", "extensions", "clashes")}
+        self.assertEqual(sum(moved.values()), 1, moved)
+        self.assertEqual(moved["clashes"], 0, moved)          # re-thinking the same evidence is never a contradiction
+        self.assertIn(1, (moved["revisits"], moved["extensions"], moved["beliefs"]), moved)
 
 
 class _StubThinkLaws:
