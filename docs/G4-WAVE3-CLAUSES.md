@@ -47,6 +47,15 @@ real tape; a failed toy is a finding, never a moved bar. The order at the end is
   the shuffled-tape twin at chance · PARK ≥ 1 on a rule that cannot be scored (a word shown once — the plant «zog»
   after its five showings is the natural dead end).
 
+- **NOTE from the verdict reader's control run (2026-09-20 13:0x +04, PREREG §16 addendum):** PREDICT's error is read on the FIRST
+  glance of each canvas against a state carried from the PREVIOUS canvas (a different thing), so every canvas is a boundary of the
+  same size (steady .23) and an ARRIVAL is invisible to it (window 1: 0 of 5 spikes, ratios .46–1.35, house and tree BELOW
+  steady). The arrival is visible in the novelty births (71 at window 1). **W3-2b (owed with W3-2):** PREDICT's target moves
+  inside the organism — the expected glance is the nearest RESONATING cell's stored vector (`_resonate`'s winner), and the
+  error is 1 − cos(glance, winner) with «no resonating cell» = error 1.0 (a genuine surprise); the toy = B13's re-run with
+  this error: spike ≥ 3× at arrival, settle by the 10th showing, the no-new-things null — the same bars, now on a signal that
+  can carry them. The modulator (lr scale, replay ranking) reads the new error.
+
 ## W3-3 · `Interests.sleep_boundary()` WIRED — one line
 - `_maybe_sleep` calls `self.interests.sleep_boundary()` after every SLEEP row (B10's contract, §11.1 step 4). Test: a
   recombine chain never pairs an answer from before a sleep with one after it (a planted pair across a sleep must not combine).
