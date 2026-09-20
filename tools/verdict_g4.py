@@ -122,6 +122,13 @@ def worker(spec_path: Path) -> int:
             rows[i] = dict(rows[i]); rows[i]["meta"] = dict(rows[i]["meta"]); rows[i]["meta"]["word"] = words[j]
     (root / "tape" / "ALL.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))   # self_exam's disjointness control reads it
     genome_path = Path(spec["genome"])
+    if spec.get("one_glance"):
+        # edit: Claude (Fable 5.1), 2026-09-20 13:03 +0400 — PREREG §16 addendum: G1's T-one-glance = gaze mode "one" (the whole canvas at
+        # glance×glance, one feature vector), forced on every glances() call of THIS worker process — the mind's learning road and
+        # the exam's held-out alike — without touching creature code (the mind hardcodes surprise/random).
+        from genome import gaze as _gaze
+        _orig = _gaze.glances
+        _gaze.glances = lambda rgb, spec_, g, mode="surprise", pic_id="": _orig(rgb, spec_, g, "one", pic_id)
     mind = Mind(genome_path, root, blind=frozenset(spec.get("blind", [])))
     if spec.get("nowire"):
         mind.org = Organism(mind.genome, wire=False)
@@ -146,11 +153,21 @@ def worker(spec_path: Path) -> int:
                "sleeps": sum(1 for r in mind_rows if "sleep" in r), "thinks": sum(1 for r in mind_rows if "think" in r),
                "parked": sum(1 for r in mind_rows if "think" in r and r["think"].get("parked")),
                "canvases": n_canvas, "seconds": round(secs, 1), "ms_per_canvas": round(1000 * secs / max(1, n_canvas), 2), "hash": org.state_hash()}
-    ex = subprocess.run([sys.executable, str(ROOT / "tools" / "self_exam.py"), "--root", str(root), "--genome", str(genome_path), "--held", "10", "--check-tape", "400"],
-                        capture_output=True, text=True, cwd=ROOT)
+    if spec.get("one_glance"):
+        from tools import self_exam as _se           # in-process, so the forced mode "one" applies to the held-out glances too
+        old_argv = sys.argv
+        try:
+            sys.argv = ["self_exam.py", "--root", str(root), "--genome", str(genome_path), "--held", "10", "--check-tape", "400"]
+            _se.main()
+        finally:
+            sys.argv = old_argv
+        summary["exam_stderr"] = ""
+    else:
+        ex = subprocess.run([sys.executable, str(ROOT / "tools" / "self_exam.py"), "--root", str(root), "--genome", str(genome_path), "--held", "10", "--check-tape", "400"],
+                            capture_output=True, text=True, cwd=ROOT)
+        summary["exam_stderr"] = ex.stderr[-500:] if ex.returncode else ""
     exams = sorted(p for p in (root / "exam").glob("*.json") if p.name[0].isdigit())
     summary["exam"] = json.loads(exams[-1].read_text()) if exams else None
-    summary["exam_stderr"] = ex.stderr[-500:] if ex.returncode else ""
     (root / "summary.json").write_text(json.dumps(summary, default=str))
     return 0
 
@@ -174,7 +191,7 @@ def run_workers(specs: List[dict], workers: int, out: Path) -> Dict[str, dict]:
     return done
 
 
-def genome_twin_text(base_text: str, label: str, numbers: Optional[dict] = None, fixations: Optional[int] = None) -> str:
+def genome_twin_text(base_text: str, label: str, numbers: Optional[dict] = None, fixations: Optional[int] = None, frozen_after: Optional[int] = None) -> str:
     """A genome-TEXT twin: the same file with its numbers replaced (random genomes, (ix)) or GAZE fixations 1 ((xi))."""
     import re
     lines = base_text.splitlines()
@@ -196,6 +213,8 @@ def genome_twin_text(base_text: str, label: str, numbers: Optional[dict] = None,
             elif head[:1] == ["ABSTAIN"]: line = f"ABSTAIN  second/best > {n['abstain_ratio']:.3f}"
         if fixations is not None and head[:1] == ["GAZE"]:
             line = re.sub(r"fixations \d+", f"fixations {fixations}", line.split("#")[0]).rstrip()
+        if frozen_after is not None and head[:1] == ["FROZEN"]:
+            line = f"FROZEN   after {frozen_after} cells"
         out.append(line)
     return f"# {label} — a genome-text twin written by tools/verdict_g4.py (PREREG §16)\n" + "\n".join(out) + "\n"
 
@@ -223,7 +242,7 @@ def modulation(G: dict, F: float) -> dict:
     mind = [r for r in G["mind"] if "moment" in r and r.get("word")]
     win = lambda r: int(r["moment"][1:5])
     by_seq = {int(r["seq"]): r for r in mind}
-    out = {"F": F, "settle_bar": round(F + 0.05, 4), "windows": {}}
+    out = {"F": F, "settle_bar": "err at the 10th showing ≤ 1.25 × the pre-window last-50 median (§16 addendum); the toy's F+.05 = %.4f printed per thing" % (F + 0.05), "windows": {}}
     seen_before: set = set()
     cur = None; idx = 0
     for i, r in enumerate(mind):
@@ -245,7 +264,8 @@ def modulation(G: dict, F: float) -> dict:
                 first3 = float(np.median(errs[:3])); tenth = errs[9] if len(errs) >= 10 else None
                 rec["per_thing"][t] = {"kind": "new" if t in new else "returning", "first3_med": round(first3, 4),
                                        "spike_ratio": round(first3 / last50, 2) if last50 > 0 else None, "spike": bool(last50 > 0 and first3 >= 3 * last50),
-                                       "err_10th": round(tenth, 4) if tenth is not None else None, "settled": bool(tenth is not None and tenth < F + 0.05)}
+                                       "err_10th": round(tenth, 4) if tenth is not None else None, "settled": bool(tenth is not None and last50 > 0 and tenth <= 1.25 * last50),
+                                       "settled_toy_bar_F_plus_05": bool(tenth is not None and tenth < F + 0.05)}
             out["windows"][str(w)] = rec
             cur = w
         seen_before.add(r["word"])
@@ -306,14 +326,17 @@ def main(argv: List[str]) -> int:
     tape_all = out / "tape" / "ALL.jsonl"
     twins_dir = out / "twins"; twins_dir.mkdir(exist_ok=True)
     base_text = genome_path.read_text()
-    one_glance = twins_dir / "one-glance.genome"; one_glance.write_text(genome_twin_text(base_text, "T-one-glance", fixations=1))
+    first_fix = twins_dir / "first-fixation.genome"; first_fix.write_text(genome_twin_text(base_text, "T-first-fixation", fixations=1))
+    frozen10 = twins_dir / "frozen-10.genome"; frozen10.write_text(genome_twin_text(base_text, "T-frozen-10", frozen_after=10))
     specs = [{"label": "unblinded-1", "root": str(twins_dir / "unblinded-1"), "tape": str(tape_all), "genome": str(genome_path)},
              {"label": "unblinded-2", "root": str(twins_dir / "unblinded-2"), "tape": str(tape_all), "genome": str(genome_path)}]
     if not a.skip_twins:
         specs += [{"label": f"blind-{b}", "root": str(twins_dir / f"blind-{b}"), "tape": str(tape_all), "genome": str(genome_path), "blind": [b]} for b in BLINDS]
         specs += [{"label": "T-shuffle", "root": str(twins_dir / "T-shuffle"), "tape": str(tape_all), "genome": str(genome_path), "shuffle_words": True},
                   {"label": "T-nowire", "root": str(twins_dir / "T-nowire"), "tape": str(tape_all), "genome": str(genome_path), "nowire": True},
-                  {"label": "T-one-glance", "root": str(twins_dir / "T-one-glance"), "tape": str(tape_all), "genome": str(one_glance)}]
+                  {"label": "T-one-glance", "root": str(twins_dir / "T-one-glance"), "tape": str(tape_all), "genome": str(genome_path), "one_glance": True},
+                  {"label": "T-first-fixation", "root": str(twins_dir / "T-first-fixation"), "tape": str(tape_all), "genome": str(first_fix)},
+                  {"label": "T-frozen-10", "root": str(twins_dir / "T-frozen-10"), "tape": str(tape_all), "genome": str(frozen10), "blind": ["frozen"]}]
     # (ix): the first --slice-hours of the tape under 20 random genomes (numbers only, structure fixed) and under the creature's own
     slice_seq = 0
     for r in G["tape"]:
@@ -389,7 +412,8 @@ def main(argv: List[str]) -> int:
                     "bar": "Q1,Q2 ≥ .80 · Q3 ≥ .85 · Q4 ≥ .90"}
     M["ii_meeting_real"] = {"pass": (q("T-shuffle") is not None and q("T-shuffle") <= .20) and (q("T-nowire") is not None and q("T-nowire") <= .20),
                             "T_shuffle_Q1": q("T-shuffle"), "T_nowire_Q1": q("T-nowire"), "bar": "≤ .20"}
-    M["iii_growth_matters"] = {"pass": q("blind-frozen") is not None and q("blind-frozen") <= seen["Q1"]["acc"] - .30, "T_frozen_Q1": q("blind-frozen"), "Q1": seen["Q1"]["acc"], "bar": "≥ 30 pp under"}
+    M["iii_growth_matters"] = {"pass": q("T-frozen-10") is not None and q("T-frozen-10") <= seen["Q1"]["acc"] - .30, "T_frozen_10_Q1": q("T-frozen-10"), "T_frozen_50_Q1": q("blind-frozen"),
+                               "T_frozen_10_cells": TW.get("T-frozen-10", {}).get("cells"), "Q1": seen["Q1"]["acc"], "bar": "≥ 30 pp under (the twin FROZEN after 10 cells, G0b's; the 50-cell twin printed — §16 addendum)"}
     c = U["c"]; pruned_share = c["edges_pruned"] / c["edges_born"] if c["edges_born"] else 0.0
     M["iv_grows_alone"] = {"pass": U["cells_born"] >= 50 and c["births_refused_budget"] == 0 and pruned_share >= .05 and c["removed_for_disuse"] == 0,
                            "cells_born": U["cells_born"], "births_refused_budget": c["births_refused_budget"], "arrivals": U["arrivals"], "budget_left": U["budget_left"],
@@ -437,9 +461,10 @@ def main(argv: List[str]) -> int:
     M["x_gaze_finds_thing"] = {"pass": lx["rate"] >= .90 and lx["rate"] >= 1.5 * lr["rate"], "gaze_rate": lx["rate"], "random_rate": lr["rate"], "random_ceiling_expected": 0.069,
                                "ratio": round(lx["rate"] / lr["rate"], 2) if lr["rate"] else None, "bar": "≥ .90 in the first 2 fixations · ≥ 1.5× random"}
     M["xi_gaze_earns_place"] = {"pass": q("T-one-glance") is not None and seen["Q1"]["acc"] - q("T-one-glance") >= .10, "Q1_gaze": seen["Q1"]["acc"], "Q1_one_glance": q("T-one-glance"),
-                                "Q1_random_gaze": q("blind-gaze"), "bar": "≥ .10 over the one-glance twin (a genome-text twin, GAZE fixations 1)"}
+                                "Q1_first_fixation_only": q("T-first-fixation"), "Q1_random_gaze": q("blind-gaze"),
+                                "bar": "≥ .10 over G1's one-glance twin (gaze mode 'one': the whole canvas at glance×glance); the first-fixation-only twin printed — §16 addendum"}
     F = 1.0 - g.theta_n
-    M["MODULATION"] = modulation(G, F); M["MODULATION"]["bar"] = "§10: at every window bringing NEW things, a majority spike ≥ 3× the last-50 median and settle < F+.05 by the 10th showing; the fake-boundary null < 1.5×"
+    M["MODULATION"] = modulation(G, F); M["MODULATION"]["bar"] = "§10 as amended §16: at every window bringing NEW things, a majority spike ≥ 3× the last-50 median and settle ≤ 1.25× it by the 10th showing; the fake-boundary null < 1.5×"
     np_err = None
     if "blind-predict" in TW and (twins_dir / "blind-predict" / "mind-journal.jsonl").exists():
         errs = [r["err"] for r in read_jsonl(twins_dir / "blind-predict" / "mind-journal.jsonl") if "moment" in r and "err" in r]
@@ -480,7 +505,7 @@ def write_verdict(out: Path, R: dict) -> None:
          f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {M['vii_replay']['vs_live']} · two replays {M['vii_replay']['two_replays']} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']} | {pf(M['vii_replay']['pass'])} |"]
     i = M["i_knows"]; L.append(f"| (i) | {i['bar']} | Q1 {i['Q1']:.3f} Q2 {i['Q2']:.3f} Q3 {i['Q3']:.3f} Q4 {i['Q4']:.3f} (chance {i['chance_Q1']}; all words Q1 {i['all_words']['Q1']:.3f}) | {pf(i['pass'])} |")
     m = M["ii_meeting_real"]; L.append(f"| (ii) | {m['bar']} | T-shuffle Q1 {m['T_shuffle_Q1']} · T-nowire Q1 {m['T_nowire_Q1']} | {pf(m['pass'])} |")
-    m = M["iii_growth_matters"]; L.append(f"| (iii) | {m['bar']} | T-frozen Q1 {m['T_frozen_Q1']} vs Q1 {m['Q1']:.3f} | {pf(m['pass'])} |")
+    m = M["iii_growth_matters"]; L.append(f"| (iii) | {m['bar']} | T-frozen-10 Q1 {m['T_frozen_10_Q1']} (cells {m['T_frozen_10_cells']}) vs Q1 {m['Q1']:.3f}; the 50-cell twin {m['T_frozen_50_Q1']} | {pf(m['pass'])} |")
     m = M["iv_grows_alone"]; L.append(f"| (iv) | {m['bar']} | born {m['cells_born']} · refused {m['births_refused_budget']} (arrivals {m['arrivals']}, budget left {m['budget_left']}) · pruned {m['edges_pruned']}/{m['edges_born']} = {100*m['pruned_share']:.1f} % (cross-thing born {m['edges_cross']['born']} / pruned {m['edges_cross']['pruned']}) · disuse {m['removed_for_disuse']} | {pf(m['pass'])} |")
     m = M["v_retention"]; L.append(f"| (v) | {m['bar']} | " + ("; ".join(f"w{p['window']}: {p['before']:.3f} → first {p['first_after']:.3f} → last {p['last_in_window']:.3f} ({p['drop_pp']:+.1f} pp drop)" for p in m['pairs']) or m['note']) + f" | {pf(m['pass'])} |")
     m = M["vi_knows_unknown"]; L.append(f"| (vi) | {m['bar']} | plant zog answered {m['plant_zog']['answered_rate']:.2f} (as {m['plant_zog']['answered_as']}, abstain {m['plant_zog']['abstain']}) · null vex abstains {m['null_vex']['abstain_rate']:.2f} (answered as {m['null_vex']['answered_as']}) · Q5 {m['Q5_spiral_abstain']:.2f} · false {m['false_abstention']:.3f} | {pf(m['pass'])} |")
@@ -488,7 +513,7 @@ def write_verdict(out: Path, R: dict) -> None:
     if "ix_not_luck" in M:
         m = M["ix_not_luck"]; L.append(f"| (ix) | {m['bar']} | rank {m['rank_of_own']} of {m['of']} (own {m['own_composite']}; best random {m['best_random']}) | {pf(m['pass'])} |")
     m = M["x_gaze_finds_thing"]; L.append(f"| (x) | {m['bar']} | gaze {m['gaze_rate']:.3f} vs random {m['random_rate']:.3f} (×{m['ratio']}) | {pf(m['pass'])} |")
-    m = M["xi_gaze_earns_place"]; L.append(f"| (xi) | {m['bar']} | Q1 gaze {m['Q1_gaze']:.3f} − one-glance {m['Q1_one_glance']} (random-gaze {m['Q1_random_gaze']}) | {pf(m['pass'])} |")
+    m = M["xi_gaze_earns_place"]; L.append(f"| (xi) | {m['bar']} | Q1 gaze {m['Q1_gaze']:.3f} − one-glance {m['Q1_one_glance']} (first-fixation-only {m['Q1_first_fixation_only']}; random-gaze {m['Q1_random_gaze']}) | {pf(m['pass'])} |")
     m = M["MODULATION"]; L.append(f"| MODULATION | {m['bar']} | windows {m['graded_windows']} · null {m.get('null_fake_boundary_w0', {}).get('no_spike')} · no-predict twin max err {m['no_predict_twin_err']} | {pf(m['pass'])} |")
     L.append(f"| TWINS random-gaze | loses (xi) | margin {M['TWINS']['random_gaze_loses_xi']['margin']} | {pf(M['TWINS']['random_gaze_loses_xi']['pass'])} |")
     L.append(f"| PARK | ≥ 1 parked · share ≤ 5 % | parked {M['PARK']['parked']} of {M['PARK']['thinks']} thinks — {M['PARK']['reason']} | not graded |")
