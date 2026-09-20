@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 import numpy as np
 
 BLINDS = ["gaze", "sleep", "predict", "curiosity", "park", "frozen"]
+REUSE = False   # --reuse: read existing twin summaries under --out instead of replaying them
 WINDOW_SECONDS = 6 * 3600
 
 
@@ -27,7 +28,19 @@ def _iso(s: str) -> datetime:
 
 
 def read_jsonl(p: Path) -> List[dict]:
-    return [json.loads(l) for l in p.read_text().splitlines() if l.strip()]
+    """A journal/tape file the body may still be APPENDING to (tomorrow's live root): tolerate exactly ONE trailing partial line
+    (dropped, named on stderr); a torn line anywhere else is corruption and raises. (edit: Claude (Fable 5.1), 2026-09-20 13:21 +0400 — robustness, not a bar.)"""
+    lines = [l for l in p.read_text().splitlines() if l.strip()]
+    out: List[dict] = []
+    for i, l in enumerate(lines):
+        try:
+            out.append(json.loads(l))
+        except json.JSONDecodeError:
+            if i == len(lines) - 1:
+                print(f"read_jsonl: dropped a trailing partial line in {p} ({len(l)} bytes, being written)", file=sys.stderr)
+                break
+            raise
+    return out
 
 
 # ----------------------------------------------------------------------------- the tape and the journal, cut at --hours
@@ -177,6 +190,9 @@ def run_workers(specs: List[dict], workers: int, out: Path) -> Dict[str, dict]:
     while pending or procs:
         while pending and len(procs) < workers:
             s = pending.pop(0); sp = out / "specs" / (s["label"] + ".json"); sp.parent.mkdir(exist_ok=True)
+            sf0 = Path(s["root"]) / "summary.json"
+            if REUSE and sf0.exists():
+                done[s["label"]] = json.loads(sf0.read_text()); print(f"  twin {s['label']}: reused", flush=True); continue
             sp.write_text(json.dumps(s)); log = open(out / "specs" / (s["label"] + ".log"), "w")
             p = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--worker", str(sp)], stdout=log, stderr=subprocess.STDOUT, cwd=ROOT)
             procs.append((s, p, log))
@@ -299,7 +315,9 @@ def main(argv: List[str]) -> int:
     ap.add_argument("--slice-hours", type=float, default=6.0); ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--nrestarts", type=int); ap.add_argument("--cpu-ns", type=int); ap.add_argument("--unit")
     ap.add_argument("--skip-twins", action="store_true"); ap.add_argument("--skip-random", action="store_true")
+    ap.add_argument("--reuse", action="store_true", help="re-grade: read twin summaries already under --out instead of replaying")
     a = ap.parse_args(argv)
+    global REUSE; REUSE = bool(a.reuse)
     if a.worker:
         return worker(Path(a.worker))
     T0 = time.perf_counter()
@@ -403,7 +421,10 @@ def main(argv: List[str]) -> int:
     U = TW["unblinded-1"]; E = U["exam"]; seen = E["ask_seen_words"]; allw = E["ask_all_words"]
     last_live_exam = G["exams"][-1] if G["exams"] else None
     def q(twin, key="Q1"):
-        t = TW.get(twin, {}); ex = t.get("exam") or {}; return (ex.get("ask_seen_words") or {}).get(key, {}).get("acc")
+        # §16 addendum 2: every TWIN is read on ask_all_words (the same 160-question denominator as the creature's all-words Q1) —
+        # a twin that met only 2 words scored .75 on its own 20 questions and .094 on the 160 (the control run, 13:2x)
+        t = TW.get(twin, {}); ex = t.get("exam") or {}; return (ex.get("ask_all_words") or {}).get(key, {}).get("acc")
+    Q1_ALL = allw["Q1"]["acc"]
     M: Dict[str, dict] = {}
     M["i_knows"] = {"pass": seen["Q1"]["acc"] >= .80 and seen["Q2"]["acc"] >= .80 and seen["Q3"]["acc"] >= .85 and seen["Q4"]["acc"] >= .90,
                     "Q1": seen["Q1"]["acc"], "Q2": seen["Q2"]["acc"], "Q3": seen["Q3"]["acc"], "Q4": seen["Q4"]["acc"], "chance_Q1": E["chance_q1"],
@@ -412,8 +433,8 @@ def main(argv: List[str]) -> int:
                     "bar": "Q1,Q2 ≥ .80 · Q3 ≥ .85 · Q4 ≥ .90"}
     M["ii_meeting_real"] = {"pass": (q("T-shuffle") is not None and q("T-shuffle") <= .20) and (q("T-nowire") is not None and q("T-nowire") <= .20),
                             "T_shuffle_Q1": q("T-shuffle"), "T_nowire_Q1": q("T-nowire"), "bar": "≤ .20"}
-    M["iii_growth_matters"] = {"pass": q("T-frozen-10") is not None and q("T-frozen-10") <= seen["Q1"]["acc"] - .30, "T_frozen_10_Q1": q("T-frozen-10"), "T_frozen_50_Q1": q("blind-frozen"),
-                               "T_frozen_10_cells": TW.get("T-frozen-10", {}).get("cells"), "Q1": seen["Q1"]["acc"], "bar": "≥ 30 pp under (the twin FROZEN after 10 cells, G0b's; the 50-cell twin printed — §16 addendum)"}
+    M["iii_growth_matters"] = {"pass": q("T-frozen-10") is not None and q("T-frozen-10") <= Q1_ALL - .30, "T_frozen_10_Q1": q("T-frozen-10"), "T_frozen_50_Q1": q("blind-frozen"),
+                               "T_frozen_10_cells": TW.get("T-frozen-10", {}).get("cells"), "Q1": Q1_ALL, "bar": "≥ 30 pp under on all 16 words (the twin FROZEN after 10 cells, G0b's; the 50-cell twin printed — §16 addenda)"}
     c = U["c"]; pruned_share = c["edges_pruned"] / c["edges_born"] if c["edges_born"] else 0.0
     M["iv_grows_alone"] = {"pass": U["cells_born"] >= 50 and c["births_refused_budget"] == 0 and pruned_share >= .05 and c["removed_for_disuse"] == 0,
                            "cells_born": U["cells_born"], "births_refused_budget": c["births_refused_budget"], "arrivals": U["arrivals"], "budget_left": U["budget_left"],
@@ -460,7 +481,7 @@ def main(argv: List[str]) -> int:
     lx = E["gaze_landing"]; lr = own["random_landing"]
     M["x_gaze_finds_thing"] = {"pass": lx["rate"] >= .90 and lx["rate"] >= 1.5 * lr["rate"], "gaze_rate": lx["rate"], "random_rate": lr["rate"], "random_ceiling_expected": 0.069,
                                "ratio": round(lx["rate"] / lr["rate"], 2) if lr["rate"] else None, "bar": "≥ .90 in the first 2 fixations · ≥ 1.5× random"}
-    M["xi_gaze_earns_place"] = {"pass": q("T-one-glance") is not None and seen["Q1"]["acc"] - q("T-one-glance") >= .10, "Q1_gaze": seen["Q1"]["acc"], "Q1_one_glance": q("T-one-glance"),
+    M["xi_gaze_earns_place"] = {"pass": q("T-one-glance") is not None and Q1_ALL - q("T-one-glance") >= .10, "Q1_gaze": Q1_ALL, "Q1_one_glance": q("T-one-glance"),
                                 "Q1_first_fixation_only": q("T-first-fixation"), "Q1_random_gaze": q("blind-gaze"),
                                 "bar": "≥ .10 over G1's one-glance twin (gaze mode 'one': the whole canvas at glance×glance); the first-fixation-only twin printed — §16 addendum"}
     F = 1.0 - g.theta_n
@@ -476,8 +497,9 @@ def main(argv: List[str]) -> int:
     M["PLANTS"] = {"vi": M["vi_knows_unknown"]["pass"], "predict_file_pair": "cannot fire on the maker's ear-then-eye stream (§14); predictions_filed " + str(st.get("predictions_filed")),
                    "park_unanswerable_want": "the folder door is OFF (§6)", "sleep_replay": {"sleeps": U["sleeps"], "no_sleep_twin_sleeps": TW.get("blind-sleep", {}).get("sleeps")},
                    "belief_contradiction": "clash unwired (§14)"}
-    M["TWINS"] = {b: {"Q1": q(f"blind-{b}"), "composite": ((TW.get(f"blind-{b}", {}).get("exam") or {}).get("ask_seen_words") or {}).get("composite"), "cells": TW.get(f"blind-{b}", {}).get("cells")} for b in BLINDS}
-    M["TWINS"]["random_gaze_loses_xi"] = {"pass": q("blind-gaze") is not None and seen["Q1"]["acc"] - q("blind-gaze") >= .10, "margin": None if q("blind-gaze") is None else round(seen["Q1"]["acc"] - q("blind-gaze"), 3)}
+    M["TWINS"] = {b: {"Q1": q(f"blind-{b}"), "Q1_seen": ((TW.get(f"blind-{b}", {}).get("exam") or {}).get("ask_seen_words") or {}).get("Q1", {}).get("acc"),
+                      "composite": ((TW.get(f"blind-{b}", {}).get("exam") or {}).get("ask_all_words") or {}).get("composite"), "cells": TW.get(f"blind-{b}", {}).get("cells")} for b in BLINDS}
+    M["TWINS"]["random_gaze_loses_xi"] = {"pass": q("blind-gaze") is not None and Q1_ALL - q("blind-gaze") >= .10, "margin": None if q("blind-gaze") is None else round(Q1_ALL - q("blind-gaze"), 3)}
     M["TWINS"]["no_sleep_v"] = {"graded": False, "reason": "SLEEP's retention is not gradable on drawn worlds (§10)", "no_sleep_Q1": q("blind-sleep")}
     M["TWINS"]["no_curiosity"] = {"graded": False, "reason": "the door mark needs the folder/web door (OFF)"}
     M["TWINS"]["no_park"] = {"graded": False, "reason": "PARK unreadable (folder OFF)"}
@@ -504,7 +526,7 @@ def write_verdict(out: Path, R: dict) -> None:
          f"| ALIVE | {A['bar_hours']} h under the unit, NRestarts 0, every counter moved every hour, no sense dead > 60 s | {A['hours_on_tape']} h on tape · moved every hour {A['every_counter_moved_every_hour']} · max gap eye/ear {A['max_gap_s_eye_ear']} s · sense restarts {A['sense_restarts']} · crashes {A['crashes']} · NRestarts {A['nrestarts']} | {pf(A['pass'])} |",
          f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {M['vii_replay']['vs_live']} · two replays {M['vii_replay']['two_replays']} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']} | {pf(M['vii_replay']['pass'])} |"]
     i = M["i_knows"]; L.append(f"| (i) | {i['bar']} | Q1 {i['Q1']:.3f} Q2 {i['Q2']:.3f} Q3 {i['Q3']:.3f} Q4 {i['Q4']:.3f} (chance {i['chance_Q1']}; all words Q1 {i['all_words']['Q1']:.3f}) | {pf(i['pass'])} |")
-    m = M["ii_meeting_real"]; L.append(f"| (ii) | {m['bar']} | T-shuffle Q1 {m['T_shuffle_Q1']} · T-nowire Q1 {m['T_nowire_Q1']} | {pf(m['pass'])} |")
+    m = M["ii_meeting_real"]; L.append(f"| (ii) | {m['bar']} (all 16 words) | T-shuffle Q1 {m['T_shuffle_Q1']} · T-nowire Q1 {m['T_nowire_Q1']} | {pf(m['pass'])} |")
     m = M["iii_growth_matters"]; L.append(f"| (iii) | {m['bar']} | T-frozen-10 Q1 {m['T_frozen_10_Q1']} (cells {m['T_frozen_10_cells']}) vs Q1 {m['Q1']:.3f}; the 50-cell twin {m['T_frozen_50_Q1']} | {pf(m['pass'])} |")
     m = M["iv_grows_alone"]; L.append(f"| (iv) | {m['bar']} | born {m['cells_born']} · refused {m['births_refused_budget']} (arrivals {m['arrivals']}, budget left {m['budget_left']}) · pruned {m['edges_pruned']}/{m['edges_born']} = {100*m['pruned_share']:.1f} % (cross-thing born {m['edges_cross']['born']} / pruned {m['edges_cross']['pruned']}) · disuse {m['removed_for_disuse']} | {pf(m['pass'])} |")
     m = M["v_retention"]; L.append(f"| (v) | {m['bar']} | " + ("; ".join(f"w{p['window']}: {p['before']:.3f} → first {p['first_after']:.3f} → last {p['last_in_window']:.3f} ({p['drop_pp']:+.1f} pp drop)" for p in m['pairs']) or m['note']) + f" | {pf(m['pass'])} |")
@@ -518,9 +540,9 @@ def write_verdict(out: Path, R: dict) -> None:
     L.append(f"| TWINS random-gaze | loses (xi) | margin {M['TWINS']['random_gaze_loses_xi']['margin']} | {pf(M['TWINS']['random_gaze_loses_xi']['pass'])} |")
     L.append(f"| PARK | ≥ 1 parked · share ≤ 5 % | parked {M['PARK']['parked']} of {M['PARK']['thinks']} thinks — {M['PARK']['reason']} | not graded |")
     L.append(f"| TWINS no-sleep / no-curiosity / no-park | (v) / door / PARK | {M['TWINS']['no_sleep_v']} · {M['TWINS']['no_curiosity']['reason']} · {M['TWINS']['no_park']['reason']} | not graded |")
-    L += ["", "## Twins (each a replay of the same tape blind to one gene)", "", "| twin | Q1 | composite | cells |", "|---|---|---|---|"]
+    L += ["", "## Twins (each a replay of the same tape blind to one gene; Q1 on all 16 words, the seen-words Q1 beside it)", "", "| twin | Q1 (all) | Q1 (seen) | composite (all) | cells |", "|---|---|---|---|---|"]
     for b in BLINDS:
-        t = M["TWINS"][b]; L.append(f"| {b} | {t['Q1']} | {t['composite']} | {t['cells']} |")
+        t = M["TWINS"][b]; L.append(f"| {b} | {t['Q1']} | {t['Q1_seen']} | {t['composite']} | {t['cells']} |")
     L += ["", "## Plants", "", json.dumps(M["PLANTS"], indent=1, default=str), "", "## BANDS (reported, never gating)", "", json.dumps(M["BANDS"], indent=1, default=str)[:3000],
           "", "## ALIVE per hour", "", json.dumps(A["per_hour"]), "", f"failed: {R['marks_failed'] or 'none'} · {R['seconds_total']} s"]
     (out / "VERDICT.md").write_text("\n".join(L) + "\n")
