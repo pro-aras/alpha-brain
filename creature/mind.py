@@ -263,6 +263,12 @@ class Mind:
             self._write_journal(row["at"], {
                 "seq": row["seq"], "sleep": {**result, "cycle": cycled}, "hash": self.org.state_hash(),
             })
+            # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:05 +0400 — W3-3 (docs/G4-WAVE3-CLAUSES.md;
+            # genome/curiosity.py's own contract, B10 note 3): one sleep_boundary() call per boundary crossed
+            # (this loop iterates once per boundary), so a recombine chain never pairs an "answered" item from
+            # before this boundary with one from after it.
+            if self.interests is not None:
+                self.interests.sleep_boundary()
 
     # ------------------------------------------------------------------ THINK (A11, PREREG §11.1 step 3)
     def _score_due_predictions(self, word: str, first_glance: Optional[np.ndarray]) -> None:
