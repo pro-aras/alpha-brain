@@ -137,6 +137,22 @@ class TestBelieveScopeClash(unittest.TestCase):
             self.assertEqual(rows[0]["cells"], [1, 2])
             self.assertEqual(rows[1]["cells"], [9, 10])  # the new belief, written whole, still readable
 
+    def test_c_partial_removal_with_overlap_is_also_a_clash(self) -> None:
+        """Rule 4 is unconditional: cells removed but an overlapping remainder survives (clash()'s own
+        law, unchanged, would call this "not disjoint" and refuse it directly -- believe() still owes a
+        clash row here, opened via _open_clash_direct since clash() itself returns None)."""
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "beliefs.jsonl"
+            believe("zog", [1, 2, 3], [1], 1, path)
+            row = believe("zog", [3, 4], [2], 2, path)  # 1,2 removed, 3 kept, 4 added
+            self.assertEqual(row["kind"], "clash")
+            self.assertEqual(sorted(row["clashes"]), [0, 1])
+            rows = read_beliefs(path)
+            self.assertEqual(len(rows), 3)
+            self.assertEqual(rows[0]["cells"], [1, 2, 3])
+            self.assertEqual(rows[1]["cells"], [3, 4])   # the new belief, written whole
+            self.assertEqual(rows[2]["kind"], "clash")
+
     def test_d_negative_control_clash_disabled_writes_nothing(self) -> None:
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "beliefs.jsonl"
@@ -225,10 +241,22 @@ class TestBelieveScopeLife1Replay(unittest.TestCase):
                 + kinds_count["clash"] + kinds_count["clash_refused"],
                 len(source_rows),
             )
+            source_count_by_word: dict = {}
+            for r in source_rows:
+                source_count_by_word[r["word"]] = source_count_by_word.get(r["word"], 0) + 1
+
             print(f"[life1 replay] folded standing beliefs: {len(folded)}")
             for f in folded:
-                print(f"  {f['word']!r}: cells={len(f['cells'])} episodes={len(f['episodes'])} "
-                      f"revisits={f['revisits']} extensions={f['extensions']} clashes={f['clashes']}")
+                w = f["word"]
+                src_n = source_count_by_word.get(w, 0)
+                chain_n = 1 + f["revisits"] + f["extensions"]  # excludes anything before a fork (clash)
+                print(f"  {w!r}: source_rows={src_n} cells={len(f['cells'])} episodes={len(f['episodes'])} "
+                      f"revisits={f['revisits']} extensions={f['extensions']} clashes={f['clashes']} "
+                      f"1+revisits+extensions={chain_n}")
+                if f["clashes"] == 0:
+                    # no fork for this word -- every source row must be accounted for in the ONE chain
+                    # (SOLUTIONS #165: reconcile parts against the total before trusting a fold)
+                    self.assertEqual(chain_n, src_n, f"{w!r}: fold lost rows with no clash to explain it")
 
 
 if __name__ == "__main__":

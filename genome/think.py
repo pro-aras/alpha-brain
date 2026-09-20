@@ -48,16 +48,22 @@ ambiguity the clause names but does not spell out to the letter, and write it do
      quiet revisit, which is why this check runs before the plain set-equality check.
 
   5. clash()'s own law (decision 3, below, unchanged) only ever finds a conflict between two rows whose
-     cell sets are DISJOINT, and only ever looks at rows of `kind=="belief"`. Two cases this clause's
-     rule 4 must cover fall outside that law: (a) the STANDING row is an EXTENSION, not a "belief" —
-     clash()'s own `kind=="belief"` filter would silently skip it; fixed by never handing clash() the
-     raw standing row, but a one-element "view" `{"kind":"belief","word":...,"line":standing_line,
-     "cells":standing_cells}` — same line, same cells, kind normalised — so clash()'s law applies
-     whichever kind is CURRENTLY standing. (b) the ledger fired with the cells UNCHANGED (decision 4) —
-     two identical cell sets are never disjoint, so clash() correctly finds no conflict by its own law
-     and returns None. believe() does not call clash() a second time or loosen its law; it opens the
-     clash row itself, in exactly clash()'s own shape (`_open_clash_direct`), since this is a
-     contradiction shape clash()'s cells-disjoint test was never meant to see. Either way, a genuine
+     cell sets are DISJOINT, and only ever looks at rows of `kind=="belief"`. Rule 4 itself ("cells
+     REMOVED, or a ledger reassignment, -> clash") is UNCONDITIONAL — every entry into that branch ends
+     in a clash row — so three cases fall outside clash()'s narrower law and are covered on top of it:
+     (a) the STANDING row is an EXTENSION, not a "belief" — clash()'s own `kind=="belief"` filter would
+     silently skip it; fixed by never handing clash() the raw standing row, but a one-element "view"
+     `{"kind":"belief","word":...,"line":standing_line,"cells":standing_cells}` — same line, same cells,
+     kind normalised — so clash()'s law applies whichever kind is CURRENTLY standing. (b) the ledger
+     fired with the cells UNCHANGED (decision 4) — two identical cell sets are never disjoint. (c) cells
+     were REMOVED but an overlapping remainder survives (standing [1,2,3] -> new [3,4]: 1,2 removed, 3
+     kept) — again not disjoint. For (b) and (c), clash() correctly finds no conflict by its own law and
+     returns None; believe() does not call clash() a second time or loosen its law, it opens the clash
+     row itself, in exactly clash()'s own shape (`_open_clash_direct`), since these are contradiction
+     shapes clash()'s cells-disjoint test was never meant to see (its own toy, unchanged, is exactly the
+     overlapping-cells case — but as a REASON NOT TO CLASH between two rows compared directly, which is
+     still true; rule 4 just does not give believe() the option of walking away from this branch without
+     a clash row once it has decided cells were removed or the ledger disagrees). Either way, a genuine
      clash first WRITES the new observation as its own fresh "belief" row (so both sides of "clashes":
      [old_line, new_line] are real, addressable rows on disk — matching Alpha 2's own law: "a
      contradiction opens a clash [naming two rows] and never overwrites"), then opens the clash row
@@ -189,8 +195,11 @@ def _write_extension(p: _pl.Path, word: str, of_line: int, added: List[int], ful
 
 
 def _open_clash_direct(p: _pl.Path, word: str, old_line: int, new_line: int, moment: int) -> Dict[str, object]:
-    """The same row SHAPE clash() writes (decision 5(b) above) for the one contradiction clash()'s own
-    cells-disjoint law cannot see: a ledger reassignment with the cell set unchanged."""
+    """The same row SHAPE clash() writes (decision 5 above) for the two contradictions clash()'s own
+    cells-disjoint law cannot see on its own: a ledger reassignment with the cell set unchanged, or a
+    partial removal that leaves an overlapping remainder. Rule 4 ("cells REMOVED, or a ledger
+    reassignment, -> clash") is unconditional — every entry into that branch ends in a clash row, one
+    way or the other; this is the "or the other"."""
     row: Dict[str, object] = {
         "line": _line_count(p),
         "kind": "clash",
@@ -256,11 +265,16 @@ def believe(word: str, cells: List[int], episode_ids: List[int], moment: int, pa
         row = clash(new_belief, [standing_view], p)
         if row is not None:
             return row
-        if ledger_clash:
-            # clash()'s own law is cells-disjoint only (decision 3/5 above); a same-cells ledger
-            # reassignment can never be disjoint from itself — believe() opens it directly.
-            return _open_clash_direct(p, word, standing_line, int(new_belief["line"]), moment)
-        return new_belief  # cells removed, but clash()'s disjoint law found an overlap (not a clash)
+        # clash()'s own law is cells-disjoint only (decision 3/5 above): a same-cells ledger
+        # reassignment can never be disjoint from itself, and neither can a PARTIAL removal that leaves
+        # an overlapping remainder (e.g. standing [1,2,3] -> new [3,4]: 1,2 removed, 3 kept). Rule 4 is
+        # unconditional ("cells REMOVED, or a ledger reassignment, -> clash") — every entry into this
+        # branch ends in a clash row; believe() opens it directly when clash()'s own narrower law does
+        # not fire, in exactly its own shape. (An earlier version of this function returned the plain
+        # new belief here instead — a fifth, undeclared "kind" outside the fixed interface, and one that
+        # silently forked read_beliefs(fold=True)'s per-word chain for any word with a partial-overlap
+        # removal; life 1's replay caught it on "diamond", 69 source rows collapsing to 11 folded.)
+        return _open_clash_direct(p, word, standing_line, int(new_belief["line"]), moment)
 
     if new_set == standing_cells:
         return _write_revisit(p, word, standing_line, new_eps, moment)
