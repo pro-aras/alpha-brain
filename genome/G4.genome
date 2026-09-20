@@ -1,5 +1,6 @@
 # G4.genome — THE 24 h LIFE, assembled by Claude (Fable 5.1), 2026-09-19 23:14 +0400 (PREREG §12): B1's file + B9's genes; TRAITS/SURPRISE/SENTENCE/HANDS declared OFF with reasons; thetas by gate G-a below.
 # edit: Claude (Fable 5.1), 2026-09-20 00:38 +0400 — PREREG §14: INDUCE and DEDUCE declared OFF (no interpreter in the mind; the TRAITS rule applied); BELIEF's clash half is unwired (stated in §14); the 24 h life restarted on this file.
+# edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15 (Amendment 5): ARRIVAL declared (never-heard word); life 2 starts on this file.
 # G4.genome — THE WHOLE SMALL CREATURE (docs/G4-DESIGN.md §9, docs/G4-PREREG.md §1: ONE correction —
 # GAZE surprise fixations 4 (the proven G1 value; 12 in the design draft was a slip). THETA_N/THETA_M
 # are left as the words gate G-a writes (genome/gate_ga.py); the machinery refuses to start until they
@@ -32,6 +33,7 @@ MEET     sight  words
 BIRTH    novelty  cos<0.952
 BIRTH    error    misfires 3
 BUDGET   400 per arrival
+ARRIVAL  never-heard word                         # PREREG §15: a word the ear has never delivered opens an arrival (the budget is fresh); reads no schedule
 NMAX     2000
 KWTA     5
 HEBB     window 1

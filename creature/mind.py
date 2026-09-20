@@ -107,6 +107,10 @@ class Mind:
         self._canvas_index: int = 0
         self._filed_predictions: list = []          # [{"row": FILE's row dict, "due_canvas": int}, ...] awaiting the next showing of their word
         self.think_counters: Dict[str, int] = {"thinks": 0, "parked": 0, "beliefs": 0, "predictions_filed": 0, "predictions_scored": 0}
+        # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15: the words the ear has ever delivered to a met canvas
+        # (sight-only "" never enters). A word not in it OPENS AN ARRIVAL when ARRIVAL is declared (below);
+        # rebuilt at resume from the ledger's moment_word so a resumed mind and a replay agree.
+        self._heard: set = set()
 
         self.pending: Dict[str, str] = {}                 # ear-consumed, eye not yet arrived: moment -> word
         self.moment_word: Dict[int, str] = {}              # org.t (per GLANCE, before increment) -> word — build_ledgers' input
@@ -159,6 +163,15 @@ class Mind:
             edges_before = len(self.org.edges_log)
             prunes_before = len(self.org.prunes_log)
             xw = encode_word(word, self.genome.ear_blank_zero)
+            # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15: a never-heard word is an ARRIVAL — the birth budget is
+            # fresh BEFORE the moment that first meets it (life 1 never called new_arrival: arrivals 0, budget spent once,
+            # 419 births refused, nothing born after 07:41 +04). Gated on the gene: an undeclared ARRIVAL changes nothing.
+            arrival_n: Optional[int] = None
+            if word not in self._heard:
+                self._heard.add(word)
+                if "ARRIVAL" in self.genome.declared:
+                    self.org.new_arrival()
+                    arrival_n = int(self.org.arrivals)
             for x in g["feats"]:
                 self.moment_word[self.org.t] = word          # keyed by the organism's OWN moment counter, one per glance
                 S, T = self.org.moment(x, xw, lr_scale=lr_scale)
@@ -177,6 +190,7 @@ class Mind:
                 "edges": [edges_born, edges_pruned],
                 "err": round(err, 4), "lr": round(lr_scale, 3), "ep": ep_id,
                 "hash": self.org.state_hash(),
+                **({"arrival": arrival_n} if arrival_n is not None else {}),   # PREREG §15: an event field on the row where an arrival opened
             }
             self._write_journal(row["at"], journal_row)
         elif fast_on:
@@ -468,6 +482,7 @@ class Mind:
             ledger = json.loads(ledger_path.read_text())
             mind.pending = dict(ledger.get("ear_pending", {}))
             mind.moment_word = {int(k): v for k, v in ledger.get("moment_word", {}).items()}
+            mind._heard = {v for v in mind.moment_word.values() if v}     # PREREG §15: the heard-set, re-derived (never persisted separately)
             mind.last_seq = int(ledger.get("last_seq", 0))
             mind._last_snapshot_moments = mind.org.t
 

@@ -213,6 +213,8 @@ class Body:
             "heartbeat_at": now, "started_at": self.started_at,
             "moments": org.t, "tape_rows": self.mind.last_seq, "journal_rows": self.mind.journal_rows_written,
             "births": len(org.births), "edges_born": int(org.c["edges_born"]), "edges_pruned": int(org.c["edges_pruned"]),
+            # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15: the three numbers that would have shown life 1's spent budget at 07:41 +04, on EVERY write (#164)
+            "arrivals": int(org.arrivals), "budget_left": int(org.budget_left), "births_refused_budget": int(org.c["births_refused_budget"]),
             "cells": org.total_cells(), "sight_only_skipped": self.mind.sight_only_skipped,
             "sense_restarts": sense_restarts, "snapshots": self.mind.snapshot_count,
             "last_seq": self.mind.last_seq, "mind_ms_median_1min": (statistics.median(recent) if recent else None),

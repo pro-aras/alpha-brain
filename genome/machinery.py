@@ -281,6 +281,14 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"after (\d+) cells", a)
                 if not m: raise GenomeError(f"FROZEN: cannot read {a!r} (§11: FROZEN after <n> cells)")
                 g["declared"]["FROZEN"] = {"after": int(m.group(1))}
+            # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15 (Amendment 5): ARRIVAL, the creature-side rule for
+            # BUDGET's "per arrival": a word the ear has never delivered opens an arrival (the mind calls
+            # Organism.new_arrival(), G0b's method verbatim). Parsed here; interpreted in creature/mind.py; a genome
+            # that never declares it never evaluates the branch (G1/G4-skeleton: the pin d4b5c6b8… untouched).
+            elif gene == "ARRIVAL":
+                m = re.fullmatch(r"never-heard word", a)
+                if not m: raise GenomeError(f"ARRIVAL: cannot read {a!r} (§15: ARRIVAL never-heard word)")
+                g["declared"]["ARRIVAL"] = {"rule": "never-heard word"}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:
