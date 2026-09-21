@@ -4,6 +4,8 @@
 # closed tape replays under its own commit; never the integration worktree, which moves at every landing (corrected 2026-09-21 21:03 +0400 on the
 # advisor's read). --folder /data/dev/genome/world: the folder door resolves `world/` against the CODE tree, his pictures live only there. --plant-after 5000: the plant at hour ≈ 6.9 of an 8 h life (window 3), 5 showings over the next hour.
 # install.sh copies and daemon-reloads only — Claude enables/starts an instance after the gates (PREREG §7's law).
+# edit: Claude (Fable 5.1), 2026-09-21 23:22 +0400 — THE LADDER (his 23:20 word): the genome comes from the life's own unit.env (GENOME=<path>, written by the launch
+# script and kept in the root as the life's record), so one template serves the top rung (G5.genome) and every ladder rung (genome/ladder/L*.genome).
 [Unit]
 Description=creature-g5 %i — an 8 h seam life of the G5 creature (root /data/dev/genome-lives/%i)
 After=network-online.target
@@ -13,7 +15,8 @@ Type=simple
 WorkingDirectory=/data/dev/genome-lives/%i/code
 Environment=OPENBLAS_NUM_THREADS=1
 Environment=OMP_NUM_THREADS=1
-ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome-lives/%i --genome /data/dev/genome-lives/%i/code/genome/G5.genome --plant-after 5000 --folder /data/dev/genome/world
+EnvironmentFile=/data/dev/genome-lives/%i/unit.env
+ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome-lives/%i --genome ${GENOME} --plant-after 5000 --folder /data/dev/genome/world
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30
