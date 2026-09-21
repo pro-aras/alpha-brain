@@ -22,6 +22,7 @@ from creature.tape import Tape, read_tape
 from genome import cochlea
 
 LIBRISPEECH_CLIP = Path("/data/alpha3-library/audio/librispeech/dev-clean-wav/1272/128104/1272-128104-0000.wav")
+A3_PRESENT = Path("/data/dev/alpha3/experiments/E52-hearing-the-cochlear-front/code/gammatone.py").exists()
 
 
 def _write_wav(path: Path, x: np.ndarray, rate: int = 16000) -> None:
@@ -37,6 +38,7 @@ def _ear_rows(root: Path):
     return [r for r in read_tape(root) if r["sense"] == "ear-sound"]
 
 
+@unittest.skipUnless(A3_PRESENT, "E52's sha-pinned tree is not present on this box")
 class TestSilencePublishesNothing(unittest.TestCase):
     """EAR.md §4/§5 Q1: "while silent it publishes nothing" -- BOTH readings of "silent" proven
     separately: (a) the door armed, no audio file present at all; (b) a wav file that IS digital silence."""

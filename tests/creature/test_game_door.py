@@ -174,5 +174,52 @@ class TestSenseThreadPublishesRows(unittest.TestCase):
         shutil.rmtree(door, ignore_errors=True)
 
 
+@unittest.skipUnless(VENV_PYTHON.exists(), "the game-worlds venv is not present on this box")
+class TestReplayNeverReRunsTheGame(unittest.TestCase):
+    """MOTOR Q1's own recommendation, adopted structurally: every frame/mission/reward is a RECORDED tape
+    row, and `creature.replay` reads only the tape -- it never invokes creature/senses/game.py or the
+    worker subprocess again. Two independent replays of the SAME tape day-file (from a genome with no
+    FAST/etc -- the skeleton -- so the mind's own journal is small and this test is about the TAPE path,
+    not the mind's interpretation of the outcome/eye/ear rows) must be byte-identical."""
+
+    def test_two_replays_of_the_same_tape_are_byte_identical(self) -> None:
+        from creature import replay as replay_module
+
+        root = _tmp()
+        door = _tmp()
+        proc = subprocess.Popen([str(VENV_PYTHON), str(game_sense.WORKER_SCRIPT), "--game", "babyai-gotolocal",
+                                  "--door-dir", str(door), "--seed", "20260922", "--steps", "5"],
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        proc.wait(timeout=60)
+        self.assertEqual(proc.returncode, 0)
+
+        tape = Tape(root)
+        stop_event = threading.Event()
+        t = threading.Thread(target=lambda: game_sense.sense(
+            tape.publish, stop_event, door_dir=door, root=root, canvas=128, poll_period=0.1), daemon=True)
+        t.start()
+        deadline = time.time() + 15.0
+        while time.time() < deadline and len(_game_rows(root)) < 14:
+            time.sleep(0.1)
+        time.sleep(0.3)
+        stop_event.set(); t.join(timeout=5.0)
+        self.assertEqual(len(_game_rows(root)), 14)
+
+        day_files = sorted((root / "tape").glob("*.jsonl"))
+        self.assertEqual(len(day_files), 1)
+        genome_path = Path(__file__).resolve().parents[2] / "genome" / "G4-skeleton.genome"
+
+        out1, out2 = _tmp(), _tmp()
+        j1 = replay_module.run_replay(genome_path, day_files[0], out1)
+        j2 = replay_module.run_replay(genome_path, day_files[0], out2)
+        self.assertEqual(j1.read_bytes(), j2.read_bytes(), "two replays of the same game-door tape must be byte-identical")
+        self.assertEqual(len(j1.read_text().splitlines()), 5, "one mind journal row per eye canvas (the 5 manifests)")
+
+        shutil.rmtree(root, ignore_errors=True)
+        shutil.rmtree(door, ignore_errors=True)
+        shutil.rmtree(out1, ignore_errors=True)
+        shutil.rmtree(out2, ignore_errors=True)
+
+
 if __name__ == "__main__":
     unittest.main()
