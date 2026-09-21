@@ -413,8 +413,10 @@ def main(argv: List[str]) -> int:
 
     # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:3x +0400 — docs/briefs/G5-L-BABYAI-WORLD-EAR.md
     # item 1: the game door, arming from declared['WORLD_GAME'] behind GAME_DOOR_GATED (C2/C3's own
-    # convention); --game-door PATH overrides the door directory for tests, regardless of the gate.
-    game_cfg = declared.get("WORLD_GAME") if "--game-door" in argv else _declared_game_config(declared)
+    # convention) -- the worker needs its seed/game-id/tile from WORLD_GAME regardless of any override, so
+    # (unlike --folder, which needs no per-line config) --game-door only overrides the DIRECTORY, never
+    # substitutes for a missing WORLD_GAME line.
+    game_cfg = _declared_game_config(declared)
     game_door_dir = (Path(argv[argv.index("--game-door") + 1]) if "--game-door" in argv
                       else (root / "game_door" if game_cfg is not None else None))
     game_proc = None
