@@ -1,5 +1,5 @@
 # REPORT — Builder C: W3-0b (six body-side gene values) + the folder door (paced, armed by WORLD) + G4-6
-*edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 13:4x +0400. Branch `g4-wave3-c`, worktree `/data/dev/genome-wt-g`.*
+*edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:25 +0400. Branch `g4-wave3-c`, worktree `/data/dev/genome-wt-g`.*
 
 ## Task 1 — C1.3's world pin (committed FIRST, before any edit to world_maker.py)
 - **Commit:** `7d25fd7` — `tests/creature/test_world_pin.py`

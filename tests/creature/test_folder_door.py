@@ -1,11 +1,11 @@
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-20 02:12 +0400 — A12 test: the folder door (PREREG §11.3).
 # A temp world dir with two pictures publishes ear-then-eye rows (source "folder"); after a restart
 # (a fresh Body on the same root), the SAME pictures are never re-published.
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 12:4x +0400 — C2 (docs/G4-WAVE3-CLAUSES.md W3-6 step 4;
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C2 (docs/G4-WAVE3-CLAUSES.md W3-6 step 4;
 # PREREG §17): pacing (at most one new picture per scan, deterministic bytewise order) and the sight-only
 # road (a loose picture under world/, or under a non-word folder, is eye-only, meta.word absent, and the
 # mind journals "word": null for it once FAST is declared).
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 13:2x +0400 — C3: FOLDER_DOOR_GATED is now True (this
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:12 +0400 — C3: FOLDER_DOOR_GATED is now True (this
 # is the commit that lands C3's passing G4-6 test); one direct test of creature.body._declared_folder_dir
 # so the arming logic itself (never exercised by any other test, since none call creature.body.main())
 # has a pin.

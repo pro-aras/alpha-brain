@@ -22,7 +22,7 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:0x +0400 — C1.2 (docs/G4-WAVE3-CLAUSES.md W3-0b):
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.2 (docs/G4-WAVE3-CLAUSES.md W3-0b):
 # TAPE's declared value read. Every genome text seen so far writes the declared path exactly "run/tape"
 # (a convention every G4 genome comment uses: the path as if from the repo root, "<repo>/run/tape"), and
 # `--root` at the call site already points at that "run" directory -- so the declared path's own leading

@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 13:1x +0400 — C3 (docs/G4-WAVE3-CLAUSES.md W3-6 step 4;
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:12 +0400 — C3 (docs/G4-WAVE3-CLAUSES.md W3-6 step 4;
 # docs/G4-PREREG.md §4 G4-6 = "G4-3 re-run PASS with two senses on the tape"). Re-creates
 # tools/gate_g4.py's gate3() shape (not imported -- tools/* is out of a creature/ builder's scope) with a
 # SECOND sense on the SAME tape: 60 maker canvases (this module's own world_maker.make(), the model for

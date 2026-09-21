@@ -27,7 +27,7 @@ from genome.world import encode_word
 Ledger = Dict[int, Set[str]]
 
 
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:4x +0400 — C1.4 (docs/G4-WAVE3-CLAUSES.md W3-0b):
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.4 (docs/G4-WAVE3-CLAUSES.md W3-0b):
 # ASK's declared verb list. ASK undeclared keeps today's unrestricted default (every verb `answer()`
 # implements stays reachable, matching creature/genes.py's own finding that ASK's value is not read at
 # all today); ASK declared gates on `declared['ASK']['verbs']` -- a verb not in that list is refused BY

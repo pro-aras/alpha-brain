@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 12:2x +0400 — C1 (docs/G4-WAVE3-CLAUSES.md W3-0b):
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1 (docs/G4-WAVE3-CLAUSES.md W3-0b):
 # the six body-side gene values ("HEART, TAPE, WORLD, ASK, CRASH, BODY declared but nothing reads their
 # VALUE") each get a toy that CHANGES the value and reads the change, per docs/briefs/W3-BUILDER-C.md C1.
 # WORLD's own toy (period/window) lives in tests/creature/test_world_maker.py alongside its other coverage

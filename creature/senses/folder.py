@@ -1,5 +1,5 @@
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-20 02:05 +0400 — A12: the folder door (docs/G4-PREREG.md §11.3).
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 12:1x +0400 — C2 (docs/G4-WAVE3-CLAUSES.md W3-6 step 4;
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C2 (docs/G4-WAVE3-CLAUSES.md W3-6 step 4;
 # PREREG §17, the amendment stamped there): PACING (at most one new picture per scan, deterministic
 # (folder, filename) bytewise order -- never mtime, never scan timing) and the SIGHT-ONLY road §11.1 step 2
 # needs (a picture under world/ directly, or under a folder whose name is not a word, publishes the EYE row

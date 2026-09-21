@@ -46,7 +46,7 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "CYCLE": "genome/machinery.py:Organism._birth (soft ceiling grow_to*nmax) + genome/sleep.py:cycle (consolidation pass)",
     },
     # ---------------------------------------------------------------------------------------- the body
-    # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:5x +0400 — C1.7 (docs/G4-WAVE3-CLAUSES.md
+    # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.7 (docs/G4-WAVE3-CLAUSES.md
     # W3-0b): BODY/TAPE/HEART/CRASH/WORLD/ASK now READ their declared values (each gated on the gene's
     # own presence -- undeclared keeps the exact prior default, a toy in each of
     # tests/creature/test_gene_values.py, test_world_pin.py, test_world_maker.py proves the change).

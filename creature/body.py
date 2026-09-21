@@ -31,7 +31,7 @@ STATUS_PERIOD_S = 10.0
 RESTART_BACKOFF_S = 1.0
 MIND_TIMES_WINDOW_S = 60.0
 
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:1x +0400 — C1.6 (docs/G4-WAVE3-CLAUSES.md W3-0b):
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.6 (docs/G4-WAVE3-CLAUSES.md W3-0b):
 # BODY's declared thread roster, the five names the body knows about (eye+ear are one "maker" thread in
 # this implementation, door covers the ask/folder/web senses, voice is the exam thread -- the check is a
 # pure VALIDATION of the declared list against this known set, independent of how many real threads a run
@@ -55,7 +55,7 @@ def _check_body_threads(declared: Dict[str, dict]) -> None:
         raise GenomeError(f"BODY declares threads {threads!r} without 'mind': the body does not start")
 
 
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:1x +0400 — C1.5 (docs/G4-WAVE3-CLAUSES.md W3-0b):
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.5 (docs/G4-WAVE3-CLAUSES.md W3-0b):
 # CRASH's declared policy. CRASH undeclared keeps today's unconditional default (PREREG §2.6's crash law
 # stands regardless of the gene, genes.py's own finding); CRASH declared reads its own two sub-facts off
 # the parsed dict. genome/machinery.py's CRASH grammar is a single fixed-string match today ("sense
@@ -132,7 +132,7 @@ class Body:
         self.root = Path(root)
         self.genome_path = Path(genome_path)
         self.blind = blind
-        # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:2x +0400 — C1 (docs/G4-WAVE3-CLAUSES.md
+        # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1 (docs/G4-WAVE3-CLAUSES.md
         # W3-0b): the genome is read once, here, before Mind exists (Mind is built only in start()) --
         # Tape's own directory (C1.2) and the BODY thread-roster refusal (C1.6) both need the declared
         # values at construction time, and HEART's/CRASH's (C1.1/C1.5) are cheapest read once too.
@@ -320,7 +320,7 @@ class Body:
             self._status_thread.join(timeout=STATUS_PERIOD_S + 1.0)
 
 
-# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 12:3x +0400 — C1.3/C2 (docs/G4-WAVE3-CLAUSES.md
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.3/C2 (docs/G4-WAVE3-CLAUSES.md
 # W3-0b, W3-6 step 4): the two WORLD-driven derivations `main()` needs, factored out so they are testable
 # without invoking the CLI (which blocks in a signal-driven loop). WORLD's own `arrival_every_h` regex in
 # genome/machinery.py is `(\d+)` (whole hours only) -- a genome cannot express the PREREG toy's own
