@@ -44,10 +44,14 @@ def load(run: Path):
     return g, org, Ls, Lw
 
 
+# edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 22:38 +0400 — added `colour=g.colour` (the orchestrator's
+# addendum: this is a LIVE consumer — `python3 -m genome.ask what-is <picture>` against a saved run whose
+# genome declares SENSE colour would recall_many() a 112-dim vector against a 144-dim organism and crash
+# inside Area.cos with a shape mismatch, same class of bug as glance_held/glance_rows above).
 def glance_picture(path: Path, g) -> List[np.ndarray]:
     p = Path(path)
     rgb = gaze.canvas_of_picture(p, int(g.gaze["canvas"]))
-    return gaze.glances(rgb, g.retina, g.gaze, "surprise", p.name)["feats"]
+    return gaze.glances(rgb, g.retina, g.gaze, "surprise", p.name, colour=g.colour)["feats"]
 
 
 def word_cells(org, Lw, word: str) -> List[int]:

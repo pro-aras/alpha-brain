@@ -129,6 +129,7 @@ def alive(G: dict, hours: float, nrestarts: Optional[int]) -> dict:
 # G5 verdict; it forwards **kw now. (2) the nowire twin rebuilt Predictor() WITHOUT the genome's declared error arm (E's
 # `; error comparator`) → the twin ran the novelty arm while the life ran the comparator; it keeps the arm now. Both factored
 # out of worker() so tests/creature/test_verdict_twins_g5.py can call them without a worker process.
+# (Builder J found the same dropped-keyword defect independently at 22:20 on its branch — its lambda variant with `colour=None` was dropped at the merge in favour of this **kw helper, which its test pins.)
 def _force_one_glance() -> None:
     """T-one-glance: gaze mode "one" on every glances() call of THIS process (PREREG §16 addendum), every other argument forwarded."""
     from genome import gaze as _gaze

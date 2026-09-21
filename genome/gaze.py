@@ -135,6 +135,29 @@ def colour_block(an: Dict[str, object], top: int, left: int) -> np.ndarray:
     return np.concatenate(out)
 
 
+# edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 22:10 +0400 — G-EYE task 3 follow-up (the orchestrator's
+# message: verdict_g4.py's T-one-glance twin needs mode "one" + colour to work, not refuse).
+def colour_block_whole(an: Dict[str, object]) -> np.ndarray:
+    """SENSE colour's rg/by 4x4 block for gaze mode 'one' (T-one-glance): there is no per-glance window in this
+    mode — the WHOLE canvas is what retina() sees (resized to glance x glance), so there is no (top, left) corner
+    to crop colour_block() at. Same idea (4x4 cells of the retina's own already-computed rg/by channels, RAW,
+    /255, never separately unit-normalised — see colour_block()'s docstring), applied over the FULL 16x16 grid
+    instead of a 4x4 crop of it: the 16x16 grid is mean-POOLED into a 4x4 grid (4 cells per pooled cell per side,
+    16/4=4 exactly, GRID=16 pinned via organs()) so every part of the canvas contributes, matching "4x4 cells
+    covering the window's extent" exactly — the window here just IS the whole canvas, same as the tower's own
+    112-vector already treats the whole canvas as its one glance in this mode. The outer fixed-gain unit-step
+    (glances(), below) still runs once over the resulting 144-vector, unchanged."""
+    ch = an["channels"]
+    out = []
+    for key in ("rg", "by"):
+        m = np.asarray(ch[key], dtype=np.float64)
+        g = m.shape[0]
+        b = g // 4
+        pooled = m.reshape(4, b, 4, b).mean(axis=(1, 3))
+        out.append(pooled.reshape(-1) / 255.0)
+    return np.concatenate(out)
+
+
 def glance_window(grey: np.ndarray, cell: Tuple[int, int], grid: int, glance: int) -> Tuple[np.ndarray, Tuple[int, int]]:
     """The glance×glance window centred on the cell's centre, clamped inside the canvas. Returns (window, (top, left))."""
     h, w = grey.shape
@@ -162,15 +185,28 @@ def glances(rgb: np.ndarray, spec: Sequence[str], gaze: Dict[str, object], mode:
     G's OTHER measured form and amplifies a legitimately-zero block's own floating-point noise to norm 1,
     #231(1) — SENSE colour's grammar above accepts only "fixed-gain", on purpose).
     Undeclared (colour=None, every existing caller): byte-identical to before this gene existed — the SAME
-    single `_analyse_frame` call this function always made (via `fixations()`), no new call, no new branch."""
+    single `_analyse_frame` call this function always made (via `fixations()`), no new call, no new branch.
+    mode "one" + colour (verdict_g4.py's T-one-glance twin; was a GenomeError refusal, fixed 2026-09-21
+    22:10 +0400): there is no per-glance (top, left) window in this mode, so colour_block_whole() (above) is
+    used instead of colour_block() — same rg/by/4x4/RAW/÷255 idea, pooled over the WHOLE 16×16 grid rather
+    than cropped at a corner, since the whole canvas IS this mode's one "glance". colour=None in this mode
+    is still byte-identical to before (the `an = _analyse_frame(rgb)` call only happens inside the
+    `if colour is not None:` branch)."""
     F, grid, glance = int(gaze["fixations"]), int(gaze["grid"]), int(gaze["glance"])
     ink_rule = INK_RULES[str(gaze.get("ink", "contrast"))]
     grey = luminance(rgb)
     if mode == "one":
-        if colour is not None:
-            raise GenomeError("SENSE colour: gaze mode 'one' (T-one-glance) has no per-glance window to read the colour cells from — not implemented, refuse loudly rather than guess")
         small = np.asarray(Image.fromarray(rgb).convert("L").resize((glance, glance), Image.BOX), dtype=np.float64) / 255.0
-        return {"feats": [retina(ink_rule(small), tuple(spec))], "fix": [], "windows": []}
+        v = retina(ink_rule(small), tuple(spec))
+        if colour is not None:
+            # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 22:10 +0400 — was a GenomeError refusal; the
+            # verdict reader's T-one-glance twin (tools/verdict_g4.py) needs this to work on every G5.genome
+            # life that declares SENSE colour (every one), or its 8h verdict refuses on mark (xi). Same fixed-
+            # gain outer unit-step as the per-glance path below, using colour_block_whole() (above) since mode
+            # "one" has no per-glance (top, left) window.
+            an = _analyse_frame(rgb)
+            v = _unit(np.concatenate([v, colour_block_whole(an)]))
+        return {"feats": [v], "fix": [], "windows": []}
     g, _r = organs()
     an = _analyse_frame(rgb)
     rows = g.gaze_sequence(an, max_fixations=F, predicted=None) if mode == "surprise" else g.random_gaze(an, seed=pic_id, max_fixations=F)

@@ -45,16 +45,26 @@ def _pid(rgb: np.ndarray) -> str:
     return hashlib.sha256(rgb.tobytes()).hexdigest()[:16]
 
 
+# edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 22:25 +0400 — added `colour=genome.colour` to both calls
+# below. Found while fixing the T-one-glance twin (the orchestrator's ask): glance_held() is the ONE shared
+# function tools/self_exam.py, tools/verdict_g4.py and tools/diag_g1.py all read held-out exam glances
+# through, in every mode (surprise/random/one) — without this, any genome that declares SENSE colour (every
+# G5.genome life, per the orchestrator's message) produces 112-dim held-out vectors against a 144-dim
+# organism, and Organism.cos()'s `self.cells[:self.n] @ x` raises ValueError on the very first held-out
+# question — exam grading, not just the T-one-glance twin, would have been broken for every colour-declared
+# life. glance_rows() has the identical pattern (used by run_g1's own G1-rung dev/a2/plant comparisons,
+# tools/verdict_g4.py:266/304/308) and is fixed for the same reason and by the same reasoning, even though
+# it was not itself named in the ask.
 def glance_rows(rows: Sequence[Tuple[str, np.ndarray, Optional[Dict[str, object]]]], genome: Genome, mode: str) -> List[Glanced]:
     out: List[Glanced] = []
     for t, rgb, truth in rows:
-        pid = _pid(rgb); g = gaze.glances(rgb, genome.retina, genome.gaze, mode, pid)
+        pid = _pid(rgb); g = gaze.glances(rgb, genome.retina, genome.gaze, mode, pid, colour=genome.colour)
         out.append((t, g["feats"], g["fix"], truth, pid))
     return out
 
 
 def glance_held(held: Dict[str, List[Tuple[np.ndarray, Optional[Dict[str, object]]]]], genome: Genome, mode: str) -> Dict[str, List[Glanced]]:
-    return {t: [(t, *(lambda g: (g["feats"], g["fix"]))(gaze.glances(rgb, genome.retina, genome.gaze, mode, _pid(rgb))), truth, _pid(rgb)) for rgb, truth in rows] for t, rows in held.items()}
+    return {t: [(t, *(lambda g: (g["feats"], g["fix"]))(gaze.glances(rgb, genome.retina, genome.gaze, mode, _pid(rgb), colour=genome.colour)), truth, _pid(rgb)) for rgb, truth in rows] for t, rows in held.items()}
 
 
 def on_thing(fix: Tuple[int, int], cell: Tuple[int, int]) -> bool:
@@ -197,8 +207,11 @@ def gate(genome_path: Path, feats: Dict[str, np.ndarray], words: Sequence[str], 
     return gate_ga.run_feats(feats, words, genome_path, out_path, seed=20260919, label=label)
 
 
+# edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 22:35 +0400 — added `colour=genome.colour` (same reason
+# as glance_rows/glance_held above: a colour-declared genome without this raises inside gate_ga.run_feats
+# via a dimension mismatch, the moment SENSE colour is declared).
 def first_glance_feats(rows_by_thing: Dict[str, List[np.ndarray]], genome: Genome) -> Dict[str, np.ndarray]:
-    return {t: np.stack([gaze.glances(rgb, genome.retina, genome.gaze, "surprise", _pid(rgb))["feats"][0] for rgb in rgbs]) for t, rgbs in rows_by_thing.items()}
+    return {t: np.stack([gaze.glances(rgb, genome.retina, genome.gaze, "surprise", _pid(rgb), colour=genome.colour)["feats"][0] for rgb in rgbs]) for t, rgbs in rows_by_thing.items()}
 
 
 # ----------------------------------------------------------------------------- main
