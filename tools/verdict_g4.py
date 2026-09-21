@@ -151,7 +151,13 @@ def worker(spec_path: Path) -> int:
         # the exam's held-out alike — without touching creature code (the mind hardcodes surprise/random).
         from genome import gaze as _gaze
         _orig = _gaze.glances
-        _gaze.glances = lambda rgb, spec_, g, mode="surprise", pic_id="": _orig(rgb, spec_, g, "one", pic_id)
+        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 22:20 +0400 — added `colour=None` to this
+        # lambda's own signature and forwarded it. Found while fixing gaze.glances()'s mode="one"+colour
+        # refusal (the orchestrator's ask, g5-bind-colour): without this, G5.genome's SENSE colour (every
+        # life declares it) meant Mind._consume_eye's `colour=self.genome.colour` kwarg hit this 5-arg
+        # lambda and raised TypeError — a second, separate bug that would have kept this T-one-glance twin
+        # broken (crashing differently) even after the GenomeError refusal itself was fixed.
+        _gaze.glances = lambda rgb, spec_, g, mode="surprise", pic_id="", colour=None: _orig(rgb, spec_, g, "one", pic_id, colour=colour)
     mind = Mind(genome_path, root, blind=frozenset(spec.get("blind", [])))
     if spec.get("nowire"):
         mind.org = Organism(mind.genome, wire=False)

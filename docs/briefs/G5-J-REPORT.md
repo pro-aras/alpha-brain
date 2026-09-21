@@ -1,5 +1,5 @@
 # Builder J (Sonnet 5) report — BIND, colour, the retina adopted
-*edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:31 +0400, corrected 2026-09-21 21:56 +0400 (advisor-caught: the reversed-ordering finding was measured but unstated; a fabricated §7 baseline number; two wrong citations — see the diffs below and §6.6). Brief: `docs/briefs/G5-J-BIND-COLOUR-RETINA.md`. Branch `g5-bind-colour`, worktree `/data/dev/genome-wt-n`.*
+*edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:31 +0400, corrected 2026-09-21 21:56 +0400 (advisor-caught: the reversed-ordering finding was measured but unstated; a fabricated §7 baseline number; two wrong citations — see the diffs below and §6.6), extended 2026-09-21 22:31 +0400 (the orchestrator's two follow-ups: mode "one"/"random" + colour, and the colour-feature-road sweep — §9, updated §6.4, updated §7). Brief: `docs/briefs/G5-J-BIND-COLOUR-RETINA.md`. Branch `g5-bind-colour`, worktree `/data/dev/genome-wt-n`.*
 
 ## 0 · In five lines
 1. **BIND** (`BIND glances per canvas`): the four glances of one canvas are MEAN-pooled into one unit-renormalised vector before `org.moment()`/`org.moment_sight()` — one moment per canvas instead of four. Measured on a real 600-canvas slice of life 2's tape: births fall 181 → 60 (≈3×) and the mind's own per-canvas cost *drops* 44.58 → 36.68 ms (fewer resonate/hebb/delta/misfire/prune/merge cycles). **Q1 (all 16 words): BIND 0.9625 vs the first-fixation twin's 0.98125 — FAILS the bar as pre-registered.** A diagnostic (§2) found the pre-registered exam itself feeds a shape (4 raw glances into `recall_many`) the BIND-trained organism never produced at wake; re-read the SAME held-out canvases through the pooling BIND actually trained on and Q1 rises to **0.9750 — one held-out answer (156 vs 157 of 160) under the bar.** Reported as FAIL either way, never loosened — §2 has both numbers and the full reasoning.
@@ -130,18 +130,18 @@ Bit-for-bit the same margin, to 3 decimals, through the real gene's wiring inste
 1. **BIND fails its pre-registered bar (§2).** Recorded as FAIL, not loosened. The mechanism-consistent re-reading (0.9750 vs the bar's 0.98125 — one held-out answer) says most of the apparent shortfall was the EXAM's own glance-feeding road, not BIND's binding rule — but "most" is not "all", and one answer is still under the bar. **Orchestrator's decision, not made here:** (a) ship BIND anyway on the strength of its OTHER measured effects (§1: ≈3× fewer spurious births, matching F's own diagnosis of the defect BIND was built to fix; a real, measured cost reduction) and treat Q1 as inconclusive pending an exam repair; (b) fix `ask_glances`'/`recall_many`'s glance-feeding road to pool held-out glances under a BIND-declaring genome (a real code change, not this brief's scope) and re-grade; (c) hold BIND pending (b). This report does not recommend one of the three — that is a design call, not a measurement.
 2. **`Organism.state_hash()`'s OLD (un-repaired) cost dominates the per-canvas mind cost** measured in both §1 (the 600-canvas slice) and §2 (the full 17,768-canvas replay: first-fixation/BIND settle near 45 ms/canvas, unbound climbs past 62 ms/canvas as its cell count grows). F's `g5-repairs` branch fixes this (35.86 → 7.29 ms median) but it is NOT part of this brief and was not adopted here (only `retina_fast.py` was, per the brief's explicit instruction). Whoever merges BIND onto a life that also wants the cheaper state_hash should merge both.
 3. **SLEEP replays raw first glances (`f0`) into a BIND-pooled-trained SLOW area.** `genome/sleep.py:44` calls `org.moment(rec["x_s"], rec["x_w"])` where `rec["x_s"]` is FAST's stored `f0` — the raw, un-pooled first glance (§4's deliberate scoping: BIND was left out of PREDICT/FAST on purpose). So under BIND, WAKE trains sight cells on pooled (mean, 4-glance) vectors while SLEEP's replay trains the SAME cells on raw single-glance vectors — two different representations of "what a canvas looks like" feeding the same cell population. `first-fixation` has no such split (its only glance IS its `f0`). Confirmed structurally (`genome/sleep.py:44`, read directly) and consistent with §2's diagnostic (the organism performs measurably better when FED pooled vectors than raw ones at exam time — the same mismatch, at a different door). **Design question for the orchestrator, not a defect in what shipped here:** should `f0`/FAST's episode write become the BIND-pooled vector when BIND is declared, so wake and sleep train on the same shape?
-4. **`gaze.glances(mode="one", colour=not None)` raises `GenomeError`** — T-one-glance (`tools/verdict_g4.py`'s twin, monkeypatching `gaze.glances` to force `mode="one"`) has no per-glance window to read the 4×4 colour cells from; the brief names no intended behaviour for this combination, so it refuses loudly rather than guessing (SOLUTIONS discipline: a gap named beats a gap silently filled). Currently inert (no genome anywhere declares `colour` yet), but flagged for whoever runs `verdict_g4.py`'s twins against a colour-bearing genome.
+4. **RESOLVED (was: `gaze.glances(mode="one", colour=not None)` raises `GenomeError`).** This item was raised at first hand-off as an unimplemented gap; the orchestrator reported it load-bearing (G5.genome declares `SENSE colour` on every life, so `tools/verdict_g4.py`'s T-one-glance twin refused on every 8h verdict) and asked for it to be implemented, then — independently, from a real crash on a real G5-life root — found the same class of defect two doors further in (`Area.cos`, "size 112 is different from 144"). Both are fixed; full account, the complete list of every `gaze.glances()` caller touched and the two deliberately left, and the tests, are in **§9**.
 5. **The BIND bar's provenance vs. this report's own measurement — and they disagree, in BOTH numbers, and the ORDERING reverses.** EYE.md/G5-DESIGN.md cite "first-fixation-only 0.975 > 4-fixation 0.956 — the extra glances cost 1.9 pp" as "life 2's own twins," the very premise G-EYE-2 (and this brief's BIND mandate) rests on, without naming which commit computed them; F's report (§0) shows the verdict reader that most plausibly produced them (`runs/g4-verdict-life2-20260921-1215/`) ran AFTER master's PREDICT law changed (2026-09-21 11:18) — i.e. those cited numbers may themselves be the counterfactual F warns about. **On this report's own three-arm replay, under the correct (75b0a9b) commit, same exam machinery, same seed: first-fixation reads 0.98125 (0.6 pp above the cited 0.975) and `unbound` (the true 4-fixation arm) reads 0.9875 (3.2 pp above the cited 0.956) — and 0.9875 > 0.98125, so the ORDER the cited numbers report (first-fixation beats 4-fixation) is reversed here (4-fixation beats first-fixation).** This is stated plainly, not softened: as measured on the correct commit, the extra-glances-cost-accuracy premise cited for G-EYE-2 does not hold up. It is not a clean refutation — `unbound` also runs 4× the moments and 39 sleeps vs first-fixation's 9 (§2's cadence table), a real confound between "more glances" and "more consolidation" that this replay was not designed to separate — but the cited 1.9 pp cost does not reproduce under the commit life 2 actually ran on, which bears directly on the ship/fix/hold decision in item 1: if extra glances are not a net Q1 loss under the real code, BIND's own justifying premise needs re-examination alongside its Q1 result. Worth a look by whoever owns the verdict reader next, and by whoever next revisits G-EYE-2's clause.
 6. **`retina_fast.py`'s pin value moved** (§5) — a consequence of this branch's own edit-attribution header, not a functional change; named so nobody is surprised the two branches' pins differ.
 
 ## 7 · Suites, on final bytes
 
-Per the orchestrator's correction: `python3 -u -m unittest discover -s tests/genome -t .` and `-s tests/creature -t .` (the `-t .` top-level flag; without it several modules' relative imports fail to load). Both run from the worktree root, on the FINAL committed bytes (after every code change in this report), `nice -n 10`.
+Per the orchestrator's correction: `python3 -u -m unittest discover -s tests/genome -t .` and `-s tests/creature -t .` (the `-t .` top-level flag; without it several modules' relative imports fail to load). Both run from the worktree root, on the FINAL committed bytes (after every code change in this report, §9 included), `nice -n 10`.
 
 ```
 $ python3 -u -m unittest discover -s tests/genome -t .
 ----------------------------------------------------------------------
-Ran 142 tests in 56.098s
+Ran 142 tests in 53.150s
 
 OK (skipped=1, expected failures=6)
 ```
@@ -149,23 +149,78 @@ OK (skipped=1, expected failures=6)
 ```
 $ python3 -u -m unittest discover -s tests/creature -t .
 ----------------------------------------------------------------------
-Ran 152 tests in 625.190s
+Ran 160 tests in 625.575s
 
 OK
 ```
 
-142 = **136** (this checkout's own pre-change baseline, `python3 -u -m unittest discover -s tests/genome -t .` run BEFORE any edit in this branch, `scratch/baseline_genome.log`: "Ran 136 tests") **+ F's `test_retina_fast.py`'s 4** (copied verbatim) **+ this branch's own `tests/genome/test_retina_fast_life3a.py`'s 2**. 152 = the pre-existing 139 (after the `test_refusal.py` sample-line fix, §6 is unaffected by that — a pure test-fixture addition, no production code touched by it) + this branch's own `tests/creature/test_bind_colour.py` (13 tests). Neither suite required a tolerance loosened, a test skipped, or a bar moved to pass; the 1 skip and 6 expected-failures in `tests/genome` are pre-existing and unrelated to this brief (PREREG-bar toys, noted by earlier builders' own edit history in those files).
+142 = **136** (this checkout's own pre-change baseline, `python3 -u -m unittest discover -s tests/genome -t .` run BEFORE any edit in this branch, `scratch/baseline_genome.log`: "Ran 136 tests") **+ F's `test_retina_fast.py`'s 4** (copied verbatim) **+ this branch's own `tests/genome/test_retina_fast_life3a.py`'s 2**. Unchanged by §9 — §9's fixes touch `genome/gaze.py`, `genome/run_g1.py`, `genome/ask.py` and `tools/verdict_g4.py` (production/tool code) but add no new tests under `tests/genome/`. 160 = the pre-existing 139 (after the `test_refusal.py` sample-line fix) **+ this branch's own `tests/creature/test_bind_colour.py`, now 21 tests** (13 at first hand-off + 8 added in §9: 4 for mode "one"/"random" + colour, 4 for the colour-feature-road sweep). Neither suite required a tolerance loosened, a test skipped, or a bar moved to pass; the 1 skip and 6 expected-failures in `tests/genome` are pre-existing and unrelated to this brief (PREREG-bar toys, noted by earlier builders' own edit history in those files).
 
-**294 tests total across both suites, all passing** (142+152); of those, 15 are new in this branch (2 retina life-3a identity tests + 13 BIND/colour mechanics tests) and the other 279 are pre-existing, unregressed.
+**302 tests total across both suites, all passing** (142+160); of those, 23 are new in this branch (2 retina life-3a identity tests + 21 in `test_bind_colour.py`) and the other 279 are pre-existing, unregressed.
 
 ## 8 · Commits
 
 On branch `g5-bind-colour`, worktree `/data/dev/genome-wt-n`, all ahead of master `ec28b4c`:
 
 ```
+<NEW-COMMIT-HASH> G5-J follow-up: mode "one"/"random" + colour, and the colour-feature-road sweep (§9)
+cfdab15 G5-J report correction: state the reversed BIND premise, fix a fabricated baseline number, two wrong citations
+b5f1f53 G5-J: report — BIND FAILS its pre-registered Q1 bar (0.9625 vs first-fixation's 0.98125); colour and retina PASS
 92e23a6 G5-J: pin BIND + colour mechanics (parser grammar, sight_dim, grey no-op, moment-count/unit-norm through a real Mind)
 203f656 G5-J: BIND (one canvas = one moment), SENSE colour (fixed-gain rg/by 4x4), retina_fast adopted
 f0bc5ea gitignore: scratch/ (orchestrator correction)
 ```
 
 Nothing committed to `/data/dev/genome`, no other worktree's tracked files touched, no systemd unit touched. The detached checkout at `scratch/wt-75b0a9b` (commit `75b0a9b`, carrying the same BIND diff manually ported for §2's replay) has uncommitted changes on disk, left for review exactly as F left `genome-wt-k-hist`; it can be removed with `git worktree remove scratch/wt-75b0a9b --force` once inspected (it carries no commits of its own). `scratch/` (both this worktree's own and the nested checkout's) is fully git-ignored and holds only reproducibility material: `time_bind.py` (§1's 600-canvas cost slice), `colour_babyai.py` (§5's BabyAI band reproduction), `wt-75b0a9b/scratch_run_bind_q1.py` + `scratch_bind_consistent_exam.py` (§2's three-arm replay and the instrument diagnostic) and their logs/run roots — none of it required to reproduce the committed code's own behaviour (the committed test suites are self-contained), all of it kept so the numbers in this report can be checked against their source.
+
+## 9 · Follow-up (post-handback): mode "one"/"random" + colour, and the colour-feature-road sweep
+
+Two orchestrator messages arrived after this report's first hand-off (commit `b5f1f53`) and its advisor-caught correction (`cfdab15`). Both are about the SAME class of gap — §6 item 4, raised but not implemented at first hand-off: `gaze.glances()` refused `mode="one"` (or was silently wrong) whenever a genome declared `SENSE colour`, and G5.genome declares it on every life.
+
+**Message 1 — the T-one-glance twin.** `tools/verdict_g4.py`'s worker builds mark (xi)'s twin by monkeypatching `genome.gaze.glances` to force `mode="one"` for the whole process; against a colour-declaring genome this hit the `GenomeError` refusal on every 8h verdict. Fixed in `genome/gaze.py`:
+- **`colour_block_whole(an)`** (new function): mode "one" has no per-glance `(top, left)` window to crop `colour_block()` at (the whole canvas IS the one glance in this mode), so the retina's already-computed 16×16 rg/by grids are mean-**pooled** into 4×4 blocks instead (4 cells per pooled cell per side, 16/4=4 exactly, `GRID=16` sha-pinned via `organs()`) — every part of the canvas contributes, matching "4×4 cells covering the window's extent" exactly, the window here just being the whole canvas. Same RAW/÷255 treatment as `colour_block()`; the outer fixed-gain unit-step in `glances()` is unchanged.
+- The `mode == "one"` branch of `glances()` no longer raises; it computes `v = retina(...)` as before, and if `colour is not None`, calls `_analyse_frame(rgb)` (a NEW per-canvas cost in this mode only, and only when colour is declared — `colour=None` still takes the exact pre-existing code path, no new call) then `_unit(np.concatenate([v, colour_block_whole(an)]))`.
+- `mode == "random"` needed no code change — it already shared the per-glance-window colour path with `mode == "surprise"` (only `mode == "one"` had a separate, special-cased branch); confirmed with a dedicated test, not merely asserted.
+- **While fixing this, a second, separate bug was found in the SAME monkeypatch**: `tools/verdict_g4.py`'s lambda (`lambda rgb, spec_, g, mode="surprise", pic_id="": _orig(...)`) had no `colour` parameter at all — `creature/mind.py`'s real call site passes `colour=self.genome.colour` as a keyword, which a 5-argument lambda without that name raises `TypeError` on, regardless of whether `gaze.glances()` itself accepts colour in mode "one". Fixed by adding `colour=None` to the lambda's own signature and forwarding it. **Without this second fix, the T-one-glance twin would have kept crashing (differently) even after the `GenomeError` was removed.**
+
+**Message 2 — the wider sweep, found by the orchestrator running `tools/self_exam.py` on a real G5-life-shaped root and hitting `Area.cos`'s "size 112 is different from 144" (`genome/machinery.py:539`).** This is a different, larger-blast-radius bug: the held-out exam glances that feed `ask_glances`/`ask_plant_glances`/`recall_many` were being built by functions that call `gaze.glances()` themselves and never forwarded `colour` at all — so a colour-declared genome would crash EVERY exam (not just the T-one-glance twin) the moment `Area.cos` compared a 112-dim query against 144-dim stored cells. A full sweep of every `gaze.glances(` call site in the tree (`grep -rn "gaze\.glances("`) found:
+
+| caller | forwards `colour`? | fixed? | why |
+|---|---|---|---|
+| `creature/mind.py:224` (`_consume_eye`) | yes, already | — | this branch's own original wiring (task 1/2 of the brief) |
+| `genome/run_g1.py` `glance_rows()` | no | **fixed** | `run_g1`'s own G1-rung dev/a2/plant comparisons; also called from `tools/verdict_g4.py` |
+| `genome/run_g1.py` `glance_held()` | no | **fixed** | THE shared function `tools/self_exam.py`, `tools/verdict_g4.py` and `tools/diag_g1.py` all read held-out exam glances through, in every mode — the direct cause of the orchestrator's `Area.cos` crash |
+| `genome/run_g1.py` `first_glance_feats()` | no | **fixed** | feeds `gate_ga.run_feats()` (G1's own theta-gating road); same dimension-mismatch class |
+| `genome/ask.py` `glance_picture()` | no | **fixed** | the `python3 -m genome.ask what-is/is/which <picture>` CLI door — a live, separate consumer of `recall_many`/`edge_many`, flagged explicitly by the orchestrator's addendum |
+| `genome/train_eye.py:320` (inside `stage_gate()`) | no | **deliberately left** | trains the sealed EYE TOWER itself (G1/G2-his band-gating), a stage that predates and is structurally prior to `SENSE colour` — the genomes it builds (`G2-his.genome` and its twins) never declare colour; not reached by any live recall/ask/exam road |
+| `genome/questions.py` `ask_glances`/`ask_plant_glances`/`ask`/`why` | n/a | not touched | these consume already-built `feats`/`held` arguments — they never call `gaze.glances()` themselves, so there is nothing in them to forward `colour` through; covered by proxy once every producer above forwards it correctly |
+
+Each production fix is the same one-line pattern used already in `creature/mind.py`: add `colour=genome.colour` (never a literal) to the existing `gaze.glances(...)` call, reading it from the parsed `Genome` object already in scope at every call site.
+
+**Tests added** (`tests/creature/test_bind_colour.py`, now 21 tests, +8 in this follow-up):
+- `TestModeOneColour` (4 tests): mode "one" + colour returns one 144-vector, colour tail exactly `0.0` on a grey canvas and non-zero on a genuinely coloured one (a synthetic RGB fixture, since `world.render_canvas` is grey-only by design); `colour_block_whole()`'s pooling arithmetic pinned against an independent direct computation; mode "one" with colour undeclared pinned byte-identical to an independent recomputation of the PRE-fix call shape (resize → ink rule → retina, no colour); mode "random" + colour confirmed to produce unit-norm 144-vectors.
+- `TestColourFeatureRoadsParity` (2 tests): `glance_held()`/`glance_rows()` with colour undeclared (`genome.colour is None`) pinned byte-identical, canvas for canvas, against an independent direct call to `gaze.glances()` with no colour argument at all — the exact pre-fix call shape, proving the `colour=genome.colour` addition is a true no-op when colour is not declared.
+- `TestColourExamRoads` (1 test): builds a small real life (`Mind` + a tape of a few canvases) under a colour-declaring genome fixture (`tests/creature/G5-colour-test.genome`, new, committed — same pattern as `G5-bind-test.genome`), closes it (writes a real snapshot), then runs `tools/self_exam.py`'s actual `main()` end-to-end against that root; asserts it returns `0`, writes exactly one exam file, `organism_hash_unchanged_by_exam` is `True`, and `ask_all_words.Q1` was actually scored (present in the output, not skipped).
+- `TestAskDoorColour` (1 test): builds a real life the same way, drops a `.genome` file into `state/` (the shape `genome/ask.py`'s `load()` reads — its own docstring in `creature/mind.py:snapshot()` says so), asks `genome.ask.glance_picture()` for a genuinely-coloured picture and calls `Organism.recall_many()` on the result — asserts a 144-dim feature vector and a well-formed answer/abstain dict, never a crash.
+
+**End-to-end verification beyond the unit tests, matching the orchestrator's exact reported scenario:** a standalone script built a small `Mind` under a colour-declaring genome, closed it, applied `tools/verdict_g4.py`'s FIXED one-glance monkeypatch (forcing `mode="one"` process-wide, forwarding `colour`), and ran `tools/self_exam.py --held 2` against it in-process — `rc=0`, `organism_hash_unchanged_by_exam: True`, `ask_all_words.Q1` scored (`n=32`, real numbers). This is the literal T-one-glance-twin-against-a-colour-genome path both orchestrator messages named; it completes without either the original `GenomeError`, the monkeypatch's `TypeError`, or the `Area.cos` `ValueError`.
+
+**Suites, on the final bytes of this follow-up** (verbatim, `-t .`, `nice -n 10`):
+
+```
+$ python3 -u -m unittest discover -s tests/genome -t .
+----------------------------------------------------------------------
+Ran 142 tests in 53.150s
+
+OK (skipped=1, expected failures=6)
+```
+
+```
+$ python3 -u -m unittest discover -s tests/creature -t .
+----------------------------------------------------------------------
+Ran 160 tests in 625.575s
+
+OK
+```
+
+Same 142/142 on `tests/genome` (no new genome-suite tests; the production fixes there — `genome/gaze.py`, `genome/run_g1.py`, `genome/ask.py` — are exercised by the 8 new `tests/creature/test_bind_colour.py` tests instead, since they need a real `Mind`/tape to build a colour-declaring organism). `tests/creature` rises 152 → **160** (139 pre-existing + 21 in `test_bind_colour.py`). §7's numbers above are updated to match; nothing in §7 outside the two `Ran` lines and the reconciliation paragraph changed.
