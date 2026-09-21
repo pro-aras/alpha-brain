@@ -20,6 +20,53 @@ not a graded wrongness. `expect()`/`note_winners()` are KEPT for the record (min
 (tests/genome/test_predict.py) and tests/genome/test_b13_modulation_arrival.py for the re-read this
 forced on both the B6 and B13 toys — reported honestly, not moved.
 
+edit: Claude (Sonnet 5, builder E), 2026-09-21 16:58 +0400 — G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md;
+docs/organs/MIND-MEMORY.md §4 G-MIND-3): PREDICT gains an ERROR ARM — the mechanism above (renamed
+"novelty" here) stays the untouched default and executes the SAME lines it always has (byte-identical
+when the genome's PREDICT line carries no `; error <arm>` clause, or spells `; error novelty` — the
+regression pin is `tests/genome/test_predict.py::test_novelty_arm_is_byte_identical_to_pre_g5e`). Three
+more arms, each exactly as MIND-MEMORY G-MIND-3 defines it, live here (the mind's own reading layer —
+never in genome/machinery.py's Area/Organism, which stay organs with no notion of "arm"):
+
+- **conjunctive** — `err = max(sight_novelty, word_novelty)`. `sight_novelty` is the novelty arm's own
+  number (identical formula). `word_novelty` = 1.0 while this WORD has been delivered fewer than 3 times
+  BEFORE this canvas, then 0.0 — held for showings 1, 2 AND 3 (not just the 1st), per G-MIND-3's own
+  ceiling table row "A, as written above": median{1.0, 1.0, 1.0} over the first 3 showings.
+  Tracked in `self._word_seen: Dict[str, int]`, incremented once per canvas that carries a word (a
+  sight-only canvas, word=None, touches nothing and reads word_novelty=0.0 — there is no word to be new).
+- **episodic** — `err = clip(max(0, cos_to_nearest_SIGHT_CELL - cos_to_nearest_EPISODE), 0, 2)`: how much
+  better the resonating prototype explains this glance than any actual remembered episode does. Needs
+  the FAST store (`episodes`, read-only: `Episodes.nearest` never mutates); with no sight cell ever born
+  `cos_to_nearest_cell := -1.0` (Area.cos's own dead-cell convention); with no episode yet written
+  `cos_to_nearest_episode := -1.0` (nothing to explain away, so the two -1's cancel to a 0 gap at the
+  very first few canvases of a life — the only place this bootstrap default is reachable, since FAST
+  writes one episode every canvas from the first one on). G-MIND-3's own table: this arm's ratio-to-
+  last-50 denominator is ~0 at steady state, so `tools/verdict_g4.py`'s `modulation()` ratio is read
+  UNCHANGED (never re-derived) and reported beside the ABSOLUTE reading the table specifies instead
+  (`first3_med >= last50_med + 0.05`) — see G5-E-REPORT.md for which arm is admissible and how each is
+  read.
+- **comparator** — `err = 1.0` when the winning sight cell's established answer (`Organism._answer_of`)
+  is NOT among this moment's WORD winners; the graded novelty otherwise. This is `Organism._misfire`'s
+  own predicate, read-only, never called: `_misfire` MUTATES (`area.misfires`, can birth) and needs S/T
+  (this canvas's sight+word winners) which do not exist yet when `error()` runs (it runs before
+  `Organism.moment()` for this canvas). So the word winners are recomputed here exactly as
+  `Organism._resonate` computes them but WITHOUT the birth side effect: `org.words.cos(xw)`, the same
+  per-area threshold (`org._theta(org.words)`), the same top-KWTA-that-resonates rule, stable sort tie-
+  break matching `_resonate`'s `np.argsort(-c, kind="stable")`. Two fallbacks mirror `_misfire` exactly:
+  no established answer yet (`ans is None`, `_misfire`'s own `continue` case) -> graded novelty, nothing
+  to violate; no word on this canvas (sight-only) -> graded novelty, nothing to compare against. Reading
+  a WORDS-area cell id against WORDS-area winners — the opposite direction of the think.py:411 bug
+  (SOLUTIONS #232's ADDENDUM 2: a SIGHT id compared to a WORDS index) — is the one line worth a second
+  look in review, and it reads the right area on both sides (`_answer_of(self.org.sight, cid)` returns a
+  WORDS cell id; `winners_w` are WORDS cell ids; compared to each other, never to a sight id).
+
+Not persisted at resume: `_word_seen` (arm A's per-word count). `Mind.resume()` re-derives `_heard` (a
+boolean set) from the ledger's `moment_word`, which cannot recover a COUNT; a resumed life under arm A
+would restart every word's count at 0. Out of scope for this brief (replay-only, a fresh Mind every
+time — creature/replay.py and this module's own worker never call resume()); raised in G5-E-REPORT.md as
+a gap a live deployment of arm A would need to close (persist `_word_seen` in ledger.json, gated the
+same way `predictor_last_winner` already is).
+
 PREDICT's OLD law (superseded above, kept here so the "why" is not lost): `expect()` named the feature
 the NEXT glance was predicted to look like — the current sight winner's own cell vector (the strongest
 resonating sight cell of the last moment lived, read from `Organism.moment()`'s new (S, T) return — B2's
@@ -57,13 +104,18 @@ class Predictor:
 
     W3-2b (2026-09-21): `error()` no longer calls `expect()` — it reads `self.org.sight` directly (the
     nearest RESONATING cell to the actual glance, module docstring). `expect()`/`note_winners()` are kept
-    for the record (still called every moment) but nothing grades on them any more."""
+    for the record (still called every moment) but nothing grades on them any more.
 
-    def __init__(self, org: Organism, lo: float = 0.5, hi: float = 2.0):
+    G5-E (2026-09-21): `arm` names which of the four G-MIND-3 error computations `error()` runs —
+    "novelty" (default, today's, byte-identical), "conjunctive", "episodic", "comparator"."""
+
+    def __init__(self, org: Organism, lo: float = 0.5, hi: float = 2.0, arm: str = "novelty"):
         self.org = org
         self.lo, self.hi = lo, hi
         self._last_winner: Optional[np.ndarray] = None
         self.last_error: Optional[float] = None
+        self.arm = arm
+        self._word_seen: Dict[str, int] = {}          # G5-E arm "conjunctive": canvases this word has been delivered on, so far
 
     def note_winners(self, S: List[int]) -> None:
         """S: the sight winners of the moment just lived (best first, §11 am. 3's resonate order). The
@@ -82,7 +134,8 @@ class Predictor:
             return np.zeros(self.org.g.sight_dim())
         return self.org.sight.cells[alive].mean(axis=0)
 
-    def error(self, x_actual: np.ndarray) -> float:
+    def error(self, x_actual: np.ndarray, word: Optional[str] = None, xw: Optional[np.ndarray] = None,
+              episodes: Optional[object] = None) -> float:
         """W3-2b (docs/G4-WAVE3-CLAUSES.md, W3-2's NOTE; PREREG §16 addendum 1): the expected glance is
         the nearest RESONATING sight cell's stored vector for THIS glance — `c = org.sight.cos(x_actual)`
         over the cells alive BEFORE this moment (the caller, creature/mind.py, calls this BEFORE
@@ -92,17 +145,93 @@ class Predictor:
         `Organism._resonate` births, which a mere error reading must never do) the error is
         `1 - c.max()` (clipped into [0, 2], cosine's own range); with nothing resonating — including no
         sight cell born yet (`org.sight.n == 0`) — the error is the maximal 1.0: a genuine surprise,
-        not a graded wrongness (there is nothing yet to be wrong ABOUT)."""
+        not a graded wrongness (there is nothing yet to be wrong ABOUT).
+
+        G5-E: this is the "novelty" arm — the DEFAULT and the only one run when `self.arm == "novelty"`,
+        UNCHANGED from the six lines above (the pin). `word`/`xw`/`episodes` are accepted so every caller
+        can pass them unconditionally (creature/mind.py does); the novelty arm ignores all three. The
+        other three arms are separate methods below, dispatched here."""
         area = self.org.sight
         if area.n == 0:
-            e = 1.0
+            e_novelty = 1.0
         else:
             c = area.cos(x_actual)
             cmax = float(c.max())
             theta = self.org._theta(area)
-            e = float(np.clip(1.0 - cmax, 0.0, 2.0)) if cmax >= theta else 1.0
+            e_novelty = float(np.clip(1.0 - cmax, 0.0, 2.0)) if cmax >= theta else 1.0
+
+        if self.arm == "novelty":
+            e = e_novelty
+        elif self.arm == "conjunctive":
+            e = self._error_conjunctive(e_novelty, word)
+        elif self.arm == "episodic":
+            e = self._error_episodic(x_actual, area, episodes)
+        elif self.arm == "comparator":
+            e = self._error_comparator(x_actual, area, word, xw, e_novelty)
+        else:
+            raise ValueError(f"Predictor.error: unknown arm {self.arm!r} (novelty|conjunctive|episodic|comparator)")
         self.last_error = e
         return e
+
+    # -------------------------------------------------------------------------------- G5-E's three arms
+    def _error_conjunctive(self, e_novelty: float, word: Optional[str]) -> float:
+        """arm A — MIND-MEMORY §4 G-MIND-3: err = max(sight_novelty, word_novelty); word_novelty = 1.0
+        while the ear has delivered this word FEWER THAN 3 TIMES, then 0 — "held for the first 3
+        showings" (G-MIND-3's own ceiling table, row "A, as written above": median{1.0, 1.0, 1.0} over
+        showings 1-3, "novelty held for the first 3 showings", so it must NOT already read 0 on the 3rd
+        showing). Read on the count of PRIOR deliveries (before this one), which is what makes showings
+        1, 2 AND 3 all read 1.0, falling to 0.0 only from the 4th showing on: prior=0 -> 1st showing,
+        prior=1 -> 2nd, prior=2 -> 3rd, all < 3 -> 1.0; prior=3 -> 4th showing, not < 3 -> 0.0. The
+        count is THEN incremented for the next call. A sight-only canvas (word=None) has no word to be
+        new: word_novelty = 0.0, err = e_novelty."""
+        if word is None:
+            return e_novelty
+        prior = self._word_seen.get(word, 0)
+        self._word_seen[word] = prior + 1
+        word_novelty = 1.0 if prior < 3 else 0.0
+        return max(e_novelty, word_novelty)
+
+    def _error_episodic(self, x_actual: np.ndarray, area, episodes: Optional[object]) -> float:
+        """arm B — MIND-MEMORY §4 G-MIND-3: err = clip(max(0, cos_to_nearest_CELL - cos_to_nearest_
+        EPISODE), 0, 2) — how much better the resonating prototype explains this glance than any actual
+        remembered episode does. `episodes` is the FAST store (genome/fast.py's Episodes), read via
+        `nearest()` only (never mutated). No sight cell ever born -> cos_to_cell = -1.0 (Area.cos's own
+        dead-cell convention); no episode yet -> cos_to_episode = -1.0 (reachable only at the very start
+        of a life, since FAST writes one episode every canvas)."""
+        cos_cell = float(area.cos(x_actual).max()) if area.n > 0 else -1.0
+        cos_ep = -1.0
+        if episodes is not None and len(episodes) > 0:
+            nearest = episodes.nearest(x_actual, 1)
+            if nearest:
+                cos_ep = nearest[0][1]
+        return float(np.clip(max(0.0, cos_cell - cos_ep), 0.0, 2.0))
+
+    def _error_comparator(self, x_actual: np.ndarray, area, word: Optional[str], xw: Optional[np.ndarray], e_novelty: float) -> float:
+        """arm C — MIND-MEMORY §4 G-MIND-3: err = 1.0 when the winning sight cell's established answer
+        (Organism._answer_of) is not among this moment's WORD winners; the graded novelty otherwise.
+        Reimplements Organism._misfire's own predicate, read-only (_misfire mutates and needs S/T, which
+        do not exist yet at this point in the canvas). No word on this canvas (sight-only, xw is None),
+        or nothing resonates in sight, or the winning cell has no established answer yet -> graded
+        novelty (nothing to compare, or nothing to violate — _misfire's own `continue` case)."""
+        if area.n == 0:
+            return 1.0
+        c = area.cos(x_actual)
+        cmax = float(c.max())
+        theta = self.org._theta(area)
+        if cmax < theta:
+            return 1.0
+        if word is None or xw is None:
+            return e_novelty
+        nearest_cell = int(np.argmax(c))
+        ans = self.org._answer_of(area, nearest_cell)
+        if ans is None:
+            return e_novelty
+        words_area = self.org.words
+        cw = words_area.cos(xw)
+        theta_w = self.org._theta(words_area)
+        order = np.argsort(-cw, kind="stable")
+        winners_w = [int(i) for i in order[: self.org.g.kwta] if words_area.alive[i] and cw[i] >= theta_w]
+        return e_novelty if ans in winners_w else 1.0
 
     def modulate(self, lr: float) -> float:
         """lr x clip(0.5 + 3*error, 0.5, 2.0) — PREREG's genome line: `PREDICT … error scales delta

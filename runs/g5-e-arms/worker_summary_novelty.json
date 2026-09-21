@@ -1,0 +1,265 @@
+{
+  "arm-novelty": {
+    "label": "arm-novelty",
+    "arrivals": 17,
+    "budget_left": 346,
+    "births": 805,
+    "c": {
+      "births_novelty_sight": 493,
+      "births_novelty_words": 17,
+      "births_error_sight": 295,
+      "births_error_words": 0,
+      "births_refused_budget": 0,
+      "births_refused_nmax": 0,
+      "births_refused_frozen": 0,
+      "births_refused_redundant": 7053,
+      "edges_born": 11630,
+      "edges_pruned": 11131,
+      "cells_merged_sight": 54,
+      "cells_merged_words": 0,
+      "scale_events": 76,
+      "removed_for_disuse": 0
+    },
+    "cells": [
+      734,
+      17
+    ],
+    "cells_born": 805,
+    "edges_cross": {
+      "born": 3717,
+      "pruned": 3639,
+      "born_total": 11630,
+      "pruned_total": 11131
+    },
+    "sleeps": 38,
+    "thinks": 1720,
+    "parked": 0,
+    "canvases": 17201,
+    "seconds": 2046.9,
+    "ms_per_canvas": 119.0,
+    "hash": "30fbc32f2d418a82dd7bf21beb30c8042258bd0e9fb844233ca44efcd057a12a",
+    "exam_stderr": "",
+    "exam": {
+      "at": "2026-09-21T14:06:25+00:00",
+      "genome": "/data/dev/genome-wt-j/genome/G4.genome",
+      "snapshot_last_seq": 34402,
+      "moments": 76404,
+      "cells": [
+        734,
+        17
+      ],
+      "words_seen": [
+        "arrow",
+        "bar",
+        "circle",
+        "cross",
+        "cup",
+        "diamond",
+        "dot",
+        "house",
+        "key",
+        "moon",
+        "ring",
+        "square",
+        "star",
+        "tree",
+        "triangle",
+        "wave",
+        "zog"
+      ],
+      "held_per_thing": 10,
+      "chance_q1": 0.059,
+      "disjoint_checked": 190,
+      "disjoint_control_caught": true,
+      "ask_seen_words": {
+        "Q1": {
+          "acc": 0.9818181818181818,
+          "n": 110,
+          "correct": 108,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "false_abstention": 0.0,
+          "per_thing": {
+            "circle": 0.9,
+            "square": 1.0,
+            "triangle": 0.9,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 1.0,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 1.0
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 1.0,
+          "n": 11,
+          "correct": 11,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "triangle",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond"
+          }
+        },
+        "Q3": {
+          "acc": 0.990909090909091,
+          "n": 110,
+          "correct": 109,
+          "true_pairs_abstained": 0,
+          "ceiling": 1.0
+        },
+        "Q4": {
+          "acc": 1.0,
+          "n": 110,
+          "correct": 110,
+          "ties": 0
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.9931818181818182
+      },
+      "ask_all_words": {
+        "Q1": {
+          "acc": 0.975,
+          "n": 160,
+          "correct": 156,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 1,
+            "close": 0
+          },
+          "false_abstention": 0.00625,
+          "per_thing": {
+            "circle": 0.9,
+            "square": 1.0,
+            "triangle": 0.9,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 1.0,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 1.0,
+            "moon": 1.0,
+            "house": 1.0,
+            "tree": 0.8,
+            "cup": 1.0,
+            "key": 1.0
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 1.0,
+          "n": 16,
+          "correct": 16,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "triangle",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond",
+            "moon": "moon",
+            "house": "house",
+            "tree": "tree",
+            "cup": "cup",
+            "key": "key"
+          }
+        },
+        "Q3": {
+          "acc": 0.9875,
+          "n": 160,
+          "correct": 158,
+          "true_pairs_abstained": 1,
+          "ceiling": 0.996875
+        },
+        "Q4": {
+          "acc": 1.0,
+          "n": 160,
+          "correct": 160,
+          "ties": 0
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.9906250000000001
+      },
+      "gaze_landing": {
+        "rate": 1.0,
+        "n": 110,
+        "hit": 110,
+        "per_thing": {
+          "circle": 1.0,
+          "square": 1.0,
+          "triangle": 1.0,
+          "cross": 1.0,
+          "ring": 1.0,
+          "bar": 1.0,
+          "dot": 1.0,
+          "star": 1.0,
+          "arrow": 1.0,
+          "wave": 1.0,
+          "diamond": 1.0
+        },
+        "first": 2
+      },
+      "organism_hash_unchanged_by_exam": true,
+      "seconds": 2.4
+    }
+  }
+}

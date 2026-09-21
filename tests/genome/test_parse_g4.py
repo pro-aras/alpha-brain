@@ -97,7 +97,9 @@ class TestParseG4(unittest.TestCase):
         self.assertEqual(g.declared["CYCLE"], {"grow_to": 0.9})
         self.assertEqual(g.declared["FAST"], {"episodes": 20000, "keys": ["sight", "words", "surprise"]})
         self.assertEqual(g.declared["SLEEP"], {"every": 2000, "replay": 200})
-        self.assertEqual(g.declared["PREDICT"], {"delta_lo": 0.5, "delta_hi": 2.0})
+        # edit: Claude (Sonnet 5, builder E), 2026-09-21 16:58 +0400 — G5-E: PREDICT's declared dict gains "arm"
+        # (default "novelty" when the genome's PREDICT line carries no trailing "; error <arm>" clause).
+        self.assertEqual(g.declared["PREDICT"], {"delta_lo": 0.5, "delta_hi": 2.0, "arm": "novelty"})
         self.assertEqual(g.declared["FILE"], {"fields": ["claim", "route", "decider", "due"]})
         self.assertEqual(g.declared["CURIOSITY"], {"interests": 50, "operators": ["recombine", "generalize", "specialize", "bridge"]})
         self.assertEqual(g.declared["PARK"], {"after": 3})
@@ -220,3 +222,44 @@ class TestTheLifeGenome(unittest.TestCase):
         for off in ("TRAITS", "SURPRISE", "SENTENCE", "HANDS"):   # edit: Claude (Fable 5.1), 2026-09-21 15:18 +0400 — INDUCE/DEDUCE are ON since life 3 (PREREG §18)
             self.assertNotIn(off, g.declared)
         self.assertEqual(g.declared["THINK"], {"every": 10}); self.assertEqual(g.declared["EXAM"], {"every": 2000}); self.assertEqual(g.declared["FROZEN"], {"after": 50})
+        # edit: Claude (Sonnet 5, builder E), 2026-09-21 16:58 +0400 — G5-E: the live file's PREDICT line carries no
+        # trailing "; error <arm>" clause -> "arm" defaults to "novelty" (today's mechanism, unchanged).
+        self.assertEqual(g.declared["PREDICT"]["arm"], "novelty")
+
+
+class TestPredictArmClause(unittest.TestCase):
+    """G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md; docs/organs/MIND-MEMORY.md §4 G-MIND-3): PREDICT's
+    OPTIONAL trailing "; error <arm>" clause. novelty|conjunctive|episodic|comparator parse; the clause
+    absent, or spelt "; error novelty", both default to "arm": "novelty"; any other word refuses (the
+    machinery's own law: a gene the parser does not know, or a value it cannot read, refuses to start)."""
+
+    BASE = "PREDICT  next glance; error scales delta 0.5..2.0; ranks replay; grades act"
+
+    def _genome_with_predict(self, predict_line: str) -> str:
+        base = _filled_g4_text()
+        self.assertIn(self.BASE, base, "the fixture's PREDICT line moved — update BASE above")
+        return base.replace(self.BASE, predict_line)
+
+    def test_bare_line_defaults_to_novelty(self) -> None:
+        g = parse_genome(self._genome_with_predict(self.BASE))
+        self.assertEqual(g.declared["PREDICT"], {"delta_lo": 0.5, "delta_hi": 2.0, "arm": "novelty"})
+
+    def test_explicit_novelty_same_as_bare(self) -> None:
+        g = parse_genome(self._genome_with_predict(self.BASE + "; error novelty"))
+        self.assertEqual(g.declared["PREDICT"], {"delta_lo": 0.5, "delta_hi": 2.0, "arm": "novelty"})
+
+    def test_conjunctive_episodic_comparator_parse(self) -> None:
+        for arm in ("conjunctive", "episodic", "comparator"):
+            with self.subTest(arm=arm):
+                g = parse_genome(self._genome_with_predict(self.BASE + f"; error {arm}"))
+                self.assertEqual(g.declared["PREDICT"], {"delta_lo": 0.5, "delta_hi": 2.0, "arm": arm})
+
+    def test_unknown_arm_word_refuses(self) -> None:
+        with self.assertRaises(GenomeError) as cm:
+            parse_genome(self._genome_with_predict(self.BASE + "; error bogus"))
+        self.assertIn("PREDICT", str(cm.exception))
+
+    def test_misspelt_clause_refuses(self) -> None:
+        # the clause word must be exactly "error" (not e.g. "arm") and the whole line must still fullmatch
+        with self.assertRaises(GenomeError):
+            parse_genome(self._genome_with_predict(self.BASE + "; arm conjunctive"))
