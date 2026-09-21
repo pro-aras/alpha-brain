@@ -124,6 +124,27 @@ def alive(G: dict, hours: float, nrestarts: Optional[int]) -> dict:
 
 
 # ----------------------------------------------------------------------------- twins (one worker per twin, a fresh root each)
+# edit: Claude (Fable 5.1), 2026-09-21 22:12 +0400 — two twin defects found at J's landing (G5): (1) the one-glance wrapper's lambda DROPPED every
+# keyword the mind now passes (`colour=`, Builder J's block) → TypeError in the T-one-glance worker → (xi) unreadable on every
+# G5 verdict; it forwards **kw now. (2) the nowire twin rebuilt Predictor() WITHOUT the genome's declared error arm (E's
+# `; error comparator`) → the twin ran the novelty arm while the life ran the comparator; it keeps the arm now. Both factored
+# out of worker() so tests/creature/test_verdict_twins_g5.py can call them without a worker process.
+def _force_one_glance() -> None:
+    """T-one-glance: gaze mode "one" on every glances() call of THIS process (PREREG §16 addendum), every other argument forwarded."""
+    from genome import gaze as _gaze
+    _orig = _gaze.glances
+    _gaze.glances = lambda rgb, spec_, g, mode="surprise", pic_id="", **kw: _orig(rgb, spec_, g, "one", pic_id, **kw)
+
+
+def _nowire(mind: "Mind") -> None:
+    """The no-wire twin: a fresh unwired Organism; the Predictor rebuilt on it with the SAME declared arm the life runs."""
+    from genome.machinery import Organism
+    from genome.predict import Predictor
+    mind.org = Organism(mind.genome, wire=False)
+    if mind.predictor is not None:
+        mind.predictor = Predictor(mind.org, arm=mind.predictor.arm)
+
+
 def worker(spec_path: Path) -> int:
     spec = json.loads(Path(spec_path).read_text())
     from creature.mind import Mind
@@ -149,13 +170,10 @@ def worker(spec_path: Path) -> int:
         # edit: Claude (Fable 5.1), 2026-09-20 13:03 +0400 — PREREG §16 addendum: G1's T-one-glance = gaze mode "one" (the whole canvas at
         # glance×glance, one feature vector), forced on every glances() call of THIS worker process — the mind's learning road and
         # the exam's held-out alike — without touching creature code (the mind hardcodes surprise/random).
-        from genome import gaze as _gaze
-        _orig = _gaze.glances
-        _gaze.glances = lambda rgb, spec_, g, mode="surprise", pic_id="": _orig(rgb, spec_, g, "one", pic_id)
+        _force_one_glance()
     mind = Mind(genome_path, root, blind=frozenset(spec.get("blind", [])))
     if spec.get("nowire"):
-        mind.org = Organism(mind.genome, wire=False)
-        if mind.predictor is not None: mind.predictor = Predictor(mind.org)
+        _nowire(mind)
     t0 = time.perf_counter(); n_canvas = 0; errs = []
     for r in rows:
         mind.consume(r)

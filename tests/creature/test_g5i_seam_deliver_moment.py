@@ -172,8 +172,9 @@ class TestSeamParity(unittest.TestCase):
 
         real_glances = gaze_module.glances
 
-        def leaky_glances(rgb, spec, gz, mode="surprise", pic_id=""):
-            g = real_glances(rgb, spec, gz, mode, pic_id)
+        def leaky_glances(rgb, spec, gz, mode="surprise", pic_id="", colour=None):
+            # edit: Claude (Fable 5.1), 2026-09-21 22:12 +0400 — the I×J seam: the mind now passes `colour=` (Builder J); a wrapper that drops it raised TypeError under the merged tree (landing J)
+            g = real_glances(rgb, spec, gz, mode, pic_id, colour=colour)
             if g["feats"] and g["windows"]:
                 top, left = g["windows"][0]
                 leaked = g["feats"][0].copy()
