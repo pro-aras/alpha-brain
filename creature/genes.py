@@ -67,6 +67,15 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "FROZEN": "creature/mind.py:Mind.__init__ (declared['FROZEN']['after'] read when 'frozen' in blind — a TWIN-ONLY gene, PREREG §11.1 step 5)",
         "FILE": "creature/mind.py:_think_work (predict_file() called for 'sight' pool items) — called UNGATED by FILE's own presence; declared['FILE'] value NOT read",
         "BELIEF": "creature/mind.py:_think_work (think_laws.believe() called for 'word' pool items, UNGATED by BELIEF's own presence for the call itself; clash_enabled=('BELIEF' in declared) IS gated on it and passed through once believe() accepts the kwarg — W3-1, Builder B, g4-wave3-b)",
+        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+        # two rows added, ONLY these two, nothing else in this file touched (Builder C owns the body rows
+        # concurrently). Both are real call sites: _think_pool builds 'rule' pool items by calling
+        # think_laws.induce()/deduce() directly (gated on their OWN declared presence — an undeclared
+        # INDUCE/DEDUCE never even computes a candidate rule), and _think_work's new 'rule' branch files
+        # them through FILE (gated on FILE's own declared presence too, W3-0b — induce()/deduce() call
+        # predict.file() internally, so without FILE the mind dead-ends BEFORE calling them).
+        "INDUCE": "creature/mind.py:_think_pool/_think_work (think_laws.induce() called for words with >= k episodes; filed as 'rule' items, scored at their due canvas)",
+        "DEDUCE": "creature/mind.py:_think_pool/_think_work (think_laws.deduce() called over standing beliefs; filed as 'rule' items, scored at their due canvas)",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
     },
 }

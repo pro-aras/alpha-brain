@@ -131,6 +131,14 @@ class Mind:
         self._think_rng = np.random.default_rng([int(self.genome.seed), 0x71494e4b])   # "THINK" bytes-ish, distinct from any other stream in this file
         self._canvas_index: int = 0
         self._filed_predictions: list = []          # [{"row": FILE's row dict, "due_canvas": int}, ...] awaiting the next showing of their word
+        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+        # words/pairs with a currently FILED-but-not-yet-SCORED rule, so _think_pool never re-files the
+        # SAME rule twice while its first attempt is still pending (removed once scored, whether PASS or
+        # FAIL, so a word/pair may be re-attempted later — up to PARK's own n identical fails). Not
+        # persisted in snapshot() (pre-existing gap, shared with _filed_predictions/Park/Interests — see
+        # the builder report).
+        self._induce_pending: set = set()            # words
+        self._deduce_pending: set = set()             # "w1|w2" (sorted) pair keys
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:05 +0400 — D-G12/W3-1 (docs/G4-WAVE3-CLAUSES.md):
         # revisits/extensions/clashes, coded against Builder B's believe() "kind" interface before it lands
         # (today believe() always returns kind="belief"; the mapping below already handles the other three).
@@ -296,27 +304,71 @@ class Mind:
         shown again — "the journal's err/recall on the next canvas with that word" (PREREG's own route
         text). Simplification, documented in the report: the decider "recall == word" is evaluated by a
         fresh word-cell lookup (questions.build_ledgers) rather than a persisted per-edge index — correct,
-        but O(births) per score, acceptable at this life's scale."""
+        but O(births) per score, acceptable at this life's scale.
+
+        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+        an entry carrying a "rule" (an INDUCE/DEDUCE FILE row, _think_rule below) is scored by ITS OWN
+        decider — "the resonance of C on that canvas >= THETA_N for >= half of C" (the brief's verbatim
+        text) — never the sight-road's "recall == word" (a rule's claim is about a CLUSTER of cells, not
+        a single word-answer edge). `_grade_rule` then runs CURIOSITY's/PARK's outcome (the brief: "the
+        outcome grades the act")."""
         if not self._filed_predictions or first_glance is None:
             return
         still_pending = []
         ledgers = None
         for entry in self._filed_predictions:
             if entry["target_word"] == word and self._canvas_index >= entry["due_canvas"]:
-                if ledgers is None:
-                    ledgers = build_ledgers(self.org, self.moment_word)
-                r = self.org.recall("sight", first_glance)
-                Lw = ledgers["words"]
-                evidence = r["cell"] is not None and Lw.get(r["cell"], set()) == {word}
+                rule = entry.get("rule")
+                if rule is not None:
+                    evidence = self._rule_evidence(rule["cluster"], first_glance)
+                else:
+                    if ledgers is None:
+                        ledgers = build_ledgers(self.org, self.moment_word)
+                    r = self.org.recall("sight", first_glance)
+                    Lw = ledgers["words"]
+                    evidence = r["cell"] is not None and Lw.get(r["cell"], set()) == {word}
                 scored = predict_score(entry["row"], evidence)
                 predict_ledger_path = self.run_root / "state" / "predictions.jsonl"
                 predict_ledger_path.parent.mkdir(parents=True, exist_ok=True)
                 with predict_ledger_path.open("a") as f:
                     f.write(json.dumps(scored, default=str) + "\n")
                 self.think_counters["predictions_scored"] += 1
+                if rule is not None:
+                    self._grade_rule(rule, evidence)
             else:
                 still_pending.append(entry)
         self._filed_predictions = still_pending
+
+    def _rule_evidence(self, cluster: List[int], first_glance: np.ndarray) -> bool:
+        """W3-2's decider, verbatim: "the resonance of C on that canvas >= THETA_N for >= half of C".
+        Replicates `Organism._resonate`'s own comparison (`area.cos(x) >= self._theta(area)`) WITHOUT
+        calling it — `_resonate` BIRTHS, and a scoring read must never change the organism (mirrors
+        genome/predict.py's `Predictor.error()`, the same law for the same reason)."""
+        if not cluster:
+            return False
+        area = self.org.sight
+        c = area.cos(first_glance)
+        theta = self.org._theta(area)
+        hits = sum(1 for cid in cluster if 0 <= cid < len(c) and c[cid] >= theta)
+        return hits * 2 >= len(cluster)
+
+    def _grade_rule(self, rule: Dict[str, object], evidence: bool) -> None:
+        """W3-2: "the outcome grades the act" — a scored PASS is CURIOSITY's "answered" (generalize +
+        recombine, curiosity.py's existing law); a scored FAIL is the NEW "failed" outcome (specialize's
+        x0.5, under its own name — curiosity.py, this task) and is also reported to PARK by name
+        ("rule_failed_3"); PARK's own n-identical-reasons law (genome/park.py, unchanged) parks the want
+        after the n-th FAIL (D39's rule). Either way the rule leaves its pending set — scored, so a NEW
+        attempt may be filed later (unless just parked, in which case _think_pool's own is_parked() check
+        keeps a fresh one from being filed — reopened only by PARK's existing reopen() road, unwired in
+        this wave, same as every other PARK want today)."""
+        op, want = str(rule["op"]), str(rule["want"])
+        key = want.split(":", 1)[1] if ":" in want else want
+        (self._induce_pending if op == "induce" else self._deduce_pending).discard(key)
+        if self.interests is not None:
+            self.interests.update({"kind": "rule", "key": key}, "answered" if evidence else "failed")
+        if not evidence and self.park is not None:
+            if self.park.answer(want, "rule_failed_3") == "parked":
+                self.think_counters["parked"] += 1
 
     def _recent_word_glances(self, word: str, n: int, fallback) -> list:
         """The sight features of the word's last n live episodes (by moment), oldest first; the fallback alone if none."""
@@ -354,6 +406,35 @@ class Mind:
         for entry in self._filed_predictions:
             if now >= entry["due_canvas"]:
                 pool.append({"kind": "due", "key": entry["target_word"], "episode": None, "pred": entry["row"]})
+        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+        # "rule" items — INDUCE (a word with >= k agreeing episodes, no counter-example) and DEDUCE (two
+        # standing beliefs sharing a cell, or the same word split disjoint — unroutable, refused by name).
+        # Each candidate is computed by CALLING think_laws.induce()/deduce() here (never re-deriving their
+        # pairing/agreement law a second time in this file) and carried on the pool item as `pred` — a
+        # word/pair already pending (filed, not yet scored) or already PARKED is skipped so the SAME claim
+        # is never filed twice while an attempt is outstanding, or after PARK has said stop. Both genes
+        # gate the WHOLE candidate computation (never just the later FILE call) — an undeclared INDUCE/
+        # DEDUCE means the mind does not even ask think_laws for a rule, matching W3-0's "the machinery
+        # does not run it" law one level up from FILE's own gate in _think_work.
+        if "INDUCE" in self.genome.declared and self.episodes is not None and _THINK_LAWS_AVAILABLE:
+            k = int(self.genome.declared["INDUCE"]["from_episodes"])
+            for rule_row in think_laws.induce(self.episodes, k, self.org):
+                word = rule_row.get("word")
+                if not word or word in self._induce_pending:
+                    continue
+                if self.park is not None and self.park.is_parked(f"induce:{word}"):
+                    continue
+                pool.append({"kind": "rule", "key": word, "episode": None, "pred": rule_row, "op": "induce"})
+        if "DEDUCE" in self.genome.declared and _THINK_LAWS_AVAILABLE:
+            beliefs = think_laws.read_beliefs(self.run_root / "state" / "beliefs.jsonl", fold=True)
+            for claim_row in think_laws.deduce(beliefs):
+                words = claim_row.get("words") or [None, None]
+                pair_key = "|".join(sorted(str(w) for w in words))
+                if pair_key in self._deduce_pending:
+                    continue
+                if self.park is not None and self.park.is_parked(f"deduce:{pair_key}"):
+                    continue
+                pool.append({"kind": "rule", "key": pair_key, "episode": None, "pred": claim_row, "op": "deduce"})
         return pool
 
     def _think_choose(self, pool: list):
@@ -395,6 +476,13 @@ class Mind:
             r = self.org.recall_many("sight", xs)
             if r.get("cell") is None:
                 return dead_end(word, "no_cell_answers")
+            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
+            # think_laws.believe() is a real call to BELIEF's mechanism (genes.py's RUNS entry) — gated on
+            # BELIEF's own declared presence now, not called unconditionally. A word item without BELIEF
+            # declared is a dead end named "no_belief_gene" (never a crash, never a silent belief written
+            # for a gene the genome never declared).
+            if "BELIEF" not in self.genome.declared:
+                return dead_end(word, "no_belief_gene")
             # edit: Claude (Fable 5.1), 2026-09-19 23:37 +0400 — believe() takes the beliefs FILE; the run ROOT was passed and the first belief
             # ever reached (after the recall_many fix) crashed the mind with IsADirectoryError — the crash law fired as designed.
             # edit: Claude (Fable 5.1), 2026-09-19 23:38 +0400 — why() tags cells as (area, id); believe() takes ints and clash() compares the sets,
@@ -435,6 +523,13 @@ class Mind:
                     break
             if nearest_word is None:
                 return dead_end(item["key"], "no_route")
+            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
+            # predict_file() is a real call to FILE's mechanism (genes.py's RUNS entry) — gated on FILE's
+            # own declared presence now. Checked HERE (after the route is found, before filing it) so a
+            # genome without FILE still exercises the routing logic above and dead-ends by name at the
+            # point FILE itself would have refused everything anyway.
+            if "FILE" not in self.genome.declared:
+                return dead_end(item["key"], "no_file_gene")
             filed = predict_file(
                 claim=f"the next showing of this sight resonates {nearest_word}'s cells",
                 route="the journal's err/recall on the next canvas with that word",
@@ -451,7 +546,61 @@ class Mind:
             # the pool here, its word has not recurred yet -- not yet answerable, not a dead end either.
             return {"outcome": "not_yet_due", "parked": False}
 
+        if item["kind"] == "rule":
+            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+            # a rule (INDUCE/DEDUCE) is a PREDICTION, filed through FILE's four fields exactly like the
+            # "sight" kind above — induce()/deduce() (genome/think.py) already CALLED predict.file()
+            # internally to build item["pred"] (_think_pool), so the row here is already accepted-or-
+            # refused BY NAME; gated on FILE's own declared presence (W3-0b) BEFORE that row is ever
+            # journaled — an undeclared FILE means the mind never writes a row FILE itself never
+            # sanctioned (the candidate computation in _think_pool is gated separately, on INDUCE/DEDUCE's
+            # own presence, one level up — W3-0's own law: a declared-but-unwired gene never runs at all).
+            op = str(item.get("op"))
+            key = str(item.get("key"))
+            want = f"{op}:{key}"
+            if "FILE" not in self.genome.declared:
+                return dead_end(want, "no_file_gene")
+            row = item.get("pred")
+            if row is None:
+                return dead_end(want, "no_route")
+            (self._induce_pending if op == "induce" else self._deduce_pending).add(key)
+            self._file_rule(row, want=want, op=op)
+            if not row.get("accepted"):
+                return {"outcome": "refused", "parked": False, "refused": row.get("refused")}
+            return {"outcome": "filed", "parked": False, "want": want}
+
         return dead_end(str(item.get("key")), "unknown_kind")
+
+    def _file_rule(self, row: Dict[str, object], want: str, op: str) -> None:
+        """W3-2: predictions.jsonl gets EVERY FILE outcome for a rule — accepted or refused BY NAME
+        (predict.py's file()/FILE's law: 'never silently dropped, never accepted half-written');
+        `predictions_filed` counts both ('filed by name or refused by name'), moved AT LAST (after the
+        write, and after the accepted branch is queued) per the brief's own words. An accepted row is
+        queued for scoring at its due canvas — due_canvas = self._canvas_index (NOT +1): this method
+        only ever runs from _think_work, called from _maybe_think, which runs AFTER _consume_eye's own
+        canvas_index increment for the triggering canvas (creature/mind.py's own call order) — so
+        self._canvas_index here already names the NEXT canvas to be consumed, and "the word's next
+        showing" (PREREG's own route text) is exactly that canvas. (The pre-existing 'sight' road above
+        uses +1 and is one canvas later than it needs to be — a pre-existing quirk, left as is and named
+        in the report, not fixed here: changing it changes what a live rule's existing consumers see.)"""
+        target_word: Optional[str] = None
+        if row.get("accepted"):
+            if op == "induce":
+                target_word = row.get("word")
+            else:
+                words = row.get("words") or [None]
+                target_word = words[0]
+        predict_ledger_path = self.run_root / "state" / "predictions.jsonl"
+        predict_ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        with predict_ledger_path.open("a") as f:
+            f.write(json.dumps(row, default=str) + "\n")
+        if row.get("accepted") and target_word:
+            cluster = [int(c) for c in (row.get("cluster") or row.get("shared") or [])]
+            self._filed_predictions.append({
+                "row": row, "target_word": str(target_word), "due_canvas": self._canvas_index,
+                "rule": {"op": op, "want": want, "cluster": cluster},
+            })
+        self.think_counters["predictions_filed"] += 1
 
     def _maybe_think(self, row: Dict[str, object]) -> None:
         """PREREG §11.1 step 3: every THINK.every canvases. THINK's own gene clause is not on master at

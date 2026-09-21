@@ -3,12 +3,19 @@
 
 edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 21:xx +0400 — new module, Wave 2 B10.
 
+edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md): a new
+outcome, "failed" — "a scored rule that FAILS lowers CURIOSITY's weight on its item", the brief's own
+words. Specialize's own arithmetic (x0.5), under its own name: a rule can FAIL (its due-canvas decider
+did not hold) without ever being PARKED (parked needs 3 identical fails on the SAME want, PARK's own
+law) — the two are different signals sharing one multiplier, so they are counted separately
+(state()["outcomes"]["failed"] vs the PARK ledger) even though the weight math is identical to "parked".
+
 Interface fixed for Builder A (docs/G4-PREREG.md §11, the coordinator's Wave 2 message, verbatim):
     class Interests(n: int, rng)
-        choose(pool, rng) -> item        # pool = [{"kind": "word"|"sight"|"due", "key": str,
+        choose(pool, rng) -> item        # pool = [{"kind": "word"|"sight"|"due"|"rule", "key": str,
                                           #          "episode": int|None, "pred": dict|None}, ...]
                                           # highest weight, ties by rng; an unseen item is born at 1.0
-        update(item, outcome)            # outcome in {"answered","parked","filed","scored"}
+        update(item, outcome)            # outcome in {"answered","parked","filed","scored","failed"}
         state()                          # for STATUS
         save(path) / load(path)          # JSON
     the null twin = choose with weights ignored (uniform by rng) — provided here as choose_uniform().
@@ -54,7 +61,7 @@ from typing import Dict, List, Optional, Tuple, Union
 Item = Dict[str, object]
 Key = Tuple[str, str]  # (kind, key)
 
-VALID_OUTCOMES = {"answered", "parked", "filed", "scored"}
+VALID_OUTCOMES = {"answered", "parked", "filed", "scored", "failed"}
 
 
 def _k(item: Item) -> Key:
@@ -119,6 +126,9 @@ class Interests:
             self._window_answered.append(k)
         elif outcome == "parked":
             # specialize: x0.5 on that item only
+            self.weights[k] = self.weights[k] * 0.5
+        elif outcome == "failed":
+            # W3-2: a scored rule FAIL — specialize's same x0.5, under its own name (module docstring).
             self.weights[k] = self.weights[k] * 0.5
         # "filed" / "scored": no operator named in the PREREG — counted, no weight change.
         self._prune()
