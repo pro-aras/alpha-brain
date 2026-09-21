@@ -1,8 +1,12 @@
 # G5-E REPORT — the three PREDICT error arms, decided by replay of life 2's tape
 
-*Builder E (Sonnet 5), stamped `date "+%Y-%m-%d %H:%M %z"` = 2026-09-21 18:07 +0400 (final pass, both
-pending jobs landed; the first edit stamps in the code were typed as 17:04 — ahead of the clock,
-SOLUTIONS #50's exact shape — and corrected in one pass to `date`'s own 16:58 output; see §9).*
+*Builder E (Sonnet 5), stamped `date "+%Y-%m-%d %H:%M %z"` = 2026-09-21 18:16 +0400 (amended pass: the
+moon reading corrected (§6 — moon is a real thing in life 2's world, spikes and settles; §3's ceiling
+table now shows the measured spike alongside G-MIND-3's pre-declared one; §5's mechanism explicitly
+marked [Likely, one trace point] against the [Certain] zero-reading; §2/§7 corrected which replays
+actually cross-checked which; per-arm cost added). First closed 18:07 +0400. The first edit stamps in
+the code were typed as 17:04 — ahead of the clock, SOLUTIONS #50's exact shape — and corrected in one
+pass to `date`'s own 16:58 output; see §9.*
 
 Branch `g5-error-arms` in worktree `/data/dev/genome-wt-j`, from master `3b3a267`. `/data/dev/genome`
 (the live creature) was never touched — no write under `run/`, `world/`, or any systemd unit; every
@@ -90,10 +94,12 @@ purely additive: a genome that never writes `; error <arm>` is unaffected by any
 All four replays (novelty/default, conjunctive, episodic, comparator) ran on the **same** 24 h-cut tape
 built once via `tools.verdict_g4.gather()` (never re-derived — reused by import) and are read against
 **the novelty arm's own replay under this worktree's code** (never life 2's stale journal, per §0).
-`novelty`/`conjunctive`/`comparator` ran via `creature.replay.run_replay` or `tools.verdict_g4.worker()`
-(both, cross-checked — see below); `episodic` ran only via `worker()` (its `Episodes.nearest` cost makes
-a second run wasteful). The no-predict twin ran with `--blind predict` under the default genome (arm-
-independent by construction: `predict_on` is `False`, `error()` is never called).
+**Only `novelty` ran twice**, via both `creature.replay.run_replay` and `tools.verdict_g4.worker()` — the
+two final hashes match exactly (table below), which is the cross-check. `conjunctive`, `episodic` and
+`comparator` each ran once, via `worker()` only (its `Episodes.nearest` cost makes a second run per arm
+wasteful) — there is no second-road cross-check for these three, only for the twin they are read against.
+The no-predict twin ran with `--blind predict` under the default genome (arm-independent by construction:
+`predict_on` is `False`, `error()` is never called).
 
 | arm | replayer | mind rows | final cells [sight, words] | final hash |
 |---|---|---|---|---|
@@ -115,13 +121,23 @@ fewer rows (the control the brief's "no-predict blind" clause asks for).
 in earlier PREREG amendments, which were measured on a *different* front). Read via
 `tools.verdict_g4.modulation(G, F)`, imported, never re-derived, on each replay's own `mind-journal`.
 
+**Cost per arm, measured (whole-canvas throughput, not comparable to G-MIND-3's own declared per-call
+cost — see below; these four ran together under `run_workers()`, 4 parallel BLAS-threaded processes
+sharing the box):** no-predict-twin 126.95 ms/canvas, conjunctive 131.14, comparator 131.67, episodic
+135.46 (novelty's own solo `run_replay` read 119.0 ms/canvas, the only single-process figure in this
+set). Episodic's ~4–8 ms/canvas premium over the others is consistent with G-MIND-3's own pre-declared
+figure for this arm's one added call — "one `Episodes.nearest` per canvas — 35.45 ms today, 3.33 ms
+after R2" (MIND-MEMORY §4 G-MIND-3) — though that number is the isolated call cost on a different
+measurement road (R2 unapplied here, solo, not the 4-worker whole-canvas figure above), so the two are
+directionally consistent, not a matched pair.
+
 **G-MIND-3's pre-declared ceiling table, walked against what was actually measured:**
 
 | arm | G-MIND-3's pre-declared ceiling/verdict | measured on this tape |
 |---|---|---|
-| A (conjunctive) | admissible; spike ≈ 4.3× (word_novelty held 3 showings, median{1.0,1.0,1.0}) | **matches**: `first3_med = 1.0` on every new thing |
+| A (conjunctive) | admissible; spike ≈ 4.3× (word_novelty held 3 showings, median{1.0,1.0,1.0}) | **matches, but larger**: `first3_med = 1.0` on every new thing; measured spike **62–64×** on house/zog (table below) — G-MIND-3's 4.3× was computed against the pre-W3-2b ~0.23 steady-state denominator (§0); today's ~0.016 denominator makes the same numerator a much bigger ratio |
 | B (episodic) | ratio undefined (denominator ~0 at steady state); the mark must be an absolute margin, `first3_med ≥ last50_med + 0.05` | **worse than predicted**: `first3_med = 0.0` (not merely undefined) on every new thing **and on zog** — see §5 |
-| C (comparator) | admissible; ≥ 4.3×, "the only arm whose denominator is guaranteed well-behaved" | **matches**: `first3_med = 1.0` on every new thing |
+| C (comparator) | admissible; ≥ 4.3×, "the only arm whose denominator is guaranteed well-behaved" | **matches, but larger**: `first3_med = 1.0` on every new thing; measured spike **64–69×** on house/zog (table below) — same pre-/post-W3-2b denominator shift as row A |
 
 **Window 1 (5 new things: cup, house, key, moon, tree) and window 3 (zog), read today:**
 
@@ -198,9 +214,10 @@ because PREDICT was blinded, not because it saw less tape.
 and `last50_med = 0.0` on every new thing at both windows, including zog — not merely an undefined ratio
 (G-MIND-3's own prediction) but a value that never rises above 0 at all in the windows read.**
 
-**[Certain — measured directly]** The mechanism is structural, not a bug in `_error_episodic` (toy-
-tested correct in isolation, `tests/genome/test_predict_arms.py::TestEpisodicArm`, §6, where the same
-formula produces a real, large positive gap on a toy with a SPARSE episode store — see
+**[Certain — measured directly]** The all-zero reading itself: `first3_med = 0.0` and `last50_med = 0.0`
+on every new thing at both windows, over the full 17,201-row replay — this is not a bug in
+`_error_episodic` (toy-tested correct in isolation, `tests/genome/test_predict_arms.py::TestEpisodicArm`,
+§9, where the same formula produces a real, large positive gap on a toy with a SPARSE episode store — see
 `test_prototype_explains_a_glance_no_episode_is_near`). A raw trace at **zog's own first canvas** (seq
 30002, `area.n=720` sight cells, `len(episodes)=15000` episodes already written):
 
@@ -208,6 +225,12 @@ formula produces a real, large positive gap on a toy with a SPARSE episode store
 area.n=720  episodes_len=15000  cos_cell=0.8723  cos_ep=0.8715  gap=0.0007
 ```
 
+**[Likely — one trace point, not measured across many]** The mechanism below is inferred from this ONE
+canvas's numbers; it was not re-measured at other new-thing arrivals or other points in the tape (that
+would need the trace repeated several times, which this brief's budget did not cover — raised in §10).
+An equally consistent alternative this single trace cannot rule out: the nearest cell and nearest
+episode landed this close because they are literally *the same canvas's* glance-k (the cell) and
+glance-1 (the episode written for it), rather than because the FAST store is generically 20× larger.
 **Neither number is low.** My first hypothesis (that a brand-new shape's first showing would find
 BOTH stores far away, "low − low ≈ 0") was wrong — measured, not guessed away: at 30,002 canvases in,
 the 64-feature glance space is dense enough that *any* new shape lands within ~0.87 cosine of something
@@ -224,15 +247,23 @@ arise on a store this populated. The gap the formula was built to detect needs a
 *smaller* than the SLOW store, which never happens here (`FAST episodes 20000` vs a few hundred cells
 mid-life, growing to thousands by the plant).
 
-**The reading itself was never in doubt** (measured
-directly off the real 24 h-cut tape, not a toy): arm B's error never rises above 0 anywhere it was
-checked, so it cannot spike on the zog plant.
+Whatever the mechanism, the practical consequence (also [Certain]) stands on its own: arm B's error
+never rises above 0 anywhere it was checked on the real tape, so it cannot spike on the zog plant.
 
 ## 6 · Admissibility (item 3's zog gate, applied)
 
-The brief: *"An arm that does not spike on zog is refused before its moon reading is read."* (There is
-no "moon" in life 2's own world — the brief's phrasing is G-MIND-3's own shorthand for "the hardest
-look-alike case," which on life 2's tape is `house`, walked in §3.)
+The brief: *"An arm that does not spike on zog is refused before its moon reading is read."* **`moon`
+is a real thing in life 2's own world** — §3's window-1 table lists it among the five new things
+(`cup, house, key, moon, tree`), it spikes under every graded arm (`first3_med = 1.0`), and it is the
+**only** one of the five that also settles by its 10th showing (`err@10 = 0.0039`, §3's settle table).
+Read literally, the brief's "moon reading" is that row: moon is the case G-MIND-3 predicted would
+resonate an existing cell strongly enough to fail the old formula's ratio bar — MIND-MEMORY §4's own
+words, "the moon resonates the circle cell, whose answer is «circle», and the word that arrives is
+«moon»," measured there at "0.9–1.9× the steady error" under the pre-W3-2b formula (§0) — and on this
+tape, under today's formula, it does not fail: measured `spike_ratio` at window 1
+is **62.11× (novelty and conjunctive) / 64.1× (comparator)**, and moon is the one thing that settles
+(`err_10th = 0.0039` at window 1, all three arms; §3's settle table). The look-alike that the unchanged
+(novelty) arm actually *does* miss on this tape is `house` (§3), which is walked there in full.
 
 | arm | zog spike | admissible per G-MIND-3's pre-declaration | measured admissibility |
 |---|---|---|---|
@@ -264,9 +295,10 @@ replays; raised as unaffordable within this brief's budget, not silently skipped
 | *(reference, not comparable — pre-W3-2b formula)* life 2's own frozen `unblinded-1` | 0.9364 | 0.9563 |
 
 **Read against the correct twin (novelty-worker, both replayed under this worktree's own code, §2 — the
-`worker()` and `run_replay` novelty replays share the identical final hash `30fbc32f…`, a third
-independent confirmation of §1's byte-identity proof):** the arms do **not** simply separate from a flat
-baseline. **Comparator's +4 questions (156→160 of 160) is outside the ±1-question noise the other three
+`worker()` and `run_replay` novelty replays share the identical final hash `30fbc32f…`, which confirms
+`run_replay` and `worker()` are deterministic and mutually consistent on this tape, not identity to
+master — §1's pristine-vs-worktree comparison is the identity proof):** the arms do **not** simply
+separate from a flat baseline. **Comparator's +4 questions (156→160 of 160) is outside the ±1-question noise the other three
 arms show** and is the clearest single exam result here — consistent with §3's mechanism (its lr scales
 up only on a genuine established-answer mismatch, never on an unresolved "nothing born yet" glance the
 other arms also treat as maximal surprise). **The no-predict twin's +3 (156→159) is the finding worth
@@ -348,11 +380,14 @@ in-flight runs (genome 136→159 as tests were added; creature 133 OK before the
    modulation mechanism (any of the four arms) buys very little over a constant learning rate. Worth a
    read by whoever owns PREDICT's design, not a verdict this brief is positioned to render (one tape, one
    life, one exam).
-7. **Arm B's formula needs a FAST store meaningfully smaller than the SLOW store to ever produce a
-   nonzero reading** (§5) — at `FAST episodes 20000` against a SLOW store that reaches only ~700–800
-   cells over 24 h, the exhaustive episode search structurally dominates the cell search from very early
-   in a life. Not a bug; a design mismatch between the arm's premise and this genome's own store sizes,
-   raised for whoever might want arm B to work on a future life.
+7. **Arm B's zero reading (§5) is [Certain]; its explanation is [Likely], not settled.** The all-zero
+   measurement (`first3_med = last50_med = 0.0` on every new thing, both windows, 17,201 rows) is
+   certain. The population-size mechanism — the exhaustive `Episodes.nearest` search over a FAST store
+   20× the size of the SLOW store structurally can't fall meaningfully behind the cell search — is
+   inferred from **one** raw trace at zog's first canvas (seq 30002). A same-canvas glance-k/glance-1
+   alternative is not ruled out by that single point. Before arm B's premise is judged a design mismatch
+   for whoever might want it on a future life, the trace should be repeated at several new-thing
+   arrivals and several points in a tape — this brief's budget covered one.
 
 ---
 
