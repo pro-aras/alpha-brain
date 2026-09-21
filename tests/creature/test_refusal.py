@@ -180,6 +180,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # genes.py RUNS entries added by this task (docs/briefs/G5-I-SEAM-DELIVER-MOMENT.md).
         "DELIVER": "DELIVER  where fixation when instant act glance",
         "MOMENT": "MOMENT   keys sight words surprise where when act source",
+        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:35 +0400 — G-EYE-2/BIND: one row, matching
+        # the genes.py RUNS entry added by this task (docs/briefs/G5-J-BIND-COLOUR-RETINA.md).
+        "BIND": "BIND     glances per canvas",
     }
 
     def test_every_runs_gene_parses(self) -> None:

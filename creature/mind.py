@@ -40,7 +40,7 @@ from PIL import Image
 from creature import genes as genes_module
 from genome import gaze
 from genome.fast import Episodes
-from genome.machinery import Genome, GenomeError, Organism, parse_genome
+from genome.machinery import Genome, GenomeError, Organism, parse_genome, _unit
 from genome.park import Park
 from genome.predict import Predictor, file as predict_file, score as predict_score
 from creature.tape import _resolve_tape_dir   # W3-0b seam: the mind reads payloads where the genome says the tape is
@@ -91,6 +91,35 @@ SNAPSHOT_EVERY = 500
 # this is a code constant, sized like FAST's own smaller genomes (genome/G4.genome declares FAST 20000; this ring
 # carries far sparser traffic — one row per act/SIT-publish, not one per glance) — not a gene value.
 OUTCOME_EPISODES_CAP = 2000
+
+
+def _bind_pool(feats: List[np.ndarray]) -> List[np.ndarray]:
+    # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-2 (= G-MIND-2): the glances of
+    # one canvas become ONE moment. F's diagnostic (docs/briefs/G5-F-REPORT.md §1) found the mechanism —
+    # 77.5% of all sight births happen on glances 1-3, not glance 0, and those cells misfire ~10pp more
+    # and wire to >1 thing ~15pp more than glance-0 births — is BINDING (several looks at the SAME,
+    # correctly-fixated object each birthing their own cell), not clutter (an off-thing glance): 87.3% of
+    # the extra glance-1-3 births are themselves ON the thing. The fix: one shared percept, not four
+    # competing ones. The rule (EYE.md §1.3's transsaccadic-integration citation — "one object, several
+    # fixations, ONE percept" — names WHAT must happen, not an exact formula; this is the plain reading of
+    # it): MEAN the glances' feature vectors, then re-normalise to unit length. Mean (not max or first-
+    # glance-only) because every glance is a real, cheap, already-computed look at the same object under
+    # F's own finding (glance 0 is not "the good one" and the rest "noise" — 22.3% of ALL sight births,
+    # including many that never misfire, are already on glance 0; the diagnostic's signal is glance INDEX,
+    # not glance content). Unit-renormalise because Organism.cos() (genome/machinery.py:451) is a RAW dot
+    # product against unit-norm stored cells — Area.cells are always unit length (born directly from a
+    # RETINA `unit`-terminated vector, or from this pooled one) — a non-unit query would silently rescale
+    # every cosine comparison (BIRTH's THETA_N threshold included) and permanently corrupt the newborn
+    # cell's OWN stored vector norm forever after (the shape of #231(1): an unnormalised quantity treated
+    # as if it already were). Cost: one np.mean + one np.linalg.norm over a (co,4)-shaped or (4,144)-shaped
+    # array — microseconds, timed in docs/briefs/G5-J-REPORT.md.
+    # Returns a ONE-element list (or the input unchanged if empty) so every existing `for x in feats:` call
+    # site keeps working unchanged, now iterating once instead of F times — this is where "one canvas = one
+    # moment" actually happens: Organism.moment()/moment_sight() is called exactly once per canvas below,
+    # org.t advances by 1 per canvas instead of by GAZE.fixations (see the cadence table, G5-J-REPORT.md).
+    if not feats:
+        return feats
+    return [_unit(np.mean(np.stack(feats, axis=0), axis=0))]
 
 
 class Mind:
@@ -338,13 +367,22 @@ class Mind:
         payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
         rgb = np.asarray(Image.open(payload_path).convert("RGB"), dtype=np.uint8)
         mode = "random" if "gaze" in self.blind else "surprise"
-        g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"])
+        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-3/§3.6: colour=None unless
+        # SENSE colour is declared (Genome.colour, machinery.py) — a complete no-op call otherwise, byte-
+        # identical to every existing pin.
+        g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour)
         word = self.pending.pop(moment, None) if moment is not None else None
         # G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md): hoisted above PREDICT's error() call, which
         # arm "comparator" needs (a word's encoding, read-only) BEFORE Organism.moment() runs for this
         # canvas — encode_word is pure, so computing it here changes nothing else (word is None on a
         # sight-only canvas, xw stays None, exactly as arm "comparator"/"conjunctive" expect).
         xw = encode_word(word, self.genome.ear_blank_zero) if word is not None else None
+        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-2/BIND (_bind_pool, above):
+        # undeclared (the common case today) this is g["feats"] itself, unchanged — every existing `for x
+        # in g["feats"]:` loop below now reads `org_feats` instead, with IDENTICAL contents when BIND is
+        # off. Declared: ONE pooled vector, so the loops below run their body once instead of F times —
+        # this is the whole of "one canvas = one moment" (org.t advances by 1, not by GAZE.fixations).
+        org_feats = _bind_pool(g["feats"]) if "BIND" in self.genome.declared else g["feats"]
 
         # PREREG §11.1 step 1 (PREDICT): measured once, on the FIRST glance, regardless of whether this
         # canvas has a word — a sight-only canvas is just as surprising or expected as a worded one.
@@ -394,8 +432,8 @@ class Mind:
                 if "ARRIVAL" in self.genome.declared:
                     self.org.new_arrival()
                     arrival_n = int(self.org.arrivals)
-            for x in g["feats"]:
-                self.moment_word[self.org.t] = word          # keyed by the organism's OWN moment counter, one per glance
+            for x in org_feats:
+                self.moment_word[self.org.t] = word          # keyed by the organism's OWN moment counter, one per glance (or one per canvas under BIND)
                 S, T = self.org.moment(x, xw, lr_scale=lr_scale)
                 if predict_on:
                     self.predictor.note_winners(S)
@@ -428,7 +466,7 @@ class Mind:
             # questions.build_ledgers needs moment_thing[m] for EVERY birth moment, sight-only ones
             # included, or snapshot() KeyErrors the first time such a birth happens (caught by this
             # test, not by inspection) -- word "" here, exactly what the written episode itself carries.
-            for x in g["feats"]:
+            for x in org_feats:
                 self.moment_word[self.org.t] = ""
                 self.org.moment_sight(x)
             xw_blank = encode_word("", self.genome.ear_blank_zero)

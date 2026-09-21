@@ -1,3 +1,6 @@
+# edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:15 +0400 -- copied VERBATIM from branch g5-repairs
+# (worktree /data/dev/genome-wt-k, commit 0e9be70) per docs/briefs/G5-J-BIND-COLOUR-RETINA.md item 3; not
+# one byte of the module below changed. genome/gaze.py's adoption (this branch's own wiring) is below.
 # edit: Claude (Sonnet 5, builder F), 2026-09-21 16:53 +0400 -- G5-F task 3 (docs/briefs/G5-F-BIND-DIAGNOSTIC-AND-REPAIRS.md
 # item 3; EYE.md §0.3 row 2 / gap 9): a numpy-vectorised drop-in for organs/retina.py's `cell_means` --
 # the pure-Python loop over every pixel that is 4.77 ms of the retina's 5.42 ms (88%, EYE.md §0.3).

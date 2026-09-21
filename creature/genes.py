@@ -101,6 +101,10 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # undeclared MOMENT never passes it to Episodes.write). Neither writes into x_s/x_w (the parity test proves it).
         "DELIVER": "creature/mind.py:Mind._consume_eye ('deliver_on' gates computing seam0 — where/when/act/source/glance — from the eye's own glance windows + the tape row, and gates the journal row's extra keys)",
         "MOMENT": "creature/mind.py:Mind._consume_eye ('moment_on' gates whether seam0 is passed to Episodes.write) + genome/fast.py:Episodes (the where/when/act/source/glance columns, get(), nearest_where(), save()/load())",
+        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:35 +0400 — G-EYE-2/BIND (docs/briefs/G5-J-BIND-COLOUR-RETINA.md):
+        # the real call site is _bind_pool() (module-level, top of creature/mind.py) + its use in Mind._consume_eye,
+        # gated on "BIND" in declared, both branches (word-bearing and sight-only).
+        "BIND": "creature/mind.py:_bind_pool + Mind._consume_eye (org_feats = _bind_pool(g['feats']) when declared; org.moment/moment_sight called once per canvas instead of once per glance)",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
     },
 }

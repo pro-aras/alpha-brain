@@ -1,3 +1,6 @@
+# edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:15 +0400 -- copied VERBATIM from branch g5-repairs
+# (worktree /data/dev/genome-wt-k, commit 0e9be70); not one byte changed. This branch's own identity test
+# against life 3a's tape lives in tests/genome/test_retina_fast_life3a.py, added below.
 # edit: Claude (Sonnet 5, builder F), 2026-09-21 17:14 +0400 -- G5-F task 3 (docs/briefs/G5-F-BIND-DIAGNOSTIC-AND-REPAIRS.md
 # item 3; EYE.md §0.3 row 2 / gap 9): tests for genome/retina_fast.py, the numpy-vectorised drop-in for
 # organs/retina.py's cell_means. Full byte-identity over life 2's 17,768-canvas tape is reported in
