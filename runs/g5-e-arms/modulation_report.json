@@ -1,0 +1,682 @@
+{
+  "novelty": {
+    "graded_windows": [
+      {
+        "window": "1",
+        "new": 5,
+        "spike": 4,
+        "settled": 1,
+        "pass": false
+      },
+      {
+        "window": "3",
+        "new": 1,
+        "spike": 1,
+        "settled": 0,
+        "pass": false
+      }
+    ],
+    "null": {
+      "at_seq": 4302,
+      "last50_med": 0.014,
+      "spike_ratio_per_thing": {
+        "arrow": 1.3,
+        "bar": 1.2,
+        "circle": 0.28,
+        "cross": 1.38,
+        "diamond": 0.87,
+        "dot": 1.96,
+        "ring": 0.82,
+        "square": 0.2,
+        "star": 0.68,
+        "triangle": 1.14,
+        "wave": 1.69
+      },
+      "no_spike": false
+    },
+    "pass": false,
+    "windows_1_3": {
+      "1": {
+        "at_seq": 8602,
+        "last50_med": 0.0161,
+        "new_things": [
+          "cup",
+          "house",
+          "key",
+          "moon",
+          "tree"
+        ],
+        "returning_things": [],
+        "per_thing": {
+          "cup": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 62.11,
+            "spike": true,
+            "err_10th": 1.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "house": {
+            "kind": "new",
+            "first3_med": 0.0431,
+            "spike_ratio": 2.68,
+            "spike": false,
+            "err_10th": 1.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "key": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 62.11,
+            "spike": true,
+            "err_10th": 0.0207,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "moon": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 62.11,
+            "spike": true,
+            "err_10th": 0.0039,
+            "settled": true,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "tree": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 62.11,
+            "spike": true,
+            "err_10th": 0.022,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          }
+        }
+      },
+      "3": {
+        "at_seq": 25804,
+        "last50_med": 0.0146,
+        "new_things": [
+          "zog"
+        ],
+        "returning_things": [
+          "cup",
+          "house",
+          "key",
+          "moon",
+          "tree"
+        ],
+        "per_thing": {
+          "zog": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 68.26,
+            "spike": true,
+            "err_10th": null,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "cup": {
+            "kind": "returning",
+            "first3_med": 0.0267,
+            "spike_ratio": 1.82,
+            "spike": false,
+            "err_10th": 0.034,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "house": {
+            "kind": "returning",
+            "first3_med": 0.0187,
+            "spike_ratio": 1.28,
+            "spike": false,
+            "err_10th": 0.0193,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "key": {
+            "kind": "returning",
+            "first3_med": 0.0204,
+            "spike_ratio": 1.39,
+            "spike": false,
+            "err_10th": 0.035,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "moon": {
+            "kind": "returning",
+            "first3_med": 0.0262,
+            "spike_ratio": 1.79,
+            "spike": false,
+            "err_10th": 0.0258,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "tree": {
+            "kind": "returning",
+            "first3_med": 0.0058,
+            "spike_ratio": 0.4,
+            "spike": false,
+            "err_10th": 0.003,
+            "settled": true,
+            "settled_toy_bar_F_plus_05": true
+          }
+        }
+      }
+    },
+    "n_err_rows": 17201
+  },
+  "conjunctive": {
+    "graded_windows": [
+      {
+        "window": "1",
+        "new": 5,
+        "spike": 5,
+        "settled": 1,
+        "pass": false
+      },
+      {
+        "window": "3",
+        "new": 1,
+        "spike": 1,
+        "settled": 0,
+        "pass": false
+      }
+    ],
+    "null": {
+      "at_seq": 4302,
+      "last50_med": 0.0149,
+      "spike_ratio_per_thing": {
+        "arrow": 1.23,
+        "bar": 1.13,
+        "circle": 0.27,
+        "cross": 1.3,
+        "diamond": 0.95,
+        "dot": 1.85,
+        "ring": 0.77,
+        "square": 0.19,
+        "star": 0.64,
+        "triangle": 1.07,
+        "wave": 1.6
+      },
+      "no_spike": false
+    },
+    "pass": false,
+    "windows_1_3": {
+      "1": {
+        "at_seq": 8602,
+        "last50_med": 0.0161,
+        "new_things": [
+          "cup",
+          "house",
+          "key",
+          "moon",
+          "tree"
+        ],
+        "returning_things": [],
+        "per_thing": {
+          "cup": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 62.11,
+            "spike": true,
+            "err_10th": 1.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "house": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 62.11,
+            "spike": true,
+            "err_10th": 1.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "key": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 62.11,
+            "spike": true,
+            "err_10th": 0.0207,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "moon": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 62.11,
+            "spike": true,
+            "err_10th": 0.0039,
+            "settled": true,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "tree": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 62.11,
+            "spike": true,
+            "err_10th": 0.022,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          }
+        }
+      },
+      "3": {
+        "at_seq": 25804,
+        "last50_med": 0.0156,
+        "new_things": [
+          "zog"
+        ],
+        "returning_things": [
+          "cup",
+          "house",
+          "key",
+          "moon",
+          "tree"
+        ],
+        "per_thing": {
+          "zog": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 64.31,
+            "spike": true,
+            "err_10th": null,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "cup": {
+            "kind": "returning",
+            "first3_med": 0.0267,
+            "spike_ratio": 1.72,
+            "spike": false,
+            "err_10th": 0.034,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "house": {
+            "kind": "returning",
+            "first3_med": 0.0187,
+            "spike_ratio": 1.2,
+            "spike": false,
+            "err_10th": 0.0278,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "key": {
+            "kind": "returning",
+            "first3_med": 0.0204,
+            "spike_ratio": 1.31,
+            "spike": false,
+            "err_10th": 0.035,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "moon": {
+            "kind": "returning",
+            "first3_med": 0.0262,
+            "spike_ratio": 1.68,
+            "spike": false,
+            "err_10th": 0.0258,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "tree": {
+            "kind": "returning",
+            "first3_med": 0.0058,
+            "spike_ratio": 0.37,
+            "spike": false,
+            "err_10th": 0.003,
+            "settled": true,
+            "settled_toy_bar_F_plus_05": true
+          }
+        }
+      }
+    },
+    "n_err_rows": 17201
+  },
+  "episodic": {
+    "graded_windows": [
+      {
+        "window": "1",
+        "new": 5,
+        "spike": 0,
+        "settled": 0,
+        "pass": false
+      },
+      {
+        "window": "3",
+        "new": 1,
+        "spike": 0,
+        "settled": 0,
+        "pass": false
+      }
+    ],
+    "null": {
+      "at_seq": 4302,
+      "last50_med": 0.0,
+      "spike_ratio_per_thing": {
+        "arrow": null,
+        "bar": null,
+        "circle": null,
+        "cross": null,
+        "diamond": null,
+        "dot": null,
+        "ring": null,
+        "square": null,
+        "star": null,
+        "triangle": null,
+        "wave": null
+      },
+      "no_spike": false
+    },
+    "pass": false,
+    "windows_1_3": {
+      "1": {
+        "at_seq": 8602,
+        "last50_med": 0.0,
+        "new_things": [
+          "cup",
+          "house",
+          "key",
+          "moon",
+          "tree"
+        ],
+        "returning_things": [],
+        "per_thing": {
+          "cup": {
+            "kind": "new",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "house": {
+            "kind": "new",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "key": {
+            "kind": "new",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "moon": {
+            "kind": "new",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "tree": {
+            "kind": "new",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          }
+        }
+      },
+      "3": {
+        "at_seq": 25804,
+        "last50_med": 0.0,
+        "new_things": [
+          "zog"
+        ],
+        "returning_things": [
+          "cup",
+          "house",
+          "key",
+          "moon",
+          "tree"
+        ],
+        "per_thing": {
+          "zog": {
+            "kind": "new",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": null,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "cup": {
+            "kind": "returning",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "house": {
+            "kind": "returning",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "key": {
+            "kind": "returning",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "moon": {
+            "kind": "returning",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "tree": {
+            "kind": "returning",
+            "first3_med": 0.0,
+            "spike_ratio": null,
+            "spike": false,
+            "err_10th": 0.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          }
+        }
+      }
+    },
+    "n_err_rows": 17201
+  },
+  "comparator": {
+    "graded_windows": [
+      {
+        "window": "1",
+        "new": 5,
+        "spike": 5,
+        "settled": 1,
+        "pass": false
+      },
+      {
+        "window": "3",
+        "new": 1,
+        "spike": 1,
+        "settled": 0,
+        "pass": false
+      }
+    ],
+    "null": {
+      "at_seq": 4302,
+      "last50_med": 0.0149,
+      "spike_ratio_per_thing": {
+        "arrow": 1.23,
+        "bar": 1.13,
+        "circle": 0.27,
+        "cross": 1.3,
+        "diamond": 0.61,
+        "dot": 1.85,
+        "ring": 0.77,
+        "square": 0.19,
+        "star": 0.64,
+        "triangle": 1.07,
+        "wave": 1.6
+      },
+      "no_spike": false
+    },
+    "pass": false,
+    "windows_1_3": {
+      "1": {
+        "at_seq": 8602,
+        "last50_med": 0.0156,
+        "new_things": [
+          "cup",
+          "house",
+          "key",
+          "moon",
+          "tree"
+        ],
+        "returning_things": [],
+        "per_thing": {
+          "cup": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 64.1,
+            "spike": true,
+            "err_10th": 1.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "house": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 64.1,
+            "spike": true,
+            "err_10th": 1.0,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "key": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 64.1,
+            "spike": true,
+            "err_10th": 0.0207,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "moon": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 64.1,
+            "spike": true,
+            "err_10th": 0.0039,
+            "settled": true,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "tree": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 64.1,
+            "spike": true,
+            "err_10th": 0.022,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          }
+        }
+      },
+      "3": {
+        "at_seq": 25804,
+        "last50_med": 0.0146,
+        "new_things": [
+          "zog"
+        ],
+        "returning_things": [
+          "cup",
+          "house",
+          "key",
+          "moon",
+          "tree"
+        ],
+        "per_thing": {
+          "zog": {
+            "kind": "new",
+            "first3_med": 1.0,
+            "spike_ratio": 68.73,
+            "spike": true,
+            "err_10th": null,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": false
+          },
+          "cup": {
+            "kind": "returning",
+            "first3_med": 0.0267,
+            "spike_ratio": 1.84,
+            "spike": false,
+            "err_10th": 0.034,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "house": {
+            "kind": "returning",
+            "first3_med": 0.0182,
+            "spike_ratio": 1.25,
+            "spike": false,
+            "err_10th": 0.0185,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "key": {
+            "kind": "returning",
+            "first3_med": 0.0204,
+            "spike_ratio": 1.4,
+            "spike": false,
+            "err_10th": 0.035,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "moon": {
+            "kind": "returning",
+            "first3_med": 0.0262,
+            "spike_ratio": 1.8,
+            "spike": false,
+            "err_10th": 0.0258,
+            "settled": false,
+            "settled_toy_bar_F_plus_05": true
+          },
+          "tree": {
+            "kind": "returning",
+            "first3_med": 0.0058,
+            "spike_ratio": 0.4,
+            "spike": false,
+            "err_10th": 0.0045,
+            "settled": true,
+            "settled_toy_bar_F_plus_05": true
+          }
+        }
+      }
+    },
+    "n_err_rows": 17201
+  },
+  "no_predict_twin": {
+    "n": 17201,
+    "max_err": 0.0
+  }
+}

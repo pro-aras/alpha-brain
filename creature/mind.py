@@ -1,3 +1,8 @@
+# edit: Claude (Sonnet 5, builder E), 2026-09-21 16:58 +0400 — G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md):
+# PREDICT's word encoding (`xw`) hoisted above the error() call and passed through (word=, xw=, episodes=)
+# so arms "conjunctive"/"episodic"/"comparator" (genome/predict.py) can read them; the default "novelty"
+# arm ignores all three (byte-identical). `self.predictor` now built with `arm=genome.declared["PREDICT"]
+# ["arm"]` (init and resume()).
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 21:41 +0400 — A2: the mind (docs/G4-PREREG.md §2.3, §2.4, §2.7).
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-20 00:55 +0400 — A9/A10 (wave 2, PREREG §11.1 steps 1/2/4):
 # PREDICT+FAST wired per canvas (err/lr/ep on the mind row; sight-only canvases now live through
@@ -117,7 +122,13 @@ class Mind:
             Episodes(int(self.genome.declared["FAST"]["episodes"]), self.genome.sight_dim(), self.genome.words_dim())
             if "FAST" in self.genome.declared else None
         )
-        self.predictor: Optional[Predictor] = Predictor(self.org) if "PREDICT" in self.genome.declared else None
+        # G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md): the arm name lives on the genome's PREDICT
+        # clause (machinery.py's parser, default "novelty" when the genome's PREDICT line carries no
+        # trailing "; error <arm>" — every genome on disk before this edit, G4.genome included).
+        self.predictor: Optional[Predictor] = (
+            Predictor(self.org, arm=self.genome.declared["PREDICT"].get("arm", "novelty"))
+            if "PREDICT" in self.genome.declared else None
+        )
         self._last_sleep_at: int = 0        # org.t at the last SLEEP boundary crossed
 
         # A11 (PREREG §11.1 step 3): THINK is gated on "THINK" in genome.declared, which requires a
@@ -189,6 +200,11 @@ class Mind:
         mode = "random" if "gaze" in self.blind else "surprise"
         g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"])
         word = self.pending.pop(moment, None) if moment is not None else None
+        # G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md): hoisted above PREDICT's error() call, which
+        # arm "comparator" needs (a word's encoding, read-only) BEFORE Organism.moment() runs for this
+        # canvas — encode_word is pure, so computing it here changes nothing else (word is None on a
+        # sight-only canvas, xw stays None, exactly as arm "comparator"/"conjunctive" expect).
+        xw = encode_word(word, self.genome.ear_blank_zero) if word is not None else None
 
         # PREREG §11.1 step 1 (PREDICT): measured once, on the FIRST glance, regardless of whether this
         # canvas has a word — a sight-only canvas is just as surprising or expected as a worded one.
@@ -196,7 +212,9 @@ class Mind:
         fast_on = self.episodes is not None
         err, lr_scale = 0.0, 1.0
         if predict_on and g["feats"]:
-            err = self.predictor.error(g["feats"][0])
+            # G5-E: word/xw/episodes passed unconditionally — the default "novelty" arm ignores all
+            # three (genome/predict.py's error(), byte-identical branch).
+            err = self.predictor.error(g["feats"][0], word=word, xw=xw, episodes=self.episodes)
             lr_scale = self.predictor.modulate(1.0)
         t_at_f0 = self.org.t
         f0 = g["feats"][0] if g["feats"] else None
@@ -205,7 +223,6 @@ class Mind:
             births_before = len(self.org.births)
             edges_before = len(self.org.edges_log)
             prunes_before = len(self.org.prunes_log)
-            xw = encode_word(word, self.genome.ear_blank_zero)
             # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15: a never-heard word is an ARRIVAL — the birth budget is
             # fresh BEFORE the moment that first meets it (life 1 never called new_arrival: arrivals 0, budget spent once,
             # 419 births refused, nothing born after 07:41 +04). Gated on the gene: an undeclared ARRIVAL changes nothing.
@@ -720,7 +737,10 @@ class Mind:
             # the LOADED org (a stale reference here would silently expect() off a dead, pre-resume
             # organism) -- caught by tracing the constructor, not by a test failure.
             if "PREDICT" in mind.genome.declared:
-                mind.predictor = Predictor(mind.org)
+                # G5-E: _word_seen (arm "conjunctive") is NOT persisted (see genome/predict.py's module
+                # docstring) — a resumed life restarts every word's count at 0. Out of scope for this
+                # brief (replay-only); raised in G5-E-REPORT.md.
+                mind.predictor = Predictor(mind.org, arm=mind.genome.declared["PREDICT"].get("arm", "novelty"))
                 last_winner = ledger.get("predictor_last_winner")
                 if last_winner is not None:
                     mind.predictor._last_winner = np.array(last_winner, dtype=np.float64)

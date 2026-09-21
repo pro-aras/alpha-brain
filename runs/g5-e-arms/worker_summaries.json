@@ -1,0 +1,1054 @@
+{
+  "no-predict-twin": {
+    "label": "no-predict-twin",
+    "arrivals": 17,
+    "budget_left": 360,
+    "births": 720,
+    "c": {
+      "births_novelty_sight": 493,
+      "births_novelty_words": 17,
+      "births_error_sight": 210,
+      "births_error_words": 0,
+      "births_refused_budget": 0,
+      "births_refused_nmax": 0,
+      "births_refused_frozen": 0,
+      "births_refused_redundant": 4657,
+      "edges_born": 12721,
+      "edges_pruned": 12329,
+      "cells_merged_sight": 28,
+      "cells_merged_words": 0,
+      "scale_events": 76,
+      "removed_for_disuse": 0
+    },
+    "cells": [
+      675,
+      17
+    ],
+    "cells_born": 720,
+    "edges_cross": {
+      "born": 4519,
+      "pruned": 4466,
+      "born_total": 12721,
+      "pruned_total": 12329
+    },
+    "sleeps": 38,
+    "thinks": 1720,
+    "parked": 0,
+    "canvases": 17201,
+    "seconds": 2183.7,
+    "ms_per_canvas": 126.95,
+    "hash": "01034dc3aa259aec3e853ccb0a6d371ef2b7ce57317626d926415b9ef7bbfc9c",
+    "exam_stderr": "",
+    "exam": {
+      "at": "2026-09-21T13:30:26+00:00",
+      "genome": "/data/dev/genome-wt-j/genome/G4.genome",
+      "snapshot_last_seq": 34402,
+      "moments": 76404,
+      "cells": [
+        675,
+        17
+      ],
+      "words_seen": [
+        "arrow",
+        "bar",
+        "circle",
+        "cross",
+        "cup",
+        "diamond",
+        "dot",
+        "house",
+        "key",
+        "moon",
+        "ring",
+        "square",
+        "star",
+        "tree",
+        "triangle",
+        "wave",
+        "zog"
+      ],
+      "held_per_thing": 10,
+      "chance_q1": 0.059,
+      "disjoint_checked": 190,
+      "disjoint_control_caught": true,
+      "ask_seen_words": {
+        "Q1": {
+          "acc": 0.990909090909091,
+          "n": 110,
+          "correct": 109,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 1,
+            "close": 0
+          },
+          "false_abstention": 0.00909090909090909,
+          "per_thing": {
+            "circle": 0.9,
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 1.0,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 1.0
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 0.9090909090909091,
+          "n": 11,
+          "correct": 10,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "tree",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond"
+          }
+        },
+        "Q3": {
+          "acc": 1.0,
+          "n": 110,
+          "correct": 110,
+          "true_pairs_abstained": 0,
+          "ceiling": 0.9954545454545455
+        },
+        "Q4": {
+          "acc": 1.0,
+          "n": 110,
+          "correct": 110,
+          "ties": 0
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.975
+      },
+      "ask_all_words": {
+        "Q1": {
+          "acc": 0.99375,
+          "n": 160,
+          "correct": 159,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 1,
+            "close": 0
+          },
+          "false_abstention": 0.00625,
+          "per_thing": {
+            "circle": 0.9,
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 1.0,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 1.0,
+            "moon": 1.0,
+            "house": 1.0,
+            "tree": 1.0,
+            "cup": 1.0,
+            "key": 1.0
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 0.9375,
+          "n": 16,
+          "correct": 15,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "tree",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond",
+            "moon": "moon",
+            "house": "house",
+            "tree": "tree",
+            "cup": "cup",
+            "key": "key"
+          }
+        },
+        "Q3": {
+          "acc": 1.0,
+          "n": 160,
+          "correct": 160,
+          "true_pairs_abstained": 0,
+          "ceiling": 0.996875
+        },
+        "Q4": {
+          "acc": 1.0,
+          "n": 160,
+          "correct": 160,
+          "ties": 0
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.9828125
+      },
+      "gaze_landing": {
+        "rate": 1.0,
+        "n": 110,
+        "hit": 110,
+        "per_thing": {
+          "circle": 1.0,
+          "square": 1.0,
+          "triangle": 1.0,
+          "cross": 1.0,
+          "ring": 1.0,
+          "bar": 1.0,
+          "dot": 1.0,
+          "star": 1.0,
+          "arrow": 1.0,
+          "wave": 1.0,
+          "diamond": 1.0
+        },
+        "first": 2
+      },
+      "organism_hash_unchanged_by_exam": true,
+      "seconds": 2.9
+    }
+  },
+  "arm-conjunctive": {
+    "label": "arm-conjunctive",
+    "arrivals": 17,
+    "budget_left": 346,
+    "births": 807,
+    "c": {
+      "births_novelty_sight": 492,
+      "births_novelty_words": 17,
+      "births_error_sight": 298,
+      "births_error_words": 0,
+      "births_refused_budget": 0,
+      "births_refused_nmax": 0,
+      "births_refused_frozen": 0,
+      "births_refused_redundant": 6972,
+      "edges_born": 11796,
+      "edges_pruned": 11310,
+      "cells_merged_sight": 55,
+      "cells_merged_words": 0,
+      "scale_events": 76,
+      "removed_for_disuse": 0
+    },
+    "cells": [
+      735,
+      17
+    ],
+    "cells_born": 807,
+    "edges_cross": {
+      "born": 4006,
+      "pruned": 3926,
+      "born_total": 11796,
+      "pruned_total": 11310
+    },
+    "sleeps": 38,
+    "thinks": 1720,
+    "parked": 0,
+    "canvases": 17201,
+    "seconds": 2255.7,
+    "ms_per_canvas": 131.14,
+    "hash": "b986d873bd07057c16546578f48d86298f777704eee1957dd1a1b5a158222457",
+    "exam_stderr": "",
+    "exam": {
+      "at": "2026-09-21T13:31:38+00:00",
+      "genome": "/data/dev/genome-wt-j/runs/g5-e-arms/genomes/G4-arm-conjunctive.genome",
+      "snapshot_last_seq": 34402,
+      "moments": 76404,
+      "cells": [
+        735,
+        17
+      ],
+      "words_seen": [
+        "arrow",
+        "bar",
+        "circle",
+        "cross",
+        "cup",
+        "diamond",
+        "dot",
+        "house",
+        "key",
+        "moon",
+        "ring",
+        "square",
+        "star",
+        "tree",
+        "triangle",
+        "wave",
+        "zog"
+      ],
+      "held_per_thing": 10,
+      "chance_q1": 0.059,
+      "disjoint_checked": 190,
+      "disjoint_control_caught": true,
+      "ask_seen_words": {
+        "Q1": {
+          "acc": 0.990909090909091,
+          "n": 110,
+          "correct": 109,
+          "abstain": {
+            "novel": 0,
+            "noedge": 1,
+            "ratio": 0,
+            "close": 0
+          },
+          "false_abstention": 0.00909090909090909,
+          "per_thing": {
+            "circle": 1.0,
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 1.0,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 0.9
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 1.0,
+          "n": 11,
+          "correct": 11,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "triangle",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond"
+          }
+        },
+        "Q3": {
+          "acc": 1.0,
+          "n": 110,
+          "correct": 110,
+          "true_pairs_abstained": 0,
+          "ceiling": 0.9954545454545455
+        },
+        "Q4": {
+          "acc": 0.990909090909091,
+          "n": 110,
+          "correct": 109,
+          "ties": 1
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.9954545454545456
+      },
+      "ask_all_words": {
+        "Q1": {
+          "acc": 0.98125,
+          "n": 160,
+          "correct": 157,
+          "abstain": {
+            "novel": 0,
+            "noedge": 1,
+            "ratio": 2,
+            "close": 0
+          },
+          "false_abstention": 0.01875,
+          "per_thing": {
+            "circle": 1.0,
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 1.0,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 0.9,
+            "moon": 1.0,
+            "house": 1.0,
+            "tree": 0.8,
+            "cup": 1.0,
+            "key": 1.0
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 1.0,
+          "n": 16,
+          "correct": 16,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "triangle",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond",
+            "moon": "moon",
+            "house": "house",
+            "tree": "tree",
+            "cup": "cup",
+            "key": "key"
+          }
+        },
+        "Q3": {
+          "acc": 0.99375,
+          "n": 160,
+          "correct": 159,
+          "true_pairs_abstained": 1,
+          "ceiling": 0.990625
+        },
+        "Q4": {
+          "acc": 0.99375,
+          "n": 160,
+          "correct": 159,
+          "ties": 1
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.9921875
+      },
+      "gaze_landing": {
+        "rate": 1.0,
+        "n": 110,
+        "hit": 110,
+        "per_thing": {
+          "circle": 1.0,
+          "square": 1.0,
+          "triangle": 1.0,
+          "cross": 1.0,
+          "ring": 1.0,
+          "bar": 1.0,
+          "dot": 1.0,
+          "star": 1.0,
+          "arrow": 1.0,
+          "wave": 1.0,
+          "diamond": 1.0
+        },
+        "first": 2
+      },
+      "organism_hash_unchanged_by_exam": true,
+      "seconds": 2.9
+    }
+  },
+  "arm-comparator": {
+    "label": "arm-comparator",
+    "arrivals": 17,
+    "budget_left": 346,
+    "births": 803,
+    "c": {
+      "births_novelty_sight": 489,
+      "births_novelty_words": 17,
+      "births_error_sight": 297,
+      "births_error_words": 0,
+      "births_refused_budget": 0,
+      "births_refused_nmax": 0,
+      "births_refused_frozen": 0,
+      "births_refused_redundant": 6907,
+      "edges_born": 11753,
+      "edges_pruned": 11233,
+      "cells_merged_sight": 61,
+      "cells_merged_words": 0,
+      "scale_events": 76,
+      "removed_for_disuse": 0
+    },
+    "cells": [
+      725,
+      17
+    ],
+    "cells_born": 803,
+    "edges_cross": {
+      "born": 4136,
+      "pruned": 4041,
+      "born_total": 11753,
+      "pruned_total": 11233
+    },
+    "sleeps": 38,
+    "thinks": 1720,
+    "parked": 0,
+    "canvases": 17201,
+    "seconds": 2264.8,
+    "ms_per_canvas": 131.67,
+    "hash": "3f12e165e8a0999de505fcfa8c89e5c3cad77baa8f4720b92e87186bbd6f0481",
+    "exam_stderr": "",
+    "exam": {
+      "at": "2026-09-21T13:31:47+00:00",
+      "genome": "/data/dev/genome-wt-j/runs/g5-e-arms/genomes/G4-arm-comparator.genome",
+      "snapshot_last_seq": 34402,
+      "moments": 76404,
+      "cells": [
+        725,
+        17
+      ],
+      "words_seen": [
+        "arrow",
+        "bar",
+        "circle",
+        "cross",
+        "cup",
+        "diamond",
+        "dot",
+        "house",
+        "key",
+        "moon",
+        "ring",
+        "square",
+        "star",
+        "tree",
+        "triangle",
+        "wave",
+        "zog"
+      ],
+      "held_per_thing": 10,
+      "chance_q1": 0.059,
+      "disjoint_checked": 190,
+      "disjoint_control_caught": true,
+      "ask_seen_words": {
+        "Q1": {
+          "acc": 1.0,
+          "n": 110,
+          "correct": 110,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "false_abstention": 0.0,
+          "per_thing": {
+            "circle": 1.0,
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 1.0,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 1.0
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 0.9090909090909091,
+          "n": 11,
+          "correct": 10,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "tree",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond"
+          }
+        },
+        "Q3": {
+          "acc": 1.0,
+          "n": 110,
+          "correct": 110,
+          "true_pairs_abstained": 0,
+          "ceiling": 1.0
+        },
+        "Q4": {
+          "acc": 1.0,
+          "n": 110,
+          "correct": 110,
+          "ties": 0
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.9772727272727273
+      },
+      "ask_all_words": {
+        "Q1": {
+          "acc": 1.0,
+          "n": 160,
+          "correct": 160,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "false_abstention": 0.0,
+          "per_thing": {
+            "circle": 1.0,
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 1.0,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 1.0,
+            "moon": 1.0,
+            "house": 1.0,
+            "tree": 1.0,
+            "cup": 1.0,
+            "key": 1.0
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 0.9375,
+          "n": 16,
+          "correct": 15,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "tree",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond",
+            "moon": "moon",
+            "house": "house",
+            "tree": "tree",
+            "cup": "cup",
+            "key": "key"
+          }
+        },
+        "Q3": {
+          "acc": 1.0,
+          "n": 160,
+          "correct": 160,
+          "true_pairs_abstained": 0,
+          "ceiling": 1.0
+        },
+        "Q4": {
+          "acc": 1.0,
+          "n": 160,
+          "correct": 160,
+          "ties": 0
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.984375
+      },
+      "gaze_landing": {
+        "rate": 1.0,
+        "n": 110,
+        "hit": 110,
+        "per_thing": {
+          "circle": 1.0,
+          "square": 1.0,
+          "triangle": 1.0,
+          "cross": 1.0,
+          "ring": 1.0,
+          "bar": 1.0,
+          "dot": 1.0,
+          "star": 1.0,
+          "arrow": 1.0,
+          "wave": 1.0,
+          "diamond": 1.0
+        },
+        "first": 2
+      },
+      "organism_hash_unchanged_by_exam": true,
+      "seconds": 2.8
+    }
+  },
+  "arm-episodic": {
+    "label": "arm-episodic",
+    "arrivals": 17,
+    "budget_left": 356,
+    "births": 780,
+    "c": {
+      "births_novelty_sight": 489,
+      "births_novelty_words": 17,
+      "births_error_sight": 274,
+      "births_error_words": 0,
+      "births_refused_budget": 0,
+      "births_refused_nmax": 0,
+      "births_refused_frozen": 0,
+      "births_refused_redundant": 6895,
+      "edges_born": 10290,
+      "edges_pruned": 9810,
+      "cells_merged_sight": 56,
+      "cells_merged_words": 0,
+      "scale_events": 76,
+      "removed_for_disuse": 0
+    },
+    "cells": [
+      707,
+      17
+    ],
+    "cells_born": 780,
+    "edges_cross": {
+      "born": 3949,
+      "pruned": 3871,
+      "born_total": 10290,
+      "pruned_total": 9810
+    },
+    "sleeps": 38,
+    "thinks": 1720,
+    "parked": 1,
+    "canvases": 17201,
+    "seconds": 2330.0,
+    "ms_per_canvas": 135.46,
+    "hash": "58151b6920f286f6e682f71b9e155cd45a090dc503c09f2e34e59840dfa05634",
+    "exam_stderr": "",
+    "exam": {
+      "at": "2026-09-21T13:32:52+00:00",
+      "genome": "/data/dev/genome-wt-j/runs/g5-e-arms/genomes/G4-arm-episodic.genome",
+      "snapshot_last_seq": 34402,
+      "moments": 76404,
+      "cells": [
+        707,
+        17
+      ],
+      "words_seen": [
+        "arrow",
+        "bar",
+        "circle",
+        "cross",
+        "cup",
+        "diamond",
+        "dot",
+        "house",
+        "key",
+        "moon",
+        "ring",
+        "square",
+        "star",
+        "tree",
+        "triangle",
+        "wave",
+        "zog"
+      ],
+      "held_per_thing": 10,
+      "chance_q1": 0.059,
+      "disjoint_checked": 190,
+      "disjoint_control_caught": true,
+      "ask_seen_words": {
+        "Q1": {
+          "acc": 0.9727272727272728,
+          "n": 110,
+          "correct": 107,
+          "abstain": {
+            "novel": 0,
+            "noedge": 2,
+            "ratio": 1,
+            "close": 0
+          },
+          "false_abstention": 0.02727272727272727,
+          "per_thing": {
+            "circle": 1.0,
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 0.8,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 0.9
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 1.0,
+          "n": 11,
+          "correct": 11,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "triangle",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond"
+          }
+        },
+        "Q3": {
+          "acc": 0.9727272727272728,
+          "n": 110,
+          "correct": 107,
+          "true_pairs_abstained": 3,
+          "ceiling": 0.9863636363636363
+        },
+        "Q4": {
+          "acc": 0.9818181818181818,
+          "n": 110,
+          "correct": 108,
+          "ties": 2
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.9818181818181818
+      },
+      "ask_all_words": {
+        "Q1": {
+          "acc": 0.98125,
+          "n": 160,
+          "correct": 157,
+          "abstain": {
+            "novel": 0,
+            "noedge": 2,
+            "ratio": 1,
+            "close": 0
+          },
+          "false_abstention": 0.01875,
+          "per_thing": {
+            "circle": 1.0,
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0,
+            "ring": 1.0,
+            "bar": 1.0,
+            "dot": 0.8,
+            "star": 1.0,
+            "arrow": 1.0,
+            "wave": 1.0,
+            "diamond": 0.9,
+            "moon": 1.0,
+            "house": 1.0,
+            "tree": 1.0,
+            "cup": 1.0,
+            "key": 1.0
+          },
+          "answers_from_multi_word_cells": 0
+        },
+        "Q2": {
+          "acc": 1.0,
+          "n": 16,
+          "correct": 16,
+          "abstain": {
+            "novel": 0,
+            "noedge": 0,
+            "ratio": 0,
+            "close": 0
+          },
+          "detail": {
+            "circle": "circle",
+            "square": "square",
+            "triangle": "triangle",
+            "cross": "cross",
+            "ring": "ring",
+            "bar": "bar",
+            "dot": "dot",
+            "star": "star",
+            "arrow": "arrow",
+            "wave": "wave",
+            "diamond": "diamond",
+            "moon": "moon",
+            "house": "house",
+            "tree": "tree",
+            "cup": "cup",
+            "key": "key"
+          }
+        },
+        "Q3": {
+          "acc": 0.98125,
+          "n": 160,
+          "correct": 157,
+          "true_pairs_abstained": 3,
+          "ceiling": 0.990625
+        },
+        "Q4": {
+          "acc": 0.9875,
+          "n": 160,
+          "correct": 158,
+          "ties": 2
+        },
+        "Q5": {
+          "spiral": {
+            "abstain_rate": 1.0,
+            "n": 10,
+            "abstain": {
+              "novel": 10,
+              "noedge": 0,
+              "ratio": 0,
+              "close": 0
+            },
+            "answered_as": {}
+          }
+        },
+        "composite": 0.9875
+      },
+      "gaze_landing": {
+        "rate": 1.0,
+        "n": 110,
+        "hit": 110,
+        "per_thing": {
+          "circle": 1.0,
+          "square": 1.0,
+          "triangle": 1.0,
+          "cross": 1.0,
+          "ring": 1.0,
+          "bar": 1.0,
+          "dot": 1.0,
+          "star": 1.0,
+          "arrow": 1.0,
+          "wave": 1.0,
+          "diamond": 1.0
+        },
+        "first": 2
+      },
+      "organism_hash_unchanged_by_exam": true,
+      "seconds": 2.5
+    }
+  }
+}

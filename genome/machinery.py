@@ -222,9 +222,16 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"SLEEP: cannot read {a!r} (B7: SLEEP every <n> moments replay <m> by surprise)")
                 g["declared"]["SLEEP"] = {"every": int(m.group(1)), "replay": int(m.group(2))}
             elif gene == "PREDICT":
-                m = re.fullmatch(r"next glance; error scales delta (" + _NUM + r")\.\.(" + _NUM + r"); ranks replay; grades act", a)
-                if not m: raise GenomeError(f"PREDICT: cannot read {a!r} (B6: PREDICT next glance; error scales delta <lo>..<hi>; ranks replay; grades act)")
-                g["declared"]["PREDICT"] = {"delta_lo": float(m.group(1)), "delta_hi": float(m.group(2))}
+                # edit: Claude (Sonnet 5, builder E), 2026-09-21 16:58 +0400 — G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md;
+                # docs/organs/MIND-MEMORY.md §4 G-MIND-3): an OPTIONAL trailing clause names which error arm PREDICT
+                # computes — novelty (today's, the default when the clause is absent) | conjunctive | episodic | comparator.
+                # The clause is wrapped in its own non-capturing optional group so a genome that never writes it (every
+                # genome on disk today, G4.genome included) parses to the exact same three-key dict shape as before this
+                # edit, plus "arm": "novelty" — byte-identical downstream, since genome/predict.py's Predictor branches
+                # the "novelty" arm through the SAME lines error() ran before this change.
+                m = re.fullmatch(r"next glance; error scales delta (" + _NUM + r")\.\.(" + _NUM + r"); ranks replay; grades act(?:; error (novelty|conjunctive|episodic|comparator))?", a)
+                if not m: raise GenomeError(f"PREDICT: cannot read {a!r} (B6: PREDICT next glance; error scales delta <lo>..<hi>; ranks replay; grades act[; error novelty|conjunctive|episodic|comparator])")
+                g["declared"]["PREDICT"] = {"delta_lo": float(m.group(1)), "delta_hi": float(m.group(2)), "arm": m.group(3) or "novelty"}
             elif gene == "FILE":
                 m = re.fullmatch(r"claim route decider due", a)
                 if not m: raise GenomeError(f"FILE: cannot read {a!r} (B6: FILE claim route decider due)")
