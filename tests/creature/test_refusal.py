@@ -176,6 +176,10 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "OUTCOME": "OUTCOME  act to episode; error grades it; ranks replay",
         "SIT": "SIT      exam every 2000 canvases; the score returns as a sense",
         "SENSE_BODY": "SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss",
+        # edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 21:19 +0400 — G-EYE-1/G-MIND-1: two rows, matching the two
+        # genes.py RUNS entries added by this task (docs/briefs/G5-I-SEAM-DELIVER-MOMENT.md).
+        "DELIVER": "DELIVER  where fixation when instant act glance",
+        "MOMENT": "MOMENT   keys sight words surprise where when act source",
     }
 
     def test_every_runs_gene_parses(self) -> None:

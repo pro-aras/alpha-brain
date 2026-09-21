@@ -96,6 +96,11 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # _think_work read the declared value or act on the row) — the same two-site shape PREDICT/FAST already use.
         "ACT": "creature/mind.py:Mind._record_reflex (declared['ACT']['verbs'] read; an outcome/sit row's act tagged in/out of the declared vocabulary)",
         "OUTCOME": "creature/mind.py:Mind.__init__ (self.outcome_episodes built) + Mind._consume_outcome/_record_reflex (residual computed via a per-act running expectation; written as a reflex episode, ranked by Episodes.most_surprising) + Mind._think_pool/_think_work ('outcome' pool kind)",
+        # edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400 — G-EYE-1/G-MIND-1 (docs/briefs/G5-I-SEAM-DELIVER-MOMENT.md):
+        # two rows, both real call sites, gated on their OWN declared presence (an undeclared DELIVER never computes seam0; an
+        # undeclared MOMENT never passes it to Episodes.write). Neither writes into x_s/x_w (the parity test proves it).
+        "DELIVER": "creature/mind.py:Mind._consume_eye ('deliver_on' gates computing seam0 — where/when/act/source/glance — from the eye's own glance windows + the tape row, and gates the journal row's extra keys)",
+        "MOMENT": "creature/mind.py:Mind._consume_eye ('moment_on' gates whether seam0 is passed to Episodes.write) + genome/fast.py:Episodes (the where/when/act/source/glance columns, get(), nearest_where(), save()/load())",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
     },
 }
