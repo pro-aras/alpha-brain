@@ -148,6 +148,10 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "HEART": "HEART    every 10 s",
         "CRASH": "CRASH    sense restart journal; mind page",
         "WORLD": "WORLD    drawn every 5 s arrivals every 6 h; folder world/; web 6 per hour by curiosity",
+        # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:5x +0400 — G5-L brief: WORLD's second shape,
+        # matching the new genes.py RUNS entry for WORLD_GAME.
+        "WORLD_GAME": ("WORLD    game babyai-gotolocal every 5 s; seed 20260922; "
+                        "frames pov 7x7 tile 32; consequence: his act chooses the next frame"),
         "ASK": "ASK      what-is show is which next why",
         "FAST": "FAST     episodes 100 keys sight words surprise",
         "PREDICT": "PREDICT  next glance; error scales delta 0.5..2.0; ranks replay; grades act",

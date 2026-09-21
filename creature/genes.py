@@ -58,6 +58,12 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "CRASH": "creature/body.py:_crash_policy, read at Body.__init__ -> SenseThread.run (restart) + Body._handle_mind_crash (page) — declared['CRASH']'s two sub-facts gate each behaviour",
         "WORLD": "creature/body.py:main (declared['WORLD']['drawn_every_s']/['arrival_every_h'] read into world_maker.sense's period/window_seconds; ['folder'] arms creature/senses/folder.py behind FOLDER_DOOR_GATED)",
         "ASK": "creature/ask.py:_ask_refusal, read at answer() (declared['ASK']['verbs'] read; a verb outside it is refused by name instead of reaching the hardcoded `if q == ...` branches)",
+        # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:0x +0400 — G5-L brief: WORLD's second shape
+        # (`WORLD game ...`, stored under its own declared key so it never clobbers declared['WORLD']'s
+        # "drawn" dict). Read at creature/body.py:main, exactly like WORLD's own row above, gated behind
+        # creature/senses/game.py's GAME_DOOR_GATED constant (the same "a genome line arms nothing until
+        # the code exists" discipline C2/C3 used for the folder door).
+        "WORLD_GAME": "creature/body.py:main (declared['WORLD_GAME'] read; arms creature/senses/game.py behind GAME_DOOR_GATED)",
     },
     # ---------------------------------------------------------------------------------------- the mind
     "mind": {
