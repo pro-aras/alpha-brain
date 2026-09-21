@@ -6,16 +6,19 @@ import tempfile
 import threading
 import time
 import unittest
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
 
 from creature import world_maker
-from creature.body import Body
+from creature.body import Body, _maker_args_from_declared
 from creature.tape import read_tape
 from genome import world
+from genome.machinery import parse_genome
 
 GENOME_PATH = Path(__file__).resolve().parents[2] / "genome" / "G4-skeleton.genome"
+G4_GENOME = Path(__file__).resolve().parents[2] / "genome" / "G4.genome"
 
 
 class TestMakePure(unittest.TestCase):
@@ -121,6 +124,58 @@ class TestPlantMechanism(unittest.TestCase):
         self.assertLessEqual(plant_count, 3)
         self.assertNotIn(world.THING_NULL, words)
         self.assertNotIn(world.THING_NEVER, words)
+
+
+class TestWorldGeneDrivesMakerPeriodAndWindow(unittest.TestCase):
+    """C1.3 (docs/G4-WAVE3-CLAUSES.md W3-0b): WORLD's declared `drawn every <n> s` / `arrivals every <h>
+    h` become the maker's period/window -- undeclared keeps the exact prior defaults (5.0 s / 6 h).
+
+    genome/machinery.py's WORLD regex parses `arrival_every_h` as `(\\d+)` (whole hours only), so the
+    PREREG toy's own example ("arrivals every 0.01 h") cannot be written as a genome line -- RAISED in the
+    builder report, not worked around (not this builder's file). `_maker_args_from_declared` is therefore
+    exercised directly against hand-built `declared` dicts for the exact toy value (0.01 h = 36 s), and
+    separately against the REAL G4.genome parse for the whole-hour case, so both halves -- "the derivation
+    math is right" and "a real genome text reaches it" -- are pinned."""
+
+    def test_undeclared_keeps_the_prior_defaults(self) -> None:
+        self.assertEqual(_maker_args_from_declared({}, 5.0, world_maker.WINDOW_SECONDS), (5.0, world_maker.WINDOW_SECONDS))
+
+    def test_declared_drives_period_and_window(self) -> None:
+        declared = {"WORLD": {"drawn_every_s": 1, "arrival_every_h": 1, "folder": "world/", "web_per_hour": 6}}
+        self.assertEqual(_maker_args_from_declared(declared, 5.0, world_maker.WINDOW_SECONDS), (1.0, 3600.0))
+
+    def test_the_lifes_own_world_line_derives_5s_and_6h(self) -> None:
+        genome = parse_genome(G4_GENOME.read_text())
+        period, window_s = _maker_args_from_declared(genome.declared, 5.0, world_maker.WINDOW_SECONDS)
+        self.assertEqual((period, window_s), (5.0, 6 * 3600.0))
+
+    def test_toy_value_0_01h_via_sense_directly(self) -> None:
+        """The toy's own numbers (period 1 s, window 0.01 h = 36 s), run through `world_maker.sense`
+        itself (the function `_maker_args_from_declared`'s output feeds) rather than through genome text:
+        >= 3 canvases in 5 s, and a window change (w0000 -> w0001) inside 60 s, read off the tape rows'
+        own meta.moment prefix."""
+        root = Path(tempfile.mkdtemp())
+        body = Body(root, GENOME_PATH)
+        body.add_sense("maker", lambda publish, stop_event: world_maker.sense(
+            publish, stop_event, root=root, period=1.0, window_seconds=36.0))
+        body.start()
+        try:
+            time.sleep(45.0)
+        finally:
+            body.stop()
+
+        rows = list(read_tape(root))
+        self.assertGreater(len(rows), 0)
+        windows_seen = sorted({r["meta"]["moment"][:5] for r in rows})   # "w0000", "w0001", ...
+
+        def _at(row):
+            return datetime.fromisoformat(row["at"].replace("Z", "+00:00"))
+
+        start = _at(rows[0])
+        early_moments = {r["meta"]["moment"] for r in rows if (_at(r) - start).total_seconds() <= 5.0}
+        self.assertGreaterEqual(len(early_moments), 3,
+                                 f"expected >= 3 canvases within 5 wall-clock seconds at period=1.0, saw {sorted(early_moments)}")
+        self.assertIn("w0001", windows_seen, f"expected a window change to w0001 within 45 s at window_seconds=36.0, saw {windows_seen}")
 
 
 if __name__ == "__main__":

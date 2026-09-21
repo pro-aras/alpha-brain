@@ -18,13 +18,25 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from genome import ask as genome_ask
 from genome.machinery import Genome, Organism, parse_genome
 from genome.world import encode_word
 
 Ledger = Dict[int, Set[str]]
+
+
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:4x +0400 — C1.4 (docs/G4-WAVE3-CLAUSES.md W3-0b):
+# ASK's declared verb list. ASK undeclared keeps today's unrestricted default (every verb `answer()`
+# implements stays reachable, matching creature/genes.py's own finding that ASK's value is not read at
+# all today); ASK declared gates on `declared['ASK']['verbs']` -- a verb not in that list is refused BY
+# NAME, a row, never the ValueError `answer()` raises for a genuinely unimplemented verb.
+def _ask_refusal(genome: Genome, q: str) -> Optional[str]:
+    verbs = genome.declared.get("ASK", {}).get("verbs")
+    if verbs is not None and q not in verbs:
+        return f"refused: {q} is not an ASK verb"
+    return None
 
 
 def load_snapshot(run_root: Path) -> Tuple[Genome, Organism, Ledger, Ledger]:
@@ -48,6 +60,9 @@ def answer(run_root: Path, q: str, args: List[str]) -> str:
     """The same rules genome/ask.py's main() applies for each command, over a PRIVATE Organism loaded
     from run_root's latest snapshot. Never mutates `org` (Organism.recall_many/edge_many never do)."""
     genome, org, Ls, Lw = load_snapshot(run_root)
+    refusal = _ask_refusal(genome, q)
+    if refusal is not None:
+        return refusal
     if q == "what-is":
         r = org.recall_many("sight", genome_ask.glance_picture(Path(args[0]), genome))
         ans = "/".join(sorted(Lw.get(r["cell"], set()))) if r["cell"] is not None else None

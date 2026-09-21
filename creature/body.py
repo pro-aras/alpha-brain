@@ -21,6 +21,8 @@ import time
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
+from genome.machinery import GenomeError, parse_genome
+
 from . import ask as ask_module
 from .mind import Mind
 from .tape import Tape, now_iso, read_tape
@@ -28,6 +30,43 @@ from .tape import Tape, now_iso, read_tape
 STATUS_PERIOD_S = 10.0
 RESTART_BACKOFF_S = 1.0
 MIND_TIMES_WINDOW_S = 60.0
+
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:1x +0400 — C1.6 (docs/G4-WAVE3-CLAUSES.md W3-0b):
+# BODY's declared thread roster, the five names the body knows about (eye+ear are one "maker" thread in
+# this implementation, door covers the ask/folder/web senses, voice is the exam thread -- the check is a
+# pure VALIDATION of the declared list against this known set, independent of how many real threads a run
+# actually starts).
+KNOWN_BODY_THREADS = frozenset({"eye", "ear", "door", "mind", "voice"})
+
+
+def _check_body_threads(declared: Dict[str, dict]) -> None:
+    """BODY undeclared -> nothing to check (the thread wiring the body actually runs is fixed by code
+    either way, creature/genes.py's own finding). BODY declared -> every named thread must be one of
+    KNOWN_BODY_THREADS, and "mind" must be named -- else the body refuses to start (GenomeError naming
+    the bad thread), before any thread object is created."""
+    body = declared.get("BODY")
+    if body is None:
+        return
+    threads = body.get("threads", [])
+    for name in threads:
+        if name not in KNOWN_BODY_THREADS:
+            raise GenomeError(f"BODY declares an unknown thread {name!r} (known: {sorted(KNOWN_BODY_THREADS)}): the body does not start")
+    if "mind" not in threads:
+        raise GenomeError(f"BODY declares threads {threads!r} without 'mind': the body does not start")
+
+
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:1x +0400 — C1.5 (docs/G4-WAVE3-CLAUSES.md W3-0b):
+# CRASH's declared policy. CRASH undeclared keeps today's unconditional default (PREREG §2.6's crash law
+# stands regardless of the gene, genes.py's own finding); CRASH declared reads its own two sub-facts off
+# the parsed dict. genome/machinery.py's CRASH grammar is a single fixed-string match today ("sense
+# restart journal; mind page") so every genome this parser accepts sets BOTH sub-facts True -- the False
+# branches below are real code, reachable the day that grammar loosens (raised in the builder report, not
+# worked around: not this builder's file).
+def _crash_policy(declared: Dict[str, dict]) -> "tuple[bool, bool]":
+    crash = declared.get("CRASH")
+    if crash is None:
+        return True, True
+    return crash.get("sense") == "restart journal", crash.get("mind") == "page"
 
 
 def _rss_mb() -> float:
@@ -37,17 +76,22 @@ def _rss_mb() -> float:
 
 class SenseThread(threading.Thread):
     """Runs `fn(publish, stop_event)` forever: `fn` is expected to loop internally until `stop_event` is
-    set. An exception from `fn` is journaled as `sense_restart` and `fn` is called again after 1 s
-    (PREREG §2.6) -- the mind is unaffected. `plant`: "eye:100" raises inside `_publish` the Nth time
-    THIS thread publishes that sense (counted across restarts, so the plant fires exactly once)."""
+    set. An exception from `fn` is journaled as `sense_restart` and, when `restart` is True (the default,
+    and CRASH's "sense restart journal" -- C1.5), `fn` is called again after 1 s (PREREG §2.6) -- the mind
+    is unaffected. When `restart` is False (CRASH declared WITHOUT "sense restart", a state the parser
+    cannot produce today -- C1.5's own raised gap) the event is still journaled once and the thread ends,
+    never retrying. `plant`: "eye:100" raises inside `_publish` the Nth time THIS thread publishes that
+    sense (counted across restarts, so the plant fires exactly once)."""
 
     def __init__(self, name: str, fn: Callable[[Callable, threading.Event], None], journal_fn: Callable[[Dict[str, object]], None],
-                 on_publish: Callable[[str, bytes, Dict[str, object], str], Dict[str, object]], plant: Optional[str] = None):
+                 on_publish: Callable[[str, bytes, Dict[str, object], str], Dict[str, object]], plant: Optional[str] = None,
+                 restart: bool = True):
         super().__init__(name=f"sense-{name}", daemon=True)
         self.sense_name = name
         self.fn = fn
         self.journal_fn = journal_fn
         self.on_publish = on_publish
+        self.restart = restart
         self._stop = threading.Event()
         self._plant_sense: Optional[str] = None
         self._plant_n: Optional[int] = None
@@ -72,6 +116,8 @@ class SenseThread(threading.Thread):
                 self.fn(self._publish, self._stop)
             except Exception as e:
                 self.journal_fn({"event": "sense_restart", "sense": self.sense_name, "error": repr(e)})
+                if not self.restart:
+                    return    # C1.5: CRASH without "sense restart" -- journaled once, thread ends, no retry
                 self._stop.wait(RESTART_BACKOFF_S)
                 continue
             else:
@@ -86,8 +132,17 @@ class Body:
         self.root = Path(root)
         self.genome_path = Path(genome_path)
         self.blind = blind
+        # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:2x +0400 — C1 (docs/G4-WAVE3-CLAUSES.md
+        # W3-0b): the genome is read once, here, before Mind exists (Mind is built only in start()) --
+        # Tape's own directory (C1.2) and the BODY thread-roster refusal (C1.6) both need the declared
+        # values at construction time, and HEART's/CRASH's (C1.1/C1.5) are cheapest read once too.
+        self._declared: Dict[str, dict] = parse_genome(self.genome_path.read_text()).declared
+        _check_body_threads(self._declared)
+        self._status_period_s: float = float(self._declared.get("HEART", {}).get("every_s", STATUS_PERIOD_S))
+        self._crash_restart_on, self._crash_page_on = _crash_policy(self._declared)
+        self._tape_declared_path: Optional[str] = self._declared.get("TAPE", {}).get("path")
         self.root.mkdir(parents=True, exist_ok=True)
-        self.tape = Tape(self.root)
+        self.tape = Tape(self.root, declared_path=self._tape_declared_path)
         self.q: "queue.Queue[Dict[str, object]]" = queue.Queue()
         self._publish_lock = threading.Lock()
         self._status_lock = threading.Lock()
@@ -107,7 +162,7 @@ class Body:
 
     # ------------------------------------------------------------------ wiring
     def add_sense(self, name: str, fn: Callable[[Callable, threading.Event], None], plant: Optional[str] = None) -> SenseThread:
-        st = SenseThread(name, fn, self._journal_event, self._publish, plant=plant)
+        st = SenseThread(name, fn, self._journal_event, self._publish, plant=plant, restart=self._crash_restart_on)
         self.sense_threads.append(st)
         return st
 
@@ -138,7 +193,7 @@ class Body:
             self.mind = Mind(self.genome_path, self.root, blind=self.blind)
             last_seq = 0
         backlog = 0
-        for row in read_tape(self.root):
+        for row in read_tape(self.root, declared_path=self._tape_declared_path):
             if row["seq"] > last_seq:
                 self._consume(row)
                 backlog += 1
@@ -190,7 +245,8 @@ class Body:
             self.crash = {"at": at, "error": repr(e), "seq": row.get("seq")}
         status = self._build_status()
         self._write_status(status)
-        self._append_page({"at": at, "why": f"mind_crash: {e!r}", "status": status})
+        if self._crash_page_on:    # C1.5: CRASH without "mind page" -- STATUS.crash + exit 3 stand (#230 is not a gene), no PAGE.json
+            self._append_page({"at": at, "why": f"mind_crash: {e!r}", "status": status})
         sys.stderr.write(f"creature.body: mind crashed at seq {row.get('seq')}: {e!r}\n")
         os._exit(3)      # PREREG §2.6: the process EXITS non-zero; no loop
 
@@ -198,7 +254,7 @@ class Body:
     def _status_loop(self) -> None:
         while not self.stop_event.is_set():
             self._write_status(self._build_status())
-            self.stop_event.wait(STATUS_PERIOD_S)
+            self.stop_event.wait(self._status_period_s)   # C1.1: HEART's declared every_s, default STATUS_PERIOD_S
         self._write_status(self._build_status())
 
     def _build_status(self) -> Dict[str, object]:
@@ -264,29 +320,65 @@ class Body:
             self._status_thread.join(timeout=STATUS_PERIOD_S + 1.0)
 
 
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 12:3x +0400 — C1.3/C2 (docs/G4-WAVE3-CLAUSES.md
+# W3-0b, W3-6 step 4): the two WORLD-driven derivations `main()` needs, factored out so they are testable
+# without invoking the CLI (which blocks in a signal-driven loop). WORLD's own `arrival_every_h` regex in
+# genome/machinery.py is `(\d+)` (whole hours only) -- a genome cannot express the PREREG toy's own
+# "arrivals every 0.01 h" example; RAISED in the builder report, not worked around (not this builder's
+# file). `_maker_args_from_declared` is exercised directly against hand-built declared dicts for that
+# reason (tests/creature/test_world_maker.py), same as C1.4/C1.5's pure-function toys.
+def _maker_args_from_declared(declared: Dict[str, dict], default_period: float, default_window_s: float) -> "tuple[float, float]":
+    """WORLD undeclared -> the given defaults, unchanged (today's 5.0 s / world_maker.WINDOW_SECONDS).
+    WORLD declared -> its own `drawn every <n> s` / `arrivals every <h> h`."""
+    world_declared = declared.get("WORLD")
+    if world_declared is None:
+        return default_period, default_window_s
+    return float(world_declared["drawn_every_s"]), float(world_declared["arrival_every_h"]) * 3600.0
+
+
+def _declared_folder_dir(declared: Dict[str, dict]) -> Optional[Path]:
+    """C2: the folder door's directory from declared['WORLD']'s `folder <dir>`, relative to the REPO root
+    (this file's own parents[1] -- never the run root), gated on creature.senses.folder.FOLDER_DOOR_GATED
+    so a genome line arms nothing until the code carrying G4-6 exists (Claude flips the constant)."""
+    from .senses import folder as folder_sense   # lazily, same discipline as world_maker's own import below
+    if not folder_sense.FOLDER_DOOR_GATED:
+        return None
+    world_declared = declared.get("WORLD")
+    if not world_declared or not world_declared.get("folder"):
+        return None
+    return Path(__file__).resolve().parents[1] / world_declared["folder"]
+
+
 # ============================================================================ CLI
 def main(argv: List[str]) -> int:
     root = Path(argv[argv.index("--root") + 1])
     genome_path = Path(argv[argv.index("--genome") + 1])
-    maker_period = float(argv[argv.index("--maker-period") + 1]) if "--maker-period" in argv else 5.0
+    # C1.3/C2: read once, here -- Body.__init__ parses the same text again for its own (TAPE/HEART/
+    # CRASH/BODY) purposes; this is the CLI's own copy, used for WORLD's maker period/window and the
+    # folder door's directory below.
+    genome_for_cli = parse_genome(genome_path.read_text())
+    declared = genome_for_cli.declared
     no_maker = "--no-maker" in argv
-    # A12 (PREREG §11.3): the folder door is armed only by an explicit --folder PATH, default OFF — it is
-    # only meant to be lit after G4-6 (a re-run of G4-3 with two senses on the tape), Claude's own gate.
-    folder_dir = Path(argv[argv.index("--folder") + 1]) if "--folder" in argv else None
-    folder_period = float(argv[argv.index("--folder-period") + 1]) if "--folder-period" in argv else 30.0
 
     body = Body(root, genome_path)
     if not no_maker:
         from . import world_maker   # imported lazily: body.py must not hard-depend on world_maker at import time
+        default_period, default_window_s = _maker_args_from_declared(declared, 5.0, world_maker.WINDOW_SECONDS)
+        maker_period = float(argv[argv.index("--maker-period") + 1]) if "--maker-period" in argv else default_period
+        window_seconds = float(argv[argv.index("--window-seconds") + 1]) if "--window-seconds" in argv else default_window_s
         plant = os.environ.get("CREATURE_PLANT_EXCEPTION")
         import functools
-        fn = functools.partial(world_maker.sense, root=root, period=maker_period)
+        fn = functools.partial(world_maker.sense, root=root, period=maker_period, window_seconds=window_seconds)
         body.add_sense("maker", fn, plant=plant)
+
+    # C2: --folder PATH stays an explicit override for tests, regardless of the gate (A12's own road,
+    # unchanged); otherwise the door arms only from the genome's own WORLD line, behind FOLDER_DOOR_GATED.
+    folder_dir = Path(argv[argv.index("--folder") + 1]) if "--folder" in argv else _declared_folder_dir(declared)
+    folder_period = float(argv[argv.index("--folder-period") + 1]) if "--folder-period" in argv else 30.0
     if folder_dir is not None:
         from .senses import folder as folder_sense   # lazily, same discipline as world_maker above
-        from genome.machinery import parse_genome
         import functools
-        canvas = int(parse_genome(genome_path.read_text()).gaze["canvas"])   # body.mind does not exist until start(); read it straight from the genome file
+        canvas = int(genome_for_cli.gaze["canvas"])
         ffn = functools.partial(folder_sense.sense, world_dir=folder_dir, root=root, canvas=canvas, period=folder_period)
         body.add_sense("folder", ffn)
 
