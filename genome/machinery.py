@@ -71,6 +71,12 @@ class Genome:
     theta_words: Optional[float] = None             # G3: the words area's own threshold (None = theta_n, the old law)
     abstain_margin: Optional[float] = None          # G3: ABSTAIN margin cos<M (None = off)
     gaze: Optional[Dict[str, object]] = None     # G1: GAZE surprise fixations F grid G canvas C glance L ink contrast (None = off)
+    # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:07 +0400 — G-EYE-3 as measured (Researcher G, §3.6):
+    # SENSE colour rg by 4x4 under the glance fixed-gain. Parsed directly onto the Genome (like `eye`/`ear_letters`
+    # above), NEVER into `declared` — colour is a core sense dimension, not a G4-wave "declared gene" subject to
+    # creature/genes.py's unwired() refusal law. None (undeclared) is a complete no-op: sight_dim() below is
+    # untouched, gaze.glances() below never computes or appends anything — parity with every existing pin.
+    colour: Optional[Dict[str, object]] = None
     declared: Dict[str, dict] = field(default_factory=dict)   # G4 §3 B1: every G4 gene's own parsed sub-dict (BODY, TAPE, HEART, …)
     text: str = field(default="", repr=False)
 
@@ -82,7 +88,11 @@ class Genome:
         raise GenomeError("no STAGE named meet")
 
     def sight_dim(self) -> int:
-        return retina_dim(self.retina, self.eye[0])
+        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:07 +0400 — +32 when SENSE colour is declared
+        # (G-EYE-3/§3.6: rg + by, 4x4 cells each, 16+16=32 numbers) appended BESIDE the tower's 112 (or
+        # whatever the RETINA line otherwise sizes to). Undeclared (colour is None, the default): unchanged.
+        d = retina_dim(self.retina, self.eye[0])
+        return d + 32 if self.colour is not None else d
 
     def words_dim(self) -> int:
         return self.ear_letters * (26 if self.ear_blank_zero else 27)
@@ -114,6 +124,14 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"SENSE ear: cannot read {a!r}")
                 g["ear_letters"] = int(m.group(1))
                 g["ear_blank_zero"] = (m.group(2) == "zero")
+            elif gene == "SENSE" and args[0] == "colour":
+                # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:07 +0400 — G-EYE-3/§3.6: SENSE colour rg
+                # by 4x4 under the glance fixed-gain. New vocabulary; a strict fullmatch on the literal decided
+                # form (Researcher G measured "fixed-gain" as the form that does not amplify a legitimately-zero
+                # block's noise, #231(1) — "block-unit" is not accepted here, on purpose).
+                m = re.fullmatch(r"rg by 4x4 under the glance fixed-gain", a[7:].strip())
+                if not m: raise GenomeError(f"SENSE colour: cannot read {a!r} (§3.6: SENSE colour rg by 4x4 under the glance fixed-gain)")
+                g["colour"] = {"channels": ("rg", "by"), "cells": (4, 4), "gain": "fixed"}
             elif gene == "RETINA":
                 for step in args:
                     if not re.fullmatch(r"thresh" + _NUM + r"|centre|blur" + _NUM + r"|pool\d+|hog\d+|hogcells\d+x\d+|tower:[A-Za-z0-9_.-]+|sqrt|unit", step):
@@ -181,6 +199,16 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"surprise fixations (\d+) grid (\d+) canvas (\d+) glance (\d+) ink (contrast|border)", a)
                 if not m: raise GenomeError(f"GAZE: cannot read {a!r} (G1 §1: surprise fixations F grid G canvas C glance L ink contrast)")
                 g["gaze"] = {"fixations": int(m.group(1)), "grid": int(m.group(2)), "canvas": int(m.group(3)), "glance": int(m.group(4)), "ink": m.group(5)}
+            elif gene == "BIND":
+                # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:07 +0400 — G-EYE-2 (= G-MIND-2): one canvas
+                # = one moment. New vocabulary; stored in `declared` (unlike SENSE eye/ear/colour above) because
+                # BIND names a real MIND-side mechanism with a real call site (creature/mind.py's _consume_eye
+                # pooling branch) that creature/genes.py's RUNS/unwired() law must name, exactly like every other
+                # G4-wave declared gene — an undeclared BIND leaves every existing pin (today's per-glance moments)
+                # untouched.
+                m = re.fullmatch(r"glances per canvas", a)
+                if not m: raise GenomeError(f"BIND: cannot read {a!r} (G-EYE-2: BIND glances per canvas)")
+                g["declared"]["BIND"] = {"pool": "glances per canvas"}
             # ======================================================================== G4 §3 B1: the new genes.
             # Each is a strict re.fullmatch (a placeholder or a missing number refuses); the parsed sub-dict is
             # stored under g["declared"][GENE] — a gene the machinery cannot run is a GenomeError, so nobody can

@@ -80,6 +80,10 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # predict.file() internally, so without FILE the mind dead-ends BEFORE calling them).
         "INDUCE": "creature/mind.py:_think_pool/_think_work (think_laws.induce() called for words with >= k episodes; filed as 'rule' items, scored at their due canvas)",
         "DEDUCE": "creature/mind.py:_think_pool/_think_work (think_laws.deduce() called over standing beliefs; filed as 'rule' items, scored at their due canvas)",
+        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:35 +0400 — G-EYE-2/BIND (docs/briefs/G5-J-BIND-COLOUR-RETINA.md):
+        # the real call site is _bind_pool() (module-level, top of creature/mind.py) + its use in Mind._consume_eye,
+        # gated on "BIND" in declared, both branches (word-bearing and sight-only).
+        "BIND": "creature/mind.py:_bind_pool + Mind._consume_eye (org_feats = _bind_pool(g['feats']) when declared; org.moment/moment_sight called once per canvas instead of once per glance)",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
     },
 }

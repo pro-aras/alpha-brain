@@ -164,6 +164,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # genes.py RUNS entries added by this task.
         "INDUCE": "INDUCE   rule from 5 episodes no counter",
         "DEDUCE": "DEDUCE   one step",
+        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:35 +0400 — G-EYE-2/BIND: one row, matching
+        # the genes.py RUNS entry added by this task (docs/briefs/G5-J-BIND-COLOUR-RETINA.md).
+        "BIND": "BIND     glances per canvas",
     }
 
     def test_every_runs_gene_parses(self) -> None:
