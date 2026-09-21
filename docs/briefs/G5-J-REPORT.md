@@ -163,7 +163,7 @@ OK
 On branch `g5-bind-colour`, worktree `/data/dev/genome-wt-n`, all ahead of master `ec28b4c`:
 
 ```
-<NEW-COMMIT-HASH> G5-J follow-up: mode "one"/"random" + colour, and the colour-feature-road sweep (§9)
+5fd9c2d G5-J follow-up: mode "one"/"random" + colour, and the colour-feature-road sweep (§9)
 cfdab15 G5-J report correction: state the reversed BIND premise, fix a fabricated baseline number, two wrong citations
 b5f1f53 G5-J: report — BIND FAILS its pre-registered Q1 bar (0.9625 vs first-fixation's 0.98125); colour and retina PASS
 92e23a6 G5-J: pin BIND + colour mechanics (parser grammar, sight_dim, grey no-op, moment-count/unit-norm through a real Mind)
