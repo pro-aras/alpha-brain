@@ -101,8 +101,10 @@ def _bind_pool(feats: List[np.ndarray]) -> List[np.ndarray]:
     # RETINA `unit`-terminated vector, or from this pooled one) — a non-unit query would silently rescale
     # every cosine comparison (BIRTH's THETA_N threshold included) and permanently corrupt the newborn
     # cell's OWN stored vector norm forever after (the shape of #231(1): an unnormalised quantity treated
-    # as if it already were). Cost: one np.mean + one np.linalg.norm over a (co,4)-shaped or (4,144)-shaped
+    # as if it already were). Cost: one np.mean + one np.linalg.norm over a (4,112)-shaped or (4,144)-shaped
     # array — microseconds, timed in docs/briefs/G5-J-REPORT.md.
+    # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:55 +0400 — fixed a typo in this comment
+    # ("(co,4)-shaped" -> "(4,112)-shaped": 4 glances x 112 sight dims, or x144 with colour); no code change.
     # Returns a ONE-element list (or the input unchanged if empty) so every existing `for x in feats:` call
     # site keeps working unchanged, now iterating once instead of F times — this is where "one canvas = one
     # moment" actually happens: Organism.moment()/moment_sight() is called exactly once per canvas below,
