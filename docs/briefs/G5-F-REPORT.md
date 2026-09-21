@@ -175,6 +175,41 @@ No other test regressed. This is the expected, correct shape of a digest-changin
 ## 5 · Raised (not worked around)
 
 1. **Replay-based diagnostics/gates against a closed life must run under the commit that was actually live**, never master HEAD, or they measure a counterfactual (§0). Flagged for whoever next builds a replay-based tool against life 1 or life 2.
-2. **`Organism.load` refuses every pre-repair snapshot** (§2). A migration/version-tag/accept-the-break decision is the orchestrator's, not mine.
+2. ~~`Organism.load` refuses every pre-repair snapshot~~ — **resolved, §6**: `load()` now accepts either digest.
 3. **Adopting `genome/retina_fast.py` into production** (rewiring `genome/gaze.py`) is a decision, not made here — proven byte-identical and ~4.1–4.3× faster, never wired in.
 4. **`edges_log`/`prunes_log` JSON serialisation is now `state_hash`'s dominant cost** (§2(a)) — noted for whoever looks at this function next; out of scope here ("the counters as now").
+
+---
+
+## 6 (added 2026-09-21 17:46 +0400) · `Organism.load` accepts EITHER digest — the orchestrator's follow-up task (commit 412d721)
+
+**The ask:** the closed lives' readers (`tools/verdict_g4.py`'s W3-2 reach control, the exam) must still LOAD old-format snapshots (saved under the pre-repair, full-array `state_hash`) — §2's refusal, while correct behaviour for a changed digest, blocked every reader that opens a real closed life predating this repair.
+
+**The fix.** `Organism.state_hash()` (the live-block hash, §2) is untouched — every NEW `save()` still writes it, every live/replay path still reads it. A new method `Organism._state_hash_legacy()` is a byte-for-byte copy of the PRE-REPAIR `state_hash` body (the full `nmax × nmax` arrays), kept verbatim, called from nowhere except `load()`'s fallback. `Organism.load()` now: computes the new hash first; on mismatch, computes the legacy hash and accepts if THAT matches; raises `GenomeError` (naming both computed digests and the saved one) only when neither matches.
+
+**Verified, read-only, on the real snapshots the ask named:**
+```
+life2:  load() OK, sight.n=700 words.n=17 t=78872
+        new hash=8472af1850b77e2a  legacy hash=07498bf839b9d090  saved=07498bf839b9d090
+life3a: load() OK, sight.n=1113 words.n=23 t=10352
+        new hash=bc57f150c6948e67  legacy hash=52a804ebb7474271  saved=52a804ebb7474271
+```
+Both load via the legacy fallback (the saved digest matches `_state_hash_legacy()`, not `state_hash()` — exactly the pre-repair snapshots they are); no write was needed to read them.
+
+**The test** (`tests/genome/test_state_hash_live_block.py::TestLoadAcceptsEitherDigest`, on `_build_toy_organism()`, a small real organism, plus the two real snapshots above): five cases, the three the orchestrator asked for plus two real-snapshot controls —
+1. `test_new_format_snapshot_loads` — a snapshot saved by the current code loads (fast path, no fallback).
+2. `test_legacy_format_snapshot_loads` — a snapshot whose saved digest is the LEGACY one (built by overwriting the `.json`'s `state_hash` field with `_state_hash_legacy()`'s value — the exact shape every real pre-repair snapshot has) loads via the fallback.
+3. `test_corrupted_snapshot_refuses_under_both` — one entry of `sight_cells` flipped after save (the toy's 40 canvases never reach `stage2_start`, so `W`/`mask`/`strikes` are genuinely all-zero and corrupting them would prove nothing here; `sight_cells` is hashed identically by both digests, so corrupting it breaks both just as surely) — `load()` still raises `GenomeError`, naming the digest it could not match either way.
+4. `test_real_life2_snapshot_now_loads` / 5. `test_real_life3a_snapshot_now_loads` — the real thing, read-only, both asserting the loaded organism's `_state_hash_legacy()` equals the saved digest (the control proving these are genuinely legacy-format snapshots, not a vacuous pass).
+
+The file's original `test_real_life2_snapshot_refuses` (§2's now-superseded behaviour) is replaced, not left contradicting the new code — noted in the class docstring, with the date and reason.
+
+**`tests/genome` on final bytes** (20 modules, same `python3 -m unittest <dotted modules>` convention `tools/gate_g4.py` itself uses):
+```
+Ran 149 tests in 98.836s
+
+FAILED (failures=1, skipped=1, expected failures=6)
+```
+The 1 skip and 6 expected-failures are the same pre-existing, unrelated ones §4's 279-test full-suite run already carried. **The one failure is `tests.genome.test_pin_skeleton.TestPinSkeleton.test_hash_dev_unchanged`** — the same OLD-pin mismatch as before (`b0531503…` vs `d4b5c6b8…`), unaffected by this task, still correctly failing. The other three OLD-pin tests (`test_mind_parity` ×2, `test_wave2_predict_fast`) live under `tests/creature`, outside this run's scope; unaffected by this change, still failing the same way — not re-run here (this task's ask was `tests/genome`), but nothing in this diff touches them. No test regressed that wasn't already failing before this task.
+
+**Committed** on branch `g5-repairs` (this worktree): `genome/machinery.py` (`_state_hash_legacy` + `load()`'s two-digest fallback) and `tests/genome/test_state_hash_live_block.py` (the superseded test replaced, the five-case class added). Nothing touched on master, `/data/dev/genome`, or any pin.

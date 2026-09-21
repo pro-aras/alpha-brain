@@ -893,8 +893,20 @@ class Organism:
         o.births = [tuple(r) for r in meta["births"]]; o.merges = [tuple(r) for r in meta["merges"]]
         o.edges_log = [tuple(r) for r in meta["edges_log"]]; o.prunes_log = [tuple(r) for r in meta["prunes_log"]]
         o.refusals_by_arrival = list(meta["refusals_by_arrival"])
-        if o.state_hash() != meta["state_hash"]:
-            raise GenomeError(f"loaded organism's state_hash {o.state_hash()[:16]} is not the saved {meta['state_hash'][:16]}")
+        # edit: Claude (Sonnet 5, builder F), 2026-09-21 17:45 +0400 -- the orchestrator's follow-up task
+        # (commit 412d721): the closed lives' readers (tools/verdict_g4.py's W3-2 reach control, the
+        # exam) must still LOAD old-format snapshots (saved before the state_hash repair). Try the NEW
+        # live-block hash first; on mismatch, try the LEGACY full-array hash (kept verbatim as
+        # `_state_hash_legacy`, never deleted); refuse only when BOTH fail. A snapshot saved by either
+        # generation of the code therefore loads; a genuinely corrupted one (neither digest matches)
+        # still refuses loudly, by name (docs/briefs/G5-F-REPORT.md §4).
+        new_hash = o.state_hash()
+        if new_hash != meta["state_hash"]:
+            legacy_hash = o._state_hash_legacy()
+            if legacy_hash != meta["state_hash"]:
+                raise GenomeError(
+                    f"loaded organism's state_hash {new_hash[:16]} (legacy {legacy_hash[:16]}) is not the saved {meta['state_hash'][:16]}"
+                )
         return o
 
     # ------------------------------------------------------------------ identity
@@ -918,6 +930,25 @@ class Organism:
             h.update(np.int64(a.n).tobytes())
         n_s, n_w = self.sight.n, self.words.n
         h.update(self.W[:n_s, :n_w].tobytes()); h.update(self.mask[:n_s, :n_w].tobytes()); h.update(self.strikes[:n_s, :n_w].tobytes())
+        h.update(np.int64(self.t).tobytes()); h.update(np.int64(self.budget_left).tobytes())
+        h.update(json.dumps(self.c, sort_keys=True).encode())
+        h.update(json.dumps(self.births).encode()); h.update(json.dumps(self.merges).encode())
+        h.update(json.dumps(self.edges_log).encode()); h.update(json.dumps(self.prunes_log).encode())
+        return h.hexdigest()
+
+    # edit: Claude (Sonnet 5, builder F), 2026-09-21 17:45 +0400 -- kept VERBATIM (byte-for-byte the old
+    # state_hash body, before the live-block repair) so Organism.load can still verify a pre-repair
+    # snapshot's saved digest. Never called from anywhere except load()'s fallback; state_hash() above
+    # remains the one every NEW save() writes and every live/replay path reads.
+    def _state_hash_legacy(self) -> str:
+        """The PRE-REPAIR state_hash: sha256 over the FULL nmax x nmax W/mask/strikes arrays (docs/briefs/
+        G5-F-REPORT.md §4). Exists only so Organism.load can accept a snapshot saved before the live-block
+        repair; every other caller uses state_hash()."""
+        h = hashlib.sha256()
+        for a in (self.sight, self.words):
+            h.update(a.cells[: a.n].tobytes()); h.update(a.alive.tobytes()); h.update(a.misfires.tobytes())
+            h.update(np.int64(a.n).tobytes())
+        h.update(self.W.tobytes()); h.update(self.mask.tobytes()); h.update(self.strikes.tobytes())
         h.update(np.int64(self.t).tobytes()); h.update(np.int64(self.budget_left).tobytes())
         h.update(json.dumps(self.c, sort_keys=True).encode())
         h.update(json.dumps(self.births).encode()); h.update(json.dumps(self.merges).encode())
