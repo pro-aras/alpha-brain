@@ -206,8 +206,16 @@ class TestLedgersAndClashEnabledPassthrough(unittest.TestCase):
         self.assertTrue(captured["clash_enabled"], "BELIEF is declared on G4.genome -> clash_enabled must be True")
 
     def test_clash_enabled_false_when_belief_undeclared(self) -> None:
-        """The same probe, with BELIEF removed from the in-memory Genome (no genome/ file touched — the
-        same in-memory-mutation technique test_wave2_think.py's module docstring already documents)."""
+        """edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 12:xx +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md;
+        docs/briefs/W3-BUILDER-D.md's own verbatim clause): "think_laws.believe() only when 'BELIEF' in
+        declared (a word item without BELIEF -> dead end no_belief_gene)". Before this clause landed on
+        this branch, BELIEF undeclared still called believe() (with clash_enabled=False) — the ORIGINAL
+        premise this test pinned. That premise is superseded by design: believe() is now gated on BELIEF's
+        OWN presence and is never reached at all when it is undeclared — the same merge-time flip
+        SOLUTIONS #232 addendum (c) names (a test pinning the ABSENCE of a feature another lane's clause
+        changes at merge time; pin the presence with the value, or pin nothing). Flipped to assert the new
+        law: a dead end named "no_belief_gene", and the stub never called at all (there is no
+        ledgers/clash_enabled kwarg to observe on a call that never happens)."""
         mind, item = _build_mind_with_a_belief_item()
         del mind.genome.declared["BELIEF"]
 
@@ -221,12 +229,14 @@ class TestLedgersAndClashEnabledPassthrough(unittest.TestCase):
         mind_module.think_laws = _StubThinkLaws(fake_believe)
         mind_module._BELIEVE_KWARGS = frozenset(inspect.signature(fake_believe).parameters)
         try:
-            mind._think_work(item)
+            result = mind._think_work(item)
         finally:
             mind_module.think_laws = orig_think_laws
             mind_module._BELIEVE_KWARGS = orig_kwargs
 
-        self.assertFalse(captured["clash_enabled"])
+        self.assertEqual(result["outcome"], "no_belief_gene")
+        self.assertEqual(captured, {},
+                          "believe() must never be called when BELIEF is undeclared -- W3-0b gates the call itself")
 
     def test_old_signature_receives_no_extra_kwargs(self) -> None:
         """A stub matching TODAY's real signature exactly (no ledgers/clash_enabled parameters) must not

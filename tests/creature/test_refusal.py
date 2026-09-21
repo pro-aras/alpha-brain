@@ -51,30 +51,59 @@ class TestPositiveControls(unittest.TestCase):
                 self.assertEqual(mind.genome.declared, {})
 
 
-class TestInduceRefusal(unittest.TestCase):
-    """(b): G4.genome plus an active INDUCE line -- INDUCE parses (the clause exists in machinery.py) but
-    no line anywhere calls think_laws.induce (PREREG §14: `grep -c think_laws.induce` reads 0) -- refuses,
-    naming INDUCE and nothing else."""
+class TestInduceNowWired(unittest.TestCase):
+    """(b), FLIPPED (W3-2, docs/G4-WAVE3-CLAUSES.md, edit: Claude (Sonnet 5, W3 builder D), 2026-09-21
+    11:xx +0400): INDUCE now has a real interpreter -- creature/mind.py's `_think_pool`/`_think_work`
+    call `think_laws.induce()` for words with enough episodes and file the result (genes.py's RUNS entry,
+    this task) -- a genome declaring it must START, not refuse. DEDUCE is wired the same way, tested for
+    symmetry below. The refusal's own negative-control role for 'a gene with no interpreter' moves to
+    SENTENCE (still OFF, still uninterpreted, docs/G4-WAVE3-CLAUSES.md's own order)."""
 
-    def test_induce_line_refuses_naming_induce(self) -> None:
+    def test_induce_line_starts(self) -> None:
         root = _tmp()
         text = G4_GENOME.read_text() + "INDUCE   rule from 5 episodes no counter\n"
         genome_path = root / "G4-plus-induce.genome"
         genome_path.write_text(text)
-        with self.assertRaises(GenomeError) as ctx:
-            Mind(genome_path, root / "run")
-        msg = str(ctx.exception)
-        self.assertIn("INDUCE", msg)
-        # every gene G4.genome ALREADY declares must still be considered wired -- only the new one is named
-        for other in ("BODY", "TAPE", "HEART", "CRASH", "FAST", "SLEEP", "PREDICT", "FILE", "CURIOSITY",
-                      "PARK", "BELIEF", "THINK", "EXAM", "FROZEN", "ARRIVAL", "CYCLE", "WORLD", "ASK"):
-            self.assertNotIn(other, msg, f"{other} was already wired on G4.genome; it must not appear in this refusal")
+        mind = Mind(genome_path, root / "run")   # must not raise
+        self.assertIn("INDUCE", mind.genome.declared)
+
+    def test_deduce_line_starts(self) -> None:
+        root = _tmp()
+        text = G4_GENOME.read_text() + "DEDUCE   one step\n"
+        genome_path = root / "G4-plus-deduce.genome"
+        genome_path.write_text(text)
+        mind = Mind(genome_path, root / "run")   # must not raise
+        self.assertIn("DEDUCE", mind.genome.declared)
 
     def test_induce_hash_off_line_alone_does_not_refuse(self) -> None:
         """The SAME clause, commented (#OFF), as G4.genome already carries it today -- confirms the toy's
         premise (INDUCE really is off in the life's own genome) rather than assuming it."""
         genome = parse_genome(G4_GENOME.read_text())
         self.assertNotIn("INDUCE", genome.declared, "G4.genome's own INDUCE line is #OFF -- must not parse")
+
+
+class TestSentenceRefusal(unittest.TestCase):
+    """(b)'s new example (INDUCE's old role, above, is now a positive control): SENTENCE parses
+    (machinery.py's clause exists) but has NO interpreter anywhere -- refuses, naming SENTENCE and
+    nothing else (mirrors the old INDUCE toy exactly)."""
+
+    def test_sentence_line_refuses_naming_sentence(self) -> None:
+        root = _tmp()
+        text = G4_GENOME.read_text() + "SENTENCE two-word frames is near under-judge\n"
+        genome_path = root / "G4-plus-sentence.genome"
+        genome_path.write_text(text)
+        with self.assertRaises(GenomeError) as ctx:
+            Mind(genome_path, root / "run")
+        msg = str(ctx.exception)
+        self.assertIn("SENTENCE", msg)
+        # every gene G4.genome ALREADY declares must still be considered wired -- only the new one is named
+        for other in ("BODY", "TAPE", "HEART", "CRASH", "FAST", "SLEEP", "PREDICT", "FILE", "CURIOSITY",
+                      "PARK", "BELIEF", "THINK", "EXAM", "FROZEN", "ARRIVAL", "CYCLE", "WORLD", "ASK"):
+            self.assertNotIn(other, msg, f"{other} was already wired on G4.genome; it must not appear in this refusal")
+
+    def test_sentence_hash_off_line_alone_does_not_refuse(self) -> None:
+        genome = parse_genome(G4_GENOME.read_text())
+        self.assertNotIn("SENTENCE", genome.declared, "G4.genome's own SENTENCE line is #OFF -- must not parse")
 
 
 class TestPlantedControl(unittest.TestCase):
@@ -131,6 +160,10 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "FILE": "FILE     claim route decider due",
         "BELIEF": "BELIEF   clash opens never overwrites",
         "TRAITS": "TRAITS   contrast head 32 lr 0.01 at sleep",
+        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2: two rows, matching the two
+        # genes.py RUNS entries added by this task.
+        "INDUCE": "INDUCE   rule from 5 episodes no counter",
+        "DEDUCE": "DEDUCE   one step",
     }
 
     def test_every_runs_gene_parses(self) -> None:

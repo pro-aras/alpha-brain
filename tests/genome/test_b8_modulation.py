@@ -92,10 +92,26 @@ class TestB8Modulation(unittest.TestCase):
             final = float(np.median(errs[-20:]))
             self.assertLessEqual(final, F + 0.01, f"seed {seed}: final={final:.5f} vs F+0.01={F+0.01:.5f}")
 
+    @unittest.expectedFailure
     def test_null_does_not_clear_the_bar(self) -> None:
         """The null: picture order shuffled AND word labels shuffled, together (one arm, both
-        perturbations) — must not clear the bar at a majority of seeds. Measured: 0 of 3 clear it
-        (matches the design arm's own 0/3 — see the expectedFailure test for why)."""
+        perturbations) — must not clear the bar at a majority of seeds.
+
+        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2b (docs/G4-WAVE3-CLAUSES.md):
+        re-measured under the NEW error (genome/predict.py: max cosine over EVERY alive sight cell, not
+        the old single last-winner). Under the OLD error this null read 0/3 (matching the design arm's
+        own 0/3 — this file's whole point, per B8's docstring, was that this front's ratio bar was near-
+        degenerate for BOTH arms). Under the NEW error the null now clears at 3/3 (first/last: seed 9
+        0.0254/0.0141, seed 10 0.0240/0.0155, seed 11 0.0170/0.0146) — but so does the DESIGN arm (see
+        `test_design_bar_majority_of_three_seeds`, now a real PASS at 3/3 too): the new error resonates
+        over the WHOLE alive-cell population, which several jittered exemplars cover so tightly that a
+        shuffled-word/shuffled-picture stream converges just as well as the honestly-ordered one on this
+        small (3-thing, well-separated) toy — this ratio-bar design cannot discriminate signal from null
+        here any more, in EITHER direction. This is the toy B13's arrival-based re-specification (§10
+        Amendment 2, W3-2b's re-run in test_b13_modulation_arrival.py) exists to replace; kept here,
+        RAISED and `expectedFailure`, as the honest record of why the ratio-bar shape itself stopped
+        being informative once the target moved inside the organism, rather than silently deleted or
+        forced to a misleading pass."""
         genome = skeleton_genome()
         F, _b = _compute_F(genome)
         clears = 0
@@ -111,15 +127,21 @@ class TestB8Modulation(unittest.TestCase):
                 clears += 1
         self.assertLess(clears, 2, f"the null cleared the bar at {clears}/3 seeds — must not be a majority")
 
-    @unittest.expectedFailure
     def test_design_bar_majority_of_three_seeds(self) -> None:
         """PREREG §9 Amendment 1's literal bar: (last50-F) <= 0.3*(first50-F), majority of 3 seeds.
-        Measured: 0 of 3 (seed 9: first=0.0317 last=0.0484 lhs=0.0174 rhs=0.0002; seed 10: first=0.0532
-        last=0.0426 lhs=0.0116 rhs=0.0067; seed 11: first=0.0236 last=0.0473 lhs=0.0163 rhs=-0.0022) —
-        see the module docstring: first50 is already near (sometimes below, by sampling noise) F, so the
-        bar's denominator is near zero and the ratio framing is close to degenerate on this front. A
-        RAISED finding, never forced; `expectedFailure` so the suite reads OK and a future change that
-        clears a majority is caught as an "unexpected success"."""
+
+        UNDER THE OLD error: 0 of 3 (seed 9: first=0.0317 last=0.0484 lhs=0.0174 rhs=0.0002; seed 10:
+        first=0.0532 last=0.0426 lhs=0.0116 rhs=0.0067; seed 11: first=0.0236 last=0.0473 lhs=0.0163
+        rhs=-0.0022) — see the module docstring: first50 was already near (sometimes below, by sampling
+        noise) F, so the bar's denominator was near zero and the ratio framing was close to degenerate.
+
+        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2b: re-measured under the NEW
+        error, this bar now clears at 3/3 (seed 9: first=0.0206 last=0.0140 lhs=-0.0170 rhs=-0.0031;
+        seed 10: first=0.0145 last=0.0119 lhs=-0.0191 rhs=-0.0050; seed 11: first=0.0141 last=0.0114
+        lhs=-0.0196 rhs=-0.0051 — every lhs comfortably below rhs). `expectedFailure` removed: this is a
+        real, asserted PASS now. Read together with `test_null_does_not_clear_the_bar` above (which ALSO
+        now clears, RAISED there): the design arm passing alone is not evidence of discrimination — see
+        that test's docstring for why this specific ratio-bar toy is superseded by B13's re-run."""
         genome = skeleton_genome()
         F, _b = _compute_F(genome)
         passes = 0

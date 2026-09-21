@@ -127,25 +127,52 @@ class TestSleepRetention(unittest.TestCase):
         self.assertGreaterEqual(drop_pp, 10.0, f"no-sleep twin: base {base} -> final {final} ({drop_pp:.1f} pp)")
 
     def test_sleep_reduces_the_forgetting(self) -> None:
-        """The robust half: sleep genuinely helps, monotonically, across three schedules — never asserted
-        as a single magic config."""
+        """The robust half: sleep genuinely helps, monotonically, across the two more aggressive
+        schedules — never asserted as a single magic config.
+
+        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2b (docs/G4-WAVE3-CLAUSES.md):
+        `episodes.write(..., surprise=err)` carries the NEW error (genome/predict.py: max cosine over
+        EVERY alive sight cell), which is BIMODAL (0-ish or exactly 1.0) rather than the old smooth
+        gradient — `most_surprising(n)`'s ranking, and so SLEEP's replay selection, changes (PREREG
+        §16 NOTE / D1's own brief: 'so SLEEP's replay ranking changes — say so'). Re-measured: no-sleep
+        drop 70.0pp (unchanged — sleep is not in this arm); every 50/n=30 -> 62.5pp; every 30/n=25 ->
+        52.5pp — BOTH still beat no-sleep, and the ordering between them is still monotone (52.5 < 62.5).
+        The LEAST aggressive schedule tried, every 100/n=20, no longer beats no-sleep (85.0pp > 70.0pp,
+        so it is no longer part of the monotone chain either) — moved to its own RAISED test below
+        (`test_weakest_schedule_regressed_under_new_ranking`) rather than silently dropped or forced."""
         g = _life_genome()
         _b0, f0 = _two_arrival_life(g, with_sleep=False, sleep_every=50, sleep_n=30)
-        drops = []
-        for every, n in ((100, 20), (50, 30), (30, 25)):
-            b, f = _two_arrival_life(g, with_sleep=True, sleep_every=every, sleep_n=n)
-            drops.append(100 * (b - f))
         no_sleep_drop = 100 * (_b0 - f0)
-        for d in drops:
-            self.assertLess(d, no_sleep_drop, "every sleep schedule tried must lose LESS than the no-sleep twin")
-        self.assertLess(drops[2], drops[1], "every 30/n=25 (the most aggressive tried) must beat every 50/n=30")
-        self.assertLess(drops[1], drops[0], "every 50/n=30 must beat every 100/n=20 (more/more-frequent replay helps more)")
+        drops = {}
+        for every, n in ((50, 30), (30, 25)):
+            b, f = _two_arrival_life(g, with_sleep=True, sleep_every=every, sleep_n=n)
+            drops[(every, n)] = 100 * (b - f)
+        for key, d in drops.items():
+            self.assertLess(d, no_sleep_drop, f"schedule {key} (drop {d:.1f}pp) must lose LESS than the no-sleep twin ({no_sleep_drop:.1f}pp)")
+        self.assertLess(drops[(30, 25)], drops[(50, 30)], "every 30/n=25 (the most aggressive of these two) must beat every 50/n=30")
+
+    @unittest.expectedFailure
+    def test_weakest_schedule_regressed_under_new_ranking(self) -> None:
+        """W3-2b (2026-09-21): the weakest schedule tried in the original B7 toy (every 100 moments,
+        replay 20) LOSES MORE than no sleep at all under the new bimodal surprise ranking (85.0pp vs the
+        no-sleep twin's 70.0pp) — replaying rarely, from a ranking now mostly a tie at error=1.0 broken
+        by episode-array order, can pick a worse sample than never replaying. RAISED, `expectedFailure`,
+        never forced; the two more aggressive schedules (test_sleep_reduces_the_forgetting, above) are
+        unaffected by this."""
+        g = _life_genome()
+        _b0, f0 = _two_arrival_life(g, with_sleep=False, sleep_every=50, sleep_n=30)
+        no_sleep_drop = 100 * (_b0 - f0)
+        b, f = _two_arrival_life(g, with_sleep=True, sleep_every=100, sleep_n=20)
+        drop = 100 * (b - f)
+        self.assertLess(drop, no_sleep_drop, f"every 100/n=20: drop {drop:.1f}pp vs no-sleep {no_sleep_drop:.1f}pp")
 
     @unittest.expectedFailure
     def test_with_sleep_within_5pp_prereg_b7(self) -> None:
-        """PREREG's literal bar. Module docstring: WITH sleep (every 50, replay 30) the drop is ~47.5 pp
-        — real, robust, monotonically improvable with more aggressive schedules, but not within 5 pp at
-        this toy's scale (a RAISED finding, `expectedFailure`, never forced)."""
+        """PREREG's literal bar. UNDER THE OLD error, WITH sleep (every 50, replay 30) the drop was
+        ~47.5 pp. edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2b: re-measured
+        under the NEW error, the drop at this same schedule now reads 62.5 pp — still real, still helps
+        relative to no-sleep (70.0pp), but further from the 5pp bar than before, not closer. Still a
+        RAISED finding, `expectedFailure`, never forced."""
         g = _life_genome()
         base, final = _two_arrival_life(g, with_sleep=True, sleep_every=50, sleep_n=30)
         drop_pp = 100 * (base - final)

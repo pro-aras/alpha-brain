@@ -447,7 +447,14 @@ def deduce(beliefs: List[Dict[str, object]]) -> List[Dict[str, object]]:
     Two beliefs about DIFFERENT words sharing >=1 cell predict a co-resonance, routed at the shared
     cell. Two beliefs about the SAME word with DISJOINT cells (decision 2/3 above) are unroutable — no
     single cell names the route — and are filed with route="", REFUSED BY NAME. Two beliefs about the
-    same word with overlapping cells are skipped (one belief, not a deduction target)."""
+    same word with overlapping cells are skipped (one belief, not a deduction target).
+
+    edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md): the
+    routable (different-words) row now also carries `row["shared"]` (the same list already named in its
+    claim/route text) — creature/mind.py's scoring needs the cluster of cells to check for resonance at
+    the rule's due canvas, and re-deriving it there from two belief rows a second time would duplicate
+    this function's own pairing logic instead of reading its answer. The refused (unroutable) row carries
+    no "shared" (there is nothing to score — predict.score() raises on a refused row, B6's law)."""
     belief_rows = [b for b in beliefs if b.get("kind", "belief") == "belief"]
     claims: List[Dict[str, object]] = []
     for i in range(len(belief_rows)):
@@ -463,6 +470,7 @@ def deduce(beliefs: List[Dict[str, object]]) -> List[Dict[str, object]]:
                     decider=f'both "{a["word"]}" and "{b["word"]}" answer',
                     due=f"belief lines {a.get('line')}/{b.get('line')}",
                 )
+                row["shared"] = shared
             else:
                 if shared:
                     continue
