@@ -893,13 +893,57 @@ class Organism:
         o.births = [tuple(r) for r in meta["births"]]; o.merges = [tuple(r) for r in meta["merges"]]
         o.edges_log = [tuple(r) for r in meta["edges_log"]]; o.prunes_log = [tuple(r) for r in meta["prunes_log"]]
         o.refusals_by_arrival = list(meta["refusals_by_arrival"])
-        if o.state_hash() != meta["state_hash"]:
-            raise GenomeError(f"loaded organism's state_hash {o.state_hash()[:16]} is not the saved {meta['state_hash'][:16]}")
+        # edit: Claude (Sonnet 5, builder F), 2026-09-21 17:45 +0400 -- the orchestrator's follow-up task
+        # (commit 412d721): the closed lives' readers (tools/verdict_g4.py's W3-2 reach control, the
+        # exam) must still LOAD old-format snapshots (saved before the state_hash repair). Try the NEW
+        # live-block hash first; on mismatch, try the LEGACY full-array hash (kept verbatim as
+        # `_state_hash_legacy`, never deleted); refuse only when BOTH fail. A snapshot saved by either
+        # generation of the code therefore loads; a genuinely corrupted one (neither digest matches)
+        # still refuses loudly, by name (docs/briefs/G5-F-REPORT.md §4).
+        new_hash = o.state_hash()
+        if new_hash != meta["state_hash"]:
+            legacy_hash = o._state_hash_legacy()
+            if legacy_hash != meta["state_hash"]:
+                raise GenomeError(
+                    f"loaded organism's state_hash {new_hash[:16]} (legacy {legacy_hash[:16]}) is not the saved {meta['state_hash'][:16]}"
+                )
         return o
 
     # ------------------------------------------------------------------ identity
+    # edit: Claude (Sonnet 5, builder F), 2026-09-21 16:45 +0400 -- G5-F task 2 / MIND-MEMORY.md R1: hash
+    # only the LIVE block W[:n_s, :n_w] (mask, strikes likewise) instead of the full nmax x nmax arrays.
+    # A cell id is only ever written by _birth() with cid < area.n at the time of the write, and area.n
+    # never decreases (G4 CYCLE retires/merges cells but keeps their ids below n) -- so every nonzero
+    # entry of W/mask/strikes already lives inside [:sight.n, :words.n]; verified empirically (not just
+    # argued) on life 1/2/3a's real closed snapshots: count_nonzero(W) == count_nonzero(W[:n_s,:n_w]),
+    # same for mask and strikes, on all three (docs/briefs/G5-F-REPORT.md). This CHANGES THE DIGEST for
+    # the same state (the bytes hashed are different) -- it is a new pin, reported, never written to
+    # tools/gate_g4.py's PIN or any test's PINNED_HASH_DEV on master; that is the orchestrator's call.
     def state_hash(self) -> str:
-        """sha256 over the fixed-dtype state arrays and the counters (mark vii, the replay gate)."""
+        """sha256 over the fixed-dtype state arrays and the counters (mark vii, the replay gate). W/mask/
+        strikes are hashed only over their LIVE block [:sight.n, :words.n] -- no cell id >= n is ever
+        written, so this is losslessly equivalent to hashing the full nmax x nmax arrays, just without
+        paying for the >99.6% that can never be non-zero (MIND-MEMORY.md §4 R1)."""
+        h = hashlib.sha256()
+        for a in (self.sight, self.words):
+            h.update(a.cells[: a.n].tobytes()); h.update(a.alive.tobytes()); h.update(a.misfires.tobytes())
+            h.update(np.int64(a.n).tobytes())
+        n_s, n_w = self.sight.n, self.words.n
+        h.update(self.W[:n_s, :n_w].tobytes()); h.update(self.mask[:n_s, :n_w].tobytes()); h.update(self.strikes[:n_s, :n_w].tobytes())
+        h.update(np.int64(self.t).tobytes()); h.update(np.int64(self.budget_left).tobytes())
+        h.update(json.dumps(self.c, sort_keys=True).encode())
+        h.update(json.dumps(self.births).encode()); h.update(json.dumps(self.merges).encode())
+        h.update(json.dumps(self.edges_log).encode()); h.update(json.dumps(self.prunes_log).encode())
+        return h.hexdigest()
+
+    # edit: Claude (Sonnet 5, builder F), 2026-09-21 17:45 +0400 -- kept VERBATIM (byte-for-byte the old
+    # state_hash body, before the live-block repair) so Organism.load can still verify a pre-repair
+    # snapshot's saved digest. Never called from anywhere except load()'s fallback; state_hash() above
+    # remains the one every NEW save() writes and every live/replay path reads.
+    def _state_hash_legacy(self) -> str:
+        """The PRE-REPAIR state_hash: sha256 over the FULL nmax x nmax W/mask/strikes arrays (docs/briefs/
+        G5-F-REPORT.md §4). Exists only so Organism.load can accept a snapshot saved before the live-block
+        repair; every other caller uses state_hash()."""
         h = hashlib.sha256()
         for a in (self.sight, self.words):
             h.update(a.cells[: a.n].tobytes()); h.update(a.alive.tobytes()); h.update(a.misfires.tobytes())
