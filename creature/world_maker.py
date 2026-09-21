@@ -67,11 +67,14 @@ def _publish_canvas(publish: Callable, root: Path, moment: str, thing: str, rgb:
 
 def sense(publish: Callable, stop_event, root: Path, period: float = 5.0, seed: int = DEFAULT_SEED,
           plant_after_canvases: int = PLANT_AFTER_CANVASES, plant_window_s: float = PLANT_WINDOW_S,
-          plant_showings: int = PLANT_SHOWINGS) -> None:
+          plant_showings: int = PLANT_SHOWINGS, window_seconds: float = WINDOW_SECONDS) -> None:
     """The world-maker sense thread body: one canvas every `period` s, forever, until `stop_event`. The
     plant (THING_PLANT) shows `plant_showings` times, evenly spaced, in the `plant_window_s` seconds
     after the `plant_after_canvases`-th canvas; THING_NULL and THING_NEVER are never shown (schedule()
-    never names them, and the plant path only ever substitutes THING_PLANT)."""
+    never names them, and the plant path only ever substitutes THING_PLANT). `window_seconds`: how long a
+    window stays open before `window` increments (default WINDOW_SECONDS, 6 h -- C1.3, W3-0b: WORLD's
+    declared `arrivals every <h> h` becomes this DEFAULT only; `schedule()`/`make()` themselves take the
+    integer `window` they are given either way, so the PIN (test_world_pin.py) is untouched)."""
     window = 0
     i = 0
     total = 0
@@ -83,7 +86,7 @@ def sense(publish: Callable, stop_event, root: Path, period: float = 5.0, seed: 
 
     while not stop_event.is_set():
         now = time.monotonic()
-        if now - window_start >= WINDOW_SECONDS:
+        if now - window_start >= window_seconds:
             window += 1
             window_start = now
             i = 0

@@ -15,14 +15,17 @@
 # BELIEF's "clash opens never overwrites" wording carry no parameter today) and BELIEF's own "clash" half
 # is additionally unwired per PREREG §14 (wave 3's own job — D-G12/W3-1).
 #
-# Several genes ARE wired without a `"X" in declared` presence-branch because the behaviour they name is
-# unconditional in the body/machinery layer (the same call happens whether or not the gene appears in the
-# genome text): BODY, TAPE, HEART, CRASH, WORLD, ASK. Declaring them is documentation of a fact the code
-# already guarantees, not a switch — so their declared VALUE is never read either (a HEART line edited to
-# "every 60 s" changes nothing; STATUS_PERIOD_S is a body.py constant). Named here rather than treated as
-# unwired because the PREREG's own W3-0 contract puts them in "the body's own" table by name (a call site
-# genuinely exists), but flagged in the report as "value read: no" — the same class of finding as TRAITS,
-# one notch less dangerous only because nothing claims to interpret a NUMBER that in fact does nothing.
+# BODY, TAPE, HEART, CRASH, WORLD, ASK are wired without a `"X" in declared` presence-branch guarding the
+# CALL SITE itself (the same call happens whether or not the gene appears in the genome text) — but as of
+# C1 (docs/G4-WAVE3-CLAUSES.md W3-0b) each one's declared VALUE IS now read when the gene is present, and
+# the prior default (the hardcoded constant/behaviour) is kept exactly when it is absent: `_check_body_
+# threads`/`_resolve_tape_dir`/`_status_period_s`/`_crash_policy` in creature/body.py + creature/tape.py,
+# and the WORLD-driven maker period/window/folder-dir also in creature/body.py:main; `_ask_refusal` in
+# creature/ask.py. TAPE and CRASH's own grammar in genome/machinery.py is still a single fixed-string
+# match each (TAPE takes any path but CRASH accepts only the literal "sense restart journal; mind page",
+# and ASK only the literal six-verb line) — the READING side is wired and tested against hand-built
+# `declared` values beyond what today's parser can produce; raised in the builder report, not worked
+# around (not this builder's file).
 """creature/genes.py — W3-0: the registry of genes the machinery RUNS, and the refusal law built on it.
 
 `RUNS[layer][GENE] = "<file>:<site> — <one-line note>"` for a gene with a real call site, or `None` for a
@@ -43,17 +46,18 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "CYCLE": "genome/machinery.py:Organism._birth (soft ceiling grow_to*nmax) + genome/sleep.py:cycle (consolidation pass)",
     },
     # ---------------------------------------------------------------------------------------- the body
-    # BODY/TAPE/HEART/CRASH/WORLD/ASK: the behaviour each names is unconditional in body.py/tape.py/ask.py
-    # (present whether or not the gene is declared) — the site is real, but the declared VALUE is never
-    # read (see the module docstring and the builder report's "value read?" column).
+    # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.7 (docs/G4-WAVE3-CLAUSES.md
+    # W3-0b): BODY/TAPE/HEART/CRASH/WORLD/ASK now READ their declared values (each gated on the gene's
+    # own presence -- undeclared keeps the exact prior default, a toy in each of
+    # tests/creature/test_gene_values.py, test_world_pin.py, test_world_maker.py proves the change).
     "body": {
         "EXAM": "creature/body.py:Body.start (declared['EXAM']['every'] read; starts the voice/exam thread)",
-        "BODY": "creature/body.py:Body/SenseThread (thread wiring is fixed by code; declared['BODY']['threads'] NOT read)",
-        "TAPE": "creature/tape.py:Tape.__init__ (root/'tape' hardcoded; declared['TAPE']['path'] NOT read)",
-        "HEART": "creature/body.py:STATUS_PERIOD_S=10.0 constant (declared['HEART']['every_s'] NOT read)",
-        "CRASH": "creature/body.py:SenseThread.run (journal on restart) + Body._handle_mind_crash (page) — unconditional, declared['CRASH'] value NOT read",
-        "WORLD": "creature/body.py:main --maker-period default 5.0 / world_maker.sense period — declared['WORLD'] values NOT read",
-        "ASK": "creature/ask.py:answer (the six verbs are hardcoded `if q == ...`; declared['ASK']['verbs'] NOT read)",
+        "BODY": "creature/body.py:_check_body_threads, read at Body.__init__ (declared['BODY']['threads'] validated against the known five; refuses naming an unknown thread or a missing 'mind')",
+        "TAPE": "creature/tape.py:_resolve_tape_dir, read at Body.__init__ / creature/body.py:Body.start's read_tape (declared['TAPE']['path'] resolves the tape directory)",
+        "HEART": "creature/body.py:Body.__init__ -> Body._status_loop (declared['HEART']['every_s'] read into self._status_period_s, the STATUS write period)",
+        "CRASH": "creature/body.py:_crash_policy, read at Body.__init__ -> SenseThread.run (restart) + Body._handle_mind_crash (page) — declared['CRASH']'s two sub-facts gate each behaviour",
+        "WORLD": "creature/body.py:main (declared['WORLD']['drawn_every_s']/['arrival_every_h'] read into world_maker.sense's period/window_seconds; ['folder'] arms creature/senses/folder.py behind FOLDER_DOOR_GATED)",
+        "ASK": "creature/ask.py:_ask_refusal, read at answer() (declared['ASK']['verbs'] read; a verb outside it is refused by name instead of reaching the hardcoded `if q == ...` branches)",
     },
     # ---------------------------------------------------------------------------------------- the mind
     "mind": {

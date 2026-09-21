@@ -22,14 +22,33 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
-class Tape:
-    """One tape rooted at `root` (creates `root/tape/` and `root/tape/payload/`). Thread-safe: one lock
-    guards payload write + row append + SEQ persistence together, so seq is strictly increasing and the
-    queue a caller feeds from `publish`'s return value is in the same order as the tape itself."""
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.2 (docs/G4-WAVE3-CLAUSES.md W3-0b):
+# TAPE's declared value read. Every genome text seen so far writes the declared path exactly "run/tape"
+# (a convention every G4 genome comment uses: the path as if from the repo root, "<repo>/run/tape"), and
+# `--root` at the call site already points at that "run" directory -- so the declared path's own leading
+# "run" segment names this Tape's `root`, not a subdirectory of it, and is stripped before joining.
+def _resolve_tape_dir(root: Path, declared_path: Optional[str]) -> Path:
+    """`declared_path` is `genome.declared['TAPE']['path']` (or None if TAPE is undeclared -> today's
+    hardcoded default, unchanged). `TAPE run/tape` under root R still writes R/tape byte-identical to
+    before; `TAPE run/tape2` writes R/tape2, nothing under R/tape (docs/briefs/W3-BUILDER-C.md C1.2's
+    own toy)."""
+    if not declared_path:
+        return root / "tape"
+    parts = Path(declared_path).parts
+    if parts and parts[0] == "run":
+        parts = parts[1:]
+    return root / Path(*parts) if parts else root / "tape"
 
-    def __init__(self, root: Path):
+
+class Tape:
+    """One tape rooted at `root` (creates `root/<tape dir>/` and its `payload/`, `<tape dir>` defaulting
+    to `tape` and otherwise read from `declared_path` -- C1.2). Thread-safe: one lock guards payload write
+    + row append + SEQ persistence together, so seq is strictly increasing and the queue a caller feeds
+    from `publish`'s return value is in the same order as the tape itself."""
+
+    def __init__(self, root: Path, declared_path: Optional[str] = None):
         self.root = Path(root)
-        self.tape_dir = self.root / "tape"
+        self.tape_dir = _resolve_tape_dir(self.root, declared_path)
         self.payload_dir = self.tape_dir / "payload"
         self.payload_dir.mkdir(parents=True, exist_ok=True)
         self.seq_path = self.tape_dir / "SEQ"
@@ -63,10 +82,13 @@ class Tape:
         return row
 
 
-def read_tape(root: Path) -> Iterator[Dict[str, object]]:
-    """Yield every row of every day file under `root/tape/`, in seq order (day files sort lexically by
-    date, and within a file rows are appended strictly in seq order by `Tape.publish`'s lock)."""
-    tape_dir = Path(root) / "tape"
+def read_tape(root: Path, declared_path: Optional[str] = None) -> Iterator[Dict[str, object]]:
+    """Yield every row of every day file under `root/<tape dir>/` (C1.2: the SAME `_resolve_tape_dir` a
+    `Tape` built with the same `declared_path` writes to -- Body.start()'s backlog replay must read the
+    genome's own TAPE path or a non-default one would publish correctly and never be replayed), in seq
+    order (day files sort lexically by date, and within a file rows are appended strictly in seq order by
+    `Tape.publish`'s lock)."""
+    tape_dir = _resolve_tape_dir(Path(root), declared_path)
     if not tape_dir.exists():
         return
     for day_file in sorted(tape_dir.glob("*.jsonl")):
