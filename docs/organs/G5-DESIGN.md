@@ -1,11 +1,11 @@
 # G5 — THE CREATURE REVERSE-ENGINEERED FROM BIOLOGY, WITH SOFTWARE ADDED — the design for Ahmad's yes
-*edit: Claude (Fable 5.1), 2026-09-21 16:07 +0400. Assembled from the six organ documents under `docs/organs/` (EYE, EAR, BODY-SENSES, MOTOR-HANDS, MIND-MEMORY, MIND-THINKING-LANGUAGE — ~580 KB, ~600 road-tagged claims, written today by six Opus 5 researchers on his 13:30 and 13:39 words) and from what I verified myself in the live tree. Nothing here is switched on. No code before his yes.*
+*edit: Claude (Fable 5.1), 2026-09-21 16:07 +0400. Assembled from the six organ documents under `docs/organs/` (EYE, EAR, BODY-SENSES, MOTOR-HANDS, MIND-MEMORY, MIND-THINKING-LANGUAGE — ~580 KB, ~600 road-tagged claims, written today by six Opus 5 researchers on his 13:30 and 13:39 words) and from what I verified myself in the live tree. Nothing here is switched on. No code before his yes. AMENDED 2026-09-21 16:41 +0400 on his 16:39 word: «keep every organ ON as raw part of the body, we don't know when anything get kicked on» — every organ line is ON from the first life; what is staged is the world that feeds it (§3, §5).*
 
 ## 0 · In five lines
 1. **The rule that decides everything:** organs are FIXED prefilters (with runtime ADAPTS that never learn); the MIND is the only place that learns — and the mind must RECEIVE, with every trait, the WHERE, the WHEN and the ACT that produced it. Today it receives none of the three.
 2. **The creature today perceives and does almost nothing:** its five sampling roads are chosen by nothing; no act has a sensory consequence; the exam it sits never comes back to it; 39 % of its CPU goes to a hash of memory that is 99.6 % empty; and two mind mechanisms could not fire at all (INDUCE fixed today at the life-3b boundary; DEDUCE deferred to life 4 with its seam).
 3. **G5 = the same genome and machinery, upgraded on exactly these features:** the seam contract on every organ (trait + where + when + act + whose + provenance), an error that is a SURPRISE (expectation vs input) rather than a NOVELTY (input vs memory), one canvas = one episode, acts with outcomes (the exam score returns; the first hand), a body sense, and the language in HIS order — all as lines in the genome's own syntax, each with the test that could refuse it.
-4. **ONE life** on the G5 genome, its multi-exam (the nine marks + one new mark per line switched on, with ceilings and nulls measured BEFORE it), a small exploration world (drawn things + his folder + his own exam score + the shelf of programs; sound only if he gives it a voice), every claim beside its twin.
+4. **ONE life** on the G5 genome with EVERY ORGAN ON as a raw part of the body (his 16:39 word) — the sound ear at the folder's and the game's audio, the body sense, smell, touch and the copy of an act at the hands, the colour channels at the eye — each delivering nothing or its raw readings until its world feeds it; the multi-exam (the nine marks + one per line, ceilings and nulls measured BEFORE it; an unfed organ's mark reads «not gradable», never FAIL for silence, never PASS by construction); a small exploration world that is what gets staged (drawn things + his folder + his own exam score + the shelf of programs + a game); every claim beside its twin.
 5. **What is his:** 18 questions (§8), of which six change the build; my recommendation is printed on each. Everything else is decided under the 09-05 delegation and journaled.
 
 ## 1 · His words, and the rule they make
@@ -51,19 +51,21 @@ DELIVER  where fixation when instant act glance     # G-EYE-1: the seam contract
 BIND     glances per canvas                          # G-EYE-2 (= G-MIND-2): one canvas = one episode; bar .975 = the first-fixation twin; the diagnostic on life 2's journal decides BIND vs `fixations 1`
 SURPRISE floor 0.05 predicted last-canvas            # G-EYE-5: the mind's prediction reaches the organ; the organ reports the residual (parser change; breaks earlier tapes' replay → a life boundary). CAVEAT (MOTOR §0.3): gaze's `predicted` slot is the PREVIOUS FRAME's map, not a top-down socket — what it accepts is read before this line is written
 GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border fovea 1 correct 1   # BODY 4.4: a coarse view + one corrective look (the mole's 11th ray; G-EYE-6)
-#OFF RETINA … opp3 …                                 # G-EYE-3 colour: REFUSED until the door has delivered ≥ N coloured pictures (rg ≡ 0 today)
+RETINA   thresh0.25 centre opp3 tower:eye-tower-g2 sqrt unit   # G-EYE-3 colour ON as a raw channel (his 16:39): the two opponency planes deliver 0 on the maker's grey canvas and light the day a coloured picture or a game frame arrives; the mark is «not gradable» until max|rg| over 100 canvases > 0
 #OFF RETINA … dog3 hogcells8x6 …                     # G-EYE-4 a genome-set front beside the pretrained tower: predicted to FAIL (G0 −0.19), proposed for the mutable front it would give
 #OFF EVENT / DEFOCUS / MICRO / EYES2                 # declared OFF with reasons (nothing in the world moves; flat renders; the renderer jitters; one canvas at a time)
 ```
 Not a gene: the retina vectorised (5.42 → 0.46 ms a canvas; a new sha-pin + byte-identity on life 2's tape).
 
-**EAR** (EAR.md §4) — only if the world has sound (EAR §5's own caution: an ear with nothing to hear passes its own tests and teaches nothing). T7 first: count the events an hour of real audio would publish against the tape's rate BEFORE the sense is armed.
+**EAR** (EAR.md §4) — ON from the first life as a raw organ (his 16:39), listening at its doors: an audio file in his folder, a game's sound, a video's track; it publishes NOTHING while the world is silent (an event ear has no idle rows), so its cost idle is a thread that waits. EAR §5's caution stands as a rule about GRADING, not presence: its marks read «not gradable: heard 0 s» until sound arrives. T7 (the events an hour of audio would publish vs the tape's rate) is measured on the first sound the door delivers, before its events are admitted to the tape.
 ```
 SENSE    ear-sound wav 16000 mono · COCHLEA gammatone erb 32 from 50 to 7800 · HAIRCELL rectify power 0.3 · AGC per-channel fast slow clamp 0.1..10
 ONSET    derivative rectified per band · MODBANK 2-4 4-8 8-16 16-32 hz · EVENT publish on onset peak; prominence 2 db gap 60 ms
 TRAIT    sound band 32 + onset-shape 4 + level 1 unit · WHEN instant sample-exact · WHERE itd us ild db · OWNVOICE subtract predicted; flag the event · PROVENANCE front file offset params
 AREA     sound from cochlea · MEET sight sound · MEET sound words
-#OFF ALARM / FOVEA / RHYTHM / WIDE                    # the moth, the bat/frog, the cricket, his own «no 20 Hz–20 kHz floor»
+ALARM    two-cell a1 a2 thresholds                   # the moth's ear: ON (two thresholds, no front, free) — a loud thing is an event even before the cochlea reads it
+#OFF FOVEA / RHYTHM                                  # bands dense where his world speaks; the cricket's delay line — need a world that speaks (a WORLD choice, not an organ)
+WIDE     from 1 to 24000                             # his own line: no 20 Hz–20 kHz floor — ON where the source is recorded wide
 ```
 The one test E52 could not do: a plant whose message is in the FREQUENCY path (two neighbouring carriers, identical amplitude and schedule; the envelope twin at chance, measured not assumed).
 
@@ -71,20 +73,21 @@ The one test E52 could not do: a plant whose message is in the FREQUENCY path (t
 ```
 SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss   # 4.1: the readings; the DRIVE stays the mind's
 SENSE    smell kind size folder age; before any picture is opened                                # 4.5: the cheap wide channel before the expensive contact sense
-COPY     hands expect before the act; organ delivers residual; mind keeps both                    # 4.2: the efference copy — a PRECONDITION on the first act, OFF until HANDS/the web door
-SENSE    touch from hands: exit rate stalls retries bytes                                          # 4.6: OFF until HANDS
+COPY     hands expect before the act; organ delivers residual; mind keeps both                    # 4.2: the efference copy — ON with the first acts (glance · open · ask) from day one; the residual is 0 until an act has an expectation
+SENSE    touch from hands: exit rate stalls retries bytes                                          # 4.6: ON at the hands' door; delivers nothing until a program runs
 ```
 
 **HANDS / ACTS** (MOTOR-HANDS.md §4)
 ```
-ACT      glance open ask                                    # G-MOT-1: only what is reachable now (his Q); fetch/run/say join as they are built
+ACT      glance open ask run say fetch                      # G-MOT-1: the whole vocabulary declared (his 16:39: every organ ON); an act with no road yet is journaled «no road» when chosen — a mark on it reads «not gradable», never FAIL
 OUTCOME  act to episode; error grades it; ranks replay      # G-MOT-2: the existing modulator pointed at a new source; plant = an act whose outcome the world-maker knows (root/truth) and the mind does not
 SIT      exam every 2000 canvases; the score returns as a sense   # G-MOT-3: one publishing thread; the file selected digit-prefixed, never by pointer; refuse if the score is constant (life 2's slid .995 → .952, so it moves)
 HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20   # G-MOT-4: choose from a shelf (rung 1), compose (rung 2); off the mind's thread
 PROBE    doors by want; rate by surprise; order is a seed function                 # G-MOT-5: the sampling act is chosen, not scheduled
 MOUTH    emit sentence; gate refuses uncited; abstention reported                  # G-MOT-6: the mouth is the mind's fixed emitter (SENTENCE composed, judged, never next-token)
 WORLD    … consequence: what he opens changes what is drawn next                    # G-MOT-7: a world that answers back
-#OFF BABBLE / EXPLORE                                       # no ear to grade a babble; one live verb has nothing to vary
+BABBLE   semi-random emission; the ear grades it            # ON now that the ear is ON: what the mouth emits is heard by its own ear (OWNVOICE) — the songbird's loop, graded only once a sound world exists
+EXPLORE  variability 0.1 on the chosen act                  # ON: the vocabulary now has several verbs to vary
 ```
 
 ## 4 · The mind of G5 (MIND-MEMORY.md §4; MIND-THINKING-LANGUAGE.md §4)
@@ -108,7 +111,7 @@ BELIEF   clash opens never overwrites; entrench by evidence     # AGM's minimal 
 Not genes: R1 the `state_hash` repair (hash the live block; the pin moves; row-for-row digest agreement live vs replay on life 2's tape); the recall-hash test of the fly's expansion (a test on the exam's recall, never a gene until it wins).
 
 ## 5 · The ONE life — the multi-exam and the small world
-- **ONE life, his 13:30 word — not a ladder.** `G5.genome` = `G4.genome` + EVERY admissible line above ON at once, one code version for the whole life (REPLAY identity). What is decided BEFORE the life costs no life: the error arm (A or C) by replaying life 2's tape; BIND vs `fixations 1` by the diagnostic on life 2's journal; the repairs of §6. What is NOT in the first life, each because its precondition does not hold today and a one-line check says so: the ear (no sound in the world), HANDS/COPY/touch (no act yet — SIT and OUTCOME on glance·open·ask are the first acts), colour (rg ≡ 0 until the door delivers pictures). Those join at the next boundary when their checks pass — a second life, not a rung of the first.
+- **ONE life, his 13:30 word — not a ladder; EVERY ORGAN ON, his 16:39 word.** `G5.genome` = `G4.genome` + every line above ON at once, one code version for the whole life (REPLAY identity: every delivery is a tape row, so an organ that delivers raw readings replays exactly). What is decided BEFORE the life costs no life: the error arm (A or C) by replaying life 2's tape; BIND vs `fixations 1` by the diagnostic on life 2's journal; the repairs of §6. What is STAGED is the WORLD, never an organ: the drawn things and his folder from the first minute; his own exam score returning; the shelf of programs for the hands; a game (§8's road, measured first by whether the eye bands its things; its frames, sound and score feed the eye, the ear and the outcome sense the moment it is opened); a coloured picture or an audio file the day he drops one in the folder. An organ whose world has not arrived costs its idle thread and grades «not gradable» — never FAIL for silence, never PASS by construction (#228 a). Cost is measured per organ, idle and fed, before the life.
 - **Before the life (the discipline of #222/#228/#231):** every new mark's ceiling and null measured on the twin's own structure and printed beside the bar; every plant placed where its mechanism can fire (the colour lines, the ear, touch/copy are REFUSED today by one-line checks); the cost of each line measured in the shape the mind runs it (per eye row, not the mixed median); the closed lives (1, 2, 3a) as the reader's controls.
 - **The multi-exam:** the nine marks of §5/§16/§18 + one mark per line ON, read by the pre-written reader at 24 h, with a 2 h smoke as the reader's positive control; each mark beside its twin (`--blind <field>`; the frozen twin; the shuffled twin; the random genomes).
 - **The small exploration world:** the maker's drawn things on their cadence (with COLOUR the day the door delivers it, and MOTION only if a change sense is ON) + his folder + his own exam score returning + a shelf of programs the jail runs + (his call) sound. The world answers back: what he opens changes what is drawn next.
@@ -144,7 +147,7 @@ R1 (words pre-cut) vs his 09-15 paste (stream first): HIS way, and the disk agre
 
 ## 9 · What this design does not claim
 - That any line will help. Each carries the test that could refuse it; G-EYE-4 is proposed expecting to fail; three of the six documents say their central line has a real chance of a clean null.
-- That the creature needs an ear, hands or colour today: each is refused by a one-line check on the world as it is, and the checks are printed in §3.
+- That an organ ON with no world yet proves anything: the ear, the hands' touch, the colour channels and the copy of an act are ON as raw parts of the body (his 16:39 word) and their marks read «not gradable» until their world arrives; the one-line checks in §3 say which world each is waiting for.
 - That the numbers in the documents are all primary: ~600 claims carry roads; `[secondary:]` on this estate means a search result that named the primary and quoted its number — before any number is written into a growth line, its primary is fetched at its open mirror (SOLUTIONS #196).
 - That the six documents agree on numbering: the animal register's rows collided (one renumbering owed); the cost columns of EYE/EAR are re-based by MIND-MEMORY's finding (§2 row 14).
 - That life 3b's verdict tomorrow decides G5: it decides W3-2 on the fixed key and reads MODULATION FAIL by the mechanism named in §18; G5's error line is decided by replay before any G5 life.
