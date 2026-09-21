@@ -38,8 +38,8 @@ class TestPositiveControls(unittest.TestCase):
         """Not load-bearing for the refusal itself, but pins the fixture: if G4.genome's active gene set
         ever changes, this test names the diff instead of a silent pass/fail elsewhere."""
         genome = parse_genome(G4_GENOME.read_text())
-        expected = {"ARRIVAL", "ASK", "BELIEF", "BODY", "CRASH", "CURIOSITY", "CYCLE", "EXAM", "FAST",
-                    "FILE", "FROZEN", "HEART", "PARK", "PREDICT", "SLEEP", "TAPE", "THINK", "WORLD"}
+        expected = {"ARRIVAL", "ASK", "BELIEF", "BODY", "CRASH", "CURIOSITY", "CYCLE", "DEDUCE", "EXAM", "FAST",
+                    "FILE", "FROZEN", "HEART", "INDUCE", "PARK", "PREDICT", "SLEEP", "TAPE", "THINK", "WORLD"}   # edit: Claude (Fable 5.1), 2026-09-21 15:38 +0400 — INDUCE/DEDUCE ON since life 3 (PREREG §18)
         self.assertEqual(set(genome.declared), expected)
 
     def test_skeleton_and_g1_genomes_start(self) -> None:
@@ -79,7 +79,7 @@ class TestInduceNowWired(unittest.TestCase):
         """The SAME clause, commented (#OFF), as G4.genome already carries it today -- confirms the toy's
         premise (INDUCE really is off in the life's own genome) rather than assuming it."""
         genome = parse_genome(G4_GENOME.read_text())
-        self.assertNotIn("INDUCE", genome.declared, "G4.genome's own INDUCE line is #OFF -- must not parse")
+        self.assertIn("INDUCE", genome.declared, "G4.genome's INDUCE line is ON since life 3 (PREREG §18) -- must parse")   # edit: Claude (Fable 5.1), 2026-09-21 15:38 +0400 — the premise flipped at 13:14 when INDUCE went ON; the pin had not moved
 
 
 class TestSentenceRefusal(unittest.TestCase):
