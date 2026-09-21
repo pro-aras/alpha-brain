@@ -57,3 +57,34 @@ class TestNowireKeepsTheArm(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPlantEyeRowPicker(unittest.TestCase):
+    """edit: Claude (Fable 5.1), 2026-09-21 22:40 +0400 — the reader's planted divergence on a G5 tape (the game door shares the seq space): index 300
+    among the maker eye rows raised IndexError on the 0.1 h dry-run; the picker takes index 300 when >300 maker rows carry a truth
+    file (G4's exact choice), else the middle one; a tape with no such row raises a NAMED IndexError."""
+    def _rows(self, n_maker: int, n_game: int, root: Path):
+        (root / "truth").mkdir(parents=True, exist_ok=True)
+        rows = []; seq = 1
+        for i in range(max(n_maker, n_game)):
+            if i < n_maker:
+                rows.append({"seq": seq, "sense": "eye", "payload": f"payload/{seq:09d}.png", "meta": {"source": "maker"}})
+                (root / "truth" / f"{seq:09d}.json").write_text("{}"); seq += 1
+            if i < n_game:
+                rows.append({"seq": seq, "sense": "eye", "payload": f"payload/{seq:09d}.png", "meta": {"source": "game"}}); seq += 1
+        return rows
+
+    def test_g4_shape_picks_index_300(self) -> None:
+        root = Path(tempfile.mkdtemp()); rows = self._rows(500, 0, root)
+        mk = [r for r in rows if r["meta"]["source"] == "maker"]
+        self.assertIs(verdict_g4._plant_eye_row(rows, root), mk[300])
+
+    def test_g5_shape_picks_the_middle_maker_row(self) -> None:
+        root = Path(tempfile.mkdtemp()); rows = self._rows(241, 242, root)
+        mk = [r for r in rows if r["meta"]["source"] == "maker"]
+        self.assertIs(verdict_g4._plant_eye_row(rows, root), mk[120])
+
+    def test_no_maker_row_raises_named(self) -> None:
+        root = Path(tempfile.mkdtemp()); rows = self._rows(0, 50, root)
+        with self.assertRaises(IndexError):
+            verdict_g4._plant_eye_row(rows, root)

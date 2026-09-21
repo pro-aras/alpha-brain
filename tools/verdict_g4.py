@@ -130,6 +130,17 @@ def alive(G: dict, hours: float, nrestarts: Optional[int]) -> dict:
 # `; error comparator`) → the twin ran the novelty arm while the life ran the comparator; it keeps the arm now. Both factored
 # out of worker() so tests/creature/test_verdict_twins_g5.py can call them without a worker process.
 # (Builder J found the same dropped-keyword defect independently at 22:20 on its branch — its lambda variant with `colour=None` was dropped at the merge in favour of this **kw helper, which its test pins.)
+def _plant_eye_row(rows: List[dict], root: Path) -> dict:
+    """REPLAY's planted divergence: the maker eye row WITH a truth file at index 300 among the first 1,000 tape rows when more
+    than 300 exist (a G4-shaped tape: exactly the row always picked), else the middle one (a G5 tape shares the seq space with
+    the game and folder doors: ~241 maker rows in 1,000). Raises IndexError, named, when no such row exists."""
+    mk = [r for r in rows if r["sense"] == "eye" and (r.get("meta") or {}).get("source", "maker") == "maker"
+          and (root / "truth" / (Path(r["payload"]).stem + ".json")).exists()]   # §18: a folder/game picture has no truth file
+    if not mk:
+        raise IndexError("no maker eye row with a truth file in the first 1,000 tape rows")
+    return mk[300] if len(mk) > 300 else mk[len(mk) // 2]
+
+
 def _force_one_glance() -> None:
     """T-one-glance: gaze mode "one" on every glances() call of THIS process (PREREG §16 addendum), every other argument forwarded."""
     from genome import gaze as _gaze
@@ -515,7 +526,11 @@ def main(argv: List[str]) -> int:
     try:
         from PIL import Image
         rows = [r for r in G["tape"] if r["seq"] <= 1000]
-        eye = [r for r in rows if r["sense"] == "eye" and (r.get("meta") or {}).get("source", "maker") == "maker"][300]   # §18: a folder picture has no truth file
+        # edit: Claude (Fable 5.1), 2026-09-21 22:40 +0400 — G5 dry-run (0.1 h of a tape with the game door ON): the first 1,000 rows hold only ~241 MAKER
+        # eye rows (the game and folder rows share the seq space), so a fixed index 300 raised IndexError and the plant read as an error.
+        # The plant is now the maker eye row WITH a truth file at index 300 when there are more than 300, else the middle one; a G4-shaped
+        # tape (maker only, ~500 eye rows in 1,000) picks exactly the row it always picked. The chosen seq is on the record (plant_seq).
+        eye = _plant_eye_row(rows, root)
         proot = out / "plant-root"; (proot / "tape").mkdir(parents=True, exist_ok=True); (proot / "tape" / "payload").mkdir(exist_ok=True)
         for r in rows:
             src = root / "tape" / r["payload"]; dst = proot / "tape" / r["payload"]
