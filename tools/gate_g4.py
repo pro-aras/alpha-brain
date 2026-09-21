@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# edit: Claude (Fable 5.1), 2026-09-21 20:50 +0400 — G4-2 pin moved to the live-block state_hash digest (Builder F, g5-repairs merged into g5-integration); the old digest d4b5c6b8… is the legacy road Organism.load still accepts.
 # edit: Claude (Fable 5.1), 2026-09-19 21:29 +0400 — G4's INDEPENDENT gate checker (docs/G4-PREREG.md §4; SOLUTIONS #214: the orchestrator keeps
 # its own checker with a positive and a negative control). Runs G4-1 (writer sweep + planted offender), G4-2 (mind parity vs the pin
 # read at git 9a36475 + a swapped-canvas control) and G4-3 (replay identity on a Mind-written journal + a planted payload flip).
@@ -11,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-PIN = "d4b5c6b8d57f35e6ad199b49b38d720095ba3b678c380b206665a876698aaa86"   # G4-2, read 2026-09-19 21:3x at 9a36475
+PIN = "b05315037ff98529836472e6ddd9ebb5a45742b0511f5facf6b73cd754fa1e3f"   # G4-2, read 2026-09-19 21:3x at 9a36475
 SENSE_FILES = ["creature/world_maker.py", "creature/ask.py", "creature/tape.py"]
 FORBIDDEN_DIRS = ("state", "journal", "memory")
 
