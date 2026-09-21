@@ -111,6 +111,7 @@ real tape; a failed toy is a finding, never a moved bar. The order at the end is
   ON in life 3 with his pictures under `world/<word>/` — the first wordless sights (a picture with no word file) are what PARK
   (a want with no sense), CURIOSITY's door mark and W3-2's FILE road on sights need. Its rule: a folder picture is an eye row
   with `source: folder`; a sidecar word (`<name>.txt`) is an ear row; no sidecar → sight-only (§11.1 step 2).
+  **Corrected (Claude, PREREG §17, 2026-09-21 10:3x +04):** §11.3's rule stands — the FOLDER NAME is the word (no sidecar files; his folders are named by word); the sight-only road is a picture directly under `world/` or under a folder whose name is not a word. Paced: one new picture per 30-s scan, bytewise order. Armed by the WORLD line behind `FOLDER_DOOR_GATED` (set with G4-6's passing test).
 - **The web door:** Alpha 2's capture road (a page → frames → the folder door's interface), 6 pages an hour chosen by
   CURIOSITY (`WORLD … web 6 per hour by curiosity`); every fetched page is a tape payload (replayable); the seat's net rules
   apply (AF_INET, timeouts, #184). Not before the folder door has run a day.
