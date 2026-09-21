@@ -5,5 +5,5 @@ Description=creature-g5-watch %i — pages when the seam life's STATUS counters 
 
 [Service]
 Type=oneshot
-WorkingDirectory=/data/dev/genome-wt-q
+WorkingDirectory=/data/dev/genome-lives/%i/code
 ExecStart=/usr/bin/python3 tools/creature_watch.py --root /data/dev/genome-lives/%i

@@ -1,7 +1,8 @@
 # edit: Claude (Fable 5.1), 2026-09-21 20:56 +0400 — the 8 h SEAM LIVES (docs/G5-SEAM-LIFE-PLAN.md §0): a TEMPLATED user unit, one instance per
-# life, %i = the life's name = its root under /data/dev/genome-lives/ (OUTSIDE every worktree). WorkingDirectory is the
-# integration worktree pinned at the commit the life started on (one code version per life; a closed tape replays under
-# its own commit). --plant-after 5000: the plant at hour ≈ 6.9 of an 8 h life (window 3), 5 showings over the next hour.
+# life, %i = the life's name = its root under /data/dev/genome-lives/ (OUTSIDE every worktree). WorkingDirectory is the life's
+# OWN detached checkout `/data/dev/genome-lives/<name>/code` (`git worktree add --detach … <commit>`) — one code version per life; a
+# closed tape replays under its own commit; never the integration worktree, which moves at every landing (corrected 2026-09-21 21:03 +0400 on the
+# advisor's read). --folder /data/dev/genome/world: the folder door resolves `world/` against the CODE tree, his pictures live only there. --plant-after 5000: the plant at hour ≈ 6.9 of an 8 h life (window 3), 5 showings over the next hour.
 # install.sh copies and daemon-reloads only — Claude enables/starts an instance after the gates (PREREG §7's law).
 [Unit]
 Description=creature-g5 %i — an 8 h seam life of the G5 creature (root /data/dev/genome-lives/%i)
@@ -9,10 +10,10 @@ After=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=/data/dev/genome-wt-q
+WorkingDirectory=/data/dev/genome-lives/%i/code
 Environment=OPENBLAS_NUM_THREADS=1
 Environment=OMP_NUM_THREADS=1
-ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome-lives/%i --genome /data/dev/genome-wt-q/genome/G5.genome --plant-after 5000
+ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome-lives/%i --genome /data/dev/genome-lives/%i/code/genome/G5.genome --plant-after 5000 --folder /data/dev/genome/world
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30

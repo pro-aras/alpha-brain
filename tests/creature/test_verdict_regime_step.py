@@ -1,7 +1,8 @@
 # edit: Claude (Fable 5.1), 2026-09-21 20:54 +0400 — the 8 h seam lives (docs/G5-SEAM-LIFE-PLAN.md §1): the regime null band is
 # the 95th percentile of fake-boundary spike ratios sampled every `step` canvases of window 0; a 2 h window 0
-# (~1,440 canvases) at step 100 yields ~14 samples where life 3b's 6 h window gave 150. `--regime-step` lets a
-# seam life sample more densely. CONTROL: the closed life 2's record must reproduce its recorded band EXACTLY
+# (~1,440 canvases) at step 100 yields ~14 fake boundaries × ~11 continuing things ≈ 150 samples (life 2's closed
+# record: 42 boundaries × 11 = 462 over 6 h; the same ~75/h) — enough; `--regime-step` lets a seam life sample more
+# densely as a convenience (corrected 2026-09-21 21:03 +0400: the first comment counted boundaries as samples). CONTROL: the closed life 2's record must reproduce its recorded band EXACTLY
 # at the default step (null_band_95 1.6644, 462 samples — runs/g4-verdict-life2-20260921-1215/results.json,
 # read 2026-09-21 20:5x), and the knob must reach modulation()'s regime dict (the last link, #180).
 from __future__ import annotations

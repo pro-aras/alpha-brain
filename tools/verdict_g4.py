@@ -329,7 +329,7 @@ def _regime_calibration(mind: List[dict], step: int = 100, prev_window: int = 50
 
 
 def modulation(G: dict, F: float, regime_step: int = 100) -> dict:
-    # edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — `regime_step` (CLI --regime-step): the fake-boundary sampling step of _regime_calibration; 100 = the recorded default; a 2 h window 0 (8 h seam lives) samples ~14 boundaries at 100 → 25 there (docs/G5-SEAM-LIFE-PLAN.md §1)
+    # edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — `regime_step` (CLI --regime-step): the fake-boundary sampling step of _regime_calibration; 100 = the recorded default; a 2 h window 0 (8 h seam lives) has ~14 boundaries × ~11 things ≈ 150 samples at 100 — enough; 25 is a convenience there (docs/G5-SEAM-LIFE-PLAN.md §1)
     # edit: Claude (Fable 5.1), 2026-09-21 13:21 +0400 — §18: MODULATION reads the DRAWN world only (maker moments "w…"); a folder row's moment is "f<sha>" and its word is a folder name
     # edit: Claude (Sonnet 5, builder H), 2026-09-21 18:44 +0400 — §18 addendum 3: BOTH the §16 fixed-bar reading (the
     # record — "pass_fixed_bars_record") and the regime-derived reading (_regime_calibration — "pass") are computed
