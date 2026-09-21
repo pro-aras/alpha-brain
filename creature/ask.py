@@ -82,7 +82,10 @@ def answer(run_root: Path, q: str, args: List[str]) -> str:
         eb = max([org.edge_many("sight", genome_ask.glance_picture(Path(args[1]), genome), c) for c in wc], default=0.0)
         pick = args[0] if ea > eb else (args[1] if eb > ea else "neither (tie)")
         return f"which {args[0]} {args[1]} {args[2]} -> {pick} (edges {ea:.3f} vs {eb:.3f}; word cells {len(wc)})"
-    raise ValueError(f"unknown question {q!r}")
+    # edit: Claude (Fable 5.1), 2026-09-21 11:44 +0400 — W3-0's law at the verb level (Builder C's finding 6: `next`/`why` are declared by the
+    # live ASK line and have NO interpreter): a declared verb nothing runs answers a refusal ROW naming itself, never a
+    # ValueError that would restart the ask sense (#230's class). `why` is owed (W3-5: the record behind an answer).
+    return f"refused: {q} is declared but has no interpreter yet (W3-0)"
 
 
 def _args_for(req: Dict[str, object]) -> List[str]:
@@ -95,7 +98,7 @@ def _args_for(req: Dict[str, object]) -> List[str]:
         return [str(req["pic"]), str(req["word"])]
     if q == "which":
         return [str(req["pic"]), str(req["pic_b"]), str(req["word"])]
-    raise ValueError(f"unknown question {q!r}")
+    return []   # a verb with no interpreter takes no args; answer() refuses it by name (W3-0 at the verb level)
 
 
 def inbox_loop(run_root: Path, stop_event, poll_period: float = 1.0) -> None:

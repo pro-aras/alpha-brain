@@ -162,6 +162,20 @@ class TestAskVerbGating(unittest.TestCase):
         self.assertEqual(creature_ask._ask_refusal(restricted, "show"), "refused: show is not an ASK verb")
         self.assertIsNone(creature_ask._ask_refusal(restricted, "what-is"))
 
+    def test_a_declared_verb_with_no_interpreter_is_refused_by_name(self) -> None:
+        """edit: Claude (Fable 5.1), 2026-09-21 11:44 +0400 — W3-0 at the verb level: the live ASK line declares `next` and `why`
+        (no interpreter anywhere, Builder C's finding 6); asking one must answer a refusal ROW naming the verb, never raise.
+        Negative control: an implemented verb still takes the answering road (it raises on a missing snapshot, not a refusal)."""
+        standard = parse_genome(G4_GENOME.read_text())
+        self.assertIsNone(creature_ask._ask_refusal(standard, "why"), "why IS declared — the list gate lets it through")
+        self.assertEqual(creature_ask._args_for({"q": "why"}), [])
+        root = Path(tempfile.mkdtemp())
+        with mock.patch.object(creature_ask, "load_snapshot", return_value=(standard, None, {}, {})):
+            self.assertEqual(creature_ask.answer(root, "why", []), "refused: why is declared but has no interpreter yet (W3-0)")
+            self.assertEqual(creature_ask.answer(root, "next", []), "refused: next is declared but has no interpreter yet (W3-0)")
+            with self.assertRaises(Exception):          # the control: `show` is implemented and walks its road (org is None here)
+                creature_ask.answer(root, "show", ["circle"])
+
     def test_ask_undeclared_keeps_every_verb_reachable(self) -> None:
         skeleton = parse_genome(GENOME_PATH.read_text())
         self.assertNotIn("ASK", skeleton.declared)
