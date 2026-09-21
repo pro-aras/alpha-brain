@@ -71,6 +71,11 @@ class Genome:
     theta_words: Optional[float] = None             # G3: the words area's own threshold (None = theta_n, the old law)
     abstain_margin: Optional[float] = None          # G3: ABSTAIN margin cos<M (None = off)
     gaze: Optional[Dict[str, object]] = None     # G1: GAZE surprise fixations F grid G canvas C glance L ink contrast (None = off)
+    # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:0x +0400 — G-G/EAR.md §4: SENSE ear-sound wav <rate>
+    # mono (None = off). A Genome FIELD, like `gaze`, NEVER a `declared[...]` key — it is read by
+    # creature/senses/ear.py directly off the parsed Genome, so it is never subject to genes.py's
+    # `unwired()` refusal (the same reason SENSE eye/SENSE ear are plain fields, not declared entries).
+    ear_sound: Optional[Dict[str, object]] = None
     declared: Dict[str, dict] = field(default_factory=dict)   # G4 §3 B1: every G4 gene's own parsed sub-dict (BODY, TAPE, HEART, …)
     text: str = field(default="", repr=False)
 
@@ -114,6 +119,15 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"SENSE ear: cannot read {a!r}")
                 g["ear_letters"] = int(m.group(1))
                 g["ear_blank_zero"] = (m.group(2) == "zero")
+            # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:0x +0400 — EAR.md §4: `SENSE ear-sound wav
+            # <rate> mono` — a NEW alternative under the existing "SENSE" gene, dispatched on args[0] exactly
+            # as "eye"/"ear" are (additive: those two branches are untouched byte-for-byte). Stored as the
+            # Genome field `ear_sound` (never `declared[...]` — see the field's own comment above), so it is
+            # never subject to genes.py's `unwired()` refusal.
+            elif gene == "SENSE" and args[0] == "ear-sound":
+                m = re.fullmatch(r"wav (\d+) mono", a[len("ear-sound "):].strip())
+                if not m: raise GenomeError(f"SENSE ear-sound: cannot read {a!r} (EAR.md §4: SENSE ear-sound wav <rate> mono)")
+                g["ear_sound"] = {"rate": int(m.group(1)), "channels": "mono"}
             elif gene == "RETINA":
                 for step in args:
                     if not re.fullmatch(r"thresh" + _NUM + r"|centre|blur" + _NUM + r"|pool\d+|hog\d+|hogcells\d+x\d+|tower:[A-Za-z0-9_.-]+|sqrt|unit", step):
@@ -260,10 +274,28 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"two-word frames is near under-judge", a)
                 if not m: raise GenomeError(f"SENTENCE: cannot read {a!r} (row 5b: SENTENCE two-word frames is near under-judge)")
                 g["declared"]["SENTENCE"] = {"frames": ["is", "near"], "judged": True}
-            elif gene == "WORLD":
+            elif gene == "WORLD" and (not args or args[0] != "game"):
                 m = re.fullmatch(r"drawn every (\d+) s arrivals every (\d+) h; folder ([A-Za-z0-9_./-]+); web (\d+) per hour by curiosity", a)
                 if not m: raise GenomeError(f"WORLD: cannot read {a!r} (row 8: WORLD drawn every <n> s arrivals every <h> h; folder <p>; web <k> per hour by curiosity)")
                 g["declared"]["WORLD"] = {"drawn_every_s": int(m.group(1)), "arrival_every_h": int(m.group(2)), "folder": m.group(3), "web_per_hour": int(m.group(4))}
+            # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:0x +0400 — G-G §4.1 / G5-L brief: `WORLD game
+            # <id> every <n> s; seed <s>; frames pov <h>x<w> tile <t>; consequence: <text>` — a SECOND, distinct
+            # shape of the WORLD gene, dispatched on args[0]=="game" so the existing "drawn ..." branch above
+            # (dispatched on args[0]!="game") is untouched byte-for-byte and BOTH lines can appear in the same
+            # genome text: stored under its OWN declared key `WORLD_GAME`, never overwriting `declared["WORLD"]`
+            # (the drawn world's dict) in either order — creature/body.py's `_maker_args_from_declared` and
+            # `_declared_folder_dir` read `declared["WORLD"]` unconditionally and must see it unchanged.
+            elif gene == "WORLD" and args[0] == "game":
+                m = re.fullmatch(
+                    r"game ([a-z][a-z0-9-]*) every (\d+) s; seed (\d+); frames pov (\d+)x(\d+) tile (\d+); consequence: (.+)", a)
+                if not m:
+                    raise GenomeError(f"WORLD game: cannot read {a!r} "
+                                       f"(G-G §4.1: WORLD game <id> every <n> s; seed <s>; frames pov <h>x<w> tile <t>; consequence: <text>)")
+                g["declared"]["WORLD_GAME"] = {
+                    "game": m.group(1), "every_s": int(m.group(2)), "seed": int(m.group(3)),
+                    "pov_h": int(m.group(4)), "pov_w": int(m.group(5)), "tile": int(m.group(6)),
+                    "consequence": m.group(7),
+                }
             elif gene == "HANDS":
                 m = re.fullmatch(r"jail ([A-Za-z0-9_./-]+)", a)
                 if not m: raise GenomeError(f"HANDS: cannot read {a!r} (row 6: HANDS jail <path>)")

@@ -63,6 +63,12 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # Body.start — the same C1.7 pattern EXAM/WORLD/ASK already use).
         "SIT": "creature/body.py:Body.start (declared['SIT']['every'] read; starts the sit-publishing sense thread) + creature/senses/sit.py:sense (the canvas-cadence check against state/ledger.json, folder.py's own pattern; publishes the latest exam file's score)",
         "SENSE_BODY": "creature/body.py:Body.start (declared['SENSE_BODY']['period_s']/['fields'] read; starts the body-sense thread) + creature/senses/body_sense.py:sense (STATUS.json's own numbers republished onto the tape every period_s)",
+        # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:0x +0400 — G5-L brief: WORLD's second shape
+        # (`WORLD game ...`, stored under its own declared key so it never clobbers declared['WORLD']'s
+        # "drawn" dict). Read at creature/body.py:main, exactly like WORLD's own row above, gated behind
+        # creature/senses/game.py's GAME_DOOR_GATED constant (the same "a genome line arms nothing until
+        # the code exists" discipline C2/C3 used for the folder door).
+        "WORLD_GAME": "creature/body.py:main (declared['WORLD_GAME'] read; arms creature/senses/game.py behind GAME_DOOR_GATED)",
     },
     # ---------------------------------------------------------------------------------------- the mind
     "mind": {

@@ -359,6 +359,20 @@ def _maker_args_from_declared(declared: Dict[str, dict], default_period: float, 
     return float(world_declared["drawn_every_s"]), float(world_declared["arrival_every_h"]) * 3600.0
 
 
+# edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:3x +0400 — docs/briefs/G5-L-BABYAI-WORLD-EAR.md item 1:
+# the game door's own arming, mirroring _declared_folder_dir's own shape and gate discipline exactly
+# (C2/C3's convention, reused rather than re-invented).
+def _declared_game_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """WORLD_GAME undeclared -> None (arms nothing). WORLD_GAME declared -> its own parsed dict, gated on
+    creature.senses.game.GAME_DOOR_GATED so a genome line arms nothing until the code carrying it exists
+    (the same "flip the constant, not the live creature" discipline C2/C3 used for the folder door --
+    Claude decides separately when to deploy this branch and restart creature.service)."""
+    from .senses import game as game_sense   # lazily, same discipline as folder's own import below
+    if not game_sense.GAME_DOOR_GATED:
+        return None
+    return declared.get("WORLD_GAME")
+
+
 def _declared_folder_dir(declared: Dict[str, dict]) -> Optional[Path]:
     """C2: the folder door's directory from declared['WORLD']'s `folder <dir>`, relative to the REPO root
     (this file's own parents[1] -- never the run root), gated on creature.senses.folder.FOLDER_DOOR_GATED
@@ -425,6 +439,43 @@ def main(argv: List[str]) -> int:
         ffn = functools.partial(folder_sense.sense, world_dir=folder_dir, root=root, canvas=canvas, period=folder_period)
         body.add_sense("folder", ffn)
 
+    # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 22:1x +0400 — docs/briefs/G5-L-BABYAI-WORLD-EAR.md
+    # item 2: the sound ear, listening AT THE SAME FOLDER DOOR the picture sense watches (the brief's own
+    # words: "a sense thread listening at the folder door for audio files") -- `--ear-sound-dir PATH`
+    # overrides it for tests, regardless of the gate; otherwise it arms only when BOTH a folder door
+    # directory AND `SENSE ear-sound ...` are present (genome_for_cli.ear_sound, a plain Genome field,
+    # never `declared[...]` -- see genome/machinery.py's own comment on that field).
+    ear_sound_dir = (Path(argv[argv.index("--ear-sound-dir") + 1]) if "--ear-sound-dir" in argv else folder_dir)
+    from .senses import ear as ear_sense   # lazily, same discipline as folder/game above
+    ear_sound_cfg = genome_for_cli.ear_sound if ear_sense.EAR_SOUND_DOOR_GATED else None
+    if ear_sound_dir is not None and ear_sound_cfg is not None:
+        import functools
+        efn = functools.partial(ear_sense.sense, audio_dir=ear_sound_dir, root=root,
+                                 rate=int(ear_sound_cfg["rate"]), period=folder_period)
+        body.add_sense("ear_sound", efn)
+
+    # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:3x +0400 — docs/briefs/G5-L-BABYAI-WORLD-EAR.md
+    # item 1: the game door, arming from declared['WORLD_GAME'] behind GAME_DOOR_GATED (C2/C3's own
+    # convention) -- the worker needs its seed/game-id/tile from WORLD_GAME regardless of any override, so
+    # (unlike --folder, which needs no per-line config) --game-door only overrides the DIRECTORY, never
+    # substitutes for a missing WORLD_GAME line.
+    game_cfg = _declared_game_config(declared)
+    game_door_dir = (Path(argv[argv.index("--game-door") + 1]) if "--game-door" in argv
+                      else (root / "game_door" if game_cfg is not None else None))
+    game_proc = None
+    game_stop_file = None
+    if game_cfg is not None:
+        from .senses import game as game_sense   # lazily, same discipline as folder above
+        import functools
+        canvas = int(genome_for_cli.gaze["canvas"])
+        game_stop_file = root / "game" / "STOP"
+        game_stop_file.parent.mkdir(parents=True, exist_ok=True)
+        game_proc = game_sense.start_worker(
+            game_door_dir, seed=int(game_cfg["seed"]), game=str(game_cfg["game"]), tile=int(game_cfg["tile"]),
+            period_s=float(game_cfg["every_s"]), stop_file=game_stop_file)
+        gfn = functools.partial(game_sense.sense, door_dir=game_door_dir, root=root, canvas=canvas, poll_period=0.5)
+        body.add_sense("game", gfn)
+
     body.start()
     stop_requested = threading.Event()
 
@@ -438,6 +489,9 @@ def main(argv: List[str]) -> int:
             time.sleep(0.2)
     finally:
         body.stop()
+        if game_proc is not None:
+            from .senses import game as game_sense
+            game_sense.stop_worker(game_proc, stop_file=game_stop_file)
     return 0
 
 
