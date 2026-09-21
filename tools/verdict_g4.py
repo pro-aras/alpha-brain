@@ -531,16 +531,53 @@ def main(argv: List[str]) -> int:
         return {"filed": len(filed), "refused": len(refused), "scored": len(scored), "accuracy": None if acc is None else round(acc, 3), "words": words,
                 "induce": sum(1 for r in rules if "cluster" in r), "deduce": sum(1 for r in rules if "shared" in r), "sight_road_rows": len(sight_road)}
     live_pred = _rule_stats(_pred_rows(twins_dir / "unblinded-1")); shuf_pred = _rule_stats(_pred_rows(twins_dir / "T-shuffle"))
+    # edit: Claude (Fable 5.1), 2026-09-21 15:21 +0400 — §18 addendum 2 (the #162 control on W3-2): a rule's CLUSTER must be the word's OWN cells.
+    # Life 3a's INDUCE compared a sight cell id to a words index (genome/think.py:411, fixed at the life-3b boundary), so its rules were
+    # induced from ANOTHER word's cells and scored 6/6 by accident. Read from the ROOT's OWN predictions and END snapshot (never the replay,
+    # which runs the current code): per induce rule, the share of its cluster that answers its word at the end; the eligible-word count
+    # (words with ≥ 1 own cell) is the denominator printed beside the accuracy. Refuses to grade PASS when any scored/filed rule's cluster
+    # share < .5 (wrong cells) or fewer than 5 words are eligible.
+    def _cluster_control(root: Path) -> dict:
+        try:
+            from genome.machinery import Organism as _Org
+            from genome import world as _world
+            org = _Org.load(root / "state" / "organism", g)
+        except Exception as e:
+            return {"error": f"{type(e).__name__}: {e}", "ok": False}
+        L = json.loads((root / "state" / "ledger.json").read_text())
+        words = sorted({w for s in L["words"].values() for w in s if w})
+        own: Dict[str, List[int]] = {}
+        for w in words:
+            r = org.recall("words", _world.encode_word(w, g.ear_blank_zero))
+            lit = r.get("lit")
+            own[w] = [] if lit is None else sorted(int(c) for c in org.sight.alive_ids() if org._answer_of(org.sight, int(c)) == lit)
+        eligible = sorted(w for w in words if own[w])
+        rows = read_jsonl(root / "state" / "predictions.jsonl") if (root / "state" / "predictions.jsonl").exists() else []
+        per_rule = []
+        for r in rows:
+            if "cluster" not in r or not r.get("accepted"):
+                continue
+            w = str(r.get("word")); cl = [int(c) for c in (r.get("cluster") or [])]
+            share = (sum(1 for c in cl if c in set(own.get(w, []))) / len(cl)) if cl else 0.0
+            per_rule.append({"word": w, "cluster": len(cl), "own_share": round(share, 3), "outcome": r.get("outcome")})
+        wrong = [x for x in per_rule if x["own_share"] < .5]
+        reached = sorted({x["word"] for x in per_rule})          # the words the mechanism actually REACHED (life 3a: 1 of 21 — «bar», by a coincidence of ids)
+        ok = (len(eligible) >= 5) and not wrong and (len(reached) >= 5)
+        return {"eligible_words": len(eligible), "words": len(words), "own_cells": {w: len(own[w]) for w in words}, "rules": per_rule,
+                "wrong_cell_rules": len(wrong), "words_with_rules": len(reached), "reached": reached, "ok": ok,
+                "reason": "" if ok else f" VOID by the wiring: rules reached {len(reached)} of {len(eligible)} eligible words (floor 5); {len(wrong)} rule(s) from another word's cells"}
+    cluster_ctl = _cluster_control(root)
     think_rows = [r for r in G["mind"] if "think" in r]
     parked_rules = sum(1 for r in think_rows if (r["think"] or {}).get("kind") == "rule" and (r["think"] or {}).get("parked"))
     rules_declared = ("INDUCE" in decl) or ("DEDUCE" in decl)
     chance = 1.0 / 11 + .10
     shuffle_ok = (shuf_pred["scored"] == 0) or (shuf_pred["accuracy"] is not None and shuf_pred["accuracy"] <= chance)
     M["W3_2_rules"] = {"graded": rules_declared,
-                       "pass": rules_declared and live_pred["filed"] + live_pred["scored"] > 0 and live_pred["scored"] > 0 and (live_pred["accuracy"] or 0.0) >= .80 and shuffle_ok,
+                       "pass": rules_declared and live_pred["filed"] + live_pred["scored"] > 0 and live_pred["scored"] > 0 and (live_pred["accuracy"] or 0.0) >= .80 and shuffle_ok and bool(cluster_ctl.get("ok")),
+                       "cluster_control": cluster_ctl,
                        "live": live_pred, "T_shuffle": shuf_pred, "parked_rules": parked_rules, "shuffle_bar": "≤ 1/11 + .10 when any rule is scored; 0 scored = the shuffle destroyed the meeting (D's toy)",
-                       "bar": "filed > 0 · scored > 0 · accuracy ≥ .80 (W3-2c's decider) · the shuffled-words twin at chance",
-                       "reason": "" if rules_declared else "INDUCE/DEDUCE not declared in this life's genome — not graded"}
+                       "bar": "filed > 0 · scored > 0 · accuracy ≥ .80 (W3-2c's decider) · the shuffled-words twin at chance · every rule's cluster ≥ .5 the word's OWN cells · rules reach ≥ 5 of ≥ 5 eligible words (§18 add. 2)",
+                       "reason": ("" if rules_declared else "INDUCE/DEDUCE not declared in this life's genome — not graded") + (cluster_ctl.get("reason") or "")}
     tape = G["tape"]
     folder_rows = [r for r in tape if (r.get("meta") or {}).get("source") == "folder"]
     f_ear_moments = {(r.get("meta") or {}).get("moment") for r in folder_rows if r["sense"] == "ear"}
@@ -635,7 +672,7 @@ def write_verdict(out: Path, R: dict) -> None:
     m = M["MODULATION"]; L.append(f"| MODULATION | {m['bar']} | windows {m['graded_windows']} · null {m.get('null_fake_boundary_w0', {}).get('no_spike')} · no-predict twin max err {m['no_predict_twin_err']} | {pf(m['pass'])} |")
     L.append(f"| TWINS random-gaze | loses (xi) | margin {M['TWINS']['random_gaze_loses_xi']['margin']} | {pf(M['TWINS']['random_gaze_loses_xi']['pass'])} |")
     def gv(m): return ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"
-    m = M["W3_2_rules"]; L.append(f"| W3-2 rules | {m['bar']} | filed {m['live']['filed']} (induce {m['live']['induce']}, deduce {m['live']['deduce']}, refused {m['live']['refused']}) · scored {m['live']['scored']} · accuracy {m['live']['accuracy']} · words {m['live']['words']} · T-shuffle scored {m['T_shuffle']['scored']} acc {m['T_shuffle']['accuracy']} · parked rules {m['parked_rules']} {m['reason']} | {gv(m)} |")
+    m = M["W3_2_rules"]; L.append(f"| W3-2 rules | {m['bar']} | filed {m['live']['filed']} (induce {m['live']['induce']}, deduce {m['live']['deduce']}, refused {m['live']['refused']}) · scored {m['live']['scored']} · accuracy {m['live']['accuracy']} · words {m['live']['words']} · T-shuffle scored {m['T_shuffle']['scored']} acc {m['T_shuffle']['accuracy']} · parked rules {m['parked_rules']} · clusters: rules reached {m['cluster_control'].get('words_with_rules')} of {m['cluster_control'].get('eligible_words')} eligible words (of {m['cluster_control'].get('words')}), wrong-cell rules {m['cluster_control'].get('wrong_cell_rules')} {m['reason']} | {gv(m)} |")
     m = M["DOOR"]; L.append(f"| DOOR | {m['bar']} | pictures {m['pictures']} (rows {m['folder_rows']}) · words {len(m['folder_words'])} · sight-only {m['sight_only_rows']} (first seq {m['sight_only_first_seq']}) · recognition {m['recognition_of_seen_pictures']} {m['reason']} | {gv(m)} |")
     m = M["W3_1_beliefs"]; L.append(f"| W3-1 beliefs | {m['bar']} | rows {m['rows']} · kinds {m['kinds']} · standing words {m['standing_words']} of {m['words_heard']} heard · max belief rows per word {m['max_belief_rows_per_word']} | {gv(m)} |")
     m = M["PARK"]; L.append(f"| PARK | {m['bar']} | parked {m['parked']} of {m['thinks']} thinks (rules {m['parked_rules']}) — {m['reason']} | {gv(m)} |")

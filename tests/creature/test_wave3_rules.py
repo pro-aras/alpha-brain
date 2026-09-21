@@ -168,7 +168,8 @@ class TestRulesFiledAndScored(unittest.TestCase):
         for claim, d in self.real_acc.items():
             print(f"[wave3-rules] REAL rule accuracy: {claim!r} n={d['n']} correct={d['correct']} acc={d['acc']:.3f}")
 
-    @unittest.expectedFailure
+    # edit: Claude (Fable 5.1), 2026-09-21 15:38 +0400 — expectedFailure REMOVED: with INDUCE clustering the word's own cells and the kind-fair
+    # think chooser (PREREG §18 addendum 2) the toy's literal bar is met (the suite read it as an unexpected success 15:3x).
     def test_at_least_5_filed_real_arm(self) -> None:
         """The toy's literal bar. Measured on this 600-canvas shuffled maker-world stream (seed
         20260921): predictions_filed=3, not >=5 — RAISED, expectedFailure, never forced. The mechanism

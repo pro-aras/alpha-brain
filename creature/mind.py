@@ -407,10 +407,14 @@ class Mind:
                 r = self.org.recall("sight", rec["x_s"])
                 if r["cell"] is None:
                     seen_words.add(rec["word"])
+                    if self.park is not None and self.park.is_parked(rec["word"]):
+                        continue   # edit: Claude (Fable 5.1), 2026-09-21 15:45 +0400 — §18 add. 2: a PARKED word is not re-worked (the rule items' own filter, mirrored; a re-worked parked want counted "parked" again — life 3a's circle at 619 and 659)
                     pool.append({"kind": "word", "key": rec["word"], "episode": eid, "pred": None})
             for eid in range(0, n_written):
                 rec = self.episodes.get(eid)
                 if rec is not None and rec["word"] == "":
+                    if self.park is not None and self.park.is_parked(f"ep{eid}"):
+                        continue   # same law for a parked wordless sight
                     pool.append({"kind": "sight", "key": f"ep{eid}", "episode": eid, "pred": None})
         now = self._canvas_index
         for entry in self._filed_predictions:
@@ -450,12 +454,22 @@ class Mind:
     def _think_choose(self, pool: list):
         if not pool:
             return None
+        # edit: Claude (Fable 5.1), 2026-09-21 15:35 +0400 — PREREG §18 addendum 2, the pool-composition rule: the KIND is chosen
+        # first, uniformly over the kinds present (the mind's own think rng, so replay is exact), and CURIOSITY chooses
+        # WITHIN the kind. Once INDUCE clusters the word's own cells, every inducible word is a "rule" item on every think
+        # (21 on life 3a's words) and the word items — the only road to a belief — were starved: in the fixed replay of
+        # life 3a 175 of 181 thinks were rule thinks, and the think-counter fixtures formed no belief at all. Kind fairness
+        # is a fixed mind rule; CURIOSITY's law (which item within a kind) is untouched, and the blind twin isolates it.
         curiosity_on = self.interests is not None and "curiosity" not in self.blind
+        if not curiosity_on and not ("curiosity" in self.blind and "CURIOSITY" in self.genome.declared):
+            return pool[0]                                                # no CURIOSITY declared: the first item (the skeleton's pinned road, unchanged)
+        # 2026-09-21 15:51 +0400 — kind fairness is CURIOSITY's road (and its blind twin's), never the no-CURIOSITY skeleton's
+        kinds = sorted({str(it.get("kind")) for it in pool})
+        kind = kinds[int(self._think_rng.integers(0, len(kinds)))] if len(kinds) > 1 else kinds[0]
+        sub = [it for it in pool if str(it.get("kind")) == kind]
         if curiosity_on:
-            return self.interests.choose(pool, self._think_rng)
-        if "curiosity" in self.blind and "CURIOSITY" in self.genome.declared:
-            return pool[int(self._think_rng.integers(0, len(pool)))]      # blind curiosity: the rng's uniform pick
-        return pool[0]                                                    # no CURIOSITY declared: the first item
+            return self.interests.choose(sub, self._think_rng)
+        return sub[int(self._think_rng.integers(0, len(sub)))]            # blind curiosity: the rng's uniform pick within the kind
 
     def _think_work(self, item: dict) -> Dict[str, object]:
         """Works one pool item; returns {"outcome", "parked", ...}. Every dead end goes to
