@@ -349,6 +349,31 @@ def _declared_folder_dir(declared: Dict[str, dict]) -> Optional[Path]:
     return Path(__file__).resolve().parents[1] / world_declared["folder"]
 
 
+# edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — the 8 h SEAM LIVES (docs/G5-SEAM-LIFE-PLAN.md §1): world_maker.sense() has always
+# taken `plant_after_canvases`, but main() never passed it, so every life ran the module default (15,000 canvases ≈ hour 21)
+# and an 8 h life could NEVER show the plant (SOLUTIONS #228 (a): a plant placed where the mechanism cannot fire). `--plant-after N`
+# on the CLI now reaches the maker partial; the default is unchanged (the 24 h lives keep hour ~21). Both derivations are
+# factored out of main() so tests can pin the LAST link — the partial's keywords (#180) — without the signal-driven loop.
+def _plant_after_from_argv(argv: List[str], default: int) -> int:
+    """`--plant-after N` -> N (an int; a malformed value raises); absent -> `default` unchanged."""
+    if "--plant-after" not in argv:
+        return int(default)
+    return int(argv[argv.index("--plant-after") + 1])
+
+
+def _maker_sense_fn(argv: List[str], declared: Dict[str, dict], root: Path):
+    """The maker sense's partial exactly as main() runs it: WORLD's `drawn every`/`arrivals every` (or the
+    --maker-period / --window-seconds overrides) and --plant-after (default world_maker.PLANT_AFTER_CANVASES)."""
+    from . import world_maker   # imported lazily: body.py must not hard-depend on world_maker at import time
+    import functools
+    default_period, default_window_s = _maker_args_from_declared(declared, 5.0, world_maker.WINDOW_SECONDS)
+    maker_period = float(argv[argv.index("--maker-period") + 1]) if "--maker-period" in argv else default_period
+    window_seconds = float(argv[argv.index("--window-seconds") + 1]) if "--window-seconds" in argv else default_window_s
+    plant_after = _plant_after_from_argv(argv, world_maker.PLANT_AFTER_CANVASES)
+    return functools.partial(world_maker.sense, root=root, period=maker_period, window_seconds=window_seconds,
+                             plant_after_canvases=plant_after)
+
+
 # ============================================================================ CLI
 def main(argv: List[str]) -> int:
     root = Path(argv[argv.index("--root") + 1])
@@ -362,13 +387,8 @@ def main(argv: List[str]) -> int:
 
     body = Body(root, genome_path)
     if not no_maker:
-        from . import world_maker   # imported lazily: body.py must not hard-depend on world_maker at import time
-        default_period, default_window_s = _maker_args_from_declared(declared, 5.0, world_maker.WINDOW_SECONDS)
-        maker_period = float(argv[argv.index("--maker-period") + 1]) if "--maker-period" in argv else default_period
-        window_seconds = float(argv[argv.index("--window-seconds") + 1]) if "--window-seconds" in argv else default_window_s
         plant = os.environ.get("CREATURE_PLANT_EXCEPTION")
-        import functools
-        fn = functools.partial(world_maker.sense, root=root, period=maker_period, window_seconds=window_seconds)
+        fn = _maker_sense_fn(argv, declared, root)   # WORLD's period/window (+ CLI overrides) + --plant-after
         body.add_sense("maker", fn, plant=plant)
 
     # C2: --folder PATH stays an explicit override for tests, regardless of the gate (A12's own road,

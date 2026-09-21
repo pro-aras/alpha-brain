@@ -8,7 +8,8 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEST="${HOME}/.config/systemd/user"
 mkdir -p "${DEST}"
 
-for f in creature.service creature-watch.service creature-watch.timer; do
+# edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — the templated seam-life units (creature-g5@, creature-g5-watch@) installed beside the 24 h life's.
+for f in creature.service creature-watch.service creature-watch.timer creature-g5@.service creature-g5-watch@.service creature-g5-watch@.timer; do
     cp "${HERE}/${f}" "${DEST}/${f}"
     echo "installed ${DEST}/${f}"
 done
@@ -20,3 +21,4 @@ echo "NOT enabled, NOT started (that is Claude's step, after the gates — docs/
 echo "Next step, when the gates pass:"
 echo "  systemctl --user enable --now creature.service"
 echo "  systemctl --user enable --now creature-watch.timer"
+echo "A seam life <name> (root /data/dev/genome-lives/<name>): systemctl --user enable --now creature-g5@<name>.service creature-g5-watch@<name>.timer"

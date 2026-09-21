@@ -1,3 +1,4 @@
+# edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — PINNED_HASH_DEV moved to the live-block digest b0531503… (Builder F's state_hash merged on g5-integration; found by a content sweep for the old digest — F's report named only the genome-suite pin, #214).
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 21:52 +0400 — A2 tests: the determinism-law AST sweep, the PNG
 # round-trip, and gate G4-2 (mind parity against run_g1.live's hash_dev) with its swapped-canvas control.
 from __future__ import annotations
@@ -24,7 +25,7 @@ MIND_SOURCE = ROOT / "creature" / "mind.py"
 # G4-2's pin (docs/G4-PREREG.md §4, read independently by the orchestrator at git 9a36475, 2026-09-19 21:26 +0400):
 # hash_dev for G4-skeleton.genome over toy_streams(genome, 5)'s 660 dev canvases, glanced by glance_rows(dev, genome,
 # "surprise"), with_arr2=False with_plant=False ask_at_dev=False -- 2,640 moments, ~10 s.
-PINNED_HASH_DEV = "d4b5c6b8d57f35e6ad199b49b38d720095ba3b678c380b206665a876698aaa86"
+PINNED_HASH_DEV = "b05315037ff98529836472e6ddd9ebb5a45742b0511f5facf6b73cd754fa1e3f"
 
 
 def _png_bytes(rgb: np.ndarray) -> bytes:

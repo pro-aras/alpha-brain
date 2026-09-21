@@ -1,0 +1,12 @@
+# edit: Claude (Fable 5.1), 2026-09-21 20:56 +0400 — every 5 min, per seam-life instance.
+[Unit]
+Description=creature-g5-watch %i, every 5 min
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30sec
+Persistent=true
+
+[Install]
+WantedBy=timers.target

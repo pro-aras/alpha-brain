@@ -1,0 +1,9 @@
+# edit: Claude (Fable 5.1), 2026-09-21 20:56 +0400 — the watch for a seam life instance (%i = the life's name); creature-watch today watches
+# creature.service's root only (#179: a unit's 'active' is not the process's motion — the watch reads the counters).
+[Unit]
+Description=creature-g5-watch %i — pages when the seam life's STATUS counters stop moving (#179, #230)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/data/dev/genome-wt-q
+ExecStart=/usr/bin/python3 tools/creature_watch.py --root /data/dev/genome-lives/%i

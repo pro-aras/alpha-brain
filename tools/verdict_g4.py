@@ -4,7 +4,7 @@
 # root as its control (life 1's known defects must show: (iv) refused 435, (vi) unreadable). Read-only on every root (#212):
 # the tape is concatenated into --out, the state is COPIED, every twin lives in its own fresh root under --out.
 """usage: python3 tools/verdict_g4.py --root <run root> --genome genome/G4.genome --out runs/g4-verdict-<stamp>
-          [--hours 24] [--random 20] [--slice-hours 6] [--workers 8] [--nrestarts N] [--cpu-ns N] [--unit creature.service]
+          [--hours 24] [--random 20] [--slice-hours 6] [--regime-step 100] [--workers 8] [--nrestarts N] [--cpu-ns N] [--unit creature.service]
           [--skip-twins] [--skip-random]
        python3 tools/verdict_g4.py --worker <spec.json>            (one twin: replay -> snapshot -> self-exam -> summary.json)
 """
@@ -328,7 +328,8 @@ def _regime_calibration(mind: List[dict], step: int = 100, prev_window: int = 50
             "sample_head": samples[:5]}
 
 
-def modulation(G: dict, F: float) -> dict:
+def modulation(G: dict, F: float, regime_step: int = 100) -> dict:
+    # edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — `regime_step` (CLI --regime-step): the fake-boundary sampling step of _regime_calibration; 100 = the recorded default; a 2 h window 0 (8 h seam lives) samples ~14 boundaries at 100 → 25 there (docs/G5-SEAM-LIFE-PLAN.md §1)
     # edit: Claude (Fable 5.1), 2026-09-21 13:21 +0400 — §18: MODULATION reads the DRAWN world only (maker moments "w…"); a folder row's moment is "f<sha>" and its word is a folder name
     # edit: Claude (Sonnet 5, builder H), 2026-09-21 18:44 +0400 — §18 addendum 3: BOTH the §16 fixed-bar reading (the
     # record — "pass_fixed_bars_record") and the regime-derived reading (_regime_calibration — "pass") are computed
@@ -336,7 +337,7 @@ def modulation(G: dict, F: float) -> dict:
     mind = [r for r in G["mind"] if "moment" in r and r.get("word") and str(r["moment"]).startswith("w")]
     win = lambda r: int(r["moment"][1:5])
     by_seq = {int(r["seq"]): r for r in mind}
-    reg = _regime_calibration(mind)
+    reg = _regime_calibration(mind, step=int(regime_step))
     out = {"F": F,
            "settle_bar": ("record (§16 addendum): err at the 10th showing ≤ 1.25 × the pre-window last-50 median; the toy's F+.05 = %.4f printed per thing. "
                           "§18 addendum 3: the regime-derived bar is an ABSOLUTE ceiling — the life's own pre-window 95th percentile, see 'regime.settle_bar_err_95'.") % (F + 0.05),
@@ -412,6 +413,7 @@ def main(argv: List[str]) -> int:
     ap.add_argument("--worker"); ap.add_argument("--root"); ap.add_argument("--genome", default=str(ROOT / "genome" / "G4.genome"))
     ap.add_argument("--out"); ap.add_argument("--hours", type=float, default=24.0); ap.add_argument("--random", type=int, default=20)
     ap.add_argument("--slice-hours", type=float, default=6.0); ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--regime-step", type=int, default=100, help="MODULATION: the fake-boundary sampling step over window 0 (100 = the recorded default; 25 for a 2 h window)")
     ap.add_argument("--nrestarts", type=int); ap.add_argument("--cpu-ns", type=int); ap.add_argument("--unit")
     ap.add_argument("--skip-twins", action="store_true"); ap.add_argument("--skip-random", action="store_true")
     ap.add_argument("--reuse", action="store_true", help="re-grade: read twin summaries already under --out instead of replaying")
@@ -588,7 +590,7 @@ def main(argv: List[str]) -> int:
                                 "bar": "≥ .10 over G1's one-glance twin (gaze mode 'one': the whole canvas at glance×glance); the first-fixation-only twin printed — §16 addendum"}
     F = 1.0 - g.theta_n
     # edit: Claude (Sonnet 5, builder H), 2026-09-21 18:44 +0400 — §18 addendum 3: the bar text now names both readings; M["MODULATION"]["pass"] grades on the regime-derived one (modulation()'s own doc)
-    M["MODULATION"] = modulation(G, F)
+    M["MODULATION"] = modulation(G, F, regime_step=a.regime_step)
     M["MODULATION"]["bar"] = ("§18 addendum 3: at every window bringing NEW things, a majority spike (≥ 3× the last-50 median AND ≥ the life's own regime null-band) and settle "
                               "(≤ the life's own regime settle-bar) by the 10th showing; the fake-boundary null clears the same band. "
                               "The §16 record (3× spike / 1.25× settle / 1.5× null, calibrated pre-W3-2b) is printed as 'pass_fixed_bars_record'.")
