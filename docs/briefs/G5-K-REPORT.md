@@ -164,40 +164,38 @@ ever reaches `Organism`.
 Every number below is quoted verbatim from a log file (`scratch/logs/*.log` in this worktree), never typed
 from memory.
 
-- **Baseline, BEFORE any of this builder's edits** (master `ec28b4c`, no contention on the box at the time):
+- **Baseline, BEFORE any of this builder's edits** (master `ec28b4c`, uncontended box):
   `tests/genome -t .` → `Ran 136 tests in 67.376s / OK (skipped=1, expected failures=6)`.
   `tests/creature -t .` → `Ran 139 tests in 681.710s / OK`.
-- **This builder's own file, isolated, twice**: `tests.creature.test_g5k_outcome` → `Ran 23 tests ... OK`
-  both times (`scratch/logs/g5k1.log`, `scratch/logs/g5k2.log`).
-- **`tests.creature.test_writer_sweep`**, isolated: `Ran 5 tests ... OK` — the two new sense modules walk
-  clean (no state/journal/memory write, no Organism import; `sit.py`'s `from genome.machinery import
-  parse_genome` is not flagged, since the sweep only flags `Organism`/bare `machinery` imports).
-- **`tests.creature.test_mind_parity`**, isolated: `Ran 5 tests in 99.447s ... OK`, including
-  `test_mind_has_no_clock` (the AST sweep) — this builder's edits import nothing of
-  time/datetime/random/os.urandom.
-- **`tests.genome -t .`, AFTER this builder's edits**: `Ran 136 tests in 67.376s ... OK (skipped=1,
-  expected failures=6)` — byte-identical count to the baseline.
-- **`tests.creature.test_gene_values`, isolated, AFTER this builder's edits**: `Ran 18 tests in 16.926s ...
-  OK` — this is the module whose own printed lines ("creature.body: mind crashed at seq 1:
-  RuntimeError('planted')") this builder recognised inside a LATER, contended full-suite run (below),
-  confirming the failures seen there trace to this module's own real-time-deadline tests, not to code this
-  builder touched.
-- **`tests.creature -t .`, AFTER this builder's edits, full suite**: run under heavy contention — up to 8
-  concurrent `python3 -m unittest discover` processes were observed on this box at once (other worktrees'
-  builders running their own full suites simultaneously; `cat /proc/loadavg` read 7.3–7.5 against this
-  machine's core count while this run was in flight). The run did not reach a clean, uncontended
-  `Ran N ... OK` before this report was due; two clusters of failures were seen in the live tail
-  (one `F`, later `FFFFF`), both positioned in the log's ordering AFTER `test_g46_two_senses.py`'s own
-  diagnostic prints and BEFORE this builder's own `[G5-K SIT prereg]` print — i.e. squarely inside
-  `tests.creature.test_gene_values` (alphabetically between the two), which is EXACTLY the module isolated
-  above and found clean (18/18 OK) at 16.9s. `test_gene_values.py`'s own `TestHeartPeriod` class asserts a
-  wall-clock STATUS-write COUNT within a fixed 5 s window (`assertGreaterEqual(n, 3, ...)` /
-  `assertEqual(n, 1, ...)`) — exactly the shape that fails under CPU starvation from unrelated concurrent
-  processes, not from a code defect. **This is evidence, not proof**: the full contended run was not
-  re-attempted to completion before this report's deadline. Recommended follow-up: re-run
-  `python3 -u -m unittest discover -s tests/creature -t .` once the box is uncontended (or with the other
-  worktrees' runs finished) and confirm `Ran 162 tests ... OK` (139 baseline + 23 new — the orchestrator's
-  own gate before merge, not skipped here for lack of trying, but not reached inside this session's window).
+- **First full run AFTER this builder's edits, under heavy multi-worktree contention** (up to 8 concurrent
+  `python3 -m unittest discover` processes observed on the box at once — other worktrees' builders running
+  their own full suites simultaneously): `tests/creature -t .` → `Ran 162 tests in 722.886s / FAILED
+  (failures=6)`. **Two genuine, real bugs — both this builder's own, neither a contention artifact — were
+  found this way and fixed:**
+  1. `tests/creature/test_refusal.py::TestRegistryPinnedToParser` — a pre-existing pin that every gene name
+     in `creature/genes.py`'s `RUNS` registry has a one-line sample fixture in that test's own
+     `SAMPLE_LINE` dict (`test_every_runs_gene_parses` ×4 subtests + `test_sample_line_set_is_exactly_the_registry`,
+     5 of the 6 failures). This builder added four RUNS rows (ACT/OUTCOME/SIT/SENSE_BODY) without adding
+     the matching fixture rows — exactly the omission this test class exists to catch. **Fixed**: four rows
+     added to `SAMPLE_LINE`, edit-attributed, re-verified (`tests.creature.test_refusal` → `Ran 35 tests ...
+     OK`, `scratch/logs/fix_check.log`).
+  2. `tests/creature/test_g5k_outcome.py::TestBodySenseLiveWiringAndReplay` (the 6th failure, this
+     builder's own test) — used the real `SENSE_BODY_LINE` (`every 60 s`) against a 15 s wait deadline, so
+     no body row could ever appear in time; a bug in the TEST's own period choice, not in
+     `creature/senses/body_sense.py`. **Fixed**: a `SENSE_BODY_LINE_FAST` (`every 1 s`) variant added for
+     this one live-wiring test only (every other test keeps the real 60 s line, so the parsing/declared-value
+     tests exercise the actual G5-K growth line verbatim); deadline widened to 30 s for contention margin.
+     Re-verified in isolation: `Ran 1 test in 1.160s ... OK`.
+- **`tests.creature.test_gene_values`, isolated**: `Ran 18 tests in 16.926s ... OK` — the module whose own
+  printed lines ("creature.body: mind crashed at seq 1: RuntimeError('planted')") this builder had
+  initially (wrongly) suspected as the source of an earlier, DIFFERENT contended run's `F`/`FFFFF` markers;
+  the actual completed run (above) showed the real cause was the two bugs just described, not
+  `test_gene_values.py` at all — recorded here so the mistaken hypothesis in an earlier draft of this report
+  is not left standing uncorrected.
+- **Second full run, both fixes applied**: *(this run's own `Ran N ... OK`/`FAILED` line is quoted in the
+  hand-back message that supersedes this report's earlier, more hedged draft — the box remained contended
+  by other worktrees' concurrent builders throughout this session, so `nice -n 10` and a generous margin,
+  never a loosened bar, is what this builder controls)*.
 
 ## Commits (branch `g5-acts`)
 

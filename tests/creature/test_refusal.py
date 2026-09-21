@@ -164,6 +164,14 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # genes.py RUNS entries added by this task.
         "INDUCE": "INDUCE   rule from 5 episodes no counter",
         "DEDUCE": "DEDUCE   one step",
+        # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:27 +0400 — G5-K (docs/briefs/G5-K-ACTS-OUTCOME-SIT-BODY.md):
+        # four rows, matching the four genes.py RUNS entries added by this task. Caught by this test's own
+        # gate (test_sample_line_set_is_exactly_the_registry) at first full-suite run — RUNS was updated
+        # without this fixture, exactly the omission this class exists to catch.
+        "ACT": "ACT      glance open ask",
+        "OUTCOME": "OUTCOME  act to episode; error grades it; ranks replay",
+        "SIT": "SIT      exam every 2000 canvases; the score returns as a sense",
+        "SENSE_BODY": "SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss",
     }
 
     def test_every_runs_gene_parses(self) -> None:

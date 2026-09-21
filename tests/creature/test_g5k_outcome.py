@@ -35,6 +35,12 @@ ACT_LINE = "ACT      glance open ask"
 OUTCOME_LINE = "OUTCOME  act to episode; error grades it; ranks replay"
 SIT_LINE = "SIT      exam every 2000 canvases; the score returns as a sense"
 SENSE_BODY_LINE = "SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss"
+# edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:27 +0400 — G5-K: a 1 s variant for the live-wiring
+# test below, which waits at most 15 s for a published row -- the real (60 s) line is used everywhere else
+# so the parsing/declared-value tests exercise the actual G5-K line verbatim. Caught at the first full run:
+# the live test used SENSE_BODY_LINE (60 s) against a 15 s deadline and read an empty body_rows list -- a
+# bug in the TEST's own period choice, not in creature/senses/body_sense.py.
+SENSE_BODY_LINE_FAST = "SENSE    body every 1 s fields moments births arrivals budget_left refused restarts mind_ms rss"
 
 # The closed root, read read-only via a hard-link copy of just its exam/ subdir (hard rule 3: "Snapshots
 # from a hard-link copy (cp -al) in scratch, never in place" -- even though this test only ever READS,
@@ -435,12 +441,12 @@ class TestBodySenseFieldMapping(unittest.TestCase):
 
 class TestBodySenseLiveWiringAndReplay(unittest.TestCase):
     def test_live_body_publishes_body_rows_equal_to_status_and_replay_is_exact(self) -> None:
-        gpath = _g4_with(SENSE_BODY_LINE, "HEART every 1 s")
+        gpath = _g4_with(SENSE_BODY_LINE_FAST, "HEART every 1 s")
         root = Path(tempfile.mkdtemp())
         body = Body(root, gpath)
         body.start()
         try:
-            deadline = time.time() + 15.0
+            deadline = time.time() + 30.0     # generous margin under this box's contended CPU (hard rule 2)
             body_rows = []
             status_at_read: Optional[dict] = None
             while time.time() < deadline:
@@ -451,7 +457,7 @@ class TestBodySenseLiveWiringAndReplay(unittest.TestCase):
                 time.sleep(0.2)
         finally:
             body.stop()
-        self.assertTrue(body_rows, "SENSE_BODY declared with SENSE_BODY.period_s honoured (creature/senses/body_sense.py's own default 60s would be too slow for this test -- see the period read below)")
+        self.assertTrue(body_rows, "SENSE_BODY.period_s (1 s here) must be honoured -- a body row must appear well inside 30 s")
         row = body_rows[0]
         reading = row["meta"]["reading"]
         self.assertIn("moments", reading)
