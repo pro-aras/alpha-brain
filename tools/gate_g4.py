@@ -6,7 +6,7 @@
 """usage: python3 tools/gate_g4.py [--genome genome/G4-skeleton.genome] [--tree /data/dev/genome] [--only 1,2,3]"""
 from __future__ import annotations
 
-import argparse, ast, io, json, os, shutil, subprocess, sys, tempfile
+import argparse, ast, io, json, os, re, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
 import numpy as np
@@ -167,17 +167,37 @@ def gate3(tree: Path, genome_path: Path) -> bool:
     return ok and caught
 
 
+# edit: Claude (Fable 5.1), 2026-09-21 11:42 +0400 — G4-6 (PREREG §4: «G4-3 re-run PASS with two senses on the tape»): runs Builder C's
+# self-contained two-sense replay test (tests/creature/test_g46_two_senses.py) as a subprocess in the tree under test and
+# requires BOTH its exit 0 AND its own printed evidence line (row counts per source with folder rows > 0 and the seq of the
+# caught divergence) — a green exit with no evidence line is a FAIL (a suite can pass by skipping; #229).
+def gate6(tree: Path) -> bool:
+    r = subprocess.run([sys.executable, "-m", "unittest", "tests.creature.test_g46_two_senses"], capture_output=True, text=True, cwd=tree)
+    out = r.stdout + r.stderr
+    m = re.search(r"G4-6 row counts by source: (\{.*?\}); caught divergence planted at seq (\d+)", out)
+    ok = r.returncode == 0 and m is not None
+    folder_rows = 0
+    if m:
+        try:
+            folder_rows = int(re.search(r"'folder': (\d+)", m.group(1)).group(1))
+        except Exception:
+            folder_rows = 0
+    ok = ok and folder_rows > 0
+    print(f"G4-6 two senses on one tape: exit {r.returncode}, evidence {'present' if m else 'ABSENT'}, folder rows {folder_rows} → {'PASS' if ok else 'FAIL'}  {(m.group(0) if m else out.strip()[-200:])}")
+    return ok
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tree", default="/data/dev/genome")
     ap.add_argument("--genome", default="genome/G4-skeleton.genome")
-    ap.add_argument("--only", default="1,2,3")
+    ap.add_argument("--only", default="1,2,3,6")
     a = ap.parse_args()
     tree = Path(a.tree).resolve(); genome_path = (tree / a.genome).resolve()
     os.chdir(tree)
     results = {}
     for k in a.only.split(","):
-        results[k] = {"1": gate1, "2": lambda t: gate2(t, genome_path), "3": lambda t: gate3(t, genome_path)}[k](tree)
+        results[k] = {"1": gate1, "2": lambda t: gate2(t, genome_path), "3": lambda t: gate3(t, genome_path), "6": gate6}[k](tree)
     print("G4 gates:", {k: ("PASS" if v else "FAIL") for k, v in results.items()})
     return 0 if all(results.values()) else 1
 
