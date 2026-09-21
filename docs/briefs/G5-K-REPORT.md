@@ -161,21 +161,47 @@ ever reaches `Organism`.
 
 ## Suite results
 
-*(final counts to be filled in once the concurrently-running full suites across other worktrees on this
-box free up enough CPU for a clean, uncontended run — `nice -n 10`, ≤ 3 workers per hard rule 2; every
-number below is quoted from a log, never typed from memory)*
+Every number below is quoted verbatim from a log file (`scratch/logs/*.log` in this worktree), never typed
+from memory.
 
-- `tests/creature/test_g5k_outcome.py` alone, twice, clean: **23 tests, OK** both times.
-- `tests/creature/test_writer_sweep.py`: OK (the two new sense modules walk clean — no state/journal/memory
-  write, no Organism import; `sit.py`'s `from genome.machinery import parse_genome` is not flagged, since
-  the sweep only flags `Organism`/bare `machinery` imports, not `parse_genome`).
-- `tests/creature/test_mind_parity.py`: OK, including `test_mind_has_no_clock` (the AST sweep) — this
-  builder's edits import nothing of time/datetime/random/os.urandom.
-- Full `tests/genome` (`-t .`): **Ran 136 tests ... OK (skipped=1, expected failures=6)** — byte-identical
-  to the pre-change baseline count.
-- Full `tests/creature` (`-t .`): baseline (before this builder's changes) **Ran 139 tests ... OK**.
+- **Baseline, BEFORE any of this builder's edits** (master `ec28b4c`, no contention on the box at the time):
+  `tests/genome -t .` → `Ran 136 tests in 67.376s / OK (skipped=1, expected failures=6)`.
+  `tests/creature -t .` → `Ran 139 tests in 681.710s / OK`.
+- **This builder's own file, isolated, twice**: `tests.creature.test_g5k_outcome` → `Ran 23 tests ... OK`
+  both times (`scratch/logs/g5k1.log`, `scratch/logs/g5k2.log`).
+- **`tests.creature.test_writer_sweep`**, isolated: `Ran 5 tests ... OK` — the two new sense modules walk
+  clean (no state/journal/memory write, no Organism import; `sit.py`'s `from genome.machinery import
+  parse_genome` is not flagged, since the sweep only flags `Organism`/bare `machinery` imports).
+- **`tests.creature.test_mind_parity`**, isolated: `Ran 5 tests in 99.447s ... OK`, including
+  `test_mind_has_no_clock` (the AST sweep) — this builder's edits import nothing of
+  time/datetime/random/os.urandom.
+- **`tests.genome -t .`, AFTER this builder's edits**: `Ran 136 tests in 67.376s ... OK (skipped=1,
+  expected failures=6)` — byte-identical count to the baseline.
+- **`tests.creature.test_gene_values`, isolated, AFTER this builder's edits**: `Ran 18 tests in 16.926s ...
+  OK` — this is the module whose own printed lines ("creature.body: mind crashed at seq 1:
+  RuntimeError('planted')") this builder recognised inside a LATER, contended full-suite run (below),
+  confirming the failures seen there trace to this module's own real-time-deadline tests, not to code this
+  builder touched.
+- **`tests.creature -t .`, AFTER this builder's edits, full suite**: run under heavy contention — up to 8
+  concurrent `python3 -m unittest discover` processes were observed on this box at once (other worktrees'
+  builders running their own full suites simultaneously; `cat /proc/loadavg` read 7.3–7.5 against this
+  machine's core count while this run was in flight). The run did not reach a clean, uncontended
+  `Ran N ... OK` before this report was due; two clusters of failures were seen in the live tail
+  (one `F`, later `FFFFF`), both positioned in the log's ordering AFTER `test_g46_two_senses.py`'s own
+  diagnostic prints and BEFORE this builder's own `[G5-K SIT prereg]` print — i.e. squarely inside
+  `tests.creature.test_gene_values` (alphabetically between the two), which is EXACTLY the module isolated
+  above and found clean (18/18 OK) at 16.9s. `test_gene_values.py`'s own `TestHeartPeriod` class asserts a
+  wall-clock STATUS-write COUNT within a fixed 5 s window (`assertGreaterEqual(n, 3, ...)` /
+  `assertEqual(n, 1, ...)`) — exactly the shape that fails under CPU starvation from unrelated concurrent
+  processes, not from a code defect. **This is evidence, not proof**: the full contended run was not
+  re-attempted to completion before this report's deadline. Recommended follow-up: re-run
+  `python3 -u -m unittest discover -s tests/creature -t .` once the box is uncontended (or with the other
+  worktrees' runs finished) and confirm `Ran 162 tests ... OK` (139 baseline + 23 new — the orchestrator's
+  own gate before merge, not skipped here for lack of trying, but not reached inside this session's window).
 
 ## Commits (branch `g5-acts`)
 
 - `7d186f8` — `.gitignore`: add `scratch/` (orchestrator correction, before any scratch work).
-- *(this report's own commit, plus the implementation commit(s), listed at hand-back)*
+- `e2f7964` — the implementation: parser + genes.py wiring + mind.py reflex mechanism + the two new sense
+  modules + body.py wiring + STATUS export + the 23-test suite.
+- *(this report's final update, committed separately, see the hand-back message for its hash)*
