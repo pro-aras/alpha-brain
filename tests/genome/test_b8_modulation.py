@@ -97,7 +97,7 @@ class TestB8Modulation(unittest.TestCase):
         """The null: picture order shuffled AND word labels shuffled, together (one arm, both
         perturbations) — must not clear the bar at a majority of seeds.
 
-        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2b (docs/G4-WAVE3-CLAUSES.md):
+        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:18 +0400 — W3-2b (docs/G4-WAVE3-CLAUSES.md):
         re-measured under the NEW error (genome/predict.py: max cosine over EVERY alive sight cell, not
         the old single last-winner). Under the OLD error this null read 0/3 (matching the design arm's
         own 0/3 — this file's whole point, per B8's docstring, was that this front's ratio bar was near-
@@ -135,7 +135,7 @@ class TestB8Modulation(unittest.TestCase):
         rhs=-0.0022) — see the module docstring: first50 was already near (sometimes below, by sampling
         noise) F, so the bar's denominator was near zero and the ratio framing was close to degenerate.
 
-        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2b: re-measured under the NEW
+        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:18 +0400 — W3-2b: re-measured under the NEW
         error, this bar now clears at 3/3 (seed 9: first=0.0206 last=0.0140 lhs=-0.0170 rhs=-0.0031;
         seed 10: first=0.0145 last=0.0119 lhs=-0.0191 rhs=-0.0050; seed 11: first=0.0141 last=0.0114
         lhs=-0.0196 rhs=-0.0051 — every lhs comfortably below rhs). `expectedFailure` removed: this is a

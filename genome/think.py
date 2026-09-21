@@ -449,7 +449,7 @@ def deduce(beliefs: List[Dict[str, object]]) -> List[Dict[str, object]]:
     single cell names the route — and are filed with route="", REFUSED BY NAME. Two beliefs about the
     same word with overlapping cells are skipped (one belief, not a deduction target).
 
-    edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md): the
+    edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md): the
     routable (different-words) row now also carries `row["shared"]` (the same list already named in its
     claim/route text) — creature/mind.py's scoring needs the cluster of cells to check for resonance at
     the rule's due canvas, and re-deriving it there from two belief rows a second time would duplicate

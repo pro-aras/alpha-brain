@@ -53,7 +53,7 @@ class TestPositiveControls(unittest.TestCase):
 
 class TestInduceNowWired(unittest.TestCase):
     """(b), FLIPPED (W3-2, docs/G4-WAVE3-CLAUSES.md, edit: Claude (Sonnet 5, W3 builder D), 2026-09-21
-    11:xx +0400): INDUCE now has a real interpreter -- creature/mind.py's `_think_pool`/`_think_work`
+    11:40 +0400): INDUCE now has a real interpreter -- creature/mind.py's `_think_pool`/`_think_work`
     call `think_laws.induce()` for words with enough episodes and file the result (genes.py's RUNS entry,
     this task) -- a genome declaring it must START, not refuse. DEDUCE is wired the same way, tested for
     symmetry below. The refusal's own negative-control role for 'a gene with no interpreter' moves to
@@ -160,7 +160,7 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "FILE": "FILE     claim route decider due",
         "BELIEF": "BELIEF   clash opens never overwrites",
         "TRAITS": "TRAITS   contrast head 32 lr 0.01 at sleep",
-        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2: two rows, matching the two
+        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2: two rows, matching the two
         # genes.py RUNS entries added by this task.
         "INDUCE": "INDUCE   rule from 5 episodes no counter",
         "DEDUCE": "DEDUCE   one step",

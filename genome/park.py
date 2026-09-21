@@ -43,7 +43,7 @@ class Park:
         return "open"
 
     def is_parked(self, want: str) -> bool:
-        """edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+        """edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
         a plain query, additive (no existing behaviour touched) — callers that build candidate work
         BEFORE calling answer() (creature/mind.py's rule pool, W3-2) need to skip an already-parked want
         without doing that work over again just to get "parked" back from answer()."""

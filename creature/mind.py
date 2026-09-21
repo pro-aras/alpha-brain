@@ -131,7 +131,7 @@ class Mind:
         self._think_rng = np.random.default_rng([int(self.genome.seed), 0x71494e4b])   # "THINK" bytes-ish, distinct from any other stream in this file
         self._canvas_index: int = 0
         self._filed_predictions: list = []          # [{"row": FILE's row dict, "due_canvas": int}, ...] awaiting the next showing of their word
-        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
         # words/pairs with a currently FILED-but-not-yet-SCORED rule, so _think_pool never re-files the
         # SAME rule twice while its first attempt is still pending (removed once scored, whether PASS or
         # FAIL, so a word/pair may be re-attempted later — up to PARK's own n identical fails). Not
@@ -306,7 +306,7 @@ class Mind:
         fresh word-cell lookup (questions.build_ledgers) rather than a persisted per-edge index — correct,
         but O(births) per score, acceptable at this life's scale.
 
-        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
         an entry carrying a "rule" (an INDUCE/DEDUCE FILE row, _think_rule below) is scored by ITS OWN
         decider — "the resonance of C on that canvas >= THETA_N for >= half of C" (the brief's verbatim
         text) — never the sight-road's "recall == word" (a rule's claim is about a CLUSTER of cells, not
@@ -406,7 +406,7 @@ class Mind:
         for entry in self._filed_predictions:
             if now >= entry["due_canvas"]:
                 pool.append({"kind": "due", "key": entry["target_word"], "episode": None, "pred": entry["row"]})
-        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
         # "rule" items — INDUCE (a word with >= k agreeing episodes, no counter-example) and DEDUCE (two
         # standing beliefs sharing a cell, or the same word split disjoint — unroutable, refused by name).
         # Each candidate is computed by CALLING think_laws.induce()/deduce() here (never re-deriving their
@@ -476,7 +476,7 @@ class Mind:
             r = self.org.recall_many("sight", xs)
             if r.get("cell") is None:
                 return dead_end(word, "no_cell_answers")
-            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
+            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
             # think_laws.believe() is a real call to BELIEF's mechanism (genes.py's RUNS entry) — gated on
             # BELIEF's own declared presence now, not called unconditionally. A word item without BELIEF
             # declared is a dead end named "no_belief_gene" (never a crash, never a silent belief written
@@ -523,7 +523,7 @@ class Mind:
                     break
             if nearest_word is None:
                 return dead_end(item["key"], "no_route")
-            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
+            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
             # predict_file() is a real call to FILE's mechanism (genes.py's RUNS entry) — gated on FILE's
             # own declared presence now. Checked HERE (after the route is found, before filing it) so a
             # genome without FILE still exercises the routing logic above and dead-ends by name at the
@@ -547,7 +547,7 @@ class Mind:
             return {"outcome": "not_yet_due", "parked": False}
 
         if item["kind"] == "rule":
-            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
+            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
             # a rule (INDUCE/DEDUCE) is a PREDICTION, filed through FILE's four fields exactly like the
             # "sight" kind above — induce()/deduce() (genome/think.py) already CALLED predict.file()
             # internally to build item["pred"] (_think_pool), so the row here is already accepted-or-

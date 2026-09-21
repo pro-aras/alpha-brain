@@ -206,7 +206,7 @@ class TestLedgersAndClashEnabledPassthrough(unittest.TestCase):
         self.assertTrue(captured["clash_enabled"], "BELIEF is declared on G4.genome -> clash_enabled must be True")
 
     def test_clash_enabled_false_when_belief_undeclared(self) -> None:
-        """edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 12:xx +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md;
+        """edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md;
         docs/briefs/W3-BUILDER-D.md's own verbatim clause): "think_laws.believe() only when 'BELIEF' in
         declared (a word item without BELIEF -> dead end no_belief_gene)". Before this clause landed on
         this branch, BELIEF undeclared still called believe() (with clash_enabled=False) — the ORIGINAL
