@@ -4,6 +4,8 @@
 
 **Commit:** `5a6dcfe` "D1 (W3-2b): PREDICT's error moves inside the organism"
 
+**Pin hash after D1 alone (verified separately from D2's re-check below):** `d4b5c6b8d57f35e6ad199b49b38d720095ba3b678c380b206665a876698aaa86` — unchanged, checked immediately after 5a6dcfe and again after every later commit; see D2's block for the value re-confirmed on the FINAL bytes (all four commits).
+
 **`tests/genome` discover, log's OK line verbatim (final bytes, after D1+D2):**
 ```
 Ran 132 tests in 66.456s
@@ -22,9 +24,11 @@ seed=10 thing=house last50_pre=0.0177 first3_med=1.0000 spike_ratio=56.418 (bar 
 seed=11 thing=moon  last50_pre=0.0158 first3_med=1.0000 spike_ratio=63.175 (bar >=3.0, PASS)  e_at_10=0.00849             settle_ratio=0.5366  (bar <=1.25, PASS)
 seed=11 thing=house last50_pre=0.0158 first3_med=0.0238 spike_ratio=1.504  (bar >=3.0, FAIL)  e_at_10=1.0                 settle_ratio=63.175  (bar <=1.25, FAIL)
 ```
-Conjunction (spike AND settle, graded as majority of the window's new things): **3/6** —
+Conjunction (spike AND settle, graded as majority of the window's new things): **3/6 per-thing** —
 `[(9,'moon',False), (9,'house',True), (10,'moon',False), (10,'house',True), (11,'moon',True), (11,'house',False)]`.
-Marked `@unittest.expectedFailure` (`test_conjunction_majority_of_new_things`) — reported as measured, no bar moved.
+Graded at the bar's own level (majority of a window's new things, per arrival window of 2 things): each seed's window is 1-of-2 — **0 of 3 windows reach a majority**. Marked `@unittest.expectedFailure` (`test_conjunction_majority_of_new_things`) — reported as measured, no bar moved.
+
+The shape behind the numbers: in every one of the 3 seeds, exactly one of the two new things reads `first3_med=1.0000` (no existing cell resonates on it at all — it births a fresh cell, spike PASSes cleanly) while the other resonates at once against an ALREADY-EXISTING cell (a low first3_med, spike FAILs) — the same "one arrival borrows the other's/an old thing's cells" pattern named in the memory record for life 2 (moon/house, like house borrowing square's cells). The two settle FAILs (`e_at_10=1.0`) are exactly the borrowed-cell things: having never gotten their own cell, their 10th-showing error never drops. Read as the numbers' own shape, not as a new conclusion.
 
 Null arm (fake boundary at the midpoint of one 300-showing OLD-things window — things continuing, not arriving — every ratio must be < 1.5x):
 ```
@@ -85,7 +89,7 @@ Null arm (ear words shuffled per-canvas with `np.random.default_rng(5)`, matchin
 predictions_filed=0  predictions_scored=0
 NULL: 0 rules ever scored under the word-shuffle -- the meeting itself is what the shuffle destroys (a finding, not a bug); nothing to grade against chance
 ```
-Both numbers pass the toy's own bar (>=3 scored, real; shuffled null at chance-or-no-rules-found, since 0 scored has nothing to disagree with chance).
+The "≥3 scored" sub-bar is met (3 scored, real arm); the "≥5 filed" bar is NOT met (3 filed — clause 1 below). The shuffled-null bar (chance-or-no-rules-found) is met: 0 filed, 0 scored, nothing to disagree with chance.
 
 **Zog (the plant shown 5 times, never again):** in this 600-canvas run INDUCE never found a k=5-agreeing cluster for "zog" (0 pending zog entries at canvas 600) — reported as read, not forced. The underlying claim ("a rule that is never due stays pending forever — never scored, never parked, never crashes") was additionally verified deterministically and independent of this run's own randomness, in `TestNeverDueRuleDeterministic`: a "ghost" rule filed by hand for a word that never recurs stays in `_filed_predictions` unscored, un-parked, with no crash, after 40 more canvases of other words.
 
@@ -100,3 +104,4 @@ Both numbers pass the toy's own bar (>=3 scored, real; shuffled null at chance-o
 4. **A refused DEDUCE row's pair is deduplicated in `_deduce_pending` forever** (deliberate — the same unroutable pair is never re-proposed once refused) — so `predictions_filed` counts each unroutable pair once per life, not once per THINK tick it is considered. Named for the record, not a defect against any clause.
 
 5. **Two pre-existing tests outside my OWN file list broke from my own W3-0b gating landing, and were flipped rather than worked around.** `tests/creature/test_wave2_think.py::test_word_item_forms_a_belief_when_answered` and `tests/creature/test_think_counters.py::test_clash_enabled_false_when_belief_undeclared` both pinned the OLD premise that `think_laws.believe()` is still called (with `clash_enabled=False`) when BELIEF is undeclared. The brief's own verbatim W3-0b clause ("`think_laws.believe()` only when `"BELIEF" in declared` ... a word item without BELIEF -> dead end `no_belief_gene`") requires the call itself to be gated, so `believe()` is never reached at all in that case — superseding both tests' premise (the same merge-time-flip class as an existing SOLUTIONS entry: a test pinning the absence of a feature another clause changes). Both were flipped to assert the new law (dead-end `no_belief_gene`, stub never called) rather than weakening the gate to keep the old tests green.
+   **Consequence for the orchestrator merging lanes A/B/D:** Builder A's `clash_enabled` kwarg passthrough (`creature/mind.py` line ~501, `extra_kwargs["clash_enabled"] = "BELIEF" in self.genome.declared`) sits AFTER my W3-0b dead-end gate, so by the time it is reached `"BELIEF" in self.genome.declared` is always True — `clash_enabled` can now only ever be passed as `True`. It is not dead code (the ledgers/clash_enabled kwarg-introspection machinery still runs for every believed word), but the "False" branch it was built to carry is now unreachable through this call site. W3-1's own control ("BELIEF undeclared writes no clash row") is now satisfied by a STRONGER fact than the one it was designed to test — no belief row of any kind is written at all when BELIEF is undeclared, not merely "no clash row" — so that control still passes, for a different reason than its own docstring states.
