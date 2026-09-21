@@ -1,2 +1,5 @@
+# edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 20:51 +0400 — scratch/ added (orchestrator correction: not covered elsewhere)
 __pycache__/
 *.pyc
+
+scratch/
