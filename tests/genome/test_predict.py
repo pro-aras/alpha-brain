@@ -25,6 +25,26 @@ three things read between-p95 (0.92) ABOVE within-median (0.81) — an OVERLAP u
 rule — so the retina itself cannot cleanly separate the population this toy draws its nulls from; the
 noise is in the FRONT, not a defect in Predictor. Reported as numbers (test_nulls_reported), not forced
 into a pass/fail claim the data does not support.
+
+edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 10:46 +0400 — W3-2b (docs/G4-WAVE3-CLAUSES.md):
+`error()` no longer reads `expect()` (the last moment's single remembered winner) — it reads
+`org.sight.cos(x_actual)` over EVERY alive sight cell and takes the max (module docstring in
+genome/predict.py). The "persistence predictor's ceiling is set by prototype DENSITY" story above was
+true of a SINGLE remembered vector; it is not true of a max over the whole population, which several
+jittered exemplars of one thing can collectively cover far more tightly than one prototype ever could.
+Re-measured on this exact toy (same genome, same THETA_N-from-the-stream, same 3-seed repeating-block
+stream): last50 now reads 0.0436 / 0.0439 / 0.0495 (seeds 9/10/11) against the SAME floor (0.198, still
+1 − within-thing-median-cosine — that number describes the RETINA+jitter, not the predictor, and is
+unchanged) — the new mechanism reads WELL BELOW that floor at all three seeds, because it is no longer
+bound by it. `test_floor_explains_the_ratio_ceiling` is rewritten below to state this (the new error
+BEATS the old ceiling, not "lands near" it) rather than deleted — the floor number is still worth
+printing, now as a lower bound the new mechanism clears, not a ceiling it approaches.
+`test_bar_0_7x_prereg_b6a`'s bar (mean ratio < 0.7x) now PASSES for real: mean ratio 0.439 (0.405 /
+0.430 / 0.482 at seeds 9/10/11), well under 0.7 — `@unittest.expectedFailure` removed (an unexpected
+success under the OLD mechanism would have failed the suite; #197's "pin in both directions" did its
+job and caught the flip). Kept as a real, asserted PASS with the new numbers in its own docstring, not
+silently deleted — the OLD numbers (mean 0.78, FAIL) stand on the record above as what the OLD `expect()`
+read on this same toy.
 """
 from __future__ import annotations
 
@@ -139,16 +159,14 @@ class TestPredictor(unittest.TestCase):
         # not asserted, just carried for the report:
         self.ratios_design = ratios
 
-    @unittest.expectedFailure
     def test_bar_0_7x_prereg_b6a(self) -> None:
-        """(a)'s LITERAL bar: median error of the last 50 < 0.7x the first 50. Module docstring: the
-        mechanism's own ceiling on this jittered pool3 stream is ~0.75-0.80 (floor/first50, where floor
-        = 1 - within-thing median cosine, a retina+jitter property — cells are FIXED prototypes,
-        machinery.py's own law, so DELTA/learning cannot push error below that floor). Mean ratio over
-        seeds (9, 10, 11) is ~0.78, consistently above 0.7 — a RAISED finding (PREREG: "a toy that fails
-        is a result you report with its numbers, never forced to pass"), pinned as `expectedFailure` so
-        the suite reads OK either way and a future change that clears the bar is caught as an
-        "unexpected success" (a pin in both directions, #197's discipline)."""
+        """(a)'s LITERAL bar: median error of the last 50 < 0.7x the first 50. UNDER THE OLD `expect()`
+        (a single remembered winner), this bar FAILED (mean ratio ~0.78, `expectedFailure`, see the
+        module docstring). W3-2b (2026-09-21) moved error()'s target to the max cosine over EVERY alive
+        sight cell, which several jittered exemplars of a thing cover far more tightly than one
+        prototype — mean ratio now reads 0.439 (0.405 / 0.430 / 0.482 at seeds 9, 10, 11), clearing 0.7x
+        at every seed. `expectedFailure` removed; this is now a real, asserted PASS (a future regression
+        that pushes the ratio back up is caught as a real failure, not silently absorbed)."""
         theta_n = _theta_n_from_the_stream()
         g = _build_genome(theta_n)
         ratios = []
@@ -158,17 +176,25 @@ class TestPredictor(unittest.TestCase):
         mean_ratio = sum(ratios) / len(ratios)
         self.assertLess(mean_ratio, 0.7, f"mean ratio over seeds {SEEDS}: {mean_ratio:.3f} (per-seed: {[round(r,3) for r in ratios]})")
 
-    def test_floor_explains_the_ratio_ceiling(self) -> None:
-        """Diagnostic, not a pass/fail claim about PREDICT: the last-50 median lands close to
-        1 - within-thing-median-cosine (the ceiling the module docstring derives), confirming this is a
-        representation ceiling, not a bug in the predictor or the toy's construction."""
+    def test_floor_beaten_not_approached(self) -> None:
+        """RENAMED and re-read (was test_floor_explains_the_ratio_ceiling; W3-2b, 2026-09-21): under the
+        OLD `expect()` the last-50 median landed NEAR 1 - within-thing-median-cosine (a ceiling set by
+        remembering one prototype). Under the NEW error (max cosine over every alive cell) that number is
+        no longer a ceiling — several jittered exemplars collectively cover a thing's neighbourhood more
+        tightly than any one of them alone, so the new error reads WELL BELOW it. Measured at all three
+        seeds: floor=0.198, last50 = 0.044 / 0.044 / 0.049 (seeds 9/10/11) — every one below the floor,
+        not near it. Asserted at all three seeds (not just seed 9, as the old version read), both
+        directions pinned: `last < floor` at every seed, and the gap is not vanishingly small (>= 0.05)."""
         from genome import gate_ga
         theta_n = _theta_n_from_the_stream()
         g = _build_genome(theta_n)
         b = gate_ga.bands(THINGS, 60, np.random.default_rng(200), SPEC, side=24)
         floor = 1.0 - b["within"]["median"]
-        _errs, _first, last = _run(g, _repeating_block_stream(9), blank_zero=True)
-        self.assertLess(abs(last - floor), 0.08, f"last50={last:.3f} should sit near the ceiling floor={floor:.3f}")
+        for seed in SEEDS:
+            with self.subTest(seed=seed):
+                _errs, _first, last = _run(g, _repeating_block_stream(seed), blank_zero=True)
+                self.assertLess(last, floor, f"seed {seed}: last50={last:.4f} should now beat the old ceiling floor={floor:.4f}")
+                self.assertGreaterEqual(floor - last, 0.05, f"seed {seed}: last50={last:.4f} floor={floor:.4f} — gap too small to trust")
 
     def test_word_shuffled_and_picture_shuffled_streams_reported(self) -> None:
         """(a)'s null half: computed and reported for the record, at all 3 seeds — see the module
