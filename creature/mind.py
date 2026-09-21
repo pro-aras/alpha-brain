@@ -86,6 +86,11 @@ except ImportError:
     _TRAITS_AVAILABLE = False
 
 SNAPSHOT_EVERY = 500
+# edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: the dedicated "reflex" (outcome/SIT) episodes
+# ring's capacity. No numeric parameter exists in either OUTCOME's or SIT's fixed genome-text shape (G-MOT-2/3), so
+# this is a code constant, sized like FAST's own smaller genomes (genome/G4.genome declares FAST 20000; this ring
+# carries far sparser traffic — one row per act/SIT-publish, not one per glance) — not a gene value.
+OUTCOME_EPISODES_CAP = 2000
 
 
 class Mind:
@@ -122,6 +127,28 @@ class Mind:
             Episodes(int(self.genome.declared["FAST"]["episodes"]), self.genome.sight_dim(), self.genome.words_dim())
             if "FAST" in self.genome.declared else None
         )
+        # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K (MOTOR-HANDS.md G-MOT-2/3): a SEPARATE
+        # Episodes ring for non-visual "reflex" observations (an act's outcome; SIT's exam score) — never self.episodes,
+        # and NEVER replayed through Organism.moment() by genome.sleep.sleep(). Why: SLEEP replays the n most-surprising
+        # live episodes AS ORDINARY MOMENTS (sleep.py's own law), i.e. `org.moment(rec["x_s"], rec["x_w"])`. An outcome
+        # has no sight glance — a zero-vector x_s makes Area.cos(x)==0 everywhere (machinery.py:427, a plain dot product,
+        # no norm division), which is < THETA_N, so `_resonate` (machinery.py:550) BIRTHS a garbage sight cell every
+        # replay; a REAL glance vector paired with encode_word(act) would instead wire that visual context to a
+        # non-"thing" word inside stage 2's HEBB/DELTA (machinery.py:566), corrupting Q1 recall. Neither is safe under
+        # the CURRENT SLEEP law, so MOTOR-HANDS.md G-MOT-2's "SLEEP already replays surprising acts into SLOW" is
+        # RAISED in the report, not built: this ring gives `most_surprising()`/`nearest()` for free (the EXISTING
+        # Episodes class, no new learning machinery) so "ranks replay" is a real, working capability on this ring, but
+        # genome.sleep.sleep() is never pointed at it. dim_s/dim_w match self.episodes' so the same class works
+        # unmodified; x_s[0] doubles as the reflex's own scalar payload ("got") — never read by cos()/_resonate since
+        # this ring is never fed to Organism.moment(). Built when EITHER OUTCOME or SIT is declared (SIT's score reuses
+        # this same mechanism, tagged act="sit" — see _record_reflex).
+        self.outcome_episodes: Optional[Episodes] = (
+            Episodes(OUTCOME_EPISODES_CAP, self.genome.sight_dim(), self.genome.words_dim())
+            if ("OUTCOME" in self.genome.declared or "SIT" in self.genome.declared) else None
+        )
+        self._act_expected: Dict[str, float] = {}     # act -> running mean of past "got" values (the PREDICTION; #175)
+        self._act_n: Dict[str, int] = {}               # act -> count backing the running mean
+        # merge (Claude (Fable 5.1), g5-integration): K's ring above + E's arm-aware Predictor below — both kept.
         # G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md): the arm name lives on the genome's PREDICT
         # clause (machinery.py's parser, default "novelty" when the genome's PREDICT line carries no
         # trailing "; error <arm>" — every genome on disk before this edit, G4.genome included).
@@ -187,10 +214,123 @@ class Mind:
             self.pending[moment] = meta.get("word")
         elif sense == "eye":
             self._consume_eye(row, moment)
+        # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: the three new tape senses. Each method
+        # gates itself on its own gene's declared presence (W3-0's own law one level up: a sense may publish a row of
+        # this sense name even under a genome that never declared the gene -- e.g. a test tape, or another builder's
+        # world -- and the mind must not act on it then; matches the existing "a 'door' row ... carries no organism
+        # work here" law for an unarmed sense).
+        elif sense == "outcome":
+            self._consume_outcome(row)
+        elif sense == "sit":
+            self._consume_sit(row)
+        elif sense == "body":
+            self._consume_body(row)
         # a "door" row (the ask door / other senses not yet armed) carries no organism work here
         self.last_seq = int(row["seq"])
         if self.org.t - self._last_snapshot_moments >= SNAPSHOT_EVERY:
             self.snapshot()
+
+    # ------------------------------------------------------------------ G5-K: ACT/OUTCOME/SIT/body (reflex episodes)
+    def _record_reflex(self, act: str, got: Optional[float], expected_in: Optional[float],
+                        residual_in: Optional[float], source: str) -> Dict[str, object]:
+        """Shared by an "outcome" tape row (G-MOT-2) and a "sit" tape row (G-MOT-3, tagged act="sit"): computes the
+        residual (expected vs got — never from how much changed, #175's own law) and, unless blind, writes it as an
+        episode in the DEDICATED self.outcome_episodes ring (never self.episodes -- see __init__'s comment on why).
+        `expected`: the row's own value if it supplied one (trusting the publisher -- e.g. a future HANDS/game
+        mechanism that computes its own expectation); otherwise the mind's own per-act running mean of past `got`
+        values -- a real PREDICTION, not the previous single reading (which would be byte-identical to the E21
+        magnitude-only twin and control nothing, MOTOR-HANDS.md G-MOT-2). `residual`: the row's own value if supplied
+        (trusting a publisher that already graded it, e.g. Builder L's game reward); else |got - expected| when both
+        exist; else None ("not gradable", #228 (a) -- never a fabricated 0)."""
+        verbs = (self.genome.declared.get("ACT") or {}).get("verbs")
+        in_vocab = verbs is None or act in verbs
+        expected: Optional[float] = float(expected_in) if expected_in is not None else self._act_expected.get(act)
+        got_f: Optional[float] = float(got) if got is not None else None
+        if residual_in is not None:
+            residual: Optional[float] = float(residual_in)
+        elif expected is not None and got_f is not None:
+            residual = abs(got_f - expected)
+        else:
+            residual = None
+        ep_id: Optional[int] = None
+        if self.outcome_episodes is not None and "outcome" not in self.blind:
+            dim_s = self.genome.sight_dim()
+            x_s = np.zeros(dim_s, dtype=np.float64)
+            x_w = np.zeros(self.genome.words_dim(), dtype=np.float64)
+            if got_f is not None:
+                x_s[0] = got_f     # the payload slot -- never read by cos()/_resonate (this ring never reaches Organism.moment)
+            ep_id = self.outcome_episodes.write(moment=self.org.t, x_s=x_s, x_w=x_w, word=act,
+                                                  surprise=float(residual) if residual is not None else 0.0)
+            if got_f is not None:                       # update the running expectation AFTER filing this residual
+                n = self._act_n.get(act, 0) + 1          # (the NEXT observation of this act is graded against it, not this one)
+                old = self._act_expected.get(act, got_f)
+                self._act_expected[act] = old + (got_f - old) / n
+                self._act_n[act] = n
+        return {"act": act, "expected": expected, "got": got_f, "residual": residual, "source": source,
+                "in_vocab": in_vocab, "gradable": residual is not None, "ep": ep_id}
+
+    def _consume_outcome(self, row: Dict[str, object]) -> None:
+        """G-MOT-2: OUTCOME must be declared (else this sense-name row is a fact on the tape with no consumer, same
+        as an unarmed door). meta carries EXACTLY act/expected/got/residual/source (the shape hard rule 6 fixes, so
+        Builder L's game-reward rows are readable here too)."""
+        if "OUTCOME" not in self.genome.declared:
+            return
+        meta = row.get("meta") or {}
+        result = self._record_reflex(act=str(meta.get("act", "")), got=meta.get("got"), expected_in=meta.get("expected"),
+                                       residual_in=meta.get("residual"), source=str(meta.get("source", "")))
+        self._write_journal(row["at"], {"seq": row["seq"], "outcome": result})
+
+    def _consume_sit(self, row: Dict[str, object]) -> None:
+        """G-MOT-3: SIT must be declared. `--blind sit` means "the score is not published" (MOTOR-HANDS.md's own
+        words for this twin) -- blind is a Mind-level concept here (senses never receive it), so the mind treats a
+        blind-sit row as if SIT had never fired: journaled as blind, no reflex recorded."""
+        if "SIT" not in self.genome.declared:
+            return
+        meta = row.get("meta") or {}
+        if "sit" in self.blind:
+            self._write_journal(row["at"], {"seq": row["seq"], "sit": {"blind": True}})
+            return
+        result = self._record_reflex(act="sit", got=meta.get("score"), expected_in=None, residual_in=None,
+                                       source=str(meta.get("source", "sit")))
+        self._write_journal(row["at"], {"seq": row["seq"], "sit": result})
+
+    def _consume_body(self, row: Dict[str, object]) -> None:
+        """BODY-SENSES.md §4.1: "the readings; the DRIVE is the mind's" -- this gene carries no threshold, so
+        there is nothing here to compute beyond recording the reading itself as a journal row (the refusal test in
+        BODY-SENSES §4.1 -- "count the moments in which any journaled decision differs" -- is satisfied structurally
+        by this row's own presence/absence; RAISED in the report: nothing downstream of this row yet changes THINK's
+        pool or CURIOSITY, so a stricter reading of that clause is not yet met -- no consumer exists to wire it to)."""
+        if "SENSE_BODY" not in self.genome.declared:
+            return
+        if "body" in self.blind:
+            self._write_journal(row["at"], {"seq": row["seq"], "body": {"blind": True}})
+            return
+        meta = row.get("meta") or {}
+        reading = meta.get("reading") or {}
+        self._write_journal(row["at"], {"seq": row["seq"], "body": dict(reading)})
+
+    def _rebuild_act_expectation(self) -> None:
+        """G5-K, called from resume(): replays self.outcome_episodes' own live entries (in id order == temporal
+        order — ids never reused, an overwritten id's slot is simply skipped by .get() returning None) through the
+        SAME running-mean update _record_reflex uses, so a resumed mind's next reflex is graded against the same
+        expectation a non-resumed one would compute."""
+        self._act_expected = {}
+        self._act_n = {}
+        ep = self.outcome_episodes
+        if ep is None:
+            return
+        for eid in range(ep.n_written):
+            rec = ep.get(eid)
+            if rec is None or not rec["word"]:
+                continue
+            act = rec["word"]
+            got_f = float(rec["x_s"][0]) if rec["x_s"] is not None and rec["x_s"].size > 0 else None
+            if got_f is None:
+                continue
+            n = self._act_n.get(act, 0) + 1
+            old = self._act_expected.get(act, got_f)
+            self._act_expected[act] = old + (got_f - old) / n
+            self._act_n[act] = n
 
     def _consume_eye(self, row: Dict[str, object], moment: Optional[str]) -> None:
         # edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — W3-0b seam (Builder C's finding 4): the payload is read under the genome's own TAPE path
@@ -466,6 +606,21 @@ class Mind:
                 if self.park is not None and self.park.is_parked(f"deduce:{pair_key}"):
                     continue
                 pool.append({"kind": "rule", "key": pair_key, "episode": None, "pred": claim_row, "op": "deduce"})
+        # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: an "outcome" kind, one item per
+        # distinct act among the last 50 live reflex episodes (word/sight's own "last N, one per key" shape, scaled
+        # down to this ring's much sparser traffic). Gated on the ring's own presence, not on OUTCOME/SIT separately
+        # -- either gene can have populated it. #232's addendum: a branch no test reaches crashes on its first real
+        # walk -- see tests/creature/test_g5k_outcome.py::test_think_can_choose_an_outcome_item for the walk.
+        if self.outcome_episodes is not None:
+            n_reflex = self.outcome_episodes.n_written
+            first_reflex = max(0, n_reflex - 50)
+            seen_acts: set = set()
+            for eid in range(first_reflex, n_reflex):
+                rec = self.outcome_episodes.get(eid)
+                if rec is None or not rec["word"] or rec["word"] in seen_acts:
+                    continue
+                seen_acts.add(rec["word"])
+                pool.append({"kind": "outcome", "key": rec["word"], "episode": eid, "pred": None})
         return pool
 
     def _think_choose(self, pool: list):
@@ -610,6 +765,17 @@ class Mind:
                 return {"outcome": "refused", "parked": False, "refused": row.get("refused")}
             return {"outcome": "filed", "parked": False, "want": want}
 
+        if item["kind"] == "outcome":
+            # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: a read-only reflection on one
+            # act's own residual -- no FILE claim (no established consumer for "is this act predictable" as a
+            # falsifiable claim yet; a further growth line, not built here, raised in the report). Never crashes on
+            # a ring the read/write side share (self.outcome_episodes), never a dead end (a residual, gradable or
+            # not, is always a real reading, not a failure to find one).
+            rec = self.outcome_episodes.get(item["episode"]) if self.outcome_episodes is not None else None
+            if rec is None:
+                return dead_end(item["key"], "episode_gone")
+            return {"outcome": "reflected", "parked": False, "act": rec["word"], "residual": float(rec["surprise"])}
+
         return dead_end(str(item.get("key")), "unknown_kind")
 
     def _file_rule(self, row: Dict[str, object], want: str, op: str) -> None:
@@ -710,6 +876,8 @@ class Mind:
 
         if self.episodes is not None:      # A9: FAST's episodes are saved with the snapshot (Episodes.save is already atomic: tmp + os.replace internally)
             self.episodes.save(state_dir / "episodes.npz")
+        if self.outcome_episodes is not None:   # G5-K: the reflex ring — same class, same atomic save; never hashed (state_hash reads only org.c/cells/W)
+            self.outcome_episodes.save(state_dir / "outcome_episodes.npz")
 
         self._last_snapshot_moments = self.org.t
         self.snapshot_count += 1
@@ -747,6 +915,14 @@ class Mind:
             episodes_path = state_dir / "episodes.npz"
             if "FAST" in mind.genome.declared and episodes_path.exists():
                 mind.episodes = Episodes.load(episodes_path)
+            # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: the reflex ring reloaded the same
+            # way; the per-act running expectation is NEVER itself persisted (advisor: "derive it from the dedicated
+            # ring at resume, no separate persisted field") — rebuilt by replaying the ring's own live entries in id
+            # (== temporal) order, x_s[0] read back as each entry's own "got" payload.
+            outcome_path = state_dir / "outcome_episodes.npz"
+            if ("OUTCOME" in mind.genome.declared or "SIT" in mind.genome.declared) and outcome_path.exists():
+                mind.outcome_episodes = Episodes.load(outcome_path)
+                mind._rebuild_act_expectation()
             if "SLEEP" in mind.genome.declared:
                 every = int(mind.genome.declared["SLEEP"]["every"])
                 mind._last_sleep_at = (mind.org.t // every) * every if every > 0 else 0

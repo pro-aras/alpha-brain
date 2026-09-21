@@ -58,6 +58,11 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "CRASH": "creature/body.py:_crash_policy, read at Body.__init__ -> SenseThread.run (restart) + Body._handle_mind_crash (page) — declared['CRASH']'s two sub-facts gate each behaviour",
         "WORLD": "creature/body.py:main (declared['WORLD']['drawn_every_s']/['arrival_every_h'] read into world_maker.sense's period/window_seconds; ['folder'] arms creature/senses/folder.py behind FOLDER_DOOR_GATED)",
         "ASK": "creature/ask.py:_ask_refusal, read at answer() (declared['ASK']['verbs'] read; a verb outside it is refused by name instead of reaching the hardcoded `if q == ...` branches)",
+        # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K (docs/briefs/G5-K-ACTS-OUTCOME-SIT-BODY.md):
+        # SIT and SENSE_BODY are the two body-side rows (sense threads, gated on their own declared presence at
+        # Body.start — the same C1.7 pattern EXAM/WORLD/ASK already use).
+        "SIT": "creature/body.py:Body.start (declared['SIT']['every'] read; starts the sit-publishing sense thread) + creature/senses/sit.py:sense (the canvas-cadence check against state/ledger.json, folder.py's own pattern; publishes the latest exam file's score)",
+        "SENSE_BODY": "creature/body.py:Body.start (declared['SENSE_BODY']['period_s']/['fields'] read; starts the body-sense thread) + creature/senses/body_sense.py:sense (STATUS.json's own numbers republished onto the tape every period_s)",
     },
     # ---------------------------------------------------------------------------------------- the mind
     "mind": {
@@ -80,6 +85,11 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # predict.file() internally, so without FILE the mind dead-ends BEFORE calling them).
         "INDUCE": "creature/mind.py:_think_pool/_think_work (think_laws.induce() called for words with >= k episodes; filed as 'rule' items, scored at their due canvas)",
         "DEDUCE": "creature/mind.py:_think_pool/_think_work (think_laws.deduce() called over standing beliefs; filed as 'rule' items, scored at their due canvas)",
+        # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: ACT/OUTCOME are the mind-side rows.
+        # Two real call sites each (Mind.__init__ builds state; Mind._consume_outcome/_consume_sit/_think_pool/
+        # _think_work read the declared value or act on the row) — the same two-site shape PREDICT/FAST already use.
+        "ACT": "creature/mind.py:Mind._record_reflex (declared['ACT']['verbs'] read; an outcome/sit row's act tagged in/out of the declared vocabulary)",
+        "OUTCOME": "creature/mind.py:Mind.__init__ (self.outcome_episodes built) + Mind._consume_outcome/_record_reflex (residual computed via a per-act running expectation; written as a reflex episode, ranked by Episodes.most_surprising) + Mind._think_pool/_think_work ('outcome' pool kind)",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
     },
 }

@@ -212,6 +212,26 @@ class Body:
             self._exam_thread = threading.Thread(target=exam_module.voice_loop, args=(self.root, self.genome_path, self.stop_event),
                                                   kwargs={"every_canvases": every, "poll_period": 5.0}, name="exam", daemon=True)
             self._exam_thread.start()
+        # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K (docs/briefs/G5-K-ACTS-OUTCOME-SIT-BODY.md):
+        # SIT and SENSE_BODY, wired the same C1.7 shape EXAM uses above (gated on the gene's own declared presence;
+        # started here, after self.mind exists, via add_sense so both get the SAME crash-isolation/restart/journal
+        # machinery every other sense has — unlike the exam thread above, which predates SenseThread and journals
+        # its own EVENT rows directly (creature/exam.py), SIT and body publish TAPE rows, exactly the shape a
+        # `SenseThread` is for. `add_sense` may be called any time before the `for st in self.sense_threads: st.start()`
+        # loop just below — it only appends to the list; nothing here requires it to run before start().
+        import functools
+        if "SIT" in self.mind.genome.declared:
+            from .senses import sit as sit_sense
+            sit_every = int(self.mind.genome.declared["SIT"]["every"])
+            sit_fn = functools.partial(sit_sense.sense, root=self.root, genome_path=self.genome_path,
+                                        every_canvases=sit_every, poll_period=5.0)
+            self.add_sense("sit", sit_fn)
+        if "SENSE_BODY" in self.mind.genome.declared:
+            from .senses import body_sense as body_sense_module
+            body_period = float(self.mind.genome.declared["SENSE_BODY"]["period_s"])
+            body_fields = list(self.mind.genome.declared["SENSE_BODY"]["fields"])
+            body_fn = functools.partial(body_sense_module.sense, root=self.root, fields=body_fields, period_s=body_period)
+            self.add_sense("body", body_fn)
         for st in self.sense_threads:
             st.start()
         self._started = True
@@ -280,6 +300,9 @@ class Body:
             **{k: int(v) for k, v in getattr(self.mind, "think_counters", {}).items()},
             "episodes": int(self.mind.episodes.n_written) if getattr(self.mind, "episodes", None) is not None else 0,
             "sleeps": int(getattr(self.mind, "sleep_count", 0)),
+            # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: the reflex ring's own count, exported
+            # on every write (#164's law: a computed value and an exported one are different features, #163's class).
+            "outcome_episodes": int(self.mind.outcome_episodes.n_written) if getattr(self.mind, "outcome_episodes", None) is not None else 0,
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:
