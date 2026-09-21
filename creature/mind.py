@@ -460,15 +460,16 @@ class Mind:
         # (21 on life 3a's words) and the word items — the only road to a belief — were starved: in the fixed replay of
         # life 3a 175 of 181 thinks were rule thinks, and the think-counter fixtures formed no belief at all. Kind fairness
         # is a fixed mind rule; CURIOSITY's law (which item within a kind) is untouched, and the blind twin isolates it.
+        curiosity_on = self.interests is not None and "curiosity" not in self.blind
+        if not curiosity_on and not ("curiosity" in self.blind and "CURIOSITY" in self.genome.declared):
+            return pool[0]                                                # no CURIOSITY declared: the first item (the skeleton's pinned road, unchanged)
+        # 2026-09-21 15:51 +0400 — kind fairness is CURIOSITY's road (and its blind twin's), never the no-CURIOSITY skeleton's
         kinds = sorted({str(it.get("kind")) for it in pool})
         kind = kinds[int(self._think_rng.integers(0, len(kinds)))] if len(kinds) > 1 else kinds[0]
         sub = [it for it in pool if str(it.get("kind")) == kind]
-        curiosity_on = self.interests is not None and "curiosity" not in self.blind
         if curiosity_on:
             return self.interests.choose(sub, self._think_rng)
-        if "curiosity" in self.blind and "CURIOSITY" in self.genome.declared:
-            return sub[int(self._think_rng.integers(0, len(sub)))]        # blind curiosity: the rng's uniform pick within the kind
-        return sub[0]                                                     # no CURIOSITY declared: the first item of the kind
+        return sub[int(self._think_rng.integers(0, len(sub)))]            # blind curiosity: the rng's uniform pick within the kind
 
     def _think_work(self, item: dict) -> Dict[str, object]:
         """Works one pool item; returns {"outcome", "parked", ...}. Every dead end goes to
