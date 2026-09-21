@@ -408,7 +408,8 @@ def induce(episodes, k: int, org: Organism) -> List[Dict[str, object]]:
     words_seen = sorted(set(str(episodes.word[i]) for i in range(len(episodes)) if str(episodes.word[i])))
     for word in words_seen:
         r = org.recall("words", world.encode_word(word, org.g.ear_blank_zero))
-        word_cell = r["cell"]
+        word_cell = r["lit"]   # edit: Claude (Fable 5.1), 2026-09-21 15:14 +0400 — was r["cell"], the SIGHT cell the word recalls; _answer_of(sight, c) is a WORDS index, so the
+        #                        cluster compared a sight id to a words index (2/21 words clustered on life 3, both the WRONG cells). r["lit"] is the word's own cell.
         if word_cell is None:
             continue  # the organism itself abstains on this word — nothing to cluster against
         C = sorted(int(c) for c in org.sight.alive_ids() if org._answer_of(org.sight, int(c)) == word_cell)

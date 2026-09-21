@@ -215,9 +215,8 @@ class TestTheLifeGenome(unittest.TestCase):
         self.assertAlmostEqual(g.theta_m, 0.9969, places=4)
         # edit: Claude (Fable 5.1), 2026-09-20 00:38 +0400 — PREREG §14: INDUCE and DEDUCE declared OFF (no interpreter in the mind), so the life's set is 17 genes
         # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15: ARRIVAL declared (never-heard word), so the life's set is 18 genes
-        self.assertEqual(sorted(g.declared), ["ARRIVAL", "ASK", "BELIEF", "BODY", "CRASH", "CURIOSITY", "CYCLE", "EXAM", "FAST", "FILE",
-                                              "FROZEN", "HEART", "PARK", "PREDICT", "SLEEP", "TAPE", "THINK", "WORLD"])
+        self.assertEqual(sorted(g.declared), ["ARRIVAL", "ASK", "BELIEF", "BODY", "CRASH", "CURIOSITY", "CYCLE", "DEDUCE", "EXAM", "FAST", "FILE", "FROZEN", "HEART", "INDUCE", "PARK", "PREDICT", "SLEEP", "TAPE", "THINK", "WORLD"])  # edit: Claude (Fable 5.1), 2026-09-21 15:18 +0400 — INDUCE and DEDUCE declared ON for life 3 (PREREG §18); the pin had not moved with the genome
         self.assertEqual(g.declared["ARRIVAL"], {"rule": "never-heard word"})
-        for off in ("TRAITS", "SURPRISE", "SENTENCE", "HANDS", "INDUCE", "DEDUCE"):
+        for off in ("TRAITS", "SURPRISE", "SENTENCE", "HANDS"):   # edit: Claude (Fable 5.1), 2026-09-21 15:18 +0400 — INDUCE/DEDUCE are ON since life 3 (PREREG §18)
             self.assertNotIn(off, g.declared)
         self.assertEqual(g.declared["THINK"], {"every": 10}); self.assertEqual(g.declared["EXAM"], {"every": 2000}); self.assertEqual(g.declared["FROZEN"], {"after": 50})
