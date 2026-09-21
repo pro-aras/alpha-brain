@@ -3,7 +3,7 @@
 
 edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 21:xx +0400 — new module, Wave 2 B10.
 
-edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md): a new
+edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md): a new
 outcome, "failed" — "a scored rule that FAILS lowers CURIOSITY's weight on its item", the brief's own
 words. Specialize's own arithmetic (x0.5), under its own name: a rule can FAIL (its due-canvas decider
 did not hold) without ever being PARKED (parked needs 3 identical fails on the SAME want, PARK's own

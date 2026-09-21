@@ -9,7 +9,7 @@ the old error's steady-state baseline (~.09-.11 under window-1 shuffling) sat to
 literal bar to be meaningful; W3-2b's error has a completely different SHAPE (see below), so re-using
 that apparatus would misdescribe the new signal, not describe it honestly.
 
-edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — D1 (docs/briefs/W3-BUILDER-D.md): re-run
+edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:18 +0400 — D1 (docs/briefs/W3-BUILDER-D.md): re-run
 with the new error, the SAME bars the brief states verbatim (matching §16 addendum 1 exactly): spike =
 median error over a new thing's first 3 showings >= 3x the median error over the 50 canvases before the
 arrival; settle = the 10th showing's error <= 1.25x that SAME pre-arrival median (not F+0.05 — §16

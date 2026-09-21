@@ -117,7 +117,7 @@ class TestThinkWorkSightAndFile(unittest.TestCase):
         sight_items = [it for it in pool if it["kind"] == "sight"]
         self.assertGreater(len(sight_items), 0)
         result = mind._think_work(sight_items[0])
-        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
+        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
         # predict_file() is now gated on "FILE" in declared; GENOME_WITH_PARK (this fixture, above) never
         # declares FILE, so the sight road now dead-ends "no_file_gene" here — added to the accepted set,
         # nothing else in this test (or its fixture) touched.
@@ -192,7 +192,7 @@ class TestThinkBeliefFormation(unittest.TestCase):
         word_items = [it for it in pool if it["kind"] == "word"]
         if word_items:
             result = mind._think_work(word_items[0])
-            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 12:xx +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
+            # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
             # think_laws.believe() is now gated on "BELIEF" in declared; GENOME_WITH_PARK (this fixture,
             # above) never declares BELIEF, so the word road now dead-ends "no_belief_gene" here — the
             # exact same fix already made to the sight-item test above for "no_file_gene", added to the

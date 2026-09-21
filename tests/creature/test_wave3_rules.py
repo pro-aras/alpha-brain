@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — D2 (docs/briefs/W3-BUILDER-D.md; W3-2,
+# edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — D2 (docs/briefs/W3-BUILDER-D.md; W3-2,
 # docs/G4-WAVE3-CLAUSES.md): INDUCE / DEDUCE wired — a rule is a PREDICTION, filed through FILE's four
 # fields, scored at its due canvas. The toy genome is `G4-wave2-test.genome` (PREDICT/FAST already on
 # it) PLUS the FILE/CURIOSITY/PARK/BELIEF/THINK/INDUCE/DEDUCE lines lifted VERBATIM from `genome/G4.genome`
@@ -271,7 +271,7 @@ class TestNeverDueRuleDeterministic(unittest.TestCase):
         self.assertEqual(len(pending), 1)
 
         # 40 more canvases, none of them "ghost"
-        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 12:xx +0400 — these two publishes used to omit
+        # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — these two publishes used to omit
         # `at=`, so Tape.now_iso() read the wall clock (non-deterministic, non-replayable — the one row in
         # this suite that broke the tape's own reproducibility law, advisor-flagged). Fixed with the SAME
         # deterministic `at` formula _publish_canvas() (above) uses for every other call site in this

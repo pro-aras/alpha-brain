@@ -130,7 +130,7 @@ class TestSleepRetention(unittest.TestCase):
         """The robust half: sleep genuinely helps, monotonically, across the two more aggressive
         schedules — never asserted as a single magic config.
 
-        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2b (docs/G4-WAVE3-CLAUSES.md):
+        edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:18 +0400 — W3-2b (docs/G4-WAVE3-CLAUSES.md):
         `episodes.write(..., surprise=err)` carries the NEW error (genome/predict.py: max cosine over
         EVERY alive sight cell), which is BIMODAL (0-ish or exactly 1.0) rather than the old smooth
         gradient — `most_surprising(n)`'s ranking, and so SLEEP's replay selection, changes (PREREG
@@ -169,7 +169,7 @@ class TestSleepRetention(unittest.TestCase):
     @unittest.expectedFailure
     def test_with_sleep_within_5pp_prereg_b7(self) -> None:
         """PREREG's literal bar. UNDER THE OLD error, WITH sleep (every 50, replay 30) the drop was
-        ~47.5 pp. edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:xx +0400 — W3-2b: re-measured
+        ~47.5 pp. edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:18 +0400 — W3-2b: re-measured
         under the NEW error, the drop at this same schedule now reads 62.5 pp — still real, still helps
         relative to no-sleep (70.0pp), but further from the 5pp bar than before, not closer. Still a
         RAISED finding, `expectedFailure`, never forced."""
