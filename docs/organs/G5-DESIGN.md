@@ -49,7 +49,7 @@ Lines are in the genome's own syntax (`NAME  value words  # source`). "parser ch
 **EYE** (EYE.md §4; BODY-SENSES §4.3–4.4)
 ```
 DELIVER  where fixation when instant act glance     # G-EYE-1: the seam contract; fields on the episode + tape row, never in the cosine (parser change)
-BIND     glances per canvas                          # G-EYE-2 (= G-MIND-2): one canvas = one episode; bar .975 = the first-fixation twin; the diagnostic on life 2's journal decides BIND vs `fixations 1`
+BIND     glances per canvas                          # G-EYE-2 (= G-MIND-2): one canvas = one episode; bar .975 = the first-fixation twin. DECIDED by the diagnostic (Builder F): 77.5 % of births come from glances 1–3, those cells misfire more (27.9 % vs 17.3 %) and wire to several things (32.9 % vs 17.9 %) while 87.3 % of them are ON the thing — binding, not clutter; `fixations 1` is refused
 SURPRISE floor 0.05 predicted last-canvas            # G-EYE-5: the mind's prediction reaches the organ; the organ reports the residual (parser change; breaks earlier tapes' replay → a life boundary). CAVEAT (MOTOR §0.3): gaze's `predicted` slot is the PREVIOUS FRAME's map, not a top-down socket — what it accepts is read before this line is written
 GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border fovea 1 correct 1   # BODY 4.4: a coarse view + one corrective look (the mole's 11th ray; G-EYE-6)
 SENSE    colour rg by 4x4 under the glance fixed-gain          # G-EYE-3 as MEASURED (Researcher G, 17:1x): the retina's own rg/by cells, already computed for saliency and dropped at glance_window, appended under each glance (144 numbers); FIXED GAIN, never block-unit (a legitimately-zero block's noise amplified to norm 1, #231(1)); on the maker's world identical to grey to 16 digits (inert until colour arrives — his 16:39 rule); on BabyAI's things through his own gaze −0.107 → +0.046; the mark «not gradable» until max|rg| over 100 canvases > 0
@@ -123,8 +123,8 @@ Not genes: R1 the `state_hash` repair (hash the live block; the pin moves; row-f
 **Said once:** today's two code changes (the INDUCE key; the kind-fair think chooser with the park filter) are G4 §14 repairs at a life boundary — declared machinery that ran wrongly, fixed before a life — not G5 lines; «no code before his yes» holds for everything in §3–§5.
 
 ## 6 · Repairs that are not genes (do before the life; each a pin that moves)
-1. `state_hash` over the live block only (39 % of CPU) — digest agreement row-for-row on life 2's tape; the mind-parity pin moves and the register says so.
-2. The retina vectorised (5.42 → 0.46 ms) — a new sha-pin; byte-identity on life 2's tape.
+1. `state_hash` over the live block only — MEASURED (Builder F, 2026-09-21 17:40): 35.86 → 7.29 ms a canvas (4.9×); life 2's journal identical in every field except `hash` over 19,583 rows; the new pin digest b0531503…; `Organism.load` accepts either digest so the closed lives' readers still load. Lands at the life 3b → G5 boundary.
+2. The retina vectorised — MEASURED: `genome/retina_fast.py`, saliency/fixations/112-vectors BYTE-IDENTICAL on all 17,768 canvases of life 2, 4.1–4.3× (not the 11.7× hoped). Same boundary.
 3. The cost columns re-based on the per-eye-row figure (≥ 33 ms), never the mixed median.
 4. The web door: parsed and implemented by nothing — either implemented as an ACT with OUTCOME, or the line removed from the genome until it is (a declared gene the machinery does not run refuses, by the genome's own rule).
 5. `RECALL k` reaching a call site, or the gene removed; `ABSTAIN` parsing both forms.
@@ -153,6 +153,7 @@ R1 (words pre-cut) vs his 09-15 paste (stream first): HIS way, and the disk agre
 - That an organ ON with no world yet proves anything: the ear, the hands' touch, the colour channels and the copy of an act are ON as raw parts of the body (his 16:39 word) and their marks read «not gradable» until their world arrives; the one-line checks in §3 say which world each is waiting for.
 - That the numbers in the documents are all primary: ~600 claims carry roads; `[secondary:]` on this estate means a search result that named the primary and quoted its number — before any number is written into a growth line, its primary is fetched at its open mirror (SOLUTIONS #196).
 - That the six documents agree on numbering: the animal register's rows collided (one renumbering owed); the cost columns of EYE/EAR are re-based by MIND-MEMORY's finding (§2 row 14).
+- That a closed life's tape replays under any code but its own: life 2 ran on 75b0a9b and wave 3 rewrote PREDICT; under current master its replay diverges almost everywhere (Builder F). Every experiment on a closed tape runs under that life's commit, and its twin is the same-code baseline, never the live journal.
 - That life 3b's verdict tomorrow decides G5: it decides W3-2 on the fixed key and reads MODULATION FAIL by the mechanism named in §18; G5's error line is decided by replay before any G5 life.
 
 *Sources: `docs/organs/EYE.md` · `EAR.md` · `BODY-SENSES.md` · `MOTOR-HANDS.md` · `MIND-MEMORY.md` · `MIND-THINKING-LANGUAGE.md` (all committed on master today) · `docs/organs/BRIEF.md` (his words) · `docs/organs/INVENTORY-2026-09-21.md` · `docs/G4-PREREG.md` §18 + addenda · the life-2 verdict `runs/g4-verdict-life2-20260921-1215/VERDICT.md` · the smoke and its control `runs/g4-smoke-life3-2h*/`.*
