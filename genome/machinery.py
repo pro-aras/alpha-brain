@@ -289,6 +289,24 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"never-heard word", a)
                 if not m: raise GenomeError(f"ARRIVAL: cannot read {a!r} (§15: ARRIVAL never-heard word)")
                 g["declared"]["ARRIVAL"] = {"rule": "never-heard word"}
+            # edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400 — G-EYE-1/G-MIND-1 (docs/briefs/G5-I-SEAM-DELIVER-MOMENT.md;
+            # docs/organs/G5-DESIGN.md §3/§4): the seam contract. DELIVER (the eye's promise) and MOMENT (the mind's promise) are
+            # both NEW, additive gene words — two more elif branches, nothing renamed, no existing branch touched. Each is a strict
+            # literal fullmatch (the design's own line is the only accepted value; there is no vocabulary yet for a second ACT or a
+            # second WHERE shape, so a placeholder or an extra word refuses exactly like every other gene here). Interpreted in
+            # creature/mind.py (_consume_eye) and genome/fast.py (Episodes); the four field names — where, when, act, source — and
+            # the glance index are additive fields on the FAST episode row and the journal row ONLY: never on x_s/x_w, so a genome
+            # that declares neither gene, or declares them beside an unmodified retina, is byte-for-byte the walking skeleton (the
+            # G4-2 pin, and the parity test in tests/genome/test_deliver_moment.py, prove it — nothing here touches self.c,
+            # state_hash's inputs, or any existing field).
+            elif gene == "DELIVER":
+                m = re.fullmatch(r"where fixation when instant act glance", a)
+                if not m: raise GenomeError(f"DELIVER: cannot read {a!r} (G-EYE-1: DELIVER where fixation when instant act glance)")
+                g["declared"]["DELIVER"] = {"where": "fixation", "when": "instant", "act": "glance"}
+            elif gene == "MOMENT":
+                m = re.fullmatch(r"keys sight words surprise where when act source", a)
+                if not m: raise GenomeError(f"MOMENT: cannot read {a!r} (G-MIND-1: MOMENT keys sight words surprise where when act source)")
+                g["declared"]["MOMENT"] = {"keys": ["sight", "words", "surprise", "where", "when", "act", "source"]}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:

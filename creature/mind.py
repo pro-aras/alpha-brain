@@ -201,6 +201,28 @@ class Mind:
         t_at_f0 = self.org.t
         f0 = g["feats"][0] if g["feats"] else None
 
+        # edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400 — G-EYE-1/G-MIND-1 (docs/briefs/G5-I-SEAM-DELIVER-MOMENT.md):
+        # the seam contract. `where` (glance 0's window origin), `when` (the tape row's own instant — the ONE wall clock this
+        # file's determinism law lets in, and it enters only through `row["at"]`, never a fresh read), `act` (today always
+        # "glance" — DELIVER's own declared value; MOTOR-HANDS.md's wider verb list is a later gene) and `source` (the eye row's
+        # OWN `meta["source"]`, already written by whichever sense published it — creature/world_maker.py / senses/folder.py —
+        # copied, never invented) are computed HERE, beside f0/xw, and go nowhere near them: `seam0` is a plain dict handed to
+        # Episodes.write and the journal row as EXTRA keyword arguments / EXTRA dict keys, never concatenated into f0 or xw, so
+        # the cosine org.moment()/moment_sight() see is byte-for-byte what it always was. Gated on DELIVER alone (what the eye
+        # promises to deliver); Episodes only STORES it when MOMENT is also declared (FAST's own schema promise) — see fast_on's
+        # kwargs below. tests/genome/test_deliver_moment.py's parity test is what proves this claim, not this comment.
+        deliver_on = "DELIVER" in self.genome.declared
+        moment_on = "MOMENT" in self.genome.declared
+        meta = row.get("meta") or {}
+        seam0: Dict[str, object] = {}
+        if deliver_on and g["windows"]:
+            # "where" in self.blind (G-EYE-1/G-MIND-1's own test clause c, `--blind where`): the SAME
+            # blind-twin convention as "gaze"/"predict"/"sleep"/"curiosity" above — glance normally,
+            # compute the window origin normally, but drop it before it is stored, so a caller can prove
+            # a mechanism that reads `where` sits at exactly chance once `where` is taken away.
+            seam0 = {"where": ((int(g["windows"][0][0]), int(g["windows"][0][1])) if "where" not in self.blind else None),
+                      "when": row["at"], "act": "glance", "source": meta.get("source"), "glance": 0}
+
         if word is not None:
             births_before = len(self.org.births)
             edges_before = len(self.org.edges_log)
@@ -220,7 +242,8 @@ class Mind:
                 S, T = self.org.moment(x, xw, lr_scale=lr_scale)
                 if predict_on:
                     self.predictor.note_winners(S)
-            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw, word=word, surprise=err) if fast_on else None
+            ep_kwargs = seam0 if moment_on else {}         # G-MIND-1: Episodes stores the seam only once MOMENT declares the columns
+            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw, word=word, surprise=err, **ep_kwargs) if fast_on else None
             self._score_due_predictions(word, g["feats"][0] if g["feats"] else None)
             births = [[b[1], int(b[2]), b[3]] for b in self.org.births[births_before:]]
             edges_born = len(self.org.edges_log) - edges_before
@@ -234,6 +257,11 @@ class Mind:
                 "err": round(err, 4), "lr": round(lr_scale, 3), "ep": ep_id,
                 "hash": self.org.state_hash(),
                 **({"arrival": arrival_n} if arrival_n is not None else {}),   # PREREG §15: an event field on the row where an arrival opened
+                # G-EYE-1 (edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400): every glance's window origin, this
+                # episode's when/act/source — EXTRA keys, never touching any key above; a genome that never declares DELIVER
+                # writes exactly the dict this branch always wrote (the parity test pins it).
+                **({"windows": [[int(t), int(l)] for (t, l) in g["windows"]], "when": row["at"], "act": "glance",
+                    "source": meta.get("source"), "glance": 0} if deliver_on else {}),
             }
             self._write_journal(row["at"], journal_row)
         elif fast_on:
@@ -247,10 +275,13 @@ class Mind:
                 self.moment_word[self.org.t] = ""
                 self.org.moment_sight(x)
             xw_blank = encode_word("", self.genome.ear_blank_zero)
-            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw_blank, word="", surprise=err)
+            ep_kwargs = seam0 if moment_on else {}
+            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw_blank, word="", surprise=err, **ep_kwargs)
             self._write_journal(row["at"], {
                 "seq": row["seq"], "moment": moment, "word": None,
                 "err": round(err, 4), "ep": ep_id, "hash": self.org.state_hash(),
+                **({"windows": [[int(t), int(l)] for (t, l) in g["windows"]], "when": row["at"], "act": "glance",
+                    "source": meta.get("source"), "glance": 0} if deliver_on else {}),
             })
         else:
             # the skeleton's own law, untouched: no FAST declared -> a sight-only canvas is skipped
