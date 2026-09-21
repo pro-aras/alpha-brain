@@ -44,6 +44,18 @@ def read_jsonl(p: Path) -> List[dict]:
 
 
 # ----------------------------------------------------------------------------- the tape and the journal, cut at --hours
+def _relink(link: Path, target: Path) -> None:
+    """A payload symlink under the reader's own --out points at the CURRENT root's payload dir. Life 2's out dir was
+    written while its root was `run/`; after the close (`mv run run-g4-life2-…`) the old link pointed into LIFE 3's
+    `run/tape/payload` — a silent cross-life read for the solo probe and the plant (found 2026-09-21 14:0x, the v2
+    control). A link is re-pointed when its target differs; a real directory is left alone."""
+    if link.is_symlink():
+        if os.readlink(link) != str(target):
+            link.unlink(); os.symlink(target, link)
+    elif not link.exists():
+        os.symlink(target, link)
+
+
 def gather(root: Path, out: Path, hours: float) -> dict:
     """Concatenates the root's tape files in seq order into out/tape/ALL.jsonl (payload symlinked, never copied), cut at
     start + hours; copies the state (a snapshot COPY); reads the journal's mind rows and event rows up to the cut."""
@@ -66,8 +78,7 @@ def gather(root: Path, out: Path, hours: float) -> dict:
     events_cut = [e for e in events if _iso(e["at"]) <= t_cut or e["event"] == "stop"]
     (out / "tape").mkdir(parents=True, exist_ok=True)
     pl = out / "tape" / "payload"
-    if not pl.exists():
-        os.symlink((root / "tape" / "payload").resolve(), pl)
+    _relink(pl, (root / "tape" / "payload").resolve())   # §18: a --reuse after the root MOVED must not read another life's payloads
     (out / "tape" / "ALL.jsonl").write_text("".join(json.dumps(r) + "\n" for r in tape_cut))
     (out / "live-journal.jsonl").write_text("".join(json.dumps(r) + "\n" for r in mind_rows))
     st = out / "live-state"; st.mkdir(exist_ok=True)
@@ -121,8 +132,7 @@ def worker(spec_path: Path) -> int:
     from genome.questions import build_ledgers
     root = Path(spec["root"]); (root / "tape").mkdir(parents=True, exist_ok=True)
     src_tape = Path(spec["tape"])
-    if not (root / "tape" / "payload").exists():
-        os.symlink((src_tape.parent / "payload").resolve(), root / "tape" / "payload")
+    _relink(root / "tape" / "payload", (src_tape.parent / "payload").resolve())
     rows = read_jsonl(src_tape)
     if spec.get("until_seq"):
         rows = [r for r in rows if r["seq"] <= spec["until_seq"]]
@@ -255,7 +265,8 @@ def own_asks(root: Path, genome_path: Path) -> dict:
 
 # ----------------------------------------------------------------------------- MODULATION (§10 verbatim, on the life's own err series)
 def modulation(G: dict, F: float) -> dict:
-    mind = [r for r in G["mind"] if "moment" in r and r.get("word")]
+    # edit: Claude (Fable 5.1), 2026-09-21 13:21 +0400 — §18: MODULATION reads the DRAWN world only (maker moments "w…"); a folder row's moment is "f<sha>" and its word is a folder name
+    mind = [r for r in G["mind"] if "moment" in r and r.get("word") and str(r["moment"]).startswith("w")]
     win = lambda r: int(r["moment"][1:5])
     by_seq = {int(r["seq"]): r for r in mind}
     out = {"F": F, "settle_bar": "err at the 10th showing ≤ 1.25 × the pre-window last-50 median (§16 addendum); the toy's F+.05 = %.4f printed per thing" % (F + 0.05), "windows": {}}
@@ -326,7 +337,7 @@ def main(argv: List[str]) -> int:
     from genome import run_g0, world
     g = parse_genome(genome_path.read_text())
     R: Dict[str, object] = {"root": str(root), "genome": str(genome_path), "genome_sha": __import__("hashlib").sha256(genome_path.read_bytes()).hexdigest()[:16],
-                            "reader": "tools/verdict_g4.py", "at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "hours": a.hours}
+                            "reader": "tools/verdict_g4.py v2 (PREREG §18: W3-2, DOOR, W3-1, PARK graded; two-sense hardening)", "at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "hours": a.hours}
     nrestarts, cpu_ns = a.nrestarts, a.cpu_ns
     if a.unit:
         try:
@@ -371,7 +382,7 @@ def main(argv: List[str]) -> int:
     try:
         from creature.mind import Mind
         sroot = out / "solo-probe"; (sroot / "tape").mkdir(parents=True, exist_ok=True)
-        if not (sroot / "tape" / "payload").exists(): os.symlink((root / "tape" / "payload").resolve(), sroot / "tape" / "payload")
+        _relink(sroot / "tape" / "payload", (root / "tape" / "payload").resolve())
         sm = Mind(genome_path, sroot); srows = [r for r in G["tape"] if r["seq"] <= 1000]
         ts = time.perf_counter()
         for r in srows: sm.consume(r)
@@ -395,17 +406,19 @@ def main(argv: List[str]) -> int:
     try:
         from PIL import Image
         rows = [r for r in G["tape"] if r["seq"] <= 1000]
-        eye = [r for r in rows if r["sense"] == "eye"][300]
+        eye = [r for r in rows if r["sense"] == "eye" and (r.get("meta") or {}).get("source", "maker") == "maker"][300]   # §18: a folder picture has no truth file
         proot = out / "plant-root"; (proot / "tape").mkdir(parents=True, exist_ok=True); (proot / "tape" / "payload").mkdir(exist_ok=True)
         for r in rows:
             src = root / "tape" / r["payload"]; dst = proot / "tape" / r["payload"]
-            if not dst.exists(): os.symlink(src.resolve(), dst)
+            if dst.is_symlink() or not dst.exists():
+                _relink(dst, src.resolve())
         pp = proot / "tape" / eye["payload"]; pp.unlink()
         arr = np.array(Image.open(root / "tape" / eye["payload"]).convert("RGB"))
         truth = json.loads((root / "truth" / (Path(eye["payload"]).stem + ".json")).read_text())
         cy, cx = truth["cell"]; y0, x0 = max(0, min(int((cy + 0.5) * 8) - 12, 104)), max(0, min(int((cx + 0.5) * 8) - 12, 104))
         arr[y0:y0 + 24, x0:x0 + 24] = 255 - arr[y0:y0 + 24, x0:x0 + 24]; Image.fromarray(arr).save(pp, format="PNG")
         (proot / "tape" / "ALL.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+        if (proot / "replay").exists(): shutil.rmtree(proot / "replay")   # §18: a --reuse re-grade recomputes the plant in the reader's own scratch (FileExistsError otherwise)
         pj = replay_mod.run_replay(genome_path, proot / "tape" / "ALL.jsonl", proot / "replay")
         dp = replay_mod.compare(replay_mod.read_mind_journal(pj), [r for r in live if int(r["seq"]) <= 1000])
         plant_ok = dp is not None; plant_seq = eye["seq"]; R["replay_plant_diverged_at"] = dp
@@ -444,7 +457,8 @@ def main(argv: List[str]) -> int:
     seq_at = {r["seq"]: r for r in G["tape"]}
     def window_of(ex):
         s = ex.get("snapshot_last_seq") or 0
-        while s > 0 and s not in seq_at: s -= 1
+        # §18 hardening: walk back to the nearest MAKER row (a folder row's moment is "f<sha>", not a window)
+        while s > 0 and (s not in seq_at or not str((seq_at[s].get("meta") or {}).get("moment", "")).startswith("w")): s -= 1
         return int(seq_at[s]["meta"]["moment"][1:5]) if s in seq_at else None
     by_w: Dict[int, List[dict]] = {}
     for ex in G["exams"]:
@@ -492,8 +506,6 @@ def main(argv: List[str]) -> int:
         np_err = {"max_err": max(errs) if errs else None, "n": len(errs)}
     M["MODULATION"]["no_predict_twin_err"] = np_err
     parked = U["parked"]
-    M["PARK"] = {"graded": False, "parked": parked, "thinks": U["thinks"], "parked_share": round(parked / U["thinks"], 4) if U["thinks"] else None,
-                 "no_park_twin_parked": TW.get("blind-park", {}).get("parked"), "reason": "not readable in this life: the folder door is OFF, no dead end can arrive (§6, §14)"}
     M["PLANTS"] = {"vi": M["vi_knows_unknown"]["pass"], "predict_file_pair": "cannot fire on the maker's ear-then-eye stream (§14); predictions_filed " + str(st.get("predictions_filed")),
                    "park_unanswerable_want": "the folder door is OFF (§6)", "sleep_replay": {"sleeps": U["sleeps"], "no_sleep_twin_sleeps": TW.get("blind-sleep", {}).get("sleeps")},
                    "belief_contradiction": "clash unwired (§14)"}
@@ -503,12 +515,96 @@ def main(argv: List[str]) -> int:
     M["TWINS"]["no_sleep_v"] = {"graded": False, "reason": "SLEEP's retention is not gradable on drawn worlds (§10)", "no_sleep_Q1": q("blind-sleep")}
     M["TWINS"]["no_curiosity"] = {"graded": False, "reason": "the door mark needs the folder/web door (OFF)"}
     M["TWINS"]["no_park"] = {"graded": False, "reason": "PARK unreadable (folder OFF)"}
+    # ------------------------------------------------------------------ §18 (edit: Claude (Fable 5.1), 2026-09-21 13:21 +0400): W3-2, DOOR, W3-1, PARK graded
+    decl = g.declared
+    def _pred_rows(twin_root: Path) -> List[dict]:
+        pth = twin_root / "state" / "predictions.jsonl"
+        return read_jsonl(pth) if pth.exists() else []
+    def _rule_stats(rows: List[dict]) -> dict:
+        rules = [r for r in rows if ("cluster" in r or "shared" in r)]
+        filed = [r for r in rules if r.get("accepted") and r.get("outcome") is None]
+        refused = [r for r in rules if not r.get("accepted")]
+        scored = [r for r in rules if r.get("outcome") in (True, False)]
+        acc = (sum(1 for r in scored if r["outcome"] is True) / len(scored)) if scored else None
+        words = sorted(set(str(r.get("word") or (r.get("words") or ["?"])[0]) for r in rules))
+        sight_road = [r for r in rows if not ("cluster" in r or "shared" in r)]
+        return {"filed": len(filed), "refused": len(refused), "scored": len(scored), "accuracy": None if acc is None else round(acc, 3), "words": words,
+                "induce": sum(1 for r in rules if "cluster" in r), "deduce": sum(1 for r in rules if "shared" in r), "sight_road_rows": len(sight_road)}
+    live_pred = _rule_stats(_pred_rows(twins_dir / "unblinded-1")); shuf_pred = _rule_stats(_pred_rows(twins_dir / "T-shuffle"))
+    think_rows = [r for r in G["mind"] if "think" in r]
+    parked_rules = sum(1 for r in think_rows if (r["think"] or {}).get("kind") == "rule" and (r["think"] or {}).get("parked"))
+    rules_declared = ("INDUCE" in decl) or ("DEDUCE" in decl)
+    chance = 1.0 / 11 + .10
+    shuffle_ok = (shuf_pred["scored"] == 0) or (shuf_pred["accuracy"] is not None and shuf_pred["accuracy"] <= chance)
+    M["W3_2_rules"] = {"graded": rules_declared,
+                       "pass": rules_declared and live_pred["filed"] + live_pred["scored"] > 0 and live_pred["scored"] > 0 and (live_pred["accuracy"] or 0.0) >= .80 and shuffle_ok,
+                       "live": live_pred, "T_shuffle": shuf_pred, "parked_rules": parked_rules, "shuffle_bar": "≤ 1/11 + .10 when any rule is scored; 0 scored = the shuffle destroyed the meeting (D's toy)",
+                       "bar": "filed > 0 · scored > 0 · accuracy ≥ .80 (W3-2c's decider) · the shuffled-words twin at chance",
+                       "reason": "" if rules_declared else "INDUCE/DEDUCE not declared in this life's genome — not graded"}
+    tape = G["tape"]
+    folder_rows = [r for r in tape if (r.get("meta") or {}).get("source") == "folder"]
+    f_ear_moments = {(r.get("meta") or {}).get("moment") for r in folder_rows if r["sense"] == "ear"}
+    f_pics = [r for r in folder_rows if r["sense"] == "eye"]
+    sight_only = [r for r in f_pics if (r.get("meta") or {}).get("moment") not in f_ear_moments]
+    folder_words = sorted({(r.get("meta") or {}).get("word") for r in folder_rows if r["sense"] == "ear"} - {None})
+    recog = {}
+    try:
+        from tools import self_exam as _se2
+        from genome import ask as _gask
+        _g2, _org2, _led2, _L2 = _se2.load_snapshot(twins_dir / "unblinded-1", genome_path)
+        _Lw2 = _led2["words"]; _h2 = _org2.state_hash()
+        by_word: Dict[str, list] = {}
+        for r in folder_rows:
+            if r["sense"] == "ear": by_word.setdefault((r.get("meta") or {}).get("word"), [])
+        moment_word = {(r.get("meta") or {}).get("moment"): (r.get("meta") or {}).get("word") for r in folder_rows if r["sense"] == "ear"}
+        for r in f_pics:
+            w = moment_word.get((r.get("meta") or {}).get("moment"))
+            if w and len(by_word.get(w, [])) < 3: by_word.setdefault(w, []).append(r)
+        for w, pics in by_word.items():
+            hits = 0
+            for r in pics:
+                res = _org2.recall_many("sight", _gask.glance_picture(root / "tape" / r["payload"], _g2))
+                ans = "/".join(sorted(_Lw2.get(res["cell"], set()))) if res.get("cell") is not None else None
+                hits += int(ans == w)
+            recog[w] = {"asked": len(pics), "own_word": hits}
+        assert _org2.state_hash() == _h2
+    except Exception as e:
+        recog = {"error": repr(e)}
+    door_graded = bool(decl.get("WORLD", {}).get("folder"))
+    M["DOOR"] = {"graded": door_graded, "pass": door_graded and len(f_pics) >= 300 and len(folder_words) >= 11,
+                 "folder_rows": len(folder_rows), "pictures": len(f_pics), "sight_only_rows": len(sight_only), "sight_only_first_seq": sight_only[0]["seq"] if sight_only else None,
+                 "folder_words": folder_words, "recognition_of_seen_pictures": recog,
+                 "bar": "≥ 300 pictures on the tape · ≥ 11 folder words heard (§18); sight-only rows and recognition REPORTED (§8)",
+                 "reason": "" if door_graded else "no `folder <dir>` in the WORLD line — the door is OFF"}
+    bel_path = twins_dir / "unblinded-1" / "state" / "beliefs.jsonl"
+    bel_rows = read_jsonl(bel_path) if bel_path.exists() else []
+    kinds = {}
+    per_word_beliefs: Dict[str, int] = {}
+    for r in bel_rows:
+        k = str(r.get("kind", "belief")); kinds[k] = kinds.get(k, 0) + 1
+        if k == "belief": per_word_beliefs[str(r.get("word"))] = per_word_beliefs.get(str(r.get("word")), 0) + 1
+    heard = sorted({(r.get("meta") or {}).get("word") for r in tape if r["sense"] == "ear"} - {None})
+    max_per_word = max(per_word_beliefs.values()) if per_word_beliefs else 0
+    M["W3_1_beliefs"] = {"graded": "BELIEF" in decl, "pass": ("BELIEF" in decl) and bool(bel_rows) and max_per_word <= 1 and kinds.get("revisit", 0) > 0,
+                         "rows": len(bel_rows), "kinds": kinds, "standing_words": len(per_word_beliefs), "words_heard": len(heard), "max_belief_rows_per_word": max_per_word,
+                         "bar": "≤ 1 raw `belief` row per word (raw rows, never the folded view — life 2's 1,473 rows all carry kind belief) · revisits > 0 · clashes reported"}
+    M["PARK"] = {"graded": True, "pass": parked >= 1 and (parked / U["thinks"] <= .05 if U["thinks"] else False), "parked": parked, "thinks": U["thinks"],
+                 "parked_share": round(parked / U["thinks"], 4) if U["thinks"] else None, "parked_rules": parked_rules,
+                 "no_park_twin_parked": TW.get("blind-park", {}).get("parked"),
+                 "reason": "graded in this life (§18): a dead end can arrive from a rule failed 3× or a wordless sight; sight-only rows on this tape: %d" % len(sight_only),
+                 "bar": "≥ 1 parked · share ≤ 5 %"}
+    M["PLANTS"]["predict_file_pair"] = {"sight_road_rows": live_pred["sight_road_rows"], "rule_rows_filed": live_pred["filed"], "rule_rows_scored": live_pred["scored"], "status_predictions_filed": st.get("predictions_filed")}
+    M["PLANTS"]["park_unanswerable_want"] = {"sight_only_rows": len(sight_only), "first_seq": sight_only[0]["seq"] if sight_only else None, "parked_total": parked}
+    M["PLANTS"]["belief_contradiction"] = {"clash_rows": kinds.get("clash", 0), "extension_rows": kinds.get("extension", 0)}
+    M["TWINS"]["no_curiosity"] = {"graded": False, "reason": "the door is ON but CURIOSITY does not choose doors yet (the web door, W3-6) — not graded"}
+    M["TWINS"]["no_park"] = {"graded": False, "reason": "reported: no-park twin parked %s vs live %d" % (TW.get("blind-park", {}).get("parked"), parked)}
     # BANDS (reported): the drawn bands from gate G-a's line in the genome; photographs from the recorded runs if present
     bands = {"drawn_gate_Ga_line": next((l for l in base_text.splitlines() if "gate G-a wrote" in l), None)}
     for name, pth in (("eye_photo_g1_gate", ROOT / "runs" / "eye-photo-g1" / "gate.json"),):
         bands[name] = json.loads(pth.read_text()) if pth.exists() else "not on disk"
     M["BANDS"] = bands
     graded = ["i_knows", "ii_meeting_real", "iii_growth_matters", "iv_grows_alone", "v_retention", "vi_knows_unknown", "vii_replay", "viii_cost", "x_gaze_finds_thing", "xi_gaze_earns_place", "MODULATION"] + (["ix_not_luck"] if "ix_not_luck" in M else [])
+    graded += [k for k in ("W3_2_rules", "W3_1_beliefs", "DOOR", "PARK") if M[k].get("graded")]   # §18: graded only when the life declares them
     failed = [k for k in graded if not M[k].get("pass")] + ([] if R["ALIVE"]["pass"] else ["ALIVE"]) + ([] if M["TWINS"]["random_gaze_loses_xi"]["pass"] else ["TWINS.random_gaze"])
     R["marks"] = M; R["marks_failed"] = failed; R["verdict"] = "PASS" if not failed else "FAIL"
     R["seconds_total"] = round(time.perf_counter() - T0, 1)
@@ -538,7 +634,11 @@ def write_verdict(out: Path, R: dict) -> None:
     m = M["xi_gaze_earns_place"]; L.append(f"| (xi) | {m['bar']} | Q1 gaze {m['Q1_gaze']:.3f} − one-glance {m['Q1_one_glance']} (first-fixation-only {m['Q1_first_fixation_only']}; random-gaze {m['Q1_random_gaze']}) | {pf(m['pass'])} |")
     m = M["MODULATION"]; L.append(f"| MODULATION | {m['bar']} | windows {m['graded_windows']} · null {m.get('null_fake_boundary_w0', {}).get('no_spike')} · no-predict twin max err {m['no_predict_twin_err']} | {pf(m['pass'])} |")
     L.append(f"| TWINS random-gaze | loses (xi) | margin {M['TWINS']['random_gaze_loses_xi']['margin']} | {pf(M['TWINS']['random_gaze_loses_xi']['pass'])} |")
-    L.append(f"| PARK | ≥ 1 parked · share ≤ 5 % | parked {M['PARK']['parked']} of {M['PARK']['thinks']} thinks — {M['PARK']['reason']} | not graded |")
+    def gv(m): return ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"
+    m = M["W3_2_rules"]; L.append(f"| W3-2 rules | {m['bar']} | filed {m['live']['filed']} (induce {m['live']['induce']}, deduce {m['live']['deduce']}, refused {m['live']['refused']}) · scored {m['live']['scored']} · accuracy {m['live']['accuracy']} · words {m['live']['words']} · T-shuffle scored {m['T_shuffle']['scored']} acc {m['T_shuffle']['accuracy']} · parked rules {m['parked_rules']} {m['reason']} | {gv(m)} |")
+    m = M["DOOR"]; L.append(f"| DOOR | {m['bar']} | pictures {m['pictures']} (rows {m['folder_rows']}) · words {len(m['folder_words'])} · sight-only {m['sight_only_rows']} (first seq {m['sight_only_first_seq']}) · recognition {m['recognition_of_seen_pictures']} {m['reason']} | {gv(m)} |")
+    m = M["W3_1_beliefs"]; L.append(f"| W3-1 beliefs | {m['bar']} | rows {m['rows']} · kinds {m['kinds']} · standing words {m['standing_words']} of {m['words_heard']} heard · max belief rows per word {m['max_belief_rows_per_word']} | {gv(m)} |")
+    m = M["PARK"]; L.append(f"| PARK | {m['bar']} | parked {m['parked']} of {m['thinks']} thinks (rules {m['parked_rules']}) — {m['reason']} | {gv(m)} |")
     L.append(f"| TWINS no-sleep / no-curiosity / no-park | (v) / door / PARK | {M['TWINS']['no_sleep_v']} · {M['TWINS']['no_curiosity']['reason']} · {M['TWINS']['no_park']['reason']} | not graded |")
     L += ["", "## Twins (each a replay of the same tape blind to one gene; Q1 on all 16 words, the seen-words Q1 beside it)", "", "| twin | Q1 (all) | Q1 (seen) | composite (all) | cells |", "|---|---|---|---|---|"]
     for b in BLINDS:
