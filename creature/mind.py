@@ -38,6 +38,7 @@ from genome.fast import Episodes
 from genome.machinery import Genome, GenomeError, Organism, parse_genome
 from genome.park import Park
 from genome.predict import Predictor, file as predict_file, score as predict_score
+from creature.tape import _resolve_tape_dir   # W3-0b seam: the mind reads payloads where the genome says the tape is
 from genome.questions import build_ledgers, why as questions_why
 from genome.sleep import cycle as run_cycle, sleep as run_sleep
 from genome.world import encode_word
@@ -181,7 +182,9 @@ class Mind:
             self.snapshot()
 
     def _consume_eye(self, row: Dict[str, object], moment: Optional[str]) -> None:
-        payload_path = self.run_root / "tape" / row["payload"]
+        # edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — W3-0b seam (Builder C's finding 4): the payload is read under the genome's own TAPE path
+        # (creature/tape.py:_resolve_tape_dir — byte-identical for the default `run/tape`), never a second hardcoded "tape".
+        payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
         rgb = np.asarray(Image.open(payload_path).convert("RGB"), dtype=np.uint8)
         mode = "random" if "gaze" in self.blind else "surprise"
         g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"])
@@ -340,17 +343,24 @@ class Mind:
         self._filed_predictions = still_pending
 
     def _rule_evidence(self, cluster: List[int], first_glance: np.ndarray) -> bool:
-        """W3-2's decider, verbatim: "the resonance of C on that canvas >= THETA_N for >= half of C".
-        Replicates `Organism._resonate`'s own comparison (`area.cos(x) >= self._theta(area)`) WITHOUT
-        calling it — `_resonate` BIRTHS, and a scoring read must never change the organism (mirrors
-        genome/predict.py's `Predictor.error()`, the same law for the same reason)."""
+        """W3-2c (edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — PREREG §18): the decider is «the due canvas's first-glance WINNER is in C» —
+        the alive sight cell of highest cosine, provided it RESONATES (cos >= THETA_N, machinery's own comparison, READ not
+        CALLED: `_resonate` births). The clause's first decider («>= half of C resonating») was measured BEFORE any life on a
+        copy of life 2's snapshot: ceiling 0.03 on the creature's OWN known words (16 words x 10 held-out first glances; «any of
+        C» .99; «winner in C» .96) — a bar above its ceiling reads on itself (#228 (b)); Builder D's 0/3 stands on the record
+        as that decider's reading. A scoring read never changes the organism."""
         if not cluster:
             return False
         area = self.org.sight
-        c = area.cos(first_glance)
-        theta = self.org._theta(area)
-        hits = sum(1 for cid in cluster if 0 <= cid < len(c) and c[cid] >= theta)
-        return hits * 2 >= len(cluster)
+        if area.n == 0:
+            return False
+        c = np.asarray(area.cos(first_glance), dtype=float)[: area.n]
+        alive = np.asarray(area.alive, dtype=bool)[: area.n]
+        c = np.where(alive, c, -np.inf)
+        winner = int(np.argmax(c))
+        if not np.isfinite(c[winner]) or c[winner] < self.org._theta(area):
+            return False
+        return winner in set(int(x) for x in cluster)
 
     def _grade_rule(self, rule: Dict[str, object], evidence: bool) -> None:
         """W3-2: "the outcome grades the act" — a scored PASS is CURIOSITY's "answered" (generalize +

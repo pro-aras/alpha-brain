@@ -43,10 +43,16 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     tape_path = Path(tape_path)
     tape_root = tape_path.parent
     work_root = Path(tempfile.mkdtemp(prefix="creature-replay-"))
-    (work_root / "tape").mkdir(parents=True, exist_ok=True)
+    # edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — W3-0b seam (Builder C's finding 5): the work root's tape dir follows the genome's own
+    # TAPE path (creature/tape.py:_resolve_tape_dir; byte-identical for the default `run/tape`), so a Mind reading payloads under
+    # that path finds the symlinked payload dir.
+    from genome.machinery import parse_genome as _parse_genome
+    from creature.tape import _resolve_tape_dir as _resolve
+    work_tape = _resolve(work_root, _parse_genome(Path(genome_path).read_text()).declared.get("TAPE", {}).get("path"))
+    work_tape.mkdir(parents=True, exist_ok=True)
     payload_src = tape_root / "payload"
     if payload_src.exists():
-        os.symlink(payload_src.resolve(), work_root / "tape" / "payload")
+        os.symlink(payload_src.resolve(), work_tape / "payload")
 
     mind = Mind(genome_path, work_root, blind=blind)
     rows = sorted(_read_jsonl(tape_path), key=lambda r: r["seq"])
