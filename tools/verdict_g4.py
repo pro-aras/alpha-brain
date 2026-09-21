@@ -264,12 +264,83 @@ def own_asks(root: Path, genome_path: Path) -> dict:
 
 
 # ----------------------------------------------------------------------------- MODULATION (§10 verbatim, on the life's own err series)
+def _regime_calibration(mind: List[dict], step: int = 100, prev_window: int = 50, first_n: int = 3, settle_skip: int = 3) -> dict:
+    """edit: Claude (Sonnet 5, builder H), 2026-09-21 18:44 +0400 — §18 addendum 3 (G5-H-MODULATION-BARS-W32B.md): the
+    null band and the settle bar DERIVED FROM DATA at read time (#158's argument for adaptivity — never a typed
+    ratio), from the life's OWN pre-window (window-0) canvases. §16 addendum's ratio bars (3x spike / 1.25x settle /
+    1.5x null) were calibrated on the pre-W3-2b ~0.23 steady-state error; W3-2b's memory-relative error collapses the
+    steady state to ~0.016 (E's report §0/§3), which makes a ratio bar on a near-floor baseline report on the
+    instrument, not the mechanism (SOLUTIONS #162, #228 b) — the same shape as the toy-front repair §16 addendum
+    already made once, now needed again for the new regime.
+
+    NULL BAND: at every `step`-th canvas inside window 0, treat it as a FAKE boundary and compute — for every thing
+    with >= `first_n` showings after it — the SAME statistic the real spike rule computes: median(its first
+    `first_n` errs after the boundary) / median(the `prev_window` errs immediately before it). Doing this at MANY
+    boundaries (not just the one midpoint the original null used) over EVERY continuing thing yields a sample of
+    "what ratio does pure noise produce on this life's own tape"; its 95th percentile is the null band. A real spike
+    must clear this band AND the fixed 3x bar (both, §18 addendum 3 step 1).
+
+    SETTLE BAR: window 0's own per-showing errors, for each thing's showings AFTER its own first `settle_skip`
+    (excluding each thing's own bootstrap transient at the very start of the life — the only place on the tape a
+    window-0 thing is itself new) — a continuing thing's own steady per-canvas noise. Its 95th percentile is the
+    settle bar: an ABSOLUTE error ceiling, not a ratio on a baseline that can collapse to near-zero (1.25x of a
+    ~0.016 median is ~0.02 — a bar a single glance's rounding can trip).
+
+    Both derivations read ONLY window-0 rows (pre-window canvases — the only stretch with no real arrival to
+    confound the calibration); if window 0 is too short for a given knob, the corresponding reading is None and
+    every caller checks for it before grading — never a divide-by-zero, never a silent 0.
+    """
+    w0 = [r for r in mind if int(r["moment"][1:5]) == 0]
+    n = len(w0)
+    ratios: List[float] = []
+    samples: List[dict] = []
+    for m in range(step, max(step, n - first_n), step):
+        prev = w0[max(0, m - prev_window):m]
+        if not prev:
+            continue
+        last50 = float(np.median([p["err"] for p in prev]))
+        if last50 <= 0:
+            continue
+        by_thing: Dict[str, list] = {}
+        for q in w0[m:]:
+            by_thing.setdefault(q["word"], []).append(q["err"])
+        for t, errs in by_thing.items():
+            if len(errs) >= first_n:
+                ratio = float(np.median(errs[:first_n])) / last50
+                ratios.append(ratio)
+                samples.append({"thing": t, "boundary_idx": m, "last50_med": round(last50, 4), "ratio": round(ratio, 4)})
+    null_band_95 = float(np.percentile(ratios, 95)) if ratios else None
+    share_within = (sum(1 for r in ratios if r < null_band_95) / len(ratios)) if (ratios and null_band_95 is not None) else None
+    seen_count: Dict[str, int] = {}
+    noise_errs: List[float] = []
+    for r in w0:
+        t = r["word"]
+        seen_count[t] = seen_count.get(t, 0) + 1
+        if seen_count[t] > settle_skip:
+            noise_errs.append(r["err"])
+    settle_bar_err = float(np.percentile(noise_errs, 95)) if noise_errs else None
+    return {"source": "window-0 (pre-window) canvases, this life's own tape — the fake-boundary sample and the settle noise are both derived here, never typed",
+            "n_w0_rows": n, "step": step, "prev_window": prev_window, "first_n": first_n,
+            "null_ratio_samples": len(ratios), "null_band_95": round(null_band_95, 4) if null_band_95 is not None else None,
+            "null_share_within_band": round(share_within, 4) if share_within is not None else None,
+            "settle_noise_n": len(noise_errs), "settle_skip_first": settle_skip,
+            "settle_bar_err_95": round(settle_bar_err, 6) if settle_bar_err is not None else None,
+            "sample_head": samples[:5]}
+
+
 def modulation(G: dict, F: float) -> dict:
     # edit: Claude (Fable 5.1), 2026-09-21 13:21 +0400 — §18: MODULATION reads the DRAWN world only (maker moments "w…"); a folder row's moment is "f<sha>" and its word is a folder name
+    # edit: Claude (Sonnet 5, builder H), 2026-09-21 18:44 +0400 — §18 addendum 3: BOTH the §16 fixed-bar reading (the
+    # record — "pass_fixed_bars_record") and the regime-derived reading (_regime_calibration — "pass") are computed
+    # and printed; grading (M["MODULATION"]["pass"], what the top-level verdict reads) uses the regime-derived one.
     mind = [r for r in G["mind"] if "moment" in r and r.get("word") and str(r["moment"]).startswith("w")]
     win = lambda r: int(r["moment"][1:5])
     by_seq = {int(r["seq"]): r for r in mind}
-    out = {"F": F, "settle_bar": "err at the 10th showing ≤ 1.25 × the pre-window last-50 median (§16 addendum); the toy's F+.05 = %.4f printed per thing" % (F + 0.05), "windows": {}}
+    reg = _regime_calibration(mind)
+    out = {"F": F,
+           "settle_bar": ("record (§16 addendum): err at the 10th showing ≤ 1.25 × the pre-window last-50 median; the toy's F+.05 = %.4f printed per thing. "
+                          "§18 addendum 3: the regime-derived bar is an ABSOLUTE ceiling — the life's own pre-window 95th percentile, see 'regime.settle_bar_err_95'.") % (F + 0.05),
+           "regime": reg, "windows": {}}
     seen_before: set = set()
     cur = None; idx = 0
     for i, r in enumerate(mind):
@@ -289,14 +360,22 @@ def modulation(G: dict, F: float) -> dict:
                 errs = [q["err"] for q in words_here if q["word"] == t]
                 if len(errs) < 3: continue
                 first3 = float(np.median(errs[:3])); tenth = errs[9] if len(errs) >= 10 else None
+                spike_fixed = bool(last50 > 0 and first3 >= 3 * last50)
+                spike_regime = bool(last50 > 0 and first3 >= 3 * last50 and (reg["null_band_95"] is None or (first3 / last50) >= reg["null_band_95"]))
+                settled_fixed = bool(tenth is not None and last50 > 0 and tenth <= 1.25 * last50)
+                settled_regime = bool(tenth is not None and reg["settle_bar_err_95"] is not None and tenth <= reg["settle_bar_err_95"])
+                first_settle_regime = next((j + 1 for j, e in enumerate(errs) if reg["settle_bar_err_95"] is not None and e <= reg["settle_bar_err_95"]), None)
                 rec["per_thing"][t] = {"kind": "new" if t in new else "returning", "first3_med": round(first3, 4),
-                                       "spike_ratio": round(first3 / last50, 2) if last50 > 0 else None, "spike": bool(last50 > 0 and first3 >= 3 * last50),
-                                       "err_10th": round(tenth, 4) if tenth is not None else None, "settled": bool(tenth is not None and last50 > 0 and tenth <= 1.25 * last50),
-                                       "settled_toy_bar_F_plus_05": bool(tenth is not None and tenth < F + 0.05)}
+                                       "spike_ratio": round(first3 / last50, 2) if last50 > 0 else None,
+                                       "spike": spike_fixed, "spike_regime": spike_regime,
+                                       "err_10th": round(tenth, 4) if tenth is not None else None,
+                                       "settled": settled_fixed, "settled_regime": settled_regime,
+                                       "settled_toy_bar_F_plus_05": bool(tenth is not None and tenth < F + 0.05),
+                                       "first_settle_showing_regime": first_settle_regime, "n_showings": len(errs)}
             out["windows"][str(w)] = rec
             cur = w
         seen_before.add(r["word"])
-    # the null: a FAKE boundary at the middle of window 0 — things continuing; the same statistic must show no spike (< 1.5x)
+    # the null: a FAKE boundary at the middle of window 0 — things continuing; the same statistic must show no spike
     w0 = [r for r in mind if win(r) == 0]
     if len(w0) > 200:
         m = len(w0) // 2; prev = w0[m - 50:m]; last50 = float(np.median([p["err"] for p in prev]))
@@ -305,16 +384,25 @@ def modulation(G: dict, F: float) -> dict:
             errs = [q["err"] for q in w0[m:] if q["word"] == t][:3]
             if len(errs) == 3: per[t] = round(float(np.median(errs)) / last50, 2) if last50 > 0 else None
         out["null_fake_boundary_w0"] = {"at_seq": int(w0[m]["seq"]), "last50_med": round(last50, 4), "spike_ratio_per_thing": per,
-                                        "no_spike": all(v is not None and v < 1.5 for v in per.values()) if per else None}
+                                        "no_spike": all(v is not None and v < 1.5 for v in per.values()) if per else None,
+                                        "no_spike_regime": (all(v is not None and v < reg["null_band_95"] for v in per.values()) if per else None) if reg["null_band_95"] is not None else None}
     # grading: at every window that brings NEW things — majority of the new things spike AND settle (B13's reading, §12)
-    graded = []
+    graded = []          # §16 fixed-bar reading — the record; §18's FAIL prediction stands against these numbers
+    graded_regime = []   # §18 addendum 3 — the regime-derived reading; the top-level verdict grades on THIS from here on
     for w, rec in out["windows"].items():
         news = [v for v in rec["per_thing"].values() if v["kind"] == "new"]
         if not news: continue
         sp = sum(v["spike"] for v in news); st = sum(v["settled"] for v in news)
         graded.append({"window": w, "new": len(news), "spike": sp, "settled": st, "pass": sp * 2 > len(news) and st * 2 > len(news)})
+        spr = sum(v["spike_regime"] for v in news); str_ = sum(v["settled_regime"] for v in news)
+        graded_regime.append({"window": w, "new": len(news), "spike": spr, "settled": str_, "pass": spr * 2 > len(news) and str_ * 2 > len(news)})
     out["graded_windows"] = graded
-    out["pass"] = bool(graded) and all(x["pass"] for x in graded) and bool(out.get("null_fake_boundary_w0", {}).get("no_spike"))
+    out["graded_windows_regime"] = graded_regime
+    nb = out.get("null_fake_boundary_w0", {}) or {}
+    out["pass_fixed_bars_record"] = bool(graded) and all(x["pass"] for x in graded) and bool(nb.get("no_spike"))
+    out["pass"] = bool(graded_regime) and all(x["pass"] for x in graded_regime) and bool(nb.get("no_spike_regime"))
+    if not out["windows"]:
+        out["reason"] = "no window change on this tape yet (e.g. a smoke shorter than the maker's window) — not gradable; the regime band is still derived and printed under 'regime'"
     return out
 
 
@@ -499,7 +587,11 @@ def main(argv: List[str]) -> int:
                                 "Q1_first_fixation_only": q("T-first-fixation"), "Q1_random_gaze": q("blind-gaze"),
                                 "bar": "≥ .10 over G1's one-glance twin (gaze mode 'one': the whole canvas at glance×glance); the first-fixation-only twin printed — §16 addendum"}
     F = 1.0 - g.theta_n
-    M["MODULATION"] = modulation(G, F); M["MODULATION"]["bar"] = "§10 as amended §16: at every window bringing NEW things, a majority spike ≥ 3× the last-50 median and settle ≤ 1.25× it by the 10th showing; the fake-boundary null < 1.5×"
+    # edit: Claude (Sonnet 5, builder H), 2026-09-21 18:44 +0400 — §18 addendum 3: the bar text now names both readings; M["MODULATION"]["pass"] grades on the regime-derived one (modulation()'s own doc)
+    M["MODULATION"] = modulation(G, F)
+    M["MODULATION"]["bar"] = ("§18 addendum 3: at every window bringing NEW things, a majority spike (≥ 3× the last-50 median AND ≥ the life's own regime null-band) and settle "
+                              "(≤ the life's own regime settle-bar) by the 10th showing; the fake-boundary null clears the same band. "
+                              "The §16 record (3× spike / 1.25× settle / 1.5× null, calibrated pre-W3-2b) is printed as 'pass_fixed_bars_record'.")
     np_err = None
     if "blind-predict" in TW and (twins_dir / "blind-predict" / "mind-journal.jsonl").exists():
         errs = [r["err"] for r in read_jsonl(twins_dir / "blind-predict" / "mind-journal.jsonl") if "moment" in r and "err" in r]
@@ -669,7 +761,10 @@ def write_verdict(out: Path, R: dict) -> None:
         m = M["ix_not_luck"]; L.append(f"| (ix) | {m['bar']} | rank {m['rank_of_own']} of {m['of']} (own {m['own_composite']}; best random {m['best_random']}) | {pf(m['pass'])} |")
     m = M["x_gaze_finds_thing"]; L.append(f"| (x) | {m['bar']} | gaze {m['gaze_rate']:.3f} vs random {m['random_rate']:.3f} (×{m['ratio']}) | {pf(m['pass'])} |")
     m = M["xi_gaze_earns_place"]; L.append(f"| (xi) | {m['bar']} | Q1 gaze {m['Q1_gaze']:.3f} − one-glance {m['Q1_one_glance']} (first-fixation-only {m['Q1_first_fixation_only']}; random-gaze {m['Q1_random_gaze']}) | {pf(m['pass'])} |")
-    m = M["MODULATION"]; L.append(f"| MODULATION | {m['bar']} | windows {m['graded_windows']} · null {m.get('null_fake_boundary_w0', {}).get('no_spike')} · no-predict twin max err {m['no_predict_twin_err']} | {pf(m['pass'])} |")
+    m = M["MODULATION"]; reg = m.get("regime", {}) or {}; nb = m.get("null_fake_boundary_w0", {}) or {}
+    L.append(f"| MODULATION | {m['bar']} | windows(regime) {m.get('graded_windows_regime')} · windows(fixed) {m['graded_windows']} · null(regime) {nb.get('no_spike_regime')} · null(fixed) {nb.get('no_spike')} "
+             f"· regime band {reg.get('null_band_95')} (n={reg.get('null_ratio_samples')}, share {reg.get('null_share_within_band')}) · regime settle bar {reg.get('settle_bar_err_95')} "
+             f"· no-predict twin max err {m['no_predict_twin_err']} · fixed-bar record {pf(m.get('pass_fixed_bars_record'))} · {m.get('reason','')} | {pf(m['pass'])} |")
     L.append(f"| TWINS random-gaze | loses (xi) | margin {M['TWINS']['random_gaze_loses_xi']['margin']} | {pf(M['TWINS']['random_gaze_loses_xi']['pass'])} |")
     def gv(m): return ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"
     m = M["W3_2_rules"]; L.append(f"| W3-2 rules | {m['bar']} | filed {m['live']['filed']} (induce {m['live']['induce']}, deduce {m['live']['deduce']}, refused {m['live']['refused']}) · scored {m['live']['scored']} · accuracy {m['live']['accuracy']} · words {m['live']['words']} · T-shuffle scored {m['T_shuffle']['scored']} acc {m['T_shuffle']['accuracy']} · parked rules {m['parked_rules']} · clusters: rules reached {m['cluster_control'].get('words_with_rules')} of {m['cluster_control'].get('eligible_words')} eligible words (of {m['cluster_control'].get('words')}), wrong-cell rules {m['cluster_control'].get('wrong_cell_rules')} {m['reason']} | {gv(m)} |")
