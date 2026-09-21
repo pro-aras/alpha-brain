@@ -289,6 +289,29 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"never-heard word", a)
                 if not m: raise GenomeError(f"ARRIVAL: cannot read {a!r} (§15: ARRIVAL never-heard word)")
                 g["declared"]["ARRIVAL"] = {"rule": "never-heard word"}
+            # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K (docs/briefs/G5-K-ACTS-OUTCOME-SIT-BODY.md,
+            # MOTOR-HANDS.md §4 G-MOT-1/2/3, BODY-SENSES.md §4.1): ACT (the vocabulary), OUTCOME (an act's residual becomes
+            # an episode), SIT (the exam score returns as a sense — extends EXAM), and SENSE body (a fourth SENSE shape,
+            # beside eye/ear). Each a strict re.fullmatch; each stored under g["declared"][...]; each REQUIRES a RUNS entry
+            # in creature/genes.py or Mind.__init__'s generic refusal (W3-0) refuses the organism by name — nobody can
+            # "declare" ACT/OUTCOME/SIT/SENSE-body into existence by parsing alone.
+            elif gene == "ACT":
+                m = re.fullmatch(r"[a-z]+(?: [a-z]+)*", a)
+                if not m: raise GenomeError(f"ACT: cannot read {a!r} (G-MOT-1: ACT <verb> [<verb> ...], lowercase words)")
+                g["declared"]["ACT"] = {"verbs": a.split()}
+            elif gene == "OUTCOME":
+                m = re.fullmatch(r"act to episode; error grades it; ranks replay", a)
+                if not m: raise GenomeError(f"OUTCOME: cannot read {a!r} (G-MOT-2: OUTCOME act to episode; error grades it; ranks replay)")
+                g["declared"]["OUTCOME"] = {"fields": ["act", "expected", "got", "residual", "source"]}
+            elif gene == "SIT":
+                m = re.fullmatch(r"exam every (\d+) canvases; the score returns as a sense", a)
+                if not m: raise GenomeError(f"SIT: cannot read {a!r} (G-MOT-3: SIT exam every <n> canvases; the score returns as a sense)")
+                g["declared"]["SIT"] = {"every": int(m.group(1))}
+            elif gene == "SENSE" and args[0] == "body":
+                rest = " ".join(args[1:])
+                m = re.fullmatch(r"every (\d+) s fields ([a-z_]+(?: [a-z_]+)*)", rest)
+                if not m: raise GenomeError(f"SENSE body: cannot read {rest!r} (BODY-SENSES §4.1: SENSE body every <n> s fields <f1> <f2> …)")
+                g["declared"]["SENSE_BODY"] = {"period_s": int(m.group(1)), "fields": m.group(2).split()}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:
