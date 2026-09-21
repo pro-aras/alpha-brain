@@ -5,6 +5,10 @@
 # PREREG §17): pacing (at most one new picture per scan, deterministic bytewise order) and the sight-only
 # road (a loose picture under world/, or under a non-word folder, is eye-only, meta.word absent, and the
 # mind journals "word": null for it once FAST is declared).
+# edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 13:2x +0400 — C3: FOLDER_DOOR_GATED is now True (this
+# is the commit that lands C3's passing G4-6 test); one direct test of creature.body._declared_folder_dir
+# so the arming logic itself (never exercised by any other test, since none call creature.body.main())
+# has a pin.
 from __future__ import annotations
 
 import json
@@ -18,12 +22,15 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from creature import body as body_module
 from creature.body import Body
 from creature.mind import Mind
 from creature.tape import read_tape
+from genome.machinery import parse_genome
 
 GENOME_PATH = Path(__file__).resolve().parents[2] / "genome" / "G4-skeleton.genome"
 WAVE2_GENOME = Path(__file__).resolve().parents[2] / "tests" / "creature" / "G4-wave2-test.genome"
+G4_GENOME = Path(__file__).resolve().parents[2] / "genome" / "G4.genome"
 
 
 def _write_pictures(world_dir: Path) -> None:
@@ -248,6 +255,31 @@ class TestFolderDoorSightOnly(unittest.TestCase):
         self.assertNotIn("word", rows[0]["meta"])
         shutil.rmtree(root, ignore_errors=True)
         shutil.rmtree(world_dir, ignore_errors=True)
+
+
+class TestDeclaredFolderDirArming(unittest.TestCase):
+    """C2/C3: creature.body._declared_folder_dir, the one function main() uses to arm the door from the
+    genome (main() itself is never called by any test -- it blocks on a signal loop -- so this is the
+    only pin on the arming logic itself)."""
+
+    def test_gated_true_arms_from_the_lifes_own_world_line(self) -> None:
+        from creature.senses import folder as folder_mod
+        self.assertTrue(folder_mod.FOLDER_DOOR_GATED, "C3's own commit must flip this True")
+        genome = parse_genome(G4_GENOME.read_text())
+        self.assertEqual(genome.declared["WORLD"]["folder"], "world/")
+        got = body_module._declared_folder_dir(genome.declared)
+        self.assertEqual(got, Path(body_module.__file__).resolve().parents[1] / "world/")
+        self.assertEqual(got.name, "world")
+
+    def test_undeclared_world_arms_nothing(self) -> None:
+        self.assertIsNone(body_module._declared_folder_dir({}))
+
+    def test_gated_false_arms_nothing_even_with_a_declared_folder(self) -> None:
+        from creature.senses import folder as folder_mod
+        import unittest.mock as mock
+        with mock.patch.object(folder_mod, "FOLDER_DOOR_GATED", False):
+            got = body_module._declared_folder_dir({"WORLD": {"folder": "world/"}})
+        self.assertIsNone(got, "FOLDER_DOOR_GATED=False must arm nothing regardless of what WORLD declares")
 
 
 if __name__ == "__main__":

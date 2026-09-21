@@ -34,10 +34,12 @@ WORD_RE = re.compile(r"[a-z]{1,8}")
 PICTURE_SUFFIXES = (".jpg", ".jpeg", ".png", ".webp")
 
 # C2 (PREREG §17): the door arms from the genome's own WORLD `folder <dir>` line only once this constant
-# is True -- a genome line arms nothing until the code carrying G4-6 (C3's passing test) exists. Claude
-# flips this, not a commit before C3's own. `--folder PATH` (creature/body.py:main) stays an override
-# regardless of this constant, for tests.
-FOLDER_DOOR_GATED = False
+# is True -- a genome line arms nothing until the code carrying G4-6 exists. Flipped True here, in the
+# commit that lands C3's passing test (the brief's own instruction), which is NOT the same as the live
+# creature (git 'master', /data/dev/genome) picking this up: Claude decides when to deploy this branch and
+# restart creature.service -- that is "flipping the life", a separate act from flipping this constant.
+# `--folder PATH` (creature/body.py:main) stays an override regardless of this constant, for tests.
+FOLDER_DOOR_GATED = True
 
 
 def _png_bytes(rgb) -> bytes:
