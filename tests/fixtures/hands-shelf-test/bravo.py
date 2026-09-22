@@ -1,0 +1,2 @@
+# shape: bravo
+print("bravo")

@@ -22,10 +22,14 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import math
 import re
+import time
+import zlib
 from pathlib import Path
 from typing import Callable, List, Tuple
 
+import numpy as np
 from PIL import Image
 
 from genome import gaze
@@ -83,7 +87,31 @@ def _candidate_pictures(world_dir: Path) -> List[Tuple[str, Path, bool]]:
     return out
 
 
-def sense(publish: Callable, stop_event, world_dir: Path, root: Path, canvas: int = 128, period: float = 30.0) -> None:
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
+# (BODY-SENSES.md §4.5): the cheap wide channel, computed from filesystem metadata alone -- suffix, byte
+# size, the folder's own name (hashed, never the name itself: BODY-SENSES's own words, "never the name,
+# which is the answer" -- a bare crc32 the mind cannot invert to a word), mtime -- BEFORE the picture is
+# decoded as an image (`gaze.canvas_of_picture`, the "opening" the brief names). A pure function of already-
+# read bytes + `pic.stat()`; no filesystem write, no state.
+def _smell_trait(pic: Path, data: bytes, word: str) -> np.ndarray:
+    suffix = pic.suffix.lower()
+    kind = (PICTURE_SUFFIXES.index(suffix) / len(PICTURE_SUFFIXES)) if suffix in PICTURE_SUFFIXES else 1.0
+    size = math.log10(max(len(data), 1))
+    folder = (zlib.crc32(word.encode("utf-8")) & 0xFFFFFFFF) / float(0x100000000)   # a HASH, never the name
+    try:
+        age_s = max(time.time() - pic.stat().st_mtime, 1e-3)
+    except OSError:
+        age_s = 1e-3
+    age = math.log10(age_s)
+    return np.array([kind, size, folder, age], dtype=np.float32)
+
+
+def sense(publish: Callable, stop_event, world_dir: Path, root: Path, canvas: int = 128, period: float = 30.0,
+          smell: bool = False) -> None:
+    """`smell` (BODY-SENSES §4.5, LIFE.genome's DRAFT `SENSE smell` line): False (the default) is byte-
+    identical to before this parameter existed -- no "smell" row is ever published, matching every other
+    additive-parameter convention this module already uses. True publishes a `smell` row BEFORE the `ear`/
+    `eye` rows of the same picture, sharing that picture's own moment."""
     world_dir = Path(world_dir)
     seen_path = Path(root) / "folder" / "SEEN.json"
     seen_path.parent.mkdir(parents=True, exist_ok=True)
@@ -98,11 +126,18 @@ def sense(publish: Callable, stop_event, world_dir: Path, root: Path, canvas: in
             sha = hashlib.sha256(data).hexdigest()
             if sha in seen:
                 continue
+            moment = "f" + sha[:12]
             try:
                 rgb = gaze.canvas_of_picture(pic, canvas)
             except Exception:
                 continue   # an unreadable picture is skipped, never fatal to the sense thread (SenseThread's own restart law covers a genuine crash)
-            moment = "f" + sha[:12]
+            # smell's own trait is computed from metadata alone (never `rgb`, the decoded pixels) -- the
+            # decode above only gates WHETHER this picture is published at all this scan (an unreadable
+            # picture must not publish a smell row with no matching eye row behind it, or a retry would
+            # re-publish the identical smell row every scan until the picture becomes readable/is fixed).
+            if smell:
+                trait = _smell_trait(pic, data, word)
+                publish("smell", trait.tobytes(), {"moment": moment, "source": "smell", "sha_prefix": sha[:12]}, "f32")
             if is_word:
                 publish("ear", word.encode("utf-8"), {"moment": moment, "source": "folder", "word": word}, "txt")
             publish("eye", _png_bytes(rgb), {"moment": moment, "source": "folder"}, "png")

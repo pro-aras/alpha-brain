@@ -1,0 +1,2 @@
+# shape: echo
+print("echo")
