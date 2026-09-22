@@ -12,7 +12,7 @@ Grading is scoped to side=="sight" only (THRESH's own band tracks sight cells; A
 per the plan, is the what-is/picture-recognition road) -- side=="words" always reads
 (grade, own_floor, resembles_cell) == (None, None, None), by design, documented here.
 
-edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:1x +0400 — #2 (docs/briefs/LIFE-A-ANSWER-SELF.md).
+edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:42 +0400 — #2 (docs/briefs/LIFE-A-ANSWER-SELF.md).
 """
 from __future__ import annotations
 

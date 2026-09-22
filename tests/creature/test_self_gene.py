@@ -8,7 +8,7 @@ declared threshold; `_maybe_think` skips (and counts) THINK while the LAST RECOR
 `backlog` stays over that threshold — read from the recorded row, never the live queue, so replay reads
 the same number and decides the same.
 
-edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 21:3x +0400 — #3 (docs/briefs/LIFE-A-ANSWER-SELF.md).
+edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:27 +0400 — #3 (docs/briefs/LIFE-A-ANSWER-SELF.md).
 """
 from __future__ import annotations
 
@@ -119,34 +119,15 @@ class TestSelfPoolAndBelief(unittest.TestCase):
         rows = read_beliefs(mind.run_root / "state" / "beliefs.jsonl")
         self.assertEqual([r["word"] for r in rows], ["self:no_room"])
 
-    def test_self_trigger_formula_recognises_a_backlog_crossing(self) -> None:
-        """The TRIGGER ITSELF (Mind._self_trigger) reads a crossing correctly in isolation."""
+    def test_self_trigger_no_longer_handles_backlog(self) -> None:
+        """`_self_trigger` keeps only the two triggers a comparison CAN see (stall, no_room) -- the
+        original finding (docs/briefs/LIFE-A-REPORT.md §3 clause 6) was that the backlog-crossing
+        trigger, read the SAME way, is preempted by its own skip and can never fire; the coordinator's
+        fix (below) replaces it with a run-of-skips rule instead of tuning the threshold."""
         mind, _tape = _mind()
         r1 = dict(BASE_READING); r1["backlog"] = 50
         r2 = dict(BASE_READING); r2["backlog"] = 250   # crosses 200
-        self.assertEqual(mind._self_trigger(r1, r2), "self:behind")
-
-    def test_backlog_crossing_is_preempted_by_its_own_skip_a_raised_finding(self) -> None:
-        """RAISED IN THE REPORT, not worked around: SELF's backlog TRIGGER and its backlog SKIP share the
-        same threshold and the same field (`_last_body_reading`, updated by the SAME `_consume_body` call
-        that makes the pair available). The first THINK boundary that could ever see a pair whose second
-        reading crosses the threshold is ALSO the first boundary where `_maybe_think`'s skip check reads
-        that exact (now-crossed) reading -- so the skip preempts the self item before it is ever chosen,
-        and "self:behind" can never actually be filed by the live pipeline. Proven here: the pair is
-        available (`_self_trigger` on the two rows returns "self:behind", proven above) and the pipeline
-        still files NOTHING, because the boundary that would have worked it was skipped instead."""
-        mind, tape = _mind()
-        _consume_canvas(mind, tape, 1)
-        r1 = dict(BASE_READING); r1["backlog"] = 50
-        _consume_body(mind, tape, r1)
-        _consume_canvas(mind, tape, 2)
-        r2 = dict(BASE_READING); r2["moments"] = 110; r2["births"] = 55; r2["arrivals"] = 2; r2["backlog"] = 250   # crosses 200
-        _consume_body(mind, tape, r2)
-        skipped_before = mind.think_counters["think_skipped_for_backlog"]
-        _consume_canvas(mind, tape, 3)
-        rows = read_beliefs(mind.run_root / "state" / "beliefs.jsonl")
-        self.assertEqual(rows, [], "self:behind is unreachable here -- the boundary that could file it was skipped instead")
-        self.assertEqual(mind.think_counters["think_skipped_for_backlog"], skipped_before + 1, "confirms WHY: this boundary was a skip, not a think")
+        self.assertIsNone(mind._self_trigger(r1, r2))
 
     def test_no_trigger_files_nothing_and_does_not_crash(self) -> None:
         mind, tape = _mind()
@@ -211,6 +192,78 @@ class TestBacklogSkip(unittest.TestCase):
         _consume_canvas(mind, tape, 3)
         self.assertEqual(mind.think_counters["thinks"], thinks_before + 1)
         self.assertEqual(mind.think_counters["think_skipped_for_backlog"], 1, "unchanged: this boundary was not skipped")
+
+
+class TestBehindBeliefOnResume(unittest.TestCase):
+    """The coordinator's fix (2026-09-22, after the report's §3 clause 6 finding): "I am behind" is not
+    a comparison trigger (it can never win against its own skip) -- it is filed at the FIRST think that
+    RUNS after a run of skips, citing the body rows the skips actually read (backlog > threshold), never
+    the resuming (now <= threshold) row. The skip itself is unchanged (still protects liveness); the
+    stall/no_room triggers are unchanged (TestSelfPoolAndBelief above)."""
+
+    def test_three_skipped_rows_then_one_resume_files_exactly_one_behind_belief(self) -> None:
+        mind, tape = _mind()
+        _consume_canvas(mind, tape, 1)                             # canvas 1: empty pool, nothing to compare yet
+        seqs = []
+        for _ in range(3):
+            seqs.append(_consume_body(mind, tape, {**BASE_READING, "backlog": 300}))
+            _consume_canvas(mind, tape, 2)                         # each: a SKIP (reads THIS row)
+        self.assertEqual(mind.think_counters["think_skipped_for_backlog"], 3)
+        self.assertEqual(read_beliefs(mind.run_root / "state" / "beliefs.jsonl"), [], "no belief while still skipping")
+        thinks_before = mind.think_counters["thinks"]
+        _consume_body(mind, tape, {**BASE_READING, "backlog": 0})
+        _consume_canvas(mind, tape, 3)                             # the FIRST think that RUNS after the run of skips
+        self.assertEqual(mind.think_counters["thinks"], thinks_before + 1)
+        self.assertEqual(mind.think_counters["think_skipped_for_backlog"], 3, "the resume boundary is not itself a skip")
+        rows = read_beliefs(mind.run_root / "state" / "beliefs.jsonl")
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["word"], "self:behind")
+        self.assertEqual(rows[0]["cells"], [])
+        self.assertEqual(sorted(rows[0]["episodes"]), sorted(seqs), "cites exactly the three body rows the skips read")
+
+    def test_run_state_resets_after_filing_a_second_run_files_a_second_belief(self) -> None:
+        mind, tape = _mind()
+        _consume_canvas(mind, tape, 1)
+        _consume_body(mind, tape, {**BASE_READING, "backlog": 300})
+        _consume_canvas(mind, tape, 2)                              # skip 1
+        _consume_body(mind, tape, {**BASE_READING, "backlog": 0})
+        _consume_canvas(mind, tape, 3)                              # resume -> belief 1 (revisit-shaped word, same cells=[])
+        _consume_body(mind, tape, {**BASE_READING, "backlog": 300})
+        _consume_canvas(mind, tape, 4)                              # skip 2 (a NEW run)
+        _consume_body(mind, tape, {**BASE_READING, "backlog": 0})
+        _consume_canvas(mind, tape, 5)                              # resume -> belief 2 (a revisit of "self:behind", same cells)
+        rows = read_beliefs(mind.run_root / "state" / "beliefs.jsonl")
+        self.assertEqual([r["word"] for r in rows], ["self:behind", "self:behind"])
+        self.assertEqual(mind.think_counters["think_skipped_for_backlog"], 2)
+
+    def test_no_backlog_files_none(self) -> None:
+        mind, tape = _mind()
+        _consume_canvas(mind, tape, 1)
+        _consume_body(mind, tape, dict(BASE_READING))               # backlog 0 throughout
+        _consume_canvas(mind, tape, 2)
+        _consume_body(mind, tape, dict(BASE_READING))
+        _consume_canvas(mind, tape, 3)
+        self.assertEqual(mind.think_counters["think_skipped_for_backlog"], 0)
+        self.assertEqual(read_beliefs(mind.run_root / "state" / "beliefs.jsonl"), [])
+
+    def test_replay_of_the_skip_then_resume_tape_is_byte_identical(self) -> None:
+        def run() -> Mind:
+            mind, tape = _mind()
+            _consume_canvas(mind, tape, 1)
+            for _ in range(3):
+                _consume_body(mind, tape, {**BASE_READING, "backlog": 300})
+                _consume_canvas(mind, tape, 2)
+            _consume_body(mind, tape, {**BASE_READING, "backlog": 0})
+            _consume_canvas(mind, tape, 3)
+            return mind
+
+        m1, m2 = run(), run()
+        self.assertEqual(m1.think_counters, m2.think_counters)
+        b1 = read_beliefs(m1.run_root / "state" / "beliefs.jsonl")
+        b2 = read_beliefs(m2.run_root / "state" / "beliefs.jsonl")
+        self.assertEqual(b1, b2)
+        self.assertEqual(len(b1), 1)
+        self.assertEqual(b1[0]["word"], "self:behind")
 
 
 class TestBlindBody(unittest.TestCase):

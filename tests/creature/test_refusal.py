@@ -183,7 +183,7 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:35 +0400 — G-EYE-2/BIND: one row, matching
         # the genes.py RUNS entry added by this task (docs/briefs/G5-J-BIND-COLOUR-RETINA.md).
         "BIND": "BIND     glances per canvas",
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:3x +0400 — L-6/L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md):
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md):
         # three rows, matching the three genes.py RUNS entries added by this task.
         "THRESH": "THRESH   cell own band history 30",
         "ANSWER": "ANSWER   resembles under own-band; unknown below 0.911",

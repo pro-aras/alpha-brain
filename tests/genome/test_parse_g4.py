@@ -65,7 +65,7 @@ NEW_GENES = {
                   "WORLD    drawn every s arrivals every 6 h; folder world/; web 6 per hour by curiosity"),
     "HANDS":     ("HANDS    jail alpha3/hands/jail_run",
                   "HANDS    jail"),
-    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 21:4x +0400 — L-14 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:02 +0400 — L-14 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
     # §4 L-14): ASK's regex generalised to any space-separated SUBSET of the six known verbs (so a genome
     # may drop one, e.g. LIFE.genome's own 5-verb line with no `next`) -- "what-is show is which next"
     # (missing only "why") is no longer malformed under that grammar; it is now exactly the shape a valid

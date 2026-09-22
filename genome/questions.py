@@ -43,7 +43,7 @@ def _feat(org: Organism, pic: np.ndarray) -> np.ndarray:
     return retina(pic, org.g.retina)
 
 
-# edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 20:2x +0400 — L-6/ANSWER (docs/briefs/LIFE-A-ANSWER-SELF.md
+# edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:47 +0400 — L-6/ANSWER (docs/briefs/LIFE-A-ANSWER-SELF.md
 # #2): one shared bucket for a `recall`/`recall_many` result's grade, used by Q1's hedge rate and every
 # Q5/plant/null "graded" count below. `grade is None` (ANSWER undeclared) degenerates to the pre-ANSWER
 # reading: a real answer is "sure_bare", an abstain is "abstain" — so every count below is well-defined

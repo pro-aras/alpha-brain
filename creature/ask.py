@@ -109,7 +109,7 @@ def answer(run_root: Path, q: str, args: List[str]) -> str:
         pick = args[0] if ea > eb else (args[1] if eb > ea else "neither (tie)")
         return f"which {args[0]} {args[1]} {args[2]} -> {pick} (edges {ea:.3f} vs {eb:.3f}; word cells {len(wc)})"
     if q == "why":
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:5x +0400 — L-14/G-MIND-8 (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:45 +0400 — L-14/G-MIND-8 (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #4): renders questions.why()'s own {cells, episodes, edges} -- nothing new is computed. `episodes`
         # is always [] here: load_snapshot() (this module) never loads the FAST episode store (episodes.npz),
         # only the Organism + ledgers -- RAISED in the report, not silently worked around; `why()` itself

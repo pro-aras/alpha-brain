@@ -166,7 +166,7 @@ class TestAskVerbGating(unittest.TestCase):
         """edit: Claude (Fable 5.1), 2026-09-21 11:44 +0400 — W3-0 at the verb level: the live ASK line declares `next` and `why`
         (no interpreter anywhere, Builder C's finding 6); asking one must answer a refusal ROW naming the verb, never raise.
         Negative control: an implemented verb still takes the answering road (it raises on a missing snapshot, not a refusal).
-        edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 21:5x +0400 — L-14/G-MIND-8 (docs/briefs/LIFE-A-ANSWER-SELF.md
+        edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:10 +0400 — L-14/G-MIND-8 (docs/briefs/LIFE-A-ANSWER-SELF.md
         #4): `why` is now WIRED (questions.why()'s own {cells, episodes, edges}, rendered) -- moved from this test's
         subject (a verb with no interpreter) to its negative-control group (an implemented verb, alongside `show`).
         `next` remains the one declared verb with no interpreter (no mechanism predicts a next thing)."""

@@ -8,7 +8,7 @@ untouched ring at all zero is byte-indistinguishable from "the gene was never de
 lets an old (pre-THRESH) snapshot load under a THRESH genome without a digest mismatch (the two "old
 snapshot" tests below).
 
-edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:47 +0400 — #1 (docs/briefs/LIFE-A-ANSWER-SELF.md).
+edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:36 +0400 — #1 (docs/briefs/LIFE-A-ANSWER-SELF.md).
 """
 from __future__ import annotations
 

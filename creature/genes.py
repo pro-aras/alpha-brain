@@ -44,7 +44,7 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
     # ---------------------------------------------------------------------------------- the machinery
     "machinery": {
         "CYCLE": "genome/machinery.py:Organism._birth (soft ceiling grow_to*nmax) + genome/sleep.py:cycle (consolidation pass)",
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:3x +0400 — L-6 (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — L-6 (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1/#2): THRESH's own consumer is Organism.moment's push + Organism.own_floor (both gated on
         # `self.sight.own_band is not None`, itself gated on THRESH's own declared presence at __init__); ANSWER's
         # is Organism.recall/recall_many's grade/own_floor/resembles_cell computation (gated on "ANSWER" in
@@ -116,13 +116,17 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # gated on "BIND" in declared, both branches (word-bearing and sight-only).
         "BIND": "creature/mind.py:_bind_pool + Mind._consume_eye (org_feats = _bind_pool(g['feats']) when declared; org.moment/moment_sight called once per canvas instead of once per glance)",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 20:0x +0400 — L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #3): SELF's real call sites -- _consume_body records the (reading, seq) pair a "self" pool item
         # compares; _think_pool appends the "self" kind item (kind-fair with word/sight/due/rule/outcome);
-        # _think_work's "self" branch does the comparison and files the belief; _maybe_think reads the LAST
-        # recorded body reading (never the live queue -- replay agrees) to skip+count THINK while backlog stays
-        # over SELF's own threshold.
-        "SELF": "creature/mind.py:Mind._consume_body (records readings) + _think_pool/_think_work ('self' kind, the belief) + _maybe_think (the backlog skip)",
+        # _think_work's "self" branch does the comparison and files the stall/no_room beliefs; _maybe_think
+        # reads the LAST recorded body reading (never the live queue -- replay agrees) to skip+count THINK
+        # while backlog stays over SELF's own threshold.
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — the coordinator's fix (docs/briefs/
+        # LIFE-A-REPORT.md §3 clause 6): the "behind" belief is NOT a comparison (one read the same field/
+        # threshold as the skip and was always preempted by it) -- _maybe_think now tracks a run of skips and
+        # _file_behind_belief() files it at the first think that RUNS after the run.
+        "SELF": "creature/mind.py:Mind._consume_body (records readings) + _think_pool/_think_work ('self' kind, stall/no_room beliefs) + _maybe_think (the backlog skip + the 'behind' belief on resume, via _file_behind_belief)",
     },
 }
 

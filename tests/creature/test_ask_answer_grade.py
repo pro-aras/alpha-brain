@@ -4,7 +4,7 @@ split out from `answer()` so it is testable without a real picture on disk), and
 ablation ("remove a cell the answer names and the answer must change; remove one it does not and it must
 not" — G-MIND-8's own test).
 
-edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 20:1x +0400 — #2/#4 (docs/briefs/LIFE-A-ANSWER-SELF.md).
+edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:46 +0400 — #2/#4 (docs/briefs/LIFE-A-ANSWER-SELF.md).
 """
 from __future__ import annotations
 

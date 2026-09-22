@@ -329,7 +329,7 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"HANDS: cannot read {a!r} (row 6: HANDS jail <path>)")
                 g["declared"]["HANDS"] = {"jail": m.group(1)}
             elif gene == "ASK":
-                # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:2x +0400 — L-14 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+                # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-14 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
                 # §4 L-14): the literal six-verb line generalised to ANY space-separated list drawn from the known
                 # verbs, so a genome may drop one (LIFE.genome's own line has no `next` — "no mechanism predicts a
                 # next thing"). G5.genome's existing six-verb line still matches (same verbs, same order) — byte-
@@ -403,7 +403,7 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"keys sight words surprise where when act source", a)
                 if not m: raise GenomeError(f"MOMENT: cannot read {a!r} (G-MIND-1: MOMENT keys sight words surprise where when act source)")
                 g["declared"]["MOMENT"] = {"keys": ["sight", "words", "surprise", "where", "when", "act", "source"]}
-            # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:5x +0400 — L-6 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+            # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
             # §4 L-6; docs/briefs/LIFE-A-ANSWER-SELF.md #1/#2): THRESH (each SIGHT cell's own band of the last
             # <history> cosines it answered CORRECTLY) and ANSWER (the graded answer: sure/unsure/unknown against
             # that band, or THETA_N when the gene is undeclared/the band is thin). Both new vocabulary; a strict
@@ -416,7 +416,7 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"resembles under own-band; unknown below (" + _NUM + r")", a)
                 if not m: raise GenomeError(f"ANSWER: cannot read {a!r} (L-6: ANSWER resembles under own-band; unknown below <f>)")
                 g["declared"]["ANSWER"] = {"unknown_below": float(m.group(1))}
-            # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:1x +0400 — L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md
+            # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md
             # #3): SELF — the mind reads its own body readings; a belief about itself when a counter stalls while
             # another moves, births_refused_nmax rises, or the backlog crosses a threshold; THINK is skipped (and
             # counted) while the last body row's backlog stays over that same threshold.
@@ -551,7 +551,7 @@ class Area:
         self._traits_cache_version = None
         self._traits_cache_n = None
         self._traits_cache_Hc = None
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:5x +0400 — L-6/THRESH: a ring of the last
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH: a ring of the last
         # <history> cosines each cell answered CORRECTLY (Organism.__init__ allocates these on `sight` ONLY,
         # when THRESH is declared — mirrors the `traits` field's shape: None by default, a real array only
         # when the owning gene is present, so an Area that never gets one costs nothing and hashes nothing).
@@ -620,7 +620,7 @@ class Organism:
         # calls moment_sight. Kept out of state_hash entirely; a life that DOES call moment_sight still
         # gets a different hash, but only through the sight cells/W it actually touches.
         self.moments_sight_only = 0
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:5x +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1): allocated on `sight` ONLY, only when declared -- an undeclared THRESH leaves Area.own_band at None,
         # touching no byte of anything (`moment()`'s push is gated on this same presence, one line below).
         if "THRESH" in genome.declared:
@@ -720,7 +720,7 @@ class Organism:
         expect next."""
         S = self._resonate(self.sight, x_s)
         T = self._resonate(self.words, x_w)
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:5x +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1): read BEFORE this moment's own wiring below touches W -- "correctly" means the cell's ESTABLISHED
         # answer (from PAST training), never the answer this same glance is about to create (ADAPTS: a passive
         # read of existing state, no new learning). S[0]/T[0] are the winning cells: `_resonate` returns
@@ -782,7 +782,7 @@ class Organism:
         for t in T:
             np.clip(self.W[:, t], -1.0, 1.0, out=self.W[:, t])
 
-    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:5x +0400 — L-6/THRESH.
+    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH.
     def _own_band_push(self, cid: int, cos_val: float) -> None:
         """Push one cosine into sight cell `cid`'s own ring (its LAST `history` correctly-answered
         glances). Only ever called when `self.sight.own_band is not None` (THRESH declared)."""
@@ -917,7 +917,7 @@ class Organism:
         lit = [int(i) for i in order[: self.g.kwta] if area.alive[i] and c[i] >= th]
         return lit, c
 
-    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:1x +0400 — L-6/ANSWER (docs/briefs/LIFE-A-ANSWER-SELF.md
+    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/ANSWER (docs/briefs/LIFE-A-ANSWER-SELF.md
     # #2): one shared helper, called at every recall()/recall_many() return site, so the grade formula is
     # written in exactly one place. `ref_cell`: the lit cell the answer/abstain actually rests on for every
     # reason but "novel" (where `lit` is None by design and the caller passes the nearest ALIVE sight cell
@@ -1024,7 +1024,7 @@ class Organism:
         (pinned in tools/pin_g1.py). Never changes the organism."""
         area, other = (self.sight, self.words) if side == "sight" else (self.words, self.sight)
         lit_union: List[int] = []; cos_of: Dict[int, float] = {}; best_cos = 0.0
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:1x +0400 — L-6/ANSWER: the nearest ALIVE cell
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/ANSWER: the nearest ALIVE cell
         # across every glance, tracked SEPARATELY from `best_cos` (whose own 0.0 floor is untouched, an
         # existing field) so the single-glance case (`recall_many(side,[x]) == recall(side,x)`) always picks
         # the same reference cell `recall()`'s own `argmax(c)` would, even at a boundary cosine (#171's class:
@@ -1105,7 +1105,7 @@ class Organism:
     def save(self, path) -> None:
         import pathlib as _pl
         path = _pl.Path(path)
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:5x +0400 — L-6/THRESH: the own-band ring, saved
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH: the own-band ring, saved
         # ONLY when it exists (THRESH declared) — an old reader (or a genome without THRESH) simply never sees
         # these keys; np.load's `.files` lets `load()` below tell the two cases apart.
         extra = {}
@@ -1130,7 +1130,7 @@ class Organism:
         o.sight.cells[: o.sight.n] = z["sight_cells"]; o.sight.alive[:] = z["sight_alive"]; o.sight.misfires[:] = z["sight_misfires"]
         o.words.cells[: o.words.n] = z["words_cells"]; o.words.alive[:] = z["words_alive"]; o.words.misfires[:] = z["words_misfires"]
         o.W[:] = z["W"]; o.mask[:] = z["mask"]; o.strikes[:] = z["strikes"]
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:5x +0400 — L-6/THRESH: restore the own-band ring
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH: restore the own-band ring
         # only when BOTH sides have it (the loading genome declares THRESH -- `o.sight.own_band is not None` --
         # AND the saved npz actually carries it). An old snapshot loaded under a new THRESH genome simply keeps
         # the freshly-allocated all-zero ring (own_band_n.any()==False); state_hash()'s own gate then reads the
@@ -1182,7 +1182,7 @@ class Organism:
         h.update(json.dumps(self.c, sort_keys=True).encode())
         h.update(json.dumps(self.births).encode()); h.update(json.dumps(self.merges).encode())
         h.update(json.dumps(self.edges_log).encode()); h.update(json.dumps(self.prunes_log).encode())
-        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:5x +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1): included ONLY once at least one cell has actually pushed a cosine (`own_band_n.any()`) — an
         # untouched ring (all zero, `own_band_n` all zero) is byte-indistinguishable from "THRESH was never
         # declared", so (a) a genome that newly declares THRESH but has not yet answered anything correctly
