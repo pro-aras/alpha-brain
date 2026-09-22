@@ -66,7 +66,6 @@ class Genome:
     theta_n: float                  # BIRTH novelty cos<THETA_N
     misfires: int                   # BIRTH error misfires N
     budget: int                     # BUDGET per arrival
-    nmax: int
     kwta: int
     hebb_window: int
     lr: float
@@ -92,6 +91,25 @@ class Genome:
     # creature/genes.py's unwired() refusal law. None (undeclared) is a complete no-op: sight_dim() below is
     # untouched, gaze.glances() below never computes or appends anything — parity with every existing pin.
     colour: Optional[Dict[str, object]] = None
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 00:58 +0400 — ALPHA4-G.md task 1 (docs/ALPHA4-PREREG.md
+    # §2/§3): `nmax` MOVED here from its old position among the non-default fields (it sat right after
+    # `budget`) so it can carry a default of None -- GROW unbounded declares no NMAX line at all, and a
+    # dataclass field without a default cannot follow one that has a default. Genome is built exclusively
+    # via `Genome(text=text, **g)` (genome/machinery.py's own parse_genome, the ONLY constructor call site
+    # — grepped project-wide, tests included) so every call is keyword-only and this reorder changes no
+    # call site's behaviour. NMAX declared (the old, unchanged road): parsed into `g["nmax"]` exactly as
+    # before, an int, in the SAME dict-building code (`elif gene == "NMAX": g["nmax"] = int(args[0])`,
+    # untouched). NMAX absent AND GROW declared: `g["nmax"]` is never set by the parser at all, and
+    # `Genome(**g)` falls back to this field's own default, None -- byte-identical to explicitly writing
+    # `g["nmax"] = None`, so `parse_genome`'s own GROW branch (below) does not need to set it.
+    nmax: Optional[int] = None
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 00:58 +0400 — ALPHA4-G.md task 3: BUDGET's
+    # OPTIONAL trailing "; regenerate <n> per <m> moments" clause (mirrors GAZE's "coarse" / SURPRISE's
+    # "predicted" optional-trailing-clause precedent above: a NEW pair of plain Genome fields, defaulted
+    # so the old bare "BUDGET <n> per arrival" line -- every genome on disk before this edit -- parses to
+    # the EXACT same values as before, budget_regen_n=0 (no regeneration) and budget_regen_every=None).
+    budget_regen_n: int = 0
+    budget_regen_every: Optional[int] = None
     declared: Dict[str, dict] = field(default_factory=dict)   # G4 §3 B1: every G4 gene's own parsed sub-dict (BODY, TAPE, HEART, …)
     text: str = field(default="", repr=False)
 
@@ -193,10 +211,33 @@ def parse_genome(text: str) -> Genome:
                 if args[1] != "misfires": raise GenomeError(f"BIRTH error: cannot read {a!r}")
                 g["misfires"] = int(args[2])
             elif gene == "BUDGET":
-                if args[1:] != ["per", "arrival"]: raise GenomeError(f"BUDGET: cannot read {a!r}")
-                g["budget"] = int(args[0])
+                # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:00 +0400 — ALPHA4-G.md task 3
+                # (docs/ALPHA4-PREREG.md §2/§3): an OPTIONAL trailing "; regenerate <n> per <m> moments"
+                # clause (GAZE's "coarse"/SURPRISE's "predicted" precedent, machinery.py's own comments
+                # above): absent -> budget_regen_n=0, budget_regen_every=None, the exact values every
+                # genome on disk before this edit already carries (the dataclass field defaults), so the
+                # bare "BUDGET <n> per arrival" line is byte-identical to its old, narrower regex.
+                m = re.fullmatch(r"(\d+) per arrival(?:; regenerate (\d+) per (\d+) moments)?", a)
+                if not m: raise GenomeError(f"BUDGET: cannot read {a!r} (BUDGET <n> per arrival[; regenerate <n> per <m> moments])")
+                g["budget"] = int(m.group(1))
+                if m.group(2) is not None:
+                    g["budget_regen_n"] = int(m.group(2))
+                    g["budget_regen_every"] = int(m.group(3))
             elif gene == "NMAX":
                 g["nmax"] = int(args[0])
+            # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:00 +0400 — ALPHA4-G.md task 1
+            # (docs/ALPHA4-PREREG.md §2/§3, his 00:17 word «no cap … nothing hardcoded except judges and
+            # laws»): GROW unbounded, a strict fixed-literal gene like BIND/TRAITS above. Stored under
+            # `g["declared"]["GROW"]` (a real MIND/machinery-side mechanism, not a plain field like NMAX --
+            # `creature/genes.py`'s RUNS registry names its site, W3-0's own convention for every gene that
+            # is more than a number). `required`'s own "nmax" entry is dropped below, post-loop, ONLY when
+            # this key is present -- so a genome declaring GROW without NMAX is exactly as valid as one
+            # declaring NMAX without GROW always was, and a genome declaring NEITHER still refuses with the
+            # unchanged "genome lacks ['nmax']" message (never silently defaults to unbounded).
+            elif gene == "GROW":
+                m = re.fullmatch(r"unbounded", a)
+                if not m: raise GenomeError(f"GROW: cannot read {a!r} (ALPHA4-G task 1: GROW unbounded)")
+                g["declared"]["GROW"] = {"unbounded": True}
             elif gene == "KWTA":
                 g["kwta"] = int(args[0])
             elif gene == "HEBB":
@@ -293,9 +334,24 @@ def parse_genome(text: str) -> Genome:
                 if m.group(2) is not None:
                     g["declared"]["SURPRISE"]["predicted"] = m.group(2)
             elif gene == "CYCLE":
-                m = re.fullmatch(r"grow to (" + _NUM + r") nmax then consolidate", a)
-                if not m: raise GenomeError(f"CYCLE: cannot read {a!r} (row 7: CYCLE grow to <f> nmax then consolidate)")
-                g["declared"]["CYCLE"] = {"grow_to": float(m.group(1))}
+                # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:01 +0400 — ALPHA4-G.md task 4
+                # (docs/ALPHA4-PREREG.md §2/§3): a SECOND, distinct form -- "consolidate when redundant >
+                # <share> of alive" -- stored under its OWN key ("share", never "grow_to") so the OLD
+                # form's declared dict stays EXACTLY {"grow_to": f}, no "kind" tag added (test_parse_g4.py
+                # :104 already pins that exact shape against a hand-built literal; genome/machinery.py:772
+                # and genome/sleep.py's cycle() distinguish the two forms by which key is present). Task 4's
+                # own refusal ("under GROW, the old form is REFUSED — a cycle keyed on a cap that does not
+                # exist") cannot be checked HERE: GROW may be declared LATER in the genome text than CYCLE
+                # (ALPHA4.genome's own draft has GROW on line 93, the old CYCLE line on line 47) — it is
+                # checked once, post-loop, beside the `required` check below.
+                m1 = re.fullmatch(r"grow to (" + _NUM + r") nmax then consolidate", a)
+                m2 = re.fullmatch(r"consolidate when redundant > (" + _NUM + r") of alive", a)
+                if m1:
+                    g["declared"]["CYCLE"] = {"grow_to": float(m1.group(1))}
+                elif m2:
+                    g["declared"]["CYCLE"] = {"share": float(m2.group(1))}
+                else:
+                    raise GenomeError(f"CYCLE: cannot read {a!r} (CYCLE grow to <f> nmax then consolidate | CYCLE consolidate when redundant > <f> of alive)")
             # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:33 +0400 — LIFE-D-ACT-SOUND.md item 3
             # (L-13): FAST accepts an optional trailing " sound" key (genome/LIFE.genome:51's own DRAFT
             # line) -- additive only, the plain "keys sight words surprise" line (no "sound") parses to
@@ -520,6 +576,11 @@ def parse_genome(text: str) -> Genome:
         seen.add(gene)
     required = ["seed", "eye", "ear_letters", "retina", "meet", "theta_n", "misfires", "budget", "nmax", "kwta",
                 "hebb_window", "lr", "prune_floor", "theta_m", "scale_every", "recall_k", "abstain_ratio"]
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:02 +0400 — ALPHA4-G.md task 1: `required`'s own
+    # "nmax" entry is dropped ONLY when GROW is declared (his 00:17 word «no cap»); a genome declaring
+    # neither NMAX nor GROW still refuses with the unchanged "genome lacks ['nmax']" message below.
+    if "GROW" in g["declared"]:
+        required = [k for k in required if k != "nmax"]
     missing = [k for k in required if k not in g]
     if missing:
         raise GenomeError(f"genome lacks {missing}")
@@ -529,6 +590,14 @@ def parse_genome(text: str) -> Genome:
         raise GenomeError("no STAGE genes")
     if g["recall_k"] < 1:
         raise GenomeError("RECALL k must be >= 1")
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:02 +0400 — ALPHA4-G.md task 4: checked here,
+    # post-loop (never inside CYCLE's own branch above), because GROW may be declared LATER in the genome
+    # text than CYCLE — ALPHA4.genome's own DRAFT has GROW on line 93, the old-form CYCLE line on line 47.
+    if "GROW" in g["declared"] and "grow_to" in g["declared"].get("CYCLE", {}):
+        raise GenomeError(
+            "CYCLE grow to <f> nmax then consolidate: refused under GROW — a cycle keyed on a cap that "
+            "does not exist (ALPHA4-G task 4; use CYCLE consolidate when redundant > <f> of alive instead)"
+        )
     return Genome(text=text, **g)  # type: ignore[arg-type]
 
 
@@ -647,6 +716,30 @@ class Area:
         self.own_band: Optional[np.ndarray] = None      # float32 (nmax, history)
         self.own_band_n: Optional[np.ndarray] = None     # int64 (nmax,) -- entries ever pushed (ring position = n % history)
 
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:10 +0400 — ALPHA4-G.md task 1
+    # (docs/ALPHA4-PREREG.md §2/§3): GROW unbounded's per-cell growth -- DOUBLE this Area's capacity
+    # (cells/alive/misfires/own_band/own_band_n; every per-cell array `nmax`-shaped, found by grep, per
+    # the brief's own instruction). Called ONLY from Organism._birth, ONLY when GROW is declared and
+    # area.n has reached area.nmax -- the NMAX road never calls this (grep shows zero other call sites),
+    # so it changes no byte of the old road. The live prefix [:old_nmax] is copied verbatim; the new
+    # [old_nmax:new_nmax] region is zero, matching a fresh Area's own initial state (np.zeros' default).
+    def grow(self) -> None:
+        old = self.nmax
+        new = old * 2
+        cells = np.zeros((new, self.dim), dtype=np.float64); cells[:old] = self.cells
+        alive = np.zeros(new, dtype=np.uint8); alive[:old] = self.alive
+        misfires = np.zeros(new, dtype=np.int64); misfires[:old] = self.misfires
+        self.cells, self.alive, self.misfires = cells, alive, misfires
+        if self.own_band is not None:
+            hist = self.own_band.shape[1]
+            own_band = np.zeros((new, hist), dtype=np.float32); own_band[:old] = self.own_band
+            own_band_n = np.zeros(new, dtype=np.int64); own_band_n[:old] = self.own_band_n
+            self.own_band, self.own_band_n = own_band, own_band_n
+        self.nmax = new
+        # Area.cos()'s H-projection cache is keyed on (traits.version, self.n) -- neither changes here
+        # (only capacity does), so the cache stays valid; not invalidated on purpose (TRAITS is #OFF on
+        # every genome that could ever combine with GROW today, so this is unexercised either way).
+
     def alive_ids(self) -> np.ndarray:
         return np.flatnonzero(self.alive[: self.n])
 
@@ -677,17 +770,36 @@ class Area:
         return c
 
 
+GROW_CHUNK = 2048    # ALPHA4-G task 1: the FIXED chunk W/mask/strikes grow by under GROW — never doubling
+                     # (the advisor's amendment, 2026-09-23 00:34 +0400: a doubling re-allocation holds
+                     # old + new during the copy, ≈3× the matrix; a chunk costs ≈1.2×). W starts at ONE
+                     # chunk (2048×2048, 32 MB for W alone) so the chunk arithmetic stays clean (2048,
+                     # 4096, 6144, …) — the brief's own "capacity = 256" is for Area's per-cell arrays only.
+AREA_INITIAL_CAPACITY = 256    # ALPHA4-G task 1: each Area's own starting capacity under GROW; doubles from here.
+
+
 class Organism:
     """One organism: two areas, one edge matrix, counters. Flags `grow` / `wire` exist for the
     twins T-frozen (grow off after 10 cells) and T-nowire (HEBB off) — defaults ON."""
 
     def __init__(self, genome: Genome, *, wire: bool = True, frozen_after: Optional[int] = None):
         self.g = genome
-        self.sight = Area("sight", genome.sight_dim(), genome.nmax)
-        self.words = Area("words", genome.words_dim(), genome.nmax)
-        self.W = np.zeros((genome.nmax, genome.nmax), dtype=np.float64)     # sight × words
-        self.mask = np.zeros((genome.nmax, genome.nmax), dtype=np.uint8)
-        self.strikes = np.zeros((genome.nmax, genome.nmax), dtype=np.uint8)
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:12 +0400 — ALPHA4-G.md task 1: under GROW
+        # (genome.nmax is None), Areas start at AREA_INITIAL_CAPACITY and double on demand (Area.grow(),
+        # called from _birth); W/mask/strikes start at ONE GROW_CHUNK and grow by fixed chunks (_grow_W(),
+        # also called from _birth) — DECOUPLED from Area's own doubling schedule on purpose (a huge N×N
+        # matrix costs too much to double; a small per-cell array does not). Under NMAX (GROW undeclared,
+        # the negative control): genome.nmax is a plain int and every one of these lines is byte-for-byte
+        # what it always was — Area/W/mask/strikes never grow, `grow()`/`_grow_W()` are never called.
+        self._grow = "GROW" in genome.declared
+        sight_cap = AREA_INITIAL_CAPACITY if self._grow else genome.nmax
+        words_cap = AREA_INITIAL_CAPACITY if self._grow else genome.nmax
+        w_cap = GROW_CHUNK if self._grow else genome.nmax
+        self.sight = Area("sight", genome.sight_dim(), sight_cap)
+        self.words = Area("words", genome.words_dim(), words_cap)
+        self.W = np.zeros((w_cap, w_cap), dtype=np.float64)     # sight × words
+        self.mask = np.zeros((w_cap, w_cap), dtype=np.uint8)
+        self.strikes = np.zeros((w_cap, w_cap), dtype=np.uint8)
         self.t = 0                                   # moments lived
         self.wire = wire
         self.frozen_after = frozen_after
@@ -719,8 +831,41 @@ class Organism:
         # touching no byte of anything (`moment()`'s push is gated on this same presence, one line below).
         if "THRESH" in genome.declared:
             hist = int(genome.declared["THRESH"]["history"])
-            self.sight.own_band = np.zeros((genome.nmax, hist), dtype=np.float32)
-            self.sight.own_band_n = np.zeros(genome.nmax, dtype=np.int64)
+            # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:12 +0400 — ALPHA4-G.md task 1: reads
+            # `self.sight.nmax` (the Area's OWN just-allocated capacity — sight_cap above) rather than
+            # `genome.nmax` directly, which is None under GROW and would crash `np.zeros((None, hist))`.
+            # Under NMAX, self.sight.nmax == genome.nmax always (sight_cap was set to it two lines above
+            # this method's own start), so this is byte-identical to the old read for the negative control.
+            self.sight.own_band = np.zeros((self.sight.nmax, hist), dtype=np.float32)
+            self.sight.own_band_n = np.zeros(self.sight.nmax, dtype=np.int64)
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:35 +0400 — ALPHA4-G.md task 3: the
+        # regeneration counter. DEVIATION FROM THE BRIEF'S LITERAL WORDING, raised here and in the report:
+        # the brief says "counted in self.c[\"budget_regenerated\"]"; a FIRST attempt at exactly that MOVED
+        # test_pin_skeleton.py's pin for G4-skeleton.genome — a genome that declares the OLD, no-regen
+        # BUDGET form and never touches this feature at all (caught RED by the suite, not by inspection).
+        # `self.c` is initialised in __init__ for EVERY Organism regardless of genome, so an unconditional
+        # `self.c["budget_regenerated"] = 0` moves json.dumps(self.c)'s bytes — hence state_hash — for every
+        # genome on disk, exactly the anti-pattern `moments_sight_only`/`births_skipped_confirmed` (above)
+        # exist to avoid. Kept as a plain attribute instead, same reasoning as those two: state_hash is
+        # unmoved for every genome whose BUDGET line carries no regenerate clause (budget_regen_every is
+        # None) — which is every genome on disk before this task, G4-skeleton.genome included. A genome
+        # that DOES declare regen still gets a hash that moves only through `budget_left` itself (already
+        # hashed) — the counter is diagnostic (STATUS/SIZING read it via creature/body.py), never a fact
+        # replay identity depends on. Persisted across save/load in `meta` (never self.c), like the two
+        # cursors immediately below.
+        self.budget_regenerated = 0
+        # ALPHA4-G.md task 4 (docs/ALPHA4-PREREG.md §2/§3): CYCLE's redundant-share form counts
+        # births_refused_redundant "since the last cycle" — a plain attribute (never self.c, same reasoning
+        # as moments_sight_only above: no genome without the new CYCLE form should see its hash move for
+        # this), persisted across save/load in `meta` (never self.c) so a resumed life's trigger doesn't
+        # spuriously fire on the WHOLE history the moment it resumes (genome/sleep.py's cycle()).
+        self._cycle_baseline_redundant = 0
+        # ALPHA4-G.md task 3: the moment counter at which budget last regenerated one unit — a plain
+        # attribute for the same reason, persisted in `meta`. `t % 60 == 0` alone would refire on every
+        # replay of the SAME moment during a sleep() replay that revisits t (it never does — org.t only
+        # advances — but the explicit cursor also protects the boundary at t=0, which must never regenerate
+        # before any BUDGET has ever been spent).
+        self._budget_regen_last_t: Optional[int] = None
 
     # ------------------------------------------------------------------ arrivals & budget
     def new_arrival(self) -> None:
@@ -729,6 +874,47 @@ class Organism:
             self.refusals_by_arrival.append(self.c["births_refused_budget"] - sum(self.refusals_by_arrival))
         self.arrivals += 1
         self.budget_left = self.g.budget
+
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:12 +0400 — ALPHA4-G.md task 3
+    # (docs/ALPHA4-PREREG.md §2/§3): the anti-flood LAW as a RATE, never a ceiling. Called from the tail of
+    # both moment() and moment_sight() (after `self.t += 1`, beside SCALE's own `self.t % scale_every`
+    # check — the same place a per-moment homeostasis tick belongs) so a replayed moment (sleep()'s replay
+    # loop calls org.moment() like any live one) regenerates budget too, "a replay is not exempt from
+    # BUDGET" (the brief's own words for the birth side; regeneration is the same law read the other way).
+    # `budget_regen_every` is None for every genome that never declares the trailing clause — the OLD
+    # "BUDGET N per arrival" form — so this method is a no-op, byte-for-byte, for every genome on disk
+    # before this task (budget_left is never touched here; self.budget_regenerated stays 0 forever).
+    def _maybe_regen_budget(self) -> None:
+        every = self.g.budget_regen_every
+        if every is None or every <= 0:
+            return
+        if self.t % every != 0 or self.t == self._budget_regen_last_t:
+            return
+        self._budget_regen_last_t = self.t
+        if self.budget_left < self.g.budget:
+            # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:12 +0400 — ALPHA4-G.md task 3: CAP the
+            # added amount so a regen tick can never push budget_left past the genome's own per-arrival
+            # BUDGET (a rate, never a ceiling ITSELF exceeded) — found RED by a toy with an absurdly fast
+            # regen (100 per 1 moment) landing budget_left at 54 against a declared cap of 5. budget_
+            # regenerated counts the REAL amount added, never the requested-but-capped surplus.
+            added = min(self.g.budget_regen_n, self.g.budget - self.budget_left)
+            self.budget_left += added
+            self.budget_regenerated += added
+
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:13 +0400 — ALPHA4-G.md task 1: W/mask/strikes
+    # grow by a FIXED chunk along ONE axis (0 = sight rows, 1 = words columns), decoupled from either
+    # Area's own doubling schedule. Called only from _birth, only under GROW, only when a live cell id is
+    # about to be written outside the current shape — the live block is copied into the new, bigger
+    # zero-filled arrays; nothing beyond the live block is ever nonzero (the state_hash invariant Builder F
+    # already established for the live-block hash holds just as well across a chunk boundary).
+    def _grow_W(self, axis: int) -> None:
+        shape = list(self.W.shape)
+        shape[axis] += GROW_CHUNK
+        shape = tuple(shape)
+        W = np.zeros(shape, dtype=np.float64); mask = np.zeros(shape, dtype=np.uint8); strikes = np.zeros(shape, dtype=np.uint8)
+        sl = tuple(slice(0, s) for s in self.W.shape)
+        W[sl] = self.W; mask[sl] = self.mask; strikes[sl] = self.strikes
+        self.W, self.mask, self.strikes = W, mask, strikes
 
     def total_cells(self) -> int:
         return int(self.sight.alive.sum() + self.words.alive.sum())
@@ -757,10 +943,17 @@ class Organism:
         if self.frozen_after is not None and (self.sight.n + self.words.n) >= self.frozen_after:
             self.c["births_refused_frozen"] += 1
             return None
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:15 +0400 — ALPHA4-G.md task 1: under GROW,
+        # a full Area GROWS instead of refusing — births_refused_nmax stays 0 and is still written (the
+        # SIZING mark reads it, PREREG §5). Under NMAX (GROW undeclared, self._grow False): byte-for-byte
+        # the old refusal, untouched.
         if area.n >= area.nmax:
-            self.c["births_refused_nmax"] += 1
-            return None
-        if "CYCLE" in self.g.declared:
+            if self._grow:
+                area.grow()
+            else:
+                self.c["births_refused_nmax"] += 1
+                return None
+        if "CYCLE" in self.g.declared and "grow_to" in self.g.declared["CYCLE"]:
             # G4 §3 B7: CYCLE's SOFT ceiling — refuse once ALIVE cells reach grow_to*NMAX, same counter
             # as the hard cap. This does NOT reuse ids (advisor review: reusing a dead slot's id would
             # corrupt questions.build_ledgers, which unions every id's birth history forever — a reborn
@@ -769,6 +962,12 @@ class Organism:
             # area.n (ever-born) never decreases, so the array's real NMAX ceiling is still the only
             # hard limit, one-shot per id, exactly as it always was. A genome that never declares CYCLE
             # (G1.genome, G4-skeleton.genome — the pin) never evaluates this branch at all.
+            # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:15 +0400 — ALPHA4-G.md task 4: gated
+            # on `"grow_to" in declared["CYCLE"]` (the OLD form only) — the new "share" form has no
+            # birth-side ceiling at all (redundancy is a CONSOLIDATION trigger, not a cap; GROW's whole
+            # point is that nothing refuses for room). The parser already refuses GROW + the old form
+            # together (a cycle keyed on a cap that does not exist), so `self.g.nmax` below is never None
+            # on this line.
             ceiling = float(self.g.declared["CYCLE"]["grow_to"]) * self.g.nmax
             if self.total_cells() >= ceiling:
                 self.c["births_refused_nmax"] += 1
@@ -777,6 +976,17 @@ class Organism:
             self.c["births_refused_budget"] += 1
             return None
         cid = area.n
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:15 +0400 — ALPHA4-G.md task 1: grow
+        # W/mask/strikes (the FIXED +2048 chunk, decoupled from Area's own doubling) BEFORE this cid is
+        # ever written into them — moment()'s _hebb runs immediately after a birth and can wire an edge to
+        # THIS SAME cid (a newborn is a winner in its own birth moment, _resonate's own law), so the shape
+        # must already be correct by the time _birth returns. A `while` (not `if`): the growth-mechanics
+        # unit tests call area.grow() directly, which can make `cid` land more than one chunk past the
+        # CURRENT W shape in principle; ordinary play through _birth only ever needs one chunk at a time.
+        if self._grow:
+            axis = 0 if area is self.sight else 1
+            while cid >= self.W.shape[axis]:
+                self._grow_W(axis)
         area.cells[cid] = x
         area.alive[cid] = 1
         area.n += 1
@@ -853,6 +1063,10 @@ class Organism:
         self.t += 1
         if self.t % self.g.scale_every == 0:
             self._scale()
+        # ALPHA4-G.md task 3: the regen tick sits beside SCALE's own per-moment homeostasis check, AFTER
+        # `self.t += 1` — a replayed moment (sleep()'s replay loop calls this same moment()) ticks it too
+        # ("a replay is not exempt from BUDGET", read the other way round for regeneration).
+        self._maybe_regen_budget()
         return S, T
 
     def moment_sight(self, x_s: np.ndarray) -> None:
@@ -868,6 +1082,7 @@ class Organism:
         self.t += 1
         if self.t % self.g.scale_every == 0:
             self._scale()
+        self._maybe_regen_budget()
 
     def _hebb(self, S: List[int], T: List[int]) -> None:
         for s in S:
@@ -880,12 +1095,22 @@ class Organism:
                     self.edges_log.append((self.t, s, t))
 
     def _delta(self, S: List[int], T: List[int], lr: Optional[float] = None) -> None:
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:20 +0400 — ALPHA4-G.md task 1: `tgt_w`/
+        # `tgt_s` sized from `self.W.shape` (the axis each one actually indexes into, via `idx`) rather
+        # than `self.g.nmax` — which is None under GROW (an immediate crash) and, more subtly, was already
+        # only an ACCIDENT of correctness under NMAX: W is square there (shape (nmax, nmax)) so
+        # `self.g.nmax == self.W.shape[1] == self.W.shape[0]` always held, but nothing enforced it was the
+        # right axis being read. Under GROW, W is NOT generally square (sight/words grow independently in
+        # fixed chunks) — `self.W.shape[1]` (tgt_w, indexed by `idx = self.mask[s] == 1`, a row of length
+        # W.shape[1]) and `self.W.shape[0]` (tgt_s, `idx = self.mask[:, t] == 1`, a column of length
+        # W.shape[0]) are the ONLY correct sizes either way. Byte-identical under NMAX (same values, same
+        # dtype, same length) — the negative control.
         lr = self.g.lr if lr is None else lr
-        tgt_w = np.zeros(self.g.nmax); tgt_w[T] = 1.0
+        tgt_w = np.zeros(self.W.shape[1]); tgt_w[T] = 1.0
         for s in S:
             idx = self.mask[s] == 1
             self.W[s, idx] += lr * (tgt_w[idx] - self.W[s, idx])
-        tgt_s = np.zeros(self.g.nmax); tgt_s[S] = 1.0
+        tgt_s = np.zeros(self.W.shape[0]); tgt_s[S] = 1.0
         for t in T:
             idx = self.mask[:, t] == 1
             self.W[idx, t] += lr * (tgt_s[idx] - self.W[idx, t])
@@ -942,8 +1167,17 @@ class Organism:
         if not lit:
             return None
         t = lit[0]                              # the word's own best-lit cell (RESONATE's own top winner)
-        row = self.W[:, t]
-        m = (self.mask[:, t] == 1) & (self.sight.alive == 1)
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:22 +0400 — ALPHA4-G.md task 1 (the
+        # advisor's review): under GROW, `self.mask[:, t]` (length W.shape[0], the sight axis's CURRENT
+        # chunked capacity) and `self.sight.alive` (length sight.nmax, the Area's own DOUBLED capacity) can
+        # diverge in size the moment the two schedules disagree — ANDing them raw then raises ValueError.
+        # Slicing both to `self.sight.n` (the live count — always <= both capacities, by construction: no
+        # cell id >= n is ever written into either array) fixes it and changes no answer under NMAX, where
+        # every index >= n reads mask=0 anyway (the AND already excluded it; slicing just stops scanning
+        # the now-larger padding zone).
+        n_s = self.sight.n
+        row = self.W[:, t][:n_s]
+        m = (self.mask[:, t] == 1)[:n_s] & (self.sight.alive[:n_s] == 1)
         if not m.any():
             return None
         s = int(np.argmax(np.where(m, row, -np.inf)))
@@ -1109,10 +1343,16 @@ class Organism:
             return result
         lit_set = set(lit)
         cands: List[Tuple[float, int, int]] = []          # (edge, other cell, lit cell)
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:23 +0400 — ALPHA4-G.md task 1 (the
+        # advisor's review): `other.n`, read once — under GROW, a mask row/column (W's chunked axis) and
+        # `other.alive` (that Area's own doubled capacity) can have different lengths; ANDing them raw
+        # raises ValueError the moment the two schedules diverge. Slicing both to the live count fixes it
+        # and is byte-identical under NMAX (see expected_sight's own comment, same reasoning).
+        n_o = other.n
         for l in lit:
-            row = self.W[l] if side == "sight" else self.W[:, l]
-            m = (self.mask[l] if side == "sight" else self.mask[:, l]) == 1
-            m &= other.alive == 1
+            row = (self.W[l] if side == "sight" else self.W[:, l])[:n_o]
+            m = ((self.mask[l] if side == "sight" else self.mask[:, l]) == 1)[:n_o]
+            m &= other.alive[:n_o] == 1
             for j in np.flatnonzero(m):
                 v = float(row[j])
                 if v > 0.0:
@@ -1169,6 +1409,7 @@ class Organism:
         # reusing the floored field here would silently pick no cell some glances actually resonated).
         nearest_cell: Optional[int] = None; nearest_val = float("-inf")
         evidence: Dict[int, Tuple[float, int]] = {}                       # other cell -> (summed evidence, lit cell of its first strongest edge)
+        n_o = other.n   # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:24 +0400 — ALPHA4-G.md task 1: recall()'s own fix, mirrored here.
         for x in xs:
             lit, c = self._lit(area, x)
             if len(c):
@@ -1184,9 +1425,9 @@ class Organism:
                     lit_union.append(l); cos_of[l] = float(c[l])
             per_j: Dict[int, Tuple[float, int]] = {}
             for l in lit:
-                row = self.W[l] if side == "sight" else self.W[:, l]
-                m = (self.mask[l] if side == "sight" else self.mask[:, l]) == 1
-                m &= other.alive == 1
+                row = (self.W[l] if side == "sight" else self.W[:, l])[:n_o]
+                m = ((self.mask[l] if side == "sight" else self.mask[:, l]) == 1)[:n_o]
+                m &= other.alive[:n_o] == 1
                 for j in np.flatnonzero(m):
                     v = float(row[j]); j = int(j)
                     if v > 0.0 and (j not in per_j or v > per_j[j][0]):
@@ -1243,19 +1484,44 @@ class Organism:
     def save(self, path) -> None:
         import pathlib as _pl
         path = _pl.Path(path)
+        n_s, n_w = self.sight.n, self.words.n
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH: the own-band ring, saved
         # ONLY when it exists (THRESH declared) — an old reader (or a genome without THRESH) simply never sees
         # these keys; np.load's `.files` lets `load()` below tell the two cases apart.
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:45 +0400 — ALPHA4-G.md task 1 (the
+        # advisor's review, item 4): under GROW, own_band is ALSO sliced to the live prefix (same reasoning
+        # as alive/misfires/W/mask/strikes below — capacity is not semantic state).
         extra = {}
         if self.sight.own_band is not None:
-            extra["sight_own_band"] = self.sight.own_band
-            extra["sight_own_band_n"] = self.sight.own_band_n
-        np.savez_compressed(path, sight_cells=self.sight.cells[: self.sight.n], sight_alive=self.sight.alive, sight_misfires=self.sight.misfires,
-                            words_cells=self.words.cells[: self.words.n], words_alive=self.words.alive, words_misfires=self.words.misfires,
-                            W=self.W, mask=self.mask, strikes=self.strikes, **extra)
+            extra["sight_own_band"] = self.sight.own_band[:n_s] if self._grow else self.sight.own_band
+            extra["sight_own_band_n"] = self.sight.own_band_n[:n_s] if self._grow else self.sight.own_band_n
+        if self._grow:
+            # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:45 +0400 — ALPHA4-G.md task 1 (the
+            # advisor's review, item 4): under GROW, save the LIVE BLOCK only — alive/misfires/W/mask/
+            # strikes at full CAPACITY would be a 4.8 GB write per snapshot at the box's projected ceiling
+            # (task 6), almost entirely zero padding whose only content is which chunk size the code
+            # happened to use. `cells` was already sliced this way before this task (todays' `[: self.n]`);
+            # this extends the same discipline to every other per-cell/edge array. Under NMAX: unchanged,
+            # full arrays, below — the negative control.
+            np.savez_compressed(path, sight_cells=self.sight.cells[:n_s], sight_alive=self.sight.alive[:n_s], sight_misfires=self.sight.misfires[:n_s],
+                                words_cells=self.words.cells[:n_w], words_alive=self.words.alive[:n_w], words_misfires=self.words.misfires[:n_w],
+                                W=self.W[:n_s, :n_w], mask=self.mask[:n_s, :n_w], strikes=self.strikes[:n_s, :n_w], **extra)
+        else:
+            np.savez_compressed(path, sight_cells=self.sight.cells[: self.sight.n], sight_alive=self.sight.alive, sight_misfires=self.sight.misfires,
+                                words_cells=self.words.cells[: self.words.n], words_alive=self.words.alive, words_misfires=self.words.misfires,
+                                W=self.W, mask=self.mask, strikes=self.strikes, **extra)
         meta = {"t": self.t, "budget_left": self.budget_left, "arrivals": self.arrivals, "c": self.c, "births": self.births, "merges": self.merges,
                 "edges_log": self.edges_log, "prunes_log": self.prunes_log, "refusals_by_arrival": self.refusals_by_arrival,
-                "sight_n": self.sight.n, "words_n": self.words.n, "genome_text": self.g.text, "state_hash": self.state_hash()}
+                "sight_n": self.sight.n, "words_n": self.words.n, "genome_text": self.g.text, "state_hash": self.state_hash(),
+                # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:45 +0400 — ALPHA4-G.md tasks 1/3/4:
+                # three plain attributes kept OUT of self.c/state_hash (see their own __init__ comments)
+                # but that DO need to survive a resume, or a resumed life's cycle/regen triggers see a
+                # baseline of 0 and can fire on the WHOLE history the moment they resume. `.get(..., default)`
+                # on load so a pre-ALPHA4-G snapshot (none of these keys) loads at the same defaults __init__
+                # already sets.
+                "grow": self._grow, "sight_nmax": self.sight.nmax, "words_nmax": self.words.nmax,
+                "w_shape": list(self.W.shape), "budget_regenerated": self.budget_regenerated,
+                "cycle_baseline_redundant": self._cycle_baseline_redundant, "budget_regen_last_t": self._budget_regen_last_t}
         path.with_suffix(".json").write_text(json.dumps(meta))
 
     @classmethod
@@ -1265,20 +1531,50 @@ class Organism:
         z = np.load(path.with_suffix(".npz")); meta = json.loads(path.with_suffix(".json").read_text())
         o = cls(genome)
         o.sight.n = int(meta["sight_n"]); o.words.n = int(meta["words_n"])
-        o.sight.cells[: o.sight.n] = z["sight_cells"]; o.sight.alive[:] = z["sight_alive"]; o.sight.misfires[:] = z["sight_misfires"]
-        o.words.cells[: o.words.n] = z["words_cells"]; o.words.alive[:] = z["words_alive"]; o.words.misfires[:] = z["words_misfires"]
-        o.W[:] = z["W"]; o.mask[:] = z["mask"]; o.strikes[:] = z["strikes"]
+        if o._grow:
+            # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:45 +0400 — ALPHA4-G.md task 1 (the
+            # advisor's review, item 4): grow Areas/W to capacities that can hold n_s/n_w BEFORE copying
+            # the saved live block in. `grow()`/`_grow_W()`'s own `while` condition (n > current capacity)
+            # exactly reconstructs the capacity the SAME organism would hold had it never been saved at all
+            # — verified: for a run that never saves, capacity after N births is the smallest
+            # AREA_INITIAL_CAPACITY*2^k (resp. GROW_CHUNK*k) strictly greater than the n value at which the
+            # LAST growth fired, which is exactly what `while n > capacity: grow()` reconstructs from n
+            # alone (see the report for the worked boundary cases, n==capacity vs n==capacity+1).
+            while o.sight.n > o.sight.nmax:
+                o.sight.grow()
+            while o.words.n > o.words.nmax:
+                o.words.grow()
+            while o.sight.n > o.W.shape[0]:
+                o._grow_W(axis=0)
+            while o.words.n > o.W.shape[1]:
+                o._grow_W(axis=1)
+        n_s, n_w = o.sight.n, o.words.n
+        if o._grow:
+            o.sight.cells[:n_s] = z["sight_cells"]; o.sight.alive[:n_s] = z["sight_alive"]; o.sight.misfires[:n_s] = z["sight_misfires"]
+            o.words.cells[:n_w] = z["words_cells"]; o.words.alive[:n_w] = z["words_alive"]; o.words.misfires[:n_w] = z["words_misfires"]
+            o.W[:n_s, :n_w] = z["W"]; o.mask[:n_s, :n_w] = z["mask"]; o.strikes[:n_s, :n_w] = z["strikes"]
+        else:
+            o.sight.cells[: o.sight.n] = z["sight_cells"]; o.sight.alive[:] = z["sight_alive"]; o.sight.misfires[:] = z["sight_misfires"]
+            o.words.cells[: o.words.n] = z["words_cells"]; o.words.alive[:] = z["words_alive"]; o.words.misfires[:] = z["words_misfires"]
+            o.W[:] = z["W"]; o.mask[:] = z["mask"]; o.strikes[:] = z["strikes"]
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH: restore the own-band ring
         # only when BOTH sides have it (the loading genome declares THRESH -- `o.sight.own_band is not None` --
         # AND the saved npz actually carries it). An old snapshot loaded under a new THRESH genome simply keeps
         # the freshly-allocated all-zero ring (own_band_n.any()==False); state_hash()'s own gate then reads the
         # same digest the pre-THRESH code would have written (see test_load_old_snapshot_without_own_band...).
         if o.sight.own_band is not None and "sight_own_band" in z.files:
-            o.sight.own_band[:] = z["sight_own_band"]; o.sight.own_band_n[:] = z["sight_own_band_n"]
+            if o._grow:
+                o.sight.own_band[:n_s] = z["sight_own_band"]; o.sight.own_band_n[:n_s] = z["sight_own_band_n"]
+            else:
+                o.sight.own_band[:] = z["sight_own_band"]; o.sight.own_band_n[:] = z["sight_own_band_n"]
         o.t = int(meta["t"]); o.budget_left = int(meta["budget_left"]); o.arrivals = int(meta["arrivals"]); o.c = dict(meta["c"])
         o.births = [tuple(r) for r in meta["births"]]; o.merges = [tuple(r) for r in meta["merges"]]
         o.edges_log = [tuple(r) for r in meta["edges_log"]]; o.prunes_log = [tuple(r) for r in meta["prunes_log"]]
         o.refusals_by_arrival = list(meta["refusals_by_arrival"])
+        o.budget_regenerated = int(meta.get("budget_regenerated", 0))
+        o._cycle_baseline_redundant = int(meta.get("cycle_baseline_redundant", 0))
+        _brl = meta.get("budget_regen_last_t")
+        o._budget_regen_last_t = int(_brl) if _brl is not None else None
         # edit: Claude (Sonnet 5, builder F), 2026-09-21 17:45 +0400 -- the orchestrator's follow-up task
         # (commit 412d721): the closed lives' readers (tools/verdict_g4.py's W3-2 reach control, the
         # exam) must still LOAD old-format snapshots (saved before the state_hash repair). Try the NEW
@@ -1286,13 +1582,22 @@ class Organism:
         # `_state_hash_legacy`, never deleted); refuse only when BOTH fail. A snapshot saved by either
         # generation of the code therefore loads; a genuinely corrupted one (neither digest matches)
         # still refuses loudly, by name (docs/briefs/G5-F-REPORT.md §4).
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:42 +0400 — ALPHA4-G.md task 2 (the
+        # advisor's review): a THIRD generation. Every snapshot on this box today (L1-L5, seam-1, seam-2,
+        # 3a, 3b) was saved under F's formula (live-block W, full-length alive/misfires/own_band) — neither
+        # this task's new formula NOR the pre-F legacy one. Without this, Organism.load would refuse every
+        # one of them the moment this task's state_hash landed. Tried in the order a snapshot is MOST
+        # likely to have been saved under (newest code first): new -> F's -> pre-F's.
         new_hash = o.state_hash()
         if new_hash != meta["state_hash"]:
-            legacy_hash = o._state_hash_legacy()
-            if legacy_hash != meta["state_hash"]:
-                raise GenomeError(
-                    f"loaded organism's state_hash {new_hash[:16]} (legacy {legacy_hash[:16]}) is not the saved {meta['state_hash'][:16]}"
-                )
+            f_hash = o._state_hash_legacy_f()
+            if f_hash != meta["state_hash"]:
+                legacy_hash = o._state_hash_legacy()
+                if legacy_hash != meta["state_hash"]:
+                    raise GenomeError(
+                        f"loaded organism's state_hash {new_hash[:16]} (F's {f_hash[:16]}, legacy {legacy_hash[:16]}) "
+                        f"is not the saved {meta['state_hash'][:16]}"
+                    )
         return o
 
     # ------------------------------------------------------------------ identity
@@ -1305,14 +1610,35 @@ class Organism:
     # same for mask and strikes, on all three (docs/briefs/G5-F-REPORT.md). This CHANGES THE DIGEST for
     # the same state (the bytes hashed are different) -- it is a new pin, reported, never written to
     # tools/gate_g4.py's PIN or any test's PINNED_HASH_DEV on master; that is the orchestrator's call.
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:40 +0400 — ALPHA4-G.md task 2
+    # (docs/ALPHA4-PREREG.md §2/§3, brief line 7): `alive`/`misfires`/`own_band`/`own_band_n` sliced to the
+    # LIVE prefix `[:a.n]` too — they were the arrays STILL hashed at full capacity length after builder
+    # F's live-block repair (W/mask/strikes/cells already were). Under GROW this is not optional: an
+    # untouched, capacity-driven padding region is now UNBOUNDED and a pure implementation artefact (which
+    # chunk size the code happens to use), never semantic state — two lives that grew their capacity on
+    # different schedules but hold the IDENTICAL live cells must hash identically, and hashing the full
+    # array would make the digest depend on capacity, not content. THIS IS A DECLARED, UNCONDITIONAL
+    # HASH-LAW CHANGE (every genome, GROW or not — see (b) below) — exactly F's own precedent, and handled
+    # the same way: the OLD formula (this method's body immediately before this edit) is kept VERBATIM as
+    # `_state_hash_legacy_f()`, `load()` now tries three generations in order, and the new PIN is computed
+    # and reported, never written into tools/gate_g4.py's PIN or any test's PINNED_HASH_DEV — that is the
+    # orchestrator's call, per F's own comment on this method, still true a paragraph below.
+    #
+    # THE BRIEF'S OWN FACTUAL GAP, raised here: task 2's line says alive/misfires "are the only arrays
+    # hashed at full length" — false for every REAL genome on this tree (L1-L4, 3b, LIFE.genome, ALPHA4.genome
+    # all declare THRESH): `own_band`/`own_band_n` are ALSO hashed at full nmax length whenever THRESH is
+    # declared and at least one cosine has been pushed. Fixed here too, same reasoning, same live-prefix
+    # slice — omitting it would leave a capacity artefact in every GROW life's hash the moment it answers
+    # its first glance correctly.
     def state_hash(self) -> str:
         """sha256 over the fixed-dtype state arrays and the counters (mark vii, the replay gate). W/mask/
-        strikes are hashed only over their LIVE block [:sight.n, :words.n] -- no cell id >= n is ever
-        written, so this is losslessly equivalent to hashing the full nmax x nmax arrays, just without
-        paying for the >99.6% that can never be non-zero (MIND-MEMORY.md §4 R1)."""
+        strikes/alive/misfires/own_band are hashed only over their LIVE block/prefix -- no cell id >= n is
+        ever written, so this is losslessly equivalent to hashing the full-capacity arrays, just without
+        paying for the padding that can never be non-zero (MIND-MEMORY.md §4 R1; extended to alive/
+        misfires/own_band by ALPHA4-G task 2 — the capacity itself is not semantic state under GROW)."""
         h = hashlib.sha256()
         for a in (self.sight, self.words):
-            h.update(a.cells[: a.n].tobytes()); h.update(a.alive.tobytes()); h.update(a.misfires.tobytes())
+            h.update(a.cells[: a.n].tobytes()); h.update(a.alive[: a.n].tobytes()); h.update(a.misfires[: a.n].tobytes())
             h.update(np.int64(a.n).tobytes())
         n_s, n_w = self.sight.n, self.words.n
         h.update(self.W[:n_s, :n_w].tobytes()); h.update(self.mask[:n_s, :n_w].tobytes()); h.update(self.strikes[:n_s, :n_w].tobytes())
@@ -1328,6 +1654,39 @@ class Organism:
         # THRESH) snapshot loads under a NEW THRESH-declared genome without a digest mismatch, because the
         # freshly-allocated, never-restored ring also reads `any()==False`. Once real history exists, both
         # replay runs of the SAME genome+tape reach that point at the identical moment (mark vii holds).
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:55 +0400 — ALPHA4-G.md task 2: the gate
+        # itself reads `own_band_n[:n].any()` (the LIVE prefix), not the full-capacity array — found by a
+        # test that corrupted only the padding (own_band_n[n:] = 3) and watched the hash move anyway: a
+        # full-length `.any()` flips the gate on padding-only noise, which is exactly the capacity-
+        # dependence this task's whole change exists to remove. Byte-identical under NMAX (padding there
+        # is just as dead, so `.any()` over the full array already agreed with `.any()` over `[:n]` for
+        # every genuine run — the divergence only shows up under an adversarial corruption of the padding
+        # itself, which no real code path produces).
+        n_s2 = self.sight.n
+        if self.sight.own_band is not None and bool(self.sight.own_band_n[:n_s2].any()):
+            h.update(self.sight.own_band[:n_s2].tobytes()); h.update(self.sight.own_band_n[:n_s2].tobytes())
+        return h.hexdigest()
+
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:40 +0400 — kept VERBATIM (byte-for-byte
+    # state_hash()'s body as builder F left it, live-block W/mask/strikes but FULL-length alive/misfires/
+    # own_band) so Organism.load can still verify every snapshot saved by every life on this box today
+    # (L1-L5, seam-1, seam-2, 3a, 3b — all saved under F's formula, none under this task's new one or the
+    # pre-F one). Never called from anywhere except load()'s fallback chain below.
+    def _state_hash_legacy_f(self) -> str:
+        """F's state_hash, PRE-ALPHA4-G (docs/briefs/G5-F-BIND-DIAGNOSTIC-AND-REPAIRS.md): live-block W/
+        mask/strikes, but alive/misfires/own_band at FULL capacity length. Exists only so Organism.load can
+        accept a snapshot saved between 2026-09-21 ~20:50 and this task; every other caller uses
+        state_hash()."""
+        h = hashlib.sha256()
+        for a in (self.sight, self.words):
+            h.update(a.cells[: a.n].tobytes()); h.update(a.alive.tobytes()); h.update(a.misfires.tobytes())
+            h.update(np.int64(a.n).tobytes())
+        n_s, n_w = self.sight.n, self.words.n
+        h.update(self.W[:n_s, :n_w].tobytes()); h.update(self.mask[:n_s, :n_w].tobytes()); h.update(self.strikes[:n_s, :n_w].tobytes())
+        h.update(np.int64(self.t).tobytes()); h.update(np.int64(self.budget_left).tobytes())
+        h.update(json.dumps(self.c, sort_keys=True).encode())
+        h.update(json.dumps(self.births).encode()); h.update(json.dumps(self.merges).encode())
+        h.update(json.dumps(self.edges_log).encode()); h.update(json.dumps(self.prunes_log).encode())
         if self.sight.own_band is not None and bool(self.sight.own_band_n.any()):
             h.update(self.sight.own_band.tobytes()); h.update(self.sight.own_band_n.tobytes())
         return h.hexdigest()

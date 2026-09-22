@@ -317,6 +317,15 @@ class Body:
             # edit: Claude (Fable 5.1), 2026-09-22 12:0x +0400 — the birth LEDGER on every write (#164): NMAX is a lifetime budget of ids (G4 §3 B7 never
             # reuses one); g5-seam-1 spent its 2,000 sight ids by hour ~6 and refused 1,988 births while this surface showed budget refusals 0
             "sight_born": int(org.sight.n), "words_born": int(org.words.n), "sight_nmax": int(org.sight.nmax), "words_nmax": int(org.words.nmax),
+            # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:32 +0400 — ALPHA4-G.md task 5: `sight_capacity`/
+            # `words_capacity` name the SAME numbers as `sight_nmax`/`words_nmax` above under a name that reads right
+            # in BOTH regimes — under GROW, `sight_nmax` is not a declared MAX any more (genome.nmax is None; it's
+            # `org.sight.nmax`, the Area's own current allocated capacity, which grows), so a reader parsing STATUS
+            # for "the cap" would be misled by the old name alone. `budget_regenerated` (genome/machinery.py's
+            # Organism.budget_regenerated, a plain attribute — see its own __init__ comment for why it's not in
+            # self.c) is 0 for every genome whose BUDGET line carries no regenerate clause, on every write (#164).
+            "sight_capacity": int(org.sight.nmax), "words_capacity": int(org.words.nmax),
+            "budget_regenerated": int(getattr(org, "budget_regenerated", 0)),
             "births_refused_nmax": int(org.c["births_refused_nmax"]), "births_refused_frozen": int(org.c["births_refused_frozen"]),
             "births_refused_redundant": int(org.c["births_refused_redundant"]),
             "births_refused_caps": int(org.c["births_refused_budget"]) + int(org.c["births_refused_nmax"]) + int(org.c["births_refused_frozen"]),
