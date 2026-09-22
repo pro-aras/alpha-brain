@@ -3,6 +3,7 @@
 # every step prints what it did. usage: scratch/launch-seam-life.sh <name> <commit>     (e.g. g5-seam-1 <sha>)
 set -euo pipefail
 NAME="${1:?life name}"; COMMIT="${2:?commit}"; GENOME_REL="${3:-genome/G5.genome}"; PLANT_AFTER="${4:-5000}"   # edit: Claude (Fable 5.1), 2026-09-22 18:24 +0400 — 4th arg: the plant's canvas (15000 for the 24 h ONE life)
+SIZING_PREDICTION="${5:-}"   # edit: Claude (Fable 5.1), 2026-09-22 22:28 +0400 — 5th arg: sight born by 24 h as PREREG §19.11 derives it; the verdict waiter passes it as --sizing-prediction
 LIVES=/data/dev/genome-lives; ROOT="$LIVES/$NAME"; CODE="$ROOT/code"
 [ -e "$ROOT" ] && { echo "root exists: $ROOT — refusing (a life's root is never reused)"; exit 2; }
 mkdir -p "$LIVES"
@@ -13,7 +14,7 @@ echo "[launch $NAME] checkout $CODE at $(git -C "$CODE" rev-parse --short HEAD)"
 # 2. units (templated) installed + daemon-reload; nothing enabled by the installer
 bash "$CODE/deploy/install.sh" | tail -2
 # 3. the root exists (the body creates it; make it now so the record is dated)
-mkdir -p "$ROOT"; date "+%Y-%m-%d %H:%M %z" > "$ROOT/STARTED-AT"; echo "$COMMIT" > "$ROOT/CODE-COMMIT"; printf "GENOME=%s\nPLANT_AFTER=%s\n" "$CODE/$GENOME_REL" "$PLANT_AFTER" > "$ROOT/unit.env"; cp "$CODE/$GENOME_REL" "$ROOT/GENOME.genome"
+mkdir -p "$ROOT"; date "+%Y-%m-%d %H:%M %z" > "$ROOT/STARTED-AT"; echo "$COMMIT" > "$ROOT/CODE-COMMIT"; printf "GENOME=%s\nPLANT_AFTER=%s\n" "$CODE/$GENOME_REL" "$PLANT_AFTER" > "$ROOT/unit.env"; cp "$CODE/$GENOME_REL" "$ROOT/GENOME.genome"; [ -n "$SIZING_PREDICTION" ] && echo "$SIZING_PREDICTION" > "$ROOT/SIZING-PREDICTION"
 # 4. enable + start the life and its watch
 systemctl --user enable --now "creature-g5@$NAME.service"
 systemctl --user enable --now "creature-g5-watch@$NAME.timer"

@@ -85,8 +85,16 @@ class GradeMark(unittest.TestCase):
         self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["null_sure_bare"], 0); self.assertEqual(m["hedge_rate"], 0.426)
         tie = dict(null, graded={"sure_bare": 5, "unsure": 3, "abstain_with_resemblance": 2, "abstain": 0})
         self.assertFalse(grade_mark(plant, tie, seen, True)["pass"])            # 5/10 sure-bare is a FAIL, never a tie
-        weak = dict(plant, graded={"sure_bare": 5, "unsure": 3, "abstain_with_resemblance": 2, "abstain": 0})
-        self.assertFalse(grade_mark(weak, null, seen, True)["pass"])            # the plant must be answered SURE ≥ 6/10
+        # edit: Claude (Fable 5.1), 2026-09-22 22:24 +0400 — §19.3's plant clause RE-SPECIFIED before the life (#228 (b): a bar above its
+        # ceiling): builder A's real-record grades (LIFE-A-REPORT.md §2: sure/unsure on held-out renders 10/0 … 0/10 per thing, hedge rate
+        # 0.426) make «sure ≥ 6/10» a coin flip for a word seen five times. The plant's mark is the CELL — answered ≥ 6/10, G4's own (vi) —
+        # with the grade distribution printed; the null's clauses (the grade's own mark) are unchanged.
+        weak = dict(plant, answered_rate=0.8, graded={"sure_bare": 5, "unsure": 3, "abstain_with_resemblance": 2, "abstain": 0})
+        m2 = grade_mark(weak, null, seen, True)
+        self.assertTrue(m2["pass"], "the plant answered 8/10 with 5 of them «unsure» is a PASS: the cell is the mark, the grade is printed")
+        self.assertEqual(m2["plant_sure"], 5); self.assertEqual(m2["plant_answered_rate"], 0.8)
+        unlearned = dict(plant, answered_rate=0.5, graded={"sure_bare": 5, "unsure": 0, "abstain_with_resemblance": 3, "abstain": 2})
+        self.assertFalse(grade_mark(unlearned, null, seen, True)["pass"])       # answered 5/10 is the FAIL (L5's cap shape, seam-1's 0/10)
 
 
 class SelfMark(unittest.TestCase):
@@ -110,36 +118,85 @@ class SelfMark(unittest.TestCase):
         self.assertFalse(self_mark(tape, [], journal, {}, True)["pass"])
 
 
-def _moments(shares_by_window, canvases_per_window=200, words=("circle",), new_words_at=()):
-    """journal moment rows: one row per canvas (glance 0 only, for brevity) with `confirmed` drawn deterministically to hit each
-    window's (first-half, second-half) shares; `when` marks the hour; new words first appear at the given window indexes."""
-    rows = []; seq = 0
-    for w, (s1, s2) in enumerate(shares_by_window):
-        for c in range(canvases_per_window):
-            half = 0 if c < canvases_per_window // 2 else 1
-            share = (s1, s2)[half]
-            confirmed = (c % 100) < int(round(share * 100))
-            word = f"new{w}" if (w in new_words_at and c < 5) else words[c % len(words)]
-            rows.append({"seq": seq, "moment": f"w{w:04d}i{c:06d}", "word": word, "when": f"2026-09-23T{(w * 4) % 24:02d}:{(c * 60 // canvases_per_window) % 60:02d}:00Z",
-                         "glance": 0, "confirmed": confirmed, "residual": 0.0 if confirmed else 0.3, "births": []}); seq += 1
-    return rows
+def _showings(things, per_thing=(0.0, 0.0, 0.0) + (0.6,) * 197, first500=None, source="maker", extra=()):   # 5 things × 200 showings = 1,000 canvases, the mark's floor
+    """edit: Claude (Fable 5.1), 2026-09-22 22:36 +0400 — journal moment rows shaped like builder B's LANDED code: `confirmed` is a LIST of four
+    booleans per located glance (never a bare bool — a list is truthy whether or not one glance confirmed, the defect the first helper hid);
+    things are shown in rotation, each showing's per-glance share drawn from `per_thing[k]` for its k-th showing (4 glances → shares in
+    quarters). `first500`: an optional per-canvas share override for the first 500 canvases (the life-scale rise clause)."""
+    rows = []; seq = 0; k = {t: 0 for t in things}; src = {}
+    order = [t for _ in range(len(per_thing)) for t in things]
+    for i, t in enumerate(order):
+        share = per_thing[min(k[t], len(per_thing) - 1)]; k[t] += 1
+        if first500 is not None and i < 500: share = first500
+        n_ok = int(round(share * 4)); flags = [j < n_ok for j in range(4)]
+        rows.append({"seq": seq, "moment": f"m{i:06d}", "word": t, "when": "2026-09-23T00:00:00Z", "confirmed": flags, "residual": [0.0] * 4, "births": []})
+        src[seq] = source; seq += 1
+    for t, flags_list, s2 in extra:
+        for flags in flags_list:
+            rows.append({"seq": seq, "moment": f"x{seq:06d}", "word": t, "when": "2026-09-23T00:00:00Z", "confirmed": flags, "residual": [0.0] * 4, "births": []}); src[seq] = s2; seq += 1
+    return rows, src
 
 
 class SurpriseMark(unittest.TestCase):
-    """PREREG §19.1 against builder B's shapes: `confirmed` on every eye moment row; STATUS glances_confirmed/glances_surprised."""
+    """PREREG §19.1 as RE-SPECIFIED on 2026-09-22 22:3x from L1's real record replayed under SURPRISE (scratch/l1-surprise, builder B's recipe):
+    (a) FIRST-SHOWING SURPRISE — for every maker thing with ≥ 30 showings, the per-glance confirmed share over its first 3 showings < over its
+    last 20, for ≥ 80 % of them AND more than the shuffled null's p95 (L1: 16 of 16 maker things; the null 12 of 26 overall, p95 16);
+    (b) the LIFE-SCALE RISE — the share over the last 500 canvases − the first 500 ≥ 0.10 (L1: 0.146; adjacent-500-bin sd 0.047);
+    (c) the `--blind surprise` twin confirms 0 glances. The old window clauses are gone: on the record the world's arrival (64 % never-seen
+    words in the next 100 canvases) moved the share +0.03 against a null band of sd 0.06, and the plant is 1 canvas in 100."""
 
-    def test_not_gradable_without_confirmed_rows(self):
+    def test_not_gradable_without_confirmed_rows_or_the_gene(self):
         from tools.verdict_life import surprise_mark
-        self.assertFalse(surprise_mark([{"seq": 1, "moment": "a", "glance": 0, "word": "x"}], {}, 200, True)["graded"])
-        self.assertFalse(surprise_mark(_moments([(0.4, 0.6)]), {}, 200, False)["graded"])
+        self.assertFalse(surprise_mark([{"seq": 1, "moment": "a", "word": "x"}], {}, True)["graded"])
+        rows, src = _showings(["circle", "square"])
+        self.assertFalse(surprise_mark(rows, {}, False, source_of=src)["graded"])
 
-    def test_rises_within_windows_and_drops_at_new_thing_boundaries(self):
+    def test_first_showings_surprised_later_confirmed_and_the_share_rises(self):
         from tools.verdict_life import surprise_mark
-        rows = _moments([(0.40, 0.60), (0.30, 0.55), (0.45, 0.62), (0.35, 0.58), (0.44, 0.61), (0.36, 0.57)], new_words_at=(1, 3))
-        m = surprise_mark(rows, {"glances_confirmed": 10, "glances_surprised": 10}, 200, True)
-        self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["windows_rising"], 6); self.assertEqual(sorted(m["new_thing_windows"]), [1, 3])
-        flat = surprise_mark(_moments([(0.5, 0.5)] * 6, new_words_at=(1,)), {}, 200, True)
-        self.assertTrue(flat["graded"]); self.assertFalse(flat["pass"])
+        things = ["circle", "square", "triangle", "cross", "ring"]
+        rows, src = _showings(things, first500=0.25)       # 250 canvases in the first 500 read 0.25; the last 500 read 0.6
+        twin = {"glances_confirmed": 0, "glances_surprised": 800}
+        m = surprise_mark(rows, {"glances_confirmed": 500, "glances_surprised": 300}, True, source_of=src, twin_status=twin)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"], m)
+        self.assertEqual(m["things_graded"], 5); self.assertEqual(m["things_rising"], 5)
+        self.assertGreaterEqual(m["rise_first_to_last_500"], 0.10); self.assertEqual(m["twin_confirmed"], 0)
+        self.assertGreater(m["things_rising"], m["null_p95"])
+        self.assertIn("null_mean", m)
+
+    def test_a_flat_record_fails_and_a_confirming_twin_fails(self):
+        from tools.verdict_life import surprise_mark
+        things = ["circle", "square", "triangle", "cross", "ring"]
+        flat, src = _showings(things, per_thing=(0.5,) * 200)
+        m = surprise_mark(flat, {}, True, source_of=src, twin_status={"glances_confirmed": 0})
+        self.assertTrue(m["graded"]); self.assertFalse(m["pass"]); self.assertEqual(m["things_rising"], 0)
+        good, src2 = _showings(things, first500=0.25)
+        self.assertFalse(surprise_mark(good, {}, True, source_of=src2, twin_status={"glances_confirmed": 12})["pass"])
+
+    def test_a_word_shared_by_the_game_and_the_maker_is_graded_over_its_maker_rows_only(self):
+        # edit: Claude (Fable 5.1), 2026-09-22 22:47 +0400 — the advisor's read: BabyAI's missions name «key», the maker's arrival brings «key»
+        from tools.verdict_life import surprise_mark
+        things = ["circle", "square", "triangle", "cross", "key"]
+        rows, src = _showings(things, first500=0.25, extra=[("key", [[False] * 4] * 40, "game"), ("ball", [[False] * 4] * 40, "game")])
+        m = surprise_mark(rows, {}, True, source_of=src, twin_status={"glances_confirmed": 0})
+        self.assertTrue(m["pass"], m); self.assertEqual(m["things_graded"], 5); self.assertIn("key", m["things"])
+        self.assertEqual(m["things"]["key"]["showings"], 200, "the game's 40 «key» frames must not enter the maker's «key» showings")
+        self.assertEqual(m["by_source"]["game"]["things"], 2); self.assertEqual(m["by_source"]["game"]["share"], 0.0)
+        self.assertIn("key@game", m["printed_not_graded"]); self.assertIn("ball@game", m["printed_not_graded"])
+        # the row's OWN `source` wins over the tape map (a DELIVER journal carries it)
+        rows2 = [dict(r, source=("game" if i % 2 else "maker")) for i, r in enumerate(rows[:1000])]
+        m2 = surprise_mark(rows2, {}, True, source_of={}, twin_status={"glances_confirmed": 0})
+        self.assertEqual(m2["by_source"]["game"]["glances"], 500 * 4); self.assertEqual(m2["by_source"]["maker"]["glances"], 500 * 4)
+
+    def test_photographs_are_printed_not_graded_and_the_share_counts_glances(self):
+        from tools.verdict_life import surprise_mark
+        things = ["circle", "square", "triangle", "cross", "ring"]
+        photos = [("anchor", [[False] * 4] * 30, "folder"), ("ant", [[False] * 4] * 30, "folder")]
+        rows, src = _showings(things, first500=0.25, extra=photos)
+        m = surprise_mark(rows, {}, True, source_of=src, twin_status={"glances_confirmed": 0})
+        self.assertTrue(m["pass"]); self.assertEqual(m["things_graded"], 5, "the folder's things are printed, never graded (L1: 0 of 10 photographs confirm)")
+        self.assertEqual(m["by_source"]["folder"]["share"], 0.0); self.assertEqual(m["by_source"]["folder"]["things"], 2)
+        one_of_four, src3 = _showings(["circle"], per_thing=(0.25,) * 50)
+        self.assertAlmostEqual(surprise_mark(one_of_four, {}, True, source_of=src3)["overall_share"], 0.25, places=3, msg="1 of 4 glances confirmed reads 0.25, never 1.0")
 
 
 class CoarseMark(unittest.TestCase):

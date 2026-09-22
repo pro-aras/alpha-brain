@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import collections
 import copy
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional, Tuple
 
 
 def _meta(r: dict) -> dict:
@@ -106,19 +106,25 @@ def sound_mark(tape: Iterable[dict], journal: Iterable[dict], status: dict) -> D
 def grade_mark(plant: dict, null: dict, seen: dict, answer_declared: bool) -> Dict[str, object]:
     """PREREG §19.3 (builder A's shapes: `graded` = {sure_bare, unsure, abstain_with_resemblance, abstain} on the reader's own plant/null
     asks; `hedge_rate` on the seen-words Q1): the null «vex» sure-bare ≤ 1 of 10 and unsure+abstain ≥ 8 of 10 (a 5/10 tie is a FAIL);
-    the plant «zog» answered SURE ≥ 6 of 10; the hedge rate printed (the plan predicted < 10 %; L1's replay read 0.426 — a finding)."""
+    the plant «zog» ANSWERED (the cell) ≥ 6 of 10 with its grade distribution printed; the hedge rate printed (the plan predicted < 10 %;
+    L1's replay read 0.426 — a finding).
+    edit: Claude (Fable 5.1), 2026-09-22 22:27 +0400 — the plant clause RE-SPECIFIED before the life (#228 (b)): «sure ≥ 6/10» sat above
+    its ceiling — builder A's real-record grades on held-out renders read sure/unsure 10/0 … 0/10 per thing (LIFE-A-REPORT.md §2; hedge
+    0.426), so a word seen five times grading «sure» six times in ten is a coin flip by construction. The plant's mark is the cell (G4's
+    own (vi)); the grade's own mark is the null's two clauses, unchanged."""
     gp = (plant or {}).get("graded"); gn = (null or {}).get("graded")
     hedge = ((seen or {}).get("Q1") or {}).get("hedge_rate")
-    out: Dict[str, object] = {"plant_graded": gp, "null_graded": gn, "hedge_rate": hedge,
-                              "bar": "null sure-bare ≤ 1/10 · null unsure+abstain ≥ 8/10 (a tie fails) · plant answered sure ≥ 6/10 · hedge rate printed, no bar (predicted < 0.10)"}
-    if not answer_declared or not isinstance(gp, dict) or not isinstance(gn, dict):
+    par = (plant or {}).get("answered_rate")
+    out: Dict[str, object] = {"plant_graded": gp, "null_graded": gn, "hedge_rate": hedge, "plant_answered_rate": par,
+                              "bar": "null sure-bare ≤ 1/10 · null unsure+abstain ≥ 8/10 (a tie fails) · plant ANSWERED ≥ 6/10 (its grades printed) · hedge rate printed, no bar (predicted < 0.10)"}
+    if not answer_declared or not isinstance(gp, dict) or not isinstance(gn, dict) or par is None:
         out.update(graded=False, **{"pass": None}, reason="not gradable: ANSWER not declared / no graded counts on the asks (a life before the graded answer)")
         return out
     n_null = sum(gn.values()) or 1; n_plant = sum(gp.values()) or 1
     null_sb = int(gn.get("sure_bare", 0)); null_soft = int(gn.get("unsure", 0)) + int(gn.get("abstain_with_resemblance", 0)) + int(gn.get("abstain", 0))
     plant_sure = int(gp.get("sure_bare", 0))
     out.update(null_sure_bare=null_sb, null_soft=null_soft, null_n=n_null, plant_sure=plant_sure, plant_n=n_plant,
-               graded=True, **{"pass": (null_sb / n_null <= 0.1) and (null_soft / n_null >= 0.8) and (plant_sure / n_plant >= 0.6)},
+               graded=True, **{"pass": (null_sb / n_null <= 0.1) and (null_soft / n_null >= 0.8) and (float(par) >= 0.6)},
                reason="graded (§19.3)")
     return out
 
@@ -143,40 +149,81 @@ def self_mark(tape: Iterable[dict], beliefs: Iterable[dict], journal: Iterable[d
     return out
 
 
-def surprise_mark(journal: Iterable[dict], status: dict, canvases_per_window: int, surprise_declared: bool) -> Dict[str, object]:
-    """PREREG §19.1 (builder B's shapes: `confirmed` on every eye moment row; STATUS glances_confirmed/glances_surprised): the
-    confirmed share RISES within each window (second half > first half in ≥ 2/3 of the windows with ≥ 100 canvases) and DROPS at
-    every window that brings new words (the first 100 canvases after the boundary under the last 100 before it). Windows are
-    `canvases_per_window` canvases of glance-0 rows in tape order (the world's arrival period). Not gradable without the field."""
-    canv = [j for j in journal if "moment" in j and j.get("glance") == 0]
-    if not surprise_declared or not canv or not any("confirmed" in j for j in canv):
-        return {"graded": False, "pass": None, "reason": "not gradable: SURPRISE not declared / no `confirmed` field on the moment rows",
-                "bar": "share rises in ≥ 2/3 of windows · drops at every new-thing window"}
-    W = max(1, int(canvases_per_window)); n = len(canv)
-    windows = [canv[i:i + W] for i in range(0, n, W)]
-    seen: set = set(); new_thing_windows: List[int] = []
-    shares: List[dict] = []
-    for w, rows in enumerate(windows):
-        head = rows[:max(1, len(rows) // 20)]
-        new = [j["word"] for j in head if j.get("word") and j["word"] not in seen]
-        for j in rows:
-            if j.get("word"): seen.add(j["word"])
-        if w > 0 and new: new_thing_windows.append(w)
-        h = len(rows) // 2
-        s1 = sum(1 for j in rows[:h] if j.get("confirmed")) / max(1, h); s2 = sum(1 for j in rows[h:] if j.get("confirmed")) / max(1, len(rows) - h)
-        shares.append({"window": w, "canvases": len(rows), "first_half": round(s1, 4), "second_half": round(s2, 4), "new_words": new[:5]})
-    full = [s for s in shares if s["canvases"] >= 100]
-    rising = sum(1 for s in full if s["second_half"] > s["first_half"])
-    drops = {}
-    for w in new_thing_windows:
-        before = windows[w - 1][-100:]; after = windows[w][:100]
-        sb = sum(1 for j in before if j.get("confirmed")) / max(1, len(before)); sa = sum(1 for j in after if j.get("confirmed")) / max(1, len(after))
-        drops[w] = {"before": round(sb, 4), "after": round(sa, 4), "dropped": sa < sb}
-    ok = bool(full) and rising * 3 >= 2 * len(full) and all(d["dropped"] for d in drops.values())
-    return {"graded": True, "pass": ok, "windows": shares, "windows_rising": rising, "windows_full": len(full), "new_thing_windows": new_thing_windows,
-            "drops_at_new_thing_windows": drops, "overall_share": round(sum(1 for j in canv if j.get("confirmed")) / n, 4),
-            "status_confirmed": status.get("glances_confirmed", "not recorded"), "status_surprised": status.get("glances_surprised", "not recorded"),
-            "reason": "graded (§19.1)", "bar": "share rises in ≥ 2/3 of windows · drops at every new-thing window"}
+def surprise_mark(journal: Iterable[dict], status: dict, surprise_declared: bool, source_of: Optional[Dict[int, str]] = None,
+                  twin_status: Optional[dict] = None, min_showings: int = 30, null_draws: int = 200) -> Dict[str, object]:
+    """PREREG §19.1 as RE-SPECIFIED (edit: Claude (Fable 5.1), 2026-09-22 22:33 +0400) on L1's closed tape replayed under SURPRISE (builder B's recipe,
+    the journal kept under scratch/l1-surprise/; the reasons in the PREREG): builder B's `confirmed` is a LIST of booleans per located glance
+    (a share counts GLANCES — the first version of this mark tested the list's truthiness and read 1.0 on every row), the coarse row excluded.
+    (a) FIRST-SHOWING SURPRISE: for every maker thing with ≥ `min_showings` showings, the share over its first 3 showings < over its last 20,
+    for ≥ 80 % of them AND more than the shuffled null's p95 (each thing's showings permuted, `null_draws` draws, a fixed seed);
+    (b) the LIFE-SCALE RISE: the share over the last 500 canvases − the first 500 ≥ 0.10; (c) the `--blind surprise` twin confirms 0 glances.
+    Things from other sources (folder / game / hands) and things under `min_showings` are PRINTED, never graded (L1: 0 of 10 photographs
+    confirmed a glance at floor 0.05); a word shown by two sources is graded over its MAKER rows and printed as `word@source` for the rest.
+    `source_of`: eye-row seq → source from the tape, used when the row carries no `source` (None = every row counts as the maker's, said so)."""
+    import random as _random, statistics as _statistics
+    rows = [j for j in journal if "moment" in j and "confirmed" in j and j.get("act") != "coarse"]
+    bar = "maker things with ≥ 30 showings: first-3 share < last-20 for ≥ 80 % and > the shuffled null's p95 · last-500 − first-500 share ≥ 0.10 · the blind-surprise twin confirms 0 glances"
+    if not surprise_declared or not rows:
+        return {"graded": False, "pass": None, "reason": "not gradable: SURPRISE not declared / no `confirmed` field on the moment rows", "bar": bar}
+    def pair(j):
+        f = j["confirmed"]; f = f if isinstance(f, list) else [f]
+        return (sum(1 for x in f if x), len(f))
+    def share(pairs):
+        n = sum(b for _, b in pairs); return (sum(a for a, _ in pairs) / n) if n else None
+    per_canvas = [pair(j) for j in rows]
+    overall = share(per_canvas)
+    first = share(per_canvas[:500]); last = share(per_canvas[-500:])
+    rise = (round(last - first, 4) if (len(per_canvas) >= 1000 and first is not None and last is not None) else None)
+    # edit: Claude (Fable 5.1), 2026-09-22 22:47 +0400 — per ROW, not per word (the advisor's read before the commit): the game's missions name «key»/«ball»/«box» and
+    # the maker's arrival brings «key», so one word lives under two sources in one-1's world; a word is graded over its MAKER rows only, and
+    # every row is bucketed by its own source (the row's `source` when the journal carries it — DELIVER declared — else the tape's by seq).
+    src = source_of or {}
+    per_thing: Dict[str, List[Tuple[int, int]]] = {}; other_things: Dict[str, List[Tuple[int, int]]] = {}
+    by_source: Dict[str, dict] = {}; things_by_source: Dict[str, set] = {}
+    for j, pc in zip(rows, per_canvas):
+        s = j.get("source") or (src.get(int(j["seq"])) if src else None) or ("maker" if not src else "?")
+        d = by_source.setdefault(str(s), {"things": 0, "confirmed": 0, "glances": 0})
+        d["confirmed"] += pc[0]; d["glances"] += pc[1]
+        w = j.get("word")
+        if not w:
+            continue
+        things_by_source.setdefault(str(s), set()).add(w)
+        (per_thing if s == "maker" else other_things).setdefault(w if s == "maker" else f"{w}@{s}", []).append(pc)
+    for s, d in by_source.items():
+        d["things"] = len(things_by_source.get(s, ()))
+        d["share"] = round(d["confirmed"] / d["glances"], 4) if d["glances"] else None
+    graded_things = {w: pcs for w, pcs in per_thing.items() if len(pcs) >= min_showings}
+    things: Dict[str, dict] = {}; rising = 0
+    for w, pcs in graded_things.items():
+        f3 = share(pcs[:3]); l20 = share(pcs[-20:]); up = bool(f3 < l20); rising += up
+        things[w] = {"showings": len(pcs), "first3": round(f3, 4), "last20": round(l20, 4), "rising": up}
+    printed = {w: {"showings": len(pcs), "source": "maker", "first3": share(pcs[:3]), "rest": share(pcs[3:])} for w, pcs in per_thing.items() if w not in graded_things}
+    printed.update({k: {"showings": len(pcs), "source": k.rsplit("@", 1)[1], "first3": share(pcs[:3]), "rest": share(pcs[3:])} for k, pcs in other_things.items()})
+    rng = _random.Random(20260922); counts: List[int] = []
+    for _ in range(null_draws if graded_things else 0):
+        h = 0
+        for w, pcs in graded_things.items():
+            u = list(pcs); rng.shuffle(u); h += bool(share(u[:3]) < share(u[-20:]))
+        counts.append(h)
+    null_mean = round(_statistics.mean(counts), 2) if counts else None
+    null_p95 = sorted(counts)[max(0, int(0.95 * len(counts)) - 1)] if counts else None
+    twin_conf = (twin_status or {}).get("glances_confirmed")
+    n_things = len(graded_things)
+    out: Dict[str, object] = {"overall_share": round(overall, 4) if overall is not None else None, "canvases": len(per_canvas),
+                              "first_500": round(first, 4) if first is not None else None, "last_500": round(last, 4) if last is not None else None,
+                              "rise_first_to_last_500": rise, "things_graded": n_things, "things_rising": rising, "things": things, "null_mean": null_mean,
+                              "null_p95": null_p95, "printed_not_graded": printed, "by_source": by_source, "source_known": bool(src),
+                              "twin_confirmed": twin_conf, "status_confirmed": status.get("glances_confirmed", "not recorded"),
+                              "status_surprised": status.get("glances_surprised", "not recorded"), "bar": bar}
+    if n_things == 0 or rise is None:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {n_things} maker things with ≥ {min_showings} showings / {len(per_canvas)} canvases (needs ≥ 1000)")
+        return out
+    ok_things = rising >= 0.8 * n_things and (null_p95 is None or rising > null_p95)
+    ok_rise = rise >= 0.10
+    ok_twin = twin_conf is not None and int(twin_conf) == 0
+    out.update(graded=True, **{"pass": bool(ok_things and ok_rise and ok_twin)}, clause_things=ok_things, clause_rise=ok_rise, clause_twin=ok_twin,
+               reason="graded (§19.1 as re-specified 2026-09-22 22:33 +0400)" + ("" if twin_conf is not None else "; the blind-surprise twin was not run — the twin clause FAILS"))
+    return out
 
 
 def coarse_mark(live_allw: dict, twin_allw: Optional[dict], coarse_declared: bool) -> Dict[str, object]:

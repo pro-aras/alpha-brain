@@ -22,7 +22,10 @@ EnvironmentFile=/data/dev/genome-lives/%i/unit.env
 ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome-lives/%i --genome ${GENOME} --plant-after ${PLANT_AFTER} --folder /data/dev/genome/world
 Restart=on-failure
 RestartSec=5
-TimeoutStopSec=30
+# edit: Claude (Fable 5.1), 2026-09-22 22:47 +0400 — 30 s was thin for the ONE life: stop() joins up to eight senses for 5 s each (the hands' jail among them),
+# then close() lands the in-flight think and saves a NMAX-sized matrix (8000² × 8 B = 512 MB before compression); a SIGKILL here loses the tail think
+# and the stop event (the 24 h verdict waits for it). The six 8 h closes took < 1 s after the joins at NMAX 2000; the pre-flight measures the ONE life's.
+TimeoutStopSec=120
 
 [Install]
 WantedBy=default.target

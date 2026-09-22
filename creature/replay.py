@@ -1,7 +1,7 @@
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 23:12 +0400 — A6: replay (docs/G4-PREREG.md §2.9). The mind's
 # decisions are a pure function of (genome, tape rows in seq order) -- I2, PREREG §2.3/B4. This tool proves it.
 """creature/replay.py — python3 -m creature.replay --genome G --tape run/tape/<date>.jsonl
-[--against run/journal/<date>.jsonl] [--blind gaze] --out DIR
+[--against run/journal/<date>.jsonl] [--blind gaze] [--closed] --out DIR
 
 Rebuilds a fresh Mind from one day's tape file (in seq order) into a temporary work root (PREREG §2.11:
 fresh roots for every test/gate), and writes DIR/journal.jsonl -- MIND rows only (rows without an
@@ -36,10 +36,15 @@ def read_mind_journal(path: Path) -> List[Dict[str, object]]:
     return [r for r in _read_jsonl(path) if "event" not in r]
 
 
-def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenSet[str] = frozenset()) -> Path:
+def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenSet[str] = frozenset(), close: bool = False) -> Path:
     """Feeds `tape_path`'s rows (one day file, sorted by seq -- defensive, they are already in order) to
     a fresh Mind in a temporary root whose tape/payload is a symlink to the source tape's own payload
-    directory (never copied: replay never writes to the source tape). Returns DIR/journal.jsonl's path."""
+    directory (never copied: replay never writes to the source tape). Returns DIR/journal.jsonl's path.
+
+    `close` (edit: Claude (Fable 5.1), 2026-09-22 22:27 +0400 — plan L-1 × L-5, builder E's tail note): a tape that is a CLOSED life's
+    whole record ends the replayed mind the way the body ended the live one — `Mind.close()` applies the think still in flight at the
+    last eye row's seq (creature/body.py:stop) — or the closed journal carries one think row the replay cannot. A MID-tape cut keeps
+    the default False: the live mind lands that think at a later boundary, outside the cut, and a close here would invent a row."""
     tape_path = Path(tape_path)
     tape_root = tape_path.parent
     work_root = Path(tempfile.mkdtemp(prefix="creature-replay-"))
@@ -58,6 +63,8 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     rows = sorted(_read_jsonl(tape_path), key=lambda r: r["seq"])
     for row in rows:
         mind.consume(row)
+    if close:
+        mind.close()
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -110,7 +117,7 @@ def main(argv: List[str]) -> int:
     out_dir = Path(argv[argv.index("--out") + 1])
     blind: FrozenSet[str] = frozenset([argv[argv.index("--blind") + 1]]) if "--blind" in argv else frozenset()
 
-    out_journal = run_replay(genome_path, tape_path, out_dir, blind=blind)
+    out_journal = run_replay(genome_path, tape_path, out_dir, blind=blind, close="--closed" in argv)   # --closed: the tape is a closed life's whole record
 
     if "--against" in argv:
         against_path = Path(argv[argv.index("--against") + 1])

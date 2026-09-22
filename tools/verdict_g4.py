@@ -97,6 +97,14 @@ def _relink(link: Path, target: Path) -> None:
         os.symlink(target, link)
 
 
+def closed_whole(events: Sequence[dict], last_seq: int, tape_last_seq: int) -> bool:
+    """edit: Claude (Fable 5.1), 2026-09-22 22:28 +0400 — plan L-1 × L-5: True iff the record is a CLOSED life read WHOLE (a `stop` event in its
+    journal and the cut reaching the tape's last row). Then every whole-tape twin ends its mind the way the body did
+    (creature/replay.py:run_replay(close=) — the think in flight lands at the last eye row's seq) or the closed journal carries one
+    think row no replay can. A live life, or a cut short of the tape's end, never closes: the live mind lands that think later."""
+    return bool(last_seq) and int(last_seq) == int(tape_last_seq) and any(e.get("event") == "stop" for e in events)
+
+
 def gather(root: Path, out: Path, hours: float) -> dict:
     """Concatenates the root's tape files in seq order into out/tape/ALL.jsonl (payload symlinked, never copied), cut at
     start + hours; copies the state (a snapshot COPY); reads the journal's mind rows and event rows up to the cut."""
@@ -132,6 +140,7 @@ def gather(root: Path, out: Path, hours: float) -> dict:
         if _iso(d["at"]) <= t_cut:
             d["_file"] = f.name; exams.append(d)
     return {"t0": t0, "t_cut": t_cut, "tape": tape_cut, "mind": mind_rows, "events": events_cut, "status": status, "exams": exams,
+            "closed_whole": closed_whole(events, last_seq, tape_rows[-1]["seq"] if tape_rows else 0),
             "last_seq": last_seq, "hours_on_tape": (_iso(tape_cut[-1]["at"]) - t0).total_seconds() / 3600 if tape_cut else 0.0}
 
 
@@ -243,7 +252,10 @@ def worker(spec_path: Path) -> int:
     for r in rows:
         mind.consume(r)
     secs = time.perf_counter() - t0
-    mind.snapshot()
+    if spec.get("close"):
+        mind.close()        # edit: Claude (Fable 5.1), 2026-09-22 22:28 +0400 — a CLOSED life's whole tape: the tail think lands as the body's stop() landed it (close() snapshots)
+    else:
+        mind.snapshot()
     org = mind.org
     L = build_ledgers(org, mind.moment_word)
     def _cross(log):
@@ -254,6 +266,8 @@ def worker(spec_path: Path) -> int:
     (root / "mind-journal.jsonl").write_text("".join(json.dumps(r) + "\n" for r in mind_rows))
     n_canvas = sum(1 for r in mind_rows if "moment" in r)
     summary = {"label": spec["label"], "arrivals": org.arrivals, "budget_left": org.budget_left, "births": len(org.births), "c": org.c,
+               "glances_confirmed": getattr(mind, "glances_confirmed", None), "glances_surprised": getattr(mind, "glances_surprised", None),   # edit: Claude (Fable 5.1), 2026-09-22 22:33 +0400 — §19.1's twin clause reads the blind-surprise twin's own count
+               "closed": bool(spec.get("close")),
                "cells": [int(org.sight.alive.sum()), int(org.words.alive.sum())], "cells_born": org.sight.n + org.words.n,
                "edges_cross": {"born": _cross(org.edges_log), "pruned": _cross(org.prunes_log), "born_total": len(org.edges_log), "pruned_total": len(org.prunes_log)},
                "sleeps": sum(1 for r in mind_rows if "sleep" in r), "thinks": sum(1 for r in mind_rows if "think" in r),
@@ -537,6 +551,11 @@ def main(argv: List[str]) -> int:
                   {"label": "T-one-glance", "root": str(twins_dir / "T-one-glance"), "tape": str(tape_all), "genome": str(genome_path), "one_glance": True},
                   {"label": "T-first-fixation", "root": str(twins_dir / "T-first-fixation"), "tape": str(tape_all), "genome": str(first_fix)},
                   {"label": "T-frozen-10", "root": str(twins_dir / "T-frozen-10"), "tape": str(tape_all), "genome": str(frozen10), "blind": ["frozen"]}]
+    # edit: Claude (Fable 5.1), 2026-09-22 22:28 +0400 — a CLOSED life read WHOLE (gather's `closed_whole`) ends every whole-tape twin's mind the way the
+    # body did; the slice/random twins below cut the tape short and never close (the live mind lands that think at a later boundary).
+    for _s in specs:
+        if not _s.get("until_seq"):
+            _s["close"] = bool(G.get("closed_whole"))
     # (ix): the first --slice-hours of the tape under 20 random genomes (numbers only, structure fixed) and under the creature's own
     slice_seq = 0
     for r in G["tape"]:
@@ -600,7 +619,7 @@ def main(argv: List[str]) -> int:
         plant_ok = dp is not None; plant_seq = eye["seq"]; R["replay_plant_diverged_at"] = dp
     except Exception as e:
         R["replay_plant_error"] = repr(e)
-    R["REPLAY"] = {"pass": d_live is None and d_two is None and plant_ok is True, "vs_live": d_live, "two_replays": d_two, "mind_rows": len(u1), "hash_masked": sorted(_ign),
+    R["REPLAY"] = {"pass": d_live is None and d_two is None and plant_ok is True, "vs_live": d_live, "two_replays": d_two, "mind_rows": len(u1), "hash_masked": sorted(_ign), "closed_whole": bool(G.get("closed_whole")),
                    "plant_seq": plant_seq, "plant_caught": plant_ok}
     print(f"[REPLAY] {R['REPLAY']}", flush=True)
 
@@ -837,9 +856,9 @@ def main(argv: List[str]) -> int:
     M["SIZING"] = _vl.sizing_mark(st, live, a.sizing_prediction)
     M["GRADE"] = _vl.grade_mark(own["plant"], own["null"], seen, "ANSWER" in decl)      # §19.3 (builder A's graded answer)
     M["SELF"] = _vl.self_mark(tape, bel_rows, live, st, "SELF" in decl)                 # §19.6 (builder A's SELF)
-    _wd = decl.get("WORLD") or {}
-    _cpw = int(float(_wd.get("arrival_every_h", 6)) * 3600 / max(1.0, float(_wd.get("drawn_every_s", 5))))
-    M["SURPRISE"] = _vl.surprise_mark(live, st, _cpw, "SURPRISE" in decl)                # §19.1 (builder B's confirmed glances); windows = the world's arrival period in canvases
+    # edit: Claude (Fable 5.1), 2026-09-22 22:33 +0400 — §19.1 as re-specified: per thing by SOURCE (the eye row's `meta.source` on the tape), the blind-surprise twin's own count
+    _src = {int(r["seq"]): ((r.get("meta") or {}).get("source")) for r in tape if r.get("sense") == "eye"}
+    M["SURPRISE"] = _vl.surprise_mark(live, st, "SURPRISE" in decl, source_of=_src, twin_status=TW.get("blind-surprise"))   # §19.1 (builder B's confirmed glances)
     M["COARSE"] = _vl.coarse_mark(allw, (TW.get("blind-coarse", {}).get("exam") or {}).get("ask_all_words"), bool((getattr(g, "gaze", None) or {}).get("coarse")))   # §19.4
     M["QUESTION"] = _vl.question_mark(live, tape, st, float(a.hours), "QUESTION" in decl)   # §19.7 (builder C's question rows; the world's `answering` rows)
     M["SENTENCE"] = _vl.sentence_mark(tape, st, "SENTENCE" in decl)                        # §19.8 + the ceiling clause (the world's own pair skew)
@@ -1035,11 +1054,11 @@ def write_verdict(out: Path, R: dict) -> None:
             elif _k == "SENTENCE":
                 body = f"missions {m.get('missions')} · the world's max pair lift {m.get('max_lift')} on «{m.get('max_pair')}» · frames filed {m.get('frames_filed')} scored {m.get('frames_scored')} true {m.get('frames_true')} (precision {m.get('precision')}) · said {m.get('said')} heard yes {m.get('heard_yes')} no {m.get('heard_no')} — {m['reason']}"
             elif _k == "SURPRISE":
-                body = (f"overall confirmed share {m.get('overall_share')} · windows rising {m.get('windows_rising')} of {m.get('windows_full')} · new-thing windows {m.get('new_thing_windows')} drops {m.get('drops_at_new_thing_windows')} · STATUS confirmed {m.get('status_confirmed')} surprised {m.get('status_surprised')} — {m['reason']}")
+                body = (f"overall confirmed share {m.get('overall_share')} over {m.get('canvases')} canvases · maker things rising {m.get('things_rising')} of {m.get('things_graded')} (null mean {m.get('null_mean')} p95 {m.get('null_p95')}) · first 500 {m.get('first_500')} → last 500 {m.get('last_500')} (rise {m.get('rise_first_to_last_500')}) · by source {m.get('by_source')} · printed not graded {len(m.get('printed_not_graded') or {})} things · blind-surprise twin confirmed {m.get('twin_confirmed')} · STATUS confirmed {m.get('status_confirmed')} surprised {m.get('status_surprised')} — {m['reason']}")
             elif _k == "COARSE":
                 body = f"Q1 all words {m.get('q1_live')} vs blind-coarse {m.get('q1_blind_coarse')} · house {m.get('house_live')} vs {m.get('house_blind_coarse')} (prediction held {m.get('house_prediction_held')}) · cup {m.get('cup_live')} vs {m.get('cup_blind_coarse')} — {m['reason']}"
             elif _k == "GRADE":
-                body = f"null graded {m['null_graded']} · plant graded {m['plant_graded']} · hedge rate on seen words {m['hedge_rate']} — {m['reason']}"
+                body = f"null graded {m['null_graded']} · plant answered {m.get('plant_answered_rate')} graded {m['plant_graded']} · hedge rate on seen words {m['hedge_rate']} — {m['reason']}"
             elif _k == "SELF":
                 body = f"self beliefs {m['self_beliefs']} (citing two body rows {m['self_beliefs_citing_two_body_rows']}; words {m['self_words']}) · self thinks {m['self_thinks']} · body rows {m['body_rows']} · skipped for backlog {m['think_skipped_for_backlog']} — {m['reason']}"
             elif _k == "ACT":
