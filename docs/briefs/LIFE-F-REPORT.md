@@ -398,4 +398,8 @@ with their numbers, neither tuned or routed around.
 
 ## Commit
 
-Branch `life-hands`, commit sha: **fe9c64c**.
+Branch `life-hands`. Implementation commit: **fe9c64c**. Report follow-up (this doc's own commit-sha
+fill-in): **aa9947c**. Self-review commit (the Addendum's real-jail touch/recognised-share toys and the
+timestamp fix): **d6d36b7** — the final commit this report was written against.
+
+<!-- edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 20:38 +0400 — recorded d6d36b7 as the closing sha. -->
