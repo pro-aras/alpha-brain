@@ -582,6 +582,9 @@ def read_mark(tape: Iterable[dict], journal: Iterable[dict], read_declared: bool
     out.update(graded=True, clause_words_born=ok_words, clause_frames=ok_frames, clause_reading=ok_reading,
                clause_blind_twin=ok_blind, **{"pass": bool(ok_words and ok_frames and ok_reading and ok_blind)},
                reason="graded (ALPHA4-PREREG §5, READ/H)" + ("" if recog_blind is not None else "; the blind twin was not run — that clause FAILS"))
+    return out   # edit: Claude (Fable 5.1), 2026-09-23 03:24 +0400 — restored at integration: the merge matched read_mark's closing `return out` with stage_mark's as shared context and kept ONE (read_mark returned None; five ReadMark tests errored on the merged bytes, none on H's branch)
+
+
 # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:22 +0400 — ALPHA4-PREREG.md §5: WEB and STAGE (I).
 def web_mark(tape: Iterable[dict], journal: Iterable[dict], door_web_declared: bool) -> Dict[str, object]:
     """§5 WEB: fetch counts (made [ok+failed] / refused_rate / refused_hold); every web row traceable to

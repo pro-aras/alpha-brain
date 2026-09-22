@@ -85,7 +85,10 @@ class TestDoorLexiconParses(unittest.TestCase):
         """DOOR is dispatched on args[0], mirroring SENSE/WORLD -- a DOOR variant this branch does not know
         (e.g. builder I's own "web", not yet landed on this branch) must fall through to the generic
         unknown-gene refusal, never be silently accepted by the lexicon branch."""
-        bad = "DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD"
+        # edit: Claude (Fable 5.1), 2026-09-23 03:23 +0400 — the example was builder I's own `DOOR web …` line, which landed at the
+        # merge and is now KNOWN (#232 (c): a test that pins the absence of another lane's feature flips at the merge);
+        # a DOOR word nobody built keeps the fall-through under test.
+        bad = "DOOR     gopher example.org answers what-is by showing"
         with self.assertRaises(GenomeError) as cm:
             parse_genome(_life_plus(bad))
         self.assertIn("unknown gene", str(cm.exception))

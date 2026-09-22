@@ -523,3 +523,30 @@ class TestSnapshotResumeAndOrgUntouched(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SitBoundaryWaitsForTheExamFile(unittest.TestCase):
+    """edit: Claude (Fable 5.1), 2026-09-23 03:25 +0400 — a boundary crossed BEFORE the exam report exists is not spent: the row is
+    published as soon as the report lands; a second boundary with no new report publishes nothing."""
+    def test_boundary_before_the_report_still_publishes_once_the_report_lands(self) -> None:
+        import tempfile, threading, time, json
+        from pathlib import Path
+        from creature.senses import sit as sit_sense
+        root = Path(tempfile.mkdtemp()); (root / "exam").mkdir(); (root / "state").mkdir()
+        genome = root / "g.genome"; genome.write_text(Path(__file__).resolve().parents[2].joinpath("genome", "LIFE.genome").read_text())
+        (root / "state" / "ledger.json").write_text(json.dumps({"moments": 40}))   # the boundary is already crossed
+        published = []; stop = threading.Event()
+        th = threading.Thread(target=sit_sense.sense, args=(lambda s_, p_, m_, e_: published.append(m_) or {"seq": 1}, stop),
+                              kwargs={"root": root, "genome_path": genome, "every_canvases": 5, "poll_period": 0.05}, daemon=True)
+        th.start(); time.sleep(0.4)                      # several polls at the crossed boundary, no report yet
+        self.assertEqual(published, [])
+        (root / "exam" / "2026-09-23T000001Z.json").write_text(json.dumps({"ask_seen_words": {"Q1": {"acc": 0.8}, "composite": 0.9}, "read_share": 0.7}))
+        deadline = time.time() + 5.0
+        while len(published) < 1 and time.time() < deadline:
+            time.sleep(0.05)
+        self.assertEqual(len(published), 1, "the report landed after the boundary: it must still be published")
+        self.assertEqual(published[0]["read_share"], 0.7)
+        (root / "state" / "ledger.json").write_text(json.dumps({"moments": 80}))   # a second boundary, no new report
+        time.sleep(0.4)
+        self.assertEqual(len(published), 1)
+        stop.set(); th.join(timeout=2.0)

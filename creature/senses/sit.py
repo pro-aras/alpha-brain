@@ -88,9 +88,14 @@ def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_ca
                 moments = 0
             canvas_count = moments // max(1, fixations)
             if canvas_count - last_canvas >= every_canvases:
-                last_canvas = canvas_count
+                # edit: Claude (Fable 5.1), 2026-09-23 03:25 +0400 — the boundary is CONSUMED only when a NEW exam file is seen (below); before this
+                # line advanced `last_canvas` first, so a boundary crossed a few seconds before the voice thread had
+                # written its report was spent on nothing and that exam's SIT row waited for the NEXT boundary (500
+                # canvases; at the last one, forever) — #237 (e)'s race, in the sense, not only in its test (the
+                # live-wiring test failed 2 of 3 runs ALONE at load 20 on the merged bytes).
                 latest = _latest_exam_file(exam_dir)
                 if latest is not None and latest.name != last_published_name:
+                    last_canvas = canvas_count
                     try:
                         data = json.loads(latest.read_text())
                     except (json.JSONDecodeError, OSError):
