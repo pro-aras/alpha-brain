@@ -44,6 +44,16 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
     # ---------------------------------------------------------------------------------- the machinery
     "machinery": {
         "CYCLE": "genome/machinery.py:Organism._birth (soft ceiling grow_to*nmax) + genome/sleep.py:cycle (consolidation pass)",
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — L-6 (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # #1/#2): THRESH's own consumer is Organism.moment's push + Organism.own_floor (both gated on
+        # `self.sight.own_band is not None`, itself gated on THRESH's own declared presence at __init__); ANSWER's
+        # is Organism.recall/recall_many's grade/own_floor/resembles_cell computation (gated on "ANSWER" in
+        # declared, side=="sight" only -- own_band tracks sight cells, and `genome/think.py:_nearest_in`'s
+        # algorithm -- the nearest ALIVE sight cell by raw cosine -- is mirrored inline in machinery.py rather
+        # than imported, since genome/think.py imports machinery.Organism and an import the other way would be
+        # circular; raised in the report, not silently substituted).
+        "THRESH": "genome/machinery.py:Organism.moment (the own-band push) + Organism.own_floor (its p5)",
+        "ANSWER": "genome/machinery.py:Organism.recall/recall_many (grade/own_floor/resembles_cell on the sight side)",
     },
     # ---------------------------------------------------------------------------------------- the body
     # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.7 (docs/G4-WAVE3-CLAUSES.md
@@ -113,6 +123,17 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # for a glance whose residual is under the declared floor. Undeclared SURPRISE: predicted stays None, every
         # residual is None, confirm is never True — byte-identical to before this gene existed.
         "SURPRISE": "creature/mind.py:Mind._consume_eye (Organism.expected_sight() + gaze.glances(predicted=) + Organism.moment(confirm=))",
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # #3): SELF's real call sites -- _consume_body records the (reading, seq) pair a "self" pool item
+        # compares; _think_pool appends the "self" kind item (kind-fair with word/sight/due/rule/outcome);
+        # _think_work's "self" branch does the comparison and files the stall/no_room beliefs; _maybe_think
+        # reads the LAST recorded body reading (never the live queue -- replay agrees) to skip+count THINK
+        # while backlog stays over SELF's own threshold.
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — the coordinator's fix (docs/briefs/
+        # LIFE-A-REPORT.md §3 clause 6): the "behind" belief is NOT a comparison (one read the same field/
+        # threshold as the skip and was always preempted by it) -- _maybe_think now tracks a run of skips and
+        # _file_behind_belief() files it at the first think that RUNS after the run.
+        "SELF": "creature/mind.py:Mind._consume_body (records readings) + _think_pool/_think_work ('self' kind, stall/no_room beliefs) + _maybe_think (the backlog skip + the 'behind' belief on resume, via _file_behind_belief)",
     },
 }
 

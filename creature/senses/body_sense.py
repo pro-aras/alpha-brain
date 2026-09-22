@@ -25,6 +25,10 @@ from typing import Callable, Dict, Optional, Sequence
 STATUS_FIELD_MAP: Dict[str, str] = {
     "moments": "moments", "births": "births", "arrivals": "arrivals", "budget_left": "budget_left",
     "refused": "births_refused_budget", "restarts": "sense_restarts", "mind_ms": "mind_ms_median_1min", "rss": "rss_mb",
+    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:00 +0400 — L-9/SELF (docs/briefs/LIFE-A-ANSWER-SELF.md
+    # #3): "backlog" (#236's STATUS.mind_backlog_rows, already landed) and "refused_nmax" (STATUS already
+    # carries births_refused_nmax) -- both new genome words this task's SELF gene reads off the body row.
+    "backlog": "mind_backlog_rows", "refused_nmax": "births_refused_nmax",
 }
 
 

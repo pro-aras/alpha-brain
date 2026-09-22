@@ -83,7 +83,11 @@ class TestExamUnchangedOnTheStandardMind(unittest.TestCase):
     """The regression control for the one-word fix: the exam's stable parts on the standard synthetic mind (test_exam's
     _build_snapshot, seed 4242, n=140; held 5, check_tape 50) hash to the value read under the PRE-FIX code on this box,
     2026-09-22 10:27 +0400, twice (scratch exam_golden.py: run 1 == run 2). A fix that moves this hash changed the ≥ 2-word road."""
-    GOLDEN = "331eb985835e8e20588758a490a0f01d91f4a82d92a930294cdf2de35f2fa575"
+    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:48 +0400 — L-6/ANSWER (docs/briefs/LIFE-A-ANSWER-SELF.md
+    # #2): re-pinned after `ask_glances` gained two ADDITIVE keys (Q1's "hedge_rate", Q5's "graded") -- verified
+    # the move is additive-only: hashing `data` with those two keys stripped out reproduces the PRIOR golden
+    # (331eb985835e8e20588758a490a0f01d91f4a82d92a930294cdf2de35f2fa575) exactly, so no existing computed value moved.
+    GOLDEN = "25e16cd8ddee01ec606205f6d8932633fdb91ea012442791c00a7b8fa6f084f9"
 
     @staticmethod
     def stable_hash(data) -> str:

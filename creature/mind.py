@@ -290,7 +290,36 @@ class Mind:
         self.think_counters: Dict[str, int] = {
             "thinks": 0, "parked": 0, "beliefs": 0, "revisits": 0, "extensions": 0, "clashes": 0,
             "predictions_filed": 0, "predictions_scored": 0,
+            # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — L-9/SELF (docs/briefs/LIFE-A-ANSWER-SELF.md
+            # #3): on STATUS from the FIRST write (#164's law: a new counter is on STATUS on every branch that
+            # writes STATUS, never only once it first moves) via _build_status's existing `**think_counters` spread.
+            "think_skipped_for_backlog": 0,
         }
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — L-9/SELF: the body sense's last TWO
+        # readings (seq, reading dict), oldest first, truncated to 2 -- the pair a "self" think item compares.
+        # `_last_body_reading` is the SINGLE most recent one, read by `_maybe_think`'s backlog-skip gate (never
+        # the live queue -- G-MIND-6's trap and its twin, in one rule: a replay reads the same recorded number
+        # and decides the same). `_self_worked_seq` is the seq of the latest body row a "self" item has already
+        # compared, so the SAME pair is never re-added to the pool on every THINK boundary between body rows
+        # (#232's "starved by a kind that always wins" class, one level down: an item that never leaves the
+        # pool once worked would crowd out every other kind at every future boundary). Neither is in the
+        # snapshot (a pre-existing gap this class shares with `_filed_predictions`/Park/Interests -- named in
+        # the builder report, not fixed here).
+        self._body_pair: List[Tuple[int, dict]] = []
+        self._last_body_reading: Optional[Dict[str, object]] = None
+        self._self_worked_seq: Optional[int] = None
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — the coordinator's fix
+        # (docs/briefs/LIFE-A-REPORT.md §3 clause 6's finding: the backlog-crossing trigger and the backlog
+        # skip read the same field/threshold, so the skip always preempts the boundary that would file it):
+        # "I am behind" is filed at the FIRST think that RUNS after a run of skips, not at a comparison --
+        # so it is tracked here across skips, never inside `_self_trigger`.
+        # `_skip_run_seqs`: the seq of the body row each skip in the CURRENT run read (may repeat if two
+        # skips share one body row); `_skip_run_skips`/`_skip_run_max_backlog`: K and N for the sentence.
+        # Reset to empty/0/None once the run's belief is filed. Read from RECORDED body rows only (never
+        # the live queue), same as the skip itself, so a replay decides identically (G-MIND-6's twin).
+        self._skip_run_seqs: List[int] = []
+        self._skip_run_skips: int = 0
+        self._skip_run_max_backlog: Optional[int] = None
         # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15: the words the ear has ever delivered to a met canvas
         # (sight-only "" never enters). A word not in it OPENS AN ARRIVAL when ARRIVAL is declared (below);
         # rebuilt at resume from the ledger's moment_word so a resumed mind and a replay agree.
@@ -419,16 +448,26 @@ class Mind:
         """BODY-SENSES.md §4.1: "the readings; the DRIVE is the mind's" -- this gene carries no threshold, so
         there is nothing here to compute beyond recording the reading itself as a journal row (the refusal test in
         BODY-SENSES §4.1 -- "count the moments in which any journaled decision differs" -- is satisfied structurally
-        by this row's own presence/absence; RAISED in the report: nothing downstream of this row yet changes THINK's
-        pool or CURIOSITY, so a stricter reading of that clause is not yet met -- no consumer exists to wire it to)."""
+        by this row's own presence/absence).
+        edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 -- L-9/SELF (docs/briefs/LIFE-A-ANSWER-SELF.md
+        #3): the consumer BODY-SENSES.md asked for and this class's own docstring said did not exist yet --
+        gated on SELF's own declared presence (a genome without SELF still just journals the reading, byte-for-
+        byte the pre-SELF behaviour). Records the (seq, reading) pair a "self" think item compares
+        (`_think_pool`/`_think_work`) and the single latest reading `_maybe_think` reads for the backlog skip --
+        both READ from this recorded row, never the live queue, so a replay of the same tape decides the same
+        (G-MIND-6's trap and its own twin, in one rule)."""
         if "SENSE_BODY" not in self.genome.declared:
             return
         if "body" in self.blind:
             self._write_journal(row["at"], {"seq": row["seq"], "body": {"blind": True}})
             return
         meta = row.get("meta") or {}
-        reading = meta.get("reading") or {}
-        self._write_journal(row["at"], {"seq": row["seq"], "body": dict(reading)})
+        reading = dict(meta.get("reading") or {})
+        self._write_journal(row["at"], {"seq": row["seq"], "body": reading})
+        if "SELF" in self.genome.declared:
+            self._body_pair.append((int(row["seq"]), reading))
+            del self._body_pair[:-2]
+            self._last_body_reading = reading
 
     # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:48 +0400 — LIFE-D-ACT-SOUND.md item 3 (L-13).
     def _consume_ear_sound(self, row: Dict[str, object]) -> None:
@@ -995,6 +1034,13 @@ class Mind:
                     continue
                 seen_acts.add(rec["word"])
                 pool.append({"kind": "outcome", "key": rec["word"], "episode": eid, "pred": None})
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — L-9/SELF: a "self" kind item, ONE at
+        # a time, present only once a comparable PAIR of body readings exists and that pair has not already
+        # been worked (`_self_worked_seq` -- else the same comparison would re-enter the pool at every THINK
+        # boundary between body rows, since body arrives far less often than THINK fires). Kind-fair with
+        # word/sight/due/rule/outcome via `_think_choose`'s own kind-first draw -- no special-casing needed.
+        if "SELF" in self.genome.declared and len(self._body_pair) >= 2 and self._body_pair[-1][0] != self._self_worked_seq:
+            pool.append({"kind": "self", "key": "body", "episode": None, "pred": None})
         return pool
 
     def _think_choose(self, pool: list):
@@ -1150,7 +1196,79 @@ class Mind:
                 return dead_end(item["key"], "episode_gone")
             return {"outcome": "reflected", "parked": False, "act": rec["word"], "residual": float(rec["surprise"])}
 
+        if item["kind"] == "self":
+            # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — L-9/SELF (docs/briefs/LIFE-A-ANSWER-SELF.md
+            # #3): the mind reads its own body. Compares the last TWO recorded body readings; on a trigger, files
+            # a belief ("word" encodes which trigger -- believe() carries no separate reason field) with cells=[]
+            # (a self belief names no sight cell -- it is about the mind, not a picture) and the two body rows'
+            # OWN seq numbers as its "episodes" (the citation the toy's own words ask for: "citing the rows").
+            # Marks the pair WORKED regardless of outcome, so an unchanging pair (nothing to report) or a repeat
+            # of the same trigger (a revisit, believe()'s own dedupe) never re-enters the pool on the next THINK
+            # boundary before a NEW body row arrives.
+            (seq1, r1), (seq2, r2) = self._body_pair[-2], self._body_pair[-1]
+            self._self_worked_seq = seq2
+            word = self._self_trigger(r1, r2)
+            if word is None:
+                return {"outcome": "no_change", "parked": False}
+            if not _THINK_LAWS_AVAILABLE:
+                return dead_end(word, "think_laws_unavailable")
+            if "BELIEF" not in self.genome.declared:
+                return dead_end(word, "no_belief_gene")
+            extra_kwargs = {}
+            if "clash_enabled" in _BELIEVE_KWARGS:
+                extra_kwargs["clash_enabled"] = "BELIEF" in self.genome.declared
+            row = think_laws.believe(word, [], [seq1, seq2], self.org.t,
+                                      self.run_root / "state" / "beliefs.jsonl", **extra_kwargs)
+            KIND_TO_COUNTER = {"belief": "beliefs", "revisit": "revisits", "extension": "extensions", "clash": "clashes"}
+            kind = row.get("kind", "belief") if isinstance(row, dict) else "belief"
+            self.think_counters[KIND_TO_COUNTER.get(kind, "beliefs")] += 1
+            return {"outcome": "belief", "parked": False, "belief": row}
+
         return dead_end(str(item.get("key")), "unknown_kind")
+
+    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — L-9/SELF: the two COMPARISON triggers
+    # (stall, no_room), in the plan's order. Each reads only the two given readings (never STATUS, never
+    # the live queue) so a replay of the same recorded pair always decides the same (G-MIND-6's twin).
+    # The THIRD trigger ("I am behind") is NOT a comparison -- see `_file_behind_belief` below and its own
+    # comment: a comparison reading the same field/threshold as the skip is always preempted by the skip
+    # (the report's §3 clause 6 finding); the coordinator's fix files it on RESUME instead.
+    _SELF_STALL_KEYS = ("moments", "births", "arrivals")
+
+    def _self_trigger(self, r1: Dict[str, object], r2: Dict[str, object]) -> Optional[str]:
+        stalled = [k for k in self._SELF_STALL_KEYS if r1.get(k) is not None and r2.get(k) is not None and r1[k] == r2[k]]
+        moved = [k for k in self._SELF_STALL_KEYS if r1.get(k) is not None and r2.get(k) is not None and r1[k] != r2[k]]
+        if stalled and moved:
+            return f"self:{stalled[0]}_stopped"
+        n1, n2 = r1.get("refused_nmax"), r2.get("refused_nmax")
+        if n1 is not None and n2 is not None and n2 > n1:
+            return "self:no_room"
+        return None
+
+    # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — the coordinator's fix (docs/briefs/
+    # LIFE-A-REPORT.md §3 clause 6).
+    def _file_behind_belief(self) -> Dict[str, object]:
+        """L-9/SELF, the coordinator's fix (2026-09-22): "I am behind" fires at the FIRST think that RUNS
+        after a run of skips, never at a crossing -- the crossing and the skip read the SAME recorded
+        field (`_last_body_reading["backlog"]`) against the SAME threshold, so the crossing boundary is
+        always the one the skip claims instead (the unreachable trigger this replaces). Cites the
+        DISTINCT body rows the skips actually read (backlog over the threshold) -- never the resuming,
+        now-under-threshold row, which is not one of them. `cells=[]` (a self belief names no sight cell)."""
+        seqs = sorted(set(self._skip_run_seqs))
+        note = (f"I was behind: max backlog {self._skip_run_max_backlog} rows over "
+                f"{self._skip_run_skips} skipped thinks, from seq {seqs[0] if seqs else None} to seq {seqs[-1] if seqs else None}")
+        if not _THINK_LAWS_AVAILABLE:
+            return {"outcome": "think_laws_unavailable", "note": note}
+        if "BELIEF" not in self.genome.declared:
+            return {"outcome": "no_belief_gene", "note": note}
+        extra_kwargs = {}
+        if "clash_enabled" in _BELIEVE_KWARGS:
+            extra_kwargs["clash_enabled"] = "BELIEF" in self.genome.declared
+        row = think_laws.believe("self:behind", [], seqs, self.org.t,
+                                  self.run_root / "state" / "beliefs.jsonl", **extra_kwargs)
+        KIND_TO_COUNTER = {"belief": "beliefs", "revisit": "revisits", "extension": "extensions", "clash": "clashes"}
+        kind = row.get("kind", "belief") if isinstance(row, dict) else "belief"
+        self.think_counters[KIND_TO_COUNTER.get(kind, "beliefs")] += 1
+        return {"outcome": "belief", "belief": row, "note": note}
 
     def _file_rule(self, row: Dict[str, object], want: str, op: str) -> None:
         """W3-2: predictions.jsonl gets EVERY FILE outcome for a rule — accepted or refused BY NAME
@@ -1194,6 +1312,38 @@ class Mind:
         every = int(self.genome.declared["THINK"]["every"])
         if every <= 0 or self._canvas_index % every != 0:
             return
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — L-9/SELF (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # #3): the ONE decision -- skip THINK entirely (never even building the pool) while the LAST RECORDED body
+        # reading's backlog stays over SELF's own threshold. Read from `_last_body_reading` (written only by
+        # `_consume_body`, never the live queue's own qsize()) so a replay of the same tape makes the same
+        # decision at the same boundary (G-MIND-6's trap: a drive that reads its own live state and lowers its
+        # own work would stabilise on doing nothing, and would decide DIFFERENTLY on a replay that reads the
+        # recording instead of a live queue -- #171's class). A skip is counted, never counted as a think.
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — the coordinator's fix: the run of
+        # skips is tracked (`_skip_run_*`, __init__); the FIRST think that RUNS after a run (the branch below,
+        # still gated on SELF and still read from the recorded row) files the "I am behind" belief and resets
+        # the run -- never a comparison, so it is never preempted by the skip it follows.
+        if "SELF" in self.genome.declared and self._last_body_reading is not None:
+            backlog = self._last_body_reading.get("backlog")
+            threshold = int(self.genome.declared["SELF"]["backlog_threshold"])
+            if backlog is not None and backlog > threshold:
+                self._skip_run_skips += 1
+                seq = self._body_pair[-1][0] if self._body_pair else None
+                if seq is not None:
+                    self._skip_run_seqs.append(seq)
+                self._skip_run_max_backlog = backlog if self._skip_run_max_backlog is None else max(self._skip_run_max_backlog, backlog)
+                self.think_counters["think_skipped_for_backlog"] += 1
+                self._write_journal(row["at"], {"seq": row["seq"], "think": {"item": None, "kind": None, "outcome": "skipped_backlog", "parked": False}})
+                return
+            if self._skip_run_skips > 0:
+                self.think_counters["thinks"] += 1
+                result = self._file_behind_belief()
+                self._write_journal(row["at"], {
+                    "seq": row["seq"],
+                    "think": {"item": "self", "kind": "self", "outcome": result.get("outcome"), "parked": False, "note": result.get("note")},
+                })
+                self._skip_run_seqs = []; self._skip_run_skips = 0; self._skip_run_max_backlog = None
+                return
         pool = self._think_pool()
         item = self._think_choose(pool)
         self.think_counters["thinks"] += 1

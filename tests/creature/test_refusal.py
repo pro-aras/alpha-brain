@@ -186,6 +186,11 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4: one row, matching the
         # genes.py RUNS entry added by this task (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md §4 L-4).
         "SURPRISE": "SURPRISE floor 0.05 predicted mind-cell",
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md):
+        # three rows, matching the three genes.py RUNS entries added by this task.
+        "THRESH": "THRESH   cell own band history 30",
+        "ANSWER": "ANSWER   resembles under own-band; unknown below 0.911",
+        "SELF": "SELF     from body; beliefs about itself; skip thinks when backlog > 200",
     }
 
     def test_every_runs_gene_parses(self) -> None:

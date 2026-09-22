@@ -43,6 +43,22 @@ def _feat(org: Organism, pic: np.ndarray) -> np.ndarray:
     return retina(pic, org.g.retina)
 
 
+# edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:47 +0400 — L-6/ANSWER (docs/briefs/LIFE-A-ANSWER-SELF.md
+# #2): one shared bucket for a `recall`/`recall_many` result's grade, used by Q1's hedge rate and every
+# Q5/plant/null "graded" count below. `grade is None` (ANSWER undeclared) degenerates to the pre-ANSWER
+# reading: a real answer is "sure_bare", an abstain is "abstain" — so every count below is well-defined
+# (all zero in the categories ANSWER would have populated) whether or not the gene is declared.
+def _grade_bucket(r: Dict[str, object]) -> str:
+    grade = r.get("grade")
+    if r["cell"] is not None:
+        return "unsure" if grade == "unsure" else "sure_bare"
+    return "abstain_with_resemblance" if grade in ("sure", "unsure") else "abstain"
+
+
+def _new_graded_counts() -> Dict[str, int]:
+    return {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 0, "abstain": 0}
+
+
 def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: Dict[str, List[np.ndarray]],
         never: Dict[str, List[np.ndarray]], blank_zero: bool = False) -> Dict[str, object]:
     """Q1–Q5 on held-out renderings of `things`; Q5 on `never` (things never shown). Returns every
@@ -58,7 +74,7 @@ def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: 
 
     # Q1 — what is this?  a held-out picture → the strongest edge from the lit sight cell into words
     q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; per = {t: [0, 0] for t in things}
-    multi = 0
+    multi = 0; q1_hedged = 0        # L-6: the "unsure" share among the CORRECT answers -- the hedge rate
     for t in things:
         for pic in held[t]:
             r = org.recall("sight", _feat(org, pic)); q1_n += 1; per[t][1] += 1
@@ -67,10 +83,12 @@ def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: 
             else:
                 ans = Lw.get(r["cell"], set())
                 if len(ans) > 1: multi += 1
-                if ans == {t}: q1_ok += 1; per[t][0] += 1
+                if ans == {t}:
+                    q1_ok += 1; per[t][0] += 1
+                    if _grade_bucket(r) == "unsure": q1_hedged += 1
     out["Q1"] = {"acc": q1_ok / q1_n, "n": q1_n, "correct": q1_ok, "abstain": q1_abst,
                  "false_abstention": sum(q1_abst.values()) / q1_n, "per_thing": {t: v[0] / v[1] for t, v in per.items()},
-                 "answers_from_multi_word_cells": multi}
+                 "answers_from_multi_word_cells": multi, "hedge_rate": (q1_hedged / q1_ok) if q1_ok else None}
 
     # Q2 — show me a «word»  a word → the strongest edge from its cell into sight; scored by the cell's thing
     q2_ok = 0; q2_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; q2_detail = {}
@@ -111,13 +129,14 @@ def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: 
     # Q5 — a thing never shown: must abstain
     q5 = {}
     for name, pics in never.items():
-        abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}
+        abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}; graded = _new_graded_counts()
         for pic in pics:
             r = org.recall("sight", _feat(org, pic))
+            graded[_grade_bucket(r)] += 1
             if r["cell"] is None: abst[r["reason"]] += 1
             else:
                 a = "/".join(sorted(Lw.get(r["cell"], set()))); answered[a] = answered.get(a, 0) + 1
-        q5[name] = {"abstain_rate": sum(abst.values()) / len(pics), "n": len(pics), "abstain": abst, "answered_as": answered}
+        q5[name] = {"abstain_rate": sum(abst.values()) / len(pics), "n": len(pics), "abstain": abst, "answered_as": answered, "graded": graded}
     out["Q5"] = q5
     out["composite"] = float(np.mean([out["Q1"]["acc"], out["Q2"]["acc"], out["Q3"]["acc"], out["Q4"]["acc"]]))
     return out
@@ -125,14 +144,15 @@ def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: 
 
 def ask_plant(org: Organism, ledgers: Dict[str, Ledger], word: str, pics: List[np.ndarray]) -> Dict[str, object]:
     """The plant («zog», shown 5 times) must be ANSWERED; the null plant («vex», shown 0 times) must abstain."""
-    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}
+    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}; graded = _new_graded_counts()
     for pic in pics:
         r = org.recall("sight", _feat(org, pic))
+        graded[_grade_bucket(r)] += 1
         if r["cell"] is None: abst[r["reason"]] += 1
         else:
             a = "/".join(sorted(Lw.get(r["cell"], set()))); answered[a] = answered.get(a, 0) + 1
             if Lw.get(r["cell"], set()) == {word}: ok += 1
-    return {"answered_rate": ok / len(pics), "abstain_rate": sum(abst.values()) / len(pics), "n": len(pics), "abstain": abst, "answered_as": answered}
+    return {"answered_rate": ok / len(pics), "abstain_rate": sum(abst.values()) / len(pics), "n": len(pics), "abstain": abst, "answered_as": answered, "graded": graded}
 
 
 # ============================================================================ G1: questions over GLANCES
@@ -152,6 +172,7 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
         raise ValueError(f"the exam needs at least two things (Q3/Q4 draw a distractor from the others); got {list(things)!r}")
     out: Dict[str, object] = {}
     q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; per = {t: [0, 0] for t in things}; multi = 0
+    q1_hedged = 0        # L-6: the "unsure" share among the CORRECT answers -- the hedge rate
     for t in things:
         for xs in held[t]:
             r = org.recall_many("sight", xs); q1_n += 1; per[t][1] += 1
@@ -160,10 +181,12 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
             else:
                 ans = Lw.get(r["cell"], set())
                 if len(ans) > 1: multi += 1
-                if ans == {t}: q1_ok += 1; per[t][0] += 1
+                if ans == {t}:
+                    q1_ok += 1; per[t][0] += 1
+                    if _grade_bucket(r) == "unsure": q1_hedged += 1
     out["Q1"] = {"acc": q1_ok / q1_n if q1_n else 0.0, "n": q1_n, "correct": q1_ok, "abstain": q1_abst,
                  "false_abstention": (sum(q1_abst.values()) / q1_n) if q1_n else 0.0, "per_thing": {t: (v[0] / v[1]) if v[1] else 0.0 for t, v in per.items()},
-                 "answers_from_multi_word_cells": multi}
+                 "answers_from_multi_word_cells": multi, "hedge_rate": (q1_hedged / q1_ok) if q1_ok else None}
     q2_ok = 0; q2_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; q2_detail = {}
     for t in things:
         r = org.recall_many("words", [world.encode_word(t, blank_zero)])
@@ -196,27 +219,29 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
     out["Q4"] = {"acc": q4_ok / q4_n if q4_n else 0.0, "n": q4_n, "correct": q4_ok, "ties": q4_ties}
     q5 = {}
     for name, rows in never.items():
-        abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}
+        abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}; graded = _new_graded_counts()
         for xs in rows:
             r = org.recall_many("sight", xs)
+            graded[_grade_bucket(r)] += 1
             if r["cell"] is None: abst[r["reason"]] += 1
             else:
                 a = "/".join(sorted(Lw.get(r["cell"], set()))); answered[a] = answered.get(a, 0) + 1
-        q5[name] = {"abstain_rate": (sum(abst.values()) / len(rows)) if rows else 0.0, "n": len(rows), "abstain": abst, "answered_as": answered}
+        q5[name] = {"abstain_rate": (sum(abst.values()) / len(rows)) if rows else 0.0, "n": len(rows), "abstain": abst, "answered_as": answered, "graded": graded}
     out["Q5"] = q5
     out["composite"] = float(np.mean([out["Q1"]["acc"], out["Q2"]["acc"], out["Q3"]["acc"], out["Q4"]["acc"]]))
     return out
 
 
 def ask_plant_glances(org: Organism, ledgers: Dict[str, Ledger], word: str, rows: List[List[np.ndarray]]) -> Dict[str, object]:
-    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}
+    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}; graded = _new_graded_counts()
     for xs in rows:
         r = org.recall_many("sight", xs)
+        graded[_grade_bucket(r)] += 1
         if r["cell"] is None: abst[r["reason"]] += 1
         else:
             a = "/".join(sorted(Lw.get(r["cell"], set()))); answered[a] = answered.get(a, 0) + 1
             if Lw.get(r["cell"], set()) == {word}: ok += 1
-    return {"answered_rate": ok / len(rows) if rows else 0.0, "abstain_rate": (sum(abst.values()) / len(rows)) if rows else 0.0, "n": len(rows), "abstain": abst, "answered_as": answered}
+    return {"answered_rate": ok / len(rows) if rows else 0.0, "abstain_rate": (sum(abst.values()) / len(rows)) if rows else 0.0, "n": len(rows), "abstain": abst, "answered_as": answered, "graded": graded}
 
 
 # ============================================================================ B5: «why» — the record behind an answer

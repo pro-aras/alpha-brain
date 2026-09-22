@@ -19,7 +19,7 @@ SURPRISE floor 0.05 predicted mind-cell                            # DRAFT (buil
 DELIVER  where fixation when instant act glance
 SENSE    ear    letters 8
 SENSE    colour rg by 4x4 under the glance fixed-gain
-SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss backlog   # DRAFT (builder A): + backlog (#236)
+SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss backlog refused_nmax   # DRAFT (builder A): + backlog (#236); + refused_nmax (L-9/SELF's «I have no room» trigger needs it; STATUS already carries births_refused_nmax)
 SENSE    ear-sound wav 16000 mono                                  # DRAFT (builder D, L-13): consumed into FAST; its own AREA is rung 2 (the world's voice)
 SENSE    smell kind size folder age                                # DRAFT (builder F, L-12): the folder door's cheap channel before a picture is opened
 SENSE    touch from hands: exit rate stalls retries bytes          # DRAFT (builder F, L-12): the hands' door

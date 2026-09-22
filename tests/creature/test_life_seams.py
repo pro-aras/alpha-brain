@@ -21,7 +21,22 @@ def _worker_obeys():
 class LifeSeams(unittest.TestCase):
     @unittest.skipUnless(_wired("THRESH", "SURPRISE"), "A x B not landed")
     def test_AxB_a_confirmed_glance_does_not_update_a_cells_own_band(self):
-        self.fail("fill at the landing: a moment with confirmed=True must leave THRESH's history untouched (a confirmation is not an answer)")
+        # filled at A's landing (Claude (Fable 5.1), 2026-09-22 19:51 +0400): a CONFIRMED moment (B's cheap moment) is not an ANSWER (A's band push) —
+        # the cell's own band must be untouched by confirmations, or the band fills with the confirmed (high) cosines and the p5 floor
+        # drifts up, turning honest answers into hedges. The same moment unconfirmed, with the cell's established answer, DOES push.
+        import numpy as np
+        from genome.machinery import parse_genome, Organism
+        text = (TREE / "genome" / "G5.genome").read_text().replace("NMAX     2000", "NMAX     64").replace("#OFF SURPRISE floor 0.05", "SURPRISE floor 0.05 predicted mind-cell") + "\nTHRESH   cell own band history 30\n"
+        g = parse_genome(text); org = Organism(g)
+        rng = np.random.default_rng(3); x = rng.standard_normal(g.sight_dim()).astype(np.float32); x /= np.linalg.norm(x)
+        w = np.zeros(g.words_dim(), dtype=np.float32); w[0] = 1.0
+        org.t = int(g.stage2_start)                      # past STAGE 1 so the wiring runs
+        for _ in range(6): org.moment(x, w)              # births + wires: the cell's established answer becomes word 0
+        n_before = int(org.sight.own_band_n.sum())
+        org.moment(x, w, confirm=True)                   # B's cheap moment on the same glance
+        self.assertEqual(int(org.sight.own_band_n.sum()), n_before, "a confirmed glance pushed the cell's own band")
+        org.moment(x, w)                                 # the same glance, unconfirmed, answered correctly → one push
+        self.assertEqual(int(org.sight.own_band_n.sum()), n_before + 1)
 
     @unittest.skipUnless(_wired("SURPRISE", "SELF") and "lands next boundary" in (TREE / "genome" / "machinery.py").read_text(errors="replace"), "B x E not landed")
     def test_BxE_the_coarse_row_and_the_confirmed_flag_are_in_the_thinks_frozen_copy(self):
