@@ -143,6 +143,56 @@ def self_mark(tape: Iterable[dict], beliefs: Iterable[dict], journal: Iterable[d
     return out
 
 
+def surprise_mark(journal: Iterable[dict], status: dict, canvases_per_window: int, surprise_declared: bool) -> Dict[str, object]:
+    """PREREG §19.1 (builder B's shapes: `confirmed` on every eye moment row; STATUS glances_confirmed/glances_surprised): the
+    confirmed share RISES within each window (second half > first half in ≥ 2/3 of the windows with ≥ 100 canvases) and DROPS at
+    every window that brings new words (the first 100 canvases after the boundary under the last 100 before it). Windows are
+    `canvases_per_window` canvases of glance-0 rows in tape order (the world's arrival period). Not gradable without the field."""
+    canv = [j for j in journal if "moment" in j and j.get("glance") == 0]
+    if not surprise_declared or not canv or not any("confirmed" in j for j in canv):
+        return {"graded": False, "pass": None, "reason": "not gradable: SURPRISE not declared / no `confirmed` field on the moment rows",
+                "bar": "share rises in ≥ 2/3 of windows · drops at every new-thing window"}
+    W = max(1, int(canvases_per_window)); n = len(canv)
+    windows = [canv[i:i + W] for i in range(0, n, W)]
+    seen: set = set(); new_thing_windows: List[int] = []
+    shares: List[dict] = []
+    for w, rows in enumerate(windows):
+        head = rows[:max(1, len(rows) // 20)]
+        new = [j["word"] for j in head if j.get("word") and j["word"] not in seen]
+        for j in rows:
+            if j.get("word"): seen.add(j["word"])
+        if w > 0 and new: new_thing_windows.append(w)
+        h = len(rows) // 2
+        s1 = sum(1 for j in rows[:h] if j.get("confirmed")) / max(1, h); s2 = sum(1 for j in rows[h:] if j.get("confirmed")) / max(1, len(rows) - h)
+        shares.append({"window": w, "canvases": len(rows), "first_half": round(s1, 4), "second_half": round(s2, 4), "new_words": new[:5]})
+    full = [s for s in shares if s["canvases"] >= 100]
+    rising = sum(1 for s in full if s["second_half"] > s["first_half"])
+    drops = {}
+    for w in new_thing_windows:
+        before = windows[w - 1][-100:]; after = windows[w][:100]
+        sb = sum(1 for j in before if j.get("confirmed")) / max(1, len(before)); sa = sum(1 for j in after if j.get("confirmed")) / max(1, len(after))
+        drops[w] = {"before": round(sb, 4), "after": round(sa, 4), "dropped": sa < sb}
+    ok = bool(full) and rising * 3 >= 2 * len(full) and all(d["dropped"] for d in drops.values())
+    return {"graded": True, "pass": ok, "windows": shares, "windows_rising": rising, "windows_full": len(full), "new_thing_windows": new_thing_windows,
+            "drops_at_new_thing_windows": drops, "overall_share": round(sum(1 for j in canv if j.get("confirmed")) / n, 4),
+            "status_confirmed": status.get("glances_confirmed", "not recorded"), "status_surprised": status.get("glances_surprised", "not recorded"),
+            "reason": "graded (§19.1)", "bar": "share rises in ≥ 2/3 of windows · drops at every new-thing window"}
+
+
+def coarse_mark(live_allw: dict, twin_allw: Optional[dict], coarse_declared: bool) -> Dict[str, object]:
+    """PREREG §19.4: Q1 on all words ≥ 0.975 (G-EYE-2's bar) beside the blind-coarse twin; the PREDICTION printed: house ≥ 0.8 live where
+    the twin reads < 0.6; cup printed, no bar. Not gradable without the gene or the twin's exam."""
+    q1 = ((live_allw or {}).get("Q1") or {}); tq1 = ((twin_allw or {}).get("Q1") or {}) if twin_allw else {}
+    if not coarse_declared or q1.get("acc") is None or tq1.get("acc") is None:
+        return {"graded": False, "pass": None, "reason": "not gradable: GAZE coarse not declared / no blind-coarse twin exam", "bar": "Q1 all words ≥ 0.975 beside the blind-coarse twin; house ≥ 0.8 vs twin < 0.6 (a prediction)"}
+    per = q1.get("per_thing") or {}; tper = tq1.get("per_thing") or {}
+    house, thouse = per.get("house"), tper.get("house")
+    held = (house is not None and thouse is not None and house >= 0.8 and thouse < 0.6)
+    return {"graded": True, "pass": float(q1["acc"]) >= 0.975, "q1_live": q1["acc"], "q1_blind_coarse": tq1["acc"], "house_live": house, "house_blind_coarse": thouse,
+            "house_prediction_held": held if (house is not None and thouse is not None) else None, "cup_live": per.get("cup"), "cup_blind_coarse": tper.get("cup"),
+            "reason": "graded (§19.4)", "bar": "Q1 all words ≥ 0.975 beside the blind-coarse twin; house ≥ 0.8 vs twin < 0.6 (a prediction)"}
+
+
 def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[float], plant_word: str = "zog") -> Dict[str, object]:
     """PREREG §19.11: sight born by 24 h within [0.5×, 1.5×] of the pre-flight's prediction; births_refused_nmax 0; the plant birthed ≥ 1
     sight cell. The per-hour sight-births SERIES is on the record (#233's instrument). Not gradable without a prediction or an older body."""

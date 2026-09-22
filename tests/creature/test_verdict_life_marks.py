@@ -110,5 +110,53 @@ class SelfMark(unittest.TestCase):
         self.assertFalse(self_mark(tape, [], journal, {}, True)["pass"])
 
 
+def _moments(shares_by_window, canvases_per_window=200, words=("circle",), new_words_at=()):
+    """journal moment rows: one row per canvas (glance 0 only, for brevity) with `confirmed` drawn deterministically to hit each
+    window's (first-half, second-half) shares; `when` marks the hour; new words first appear at the given window indexes."""
+    rows = []; seq = 0
+    for w, (s1, s2) in enumerate(shares_by_window):
+        for c in range(canvases_per_window):
+            half = 0 if c < canvases_per_window // 2 else 1
+            share = (s1, s2)[half]
+            confirmed = (c % 100) < int(round(share * 100))
+            word = f"new{w}" if (w in new_words_at and c < 5) else words[c % len(words)]
+            rows.append({"seq": seq, "moment": f"w{w:04d}i{c:06d}", "word": word, "when": f"2026-09-23T{(w * 4) % 24:02d}:{(c * 60 // canvases_per_window) % 60:02d}:00Z",
+                         "glance": 0, "confirmed": confirmed, "residual": 0.0 if confirmed else 0.3, "births": []}); seq += 1
+    return rows
+
+
+class SurpriseMark(unittest.TestCase):
+    """PREREG §19.1 against builder B's shapes: `confirmed` on every eye moment row; STATUS glances_confirmed/glances_surprised."""
+
+    def test_not_gradable_without_confirmed_rows(self):
+        from tools.verdict_life import surprise_mark
+        self.assertFalse(surprise_mark([{"seq": 1, "moment": "a", "glance": 0, "word": "x"}], {}, 200, True)["graded"])
+        self.assertFalse(surprise_mark(_moments([(0.4, 0.6)]), {}, 200, False)["graded"])
+
+    def test_rises_within_windows_and_drops_at_new_thing_boundaries(self):
+        from tools.verdict_life import surprise_mark
+        rows = _moments([(0.40, 0.60), (0.30, 0.55), (0.45, 0.62), (0.35, 0.58), (0.44, 0.61), (0.36, 0.57)], new_words_at=(1, 3))
+        m = surprise_mark(rows, {"glances_confirmed": 10, "glances_surprised": 10}, 200, True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["windows_rising"], 6); self.assertEqual(sorted(m["new_thing_windows"]), [1, 3])
+        flat = surprise_mark(_moments([(0.5, 0.5)] * 6, new_words_at=(1,)), {}, 200, True)
+        self.assertTrue(flat["graded"]); self.assertFalse(flat["pass"])
+
+
+class CoarseMark(unittest.TestCase):
+    """PREREG §19.4: Q1 on all words ≥ 0.975 beside the blind-coarse twin; the house prediction printed."""
+
+    def test_not_gradable_without_the_gene_or_the_twin(self):
+        from tools.verdict_life import coarse_mark
+        self.assertFalse(coarse_mark({"Q1": {"acc": 0.98, "per_thing": {"house": 0.9}}}, None, True)["graded"])
+        self.assertFalse(coarse_mark({"Q1": {"acc": 0.98, "per_thing": {}}}, {"Q1": {"acc": 0.9, "per_thing": {}}}, False)["graded"])
+
+    def test_bar_and_the_house_prediction(self):
+        from tools.verdict_life import coarse_mark
+        live = {"Q1": {"acc": 0.98, "per_thing": {"house": 0.9, "cup": 0.3}}}; twin = {"Q1": {"acc": 0.95, "per_thing": {"house": 0.5, "cup": 0.3}}}
+        m = coarse_mark(live, twin, True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertTrue(m["house_prediction_held"]); self.assertEqual(m["cup_live"], 0.3)
+        self.assertFalse(coarse_mark({"Q1": {"acc": 0.96, "per_thing": {}}}, twin, True)["pass"])
+
+
 if __name__ == "__main__":
     unittest.main()
