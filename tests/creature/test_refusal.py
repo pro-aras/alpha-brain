@@ -82,28 +82,55 @@ class TestInduceNowWired(unittest.TestCase):
         self.assertIn("INDUCE", genome.declared, "G4.genome's INDUCE line is ON since life 3 (PREREG §18) -- must parse")   # edit: Claude (Fable 5.1), 2026-09-21 15:38 +0400 — the premise flipped at 13:14 when INDUCE went ON; the pin had not moved
 
 
-class TestSentenceRefusal(unittest.TestCase):
-    """(b)'s new example (INDUCE's old role, above, is now a positive control): SENTENCE parses
-    (machinery.py's clause exists) but has NO interpreter anywhere -- refuses, naming SENTENCE and
-    nothing else (mirrors the old INDUCE toy exactly)."""
+class TestSentenceNowWired(unittest.TestCase):
+    """(b), FLIPPED a second time (L-11, docs/briefs/LIFE-C-QUESTION-SENTENCE.md task 3; mirrors
+    TestInduceNowWired above exactly): SENTENCE now has a real interpreter -- creature/mind.py's
+    `_think_pool`/`_think_work` call `genome.sentence.find_frames()` for episodes carrying >= 2
+    words_in_instant and file the result -- a genome declaring the NEW line must START, not refuse. The
+    refusal's own negative-control role for 'a gene with no interpreter' moves to TRAITS (still
+    uninterpreted, PREREG §12/§14's own finding, genes.py:TRAITS = None)."""
 
-    def test_sentence_line_refuses_naming_sentence(self) -> None:
+    def test_sentence_line_starts(self) -> None:
         root = _tmp()
-        text = G4_GENOME.read_text() + "SENTENCE two-word frames is near under-judge\n"
+        text = G4_GENOME.read_text() + "SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token\n"
         genome_path = root / "G4-plus-sentence.genome"
+        genome_path.write_text(text)
+        mind = Mind(genome_path, root / "run")   # must not raise
+        self.assertIn("SENTENCE", mind.genome.declared)
+
+    def test_sentence_old_line_no_longer_parses(self) -> None:
+        """The old literal was REPLACED, not extended (L-11): it must now refuse as an unrecognised value,
+        not silently keep parsing to the old declared shape."""
+        with self.assertRaises(GenomeError):
+            parse_genome("SEED 1\nSENTENCE two-word frames is near under-judge\n")
+
+    def test_sentence_hash_off_line_alone_does_not_refuse(self) -> None:
+        genome = parse_genome(G4_GENOME.read_text())
+        self.assertNotIn("SENTENCE", genome.declared, "G4.genome's own SENTENCE line is #OFF -- must not parse")
+
+
+class TestTraitsRefusal(unittest.TestCase):
+    """(b)'s new example (SENTENCE's old role, above, is now a positive control): TRAITS parses
+    (machinery.py's clause exists) but has NO interpreter anywhere (genes.py: RUNS["mind"]["TRAITS"] =
+    None) -- refuses, naming TRAITS and nothing else (mirrors the old INDUCE/SENTENCE toy exactly)."""
+
+    def test_traits_line_refuses_naming_traits(self) -> None:
+        root = _tmp()
+        text = G4_GENOME.read_text() + "TRAITS   contrast head 32 lr 0.01 at sleep\n"
+        genome_path = root / "G4-plus-traits.genome"
         genome_path.write_text(text)
         with self.assertRaises(GenomeError) as ctx:
             Mind(genome_path, root / "run")
         msg = str(ctx.exception)
-        self.assertIn("SENTENCE", msg)
+        self.assertIn("TRAITS", msg)
         # every gene G4.genome ALREADY declares must still be considered wired -- only the new one is named
         for other in ("BODY", "TAPE", "HEART", "CRASH", "FAST", "SLEEP", "PREDICT", "FILE", "CURIOSITY",
                       "PARK", "BELIEF", "THINK", "EXAM", "FROZEN", "ARRIVAL", "CYCLE", "WORLD", "ASK"):
             self.assertNotIn(other, msg, f"{other} was already wired on G4.genome; it must not appear in this refusal")
 
-    def test_sentence_hash_off_line_alone_does_not_refuse(self) -> None:
+    def test_traits_hash_off_line_alone_does_not_refuse(self) -> None:
         genome = parse_genome(G4_GENOME.read_text())
-        self.assertNotIn("SENTENCE", genome.declared, "G4.genome's own SENTENCE line is #OFF -- must not parse")
+        self.assertNotIn("TRAITS", genome.declared, "G4.genome's own TRAITS line is #OFF -- must not parse")
 
 
 class TestPlantedControl(unittest.TestCase):
@@ -191,6 +218,11 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "THRESH": "THRESH   cell own band history 30",
         "ANSWER": "ANSWER   resembles under own-band; unknown below 0.911",
         "SELF": "SELF     from body; beliefs about itself; skip thinks when backlog > 200",
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10/L-11: three rows, matching
+        # the three genes.py RUNS entries added by this task (docs/briefs/LIFE-C-QUESTION-SENTENCE.md).
+        "SENTENCE": "SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token",
+        "QUESTION": "QUESTION from wants; forms what-is is which; to the world door",
+        "MOUTH": "MOUTH    say one frame per think; journaled",
     }
 
     def test_every_runs_gene_parses(self) -> None:

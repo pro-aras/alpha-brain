@@ -328,9 +328,32 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"BELIEF: cannot read {a!r} (row 4b: BELIEF clash opens never overwrites)")
                 g["declared"]["BELIEF"] = {"clash": "opens", "overwrite": False}
             elif gene == "SENTENCE":
-                m = re.fullmatch(r"two-word frames is near under-judge", a)
-                if not m: raise GenomeError(f"SENTENCE: cannot read {a!r} (row 5b: SENTENCE two-word frames is near under-judge)")
-                g["declared"]["SENTENCE"] = {"frames": ["is", "near"], "judged": True}
+                # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 (docs/briefs/
+                # LIFE-C-QUESTION-SENTENCE.md task 3; NEXT-LIFE-PLAN-2026-09-22.md §4 L-11): the OLD line
+                # ("two-word frames is near under-judge" — its own "is" condition unreachable by
+                # construction, MIND-THINKING-LANGUAGE.md §4.7) is REPLACED, not extended, by the new one:
+                # a frame is now two words that met in ONE instant, judged by the eye's own recall, never
+                # next-token. The old literal no longer parses -- a genome carrying it refuses exactly like
+                # any other unknown value (tests/genome/G4-draft.genome and test_parse_g4.py's own fixture
+                # updated alongside this line, in the same commit).
+                m = re.fullmatch(r"two-word frames from co-occurring words; judged by the eye; never next-token", a)
+                if not m: raise GenomeError(f"SENTENCE: cannot read {a!r} (L-11: SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token)")
+                g["declared"]["SENTENCE"] = {"frames": "co-occurring", "judged": "eye", "next_token": False}
+            elif gene == "QUESTION":
+                # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10 (docs/briefs/
+                # LIFE-C-QUESTION-SENTENCE.md task 1; NEXT-LIFE-PLAN-2026-09-22.md §4 L-10): a want (a
+                # wordless sight seen twice, a rule that failed once, a belief clash, or PARK parking one)
+                # writes ONE question to the world door.
+                m = re.fullmatch(r"from wants; forms what-is is which; to the world door", a)
+                if not m: raise GenomeError(f"QUESTION: cannot read {a!r} (L-10: QUESTION from wants; forms what-is is which; to the world door)")
+                g["declared"]["QUESTION"] = {"source": "wants", "forms": ["what-is", "is", "which"], "to": "world door"}
+            elif gene == "MOUTH":
+                # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 (docs/briefs/
+                # LIFE-C-QUESTION-SENTENCE.md task 4; MOTOR-HANDS.md G-MOT-6): says one filed, CITED frame
+                # per think; an uncited frame is refused by name, never said.
+                m = re.fullmatch(r"say one frame per think; journaled", a)
+                if not m: raise GenomeError(f"MOUTH: cannot read {a!r} (L-11: MOUTH say one frame per think; journaled)")
+                g["declared"]["MOUTH"] = {"say": "one frame per think", "journaled": True}
             elif gene == "WORLD" and (not args or args[0] != "game"):
                 m = re.fullmatch(r"drawn every (\d+) s arrivals every (\d+) h; folder ([A-Za-z0-9_./-]+); web (\d+) per hour by curiosity", a)
                 if not m: raise GenomeError(f"WORLD: cannot read {a!r} (row 8: WORLD drawn every <n> s arrivals every <h> h; folder <p>; web <k> per hour by curiosity)")

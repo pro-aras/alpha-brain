@@ -115,6 +115,13 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # the real call site is _bind_pool() (module-level, top of creature/mind.py) + its use in Mind._consume_eye,
         # gated on "BIND" in declared, both branches (word-bearing and sight-only).
         "BIND": "creature/mind.py:_bind_pool + Mind._consume_eye (org_feats = _bind_pool(g['feats']) when declared; org.moment/moment_sight called once per canvas instead of once per glance)",
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10/L-11 (docs/briefs/LIFE-C-QUESTION-SENTENCE.md):
+        # three rows, real call sites each. SENTENCE was previously declared-and-parsed with NO consumer (the
+        # unreachable "is near" clause, MIND-THINKING-LANGUAGE.md §4.7); it is now wired against the new co-occurrence
+        # definition, and its OLD line no longer parses (genome/machinery.py's own regex replaced, not extended).
+        "SENTENCE": "creature/mind.py:_think_pool/_think_work ('frame' pool items via genome.sentence.find_frames() over episodes with >=2 words_in_instant; filed through FILE; _score_due_predictions grades a frame when w1 recurs, judged by the mind's own recall(sight) against w2's word-cell)",
+        "QUESTION": "creature/mind.py:_maybe_ask (a want -- a parked wordless sight, a rule/frame that failed once, a belief clash, or PARK actually parking one -- writes ONE run/ask/out/q-<n>.json row; ASKED.json ledger dedupes) + creature/world_maker.py:sense (the door polls ask/out, answers a what-is on a canvas it drew by showing the thing again with its word)",
+        "MOUTH": "creature/mind.py:_maybe_say (a filed, CITED frame whose w1 is in the current instant's words_in_instant is said: a journal 'say' row + an ask/out 'is' row, judged synchronously by the mind's own recall — an uncited frame is refused by name, never said)",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
         # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
         # §4): a real call site, gated on SURPRISE's own presence — creature/mind.py:Mind._consume_eye computes

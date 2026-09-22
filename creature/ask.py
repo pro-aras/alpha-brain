@@ -126,6 +126,11 @@ def answer(run_root: Path, q: str, args: List[str]) -> str:
 
 def _args_for(req: Dict[str, object]) -> List[str]:
     q = req["q"]
+    # edit: Claude (Fable 5.1), 2026-09-22 20:08 +0400 — the A×C SEAM (tests/creature/test_life_seams.py): a question the MIND writes (creature/mind.py:
+    # _write_ask_out, `args` as a list) is answerable by the same door the human inbox uses (pic/word keys). Found by the seam test
+    # on the merged bytes (KeyError 'pic'); a row carrying `args` is taken as written, the inbox keys unchanged.
+    if isinstance(req.get("args"), list):
+        return [str(x) for x in req["args"]]
     if q == "what-is":
         return [str(req["pic"])]
     if q == "show":

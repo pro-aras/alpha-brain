@@ -95,19 +95,22 @@ class TestSenseThreadPublishesRows(unittest.TestCase):
         t.start()
         deadline = time.time() + 15.0
         rows = []
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: TWO ear rows per
+        # manifest now (colour + object), so 5 manifests -> 1 reset (2 ear + 1 eye) + 4 stepped (2 ear + 1
+        # eye + 1 outcome) = 3 + 4*4 = 19 (was 14 with one ear row per manifest).
         while time.time() < deadline:
             rows = _game_rows(root)
-            if len(rows) >= 14:   # 5 manifests: 1 reset (ear+eye, no outcome) + 4 stepped (ear+eye+outcome) = 2 + 12 = 14
+            if len(rows) >= 19:
                 break
             time.sleep(0.1)
         time.sleep(0.3)
         stop_event.set(); t.join(timeout=5.0)
 
-        self.assertEqual(len(rows), 14, f"expected 14 rows (1 reset x 2 + 4 steps x 3), got {len(rows)}: {[r['sense'] for r in rows]}")
+        self.assertEqual(len(rows), 19, f"expected 19 rows (1 reset x 3 + 4 steps x 4), got {len(rows)}: {[r['sense'] for r in rows]}")
         ears = [r for r in rows if r["sense"] == "ear"]
         eyes = [r for r in rows if r["sense"] == "eye"]
         outs = [r for r in rows if r["sense"] == "outcome"]
-        self.assertEqual(len(ears), 5)
+        self.assertEqual(len(ears), 10, "2 ear rows (colour, object) per manifest x 5 manifests")
         self.assertEqual(len(eyes), 5)
         self.assertEqual(len(outs), 4)
 
@@ -116,6 +119,20 @@ class TestSenseThreadPublishesRows(unittest.TestCase):
             self.assertIn("mission", r["meta"])
             self.assertTrue(r["meta"]["word"].isalpha())
             self.assertLessEqual(len(r["meta"]["word"]), 8, "the ear's own word channel is <= 8 letters a-z")
+
+        # L-11 task 2: within each moment, the colour ear row precedes the object ear row (both precede
+        # the eye row), and the object word is always the mission's own last token (target_word()).
+        by_moment_ears: dict = {}
+        for r in ears:
+            by_moment_ears.setdefault(r["meta"]["moment"], []).append(r)
+        for m, rs in by_moment_ears.items():
+            self.assertEqual(len(rs), 2, f"expected exactly 2 ear rows for moment {m}")
+            rs.sort(key=lambda r: r["seq"])
+            colour_row, object_row = rs
+            mission = object_row["meta"]["mission"]
+            self.assertEqual(object_row["meta"]["word"], game_sense.target_word(mission))
+            self.assertEqual(colour_row["meta"]["word"], game_sense.mission_words(mission)[0])
+            self.assertLess(colour_row["seq"], object_row["seq"], f"colour ear row must precede object ear row for moment {m}")
 
         for r in outs:
             m = r["meta"]
@@ -156,7 +173,8 @@ class TestSenseThreadPublishesRows(unittest.TestCase):
             tape.publish, stop_event, door_dir=door, root=root, canvas=128, poll_period=0.1), daemon=True)
         t.start()
         deadline = time.time() + 15.0
-        while time.time() < deadline and len(_game_rows(root)) < 11:   # 4 manifests -> 2 + 3*3 = 11
+        # L-11 task 2: 4 manifests -> 1 reset x 3-row (2 ear + 1 eye) + 3 stepped x 4-row (2 ear + 1 eye + 1 outcome) = 3 + 12 = 15
+        while time.time() < deadline and len(_game_rows(root)) < 15:
             time.sleep(0.1)
         time.sleep(0.3)
         stop_event.set(); t.join(timeout=5.0)
@@ -199,11 +217,12 @@ class TestReplayNeverReRunsTheGame(unittest.TestCase):
             tape.publish, stop_event, door_dir=door, root=root, canvas=128, poll_period=0.1), daemon=True)
         t.start()
         deadline = time.time() + 15.0
-        while time.time() < deadline and len(_game_rows(root)) < 14:
+        # L-11 task 2: 5 manifests -> 19 rows (see TestSenseThreadPublishesRows above)
+        while time.time() < deadline and len(_game_rows(root)) < 19:
             time.sleep(0.1)
         time.sleep(0.3)
         stop_event.set(); t.join(timeout=5.0)
-        self.assertEqual(len(_game_rows(root)), 14)
+        self.assertEqual(len(_game_rows(root)), 19)
 
         day_files = sorted((root / "tape").glob("*.jsonl"))
         self.assertEqual(len(day_files), 1)

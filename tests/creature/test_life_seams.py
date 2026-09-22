@@ -44,11 +44,46 @@ class LifeSeams(unittest.TestCase):
 
     @unittest.skipUnless(_wired("MOUTH") and _worker_obeys(), "C x D not landed")
     def test_CxD_a_say_row_is_an_act_with_an_outcome_and_both_mission_words_reach_the_frame_road(self):
-        self.fail("fill at the landing: a say journals an act row and an outcome episode; a game manifest's two ear rows land in words_in_instant")
+        # filled at C's landing (Claude (Fable 5.1), 2026-09-22 20:07 +0400): (1) the mission's two words (C) reach the instant the frame road reads;
+        # (2) a SAY (C's mouth) is an ACT with an OUTCOME (D's census and K's reflex ring) — the plan's L-8/L-11 seam: an utterance the
+        # creature makes counts among its acts and its being heard is the act's residual. RED on the merged bytes until the seam is built.
+        import json, tempfile
+        import numpy as np
+        from creature.mind import Mind
+        from creature.senses.game import mission_words
+        self.assertEqual(mission_words("go to the red ball"), ("red", "ball"))
+        text = (TREE / "genome" / "G5.genome").read_text().replace("NMAX     2000", "NMAX     64")
+        text = text.replace("#OFF SENTENCE two-word frames is near under-judge", "SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token")
+        text = text.replace("ACT      glance open ask ", "ACT      glance open ask say ")
+        text += "\nMOUTH    say one frame per think; journaled\nQUESTION from wants; forms what-is is which; to the world door\n"
+        root = Path(tempfile.mkdtemp(prefix="seamCD-")); gp = root / "g.genome"; gp.write_text(text)
+        for d in ("journal", "state", "tape", "ask/out"): (root / d).mkdir(parents=True, exist_ok=True)
+        mind = Mind(gp, root)
+        mind._frames = {"red|ball": {"w1": "red", "w2": "ball", "episodes": [1, 2]}}
+        mind._last_words_in_instant = ["red", "ball"]
+        mind._last_glance = np.zeros(mind.genome.sight_dim(), dtype=np.float32)
+        row = {"seq": 7, "at": "2026-09-23T00:00:00.000Z", "meta": {"moment": "gseam0000001"}}
+        mind._maybe_say(row)
+        self.assertEqual(mind.think_counters["said"], 1)
+        self.assertEqual(mind.acts_chosen.get("say"), 1, "a say is not counted among the creature's acts")
+        ring = mind.outcome_episodes
+        self.assertIsNotNone(ring); self.assertGreaterEqual(len(ring), 1)
+        self.assertIn("say", set(ring.word.tolist()), "a say wrote no outcome episode")
 
     @unittest.skipUnless(_wired("ANSWER", "QUESTION"), "A x C not landed")
     def test_AxC_a_questions_what_is_answer_carries_the_grade(self):
-        self.fail("fill at the landing: the world door's answer to a what-is question is journaled with the grade (sure/unsure/unknown)")
+        # filled at C's landing (Claude (Fable 5.1), 2026-09-22 20:07 +0400): a question the MIND writes (C's ask/out row) has the shape the ASK door
+        # answers (A's graded rendering) — the same JSON the inbox takes, and the rendering of a graded recall names its grade.
+        from creature import ask
+        from genome.machinery import parse_genome, Organism
+        q = {"q": "what-is", "args": ["deadbeef.png"], "from": "mind", "seq": 9, "at": "2026-09-23T00:00:00Z", "why": {}}
+        self.assertEqual(ask._args_for(q), ["deadbeef.png"])
+        text = (TREE / "genome" / "G5.genome").read_text().replace("NMAX     2000", "NMAX     64") + "\nTHRESH   cell own band history 30\nANSWER   resembles under own-band; unknown below 0.911\n"
+        org = Organism(parse_genome(text)); Lw = {0: {"ring"}}
+        r = {"cell": 0, "reason": "answer", "lit": 0, "best": 0.5, "second": 0.0, "cos": 0.953, "grade": "unsure", "own_floor": 0.961, "resembles_cell": 0}
+        sentence = ask.render_what_is("deadbeef.png", r, org, Lw)
+        self.assertIn("resembles ring", sentence)
+        r2 = dict(r, grade="sure"); self.assertNotIn("resembles", ask.render_what_is("deadbeef.png", r2, org, Lw))
 
     @unittest.skipUnless(_worker_obeys() and "lands next boundary" in (TREE / "genome" / "machinery.py").read_text(errors="replace"), "D x E not landed")
     def test_DxE_the_act_is_chosen_on_the_mind_thread_never_the_think_thread(self):
