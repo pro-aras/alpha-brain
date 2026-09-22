@@ -59,8 +59,10 @@ NEW_GENES = {
                   "DEDUCE   one"),
     "BELIEF":    ("BELIEF   clash opens never overwrites",
                   "BELIEF   clash opens overwrites"),
-    "SENTENCE":  ("SENTENCE two-word frames is near under-judge",
-                  "SENTENCE two-word frames is near"),
+    # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11: the OLD literal no longer
+    # parses (genome/machinery.py's SENTENCE regex replaced, not extended); this fixture line moved with it.
+    "SENTENCE":  ("SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token",
+                  "SENTENCE two-word frames from co-occurring words"),
     "WORLD":     ("WORLD    drawn every 5 s arrivals every 6 h; folder world/; web 6 per hour by curiosity",
                   "WORLD    drawn every s arrivals every 6 h; folder world/; web 6 per hour by curiosity"),
     "HANDS":     ("HANDS    jail alpha3/hands/jail_run",
@@ -106,7 +108,7 @@ class TestParseG4(unittest.TestCase):
         self.assertEqual(g.declared["INDUCE"], {"from_episodes": 5})
         self.assertEqual(g.declared["DEDUCE"], {"steps": 1})
         self.assertEqual(g.declared["BELIEF"], {"clash": "opens", "overwrite": False})
-        self.assertEqual(g.declared["SENTENCE"], {"frames": ["is", "near"], "judged": True})
+        self.assertEqual(g.declared["SENTENCE"], {"frames": "co-occurring", "judged": "eye", "next_token": False})
         self.assertEqual(g.declared["WORLD"], {"drawn_every_s": 5, "arrival_every_h": 6, "folder": "world/", "web_per_hour": 6})
         self.assertEqual(g.declared["HANDS"], {"jail": "alpha3/hands/jail_run"})
         self.assertEqual(g.declared["ASK"], {"verbs": ["what-is", "show", "is", "which", "next", "why"]})

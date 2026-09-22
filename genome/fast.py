@@ -77,6 +77,16 @@ class Episodes:
         self.act = np.array([""] * cap, dtype="<U16")
         self.source = np.array([""] * cap, dtype="<U32")
         self.glance = np.full(cap, -1, dtype=np.int64)
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:28 +0400 — L-11 (docs/briefs/LIFE-C-QUESTION-SENTENCE.md
+        # task 2): `words_in_instant` — every word the ear delivered since the last eye row, in order, "|"-joined (a
+        # canvas with one word: "word"; two: "colour|object"; sight-only: ""). SENTENCE's frame-finder reads this
+        # column; nothing that computes a cosine reads it (same convention as x_s2/where/when/act/source above —
+        # never inside x_s/x_w, #228 (c)). `tape_moment` — the tape's own moment string (e.g. "w0004i000012t000000123")
+        # this episode's canvas was published under, so a consumer (QUESTION's want-formation) can recover which
+        # canvas a live episode came from without a second moment->episode index. Both new columns, both optional at
+        # write(), both default to "" (absent) — never touching any existing field.
+        self.words_in_instant = np.array([""] * cap, dtype="<U256")
+        self.tape_moment = np.array([""] * cap, dtype="<U64")
         self.n_written = 0        # episodes ever written (the next write's id)
         self._next_slot = 0       # the ring's next slot to write (== the oldest live slot once full)
         self._id_to_slot: Dict[int, int] = {}
@@ -89,7 +99,8 @@ class Episodes:
                x_s2: Optional[np.ndarray] = None,
                where: Optional[Tuple[int, int]] = None, when: Optional[str] = None,
                act: Optional[str] = None, source: Optional[str] = None,
-               glance: Optional[int] = None) -> int:
+               glance: Optional[int] = None,
+               words_in_instant: Optional[List[str]] = None, tape_moment: Optional[str] = None) -> int:
         """Writes one episode at the ring's next slot (the oldest, once the ring is full) and returns
         its id (0, 1, 2, … — never reused; an overwritten episode's old id simply stops resolving).
         `x_s2` (B12): the same canvas's second glance, if the caller has one; None (the default) marks
@@ -128,6 +139,8 @@ class Episodes:
         self.act[slot] = act if act is not None else ""
         self.source[slot] = source if source is not None else ""
         self.glance[slot] = int(glance) if glance is not None else -1
+        self.words_in_instant[slot] = "|".join(str(w) for w in words_in_instant) if words_in_instant else ""
+        self.tape_moment[slot] = tape_moment if tape_moment is not None else ""
         self.ids[slot] = eid
         self._id_to_slot[eid] = slot
         self._next_slot = (self._next_slot + 1) % self.cap
@@ -151,7 +164,10 @@ class Episodes:
                 "when": (str(self.when[slot]) or None),
                 "act": (str(self.act[slot]) or None),
                 "source": (str(self.source[slot]) or None),
-                "glance": (int(self.glance[slot]) if int(self.glance[slot]) != -1 else None)}
+                "glance": (int(self.glance[slot]) if int(self.glance[slot]) != -1 else None),
+                "words_in_instant": ([w for w in str(self.words_in_instant[slot]).split("|") if w]
+                                       if self.words_in_instant[slot] else []),
+                "tape_moment": (str(self.tape_moment[slot]) or None)}
 
     def nearest(self, x_s: np.ndarray, k: int) -> List[Tuple[int, float]]:
         """The top-k live episodes by cosine of `x_s` to the episode's own x_s (best first, ties by the
@@ -211,7 +227,9 @@ class Episodes:
                                  word=self.word, surprise=self.surprise, x_s2=self.x_s2, has_s2=self.has_s2,
                                  # G-MIND-1 (edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400):
                                  where_y=self.where_y, where_x=self.where_x, has_where=self.has_where,
-                                 when=self.when, act=self.act, source=self.source, glance=self.glance)
+                                 when=self.when, act=self.act, source=self.source, glance=self.glance,
+                                 # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:28 +0400 — L-11 task 2.
+                                 words_in_instant=self.words_in_instant, tape_moment=self.tape_moment)
         tmp.replace(path)
 
     @classmethod
@@ -234,6 +252,11 @@ class Episodes:
             if "where_y" in z.files:
                 ep.where_y[:] = z["where_y"]; ep.where_x[:] = z["where_x"]; ep.has_where[:] = z["has_where"]
                 ep.when[:] = z["when"]; ep.act[:] = z["act"]; ep.source[:] = z["source"]; ep.glance[:] = z["glance"]
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:28 +0400 — L-11 task 2: absent from a file saved
+            # before SENTENCE/QUESTION existed -- default to "" everywhere (the __init__ defaults), same back-compat
+            # rule as x_s2 and where/when/act/source above.
+            if "words_in_instant" in z.files:
+                ep.words_in_instant[:] = z["words_in_instant"]; ep.tape_moment[:] = z["tape_moment"]
             ep.n_written = int(meta[3]); ep._next_slot = int(meta[4])
         ep._id_to_slot = {int(ep.ids[s]): s for s in range(len(ep))}
         return ep

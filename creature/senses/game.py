@@ -8,12 +8,19 @@ does not hold this tree -- docs/briefs/G5-G-GAME-WORLDS.md §6's own install roa
 worker's own doc). Every manifest publishes rows in the tape's own order law (PREREG §2.2, the SAME order
 `creature/senses/folder.py` and `creature/world_maker.py` already use -- ear before eye):
 
-  1. ear  (the mission's target-object word)                        -- always
-  2. eye  (the frame, through gaze.canvas_of_picture -- the SAME     -- always
+  1. ear  (the mission's colour word)                                -- when the mission carries one
+  2. ear  (the mission's target-object word)                         -- always
+  3. eye  (the frame, through gaze.canvas_of_picture -- the SAME     -- always
            road the folder door uses for a picture: folder.py:102)
-  3. outcome (the act that PRODUCED this frame + its reward)         -- every manifest but the reset frame
+  4. outcome (the act that PRODUCED this frame + its reward)         -- every manifest but the reset frame
      (the very first manifest of an episode carries no act -- nothing produced it, it is what `env.reset`
      handed back -- so no outcome row is published for it)
+
+edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2 (docs/briefs/
+LIFE-C-QUESTION-SENTENCE.md): the colour word is now published as its OWN ear row, same moment, BEFORE
+the object's -- creature/mind.py holds every word heard since the last eye row (`words_in_instant`); the
+moment's own `word` (mind.py's `self.pending`, last-wins) stays the object, so every mark keeps its
+existing meaning.
 
 `outcome` is published under that sense NAME, carrying K's own OUTCOME row shape (docs/briefs/
 G5-K-ACTS-OUTCOME-SIT-BODY.md item 2: fields `act` (str), `expected` (float|null), `got` (float),
@@ -64,6 +71,21 @@ def _png_bytes(rgb) -> bytes:
     buf = io.BytesIO()
     Image.fromarray(rgb, mode="RGB").save(buf, format="PNG")
     return buf.getvalue()
+
+
+def mission_words(mission: str) -> tuple:
+    """edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2
+    (docs/briefs/LIFE-C-QUESTION-SENTENCE.md): the mission's colour word (the token just before the
+    object -- "go to a/the <colour> <object>") and its object word (== target_word's own last token),
+    as a (colour, object) pair. `colour` is None when the mission carries fewer than two tokens (never
+    true for GoToLocal's own missions, but a mission from a different BabyAI level might not name a
+    colour -- SENTENCE's frame-finder only ever sees TWO ear rows on an instant that had two words to
+    begin with, so a single-token mission degrades to exactly today's one-ear-row behaviour, never a
+    crash)."""
+    toks = mission.strip().split()
+    obj = toks[-1]
+    colour = toks[-2] if len(toks) >= 2 else None
+    return colour, obj
 
 
 def target_word(mission: str) -> str:
@@ -168,10 +190,18 @@ def sense(publish: Callable, stop_event, door_dir: Path, root: Path, canvas: int
                         # never fatal to the sense thread -- SenseThread's own restart law covers a real crash)
 
             mission = data["mission"]
-            word = target_word(mission)
+            colour, word = mission_words(mission)      # word == target_word(mission), unchanged
             moment = f"g{str(data['game'])[:4]}{int(data['seed']):08d}s{step_idx:09d}"
             common = {"game": data["game"], "episode": data["episode"], "step": step_idx}
 
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: the mission's
+            # colour word, published FIRST as its own ear row on the SAME moment (the object's ear row
+            # follows, unchanged) -- creature/mind.py holds every word heard since the last eye row
+            # (`pending_words`), so the object stays the moment's own `word` (mind.py's `self.pending`,
+            # last-wins) and every existing mark is untouched; the eye row is unaffected either way.
+            if colour is not None:
+                publish("ear", colour.encode("utf-8"),
+                        {"moment": moment, "source": "game", "word": colour, "mission": mission, **common}, "txt")
             publish("ear", word.encode("utf-8"),
                     {"moment": moment, "source": "game", "word": word, "mission": mission, **common}, "txt")
             publish("eye", _png_bytes(rgb), {"moment": moment, "source": "game", **common}, "png")

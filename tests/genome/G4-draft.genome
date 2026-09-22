@@ -52,7 +52,9 @@ INDUCE   rule from 5 episodes no counter           # a rule is a prediction
 DEDUCE   one step                                  # two beliefs → a prediction
 BELIEF   clash opens never overwrites               # Alpha 2's scope law
 # LANGUAGE
-SENTENCE two-word frames is near under-judge       # speech_v2's road, minimal; never next-token
+# edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11: the line's OWN syntax replaced
+# (genome/machinery.py's SENTENCE regex no longer accepts the old "is near under-judge" form).
+SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token
 # HANDS + WORLD
 WORLD    drawn every 5 s arrivals every 6 h; folder world/; web 6 per hour by curiosity
 HANDS    jail alpha3/hands/jail_run                # switched on last

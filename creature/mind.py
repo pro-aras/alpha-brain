@@ -32,7 +32,7 @@ import inspect
 import json
 import os
 from pathlib import Path
-from typing import Dict, FrozenSet, Optional, Tuple
+from typing import Callable, Dict, FrozenSet, List, Optional, Tuple
 
 import numpy as np
 from PIL import Image
@@ -45,6 +45,7 @@ from genome.park import Park
 from genome.predict import Predictor, file as predict_file, score as predict_score
 from creature.tape import _resolve_tape_dir   # W3-0b seam: the mind reads payloads where the genome says the tape is
 from genome.questions import build_ledgers, why as questions_why
+from genome.sentence import find_frames
 from genome.sleep import cycle as run_cycle, sleep as run_sleep
 from genome.world import encode_word
 
@@ -215,13 +216,48 @@ class Mind:
         self.think_counters: Dict[str, int] = {
             "thinks": 0, "parked": 0, "beliefs": 0, "revisits": 0, "extensions": 0, "clashes": 0,
             "predictions_filed": 0, "predictions_scored": 0,
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10/L-11 (docs/briefs/
+            # LIFE-C-QUESTION-SENTENCE.md): a new counter goes on STATUS on every branch that writes STATUS
+            # (#164) — creature/body.py's STATUS loop already unpacks every key of this dict unconditionally.
+            "questions_written": 0, "questions_answered": 0,
+            "frames_filed": 0, "frames_scored": 0, "frames_true": 0,
+            "said": 0, "heard_yes": 0, "heard_no": 0,
         }
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 3 (SENTENCE): "w1|w2" keys
+        # currently filed-not-yet-scored (INDUCE/DEDUCE's own _induce_pending/_deduce_pending pattern above).
+        self._frame_pending: set = set()
+        # every frame the mind has ever filed, keyed "w1|w2" -> {"w1","w2","episodes"} (MOUTH reads this to
+        # pick what to say; G-MOT-6's citation gate reads its "episodes").
+        self._frames: Dict[str, Dict[str, object]] = {}
+        # L-10 (QUESTION): want -> the form it was asked with, so a want is asked AT MOST ONCE. Loaded from
+        # `run/ask/out/ASKED.json` HERE (not only at resume()) -- a plain file beside the questions
+        # themselves, independent of the snapshot cadence, so a crash between a snapshot and the next
+        # question can never re-ask a want the ledger already remembers (the same durability reason
+        # ear_pending exists beside the ledger.json's own moment_word).
+        asked_path = self.run_root / "ask" / "out" / "ASKED.json"
+        try:
+            self._asked = {str(k): str(v) for k, v in json.loads(asked_path.read_text()).items()} if asked_path.exists() else {}
+        except (json.JSONDecodeError, OSError):
+            self._asked = {}   # a torn/partial ASKED.json from a crash mid-write is "nothing asked yet", never fatal (#230's discipline)
+        # a resonating-but-not-newly-born sight cell -> how many wordless (word="") canvases have resonated
+        # it in a row without it ever being named (L-10's "seen for the SECOND time without a word").
+        self._wordless_seen: Dict[int, int] = {}
+        # the tape row currently being consumed -- read by nested calls (_grade_rule, _maybe_ask, _maybe_say)
+        # that need "at"/"seq" but are not themselves handed `row` (mirrors the existing thread-the-row
+        # discipline everywhere else in this file, without widening every intermediate signature).
+        self._cur_at: Optional[str] = None
+        self._cur_seq: Optional[int] = None
         # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15: the words the ear has ever delivered to a met canvas
         # (sight-only "" never enters). A word not in it OPENS AN ARRIVAL when ARRIVAL is declared (below);
         # rebuilt at resume from the ledger's moment_word so a resumed mind and a replay agree.
         self._heard: set = set()
 
         self.pending: Dict[str, str] = {}                 # ear-consumed, eye not yet arrived: moment -> word
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: moment -> every word heard
+        # (ear rows APPEND, never overwrite -- see consume()'s ear branch above).
+        self.pending_words: Dict[str, List[str]] = {}
+        self._last_words_in_instant: List[str] = []    # L-11 task 4 (MOUTH): this canvas's own words, read by _maybe_say
+        self._last_glance = None                        # L-11 task 4 (MOUTH): this canvas's own first glance
         self.moment_word: Dict[int, str] = {}              # org.t (per GLANCE, before increment) -> word — build_ledgers' input
         self.last_seq: int = 0
         self.sight_only_skipped: int = 0
@@ -243,6 +279,14 @@ class Mind:
         moment = meta.get("moment")
         if sense == "ear":
             self.pending[moment] = meta.get("word")
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2 (docs/briefs/
+            # LIFE-C-QUESTION-SENTENCE.md): every word heard since the last eye row on THIS moment,
+            # APPENDED (never overwritten, unlike self.pending above) -- SENTENCE's frame-finder reads
+            # this from the episode row. Popped in _consume_eye alongside self.pending; a moment with one
+            # ear row behaves exactly as before (a one-element list).
+            w = meta.get("word")
+            if w:
+                self.pending_words.setdefault(moment, []).append(w)
         elif sense == "eye":
             self._consume_eye(row, moment)
         # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: the three new tape senses. Each method
@@ -364,6 +408,11 @@ class Mind:
             self._act_n[act] = n
 
     def _consume_eye(self, row: Dict[str, object], moment: Optional[str]) -> None:
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10/L-11: this canvas's own
+        # "at"/"seq", read by nested calls (_grade_rule, _maybe_ask, _maybe_say) that are not themselves
+        # handed `row`. Set at the top, read-only for the duration of this one call.
+        self._cur_at = row["at"]
+        self._cur_seq = row["seq"]
         # edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — W3-0b seam (Builder C's finding 4): the payload is read under the genome's own TAPE path
         # (creature/tape.py:_resolve_tape_dir — byte-identical for the default `run/tape`), never a second hardcoded "tape".
         payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
@@ -374,6 +423,14 @@ class Mind:
         # identical to every existing pin.
         g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour)
         word = self.pending.pop(moment, None) if moment is not None else None
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: every word this
+        # instant's ear rows delivered, in order (popped alongside self.pending above; a moment with one
+        # ear row is a one-element list, byte-identical in meaning to `word` alone).
+        words_in_instant: List[str] = self.pending_words.pop(moment, []) if moment is not None else []
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 4 (MOUTH): the CURRENT
+        # instant's words and first glance, read by _maybe_think -> _maybe_say below (the mouth judges what
+        # it says against THIS canvas's own glance, never a stored/replayed one).
+        self._last_words_in_instant: List[str] = words_in_instant
         # G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md): hoisted above PREDICT's error() call, which
         # arm "comparator" needs (a word's encoding, read-only) BEFORE Organism.moment() runs for this
         # canvas — encode_word is pure, so computing it here changes nothing else (word is None on a
@@ -398,6 +455,7 @@ class Mind:
             lr_scale = self.predictor.modulate(1.0)
         t_at_f0 = self.org.t
         f0 = g["feats"][0] if g["feats"] else None
+        self._last_glance = f0    # L-11 task 4 (MOUTH): this canvas's own first glance, for _maybe_say
 
         # edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400 — G-EYE-1/G-MIND-1 (docs/briefs/G5-I-SEAM-DELIVER-MOMENT.md):
         # the seam contract. `where` (glance 0's window origin), `when` (the tape row's own instant — the ONE wall clock this
@@ -412,6 +470,14 @@ class Mind:
         deliver_on = "DELIVER" in self.genome.declared
         moment_on = "MOMENT" in self.genome.declared
         meta = row.get("meta") or {}
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — advisor-caught (#164's class):
+        # STATUS declares `questions_answered` but nothing wrote it. The world-maker's QUESTION door
+        # (creature/world_maker.py:_publish_canvas) stamps `answering: "<qid>"` on BOTH the ear and eye rows
+        # of the canvas it shows again — this is the eye row, so a non-empty `answering` here is exactly
+        # "this canvas answers a want this mind once asked." Counted once per answered canvas (never per
+        # ear+eye pair — only the eye row reaches this method).
+        if meta.get("answering"):
+            self.think_counters["questions_answered"] += 1
         seam0: Dict[str, object] = {}
         if deliver_on and g["windows"]:
             # "where" in self.blind (G-EYE-1/G-MIND-1's own test clause c, `--blind where`): the SAME
@@ -440,8 +506,13 @@ class Mind:
                 if predict_on:
                     self.predictor.note_winners(S)
             ep_kwargs = seam0 if moment_on else {}         # G-MIND-1: Episodes stores the seam only once MOMENT declares the columns
-            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw, word=word, surprise=err, **ep_kwargs) if fast_on else None
-            self._score_due_predictions(word, g["feats"][0] if g["feats"] else None)
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: words_in_instant/
+            # tape_moment are stored UNCONDITIONALLY (not gated on MOMENT — the plan's own words: "MOMENT
+            # keys ... gains nothing in the genome"), a fresh pair of Episodes columns exactly like x_s2 above.
+            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw, word=word, surprise=err,
+                                          words_in_instant=words_in_instant, tape_moment=moment,
+                                          **ep_kwargs) if fast_on else None
+            self._score_due_predictions(word, g["feats"][0] if g["feats"] else None, words_in_instant=words_in_instant)
             births = [[b[1], int(b[2]), b[3]] for b in self.org.births[births_before:]]
             edges_born = len(self.org.edges_log) - edges_before
             edges_pruned = len(self.org.prunes_log) - prunes_before
@@ -468,12 +539,46 @@ class Mind:
             # questions.build_ledgers needs moment_thing[m] for EVERY birth moment, sight-only ones
             # included, or snapshot() KeyErrors the first time such a birth happens (caught by this
             # test, not by inspection) -- word "" here, exactly what the written episode itself carries.
+            births_before = len(self.org.births)
             for x in org_feats:
                 self.moment_word[self.org.t] = ""
                 self.org.moment_sight(x)
+            births_after = len(self.org.births)
             xw_blank = encode_word("", self.genome.ear_blank_zero)
             ep_kwargs = seam0 if moment_on else {}
-            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw_blank, word="", surprise=err, **ep_kwargs)
+            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw_blank, word="", surprise=err,
+                                          words_in_instant=words_in_instant, tape_moment=moment, **ep_kwargs)
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10 task 1 (QUESTION): "a
+            # wordless sight seen for the SECOND time without a word". The mechanism-grounded reading: no
+            # NEW cell was born this canvas (moment_sight resonated an EXISTING cell) AND that cell was
+            # itself born wordless (every birth ever recorded for it carries word="" in the ledger) — the
+            # organism already holds this look and still has no name for it. Counted per resonating cell;
+            # the want fires on the 2nd such count (never the 1st — "seen ... for the SECOND time").
+            if ("QUESTION" in self.genome.declared and births_after == births_before
+                    and f0 is not None and moment is not None):
+                r = self.org.recall("sight", f0)
+                # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — a discovered fix:
+                # r["lit"] (the SIGHT cell that actually resonated) is the right field here, not r["cell"]
+                # (recall's cross-area ANSWER, which needs a sight->words EDGE to exist — during STAGE 1,
+                # before MEET starts, or for any picture with no word yet, recall abstains "noedge" and
+                # r["cell"] is None even though a real sight cell resonated; r["lit"] is populated on every
+                # non-"novel" abstain, not just a successful answer). Caught by this file's own test
+                # (test_question_sentence_mouth.py), not by inspection: the trigger never fired at all
+                # under r["cell"] on a real (STAGE-1) tape.
+                cell = r.get("lit")
+                if cell is not None:
+                    ledgers = build_ledgers(self.org, self.moment_word)
+                    if ledgers["sight"].get(cell) == {""}:
+                        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — the FIRST canvas
+                        # that births this cell is sighting #1 (never counted here — births_after !=
+                        # births_before skips this whole block for it); THIS resonate-without-birth event
+                        # is therefore already sighting #2 the moment it is counted once. Firing at n==1
+                        # (not n>=2, which would need a THIRD sighting) — caught by this file's own test:
+                        # at n>=2 the trigger never fired on a real 2-canvas tape at all.
+                        n = self._wordless_seen.get(cell, 0) + 1
+                        self._wordless_seen[cell] = n
+                        if n >= 1:
+                            self._maybe_ask(f"sight:{cell}", "what-is", [moment])
             self._write_journal(row["at"], {
                 "seq": row["seq"], "moment": moment, "word": None,
                 "err": round(err, 4), "ep": ep_id, "hash": self.org.state_hash(),
@@ -530,7 +635,8 @@ class Mind:
                 self.interests.sleep_boundary()
 
     # ------------------------------------------------------------------ THINK (A11, PREREG §11.1 step 3)
-    def _score_due_predictions(self, word: str, first_glance: Optional[np.ndarray]) -> None:
+    def _score_due_predictions(self, word: str, first_glance: Optional[np.ndarray],
+                                 words_in_instant: Optional[List[str]] = None) -> None:
         """A prediction filed by THINK's kind-(b) work becomes scorable the next time ITS OWN word is
         shown again — "the journal's err/recall on the next canvas with that word" (PREREG's own route
         text). Simplification, documented in the report: the decider "recall == word" is evaluated by a
@@ -547,10 +653,22 @@ class Mind:
             return
         still_pending = []
         ledgers = None
+        words_in_instant = words_in_instant or []
         for entry in self._filed_predictions:
-            if entry["target_word"] == word and self._canvas_index >= entry["due_canvas"]:
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 3 (SENTENCE): a
+            # frame entry's target_word is w1, the COLOUR — never equal to `word` (the moment's own word is
+            # the OBJECT, game.py's own publish order). Its trigger is "w1 in this instant's words", not
+            # "word == w1"; every other entry keeps the original word==target_word trigger, unchanged.
+            frame_w2 = entry.get("frame_w2")
+            if frame_w2 is not None:
+                due = entry["target_word"] in words_in_instant
+            else:
+                due = entry["target_word"] == word
+            if due and self._canvas_index >= entry["due_canvas"]:
                 rule = entry.get("rule")
-                if rule is not None:
+                if frame_w2 is not None:
+                    evidence = self._frame_evidence(str(frame_w2), first_glance)
+                elif rule is not None:
                     evidence = self._rule_evidence(rule["cluster"], first_glance)
                 else:
                     if ledgers is None:
@@ -564,11 +682,27 @@ class Mind:
                 with predict_ledger_path.open("a") as f:
                     f.write(json.dumps(scored, default=str) + "\n")
                 self.think_counters["predictions_scored"] += 1
-                if rule is not None:
+                if frame_w2 is not None:
+                    self._frame_pending.discard(entry.get("frame_key"))
+                    self.think_counters["frames_scored"] += 1
+                    if evidence:
+                        self.think_counters["frames_true"] += 1
+                elif rule is not None:
                     self._grade_rule(rule, evidence)
             else:
                 still_pending.append(entry)
         self._filed_predictions = still_pending
+
+    def _frame_evidence(self, w2: str, first_glance: np.ndarray) -> bool:
+        """L-11 task 3's decider, verbatim: "the eye answers BOTH words on the next instant that carries
+        w1" — the mind's own recall_many over that instant's glances must return w2's cell (sight →
+        words). Simplified to `recall` over the due canvas's first glance (the same simplification
+        `_score_due_predictions`'s pre-existing sight-road already makes for "recall == word", documented
+        there); a scoring read never changes the organism."""
+        ledgers = build_ledgers(self.org, self.moment_word)
+        r = self.org.recall("sight", first_glance)
+        Lw = ledgers["words"]
+        return r["cell"] is not None and Lw.get(r["cell"], set()) == {w2}
 
     def _rule_evidence(self, cluster: List[int], first_glance: np.ndarray) -> bool:
         """W3-2c (edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — PREREG §18): the decider is «the due canvas's first-glance WINNER is in C» —
@@ -604,9 +738,18 @@ class Mind:
         (self._induce_pending if op == "induce" else self._deduce_pending).discard(key)
         if self.interests is not None:
             self.interests.update({"kind": "rule", "key": key}, "answered" if evidence else "failed")
-        if not evidence and self.park is not None:
-            if self.park.answer(want, "rule_failed_3") == "parked":
-                self.think_counters["parked"] += 1
+        if not evidence:
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10 task 1 (QUESTION): "a
+            # rule fails once (the think outcome that today counts toward PARK's 3)" -- fires on THIS one
+            # failure, not only the n-th that parks it (PARK's own parking, if it happens, is trigger (d),
+            # handled separately below). `key` is the word (induce) or "w1|w2" (deduce) the rule claimed;
+            # its latest live episode's own tape_moment (L-11 task 2's new Episodes column) is the "what-is"
+            # want's evidence -- the same word/cluster a human would need shown again to judge the claim.
+            self._maybe_ask_word(f"rule:{want}", key)
+            if self.park is not None:
+                if self.park.answer(want, "rule_failed_3") == "parked":
+                    self.think_counters["parked"] += 1
+                    self._maybe_ask_word(f"parked:{want}", key)
 
     def _recent_word_glances(self, word: str, n: int, fallback) -> list:
         """The sight features of the word's last n live episodes (by moment), oldest first; the fallback alone if none."""
@@ -618,6 +761,93 @@ class Mind:
             return [fallback]
         order = live[np.argsort(ep.moment[live], kind="stable")][-n:]
         return [ep.x_s[i].copy() for i in order]
+
+    # ------------------------------------------------------------------ QUESTION (L-10)
+    def _write_ask_out(self, payload: Dict[str, object]) -> None:
+        """Writes ONE `run/ask/out/q-<n>.json` row -- the SAME JSON shape `run/ask/in/` accepts (creature/
+        ask.py's own inbox schema), but this mind is the WRITER here, not the answerer: the world-maker's
+        door (creature/world_maker.py:sense) and, for a `what-is` no sense drew, the human ASK door's own
+        listener, are its readers. `n` is a mind-local running counter (questions_written), never the tape
+        row's own seq -- two wants can form on the same tape row (advisor's point 5), and the filename must
+        be unique per question regardless.
+        edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — advisor-caught: `questions_written`
+        used to be incremented by `_maybe_ask` AFTER calling this method, but MOUTH's `_maybe_say` also
+        calls this method directly (its "is" row) and never incremented anything -- a second `say` (or a
+        `say` followed by a `_maybe_ask`) would overwrite the SAME q-N.json instead of getting its own file.
+        The counter now lives here, the one place a q-file is actually written, so every caller shares it
+        and every write gets a distinct name. Verified by
+        TestMouth.test_two_says_get_two_distinct_q_files."""
+        out_dir = self.run_root / "ask" / "out"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        n = self.think_counters["questions_written"]
+        (out_dir / f"q-{n}.json").write_text(json.dumps(payload, default=str))
+        self.think_counters["questions_written"] += 1
+
+    def _maybe_ask(self, want: str, form: str, args: list, why_word: Optional[str] = None) -> None:
+        """L-10: forms ONE question for `want`, at most once ever (self._asked, persisted to
+        run/ask/out/ASKED.json so a resumed OR replayed mind never re-asks). `why_word`, when given, is
+        resolved through questions.why() (the addresses behind the mind's own knowledge of that word) and
+        carried on the row as "why" — the plan's own text: "why: the addresses questions.why() returns
+        when a word is involved"."""
+        if "QUESTION" not in self.genome.declared:
+            return
+        if want in self._asked:
+            return
+        self._asked[want] = form
+        asked_path = self.run_root / "ask" / "out" / "ASKED.json"
+        asked_path.parent.mkdir(parents=True, exist_ok=True)
+        asked_path.write_text(json.dumps(self._asked))
+        payload: Dict[str, object] = {
+            "q": form, "args": list(args), "from": "mind",
+            "seq": self.think_counters["questions_written"], "at": self._cur_at,
+        }
+        if why_word is not None:
+            ledgers = build_ledgers(self.org, self.moment_word)
+            record = questions_why(self.org, ledgers, self.episodes, why_word)
+            payload["why"] = {
+                "cells": [[area, int(c)] for area, c in record["cells"]],
+                "episodes": list(record["episodes"]),
+                "edges": [[int(s), int(t), float(w)] for s, t, w in record["edges"]],
+            }
+        self._write_ask_out(payload)   # advances questions_written itself (see that method's own comment)
+        self._write_journal(self._cur_at, {"seq": self._cur_seq, "question": payload})
+
+    def _latest_tape_moment_for_word(self, word: str) -> Optional[str]:
+        """The tape moment string (L-11 task 2's new Episodes column) of `word`'s LATEST live episode, or
+        None if it has none live (fallen off FAST's ring, or never seen). Shared by every QUESTION trigger
+        that needs "a moment to show again" for a word it already knows about."""
+        if self.episodes is None:
+            return None
+        ep = self.episodes
+        live = np.flatnonzero((ep.ids >= 0) & (ep.word == word))
+        if live.size == 0:
+            return None
+        last_slot = int(live[np.argsort(ep.moment[live], kind="stable")][-1])
+        return str(ep.tape_moment[last_slot]) or None
+
+    def _maybe_ask_word(self, want: str, word: str) -> None:
+        """Resolves `word` (or, for a DEDUCE pair key "w1|w2", its FIRST word -- deduce's claim is about
+        the shared cell, not one word alone) to its LATEST live episode's own tape_moment and asks a
+        what-is question citing it, with the word's own why(). No episode to cite yet (a word whose only
+        episodes have already fallen off FAST's ring) asks nothing -- there is no moment to name."""
+        if "QUESTION" not in self.genome.declared:
+            return
+        w = word.split("|", 1)[0] if "|" in word else word
+        tape_moment = self._latest_tape_moment_for_word(w)
+        if tape_moment is None:
+            return
+        self._maybe_ask(want, "what-is", [tape_moment], why_word=w)
+
+    def _maybe_ask_clash(self, want: str, word: str) -> None:
+        """L-10: a belief CLASH forms a want too, form "is" (the brief's own shape: `{"q": "is", "args":
+        [<moment>, <word>]}`) -- the same latest-tape-moment resolution as _maybe_ask_word, a different
+        rendered form."""
+        if "QUESTION" not in self.genome.declared:
+            return
+        tape_moment = self._latest_tape_moment_for_word(word)
+        if tape_moment is None:
+            return
+        self._maybe_ask(want, "is", [tape_moment, word], why_word=word)
 
     def _think_pool(self) -> list:
         """PREREG §11.1 step 3's POOL: (a) words of the last 200 episodes whose recall abstains; (b)
@@ -677,6 +907,19 @@ class Mind:
                 if self.park is not None and self.park.is_parked(f"deduce:{pair_key}"):
                     continue
                 pool.append({"kind": "rule", "key": pair_key, "episode": None, "pred": claim_row, "op": "deduce"})
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 3 (SENTENCE): a "frame"
+        # kind, one item per candidate frame genome.sentence.find_frames() returns (kind-fair with word/
+        # sight/rule/outcome above, W3-2's own "kind is chosen first, uniformly" law untouched) -- gated on
+        # the ring's own presence (a frame needs words_in_instant, FAST's own column). A pair already
+        # pending (filed, not yet scored) or PARKED is skipped, same law as INDUCE/DEDUCE above.
+        if "SENTENCE" in self.genome.declared and self.episodes is not None:
+            for frame_row in find_frames(self.episodes):
+                key = f"{frame_row['w1']}|{frame_row['w2']}"
+                if key in self._frame_pending:
+                    continue
+                if self.park is not None and self.park.is_parked(f"frame:{key}"):
+                    continue
+                pool.append({"kind": "frame", "key": key, "episode": None, "pred": frame_row, "op": "frame"})
         # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: an "outcome" kind, one item per
         # distinct act among the last 50 live reflex episodes (word/sight's own "last N, one per key" shape, scaled
         # down to this ring's much sparser traffic). Gated on the ring's own presence, not on OUTCOME/SIT separately
@@ -718,23 +961,30 @@ class Mind:
         """Works one pool item; returns {"outcome", "parked", ...}. Every dead end goes to
         park.answer(want, reason) when PARK is declared (PREREG: "every dead end goes to park.answer");
         without PARK declared a dead end simply stays a dead end (nothing to park it with)."""
-        def dead_end(want: str, reason: str) -> Dict[str, object]:
+        def dead_end(want: str, reason: str, ask_on_park: Optional[Callable[[], None]] = None) -> Dict[str, object]:
             parked = False
             if self.park is not None:
                 parked = self.park.answer(want, reason) == "parked"
                 if parked:
                     self.think_counters["parked"] += 1
+                    # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10 task 1
+                    # (QUESTION): "whenever PARK parks a want" — trigger (d), generic to every kind that
+                    # can dead-end through PARK (a caller supplies HOW to ask, since "want" alone does not
+                    # say whether there is a word or a bare episode to cite).
+                    if ask_on_park is not None:
+                        ask_on_park()
             return {"outcome": reason, "parked": parked}
 
         if item["kind"] == "word":
             word = item["key"]
+            word_ask = lambda: self._maybe_ask_word(f"parked:word:{word}", word)   # noqa: E731 — local, read only by dead_end() below
             if not _THINK_LAWS_AVAILABLE:
-                return dead_end(word, "think_laws_unavailable")
+                return dead_end(word, "think_laws_unavailable", ask_on_park=word_ask)
             ledgers = build_ledgers(self.org, self.moment_word)
             record = questions_why(self.org, ledgers, self.episodes, word)
             rec = self.episodes.get(item["episode"]) if self.episodes is not None else None
             if rec is None:
-                return dead_end(word, "episode_gone")
+                return dead_end(word, "episode_gone", ask_on_park=word_ask)
             # edit: Claude (Fable 5.1), 2026-09-19 23:33 +0400 — PREREG §11.1 (a) as read in the first 30-min life: the pool admits a word whose
             # LATEST glance abstains, and re-asking the SAME glance can only abstain again (172/172 dead ends). The work now asks over the
             # word's last five episodes' glances (Organism.recall_many, G1's road) — a word known in general though this glance was not
@@ -742,14 +992,14 @@ class Mind:
             xs = self._recent_word_glances(word, 5, fallback=rec["x_s"])
             r = self.org.recall_many("sight", xs)
             if r.get("cell") is None:
-                return dead_end(word, "no_cell_answers")
+                return dead_end(word, "no_cell_answers", ask_on_park=word_ask)
             # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
             # think_laws.believe() is a real call to BELIEF's mechanism (genes.py's RUNS entry) — gated on
             # BELIEF's own declared presence now, not called unconditionally. A word item without BELIEF
             # declared is a dead end named "no_belief_gene" (never a crash, never a silent belief written
             # for a gene the genome never declared).
             if "BELIEF" not in self.genome.declared:
-                return dead_end(word, "no_belief_gene")
+                return dead_end(word, "no_belief_gene", ask_on_park=word_ask)
             # edit: Claude (Fable 5.1), 2026-09-19 23:37 +0400 — believe() takes the beliefs FILE; the run ROOT was passed and the first belief
             # ever reached (after the recall_many fix) crashed the mind with IsADirectoryError — the crash law fired as designed.
             # edit: Claude (Fable 5.1), 2026-09-19 23:38 +0400 — why() tags cells as (area, id); believe() takes ints and clash() compares the sets,
@@ -775,12 +1025,22 @@ class Mind:
             KIND_TO_COUNTER = {"belief": "beliefs", "revisit": "revisits", "extension": "extensions", "clash": "clashes"}
             kind = row.get("kind", "belief") if isinstance(row, dict) else "belief"
             self.think_counters[KIND_TO_COUNTER.get(kind, "beliefs")] += 1
+            if kind == "clash":
+                # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10 task 1 (QUESTION):
+                # "a belief CLASH is filed" forms a want, form "is" ({"q":"is","args":[<moment>,<word>]}).
+                clash_lines = row.get("clashes") if isinstance(row, dict) else None
+                self._maybe_ask_clash(f"clash:{word}:{clash_lines}", word)
             return {"outcome": "belief", "parked": False, "belief": row}
 
         if item["kind"] == "sight":
             rec = self.episodes.get(item["episode"]) if self.episodes is not None else None
             if rec is None:
                 return dead_end(item["key"], "episode_gone")
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10 task 1 (QUESTION):
+            # this episode's OWN tape_moment (L-11 task 2's column) is exactly the "wordless sight" a
+            # what-is question needs to cite, when PARK ends up parking this want.
+            tape_moment = rec.get("tape_moment")
+            sight_ask = (lambda: self._maybe_ask(f"parked:sight:{item['key']}", "what-is", [tape_moment])) if tape_moment else None
             candidates = self.episodes.nearest(rec["x_s"], 10)
             nearest_word = None
             for eid, _cos in candidates:
@@ -789,7 +1049,7 @@ class Mind:
                     nearest_word = other["word"]
                     break
             if nearest_word is None:
-                return dead_end(item["key"], "no_route")
+                return dead_end(item["key"], "no_route", ask_on_park=sight_ask)
             # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-0b (docs/G4-WAVE3-CLAUSES.md):
             # predict_file() is a real call to FILE's mechanism (genes.py's RUNS entry) — gated on FILE's
             # own declared presence now. Checked HERE (after the route is found, before filing it) so a
@@ -835,6 +1095,41 @@ class Mind:
             if not row.get("accepted"):
                 return {"outcome": "refused", "parked": False, "refused": row.get("refused")}
             return {"outcome": "filed", "parked": False, "want": want}
+
+        if item["kind"] == "frame":
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 3 (SENTENCE): a
+            # frame is a PREDICTION, filed through FILE's four fields exactly as the plan's own text names
+            # them (claim "w1 w2"; route "frame"; decider "the eye answers BOTH words on the next instant
+            # that carries w1"; due "the next instant with w1"). Scored later by _score_due_predictions'
+            # frame branch (triggers on w1 IN that instant's words_in_instant, never word==w1 -- w1 is the
+            # COLOUR, never the moment's own `word`, the OBJECT).
+            frame_row = item.get("pred") or {}
+            w1, w2 = str(frame_row.get("w1")), str(frame_row.get("w2"))
+            key = str(item.get("key"))
+            want = f"frame:{key}"
+            if "FILE" not in self.genome.declared:
+                return dead_end(want, "no_file_gene")
+            filed = predict_file(
+                claim=f'"{w1} {w2}"', route="frame",
+                decider="the eye answers BOTH words on the next instant that carries w1",
+                due=f"the next instant with {w1!r}",
+            )
+            predict_ledger_path = self.run_root / "state" / "predictions.jsonl"
+            predict_ledger_path.parent.mkdir(parents=True, exist_ok=True)
+            with predict_ledger_path.open("a") as f:
+                f.write(json.dumps(filed, default=str) + "\n")
+            self.think_counters["predictions_filed"] += 1
+            if not filed.get("accepted"):
+                return {"outcome": "refused", "parked": False, "refused": filed.get("refused")}
+            self._frame_pending.add(key)
+            episodes_cited = [int(e) for e in (frame_row.get("episodes") or [])]
+            self._frames[key] = {"w1": w1, "w2": w2, "episodes": episodes_cited}
+            self._filed_predictions.append({
+                "row": filed, "target_word": w1, "due_canvas": self._canvas_index,
+                "frame_w2": w2, "frame_key": key,
+            })
+            self.think_counters["frames_filed"] += 1
+            return {"outcome": "filed", "parked": False, "frame": key}
 
         if item["kind"] == "outcome":
             # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: a read-only reflection on one
@@ -894,6 +1189,14 @@ class Mind:
         pool = self._think_pool()
         item = self._think_choose(pool)
         self.think_counters["thinks"] += 1
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — advisor-caught: this call used
+        # to sit AFTER the `if item is None: return` below, so a think whose pool was EMPTY (exactly the
+        # state a settled life reaches once every word is parked and every frame scored) never reached the
+        # mouth -- MOUTH would go silent by control flow, not by G-MOT-6's own citation gate. Moved above
+        # the early return so a filed, cited frame is said on every THINK tick regardless of what (if
+        # anything) the pool held this time; verified by
+        # tests.creature.test_question_sentence_mouth.TestMouth.test_says_even_when_the_think_pool_is_empty.
+        self._maybe_say(row)
         if item is None:
             self._write_journal(row["at"], {"seq": row["seq"], "think": {"item": None, "kind": None, "outcome": "empty_pool", "parked": False}})
             return
@@ -902,6 +1205,42 @@ class Mind:
             "seq": row["seq"],
             "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": result.get("outcome"), "parked": bool(result.get("parked"))},
         })
+
+    # ------------------------------------------------------------------ MOUTH (L-11 task 4)
+    def _maybe_say(self, row: Dict[str, object]) -> None:
+        """L-11 task 4: "on a think, if a filed frame exists and the CURRENT instant's words include w1,
+        the mouth SAYS the frame": a journal `say` row + an `ask/out` "is" row, judged SYNCHRONOUSLY by
+        the mind's OWN recall of THIS instant (the songbird's loop -- it hears itself through its own eye;
+        no external judge, no teacher, never the async ask/in->ask/out round trip). G-MOT-6's gate: a said
+        frame must cite its episodes or is refused BY NAME (never said). One frame per think (the first
+        match, dict order == filed order); the abstention rate is counted, never optimised (STATUS `said`/
+        `heard_yes`/`heard_no` — a mouth that says nothing passes this test perfectly, and that is reported,
+        not hidden)."""
+        if "MOUTH" not in self.genome.declared:
+            return
+        words = self._last_words_in_instant
+        for key, frame in self._frames.items():
+            w1 = str(frame.get("w1"))
+            if w1 not in words:
+                continue
+            episodes_cited = frame.get("episodes") or []
+            if not episodes_cited:
+                # G-MOT-6: "a said frame must cite its episodes or is refused by name" — a planted
+                # uncited frame (self._frames[...]["episodes"] == []) is refused, never said.
+                self._write_journal(row["at"], {"seq": row["seq"],
+                                                  "say": {"frame": key, "outcome": "refused", "reason": "uncited"}})
+                return
+            w2 = str(frame.get("w2"))
+            heard = self._last_glance is not None and self._frame_evidence(w2, self._last_glance)
+            moment = (row.get("meta") or {}).get("moment")
+            self._write_ask_out({"q": "is", "args": [moment, w2], "from": "mouth", "seq": row["seq"], "at": row["at"]})
+            self._write_journal(row["at"], {
+                "seq": row["seq"],
+                "say": {"frame": f"{w1} {w2}", "seq": row["seq"], "heard": "yes" if heard else "no", "episodes": episodes_cited},
+            })
+            self.think_counters["said"] += 1
+            self.think_counters["heard_yes" if heard else "heard_no"] += 1
+            return   # one frame per think
 
     def _write_journal(self, at: str, obj: Dict[str, object]) -> None:
         date = at[:10]
@@ -937,6 +1276,10 @@ class Mind:
             "moment_word": {str(k): v for k, v in self.moment_word.items()},
             "moments": self.org.t,
             "ear_pending": dict(self.pending),
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: the SAME kind
+            # of in-flight state as ear_pending above, same reason (a resume never loses an ear row
+            # consumed just before a crash).
+            "ear_pending_words": {k: list(v) for k, v in self.pending_words.items()},
             "sight": {str(k): sorted(v) for k, v in ledgers["sight"].items()},
             "words": {str(k): sorted(v) for k, v in ledgers["words"].items()},
             "predictor_last_winner": predictor_last_winner,
@@ -966,6 +1309,7 @@ class Mind:
             mind.org = Organism.load(state_dir / "organism", mind.genome)
             ledger = json.loads(ledger_path.read_text())
             mind.pending = dict(ledger.get("ear_pending", {}))
+            mind.pending_words = {k: list(v) for k, v in ledger.get("ear_pending_words", {}).items()}
             mind.moment_word = {int(k): v for k, v in ledger.get("moment_word", {}).items()}
             mind._heard = {v for v in mind.moment_word.values() if v}     # PREREG §15: the heard-set, re-derived (never persisted separately)
             mind.last_seq = int(ledger.get("last_seq", 0))
