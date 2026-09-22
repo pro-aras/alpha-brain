@@ -4,10 +4,38 @@
 [--against run/journal/<date>.jsonl] [--blind gaze] [--closed] --out DIR
 
 Rebuilds a fresh Mind from one day's tape file (in seq order) into a temporary work root (PREREG §2.11:
-fresh roots for every test/gate), and writes DIR/journal.jsonl -- MIND rows only (rows without an
-"event" key; the body's own event rows carry wall-clock facts the mind never produced, PREREG §2.4).
-With --against, exit 0 iff every mind row matches field by field, else exit 1 naming the first
-differing (seq, field).
+fresh roots for every test/gate), and writes DIR/journal.jsonl -- MIND rows only, which since ALPHA4
+(docs/ALPHA4-PREREG.md §4/§6) is a WIDER set than G4-PREREG.md §2.4 originally drew: a row with NO
+"event" key (every ordinary domain row: "moment"/"hash"/"sight_only", and now also "grade"/"hold"/"web"/
+"readiness"), PLUS a row whose "event" value is a genuine MIND-level semantic event (ALPHA4-PREREG §4's
+"stage", §6's "epoch") — a fact the mind itself decided and journaled via `Mind._write_journal`, fully
+reproducible by a bare-Mind replay, unlike the five NON-MIND bookkeeping events (`NON_MIND_EVENTS`,
+below) — four from creature/body.py's own `_journal_event` (wall-clock/thread-lifecycle facts:
+`resumed_from_seq`, `sense_restart`'s own error, `snapshots`, …) plus "exam" from creature/exam.py's OWN,
+separate `_journal_event` (the voice thread examines real pictures on disk, off its own wall-clock
+cadence, never the tape) — neither writer is the Mind, and a bare Mind (what `run_replay` below drives)
+cannot reproduce anything either one wrote. With --against, exit 0 iff every mind row matches field by
+field, else exit 1 naming the first differing (seq, field).
+
+edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:5x +0400 — found while proving "a tape carrying a
+web/stage row replays identically" (my own brief's own test list) through THIS tool rather than only my
+own ad hoc two-Mind comparison: the OLD blanket `"event" not in r` filter silently dropped the "stage"
+event from `out_journal` — indistinguishable from "the stage event never fired" to any --against
+comparison built from this function's own output (both sides equally blind). Not live-breaking today (no
+genome on this tree has ever declared STAGE_READY/EVOLVE before this brief; gate_g4.py's own gate3 runs
+G4-skeleton.genome/G4.genome, neither of which produces ANY mind-level event, so its "live" and "replay"
+sides were equally empty of them either way) -- but it WOULD have silently defeated replay verification
+the moment any life actually reached stage 4 or adopted an EVOLVE epoch, exactly when that proof matters
+most. Fixed by naming the NON-mind events explicitly rather than testing for "event" at all -- first as
+the four body-only ones (grep of creature/body.py alone), THEN widened to five after
+tests/creature/test_exam.py's own `test_exam_event_row_excluded_from_mind_journal_reader` failed on the
+full suite: creature/exam.py's voice thread journals its OWN "exam" event directly, a THIRD writer this
+file's first pass missed — re-grepped `'"event":'` across creature/*.py and genome/*.py exhaustively
+(`NON_MIND_EVENTS`'s own comment names the command) before calling this done a second time. Verified
+additive: gate_g4.py's gate2/gate3/gate6 (G4-skeleton.genome), the full tests/creature/test_exam.py suite,
+and this tree's own life-3a replay-diff (scratch/replay-life3a-{master,mine}/journal.jsonl, 2,576 rows, 0
+divergence) all re-ran byte-identical after this change (no existing tape/genome ever produces a MIND-
+level "event" row in the first place, so the excluded set is unchanged for every existing case).
 """
 from __future__ import annotations
 
@@ -20,6 +48,22 @@ from typing import Dict, FrozenSet, Iterable, List, Optional, Tuple
 
 from .mind import Mind
 
+# Every event name written by something OTHER than `Mind._write_journal` -- exhaustive by
+# `grep -rn '"event":\s*"' creature/*.py genome/*.py` at the time of this edit: four from
+# creature/body.py's `_journal_event` (the BODY's own writer) and one, "exam", from creature/exam.py's
+# OWN separate `_journal_event` (the voice thread, examining real pictures off its own wall-clock cadence
+# -- never the tape). A bare Mind (what `run_replay` below drives) cannot reproduce any of these five --
+# there is no sense-thread to restart, no voice thread sitting an exam, no wall-clock
+# "resumed_from_seq"/"backlog_replayed" a replay ever computes, and Mind.snapshot()/close() are called
+# directly here without Body's own snapshot-count bookkeeping around them. Anything else carrying an
+# "event" key is a MIND-level semantic event (`Mind._write_journal`'s own writes -- ALPHA4-PREREG §4's
+# "stage", §6's "epoch") and belongs in the comparison.
+NON_MIND_EVENTS = frozenset({"start", "sense_restart", "snapshot", "stop", "exam"})
+
+
+def is_mind_row(r: Dict[str, object]) -> bool:
+    return r.get("event") not in NON_MIND_EVENTS
+
 
 def _read_jsonl(path: Path) -> List[Dict[str, object]]:
     rows: List[Dict[str, object]] = []
@@ -31,9 +75,11 @@ def _read_jsonl(path: Path) -> List[Dict[str, object]]:
 
 
 def read_mind_journal(path: Path) -> List[Dict[str, object]]:
-    """Mind rows only -- a row without an "event" key (PREREG §2.4: the body writes event rows, the
-    mind writes rows carrying "moment"/"hash" or "sight_only")."""
-    return [r for r in _read_jsonl(path) if "event" not in r]
+    """Mind rows -- every row except the five NON-mind bookkeeping events (`NON_MIND_EVENTS`): the body
+    and the voice thread write those, the mind writes everything else, including its own semantic event
+    rows since ALPHA4 (the module docstring explains the amendment to G4-PREREG.md §2.4's original,
+    narrower law)."""
+    return [r for r in _read_jsonl(path) if is_mind_row(r)]
 
 
 def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenSet[str] = frozenset(), close: bool = False) -> Path:
@@ -73,7 +119,7 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     jdir = work_root / "journal"
     if jdir.exists():
         for f in sorted(jdir.glob("*.jsonl")):
-            mind_rows.extend(r for r in _read_jsonl(f) if "event" not in r)
+            mind_rows.extend(r for r in _read_jsonl(f) if is_mind_row(r))
     with out_journal.open("w") as f:
         for r in mind_rows:
             f.write(json.dumps(r) + "\n")

@@ -237,6 +237,13 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6: one row,
         # matching the genes.py RUNS entry added by this task (EVOLVE).
         "EVOLVE": "EVOLVE   every 6 h; mutate 1 gene within bounds; judge on the last 2 h; adopt at sleep under the regression bar",
+        # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:34 +0400 — ALPHA4-PREREG.md §3/§4: three
+        # rows, matching the three genes.py RUNS entries added by this task (DOOR_WEB, SENSE_GRADE,
+        # STAGE_READY). Caught by this test's own gate on the first full-suite run after landing — exactly
+        # the omission this class exists to catch (its own comment above, now proven on a fourth builder).
+        "DOOR_WEB": "DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD",
+        "SENSE_GRADE": "SENSE    grade from ask/graded",
+        "STAGE_READY": "STAGE    4 world by READY",
     }
 
     def test_every_runs_gene_parses(self) -> None:

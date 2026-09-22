@@ -153,6 +153,40 @@ class TestWriterSweepG41(unittest.TestCase):
         import_offenders = find_offenders(offender, check_organism_import=True)
         self.assertTrue(import_offenders, "the planted Organism import must be caught")
 
+    # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md's own instruction
+    # (via the brief): "a planted offender: a web sense that writes memory" — a plant SHAPED like this
+    # builder's own module (a `sense(publish, stop_event, root, ...)` signature, the same imports web.py
+    # actually uses), caught by BOTH this file's own `find_offenders` AND `tools/gate_g4.py`'s independent
+    # `sweep()` (SOLUTIONS #214: the orchestrator keeps its own checker, and a builder's own control must
+    # pass under it too, not only under the file it happens to be editing).
+    def test_planted_web_sense_that_writes_memory_is_caught_by_both_sweeps(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        plant = tmp_dir / "planted_web_sense.py"
+        plant.write_text(
+            "from pathlib import Path\n"
+            "def sense(publish, stop_event, root, questions_dir=None, hold_file=None, floor_s=2.0):\n"
+            "    p = Path(root) / 'memory' / 'web_cache.json'\n"
+            "    p.write_text('{}')\n"
+        )
+        offenders = find_offenders(plant, check_organism_import=False)
+        self.assertTrue(offenders, "a web-shaped sense writing under 'memory' must be caught by this file's own walker")
+
+        import importlib
+        gate_g4 = importlib.import_module("tools.gate_g4")
+        g4_offenders = gate_g4.sweep([plant])
+        self.assertTrue(g4_offenders, "the SAME plant must be caught by tools/gate_g4.py's own independent sweep() too")
+
+    def test_the_real_web_and_grade_modules_pass_both_sweeps(self) -> None:
+        """The negative control's positive twin: the actual, shipped web.py/grade.py must NOT be flagged by
+        either sweep — a sweep that catches everything proves nothing (#91)."""
+        real = [ROOT / "creature" / "senses" / "web.py", ROOT / "creature" / "senses" / "grade.py"]
+        for p in real:
+            self.assertEqual(find_offenders(p, check_organism_import=False), [], f"{p} must be clean under this file's own walker")
+            self.assertEqual(find_offenders(p, check_organism_import=True), [], f"{p} must not import Organism")
+        import importlib
+        gate_g4 = importlib.import_module("tools.gate_g4")
+        self.assertEqual(gate_g4.sweep(real), [], "the real modules must be clean under tools/gate_g4.py's own sweep() too")
+
     def test_planted_clean_write_is_not_flagged(self) -> None:
         """Negative control for the negative control (#91): a write OUTSIDE state/journal/memory must
         NOT be flagged, or the sweep would be trivially "catch everything"."""

@@ -897,6 +897,13 @@ def main(argv: List[str]) -> int:
         except (json.JSONDecodeError, OSError):
             _evolve_nc = None
     M["EVOLVE"] = _vl.evolve_mark(tape, live, "EVOLVE" in decl, float(a.hours), negative_control=_evolve_nc)   # §5/§6 (builder J's proposals/adoptions)
+    # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:5x +0400 — ALPHA4-PREREG.md §5: WEB and STAGE (I) —
+    # wired the SAME way every other builder's mark above is (a pure function in tools/verdict_life.py, called here
+    # with `decl`/`tape`/`live`), so a run of THIS reader against an ALPHA4 life computes them, never leaves them
+    # DECLARED-ONLY in the sense #180 exists to catch. Both read «not gradable» on every closed record this reader
+    # has ever seen (none declares DOOR_WEB/STAGE_READY) — the control every OTHER mark above already gets for free.
+    M["WEB"] = _vl.web_mark(tape, live, "DOOR_WEB" in decl)
+    M["STAGE"] = _vl.stage_mark(live, "STAGE_READY" in decl)
     M["PLANTS"]["predict_file_pair"] = {"sight_road_rows": live_pred["sight_road_rows"], "rule_rows_filed": live_pred["filed"], "rule_rows_scored": live_pred["scored"], "status_predictions_filed": st.get("predictions_filed")}
     M["PLANTS"]["park_unanswerable_want"] = {"sight_only_rows": len(sight_only), "first_seq": sight_only[0]["seq"] if sight_only else None, "parked_total": parked}
     M["PLANTS"]["belief_contradiction"] = {"clash_rows": kinds.get("clash", 0), "extension_rows": kinds.get("extension", 0)}

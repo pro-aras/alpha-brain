@@ -217,10 +217,32 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"every (\d+) moments", a)
                 if not m: raise GenomeError(f"SCALE: cannot read {a!r}")
                 g["scale_every"] = int(m.group(1))
+            # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 00:56 +0400 — ALPHA4-PREREG.md §3/§4:
+            # the "moments" form is untouched, tried FIRST (byte-identical grammar, byte-identical tuple
+            # shape for every genome on disk today). A NEW second form, "<n> <name> by <JUDGE>", is tried
+            # only when the first does not match — never the other way round, so "moments" cannot be
+            # mis-read as "by". `<JUDGE>` must be the literal "READY" (the only judge this machinery
+            # implements, §4 THE READINESS JUDGE); any other word (a typo, an unimplemented judge name)
+            # refuses BY NAME, never silently accepted or silently ignored. The stored tuple keeps the
+            # existing 4-element (index, name, a, b) shape `stage2_start` already unpacks — `a` holds the
+            # judge name (a str) instead of a moment count (an int) for this form, `b` stays None; nothing
+            # currently reads `stages[i][2]` except `stage2_start`'s `name == "meet"` branch, which never
+            # touches a judge-form row. `g["declared"]["STAGE_READY"]` is written ADDITIONALLY (never in
+            # place of the stages entry) so W3-0's generic refusal (creature/genes.py) has a real key to
+            # gate on — a genome that declares "by READY" but whose tree has no judge wired refuses to
+            # start, exactly like every other G4-wave gene.
             elif gene == "STAGE":
                 m = re.fullmatch(r"(\d+) (\w+) moments (\d+)\.\.(\d*)", a)
-                if not m: raise GenomeError(f"STAGE: cannot read {a!r}")
-                g["stages"].append((int(m.group(1)), m.group(2), int(m.group(3)), int(m.group(4)) if m.group(4) else None))
+                if m:
+                    g["stages"].append((int(m.group(1)), m.group(2), int(m.group(3)), int(m.group(4)) if m.group(4) else None))
+                else:
+                    m2 = re.fullmatch(r"(\d+) (\w+) by (\w+)", a)
+                    if not m2: raise GenomeError(f"STAGE: cannot read {a!r} (ALPHA4-PREREG §3: STAGE <n> <name> moments <a>..<b> | STAGE <n> <name> by <JUDGE>)")
+                    idx, name, judge = int(m2.group(1)), m2.group(2), m2.group(3)
+                    if judge != "READY":
+                        raise GenomeError(f"STAGE: unknown judge {judge!r} (only READY is implemented, ALPHA4-PREREG §4) — the organism does not start")
+                    g["stages"].append((idx, name, judge, None))
+                    g["declared"]["STAGE_READY"] = {"stage": idx}
             elif gene == "RECALL":
                 m = re.fullmatch(r"k=(\d+)", a)
                 if not m: raise GenomeError(f"RECALL: cannot read {a!r}")
@@ -550,6 +572,35 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"EVOLVE: cannot read {a!r} (§6: EVOLVE every <n> h; mutate 1 gene "
                                              f"within bounds; judge on the last <m> h; adopt at sleep under the regression bar)")
                 g["declared"]["EVOLVE"] = {"every_h": int(m.group(1)), "judge_h": int(m.group(2))}
+            # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 00:56 +0400 — ALPHA4-PREREG.md §3: THE
+            # WEB DOOR. New vocabulary, dispatched on args[0] exactly as SENSE eye/ear/colour/… dispatch on
+            # THEIR args[0] (so a future "DOOR lexicon …" branch, builder H's, can be added the same way
+            # without touching this one — two DOOR forms are additive, not a merge conflict on one regex).
+            # A strict fullmatch of the PREREG's own literal line: a typo anywhere (the fixed literal
+            # tokens, a non-numeric floor/rate/stage, a malformed path) refuses BY NAME, never silently
+            # substitutes a default. Stored under `declared["DOOR_WEB"]` (never a bare Genome field): the
+            # web door is a G4-wave "declared gene" subject to creature/genes.py's unwired() refusal law,
+            # matching WORLD_GAME's own precedent for a second DOOR-shaped line.
+            elif gene == "DOOR" and args[0] == "web":
+                m = re.fullmatch(
+                    r"web wikipedia-summary wiktionary; floor (" + _NUM + r") s; (\d+) per hour; "
+                    r"opens at STAGE (\d+); hold-file ([A-Za-z0-9_./-]+)", a)
+                if not m:
+                    raise GenomeError(f"DOOR web: cannot read {a!r} (ALPHA4-PREREG §3: DOOR web wikipedia-summary "
+                                       f"wiktionary; floor <n> s; <n> per hour; opens at STAGE <n>; hold-file <path>)")
+                g["declared"]["DOOR_WEB"] = {
+                    "sources": ["wikipedia-summary", "wiktionary"], "floor_s": float(m.group(1)),
+                    "per_hour": int(m.group(2)), "opens_at_stage": int(m.group(3)), "hold_file": m.group(4),
+                }
+            # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 00:56 +0400 — ALPHA4-PREREG.md §4(d): THE
+            # SEAT'S GRADES + THE HOLD. New vocabulary under the existing "SENSE" gene (dispatched on
+            # args[0], exactly like SENSE smell/touch above); a thread publishing `ask/graded/<id>.json`
+            # rows as `grade` tape rows, and the presence of `world/HOLD` as `hold` tape rows on every
+            # change — "mentorship enters through the tape, so the judge replays" (the brief's own words).
+            elif gene == "SENSE" and args[0] == "grade":
+                m = re.fullmatch(r"from ask/graded", a[len("grade "):].strip())
+                if not m: raise GenomeError(f"SENSE grade: cannot read {a!r} (ALPHA4-PREREG §4(d): SENSE grade from ask/graded)")
+                g["declared"]["SENSE_GRADE"] = {"from": "ask/graded"}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:

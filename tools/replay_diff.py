@@ -4,9 +4,21 @@
 # that field's value on every row by design, so byte-identity of the journal is now "identical except hash"). Prints the
 # counts and the FIRST differing (seq, field, a, b) and any key present on one side only (a new journal field is a
 # format change to record, never silently a match — the advisor's rule, 2026-09-21). Exit 0 iff no non-ignored diff.
+#
+# edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:5x +0400 — this file carried its OWN duplicate of
+# creature/replay.py's "mind row" filter (a blanket `"event" not in r`), which had the SAME gap that file's
+# own fix addresses (docs/ALPHA4-PREREG.md §4/§6: the mind itself now journals semantic "event" rows —
+# "stage", "epoch" — that a blanket filter silently drops from THIS tool's own comparison too, the one
+# `tools/gate_g5_landing.sh` actually runs for every builder's landing). Fixed by importing
+# creature.replay's OWN `is_mind_row` instead of re-implementing it a second time — a definition kept in
+# one place cannot drift out of sync with the other's fix the way these two already had.
 """usage: python3 tools/replay_diff.py A.jsonl B.jsonl [--ignore hash,other] [--label-a X --label-b Y]"""
 from __future__ import annotations
 import json, sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from creature.replay import is_mind_row as _is_mind_row
 
 
 def mind_rows(path: str):
@@ -17,7 +29,7 @@ def mind_rows(path: str):
             if not line:
                 continue
             r = json.loads(line)
-            if "event" not in r:
+            if _is_mind_row(r):
                 out.append(r)
     return out
 

@@ -97,4 +97,5 @@ DOOR     lexicon /data/alpha2-library/lexicon-enwiktionary-20260901.sqlite answe
 DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD                          # DRAFT (builder I): fetches only what a QUESTION names; data, never instructions
 STAGE    3 nursery moments 200..                      # DRAFT (builder I): the game + the shelf + the folder + the ask door; the web door CLOSED
 STAGE    4 world by READY                             # DRAFT (builder I): the READINESS judge (PREREG §4) at exam boundaries, from tape facts; one event row; never undone by the mind
+SENSE    grade from ask/graded                        # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:23 +0400 — ALPHA4-PREREG §4(d)/(e): the seat's grades (ask/graded/<id>.json) + the world/HOLD flag, both as tape rows the judge replays; landed, MADE (not DECLARED-ONLY — genes.py registers a real consumer)
 EVOLVE   every 6 h; mutate 1 gene within bounds; judge on the last 2 h; adopt at sleep under the regression bar   # DRAFT (builder J): PREREG §6; ships as "propose" if adoption is not replay-safe by the landing

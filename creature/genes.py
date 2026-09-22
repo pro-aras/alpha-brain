@@ -104,6 +104,20 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # until the code carrying it exists, behind each module's own *_DOOR_GATED constant).
         "SENSE_READ": "creature/body.py:main (declared['SENSE_READ'] read; arms creature/senses/read.py behind READ_DOOR_GATED) + creature/mind.py:consume ('ear'/'eye' branches, unchanged -- a shelf row is source='shelf', read exactly like every other ear/eye row; MEET/ARRIVAL/FAST all apply with no new branch)",
         "DOOR_LEXICON": "creature/body.py:main (declared['DOOR_LEXICON'] read; arms creature/senses/lexicon.py behind LEXICON_DOOR_GATED) + creature/mind.py:_maybe_ask (gated on 'DOOR_LEXICON' in declared: a what-is want that resolves a word also writes world/questions/q-<n>.json {q, word} for the door to answer -- ask/out/q-<n>.json alone carries no word, only a tape moment, ALPHA4-H-REPORT.md's own RAISED clause)",
+        # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 00:56 +0400 — ALPHA4-PREREG.md §3: two real
+        # call sites each, the same two-site shape HANDS/WORLD_GAME already use (body arms the sense
+        # thread; the mind consumes what it publishes). DOOR_WEB: creature/body.py:main reads
+        # declared['DOOR_WEB'] and arms creature/senses/web.py behind WEB_DOOR_GATED (the same
+        # "a genome line arms nothing until the code exists" discipline C2/C3 used for the folder/game
+        # doors); creature/mind.py:Mind._consume_web counts fetches/refusals from the `web` tape rows the
+        # sense publishes (STATUS's web_fetches/web_refused_rate) and tracks the hold flag `_hold_active`
+        # from `hold` tape rows (STATUS's web_hold; also read by the READINESS judge's (e)).
+        # SENSE_GRADE: creature/body.py:Body.start reads declared['SENSE_GRADE'] and starts
+        # creature/senses/grade.py:sense (the same C1.7 pattern SIT/SENSE_BODY use); creature/mind.py:
+        # Mind._consume_grade/_consume_hold track the seat's grades and the hold flag the READINESS
+        # judge's (d)/(e) read.
+        "DOOR_WEB": "creature/body.py:main (declared['DOOR_WEB'] read; arms creature/senses/web.py behind WEB_DOOR_GATED) + creature/mind.py:Mind._consume_web (fetch/refusal counters + the hold flag)",
+        "SENSE_GRADE": "creature/body.py:Body.start (declared['SENSE_GRADE'] read; starts creature/senses/grade.py:sense) + creature/mind.py:Mind._consume_grade/_consume_hold (the seat's grades + the hold flag, both read by the READINESS judge)",
     },
     # ---------------------------------------------------------------------------------------- the mind
     "mind": {
@@ -186,6 +200,13 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # WORLD_GAME/HANDS use.
         "EVOLVE": "creature/mind.py:Mind._consume_proposal + Mind._maybe_sleep (adoption) + Mind.resume (epoch-aware) "
                   "+ creature/body.py:main (arms tools/evolve.py + creature/senses/evolve.py) + tools/evolve.py (the shadow/twin replay + grading)",
+        # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 00:56 +0400 — ALPHA4-PREREG.md §3/§4: the
+        # ONE real call site of the "by READY" STAGE form — creature/mind.py:Mind._consume_sit evaluates
+        # §4 (a)-(e) from tape facts at every EXAM boundary and commits STAGE 4 (self.stage, a journal
+        # "stage" event) once all five hold on two consecutive windows. The plain "moments" STAGE form
+        # (STAGE 1/2/3 here) stays an undeclared, ungated Genome field exactly as before — this row exists
+        # only for the NEW `declared["STAGE_READY"]` key the "by READY" grammar writes.
+        "STAGE_READY": "creature/mind.py:Mind._consume_sit (THE READINESS JUDGE, ALPHA4-PREREG §4 (a)-(e); commits self.stage=4 via a journal event, never undone)",
     },
 }
 

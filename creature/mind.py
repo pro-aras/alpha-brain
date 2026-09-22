@@ -34,6 +34,7 @@ from __future__ import annotations
 # The actual wall-clock read (timing a think's compute, timing a wait) lives in creature/think_thread.py,
 # which this law does not bind; this file only ever does ARITHMETIC on the float ms numbers that module
 # hands back (see _maybe_think_threaded/_think_apply_pending below).
+import collections
 import concurrent.futures
 import hashlib
 import inspect
@@ -509,8 +510,60 @@ class Mind:
         # checked immediately after parse_genome, before this point is ever reached.
         self._last_snapshot_moments: int = 0
 
+        # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §3/§4: THE
+        # STAGE and its readiness judge. `self.stage` starts at the highest MOMENTS-based STAGE this
+        # genome declares whose lower bound org.t has already reached (`_moments_stage()`, below) -- a
+        # fresh Organism starts at t=0, so this reads 1 here; `consume()` recomputes it on every row
+        # (org.t only ever increases, so this is a monotonic, idempotent refresh, exactly like
+        # `stage2_start` is already recomputed from the genome on demand). A "by READY" stage (STAGE_READY
+        # declared) is committed permanently by `_maybe_advance_stage` once §4 (a)-(e) all hold on two
+        # consecutive EXAM boundaries -- "never undone by the mind" (the brief's own words): nothing here
+        # ever LOWERS self.stage.
+        self.stage: int = self._moments_stage()
+        self._stage_ready_streak: int = 0
+        # (d): the seat's grades (`grade` tape rows, creature/senses/grade.py) -- ALL of them (since
+        # birth, the PREREG's own words), plus the RIGHT flag of the last 10 flagged `novel` (a picture
+        # this mind had never seen; "right" there means "correctly said I don't know", the grade
+        # schema's own meaning for a novel item — SENSE_GRADE's own docstring).
+        self._grades_total: int = 0
+        self._grades_right: int = 0
+        self._novel_grades: "collections.deque[bool]" = collections.deque(maxlen=10)
+        # (e): the hold flag, from `hold` tape rows (the SAME grade sense, on every change, including the
+        # very first observation — creature/senses/grade.py's own docstring).
+        self._hold_active: bool = False
+        # (a): the mind-chosen game rewards, the last 200 of them (condition (a)'s own window) -- appended
+        # in `_consume_outcome` below, gated the SAME way `_check_act_mismatch` already is
+        # (source=="game" and chosen_by=="mind").
+        self._game_rewards: "collections.deque[float]" = collections.deque(maxlen=200)
+        # (c): the last TWO `sit` rows' (score, composite) pairs -- `score` is the existing SIT payload
+        # (Q1's own accuracy, `creature/senses/sit.py`'s own `_score_of`); `composite` is a NEW field that
+        # module's `sense()` gains in this same brief (`_composite_of`) so this judge can read §4(c)'s
+        # OTHER number from tape facts too — an older `sit` row (before that field existed) carries no
+        # `composite` key, read as None, which fails (c) honestly rather than fabricating a pass.
+        self._sit_readings: "collections.deque[tuple]" = collections.deque(maxlen=2)
+        # (b)'s second half is RAISED — see `_read_proxy`'s own docstring below and the builder report.
+        # `_read_proxy_override`: NEVER set by production code; a test pokes this attribute directly so
+        # the streak/commit machinery (conditions a, c, d, e plus (b)'s frame half) can be proven
+        # independently of the one permanently-open question, and so a SIXTH test can prove the judge
+        # stays fail-closed with the override absent (the honest, shipped behaviour).
+        self._read_proxy_override: Optional[bool] = None
+        # WEB (I): fetch/refusal counters from `web` tape rows (creature/senses/web.py) — on STATUS on
+        # every branch (#164), and the hold flag above doubles as STATUS.web_hold (the SAME `_hold_active`
+        # (e) reads — one fact, one name, never two counters that could disagree, #180).
+        self.web_fetches: int = 0
+        self.web_refused_rate: int = 0
+        self.web_refused_hold: int = 0
+
         (self.run_root / "journal").mkdir(parents=True, exist_ok=True)
         (self.run_root / "state").mkdir(parents=True, exist_ok=True)
+
+    @property
+    def hold_active(self) -> bool:
+        """Read-only public view of `_hold_active` (§4(e)'s own flag) — creature/body.py's STATUS builder
+        reads every OTHER exported fact off a plain public attribute (think_waits, web_fetches, …); this
+        property keeps that convention instead of reaching into a leading-underscore field from outside
+        the class."""
+        return self._hold_active
 
     # ------------------------------------------------------------------ consume
     def consume(self, row: Dict[str, object]) -> None:
@@ -556,8 +609,21 @@ class Mind:
         # EVOLVE worker's own proposal, republished onto the tape by creature/senses/evolve.py.
         elif sense == "proposal":
             self._consume_proposal(row)
+        # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §3/§4: three
+        # more tape senses, the same one-row-carries-no-work-until-armed law every sense above already
+        # follows. `grade`/`hold` feed the READINESS judge's (d)/(e); `web` is counted only (an
+        # UNCONSUMED sense otherwise, the brief's own words — see _consume_web's own docstring).
+        elif sense == "grade":
+            self._consume_grade(row)
+        elif sense == "hold":
+            self._consume_hold(row)
+        elif sense == "web":
+            self._consume_web(row)
         # a "door" row (the ask door / other senses not yet armed) carries no organism work here
         self.last_seq = int(row["seq"])
+        # ALPHA4-PREREG.md §3: self.stage only ever RISES here (org.t is monotonic; a committed "by READY"
+        # stage is never revisited by _moments_stage, which cannot itself produce a judge-stage index).
+        self.stage = max(self.stage, self._moments_stage())
         if self.org.t - self._last_snapshot_moments >= SNAPSHOT_EVERY:
             self.snapshot()
 
@@ -618,6 +684,13 @@ class Mind:
         if meta.get("source") == "game" and meta.get("chosen_by") == "mind":
             result = dict(result)
             result["act_mismatch"] = self._check_act_mismatch(meta)
+            # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §4(a):
+            # THE READINESS JUDGE's own window — "the mind-chosen acts' reward over the last 200 acts".
+            # The SAME gate the mismatch check above already uses (source=="game" and chosen_by=="mind"),
+            # so a scheduled/worker-chosen act (no ACT gene driving the game yet) never counts toward it.
+            got = meta.get("got")
+            if got is not None:
+                self._game_rewards.append(float(got))
         # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
         # 2 (L-12): the OTHER half of `_maybe_think`'s pending gate — a hands outcome row's own `act_seq`
         # (the eye row that chose it) clears `_hands_pending` iff it matches the CURRENT pending choice
@@ -635,7 +708,16 @@ class Mind:
     def _consume_sit(self, row: Dict[str, object]) -> None:
         """G-MOT-3: SIT must be declared. `--blind sit` means "the score is not published" (MOTOR-HANDS.md's own
         words for this twin) -- blind is a Mind-level concept here (senses never receive it), so the mind treats a
-        blind-sit row as if SIT had never fired: journaled as blind, no reflex recorded."""
+        blind-sit row as if SIT had never fired: journaled as blind, no reflex recorded.
+
+        edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §4: every SIT
+        row is also an EXAM BOUNDARY — the point at which THE READINESS JUDGE is evaluated (never on a
+        blind row: a blind SIT twin never receives a score at all, so §4(c) can never hold for it either
+        way, and evaluating here would be dead code exercised by nothing). `composite` (§4(c)'s OTHER
+        number) is read straight off the row's own meta — `creature/senses/sit.py`'s `sense()` gains this
+        field in this same brief (`_composite_of`, additive, alongside the existing `score`); an older row
+        (recorded before that change) simply carries no `composite` key, read as None here, which fails
+        (c) honestly rather than inventing a value."""
         if "SIT" not in self.genome.declared:
             return
         meta = row.get("meta") or {}
@@ -644,7 +726,174 @@ class Mind:
             return
         result = self._record_reflex(act="sit", got=meta.get("score"), expected_in=None, residual_in=None,
                                        source=str(meta.get("source", "sit")))
-        self._write_journal(row["at"], {"seq": row["seq"], "sit": result})
+        composite = meta.get("composite")
+        self._sit_readings.append((meta.get("score"), float(composite) if isinstance(composite, (int, float)) else None))
+        readiness = self._readiness_readings() if "STAGE_READY" in self.genome.declared else None
+        journal_row: Dict[str, object] = {"seq": row["seq"], "sit": result}
+        if readiness is not None:
+            journal_row["readiness"] = readiness       # #164/(b)'s "print it": every EXAM boundary states its own readings, not only the one that commits
+        self._write_journal(row["at"], journal_row)
+        if readiness is not None:
+            self._maybe_advance_stage(row, readiness)
+
+    # ------------------------------------------------------------------ ALPHA4-PREREG.md §4: THE READINESS JUDGE
+    def _moments_stage(self) -> int:
+        """The highest STAGE index whose grammar is `moments <a>..<b>` and whose lower bound `a` the
+        organism has already reached (`org.t >= a`) — a pure function of the genome + org.t, recomputed on
+        demand (never persisted separately), exactly like `Genome.stage2_start` already is. A "by READY"
+        stage's own `a` is a judge NAME (a str), never an int, so it is simply skipped here — only
+        `_maybe_advance_stage` may ever raise `self.stage` to that index."""
+        best = 1
+        for idx, _name, a, _b in self.genome.stages:
+            if isinstance(a, int) and self.org.t >= a:
+                best = max(best, idx)
+        return best
+
+    def _frames_lift_ok(self) -> "Tuple[int, bool]":
+        """§4(b)'s frame half: `alive` = every frame this mind has EVER filed (`self._frames` — nothing
+        ever removes from it, so "alive" here means "on the record", matching the brief's own reading);
+        each alive frame's CURRENT co-occurrence lift, recomputed from `self.episodes` via the SAME
+        `genome.sentence.find_frames()` the THINK step already calls (never a fresh computation invented
+        for this judge) — "from the mind's own counts" (the brief's own words). `find_frames()` only ever
+        returns a row for a pair that ALREADY clears its own `count > factor * expected` bar (factor=2.0
+        by default, the SAME 2.0 this judge asks for): a frame that no longer clears it is simply ABSENT
+        from the fresh call, which reads as lift-not-met here, never a crash or a fabricated number."""
+        alive = list(self._frames.keys())
+        if not alive or self.episodes is None:
+            return len(alive), False
+        current = {f"{r['w1']}|{r['w2']}": r for r in find_frames(self.episodes)}
+        ok = True
+        for key in alive:
+            row = current.get(key)
+            if row is None:
+                ok = False
+                break
+            expected = row.get("expected") or 0.0
+            if expected > 0 and (row["count"] / expected) < 2.0:
+                ok = False
+                break
+            # expected == 0 with count > 0 is an infinite lift; find_frames() only emits such a row once
+            # it already cleared `count >= min_count`, so its mere presence here satisfies >= 2.0.
+        return len(alive), ok
+
+    # RAISED (2026-09-23, this builder's report): no counter this mind holds lets it compute "the mind's
+    # own answer rate on the last 50 shelf lines" without RE-ASKING the organism at judge time (calling
+    # org.recall_many against stored FAST episodes' own x_s) — a real computation over the organism, not a
+    # read of a counter or a journaled fact, which the advisor's 2026-09-23 00:34 amendment rules out in
+    # as many words: "the judge reads only rows and counters the mind already holds". FAST's episode rows
+    # carry what the ear TOLD the mind at that moment (`word`), never what the mind ANSWERED when it later
+    # saw that glance again — no per-episode "was this read correctly" field exists, and none of
+    # SURPRISE's `confirmed` (word→sight EXPECTATION, not reading), MOUTH's `heard_yes`/`heard_no` (never
+    # fires on a shelf moment — nobody grades the mouth's own frame-sentences against shelf content), or
+    # any other journaled per-moment field fits. Candidate for a future gene: SURPRISE's confirmed-share
+    # computed specifically over shelf-sourced episodes (source=="shelf") — buildable once builder H's
+    # reader lands and a life has run long enough to carry SURPRISE + shelf episodes together; not built
+    # here. `_read_proxy_override` (test-only) exists so the OTHER four conditions can be verified without
+    # this one permanently-open question in the way.
+    _READ_PROXY_RAISE_REASON = ('RAISED: no honest proxy for "the mind\'s own answer rate on the last 50 '
+                                 'shelf lines" exists from counters alone — computing one would mean '
+                                 're-asking the organism at judge time, which the 2026-09-23 00:34 '
+                                 'amendment rules out; see ALPHA4-I-REPORT.md')
+
+    def _read_proxy(self) -> Optional[bool]:
+        """§4(b)'s read-proxy half. Always None (RAISED — see `_READ_PROXY_RAISE_REASON` above): treated
+        as NOT held wherever it is read (fail-closed — the PREREG's own stance on an unmet bar: "a life
+        that never opens the door is a FAIL of nothing, it is a reading of the bar"), never as True."""
+        if self._read_proxy_override is not None:
+            return self._read_proxy_override
+        return None
+
+    def _sit_composite_ok(self) -> bool:
+        """§4(c): the last TWO `sit` rows' composite >= 0.95 AND Q1 (the row's own `score`) >= 0.98 — both
+        numbers, both rows. Fewer than two SIT rows yet, or either number missing/under its bar, fails."""
+        if len(self._sit_readings) < 2:
+            return False
+        return all(score is not None and score >= 0.98 and composite is not None and composite >= 0.95
+                   for score, composite in self._sit_readings)
+
+    def _readiness_readings(self) -> Dict[str, object]:
+        """§4 (a)-(e), from TAPE FACTS ONLY — every value below is derived from a counter this mind built
+        by CONSUMING rows (outcome/sit/grade/hold), never by reaching outside the tape or the organism's
+        own already-held state. Returns the five letter keys (bool) PLUS `b_read_proxy` (bool or None —
+        (b)'s "define it, name it, print it": None IS the printed answer, the RAISED clause named above)."""
+        a = len(self._game_rewards) >= 200 and (sum(self._game_rewards) / len(self._game_rewards)) >= 0.35
+        frames_alive, lift_ok = self._frames_lift_ok()
+        read_proxy = self._read_proxy()
+        b = bool(frames_alive >= 3 and lift_ok and read_proxy is True)
+        c = self._sit_composite_ok()
+        # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:5x +0400 — advisor-caught: PREREG §4(d)
+        # and §8 point 7 both name TEN as the denominator ("8 of the last 10 grades flagged novel"; "ten
+        # of them never-seen pictures, so the judge's (d) can ever be true") — `>= 8` on a maxlen=10 deque
+        # let as few as 8 novel grades (all right) satisfy (d) before the window ever filled. `== 10`
+        # (never `>`, since the deque's own maxlen caps it) requires the FULL last-10 window before (d)
+        # can ever hold, matching the bar's own denominator.
+        d = (self._grades_total >= 20 and (self._grades_right / self._grades_total) >= 0.8
+             and len(self._novel_grades) == 10 and sum(1 for r in self._novel_grades if r) >= 8) if self._grades_total else False
+        e = not self._hold_active
+        return {"a": bool(a), "b": b, "c": bool(c), "d": bool(d), "e": bool(e), "b_read_proxy": read_proxy}
+
+    def _maybe_advance_stage(self, row: Dict[str, object], readings: Dict[str, object]) -> None:
+        """§4: all five hold on TWO CONSECUTIVE exam windows -> ONE journal event, `self.stage` raised to
+        the declared judge's own stage index, NEVER undone by the mind (this method is a no-op forever
+        once `self.stage` has already reached `target_stage` — the streak counter is not even read then)."""
+        ready_gene = self.genome.declared.get("STAGE_READY")
+        if ready_gene is None:
+            return
+        target_stage = int(ready_gene["stage"])
+        if self.stage >= target_stage:
+            return
+        all_hold = all(readings[k] is True for k in ("a", "b", "c", "d", "e"))
+        self._stage_ready_streak = (self._stage_ready_streak + 1) if all_hold else 0
+        if self._stage_ready_streak >= 2:
+            self.stage = target_stage
+            self._write_journal(row["at"], {"seq": row["seq"], "event": "stage", "stage": target_stage,
+                                              "moment": self.org.t,
+                                              "readings": {k: readings[k] for k in ("a", "b", "c", "d", "e")}})
+
+    # ------------------------------------------------------------------ (d)/(e): the seat's grades + the hold flag
+    def _consume_grade(self, row: Dict[str, object]) -> None:
+        """ALPHA4-PREREG.md §4(d): a `grade` tape row (creature/senses/grade.py) — "mentorship enters
+        through the tape, so the judge replays". Gated on SENSE_GRADE's own declared presence (the same
+        "an unarmed sense's rows carry no organism work" law every other new tape-sense here follows)."""
+        if "SENSE_GRADE" not in self.genome.declared:
+            return
+        meta = row.get("meta") or {}
+        right = bool(meta.get("right"))
+        novel = bool(meta.get("novel"))
+        self._grades_total += 1
+        if right:
+            self._grades_right += 1
+        if novel:
+            self._novel_grades.append(right)
+        self._write_journal(row["at"], {"seq": row["seq"], "grade": {"id": meta.get("id"), "right": right, "novel": novel}})
+
+    def _consume_hold(self, row: Dict[str, object]) -> None:
+        """§4(e): a `hold` tape row (the SAME grade sense, on every change — creature/senses/grade.py's own
+        docstring). Gated on SENSE_GRADE's own declared presence, matching `_consume_grade` above."""
+        if "SENSE_GRADE" not in self.genome.declared:
+            return
+        meta = row.get("meta") or {}
+        self._hold_active = bool(meta.get("active"))
+        self._write_journal(row["at"], {"seq": row["seq"], "hold": {"active": self._hold_active}})
+
+    # ------------------------------------------------------------------ WEB (I): fetch/refusal counters
+    def _consume_web(self, row: Dict[str, object]) -> None:
+        """A `web` tape row (creature/senses/web.py) — counted, never otherwise acted on (the mind
+        consumes nothing of the web row's own content: "an unconsumed sense", the brief's own words,
+        matching the game door's outcome rows before K wired them). Gated on DOOR_WEB's own declared
+        presence."""
+        if "DOOR_WEB" not in self.genome.declared:
+            return
+        meta = row.get("meta") or {}
+        status = meta.get("status")
+        if status in ("ok", "failed"):
+            self.web_fetches += 1
+        elif status == "refused_rate":
+            self.web_refused_rate += 1
+        elif status == "refused_hold":
+            self.web_refused_hold += 1
+        self._write_journal(row["at"], {"seq": row["seq"],
+                                         "web": {"status": status, "question_id": meta.get("question_id")}})
 
     def _consume_body(self, row: Dict[str, object]) -> None:
         """BODY-SENSES.md §4.1: "the readings; the DRIVE is the mind's" -- this gene carries no threshold, so
@@ -2390,6 +2639,21 @@ class Mind:
             "hands_rng_state": self._hands_rng.bit_generator.state,
             "hands_pending": self._hands_pending,
             "hands_last_program": self._hands_last_program,
+            # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §3/§4:
+            # THE STAGE and its judge's own running state — "a resume mid-life keeps the stage" (the
+            # brief's own test); the streak/grade/reward/sit-reading state is persisted too so a resume
+            # does not lose a partial streak or the (d) grade tally it has already earned.
+            "stage": self.stage,
+            "stage_ready_streak": self._stage_ready_streak,
+            "grades_total": self._grades_total,
+            "grades_right": self._grades_right,
+            "novel_grades": list(self._novel_grades),
+            "hold_active": self._hold_active,
+            "game_rewards": list(self._game_rewards),
+            "sit_readings": [list(t) for t in self._sit_readings],
+            "web_fetches": self.web_fetches,
+            "web_refused_rate": self.web_refused_rate,
+            "web_refused_hold": self.web_refused_hold,
         }
         ledger_tmp = state_dir / "ledger_tmp.json"
         ledger_tmp.write_text(json.dumps(ledger))
@@ -2448,6 +2712,22 @@ class Mind:
             mind._heard = {v for v in mind.moment_word.values() if v}     # PREREG §15: the heard-set, re-derived (never persisted separately)
             mind.last_seq = int(ledger.get("last_seq", 0))
             mind._last_snapshot_moments = mind.org.t
+            # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §3/§4:
+            # THE STAGE — "a resume mid-life keeps the stage" (the brief's own test). Absent (a snapshot
+            # from before this gene existed) -> recomputed from the JUST-LOADED org.t via `_moments_stage`
+            # (never the pre-load org's t=0, which __init__ used to seed `mind.stage` a few lines above
+            # this classmethod's own body starts) — the same fallback shape `_last_sleep_at` below uses.
+            mind.stage = int(ledger["stage"]) if "stage" in ledger else mind._moments_stage()
+            mind._stage_ready_streak = int(ledger.get("stage_ready_streak", 0))
+            mind._grades_total = int(ledger.get("grades_total", 0))
+            mind._grades_right = int(ledger.get("grades_right", 0))
+            mind._novel_grades = collections.deque(ledger.get("novel_grades", []), maxlen=10)
+            mind._hold_active = bool(ledger.get("hold_active", False))
+            mind._game_rewards = collections.deque(ledger.get("game_rewards", []), maxlen=200)
+            mind._sit_readings = collections.deque([tuple(x) for x in ledger.get("sit_readings", [])], maxlen=2)
+            mind.web_fetches = int(ledger.get("web_fetches", 0))
+            mind.web_refused_rate = int(ledger.get("web_refused_rate", 0))
+            mind.web_refused_hold = int(ledger.get("web_refused_hold", 0))
             # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
             # (L-8): restore the act rng's stream exactly (absent from a snapshot taken before this gene
             # existed -> the freshly-seeded stream __init__ already built, unchanged).

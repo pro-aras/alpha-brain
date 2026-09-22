@@ -249,6 +249,17 @@ class Body:
                                           shelf_dir=hands_cfg["shelf_dir"], cpu=hands_cfg["cpu"],
                                           mem=hands_cfg["mem"], wall=hands_cfg["wall"], poll_period=0.2)
             self.add_sense("hands", hands_fn)
+        # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:15 +0400 — ALPHA4-PREREG.md §4(d)/(e):
+        # SENSE grade, the SAME C1.7 shape SIT/SENSE_BODY/HANDS use above. `hold_file` is threaded from
+        # DOOR_WEB's own declared clause when THAT gene is ALSO present (grade.py's own docstring: None
+        # means "never watch a hold at all" — a genome with SENSE_GRADE but no DOOR_WEB still gets grade
+        # rows, just no hold rows, exactly like `_declared_hands_config`'s own "arms nothing" default).
+        if "SENSE_GRADE" in self.mind.genome.declared:
+            from .senses import grade as grade_sense
+            door_web = self.mind.genome.declared.get("DOOR_WEB")
+            grade_hold_file = (self.root / door_web["hold_file"]) if door_web is not None else None
+            grade_fn = functools.partial(grade_sense.sense, root=self.root, hold_file=grade_hold_file, period=2.0)
+            self.add_sense("grade", grade_fn)
         for st in self.sense_threads:
             st.start()
         self._started = True
@@ -373,6 +384,20 @@ class Body:
             # declares EVOLVE.
             "evolve_epoch": int(getattr(self.mind, "evolve_epoch", 0)),
             "evolve_proposals_seen": int(getattr(self.mind, "evolve_proposals_seen", 0)),
+            # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:15 +0400 — ALPHA4-PREREG.md §3/§4: on
+            # STATUS on EVERY write (#164) — 1/0/0/False on a genome that never declares STAGE's "by READY"
+            # form / DOOR_WEB (getattr's own defaults cover both; `stage` still reflects the plain moments-
+            # based STAGE lines every genome must declare, since `_moments_stage()` never needs STAGE_READY).
+            "stage": int(getattr(self.mind, "stage", 1)),
+            "web_fetches": int(getattr(self.mind, "web_fetches", 0)),
+            "web_refused_rate": int(getattr(self.mind, "web_refused_rate", 0)),
+            "web_hold": bool(getattr(self.mind, "hold_active", False)),
+            # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 02:07 +0400 — the brief's own list names
+            # four keys (stage/web_fetches/web_refused_rate/web_hold); this fifth is computed and persisted
+            # already (Mind.web_refused_hold) and #163's law (computing and exporting are different
+            # features) applies here exactly as it did to every other counter in this method — costs
+            # nothing to also export it.
+            "web_refused_hold": int(getattr(self.mind, "web_refused_hold", 0)),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:
@@ -454,6 +479,15 @@ def _declared_evolve_config(declared: Dict[str, dict]) -> Optional[Dict[str, obj
     if not evolve_sense.EVOLVE_DOOR_GATED:
         return None
     return declared.get("EVOLVE")
+# edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:15 +0400 — ALPHA4-PREREG.md §3: the web door's
+# own arming, mirroring _declared_game_config's own shape and gate discipline exactly (C2/C3's convention).
+def _declared_web_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """DOOR_WEB undeclared -> None (arms nothing). DOOR_WEB declared -> its own parsed dict, gated on
+    creature.senses.web.WEB_DOOR_GATED so a genome line arms nothing until the code carrying it exists."""
+    from .senses import web as web_sense   # lazily, same discipline as game's own import above
+    if not web_sense.WEB_DOOR_GATED:
+        return None
+    return declared.get("DOOR_WEB")
 
 
 # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:41 +0400 — LIFE-D-ACT-SOUND.md item 1 (L-8): the
@@ -690,6 +724,23 @@ def main(argv: List[str]) -> int:
         evolve_proc = evolve_sense.start_worker(root, genome_path, evolve_stop_file)
         efn = functools.partial(evolve_sense.sense, root=root, poll_period=5.0)
         body.add_sense("evolve", efn)
+    # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:15 +0400 — ALPHA4-PREREG.md §3: the web
+    # door, armed from declared['DOOR_WEB'] behind WEB_DOOR_GATED (C2/C3's own convention). `questions_dir`
+    # is this builder's OWN invented queue location (world/questions — RAISED in the report: builder H's
+    # lexicon door had not landed when this was written); `max_words` reads builder H's own SENSE_READ
+    # line when present (words), else the code-side default 8 (also H's own genome DRAFT value) — this
+    # reads live off `declared` so the day H's parser branch lands, no edit is needed here.
+    web_cfg = _declared_web_config(declared)
+    if web_cfg is not None:
+        from .senses import web as web_sense   # lazily, same discipline as game above
+        import functools
+        read_cfg = declared.get("SENSE_READ") or {}
+        web_fn = functools.partial(
+            web_sense.sense, questions_dir=root / "world" / "questions", hold_file=root / web_cfg["hold_file"],
+            floor_s=float(web_cfg["floor_s"]), per_hour=int(web_cfg["per_hour"]), open_at_stage=int(web_cfg["opens_at_stage"]),
+            max_words=int(read_cfg.get("words", 8)), letters=int(genome_for_cli.ear_letters),
+            canvas=int(genome_for_cli.gaze["canvas"]) if genome_for_cli.gaze else 128, poll_period=2.0)
+        body.add_sense("web", web_fn)
 
     body.start()
     stop_requested = threading.Event()
