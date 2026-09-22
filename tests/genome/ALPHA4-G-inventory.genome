@@ -1,0 +1,26 @@
+# edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 03:00 +0400 — ALPHA4-G.md's own inventory gate ("tools/inventory.py (GROW,
+# BUDGET regen, CYCLE redundancy = MADE)"): G4-skeleton.genome VERBATIM with NMAX removed and GROW/BUDGET-regen/CYCLE-redundant
+# substituted in — nothing else changed, so this fixture's inventory rows for every OTHER gene stay identical to G4-skeleton's own
+# (never used for the pin; test_pin_skeleton.py reads G4-skeleton.genome only, unchanged).
+SEED   20260919
+SENSE  eye    32x32 grey
+RETINA thresh0.25 centre tower:eye-tower-g2 sqrt unit
+SENSE  ear    letters 8
+AREA   sight  from retina
+AREA   words  from ear
+MEET   sight  words
+BIRTH  novelty  cos<0.955
+BIRTH  error    misfires 3
+BUDGET 400 per arrival; regenerate 1 per 60 moments
+GROW   unbounded
+KWTA   5
+HEBB   window 1
+DELTA  lr 0.05
+PRUNE  w<0.02 after 3 chances
+MERGE  cos>0.9975 same-answer
+SCALE  every 1000 moments
+CYCLE  consolidate when redundant > 0.05 of alive
+STAGE  1 senses   moments 0..200
+STAGE  2 meet     moments 200..
+RECALL k=1
+ABSTAIN second/best > 0.85

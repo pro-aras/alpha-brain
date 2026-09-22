@@ -68,6 +68,47 @@ class SizingMark(unittest.TestCase):
         self.assertFalse(sizing_mark({"sight_born": 3000, "sight_nmax": 4000, "births_refused_nmax": 0}, j, 1000)["pass"])   # over the band
         self.assertFalse(sizing_mark({"sight_born": 1000, "sight_nmax": 4000, "births_refused_nmax": 5}, j, 1000)["pass"])   # refused at the cap
 
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:48 +0400 — ALPHA4-G.md task 5
+    # (docs/ALPHA4-PREREG.md §2/§3, PREREG §5's GROW mark): under GROW there is no fixed cap and no
+    # pre-flight banding prediction to grade against — the bar reads refused-by-nmax 0, the plant
+    # birthed >= 1, born printed with no band. `births_refused_budget`/`budget_regenerated` print beside
+    # `births_refused_nmax` in EVERY case (not only under grow).
+    def test_grow_gradable_without_a_prediction_no_band(self):
+        from tools.verdict_life import sizing_mark
+        j = [{"moment": "w1", "when": "2026-09-23T12:00:00Z", "word": "zog", "births": [["sight", 1, "novelty"]]}]
+        st = {"sight_born": 50000, "sight_nmax": 65536, "births_refused_nmax": 0,
+              "births_refused_budget": 12, "budget_regenerated": 40}
+        out = sizing_mark(st, j, None, grow=True)   # no prediction at all -- must still be gradable
+        self.assertTrue(out["graded"]); self.assertTrue(out["pass"])
+        self.assertIn("no band", out["bar"])
+        self.assertEqual(out["sight_born"], 50000)
+        self.assertEqual(out["births_refused_budget"], 12)
+        self.assertEqual(out["budget_regenerated"], 40)
+
+    def test_grow_fails_on_any_nmax_refusal(self):
+        from tools.verdict_life import sizing_mark
+        j = [{"moment": "w1", "when": "2026-09-23T12:00:00Z", "word": "zog", "births": [["sight", 1, "novelty"]]}]
+        st = {"sight_born": 50000, "sight_nmax": 65536, "births_refused_nmax": 1,
+              "births_refused_budget": 0, "budget_regenerated": 0}
+        self.assertFalse(sizing_mark(st, j, None, grow=True)["pass"], "GROW must never refuse for room -- any refusal is a real defect")
+
+    def test_grow_fails_without_the_plants_birth(self):
+        from tools.verdict_life import sizing_mark
+        j = [{"moment": "w1", "when": "2026-09-23T12:00:00Z", "word": "circle", "births": [["sight", 1, "novelty"]]}]
+        st = {"sight_born": 50000, "sight_nmax": 65536, "births_refused_nmax": 0,
+              "births_refused_budget": 0, "budget_regenerated": 0}
+        self.assertFalse(sizing_mark(st, j, None, grow=True)["pass"])
+
+    def test_non_grow_still_prints_budget_fields_beside_nmax(self):
+        """Beside the OLD form's banding logic, unchanged -- budget refusals/regen print too."""
+        from tools.verdict_life import sizing_mark
+        j = [{"moment": "w1", "when": "2026-09-23T12:00:00Z", "word": "zog", "births": [["sight", 1, "novelty"]]}]
+        st = {"sight_born": 1000, "sight_nmax": 4000, "births_refused_nmax": 0, "births_refused_budget": 3, "budget_regenerated": 9}
+        out = sizing_mark(st, j, 1000)
+        self.assertTrue(out["pass"])
+        self.assertEqual(out["births_refused_budget"], 3)
+        self.assertEqual(out["budget_regenerated"], 9)
+
 
 class GradeMark(unittest.TestCase):
     """PREREG §19.3 against builder A's landed shapes: `graded` counts {sure_bare, unsure, abstain_with_resemblance, abstain} on the

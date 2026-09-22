@@ -428,9 +428,19 @@ def evolve_mark(tape: Iterable[dict], journal: Iterable[dict], evolve_declared: 
     return out
 
 
-def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[float], plant_word: str = "zog") -> Dict[str, object]:
+# edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:50 +0400 — ALPHA4-G.md task 5 (docs/ALPHA4-PREREG.md
+# §2/§3, PREREG §5's GROW mark): `grow` (default False, every existing call site byte-identical) — under
+# GROW there is no NMAX cap and no pre-flight banding prediction to grade against, so the bar reads
+# refused-by-nmax 0 (any nmax refusal is a real defect: GROW must NEVER refuse for room) and the plant's
+# birth, with `born` printed for the record but no [0.5x, 1.5x] band. `births_refused_budget`/
+# `budget_regenerated` print beside `births_refused_nmax` in EVERY case (both regimes) — BUDGET's own
+# refusal/regeneration counters are a separate concern from NMAX's, worth seeing whichever form CYCLE/GROW
+# a life declares.
+def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[float], plant_word: str = "zog", grow: bool = False) -> Dict[str, object]:
     """PREREG §19.11: sight born by 24 h within [0.5×, 1.5×] of the pre-flight's prediction; births_refused_nmax 0; the plant birthed ≥ 1
-    sight cell. The per-hour sight-births SERIES is on the record (#233's instrument). Not gradable without a prediction or an older body."""
+    sight cell. The per-hour sight-births SERIES is on the record (#233's instrument). Not gradable without a prediction or an older body.
+    Under GROW (ALPHA4-G task 5): no prediction is needed or graded against — refused-by-nmax must be 0, the plant must have birthed,
+    born is printed with no band."""
     per_hour: "collections.OrderedDict[str, int]" = collections.OrderedDict(); plant_births = 0; plant_shown = 0
     for j in journal:
         if "moment" in j:
@@ -440,10 +450,19 @@ def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[floa
             if j.get("word") == plant_word:
                 plant_shown += 1; plant_births += n
     born = status.get("sight_born"); nmax = status.get("sight_nmax"); refused = status.get("births_refused_nmax")
-    out: Dict[str, object] = {"sight_born": born, "sight_nmax": nmax, "births_refused_nmax": refused, "prediction": prediction,
-                              "series_sight_births_per_hour": list(per_hour.values()), "plant_shown_moments": plant_shown, "plant_sight_births": plant_births,
-                              "bar": "born within [0.5×, 1.5×] of the prediction · refused at NMAX 0 · the plant birthed ≥ 1 sight cell"}
-    if prediction is None:
+    bar = ("under GROW: refused-by-nmax 0 · the plant birthed ≥ 1 sight cell · born printed (no band — there is no prediction under GROW)"
+           if grow else "born within [0.5×, 1.5×] of the prediction · refused at NMAX 0 · the plant birthed ≥ 1 sight cell")
+    out: Dict[str, object] = {"sight_born": born, "sight_nmax": nmax, "births_refused_nmax": refused,
+                              "births_refused_budget": status.get("births_refused_budget"), "budget_regenerated": status.get("budget_regenerated"),
+                              "prediction": prediction, "series_sight_births_per_hour": list(per_hour.values()),
+                              "plant_shown_moments": plant_shown, "plant_sight_births": plant_births, "bar": bar}
+    if grow:
+        if not isinstance(born, int) or not isinstance(refused, int):
+            out.update(graded=False, **{"pass": None}, reason="not gradable: sight_born / births_refused_nmax not on STATUS (an older body)")
+        else:
+            out.update(graded=True, **{"pass": refused == 0 and plant_births >= 1},
+                       reason=f"graded (§19.11, GROW): refused {refused}; plant births {plant_births}; born {born} (no band)")
+    elif prediction is None:
         out.update(graded=False, **{"pass": None}, reason="not gradable: no sizing prediction on the record (PREREG §19.11 is written at the pre-flight)")
     elif not isinstance(born, int) or not isinstance(nmax, int):
         out.update(graded=False, **{"pass": None}, reason="not gradable: sight_born / sight_nmax not on STATUS (an older body)")

@@ -853,7 +853,10 @@ def main(argv: List[str]) -> int:
     else:
         M["ACT"]["shuffled_twin_diverged"] = "not run (not gradable)"
     M["SOUND"] = _vl.sound_mark(tape, live, st)
-    M["SIZING"] = _vl.sizing_mark(st, live, a.sizing_prediction)
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:52 +0400 — ALPHA4-G.md task 5: `grow=` from
+    # the life's OWN genome (`decl`, already parsed above for "SELF"/"ANSWER") — never guessed from STATUS
+    # shape, so a genome that happens to have a small sight_nmax under NMAX is never mistaken for GROW.
+    M["SIZING"] = _vl.sizing_mark(st, live, a.sizing_prediction, grow=("GROW" in decl))
     M["GRADE"] = _vl.grade_mark(own["plant"], own["null"], seen, "ANSWER" in decl)      # §19.3 (builder A's graded answer)
     M["SELF"] = _vl.self_mark(tape, bel_rows, live, st, "SELF" in decl)                 # §19.6 (builder A's SELF)
     # edit: Claude (Fable 5.1), 2026-09-22 22:33 +0400 — §19.1 as re-specified: per thing by SOURCE (the eye row's `meta.source` on the tape), the blind-surprise twin's own count

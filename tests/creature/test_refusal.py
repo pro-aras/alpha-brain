@@ -169,6 +169,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
 
     SAMPLE_LINE = {
         "CYCLE": "CYCLE    grow to 0.9 nmax then consolidate",
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 03:05 +0400 — ALPHA4-G.md task 1: one row,
+        # matching the genes.py RUNS entry added by this task (docs/ALPHA4-PREREG.md §2/§3).
+        "GROW": "GROW     unbounded",
         "EXAM": "EXAM     every 2000 canvases",
         "BODY": "BODY     service creature threads eye ear door mind voice",
         "TAPE": "TAPE     run/tape",

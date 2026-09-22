@@ -119,6 +119,39 @@ class TestSelfPoolAndBelief(unittest.TestCase):
         rows = read_beliefs(mind.run_root / "state" / "beliefs.jsonl")
         self.assertEqual([r["word"] for r in rows], ["self:no_room"])
 
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:38 +0400 — ALPHA4-G.md task 5
+    # (docs/ALPHA4-PREREG.md §2/§3): SELF's «no room» belief reads BOTH `refused_nmax` (unchanged, the
+    # test right above) AND `refused` (the body row's own BUDGET refusals, BASE_READING's "refused" key --
+    # STATUS's births_refused_budget) -- the belief text says WHICH: "self:no_room" vs "self:no_budget".
+    def test_refused_budget_rising_files_no_budget_belief(self) -> None:
+        mind, tape = _mind()
+        _consume_canvas(mind, tape, 1)
+        _consume_body(mind, tape, dict(BASE_READING))
+        _consume_canvas(mind, tape, 2)
+        # moments/births/arrivals move together (isolating this trigger from the stall trigger);
+        # refused_nmax stays flat (isolating it from "self:no_room" -- the other cap entirely)
+        r2 = dict(BASE_READING); r2["moments"] = 110; r2["births"] = 55; r2["arrivals"] = 2; r2["refused"] = 5
+        _consume_body(mind, tape, r2)
+        _consume_canvas(mind, tape, 3)
+        rows = read_beliefs(mind.run_root / "state" / "beliefs.jsonl")
+        self.assertEqual([r["word"] for r in rows], ["self:no_budget"])
+
+    def test_no_room_beats_no_budget_when_both_rise_together(self) -> None:
+        """Both triggers can fire on the SAME pair (a life starved of both room and budget at once) --
+        `_self_trigger` returns exactly one word (`believe()` carries no second reason field), and the
+        order must be DETERMINISTIC (checked no_room first, matching the brief's own line order: "reads
+        BOTH refused_nmax and refused ... the belief text says which")."""
+        mind, tape = _mind()
+        _consume_canvas(mind, tape, 1)
+        _consume_body(mind, tape, dict(BASE_READING))
+        _consume_canvas(mind, tape, 2)
+        r2 = dict(BASE_READING); r2["moments"] = 110; r2["births"] = 55; r2["arrivals"] = 2
+        r2["refused_nmax"] = 3; r2["refused"] = 5
+        _consume_body(mind, tape, r2)
+        _consume_canvas(mind, tape, 3)
+        rows = read_beliefs(mind.run_root / "state" / "beliefs.jsonl")
+        self.assertEqual([r["word"] for r in rows], ["self:no_room"])
+
     def test_self_trigger_no_longer_handles_backlog(self) -> None:
         """`_self_trigger` keeps only the two triggers a comparison CAN see (stall, no_room) -- the
         original finding (docs/briefs/LIFE-A-REPORT.md §3 clause 6) was that the backlog-crossing

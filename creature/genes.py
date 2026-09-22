@@ -62,7 +62,20 @@ import numpy as np
 RUNS: Dict[str, Dict[str, Optional[str]]] = {
     # ---------------------------------------------------------------------------------- the machinery
     "machinery": {
-        "CYCLE": "genome/machinery.py:Organism._birth (soft ceiling grow_to*nmax) + genome/sleep.py:cycle (consolidation pass)",
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:55 +0400 — ALPHA4-G.md task 4
+        # (docs/ALPHA4-PREREG.md §2/§3): the description text updated for CYCLE's SECOND form (redundant-
+        # share, `declared["CYCLE"] == {"share": f}` — distinguished from the old {"grow_to": f} by which
+        # key is present, genome/machinery.py's own parser comment) — the site itself (both branches) is
+        # unchanged, so this row's "wired" status (non-None) was already correct; only the words move.
+        "CYCLE": "genome/machinery.py:Organism._birth (soft ceiling grow_to*nmax, the OLD form only) + genome/sleep.py:cycle "
+                 "(consolidation pass; the redundant-share form's own trigger, births_refused_redundant since the last cycle / alive)",
+        # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:55 +0400 — ALPHA4-G.md task 1
+        # (docs/ALPHA4-PREREG.md §2/§3, his 00:17 word «no cap»): GROW unbounded's own row — two real call
+        # sites, both gated on `"GROW" in declared` (an undeclared GROW never touches area capacity beyond
+        # genome.nmax, never grows W/mask/strikes beyond it either — the NMAX road is byte-for-byte
+        # untouched, the negative control test_grow_mechanics.py:TestInitialCapacity pins).
+        "GROW": "genome/machinery.py:Organism.__init__ (Area/W initial capacity) + Organism._birth (Area.grow()'s doubling, "
+                "Organism._grow_W()'s fixed +2048 chunks — never a births_refused_nmax refusal)",
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — L-6 (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1/#2): THRESH's own consumer is Organism.moment's push + Organism.own_floor (both gated on
         # `self.sight.own_band is not None`, itself gated on THRESH's own declared presence at __init__); ANSWER's

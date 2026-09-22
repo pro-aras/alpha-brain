@@ -2160,6 +2160,12 @@ class Mind:
     # (the report's §3 clause 6 finding); the coordinator's fix files it on RESUME instead.
     _SELF_STALL_KEYS = ("moments", "births", "arrivals")
 
+    # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:40 +0400 — ALPHA4-G.md task 5
+    # (docs/ALPHA4-PREREG.md §2/§3): a FOURTH trigger — "self:no_budget", read from `refused` (the body
+    # row's own field name for STATUS's births_refused_budget, BODY-SENSES §4.1's SENSE body field list) —
+    # beside the existing `refused_nmax` ("self:no_room"). Checked AFTER no_room, so a pair where BOTH
+    # rise on the same comparison (a life starved of room and budget at once) still returns exactly one
+    # word (believe() carries no second reason field) — DETERMINISTIC, never a set/dict iteration order.
     def _self_trigger(self, r1: Dict[str, object], r2: Dict[str, object]) -> Optional[str]:
         stalled = [k for k in self._SELF_STALL_KEYS if r1.get(k) is not None and r2.get(k) is not None and r1[k] == r2[k]]
         moved = [k for k in self._SELF_STALL_KEYS if r1.get(k) is not None and r2.get(k) is not None and r1[k] != r2[k]]
@@ -2168,6 +2174,9 @@ class Mind:
         n1, n2 = r1.get("refused_nmax"), r2.get("refused_nmax")
         if n1 is not None and n2 is not None and n2 > n1:
             return "self:no_room"
+        b1, b2 = r1.get("refused"), r2.get("refused")
+        if b1 is not None and b2 is not None and b2 > b1:
+            return "self:no_budget"
         return None
 
     # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:37 +0400 — the coordinator's fix (docs/briefs/

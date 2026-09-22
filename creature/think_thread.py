@@ -151,7 +151,11 @@ def self_trigger(r1: Dict[str, object], r2: Dict[str, object]) -> Optional[str]:
     unbound because it is eight lines, pure, reads only its two arguments and a class-level tuple, and
     keeping it here means `decide()`'s "self" branch needs no live Mind reference at all, not even for
     this one class attribute. If `Mind._self_trigger`'s law ever changes, this copy must change with it —
-    named in the report as a duplication to watch, not hidden."""
+    named in the report as a duplication to watch, not hidden.
+
+    edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:41 +0400 — ALPHA4-G.md task 5: kept in sync
+    with `Mind._self_trigger`'s own edit, same day — the "self:no_budget" branch (`refused`, checked
+    after no_room, same reasoning: exactly one word even when both rise together)."""
     stalled = [k for k in _SELF_STALL_KEYS if r1.get(k) is not None and r2.get(k) is not None and r1[k] == r2[k]]
     moved = [k for k in _SELF_STALL_KEYS if r1.get(k) is not None and r2.get(k) is not None and r1[k] != r2[k]]
     if stalled and moved:
@@ -159,6 +163,9 @@ def self_trigger(r1: Dict[str, object], r2: Dict[str, object]) -> Optional[str]:
     n1, n2 = r1.get("refused_nmax"), r2.get("refused_nmax")
     if n1 is not None and n2 is not None and n2 > n1:
         return "self:no_room"
+    b1, b2 = r1.get("refused"), r2.get("refused")
+    if b1 is not None and b2 is not None and b2 > b1:
+        return "self:no_budget"
     return None
 
 
