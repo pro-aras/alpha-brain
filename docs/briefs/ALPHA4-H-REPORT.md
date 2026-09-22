@@ -128,4 +128,4 @@ The two-moment design roughly **doubles** the mind's per-canvas cost (not 6–9x
 
 ## Commit
 
-`0762f5306a345522cddd6ce02d69811539451ed5` on branch `alpha4-read` (worktree `/data/dev/genome-wt-y`), off master `74c661d`. 18 files changed (7 modified, 11 new), 2,361 insertions.
+`e147f771e0a85164439807acd1a189ac9193ef9b` on branch `alpha4-read` (worktree `/data/dev/genome-wt-y`), off master `74c661d`. The work itself is `0762f5306a345522cddd6ce02d69811539451ed5` (18 files changed — 7 modified, 11 new — 2,361 insertions); `e147f77` is a one-line follow-up recording that sha in this report.
