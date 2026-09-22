@@ -1,0 +1,92 @@
+# G5-nmax8000.genome — THE CONTROL LIFE g5-seam-2 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md §7): G5.genome (the six seam lives' file)
+# with EXACTLY ONE change — NMAX 2000 -> 8000 — so the game rung's spend of sight ids, never observed past the cap (L5: 390 · 673 · 690 · 196
+# births/h then 0 at ≈ 3.5 h), is measured over 8 h, and the plant «zog» (refused a sight cell at the cap on L5/seam-1, 0/10) gets its
+# chance: the one prediction is «zog» answered ≥ 6/10 (L1's reading). W = 8000² × 8 B = 512 MB; a snapshot every 500 moments.
+# edit: Claude (Fable 5.1), 2026-09-22 18:2x +0400 — derived from genome/G5.genome by one substitution; every other byte identical.
+# G5.genome — DRAFT for the 8 h SEAM LIVES, assembled by Claude (Fable 5.1), 2026-09-21 20:55 +0400 (docs/G5-SEAM-LIFE-PLAN.md; docs/organs/G5-DESIGN.md §3–§5).
+# = G4.genome (life 3b's file) + every G5 line ON as a raw part of the body (his 16:39 word), the world staged; lines marked DRAFT
+# carry the builders' brief syntax verbatim and are re-checked against each landed parser before this file is used. NOT LIVE.
+# edit: Claude (Fable 5.1), 2026-09-21 21:53 +0400 — BIND declared OFF on J's refused bar; SLEEP/FAST cadences unchanged; the fast retina is a silent adoption (no syntax).
+# GAZE surprise fixations 4 (the proven G1 value; 12 in the design draft was a slip). THETA_N/THETA_M
+# are left as the words gate G-a writes (genome/gate_ga.py); the machinery refuses to start until they
+# are numbers, exactly as G1.genome/G4-skeleton.genome do before their own gate runs.
+#
+# Every new gene below is declared but the machinery does not yet WIRE most of them into a life (B2–B7
+# land the interpreters one at a time; PARK's toy runs today per B4, FAST per B3, PREDICT/FILE per B6,
+# SLEEP/CYCLE per B7). CURIOSITY, INDUCE, DEDUCE, BELIEF, SENTENCE, WORLD, HANDS, TRAITS, SURPRISE are
+# Wave 2 (PREREG §3): they parse and REFUSE nothing, but nothing runs them yet.
+SEED     20260920
+# BODY
+BODY     service creature threads eye ear door mind voice
+TAPE     run/tape                                  # every sense delivery: instant, sense, sha256; the mind reads only the tape
+HEART    every 10 s                                # STATUS counters on every branch; liveness = motion
+CRASH    sense restart journal; mind page          # a sense's error never kills the mind; a mind error pages, never loops (#230)
+# SENSES
+SENSE    eye    32x32 grey                         # the sealed tower's frame (G0b)
+RETINA   thresh0.25 centre tower:eye-tower-g2 sqrt unit
+GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border   # G1 §6 (the proven value; PREREG §1 correction)
+#OFF BIND     glances per canvas                  # OFF (Builder J, 2026-09-21 21:4x): the pre-registered bar FAILED — Q1 0.9625 on life 2's replay vs the first-fixation twin's 0.98125 (the BIND-consistent reading 0.9750, still one answer short); the mechanism ships tested, declared OFF with its reason (G4 §12's TRAITS precedent); a twin experiment, not a line
+DELIVER  where fixation when instant act glance    # DRAFT (Builder I): where/when/act travel BESIDE the trait, never into the cosine
+#OFF TRAITS   contrast head 32 lr 0.01 at sleep         # NEW: a small head over the frozen tower, learned by contrast from replayed episodes   # OFF (PREREG §12): InfoNCE over canvas instances learns instance identity after 5 sleeps (margin −0.116 < raw 0.009); wave 3 = same-cell positives
+SENSE    ear    letters 8
+SENSE    colour rg by 4x4 under the glance fixed-gain   # DRAFT (Builder J): 32 numbers BESIDE the 112 (a 144-vector); grey world identical to grey to 16 digits
+SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss   # DRAFT (Builder K): STATUS's readings as a tape row
+SENSE    ear-sound wav 16000 mono                  # DRAFT (Builder L): the event ear ON at the folder door; publishes nothing while silent
+#OFF SURPRISE floor 0.05                                # a sense publishes when |actual − predicted| > floor (V0.1's rule on every sense)   # OFF (PREREG §12): no sense on the maker/folder streams needs it yet
+# AREAS + MEET (G0b)
+AREA     sight  from retina
+AREA     words  from ear
+AREA     episodes from fast
+MEET     sight  words
+# GROW / WIRE / SHRINK (G0b verbatim)
+BIRTH    novelty  cos<0.952
+BIRTH    error    misfires 3
+BUDGET   400 per arrival
+ARRIVAL  never-heard word                         # PREREG §15: a word the ear has never delivered opens an arrival (the budget is fresh); reads no schedule
+NMAX     8000    # the ONE change of g5-seam-2 (was 2000): the cap sized so it is not reached in 8 h; see the header
+KWTA     5
+HEBB     window 1
+DELTA    lr 0.05
+PRUNE    w<0.02 after 3 chances
+MERGE    cos>0.9969 same-answer
+SCALE    every 1000 moments
+CYCLE    grow to 0.9 nmax then consolidate         # NEW: the cap becomes a cycle (D41)
+# MEMORY, fast and slow
+FAST     episodes 20000 keys sight words surprise  # unchanged (BIND OFF)
+MOMENT   keys sight words surprise where when act source   # DRAFT (Builder I): the episode row's fields
+SLEEP    every 2000 moments replay 200 by surprise # unchanged: BIND is OFF, so a moment stays one glance (4 a canvas) and every moment-denominated cadence keeps its wall-clock meaning (J's table)
+# PREDICT — the one modulator
+PREDICT  next glance; error scales delta 0.5..2.0; ranks replay; grades act; error comparator   # Builder E (merged on g5-integration): the G5 error is the COMPARATOR (decided by replay of life 2's tape)
+FILE     claim route decider due                   # the falsifiability law: four fields or refused by name
+# ATTENTION / CURIOSITY / METACOGNITION
+CURIOSITY interests 50 operators recombine generalize specialize bridge   # chooses what to THINK about and which door to open, never whether to perceive
+PARK     after 3 identical dead-ends reopen on new-sense                  # D39
+# THINKING
+INDUCE   rule from 5 episodes no counter      # a rule is a prediction (ON since life 3, PREREG §18; the cluster is the word's OWN cells since life 3b, §18 add. 2)
+DEDUCE   one step                             # two beliefs → a prediction (ON since life 3; its routable branch is unreachable by construction until W3-5 — §18 add. 2 grades it VOID, never 1.00 on zero rows)
+BELIEF   clash opens never overwrites               # Alpha 2's scope law
+THINK    every 10 canvases                        # §11.1 step 3: the pool → CURIOSITY chooses → work → PARK/FILE
+EXAM     every 500 canvases                       # SEAM LIFE: ≈ 42 min so every 2 h window holds ≥ 2 exams ((v) readable); an exam costs ~2.2 s
+SIT      exam every 500 canvases; the score returns as a sense   # DRAFT (Builder K): the exam's score comes back as a tape row
+FROZEN   after 50 cells                           # twin-only gene (§11.1 step 5): the frozen twin's ceiling
+# LANGUAGE
+#OFF SENTENCE two-word frames is near under-judge       # speech_v2's road, minimal; never next-token   # OFF (PREREG §12): wave 3 — no interpreter yet; a declared gene the machinery does not run must refuse
+# HANDS + WORLD
+WORLD    drawn every 5 s arrivals every 2 h; folder world/; web 0 per hour by curiosity   # SEAM LIFE: web 0 — the web door is implemented by nothing (G5-DESIGN §6.4: an ACT with OUTCOME or the line goes; the regex needs the clause); 2 h windows (0..3 in 8 h); the plant by the unit's --plant-after 5000
+WORLD    game babyai-gotolocal every 5 s; seed 20260922; frames pov 7x7 tile 32; consequence: his act chooses the next frame   # DRAFT (Builder L)
+#OFF HANDS    jail alpha3/hands/jail_run                # switched on last   # OFF (PREREG §12): wave 3
+ACT      glance open ask                          # DRAFT (Builder K): the act vocabulary (L adds `turn step` for the game)
+OUTCOME  act to episode; error grades it; ranks replay   # DRAFT (Builder K): an act becomes an episode; its residual is its surprise
+# ANSWER
+RECALL   k=3
+ABSTAIN  second/best > 0.85
+ASK      what-is show is which next why
+# STAGES
+STAGE    1 senses   moments 0..200
+STAGE    2 meet     moments 200..
+#OFF ANALOGY   hesse                               # declared; no structure to map yet
+#OFF AUDIENCE  listener-model                      # declared; «why» is its first cell
+#OFF EAR-SOUND cochlear gammatone agc               # E52's front (the loudness path proven, the frequency path untested)
+#OFF READ-EYE  words through the eye               # E43/E47
+# gate G-a wrote THETA_N=0.952 THETA_M=0.9969 — G1 gate on glances [G4-life: the makers world, first-fixation glances, 60/thing over THINGS_11 + THINGS_ARRIVAL2]: THETA_N = within-median; floor (between-p95, ear-max) 0.9113 · within-p5 0.8412 · within-p95 0.9939 · seed 20260920
+# gate G-a MEASURED on the G5 front (Claude (Fable 5.1), 2026-09-21 22:06 +0400; scratch/gate-ga-G5.log): 16 things × 60 first-fixation glances on the 144-vector — colour block max|.| = 0.0 on the makers world (J's grey no-op, to the byte); within: median 0.952 p5 0.837 p95 0.994 · between: median 0.744 p95 0.911 max 0.976 · ear max 0.625 — the same bands the G4 gate wrote (0.952 / floor 0.9113 / within-p5 0.8412 / within-p95 0.9939); THETA_N/THETA_M kept as written above. The game's coloured frames were NOT in this gate (their bands read by the world's own controls, G's null .29).

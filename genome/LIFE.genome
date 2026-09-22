@@ -1,0 +1,89 @@
+# LIFE.genome — THE ONE LIFE (his 17:44 word: «one genome carrying all the things, grown and verified after 24 hours of testings …
+# a proper one organism, that has ability to be intelligent when it is born as primitive»). DRAFT, NOT LIVE — the law of this file is
+# docs/organs/NEXT-LIFE-PLAN-2026-09-22.md (§4 the laws L-1..L-14, §5 the line table, §6 the marks, §8 the launch sequence).
+# = genome/G5.genome (the six seam lives' file) + every line the plan switches ON; every DRAFT line is re-checked against the LANDED
+# parser at the pre-flight, and any line whose builder has not landed by the launch is turned #OFF WITH ITS REASON ON THE LINE —
+# never removed, never silently. NMAX and the game's cadence are written by the pre-flight (L-3), not by hand.
+# edit: Claude (Fable 5.1), 2026-09-22 18:2x +0400.
+SEED     20260923
+# BODY
+BODY     service creature threads eye ear door mind think voice   # DRAFT (builder E, L-5): `think` = the thinking thread; refuses until the machinery names it
+TAPE     run/tape
+HEART    every 10 s
+CRASH    sense restart journal; mind page
+# SENSES
+SENSE    eye    32x32 grey
+RETINA   thresh0.25 centre tower:eye-tower-g2 sqrt unit           # the FIXED front — his 17:28 word: traits are DATA the eye captures
+GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border coarse 32   # DRAFT (builder B, L-7): + ONE whole-canvas glance a canvas, tagged act coarse
+SURPRISE floor 0.05 predicted mind-cell                            # DRAFT (builder B, L-4): the mind's expected cell reaches the eye; the eye stamps the residual; a glance under the floor is a CONFIRMED (cheap) moment — his 17:28 word: keep the gate on
+DELIVER  where fixation when instant act glance
+SENSE    ear    letters 8
+SENSE    colour rg by 4x4 under the glance fixed-gain
+SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss backlog   # DRAFT (builder A): + backlog (#236)
+SENSE    ear-sound wav 16000 mono                                  # DRAFT (builder D, L-13): consumed into FAST; its own AREA is rung 2 (the world's voice)
+SENSE    smell kind size folder age                                # DRAFT (builder F, L-12): the folder door's cheap channel before a picture is opened
+SENSE    touch from hands: exit rate stalls retries bytes          # DRAFT (builder F, L-12): the hands' door
+#OFF BIND     glances per canvas                  # OFF (Builder J, 2026-09-21): the pre-registered bar FAILED — Q1 0.9625 on life 2's replay vs the first-fixation twin's 0.98125
+#OFF TRAITS   contrast head 32 lr 0.01 at sleep   # OFF (PREREG §12; his 17:28 word): a learned head is not a trait; the front is fixed data
+#OFF RETINA   thresh0.25 centre dog3 hogcells8x6 unit   # G-EYE-4: the genome-set front — a TWIN experiment on the closed tapes first (predicted to lose: G0 −0.19)
+#OFF SCAN     channels lum rg by across fixations       # G-EYE-7: an experiment against the colour block on a coloured world that repeats (the game's tapes)
+# AREAS + MEET
+AREA     sight  from retina
+AREA     words  from ear
+AREA     episodes from fast
+MEET     sight  words
+# GROW / WIRE / SHRINK
+BIRTH    novelty  cos<0.952
+BIRTH    error    misfires 3
+BUDGET   400 per arrival
+ARRIVAL  never-heard word
+NMAX     6000    # DRAFT: written by the pre-flight (L-3: births/hour × 24 × 1.5, ≥ 4000; the game's cadence the knob above 8000); 6000 is the estimate from L5's series at a slower game
+KWTA     5
+HEBB     window 1                                 # the window IS one moment by construction (wiring happens inside `moment`); any other value refuses
+DELTA    lr 0.05
+PRUNE    w<0.02 after 3 chances
+MERGE    cos>0.9969 same-answer
+SCALE    every 1250 moments                       # re-based for five moments a canvas (L-7): the wall-clock cadence of G5's 1000 kept
+CYCLE    grow to 0.9 nmax then consolidate
+THRESH   cell own band history 30                 # DRAFT (builder A, L-6): each cell keeps the cosines of the glances it answered; its p5 is its own floor (BCM's shape, ADAPTS)
+ANSWER   resembles under own-band; unknown below 0.911   # DRAFT (builder A, L-6): «X» / «I don't know what it is, but it resembles X» / «I don't know»; 0.911 = gate G-a's between-p95 on this front
+# MEMORY, fast and slow
+FAST     episodes 20000 keys sight words surprise sound   # DRAFT (builder D): + sound (the ear-sound trait)
+MOMENT   keys sight words surprise where when act source
+SLEEP    every 2500 moments replay 200 by surprise        # re-based for five moments a canvas (L-7): G5's 2000 kept in wall-clock
+# PREDICT — the one modulator
+PREDICT  next glance; error scales delta 0.5..2.0; ranks replay; grades act; error comparator
+FILE     claim route decider due
+# ATTENTION / CURIOSITY / METACOGNITION
+CURIOSITY interests 50 operators recombine generalize specialize bridge
+PARK     after 3 identical dead-ends reopen on new-sense
+SELF     from body; beliefs about itself; skip thinks when backlog > 200   # DRAFT (builder A, L-9): the mind reads its own numbers and acts on one of them
+# THINKING
+INDUCE   rule from 5 episodes no counter
+DEDUCE   one step
+BELIEF   clash opens never overwrites
+THINK    every 10 canvases; on its own thread; lands next boundary   # DRAFT (builder E, L-5): launched on a frozen copy at a boundary; applied at the next; the mind waits if late — replay identical by construction
+EXAM     every 500 canvases
+SIT      exam every 500 canvases; the score returns as a sense
+FROZEN   after 50 cells
+# LANGUAGE
+SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token   # DRAFT (builder C, L-11): a frame = two words that met in one instant ≥ 5 times, FILED with its episodes
+MOUTH    say one frame per think; journaled                                              # DRAFT (builder C, L-11): the mouth says a frame as an `is` question the next frame grades
+QUESTION from wants; forms what-is is which; to the world door                          # DRAFT (builder C, L-10): a wordless sight's 2nd showing, a failed rule, a clash, a park → a question row the world answers by showing
+# HANDS + WORLD
+WORLD    drawn every 5 s arrivals every 4 h; folder world/; web 0 per hour by curiosity   # 24 h = six windows; the plant by the unit's PLANT_AFTER=15000 (hour ≈ 21); web 0 = the web door is implemented by nothing
+WORLD    game babyai-gotolocal every 15 s; seed 20260923; frames pov 7x7 tile 32; consequence: his act chooses the next frame   # DRAFT: cadence written by the pre-flight (L-3); the ACT is the MIND's (builder D, L-8)
+HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20          # DRAFT (builder F, L-12): rung 1 — choose from the shelf; the output rendered as a canvas the eye sees
+ACT      glance open ask turn step say run                                                # DRAFT (builders C, D, F): the whole vocabulary; an act with no road yet journals «no road»
+OUTCOME  act to episode; error grades it; ranks replay
+# ANSWER
+ABSTAIN  second/best > 0.85
+ASK      what-is show is which why                # `why` = the addresses questions.why() returns (builder A); `next` dropped — no mechanism predicts a next thing; RECALL k removed — it reached no call site
+# STAGES
+STAGE    1 senses   moments 0..200
+STAGE    2 meet     moments 200..
+#OFF ANALOGY   hesse                               # declared; no structure to map yet
+#OFF AUDIENCE  listener-model                      # declared; «why» is its first cell
+#OFF EAR-SOUND cochlear gammatone agc               # E52's front is the SENSE ear-sound line above; this older spelling stays off
+#OFF READ-EYE  words through the eye               # E43/E47
+# THETA_N / THETA_M are written by gate G-a at the pre-flight on THIS front (the coarse row included); the machinery refuses to start until they are numbers.
