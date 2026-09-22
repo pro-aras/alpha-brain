@@ -319,6 +319,13 @@ class Body:
             # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: the reflex ring's own count, exported
             # on every write (#164's law: a computed value and an exported one are different features, #163's class).
             "outcome_episodes": int(self.mind.outcome_episodes.n_written) if getattr(self.mind, "outcome_episodes", None) is not None else 0,
+            # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:41 +0400 — LIFE-D-ACT-SOUND.md items 2/3
+            # (L-8/L-13): `acts_chosen` is a dict, one count PER VERB (G-MOT-1's census, never a total,
+            # #165), never omitted (#164, every write). `getattr` defaults cover every genome that never
+            # declares ACT's turn/step verbs or FAST's sound key -- those never build the counters at all.
+            "acts_chosen": dict(getattr(self.mind, "acts_chosen", {}) or {}),
+            "act_mismatches": int(getattr(self.mind, "act_mismatches", 0)),
+            "sound_events": int(getattr(self.mind, "sound_events", 0)),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:
@@ -387,6 +394,20 @@ def _declared_game_config(declared: Dict[str, dict]) -> Optional[Dict[str, objec
     if not game_sense.GAME_DOOR_GATED:
         return None
     return declared.get("WORLD_GAME")
+
+
+# edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:41 +0400 — LIFE-D-ACT-SOUND.md item 1 (L-8): the
+# body's own half of the ONE gate (creature/senses/game.py:mind_drives_acts) that decides whether
+# --act-file ever reaches the worker -- the SAME predicate creature/mind.py reads before it ever writes
+# root/game/ACT, so the two sides can never disagree (#180).
+def _game_act_file_path(root: Path, declared: Dict[str, dict]) -> Optional[Path]:
+    """None (the worker keeps its own seeded schedule) unless this genome's ACT vocabulary carries BOTH
+    "turn" and "step" -- then `root/game/ACT`, the path the mind writes and the worker's --act-file
+    reads."""
+    from .senses import game as game_sense
+    if not game_sense.mind_drives_acts(declared):
+        return None
+    return root / "game" / "ACT"
 
 
 def _declared_folder_dir(declared: Dict[str, dict]) -> Optional[Path]:
@@ -486,9 +507,12 @@ def main(argv: List[str]) -> int:
         canvas = int(genome_for_cli.gaze["canvas"])
         game_stop_file = root / "game" / "STOP"
         game_stop_file.parent.mkdir(parents=True, exist_ok=True)
+        # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:41 +0400 — LIFE-D-ACT-SOUND.md item 1 (L-8):
+        # --act-file only when this genome's ACT vocabulary drives the game (_game_act_file_path's own gate).
+        act_file = _game_act_file_path(root, declared)
         game_proc = game_sense.start_worker(
             game_door_dir, seed=int(game_cfg["seed"]), game=str(game_cfg["game"]), tile=int(game_cfg["tile"]),
-            period_s=float(game_cfg["every_s"]), stop_file=game_stop_file)
+            period_s=float(game_cfg["every_s"]), stop_file=game_stop_file, act_file=act_file)
         gfn = functools.partial(game_sense.sense, door_dir=game_door_dir, root=root, canvas=canvas, poll_period=0.5)
         body.add_sense("game", gfn)
 

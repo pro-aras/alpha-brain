@@ -91,6 +91,9 @@ SNAPSHOT_EVERY = 500
 # this is a code constant, sized like FAST's own smaller genomes (genome/G4.genome declares FAST 20000; this ring
 # carries far sparser traffic — one row per act/SIT-publish, not one per glance) — not a gene value.
 OUTCOME_EPISODES_CAP = 2000
+# edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:48 +0400 — LIFE-D-ACT-SOUND.md item 3 (L-13;
+# EAR.md §4's own TRAIT line): band 32 + onset-shape 4 + level 1.
+SOUND_TRAIT_DIM = 37
 
 
 def _bind_pool(feats: List[np.ndarray]) -> List[np.ndarray]:
@@ -177,6 +180,19 @@ class Mind:
             Episodes(OUTCOME_EPISODES_CAP, self.genome.sight_dim(), self.genome.words_dim())
             if ("OUTCOME" in self.genome.declared or "SIT" in self.genome.declared) else None
         )
+        # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:48 +0400 — LIFE-D-ACT-SOUND.md item 3 (L-13):
+        # a THIRD, separate Episodes ring for ear-sound events (37-wide: EAR.md §4's TRAIT line, band 32 +
+        # onset-shape 4 + level 1) -- never self.episodes (dims differ) and never fed to SLEEP's org.moment
+        # replay (K's own hazard for outcome_episodes above applies identically: a zero sight vector would
+        # birth a garbage cell). Gated on FAST declaring the "sound" key (genome/machinery.py's parser);
+        # cap reuses FAST's own declared episode count (the same gene's cap parameter, a separate ring
+        # instance). x_w is a single unused slot (sound has no word dimension).
+        self.sound_episodes: Optional[Episodes] = (
+            Episodes(int(self.genome.declared["FAST"]["episodes"]), SOUND_TRAIT_DIM, 1)
+            if ("FAST" in self.genome.declared and "sound" in (self.genome.declared["FAST"].get("keys") or []))
+            else None
+        )
+        self.sound_events: int = 0
         self._act_expected: Dict[str, float] = {}     # act -> running mean of past "got" values (the PREDICTION; #175)
         self._act_n: Dict[str, int] = {}               # act -> count backing the running mean
         # merge (Claude (Fable 5.1), g5-integration): K's ring above + E's arm-aware Predictor below — both kept.
@@ -199,6 +215,22 @@ class Mind:
             if "CURIOSITY" in self.genome.declared and _CURIOSITY_AVAILABLE else None
         )
         self._think_rng = np.random.default_rng([int(self.genome.seed), 0x71494e4b])   # "THINK" bytes-ish, distinct from any other stream in this file
+        # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
+        # (L-8): the game's own act-choosing policy. `_act_policy_on` is the SAME gate creature/body.py's
+        # `_game_act_file_path` reads (creature.senses.game.mind_drives_acts), computed once here so a
+        # genome that never declares ACT's turn+step verbs touches none of this (byte-identical to before,
+        # G4-8's own law). `_act_rng`: its own stream, distinct from `_think_rng`/CURIOSITY's/the
+        # organism's — resume-safe (its bit_generator state lives in the snapshot, see snapshot()/resume()
+        # below). `_act_choices`: seq (the eye row that triggered the choice) -> {"idx","name"}, popped by
+        # the matching outcome row's own act_seq (#175: the mismatch check compares against the CHOICE
+        # that produced THIS row, never merely "the last one made" — eye_k chooses for outcome_k, but by
+        # the time outcome_k arrives the mind may already have chosen for eye_{k+1}).
+        from creature.senses.game import mind_drives_acts as _mind_drives_acts
+        self._act_policy_on: bool = _mind_drives_acts(self.genome.declared)
+        self._act_rng = np.random.default_rng([int(self.genome.seed), 0x4143544d])   # "ACTM" bytes-ish
+        self._act_choices: Dict[int, Dict[str, object]] = {}
+        self.acts_chosen: Dict[str, int] = {}
+        self.act_mismatches: int = 0
         self._canvas_index: int = 0
         self._filed_predictions: list = []          # [{"row": FILE's row dict, "due_canvas": int}, ...] awaiting the next showing of their word
         # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
@@ -256,6 +288,12 @@ class Mind:
             self._consume_sit(row)
         elif sense == "body":
             self._consume_body(row)
+        # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:48 +0400 — LIFE-D-ACT-SOUND.md item 3
+        # (L-13): the branch the brief's own READ FIRST line named as missing ("no ear-sound branch --
+        # :244-257"). Gates itself on FAST's own "sound" key (self.sound_episodes is None otherwise), the
+        # same one-row-carries-no-work-until-armed law every other new sense here already follows.
+        elif sense == "ear-sound":
+            self._consume_ear_sound(row)
         # a "door" row (the ask door / other senses not yet armed) carries no organism work here
         self.last_seq = int(row["seq"])
         if self.org.t - self._last_snapshot_moments >= SNAPSHOT_EVERY:
@@ -309,6 +347,15 @@ class Mind:
         meta = row.get("meta") or {}
         result = self._record_reflex(act=str(meta.get("act", "")), got=meta.get("got"), expected_in=meta.get("expected"),
                                        residual_in=meta.get("residual"), source=str(meta.get("source", "")))
+        # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
+        # (L-8): the REPLAY control. Only a game row the mind itself chose (`chosen_by: "mind"`) carries
+        # anything to check against -- a "schedule" row (no --act-file, or the ladder's twin road) has no
+        # pending choice, and `_check_act_mismatch` would correctly return None for it anyway, but gating
+        # here keeps every pre-existing test's outcome dict shape (#175's law for what a check MUST NOT
+        # do: touch rows it was never asked about) untouched.
+        if meta.get("source") == "game" and meta.get("chosen_by") == "mind":
+            result = dict(result)
+            result["act_mismatch"] = self._check_act_mismatch(meta)
         self._write_journal(row["at"], {"seq": row["seq"], "outcome": result})
 
     def _consume_sit(self, row: Dict[str, object]) -> None:
@@ -340,6 +387,38 @@ class Mind:
         reading = meta.get("reading") or {}
         self._write_journal(row["at"], {"seq": row["seq"], "body": dict(reading)})
 
+    # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:48 +0400 — LIFE-D-ACT-SOUND.md item 3 (L-13).
+    def _consume_ear_sound(self, row: Dict[str, object]) -> None:
+        """The sound ear, consumed: a 37-float trait (band 32 + onset-shape 4 + level 1, EAR.md §4's TRAIT
+        line) decoded from the row's own payload bytes (float32, `errors="replace"`'s spirit applied to a
+        shape mismatch: a bad payload journals an error and returns, never crashes -- #230, the crash-loop
+        lesson) and written to the DEDICATED sound_episodes ring (never self.episodes -- dims differ and
+        this ring, like K's outcome_episodes, is never replayed through Organism.moment). "sound_episodes
+        is None" covers both "FAST undeclared" and "FAST declared without the 'sound' key" -- the twin
+        (#228): the row is stepped over, no journal, no episode, byte-for-byte the pre-L-13 behaviour."""
+        if self.sound_episodes is None:
+            return
+        meta = row.get("meta") or {}
+        payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
+        try:
+            raw = payload_path.read_bytes()
+            trait = np.frombuffer(raw, dtype="float32")
+            if trait.shape != (SOUND_TRAIT_DIM,):
+                raise ValueError(f"ear-sound trait: expected {SOUND_TRAIT_DIM} float32s, got {trait.shape[0]}")
+        except (OSError, ValueError) as e:
+            # a malformed row is NOT an event -- self.sound_events is deliberately left untouched (#175: never a fabricated count)
+            self._write_journal(row["at"], {"seq": row["seq"], "sound": {"error": str(e)}})
+            return
+        x_s = trait.astype(np.float64)
+        x_w = np.zeros(1, dtype=np.float64)
+        ep_id = self.sound_episodes.write(moment=self.org.t, x_s=x_s, x_w=x_w, word="", surprise=0.0)
+        self.sound_events += 1
+        self._write_journal(row["at"], {
+            "seq": row["seq"],
+            "sound": {"moment": meta.get("moment"), "level": meta.get("level"), "when": meta.get("when"),
+                      "file": meta.get("file"), "ep": ep_id},
+        })
+
     def _rebuild_act_expectation(self) -> None:
         """G5-K, called from resume(): replays self.outcome_episodes' own live entries (in id order == temporal
         order — ids never reused, an overwritten id's slot is simply skipped by .get() returning None) through the
@@ -363,7 +442,107 @@ class Mind:
             self._act_expected[act] = old + (got_f - old) / n
             self._act_n[act] = n
 
+    # ------------------------------------------------------------------ LIFE builder D: L-8, the act loop
+    def _recent_reflex_residuals(self, act: str, k: int = 10) -> List[float]:
+        """The last (most recent) `k` LIVE outcome_episodes rows whose `word` (the act's own name — see
+        `_record_reflex`'s `write(..., word=act, ...)`) equals `act`, newest first, each read back as its
+        own `surprise` field (already the |residual| `_record_reflex` computed and stored -- never None,
+        it substitutes 0.0 when the residual itself was ungradable). [] for an act never yet observed."""
+        ep = self.outcome_episodes
+        if ep is None:
+            return []
+        out: List[float] = []
+        n = ep.n_written
+        lo = max(0, n - ep.cap)
+        for eid in range(n - 1, lo - 1, -1):
+            rec = ep.get(eid)
+            if rec is not None and rec["word"] == act:
+                out.append(float(rec["surprise"]))
+                if len(out) >= k:
+                    break
+        return out
+
+    def _maybe_choose_act(self, row: Dict[str, object]) -> None:
+        """L-8 (MOTOR-HANDS.md G-MOT-1/G-MOT-4's "replay problem, named"; the plan's §4 L-8): on a game
+        eye row, when this genome's ACT vocabulary drives the game (`self._act_policy_on`), choose the
+        NEXT act and write it to `root/game/ACT` for the worker to obey. Policy (rung 1, exactly as the
+        brief specifies): for each of the game's own acts (never `declared["ACT"]["verbs"]` -- the game's
+        acts are BabyAI's own left/right/forward/pickup/drop/toggle/done, a DIFFERENT vocabulary; an
+        outcome row's `act` field lands outside `declared["ACT"]["verbs"]` and is tagged `in_vocab: False`
+        by `_record_reflex`, pre-existing and unchanged, raised in the report) the mean |residual| of its
+        last 10 outcome episodes (0.0 for an act never yet observed); argmax with probability 0.9, uniform
+        with 0.1; ties broken by `_act_rng`. Exactly TWO `_act_rng` draws per choice regardless of branch
+        (one for explore-vs-exploit, one for the pick) so the stream's shape never depends on how many
+        acts happen to tie -- replay recomputes the identical branch from the identical data either way,
+        but a fixed draw count keeps the stream easy to reason about. A pure function of (genome, seed,
+        the outcome ring's own live content, this row) -- replay re-derives the identical choice; no
+        clock, no other rng stream, no organism state is read."""
+        if not self._act_policy_on:
+            return
+        meta = row.get("meta") or {}
+        if meta.get("source") != "game":
+            return
+        n_actions = meta.get("n_actions")
+        if n_actions is None:
+            return   # a game eye row that (for whatever reason) never published its own action-space size -- nothing to choose over
+        n_actions = int(n_actions)
+        act_names = list(meta.get("act_names") or [str(i) for i in range(n_actions)])[:n_actions]
+        weights = []
+        for name in act_names:
+            residuals = self._recent_reflex_residuals(name, k=10)
+            weights.append(sum(residuals) / len(residuals) if residuals else 0.0)
+
+        u = float(self._act_rng.random())
+        if u < 0.1:
+            idx = int(self._act_rng.integers(0, n_actions))
+        else:
+            best = max(weights)
+            tied = [i for i, w in enumerate(weights) if w == best]
+            pick = int(self._act_rng.integers(0, len(tied)))
+            idx = tied[pick]
+        act_name = act_names[idx]
+        seq = int(row["seq"])
+
+        act_path = self.run_root / "game" / "ACT"
+        act_path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = act_path.with_suffix(".tmp")
+        tmp.write_text(json.dumps({"seq": seq, "act": idx, "at": row["at"]}))
+        os.replace(str(tmp), str(act_path))
+
+        self._act_choices[seq] = {"idx": idx, "name": act_name}
+        self.acts_chosen[act_name] = self.acts_chosen.get(act_name, 0) + 1
+        self._write_journal(row["at"], {
+            "seq": seq,
+            "act": {"game": meta.get("game"), "act": act_name, "act_idx": idx, "seq": seq,
+                    "policy": "outcome-weighted", "weights": [round(w, 6) for w in weights]},
+        })
+
+    def _check_act_mismatch(self, meta: Dict[str, object]) -> Optional[bool]:
+        """L-8's REPLAY control: the outcome row that follows a chosen act carries the act the worker
+        ACTUALLY took (`act_idx`), keyed to the choice that produced it by `act_seq` (the eye row's own
+        seq -- #175: never "the last choice made", which by the time this row arrives may already be a
+        LATER choice; see `_act_choices`'s own docstring above). None when there is nothing to check
+        against (no `act_seq`, or no pending choice under it — never fabricated as a match or a
+        mismatch, #175)."""
+        act_seq = meta.get("act_seq")
+        if act_seq is None:
+            return None
+        chosen = self._act_choices.pop(int(act_seq), None)
+        if chosen is None:
+            return None
+        got_idx = meta.get("act_idx")
+        mismatch = (got_idx is None) or (int(got_idx) != int(chosen["idx"]))
+        if mismatch:
+            self.act_mismatches += 1
+        return bool(mismatch)
+
     def _consume_eye(self, row: Dict[str, object], moment: Optional[str]) -> None:
+        # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
+        # (L-8): on a GAME eye row, choose the next act before anything else in this method (order among
+        # the rest of _consume_eye's work is otherwise irrelevant to replay identity — this is a pure
+        # function of genome/seed/tape either way — but the choice is made as early as possible so the
+        # worker sees it with the least possible latency in a live life).
+        self._maybe_choose_act(row)
         # edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — W3-0b seam (Builder C's finding 4): the payload is read under the genome's own TAPE path
         # (creature/tape.py:_resolve_tape_dir — byte-identical for the default `run/tape`), never a second hardcoded "tape".
         payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
@@ -940,6 +1119,11 @@ class Mind:
             "sight": {str(k): sorted(v) for k, v in ledgers["sight"].items()},
             "words": {str(k): sorted(v) for k, v in ledgers["words"].items()},
             "predictor_last_winner": predictor_last_winner,
+            # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
+            # (L-8): "_act_rng, resume-safe: its state in the snapshot". `Generator.bit_generator.state`
+            # is a plain JSON-safe dict (PCG64: {"state": {"state": int, "inc": int}, "has_uint32": int,
+            # "uinteger": int}) -- persisted whole, restored whole in resume() below.
+            "act_rng_state": self._act_rng.bit_generator.state,
         }
         ledger_tmp = state_dir / "ledger_tmp.json"
         ledger_tmp.write_text(json.dumps(ledger))
@@ -949,6 +1133,8 @@ class Mind:
             self.episodes.save(state_dir / "episodes.npz")
         if self.outcome_episodes is not None:   # G5-K: the reflex ring — same class, same atomic save; never hashed (state_hash reads only org.c/cells/W)
             self.outcome_episodes.save(state_dir / "outcome_episodes.npz")
+        if self.sound_episodes is not None:   # LIFE builder D (L-13): the sound ring — same class, same atomic save; never hashed
+            self.sound_episodes.save(state_dir / "sound_episodes.npz")
 
         self._last_snapshot_moments = self.org.t
         self.snapshot_count += 1
@@ -970,6 +1156,12 @@ class Mind:
             mind._heard = {v for v in mind.moment_word.values() if v}     # PREREG §15: the heard-set, re-derived (never persisted separately)
             mind.last_seq = int(ledger.get("last_seq", 0))
             mind._last_snapshot_moments = mind.org.t
+            # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
+            # (L-8): restore the act rng's stream exactly (absent from a snapshot taken before this gene
+            # existed -> the freshly-seeded stream __init__ already built, unchanged).
+            act_rng_state = ledger.get("act_rng_state")
+            if act_rng_state is not None:
+                mind._act_rng.bit_generator.state = act_rng_state
 
             # A9: `mind.predictor`/`mind.episodes` were built in __init__ against the PRE-load org/genome;
             # the predictor in particular closes over `org` by reference, so it must be rebuilt against
@@ -994,6 +1186,12 @@ class Mind:
             if ("OUTCOME" in mind.genome.declared or "SIT" in mind.genome.declared) and outcome_path.exists():
                 mind.outcome_episodes = Episodes.load(outcome_path)
                 mind._rebuild_act_expectation()
+            # LIFE builder D (L-13): the sound ring reloaded the same way; sound_events (a plain count,
+            # like snapshots/sleeps elsewhere in this file) is NOT persisted -- a resumed life's count
+            # restarts at 0, matching the existing gap this file already documents for think_counters etc.
+            sound_path = state_dir / "sound_episodes.npz"
+            if mind.sound_episodes is not None and sound_path.exists():
+                mind.sound_episodes = Episodes.load(sound_path)
             if "SLEEP" in mind.genome.declared:
                 every = int(mind.genome.declared["SLEEP"]["every"])
                 mind._last_sleep_at = (mind.org.t // every) * every if every > 0 else 0

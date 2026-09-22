@@ -255,10 +255,15 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"grow to (" + _NUM + r") nmax then consolidate", a)
                 if not m: raise GenomeError(f"CYCLE: cannot read {a!r} (row 7: CYCLE grow to <f> nmax then consolidate)")
                 g["declared"]["CYCLE"] = {"grow_to": float(m.group(1))}
+            # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:33 +0400 — LIFE-D-ACT-SOUND.md item 3
+            # (L-13): FAST accepts an optional trailing " sound" key (genome/LIFE.genome:51's own DRAFT
+            # line) -- additive only, the plain "keys sight words surprise" line (no "sound") parses to
+            # the exact same dict as before (test_fast_sound_key.py's own regression clause).
             elif gene == "FAST":
-                m = re.fullmatch(r"episodes (\d+) keys sight words surprise", a)
-                if not m: raise GenomeError(f"FAST: cannot read {a!r} (B3: FAST episodes <n> keys sight words surprise)")
-                g["declared"]["FAST"] = {"episodes": int(m.group(1)), "keys": ["sight", "words", "surprise"]}
+                m = re.fullmatch(r"episodes (\d+) keys sight words surprise( sound)?", a)
+                if not m: raise GenomeError(f"FAST: cannot read {a!r} (B3/L-13: FAST episodes <n> keys sight words surprise [sound])")
+                keys = ["sight", "words", "surprise"] + (["sound"] if m.group(2) else [])
+                g["declared"]["FAST"] = {"episodes": int(m.group(1)), "keys": keys}
             elif gene == "SLEEP":
                 m = re.fullmatch(r"every (\d+) moments replay (\d+) by surprise", a)
                 if not m: raise GenomeError(f"SLEEP: cannot read {a!r} (B7: SLEEP every <n> moments replay <m> by surprise)")
