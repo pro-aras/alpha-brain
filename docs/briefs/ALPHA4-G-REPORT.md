@@ -109,4 +109,4 @@ Both suites, final bytes, `-t .`, `TMPDIR=scratch/tmp`, `nice -n 10`. Full logs:
 12 modified: `creature/body.py`, `creature/genes.py`, `creature/mind.py`, `creature/think_thread.py`, `genome/machinery.py` (+404/−45), `genome/sleep.py`, `tests/creature/test_refusal.py`, `tests/creature/test_self_gene.py`, `tests/creature/test_verdict_life_marks.py`, `tests/genome/_toy.py`, `tools/verdict_g4.py`, `tools/verdict_life.py`.
 7 new: `tests/creature/test_status_grow.py`, `tests/genome/ALPHA4-G-inventory.genome`, `tests/genome/test_budget_regen.py`, `tests/genome/test_cycle_redundant.py`, `tests/genome/test_grow_mechanics.py`, `tests/genome/test_parse_grow.py`, `tests/genome/test_state_hash_grow.py`.
 
-Commit: PENDING_SHA
+Commit: `5c0073dd020a19d9d0694053d9c590e886075a12` (branch `alpha4-grow`, base `74c661d`).
