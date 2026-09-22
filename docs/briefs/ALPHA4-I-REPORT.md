@@ -1,6 +1,14 @@
 # Builder I report — THE WEB DOOR, THE STAGES and THE READINESS JUDGE
 *by Claude Sonnet 5, ALPHA4 builder I, 2026-09-23. Branch `alpha4-world`, worktree `/data/dev/genome-wt-z`.*
 
+**For the integrator, up front: STAGE 4 cannot open in `alpha4-1` as shipped.** This is finding 1 below,
+not a bug — the READINESS judge's (b) read-proxy is RAISED and fails closed by design — but its
+consequence reaches past this brief: the web door's real-fetch path, `read_common`'s real renderer, and
+the H×I seam it exercises all stay UNTESTED-BY-A-REAL-LIFE until (b) is resolved (my own tests prove the
+mechanism with a test-only override; nothing in the shipped code can trigger it). PREREG §9's own
+prediction — "the internet door: NOT open by hour 12 [Likely], open by hour 24 [Guessing]" — is false by
+construction as of this commit and should be re-stated before launch, not discovered at hour 24.
+
 ## What is NOT done, and why
 
 1. **§4(b)'s read-proxy half is RAISED — the shipped judge cannot reach STAGE 4 today.** "the mind's own
@@ -52,7 +60,13 @@
    consistent source (my own brief) and implemented five. Flagging the inconsistency rather than silently
    picking one.
 
-## Two shared-tool gaps found and fixed while proving my own deliverables (not asked for, but blocking)
+## Findings A–D: two shared-tool gaps and two corrections, found while proving my own deliverables (not asked for, but blocking)
+
+Every one of these four is the SAME shape (#162's class, three times in one night): a check that tested
+for the SHAPE of a thing instead of the NAMED thing it actually meant — an `event` key (any of them) stood
+in for "a body-only bookkeeping row"; a bare AST `Name` node stood in for "wherever this path is used"; a
+raw count `>= 8` stood in for "the last 10, filled." Each was found by building the exact case the shape
+and the meaning disagree on, not by inspection.
 
 **A. `tools/gate_g4.py`'s writer sweep had a real blind spot.** Its `sweep()` built a write target's text
 from `_literal_text(fn.value)` — a bare AST walk of the receiver expression — which sees an INLINE write
@@ -105,14 +119,14 @@ reachable BEFORE the window filled). A regression test
 
 **A pre-existing, environment-load-induced flaky test, unrelated to this work:**
 `tests/creature/test_g5k_outcome.py::TestSitLiveWiring::test_sense_publishes_the_newest_exam_files_score_as_they_appear`
-failed on my FIRST full-suite run after landing everything (4 failures total that run, all four actually
-the `test_refusal.py` registry-pinning gap above — the SIT test itself did not fail that particular run,
-but it DID fail 2 of 3 times when I ran it in isolation while the box was under heavy concurrent load from
-sibling builders' processes, e.g. `tools/evolve.py --negative-control` at 126% CPU, the live `g5-seam-2`
-body, and at least two other worktrees' own full test suites running at the same time). Proven innocent by
-isolation: `git stash`-ing every change on this branch and re-running the SAME test 3 times against the
-completely unmodified tree still failed 3/3, with the identical `AssertionError: 0 != 1` — the sense
-thread's own 5 s deadline (`tests/creature/test_g5k_outcome.py:453`, this file's own comment already
+did NOT fail in any of my three FULL-suite runs this session (the one full-suite failure I saw — 4
+failures, one run — was entirely `test_refusal.py`'s registry-pinning gap, finding C below; 0 elsewhere).
+It DID fail 2 of 3 times when I ran it ALONE, in isolation, while the box was under heavy concurrent load
+from sibling builders' processes, e.g. `tools/evolve.py --negative-control` at 126% CPU, the live
+`g5-seam-2` body, and at least two other worktrees' own full test suites running at the same time. Proven
+innocent by isolation: `git stash`-ing every change on this branch and re-running the SAME test 3 times
+against the completely unmodified tree still failed 3/3, with the identical `AssertionError: 0 != 1` — the
+sense thread's own 5 s deadline (`tests/creature/test_g5k_outcome.py:453`, this file's own comment already
 acknowledges "generous margin under this box's contended CPU") is simply not generous enough under
 TODAY's specific multi-worktree load. Not touched — not my file, not caused by my changes, would need K's
 (or the orchestrator's) own call on whether to widen it further.
