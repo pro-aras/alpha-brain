@@ -223,7 +223,7 @@ class HandsMark(unittest.TestCase):
         from tools.verdict_life import hands_mark
         st = {"runs": 30, "runs_by_program": {"p1": 10, "p2": 20}, "hands_no_road": 0, "touch_events": 30, "smell_events": 12}
         ok = hands_mark(st, self._rows(30), {"asked": 30, "hits": 20, "shuffled_hits": 11}, True)
-        self.assertTrue(ok["graded"]); self.assertTrue(ok["pass"]); self.assertAlmostEqual(ok["recognised_share"], 20 / 30); self.assertAlmostEqual(ok["shuffled_share"], 11 / 30)
+        self.assertTrue(ok["graded"]); self.assertTrue(ok["pass"]); self.assertAlmostEqual(ok["recognised_share"], 20 / 30, places=3); self.assertAlmostEqual(ok["shuffled_share"], 11 / 30, places=3)   # the mark rounds to 4 places
         bad = hands_mark(st, self._rows(30), {"asked": 30, "hits": 5, "shuffled_hits": 2}, True)
         self.assertTrue(bad["graded"]); self.assertFalse(bad["pass"])
 
