@@ -141,6 +141,16 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # threshold as the skip and was always preempted by it) -- _maybe_think now tracks a run of skips and
         # _file_behind_belief() files it at the first think that RUNS after the run.
         "SELF": "creature/mind.py:Mind._consume_body (records readings) + _think_pool/_think_work ('self' kind, stall/no_room beliefs) + _maybe_think (the backlog skip + the 'behind' belief on resume, via _file_behind_belief)",
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:41 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+        # (docs/briefs/LIFE-F-HANDS-TOUCH-SMELL.md; MOTOR-HANDS.md G-MOT-4; BODY-SENSES.md §4.5/§4.6):
+        # HANDS/SENSE_TOUCH/SENSE_SMELL, the mind-side rows. HANDS: two real call sites (Mind.__init__
+        # resolves the jail/shelf paths; Mind._think_pool/_think_work builds and works the 'hands' pool
+        # kind, Mind._maybe_think writes run/hands/ACT). SENSE_TOUCH/SENSE_SMELL: the same two-site shape
+        # FAST's "sound" key uses (Mind.__init__ builds the dedicated ring; Mind._consume_touch/
+        # _consume_smell read the declared presence and act on the row).
+        "HANDS": "creature/mind.py:Mind.__init__ (self._hands_jail_path/_hands_shelf_dir resolved) + Mind._think_pool/_think_work ('hands' pool kind chooses a program) + Mind._maybe_think (writes run/hands/ACT) + creature/body.py:Body.start (declared['HANDS'] read via _declared_hands_config; starts creature/senses/hands.py:sense behind HANDS_DOOR_GATED)",
+        "SENSE_TOUCH": "creature/mind.py:Mind.__init__ (self.touch_episodes built) + Mind._consume_touch (trait decoded, written to the dedicated ring, journaled)",
+        "SENSE_SMELL": "creature/mind.py:Mind.__init__ (self.smell_episodes built) + Mind._consume_smell (trait decoded, written to the dedicated ring, journaled)",
     },
 }
 

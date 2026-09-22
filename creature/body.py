@@ -232,6 +232,17 @@ class Body:
             body_fields = list(self.mind.genome.declared["SENSE_BODY"]["fields"])
             body_fn = functools.partial(body_sense_module.sense, root=self.root, fields=body_fields, period_s=body_period)
             self.add_sense("body", body_fn)
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+        # item 2 (MOTOR-HANDS.md G-MOT-4): the hands door, the SAME C1.7 shape SIT/SENSE_BODY use above
+        # (gated on the gene's own declared presence; started via add_sense so it gets the same crash-
+        # isolation/restart/journal machinery every other sense here has).
+        hands_cfg = _declared_hands_config(self.mind.genome.declared)
+        if hands_cfg is not None:
+            from .senses import hands as hands_sense
+            hands_fn = functools.partial(hands_sense.sense, root=self.root, jail_path=hands_cfg["jail_path"],
+                                          shelf_dir=hands_cfg["shelf_dir"], cpu=hands_cfg["cpu"],
+                                          mem=hands_cfg["mem"], wall=hands_cfg["wall"], poll_period=0.2)
+            self.add_sense("hands", hands_fn)
         for st in self.sense_threads:
             st.start()
         self._started = True
@@ -332,6 +343,15 @@ class Body:
             "glances_confirmed": int(getattr(self.mind, "glances_confirmed", 0)),
             "glances_surprised": int(getattr(self.mind, "glances_surprised", 0)),
             "births_skipped_confirmed": int(getattr(org, "births_skipped_confirmed", 0)),
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+            # item 2 (G-MOT-1's census shape, never a total, #165): `runs_by_program` is a dict, one count
+            # PER PROGRAM; `runs` is its sum, for a reader that wants the total without summing itself.
+            # `getattr` defaults cover every genome that never declares HANDS/SENSE_TOUCH/SENSE_SMELL.
+            "runs_by_program": dict(getattr(self.mind, "runs_chosen", {}) or {}),
+            "runs": sum((getattr(self.mind, "runs_chosen", {}) or {}).values()),
+            "hands_no_road": int(getattr(self.mind, "hands_no_road", 0)),
+            "touch_events": int(getattr(self.mind, "touch_events", 0)),
+            "smell_events": int(getattr(self.mind, "smell_events", 0)),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:
@@ -429,6 +449,32 @@ def _declared_folder_dir(declared: Dict[str, dict]) -> Optional[Path]:
     return Path(__file__).resolve().parents[1] / world_declared["folder"]
 
 
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
+# (MOTOR-HANDS.md G-MOT-4): the hands door's own arming, mirroring _declared_folder_dir/_declared_game_
+# config's own shape and gate discipline exactly (C2/C3's convention, reused rather than re-invented).
+def _declared_hands_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """HANDS undeclared, or declared in its SHORT form (no shelf -- the pre-existing "HANDS jail <path>"
+    grammar, test_parse_g4.py's own pin) -> None (arms nothing, exactly like a WORLD line with no folder).
+    HANDS declared in its FULL form -> `{"jail_path", "shelf_dir", "cpu", "mem", "wall"}`, gated on
+    creature.senses.hands.HANDS_DOOR_GATED so a genome line arms nothing until the code carrying it exists.
+    `jail_path` resolves against this file's own parents[2] (the worktree's PARENT -- alpha3/ is a SIBLING
+    tree, never inside this repo); `shelf_dir` resolves against parents[1] (the repo root, the SAME root
+    `_declared_folder_dir` above already uses for WORLD's own `folder`) -- `creature/mind.py`'s own
+    `_hands_paths` resolves the identical two roots for the SAME reason (LIFE-F-HANDS-TOUCH-SMELL.md's own
+    module-level comment there)."""
+    from .senses import hands as hands_sense
+    if not hands_sense.HANDS_DOOR_GATED:
+        return None
+    hands = declared.get("HANDS")
+    if hands is None or "shelf" not in hands:
+        return None
+    return {
+        "jail_path": Path(__file__).resolve().parents[2] / str(hands["jail"]),
+        "shelf_dir": Path(__file__).resolve().parents[1] / str(hands["shelf"]),
+        "cpu": int(hands["cpu"]), "mem": int(hands["mem"]), "wall": int(hands["wall"]),
+    }
+
+
 # edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — the 8 h SEAM LIVES (docs/G5-SEAM-LIFE-PLAN.md §1): world_maker.sense() has always
 # taken `plant_after_canvases`, but main() never passed it, so every life ran the module default (15,000 canvases ≈ hour 21)
 # and an 8 h life could NEVER show the plant (SOLUTIONS #228 (a): a plant placed where the mechanism cannot fire). `--plant-after N`
@@ -479,7 +525,12 @@ def main(argv: List[str]) -> int:
         from .senses import folder as folder_sense   # lazily, same discipline as world_maker above
         import functools
         canvas = int(genome_for_cli.gaze["canvas"])
-        ffn = functools.partial(folder_sense.sense, world_dir=folder_dir, root=root, canvas=canvas, period=folder_period)
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
+        # 4: `smell` gated on the genome's own SENSE_SMELL declared presence (C1.7's own shape) -- False
+        # (folder.sense's own default) when undeclared, byte-identical to before this brief.
+        smell_on = "SENSE_SMELL" in declared
+        ffn = functools.partial(folder_sense.sense, world_dir=folder_dir, root=root, canvas=canvas,
+                                 period=folder_period, smell=smell_on)
         body.add_sense("folder", ffn)
 
     # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 22:1x +0400 — docs/briefs/G5-L-BABYAI-WORLD-EAR.md

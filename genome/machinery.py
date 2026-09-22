@@ -148,6 +148,23 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"wav (\d+) mono", a[len("ear-sound "):].strip())
                 if not m: raise GenomeError(f"SENSE ear-sound: cannot read {a!r} (EAR.md §4: SENSE ear-sound wav <rate> mono)")
                 g["ear_sound"] = {"rate": int(m.group(1)), "channels": "mono"}
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:25 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+            # item 4 (BODY-SENSES.md §4.5): SENSE smell kind size folder age. New vocabulary, dispatched on
+            # args[0] exactly as ear/ear-sound/colour above (additive: those branches untouched). Stored
+            # under g["declared"]["SENSE_SMELL"] (unlike eye/ear/colour, which are plain Genome fields) --
+            # SENSE_SMELL names a real MIND-side consumer (creature/mind.py's _consume_smell) that
+            # creature/genes.py's RUNS/unwired() law must name, matching BIND/DELIVER/MOMENT's own
+            # convention for a "SENSE ..." line with a real call site.
+            elif gene == "SENSE" and args[0] == "smell":
+                m = re.fullmatch(r"kind size folder age", a[len("smell "):].strip())
+                if not m: raise GenomeError(f"SENSE smell: cannot read {a!r} (BODY-SENSES §4.5: SENSE smell kind size folder age)")
+                g["declared"]["SENSE_SMELL"] = {"fields": ["kind", "size", "folder", "age"]}
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:25 +0400 — item 3 (BODY-SENSES.md §4.6):
+            # SENSE touch from hands: exit rate stalls retries bytes. Same convention as SENSE smell above.
+            elif gene == "SENSE" and args[0] == "touch":
+                m = re.fullmatch(r"from hands: exit rate stalls retries bytes", a[len("touch "):].strip())
+                if not m: raise GenomeError(f"SENSE touch: cannot read {a!r} (BODY-SENSES §4.6: SENSE touch from hands: exit rate stalls retries bytes)")
+                g["declared"]["SENSE_TOUCH"] = {"from": "hands", "fields": ["exit", "rate", "stalls", "retries", "bytes"]}
             elif gene == "SENSE" and args[0] == "colour":
                 # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:07 +0400 — G-EYE-3/§3.6: SENSE colour rg
                 # by 4x4 under the glance fixed-gain. New vocabulary; a strict fullmatch on the literal decided
@@ -376,10 +393,20 @@ def parse_genome(text: str) -> Genome:
                     "pov_h": int(m.group(4)), "pov_w": int(m.group(5)), "tile": int(m.group(6)),
                     "consequence": m.group(7),
                 }
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:25 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+            # item 2 (MOTOR-HANDS.md G-MOT-4, the plan's L-12): HANDS gains an OPTIONAL trailing clause
+            # "shelf <dir> cpu <n> mem <n> wall <n>" wrapped in its own non-capturing optional group -- the
+            # pre-existing SHORT form ("HANDS jail <path>", tests/genome/test_parse_g4.py:111's own pin
+            # against tests/genome/G4-draft.genome) keeps parsing to the EXACT same one-key dict as before
+            # this edit; only the full form (genome/LIFE.genome:76's own DRAFT line) gains the four extra
+            # keys.
             elif gene == "HANDS":
-                m = re.fullmatch(r"jail ([A-Za-z0-9_./-]+)", a)
-                if not m: raise GenomeError(f"HANDS: cannot read {a!r} (row 6: HANDS jail <path>)")
-                g["declared"]["HANDS"] = {"jail": m.group(1)}
+                m = re.fullmatch(r"jail ([A-Za-z0-9_./-]+)(?: shelf ([A-Za-z0-9_./-]+) cpu (\d+) mem (\d+) wall (\d+))?", a)
+                if not m: raise GenomeError(f"HANDS: cannot read {a!r} (row 6: HANDS jail <path>[ shelf <dir> cpu <n> mem <n> wall <n>])")
+                d: Dict[str, object] = {"jail": m.group(1)}
+                if m.group(2) is not None:
+                    d.update({"shelf": m.group(2), "cpu": int(m.group(3)), "mem": int(m.group(4)), "wall": int(m.group(5))})
+                g["declared"]["HANDS"] = d
             elif gene == "ASK":
                 # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-14 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
                 # §4 L-14): the literal six-verb line generalised to ANY space-separated list drawn from the known

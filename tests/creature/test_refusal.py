@@ -223,6 +223,11 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "SENTENCE": "SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token",
         "QUESTION": "QUESTION from wants; forms what-is is which; to the world door",
         "MOUTH": "MOUTH    say one frame per think; journaled",
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:42 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md:
+        # three rows, matching the three genes.py RUNS entries added by this task.
+        "HANDS": "HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20",
+        "SENSE_TOUCH": "SENSE    touch from hands: exit rate stalls retries bytes",
+        "SENSE_SMELL": "SENSE    smell kind size folder age",
     }
 
     def test_every_runs_gene_parses(self) -> None:
