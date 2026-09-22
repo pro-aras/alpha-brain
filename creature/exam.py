@@ -27,7 +27,7 @@ def run_exam(root: Path, genome_path: Path, held: int = 10, check_tape: int = 40
     root = Path(root)
     old_argv = sys.argv
     try:
-        sys.argv = ["self_exam.py", "--root", str(root), "--genome", str(genome_path), "--held", str(held), "--check-tape", str(check_tape)]
+        sys.argv = ["self_exam.py", "--root", str(root), "--genome", str(genome_path), "--held", str(held), "--check-tape", str(check_tape), "--read-words", "20"]   # ALPHA4 §4(b): the reading share on every sitting (Claude (Fable 5.1), 2026-09-23 03:02 +0400)
         self_exam.main()
     finally:
         sys.argv = old_argv

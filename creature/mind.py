@@ -727,7 +727,9 @@ class Mind:
         result = self._record_reflex(act="sit", got=meta.get("score"), expected_in=None, residual_in=None,
                                        source=str(meta.get("source", "sit")))
         composite = meta.get("composite")
-        self._sit_readings.append((meta.get("score"), float(composite) if isinstance(composite, (int, float)) else None))
+        read_share = meta.get("read_share")   # ALPHA4 §4(b): a TAPE FACT the sitter computed (Claude (Fable 5.1), 2026-09-23 03:02 +0400)
+        self._sit_readings.append((meta.get("score"), float(composite) if isinstance(composite, (int, float)) else None,
+                                   float(read_share) if isinstance(read_share, (int, float)) else None))
         readiness = self._readiness_readings() if "STAGE_READY" in self.genome.declared else None
         journal_row: Dict[str, object] = {"seq": row["seq"], "sit": result}
         if readiness is not None:
@@ -801,15 +803,24 @@ class Mind:
         that never opens the door is a FAIL of nothing, it is a reading of the bar"), never as True."""
         if self._read_proxy_override is not None:
             return self._read_proxy_override
-        return None
+        # edit: Claude (Fable 5.1), 2026-09-23 03:02 +0400 — RESOLVED at integration: the share is a TAPE FACT. The exam sitter (off the
+        # mind thread, on the snapshot) renders the last 20 HEARD shelf words in the held-out font and reports
+        # `read_share`; the SIT row carries it; here it is READ, never computed. Both of the last two rows >= 0.6
+        # -> True; a row without the number -> None (fails closed, the shipped stance kept).
+        if len(self._sit_readings) < 2:
+            return None
+        shares = [r[2] if len(r) > 2 else None for r in self._sit_readings]
+        if any(v is None for v in shares):
+            return None
+        return all(v >= 0.6 for v in shares)
 
     def _sit_composite_ok(self) -> bool:
         """§4(c): the last TWO `sit` rows' composite >= 0.95 AND Q1 (the row's own `score`) >= 0.98 — both
         numbers, both rows. Fewer than two SIT rows yet, or either number missing/under its bar, fails."""
         if len(self._sit_readings) < 2:
             return False
-        return all(score is not None and score >= 0.98 and composite is not None and composite >= 0.95
-                   for score, composite in self._sit_readings)
+        return all(r[0] is not None and r[0] >= 0.98 and r[1] is not None and r[1] >= 0.95
+                   for r in self._sit_readings)
 
     def _readiness_readings(self) -> Dict[str, object]:
         """§4 (a)-(e), from TAPE FACTS ONLY — every value below is derived from a counter this mind built

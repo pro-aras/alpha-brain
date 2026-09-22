@@ -429,7 +429,10 @@ class TestPlantedReadOffender(unittest.TestCase):
         inline = tmp_dir / "planted_inline.py"; inline.write_text(self._planted_offender_text(True))
         via_var = tmp_dir / "planted_via_var.py"; via_var.write_text(self._planted_offender_text(False))
         self.assertTrue(gate_g4.sweep([inline]), "the inline literal form must still be caught")
-        self.assertEqual(gate_g4.sweep([via_var]), [], "documents the gap: the variable-built form is missed by gate_g4.py's own sweep")
+        # edit: Claude (Fable 5.1), 2026-09-23 03:06 +0400 — the gap this test DOCUMENTED was CLOSED by builder I on the same night
+        # (tools/gate_g4.py's sweep now resolves the variable-built form); a test pinning an absence flips at the merge
+        # (#232 addendum (c)) — it now pins the presence: both forms caught.
+        self.assertNotEqual(gate_g4.sweep([via_var]), [], "gate_g4.py's own sweep must catch the variable-built offender too (builder I's fix)")
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
     def test_the_real_read_module_is_never_flagged(self) -> None:

@@ -93,37 +93,26 @@ def _load_seen(seen_path: Path) -> set:
 
 
 def unanswered_questions(questions_dir: Path, exclude: set) -> List[Tuple[str, str]]:
-    """This door's own candidates: every `<id>.json` under `questions_dir` whose sidecar
-    `<id>.status.json` reads `{"status": "unanswered"}`, `id` not in `exclude`, sorted bytewise by id
-    (deterministic — C2's pacing convention). A question with no `word` is skipped (no title to fetch)."""
+    """edit: Claude (Fable 5.1), 2026-09-23 03:02 +0400 — RECONCILED at integration with builder H's REAL convention (creature/senses/
+    lexicon.py): the lexicon door RENAMES a question it cannot answer to `<qid>.unanswered.json` (the JSON body still
+    carries "q"/"word"); there is no sidecar. This door's candidates are exactly those files, `qid` not in `exclude`,
+    sorted bytewise. (The sidecar shape this module first assumed is gone — ALPHA4-I-REPORT "not done" 2.)"""
     out: List[Tuple[str, str]] = []
+    questions_dir = Path(questions_dir)
     if not questions_dir.exists():
         return out
-    for p in sorted(questions_dir.glob("*.json")):
-        if p.name.endswith(".status.json"):
-            continue
-        qid = p.stem
+    for p in sorted(questions_dir.glob("*.unanswered.json")):
+        qid = p.name[: -len(".unanswered.json")]
         if qid in exclude:
             continue
-        status_path = questions_dir / f"{qid}.status.json"
-        if not status_path.exists():
-            continue
         try:
-            status = json.loads(status_path.read_text()).get("status")
+            body = json.loads(p.read_text())
         except (json.JSONDecodeError, OSError):
             continue
-        if status != "unanswered":
-            continue
-        try:
-            data = json.loads(p.read_text())
-        except (json.JSONDecodeError, OSError):
-            continue
-        word = data.get("word")
-        if not word:
-            continue
-        out.append((qid, str(word)))
+        word = str(body.get("word") or "").strip()
+        if word:
+            out.append((qid, word))
     return out
-
 
 def _first_wiktionary_definition(data: dict) -> Optional[str]:
     """Best-effort extraction over the REST `page/definition/<word>` shape (a dict keyed by language
@@ -173,6 +162,11 @@ def sense(publish: Callable, stop_event, root: Path, questions_dir: Optional[Pat
     door's C2/C3 gate)."""
     root = Path(root)
     questions_dir = Path(questions_dir) if questions_dir is not None else (root / "world" / "questions")
+    # edit: Claude (Fable 5.1), 2026-09-23 03:06 +0400 — the H×I seam at integration: the REAL renderer (builder H's read_common)
+    # needs a font; None (this door's own default, written against the stub) made PIL raise after the first fetch and the
+    # thread died silently (1 fetch, then nothing — caught by I's own 61-question test on the merged bytes). The DEFAULT
+    # font, never the held-out one (that font is the reading mark's, read_common.HELDOUT_FONT_PATH).
+    font_path = font_path or read_common.DEFAULT_FONT_PATH
     status_path = root / "STATUS.json"
     seen_path = root / "web" / "SEEN.json"
     seen_path.parent.mkdir(parents=True, exist_ok=True)
@@ -301,7 +295,7 @@ def sense(publish: Callable, stop_event, root: Path, questions_dir: Optional[Pat
                 try:
                     rgb = read_common.render_line(sentence, canvas, font_path)
                     png = read_common.png_bytes(rgb)
-                except NotImplementedError:
+                except Exception:   # NotImplementedError (a stub) or a renderer failure on one line: the ear rows stand, no eye row, the door lives on (#230)
                     png = None
                 if png is not None:
                     publish("eye", png, {"moment": moment, "source": "web", "question_id": qid,

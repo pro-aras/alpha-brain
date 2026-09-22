@@ -130,6 +130,37 @@ def _moment_id(doc_id: str, sentence_ix: int, chunk_ix: int, word_ix: Optional[i
     return "read" + hashlib.sha256(key.encode("utf-8")).hexdigest()[:8]
 
 
+HEARD_NAME = "HEARD.json"
+
+
+def heard_words(root: Path) -> List[str]:
+    """edit: Claude (Fable 5.1), 2026-09-23 03:02 +0400 — the words the shelf reader has HEARD so far, first-heard order, distinct
+    (`root/read/HEARD.json`, this sense's own record beside its cursor). The exam sitter (tools/self_exam.py
+    --read-words) renders the LAST n of them in the held-out font and asks the snapshot — the reading share as a
+    tape fact (the SIT row), so the READINESS judge's (b) reads a row, never re-asks the organism (ALPHA4-I-REPORT
+    "not done" 1, resolved at integration). A torn file reads as empty (folder.py's own SEEN.json law)."""
+    p = Path(root) / "read" / HEARD_NAME
+    if not p.exists():
+        return []
+    try:
+        v = json.loads(p.read_text())
+        return [str(w) for w in v] if isinstance(v, list) else []
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def _record_heard(root: Path, words: List[str]) -> None:
+    """Append the new distinct words to HEARD.json atomically (tmp + rename) — AFTER their rows are durable."""
+    p = Path(root) / "read" / HEARD_NAME
+    have = heard_words(root); seen = set(have)
+    new = [w for w in words if w and w not in seen and not seen.add(w)]
+    if not new:
+        return
+    tmp = p.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(have + new))
+    tmp.replace(p)
+
+
 def _publish_chunk(publish: Callable, doc_id: str, sentence_ix: int, chunk_ix: int, chunk_words: List[str],
                     canvas: int, font_path: str, one_word_moments: bool) -> None:
     if one_word_moments:
@@ -198,6 +229,7 @@ def sense(publish: Callable, stop_event, shelf_db: str, curriculum_md: str, root
 
         chunk_words = cur_chunks[chunk_ix]
         _publish_chunk(publish, doc_id, sentence_ix, chunk_ix, chunk_words, canvas, font_path, one_word_moments)
+        _record_heard(root, chunk_words)   # the sitter's word list, after the rows are durable and before the cursor (#230)
 
         next_chunk_ix = chunk_ix + 1
         if next_chunk_ix >= len(cur_chunks):

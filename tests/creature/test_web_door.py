@@ -21,9 +21,10 @@ def _make_root(stage) -> Path:
 
 
 def _plant_question(root: Path, qid: str, word: str, status: str = "unanswered") -> None:
+    """edit: Claude (Fable 5.1), 2026-09-23 03:03 +0400 — at integration: builder H's REAL convention (creature/senses/lexicon.py renames
+    the question file to `<qid>.unanswered.json` / `<qid>.answered.json`; the body still carries id/q/word; no sidecar)."""
     qdir = root / "world" / "questions"
-    (qdir / f"{qid}.json").write_text(json.dumps({"id": qid, "q": "what-is", "word": word}))
-    (qdir / f"{qid}.status.json").write_text(json.dumps({"status": status}))
+    (qdir / f"{qid}.{status}.json").write_text(json.dumps({"id": qid, "q": "what-is", "word": word}))
 
 
 def _ok_fetcher(u, t, ua):
@@ -61,9 +62,8 @@ class TestUnansweredQuestions(unittest.TestCase):
         qdir = root / "world" / "questions"
         _plant_question(root, "0", "zog", status="unanswered")
         _plant_question(root, "1", "bar", status="answered")
-        (qdir / "2.json").write_text(json.dumps({"id": "2", "q": "what-is"}))   # no word
-        (qdir / "2.status.json").write_text(json.dumps({"status": "unanswered"}))
-        (qdir / "3.json").write_text(json.dumps({"id": "3", "q": "what-is", "word": "nosidecar"}))  # no status sidecar at all
+        (qdir / "2.unanswered.json").write_text(json.dumps({"id": "2", "q": "what-is"}))   # no word
+        (qdir / "3.json").write_text(json.dumps({"id": "3", "q": "what-is", "word": "pending"}))  # not yet looked up by the lexicon door: not served
         out = web_module.unanswered_questions(qdir, exclude=set())
         self.assertEqual(out, [("0", "zog")])
 
@@ -214,14 +214,20 @@ class TestWebDoorGating(unittest.TestCase):
         self.assertEqual(web_rows[1]["status"], "ok")
         self.assertGreater(len(calls), calls_before_jump)
 
-    def test_stub_read_common_publishes_the_record_with_rendered_false_and_no_ear_eye_rows(self) -> None:
+    def test_real_read_common_publishes_the_record_with_rendered_true_and_ear_eye_rows(self) -> None:
+        # edit: Claude (Fable 5.1), 2026-09-23 03:06 +0400 — this test pinned the STUB's behaviour (rendered False, no rows); builder H's real
+        # read_common landed at integration and flipped the premise (#232 addendum (c): never pin the ABSENCE of a feature
+        # another lane is building). With the real renderer: the record says rendered True and the extract's words are
+        # heard and its line shown on web moments.
         root = _make_root(4)
         _plant_question(root, "0", "zog")
-        published = _run(root, 0.2, open_at_stage=4)   # web_module.read_common is the real (stub) module -- IS_STUB True
+        published = _run(root, 0.3, open_at_stage=4)
         web_rows = [m for s, m in published if s == "web"]
         self.assertEqual(len(web_rows), 1)
-        self.assertFalse(web_rows[0]["rendered"])
-        self.assertEqual([m for s, m in published if s in ("ear", "eye")], [])
+        self.assertTrue(web_rows[0]["rendered"])
+        ears = [m for s, m in published if s == "ear"]; eyes = [m for s, m in published if s == "eye"]
+        self.assertGreaterEqual(len(ears), 1); self.assertGreaterEqual(len(eyes), 1)
+        self.assertTrue(all(m["source"] == "web" and m["moment"].startswith("web0") for m in ears + eyes))
 
     def test_a_fetch_with_no_content_still_counts_ok_and_is_not_retried(self) -> None:
         root = _make_root(4)

@@ -51,6 +51,13 @@ def _score_of(data: dict) -> Optional[float]:
 # reader of a `sit` row (tests.creature.test_g5k_outcome's own dogfooding test, `creature/mind.py`'s
 # `_consume_sit`'s `_record_reflex` call, which reads only `meta.get("score")`) sees any different value
 # than before.
+def _read_share_of(data: dict) -> Optional[float]:
+    """edit: Claude (Fable 5.1), 2026-09-23 03:02 +0400 — ALPHA4 §4(b): the exam report's `read_share` (tools/self_exam.py --read-words),
+    forwarded to the tape the same additive way `composite` is; None when the report carries no number."""
+    v = data.get("read_share") if isinstance(data, dict) else None
+    return float(v) if isinstance(v, (int, float)) else None
+
+
 def _composite_of(data: dict) -> Optional[float]:
     """The mean of Q1..Q4's own accuracies — the SAME field `_score_of` reads Q1 out of
     (`ask_seen_words.composite`), extracted the same defensive way (#162's discipline)."""
@@ -92,8 +99,8 @@ def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_ca
                         score = _score_of(data)
                         if score is not None:
                             composite = _composite_of(data)   # ALPHA4-PREREG §4(c): additive, alongside score (None on an exam report that carries no "composite" field)
-                            payload = json.dumps({"score": score, "exam_file": latest.name, "composite": composite}).encode("utf-8")
+                            payload = json.dumps({"score": score, "exam_file": latest.name, "composite": composite, "read_share": _read_share_of(data)}).encode("utf-8")
                             publish("sit", payload, {"moment": f"sit{latest.stem}", "source": "sit",
-                                                      "exam_file": latest.name, "score": score, "composite": composite}, "json")
+                                                      "exam_file": latest.name, "score": score, "composite": composite, "read_share": _read_share_of(data)}, "json")
                         last_published_name = latest.name    # advance the cursor AFTER the row is durable (#230), even if score was None (a malformed report is not re-tried forever)
         stop_event.wait(poll_period)
