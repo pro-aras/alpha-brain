@@ -106,6 +106,13 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # gated on "BIND" in declared, both branches (word-bearing and sight-only).
         "BIND": "creature/mind.py:_bind_pool + Mind._consume_eye (org_feats = _bind_pool(g['feats']) when declared; org.moment/moment_sight called once per canvas instead of once per glance)",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
+        # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+        # §4): a real call site, gated on SURPRISE's own presence — creature/mind.py:Mind._consume_eye computes
+        # `Organism.expected_sight(xw)` and passes it into `gaze.glances(..., predicted=...)`, reads the returned
+        # `"residual"` back onto the journal row, and passes `confirm=` into `Organism.moment()` (genome/machinery.py)
+        # for a glance whose residual is under the declared floor. Undeclared SURPRISE: predicted stays None, every
+        # residual is None, confirm is never True — byte-identical to before this gene existed.
+        "SURPRISE": "creature/mind.py:Mind._consume_eye (Organism.expected_sight() + gaze.glances(predicted=) + Organism.moment(confirm=))",
     },
 }
 

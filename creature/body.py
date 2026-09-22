@@ -319,6 +319,12 @@ class Body:
             # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: the reflex ring's own count, exported
             # on every write (#164's law: a computed value and an exported one are different features, #163's class).
             "outcome_episodes": int(self.mind.outcome_episodes.n_written) if getattr(self.mind, "outcome_episodes", None) is not None else 0,
+            # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+            # §4): the three counters the mind computed and STATUS never carried (#163's class: computing and exporting
+            # differ) — on EVERY write (#164), 0 on a genome that never declares SURPRISE.
+            "glances_confirmed": int(getattr(self.mind, "glances_confirmed", 0)),
+            "glances_surprised": int(getattr(self.mind, "glances_surprised", 0)),
+            "births_skipped_confirmed": int(getattr(org, "births_skipped_confirmed", 0)),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:

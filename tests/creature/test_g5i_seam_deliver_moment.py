@@ -172,9 +172,13 @@ class TestSeamParity(unittest.TestCase):
 
         real_glances = gaze_module.glances
 
-        def leaky_glances(rgb, spec, gz, mode="surprise", pic_id="", colour=None):
+        def leaky_glances(rgb, spec, gz, mode="surprise", pic_id="", colour=None, **kw):
             # edit: Claude (Fable 5.1), 2026-09-21 22:12 +0400 — the I×J seam: the mind now passes `colour=` (Builder J); a wrapper that drops it raised TypeError under the merged tree (landing J)
-            g = real_glances(rgb, spec, gz, mode, pic_id, colour=colour)
+            # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4: the mind now also passes
+            # `predicted=` (SOLUTIONS #235's own class again — a fixed-signature wrapper around gaze.glances()
+            # dropped the new keyword and raised TypeError); **kw forwards it (and anything future) unchanged,
+            # matching tools/verdict_g4.py's own `_force_one_glance` fix for the identical defect shape.
+            g = real_glances(rgb, spec, gz, mode, pic_id, colour=colour, **kw)
             if g["feats"] and g["windows"]:
                 top, left = g["windows"][0]
                 leaked = g["feats"][0].copy()

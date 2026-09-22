@@ -15,6 +15,16 @@ the machinery cannot run is still a GenomeError; a placeholder value (THETA_N/TH
 edit: Claude (Sonnet 5, G4 builder B), 2026-09-19 22:07 +0400 — B2 `Organism.moment_sight`; B6 `moment(x_s, x_w,
 lr_scale=1.0)` now returns `(S, T)` (was None) and threads `lr_scale` into `_delta`'s lr (default 1.0 is exact,
 `x*1.0==x`, so the pin is untouched) for genome/predict.py's Predictor.
+edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 18:3x +0400 — L-4/L-7 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+§4, docs/organs/EYE.md §4 G-EYE-5/G-EYE-6): GAZE's fullmatch gains an optional trailing ` coarse (<int>)` clause
+(absent = today, byte-identical — the coarse feature is added in genome/gaze.py, gated on the key's presence);
+SURPRISE's fullmatch gains an optional trailing ` predicted (mind-cell)` literal (the only accepted value; the
+mechanism is Organism.expected_sight() + moment(confirm=), below). `Organism.moment`/`_resonate` gain a
+`confirm` flag (default False, every existing call site untouched byte-for-byte): CONFIRMED means HEBB/DELTA
+only — no birth (a would-be novelty birth is counted on the plain attribute `births_skipped_confirmed`, kept
+OUT of `self.c`/state_hash for the same reason `moments_sight_only` is, see its own comment below: a new
+`self.c` key would move every genome's hash, even one that never declares SURPRISE), no misfire/prune/merge.
+`Organism.expected_sight(xw)` is read-only (never births, mirrors `recall()`'s own alive-masking).
 
 Laws of this file:
 - The genome is text. A gene this machinery does not know REFUSES to start (GenomeError),
@@ -210,9 +220,16 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"RESONATE: cannot read {a!r} (G3 §1: sight nearest words cos>=T)")
                 g["resonate"] = "nearest"; g["theta_words"] = float(m.group(1))
             elif gene == "GAZE":
-                m = re.fullmatch(r"surprise fixations (\d+) grid (\d+) canvas (\d+) glance (\d+) ink (contrast|border)", a)
-                if not m: raise GenomeError(f"GAZE: cannot read {a!r} (G1 §1: surprise fixations F grid G canvas C glance L ink contrast)")
+                # L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 18:3x +0400): an OPTIONAL trailing
+                # " coarse <int>" clause, wrapped in its own non-capturing optional group so a genome that
+                # never writes it (every genome on disk before this edit) parses to the exact same dict shape
+                # as before — "coarse" simply absent from g["gaze"], and genome/gaze.py's glances() only adds
+                # the fifth whole-canvas feature when the key IS present (byte-identical otherwise).
+                m = re.fullmatch(r"surprise fixations (\d+) grid (\d+) canvas (\d+) glance (\d+) ink (contrast|border)(?: coarse (\d+))?", a)
+                if not m: raise GenomeError(f"GAZE: cannot read {a!r} (G1 §1: surprise fixations F grid G canvas C glance L ink contrast [coarse N])")
                 g["gaze"] = {"fixations": int(m.group(1)), "grid": int(m.group(2)), "canvas": int(m.group(3)), "glance": int(m.group(4)), "ink": m.group(5)}
+                if m.group(6) is not None:
+                    g["gaze"]["coarse"] = int(m.group(6))
             elif gene == "BIND":
                 # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:07 +0400 — G-EYE-2 (= G-MIND-2): one canvas
                 # = one moment. New vocabulary; stored in `declared` (unlike SENSE eye/ear/colour above) because
@@ -248,9 +265,16 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"TRAITS: cannot read {a!r} (row 2b: TRAITS contrast head <n> lr <f> at sleep)")
                 g["declared"]["TRAITS"] = {"head": int(m.group(1)), "lr": float(m.group(2)), "when": "sleep"}
             elif gene == "SURPRISE":
-                m = re.fullmatch(r"floor (" + _NUM + r")", a)
-                if not m: raise GenomeError(f"SURPRISE: cannot read {a!r} (row 1c: SURPRISE floor <f>)")
+                # L-4 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 18:3x +0400): an OPTIONAL trailing
+                # " predicted mind-cell" literal — the ONLY accepted value (any other word after "predicted"
+                # refuses, matching CRASH/ASK's own strict-literal discipline); absent, this is byte-identical
+                # to the old parse (g["declared"]["SURPRISE"] == {"floor": f}, exactly as every genome that
+                # declares the OLD "SURPRISE floor <f>" line on disk still parses).
+                m = re.fullmatch(r"floor (" + _NUM + r")(?: predicted (mind-cell))?", a)
+                if not m: raise GenomeError(f"SURPRISE: cannot read {a!r} (row 1c: SURPRISE floor <f> [predicted mind-cell])")
                 g["declared"]["SURPRISE"] = {"floor": float(m.group(1))}
+                if m.group(2) is not None:
+                    g["declared"]["SURPRISE"]["predicted"] = m.group(2)
             elif gene == "CYCLE":
                 m = re.fullmatch(r"grow to (" + _NUM + r") nmax then consolidate", a)
                 if not m: raise GenomeError(f"CYCLE: cannot read {a!r} (row 7: CYCLE grow to <f> nmax then consolidate)")
@@ -587,6 +611,11 @@ class Organism:
         # calls moment_sight. Kept out of state_hash entirely; a life that DOES call moment_sight still
         # gets a different hash, but only through the sight cells/W it actually touches.
         self.moments_sight_only = 0
+        # L-4 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 18:3x +0400): SURPRISE's "cheap moment"
+        # counter — a would-be novelty birth refused because this glance was CONFIRMED. Same reasoning as
+        # moments_sight_only immediately above: a plain attribute, never a self.c key, so state_hash is
+        # unmoved for every genome that never declares SURPRISE (or never confirms).
+        self.births_skipped_confirmed = 0
 
     # ------------------------------------------------------------------ arrivals & budget
     def new_arrival(self) -> None:
@@ -655,11 +684,18 @@ class Organism:
         """G3 §1: the words area may carry its own threshold (RESONATE … words cos>=T); sight uses THETA_N (the floor under `nearest`)."""
         return self.g.theta_words if (area is self.words and self.g.theta_words is not None) else self.g.theta_n
 
-    def _resonate(self, area: Area, x: np.ndarray) -> List[int]:
+    def _resonate(self, area: Area, x: np.ndarray, confirm: bool = False) -> List[int]:
         """BIRTH novelty + KWTA: births a cell if nothing resonates (cos < THETA_N), then returns
-        the winners (top KWTA alive cells by cosine; a newborn is a winner in its birth moment)."""
+        the winners (top KWTA alive cells by cosine; a newborn is a winner in its birth moment).
+        L-4 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 18:3x +0400): `confirm=True` (SURPRISE's
+        cheap moment) refuses the would-be novelty birth instead of taking it — counted on
+        births_skipped_confirmed (a plain attribute, never self.c — see __init__). Default False is
+        byte-identical to every call site before this edit."""
         if area.n == 0 or float(area.cos(x).max()) < self._theta(area):
-            self._birth(area, x, "novelty")
+            if confirm:
+                self.births_skipped_confirmed += 1
+            else:
+                self._birth(area, x, "novelty")
         if area.n == 0:
             return []
         c = area.cos(x)
@@ -671,22 +707,30 @@ class Organism:
         return winners
 
     # ------------------------------------------------------------------ one moment
-    def moment(self, x_s: np.ndarray, x_w: np.ndarray, lr_scale: float = 1.0) -> Tuple[List[int], List[int]]:
+    def moment(self, x_s: np.ndarray, x_w: np.ndarray, lr_scale: float = 1.0, confirm: bool = False) -> Tuple[List[int], List[int]]:
         """G4 §3 B6: `lr_scale` (default 1.0, exact — `self.g.lr * 1.0 == self.g.lr` in IEEE754, so the
         pin is untouched) scales DELTA's learning rate for this moment only (PREDICT's `modulate`, B6).
         Returns (S, T), the final sight/words winners of this moment (after any misfire birth) — a NEW
         return value (moment() returned None before this gene); every existing caller discards it as a
         bare statement, so this is additive. genome/predict.py's Predictor reads S to know what to
-        expect next."""
-        S = self._resonate(self.sight, x_s)
-        T = self._resonate(self.words, x_w)
+        expect next.
+
+        L-4 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 18:3x +0400): `confirm=True` (default
+        False, byte-identical to every existing call) is SURPRISE's cheap moment — "HEBB/DELTA only, no
+        birth, no think item" (the brief's own words): `_resonate` refuses the novelty birth (above), and
+        MISFIRE/PRUNE/MERGE — every mechanism that can birth an error cell, strike a misfire, or retire a
+        cell — is skipped whole, not just the birth inside it. HEBB/DELTA still run on whatever already-
+        resonating winners S/T this moment finds, exactly as an ordinary moment's wiring step."""
+        S = self._resonate(self.sight, x_s, confirm=confirm)
+        T = self._resonate(self.words, x_w, confirm=confirm)
         if self.wire and self.t >= self.g.stage2_start and S and T:
             self._hebb(S, T)
             self._delta(S, T, lr=self.g.lr * lr_scale)
-            S, T = self._misfire(S, T, x_s, x_w)
-            self._prune(S, T)
-            self._merge(self.sight, S, axis=0)
-            self._merge(self.words, T, axis=1)
+            if not confirm:
+                S, T = self._misfire(S, T, x_s, x_w)
+                self._prune(S, T)
+                self._merge(self.sight, S, axis=0)
+                self._merge(self.words, T, axis=1)
         self.t += 1
         if self.t % self.g.scale_every == 0:
             self._scale()
@@ -738,6 +782,32 @@ class Organism:
             return None
         vals = np.where(m == 1, row, -np.inf)
         return int(np.argmax(vals))
+
+    # ------------------------------------------------------------------ L-4: SURPRISE's expectation
+    def expected_sight(self, xw: Optional[np.ndarray]) -> Optional[np.ndarray]:
+        """SURPRISE `floor <f> predicted mind-cell` (docs/organs/EYE.md §4 G-EYE-5, docs/organs/NEXT-
+        LIFE-PLAN-2026-09-22.md §4 L-4): this canvas's EXPECTATION — "the alive sight cell with the
+        largest edge to the word's cell". `xw` is the encoded word (creature/mind.py's `encode_word`);
+        the word's own cell is the best-lit word cell for xw (the same lighting `_lit`/`recall` use —
+        RESONATE's own cos>=THETA_N rule, so an unheard word, xw=None, or nothing yet resonating all
+        read None, "unknown"); its "best sight cell" is the alive sight cell with the largest W[s, t]
+        edge (mirrors `_answer_of`, but masked by `self.sight.alive` EXPLICITLY rather than relying on
+        MERGE always zeroing a retired cell's row — structural, not incidental, per review). None when
+        the word's own cell has no edge yet. Read-only: never births, never changes any winner — the
+        SAME guarantee `recall()`/`_lit()` give; called from creature/mind.py BEFORE `Organism.moment()`
+        runs for this canvas, so it can never see a cell this very canvas is about to birth."""
+        if xw is None or self.words.n == 0:
+            return None
+        lit, _c = self._lit(self.words, xw)
+        if not lit:
+            return None
+        t = lit[0]                              # the word's own best-lit cell (RESONATE's own top winner)
+        row = self.W[:, t]
+        m = (self.mask[:, t] == 1) & (self.sight.alive == 1)
+        if not m.any():
+            return None
+        s = int(np.argmax(np.where(m, row, -np.inf)))
+        return self.sight.cells[s].copy()
 
     def _misfire(self, S, T, x_s, x_w):
         """BIRTH error misfires N: a cell whose strongest edge is not among this moment's winners on
@@ -1067,5 +1137,6 @@ class Organism:
         return {
             "moments": self.t, "cells_sight": int(self.sight.alive.sum()), "cells_words": int(self.words.alive.sum()),
             "cells_born_sight": self.sight.n, "cells_born_words": self.words.n,
-            "edges_alive": int(self.mask.sum()), "moments_sight_only": self.moments_sight_only, **self.c,
+            "edges_alive": int(self.mask.sum()), "moments_sight_only": self.moments_sight_only,
+            "births_skipped_confirmed": self.births_skipped_confirmed, **self.c,
         }
