@@ -1,3 +1,4 @@
+# edit: Claude (Fable 5.1), 2026-09-23 03:43 +0400 — RE-PIN at ALPHA 4 integration: G's declared hash-law change (state_hash over the live prefix of alive/misfires) moved every genome's digest once; the new digest read identically from the genome suite, the creature suite and gate 2 on the merged tree 6ff2204 (three witnesses).
 # edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — PINNED_HASH_DEV moved to the live-block digest b0531503… (Builder F's state_hash merged on g5-integration; found by a content sweep for the old digest — F's report named only the genome-suite pin, #214).
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-20 01:05 +0400 — A9: PREDICT + FAST in the mind (PREREG §11.1
 # steps 1-2). err/lr/ep on every eye-row mind row, replay-identical; sight-only canvases now live through
@@ -21,7 +22,7 @@ from genome.machinery import parse_genome
 ROOT = Path(__file__).resolve().parents[2]
 SKELETON_GENOME = ROOT / "genome" / "G4-skeleton.genome"
 WAVE2_GENOME = ROOT / "tests" / "creature" / "G4-wave2-test.genome"
-PINNED_HASH_DEV = "b05315037ff98529836472e6ddd9ebb5a45742b0511f5facf6b73cd754fa1e3f"
+PINNED_HASH_DEV = "44f6fa81f9c21c549036a44f89dfb04276cd07aaec9565ccbd13ef75a11bcc00"
 
 
 def _png_bytes(rgb: np.ndarray) -> bytes:

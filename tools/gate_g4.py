@@ -1,3 +1,4 @@
+# edit: Claude (Fable 5.1), 2026-09-23 03:43 +0400 — RE-PIN at ALPHA 4 integration: G's declared hash-law change (state_hash over the live prefix of alive/misfires) moved every genome's digest once; the new digest read identically from the genome suite, the creature suite and gate 2 on the merged tree 6ff2204 (three witnesses).
 #!/usr/bin/env python3
 # edit: Claude (Fable 5.1), 2026-09-21 20:50 +0400 — G4-2 pin moved to the live-block state_hash digest (Builder F, g5-repairs merged into g5-integration); the old digest d4b5c6b8… is the legacy road Organism.load still accepts.
 # edit: Claude (Fable 5.1), 2026-09-19 21:29 +0400 — G4's INDEPENDENT gate checker (docs/G4-PREREG.md §4; SOLUTIONS #214: the orchestrator keeps
@@ -12,7 +13,7 @@ from pathlib import Path
 
 import numpy as np
 
-PIN = "b05315037ff98529836472e6ddd9ebb5a45742b0511f5facf6b73cd754fa1e3f"   # G4-2, read 2026-09-19 21:3x at 9a36475
+PIN = "44f6fa81f9c21c549036a44f89dfb04276cd07aaec9565ccbd13ef75a11bcc00"   # G4-2, read 2026-09-19 21:3x at 9a36475
 # edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5 (docs/briefs/LIFE-E-THINK-THREAD.md
 # item 4): "extend the sweep's walk to the think module if it does not reach it" -- it did not (the walk
 # was creature/world_maker.py/ask.py/tape.py + creature/senses/*.py; the think thread's own module,

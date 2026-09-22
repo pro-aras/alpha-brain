@@ -1,3 +1,4 @@
+# edit: Claude (Fable 5.1), 2026-09-23 03:43 +0400 — RE-PIN at ALPHA 4 integration: G's declared hash-law change (state_hash over the live prefix of alive/misfires) moved every genome's digest once; the new digest read identically from the genome suite, the creature suite and gate 2 on the merged tree 6ff2204 (three witnesses).
 # edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — PINNED_HASH_DEV moved to the live-block digest b0531503… (Builder F's state_hash merged on g5-integration; found by a content sweep for the old digest — F's report named only the genome-suite pin, #214).
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 21:52 +0400 — A2 tests: the determinism-law AST sweep, the PNG
 # round-trip, and gate G4-2 (mind parity against run_g1.live's hash_dev) with its swapped-canvas control.
@@ -25,7 +26,7 @@ MIND_SOURCE = ROOT / "creature" / "mind.py"
 # G4-2's pin (docs/G4-PREREG.md §4, read independently by the orchestrator at git 9a36475, 2026-09-19 21:26 +0400):
 # hash_dev for G4-skeleton.genome over toy_streams(genome, 5)'s 660 dev canvases, glanced by glance_rows(dev, genome,
 # "surprise"), with_arr2=False with_plant=False ask_at_dev=False -- 2,640 moments, ~10 s.
-PINNED_HASH_DEV = "b05315037ff98529836472e6ddd9ebb5a45742b0511f5facf6b73cd754fa1e3f"
+PINNED_HASH_DEV = "44f6fa81f9c21c549036a44f89dfb04276cd07aaec9565ccbd13ef75a11bcc00"
 
 
 def _png_bytes(rgb: np.ndarray) -> bytes:
