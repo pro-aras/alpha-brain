@@ -78,8 +78,11 @@ def render_what_is(picture_name: str, r: Dict[str, object], org: Organism, Lw: L
             resembles = "/".join(sorted(Lw.get(ans_cell, set()))) if ans_cell is not None else None
         if resembles:
             label = "unsure" if r["reason"] == "answer" else r["reason"]
+            # edit: Claude (Fable 5.1), 2026-09-22 21:2x +0400 — the rehearsal's ask dry-run read «cos 1.000 under diamond's own floor 0.952» on a
+            # RATIO abstention: «under» belongs only to the floor comparison; a resemblance that abstained for another reason says so.
+            rel = "under" if (r.get("own_floor") is not None and r["cos"] < r["own_floor"]) else "at or over"
             return (f"what-is {picture_name} -> I don't know what it is, but it resembles {resembles} "
-                    f"({label}; cos {r['cos']:.3f} under {resembles}'s own floor {r['own_floor']:.3f})")
+                    f"({label}; cos {r['cos']:.3f} {rel} {resembles}'s own floor {r['own_floor']:.3f})")
     return f"what-is {picture_name} -> I do not know this ({r['reason']}; best {r['best']:.3f} second {r['second']:.3f} cos {r['cos']:.3f})"
 
 
