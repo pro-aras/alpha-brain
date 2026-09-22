@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:44 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
 # (BODY-SENSES.md §4.5): the folder door publishes a `smell` row BEFORE it opens a picture (`meta.source:
 # "smell"`), gated on a new `smell: bool = False` parameter (byte-identical to before when False, matching
 # every other additive-parameter convention this file already uses — C2's `period`, EAR's own gate shape).

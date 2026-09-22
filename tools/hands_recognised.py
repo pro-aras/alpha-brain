@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 6
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:48 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 6
 # (PREREG §19.9's mark, L-12).
 """tools/hands_recognised.py — the recognised share: does the exam's own road (`recall_many` on the
 rendered canvas's glances, by the ledger — the SAME mechanism genome/questions.py:ask's Q1 uses, tools/

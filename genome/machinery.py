@@ -138,7 +138,7 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"wav (\d+) mono", a[len("ear-sound "):].strip())
                 if not m: raise GenomeError(f"SENSE ear-sound: cannot read {a!r} (EAR.md §4: SENSE ear-sound wav <rate> mono)")
                 g["ear_sound"] = {"rate": int(m.group(1)), "channels": "mono"}
-            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:25 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
             # item 4 (BODY-SENSES.md §4.5): SENSE smell kind size folder age. New vocabulary, dispatched on
             # args[0] exactly as ear/ear-sound/colour above (additive: those branches untouched). Stored
             # under g["declared"]["SENSE_SMELL"] (unlike eye/ear/colour, which are plain Genome fields) --
@@ -149,7 +149,7 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"kind size folder age", a[len("smell "):].strip())
                 if not m: raise GenomeError(f"SENSE smell: cannot read {a!r} (BODY-SENSES §4.5: SENSE smell kind size folder age)")
                 g["declared"]["SENSE_SMELL"] = {"fields": ["kind", "size", "folder", "age"]}
-            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — item 3 (BODY-SENSES.md §4.6):
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:25 +0400 — item 3 (BODY-SENSES.md §4.6):
             # SENSE touch from hands: exit rate stalls retries bytes. Same convention as SENSE smell above.
             elif gene == "SENSE" and args[0] == "touch":
                 m = re.fullmatch(r"from hands: exit rate stalls retries bytes", a[len("touch "):].strip())
@@ -346,7 +346,7 @@ def parse_genome(text: str) -> Genome:
                     "pov_h": int(m.group(4)), "pov_w": int(m.group(5)), "tile": int(m.group(6)),
                     "consequence": m.group(7),
                 }
-            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:25 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
             # item 2 (MOTOR-HANDS.md G-MOT-4, the plan's L-12): HANDS gains an OPTIONAL trailing clause
             # "shelf <dir> cpu <n> mem <n> wall <n>" wrapped in its own non-capturing optional group -- the
             # pre-existing SHORT form ("HANDS jail <path>", tests/genome/test_parse_g4.py:111's own pin

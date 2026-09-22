@@ -94,7 +94,7 @@ OUTCOME_EPISODES_CAP = 2000
 # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:48 +0400 — LIFE-D-ACT-SOUND.md item 3 (L-13;
 # EAR.md §4's own TRAIT line): band 32 + onset-shape 4 + level 1.
 SOUND_TRAIT_DIM = 37
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md items 3/4
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md items 3/4
 # (BODY-SENSES.md §4.5/§4.6): SENSE touch's own five fields (exit, rate, stalls, retries, bytes) and SENSE
 # smell's own four (kind, size, folder, age) -- each gets a DEDICATED Episodes ring sized to its own trait
 # dim, the same shape as sound_episodes above (never self.outcome_episodes, whose x_s is sight_dim()-wide
@@ -139,7 +139,7 @@ def _bind_pool(feats: List[np.ndarray]) -> List[np.ndarray]:
     return [_unit(np.mean(np.stack(feats, axis=0), axis=0))]
 
 
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
 # (MOTOR-HANDS.md G-MOT-4): HANDS's declared `jail`/`shelf` values are paths RELATIVE TO A ROOT the genome
 # text itself never names -- `jail` is a SIBLING of the worktree (/data/dev/alpha3/hands/jail_run), `shelf`
 # is a directory INSIDE the worktree (world/programs/, never /data/dev/genome/world -- the brief's own
@@ -231,7 +231,7 @@ class Mind:
             else None
         )
         self.sound_events: int = 0
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # items 3/4: touch/smell's own dedicated rings (see the module-level comment on TOUCH_TRAIT_DIM
         # above for why they are not self.outcome_episodes). Gated on their own SENSE_TOUCH/SENSE_SMELL
         # declared presence, matching sound_episodes' own gate one line up.
@@ -243,7 +243,7 @@ class Mind:
         )
         self.touch_events: int = 0
         self.smell_events: int = 0
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # item 2 (L-12): HANDS's own choosing state. `_hands_jail_path`/`_hands_shelf_dir`: None unless
         # HANDS declares the full form (jail + shelf) -- see _hands_paths' own docstring. `_hands_rng`: its
         # own stream, distinct from every other rng here (resume-safe, its bit_generator state lives in
@@ -362,7 +362,7 @@ class Mind:
         # same one-row-carries-no-work-until-armed law every other new sense here already follows.
         elif sense == "ear-sound":
             self._consume_ear_sound(row)
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # items 3/4: the two new tape senses (touch/smell), same one-row-carries-no-work-until-armed law.
         elif sense == "touch":
             self._consume_touch(row)
@@ -430,7 +430,7 @@ class Mind:
         if meta.get("source") == "game" and meta.get("chosen_by") == "mind":
             result = dict(result)
             result["act_mismatch"] = self._check_act_mismatch(meta)
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
         # 2 (L-12): the OTHER half of `_maybe_think`'s pending gate — a hands outcome row's own `act_seq`
         # (the eye row that chose it) clears `_hands_pending` iff it matches the CURRENT pending choice
         # (#175: never cleared by a stale/foreign row) so the 'hands' pool item can be offered again. No
@@ -505,7 +505,7 @@ class Mind:
                       "file": meta.get("file"), "ep": ep_id},
         })
 
-    # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 3
+    # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 3
     # (BODY-SENSES.md §4.6). Mirrors _consume_ear_sound's own shape exactly (dedicated ring, errors=replace's
     # spirit applied to a shape mismatch -- a bad payload journals an error and returns, never crashes,
     # #230): decodes the row's own payload bytes as TOUCH_TRAIT_DIM float32s (exit, rate, stalls, retries,
@@ -537,7 +537,7 @@ class Mind:
                       "bytes": round(float(trait[4]), 6)},
         })
 
-    # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
+    # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
     # (BODY-SENSES.md §4.5). Same shape as _consume_touch above (kind, size, folder, age -- SENSE smell's
     # own declared field order).
     def _consume_smell(self, row: Dict[str, object]) -> None:
@@ -1016,7 +1016,7 @@ class Mind:
                     continue
                 seen_acts.add(rec["word"])
                 pool.append({"kind": "outcome", "key": rec["word"], "episode": eid, "pred": None})
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
         # 2 (L-12): the 'hands' kind — ONE item, present iff HANDS declares a shelf (_hands_shelf_dir is
         # not None) AND no run is already in flight (_hands_pending is None, #175: never offer a second
         # choice before the sense thread has answered the first). `_think_work` picks the program;
@@ -1180,7 +1180,7 @@ class Mind:
                 return dead_end(item["key"], "episode_gone")
             return {"outcome": "reflected", "parked": False, "act": rec["word"], "residual": float(rec["surprise"])}
 
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
         # 2 (L-12; MOTOR-HANDS.md G-MOT-4): the 'hands' branch PICKS a program and RETURNS the decision --
         # it never touches the filesystem itself (E's seam note, docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
         # §4 L-5: "the think thread writes nothing; the mind applies" — _maybe_think is what writes
@@ -1260,7 +1260,7 @@ class Mind:
             "seq": row["seq"],
             "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": result.get("outcome"), "parked": bool(result.get("parked"))},
         }
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
         # 2 (L-12): the ONE place a 'hands' decision touches the filesystem (E's seam note, quoted at
         # _think_work's own 'hands' branch above) — the atomic write-tmp-then-replace pattern
         # `_maybe_choose_act` already uses for run/game/ACT, applied here to run/hands/ACT. `_hands_pending`
@@ -1323,7 +1323,7 @@ class Mind:
             # is a plain JSON-safe dict (PCG64: {"state": {"state": int, "inc": int}, "has_uint32": int,
             # "uinteger": int}) -- persisted whole, restored whole in resume() below.
             "act_rng_state": self._act_rng.bit_generator.state,
-            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
             # item 2 (L-12): `_hands_rng`'s state (the same resume-safety `_act_rng` already has, one line
             # up), `_hands_pending` (a run already in flight, its own ACT file already on disk — the pool
             # must stay closed to a second 'hands' item across a resume until the matching outcome row is
@@ -1342,7 +1342,7 @@ class Mind:
             self.outcome_episodes.save(state_dir / "outcome_episodes.npz")
         if self.sound_episodes is not None:   # LIFE builder D (L-13): the sound ring — same class, same atomic save; never hashed
             self.sound_episodes.save(state_dir / "sound_episodes.npz")
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # items 3/4: the touch/smell rings — same class, same atomic save; never hashed.
         if self.touch_episodes is not None:
             self.touch_episodes.save(state_dir / "touch_episodes.npz")
@@ -1375,7 +1375,7 @@ class Mind:
             act_rng_state = ledger.get("act_rng_state")
             if act_rng_state is not None:
                 mind._act_rng.bit_generator.state = act_rng_state
-            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
             # item 2 (L-12): the hands rng/pending/last-program state, restored the same way.
             hands_rng_state = ledger.get("hands_rng_state")
             if hands_rng_state is not None:
@@ -1412,7 +1412,7 @@ class Mind:
             sound_path = state_dir / "sound_episodes.npz"
             if mind.sound_episodes is not None and sound_path.exists():
                 mind.sound_episodes = Episodes.load(sound_path)
-            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
             # items 3/4: the touch/smell rings reloaded the same way; touch_events/smell_events (plain
             # counts, matching sound_events' own gap) are NOT persisted.
             touch_path = state_dir / "touch_episodes.npz"

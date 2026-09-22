@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2/5
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:38 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2/5
 # (MOTOR-HANDS.md G-MOT-4). Exercises creature/senses/hands.py against the REAL jail binary at
 # /data/dev/alpha3/hands/jail_run (never a stub -- G-MOT-4's own controls each need a real jailed process:
 # the fence control's Permission denied and the crash control's U+FFFD are facts about the jail/kernel, not
@@ -214,6 +214,67 @@ def _tape_rows(root: Path):
             if line.strip():
                 out.append(json.loads(line))
     return sorted(out, key=lambda r: r["seq"])
+
+
+def _touch_vector_from_result(result: dict) -> np.ndarray:
+    """The SAME construction `creature/senses/hands.py:_run_one` uses (mirrored, not imported, so a change
+    to the production formula cannot silently drag this toy along with it unnoticed)."""
+    rate = (len(result["stdout"]) / result["dt_ms"]) if result["dt_ms"] > 0 else 0.0
+    return np.array([float(result["exit"]), float(rate), 1.0 if result["timed_out"] else 0.0,
+                      0.0, float(len(result["stdout"]))], dtype=np.float32)
+
+
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 20:12 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 3
+# (BODY-SENSES.md §4.6's own toy, run through the REAL jail as test_mind_touch_smell.py's docstring already
+# promised and this file had not yet delivered -- caught on re-review: that test asserted two hand-typed
+# arrays differ, a tautology, and pointed here for "the jail-driven version" which did not exist).
+@unittest.skipUnless(JAIL_PATH.exists(), "the real jail binary is not present on this box")
+class TestTouchToyRealJail(unittest.TestCase):
+    """BODY-SENSES §4.6: two programs with the SAME stdout by different roads (one stalls 3s) must give
+    DIFFERENT touch vectors (the rate axis, in particular); two runs of the SAME fast program must give the
+    same vector (to a relative tolerance on the timed axis -- wall-clock jitter is real, exit/bytes are
+    exact). Both programs print the identical 8-character string so only the ROAD (stall vs not) differs."""
+
+    def test_same_output_stalling_road_gives_a_different_rate(self) -> None:
+        shelf = Path(tempfile.mkdtemp())
+        fast = _write_program(shelf, "fast_road", '# control: touch_toy\nprint("#" * 8)\n')
+        slow = _write_program(
+            shelf, "slow_road",
+            '# control: touch_toy\nimport time\ntime.sleep(3)\nprint("#" * 8)\n',
+        )
+
+        scratch_fast = Path(tempfile.mkdtemp())
+        r_fast = hands_sense.run_in_jail(JAIL_PATH, shelf, fast, scratch_fast, cpu=10, mem=512, wall=8)
+        scratch_slow = Path(tempfile.mkdtemp())
+        r_slow = hands_sense.run_in_jail(JAIL_PATH, shelf, slow, scratch_slow, cpu=10, mem=512, wall=8)
+
+        self.assertEqual(r_fast["stdout"], r_slow["stdout"], "same stdout by construction -- only the road differs")
+        v_fast = _touch_vector_from_result(r_fast)
+        v_slow = _touch_vector_from_result(r_slow)
+        print(f"touch toy (real jail): fast rate={v_fast[1]:.3f} B/ms  slow rate={v_slow[1]:.6f} B/ms  "
+              f"ratio={v_fast[1] / v_slow[1]:.1f}x")
+        self.assertFalse(np.allclose(v_fast, v_slow), "same output, different roads -- vectors must differ")
+        # the rate axis specifically: the stalling road must read at least a decade slower
+        self.assertGreater(v_fast[1] / v_slow[1], 10.0)
+
+    def test_two_runs_of_the_fast_program_agree(self) -> None:
+        shelf = Path(tempfile.mkdtemp())
+        fast = _write_program(shelf, "fast_road", '# control: touch_toy\nprint("#" * 8)\n')
+
+        scratch_a = Path(tempfile.mkdtemp())
+        r_a = hands_sense.run_in_jail(JAIL_PATH, shelf, fast, scratch_a, cpu=10, mem=512, wall=8)
+        scratch_b = Path(tempfile.mkdtemp())
+        r_b = hands_sense.run_in_jail(JAIL_PATH, shelf, fast, scratch_b, cpu=10, mem=512, wall=8)
+
+        v_a = _touch_vector_from_result(r_a)
+        v_b = _touch_vector_from_result(r_b)
+        print(f"touch toy (real jail): run1 rate={v_a[1]:.3f} B/ms  run2 rate={v_b[1]:.3f} B/ms")
+        self.assertEqual(v_a[0], v_b[0])   # exit
+        self.assertEqual(v_a[4], v_b[4])   # bytes
+        self.assertEqual(v_a[2], v_b[2])   # timed_out
+        # the rate axis is a wall-clock timing and legitimately jitters run to run -- same fast road,
+        # generous relative tolerance (both runs are still many decades apart from the slow road's rate)
+        self.assertLess(abs(v_a[1] - v_b[1]) / max(v_a[1], v_b[1]), 0.9)
 
 
 if __name__ == "__main__":

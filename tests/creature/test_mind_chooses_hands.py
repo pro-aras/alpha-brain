@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:35 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
 # (MOTOR-HANDS.md G-MOT-4, the plan's L-12). Mirrors test_mind_chooses_act.py's own shape: the mind's HALF
 # of the run/hands/ACT protocol, proven with a FAKE hands sense thread (no real jail needed for this file —
 # see tests/creature/test_hands_sense.py for the real-jail version) that reads the ACT file the mind wrote

@@ -1,10 +1,15 @@
 # Builder F report — HANDS, TOUCH, SMELL
-*edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 20:01 +0400. Branch `life-hands`, worktree `/data/dev/genome-wt-w`, from `g5-integration 7165e05` (builder D's `life-act` landed). Brief: `docs/briefs/LIFE-F-HANDS-TOUCH-SMELL.md`.*
+*edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 20:17 +0400. Branch `life-hands`, worktree `/data/dev/genome-wt-w`, from `g5-integration 7165e05` (builder D's `life-act` landed). Brief: `docs/briefs/LIFE-F-HANDS-TOUCH-SMELL.md`.*
 
 ## Summary
 
-All seven numbered clauses of the brief landed. Nothing was skipped; four design decisions and one genuine
-gap are RAISED below, each with the reasoning and the alternative I did NOT take.
+All seven numbered clauses of the brief landed. Nothing was skipped; six design decisions and nine clauses
+are RAISED below (four from the first pass, five more from a self-review pass before handback — see the
+Addendum), each with the reasoning and the alternative I did NOT take. **One of those clauses is a genuine
+gate FAILURE, reported as a result and not worked around**: the recognised-share bar (≥ 0.6, PREREG §19.9)
+is NOT cleared on the real ASCII/jail-rendered road (measured 0.100–0.200 vs a shuffled-twin's 0.060) —
+see item 6 and clause 5 below. The reader mechanism itself is proven correct separately (1.000 vs 0.385 on
+in-distribution drawn-canvas pictures); the miss is in the rendering road's distribution, diagnosed below.
 
 ## What landed, with file:line
 
@@ -23,6 +28,11 @@ gap are RAISED below, each with the reasoning and the alternative I did NOT take
      32×32 char grid (which would give a single 32×32-px glance only a corner, #228 (a)/(c)'s trap).
    - All 54 programs verified to run cleanly under plain Python (`python3 <prog>.py`, exit 0/1 only) AND
      under the real jail (`run_in_jail`, 50 shape programs, 0.88 s total / 17.7 ms average, 0 failures).
+   - **No per-file `# edit:` attribution line on the 54 shelf programs themselves**: `hands.py:_manifest`
+     requires the program's own FIRST line to be `# shape: <thing>` or `# control: <kind>` (a parsed
+     contract, tested by `TestManifest`); a leading attribution comment would break that parse. The
+     generator (`tools/build_hands_shelf.py`) carries the attribution instead, and is itself the tool that
+     wrote every one of the 54 files — named here rather than silently deviating from the edit-comment rule.
 
 2. **`HANDS`, the sense thread, and the think-pool choice** (MOTOR-HANDS.md G-MOT-4, the plan's L-12):
    - `genome/machinery.py:332` — HANDS's grammar gains an OPTIONAL trailing clause (`shelf <dir> cpu <n>
@@ -118,14 +128,27 @@ gap are RAISED below, each with the reasoning and the alternative I did NOT take
      `Organism.recall_many("sight", glances)`, reads the answer off `ledgers["words"]` — the identical
      mechanism `genome/questions.py:ask`'s Q1 uses on a held-out DRAWN canvas, here applied to a
      HANDS-rendered one. `«not gradable»` under 20 runs, printed by name.
-   - **Mechanism proof** (`tests/tools/test_hands_recognised.py`, a REAL `Mind`, never a mock): a mind
-     taught "circle"/"square" through 200 ordinary drawn canvases, then given 26 HANDS-tagged real-circle/
-     real-square renderings — **recognised share 1.000 vs the shuffled-shelf twin's 0.385** (26 ≥ 20, the
-     brief's own bar of ≥ 0.6 cleared). An UNTAUGHT mind reads exactly 0.0 (no words to answer with) — the
-     refusal test's other side.
-   - **A REAL 6-minute-class pre-flight was also run** (see "The real pre-flight", below) — it validated
-     the LIVE orchestration end to end (real jail, real 54-program shelf, real `Body.start()` wiring) but
-     did not reach 20 real runs in the time available; its honest numbers are reported rather than padded.
+   - **Reader mechanism proof** (`tests/tools/test_hands_recognised.py::TestRecognisedShareMechanism`, a
+     REAL `Mind`, never a mock): a mind taught "circle"/"square" through 200 ordinary drawn canvases, then
+     given 26 HANDS-tagged rows carrying the SAME `world.render_canvas` kind of picture (never the ASCII
+     road) — **recognised share 1.000 vs the shuffled-shelf twin's 0.385**. This proves `recall_many` +
+     the word ledger correctly answers a hands-tagged row when the picture itself is one the tower already
+     recognises; it is a positive control on the READER, not a measurement of the real hands road, and is
+     labelled that way below (see the Addendum: an earlier draft of this report conflated the two).
+   - **The REAL ASCII/jail road, measured** (`TestRecognisedShareOnTheRealAsciiRoad`, same file) — the
+     mark's own question: a mind taught all 16 shelf shapes (`genome/world.py`'s `THINGS_11` +
+     `THINGS_ARRIVAL2`) through ordinary drawn canvases, then given the REAL shelf's 50 shape programs run
+     through the REAL jail and rendered through the SAME `_render_ascii`/`_png_bytes`/`_manifest`
+     `creature/senses/hands.py`'s own sense thread uses (imported, not reimplemented) — **recognised share
+     0.100 vs the shuffled-shelf twin's 0.060** (n=50, 27 of 50 abstained; teach seed 13, 40 canvases/thing).
+     A robustness check at a different teach seed and more repetition (seed 4242, 80/thing) read **0.200 vs
+     0.060** (n=50, 19 abstained) — the direction holds (real road always beats its own shuffled twin) but
+     the ABSOLUTE share stays far under the brief's ≥ 0.6 bar both times. **This is a genuine gate FAILURE
+     on the real rendering road, reported as a result (PREREG §9–§11's law), not routed around** — see
+     clause 5 below for the diagnosis (a rendering-distribution mismatch, not a mechanism defect).
+   - **A REAL 18-minute pre-flight was also run** (see "The real pre-flight", below) — it validated the LIVE
+     orchestration end to end (real jail, real 54-program shelf, real `Body.start()` wiring) but did not
+     reach 20 real runs in the time available; its honest numbers are reported rather than padded.
 
 7. **Registered in `creature/genes.py`**: `HANDS`, `SENSE_TOUCH`, `SENSE_SMELL` under `RUNS["mind"]`, each
    naming every real call site (including the `creature/body.py` wiring for `HANDS`).
@@ -214,13 +237,13 @@ Each test file was written before its implementation existed (import errors / `A
 | `tests/genome/test_hands_touch_smell_parser.py` | `GenomeError` on the unextended HANDS grammar / unknown gene `SENSE smell`/`SENSE touch` | 9/9 ok |
 | `tests/creature/test_mind_touch_smell.py` | `SENSE_TOUCH`/`SENSE_SMELL declared but nothing runs it (W3-0)`; `AttributeError: no touch_episodes` | 12/12 ok |
 | `tests/creature/test_mind_chooses_hands.py` | `ImportError: cannot import name 'hands'` (for the 2 fake-sense tests); the rest RED via the pool/think mechanism not existing yet | 12/12 ok |
-| `tests/creature/test_hands_sense.py` | `AttributeError: module 'creature.senses' has no attribute 'hands'` | 16/16 ok (real jail) |
+| `tests/creature/test_hands_sense.py` | `AttributeError: module 'creature.senses' has no attribute 'hands'`; `TestTouchToyRealJail` (added on self-review) RED via `AttributeError: no run_in_jail` before `hands.py` existed, then re-confirmed meaningful by a deliberately-backwards direction check (see the Addendum) | 18/18 ok (real jail) |
 | `tests/creature/test_hands_controls.py` | same (module did not exist) | 4/4 ok (real jail, all four controls) |
 | `tests/creature/test_hands_arming.py` | `AttributeError: no _declared_hands_config` | 4/4 ok |
 | `tests/creature/test_status_hands_touch_smell.py` | `KeyError`/`AssertionError` on the missing STATUS fields | 4/4 ok |
 | `tests/creature/test_folder_smell.py` | `TypeError: sense() got an unexpected keyword argument 'smell'` | 3/3 ok |
 | `tests/tools/test_smell_auc.py` | `ModuleNotFoundError: tools.smell_auc`; then (after the module existed) the toy's OWN sign-convention bug caught by its own planted controls (see below) | 6/6 ok |
-| `tests/tools/test_hands_recognised.py` | `ModuleNotFoundError: tools.hands_recognised` | 3/3 ok |
+| `tests/tools/test_hands_recognised.py` | `ModuleNotFoundError: tools.hands_recognised`; `TestRecognisedShareOnTheRealAsciiRoad` (added on self-review) RED via `AttributeError: no _shelf_shape_programs`/`ModuleNotFoundError` before it was written | 4/4 ok (real jail; the real-road class's own number is the honest miss in clause 5) |
 | `tests/creature/test_refusal.py` (extended, not new) | `AssertionError: 'SENSE_SMELL' not found in {...}` (the registry-pinned-to-parser fixture) | 12/12 ok |
 
 **A bug caught by my own planted controls, worth naming**: `tools/smell_auc.py`'s first `_auc_from_distances`
@@ -233,11 +256,15 @@ same toy, then run on the real closed life.
 
 - **Touch** (BODY-SENSES §4.6's own toy: two programs with the SAME output by different roads, one
   stalling, must give DIFFERENT touch vectors; two runs of one program must give the same one, to
-  rounding): confirmed structurally in `TestTouchConsumed.test_same_output_different_roads_give_different_
-  touch_vectors` (a `rate` of 200 bytes/ms vs 0.003 bytes/ms — a ~5-decade gap — for the same stdout content
-  by a fast vs. a `sleep`-bearing road) and, live, by the positive control across 3 real jail runs: `exit`,
-  `stalls`, `retries`, `bytes` identical to the byte; `rate` varied only by real timing jitter (single-digit
-  ms on a `print("#"*4)` program).
+  rounding), run through the REAL jail (`tests/creature/test_hands_sense.py::TestTouchToyRealJail`, added
+  on re-review after the first draft's toy was found to be a hand-typed-array tautology pointing at a
+  jail-driven version that did not yet exist — see the Addendum): two shelf-style programs print the
+  IDENTICAL 8-character stdout, one via a plain `print`, the other after `time.sleep(3)` first — real jail,
+  real timing. **Fast road: rate ≈ 0.496 bytes/ms; stalling road: rate ≈ 0.003 bytes/ms — a ~166× (> 2
+  decade) gap**, `exit`/`bytes`/`stalls` axes identical (same stdout, same exit 0, jail's own alarm never
+  fires at `wall=8` against a 3 s sleep). Two runs of the FAST program agree closely (0.478 vs 0.518
+  bytes/ms — real-timing jitter, well inside the fast/slow gap) confirming the "two runs of one program
+  agree" half of the toy on the real jail too.
 - **Smell AUC** (BODY-SENSES §4.5's own refusal test), run on `/data/dev/genome-lives/g5-seam-1`'s closed
   tape (307 folder eye rows, **all 307 matched** their source file under `/data/dev/genome/world` by sha12,
   read-only, 0 unmatched) — **printed, never tuned to**:
@@ -251,27 +278,73 @@ same toy, then run on the real closed life.
     is close to realised for those two axes; the full vector's apparent strength is mostly the answer
     riding along on the folder-hash axis, which is why both numbers are reported and neither is preferred.
 
+## Addendum (self-review, 2026-09-22 20:1x +0400): three gaps closed before handback
+
+A review pass against this report's first draft (before handback) found three gaps, each closed rather
+than left for the reader to discover:
+
+1. **The touch toy had never actually run through the jail.** The first draft's toy
+   (`TestTouchConsumed.test_same_output_different_roads_give_different_touch_vectors`) asserted two
+   HAND-TYPED numpy arrays differ — true, but a tautology — and its own docstring pointed at "the
+   jail-driven version in test_hands_sense.py", which did not exist. Fixed: `TestTouchToyRealJail` (two
+   tests, `tests/creature/test_hands_sense.py`) runs two real shelf-style programs through the real jail —
+   see "The touch/smell toys' numbers" above for the real 166× rate gap this produced.
+2. **The recognised-share mark had only ever been measured on the reader's OWN positive control**
+   (drawn-canvas pictures tagged `source=hands`, never the actual blocky ASCII a jailed program's stdout
+   renders to). The 1.000-vs-0.385 number in the first draft was true but answered "does the reader work",
+   not "does the mark clear its bar on the real road" — the brief's actual question (PREREG §19.9: "the exam
+   answers the run's rendered canvas with the program's own shape"). Fixed: `TestRecognisedShareOnTheReal
+   AsciiRoad` (same file) runs the real 50-program shelf through the real jail's own `_render_ascii` road —
+   see item 6 and clause 5 above for the honest result (0.100–0.200 vs twin 0.060, well under the ≥ 0.6 bar).
+3. **~40 edit-comment lines across this brief's diff carried one blanket timestamp** (`2026-09-22 19:24
+   +0400`) typed once and reused, rather than a fresh `date` reading per file — SOLUTIONS #50/#197's own
+   named class ("edit-attribution timestamps drifted... run `date` per stamp, never per session"). Fixed:
+   every touched file's stamp was set to that FILE's own real recorded mtime (`date -r <file>`, captured
+   before this addendum's own edits), not re-typed from memory. A file with several edit-comment lines
+   added at different moments now carries its own single last-write mtime on all of them (the filesystem
+   does not retain per-line history across sequential edits) rather than one uniform wrong time across the
+   whole brief — an improvement, not a perfect per-line record, and named as such here.
+
+Also raised (documentation only, no code change; clauses 6–9 above): a replay-time dependency on the jail
+binary's absolute path existing on the replaying box; a one-shot-with-no-signal failure mode if HANDS is
+declared but the sense thread is never armed; a seam note for builder E's future threaded THINK about where
+`_hands_rng`/`_hands_last_program` are mutated; and `_tape_row_count`'s hardcoded `"tape"` directory name.
+
 ## Suites, final bytes
 
 ```
 $ TMPDIR=$PWD/scratch/tmp python3 -m unittest discover -s tests -t . -v
-Ran 605 tests in 403.328s
+Ran 608 tests in 527.387s
 
 OK (skipped=7, expected failures=6)
 ```
 
-(`scratch/logs/full_suite_run1.log`, run on the FINAL bytes — after the shelf, all source/test files, and
-this report's own commit-ready state.) The 7 skips and 6 expected failures are ALL pre-existing, unrelated
-to this brief: 5 are the seam-test skeletons for A×B/A×C/B×E/C×D/D×E (none involve builder F — confirmed by
-name, `grep -n hands tests/creature/test_life_seams.py` returns nothing), one is a missing
-`scratch/life2-ro/exam` fixture copy, and 6 are pre-registered B7/B8/B12-family modulation-experiment bars
-this estate already expects to fail on this world (the same class D's own report names for the same reason).
-None belong to any file this brief touched. All of this brief's own new test files/methods — `tests/genome/
-test_hands_touch_smell_parser.py`, `tests/creature/test_mind_touch_smell.py`, `tests/creature/test_mind_
-chooses_hands.py`, `tests/creature/test_hands_sense.py`, `tests/creature/test_hands_controls.py`, `tests/
-creature/test_hands_arming.py`, `tests/creature/test_status_hands_touch_smell.py`, `tests/creature/test_
-folder_smell.py`, `tests/tools/test_smell_auc.py`, `tests/tools/test_hands_recognised.py`, and the 3
-extended assertions in `tests/creature/test_refusal.py` — are included in the 605 and passed.
+(`scratch/logs/full_suite_run3.log`, run on the FINAL bytes — after the shelf, all source/test files, the
+self-review Addendum's two new test classes, and this report's own commit-ready state; 608 = the earlier
+605 + `TestTouchToyRealJail`'s 2 tests + `TestRecognisedShareOnTheRealAsciiRoad`'s 1 test.) The 7 skips and
+6 expected failures are ALL pre-existing, unrelated to this brief: 5 are the seam-test skeletons for
+A×B/A×C/B×E/C×D/D×E (none involve builder F — confirmed by name, `grep -n hands tests/creature/test_life_
+seams.py` returns nothing), one is a missing `scratch/life2-ro/exam` fixture copy, and 6 are pre-registered
+B7/B8/B12-family modulation-experiment bars this estate already expects to fail on this world (the same
+class D's own report names for the same reason). None belong to any file this brief touched. All of this
+brief's own new test files/methods — `tests/genome/test_hands_touch_smell_parser.py`, `tests/creature/
+test_mind_touch_smell.py`, `tests/creature/test_mind_chooses_hands.py`, `tests/creature/test_hands_sense.py`,
+`tests/creature/test_hands_controls.py`, `tests/creature/test_hands_arming.py`, `tests/creature/test_status_
+hands_touch_smell.py`, `tests/creature/test_folder_smell.py`, `tests/tools/test_smell_auc.py`, `tests/tools/
+test_hands_recognised.py`, and the 3 extended assertions in `tests/creature/test_refusal.py` — are included
+in the 608 and passed.
+
+**One intermediate run (`scratch/logs/full_suite_run2.log`, 550.403 s) read `FAILED (failures=1, ...)`**:
+`tests.creature.test_g5k_outcome.TestSitLiveWiring.test_sense_publishes_the_newest_exam_files_score_as_they_
+appear` — `AssertionError: 0 != 1`, a SIT/exam live-wiring test that polls a thread for a published row
+within a fixed deadline. Diagnosed before re-running rather than silently discarded: (a) `git diff --stat --
+tests/creature/test_g5k_outcome.py` shows NO changes — this file is untouched by this brief's diff; (b) run
+alone immediately afterward it passed in 0.102 s; (c) this box was running this brief's OWN 550-second full
+suite (heavy concurrent test-thread polling and CPU) at the moment it fired — the same class of finding this
+report's own pre-flight section and SOLUTIONS #236 both name (a heavy concurrent run starving a
+timing-sensitive thread-polling test of its deadline). Re-run clean (`run3`, above, `OK`) confirms it was
+this run's own load, not a regression this brief introduced — reported here rather than hidden, since a
+quoted `Ran N ... OK/FAILED` line is only honest if every reading is shown, not only the clean one.
 
 ## Clauses raised
 
@@ -283,11 +356,45 @@ extended assertions in `tests/creature/test_refusal.py` — are included in the 
    only, where "now" is honest.
 4. The real 18-minute pre-flight reached 7 hands runs, not ≥ 20, under this box's shared CPU contention
    (see "The real pre-flight" above) — the mechanism is separately proven at n=26 by a real-Mind synthetic
-   test that does clear the bar.
+   test on drawn-canvas pictures; the REAL ASCII road's own measurement is clause 5, immediately below.
+5. **The recognised-share bar (≥ 0.6) is NOT cleared on the real ASCII/jail-rendered road** — measured
+   0.100–0.200 (twin 0.060), n=50, ~40–54 % abstained (see item 6 above). This is a genuine gate FAILURE,
+   reported as a result, not worked around. Diagnosis: `_render_ascii` produces a BINARY 0/255, 4×4-block
+   grid — sharp edges, no anti-aliasing, no grey ramp — while every taught word came from
+   `genome/world.py:render_canvas`'s smoother, noisier drawn distribution; the sight tower's cells were
+   never shown anything like the blocky rendering at teach time. This is SOLUTIONS #228(c)'s own class (a
+   plant/measurement placed outside the distribution the mechanism was trained on) applied to the hands
+   road specifically, and is a fact about the RENDERING, not about `recall_many`, the word ledger, or the
+   think-pool/jail machinery — all of which the reader mechanism proof (item 6) shows working correctly
+   when the picture IS in-distribution. Not fixed here: a texture/anti-aliasing pass on `_render_ascii`, or
+   teaching words directly on ASCII-rendered exemplars, are both real options for whoever owns the sight
+   tower next, named here rather than attempted under this brief's own scope.
+6. `_think_work`'s "no road" check reads `/data/dev/alpha3/hands/jail_run` (an out-of-tree path) fresh
+   every time it is asked. A replay of this tape on a box where that path is absent diverges at the first
+   "hands" think (a `dead_end("run", "no road")` where the live tape recorded a real `run`) — replay
+   correctness for HANDS assumes the jail exists at the same path, true for the pinned reader on this box,
+   named here as a standing assumption rather than silently relied on.
+7. If HANDS is declared but the sense thread is never armed (the gate flipped off, or a `Body` started
+   without wiring `add_sense("hands", ...)`), the mind writes `run/hands/ACT` once, `_hands_pending` never
+   clears (nothing ever answers it), and the "hands" kind is silently never offered to the think pool again
+   (`_think_pool`'s own guard, `_hands_pending is None`) — a one-shot with no STATUS signal saying so. Named
+   here; not fixed, since fixing it would mean either a STATUS field or a timeout-and-retry policy this
+   brief's PREREG does not specify.
+8. For builder E's seam (a future threaded THINK): the "hands" branch of `_think_work` mutates
+   `self._hands_rng` and `self._hands_last_program` INSIDE `_think_work` itself — the same class of
+   state-mutation-inside-work as `_think_rng`/`_induce_pending` already carry. A frozen copy of the mind's
+   state for a threaded worker must carry these two fields too, or the hands draws would move to
+   `_maybe_think`'s apply step and change what "two RNG draws every time" means. Named for whoever wires
+   the threaded THINK seam; not a defect in the synchronous THINK this brief implements.
+9. `_tape_row_count` hardcodes the tape directory name `"tape"` (its own `tape_dirname` default) — the
+   SAME class SOLUTIONS #219 names (a hardcoded default is fine when it is the ONLY value ever passed, as
+   is true here; every caller in this codebase uses the default), named rather than hidden in case a future
+   caller ever needs a different tape root.
 
-Everything else in the brief landed as specified; no gate or bar failed by construction (the two "not
-gradable" readings — the real pre-flight's own n=7, and the closed-life smell AUC's honest `kind`/`size`
-weakness — are results, not failures, per PREREG §9–§11's own law).
+Everything else in the brief landed as specified. Two gate/bar readings are RESULTS, not silent failures,
+per PREREG §9–§11's own law: the recognised-share bar (clause 5, a genuine miss on the real road) and the
+closed-life smell AUC's honest `kind`/`size` weakness (design decision 4's section, above) — both reported
+with their numbers, neither tuned or routed around.
 
 ## Commit
 

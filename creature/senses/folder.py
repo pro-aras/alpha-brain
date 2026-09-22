@@ -87,7 +87,7 @@ def _candidate_pictures(world_dir: Path) -> List[Tuple[str, Path, bool]]:
     return out
 
 
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:44 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
 # (BODY-SENSES.md §4.5): the cheap wide channel, computed from filesystem metadata alone -- suffix, byte
 # size, the folder's own name (hashed, never the name itself: BODY-SENSES's own words, "never the name,
 # which is the answer" -- a bare crc32 the mind cannot invert to a word), mtime -- BEFORE the picture is

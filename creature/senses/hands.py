@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:39 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
 # (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md §4 L-12; docs/organs/MOTOR-HANDS.md G-MOT-4).
 """creature/senses/hands.py — the hands door: the creature runs a chosen program from the shelf through
 Alpha 2's jail (`/data/dev/alpha3/hands/jail_run`) and SEES what its hands made.

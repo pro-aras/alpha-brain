@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:47 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
 # (BODY-SENSES.md §4.5's own refusal test): "measure whether the smell vector predicts anything the
 # creature cares about better than chance -- e.g. whether two pictures with the same folder word have
 # closer smell vectors than two with different words. If the AUC is ~= 0.5, the channel is noise and is

@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:47 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 4
 # (BODY-SENSES.md §4.5's own refusal test), run against the REAL closed life named in the brief's own words
 # ("the closed folder rows of /data/dev/genome-lives/g5-seam-1/tape/*.jsonl") and the maker's real,
 # read-only world/ directory -- never a synthetic fixture, since the whole point is what the ACTUAL folder

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 1
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:51 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 1
 # (MOTOR-HANDS.md G-MOT-4's own shelf: "a small shelf of programs each with a known output"). A ONE-TIME
 # generator (run to produce world/programs/*.py, then committed as data — the generator itself is not
 # imported by the creature or its tests) for the 50 shape programs + the two "shape" control programs

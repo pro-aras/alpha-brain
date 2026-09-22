@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 5
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:39 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 5
 # (MOTOR-HANDS.md G-MOT-4's own four controls, "each producing a real tape row from a real jail run"): the
 # full chain — real jail, creature/senses/hands.py's own _run_one, creature/mind.py's Mind.consume — for
 # each of the four controls, checked against G-MOT-4's own refusal test: "positive residual 0; negative

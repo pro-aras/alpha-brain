@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2.
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:40 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2.
 """test_hands_arming.py — creature.body._declared_hands_config, the function main() uses to arm the hands
 door from the genome (main() itself is never called -- test_game_and_ear_sound_arming.py's own precedent,
 mirrored here)."""

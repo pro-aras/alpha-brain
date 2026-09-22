@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2/3/4:
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:41 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2/3/4:
 # STATUS gains `runs_by_program` (a dict, one count PER PROGRAM -- G-MOT-1's census, never a total), `runs`
 # (its sum), `hands_no_road`, `touch_events`, `smell_events` -- every field written on EVERY status build
 # (#164), via getattr like sound_events above (test_status_act_and_sound.py's own pattern, mirrored here).

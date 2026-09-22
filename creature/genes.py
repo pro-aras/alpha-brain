@@ -106,7 +106,7 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # gated on "BIND" in declared, both branches (word-bearing and sight-only).
         "BIND": "creature/mind.py:_bind_pool + Mind._consume_eye (org_feats = _bind_pool(g['feats']) when declared; org.moment/moment_sight called once per canvas instead of once per glance)",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:41 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # (docs/briefs/LIFE-F-HANDS-TOUCH-SMELL.md; MOTOR-HANDS.md G-MOT-4; BODY-SENSES.md §4.5/§4.6):
         # HANDS/SENSE_TOUCH/SENSE_SMELL, the mind-side rows. HANDS: two real call sites (Mind.__init__
         # resolves the jail/shelf paths; Mind._think_pool/_think_work builds and works the 'hands' pool

@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md items 3/4
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:28 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md items 3/4
 # (BODY-SENSES.md §4.5/§4.6): touch/smell each get a DEDICATED Episodes ring (creature/mind.py's own
 # sound_episodes precedent, LIFE builder D, 2026-09-22 18:48 +0400) sized to their own trait dim -- never
 # self.outcome_episodes (whose x_s is sight_dim()-wide with only x_s[0] used as a scalar payload; a 5- or

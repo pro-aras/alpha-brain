@@ -232,7 +232,7 @@ class Body:
             body_fields = list(self.mind.genome.declared["SENSE_BODY"]["fields"])
             body_fn = functools.partial(body_sense_module.sense, root=self.root, fields=body_fields, period_s=body_period)
             self.add_sense("body", body_fn)
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # item 2 (MOTOR-HANDS.md G-MOT-4): the hands door, the SAME C1.7 shape SIT/SENSE_BODY use above
         # (gated on the gene's own declared presence; started via add_sense so it gets the same crash-
         # isolation/restart/journal machinery every other sense here has).
@@ -337,7 +337,7 @@ class Body:
             "acts_chosen": dict(getattr(self.mind, "acts_chosen", {}) or {}),
             "act_mismatches": int(getattr(self.mind, "act_mismatches", 0)),
             "sound_events": int(getattr(self.mind, "sound_events", 0)),
-            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
+            # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
             # item 2 (G-MOT-1's census shape, never a total, #165): `runs_by_program` is a dict, one count
             # PER PROGRAM; `runs` is its sum, for a reader that wants the total without summing itself.
             # `getattr` defaults cover every genome that never declares HANDS/SENSE_TOUCH/SENSE_SMELL.
@@ -443,7 +443,7 @@ def _declared_folder_dir(declared: Dict[str, dict]) -> Optional[Path]:
     return Path(__file__).resolve().parents[1] / world_declared["folder"]
 
 
-# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
+# edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
 # (MOTOR-HANDS.md G-MOT-4): the hands door's own arming, mirroring _declared_folder_dir/_declared_game_
 # config's own shape and gate discipline exactly (C2/C3's convention, reused rather than re-invented).
 def _declared_hands_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
@@ -519,7 +519,7 @@ def main(argv: List[str]) -> int:
         from .senses import folder as folder_sense   # lazily, same discipline as world_maker above
         import functools
         canvas = int(genome_for_cli.gaze["canvas"])
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
         # 4: `smell` gated on the genome's own SENSE_SMELL declared presence (C1.7's own shape) -- False
         # (folder.sense's own default) when undeclared, byte-identical to before this brief.
         smell_on = "SENSE_SMELL" in declared

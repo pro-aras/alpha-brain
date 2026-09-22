@@ -183,7 +183,7 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:35 +0400 — G-EYE-2/BIND: one row, matching
         # the genes.py RUNS entry added by this task (docs/briefs/G5-J-BIND-COLOUR-RETINA.md).
         "BIND": "BIND     glances per canvas",
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:24 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md:
+        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:42 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md:
         # three rows, matching the three genes.py RUNS entries added by this task.
         "HANDS": "HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20",
         "SENSE_TOUCH": "SENSE    touch from hands: exit rate stalls retries bytes",
