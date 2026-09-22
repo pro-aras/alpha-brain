@@ -57,14 +57,15 @@ included) and against `life 3a`'s own real 2,576-row tape (see "life 3a" below).
    scope to redesign.
 6. **The negative control against a REAL closed life (g5-seam-1) is slow.** The shadow must replay the
    life's own tape from birth up to the −2 h boundary before it can checkpoint at all — on seam-1's
-   ~37,000-row pre-window (real 32×32 eye rows through the sealed CNN tower, ACT/OUTCOME reflexes, SIT,
-   threaded THINK) this took on the order of 25-30 CPU-minutes on one core, measured under real contention
-   from four other builders' parallel test suites and lives on the same box (`nice -n 10` throughout, per
-   the rules) — confirmed NOT a bug: a direct 1000/3000-row timing probe on the same genome (169/138
-   rows/sec) badly under-estimated the full run because per-row cost (auto-snapshot compression of a
-   32 MB W matrix every `SNAPSHOT_EVERY=500` moments; `build_ledgers`-class O(cells)-ish work in THINK)
-   GROWS with the organism's own size, and a fresh Mind's first few thousand rows are the CHEAP, small-
-   organism part of that curve. This IS the brief's own COST deliverable (item 5: "measure the shadow's
+   37,100-row pre-window (real 32×32 eye rows through the sealed CNN tower, ACT/OUTCOME reflexes, SIT,
+   threaded THINK) this took **the measured ≈28.5 CPU-minutes given in the "COST" paragraph of the
+   negative-control section below** (derived there from the worker process's own ≈55 total CPU-minutes
+   minus the four twins' own ≈26.5 CPU-minutes, which the proposal records state exactly) — confirmed NOT
+   a bug: a direct 1000/3000-row timing probe on the same genome (169/138 rows/sec) badly under-estimated
+   the full run because per-row cost (auto-snapshot compression of a 32 MB W matrix every
+   `SNAPSHOT_EVERY=500` moments; `build_ledgers`-class O(cells)-ish work in THINK) GROWS with the
+   organism's own size, and a fresh Mind's first few thousand rows are the CHEAP, small-organism part of
+   that curve. This IS the brief's own COST deliverable (item 5: "measure the shadow's
    CPU share and the twins' wall time on the seam-1 slice; report both") — the numbers are below, not a
    thing left undone, but they are the reason this report took real wall-clock time to finish.
 7. **Two structural limits of a judging round's own readings, found in review (advisor-caught) and NOT
@@ -240,6 +241,14 @@ Run via `python3 tools/evolve.py --negative-control --root <copy of g5-seam-1> -
 `/data/dev/genome-lives/g5-seam-1/` itself — verified byte-identical to the source via `md5sum` on every
 tape `.jsonl` file both before AND after the run).
 
+**Operational note for the pre-flight (PREREG §8 step 5):** `tools/verdict_g4.py`'s own EVOLVE wiring
+looks for the negative control's two output files at `root/evolve/NEGATIVE-CONTROL-planted_bad.json` and
+`root/evolve/NEGATIVE-CONTROL-null.json` (`root` being whatever life it is reading). For the READER to
+pick these up on `alpha4-1`, whoever runs the pre-flight negative control must pass `--out` pointing INTO
+`alpha4-1`'s own root (`<alpha4-1 root>/evolve`), not an arbitrary scratch directory as this validation
+run used — the run below used `scratch/negctl-seam1/_out` on purpose (seam-1's copy is not, and must never
+become, `alpha4-1`'s own root).
+
 ```
 shadow consumed 37100 rows up to seq 37100 (T-2.0h checkpoint)
 shadow consumed 7225 more rows to the tape's end (seq 44325)
@@ -250,6 +259,16 @@ null incumbent q1_seen=0.9727272727272728 mutant q1_seen=0.9727272727272728 q1_s
 planted_bad REFUSED: True; null REFUSED: True
 EXIT CODE: 0
 ```
+**A reconciliation, not a coincidence:** seam-1's own `CLOSED-AT` file records the life's mind at seq
+37,086 against a tape at seq 44,325 (lag 7,239) at the moment it was closed. This worker's checkpoint —
+computed independently, by finding the tape row whose OWN "at" timestamp is closest to (last "at" − 2 h),
+with no reference to that recorded lag — landed at seq 37,100, 14 rows later than where the live mind had
+actually reached at close. The two numbers agree to within 0.2 % via two unrelated derivations (one from
+the mind's own real-time consumption before it fell behind under the six verdict-readers' load that
+night; one from this worker's post-hoc timestamp arithmetic on the same tape) — the kind of agreement
+that makes a number a fact about the record rather than an artifact of whichever tool produced it (#168's
+own rule: "agreement to a nameable difference is what makes it a fact about the subject").
+
 (`scratch/negctl-seam1-run.log`, full output.) **COST (brief item 5), exact numbers from the proposal
 records themselves (`NEGATIVE-CONTROL-*.json`'s own `wall_s` fields, never estimated):** the FOUR twin
 replays (incumbent+mutant × 2 rounds, each over the identical real 7,225-row 2 h slice) took **381.8 s /
@@ -269,7 +288,15 @@ under-estimated the full run for exactly this reason (item 6's own finding). `sh
 on these two JSON files specifically — they were produced by a process already running (started ≈00:52)
 before that field's own code landed (≈01:56); it is unit-tested (`tests/tools/test_evolve_worker.py`) and
 present on every proposal a freshly-started worker produces from here on, but not on this one historical
-artifact, said here rather than silently reformatted to look like it was there all along.
+artifact, said here rather than silently reformatted to look like it was there all along. **Peak RSS**
+(`ps`'s own `RSS` column, sampled repeatedly through the run, not a peak-memory profiler): the worker
+process — shadow + one twin at a time, per brief item 2's own "never in parallel" — reached **≈ 681 MB**
+at its highest observed sample (during round 902's mutant twin, the largest organism this run ever built).
+Against PREREG §5 GROW's own box-total projection ("mind + EVOLVE's shadow + one twin ≤ 20 GB"), that
+reading is for the SHADOW alone at seam-1's own (non-EVOLVE, un-grown) scale; the live MIND process and a
+genuinely GROW-unbounded organism at 24 h scale are each a separate, larger budget line the pre-flight
+projection in PREREG §8 step 5 will need to size on its own — this number is one data point toward it, not
+a substitute for that projection.
 
 **The result is unambiguous.** `q1_seen_start` (measured once, on the checkpoint, before either twin runs)
 was **0.9727** for both rounds — confirming the retention finding above (identical by construction). The
