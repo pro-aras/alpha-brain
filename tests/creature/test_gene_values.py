@@ -309,9 +309,20 @@ class TestBodyThreadRoster(unittest.TestCase):
         self.assertIn("mind", str(ctx.exception))
 
     def test_the_lifes_own_line_starts(self) -> None:
+        # edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 21:1x +0400 — L-5 (docs/briefs/
+        # LIFE-E-THINK-THREAD.md item 1): KNOWN_BODY_THREADS gained a SIXTH, opt-in name, "think" -- G4.genome
+        # (an older reference genome; it never declares THINK's own threaded tail) legitimately still lists
+        # only five, so the premise "the life's line equals the FULL known set" no longer holds by
+        # construction (#232 addendum (c): a test that pins a merge-time absence another lane changes is a
+        # merge-time failure by design). Flipped to the two facts that actually still hold: G4.genome's own
+        # five threads are each a KNOWN name (a subset, not the whole set), and the sixth name exists and is
+        # known -- Body(G4.genome) still constructs without raising either way (BODY's own law never required
+        # a genome to name every known thread, only that every NAMED thread be known and "mind" be among them).
         genome = parse_genome(G4_GENOME.read_text())
         self.assertEqual(genome.declared["BODY"]["threads"], ["eye", "ear", "door", "mind", "voice"])
-        self.assertEqual(set(genome.declared["BODY"]["threads"]), KNOWN_BODY_THREADS)
+        self.assertTrue(set(genome.declared["BODY"]["threads"]).issubset(KNOWN_BODY_THREADS))
+        self.assertIn("think", KNOWN_BODY_THREADS)
+        self.assertEqual(len(KNOWN_BODY_THREADS), 6)
         body = Body(Path(tempfile.mkdtemp()), G4_GENOME)   # must construct without raising
         self.assertIsNotNone(body)
 

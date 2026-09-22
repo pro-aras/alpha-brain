@@ -422,9 +422,19 @@ def parse_genome(text: str) -> Genome:
             # Interface fixed for Builder A: declared["THINK"] == {"every": int}, declared["EXAM"] == {"every": int},
             # declared["FROZEN"] == {"after": int}. None of these are in `required`; none touch self.c (the pin).
             elif gene == "THINK":
-                m = re.fullmatch(r"every (\d+) canvases", a)
-                if not m: raise GenomeError(f"THINK: cannot read {a!r} (§11: THINK every <n> canvases)")
+                # edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+                # §4 L-5, docs/briefs/LIFE-E-THINK-THREAD.md item 1): the optional tail "; on its own thread; lands next
+                # boundary". Absent -> declared["THINK"] == {"every": int} EXACTLY as before this brief (no "threaded" key
+                # at all, not even False) -- every existing test/genome asserting that exact shape (tests/genome/
+                # test_parse_g4.py, test_parse_g4_wave2.py, tests/creature/test_wave2_think.py) stays byte-identical, and
+                # creature/mind.py reads the flag with `.get("threaded", False)` so an old-shape dict (a test that builds
+                # `{"every": N}` by hand) is read as untreaded, exactly today's behaviour. Present -> declared["THINK"]
+                # gains "threaded": True, creature/mind.py's own switch to the threaded road.
+                m = re.fullmatch(r"every (\d+) canvases(; on its own thread; lands next boundary)?", a)
+                if not m: raise GenomeError(f"THINK: cannot read {a!r} (§11: THINK every <n> canvases[; on its own thread; lands next boundary])")
                 g["declared"]["THINK"] = {"every": int(m.group(1))}
+                if m.group(2):
+                    g["declared"]["THINK"]["threaded"] = True
             elif gene == "EXAM":
                 m = re.fullmatch(r"every (\d+) canvases", a)
                 if not m: raise GenomeError(f"EXAM: cannot read {a!r} (§11: EXAM every <n> canvases)")
