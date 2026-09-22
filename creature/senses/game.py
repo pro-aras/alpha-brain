@@ -46,7 +46,7 @@ import signal
 import subprocess
 import sys
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional
 
 from genome import gaze
 
@@ -66,6 +66,17 @@ def _png_bytes(rgb) -> bytes:
     return buf.getvalue()
 
 
+# edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:37 +0400 — LIFE-D-ACT-SOUND.md item 1 (L-8): the
+# ONE gate creature/body.py:main reads before passing --act-file to the worker, and creature/mind.py reads
+# before it ever writes root/game/ACT -- a single source of truth so the two can never disagree (#180: a
+# fact computed independently in two places is two features sharing one name, not one). True when this
+# genome's ACT vocabulary carries BOTH "turn" and "step" (the plan's own phrase, §4 L-8: "ACT ... turn
+# step" declared together with WORLD game).
+def mind_drives_acts(declared: Dict[str, dict]) -> bool:
+    verbs = set((declared.get("ACT") or {}).get("verbs") or [])
+    return {"turn", "step"} <= verbs
+
+
 def target_word(mission: str) -> str:
     """The mission's single decision-critical word: its LAST token -- the object noun (ball/key/box) in
     every GoToLocal mission ("go to a/the <colour> <object>"). RAISED in the builder report: the full
@@ -81,13 +92,18 @@ def target_word(mission: str) -> str:
 
 def start_worker(door_dir: Path, seed: int, game: str = "babyai-gotolocal", tile: int = 32,
                   period_s: float = 0.0, steps: int = 0, python: str = VENV_PYTHON,
-                  stop_file: Optional[Path] = None) -> "subprocess.Popen[bytes]":
+                  stop_file: Optional[Path] = None, act_file: Optional[Path] = None) -> "subprocess.Popen[bytes]":
+    """`act_file` (L-8): forwarded as `--act-file` when given -- creature/body.py:main passes this only
+    when `mind_drives_acts(declared)` is true, the same gate above; absent (the common case until a
+    genome declares ACT's turn/step verbs), the worker keeps its own seeded schedule, unchanged."""
     door_dir = Path(door_dir)
     door_dir.mkdir(parents=True, exist_ok=True)
     argv = [python, WORKER_SCRIPT, "--game", game, "--door-dir", str(door_dir), "--seed", str(seed),
             "--tile", str(tile), "--period-s", str(period_s), "--steps", str(steps)]
     if stop_file is not None:
         argv += ["--stop-file", str(stop_file)]
+    if act_file is not None:
+        argv += ["--act-file", str(act_file)]
     return subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
@@ -171,22 +187,35 @@ def sense(publish: Callable, stop_event, door_dir: Path, root: Path, canvas: int
             word = target_word(mission)
             moment = f"g{str(data['game'])[:4]}{int(data['seed']):08d}s{step_idx:09d}"
             common = {"game": data["game"], "episode": data["episode"], "step": step_idx}
+            # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:37 +0400 — LIFE-D-ACT-SOUND.md item 1
+            # (L-8): the worker's own manifest, never hardcoded -- absent (a manifest from before this
+            # change) falls back to the module's own ACT_NAMES/7, byte-identical to before.
+            n_actions = int(data["n_actions"]) if data.get("n_actions") is not None else len(ACT_NAMES)
+            act_names = data.get("act_names") or ACT_NAMES
 
             publish("ear", word.encode("utf-8"),
                     {"moment": moment, "source": "game", "word": word, "mission": mission, **common}, "txt")
-            publish("eye", _png_bytes(rgb), {"moment": moment, "source": "game", **common}, "png")
+            publish("eye", _png_bytes(rgb),
+                    {"moment": moment, "source": "game", "n_actions": n_actions, "act_names": act_names, **common}, "png")
 
             act = data.get("act")
             if act is not None:
                 act_i = int(act)
-                act_name = ACT_NAMES[act_i] if 0 <= act_i < len(ACT_NAMES) else str(act_i)
+                act_name = act_names[act_i] if 0 <= act_i < len(act_names) else str(act_i)
                 got = float(data["reward"])
+                # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:37 +0400 — LIFE-D-ACT-SOUND.md item 1
+                # (L-8): chosen_by/act_seq read straight off the worker's own manifest -- "schedule"/None
+                # when absent (every manifest before this change, and every --act-file-less run since),
+                # byte-identical to the old hardcoded values (test_game_door.py's own pin).
+                chosen_by = data.get("chosen_by") or "schedule"
+                act_seq = data.get("act_seq")
+                road = "mind" if chosen_by == "mind" else "no road"
                 payload = json.dumps({"act": act_name, "expected": None, "got": got, "residual": None,
                                        "source": "game"}).encode("utf-8")
                 publish("outcome",
                         payload,
-                        {"moment": moment, "source": "game", "act": act_name, "expected": None,
-                         "got": got, "residual": None, "chosen_by": "schedule", "road": "no road",
+                        {"moment": moment, "source": "game", "act": act_name, "act_idx": act_i, "expected": None,
+                         "got": got, "residual": None, "chosen_by": chosen_by, "road": road, "act_seq": act_seq,
                          "terminated": bool(data.get("terminated")), "truncated": bool(data.get("truncated")),
                          **common}, "json")
 

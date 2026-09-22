@@ -40,6 +40,26 @@ class TestDeclaredGameConfigArming(unittest.TestCase):
         self.assertIsNone(got)
 
 
+# edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:38 +0400 — LIFE-D-ACT-SOUND.md item 1 (L-8):
+# creature/body.py:_game_act_file_path, main()'s own half of the ONE gate (game_sense.mind_drives_acts)
+# that decides whether --act-file is ever passed to the worker.
+class TestGameActFilePathArming(unittest.TestCase):
+    def test_turn_and_step_declared_arms_the_act_file_path(self) -> None:
+        root = Path("/tmp/does-not-need-to-exist-for-this-check")
+        declared = {"ACT": {"verbs": ["glance", "open", "ask", "turn", "step", "say", "run"]}}
+        got = body_module._game_act_file_path(root, declared)
+        self.assertEqual(got, root / "game" / "ACT")
+
+    def test_act_without_turn_or_step_arms_nothing(self) -> None:
+        root = Path("/tmp/does-not-need-to-exist-for-this-check")
+        declared = {"ACT": {"verbs": ["glance", "open", "ask"]}}
+        self.assertIsNone(body_module._game_act_file_path(root, declared))
+
+    def test_undeclared_act_arms_nothing(self) -> None:
+        root = Path("/tmp/does-not-need-to-exist-for-this-check")
+        self.assertIsNone(body_module._game_act_file_path(root, {}))
+
+
 class TestEarSoundGate(unittest.TestCase):
     def test_gated_true_reads_the_genome_field(self) -> None:
         from creature.senses import ear as ear_sense
