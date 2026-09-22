@@ -70,14 +70,20 @@ def main() -> int:
     feats = run_g1.feats_only(held_g)
     never = {world.THING_NEVER: feats[world.THING_NEVER]}
     words_seen = sorted({w for s in ledgers["words"].values() for w in s})
-    ask = ask_glances(org, ledgers, [t for t in things if t in words_seen] or things, feats, never, g.ear_blank_zero)
+    # edit: Claude (Fable 5.1), 2026-09-22 10:3x +0400 — the seen-words exam needs two things (a distractor); with fewer than two seen it is sat
+    # on ALL things and says so (`seen_words_fallback_to_all`, written True/False on every exam — #164). Before: one seen word divided by zero
+    # in ask_glances (the frozen-10 twin on the game tapes, 2026-09-22 00:45 +04 — (iii) read None on g5-seam-1 and L5).
+    seen_things = [t for t in things if t in words_seen]
+    fallback = len(seen_things) < 2
+    ask = ask_glances(org, ledgers, things if fallback else seen_things, feats, never, g.ear_blank_zero)
     ask_all = ask_glances(org, ledgers, things + arr2, feats, never, g.ear_blank_zero)
     landing = run_g1.landing(held_g, things, first=2)
     hash_before = L.get("state_hash") or org.state_hash()
     out = {
         "at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "genome": str(a.genome), "snapshot_last_seq": L.get("last_seq"),
         "moments": org.t, "cells": [int(org.sight.alive.sum()), int(org.words.alive.sum())], "words_seen": words_seen,
-        "held_per_thing": a.held, "chance_q1": round(1.0 / max(1, len(words_seen or things)), 3),
+        "held_per_thing": a.held, "chance_q1": round(1.0 / max(1, len(things) if fallback else len(words_seen or things)), 3),
+        "seen_words_fallback_to_all": fallback,
         "disjoint_checked": disjoint_checked, "disjoint_control_caught": caught,
         "ask_seen_words": ask, "ask_all_words": ask_all, "gaze_landing": landing,
         "organism_hash_unchanged_by_exam": org.state_hash() == hash_before, "seconds": round(time.perf_counter() - t0, 1),

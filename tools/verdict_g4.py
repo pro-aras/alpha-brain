@@ -12,7 +12,7 @@ from __future__ import annotations
 import argparse, json, os, shutil, statistics, subprocess, sys, tempfile, time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -457,7 +457,7 @@ def main(argv: List[str]) -> int:
     from genome import run_g0, world
     g = parse_genome(genome_path.read_text())
     R: Dict[str, object] = {"root": str(root), "genome": str(genome_path), "genome_sha": __import__("hashlib").sha256(genome_path.read_bytes()).hexdigest()[:16],
-                            "reader": "tools/verdict_g4.py v2 (PREREG §18: W3-2, DOOR, W3-1, PARK graded; two-sense hardening)", "at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "hours": a.hours}
+                            "reader": "tools/verdict_g4.py v3 (2026-09-22: W3-1 accounts the clash law's belief row; (viii) graded only in ms per canvas; one-word exam refused by name; INDUCE hoisted, bit-identical)", "at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "hours": a.hours}
     nrestarts, cpu_ns = a.nrestarts, a.cpu_ns
     if a.unit:
         try:
@@ -601,10 +601,9 @@ def main(argv: List[str]) -> int:
                              "plant_zog": p, "null_vex": n, "Q5_spiral_abstain": seen["Q5"][world.THING_NEVER]["abstain_rate"], "false_abstention": seen["Q1"]["false_abstention"],
                              "bar": "plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20"}
     M["vii_replay"] = {"pass": R["REPLAY"]["pass"], **{k: v for k, v in R["REPLAY"].items() if k != "pass"}, "bar": "two replays byte-identical; the plant caught"}
-    st = G["status"]; rss = st.get("rss_mb"); live_ms = st.get("mind_ms_median_1min"); solo_ms = R.get("solo_ms_per_canvas_probe") or U["ms_per_canvas"]
-    M["viii_cost"] = {"pass": (rss is not None and rss < 2048) and (live_ms is None or solo_ms <= 0 or live_ms <= 2 * solo_ms),
-                      "rss_mb_last_status": rss, "live_mind_ms_last_status": live_ms, "solo_ms_per_canvas_replay": solo_ms, "unblinded_replay_ms_under_workers": U["ms_per_canvas"],
-                      "cpu_hours": round(cpu_ns / 3.6e12, 3) if cpu_ns else None, "bar": "G4-7: live median ≤ 2× solo · RSS < 2 GB (the 24 h CPU bill printed)"}
+    st = G["status"]
+    # edit: Claude (Fable 5.1), 2026-09-22 10:3x +0400 — (viii) in ONE unit (#162): the per-row median it read until today is not the probe's ms per canvas
+    M["viii_cost"] = viii_cost(st, R.get("solo_ms_per_canvas_probe") or U["ms_per_canvas"], U["ms_per_canvas"], cpu_ns)
     if not a.skip_random:
         comps = []
         for k, t in TW.items():
@@ -743,16 +742,10 @@ def main(argv: List[str]) -> int:
                  "reason": "" if door_graded else "no `folder <dir>` in the WORLD line — the door is OFF"}
     bel_path = twins_dir / "unblinded-1" / "state" / "beliefs.jsonl"
     bel_rows = read_jsonl(bel_path) if bel_path.exists() else []
-    kinds = {}
-    per_word_beliefs: Dict[str, int] = {}
-    for r in bel_rows:
-        k = str(r.get("kind", "belief")); kinds[k] = kinds.get(k, 0) + 1
-        if k == "belief": per_word_beliefs[str(r.get("word"))] = per_word_beliefs.get(str(r.get("word")), 0) + 1
     heard = sorted({(r.get("meta") or {}).get("word") for r in tape if r["sense"] == "ear"} - {None})
-    max_per_word = max(per_word_beliefs.values()) if per_word_beliefs else 0
-    M["W3_1_beliefs"] = {"graded": "BELIEF" in decl, "pass": ("BELIEF" in decl) and bool(bel_rows) and max_per_word <= 1 and kinds.get("revisit", 0) > 0,
-                         "rows": len(bel_rows), "kinds": kinds, "standing_words": len(per_word_beliefs), "words_heard": len(heard), "max_belief_rows_per_word": max_per_word,
-                         "bar": "≤ 1 raw `belief` row per word (raw rows, never the folded view — life 2's 1,473 rows all carry kind belief) · revisits > 0 · clashes reported"}
+    # edit: Claude (Fable 5.1), 2026-09-22 10:3x +0400 — the bar accounts for the clash law's own fresh belief row (found on the six 2 h smokes)
+    M["W3_1_beliefs"] = w3_1_beliefs(bel_rows, decl, heard)
+    kinds = M["W3_1_beliefs"]["kinds"]
     M["PARK"] = {"graded": True, "pass": parked >= 1 and (parked / U["thinks"] <= .05 if U["thinks"] else False), "parked": parked, "thinks": U["thinks"],
                  "parked_share": round(parked / U["thinks"], 4) if U["thinks"] else None, "parked_rules": parked_rules,
                  "no_park_twin_parked": TW.get("blind-park", {}).get("parked"),
@@ -768,8 +761,8 @@ def main(argv: List[str]) -> int:
     for name, pth in (("eye_photo_g1_gate", ROOT / "runs" / "eye-photo-g1" / "gate.json"),):
         bands[name] = json.loads(pth.read_text()) if pth.exists() else "not on disk"
     M["BANDS"] = bands
-    graded = ["i_knows", "ii_meeting_real", "iii_growth_matters", "iv_grows_alone", "v_retention", "vi_knows_unknown", "vii_replay", "viii_cost", "x_gaze_finds_thing", "xi_gaze_earns_place", "MODULATION"] + (["ix_not_luck"] if "ix_not_luck" in M else [])
-    graded += [k for k in ("W3_2_rules", "W3_1_beliefs", "DOOR", "PARK") if M[k].get("graded")]   # §18: graded only when the life declares them
+    graded = ["i_knows", "ii_meeting_real", "iii_growth_matters", "iv_grows_alone", "v_retention", "vi_knows_unknown", "vii_replay", "x_gaze_finds_thing", "xi_gaze_earns_place", "MODULATION"] + (["ix_not_luck"] if "ix_not_luck" in M else [])
+    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK") if M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
     failed = [k for k in graded if not M[k].get("pass")] + ([] if R["ALIVE"]["pass"] else ["ALIVE"]) + ([] if M["TWINS"]["random_gaze_loses_xi"]["pass"] else ["TWINS.random_gaze"])
     R["marks"] = M; R["marks_failed"] = failed; R["verdict"] = "PASS" if not failed else "FAIL"
     R["seconds_total"] = round(time.perf_counter() - T0, 1)
@@ -779,20 +772,72 @@ def main(argv: List[str]) -> int:
     return 0
 
 
+def w3_1_beliefs(bel_rows: List[dict], decl: dict, heard: Sequence[str]) -> dict:
+    """W3-1 (PREREG §18) as amended 2026-09-22: a word carries ONE raw `belief` row, plus one more for every clash — genome/think.py's
+    clash law (decision 5) FIRST writes the new observation as its own fresh `belief` row and then a `clash` row naming
+    [standing_line, new_line], so the extra row is the clash's second side by design. Every belief row beyond a word's first must
+    be NAMED as `clashes[1]` of a clash row of that word; an unnamed extra row is life 2's dedupe defect (1,473 rows, all kind
+    belief, no clash) and still fails. Revisits > 0 as before. Found on the 2 h smokes of the six 8 h lives (L4 max 2, L5/seam-1
+    max 4 — all 24 extra rows named by a clash, measured on the live files 2026-09-22 10:1x +04)."""
+    kinds: Dict[str, int] = {}
+    per_word_beliefs: Dict[str, List[int]] = {}
+    named: Dict[str, set] = {}
+    for r in bel_rows:
+        k = str(r.get("kind", "belief")); kinds[k] = kinds.get(k, 0) + 1
+        w = str(r.get("word"))
+        if k == "belief":
+            per_word_beliefs.setdefault(w, []).append(int(r.get("line", -1)))
+        elif k == "clash":
+            c = r.get("clashes")
+            if isinstance(c, list) and len(c) == 2:
+                named.setdefault(w, set()).add(int(c[1]))
+    unaccounted = [[w, ln] for w, lines in per_word_beliefs.items() for ln in lines[1:] if ln not in named.get(w, set())]
+    max_per_word = max((len(v) for v in per_word_beliefs.values()), default=0)
+    extra = sum(len(v) - 1 for v in per_word_beliefs.values())
+    graded = "BELIEF" in decl
+    return {"graded": graded, "pass": graded and bool(bel_rows) and not unaccounted and kinds.get("revisit", 0) > 0,
+            "rows": len(bel_rows), "kinds": kinds, "standing_words": len(per_word_beliefs), "words_heard": len(heard),
+            "max_belief_rows_per_word": max_per_word, "extra_belief_rows": extra, "clash_rows": kinds.get("clash", 0), "unaccounted": unaccounted,
+            "bar": "every raw `belief` row beyond a word's first is the named second side of a `clash` row of that word (the clash law writes it; "
+                   "life 2's 1,473 unnamed rows fail) · revisits > 0 · clashes reported"}
+
+
+def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns) -> dict:
+    """(viii) COST, G4-7, in ONE unit (#162 — found 2026-09-22 on the six 2 h smokes: STATUS.mind_ms_median_1min is the median of
+    `mind.consume(row)` over EVERY tape row — ear, outcome, body rows included — while the probe is all rows' time ÷ CANVASES; 0.168 ms
+    «vs» 13 ms passed in every life to date). The live number is STATUS.mind_ms_per_canvas_1min (creature/body.py writes it from
+    2026-09-22); a status that carries only the per-row median is NOT GRADED — never PASS."""
+    rss = status.get("rss_mb"); per_canvas = status.get("mind_ms_per_canvas_1min"); per_row = status.get("mind_ms_median_1min")
+    graded = per_canvas is not None
+    m = {"graded": graded, "pass": None, "rss_mb_last_status": rss, "live_ms_per_canvas": per_canvas, "live_mind_ms_median_per_row": per_row,
+         "solo_ms_per_canvas_replay": solo_ms, "unblinded_replay_ms_under_workers": unblinded_ms,
+         "cpu_hours": round(cpu_ns / 3.6e12, 3) if cpu_ns else None,
+         "bar": "G4-7: live ms per CANVAS (STATUS.mind_ms_per_canvas_1min) ≤ 2× the solo probe's · RSS < 2 GB (the 24 h CPU bill printed)",
+         "reason": ""}
+    if not graded:
+        m["reason"] = ("STATUS carries only the per-row median (mind_ms_median_1min), which is not the probe's unit (ms per canvas, #162): "
+                       "not graded — every (viii) PASS before 2026-09-22 was a reading of this instrument")
+        return m
+    m["pass"] = (rss is not None and rss < 2048) and (solo_ms is None or solo_ms <= 0 or per_canvas <= 2 * solo_ms)
+    return m
+
+
 def write_verdict(out: Path, R: dict) -> None:
     M = R["marks"]; A = R["ALIVE"]
     def pf(x): return "PASS" if x else "FAIL"
+    def gv(m): return ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"   # hoisted 2026-09-22: (viii) renders through it before its old definition below
     L = [f"# G4 VERDICT — {R['verdict']}", "", f"root `{R['root']}` · genome `{R['genome']}` (sha {R['genome_sha']}) · read {R['at']} by `{R['reader']}` (PREREG §5 as amended; the reader's rules §16) · {R['hours']} h",
          "", "| mark | bar | reading | verdict |", "|---|---|---|---|",
          f"| ALIVE | {A['bar_hours']} h under the unit, NRestarts 0, every counter moved every hour, no sense dead > 60 s | {A['hours_on_tape']} h on tape · moved every hour {A['every_counter_moved_every_hour']} · max gap eye/ear {A['max_gap_s_eye_ear']} s · sense restarts {A['sense_restarts']} · crashes {A['crashes']} · NRestarts {A['nrestarts']} | {pf(A['pass'])} |",
-         f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {M['vii_replay']['vs_live']} · two replays {M['vii_replay']['two_replays']} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']} | {pf(M['vii_replay']['pass'])} |"]
+         # edit: Claude (Fable 5.1), 2026-09-22 11:0x +0400 — compare() returns None when EVERY row matches; the old rendering printed "vs live None", which reads as unmeasured (the advisor's read, 2026-09-22 10:5x)
+         f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {'identical' if M['vii_replay']['vs_live'] is None else 'DIVERGED at ' + str(M['vii_replay']['vs_live'])} · two replays {'identical' if M['vii_replay']['two_replays'] is None else 'DIVERGED at ' + str(M['vii_replay']['two_replays'])} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']} | {pf(M['vii_replay']['pass'])} |"]
     i = M["i_knows"]; L.append(f"| (i) | {i['bar']} | Q1 {i['Q1']:.3f} Q2 {i['Q2']:.3f} Q3 {i['Q3']:.3f} Q4 {i['Q4']:.3f} (chance {i['chance_Q1']}; all words Q1 {i['all_words']['Q1']:.3f}) | {pf(i['pass'])} |")
     m = M["ii_meeting_real"]; L.append(f"| (ii) | {m['bar']} (all 16 words) | T-shuffle Q1 {m['T_shuffle_Q1']} · T-nowire Q1 {m['T_nowire_Q1']} | {pf(m['pass'])} |")
     m = M["iii_growth_matters"]; L.append(f"| (iii) | {m['bar']} | T-frozen-10 Q1 {m['T_frozen_10_Q1']} (cells {m['T_frozen_10_cells']}) vs Q1 {m['Q1']:.3f}; the 50-cell twin {m['T_frozen_50_Q1']} | {pf(m['pass'])} |")
     m = M["iv_grows_alone"]; L.append(f"| (iv) | {m['bar']} | born {m['cells_born']} · refused {m['births_refused_budget']} (arrivals {m['arrivals']}, budget left {m['budget_left']}) · pruned {m['edges_pruned']}/{m['edges_born']} = {100*m['pruned_share']:.1f} % (cross-thing born {m['edges_cross']['born']} / pruned {m['edges_cross']['pruned']}) · disuse {m['removed_for_disuse']} | {pf(m['pass'])} |")
     m = M["v_retention"]; L.append(f"| (v) | {m['bar']} | " + ("; ".join(f"w{p['window']}: {p['before']:.3f} → first {p['first_after']:.3f} → last {p['last_in_window']:.3f} ({p['drop_pp']:+.1f} pp drop)" for p in m['pairs']) or m['note']) + f" | {pf(m['pass'])} |")
     m = M["vi_knows_unknown"]; L.append(f"| (vi) | {m['bar']} | plant zog answered {m['plant_zog']['answered_rate']:.2f} (as {m['plant_zog']['answered_as']}, abstain {m['plant_zog']['abstain']}) · null vex abstains {m['null_vex']['abstain_rate']:.2f} (answered as {m['null_vex']['answered_as']}) · Q5 {m['Q5_spiral_abstain']:.2f} · false {m['false_abstention']:.3f} | {pf(m['pass'])} |")
-    m = M["viii_cost"]; L.append(f"| (viii) COST | {m['bar']} | live {m['live_mind_ms_last_status']} ms vs solo {m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h | {pf(m['pass'])} |")
+    m = M["viii_cost"]; L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo {m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
     if "ix_not_luck" in M:
         m = M["ix_not_luck"]; L.append(f"| (ix) | {m['bar']} | rank {m['rank_of_own']} of {m['of']} (own {m['own_composite']}; best random {m['best_random']}) | {pf(m['pass'])} |")
     m = M["x_gaze_finds_thing"]; L.append(f"| (x) | {m['bar']} | gaze {m['gaze_rate']:.3f} vs random {m['random_rate']:.3f} (×{m['ratio']}) | {pf(m['pass'])} |")
@@ -805,7 +850,7 @@ def write_verdict(out: Path, R: dict) -> None:
     def gv(m): return ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"
     m = M["W3_2_rules"]; L.append(f"| W3-2 rules | {m['bar']} | filed {m['live']['filed']} (induce {m['live']['induce']}, deduce {m['live']['deduce']}, refused {m['live']['refused']}) · scored {m['live']['scored']} · accuracy {m['live']['accuracy']} · words {m['live']['words']} · T-shuffle scored {m['T_shuffle']['scored']} acc {m['T_shuffle']['accuracy']} · parked rules {m['parked_rules']} · clusters: rules reached {m['cluster_control'].get('words_with_rules')} of {m['cluster_control'].get('eligible_words')} eligible words (of {m['cluster_control'].get('words')}), wrong-cell rules {m['cluster_control'].get('wrong_cell_rules')} {m['reason']} | {gv(m)} |")
     m = M["DOOR"]; L.append(f"| DOOR | {m['bar']} | pictures {m['pictures']} (rows {m['folder_rows']}) · words {len(m['folder_words'])} · sight-only {m['sight_only_rows']} (first seq {m['sight_only_first_seq']}) · recognition {m['recognition_of_seen_pictures']} {m['reason']} | {gv(m)} |")
-    m = M["W3_1_beliefs"]; L.append(f"| W3-1 beliefs | {m['bar']} | rows {m['rows']} · kinds {m['kinds']} · standing words {m['standing_words']} of {m['words_heard']} heard · max belief rows per word {m['max_belief_rows_per_word']} | {gv(m)} |")
+    m = M["W3_1_beliefs"]; L.append(f"| W3-1 beliefs | {m['bar']} | rows {m['rows']} · kinds {m['kinds']} · standing words {m['standing_words']} of {m['words_heard']} heard · max belief rows per word {m['max_belief_rows_per_word']} · extra belief rows {m['extra_belief_rows']} vs clash rows {m['clash_rows']} · unaccounted {m['unaccounted']} | {gv(m)} |")
     m = M["PARK"]; L.append(f"| PARK | {m['bar']} | parked {m['parked']} of {m['thinks']} thinks (rules {m['parked_rules']}) — {m['reason']} | {gv(m)} |")
     L.append(f"| TWINS no-sleep / no-curiosity / no-park | (v) / door / PARK | {M['TWINS']['no_sleep_v']} · {M['TWINS']['no_curiosity']['reason']} · {M['TWINS']['no_park']['reason']} | not graded |")
     L += ["", "## Twins (each a replay of the same tape blind to one gene; Q1 on all 16 words, the seen-words Q1 beside it)", "", "| twin | Q1 (all) | Q1 (seen) | composite (all) | cells |", "|---|---|---|---|---|"]

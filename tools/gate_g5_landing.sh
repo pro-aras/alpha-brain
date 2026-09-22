@@ -10,6 +10,9 @@ TREE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LABEL="${1:?label}"
 OUT="$TREE/scratch/landing-$LABEL"; mkdir -p "$OUT"
 cd "$TREE"
+# edit: Claude (Fable 5.1), 2026-09-22 11:11 +0400 — the suites' tempfile roots leak (mkdtemp without cleanup): 7,348 of them held 13 GB of
+# the 14 GB tmpfs at /tmp this morning (RAM), and the harness killed a suite run for "low memory" with 19 GB free. Route them to DISK.
+export TMPDIR="$TREE/scratch/tmp"; mkdir -p "$TMPDIR"
 rc=0
 echo "[landing $LABEL] tree $TREE at $(git rev-parse --short HEAD) — $(date '+%Y-%m-%d %H:%M %z'); load $(cut -d' ' -f1-3 /proc/loadavg)"
 nice -n 10 python3 -u tools/gate_g4.py --tree "$TREE" --only 1,2,3,6 > "$OUT/gate_g4.log" 2>&1; g=$?

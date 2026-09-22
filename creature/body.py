@@ -243,7 +243,8 @@ class Body:
         self.mind.consume(row)
         ms = (time.perf_counter() - t0) * 1000.0
         with self._status_lock:
-            self._mind_times.append((time.perf_counter(), ms))
+            # edit: Claude (Fable 5.1), 2026-09-22 10:3x +0400 — the row's sense rides with the timing so STATUS can state the cost per CANVAS (#162)
+            self._mind_times.append((time.perf_counter(), ms, row.get("sense")))
         if self.mind.snapshot_count > prev_snap:
             self._journal_event({"event": "snapshot", "snapshots": self.mind.snapshot_count, "at_moment": self.mind.org.t})
 
@@ -281,9 +282,14 @@ class Body:
         now = now_iso()
         with self._status_lock:
             cutoff = time.perf_counter() - MIND_TIMES_WINDOW_S
-            recent = [ms for ts, ms in self._mind_times if ts >= cutoff]
+            recent_rows = [(ms, sense) for ts, ms, sense in self._mind_times if ts >= cutoff]
+            recent = [ms for ms, _s in recent_rows]
             sense_restarts = self.sense_restarts
             crash = self.crash
+        # edit: Claude (Fable 5.1), 2026-09-22 10:3x +0400 — the mind's cost in the verdict probe's unit: every row's consume time in the
+        # window ÷ eye rows (one canvas each) in the window; None when no eye row fell in it — the key is on EVERY write (#164, #162)
+        eye_rows = sum(1 for _ms, s in recent_rows if s == "eye")
+        ms_per_canvas = (sum(recent) / eye_rows) if eye_rows else None
         org = self.mind.org
         return {
             "heartbeat_at": now, "started_at": self.started_at,
@@ -294,6 +300,10 @@ class Body:
             "cells": org.total_cells(), "sight_only_skipped": self.mind.sight_only_skipped,
             "sense_restarts": sense_restarts, "snapshots": self.mind.snapshot_count,
             "last_seq": self.mind.last_seq, "mind_ms_median_1min": (statistics.median(recent) if recent else None),
+            "mind_ms_per_canvas_1min": (round(ms_per_canvas, 4) if ms_per_canvas is not None else None),
+            # edit: Claude (Fable 5.1), 2026-09-22 10:49 +0400 — rows delivered by the senses and not yet consumed: a mind behind its world
+            # (g5-seam-1 sat 6,917 rows behind under the readers' load, 2026-09-22 10:34 +04, and no surface said so — #164, #180)
+            "mind_backlog_rows": self.q.qsize(),
             "rss_mb": round(_rss_mb(), 2), "crash": crash,
             # edit: Claude (Fable 5.1), 2026-09-19 23:17 +0400 — PREREG §11.1 step 3's STATUS fields, written on EVERY status write (#164):
             # the mind computed them (think_counters) and nothing exported them (#163's class: computing and exporting differ).

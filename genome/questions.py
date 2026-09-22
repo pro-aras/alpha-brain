@@ -49,6 +49,11 @@ def ask(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: 
     count, the abstain reasons separately, and per-thing accuracy."""
     Ls, Lw = ledgers["sight"], ledgers["words"]
     n = len(things)
+    # edit: Claude (Fable 5.1), 2026-09-22 10:3x +0400 — Q3/Q4 draw a DISTRACTOR from the other things (`i % (n - 1)`); one thing has none.
+    # The 2 h smokes of g5-seam-1 / L5 (2026-09-22 00:45 +04) hit this as a ZeroDivisionError inside the frozen-10 twin's exam
+    # (the twin knew one word on the game tape) and the reader read (iii) as None. Refused by name (both ask roads); the caller falls back.
+    if n < 2:
+        raise ValueError(f"the exam needs at least two things (Q3/Q4 draw a distractor from the others); got {list(things)!r}")
     out: Dict[str, object] = {}
 
     # Q1 — what is this?  a held-out picture → the strongest edge from the lit sight cell into words
@@ -140,6 +145,11 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
                 blank_zero: bool = False) -> Dict[str, object]:
     Ls, Lw = ledgers["sight"], ledgers["words"]
     n = len(things)
+    # edit: Claude (Fable 5.1), 2026-09-22 10:3x +0400 — Q3/Q4 draw a DISTRACTOR from the other things (`i % (n - 1)`); one thing has none.
+    # The 2 h smokes of g5-seam-1 / L5 (2026-09-22 00:45 +04) hit this as a ZeroDivisionError inside the frozen-10 twin's exam
+    # (the twin knew one word on the game tape) and the reader read (iii) as None. Refused by name (both ask roads); the caller falls back.
+    if n < 2:
+        raise ValueError(f"the exam needs at least two things (Q3/Q4 draw a distractor from the others); got {list(things)!r}")
     out: Dict[str, object] = {}
     q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; per = {t: [0, 0] for t in things}; multi = 0
     for t in things:

@@ -394,6 +394,18 @@ def _nearest_sight_cell(org: Organism, x: np.ndarray) -> Optional[int]:
     return int(ids[int(np.argmax(cos))])
 
 
+def _nearest_in(ids: np.ndarray, M: np.ndarray, x: np.ndarray) -> Optional[int]:
+    """_nearest_sight_cell over a HOISTED alive matrix: `ids = org.sight.alive_ids()` and `M = org.sight.cells[ids]` computed once
+    by the caller. The same contiguous bytes through the same matvec, so the answer is bit-identical to the per-call twin
+    (tests/genome/test_induce_hoist.py pins it on every episode + 100 random vectors; the real-tape gate is the replay of
+    g5-seam-1's 2 h smoke tape). edit: Claude (Fable 5.1), 2026-09-22 11:0x +0400 — profiled on the closed seam life's end state:
+    one think = 147 s, 133 s of them 14,648 fresh 2 MB copies of the alive matrix, one per episode."""
+    if len(ids) == 0:
+        return None
+    cos = M @ x
+    return int(ids[int(np.argmax(cos))])
+
+
 # ============================================================================ INDUCE
 def induce(episodes, k: int, org: Organism) -> List[Dict[str, object]]:
     """PREREG row 4d: INDUCE rule from <n> episodes no counter — a rule W => cluster C when >= k
@@ -406,19 +418,23 @@ def induce(episodes, k: int, org: Organism) -> List[Dict[str, object]]:
     if episodes is None or len(episodes) == 0:
         return rules
     words_seen = sorted(set(str(episodes.word[i]) for i in range(len(episodes)) if str(episodes.word[i])))
+    # edit: Claude (Fable 5.1), 2026-09-22 11:0x +0400 — the alive matrix and each alive cell's answer are read ONCE per call (induce never
+    # writes the organism, so they cannot move inside it); before, every episode fancy-indexed a fresh 2 MB copy (see _nearest_in).
+    ids = org.sight.alive_ids(); M = org.sight.cells[ids]
+    answer_of = {int(c): org._answer_of(org.sight, int(c)) for c in ids}
     for word in words_seen:
         r = org.recall("words", world.encode_word(word, org.g.ear_blank_zero))
         word_cell = r["lit"]   # edit: Claude (Fable 5.1), 2026-09-21 15:14 +0400 — was r["cell"], the SIGHT cell the word recalls; _answer_of(sight, c) is a WORDS index, so the
         #                        cluster compared a sight id to a words index (2/21 words clustered on life 3, both the WRONG cells). r["lit"] is the word's own cell.
         if word_cell is None:
             continue  # the organism itself abstains on this word — nothing to cluster against
-        C = sorted(int(c) for c in org.sight.alive_ids() if org._answer_of(org.sight, int(c)) == word_cell)
+        C = sorted(c for c in answer_of if answer_of[c] == word_cell)
         agree = disagree = 0
         ep_ids: List[int] = []
         for i in range(len(episodes)):
             if str(episodes.word[i]) != word:
                 continue
-            nearest = _nearest_sight_cell(org, episodes.x_s[i])
+            nearest = _nearest_in(ids, M, episodes.x_s[i])
             if nearest is None:
                 continue
             if nearest in C:
