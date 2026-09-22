@@ -128,4 +128,4 @@ The two-moment design roughly **doubles** the mind's per-canvas cost (not 6–9x
 
 ## Commit
 
-PLACEHOLDER — filled in after the commit is made.
+`0762f5306a345522cddd6ce02d69811539451ed5` on branch `alpha4-read` (worktree `/data/dev/genome-wt-y`), off master `74c661d`. 18 files changed (7 modified, 11 new), 2,361 insertions.
