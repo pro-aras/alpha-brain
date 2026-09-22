@@ -155,19 +155,21 @@ OK (skipped=1, expected failures=6)
 
 ```
 $ python3 -m unittest discover -s tests/creature -t .
-Ran 546 tests in 547.480s
+Ran 548 tests in 565.116s
 OK (skipped=1)
 ```
-(`scratch/suite-creature-COMMITTED.log` — re-run a SECOND time specifically on the exact committed bytes
-of `da0464c` after the advisor flagged that an earlier 536-test run had started before several late edits
-landed, git-discovery having already imported the old bytes; this is the truthful "on the final bytes"
-number.) The FIRST full run caught a real, pre-existing-fixture omission of mine:
-`tests/creature/test_refusal.py:TestRegistryPinnedToParser` pins every `creature/genes.py` RUNS entry
-against a hand-written sample genome LINE (the same fixture G5 builders I/J/K and LIFE builders A/B/C/F all
-had to extend when they added their own RUNS rows) — I had added `RUNS["mind"]["EVOLVE"]` without adding
-`SAMPLE_LINE["EVOLVE"]`, and the suite caught it by name (`test_every_runs_gene_parses`,
-`test_sample_line_set_is_exactly_the_registry`) exactly as it is designed to. Fixed (one row added,
-matching the file's own convention); re-ran green.
+(`scratch/suite-creature-68f0e9f.log` — the suite's THIRD full run, this one on the exact bytes of the
+SECOND (follow-up) commit `68f0e9f`, the true final state of this branch: 546 on `da0464c` + 2 new
+`shadow_lag_rows` tests in `test_verdict_life_marks.py` = 548, OK. History, for the record: the FIRST run
+(536) started before the STATUS export / EvolveMark tests / sort-bug fix landed — stale, per the advisor's
+own catch; the SECOND run (546, `scratch/suite-creature-COMMITTED.log`) confirmed `da0464c` itself; this
+THIRD run confirms the branch's actual HEAD.) The very first run of all caught a real, pre-existing-fixture
+omission of mine along the way: `tests/creature/test_refusal.py:TestRegistryPinnedToParser` pins every
+`creature/genes.py` RUNS entry against a hand-written sample genome LINE (the same fixture G5 builders
+I/J/K and LIFE builders A/B/C/F all had to extend when they added their own RUNS rows) — I had added
+`RUNS["mind"]["EVOLVE"]` without adding `SAMPLE_LINE["EVOLVE"]`, and the suite caught it by name
+(`test_every_runs_gene_parses`, `test_sample_line_set_is_exactly_the_registry`) exactly as it is designed
+to. Fixed (one row added, matching the file's own convention); every subsequent run green.
 
 ## Gates
 
@@ -239,21 +241,49 @@ Run via `python3 tools/evolve.py --negative-control --root <copy of g5-seam-1> -
 tape `.jsonl` file both before AND after the run).
 
 ```
-[FILL: shadow consumed N rows up to seq S (T-2h checkpoint)]
-[FILL: shadow consumed N more rows to the tape's end (seq S)]
-[FILL: planted_bad (BIRTH.theta_n=0.5): verdict=... reason=...]
-[FILL: planted_bad incumbent q1_seen=... mutant q1_seen=... q1_seen_start=...]
-[FILL: null (DELTA.lr=0.051): verdict=... reason=...]
-[FILL: null incumbent q1_seen=... mutant q1_seen=... q1_seen_start=...]
-[FILL: wall-clock / CPU cost numbers]
+shadow consumed 37100 rows up to seq 37100 (T-2.0h checkpoint)
+shadow consumed 7225 more rows to the tape's end (seq 44325)
+planted_bad (BIRTH.theta_n=0.5): verdict=REFUSED reason=q1_seen: incumbent 0.9727272727272728, mutant 0.6727272727272727 (regressed)
+planted_bad incumbent q1_seen=0.9727272727272728 mutant q1_seen=0.6727272727272727 q1_seen_start=0.9727272727272728
+null (DELTA.lr=0.051): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+null incumbent q1_seen=0.9727272727272728 mutant q1_seen=0.9727272727272728 q1_seen_start=0.9727272727272728
+planted_bad REFUSED: True; null REFUSED: True
+EXIT CODE: 0
 ```
+(`scratch/negctl-seam1-run.log`, full output.) **COST (brief item 5), exact numbers from the proposal
+records themselves (`NEGATIVE-CONTROL-*.json`'s own `wall_s` fields, never estimated):** the FOUR twin
+replays (incumbent+mutant × 2 rounds, each over the identical real 7,225-row 2 h slice) took **381.8 s /
+445.9 s** (planted_bad: incumbent/mutant, cost_ratio 1.168×) and **371.4 s / 390.2 s** (null:
+incumbent/mutant, cost_ratio 1.051×) — **1,589.2 s (≈ 26.5 CPU-minutes) total for all four**, both ratios
+comfortably under the 1.2× cost bar on their own (the planted-bad mutant was refused on its measured Q1
+regression, not on cost). The worker process's own accumulated CPU time at exit (`ps`'s `TIME` column) was
+**≈ 55 minutes on one core**, measured under real contention from four other builders' parallel test
+suites/lives on the same box (`nice -n 10` throughout, per the rules) — so the SHADOW's own build-up
+(birth → the T−2 h checkpoint, 37,100 rows of real 32×32 eye rows through the sealed CNN tower,
+ACT/OUTCOME reflexes, SIT, THINK) accounted for the remaining **≈ 28.5 minutes**, the dominant cost, as
+item 6 above already named: the O(organism-size) scaling this codebase already carries elsewhere
+(auto-snapshot compression every `SNAPSHOT_EVERY=500` moments on a genuinely large, ~2000-cell organism;
+THINK-side O(cells)-ish work) means a shadow that must replay a WHOLE life from birth gets more expensive
+as that life gets older — a fresh 1,000-3,000-row timing probe on the SAME genome (169/138 rows/sec) badly
+under-estimated the full run for exactly this reason (item 6's own finding). `shadow_lag_rows` reads `None`
+on these two JSON files specifically — they were produced by a process already running (started ≈00:52)
+before that field's own code landed (≈01:56); it is unit-tested (`tests/tools/test_evolve_worker.py`) and
+present on every proposal a freshly-started worker produces from here on, but not on this one historical
+artifact, said here rather than silently reformatted to look like it was there all along.
 
-Both readings are printed regardless of verdict (brief's own instruction, and advisor's point 7: a PASS
-here would be a finding about the bar, never a reason to loosen it — reported honestly, not routed around).
-On the smaller synthetic tapes used throughout the unit suite, `BIRTH.theta_n=0.5` reliably shows as
-REFUSED, sometimes via a measured Q1 regression and sometimes via "no reading cleared its declared margin"
-(the mutation not yet having damaged Q1 within that short a synthetic slice) — both are legitimate REFUSED
-outcomes of the SAME bar; the seam-1-scale run above is the one that matters for the record.
+**The result is unambiguous.** `q1_seen_start` (measured once, on the checkpoint, before either twin runs)
+was **0.9727** for both rounds — confirming the retention finding above (identical by construction). The
+INCUMBENT held that same 0.9727 after replaying the real slice in BOTH rounds (a faithful continuation).
+The PLANTED-BAD mutant (`theta_n` moved from 0.952 to 0.5, deliberately outside BOUNDS' own [0.85, 0.99]
+band) collapsed Q1 to **0.6727** — a 30-point drop, cleanly REFUSED on a measured regression, not merely
+"no improvement" (unlike the smaller synthetic tapes in the unit suite, where the same plant sometimes only
+manages "no improvement" within a short synthetic slice — this seam-1-scale run is the one that matters for
+the record, and it shows the bar catching a REAL, large, unambiguous act of harm). The NULL mutant (`lr`
+moved one step, 0.05 → 0.051) changed nothing measurable — REFUSED for lack of any improvement, exactly the
+"a value moved by one step inside the noise" case the brief names. Both readings are printed regardless of
+verdict (brief's own instruction, and advisor's point 7: a PASS here would be a finding about the bar,
+never a reason to loosen it — reported honestly, not routed around); here both are REFUSED, cleanly, for
+exactly the reasons the mechanism exists to catch.
 
 ## The mechanism, in one paragraph
 
@@ -285,4 +315,8 @@ declares EVOLVE.
 
 ## Commit
 
-`[FILL: sha]` on branch `alpha4-evolve`, message naming this brief.
+`da0464cf090a8ed386bb626d88e8c5f4ffdb5243` — the mechanism, all code, all tests, the negative control
+machinery, the initial numbers.
+`68f0e9fa772b023df035c7d0f7f2b9bb288c615b` — the advisor-review follow-up (`shadow_lag_rows`, the two
+structural bar-limit findings, the corrected/re-verified full-suite count).
+Both on branch `alpha4-evolve`, off master `74c661d`.
