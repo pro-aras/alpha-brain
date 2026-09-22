@@ -464,6 +464,40 @@ def _declared_folder_dir(declared: Dict[str, dict]) -> Optional[Path]:
     return Path(__file__).resolve().parents[1] / world_declared["folder"]
 
 
+# edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:2x +0400 — ALPHA4-H task 2 (docs/briefs/ALPHA4-H.md;
+# ALPHA4-PREREG.md §3): the shelf reader's own arming, mirroring _declared_folder_dir/_declared_game_config's
+# shape and gate discipline exactly (C2/C3's convention). Unlike WORLD's `folder <dir>` (repo-relative),
+# SENSE read's shelf/curriculum paths are ALREADY ABSOLUTE in the genome line
+# (`/data/alpha3-library/SHELF.sqlite`) -- no resolution against any root is needed or done here.
+def _declared_read_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """SENSE_READ undeclared -> None (arms nothing). Declared -> its own parsed dict, gated on
+    creature.senses.read.READ_DOOR_GATED so a genome line arms nothing until the code carrying it exists."""
+    from .senses import read as read_sense   # lazily, same discipline as folder/game/hands above
+    if not read_sense.READ_DOOR_GATED:
+        return None
+    return declared.get("SENSE_READ")
+
+
+def _declared_lexicon_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """DOOR_LEXICON undeclared -> None (arms nothing). Declared -> its own parsed dict ({"sqlite": path}),
+    gated on creature.senses.lexicon.LEXICON_DOOR_GATED (C2/C3's discipline)."""
+    from .senses import lexicon as lexicon_sense
+    if not lexicon_sense.LEXICON_DOOR_GATED:
+        return None
+    return declared.get("DOOR_LEXICON")
+
+
+# edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:5x +0400 — ALPHA4-H task 0 (docs/briefs/ALPHA4-H.md;
+# ALPHA4-H-REPORT.md's own numbers): factored out of main() so the production decision itself (two-moment
+# by default) has a direct pin, the same convention `_plant_after_from_argv` above already uses.
+def _read_shape_from_argv(argv: List[str]) -> bool:
+    """True (the default, ALWAYS unless overridden) -> `read.py`'s two-moment shape, MEASURED at 0.60
+    (24/40) on the held-out-font reading mark vs the genome line's own literal single-moment shape's 0.15
+    (6/40) — task 0's own rule ("build that shape only if the toy under it reads higher") decided this.
+    `--read-single-moment` is the one override, back to the lower-ceiling literal shape, for comparison."""
+    return "--read-single-moment" not in argv
+
+
 # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
 # (MOTOR-HANDS.md G-MOT-4): the hands door's own arming, mirroring _declared_folder_dir/_declared_game_
 # config's own shape and gate discipline exactly (C2/C3's convention, reused rather than re-invented).
@@ -547,6 +581,41 @@ def main(argv: List[str]) -> int:
         ffn = functools.partial(folder_sense.sense, world_dir=folder_dir, root=root, canvas=canvas,
                                  period=folder_period, smell=smell_on)
         body.add_sense("folder", ffn)
+
+    # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:2x +0400 — ALPHA4-H task 2 (docs/briefs/
+    # ALPHA4-H.md): the shelf reader, wired BESIDE the folder sense (the brief's own words) -- `--shelf`/
+    # `--curriculum` stay explicit overrides for tests, regardless of the gate (C2's own discipline);
+    # `letters` is the EAR's own limit (genome_for_cli.ear_letters, "SENSE ear letters 8"), never a second
+    # number invented here, so a word this sense hands the ear can never be longer than the ear accepts.
+    read_cfg = _declared_read_config(declared)
+    shelf_override = Path(argv[argv.index("--shelf") + 1]) if "--shelf" in argv else None
+    curriculum_override = Path(argv[argv.index("--curriculum") + 1]) if "--curriculum" in argv else None
+    read_one_word_moments = _read_shape_from_argv(argv)
+    if read_cfg is not None:
+        from .senses import read as read_sense_module
+        import functools
+        read_canvas = int(read_cfg.get("canvas") or int(genome_for_cli.gaze["canvas"]))
+        rfn = functools.partial(
+            read_sense_module.sense, shelf_db=str(shelf_override or read_cfg["shelf"]),
+            curriculum_md=str(curriculum_override or read_cfg["curriculum"]), root=root, canvas=read_canvas,
+            period=float(read_cfg["every_s"]), words=int(read_cfg["words"]), letters=int(genome_for_cli.ear_letters),
+            one_word_moments=read_one_word_moments)
+        body.add_sense("read", rfn)
+
+    # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:2x +0400 — ALPHA4-H task 3 (docs/briefs/
+    # ALPHA4-H.md): the lexicon door. `DOOR lexicon <sqlite> answers what-is by showing` carries no
+    # numeric clause of its own (unlike SENSE read's `words <k> canvas <px>`), so `words`/`canvas` are the
+    # module's own defaults; `letters` is still the EAR's own limit, never invented here.
+    lex_cfg = _declared_lexicon_config(declared)
+    lexicon_override = Path(argv[argv.index("--lexicon") + 1]) if "--lexicon" in argv else None
+    if lex_cfg is not None:
+        from .senses import lexicon as lexicon_sense_module
+        import functools
+        lex_canvas = int(genome_for_cli.gaze["canvas"])
+        lfn = functools.partial(
+            lexicon_sense_module.sense, sqlite_path=str(lexicon_override or lex_cfg["sqlite"]), root=root,
+            canvas=lex_canvas, period=1.0, words=8, letters=int(genome_for_cli.ear_letters))
+        body.add_sense("lexicon", lfn)
 
     # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 22:1x +0400 — docs/briefs/G5-L-BABYAI-WORLD-EAR.md
     # item 2: the sound ear, listening AT THE SAME FOLDER DOOR the picture sense watches (the brief's own

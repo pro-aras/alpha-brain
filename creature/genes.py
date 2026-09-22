@@ -79,6 +79,12 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # creature/senses/game.py's GAME_DOOR_GATED constant (the same "a genome line arms nothing until
         # the code exists" discipline C2/C3 used for the folder door).
         "WORLD_GAME": "creature/body.py:main (declared['WORLD_GAME'] read; arms creature/senses/game.py behind GAME_DOOR_GATED)",
+        # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:0x +0400 — ALPHA4-H (docs/briefs/ALPHA4-H.md
+        # tasks 2/3; ALPHA4-PREREG.md §3): the shelf reader and the lexicon door, wired the SAME C1.7/C2 shape
+        # WORLD_GAME/HANDS above use (gated on the gene's own declared presence; a genome line arms nothing
+        # until the code carrying it exists, behind each module's own *_DOOR_GATED constant).
+        "SENSE_READ": "creature/body.py:main (declared['SENSE_READ'] read; arms creature/senses/read.py behind READ_DOOR_GATED) + creature/mind.py:consume ('ear'/'eye' branches, unchanged -- a shelf row is source='shelf', read exactly like every other ear/eye row; MEET/ARRIVAL/FAST all apply with no new branch)",
+        "DOOR_LEXICON": "creature/body.py:main (declared['DOOR_LEXICON'] read; arms creature/senses/lexicon.py behind LEXICON_DOOR_GATED) + creature/mind.py:_maybe_ask (gated on 'DOOR_LEXICON' in declared: a what-is want that resolves a word also writes world/questions/q-<n>.json {q, word} for the door to answer -- ask/out/q-<n>.json alone carries no word, only a tape moment, ALPHA4-H-REPORT.md's own RAISED clause)",
     },
     # ---------------------------------------------------------------------------------------- the mind
     "mind": {

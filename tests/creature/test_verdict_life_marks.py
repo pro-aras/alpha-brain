@@ -2,6 +2,8 @@
 # «not gradable» on a record whose life did not declare the line, and grade on synthetic rows shaped like builder D's landed code.
 import unittest
 
+import numpy as np   # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:2x +0400 — ALPHA4-H task 4's ReadFrames/ReadMark tests
+
 
 def _tape_game(n_mind, n_sched, reward=0.0):
     rows = [{"seq": 1, "sense": "eye", "meta": {"source": "game", "act_names": ["left", "right", "forward"], "n_actions": 3}}]
@@ -300,6 +302,186 @@ class ThreadMark(unittest.TestCase):
         self.assertTrue(ok["graded"]); self.assertTrue(ok["pass"]); self.assertEqual(ok["max_gap_s"], 2.0); self.assertEqual(ok["waits_share"], 0.0)
         self.assertFalse(thread_mark({"max_gap_s_eye_ear": [1.0, 6.0]}, {"thinks": 100, "think_waits": 0}, True)["pass"])     # a gap over 5.1 s
         self.assertFalse(thread_mark({"max_gap_s_eye_ear": [1.0]}, {"thinks": 100, "think_waits": 6}, True)["pass"])          # waits 6 % ≥ 5 %
+
+
+# edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:2x +0400 — ALPHA4-H task 4 (docs/briefs/ALPHA4-H.md;
+# ALPHA4-PREREG.md §5 READ): the SAME "must read not-gradable on a record whose life did not declare the
+# line, and grade on synthetic rows shaped like the landed code" discipline this file's header states.
+def _tape_shelf(sentences, source="shelf"):
+    """`sentences`: a list of word-lists. Builds ear-then-eye rows (PREREG §2.2's order law) on one moment
+    per sentence, shaped exactly like creature/senses/read.py's own publish order."""
+    rows = []
+    seq = 1
+    for i, words in enumerate(sentences):
+        moment = f"read{i:08d}"
+        for w in words:
+            rows.append({"seq": seq, "sense": "ear", "meta": {"source": source, "moment": moment, "word": w}}); seq += 1
+        rows.append({"seq": seq, "sense": "eye", "meta": {"source": source, "moment": moment}}); seq += 1
+    return rows
+
+
+def _journal_births(sentences, words_born_per_sentence):
+    """One journal MOMENT row per sentence, `words_born_per_sentence[i]` words-area births on it (matching
+    creature/mind.py:_consume_eye's own `journal_row["births"]` shape: [area, cell, reason])."""
+    out = []
+    for i, _words in enumerate(sentences):
+        moment = f"read{i:08d}"
+        births = [["words", 100 + i, "novelty"] for _ in range(words_born_per_sentence[i])]
+        out.append({"seq": i, "moment": moment, "births": births})
+    return out
+
+
+class ReadWordsBorn(unittest.TestCase):
+    def test_counts_only_words_births_on_shelf_moments(self):
+        from tools.verdict_life import read_words_born
+        sentences = [["cat", "sat"], ["dog", "ran"]]
+        tape = _tape_shelf(sentences) + [{"seq": 99, "sense": "eye", "meta": {"source": "maker", "moment": "w0i0t0"}}]
+        journal = _journal_births(sentences, [2, 1]) + [{"seq": 100, "moment": "w0i0t0", "births": [["words", 5, "novelty"]]}]
+        self.assertEqual(read_words_born(tape, journal), 3, "the maker's own moment's word-birth must not count")
+
+    def test_sight_births_never_counted(self):
+        from tools.verdict_life import read_words_born
+        sentences = [["cat", "sat"]]
+        tape = _tape_shelf(sentences)
+        journal = [{"seq": 0, "moment": "read00000000", "births": [["sight", 1, "novelty"], ["sight", 2, "novelty"]]}]
+        self.assertEqual(read_words_born(tape, journal), 0)
+
+    def test_zero_on_an_empty_record(self):
+        from tools.verdict_life import read_words_born
+        self.assertEqual(read_words_born([], []), 0)
+
+
+class ShelfEpisodesFromTape(unittest.TestCase):
+    def test_extracts_words_in_instant_in_publish_order(self):
+        from tools.verdict_life import shelf_episodes_from_tape
+        sentences = [["red", "ball"], ["blue", "key", "box"]]
+        rows = shelf_episodes_from_tape(_tape_shelf(sentences))
+        self.assertEqual([r["words_in_instant"] for r in rows], sentences)
+
+    def test_a_non_shelf_moment_is_excluded(self):
+        from tools.verdict_life import shelf_episodes_from_tape
+        rows = _tape_shelf([["a", "b"]]) + _tape_shelf([["c", "d"]], source="maker")
+        got = shelf_episodes_from_tape(rows)
+        self.assertEqual(len(got), 1)
+        self.assertEqual(got[0]["words_in_instant"], ["a", "b"])
+
+
+class ShuffledShelfEpisodes(unittest.TestCase):
+    def test_preserves_lengths_and_the_word_pool_destroys_pairing(self):
+        from tools.verdict_life import shuffled_shelf_episodes
+        rows = [{"id": i, "words_in_instant": ws} for i, ws in enumerate([["red", "ball"], ["blue", "key"], ["red", "ball"], ["red", "ball"]])]
+        twin = shuffled_shelf_episodes(rows, seed=1)
+        self.assertEqual([len(r["words_in_instant"]) for r in twin], [len(r["words_in_instant"]) for r in rows])
+        real_pool = sorted(w for r in rows for w in r["words_in_instant"])
+        twin_pool = sorted(w for r in twin for w in r["words_in_instant"])
+        self.assertEqual(real_pool, twin_pool, "the multiset of every word is preserved exactly")
+
+    def test_deterministic_for_a_fixed_seed(self):
+        from tools.verdict_life import shuffled_shelf_episodes
+        rows = [{"id": i, "words_in_instant": ws} for i, ws in enumerate([["a", "b"], ["c", "d"], ["a", "b"]])]
+        a = shuffled_shelf_episodes(rows, seed=7)
+        b = shuffled_shelf_episodes(rows, seed=7)
+        self.assertEqual(a, b)
+
+
+class ReadFrames(unittest.TestCase):
+    def test_a_skewed_corpus_files_the_skewed_pair_with_high_precision(self):
+        from tools.verdict_life import read_frames
+        from genome.sentence import synthetic_missions
+        # genome/sentence.py's OWN calibrated toy (its module docstring's worked example): a lift>2 pair is
+        # NOT necessarily the deliberately-skewed one -- when a pair dominates BOTH its words' marginals,
+        # lift = count/(N*p1*p2) approaches N/count, which caps below 2 once skew_share > 0.5 (measured
+        # here, not assumed); the OTHER, modestly-skewed pairs are what clears the bar, and that is exactly
+        # what this toy is FOR (find_frames' own statistic, not this file's fixture).
+        rng = np.random.default_rng(20260923)
+        missions = synthetic_missions(rng, n=200, skew_pairs=[("red", "ball")], skew_share=0.6)
+        rows = _tape_shelf([list(m) for m in missions])
+        out = read_frames(rows, shuffle_seed=20260923)
+        self.assertGreaterEqual(out["filed"], 1)
+        self.assertIsNotNone(out["precision"])
+        self.assertGreaterEqual(out["precision"], 0.5)
+
+    def test_a_uniform_corpus_files_nothing_precision_is_none(self):
+        from tools.verdict_life import read_frames
+        rng_pairs = [(c, o) for c in ("red", "blue", "green") for o in ("ball", "key", "box")]
+        sentences = (rng_pairs * 6)   # every pair equally often -> no lift over independence
+        rows = _tape_shelf(sentences)
+        out = read_frames(rows)
+        self.assertEqual(out["filed"], 0)
+        self.assertIsNone(out["precision"], "no denominator -- never a spurious 0 or 1 (#162's class)")
+
+    def test_multiword_moments_counted_correctly(self):
+        from tools.verdict_life import read_frames
+        rows = _tape_shelf([["only"], ["two", "words"], ["three", "words", "here"]])
+        out = read_frames(rows)
+        self.assertEqual(out["shelf_moments"], 3)
+        self.assertEqual(out["shelf_multiword_moments"], 2, "a one-word moment carries no pair")
+
+
+class ReadMark(unittest.TestCase):
+    def _skewed_tape_and_journal(self, n_extra_born=520):
+        from genome.sentence import synthetic_missions
+        rng = np.random.default_rng(20260923)
+        missions = synthetic_missions(rng, n=200, skew_pairs=[("red", "ball")], skew_share=0.6)
+        sentences = [list(m) for m in missions]
+        tape = _tape_shelf(sentences)
+        per_sentence = [1] * len(sentences)
+        per_sentence[-1] += max(0, n_extra_born - len(sentences))
+        journal = _journal_births(sentences, per_sentence)
+        return tape, journal
+
+    def test_not_gradable_without_the_gene(self):
+        from tools.verdict_life import read_mark
+        self.assertFalse(read_mark([], [], False, {"n": 40, "share": 0.8}, {"n": 40, "share": 0.0})["graded"])
+
+    def test_not_gradable_without_reading_asks_on_the_record(self):
+        from tools.verdict_life import read_mark
+        tape, journal = self._skewed_tape_and_journal()
+        m = read_mark(tape, journal, True, None, None)
+        self.assertFalse(m["graded"])
+        self.assertIn("no reading-mark asks", m["reason"])
+
+    def test_graded_pass_when_every_clause_clears_its_bar(self):
+        from tools.verdict_life import read_mark
+        tape, journal = self._skewed_tape_and_journal(n_extra_born=520)
+        recog = {"n": 50, "correct": 40, "share": 0.8}
+        recog_blind = {"n": 50, "correct": 0, "share": 0.0}
+        m = read_mark(tape, journal, True, recog, recog_blind, min_words_born=500, min_frames=1)
+        self.assertTrue(m["graded"])
+        self.assertTrue(m["clause_words_born"]); self.assertTrue(m["clause_reading"]); self.assertTrue(m["clause_blind_twin"])
+        self.assertTrue(m["pass"], m)
+
+    def test_fails_when_words_born_under_the_bar(self):
+        from tools.verdict_life import read_mark
+        tape, journal = self._skewed_tape_and_journal(n_extra_born=10)
+        recog = {"n": 50, "correct": 40, "share": 0.8}
+        recog_blind = {"n": 50, "correct": 0, "share": 0.0}
+        m = read_mark(tape, journal, True, recog, recog_blind, min_words_born=500, min_frames=1)
+        self.assertTrue(m["graded"]); self.assertFalse(m["clause_words_born"]); self.assertFalse(m["pass"])
+
+    def test_fails_when_the_reading_share_is_under_the_bar(self):
+        from tools.verdict_life import read_mark
+        tape, journal = self._skewed_tape_and_journal(n_extra_born=520)
+        recog = {"n": 50, "correct": 10, "share": 0.2}
+        recog_blind = {"n": 50, "correct": 0, "share": 0.0}
+        m = read_mark(tape, journal, True, recog, recog_blind, min_words_born=500, min_frames=1)
+        self.assertTrue(m["graded"]); self.assertFalse(m["clause_reading"]); self.assertFalse(m["pass"])
+
+    def test_fails_when_the_blind_twin_does_not_read_zero(self):
+        from tools.verdict_life import read_mark
+        tape, journal = self._skewed_tape_and_journal(n_extra_born=520)
+        recog = {"n": 50, "correct": 40, "share": 0.8}
+        recog_blind = {"n": 50, "correct": 3, "share": 0.06}
+        m = read_mark(tape, journal, True, recog, recog_blind, min_words_born=500, min_frames=1)
+        self.assertTrue(m["graded"]); self.assertFalse(m["clause_blind_twin"]); self.assertFalse(m["pass"])
+
+    def test_no_blind_twin_run_fails_and_says_so(self):
+        from tools.verdict_life import read_mark
+        tape, journal = self._skewed_tape_and_journal(n_extra_born=520)
+        recog = {"n": 50, "correct": 40, "share": 0.8}
+        m = read_mark(tape, journal, True, recog, None, min_words_born=500, min_frames=1)
+        self.assertTrue(m["graded"]); self.assertFalse(m["pass"])
+        self.assertIn("blind twin was not run", m["reason"])
 
 
 if __name__ == "__main__":

@@ -228,6 +228,12 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "HANDS": "HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20",
         "SENSE_TOUCH": "SENSE    touch from hands: exit rate stalls retries bytes",
         "SENSE_SMELL": "SENSE    smell kind size folder age",
+        # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:3x +0400 — ALPHA4-H (docs/briefs/ALPHA4-H.md
+        # tasks 2/3): two rows, matching the two genes.py RUNS entries added by this task. Caught by this
+        # test's own gate (test_sample_line_set_is_exactly_the_registry) on the full suite, exactly the
+        # omission this class exists to catch (G5-K's own comment above, again).
+        "SENSE_READ": "SENSE    read shelf /data/alpha3-library/SHELF.sqlite curriculum /data/alpha3-library/CURRICULUM.md every 5 s words 8 canvas 128",
+        "DOOR_LEXICON": "DOOR     lexicon /data/alpha2-library/lexicon-enwiktionary-20260901.sqlite answers what-is by showing",
     }
 
     def test_every_runs_gene_parses(self) -> None:

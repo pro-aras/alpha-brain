@@ -513,6 +513,32 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"from body; beliefs about itself; skip thinks when backlog > (\d+)", a)
                 if not m: raise GenomeError(f"SELF: cannot read {a!r} (L-9: SELF from body; beliefs about itself; skip thinks when backlog > <n>)")
                 g["declared"]["SELF"] = {"backlog_threshold": int(m.group(1))}
+            # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:0x +0400 — ALPHA4-H task 2 (docs/briefs/
+            # ALPHA4-H.md; ALPHA4-PREREG.md §3): a THIRD "SENSE" shape, dispatched on args[0]=="read" exactly
+            # like "eye"/"ear"/"ear-sound"/"smell"/"touch"/"colour"/"body" above (additive: none of those
+            # branches are touched). `SENSE read shelf <sqlite> curriculum <md> every <n> s words <k> canvas
+            # <px>` -- a sentence SHOWN (rendered on a canvas of <px>) and HEARD (its words as ear rows), at
+            # most <k> words per moment, every <n> seconds. Stored under g["declared"]["SENSE_READ"] (unlike
+            # SENSE eye/ear/colour, which are plain Genome fields) -- SENSE_READ names a real call site
+            # (creature/senses/read.py, wired from creature/body.py) that creature/genes.py's RUNS/unwired()
+            # law must name, the same convention SENSE_SMELL/SENSE_TOUCH/SENSE_BODY already use.
+            elif gene == "SENSE" and args[0] == "read":
+                rest = " ".join(args[1:])
+                m = re.fullmatch(r"shelf ([A-Za-z0-9_./-]+) curriculum ([A-Za-z0-9_./-]+) every (\d+) s words (\d+) canvas (\d+)", rest)
+                if not m: raise GenomeError(f"SENSE read: cannot read {rest!r} (ALPHA4-PREREG §3: SENSE read shelf <sqlite> curriculum <md> every <n> s words <k> canvas <px>)")
+                g["declared"]["SENSE_READ"] = {"shelf": m.group(1), "curriculum": m.group(2), "every_s": int(m.group(3)),
+                                                "words": int(m.group(4)), "canvas": int(m.group(5))}
+            # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:0x +0400 — ALPHA4-H task 3 (ALPHA4-PREREG.md
+            # §3): the FIRST "DOOR" gene word (a brand-new top-level keyword, dispatched on args[0] the same
+            # way "SENSE" is -- builder I's `DOOR web ...` is a SIBLING elif on args[0]=="web", landing beside
+            # this one at integration, neither touching the other). `DOOR lexicon <sqlite> answers what-is by
+            # showing` -- the offline dictionary door; `DOOR_LEXICON` names creature/senses/lexicon.py's real
+            # call site in creature/genes.py's RUNS/unwired() law.
+            elif gene == "DOOR" and args and args[0] == "lexicon":
+                rest = " ".join(args[1:])
+                m = re.fullmatch(r"([A-Za-z0-9_./-]+) answers what-is by showing", rest)
+                if not m: raise GenomeError(f"DOOR lexicon: cannot read {rest!r} (ALPHA4-PREREG §3: DOOR lexicon <sqlite> answers what-is by showing)")
+                g["declared"]["DOOR_LEXICON"] = {"sqlite": m.group(1)}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:

@@ -1300,13 +1300,16 @@ class Mind:
         return [ep.x_s[i].copy() for i in order]
 
     # ------------------------------------------------------------------ QUESTION (L-10)
-    def _write_ask_out(self, payload: Dict[str, object]) -> None:
+    def _write_ask_out(self, payload: Dict[str, object]) -> int:
         """Writes ONE `run/ask/out/q-<n>.json` row -- the SAME JSON shape `run/ask/in/` accepts (creature/
         ask.py's own inbox schema), but this mind is the WRITER here, not the answerer: the world-maker's
         door (creature/world_maker.py:sense) and, for a `what-is` no sense drew, the human ASK door's own
         listener, are its readers. `n` is `self._ask_out_n`, a mind-local FILENAME counter shared by every
         writer of a q-file (never the tape row's own seq -- two wants can form on the same tape row,
-        advisor's point 5), so no two writes ever collide on a name.
+        advisor's point 5), so no two writes ever collide on a name. Returns the `n` used (edit: Claude
+        (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:1x +0400 — ALPHA4-H task 3: additive, every existing
+        caller discards it as a bare statement, exactly like Organism.moment's own S/T return did when it
+        was added).
         edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 — advisor-caught (BLOCKS): an
         earlier fix (2026-09-22 19:12) put this increment on `self.think_counters["questions_written"]`
         directly, which conflates two different things: MOUTH's `is` rows (this method's OTHER caller,
@@ -1321,6 +1324,27 @@ class Mind:
         n = self._ask_out_n
         (out_dir / f"q-{n}.json").write_text(json.dumps(payload, default=str))
         self._ask_out_n += 1
+        return n
+
+    # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:1x +0400 — ALPHA4-H task 3 (docs/briefs/
+    # ALPHA4-H.md; ALPHA4-PREREG.md §3 DOOR lexicon): the RAISED clause. The brief's own words: "watches the
+    # QUESTION queue C landed (read its format from the code; if questions are only journaled and not
+    # written as files, RAISE it and write the smallest queue...)". Read from the code (this file, L-10):
+    # questions ARE written as files (`_write_ask_out`, just above) -- but the file's `args` carries a TAPE
+    # MOMENT (`_maybe_ask_word`'s own `[tape_moment]`), never the word text a dictionary lookup needs; the
+    # brief's own contingency assumed "files vs. no files", not "files keyed by the wrong thing". The
+    # narrower gap the brief authorizes fixing is real, so this write lands: a SEPARATE, additive outbox
+    # (`run/world/questions/`, never touching `run/ask/out/` -- world_maker's own door polls THAT directory
+    # matching `args[0]` against ITS OWN drawn-moment shape, and must never be handed a word-keyed want to
+    # misinterpret) carrying the word `_maybe_ask` already resolved. A PURE, deterministic write of
+    # information already computed this call (payload's own `seq`, `why_word`) -- no new randomness, no new
+    # wall-clock read -- so replay stays identical; gated on 'DOOR_LEXICON' in self.genome.declared (W3-0's
+    # law: an undeclared gene changes nothing -- life 3a's replay, which never declares it, writes nothing
+    # new here, the closed-tape regression's own requirement).
+    def _write_lexicon_want(self, n: int, word: str) -> None:
+        q_dir = self.run_root / "world" / "questions"
+        q_dir.mkdir(parents=True, exist_ok=True)
+        (q_dir / f"q-{n}.json").write_text(json.dumps({"q": "what-is", "word": word}))
 
     def _maybe_ask(self, want: str, form: str, args: list, why_word: Optional[str] = None) -> None:
         """L-10: forms ONE question for `want`, at most once ever (self._asked, persisted to
@@ -1348,7 +1372,13 @@ class Mind:
                 "episodes": list(record["episodes"]),
                 "edges": [[int(s), int(t), float(w)] for s, t, w in record["edges"]],
             }
-        self._write_ask_out(payload)   # advances self._ask_out_n itself (see that method's own comment)
+        n = self._write_ask_out(payload)   # advances self._ask_out_n itself (see that method's own comment)
+        # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:1x +0400 — ALPHA4-H task 3: the lexicon
+        # door's own queue (see _write_lexicon_want's own comment for the RAISED clause this answers) --
+        # only a real "what-is <word>" want (why_word resolved -- never the sight-only "show me this
+        # picture again" want at line ~1078, which has no why_word and is world_maker's/folder's domain).
+        if form == "what-is" and why_word is not None and "DOOR_LEXICON" in self.genome.declared:
+            self._write_lexicon_want(n, why_word)
         self._write_journal(self._cur_at, {"seq": self._cur_seq, "question": payload})
         # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 — advisor-caught: the SEMANTIC
         # STATUS mark for "a real QUESTION want was formed" lives HERE, on the one caller that actually

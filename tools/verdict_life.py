@@ -3,12 +3,19 @@
 # functions over the tape rows, the live journal rows and STATUS, imported by tools/verdict_g4.py. Each reads «not gradable» (graded False,
 # with the reason) on a record whose life did not declare the line — the six closed 8 h records and life 3b are the control (L-1). Written
 # test-first against builder D's landed shapes (creature/senses/game.py:213-220; creature/mind.py:_maybe_choose_act / _consume_ear_sound).
-"""The ONE life's verdict marks: ACT (§19.5), SOUND (§19.10), SIZING (§19.11); the shuffled-act plant."""
+"""The ONE life's verdict marks: ACT (§19.5), SOUND (§19.10), SIZING (§19.11); the shuffled-act plant.
+
+edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:18 +0400 — ALPHA4-H task 4 (docs/briefs/ALPHA4-H.md;
+ALPHA4-PREREG.md §5 READ (H)): read_words_born / shelf_episodes_from_tape / shuffled_shelf_episodes /
+read_mark, added below the existing marks, none of them touched.
+"""
 from __future__ import annotations
 
 import collections
 import copy
 from typing import Dict, Iterable, List, Optional, Tuple
+
+import numpy as np
 
 
 def _meta(r: dict) -> dict:
@@ -372,4 +379,135 @@ def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[floa
         band = 0.5 * prediction <= born <= 1.5 * prediction
         out.update(graded=True, **{"pass": band and int(refused or 0) == 0 and plant_births >= 1},
                    reason=f"graded (§19.11): band {'ok' if band else 'MISSED'}; refused {refused}; plant births {plant_births}")
+    return out
+
+
+# ============================================================================ ALPHA4-PREREG §5: READ (builder H)
+# edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:2x +0400 — docs/briefs/ALPHA4-H.md task 4. Three
+# tape-only helpers (never the mind's internal FAST ring — world_pair_skew's own precedent above) + the
+# mark itself, which additionally takes `recog`/`recog_blind` (dicts from tools/read_recognised.py's
+# `recognised_share`, computed OUTSIDE this pure module — hands_mark's own precedent for `recog` above).
+def read_words_born(tape: Iterable[dict], journal: Iterable[dict]) -> int:
+    """"words born from shelf moments (map birth moments -> source via the tape)" (ALPHA4-H.md task 4's own
+    words): a journal MOMENT row's own `moment` field IS the tape's moment string (shared by construction,
+    creature/mind.py:_consume_eye writes both from the SAME `moment` local); build moment->source from every
+    EYE row's own meta, then count `births` entries with area=="words" whose row's moment resolves to
+    source=="shelf". A moment the tape never carries (should not happen, defensive) resolves to None and is
+    never counted."""
+    source_of_moment: Dict[str, Optional[str]] = {}
+    for r in tape:
+        if r.get("sense") == "eye":
+            source_of_moment[_meta(r).get("moment")] = _meta(r).get("source")
+    n = 0
+    for j in journal:
+        if "moment" not in j or not j.get("births"):
+            continue
+        if source_of_moment.get(j["moment"]) != "shelf":
+            continue
+        n += sum(1 for b in j["births"] if b and b[0] == "words")
+    return n
+
+
+def shelf_episodes_from_tape(tape: Iterable[dict]) -> List[Dict[str, object]]:
+    """Every shelf "sentence moment" as a `words_in_instant` row -- genome.sentence.find_frames' own input
+    shape (_FakeEpisode's `.get(eid)["words_in_instant"]`) -- built PURELY from the tape: every `ear` row
+    with `meta.source == "shelf"` published BEFORE its own moment's `eye` row (PREREG §2.2's order law)
+    supplies that moment's words, in publish order (creature/senses/read.py's own chunk order). Never reads
+    the mind's FAST ring (the SAME tape-only discipline `world_pair_skew` above already uses for the game's
+    missions) -- so this is gradable on a closed record with no episodes.npz at all."""
+    tape = list(tape)
+    words_by_moment: Dict[str, List[str]] = {}
+    for r in tape:
+        if r.get("sense") == "ear" and _meta(r).get("source") == "shelf":
+            words_by_moment.setdefault(_meta(r)["moment"], []).append(str(_meta(r).get("word")))
+    out: List[Dict[str, object]] = []
+    i = 0
+    for r in tape:
+        if r.get("sense") == "eye" and _meta(r).get("source") == "shelf":
+            words = words_by_moment.get(_meta(r)["moment"], [])
+            out.append({"id": i, "words_in_instant": words})
+            i += 1
+    return out
+
+
+def shuffled_shelf_episodes(rows: List[Dict[str, object]], seed: int = 20260923) -> List[Dict[str, object]]:
+    """The shuffled twin (task 4's own words: "vs the shuffled twin"): every word across every shelf moment,
+    pooled and shuffled (a fixed seed -- #158's law: never re-drawn until it looks better), then
+    redistributed back into moments of their ORIGINAL lengths -- word MARGINALS (how often "cat" appears at
+    all) and each moment's OWN size are preserved; the actual observed PAIRING (which words met in the SAME
+    moment) is destroyed. A pair genome.sentence.find_frames() still files on this shuffled corpus is, by
+    construction, a false positive its own statistical bar (count > factor*expected) could not tell apart
+    from chance -- the standard permutation-test null for a co-occurrence claim."""
+    rng = np.random.default_rng(seed)
+    lengths = [len(r["words_in_instant"]) for r in rows]
+    pool: List[str] = [w for r in rows for w in r["words_in_instant"]]
+    order = rng.permutation(len(pool))
+    shuffled_pool = [pool[i] for i in order]
+    out: List[Dict[str, object]] = []
+    i = 0
+    for idx, n in enumerate(lengths):
+        out.append({"id": idx, "words_in_instant": shuffled_pool[i:i + n]})
+        i += n
+    return out
+
+
+def read_frames(tape: Iterable[dict], shuffle_seed: int = 20260923) -> Dict[str, object]:
+    """Frames filed from shelf moments (genome.sentence.find_frames -- "SENTENCE's own twin machinery",
+    task 4's own words) + the shuffled-twin precision: of the pairs find_frames() files on the REAL shelf
+    corpus, the share that do NOT also get filed on the shuffled corpus (a pair the shuffle still files is
+    indistinguishable from a false positive under find_frames' own bar). `None` precision when nothing was
+    filed on the real corpus (never a spurious 0 or 1 — #162's class: a ratio needs a denominator)."""
+    from genome.sentence import find_frames, _FakeEpisode
+    rows = shelf_episodes_from_tape(tape)
+    real = find_frames(_FakeEpisode(rows))
+    twin_rows = shuffled_shelf_episodes(rows, seed=shuffle_seed)
+    twin = find_frames(_FakeEpisode(twin_rows))
+    real_pairs = {(f["w1"], f["w2"]) for f in real}
+    twin_pairs = {(f["w1"], f["w2"]) for f in twin}
+    true_pairs = real_pairs - twin_pairs
+    precision = (len(true_pairs) / len(real_pairs)) if real_pairs else None
+    multiword = sum(1 for r in rows if len({w for w in r["words_in_instant"] if w}) >= 2)
+    return {"shelf_moments": len(rows), "shelf_multiword_moments": multiword, "filed": len(real),
+            "true_vs_shuffled": len(true_pairs), "shuffled_filed": len(twin),
+            "precision": (round(precision, 4) if precision is not None else None),
+            "pairs": sorted(f"{w1}|{w2}" for w1, w2 in real_pairs)}
+
+
+def read_mark(tape: Iterable[dict], journal: Iterable[dict], read_declared: bool, recog: Optional[dict],
+              recog_blind: Optional[dict], min_words_born: int = 500, min_frames: int = 20,
+              frame_precision_bar: float = 0.8, reading_bar: float = 0.6, shuffle_seed: int = 20260923) -> Dict[str, object]:
+    """ALPHA4-PREREG.md §5 READ (H): words born from shelf moments >= `min_words_born`; frames from shelf
+    moments >= `min_frames` with precision >= `frame_precision_bar` vs the shuffled twin; the READING mark
+    (`recog`, from tools/read_recognised.py:recognised_share over the life's own snapshot) >= `reading_bar`;
+    the blind twin (`recog_blind`, the SAME instrument over a Mind replayed with every shelf row dropped,
+    tools/read_recognised.py:blind_twin_root) reads 0 by construction. `recog`/`recog_blind` are computed
+    OUTSIDE this pure function (hands_mark's own precedent: a script does the I/O, this module only grades
+    the numbers) — see the builder report for the RAISED clause on what "held out" means for the 50 words
+    (the FONT, not the word: a word never heard has no words-cell, recall_many can only ever read 0 for it
+    by construction, #228 (b)'s class — ALPHA4-H.md's own task-4 text asked for both at once, which cannot
+    both hold)."""
+    tape = list(tape); journal = list(journal)
+    words_born = read_words_born(tape, journal)
+    frames = read_frames(tape, shuffle_seed=shuffle_seed)
+    out: Dict[str, object] = {
+        "shelf_eye_rows": sum(1 for r in tape if r.get("sense") == "eye" and _meta(r).get("source") == "shelf"),
+        "words_born_from_shelf": words_born, "frames": frames, "reading": recog, "reading_blind_twin": recog_blind,
+        "bar": (f"words born from shelf >= {min_words_born} · frames from shelf >= {min_frames} with precision "
+                f">= {frame_precision_bar} vs the shuffled twin · the reading mark >= {reading_bar} (50 shelf "
+                f"words the life DID hear, rendered in the held-out font) · the blind twin reads 0 by construction"),
+    }
+    if not read_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: SENSE_READ not declared on this life")
+        return out
+    if not isinstance(recog, dict) or not recog.get("n"):
+        out.update(graded=False, **{"pass": None}, reason="not gradable: no reading-mark asks on the record")
+        return out
+    ok_words = words_born >= min_words_born
+    ok_frames = frames["filed"] >= min_frames and frames["precision"] is not None and frames["precision"] >= frame_precision_bar
+    ok_reading = recog.get("share") is not None and float(recog["share"]) >= reading_bar
+    blind_share = (recog_blind or {}).get("share")
+    ok_blind = blind_share is not None and float(blind_share) == 0.0
+    out.update(graded=True, clause_words_born=ok_words, clause_frames=ok_frames, clause_reading=ok_reading,
+               clause_blind_twin=ok_blind, **{"pass": bool(ok_words and ok_frames and ok_reading and ok_blind)},
+               reason="graded (ALPHA4-PREREG §5, READ/H)" + ("" if recog_blind is not None else "; the blind twin was not run — that clause FAILS"))
     return out
