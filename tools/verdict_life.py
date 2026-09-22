@@ -103,6 +103,46 @@ def sound_mark(tape: Iterable[dict], journal: Iterable[dict], status: dict) -> D
     return out
 
 
+def grade_mark(plant: dict, null: dict, seen: dict, answer_declared: bool) -> Dict[str, object]:
+    """PREREG §19.3 (builder A's shapes: `graded` = {sure_bare, unsure, abstain_with_resemblance, abstain} on the reader's own plant/null
+    asks; `hedge_rate` on the seen-words Q1): the null «vex» sure-bare ≤ 1 of 10 and unsure+abstain ≥ 8 of 10 (a 5/10 tie is a FAIL);
+    the plant «zog» answered SURE ≥ 6 of 10; the hedge rate printed (the plan predicted < 10 %; L1's replay read 0.426 — a finding)."""
+    gp = (plant or {}).get("graded"); gn = (null or {}).get("graded")
+    hedge = ((seen or {}).get("Q1") or {}).get("hedge_rate")
+    out: Dict[str, object] = {"plant_graded": gp, "null_graded": gn, "hedge_rate": hedge,
+                              "bar": "null sure-bare ≤ 1/10 · null unsure+abstain ≥ 8/10 (a tie fails) · plant answered sure ≥ 6/10 · hedge rate printed, no bar (predicted < 0.10)"}
+    if not answer_declared or not isinstance(gp, dict) or not isinstance(gn, dict):
+        out.update(graded=False, **{"pass": None}, reason="not gradable: ANSWER not declared / no graded counts on the asks (a life before the graded answer)")
+        return out
+    n_null = sum(gn.values()) or 1; n_plant = sum(gp.values()) or 1
+    null_sb = int(gn.get("sure_bare", 0)); null_soft = int(gn.get("unsure", 0)) + int(gn.get("abstain_with_resemblance", 0)) + int(gn.get("abstain", 0))
+    plant_sure = int(gp.get("sure_bare", 0))
+    out.update(null_sure_bare=null_sb, null_soft=null_soft, null_n=n_null, plant_sure=plant_sure, plant_n=n_plant,
+               graded=True, **{"pass": (null_sb / n_null <= 0.1) and (null_soft / n_null >= 0.8) and (plant_sure / n_plant >= 0.6)},
+               reason="graded (§19.3)")
+    return out
+
+
+def self_mark(tape: Iterable[dict], beliefs: Iterable[dict], journal: Iterable[dict], status: dict, self_declared: bool, min_body_rows: int = 24) -> Dict[str, object]:
+    """PREREG §19.6 (builder A's shapes: a belief row whose word starts with `self:`, cells [], episodes = the two body rows' seqs):
+    ≥ 1 self belief citing two real body rows; `think_skipped_for_backlog` printed. Not gradable under `min_body_rows` body rows or
+    without the gene."""
+    body_seqs = {int(r["seq"]) for r in tape if r.get("sense") == "body"}
+    selfs = [b for b in beliefs if str(b.get("word", "")).startswith("self:")]
+    cited_ok = [b for b in selfs if len(b.get("episodes") or []) == 2 and all(int(e) in body_seqs for e in b["episodes"])]
+    self_thinks = sum(1 for j in journal if isinstance(j.get("think"), dict) and j["think"].get("kind") == "self")
+    out: Dict[str, object] = {"body_rows": len(body_seqs), "self_beliefs": len(selfs), "self_beliefs_citing_two_body_rows": len(cited_ok),
+                              "self_words": sorted({b.get("word") for b in selfs}), "self_thinks": self_thinks,
+                              "think_skipped_for_backlog": status.get("think_skipped_for_backlog", "not recorded"),
+                              "bar": "≥ 1 belief about itself citing two real body rows; skips printed; not gradable under %d body rows" % min_body_rows}
+    if not self_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: SELF not declared on this life"); return out
+    if len(body_seqs) < min_body_rows:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {len(body_seqs)} body rows < {min_body_rows}"); return out
+    out.update(graded=True, **{"pass": len(cited_ok) >= 1}, reason="graded (§19.6)")
+    return out
+
+
 def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[float], plant_word: str = "zog") -> Dict[str, object]:
     """PREREG §19.11: sight born by 24 h within [0.5×, 1.5×] of the pre-flight's prediction; births_refused_nmax 0; the plant birthed ≥ 1
     sight cell. The per-hour sight-births SERIES is on the record (#233's instrument). Not gradable without a prediction or an older body."""

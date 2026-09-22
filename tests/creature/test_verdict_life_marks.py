@@ -67,5 +67,48 @@ class SizingMark(unittest.TestCase):
         self.assertFalse(sizing_mark({"sight_born": 1000, "sight_nmax": 4000, "births_refused_nmax": 5}, j, 1000)["pass"])   # refused at the cap
 
 
+class GradeMark(unittest.TestCase):
+    """PREREG §19.3 against builder A's landed shapes: `graded` counts {sure_bare, unsure, abstain_with_resemblance, abstain} on the
+    reader's own plant/null asks, `hedge_rate` on the seen-words Q1."""
+
+    def test_not_gradable_without_graded_counts(self):
+        from tools.verdict_life import grade_mark
+        m = grade_mark({"answered_rate": 0.4, "abstain_rate": 0.6, "n": 10}, {"abstain_rate": 0.5, "n": 10}, {"Q1": {"acc": 0.98}}, "ANSWER" in {})
+        self.assertFalse(m["graded"])
+
+    def test_null_and_plant_bars(self):
+        from tools.verdict_life import grade_mark
+        plant = {"answered_rate": 0.7, "n": 10, "graded": {"sure_bare": 7, "unsure": 1, "abstain_with_resemblance": 2, "abstain": 0}}
+        null = {"answered_rate": 0.0, "n": 10, "graded": {"sure_bare": 0, "unsure": 7, "abstain_with_resemblance": 3, "abstain": 0}}
+        seen = {"Q1": {"acc": 0.98, "hedge_rate": 0.426}}
+        m = grade_mark(plant, null, seen, True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["null_sure_bare"], 0); self.assertEqual(m["hedge_rate"], 0.426)
+        tie = dict(null, graded={"sure_bare": 5, "unsure": 3, "abstain_with_resemblance": 2, "abstain": 0})
+        self.assertFalse(grade_mark(plant, tie, seen, True)["pass"])            # 5/10 sure-bare is a FAIL, never a tie
+        weak = dict(plant, graded={"sure_bare": 5, "unsure": 3, "abstain_with_resemblance": 2, "abstain": 0})
+        self.assertFalse(grade_mark(weak, null, seen, True)["pass"])            # the plant must be answered SURE ≥ 6/10
+
+
+class SelfMark(unittest.TestCase):
+    """PREREG §19.6 against builder A's shapes: belief rows whose word starts with `self:`, cells [], episodes = two body-row seqs."""
+
+    def test_not_gradable_under_24_body_rows_or_without_the_gene(self):
+        from tools.verdict_life import self_mark
+        tape = [{"seq": i, "sense": "body", "meta": {}} for i in range(10)]
+        self.assertFalse(self_mark(tape, [], [], {}, True)["graded"])
+        self.assertFalse(self_mark([{"seq": i, "sense": "body", "meta": {}} for i in range(30)], [], [], {}, False)["graded"])
+
+    def test_a_self_belief_citing_two_body_rows_passes(self):
+        from tools.verdict_life import self_mark
+        tape = [{"seq": i, "sense": "body", "meta": {}} for i in range(30)]
+        bel = [{"word": "self:births_stopped", "kind": "belief", "cells": [], "episodes": [3, 4]}, {"word": "circle", "kind": "belief", "cells": [1], "episodes": [9]}]
+        journal = [{"think": {"kind": "self", "outcome": "belief"}}, {"think": {"kind": "self", "outcome": "no_change"}}]
+        m = self_mark(tape, bel, journal, {"think_skipped_for_backlog": 2}, True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["self_beliefs"], 1); self.assertEqual(m["self_thinks"], 2); self.assertEqual(m["think_skipped_for_backlog"], 2)
+        bad = [{"word": "self:no_room", "kind": "belief", "cells": [], "episodes": [3]}]     # one row cited, not two
+        self.assertFalse(self_mark(tape, bad, journal, {}, True)["pass"])
+        self.assertFalse(self_mark(tape, [], journal, {}, True)["pass"])
+
+
 if __name__ == "__main__":
     unittest.main()
