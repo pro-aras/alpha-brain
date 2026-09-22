@@ -78,7 +78,8 @@ ACT      glance open ask turn step say run                                      
 OUTCOME  act to episode; error grades it; ranks replay
 # ANSWER
 ABSTAIN  second/best > 0.85
-ASK      what-is show is which why                # `why` = the addresses questions.why() returns (builder A); `next` dropped — no mechanism predicts a next thing; RECALL k removed — it reached no call site
+RECALL   k=3                                      # parsed and REQUIRED by the parser's own list; the value reaches no call site (recall_many lights every resonating cell) — the inventory prints it VALUE-UNREAD; kept because the machinery refuses a genome without it, said here, not hidden
+ASK      what-is show is which why                # `why` = the addresses questions.why() returns (builder A); `next` dropped — no mechanism predicts a next thing
 # STAGES
 STAGE    1 senses   moments 0..200
 STAGE    2 meet     moments 200..
