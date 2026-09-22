@@ -297,6 +297,12 @@ class Body:
             "births": len(org.births), "edges_born": int(org.c["edges_born"]), "edges_pruned": int(org.c["edges_pruned"]),
             # edit: Claude (Fable 5.1), 2026-09-20 11:59 +0400 — PREREG §15: the three numbers that would have shown life 1's spent budget at 07:41 +04, on EVERY write (#164)
             "arrivals": int(org.arrivals), "budget_left": int(org.budget_left), "births_refused_budget": int(org.c["births_refused_budget"]),
+            # edit: Claude (Fable 5.1), 2026-09-22 12:0x +0400 — the birth LEDGER on every write (#164): NMAX is a lifetime budget of ids (G4 §3 B7 never
+            # reuses one); g5-seam-1 spent its 2,000 sight ids by hour ~6 and refused 1,988 births while this surface showed budget refusals 0
+            "sight_born": int(org.sight.n), "words_born": int(org.words.n), "sight_nmax": int(org.sight.nmax), "words_nmax": int(org.words.nmax),
+            "births_refused_nmax": int(org.c["births_refused_nmax"]), "births_refused_frozen": int(org.c["births_refused_frozen"]),
+            "births_refused_redundant": int(org.c["births_refused_redundant"]),
+            "births_refused_caps": int(org.c["births_refused_budget"]) + int(org.c["births_refused_nmax"]) + int(org.c["births_refused_frozen"]),
             "cells": org.total_cells(), "sight_only_skipped": self.mind.sight_only_skipped,
             "sense_restarts": sense_restarts, "snapshots": self.mind.snapshot_count,
             "last_seq": self.mind.last_seq, "mind_ms_median_1min": (statistics.median(recent) if recent else None),

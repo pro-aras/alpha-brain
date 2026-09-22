@@ -340,8 +340,12 @@ class TestSitLiveWiring(unittest.TestCase):
             # SIT's own cadence only re-checks on the NEXT multiple of every_canvases (exactly like EXAM's
             # own voice_loop) -- a live ledger keeps advancing; this test advances it by hand to cross the
             # next boundary (canvas_count 10 -> 25, since every_canvases=5).
-            (root / "state" / "ledger.json").write_text(json.dumps({"moments": 100}))
+            # edit: Claude (Fable 5.1), 2026-09-22 12:35 +0400 — the newer FILE lands BEFORE the ledger crosses the boundary: with a 50 ms poll the
+            # sense could consume the boundary between the two writes (ledger first, file second) and, with no further boundary in this test,
+            # never publish the second score — 1 != 2 in 3 of 4 full-suite runs today, always green alone. In a life the same race only delays a
+            # score to the next boundary (500 canvases on). The order below is the live order too: the exam writes its file, the ledger advances.
             (exam_dir / "2026-09-21T000002Z.json").write_text(json.dumps({"ask_seen_words": {"Q1": {"acc": 0.60}}}))
+            (root / "state" / "ledger.json").write_text(json.dumps({"moments": 100}))
             deadline = time.time() + 5.0
             while len(published) < 2 and time.time() < deadline:
                 time.sleep(0.05)

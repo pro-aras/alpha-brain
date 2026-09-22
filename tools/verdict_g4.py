@@ -415,20 +415,17 @@ def modulation(G: dict, F: float, regime_step: int = 100) -> dict:
             errs = [q["err"] for q in w0[m:] if q["word"] == t][:3]
             if len(errs) == 3: per[t] = round(float(np.median(errs)) / last50, 2) if last50 > 0 else None
         out["null_fake_boundary_w0"] = {"at_seq": int(w0[m]["seq"]), "last50_med": round(last50, 4), "spike_ratio_per_thing": per,
-                                        "no_spike": all(v is not None and v < 1.5 for v in per.values()) if per else None,
-                                        "no_spike_regime": (all(v is not None and v < reg["null_band_95"] for v in per.values()) if per else None) if reg["null_band_95"] is not None else None}
+                                        "no_spike": all(v is not None and v < 1.5 for v in per.values()) if per else None,   # the §16 record, kept as recorded
+                                        # §18 addendum 4 (b2): the graded null clears by MAJORITY under the p95 band (all() failed by construction ~43 % of the time)
+                                        "no_spike_regime": null_clears(per, reg["null_band_95"])[0],
+                                        "share_under_band_regime": null_clears(per, reg["null_band_95"])[1]}
     # grading: at every window that brings NEW things — majority of the new things spike AND settle (B13's reading, §12)
-    graded = []          # §16 fixed-bar reading — the record; §18's FAIL prediction stands against these numbers
-    graded_regime = []   # §18 addendum 3 — the regime-derived reading; the top-level verdict grades on THIS from here on
-    for w, rec in out["windows"].items():
-        news = [v for v in rec["per_thing"].values() if v["kind"] == "new"]
-        if not news: continue
-        sp = sum(v["spike"] for v in news); st = sum(v["settled"] for v in news)
-        graded.append({"window": w, "new": len(news), "spike": sp, "settled": st, "pass": sp * 2 > len(news) and st * 2 > len(news)})
-        spr = sum(v["spike_regime"] for v in news); str_ = sum(v["settled_regime"] for v in news)
-        graded_regime.append({"window": w, "new": len(news), "spike": spr, "settled": str_, "pass": spr * 2 > len(news) and str_ * 2 > len(news)})
+    # §16 fixed-bar reading — the record; §18 addendum 3 — the regime-derived reading (the top-level verdict grades on it); §18 addendum 4
+    # (2026-09-22) — a window whose new things never reached 10 showings (the plant's window) is NOT GRADABLE, never FAIL
+    graded, graded_regime, skipped = grade_modulation_windows(out["windows"])
     out["graded_windows"] = graded
     out["graded_windows_regime"] = graded_regime
+    out["not_gradable_windows"] = skipped
     nb = out.get("null_fake_boundary_w0", {}) or {}
     out["pass_fixed_bars_record"] = bool(graded) and all(x["pass"] for x in graded) and bool(nb.get("no_spike"))
     out["pass"] = bool(graded_regime) and all(x["pass"] for x in graded_regime) and bool(nb.get("no_spike_regime"))
@@ -573,10 +570,11 @@ def main(argv: List[str]) -> int:
     M["iii_growth_matters"] = {"pass": q("T-frozen-10") is not None and q("T-frozen-10") <= Q1_ALL - .30, "T_frozen_10_Q1": q("T-frozen-10"), "T_frozen_50_Q1": q("blind-frozen"),
                                "T_frozen_10_cells": TW.get("T-frozen-10", {}).get("cells"), "Q1": Q1_ALL, "bar": "≥ 30 pp under on all 16 words (the twin FROZEN after 10 cells, G0b's; the 50-cell twin printed — §16 addenda)"}
     c = U["c"]; pruned_share = c["edges_pruned"] / c["edges_born"] if c["edges_born"] else 0.0
-    M["iv_grows_alone"] = {"pass": U["cells_born"] >= 50 and c["births_refused_budget"] == 0 and pruned_share >= .05 and c["removed_for_disuse"] == 0,
-                           "cells_born": U["cells_born"], "births_refused_budget": c["births_refused_budget"], "arrivals": U["arrivals"], "budget_left": U["budget_left"],
+    refused = iv_refusals(c)   # §18 addendum 4 (2026-09-22): every CAP refusal counts — budget, nmax, frozen; redundant printed only
+    M["iv_grows_alone"] = {"pass": U["cells_born"] >= 50 and refused["caps_total"] == 0 and pruned_share >= .05 and c["removed_for_disuse"] == 0,
+                           "cells_born": U["cells_born"], "births_refused_budget": c["births_refused_budget"], "refused": refused, "arrivals": U["arrivals"], "budget_left": U["budget_left"],
                            "pruned_share": round(pruned_share, 4), "edges_born": c["edges_born"], "edges_pruned": c["edges_pruned"], "edges_cross": U["edges_cross"],
-                           "removed_for_disuse": c["removed_for_disuse"], "bar": "≥ 50 born · 0 refused · ≥ 5 % pruned · 0 by disuse"}
+                           "removed_for_disuse": c["removed_for_disuse"], "bar": "≥ 50 born · 0 refused at ANY cap (budget · nmax · frozen; §18 add. 4) · ≥ 5 % pruned · 0 by disuse"}
     # (v) §15's pair: per odd window, the LAST exam inside it vs the LAST exam of the preceding even window, Q1 on the seen eleven
     seq_at = {r["seq"]: r for r in G["tape"]}
     def window_of(ex):
@@ -692,7 +690,7 @@ def main(argv: List[str]) -> int:
         ok = (len(eligible) >= 5) and not wrong and (len(reached) >= 5)
         return {"eligible_words": len(eligible), "words": len(words), "own_cells": {w: len(own[w]) for w in words}, "rules": per_rule,
                 "wrong_cell_rules": len(wrong), "words_with_rules": len(reached), "reached": reached, "ok": ok,
-                "reason": "" if ok else f" VOID by the wiring: rules reached {len(reached)} of {len(eligible)} eligible words (floor 5); {len(wrong)} rule(s) from another word's cells"}
+                "reason": "" if ok else w3_2_reason(len(eligible), len(reached), wrong)}   # §18 add. 4: the reason names the clause that failed
     cluster_ctl = _cluster_control(root)
     think_rows = [r for r in G["mind"] if "think" in r]
     parked_rules = sum(1 for r in think_rows if (r["think"] or {}).get("kind") == "rule" and (r["think"] or {}).get("parked"))
@@ -802,6 +800,61 @@ def w3_1_beliefs(bel_rows: List[dict], decl: dict, heard: Sequence[str]) -> dict
                    "life 2's 1,473 unnamed rows fail) · revisits > 0 · clashes reported"}
 
 
+def grade_modulation_windows(windows: dict, min_showings: int = 10):
+    """PREREG §18 addendum 4 (2026-09-22): a window is graded over the NEW things that reached `min_showings` showings — «settled by
+    the 10th showing» cannot be read on a thing shown fewer times (the PLANT is shown 5 times by design; on every rung of the ladder
+    window 3's only new thing was the plant and the mark read FAIL on a bar above its ceiling, #228 (b)). A window whose new things
+    ALL fall under the floor is reported NOT GRADABLE (skipped), never FAIL. Returns (graded_fixed, graded_regime, skipped)."""
+    graded, graded_regime, skipped = [], [], []
+    for w, rec in windows.items():
+        news_all = {t: v for t, v in rec["per_thing"].items() if v["kind"] == "new"}
+        if not news_all:
+            continue
+        news = [v for v in news_all.values() if v.get("n_showings", 0) >= min_showings]
+        if not news:
+            skipped.append({"window": w, "new": len(news_all), "new_under_min": sorted(news_all), "gradable": False,
+                            "reason": f"no new thing reached {min_showings} showings (the plant is shown 5 times by design) — settle cannot be read; not gradable"})
+            continue
+        sp = sum(v["spike"] for v in news); st = sum(v["settled"] for v in news)
+        graded.append({"window": w, "new": len(news), "spike": sp, "settled": st, "pass": sp * 2 > len(news) and st * 2 > len(news)})
+        spr = sum(v["spike_regime"] for v in news); str_ = sum(v["settled_regime"] for v in news)
+        graded_regime.append({"window": w, "new": len(news), "spike": spr, "settled": str_, "pass": spr * 2 > len(news) and str_ * 2 > len(news)})
+    return graded, graded_regime, skipped
+
+
+def null_clears(per: dict, band):
+    """§18 addendum 4 (b2): the fake-boundary NULL clears when the MAJORITY of continuing things' spike ratios sit under the regime band
+    (the spike rule's own majority). The band is the 95th percentile of exactly these ratios, so `all()` over eleven things failed by
+    construction ~43 % of the time (L1: ten of eleven under 2.27, «wave» 3.73). Returns (pass, share_under_band); (None, None) when
+    there is no band or nothing to read."""
+    vals = [v for v in per.values() if v is not None] if per else []
+    if band is None or not vals:
+        return None, None
+    share = sum(1 for v in vals if v < band) / len(vals)
+    return share > 0.5, share
+
+
+def iv_refusals(c: dict) -> dict:
+    """(iv)'s refusals, §18 addendum 4: every CAP refusal counts (budget · nmax · frozen); `redundant` is the ordinary no-birth path and is
+    printed only. g5-seam-1 refused 1,988 births at NMAX (its 2,000 sight ids spent by hour ~6) while the old bar read `births_refused_budget`
+    alone and PASSED — the plant could not be learned and no surface said so."""
+    b = int(c.get("births_refused_budget", 0)); n = int(c.get("births_refused_nmax", 0)); f = int(c.get("births_refused_frozen", 0))
+    return {"budget": b, "nmax": n, "frozen": f, "redundant": int(c.get("births_refused_redundant", 0)), "caps_total": b + n + f}
+
+
+def w3_2_reason(eligible_n: int, reached_n: int, wrong: list) -> str:
+    """The W3-2 cluster control's reason names the clause that failed (§18 addendum 4): «VOID by the wiring» is the REACH floor only
+    (life 3a's shape — one word of 21 by a coincidence of ids); a cluster under .5 own share is a real reading of the rules."""
+    fails = []
+    if eligible_n < 5:
+        fails.append(f"fewer than 5 eligible words ({eligible_n})")
+    if reached_n < 5:
+        return f" VOID by the wiring: rules reached {reached_n} of {eligible_n} eligible words (floor 5)" + (f"; {len(wrong)} rule(s) under .5 own share" if wrong else "")
+    if wrong:
+        fails.append("own-cells clause: " + ", ".join(f"{x['word']} {x['own_share']:.3f}" for x in wrong) + " (bar .5 of the word's own cells)")
+    return (" FAIL on the " + "; ".join(fails)) if fails else ""
+
+
 def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns) -> dict:
     """(viii) COST, G4-7, in ONE unit (#162 — found 2026-09-22 on the six 2 h smokes: STATUS.mind_ms_median_1min is the median of
     `mind.consume(row)` over EVERY tape row — ear, outcome, body rows included — while the probe is all rows' time ÷ CANVASES; 0.168 ms
@@ -834,7 +887,7 @@ def write_verdict(out: Path, R: dict) -> None:
     i = M["i_knows"]; L.append(f"| (i) | {i['bar']} | Q1 {i['Q1']:.3f} Q2 {i['Q2']:.3f} Q3 {i['Q3']:.3f} Q4 {i['Q4']:.3f} (chance {i['chance_Q1']}; all words Q1 {i['all_words']['Q1']:.3f}) | {pf(i['pass'])} |")
     m = M["ii_meeting_real"]; L.append(f"| (ii) | {m['bar']} (all 16 words) | T-shuffle Q1 {m['T_shuffle_Q1']} · T-nowire Q1 {m['T_nowire_Q1']} | {pf(m['pass'])} |")
     m = M["iii_growth_matters"]; L.append(f"| (iii) | {m['bar']} | T-frozen-10 Q1 {m['T_frozen_10_Q1']} (cells {m['T_frozen_10_cells']}) vs Q1 {m['Q1']:.3f}; the 50-cell twin {m['T_frozen_50_Q1']} | {pf(m['pass'])} |")
-    m = M["iv_grows_alone"]; L.append(f"| (iv) | {m['bar']} | born {m['cells_born']} · refused {m['births_refused_budget']} (arrivals {m['arrivals']}, budget left {m['budget_left']}) · pruned {m['edges_pruned']}/{m['edges_born']} = {100*m['pruned_share']:.1f} % (cross-thing born {m['edges_cross']['born']} / pruned {m['edges_cross']['pruned']}) · disuse {m['removed_for_disuse']} | {pf(m['pass'])} |")
+    m = M["iv_grows_alone"]; L.append(f"| (iv) | {m['bar']} | born {m['cells_born']} · refused at caps {m['refused']['caps_total']} (budget {m['refused']['budget']} · nmax {m['refused']['nmax']} · frozen {m['refused']['frozen']}; redundant {m['refused']['redundant']}, not a refusal) (arrivals {m['arrivals']}, budget left {m['budget_left']}) · pruned {m['edges_pruned']}/{m['edges_born']} = {100*m['pruned_share']:.1f} % (cross-thing born {m['edges_cross']['born']} / pruned {m['edges_cross']['pruned']}) · disuse {m['removed_for_disuse']} | {pf(m['pass'])} |")
     m = M["v_retention"]; L.append(f"| (v) | {m['bar']} | " + ("; ".join(f"w{p['window']}: {p['before']:.3f} → first {p['first_after']:.3f} → last {p['last_in_window']:.3f} ({p['drop_pp']:+.1f} pp drop)" for p in m['pairs']) or m['note']) + f" | {pf(m['pass'])} |")
     m = M["vi_knows_unknown"]; L.append(f"| (vi) | {m['bar']} | plant zog answered {m['plant_zog']['answered_rate']:.2f} (as {m['plant_zog']['answered_as']}, abstain {m['plant_zog']['abstain']}) · null vex abstains {m['null_vex']['abstain_rate']:.2f} (answered as {m['null_vex']['answered_as']}) · Q5 {m['Q5_spiral_abstain']:.2f} · false {m['false_abstention']:.3f} | {pf(m['pass'])} |")
     m = M["viii_cost"]; L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo {m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
@@ -845,6 +898,7 @@ def write_verdict(out: Path, R: dict) -> None:
     m = M["MODULATION"]; reg = m.get("regime", {}) or {}; nb = m.get("null_fake_boundary_w0", {}) or {}
     L.append(f"| MODULATION | {m['bar']} | windows(regime) {m.get('graded_windows_regime')} · windows(fixed) {m['graded_windows']} · null(regime) {nb.get('no_spike_regime')} · null(fixed) {nb.get('no_spike')} "
              f"· regime band {reg.get('null_band_95')} (n={reg.get('null_ratio_samples')}, share {reg.get('null_share_within_band')}) · regime settle bar {reg.get('settle_bar_err_95')} "
+             f"· not gradable (§18 add. 4: no new thing reached 10 showings) {m.get('not_gradable_windows')} "
              f"· no-predict twin max err {m['no_predict_twin_err']} · fixed-bar record {pf(m.get('pass_fixed_bars_record'))} · {m.get('reason','')} | {pf(m['pass'])} |")
     L.append(f"| TWINS random-gaze | loses (xi) | margin {M['TWINS']['random_gaze_loses_xi']['margin']} | {pf(M['TWINS']['random_gaze_loses_xi']['pass'])} |")
     def gv(m): return ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"
