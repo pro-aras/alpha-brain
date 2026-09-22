@@ -367,6 +367,12 @@ class Body:
             "think_wait_ms": round(float(getattr(self.mind, "think_wait_ms", 0.0)), 3),
             "think_ms_last": (round(float(v), 3) if (v := getattr(self.mind, "think_ms_last", None)) is not None else None),
             "think_ms_median": (round(float(v), 3) if (v := self.mind.think_ms_median()) is not None else None),
+            # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE):
+            # the mind computes these (creature/mind.py:_consume_proposal/_maybe_adopt_evolve_proposal) and
+            # nothing exported them (#163's class) — on EVERY write (#164), 0 on a genome that never
+            # declares EVOLVE.
+            "evolve_epoch": int(getattr(self.mind, "evolve_epoch", 0)),
+            "evolve_proposals_seen": int(getattr(self.mind, "evolve_proposals_seen", 0)),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:
@@ -435,6 +441,19 @@ def _declared_game_config(declared: Dict[str, dict]) -> Optional[Dict[str, objec
     if not game_sense.GAME_DOOR_GATED:
         return None
     return declared.get("WORLD_GAME")
+
+
+# edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE): the
+# worker's own arming, mirroring _declared_game_config's own shape and gate discipline exactly.
+def _declared_evolve_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """EVOLVE undeclared -> None (arms nothing). EVOLVE declared -> its own parsed dict, gated on
+    creature.senses.evolve.EVOLVE_DOOR_GATED so a genome line arms nothing until the code carrying it
+    exists (the same "flip the constant, not the live creature" discipline C2/C3/G5-L used for the
+    folder/game doors)."""
+    from .senses import evolve as evolve_sense   # lazily, same discipline as folder/game above
+    if not evolve_sense.EVOLVE_DOOR_GATED:
+        return None
+    return declared.get("EVOLVE")
 
 
 # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:41 +0400 — LIFE-D-ACT-SOUND.md item 1 (L-8): the
@@ -588,6 +607,21 @@ def main(argv: List[str]) -> int:
         gfn = functools.partial(game_sense.sense, door_dir=game_door_dir, root=root, canvas=canvas, poll_period=0.5)
         body.add_sense("game", gfn)
 
+    # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6: the EVOLVE
+    # worker, armed from declared['EVOLVE'] behind EVOLVE_DOOR_GATED — the SAME shape the game door above
+    # uses (a subprocess worker `tools/evolve.py` + an in-process sense thread that republishes its
+    # PROPOSAL-<n>.json files onto the tape).
+    evolve_cfg = _declared_evolve_config(declared)
+    evolve_proc = None
+    evolve_stop_file = None
+    if evolve_cfg is not None:
+        from .senses import evolve as evolve_sense
+        evolve_stop_file = root / "evolve" / "STOP"
+        evolve_stop_file.parent.mkdir(parents=True, exist_ok=True)
+        evolve_proc = evolve_sense.start_worker(root, genome_path, evolve_stop_file)
+        efn = functools.partial(evolve_sense.sense, root=root, poll_period=5.0)
+        body.add_sense("evolve", efn)
+
     body.start()
     stop_requested = threading.Event()
 
@@ -604,6 +638,9 @@ def main(argv: List[str]) -> int:
         if game_proc is not None:
             from .senses import game as game_sense
             game_sense.stop_worker(game_proc, stop_file=game_stop_file)
+        if evolve_proc is not None:
+            from .senses import evolve as evolve_sense
+            evolve_sense.stop_worker(evolve_proc, stop_file=evolve_stop_file)
     return 0
 
 

@@ -34,10 +34,29 @@ finding, kept as an explicit row rather than a bare absence so the next reader s
 
 `unwired(declared)` is the law `Mind.__init__` runs first: any key in a parsed genome's `declared` dict
 that names no wired gene (RUNS entry with a non-None site) is named in the refusal.
+
+# edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE): BOUNDS,
+# below RUNS/unwired. One table naming EVERY numeric gene value `genome/machinery.py`'s parser reads,
+# `[lo, hi]` + the step (int, or float with the decimal count the parser prints back). Genes that change a
+# MOMENT's shape or an ARRAY's shape are EXCLUDED, named with the reason (the advisor's amendment, brief
+# ALPHA4-J.md item 1, 2026-09-23 00:34 +0400): mutating one of these would change what a persisted episode
+# ring/journal row/W-matrix MEANS mid-life, which no replay-identity law here defends against — only RATES
+# and THRESHOLDS are mutated. Two more are excluded on a narrower, documented reading of the same brief
+# clause: PARK's "after" and INDUCE's "from" were named in the brief's own first (pre-exclusion) list of
+# "every numeric gene value the parser reads", but its FINAL sentence ("Mutate RATES and THRESHOLDS only:
+# theta_n, DELTA lr, KWTA, BUDGET per arrival and its regen, SLEEP every/replay, THINK every, PRUNE
+# w/chances, MERGE cos, ABSTAIN ratio, CURIOSITY interests, SCALE every, BIRTH misfires, PARK after") does
+# not mention INDUCE at all, and FROZEN's own RUNS row below already marks it TWIN-ONLY (never read from a
+# live genome — mutating it would change nothing a live proposal could ever grade). Read conservatively:
+# PARK after IS in the final list (kept, mutable); INDUCE from is NOT (excluded here, named, not silently
+# dropped) — raised in the builder report as an interpretation, not a silent guess.
 """
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+import re
+from typing import Dict, List, Optional, Tuple
+
+import numpy as np
 
 
 RUNS: Dict[str, Dict[str, Optional[str]]] = {
@@ -151,6 +170,16 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "HANDS": "creature/mind.py:Mind.__init__ (self._hands_jail_path/_hands_shelf_dir resolved) + Mind._think_pool/_think_work ('hands' pool kind chooses a program) + Mind._maybe_think (writes run/hands/ACT) + creature/body.py:Body.start (declared['HANDS'] read via _declared_hands_config; starts creature/senses/hands.py:sense behind HANDS_DOOR_GATED)",
         "SENSE_TOUCH": "creature/mind.py:Mind.__init__ (self.touch_episodes built) + Mind._consume_touch (trait decoded, written to the dedicated ring, journaled)",
         "SENSE_SMELL": "creature/mind.py:Mind.__init__ (self.smell_episodes built) + Mind._consume_smell (trait decoded, written to the dedicated ring, journaled)",
+        # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6: EVOLVE. Real call
+        # sites: Mind._consume_proposal (a 'proposal' tape row, gated on EVOLVE's own declared presence, records the
+        # latest not-yet-adopted PASS proposal) + Mind._maybe_sleep's adoption branch (writes GENOME.v<n>.genome,
+        # re-parses self.genome/self.org.g, journals the epoch row) + Mind.resume (epoch-aware: resolves the latest
+        # GENOME.v<n>.genome under root instead of the launch genome_path). creature/body.py:main arms the worker
+        # (tools/evolve.py, a subprocess) and creature/senses/evolve.py's sense thread (publishes PROPOSAL-<n>.json
+        # files as 'proposal' tape rows) behind EVOLVE's own declared presence, the same C2/C3 gate discipline
+        # WORLD_GAME/HANDS use.
+        "EVOLVE": "creature/mind.py:Mind._consume_proposal + Mind._maybe_sleep (adoption) + Mind.resume (epoch-aware) "
+                  "+ creature/body.py:main (arms tools/evolve.py + creature/senses/evolve.py) + tools/evolve.py (the shadow/twin replay + grading)",
     },
 }
 
@@ -162,3 +191,161 @@ def unwired(declared: Dict[str, dict]) -> List[str]:
     claims a site for it, so `wired` below never contains it."""
     wired = {gene for layer in RUNS.values() for gene, site in layer.items() if site is not None}
     return sorted(gene for gene in declared if gene not in wired)
+
+
+# ============================================================================ ALPHA4-PREREG.md §6: BOUNDS
+# edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400.
+#
+# Each MUTABLE entry: {"lo", "hi", "kind" ("int"|"float"), "decimals" (float only — the decimal count the
+# genome text already carries, so a mutant line reads exactly like a hand-written one), "pattern" (a
+# MULTILINE regex over the RAW genome TEXT — comments included — with group(1) the fixed text up to and
+# including the number's own left edge, and group(2) everything AFTER the number to end of line, `.*`
+# greedy so a trailing clause this builder has never seen — G's future "; regenerate …" on BUDGET, per the
+# advisor's own example — survives untouched: only the number between the two groups is replaced).
+#
+# Each EXCLUDED entry carries "excluded": True and "reason" — named, never silently dropped, per the
+# brief's own instruction.
+_NUM_RE = r"-?\d+(?:\.\d+)?"
+
+BOUNDS: Dict[str, dict] = {
+    # ---- mutable: RATES and THRESHOLDS only (brief ALPHA4-J.md item 1's final sentence) ----
+    "BIRTH.theta_n": {
+        "lo": 0.85, "hi": 0.99, "kind": "float", "decimals": 3,
+        "pattern": re.compile(r"^(BIRTH\s+novelty\s+cos<)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "BIRTH novelty cos<THETA_N — the brief's own planted-bad value (0.5) is deliberately OUTSIDE this band",
+    },
+    "BIRTH.misfires": {
+        "lo": 1, "hi": 8, "kind": "int",
+        "pattern": re.compile(r"^(BIRTH\s+error\s+misfires\s+)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "BIRTH error misfires N",
+    },
+    "DELTA.lr": {
+        "lo": 0.01, "hi": 0.2, "kind": "float", "decimals": 2,
+        "pattern": re.compile(r"^(DELTA\s+lr\s+)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "DELTA lr F",
+    },
+    "KWTA.k": {
+        "lo": 2, "hi": 10, "kind": "int",
+        "pattern": re.compile(r"^(KWTA\s+)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "KWTA N",
+    },
+    "BUDGET.per_arrival": {
+        "lo": 100, "hi": 800, "kind": "int",
+        "pattern": re.compile(r"^(BUDGET\s+)" + _NUM_RE + r"(\s+per\s+arrival.*)$", re.MULTILINE),
+        "note": "BUDGET N per arrival — the regen clause (builder G, ALPHA4-PREREG §3) is not in this "
+                "worktree's grammar; the suffix group's trailing `.*` preserves it untouched once it lands",
+    },
+    "SLEEP.every": {
+        "lo": 500, "hi": 5000, "kind": "int",
+        "pattern": re.compile(r"^(SLEEP\s+every\s+)" + _NUM_RE + r"(\s+moments\s+replay.*)$", re.MULTILINE),
+        "note": "SLEEP every N moments replay M by surprise",
+    },
+    "SLEEP.replay": {
+        "lo": 50, "hi": 500, "kind": "int",
+        "pattern": re.compile(r"^(SLEEP\s+every\s+" + _NUM_RE + r"\s+moments\s+replay\s+)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "SLEEP every N moments replay M by surprise",
+    },
+    "THINK.every": {
+        "lo": 2, "hi": 50, "kind": "int",
+        "pattern": re.compile(r"^(THINK\s+every\s+)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "THINK every N canvases[; on its own thread; lands next boundary] — the optional tail survives via the suffix group",
+    },
+    "PRUNE.floor": {
+        "lo": 0.005, "hi": 0.1, "kind": "float", "decimals": 2,
+        "pattern": re.compile(r"^(PRUNE\s+w<)" + _NUM_RE + r"(\s+after\s+.*)$", re.MULTILINE),
+        "note": "PRUNE w<F after N chances",
+    },
+    "PRUNE.chances": {
+        "lo": 1, "hi": 10, "kind": "int",
+        "pattern": re.compile(r"^(PRUNE\s+w<" + _NUM_RE + r"\s+after\s+)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "PRUNE w<F after N chances",
+    },
+    "MERGE.theta_m": {
+        "lo": 0.98, "hi": 0.999, "kind": "float", "decimals": 4,
+        "pattern": re.compile(r"^(MERGE\s+cos>)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "MERGE cos>THETA_M same-answer",
+    },
+    "ABSTAIN.ratio": {
+        "lo": 0.5, "hi": 0.98, "kind": "float", "decimals": 2,
+        "pattern": re.compile(r"^(ABSTAIN\s+second/best\s*>\s*)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "ABSTAIN second/best > F — the ratio form only (the margin form, ABSTAIN margin cos<M, is a "
+                "different sub-gene; LIFE.genome/ALPHA4.genome both use the ratio form)",
+    },
+    "CURIOSITY.interests": {
+        "lo": 10, "hi": 200, "kind": "int",
+        "pattern": re.compile(r"^(CURIOSITY\s+interests\s+)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "CURIOSITY interests N operators … — genome/curiosity.py's Interests.n is a SOFT POPULATION "
+                "CAP on a plain dict, never an array size (checked against the source, not assumed)",
+    },
+    "SCALE.every": {
+        "lo": 200, "hi": 5000, "kind": "int",
+        "pattern": re.compile(r"^(SCALE\s+every\s+)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "SCALE every N moments",
+    },
+    "PARK.after": {
+        "lo": 1, "hi": 10, "kind": "int",
+        "pattern": re.compile(r"^(PARK\s+after\s+)" + _NUM_RE + r"(.*)$", re.MULTILINE),
+        "note": "PARK after N identical dead-ends … — genome/park.py's Park.n gates a plain dict counter, never an array size",
+    },
+    # ---- excluded: shape genes (the advisor's amendment) ----
+    "GAZE.fixations": {"excluded": True, "reason": "moments per canvas — exam.py:66 divides by it; every 'every N canvases' cadence depends on it; the episode ring's keys change meaning"},
+    "GAZE.grid": {"excluded": True, "reason": "the fixation grid — an array-shape gene of the same GAZE line"},
+    "GAZE.canvas": {"excluded": True, "reason": "the canvas side — an array-shape gene of the same GAZE line"},
+    "GAZE.glance": {"excluded": True, "reason": "the glance window side — an array-shape gene of the same GAZE line"},
+    "SENSE.ear_letters": {"excluded": True, "reason": "words_dim() = ear_letters * 26|27 — a sight/words AREA dimension"},
+    "RETINA": {"excluded": True, "reason": "the fixed front's own step list — sight_dim() depends on it structurally"},
+    "FAST.episodes": {"excluded": True, "reason": "the episode ring's own size — a persisted array shape"},
+    "HEBB.window": {"excluded": True, "reason": "the window IS one moment by construction (machinery.py's own comment); any other value refuses"},
+    "SENSE.colour": {"excluded": True, "reason": "sight_dim() += 32 when declared — an AREA dimension"},
+    "EXAM.every": {"excluded": True, "reason": "the judge's own window — PREREG §2: judges are sealed, never mutated in-life"},
+    "SIT.every": {"excluded": True, "reason": "the judge's own window — PREREG §2: judges are sealed, never mutated in-life"},
+    "STAGE": {"excluded": True, "reason": "developmental stage boundaries — a moment's own meaning (senses/meet/nursery/world) changes at these, not a rate"},
+    # ---- excluded: read conservatively from the brief's own final ("mutate only") list (see module docstring) ----
+    "PARK.reopen_kinds": {"excluded": True, "reason": "not a number — 'reopen on new-sense' is a fixed literal the parser accepts, nothing to mutate"},
+    "FROZEN.after": {"excluded": True, "reason": "creature/genes.py RUNS['mind']['FROZEN'] is TWIN-ONLY (read only when 'frozen' in blind) — a live genome never reads it, so a live proposal could never grade a mutation of it"},
+    "INDUCE.from_episodes": {"excluded": True, "reason": "named in the brief's own first (pre-exclusion) list but absent from its final 'Mutate RATES and THRESHOLDS only' sentence — read conservatively as not included (raised in the report, not silently guessed)"},
+}
+
+MUTABLE_KEYS: Tuple[str, ...] = tuple(sorted(k for k, v in BOUNDS.items() if not v.get("excluded")))
+
+
+def draw_mutation(seed: int, epoch: int, proposal_no: int) -> Tuple[str, object]:
+    """ALPHA4-PREREG.md §6: "one numeric gene moved within genes.py BOUNDS by the mind's own rng seeded on
+    (SEED, epoch)" — the brief's own item 1 adds `proposal_no` as a third stream key so two proposals filed
+    within the same epoch (a refused one, then a retry) never draw the same mutation. `np.random.default_
+    rng` with an integer sequence seed is deterministic across processes/machines — the SAME triple always
+    draws the SAME (gene, value), which is what makes a replay of a 'proposal' tape row reproduce the exact
+    mutant text without the mutant text itself needing to be re-derived (it is carried verbatim on the row
+    regardless — this function is what PRODUCES that text the first time, at the worker)."""
+    rng = np.random.default_rng([int(seed), int(epoch), int(proposal_no)])
+    key = MUTABLE_KEYS[int(rng.integers(0, len(MUTABLE_KEYS)))]
+    spec = BOUNDS[key]
+    if spec["kind"] == "int":
+        value: object = int(rng.integers(int(spec["lo"]), int(spec["hi"]) + 1))
+    else:
+        value = round(float(rng.uniform(spec["lo"], spec["hi"])), int(spec["decimals"]))
+    return key, value
+
+
+def apply_mutation(text: str, key: str, value: object) -> str:
+    """One gene, one value, substituted into the genome TEXT (never a dict — brief item 1: "the mutant TEXT
+    is what is stored"). `pattern.subn` with `count=1` — a pattern that matches zero or more than once
+    raises, naming the count, rather than silently mutating the wrong line or every line."""
+    spec = BOUNDS.get(key)
+    if spec is None or spec.get("excluded"):
+        raise ValueError(f"EVOLVE: {key!r} is not a mutable BOUNDS entry ({(spec or {}).get('reason', 'unknown key')})")
+    kind = spec["kind"]
+    val_str = str(int(round(value))) if kind == "int" else f"{float(value):.{int(spec['decimals'])}f}"
+    pattern = spec["pattern"]
+    new_text, n = pattern.subn(lambda m: m.group(1) + val_str + m.group(2), text, count=1)
+    if n != 1:
+        raise ValueError(f"EVOLVE: BOUNDS[{key!r}]'s pattern matched {n} times in the genome text (need exactly 1)")
+    return new_text
+
+
+def mutate_genome_text(text: str, seed: int, epoch: int, proposal_no: int) -> Tuple[str, str, object]:
+    """Draw one (gene, value) deterministically (SEED, epoch, proposal_no) and apply it to `text`. Returns
+    (mutant_text, gene_key, value) — the worker publishes all three on the proposal row (brief item 2's
+    payload shape) so a reader never has to re-derive the value from the rng to know what changed."""
+    key, value = draw_mutation(seed, epoch, proposal_no)
+    return apply_mutation(text, key, value), key, value

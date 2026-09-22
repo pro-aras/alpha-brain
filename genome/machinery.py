@@ -513,6 +513,17 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"from body; beliefs about itself; skip thinks when backlog > (\d+)", a)
                 if not m: raise GenomeError(f"SELF: cannot read {a!r} (L-9: SELF from body; beliefs about itself; skip thinks when backlog > <n>)")
                 g["declared"]["SELF"] = {"backlog_threshold": int(m.group(1))}
+            # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §3/§6: EVOLVE
+            # every <n> h; mutate 1 gene within bounds; judge on the last <m> h; adopt at sleep under the regression
+            # bar. Every clause but the two integers is a fixed literal (matching CRASH/ASK's own strict-literal
+            # discipline) — the mechanism this line names is exactly and only ALPHA4-PREREG.md §6, so a genome
+            # cannot silently ask for a DIFFERENT evolve mechanism by writing different words here.
+            elif gene == "EVOLVE":
+                m = re.fullmatch(r"every (\d+) h; mutate 1 gene within bounds; judge on the last (\d+) h; "
+                                  r"adopt at sleep under the regression bar", a)
+                if not m: raise GenomeError(f"EVOLVE: cannot read {a!r} (§6: EVOLVE every <n> h; mutate 1 gene "
+                                             f"within bounds; judge on the last <m> h; adopt at sleep under the regression bar)")
+                g["declared"]["EVOLVE"] = {"every_h": int(m.group(1)), "judge_h": int(m.group(2))}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:

@@ -302,5 +302,77 @@ class ThreadMark(unittest.TestCase):
         self.assertFalse(thread_mark({"max_gap_s_eye_ear": [1.0]}, {"thinks": 100, "think_waits": 6}, True)["pass"])          # waits 6 % ≥ 5 %
 
 
+# edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §5/§6: EVOLVE against
+# tools/evolve.py's own proposal/epoch shapes (never re-implemented -- the same fixture-shape convention
+# every class above uses).
+def _proposal_row(seq, no, verdict, paired=True):
+    meta = {"no": no, "verdict": verdict}
+    if paired:
+        meta.update(incumbent={"q1_seen": 0.9}, mutant={"q1_seen": 0.95 if verdict == "PASS" else 0.85})
+    return {"seq": seq, "sense": "proposal", "meta": meta}
+
+
+def _epoch_row(seq, epoch, sha="a" * 64, gene="KWTA.k"):
+    return {"seq": seq, "epoch": {"epoch": epoch, "genome_sha": sha, "moment": seq * 10, "gene": gene, "value": 7}}
+
+
+class EvolveMark(unittest.TestCase):
+    def test_not_gradable_without_the_gene_or_under_zero_hours(self):
+        from tools.verdict_life import evolve_mark
+        self.assertFalse(evolve_mark([], [], False, 24.0)["graded"])
+        self.assertFalse(evolve_mark([], [], True, 0.0)["graded"])
+
+    def test_needed_count_scales_with_hours(self):
+        from tools.verdict_life import evolve_mark
+        m = evolve_mark([], [], True, 2.0)
+        self.assertTrue(m["graded"])
+        self.assertEqual(m["needed"], 1)   # max(1, round(3 * 2/24)) = 1
+        self.assertFalse(m["pass"])        # 0 proposals < 1 needed
+
+    def test_graded_pass_with_enough_paired_proposals_and_fewer_adoptions(self) -> None:
+        from tools.verdict_life import evolve_mark
+        tape = [_proposal_row(i, i, "PASS" if i % 2 else "REFUSED") for i in range(1, 4)]
+        journal = [_epoch_row(2, 1)]   # only the PASS proposals (2 of them) COULD have adopted; 1 <= 3 proposals
+        m = evolve_mark(tape, journal, True, 24.0)
+        self.assertTrue(m["graded"])
+        self.assertEqual(m["proposals"], 3)
+        self.assertEqual(m["paired_readings"], 3)
+        self.assertEqual(m["adoptions"], 1)
+        self.assertTrue(m["pass"])
+        self.assertEqual(m["epoch_events"][0]["gene"], "KWTA.k")
+
+    def test_more_adoptions_than_proposals_fails(self) -> None:
+        from tools.verdict_life import evolve_mark
+        tape = [_proposal_row(1, 1, "PASS")]
+        journal = [_epoch_row(2, 1), _epoch_row(3, 2)]   # 2 adoptions from 1 proposal -- impossible, must fail
+        m = evolve_mark(tape, journal, True, 24.0)
+        self.assertTrue(m["graded"])
+        self.assertFalse(m["pass"])
+
+    def test_an_unpaired_proposal_fails(self) -> None:
+        from tools.verdict_life import evolve_mark
+        tape = [_proposal_row(1, 1, "PASS", paired=False), _proposal_row(2, 2, "PASS"), _proposal_row(3, 3, "PASS")]
+        m = evolve_mark(tape, [], True, 24.0)
+        self.assertTrue(m["graded"])
+        self.assertEqual(m["paired_readings"], 2)
+        self.assertFalse(m["pass"])
+
+    def test_negative_control_both_refused_is_required_to_pass(self) -> None:
+        from tools.verdict_life import evolve_mark
+        tape = [_proposal_row(i, i, "PASS") for i in range(1, 4)]
+        m_ok = evolve_mark(tape, [], True, 24.0, negative_control={"planted_bad": {"verdict": "REFUSED"}, "null": {"verdict": "REFUSED"}})
+        self.assertTrue(m_ok["pass"])
+        m_bad = evolve_mark(tape, [], True, 24.0, negative_control={"planted_bad": {"verdict": "PASS"}, "null": {"verdict": "REFUSED"}})
+        self.assertFalse(m_bad["pass"])
+        self.assertIn("DID NOT REFUSE", m_bad["reason"])
+
+    def test_negative_control_omitted_does_not_block_the_pass(self) -> None:
+        from tools.verdict_life import evolve_mark
+        tape = [_proposal_row(i, i, "PASS") for i in range(1, 4)]
+        m = evolve_mark(tape, [], True, 24.0, negative_control=None)
+        self.assertTrue(m["pass"])
+        self.assertIn("not checked this read", m["reason"])
+
+
 if __name__ == "__main__":
     unittest.main()

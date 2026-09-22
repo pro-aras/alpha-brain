@@ -349,6 +349,58 @@ def thread_mark(alive: dict, status: dict, threaded: bool, max_gap_bar: float = 
     return out
 
 
+def evolve_mark(tape: Iterable[dict], journal: Iterable[dict], evolve_declared: bool, hours: float,
+                 negative_control: Optional[Dict[str, dict]] = None) -> Dict[str, object]:
+    """ALPHA4-PREREG.md §5/§6 (builder J's shapes): proposals filed (tape rows sense=="proposal") >= a bar
+    SCALED by the record's own hours (3 in 24 h — the plan's own figure — never a fixed 3 under a shorter
+    window, the same scaling `question_mark` above already uses for its own "per 2 h after hour 2" bar),
+    each with BOTH readings paired on the same rows (meta carries dict "incumbent" and "mutant" — the SAME
+    tape slice by construction, `tools/evolve.py:run_judging_round`'s own shape); adoptions (journal rows
+    carrying a nested "epoch" dict — never a top-level "event" key, see `creature/mind.py:Mind._maybe_
+    adopt_evolve_proposal`'s own docstring for why) <= proposals; every adoption's genome sha/moment
+    printed. `negative_control`, when given (the two `NEGATIVE-CONTROL-*.json` files
+    `tools/evolve.py --negative-control` writes, read by the caller — the planted-bad and null mutants are
+    NEVER run against the live tape itself, so this reader cannot derive them from `tape`/`journal` alone):
+    both must read REFUSED for the mark to pass; omitted, the mark is still graded on the tape's own record
+    but says so in its reason (never silently assumed true). Not gradable without the gene (the seven
+    closed records that predate EVOLVE, L-1's own control)."""
+    proposals = [r for r in tape if r.get("sense") == "proposal"]
+    paired = [p for p in proposals if isinstance(_meta(p).get("incumbent"), dict) and isinstance(_meta(p).get("mutant"), dict)]
+    epochs = [j for j in journal if isinstance(j.get("epoch"), dict)]
+    epoch_events = [{"epoch": j["epoch"].get("epoch"), "genome_sha": j["epoch"].get("genome_sha"),
+                      "moment": j["epoch"].get("moment"), "gene": j["epoch"].get("gene"), "value": j["epoch"].get("value")}
+                     for j in epochs]
+    out: Dict[str, object] = {
+        "proposals": len(proposals), "paired_readings": len(paired), "adoptions": len(epochs),
+        "epoch_events": epoch_events, "hours": hours, "negative_control": negative_control,
+        "bar": "proposals >= 3 scaled to the record's own hours (min 1) · every proposal paired (incumbent+mutant readings) "
+               "· adoptions <= proposals · every adoption's genome sha printed · REPLAY identical across epochs (the "
+               "existing REPLAY mark, on a tape carrying a proposal row) · the negative control's planted-bad and null "
+               "mutants both REFUSED",
+    }
+    if not evolve_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: EVOLVE not declared on this life")
+        return out
+    if hours <= 0:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: hours <= 0")
+        return out
+    needed = max(1, round(3 * hours / 24.0))
+    all_paired = len(paired) == len(proposals)
+    adoptions_ok = len(epochs) <= len(proposals)
+    nc_ok: Optional[bool] = None
+    if negative_control is not None:
+        nc_ok = (negative_control.get("planted_bad", {}).get("verdict") == "REFUSED"
+                 and negative_control.get("null", {}).get("verdict") == "REFUSED")
+    out.update(
+        needed=needed, graded=True,
+        **{"pass": bool(len(proposals) >= needed and all_paired and adoptions_ok and (nc_ok is not False))},
+        reason=(f"graded (§5/§6): {len(proposals)} proposals vs {needed} needed; paired {len(paired)}/{len(proposals)}; "
+                f"adoptions {len(epochs)} <= proposals; negative control "
+                + ("REFUSED both (ok)" if nc_ok else ("not checked this read" if negative_control is None else "DID NOT REFUSE — a finding about the bar, not loosened"))),
+    )
+    return out
+
+
 def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[float], plant_word: str = "zog") -> Dict[str, object]:
     """PREREG §19.11: sight born by 24 h within [0.5×, 1.5×] of the pre-flight's prediction; births_refused_nmax 0; the plant birthed ≥ 1
     sight cell. The per-hour sight-births SERIES is on the record (#233's instrument). Not gradable without a prediction or an older body."""

@@ -228,6 +228,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "HANDS": "HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20",
         "SENSE_TOUCH": "SENSE    touch from hands: exit rate stalls retries bytes",
         "SENSE_SMELL": "SENSE    smell kind size folder age",
+        # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6: one row,
+        # matching the genes.py RUNS entry added by this task (EVOLVE).
+        "EVOLVE": "EVOLVE   every 6 h; mutate 1 gene within bounds; judge on the last 2 h; adopt at sleep under the regression bar",
     }
 
     def test_every_runs_gene_parses(self) -> None:
