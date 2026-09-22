@@ -479,6 +479,7 @@ def main(argv: List[str]) -> int:
     ap.add_argument("--nrestarts", type=int); ap.add_argument("--cpu-ns", type=int); ap.add_argument("--unit")
     ap.add_argument("--skip-twins", action="store_true"); ap.add_argument("--skip-random", action="store_true")
     ap.add_argument("--reuse", action="store_true", help="re-grade: read twin summaries already under --out instead of replaying")
+    ap.add_argument("--sizing-prediction", type=float, default=None, help="PREREG §19.11: the pre-flight's predicted sight births by 24 h (absent = SIZING not gradable)")
     a = ap.parse_args(argv)
     global REUSE; REUSE = bool(a.reuse)
     if a.worker:
@@ -785,6 +786,37 @@ def main(argv: List[str]) -> int:
                  "no_park_twin_parked": TW.get("blind-park", {}).get("parked"),
                  "reason": "graded in this life (§18): a dead end can arrive from a rule failed 3× or a wordless sight; sight-only rows on this tape: %d" % len(sight_only),
                  "bar": "≥ 1 parked · share ≤ 5 %"}
+    # edit: Claude (Fable 5.1), 2026-09-22 19:3x +0400 — THE ONE LIFE's marks (PREREG §19.5/§19.10/§19.11; plan L-1): pure functions in
+    # tools/verdict_life.py; each reads «not gradable» on a record whose life did not declare the line (the closed records are the control).
+    from tools import verdict_life as _vl
+    M["ACT"] = _vl.act_mark(tape, live, st)
+    if M["ACT"].get("graded"):
+        # the shuffled-act PLANT (§19.5's control): the first rows up to the 20th mind-chosen game outcome, every such outcome's act moved
+        # to the next one; the replay must journal an act_mismatch on the first of them, or the check does not check.
+        try:
+            _mind_out = [r for r in tape if r["sense"] == "outcome" and (r.get("meta") or {}).get("chosen_by") == "mind"]
+            _cut = int(_mind_out[min(19, len(_mind_out) - 1)]["seq"])
+            _rows = _vl.shift_acts([r for r in tape if int(r["seq"]) <= _cut])
+            aroot = out / "act-plant-root"; (aroot / "tape" / "payload").mkdir(parents=True, exist_ok=True)
+            for r in _rows:
+                src = root / "tape" / r["payload"]; dst = aroot / "tape" / r["payload"]
+                if r["sense"] == "outcome" and (r.get("meta") or {}).get("chosen_by") == "mind":
+                    if dst.is_symlink() or dst.exists(): dst.unlink()
+                    _m = r["meta"]; dst.write_text(json.dumps({"act": _m.get("act"), "expected": None, "got": _m.get("got"), "residual": None, "source": "game"}))
+                elif dst.is_symlink() or not dst.exists():
+                    _relink(dst, src.resolve())
+            (aroot / "tape" / "ALL.jsonl").write_text("".join(json.dumps(r) + "\n" for r in _rows))
+            if (aroot / "replay").exists(): shutil.rmtree(aroot / "replay")
+            _pj = replay_mod.run_replay(genome_path, aroot / "tape" / "ALL.jsonl", aroot / "replay")
+            _mis = [j for j in replay_mod.read_mind_journal(_pj) if isinstance(j.get("outcome"), dict) and j["outcome"].get("act_mismatch")]
+            M["ACT"]["shuffled_twin_diverged"] = bool(_mis); M["ACT"]["shuffled_twin_first_mismatch_seq"] = (int(_mis[0]["seq"]) if _mis else None)
+            M["ACT"]["pass"] = bool(M["ACT"]["pass"]) and bool(_mis)
+        except Exception as e:
+            M["ACT"]["shuffled_twin_diverged"] = None; M["ACT"]["shuffled_twin_error"] = repr(e); M["ACT"]["pass"] = False
+    else:
+        M["ACT"]["shuffled_twin_diverged"] = "not run (not gradable)"
+    M["SOUND"] = _vl.sound_mark(tape, live, st)
+    M["SIZING"] = _vl.sizing_mark(st, live, a.sizing_prediction)
     M["PLANTS"]["predict_file_pair"] = {"sight_road_rows": live_pred["sight_road_rows"], "rule_rows_filed": live_pred["filed"], "rule_rows_scored": live_pred["scored"], "status_predictions_filed": st.get("predictions_filed")}
     M["PLANTS"]["park_unanswerable_want"] = {"sight_only_rows": len(sight_only), "first_seq": sight_only[0]["seq"] if sight_only else None, "parked_total": parked}
     M["PLANTS"]["belief_contradiction"] = {"clash_rows": kinds.get("clash", 0), "extension_rows": kinds.get("extension", 0)}
@@ -796,7 +828,7 @@ def main(argv: List[str]) -> int:
         bands[name] = json.loads(pth.read_text()) if pth.exists() else "not on disk"
     M["BANDS"] = bands
     graded = ["i_knows", "ii_meeting_real", "iii_growth_matters", "iv_grows_alone", "v_retention", "vi_knows_unknown", "vii_replay", "x_gaze_finds_thing", "xi_gaze_earns_place", "MODULATION"] + (["ix_not_luck"] if "ix_not_luck" in M else [])
-    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK") if M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
+    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK", "ACT", "SOUND", "SIZING") if k in M and M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
     failed = [k for k in graded if not M[k].get("pass")] + ([] if R["ALIVE"]["pass"] else ["ALIVE"]) + ([] if M["TWINS"]["random_gaze_loses_xi"]["pass"] else ["TWINS.random_gaze"])
     R["marks"] = M; R["marks_failed"] = failed; R["verdict"] = "PASS" if not failed else "FAIL"
     R["seconds_total"] = round(time.perf_counter() - T0, 1)
@@ -942,6 +974,17 @@ def write_verdict(out: Path, R: dict) -> None:
     m = M["DOOR"]; L.append(f"| DOOR | {m['bar']} | pictures {m['pictures']} (rows {m['folder_rows']}) · words {len(m['folder_words'])} · sight-only {m['sight_only_rows']} (first seq {m['sight_only_first_seq']}) · recognition {m['recognition_of_seen_pictures']} {m['reason']} | {gv(m)} |")
     m = M["W3_1_beliefs"]; L.append(f"| W3-1 beliefs | {m['bar']} | rows {m['rows']} · kinds {m['kinds']} · standing words {m['standing_words']} of {m['words_heard']} heard · max belief rows per word {m['max_belief_rows_per_word']} · extra belief rows {m['extra_belief_rows']} vs clash rows {m['clash_rows']} · unaccounted {m['unaccounted']} | {gv(m)} |")
     m = M["PARK"]; L.append(f"| PARK | {m['bar']} | parked {m['parked']} of {m['thinks']} thinks (rules {m['parked_rules']}) — {m['reason']} | {gv(m)} |")
+    # edit: Claude (Fable 5.1), 2026-09-22 19:3x +0400 — THE ONE LIFE's marks (PREREG §19)
+    for _k in ("ACT", "SOUND", "SIZING"):
+        if _k in M:
+            m = M[_k]
+            if _k == "ACT":
+                body = f"mind-chosen {m['mind_chosen']} of {m['game_outcomes']} (share {m['mind_share']}) · mismatches journal {m['mismatches_journal']} status {m['mismatches_status']} · census {m['census']} max {m['max_share']} zero {m['zero_acts']} · shuffled twin diverged {m.get('shuffled_twin_diverged')} · reward mean {m['reward_mean']} success/episode {m['success_per_episode']} (random null {m['random_null_success']}) — {m['reason']}"
+            elif _k == "SOUND":
+                body = f"ear-sound rows {m['ear_sound_rows']} · consumed {m['consumed']} · errors {m['errors']} · STATUS sound_events {m['status_sound_events']} — {m['reason']}"
+            else:
+                body = f"born {m['sight_born']} of {m['sight_nmax']} · prediction {m['prediction']} · refused at NMAX {m['births_refused_nmax']} · series/h {m['series_sight_births_per_hour']} · plant shown {m['plant_shown_moments']} birthed {m['plant_sight_births']} — {m['reason']}"
+            L.append(f"| {_k} | {m['bar']} | {body} | {gv(m)} |")
     L.append(f"| TWINS no-sleep / no-curiosity / no-park | (v) / door / PARK | {M['TWINS']['no_sleep_v']} · {M['TWINS']['no_curiosity']['reason']} · {M['TWINS']['no_park']['reason']} | not graded |")
     L += ["", "## Twins (each a replay of the same tape blind to one gene; Q1 on all 16 words, the seen-words Q1 beside it)", "", "| twin | Q1 (all) | Q1 (seen) | composite (all) | cells |", "|---|---|---|---|---|"]
     for b in BLINDS:
