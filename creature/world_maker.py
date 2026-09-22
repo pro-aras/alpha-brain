@@ -76,7 +76,7 @@ def _publish_canvas(publish: Callable, root: Path, moment: str, thing: str, rgb:
 
 
 # ============================================================================ L-10: QUESTION's door
-# edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:1x +0400 — L-10 (docs/briefs/LIFE-C-QUESTION-SENTENCE.md
+# edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — L-10 (docs/briefs/LIFE-C-QUESTION-SENTENCE.md
 # task 1; NEXT-LIFE-PLAN-2026-09-22.md §4 L-10): the world-maker's door polls `run/ask/out/` and answers a
 # `what-is` whose moment id names a canvas IT DREW (the "w<4>i<6>t<9>" shape `sense()`'s own moment strings
 # always take) by showing that thing again, byte-identical (`make()` is pure), with a FRESH `total` so the
@@ -97,7 +97,7 @@ def _answer_one_question(publish: Callable, root: Path, seed: int, total: int) -
     ask_out = root / "ask" / "out"
     if not ask_out.exists():
         return None
-    # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:4x +0400 — the glob "q-*.json" ALSO matches an
+    # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 — the glob "q-*.json" ALSO matches an
     # already-renamed "q-<n>.answered.json" (the `*` wildcard swallows ".answered"), which would re-answer
     # (and re-rename to "...answered.answered.json") a question this function already finished with on the
     # very next tick -- caught by this file's own live test, not by inspection. Filtered out explicitly.
@@ -115,7 +115,7 @@ def _answer_one_question(publish: Callable, root: Path, seed: int, total: int) -
         if not m:
             continue
         w_orig, i_orig = int(m.group(1)), int(m.group(2))
-        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:2x +0400 — a discovered off-by-one in
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — a discovered off-by-one in
         # sense()'s own moment-string line, verified against a live tape (world_maker.make(seed, 0, 0) ==
         # "circle" but the FIRST recorded moment reads "w0000i000001..."): `moment = f"...i{i:06d}..."`
         # below is built AFTER the regular branch's `i += 1`, so a recorded moment's `i` field is always

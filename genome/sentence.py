@@ -49,8 +49,9 @@ def find_frames(episodes, min_count: int = 5, factor: float = 2.0) -> List[Dict[
         # (LIFE.genome's FAST is 20000; the game rungs ran ~30k rows in 8h), with nothing on STATUS saying
         # so. genome/think.py's induce() avoids this by iterating SLOTS directly (`episodes.word[i]`); here
         # we iterate the correct ID range instead, since find_frames reads via the public `.get()` API.
-        # Verified by tests.genome.test_sentence.TestFindFramesRingWrap (cap=3, 6 writes, only the last 3
-        # counted -- the old range(len(episodes)) code finds nothing on that fixture).
+        # Verified by tests.genome.test_sentence.TestFindFramesRingWrap (cap=5, 8 writes, only the 3 live
+        # "red ball" episodes counted -- the old range(len(episodes)) code visits only 2 of them, below
+        # min_count, and finds nothing on that fixture).
         n_written = int(getattr(episodes, "n_written", len(episodes)))
         cap = int(getattr(episodes, "cap", len(episodes)) or 0)
         lo = max(0, n_written - cap) if cap else 0
@@ -65,7 +66,7 @@ def find_frames(episodes, min_count: int = 5, factor: float = 2.0) -> List[Dict[
             N += 1
             for w in distinct:
                 marginal[w] = marginal.get(w, 0) + 1
-            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:0x +0400 — "ordered" means TEMPORAL
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:00 +0400 — "ordered" means TEMPORAL
             # order (the sequence words_in_instant preserves, colour before object -- game.py's own
             # publish order), never every permutation: only pairs (distinct[a], distinct[b]) with a < b
             # are counted. Counting BOTH (w1,w2) and (w2,w1) would make them PERFECTLY correlated (same

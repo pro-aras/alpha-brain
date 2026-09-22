@@ -186,6 +186,40 @@ class TestQuestionRuleFailsAndClash(unittest.TestCase):
         self.assertEqual(qs[0]["q"], "is")
         self.assertEqual(qs[0]["args"], ["m_square_0", "square"])
 
+    def test_a_plain_filed_prediction_failing_also_asks_what_is(self) -> None:
+        """edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 -- advisor-caught (BLOCKS): the
+        codebase's OTHER pre-existing prediction road (W3 builder D's plain "sight" kind -- _think_work's
+        "sight" branch, "the next showing of this sight resonates X's cells", filed via predict_file()
+        directly, carrying neither a "rule" nor a "frame_w2" key) was scored in _score_due_predictions's
+        own fallback branch WITHOUT ever calling _grade_rule -- a FALSE outcome there formed no want at
+        all. Demonstrated live in the 6-min pre-flight (docs/briefs/LIFE-C-REPORT.md Sec 4/5): 2 of 7
+        scored predictions there were FALSE "sight"-kind outcomes and neither produced a question. Fixed:
+        _score_due_predictions's plain-sight branch now asks what-is on a FALSE outcome too -- the brief's
+        own trigger (b) text ("a rule fails once") names no specific mechanism, and _grade_rule's own
+        PARK/CURIOSITY bookkeeping (built for INDUCE/DEDUCE's op/want shape) does not apply here, so this
+        is a direct _maybe_ask_word call, not a _grade_rule call."""
+        mind = self._mind_with_one_episode("circle")
+        tape = Tape(mind.run_root)
+        rng = np.random.default_rng(4)
+        square_rgb, _truth = world.render_canvas("square", rng)
+        _publish_sight_only(tape, mind, square_rgb, "sq_only_0", 1)   # a real glance that does NOT resonate "circle"
+        wrong_glance = mind._last_glance
+        self.assertIsNotNone(wrong_glance)
+
+        from genome.predict import file as _predict_file
+        filed = _predict_file(claim="the next showing of this sight resonates circle's cells",
+                               route="the journal's err/recall on the next canvas with that word",
+                               decider="recall == word", due="the next showing")
+        mind._filed_predictions.append({"row": filed, "target_word": "circle", "due_canvas": 0})
+        self.assertEqual(_questions_written(mind.run_root), [], "no want yet")
+        mind._score_due_predictions("circle", wrong_glance, ["circle"])
+
+        self.assertEqual(mind.think_counters["predictions_scored"], 1)
+        qs = _questions_written(mind.run_root)
+        self.assertEqual(len(qs), 1, f"a FALSE plain-sight prediction must ask what-is too: {qs}")
+        self.assertEqual(qs[0]["q"], "what-is")
+        self.assertEqual(qs[0]["args"], ["m_circle_0"])
+
 
 @unittest.skipUnless(_THINK_LAWS_AVAILABLE, "genome.think not on master")
 class TestSentenceFramesThroughTheMind(unittest.TestCase):
@@ -292,10 +326,16 @@ class TestMouth(unittest.TestCase):
         self.assertEqual(mind.think_counters["said"], 1, "MOUTH must still say a planted, cited frame on an empty-pool think")
 
     def test_two_says_get_two_distinct_q_files(self) -> None:
-        """edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — advisor-caught:
-        `questions_written` used to be incremented only inside `_maybe_ask`, never by `_write_ask_out`
-        itself -- a second MOUTH 'is' row would silently OVERWRITE the first q-N.json instead of getting
-        its own file (both writes computing the same, never-advanced `n`)."""
+        """edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 — advisor-caught, twice: (1) the
+        filenames used to collide (`_write_ask_out`'s `n` was never advanced by anything but `_maybe_ask`)
+        -- fixed with a shared `self._ask_out_n` filename counter; (2) that first fix then put the
+        increment on `think_counters["questions_written"]` itself, which MOUTH's `_maybe_say` also drives
+        through `_write_ask_out` -- a life where MOUTH says 50 things and QUESTION never asks would have
+        read `questions_written=50`, a false positive on the QUESTION-specific STATUS mark. This test pins
+        BOTH: two distinct MOUTH files, AND that `questions_written` counts ONLY real "from: mind" wants
+        (this genome's full THINK+PARK can incidentally form its own want in these two canvases -- proven
+        directly by TestQuestionParkParksAWordlessSight -- so the exact count is compared against the
+        'from: mind' files actually on disk, never hardcoded to 0)."""
         mind = self._mind()
         tape = Tape(mind.run_root)
         mind._frames["red|ball"] = {"w1": "red", "w2": "ball", "episodes": [0, 1, 2, 3, 4, 5]}
@@ -307,13 +347,17 @@ class TestMouth(unittest.TestCase):
 
         self.assertEqual(mind.think_counters["said"], 2, mind.think_counters)
         ask_out = sorted((mind.run_root / "ask" / "out").glob("q-*.json"))
-        mouth_rows = [(p.name, json.loads(p.read_text())) for p in ask_out]
-        mouth_rows = [(name, row) for name, row in mouth_rows if row.get("from") == "mouth"]
+        rows = [(p.name, json.loads(p.read_text())) for p in ask_out]
+        mouth_rows = [(name, row) for name, row in rows if row.get("from") == "mouth"]
+        mind_rows = [(name, row) for name, row in rows if row.get("from") == "mind"]
         self.assertEqual(len(mouth_rows), 2, f"two SAYs must produce two distinct q-files, got: {mouth_rows}")
         names = {name for name, _row in mouth_rows}
         self.assertEqual(len(names), 2, "must be two DISTINCT filenames, not one overwritten twice")
         seqs = {row["seq"] for _name, row in mouth_rows}
         self.assertEqual(len(seqs), 2, "two distinct canvases' own seq, not the same row twice")
+        self.assertEqual(mind.think_counters["questions_written"], len(mind_rows),
+                          f"questions_written must count only real 'from: mind' wants, never MOUTH's own "
+                          f"'is' rows: mind_rows={mind_rows} mouth_rows={mouth_rows}")
 
     def test_refuses_an_uncited_planted_frame(self) -> None:
         mind = self._mind()

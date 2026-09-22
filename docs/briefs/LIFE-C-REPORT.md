@@ -2,7 +2,11 @@
 
 Claude (Sonnet 5, LIFE builder C). Branch `life-language`, worktree `/data/dev/genome-wt-t`, off
 `g5-integration` at `aed56d5`. Brief: `docs/briefs/LIFE-C-QUESTION-SENTENCE.md`. Report written
-2026-09-22 19:30 +0400; every timestamp below is a real `date` call, none typed from memory (#50).
+2026-09-22 19:48 +0400; every timestamp below is a real `date` call, none typed from memory (#50).
+This report went through TWO advisor review rounds — the second round (§2 items 15-16, §4's replay-
+after-fix reading) caught real defects the first round's own report had not yet surfaced, including one
+BLOCKING correctness gap (item 15) found only by reading the pre-flight's own `predictions.jsonl` data
+against the STATUS counts rather than trusting the counts alone.
 
 ## 1. What landed (file:line)
 
@@ -16,13 +20,17 @@ Claude (Sonnet 5, LIFE builder C). Branch `life-language`, worktree `/data/dev/g
   `:103` `write()` params, `:142-143` stored, `:168-170` read back, `:232` saved, `:258-259` loaded
   (back-compat guarded). `tests/genome/test_words_in_instant.py` — 6/6 green.
 
-- **Task 1 — QUESTION.** `creature/mind.py:786` `_maybe_ask` (dedupe via `self._asked`, persisted to
-  `run/ask/out/ASKED.json`, embeds `questions.why()` when a word is named); `:828` `_maybe_ask_word`;
-  `:841` `_maybe_ask_clash`; `:766` `_write_ask_out` (the sole q-file writer, see §3 below). All four
-  triggers wired: (a) wordless 2nd showing — `_consume_eye` (`creature/mind.py:410`), sight-only branch;
-  (b) rule fails once — `_grade_rule` (`:727`), `not evidence` branch; (c) belief clash — `_maybe_ask_clash`
-  called from `_think_work`'s clash-kind branch; (d) PARK parks a want — `_think_work`'s `dead_end()`
-  closure's `ask_on_park` callback, wired from both the word- and sight-kind branches. The world door:
+- **Task 1 — QUESTION.** `creature/mind.py:808` `_maybe_ask` (dedupe via `self._asked`, persisted to
+  `run/ask/out/ASKED.json`, embeds `questions.why()` when a word is named); `_maybe_ask_word`;
+  `_maybe_ask_clash`; `:786` `_write_ask_out` (the shared q-file writer — filenames only, see §2 item 16
+  below). All four triggers wired: (a) wordless 2nd showing — `_consume_eye` (`creature/mind.py:410`),
+  sight-only branch; (b) rule fails once — `_grade_rule`, `not evidence` branch, covering INDUCE/DEDUCE's
+  "rule" kind, **and** `_score_due_predictions:698`'s own `elif not evidence:` branch, covering the OTHER,
+  pre-existing "sight"-kind FILE road (W3 builder D's "the next showing of this sight resonates X's cells"
+  — see §2 item 15, a gap this report's first draft missed and the advisor's second round caught); (c)
+  belief clash — `_maybe_ask_clash` called from `_think_work`'s clash-kind branch; (d) PARK parks a want —
+  `_think_work`'s `dead_end()` closure's `ask_on_park` callback, wired from both the word- and sight-kind
+  branches. The world door:
   `creature/world_maker.py:90` `_answer_one_question` (polls `ask/out/q-*.json`, excludes already-
   `.answered.json`, recomputes the canvas via `make(seed, w, i-1)` — see the off-by-one RAISE, §5) and
   `:59` `_publish_canvas`'s new `answering=` param, wired into `sense()` (`:137`) before the regular
@@ -89,8 +97,7 @@ Claude (Sonnet 5, LIFE builder C). Branch `life-language`, worktree `/data/dev/g
    clear. GREEN: derived the math and used 6 red-ball + 8 noise (`N=14, expected=2.571, 6 > 5.143` — see
    §3 for the exact run).
 
-**Found by the advisor's review, fixed this round (all RED confirmed by a new/updated test before the
-fix, all GREEN after):**
+**Found by the advisor's FIRST review, fixed this round:**
 9. **`genome/sentence.py:44` — `find_frames` ring-wrap bug.** `for i in range(len(episodes)): episodes.get(i)`
    treated a slot index as an episode ID. `.get(eid)` maps through `_id_to_slot`; once FAST's ring wraps
    (`n_written > cap`), ids `0..cap-1` are exactly the EVICTED ones and every LIVE id is never visited —
@@ -101,20 +108,28 @@ fix, all GREEN after):**
    confirmed (`test_the_old_range_len_approach_would_have_found_nothing_on_this_fixture` shows the buggy
    loop visits only 2 of 3 live episodes, undercounting below `min_count`) → GREEN
    (`test_only_the_live_ring_slots_are_counted_after_a_wrap`: count=3, episodes=[3,4,5]).
-10. **`creature/mind.py:1178` — `_maybe_say` sat after `_maybe_think`'s `if item is None: return`.** A
+10. **`creature/mind.py` — `_maybe_say` sat after `_maybe_think`'s `if item is None: return`.** A
     think whose pool was EMPTY (exactly the state a settled life reaches once every want is parked and
     every frame scored) never reached the mouth — MOUTH would go silent by control flow, not by its own
     citation gate. Fixed: moved the `_maybe_say(row)` call above the early return. New test
-    `TestMouth::test_says_even_when_the_think_pool_is_empty` — plants a cited frame, pre-parks the only
-    word the canvas would file (so the pool is provably empty, confirmed via the journal's
-    `think.outcome == "empty_pool"`), asserts `said == 1`.
-11. **`creature/mind.py:766` — `questions_written` never advanced by `_write_ask_out` itself.** It was
-    incremented only inside `_maybe_ask`, but `_maybe_say` also calls `_write_ask_out` directly (its `is`
-    row) without incrementing anything — two `say`s, or a `say` followed by a `_maybe_ask`, would silently
-    overwrite the SAME `q-N.json`. Fixed: the increment now lives inside `_write_ask_out`, the one place a
-    q-file is actually written; removed the now-redundant increment from `_maybe_ask`. New test
-    `TestMouth::test_two_says_get_two_distinct_q_files` — two `say`s across two canvases, asserts 2
-    distinct filenames and 2 distinct `seq` values.
+    `TestMouth::test_says_even_when_the_think_pool_is_empty` (plants a cited frame, pre-parks the only
+    word the canvas would file so the pool is provably empty, confirmed via the journal's
+    `think.outcome == "empty_pool"`). **RED independently re-confirmed** for this report (not just at
+    first-write time): reverted the fix (moved `_maybe_say(row)` back below the early return), ran the
+    test — `AssertionError: 0 != 1 : MOUTH must still say a planted, cited frame on an empty-pool think` —
+    then restored and re-ran to GREEN. Side effect named, not hidden: this reordering moves MOUTH's
+    journal row ahead of the THINK-work row within one THINK tick's seq (`[say, think]` instead of
+    `[think, say]`); no closed tape anywhere has MOUTH declared yet, so nothing diverges today, but the
+    next reader of a journal with MOUTH on it should expect this order.
+11. **`creature/mind.py` — the q-file FILENAME counter was never advanced by `_write_ask_out` itself.** It
+    was incremented only inside `_maybe_ask`, but `_maybe_say` also calls `_write_ask_out` directly (its
+    `is` row) without incrementing anything — two `say`s, or a `say` followed by a `_maybe_ask`, would
+    silently overwrite the SAME `q-N.json`. New test `TestMouth::test_two_says_get_two_distinct_q_files`.
+    **RED independently re-confirmed**: commented out the counter's increment, ran the test —
+    `AssertionError: 1 != 2 : two SAYs must produce two distinct q-files, got: [('q-0.json', ...'from':
+    'mouth'...)]` (the second SAY's file overwrote the first) — then restored to GREEN. This fix's FIRST
+    pass (see item 16) put the increment on `think_counters["questions_written"]` directly, which turned
+    out to be a second, separate bug the advisor's SECOND round caught — see item 16.
 12. **`creature/world_maker.py:170` — plant-after check used `==` against `total`, which
     `_answer_one_question` can advance by one BEFORE the check runs (an answered question inserts an EXTRA
     canvas).** A tick that entered with `total == plant_after_canvases` could reach the check at
@@ -142,13 +157,49 @@ fix, all GREEN after):**
     returns 0 (byte-identical, 175 mind rows matched) and two independent replays of the same tape agree
     with each other. 3/3 green.
 
-**Full run of all six new/modified test files after every fix above (final bytes):**
+**Found by the advisor's SECOND review, reading the pre-flight's own recorded data rather than trusting
+the STATUS counts alone:**
+15. **BLOCKS — `creature/mind.py:_score_due_predictions` — QUESTION's trigger (b) only ever covered
+    INDUCE/DEDUCE's "rule" kind, never the codebase's OTHER, pre-existing "sight"-kind FILE road.** The
+    pre-flight's own `state/predictions.jsonl` (§4) has `predictions_scored=7` but only 2 of those 7 rows
+    are INDUCE "rule"-kind claims (both scored TRUE); the other 5 are W3 builder D's plain "sight"-kind
+    claims ("the next showing of this sight resonates X's cells", filed directly by `_think_work`'s
+    "sight" branch, never through `_file_rule`) — **2 of those 5 scored FALSE** (word=`box`, word=`circle`)
+    and produced zero wants, because `_score_due_predictions`'s scoring loop only called `_grade_rule` in
+    its `elif rule is not None:` branch; the plain-sight branch had no `elif`/`else` at all. Test-first:
+    `TestQuestionRuleFailsAndClash::test_a_plain_filed_prediction_failing_also_asks_what_is` — files a real
+    plain-sight prediction via `genome.predict.file()` (the same shape `_think_work`'s "sight" branch
+    builds), forces a FALSE score with a glance from a DIFFERENT picture, and asserts a `what-is` question.
+    RED confirmed before the fix: `AssertionError: 0 != 1`. Fixed: a new `elif not evidence:` branch calls
+    `_maybe_ask_word` directly (never `_grade_rule`, whose PARK/CURIOSITY bookkeeping is built around
+    INDUCE/DEDUCE's op/want shape and does not apply to this claim family) → GREEN. **Verified against the
+    pre-flight's own recorded tape**, not just the toy: replaying `scratch/preflight/root`'s tape file
+    under the FIXED code (`creature.replay.run_replay`, same genome, no code re-run needed) now produces
+    **exactly 2** `what-is` questions — `args=["gbaby20260922s000000014"]` and
+    `args=["w0000i000056t000000055"]` — matching the 2 FALSE plain-sight outcomes precisely. §4 below is
+    updated to carry both the ORIGINAL pre-flight numbers (what the walk actually produced, honestly kept)
+    and this after-the-fix replay reading.
+16. **`creature/mind.py` — item 11's own fix conflated two different counters.** Putting the filename
+    increment on `self.think_counters["questions_written"]` directly meant MOUTH's `is` rows (also written
+    through `_write_ask_out`) counted toward the QUESTION-specific `questions_written` STATUS mark — a life
+    where MOUTH says 50 things and QUESTION forms 0 wants would have read `questions_written=50`, a false
+    positive on the L-10 mark. Fixed: split into `self._ask_out_n` (a private filename/seq counter, owned
+    by `_write_ask_out`, shared by every caller) and `think_counters["questions_written"]` (incremented
+    ONLY inside `_maybe_ask` itself, the one place a REAL want is formed).
+    `TestMouth::test_two_says_get_two_distinct_q_files` now also asserts `questions_written` equals the
+    count of `from: mind` files actually on disk (not hardcoded to 0 — this genome's full THINK+PARK can
+    incidentally form its own want within the test's two canvases, proven separately by
+    `TestQuestionParkParksAWordlessSight`; the test compares against the real file count so it is not
+    fragile to that incidental activity).
+
+**Full run of all eight new/modified test files after every fix above (final bytes):**
 ```
 $ python3 -m unittest tests.genome.test_sentence tests.creature.test_question_sentence_mouth \
     tests.creature.test_question_door tests.creature.test_replay_question_sentence_mouth \
-    tests.creature.test_game_door -v
+    tests.creature.test_game_door tests.creature.test_refusal tests.genome.test_parse_g4 \
+    tests.genome.test_words_in_instant -v
 ...
-Ran 33 tests in 12.533s
+Ran 73 tests in 12.540s
 OK
 ```
 
@@ -181,30 +232,52 @@ crash). My three lines parsed byte-for-byte against my own regexes (checked befo
 `QUESTION {'source': 'wants', 'forms': ['what-is','is','which'], 'to': 'world door'}`.
 
 **Tape:** 479 rows — game 150 ear/75 eye/74 outcome (75 missions, one incomplete at cutoff), maker 74
-ear/74 eye, folder 12 ear/13 eye, body 7 event rows.
+ear/74 eye, folder 12 ear/13 eye (one wordless canvas beside the 13 published — see trigger (a) below),
+body 7 event rows.
 
-**STATUS.json denominators** (SOLUTIONS #168's rule: every zero reported with its denominator, never
-bare): `thinks=16` (THINK every=10 canvases), `parked=0`, `clashes=0`, `beliefs=2`,
-`predictions_filed=7`, `predictions_scored=7` (all 7 are INDUCE rule items — `think` outcomes:
-`filed=7, reflected=5, belief=2, no_cell_answers=1, not_yet_due=1`), `frames_filed=0`, `frames_scored=0`,
-`frames_true=0`, **`questions_written=0`, `questions_answered=0`, `said=0`, `heard_yes=0`, `heard_no=0`**.
-`ask/out/` is empty (0 q-files, 0 `.answered.json`).
+**STATUS.json denominators, as the walk originally produced them** (SOLUTIONS #168's rule: every zero
+reported with its denominator, never bare; kept exactly as recorded — see the after-the-fix replay
+reading further down for what the SAME tape now produces): `thinks=16` (THINK every=10 canvases),
+`parked=0`, `clashes=0`, `beliefs=2`, `predictions_filed=7`, `predictions_scored=7`, `frames_filed=0`,
+`frames_scored=0`, `frames_true=0`, **`questions_written=0`, `questions_answered=0`, `said=0`,
+`heard_yes=0`, `heard_no=0`**. `ask/out/` is empty (0 q-files, 0 `.answered.json`).
+
+**The 7 scored predictions, read from `state/predictions.jsonl` directly** (the STATUS count alone hid
+this — a plain "outcome" tally would have called them uniformly INDUCE; reading the actual rows is what
+§2 item 15 was caught by): only **2 of 7** are INDUCE "rule"-kind claims (word=`ring`, both scored TRUE);
+the other **5 of 7** are the OTHER, pre-existing plain "sight"-kind claims ("the next showing of this
+sight resonates X's cells") — `box` FALSE, `square` TRUE, `square` TRUE, `circle` FALSE, `square` TRUE.
+**2 of those 5 were FALSE outcomes that, at the time of the walk, produced no want at all** (item 15's
+bug). `beliefs=2` matches the 2 INDUCE claims folding into standing beliefs; `revisits=0, extensions=0`.
 
 **Reading the zeros against their denominators, not as failures:**
-- **QUESTION (0 questions):** fully explained — none of its 4 triggers fired: `parked=0` (trigger d never
-  occurred), `clashes=0` (trigger c never occurred), and the 7 filed/scored predictions were all INDUCE
-  rules that never failed (no rule-fails-once event, trigger b), and no wordless picture was seen twice
-  without a word within this short window (trigger a). This is consistent with the toy-level tests, which
-  each isolate a single trigger deliberately — a natural 6-minute life with THINK firing only once per 10
-  canvases (16 thinks total) is short odds for any of the four to land by chance. The 7-test dedicated
-  QUESTION suite (`tests/creature/test_question_door.py` + the QUESTION classes in
-  `test_question_sentence_mouth.py`) is where each trigger is proven to fire on the mechanism directly.
+- **QUESTION (0 questions, as originally walked):** trigger (d) never occurred (`parked=0`), trigger (c)
+  never occurred (`clashes=0`), trigger (a) never occurred (only one wordless folder canvas was ever
+  shown, and only once — never a SECOND identical wordless showing within this short window). Trigger (b)
+  DID have material to fire on (the 2 FALSE plain-sight outcomes above) but, at the time of the walk, that
+  branch of the code did not yet call anything — the gap §2 item 15 names and fixes. **After the fix**,
+  replaying this exact tape (`creature.replay.run_replay`, no re-walk needed — the tape is a fixed
+  recording) produces **2** `what-is` questions, matching those 2 FALSE outcomes exactly (§2 item 15's own
+  detail). The original zero is kept in this report as the honest record of what the walk itself produced;
+  the corrected mechanism's effect is shown by the replay, not by re-running the pre-flight.
 - **SENTENCE (0 frames):** consistent with the module's own documented RAISE (§5, below) — only 75 game
   missions were drawn in 6 minutes (one every 5s), and `find_frames`'s default `min_count=5, factor=2.0`
   bar needs either a skewed (colour,object) pairing or enough unrelated background noise to buy lift; this
   builder did not measure BabyAI-GoToLocal's own seed schedule for skew (see §5) — a genuinely open
   question, not a bug.
 - **MOUTH (0 says):** a direct consequence of 0 filed frames — nothing was ever in `self._frames` to say.
+
+**After-the-fix replay reading** (same tape, same genome, the CURRENT — post-§2-item-15 — code,
+`creature.replay.run_replay(genome_path, tape_path, out_dir)`, no live re-walk):
+```
+question rows after fix replay: 2
+what-is ['gbaby20260922s000000014'] [['sight', 5], ['sight', 6], ..., ['words', 1]]
+what-is ['w0000i000056t000000055'] [['sight', 71], ['sight', 72], ..., ['words', 12]]
+```
+Replay never runs `world_maker.sense()` live, so these 2 new questions are not themselves answered by the
+world door in this reading (that road is proven separately and thoroughly by
+`tests/creature/test_question_door.py`); this reading is scoped to the MIND side only — proof that
+trigger (b) now reacts to the exact data this walk already produced.
 
 ## 5. Every clause RAISED (never worked around)
 
@@ -253,17 +326,22 @@ bare): `thinks=16` (THINK every=10 canvases), `parked=0`, `clashes=0`, `beliefs=
 
 ## 6. Suites, final bytes
 
-Both run with `-t .`, output logged to files, final `Ran N … OK/FAILED` lines:
+Both run with `-t .`, output logged to files, final `Ran N … OK/FAILED` lines — **run TWICE**: once after
+the first advisor round (§2 items 9-14), once more after the second round's fixes (§2 items 15-16, the
+last code changes in this report):
 
 ```
-$ python3 -m unittest discover -s tests/creature -t . -v > scratch/logs/suite_creature.log 2>&1
-Ran 282 tests in 323.705s
+$ python3 -m unittest discover -s tests/creature -t . -v > scratch/logs/suite_creature3.log 2>&1
+Ran 283 tests in 320.138s
 OK (skipped=1)
 
-$ python3 -m unittest discover -s tests/genome -t . -v > scratch/logs/suite_genome.log 2>&1
-Ran 236 tests in 64.393s
+$ python3 -m unittest discover -s tests/genome -t . -v > scratch/logs/suite_genome3.log 2>&1
+Ran 236 tests in 63.040s
 OK (skipped=1, expected failures=6)
 ```
+(the "2" logs from the round after §2 items 9-14 read 283/318.7s and 236/64.7s, both also clean; the "3"
+logs above are the FINAL bytes, after §2 items 15-16 and the stamp cleanup in §7 — both runs agree.)
+(283 vs the first round's 282: one new test, `test_a_plain_filed_prediction_failing_also_asks_what_is`.)
 Zero `FAIL:`/`ERROR:` lines in either log (grepped explicitly). The genome suite's 6 "expected failures"
 are pre-existing `@unittest.expectedFailure`-marked tests, not introduced by this build.
 `tests/creature/test_world_pin.py` re-checked standalone after every change in this report: 3/3 green,
@@ -274,7 +352,21 @@ are pre-existing `@unittest.expectedFailure`-marked tests, not introduced by thi
 No file under `run/`, `world/`, systemd, `/data/dev/genome` (master), `/data/dev/genome-lives`, or any
 other worktree was touched. `world_maker.py`'s `schedule()`/`make()` are byte-identical to the pin (§6).
 Every edited file carries a `# edit: Claude (Sonnet 5, LIFE builder C), <date> — …` comment with a real
-`date`-sourced timestamp (an early batch of comments in this file's own session drifted ~40 minutes ahead
-of the clock during a dense editing burst — SOLUTIONS #50's exact failure mode — caught by re-running
-`date` before this final pass and corrected to the verified time, 2026-09-22 19:12 +0400, across all six
-touched files).
+`date`-sourced timestamp. Two separate drifts were caught and corrected across this build's two advisor
+rounds (SOLUTIONS #50's exact failure mode, twice): an early batch drifted ~40 minutes ahead of the clock
+during a dense editing burst, corrected to 19:12 +0400; a second, smaller batch from the second round's
+own fixes carried literal `x`-placeholder stamps (`19:4x`, never a real `date` call), corrected to
+19:40 +0400. Both corrections were swept with `grep -rn` across every file this builder touched, not
+assumed fixed from memory.
+
+## 8. RAISE — QUESTION's trigger (b) may still be incomplete
+
+§2 item 15 closed the gap between trigger (b) and the pre-existing "sight"-kind FILE road, but this
+builder makes no claim to have found EVERY prediction/claim-scoring code path in `creature/mind.py` that
+could produce a FALSE outcome silently. The two known ones (INDUCE/DEDUCE's "rule" kind via `_grade_rule`,
+and the plain "sight" kind via the new `elif not evidence:` branch) are both covered and tested; SENTENCE's
+own frame-scoring (`frames_scored`/`frames_true`) deliberately does NOT call either — a frame that scores
+FALSE is simply not `frames_true`, with no want formed, because the brief's task 3 names no such trigger
+for SENTENCE and task 1's own trigger (b) text says "a rule fails", which this builder reads as excluding
+SENTENCE's frames (a "frame" is never called "a rule" anywhere in this codebase's vocabulary). If that
+reading is wrong, a fourth wiring is needed; RAISED rather than guessed at.

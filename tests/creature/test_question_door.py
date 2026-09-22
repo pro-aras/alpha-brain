@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:3x +0400 — L-10 (docs/briefs/LIFE-C-QUESTION-SENTENCE.md
+# edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 — L-10 (docs/briefs/LIFE-C-QUESTION-SENTENCE.md
 # task 1): the world-maker's own door -- it polls `run/ask/out/`, answers a `what-is` whose moment id
 # names a canvas IT DREW by showing that thing again, and renames the question file. Kept separate from
 # test_world_maker.py (that file's own discipline: new tests beside it, not folded in).

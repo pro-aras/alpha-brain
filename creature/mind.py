@@ -229,6 +229,12 @@ class Mind:
         # every frame the mind has ever filed, keyed "w1|w2" -> {"w1","w2","episodes"} (MOUTH reads this to
         # pick what to say; G-MOT-6's citation gate reads its "episodes").
         self._frames: Dict[str, Dict[str, object]] = {}
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 — advisor-caught: the q-file
+        # FILENAME counter, shared by every writer of run/ask/out/q-<n>.json (_maybe_ask's real wants AND
+        # MOUTH's _maybe_say "is" rows) so no two writes collide on a name -- kept separate from
+        # think_counters["questions_written"], which is now the SEMANTIC "a real want was formed" mark
+        # (see _write_ask_out's and _maybe_ask's own comments).
+        self._ask_out_n: int = 0
         # L-10 (QUESTION): want -> the form it was asked with, so a want is asked AT MOST ONCE. Loaded from
         # `run/ask/out/ASKED.json` HERE (not only at resume()) -- a plain file beside the questions
         # themselves, independent of the snapshot cadence, so a crash between a snapshot and the next
@@ -689,6 +695,20 @@ class Mind:
                         self.think_counters["frames_true"] += 1
                 elif rule is not None:
                     self._grade_rule(rule, evidence)
+                elif not evidence:
+                    # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 — advisor-caught
+                    # (BLOCKS): this is the codebase's OTHER, pre-existing prediction road (W3 builder D's
+                    # plain "sight" kind, _think_work's "sight" branch — "the next showing of this sight
+                    # resonates X's cells", filed via predict_file() directly, carrying neither a "rule"
+                    # nor a "frame_w2" key). Its FALSE outcomes used to be silently dropped here — no want
+                    # ever formed, so QUESTION's trigger (b) ("a rule fails once") only ever covered
+                    # INDUCE/DEDUCE's "rule" kind, never this one. Demonstrated live in the 6-min
+                    # pre-flight (docs/briefs/LIFE-C-REPORT.md): 2 of 7 scored predictions there were FALSE
+                    # "sight"-kind outcomes and neither produced a question. The brief's own trigger-(b)
+                    # text names no specific mechanism, so this FALSE outcome asks what-is too — a direct
+                    # _maybe_ask_word call, never _grade_rule (whose PARK/CURIOSITY bookkeeping is built
+                    # around INDUCE/DEDUCE's op/want shape and does not apply to this claim family).
+                    self._maybe_ask_word(f"predict:sight:{entry['target_word']}", str(entry["target_word"]))
             else:
                 still_pending.append(entry)
         self._filed_predictions = still_pending
@@ -767,21 +787,23 @@ class Mind:
         """Writes ONE `run/ask/out/q-<n>.json` row -- the SAME JSON shape `run/ask/in/` accepts (creature/
         ask.py's own inbox schema), but this mind is the WRITER here, not the answerer: the world-maker's
         door (creature/world_maker.py:sense) and, for a `what-is` no sense drew, the human ASK door's own
-        listener, are its readers. `n` is a mind-local running counter (questions_written), never the tape
-        row's own seq -- two wants can form on the same tape row (advisor's point 5), and the filename must
-        be unique per question regardless.
-        edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — advisor-caught: `questions_written`
-        used to be incremented by `_maybe_ask` AFTER calling this method, but MOUTH's `_maybe_say` also
-        calls this method directly (its "is" row) and never incremented anything -- a second `say` (or a
-        `say` followed by a `_maybe_ask`) would overwrite the SAME q-N.json instead of getting its own file.
-        The counter now lives here, the one place a q-file is actually written, so every caller shares it
-        and every write gets a distinct name. Verified by
-        TestMouth.test_two_says_get_two_distinct_q_files."""
+        listener, are its readers. `n` is `self._ask_out_n`, a mind-local FILENAME counter shared by every
+        writer of a q-file (never the tape row's own seq -- two wants can form on the same tape row,
+        advisor's point 5), so no two writes ever collide on a name.
+        edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 — advisor-caught (BLOCKS): an
+        earlier fix (2026-09-22 19:12) put this increment on `self.think_counters["questions_written"]`
+        directly, which conflates two different things: MOUTH's `is` rows (this method's OTHER caller,
+        _maybe_say) now counted toward the QUESTION-specific `questions_written` STATUS mark -- a life
+        where MOUTH says 50 things and QUESTION forms 0 wants would have read `questions_written=50`, a
+        false positive on the L-10 mark. Split: `self._ask_out_n` (below) owns the FILENAME/seq only;
+        `think_counters["questions_written"]` is incremented ONLY by `_maybe_ask` itself (a real want),
+        again below. Verified by TestMouth.test_two_says_get_two_distinct_q_files, which now also asserts
+        `questions_written == 0` after two SAYs and zero real asks."""
         out_dir = self.run_root / "ask" / "out"
         out_dir.mkdir(parents=True, exist_ok=True)
-        n = self.think_counters["questions_written"]
+        n = self._ask_out_n
         (out_dir / f"q-{n}.json").write_text(json.dumps(payload, default=str))
-        self.think_counters["questions_written"] += 1
+        self._ask_out_n += 1
 
     def _maybe_ask(self, want: str, form: str, args: list, why_word: Optional[str] = None) -> None:
         """L-10: forms ONE question for `want`, at most once ever (self._asked, persisted to
@@ -799,7 +821,7 @@ class Mind:
         asked_path.write_text(json.dumps(self._asked))
         payload: Dict[str, object] = {
             "q": form, "args": list(args), "from": "mind",
-            "seq": self.think_counters["questions_written"], "at": self._cur_at,
+            "seq": self._ask_out_n, "at": self._cur_at,
         }
         if why_word is not None:
             ledgers = build_ledgers(self.org, self.moment_word)
@@ -809,8 +831,13 @@ class Mind:
                 "episodes": list(record["episodes"]),
                 "edges": [[int(s), int(t), float(w)] for s, t, w in record["edges"]],
             }
-        self._write_ask_out(payload)   # advances questions_written itself (see that method's own comment)
+        self._write_ask_out(payload)   # advances self._ask_out_n itself (see that method's own comment)
         self._write_journal(self._cur_at, {"seq": self._cur_seq, "question": payload})
+        # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:40 +0400 — advisor-caught: the SEMANTIC
+        # STATUS mark for "a real QUESTION want was formed" lives HERE, on the one caller that actually
+        # forms a want -- never on _write_ask_out (shared with MOUTH's unrelated "is" rows, see that
+        # method's own comment).
+        self.think_counters["questions_written"] += 1
 
     def _latest_tape_moment_for_word(self, word: str) -> Optional[str]:
         """The tape moment string (L-11 task 2's new Episodes column) of `word`'s LATEST live episode, or
