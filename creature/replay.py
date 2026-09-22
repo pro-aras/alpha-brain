@@ -73,7 +73,7 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     return out_journal
 
 
-def compare(got: Iterable[Dict[str, object]], want: Iterable[Dict[str, object]]) -> Optional[Tuple[int, str]]:
+def compare(got: Iterable[Dict[str, object]], want: Iterable[Dict[str, object]], ignore: Iterable[str] = ()) -> Optional[Tuple[int, str]]:
     """None iff every row matches field by field (as JSON objects, never as raw text/whitespace); else
     the first (seq, field) that differs, seqs walked in order.
 
@@ -96,7 +96,9 @@ def compare(got: Iterable[Dict[str, object]], want: Iterable[Dict[str, object]])
         if len(gs) != len(ws):
             return seq, f"<row count: replay {len(gs)} vs --against {len(ws)}>"
         for g, w in zip(gs, ws):
-            for key in sorted(set(g) | set(w)):
+            # edit: Claude (Fable 5.1), 2026-09-22 18:29 +0400 — `ignore`: fields DECLARED volatile by the caller (the reader masks `hash` only when its commit is not the life's — PREREG §19 / plan L-1); default () = every field, as always.
+            skip = set(ignore)
+            for key in sorted((set(g) | set(w)) - skip):
                 if g.get(key) != w.get(key):
                     return seq, key
     return None

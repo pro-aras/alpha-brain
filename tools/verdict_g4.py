@@ -23,6 +23,41 @@ REUSE = False   # --reuse: read existing twin summaries under --out instead of r
 WINDOW_SECONDS = 6 * 3600
 
 
+# edit: Claude (Fable 5.1), 2026-09-22 18:29 +0400 — v3.2 (PREREG §19 / the plan's L-1, Appendix A «what is owed»): the version string names the reader that
+# read a record (v3.1 never bumped it — every verdict-8h-v31/results.json said v3); `hash` is a DECLARED volatile field of the vs-live
+# comparison only when the reader's commit is not the life's (a live journal is a record of the code it loaded — #234; life 3b's REPLAY
+# FAIL at 16:49 was a cross-version hash); the two-replays comparison never masks anything.
+READER_VERSION = "tools/verdict_g4.py v3.2 (2026-09-22: v3.1's rules + the version string on the record + `hash` volatile across commits, declared)"
+
+
+def _git_head(tree) -> "str | None":
+    try:
+        import subprocess
+        return subprocess.check_output(["git", "-C", str(tree), "rev-parse", "HEAD"], stderr=subprocess.DEVNULL).decode().strip() or None
+    except Exception:
+        return None
+
+
+def _life_commit(root) -> "str | None":
+    """The commit a life LIVED on: its root's CODE-COMMIT (the seam lives, written by tools/lives/launch.sh) or its own checkout's HEAD;
+    None when neither exists (the G4 lives under /data/dev/genome ran on master at a commit the register names, not the root)."""
+    root = Path(root)
+    f = root / "CODE-COMMIT"
+    if f.exists():
+        v = f.read_text().strip()
+        return _git_head(root / "code") or v if (root / "code").exists() else v
+    if (root / "code").exists():
+        return _git_head(root / "code")
+    return None
+
+
+def replay_ignore_fields(reader_commit, life_commit) -> set:
+    """PURE: the fields the vs-live comparison masks. Same commit (both known, equal, or one a prefix of the other) → none; else {"hash"}."""
+    if reader_commit and life_commit and (reader_commit == life_commit or reader_commit.startswith(life_commit) or life_commit.startswith(reader_commit)):
+        return set()
+    return {"hash"}
+
+
 def _iso(s: str) -> datetime:
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
@@ -454,7 +489,7 @@ def main(argv: List[str]) -> int:
     from genome import run_g0, world
     g = parse_genome(genome_path.read_text())
     R: Dict[str, object] = {"root": str(root), "genome": str(genome_path), "genome_sha": __import__("hashlib").sha256(genome_path.read_bytes()).hexdigest()[:16],
-                            "reader": "tools/verdict_g4.py v3 (2026-09-22: W3-1 accounts the clash law's belief row; (viii) graded only in ms per canvas; one-word exam refused by name; INDUCE hoisted, bit-identical)", "at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "hours": a.hours}
+                            "reader": READER_VERSION, "reader_commit": _git_head(Path(__file__).resolve().parent.parent), "life_commit": _life_commit(root), "at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "hours": a.hours}
     nrestarts, cpu_ns = a.nrestarts, a.cpu_ns
     if a.unit:
         try:
@@ -517,7 +552,8 @@ def main(argv: List[str]) -> int:
     live = replay_mod.read_mind_journal(out / "live-journal.jsonl")
     u1 = replay_mod.read_mind_journal(twins_dir / "unblinded-1" / "mind-journal.jsonl")
     u2 = replay_mod.read_mind_journal(twins_dir / "unblinded-2" / "mind-journal.jsonl")
-    d_live = replay_mod.compare(u1, live); d_two = replay_mod.compare(u1, u2)
+    _ign = replay_ignore_fields(R.get("reader_commit"), R.get("life_commit"))
+    d_live = replay_mod.compare(u1, live, ignore=_ign); d_two = replay_mod.compare(u1, u2)   # v3.2: the two-replays comparison masks nothing
     # the plant: the first 1,000 rows with one eye payload's thing inverted (its cell from the root's truth file) must DIVERGE
     plant_ok = None; plant_seq = None
     try:
@@ -545,7 +581,7 @@ def main(argv: List[str]) -> int:
         plant_ok = dp is not None; plant_seq = eye["seq"]; R["replay_plant_diverged_at"] = dp
     except Exception as e:
         R["replay_plant_error"] = repr(e)
-    R["REPLAY"] = {"pass": d_live is None and d_two is None and plant_ok is True, "vs_live": d_live, "two_replays": d_two, "mind_rows": len(u1),
+    R["REPLAY"] = {"pass": d_live is None and d_two is None and plant_ok is True, "vs_live": d_live, "two_replays": d_two, "mind_rows": len(u1), "hash_masked": sorted(_ign),
                    "plant_seq": plant_seq, "plant_caught": plant_ok}
     print(f"[REPLAY] {R['REPLAY']}", flush=True)
 
@@ -883,7 +919,7 @@ def write_verdict(out: Path, R: dict) -> None:
          "", "| mark | bar | reading | verdict |", "|---|---|---|---|",
          f"| ALIVE | {A['bar_hours']} h under the unit, NRestarts 0, every counter moved every hour, no sense dead > 60 s | {A['hours_on_tape']} h on tape · moved every hour {A['every_counter_moved_every_hour']} · max gap eye/ear {A['max_gap_s_eye_ear']} s · sense restarts {A['sense_restarts']} · crashes {A['crashes']} · NRestarts {A['nrestarts']} | {pf(A['pass'])} |",
          # edit: Claude (Fable 5.1), 2026-09-22 11:0x +0400 — compare() returns None when EVERY row matches; the old rendering printed "vs live None", which reads as unmeasured (the advisor's read, 2026-09-22 10:5x)
-         f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {'identical' if M['vii_replay']['vs_live'] is None else 'DIVERGED at ' + str(M['vii_replay']['vs_live'])} · two replays {'identical' if M['vii_replay']['two_replays'] is None else 'DIVERGED at ' + str(M['vii_replay']['two_replays'])} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']} | {pf(M['vii_replay']['pass'])} |"]
+         f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {'identical' if M['vii_replay']['vs_live'] is None else 'DIVERGED at ' + str(M['vii_replay']['vs_live'])} · two replays {'identical' if M['vii_replay']['two_replays'] is None else 'DIVERGED at ' + str(M['vii_replay']['two_replays'])} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']}{(' · masked ' + ','.join(M['vii_replay']['hash_masked']) + ' (reader ' + str(R.get('reader_commit'))[:7] + ' ≠ life ' + str(R.get('life_commit'))[:7] + ')') if M['vii_replay'].get('hash_masked') else ''} | {pf(M['vii_replay']['pass'])} |"]
     i = M["i_knows"]; L.append(f"| (i) | {i['bar']} | Q1 {i['Q1']:.3f} Q2 {i['Q2']:.3f} Q3 {i['Q3']:.3f} Q4 {i['Q4']:.3f} (chance {i['chance_Q1']}; all words Q1 {i['all_words']['Q1']:.3f}) | {pf(i['pass'])} |")
     m = M["ii_meeting_real"]; L.append(f"| (ii) | {m['bar']} (all 16 words) | T-shuffle Q1 {m['T_shuffle_Q1']} · T-nowire Q1 {m['T_nowire_Q1']} | {pf(m['pass'])} |")
     m = M["iii_growth_matters"]; L.append(f"| (iii) | {m['bar']} | T-frozen-10 Q1 {m['T_frozen_10_Q1']} (cells {m['T_frozen_10_cells']}) vs Q1 {m['Q1']:.3f}; the 50-cell twin {m['T_frozen_50_Q1']} | {pf(m['pass'])} |")
