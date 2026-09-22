@@ -123,3 +123,34 @@ class TestVoiceLoopCadence(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# edit: Claude (Fable 5.1), 2026-09-23 02:13 +0400 — the J × exam seam (ALPHA4-J-REPORT.md "not done" 1): after an EVOLVE adoption the voice
+# thread must sit the exam under the ADOPTED genome (GENOME.v<n>.genome, the highest n — numerically, never lexically), and
+# under the birth genome when none exists.
+class ExamSitsUnderTheAdoptedGenome(unittest.TestCase):
+    def test_genome_for_sitting_prefers_the_highest_epoch_numerically(self):
+        import tempfile
+        from creature import exam as exam_module
+        root = Path(tempfile.mkdtemp()); birth = root / "birth.genome"; birth.write_text("SEED 1\n")
+        self.assertEqual(exam_module.genome_for_sitting(root, birth), birth)
+        (root / "GENOME.v3.genome").write_text("SEED 3\n"); (root / "GENOME.v10.genome").write_text("SEED 10\n")
+        self.assertEqual(exam_module.genome_for_sitting(root, birth), root / "GENOME.v10.genome")
+
+    def test_voice_loop_sits_under_the_adopted_genome(self):
+        import tempfile, threading, json
+        from unittest import mock
+        from creature import exam as exam_module
+        root = Path(tempfile.mkdtemp()); (root / "state").mkdir(); (root / "exam").mkdir()
+        birth = root / "birth.genome"; birth.write_text("SEED 1\n")
+        (root / "GENOME.v2.genome").write_text("SEED 2\n")
+        (root / "state" / "ledger.json").write_text(json.dumps({"moments": 5000}))
+        seen = []
+        stop = threading.Event()
+        def fake_run(r, gp, held=10, check_tape=400):
+            seen.append(Path(gp)); stop.set(); return {}
+        fake_genome = mock.Mock(); fake_genome.gaze = {"fixations": 4}
+        with mock.patch.object(exam_module, "run_and_journal", side_effect=fake_run), \
+             mock.patch("genome.machinery.parse_genome", return_value=fake_genome):
+            exam_module.voice_loop(root, birth, stop, every_canvases=10, poll_period=0.01)
+        self.assertEqual(seen, [root / "GENOME.v2.genome"])

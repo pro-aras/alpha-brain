@@ -61,6 +61,17 @@ def run_and_journal(root: Path, genome_path: Path, held: int = 10, check_tape: i
     return result
 
 
+def genome_for_sitting(root: Path, birth_genome_path: Path) -> Path:
+    """edit: Claude (Fable 5.1), 2026-09-23 02:13 +0400 — the J × exam seam (docs/briefs/ALPHA4-J-REPORT.md, "not done" 1): the
+    genome a SITTING runs under is the latest ADOPTED one (`GENOME.v<n>.genome` under the root, the highest n read
+    numerically — creature/mind.py's own `_latest_evolved_genome`, the same resolver Mind.resume uses), and the birth
+    genome when no adoption has happened. Resolved at EVERY sitting, never once at thread start, so an adoption between
+    two sittings is honoured by the next one."""
+    from creature.mind import _latest_evolved_genome
+    n, path = _latest_evolved_genome(Path(root))
+    return Path(path) if path is not None else Path(birth_genome_path)
+
+
 def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, poll_period: float = 5.0) -> None:
     """The voice's own exam cadence: every `every_canvases` canvases, read from the latest snapshot's
     own "moments" (state/ledger.json) divided by the genome's fixations-per-canvas -- never a counter the
@@ -90,5 +101,5 @@ def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, p
             if every_canvases > 0 and canvas_count - last_canvas >= every_canvases:
                 last_canvas = canvas_count
                 last_path.write_text(json.dumps({"last_canvas": last_canvas}))
-                run_and_journal(root, genome_path)
+                run_and_journal(root, genome_for_sitting(root, genome_path))   # the adopted genome, if any (the J × exam seam)
         stop_event.wait(poll_period)
