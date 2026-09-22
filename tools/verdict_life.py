@@ -285,6 +285,23 @@ def hands_mark(status: dict, rows: Iterable[dict], recog: Optional[dict], hands_
     return out
 
 
+def thread_mark(alive: dict, status: dict, threaded: bool, max_gap_bar: float = 5.1, waits_bar: float = 0.05) -> Dict[str, object]:
+    """PREREG §19.2 (builder E's shapes): ALIVE's max sense gap ≤ 5.1 s (life 3b's, the box otherwise idle) with the think ms series
+    printed; think_waits / thinks < 5 %. Not gradable when THINK is not on its own thread, or when no think ran."""
+    gaps = [float(g) for g in (alive or {}).get("max_gap_s_eye_ear") or [] if g is not None]
+    thinks = int(status.get("thinks") or 0); waits = int(status.get("think_waits") or 0)
+    out: Dict[str, object] = {"max_gap_s": (max(gaps) if gaps else None), "gaps_per_hour": gaps, "thinks": thinks, "think_waits": waits,
+                              "waits_share": (round(waits / thinks, 4) if thinks else None), "think_wait_ms": status.get("think_wait_ms", "not recorded"),
+                              "think_ms_last": status.get("think_ms_last", "not recorded"), "think_ms_median": status.get("think_ms_median", "not recorded"),
+                              "bar": f"max sense gap ≤ {max_gap_bar} s · think_waits / thinks < {waits_bar:.0%}"}
+    if not threaded:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: THINK is not on its own thread on this life"); return out
+    if thinks == 0 or not gaps:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: no think ran / no sense gaps on the record"); return out
+    out.update(graded=True, **{"pass": max(gaps) <= max_gap_bar and (waits / thinks) < waits_bar}, reason="graded (§19.2)")
+    return out
+
+
 def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[float], plant_word: str = "zog") -> Dict[str, object]:
     """PREREG §19.11: sight born by 24 h within [0.5×, 1.5×] of the pre-flight's prediction; births_refused_nmax 0; the plant birthed ≥ 1
     sight cell. The per-hour sight-births SERIES is on the record (#233's instrument). Not gradable without a prediction or an older body."""

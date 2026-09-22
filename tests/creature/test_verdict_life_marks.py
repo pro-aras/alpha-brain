@@ -228,5 +228,22 @@ class HandsMark(unittest.TestCase):
         self.assertTrue(bad["graded"]); self.assertFalse(bad["pass"])
 
 
+class ThreadMark(unittest.TestCase):
+    """PREREG §19.2 against builder E's shapes: ALIVE's per-hour max sense gaps; STATUS thinks / think_waits / think_wait_ms /
+    think_ms_last / think_ms_median; THINK's `threaded` flag."""
+
+    def test_not_gradable_when_unthreaded_or_without_thinks(self):
+        from tools.verdict_life import thread_mark
+        self.assertFalse(thread_mark({"max_gap_s_eye_ear": [1.0, 2.0]}, {"thinks": 100, "think_waits": 0}, False)["graded"])
+        self.assertFalse(thread_mark({"max_gap_s_eye_ear": [1.0]}, {"thinks": 0, "think_waits": 0}, True)["graded"])
+
+    def test_gap_and_wait_bars(self):
+        from tools.verdict_life import thread_mark
+        ok = thread_mark({"max_gap_s_eye_ear": [1.6, 2.0, 1.2]}, {"thinks": 832, "think_waits": 0, "think_wait_ms": 0.0, "think_ms_last": 6.3, "think_ms_median": 3.1}, True)
+        self.assertTrue(ok["graded"]); self.assertTrue(ok["pass"]); self.assertEqual(ok["max_gap_s"], 2.0); self.assertEqual(ok["waits_share"], 0.0)
+        self.assertFalse(thread_mark({"max_gap_s_eye_ear": [1.0, 6.0]}, {"thinks": 100, "think_waits": 0}, True)["pass"])     # a gap over 5.1 s
+        self.assertFalse(thread_mark({"max_gap_s_eye_ear": [1.0]}, {"thinks": 100, "think_waits": 6}, True)["pass"])          # waits 6 % ≥ 5 %
+
+
 if __name__ == "__main__":
     unittest.main()
