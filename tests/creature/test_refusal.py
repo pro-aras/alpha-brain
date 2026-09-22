@@ -234,6 +234,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # omission this class exists to catch (G5-K's own comment above, again).
         "SENSE_READ": "SENSE    read shelf /data/alpha3-library/SHELF.sqlite curriculum /data/alpha3-library/CURRICULUM.md every 5 s words 8 canvas 128",
         "DOOR_LEXICON": "DOOR     lexicon /data/alpha2-library/lexicon-enwiktionary-20260901.sqlite answers what-is by showing",
+        # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6: one row,
+        # matching the genes.py RUNS entry added by this task (EVOLVE).
+        "EVOLVE": "EVOLVE   every 6 h; mutate 1 gene within bounds; judge on the last 2 h; adopt at sleep under the regression bar",
     }
 
     def test_every_runs_gene_parses(self) -> None:

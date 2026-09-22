@@ -884,6 +884,19 @@ def main(argv: List[str]) -> int:
             _hrecog = {"asked": 0, "error": repr(e)}
     M["HANDS"] = _vl.hands_mark(st, _hrows, _hrecog, "HANDS" in decl)
     M["THREAD"] = _vl.thread_mark(R["ALIVE"], st, bool((decl.get("THINK") or {}).get("threaded")))   # §19.2 (builder E's thinking thread)
+    # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §5/§6: EVOLVE. The negative
+    # control (brief item 4) is run ONCE, before the life, by `tools/evolve.py --negative-control` with `--out`
+    # pointing into the life's own `evolve/` dir — its two files persist as part of the record; this reader loads
+    # them if present (never re-runs them: a planted-bad/null mutant is never part of the real tape).
+    _nc_bad_path = root / "evolve" / "NEGATIVE-CONTROL-planted_bad.json"
+    _nc_null_path = root / "evolve" / "NEGATIVE-CONTROL-null.json"
+    _evolve_nc = None
+    if _nc_bad_path.exists() and _nc_null_path.exists():
+        try:
+            _evolve_nc = {"planted_bad": json.loads(_nc_bad_path.read_text()), "null": json.loads(_nc_null_path.read_text())}
+        except (json.JSONDecodeError, OSError):
+            _evolve_nc = None
+    M["EVOLVE"] = _vl.evolve_mark(tape, live, "EVOLVE" in decl, float(a.hours), negative_control=_evolve_nc)   # §5/§6 (builder J's proposals/adoptions)
     M["PLANTS"]["predict_file_pair"] = {"sight_road_rows": live_pred["sight_road_rows"], "rule_rows_filed": live_pred["filed"], "rule_rows_scored": live_pred["scored"], "status_predictions_filed": st.get("predictions_filed")}
     M["PLANTS"]["park_unanswerable_want"] = {"sight_only_rows": len(sight_only), "first_seq": sight_only[0]["seq"] if sight_only else None, "parked_total": parked}
     M["PLANTS"]["belief_contradiction"] = {"clash_rows": kinds.get("clash", 0), "extension_rows": kinds.get("extension", 0)}
@@ -895,7 +908,7 @@ def main(argv: List[str]) -> int:
         bands[name] = json.loads(pth.read_text()) if pth.exists() else "not on disk"
     M["BANDS"] = bands
     graded = ["i_knows", "ii_meeting_real", "iii_growth_matters", "iv_grows_alone", "v_retention", "vi_knows_unknown", "vii_replay", "x_gaze_finds_thing", "xi_gaze_earns_place", "MODULATION"] + (["ix_not_luck"] if "ix_not_luck" in M else [])
-    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK", "ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD") if k in M and M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
+    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK", "ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD", "EVOLVE") if k in M and M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
     failed = [k for k in graded if not M[k].get("pass")] + ([] if R["ALIVE"]["pass"] else ["ALIVE"]) + ([] if M["TWINS"]["random_gaze_loses_xi"]["pass"] else ["TWINS.random_gaze"])
     R["marks"] = M; R["marks_failed"] = failed; R["verdict"] = "PASS" if not failed else "FAIL"
     R["seconds_total"] = round(time.perf_counter() - T0, 1)

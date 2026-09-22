@@ -35,9 +35,11 @@ from __future__ import annotations
 # which this law does not bind; this file only ever does ARITHMETIC on the float ms numbers that module
 # hands back (see _maybe_think_threaded/_think_apply_pending below).
 import concurrent.futures
+import hashlib
 import inspect
 import json
 import os
+import re
 import statistics
 from pathlib import Path
 from typing import Callable, Dict, FrozenSet, List, Optional, Tuple
@@ -160,6 +162,23 @@ def _bind_pool(feats: List[np.ndarray]) -> List[np.ndarray]:
 # `/data/dev` as a literal.
 def _mind_repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
+
+
+# edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE): the
+# genome a resumed Mind rebuilds from. `Mind._maybe_adopt_evolve_proposal` writes `GENOME.v<n>.genome` under
+# `run_root` at every adoption; a process restart must rebuild from the HIGHEST such file, never from the
+# caller's own (birth) `genome_path`, or every adopted mutation is silently undone the moment the mind
+# process is restarted. `creature/replay.py` never calls `resume()` (it always starts a fresh Mind from
+# birth and re-consumes the whole tape, including the 'proposal' rows that drove every adoption), so this
+# function is read by `Mind.resume` only.
+def _latest_evolved_genome(run_root: Path) -> Tuple[int, Optional[Path]]:
+    """(0, None) when no GENOME.v<n>.genome exists under `run_root`; else (the highest n, its path)."""
+    best_n, best_path = 0, None
+    for p in Path(run_root).glob("GENOME.v*.genome"):
+        m = re.fullmatch(r"GENOME\.v(\d+)\.genome", p.name)
+        if m and int(m.group(1)) > best_n:
+            best_n, best_path = int(m.group(1)), p
+    return best_n, best_path
 
 
 def _hands_paths(declared: Dict[str, dict]) -> Tuple[Optional[Path], Optional[Path]]:
@@ -313,6 +332,15 @@ class Mind:
             if "PREDICT" in self.genome.declared else None
         )
         self._last_sleep_at: int = 0        # org.t at the last SLEEP boundary crossed
+        # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE):
+        # the latest not-yet-adopted PASS proposal (a dict: no/epoch/gene/value/mutant_genome_text/…), None
+        # when there is none or the last one seen was already adopted (_consume_proposal/_maybe_adopt_
+        # evolve_proposal below). `evolve_epoch`: how many adoptions this Mind has lived through (0 = the
+        # birth genome, unmutated) — stamped on the epoch journal row and on GENOME.v<n>.genome's own name;
+        # `resume()` below restores it from the highest such file already on disk, never from a counter.
+        self._evolve_pending_proposal: Optional[Dict[str, object]] = None
+        self.evolve_epoch: int = 0
+        self.evolve_proposals_seen: int = 0
 
         # A11 (PREREG §11.1 step 3): THINK is gated on "THINK" in genome.declared, which requires a
         # parser clause not yet on master at the time this was written (raised in the builder report,
@@ -524,6 +552,10 @@ class Mind:
             self._consume_touch(row)
         elif sense == "smell":
             self._consume_smell(row)
+        # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6: the
+        # EVOLVE worker's own proposal, republished onto the tape by creature/senses/evolve.py.
+        elif sense == "proposal":
+            self._consume_proposal(row)
         # a "door" row (the ask door / other senses not yet armed) carries no organism work here
         self.last_seq = int(row["seq"])
         if self.org.t - self._last_snapshot_moments >= SNAPSHOT_EVERY:
@@ -1118,6 +1150,71 @@ class Mind:
             out["residual"] = residuals[idx]; out["confirmed"] = confirmed_flags[idx]
         return out
 
+    # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE).
+    def _consume_proposal(self, row: Dict[str, object]) -> None:
+        """A 'proposal' tape row, published by creature/senses/evolve.py (a SENSE in the writer law's
+        sense — it never touches state/journal/memory itself; it only reads $ROOT/evolve/PROPOSAL-<n>.json
+        files tools/evolve.py's worker wrote and republishes them onto the tape). EVOLVE must be declared,
+        else this sense-name row is a fact on the tape with no consumer here (the same "a door row carries
+        no organism work" law every other unarmed sense follows, W3-0's own law one level up). Only a PASS
+        verdict is remembered for adoption — a REFUSED proposal is still counted (`evolve_proposals_seen`,
+        STATUS's own #164 field) but never adopted. A LATER proposal (PASS or not) simply overwrites the
+        pending one — the tape's own order decides which mutation reaches the next sleep boundary, exactly
+        as a live worker and a replay of the same tape must agree (both consume rows in the same seq order)."""
+        if "EVOLVE" not in self.genome.declared:
+            return
+        meta = row.get("meta") or {}
+        self.evolve_proposals_seen += 1
+        if meta.get("verdict") == "PASS":
+            self._evolve_pending_proposal = dict(meta)
+
+    def _maybe_adopt_evolve_proposal(self, row: Dict[str, object]) -> None:
+        """ALPHA4-PREREG.md §6: ADOPTION at the next SLEEP boundary — if a 'proposal' row with verdict PASS
+        has arrived since the last sleep and no epoch has adopted it yet, adopt it: write
+        GENOME.v<n>.genome (the mutant TEXT, never a dict — brief item 1), re-parse self.genome/self.org.g
+        from it (only VALUE genes ever change here: BOUNDS excludes every gene that could change a moment's
+        or an array's shape, so this re-parse is always safe by construction), journal the epoch as a MIND
+        row — never a top-level "event" key (PREREG §2.4's own discriminator: the BODY writes "event" rows,
+        and creature.replay.read_mind_journal() drops any row that carries one; nesting it under "epoch"
+        keeps this a first-class, replay-comparable MIND row, which is what "REPLAY identical … including
+        the epoch event" (brief item 3) requires in practice — PREREG §6's own JSON sketch names the
+        SEMANTIC event, not a literal dict key) — and live-patches the two stateful objects whose OWN gene
+        value is cached at construction time rather than read live: genome/park.py's Park.n and
+        genome/curiosity.py's Interests.n (checked against their source before writing this; every other
+        mutable gene is read LIVE off self.g/self.genome.declared each time it is used, so the re-parse
+        alone is enough for those)."""
+        proposal = self._evolve_pending_proposal
+        if proposal is None:
+            return
+        self._evolve_pending_proposal = None
+        mutant_text = str(proposal.get("mutant_genome_text", ""))
+        gene_key = proposal.get("gene")
+        value = proposal.get("value")
+        try:
+            new_genome = parse_genome(mutant_text)
+        except GenomeError as e:
+            # a proposal whose mutant text does not parse is a worker bug, never a live crash — journaled, not adopted.
+            self._write_journal(row["at"], {"seq": row["seq"],
+                                             "epoch_refused": {"reason": f"mutant genome text did not parse: {e!r}",
+                                                                "gene": gene_key, "value": value, "proposal_no": proposal.get("no")}})
+            return
+        self.evolve_epoch += 1
+        genome_sha = hashlib.sha256(mutant_text.encode("utf-8")).hexdigest()
+        (self.run_root / f"GENOME.v{self.evolve_epoch}.genome").write_text(mutant_text)
+        self.genome_text = mutant_text
+        self.genome = new_genome
+        self.org.g = new_genome
+        if gene_key == "PARK.after" and self.park is not None:
+            self.park.n = int(new_genome.declared["PARK"]["after"])
+        elif gene_key == "CURIOSITY.interests" and self.interests is not None:
+            self.interests.n = int(new_genome.declared["CURIOSITY"]["interests"])
+        self._write_journal(row["at"], {
+            "seq": row["seq"],
+            "epoch": {"epoch": self.evolve_epoch, "genome_sha": genome_sha, "moment": self.org.t,
+                      "gene": gene_key, "value": value, "proposal_no": proposal.get("no")},
+            "hash": self.org.state_hash(),
+        })
+
     def _maybe_sleep(self, row: Dict[str, object]) -> None:
         """PREREG §11.1 step 4: every SLEEP.every MOMENTS (org.t, not canvases), after the canvas that
         crosses the boundary — a while loop so a canvas whose glances cross more than one boundary at
@@ -1156,6 +1253,11 @@ class Mind:
             # before this boundary with one from after it.
             if self.interests is not None:
                 self.interests.sleep_boundary()
+            # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6: adoption
+            # happens LAST in a boundary's own processing (this SLEEP/CYCLE/CURIOSITY-window-close all run
+            # under the genome this boundary was ENTERED with; a pending mutation, if any, then takes over
+            # from the next moment on) — a no-op call when EVOLVE is undeclared or no PASS proposal is pending.
+            self._maybe_adopt_evolve_proposal(row)
 
     # ------------------------------------------------------------------ THINK (A11, PREREG §11.1 step 3)
     def _score_due_predictions(self, word: str, first_glance: Optional[np.ndarray],
@@ -2325,8 +2427,16 @@ class Mind:
 
     @classmethod
     def resume(cls, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset()) -> Tuple["Mind", int]:
-        """Load the latest snapshot (if any) and return (mind, last_seq). No snapshot -> a fresh mind, 0."""
-        mind = cls(genome_path, run_root, blind=blind)
+        """Load the latest snapshot (if any) and return (mind, last_seq). No snapshot -> a fresh mind, 0.
+
+        ALPHA4-PREREG.md §6 (EVOLVE): epoch-aware (`_latest_evolved_genome`, above) — a root that carries one
+        or more `GENOME.v<n>.genome` files is rebuilt from the HIGHEST one, never from the caller's own
+        (birth) `genome_path`, so a process restart after an adoption does not silently revert to pre-
+        adoption gene values; `evolve_epoch` is restored to that same n (never re-derived from a persisted
+        counter — the files on disk ARE the count)."""
+        evolve_epoch, evolved_path = _latest_evolved_genome(Path(run_root))
+        mind = cls(evolved_path if evolved_path is not None else genome_path, run_root, blind=blind)
+        mind.evolve_epoch = evolve_epoch
         state_dir = Path(run_root) / "state"
         npz, meta, ledger_path = state_dir / "organism.npz", state_dir / "organism.json", state_dir / "ledger.json"
         if npz.exists() and meta.exists() and ledger_path.exists():
