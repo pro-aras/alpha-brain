@@ -165,14 +165,22 @@ class TestAskVerbGating(unittest.TestCase):
     def test_a_declared_verb_with_no_interpreter_is_refused_by_name(self) -> None:
         """edit: Claude (Fable 5.1), 2026-09-21 11:44 +0400 — W3-0 at the verb level: the live ASK line declares `next` and `why`
         (no interpreter anywhere, Builder C's finding 6); asking one must answer a refusal ROW naming the verb, never raise.
-        Negative control: an implemented verb still takes the answering road (it raises on a missing snapshot, not a refusal)."""
+        Negative control: an implemented verb still takes the answering road (it raises on a missing snapshot, not a refusal).
+        edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 21:5x +0400 — L-14/G-MIND-8 (docs/briefs/LIFE-A-ANSWER-SELF.md
+        #4): `why` is now WIRED (questions.why()'s own {cells, episodes, edges}, rendered) -- moved from this test's
+        subject (a verb with no interpreter) to its negative-control group (an implemented verb, alongside `show`).
+        `next` remains the one declared verb with no interpreter (no mechanism predicts a next thing)."""
         standard = parse_genome(G4_GENOME.read_text())
-        self.assertIsNone(creature_ask._ask_refusal(standard, "why"), "why IS declared — the list gate lets it through")
-        self.assertEqual(creature_ask._args_for({"q": "why"}), [])
+        self.assertIsNone(creature_ask._ask_refusal(standard, "next"), "next IS declared — the list gate lets it through")
+        self.assertEqual(creature_ask._args_for({"q": "next"}), [])
         root = Path(tempfile.mkdtemp())
         with mock.patch.object(creature_ask, "load_snapshot", return_value=(standard, None, {}, {})):
-            self.assertEqual(creature_ask.answer(root, "why", []), "refused: why is declared but has no interpreter yet (W3-0)")
             self.assertEqual(creature_ask.answer(root, "next", []), "refused: next is declared but has no interpreter yet (W3-0)")
+            # `why` is ALSO now implemented (L-14) — not a "refused" string; unlike `show`/`is` it never
+            # touches `org` when the ledgers are empty (questions.why()'s own documented graceful shape:
+            # "a word never shown returns every list empty, never an error"), so it answers cleanly even
+            # with org=None here — the control is "not refused", not "raises".
+            self.assertEqual(creature_ask.answer(root, "why", ["circle"]), "why circle -> cells [] episodes [] edges []")
             with self.assertRaises(Exception):          # the control: `show` is implemented and walks its road (org is None here)
                 creature_ask.answer(root, "show", ["circle"])
 

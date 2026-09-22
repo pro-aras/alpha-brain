@@ -44,6 +44,16 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
     # ---------------------------------------------------------------------------------- the machinery
     "machinery": {
         "CYCLE": "genome/machinery.py:Organism._birth (soft ceiling grow_to*nmax) + genome/sleep.py:cycle (consolidation pass)",
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:3x +0400 — L-6 (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # #1/#2): THRESH's own consumer is Organism.moment's push + Organism.own_floor (both gated on
+        # `self.sight.own_band is not None`, itself gated on THRESH's own declared presence at __init__); ANSWER's
+        # is Organism.recall/recall_many's grade/own_floor/resembles_cell computation (gated on "ANSWER" in
+        # declared, side=="sight" only -- own_band tracks sight cells, and `genome/think.py:_nearest_in`'s
+        # algorithm -- the nearest ALIVE sight cell by raw cosine -- is mirrored inline in machinery.py rather
+        # than imported, since genome/think.py imports machinery.Organism and an import the other way would be
+        # circular; raised in the report, not silently substituted).
+        "THRESH": "genome/machinery.py:Organism.moment (the own-band push) + Organism.own_floor (its p5)",
+        "ANSWER": "genome/machinery.py:Organism.recall/recall_many (grade/own_floor/resembles_cell on the sight side)",
     },
     # ---------------------------------------------------------------------------------------- the body
     # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.7 (docs/G4-WAVE3-CLAUSES.md
@@ -106,6 +116,13 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # gated on "BIND" in declared, both branches (word-bearing and sight-only).
         "BIND": "creature/mind.py:_bind_pool + Mind._consume_eye (org_feats = _bind_pool(g['feats']) when declared; org.moment/moment_sight called once per canvas instead of once per glance)",
         "TRAITS": None,  # PREREG §12/§14: declared but the mind has no TRAITS interpreter yet (wave 3, W3-4: same-cell positives) — the organism does not start.
+        # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 20:0x +0400 — L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md
+        # #3): SELF's real call sites -- _consume_body records the (reading, seq) pair a "self" pool item
+        # compares; _think_pool appends the "self" kind item (kind-fair with word/sight/due/rule/outcome);
+        # _think_work's "self" branch does the comparison and files the belief; _maybe_think reads the LAST
+        # recorded body reading (never the live queue -- replay agrees) to skip+count THINK while backlog stays
+        # over SELF's own threshold.
+        "SELF": "creature/mind.py:Mind._consume_body (records readings) + _think_pool/_think_work ('self' kind, the belief) + _maybe_think (the backlog skip)",
     },
 }
 
