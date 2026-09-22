@@ -66,7 +66,7 @@ def find_frames(episodes, min_count: int = 5, factor: float = 2.0) -> List[Dict[
             N += 1
             for w in distinct:
                 marginal[w] = marginal.get(w, 0) + 1
-            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:00 +0400 — "ordered" means TEMPORAL
+            # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:59 +0400 — "ordered" means TEMPORAL
             # order (the sequence words_in_instant preserves, colour before object -- game.py's own
             # publish order), never every permutation: only pairs (distinct[a], distinct[b]) with a < b
             # are counted. Counting BOTH (w1,w2) and (w2,w1) would make them PERFECTLY correlated (same

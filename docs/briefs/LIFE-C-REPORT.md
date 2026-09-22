@@ -23,7 +23,7 @@ against the STATUS counts rather than trusting the counts alone.
 - **Task 1 — QUESTION.** `creature/mind.py:808` `_maybe_ask` (dedupe via `self._asked`, persisted to
   `run/ask/out/ASKED.json`, embeds `questions.why()` when a word is named); `_maybe_ask_word`;
   `_maybe_ask_clash`; `:786` `_write_ask_out` (the shared q-file writer — filenames only, see §2 item 16
-  below). All four triggers wired: (a) wordless 2nd showing — `_consume_eye` (`creature/mind.py:410`),
+  below). All four triggers wired: (a) wordless 2nd showing — `_consume_eye` (`creature/mind.py:416`),
   sight-only branch; (b) rule fails once — `_grade_rule`, `not evidence` branch, covering INDUCE/DEDUCE's
   "rule" kind, **and** `_score_due_predictions:698`'s own `elif not evidence:` branch, covering the OTHER,
   pre-existing "sight"-kind FILE road (W3 builder D's "the next showing of this sight resonates X's cells"
@@ -44,18 +44,18 @@ against the STATUS counts rather than trusting the counts alone.
   renamed `TestSentenceNowWired`/new `TestTraitsRefusal` prove both directions). `genome/sentence.py:30`
   `find_frames(episodes, min_count=5, factor=2.0)` — ordered-pair (temporal, never symmetric) co-occurrence
   over episodes with >= 2 distinct `words_in_instant`, both a count bar and an independence-ratio bar,
-  returns citable episode ids per frame. Wired into `creature/mind.py:852` `_think_pool` (a "frame" kind,
+  returns citable episode ids per frame. Wired into `creature/mind.py:879` `_think_pool` (a "frame" kind,
   kind-fair with word/sight/rule/outcome), `_think_work`'s frame branch (files via `predict_file`,
   claim/route/decider/due exactly as specified), and `_score_due_predictions` (scores when `w1` recurs,
   judged by `org.recall("sight", ...)` against `w2`'s word-cell — the eye's own recall, never next-token).
   `tests/genome/test_sentence.py` — 9/9 green (see §2 for the ring-wrap regression added this round).
 
-- **Task 4 — MOUTH.** `creature/mind.py:1210` `_maybe_say` — checks `self._frames` for a `w1` in the
+- **Task 4 — MOUTH.** `creature/mind.py:1237` `_maybe_say` — checks `self._frames` for a `w1` in the
   current instant's words; an uncited frame (`episodes == []`) is refused by name, journaled
   `{"say": {"outcome": "refused", "reason": "uncited"}}`, never said (G-MOT-6's gate); a cited frame is
   said: a journal `say` row (`heard: "yes"/"no"` from `_frame_evidence`, judged synchronously by the
   mind's own `recall`) plus an `ask/out` `"is"` row `from: "mouth"`. Wired into `_maybe_think`
-  (`creature/mind.py:1178`) — see §2 for the empty-pool fix this round. `tests/creature/
+  (`creature/mind.py:1205`) — see §2 for the empty-pool fix this round. `tests/creature/
   test_question_sentence_mouth.py`'s `TestMouth` class — 4/4 green (2 original + 2 new regression tests).
 
 - **Task 5 — genes.py registration.** `creature/genes.py:112-114` — `RUNS["mind"]["SENTENCE"]`,
@@ -142,7 +142,7 @@ against the STATUS counts rather than trusting the counts alone.
     fake clock (documented here rather than asserted synthetically).
 13. **`creature/mind.py:222` — `questions_answered` computed nowhere.** STATUS declared the field
     (`creature/body.py:316` spreads `think_counters` into STATUS) but nothing ever wrote it. Fixed:
-    `_consume_eye` (`:472-480`) increments it whenever the eye row's own `meta.get("answering")` is set
+    `_consume_eye` (`:485-486`) increments it whenever the eye row's own `meta.get("answering")` is set
     (stamped by the world door's `_publish_canvas`). Verified via the pre-flight run's `STATUS.json`
     (§4) reading `questions_answered: 0` consistently with `questions_written: 0` (no want was ever
     answered because none was ever asked in that 6-minute window — a consistent zero, not a silent gap).
@@ -303,19 +303,27 @@ trigger (b) now reacts to the exact data this walk already produced.
    `world_maker.py` more broadly should decide whether to fix the root cause** (it would change every
    future tape's moment-string semantics).
 
-3. **`creature/mind.py`'s `snapshot()`/`resume()` (lines 1253-1310) never persist `_frames`,
-   `_frame_pending`, or `_wordless_seen`.** This is the SAME pre-existing gap the codebase already has for
-   `_induce_pending`/`_deduce_pending` (in-flight FILE claims not yet scored) — not unique to this build,
-   but my three new pieces of in-flight state fall into the identical hole. Consequences on a resume/
-   restart: (a) `_frames` lost → MOUTH goes silent until SENTENCE re-files a frame from the FAST ring
-   (which IS persisted, so this self-heals once enough episodes are re-seen, but with a gap); (b)
-   `_frame_pending` lost → a frame already filed-but-unscored before the restart could be RE-filed
-   (a duplicate FILE claim, inflating `predictions_filed`); (c) `_wordless_seen` lost → a picture on its
-   "2nd" wordless showing pre-restart needs two MORE sightings post-restart to re-trigger QUESTION's
-   trigger (a). None of this breaks determinism (replay is unaffected — replay always starts fresh, §2
-   item 14) — it only affects a live process that crashes and resumes mid-life. Flagged, not fixed: fixing
-   it correctly means deciding the resume contract for ALL of `_induce_pending`/`_deduce_pending`/
-   `_frame_pending`/`_frames`/`_wordless_seen` together, which is bigger than this brief's three genes.
+3. **`creature/mind.py`'s `snapshot()`/`resume()` (lines 1280-1330) never persist `_frames`,
+   `_frame_pending`, `_wordless_seen`, or (round 2's own addition) `_ask_out_n`.** This is the SAME
+   pre-existing gap the codebase already has for `_induce_pending`/`_deduce_pending` (in-flight FILE claims
+   not yet scored) — not unique to this build, but my four new pieces of in-flight state fall into the
+   identical hole. Consequences on a resume/restart: (a) `_frames` lost → MOUTH goes silent until SENTENCE
+   re-files a frame from the FAST ring (which IS persisted, so this self-heals once enough episodes are
+   re-seen, but with a gap); (b) `_frame_pending` lost → a frame already filed-but-unscored before the
+   restart could be RE-filed (a duplicate FILE claim, inflating `predictions_filed`); (c) `_wordless_seen`
+   lost → a picture on its "2nd" wordless showing pre-restart needs two MORE sightings post-restart to
+   re-trigger QUESTION's trigger (a); (d) **`_ask_out_n` resets to 0** → a resumed mind's next q-file
+   overwrites `q-0.json`, `q-1.json`, ... on disk. A pre-crash ANSWERED question is safe (the world door
+   already renamed it to `<qid>.answered.json`, a different name), but a pre-crash UNANSWERED
+   `q-N.json` is silently overwritten and its want vanishes from the door's view — while `self._asked`
+   (loaded fresh from `ASKED.json` at every `Mind.__init__`, independent of the snapshot cadence) still
+   remembers the want was asked, so it is never re-asked either. That want is then answered by nobody.
+   None of this breaks determinism (replay is unaffected — replay always starts fresh, §2 item 14) — it
+   only affects a live process that crashes and resumes mid-life. Flagged, not fixed: a correct fix for
+   `_ask_out_n` alone is small (seed it from `max(existing q-*.json id) + 1` at `Mind.__init__`), but fixing
+   the resume contract for ALL of `_induce_pending`/`_deduce_pending`/`_frame_pending`/`_frames`/
+   `_wordless_seen`/`_ask_out_n` together is bigger than this brief's three genes, so left as one RAISE
+   rather than a partial patch.
 
 4. **The `total == plant_after_canvases` → `total >= plant_after_canvases` fix in `world_maker.py:170`
    (§2 item 12) is a genuine but low-probability race** (an answered question landing on the exact tick
