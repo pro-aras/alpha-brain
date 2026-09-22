@@ -210,6 +210,25 @@ class TestJudgingRoundEndToEnd(unittest.TestCase):
         self.assertEqual(proposal["value"], 8)
         # PAIRED on the same rows -- both twins graded over the identical slice
         self.assertEqual(proposal["incumbent"]["tape_rows"], proposal["mutant"]["tape_rows"])
+        # the shadow was fully advanced (no `tape_head_seq` override) -- lag reads 0
+        self.assertEqual(proposal["shadow_lag_rows"], 0)
+
+    def test_shadow_lag_rows_is_the_gap_to_the_given_tape_head(self) -> None:
+        root, shadow, checkpoints_dir = self._two_stage_shadow()
+        runs_dir = _tmp()
+        proposal = ev.run_judging_round(root, shadow, checkpoints_dir, "2026-09-23T09:05:00.000Z", judge_h=2.0,
+                                         seed=20260923, proposal_no=1, runs_dir=runs_dir, forced_mutation=("KWTA.k", 8),
+                                         tape_head_seq=shadow.last_seq + 250)
+        self.assertEqual(proposal["shadow_lag_rows"], 250)
+
+    def test_shadow_lag_rows_is_present_even_when_not_gradable(self) -> None:
+        root, shadow, checkpoints_dir = self._two_stage_shadow()
+        runs_dir = _tmp()
+        proposal = ev.run_judging_round(root, shadow, checkpoints_dir, "2026-09-23T03:00:00.000Z", judge_h=2.0,
+                                         seed=20260923, proposal_no=1, runs_dir=runs_dir, forced_mutation=("KWTA.k", 8),
+                                         tape_head_seq=shadow.last_seq + 40)
+        self.assertIn("not gradable", proposal["reason"])
+        self.assertEqual(proposal["shadow_lag_rows"], 40)
 
     def test_no_checkpoint_old_enough_is_not_gradable(self) -> None:
         root, shadow, checkpoints_dir = self._two_stage_shadow()

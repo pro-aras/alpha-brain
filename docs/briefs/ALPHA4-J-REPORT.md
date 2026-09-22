@@ -58,11 +58,40 @@ included) and against `life 3a`'s own real 2,576-row tape (see "life 3a" below).
 6. **The negative control against a REAL closed life (g5-seam-1) is slow.** The shadow must replay the
    life's own tape from birth up to the −2 h boundary before it can checkpoint at all — on seam-1's
    ~37,000-row pre-window (real 32×32 eye rows through the sealed CNN tower, ACT/OUTCOME reflexes, SIT,
-   threaded THINK) this took **[FILL: N minutes] CPU-seconds on one core**, measured under real contention
-   from four other builders' parallel test suites on the same box (`nice -n 10` throughout, per the rules).
-   This IS the brief's own COST deliverable (item 5: "measure the shadow's CPU share and the twins' wall
-   time on the seam-1 slice; report both") — the numbers are below, not a thing left undone, but they are
-   the reason this report took real wall-clock time to finish.
+   threaded THINK) this took on the order of 25-30 CPU-minutes on one core, measured under real contention
+   from four other builders' parallel test suites and lives on the same box (`nice -n 10` throughout, per
+   the rules) — confirmed NOT a bug: a direct 1000/3000-row timing probe on the same genome (169/138
+   rows/sec) badly under-estimated the full run because per-row cost (auto-snapshot compression of a
+   32 MB W matrix every `SNAPSHOT_EVERY=500` moments; `build_ledgers`-class O(cells)-ish work in THINK)
+   GROWS with the organism's own size, and a fresh Mind's first few thousand rows are the CHEAP, small-
+   organism part of that curve. This IS the brief's own COST deliverable (item 5: "measure the shadow's
+   CPU share and the twins' wall time on the seam-1 slice; report both") — the numbers are below, not a
+   thing left undone, but they are the reason this report took real wall-clock time to finish.
+7. **Two structural limits of a judging round's own readings, found in review (advisor-caught) and NOT
+   fixed — recorded on every proposal and printed by `evolve_mark`, never silently hidden.** (a)
+   `reward_mean` (`act_mark`'s own field) is read from the SLICE's own recorded outcome rows, which BOTH
+   twins consume unchanged regardless of their own genome — it is therefore mathematically IDENTICAL for
+   incumbent and mutant on every round (the exact same collapse as retention, item 5 above), can never
+   clear its declared MARGINS entry, and can never register as a regression either; it is only a live
+   signal once a genome actually drives the game (`ACT` declaring both `turn` and `step`, as ALPHA4's own
+   genome does — seam-1's does not, `mind_drives_acts` reads False there, so this specific limit never
+   fired in the negative control below). (b) On a genome that DOES drive acts, a mutant twin whose chosen
+   action diverges from the tape's own historical choice (made under the INCUMBENT, never the mutant) is
+   graded `act_mismatch > 0` by `act_mark`'s own bar, which fails `act_pass`, which `regression_bar` reads
+   as a REGRESSION — structurally more likely for ANY mutation that changes a decision-relevant gene,
+   independent of whether the change is actually better. Neither limit changes what THIS brief delivers
+   (the mechanism, the bar, the tests); both are PREREG-level findings about what the bar can and cannot
+   see, exactly the kind of thing item 5's "not gradable"/"printed, not graded" convention already exists
+   to carry — `evolve_mark`'s own docstring and bar text now say so explicitly.
+8. **`shadow_lag_rows`** (the gap between the live tape's own head seq and what the shadow has actually
+   consumed at judging time) is now recorded on every proposal and surfaced as `evolve_mark`'s
+   `max_shadow_lag_rows` — PRINTED, never gating (#236's own failure mode: a box loaded with other
+   builders' work can let the shadow fall behind, silently shrinking a round's slice below `judge_h` while
+   the record still claims the full window). Added after the advisor's own review of this brief's first
+   commit; not present in the numbers already gathered against g5-seam-1 below (that run pre-dates the
+   field — its own `advance_shadow` calls there always fully catch the shadow up before judging, so its
+   TRUE lag was 0 throughout; the field exists for when a live 24 h life runs the worker continuously
+   beside five other builders' own lives, which this negative control does not simulate).
 
 ## A real bug, found and fixed during my own review
 
@@ -126,11 +155,14 @@ OK (skipped=1, expected failures=6)
 
 ```
 $ python3 -m unittest discover -s tests/creature -t .
-Ran 536 tests in 534.193s
+Ran 546 tests in 547.480s
 OK (skipped=1)
 ```
-(`scratch/suite-creature-final.log`) — the FIRST full run caught a real, pre-existing-fixture omission of
-mine: `tests/creature/test_refusal.py:TestRegistryPinnedToParser` pins every `creature/genes.py` RUNS entry
+(`scratch/suite-creature-COMMITTED.log` — re-run a SECOND time specifically on the exact committed bytes
+of `da0464c` after the advisor flagged that an earlier 536-test run had started before several late edits
+landed, git-discovery having already imported the old bytes; this is the truthful "on the final bytes"
+number.) The FIRST full run caught a real, pre-existing-fixture omission of mine:
+`tests/creature/test_refusal.py:TestRegistryPinnedToParser` pins every `creature/genes.py` RUNS entry
 against a hand-written sample genome LINE (the same fixture G5 builders I/J/K and LIFE builders A/B/C/F all
 had to extend when they added their own RUNS rows) — I had added `RUNS["mind"]["EVOLVE"]` without adding
 `SAMPLE_LINE["EVOLVE"]`, and the suite caught it by name (`test_every_runs_gene_parses`,

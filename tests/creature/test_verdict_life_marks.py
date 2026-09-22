@@ -305,8 +305,8 @@ class ThreadMark(unittest.TestCase):
 # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §5/§6: EVOLVE against
 # tools/evolve.py's own proposal/epoch shapes (never re-implemented -- the same fixture-shape convention
 # every class above uses).
-def _proposal_row(seq, no, verdict, paired=True):
-    meta = {"no": no, "verdict": verdict}
+def _proposal_row(seq, no, verdict, paired=True, shadow_lag_rows=0):
+    meta = {"no": no, "verdict": verdict, "shadow_lag_rows": shadow_lag_rows}
     if paired:
         meta.update(incumbent={"q1_seen": 0.9}, mutant={"q1_seen": 0.95 if verdict == "PASS" else 0.85})
     return {"seq": seq, "sense": "proposal", "meta": meta}
@@ -372,6 +372,19 @@ class EvolveMark(unittest.TestCase):
         m = evolve_mark(tape, [], True, 24.0, negative_control=None)
         self.assertTrue(m["pass"])
         self.assertIn("not checked this read", m["reason"])
+
+    def test_max_shadow_lag_rows_is_printed_never_gates(self) -> None:
+        from tools.verdict_life import evolve_mark
+        tape = [_proposal_row(1, 1, "PASS", shadow_lag_rows=0), _proposal_row(2, 2, "PASS", shadow_lag_rows=6917),
+                _proposal_row(3, 3, "PASS", shadow_lag_rows=40)]
+        m = evolve_mark(tape, [], True, 24.0)
+        self.assertEqual(m["max_shadow_lag_rows"], 6917)
+        self.assertTrue(m["pass"], "a large shadow lag is REPORTED, never a reason to refuse the mark")
+
+    def test_max_shadow_lag_rows_none_without_any_proposal(self) -> None:
+        from tools.verdict_life import evolve_mark
+        m = evolve_mark([], [], True, 24.0)
+        self.assertIsNone(m["max_shadow_lag_rows"])
 
 
 if __name__ == "__main__":

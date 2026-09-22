@@ -363,20 +363,40 @@ def evolve_mark(tape: Iterable[dict], journal: Iterable[dict], evolve_declared: 
     NEVER run against the live tape itself, so this reader cannot derive them from `tape`/`journal` alone):
     both must read REFUSED for the mark to pass; omitted, the mark is still graded on the tape's own record
     but says so in its reason (never silently assumed true). Not gradable without the gene (the seven
-    closed records that predate EVOLVE, L-1's own control)."""
+    closed records that predate EVOLVE, L-1's own control).
+
+    `shadow_lag_rows` (printed, never gated on — #236's failure mode): the worst `shadow_lag_rows` any
+    proposal on the tape recorded — the gap between the live tape's own head seq and the shadow's, at the
+    moment that round was judged. A box loaded with other work can let the shadow fall behind, silently
+    shrinking a round's slice below `judge_h` while its record still claims the full window; this number
+    lets a reader see that without the mark refusing on it.
+
+    TWO KNOWN LIMITS of a judging round's own readings, both structural (found in review, not fixed here
+    — see the builder report): (1) `reward_mean` is READ FROM THE RECORDED SLICE's own outcome rows, which
+    both twins consume UNCHANGED regardless of their own genome — it is therefore IDENTICAL for incumbent
+    and mutant on every round, can never clear its declared margin, and can never register a regression
+    either; it is not a live signal on a replayed tape, only on a genome that is actually driving the game
+    (`creature.senses.game.mind_drives_acts` — true once ACT declares both "turn" and "step", as ALPHA4's
+    own genome does). (2) When a genome DOES drive acts, a mutant twin whose chosen act diverges from the
+    tape's own historical choice (made under the INCUMBENT, not the mutant) is graded `act_mismatch > 0`
+    by `act_mark`'s own bar, which fails `act_pass` and reads as a "regression" in `regression_bar` — a
+    mutation that changes ANY decision-relevant gene is structurally more likely to diverge from a history
+    it did not produce, independent of whether the change is actually better or worse."""
     proposals = [r for r in tape if r.get("sense") == "proposal"]
     paired = [p for p in proposals if isinstance(_meta(p).get("incumbent"), dict) and isinstance(_meta(p).get("mutant"), dict)]
     epochs = [j for j in journal if isinstance(j.get("epoch"), dict)]
     epoch_events = [{"epoch": j["epoch"].get("epoch"), "genome_sha": j["epoch"].get("genome_sha"),
                       "moment": j["epoch"].get("moment"), "gene": j["epoch"].get("gene"), "value": j["epoch"].get("value")}
                      for j in epochs]
+    lags = [int(_meta(p)["shadow_lag_rows"]) for p in proposals if isinstance(_meta(p).get("shadow_lag_rows"), (int, float))]
     out: Dict[str, object] = {
         "proposals": len(proposals), "paired_readings": len(paired), "adoptions": len(epochs),
         "epoch_events": epoch_events, "hours": hours, "negative_control": negative_control,
+        "max_shadow_lag_rows": (max(lags) if lags else None),
         "bar": "proposals >= 3 scaled to the record's own hours (min 1) · every proposal paired (incumbent+mutant readings) "
                "· adoptions <= proposals · every adoption's genome sha printed · REPLAY identical across epochs (the "
                "existing REPLAY mark, on a tape carrying a proposal row) · the negative control's planted-bad and null "
-               "mutants both REFUSED",
+               "mutants both REFUSED · max_shadow_lag_rows printed, never gated (#236)",
     }
     if not evolve_declared:
         out.update(graded=False, **{"pass": None}, reason="not gradable: EVOLVE not declared on this life")

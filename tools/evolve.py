@@ -333,17 +333,28 @@ def tape_slice(live_root: Path, from_seq: int, to_seq: int) -> List[dict]:
 # ============================================================================ one judging round
 def run_judging_round(live_root: Path, shadow: Mind, checkpoints_dir: Path, now_iso: str, judge_h: float,
                        seed: int, proposal_no: int, runs_dir: Path,
-                       forced_mutation: Optional[Tuple[str, object]] = None) -> dict:
+                       forced_mutation: Optional[Tuple[str, object]] = None,
+                       tape_head_seq: Optional[int] = None) -> dict:
     """ALPHA4-PREREG.md §6: one round. `forced_mutation` (gene_key, value) bypasses the rng draw — used
     ONLY by the negative control (brief item 4), which must plant a SPECIFIC gene/value, never a random
-    one. Returns the proposal dict (also written to `$ROOT/evolve/PROPOSAL-<proposal_no>.json` by the
-    caller)."""
+    one. `tape_head_seq`: the LIVE tape's own latest seq at the moment `now_iso` was read (the caller
+    already has it — `main()`'s own `rows[-1]["seq"]` — a second `read_tape` scan here would be wasted
+    work); defaults to `shadow.last_seq` when not given (the advance-and-judge CLI always advances the
+    shadow to the tape's own end first, so the two coincide there by construction). The GAP between this
+    and `shadow.last_seq` — `shadow_lag_rows` on the returned dict — is the box-under-load failure mode
+    #236 names: if the shadow has fallen behind the live tape (the box loaded with five builders' lives
+    and readers), the slice this round grades is silently SHORTER than `judge_h` while the record still
+    says 2 h. Never refused on — recorded, so a reader can judge whether to trust a given round's numbers.
+    Returns the proposal dict (also written to `$ROOT/evolve/PROPOSAL-<proposal_no>.json` by the caller)."""
     from datetime import datetime, timedelta
     target_iso = (datetime.fromisoformat(now_iso.replace("Z", "+00:00")) - timedelta(hours=judge_h)).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    head_seq = int(tape_head_seq) if tape_head_seq is not None else shadow.last_seq
+    shadow_lag_rows = head_seq - shadow.last_seq
     cp = checkpoint_near(checkpoints_dir, target_iso)
     if cp is None:
         return {"no": proposal_no, "epoch": shadow.evolve_epoch, "verdict": "REFUSED",
-                "reason": f"not gradable: no shadow checkpoint at or before {target_iso} yet"}
+                "reason": f"not gradable: no shadow checkpoint at or before {target_iso} yet",
+                "shadow_lag_rows": shadow_lag_rows}
     to_seq = shadow.last_seq
     slice_rows = tape_slice(live_root, cp["last_seq"], to_seq)
     incumbent_text = cp["dir"].joinpath("GENOME.genome").read_text()
@@ -382,6 +393,7 @@ def run_judging_round(live_root: Path, shadow: Mind, checkpoints_dir: Path, now_
         "no": proposal_no, "epoch": shadow.evolve_epoch, "gene": gene_key, "value": value,
         "mutant_genome_text": mutant_text, "checkpoint": cp["n"], "checkpoint_at": cp["at"],
         "slice_from_seq": cp["last_seq"], "slice_to_seq": to_seq, "slice_rows": len(slice_rows),
+        "shadow_lag_rows": shadow_lag_rows,
         "q1_seen_start": q1_start,
         "incumbent": incumbent_readings, "mutant": mutant_readings,
         "verdict": verdict, "reason": reason,
@@ -441,7 +453,8 @@ def run_negative_control(root: Path, genome_path: Path, out_dir: Path, judge_h: 
     for label, forced in (("planted_bad", ("BIRTH.theta_n", 0.5)), ("null", ("DELTA.lr", 0.051))):
         proposal = run_judging_round(root, shadow, checkpoints_dir, last_at, judge_h, int(shadow.genome.seed),
                                       proposal_no=(901 if label == "planted_bad" else 902),
-                                      runs_dir=out_dir / "runs", forced_mutation=forced)
+                                      runs_dir=out_dir / "runs", forced_mutation=forced,
+                                      tape_head_seq=int(rows[-1]["seq"]))
         results[label] = proposal
         print(f"[evolve/negctl] {label} ({forced[0]}={forced[1]}): verdict={proposal.get('verdict')} reason={proposal.get('reason')}")
         print(f"[evolve/negctl] {label} incumbent q1_seen={proposal.get('incumbent', {}).get('q1_seen')} "
@@ -490,6 +503,11 @@ def main(argv: List[str]) -> int:
     last_proposal_at: Optional[str] = None
 
     print(f"[evolve] worker started: every_h={every_h} judge_h={judge_h} seed={seed} shadow_epoch={shadow.evolve_epoch}")
+    # steady-state cost note (report-only, not fixed here): this loop reads the WHOLE live tape twice per
+    # poll (once inside advance_shadow, once here for now_iso/tape_head_seq) -- at ~100K rows that is
+    # roughly a couple of seconds of pure parsing against a `poll_period` of tens of seconds, acceptable
+    # at this life's scale (mirrors genome/predict.py's own "acceptable at this life's scale" note for a
+    # different O(N) read); an incremental tail-read would remove it if a much longer life ever needs to.
     while not stop_file.exists():
         advance_shadow(shadow, root)
         rows = list(read_tape(root))
@@ -500,7 +518,8 @@ def main(argv: List[str]) -> int:
                 last_checkpoint_at = now_iso
                 print(f"[evolve] checkpoint {cp.name} at {now_iso} (epoch {shadow.evolve_epoch})")
             if last_proposal_at is None or hours_between(last_proposal_at, now_iso) >= every_h:
-                proposal = run_judging_round(root, shadow, checkpoints_dir, now_iso, judge_h, seed, proposal_no, runs_dir)
+                proposal = run_judging_round(root, shadow, checkpoints_dir, now_iso, judge_h, seed, proposal_no, runs_dir,
+                                              tape_head_seq=int(rows[-1]["seq"]))
                 write_proposal(evolve_dir, proposal)
                 print(f"[evolve] proposal {proposal_no}: {proposal.get('verdict')} — {proposal.get('reason')}")
                 proposal_no += 1
