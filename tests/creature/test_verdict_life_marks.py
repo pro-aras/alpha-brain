@@ -206,5 +206,27 @@ class SentenceMark(unittest.TestCase):
         self.assertFalse(sentence_mark(tape[:100], {"frames_filed": 4, "frames_scored": 4, "frames_true": 4}, True)["graded"])  # < 100 missions
 
 
+class HandsMark(unittest.TestCase):
+    """PREREG §19.9 against builder F's shapes: eye rows `source: hands` with meta program/shape/control; STATUS runs_by_program, runs,
+    hands_no_road, touch_events, smell_events; the reader's own asks give {asked, hits, shuffled_hits}."""
+
+    def _rows(self, n):
+        return [{"seq": i, "sense": "eye", "meta": {"source": "hands", "program": f"p{i}", "shape": ["circle", "square", "ring"][i % 3], "control": None}} for i in range(n)]
+
+    def test_not_gradable_without_the_gene_or_under_20_runs(self):
+        from tools.verdict_life import hands_mark
+        self.assertFalse(hands_mark({}, self._rows(30), {"asked": 30, "hits": 25, "shuffled_hits": 10}, False)["graded"])
+        m = hands_mark({"runs": 7}, self._rows(7), {"asked": 7, "hits": 7, "shuffled_hits": 2}, True)
+        self.assertFalse(m["graded"]); self.assertIn("7", m["reason"])
+
+    def test_recognised_share_bar_and_the_twin_printed(self):
+        from tools.verdict_life import hands_mark
+        st = {"runs": 30, "runs_by_program": {"p1": 10, "p2": 20}, "hands_no_road": 0, "touch_events": 30, "smell_events": 12}
+        ok = hands_mark(st, self._rows(30), {"asked": 30, "hits": 20, "shuffled_hits": 11}, True)
+        self.assertTrue(ok["graded"]); self.assertTrue(ok["pass"]); self.assertAlmostEqual(ok["recognised_share"], 20 / 30); self.assertAlmostEqual(ok["shuffled_share"], 11 / 30)
+        bad = hands_mark(st, self._rows(30), {"asked": 30, "hits": 5, "shuffled_hits": 2}, True)
+        self.assertTrue(bad["graded"]); self.assertFalse(bad["pass"])
+
+
 if __name__ == "__main__":
     unittest.main()

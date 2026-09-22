@@ -259,6 +259,32 @@ def sentence_mark(tape: Iterable[dict], status: dict, sentence_declared: bool, m
     return out
 
 
+def hands_rows(tape: Iterable[dict]) -> List[dict]:
+    """The hands' pictures on the tape: eye rows `source: hands` carrying a shape (the control programs carry none)."""
+    return [r for r in tape if r.get("sense") == "eye" and _meta(r).get("source") == "hands" and _meta(r).get("shape")]
+
+
+def hands_mark(status: dict, rows: Iterable[dict], recog: Optional[dict], hands_declared: bool, min_runs: int = 20) -> Dict[str, object]:
+    """PREREG §19.9 (builder F's shapes): not gradable under `min_runs` runs; then the recognised share (the reader's own asks of the
+    hands' rendered canvases answered with the program's own shape) ≥ 0.6 beside the shuffled-shelf twin (shapes permuted). The
+    prediction on the record: ≈ 0.1–0.2 with the ASCII render (the eye's generalisation across render styles), a FAIL kept as a result."""
+    rows = list(rows); runs = int(status.get("runs") or len(rows))
+    out: Dict[str, object] = {"runs": runs, "pictures_with_shape": len(rows), "runs_by_program": status.get("runs_by_program", "not recorded"),
+                              "hands_no_road": status.get("hands_no_road", "not recorded"), "touch_events": status.get("touch_events", "not recorded"),
+                              "smell_events": status.get("smell_events", "not recorded"),
+                              "bar": "≥ 0.6 recognised (the exam answers the run's canvas with the program's own shape) vs the shuffled-shelf twin; not gradable under %d runs" % min_runs}
+    if not hands_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: HANDS not declared on this life"); return out
+    if runs < min_runs or len(rows) < 1:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {runs} runs < {min_runs}"); return out
+    if not recog or not recog.get("asked"):
+        out.update(graded=False, **{"pass": None}, reason="not gradable: the reader could not ask the hands' pictures (%s)" % (recog or {}).get("error", "no asks")); return out
+    share = recog["hits"] / recog["asked"]; tw = recog.get("shuffled_hits", 0) / recog["asked"]
+    out.update(asked=recog["asked"], hits=recog["hits"], recognised_share=round(share, 4), shuffled_share=round(tw, 4),
+               graded=True, **{"pass": share >= 0.6}, reason="graded (§19.9)")
+    return out
+
+
 def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[float], plant_word: str = "zog") -> Dict[str, object]:
     """PREREG §19.11: sight born by 24 h within [0.5×, 1.5×] of the pre-flight's prediction; births_refused_nmax 0; the plant birthed ≥ 1
     sight cell. The per-hour sight-births SERIES is on the record (#233's instrument). Not gradable without a prediction or an older body."""
