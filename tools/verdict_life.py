@@ -193,6 +193,72 @@ def coarse_mark(live_allw: dict, twin_allw: Optional[dict], coarse_declared: boo
             "reason": "graded (§19.4)", "bar": "Q1 all words ≥ 0.975 beside the blind-coarse twin; house ≥ 0.8 vs twin < 0.6 (a prediction)"}
 
 
+def question_mark(journal: Iterable[dict], tape: Iterable[dict], status: dict, hours: float, question_declared: bool) -> Dict[str, object]:
+    """PREREG §19.7 (builder C's shapes: journal `question` rows; tape rows whose meta carries `answering`; STATUS questions_written /
+    questions_answered): questions written ≥ 1 per 2 h after hour 2 (≥ (hours − 2)/2 over the life); the share the world answered
+    within its next canvases printed (the plan's prediction ≥ 0.5 for maker things). Not gradable without the gene or under 2 h."""
+    qs = [j for j in journal if isinstance(j.get("question"), dict)]
+    answered = [r for r in tape if _meta(r).get("answering")]
+    forms = collections.Counter(str(j["question"].get("q")) for j in qs)
+    out: Dict[str, object] = {"questions": len(qs), "forms": dict(forms), "answered_rows": len(answered),
+                              "answered_share": (round(len(answered) / len(qs), 4) if qs else None),
+                              "status_written": status.get("questions_written", "not recorded"), "status_answered": status.get("questions_answered", "not recorded"),
+                              "bar": "questions ≥ (hours − 2)/2 · the answered share printed (prediction ≥ 0.5 for maker things)"}
+    if not question_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: QUESTION not declared on this life"); return out
+    if hours < 2.0:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {hours} h < 2 h (questions are graded after hour 2)"); return out
+    need = max(1, int((hours - 2.0) / 2.0))
+    out.update(needed=need, graded=True, **{"pass": len(qs) >= need}, reason=f"graded (§19.7): {len(qs)} questions vs {need} needed")
+    return out
+
+
+def world_pair_skew(tape: Iterable[dict]) -> Dict[str, object]:
+    """The world's OWN pair skew (PREREG §19.8's ceiling clause): over the game's missions on the tape (one per object ear row, the
+    mission's last two tokens = colour, object), the max lift count / (n · p(colour) · p(object)) over pairs met ≥ 5 times."""
+    pairs: collections.Counter = collections.Counter()
+    for r in tape:
+        m = _meta(r)
+        if r.get("sense") != "ear" or m.get("source") != "game" or not m.get("mission"):
+            continue
+        toks = str(m["mission"]).split()
+        if len(toks) < 2 or m.get("word") != toks[-1]:
+            continue                                  # count each mission ONCE, on its object row
+        pairs[(toks[-2], toks[-1])] += 1
+    n = sum(pairs.values())
+    if not n:
+        return {"missions": 0, "max_lift": None, "max_pair": None, "pairs": 0}
+    pc: collections.Counter = collections.Counter(); po: collections.Counter = collections.Counter()
+    for (c, o), k in pairs.items():
+        pc[c] += k; po[o] += k
+    best = None; best_pair = None
+    for (c, o), k in pairs.items():
+        if k < 5: continue
+        lift = k / (n * (pc[c] / n) * (po[o] / n))
+        if best is None or lift > best: best, best_pair = lift, f"{c} {o}"
+    return {"missions": n, "max_lift": (round(best, 4) if best is not None else None), "max_pair": best_pair, "pairs": len(pairs)}
+
+
+def sentence_mark(tape: Iterable[dict], status: dict, sentence_declared: bool, min_missions: int = 100) -> Dict[str, object]:
+    """PREREG §19.8 + its ceiling clause: ≥ 3 frames filed with precision ≥ 0.8 (frames_true / frames_scored), not gradable under
+    `min_missions` missions on the tape, and NOT GRADABLE when the world's own max pair lift < 2 (no frame can exist there — builder C's
+    finding on BabyAI GoToLocal's independent colour/object draws)."""
+    tape = list(tape); skew = world_pair_skew(tape)
+    filed = int(status.get("frames_filed") or 0); scored = int(status.get("frames_scored") or 0); true = int(status.get("frames_true") or 0)
+    out: Dict[str, object] = {**skew, "frames_filed": filed, "frames_scored": scored, "frames_true": true,
+                              "precision": (round(true / scored, 4) if scored else None), "said": status.get("said", "not recorded"),
+                              "heard_yes": status.get("heard_yes", "not recorded"), "heard_no": status.get("heard_no", "not recorded"),
+                              "bar": "≥ 3 frames · precision ≥ 0.8 · not gradable under %d missions or when the world's max pair lift < 2 (the ceiling clause)" % min_missions}
+    if not sentence_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: SENTENCE not declared on this life"); return out
+    if skew["missions"] < min_missions:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {skew['missions']} missions < {min_missions}"); return out
+    if skew["max_lift"] is None or skew["max_lift"] < 2.0:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: the world's word pairs are independent (max lift {skew['max_lift']} < 2; a frame cannot exist there — PREREG §19.8's ceiling clause)"); return out
+    out.update(graded=True, **{"pass": filed >= 3 and scored >= 1 and (true / scored) >= 0.8}, reason="graded (§19.8): the world admits a frame (max lift %s on «%s»)" % (skew["max_lift"], skew["max_pair"]))
+    return out
+
+
 def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[float], plant_word: str = "zog") -> Dict[str, object]:
     """PREREG §19.11: sight born by 24 h within [0.5×, 1.5×] of the pre-flight's prediction; births_refused_nmax 0; the plant birthed ≥ 1
     sight cell. The per-hour sight-births SERIES is on the record (#233's instrument). Not gradable without a prediction or an older body."""

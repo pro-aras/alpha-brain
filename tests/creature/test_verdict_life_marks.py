@@ -158,5 +158,53 @@ class CoarseMark(unittest.TestCase):
         self.assertFalse(coarse_mark({"Q1": {"acc": 0.96, "per_thing": {}}}, twin, True)["pass"])
 
 
+class QuestionMark(unittest.TestCase):
+    """PREREG §19.7 against builder C's shapes: journal `question` rows; tape rows with meta `answering`; STATUS questions_written/answered."""
+
+    def test_not_gradable_without_the_gene_or_under_two_hours(self):
+        from tools.verdict_life import question_mark
+        self.assertFalse(question_mark([], [], {}, 24.0, False)["graded"])
+        self.assertFalse(question_mark([{"seq": 1, "question": {"q": "what-is"}}], [], {}, 1.5, True)["graded"])
+
+    def test_rate_after_hour_two_and_the_answered_share(self):
+        from tools.verdict_life import question_mark
+        journal = [{"seq": i, "question": {"q": "what-is", "args": ["w%d" % i]}, "when": "2026-09-23T%02d:00:00Z" % (3 + i % 20)} for i in range(24)]
+        tape = [{"seq": 100 + i, "sense": "eye", "meta": {"source": "maker", "answering": "q-%d" % i}} for i in range(12)]
+        m = question_mark(journal, tape, {"questions_written": 24, "questions_answered": 12}, 24.0, True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["questions"], 24); self.assertEqual(m["answered_rows"], 12); self.assertAlmostEqual(m["answered_share"], 0.5)
+        few = question_mark(journal[:5], tape, {}, 24.0, True)
+        self.assertTrue(few["graded"]); self.assertFalse(few["pass"])
+
+
+class SentenceMark(unittest.TestCase):
+    """PREREG §19.8 with its ceiling clause: the world's own pair skew from the game's mission ear rows; graded only when a frame can exist."""
+
+    def _tape(self, missions):
+        rows = []
+        for i, (c, o) in enumerate(missions):
+            rows.append({"seq": 3 * i, "sense": "ear", "meta": {"source": "game", "word": c, "mission": f"go to the {c} {o}"}})
+            rows.append({"seq": 3 * i + 1, "sense": "ear", "meta": {"source": "game", "word": o, "mission": f"go to the {c} {o}"}})
+        return rows
+
+    def test_independent_world_is_not_gradable_with_its_max_lift_printed(self):
+        from tools.verdict_life import sentence_mark
+        import itertools
+        missions = [(c, o) for c, o in itertools.product(["red", "blue", "green"], ["ball", "key", "box"])] * 15   # 135 missions, uniform
+        m = sentence_mark(self._tape(missions), {"frames_filed": 0, "frames_scored": 0, "frames_true": 0}, True)
+        self.assertFalse(m["graded"]); self.assertLess(m["max_lift"], 2.0); self.assertEqual(m["missions"], 135)
+
+    def test_skewed_world_grades_on_frames_and_precision(self):
+        from tools.verdict_life import sentence_mark
+        # a world with STRUCTURE: each colour keeps its object (lift 3.0 at 1/3 × 1/3), plus a little noise — C's arithmetic: a single
+        # skewed pair on an otherwise uniform grid caps near 1.33×, so structure, not repetition, is what buys lift over 2×
+        missions = [("red", "ball")] * 50 + [("blue", "key")] * 50 + [("green", "box")] * 50 + [("red", "key")] * 3 + [("blue", "box")] * 3 + [("green", "ball")] * 3
+        tape = self._tape(missions)
+        m = sentence_mark(tape, {"frames_filed": 4, "frames_scored": 4, "frames_true": 4}, True)
+        self.assertTrue(m["graded"]); self.assertGreaterEqual(m["max_lift"], 2.0); self.assertTrue(m["pass"])
+        self.assertFalse(sentence_mark(tape, {"frames_filed": 2, "frames_scored": 2, "frames_true": 2}, True)["pass"])          # < 3 frames
+        self.assertFalse(sentence_mark(tape, {"frames_filed": 4, "frames_scored": 4, "frames_true": 2}, True)["pass"])          # precision .5
+        self.assertFalse(sentence_mark(tape[:100], {"frames_filed": 4, "frames_scored": 4, "frames_true": 4}, True)["graded"])  # < 100 missions
+
+
 if __name__ == "__main__":
     unittest.main()

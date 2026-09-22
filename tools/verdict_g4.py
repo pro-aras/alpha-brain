@@ -829,6 +829,8 @@ def main(argv: List[str]) -> int:
     _cpw = int(float(_wd.get("arrival_every_h", 6)) * 3600 / max(1.0, float(_wd.get("drawn_every_s", 5))))
     M["SURPRISE"] = _vl.surprise_mark(live, st, _cpw, "SURPRISE" in decl)                # §19.1 (builder B's confirmed glances); windows = the world's arrival period in canvases
     M["COARSE"] = _vl.coarse_mark(allw, (TW.get("blind-coarse", {}).get("exam") or {}).get("ask_all_words"), bool((getattr(g, "gaze", None) or {}).get("coarse")))   # §19.4
+    M["QUESTION"] = _vl.question_mark(live, tape, st, float(a.hours), "QUESTION" in decl)   # §19.7 (builder C's question rows; the world's `answering` rows)
+    M["SENTENCE"] = _vl.sentence_mark(tape, st, "SENTENCE" in decl)                        # §19.8 + the ceiling clause (the world's own pair skew)
     M["PLANTS"]["predict_file_pair"] = {"sight_road_rows": live_pred["sight_road_rows"], "rule_rows_filed": live_pred["filed"], "rule_rows_scored": live_pred["scored"], "status_predictions_filed": st.get("predictions_filed")}
     M["PLANTS"]["park_unanswerable_want"] = {"sight_only_rows": len(sight_only), "first_seq": sight_only[0]["seq"] if sight_only else None, "parked_total": parked}
     M["PLANTS"]["belief_contradiction"] = {"clash_rows": kinds.get("clash", 0), "extension_rows": kinds.get("extension", 0)}
@@ -840,7 +842,7 @@ def main(argv: List[str]) -> int:
         bands[name] = json.loads(pth.read_text()) if pth.exists() else "not on disk"
     M["BANDS"] = bands
     graded = ["i_knows", "ii_meeting_real", "iii_growth_matters", "iv_grows_alone", "v_retention", "vi_knows_unknown", "vii_replay", "x_gaze_finds_thing", "xi_gaze_earns_place", "MODULATION"] + (["ix_not_luck"] if "ix_not_luck" in M else [])
-    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK", "ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE") if k in M and M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
+    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK", "ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE") if k in M and M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
     failed = [k for k in graded if not M[k].get("pass")] + ([] if R["ALIVE"]["pass"] else ["ALIVE"]) + ([] if M["TWINS"]["random_gaze_loses_xi"]["pass"] else ["TWINS.random_gaze"])
     R["marks"] = M; R["marks_failed"] = failed; R["verdict"] = "PASS" if not failed else "FAIL"
     R["seconds_total"] = round(time.perf_counter() - T0, 1)
@@ -987,10 +989,14 @@ def write_verdict(out: Path, R: dict) -> None:
     m = M["W3_1_beliefs"]; L.append(f"| W3-1 beliefs | {m['bar']} | rows {m['rows']} · kinds {m['kinds']} · standing words {m['standing_words']} of {m['words_heard']} heard · max belief rows per word {m['max_belief_rows_per_word']} · extra belief rows {m['extra_belief_rows']} vs clash rows {m['clash_rows']} · unaccounted {m['unaccounted']} | {gv(m)} |")
     m = M["PARK"]; L.append(f"| PARK | {m['bar']} | parked {m['parked']} of {m['thinks']} thinks (rules {m['parked_rules']}) — {m['reason']} | {gv(m)} |")
     # edit: Claude (Fable 5.1), 2026-09-22 19:3x +0400 — THE ONE LIFE's marks (PREREG §19)
-    for _k in ("ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE"):
+    for _k in ("ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE"):
         if _k in M:
             m = M[_k]
-            if _k == "SURPRISE":
+            if _k == "QUESTION":
+                body = f"questions {m.get('questions')} (forms {m.get('forms')}; needed {m.get('needed')}) · answered by the world {m.get('answered_rows')} (share {m.get('answered_share')}) · STATUS written {m.get('status_written')} answered {m.get('status_answered')} — {m['reason']}"
+            elif _k == "SENTENCE":
+                body = f"missions {m.get('missions')} · the world's max pair lift {m.get('max_lift')} on «{m.get('max_pair')}» · frames filed {m.get('frames_filed')} scored {m.get('frames_scored')} true {m.get('frames_true')} (precision {m.get('precision')}) · said {m.get('said')} heard yes {m.get('heard_yes')} no {m.get('heard_no')} — {m['reason']}"
+            elif _k == "SURPRISE":
                 body = (f"overall confirmed share {m.get('overall_share')} · windows rising {m.get('windows_rising')} of {m.get('windows_full')} · new-thing windows {m.get('new_thing_windows')} drops {m.get('drops_at_new_thing_windows')} · STATUS confirmed {m.get('status_confirmed')} surprised {m.get('status_surprised')} — {m['reason']}")
             elif _k == "COARSE":
                 body = f"Q1 all words {m.get('q1_live')} vs blind-coarse {m.get('q1_blind_coarse')} · house {m.get('house_live')} vs {m.get('house_blind_coarse')} (prediction held {m.get('house_prediction_held')}) · cup {m.get('cup_live')} vs {m.get('cup_blind_coarse')} — {m['reason']}"
