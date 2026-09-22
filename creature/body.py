@@ -36,7 +36,13 @@ MIND_TIMES_WINDOW_S = 60.0
 # this implementation, door covers the ask/folder/web senses, voice is the exam thread -- the check is a
 # pure VALIDATION of the declared list against this known set, independent of how many real threads a run
 # actually starts).
-KNOWN_BODY_THREADS = frozenset({"eye", "ear", "door", "mind", "voice"})
+# edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5 (docs/briefs/LIFE-E-THINK-THREAD.md
+# item 1): a sixth name, "think" -- the thinking thread (creature/mind.py's own internal executor, started
+# by Mind.__init__ when THINK's genome line carries the "; on its own thread" tail, PREREG §19.2/plan §4
+# L-5). This name's own VALIDATION-ONLY law is unchanged: a genome that lists "think" here but whose THINK
+# gene has no threaded tail (or no THINK gene at all) still runs THINK inline -- the roster and the
+# mechanism are two different facts, exactly as this class's own docstring says of every other name here.
+KNOWN_BODY_THREADS = frozenset({"eye", "ear", "door", "mind", "voice", "think"})
 
 
 def _check_body_threads(declared: Dict[str, dict]) -> None:
@@ -332,6 +338,15 @@ class Body:
             "glances_confirmed": int(getattr(self.mind, "glances_confirmed", 0)),
             "glances_surprised": int(getattr(self.mind, "glances_surprised", 0)),
             "births_skipped_confirmed": int(getattr(org, "births_skipped_confirmed", 0)),
+            # edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5 (docs/briefs/
+            # LIFE-E-THINK-THREAD.md; PREREG §19.2's own mark: "think_waits/thinks < 5%", "think_ms ...
+            # last value and a running median"), on EVERY write (#164) — 0/0/None on a genome whose THINK
+            # gene is undeclared or untreaded (getattr's own defaults cover both: the attributes exist on
+            # every Mind, but stay at their init values when the threaded road never runs).
+            "think_waits": int(getattr(self.mind, "think_waits", 0)),
+            "think_wait_ms": round(float(getattr(self.mind, "think_wait_ms", 0.0)), 3),
+            "think_ms_last": (round(float(v), 3) if (v := getattr(self.mind, "think_ms_last", None)) is not None else None),
+            "think_ms_median": (round(float(v), 3) if (v := self.mind.think_ms_median()) is not None else None),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:

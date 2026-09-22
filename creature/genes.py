@@ -62,7 +62,7 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
     # tests/creature/test_gene_values.py, test_world_pin.py, test_world_maker.py proves the change).
     "body": {
         "EXAM": "creature/body.py:Body.start (declared['EXAM']['every'] read; starts the voice/exam thread)",
-        "BODY": "creature/body.py:_check_body_threads, read at Body.__init__ (declared['BODY']['threads'] validated against the known five; refuses naming an unknown thread or a missing 'mind')",
+        "BODY": "creature/body.py:_check_body_threads, read at Body.__init__ (declared['BODY']['threads'] validated against the known six — 'think' added by LIFE builder E, L-5; refuses naming an unknown thread or a missing 'mind')",
         "TAPE": "creature/tape.py:_resolve_tape_dir, read at Body.__init__ / creature/body.py:Body.start's read_tape (declared['TAPE']['path'] resolves the tape directory)",
         "HEART": "creature/body.py:Body.__init__ -> Body._status_loop (declared['HEART']['every_s'] read into self._status_period_s, the STATUS write period)",
         "CRASH": "creature/body.py:_crash_policy, read at Body.__init__ -> SenseThread.run (restart) + Body._handle_mind_crash (page) — declared['CRASH']'s two sub-facts gate each behaviour",
@@ -88,7 +88,7 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "CURIOSITY": "creature/mind.py:Mind.__init__ (Interests built when declared and genome.curiosity importable)",
         "ARRIVAL": "creature/mind.py:Mind._consume_eye (Organism.new_arrival() called on a never-heard word)",
         "SLEEP": "creature/mind.py:Mind._maybe_sleep (every/replay read) + Mind.resume (_last_sleep_at rebuilt)",
-        "THINK": "creature/mind.py:Mind._maybe_think (gated: 'THINK' not in declared -> return; every read otherwise)",
+        "THINK": "creature/mind.py:Mind._maybe_think (gated: 'THINK' not in declared -> return; every read otherwise). declared['THINK']['threaded'] (L-5, the '; on its own thread; lands next boundary' tail) additionally gates Mind._maybe_think_threaded/_think_apply_pending/_think_apply_plan + creature/think_thread.py's frozen-copy/decide() -- absent, byte-identical to before this gene's tail existed",
         "FROZEN": "creature/mind.py:Mind.__init__ (declared['FROZEN']['after'] read when 'frozen' in blind — a TWIN-ONLY gene, PREREG §11.1 step 5)",
         "FILE": "creature/mind.py:_think_work (predict_file() called for 'sight' pool items) — called UNGATED by FILE's own presence; declared['FILE'] value NOT read",
         "BELIEF": "creature/mind.py:_think_work (think_laws.believe() called for 'word' pool items, UNGATED by BELIEF's own presence for the call itself; clash_enabled=('BELIEF' in declared) IS gated on it and passed through once believe() accepts the kwarg — W3-1, Builder B, g4-wave3-b)",

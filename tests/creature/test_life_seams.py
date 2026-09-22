@@ -40,7 +40,66 @@ class LifeSeams(unittest.TestCase):
 
     @unittest.skipUnless(_wired("SURPRISE", "SELF") and "lands next boundary" in (TREE / "genome" / "machinery.py").read_text(errors="replace"), "B x E not landed")
     def test_BxE_the_coarse_row_and_the_confirmed_flag_are_in_the_thinks_frozen_copy(self):
-        self.fail("fill at the landing: the think thread's frozen copy carries the coarse moments and their confirmed flags")
+        # filled at E's landing (Claude (Sonnet 5, LIFE builder E), 2026-09-22 21:3x +0400): B's L-4 (SURPRISE/CONFIRM) law is
+        # "a CONFIRMED glance is NO think-pool item" (creature/mind.py `_think_pool`'s `if eid in self._confirmed_episodes:
+        # continue`), enforced BEFORE a candidate ever reaches `_think_choose`/the frozen copy the think thread receives —
+        # so the seam this test proves is that E's threaded road never widens that exclusion: (1) a real tape under
+        # SURPRISE+coarse+THINK-threaded produces at least one CONFIRMED episode (the positive control: confirmations really
+        # happen on this front) and (2) not one item the LIVE pool offers `_think_choose` — the same pool a "word"/"sight"
+        # item bound for the think thread's frozen copy is drawn from — names a confirmed episode id. A regression here
+        # would let a confirmed (cheap, expected) glance form a belief/prediction as if it had been a real surprise.
+        import io, tempfile
+        import numpy as np
+        from PIL import Image
+        from creature.mind import Mind
+        from creature.tape import Tape, read_tape
+        from genome import world
+
+        text = (TREE / "genome" / "G5.genome").read_text().replace("NMAX     2000", "NMAX     300")
+        text = text.replace("#OFF SURPRISE floor 0.05", "SURPRISE floor 0.9 predicted mind-cell")
+        text = text.replace(
+            "GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border   # G1 §6 (the proven value; PREREG §1 correction)",
+            "GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border coarse 32",
+        )
+        text = text.replace(
+            "BODY     service creature threads eye ear door mind voice",
+            "BODY     service creature threads eye ear door mind think voice",
+        )
+        text = text.replace(
+            "THINK    every 10 canvases                        # §11.1 step 3: the pool → CURIOSITY chooses → work → PARK/FILE",
+            "THINK    every 10 canvases; on its own thread; lands next boundary",
+        )
+        root = Path(tempfile.mkdtemp(prefix="seamBE-"))
+        gp = root / "g.genome"
+        gp.write_text(text)
+
+        def png(rgb):
+            b = io.BytesIO(); Image.fromarray(rgb).save(b, format="PNG"); return b.getvalue()
+
+        tape = Tape(root)
+        rng = np.random.default_rng(5)
+        things = ["circle", "square", "triangle"]
+        for i in range(150):
+            thing = things[i % len(things)]
+            rgb, _truth = world.render_canvas(thing, rng)
+            m = f"m{i:05d}"
+            # every canvas repeats its OWN thing's word from its own last showing -- a high SURPRISE floor
+            # (0.9) still confirms the REPEATS of a thing already met a few times (its expected cell gets close).
+            tape.publish("ear", thing.encode(), {"moment": m, "source": "test", "word": thing}, "txt")
+            tape.publish("eye", png(rgb), {"moment": m, "source": "test"}, "png")
+
+        mind = Mind(gp, root)
+        for r in read_tape(root):
+            mind.consume(r)
+        mind.close()
+
+        self.assertGreater(len(mind._confirmed_episodes), 0,
+                            "fixture produced no confirmed episode -- the positive control never fired, test proves nothing")
+        pool = mind._think_pool()
+        pool_episode_ids = {it["episode"] for it in pool if it.get("episode") is not None}
+        confirmed_in_pool = pool_episode_ids & mind._confirmed_episodes
+        self.assertEqual(confirmed_in_pool, set(),
+                          "a CONFIRMED episode reached the think pool -- it could be chosen and handed to the think thread's frozen copy")
 
     @unittest.skipUnless(_wired("MOUTH") and _worker_obeys(), "C x D not landed")
     def test_CxD_a_say_row_is_an_act_with_an_outcome_and_both_mission_words_reach_the_frame_road(self):
@@ -87,7 +146,56 @@ class LifeSeams(unittest.TestCase):
 
     @unittest.skipUnless(_worker_obeys() and "lands next boundary" in (TREE / "genome" / "machinery.py").read_text(errors="replace"), "D x E not landed")
     def test_DxE_the_act_is_chosen_on_the_mind_thread_never_the_think_thread(self):
-        self.fail("fill at the landing: the act decision row is written by the mind at consume; the think thread writes nothing (the writer sweep's planted offender)")
+        # filled at E's landing (Claude (Sonnet 5, LIFE builder E), 2026-09-22 21:3x +0400): D's L-8 act
+        # choice (`Mind._maybe_choose_act`, writing `run/game/ACT`) is called from `_consume_eye` directly,
+        # never from `_maybe_think`/`_maybe_think_threaded`/`creature/think_thread.py` -- it is a MIND-thread
+        # act, unconditionally, whether or not THINK itself is threaded. Proved three ways: (1) static --
+        # creature/think_thread.py (the ONE module that runs on the think thread) names neither
+        # `_maybe_choose_act` nor `game/ACT` anywhere in its source; (2) the writer sweep (item 4's own gate,
+        # tools/gate_g4.py's SENSE_FILES, which now includes creature/think_thread.py) already refuses ANY
+        # write under a forbidden dir from that file, and `run/game/ACT` -- while not itself one of
+        # state/journal/memory -- is written by `Path.write_text`/`os.replace` calls the sweep's own AST walk
+        # would catch from ANY of its swept files were they present in creature/think_thread.py, which they
+        # are not (the planted-offender control in TestWriterSweepReachesTheThinkModule proves the sweep DOES
+        # catch a write call of this exact shape); (3) live -- a genome that drives the game AND threads THINK
+        # still gets a `run/game/ACT` write on the FIRST game eye row, before any THINK boundary is even
+        # reached (ACT's own cadence is per-eye-row, THINK's is per `every` canvases) -- proving the write
+        # path is independent of whether THINK itself is threaded.
+        think_thread_src = (TREE / "creature" / "think_thread.py").read_text()
+        self.assertNotIn("_maybe_choose_act", think_thread_src)
+        self.assertNotIn("game/ACT", think_thread_src)
+        self.assertNotIn("game\" / \"ACT\"", think_thread_src)
+
+        import tempfile
+        from creature.mind import Mind
+        genome_text = (
+            "SEED 20260923\n"
+            "BODY     service creature threads eye ear door mind think voice\n"
+            "TAPE     run/tape\nHEART    every 10 s\nCRASH    sense restart journal; mind page\n"
+            "SENSE    eye    32x32 grey\nRETINA   thresh0.25 centre tower:eye-tower-g2 sqrt unit\n"
+            "GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border\n"
+            "SENSE    ear    letters 8\nAREA     sight  from retina\nAREA     words  from ear\nMEET     sight  words\n"
+            "BIRTH    novelty  cos<0.952\nBIRTH    error    misfires 3\nBUDGET   400 per arrival\nNMAX     64\nKWTA     5\n"
+            "HEBB     window 1\nDELTA    lr 0.05\nPRUNE    w<0.02 after 3 chances\nMERGE    cos>0.9969 same-answer\n"
+            "SCALE    every 1000 moments\nRECALL   k=3\nABSTAIN  second/best > 0.85\nASK      what-is show is which next why\n"
+            "STAGE    1 senses   moments 0..0\nSTAGE    2 meet     moments 0..\n"
+            "ACT      glance open ask turn step\n"
+            "THINK    every 10 canvases; on its own thread; lands next boundary\n"
+        )
+        root = Path(tempfile.mkdtemp(prefix="seamDE-"))
+        gp = root / "g.genome"; gp.write_text(genome_text)
+        for d in ("journal", "state", "tape/payload", "game"):
+            (root / d).mkdir(parents=True, exist_ok=True)
+        mind = Mind(gp, root)
+        self.assertTrue(mind._act_policy_on, "fixture's ACT vocabulary (turn+step) must drive the game -- test premise broken")
+        row = {"seq": 1, "at": "2026-09-23T00:00:00.000Z",
+               "meta": {"moment": "gm0", "source": "game", "n_actions": 3, "act_names": ["left", "right", "forward"], "game": "toy"}}
+        mind._maybe_choose_act(row)   # the mind thread's own call -- exactly what _consume_eye makes, before THINK ever runs
+        act_path = root / "game" / "ACT"
+        self.assertTrue(act_path.exists(), "the mind-thread act choice never wrote run/game/ACT")
+        import json
+        self.assertEqual(json.loads(act_path.read_text())["seq"], 1)
+        mind.close()
 
     @unittest.skipUnless(_worker_obeys(), "D not landed")
     def test_D_the_workers_act_wait_checks_the_stop_file(self):

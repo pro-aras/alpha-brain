@@ -28,9 +28,17 @@ alone) so a genome that declares nothing new is byte-for-byte the walking skelet
 """
 from __future__ import annotations
 
+# edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5: `concurrent.futures` is a
+# CONCURRENCY primitive, not a clock/randomness source — it is NOT in the determinism law's forbidden set
+# (time, datetime, random, os.urandom; test_mind_has_no_clock's own AST sweep names exactly those four).
+# The actual wall-clock read (timing a think's compute, timing a wait) lives in creature/think_thread.py,
+# which this law does not bind; this file only ever does ARITHMETIC on the float ms numbers that module
+# hands back (see _maybe_think_threaded/_think_apply_pending below).
+import concurrent.futures
 import inspect
 import json
 import os
+import statistics
 from pathlib import Path
 from typing import Callable, Dict, FrozenSet, List, Optional, Tuple
 
@@ -38,6 +46,7 @@ import numpy as np
 from PIL import Image
 
 from creature import genes as genes_module
+from creature import think_thread
 from genome import gaze
 from genome.fast import Episodes
 from genome.machinery import Genome, GenomeError, Organism, parse_genome, _unit
@@ -247,6 +256,31 @@ class Mind:
             if "CURIOSITY" in self.genome.declared and _CURIOSITY_AVAILABLE else None
         )
         self._think_rng = np.random.default_rng([int(self.genome.seed), 0x71494e4b])   # "THINK" bytes-ish, distinct from any other stream in this file
+        # edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5 (docs/briefs/LIFE-E-THINK-THREAD.md;
+        # PREREG §19.2): THINK on its own thread. `_think_threaded` reads the genome's own flag (absent -> False,
+        # byte-identical to today -- genome/machinery.py's own comment on the parser change). The executor is built
+        # ONLY when threaded (a genome that never asks for this starts no extra thread, ever) -- one worker, so at
+        # most one think is ever in flight, matching the brief's own "launch at N, apply at N+every" pipeline (never
+        # more than one boundary's worth of work outstanding at a time, `THINK.every` >= 1 canvas apart). `_think_
+        # pending` holds the ONE outstanding launch (its Future, the boundary N it was launched at, and the chosen
+        # item) between the boundary that launched it and the boundary that applies it -- never persisted in
+        # snapshot()/resume() (a resumed or replayed mind is a FRESH Mind, so there is never a pending think to
+        # restore; a crash between launch and apply loses that one think's result, same class of gap as
+        # _filed_predictions/Park/Interests not being persisted either, named in the report). `think_waits`/
+        # `think_wait_ms` (cumulative) and `_think_ms_history` (capped, for a running median) are exported on
+        # STATUS via creature/body.py's existing `getattr(self.mind, ...)` pattern -- this file computes ZERO wall-
+        # clock reads itself (creature/think_thread.py's `worker_run`/`wait_for` measure think_ms/wait_ms and hand
+        # back plain floats; this file only ever does arithmetic on them, per the determinism law's own comment
+        # above the concurrent.futures import).
+        self._think_threaded: bool = "THINK" in self.genome.declared and bool(self.genome.declared["THINK"].get("threaded"))
+        self._think_executor: Optional[concurrent.futures.ThreadPoolExecutor] = (
+            concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix="think") if self._think_threaded else None
+        )
+        self._think_pending: Optional[Dict[str, object]] = None
+        self.think_waits: int = 0
+        self.think_wait_ms: float = 0.0
+        self.think_ms_last: Optional[float] = None
+        self._think_ms_history: List[float] = []
         # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
         # (L-8): the game's own act-choosing policy. `_act_policy_on` is the SAME gate creature/body.py's
         # `_game_act_file_path` reads (creature.senses.game.mind_drives_acts), computed once here so a
@@ -1592,7 +1626,7 @@ class Mind:
         self.think_counters[KIND_TO_COUNTER.get(kind, "beliefs")] += 1
         return {"outcome": "belief", "belief": row, "note": note}
 
-    def _file_rule(self, row: Dict[str, object], want: str, op: str) -> None:
+    def _file_rule(self, row: Dict[str, object], want: str, op: str, due_canvas: Optional[int] = None) -> None:
         """W3-2: predictions.jsonl gets EVERY FILE outcome for a rule — accepted or refused BY NAME
         (predict.py's file()/FILE's law: 'never silently dropped, never accepted half-written');
         `predictions_filed` counts both ('filed by name or refused by name'), moved AT LAST (after the
@@ -1603,7 +1637,16 @@ class Mind:
         self._canvas_index here already names the NEXT canvas to be consumed, and "the word's next
         showing" (PREREG's own route text) is exactly that canvas. (The pre-existing 'sight' road above
         uses +1 and is one canvas later than it needs to be — a pre-existing quirk, left as is and named
-        in the report, not fixed here: changing it changes what a live rule's existing consumers see.)"""
+        in the report, not fixed here: changing it changes what a live rule's existing consumers see.)
+
+        edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5: `due_canvas`, optional,
+        defaulting to `self._canvas_index` (byte-identical to every call site before this brief — the sole
+        inline caller, `_think_work`'s "rule" branch, never passes it). The THREADED road's own caller
+        (`_think_apply_plan`) passes the LAUNCH boundary explicitly: this method is now called from
+        `_think_apply_pending`, running at boundary N+every, where `self._canvas_index` would read
+        N+every — the wrong content for a rule DECIDED from state at N (item 3's shift-equivalence gate:
+        the filed row's own content must match what inline-at-N would have produced, only its journal
+        seq/launched_at move)."""
         target_word: Optional[str] = None
         if row.get("accepted"):
             if op == "induce":
@@ -1618,17 +1661,17 @@ class Mind:
         if row.get("accepted") and target_word:
             cluster = [int(c) for c in (row.get("cluster") or row.get("shared") or [])]
             self._filed_predictions.append({
-                "row": row, "target_word": str(target_word), "due_canvas": self._canvas_index,
+                "row": row, "target_word": str(target_word),
+                "due_canvas": self._canvas_index if due_canvas is None else int(due_canvas),
                 "rule": {"op": op, "want": want, "cluster": cluster},
             })
         self.think_counters["predictions_filed"] += 1
 
     def _maybe_think(self, row: Dict[str, object]) -> None:
-        """PREREG §11.1 step 3: every THINK.every canvases. THINK's own gene clause is not on master at
-        the time this was written (`"THINK" in self.genome.declared` is therefore never true today for
-        any genome this worktree can parse) — RAISED, not worked around; the step is fully wired against
-        the given interface names and exercised directly by the test (bypassing the gate) against every
-        piece that does not need genome.curiosity/genome.think."""
+        """PREREG §11.1 step 3: every THINK.every canvases. THINK's own gene clause parses since Builder
+        B's B9 (genome/machinery.py) — the INLINE road below is byte-identical to what it has always been;
+        L-5 (docs/briefs/LIFE-E-THINK-THREAD.md) adds a SECOND road, `_maybe_think_threaded`, taken only
+        when `self._think_threaded` (the genome's own "; on its own thread; lands next boundary" tail)."""
         if "THINK" not in self.genome.declared:
             return
         every = int(self.genome.declared["THINK"]["every"])
@@ -1666,6 +1709,13 @@ class Mind:
                 })
                 self._skip_run_seqs = []; self._skip_run_skips = 0; self._skip_run_max_backlog = None
                 return
+        # edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5: the threaded road is a
+        # SEPARATE method (below), taken here BEFORE the pool is ever built on this thread — everything
+        # from this line down is the ORIGINAL inline road, untouched, byte-identical to before this brief
+        # (G4-8's own law: absent the genome's threaded tail, nothing here changed).
+        if self._think_threaded:
+            self._maybe_think_threaded(row)
+            return
         pool = self._think_pool()
         item = self._think_choose(pool)
         self.think_counters["thinks"] += 1
@@ -1685,6 +1735,234 @@ class Mind:
             "seq": row["seq"],
             "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": result.get("outcome"), "parked": bool(result.get("parked"))},
         })
+
+    # ------------------------------------------------------------------ L-5: THE THINKING THREAD (threaded road)
+    def _maybe_think_threaded(self, row: Dict[str, object]) -> None:
+        """PREREG §19.2/plan §4 L-5: at boundary N (this call), FIRST apply the PREVIOUS boundary's think
+        (if one is pending — waiting, blocking, if it is not back yet), THEN build the pool and choose an
+        item HERE, live, on the mind's own thread (`_think_pool`/`_think_choose` are cheap: no organism
+        edge-matrix touch, and `_think_choose` mutates `self.interests` — a live write that must stay on
+        this thread), and finally hand the CHOSEN item's own work to the think thread as a frozen copy
+        (creature/think_thread.py) and continue — `consume()` returns right after `submit()`, it never
+        waits for this boundary's own result (that happens at boundary N+every, above this method, in
+        `_maybe_think`'s `if self._think_pending is not None:` gate — see `_think_apply_pending`)."""
+        if self._think_pending is not None:
+            self._think_apply_pending(row)
+        pool = self._think_pool()
+        item = self._think_choose(pool)
+        self.think_counters["thinks"] += 1
+        # MOUTH (`_maybe_say`) judges THIS canvas's OWN instant synchronously, every boundary, threaded or
+        # not — its own law (docs/briefs/LIFE-C-QUESTION-SENTENCE.md task 4: "the songbird's loop ... no
+        # external judge") is defined in terms of `self._last_words_in_instant`/`self._last_glance`, i.e.
+        # the CURRENT canvas; deferring it to N+every would judge a DIFFERENT canvas's instant, changing
+        # what it means, not merely when it runs. RAISED in the report: item 2's "say rows" among a think's
+        # deferred writes is read here as the general class of writes a THINK tick can make, not a
+        # directive to move MOUTH off its own synchronous law.
+        self._maybe_say(row)
+        if item is None:
+            self._think_pending = None
+            return
+        # edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 21:2x +0400 — found empirically, closing a
+        # real shift-equivalence break (item 3's gate; the LIFE-E-REPORT.md has the numbers): deferring
+        # "sight"/"rule"/"frame"'s in-memory pool-gating bookkeeping (`_filed_predictions.append`,
+        # `_induce_pending`/`_deduce_pending`/`_frame_pending` adds) to apply time (N+every) — as item 2's
+        # letter asks for every kind — means the SAME candidate stays offered to `_think_choose` on every
+        # threaded boundary between N and N+every where the inline road would already have excluded it
+        # (or a "due" item can appear/vanish on a different boundary than inline). A different pool
+        # COMPOSITION draws a different number of `self._think_rng` picks, desyncing every choice after
+        # it from the inline trajectory — not a timing shift, a different life. None of these five kinds
+        # (sight, due, rule, frame, outcome) touch the organism's edge matrix (§ the module docstring of
+        # creature/think_thread.py) — the ring/pool-item lookups they need are already cheap and bounded,
+        # so there is no real latency win in deferring them. SCOPE: only "word" and "self" — the two kinds
+        # that DO need `Organism.recall_many`/`build_ledgers`/`questions_why` (an O(alive cells) read that
+        # can grow as the organism does) — go through the launch/apply pipeline below; every other kind
+        # calls the ORIGINAL, unmodified `_think_work` here, synchronously, and its journal row is written
+        # at THIS boundary — byte-identical to the inline road's own handling of these five kinds. RAISED:
+        # `creature/think_thread.py:decide()`'s sight/due/rule/frame/outcome branches and this file's
+        # `_think_apply_plan`'s matching branches are BUILT and unit-tested for content-equivalence against
+        # `_think_work` (see LIFE-E-REPORT.md), but are DEAD CODE on this scoped pipeline — a future
+        # session that fixes the pool-gating timing (mark `_filed_predictions`/`_frame_pending` bookkeeping
+        # synchronously too, the same pattern this fix already applies to `_self_worked_seq`/rule/frame's
+        # pending sets) can re-route them through the thread without rewriting them.
+        if item.get("kind") not in ("word", "self"):
+            result = self._think_work(item)
+            self._think_pending = None
+            self._write_journal(row["at"], {
+                "seq": row["seq"],
+                "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": result.get("outcome"), "parked": bool(result.get("parked"))},
+            })
+            return
+        if item.get("kind") == "self":
+            # LIFE-A-ANSWER-SELF.md #3's own law: `_self_worked_seq` is marked the MOMENT the pair is
+            # chosen (unconditionally, whatever the outcome), so the SAME pair never re-enters the pool at
+            # the next boundary — this is live pool-bookkeeping, not part of the item's WORK, so it happens
+            # here, synchronously, exactly where `_think_work`'s own "self" branch used to do it.
+            item = dict(item)
+            item["body_pair"] = list(self._body_pair)
+            self._self_worked_seq = self._body_pair[-1][0]
+        frozen = think_thread.freeze_inputs(self, item, self._canvas_index)
+        future = self._think_executor.submit(think_thread.worker_run, frozen)
+        self._think_pending = {"future": future, "boundary": self._canvas_index, "item": item}
+
+    def _think_apply_pending(self, row: Dict[str, object]) -> None:
+        """Applies the ONE outstanding think (launched at `self._think_pending["boundary"]`, some earlier
+        boundary N): waits for the future if it is not done yet (`think_waits`/`think_wait_ms` — the WAIT
+        itself is timed by creature/think_thread.py's `wait_for`, never by this file, per the determinism
+        law's own comment on the `concurrent.futures` import above), then performs the REAL writes the
+        think decided on (`_think_apply_plan`) and journals the "think" row for the TRIGGERING (launch)
+        item, stamped with `launched_at` so a reader can always tell which boundary decided it — the row
+        itself is written now, at this (later) boundary's own `row["at"]`/`row["seq"]` (item 2's own words:
+        "the files and journal rows are written then")."""
+        pending = self._think_pending
+        future = pending["future"]
+        was_done = future.done()
+        outcome = think_thread.wait_for(future)
+        if not was_done:
+            self.think_waits += 1
+            self.think_wait_ms += outcome["wait_ms"]
+        result = outcome["result"]
+        self.think_ms_last = result.get("think_ms")
+        if self.think_ms_last is not None:
+            self._think_ms_history.append(float(self.think_ms_last))
+            if len(self._think_ms_history) > 500:
+                del self._think_ms_history[: len(self._think_ms_history) - 500]
+        item = pending["item"]
+        launched_at = pending["boundary"]
+        if result.get("error") is not None:
+            self._write_journal(row["at"], {
+                "seq": row["seq"],
+                "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": "error",
+                          "error": result["error"], "parked": False, "launched_at": launched_at},
+            })
+            self._think_pending = None
+            return
+        plan = result.get("plan") or {}
+        applied = self._think_apply_plan(item, plan, launched_at)
+        self._write_journal(row["at"], {
+            "seq": row["seq"],
+            "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": applied.get("outcome"),
+                      "parked": bool(applied.get("parked")), "launched_at": launched_at},
+        })
+        self._think_pending = None
+
+    def _think_apply_plan(self, item: Dict[str, object], plan: Dict[str, object], launched_at: int) -> Dict[str, object]:
+        """Performs the REAL write(s) `creature/think_thread.py:decide()` decided on (a plan, never a
+        write itself — the ONE-WRITER law: this is the ONLY place that plan is ever acted on, and it runs
+        on the mind's own thread). Mirrors `_think_work`'s branches field-for-field: same dead-end reason
+        vocabulary, same PARK/ASK/believe()/predict_file() call shapes, same STATUS counters — the only
+        difference is WHERE the deciding data came from (a frozen copy at `launched_at`, not live state
+        now) and, for "rule"/"frame", that `due_canvas` is pinned to `launched_at` rather than read live
+        off `self._canvas_index` at call time (`_file_rule`'s own `due_canvas=` parameter, added by this
+        brief) — the INLINE road computes it at the boundary it runs on; this road must use the boundary
+        the DECISION was made at, or a filed rule's own due_canvas would silently be `every` canvases later
+        than the shift-equivalence gate expects (item 3)."""
+        def dead_end(want: str, reason: str, ask_spec: Optional[Dict[str, object]]) -> Dict[str, object]:
+            parked = False
+            if self.park is not None:
+                parked = self.park.answer(want, reason) == "parked"
+                if parked:
+                    self.think_counters["parked"] += 1
+                    if ask_spec is not None:
+                        if "args_word" in ask_spec:
+                            w = str(ask_spec["args_word"])
+                            self._maybe_ask_word(f"parked:word:{w}", w)
+                        elif "args_tape_moment" in ask_spec:
+                            self._maybe_ask(f"parked:sight:{item['key']}", "what-is", [ask_spec["args_tape_moment"]])
+            return {"outcome": reason, "parked": parked}
+
+        if "dead_end" in plan:
+            d = plan["dead_end"]
+            return dead_end(str(d["want"]), str(d["reason"]), d.get("ask"))
+
+        if "not_yet_due" in plan:
+            return {"outcome": "not_yet_due", "parked": False}
+
+        if "no_change" in plan:
+            return {"outcome": "no_change", "parked": False}
+
+        if "reflected" in plan:
+            r = plan["reflected"]
+            return {"outcome": "reflected", "parked": False, "act": r["act"], "residual": r["residual"]}
+
+        if "believe" in plan:
+            if not _THINK_LAWS_AVAILABLE:
+                return {"outcome": "think_laws_unavailable", "parked": False}
+            b = plan["believe"]
+            # believe()'s "ledgers" kwarg is its OWN drift check (rule 4: has one of this word's cells since
+            # been reassigned to another word by a birth/merge that happened AFTER this belief's content was
+            # decided?) — built LIVE, here, at apply time (cheap: O(births), no W/mask touch), deliberately
+            # NOT from the frozen copy: a frozen ledger could never disagree with cells decided from that
+            # SAME frozen state, which would make the drift check a no-op. This is the one place the
+            # threaded and inline roads can genuinely diverge in CONTENT (revisit/extension/clash, never
+            # whether a row is written at all) when births/merges land between launch and apply — named in
+            # the report, not hidden.
+            ledgers = build_ledgers(self.org, self.moment_word) if item.get("kind") == "word" else None
+            extra_kwargs: Dict[str, object] = {}
+            if "ledgers" in _BELIEVE_KWARGS:
+                extra_kwargs["ledgers"] = ledgers
+            if "clash_enabled" in _BELIEVE_KWARGS:
+                extra_kwargs["clash_enabled"] = "BELIEF" in self.genome.declared
+            belief_row = think_laws.believe(str(b["word"]), list(b["cells"]), list(b["episode_ids"]), int(b["moment"]),
+                                             self.run_root / "state" / "beliefs.jsonl", **extra_kwargs)
+            KIND_TO_COUNTER = {"belief": "beliefs", "revisit": "revisits", "extension": "extensions", "clash": "clashes"}
+            kind = belief_row.get("kind", "belief") if isinstance(belief_row, dict) else "belief"
+            self.think_counters[KIND_TO_COUNTER.get(kind, "beliefs")] += 1
+            if kind == "clash":
+                clash_lines = belief_row.get("clashes") if isinstance(belief_row, dict) else None
+                self._maybe_ask_clash(f"clash:{b['word']}:{clash_lines}", str(b["word"]))
+            return {"outcome": "belief", "parked": False, "belief": belief_row}
+
+        if "file_predict" in plan:
+            fp = plan["file_predict"]
+            filed = predict_file(claim=str(fp["claim"]), route=str(fp["route"]), decider=str(fp["decider"]), due=str(fp["due"]))
+            if not filed["accepted"]:
+                return {"outcome": "refused", "parked": False, "refused": filed.get("refused")}
+            self._filed_predictions.append({"row": filed, "target_word": fp["target_word"], "due_canvas": int(fp["due_canvas"])})
+            self.think_counters["predictions_filed"] += 1
+            return {"outcome": "filed", "parked": False, "route_word": fp["target_word"]}
+
+        if "file_rule" in plan:
+            fr = plan["file_rule"]
+            op, want, row_pred = str(fr["op"]), str(fr["want"]), fr["row"]
+            key = want.split(":", 1)[1] if ":" in want else want
+            (self._induce_pending if op == "induce" else self._deduce_pending).add(key)
+            self._file_rule(row_pred, want=want, op=op, due_canvas=launched_at)
+            if not row_pred.get("accepted"):
+                return {"outcome": "refused", "parked": False, "refused": row_pred.get("refused")}
+            return {"outcome": "filed", "parked": False, "want": want}
+
+        if "file_frame" in plan:
+            ff = plan["file_frame"]
+            w1, w2, key = str(ff["w1"]), str(ff["w2"]), str(ff["key"])
+            filed = predict_file(claim=f'"{w1} {w2}"', route="frame",
+                                  decider="the eye answers BOTH words on the next instant that carries w1",
+                                  due=f"the next instant with {w1!r}")
+            predict_ledger_path = self.run_root / "state" / "predictions.jsonl"
+            predict_ledger_path.parent.mkdir(parents=True, exist_ok=True)
+            with predict_ledger_path.open("a") as f:
+                f.write(json.dumps(filed, default=str) + "\n")
+            self.think_counters["predictions_filed"] += 1
+            if not filed.get("accepted"):
+                return {"outcome": "refused", "parked": False, "refused": filed.get("refused")}
+            self._frame_pending.add(key)
+            self._frames[key] = {"w1": w1, "w2": w2, "episodes": list(ff["episodes_cited"])}
+            self._filed_predictions.append({
+                "row": filed, "target_word": w1, "due_canvas": launched_at,
+                "frame_w2": w2, "frame_key": key,
+            })
+            self.think_counters["frames_filed"] += 1
+            return {"outcome": "filed", "parked": False, "frame": key}
+
+        return {"outcome": "unknown_plan", "parked": False}
+
+    def think_ms_median(self) -> Optional[float]:
+        """PREREG §19.2 L-5's mark: "think_ms ... on STATUS as a series-friendly last value and a running
+        median" — `think_ms_last` is the last value; this is the median over the last (at most 500) real
+        think computations (`_think_ms_history`, capped in `_think_apply_pending`). `statistics` is not on
+        the determinism law's forbidden list (time/datetime/random/os.urandom) — no clock read, arithmetic
+        only, over numbers creature/think_thread.py already measured. None (not 0.0 — never a fabricated
+        reading, #175) when no threaded think has completed yet, including on every non-threaded genome."""
+        return statistics.median(self._think_ms_history) if self._think_ms_history else None
 
     # ------------------------------------------------------------------ MOUTH (L-11 task 4)
     def _maybe_say(self, row: Dict[str, object]) -> None:
@@ -1790,6 +2068,17 @@ class Mind:
         self.snapshot_count += 1
 
     def close(self) -> None:
+        # edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5: a tape can end (or a life
+        # can stop) with a think still in flight — its result would otherwise be silently lost (never
+        # applied, never journaled). Applied here, against the LAST eye row's own at/seq (self._cur_at/
+        # _cur_seq, set by every _consume_eye call) — the brief does not specify a tail rule for this edge;
+        # raised in the report as the chosen behaviour, not left undefined. The executor is shut down
+        # (wait=True: the one in-flight future, if any, already finished by the apply call above) so a
+        # short-lived Mind (a replay, a test) leaves no daemon thread behind it.
+        if self._think_pending is not None and self._cur_at is not None:
+            self._think_apply_pending({"at": self._cur_at, "seq": self._cur_seq})
+        if self._think_executor is not None:
+            self._think_executor.shutdown(wait=True)
         self.snapshot()
 
     @classmethod

@@ -13,7 +13,17 @@ from pathlib import Path
 import numpy as np
 
 PIN = "b05315037ff98529836472e6ddd9ebb5a45742b0511f5facf6b73cd754fa1e3f"   # G4-2, read 2026-09-19 21:3x at 9a36475
-SENSE_FILES = ["creature/world_maker.py", "creature/ask.py", "creature/tape.py"]
+# edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5 (docs/briefs/LIFE-E-THINK-THREAD.md
+# item 4): "extend the sweep's walk to the think module if it does not reach it" -- it did not (the walk
+# was creature/world_maker.py/ask.py/tape.py + creature/senses/*.py; the think thread's own module,
+# creature/think_thread.py, is none of those, so a write planted there would have gone uncaught). Added
+# here, not to creature/senses/ (it is not a sense) -- the sweep's SECOND check (any open/write_text/save/
+# etc. call whose target names a forbidden dir) applies to every file in this list regardless of the
+# "is_sense" gate that guards ONLY the first check (imports Organism); the think module legitimately
+# imports Organism (it builds a read-only shadow of one, genome.machinery.Organism/Area, to reuse
+# Organism.recall_many/genome.questions.build_ledgers verbatim against a frozen copy -- never the live
+# organism), so it deliberately does NOT get the "is_sense" treatment, only the writer check.
+SENSE_FILES = ["creature/world_maker.py", "creature/ask.py", "creature/tape.py", "creature/think_thread.py"]
 FORBIDDEN_DIRS = ("state", "journal", "memory")
 
 
