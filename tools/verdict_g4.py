@@ -189,6 +189,16 @@ def _force_one_glance() -> None:
     _gaze.glances = lambda rgb, spec_, g, mode="surprise", pic_id="", **kw: _orig(rgb, spec_, g, "one", pic_id, **kw)
 
 
+def _force_no_coarse() -> None:
+    """The blind-coarse twin ASKS with the four located glances it LEARNED on (builder B's clause 9, docs/briefs/LIFE-B-REPORT.md §6:
+    a `--blind coarse` twin learned without the fifth glance and was asked with it — «learned without, asked with»). The sibling of
+    `_force_one_glance()`: every glances() call of THIS process sees a gaze dict without `coarse`, every other argument forwarded.
+    edit: Claude (Fable 5.1), 2026-09-22 20:39 +0400 — written RED first (tests/creature/test_verdict_blind_coarse.py)."""
+    from genome import gaze as _gaze
+    _orig = _gaze.glances
+    _gaze.glances = lambda rgb, spec_, g, mode="surprise", pic_id="", **kw: _orig(rgb, spec_, {k: v for k, v in dict(g).items() if k != "coarse"}, mode, pic_id, **kw)
+
+
 def _nowire(mind: "Mind") -> None:
     """The no-wire twin: a fresh unwired Organism; the Predictor rebuilt on it with the SAME declared arm the life runs."""
     from genome.machinery import Organism
@@ -224,6 +234,8 @@ def worker(spec_path: Path) -> int:
         # glance×glance, one feature vector), forced on every glances() call of THIS worker process — the mind's learning road and
         # the exam's held-out alike — without touching creature code (the mind hardcodes surprise/random).
         _force_one_glance()
+    if "coarse" in spec.get("blind", []):
+        _force_no_coarse()      # edit: Claude (Fable 5.1), 2026-09-22 20:39 +0400 — B's clause 9: the twin asks with the glances it learned on
     mind = Mind(genome_path, root, blind=frozenset(spec.get("blind", [])))
     if spec.get("nowire"):
         _nowire(mind)
@@ -247,8 +259,8 @@ def worker(spec_path: Path) -> int:
                "sleeps": sum(1 for r in mind_rows if "sleep" in r), "thinks": sum(1 for r in mind_rows if "think" in r),
                "parked": sum(1 for r in mind_rows if "think" in r and r["think"].get("parked")),
                "canvases": n_canvas, "seconds": round(secs, 1), "ms_per_canvas": round(1000 * secs / max(1, n_canvas), 2), "hash": org.state_hash()}
-    if spec.get("one_glance"):
-        from tools import self_exam as _se           # in-process, so the forced mode "one" applies to the held-out glances too
+    if spec.get("one_glance") or "coarse" in spec.get("blind", []):
+        from tools import self_exam as _se           # in-process, so the forced mode "one" (or the forced no-coarse) applies to the held-out glances too
         old_argv = sys.argv
         try:
             sys.argv = ["self_exam.py", "--root", str(root), "--genome", str(genome_path), "--held", "10", "--check-tape", "400"]
