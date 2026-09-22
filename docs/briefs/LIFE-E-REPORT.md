@@ -238,4 +238,4 @@ Branch `life-think`, commits on top of `0a640f0`:
    coverage, and the seam fills.
 2. This report.
 
-Final commit sha: **filled in after the commit below** (see the tool output).
+Final commit sha: **fb27d7a**.
