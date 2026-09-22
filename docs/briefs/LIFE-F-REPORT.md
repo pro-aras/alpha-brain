@@ -291,4 +291,4 @@ weakness — are results, not failures, per PREREG §9–§11's own law).
 
 ## Commit
 
-Branch `life-hands`, commit sha: **(recorded after `git commit`, see the final handback message)**.
+Branch `life-hands`, commit sha: **fe9c64c**.
