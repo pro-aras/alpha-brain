@@ -373,3 +373,50 @@ def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[floa
         out.update(graded=True, **{"pass": band and int(refused or 0) == 0 and plant_births >= 1},
                    reason=f"graded (§19.11): band {'ok' if band else 'MISSED'}; refused {refused}; plant births {plant_births}")
     return out
+
+
+# edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:22 +0400 — ALPHA4-PREREG.md §5: WEB and STAGE (I).
+def web_mark(tape: Iterable[dict], journal: Iterable[dict], door_web_declared: bool) -> Dict[str, object]:
+    """§5 WEB: fetch counts (made [ok+failed] / refused_rate / refused_hold); every web row traceable to
+    a question — this mark's own proxy (RAISED; see the builder report and creature/senses/web.py's own
+    module docstring): builder H's lexicon door had not landed when this was written, so there is no real
+    "QUESTION row" shape on the tape yet to cross-reference against — every `web` row's own `question_id`
+    (never null, by construction of creature/senses/web.py's own `_record_meta`) is read as the mark's
+    traceability proxy instead; a null there is what "a fetch without one" (the PREREG's own words) means
+    here, and FAILS the mark. Under STAGE 3 (no stage-4 event on this record) the made count must be 0 —
+    the door's own law, checked directly against the record rather than assumed."""
+    rows = [r for r in tape if r.get("sense") == "web"]
+    made = [r for r in rows if _meta(r).get("status") in ("ok", "failed")]
+    refused_rate = [r for r in rows if _meta(r).get("status") == "refused_rate"]
+    refused_hold = [r for r in rows if _meta(r).get("status") == "refused_hold"]
+    untraceable = [r for r in rows if _meta(r).get("question_id") is None]
+    stage4_events = [j for j in journal if j.get("event") == "stage" and j.get("stage") == 4]
+    out: Dict[str, object] = {
+        "web_rows": len(rows), "made": len(made), "refused_rate": len(refused_rate), "refused_hold": len(refused_hold),
+        "untraceable": len(untraceable), "stage4_reached": bool(stage4_events),
+        "bar": "made/refused_rate/refused_hold printed · every web row's question_id present (this mark's own traceability proxy, RAISED) · under STAGE 3 (no stage-4 event) made == 0",
+    }
+    if not door_web_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: DOOR_WEB not declared on this life")
+        return out
+    if not rows:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: no web row on this tape (STAGE 4 never reached, or the door never had a question to serve)")
+        return out
+    stage3_law_ok = bool(stage4_events) or len(made) == 0
+    out.update(graded=True, **{"pass": len(untraceable) == 0 and stage3_law_ok}, reason="graded (§5 WEB)")
+    return out
+
+
+def stage_mark(journal: Iterable[dict], stage_ready_declared: bool) -> Dict[str, object]:
+    """§5 STAGE: the stage series by moment, each with the READINESS judge's own readings (a..e) at the
+    moment it fired; exactly one stage-4 event or none — never more (the mind's own "never undone" law,
+    checked directly: a second event would mean the guard in `_maybe_advance_stage` broke)."""
+    events = [j for j in journal if j.get("event") == "stage"]
+    series = [{"moment": j.get("moment"), "stage": j.get("stage"), "readings": j.get("readings")} for j in events]
+    out: Dict[str, object] = {"stage_events": len(events), "series": series,
+                              "bar": "the stage series by moment, each with its five readings · at most ONE stage-4 event, ever"}
+    if not stage_ready_declared:
+        out.update(graded=False, **{"pass": None}, reason='not gradable: STAGE_READY ("by READY") not declared on this life')
+        return out
+    out.update(graded=True, **{"pass": len(events) <= 1}, reason="graded (§5 STAGE)")
+    return out

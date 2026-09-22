@@ -36,6 +36,61 @@ def _literal_text(node) -> str:
     return " ".join(out)
 
 
+# edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — a gap found while landing the web
+# door's OWN planted-offender test (ALPHA4-PREREG.md's instruction: "a planted offender: a web sense that
+# writes memory"): the two-step form every real sense module here actually uses for its cursor writes —
+# `seen_path = Path(root) / "folder" / "SEEN.json"` on one line, `seen_path.write_text(...)` later
+# (folder.py, game.py, sit.py, this builder's own grade.py/web.py) — was INVISIBLE to this sweep. `target`
+# was built from `_literal_text(fn.value)`, a bare walk of the RECEIVER expression; for `seen_path.write_
+# text(...)`, `fn.value` is just the `Name` node `seen_path`, which carries no string constant of its own
+# — the path text lives in a SEPARATE, earlier assignment this walk never looked at. A same-module plant
+# in exactly this shape (`p = Path(root) / 'memory' / 'x.json'; p.write_text('{}')`) sailed through with
+# ZERO offenders (verified: the INLINE form, `(Path(root)/'memory'/'x.json').write_text(...)`, was already
+# caught — only the two-step, variable-indirected form was blind). tests/creature/test_writer_sweep.py's
+# OWN independent sweep (`find_offenders`) already resolves this via `_build_env`/`_flatten`; `_resolve`
+# below is the same technique, ported here so gate_g4.py's sweep — the one every builder's landing runs
+# under `tools/gate_g5_landing.sh` — has the SAME resolving power, not a narrower one. Additive only: every
+# node shape this function did not specially handle before still falls through to the exact same
+# `_literal_text` walk, so no previously-caught offender or previously-clean file changes verdict; the six
+# real sense modules (folder/game/sit/body_sense/hands/ear — every one already using this two-step
+# pattern) were re-swept after this change and stayed clean (tests.creature.test_writer_sweep.
+# TestWriterSweepG41.test_the_real_web_and_grade_modules_pass_both_sweeps and a manual re-run of gate1
+# below, both green).
+def _resolve(node, env: dict) -> Optional[str]:
+    """Best-effort static text of a path-like expression: literals/f-strings (falls through to
+    `_literal_text`), `a / b` chains, `Path(...)` calls, `.attr` chains, and a same-module bare variable
+    name resolved through `env` (built by `_build_env`, below)."""
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.Name):
+        return env.get(node.id)
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+        left, right = _resolve(node.left, env), _resolve(node.right, env)
+        return None if left is None and right is None else f"{left or ''}/{right or ''}"
+    if isinstance(node, ast.Call):
+        callee = node.func
+        name = callee.id if isinstance(callee, ast.Name) else (callee.attr if isinstance(callee, ast.Attribute) else None)
+        if name == "Path" and node.args:
+            return _resolve(node.args[0], env)
+        return _literal_text(node)   # a call shape not specially understood -- the plain walk, unchanged
+    if isinstance(node, ast.Attribute):
+        return _resolve(node.value, env)
+    return _literal_text(node)       # anything else -- the plain walk, unchanged (byte-identical fallback)
+
+
+def _build_env(tree: ast.AST) -> dict:
+    """A same-module `name -> resolved path text` map from simple `x = <expr>` assignments (last write
+    wins — adequate for this codebase's straight-line sense modules, not real dataflow; mirrors tests/
+    creature/test_writer_sweep.py's own `_build_env` exactly)."""
+    env: dict = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+            text = _resolve(node.value, env)
+            if text is not None:
+                env[node.targets[0].id] = text
+    return env
+
+
 def sweep(paths) -> list:
     offenders = []
     for p in paths:
@@ -43,6 +98,7 @@ def sweep(paths) -> list:
         if not p.exists():
             continue
         tree = ast.parse(p.read_text(), filename=str(p))
+        env = _build_env(tree)
         for node in ast.walk(tree):
             if isinstance(node, (ast.Import, ast.ImportFrom)):
                 names = [a.name for a in node.names] + ([node.module or ""] if isinstance(node, ast.ImportFrom) else [])
@@ -53,11 +109,11 @@ def sweep(paths) -> list:
                 fn = node.func
                 name = fn.attr if isinstance(fn, ast.Attribute) else (fn.id if isinstance(fn, ast.Name) else "")
                 if name in ("open", "write_text", "write_bytes", "save", "savez", "savez_compressed", "replace", "rename"):
-                    target = _literal_text(node.args[0]) if node.args else ""
+                    target = (_resolve(node.args[0], env) or "") if node.args else ""
                     if name == "open" and node.args and len(node.args) > 1:
                         target += " " + _literal_text(node.args[1])
                     if isinstance(fn, ast.Attribute):
-                        target += " " + _literal_text(fn.value)
+                        target += " " + (_resolve(fn.value, env) or "")
                     mode = ""
                     for kw in node.keywords:
                         if kw.arg == "mode":

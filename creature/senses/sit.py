@@ -41,6 +41,24 @@ def _score_of(data: dict) -> Optional[float]:
     return float(acc) if isinstance(acc, (int, float)) else None
 
 
+# edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:13 +0400 — ALPHA4-PREREG.md §4(c) (THE
+# READINESS JUDGE): "the last two SIT rows composite >= 0.95". The exam report already carries this
+# number (`ask_seen_words.composite`, `genome/questions.py`'s own field — the mean of Q1..Q4's own
+# accuracies, `tools/verdict_g4.py`'s and `genome/run_g0.py`/`run_g1.py`'s own established reader of it)
+# but `_score_of` above only ever forwarded Q1 to the tape; the READINESS judge (creature/mind.py, "from
+# TAPE FACTS ONLY") has no other road to this number. ADDITIVE: `sense()`'s existing "score"/"exam_file"
+# payload/meta keys are untouched, byte for byte — this only adds a THIRD key, "composite", so no existing
+# reader of a `sit` row (tests.creature.test_g5k_outcome's own dogfooding test, `creature/mind.py`'s
+# `_consume_sit`'s `_record_reflex` call, which reads only `meta.get("score")`) sees any different value
+# than before.
+def _composite_of(data: dict) -> Optional[float]:
+    """The mean of Q1..Q4's own accuracies — the SAME field `_score_of` reads Q1 out of
+    (`ask_seen_words.composite`), extracted the same defensive way (#162's discipline)."""
+    ask = data.get("ask_seen_words") if isinstance(data, dict) else None
+    comp = (ask or {}).get("composite") if isinstance(ask, dict) else None
+    return float(comp) if isinstance(comp, (int, float)) else None
+
+
 def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_canvases: int, poll_period: float = 5.0) -> None:
     """Mirrors `creature/exam.py`'s own `voice_loop` cadence (state/ledger.json's "moments" divided by the
     genome's fixations-per-canvas) so SIT's own `every` value is a real, read parameter — never a fixed
@@ -73,8 +91,9 @@ def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_ca
                     if data is not None:
                         score = _score_of(data)
                         if score is not None:
-                            payload = json.dumps({"score": score, "exam_file": latest.name}).encode("utf-8")
+                            composite = _composite_of(data)   # ALPHA4-PREREG §4(c): additive, alongside score (None on an exam report that carries no "composite" field)
+                            payload = json.dumps({"score": score, "exam_file": latest.name, "composite": composite}).encode("utf-8")
                             publish("sit", payload, {"moment": f"sit{latest.stem}", "source": "sit",
-                                                      "exam_file": latest.name, "score": score}, "json")
+                                                      "exam_file": latest.name, "score": score, "composite": composite}, "json")
                         last_published_name = latest.name    # advance the cursor AFTER the row is durable (#230), even if score was None (a malformed report is not re-tried forever)
         stop_event.wait(poll_period)

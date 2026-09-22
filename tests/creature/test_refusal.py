@@ -228,6 +228,13 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "HANDS": "HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20",
         "SENSE_TOUCH": "SENSE    touch from hands: exit rate stalls retries bytes",
         "SENSE_SMELL": "SENSE    smell kind size folder age",
+        # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:34 +0400 — ALPHA4-PREREG.md §3/§4: three
+        # rows, matching the three genes.py RUNS entries added by this task (DOOR_WEB, SENSE_GRADE,
+        # STAGE_READY). Caught by this test's own gate on the first full-suite run after landing — exactly
+        # the omission this class exists to catch (its own comment above, now proven on a fourth builder).
+        "DOOR_WEB": "DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD",
+        "SENSE_GRADE": "SENSE    grade from ask/graded",
+        "STAGE_READY": "STAGE    4 world by READY",
     }
 
     def test_every_runs_gene_parses(self) -> None:

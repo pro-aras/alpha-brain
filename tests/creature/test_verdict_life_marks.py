@@ -302,5 +302,71 @@ class ThreadMark(unittest.TestCase):
         self.assertFalse(thread_mark({"max_gap_s_eye_ear": [1.0]}, {"thinks": 100, "think_waits": 6}, True)["pass"])          # waits 6 % ≥ 5 %
 
 
+# edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:22 +0400 — ALPHA4-PREREG.md §5: WEB and STAGE (I).
+def _web_row(status, qid="0", seq=1):
+    return {"seq": seq, "sense": "web", "meta": {"status": status, "question_id": qid, "word": "zog", "source": "web"}}
+
+
+class WebMark(unittest.TestCase):
+    def test_not_gradable_without_the_gene(self):
+        from tools.verdict_life import web_mark
+        self.assertFalse(web_mark([_web_row("ok")], [], False)["graded"])
+
+    def test_not_gradable_with_no_web_rows(self):
+        from tools.verdict_life import web_mark
+        self.assertFalse(web_mark([], [], True)["graded"])
+
+    def test_counts_and_pass_with_traceable_rows_and_a_stage4_event(self):
+        from tools.verdict_life import web_mark
+        tape = [_web_row("ok", "0", 1), _web_row("failed", "1", 2), _web_row("refused_rate", "2", 3), _web_row("refused_hold", "3", 4)]
+        journal = [{"event": "stage", "stage": 4, "moment": 10, "readings": {"a": True, "b": True, "c": True, "d": True, "e": True}}]
+        m = web_mark(tape, journal, True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"])
+        self.assertEqual(m["made"], 2); self.assertEqual(m["refused_rate"], 1); self.assertEqual(m["refused_hold"], 1)
+        self.assertEqual(m["untraceable"], 0)
+
+    def test_a_row_with_no_question_id_fails(self):
+        from tools.verdict_life import web_mark
+        bad = {"seq": 1, "sense": "web", "meta": {"status": "ok", "question_id": None}}
+        journal = [{"event": "stage", "stage": 4}]
+        m = web_mark([bad], journal, True)
+        self.assertTrue(m["graded"]); self.assertFalse(m["pass"]); self.assertEqual(m["untraceable"], 1)
+
+    def test_made_fetches_under_stage_3_with_no_stage4_event_fails_the_law(self):
+        from tools.verdict_life import web_mark
+        m = web_mark([_web_row("ok")], [], True)   # a made fetch, but no stage-4 event anywhere on the record
+        self.assertTrue(m["graded"]); self.assertFalse(m["pass"])
+
+    def test_refusals_alone_under_stage_3_pass_the_law(self):
+        from tools.verdict_life import web_mark
+        m = web_mark([_web_row("refused_rate")], [], True)   # 0 MADE fetches -- the law holds even with no stage-4 event
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"])
+
+
+class StageMark(unittest.TestCase):
+    def test_not_gradable_without_the_gene(self):
+        from tools.verdict_life import stage_mark
+        self.assertFalse(stage_mark([{"event": "stage", "stage": 4}], False)["graded"])
+
+    def test_no_event_yet_is_graded_and_passes(self):
+        from tools.verdict_life import stage_mark
+        m = stage_mark([], True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["stage_events"], 0)
+
+    def test_one_event_passes_and_carries_the_readings(self):
+        from tools.verdict_life import stage_mark
+        journal = [{"event": "stage", "stage": 4, "moment": 42, "readings": {"a": True, "b": True, "c": True, "d": True, "e": True}}]
+        m = stage_mark(journal, True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["stage_events"], 1)
+        self.assertEqual(m["series"][0]["moment"], 42)
+        self.assertEqual(m["series"][0]["readings"]["a"], True)
+
+    def test_two_events_fails_never_undone_broken(self):
+        from tools.verdict_life import stage_mark
+        journal = [{"event": "stage", "stage": 4, "moment": 1}, {"event": "stage", "stage": 4, "moment": 2}]
+        m = stage_mark(journal, True)
+        self.assertTrue(m["graded"]); self.assertFalse(m["pass"])
+
+
 if __name__ == "__main__":
     unittest.main()
