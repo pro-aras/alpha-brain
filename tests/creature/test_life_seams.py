@@ -41,7 +41,17 @@ class LifeSeams(unittest.TestCase):
 
     @unittest.skipUnless(_worker_obeys(), "D not landed")
     def test_D_the_workers_act_wait_checks_the_stop_file(self):
-        self.fail("fill at the landing: the worker blocked on ACT exits within one poll of the stop file appearing (the advisor's orphan finding)")
+        # filled at D's landing (Claude (Fable 5.1), 2026-09-22 19:04 +0400): a worker blocked on ACT must leave within a few polls of the stop
+        # file appearing, or `systemctl stop` orphans the venv subprocess (the advisor's finding on the brief's «no timeout»).
+        import tempfile, threading, time
+        from tools.game_worker_babyai import _wait_for_act, ACT_FILE_POLL_S
+        d = Path(tempfile.mkdtemp(prefix="seamD-")); act = d / "ACT"; stop = d / "STOP"
+        threading.Timer(0.25, lambda: stop.write_text("stop")).start()
+        t0 = time.perf_counter(); got = _wait_for_act(act, 0, stop); dt = time.perf_counter() - t0
+        self.assertIsNone(got)
+        self.assertLess(dt, 0.25 + 10 * ACT_FILE_POLL_S + 0.5)
+        stop.unlink(); act.write_text('{"seq": 7, "act": 2, "at": "now"}')
+        self.assertEqual(int(_wait_for_act(act, 0, stop)["seq"]), 7)      # and an act newer than last_seq is returned
 
 
 if __name__ == "__main__":
