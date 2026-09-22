@@ -183,6 +183,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:35 +0400 — G-EYE-2/BIND: one row, matching
         # the genes.py RUNS entry added by this task (docs/briefs/G5-J-BIND-COLOUR-RETINA.md).
         "BIND": "BIND     glances per canvas",
+        # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4: one row, matching the
+        # genes.py RUNS entry added by this task (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md §4 L-4).
+        "SURPRISE": "SURPRISE floor 0.05 predicted mind-cell",
     }
 
     def test_every_runs_gene_parses(self) -> None:

@@ -2,6 +2,15 @@
 
 edit: Claude (Fable 5.1), 2026-09-19 17:35 +0400 — §6 amendment 1: the `border` INK rule (background from the window's rim); `contrast` kept as the first run's record.
 edit: Claude (Fable 5.1), 2026-09-19 17:21 +0400 — G1 rung 1, on Ahmad's 17:10 «Ok go for it» (D-G4 road (a)).
+edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 18:3x +0400 — L-4/L-7 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+§4): `glances()` gains `predicted=` (SURPRISE's expectation vector — G-EYE-5's slot; NEVER forwarded into
+`gaze_sequence`'s own `predicted=` argument, which would move FIXATION selection, a different, undeclared
+form — see G-EYE-5's own "the other form" note) and returns a `"residual"` list (`1 - cos(v, predicted)` per
+feature, None when predicted is None) parallel to `"feats"`. `glances()` also grows a FIFTH whole-canvas
+feature ("coarse") when `gaze["coarse"]` is declared — the exact `mode="one"` computation (`_one_glance_
+vector`, shared so the two are identical to the byte on the same size), appended to `feats`/`residual` but
+NOT to `fix`/`windows` (which stay the four located glances only). `gaze["coarse"]` absent (every existing
+caller/genome) is byte-identical to before this edit.
 
 Nothing of the saliency or the fixation rule is written here: `organs/retina.py` and `organs/gaze.py`
 are imported from /data/dev/alpha2 and refused if their sha256 is not the pinned one. This file only
@@ -158,6 +167,31 @@ def colour_block_whole(an: Dict[str, object]) -> np.ndarray:
     return np.concatenate(out)
 
 
+def _one_glance_vector(rgb: np.ndarray, spec: Sequence[str], size: int, ink_rule, colour: Optional[Dict[str, object]]) -> np.ndarray:
+    """The mode="one" whole-canvas feature at `size`×`size`: resize the WHOLE canvas (never a cropped
+    window), apply the declared INK rule, run RETINA, and (colour declared) concatenate colour_block_
+    whole()'s 32 raw numbers then unit-renormalise once — byte-for-byte what `glances(..., mode="one")`
+    has always computed. Shared here (L-7, edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 18:3x
+    +0400) so the coarse glance and the T-one-glance twin's mode="one" road are ONE derivation of the
+    formula, never two (SOLUTIONS #172's family: a value re-derived twice drifts)."""
+    small = np.asarray(Image.fromarray(rgb).convert("L").resize((size, size), Image.BOX), dtype=np.float64) / 255.0
+    v = retina(ink_rule(small), tuple(spec))
+    if colour is not None:
+        an = _analyse_frame(rgb)
+        v = _unit(np.concatenate([v, colour_block_whole(an)]))
+    return v
+
+
+def _residual(v: np.ndarray, predicted: Optional[np.ndarray]) -> Optional[float]:
+    """SURPRISE (L-4): `1 - cos(v, predicted)`. Both `v` (RETINA's own tower/colour output) and
+    `predicted` (Organism.expected_sight's stored cell) are unit length by construction, so cos is a
+    plain dot product — never divided by a norm that could be zero. None ("not gradable") when there is
+    no expectation for this canvas."""
+    if predicted is None:
+        return None
+    return float(1.0 - float(np.dot(v, predicted)))
+
+
 def glance_window(grey: np.ndarray, cell: Tuple[int, int], grid: int, glance: int) -> Tuple[np.ndarray, Tuple[int, int]]:
     """The glance×glance window centred on the cell's centre, clamped inside the canvas. Returns (window, (top, left))."""
     h, w = grey.shape
@@ -167,9 +201,26 @@ def glance_window(grey: np.ndarray, cell: Tuple[int, int], grid: int, glance: in
 
 
 def glances(rgb: np.ndarray, spec: Sequence[str], gaze: Dict[str, object], mode: str = "surprise", pic_id: str = "",
-            colour: Optional[Dict[str, object]] = None) -> Dict[str, object]:
+            colour: Optional[Dict[str, object]] = None, predicted: Optional[np.ndarray] = None) -> Dict[str, object]:
     """One picture → its glance features. mode: surprise (the gene) | random (T-random-gaze) | one (T-one-glance: the whole
-    canvas at glance×glance, one feature vector). Returns {"feats": [...], "fix": [(y, x), ...], "windows": [(top, left), ...]}.
+    canvas at glance×glance, one feature vector). Returns {"feats": [...], "fix": [(y, x), ...], "windows": [(top, left), ...],
+    "residual": [...]}.
+
+    `predicted` (L-4, new — Organism.expected_sight()'s vector or None; caller: creature/mind.py's
+    `_consume_eye`, computed once per canvas BEFORE this call): NEVER forwarded into `gaze_sequence`'s own
+    `predicted=` argument below (that would move which cells get FIXATED — G-EYE-5's OTHER, undeclared
+    form; the mind's prediction never touches fixation selection, only what is REPORTED about each
+    already-chosen glance). Instead every returned feature (each located glance, and the coarse one below)
+    gets a `residual = 1 - cos(feature, predicted)` in the parallel `"residual"` list — None wherever
+    `predicted` is None (undeclared SURPRISE, an unknown word, sight-only). predicted=None (every existing
+    caller before this edit): `"residual"` is `[None, ...]`, and nothing else about `"feats"`/`"fix"`/
+    `"windows"` changes — byte-identical.
+
+    `gaze.get("coarse")` (L-7, new — the size in pixels, e.g. 32; None unless GAZE's genome line declares
+    the trailing "coarse <n>" clause): a FIFTH feature, the exact `mode="one"` whole-canvas vector at that
+    size (`_one_glance_vector`, above — the same derivation, never a second one), appended to `"feats"`
+    (and `"residual"`) but NOT to `"fix"`/`"windows"` (which stay the located glances only — the coarse
+    glance has no window). Undeclared (every existing genome): byte-identical, nothing appended.
 
     `colour` (G-EYE-3/§3.6, new — Genome.colour, None unless SENSE colour is declared): when not None, each
     feature vector is RETINA's own unit-length tower block concatenated with colour_block()'s 32 RAW (never
@@ -196,17 +247,8 @@ def glances(rgb: np.ndarray, spec: Sequence[str], gaze: Dict[str, object], mode:
     ink_rule = INK_RULES[str(gaze.get("ink", "contrast"))]
     grey = luminance(rgb)
     if mode == "one":
-        small = np.asarray(Image.fromarray(rgb).convert("L").resize((glance, glance), Image.BOX), dtype=np.float64) / 255.0
-        v = retina(ink_rule(small), tuple(spec))
-        if colour is not None:
-            # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 22:10 +0400 — was a GenomeError refusal; the
-            # verdict reader's T-one-glance twin (tools/verdict_g4.py) needs this to work on every G5.genome
-            # life that declares SENSE colour (every one), or its 8h verdict refuses on mark (xi). Same fixed-
-            # gain outer unit-step as the per-glance path below, using colour_block_whole() (above) since mode
-            # "one" has no per-glance (top, left) window.
-            an = _analyse_frame(rgb)
-            v = _unit(np.concatenate([v, colour_block_whole(an)]))
-        return {"feats": [v], "fix": [], "windows": []}
+        v = _one_glance_vector(rgb, spec, glance, ink_rule, colour)
+        return {"feats": [v], "fix": [], "windows": [], "residual": [_residual(v, predicted)]}
     g, _r = organs()
     an = _analyse_frame(rgb)
     rows = g.gaze_sequence(an, max_fixations=F, predicted=None) if mode == "surprise" else g.random_gaze(an, seed=pic_id, max_fixations=F)
@@ -218,7 +260,11 @@ def glances(rgb: np.ndarray, spec: Sequence[str], gaze: Dict[str, object], mode:
         if colour is not None:
             v = _unit(np.concatenate([v, colour_block(an, tl[0], tl[1])]))
         feats.append(v); wins.append(tl)
-    return {"feats": feats, "fix": fix, "windows": wins}
+    coarse_size = gaze.get("coarse")
+    if coarse_size:
+        feats.append(_one_glance_vector(rgb, spec, int(coarse_size), ink_rule, colour))
+    residual = [_residual(v, predicted) for v in feats]
+    return {"feats": feats, "fix": fix, "windows": wins, "residual": residual}
 
 
 def canvas_of_picture(path: Path, canvas: int = 128) -> np.ndarray:

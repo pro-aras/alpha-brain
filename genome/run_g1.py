@@ -91,7 +91,15 @@ def live(genome: Genome, dev: List[Glanced], a2: List[Glanced], plant: List[Glan
             xw = world.encode_word(w, genome.ear_blank_zero)
             for k, x in enumerate(feats):
                 moment_thing[org.t] = t
-                if truth is not None and fix:
+                # L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): SOLUTIONS #235's
+                # own chain — `feats` gains a 5th (coarse) entry when GAZE declares "coarse", but `fix`
+                # (the LOCATED glances' cells) stays at 4; `fix[k]` at k=4 raised IndexError on the first
+                # coarse-declaring genome this function ever saw (caught here, not by inspection — the
+                # crash was reproduced first). The coarse glance has no fixation cell (mind.py's own
+                # journal row for it carries fix: null), so it is simply excluded from moment_on's
+                # on-thing/off-thing bookkeeping — never guessed to be "on" (the whole canvas trivially
+                # contains the thing) or "off".
+                if truth is not None and fix and k < len(fix):
                     moment_on[org.t] = on_thing(fix[k], truth["cell"])
                 org.moment(x, xw)
 

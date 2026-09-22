@@ -1,0 +1,47 @@
+# G5-surprise-coarse-test.genome — tests/creature/G5-colour-test.genome VERBATIM + GAZE's "coarse 32" clause
+# + a live SURPRISE line (L-4/L-7, docs/organs/NEXT-LIFE-PLAN-2026-09-22.md §4). Built by Claude (Sonnet 5,
+# LIFE builder B), 2026-09-22 19:0x +0400, for tests/creature/test_surprise_coarse.py — the two ONLY diffs
+# from G5-colour-test.genome are marked below; every other line is that file's own text, unchanged.
+SEED   20260919
+# BODY — the senses and the areas
+SENSE  eye    32x32 grey
+RETINA thresh0.25 centre tower:eye-tower-g2 sqrt unit
+SENSE  ear    letters 8
+AREA   sight  from retina
+AREA   words  from ear
+MEET   sight  words
+# GROW
+BIRTH  novelty  cos<0.955
+BIRTH  error    misfires 3
+BUDGET 400 per arrival
+NMAX   2000
+# WIRE
+KWTA   5
+HEBB   window 1
+DELTA  lr 0.05
+# SHRINK
+PRUNE  w<0.02 after 3 chances
+MERGE  cos>0.9975 same-answer
+SCALE  every 1000 moments
+# STAGE
+STAGE  1 senses   moments 0..200
+STAGE  2 meet     moments 200..
+# ANSWER
+RECALL k=1
+ABSTAIN second/best > 0.85
+#
+GAZE   surprise fixations 4 grid 16 canvas 128 glance 32 ink border coarse 32   # DIFF 1: L-7's trailing " coarse 32" clause added
+#OFF EAR-SOUND cochlear gammatone agc
+#OFF CONTEXT   family read-time
+#OFF CURIOSITY interest-population
+#OFF PREDICT   next-moment error
+#OFF SENTENCE  compose under-judge
+#OFF HANDS     jail landlock seccomp
+# gate G-a wrote THETA_N=0.955 THETA_M=0.9975 — G1 gate on glances [toy first-fixation glances]: THETA_N = within-median; floor (between-p95, ear-max) 0.9064 · within-p5 0.8468 · within-p95 0.9950 · seed 20260919
+
+# --- wave 2 test additions (A9): edit: Claude (Sonnet 5, G4 builder A), 2026-09-20 00:58 +0400
+PREDICT next glance; error scales delta 0.5..2.0; ranks replay; grades act
+FAST     episodes 2000 keys sight words surprise
+SLEEP    every 40 moments replay 5 by surprise
+SENSE    colour rg by 4x4 under the glance fixed-gain
+SURPRISE floor 0.05 predicted mind-cell   # DIFF 2: L-4's gene, live for this fixture's own tests

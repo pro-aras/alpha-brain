@@ -326,6 +326,12 @@ class Body:
             "acts_chosen": dict(getattr(self.mind, "acts_chosen", {}) or {}),
             "act_mismatches": int(getattr(self.mind, "act_mismatches", 0)),
             "sound_events": int(getattr(self.mind, "sound_events", 0)),
+            # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+            # §4): the three counters the mind computed and STATUS never carried (#163's class: computing and exporting
+            # differ) — on EVERY write (#164), 0 on a genome that never declares SURPRISE.
+            "glances_confirmed": int(getattr(self.mind, "glances_confirmed", 0)),
+            "glances_surprised": int(getattr(self.mind, "glances_surprised", 0)),
+            "births_skipped_confirmed": int(getattr(org, "births_skipped_confirmed", 0)),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:

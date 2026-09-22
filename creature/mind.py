@@ -149,6 +149,37 @@ class Mind:
         if bad:
             raise GenomeError(f"{', '.join(bad)} declared but nothing runs it (W3-0): the organism does not start")
 
+        # L-4/L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): BIND pools every one of
+        # a canvas's feature vectors into ONE mean vector before Organism.moment() ever sees them
+        # (_bind_pool, below) — SURPRISE's confirm= and the coarse glance's residual are both computed per
+        # INDIVIDUAL feature, index-aligned with org_feats (_consume_eye, below), which BIND breaks by
+        # construction (a pooled vector has no single glance a residual could be attributed to). Neither
+        # combination has a mechanism — W3-0's own law, applied here explicitly rather than silently
+        # falling back to confirm=False/no-coarse: BIND is #OFF in every genome that declares SURPRISE or
+        # GAZE's coarse clause today (LIFE.genome), so this refuses nothing live, only an unbuilt combination.
+        if "BIND" in self.genome.declared:
+            if "SURPRISE" in self.genome.declared:
+                raise GenomeError("BIND and SURPRISE both declared: SURPRISE's per-glance residual has no "
+                                   "mechanism once BIND pools the canvas into one vector — the organism does not start")
+            if "coarse" in (self.genome.gaze or {}):
+                raise GenomeError("BIND declared with GAZE's coarse clause: BIND pools whatever org_feats "
+                                   "holds, including the coarse glance, into one indiscriminate mean — the organism does not start")
+
+        # L-4 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:3x +0400): the BARE old form
+        # `SURPRISE floor <f>` (no `predicted mind-cell`) still parses — genome/machinery.py:275 sets
+        # `declared["SURPRISE"] = {"floor": f}` regardless, on purpose, so every genome that already
+        # carries the old line on disk (G5.genome:30, G4.genome:28, G5-nmax8000.genome:35 — all `#OFF`
+        # today) keeps parsing byte-identically. G5.genome's own comment gives that bare line a DIFFERENT
+        # intended meaning than this brief's mechanism: "a sense publishes when |actual − predicted| > floor
+        # (V0.1's rule on every sense)" — a per-sense publish gate that was never built. Once creature/genes.py
+        # names "SURPRISE" in RUNS["mind"] (added by this same brief, below), a bare declared SURPRISE would
+        # pass genes_module.unwired() and silently run THIS mechanism instead of refusing — the exact trap
+        # W3-0 exists to catch. So: SURPRISE is wired ONLY for the `predicted mind-cell` form; the bare form
+        # has no consumer here and refuses by name, exactly as it did before this brief touched RUNS.
+        if "SURPRISE" in self.genome.declared and self.genome.declared["SURPRISE"].get("predicted") != "mind-cell":
+            raise GenomeError("SURPRISE floor declared without 'predicted mind-cell': no consumer names this "
+                               "form (W3-0) — the organism does not start")
+
         # PREREG §11.1 step 5: "frozen" is a TWIN-ONLY blind — it changes how the Organism itself is
         # built, not a per-step gate. FROZEN's own parser clause is not on master yet (A10); absent, its
         # "after" defaults to 50, exactly as the PREREG says.
@@ -241,6 +272,18 @@ class Mind:
         # the builder report).
         self._induce_pending: set = set()            # words
         self._deduce_pending: set = set()             # "w1|w2" (sorted) pair keys
+        # L-4 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): SURPRISE's per-glance counters
+        # (STATUS's own two, creature/body.py) and "no think-pool item" for a CONFIRMED glance -- an episode
+        # id whose glance 0 was confirmed, skipped by _think_pool()'s two FAST-episode loops below. Additive:
+        # the episode is still WRITTEN (SLEEP's most_surprising(), the episodic PREDICT arm and "ep" on the
+        # journal row are all untouched -- the alternative, skipping the FAST write itself, was raised and
+        # not built: its blast radius reaches those three mechanisms, this narrower fix reaches only THINK).
+        # NOT persisted at resume -- same class of gap as _induce_pending/_deduce_pending/_filed_predictions
+        # immediately above/below (raised, not built; replay is a fresh Mind every time, so the tape road
+        # this brief owns is unaffected).
+        self.glances_confirmed: int = 0
+        self.glances_surprised: int = 0
+        self._confirmed_episodes: set = set()
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:05 +0400 — D-G12/W3-1 (docs/G4-WAVE3-CLAUSES.md):
         # revisits/extensions/clashes, coded against Builder B's believe() "kind" interface before it lands
         # (today believe() always returns kind="belief"; the mapping below already handles the other three).
@@ -548,22 +591,57 @@ class Mind:
         payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
         rgb = np.asarray(Image.open(payload_path).convert("RGB"), dtype=np.uint8)
         mode = "random" if "gaze" in self.blind else "surprise"
-        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-3/§3.6: colour=None unless
-        # SENSE colour is declared (Genome.colour, machinery.py) — a complete no-op call otherwise, byte-
-        # identical to every existing pin.
-        g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour)
+        # L-4 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): word/xw moved ABOVE the
+        # gaze.glances() call (were below it) so SURPRISE's expectation — the word's best sight cell — can
+        # be computed and passed in as `predicted=`. Safe by PREREG §2.2's own order law (the ear row
+        # precedes the eye row of the same moment; `word` is already fully known here, exactly as it
+        # always was two lines further down before this edit).
         word = self.pending.pop(moment, None) if moment is not None else None
         # G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md): hoisted above PREDICT's error() call, which
         # arm "comparator" needs (a word's encoding, read-only) BEFORE Organism.moment() runs for this
         # canvas — encode_word is pure, so computing it here changes nothing else (word is None on a
         # sight-only canvas, xw stays None, exactly as arm "comparator"/"conjunctive" expect).
         xw = encode_word(word, self.genome.ear_blank_zero) if word is not None else None
+        surprise_gene = self.genome.declared.get("SURPRISE")
+        # L-4: read-only, never births (Organism.expected_sight's own guarantee) — None when SURPRISE is
+        # undeclared, xw is None (sight-only or an unknown word), or the word's own cell has no edge yet.
+        predicted = self.org.expected_sight(xw) if surprise_gene is not None else None
+        # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-3/§3.6: colour=None unless
+        # SENSE colour is declared (Genome.colour, machinery.py) — a complete no-op call otherwise, byte-
+        # identical to every existing pin.
+        g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour, predicted=predicted)
+        # L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): --blind coarse drops the
+        # fifth (coarse) feature from THIS mind's own learning road entirely — genome/gaze.py has no notion
+        # of "blind" (a Mind-only concept), so it always appends the coarse feature when the gene is
+        # declared; stripping it here, before org_feats/residuals are built, is what makes a blind-coarse
+        # replay's journal equal a genome that never declared coarse at all (the reader's own test, below).
+        if "coarse" in (self.genome.gaze or {}) and "coarse" in self.blind:
+            g = dict(g)
+            g["feats"] = g["feats"][:-1]
+            if g.get("residual") is not None:
+                g["residual"] = g["residual"][:-1]
         # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-2/BIND (_bind_pool, above):
         # undeclared (the common case today) this is g["feats"] itself, unchanged — every existing `for x
         # in g["feats"]:` loop below now reads `org_feats` instead, with IDENTICAL contents when BIND is
         # off. Declared: ONE pooled vector, so the loops below run their body once instead of F times —
         # this is the whole of "one canvas = one moment" (org.t advances by 1, not by GAZE.fixations).
         org_feats = _bind_pool(g["feats"]) if "BIND" in self.genome.declared else g["feats"]
+        # L-4 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): index-aligned with
+        # org_feats — safe because BIND and SURPRISE/coarse are refused together at __init__ above, so
+        # whenever SURPRISE is declared (the only case confirmed_flags can ever be True) org_feats IS
+        # g["feats"] unpooled. `floor` is the blind twin's own law: "--blind surprise" reads residual/
+        # confirmed exactly as the live mind does (still computed, still journaled) but never confirms
+        # (floor -1 is below every possible residual, which is >= 0 by construction) — a twin to compare
+        # the CONFIRM mechanism's effect against, not a twin blind to the computation itself.
+        residuals = g.get("residual") or [None] * len(org_feats)
+        floor: Optional[float] = None
+        if surprise_gene is not None:
+            floor = -1.0 if "surprise" in self.blind else float(surprise_gene["floor"])
+        confirmed_flags = [(floor is not None and r is not None and r < floor) for r in residuals]
+        n_graded = sum(1 for r in residuals if r is not None)
+        n_confirmed = sum(1 for f in confirmed_flags if f)
+        self.glances_confirmed += n_confirmed
+        self.glances_surprised += max(0, n_graded - n_confirmed)
 
         # PREREG §11.1 step 1 (PREDICT): measured once, on the FIRST glance, regardless of whether this
         # canvas has a word — a sight-only canvas is just as surprising or expected as a worded one.
@@ -613,13 +691,21 @@ class Mind:
                 if "ARRIVAL" in self.genome.declared:
                     self.org.new_arrival()
                     arrival_n = int(self.org.arrivals)
-            for x in org_feats:
+            for i, x in enumerate(org_feats):
                 self.moment_word[self.org.t] = word          # keyed by the organism's OWN moment counter, one per glance (or one per canvas under BIND)
-                S, T = self.org.moment(x, xw, lr_scale=lr_scale)
+                # L-4: confirmed_flags[i] is False on every existing genome (SURPRISE undeclared -> floor
+                # is None -> every flag False) — byte-identical to the old bare `self.org.moment(x, xw,
+                # lr_scale=lr_scale)` call.
+                S, T = self.org.moment(x, xw, lr_scale=lr_scale, confirm=confirmed_flags[i])
                 if predict_on:
                     self.predictor.note_winners(S)
             ep_kwargs = seam0 if moment_on else {}         # G-MIND-1: Episodes stores the seam only once MOMENT declares the columns
             ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw, word=word, surprise=err, **ep_kwargs) if fast_on else None
+            # L-4: "no think-pool item" — glance 0 is the one FAST's episode is built from (f0 above); if
+            # it was CONFIRMED, this episode is excluded from _think_pool()'s pool (below), never from
+            # SLEEP/the episodic PREDICT arm, which read the episode ring directly, not the pool.
+            if fast_on and ep_id is not None and confirmed_flags and confirmed_flags[0]:
+                self._confirmed_episodes.add(ep_id)
             self._score_due_predictions(word, g["feats"][0] if g["feats"] else None)
             births = [[b[1], int(b[2]), b[3]] for b in self.org.births[births_before:]]
             edges_born = len(self.org.edges_log) - edges_before
@@ -638,8 +724,16 @@ class Mind:
                 # writes exactly the dict this branch always wrote (the parity test pins it).
                 **({"windows": [[int(t), int(l)] for (t, l) in g["windows"]], "when": row["at"], "act": "glance",
                     "source": meta.get("source"), "glance": 0} if deliver_on else {}),
+                # L-4 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): residual/confirmed
+                # on every eye moment row — the brief's own words — sliced to the four LOCATED glances
+                # (len(g["fix"])); the coarse glance's own residual/confirmed live on its own row, below.
+                # Undeclared SURPRISE: this key is absent, byte-identical to before this gene existed.
+                **({"residual": residuals[:len(g["fix"])], "confirmed": confirmed_flags[:len(g["fix"])]} if surprise_gene is not None else {}),
             }
             self._write_journal(row["at"], journal_row)
+            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene)
+            if coarse_row is not None:
+                self._write_journal(row["at"], coarse_row)
         elif fast_on:
             # PREREG §11.1 step 2: sight-only, FAST declared -> Organism.moment_sight per glance (B2),
             # never Organism.moment (no word to MEET); an episode is still written, word "". A sight-only
@@ -658,7 +752,13 @@ class Mind:
                 "err": round(err, 4), "ep": ep_id, "hash": self.org.state_hash(),
                 **({"windows": [[int(t), int(l)] for (t, l) in g["windows"]], "when": row["at"], "act": "glance",
                     "source": meta.get("source"), "glance": 0} if deliver_on else {}),
+                # L-4: a sight-only canvas has no word, so `predicted` is always None here and no glance
+                # ever confirms — the fields are still journaled (gated the same way) for schema parity.
+                **({"residual": residuals[:len(g["fix"])], "confirmed": confirmed_flags[:len(g["fix"])]} if surprise_gene is not None else {}),
             })
+            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene)
+            if coarse_row is not None:
+                self._write_journal(row["at"], coarse_row)
         else:
             # the skeleton's own law, untouched: no FAST declared -> a sight-only canvas is skipped
             # entirely, the organism never sees it (G4-8's byte-identical pin depends on this).
@@ -668,6 +768,26 @@ class Mind:
         self._canvas_index += 1
         self._maybe_sleep(row)
         self._maybe_think(row)
+
+    def _coarse_row(self, seq: object, moment: Optional[str], residuals: list, confirmed_flags: list,
+                     surprise_gene: Optional[dict]) -> Optional[Dict[str, object]]:
+        """L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): the fifth, whole-canvas
+        glance's OWN journal row — SLEEP's own "a second mind row sharing the triggering canvas's own seq"
+        pattern (creature.replay's compare() already groups mind rows by seq for exactly this reason).
+        `act: "coarse"`, `glance: 4` (the coarse feature's own index — always LAST in g["feats"]/residual,
+        after the four located glances), `fix: null`, `windows: null` (it has no location) — the brief's
+        own field shapes. None (nothing journaled) when GAZE's coarse clause is undeclared, or blind to it
+        ("coarse" in self.blind — the coarse feature was already stripped from org_feats above, so there is
+        nothing to report)."""
+        gaze_decl = self.genome.gaze or {}
+        if "coarse" not in gaze_decl or "coarse" in self.blind:
+            return None
+        idx = len(residuals) - 1
+        out: Dict[str, object] = {"seq": seq, "moment": moment, "act": "coarse", "glance": idx,
+                                   "fix": None, "windows": None, "hash": self.org.state_hash()}
+        if surprise_gene is not None:
+            out["residual"] = residuals[idx]; out["confirmed"] = confirmed_flags[idx]
+        return out
 
     def _maybe_sleep(self, row: Dict[str, object]) -> None:
         """PREREG §11.1 step 4: every SLEEP.every MOMENTS (org.t, not canvases), after the canvas that
@@ -808,6 +928,8 @@ class Mind:
             first_id = max(0, n_written - 200)
             seen_words = set()
             for eid in range(first_id, n_written):
+                if eid in self._confirmed_episodes:
+                    continue   # L-4: "no think-pool item" for a CONFIRMED glance — this episode's word was already expected and matched
                 rec = self.episodes.get(eid)
                 if rec is None or not rec["word"] or rec["word"] in seen_words:
                     continue
@@ -818,6 +940,8 @@ class Mind:
                         continue   # edit: Claude (Fable 5.1), 2026-09-21 15:45 +0400 — §18 add. 2: a PARKED word is not re-worked (the rule items' own filter, mirrored; a re-worked parked want counted "parked" again — life 3a's circle at 619 and 659)
                     pool.append({"kind": "word", "key": rec["word"], "episode": eid, "pred": None})
             for eid in range(0, n_written):
+                if eid in self._confirmed_episodes:
+                    continue   # L-4: same law for a sight-only episode (never actually reachable — a confirmed episode always carries a word — kept for symmetry)
                 rec = self.episodes.get(eid)
                 if rec is not None and rec["word"] == "":
                     if self.park is not None and self.park.is_parked(f"ep{eid}"):

@@ -18,7 +18,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import numpy as np
 
-BLINDS = ["gaze", "sleep", "predict", "curiosity", "park", "frozen"]
+# edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4/L-7 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
+# §4): "coarse" (drops the fifth, whole-canvas glance from the mind's own learning road — Mind._consume_eye
+# strips it from org_feats and writes no coarse journal row) and "surprise" (floor -1: residual/confirmed are
+# STILL computed and journaled — a twin to compare the CONFIRM mechanism's effect against, never a twin blind
+# to the computation itself) beside the six existing blinds. Neither gene needs to be declared for its blind
+# to be harmless (Mind gates every use of self.blind on the gene's OWN presence first).
+BLINDS = ["gaze", "sleep", "predict", "curiosity", "park", "frozen", "coarse", "surprise"]
 REUSE = False   # --reuse: read existing twin summaries under --out instead of replaying them
 WINDOW_SECONDS = 6 * 3600
 
