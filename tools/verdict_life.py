@@ -112,15 +112,24 @@ def sound_mark(tape: Iterable[dict], journal: Iterable[dict], status: dict) -> D
     """PREREG §19.10: «not gradable: heard 0 s» in a silent world (the plan's §10 names the rung that brings sound); with sound on the
     tape, every ear-sound row is consumed (a journal `sound` row per tape row, none an error)."""
     rows = [r for r in tape if r.get("sense") == "ear-sound"]
-    consumed = [j for j in journal if isinstance(j.get("sound"), dict) and "error" not in j["sound"]]
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:43 +0400 — A4L-VOICE task 5: on a VOICED tape the eye row that
+    # BINDS a maker sound carries a `sound` dict too ({seq, winners, cells}); counting it would read consumed > rows on every voiced
+    # tape. A binding row is told by its SHAPE (its `sound` dict carries `winners`; a sound row's never does) and is never counted
+    # as a consumption. Heard time sums each row's `duration_s` when the maker stamps it (a chord is 0.45 s), else its onset `when`
+    # as before; the maker's rows and the bound canvases are printed.
+    consumed = [j for j in journal if isinstance(j.get("sound"), dict) and "error" not in j["sound"] and "winners" not in j["sound"]]
     errors = [j for j in journal if isinstance(j.get("sound"), dict) and "error" in j["sound"]]
+    bound = [j for j in journal if isinstance(j.get("sound"), dict) and "winners" in j["sound"]]
     heard_s = 0.0
     try:
-        heard_s = float(sum(float(_meta(r).get("when") or 0.0) for r in rows))
+        heard_s = float(sum(float(_meta(r).get("duration_s") or _meta(r).get("when") or 0.0) for r in rows))
     except Exception:
         heard_s = 0.0
     out: Dict[str, object] = {"ear_sound_rows": len(rows), "consumed": len(consumed), "errors": len(errors),
+                              "voiced_rows": sum(1 for r in rows if _meta(r).get("source") == "maker"), "bound_rows": len(bound),
+                              "heard_s": round(heard_s, 3),
                               "status_sound_events": status.get("sound_events", "not recorded"),
+                              "status_voice_rows": status.get("voice_rows", "not recorded"), "status_voice_bound": status.get("voice_bound", "not recorded"),
                               "bar": "every ear-sound row consumed into the sound ring, 0 errors; not gradable while the world is silent"}
     if not rows:
         out.update(graded=False, **{"pass": None}, reason="not gradable: heard 0 s — no ear-sound row on the tape (the world is silent; the plan's §10 names the rung that brings a voice)")
@@ -1511,3 +1520,110 @@ def hash_law_mark(journal: Iterable[dict], status: dict, declared: bool, replay_
     out.update(graded=True, **{"pass": bool(ok)},
                reason="graded (A4-LADDER-PREREG §2.1 C1)" + ("" if form != "dense" else " — STATUS says the life ran the DENSE witness"))
     return out
+# ============================================================================ A4L-VOICE: the rung's marks (A4-LADDER-PREREG §2.3)
+# edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:44 +0400 — docs/briefs/A4L-VOICE.md task 5. PURE functions over the
+# shapes this branch LANDED: genome/questions.py:ask_sound's dict (V1/V2/V5/V1b, `gradable`, `voiced`), the exam file's
+# `ask_seen_words.Q1.acc`, STATUS's sound keys. Written test-first (tests/creature/test_verdict_voice_marks.py); each reads «not
+# gradable» on a record whose life has no sound area (the hour-1 fixture: alpha4-1 — the control, L-1's rule).
+def hear_mark(rung: Optional[dict], blind_ear: Optional[dict], shuffled: Optional[dict], min_v1: int = 13, max_null_v1: int = 2,
+              min_v2: float = 0.8, max_null_v2: float = 0.15, min_v5: float = 0.8) -> Dict[str, object]:
+    """V1 (the thing named by SOUND, the letter ear blinded): on the `--blind ear` twin's final state, chord → sound → the
+    strongest MEET edge to sight → the sight cell's birth ledger names the thing ≥ 13/16; the SHUFFLED-sound twin (the maker's
+    chords permuted across things on the tape before replay, `shuffle_voice`) ≤ 2/16 by the true mapping. V2 (sight → sound, on
+    the rung's own final state): held-out renders → the sound cell NAMED BY THE CHORD IT HOLDS ≥ 0.8; the shuffled twin ≤ 0.15.
+    V5 (sound → words, the rung): ≥ 0.8 — «not gradable» when MEET sound words is off. V1b (the ±4 % chords) printed, no bar.
+    Not gradable until every asked thing was voiced ≥ 5 times (the rung's own `voiced`), or when a twin is missing."""
+    bar = (f"V1 blind-ear ≥ {min_v1}/16 and the shuffled twin ≤ {max_null_v1}/16 · V2 ≥ {min_v2} and the shuffled twin ≤ {max_null_v2} · "
+           f"V5 ≥ {min_v5} (not gradable when MEET sound words is off) · not gradable until every thing voiced ≥ 5 times · V1b printed, no bar")
+    out: Dict[str, object] = {"bar": bar}
+    if not isinstance(rung, dict) or rung.get("V1") is None and rung.get("V2") is None:
+        why = (rung or {}).get("reason") if isinstance(rung, dict) else None
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {why or 'no exam by sound on this record (no sound area — the voice was not declared)'}")
+        return out
+    if not rung.get("gradable"):
+        out.update(graded=False, **{"pass": None}, reason=f"{rung.get('reason') or 'not gradable: a thing voiced < 5 times'}")
+        return out
+    if not isinstance(blind_ear, dict) or not isinstance(shuffled, dict) or blind_ear.get("V1") is None or shuffled.get("V1") is None:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: the --blind ear twin or the shuffled-sound twin is missing")
+        return out
+    v1 = {"blind_ear_correct": int(blind_ear["V1"]["correct"]), "n": int(blind_ear["V1"]["n"]),
+          "shuffled_correct": int(shuffled["V1"]["correct"]), "rung_correct": int((rung.get("V1") or {}).get("correct", 0)),
+          "per_thing_blind_ear": (blind_ear["V1"] or {}).get("per_thing")}
+    v1["pass"] = v1["blind_ear_correct"] >= min_v1 and v1["shuffled_correct"] <= max_null_v1
+    v2r, v2s = rung.get("V2") or {}, shuffled.get("V2") or {}
+    v2 = {"acc": v2r.get("acc"), "n": v2r.get("n"), "shuffled_acc": v2s.get("acc"), "ledger_correct": v2r.get("ledger_correct")}
+    v2["pass"] = (v2["acc"] is not None and v2["acc"] >= min_v2) and (v2["shuffled_acc"] is not None and v2["shuffled_acc"] <= max_null_v2)
+    v5r = rung.get("V5")
+    if v5r is None:
+        v5 = {"graded": False, "pass": None, "reason": "not gradable: MEET sound words is off (#OFF with its reason on the line)"}
+    else:
+        v5 = {"graded": True, "acc": v5r.get("acc"), "correct": v5r.get("correct"), "n": v5r.get("n"), "pass": float(v5r.get("acc") or 0.0) >= min_v5}
+    out.update(V1=v1, V2=v2, V5=v5, V1b={"blind_ear": blind_ear.get("V1b"), "rung": rung.get("V1b")}, voiced=rung.get("voiced"))
+    ok = bool(v1["pass"]) and bool(v2["pass"]) and (v5["pass"] if v5["graded"] else True)
+    out.update(graded=True, **{"pass": ok}, reason="graded (A4-LADDER-PREREG §2.3 V1/V2/V5)")
+    return out
+
+
+def voice_harm_mark(rung_exam: Optional[dict], blind_sound_exam: Optional[dict], declared: bool, bar_delta: float = -0.01) -> Dict[str, object]:
+    """V3 NO HARM (the regression bar): Q1 on seen words in the rung − the `--blind sound` replay of the SAME tape ≥ −0.01. Not
+    gradable when the life did not declare the voice, or either exam is missing (the fixture clause — the hour-1 fixture under the
+    rung genome ≡ master+FLOOR INCLUDING hash — is the landing gate's, not this mark's)."""
+    out: Dict[str, object] = {"bar": f"Q1(rung) − Q1(--blind sound) ≥ {bar_delta}"}
+    def q1(e):
+        try:
+            return float(((e or {}).get("ask_seen_words") or {}).get("Q1", {}).get("acc"))
+        except (TypeError, ValueError):
+            return None
+    a, b = q1(rung_exam), q1(blind_sound_exam)
+    out.update(q1_rung=a, q1_blind_sound=b)
+    if not declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: the voice (AREA sound) is not declared on this record")
+    elif a is None or b is None:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: the rung's exam or its --blind sound twin's exam is missing")
+    else:
+        d = round(a - b, 6)
+        out.update(delta=d, graded=True, **{"pass": d >= bar_delta}, reason="graded (A4-LADDER-PREREG §2.3 V3)")
+    return out
+
+
+def sound_cells_mark(status: dict) -> Dict[str, object]:
+    """V4 SOUND CELLS, printed (no bar): sound cells born / alive and refused (the ONE budget's sound refusals), the maker's voice
+    rows consumed and bound. ≈ 17 born expected (one per chord); many more means the front does not band the chords — a finding."""
+    keys = ("sound_born", "sound_cells", "sound_births_refused", "voice_rows", "voice_bound")
+    out: Dict[str, object] = {k: (status or {}).get(k) for k in keys}
+    out["bar"] = "printed, no bar — ≈ 17 expected (one per chord); many more is a finding"
+    if (status or {}).get("sound_born") is None:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: STATUS carries no sound keys (a record before the voice)")
+    else:
+        out.update(graded=True, **{"pass": None}, reason="printed (A4-LADDER-PREREG §2.3 V4)")
+    return out
+
+
+def shuffle_voice(rows: List[dict], seed: int) -> Tuple[List[dict], Dict[str, str]]:
+    """The SHUFFLED-SOUND twin's tape (V1/V2's null): copies of the rows with every MAKER ear-sound row's payload replaced by
+    ANOTHER thing's chord, by a fixed DERANGEMENT of the voiced things drawn from `seed` (the reader's) — the first payload
+    heard for that thing. Every other row (the words, the canvases, a folder wav's rows) is untouched; `meta.word` stays the
+    canvas's own (the mind never learns from it). Pure: the input is never touched. Returns (rows', {word: word it now hears})."""
+    first_payload: Dict[str, str] = {}
+    for r in rows:
+        m = _meta(r)
+        if r.get("sense") == "ear-sound" and m.get("source") == "maker" and m.get("word") and m["word"] not in first_payload:
+            first_payload[m["word"]] = r.get("payload")
+    words = sorted(first_payload)
+    perm: Dict[str, str] = {}
+    if len(words) >= 2:
+        rng = np.random.default_rng(int(seed))
+        while True:
+            p = [words[int(i)] for i in rng.permutation(len(words))]
+            if all(a != b for a, b in zip(words, p)):
+                perm = dict(zip(words, p)); break
+    out = []
+    for r in rows:
+        m = _meta(r)
+        if r.get("sense") == "ear-sound" and m.get("source") == "maker" and m.get("word") in perm:
+            r2 = copy.deepcopy(r)
+            r2["payload"] = first_payload[perm[m["word"]]]
+            out.append(r2)
+        else:
+            out.append(r)
+    return out, perm

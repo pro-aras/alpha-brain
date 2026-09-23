@@ -253,6 +253,11 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:15 +0400 — A4L-LANG: one row, matching the genes.py RUNS entry
         # (CHAT). Caught by this test's own gate on the landing's first full-suite run — the omission this class exists to catch.
         "CHAT": "CHAT     door chat/in chat/out; chain of frames + one pivot slot; links adjacent 5; pivot 10 distinct 20 instants; at most 6 words; a question never teaches",
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 12:14 +0400 — A4L-VOICE (docs/briefs/A4L-VOICE.md): three rows, matching the three
+        # genes.py RUNS entries added by this task. Caught by this test's own gate on the landing's full suite (the fifth builder it caught).
+        "AREA_SOUND": "AREA     sound  from cochlea cos>=0.975",
+        "MEET_SIGHT_SOUND": "MEET     sight  sound",
+        "MEET_SOUND_WORDS": "MEET     sound  words",
     }
 
     def test_every_runs_gene_parses(self) -> None:

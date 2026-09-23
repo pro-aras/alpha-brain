@@ -98,6 +98,15 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # the real call site truthfully.
         "ANSWER": "genome/machinery.py:Organism.recall/recall_many (grade/own_floor/resembles_cell on the sight side; "
                   "recall_many's own majority-of-glances gate — A4-LADDER-PREREG §2.2 — reason \"minority\")",
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400 — A4L-VOICE (docs/briefs/A4L-VOICE.md task 2;
+        # docs/A4-LADDER-PREREG.md §2.3): the sound area and its two meetings — real call sites, each gated on its own declared
+        # presence (an undeclared AREA sound builds no area, no pair; the hash, save/load and every old road untouched).
+        "AREA_SOUND": "genome/machinery.py:Organism.__init__ (the sound Area, THETA_SOUND read) + Organism.moment (x_snd resonated: novelty "
+                      "birth at THETA_SOUND via _theta, the ONE budget, KWTA, GROW) + creature/mind.py:Mind._consume_ear_sound (a maker-moment "
+                      "sound row held pending) / Mind._consume_eye (bound at its canvas)",
+        "MEET_SIGHT_SOUND": "genome/machinery.py:Organism._sound_meets (HEBB/DELTA/MISFIRE/PRUNE/MERGE over the sight-sound _Pair; SCALE in "
+                            "_scale) + Organism.recall/recall_many(to='sound'|'sight') (the exam's ask_sound V1/V2)",
+        "MEET_SOUND_WORDS": "genome/machinery.py:Organism._sound_meets (the sound-words _Pair, the same rules) + Organism.recall(to='words') (V5)",
     },
     # ---------------------------------------------------------------------------------------- the body
     # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.7 (docs/G4-WAVE3-CLAUSES.md
@@ -110,7 +119,7 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "TAPE": "creature/tape.py:_resolve_tape_dir, read at Body.__init__ / creature/body.py:Body.start's read_tape (declared['TAPE']['path'] resolves the tape directory)",
         "HEART": "creature/body.py:Body.__init__ -> Body._status_loop (declared['HEART']['every_s'] read into self._status_period_s, the STATUS write period)",
         "CRASH": "creature/body.py:_crash_policy, read at Body.__init__ -> SenseThread.run (restart) + Body._handle_mind_crash (page) — declared['CRASH']'s two sub-facts gate each behaviour",
-        "WORLD": "creature/body.py:main (declared['WORLD']['drawn_every_s']/['arrival_every_h'] read into world_maker.sense's period/window_seconds; ['folder'] arms creature/senses/folder.py behind FOLDER_DOOR_GATED)",
+        "WORLD": "creature/body.py:main (declared['WORLD']['drawn_every_s']/['arrival_every_h'] read into world_maker.sense's period/window_seconds; ['folder'] arms creature/senses/folder.py behind FOLDER_DOOR_GATED; ['voice'] (A4L-VOICE, «; voice formant») read by creature/body.py:_maker_sense_fn into world_maker.sense(voice=) -> _publish_canvas publishes the thing's chord as one ear-sound row)",
         "ASK": "creature/ask.py:_ask_refusal, read at answer() (declared['ASK']['verbs'] read; a verb outside it is refused by name instead of reaching the hardcoded `if q == ...` branches)",
         # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K (docs/briefs/G5-K-ACTS-OUTCOME-SIT-BODY.md):
         # SIT and SENSE_BODY are the two body-side rows (sense threads, gated on their own declared presence at

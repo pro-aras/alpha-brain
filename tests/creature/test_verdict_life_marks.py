@@ -757,7 +757,8 @@ class WebMark(unittest.TestCase):
 # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
 # (docs/briefs/A4L-DROP.md task 5): drop_mark + annotate_windows, test-first against synthetic exam
 # dicts shaped like tools/self_exam.py's own JSON (genome/questions.py:ask_glances's Q1..Q5 schema).
-def _exam(q1, q2=1.0, q3=1.0, q4=1.0, hedge=0.0, snapshot_last_seq=None, spiral_abstain=0.5, window=None):
+# edit: Claude (Fable 5.1), 2026-09-23 14:32 +0400 — renamed at the integration merge: DROP's helper shadowed ANSWER's `_exam` (#239 (1): two builders, one name)
+def _drop_exam(q1, q2=1.0, q3=1.0, q4=1.0, hedge=0.0, snapshot_last_seq=None, spiral_abstain=0.5, window=None):
     d = {"ask_seen_words": {"Q1": {"acc": q1, "hedge_rate": hedge}, "Q2": {"acc": q2}, "Q3": {"acc": q3}, "Q4": {"acc": q4},
                              "Q5": {"spiral": {"abstain_rate": spiral_abstain}}},
          "snapshot_last_seq": snapshot_last_seq}
@@ -769,7 +770,7 @@ def _exam(q1, q2=1.0, q3=1.0, q4=1.0, hedge=0.0, snapshot_last_seq=None, spiral_
 class DropMark(unittest.TestCase):
     def test_not_gradable_when_undeclared(self):
         from tools.verdict_life import drop_mark
-        exams = [_exam(0.9, snapshot_last_seq=10), _exam(0.9, snapshot_last_seq=20)]
+        exams = [_drop_exam(0.9, snapshot_last_seq=10), _drop_exam(0.9, snapshot_last_seq=20)]
         self.assertFalse(drop_mark(exams, exams, [], [], None)["graded"])
         self.assertFalse(drop_mark(exams, exams, [], [], {"floor": 0.05})["graded"])
         self.assertFalse(drop_mark(exams, exams, [], [], {"floor": 0.05, "predicted": "mind-cell"})["graded"])
@@ -777,8 +778,8 @@ class DropMark(unittest.TestCase):
     def test_not_gradable_with_fewer_than_two_exams(self):
         from tools.verdict_life import drop_mark
         declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
-        one = [_exam(0.9, snapshot_last_seq=10)]
-        two = [_exam(0.9, snapshot_last_seq=10), _exam(0.9, snapshot_last_seq=20)]
+        one = [_drop_exam(0.9, snapshot_last_seq=10)]
+        two = [_drop_exam(0.9, snapshot_last_seq=10), _drop_exam(0.9, snapshot_last_seq=20)]
         m = drop_mark(one, two, [], [], declared)
         self.assertFalse(m["graded"]); self.assertIsNone(m["pass"]); self.assertIn("1 floor", m["reason"])
         m2 = drop_mark([], [], [], [], declared)
@@ -787,8 +788,8 @@ class DropMark(unittest.TestCase):
     def test_graded_claim_holds_q1_within_bar_no_window_data(self):
         from tools.verdict_life import drop_mark
         declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
-        floor = [_exam(0.900, snapshot_last_seq=500), _exam(0.920, snapshot_last_seq=1000), _exam(0.930, snapshot_last_seq=1500)]
-        drop = [_exam(0.905, snapshot_last_seq=500), _exam(0.915, snapshot_last_seq=1000), _exam(0.935, snapshot_last_seq=1500)]
+        floor = [_drop_exam(0.900, snapshot_last_seq=500), _drop_exam(0.920, snapshot_last_seq=1000), _drop_exam(0.930, snapshot_last_seq=1500)]
+        drop = [_drop_exam(0.905, snapshot_last_seq=500), _drop_exam(0.915, snapshot_last_seq=1000), _drop_exam(0.935, snapshot_last_seq=1500)]
         m = drop_mark(floor, drop, [], [], declared)
         self.assertTrue(m["graded"])
         self.assertTrue(m["claim_q1"])
@@ -803,8 +804,8 @@ class DropMark(unittest.TestCase):
     def test_graded_claim_fails_when_a_single_exam_exceeds_the_q1_bar(self):
         from tools.verdict_life import drop_mark
         declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
-        floor = [_exam(0.900, snapshot_last_seq=500), _exam(0.920, snapshot_last_seq=1000)]
-        drop = [_exam(0.905, snapshot_last_seq=500), _exam(0.870, snapshot_last_seq=1000)]   # 5 pp drop at exam 2
+        floor = [_drop_exam(0.900, snapshot_last_seq=500), _drop_exam(0.920, snapshot_last_seq=1000)]
+        drop = [_drop_exam(0.905, snapshot_last_seq=500), _drop_exam(0.870, snapshot_last_seq=1000)]   # 5 pp drop at exam 2
         m = drop_mark(floor, drop, [], [], declared)
         self.assertTrue(m["graded"])
         self.assertFalse(m["claim_q1"])
@@ -813,8 +814,8 @@ class DropMark(unittest.TestCase):
     def test_retention_graded_with_a_window_2_pair(self):
         from tools.verdict_life import drop_mark
         declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
-        floor = [_exam(0.90, snapshot_last_seq=500, window=1), _exam(0.85, snapshot_last_seq=1000, window=2), _exam(0.80, snapshot_last_seq=1500, window=2)]
-        drop = [_exam(0.90, snapshot_last_seq=500, window=1), _exam(0.85, snapshot_last_seq=1000, window=2), _exam(0.79, snapshot_last_seq=1500, window=2)]
+        floor = [_drop_exam(0.90, snapshot_last_seq=500, window=1), _drop_exam(0.85, snapshot_last_seq=1000, window=2), _drop_exam(0.80, snapshot_last_seq=1500, window=2)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500, window=1), _drop_exam(0.85, snapshot_last_seq=1000, window=2), _drop_exam(0.79, snapshot_last_seq=1500, window=2)]
         m = drop_mark(floor, drop, [], [], declared)
         self.assertTrue(m["retention"]["readable"])
         # floor's own change = 100*(0.80-0.90) = -10.0; drop's own change = 100*(0.79-0.90) = -11.0;
@@ -828,8 +829,8 @@ class DropMark(unittest.TestCase):
     def test_retention_fails_the_claim_when_delta_below_bar(self):
         from tools.verdict_life import drop_mark
         declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
-        floor = [_exam(0.90, snapshot_last_seq=500, window=1), _exam(0.85, snapshot_last_seq=1000, window=2)]
-        drop = [_exam(0.90, snapshot_last_seq=500, window=1), _exam(0.60, snapshot_last_seq=1000, window=2)]   # a huge extra retention loss
+        floor = [_drop_exam(0.90, snapshot_last_seq=500, window=1), _drop_exam(0.85, snapshot_last_seq=1000, window=2)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500, window=1), _drop_exam(0.60, snapshot_last_seq=1000, window=2)]   # a huge extra retention loss
         m = drop_mark(floor, drop, [], [], declared)
         self.assertTrue(m["retention"]["readable"])
         self.assertLess(m["retention"]["delta_pp"], -1.0)
@@ -839,8 +840,8 @@ class DropMark(unittest.TestCase):
     def test_mismatched_snapshot_rows_between_twins_fails(self):
         from tools.verdict_life import drop_mark
         declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
-        floor = [_exam(0.90, snapshot_last_seq=500), _exam(0.92, snapshot_last_seq=1000)]
-        drop = [_exam(0.90, snapshot_last_seq=500), _exam(0.92, snapshot_last_seq=1200)]   # exam 1 landed at a DIFFERENT row
+        floor = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.92, snapshot_last_seq=1000)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.92, snapshot_last_seq=1200)]   # exam 1 landed at a DIFFERENT row
         m = drop_mark(floor, drop, [], [], declared)
         self.assertTrue(m["graded"])
         self.assertFalse(m["pass"])
@@ -854,8 +855,8 @@ class DropMark(unittest.TestCase):
         # has teeth.
         from tools.verdict_life import drop_mark
         declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
-        floor = [_exam(0.90, snapshot_last_seq=500), _exam(0.90, snapshot_last_seq=1000)]
-        drop = [_exam(0.90, snapshot_last_seq=500), _exam(0.90, snapshot_last_seq=1000)]
+        floor = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
         timings_floor = [{"seq": i, "sense": "eye", "ms": 10.0} for i in range(100)] + [{"seq": i, "sense": "ear", "ms": 0.1} for i in range(100)]
         timings_drop = [{"seq": i, "sense": "eye", "ms": 8.0} for i in range(100)] + [{"seq": i, "sense": "ear", "ms": 0.1} for i in range(100)]
         m = drop_mark(floor, drop, timings_floor, timings_drop, declared)
@@ -866,7 +867,7 @@ class DropMark(unittest.TestCase):
     def test_d4_none_when_no_timings(self):
         from tools.verdict_life import drop_mark
         declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
-        floor = [_exam(0.90, snapshot_last_seq=500), _exam(0.90, snapshot_last_seq=1000)]
+        floor = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
         m = drop_mark(floor, floor, [], [], declared)
         self.assertIsNone(m["d4_ms_saved_pct"])
 
@@ -879,8 +880,8 @@ class DropMark(unittest.TestCase):
         # but floor/drop DIFFER within each window -- the windowed reading must isolate exactly that.
         from tools.verdict_life import drop_mark
         declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
-        floor = [_exam(0.90, snapshot_last_seq=500), _exam(0.90, snapshot_last_seq=1000)]
-        drop = [_exam(0.90, snapshot_last_seq=500), _exam(0.90, snapshot_last_seq=1000)]
+        floor = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
         timings_floor = ([{"seq": i, "sense": "eye", "ms": 10.0} for i in range(1, 501)]
                           + [{"seq": i, "sense": "eye", "ms": 90.0} for i in range(501, 1001)])
         timings_drop = ([{"seq": i, "sense": "eye", "ms": 9.0} for i in range(1, 501)]

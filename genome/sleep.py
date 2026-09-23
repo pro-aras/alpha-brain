@@ -40,12 +40,17 @@ import numpy as np
 from .machinery import Organism
 
 
-def sleep(org: Organism, episodes, n: int) -> Dict[str, object]:
+def sleep(org: Organism, episodes, n: int, words: bool = True) -> Dict[str, object]:
     """Replays the `n` most surprising LIVE episodes in `episodes` (genome/fast.py's Episodes) as
     ordinary moments. An episode the ring has since overwritten (most_surprising ranked it, then it fell
     off before replay) is skipped, never an error. Returns counts measured against the organism's own
     state before/after — births/merges/prunes are read from Organism.c, so this never double-counts
-    anything moment() itself would not have counted."""
+    anything moment() itself would not have counted.
+
+    edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400 — A4L-VOICE task 3: `words=False` (the mind's
+    `--blind ear` twin only) replays each episode's glance with NO word (`Organism.moment(x_s, None)`): «the words area never
+    lights» holds in sleep too (an episode's blank-word encoding would otherwise light a blank word cell and wire sight to
+    it). Default True: byte-for-byte the old replay."""
     ids = episodes.most_surprising(n)
     births_before = org.sight.n + org.words.n
     merges_before = org.c["cells_merged_sight"] + org.c["cells_merged_words"]
@@ -55,7 +60,7 @@ def sleep(org: Organism, episodes, n: int) -> Dict[str, object]:
         rec = episodes.get(eid)
         if rec is None:
             continue
-        org.moment(rec["x_s"], rec["x_w"])
+        org.moment(rec["x_s"], rec["x_w"] if words else None)
         replayed += 1
     return {
         "replayed": replayed,

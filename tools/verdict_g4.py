@@ -38,7 +38,7 @@ WINDOW_SECONDS = 6 * 3600
 READER_VERSION = ("tools/verdict_g4.py v3.3 (2026-09-23: v3.2 + READER-FIX-0923 — EVOLVE's void round apart; COST as §8b's function of cells; ACT's census "
                   "over the game's acts, ≥ 95 % on the last 100; SENTENCE's missions per episode; QUESTION once per question, the lexicon counted; READ's "
                   "fixed-seed sample of shelf-only words + its blind twin; THREAD's gaps attributed to sleeps; STAGE's readiness series + the mind's stage "
-                  "events carried; not gradable never failed; the plant clauses not gradable before the plant)")
+                  "events carried; not gradable never failed; the plant clauses not gradable before the plant; + A4L-VOICE: the voice twins blind-ear/blind-sound/T-shuffle-sound when AREA sound is declared, and the marks HEAR/VOICE_HARM/SOUND_CELLS)")
 
 
 def _git_head(tree) -> "str | None":
@@ -261,6 +261,12 @@ def worker(spec_path: Path) -> int:
     src_tape = Path(spec["tape"])
     _relink(root / "tape" / "payload", (src_tape.parent / "payload").resolve())
     rows = rows_for_spec(read_jsonl(src_tape), spec)
+    if spec.get("shuffle_voice") is not None:
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:48 +0400 — A4L-VOICE: the SHUFFLED-SOUND twin (V1/V2's null) — every
+        # maker ear-sound row's payload replaced by ANOTHER thing's chord by a fixed derangement of the reader's seed (tools/verdict_life.py:shuffle_voice)
+        from tools import verdict_life as _vl_w
+        rows, _voice_perm = _vl_w.shuffle_voice(rows, int(spec["shuffle_voice"]))
+        (root / "voice_perm.json").write_text(json.dumps(_voice_perm))
     (root / "tape" / "ALL.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))   # self_exam's disjointness control reads it
     genome_path = Path(spec["genome"])
     if spec.get("one_glance"):
@@ -603,6 +609,12 @@ def main(argv: List[str]) -> int:
     # (A4-LADDER-PREREG §4: «each with its twin set only … LANG + blind-chat»), so it runs OUTSIDE `if not a.skip_twins:` — a read
     # with --skip-twins still grades L1 (the first draft sat inside that block; the advisor's catch before the life).
     specs += chat_twin_specs(g.declared, twins_dir, tape_all, genome_path)
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:48 +0400 — A4L-VOICE (A4-LADDER-PREREG §4: «VOICE + blind-ear, blind-sound,
+    # shuffled-sound»): the rung's OWN twin set, run whenever the life's genome declares the sound area — with or without --skip-twins.
+    if "AREA_SOUND" in g.declared:
+        specs += [{"label": "blind-ear", "root": str(twins_dir / "blind-ear"), "tape": str(tape_all), "genome": str(genome_path), "blind": ["ear"]},
+                  {"label": "blind-sound", "root": str(twins_dir / "blind-sound"), "tape": str(tape_all), "genome": str(genome_path), "blind": ["sound"]},
+                  {"label": "T-shuffle-sound", "root": str(twins_dir / "T-shuffle-sound"), "tape": str(tape_all), "genome": str(genome_path), "shuffle_voice": 20260923}]
     # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (11): READ's blind twin (every shelf row dropped) is
     # one more twin of the set — under --skip-random too (it is not a random twin); skipped with its reason (the clause then reads not
     # gradable, never FAIL) when SENSE_READ is undeclared, under --skip-twins, or when the cut tape carries no shelf row (it would be the
@@ -947,6 +959,13 @@ def main(argv: List[str]) -> int:
     else:
         M["ACT"]["shuffled_twin_diverged"] = "not run (not gradable)"
     M["SOUND"] = _vl.sound_mark(tape, live, st)
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:48 +0400 — A4L-VOICE's marks (A4-LADDER-PREREG §2.3): V1 on the blind-ear twin, V2/V5
+    # on the organism at the cut (the unblinded replay), both nulls on the shuffled-sound twin; V3 against the blind-sound twin; V4 printed from STATUS.
+    def _ask_sound_of(label):
+        return ((TW.get(label, {}) or {}).get("exam") or {}).get("ask_sound")
+    M["HEAR"] = _vl.hear_mark((E or {}).get("ask_sound"), _ask_sound_of("blind-ear"), _ask_sound_of("T-shuffle-sound"))
+    M["VOICE_HARM"] = _vl.voice_harm_mark(E, (TW.get("blind-sound", {}) or {}).get("exam"), "AREA_SOUND" in decl)
+    M["SOUND_CELLS"] = _vl.sound_cells_mark(st)
     # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 02:52 +0400 — ALPHA4-G.md task 5: `grow=` from
     # the life's OWN genome (`decl`, already parsed above for "SELF"/"ANSWER") — never guessed from STATUS
     # shape, so a genome that happens to have a small sight_nmax under NMAX is never mistaken for GROW.

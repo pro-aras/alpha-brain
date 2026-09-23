@@ -172,7 +172,11 @@ class TestAnswerXQuestion(unittest.TestCase):
         # wordless-sight road. That is the intended failure mode: it forces a human to re-read this seam's
         # own reasoning (§ above) rather than silently going stale, not a promise that the count itself is
         # meaningful in isolation.
-        self.assertEqual(src_mind.count("self.org.recall_many("), 1, "a new recall_many call site appeared -- re-audit this seam (task 6)")
+        # edit: Claude (Fable 5.1), 2026-09-23 14:32 +0400 — re-audited at the integration merge: the second call site is A4L-LANG's `_chat_content` (the chat's
+        # canvas — a rendered line or a picture — asked by the genome's own answer law: a PICTURE road like the ask door's, so the majority
+        # clause applies to it as to every picture; still no wordless SIGHT road calls recall_many).
+        self.assertEqual(src_mind.count("self.org.recall_many("), 2, "a new recall_many call site appeared -- re-audit this seam (task 6)")
+        self.assertIn("def _chat_content", src_mind)
         self.assertEqual(src_think_thread.count(".recall_many("), 1, "a new recall_many call site appeared -- re-audit this seam (task 6)")
 
 
