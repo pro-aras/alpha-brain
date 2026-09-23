@@ -43,8 +43,11 @@ class TestSenseReadParses(unittest.TestCase):
         g = parse_genome(_life_plus(stripped))
         self.assertEqual(g.declared["SENSE_READ"]["shelf"], "/data/alpha3-library/SHELF.sqlite")
         self.assertEqual(g.declared["SENSE_READ"]["curriculum"], "/data/alpha3-library/CURRICULUM.md")
-        self.assertEqual(g.declared["SENSE_READ"]["every_s"], 5)
-        self.assertEqual(g.declared["SENSE_READ"]["words"], 8)
+        # edit: Claude (Fable 5.1), 2026-09-23 12:17 +0400 — the deployed line reads `every 20 s words 4` since the pre-flight's cadence
+        # decision (ALPHA4-PREREG §8b, 04:37 +04); the pin had stayed at the builder's 5 s / 8 words and master's genome
+        # suite read FAILED (failures=1) from the launch commit on — found by the judge builder (JUDGE-UNITS-0923 §0.7).
+        self.assertEqual(g.declared["SENSE_READ"]["every_s"], 20)
+        self.assertEqual(g.declared["SENSE_READ"]["words"], 4)
         self.assertEqual(g.declared["SENSE_READ"]["canvas"], 128)
 
     def test_misspelt_keyword_refuses_by_name(self) -> None:
