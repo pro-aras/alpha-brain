@@ -247,6 +247,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "DOOR_WEB": "DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD",
         "SENSE_GRADE": "SENSE    grade from ask/graded",
         "STAGE_READY": "STAGE    4 world by READY",
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:15 +0400 — A4L-LANG: one row, matching the genes.py RUNS entry
+        # (CHAT). Caught by this test's own gate on the landing's first full-suite run — the omission this class exists to catch.
+        "CHAT": "CHAT     door chat/in chat/out; chain of frames + one pivot slot; links adjacent 5; pivot 10 distinct 20 instants; at most 6 words; a question never teaches",
     }
 
     def test_every_runs_gene_parses(self) -> None:
