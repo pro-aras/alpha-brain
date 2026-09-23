@@ -91,7 +91,13 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # than imported, since genome/think.py imports machinery.Organism and an import the other way would be
         # circular; raised in the report, not silently substituted).
         "THRESH": "genome/machinery.py:Organism.moment (the own-band push) + Organism.own_floor (its p5)",
-        "ANSWER": "genome/machinery.py:Organism.recall/recall_many (grade/own_floor/resembles_cell on the sight side)",
+        # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:10 +0400 — A4-LADDER-PREREG.md §2.2: the
+        # OPTIONAL "; sure only when a majority of the glances light" clause is read at the SAME site
+        # (`declared["ANSWER"]["majority"]`, gated inside Organism.recall_many only -- `recall` is untouched by
+        # construction, one glance can never trip a majority gate) -- no new RUNS row, the existing one still names
+        # the real call site truthfully.
+        "ANSWER": "genome/machinery.py:Organism.recall/recall_many (grade/own_floor/resembles_cell on the sight side; "
+                  "recall_many's own majority-of-glances gate — A4-LADDER-PREREG §2.2 — reason \"minority\")",
     },
     # ---------------------------------------------------------------------------------------- the body
     # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.7 (docs/G4-WAVE3-CLAUSES.md

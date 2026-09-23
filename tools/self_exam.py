@@ -78,6 +78,31 @@ def main() -> int:
     fallback = len(seen_things) < 2
     ask = ask_glances(org, ledgers, things if fallback else seen_things, feats, never, g.ear_blank_zero)
     ask_all = ask_glances(org, ledgers, things + arr2, feats, never, g.ear_blank_zero)
+    # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:12 +0400 — A4-LADDER-PREREG §2.2 task 3:
+    # THE SITTER SITS BOTH LAWS — but only when this genome's ANSWER line actually declares the majority
+    # clause (`recall_many`'s own gate would otherwise never fire, so an "old law" pass would be BYTE-
+    # IDENTICAL to the new one — a wasted second full ask_glances pass on every OTHER rung's and alpha4-1's
+    # own exam duty, which all share this module via creature/exam.py:run_exam). Undeclared: both keys are
+    # still written (#164 — a stable schema every reader can rely on) as None, with the reason on the
+    # sibling `*_old_law_note` field, never silently omitted.
+    seen_for_ceiling = things if fallback else seen_things
+    answer_majority_declared = bool(g.declared.get("ANSWER", {}).get("majority"))
+    ask_old, ask_all_old, lit_counts_seen, old_law_note = None, None, None, None
+    if answer_majority_declared:
+        ask_old = ask_glances(org, ledgers, things if fallback else seen_things, feats, never, g.ear_blank_zero, majority=False)
+        ask_all_old = ask_glances(org, ledgers, things + arr2, feats, never, g.ear_blank_zero, majority=False)
+        # A2's own per-exam ceiling (task 0/5): the lit-glance distribution over the SAME seen canvases Q1
+        # was just read on — forced ON (majority=True) so it reads the count regardless of the genome's own
+        # law (moot here, since the clause IS declared, but keeps this loop's meaning independent of `ask`'s).
+        lit_counts_seen = {}
+        for t in seen_for_ceiling:
+            for xs in feats.get(t, []):
+                r = org.recall_many("sight", xs, majority=True)
+                n_lit = r.get("lit_n")
+                if n_lit is not None:
+                    lit_counts_seen[n_lit] = lit_counts_seen.get(n_lit, 0) + 1
+    else:
+        old_law_note = "ANSWER's majority clause is not declared on this genome — old law == new law by construction, not sat twice"
     landing = run_g1.landing(held_g, things, first=2)
     hash_before = L.get("state_hash") or org.state_hash()
     # edit: Claude (Fable 5.1), 2026-09-23 03:02 +0400 — ALPHA4 §4(b): the reading share as a TAPE FACT. The sitter (off the mind
@@ -103,6 +128,10 @@ def main() -> int:
         "seen_words_fallback_to_all": fallback,
         "disjoint_checked": disjoint_checked, "disjoint_control_caught": caught,
         "ask_seen_words": ask, "ask_all_words": ask_all, "gaze_landing": landing,
+        # A4-LADDER-PREREG §2.2 task 3 — both laws, one snapshot, no replay; None + a note when the clause
+        # is not declared on this genome (#164: the key is always present).
+        "ask_seen_words_old_law": ask_old, "ask_all_words_old_law": ask_all_old,
+        "lit_counts_seen": lit_counts_seen, "answer_majority_declared": answer_majority_declared, "old_law_note": old_law_note,
         "read_share": read_share, "read_words_n": read_words_n, "read_words": read_words_list,
         "organism_hash_unchanged_by_exam": org.state_hash() == hash_before, "seconds": round(time.perf_counter() - t0, 1),
     }

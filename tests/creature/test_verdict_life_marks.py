@@ -147,6 +147,104 @@ class GradeMark(unittest.TestCase):
         self.assertFalse(grade_mark(unlearned, null, seen, True)["pass"])       # answered 5/10 is the FAIL (L5's cap shape, seam-1's 0/10)
 
 
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:12 +0400 — A4-LADDER-PREREG §2.2 A1/A2
+# (test-first against self_exam.py's own exam shape, task 3/5).
+def _exam(at, spiral_new, spiral_old=None, lit_counts=None, q1_new=None, q1_old=None):
+    """One sitter exam dict, shaped exactly as self_exam.py's `out` (task 3): ask_all_words/Q5/spiral for
+    the spiral clause, ask_seen_words/Q1 + lit_counts_seen for A2's ceiling."""
+    row = {"at": at, "ask_all_words": {"Q5": {"spiral": {"graded": spiral_new}}},
+           "ask_seen_words": {"Q1": {"acc": q1_new}}, "lit_counts_seen": lit_counts or {}}
+    if spiral_old is not None:
+        row["ask_all_words_old_law"] = {"Q5": {"spiral": {"graded": spiral_old}}}
+    if q1_old is not None:
+        row["ask_seen_words_old_law"] = {"Q1": {"acc": q1_old}}
+    return row
+
+
+class AnswerNullMark(unittest.TestCase):
+    """A1 NULL: the sitter's spiral (Q5) at every exam + the reader's one-off vex, both under the same
+    two clauses grade_mark's null half already uses (sure-bare <= 1/10, soft >= 8/10, a tie fails)."""
+
+    def test_not_gradable_when_majority_not_declared(self):
+        from tools.verdict_life import answer_null_mark
+        m = answer_null_mark([_exam("t0", {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0})], None, None, False)
+        self.assertFalse(m["graded"]); self.assertIsNone(m["pass"])
+
+    def test_not_gradable_when_no_exam_carries_q5(self):
+        from tools.verdict_life import answer_null_mark
+        empty = {"at": "t0", "ask_all_words": {"Q5": {}}, "ask_seen_words": {"Q1": {}}, "lit_counts_seen": {}}
+        m = answer_null_mark([empty], None, None, True)
+        self.assertFalse(m["graded"]); self.assertIn("no Q5", m["reason"])
+
+    def test_not_gradable_before_the_reader_has_asked_vex(self):
+        from tools.verdict_life import answer_null_mark
+        clean_spiral = {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0}
+        m = answer_null_mark([_exam("t0", clean_spiral)], None, None, True)
+        self.assertFalse(m["graded"]); self.assertIn("no vex reading", m["reason"])
+
+    def test_passes_when_every_exam_spiral_and_the_final_vex_clear_the_bar(self):
+        from tools.verdict_life import answer_null_mark
+        clean_spiral = {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0}
+        edge_spiral = {"sure_bare": 1, "unsure": 2, "abstain_with_resemblance": 7, "abstain": 0}   # AT the ceiling (1/10 sure-bare)
+        exams = [_exam("t0", clean_spiral), _exam("t1", edge_spiral)]
+        vex_new = {"graded": {"sure_bare": 1, "unsure": 3, "abstain_with_resemblance": 6, "abstain": 0}}
+        m = answer_null_mark(exams, vex_new, {"graded": {"sure_bare": 9, "unsure": 1, "abstain_with_resemblance": 0, "abstain": 0}}, True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"])
+        self.assertTrue(m["spiral_pass"]); self.assertTrue(m["vex_pass"])
+        self.assertEqual(len(m["spiral_per_exam"]), 2)
+        self.assertEqual(m["spiral_per_exam"][1]["old_law_sure_bare"], None)   # no old-law reading passed for that exam
+
+    def test_one_exam_over_the_line_fails_the_whole_mark(self):
+        """A1 is conjunctive across EVERY exam from hour 1 -- one bad reading fails it, not just the latest."""
+        from tools.verdict_life import answer_null_mark
+        clean_spiral = {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0}
+        bad_spiral = {"sure_bare": 9, "unsure": 1, "abstain_with_resemblance": 0, "abstain": 0}     # ALPHA4's own regression shape
+        exams = [_exam("t0", clean_spiral), _exam("t1", bad_spiral, spiral_old=bad_spiral)]
+        vex = {"graded": {"sure_bare": 0, "unsure": 3, "abstain_with_resemblance": 7, "abstain": 0}}
+        m = answer_null_mark(exams, vex, vex, True)
+        self.assertTrue(m["graded"]); self.assertFalse(m["pass"]); self.assertFalse(m["spiral_pass"])
+        self.assertEqual(m["spiral_per_exam"][1]["old_law_sure_bare"], 9)
+
+    def test_vex_tie_fails(self):
+        from tools.verdict_life import answer_null_mark
+        clean_spiral = {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0}
+        tie_vex = {"graded": {"sure_bare": 5, "unsure": 3, "abstain_with_resemblance": 2, "abstain": 0}}
+        m = answer_null_mark([_exam("t0", clean_spiral)], tie_vex, tie_vex, True)
+        self.assertFalse(m["vex_pass"]); self.assertFalse(m["pass"])
+
+
+class AnswerSeenMark(unittest.TestCase):
+    """A2 SEEN: graded only from the first exam whose OWN ceiling (share of seen canvases lighting >= 3
+    of the glances asked) reaches 95 % -- an early organism's low share prints Δ, ungraded (#231 (5))."""
+
+    def test_not_gradable_when_majority_not_declared(self):
+        from tools.verdict_life import answer_seen_mark
+        m = answer_seen_mark([_exam("t0", {}, lit_counts={"5": 10}, q1_new=1.0, q1_old=1.0)], False)
+        self.assertFalse(m["graded"])
+
+    def test_not_gradable_below_the_ceiling(self):
+        """task 0's own early-organism reading: 119/160 (74 %) lighting >= 3 -- below the 95 % ceiling."""
+        from tools.verdict_life import answer_seen_mark
+        early = _exam("t0", {}, lit_counts={"1": 34, "2": 7, "3": 5, "4": 7, "5": 107}, q1_new=0.9, q1_old=0.9)
+        m = answer_seen_mark([early], True)
+        self.assertFalse(m["graded"]); self.assertIn("early-organism", m["reason"])
+        self.assertAlmostEqual(m["per_exam"][0]["share"], 119 / 160)
+
+    def test_passes_once_the_ceiling_holds_and_q1_does_not_regress(self):
+        from tools.verdict_life import answer_seen_mark
+        early = _exam("t0", {}, lit_counts={"1": 34, "2": 7, "3": 5, "4": 7, "5": 107}, q1_new=0.9, q1_old=0.9)
+        mature = _exam("t1", {}, lit_counts={"3": 1, "4": 3, "5": 156}, q1_new=0.98, q1_old=0.981)
+        m = answer_seen_mark([early, mature], True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"])
+        self.assertAlmostEqual(m["per_exam"][1]["share"], 1.0)
+
+    def test_fails_when_q1_regresses_past_the_bound_once_the_ceiling_holds(self):
+        from tools.verdict_life import answer_seen_mark
+        mature_regressed = _exam("t0", {}, lit_counts={"3": 1, "4": 3, "5": 156}, q1_new=0.90, q1_old=0.95)
+        m = answer_seen_mark([mature_regressed], True)
+        self.assertTrue(m["graded"]); self.assertFalse(m["pass"])
+
+
 class SelfMark(unittest.TestCase):
     """PREREG §19.6 against builder A's shapes: belief rows whose word starts with `self:`, cells [], episodes = two body-row seqs."""
 

@@ -177,6 +177,108 @@ def grade_mark(plant: dict, null: dict, seen: dict, answer_declared: bool, plant
     return out
 
 
+# ============================================================================ A4L-ANSWER (A4-LADDER-PREREG §2.2)
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:11 +0400 — A1/A2, test-first against the
+# self_exam.py/questions.py shapes this rung lands (#171/#173): the sitter's own exam dicts (each carrying
+# ask_seen_words/ask_all_words/ask_seen_words_old_law/ask_all_words_old_law/lit_counts_seen — task 3) and the
+# reader's one-off plant-shaped asks (genome/questions.py:ask_plant_glances) for the null plant "vex" on the
+# final snapshot, both laws (task 5).
+def _two_clauses(graded: dict) -> Optional[bool]:
+    """The shared A1 bar (grade_mark's own null-clause math, generalised to any n): sure-bare <= 1/10 of the
+    asked AND unsure+abstain_with_resemblance+abstain >= 8/10 -- both bounds strict, so a tie (neither
+    clearly clears nor clearly fails, e.g. a 5/10 split under an older ">50%" phrasing) fails by
+    construction. None when there is nothing to grade (n == 0)."""
+    n = sum(int(v) for v in (graded or {}).values())
+    if not n:
+        return None
+    sb = int((graded or {}).get("sure_bare", 0))
+    soft = n - sb
+    return (sb / n <= 0.1) and (soft / n >= 0.8)
+
+
+def _q5_graded(ask_result: Optional[dict], thing: str) -> Optional[dict]:
+    q5 = ((ask_result or {}).get("Q5") or {}).get(thing)
+    return (q5 or {}).get("graded") if isinstance(q5, dict) else None
+
+
+def answer_null_mark(exams: Iterable[dict], vex_new: Optional[dict], vex_old: Optional[dict],
+                     answer_majority_declared: bool, spiral_key: str = "spiral") -> Dict[str, object]:
+    """A4-LADDER-PREREG §2.2 A1 NULL: the exam files' Q5 spiral at EVERY exam from hour 1 (sure-bare <=
+    1/10 AND resembles+unsure+abstain >= 8/10; a tie fails, `_two_clauses`) + the reader's one-off `vex`
+    asks (genome/questions.py:ask_plant_glances on THING_NULL) on the rung's final snapshot, the SAME two
+    clauses. `exams`: the sitter's own exam dicts, in order (self_exam.py's `out`, task 3 — Q5 is read off
+    `ask_all_words` since it is invariant to which `things` list Q1-4 used). `vex_new`/`vex_old`: the
+    reader's `ask_plant_glances(..., world.THING_NULL, ..., majority=None/False)` return dicts (or None
+    before alpha4-1 closes — A3/A1's vex clause is not gradable that early, printed as such). The old-law
+    reading (spiral per-exam, vex) is printed beside each, never graded (A1's own bar is the new law's)."""
+    bar = ('spiral: at every exam from hour 1, sure-bare <= 1/10 AND resembles+unsure+abstain >= 8/10 (a tie fails) · '
+           'vex (the reader, final snapshot): the same two clauses · the old-law reading printed beside each, ungraded')
+    out: Dict[str, object] = {"bar": bar}
+    if not answer_majority_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: ANSWER's majority clause not declared on this line")
+        return out
+    per_exam = []
+    for ex in exams:
+        g_new = _q5_graded(ex.get("ask_all_words"), spiral_key)
+        g_old = _q5_graded(ex.get("ask_all_words_old_law"), spiral_key)
+        if g_new is None:
+            continue
+        n = sum(int(v) for v in g_new.values())
+        per_exam.append({"at": ex.get("at"), "n": n, "sure_bare": int(g_new.get("sure_bare", 0)),
+                          "pass": _two_clauses(g_new), "old_law_sure_bare": (int(g_old.get("sure_bare", 0)) if g_old else None)})
+    if not per_exam:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: the exam file carries no Q5"); return out
+    spiral_pass = all(e["pass"] for e in per_exam)
+    vex_graded_new = (vex_new or {}).get("graded")
+    vex_graded_old = (vex_old or {}).get("graded")
+    vex_pass = _two_clauses(vex_graded_new) if isinstance(vex_graded_new, dict) else None
+    out.update(spiral_per_exam=per_exam, spiral_pass=spiral_pass,
+               vex_graded=vex_graded_new, vex_old_law_graded=vex_graded_old, vex_pass=vex_pass)
+    if vex_pass is None:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: no vex reading yet (the reader asks it on the rung's final snapshot)")
+        return out
+    out.update(graded=True, **{"pass": bool(spiral_pass and vex_pass)}, reason="graded (§2.2 A1)")
+    return out
+
+
+def answer_seen_mark(exams: Iterable[dict], answer_majority_declared: bool, glances_needed: int = 3,
+                     ceiling_share: float = 0.95, min_delta: float = -0.01, min_q1: float = 0.95) -> Dict[str, object]:
+    """A4-LADDER-PREREG §2.2 A2 SEEN (the regression bar, #231 (6)): at every exam WHERE ITS OWN CEILING
+    HOLDS (the sitter's `lit_counts_seen` share of seen canvases lighting >= `glances_needed` of the
+    glances asked, >= `ceiling_share`) -- Q1 on seen words under the new law minus Q1 under the old law,
+    read off the SAME snapshot by the sitter (task 3) >= `min_delta`; Q1 (new) >= `min_q1`. An early
+    organism may light fewer glances per canvas (measured, task 0: 74 % at ~1,500 cells vs 100 % at
+    ~4,000) — a reason the CEILING gives, never the law — so every exam prints its own share/delta and
+    only the ones whose ceiling clears are graded; not gradable when none ever does."""
+    bar = (f"at every exam whose own ceiling (share of seen canvases lighting >= {glances_needed} glances) reaches "
+           f">= {ceiling_share:.0%}: Q1(new) - Q1(old) >= {min_delta} AND Q1(new) >= {min_q1}; earlier exams print their own share/delta, ungraded")
+    out: Dict[str, object] = {"bar": bar}
+    if not answer_majority_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: ANSWER's majority clause not declared on this line")
+        return out
+    per_exam = []
+    for ex in exams:
+        counts = ex.get("lit_counts_seen") or {}
+        total = sum(int(v) for v in counts.values())
+        share = (sum(int(v) for k, v in counts.items() if int(k) >= glances_needed) / total) if total else None
+        q1_new = ((ex.get("ask_seen_words") or {}).get("Q1") or {}).get("acc")
+        q1_old = ((ex.get("ask_seen_words_old_law") or {}).get("Q1") or {}).get("acc")
+        delta = (q1_new - q1_old) if (q1_new is not None and q1_old is not None) else None
+        per_exam.append({"at": ex.get("at"), "share": share, "q1_new": q1_new, "q1_old": q1_old, "delta": delta,
+                          "ceiling_holds": (share is not None and share >= ceiling_share)})
+    if not per_exam:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: no exams with a lit_counts_seen reading"); return out
+    out["per_exam"] = per_exam
+    graded_rows = [e for e in per_exam if e["ceiling_holds"]]
+    if not graded_rows:
+        out.update(graded=False, **{"pass": None},
+                   reason=f"not gradable: no exam's own ceiling reaches {ceiling_share:.0%} yet (an early-organism finding, #231 (5) — printed per_exam)")
+        return out
+    ok = all((e["delta"] is not None and e["delta"] >= min_delta and e["q1_new"] is not None and e["q1_new"] >= min_q1) for e in graded_rows)
+    out.update(graded=True, **{"pass": bool(ok)}, reason="graded (§2.2 A2)")
+    return out
+
+
 def self_mark(tape: Iterable[dict], beliefs: Iterable[dict], journal: Iterable[dict], status: dict, self_declared: bool, min_body_rows: int = 24) -> Dict[str, object]:
     """PREREG §19.6 (builder A's shapes: a belief row whose word starts with `self:`, cells [], episodes = the two body rows' seqs):
     ≥ 1 self belief citing two real body rows; `think_skipped_for_backlog` printed. Not gradable under `min_body_rows` body rows or
