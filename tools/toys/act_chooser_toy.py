@@ -161,17 +161,19 @@ def choose(weights: Sequence[float], rng: np.random.Generator, n_actions: int,
 
 
 def replay_choices(tape_rows: Iterable[Dict[str, object]], journal_rows: Iterable[Dict[str, object]],
-                   seed: int) -> List[Dict[str, object]]:
-    """THE PARITY WALK: the game rows of a tape in seq order — on a game `eye` row the old chooser's weights and
-    choice are recomputed from the ring as it stands (BEFORE that frame's own outcome row, which follows it on
-    the tape) and compared with the journal's `act` row at that seq; on a game `outcome` row the outcome is filed.
-    One row per game eye row: {seq, weights, act_idx, act, weights_match, act_match, journal}."""
+                   seed: int, law: str = "old", window: int = WINDOW, optimism: float = 1.0) -> List[Dict[str, object]]:
+    """THE PARITY WALK: the game rows of a tape in seq order — on a game `eye` row the chooser's weights and choice
+    are recomputed from the ring as it stands (BEFORE that frame's own outcome row, which follows it on the tape)
+    and compared with the journal's `act` row at that seq; on a game `outcome` row the outcome is filed. `law`:
+    "old" (the life's outcome-weighted law) or "reward" (the candidate — the rung's `ACT value reward <window>;
+    optimism <optimism>`, Phase 2's parity). One row per game eye row: {seq, weights, act_idx, act,
+    weights_match, act_match, journal}."""
     journal_acts: Dict[int, Dict[str, object]] = {}
     for r in journal_rows:
         a = r.get("act")
         if isinstance(a, dict) and "weights" in a:
             journal_acts[int(r["seq"])] = a
-    ring = Ring()
+    ring = Ring(k=window)
     rng = act_rng(seed)
     out: List[Dict[str, object]] = []
     for row in sorted(tape_rows, key=lambda r: int(r["seq"])):
@@ -184,11 +186,11 @@ def replay_choices(tape_rows: Iterable[Dict[str, object]], journal_rows: Iterabl
                 continue
             n_actions = int(n_actions)
             names = list(meta.get("act_names") or [str(i) for i in range(n_actions)])[:n_actions]
-            w = old_weights(ring, names)
-            idx, _explored = choose(w, rng, n_actions)
+            w = old_weights(ring, names) if law == "old" else reward_values(ring, names, optimism)
+            idx, explored = choose(w, rng, n_actions)
             wr = [round(x, 6) for x in w]
             j = journal_acts.get(int(row["seq"]))
-            out.append({"seq": int(row["seq"]), "weights": wr, "act_idx": idx, "act": names[idx],
+            out.append({"seq": int(row["seq"]), "weights": wr, "act_idx": idx, "act": names[idx], "explored": explored,
                         "weights_match": j is not None and list(j.get("weights") or []) == wr,
                         "act_match": j is not None and int(j.get("act_idx", -1)) == idx and j.get("act") == names[idx],
                         "journal": j})

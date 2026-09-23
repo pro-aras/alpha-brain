@@ -362,6 +362,13 @@ class Body:
             # declares ACT's turn/step verbs or FAST's sound key -- those never build the counters at all.
             "acts_chosen": dict(getattr(self.mind, "acts_chosen", {}) or {}),
             "act_mismatches": int(getattr(self.mind, "act_mismatches", 0)),
+            # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:59 +0400 — docs/A4-LADDER-PREREG.md §2.5 (A4L-EXPLORE):
+            # the game chooser's law, its last weights (the VALUES under `ACT value …`) and its 10 % uniform draws — on EVERY
+            # write (#164); None / None / 0 before any choice and on a genome whose ACT drives no game. The counter the
+            # pre-flight reads MOVES (≈ one choice in ten); the weights move as rewards land and as the untried acts are tried.
+            "act_policy": getattr(self.mind, "act_policy", None),
+            "act_weights": (list(w) if (w := getattr(self.mind, "act_weights", None)) is not None else None),
+            "act_explored": int(getattr(self.mind, "act_explored", 0)),
             "sound_events": int(getattr(self.mind, "sound_events", 0)),
             # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
             # §4): the three counters the mind computed and STATUS never carried (#163's class: computing and exporting
