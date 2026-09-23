@@ -1,0 +1,63 @@
+{
+ "0a BabyAI-GoToRedBall-v0": {
+  "env": "BabyAI-GoToRedBall-v0",
+  "episodes": 100,
+  "seeds": "101..200",
+  "rng": 20260921,
+  "success_rate": 0.29,
+  "mean_return": 0.1464,
+  "mean_steps": 55.65
+ },
+ "0a BabyAI-GoToLocal-v0": {
+  "env": "BabyAI-GoToLocal-v0",
+  "episodes": 100,
+  "seeds": "101..200",
+  "rng": 20260921,
+  "success_rate": 0.29,
+  "mean_return": 0.1429,
+  "mean_steps": 55.9
+ },
+ "0b": {
+  "fixture_outcomes": 120,
+  "fixture_equal": 120,
+  "fixture_first_diff": null,
+  "fixture_chosen_by_mind": 120,
+  "snapshot_game_outcomes": 711,
+  "snapshot_equal": 711,
+  "snapshot_first_diff": null,
+  "snapshot_last_seq": 25242,
+  "act_rng_state_equal_after_choices": {
+   "711": false,
+   "712": true
+  },
+  "snapshot_rewarded": [
+   [
+    363,
+    "left",
+    0.38125
+   ],
+   [
+    693,
+    "left",
+    0.859375
+   ]
+  ],
+  "census_to_snapshot": {
+   "left": 373,
+   "pickup": 72,
+   "forward": 59,
+   "drop": 55,
+   "done": 54,
+   "right": 54,
+   "toggle": 44
+  },
+  "last100_to_snapshot": {
+   "left": 88,
+   "forward": 5,
+   "pickup": 3,
+   "done": 2,
+   "drop": 1,
+   "right": 1
+  }
+ }
+}
