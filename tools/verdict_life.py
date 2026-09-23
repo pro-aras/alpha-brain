@@ -894,3 +894,273 @@ def stage_mark(journal: Iterable[dict], stage_ready_declared: bool, tape: Option
         return out
     out.update(graded=True, **{"pass": len(events) <= 1}, reason="graded (§5 STAGE)")
     return out
+
+
+# ============================================================================ A4-LADDER-PREREG §3.4: the LANG rung's marks
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:47 +0400 — A4L-LANG task 7 (docs/briefs/A4L-LANG.md): L1-L9
+# as PURE functions over the shapes LANDED (#171/#173): creature/mind.py:_consume_chat's chat/out/<id>.json and its journal
+# `say` row of kind "chat"; tools/chat_seat.py's chat/truth/<id>.json; creature/senses/chat.py's `chat` / kind-chat `grade`
+# rows on the tape. Every mark reads «not gradable» on a record whose life did not declare CHAT (the hour-1 fixture, every
+# closed record before tonight — the L-1 control). The READ-ONLY law's replay twin (--blind chat, creature/replay.py) is
+# computed OUTSIDE this module (tools/verdict_g4.py's `blind-chat` worker) and handed in as `blind_journal`.
+CHAT_NULL_THINGS = ("spiral", "vex")
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:52 +0400 — L5's pre-registered ceiling, measured BEFORE the life (task 0 (b)) on
+# alpha4-1's 10:54 snapshot copy: the share of two-thing canvases where a located glance lands on the asked thing AND its
+# single-glance recall is the asked word. tools/chat_ceiling.py on the seat's OWN where-canvases (plan_slot k = 6 + 7i, 50):
+# 39/50 = 0.78 (the POINT rule itself also 39/50); the builder's first probe (scratch, one rng(3) stream over the 16): 42/50 =
+# 0.84. Both >= 0.5 -> L5 is gradable; the seat-road number is the one the life's canvases are drawn from, so it is the bar's.
+CHAT_POINTING_CEILING_PRELIFE = 0.78
+CHAT_MARKS = ("L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9")
+
+
+def _chat_dt(s: str):
+    from datetime import datetime, timezone
+    s = str(s).replace("Z", "+00:00")
+    d = datetime.fromisoformat(s)
+    return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
+
+
+def _chat_said(o: dict) -> List[str]:
+    return [str(w) for w in (o.get("answer") or [])]
+
+
+def _chat_q1_nearest(exams: Sequence[dict], when) -> Optional[float]:
+    best = None
+    for e in exams or []:
+        q1 = (((e.get("ask_seen_words") or {}).get("Q1") or {}).get("acc"))
+        if q1 is None or not e.get("at"):
+            continue
+        d = abs((_chat_dt(e["at"]) - when).total_seconds())
+        if best is None or d < best[0]:
+            best = (d, float(q1))
+    return None if best is None else best[1]
+
+
+def _chat_tape_instants(tape: List[dict]) -> List[Tuple[int, List[str]]]:
+    """(eye seq, words heard on its moment in publish order) for every eye row — pending_words' own rule, rebuilt from
+    the tape alone (never the mind's FAST ring): the independent witness of L7's CITED clause."""
+    words: Dict[str, List[str]] = {}
+    out: List[Tuple[int, List[str]]] = []
+    for r in tape:
+        m = _meta(r)
+        if r.get("sense") == "ear" and m.get("word"):
+            words.setdefault(str(m.get("moment")), []).append(str(m["word"]))
+        elif r.get("sense") == "eye":
+            out.append((int(r["seq"]), words.pop(str(m.get("moment")), [])))
+    return out
+
+
+def chat_marks(chat_out: Dict[str, dict], chat_truth: Dict[str, dict], tape: Iterable[dict], journal: Iterable[dict],
+               exams: Sequence[dict], declared: dict, blind_journal: Optional[List[dict]] = None,
+               pointing_ceiling: Optional[float] = None, born: Optional[str] = None, seed: int = 20260923,
+               permutations: int = 200, tape_canvases: Optional[Sequence[np.ndarray]] = None,
+               chat_pics: Optional[Dict[str, np.ndarray]] = None, min_answered: int = 20, glance: int = 32) -> Dict[str, object]:
+    """A4-LADDER-PREREG §3.4 L1-L9, exactly: L1 the read-only law (every say row's hash_before == hash_after AND the blind-chat
+    twin equal to the live journal's non-chat rows field for field including `hash`); L2 what-is precision >= max(0.80, Q1 at
+    the nearest exam - 0.05) over answered, abstention on seen things <= 0.10, the shuffled-question twin's p95 <= 0.20
+    (`permutations` re-judgings, `seed` — the reader's own); L3 yes-no the same precision bar and ECHO <= 0.10 (the echo twin —
+    content := the lure — printed: 0.5 by construction); L4 which precision >= 0.85; L5 where POINT >= ceiling - 0.15, graded
+    only when the pre-life pointing ceiling >= 0.5; L6 from hour 4 >= 0.5 of the correct what-is + yes-no + which answers
+    carry >= 3 words (the per-hour length table and the longest printed); L7 100 % of said contents grounded and 100 % of
+    links/pivots cited — re-checked on the TAPE; L8 the seat's grades printed (no bar); L9 the null in words printed. A
+    family under `min_answered` answered chats reads «not gradable». The canvases' disjointness from the tape is checked
+    when both are handed in (world.assert_disjoint_canvas + its planted control)."""
+    from creature.senses.chat import render_answer
+    tape = list(tape); journal = list(journal)
+    decl = (declared or {}).get("CHAT")
+    if decl is None:
+        out0: Dict[str, object] = {k: {"graded": False, "pass": None, "reason": "not gradable: CHAT not declared on this life"} for k in CHAT_MARKS}
+        out0["disjoint"] = {"checked": 0, "ok": None, "reason": "not checked: CHAT not declared"}
+        return out0
+    adj_bar, fol_bar = int(decl["links_adjacent"]), int(decl["pivot_distinct"])
+    t0 = _chat_dt(born) if born else (_chat_dt(tape[0]["at"]) if tape else None)
+
+    def hours(o: dict) -> Optional[float]:
+        return None if (t0 is None or not o.get("at")) else (_chat_dt(o["at"]) - t0).total_seconds() / 3600.0
+
+    pairs = [(chat_out[i], chat_truth[i]) for i in sorted(chat_out) if i in chat_truth]
+    fam = lambda f: [(o, t) for o, t in pairs if t.get("family") == f]
+    M: Dict[str, object] = {}
+
+    # ---- L1 READ-ONLY
+    from creature import replay as _replay
+    says = [j for j in journal if _replay.is_chat_journal_row(j) and isinstance(j.get("say"), dict)]
+    heq = sum(1 for j in says if j["say"].get("hash_before") == j["say"].get("hash_after"))
+    non_chat = [j for j in journal if not _replay.is_chat_journal_row(j)]
+    L1: Dict[str, object] = {"say_rows": len(says), "hash_equal": heq, "live_non_chat_rows": len(non_chat),
+                             "bar": "hash_before == hash_after on 100 % of say rows · the blind-chat twin reproduces every non-chat row INCLUDING hash"}
+    if not says:
+        L1.update(graded=False, **{"pass": None}, reason="not gradable: no chat on this record")
+    else:
+        diff = None if blind_journal is None else _replay.compare(list(blind_journal), non_chat)
+        L1["twin_rows"] = None if blind_journal is None else len(list(blind_journal))
+        L1["twin_first_difference"] = (list(diff) if diff else None)
+        twin_ok = blind_journal is not None and diff is None
+        L1.update(graded=True, **{"pass": heq == len(says) and twin_ok},
+                  reason=("graded (§3.4 L1)" if blind_journal is not None else "graded (§3.4 L1); the blind-chat twin was not run — that clause FAILS"))
+    M["L1"] = L1
+
+    # ---- shared: the precision family bars
+    def precision_block(items: List[Tuple[dict, dict]], label: str) -> Dict[str, object]:
+        ans = [(o, t) for o, t in items if _chat_said(o)]
+        correct = sum(1 for o, t in ans if o.get("content") == t.get("thing"))
+        q1s = [q for q in (_chat_q1_nearest(exams, _chat_dt(o["at"])) for o, _t in ans if o.get("at")) if q is not None]
+        q1 = (sum(q1s) / len(q1s)) if q1s else None
+        return {"items": len(items), "answered": len(ans), "correct": correct,
+                "precision": (round(correct / len(ans), 4) if ans else None), "q1_nearest_mean": (round(q1, 4) if q1 is not None else None),
+                "bar_precision": round(max(0.80, (q1 - 0.05) if q1 is not None else 0.80), 4), "_ans": ans}
+
+    # ---- L2 WHAT-IS (the null things excluded; printed in L9)
+    b = precision_block([(o, t) for o, t in fam("what-is") if t.get("thing") not in CHAT_NULL_THINGS], "what-is")
+    ans = b.pop("_ans")
+    abst = round((b["items"] - b["answered"]) / b["items"], 4) if b["items"] else None
+    p95 = None
+    if ans:
+        rng = np.random.default_rng(seed); contents = [o.get("content") for o, _t in ans]; truths = [t.get("thing") for _o, t in ans]
+        precs = sorted(sum(1 for c, tt in zip(contents, [truths[i] for i in rng.permutation(len(truths))]) if c == tt) / len(ans) for _ in range(permutations))
+        p95 = round(precs[max(0, int(0.95 * len(precs)) - 1)], 4)
+    L2 = {**b, "abstention_seen": abst, "shuffled_p95": p95, "chance": round(1.0 / 16, 4),
+          "bar": "precision >= max(0.80, Q1 at the nearest exam - 0.05) · abstention on seen things <= 0.10 · the shuffled-question twin's p95 <= 0.20"}
+    if b["answered"] < min_answered:
+        L2.update(graded=False, **{"pass": None}, reason=f"not gradable: {b['answered']} what-is answered < {min_answered}")
+    else:
+        L2.update(graded=True, **{"pass": bool(b["precision"] >= b["bar_precision"] and abst <= 0.10 and p95 <= 0.20)}, reason="graded (§3.4 L2)")
+    M["L2"] = L2
+
+    # ---- L3 YES-NO (the lure)
+    b = precision_block(fam("yes-no"), "yes-no")
+    ans = b.pop("_ans")
+    wrong = [(o, t) for o, t in ans if t.get("lure") != t.get("thing")]
+    echo = sum(1 for o, t in wrong if o.get("content") == t.get("lure"))
+    twin_prec = (round(sum(1 for _o, t in ans if t.get("lure") == t.get("thing")) / len(ans), 4) if ans else None)
+    L3 = {**b, "wrong_lures_answered": len(wrong), "echo": echo, "echo_rate": (round(echo / len(wrong), 4) if wrong else None),
+          "echo_twin_precision": twin_prec, "bar": "precision >= max(0.80, Q1 - 0.05) · ECHO <= 0.10 (the echo twin — content := the lure — reads 0.5 by construction)"}
+    if b["answered"] < min_answered:
+        L3.update(graded=False, **{"pass": None}, reason=f"not gradable: {b['answered']} yes-no answered < {min_answered}")
+    else:
+        L3.update(graded=True, **{"pass": bool(b["precision"] >= b["bar_precision"] and (L3["echo_rate"] or 0.0) <= 0.10)}, reason="graded (§3.4 L3)")
+    M["L3"] = L3
+
+    # ---- L4 WHICH
+    b = precision_block(fam("which"), "which"); b.pop("_ans")
+    L4 = {**b, "chance": 0.5, "bar": "precision >= 0.85"}
+    if b["answered"] < min_answered:
+        L4.update(graded=False, **{"pass": None}, reason=f"not gradable: {b['answered']} which answered < {min_answered}")
+    else:
+        L4.update(graded=True, **{"pass": bool(b["precision"] >= 0.85)}, reason="graded (§3.4 L4)")
+    M["L4"] = L4
+
+    # ---- L5 WHERE (the POINT)
+    items = fam("where"); hits = 0
+    for o, t in items:
+        pt = o.get("point"); box = (t.get("bboxes") or {}).get(t.get("thing"))
+        if pt and box and pt.get("window"):
+            cy, cx = int(pt["window"][0]) + glance / 2.0, int(pt["window"][1]) + glance / 2.0
+            hits += int(box[0] <= cy < box[0] + box[2] and box[1] <= cx < box[1] + box[3])
+    rate = round(hits / len(items), 4) if items else None
+    L5: Dict[str, object] = {"items": len(items), "pointed_inside": hits, "point_rate": rate, "pointing_ceiling": pointing_ceiling,
+                             "bar": "graded only if the pre-life pointing ceiling >= 0.5; then POINT >= ceiling - 0.15 (the pointed window's centre inside the asked thing's bbox)"}
+    if pointing_ceiling is None:
+        L5.update(graded=False, **{"pass": None}, reason="not gradable: no pointing ceiling on the record (task 0 (b) measured it pre-life)")
+    elif pointing_ceiling < 0.5:
+        L5.update(graded=False, **{"pass": None}, reason=f"not gradable: the pointing ceiling is {pointing_ceiling}")
+    elif not items:
+        L5.update(graded=False, **{"pass": None}, reason="not gradable: no where-question on this record")
+    else:
+        L5["bar"] = round(pointing_ceiling - 0.15, 4)
+        L5.update(graded=True, **{"pass": bool(rate >= pointing_ceiling - 0.15)}, reason=f"graded (§3.4 L5): the pointing ceiling {pointing_ceiling}")
+    M["L5"] = L5
+
+    # ---- L6 LENGTH
+    said_all = [(o, t) for o, t in pairs if _chat_said(o)]
+    per_hour: Dict[int, Dict[int, int]] = {}
+    for o, _t in said_all:
+        h = hours(o)
+        if h is not None:
+            d = per_hour.setdefault(int(h), {}); n = len(_chat_said(o)); d[n] = d.get(n, 0) + 1
+    late_correct = [(o, t) for o, t in said_all if t.get("family") in ("what-is", "yes-no", "which") and t.get("thing") not in CHAT_NULL_THINGS
+                    and o.get("content") == t.get("thing") and (hours(o) or 0.0) >= 4.0]
+    three = sum(1 for o, _t in late_correct if len(_chat_said(o)) >= 3)
+    any_cand = any(int(o.get("candidates_n") or 0) > 0 for o, _t in pairs)
+    L6: Dict[str, object] = {"correct_from_hour_4": len(late_correct), "with_3_words": three,
+                             "share_3plus": (round(three / len(late_correct), 4) if late_correct else None),
+                             "longest": max((len(_chat_said(o)) for o, _t in said_all), default=0),
+                             "longest_said": max((" ".join(_chat_said(o)) for o, _t in said_all), key=len, default=None),
+                             "per_hour": {h: per_hour[h] for h in sorted(per_hour)},
+                             "bar": "from hour 4, >= 0.5 of the CORRECT what-is + yes-no + which answers carry >= 3 words (content-only control: 1 word by construction)"}
+    if not any_cand:
+        L6.update(graded=False, **{"pass": None}, reason="not gradable: the rung's frames never yielded a pivot-ending candidate with a question word")
+    elif not late_correct:
+        L6.update(graded=False, **{"pass": None}, reason="not gradable: no correct answer from hour 4")
+    else:
+        L6.update(graded=True, **{"pass": bool(three / len(late_correct) >= 0.5)}, reason="graded (§3.4 L6)")
+    M["L6"] = L6
+
+    # ---- L7 GROUNDED + CITED (the record, then the TAPE)
+    said = [o for o, _t in said_all]
+    ungrounded = [o["id"] for o in said if not ((o.get("grounded") or {}).get("ok") and ((o.get("grounded") or {}).get("edge") or [0, 0, 0])[2] > 0)]
+    short_rec = [f"{l[0]} {l[1]} @ {o['id']}: {l[2]}" for o in said for l in (o.get("links") or []) if int(l[2]) < adj_bar]
+    piv_short = [o["id"] for o in said if len(_chat_said(o)) > 1 and o.get("form") and int(o.get("pivot_followers") or 0) < fol_bar]
+    inst = _chat_tape_instants(tape)
+    import bisect
+    adj_seqs: Dict[Tuple[str, str], List[int]] = {}; foll_first: Dict[str, Dict[str, int]] = {}
+    for s, ws in inst:
+        for a_, b_ in set(zip(ws, ws[1:])):
+            adj_seqs.setdefault((a_, b_), []).append(s)
+        for a_, b_ in zip(ws, ws[1:]):
+            foll_first.setdefault(a_, {}).setdefault(b_, s)
+    tape_short: List[str] = []; min_adj = None; min_fol = None
+    for o in said:
+        cs = int(o.get("seq") or 0)
+        for l in (o.get("links") or []):
+            n = bisect.bisect_left(adj_seqs.get((str(l[0]), str(l[1])), []), cs)
+            min_adj = n if min_adj is None else min(min_adj, n)
+            if n < adj_bar:
+                tape_short.append(f"{l[0]} {l[1]} @ {o['id']}: {n}")
+        if o.get("form") and o.get("pivot"):
+            nf = sum(1 for s in foll_first.get(str(o["pivot"]), {}).values() if s < cs)
+            min_fol = nf if min_fol is None else min(min_fol, nf)
+            if nf < fol_bar:
+                tape_short.append(f"pivot {o['pivot']} @ {o['id']}: {nf} followers")
+    L7 = {"said": len(said), "ungrounded": ungrounded, "record_short_links": short_rec, "record_short_pivots": piv_short,
+          "tape_short_links": tape_short, "tape_min_link_adjacency": min_adj, "tape_min_pivot_followers": min_fol,
+          "bar": f"100 % of said contents MEET-tied to their own picture's lit cells · every link >= {adj_bar} adjacency instants and every pivot >= {fol_bar} followers — on the record AND re-counted on the tape"}
+    if not said:
+        L7.update(graded=False, **{"pass": None}, reason="not gradable: nothing was said")
+    else:
+        L7.update(graded=True, **{"pass": not (ungrounded or short_rec or piv_short or tape_short)}, reason="graded (§3.4 L7)")
+    M["L7"] = L7
+
+    # ---- L8 FORM (printed, seat-graded) and L9 THE NULL IN WORDS (printed)
+    by_family: Dict[str, Dict[str, int]] = {}
+    for j in journal:
+        g = j.get("grade")
+        if isinstance(g, dict) and g.get("kind") == "chat":
+            f = (chat_truth.get(str(g.get("id"))) or {}).get("family", "?")
+            d = by_family.setdefault(f, {"right": 0, "wrong": 0}); d["right" if g.get("right") else "wrong"] += 1
+    M["L8"] = {"graded": False, "pass": None, "by_family": by_family, "reason": "printed (seat-graded, no bar)",
+               "bar": "no bar: the seat grades 30 random family answers and every free chat for well-formedness"}
+    null_said: Dict[str, List[dict]] = {}
+    for o, t in fam("what-is"):
+        if t.get("thing") in CHAT_NULL_THINGS:
+            null_said.setdefault(t["thing"], []).append({"id": o["id"], "said": render_answer(o), "grade": o.get("grade"), "resembles": o.get("resembles")})
+    M["L9"] = {"graded": False, "pass": None, "said": null_said, "reason": "printed (A4L-ANSWER's clause; ALPHA4's own answer law, heard)", "bar": "no bar"}
+
+    # ---- the pictures' disjointness from the tape (§3.3), with its planted control
+    if tape_canvases is not None and chat_pics:
+        from genome import world as _world
+        dev = [("?", rgb, {}) for rgb in tape_canvases]
+        held = {cid: [(rgb, {})] for cid, rgb in chat_pics.items()}
+        try:
+            k = _world.assert_disjoint_canvas(dev, held); ok = True
+        except AssertionError:
+            k = sum(len(v) for v in held.values()); ok = False
+        first = next(iter(held.values()))[0][0]
+        try:
+            _world.assert_disjoint_canvas(dev + [("?", first.copy(), {})], held); caught = False
+        except AssertionError:
+            caught = True
+        M["disjoint"] = {"checked": k, "ok": ok, "control_caught": caught}
+    else:
+        M["disjoint"] = {"checked": 0, "ok": None, "reason": "not checked (no canvases handed in)"}
+    return M

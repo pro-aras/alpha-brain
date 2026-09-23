@@ -220,6 +220,15 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # (STAGE 1/2/3 here) stays an undeclared, ungated Genome field exactly as before — this row exists
         # only for the NEW `declared["STAGE_READY"]` key the "by READY" grammar writes.
         "STAGE_READY": "creature/mind.py:Mind._consume_sit (THE READINESS JUDGE, ALPHA4-PREREG §4 (a)-(e); commits self.stage=4 via a journal event, never undone)",
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:28 +0400 — A4L-LANG (docs/A4-LADDER-PREREG.md §3.2; docs/briefs/
+        # A4L-LANG.md): the CHAT gene's real call sites — the door (a SENSE, armed by creature/body.py:main behind
+        # CHAT_DOOR_GATED) publishes `chat` rows and kind-chat `grade` rows; the mind routes every `chat` row to ONE
+        # read-only branch (never the MEET road) and counts kind-chat grades apart from the READINESS judge's (d).
+        "CHAT": "creature/mind.py:Mind._consume_chat (glance the canvas, read — never write — the organism: content by recall_many / "
+                "edge_many among named thing-words, frames/links/pivots from the episodes, genome/chain.py's compose + judge, "
+                "chat/out/<id>.json + ONE say row, hash_before == hash_after asserted) + Mind._consume_grade (kind-chat grades "
+                "counted on STATUS, never the READINESS judge's (d)) + creature/body.py:main (declared['CHAT'] arms "
+                "creature/senses/chat.py behind CHAT_DOOR_GATED)",
     },
 }
 

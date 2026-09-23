@@ -657,6 +657,35 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"from ask/graded", a[len("grade "):].strip())
                 if not m: raise GenomeError(f"SENSE grade: cannot read {a!r} (ALPHA4-PREREG §4(d): SENSE grade from ask/graded)")
                 g["declared"]["SENSE_GRADE"] = {"from": "ask/graded"}
+            # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:28 +0400 — A4L-LANG task 1 (docs/A4-LADDER-PREREG.md
+            # §3.2; docs/briefs/A4L-LANG.md): THE CHAT GENE, one line = one road. `CHAT door <in> <out>; chain of frames + one
+            # pivot slot; links adjacent <n>; pivot <n> distinct <n> instants; at most <n> words; a question never teaches` —
+            # every literal is fixed (a mis-spelt form refuses BY NAME, the refusal starting "CHAT"), every number is read
+            # into declared["CHAT"] and consumed (genome/chain.py's links()/pivots()/compose(), creature/mind.py's
+            # _consume_chat); the two door paths are RELATIVE to the life's root (an absolute path, a parent escape, or the
+            # same directory twice — the door reading its own answers — refuses). "a question never teaches" is the
+            # read-only law (§3.2 item 2), recorded as teaches=False; there is no other value.
+            elif gene == "CHAT":
+                m = re.fullmatch(r"door ([A-Za-z0-9_./-]+) ([A-Za-z0-9_./-]+); chain of frames \+ one pivot slot; "
+                                  r"links adjacent (\d+); pivot (\d+) distinct (\d+) instants; at most (\d+) words; "
+                                  r"a question never teaches", a)
+                if not m:
+                    raise GenomeError(f"CHAT: cannot read {a!r} (A4-LADDER-PREREG §3.2: CHAT door <in> <out>; chain of frames "
+                                       f"+ one pivot slot; links adjacent <n>; pivot <n> distinct <n> instants; at most <n> "
+                                       f"words; a question never teaches)")
+                d_in, d_out = m.group(1), m.group(2)
+                for p_ in (d_in, d_out):
+                    if p_.startswith("/") or ".." in p_.split("/"):
+                        raise GenomeError(f"CHAT: the door path {p_!r} must be relative to the life's root (no leading '/', no '..')")
+                if d_in == d_out:
+                    raise GenomeError(f"CHAT: the door's in and out are the same directory {d_in!r} — the door would read its own answers")
+                adj_, piv_d, piv_i, max_w = (int(m.group(k)) for k in (3, 4, 5, 6))
+                if adj_ < 1 or piv_d < 1 or piv_i < 1:
+                    raise GenomeError(f"CHAT: links adjacent / pivot distinct / pivot instants must each be >= 1, got {adj_}/{piv_d}/{piv_i}")
+                if max_w < 2:
+                    raise GenomeError(f"CHAT: at most {max_w} words leaves no room for a slot after a frame (>= 2 needed)")
+                g["declared"]["CHAT"] = {"in": d_in, "out": d_out, "links_adjacent": adj_, "pivot_distinct": piv_d,
+                                          "pivot_instants": piv_i, "max_words": max_w, "teaches": False}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:

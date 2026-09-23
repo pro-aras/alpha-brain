@@ -58,6 +58,10 @@ from genome.predict import Predictor, file as predict_file, score as predict_sco
 from creature.tape import _resolve_tape_dir   # W3-0b seam: the mind reads payloads where the genome says the tape is
 from genome.questions import build_ledgers, why as questions_why
 from genome.sentence import find_frames
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG (A4-LADDER-PREREG §3.2): the composer/judge/thing-words (pure readers), called
+# through the MODULE (`_chain.compose`, never a bare import) so a planted test double reaches the live branch.
+from genome import chain as _chain
+from genome.questions import word_cells
 from genome.sleep import cycle as run_cycle, sleep as run_sleep
 from genome.world import encode_word
 
@@ -570,6 +574,11 @@ class Mind:
         self.web_fetches: int = 0
         self.web_refused_rate: int = 0
         self.web_refused_hold: int = 0
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG task 10: the chat counters (STATUS's ten chat keys via
+        # creature/body.py:_chat_status, on every write — #164). Present on EVERY Mind (zeros unless CHAT is declared).
+        self.chat_counters: Dict[str, int] = {"chats": 0, "answered": 0, "abstained": 0, "refused_form": 0,
+                                               "refused_content": 0, "words_total": 0, "longest": 0,
+                                               "graded": 0, "graded_right": 0, "graded_novel": 0}
 
         (self.run_root / "journal").mkdir(parents=True, exist_ok=True)
         (self.run_root / "state").mkdir(parents=True, exist_ok=True)
@@ -636,6 +645,11 @@ class Mind:
             self._consume_hold(row)
         elif sense == "web":
             self._consume_web(row)
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG task 3 (A4-LADDER-PREREG §3.2 item 2): a `chat` row goes to ONE
+        # read-only branch and NEVER into the MEET road (it is never an ear/eye row, so pending/moment_word/org.t/
+        # _canvas_index/ARRIVAL/FAST/THINK/SLEEP are never reached from it) — gated inside on CHAT's own presence.
+        elif sense == "chat":
+            self._consume_chat(row)
         # a "door" row (the ask door / other senses not yet armed) carries no organism work here
         self.last_seq = int(row["seq"])
         # ALPHA4-PREREG.md §3: self.stage only ever RISES here (org.t is monotonic; a committed "by READY"
@@ -883,6 +897,22 @@ class Mind:
         """ALPHA4-PREREG.md §4(d): a `grade` tape row (creature/senses/grade.py) — "mentorship enters
         through the tape, so the judge replays". Gated on SENSE_GRADE's own declared presence (the same
         "an unarmed sense's rows carry no organism work" law every other new tape-sense here follows)."""
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG task 3: a kind-"chat" grade (the chat door's republished seat
+        # grade) is routed FIRST under CHAT — counted on STATUS (chat_graded/_right/_novel) and journaled as a grade row
+        # carrying its kind, and NEVER reaching _grades_total/_grades_right/_novel_grades (the READINESS judge's (d)):
+        # a grade on a chat moves nothing in this rung (§3.2 item 2). Such a row exists only where CHAT armed the door;
+        # a genome without CHAT keeps master's road below, unchanged (the negative control).
+        meta0 = row.get("meta") or {}
+        if meta0.get("kind") == "chat" and "CHAT" in self.genome.declared:
+            if "chat" in self.blind:
+                return
+            right_c, novel_c = bool(meta0.get("right")), bool(meta0.get("novel"))
+            self.chat_counters["graded"] += 1
+            self.chat_counters["graded_right"] += int(right_c)
+            self.chat_counters["graded_novel"] += int(novel_c)
+            self._write_journal(row["at"], {"seq": row["seq"], "grade": {"id": meta0.get("id"), "right": right_c,
+                                                                          "novel": novel_c, "kind": "chat"}})
+            return
         if "SENSE_GRADE" not in self.genome.declared:
             return
         meta = row.get("meta") or {}
@@ -922,6 +952,199 @@ class Mind:
             self.web_refused_hold += 1
         self._write_journal(row["at"], {"seq": row["seq"],
                                          "web": {"status": status, "question_id": meta.get("question_id")}})
+
+    # ------------------------------------------------------------------ A4L-LANG: THE CHAT (read-only)
+    # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG tasks 3/5 (docs/briefs/A4L-LANG.md; A4-LADDER-PREREG §3.2 items 2-6).
+    def _glances_per_canvas(self) -> int:
+        """How many org moments one canvas occupies (the birth-source attribution's own window): 1 under BIND, else the
+        GAZE fixations plus the coarse glance when it is declared and not blinded."""
+        if "BIND" in self.genome.declared:
+            return 1
+        gz = self.genome.gaze or {}
+        return int(gz.get("fixations", 1)) + (1 if (gz.get("coarse") and "coarse" not in self.blind) else 0)
+
+    def _chat_guard(self) -> tuple:
+        """The mind-level road a chat must never touch (the brief's own list), as one comparable value — asserted equal
+        around the branch beside the organism's hash: the clock, the canvas index, the MEET road's pending words, the
+        moment->word ledger, the heard set (ARRIVAL), every ring's size, the sleep cursor, SURPRISE's counts and the
+        predictor's expectation, the act census, the think counters and pending sets, the READINESS tallies, the
+        mouth's current instant."""
+        rings = tuple(getattr(self, k).n_written if getattr(self, k) is not None else None
+                      for k in ("episodes", "outcome_episodes", "sound_episodes", "touch_episodes", "smell_episodes"))
+        lw = self.predictor._last_winner if self.predictor is not None else None
+        return (self.org.t, self._canvas_index, tuple(sorted(self.pending.items())),
+                tuple(sorted((k, tuple(v)) for k, v in self.pending_words.items())), len(self.moment_word),
+                len(self._heard), rings, self._last_sleep_at, self.sleep_count, self.glances_confirmed,
+                self.glances_surprised, (None if lw is None else np.asarray(lw).tobytes()),
+                tuple(sorted(self.acts_chosen.items())), tuple(sorted(self.think_counters.items())),
+                len(self._filed_predictions), len(self._frame_pending), len(self._frames), self._ask_out_n,
+                self._grades_total, self._grades_right, tuple(self._novel_grades), self.stage,
+                tuple(self._last_words_in_instant), self.org.budget_left, self.org.arrivals)
+
+    def _chat_content(self, heard: List[str], xs: List[np.ndarray], Ls: Dict[int, set], Lw: Dict[int, set]) -> Dict[str, object]:
+        """§3.2 item 3 — the content, grounded, chosen FIRST, one road for every chat: the canvas's glances asked by the
+        genome's own answer law (recall_many + ANSWER's grade, unchanged); when the question names >= 2 THING-words
+        (genome/chain.py:thing_words under THING_WORD_RULE — RAISED), the content is chosen AMONG them by the larger
+        summed edge from the canvas's lit cells (the Q4 road: edge_many, max over the word's own cells); a tie abstains.
+        Reads only."""
+        r = self.org.recall_many("sight", xs) if xs else {"cell": None, "reason": "novel", "grade": None, "resembles_cell": None}
+        things = _chain.thing_words(self.org, Lw, self.episodes, per_canvas=self._glances_per_canvas(), rule=_chain.THING_WORD_RULE)
+        named = list(dict.fromkeys(w for w in heard if w in things))
+        out: Dict[str, object] = {"recall": r, "named_things": named, "content": None, "abstain_reason": None,
+                                   "road": "recall", "edges": None}
+        if len(named) >= 2:
+            out["road"] = "choose"
+            edges = {w: max([self.org.edge_many("sight", xs, c) for c in word_cells(self.org, Lw, w)], default=0.0) for w in named}
+            ranked = sorted(edges.items(), key=lambda kv: (-kv[1], kv[0]))
+            out["edges"] = [[w, round(float(v), 6)] for w, v in ranked]
+            if ranked[0][1] <= 0.0:
+                out["abstain_reason"] = "no_edge"
+            elif len(ranked) > 1 and ranked[0][1] == ranked[1][1]:
+                out["abstain_reason"] = "tie"
+            else:
+                out["content"] = ranked[0][0]
+            return out
+        if r.get("cell") is None:
+            out["abstain_reason"] = str(r.get("reason"))
+            return out
+        ws = Lw.get(int(r["cell"]), set())
+        if len(ws) == 1 and next(iter(ws)):
+            out["content"] = next(iter(ws))
+        else:
+            out["abstain_reason"] = "not_one_word"     # the answer cell's ledger is not one word (a merged or a sight-only birth)
+        return out
+
+    def _chat_grounded(self, xs: List[np.ndarray], content: str, Lw: Dict[int, set]) -> Dict[str, object]:
+        """§3.2 item 5's content half: MEET-tied to THIS canvas — W > 0 from a sight cell one of its glances lights to
+        one of the content's own word cells. The citation is the strongest such edge."""
+        lit: List[int] = []
+        for x in xs:
+            for l in self.org._lit(self.org.sight, x)[0]:
+                if l not in lit:
+                    lit.append(int(l))
+        best = None
+        for t in word_cells(self.org, Lw, content):
+            for l in lit:
+                if self.org.mask[l, t] == 1 and float(self.org.W[l, t]) > 0.0:
+                    w = float(self.org.W[l, t])
+                    if best is None or w > best[2]:
+                        best = (l, int(t), w)
+        return {"ok": best is not None, "lit": len(lit),
+                 "edge": (None if best is None else [best[0], best[1], round(best[2], 6)])}
+
+    def _chat_point(self, g: Dict[str, object], xs: List[np.ndarray], target: Optional[str], Lw: Dict[int, set]) -> Optional[Dict[str, object]]:
+        """§3.2 item 6: the window of the FIRST located glance whose own single-glance recall is `target` (the question's
+        first thing-word, else the content); None when no located glance answers it."""
+        if not target:
+            return None
+        for i in range(len(g.get("fix") or [])):
+            rr = self.org.recall("sight", xs[i])
+            ws = Lw.get(int(rr["cell"]), set()) if rr.get("cell") is not None else set()
+            if ws == {target}:
+                top, left = g["windows"][i]
+                return {"glance": i, "window": [int(top), int(left)], "word": target}
+        return None
+
+    def _consume_chat(self, row: Dict[str, object]) -> None:
+        """THE READ-ONLY LAW — «a question never teaches» (§3.2 item 2). Glance the canvas (the gaze's deterministic mode,
+        the eye's own road), then READ — never write — the organism: the content (item 3), the point (item 6), the
+        frames/links/pivots from `self.episodes` (the SAME find_frames the think step calls), the composer (item 4), the
+        judge (item 5). Then write chat/out/<id>.json and journal ONE row {seq, say: {kind: "chat", …}}. It touches none
+        of pending/pending_words/moment_word/_heard/org.t/_canvas_index, the rings, SURPRISE's expectation, the
+        predictor, the THINK/SLEEP/SIT/EXAM boundaries, acts_chosen, the reflex ring, think_counters: `_chat_guard` and
+        the organism's state hash are compared around it, and a difference RAISES — the crash law pages; a chat that
+        changed him is a defect, never a result to log and continue."""
+        decl = self.genome.declared.get("CHAT")
+        if decl is None or "chat" in self.blind:
+            return
+        meta = row.get("meta") or {}
+        raw_id = str(meta.get("id") or "")
+        cid = raw_id if re.fullmatch(r"[A-Za-z0-9_-]{1,64}", raw_id) else f"seq{int(row['seq'])}"
+        heard = [str(w) for w in (meta.get("words") or []) if w]
+        guard_before = self._chat_guard()
+        hash_before = self.org.state_hash()
+
+        payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
+        rgb = np.asarray(Image.open(payload_path).convert("RGB"), dtype=np.uint8)
+        mode = "random" if "gaze" in self.blind else "surprise"
+        g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour)
+        if "coarse" in (self.genome.gaze or {}) and "coarse" in self.blind:
+            g = dict(g); g["feats"] = g["feats"][:-1]
+        xs = list(g["feats"])
+        ledgers = build_ledgers(self.org, self.moment_word)
+        Ls, Lw = ledgers["sight"], ledgers["words"]
+
+        c = self._chat_content(heard, xs, Ls, Lw)
+        content = c["content"]
+        r = c["recall"]
+        grade = r.get("grade")
+        resembles = None
+        if content is None and grade in ("sure", "unsure") and r.get("resembles_cell") is not None:
+            rs = Ls.get(int(r["resembles_cell"]), set())
+            resembles = next(iter(rs)) if len(rs) == 1 else None
+        first_thing = c["named_things"][0] if c["named_things"] else None
+        point = self._chat_point(g, xs, first_thing or content, Lw)
+
+        rows_ = _chain.instants(self.episodes)
+        stats = _chain.store_stats(self.episodes, rows=rows_)
+        frames = find_frames(self.episodes)
+        links = _chain.links(self.episodes, adj=int(decl["links_adjacent"]), stats=stats, frames=frames)
+        pivots = _chain.pivots(self.episodes, distinct=int(decl["pivot_distinct"]), instants=int(decl["pivot_instants"]), stats=stats)
+        comp = _chain.compose(heard, content, links, pivots, stats["follow"], stats["adjacency"], max_words=int(decl["max_words"]))
+        form = list(comp.get("form") or [])
+
+        refused: Optional[str] = None
+        grounded: Optional[Dict[str, object]] = None
+        judged = {"ok": True, "reason": None, "links": [], "cited": [], "pivot_followers": None, "pivot_instants": None}
+        chain_said: List[str] = []
+        if content is not None:
+            grounded = self._chat_grounded(xs, content, Lw)
+            if not grounded["ok"]:
+                refused = "content"
+            else:
+                judged = _chain.judge_form(form, self.episodes, adj=int(decl["links_adjacent"]), distinct=int(decl["pivot_distinct"]),
+                                           instants=int(decl["pivot_instants"]), rows=rows_, frames=frames)
+                if judged["ok"]:
+                    chain_said = list(comp.get("answer") or [content])
+                else:
+                    refused = "form"
+                    chain_said = [content]
+        chain_said = chain_said[: int(decl["max_words"])]
+
+        hash_after = self.org.state_hash()
+        if hash_after != hash_before or self._chat_guard() != guard_before:
+            raise RuntimeError(f"CHAT: a chat changed the organism (id {cid}, seq {row['seq']}): hash {hash_before[:16]}… -> "
+                               f"{hash_after[:16]}…, mind road {'unchanged' if self._chat_guard() == guard_before else 'CHANGED'} — the read-only law (A4-LADDER-PREREG §3.2 item 2)")
+
+        say = {"kind": "chat", "id": cid, "heard": heard, "content": content, "grade": grade, "chain": chain_said,
+               "form": form, "pivot": comp.get("pivot"),
+               "links": judged["links"] if judged["links"] else [[l["w1"], l["w2"], l["adj_count"], l["n_episodes"]]
+                                                                   for l in links if [l["w1"], l["w2"]] in
+                                                                   [[a, b] for a, b in zip(form, form[1:])]],
+               "pivot_followers": judged.get("pivot_followers"), "point": point, "abstain_reason": c["abstain_reason"],
+               "resembles": resembles, "refused": refused, "road": c["road"], "named_things": c["named_things"],
+               "edges": c["edges"], "grounded": grounded, "form_reason": judged.get("reason"),
+               "candidates_n": comp.get("candidates_n"), "truncated": comp.get("truncated"),
+               "hash_before": hash_before, "hash_after": hash_after}
+        out_dir = self.run_root / str(decl["out"])
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out = {"id": cid, "seq": row["seq"], "at": row["at"], "answer": (chain_said or None), **{k: v for k, v in say.items() if k != "kind"}}
+        tmp = out_dir / f"{cid}.json.tmp"
+        tmp.write_text(json.dumps(out, default=str))
+        os.replace(str(tmp), str(out_dir / f"{cid}.json"))
+        self._write_journal(row["at"], {"seq": row["seq"], "say": say})
+
+        self.chat_counters["chats"] += 1
+        if chain_said:
+            self.chat_counters["answered"] += 1
+            self.chat_counters["words_total"] += len(chain_said)
+            self.chat_counters["longest"] = max(self.chat_counters["longest"], len(chain_said))
+            if refused == "form":
+                self.chat_counters["refused_form"] += 1
+        elif refused == "content":
+            self.chat_counters["refused_content"] += 1
+        else:
+            self.chat_counters["abstained"] += 1
 
     def _consume_body(self, row: Dict[str, object]) -> None:
         """BODY-SENSES.md §4.1: "the readings; the DRIVE is the mind's" -- this gene carries no threshold, so
@@ -2703,6 +2926,10 @@ class Mind:
             "web_refused_rate": self.web_refused_rate,
             "web_refused_hold": self.web_refused_hold,
         }
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:40 +0400 — A4L-LANG task 10: the chat counters survive a restart
+        # (STATUS reads them) — written ONLY under CHAT, so a genome without the gene writes the ledger it always wrote.
+        if "CHAT" in self.genome.declared:
+            ledger["chat_counters"] = dict(self.chat_counters)
         ledger_tmp = state_dir / "ledger_tmp.json"
         ledger_tmp.write_text(json.dumps(ledger))
         os.replace(str(ledger_tmp), str(state_dir / "ledger.json"))
@@ -2776,6 +3003,10 @@ class Mind:
             mind.web_fetches = int(ledger.get("web_fetches", 0))
             mind.web_refused_rate = int(ledger.get("web_refused_rate", 0))
             mind.web_refused_hold = int(ledger.get("web_refused_hold", 0))
+            # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:40 +0400 — A4L-LANG task 10: restored when present (CHAT only).
+            for k_, v_ in (ledger.get("chat_counters") or {}).items():
+                if k_ in mind.chat_counters:
+                    mind.chat_counters[k_] = int(v_)
             # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
             # (L-8): restore the act rng's stream exactly (absent from a snapshot taken before this gene
             # existed -> the freshly-seeded stream __init__ already built, unchanged).

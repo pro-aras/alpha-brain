@@ -557,6 +557,9 @@ def main(argv: List[str]) -> int:
     ap.add_argument("--skip-twins", action="store_true"); ap.add_argument("--skip-random", action="store_true")
     ap.add_argument("--reuse", action="store_true", help="re-grade: read twin summaries already under --out instead of replaying")
     ap.add_argument("--sizing-prediction", type=float, default=None, help="PREREG §19.11: the pre-flight's predicted sight births by 24 h (absent = SIZING not gradable)")
+    # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:50 +0400 — A4L-LANG L5: the WHERE pointing ceiling measured BEFORE the life
+    # (task 0 (b), tools/chat_ceiling.py on alpha4-1's 10:54 snapshot copy); the default is that pre-registered number.
+    ap.add_argument("--chat-pointing-ceiling", type=float, default=None, help="A4-LADDER-PREREG §3.4 L5: the pre-life pointing ceiling (default: tools/verdict_life.CHAT_POINTING_CEILING_PRELIFE)")
     a = ap.parse_args(argv)
     global REUSE; REUSE = bool(a.reuse)
     if a.worker:
@@ -596,6 +599,10 @@ def main(argv: List[str]) -> int:
                   {"label": "T-one-glance", "root": str(twins_dir / "T-one-glance"), "tape": str(tape_all), "genome": str(genome_path), "one_glance": True},
                   {"label": "T-first-fixation", "root": str(twins_dir / "T-first-fixation"), "tape": str(tape_all), "genome": str(first_fix)},
                   {"label": "T-frozen-10", "root": str(twins_dir / "T-frozen-10"), "tape": str(tape_all), "genome": str(frozen10), "blind": ["frozen"]}]
+    # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:31 +0400 — A4L-LANG L1: the READ-ONLY law's twin is the LANG rung's OWN twin set
+    # (A4-LADDER-PREREG §4: «each with its twin set only … LANG + blind-chat»), so it runs OUTSIDE `if not a.skip_twins:` — a read
+    # with --skip-twins still grades L1 (the first draft sat inside that block; the advisor's catch before the life).
+    specs += chat_twin_specs(g.declared, twins_dir, tape_all, genome_path)
     # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (11): READ's blind twin (every shelf row dropped) is
     # one more twin of the set — under --skip-random too (it is not a random twin); skipped with its reason (the clause then reads not
     # gradable, never FAIL) when SENSE_READ is undeclared, under --skip-twins, or when the cut tape carries no shelf row (it would be the
@@ -1032,6 +1039,10 @@ def main(argv: List[str]) -> int:
     _stage_journal = list(live) + list(G.get("mind_events") or [])
     M["WEB"] = _vl.web_mark(tape, _stage_journal, "DOOR_WEB" in decl)
     M["STAGE"] = _vl.stage_mark(_stage_journal, "STAGE_READY" in decl, tape=tape)
+    # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:00 +0400 — A4-LADDER-PREREG §3.4 L1-L9: `chat_read` (below main) gathers the
+    # record and calls the pure marks; lifted out of main() so a test reads the LAST link (#180).
+    M["CHAT"] = chat_read(root, tape, live, G["exams"], decl, twins_dir,
+                          a.chat_pointing_ceiling if a.chat_pointing_ceiling is not None else _vl.CHAT_POINTING_CEILING_PRELIFE, G["t0"])
     M["PLANTS"]["predict_file_pair"] = {"sight_road_rows": live_pred["sight_road_rows"], "rule_rows_filed": live_pred["filed"], "rule_rows_scored": live_pred["scored"], "status_predictions_filed": st.get("predictions_filed")}
     M["PLANTS"]["park_unanswerable_want"] = {"sight_only_rows": len(sight_only), "first_seq": sight_only[0]["seq"] if sight_only else None, "parked_total": parked}
     M["PLANTS"]["belief_contradiction"] = {"clash_rows": kinds.get("clash", 0), "extension_rows": kinds.get("extension", 0)}
@@ -1054,6 +1065,45 @@ def main(argv: List[str]) -> int:
     print(f"VERDICT {R['verdict']} — failed: {failed or 'none'} — not gradable: {[k for k, _r in not_gradable] or 'none'} — {out} ({R['seconds_total']} s)", flush=True)
     return 0
 
+
+
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:00 +0400 — A4-LADDER-PREREG §3.4 L1-L9 (builder LANG's marks, pure, in
+# tools/verdict_life.py): the chat/out answers joined with the seat's chat/truth, the tape, the live journal, the exams, the
+# blind-chat twin's journal (`twins_dir/blind-chat/mind-journal.jsonl`, run only when CHAT is declared), the pre-life pointing
+# ceiling; the chat pictures checked disjoint from the maker's canvases on the tape. «not gradable» on every record that did not
+# declare CHAT. A summary `graded`/`pass` over L1-L7 for the verdict's failed-list.
+
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:31 +0400 — A4L-LANG L1: the blind-chat twin's worker spec — every chat row and every
+# kind-chat grade ignored (the Mind's own `chat` blind; creature/replay.py's tape filter is pinned equal to it by
+# tests/creature/test_replay_blind_chat.py). Only a life that declares CHAT gets it: every other record reads exactly as before.
+def chat_twin_specs(declared: dict, twins_dir: Path, tape_all: Path, genome_path: Path) -> List[dict]:
+    if "CHAT" not in declared:
+        return []
+    return [{"label": "blind-chat", "root": str(Path(twins_dir) / "blind-chat"), "tape": str(tape_all), "genome": str(genome_path), "blind": ["chat"]}]
+
+def chat_read(root: Path, tape: List[dict], live: List[dict], exams: List[dict], decl: dict, twins_dir: Path,
+              pointing_ceiling: Optional[float], t0) -> Dict[str, object]:
+    from tools import verdict_life as _vl
+    from creature import replay as replay_mod
+    try:
+        cout = {p_.stem: json.loads(p_.read_text()) for p_ in sorted((root / "chat" / "out").glob("*.json"))} if (root / "chat" / "out").exists() else {}
+        ctru = {p_.stem: json.loads(p_.read_text()) for p_ in sorted((root / "chat" / "truth").glob("*.json"))} if (root / "chat" / "truth").exists() else {}
+        bj = Path(twins_dir) / "blind-chat" / "mind-journal.jsonl"
+        blind = replay_mod.read_mind_journal(bj) if bj.exists() else None
+        tape_cv, pics = None, None
+        if "CHAT" in decl and cout:
+            from PIL import Image as _CImg
+            tape_cv = [np.asarray(_CImg.open(root / "tape" / r["payload"]).convert("RGB"), dtype=np.uint8)
+                       for r in tape if r.get("sense") == "eye" and (r.get("meta") or {}).get("source") == "maker"]
+            pics = {p_.stem: np.asarray(_CImg.open(p_).convert("RGB"), dtype=np.uint8) for p_ in sorted((root / "chat" / "pics").glob("*.png"))}
+        C = _vl.chat_marks(cout, ctru, tape, live, exams, decl, blind_journal=blind, pointing_ceiling=pointing_ceiling,
+                           born=(t0.isoformat() if hasattr(t0, "isoformat") else t0), tape_canvases=tape_cv, chat_pics=pics or None)
+    except Exception as e:
+        C = {"error": repr(e)}
+    graded = [k for k in _vl.CHAT_MARKS if isinstance(C.get(k), dict) and C[k].get("graded")]
+    C["graded"] = bool(graded) or ("error" in C and "CHAT" in decl)
+    C["pass"] = bool(graded) and all(C[k].get("pass") for k in graded) and "error" not in C
+    return C
 
 def w3_1_beliefs(bel_rows: List[dict], decl: dict, heard: Sequence[str]) -> dict:
     """W3-1 (PREREG §18) as amended 2026-09-22: a word carries ONE raw `belief` row, plus one more for every clash — genome/think.py's
@@ -1367,6 +1417,20 @@ def write_verdict(out: Path, R: dict) -> None:
                 body = f"born {m['sight_born']} of {m['sight_nmax']} · prediction {m['prediction']} · refused at NMAX {m['births_refused_nmax']} · series/h {m['series_sight_births_per_hour']} · plant shown {m['plant_shown_moments']} birthed {m['plant_sight_births']} (plant clause {'graded' if _pc.get('graded', True) else 'NOT GRADABLE'}) — {m['reason']}"
             L.append(f"| {_k} | {m['bar']} | {body} | {gv(m)} |")
     L.append(f"| TWINS no-sleep / no-curiosity / no-park | (v) / door / PARK | {M['TWINS']['no_sleep_v']} · {M['TWINS']['no_curiosity']['reason']} · {M['TWINS']['no_park']['reason']} | not graded |")
+    # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:50 +0400 — A4-LADDER-PREREG §3.4: the LANG rung's L1-L9, one row each.
+    if isinstance(M.get("CHAT"), dict):
+        C = M["CHAT"]
+        if "error" in C:
+            L.append(f"| CHAT | §3.4 L1-L9 | the chat marks raised: {C['error']} | FAIL |")
+        for _ck in ("L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9"):
+            m = C.get(_ck)
+            if not isinstance(m, dict):
+                continue
+            nums = {k_: v_ for k_, v_ in m.items() if k_ not in ("bar", "reason", "graded", "pass", "said", "per_hour", "by_family")}
+            extra = m.get("said") or m.get("per_hour") or m.get("by_family") or ""
+            L.append(f"| CHAT {_ck} | {m.get('bar', '')} | {json.dumps(nums, default=str)[:600]} {json.dumps(extra, default=str)[:400] if extra else ''} — {m.get('reason')} | {gv(m)} |")
+        if isinstance(C.get("disjoint"), dict):
+            L.append(f"| CHAT pictures disjoint | §3.3: seed-3 renders never a tape canvas (+ planted control) | {json.dumps(C['disjoint'])} | reported |")
     L += ["", f"**failed ({len(R['marks_failed'])}):** {', '.join(R['marks_failed']) or 'none'}", "",
           f"**not gradable ({len(R.get('marks_not_gradable') or [])}) — never in the failed list (READER-FIX-0923 (9)):** "
           + ("; ".join(f"{k} ({r})" for k, r in (R.get("marks_not_gradable") or [])) or "none")]
