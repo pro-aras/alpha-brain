@@ -22,10 +22,17 @@ def _meta(r: dict) -> dict:
     return r.get("meta") or {}
 
 
-def act_mark(tape: Iterable[dict], journal: Iterable[dict], status: dict, min_outcomes: int = 100) -> Dict[str, object]:
+def act_mark(tape: Iterable[dict], journal: Iterable[dict], status: dict, min_outcomes: int = 100, last_n: int = 100) -> Dict[str, object]:
     """PREREG §19.5: outcome rows with chosen_by == mind = 100 % of the game's outcome rows; act_mismatch 0 (the journal's own check and
     STATUS); the census per act (G-MOT-1: no act ≥ 95 %, no reachable act at 0); the reward printed beside G's random null 0.29, no bar.
-    Not gradable when the game published fewer than `min_outcomes` outcome rows or the mind chose none (the worker's schedule chose)."""
+    Not gradable when the game published fewer than `min_outcomes` outcome rows or the mind chose none (the worker's schedule chose).
+
+    edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (3), the third hand's review of alpha4-1 §6:
+    the census is over the GAME's own acts — the tape's mind-chosen game outcome rows in seq order — never STATUS `acts_chosen`, which
+    counts the mouth's `say` beside the seven game acts (creature/mind.py:_maybe_say, the C×D seam) over the whole life (`left` read 244
+    of 669 = 36 % there at 09:41 while it was 96 of the last 100 game acts). «no act ≥ 95 %» reads the census of the LAST `last_n` game
+    acts (a lock the whole-life census cannot see); «no reachable act at 0» reads the whole life. STATUS's dict is printed as
+    `census_all` (the old number), never graded."""
     game_out = [r for r in tape if r.get("sense") == "outcome" and _meta(r).get("source") == "game"]
     mind = [r for r in game_out if _meta(r).get("chosen_by") == "mind"]
     act_names: List[str] = []
@@ -34,12 +41,21 @@ def act_mark(tape: Iterable[dict], journal: Iterable[dict], status: dict, min_ou
             act_names = list(_meta(r)["act_names"]); break
     choices = [j for j in journal if isinstance(j.get("act"), dict)]
     mism_j = sum(1 for j in journal if isinstance(j.get("outcome"), dict) and j["outcome"].get("act_mismatch"))
-    census = dict(status.get("acts_chosen") or {})
-    if not census:
-        census = dict(collections.Counter(j["act"].get("act") for j in choices))
-    total = sum(census.values())
+    census_all = dict(status.get("acts_chosen") or {})
+    if not census_all:
+        census_all = dict(collections.Counter(j["act"].get("act") for j in choices))
+    game_acts = [str(_meta(r).get("act")) for r in mind]
+    reachable = act_names or sorted(set(game_acts))
+    census: Dict[str, int] = {a: 0 for a in reachable}
+    for a in game_acts:
+        census[a] = census.get(a, 0) + 1
+    last = game_acts[-last_n:] if last_n > 0 else []
+    census_last: Dict[str, int] = {a: 0 for a in reachable}
+    for a in last:
+        census_last[a] = census_last.get(a, 0) + 1
+    total = len(game_acts)
     max_share = (max(census.values()) / total) if total else None
-    reachable = act_names or sorted(census)
+    max_share_last = (max(census_last.values()) / len(last)) if last else None
     zero_acts = [a for a in reachable if census.get(a, 0) == 0]
     rewards = [float(_meta(r).get("got") or 0.0) for r in game_out]
     episodes = sum(1 for r in game_out if _meta(r).get("terminated") or _meta(r).get("truncated"))
@@ -48,10 +64,13 @@ def act_mark(tape: Iterable[dict], journal: Iterable[dict], status: dict, min_ou
         "game_outcomes": len(game_out), "mind_chosen": len(mind), "mind_share": (len(mind) / len(game_out)) if game_out else None,
         "choices_journaled": len(choices), "mismatches_journal": mism_j, "mismatches_status": int(status.get("act_mismatches") or 0),
         "census": census, "max_share": (round(max_share, 4) if max_share is not None else None), "zero_acts": zero_acts,
+        f"census_last{last_n}": census_last, f"max_share_last{last_n}": (round(max_share_last, 4) if max_share_last is not None else None),
+        "last_n": len(last), "census_all": census_all,
+        "census_source": "the tape's mind-chosen game outcome rows (seq order): the game's own acts; census_all = STATUS acts_chosen (with the mouth's say), printed only",
         "reachable_acts": reachable, "reward_mean": (round(sum(rewards) / len(rewards), 4) if rewards else None),
         "episodes": episodes, "successes": successes, "success_per_episode": (round(successes / episodes, 4) if episodes else None),
         "random_null_success": 0.29,
-        "bar": f"mind-chosen = 100 % of ≥ {min_outcomes} game outcomes · mismatches 0 · census: no act ≥ 95 %, no reachable act at 0 · the shuffled-act plant diverges · reward printed, no bar",
+        "bar": f"mind-chosen = 100 % of ≥ {min_outcomes} game outcomes · mismatches 0 · census over the GAME's acts: no act ≥ 95 % of the last {last_n} game acts, no reachable act at 0 over the life · the shuffled-act plant diverges · reward printed, no bar",
     }
     if not game_out:
         out.update(graded=False, pass_=None, reason="not gradable: the game published no outcome rows on this tape")
@@ -61,8 +80,8 @@ def act_mark(tape: Iterable[dict], journal: Iterable[dict], status: dict, min_ou
         out.update(graded=False, pass_=None, reason=f"not gradable: {len(game_out)} game outcomes < {min_outcomes}")
     else:
         ok = (len(mind) == len(game_out)) and mism_j == 0 and int(status.get("act_mismatches") or 0) == 0 \
-            and (max_share is not None and max_share < 0.95) and not zero_acts
-        out.update(graded=True, pass_=ok, reason="graded (§19.5)")
+            and (max_share_last is not None and max_share_last < 0.95) and not zero_acts
+        out.update(graded=True, pass_=ok, reason=f"graded (§19.5; the ≥ 95 % clause on the last {len(last)} game acts)")
     out["pass"] = out.pop("pass_")
     return out
 
@@ -110,7 +129,24 @@ def sound_mark(tape: Iterable[dict], journal: Iterable[dict], status: dict) -> D
     return out
 
 
-def grade_mark(plant: dict, null: dict, seen: dict, answer_declared: bool) -> Dict[str, object]:
+def plant_showings(journal: Iterable[dict], plant_word: str = "zog") -> int:
+    """edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (10): how many canvases showed the plant, from
+    the journal's glance rows (`moment` + `word`; the coarse row carries no word) — `sizing_mark`'s own count, shared so GRADE and (vi)
+    read the same fact. The plant lands at maker canvas PLANT_AFTER (15,000 on alpha4-1 ≈ hour 21): before it, a plant clause has
+    nothing to read."""
+    return sum(1 for j in journal if "moment" in j and j.get("act") != "coarse" and j.get("word") == plant_word)
+
+
+def plant_clause(ok: Optional[bool], plant_shown: Optional[int], what: str) -> Dict[str, object]:
+    """READER-FIX-0923 (10): a mark's PLANT clause is NOT GRADABLE while the plant was never shown (printed, never FAIL); graded from the
+    first showing. `plant_shown` None = the caller could not count (an older call) — graded as before."""
+    if plant_shown is not None and int(plant_shown) == 0:
+        return {"graded": False, "pass": None, "plant_shown": 0, "what": what,
+                "reason": "not gradable: plant shown 0 (the plant lands at the maker's PLANT_AFTER canvas; graded from its first showing)"}
+    return {"graded": True, "pass": bool(ok), "plant_shown": plant_shown, "what": what, "reason": "graded"}
+
+
+def grade_mark(plant: dict, null: dict, seen: dict, answer_declared: bool, plant_shown: Optional[int] = None) -> Dict[str, object]:
     """PREREG §19.3 (builder A's shapes: `graded` = {sure_bare, unsure, abstain_with_resemblance, abstain} on the reader's own plant/null
     asks; `hedge_rate` on the seen-words Q1): the null «vex» sure-bare ≤ 1 of 10 and unsure+abstain ≥ 8 of 10 (a 5/10 tie is a FAIL);
     the plant «zog» ANSWERED (the cell) ≥ 6 of 10 with its grade distribution printed; the hedge rate printed (the plan predicted < 10 %;
@@ -118,21 +154,26 @@ def grade_mark(plant: dict, null: dict, seen: dict, answer_declared: bool) -> Di
     edit: Claude (Fable 5.1), 2026-09-22 22:27 +0400 — the plant clause RE-SPECIFIED before the life (#228 (b)): «sure ≥ 6/10» sat above
     its ceiling — builder A's real-record grades on held-out renders read sure/unsure 10/0 … 0/10 per thing (LIFE-A-REPORT.md §2; hedge
     0.426), so a word seen five times grading «sure» six times in ten is a coin flip by construction. The plant's mark is the cell (G4's
-    own (vi)); the grade's own mark is the null's two clauses, unchanged."""
+    own (vi)); the grade's own mark is the null's two clauses, unchanged.
+    edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (10): the plant clause is NOT GRADABLE while
+    `plant_shown` is 0 (alpha4-1's 2 h smoke read GRADE FAIL on «plant answered 0.0» with the plant 19 hours away); the null's two
+    clauses stay graded and carry the mark; the plant clause is printed as `plant_clause` with its reason."""
     gp = (plant or {}).get("graded"); gn = (null or {}).get("graded")
     hedge = ((seen or {}).get("Q1") or {}).get("hedge_rate")
     par = (plant or {}).get("answered_rate")
-    out: Dict[str, object] = {"plant_graded": gp, "null_graded": gn, "hedge_rate": hedge, "plant_answered_rate": par,
-                              "bar": "null sure-bare ≤ 1/10 · null unsure+abstain ≥ 8/10 (a tie fails) · plant ANSWERED ≥ 6/10 (its grades printed) · hedge rate printed, no bar (predicted < 0.10)"}
+    out: Dict[str, object] = {"plant_graded": gp, "null_graded": gn, "hedge_rate": hedge, "plant_answered_rate": par, "plant_shown": plant_shown,
+                              "bar": "null sure-bare ≤ 1/10 · null unsure+abstain ≥ 8/10 (a tie fails) · plant ANSWERED ≥ 6/10 (its grades printed; not gradable while the plant was never shown) · hedge rate printed, no bar (predicted < 0.10)"}
     if not answer_declared or not isinstance(gp, dict) or not isinstance(gn, dict) or par is None:
         out.update(graded=False, **{"pass": None}, reason="not gradable: ANSWER not declared / no graded counts on the asks (a life before the graded answer)")
         return out
     n_null = sum(gn.values()) or 1; n_plant = sum(gp.values()) or 1
     null_sb = int(gn.get("sure_bare", 0)); null_soft = int(gn.get("unsure", 0)) + int(gn.get("abstain_with_resemblance", 0)) + int(gn.get("abstain", 0))
     plant_sure = int(gp.get("sure_bare", 0))
-    out.update(null_sure_bare=null_sb, null_soft=null_soft, null_n=n_null, plant_sure=plant_sure, plant_n=n_plant,
-               graded=True, **{"pass": (null_sb / n_null <= 0.1) and (null_soft / n_null >= 0.8) and (float(par) >= 0.6)},
-               reason="graded (§19.3)")
+    pc = plant_clause(float(par) >= 0.6, plant_shown, "plant ANSWERED ≥ 6/10")
+    ok_null = (null_sb / n_null <= 0.1) and (null_soft / n_null >= 0.8)
+    out.update(null_sure_bare=null_sb, null_soft=null_soft, null_n=n_null, plant_sure=plant_sure, plant_n=n_plant, plant_clause=pc,
+               graded=True, **{"pass": bool(ok_null and (pc["pass"] if pc["graded"] else True))},
+               reason="graded (§19.3)" + ("" if pc["graded"] else "; the plant clause " + pc["reason"]))
     return out
 
 
@@ -352,14 +393,46 @@ def coarse_mark(live_allw: dict, twin_allw: Optional[dict], coarse_declared: boo
 def question_mark(journal: Iterable[dict], tape: Iterable[dict], status: dict, hours: float, question_declared: bool) -> Dict[str, object]:
     """PREREG §19.7 (builder C's shapes: journal `question` rows; tape rows whose meta carries `answering`; STATUS questions_written /
     questions_answered): questions written ≥ 1 per 2 h after hour 2 (≥ (hours − 2)/2 over the life); the share the world answered
-    within its next canvases printed (the plan's prediction ≥ 0.5 for maker things). Not gradable without the gene or under 2 h."""
+    within its next canvases printed (the plan's prediction ≥ 0.5 for maker things). Not gradable without the gene or under 2 h.
+
+    edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (5), the third hand's review §4: the answered
+    share counts each QUESTION once. `answered_rows` counted the maker's answer twice (it stamps `answering` on BOTH its ear and eye
+    rows, creature/world_maker.py:68-70) and the lexicon door's answers never (its eye row carries `answers: <word>` and a moment hashed
+    from (word, qid), creature/senses/lexicon.py:_moment_id — imported, never re-typed). qid = `q-<n>`, n the question row's own payload
+    `seq` (the ask/out index both doors key on). Printed: maker / lexicon / both / unanswered, and the questions about the hands' own
+    pictures (args[0] a moment whose eye row is `source: hands`) — no door answers a hands moment."""
+    from creature.senses.lexicon import _moment_id as _lex_moment
     qs = [j for j in journal if isinstance(j.get("question"), dict)]
     answered = [r for r in tape if _meta(r).get("answering")]
     forms = collections.Counter(str(j["question"].get("q")) for j in qs)
+    qids = [f"q-{j['question'].get('seq')}" for j in qs]
+    qset = set(qids)
+    maker_qids = {str(_meta(r)["answering"]) for r in answered}
+    lex_rows = [r for r in tape if r.get("sense") == "eye" and _meta(r).get("source") == "lexicon" and _meta(r).get("answers")]
+    lex_moments = {str(_meta(r).get("moment")) for r in lex_rows}
+    lex_words = sorted({str(_meta(r)["answers"]) for r in lex_rows})
+    lex_qids: set = set(); lex_matched: set = set()
+    for q in qids:
+        for w in lex_words:
+            mid = _lex_moment(w, q)
+            if mid in lex_moments:
+                lex_qids.add(q); lex_matched.add(mid)
+    by_maker = maker_qids & qset; by_lex = lex_qids & qset; ans = by_maker | by_lex
+    src_of = {str(_meta(r).get("moment")): _meta(r).get("source") for r in tape if r.get("sense") == "eye"}
+    hands_q = {q for q, j in zip(qids, qs) if (j["question"].get("args") or [None])[0] is not None
+               and src_of.get(str(j["question"]["args"][0])) == "hands"}
+    unanswered = qset - ans
+    un_forms = collections.Counter(str(j["question"].get("q")) for q, j in zip(qids, qs) if q in unanswered and q not in hands_q)
     out: Dict[str, object] = {"questions": len(qs), "forms": dict(forms), "answered_rows": len(answered),
-                              "answered_share": (round(len(answered) / len(qs), 4) if qs else None),
+                              "answered_by_maker": len(by_maker), "answered_by_lexicon": len(by_lex), "answered_by_both": len(by_maker & by_lex),
+                              "answered": len(ans), "unanswered": len(unanswered),
+                              "hands_picture_questions": len(hands_q), "unanswered_hands_pictures": len(hands_q & unanswered),
+                              "unanswered_other_by_form": dict(un_forms),
+                              "answered_share": (round(len(ans) / len(qs), 4) if qs else None),
+                              "lexicon_answers_on_tape": len(lex_rows), "lexicon_answers_unattributed": len(lex_moments - lex_matched),
+                              "maker_answers_not_a_question": sorted(maker_qids - qset),
                               "status_written": status.get("questions_written", "not recorded"), "status_answered": status.get("questions_answered", "not recorded"),
-                              "bar": "questions ≥ (hours − 2)/2 · the answered share printed (prediction ≥ 0.5 for maker things)"}
+                              "bar": "questions ≥ (hours − 2)/2 · the answered share printed (prediction ≥ 0.5 for maker things): each question once, by the maker or the lexicon door"}
     if not question_declared:
         out.update(graded=False, **{"pass": None}, reason="not gradable: QUESTION not declared on this life"); return out
     if hours < 2.0:
@@ -369,21 +442,10 @@ def question_mark(journal: Iterable[dict], tape: Iterable[dict], status: dict, h
     return out
 
 
-def world_pair_skew(tape: Iterable[dict]) -> Dict[str, object]:
-    """The world's OWN pair skew (PREREG §19.8's ceiling clause): over the game's missions on the tape (one per object ear row, the
-    mission's last two tokens = colour, object), the max lift count / (n · p(colour) · p(object)) over pairs met ≥ 5 times."""
-    pairs: collections.Counter = collections.Counter()
-    for r in tape:
-        m = _meta(r)
-        if r.get("sense") != "ear" or m.get("source") != "game" or not m.get("mission"):
-            continue
-        toks = str(m["mission"]).split()
-        if len(toks) < 2 or m.get("word") != toks[-1]:
-            continue                                  # count each mission ONCE, on its object row
-        pairs[(toks[-2], toks[-1])] += 1
+def _max_lift(pairs: "collections.Counter") -> Tuple[Optional[float], Optional[str]]:
     n = sum(pairs.values())
     if not n:
-        return {"missions": 0, "max_lift": None, "max_pair": None, "pairs": 0}
+        return None, None
     pc: collections.Counter = collections.Counter(); po: collections.Counter = collections.Counter()
     for (c, o), k in pairs.items():
         pc[c] += k; po[o] += k
@@ -392,7 +454,44 @@ def world_pair_skew(tape: Iterable[dict]) -> Dict[str, object]:
         if k < 5: continue
         lift = k / (n * (pc[c] / n) * (po[o] / n))
         if best is None or lift > best: best, best_pair = lift, f"{c} {o}"
-    return {"missions": n, "max_lift": (round(best, 4) if best is not None else None), "max_pair": best_pair, "pairs": len(pairs)}
+    return (round(best, 4) if best is not None else None), best_pair
+
+
+def world_pair_skew(tape: Iterable[dict]) -> Dict[str, object]:
+    """The world's OWN pair skew (PREREG §19.8's ceiling clause): over the game's missions on the tape (the mission's last two tokens =
+    colour, object), the max lift count / (n · p(colour) · p(object)) over pairs met ≥ 5 times.
+
+    edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (4), the third hand's review §6: ONE mission per
+    game EPISODE, never one per frame — every frame of an episode republishes the same mission (creature/senses/game.py:209-225), so a
+    64-frame episode was 64 «meetings» and one episode cleared «met ≥ 5» alone (alpha4-1's hour 1: 121 frames, 2 episodes, lift 2.16
+    «gradable»): the gate measured episode sparsity, not the world. An episode is a RUN of object rows with one (game, episode) — a run,
+    so an episode id a restarted worker re-uses is a new mission; a row without an `episode` (an older game door) is its own mission,
+    the old count, and says so. The per-frame count and its lift are printed beside, never graded."""
+    per_frame: collections.Counter = collections.Counter(); episodes: List[Tuple[str, str]] = []
+    prev_key = object(); no_episode = 0
+    for r in tape:
+        m = _meta(r)
+        if r.get("sense") != "ear" or m.get("source") != "game" or not m.get("mission"):
+            continue
+        toks = str(m["mission"]).split()
+        if len(toks) < 2 or m.get("word") != toks[-1]:
+            continue                                  # each FRAME once, on its object row
+        pair = (toks[-2], toks[-1])
+        per_frame[pair] += 1
+        if m.get("episode") is None:
+            no_episode += 1; episodes.append(pair); prev_key = object(); continue
+        key = (m.get("game"), m.get("episode"))
+        if key != prev_key:
+            episodes.append(pair); prev_key = key
+    pairs: collections.Counter = collections.Counter(episodes)
+    n = sum(pairs.values())
+    lift_f, pair_f = _max_lift(per_frame)
+    base = {"missions_per_frame": sum(per_frame.values()), "max_lift_per_frame": lift_f, "max_pair_per_frame": pair_f,
+            "rows_without_episode": no_episode, "missions_unit": "one per game episode (a run of object rows with one (game, episode))"}
+    if not n:
+        return {"missions": 0, "max_lift": None, "max_pair": None, "pairs": 0, **base}
+    best, best_pair = _max_lift(pairs)
+    return {"missions": n, "max_lift": best, "max_pair": best_pair, "pairs": len(pairs), **base}
 
 
 def sentence_mark(tape: Iterable[dict], status: dict, sentence_declared: bool, min_missions: int = 100) -> Dict[str, object]:
@@ -407,8 +506,8 @@ def sentence_mark(tape: Iterable[dict], status: dict, sentence_declared: bool, m
                               "bar": "≥ 3 frames · precision ≥ 0.8 · not gradable under %d missions or when the world's max pair lift < 2 (the ceiling clause)" % min_missions}
     if not sentence_declared:
         out.update(graded=False, **{"pass": None}, reason="not gradable: SENTENCE not declared on this life"); return out
-    if skew["missions"] < min_missions:
-        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {skew['missions']} missions < {min_missions}"); return out
+    if skew["missions"] < min_missions:   # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (4): missions are EPISODES
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {skew['missions']} missions < {min_missions} (one per game episode; {skew.get('missions_per_frame')} frames)"); return out
     if skew["max_lift"] is None or skew["max_lift"] < 2.0:
         out.update(graded=False, **{"pass": None}, reason=f"not gradable: the world's word pairs are independent (max lift {skew['max_lift']} < 2; a frame cannot exist there — PREREG §19.8's ceiling clause)"); return out
     out.update(graded=True, **{"pass": filed >= 3 and scored >= 1 and (true / scored) >= 0.8}, reason="graded (§19.8): the world admits a frame (max lift %s on «%s»)" % (skew["max_lift"], skew["max_pair"]))
@@ -441,15 +540,70 @@ def hands_mark(status: dict, rows: Iterable[dict], recog: Optional[dict], hands_
     return out
 
 
-def thread_mark(alive: dict, status: dict, threaded: bool, max_gap_bar: float = 5.1, waits_bar: float = 0.05) -> Dict[str, object]:
+def _parse_at(s: str):
+    import datetime as _dt
+    return _dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+
+
+def sleep_times(tape: Iterable[dict], journal: Iterable[dict]) -> List[Tuple[int, object]]:
+    """edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (7): every `sleep` journal row as (seq, time).
+    The row carries the TRIGGERING canvas's seq and no clock (creature/mind.py:_maybe_sleep journals it after the sleep, on that seq);
+    its time is that tape row's `at` — the stall of the sleep's merge begins at it (plus the mind's lag, rows, never minutes)."""
+    at_of = {int(r["seq"]): r["at"] for r in tape if r.get("at") is not None and r.get("seq") is not None}
+    out = [(int(j["seq"]), _parse_at(at_of[int(j["seq"])])) for j in journal
+           if isinstance(j.get("sleep"), dict) and j.get("seq") is not None and int(j["seq"]) in at_of]
+    return sorted(out, key=lambda x: x[1])
+
+
+def sleep_gap_attribution(tape: Iterable[dict], journal: Iterable[dict], bar: float, window_s: float = 60.0,
+                          senses: Tuple[str, ...] = ("eye", "ear")) -> Dict[str, object]:
+    """READER-FIX-0923 (7), the third hand's review §2/§6: the two longest eye gaps of alpha4-1's first five hours sat on sleeps 18 and 17
+    (the cycle's pure-Python O(n²) merge). Every gap between consecutive rows of one sense is IN a sleep's minute when it overlaps
+    [t, t + window_s], t = the sleep row's tape time; printed: the max inside and outside those minutes, and every gap over the bar with
+    the sleep it sits on (None = outside). The bar is not touched here — the reader attributes, it never excuses."""
+    import bisect
+    import datetime as _dt
+    tape = list(tape)
+    sleeps = sleep_times(tape, journal)
+    ts = [t for _s, t in sleeps]
+    w = _dt.timedelta(seconds=window_s)
+    inside: List[float] = []; outside: List[float] = []; over: List[dict] = []; per_sleep: Dict[int, float] = {}
+    for sense in senses:
+        rows = [(int(r["seq"]), _parse_at(r["at"])) for r in tape if r.get("sense") == sense and r.get("at") is not None]
+        for (_sa, a), (_sb, b) in zip(rows, rows[1:]):
+            gap = (b - a).total_seconds()
+            i = bisect.bisect_right(ts, a - w)              # the first sleep with t > a − window: it overlaps iff t < b
+            sleep_seq = sleeps[i][0] if (i < len(ts) and ts[i] < b) else None
+            (inside if sleep_seq is not None else outside).append(gap)
+            if sleep_seq is not None:
+                per_sleep[sleep_seq] = max(per_sleep.get(sleep_seq, 0.0), gap)
+            if gap > bar:
+                over.append({"sense": sense, "at": a.isoformat(timespec="milliseconds"), "gap_s": round(gap, 3), "sleep_seq": sleep_seq})
+    over.sort(key=lambda d: d["at"])
+    return {"sleeps_on_record": len(sleeps), "sleep_window_s": window_s,
+            "max_gap_in_sleep_minutes_s": (round(max(inside), 3) if inside else None),
+            "max_gap_outside_sleep_minutes_s": (round(max(outside), 3) if outside else None),
+            "over_bar_in_sleep_minutes": sum(1 for d in over if d["sleep_seq"] is not None),
+            "over_bar_outside_sleep_minutes": sum(1 for d in over if d["sleep_seq"] is None),
+            "gaps_over_bar": over, "sleep_minute_max_gaps": [[s, round(g, 3)] for s, g in sorted(per_sleep.items())],
+            "attribution_rule": f"a gap between consecutive rows of one sense is IN a sleep's minute when it overlaps [t, t + {window_s:g} s], t = the tape time of the sleep row's triggering canvas (the journal's sleep row carries its seq, no clock)"}
+
+
+def thread_mark(alive: dict, status: dict, threaded: bool, max_gap_bar: float = 5.1, waits_bar: float = 0.05,
+                tape: Optional[Iterable[dict]] = None, journal: Optional[Iterable[dict]] = None) -> Dict[str, object]:
     """PREREG §19.2 (builder E's shapes): ALIVE's max sense gap ≤ 5.1 s (life 3b's, the box otherwise idle) with the think ms series
-    printed; think_waits / thinks < 5 %. Not gradable when THINK is not on its own thread, or when no think ran."""
+    printed; think_waits / thinks < 5 %. Not gradable when THINK is not on its own thread, or when no think ran.
+    edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (7): with the tape and the journal given, the
+    gaps are ATTRIBUTED (`sleep_gap_attribution`): those in the minute after a `sleep` row and the max outside those minutes printed beside
+    the max; the 5.1 s bar is unchanged. (`gaps_per_hour` is ALIVE's per-SENSE pair [eye, ear] — a misnomer kept for the record.)"""
     gaps = [float(g) for g in (alive or {}).get("max_gap_s_eye_ear") or [] if g is not None]
     thinks = int(status.get("thinks") or 0); waits = int(status.get("think_waits") or 0)
     out: Dict[str, object] = {"max_gap_s": (max(gaps) if gaps else None), "gaps_per_hour": gaps, "thinks": thinks, "think_waits": waits,
                               "waits_share": (round(waits / thinks, 4) if thinks else None), "think_wait_ms": status.get("think_wait_ms", "not recorded"),
                               "think_ms_last": status.get("think_ms_last", "not recorded"), "think_ms_median": status.get("think_ms_median", "not recorded"),
-                              "bar": f"max sense gap ≤ {max_gap_bar} s · think_waits / thinks < {waits_bar:.0%}"}
+                              "bar": f"max sense gap ≤ {max_gap_bar} s · think_waits / thinks < {waits_bar:.0%} (gaps attributed to sleeps, printed, never excused)"}
+    if tape is not None and journal is not None:
+        out.update(sleep_gap_attribution(tape, journal, bar=max_gap_bar))
     if not threaded:
         out.update(graded=False, **{"pass": None}, reason="not gradable: THINK is not on its own thread on this life"); return out
     if thinks == 0 or not gaps:
@@ -459,7 +613,7 @@ def thread_mark(alive: dict, status: dict, threaded: bool, max_gap_bar: float = 
 
 
 def evolve_mark(tape: Iterable[dict], journal: Iterable[dict], evolve_declared: bool, hours: float,
-                 negative_control: Optional[Dict[str, dict]] = None) -> Dict[str, object]:
+                 negative_control: Optional[Dict[str, dict]] = None, every_h: Optional[float] = None) -> Dict[str, object]:
     """ALPHA4-PREREG.md §5/§6 (builder J's shapes): proposals filed (tape rows sense=="proposal") >= a bar
     SCALED by the record's own hours (3 in 24 h — the plan's own figure — never a fixed 3 under a shorter
     window, the same scaling `question_mark` above already uses for its own "per 2 h after hour 2" bar),
@@ -490,22 +644,37 @@ def evolve_mark(tape: Iterable[dict], journal: Iterable[dict], evolve_declared: 
     tape's own historical choice (made under the INCUMBENT, not the mutant) is graded `act_mismatch > 0`
     by `act_mark`'s own bar, which fails `act_pass` and reads as a "regression" in `regression_bar` — a
     mutation that changes ANY decision-relevant gene is structurally more likely to diverge from a history
-    it did not produce, independent of whether the change is actually better or worse."""
+    it did not produce, independent of whether the change is actually better or worse.
+
+    edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (1), the third hand's review §6: a VOID round
+    is not a judged round. The designed minute-2 round (tools/evolve.py:355 — no shadow checkpoint yet, epoch 0) publishes a proposal
+    row with `reason` «not gradable: …» and NO incumbent/mutant readings; «every proposal paired» failed on it by construction on every
+    ALPHA4 life. A void round = no paired readings AND a reason that says «not gradable» (both — an unpaired row with any other reason is
+    still a defect and still FAILS); void rounds are printed (`void_rounds`, their reasons) and excluded from the ≥ 3 count, the pairing
+    and the adoption bound. `every_h` (the genome's EVOLVE every) prints `rounds_possible` beside `needed` — a schedule fact."""
     proposals = [r for r in tape if r.get("sense") == "proposal"]
-    paired = [p for p in proposals if isinstance(_meta(p).get("incumbent"), dict) and isinstance(_meta(p).get("mutant"), dict)]
+    def _is_paired(p) -> bool:
+        return isinstance(_meta(p).get("incumbent"), dict) and isinstance(_meta(p).get("mutant"), dict)
+    void = [p for p in proposals if not _is_paired(p) and str(_meta(p).get("reason") or "").startswith("not gradable")]
+    void_ids = {id(p) for p in void}
+    judged = [p for p in proposals if id(p) not in void_ids]
+    paired = [p for p in judged if _is_paired(p)]
     epochs = [j for j in journal if isinstance(j.get("epoch"), dict)]
     epoch_events = [{"epoch": j["epoch"].get("epoch"), "genome_sha": j["epoch"].get("genome_sha"),
                       "moment": j["epoch"].get("moment"), "gene": j["epoch"].get("gene"), "value": j["epoch"].get("value")}
                      for j in epochs]
     lags = [int(_meta(p)["shadow_lag_rows"]) for p in proposals if isinstance(_meta(p).get("shadow_lag_rows"), (int, float))]
     out: Dict[str, object] = {
-        "proposals": len(proposals), "paired_readings": len(paired), "adoptions": len(epochs),
+        "proposals": len(proposals), "judged_rounds": len(judged), "void_rounds": len(void),
+        "void_round_reasons": [str(_meta(p).get("reason")) for p in void],
+        "paired_readings": len(paired), "adoptions": len(epochs),
         "epoch_events": epoch_events, "hours": hours, "negative_control": negative_control,
+        "every_h": every_h, "rounds_possible": (int(hours // every_h) if every_h else None),
         "max_shadow_lag_rows": (max(lags) if lags else None),
-        "bar": "proposals >= 3 scaled to the record's own hours (min 1) · every proposal paired (incumbent+mutant readings) "
-               "· adoptions <= proposals · every adoption's genome sha printed · REPLAY identical across epochs (the "
-               "existing REPLAY mark, on a tape carrying a proposal row) · the negative control's planted-bad and null "
-               "mutants both REFUSED · max_shadow_lag_rows printed, never gated (#236)",
+        "bar": "JUDGED rounds >= 3 scaled to the record's own hours (min 1; a void round — no readings, reason «not gradable» — is printed, "
+               "never counted) · every judged round paired (incumbent+mutant readings) · adoptions <= judged rounds · every adoption's genome "
+               "sha printed · REPLAY identical across epochs (the existing REPLAY mark, on a tape carrying a proposal row) · the negative "
+               "control's planted-bad and null mutants both REFUSED · max_shadow_lag_rows printed, never gated (#236)",
     }
     if not evolve_declared:
         out.update(graded=False, **{"pass": None}, reason="not gradable: EVOLVE not declared on this life")
@@ -514,17 +683,17 @@ def evolve_mark(tape: Iterable[dict], journal: Iterable[dict], evolve_declared: 
         out.update(graded=False, **{"pass": None}, reason="not gradable: hours <= 0")
         return out
     needed = max(1, round(3 * hours / 24.0))
-    all_paired = len(paired) == len(proposals)
-    adoptions_ok = len(epochs) <= len(proposals)
+    all_paired = len(paired) == len(judged)
+    adoptions_ok = len(epochs) <= len(judged)
     nc_ok: Optional[bool] = None
     if negative_control is not None:
         nc_ok = (negative_control.get("planted_bad", {}).get("verdict") == "REFUSED"
                  and negative_control.get("null", {}).get("verdict") == "REFUSED")
     out.update(
         needed=needed, graded=True,
-        **{"pass": bool(len(proposals) >= needed and all_paired and adoptions_ok and (nc_ok is not False))},
-        reason=(f"graded (§5/§6): {len(proposals)} proposals vs {needed} needed; paired {len(paired)}/{len(proposals)}; "
-                f"adoptions {len(epochs)} <= proposals; negative control "
+        **{"pass": bool(len(judged) >= needed and all_paired and adoptions_ok and (nc_ok is not False))},
+        reason=(f"graded (§5/§6): {len(judged)} judged rounds vs {needed} needed (+{len(void)} void, printed); paired {len(paired)}/{len(judged)}; "
+                f"adoptions {len(epochs)} <= judged rounds; negative control "
                 + ("REFUSED both (ok)" if nc_ok else ("not checked this read" if negative_control is None else "DID NOT REFUSE — a finding about the bar, not loosened"))),
     )
     return out
@@ -558,20 +727,26 @@ def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[floa
                               "births_refused_budget": status.get("births_refused_budget"), "budget_regenerated": status.get("budget_regenerated"),
                               "prediction": prediction, "series_sight_births_per_hour": list(per_hour.values()),
                               "plant_shown_moments": plant_shown, "plant_sight_births": plant_births, "bar": bar}
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (10): «the plant birthed ≥ 1 sight cell» is NOT
+    # GRADABLE while the plant was never shown (alpha4-1's 2 h smoke: plant shown 0 read SIZING FAIL); the other clauses stay graded.
+    pc = plant_clause(plant_births >= 1, plant_shown, "the plant birthed ≥ 1 sight cell")
+    out["plant_clause"] = pc
+    ok_plant = pc["pass"] if pc["graded"] else True
+    plant_txt = f"plant births {plant_births}" if pc["graded"] else "plant clause not gradable (plant shown 0)"
     if grow:
         if not isinstance(born, int) or not isinstance(refused, int):
             out.update(graded=False, **{"pass": None}, reason="not gradable: sight_born / births_refused_nmax not on STATUS (an older body)")
         else:
-            out.update(graded=True, **{"pass": refused == 0 and plant_births >= 1},
-                       reason=f"graded (§19.11, GROW): refused {refused}; plant births {plant_births}; born {born} (no band)")
+            out.update(graded=True, **{"pass": bool(refused == 0 and ok_plant)},
+                       reason=f"graded (§19.11, GROW): refused {refused}; {plant_txt}; born {born} (no band)")
     elif prediction is None:
         out.update(graded=False, **{"pass": None}, reason="not gradable: no sizing prediction on the record (PREREG §19.11 is written at the pre-flight)")
     elif not isinstance(born, int) or not isinstance(nmax, int):
         out.update(graded=False, **{"pass": None}, reason="not gradable: sight_born / sight_nmax not on STATUS (an older body)")
     else:
         band = 0.5 * prediction <= born <= 1.5 * prediction
-        out.update(graded=True, **{"pass": band and int(refused or 0) == 0 and plant_births >= 1},
-                   reason=f"graded (§19.11): band {'ok' if band else 'MISSED'}; refused {refused}; plant births {plant_births}")
+        out.update(graded=True, **{"pass": bool(band and int(refused or 0) == 0 and ok_plant)},
+                   reason=f"graded (§19.11): band {'ok' if band else 'MISSED'}; refused {refused}; {plant_txt}")
     return out
 
 
@@ -666,9 +841,40 @@ def read_frames(tape: Iterable[dict], shuffle_seed: int = 20260923) -> Dict[str,
             "pairs": sorted(f"{w1}|{w2}" for w1, w2 in real_pairs)}
 
 
+def read_sample(heard: Iterable[str], tape: Iterable[dict], n: int = 50, seed: int = 20260923) -> Dict[str, object]:
+    """edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (6) × (11): the reading mark's 50 words.
+    (6) A fixed-seed draw (`random.Random(seed).sample`) over the WHOLE of read/HEARD.json in first-heard order, never its newest 50 (the
+    20/50 NEWEST are the least-exposed words — the third hand's review §3). (11) Drawn only from the words the SHELF owns on the CUT tape:
+    a word also heard from another source (7 of 255 in alpha4-1's hour 1 — the lexicon's glosses: of/and/with/or/to/more/a) keeps a
+    words-cell in the blind twin (shelf rows dropped), so «the blind twin reads 0 by construction» holds only without them; a word not on
+    the cut tape's shelf rows was never heard by the twins (read with --hours under the life's length). Both exclusions printed."""
+    import random as _random
+    heard = [str(w) for w in heard]
+    shelf: set = set(); other: set = set()
+    for r in tape:
+        if r.get("sense") != "ear":
+            continue
+        w = _meta(r).get("word")
+        if w:
+            (shelf if _meta(r).get("source") == "shelf" else other).add(str(w))
+    not_on_tape = [w for w in heard if w not in shelf]
+    shared = [w for w in heard if w in shelf and w in other]
+    eligible = [i for i, w in enumerate(heard) if w in shelf and w not in other]
+    out: Dict[str, object] = {"seed": seed, "n": n, "population_heard": len(heard), "excluded_not_on_cut_tape": len(not_on_tape),
+                              "excluded_other_source": shared, "eligible": len(eligible),
+                              "rule": f"random.Random({seed}).sample over HEARD.json's words the shelf alone heard on the cut tape (first-heard order kept)"}
+    if len(eligible) < n:
+        out.update(indices=[], words=[], note=f"only {len(eligible)} eligible shelf words (of {len(heard)} heard); the mark asks {n}")
+        return out
+    idx = sorted(_random.Random(seed).sample(eligible, n))
+    out.update(indices=idx, words=[heard[i] for i in idx], note="")
+    return out
+
+
 def read_mark(tape: Iterable[dict], journal: Iterable[dict], read_declared: bool, recog: Optional[dict],
               recog_blind: Optional[dict], min_words_born: int = 500, min_frames: int = 20,
-              frame_precision_bar: float = 0.8, reading_bar: float = 0.6, shuffle_seed: int = 20260923) -> Dict[str, object]:
+              frame_precision_bar: float = 0.8, reading_bar: float = 0.6, shuffle_seed: int = 20260923,
+              sample: Optional[dict] = None, blind_reason: Optional[str] = None) -> Dict[str, object]:
     """ALPHA4-PREREG.md §5 READ (H): words born from shelf moments >= `min_words_born`; frames from shelf
     moments >= `min_frames` with precision >= `frame_precision_bar` vs the shuffled twin; the READING mark
     (`recog`, from tools/read_recognised.py:recognised_share over the life's own snapshot) >= `reading_bar`;
@@ -682,9 +888,19 @@ def read_mark(tape: Iterable[dict], journal: Iterable[dict], read_declared: bool
     tape = list(tape); journal = list(journal)
     words_born = read_words_born(tape, journal)
     frames = read_frames(tape, shuffle_seed=shuffle_seed)
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (11): the blind twin's clause. A twin that RAN is
+    # graded (share == 0); a twin that CANNOT run (`blind_reason`: no shelf rows on the cut tape, no snapshot, --skip-twins, a worker error)
+    # leaves the clause NOT GRADABLE, printed, never FAIL; neither given = the reader never tried — FAIL, as before (a mark cannot vouch for
+    # a control nobody attempted). Its price (the twin's replay seconds) is printed in `blind_twin`.
+    blind_ran = isinstance(recog_blind, dict) and recog_blind.get("share") is not None
+    blind: Dict[str, object] = {"graded": bool(blind_ran) or blind_reason is None,
+                                "share": (recog_blind or {}).get("share"), "n": (recog_blind or {}).get("n"),
+                                "correct": (recog_blind or {}).get("correct"), "seconds": (recog_blind or {}).get("seconds"),
+                                "reason": ("graded" if blind_ran else (blind_reason or "the blind twin was not run — that clause FAILS"))}
     out: Dict[str, object] = {
         "shelf_eye_rows": sum(1 for r in tape if r.get("sense") == "eye" and _meta(r).get("source") == "shelf"),
         "words_born_from_shelf": words_born, "frames": frames, "reading": recog, "reading_blind_twin": recog_blind,
+        "reading_sample": sample, "blind_twin": blind,
         "bar": (f"words born from shelf >= {min_words_born} · frames from shelf >= {min_frames} with precision "
                 f">= {frame_precision_bar} vs the shuffled twin · the reading mark >= {reading_bar} (50 shelf "
                 f"words the life DID hear, rendered in the held-out font) · the blind twin reads 0 by construction"),
@@ -698,11 +914,15 @@ def read_mark(tape: Iterable[dict], journal: Iterable[dict], read_declared: bool
     ok_words = words_born >= min_words_born
     ok_frames = frames["filed"] >= min_frames and frames["precision"] is not None and frames["precision"] >= frame_precision_bar
     ok_reading = recog.get("share") is not None and float(recog["share"]) >= reading_bar
-    blind_share = (recog_blind or {}).get("share")
-    ok_blind = blind_share is not None and float(blind_share) == 0.0
+    if blind_ran:
+        ok_blind: Optional[bool] = float(recog_blind["share"]) == 0.0
+    elif blind_reason is not None:
+        ok_blind = None
+    else:
+        ok_blind = False
     out.update(graded=True, clause_words_born=ok_words, clause_frames=ok_frames, clause_reading=ok_reading,
-               clause_blind_twin=ok_blind, **{"pass": bool(ok_words and ok_frames and ok_reading and ok_blind)},
-               reason="graded (ALPHA4-PREREG §5, READ/H)" + ("" if recog_blind is not None else "; the blind twin was not run — that clause FAILS"))
+               clause_blind_twin=ok_blind, **{"pass": bool(ok_words and ok_frames and ok_reading and (ok_blind is not False))},
+               reason="graded (ALPHA4-PREREG §5, READ/H)" + ("" if blind_ran else "; the blind twin: " + str(blind["reason"])))
     return out   # edit: Claude (Fable 5.1), 2026-09-23 03:24 +0400 — restored at integration: the merge matched read_mark's closing `return out` with stage_mark's as shared context and kept ONE (read_mark returned None; five ReadMark tests errored on the merged bytes, none on H's branch)
 
 
@@ -738,14 +958,39 @@ def web_mark(tape: Iterable[dict], journal: Iterable[dict], door_web_declared: b
     return out
 
 
-def stage_mark(journal: Iterable[dict], stage_ready_declared: bool) -> Dict[str, object]:
+def stage_mark(journal: Iterable[dict], stage_ready_declared: bool, tape: Optional[Iterable[dict]] = None) -> Dict[str, object]:
     """§5 STAGE: the stage series by moment, each with the READINESS judge's own readings (a..e) at the
     moment it fired; exactly one stage-4 event or none — never more (the mind's own "never undone" law,
-    checked directly: a second event would mean the guard in `_maybe_advance_stage` broke)."""
+    checked directly: a second event would mean the guard in `_maybe_advance_stage` broke).
+
+    edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (8), the third hand's review §3: «≤ 1 stage-4
+    event» cannot fail and says nothing about WHY a door stayed shut. Beside the unchanged bar, the READINESS SERIES: per SIT boundary
+    (the `sit` journal row's `readiness`, creature/mind.py:_consume_sit), which of (a)–(e) held, `b_read_proxy`, and — joined by seq from
+    the tape's `sit` row — the exam's score/composite/read_share that (b)/(c) read; the count of boundaries where all five held and the
+    longest run of them (two consecutive open the door). The numbers behind (a) the reward window, (b) frames alive/lift and (d) the
+    grade counts are on NO record (the mind journals booleans) — a life-side gap, said here, not invented. The caller passes the mind's
+    `stage` event rows beside the journal (gather's `mind_events`: they carry no `at`)."""
+    journal = list(journal)
     events = [j for j in journal if j.get("event") == "stage"]
     series = [{"moment": j.get("moment"), "stage": j.get("stage"), "readings": j.get("readings")} for j in events]
+    sit_meta = {int(r["seq"]): _meta(r) for r in (tape or []) if r.get("sense") == "sit" and r.get("seq") is not None}
+    rs: List[Dict[str, object]] = []
+    for j in journal:
+        rd = j.get("readiness")
+        if not isinstance(rd, dict):
+            continue
+        m = sit_meta.get(int(j["seq"]), {}) if j.get("seq") is not None else {}
+        rs.append({"seq": j.get("seq"), **{k: rd.get(k) for k in "abcde"}, "b_read_proxy": rd.get("b_read_proxy"),
+                   "score": m.get("score"), "composite": m.get("composite"), "read_share": m.get("read_share")})
+    all5 = [all(x[k] is True for k in "abcde") for x in rs]
+    longest = run = 0
+    for ok in all5:
+        run = run + 1 if ok else 0; longest = max(longest, run)
     out: Dict[str, object] = {"stage_events": len(events), "series": series,
-                              "bar": "the stage series by moment, each with its five readings · at most ONE stage-4 event, ever"}
+                              "readiness_boundaries": len(rs), "held": {k: sum(1 for x in rs if x[k] is True) for k in "abcde"},
+                              "all_five_held": sum(all5), "longest_all_five_streak": longest, "readiness_series": rs,
+                              "readiness_note": "booleans from the mind's `sit` rows; the numbers behind (a) the reward window, (b) frames/lift and (d) grade counts are on no record (the mind journals booleans only)",
+                              "bar": "the stage series by moment, each with its five readings · at most ONE stage-4 event, ever (the readiness series printed beside, never gating)"}
     if not stage_ready_declared:
         out.update(graded=False, **{"pass": None}, reason='not gradable: STAGE_READY ("by READY") not declared on this life')
         return out

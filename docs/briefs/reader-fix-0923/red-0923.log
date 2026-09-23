@@ -1,0 +1,292 @@
+EFEEEEEEEEEEEEEEEEEFEEEEEEEEFFEEE.
+======================================================================
+ERROR: test_a_spread_last_100_passes (tests.creature.test_verdict_reader_fix_0923.ActCensusGameOnlyLast100.test_a_spread_last_100_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 144, in test_a_spread_last_100_passes
+    self.assertEqual(sum(m["census_last100"].values()), 100)
+                         ~^^^^^^^^^^^^^^^^^^
+KeyError: 'census_last100'
+
+======================================================================
+ERROR: test_a_grow_life_is_graded_against_one_and_a_half_times_the_function_at_its_own_cell_count (tests.creature.test_verdict_reader_fix_0923.CostFunctionOfCells.test_a_grow_life_is_graded_against_one_and_a_half_times_the_function_at_its_own_cell_count)
+ALPHA4-PREREG §8b: 0.09 ms × cells per canvas; the mark reads the 24 h figure against 1.5× that at the final cell count.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 83, in test_a_grow_life_is_graded_against_one_and_a_half_times_the_function_at_its_own_cell_count
+    m = viii_cost(st, 21.0, 85.0, None, grow=True)
+TypeError: viii_cost() got an unexpected keyword argument 'grow'
+
+======================================================================
+ERROR: test_a_grow_status_without_cells_is_not_graded (tests.creature.test_verdict_reader_fix_0923.CostFunctionOfCells.test_a_grow_status_without_cells_is_not_graded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 98, in test_a_grow_status_without_cells_is_not_graded
+    m = viii_cost({"rss_mb": 900.0, "mind_ms_per_canvas_1min": 600.0}, 21.0, 85.0, None, grow=True)
+TypeError: viii_cost() got an unexpected keyword argument 'grow'
+
+======================================================================
+ERROR: test_a_non_grow_record_reads_g4_7_exactly_as_before (tests.creature.test_verdict_reader_fix_0923.CostFunctionOfCells.test_a_non_grow_record_reads_g4_7_exactly_as_before)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 107, in test_a_non_grow_record_reads_g4_7_exactly_as_before
+    self.assertEqual(m["form"], "G4-7"); self.assertEqual((m["graded"], m["pass"]), (m["g4_7"]["graded"], m["g4_7"]["pass"]))
+                     ~^^^^^^^^
+KeyError: 'form'
+
+======================================================================
+ERROR: test_the_sleep_flag_is_printed_never_graded (tests.creature.test_verdict_reader_fix_0923.CostFunctionOfCells.test_the_sleep_flag_is_printed_never_graded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 112, in test_the_sleep_flag_is_printed_never_graded
+    m = viii_cost(st, 21.0, 85.0, None, grow=True, sleeps_in_window=1)
+TypeError: viii_cost() got an unexpected keyword argument 'grow'
+
+======================================================================
+ERROR: test_under_the_function_passes_where_the_fixed_g4_7_number_would_fail (tests.creature.test_verdict_reader_fix_0923.CostFunctionOfCells.test_under_the_function_passes_where_the_fixed_g4_7_number_would_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 93, in test_under_the_function_passes_where_the_fixed_g4_7_number_would_fail
+    m = viii_cost(st, 21.0, 85.0, None, grow=True)
+TypeError: viii_cost() got an unexpected keyword argument 'grow'
+
+======================================================================
+ERROR: test_a_not_gradable_reason_WITH_paired_readings_is_a_judged_round (tests.creature.test_verdict_reader_fix_0923.EvolveVoidRound.test_a_not_gradable_reason_WITH_paired_readings_is_a_judged_round)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 60, in test_a_not_gradable_reason_WITH_paired_readings_is_a_judged_round
+    m = evolve_mark(tape, [], True, 2.0, every_h=6)
+TypeError: evolve_mark() got an unexpected keyword argument 'every_h'
+
+======================================================================
+ERROR: test_adoptions_are_bounded_by_judged_rounds (tests.creature.test_verdict_reader_fix_0923.EvolveVoidRound.test_adoptions_are_bounded_by_judged_rounds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 73, in test_adoptions_are_bounded_by_judged_rounds
+    m = evolve_mark([_void_proposal(1)], [epoch], True, 2.0, every_h=6)
+TypeError: evolve_mark() got an unexpected keyword argument 'every_h'
+
+======================================================================
+ERROR: test_an_unpaired_row_without_the_void_reason_still_fails (tests.creature.test_verdict_reader_fix_0923.EvolveVoidRound.test_an_unpaired_row_without_the_void_reason_still_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 66, in test_an_unpaired_row_without_the_void_reason_still_fails
+    m = evolve_mark([_void_proposal(1), bad, _judged_proposal(9, 3), _judged_proposal(12, 4)], [], True, 24.0, every_h=6)
+TypeError: evolve_mark() got an unexpected keyword argument 'every_h'
+
+======================================================================
+ERROR: test_the_designed_void_round_is_not_a_judged_round (tests.creature.test_verdict_reader_fix_0923.EvolveVoidRound.test_the_designed_void_round_is_not_a_judged_round)
+The review §6: the minute-2 round put an unpaired `proposal` row on the tape and `evolve_mark` passes only if EVERY proposal is
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 44, in test_the_designed_void_round_is_not_a_judged_round
+    m = evolve_mark(tape, [], True, 24.0, every_h=6)
+TypeError: evolve_mark() got an unexpected keyword argument 'every_h'
+
+======================================================================
+ERROR: test_the_hour_one_shape_reads_zero_judged_against_one_needed_with_the_schedule_printed (tests.creature.test_verdict_reader_fix_0923.EvolveVoidRound.test_the_hour_one_shape_reads_zero_judged_against_one_needed_with_the_schedule_printed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 52, in test_the_hour_one_shape_reads_zero_judged_against_one_needed_with_the_schedule_printed
+    m = evolve_mark([_void_proposal(29)], [], True, 1.0, every_h=6)
+TypeError: evolve_mark() got an unexpected keyword argument 'every_h'
+
+======================================================================
+ERROR: test_a_stage_event_without_at_is_carried_not_crashed_on (tests.creature.test_verdict_reader_fix_0923.GatherToleratesTheMindsStageEvent.test_a_stage_event_without_at_is_carried_not_crashed_on)
+creature/mind.py:877 journals {"seq", "event": "stage", ...} with NO `at`; gather() cut every "event" row by `_iso(e["at"])` —
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 341, in test_a_stage_event_without_at_is_carried_not_crashed_on
+    G = gather(root, out, 1.0)
+  File "/data/dev/genome-wt-reader-fix/tools/verdict_g4.py", line 127, in gather
+    events_cut = [e for e in events if _iso(e["at"]) <= t_cut or e["event"] == "stop"]
+                                            ~^^^^^^
+KeyError: 'at'
+
+======================================================================
+ERROR: test_a_mark_without_graded_is_named_and_kept_in_failed_when_it_fails (tests.creature.test_verdict_reader_fix_0923.PartitionMarks.test_a_mark_without_graded_is_named_and_kept_in_failed_when_it_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 365, in test_a_mark_without_graded_is_named_and_kept_in_failed_when_it_fails
+    from tools.verdict_g4 import partition_marks
+ImportError: cannot import name 'partition_marks' from 'tools.verdict_g4' (/data/dev/genome-wt-reader-fix/tools/verdict_g4.py)
+
+======================================================================
+ERROR: test_a_not_gradable_mark_never_sits_in_failed (tests.creature.test_verdict_reader_fix_0923.PartitionMarks.test_a_not_gradable_mark_never_sits_in_failed)
+alpha4-1's 2 h smoke: MODULATION's own reason read «… not gradable» and it was still in `marks_failed`.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 351, in test_a_not_gradable_mark_never_sits_in_failed
+    from tools.verdict_g4 import partition_marks
+ImportError: cannot import name 'partition_marks' from 'tools.verdict_g4' (/data/dev/genome-wt-reader-fix/tools/verdict_g4.py)
+
+======================================================================
+ERROR: test_modulation_without_a_window_change_reads_not_gradable (tests.creature.test_verdict_reader_fix_0923.PartitionMarks.test_modulation_without_a_window_change_reads_not_gradable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 373, in test_modulation_without_a_window_change_reads_not_gradable
+    self.assertFalse(m["graded"]); self.assertIn("not gradable", m["reason"])
+                     ~^^^^^^^^^^
+KeyError: 'graded'
+
+======================================================================
+ERROR: test_retention_without_a_pair_reads_not_gradable (tests.creature.test_verdict_reader_fix_0923.PartitionMarks.test_retention_without_a_pair_reads_not_gradable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 376, in test_retention_without_a_pair_reads_not_gradable
+    from tools.verdict_g4 import retention_mark
+ImportError: cannot import name 'retention_mark' from 'tools.verdict_g4' (/data/dev/genome-wt-reader-fix/tools/verdict_g4.py)
+
+======================================================================
+ERROR: test_grade_reads_the_plant_clause_not_gradable_while_the_plant_was_never_shown (tests.creature.test_verdict_reader_fix_0923.PlantClausesBeforeThePlant.test_grade_reads_the_plant_clause_not_gradable_while_the_plant_was_never_shown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 389, in test_grade_reads_the_plant_clause_not_gradable_while_the_plant_was_never_shown
+    m = grade_mark(self.PLANT_UNLEARNED, self.NULL_OK, {"Q1": {"hedge_rate": 0.24}}, True, plant_shown=0)
+TypeError: grade_mark() got an unexpected keyword argument 'plant_shown'
+
+======================================================================
+ERROR: test_plant_showings_counts_glance_rows_of_the_plant_word (tests.creature.test_verdict_reader_fix_0923.PlantClausesBeforeThePlant.test_plant_showings_counts_glance_rows_of_the_plant_word)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 413, in test_plant_showings_counts_glance_rows_of_the_plant_word
+    from tools.verdict_life import plant_showings
+ImportError: cannot import name 'plant_showings' from 'tools.verdict_life' (/data/dev/genome-wt-reader-fix/tools/verdict_life.py)
+
+======================================================================
+ERROR: test_vi_reads_its_plant_clause_the_same_way (tests.creature.test_verdict_reader_fix_0923.PlantClausesBeforeThePlant.test_vi_reads_its_plant_clause_the_same_way)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 406, in test_vi_reads_its_plant_clause_the_same_way
+    from tools.verdict_g4 import vi_mark
+ImportError: cannot import name 'vi_mark' from 'tools.verdict_g4' (/data/dev/genome-wt-reader-fix/tools/verdict_g4.py)
+
+======================================================================
+ERROR: test_each_question_counts_once_and_the_lexicon_answers (tests.creature.test_verdict_reader_fix_0923.QuestionAnsweredOncePerQuestion.test_each_question_counts_once_and_the_lexicon_answers)
+The review §4/§6: 28 questions, 9 answered — the reader's `answered_rows` counted ear AND eye rows of each maker answer and none
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 218, in test_each_question_counts_once_and_the_lexicon_answers
+    self.assertEqual(m["answered_by_maker"], 2); self.assertEqual(m["answered_by_lexicon"], 2); self.assertEqual(m["answered_by_both"], 1)
+                     ~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'answered_by_maker'
+
+======================================================================
+ERROR: test_a_blind_twin_that_could_not_run_is_not_gradable_never_fail (tests.creature.test_verdict_reader_fix_0923.ReadBlindTwin.test_a_blind_twin_that_could_not_run_is_not_gradable_never_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 436, in test_a_blind_twin_that_could_not_run_is_not_gradable_never_fail
+    m = read_mark(tape, journal, True, {"n": 50, "correct": 40, "share": 0.8}, None, min_words_born=500, min_frames=1,
+        ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  blind_reason="not gradable: no shelf rows on the cut tape — the blind twin would equal the unblinded one")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: read_mark() got an unexpected keyword argument 'blind_reason'
+
+======================================================================
+ERROR: test_a_blind_twin_that_ran_is_graded_and_its_seconds_printed (tests.creature.test_verdict_reader_fix_0923.ReadBlindTwin.test_a_blind_twin_that_ran_is_graded_and_its_seconds_printed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 446, in test_a_blind_twin_that_ran_is_graded_and_its_seconds_printed
+    self.assertTrue(m["clause_blind_twin"]); self.assertTrue(m["pass"]); self.assertEqual(m["blind_twin"]["seconds"], 812.5)
+                                                                                          ~^^^^^^^^^^^^^^
+KeyError: 'blind_twin'
+
+======================================================================
+ERROR: test_the_worker_drops_the_named_source_before_the_mind_sees_a_row (tests.creature.test_verdict_reader_fix_0923.ReadBlindTwin.test_the_worker_drops_the_named_source_before_the_mind_sees_a_row)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 449, in test_the_worker_drops_the_named_source_before_the_mind_sees_a_row
+    from tools.verdict_g4 import rows_for_spec
+ImportError: cannot import name 'rows_for_spec' from 'tools.verdict_g4' (/data/dev/genome-wt-reader-fix/tools/verdict_g4.py)
+
+======================================================================
+ERROR: test_a_fixed_seed_draw_over_the_whole_heard_list_not_the_newest_fifty (tests.creature.test_verdict_reader_fix_0923.ReadSample.test_a_fixed_seed_draw_over_the_whole_heard_list_not_the_newest_fifty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 237, in test_a_fixed_seed_draw_over_the_whole_heard_list_not_the_newest_fifty
+    from tools.verdict_life import read_sample
+ImportError: cannot import name 'read_sample' from 'tools.verdict_life' (/data/dev/genome-wt-reader-fix/tools/verdict_life.py)
+
+======================================================================
+ERROR: test_fewer_than_fifty_eligible_asks_nothing (tests.creature.test_verdict_reader_fix_0923.ReadSample.test_fewer_than_fifty_eligible_asks_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 259, in test_fewer_than_fifty_eligible_asks_nothing
+    from tools.verdict_life import read_sample
+ImportError: cannot import name 'read_sample' from 'tools.verdict_life' (/data/dev/genome-wt-reader-fix/tools/verdict_life.py)
+
+======================================================================
+ERROR: test_words_the_shelf_does_not_own_on_the_cut_tape_are_excluded (tests.creature.test_verdict_reader_fix_0923.ReadSample.test_words_the_shelf_does_not_own_on_the_cut_tape_are_excluded)
+The blind twin (shelf rows dropped) reads 0 BY CONSTRUCTION only on words heard from the shelf alone: 7 of 255 shelf words of
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 250, in test_words_the_shelf_does_not_own_on_the_cut_tape_are_excluded
+    from tools.verdict_life import read_sample
+ImportError: cannot import name 'read_sample' from 'tools.verdict_life' (/data/dev/genome-wt-reader-fix/tools/verdict_life.py)
+
+======================================================================
+ERROR: test_a_record_without_the_gene_is_not_gradable (tests.creature.test_verdict_reader_fix_0923.StageReadinessSeries.test_a_record_without_the_gene_is_not_gradable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 319, in test_a_record_without_the_gene_is_not_gradable
+    m = stage_mark([_sit_boundary(100, False, False, True, False, True)], False, tape=[])
+TypeError: stage_mark() got an unexpected keyword argument 'tape'
+
+======================================================================
+ERROR: test_the_readiness_series_is_printed_beside_the_unchanged_bar (tests.creature.test_verdict_reader_fix_0923.StageReadinessSeries.test_the_readiness_series_is_printed_beside_the_unchanged_bar)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 311, in test_the_readiness_series_is_printed_beside_the_unchanged_bar
+    m = stage_mark(journal, True, tape=tape)
+TypeError: stage_mark() got an unexpected keyword argument 'tape'
+
+======================================================================
+ERROR: test_gaps_in_the_minute_after_a_sleep_are_printed_apart_and_the_bar_stays (tests.creature.test_verdict_reader_fix_0923.ThreadAttributesGapsToSleeps.test_gaps_in_the_minute_after_a_sleep_are_printed_apart_and_the_bar_stays)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 285, in test_gaps_in_the_minute_after_a_sleep_are_printed_apart_and_the_bar_stays
+    m = thread_mark(alive, {"thinks": 300, "think_waits": 0}, True, tape=tape, journal=journal)
+TypeError: thread_mark() got an unexpected keyword argument 'tape'
+
+======================================================================
+FAIL: test_the_mouths_say_is_not_a_game_act_and_the_last_100_lock_fails (tests.creature.test_verdict_reader_fix_0923.ActCensusGameOnlyLast100.test_the_mouths_say_is_not_a_game_act_and_the_last_100_lock_fails)
+The review §6: `left` 96 of the last 100; STATUS `acts_chosen` mixes the mouth's `say` with the seven game acts over the whole
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 133, in test_the_mouths_say_is_not_a_game_act_and_the_last_100_lock_fails
+    self.assertTrue(m["graded"]); self.assertFalse(m["pass"], m)
+                                  ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: True is not false : {'game_outcomes': 121, 'mind_chosen': 121, 'mind_share': 1.0, 'choices_journaled': 0, 'mismatches_journal': 0, 'mismatches_status': 0, 'census': {'left': 103, 'right': 3, 'forward': 3, 'pickup': 3, 'drop': 3, 'toggle': 3, 'done': 3, 'say': 300}, 'max_share': 0.7126, 'zero_acts': [], 'reachable_acts': ['left', 'right', 'forward', 'pickup', 'drop', 'toggle', 'done'], 'reward_mean': 0.0, 'episodes': 1, 'successes': 0, 'success_per_episode': 0.0, 'random_null_success': 0.29, 'bar': 'mind-chosen = 100 % of ≥ 100 game outcomes · mismatches 0 · census: no act ≥ 95 %, no reachable act at 0 · the shuffled-act plant diverges · reward printed, no bar', 'graded': True, 'reason': 'graded (§19.5)', 'pass': True}
+
+======================================================================
+FAIL: test_sizing_reads_the_plant_clause_not_gradable_while_the_plant_was_never_shown (tests.creature.test_verdict_reader_fix_0923.PlantClausesBeforeThePlant.test_sizing_reads_the_plant_clause_not_gradable_while_the_plant_was_never_shown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 400, in test_sizing_reads_the_plant_clause_not_gradable_while_the_plant_was_never_shown
+    self.assertTrue(m["graded"]); self.assertTrue(m["pass"], m); self.assertFalse(m["plant_clause"]["graded"])
+                                  ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: False is not true : {'sight_born': 3329, 'sight_nmax': 4096, 'births_refused_nmax': 0, 'births_refused_budget': 0, 'budget_regenerated': 328, 'prediction': None, 'series_sight_births_per_hour': [1], 'plant_shown_moments': 0, 'plant_sight_births': 0, 'bar': 'under GROW: refused-by-nmax 0 · the plant birthed ≥ 1 sight cell · born printed (no band — there is no prediction under GROW)', 'graded': True, 'pass': False, 'reason': 'graded (§19.11, GROW): refused 0; plant births 0; born 3329 (no band)'}
+
+======================================================================
+FAIL: test_a_64_frame_episode_is_one_meeting (tests.creature.test_verdict_reader_fix_0923.SentenceMissionsPerEpisode.test_a_64_frame_episode_is_one_meeting)
+The review §6: the world-pair-skew gate counted every game FRAME as a mission (≤ 64 an episode), so one episode clears «met ≥ 5»
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 169, in test_a_64_frame_episode_is_one_meeting
+    self.assertEqual(sk["missions"], 3); self.assertEqual(sk["missions_per_frame"], 192)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: 192 != 3
+
+======================================================================
+FAIL: test_enough_structured_episodes_still_grade (tests.creature.test_verdict_reader_fix_0923.SentenceMissionsPerEpisode.test_enough_structured_episodes_still_grade)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/creature/test_verdict_reader_fix_0923.py", line 177, in test_enough_structured_episodes_still_grade
+    self.assertTrue(m["graded"]); self.assertEqual(m["missions"], 159); self.assertEqual(m["missions_per_frame"], 318); self.assertTrue(m["pass"])
+                                  ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: 318 != 159
+
+----------------------------------------------------------------------
+Ran 34 tests in 0.153s
+
+FAILED (failures=4, errors=29)

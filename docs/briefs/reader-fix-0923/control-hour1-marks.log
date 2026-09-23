@@ -1,0 +1,10 @@
+EVOLVE: {'graded': True, 'pass': False, 'proposals': 1, 'void_rounds': 1, 'judged_rounds': 0, 'needed': 1, 'every_h': 6, 'rounds_possible': 0} | graded (§5/§6): 0 judged rounds vs 1 needed (+1 void, printed); paired 0/0; adoptions 0 <= judged rounds; negative control not checked this read
+SENTENCE skew: {'missions': 2, 'missions_per_frame': 121, 'max_lift': None, 'max_lift_per_frame': 2.1607, 'max_pair_per_frame': 'purple ball', 'rows_without_episode': 0}
+SENTENCE mark: False | not gradable: 2 missions < 100 (one per game episode; 121 frames)
+ACT: {'graded': True, 'pass': True, 'game_outcomes': 120, 'mind_chosen': 120, 'census': {'left': 21, 'right': 19, 'forward': 12, 'pickup': 25, 'drop': 15, 'toggle': 14, 'done': 14}, 'max_share': 0.2083, 'census_last100': {'left': 21, 'right': 13, 'forward': 10, 'pickup': 22, 'drop': 12, 'toggle': 13, 'done': 9}, 'max_share_last100': 0.22, 'last_n': 100, 'zero_acts': []} | graded (§19.5; the ≥ 95 % clause on the last 100 game acts)
+READ sample: {'seed': 20260923, 'population_heard': 255, 'excluded_not_on_cut_tape': 0, 'excluded_other_source': ['of', 'and', 'with', 'or', 'to', 'more', 'a'], 'eligible': 248} indices span (1, 251)
+READ sample words: ['project', 'eclectic', 'reader', 'revised', 'anyone', 'anywhere', 'parts', 'restrict', 'license', 'check', 'before', 'using', 'holmes', 'updated', 'october', 'informat', 'transcri', 'schoolro', 'blind', 'man', 'still', 'suitable', 'alternat', 'explanat', 'read', 'write', 'related', 'reading', 'printed', 'handwrit', 'educatio', 'inc', 'new', 'york', 'singapor', 'be', 'method', 'two', 'i', 'sounds', 'occur', 'r', 'certain', 'begin', 'require', 'groups', 'all', 'sentence', 'v', 'american']
+the newest 50 (old rule) overlap with the sample: 7
+lexicon answers on the hour-1 tape: 4 each attributed to exactly one qid by the door's own hash: {('wave', 'lex38333be3'): [0], ('circle', 'lex3f2e53a7'): [5], ('square', 'lex94696115'): [10], ('bar', 'lex102c7401'): [11]}
+maker `answering` qids: ['q-0', 'q-10', 'q-11', 'q-5'] rows stamped: 8
+plant (zog) ear rows on the hour-1 tape: 0

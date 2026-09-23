@@ -29,8 +29,12 @@ class ActMark(unittest.TestCase):
         self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["mind_share"], 1.0); self.assertEqual(m["zero_acts"], [])
 
     def test_a_mismatch_or_a_dead_act_fails(self):
+        # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (3): the census is read off the TAPE's
+        # mind-chosen game outcomes now (STATUS acts_chosen mixes the mouth's say, printed as census_all); this test's tape cycled
+        # left/right/forward while its STATUS said left only — the dead acts are now dead on the tape itself.
         from tools.verdict_life import act_mark
-        m = act_mark(_tape_game(120, 0), [{"seq": 5, "outcome": {"act_mismatch": True}}], {"acts_chosen": {"left": 120, "right": 0, "forward": 0}})
+        tape = _tape_game(0, 0) + [{"seq": 2 + i, "sense": "outcome", "meta": {"source": "game", "chosen_by": "mind", "act": "left", "act_idx": 0, "got": 0.0}} for i in range(120)]
+        m = act_mark(tape, [{"seq": 5, "outcome": {"act_mismatch": True}}], {"acts_chosen": {"left": 120, "right": 0, "forward": 0}})
         self.assertTrue(m["graded"]); self.assertFalse(m["pass"]); self.assertEqual(m["mismatches_journal"], 1); self.assertEqual(sorted(m["zero_acts"]), ["forward", "right"])
 
     def test_shift_acts_moves_only_mind_chosen_game_outcomes_and_keeps_the_input(self):
@@ -93,8 +97,11 @@ class SizingMark(unittest.TestCase):
         self.assertFalse(sizing_mark(st, j, None, grow=True)["pass"], "GROW must never refuse for room -- any refusal is a real defect")
 
     def test_grow_fails_without_the_plants_birth(self):
+        # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (10): the plant clause is not gradable while
+        # the plant was never shown; this test's journal never showed «zog» — it now shows it (no sight birth) and the FAIL is the plant's.
         from tools.verdict_life import sizing_mark
-        j = [{"moment": "w1", "when": "2026-09-23T12:00:00Z", "word": "circle", "births": [["sight", 1, "novelty"]]}]
+        j = [{"moment": "w1", "when": "2026-09-23T12:00:00Z", "word": "circle", "births": [["sight", 1, "novelty"]]},
+             {"moment": "w2", "when": "2026-09-23T13:00:00Z", "word": "zog", "births": []}]
         st = {"sight_born": 50000, "sight_nmax": 65536, "births_refused_nmax": 0,
               "births_refused_budget": 0, "budget_regenerated": 0}
         self.assertFalse(sizing_mark(st, j, None, grow=True)["pass"])
@@ -366,7 +373,9 @@ class QuestionMark(unittest.TestCase):
 
     def test_rate_after_hour_two_and_the_answered_share(self):
         from tools.verdict_life import question_mark
-        journal = [{"seq": i, "question": {"q": "what-is", "args": ["w%d" % i]}, "when": "2026-09-23T%02d:00:00Z" % (3 + i % 20)} for i in range(24)]
+        # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (5): the question payload carries its ask/out
+        # index `seq` (creature/mind.py:_maybe_ask, always) — the qid the doors answer as `q-<seq>`; the mark now counts each question once.
+        journal = [{"seq": i, "question": {"q": "what-is", "args": ["w%d" % i], "from": "mind", "seq": i}, "when": "2026-09-23T%02d:00:00Z" % (3 + i % 20)} for i in range(24)]
         tape = [{"seq": 100 + i, "sense": "eye", "meta": {"source": "maker", "answering": "q-%d" % i}} for i in range(12)]
         m = question_mark(journal, tape, {"questions_written": 24, "questions_answered": 12}, 24.0, True)
         self.assertTrue(m["graded"]); self.assertTrue(m["pass"]); self.assertEqual(m["questions"], 24); self.assertEqual(m["answered_rows"], 12); self.assertAlmostEqual(m["answered_share"], 0.5)
