@@ -27,7 +27,7 @@ class ReaderVolatileFields(unittest.TestCase):
 
     def test_reader_version_names_v32(self):
         from tools.verdict_g4 import READER_VERSION
-        self.assertIn("v3.2", READER_VERSION)
+        self.assertIn("v3.3", READER_VERSION)   # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 bumped the reader to v3.3 (#237 (j))
 
 
 if __name__ == "__main__":

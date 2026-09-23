@@ -1,0 +1,95 @@
+verdict before: FAIL ['v_retention', 'vi_knows_unknown', 'vii_replay', 'MODULATION', 'viii_cost', 'W3_2_rules', 'DOOR', 'PARK', 'GRADE', 'COARSE', 'ALIVE']
+verdict after:  FAIL ['vi_knows_unknown', 'vii_replay', 'viii_cost', 'W3_2_rules', 'DOOR', 'PARK', 'GRADE', 'COARSE', 'ALIVE']
+not gradable after: [['v_retention', "not gradable: no odd window with exams on both sides (the maker's second window has not closed on this record)"], ['MODULATION', "no window change on this tape yet (e.g. a smoke shorter than the maker's window) — not gradable; the regime band is still derived and printed under 'regime'"], ['ACT', 'not gradable: 72 game outcomes < 100'], ['SOUND', "not gradable: heard 0 s — no ear-sound row on the tape (the world is silent; the plan's §10 names the rung that brings a voice)"], ['SIZING', 'not gradable: no sizing prediction on the record (PREREG §19.11 is written at the pre-flight)'], ['SELF', 'not gradable: 18 body rows < 24'], ['SURPRISE', 'not gradable: 0 maker things with ≥ 30 showings / 326 canvases (needs ≥ 1000)'], ['QUESTION', 'not gradable: 0.3 h < 2 h (questions are graded after hour 2)'], ['SENTENCE', 'not gradable: 2 missions < 100 (one per game episode; 73 frames)'], ['HANDS', 'not gradable: 0 runs < 20'], ['EVOLVE', 'not gradable: EVOLVE not declared on this life'], ['READ', 'not gradable: SENSE_READ not declared on this life'], ['WEB', 'not gradable: DOOR_WEB not declared on this life'], ['STAGE', 'not gradable: STAGE_READY ("by READY") not declared on this life'], ['TWINS.no_curiosity', 'the door is ON but CURIOSITY does not choose doors yet (the web door, W3-6) — not graded'], ['TWINS.no_park', 'reported: no-park twin parked 0 vs live 0'], ['TWINS.no_sleep_v', "SLEEP's retention is not gradable on drawn worlds (§10)"]]
+missing graded: []
+
+89 differing leaves in 24 places:
+  marks.ACT: 15
+      marks/ACT/bar | mind-chosen = 100 % of ≥ 100 game outcomes · mismatches 0 · census: no act ≥ 95  -> mind-chosen = 100 % of ≥ 100 game outcomes · mismatches 0 · census over the GAME
+      marks/ACT/census/done | 11 -> 9
+      marks/ACT/census/drop | 12 -> 9
+      marks/ACT/census/forward | 11 -> 6
+      marks/ACT/census/left | 12 -> 9
+      marks/ACT/census/pickup | 21 -> 18
+  marks.EVOLVE: 6
+      marks/EVOLVE/bar | proposals >= 3 scaled to the record's own hours (min 1) · every proposal paired  -> JUDGED rounds >= 3 scaled to the record's own hours (min 1; a void round — no re
+      marks/EVOLVE/every_h | <absent> -> new
+      marks/EVOLVE/judged_rounds | <absent> -> new
+      marks/EVOLVE/rounds_possible | <absent> -> new
+      marks/EVOLVE/void_round_reasons | <absent> -> new
+      marks/EVOLVE/void_rounds | <absent> -> new
+  marks.GRADE: 4
+      marks/GRADE/bar | null sure-bare ≤ 1/10 · null unsure+abstain ≥ 8/10 (a tie fails) · plant ANSWERE -> null sure-bare ≤ 1/10 · null unsure+abstain ≥ 8/10 (a tie fails) · plant ANSWERE
+      marks/GRADE/plant_clause | <absent> -> new
+      marks/GRADE/plant_shown | <absent> -> new
+      marks/GRADE/reason | graded (§19.3) -> graded (§19.3); the plant clause not gradable: plant shown 0 (the plant lands at
+  marks.MODULATION: 2
+      marks/MODULATION/graded | <absent> -> new
+      marks/MODULATION/pass | False -> None
+  marks.QUESTION: 13
+      marks/QUESTION/answered | <absent> -> new
+      marks/QUESTION/answered_by_both | <absent> -> new
+      marks/QUESTION/answered_by_lexicon | <absent> -> new
+      marks/QUESTION/answered_by_maker | <absent> -> new
+      marks/QUESTION/answered_share | 2.0 -> 1.0
+      marks/QUESTION/bar | questions ≥ (hours − 2)/2 · the answered share printed (prediction ≥ 0.5 for mak -> questions ≥ (hours − 2)/2 · the answered share printed (prediction ≥ 0.5 for mak
+  marks.READ: 2
+      marks/READ/blind_twin | <absent> -> new
+      marks/READ/reading_sample | <absent> -> new
+  marks.SENTENCE: 9
+      marks/SENTENCE/max_lift | 9.125 -> None
+      marks/SENTENCE/max_lift_per_frame | <absent> -> new
+      marks/SENTENCE/max_pair | purple ball -> None
+      marks/SENTENCE/max_pair_per_frame | <absent> -> new
+      marks/SENTENCE/missions | 73 -> 2
+      marks/SENTENCE/missions_per_frame | <absent> -> new
+  marks.SIZING: 1
+      marks/SIZING/plant_clause | <absent> -> new
+  marks.STAGE: 7
+      marks/STAGE/all_five_held | <absent> -> new
+      marks/STAGE/bar | the stage series by moment, each with its five readings · at most ONE stage-4 ev -> the stage series by moment, each with its five readings · at most ONE stage-4 ev
+      marks/STAGE/held | <absent> -> new
+      marks/STAGE/longest_all_five_streak | <absent> -> new
+      marks/STAGE/readiness_boundaries | <absent> -> new
+      marks/STAGE/readiness_note | <absent> -> new
+  marks.THREAD: 10
+      marks/THREAD/attribution_rule | <absent> -> new
+      marks/THREAD/bar | max sense gap ≤ 5.1 s · think_waits / thinks < 5% -> max sense gap ≤ 5.1 s · think_waits / thinks < 5% (gaps attributed to sleeps, pr
+      marks/THREAD/gaps_over_bar | <absent> -> new
+      marks/THREAD/max_gap_in_sleep_minutes_s | <absent> -> new
+      marks/THREAD/max_gap_outside_sleep_minutes_s | <absent> -> new
+      marks/THREAD/over_bar_in_sleep_minutes | <absent> -> new
+  marks.TWINS: 1
+      marks/TWINS/random_gaze_loses_xi/graded | <absent> -> new
+  marks.i_knows: 1
+      marks/i_knows/graded | <absent> -> new
+  marks.ii_meeting_real: 1
+      marks/ii_meeting_real/graded | <absent> -> new
+  marks.iii_growth_matters: 1
+      marks/iii_growth_matters/graded | <absent> -> new
+  marks.iv_grows_alone: 1
+      marks/iv_grows_alone/graded | <absent> -> new
+  marks.v_retention: 3
+      marks/v_retention/graded | <absent> -> new
+      marks/v_retention/pass | False -> None
+      marks/v_retention/reason | <absent> -> new
+  marks.vi_knows_unknown: 4
+      marks/vi_knows_unknown/bar | plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20 -> plant majority answered (not gradable while the plant was never shown) · null ma
+      marks/vi_knows_unknown/graded | <absent> -> new
+      marks/vi_knows_unknown/plant_clause | <absent> -> new
+      marks/vi_knows_unknown/plant_shown | <absent> -> new
+  marks.vii_replay: 1
+      marks/vii_replay/graded | <absent> -> new
+  marks.viii_cost: 2
+      marks/viii_cost/form | <absent> -> new
+      marks/viii_cost/g4_7 | <absent> -> new
+  marks.x_gaze_finds_thing: 1
+      marks/x_gaze_finds_thing/graded | <absent> -> new
+  marks.xi_gaze_earns_place: 1
+      marks/xi_gaze_earns_place/graded | <absent> -> new
+  marks_failed: 1
+      marks_failed | ['v_retention', 'vi_knows_unknown', 'vii_replay', 'MODULATION', 'viii_cost', 'W3 -> ['vi_knows_unknown', 'vii_replay', 'viii_cost', 'W3_2_rules', 'DOOR', 'PARK', 'G
+  marks_missing_graded: 1
+      marks_missing_graded | <absent> -> new
+  marks_not_gradable: 1
+      marks_not_gradable | <absent> -> new
