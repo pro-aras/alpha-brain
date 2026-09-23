@@ -76,6 +76,12 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # untouched, the negative control test_grow_mechanics.py:TestInitialCapacity pins).
         "GROW": "genome/machinery.py:Organism.__init__ (Area/W initial capacity) + Organism._birth (Area.grow()'s doubling, "
                 "Organism._grow_W()'s fixed +2048 chunks — never a births_refused_nmax refusal)",
+        # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:58 +0400 — A4L-COST (docs/briefs/A4L-COST.md; docs/A4-LADDER-PREREG.md
+        # §2.1): HASH's own row — real call sites, all gated on `"HASH" in declared` at Organism.__init__ (an undeclared HASH builds no
+        # witness, and row_hash() is state_hash(), byte-identical — the negative control).
+        "HASH": "genome/machinery.py:Organism.row_hash (the per-row witness: genome/witness.py's SPARSE digest when declared) + "
+                "Organism._hebb/_prune/_merge (mark the rows whose MASK they change) + creature/mind.py's five hashed journal rows; "
+                "Organism.save keeps the DENSE state_hash in the snapshot meta (load's verification chain unchanged)",
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — L-6 (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1/#2): THRESH's own consumer is Organism.moment's push + Organism.own_floor (both gated on
         # `self.sight.own_band is not None`, itself gated on THRESH's own declared presence at __init__); ANSWER's

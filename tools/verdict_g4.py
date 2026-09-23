@@ -1043,6 +1043,9 @@ def main(argv: List[str]) -> int:
     # record and calls the pure marks; lifted out of main() so a test reads the LAST link (#180).
     M["CHAT"] = chat_read(root, tape, live, G["exams"], decl, twins_dir,
                           a.chat_pointing_ceiling if a.chat_pointing_ceiling is not None else _vl.CHAT_POINTING_CEILING_PRELIFE, G["t0"])
+    # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:59 +0400 — A4L-COST (A4-LADDER-PREREG §2.1 C1 (iii)): the reader's own unblinded replay IS a replay under
+    # the life's code+genome when the commits agree (hash unmasked); the floor's replay (ii) is the tape twin's (§1.4 (c)), not this reader's.
+    M["HASH"] = _vl.hash_law_mark(live, st, "HASH" in decl, replay_same=(u1 if not _ign else None))
     M["PLANTS"]["predict_file_pair"] = {"sight_road_rows": live_pred["sight_road_rows"], "rule_rows_filed": live_pred["filed"], "rule_rows_scored": live_pred["scored"], "status_predictions_filed": st.get("predictions_filed")}
     M["PLANTS"]["park_unanswerable_want"] = {"sight_only_rows": len(sight_only), "first_seq": sight_only[0]["seq"] if sight_only else None, "parked_total": parked}
     M["PLANTS"]["belief_contradiction"] = {"clash_rows": kinds.get("clash", 0), "extension_rows": kinds.get("extension", 0)}
@@ -1201,13 +1204,30 @@ def _viii_g4_7(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns) -> dic
          "solo_ms_per_canvas_replay": solo_ms, "unblinded_replay_ms_under_workers": unblinded_ms,
          "cpu_hours": round(cpu_ns / 3.6e12, 3) if cpu_ns else None,
          "bar": "G4-7: live ms per CANVAS (STATUS.mind_ms_per_canvas_1min) ≤ 2× the solo probe's · RSS < 2 GB (the 24 h CPU bill printed)",
-         "reason": ""}
+         "reason": "",
+         # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:59 +0400 — A4L-COST task 5: the per-row witness's form and its own ms (STATUS, #164)
+         "hash_form": status.get("hash_form", "not recorded"), "hash_ms_last": status.get("hash_ms_last", "not recorded")}
     if not graded:
         m["reason"] = ("STATUS carries only the per-row median (mind_ms_median_1min), which is not the probe's unit (ms per canvas, #162): "
                        "not graded — every (viii) PASS before 2026-09-22 was a reading of this instrument")
         return m
     m["pass"] = (rss is not None and rss < 2048) and (solo_ms is None or solo_ms <= 0 or per_canvas <= 2 * solo_ms)
     return m
+
+
+# edit: Claude (Fable 5.1), 2026-09-23 12:49 +0400 — the merge of A4L-COST task 5 (one renderer for the (viii) row, the witness's form and ms beside the
+# cost) with READER-FIX-0923 (2) (the §8b function-of-cells form): ONE `cost_line` for BOTH forms; `gv` is the renderer's own when given.
+def cost_line(m: dict, gv=None) -> str:
+    def _gv(x): return (("PASS" if x.get("pass") else "FAIL") if x.get("graded") else "not graded")
+    gv = gv or _gv
+    form = m.get("hash_form", "not recorded")
+    hash_part = " · hash not recorded" if form == "not recorded" else f" · hash {form} {m.get('hash_ms_last')} ms a row"
+    tail = f"{hash_part}{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |"
+    if m.get("form") == "§8b":
+        _pts = " · ".join(f"{p['ms_per_cell']} at {p['cells']:,}" for p in m.get("review_points") or [])
+        _g = m.get("g4_7") or {}
+        return (f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas at {m['cells_alive']} alive cells = {m['per_cell_ms']} ms/cell vs the bar {m['bar_per_cell_ms']} ms/cell ({m['bar_ms']} ms) · the review's points (ms/cell at cells): {_pts} · {m['reading_window']}; sleeps in its last 3 min {m.get('sleeps_in_window')} · RSS {m['rss_mb_last_status']} MB (a peak) · CPU {m['cpu_hours']} h · G4-7 beside (not graded): {gv(_g)} vs solo {_g.get('solo_ms_per_canvas_replay')} ms" + tail)
+    return (f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo {m.get('solo_ms_per_canvas_replay')} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h" + tail)
 
 
 # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (2): ALPHA4-PREREG §8b's COST bar, «stated as a FUNCTION,
@@ -1247,6 +1267,7 @@ def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns, grow: b
          "live_mind_ms_median_per_row": status.get("mind_ms_median_1min"), "cpu_hours": g47.get("cpu_hours"),
          "reading_window": "ONE 1-min window: STATUS's last write (heartbeat %s) — no per-canvas series exists on any record" % status.get("heartbeat_at"),
          "sleeps_in_window": sleeps_in_window, "g4_7": g47,
+         "hash_form": g47.get("hash_form", "not recorded"), "hash_ms_last": g47.get("hash_ms_last", "not recorded"),   # A4L-COST task 5, carried onto the §8b form at the merge
          "bar": f"ALPHA4-PREREG §8b: live ms per CANVAS (STATUS.mind_ms_per_canvas_1min) ≤ {factor} × {per_cell_ms} ms × the life's own final alive cells (STATUS cells); G4-7 printed beside, not graded",
          "reason": ""}
     if per_canvas is None:
@@ -1342,13 +1363,7 @@ def write_verdict(out: Path, R: dict) -> None:
     m = M["v_retention"]; L.append(f"| (v) | {m['bar']} | " + ("; ".join(f"w{p['window']}: {p['before']:.3f} → first {p['first_after']:.3f} → last {p['last_in_window']:.3f} ({p['drop_pp']:+.1f} pp drop)" for p in m['pairs']) or m['note']) + f"{_why(m)} | {gv(m)} |")
     m = M["vi_knows_unknown"]; _pc = m.get("plant_clause") or {}
     L.append(f"| (vi) | {m['bar']} | plant zog answered {m['plant_zog']['answered_rate']:.2f} (as {m['plant_zog']['answered_as']}, abstain {m['plant_zog']['abstain']}; plant shown {m.get('plant_shown')} — plant clause {'graded' if _pc.get('graded', True) else 'NOT GRADABLE'}) · null vex abstains {m['null_vex']['abstain_rate']:.2f} (answered as {m['null_vex']['answered_as']}) · Q5 {m['Q5_spiral_abstain']:.2f} · false {m['false_abstention']:.3f} | {gv(m)} |")
-    m = M["viii_cost"]
-    if m.get("form") == "§8b":
-        _pts = " · ".join(f"{p['ms_per_cell']} at {p['cells']:,}" for p in m.get("review_points") or [])
-        _g = m.get("g4_7") or {}
-        L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas at {m['cells_alive']} alive cells = {m['per_cell_ms']} ms/cell vs the bar {m['bar_per_cell_ms']} ms/cell ({m['bar_ms']} ms) · the review's points (ms/cell at cells): {_pts} · {m['reading_window']}; sleeps in its last 3 min {m.get('sleeps_in_window')} · RSS {m['rss_mb_last_status']} MB (a peak) · CPU {m['cpu_hours']} h · G4-7 beside (not graded): {gv(_g)} vs solo {_g.get('solo_ms_per_canvas_replay')} ms{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
-    else:
-        L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo {m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
+    m = M["viii_cost"]; L.append(cost_line(m, gv))   # A4L-COST: one renderer (cost_line, above) for both forms — the witness beside the cost
     if "ix_not_luck" in M:
         m = M["ix_not_luck"]; L.append(f"| (ix) | {m['bar']} | rank {m['rank_of_own']} of {m['of']} (own {m['own_composite']}; best random {m['best_random']}){_why(m)} | {gv(m)} |")
     m = M["x_gaze_finds_thing"]; L.append(f"| (x) | {m['bar']} | gaze {m['gaze_rate']:.3f} vs random {m['random_rate']:.3f} (×{m['ratio']}) | {gv(m)} |")
@@ -1365,10 +1380,13 @@ def write_verdict(out: Path, R: dict) -> None:
     m = M["W3_1_beliefs"]; L.append(f"| W3-1 beliefs | {m['bar']} | rows {m['rows']} · kinds {m['kinds']} · standing words {m['standing_words']} of {m['words_heard']} heard · max belief rows per word {m['max_belief_rows_per_word']} · extra belief rows {m['extra_belief_rows']} vs clash rows {m['clash_rows']} · unaccounted {m['unaccounted']} | {gv(m)} |")
     m = M["PARK"]; L.append(f"| PARK | {m['bar']} | parked {m['parked']} of {m['thinks']} thinks (rules {m['parked_rules']}) — {m['reason']} | {gv(m)} |")
     # edit: Claude (Fable 5.1), 2026-09-22 19:3x +0400 — THE ONE LIFE's marks (PREREG §19)
-    for _k in ("ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD", "READ", "EVOLVE", "WEB", "STAGE"):
+    for _k in ("ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD", "HASH", "READ", "EVOLVE", "WEB", "STAGE"):
         if _k in M:
             m = M[_k]
-            if _k == "THREAD":
+            if _k == "HASH":     # A4L-COST (Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:59 +0400)
+                body = (f"form {m.get('status_hash_form')} · hash ms last {m.get('status_hash_ms_last')} · hashed rows {m.get('hash_rows')} · "
+                        f"(iii) {m.get('iii')} · (ii) {m.get('ii')} — {m['reason']}")
+            elif _k == "THREAD":
                 body = (f"max sense gap {m.get('max_gap_s')} s (eye/ear {m.get('gaps_per_hour')}) · in the minute after a sleep: max {m.get('max_gap_in_sleep_minutes_s')} s, "
                         f"{m.get('over_bar_in_sleep_minutes')} over the bar · outside those minutes: max {m.get('max_gap_outside_sleep_minutes_s')} s, {m.get('over_bar_outside_sleep_minutes')} over the bar "
                         f"({m.get('sleeps_on_record')} sleeps) · thinks {m.get('thinks')} waits {m.get('think_waits')} (share {m.get('waits_share')}, {m.get('think_wait_ms')} ms) · think ms last {m.get('think_ms_last')} median {m.get('think_ms_median')} — {m['reason']}")

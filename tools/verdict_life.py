@@ -1164,3 +1164,86 @@ def chat_marks(chat_out: Dict[str, dict], chat_truth: Dict[str, dict], tape: Ite
     else:
         M["disjoint"] = {"checked": 0, "ok": None, "reason": "not checked (no canvases handed in)"}
     return M
+# edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:58 +0400 — A4L-COST task 5 (docs/briefs/A4L-COST.md; docs/A4-LADDER-PREREG.md §1.9, §2.1 C1):
+# the rung's own mark, a PURE function over the landed row shapes (#171/#173) — «not gradable» on a life whose genome does not declare HASH
+# (the hour-1 fixture is the control: alpha4-1's genome declares none), else C1 (ii)/(iii) read from a record and a replay.
+_NON_MIND_EVENTS = frozenset({"start", "sense_restart", "snapshot", "stop", "exam"})   # creature/replay.py's NON_MIND_EVENTS, repeated so this
+                                                                                         # module stays import-light; a test pins them equal
+
+
+def _first_diff(record: List[dict], replay: List[dict], ignore=()) -> Optional[Tuple[int, str]]:
+    """creature/replay.py:compare's rule, pure: rows grouped by seq into ordered lists and compared field by field (minus `ignore`); the
+    first (seq, field) that differs, a row-count mismatch at a seq, or a seq present on one side only."""
+    a: Dict[int, List[dict]] = {}; b: Dict[int, List[dict]] = {}
+    for r in record:
+        a.setdefault(int(r["seq"]), []).append(r)
+    for r in replay:
+        b.setdefault(int(r["seq"]), []).append(r)
+    skip = set(ignore)
+    for seq in sorted(set(a) | set(b)):
+        ra, rb = a.get(seq), b.get(seq)
+        if ra is None:
+            return seq, "<missing from the record>"
+        if rb is None:
+            return seq, "<missing from the replay>"
+        if len(ra) != len(rb):
+            return seq, f"<row count: record {len(ra)} vs replay {len(rb)}>"
+        for x, y in zip(ra, rb):
+            for key in sorted((set(x) | set(y)) - skip):
+                if x.get(key) != y.get(key):
+                    return seq, key
+    return None
+
+
+def hash_law_mark(journal: Iterable[dict], status: dict, declared: bool, replay_same: Optional[List[dict]] = None,
+                  replay_floor: Optional[List[dict]] = None) -> Dict[str, object]:
+    """A4-LADDER-PREREG §2.1 C1, read from a record and a replay. (iii) a replay of the life's own tape under the RUNG's code and genome is
+    identical to the record INCLUDING `hash` — the sparse witness replays; (ii) a replay under the FLOOR genome (no HASH line) is identical
+    EXCEPT `hash`, and every hashed row's value differs (the sparse digest is domain-separated) — the witness decides nothing; STATUS names
+    the form it ran (`hash_form` sparse; a HASH life whose STATUS says dense did not run the sparse witness). Each clause is graded on what
+    is given; a missing replay is printed «not read». «not gradable» when HASH is undeclared (the dense per-row witness) or no replay is
+    given. `journal`: the life's mind rows (event bookkeeping rows are dropped here)."""
+    J = [r for r in journal if r.get("event") not in _NON_MIND_EVENTS]
+    hashed = [r for r in J if "hash" in r]
+    form = status.get("hash_form", "not recorded")
+    out: Dict[str, object] = {"mind_rows": len(J), "hash_rows": len(hashed), "status_hash_form": form,
+                              "status_hash_ms_last": status.get("hash_ms_last", "not recorded"),
+                              "iii": None, "iii_first_diff": None, "ii": None, "ii_first_diff": None, "hash_rows_differing_from_floor": None,
+                              "bar": "(iii) the rung's replay identical INCLUDING hash · (ii) the floor's replay identical EXCEPT hash, every hashed "
+                                     "row's value differing · STATUS hash_form sparse"}
+    if not declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: HASH not declared on this life (the dense per-row witness — the floor)")
+        return out
+    if replay_same is None and replay_floor is None:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: no replay given (C1 (ii)/(iii) are read from a record AND a replay)")
+        return out
+    ok = form != "dense"
+    if replay_same is not None:
+        S = [r for r in replay_same if r.get("event") not in _NON_MIND_EVENTS]
+        d = _first_diff(J, S)
+        out["iii_first_diff"] = list(d) if d else None
+        out["iii"] = "identical including hash" if d is None else f"DIVERGED at seq {d[0]} ({d[1]})"
+        ok = ok and d is None
+    else:
+        out["iii"] = "not read (no replay under the rung's own code and genome given)"
+    if replay_floor is not None:
+        F = [r for r in replay_floor if r.get("event") not in _NON_MIND_EVENTS]
+        d = _first_diff(J, F, ignore=("hash",))
+        out["ii_first_diff"] = list(d) if d else None
+        out["ii"] = "identical except hash" if d is None else f"DIVERGED at seq {d[0]} ({d[1]})"
+        fh: Dict[int, List[str]] = {}
+        for r in F:
+            if "hash" in r:
+                fh.setdefault(int(r["seq"]), []).append(r["hash"])
+        seen: Dict[int, int] = {}; differ = 0
+        for r in hashed:
+            s_ = int(r["seq"]); i_ = seen.get(s_, 0); seen[s_] = i_ + 1
+            other = fh.get(s_, [])
+            differ += (i_ < len(other) and other[i_] != r["hash"])
+        out["hash_rows_differing_from_floor"] = differ
+        ok = ok and d is None and differ == len(hashed)
+    else:
+        out["ii"] = "not read (the floor's replay of this tape is the tape twin's, A4-LADDER-PREREG §1.4 (c))"
+    out.update(graded=True, **{"pass": bool(ok)},
+               reason="graded (A4-LADDER-PREREG §2.1 C1)" + ("" if form != "dense" else " — STATUS says the life ran the DENSE witness"))
+    return out

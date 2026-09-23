@@ -347,6 +347,11 @@ class Body:
             # edit: Claude (Fable 5.1), 2026-09-22 10:49 +0400 — rows delivered by the senses and not yet consumed: a mind behind its world
             # (g5-seam-1 sat 6,917 rows behind under the readers' load, 2026-09-22 10:34 +04, and no surface said so — #164, #180)
             "mind_backlog_rows": self.q.qsize(),
+            # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:58 +0400 — A4L-COST task 5: the per-row witness's FORM and its own cost
+            # (ms of the LAST row hash, measured by the organism — genome/witness.py) on EVERY write (#164): "dense" and the dense digest's
+            # ms on a genome that does not declare HASH (the floor), "sparse" and the sparse digest's ms under it; None before any row.
+            "hash_form": str(getattr(org, "hash_form", "dense")),
+            "hash_ms_last": (round(float(v), 3) if (v := getattr(org, "hash_ms_last", None)) is not None else None),
             "rss_mb": round(_rss_mb(), 2), "crash": crash,
             # edit: Claude (Fable 5.1), 2026-09-19 23:17 +0400 — PREREG §11.1 step 3's STATUS fields, written on EVERY status write (#164):
             # the mind computed them (think_counters) and nothing exported them (#163's class: computing and exporting differ).
