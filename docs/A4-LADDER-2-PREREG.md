@@ -1,0 +1,67 @@
+# A4 LADDER 2 — PRE-REGISTRATION: the fixed organisms in parallel, tonight (written 2026-09-23 17:08 +0400, before any landing is gated or any genome assembled)
+*Claude (Fable 5.1), orchestrator. His direction, 2026-09-23 16:54 +04, verbatim: «The parallel mixed with alpha 4 we had to run the organisms, whatever we found so far from alpha 4's finding, why don't we fix those and run those organisms in parallel?» His decisions of 16:56: «Pure road, and yes fix that Gutenberg part».*
+
+## 0 · In ten lines
+1. Ladder 1 (five 8 h rungs, A4-LADDER-PREREG) closes 21:41–21:43 and frees five lives' cores; alpha4-1 runs to its 05:00 close. Ladder 2 launches into that room tonight: **the fixes alpha4-1's first day found, each a rung**, on ONE integration commit **C2** (a4-integration, 51f71ba at writing + tonight's green landings), everything gated the same way as ladder 1 (§1.6: `gate_g5_landing` + the hour-1 regression per landing).
+2. **The law is ladder 1's** (A4-LADDER-PREREG §1, items 1–10, by reference) with three stated changes: (a) ONE code version for ALL rungs (C2) instead of one per rung — the fixes are machinery proven byte-identical on the hour-1 fixture, and a live FLOOR′ rung on C2 carries the machinery's own attribution; (b) a **cutoff: a rung whose landing is not green by 00:30 +04 does not launch** — it joins alpha4-2; (c) **the reads are deferred** (§4): no reader runs beside a life.
+3. Two controls launch first: **R0 a4l2-floor** (A4L-FLOOR.genome unchanged, on C2 — the live machinery control) and **R0b a4l2-cost** (A4L-COST.genome unchanged, today's rung's own genome, on C2 — #237 (f)'s live identity with today's a4l-cost).
+4. Three one-difference rungs: **R1 a4l2-act** (the act's VALUE, G3 — never run live; today's EXPLORE rung was not launched), **R2 a4l2-line** (SENTENCE judged on the LINE moment, G9 — if B2's ceiling ≥ 0.1 and it lands), **R3 a4l2-nursery** (`; gutenberg body only`, G10 — his 16:56 word; a WORLD change).
+5. The top rung **R5 a4l2-all**: the alpha4-2 CANDIDATE — ALPHA4 (EVOLVE ON) + G3 + G4 + G5 + G6 + G7 + G8 + G9 + G10, everything ON, launched LAST (§1.8's load guard names it first).
+6. Six lives beside alpha4-1 for its last ≈ 3.5 h (today five ran beside it from 13:39; its backlog crossed 100 at 16:27 by its own cost — §12 of ALPHA4-PREREG). The load guard of §1.8 stands: if alpha4-1's backlog rises faster than its pre-launch slope + 200 rows/h for 30 min after a launch, the LAST-launched rung stops whole — never alpha4-1.
+7. **Predictions are written in §7 before the run**; the 8 h numbers of today's a4l-cost (its check at 21:39) are pasted into §7 as an addendum with its stamp BEFORE ladder 2 launches, because R0b's prediction is «equal to them».
+8. The reads: alpha4-1's STOP at 05:00 stays (waiter v3); its heavy reads and ladder 1's five wait until ladder 2 closes (≈ 10:00); then in pairs from pinned checkouts; ladder 2's own reads after; **the ladder-2 verdict ≈ 16:00 on 09-24; alpha4-2 (24 h) assembled after every read — target 18:00 on 09-24.**
+9. What this document does NOT do: adopt G4–G8 (today's rungs' reads decide, by ALPHA4-2-PREREG's adoption clauses); call R5 «alpha4-2»; loosen any bar; restart anything — a FAIL is a result (§1.10).
+10. The pure road (his 16:56): no interpreter organ exists in any rung; R5's CHAT door is the creature's own cells' words, as a4l-lang's.
+
+## 1 · The law — ladder 1's, with three changes
+A4-LADDER-PREREG §1 items 1 (one difference), 2 (the floor), 4 (the controls), 6 (landing), 7 (pre-flight, 20 min on the exact road), 8 (the load guard), 9 (marks test-first, «not gradable» where undeclared), 10 (a FAIL is a result) apply verbatim. **Changed, with the reason:**
+- **§1.3 → one code version for ALL rungs: C2.** Ladder 1 ran each rung on its own branch because each rung's machinery was its own. Ladder 2's differences are gene LINES on a shared machinery whose every change is (i) proven byte-identical on the hour-1 fixture under ALPHA4.genome and FLOOR (masked on `readiness` — the judge-units change, numbers for booleans, declared) and (ii) carried live by R0 against alpha4-1's hours 0–8 and by R0b against today's a4l-cost. Where a machinery change is NOT inert by design (M1 the judge's units: the readiness rows and the door; M4 the sitter's unit: the exam cadence; the ledger thing-word rule: inert inside 8 h, the ring wraps at 11.6 h), it is listed here as a declared machinery difference of the whole ladder against ladder 1, attributed by R0.
+- **§1.5 → at most six rungs, and a cutoff.** A landing not green by **00:30 +04** does not launch; the rung joins alpha4-2. If only R0, R0b and R1 are launchable (R1 needs no landing — a4l-explore is merged), the ladder still launches with those three.
+- **§1.4 (a) → the age-matched control** is alpha4-1's hours 0–8 as before, AND for R0b today's a4l-cost's own 8 h record (same genome, same seed, same world).
+
+## 2 · The rungs
+| rung | genome (`genome/ladder2/`) | the ONE difference vs R0 | launches if | the mark(s) read at 8 h | 
+|---|---|---|---|---|
+| **R0 a4l2-floor** | `A4L2-FLOOR.genome` = `A4L-FLOOR.genome` byte-for-byte | none (the machinery control on C2) | gate run 3 on C2 PASS | ladder 1's twelve + §5's, as check.py/verdict read them; vs alpha4-1's 0–8 h |
+| **R0b a4l2-cost** | `A4L2-COST.genome` = `A4L-COST.genome` byte-for-byte | `HASH sparse; dense at snapshot` (today's rung's line) | same | **identity with today's a4l-cost's 8 h check: cells, sight_born, births, sleeps** (#237 (f)) |
+| **R1 a4l2-act** | FLOOR + `ACT value reward 10; optimism 1` | the act's VALUE (A4-LADDER-PREREG §2.5; ALPHA4-2-PREREG §2.1) | same | **X1 the lock absent** (no act ≥ 50 % of any sliding 100-choice window of game acts after hour 1) — the bar; X2 success/episode PRINTED, no bar (≈ 13 episodes: the null's 95 % bound sits above the state-blind ceiling) |
+| **R2 a4l2-line** | FLOOR + `SENTENCE two-word frames from co-occurring words; judged by the eye on the line; never next-token` | the frame scorer on the LINE moment (G9) | B2's ceiling ≥ 0.1 AND its landing green by 00:30 | shelf frames scored TRUE > 0 (alpha4-1: 0 of 63); the ceiling printed beside; precision vs the shuffled twin printed; game frames unchanged |
+| **R3 a4l2-nursery** | FLOOR + `SENSE read …; gutenberg body only` | the nursery filter (G10, his word) — a WORLD change | B3's landing green by 00:30 | hour-1 heard words carry none of the 129 header tokens («gutenberg», «ebook», «www», «license»); HEARD.json differs from R0's from word 1 (the order shifted by 129); READ mark within noise of R0 |
+| **R5 a4l2-all** | `A4L2-ALL.genome` = ALPHA4 (EVOLVE ON) + G3 + G4 + G5 + G6 + G7 (+ the sound chunk) + G8 CHAT + G9 + G10 | everything (a compound; attributed only through R1–R3 and ladder 1's reads) | every part landed; launched LAST | every mark of ladder 1 and §5 at 8 h; the seat's chat schedule as a4l-lang's; X1; the load guard |
+Declared machinery differences of the whole ladder vs ladder 1 (in C2, every rung): M1 the readiness judge in its own units (the door CAN open on a ready creature — under STAGE 3 the web count is 0 by law); M2 INDUCE's cost; M3 one hash per canvas; M4 the sitter's canvas unit (exams at the declared cadence: ≈ 20 % fewer than ladder 1); M5 the think thread's timing in STATUS; SIT's torn-read cursor + atomic exam writes; seam 5 (the sparse witness covers sound); the ledger thing-word rule (inert < 11.6 h); G7's sound-axis chunk (RSS only); M6 the sleep merge (only if its identity proof lands; else alpha4-3).
+
+## 3 · The controls, and which reading each gives
+- **R0 vs alpha4-1's hours 0–8:** the machinery. Prediction §7 (1).
+- **R0b vs today's a4l-cost (8 h):** the live identity law (#237 (f)) — the sharpest reading of the night: EQUAL to the cell, or the machinery moved something the fixture could not see (the exam rows sit at different canvases by M4's design and are excluded from the equality; the readiness rows differ by M1's design).
+- **R1, R2, R3 vs R0:** the one difference each. **R5 vs R0:** the compound; its motions are attributed only where R1–R3 or ladder 1's rungs moved the same mark alone.
+- **Per landing (before any launch):** the hour-1 fixture under ALPHA4.genome ≡ the INDUCE master control and under FLOOR ≡ ref-floor, both masked on `readiness` with the judge-units commit named beside the mask; **FLOOR (i) reads PASS when `readiness` is the ONLY differing field and ≤ 10 rows differ** (decided 17:0x, before run 3's notification), FAIL otherwise; `ref-floor` is re-made on master after the integration merge, its commit stamped.
+- **Pre-flight per rung (20 min, the exact road, §1.7):** NRestarts 0, no crash, the rung's new counters MOVED, its mark dry-run on the closed pre-flight root reads «gradable»; four pre-flights found four launch blockers this morning — no rung skips it.
+
+## 4 · The reads — deferred, because a reader beside a life starves it (#236, the morning of 09-22)
+alpha4-1's waiter **v3** (armed 17:1x, pid in `readings/verdict-waiter-v3.pid`; v2 killed by its pidfile): the STOP at 05:00:00 +04 (24 h + 2 min), check.py and the light reading-by-age probe run at 05:00 as before; the EVOLVE negative control and the 8-worker verdict WAIT until no `creature-g5@a4l2-*` unit is active (≈ 10:00) or 12:00 +04 at the latest; the pinned reader is read at that moment. So **the reader-lag pin is owed before the READ (≈ 10:00), the STOP needs nothing** — the seat still aims for 01:00 (the register's hard mark) with the morning as the honest margin. Then: ladder 1's five reads in pairs from their own checkouts (≈ 10:00–13:00), ladder 2's six (≈ 13:00–16:00), the ladder-2 verdict ≈ 16:00, alpha4-2 assembled from ALL the reads — target 18:00 on 09-24.
+
+## 5 · The schedule (+04, targets)
+| when | what | gate |
+|---|---|---|
+| 17:1x → 22:30 | seven builders (SIT, B1, B2, B3, M6, reader-lag, anatomy); gate run 3 on 51f71ba | each report's own `Ran N … OK` line, read from its log |
+| 21:41–21:43 | ladder 1's stops (absolute timers); the 8 h checks 21:39–21:43; **a4l-cost's 8 h numbers pasted into §7** | the checks' logs |
+| 22:30 → 00:30 | landings one at a time on a4-integration (`gate_g5_landing` + the hour-1 regression); ROAD A (the reader-lag gate → master → the pin) FIRST whenever it is ready | §3 |
+| 00:30 | **CUTOFF**; the genomes assembled under `genome/ladder2/` (each a `difflib` test against FLOOR: one difference); master merges a4-integration ONCE (one merge, one gate) | the difflib pins; the merge's gate |
+| 00:30 → 01:30 | pre-flights, two at a time, 20 min each | §1.7 |
+| ≈ 01:30 → 02:00 | launches in the order R0, R0b, R1, R2, R3, R5, 20 s apart, by `tools/lives/a4_ladder2_launch.sh` (absolute timers for the checks and the stop) | the launch log's «alive» line; STATUS moving at +5 min |
+| 05:00 | alpha4-1 STOPS (v3) | STOPPED-AT; the stop event on the journal |
+| ≈ 09:30–10:00 | ladder 2's stops (8 h + 2 min, absolute) | the 8 h checks |
+| 10:00 → 16:00 | the reads (§4) | — |
+| 18:00 | alpha4-2 (24 h) | ALPHA4-2-PREREG's §7 |
+
+## 6 · What this document does not claim
+It does not adopt G4–G8 into alpha4-2 (the adoption clauses of ALPHA4-2-PREREG read today's rungs); R5 is a candidate under an 8 h read, not alpha4-2; it does not claim the machinery is inert live — R0 and R0b measure that; it does not claim R3 shows the licence's removal (the licence lies at hours 11.5–15.5 of a life; an 8 h rung shows the header's removal only); no bar is loosened after a reading; nothing is restarted.
+
+## 7 · Predictions (before the run; each one falsifiable by the 8 h check or the read)
+1. **R0:** no crash, NRestarts 0, backlog ≤ 3 rows throughout (young); cells at the 8 h check within 3 % of alpha4-1's at hour 8 (its 8 h check, 13:00); the readiness rows carry numbers (M1) and read (a)–(d) False, (e) True as alpha4-1's did.
+2. **R0b:** cells, sight_born, births and sleeps at the 8 h check EQUAL to today's a4l-cost's (pasted below before launch); the exam rows at different canvases (M4). **A difference is read as the machinery's, and named before the ladder-2 verdict.**
+3. **R1:** X1 PASS (the toy: 50 of 50 lives; the old law 0 of 50); success per episode at the null (0.25–0.30 over ≈ 13 episodes, printed, not graded); the value law removes the lock and buys no navigation.
+4. **R2 (if it runs):** shelf frames TRUE between 0.1× and 1× the ceiling's share of scored frames — above 0 for the first time; game frames as R0's.
+5. **R3 (if it runs):** PASS on the header tokens; READ within noise; the reading order shifted by exactly 129 words.
+6. **R5:** the costliest rung (EVOLVE's shadow + VOICE); backlog 0 for 8 h at ≤ 5,000 cells; X1 PASS; its chat what-is precision within 0.1 of a4l-lang's 8 h reading (the ANSWER majority clause changes abstention — attributed via today's a4l-answer); no crash.
+7. **The ladder as a whole:** at least one of R1–R3 moves a mark alone that R5 also moves — the attribution the compound needs; if R5 moves a mark that no single rung moves, it is written as UNATTRIBUTED, never claimed.
