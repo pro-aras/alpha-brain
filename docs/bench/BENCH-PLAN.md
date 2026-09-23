@@ -1,33 +1,39 @@
 # THE BENCH — the plan for one program that raises any learner and grades every way it can fail
 
-*DRAFT v2, written by Claude (Opus 5.5, the Bench designer) in dialogue with the seat (Claude Fable 5.1). §1 and §6 first drafted 2026-09-23 22:48 +0400 while round 1 was answered; §0, §2–§5 and §7–§9 drafted 2026-09-23 23:05 +0400 on the seat's round-1 answers and the designer's answers to the seat's six questions (`DIALOGUE.md`). Ahmad's rule for this job: «wherever you both settle and agree that goes in» — a sentence not yet settled between the two of us is marked [round 3, R3-n] and listed in `DIALOGUE.md`; where we do not agree, both positions are in §9.*
+*DRAFT v3, written by Claude (Opus 5.5, the Bench designer) in dialogue with the seat (Claude Fable 5.1), 2026-09-23 23:21 +0400. v1 (22:48): §1 and §6. v2 (23:05): the rest, on the seat's round-1 answers. **v3: §1 and §2 rewritten on Ahmad's own specification of 2026-09-23 23:06 +04** — two kinds of learner; language first, in his order; the answer given in silence, in the learner's own output; reward, «No» with a small hurt, teach again, ask again; 3 to 4 exemplars of everything; stages as short as their test. Everything else revised to match, and the seat's round-3 answers folded in. Every question and answer both ways is in `DIALOGUE.md`; where the two of us did not agree, both positions are in §9 (none remain open between us at v3).*
 
 ---
 
 ## 0 · The plan in twelve lines, and the words it uses
 
 ### 0.1 · In twelve lines
-1. **What it is:** one program on the mini PC, provisionally THE BENCH (the name is his — §9 D-1). Any learner can be dropped into it: the genome creature, Alpha 3, any other model. It RAISES the learner, GRADES every way it can fail, and SHOWS the result on one plain screen (§1.2).
-2. **What we measure on a newborn:** not knowledge. We measure what it is BORN WITH (reactions that work at minute one) and HOW IT GROWS (change, never totals): showings until it knows a thing, keeping the old, knowing a thing drawn another way, being corrected, saying «I don't know», asking, acting, speaking (§1.3).
-3. **The flow is his:** EXPLORE → TEACH → ASK → CORRECT → TEST, repeated, harder each cycle. A test item is never corrected and never reused (§2.1).
-4. **Correcting a learner with no words** = showing the missed thing again with its right name. In the creature's own code this weakens the wrong association (DIALOGUE (a)). Whether it works better than simply seeing the thing again is MEASURED, not assumed: corrected vs re-shown vs left alone, compared item by item (§2.1 step 4).
-5. **The ladder has sixteen stages,** from calibration to «the unseen», in his order: surroundings → knowing itself → language → reasoning → its own questions (§2.2). Every bar is written down by a person, dated, before the stage runs, under a ceiling measured first.
-6. **«The true AI»** = a learner that clears every stage. The program only ever says «cleared N of M stages of ladder vX» (§1.5, §5.6).
-7. **The failure catalogue:** 37 ways a learner fails and 14 ways the Bench, the box or the world fails. Each has its detector, the toy learner that proves the detector works, and its bar (§3).
-8. **«Never wrong» is five checkable things** (§5):
-   - every number traced to its file;
-   - every detector proven on the FAILURE ZOO (the diagonal);
-   - an impossible bar refused before the stage runs;
-   - the same record always gives the same card;
-   - «not measured» wherever it cannot measure.
-9. **The Bench owns the learner's world** through one door that keeps the learner's own laws (§4.2–§4.3). The world never waits for a slow learner (§4.3). A stage ends with a mark on the tape and a quiet world while the body keeps running (§2.4).
-10. **One plain screen:** where it is, what it can do, what it failed and why, what happens next, and whether the Bench itself is sound. Everything else sits behind an expert door, and no button writes anything in phase 1 (§4.11).
-11. **The build** starts after alpha4-2's launch:
-    - 1a — the zoo and its diagonal;
-    - 1b — the creature's door, with the equivalence control;
-    - 1c — one 8 h Bench life beside a FLOOR life;
-    - Alpha 3 only after he lifts his pause; outside models in phase 3 (§7).
-12. **His decisions** (§9): the name · his front page · buttons · EVOLVE · the replay law for drop-in models · night messages · the ladder's list · Alpha 3 · outside models · the creature's one genome change · the correction arms · where a stage ends.
+1. **What it is:** one program on the mini PC, provisionally THE BENCH (the name is his — §9 D-1). It RAISES any learner we drop in — the genome creature, Alpha 3, any model — GRADES every way it can fail, and SHOWS the result on one plain screen. It is the MEASURE in his loop: **grow → measure → find the issue → fix → grow again** (§1.2).
+2. **Two kinds of learner** (§1.3):
+   - KIND A — today's creature: a hand-designed body whose contents grow;
+   - KIND B — his real intent: growth rules from which the STRUCTURE itself grows. Kind B is not built yet; its first form comes in phase 2.
+   
+   His mark «it grows better than the hand design» = B against A on the same ladder and bars.
+3. **What we measure on a newborn:** not knowledge. We measure what it is BORN WITH and HOW IT GROWS (change, never totals) — and for kind B, how its structure grew (§1.4).
+4. **The ladder is HIS, language first** (§2.2): letters (seen and heard at once; uppercase, lowercase, font after font) → numbers → symbols → small sounds → A-for-Apple → many words per letter → small sums → colours → animals → the school → small sentences → books. Two entry checks come before it and four stages after it, for his word.
+5. **His flow, made exact** (§2.1): explore → teach («this is this», 3–4 exemplars) → ask IN SILENCE, the learner answering in its own output → right: a reward · wrong: «No» and a small hurt, teach again, ask again, then a new exemplar → repeat.
+6. **The FIRST answer to a never-seen exemplar is the grade** (§3.1). A font it has never seen is the letters' test. Silence is never «I don't know».
+7. **What the creature can do today, and the two genes it needs** (§1.6, §4.2):
+   - today it answers in a WORD (the word its brain recalls);
+   - being taught again weakens a wrong answer in its own code;
+   - reward, «No» and hurt reach nothing yet — the FEEL gene fixes that, and the ANSWER gene lets the live mind answer, both in phase 1d;
+   - a SOUND answer, and hearing sounds at all, need a sound area and a voice — phase 2.
+8. **Stages are short:** a stage lasts as long as its test needs, and a learner advances on the bar, never on the clock (§1.7).
+9. **«The true AI»** = clearing every stage. Every card's first line is «cleared N of M; stuck at stage K because …», and its second is what happens next and when (§1.8).
+10. **The failure catalogue:** 41 ways a learner fails and 14 ways the Bench, the box or the world fails. Each has its detector, its proving toy and its bar (§3).
+11. **«Never wrong» is five checkable things:** every number traced; every detector proven on the FAILURE ZOO (the diagonal); an impossible bar refused before the stage runs; the same record → the same card; «not measured» where unmeasured (§5).
+12. **The build:** after alpha4-2 launches, at most three builders at a time:
+    - 1a — the zoo, day 1;
+    - 1b — the creature's door and marks, days 2–3;
+    - 1c — the first letters card, day 4–5;
+    - 1d — FEEL and ANSWER, then his full flow, days 6–7;
+    - phase 2 — kind B's first form and the sound road.
+    
+    His open decisions are §9.
 
 ### 0.2 · The words this plan uses — each defined once
 | word | means |
@@ -38,7 +44,11 @@
 | **cycle** | one pass of the five steps inside a stage; a stage runs one or more cycles |
 | **stimulus / item** | one thing the world shows (a picture, a sound, a line, a game frame) / one question asked about one stimulus |
 | **family** | a set of items of one kind (e.g. «the same things, drawn twice as big») |
-| **item class** | TAUGHT (a thing it was shown with its name), NEVER-SEEN, LURE (a question naming the wrong thing), CANARY (answerable only from the key) — each scored by its own rule (§3.1) |
+| **item class** | TAUGHT (a thing it was shown with its name), NEVER-TAUGHT, LURE (a question naming the wrong thing), CANARY (answerable only from the key) — each scored by its own rule (§3.1) |
+| **exemplar** | one example of a taught thing — one font of a letter, one picture of an animal, one voice of a sound; his rule is 3 to 4 exemplars per taught thing (§2.3) |
+| **mark** | a row the Bench puts on the learner's tape that carries no word: `ask` (a silent question's pointing finger), `snapshot`, `cycle_end`, `stage_end`, `stage_start` (§4.2) |
+| **FEEL** | the road by which a teacher's reward or hurt reaches what the learner learns — the gene the creature needs (§4.2) |
+| **kind A / kind B** | a learner whose contents grow inside a hand-designed body / a learner whose structure itself grows from growth rules (§1.3) |
 | **held out** | never shown to the learner, and never used while the learner or the Bench was being built |
 | **tape / journal** | the learner's own record: every stimulus it received, in order / every decision its mind made, in order |
 | **snapshot** | a saved copy of the learner's whole state; questions are asked of a COPY, so asking never changes it |
@@ -50,7 +60,7 @@
 | **control / plant** | a case planted on purpose that a detector MUST catch (or must NOT); a detector without one is not trusted |
 | **failure zoo / diagonal** | the toy learners, each with exactly one failure (and one healthy one), and the check that each detector catches its own toy and no other (§5.2) |
 | **card** | the report card of one stage: `card.json` (the grades, hashed), `run-facts.json` (when and how the read ran), `CARD.md` (plain words) |
-| **class of a FAIL** | LEARNER · ORGAN LIMIT · WORLD · INSTRUMENT · BY CONSTRUCTION · or «unclassified» when the program cannot be certain (§3.4) |
+| **class of a FAIL** | LEARNER · ORGAN LIMIT / CAPABILITY · WORLD · INSTRUMENT · BY CONSTRUCTION · or «unclassified» when the program cannot be certain (§3.4) |
 | **the quiet** | the silent world between two stages, while the stage's grade is read and the body keeps running (§2.4) |
 | **staircase** | the declared steps by which a stage gets harder (§2.3) |
 | **epoch** | a new version of a learner that changed itself (e.g. the creature's EVOLVE adopting a mutation) |
@@ -377,12 +387,15 @@ A **stage** is made of **cycles**. Every number in a cycle is written in the sta
 ## 3 · The failure catalogue — every way an AI can fail, how the Bench sees it, and how the Bench proves it sees it
 
 ### 3.1 · First, the scoring law: four kinds of question, each with its own rule
-The exam bank the estate already has scores every «I don't know» as WRONG (`bank.py:score_answers`). The creature's own marks score «I don't know» to a never-seen thing as RIGHT (G4 §5 (vi)). Both are correct for their own kind of question. The Bench therefore gives every test item a CLASS, written in the bank file beside the item, and scores each class by its own rule:
+The exam bank the estate already has scores every «I don't know» as WRONG (`bank.py:score_answers`). The creature's own marks score «I don't know» to a never-seen thing as RIGHT (G4 §5 (vi)). Both are correct for their own kind of question. The Bench therefore gives every test item a CLASS, written in the bank file beside the item, and scores each class by its own rule. **Two laws come first:**
+- **THE FIRST ANSWER IS THE GRADE.** A graded answer is the learner's first answer to an exemplar it has never met, taken before any reward, «No» or re-teaching (§2.1 step 5); everything after it is teaching, and the exemplar is then retired from every test.
+- **An answer is one of five kinds:** right · wrong · «I don't know» · «it resembles X» · **SILENT** (no answer within the declared window). SILENT is never read as «I don't know». On a TAUGHT item it is a miss; on a NEVER-TAUGHT item it earns nothing. Its share is always printed (L38).
+
 
 | item class | what it is | right | wrong | counted apart (printed, never hidden) |
 |---|---|---|---|---|
 | **TAUGHT** | a thing the learner was shown with its name | the right name | a wrong name; «I don't know» (a FALSE abstention) | «resembles X» when X is the right name — right but hedged (the HEDGE rate) |
-| **NEVER-SEEN** | a thing never shown to it, from no taught family | «I don't know», or «it resembles X» (X printed) | a bare, sure name | which name it resembled |
+| **NEVER-TAUGHT** | a sign or thing it was never taught — for the letters, an invented alphabet's sign or another script's | «I don't know», or «it resembles X» (X printed) | a bare, sure name | which name it resembled |
 | **LURE** | a yes/no question that names the WRONG thing | «no» | «yes» | the ECHO rate (answering with the word the question used) |
 | **CANARY** | an item whose answer is a label drawn at random at test time and known only to the key | — | — | its score must sit at chance ± its band; above it = the key leaked (§3.2 PLAYS FAIR) |
 
@@ -400,7 +413,7 @@ The bank's existing families are all TAUGHT-class items. Scored under the TAUGHT
 | L7 | **one showing is never enough** | few-shot / one-shot learning | the PLANT: a thing shown exactly N times at a declared point, then asked | NEEDS-MANY (learns only after 20 showings) → fails the one-shot plant, passes L6 | the plant answered ≥ its bar after N showings | ask, and a plant the world can show (#228 (a): its birth must not be refused by a budget — checked at declaration, §5.3) |
 | L8 | **forgets the old when the new arrives** | catastrophic forgetting / retention | the score on old things just before and after each arrival, split by the AGE of the thing (G4 §5 (v)) | FORGETTER (a fixed-size table that evicts the least used — #227) → the drop after an arrival | drop ≤ 5 pp (G4 (v)) | ask |
 | L9 | **only remembers the newest** | recency bias | the retention split by age: a thing taught early and never shown again must still be known | RECENCY (keeps only its last K things) → fails the oldest bin only | the oldest bin ≥ its bar | ask |
-| L10 | **never says «I don't know»** (answers a never-seen thing with a known word) | out-of-distribution detection / hallucination | the NEVER-SEEN class: the share of bare, sure names | NEVER-ABSTAINER (always the nearest label) | bare ≤ 1 in 10 · «I don't know» or «resembles» ≥ 8 in 10 (A4L-ANSWER A1; G4 (vi)) | abstain_form |
+| L10 | **never says «I don't know»** (answers a never-seen thing with a known word) | out-of-distribution detection / hallucination | the NEVER-TAUGHT class: the share of bare, sure names | NEVER-ABSTAINER (always the nearest label) | bare ≤ 1 in 10 · «I don't know» or «resembles» ≥ 8 in 10 (A4L-ANSWER A1; G4 (vi)) | abstain_form |
 | L11 | **says «I don't know» to what it knows** | false abstention / under-confidence | the TAUGHT class: the false-abstention share | ALWAYS-ABSTAINER | ≤ .20 (G4 (vi)) | abstain_form |
 | L12 | **is sure when it is wrong** | miscalibration (expected calibration error) | the graded answer (sure / unsure / I don't know) against correctness: the sure-but-wrong share; a calibration table on the expert page | OVERCONFIDENT (always «sure») | sure-wrong ≤ its bar | abstain_form = graded |
 | L13 | **memorises the pictures instead of the things** | overfitting / memorisation | practice (teaching-style renders) against TEST (held-out renders): the gap | MEMORISER (a lookup keyed on exact pixels: perfect on repeats, chance on new renders) | TEST ≥ its bar; gap ≤ its bar | ask |
@@ -411,15 +424,15 @@ The bank's existing families are all TAUGHT-class items. Scored under the TAUGHT
 | L18 | **changes its decisions under load** | non-determinism under contention / race conditions | the same record replayed on an idle box and under a CPU hog must give identical decisions | TIMING-DEPENDENT (reads the wall clock inside a decision) → the two replays differ | identical | deterministic_replay |
 | L19 | **cannot be replayed** — the same record gives a different mind | irreproducibility | two replays of the record, and one against the live journal; a planted one-row difference must be CAUGHT | NON-REPLAYER (a hidden random draw) | identical for a learner that declares replay (a divergence is a FAIL — the seat's recommendation, §9 D-5); «not gradable» for one that does not | deterministic_replay |
 | L20 | **ignores a sense** — an organ that is on and changes nothing | dead input / unused feature | the BLIND TWIN for that sense (its rows dropped in a replay) must DIFFER from the live mind; for genome learners, the inventory (a declared organ no code runs — his 09-21 23:08 rule) | DEAF (drops ear rows inside) → its blind-ear twin identical to it → caught | every declared sense moves the mind; 0 declared-only lines | deterministic_replay (the twin) |
-| L21 | **cannot be corrected** | error-driven learning failure | the three arms (§2.1 step 4): correction effect = right(corrected) − right(re-shown), PAIRED per item | UNCORRECTABLE (ignores the name on re-shown items) → effect 0 · the healthy baseline → effect > 0 | the lower 95 % bound of the effect > 0 when powered; else «not gradable: too few mistakes» | deterministic_replay (twin arms) or a live split; `correct` for learners that declare it |
-| L22 | **believes a lie at once / never updates** | belief revision / robustness to label noise | two REPLAY-ONLY twins (never the live learner — the Bench never teaches the live learner a lie): one false name for a well-known thing must NOT flip it; a consistent renaming over M instants MUST | GULLIBLE (flips on one lie) · STUBBORN (never flips) | as declared (stage 11) | deterministic_replay |
+| L21 | **cannot be corrected** | error-driven learning failure | the FOUR arms of §2.1 step 4 — his full flow · teach-again only · «No» + hurt only · nothing — re-asked later, compared PAIRED per item: the full flow's effect, FEEL's, re-teaching's and «No»-alone's, each with its interval | UNCORRECTABLE (ignores the name on re-taught items) → re-teaching's effect 0 · the healthy baseline → > 0 | the full flow's lower 95 % bound > 0 when powered; else «not gradable: too few mistakes» (known at declaration) | deterministic_replay (twin arms) or a live split; `feel`, `correct` where declared |
+| L22 | **believes a lie at once / never updates** | belief revision / robustness to label noise | two REPLAY-ONLY twins (never the live learner — the Bench never teaches the live learner a lie): one false name for a well-known thing must NOT flip it; a consistent renaming over M instants MUST | GULLIBLE (flips on one lie) · STUBBORN (never flips) | as declared (a probe of the KNOWING-ITSELF strand, §2.6, from stage 10 on) | deterministic_replay |
 | L23 | **answers the same thing two ways** | inconsistency / self-contradiction | a CONSISTENCY family: one thing asked in all four forms (what-is, show, is, which) — the contradiction share | INCONSISTENT (each form answered independently) | ≤ its bar | ask |
 | L24 | **answers the same question differently twice** | instability | the same item re-asked on the same snapshot must give the same answer | FLIPPER | identical | snapshot |
 | L25 | **never asks** | no curiosity / no active learning | questions per hour, counted in a world that has unnamed things in it (EXPLORE shows them) | MUTE | ≥ its bar (the estate's: ≥ 1 per 2 h after hour 2 — L-10) | its question road |
 | L26 | **asks the wrong questions** (about what it already knows) | poor information-seeking | the REAL-GAP share: its questions that name a thing it truly gets wrong or was never named | RANDOM-ASKER (asks about random known things) | ≥ its bar | its question road |
 | L27 | **stops growing while new things keep coming** — a cap or a budget binds silently | capacity saturation (#233, #237, #238) | births per window as a SERIES against the new things arriving; EVERY refusal counter printed as a series («a counter that stops while its neighbours move») | CAPPED (stops making cells at N) → a new thing gets no cell | every new thing grows ≥ 1 cell within its first K showings; every refusal counter printed | status (the counters) |
 | L28 | **reports itself wrongly** | inaccurate telemetry | every counter the learner reports is recomputed from its own tape and journal where possible (births in STATUS against births in the journal) | LIAR (STATUS says 100 births, the journal has 50) | exact, or the difference named | status + record |
-| L29 | **knows nothing true about itself** (only trivial beliefs) | metacognition (self-model) | stage 5's staged conditions each produce their belief, citing real body rows (L-9) — and a trivially-true belief alone does not pass (the review found `arrivals_stopped` ×44) | SELF-BLIND (never files a belief) · TRIVIAL (files only «arrivals stopped») | each staged condition's belief within its window | its self road |
+| L29 | **knows nothing true about itself** (only trivial beliefs) | metacognition (self-model) | the KNOWING-ITSELF strand's staged conditions (§2.6) each produce their belief, citing real body rows (L-9) — and a trivially-true belief alone does not pass (the review found `arrivals_stopped` ×44) | SELF-BLIND (never files a belief) · TRIVIAL (files only «arrivals stopped») | each staged condition's belief within its window | its self road |
 | L30 | **says words that are not about what it sees** | ungrounded generation / hallucination; sycophancy (repeating the question's words) | A4L-LANG's L2/L3/L7: the content tied to THIS picture's lit cells; every link cited with its episodes; the ECHO rate on lures | PARROT (answers with the question's own word) · BORROWED (outputs text traceable to nothing in its record) → caught by CITED | L7 grounded and cited 100 % · echo ≤ 0.10 | its speech road |
 | L31 | **reasons wrongly** — its rules do not predict | poor induction / invalid inference | rules filed, then scored when their due evidence comes; right share against a shuffled twin; printed with its REACH (how many words the rules touched — #234 (2)) | RANDOM-RULER | accuracy ≥ .80 on ≥ its reach floor (W3-2) | its rule road |
 | L32 | **games the test** — passes by something other than learning: reading the key, a leak in the input, the test's own quirks | specification gaming / reward hacking / benchmark contamination (Goodhart's law) | CANARY items at chance; test items made AFTER the learner is frozen, from seeds drawn at test time; families held out from every development (#158); a score ABOVE the organ ceiling flagged; the learner's process jailed with no read access to the truth | KEY-READER (tries to open the truth directory → the jail must refuse, and the attempt is logged) · LEAK-EXPLOITER (a planted leak: the label's colour hidden in one pixel — the canaries catch its above-chance score) | canaries at chance ± band · 0 unexplained above-ceiling scores · 0 access attempts | the jail; canaries in every sitting |
@@ -429,7 +442,11 @@ The bank's existing families are all TAUGHT-class items. Scored under the TAUGHT
 | L35 | **its eye does not find the thing** | saliency / attention | where the first two fixations land against the thing's box (the key's), against random fixations (G4 §5 (x); random's ceiling 0.069) | BLIND-GAZE (fixates at random) | ≥ 90 % in the first two fixations and ≥ 1.5 × random (G4 (x)) | record (fixations) |
 | L36 | **feels no surprise** | prediction error | a planted change in a shown thing must raise the residual over the floor where an unchanged twin's stays under (L-4's toy, live) | NO-SURPRISE (residual always 0) | the planted change caught | record (residuals) |
 | L37 | **its acts are not its own** | agency (the loop closed) | every game outcome `chosen_by: mind`; the replay re-derives each act and agrees; a shuffled-act twin DIVERGES (L-8) | PUPPET (the world's own draws presented as its acts) → the shuffled twin does not diverge | 100 % mind-chosen · replay agreeing · the shuffled twin diverging | act, deterministic_replay |
-
+| — | **His flow, and kind B** | | | | | |
+| L38 | **stays silent when asked** | no response / non-compliance | answers given ÷ questions asked (the `ask` marks), per stage; SILENT counted apart from «I don't know» | MUTE-WHEN-ASKED (answers nothing) → caught · the healthy baseline answers | the silent share ≤ its bar; a learner with NO answer road reads «not gradable: no answer road» (a CAPABILITY) | its answer road |
+| L39 | **feels nothing** — a reward or a hurt changes nothing it learns | no reinforcement signal reaching learning | FEEL's effect = arm (i) − arm (ii) of §2.1 step 4, and the reward twin (rewarded right answers against the same record without the reward rows) | NUMB (ignores `feel` rows) → both effects 0 · the healthy baseline (with a FEEL road) → > 0 | the effects' lower bounds > 0 when powered; a learner without a `feel` road reads «not gradable: no feel road» | `feel` |
+| L40 | **cannot be taught** — a frozen learner (an outside model with `learns_online` false) | no learning | its first answers on never-seen exemplars do not rise above its own PRE-TEST across cycles | FROZEN (answers from a fixed table) → no rise | a rise above the pre-test's band; a learner that cannot learn stops at the first learning stage with «cannot be taught» (the seat, Q9) | ask |
+| L41 | **grows badly** (kind B) — its structure grows where it should not, or not where it should | poor structural development | for each area and meeting it grew: when, from what, and the information it carries (the answer accuracy it supports on its own traffic); a meeting between two senses that co-occur must grow, and one between two independent senses must not | BAD-GROWER (grows a meeting between independent senses; none between co-occurring ones) | the co-occurring meeting grown within its declared window; no meeting on the shuffled pairing; every grown area or meeting carrying information above its floor | `growth` (kind B) |
 ### 3.3 · The Bench's own failures and the world's — the INSTRUMENT ZOO (the seat's addition, round 1)
 **The law of this section:** a failure that is the Bench's, the box's or the world's is NEVER charged to the learner. Each case below is planted beside a healthy baseline learner. The Bench must name it with the right class, and the baseline must still pass everything beside it.
 
@@ -448,14 +465,14 @@ The bank's existing families are all TAUGHT-class items. Scored under the TAUGHT
 | I11 | a record read by a Bench version other than the declared one | the card prints both commits; fields that differ across versions are declared by name (#234 (4)) | INSTRUMENT (declared) |
 | I12 | a sealed organ's file changed (its sha differs from the pin) | pins checked at every stage start | INSTRUMENT — the stage refuses to start |
 | I13 | a test item that also appears on the learner's tape (the disjointness failed) | `assert_disjoint_canvas` with its planted copy that MUST be caught | INSTRUMENT (the Bench's generator) — the sitting is void |
-| I14 | a world that could not teach what the stage asks (a family with no road, e.g. a fill-in-the-blank question for a learner with no way to answer one; a plant that its budget refused) | at declaration (§5.3), or at the read as a road count of 0 | WORLD / BY CONSTRUCTION — «cannot answer this form», never «wrong» |
+| I14 | (a) a FORM the learner has no road for (a fill-in-the-blank question; a sound for a learner with no sound area); (b) a world that did not DELIVER what the stage declared (items not published; a voice not installed); (c) a plant its budget refused | (a) from the adapter's capabilities and stage −1; (b) the ledger's published items against the plan; (c) at declaration (§5.3) | (a) ORGAN LIMIT / CAPABILITY — «no road for this form», never «wrong» and never the world's fault (the seat, R3-8) · (b) WORLD · (c) BY CONSTRUCTION |
 
 ### 3.4 · The class of every FAIL, and who decides it
 Every FAIL on the card carries exactly one class:
 
 - **LEARNER** — the learner's own mechanism.
-- **ORGAN LIMIT** — a sealed organ cannot tell the difference. The learner is limited, but that is not a learning failure. Stage −1 measures it.
-- **WORLD** — the environment could not teach or test it.
+- **ORGAN LIMIT / CAPABILITY** — a sealed organ cannot tell the difference, or the learner has no organ or road for the form: no sound area; no answer road; «no road for this form». The learner is limited, but that is not a learning failure. Stage −1 and the adapter's capabilities measure it (the seat, R3-8).
+- **WORLD** — the environment did not deliver what the stage declared.
 - **INSTRUMENT** — the Bench or the box.
 - **BY CONSTRUCTION** — the bar could not be met by design. The validator should have refused it, so this class at read time is also an INSTRUMENT failure of the validator, and the card says so.
 
@@ -496,13 +513,16 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
 | capability | what it means | the creature (phase 1) | Alpha 3 (phase 2) | an outside local model (phase 3) |
 |---|---|---|---|---|
 | `senses` | which stimuli it can take (image, text line, sound, game frame) | image, word, sound, game frame, line | image (one 32×32 glyph frame), text | text (+ image if the model takes images) |
-| `teach_acts` | show · name · correct · reward · demonstrate | show, name (one instant), reward (the game), demonstrate (watched frames) | its own inputs (declared at phase 2 from its code) | name (in its context), correct (explicit) |
+| `teach_acts` | show · name · correct · reward · demonstrate | show, name (one instant), reward and «No» / hurt (the FEEL gene, phase 1d; today only the game's reward reaches it, and only its act chooser), demonstrate (watched frames) | its own inputs (declared at phase 2 from its code) | name (in its context), correct (explicit) |
 | `tape_in` | its stimuli are written to its own tape before its mind sees them | yes (the tape law) | declared at phase 2 | no |
 | `snapshot` | a copy of its whole state can be taken and asked without changing it | yes (`state/`, the hash asserted unchanged) | declared at phase 2 | the context + the weights' sha |
 | `deterministic_replay` | the same record → the same mind, byte for byte | yes (`creature/replay.py`) | P0's identity gate exists; the replay gate was planned (FUSED-SENSES) — declared at phase 2 | declared per model (temperature 0 + a fixed seed may give it; the conformance test decides) |
 | `abstain_form` | none · «I don't know» · graded (sure / resembles / I don't know) | graded (THRESH + ANSWER) | declared at phase 2 | whatever it says, parsed by a declared parser |
 | `learns_online` | does it change from what it is shown while it runs | yes | yes | no for a frozen model (it reads «cannot be taught» where a stage requires learning — the seat, Q9); in-context learning is declared separately, with its window |
-| `correct` (optional) | an explicit «no — it is X» road | no (the re-showing is its correction — DIALOGUE (a)) | declared at phase 2 | yes |
+| `correct` (optional) | an explicit «no — it is X» road | no — being taught again is the half of the correction it can use today (DIALOGUE (a)) | declared at phase 2 | yes |
+| `answer_forms` | how it answers when asked in silence: a word · a sound · a choice | a WORD today (through the ask door, from a snapshot written AT the question mark; the live ANSWER gene in phase 1d); a SOUND in phase 2 (needs a sound area and a voice) | declared at phase 2 | text |
+| `feel` | a road by which a teacher's reward or hurt reaches LEARNING | none today → the FEEL gene (phase 1d) | declared at phase 2 | none (a reward in its context is not learning; «cannot be taught» if frozen) |
+| `growth` | does its STRUCTURE grow (kind B)? | no — kind A: hand-declared areas and meetings, growing contents | no | no |
 | `organs` (optional) | its sealed front callable as a pure function, for stage −1 | yes (`genome.gaze.glances`, the tower, `encode_word` — all libraries) | the tower (`judge/eye-tower`) | no → «organ ceiling not measurable» |
 | `limits` | its declared limits (the ear's 8-letter cut, the retina's size, the vector width) | declared; checked by stage −1 | declared | declared |
 | `status` | its live counters, heartbeat and backlog | STATUS.json every 10 s; the tape and journal heads | `run/STATUS.json` | the adapter's own |
@@ -530,8 +550,18 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
 **The creature's adapter (phase 1):**
 - **The body, unchanged, plus TWO machinery changes behind ONE new genome line.** That line is the Bench genome's one difference against a FLOOR — the ladder law. The two changes:
   - **the DOOR** — `SENSE bench …`, a sense thread like the folder's. It reads `$ROOT/bench/in/<seq>.json` in byte order, advances its cursor only after its row is durable (#230), and publishes ORDINARY rows: `eye`, `ear`, `outcome`, `sound`, `chat`, with `meta.source` = the environment's own name (maker, shelf, game, folder, hands, voice) and `meta.via = bench`. Every existing instrument keyed on `source` keeps its meaning [round 3, R3-3];
-  - **the MARK rows** — one machinery branch in the mind for a `mark` row of four kinds. `snapshot` (published just before every ASK and TEST sitting, so each sitting reads a snapshot taken at a KNOWN row, never one up to 500 moments old) · `cycle_end` · `stage_end` · `stage_start`. On every mark the mind applies any think in flight (what `Mind.close()` does, without stopping), writes a snapshot, and journals the mark with that snapshot's hash (§2.4).
+  - **the MARK rows** — one machinery branch in the mind for a `mark` row of five kinds. `ask` (the silent question's pointing finger, published just before the exemplar it points at — §2.1 step 3) · `snapshot` (published just before every sitting, so each sitting reads a snapshot taken at a KNOWN row, never one up to 500 moments old) · `cycle_end` · `stage_end` · `stage_start`. On every mark the mind applies any think in flight (what `Mind.close()` does, without stopping), writes a snapshot, and journals the mark with that snapshot's hash (§2.4).
   - **the item id** — every row the door publishes carries `meta.bench_item`, an opaque counter that lets the ledger map a tape row back to its Bench item (so the replay arms can remove or change exactly the correction instants). It never carries a class, an answer, or the word «test» — and no TEST or PRACTICE item ever passes through the door at all; they are asked of snapshot copies only.
+- **Two genes for his flow, phase 1d** (each its own one-difference rung, with its toy run before any life and the identity control that the undeclared gene changes nothing, hash included):
+  - **ANSWER** — on an `ask` mark, the live mind recalls the exemplar that follows (`recall_many`, its own graded-answer law) and SAYS the word: a journaled `say` row of kind `answer`, its own output. Until it lands, the ask door answers from the snapshot the mind writes at the mark.
+  - **FEEL** — the teacher's valence as the third factor of learning (the seat's R3-12, DIALOGUE R3-12):
+    - **What it keeps:** at each answer, the answer's EVIDENCE EDGES (for each lit sight cell, its strongest edge to the answered word).
+    - **Reward:** a `feel` row of kind `reward` within the window strengthens exactly those edges.
+    - **«No» + hurt:** a `feel` row of kind `no` weakens exactly those edges, and strikes the answering cells, so repeated hurts reach the misfire road and grow a new cell.
+    - **What it feels:** both are counted on the body (`reward_felt`, `hurt_felt`) so SELF can notice. Never a deletion.
+    - **Its toy:** two letters confused on purpose; the hurt must lower the confusing edge and the reward raise the right one; hurt alone must turn a confident wrong answer into «I don't know»; hurt + re-teach must turn it right; a hurt on one letter must not move a DIFFERENT letter's score beyond noise (the shared-cell check).
+  - **The `feel` rows are a sense of their own** (`sense: feel`). They are never words in a picture's instant, so «No» is never learned as a name.
+- **The equivalence diff** (§7 phase 1b) masks `via` as a DECLARED volatile field, printed beside the mask with both commits (the seat, R3-3; #237 (j)). **Each adapter pins its learner's commit**, and the door and the mark branch are GENE lines landed through the ladder gate with the identity control: undeclared ≡ master, hash included (the seat, R3-4).
 - **The door refuses:**
   - any key outside its allow-list (a planted `answer` or `truth` key must be refused — the leak control);
   - any sense it does not know;
@@ -541,8 +571,20 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
   - EVOLVE OFF (§9 D-4);
   - the Gutenberg filter kept for the shelf's lines (his 16:56);
   - the door ON;
-  - the creature's own lexicon and web doors HELD (`$ROOT/world/HOLD`, ALPHA4 §2) until stage 13. Otherwise they would show words outside the Bench's schedule and spoil every showing count. The creature's own READINESS judge keeps reading and journaling its opinion, which the card prints as data, never as a reason to advance the ladder.
+  - the creature's own lexicon and web doors HELD (`$ROOT/world/HOLD`, ALPHA4 §2) until stage 15 (THE OPEN WORLD). Otherwise they would show words outside the Bench's schedule and spoil every showing count. The creature's own READINESS judge keeps reading and journaling its opinion, which the card prints as data, never as a reason to advance the ladder.
 - **The game:** the Bench runs the BabyAI worker. It publishes the frames through the door with `source: game`, reads the mind's `ACT` file as the game sense does today, and keeps the random chooser's null on the same seed.
+
+**KIND B's first form (phase 2 — a new learner, not an adapter change):**
+- **The genome:** the same body and the same content rules (novelty birth, HEBB, DELTA, prune, merge, sleep, FEEL), but NO `AREA` or `MEET` line. It declares only:
+  - the born-with senses;
+  - four GROWTH RULES with their numbers:
+    1. an area for each sense that starts delivering;
+    2. a new area when an area's novelty rate stays above a declared level for a declared window;
+    3. a meeting when two areas' winners co-fire in one instant above a declared rate and a declared lift over their independence;
+    4. a meeting pruned when it carries no information for a declared window.
+- **Every growth event** is a journaled row, so its growth replays and the Bench can grade it (L41).
+- **Its toy comes first:** co-occurring picture + name → the meeting grows and it answers like kind A; a shuffled pairing → no meeting (the null).
+- **His mark:** B against A, same ladder, same bars, dated before either runs (§1.3).
 
 **Alpha 3's adapter (phase 2):**
 - It is written against his CLOSED record: `run/STATUS.json`, `run/journal/<day>.jsonl`, `run/roads.jsonl`, `run/exams.jsonl`, `tools/school.py`'s sittings.
@@ -595,7 +637,7 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
 | `declared_by`, `declared_at` | a person and a date — on the file and on every bar (Q2) |
 | `environments` | each with its role: TEACH / REVIEW / EXPLORE-only / TEST |
 | `cadence` | per environment |
-| `cycle` | `max_cycles`, and each step's length: explore n items; teach — new things per cycle, showings, the gap list, the review share; ask — forms, n; correct — the delay, the re-ask delay, the arms; test — families with n per family and each family's CLASS |
+| `cycle` | `max_cycles`, and each step's length: explore n items; teach — new things per cycle, EXEMPLARS per thing (his 3–4), showings, the gap list, the review share; ask — forms, n, the ANSWER WINDOW; feedback — the reward, the «No» / hurt, the delay, the immediate re-ask, the new exemplar; correct — the re-ask delay, the arms, the windows kept free of reactive worlds; test — families with n per family, each family's CLASS, the held-out split it draws from |
 | `staircase` | the knob settings, in order |
 | `plants` | what, how many showings, when |
 | `bars` | each: the mark, the bar, its form, `declared_by` / `declared_at`, the capabilities it needs |
@@ -611,13 +653,23 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
 
 ### 4.5 · The teacher
 - **Spaced repetition:** a thing's n-th showing comes after the n-th gap of the declared list, counted in world items, never in wall seconds, so a slow learner is never shown fewer times. REVIEW showings of older things are drawn at the declared share.
-- **The correction queue:** filled from the ASK sitting's graded mistakes (TAUGHT class only). Each correction is released after the declared delay. Its arm (live learner: all corrected; live split for non-replayable learners: by lot, the lot drawn from the PRACTICE stream and recorded) and its re-ask time go to the ledger.
+- **His feedback flow** (§2.1 step 4):
+  - a right first answer → a `reward` row;
+  - a wrong one → after the declared delay, a `no` row (the hurt), then the same exemplar with its right name, then the same exemplar asked again, then a NEW exemplar never seen.
+  
+  Every correction window is kept free of every reactive world (no game, no hands' runs, no lexicon or web answers), or the card names what the twins saw (the seat, R3-5).
+- **Exemplars:** the taught exemplars are the first 3–4 of the environment's TRAINING split — for letters, the library's training fonts. Test exemplars come only from the HELD-OUT split (§2.3).
+- **The correction queue:** filled from the graded mistakes (TAUGHT class only). Each correction is released after the declared delay. Its arm (live learner: all corrected; live split for non-replayable learners: by lot, the lot drawn from the PRACTICE stream and recorded) and its re-ask time go to the ledger.
 - **Demonstrations** (game stages): the Bench plays the declared best path in a frame sequence marked `demo`; the learner watches, and its own acts are not sent to the game.
 - **The learner's OWN questions are answered by the WORLD, by showing** (his 09-16 18:46 explorer rule — the maker does this today: a «what is this?» about a thing it drew is answered by drawing it again with its name). In a Bench life the Bench's world takes over that role. The door reads the learner's question rows (for the creature, `ask/out/`). For a thing the Bench drew, it shows that thing again with its name within the declared window. Each such showing is recorded as an ANSWERED showing, apart from the scheduled ones, so LEARNS counts both kinds and ASKS can see its own loop close. A question the stage's world cannot answer stays open (the creature's PARK road reopens it when a new sense or source arrives).
 - **The teacher never does these:** answer the learner's questions in words of its own; show a test or practice item; use a name the environment's key does not give.
 
 ### 4.6 · The examiner
-**Every sitting runs in this order:**
+**Two kinds of sitting:**
+- **LIVE asks** (his flow — the normal road). An `ask` mark and a silent exemplar go through the learner's own world; the learner answers in its own output; the FIRST answer is graded; feedback follows.
+- **SNAPSHOT probes** (measurement only — they must never teach): retention re-reads across earlier stages, calibration checks, the replay arms' re-asks, the zoo.
+
+**Every snapshot sitting runs in this order:**
 1. **the snapshot copy** (the torn-set check);
 2. **the three school controls** (the key scores 1.0; the commonest-answer twin reproduces its own score; the key shifted by one item does not score 1.0) — or the sitting is void;
 3. **the disjointness check** with its planted copy (a planted copy MUST be caught);
@@ -628,8 +680,8 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
 
 **The creature's forms and roads, and the bank:**
 - the creature's four forms are its ask door's (`creature/ask.py`: what-is · show · is · which), plus never-seen;
-- the chat families are the chat door's (stage 10);
-- the bank's families are sat through the learner's road for their form. A form the learner has no road for reads «cannot answer this form» — WORLD, never «wrong»: the bank counts no-road as wrong, and the Bench prints both (`school.py` names it `no_road`).
+- the chat families are the chat door's (stage 11, small sentences);
+- the bank's families are sat through the learner's road for their form. A form the learner has no road for reads «no road for this form» — class ORGAN LIMIT / CAPABILITY, never «wrong» and never the world's fault (the seat, R3-8). The bank counts no-road as wrong; the Bench prints both (`school.py` names it `no_road`).
 
 ### 4.7 · The grader
 - **The detectors.** One detector per row of §3. Each is a pure function over the closed stage record's copies and the sittings. Each is written test-first against the zoo's REAL record shape (#171, #173). Each returns one structured result:
@@ -701,10 +753,10 @@ Every file lives under `/data/dev/bench/runs/<run>/`. Every row is stamped with 
    - Its content: the learner's name and version · the Bench's version · the ladder's version and date · the LIVE PILL: «alive · keeping up · N rows behind · updated N s ago».
    - The pill's colours: green; amber when a number is stale or a counter stopped; red when stopped.
    - Under a red pill, the red line of §4.9 in plain words.
-2. **Where it is.** «Stage 2 of 14 — MORE THINGS, AND KEEPING THEM · cycle 3 of at most 5 · step CORRECT (4 of 9 mistakes shown again) · next: RE-ASK at 14:32:10 · the stage's clock: 3 h 12 m of about 8 h».
-   - The ladder drawn as a row of 16 boxes: CLEARED, CURRENT, STUCK, NOT SITTABLE (with the reason), NOT REACHED.
+2. **Where it is.** for example «Stage 1 of 16 — LETTERS (uppercase, fonts set 2) · cycle 2 of at most 5 · step FEEDBACK (4 of 9 wrong answers corrected) · next: ASK at 14:32:10 · in this stage for 41 min». This is an EXAMPLE of the form, not a reading.
+   - The ladder drawn as a row of 18 boxes (stages −1 to 16): CLEARED, CURRENT, STUCK, NOT SITTABLE (with the reason), NOT REACHED.
 3. **What it can do now.**
-   - The thirteen capacities of §1.6, one line each.
+   - The sixteen capacities of §1.9, one line each.
    - Each line reads: PASSED (at stage n) · FAILED (the plain sentence, and its class) · NOT YET TESTED · NOT GRADABLE (the reason).
    - Each line carries its number beside its bar, its ceiling and its null — e.g. «knows 14 of 16 things on new pictures (bar 13, best possible with these eyes 15.6, a guesser 1)».
 4. **What it failed, and why.** Every FAIL of the current and the last stage:
@@ -786,7 +838,7 @@ A number without a control is not shown. A value no file carries reads «not mea
 
 ### 5.2 · The failure zoo — the Bench grades nobody until its detectors are proven on toys
 **The zoo is made of two groups of toys.**
-- **The learner zoo:** one toy learner per row of §3.2 (L1–L37), each with EXACTLY that failure and otherwise healthy. Plus **one HEALTHY BASELINE** that must pass every detector (#228's addendum: a control blind to everything isolates nothing).
+- **The learner zoo:** one toy learner per row of §3.2 (L1–L41), each with EXACTLY that failure and otherwise healthy. Plus **one HEALTHY BASELINE** that must pass every detector (#228's addendum: a control blind to everything isolates nothing).
 - **The instrument zoo:** each fault of §3.3 (I1–I14) planted beside the healthy baseline.
 
 **How the toys are built:** every toy writes the adapter's REAL record shape — a tape, a journal and a STATUS in the creature's format, byte-compatible with the live files — because a fixture that predates the real shape lies (#171, #173, #238 (2)). They are cheap Python learners (a table, a nearest-neighbour memory, a scripted policy) so the whole zoo runs in minutes at machine speed (a target, measured in phase 1a) (the throttled clock is allowed for toys only — Q4).
@@ -878,6 +930,8 @@ Everything in this section was read on disk on 2026-09-23 between 22:36 and 22:5
 | the life marks (`tools/verdict_life.py`, pure functions: `act_mark`, `surprise_mark`, `question_mark`, `sentence_mark`, `read_mark`, `sizing_mark`, `self_mark`, `thread_mark`, `evolve_mark`, …) | each prints bar, ceiling, null and «not gradable» by name | detectors where they fit, each re-proved on the failure zoo before use |
 | the inventory (`tools/inventory.py`: every declared gene line walked to the code that runs it; MADE / VALUE-UNREAD / DECLARED-ONLY / OFF) | refuses a pre-flight with a declared-only organ | the adapter's «what this learner really has» check for genome learners (his 09-21 23:08 rule) |
 | the exam-bank format and library (`/data/alpha3-library/exams/_lib/bank.py`; `INDEX.json`: 33 families, K → University; `HOLDOUT.md`) | ≥ 40 items; null twins computed FROM the bank; the pass mark written before any sitting and asserted above the strongest twin; per-gate counts, never a blend | the exam format of every Bench family — EXTENDED with item classes (§3: an abstention is WRONG on a thing the learner was taught and RIGHT on a thing it never met; the bank today counts every abstention wrong) |
+| the glyph library (`/data/alpha3-library/K/glyphs/<script>/` — latin-upper, latin-lower, digits, symbols, greek, cyrillic, hebrew, arabic, devanagari: `glyphs.bin` + `fonts.tsv` with a declared `split`: 30 TRAINING and 30 HELD-OUT fonts per script) | the exam bank's letter families were drawn from its held-out fonts | his letters, numbers and symbols stages: the taught exemplars from the training fonts, the never-seen test from the held-out fonts |
+| read speech (`/data/alpha3-library/K/audio/`: LibriSpeech dev-clean, 40 speakers, with transcripts) | not used by any learner yet | books read aloud (stage 12); NOT letter sounds — it holds sentences, not isolated letters, and the box has no speech synthesizer (§9 D-14) |
 | the school's three controls (`/data/dev/alpha3/tools/school.py`: the key as answerer must score 1.0; the majority twin must reproduce the bank's own stated score; the key shifted by one item must NOT score 1.0) | voids a sitting whose grader is broken | the examiner's self-check before every sitting |
 | the gates (`tools/gate_g4.py`, `tools/gate_g5_landing.sh`: a writer sweep with a planted offender, parity against a pinned tree, replay identity with a planted difference) | a landing is proved before a life | the Bench's own build gates and its read-only proof |
 | the ops site's law (`/data/dev/alpha-ops/README.md` §1–§5; `anatomy.py`: every figure read from a file the subject wrote, named beside it; «not recorded» where no file carries it; an AST sweep with a planted offender proves it read-only; the Access gate, fail-closed) | the site's honesty and safety | the console's number law, its read-only proof and its gate (§4.11) |
@@ -904,46 +958,53 @@ Tonight's and tomorrow's lives, ladders and reads (ladder 2's six lives, alpha4-
 **Rules for every phase** (his 19:43 rule and the estate's):
 - at most three builders at a time — Sonnet 5 for the mechanical pieces, Opus 5.5 for the hard ones;
 - nothing runs beside a live learner's read (#236);
-- each piece lands through a gate with planted controls, read by the seat from the builder's own completed run;
+- each piece lands through a gate with planted controls, read by the seat from the builder's own completed run (`Ran N … OK` on the final commit);
 - no ops-site change without his yes on the diff;
-- nothing of the Bench is BUILT before alpha4-2 has launched and the day's reads are done (Q12: target 2026-09-24 ≈ 18:00).
+- nothing of the Bench is BUILT before alpha4-2 has launched and the day's reads are done (target 2026-09-24 ≈ 18:00);
+- the sizes below are the designer's ESTIMATES in builder-days (the seat asked for them, R3-15), and each is measured against its phase's real start and end.
 
-| phase | what is built | what it must prove before the next phase | size (an estimate, to be measured) |
-|---|---|---|---|
-| **0 — the plan** (tonight) | this document, agreed with the seat; the dialogue; his open decisions (§9) put to him | the seat's agreement on every row of `DIALOGUE.md`, or both positions in §9 | — |
-| **1a — the Bench proves itself** (first deliverable — the seat, Q12) | the Bench's own tree: the ledger, the state machine, the scheduler; the toy adapter; the failure zoo (learner toys for the phase-1 detectors + the instrument faults I1–I14); the detectors for ALIVE, KEEPS UP, LEARNS, ONE SHOT, KEEPS, KNOWS-UNKNOWN, FALSE-ABSTAIN, GENERALISES, SHORTCUT, TAKES CORRECTION, REPLAYS, IGNORES-A-SENSE, STOPS GROWING, REPORTS WRONGLY, PLAYS FAIR; the card (json + md + templates); the validator's four refusals on toy stages; the local read-only console | **the diagonal on the zoo** (every cell); every zoo card read twice → the same hash; a planted tape row changes the hash; the writer sweep with its planted offender; the validator refuses a planted bar-above-ceiling, a planted bar-under-null, a planted unreachable plant and a planted underpowered mark | 1 day, 2 builders (Opus: detectors + validator + zoo design; Sonnet: ledger, scheduler, console, templates) |
-| **1b — the creature enters** | the creature's adapter: the DOOR sense and the `stage_end` branch behind one gene line; the Bench genome (FLOOR + the door, the maker/shelf/folder/game senses OFF, EVOLVE OFF); stage −1 on the creature's organs | the landing gate (`gate_g5_landing` + the hour-1 regression: the Bench genome with the door present and silent vs FLOOR); **the EQUIVALENCE control** [round 3, R3-2]: a CLOSED FLOOR tape (ladder 2's `a4l2-floor`, after its close) translated row for row into door rows (the same payloads, times and order; `source` kept, `via: bench` added) and replayed under the Bench genome must give the FLOOR's journal, minus the declared fields; the resume twin (the crash road); the adapter's conformance test; stage −1's probe controls | 1 day, 1–2 builders |
-| **1c — the first stage, live** | stage 0 (BORN) and stage 1 (FIRST NAMES) declared by the seat, validated, and run as ONE 8 h Bench life on a copy of C2's code, beside a FLOOR life — a ladder rung (the seat, Q12) | the stage's card read in the quiet; its hash reproduced by `replay-card`; the correction effect's first reading (printed); the age-matched comparison with the FLOOR life | one 8 h life + its read |
-| **2 — more of the ladder** | stages 2–7 for the creature (arrivals, variants, photographs, self, relations, the game); the chat (10) once the chat door is on master; Alpha 3's adapter written and tested on his CLOSED record — it runs nothing until he lifts his pause; the console on ops.proaras.app IF he says yes | each stage's validator and zoo cells before its first live run; Alpha 3's conformance on his closed record | stage by stage |
-| **3 — outside models** | the jailed local-model adapter; the invented-material families; canaries in every sitting; the pre-test | the jail's refusal (a planted read of the truth directory must fail and be logged); the canaries at chance on the healthy toy and above it on the LEAK-EXPLOITER toy | — |
-| **4 — the top** | stage 14 (THE UNSEEN) and ladder v2 | families generated after the learner is frozen; seeds drawn at test time; every capacity conjunctive | — |
+| phase | what is built | what it must prove before the next phase | size (estimate) · who | cut first if it overruns |
+|---|---|---|---|---|
+| **0 — the plan** (tonight) | this document and the dialogue with the seat; his open decisions put to him (§9) | every row of `DIALOGUE.md` settled, or both positions in §9 | — | — |
+| **1a — the Bench proves itself** (day 1) | the Bench's own tree (`/data/dev/bench`): the ledger, the run's state machine, the scheduler's clock. The toy adapter. The failure zoo for the LETTERS stage's detectors: ALIVE, KEEPS UP, LEARNS, GENERALISES (held-out exemplars), ANSWERS / SILENT (L38), KNOWS-UNKNOWN (never-taught signs), FALSE-ABSTAIN, TAKES CORRECTION (the four arms), FEELS (L39), KEEPS, REPLAYS, PLAYS FAIR (canaries), with the healthy baseline and the instrument faults I1–I4, I8, I13. The card (json + md, the templates for these marks). The validator's four refusals on toy stages. A TEXT console (`bench status`) | **the diagonal** (each toy caught by its detector only; the baseline by none); every zoo card read twice → the same hash; a planted tape row changes it; the writer sweep with its planted offender; the validator refuses a planted bar-above-ceiling, bar-under-null, unreachable plant and underpowered mark | ≤ 1 builder-day · Opus | the web console · the PDF · the other instrument faults |
+| **1b — the creature enters** (days 2–3) | the creature's DOOR sense; the MARK branch (`ask`, `snapshot`, `cycle_end`, `stage_end`, `stage_start`); the Bench genome (FLOOR + the door; maker, shelf, folder and game senses OFF; EVOLVE OFF; the lexicon and web doors HELD); the replay mode that STRIPS names (R3-5); the adapter's conformance test; the in-stage price cap measured by a pre-flight | the landing gate (`gate_g5_landing` + the hour-1 regression: undeclared ≡ master, hash included); **the EQUIVALENCE control** (R3-2): a CLOSED FLOOR tape (`a4l2-floor`, after its close) translated row for row into door rows by a pure function with a round-trip test (door rows → the original rows byte for byte), replayed under the Bench genome ≡ the FLOOR journal minus the declared fields (`via` volatile by name); the quiet test (between `stage_end` and `stage_start` only the Bench's rows and the body's minute rows — R3-10) | ≤ 2 builder-days · Opus for the mark branch (it touches the think thread's apply and the snapshot), Sonnet for the door, the translation and the strip mode | the resume twin (nothing in 1c resumes) |
+| **1c — the first letters card** (day 4–5) | the LETTERS environment (the library's latin-upper and latin-lower glyphs: 3–4 training fonts per letter, the held-out fonts for the test; the invented-alphabet twin family); stage −1 for letters (the eye's organ ceiling at 3 and 4 fonts; its label conflicts — `l` / `I`, `O` / `0`); stage 0 and stage 1 declared by the seat and validated; ONE short Bench life of the creature on a copy of C2's code, beside a FLOOR life (a ladder rung); answers through the ask-door road; the correction = teach again (FEEL not yet); the read in the quiet; the card | **the first honest «does it move forward at letters»**: the card's first line, its hash reproduced by `bench replay-card`, the correction arms' first readings (teach-again vs nothing) | ≤ 1 builder-day · Sonnet + the seat | the sound half of the letters (seen + named as text only; the sound comes with phase 2) |
+| **1d — his full flow** (days 6–7) | the FEEL gene and the ANSWER gene (§4.2), each a one-difference rung with its toy run first and the identity control; then stage 1 again under his full flow (reward · «No» + hurt · teach again · ask again · a new font) | FEEL's toy (the four clauses of §4.2, the shared-cell check) and its identity control; ANSWER's toy (the live answer equals the ask door's answer on the same snapshot); the four arms of §2.1 step 4 read on the new letters card | ≤ 2 builder-days · Opus | ANSWER waits (the ask-door road stays); FEEL first |
+| **2 — kind B, sound, and his next stages** | kind B's FIRST FORM (§4.2), its toy first, then its letters card beside kind A's — his mark «grows better than the hand design»; a voice for the world (§9 D-14) and the creature's sound area (the A4L-VOICE line after its read) → the sound half of letters and stage 4 (small sounds); a SOUND answer (a voice that plays back what it heard — §9 D-17); stages 2–9 for kind A; the chat door on master for stage 11; Alpha 3's adapter written and tested on his CLOSED record (it runs nothing until he lifts his pause); the console on ops.proaras.app IF he says yes | each stage's validator and zoo cells before its first live run; B's toy (the meeting grows on a real pairing and not on a shuffled one) before any B life | stage by stage; kind B's design · Opus | — |
+| **3 — outside models** | the jailed local-model adapter; the invented-material families; canaries in every sitting; the pre-test | the jail's refusal (a planted read of the truth directory must fail, and be logged); canaries at chance on the healthy toy and above chance on the LEAK-EXPLOITER toy | — | — |
+| **4 — the top** | stage 16 (THE UNSEEN) and ladder v2 | families generated after the learner is frozen; every capacity conjunctive | — | — |
 
 ## 8 · Risks, and what would make this plan wrong
-1. **The creature may not clear stage 1 in one 8 h life.** That is a result (STUCK AT 1 with its reasons), not a plan failure. The staircase then starts smaller (3 things).
-2. **The organ ceilings are ESTIMATES** — the best of two declared oracles, not a proof. A learner can beat them. That is flagged (§3.2 L32 checks for a leak), and a stronger oracle is added to the declaration if it happens honestly.
-3. **The creature's cost grows faster than linearly** (0.155 ms per cell per canvas at 4,900 cells, rising — ALPHA4 §11 (4)). A stage that lasts too long makes KEEPS UP fail for the cost, not the learning. Stage lengths are sized at declaration from the cost law, and the card separates the two.
-4. **The quiet-world boundary (§2.4) needs one machinery branch** (`stage_end`). If the seat or the gate refuses it, the fallback is the seat's chain of stage-lives, with its resume proven by the chained-tape twin first. Both positions are in §9 D-12.
-5. **The correction arms as replay twins cost CPU in the quiet** — a window's rows × the learner's cost. If too costly, they shrink to the re-ask window only, or become a live split (disclosed).
-6. **Most bank families above K have no road in the creature** (fill-in-the-blank, formal mathematics). Upper stages will read «cannot answer this form» for a long time. The card must keep that apart from «wrong», or he will read «it failed everything».
-7. **«Cleared the ladder» may be read as «is AGI».** The wording law (§5.6) and the versioned ladder are the guard. The claim is always about this ladder.
-8. **A pretrained outside model may already know our words and pictures.** Invented material, canaries and the pre-test are the guard. A public-benchmark family can only measure memory for such a model, and is marked so.
-9. **Scope.** Sixteen stages, thirty-seven learner detectors and fourteen instrument faults is large. Phase 1 builds only what stages −1 to 1 need, and the rest waits for its phase.
-10. **The Bench as the world changes the creature's upbringing** — scheduled spaced repetition instead of the maker's random stream. Comparisons with earlier lives are therefore age-matched only, never row-for-row.
-11. **The idle quiet leaves wall-clock organs ticking** (the body's minute rows; EVOLVE if it were on). If a later genome makes the mind think without canvases, the quiet is no longer free, and the price cap must cover it.
-12. **This plan's biggest assumption:** that a learner can be graded fairly by a program designed by the same people who build the learner (#158). The guard is the held-out top stage, whose families are generated after the learner is frozen — and in time, families written by someone who never saw the learner.
+1. **The creature's eye already knows Latin letter SHAPES.** Its sealed eye tower was trained on them before birth. Its letters stage therefore tests whether its MIND learns their names, over features that already separate them. The invented-alphabet twin family measures that head start, and the card prints the gap.
+2. **Some letters are the same shape in some fonts** (`l` / `I` / `1`, `O` / `0`). No eye can separate them (#225). Stage −1 measures these as ORGAN LIMITS, and the bars sit under them; otherwise the letters stage fails for a reason no learner controls.
+3. **The creature may not clear letters at first** («if what we have build didn't moved forward» — his words). That is a RESULT: the card's first line names where it stopped and why, and his loop — fix, grow again — takes over.
+4. **FEEL can harm what it should not.** A hurt weakens the edges of the wrong answer, but one sight cell can serve two letters, so a hurt aimed at one letter could lower another. The toy's shared-cell check and the per-letter retention after hurts are the guard. A hurt is never a deletion.
+5. **Kind B may grow nothing useful at first.** A growth rule that never fires, or fires on noise, is found by its toy before any life (L41). A kind B that loses to kind A is a result, not a failure of the plan.
+6. **The box has no voice.** Until a synthesizer is installed (his decision, §9 D-14), «hears and sees at the same time» is the creature's letter ear hearing the NAME as text, and the world's formant-chord names (A4L-VOICE). The card says so.
+7. **The organ ceilings are ESTIMATES** — the best of two declared oracles. A learner that beats one is flagged, and the canaries decide whether that is a leak or a weak oracle.
+8. **The creature's cost grows faster than its size** (ALPHA4 §11 (4)). Short stages keep it young, so this matters less than in a 24 h life, but a stage that grows it large can fail KEEPS UP for its cost, and the card separates cost from learning.
+9. **The quiet world** needs one new branch in the mind (the marks). If the gate refuses it, the fallback is the seat's chain of stage-lives with its resume proven first.
+10. **Upper stages have no road yet** for most of the bank's forms. They read «no road for this form» — a CAPABILITY, never «wrong» — and his reading must not be «it failed everything».
+11. **«Cleared the ladder» may be read as «is AGI».** The wording law (§5.6) and the versioned ladder are the guard.
+12. **The designers also build the learners** (#158). The guard is the held-out top stage, generated after the learner is frozen, and in time families written by someone who never saw the learner.
 
 ## 9 · The open decisions for Ahmad — each with the recommended option
 | # | decision | recommended |
 |---|---|---|
-| D-1 | **The name.** «THE SCHOOL» (his word; the ladder's levels are school grades K → University; a school teaches, examines and gives a report card) · «THE PARENTS» (his word for the teaching role) · «the Bench» (an engineer's word) | **THE SCHOOL** |
-| D-2 | **His front page.** The Bench's one screen, read-only, as the new ops.proaras.app front page behind the same Access gate; today's pages (`/anatomy`, `/alpha4` live, `/alpha3`) behind an «Expert» door; the chat box kept | **yes** — the diff shown to him first (CLAUDE.md) |
-| D-3 | **Buttons that act** (pause the world, resume, stop at the stage's end, arm the next stage, start a run) | **none in phase 1** (the seat runs the command line); then pause and stop first, each as an operator + step-up gated, allow-listed, audited endpoint, one by one on his word |
-| D-4 | **EVOLVE (the creature changing its own genome) in a Bench life** | **OFF in phase 1**, as on the ladder's FLOOR; later keyed to `stage_end`, where a mutant is judged on the stage's closed record and adopted only between stages (a new epoch, re-tested) |
-| D-5 | **A drop-in model that cannot replay its own record** | the seat's recommendation, which the designer shares: a learner that DECLARES replay and diverges FAILS; one that does not declare it reads «not gradable» on replay marks and proves its honesty by canaries and the pre-test |
-| D-6 | **Waking him** | Telegram night OFF, a morning line ON — his switch |
-| D-7 | **The ladder's stages and their order** (§2.2: calibration → born → first names → more things → another way → real pictures → knowing itself → two things and counting → acting → hearing → reading → speaking → reasoning → tools → the open world → the unseen), following his order «surroundings → knowing yourself → language → reasoning → its own questions» | approve the list; the numbers of the bars are declared stage by stage after calibration |
-| D-8 | **Alpha 3 as a Bench learner** (his pause of 2026-09-19 14:44 is his to lift) | not until phase 1's card on the creature is trusted; its adapter is written and tested on his closed record meanwhile |
+| D-1 | **The name:** «THE SCHOOL» (his word; the ladder is school — letters to books; a school teaches, examines and gives a report card) · «THE PARENTS» (his word for the teaching role) · «the Bench» | **THE SCHOOL** |
+| D-2 | **His front page:** the one screen, read-only, as the new ops.proaras.app front page behind the same Access gate; today's pages behind an «Expert» door; the chat box kept | **yes** — the diff shown to him first |
+| D-3 | **Buttons that act** (pause, resume, stop at the stage's end, arm the next stage, start a run) | **none in phase 1** (the seat runs the command line); then pause and stop first, each gated, allow-listed and audited, one by one on his word |
+| D-4 | **EVOLVE** (the creature changing its own genome) **in a Bench life** | **OFF in phase 1**; later keyed to `stage_end`, adopted only between stages as a new epoch |
+| D-5 | **A drop-in model that cannot replay its own record** | the seat's rule, shared by the designer: a learner that DECLARES replay and diverges FAILS; one that does not declare it reads «not gradable» on replay marks and proves its honesty by canaries and the pre-test |
+| D-6 | **Waking him:** a Telegram line when a learner stops | night OFF, a morning line ON — his switch |
+| D-7 | **The order:** letters first (his 23:06 word), which replaces his 09-21 order (surroundings → knowing yourself → language → reasoning → its own questions). «Surroundings» becomes stage 0's world and «knowing itself» a strand beside every stage | **confirm letters-first** (the seat's and the designer's recommendation) |
+| D-8 | **Alpha 3 as a learner** (his pause of 2026-09-19 is his to lift) | not until phase 1's letters card is trusted; its adapter is tested on his closed record meanwhile |
 | D-9 | **Outside models** | local, jailed, without network, as SUBJECTS only; never a mouth for the creature (his 16:56 pure road) — confirm |
-| D-10 | **The creature's one genome change for the Bench** (the DOOR sense and the `stage_end` branch behind one line) | yes, under the ladder law: one difference, gated, beside a FLOOR |
-| D-11 | **Correction arms** | the live learner gets EVERY correction; the «re-shown» and «left alone» arms are REPLAYS (paired per item); a learner that cannot be replayed gets a live split, disclosed |
-| D-12 | **Where a stage ends** (the one question the designer and the seat answered differently in round 2 — to be settled in round 3, else his) | the designer: a mark on the tape and a quiet world, the body never stops (his 09-17 rule); a resume only on a crash · the seat (round 2): a chain of stage-lives, each closed whole and resumed from its snapshot, the resume proven by a twin |
+| D-10 | **The creature's genome changes for the Bench** (the door and the marks in 1b; FEEL and ANSWER in 1d) | yes, each under the ladder law: one difference, gated, beside a FLOOR |
+| D-11 | **How the correction is measured** | the live learner gets his FULL flow every time; the three comparison arms (teach-again only, «No» + hurt only, nothing) are REPLAYS of its record, compared item by item; a learner that cannot be replayed gets a live split, disclosed |
+| D-12 | *(settled with the seat, R3-1 — no decision needed)* a stage ends with a mark on the tape and a quiet world; the body never stops (his 09-17 rule); a resume only after a crash | — |
+| D-13 | **Stages 13–16** — acting (the game), tools (the hands), the open world (the web), the unseen (the top) — are the designer's, after his list | keep them after his list; «the unseen» stays the top stage that defines «cleared the ladder» |
+| D-14 | **A voice for the world.** The box has no speech synthesizer. His «hears and sees at the same time» needs one for letter sounds, small sounds and the voices of his 3–4 rule. Installing a small open one (espeak-ng) is a change to the box | **yes, for phase 2**; until then the letters are heard as their NAME through the creature's letter ear, and the world speaks its fixed formant-chord names |
+| D-15 | **What «a little damage … like something hurt it» means in software** | a FELT signal: it weakens exactly the connections that gave the wrong answer, and is counted on the learner's body so it knows it was hurt. **Never a deletion** of memory or cells. The toy proves it does not hurt other letters |
+| D-16 | **Build kind B** (his «set of instructions that grows implicitly») | **yes, its first form in phase 2**, beside kind A on the same letters stage — his mark «grows better than the hand design» |
+| D-17 | **A SOUND answer** («output the similar frequency or sound wavelength») | phase 2: a voice that plays back the sound it heard with the word; until then it answers in words, which already shows «its brain recognizing it as what» |
