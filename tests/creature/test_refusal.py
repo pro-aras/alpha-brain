@@ -172,6 +172,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 03:05 +0400 — ALPHA4-G.md task 1: one row,
         # matching the genes.py RUNS entry added by this task (docs/ALPHA4-PREREG.md §2/§3).
         "GROW": "GROW     unbounded",
+        # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 12:13 +0400 — A4L-COST: one row, matching the genes.py RUNS entry added by
+        # docs/briefs/A4L-COST.md (the per-row witness made sparse, A4-LADDER-PREREG §2.1).
+        "HASH": "HASH     sparse; dense at snapshot",
         "EXAM": "EXAM     every 2000 canvases",
         "BODY": "BODY     service creature threads eye ear door mind voice",
         "TAPE": "TAPE     run/tape",

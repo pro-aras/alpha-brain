@@ -928,6 +928,9 @@ def main(argv: List[str]) -> int:
     # has ever seen (none declares DOOR_WEB/STAGE_READY) — the control every OTHER mark above already gets for free.
     M["WEB"] = _vl.web_mark(tape, live, "DOOR_WEB" in decl)
     M["STAGE"] = _vl.stage_mark(live, "STAGE_READY" in decl)
+    # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:59 +0400 — A4L-COST (A4-LADDER-PREREG §2.1 C1 (iii)): the reader's own unblinded replay IS a replay under
+    # the life's code+genome when the commits agree (hash unmasked); the floor's replay (ii) is the tape twin's (§1.4 (c)), not this reader's.
+    M["HASH"] = _vl.hash_law_mark(live, st, "HASH" in decl, replay_same=(u1 if not _ign else None))
     M["PLANTS"]["predict_file_pair"] = {"sight_road_rows": live_pred["sight_road_rows"], "rule_rows_filed": live_pred["filed"], "rule_rows_scored": live_pred["scored"], "status_predictions_filed": st.get("predictions_filed")}
     M["PLANTS"]["park_unanswerable_want"] = {"sight_only_rows": len(sight_only), "first_seq": sight_only[0]["seq"] if sight_only else None, "parked_total": parked}
     M["PLANTS"]["belief_contradiction"] = {"clash_rows": kinds.get("clash", 0), "extension_rows": kinds.get("extension", 0)}
@@ -939,7 +942,9 @@ def main(argv: List[str]) -> int:
         bands[name] = json.loads(pth.read_text()) if pth.exists() else "not on disk"
     M["BANDS"] = bands
     graded = ["i_knows", "ii_meeting_real", "iii_growth_matters", "iv_grows_alone", "v_retention", "vi_knows_unknown", "vii_replay", "x_gaze_finds_thing", "xi_gaze_earns_place", "MODULATION"] + (["ix_not_luck"] if "ix_not_luck" in M else [])
-    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK", "ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD", "EVOLVE") if k in M and M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
+    # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 12:18 +0400 — A4L-COST: "HASH" counted (a FAIL of the rung's own mark must reach `failed`; it is graded only
+    # when the life declares HASH AND the reader's replay is under the life's own code — hash unmasked — so no other life is touched).
+    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK", "ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD", "EVOLVE", "HASH") if k in M and M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
     failed = [k for k in graded if not M[k].get("pass")] + ([] if R["ALIVE"]["pass"] else ["ALIVE"]) + ([] if M["TWINS"]["random_gaze_loses_xi"]["pass"] else ["TWINS.random_gaze"])
     R["marks"] = M; R["marks_failed"] = failed; R["verdict"] = "PASS" if not failed else "FAIL"
     R["seconds_total"] = round(time.perf_counter() - T0, 1)
@@ -1045,13 +1050,26 @@ def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns) -> dict
          "solo_ms_per_canvas_replay": solo_ms, "unblinded_replay_ms_under_workers": unblinded_ms,
          "cpu_hours": round(cpu_ns / 3.6e12, 3) if cpu_ns else None,
          "bar": "G4-7: live ms per CANVAS (STATUS.mind_ms_per_canvas_1min) ≤ 2× the solo probe's · RSS < 2 GB (the 24 h CPU bill printed)",
-         "reason": ""}
+         "reason": "",
+         # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:59 +0400 — A4L-COST task 5: the per-row witness's form and its own ms (STATUS, #164)
+         "hash_form": status.get("hash_form", "not recorded"), "hash_ms_last": status.get("hash_ms_last", "not recorded")}
     if not graded:
         m["reason"] = ("STATUS carries only the per-row median (mind_ms_median_1min), which is not the probe's unit (ms per canvas, #162): "
                        "not graded — every (viii) PASS before 2026-09-22 was a reading of this instrument")
         return m
     m["pass"] = (rss is not None and rss < 2048) and (solo_ms is None or solo_ms <= 0 or per_canvas <= 2 * solo_ms)
     return m
+
+
+# edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:59 +0400 — A4L-COST task 5 («the reader's COST line prints both»): the (viii) row, rendered by one pure function so the
+# line a reader prints is the line a test reads — the witness's form and its own ms beside the per-canvas cost.
+def cost_line(m: dict) -> str:
+    gv = ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"
+    form = m.get("hash_form", "not recorded")
+    hash_part = " · hash not recorded" if form == "not recorded" else f" · hash {form} {m.get('hash_ms_last')} ms a row"
+    return (f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo "
+            f"{m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h{hash_part}"
+            f"{(' · ' + m['reason']) if m.get('reason') else ''} | {gv} |")
 
 
 def write_verdict(out: Path, R: dict) -> None:
@@ -1069,7 +1087,7 @@ def write_verdict(out: Path, R: dict) -> None:
     m = M["iv_grows_alone"]; L.append(f"| (iv) | {m['bar']} | born {m['cells_born']} · refused at caps {m['refused']['caps_total']} (budget {m['refused']['budget']} · nmax {m['refused']['nmax']} · frozen {m['refused']['frozen']}; redundant {m['refused']['redundant']}, not a refusal) (arrivals {m['arrivals']}, budget left {m['budget_left']}) · pruned {m['edges_pruned']}/{m['edges_born']} = {100*m['pruned_share']:.1f} % (cross-thing born {m['edges_cross']['born']} / pruned {m['edges_cross']['pruned']}) · disuse {m['removed_for_disuse']} | {pf(m['pass'])} |")
     m = M["v_retention"]; L.append(f"| (v) | {m['bar']} | " + ("; ".join(f"w{p['window']}: {p['before']:.3f} → first {p['first_after']:.3f} → last {p['last_in_window']:.3f} ({p['drop_pp']:+.1f} pp drop)" for p in m['pairs']) or m['note']) + f" | {pf(m['pass'])} |")
     m = M["vi_knows_unknown"]; L.append(f"| (vi) | {m['bar']} | plant zog answered {m['plant_zog']['answered_rate']:.2f} (as {m['plant_zog']['answered_as']}, abstain {m['plant_zog']['abstain']}) · null vex abstains {m['null_vex']['abstain_rate']:.2f} (answered as {m['null_vex']['answered_as']}) · Q5 {m['Q5_spiral_abstain']:.2f} · false {m['false_abstention']:.3f} | {pf(m['pass'])} |")
-    m = M["viii_cost"]; L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo {m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
+    m = M["viii_cost"]; L.append(cost_line(m))   # A4L-COST: one renderer (cost_line, above) — the same cells as before, plus the witness
     if "ix_not_luck" in M:
         m = M["ix_not_luck"]; L.append(f"| (ix) | {m['bar']} | rank {m['rank_of_own']} of {m['of']} (own {m['own_composite']}; best random {m['best_random']}) | {pf(m['pass'])} |")
     m = M["x_gaze_finds_thing"]; L.append(f"| (x) | {m['bar']} | gaze {m['gaze_rate']:.3f} vs random {m['random_rate']:.3f} (×{m['ratio']}) | {pf(m['pass'])} |")
@@ -1086,10 +1104,13 @@ def write_verdict(out: Path, R: dict) -> None:
     m = M["W3_1_beliefs"]; L.append(f"| W3-1 beliefs | {m['bar']} | rows {m['rows']} · kinds {m['kinds']} · standing words {m['standing_words']} of {m['words_heard']} heard · max belief rows per word {m['max_belief_rows_per_word']} · extra belief rows {m['extra_belief_rows']} vs clash rows {m['clash_rows']} · unaccounted {m['unaccounted']} | {gv(m)} |")
     m = M["PARK"]; L.append(f"| PARK | {m['bar']} | parked {m['parked']} of {m['thinks']} thinks (rules {m['parked_rules']}) — {m['reason']} | {gv(m)} |")
     # edit: Claude (Fable 5.1), 2026-09-22 19:3x +0400 — THE ONE LIFE's marks (PREREG §19)
-    for _k in ("ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD"):
+    for _k in ("ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD", "HASH"):
         if _k in M:
             m = M[_k]
-            if _k == "THREAD":
+            if _k == "HASH":     # A4L-COST (Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:59 +0400)
+                body = (f"form {m.get('status_hash_form')} · hash ms last {m.get('status_hash_ms_last')} · hashed rows {m.get('hash_rows')} · "
+                        f"(iii) {m.get('iii')} · (ii) {m.get('ii')} — {m['reason']}")
+            elif _k == "THREAD":
                 body = f"max sense gap {m.get('max_gap_s')} s (per hour {m.get('gaps_per_hour')}) · thinks {m.get('thinks')} waits {m.get('think_waits')} (share {m.get('waits_share')}, {m.get('think_wait_ms')} ms) · think ms last {m.get('think_ms_last')} median {m.get('think_ms_median')} — {m['reason']}"
             elif _k == "HANDS":
                 body = f"runs {m.get('runs')} (by program {m.get('runs_by_program')}; no road {m.get('hands_no_road')}) · asked {m.get('asked')} recognised {m.get('recognised_share')} vs shuffled shelf {m.get('shuffled_share')} · touch {m.get('touch_events')} smell {m.get('smell_events')} — {m['reason']}"

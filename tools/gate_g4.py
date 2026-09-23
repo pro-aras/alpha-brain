@@ -24,7 +24,10 @@ PIN = "44f6fa81f9c21c549036a44f89dfb04276cd07aaec9565ccbd13ef75a11bcc00"   # G4-
 # imports Organism (it builds a read-only shadow of one, genome.machinery.Organism/Area, to reuse
 # Organism.recall_many/genome.questions.build_ledgers verbatim against a frozen copy -- never the live
 # organism), so it deliberately does NOT get the "is_sense" treatment, only the writer check.
-SENSE_FILES = ["creature/world_maker.py", "creature/ask.py", "creature/tape.py", "creature/think_thread.py"]
+# edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:59 +0400 — A4L-COST (the brief's writer law: «tools/gate_g4.py step 1 must stay green and you ADD a
+# planted offender for your new module»): genome/witness.py, the sparse per-row witness, is part of the organism and writes NO file — the
+# sweep's writer check now reaches it (its planted offender: tests/genome/test_a4l_cost_writer_sweep.py, TestGateG4SweepsTheNewModule).
+SENSE_FILES = ["creature/world_maker.py", "creature/ask.py", "creature/tape.py", "creature/think_thread.py", "genome/witness.py"]
 FORBIDDEN_DIRS = ("state", "journal", "memory")
 
 

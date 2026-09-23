@@ -25,6 +25,11 @@ only — no birth (a would-be novelty birth is counted on the plain attribute `b
 OUT of `self.c`/state_hash for the same reason `moments_sight_only` is, see its own comment below: a new
 `self.c` key would move every genome's hash, even one that never declares SURPRISE), no misfire/prune/merge.
 `Organism.expected_sight(xw)` is read-only (never births, mirrors `recall()`'s own alive-masking).
+edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:57 +0400 — A4L-COST (docs/briefs/A4L-COST.md; docs/A4-LADDER-PREREG.md §2.1): the
+gene `HASH sparse; dense at snapshot` and `Organism.row_hash()`, the per-row witness every journal row carries — state_hash() itself when
+HASH is undeclared (byte-identical, the negative control), genome/witness.py's SPARSE digest when declared; the three MASK writers
+(_hebb, _prune, _merge) tell the witness which rows they changed. state_hash(), save() and load() are untouched: the dense digest stays
+the snapshot's.
 
 Laws of this file:
 - The genome is text. A gene this machinery does not know REFUSES to start (GenomeError),
@@ -47,6 +52,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
+
+from .witness import SparseWitness, timed as _witness_timed    # A4L-COST: the sparse per-row witness (imports nothing from this module)
 
 
 class GenomeError(Exception):
@@ -238,6 +245,14 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"unbounded", a)
                 if not m: raise GenomeError(f"GROW: cannot read {a!r} (ALPHA4-G task 1: GROW unbounded)")
                 g["declared"]["GROW"] = {"unbounded": True}
+            # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:57 +0400 — A4L-COST (A4-LADDER-PREREG §2.1): HASH sparse; dense at snapshot —
+            # the `hash` field of every journal row becomes the SPARSE digest (genome/witness.py); the dense state_hash() stays the snapshot's
+            # (Organism.save's meta; load's verification chain unchanged). A strict fixed literal like CRASH/GROW: any other form refuses BY
+            # NAME, never silently falls back to the dense witness. Undeclared: today's dense per-row hash, byte-identical.
+            elif gene == "HASH":
+                m = re.fullmatch(r"sparse; dense at snapshot", a)
+                if not m: raise GenomeError(f"HASH: cannot read {a!r} (A4L-COST: HASH sparse; dense at snapshot)")
+                g["declared"]["HASH"] = {"row": "sparse", "snapshot": "dense"}
             elif gene == "KWTA":
                 g["kwta"] = int(args[0])
             elif gene == "HEBB":
@@ -964,6 +979,13 @@ class Organism:
         # advances — but the explicit cursor also protects the boundary at t=0, which must never regenerate
         # before any BUDGET has ever been spent).
         self._budget_regen_last_t: Optional[int] = None
+        # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:57 +0400 — A4L-COST: the per-row witness. `_witness` exists ONLY when HASH is
+        # declared (undeclared: None, and row_hash() IS state_hash() — the negative control, byte-identical). `hash_form`/`hash_ms_last`
+        # are plain attributes, never self.c keys (a new self.c key would move every genome's hash — moments_sight_only's own reason),
+        # read by STATUS (creature/body.py). The think's shadow (object.__new__) carries none of the three.
+        self._witness: Optional[SparseWitness] = SparseWitness() if "HASH" in genome.declared else None
+        self.hash_form = "sparse" if self._witness is not None else "dense"
+        self.hash_ms_last: Optional[float] = None
 
     # ------------------------------------------------------------------ arrivals & budget
     def new_arrival(self) -> None:
@@ -1183,6 +1205,7 @@ class Organism:
         self._maybe_regen_budget()
 
     def _hebb(self, S: List[int], T: List[int]) -> None:
+        w = getattr(self, "_witness", None)      # A4L-COST: the witness learns every row whose MASK this wires (None: HASH undeclared)
         for s in S:
             for t in T:
                 if self.mask[s, t] == 0:
@@ -1191,6 +1214,8 @@ class Organism:
                     self.strikes[s, t] = 0
                     self.c["edges_born"] += 1
                     self.edges_log.append((self.t, int(s), int(t)))   # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — cast (same crash class as the merge log)
+                    if w is not None:
+                        w.mark(s)
 
     def _delta(self, S: List[int], T: List[int], lr: Optional[float] = None) -> None:
         # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:20 +0400 — ALPHA4-G.md task 1: `tgt_w`/
@@ -1307,6 +1332,7 @@ class Organism:
 
     def _prune(self, S: List[int], T: List[int]) -> None:
         fl, ch = self.g.prune_floor, self.g.prune_chances
+        w = getattr(self, "_witness", None)      # A4L-COST: the witness learns every row whose MASK a pruned edge clears
         rows = np.array(sorted(set(S)), dtype=np.int64); cols = np.array(sorted(set(T)), dtype=np.int64)
         for sel in ((rows, slice(None)), (slice(None), cols)):
             m = self.mask[sel] == 1
@@ -1327,12 +1353,15 @@ class Organism:
                         self.prunes_log.append((self.t, int(rows[r_]), int(c_)))
                 W[dead] = 0.0; M[dead] = 0; ST[dead] = 0
                 self.W[sel] = W; self.mask[sel] = M; self.strikes[sel] = ST
+                if w is not None:
+                    w.mark_rows(np.flatnonzero(dead.any(axis=1)) if isinstance(sel[0], slice) else rows[dead.any(axis=1)])
                 self.c["edges_pruned"] += int(k)   # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — a numpy count in self.c is a numpy int forever: cast
 
     def _merge(self, area: Area, winners: List[int], axis: int) -> None:
         """MERGE cos>THETA_M same-answer: two alike winners with the same answer become one
         (the lower id is kept, rows averaged over the union of their edges)."""
         ws = sorted(set(w for w in winners if area.alive[w]))
+        wit = getattr(self, "_witness", None)    # A4L-COST: the witness learns every row whose MASK a merge changes
         for i in range(len(ws)):
             for j in range(i + 1, len(ws)):
                 a, b = ws[i], ws[j]
@@ -1350,6 +1379,8 @@ class Organism:
                     self.mask[a] = ((ma + mb) > 0).astype(np.uint8)
                     self.strikes[a] = np.minimum(self.strikes[a], self.strikes[b])
                     self.W[b] = 0.0; self.mask[b] = 0; self.strikes[b] = 0
+                    if wit is not None:
+                        wit.mark_rows([a, b])
                 else:
                     ma, mb = self.mask[:, a].astype(np.float64), self.mask[:, b].astype(np.float64)
                     den = np.maximum(ma + mb, 1.0)
@@ -1357,6 +1388,8 @@ class Organism:
                     self.mask[:, a] = ((ma + mb) > 0).astype(np.uint8)
                     self.strikes[:, a] = np.minimum(self.strikes[:, a], self.strikes[:, b])
                     self.W[:, b] = 0.0; self.mask[:, b] = 0; self.strikes[:, b] = 0
+                    if wit is not None:
+                        wit.mark_rows(np.flatnonzero(mb))     # every row of column b moved to column a
                 area.alive[b] = 0
                 area.misfires[b] = 0
                 self.c[f"cells_merged_{area.name}"] += 1
@@ -1699,6 +1732,16 @@ class Organism:
         return o
 
     # ------------------------------------------------------------------ identity
+    # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:57 +0400 — A4L-COST task 1 (docs/A4-LADDER-PREREG.md §2.1).
+    def row_hash(self) -> str:
+        """The per-row witness every journal row carries (creature/mind.py's five hashed rows). HASH undeclared: state_hash() itself —
+        byte-identical, the negative control. HASH sparse: genome/witness.py's sparse digest over the same state (lossless by the
+        invariant W != 0 => mask != 0). Timed by genome/witness.py's clock into `hash_ms_last` for STATUS — the mind never reads a clock
+        (G4-PREREG §2.3). The dense digest stays the snapshot's: save() writes state_hash() into the meta and load() verifies it."""
+        w = getattr(self, "_witness", None)
+        h, self.hash_ms_last = _witness_timed(self.state_hash if w is None else (lambda: w.digest(self)))
+        return h
+
     # edit: Claude (Sonnet 5, builder F), 2026-09-21 16:45 +0400 -- G5-F task 2 / MIND-MEMORY.md R1: hash
     # only the LIVE block W[:n_s, :n_w] (mask, strikes likewise) instead of the full nmax x nmax arrays.
     # A cell id is only ever written by _birth() with cid < area.n at the time of the write, and area.n

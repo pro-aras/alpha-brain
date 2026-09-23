@@ -1,3 +1,6 @@
+# edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:58 +0400 — A4L-COST (docs/briefs/A4L-COST.md; A4-LADDER-PREREG §2.1): the five hashed journal rows (the canvas row, a
+# sight-only canvas, the coarse row, the epoch row, the sleep row) read `self.org.row_hash()` — the ONE per-row witness the genome
+# declares (dense = the digest they always carried; sparse under HASH). This file still reads no clock: the organism times its witness.
 # edit: Claude (Sonnet 5, builder E), 2026-09-21 16:58 +0400 — G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md):
 # PREDICT's word encoding (`xw`) hoisted above the error() call and passed through (word=, xw=, episodes=)
 # so arms "conjunctive"/"episodic"/"comparator" (genome/predict.py) can read them; the default "novelty"
@@ -1321,7 +1324,7 @@ class Mind:
                 "cells": [int(self.org.sight.alive.sum()), int(self.org.words.alive.sum())],
                 "edges": [edges_born, edges_pruned],
                 "err": round(err, 4), "lr": round(lr_scale, 3), "ep": ep_id,
-                "hash": self.org.state_hash(),
+                "hash": self.org.row_hash(),
                 **({"arrival": arrival_n} if arrival_n is not None else {}),   # PREREG §15: an event field on the row where an arrival opened
                 # G-EYE-1 (edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400): every glance's window origin, this
                 # episode's when/act/source — EXTRA keys, never touching any key above; a genome that never declares DELIVER
@@ -1387,7 +1390,7 @@ class Mind:
                             self._maybe_ask(f"sight:{cell}", "what-is", [moment])
             self._write_journal(row["at"], {
                 "seq": row["seq"], "moment": moment, "word": None,
-                "err": round(err, 4), "ep": ep_id, "hash": self.org.state_hash(),
+                "err": round(err, 4), "ep": ep_id, "hash": self.org.row_hash(),
                 **({"windows": [[int(t), int(l)] for (t, l) in g["windows"]], "when": row["at"], "act": "glance",
                     "source": meta.get("source"), "glance": 0} if deliver_on else {}),
                 # L-4: a sight-only canvas has no word, so `predicted` is always None here and no glance
@@ -1422,7 +1425,7 @@ class Mind:
             return None
         idx = len(residuals) - 1
         out: Dict[str, object] = {"seq": seq, "moment": moment, "act": "coarse", "glance": idx,
-                                   "fix": None, "windows": None, "hash": self.org.state_hash()}
+                                   "fix": None, "windows": None, "hash": self.org.row_hash()}
         if surprise_gene is not None:
             out["residual"] = residuals[idx]; out["confirmed"] = confirmed_flags[idx]
         return out
@@ -1489,7 +1492,7 @@ class Mind:
             "seq": row["seq"],
             "epoch": {"epoch": self.evolve_epoch, "genome_sha": genome_sha, "moment": self.org.t,
                       "gene": gene_key, "value": value, "proposal_no": proposal.get("no")},
-            "hash": self.org.state_hash(),
+            "hash": self.org.row_hash(),
         })
 
     def _maybe_sleep(self, row: Dict[str, object]) -> None:
@@ -1522,7 +1525,7 @@ class Mind:
             if "TRAITS" in self.genome.declared and _TRAITS_AVAILABLE:
                 Traits.learn(self.episodes)      # per the interface name given for wave 2; unexercised until genome/traits.py lands
             self._write_journal(row["at"], {
-                "seq": row["seq"], "sleep": {**result, "cycle": cycled}, "hash": self.org.state_hash(),
+                "seq": row["seq"], "sleep": {**result, "cycle": cycled}, "hash": self.org.row_hash(),
             })
             # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:05 +0400 — W3-3 (docs/G4-WAVE3-CLAUSES.md;
             # genome/curiosity.py's own contract, B10 note 3): one sleep_boundary() call per boundary crossed
