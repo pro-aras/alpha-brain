@@ -38,6 +38,18 @@ class JournalCounts(unittest.TestCase):
         self.assertEqual(c["moments"], 4); self.assertEqual(c["canvases"], 3); self.assertEqual(c["coarse_rows"], 1)
 
 
+# edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:59 +0400 — A4L-VOICE: a voiced canvas's eye row carries a `sound` dict too
+# (the binding: {seq, winners, cells}) — the check counts the SOUND ROWS consumed under `sound` and the bindings under `sound_bound`, never
+# one tape row twice; a genome without the voice counts exactly as before.
+class VoiceCounts(unittest.TestCase):
+    def test_a_binding_row_is_counted_apart(self):
+        rows = [{"seq": 10, "sound": {"moment": "m9", "level": 0.1, "when": 0.006, "file": None, "ep": None, "pending": True}},
+                {"seq": 11, "moment": "m9", "glance": 0, "word": "cup", "births": [["sound", 0, "novelty"]], "sound": {"seq": 10, "winners": [0], "cells": 1}}]
+        c = check.journal_counts(rows)
+        self.assertEqual(c["sound"], 1); self.assertEqual(c["sound_bound"], 1)
+        self.assertNotIn("sound_bound", check.journal_counts(ROWS))
+
+
 class BirthsByHour(unittest.TestCase):
     def test_sight_births_per_hour_split_by_source(self):
         hours, by_hour, by_source = check.births_by_hour(ROWS)

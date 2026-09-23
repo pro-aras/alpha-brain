@@ -42,6 +42,11 @@ def journal_counts(rows) -> collections.Counter:
             if d["think"].get("kind") == "self": c["self_thinks"] += 1
         for k in ("question", "say", "sound", "sit", "sleep", "outcome", "body"):
             if k in d: c[k] += 1
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:59 +0400 — A4L-VOICE: the eye row that BINDS a maker sound carries a
+        # `sound` dict ({seq, winners, cells}); it is counted as `sound_bound`, never as a second `sound` (one tape row counted once).
+        if isinstance(d.get("sound"), dict) and "winners" in d["sound"]:
+            c["sound"] -= 1; c["sound_bound"] += 1
+            if c["sound"] == 0: del c["sound"]
     return c
 
 
@@ -129,6 +134,18 @@ def main(argv) -> int:
         for name, v in q5.items(): print(f"[check] Q5 {name}: {json.dumps(v)[:240]}")
         comp = (e.get("ask_all_words") or {}).get("composite")
         if comp: print(f"[check] composite: {json.dumps(comp)[:300]}")
+        # A4L-VOICE (Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:59 +0400): the exam by sound, when the genome has the area —
+        # the 16-thing marks and the scores over the things the world has voiced (a 20-min pre-flight voices window 0's eleven only).
+        snd = e.get("ask_sound")
+        if isinstance(snd, dict):
+            def _acc(b):
+                return None if not isinstance(b, dict) or b.get("acc") is None else round(float(b["acc"]), 3)
+            print(f"[check] ask_sound: V1 {_acc(snd.get('V1'))} V2 {_acc(snd.get('V2'))} V5 {_acc(snd.get('V5'))} · on the voiced "
+                  f"{len(snd.get('voiced_things') or [])}: V1 {_acc(snd.get('V1_on_voiced'))} V2 {_acc(snd.get('V2_on_voiced'))} V5 {_acc(snd.get('V5_on_voiced'))}"
+                  f" · V1b {json.dumps({k: (v or {}).get('correct') for k, v in (snd.get('V1b') or {}).items()})} · {snd.get('reason')}")
+    if status.get("sound_born") is not None:
+        print(f"[check] voice: sound_born {status.get('sound_born')} alive {status.get('sound_cells')} refused {status.get('sound_births_refused')} "
+              f"· voice rows {status.get('voice_rows')} bound {status.get('voice_bound')}")
     return 0
 
 

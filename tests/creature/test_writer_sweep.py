@@ -201,6 +201,37 @@ class TestWriterSweepG41(unittest.TestCase):
         self.assertEqual(find_offenders(clean, check_organism_import=False), [])
         self.assertEqual(find_offenders(clean, check_organism_import=True), [])
 
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:46 +0400 — A4L-VOICE (docs/briefs/A4L-VOICE.md, the writer law):
+    # a planted offender SHAPED like this branch's new module (genome/voice.py's `wav_bytes`, the maker's `_publish_voice` writing the
+    # chord's audit wav) that writes the wav under `state/` instead of `truth/voice/` and imports machinery — caught by BOTH sweeps;
+    # the real genome/voice.py and creature/world_maker.py (which now writes truth/voice/<word>.wav) are clean under both.
+    def test_planted_voice_module_that_writes_memory_is_caught_by_both_sweeps(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        plant = tmp_dir / "planted_voice.py"
+        plant.write_text(
+            "from pathlib import Path\n"
+            "from genome import machinery\n"
+            "def _publish_voice(publish, root, moment, thing, answering=None):\n"
+            "    wav_dir = Path(root) / 'state' / 'voice'\n"
+            "    wav_path = wav_dir / (thing + '.wav')\n"
+            "    wav_path.write_bytes(b'RIFF')\n"
+        )
+        self.assertTrue(find_offenders(plant, check_organism_import=False), "a voice-shaped module writing under 'state' must be caught")
+        self.assertTrue(find_offenders(plant, check_organism_import=True), "and its machinery import too")
+        import importlib
+        gate_g4 = importlib.import_module("tools.gate_g4")
+        self.assertTrue(gate_g4.sweep([plant]), "the SAME plant must be caught by tools/gate_g4.py's own sweep()")
+        self.assertIn("genome/voice.py", gate_g4.SENSE_FILES, "the orchestrator's gate walks the voice module")
+
+    def test_the_real_voice_module_and_the_voiced_maker_pass_both_sweeps(self) -> None:
+        real = [ROOT / "genome" / "voice.py", ROOT / "creature" / "world_maker.py"]
+        for p in real:
+            self.assertEqual(find_offenders(p, check_organism_import=False), [], f"{p} must be clean under this file's own walker")
+            self.assertEqual(find_offenders(p, check_organism_import=True), [], f"{p} must not import Organism/machinery")
+        import importlib
+        gate_g4 = importlib.import_module("tools.gate_g4")
+        self.assertEqual(gate_g4.sweep(real), [])
+
 
 if __name__ == "__main__":
     unittest.main()

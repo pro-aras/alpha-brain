@@ -24,7 +24,10 @@ PIN = "44f6fa81f9c21c549036a44f89dfb04276cd07aaec9565ccbd13ef75a11bcc00"   # G4-
 # imports Organism (it builds a read-only shadow of one, genome.machinery.Organism/Area, to reuse
 # Organism.recall_many/genome.questions.build_ledgers verbatim against a frozen copy -- never the live
 # organism), so it deliberately does NOT get the "is_sense" treatment, only the writer check.
-SENSE_FILES = ["creature/world_maker.py", "creature/ask.py", "creature/tape.py", "creature/think_thread.py"]
+SENSE_FILES = ["creature/world_maker.py", "creature/ask.py", "creature/tape.py", "creature/think_thread.py",
+               # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:46 +0400 — A4L-VOICE: the world's voice (a module the maker
+               # SENSE imports) is walked by the writer check too; tests/creature/test_writer_sweep.py plants an offender shaped like it.
+               "genome/voice.py"]
 FORBIDDEN_DIRS = ("state", "journal", "memory")
 
 

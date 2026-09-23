@@ -136,3 +136,22 @@ class ShuffleVoice(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:50 +0400 — the marks on the hour-1 fixture's record.
+class OnTheHourOneFixture(unittest.TestCase):
+    """L-1's rule on THIS record (A4-LADDER-PREREG §1.9): alpha4-1's first hour — no voice, no sound area — reads «not gradable»
+    on every voice mark. The fixture is read-only (/data/dev/a4-ladder/fixtures/, made at dispatch); skipped where it is absent."""
+    FIX = __import__("pathlib").Path("/data/dev/a4-ladder/fixtures/alpha4-1-hour1/tape/2026-09-23.jsonl")
+
+    @unittest.skipUnless(FIX.exists(), "the hour-1 fixture is not on this machine")
+    def test_every_voice_mark_is_not_gradable_on_the_fixture(self):
+        import json
+        from tools.verdict_life import hear_mark, sound_cells_mark, sound_mark, voice_harm_mark
+        tape = [json.loads(l) for l in self.FIX.read_text().splitlines() if l.strip()]
+        self.assertGreater(len(tape), 4000)
+        m = sound_mark(tape, [], {})
+        self.assertFalse(m["graded"]); self.assertIn("heard 0 s", m["reason"])
+        self.assertFalse(hear_mark(None, None, None)["graded"])      # the life's genome has no sound area: its exam carries ask_sound None
+        self.assertFalse(voice_harm_mark({"ask_seen_words": {"Q1": {"acc": 0.9}}}, None, declared=False)["graded"])
+        self.assertFalse(sound_cells_mark({})["graded"])

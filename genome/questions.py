@@ -357,6 +357,23 @@ def ask_sound(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], 
     voiced = dict(voiced or {})
     out["voiced"] = {t: int(voiced.get(t, 0)) for t in things}
     short = [t for t in things if voiced.get(t, 0) < min_voiced]
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:49 +0400 — the scores over the things the world has VOICED ≥ min_voiced
+    # times, printed beside the whole-16 marks: a 20-min pre-flight voices window 0's eleven only (window 2 arrives at hour 4), so its
+    # positive control reads HERE while the 16-thing marks read «not gradable» — never a bar, a reading of the road on what was heard.
+    heard = [t for t in things if voiced.get(t, 0) >= min_voiced]
+    def _on(block, key_ok):
+        if not block or not heard:
+            return None
+        ok = sum(1 for t in heard if key_ok(block, t))
+        return {"correct": ok, "n": len(heard), "acc": ok / len(heard)}
+    out["voiced_things"] = heard
+    out["V1_on_voiced"] = _on(out.get("V1"), lambda b, t: b["per_thing"].get(t) == t)
+    out["V5_on_voiced"] = _on(out.get("V5"), lambda b, t: b["per_thing"].get(t) == t)
+    if out.get("V2") and heard:
+        per = out["V2"]["per_thing"]; vals = [per.get(t) for t in heard if per.get(t) is not None]
+        out["V2_on_voiced"] = {"acc": (sum(vals) / len(vals)) if vals else None, "n_things": len(vals)}
+    else:
+        out["V2_on_voiced"] = None
     out["gradable"] = not short
     out["reason"] = "graded" if not short else f"not gradable: voiced < {min_voiced} times: {short}"
     return out

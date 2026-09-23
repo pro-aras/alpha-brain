@@ -1041,6 +1041,12 @@ class Organism:
         # live in `self.c_sound`, NEVER in `self.c` (json.dumps(self.c) is hashed whole: one new key would move every
         # genome's digest — the `moments_sight_only`/`budget_regenerated` precedent), and `state_hash()` reads the sound state
         # only once the area holds a cell (an EMPTY sound area is hash-neutral, as an untouched THRESH ring is).
+        # The MEET sight words line's own value is READ here (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:47 +0400):
+        # the sight↔words meeting is this class's W/mask/strikes, so any other primary pair has no mechanism and refuses by name.
+        # Before this the value was parsed and read by nothing (tools/inventory.py's VALUE-UNREAD row for MEET, on every genome);
+        # the parser already accepts only the three known pairs, so this refuses nothing that parses today.
+        if tuple(genome.meet) != ("sight", "words"):
+            raise GenomeError(f"MEET {genome.meet[0]} {genome.meet[1]}: the organism's edge matrix is sight × words (A4L-VOICE: the sound meetings are MEET sight sound | MEET sound words)")
         self.sound: Optional[Area] = None
         self.sound_meets: Dict[str, _Pair] = {}
         self.c_sound: Dict[str, int] = {}
