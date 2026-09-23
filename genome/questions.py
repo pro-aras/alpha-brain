@@ -24,15 +24,21 @@ Ledger = Dict[int, Set[str]]     # cell id -> the set of things (or words) it wa
 
 def build_ledgers(org: Organism, moment_thing: Dict[int, str]) -> Dict[str, Ledger]:
     """From the organism's birth log (moment, area, cell, reason) and the runner's own map of
-    moment → thing shown, derive which thing each cell was born on. Merges union the sets."""
+    moment → thing shown, derive which thing each cell was born on. Merges union the sets.
+
+    edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — A4L-VOICE (docs/briefs/A4L-VOICE.md task 2):
+    a THIRD ledger. Before this edit every birth whose area was not "sight" was filed as WORDS — a sound cell would have
+    been read as a word cell, silently. A sound birth is filed as SOUND, its own ledger; the returned dict always carries
+    "sound" (empty for a genome without the area — every consumer reads "sight"/"words" by key, grepped)."""
     sight: Ledger = {}
     words: Ledger = {}
+    sound: Ledger = {}
     for m, area, cid, _reason in org.births:
-        (sight if area == "sight" else words).setdefault(cid, set()).add(moment_thing[m])
+        (sight if area == "sight" else (sound if area == "sound" else words)).setdefault(cid, set()).add(moment_thing[m])
     for _m, area, kept, dropped in org.merges:
-        L = sight if area == "sight" else words
+        L = sight if area == "sight" else (sound if area == "sound" else words)
         L.setdefault(kept, set()).update(L.get(dropped, set()))
-    return {"sight": sight, "words": words}
+    return {"sight": sight, "words": words, "sound": sound}
 
 
 def word_cells(org: Organism, ledger_words: Ledger, word: str) -> List[int]:
@@ -269,3 +275,88 @@ def why(org: Organism, ledgers: Dict[str, Ledger], episodes, word: str) -> Dict[
             if org.mask[s, t]:
                 edges.append((s, t, float(org.W[s, t])))
     return {"cells": cells, "episodes": ep_ids, "edges": edges}
+
+
+# ============================================================================ A4L-VOICE: the exam by SOUND
+# edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:37 +0400 — docs/briefs/A4L-VOICE.md task 4; docs/A4-LADDER-PREREG.md
+# §2.3 (V1, V2, V5, V1b). The chords are handed in (genome/voice.py's trait_f32 — the bytes the maker publishes), the held-out renders
+# are the exam's own (seed 2), and every answer is scored by a LEDGER outside the organism. Reads only: the organism's hash is
+# unchanged by it (the exam asserts it).
+def _label(L: Ledger, cell) -> str:
+    return "/".join(sorted(L.get(cell, set()))) if cell is not None else ""
+
+
+def ask_sound(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: Dict[str, List[List[np.ndarray]]],
+              chords: Dict[str, np.ndarray], shifted: Dict[str, Dict[str, np.ndarray]] = None,
+              voiced: Dict[str, int] = None, min_voiced: int = 5) -> Dict[str, object]:
+    """V1 — each thing's chord → recall sound→sight → the sight cell's birth ledger names the thing.
+    V2 — each held-out render's glances → recall_many sight→sound → the sound cell's ledger names the thing.
+    V5 — each chord → recall sound→words → the word cell's ledger names the thing (only when MEET sound words exists).
+    V1b — the ±4 % pitch-shifted chords, V1's road (printed, no bar). `voiced`: the maker's sound rows per word on the
+    tape; `gradable` is False until every asked thing was voiced ≥ `min_voiced` times (the PREREG's «not gradable» rule).
+    A genome with no sound area answers `{"graded": False, "reason": ...}` — never an error."""
+    if getattr(org, "sound", None) is None:
+        return {"gradable": False, "reason": "no sound area (AREA sound undeclared)"}
+    Ls, Lw, Lu = ledgers["sight"], ledgers["words"], ledgers.get("sound", {})
+    pairs = getattr(org, "sound_meets", {})
+    out: Dict[str, object] = {"things": list(things), "sound_born": int(org.sound.n), "sound_alive": int(org.sound.alive.sum())}
+
+    def by_chord(to: str, L: Ledger, table: Dict[str, np.ndarray]) -> Dict[str, object]:
+        ok = 0; per: Dict[str, str] = {}; reasons: Dict[str, int] = {}
+        for t in things:
+            if t not in table:
+                per[t] = "no chord"; continue
+            r = org.recall("sound", table[t], to=to)
+            if r["cell"] is None:
+                reasons[r["reason"]] = reasons.get(r["reason"], 0) + 1
+                per[t] = f"abstain:{r['reason']}"
+            else:
+                lab = _label(L, r["cell"]); per[t] = lab or "?"
+                ok += int(L.get(r["cell"], set()) == {t})
+        n = len(things)
+        return {"correct": ok, "n": n, "acc": (ok / n) if n else 0.0, "abstain": reasons, "per_thing": per}
+
+    out["V1"] = by_chord("sight", Ls, chords) if "sight-sound" in pairs else None
+    out["V5"] = by_chord("words", Lw, chords) if "sound-words" in pairs else None
+    # V2 names the answered SOUND cell by the chord it HOLDS (its prototype resonates the thing's TRUE chord at THETA_SOUND)
+    # — «the true mapping». On the rung this is its birth ledger (the maker says chord(t) on t's canvas); on the SHUFFLED-
+    # sound twin the birth ledger would carry the canvas's label and read the permuted pairing as correct — a null that
+    # passes by construction (#228's fifth gate). The birth-ledger reading is printed beside it (`ledger_correct`).
+    identity: Dict[int, str] = {}
+    th = float(getattr(org, "theta_sound", 0.0) or 0.0)
+    for u in range(int(org.sound.n)):
+        if not org.sound.alive[u]:
+            continue
+        best_t, best_c = None, -1.0
+        for t, ch in chords.items():
+            cv = float(org.sound.cells[u] @ ch)
+            if cv > best_c:
+                best_t, best_c = t, cv
+        if best_t is not None and best_c >= th:
+            identity[u] = best_t
+    out["sound_identity"] = {int(u): t for u, t in sorted(identity.items())}
+    if "sight-sound" in pairs:
+        ok = 0; ok_ledger = 0; n = 0; per: Dict[str, List[int]] = {}; reasons: Dict[str, int] = {}
+        for t in things:
+            per[t] = [0, 0]
+            for xs in held.get(t, []):
+                r = org.recall_many("sight", xs, to="sound"); n += 1; per[t][1] += 1
+                if r["cell"] is None:
+                    reasons[r["reason"]] = reasons.get(r["reason"], 0) + 1
+                    continue
+                if identity.get(int(r["cell"])) == t:
+                    ok += 1; per[t][0] += 1
+                if Lu.get(r["cell"], set()) == {t}:
+                    ok_ledger += 1
+        out["V2"] = {"correct": ok, "n": n, "acc": (ok / n) if n else 0.0, "abstain": reasons, "ledger_correct": ok_ledger,
+                     "per_thing": {t: (v[0] / v[1]) if v[1] else None for t, v in per.items()}}
+    else:
+        out["V2"] = None
+    if shifted and "sight-sound" in pairs:
+        out["V1b"] = {s: by_chord("sight", Ls, {t: d[s] for t, d in shifted.items() if s in d}) for s in ("0.96", "1.04")}
+    voiced = dict(voiced or {})
+    out["voiced"] = {t: int(voiced.get(t, 0)) for t in things}
+    short = [t for t in things if voiced.get(t, 0) < min_voiced]
+    out["gradable"] = not short
+    out["reason"] = "graded" if not short else f"not gradable: voiced < {min_voiced} times: {short}"
+    return out

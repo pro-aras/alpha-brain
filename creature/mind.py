@@ -309,6 +309,12 @@ class Mind:
             else None
         )
         self.sound_events: int = 0
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:32 +0400 — A4L-VOICE: the maker's sound rows held until
+        # their canvas's eye row (moment -> {"trait", "seq"}), and two counts on STATUS on every write (#164): maker sound rows
+        # consumed (`voice_rows`) and bound at a canvas (`voice_bound`) — a voice that is heard but never bound is the finding.
+        self.pending_sound: Dict[str, Dict[str, object]] = {}
+        self.voice_rows: int = 0
+        self.voice_bound: int = 0
         # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # items 3/4: touch/smell's own dedicated rings (see the module-level comment on TOUCH_TRAIT_DIM
         # above for why they are not self.outcome_episodes). Gated on their own SENSE_TOUCH/SENSE_SMELL
@@ -615,7 +621,10 @@ class Mind:
         # :244-257"). Gates itself on FAST's own "sound" key (self.sound_episodes is None otherwise), the
         # same one-row-carries-no-work-until-armed law every other new sense here already follows.
         elif sense == "ear-sound":
-            self._consume_ear_sound(row)
+            # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:32 +0400 — A4L-VOICE task 3: `--blind sound` (the V3
+            # twin) steps every sound row over whole — no FAST episode, no pending sound, no journal row.
+            if "sound" not in self.blind:
+                self._consume_ear_sound(row)
         # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # items 3/4: the two new tape senses (touch/smell), same one-row-carries-no-work-until-armed law.
         elif sense == "touch":
@@ -956,10 +965,19 @@ class Mind:
         lesson) and written to the DEDICATED sound_episodes ring (never self.episodes -- dims differ and
         this ring, like K's outcome_episodes, is never replayed through Organism.moment). "sound_episodes
         is None" covers both "FAST undeclared" and "FAST declared without the 'sound' key" -- the twin
-        (#228): the row is stepped over, no journal, no episode, byte-for-byte the pre-L-13 behaviour."""
-        if self.sound_episodes is None:
-            return
+        (#228): the row is stepped over, no journal, no episode, byte-for-byte the pre-L-13 behaviour.
+
+        A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:32 +0400 — docs/briefs/A4L-VOICE.md task 2):
+        a sound row the MAKER published on a canvas's own moment (`source: maker` — the world's voice) is ALSO held pending
+        like a word, when the organism has a sound area (AREA sound declared), and bound at that moment's eye row
+        (`_consume_eye`): the sound area resonates/births and meets sight and words there. Its journal row carries
+        `"pending": True`. A sound row without a maker moment (a wav dropped in his folder: the ear door's `a<sha>e<i>`
+        moments) keeps today's FAST-only road; with no sound area at all (the FLOOR genome — «the voice alone»), every row
+        keeps it, byte-for-byte."""
         meta = row.get("meta") or {}
+        area_on = (self.org.sound is not None and meta.get("source") == "maker" and meta.get("moment") is not None)
+        if self.sound_episodes is None and not area_on:
+            return
         payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
         try:
             raw = payload_path.read_bytes()
@@ -972,13 +990,17 @@ class Mind:
             return
         x_s = trait.astype(np.float64)
         x_w = np.zeros(1, dtype=np.float64)
-        ep_id = self.sound_episodes.write(moment=self.org.t, x_s=x_s, x_w=x_w, word="", surprise=0.0)
-        self.sound_events += 1
-        self._write_journal(row["at"], {
-            "seq": row["seq"],
-            "sound": {"moment": meta.get("moment"), "level": meta.get("level"), "when": meta.get("when"),
-                      "file": meta.get("file"), "ep": ep_id},
-        })
+        ep_id = None
+        if self.sound_episodes is not None:
+            ep_id = self.sound_episodes.write(moment=self.org.t, x_s=x_s, x_w=x_w, word="", surprise=0.0)
+            self.sound_events += 1
+        sound_row: Dict[str, object] = {"moment": meta.get("moment"), "level": meta.get("level"), "when": meta.get("when"),
+                                         "file": meta.get("file"), "ep": ep_id}
+        if area_on:
+            self.pending_sound[str(meta.get("moment"))] = {"trait": x_s, "seq": int(row["seq"])}
+            self.voice_rows += 1
+            sound_row["pending"] = True
+        self._write_journal(row["at"], {"seq": row["seq"], "sound": sound_row})
 
     # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 3
     # (BODY-SENSES.md §4.6). Mirrors _consume_ear_sound's own shape exactly (dedicated ring, errors=replace's
@@ -1183,6 +1205,20 @@ class Mind:
         # instant's ear rows delivered, in order (popped alongside self.pending above; a moment with one
         # ear row is a one-element list, byte-identical in meaning to `word` alone).
         words_in_instant: List[str] = self.pending_words.pop(moment, []) if moment is not None else []
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:36 +0400 — A4L-VOICE task 3: `--blind ear` (V1's twin).
+        # «The words area never lights»: the ORGANISM hears no word — `word`/`words_in_instant` (and so xw, PREDICT, SURPRISE's
+        # expectation, the episode) are None/[] below, exactly as on a wordless canvas. The RUNNER's bookkeeping still reads the
+        # ear row: `label` is the word the tape carried, used ONLY for the ledger (moment_word — «the sight cell's birth ledger
+        # names the thing», V1's own read) and for ARRIVAL's world clock (a never-heard word opens an arrival, the ONE budget
+        # refreshes). Blind to exactly ONE thing (#228's addendum): without ARRIVAL the twin would have 0 arrivals in 8 h and
+        # its births would be refused by the budget — V1 would then read the budget, not the ear (#228 (a), #238). Not blind:
+        # label == word, every line below byte-for-byte what it was.
+        label = word
+        if "ear" in self.blind:
+            word, words_in_instant = None, []
+        # A4L-VOICE task 2: this canvas's SOUND (the maker's chord, held since its ear-sound row) — bound HERE, at the eye row.
+        snd = self.pending_sound.pop(str(moment), None) if (moment is not None and self.pending_sound) else None
+        x_snd = snd["trait"] if snd is not None else None
         # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 4 (MOUTH): the CURRENT
         # instant's words and first glance, read by _maybe_think -> _maybe_say below (the mouth judges what
         # it says against THIS canvas's own glance, never a stored/replayed one).
@@ -1277,7 +1313,12 @@ class Mind:
             seam0 = {"where": ((int(g["windows"][0][0]), int(g["windows"][0][1])) if "where" not in self.blind else None),
                       "when": row["at"], "act": "glance", "source": meta.get("source"), "glance": 0}
 
-        if word is not None:
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:36 +0400 — A4L-VOICE task 2/3: the worded road ALSO
+        # carries a canvas that has a SOUND and no word (`--blind ear`, or a voiced canvas whose word never came) — «a canvas
+        # that carries a SOUND and no word must still run the sight↔sound meeting, never the sight-only road» (the brief's own
+        # words; #228 (a): else V1's twin can learn nothing by construction). With a word and no sound every line below is
+        # byte-for-byte the old road (x_snd None; `word or label` == word; the episode/score/journal lines unchanged).
+        if word is not None or x_snd is not None:
             births_before = len(self.org.births)
             edges_before = len(self.org.edges_log)
             prunes_before = len(self.org.prunes_log)
@@ -1285,24 +1326,31 @@ class Mind:
             # fresh BEFORE the moment that first meets it (life 1 never called new_arrival: arrivals 0, budget spent once,
             # 419 births refused, nothing born after 07:41 +04). Gated on the gene: an undeclared ARRIVAL changes nothing.
             arrival_n: Optional[int] = None
-            if word not in self._heard:
-                self._heard.add(word)
+            arr_word = word if word is not None else label       # A4L-VOICE: the blind-ear twin keeps the world's arrival clock
+            if arr_word is not None and arr_word not in self._heard:
+                self._heard.add(arr_word)
                 if "ARRIVAL" in self.genome.declared:
                     self.org.new_arrival()
                     arrival_n = int(self.org.arrivals)
+            ledger_word = word if word is not None else (label if label is not None else "")
+            sound_winners: List[int] = []
             for i, x in enumerate(org_feats):
-                self.moment_word[self.org.t] = word          # keyed by the organism's OWN moment counter, one per glance (or one per canvas under BIND)
+                self.moment_word[self.org.t] = ledger_word    # keyed by the organism's OWN moment counter, one per glance (or one per canvas under BIND)
                 # L-4: confirmed_flags[i] is False on every existing genome (SURPRISE undeclared -> floor
                 # is None -> every flag False) — byte-identical to the old bare `self.org.moment(x, xw,
                 # lr_scale=lr_scale)` call.
-                S, T = self.org.moment(x, xw, lr_scale=lr_scale, confirm=confirmed_flags[i])
+                S, T = self.org.moment(x, xw, lr_scale=lr_scale, confirm=confirmed_flags[i], x_snd=x_snd)
+                if x_snd is not None:
+                    sound_winners.extend(u for u in self.org.last_sound_winners if u not in sound_winners)
                 if predict_on:
                     self.predictor.note_winners(S)
             ep_kwargs = seam0 if moment_on else {}         # G-MIND-1: Episodes stores the seam only once MOMENT declares the columns
             # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: words_in_instant/
             # tape_moment are stored UNCONDITIONALLY (not gated on MOMENT — the plan's own words: "MOMENT
             # keys ... gains nothing in the genome"), a fresh pair of Episodes columns exactly like x_s2 above.
-            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw, word=word, surprise=err,
+            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0,
+                                          x_w=(xw if xw is not None else encode_word("", self.genome.ear_blank_zero)),
+                                          word=(word if word is not None else ""), surprise=err,
                                           words_in_instant=words_in_instant, tape_moment=moment,
                                           **ep_kwargs) if fast_on else None
             # L-4: "no think-pool item" — glance 0 is the one FAST's episode is built from (f0 above); if
@@ -1310,7 +1358,10 @@ class Mind:
             # SLEEP/the episodic PREDICT arm, which read the episode ring directly, not the pool.
             if fast_on and ep_id is not None and confirmed_flags and confirmed_flags[0]:
                 self._confirmed_episodes.add(ep_id)
-            self._score_due_predictions(word, g["feats"][0] if g["feats"] else None, words_in_instant=words_in_instant)
+            if word is not None:
+                self._score_due_predictions(word, g["feats"][0] if g["feats"] else None, words_in_instant=words_in_instant)
+            if snd is not None:
+                self.voice_bound += 1
             births = [[b[1], int(b[2]), b[3]] for b in self.org.births[births_before:]]
             edges_born = len(self.org.edges_log) - edges_before
             edges_pruned = len(self.org.prunes_log) - prunes_before
@@ -1333,6 +1384,11 @@ class Mind:
                 # (len(g["fix"])); the coarse glance's own residual/confirmed live on its own row, below.
                 # Undeclared SURPRISE: this key is absent, byte-identical to before this gene existed.
                 **({"residual": residuals[:len(g["fix"])], "confirmed": confirmed_flags[:len(g["fix"])]} if surprise_gene is not None else {}),
+                # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:36 +0400): the sound bound at this
+                # canvas — its tape row's seq, the sound winners of its glances, the sound area's alive count. Absent (no key at
+                # all) on every canvas without a sound: a genome/tape without the voice writes exactly the row it always wrote.
+                **({"sound": {"seq": int(snd["seq"]), "winners": [int(u) for u in sound_winners],
+                              "cells": int(self.org.sound.alive.sum()) if self.org.sound is not None else 0}} if snd is not None else {}),
             }
             self._write_journal(row["at"], journal_row)
             coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene)
@@ -1346,8 +1402,15 @@ class Mind:
             # included, or snapshot() KeyErrors the first time such a birth happens (caught by this
             # test, not by inspection) -- word "" here, exactly what the written episode itself carries.
             births_before = len(self.org.births)
+            # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:36 +0400 — A4L-VOICE task 3: under `--blind ear` a
+            # worded canvas with no sound comes here; the runner still books its label (the ledger) and its arrival (the world's
+            # clock). Not blind: `label` is None on this road (no word came), so both lines are no-ops — byte-for-byte the old road.
+            if label is not None and label not in self._heard:
+                self._heard.add(label)
+                if "ARRIVAL" in self.genome.declared:
+                    self.org.new_arrival()
             for x in org_feats:
-                self.moment_word[self.org.t] = ""
+                self.moment_word[self.org.t] = label if label is not None else ""
                 self.org.moment_sight(x)
             births_after = len(self.org.births)
             xw_blank = encode_word("", self.genome.ear_blank_zero)
@@ -1516,7 +1579,8 @@ class Mind:
                 rec = self.episodes.get(eid)
                 if rec is not None:
                     self.moment_word[t0 + i] = rec["word"]
-            result = run_sleep(self.org, self.episodes, n)
+            # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400): `--blind ear` replays with no word
+            result = run_sleep(self.org, self.episodes, n, **({"words": False} if "ear" in self.blind else {}))
             self.sleep_count += 1
             cycled = run_cycle(self.org)
             if "TRAITS" in self.genome.declared and _TRAITS_AVAILABLE:
@@ -2703,6 +2767,15 @@ class Mind:
             "web_refused_rate": self.web_refused_rate,
             "web_refused_hold": self.web_refused_hold,
         }
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400 — A4L-VOICE: the SOUND ledger (a sound birth is
+        # filed as sound, genome/questions.build_ledgers) and the in-flight maker sounds (the same durability `ear_pending` has,
+        # #230) — written ONLY when the organism has a sound area, so a genome without it writes exactly the ledger it always did.
+        if self.org.sound is not None:
+            ledger["sound"] = {str(k): sorted(v) for k, v in ledgers.get("sound", {}).items()}
+            ledger["sound_pending"] = {k: {"trait": [float(x) for x in v["trait"]], "seq": int(v["seq"])}
+                                       for k, v in self.pending_sound.items()}
+            ledger["voice_rows"] = self.voice_rows
+            ledger["voice_bound"] = self.voice_bound
         ledger_tmp = state_dir / "ledger_tmp.json"
         ledger_tmp.write_text(json.dumps(ledger))
         os.replace(str(ledger_tmp), str(state_dir / "ledger.json"))
@@ -2756,6 +2829,11 @@ class Mind:
             ledger = json.loads(ledger_path.read_text())
             mind.pending = dict(ledger.get("ear_pending", {}))
             mind.pending_words = {k: list(v) for k, v in ledger.get("ear_pending_words", {}).items()}
+            # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400): in-flight maker sounds + counts
+            mind.pending_sound = {k: {"trait": np.asarray(v["trait"], dtype=np.float64), "seq": int(v["seq"])}
+                                  for k, v in (ledger.get("sound_pending") or {}).items()}
+            mind.voice_rows = int(ledger.get("voice_rows", 0))
+            mind.voice_bound = int(ledger.get("voice_bound", 0))
             mind.moment_word = {int(k): v for k, v in ledger.get("moment_word", {}).items()}
             mind._heard = {v for v in mind.moment_word.values() if v}     # PREREG §15: the heard-set, re-derived (never persisted separately)
             mind.last_seq = int(ledger.get("last_seq", 0))

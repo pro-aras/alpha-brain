@@ -197,12 +197,39 @@ def parse_genome(text: str) -> Genome:
                         raise GenomeError(f"RETINA: unknown fixed step {step!r} in {a!r}")
                 if args[-1] != "unit": raise GenomeError("RETINA: the last step must be unit")
                 g["retina"] = tuple(args)
+            # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:25 +0400 — A4L-VOICE (docs/briefs/A4L-VOICE.md task 2;
+            # docs/A4-LADDER-PREREG.md §2.3): `AREA sound from cochlea cos>=<THETA_SOUND>` — a THIRD area on the sealed E52 front's
+            # 37-number trait, its resonance floor ON the line (the PREREG's «one road, four lines»); THETA_SOUND is written by the
+            # V0 band gate (tools/voice_bands.py) exactly as gate G-a writes THETA_N, and the placeholder refuses by name. Stored
+            # under declared["AREA_SOUND"] (a real call site in creature/genes.py's RUNS) AND g["areas"]["sound"] (the areas
+            # check below). Every other AREA line parses exactly as before (the 3-argument form, untouched).
+            elif gene == "AREA" and args and args[0] == "sound":
+                m = re.fullmatch(r"sound from cochlea cos>=(" + _NUM + r")", a)
+                if not m:
+                    if re.fullmatch(r"sound from cochlea cos>=THETA_SOUND", a):
+                        raise GenomeError("AREA sound: THETA_SOUND not set (the V0 band gate writes it: tools/voice_bands.py)")
+                    raise GenomeError(f"AREA sound: cannot read {a!r} (A4L-VOICE: AREA sound from cochlea cos>=<THETA_SOUND>)")
+                g["areas"]["sound"] = "cochlea"
+                g["declared"]["AREA_SOUND"] = {"from": "cochlea", "theta": float(m.group(1))}
             elif gene == "AREA":
                 if len(args) != 3 or args[1] != "from": raise GenomeError(f"AREA: cannot read {a!r}")
                 g["areas"][args[0]] = args[2]
             elif gene == "MEET":
+                # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:25 +0400 — A4L-VOICE: THREE meetings, never one
+                # overwriting another. `MEET sight words` keeps its own field g["meet"] (every genome on disk; tests pin it);
+                # `MEET sight sound` / `MEET sound words` are declared genes (creature/genes.py RUNS). Any other pair refuses by
+                # name — before this edit ANY two words parsed silently into g["meet"] (a mis-spelt «MEET sight sounds» would
+                # have replaced the sight↔words meeting); grepped: only «MEET sight words» exists in any genome or test.
                 if len(args) != 2: raise GenomeError(f"MEET: cannot read {a!r}")
-                g["meet"] = (args[0], args[1])
+                pair = (args[0], args[1])
+                if pair == ("sight", "words"):
+                    g["meet"] = pair
+                elif pair == ("sight", "sound"):
+                    g["declared"]["MEET_SIGHT_SOUND"] = {"pair": ["sight", "sound"]}
+                elif pair == ("sound", "words"):
+                    g["declared"]["MEET_SOUND_WORDS"] = {"pair": ["sound", "words"]}
+                else:
+                    raise GenomeError(f"MEET: cannot read {a!r} (the meetings are MEET sight words | MEET sight sound | MEET sound words)")
             elif gene == "BIRTH" and args[0] == "novelty":
                 m = re.fullmatch(r"cos<(" + _NUM + ")", args[1])
                 if not m: raise GenomeError(f"BIRTH novelty: THETA_N not set (gate G-a writes it): {a!r}")
@@ -450,9 +477,17 @@ def parse_genome(text: str) -> Genome:
                 if not m: raise GenomeError(f"MOUTH: cannot read {a!r} (L-11: MOUTH say one frame per think; journaled)")
                 g["declared"]["MOUTH"] = {"say": "one frame per think", "journaled": True}
             elif gene == "WORLD" and (not args or args[0] != "game"):
-                m = re.fullmatch(r"drawn every (\d+) s arrivals every (\d+) h; folder ([A-Za-z0-9_./-]+); web (\d+) per hour by curiosity", a)
-                if not m: raise GenomeError(f"WORLD: cannot read {a!r} (row 8: WORLD drawn every <n> s arrivals every <h> h; folder <p>; web <k> per hour by curiosity)")
+                # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:25 +0400 — A4L-VOICE task 1: an OPTIONAL trailing
+                # "; voice <kind>" clause (GAZE's "coarse"/BUDGET's "regenerate" precedent) — absent, the dict is EXACTLY the four
+                # keys every pin reads (no "voice" key at all); present, only "formant" is implemented (anything else refuses by
+                # name). Read by creature/body.py:_maker_sense_fn -> creature/world_maker.py:_publish_canvas (the chord's row).
+                m = re.fullmatch(r"drawn every (\d+) s arrivals every (\d+) h; folder ([A-Za-z0-9_./-]+); web (\d+) per hour by curiosity(?:; voice ([A-Za-z0-9_-]+))?", a)
+                if not m: raise GenomeError(f"WORLD: cannot read {a!r} (row 8: WORLD drawn every <n> s arrivals every <h> h; folder <p>; web <k> per hour by curiosity[; voice formant])")
                 g["declared"]["WORLD"] = {"drawn_every_s": int(m.group(1)), "arrival_every_h": int(m.group(2)), "folder": m.group(3), "web_per_hour": int(m.group(4))}
+                if m.group(5) is not None:
+                    if m.group(5) != "formant":
+                        raise GenomeError(f"WORLD voice: unknown voice {m.group(5)!r} (A4L-VOICE: WORLD …; voice formant — the only voice implemented)")
+                    g["declared"]["WORLD"]["voice"] = "formant"
             # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 21:0x +0400 — G-G §4.1 / G5-L brief: `WORLD game
             # <id> every <n> s; seed <s>; frames pov <h>x<w> tile <t>; consequence: <text>` — a SECOND, distinct
             # shape of the WORLD gene, dispatched on args[0]=="game" so the existing "drawn ..." branch above
@@ -672,8 +707,13 @@ def parse_genome(text: str) -> Genome:
     missing = [k for k in required if k not in g]
     if missing:
         raise GenomeError(f"genome lacks {missing}")
-    if not {"sight", "words"} <= set(g["areas"].keys()) or set(g["areas"].keys()) - {"sight", "words", "episodes"}:
-        raise GenomeError(f"needs AREA sight and AREA words (G4 §3 B1: episodes from fast is also allowed), got {sorted(g['areas'])}")
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:25 +0400 — A4L-VOICE: `sound` joins the allowed areas (set only
+    # by the AREA sound branch above, which also declares AREA_SOUND); a MEET to sound without the area refuses by name.
+    if not {"sight", "words"} <= set(g["areas"].keys()) or set(g["areas"].keys()) - {"sight", "words", "episodes", "sound"}:
+        raise GenomeError(f"needs AREA sight and AREA words (G4 §3 B1: episodes from fast is also allowed; A4L-VOICE: sound from cochlea), got {sorted(g['areas'])}")
+    for _k, _line in (("MEET_SIGHT_SOUND", "MEET sight sound"), ("MEET_SOUND_WORDS", "MEET sound words")):
+        if _k in g["declared"] and "AREA_SOUND" not in g["declared"]:
+            raise GenomeError(f"{_line}: no AREA sound declared — the meeting has no area (A4L-VOICE: AREA sound from cochlea cos>=<THETA_SOUND>)")
     if not g["stages"]:
         raise GenomeError("no STAGE genes")
     if g["recall_k"] < 1:
@@ -876,6 +916,37 @@ def _json_num(o):
         return float(o)
     raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
 
+
+# edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — A4L-VOICE task 2 (docs/briefs/A4L-VOICE.md;
+# docs/A4-LADDER-PREREG.md §2.3): the sound area's trait (EAR.md §4's TRAIT line: band 32 + onset-shape 4 + level 1 — the
+# sealed E52 front, genome/cochlea.py) and ONE MEET between two areas as a value: its own edge matrix (rows = area a, cols =
+# area b), mask, strikes and logs. The sight↔words meeting stays exactly where it always lived (Organism.W/mask/strikes/
+# edges_log/prunes_log, its own methods byte-for-byte); the two sound meetings are `_Pair`s run by the `_pair_*` methods,
+# which are the SAME HEBB/DELTA/PRUNE/SCALE/answer formulas written over a pair (tests/genome/test_a4l_voice_machinery.py
+# pins the pair recall equal to recall on the sight↔words matrix itself).
+SOUND_TRAIT_DIM = 37
+
+
+class _Pair:
+    """One MEET between area `a` (rows) and area `b` (cols) — W, mask, strikes, and the pair's own birth/prune logs of edges
+    as (moment, a cell, b cell). Capacity is `rows × cols` (GROW: one GROW_CHUNK each, grown by `Organism._grow_pairs`)."""
+
+    def __init__(self, name: str, a: "Area", b: "Area", rows: int, cols: int):
+        self.name, self.a, self.b = name, a, b
+        self.W = np.zeros((rows, cols), dtype=np.float64)
+        self.mask = np.zeros((rows, cols), dtype=np.uint8)
+        self.strikes = np.zeros((rows, cols), dtype=np.uint8)
+        self.edges_log: List[Tuple[int, int, int]] = []
+        self.prunes_log: List[Tuple[int, int, int]] = []
+
+    def grow(self, axis: int) -> None:
+        shape = list(self.W.shape); shape[axis] += GROW_CHUNK; shape = tuple(shape)
+        W = np.zeros(shape, dtype=np.float64); mask = np.zeros(shape, dtype=np.uint8); strikes = np.zeros(shape, dtype=np.uint8)
+        sl = tuple(slice(0, s) for s in self.W.shape)
+        W[sl] = self.W; mask[sl] = self.mask; strikes[sl] = self.strikes
+        self.W, self.mask, self.strikes = W, mask, strikes
+
+
 class Organism:
     """One organism: two areas, one edge matrix, counters. Flags `grow` / `wire` exist for the
     twins T-frozen (grow off after 10 cells) and T-nowire (HEBB off) — defaults ON."""
@@ -964,6 +1035,29 @@ class Organism:
         # advances — but the explicit cursor also protects the boundary at t=0, which must never regenerate
         # before any BUDGET has ever been spent).
         self._budget_regen_last_t: Optional[int] = None
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — A4L-VOICE task 2: the THIRD area and its
+        # two meetings, built ONLY when declared (AREA sound / MEET sight sound / MEET sound words). Undeclared: `self.sound`
+        # is None, `self.sound_meets` empty, `self.c_sound` empty — nothing here is read by any old road. The sound counters
+        # live in `self.c_sound`, NEVER in `self.c` (json.dumps(self.c) is hashed whole: one new key would move every
+        # genome's digest — the `moments_sight_only`/`budget_regenerated` precedent), and `state_hash()` reads the sound state
+        # only once the area holds a cell (an EMPTY sound area is hash-neutral, as an untouched THRESH ring is).
+        self.sound: Optional[Area] = None
+        self.sound_meets: Dict[str, _Pair] = {}
+        self.c_sound: Dict[str, int] = {}
+        self.theta_sound: Optional[float] = None
+        self.last_sound_winners: List[int] = []      # the sound winners of the LAST moment (the mind journals them); never hashed
+        if "AREA_SOUND" in genome.declared:
+            self.theta_sound = float(genome.declared["AREA_SOUND"]["theta"])
+            self.sound = Area("sound", SOUND_TRAIT_DIM, AREA_INITIAL_CAPACITY if self._grow else genome.nmax)
+            self.c_sound = {"births_novelty_sound": 0, "births_error_sound": 0, "births_refused_budget_sound": 0,
+                            "births_refused_redundant_sound": 0, "cells_merged_sound": 0}
+            cap = GROW_CHUNK if self._grow else genome.nmax
+            if "MEET_SIGHT_SOUND" in genome.declared:
+                self.sound_meets["sight-sound"] = _Pair("sight-sound", self.sight, self.sound, cap, cap)
+                self.c_sound.update({"edges_born_sight_sound": 0, "edges_pruned_sight_sound": 0})
+            if "MEET_SOUND_WORDS" in genome.declared:
+                self.sound_meets["sound-words"] = _Pair("sound-words", self.sound, self.words, cap, cap)
+                self.c_sound.update({"edges_born_sound_words": 0, "edges_pruned_sound_words": 0})
 
     # ------------------------------------------------------------------ arrivals & budget
     def new_arrival(self) -> None:
@@ -1072,6 +1166,8 @@ class Organism:
                 return None
         if self.budget_left <= 0:
             self.c["births_refused_budget"] += 1
+            if area is self.sound:           # A4L-VOICE: the ONE budget's own counter above + the sound's attribution (V4)
+                self.c_sound["births_refused_budget_sound"] += 1
             return None
         cid = area.n
         # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:15 +0400 — ALPHA4-G.md task 1: grow
@@ -1082,19 +1178,43 @@ class Organism:
         # unit tests call area.grow() directly, which can make `cid` land more than one chunk past the
         # CURRENT W shape in principle; ordinary play through _birth only ever needs one chunk at a time.
         if self._grow:
-            axis = 0 if area is self.sight else 1
-            while cid >= self.W.shape[axis]:
-                self._grow_W(axis)
+            # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — A4L-VOICE: a SOUND cell never grows the
+            # sight↔words matrix (it is on neither of its axes); every pair the area sits on grows by the same +GROW_CHUNK law
+            # (`_grow_pairs`, a no-op when no sound meeting exists — this branch is then byte-for-byte what it was).
+            if area is not self.sound:
+                axis = 0 if area is self.sight else 1
+                while cid >= self.W.shape[axis]:
+                    self._grow_W(axis)
+            if self.sound_meets:
+                self._grow_pairs(area, cid)
         area.cells[cid] = x
         area.alive[cid] = 1
         area.n += 1
         self.budget_left -= 1
-        self.c[f"births_{reason}_{area.name}"] += 1
+        if area is self.sound:
+            self.c_sound[f"births_{reason}_sound"] += 1     # A4L-VOICE: never a self.c key (the hash law above)
+        else:
+            self.c[f"births_{reason}_{area.name}"] += 1
         self.births.append((self.t, area.name, cid, reason))
         return cid
 
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — A4L-VOICE: every pair on `area` holds `cid`.
+    def _grow_pairs(self, area: Area, cid: int) -> None:
+        for p in self.sound_meets.values():
+            if p.a is area:
+                while cid >= p.W.shape[0]:
+                    p.grow(0)
+            if p.b is area:
+                while cid >= p.W.shape[1]:
+                    p.grow(1)
+
     def _theta(self, area: Area) -> float:
-        """G3 §1: the words area may carry its own threshold (RESONATE … words cos>=T); sight uses THETA_N (the floor under `nearest`)."""
+        """G3 §1: the words area may carry its own threshold (RESONATE … words cos>=T); sight uses THETA_N (the floor under `nearest`).
+        A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400): the sound area resonates at its own
+        floor THETA_SOUND (the AREA sound line's cos>=, written by the V0 band gate). Tested by NAME, never by `self.sound`, so a
+        shadow Organism with no sound attributes (creature/think_thread.py) reads the old two branches untouched."""
+        if area.name == "sound":
+            return self.theta_sound
         return self.g.theta_words if (area is self.words and self.g.theta_words is not None) else self.g.theta_n
 
     def _resonate(self, area: Area, x: np.ndarray, confirm: bool = False) -> List[int]:
@@ -1120,7 +1240,8 @@ class Organism:
         return winners
 
     # ------------------------------------------------------------------ one moment
-    def moment(self, x_s: np.ndarray, x_w: np.ndarray, lr_scale: float = 1.0, confirm: bool = False) -> Tuple[List[int], List[int]]:
+    def moment(self, x_s: np.ndarray, x_w: Optional[np.ndarray], lr_scale: float = 1.0, confirm: bool = False,
+               x_snd: Optional[np.ndarray] = None) -> Tuple[List[int], List[int]]:
         """G4 §3 B6: `lr_scale` (default 1.0, exact — `self.g.lr * 1.0 == self.g.lr` in IEEE754, so the
         pin is untouched) scales DELTA's learning rate for this moment only (PREDICT's `modulate`, B6).
         Returns (S, T), the final sight/words winners of this moment (after any misfire birth) — a NEW
@@ -1133,9 +1254,19 @@ class Organism:
         birth, no think item" (the brief's own words): `_resonate` refuses the novelty birth (above), and
         MISFIRE/PRUNE/MERGE — every mechanism that can birth an error cell, strike a misfire, or retire a
         cell — is skipped whole, not just the birth inside it. HEBB/DELTA still run on whatever already-
-        resonating winners S/T this moment finds, exactly as an ordinary moment's wiring step."""
+        resonating winners S/T this moment finds, exactly as an ordinary moment's wiring step.
+
+        A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — docs/briefs/A4L-VOICE.md task 2):
+        `x_snd` (default None — every existing call byte-identical) is the canvas's SOUND (the maker's chord trait, bound at
+        the eye row): resonated in the sound area AFTER sight and words, under the SAME laws (novelty birth at THETA_SOUND,
+        the ONE budget, KWTA, GROW), then wired to sight and to words by `_sound_meets` (HEBB/DELTA/MISFIRE/PRUNE/MERGE —
+        SCALE in `_scale`) after the sight↔words road has run untouched. `x_w=None` (only ever passed by the mind's
+        sound-and-no-word road — `--blind ear`, or a voiced canvas whose word never came) resonates no word: the words area
+        never lights, the sight↔words road does not run, and the sight↔sound meeting still forms."""
         S = self._resonate(self.sight, x_s, confirm=confirm)
-        T = self._resonate(self.words, x_w, confirm=confirm)
+        T = self._resonate(self.words, x_w, confirm=confirm) if x_w is not None else []
+        U = (self._resonate(self.sound, x_snd, confirm=confirm)
+             if (x_snd is not None and self.sound is not None) else [])
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1): read BEFORE this moment's own wiring below touches W -- "correctly" means the cell's ESTABLISHED
         # answer (from PAST training), never the answer this same glance is about to create (ADAPTS: a passive
@@ -1150,7 +1281,9 @@ class Organism:
             s0 = S[0]
             if self._answer_of(self.sight, s0) == T[0]:
                 self._own_band_push(s0, float(self.sight.cos(x_s)[s0]))
+        w_ran = False
         if self.wire and self.t >= self.g.stage2_start and S and T:
+            w_ran = True
             self._hebb(S, T)
             self._delta(S, T, lr=self.g.lr * lr_scale)
             if not confirm:
@@ -1158,6 +1291,9 @@ class Organism:
                 self._prune(S, T)
                 self._merge(self.sight, S, axis=0)
                 self._merge(self.words, T, axis=1)
+        self.last_sound_winners = U
+        if U and self.sound_meets:
+            self._sound_meets(S, T, U, x_s, x_w, x_snd, lr_scale, confirm, w_ran)
         self.t += 1
         if self.t % self.g.scale_every == 0:
             self._scale()
@@ -1166,6 +1302,210 @@ class Organism:
         # ("a replay is not exempt from BUDGET", read the other way round for regeneration).
         self._maybe_regen_budget()
         return S, T
+
+    # ------------------------------------------------------------------ A4L-VOICE: the two sound meetings
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — docs/briefs/A4L-VOICE.md task 2;
+    # docs/A4-LADDER-PREREG.md §2.3. The SAME HEBB/DELTA/MISFIRE/PRUNE/MERGE rules as sight↔words, written over a `_Pair`.
+    # ONE misfire/merge CHANCE per cell per moment, taken in the FIRST meeting that runs with the cell's area on it, in the
+    # fixed order sight↔words → sight↔sound → sound↔words: a cell is one cell and a moment one chance. Without this, on the
+    # maker's world — where the chord is a 1:1 function of the word, so a sight cell's sound answer and word answer name
+    # the SAME thing — every confusion of a sight cell would be counted twice and split twice (alpha4-1's sight births are
+    # 58 % error births, 3,979 of 6,896 at its 09:54 snapshot), a second change to the sight↔words road beyond the one road
+    # under test (V3). So: with a word, sight and word cells misfire and merge in sight↔words exactly as before, and the
+    # sound cells in sight↔sound; with NO word (the blind-ear twin), sight cells take their chance in sight↔sound — the
+    # twin keeps the whole law in its one meeting. RAISED in the report as the reading of «the SAME rules» this implements.
+    def _sound_meets(self, S, T, U, x_s, x_w, x_snd, lr_scale: float, confirm: bool, w_ran: bool) -> None:
+        if not (self.wire and self.t >= self.g.stage2_start):
+            return
+        lr = self.g.lr * lr_scale
+        S = [s for s in S if self.sight.alive[s]]           # a W-road merge may have retired a winner this very moment
+        T = [t for t in T if self.words.alive[t]]
+        U = [u for u in U if self.sound.alive[u]]
+        chance = {"sight": not w_ran, "words": not w_ran, "sound": True}
+        ss = self.sound_meets.get("sight-sound")
+        if ss is not None and S and U:
+            self._pair_hebb(ss, S, U)
+            self._pair_delta(ss, S, U, lr)
+            if not confirm:
+                S, U = self._pair_misfire(ss, S, U, x_s, x_snd, chance)
+                self._pair_prune(ss, S, U)
+                if chance["sight"]:
+                    self._area_merge(self.sight, S, ss)
+                if chance["sound"]:
+                    self._area_merge(self.sound, U, ss)
+                chance["sight"] = chance["sound"] = False
+                U = [u for u in U if self.sound.alive[u]]
+        sw = self.sound_meets.get("sound-words")
+        if sw is not None and U and T:
+            self._pair_hebb(sw, U, T)
+            self._pair_delta(sw, U, T, lr)
+            if not confirm:
+                U, T = self._pair_misfire(sw, U, T, x_snd, x_w, chance)
+                self._pair_prune(sw, U, T)
+                if chance["sound"]:
+                    self._area_merge(self.sound, U, sw)
+                if chance["words"]:
+                    self._area_merge(self.words, T, sw)
+
+    def _pair_count(self, key: str, n: int = 1) -> None:
+        self.c_sound[key] = self.c_sound.get(key, 0) + int(n)
+
+    def _pair_hebb(self, p: _Pair, R: List[int], C: List[int]) -> None:
+        """`_hebb` over a pair: an edge is born at w = lr the first time its two cells are winners together."""
+        for r in R:
+            for c in C:
+                if p.mask[r, c] == 0:
+                    p.mask[r, c] = 1
+                    p.W[r, c] = self.g.lr
+                    p.strikes[r, c] = 0
+                    self._pair_count(f"edges_born_{p.name.replace('-', '_')}")
+                    p.edges_log.append((self.t, int(r), int(c)))
+
+    def _pair_delta(self, p: _Pair, R: List[int], C: List[int], lr: float) -> None:
+        """`_delta` over a pair (the delta rule toward 1 for this moment's winners, 0 for the rest of a cell's edges)."""
+        tgt_c = np.zeros(p.W.shape[1]); tgt_c[C] = 1.0
+        for r in R:
+            idx = p.mask[r] == 1
+            p.W[r, idx] += lr * (tgt_c[idx] - p.W[r, idx])
+        tgt_r = np.zeros(p.W.shape[0]); tgt_r[R] = 1.0
+        for c in C:
+            idx = p.mask[:, c] == 1
+            p.W[idx, c] += lr * (tgt_r[idx] - p.W[idx, c])
+        for r in R:
+            np.clip(p.W[r], -1.0, 1.0, out=p.W[r])
+        for c in C:
+            np.clip(p.W[:, c], -1.0, 1.0, out=p.W[:, c])
+
+    def _pair_answer_of(self, p: _Pair, area: Area, cid: int) -> Optional[int]:
+        """`_answer_of` over a pair: the cell on the OTHER side of `p` with `cid`'s strongest masked edge."""
+        row = p.W[cid] if area is p.a else p.W[:, cid]
+        m = p.mask[cid] if area is p.a else p.mask[:, cid]
+        if not m.any():
+            return None
+        vals = np.where(m == 1, row, -np.inf)
+        return int(np.argmax(vals))
+
+    def _pair_misfire(self, p: _Pair, R: List[int], C: List[int], x_r, x_c, chance: Dict[str, bool]):
+        """`_misfire` over a pair, for the sides whose cells still hold this moment's chance (see `_sound_meets`). A
+        redundant would-be error birth of a SOUND cell is counted on c_sound (never on the shared counter CYCLE reads —
+        a sound refusal would otherwise fire sight/words consolidation); a sight/word cell's goes where it always went."""
+        for area, winners, other, x in ((p.a, R, C, x_r), (p.b, C, R, x_c)):
+            if not chance.get(area.name, False) or x is None:
+                continue
+            for cid in list(winners):
+                ans = self._pair_answer_of(p, area, cid)
+                if ans is None:
+                    continue
+                if ans in other:
+                    area.misfires[cid] = 0
+                else:
+                    area.misfires[cid] += 1
+                    if area.misfires[cid] >= self.g.misfires:
+                        area.misfires[cid] = 0
+                        if float(area.cells[cid] @ x) > self.g.theta_m:
+                            if area is self.sound:
+                                self.c_sound["births_refused_redundant_sound"] += 1
+                            else:
+                                self.c["births_refused_redundant"] += 1
+                            continue
+                        new = self._birth(area, x, "error")
+                        if new is not None and new not in winners:
+                            winners.append(new)
+        return R, C
+
+    def _pair_prune(self, p: _Pair, R: List[int], C: List[int]) -> None:
+        """`_prune` over a pair: an edge under the floor for `chances` moments it could have been used is removed, logged."""
+        fl, ch = self.g.prune_floor, self.g.prune_chances
+        rows = np.array(sorted(set(R)), dtype=np.int64); cols = np.array(sorted(set(C)), dtype=np.int64)
+        key = f"edges_pruned_{p.name.replace('-', '_')}"
+        for sel in ((rows, slice(None)), (slice(None), cols)):
+            m = p.mask[sel] == 1
+            low = (np.abs(p.W[sel]) < fl) & m
+            st = p.strikes[sel]
+            st = np.where(low, np.minimum(st + 1, 255), 0).astype(np.uint8)
+            p.strikes[sel] = st
+            dead = (st >= ch) & m
+            k = int(dead.sum())
+            if k:
+                W = p.W[sel]; M = p.mask[sel]; ST = p.strikes[sel]
+                if isinstance(sel[0], slice):
+                    for r_, c_ in zip(*np.nonzero(dead)):
+                        p.prunes_log.append((self.t, int(r_), int(cols[c_])))
+                else:
+                    for r_, c_ in zip(*np.nonzero(dead)):
+                        p.prunes_log.append((self.t, int(rows[r_]), int(c_)))
+                W[dead] = 0.0; M[dead] = 0; ST[dead] = 0
+                p.W[sel] = W; p.mask[sel] = M; p.strikes[sel] = ST
+                self._pair_count(key, k)
+
+    def _area_merge(self, area: Area, winners: List[int], via: _Pair) -> None:
+        """`_merge` for a cell whose chance falls in a sound meeting: two alike winners (cos > THETA_M) with the same answer
+        IN `via` become one — the lower id kept. The cell is one cell, so its edges in EVERY matrix it sits on are merged
+        (`_merge_edges_everywhere`), and the merge is logged in the ONE merges log with its area's name."""
+        ws = sorted(set(w for w in winners if area.alive[w]))
+        for i in range(len(ws)):
+            for j in range(i + 1, len(ws)):
+                a, b = ws[i], ws[j]
+                if not (area.alive[a] and area.alive[b]):
+                    continue
+                if float(area.cells[a] @ area.cells[b]) <= self.g.theta_m:
+                    continue
+                aa, ab = self._pair_answer_of(via, area, a), self._pair_answer_of(via, area, b)
+                if aa is None or ab is None or aa != ab:
+                    continue
+                if area is self.sight:
+                    self._merge_rows(self.W, self.mask, self.strikes, a, b, axis=0)
+                elif area is self.words:
+                    self._merge_rows(self.W, self.mask, self.strikes, a, b, axis=1)
+                self._merge_pair_edges(area, a, b)
+                area.alive[b] = 0
+                area.misfires[b] = 0
+                if area is self.sound:
+                    self.c_sound["cells_merged_sound"] += 1
+                else:
+                    self.c[f"cells_merged_{area.name}"] += 1
+                self.merges.append((self.t, area.name, int(a), int(b)))
+
+    @staticmethod
+    def _merge_rows(W: np.ndarray, M: np.ndarray, ST: np.ndarray, a: int, b: int, axis: int) -> None:
+        """MERGE's own edge arithmetic (rows averaged over the union of the two cells' edges; b zeroed), on one matrix and
+        one axis — the same four lines `_merge` runs on the sight↔words matrix."""
+        if axis == 0:
+            ma, mb = M[a].astype(np.float64), M[b].astype(np.float64)
+            den = np.maximum(ma + mb, 1.0)
+            W[a] = (W[a] * ma + W[b] * mb) / den
+            M[a] = ((ma + mb) > 0).astype(np.uint8)
+            ST[a] = np.minimum(ST[a], ST[b])
+            W[b] = 0.0; M[b] = 0; ST[b] = 0
+        else:
+            ma, mb = M[:, a].astype(np.float64), M[:, b].astype(np.float64)
+            den = np.maximum(ma + mb, 1.0)
+            W[:, a] = (W[:, a] * ma + W[:, b] * mb) / den
+            M[:, a] = ((ma + mb) > 0).astype(np.uint8)
+            ST[:, a] = np.minimum(ST[:, a], ST[:, b])
+            W[:, b] = 0.0; M[:, b] = 0; ST[:, b] = 0
+
+    def _merge_pair_edges(self, area: Area, a: int, b: int) -> None:
+        """A merged cell's edges in every SOUND meeting it sits on follow it (#235's chain: a retired cell must not keep
+        answering in a matrix the merge never touched)."""
+        for p in self.sound_meets.values():
+            if p.a is area:
+                self._merge_rows(p.W, p.mask, p.strikes, a, b, axis=0)
+            if p.b is area:
+                self._merge_rows(p.W, p.mask, p.strikes, a, b, axis=1)
+
+    def _scale_pairs(self) -> None:
+        """SCALE over each sound meeting: a cell's edge vector IN THAT MEETING is scaled down to unit norm when it
+        exceeds it (never up) — `_scale`'s own rule, per matrix."""
+        for p in self.sound_meets.values():
+            for r in p.a.alive_ids():
+                n = float(np.linalg.norm(p.W[r]))
+                if n > 1.0:
+                    p.W[r] /= n
+            for c in p.b.alive_ids():
+                n = float(np.linalg.norm(p.W[:, c]))
+                if n > 1.0:
+                    p.W[:, c] /= n
 
     def moment_sight(self, x_s: np.ndarray) -> None:
         """G4 §3 B2 (docs/G4-PREREG.md, row 1a's BODY/tape: a sight-only moment — an eye row whose moment
@@ -1361,6 +1701,8 @@ class Organism:
                 area.misfires[b] = 0
                 self.c[f"cells_merged_{area.name}"] += 1
                 self.merges.append((self.t, area.name, int(a), int(b)))   # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — numpy ids cast: json.dumps in state_hash crashed the mind at its 2nd sleep (alpha4-pre-1, seq 2604) — the FIRST real cycle() this road ever ran
+                if self.sound_meets:      # A4L-VOICE (Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400): the merged cell's sound-meeting edges follow it (#235)
+                    self._merge_pair_edges(area, a, b)
 
     def _scale(self) -> None:
         """SCALE every N moments — synaptic scaling: a cell's edge vector is scaled down to unit norm
@@ -1374,6 +1716,8 @@ class Organism:
             n = float(np.linalg.norm(self.W[:, t]))
             if n > 1.0:
                 self.W[:, t] /= n
+        if self.sound_meets:              # A4L-VOICE (Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400): the same rule, per sound meeting
+            self._scale_pairs()
 
     # ------------------------------------------------------------------ answering
     def _lit(self, area: Area, x: np.ndarray) -> Tuple[List[int], np.ndarray]:
@@ -1410,7 +1754,7 @@ class Organism:
             grade = "unknown"
         result["grade"] = grade; result["own_floor"] = own_floor; result["resembles_cell"] = ref_cell
 
-    def recall(self, side: str, x: np.ndarray, k: int = 1) -> Dict[str, object]:
+    def recall(self, side: str, x: np.ndarray, k: int = 1, to: Optional[str] = None) -> Dict[str, object]:
         """RECALL k=1 + ABSTAIN: light one side (its resonating winners, §11 am. 6; none → NOVEL), read
         the strongest edge from any lit cell to the other side (none positive → NOEDGE); ABSTAIN when the
         strongest COMPETING edge — to a cell whose own answer leads back outside the lit set (§11 am. 5) —
@@ -1419,7 +1763,16 @@ class Organism:
         G4 §3 B1 (RECALL k=N): k > 1 additionally returns "ranked", the top-k distinct answer cells by
         their strongest edge from a lit cell (ties by cell id) — it never changes which cell/reason is
         returned. k=1 (the default) is byte-identical to G1's recall: `ranked(...)` returns {} so the
-        returned dict carries exactly the same keys as before this gene existed."""
+        returned dict carries exactly the same keys as before this gene existed.
+
+        A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400): `to` names the OTHER side
+        when a sound meeting is asked («sound»→«sight», «sight»→«sound», «sound»→«words», «words»→«sound»); None (every
+        existing call) or the sight↔words pairing itself runs the lines below untouched — they never touch the sound state,
+        so a shadow Organism without it (creature/think_thread.py) still recalls."""
+        if to is not None or side == "sound":
+            p = self._pair_for(side, to)
+            if p is not None:
+                return self._recall_pair(p, side, x, k=k)
         area, other = (self.sight, self.words) if side == "sight" else (self.words, self.sight)
         lit, c = self._lit(area, x)
 
@@ -1493,11 +1846,16 @@ class Organism:
         gap = c_best - c_other
         return gap if gap < self.g.abstain_margin else None
 
-    def recall_many(self, side: str, xs: List[np.ndarray]) -> Dict[str, object]:
+    def recall_many(self, side: str, xs: List[np.ndarray], to: Optional[str] = None) -> Dict[str, object]:
         """G1 §1: RECALL over glances. Each glance lights its resonating winners as `recall` does; the evidence for a cell
         on the other side is the SUM over glances of the strongest edge from that glance's lit cells to it; best/second/
         abstain by the same rules over the union of the lit sets. For ONE glance this is `recall`, result for result
-        (pinned in tools/pin_g1.py). Never changes the organism."""
+        (pinned in tools/pin_g1.py). Never changes the organism.
+        A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400): `to` as in `recall`."""
+        if to is not None or side == "sound":
+            p = self._pair_for(side, to)
+            if p is not None:
+                return self._recall_pair_many(p, side, xs)
         area, other = (self.sight, self.words) if side == "sight" else (self.words, self.sight)
         lit_union: List[int] = []; cos_of: Dict[int, float] = {}; best_cos = 0.0
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/ANSWER: the nearest ALIVE cell
@@ -1561,6 +1919,156 @@ class Organism:
         self._attach_grade(result, side, best_l)
         return result
 
+    # ------------------------------------------------------------------ A4L-VOICE: recall across a sound meeting
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — docs/briefs/A4L-VOICE.md task 2/4. `recall` and
+    # `recall_many`'s own algorithm (lit → strongest positive edge → the competitor ratio → the margin → the answer; the same
+    # keys, the same order, the same grade), written over a `_Pair`. Pointed at the sight↔words matrix itself it returns what
+    # recall/recall_many return, result for result (tests/genome/test_a4l_voice_machinery.py) — one law, two matrices.
+    def _pair_for(self, side: str, to: Optional[str]) -> Optional[_Pair]:
+        if to is None:
+            raise ValueError(f"recall from {side!r} names no other side: pass to='sight'|'words' (A4L-VOICE)")
+        if {side, to} == {"sight", "words"}:
+            return None
+        name = "sight-sound" if {side, to} == {"sight", "sound"} else ("sound-words" if {side, to} == {"sound", "words"} else None)
+        if name is None:
+            raise ValueError(f"no meeting between {side!r} and {to!r}")
+        p = getattr(self, "sound_meets", {}).get(name)
+        if p is None:
+            raise GenomeError(f"recall {side}->{to}: MEET {name.replace('-', ' ')} is not declared (A4L-VOICE)")
+        return p
+
+    def _pair_sides(self, p: _Pair, side: str):
+        forward = (side == p.a.name)
+        area, other = (p.a, p.b) if forward else (p.b, p.a)
+        return forward, area, other
+
+    def _pair_margin_close(self, p: _Pair, side: str, other: Area, best_id: int, cos_of: Dict[int, float]) -> Optional[float]:
+        """`_margin_close` over a pair (the sight side only, as there): the answers read in the SAME matrix."""
+        if self.g.abstain_margin is None or side != "sight":
+            return None
+        c_best = max([v for l, v in cos_of.items() if self._pair_answer_of(p, self.sight, l) == best_id], default=None)
+        c_other = max([v for l, v in cos_of.items() if self._pair_answer_of(p, self.sight, l) not in (None, best_id)], default=None)
+        if c_best is None or c_other is None:
+            return None
+        gap = c_best - c_other
+        return gap if gap < self.g.abstain_margin else None
+
+    def _recall_pair(self, p: _Pair, side: str, x: np.ndarray, k: int = 1) -> Dict[str, object]:
+        forward, area, other = self._pair_sides(p, side)
+        lit, c = self._lit(area, x)
+
+        def ranked(cands: List[Tuple[float, int, int]]) -> Dict[str, object]:
+            if k <= 1:
+                return {}
+            best_per: Dict[int, float] = {}
+            for v, j, _l in cands:
+                if j not in best_per or v > best_per[j]:
+                    best_per[j] = v
+            top = sorted(best_per.items(), key=lambda kv: (-kv[1], kv[0]))[:k]
+            return {"ranked": [(int(j), float(v)) for j, v in top]}
+
+        if not lit:
+            best_cos = float(c.max()) if len(c) else 0.0
+            nearest = int(np.argmax(c)) if len(c) else None
+            result = {"cell": None, "reason": "novel", "lit": None, "best": 0.0, "second": 0.0, "cos": best_cos, **ranked([])}
+            self._attach_grade(result, side, nearest)
+            return result
+        lit_set = set(lit)
+        cands: List[Tuple[float, int, int]] = []
+        n_o = other.n
+        for l in lit:
+            row = (p.W[l] if forward else p.W[:, l])[:n_o]
+            m = ((p.mask[l] if forward else p.mask[:, l]) == 1)[:n_o]
+            m &= other.alive[:n_o] == 1
+            for j in np.flatnonzero(m):
+                v = float(row[j])
+                if v > 0.0:
+                    cands.append((v, int(j), l))
+        if not cands:
+            result = {"cell": None, "reason": "noedge", "lit": lit[0], "best": 0.0, "second": 0.0, "cos": float(c[lit[0]]), **ranked(cands)}
+            self._attach_grade(result, side, lit[0])
+            return result
+        cands.sort(key=lambda z: (-z[0], z[1], z[2]))
+        best, best_id, best_l = cands[0]
+        second = 0.0
+        for v, j, _l in cands[1:]:
+            if j == best_id:
+                continue
+            if self._pair_answer_of(p, other, j) not in lit_set:
+                second = v
+                break
+        if second > 0.0 and second / best > self.g.abstain_ratio:
+            result = {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), **ranked(cands)}
+            self._attach_grade(result, side, best_l)
+            return result
+        close = self._pair_margin_close(p, side, other, best_id, {l: float(c[l]) for l in lit})
+        if close is not None:
+            result = {"cell": None, "reason": "close", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), "margin": close, **ranked(cands)}
+            self._attach_grade(result, side, best_l)
+            return result
+        result = {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": float(c[best_l]), **ranked(cands)}
+        self._attach_grade(result, side, best_l)
+        return result
+
+    def _recall_pair_many(self, p: _Pair, side: str, xs: List[np.ndarray]) -> Dict[str, object]:
+        forward, area, other = self._pair_sides(p, side)
+        lit_union: List[int] = []; cos_of: Dict[int, float] = {}; best_cos = 0.0
+        nearest_cell: Optional[int] = None; nearest_val = float("-inf")
+        evidence: Dict[int, Tuple[float, int]] = {}
+        n_o = other.n
+        for x in xs:
+            lit, c = self._lit(area, x)
+            if len(c):
+                cur_max = float(c.max())
+                best_cos = max(best_cos, cur_max)
+                if cur_max > nearest_val:
+                    nearest_val = cur_max
+                    nearest_cell = int(np.argmax(c))
+            if not lit:
+                continue
+            for l in lit:
+                if l not in cos_of:
+                    lit_union.append(l); cos_of[l] = float(c[l])
+            per_j: Dict[int, Tuple[float, int]] = {}
+            for l in lit:
+                row = (p.W[l] if forward else p.W[:, l])[:n_o]
+                m = ((p.mask[l] if forward else p.mask[:, l]) == 1)[:n_o]
+                m &= other.alive[:n_o] == 1
+                for j in np.flatnonzero(m):
+                    v = float(row[j]); j = int(j)
+                    if v > 0.0 and (j not in per_j or v > per_j[j][0]):
+                        per_j[j] = (v, l)
+            for j, (v, l) in per_j.items():
+                e = evidence.get(j)
+                evidence[j] = (v, l) if e is None else (e[0] + v, e[1])
+        if not lit_union:
+            result = {"cell": None, "reason": "novel", "lit": None, "best": 0.0, "second": 0.0, "cos": best_cos}
+            self._attach_grade(result, side, nearest_cell)
+            return result
+        if not evidence:
+            result = {"cell": None, "reason": "noedge", "lit": lit_union[0], "best": 0.0, "second": 0.0, "cos": cos_of[lit_union[0]]}
+            self._attach_grade(result, side, lit_union[0])
+            return result
+        cands = sorted(evidence.items(), key=lambda kv: (-kv[1][0], kv[0]))
+        best_id, (best, best_l) = cands[0]
+        lit_set = set(lit_union); second = 0.0
+        for j, (v, _l) in cands[1:]:
+            if self._pair_answer_of(p, other, j) not in lit_set:
+                second = v
+                break
+        if second > 0.0 and second / best > self.g.abstain_ratio:
+            result = {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l]}
+            self._attach_grade(result, side, best_l)
+            return result
+        close = self._pair_margin_close(p, side, other, best_id, cos_of)
+        if close is not None:
+            result = {"cell": None, "reason": "close", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l], "margin": close}
+            self._attach_grade(result, side, best_l)
+            return result
+        result = {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l]}
+        self._attach_grade(result, side, best_l)
+        return result
+
     def edge_many(self, side: str, xs: List[np.ndarray], other_cell: int) -> float:
         """G1 §1: Q3/Q4's edge summed over glances (one glance = `edge`)."""
         return float(sum(self.edge(side, x, other_cell) for x in xs))
@@ -1593,6 +2101,18 @@ class Organism:
         if self.sight.own_band is not None:
             extra["sight_own_band"] = self.sight.own_band[:n_s] if self._grow else self.sight.own_band
             extra["sight_own_band_n"] = self.sight.own_band_n[:n_s] if self._grow else self.sight.own_band_n
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — A4L-VOICE: the sound area and its meetings,
+        # saved ONLY when the genome declares them (LIVE block, both modes — capacity is not state); an old reader never sees the
+        # keys, and `load()` tells an old snapshot (no sound keys) from a voiced one by `z.files`.
+        if self.sound is not None:
+            n_u = self.sound.n
+            extra["sound_cells"] = self.sound.cells[:n_u]; extra["sound_alive"] = self.sound.alive[:n_u]
+            extra["sound_misfires"] = self.sound.misfires[:n_u]
+            for name, p in self.sound_meets.items():
+                rn, cn = p.a.n, p.b.n
+                key = name.replace("-", "_")
+                extra[f"pair_{key}_W"] = p.W[:rn, :cn]; extra[f"pair_{key}_mask"] = p.mask[:rn, :cn]
+                extra[f"pair_{key}_strikes"] = p.strikes[:rn, :cn]
         if self._grow:
             # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:45 +0400 — ALPHA4-G.md task 1 (the
             # advisor's review, item 4): under GROW, save the LIVE BLOCK only — alive/misfires/W/mask/
@@ -1620,6 +2140,10 @@ class Organism:
                 "grow": self._grow, "sight_nmax": self.sight.nmax, "words_nmax": self.words.nmax,
                 "w_shape": list(self.W.shape), "budget_regenerated": self.budget_regenerated,
                 "cycle_baseline_redundant": self._cycle_baseline_redundant, "budget_regen_last_t": self._budget_regen_last_t}
+        if self.sound is not None:      # A4L-VOICE (Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400)
+            meta["sound"] = {"n": self.sound.n, "nmax": self.sound.nmax, "c_sound": self.c_sound,
+                             "pairs": {name: {"edges_log": p.edges_log, "prunes_log": p.prunes_log, "shape": list(p.W.shape)}
+                                       for name, p in self.sound_meets.items()}}
         path.with_suffix(".json").write_text(json.dumps(meta, default=_json_num))
 
     @classmethod
@@ -1673,6 +2197,35 @@ class Organism:
         o._cycle_baseline_redundant = int(meta.get("cycle_baseline_redundant", 0))
         _brl = meta.get("budget_regen_last_t")
         o._budget_regen_last_t = int(_brl) if _brl is not None else None
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — A4L-VOICE: the sound area and its meetings
+        # restored when BOTH sides have them (the loading genome declares AREA sound AND the snapshot carries it). An old
+        # snapshot under the VOICE genome keeps the fresh, EMPTY area — hash-neutral, so the digest check below still passes;
+        # a voiced snapshot under a genome WITHOUT the area refuses there by name (its saved digest includes the sound state).
+        if o.sound is not None and "sound_cells" in z.files:
+            sm = meta.get("sound") or {}
+            n_u = int(sm.get("n", len(z["sound_cells"])))
+            while n_u > o.sound.nmax:
+                o.sound.grow()
+            o.sound.n = n_u
+            o.sound.cells[:n_u] = z["sound_cells"]; o.sound.alive[:n_u] = z["sound_alive"]; o.sound.misfires[:n_u] = z["sound_misfires"]
+            o.c_sound = {**o.c_sound, **{k: int(v) for k, v in (sm.get("c_sound") or {}).items()}}
+            for name, p in o.sound_meets.items():
+                key = name.replace("-", "_")
+                if f"pair_{key}_W" not in z.files:
+                    continue
+                Wz = z[f"pair_{key}_W"]; rn, cn = Wz.shape
+                while rn > p.W.shape[0]:
+                    p.grow(0)
+                while cn > p.W.shape[1]:
+                    p.grow(1)
+                p.W[:rn, :cn] = Wz; p.mask[:rn, :cn] = z[f"pair_{key}_mask"]; p.strikes[:rn, :cn] = z[f"pair_{key}_strikes"]
+                pm = (sm.get("pairs") or {}).get(name) or {}
+                p.edges_log = [tuple(r) for r in pm.get("edges_log", [])]
+                p.prunes_log = [tuple(r) for r in pm.get("prunes_log", [])]
+        if o._grow and o.sound_meets:       # the pairs' sight/words axes cover the loaded live cells too (GROW's chunk law)
+            for area in (o.sight, o.words):
+                if area.n > 0:
+                    o._grow_pairs(area, area.n - 1)
         # edit: Claude (Sonnet 5, builder F), 2026-09-21 17:45 +0400 -- the orchestrator's follow-up task
         # (commit 412d721): the closed lives' readers (tools/verdict_g4.py's W3-2 reach control, the
         # exam) must still LOAD old-format snapshots (saved before the state_hash repair). Try the NEW
@@ -1767,6 +2320,21 @@ class Organism:
         n_s2 = self.sight.n
         if self.sight.own_band is not None and bool(self.sight.own_band_n[:n_s2].any()):
             h.update(self.sight.own_band[:n_s2].tobytes()); h.update(self.sight.own_band_n[:n_s2].tobytes())
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400 — A4L-VOICE: the sound area and its meetings,
+        # hashed LAST and ONLY once the area holds a cell or a sound counter has moved (THRESH's `own_band_n.any()` precedent):
+        # an EMPTY sound area and empty sound matrices are hash-neutral — the hour-1 fixture (no sound rows) under the VOICE
+        # genome reads the FLOOR's digest on every row (V3's fixture clause). `getattr`: a shadow Organism (think thread) has
+        # no sound attributes and hashes exactly as before.
+        snd = getattr(self, "sound", None)
+        if snd is not None and (snd.n > 0 or any(self.c_sound.values())):
+            h.update(snd.cells[: snd.n].tobytes()); h.update(snd.alive[: snd.n].tobytes()); h.update(snd.misfires[: snd.n].tobytes())
+            h.update(np.int64(snd.n).tobytes())
+            for name in sorted(self.sound_meets):
+                p = self.sound_meets[name]
+                rn, cn = p.a.n, p.b.n
+                h.update(name.encode()); h.update(p.W[:rn, :cn].tobytes()); h.update(p.mask[:rn, :cn].tobytes()); h.update(p.strikes[:rn, :cn].tobytes())
+                h.update(json.dumps(p.edges_log, default=_json_num).encode()); h.update(json.dumps(p.prunes_log, default=_json_num).encode())
+            h.update(json.dumps(self.c_sound, sort_keys=True, default=_json_num).encode())
         return h.hexdigest()
 
     # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:40 +0400 — kept VERBATIM (byte-for-byte

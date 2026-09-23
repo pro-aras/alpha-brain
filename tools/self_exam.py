@@ -24,8 +24,37 @@ def load_snapshot(root: Path, genome_path: Path):
     g = parse_genome(genome_path.read_text())
     org = Organism.load(root / "state" / "organism", g)
     L = json.loads((root / "state" / "ledger.json").read_text())
-    ledgers = {"sight": {int(k): set(v) for k, v in L["sight"].items()}, "words": {int(k): set(v) for k, v in L["words"].items()}}
+    ledgers = {"sight": {int(k): set(v) for k, v in L["sight"].items()}, "words": {int(k): set(v) for k, v in L["words"].items()},
+               # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:39 +0400): the SOUND ledger (absent -> empty)
+               "sound": {int(k): set(v) for k, v in (L.get("sound") or {}).items()}}
     return g, org, ledgers, L
+
+
+def voiced_counts(root: Path) -> dict:
+    """A4L-VOICE: the maker's sound rows on the tape, per word (the «voiced ≥ 5 times» gradability rule of V1/V2/V5)."""
+    counts: dict = {}
+    for f in sorted((root / "tape").glob("*.jsonl")):
+        for line in f.read_text().splitlines():
+            if '"ear-sound"' not in line:
+                continue
+            r = json.loads(line)
+            m = r.get("meta") or {}
+            if r.get("sense") == "ear-sound" and m.get("source") == "maker" and m.get("word"):
+                counts[m["word"]] = counts.get(m["word"], 0) + 1
+    return counts
+
+
+def sound_exam(org, ledgers, things, feats, voiced=None) -> dict:
+    """A4L-VOICE task 4: ask_sound on the snapshot — the chords are genome/voice.py's (the bytes the maker publishes), the
+    renders the exam's own held-out ones (seed 2), the ±4 % shifted chords printed (V1b). None when there is no sound area."""
+    if getattr(org, "sound", None) is None:
+        return None
+    from genome import voice as _voice
+    from genome.questions import ask_sound as _ask_sound
+    chords = {t: _voice.trait_f32(t) for t in things}
+    shifted = {t: {s: _voice.trait_f32(t, shift=float(s)) for s in ("0.96", "1.04")} for t in things}
+    return {"chords_from": "genome/voice.py formant (sha256(word) -> F1/F2/F3), the sealed E52 front's FIRST event",
+            **_ask_sound(org, ledgers, things, {t: feats[t] for t in things if t in feats}, chords, shifted, voiced=voiced)}
 
 
 def tape_canvases(root: Path, n: int):
@@ -80,6 +109,10 @@ def main() -> int:
     ask_all = ask_glances(org, ledgers, things + arr2, feats, never, g.ear_blank_zero)
     landing = run_g1.landing(held_g, things, first=2)
     hash_before = L.get("state_hash") or org.state_hash()
+    # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:39 +0400): the exam by SOUND (V1/V2/V5/V1b) on the
+    # 16 drawn things — None (the key still written, #164) on a genome with no sound area; sat AFTER hash_before, so the
+    # exam's own `organism_hash_unchanged_by_exam` covers it.
+    ask_sound_out = sound_exam(org, ledgers, things + arr2, feats, voiced=voiced_counts(root)) if getattr(org, "sound", None) is not None else None
     # edit: Claude (Fable 5.1), 2026-09-23 03:02 +0400 — ALPHA4 §4(b): the reading share as a TAPE FACT. The sitter (off the mind
     # thread, on the snapshot) renders the last N HEARD shelf words in the HELD-OUT font (tools/read_recognised.py, builder
     # H's own mark instrument) and reports the share; the SIT row forwards it and the judge reads the row.
@@ -102,7 +135,7 @@ def main() -> int:
         "held_per_thing": a.held, "chance_q1": round(1.0 / max(1, len(things) if fallback else len(words_seen or things)), 3),
         "seen_words_fallback_to_all": fallback,
         "disjoint_checked": disjoint_checked, "disjoint_control_caught": caught,
-        "ask_seen_words": ask, "ask_all_words": ask_all, "gaze_landing": landing,
+        "ask_seen_words": ask, "ask_all_words": ask_all, "gaze_landing": landing, "ask_sound": ask_sound_out,
         "read_share": read_share, "read_words_n": read_words_n, "read_words": read_words_list,
         "organism_hash_unchanged_by_exam": org.state_hash() == hash_before, "seconds": round(time.perf_counter() - t0, 1),
     }

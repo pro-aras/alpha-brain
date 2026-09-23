@@ -363,6 +363,14 @@ class Body:
             "acts_chosen": dict(getattr(self.mind, "acts_chosen", {}) or {}),
             "act_mismatches": int(getattr(self.mind, "act_mismatches", 0)),
             "sound_events": int(getattr(self.mind, "sound_events", 0)),
+            # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400 — A4L-VOICE (V4, #164): the sound area's born/
+            # alive cells, its budget refusals, and the world's voice rows consumed/bound — on EVERY write, 0 on a genome without
+            # the area (a voice heard and never bound, or a sound area that never births, is the finding a surface must show).
+            "sound_born": int(org.sound.n) if getattr(org, "sound", None) is not None else 0,
+            "sound_cells": int(org.sound.alive.sum()) if getattr(org, "sound", None) is not None else 0,
+            "sound_births_refused": int((getattr(org, "c_sound", None) or {}).get("births_refused_budget_sound", 0)),
+            "voice_rows": int(getattr(self.mind, "voice_rows", 0)),
+            "voice_bound": int(getattr(self.mind, "voice_bound", 0)),
             # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
             # §4): the three counters the mind computed and STATUS never carried (#163's class: computing and exporting
             # differ) — on EVERY write (#164), 0 on a genome that never declares SURPRISE.
@@ -612,8 +620,12 @@ def _maker_sense_fn(argv: List[str], declared: Dict[str, dict], root: Path):
     maker_period = float(argv[argv.index("--maker-period") + 1]) if "--maker-period" in argv else default_period
     window_seconds = float(argv[argv.index("--window-seconds") + 1]) if "--window-seconds" in argv else default_window_s
     plant_after = _plant_after_from_argv(argv, world_maker.PLANT_AFTER_CANVASES)
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:35 +0400 — A4L-VOICE task 1: WORLD's «; voice formant» reaches
+    # the maker's partial as `voice=` ONLY when declared, so every genome without the clause gets exactly the partial it always did.
+    voice = (declared.get("WORLD") or {}).get("voice")
+    extra = {"voice": voice} if voice else {}
     return functools.partial(world_maker.sense, root=root, period=maker_period, window_seconds=window_seconds,
-                             plant_after_canvases=plant_after)
+                             plant_after_canvases=plant_after, **extra)
 
 
 # ============================================================================ CLI
