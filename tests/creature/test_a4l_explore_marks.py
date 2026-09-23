@@ -102,6 +102,21 @@ class TestX1TheLockAbsent(unittest.TestCase):
         self.assertFalse(m["graded"])
         self.assertIn("100", m["reason"])
 
+    def test_alpha4_1s_own_choices_fail_x1(self) -> None:
+        """THE CONTROL ON REAL DATA (edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 12:02 +0400): the 711 game acts
+        alpha4-1 took by its 10:55 snapshot (its outcome ring; = its choices, act_mismatch 0), timed at the game's 30 s
+        cadence, read with the line FORCED declared (the instrument check; the life's own verdict reads «not gradable»,
+        L-1): X1 must FAIL on the lock onto `left` (the review: 96 of the last 100 at hour 5)."""
+        doc = json.loads((ROOT / "tests" / "fixtures" / "a4l-explore" / "snapshot-game-acts.json").read_text())
+        self.assertEqual(len(doc["acts"]), 711)
+        tape, journal = _choices(doc["acts"], start_s=1.0, step_s=30.0)
+        m = explore_lock_mark(tape, journal, True)
+        self.assertTrue(m["graded"])
+        self.assertFalse(m["pass"])
+        self.assertEqual(m["max_act"], "left")
+        self.assertGreaterEqual(m["max_share"], 0.9)
+        self.assertFalse(explore_lock_mark(tape, journal, False)["graded"], "undeclared on the life: not gradable (L-1)")
+
     def test_the_hour_one_fixture_is_not_gradable(self) -> None:
         """The L-1 control: alpha4-1's first hour (its game rows + the 121 act rows a replay wrote) — the line is
         undeclared there, and no choice falls after hour 1 in any case."""
