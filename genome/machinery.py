@@ -30,6 +30,12 @@ gene `HASH sparse; dense at snapshot` and `Organism.row_hash()`, the per-row wit
 HASH is undeclared (byte-identical, the negative control), genome/witness.py's SPARSE digest when declared; the three MASK writers
 (_hebb, _prune, _merge) tell the witness which rows they changed. state_hash(), save() and load() are untouched: the dense digest stays
 the snapshot's.
+edit: Claude (Opus 5.5, A4 seam-5 builder), 2026-09-23 14:59 +0400 — SEAM 5 (COST x VOICE, docs/ALPHA4-2-PREREG.md §7.2 on a42): the MASK
+writers of A4L-VOICE's two sound meetings tell the witness which rows of WHICH meeting they changed (`_pair_hebb`, `_pair_prune`,
+`_merge_pair_edges`: `pair=`), and `_area_merge` — which moves the sight<->words mask through `_merge_rows` when a sight or word cell merges
+INSIDE a sound meeting — now tells the witness too (unmarked, the sparse witness drifted from its own from-scratch recompute from the first
+such merge of a voiced toy life). `_merge_rows` returns the rows whose mask it changed. The witness itself covers the sound state
+(genome/witness.py). No decision changes: a mark is bookkeeping of the witness only, and it runs only when HASH is declared.
 
 Laws of this file:
 - The genome is text. A gene this machinery does not know REFUSES to start (GenomeError),
@@ -1428,6 +1434,7 @@ class Organism:
 
     def _pair_hebb(self, p: _Pair, R: List[int], C: List[int]) -> None:
         """`_hebb` over a pair: an edge is born at w = lr the first time its two cells are winners together."""
+        w = getattr(self, "_witness", None)      # SEAM 5: the witness learns every row of THIS meeting whose MASK this wires (None: HASH undeclared)
         for r in R:
             for c in C:
                 if p.mask[r, c] == 0:
@@ -1436,6 +1443,8 @@ class Organism:
                     p.strikes[r, c] = 0
                     self._pair_count(f"edges_born_{p.name.replace('-', '_')}")
                     p.edges_log.append((self.t, int(r), int(c)))
+                    if w is not None:
+                        w.mark(r, pair=p.name)
 
     def _pair_delta(self, p: _Pair, R: List[int], C: List[int], lr: float) -> None:
         """`_delta` over a pair (the delta rule toward 1 for this moment's winners, 0 for the rest of a cell's edges)."""
@@ -1492,6 +1501,7 @@ class Organism:
     def _pair_prune(self, p: _Pair, R: List[int], C: List[int]) -> None:
         """`_prune` over a pair: an edge under the floor for `chances` moments it could have been used is removed, logged."""
         fl, ch = self.g.prune_floor, self.g.prune_chances
+        w = getattr(self, "_witness", None)      # SEAM 5: the witness learns every row of THIS meeting whose MASK a pruned edge clears
         rows = np.array(sorted(set(R)), dtype=np.int64); cols = np.array(sorted(set(C)), dtype=np.int64)
         key = f"edges_pruned_{p.name.replace('-', '_')}"
         for sel in ((rows, slice(None)), (slice(None), cols)):
@@ -1512,6 +1522,8 @@ class Organism:
                         p.prunes_log.append((self.t, int(rows[r_]), int(c_)))
                 W[dead] = 0.0; M[dead] = 0; ST[dead] = 0
                 p.W[sel] = W; p.mask[sel] = M; p.strikes[sel] = ST
+                if w is not None:
+                    w.mark_rows(np.flatnonzero(dead.any(axis=1)) if isinstance(sel[0], slice) else rows[dead.any(axis=1)], pair=p.name)
                 self._pair_count(key, k)
 
     def _area_merge(self, area: Area, winners: List[int], via: _Pair) -> None:
@@ -1519,6 +1531,7 @@ class Organism:
         IN `via` become one — the lower id kept. The cell is one cell, so its edges in EVERY matrix it sits on are merged
         (`_merge_edges_everywhere`), and the merge is logged in the ONE merges log with its area's name."""
         ws = sorted(set(w for w in winners if area.alive[w]))
+        wit = getattr(self, "_witness", None)    # SEAM 5: the witness learns every sight<->words row whose MASK this merge moves
         for i in range(len(ws)):
             for j in range(i + 1, len(ws)):
                 a, b = ws[i], ws[j]
@@ -1530,9 +1543,13 @@ class Organism:
                 if aa is None or ab is None or aa != ab:
                     continue
                 if area is self.sight:
-                    self._merge_rows(self.W, self.mask, self.strikes, a, b, axis=0)
+                    moved = self._merge_rows(self.W, self.mask, self.strikes, a, b, axis=0)
+                    if wit is not None:
+                        wit.mark_rows(moved)                  # rows a and b of the sight<->words W
                 elif area is self.words:
-                    self._merge_rows(self.W, self.mask, self.strikes, a, b, axis=1)
+                    moved = self._merge_rows(self.W, self.mask, self.strikes, a, b, axis=1)
+                    if wit is not None:
+                        wit.mark_rows(moved)                  # every row of word column b (moved to column a)
                 self._merge_pair_edges(area, a, b)
                 area.alive[b] = 0
                 area.misfires[b] = 0
@@ -1543,9 +1560,12 @@ class Organism:
                 self.merges.append((self.t, area.name, int(a), int(b)))
 
     @staticmethod
-    def _merge_rows(W: np.ndarray, M: np.ndarray, ST: np.ndarray, a: int, b: int, axis: int) -> None:
+    def _merge_rows(W: np.ndarray, M: np.ndarray, ST: np.ndarray, a: int, b: int, axis: int) -> np.ndarray:
         """MERGE's own edge arithmetic (rows averaged over the union of the two cells' edges; b zeroed), on one matrix and
-        one axis — the same four lines `_merge` runs on the sight↔words matrix."""
+        one axis — the same four lines `_merge` runs on the sight↔words matrix.
+        SEAM 5 (edit: Claude (Opus 5.5, A4 seam-5 builder), 2026-09-23 14:59 +0400): returns the ROWS whose mask it changed — rows a and b
+        (axis 0), every row of column b (axis 1, read before b is zeroed) — for the caller to mark the witness of THAT matrix (this helper
+        writes through its parameters and does not know which block it was handed; tests/genome/test_a4l_cost_writer_sweep.py's alias rule)."""
         if axis == 0:
             ma, mb = M[a].astype(np.float64), M[b].astype(np.float64)
             den = np.maximum(ma + mb, 1.0)
@@ -1553,22 +1573,28 @@ class Organism:
             M[a] = ((ma + mb) > 0).astype(np.uint8)
             ST[a] = np.minimum(ST[a], ST[b])
             W[b] = 0.0; M[b] = 0; ST[b] = 0
-        else:
-            ma, mb = M[:, a].astype(np.float64), M[:, b].astype(np.float64)
-            den = np.maximum(ma + mb, 1.0)
-            W[:, a] = (W[:, a] * ma + W[:, b] * mb) / den
-            M[:, a] = ((ma + mb) > 0).astype(np.uint8)
-            ST[:, a] = np.minimum(ST[:, a], ST[:, b])
-            W[:, b] = 0.0; M[:, b] = 0; ST[:, b] = 0
+            return np.array([a, b], dtype=np.int64)
+        ma, mb = M[:, a].astype(np.float64), M[:, b].astype(np.float64)
+        den = np.maximum(ma + mb, 1.0)
+        W[:, a] = (W[:, a] * ma + W[:, b] * mb) / den
+        M[:, a] = ((ma + mb) > 0).astype(np.uint8)
+        ST[:, a] = np.minimum(ST[:, a], ST[:, b])
+        W[:, b] = 0.0; M[:, b] = 0; ST[:, b] = 0
+        return np.flatnonzero(mb)
 
     def _merge_pair_edges(self, area: Area, a: int, b: int) -> None:
         """A merged cell's edges in every SOUND meeting it sits on follow it (#235's chain: a retired cell must not keep
         answering in a matrix the merge never touched)."""
+        wit = getattr(self, "_witness", None)    # SEAM 5: the witness learns every row of each meeting whose MASK the merge moves
         for p in self.sound_meets.values():
             if p.a is area:
-                self._merge_rows(p.W, p.mask, p.strikes, a, b, axis=0)
+                moved = self._merge_rows(p.W, p.mask, p.strikes, a, b, axis=0)
+                if wit is not None:
+                    wit.mark_rows(moved, pair=p.name)
             if p.b is area:
-                self._merge_rows(p.W, p.mask, p.strikes, a, b, axis=1)
+                moved = self._merge_rows(p.W, p.mask, p.strikes, a, b, axis=1)
+                if wit is not None:
+                    wit.mark_rows(moved, pair=p.name)
 
     def _scale_pairs(self) -> None:
         """SCALE over each sound meeting: a cell's edge vector IN THAT MEETING is scaled down to unit norm when it
