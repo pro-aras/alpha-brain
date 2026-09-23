@@ -675,12 +675,23 @@ def parse_genome(text: str) -> Genome:
             # SENSE eye/ear/colour, which are plain Genome fields) -- SENSE_READ names a real call site
             # (creature/senses/read.py, wired from creature/body.py) that creature/genes.py's RUNS/unwired()
             # law must name, the same convention SENSE_SMELL/SENSE_TOUCH/SENSE_BODY already use.
+            # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:2x +0400 — A42-B3 task 2 (docs/ALPHA4-2-PREREG.md
+            # §2 G10, §2.3: branch A, ADOPTED by Ahmad 2026-09-23 16:56 +0400 -- "yes fix that Gutenberg part"): an
+            # OPTIONAL trailing clause "; gutenberg body only". Absent -> declared["SENSE_READ"] is EXACTLY the five
+            # keys above (byte-identical to every existing genome/test); present -> a sixth key,
+            # "gutenberg_body_only": True, tells creature/senses/read.py's _doc_sentences to keep only the text
+            # between the Project Gutenberg START/END markers (creature/senses/read.py, wired from creature/body.py).
+            # Built UNDECLARED here on purpose -- this line is NOT added to any genome file by this task; the seat
+            # declares it when ready.
             elif gene == "SENSE" and args[0] == "read":
                 rest = " ".join(args[1:])
-                m = re.fullmatch(r"shelf ([A-Za-z0-9_./-]+) curriculum ([A-Za-z0-9_./-]+) every (\d+) s words (\d+) canvas (\d+)", rest)
-                if not m: raise GenomeError(f"SENSE read: cannot read {rest!r} (ALPHA4-PREREG §3: SENSE read shelf <sqlite> curriculum <md> every <n> s words <k> canvas <px>)")
-                g["declared"]["SENSE_READ"] = {"shelf": m.group(1), "curriculum": m.group(2), "every_s": int(m.group(3)),
-                                                "words": int(m.group(4)), "canvas": int(m.group(5))}
+                m = re.fullmatch(r"shelf ([A-Za-z0-9_./-]+) curriculum ([A-Za-z0-9_./-]+) every (\d+) s words (\d+) canvas (\d+)(; gutenberg body only)?", rest)
+                if not m: raise GenomeError(f"SENSE read: cannot read {rest!r} (ALPHA4-PREREG §3: SENSE read shelf <sqlite> curriculum <md> every <n> s words <k> canvas <px>[; gutenberg body only])")
+                d = {"shelf": m.group(1), "curriculum": m.group(2), "every_s": int(m.group(3)),
+                     "words": int(m.group(4)), "canvas": int(m.group(5))}
+                if m.group(6):
+                    d["gutenberg_body_only"] = True
+                g["declared"]["SENSE_READ"] = d
             # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:0x +0400 — ALPHA4-H task 3 (ALPHA4-PREREG.md
             # §3): the FIRST "DOOR" gene word (a brand-new top-level keyword, dispatched on args[0] the same
             # way "SENSE" is -- builder I's `DOOR web ...` is a SIBLING elif on args[0]=="web", landing beside
