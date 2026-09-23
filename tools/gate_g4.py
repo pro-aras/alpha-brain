@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse, ast, io, json, os, re, shutil, subprocess, sys, tempfile
 from pathlib import Path
+from typing import Optional     # FIX 2: `_resolve` was already annotated `-> Optional[str]` with no import (lazy under `from __future__ import annotations`)
 
 import numpy as np
 
@@ -81,17 +82,62 @@ def _resolve(node, env: dict) -> Optional[str]:
     return _literal_text(node)       # anything else -- the plain walk, unchanged (byte-identical fallback)
 
 
-def _build_env(tree: ast.AST) -> dict:
-    """A same-module `name -> resolved path text` map from simple `x = <expr>` assignments (last write
-    wins — adequate for this codebase's straight-line sense modules, not real dataflow; mirrors tests/
-    creature/test_writer_sweep.py's own `_build_env` exactly)."""
-    env: dict = {}
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+# edit: Claude (Fable 5.1), 2026-09-23 17:00 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 2 (docs/briefs/SEAM5-WITNESS-SOUND-REPORT.md item 5): the env is
+# built PER FUNCTION SCOPE. Before, ONE flat env was built over the whole module (`ast.walk` over every Assign, last write wins), so a
+# same-named local in a DIFFERENT function overwrote a leak's binding: the seam-5 builder's own edit bound an unrelated local `p`, COST's
+# planted leak (`p = root/'state'/'witness.json'; p.write_text(...)`) resolved to the wrong text, and BOTH sweeps read [] — a negative control
+# that had stopped controlling (#91's class). Now every def/lambda gets its own env, seeded from the enclosing scope's finished env (module-
+# level names stay visible inside functions, as at run time) and taking only its OWN simple assignments, in source order; a sibling's locals
+# never enter it. Class bodies are left transparent (a widening only: more names visible, never fewer). `_resolve` is unchanged. Mirrors
+# tests/creature/test_writer_sweep.py's `_scope_map`/`_build_env` exactly; the planted control (two functions, one binding `p` innocently,
+# the other binding `p` to a forbidden path and writing through it, in BOTH orders) is
+# tests.creature.test_writer_sweep.TestWriterSweepG41.test_a_leak_shadowed_by_a_same_named_local_in_another_function_is_caught_by_both_sweeps.
+_SCOPE_NODES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)
+
+
+def _scope_map(tree: ast.AST) -> dict:
+    """node -> its nearest enclosing function scope (the Module node for top-level code). A def/lambda node itself belongs
+    to the scope it is written in; everything under it belongs to the def (its decorators/defaults included — a
+    simplification that can only widen a name's visibility, never narrow it)."""
+    scope_of: dict = {tree: tree}
+
+    def visit(node, scope):
+        for child in ast.iter_child_nodes(node):
+            scope_of[child] = scope
+            visit(child, child if isinstance(child, _SCOPE_NODES) else scope)
+
+    visit(tree, tree)
+    return scope_of
+
+
+def _build_env(tree: ast.AST, scope_of: Optional[dict] = None) -> dict:
+    """`{scope_node: name -> resolved path text}` — one env for the Module and one for every def/lambda, from simple
+    `x = <expr>` assignments (last write wins WITHIN a scope, in source order — still not real dataflow, adequate for this
+    codebase's straight-line sense modules). A def's env starts as a copy of its enclosing scope's COMPLETE env, then takes
+    the def's own assignments; a sibling function's locals never reach it."""
+    scope_of = scope_of if scope_of is not None else _scope_map(tree)
+    own: dict = {}
+    assigns = (n for n in ast.walk(tree) if isinstance(n, ast.Assign) and len(n.targets) == 1 and isinstance(n.targets[0], ast.Name))
+    for node in sorted(assigns, key=lambda n: (n.lineno, n.col_offset)):
+        own.setdefault(scope_of[node], []).append(node)
+    envs: dict = {}
+
+    def env_of(scope) -> dict:
+        if scope in envs:
+            return envs[scope]
+        env = {} if scope is tree else dict(env_of(scope_of[scope]))     # the enclosing scope's finished env, copied
+        envs[scope] = env
+        for node in own.get(scope, []):
             text = _resolve(node.value, env)
             if text is not None:
                 env[node.targets[0].id] = text
-    return env
+        return env
+
+    env_of(tree)
+    for node in ast.walk(tree):
+        if isinstance(node, _SCOPE_NODES):
+            env_of(node)
+    return envs
 
 
 def sweep(paths) -> list:
@@ -101,7 +147,8 @@ def sweep(paths) -> list:
         if not p.exists():
             continue
         tree = ast.parse(p.read_text(), filename=str(p))
-        env = _build_env(tree)
+        scope_of = _scope_map(tree)
+        envs = _build_env(tree, scope_of)
         for node in ast.walk(tree):
             if isinstance(node, (ast.Import, ast.ImportFrom)):
                 names = [a.name for a in node.names] + ([node.module or ""] if isinstance(node, ast.ImportFrom) else [])
@@ -112,6 +159,7 @@ def sweep(paths) -> list:
                 fn = node.func
                 name = fn.attr if isinstance(fn, ast.Attribute) else (fn.id if isinstance(fn, ast.Name) else "")
                 if name in ("open", "write_text", "write_bytes", "save", "savez", "savez_compressed", "replace", "rename"):
+                    env = envs[scope_of[node]]          # FIX 2: the env of THIS call's own scope, not one flat module-wide map
                     target = (_resolve(node.args[0], env) or "") if node.args else ""
                     if name == "open" and node.args and len(node.args) > 1:
                         target += " " + _literal_text(node.args[1])

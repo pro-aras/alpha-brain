@@ -22,6 +22,11 @@ import json
 from pathlib import Path
 from typing import Callable, Optional
 
+# edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1 (docs/briefs/SEAM5-WITNESS-SOUND-REPORT.md item 2): how many
+# consecutive polls a NEW exam file may fail to parse before the sense gives it up for good (a torn read heals on the next poll; a file that
+# never parses is malformed). Read by tests.creature.test_g5k_outcome.TestSitLiveWiring's controls.
+MAX_TORN_RETRIES = 5
+
 
 def _latest_exam_file(exam_dir: Path) -> Optional[Path]:
     """The newest digit-prefixed exam report — never `LAST.json` (`creature/exam.py`'s own scar)."""
@@ -75,6 +80,8 @@ def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_ca
     exam_dir = root / "exam"
     last_canvas = 0
     last_published_name: Optional[str] = None
+    torn_name: Optional[str] = None      # the file the last failed read was of, and how many consecutive polls it has failed (FIX 1)
+    torn_count = 0
     from genome.machinery import parse_genome
     genome = parse_genome(Path(genome_path).read_text())
     fixations = int(genome.gaze["fixations"]) if genome.gaze else 1
@@ -95,17 +102,35 @@ def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_ca
                 # live-wiring test failed 2 of 3 runs ALONE at load 20 on the merged bytes).
                 latest = _latest_exam_file(exam_dir)
                 if latest is not None and latest.name != last_published_name:
-                    last_canvas = canvas_count
+                    # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1 (docs/briefs/SEAM5-WITNESS-SOUND-REPORT.md item 2):
+                    # the boundary is spent ONLY by a read that parses (or by giving a file up, below). Before, `last_canvas = canvas_count`
+                    # ran HERE, before the read, so a torn read (the empty file between the voice's create and its write; a partial write)
+                    # closed the gate with nothing published and the file waited for the NEXT boundary — 500 canvases on; at a life's last
+                    # boundary, forever. The comment beside the except said "try again next one"; the cursor above it made that false
+                    # (tests.creature.test_g5k_outcome.TestSitLiveWiring.test_a_... read 0 published on those bytes). Now a transient failure
+                    # leaves BOTH cursors untouched, so the very next poll retries the SAME file; a file that fails MAX_TORN_RETRIES
+                    # consecutive polls is malformed for good — both cursors advance past it, once, with a printed note (a sense has no
+                    # journal channel, and must not publish a row it did not read).
                     try:
                         data = json.loads(latest.read_text())
                     except (json.JSONDecodeError, OSError):
-                        data = None      # a torn/partial exam file mid-write (#47/#186) -- skip this poll, try again next one
-                    if data is not None:
+                        data = None      # a torn/partial exam file mid-write (#47/#186): cursors untouched, this file is re-read next poll
+                    if data is None:
+                        torn_count = torn_count + 1 if torn_name == latest.name else 1
+                        torn_name = latest.name
+                        if torn_count >= MAX_TORN_RETRIES:
+                            print(f"sit: gave up on {latest.name} after {MAX_TORN_RETRIES} unreadable polls (malformed exam report; never re-read)")
+                            last_canvas = canvas_count
+                            last_published_name = latest.name
+                            torn_name, torn_count = None, 0
+                    else:
+                        torn_name, torn_count = None, 0
                         score = _score_of(data)
                         if score is not None:
                             composite = _composite_of(data)   # ALPHA4-PREREG §4(c): additive, alongside score (None on an exam report that carries no "composite" field)
                             payload = json.dumps({"score": score, "exam_file": latest.name, "composite": composite, "read_share": _read_share_of(data)}).encode("utf-8")
                             publish("sit", payload, {"moment": f"sit{latest.stem}", "source": "sit",
                                                       "exam_file": latest.name, "score": score, "composite": composite, "read_share": _read_share_of(data)}, "json")
-                        last_published_name = latest.name    # advance the cursor AFTER the row is durable (#230), even if score was None (a malformed report is not re-tried forever)
+                        last_canvas = canvas_count           # both cursors advance together, AFTER the row is durable (#230) — even if score was
+                        last_published_name = latest.name    # None (a report that parses but carries no Q1 is not re-tried forever, as before)
         stop_event.wait(poll_period)

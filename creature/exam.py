@@ -10,6 +10,7 @@ own — PREREG §2.4, and explicitly asked for here by §11.4) is not in the swe
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Dict, Optional
@@ -108,6 +109,11 @@ def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, p
             canvas_count = moments // max(1, fixations)
             if every_canvases > 0 and canvas_count - last_canvas >= every_canvases:
                 last_canvas = canvas_count
-                last_path.write_text(json.dumps({"last_canvas": last_canvas}))
+                # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1: the pointer is written atomically too (tmp + os.replace,
+                # the same pattern as the report in tools/self_exam.py) — the only other writer under root/exam/. Its one reader is this loop's
+                # own restart read above (a torn read there fell back to 0 and re-sat at once), so this is consistency, not a live defect.
+                tmp = last_path.with_name(last_path.name + ".tmp")
+                tmp.write_text(json.dumps({"last_canvas": last_canvas}))
+                os.replace(str(tmp), str(last_path))
                 run_and_journal(root, genome_for_sitting(root, genome_path))   # the adopted genome, if any (the J × exam seam)
         stop_event.wait(poll_period)

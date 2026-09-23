@@ -7,7 +7,7 @@
 """usage: python3 tools/self_exam.py --root /data/dev/genome/run [--genome genome/G4-skeleton.genome] [--held 10] [--check-tape 400]"""
 from __future__ import annotations
 
-import argparse, io, json, sys, time
+import argparse, io, json, os, sys, time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -196,7 +196,13 @@ def main() -> int:
     }
     (root / "exam").mkdir(exist_ok=True)
     p = root / "exam" / (datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ") + ".json")
-    p.write_text(json.dumps(out, indent=1, default=str))
+    # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1 (docs/briefs/SEAM5-WITNESS-SOUND-REPORT.md item 2): written
+    # atomically (tmp in the same dir + os.replace, creature/body.py's `_write_status` pattern) so no reader — creature/senses/sit.py's poll,
+    # tools/lives/view.py, tools/verdict_g4.py — can see the empty or partial file write_text left visible between its create and its write.
+    # The `.json.tmp` name matches no reader's `*.json` glob.
+    tmp = p.with_name(p.name + ".tmp")
+    tmp.write_text(json.dumps(out, indent=1, default=str))
+    os.replace(str(tmp), str(p))
     print(json.dumps({k: out[k] for k in ("moments", "cells", "words_seen", "chance_q1", "disjoint_checked", "disjoint_control_caught",
                                           "organism_hash_unchanged_by_exam", "seconds")}, default=str))
     q = ask.get("q1") or ask.get("Q1") or {k: v for k, v in ask.items() if k.startswith("q1")}
