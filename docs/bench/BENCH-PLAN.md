@@ -443,7 +443,7 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
   An item whose tape seq never appears is a DELIVERY FAILURE (INSTRUMENT).
 
 ### 4.4 · The curriculum engine — the declaration file and the run's state machine
-**A stage's declaration file** (`declarations/<ladder-version>/stage-<n>.yaml`, committed, its sha on every card) carries:
+**A stage's declaration file** (`declarations/<ladder-version>/stage-<n>.toml` — a format Python's standard library reads, so no new dependency; committed; its sha on every card) carries:
 
 | field | what it holds |
 |---|---|
@@ -522,7 +522,7 @@ Every file lives under `/data/dev/bench/runs/<run>/`. Every row is stamped with 
   - its STATUS (written every 10 s by the body — a figure's AGE is shown beside it, never hidden);
   - the tape's head seq and time;
   - the journal's head seq and time;
-  - the BACKLOG (tape head − the mind's last consumed seq — a per-row figure, exact, not a 10-s one);
+  - the BACKLOG two ways, both printed: from the files (the tape's head seq − the journal's last seq — exact to within the rows that write no journal line, such as a word waiting for its picture) and from the body's own queue depth in STATUS (exact, but every 10 s);
   - the process's CPU and RSS from `/proc`;
   - the box's load, free RAM, free disk and `/tmp`;
   - the world's own schedule lag (planned time − published time).
@@ -644,7 +644,7 @@ A number without a control is not shown. A value no file carries reads «not mea
 - **The learner zoo:** one toy learner per row of §3.2 (L1–L37), each with EXACTLY that failure and otherwise healthy. Plus **one HEALTHY BASELINE** that must pass every detector (#228's addendum: a control blind to everything isolates nothing).
 - **The instrument zoo:** each fault of §3.3 (I1–I14) planted beside the healthy baseline.
 
-**How the toys are built:** every toy writes the adapter's REAL record shape — a tape, a journal and a STATUS in the creature's format, byte-compatible with the live files — because a fixture that predates the real shape lies (#171, #173, #238 (2)). They are cheap Python learners (a table, a nearest-neighbour memory, a scripted policy) so the whole zoo runs in minutes at machine speed (the throttled clock is allowed for toys only — Q4).
+**How the toys are built:** every toy writes the adapter's REAL record shape — a tape, a journal and a STATUS in the creature's format, byte-compatible with the live files — because a fixture that predates the real shape lies (#171, #173, #238 (2)). They are cheap Python learners (a table, a nearest-neighbour memory, a scripted policy) so the whole zoo runs in minutes at machine speed (a target, measured in phase 1a) (the throttled clock is allowed for toys only — Q4).
 
 **THE DIAGONAL.** Run the whole Bench on every toy, then draw the matrix: toys down, detectors across.
 - It must be DIAGONAL: each failure toy is caught by ITS detector (and by any detector the plan names as sharing that failure, listed beside it); the healthy baseline is caught by none; each instrument fault is classed INSTRUMENT (or WORLD where §3.3 says so) and never charged to the learner.
@@ -664,7 +664,7 @@ For every bar of a stage, `bench validate` computes and prints the following, an
      - the ceiling of the stage's own SHOWING SCHEDULE (a thing shown N times cannot be graded on showing N+1).
    - An eleven-thing null under a 95th-percentile band clears only 0.95^11 ≈ 57 % of the time, so a bar that needs ALL eleven sits above its own ceiling — the validator computes such rates and prints them beside the bar (#237 (c)).
 2. **The bar sits at or under its NULL:** the shuffled-label oracle, the commonest-answer twin, chance, or the random chooser on the same seed.
-3. **A control that cannot fire** (the seat's widening; #228 (a)). The validator REHEARSES the stage's declared schedule on a COPY of the learner's current snapshot at machine speed, in a scratch root (#212). It checks that each plant's mechanism can act there: its birth is not refused by a budget or a cap; its window lies inside the stage; its showings are delivered. For a learner that cannot be replayed, the rehearsal runs on the zoo's healthy baseline instead, and the card says so.
+3. **A control that cannot fire** (the seat's widening; #228 (a)). The validator REHEARSES the stage's declared schedule on a COPY of the learner's current snapshot at machine speed, in a scratch root (#212). It checks that each plant's mechanism can act there: its birth is not refused by a budget or a cap; its window lies inside the stage; its showings are delivered. The rehearsal is PRICED first, and runs in the quiet. If its price exceeds the declaration's rehearsal budget, reachability is argued from the learner's own counters instead (budget left, its regeneration rate, refusals per hour in the previous stage), and the plant's clause is marked «reachability estimated, not rehearsed». For a learner that cannot be replayed, the rehearsal runs on the zoo's healthy baseline, and the card says so.
 4. **Too little power:** the expected number of items (of mistakes, for the correction effect; of episodes, for ACTS) cannot show an effect of the declared size at the declared confidence. That mark is declared «not gradable: too few <items>» NOW, never discovered at the read.
 
 A refusal prints its arithmetic, is written to `events.jsonl`, and is fixed only by changing the TEST (its negative, its window, its item count, its schedule) — never by moving a bar after a reading (#228). The program never edits a bar; the seat re-declares (Q6).
