@@ -1,0 +1,13 @@
+1 EVOLVE  old: 3 judged + the void round at 24 h -> False | graded (§5/§6): 4 proposals vs 3 needed; paired 3/4; adoptions 0 <= proposals; negative control not checked this read
+2 COST    old: GROW life 600.0 ms/canvas at 4,900 cells -> False (bar: G4-7: live ms per CANVAS (STATUS.mind_ms_per_canvas_1min) ≤  …) — §8b's bar is 661.5 ms
+2 COST    old: GROW life 756.0 ms/canvas at 4,900 cells -> False (bar: G4-7: live ms per CANVAS (STATUS.mind_ms_per_canvas_1min) ≤  …) — §8b's bar is 661.5 ms
+3 ACT     old: the last 100 game acts all `left`, STATUS with say 300 -> True max_share 0.7126 census {'left': 103, 'right': 3, 'forward': 3, 'pickup': 3, 'drop': 3, 'toggle': 3, 'done': 3, 'say': 300}
+4 SENTENCE old: 3 episodes × 64 frames -> graded True missions 192 max lift 3.0
+5 QUESTION old: 5 questions, 3 answered (maker 2, lexicon 2, both 1) -> answered_rows 4 share 0.8 (truth 0.6)
+6 READ    old rule on alpha4-1's hour 1: the NEWEST 50 of 255 heard; the new sample shares 7 of 50 with them (scratch/control-hour1-marks.log)
+7 THREAD  old: a 7.0 s gap on a sleep and a 5.5 s gap off it -> False attribution keys: none
+8 STAGE   old: 3 boundaries with readiness -> True readiness keys: none
+8 STAGE   old gather on the mind's stage event row (no `at`) -> KeyError 'at'
+9 PARTITION old (alpha4-1's 2 h smoke): MODULATION in marks_failed: True | its reason: no window change on this tape yet (e.g. a smoke shorter than the maker | READ graded FAIL, in failed: False
+10 PLANT  old on the smoke: plant shown 0 -> SIZING False GRADE False (plant answered 0.0 )
+11 READ blind old: the twin not run -> False | graded (ALPHA4-PREREG §5, READ/H); the blind twin was not run — that clause FAILS

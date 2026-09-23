@@ -1,0 +1,61 @@
+............[B13] F=0.0310 (context only — neither bar below reads it, §16 addendum 1)
+.[B13] NULL seed=9 thing=circle last50_pre=0.0119 first3_med=0.0152 ratio=1.272 (bar <1.5)
+[B13] NULL seed=9 thing=square last50_pre=0.0119 first3_med=0.0071 ratio=0.594 (bar <1.5)
+[B13] NULL seed=9 thing=triangle last50_pre=0.0119 first3_med=0.0040 ratio=0.333 (bar <1.5)
+[B13] NULL seed=10 thing=circle last50_pre=0.0134 first3_med=0.0155 ratio=1.157 (bar <1.5)
+[B13] NULL seed=10 thing=square last50_pre=0.0134 first3_med=0.0115 ratio=0.853 (bar <1.5)
+[B13] NULL seed=10 thing=triangle last50_pre=0.0134 first3_med=0.0168 ratio=1.249 (bar <1.5)
+[B13] NULL seed=11 thing=circle last50_pre=0.0128 first3_med=0.0164 ratio=1.279 (bar <1.5)
+[B13] NULL seed=11 thing=square last50_pre=0.0128 first3_med=0.0144 ratio=1.123 (bar <1.5)
+[B13] NULL seed=11 thing=triangle last50_pre=0.0128 first3_med=0.0097 ratio=0.756 (bar <1.5)
+.[B13] conjunction (spike AND settle): 3/6 — [(9, 'moon', False), (9, 'house', True), (10, 'moon', False), (10, 'house', True), (11, 'moon', True), (11, 'house', False)]
+x[B13] seed=9 thing=moon last50_pre=0.0185 first3_med=0.0353 spike_ratio=1.907 (bar >=3.0, FAIL) e_at_10=1.0 settle_ratio=53.95097626926712 (bar <=1.25, FAIL)
+[B13] seed=9 thing=house last50_pre=0.0185 first3_med=1.0000 spike_ratio=53.951 (bar >=3.0, PASS) e_at_10=0.004388073652515478 settle_ratio=0.2367408574946589 (bar <=1.25, PASS)
+[B13] seed=10 thing=moon last50_pre=0.0177 first3_med=0.0168 spike_ratio=0.948 (bar >=3.0, FAIL) e_at_10=0.01062433753147185 settle_ratio=0.5994019761589211 (bar <=1.25, PASS)
+[B13] seed=10 thing=house last50_pre=0.0177 first3_med=1.0000 spike_ratio=56.418 (bar >=3.0, PASS) e_at_10=0.014373961408790104 settle_ratio=0.8109475859684273 (bar <=1.25, PASS)
+[B13] seed=11 thing=moon last50_pre=0.0158 first3_med=1.0000 spike_ratio=63.175 (bar >=3.0, PASS) e_at_10=0.008494453816940695 settle_ratio=0.5366355783409379 (bar <=1.25, PASS)
+[B13] seed=11 thing=house last50_pre=0.0158 first3_med=0.0238 spike_ratio=1.504 (bar >=3.0, FAIL) e_at_10=1.0 settle_ratio=63.17481852343615 (bar <=1.25, FAIL)
+....xs......
+[life1 replay] source rows=762 distinct words=15 -> {'belief': 15, 'revisit': 667, 'extension': 79, 'clash': 1, 'clash_refused': 0}
+[life1 replay] folded standing beliefs: 15
+  'bar': source_rows=18 cells=9 episodes=132 revisits=15 extensions=2 clashes=0 1+revisits+extensions=18
+  'star': source_rows=1 cells=3 episodes=3 revisits=0 extensions=0 clashes=0 1+revisits+extensions=1
+  'dot': source_rows=196 cells=53 episodes=841 revisits=172 extensions=23 clashes=0 1+revisits+extensions=196
+  'wave': source_rows=30 cells=38 episodes=294 revisits=24 extensions=5 clashes=0 1+revisits+extensions=30
+  'square': source_rows=35 cells=19 episodes=394 revisits=28 extensions=6 clashes=0 1+revisits+extensions=35
+  'circle': source_rows=68 cells=24 episodes=372 revisits=59 extensions=8 clashes=0 1+revisits+extensions=68
+  'ring': source_rows=62 cells=41 episodes=375 revisits=51 extensions=10 clashes=0 1+revisits+extensions=62
+  'diamond': source_rows=69 cells=48 episodes=409 revisits=6 extensions=4 clashes=1 1+revisits+extensions=11
+  'arrow': source_rows=2 cells=14 episodes=322 revisits=0 extensions=1 clashes=0 1+revisits+extensions=2
+  'cup': source_rows=101 cells=31 episodes=482 revisits=95 extensions=5 clashes=0 1+revisits+extensions=101
+  'house': source_rows=63 cells=8 episodes=507 revisits=61 extensions=1 clashes=0 1+revisits+extensions=63
+  'tree': source_rows=52 cells=10 episodes=456 revisits=51 extensions=0 clashes=0 1+revisits+extensions=52
+  'triangle': source_rows=14 cells=10 episodes=909 revisits=13 extensions=0 clashes=0 1+revisits+extensions=14
+  'key': source_rows=39 cells=7 episodes=433 revisits=38 extensions=0 clashes=0 1+revisits+extensions=39
+  'moon': source_rows=12 cells=9 episodes=514 revisits=11 extensions=0 clashes=0 1+revisits+extensions=12
+..................................................................................................................................................................................................................................F.....[life3a retina identity] 2338/2338 eye canvases byte-identical, max|delta|=0.0
+..................xx........................................................[B12b, literal 32-row identity] raw=[-0.08740248 -0.13724989  0.03004636  0.08157524  0.00823997] projected=[-0.32565395 -0.08178045 -0.18357541 -0.03094237  0.08078127] max|diff|=0.2383
+x.........[B12, THETA interaction] RAW recall: reason=noedge cos=0.9635992562734164 (THETA_N=0.955)
+[B12, THETA interaction] at init (random orthogonal H) recall: reason=noedge cos=0.9650282453970629
+[B12, THETA interaction] after ONE learn() {'steps': 20, 'batch': 50, 'loss_before': 3.126301486766711, 'loss_after': 1.16555259330799}: recall reason=novel cos=0.7005975004284148
+.[B12a] RAW margin 0.0091 (within-median 0.9628, between-p95 0.9537)
+[B12a] 5 sleeps: [{'steps': 20, 'batch': 120, 'loss_before': 4.079109601833773, 'loss_after': 2.3579384859623462}, {'steps': 20, 'batch': 120, 'loss_before': 2.3579384859623462, 'loss_after': 2.0196415653488127}, {'steps': 20, 'batch': 120, 'loss_before': 2.0196415653488127, 'loss_after': 1.714253934289475}, {'steps': 20, 'batch': 120, 'loss_before': 1.714253934289475, 'loss_after': 1.4220967832634952}, {'steps': 20, 'batch': 120, 'loss_before': 1.4220967832634952, 'loss_after': 1.224647397062408}]
+[B12a] LEARNED margin (5 sleeps) -0.1161 (within-median 0.1630, between-p95 0.2791)
+x[B12, photographs] BEFORE (raw front) margin -0.0897 (within-median 0.8283, between-p95 0.9181) over 10 words, 200 images
+[B12, photographs] AFTER (toy-world-trained head) margin -0.2915 (within-median 0.4607, between-p95 0.7522)
+.[B12a, single sleep] margin 0.0691 vs raw 0.0091 (7.6x)
+............
+======================================================================
+FAIL: test_the_real_deployed_line_in_alpha4_genome_parses_identically (tests.genome.test_read_lexicon_parser.TestSenseReadParses.test_the_real_deployed_line_in_alpha4_genome_parses_identically)
+A pin against the ACTUAL bytes of genome/ALPHA4.genome:95 (the trailing comment stripped exactly
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/tests/genome/test_read_lexicon_parser.py", line 46, in test_the_real_deployed_line_in_alpha4_genome_parses_identically
+    self.assertEqual(g.declared["SENSE_READ"]["every_s"], 5)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 20 != 5
+
+----------------------------------------------------------------------
+Ran 360 tests in 77.060s
+
+FAILED (failures=1, skipped=1, expected failures=6)
