@@ -130,18 +130,64 @@ READY_A_NULL = 0.29        # the random worker's success per episode (L-8's own 
 READY_A_ALPHA = 0.05       # the null's one-sided band
 
 
+def binomial_tail(n: int, p: float, k: int) -> float:
+    """P(Binomial(n, p) >= k), exact (math.comb, fsum). Factored out of binomial_bound (below) so family_wise_bound
+    (below) can share it — the same arithmetic, never retyped."""
+    from math import comb, fsum
+    return fsum(comb(n, j) * p ** j * (1.0 - p) ** (n - j) for j in range(k, n + 1))
+
+
 def binomial_bound(n: int, p: float, alpha: float) -> int:
     """The smallest k with P(Binomial(n, p) >= k) <= alpha — the least number of successes in n trials that a policy no
-    better than the null reaches with probability at most alpha. Exact (math.comb, fsum); n + 1 when even k = n is not rare
-    enough (never, for n >= 1 and p < 1). binomial_bound(20, 0.29, 0.05) == 10: P(X >= 10) = 0.0385, P(X >= 9) = 0.0948."""
-    from math import comb, fsum
+    better than the null reaches with probability at most alpha. Exact; n + 1 when even k = n is not rare enough (never,
+    for n >= 1 and p < 1). binomial_bound(20, 0.29, 0.05) == 10: P(X >= 10) = 0.0385, P(X >= 9) = 0.0948. This is the
+    SINGLE-READING bound — right for a judge read ONCE, wrong for one read at every sitting on an overlapping window
+    (see family_wise_bound and READY_A_BLOCK_K below, ALPHA4-2-PREREG §4.3)."""
     for k in range(n + 2):
-        if fsum(comb(n, j) * p ** j * (1.0 - p) ** (n - j) for j in range(k, n + 1)) <= alpha:
+        if binomial_tail(n, p, k) <= alpha:
             return k
     return n + 1
 
 
 READY_A_BOUND = binomial_bound(READY_A_WINDOW, READY_A_NULL, READY_A_ALPHA)
+
+
+# edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3 (§0.4 finding 5; recommended
+# by the designer, adopted by the orchestrator under Ahmad's 2026-09-05 delegation). THE FLAW: (a) was read at EVERY
+# sitting on a SLIDING window of the last READY_A_WINDOW completed episodes (READY_A_BOUND computed above), so the 5%
+# bound holds for ONE reading only; over a 24 h life (~30-45 sittings, each an overlapping window) a policy exactly at
+# the null clears it somewhere ~23% of the time (six times the stated alpha) — a family-wise-error problem, #162/#215's
+# class. THE FIX: (a) now reads DISJOINT blocks of READY_A_WINDOW completed mind-chosen episodes — block j = episodes
+# 20j+1 .. 20j+20 in the order they completed (never overlapping) — against a HIGHER k chosen so the FAMILY-WISE rate
+# over the blocks a 24 h life can complete at the null's pace stays under alpha.
+def family_wise_bound(n: int, p: float, alpha: float, blocks: int) -> int:
+    """The smallest k with the FAMILY-WISE rate over `blocks` independent disjoint n-trial blocks —
+    1 - (1 - P(Binomial(n, p) >= k))**blocks — <= alpha. At the adopted parameters (20, 0.29, 0.05, 2) this is 11: the
+    single-block tail at k=11 is 0.0132 (binomial_bound's own k=10 gives 0.0385), and the family-wise rate over the ~2
+    blocks a 24 h life completes at the null's pace is 1-(1-0.0132)**2 = 0.0262 (k=10's family-wise rate, 0.0755, is
+    ABOVE alpha — why k moved). A real function of the null (never a typed 11): family_wise_bound(20, 0.5, 0.05, 2) ==
+    15, a different k at a different null."""
+    for k in range(n + 2):
+        family = 1.0 - (1.0 - binomial_tail(n, p, k)) ** blocks
+        if family <= alpha:
+            return k
+    return n + 1
+
+
+# The blocks a 24 h life completes at the null's pace: the game steps every 30 s (~2,880 steps/24h) and a policy at
+# READY_A_NULL averages ~54 steps/episode (A4L-EXPLORE-TOY §3), so ~53 episodes/24h ~= 2 full 20-episode blocks
+# (ALPHA4-2-PREREG §4.3's own words: "the blocks a 24 h life can complete (2 at the null's rate)"). Not a general
+# claim about every success rate (a policy near the state-blind ceiling finishes episodes faster and completes MORE
+# than 2 blocks/24h — §4.3's own table — which is why this constant is scoped to the null's own pace, the rate (a)'s
+# false-positive risk is actually judged against).
+READY_A_BLOCKS_PER_LIFE = 2
+READY_A_BLOCK_K = family_wise_bound(READY_A_WINDOW, READY_A_NULL, READY_A_ALPHA, READY_A_BLOCKS_PER_LIFE)
+# The SINGLE-BLOCK tail at k = READY_A_BLOCK_K (0.0132) — what `p_null_at_k` prints on every readiness row. Distinct
+# from the FAMILY-WISE rate over READY_A_BLOCKS_PER_LIFE blocks (0.0262, computed above, never stored) that is the
+# actual reason k = 11 was chosen over k = 10 — a single-block tail answers "how surprising is THIS block", the
+# family-wise rate answers "how surprising is a life containing this block among others" (#162's unit-mismatch class:
+# these are two different statistics and neither may stand in for the other unlabelled).
+READY_A_BLOCK_P_NULL = binomial_tail(READY_A_WINDOW, READY_A_NULL, READY_A_BLOCK_K)
 
 
 def _bind_pool(feats: List[np.ndarray]) -> List[np.ndarray]:
@@ -572,12 +618,25 @@ class Mind:
         # (e): the hold flag, from `hold` tape rows (the SAME grade sense, on every change, including the
         # very first observation — creature/senses/grade.py's own docstring).
         self._hold_active: bool = False
-        # (a) (edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:40 +0400 — §4 AMENDED: per EPISODE, never per act):
-        # the last READY_A_WINDOW COMPLETED mind-chosen game episodes, one [episode, step, success] entry each, appended in
-        # `_consume_outcome` on the episode's TERMINAL outcome row (terminated or truncated), gated the SAME way
-        # `_check_act_mismatch` already is (source=="game" and chosen_by=="mind"); success = that row's own reward > 0.
-        # Persisted in the snapshot ledger ("game_episodes") so a resumed mind reads the same window (replay purity).
-        self._game_episodes: "collections.deque[list]" = collections.deque(maxlen=READY_A_WINDOW)
+        # (a) (edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:40 +0400 — §4 AMENDED: per EPISODE, never per act;
+        # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: DISJOINT blocks, never
+        # a sliding deque). Three fields replace the old sliding `_game_episodes` deque:
+        #   _game_last_episode_step: the (episode, step) of the last COUNTED terminal row — the dedup guard the deque's
+        #     own [-1] used to serve (a sense restart between a publish and its cursor write re-publishes that step,
+        #     #230's cursor law; the SAME row twice must count once).
+        #   _game_block_n / _game_block_successes: episodes counted toward the block CURRENTLY being filled (0..19) and
+        #     its successes so far. Meaningful only before the FIRST block ever completes — once any block has, these
+        #     reset to 0 after each completion and are never read for the reported (a) numbers again (the reading pins
+        #     to _game_last_block below; #180's law: a value computed is not a value read unless something reads it).
+        #   _game_last_block: the latest COMPLETE block, {"block_index": int, "successes": int} — locked in the instant
+        #     it completes (in _consume_outcome), never mutated again except to be REPLACED wholesale when the NEXT
+        #     block completes ("a block once read is never re-read with a different verdict", §4.3).
+        # All persisted in the snapshot ledger (game_last_episode_step/game_block_n/game_block_successes/game_last_block)
+        # so a resumed mind reads the same blocks (replay purity) — see snapshot()/resume() below.
+        self._game_last_episode_step: "Optional[Tuple[object, object]]" = None
+        self._game_block_n: int = 0
+        self._game_block_successes: int = 0
+        self._game_last_block: "Optional[Dict[str, int]]" = None
         # (c): the last TWO `sit` rows' (score, composite) pairs -- `score` is the existing SIT payload
         # (Q1's own accuracy, `creature/senses/sit.py`'s own `_score_of`); `composite` is a NEW field that
         # module's `sense()` gains in this same brief (`_composite_of`) so this judge can read §4(c)'s
@@ -736,14 +795,28 @@ class Mind:
             # last one counted is ONE episode, never two (a sense restart between a publish and its cursor write
             # re-publishes that step — the cursor law, #230). The journal's outcome row is untouched (the negative
             # control: nothing but the readiness rows moves).
+            # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: DISJOINT blocks
+            # of READY_A_WINDOW, never a sliding deque. The dedup guard reads `_game_last_episode_step` (the deque's own
+            # [-1] read the same fact); a counted episode advances the block-in-progress counters and, on the block's
+            # READY_A_WINDOW'th episode, LOCKS `_game_last_block` (never mutated again except wholesale replacement by
+            # the NEXT block completing) and resets the in-progress counters for the block after it.
             if meta.get("terminated") or meta.get("truncated"):
                 ep, step = meta.get("episode"), meta.get("step")
-                last = self._game_episodes[-1] if self._game_episodes else None
+                last = self._game_last_episode_step
                 duplicate = (last is not None and ep is not None and step is not None
                              and last[0] == ep and last[1] == step)
                 if not duplicate:
+                    self._game_last_episode_step = (ep, step)
                     got = meta.get("got")
-                    self._game_episodes.append([ep, step, bool(got is not None and float(got) > 0.0)])
+                    success = bool(got is not None and float(got) > 0.0)
+                    self._game_block_n += 1
+                    if success:
+                        self._game_block_successes += 1
+                    if self._game_block_n == READY_A_WINDOW:
+                        block_index = (self._game_last_block["block_index"] + 1) if self._game_last_block else 0
+                        self._game_last_block = {"block_index": block_index, "successes": self._game_block_successes}
+                        self._game_block_n = 0
+                        self._game_block_successes = 0
         # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
         # 2 (L-12): the OTHER half of `_maybe_think`'s pending gate — a hands outcome row's own `act_seq`
         # (the eye row that chose it) clears `_hands_pending` iff it matches the CURRENT pending choice
@@ -859,20 +932,43 @@ class Mind:
         edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:41 +0400 — §4 AMENDED (§11 finding 1): every clause is a
         BLOCK carrying its NUMBERS beside its verdict `ok` (#164 — the 23 readiness rows of alpha4-1's first hours carried
         booleans only), written on EVERY reading, the first included; every key on every row:
-          a: {window, n, successes, bound, null, ok} — success per COMPLETED episode over the last `window` (20) mind-chosen
-             game episodes; ok iff the window is full (n == 20) and successes >= bound, the smallest k with
-             P(Binomial(20, 0.29) >= k) <= 0.05 (= 10; READY_A_BOUND). The unamended clause averaged the per-STEP reward
-             (0 on every step but a successful terminal one) over 200 acts against 0.35 — in the units of no null.
+          a: success per COMPLETED episode, now over DISJOINT blocks (edit: Claude (Sonnet 5, judge builder B4),
+             2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3, replacing the sliding-window read below). {window, n,
+             successes, bound, null, ok, block_index, block_n, k, p_null_at_k, blocks_complete, k_single_reading} — the
+             reading is the LATEST COMPLETE disjoint block of `window` (block_n, both READY_A_WINDOW) mind-chosen game
+             episodes; `n`/`successes` are that block's own count and tally once any block has completed (frozen — "a
+             block once read is never re-read with a different verdict" — until the NEXT block completes), or the
+             in-progress count toward the block still being filled when NO block has completed yet (n < window, ok
+             always False). `bound` == `k` == READY_A_BLOCK_K (11): the OPERATIVE threshold, the smallest k whose
+             FAMILY-WISE rate over the ~2 disjoint blocks a 24 h life completes at the null's pace stays under alpha
+             (`family_wise_bound`, computed, never typed — changing the null moves it). `p_null_at_k` is the SINGLE-BLOCK
+             tail P(Binomial(window, null) >= k) at that k (0.0132) — NOT the family-wise rate (0.026) that is why k
+             moved off `k_single_reading` (READY_A_BOUND, 10: the smallest k whose SINGLE-reading tail is <= alpha — the
+             bound the held branch used before this amendment, correct for a judge read once, six-fold too loose read at
+             every sitting on an overlapping window). `blocks_complete` counts every block that has ever locked in. The
+             old formula (ok iff the window is full (n == 20) and successes >= bound): success over the SLIDING last
+             `window` completed episodes, re-tested at every sitting — replaced here, not merely renamed.
           b: {frames_alive, lifts (the top 3 by lift, then by frame), read_share_last2, frames_ok, read_ok, ok} — ok iff
              >= 3 frames alive in the ring now (`_frames_alive`) AND both of the last two sittings' read_share >= 0.6.
           c: {composite_last2, q1_last2, ok} — unchanged: both of the last two sittings' composite >= 0.95 and Q1 >= 0.98.
           d: {answered, right, novel_window_n, novel_right, ok} — unchanged: >= 20 graded since birth, >= 0.8 right, and the
              last 10 novel grades FULL with >= 8 right.
           e: {hold, ok} — unchanged: no HOLD."""
-        window = list(self._game_episodes)
-        successes = sum(1 for entry in window if entry[2])
-        a = {"window": READY_A_WINDOW, "n": len(window), "successes": successes, "bound": READY_A_BOUND,
-             "null": READY_A_NULL, "ok": bool(len(window) == READY_A_WINDOW and successes >= READY_A_BOUND)}
+        if self._game_last_block is not None:
+            block_index = self._game_last_block["block_index"]
+            a_n = READY_A_WINDOW
+            a_successes = self._game_last_block["successes"]
+        else:
+            block_index = None
+            a_n = self._game_block_n
+            a_successes = self._game_block_successes
+        blocks_complete = block_index + 1 if block_index is not None else 0
+        a_ok = bool(self._game_last_block is not None and a_successes >= READY_A_BLOCK_K)
+        a = {"window": READY_A_WINDOW, "n": a_n, "successes": a_successes, "bound": READY_A_BLOCK_K,
+             "null": READY_A_NULL, "ok": a_ok,
+             "block_index": block_index, "block_n": READY_A_WINDOW, "k": READY_A_BLOCK_K,
+             "p_null_at_k": READY_A_BLOCK_P_NULL, "blocks_complete": blocks_complete,
+             "k_single_reading": READY_A_BOUND}
 
         alive = self._frames_alive()
         top = sorted(alive, key=lambda kv: (-(kv[1] if kv[1] is not None else float("inf")), kv[0]))[:3]
@@ -903,8 +999,9 @@ class Mind:
 
     def _maybe_advance_stage(self, row: Dict[str, object], readings: Dict[str, object]) -> None:
         """§4 (AMENDED 2026-09-23 — the streak defined ONCE): the door opens on ONE readiness reading whose five clauses all
-        hold — each clause already spans its own horizon ((a) the last 20 completed episodes; (b) the ring now and the last
-        two sittings' read shares; (c) the last two sittings; (d) since birth and the last 10 novel grades; (e) now). The
+        hold — each clause already spans its own horizon ((a) the latest complete disjoint block of 20 completed episodes,
+        ALPHA4-2-PREREG §4.3; (b) the ring now and the last two sittings' read shares; (c) the last two sittings; (d) since
+        birth and the last 10 novel grades; (e) now). The
         unamended «on two consecutive exam windows» counted (b)'s read half and (c) three sittings deep. ONE journal event
         carrying the whole reading (the same five blocks the readiness row carries), `self.stage` raised to the declared
         judge's own stage index, NEVER undone by the mind (a no-op forever once `self.stage` has reached it). Each verdict
@@ -2737,12 +2834,18 @@ class Mind:
             # edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:41 +0400 — §4 AMENDED: "stage_ready_streak" is gone
             # (the door opens on ONE reading) and (a)'s per-act "game_rewards" became the per-EPISODE "game_episodes"
             # ([episode, step, success] each, the last READY_A_WINDOW). Neither key is journaled or hashed.
+            # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: the sliding
+            # "game_episodes" deque is gone; the disjoint-block state is four small fields instead (see __init__'s own
+            # comment on _game_last_block/_game_block_n/_game_block_successes/_game_last_episode_step).
             "stage": self.stage,
             "grades_total": self._grades_total,
             "grades_right": self._grades_right,
             "novel_grades": list(self._novel_grades),
             "hold_active": self._hold_active,
-            "game_episodes": [list(e) for e in self._game_episodes],
+            "game_last_episode_step": list(self._game_last_episode_step) if self._game_last_episode_step else None,
+            "game_block_n": self._game_block_n,
+            "game_block_successes": self._game_block_successes,
+            "game_last_block": self._game_last_block,
             "sit_readings": [list(t) for t in self._sit_readings],
             "web_fetches": self.web_fetches,
             "web_refused_rate": self.web_refused_rate,
@@ -2818,7 +2921,16 @@ class Mind:
             # edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:41 +0400 — §4 AMENDED: (a)'s per-EPISODE window (absent
             # from a snapshot taken before the amendment -> empty: the old per-act "game_rewards" is in other units and is
             # never converted; the old "stage_ready_streak" is ignored, the door opens on one reading).
-            mind._game_episodes = collections.deque([list(e) for e in ledger.get("game_episodes", [])], maxlen=READY_A_WINDOW)
+            # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: the disjoint-block
+            # state (absent from a snapshot taken before THIS amendment -> empty: an old "game_episodes" deque holds only
+            # the last 20 completed episodes with no record of block boundaries, so it cannot be converted into a
+            # disjoint block either — not merely skipped, genuinely impossible to reconstruct; moot for alpha4-2, a fresh
+            # life, ALPHA4-2-PREREG §7.1).
+            gles = ledger.get("game_last_episode_step")
+            mind._game_last_episode_step = tuple(gles) if gles else None
+            mind._game_block_n = int(ledger.get("game_block_n", 0))
+            mind._game_block_successes = int(ledger.get("game_block_successes", 0))
+            mind._game_last_block = ledger.get("game_last_block")
             mind._sit_readings = collections.deque([tuple(x) for x in ledger.get("sit_readings", [])], maxlen=2)
             mind.web_fetches = int(ledger.get("web_fetches", 0))
             mind.web_refused_rate = int(ledger.get("web_refused_rate", 0))

@@ -31,7 +31,11 @@ ROOT = Path(__file__).resolve().parents[2]
 SKELETON_TEXT = (ROOT / "genome" / "G4-skeleton.genome").read_text()
 PREREG = ROOT / "docs" / "ALPHA4-PREREG.md"          # __file__-relative, never a live-tree literal (#199)
 BLOCK_KEYS = {
-    "a": {"window", "n", "successes", "bound", "null", "ok"},
+    # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3 (the DISJOINT-BLOCK
+    # amendment): (a) gains block_index/block_n/k/p_null_at_k/blocks_complete/k_single_reading (see
+    # creature/mind.py's _readiness_readings docstring for what each means).
+    "a": {"window", "n", "successes", "bound", "null", "ok", "block_index", "block_n", "k", "p_null_at_k",
+          "blocks_complete", "k_single_reading"},
     "b": {"frames_alive", "lifts", "read_share_last2", "frames_ok", "read_ok", "ok"},
     "c": {"composite_last2", "q1_last2", "ok"},
     "d": {"answered", "right", "novel_window_n", "novel_right", "ok"},
@@ -75,19 +79,115 @@ class TestAPerEpisode(_Base):
         self.assertGreater(tail(20, 0.29, 9), 0.05)
         self.assertEqual((mind_mod.READY_A_WINDOW, mind_mod.READY_A_NULL, mind_mod.READY_A_BOUND), (20, 0.29, 10))
 
-    def test_ten_of_twenty_opens_a_per_episode_where_the_per_act_mean_never_could(self) -> None:
-        """RED on the review's defect: 10 successful episodes of the last 20 is the bound exactly; the unamended clause (a)
-        reads the SAME history's per-step mean over its last 200 acts (≈ 0.01) against 0.35 and says False."""
+    # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: clause (a) is read at
+    # EVERY sitting on a SLIDING window of the last 20 completed episodes, so the 5% bound holds for ONE reading; over a
+    # 24 h life (~30-45 sittings) a policy at the random null clears it somewhere ~23% of the time (six times the stated
+    # alpha). THE FIX: (a) now reads DISJOINT blocks of 20 completed mind-chosen episodes (block j = episodes 20j+1..20j+20
+    # in the order they completed), the reading at a sitting is the LATEST COMPLETE block's successes against
+    # k = READY_A_BLOCK_K = 11 (the smallest k whose FAMILY-WISE rate over the ~2 blocks a 24 h life completes at the
+    # null's pace stays under 0.05 -- family_wise_bound(20, 0.29, 0.05, 2) == 11, single-block tail P(X>=11|0.29) = 0.0132,
+    # family-wise over 2 blocks = 0.0262, close to the designer's own Monte Carlo 0.025); a block once read is never
+    # re-read with a different verdict. The four tests below replace/extend the old single-window ones.
+    def test_the_disjoint_block_bound_is_computed_from_the_null_never_typed(self) -> None:
+        """(iii) RED (absent on bbf7af8, before this fix — family_wise_bound does not exist yet). k = 11 at the adopted
+        parameters (20, 0.29, 0.05, 2 blocks); changing the null to 0.5 moves k to a different value (15) — proving k is a
+        real function of the null, never a typed 11. READY_A_BLOCK_P_NULL is the SINGLE-BLOCK tail at k = 11 (0.0132, what
+        `p_null_at_k` prints on every row) — distinct from the FAMILY-WISE rate over 2 blocks (0.026) that is why k = 11 was
+        chosen over k = 10 (whose family-wise rate, 0.076, exceeds 0.05)."""
+        from creature import mind as mind_mod
+        fwb = getattr(mind_mod, "family_wise_bound")
+        tail = lambda n, p, k: sum(comb(n, j) * p ** j * (1 - p) ** (n - j) for j in range(k, n + 1))
+        family = lambda n, p, k, blocks: 1.0 - (1.0 - tail(n, p, k)) ** blocks
+        self.assertEqual(fwb(20, 0.29, 0.05, 2), 11)
+        self.assertLessEqual(family(20, 0.29, 11, 2), 0.05)
+        self.assertGreater(family(20, 0.29, 10, 2), 0.05, "k=10's family-wise rate over 2 blocks must exceed alpha -- that is why k moved")
+        moved = fwb(20, 0.5, 0.05, 2)
+        self.assertNotEqual(moved, 11, "the k must be a function of the null, not a hardcoded 11")
+        self.assertEqual(moved, 15)
+        self.assertEqual((mind_mod.READY_A_BLOCKS_PER_LIFE, mind_mod.READY_A_BLOCK_K), (2, 11))
+        self.assertAlmostEqual(mind_mod.READY_A_BLOCK_P_NULL, tail(20, 0.29, 11), places=12)
+
+    def test_ten_of_twenty_no_longer_opens_eleven_does(self) -> None:
+        """RED on bbf7af8 (this branch's own prior state, before this fix): ten of the last 20 completed episodes used to
+        open (a) under the single-reading bound (READY_A_BOUND = 10, still printed as k_single_reading); the disjoint-block
+        amendment raises the OPERATIVE threshold to k = READY_A_BLOCK_K = 11. Ten successes in one complete block must now
+        read False; eleven must read True — and the per-act-mean contrast the old test made still holds for both."""
         clk = rr.Clock()
         mind = self._mind()
-        rows = rr.episodes(clk, "SF" * 10)
+        rows = rr.episodes(clk, "SF" * 10)          # 10 S, 10 F -- one complete block, 10 successes
         self._feed(mind, rows)
         self.assertLess(rr.per_act_mean_last_200(rows), 0.35, "the history must be one the per-act clause could never pass")
         mind.consume(rr.sit(clk, 0.5, 0.5, None))
         r = self._readiness_rows(self._root)[-1]["readiness"]
-        self.assertIs(rr.ok(r, "a"), True, f"10 of the last 20 episodes succeeded (the bound is 10); (a) read {r['a']!r}")
-        self.assertEqual({k: r["a"][k] for k in ("window", "n", "successes", "bound", "null")},
-                         {"window": 20, "n": 20, "successes": 10, "bound": 10, "null": 0.29})
+        self.assertIs(rr.ok(r, "a"), False, f"ten of twenty must no longer open (a) under k=11; (a) read {r['a']!r}")
+        self.assertEqual({k: r["a"][k] for k in ("window", "n", "successes", "bound", "k", "null", "block_index",
+                                                  "blocks_complete", "k_single_reading")},
+                         {"window": 20, "n": 20, "successes": 10, "bound": 11, "k": 11, "null": 0.29,
+                          "block_index": 0, "blocks_complete": 1, "k_single_reading": 10})
+
+        clk2 = rr.Clock()
+        mind2 = self._mind()
+        self._feed(mind2, rr.episodes(clk2, "S" * 11 + "F" * 9))    # one complete block, 11 successes
+        mind2.consume(rr.sit(clk2, 0.5, 0.5, None))
+        r2 = self._readiness_rows(self._root)[-1]["readiness"]
+        self.assertIs(rr.ok(r2, "a"), True, f"eleven of twenty must open (a); (a) read {r2['a']!r}")
+        self.assertEqual((r2["a"]["successes"], r2["a"]["block_index"], r2["a"]["blocks_complete"]), (11, 0, 1))
+
+    def test_a_complete_block_is_pinned_until_the_next_block_completes(self) -> None:
+        """(ii) RED on bbf7af8: 11 successes complete block 0 (opens (a)); 19 more failures follow (39 episodes total). The
+        OLD sliding window then holds the last 20 completed episodes (the block's own last F plus 19 new F = 20 F, 0
+        successes) and reads False — a policy that just proved itself loses the door the moment its streak ages out of the
+        lookback. The amended judge reads the LATEST COMPLETE block only: block 0 stays pinned at 11 successes / True
+        through this sitting until block 1 itself completes (episode 40), at which point block 1's own 0 successes take
+        over and (a) reads False again — 'a block once read is never re-read with a different verdict' (§4.3)."""
+        clk = rr.Clock()
+        mind = self._mind()
+        self._feed(mind, rr.episodes(clk, "S" * 11 + "F" * 9))       # block 0 complete: 11 successes
+        mind.consume(rr.sit(clk, 0.5, 0.5, None))
+        r1 = self._readiness_rows(self._root)[-1]["readiness"]
+        self.assertEqual((rr.ok(r1, "a"), r1["a"]["block_index"], r1["a"]["successes"], r1["a"]["blocks_complete"]),
+                         (True, 0, 11, 1))
+
+        self._feed(mind, rr.episodes(clk, "F" * 19))                  # block 1: 19/20, NOT complete
+        mind.consume(rr.sit(clk, 0.5, 0.5, None))
+        r2 = self._readiness_rows(self._root)[-1]["readiness"]
+        self.assertEqual((rr.ok(r2, "a"), r2["a"]["block_index"], r2["a"]["successes"], r2["a"]["n"],
+                          r2["a"]["blocks_complete"]), (True, 0, 11, 20, 1),
+                         f"block 0 must stay pinned; (a) read {r2['a']!r}")
+
+        self._feed(mind, rr.episodes(clk, "F"))                       # block 1 completes: 20 F, 0 successes
+        mind.consume(rr.sit(clk, 0.5, 0.5, None))
+        r3 = self._readiness_rows(self._root)[-1]["readiness"]
+        self.assertEqual((rr.ok(r3, "a"), r3["a"]["block_index"], r3["a"]["successes"], r3["a"]["blocks_complete"]),
+                         (False, 1, 0, 2), f"block 1 must now take over; (a) read {r3['a']!r}")
+
+    def test_a_sliding_window_would_open_where_no_disjoint_block_does(self) -> None:
+        """(i) RED on bbf7af8: episodes 1-20 read F*11+S*9 (block 0: 9 successes, fails); episodes 21-40 read S*9+F*11
+        (block 1: 9 successes, fails) — but the 9 successes at the END of block 0 (positions 12-20) and the 9 at the START
+        of block 1 (positions 21-29) are ADJACENT, so the OLD sliding window at episode 31 (the last 20 completed:
+        episodes 12-31) catches all 18 of them — 18/20, far past even the single-reading bound of 10 — and reads True,
+        though NEITHER real block ever reached 11. The amended judge, which only ever reads a disjoint block's own
+        successes, reads False at every sitting through the whole 40-episode history."""
+        clk = rr.Clock()
+        mind = self._mind()
+        pattern = "F" * 11 + "S" * 18 + "F" * 11
+        self.assertEqual(len(pattern), 40)
+        successes = [ch == "S" for ch in pattern]
+
+        def max_sliding_20(xs: List[bool]) -> int:
+            return max(sum(xs[i:i + 20]) for i in range(len(xs) - 19))
+
+        self.assertGreaterEqual(max_sliding_20(successes), 11, "documented: the sliding window's own peak, never used to judge")
+        self.assertEqual((sum(successes[:20]), sum(successes[20:])), (9, 9), "neither disjoint block reaches 11")
+
+        check_after = {20, 25, 31, 35, 40}
+        for i, ch in enumerate(pattern, start=1):
+            self._feed(mind, rr.episode(clk, success=(ch == "S")))
+            if i in check_after:
+                mind.consume(rr.sit(clk, 0.5, 0.5, None))
+                reading = self._readiness_rows(self._root)[-1]["readiness"]
+                self.assertIs(rr.ok(reading, "a"), False,
+                              f"at episode {i}: no disjoint block ever reaches 11; (a) read {reading['a']!r}")
 
     def test_five_of_twenty_reads_false_under_both(self) -> None:
         """GUARD (passes on both trees): 5 of 20 is under the band and the per-act mean is under 0.35."""
@@ -118,14 +218,18 @@ class TestAPerEpisode(_Base):
         self.assertIs(rr.ok(r, "a"), False)
         self.assertEqual((r["a"]["n"], r["a"]["successes"]), (19, 19))
 
-    def test_the_window_holds_the_last_twenty_only(self) -> None:
-        """Twelve successes long ago, then twenty failures: the window is the last 20 completed episodes — 0 successes."""
+    def test_a_complete_block_is_not_diluted_by_later_episodes_outside_it(self) -> None:
+        """(the disjoint-block mirror of the old 'the window holds the last twenty only' test — RED on bbf7af8, whose
+        sliding window read this exact history as 0 successes / False): twelve successes complete block 0 (12 >= 11:
+        opens (a)); twenty more failures follow, filling block 1 to 12/20 -- NOT complete. Under the old sliding window
+        this history's last 20 completed episodes were all failures. The amended judge reads the latest COMPLETE block
+        only: block 0's 12 successes stay pinned and (a) stays True."""
         clk = rr.Clock()
         mind = self._mind()
         self._feed(mind, rr.episodes(clk, "S" * 12 + "F" * 20))
         mind.consume(rr.sit(clk, 0.5, 0.5, None))
         r = self._readiness_rows(self._root)[-1]["readiness"]
-        self.assertEqual((r["a"]["n"], r["a"]["successes"], r["a"]["ok"]), (20, 0, False))
+        self.assertEqual((r["a"]["n"], r["a"]["successes"], r["a"]["ok"], r["a"]["block_index"]), (20, 12, True, 0))
 
     def test_an_unfinished_episode_never_counts(self) -> None:
         clk = rr.Clock()
@@ -303,7 +407,9 @@ class TestNumbersOnEveryRow(_Base):
                 self.assertIsInstance(rd[k]["ok"], bool)
         first, last = rows[0]["readiness"], rows[-1]["readiness"]
         self.assertEqual((first["c"]["q1_last2"], first["c"]["composite_last2"]), ([0.97], [0.93]))
-        self.assertEqual((last["a"]["n"], last["a"]["successes"], last["a"]["bound"]), (3, 1, 10))
+        self.assertEqual((last["a"]["n"], last["a"]["successes"], last["a"]["bound"]), (3, 1, 11))
+        self.assertEqual((last["a"]["block_index"], last["a"]["blocks_complete"], last["a"]["k"],
+                          last["a"]["k_single_reading"]), (None, 0, 11, 10))
         self.assertEqual((last["c"]["q1_last2"], last["c"]["composite_last2"]), ([0.99, 0.98], [0.96, 0.95]))
         self.assertEqual(last["b"]["read_share_last2"], [0.5, None])
         self.assertEqual((last["d"]["answered"], last["d"]["right"], last["d"]["novel_window_n"], last["d"]["novel_right"]),

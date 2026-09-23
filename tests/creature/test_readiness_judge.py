@@ -36,7 +36,11 @@ SKELETON_TEXT = (ROOT / "genome" / "G4-skeleton.genome").read_text()
 
 EXTRA_LINES = rr.EXTRA_LINES
 FRAME_PAIRS = [("red", "ball"), ("blue", "key"), ("green", "box")]
-PASSING_EPISODES = "SSFSSFSSFSSFSSFSSFFF"       # 12 successes in the last 20 completed episodes (the bound is 10)
+# edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: exactly 20 episodes (one
+# complete disjoint block), 12 successes -- clears the disjoint-block k (READY_A_BLOCK_K = 11) as it cleared the old
+# single-reading bound (READY_A_BOUND = 10); unaffected by the amendment (n/successes/block_index unchanged, see
+# TestAllFiveHoldReachesStage4.test_all_five_hold_on_one_reading_opens_the_door's own assertion).
+PASSING_EPISODES = "SSFSSFSSFSSFSSFSSFFF"       # 12 successes in one complete 20-episode block
 
 
 def _genome_path(tmp_root: Path, extra: List[str] = EXTRA_LINES) -> Path:
@@ -306,8 +310,14 @@ class TestResumeKeepsStage(unittest.TestCase):
         self.assertEqual(resumed._grades_right, mind._grades_right)
         self.assertEqual(list(resumed._novel_grades), list(mind._novel_grades))
         self.assertEqual(resumed._hold_active, mind._hold_active)
-        self.assertEqual(list(resumed._game_episodes), list(mind._game_episodes))
-        self.assertEqual(len(resumed._game_episodes), 20)
+        # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: the sliding-window
+        # deque `_game_episodes` is gone; the disjoint-block state is `_game_last_block` (the latest COMPLETE block,
+        # frozen once set) plus `_game_block_n`/`_game_block_successes` (the in-progress block, only live before the
+        # FIRST block ever completes -- PASSING_EPISODES is exactly one complete block, so both must read 0 here).
+        self.assertEqual(resumed._game_last_block, mind._game_last_block)
+        self.assertEqual(mind._game_last_block, {"block_index": 0, "successes": 12})
+        self.assertEqual((resumed._game_block_n, resumed._game_block_successes), (mind._game_block_n, mind._game_block_successes))
+        self.assertEqual((mind._game_block_n, mind._game_block_successes), (0, 0))
         self.assertEqual([tuple(x) for x in resumed._sit_readings], list(mind._sit_readings))
         self.assertEqual(json.dumps(resumed._readiness_readings(), sort_keys=True),
                          json.dumps(mind._readiness_readings(), sort_keys=True), "the resumed mind reads the same judge")
