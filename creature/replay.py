@@ -66,6 +66,21 @@ def is_mind_row(r: Dict[str, object]) -> bool:
     return r.get("event") not in NON_MIND_EVENTS
 
 
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:41 +0400 — A4L-LANG task 7 (A4-LADDER-PREREG §3.4 L1): the READ-ONLY
+# law's twin. A chat TAPE row is a `chat` row or a `grade` row of kind "chat" (creature/senses/chat.py); a chat JOURNAL
+# row is the mind's `say` row of kind "chat" or its kind-chat `grade` row (creature/mind.py:_consume_chat/_consume_grade).
+# `--blind chat` removes the tape rows BEFORE the replay (and the Mind is blind to them besides — both roads are pinned
+# equal by tests/creature/test_replay_blind_chat.py); the twin's journal must equal the live journal minus its chat rows,
+# field for field INCLUDING `hash`.
+def is_chat_row(r: Dict[str, object]) -> bool:
+    return r.get("sense") == "chat" or (r.get("sense") == "grade" and (r.get("meta") or {}).get("kind") == "chat")
+
+
+def is_chat_journal_row(j: Dict[str, object]) -> bool:
+    say, grade = j.get("say"), j.get("grade")
+    return (isinstance(say, dict) and say.get("kind") == "chat") or (isinstance(grade, dict) and grade.get("kind") == "chat")
+
+
 def _read_jsonl(path: Path) -> List[Dict[str, object]]:
     rows: List[Dict[str, object]] = []
     for line in path.read_text().splitlines():
@@ -109,6 +124,8 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
 
     mind = Mind(genome_path, work_root, blind=blind)
     rows = sorted(_read_jsonl(tape_path), key=lambda r: r["seq"])
+    if "chat" in blind:          # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:41 +0400 — the blind-chat twin (L1)
+        rows = [r for r in rows if not is_chat_row(r)]
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     # edit: Claude (Fable 5.1), 2026-09-23 10:58 +0400 — A4-LADDER-PREREG §4's two instruments, both OUTSIDE the mind's road (the

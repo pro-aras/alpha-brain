@@ -407,6 +407,8 @@ class Body:
             # features) applies here exactly as it did to every other counter in this method — costs
             # nothing to also export it.
             "web_refused_hold": int(getattr(self.mind, "web_refused_hold", 0)),
+            # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG task 10: the ten chat keys (#164)
+            **_chat_status(self.mind),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:
@@ -547,6 +549,47 @@ def _declared_lexicon_config(declared: Dict[str, dict]) -> Optional[Dict[str, ob
     if not lexicon_sense.LEXICON_DOOR_GATED:
         return None
     return declared.get("DOOR_LEXICON")
+
+
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG task 2 (docs/briefs/A4L-LANG.md; A4-LADDER-PREREG
+# §3.2 item 1): the chat door's arming, mirroring _declared_read_config's shape and gate discipline exactly (C2/C3's
+# convention); `_chat_sense_fn` is the partial main() hands add_sense, factored out so a test pins its LAST link — the
+# keywords the door actually receives (#180; builder I's web door once lacked `root` and restarted every second).
+def _declared_chat_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """CHAT undeclared -> None (arms nothing). Declared -> its own parsed dict, gated on
+    creature.senses.chat.CHAT_DOOR_GATED so a genome line arms nothing until the code carrying it exists."""
+    from .senses import chat as chat_sense   # lazily, same discipline as read/lexicon above
+    if not chat_sense.CHAT_DOOR_GATED:
+        return None
+    return declared.get("CHAT")
+
+
+def _chat_sense_fn(root: Path, chat_cfg: Dict[str, object], canvas: int, letters: int, period: Optional[float] = None):
+    """The chat door's sense as main() arms it: the door watches `root / <CHAT's in path>`; the canvas is the GAZE
+    canvas the eye reads; `letters` is the EAR's own limit (never a second number invented here)."""
+    import functools
+    from .senses import chat as chat_sense
+    return functools.partial(chat_sense.sense, root=Path(root), in_dir=Path(root) / str(chat_cfg["in"]), canvas=int(canvas),
+                             letters=int(letters), period=float(period if period is not None else chat_sense.DEFAULT_PERIOD_S))
+
+
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG task 10: the ten chat counters, on EVERY STATUS
+# write (#164) through `_build_status` (the one builder the status loop, the crash page and stop() all use) — zeros and
+# None on a genome that never declares CHAT (the mind's `chat_counters` exists on every Mind; getattr covers an older one).
+CHAT_STATUS_KEYS = ("chats", "chat_answered", "chat_abstained", "chat_refused_form", "chat_refused_content",
+                    "chat_words_mean", "chat_longest", "chat_graded", "chat_graded_right", "chat_graded_novel")
+
+
+def _chat_status(mind) -> Dict[str, object]:
+    c = dict(getattr(mind, "chat_counters", {}) or {})
+    answered = int(c.get("answered", 0))
+    return {
+        "chats": int(c.get("chats", 0)), "chat_answered": answered, "chat_abstained": int(c.get("abstained", 0)),
+        "chat_refused_form": int(c.get("refused_form", 0)), "chat_refused_content": int(c.get("refused_content", 0)),
+        "chat_words_mean": (round(int(c.get("words_total", 0)) / answered, 4) if answered else None),
+        "chat_longest": int(c.get("longest", 0)), "chat_graded": int(c.get("graded", 0)),
+        "chat_graded_right": int(c.get("graded_right", 0)), "chat_graded_novel": int(c.get("graded_novel", 0)),
+    }
 
 
 # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:5x +0400 — ALPHA4-H task 0 (docs/briefs/ALPHA4-H.md;
@@ -695,6 +738,13 @@ def main(argv: List[str]) -> int:
             lexicon_sense_module.sense, sqlite_path=str(lexicon_override or lex_cfg["sqlite"]), root=root,
             canvas=lex_canvas, period=1.0, words=8, letters=int(genome_for_cli.ear_letters))
         body.add_sense("lexicon", lfn)
+
+    # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG task 2: the chat door, armed from the CHAT line
+    # behind CHAT_DOOR_GATED like the reader; the canvas is the GAZE canvas, the letters the ear's own limit.
+    chat_cfg = _declared_chat_config(declared)
+    if chat_cfg is not None:
+        body.add_sense("chat", _chat_sense_fn(root, chat_cfg, canvas=int(genome_for_cli.gaze["canvas"]) if genome_for_cli.gaze else 128,
+                                              letters=int(genome_for_cli.ear_letters)))
 
     # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 22:1x +0400 — docs/briefs/G5-L-BABYAI-WORLD-EAR.md
     # item 2: the sound ear, listening AT THE SAME FOLDER DOOR the picture sense watches (the brief's own

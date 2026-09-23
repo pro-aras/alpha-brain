@@ -1,0 +1,7 @@
+{
+  "_about": "A4L-LANG's DEV phrasings (A4-LADDER-PREREG §3.3) — the ones the builder develops and tests on, and the ones M3 measured. The life asks the orchestrator's TEST phrasings (outside the repo, never opened by the builder). Same schema: one list per family, {X}/{Y} are thing names; keys starting with '_' are ignored. Written 2026-09-23 11:42 +0400 by Claude (Opus 5.5, A4 ladder builder LANG).",
+  "what-is": ["what is this"],
+  "yes-no": ["is this a {X}"],
+  "which": ["is it a {X} or a {Y}"],
+  "where": ["where is the {X}"]
+}

@@ -40,9 +40,26 @@ def journal_counts(rows) -> collections.Counter:
         if isinstance(d.get("think"), dict):
             c["think"] += 1
             if d["think"].get("kind") == "self": c["self_thinks"] += 1
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:51 +0400 — A4L-LANG task 10: a chat `say` row (kind "chat") and a
+        # kind-chat grade are counted APART from the think-mouth's `say` and the ask door's grades (#180: two mechanisms, two names).
+        if isinstance(d.get("say"), dict) and d["say"].get("kind") == "chat":
+            c["chat_say"] += 1
+            continue
+        if isinstance(d.get("grade"), dict) and d["grade"].get("kind") == "chat":
+            c["chat_grade"] += 1
         for k in ("question", "say", "sound", "sit", "sleep", "outcome", "body"):
             if k in d: c[k] += 1
     return c
+
+
+CHAT_KEYS = ("chats", "chat_answered", "chat_abstained", "chat_refused_form", "chat_refused_content", "chat_words_mean",
+             "chat_longest", "chat_graded", "chat_graded_right", "chat_graded_novel")
+
+
+def chat_status_line(status) -> str:
+    """edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:51 +0400 — A4L-LANG task 10: STATUS's ten chat keys, «not recorded»
+    for a key an older body never wrote (never a fabricated 0)."""
+    return "[check] chat: " + " · ".join(f"{k} {status[k]}" if k in status else f"{k} not recorded" for k in CHAT_KEYS)
 
 
 def births_by_hour(rows):
@@ -78,6 +95,7 @@ def main(argv) -> int:
     print(f"[check] root {root} · STATUS moments {status.get('moments')} cells {status.get('cells')} crash {status.get('crash')} "
           f"backlog {status.get('mind_backlog_rows', 'not recorded')} sight_born {status.get('sight_born', 'not recorded')}/{status.get('sight_nmax', '?')} "
           f"refused nmax {status.get('births_refused_nmax', 'not recorded')} budget {status.get('births_refused_budget', 'not recorded')}")
+    print(chat_status_line(status))   # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:51 +0400 — A4L-LANG task 10
     # 1. the body rows on the tape = the STATUS series (every 60 s)
     body = []
     for f in sorted(glob.glob(str(root / "tape" / "*.jsonl"))):

@@ -139,7 +139,18 @@ def gate1(tree: Path) -> bool:
                          "def f(root):\n    with open(root / 'state' / 'organism.npz', 'wb') as h:\n        h.write(b'x')\n")
         caught = sweep([plant])
         print(f"G4-1 control: planted offender {'CAUGHT' if caught else 'MISSED'}")
-    return not off and bool(caught)
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG (docs/briefs/A4L-LANG.md, gates): the chat
+        # sense's planted offender — a chat-shaped sense (creature/senses/chat.py's own signature and its own two-step
+        # cursor style) that writes its SEEN cursor under root/state/ instead of root/chat/. The real chat.py is in the
+        # walk above (creature/senses/*.py); this plant proves the walk would see it misbehave.
+        plant_chat = Path(d) / "senses" / "chat_offender.py"; plant_chat.parent.mkdir(parents=True, exist_ok=True)
+        plant_chat.write_text("from pathlib import Path\n"
+                              "def sense(publish, stop_event, root, in_dir=None, canvas=128, letters=8, period=1.0):\n"
+                              "    seen_path = Path(root) / 'state' / 'SEEN.json'\n"
+                              "    seen_path.write_text('[]')\n")
+        caught_chat = sweep([plant_chat])
+        print(f"G4-1 control: the chat sense's planted offender {'CAUGHT' if caught_chat else 'MISSED'}")
+    return not off and bool(caught) and bool(caught_chat)
 
 
 def _png(rgb) -> bytes:
