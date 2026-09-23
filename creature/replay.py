@@ -1,7 +1,7 @@
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 23:12 +0400 — A6: replay (docs/G4-PREREG.md §2.9). The mind's
 # decisions are a pure function of (genome, tape rows in seq order) -- I2, PREREG §2.3/B4. This tool proves it.
 """creature/replay.py — python3 -m creature.replay --genome G --tape run/tape/<date>.jsonl
-[--against run/journal/<date>.jsonl] [--blind gaze] [--closed] --out DIR
+[--against run/journal/<date>.jsonl] [--blind gaze] [--closed] [--timings] [--exam-every N] --out DIR
 
 Rebuilds a fresh Mind from one day's tape file (in seq order) into a temporary work root (PREREG §2.11:
 fresh roots for every test/gate), and writes DIR/journal.jsonl -- MIND rows only, which since ALPHA4
@@ -40,6 +40,7 @@ level "event" row in the first place, so the excluded set is unchanged for every
 from __future__ import annotations
 
 import json
+import shutil
 import os
 import sys
 import tempfile
@@ -82,7 +83,8 @@ def read_mind_journal(path: Path) -> List[Dict[str, object]]:
     return [r for r in _read_jsonl(path) if is_mind_row(r)]
 
 
-def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenSet[str] = frozenset(), close: bool = False) -> Path:
+def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenSet[str] = frozenset(), close: bool = False,
+               timings: bool = False, exam_every: int = 0) -> Path:
     """Feeds `tape_path`'s rows (one day file, sorted by seq -- defensive, they are already in order) to
     a fresh Mind in a temporary root whose tape/payload is a symlink to the source tape's own payload
     directory (never copied: replay never writes to the source tape). Returns DIR/journal.jsonl's path.
@@ -107,13 +109,40 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
 
     mind = Mind(genome_path, work_root, blind=blind)
     rows = sorted(_read_jsonl(tape_path), key=lambda r: r["seq"])
-    for row in rows:
-        mind.consume(row)
-    if close:
-        mind.close()
-
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    # edit: Claude (Fable 5.1), 2026-09-23 10:58 +0400 — A4-LADDER-PREREG §4's two instruments, both OUTSIDE the mind's road (the
+    # journal is byte-identical with or without them — pinned by tests/creature/test_replay_instruments.py):
+    # `timings`: per-row consume wall-ms to DIR/timings.jsonl (the COST rung's C2 bars and DROP's D4 read it);
+    # `exam_every`: every N eye rows (N canvases) the replayed organism is SNAPSHOT to its work root and the
+    # self-exam sits on that snapshot READ-ONLY (creature/exam.py:run_exam, check_tape 0) — the exam files land
+    # under DIR/exam/ (ANSWER's A-controls and DROP's D1 read them). An exam never changes him: the identity
+    # control is the same journal with exam_every 0.
+    import time as _time
+    tf = (out_dir / "timings.jsonl").open("w") if timings else None
+    eye_rows = 0
+    exam_dir = out_dir / "exam"
+    for row in rows:
+        t0 = _time.perf_counter() if tf is not None else None
+        mind.consume(row)
+        if tf is not None:
+            tf.write(json.dumps({"seq": row.get("seq"), "sense": row.get("sense"), "source": (row.get("meta") or {}).get("source"),
+                                 "ms": round((_time.perf_counter() - t0) * 1000.0, 3)}) + "\n")
+        if exam_every > 0 and row.get("sense") == "eye":
+            eye_rows += 1
+            if eye_rows % exam_every == 0:
+                mind.snapshot()
+                from creature import exam as _exam_module
+                _exam_module.run_exam(work_root, genome_path, held=10, check_tape=0)
+    if tf is not None:
+        tf.close()
+    if close:
+        mind.close()
+    if exam_every > 0 and (work_root / "exam").exists():
+        exam_dir.mkdir(parents=True, exist_ok=True)
+        for f_ in sorted((work_root / "exam").glob("*.json")):
+            if f_.name != "LAST.json":
+                shutil.copy2(f_, exam_dir / f_.name)
     out_journal = out_dir / "journal.jsonl"
     mind_rows: List[Dict[str, object]] = []
     jdir = work_root / "journal"
@@ -163,7 +192,9 @@ def main(argv: List[str]) -> int:
     out_dir = Path(argv[argv.index("--out") + 1])
     blind: FrozenSet[str] = frozenset([argv[argv.index("--blind") + 1]]) if "--blind" in argv else frozenset()
 
-    out_journal = run_replay(genome_path, tape_path, out_dir, blind=blind, close="--closed" in argv)   # --closed: the tape is a closed life's whole record
+    exam_every = int(argv[argv.index("--exam-every") + 1]) if "--exam-every" in argv else 0
+    out_journal = run_replay(genome_path, tape_path, out_dir, blind=blind, close="--closed" in argv,   # --closed: the tape is a closed life's whole record
+                             timings="--timings" in argv, exam_every=exam_every)   # A4 ladder instruments (2026-09-23 10:58 +0400)
 
     if "--against" in argv:
         against_path = Path(argv[argv.index("--against") + 1])
