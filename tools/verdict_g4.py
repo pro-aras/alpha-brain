@@ -886,6 +886,27 @@ def main(argv: List[str]) -> int:
         except Exception as e:
             _hrecog = {"asked": 0, "error": repr(e)}
     M["HANDS"] = _vl.hands_mark(st, _hrows, _hrecog, "HANDS" in decl)
+    # edit: Claude (Fable 5.1), 2026-09-23 04:05 +0400 — ALPHA4-PREREG §5 READ (builder H's mark, wired at integration — H's report deferred
+    # this three-line pattern to the integrator): the reader ASKS the last 50 words the shelf reader HEARD (the record's own
+    # `read/HEARD.json`, builder H's HELD-OUT font) through the unblinded twin's organism via H's own instrument
+    # (tools/read_recognised.py, recall_many — never mutating, its state_hash pinned inside). The BLIND twin (the same tape with
+    # the shelf rows dropped) is NOT run by this reader yet: `recog_blind=None` and the mark says so in its reason ("the blind
+    # twin was not run — that clause FAILS") — a reader-only addition owed after alpha4-1's launch, never a loosened bar.
+    _rrecog = None
+    if "SENSE_READ" in decl:
+        try:
+            import json as _json_r
+            from tools import read_recognised as _rr
+            _heard_p = root / "read" / "HEARD.json"
+            _heard = _json_r.loads(_heard_p.read_text()) if _heard_p.exists() else []
+            _words_r = [str(w) for w in _heard][-50:]
+            if len(_words_r) >= 50:
+                _rrecog = _rr.recognised_share(twins_dir / "unblinded-1", genome_path, _words_r)
+            else:
+                _rrecog = {"n": 0, "share": None, "note": f"only {len(_words_r)} shelf words heard; the mark asks 50"}
+        except Exception as e:
+            _rrecog = {"n": 0, "share": None, "error": repr(e)}
+    M["READ"] = _vl.read_mark(tape, live, "SENSE_READ" in decl, _rrecog, None)
     M["THREAD"] = _vl.thread_mark(R["ALIVE"], st, bool((decl.get("THINK") or {}).get("threaded")))   # §19.2 (builder E's thinking thread)
     # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §5/§6: EVOLVE. The negative
     # control (brief item 4) is run ONCE, before the life, by `tools/evolve.py --negative-control` with `--out`
