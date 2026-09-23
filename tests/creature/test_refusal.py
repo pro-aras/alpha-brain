@@ -258,6 +258,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "AREA_SOUND": "AREA     sound  from cochlea cos>=0.975",
         "MEET_SIGHT_SOUND": "MEET     sight  sound",
         "MEET_SOUND_WORDS": "MEET     sound  words",
+        # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 12:20 +0400 — docs/A4-LADDER-PREREG.md §2.5: one row, matching the
+        # genes.py RUNS entry the rung adds (ACT_VALUE — the second ACT line). Caught by this class on the first landing run.
+        "ACT_VALUE": "ACT      value reward 10; optimism 1",
     }
 
     def test_every_runs_gene_parses(self) -> None:

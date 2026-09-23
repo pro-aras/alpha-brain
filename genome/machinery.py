@@ -602,6 +602,18 @@ def parse_genome(text: str) -> Genome:
             # beside eye/ear). Each a strict re.fullmatch; each stored under g["declared"][...]; each REQUIRES a RUNS entry
             # in creature/genes.py or Mind.__init__'s generic refusal (W3-0) refuses the organism by name — nobody can
             # "declare" ACT/OUTCOME/SIT/SENSE-body into existence by parsing alone.
+            # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:58 +0400 — docs/A4-LADDER-PREREG.md §2.5 (A4L-EXPLORE): a
+            # SECOND ACT line, `ACT value reward <n>; optimism <f>` — the game act chooser's VALUE law (creature/mind.py
+            # `_maybe_choose_act`: the act's value = its mean REWARD over its last <n> outcomes; an act with no outcome in
+            # that window reads <f>). Dispatched on args[0] == "value" exactly as SENSE dispatches on args[0]; stored under
+            # declared["ACT_VALUE"] so the verbs line's own declared["ACT"] is never overwritten. The verbs branch below is
+            # untouched byte for byte; the one form it accepted that this branch now takes is a verb list that STARTS with
+            # the word "value" — no genome on disk has one (grep), and «ACT value» alone now refuses by name.
+            elif gene == "ACT" and args and args[0] == "value":
+                m = re.fullmatch(r"value reward (\d+); optimism (" + _NUM + r")", a)
+                if not m: raise GenomeError(f"ACT value: cannot read {a!r} (A4L-EXPLORE: ACT value reward <n>; optimism <f>)")
+                if int(m.group(1)) < 1: raise GenomeError(f"ACT value: the window must be >= 1 outcome, got {m.group(1)}")
+                g["declared"]["ACT_VALUE"] = {"law": "reward", "window": int(m.group(1)), "optimism": float(m.group(2))}
             elif gene == "ACT":
                 m = re.fullmatch(r"[a-z]+(?: [a-z]+)*", a)
                 if not m: raise GenomeError(f"ACT: cannot read {a!r} (G-MOT-1: ACT <verb> [<verb> ...], lowercase words)")

@@ -1627,3 +1627,106 @@ def shuffle_voice(rows: List[dict], seed: int) -> Tuple[List[dict], Dict[str, st
         else:
             out.append(r)
     return out, perm
+# ============================================================================ A4L-EXPLORE (docs/A4-LADDER-PREREG.md §2.5)
+# edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:59 +0400 — the rung's two marks, test-first
+# (tests/creature/test_a4l_explore_marks.py) against the landed shapes: the game eye rows (creature/senses/game.py), the
+# journal `act` rows (creature/mind.py:_maybe_choose_act), the game `outcome` rows (terminated / truncated / got).
+def _at_s(at: str) -> float:
+    import datetime as _dt
+    return _dt.datetime.fromisoformat(str(at).replace("Z", "+00:00")).timestamp()
+
+
+def _first_at_s(tape: List[dict]) -> Optional[float]:
+    ats = [_at_s(r["at"]) for r in tape if r.get("at")]
+    return min(ats) if ats else None
+
+
+def explore_lock_mark(tape: Iterable[dict], journal: Iterable[dict], value_declared: bool, after_s: float = 3600.0,
+                      window: int = 100, bar: float = 0.5) -> Dict[str, object]:
+    """X1 THE LOCK ABSENT (§2.5): over the MIND's game choices (journal `act` rows — never STATUS `acts_chosen`, which
+    counts the mouth's `say` beside the seven game acts, the review's finding 3) made on eye rows at or after `after_s`
+    of the tape's first row, no act holds ≥ `bar` of any sliding window of `window` consecutive choices. Control:
+    alpha4-1's 0–8 h record (`left` 96 of 100 at hour 5) must FAIL; the toy's 50 fresh 8 h lives read the old chooser
+    0 / 50 and the candidate 50 / 50. A LOCK detector, not a learning detector: the state-blind ceiling itself
+    (forward 0.5) holds 0.54–0.66 of a window. Not gradable where the ACT value line is undeclared (L-1) or fewer than
+    `window` choices fall after hour 1."""
+    tape = list(tape)
+    t0 = _first_at_s(tape)
+    at_of = {int(r["seq"]): _at_s(r["at"]) for r in tape if r.get("sense") == "eye" and _meta(r).get("source") == "game" and r.get("at")}
+    choices = sorted(((int(j["seq"]), j["act"]) for j in journal if isinstance(j.get("act"), dict) and j["act"].get("game")),
+                     key=lambda x: x[0])
+    after = [(s, a) for s, a in choices if t0 is not None and s in at_of and at_of[s] >= t0 + after_s]
+    names = [a.get("act") for _s, a in after]
+    policies = dict(collections.Counter(a.get("policy") for _s, a in choices))
+    out: Dict[str, object] = {"choices": len(choices), "choices_after": len(names), "policies": policies,
+                              "census_after": dict(collections.Counter(names).most_common()),
+                              "bar": f"no act ≥ {bar:.0%} of any {window}-choice window after hour {after_s / 3600:g} (the mind's journal act rows)"}
+    mx, mx_act, mx_seq = None, None, None
+    if len(names) >= window:
+        cnt = collections.Counter(names[:window])
+        a0, c0 = cnt.most_common(1)[0]
+        mx, mx_act, mx_seq = c0 / window, a0, after[0][0]
+        for i in range(window, len(names)):
+            cnt[names[i]] += 1
+            cnt[names[i - window]] -= 1
+            a1, c1 = cnt.most_common(1)[0]
+            if c1 / window > mx:
+                mx, mx_act, mx_seq = c1 / window, a1, after[i - window + 1][0]
+    out.update(max_share=(round(mx, 4) if mx is not None else None), max_act=mx_act, max_window_first_seq=mx_seq)
+    if not value_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: the ACT value line is not declared on this life (L-1)")
+    elif len(names) < window:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {len(names)} game choices after hour 1 < {window}")
+    else:
+        out.update(graded=True, **{"pass": bool(mx < bar)}, reason="graded (A4L-EXPLORE X1)")
+    return out
+
+
+def _binom_bound_k(n: int, p0: float, alpha: float) -> int:
+    """The smallest k with P(X ≥ k | Binomial(n, p0)) ≤ alpha — the one-sided (1 − alpha) upper bound of the null."""
+    from math import comb
+    tail = 0.0
+    for k in range(n, -1, -1):
+        tail += comb(n, k) * (p0 ** k) * ((1.0 - p0) ** (n - k))
+        if tail > alpha:
+            return k + 1
+    return 0
+
+
+def explore_success_mark(tape: Iterable[dict], value_declared: bool, from_s: float = 7200.0, to_s: float = 28800.0,
+                         p0: float = 0.29, alpha: float = 0.05, ceiling: float = 0.488,
+                         toy_candidate: Tuple[float, float] = (0.240, 0.106),
+                         age_matched: Optional[dict] = None) -> Dict[str, object]:
+    """X2 SUCCESS PER EPISODE (§2.5) over hours 2–8 — PRINTED, NO BAR (edit: Claude (Opus 5.5, A4 ladder builder EXPLORE),
+    2026-09-23 12:26 +0400, on the orchestrator's 12:2x +04 order; #228 (b)): the game episodes whose terminal outcome row (terminated or
+    truncated) falls in [t0 + from_s, t0 + to_s); successes = terminated with reward > 0. Printed beside them: the null's
+    one-sided 95 % bound at that N (p0 = L-8's 0.29, reproduced by the toy's (0a) on GoToLocal), the state-blind CEILING
+    the toy measured (forward 0.5: 0.488 ± 0.023, docs/briefs/A4L-EXPLORE-TOY.md §3), whether the bound sits above it
+    (at an 8 h life's N ≈ 13 it does: 8 / 13 = 0.615 — no state-blind chooser can clear it, so no bar is set), the
+    toy's candidate reading over 50 fresh 8 h lives (0.240 ± 0.106 — the prediction) and the age-matched control the
+    orchestrator passes (alpha4-1's own episodes over its hours 2–8). Never graded; «not gradable» where the ACT value
+    line is undeclared (L-1)."""
+    tape = list(tape)
+    t0 = _first_at_s(tape)
+    ends = [r for r in tape if r.get("sense") == "outcome" and _meta(r).get("source") == "game" and r.get("at")
+            and (_meta(r).get("terminated") or _meta(r).get("truncated"))]
+    win = [r for r in ends if t0 is not None and t0 + from_s <= _at_s(r["at"]) < t0 + to_s]
+    n = len(win)
+    k = sum(1 for r in win if _meta(r).get("terminated") and float(_meta(r).get("got") or 0.0) > 0)
+    kb = _binom_bound_k(n, p0, alpha) if n else None
+    out: Dict[str, object] = {
+        "episodes": n, "successes": k, "success_rate": (round(k / n, 4) if n else None), "p0": p0, "alpha": alpha,
+        "bound_k": kb, "bound_rate": (round(kb / n, 4) if n else None), "ceiling": ceiling,
+        "bound_above_ceiling": (bool(kb / n > ceiling) if n else None), "clears_bound": (bool(k >= kb) if n else None),
+        "toy_candidate_mean_sd": list(toy_candidate), "age_matched": age_matched,
+        "bar": "none — printed (#228 (b)): at an 8 h life's N the null's 95 % bound sits above the state-blind ceiling",
+    }
+    if not value_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: the ACT value line is not declared on this life (L-1)")
+    elif n == 0:
+        out.update(graded=False, **{"pass": None}, reason="printed, no bar: no game episode ended in hours 2–8")
+    else:
+        out.update(graded=False, **{"pass": None},
+                   reason=(f"printed, no bar (#228 (b)): {k} of {n} episodes; the null's 95 % bound {kb}/{n} = {kb / n:.3f}"
+                           f" {'above' if kb / n > ceiling else 'at or under'} the state-blind ceiling {ceiling}"))
+    return out
