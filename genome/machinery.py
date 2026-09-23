@@ -350,11 +350,22 @@ def parse_genome(text: str) -> Genome:
                 # refuses, matching CRASH/ASK's own strict-literal discipline); absent, this is byte-identical
                 # to the old parse (g["declared"]["SURPRISE"] == {"floor": f}, exactly as every genome that
                 # declares the OLD "SURPRISE floor <f>" line on disk still parses).
-                m = re.fullmatch(r"floor (" + _NUM + r")(?: predicted (mind-cell))?", a)
-                if not m: raise GenomeError(f"SURPRISE: cannot read {a!r} (row 1c: SURPRISE floor <f> [predicted mind-cell])")
+                # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+                # (docs/briefs/A4L-DROP.md task 1): a SECOND optional trailing clause, "; drop confirmed" — the
+                # ONLY accepted value, nested INSIDE the "predicted mind-cell" group so "floor <f>; drop confirmed"
+                # (no "predicted") refuses by regex, never silently resurrecting the bare form's OLD, different,
+                # never-built meaning that test_old_form_refuses_at_mind_start guards (creature/genes.py's
+                # unwired() only sees the top-level "SURPRISE" key, not this sub-clause, so the regex itself is
+                # the only gate). Absent (every genome on disk before this task, A4L-FLOOR.genome included):
+                # byte-identical to the "predicted mind-cell"-only parse — g["declared"]["SURPRISE"] gains no
+                # "drop" key at all.
+                m = re.fullmatch(r"floor (" + _NUM + r")(?: predicted (mind-cell)(?:; drop (confirmed))?)?", a)
+                if not m: raise GenomeError(f"SURPRISE: cannot read {a!r} (row 1c / A4-LADDER-PREREG §2.4: SURPRISE floor <f> [predicted mind-cell [; drop confirmed]])")
                 g["declared"]["SURPRISE"] = {"floor": float(m.group(1))}
                 if m.group(2) is not None:
                     g["declared"]["SURPRISE"]["predicted"] = m.group(2)
+                if m.group(3) is not None:
+                    g["declared"]["SURPRISE"]["drop"] = m.group(3)
             elif gene == "CYCLE":
                 # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:01 +0400 — ALPHA4-G.md task 4
                 # (docs/ALPHA4-PREREG.md §2/§3): a SECOND, distinct form -- "consolidate when redundant >
@@ -1177,6 +1188,24 @@ class Organism:
         docstring in __init__ for why that counter is a plain attribute and not a self.c key."""
         self._resonate(self.sight, x_s)
         self.moments_sight_only += 1
+        self.t += 1
+        if self.t % self.g.scale_every == 0:
+            self._scale()
+        self._maybe_regen_budget()
+
+    # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+    # (docs/briefs/A4L-DROP.md task 2): "SURPRISE ... ; drop confirmed"'s own cheap moment — a glance the
+    # eye already stamped CONFIRMED (residual under the declared floor against the mind's own expectation)
+    # is not passed to moment() AT ALL: no resonance (`_resonate` never runs — no cosine, no winners, no
+    # novelty-birth refusal to count), no HEBB, no DELTA. Only the CLOCK still ticks, so every moment-
+    # denominated cadence (SLEEP, SCALE, BUDGET's regeneration, a snapshot's own canvas cadence one layer
+    # up) keeps its wall-clock meaning (D3) — this method is moment_sight()'s tail, verbatim, with the
+    # `_resonate`/`moments_sight_only` line removed: `t += 1`, SCALE at its own multiples, the budget's
+    # regen check. Called ONLY from creature/mind.py:Mind._consume_eye's per-glance loop, ONLY when the
+    # genome declares "drop confirmed" AND this glance's own `confirmed_flags[i]` is True; every other
+    # call site is unaffected (this method has none before this task, and moment()/moment_sight() are
+    # untouched).
+    def tick(self) -> None:
         self.t += 1
         if self.t % self.g.scale_every == 0:
             self._scale()

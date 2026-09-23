@@ -369,6 +369,12 @@ class Body:
             "glances_confirmed": int(getattr(self.mind, "glances_confirmed", 0)),
             "glances_surprised": int(getattr(self.mind, "glances_surprised", 0)),
             "births_skipped_confirmed": int(getattr(org, "births_skipped_confirmed", 0)),
+            # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md
+            # §2.4 (docs/briefs/A4L-DROP.md task 5): "glances_dropped" on EVERY write (#164), 0 on a genome
+            # that never declares "; drop confirmed". Must equal glances_confirmed while the clause is
+            # declared (every confirmed glance IS a dropped one under this rung — the same set, by task 2's
+            # own construction); tools/lives/check.py's own print is the live read of that equality.
+            "glances_dropped": int(getattr(self.mind, "glances_dropped", 0)),
             # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
             # item 2 (G-MOT-1's census shape, never a total, #165): `runs_by_program` is a dict, one count
             # PER PROGRAM; `runs` is its sum, for a reader that wants the total without summing itself.

@@ -181,7 +181,12 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # `"residual"` back onto the journal row, and passes `confirm=` into `Organism.moment()` (genome/machinery.py)
         # for a glance whose residual is under the declared floor. Undeclared SURPRISE: predicted stays None, every
         # residual is None, confirm is never True — byte-identical to before this gene existed.
-        "SURPRISE": "creature/mind.py:Mind._consume_eye (Organism.expected_sight() + gaze.glances(predicted=) + Organism.moment(confirm=))",
+        # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+        # (docs/briefs/A4L-DROP.md): the "; drop confirmed" sub-clause's own real call site — a CONFIRMED
+        # glance (declared["SURPRISE"]["drop"] == "confirmed") is routed to Organism.tick() instead of
+        # Organism.moment(confirm=); undeclared "drop": every confirmed glance still reaches
+        # Organism.moment(confirm=True) exactly as before this task.
+        "SURPRISE": "creature/mind.py:Mind._consume_eye (Organism.expected_sight() + gaze.glances(predicted=) + Organism.moment(confirm=) | Organism.tick() when declared['SURPRISE']['drop'] == 'confirmed')",
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #3): SELF's real call sites -- _consume_body records the (reading, seq) pair a "self" pool item
         # compares; _think_pool appends the "self" kind item (kind-fair with word/sight/due/rule/outcome);

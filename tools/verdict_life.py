@@ -636,6 +636,168 @@ def web_mark(tape: Iterable[dict], journal: Iterable[dict], door_web_declared: b
     return out
 
 
+# edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+# (docs/briefs/A4L-DROP.md task 5): D1's mark. drop_mark's own 5-parameter signature is the brief's own
+# words and stays TAPE-FREE (pure); window membership — needed for D1's "retention pair across window 2"
+# clause — is resolved SEPARATELY by annotate_windows(exams, tape) (the caller's own job, mirroring
+# tools/verdict_g4.py's window_of()/§15 pairing exactly, tape and all) and handed in as an OPTIONAL
+# "window" key already sitting on each exam dict; drop_mark only ever READS that key, never derives it.
+def annotate_windows(exams: Iterable[dict], tape: Iterable[dict]) -> List[dict]:
+    """Each exam dict gets a "window" key (int, or None when unresolvable) — mirrors tools/verdict_g4.py's
+    own window_of() (§15's retention pairing) to the letter: walk BACK from the exam's own
+    `snapshot_last_seq` to the nearest MAKER row (a moment id shaped "w<NNNN>i...") and read its window
+    number from the id itself. Never mutates an input dict (returns fresh copies, `exams`' own tape-free
+    contract preserved for the caller) — a pure function over already-loaded rows, no I/O of its own."""
+    seq_at: Dict[object, dict] = {r["seq"]: r for r in tape}
+    out: List[dict] = []
+    for ex in exams:
+        s = ex.get("snapshot_last_seq") or 0
+        while s > 0 and (s not in seq_at or not str((seq_at[s].get("meta") or {}).get("moment", "")).startswith("w")):
+            s -= 1
+        window = int(seq_at[s]["meta"]["moment"][1:5]) if s in seq_at else None
+        out.append({**ex, "window": window})
+    return out
+
+
+def drop_mark(twin_floor_exams: List[dict], twin_drop_exams: List[dict], timings_floor: List[dict],
+              timings_drop: List[dict], declared: Optional[dict]) -> Dict[str, object]:
+    """A4-LADDER-PREREG.md §2.4, D1 WHAT THE EXAM LOSES (the tape twin, exact): alpha4-1's 0-8 h cut
+    replayed under DROP and under the FLOOR, the self-exam sat every 500 canvases at the SAME rows —
+    `twin_floor_exams`/`twin_drop_exams` are the two ordered exam-JSON lists (tools/self_exam.py's own
+    shape, `ask_seen_words.Q1..Q4.acc`, `.Q1.hedge_rate`, `.Q5`), matched by POSITION: both twins replay
+    the identical tape at the identical --exam-every N cadence, so exam i lands at the same eye-row
+    boundary in both (DROP never skips or adds a tape row, only within-canvas LEARNING) — a
+    `snapshot_last_seq` mismatch at the same index is therefore itself a defect, not a reading, and fails
+    the mark (`mismatched_snapshot_rows`). `declared` is the DROP genome's own `genome.declared["SURPRISE"]`
+    sub-dict. The pre-registered CLAIM ("the drop costs nothing"): |ΔQ1| <= 0.01 AT EVERY EXAM AND
+    Δretention >= -1 pp across window 2 — retention read from a PRE-ANNOTATED "window" key
+    (annotate_windows(), above); when no window-2 pair exists on this cut (the hour-1 fixture: only
+    window 0, arrivals are hours apart) retention reads NOT READABLE and the claim is judged on Q1 alone
+    (A2's own "graded only where its ceiling holds" precedent, sizing_mark/hands_mark's own printed-not-
+    gated fields) — never silently assumed to pass. D4 (ms saved on the same rows) is printed, no bar.
+    «not gradable» when the clause is undeclared or fewer than 2 exams exist on EITHER twin's cut."""
+    bar = ("|ΔQ1| ≤ 0.01 at every exam AND Δretention ≥ −1 pp across window 2 (the pre-registered claim, "
+           "'the drop costs nothing'); retention graded only where a window-2 pair exists on this cut; "
+           "D4 (ms saved) printed, no bar")
+    out: Dict[str, object] = {"bar": bar}
+    if declared is None or declared.get("drop") != "confirmed":
+        out.update(graded=False, **{"pass": None}, reason="not gradable: SURPRISE 'drop confirmed' undeclared")
+        return out
+    n = min(len(twin_floor_exams), len(twin_drop_exams))
+    if n < 2:
+        out.update(graded=False, **{"pass": None},
+                   reason=f"not gradable: {len(twin_floor_exams)} floor / {len(twin_drop_exams)} drop exams on the cut (need >= 2 each)")
+        return out
+
+    def q(ex: dict, key: str) -> Optional[float]:
+        return ((ex.get("ask_seen_words") or {}).get(key) or {}).get("acc")
+
+    def hedge(ex: dict) -> Optional[float]:
+        return ((ex.get("ask_seen_words") or {}).get("Q1") or {}).get("hedge_rate")
+
+    def q5(ex: dict) -> Dict[str, object]:
+        d = (ex.get("ask_seen_words") or {}).get("Q5") or {}
+        return {name: v.get("abstain_rate") for name, v in d.items()}
+
+    table: List[Dict[str, object]] = []
+    max_abs_dq1 = 0.0
+    mismatched_rows: List[Tuple[int, object, object]] = []
+    for i in range(n):
+        ef, ed = twin_floor_exams[i], twin_drop_exams[i]
+        if ef.get("snapshot_last_seq") != ed.get("snapshot_last_seq"):
+            mismatched_rows.append((i, ef.get("snapshot_last_seq"), ed.get("snapshot_last_seq")))
+        row: Dict[str, object] = {"i": i, "snapshot_last_seq_floor": ef.get("snapshot_last_seq"), "snapshot_last_seq_drop": ed.get("snapshot_last_seq")}
+        for key in ("Q1", "Q2", "Q3", "Q4"):
+            fv, dv = q(ef, key), q(ed, key)
+            row[key] = {"floor": fv, "drop": dv, "delta": (round(dv - fv, 6) if (fv is not None and dv is not None) else None)}
+        fh, dh = hedge(ef), hedge(ed)
+        row["hedge"] = {"floor": fh, "drop": dh, "delta": (round(dh - fh, 6) if (fh is not None and dh is not None) else None)}
+        row["Q5"] = {"floor": q5(ef), "drop": q5(ed)}
+        dq1 = row["Q1"]["delta"]
+        if dq1 is not None:
+            max_abs_dq1 = max(max_abs_dq1, abs(dq1))
+        table.append(row)
+
+    def retention_change_pp(exams: List[dict]) -> Optional[float]:
+        # §15's own pair: the LAST exam of window 1 (before arrival 2) vs the LAST exam of window 2, read
+        # as a CHANGE (last - before) — negative = accuracy fell (retention lost), positive = it rose.
+        by_w: Dict[int, List[dict]] = {}
+        for ex in exams:
+            w = ex.get("window")
+            if w is not None:
+                by_w.setdefault(int(w), []).append(ex)
+        if 1 not in by_w or 2 not in by_w or not by_w[1] or not by_w[2]:
+            return None
+        b, l = q(by_w[1][-1], "Q1"), q(by_w[2][-1], "Q1")
+        return None if (b is None or l is None) else round(100.0 * (l - b), 4)
+
+    floor_retention_change_pp = retention_change_pp(twin_floor_exams)
+    drop_retention_change_pp = retention_change_pp(twin_drop_exams)
+    retention_readable = floor_retention_change_pp is not None and drop_retention_change_pp is not None
+    # Δretention = DROP's own change minus FLOOR's own change — negative means DROP retained WORSE than
+    # FLOOR did over the same window (the quantity A4-LADDER-PREREG §2.4's bar reads: "Δretention >= -1 pp").
+    delta_retention_pp = round(drop_retention_change_pp - floor_retention_change_pp, 4) if retention_readable else None
+    retention_claim = (delta_retention_pp is not None and delta_retention_pp >= -1.0) if retention_readable else None
+
+    def mean_ms_per_canvas(timings: Iterable[dict]) -> Optional[float]:
+        # "per-canvas" == per EYE row (a canvas). timings.jsonl (creature/replay.py --timings) carries
+        # EVERY tape row's own consume time -- ear/outcome/smell/body/touch/sit rows mixed in beside the
+        # eye ones -- so a plain mean over every row silently dilutes the canvas cost by however many
+        # cheap non-eye rows the tape also carries (measured on the hour-1 fixture: 23.1 ms mixed vs
+        # 58.2 ms eye-only -- a 2.5x understatement, #213's class: the wrong denominator still looks like
+        # a real number).
+        vals = [float(r["ms"]) for r in timings if isinstance(r, dict) and r.get("sense") == "eye" and "ms" in r]
+        return (sum(vals) / len(vals)) if vals else None
+
+    floor_ms, drop_ms = mean_ms_per_canvas(timings_floor), mean_ms_per_canvas(timings_drop)
+    ms_saved_pct = (round(100.0 * (floor_ms - drop_ms) / floor_ms, 2) if (floor_ms and drop_ms is not None and floor_ms > 0) else None)
+
+    # the per-exam WINDOWED reading (task 4's own words: "at every exam row print ... the per-canvas ms
+    # of both") -- the canvases strictly between the PREVIOUS exam's own snapshot_last_seq and this
+    # one's, the SAME seq range on both twins by construction. Far less confounded than the one
+    # whole-tape mean above: per-canvas cost is DOMINATED by the organism's own size (state_hash is
+    # quadratic in cells x words, M1), which grows across the tape, so an aggregate mean conflates "the
+    # drop's own per-glance saving" with "which segment of the growth curve the mean happened to average
+    # over" -- measured on the hour-1 fixture, the LAST window (near-identical final cell counts, 1334 vs
+    # 1351 sight cells) read floor and drop at the identical 93.67 ms/canvas; the whole-tape means read
+    # -5.5% (DROP slower) purely from the growth-curve shape, not from either road's own per-glance cost.
+    def eye_rows_sorted(timings: Iterable[dict]) -> List[dict]:
+        return sorted((r for r in timings if isinstance(r, dict) and r.get("sense") == "eye" and "ms" in r and "seq" in r),
+                       key=lambda r: r["seq"])
+
+    def window_mean(rows: List[dict], lo_excl: object, hi_incl: object) -> Optional[float]:
+        if hi_incl is None:
+            return None
+        vals = [r["ms"] for r in rows if (lo_excl is None or r["seq"] > lo_excl) and r["seq"] <= hi_incl]
+        return (sum(vals) / len(vals)) if vals else None
+
+    floor_eye, drop_eye = eye_rows_sorted(timings_floor), eye_rows_sorted(timings_drop)
+    prev_seq: Optional[object] = None
+    for row in table:
+        hi = row.get("snapshot_last_seq_floor")   # == snapshot_last_seq_drop when not mismatched (checked above)
+        row["ms_window"] = {"floor": window_mean(floor_eye, prev_seq, hi), "drop": window_mean(drop_eye, prev_seq, hi)}
+        if hi is not None:
+            prev_seq = hi
+
+    q1_claim = max_abs_dq1 <= 0.01
+    # the claim is judged on what IS readable: retention only counts against the verdict once it HAS a
+    # window-2 pair to read (never silently assumed true OR false while unreadable — A2's own law).
+    overall_pass = bool(q1_claim and (retention_claim if retention_readable else True) and not mismatched_rows)
+    out.update(
+        table=table, n_exams=n, max_abs_delta_q1=round(max_abs_dq1, 4), claim_q1=q1_claim,
+        retention={"readable": retention_readable, "floor_change_pp": floor_retention_change_pp, "drop_change_pp": drop_retention_change_pp,
+                   "delta_pp": delta_retention_pp, "pass": retention_claim,
+                   "reason": "graded" if retention_readable else "not readable: no window-1-then-window-2 pair on this cut"},
+        mismatched_snapshot_rows=mismatched_rows,
+        d4_ms_saved_pct=ms_saved_pct, floor_ms_per_canvas=(round(floor_ms, 3) if floor_ms is not None else None),
+        drop_ms_per_canvas=(round(drop_ms, 3) if drop_ms is not None else None),
+        graded=True, **{"pass": overall_pass},
+        reason=("graded (§2.4 D1): the claim holds" if overall_pass else "graded (§2.4 D1): the claim FAILS")
+              + ("" if not mismatched_rows else f"; {len(mismatched_rows)} exam(s) landed at different rows between twins — a defect, not a reading"),
+    )
+    return out
+
+
 def stage_mark(journal: Iterable[dict], stage_ready_declared: bool) -> Dict[str, object]:
     """§5 STAGE: the stage series by moment, each with the READINESS judge's own readings (a..e) at the
     moment it fired; exactly one stage-4 event or none — never more (the mind's own "never undone" law,
