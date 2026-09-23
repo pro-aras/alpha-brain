@@ -1,0 +1,213 @@
+RED run 2026-09-23 17:10:41 +0400 commit bd68b83 load 8.23 7.63 6.32
+EE.EE..F.EFFFFEFF...FF.E/data/dev/genome-wt-b1/tools/lives/check.py:99: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-b1/scratch/tmp/tmpk02ay509/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+F/data/dev/genome-wt-b1/tools/lives/check.py:99: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-b1/scratch/tmp/tmpjit8w4nd/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+FE.
+======================================================================
+ERROR: test_a_base_x_key_resolves_only_through_its_own_runs_row (tests.creature.test_a42_b1.InventoryResolvesAKeyThroughItsOwnRow.test_a_base_x_key_resolves_only_through_its_own_runs_row)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 312, in test_a_base_x_key_resolves_only_through_its_own_runs_row
+    self.assertEqual(inventory.site_of("ACT", {"ACT"}), "genes.RUNS")
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: module 'inventory_tool' has no attribute 'site_of'
+
+======================================================================
+ERROR: test_agrees_with_the_refusal_law_on_the_real_registry (tests.creature.test_a42_b1.InventoryResolvesAKeyThroughItsOwnRow.test_agrees_with_the_refusal_law_on_the_real_registry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 325, in test_agrees_with_the_refusal_law_on_the_real_registry
+    self.assertEqual(inventory.site_of(k, wired()).startswith("NO"), k in genes.unwired(g.declared), k)
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: module 'inventory_tool' has no attribute 'site_of'
+
+======================================================================
+ERROR: test_a_planted_moment_between_the_two_rows_refuses_the_reuse (tests.creature.test_a42_b1.M3OneHashPerCanvas.test_a_planted_moment_between_the_two_rows_refuses_the_reuse) (plant=False)
+PREREG §2.5 M3: 'a planted write between the two rows (a test-only moment) makes the reuse REFUSE (the digest
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 185, in test_a_planted_moment_between_the_two_rows_refuses_the_reuse
+    self.assertEqual(mind.hash_reuse_refused, 0)
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Mind' object has no attribute 'hash_reuse_refused'
+
+======================================================================
+ERROR: test_a_planted_moment_between_the_two_rows_refuses_the_reuse (tests.creature.test_a42_b1.M3OneHashPerCanvas.test_a_planted_moment_between_the_two_rows_refuses_the_reuse) (plant=True)
+PREREG §2.5 M3: 'a planted write between the two rows (a test-only moment) makes the reuse REFUSE (the digest
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 182, in test_a_planted_moment_between_the_two_rows_refuses_the_reuse
+    self.assertEqual(mind.hash_reuse_refused, 1)
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Mind' object has no attribute 'hash_reuse_refused'
+
+======================================================================
+ERROR: test_canvas_count_of_prefers_the_minds_own_count_and_falls_back (tests.creature.test_a42_b1.M4TheSittersCanvasUnit.test_canvas_count_of_prefers_the_minds_own_count_and_falls_back)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 204, in test_canvas_count_of_prefers_the_minds_own_count_and_falls_back
+    from creature.exam import canvas_count_of
+ImportError: cannot import name 'canvas_count_of' from 'creature.exam' (/data/dev/genome-wt-b1/creature/exam.py)
+
+======================================================================
+ERROR: test_a_threaded_run_records_freeze_and_apply_ms_as_floats (tests.creature.test_a42_b1.M5ThinkTiming.test_a_threaded_run_records_freeze_and_apply_ms_as_floats)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 291, in test_a_threaded_run_records_freeze_and_apply_ms_as_floats
+    self.assertGreater(mind.thinks, 0, "premise: a threaded think ran on this tape")
+                       ^^^^^^^^^^^
+AttributeError: 'Mind' object has no attribute 'thinks'
+
+======================================================================
+ERROR: test_genome_declares_grow_reads_the_roots_genome_file (tests.creature.test_lives_check.SizingUnderGrow.test_genome_declares_grow_reads_the_roots_genome_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_lives_check.py", line 114, in test_genome_declares_grow_reads_the_roots_genome_file
+    self.assertIsNone(check.genome_declares_grow(root), "no GENOME.genome at the root (an older run): unknown, never a guess")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'lives_check' has no attribute 'genome_declares_grow'
+
+======================================================================
+ERROR: test_sizing_wording_says_capacity_doubles_under_grow_and_crosses_nmax_without_it (tests.creature.test_lives_check.SizingUnderGrow.test_sizing_wording_says_capacity_doubles_under_grow_and_crosses_nmax_without_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_lives_check.py", line 123, in test_sizing_wording_says_capacity_doubles_under_grow_and_crosses_nmax_without_it
+    kind, crosses = check.sizing_wording(2100.0, 2000, True)
+                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'lives_check' has no attribute 'sizing_wording'
+
+======================================================================
+FAIL: test_row_hash_is_called_once_per_worded_canvas (tests.creature.test_a42_b1.M3OneHashPerCanvas.test_row_hash_is_called_once_per_worded_canvas)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 140, in test_row_hash_is_called_once_per_worded_canvas
+    self.assertEqual(len(calls), 1, f"row_hash calls on one worded canvas: {len(calls)} — the coarse row must carry the canvas row's digest (M3)")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 1 : row_hash calls on one worded canvas: 2 — the coarse row must carry the canvas row's digest (M3)
+
+======================================================================
+FAIL: test_sit_sense_reads_the_same_canvas_unit (tests.creature.test_a42_b1.M4TheSittersCanvasUnit.test_sit_sense_reads_the_same_canvas_unit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 263, in test_sit_sense_reads_the_same_canvas_unit
+    self.assertEqual(published, [], "3 real canvases < every 5: no sitting row (the old arithmetic read 40 // 4 = 10 and published)")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'moment': 'sit2026-09-23T000001Z', 'sour[98 chars]0.7}] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+{'moment': 'sit2026-09-23T000001Z', 'source': 'sit', 'exam_file': '2026-09-23T000001Z.json', 'score': 0.8, 'composite': 0.9, 'read_share': 0.7}
+
++ []
+- [{'composite': 0.9,
+-   'exam_file': '2026-09-23T000001Z.json',
+-   'moment': 'sit2026-09-23T000001Z',
+-   'read_share': 0.7,
+-   'score': 0.8,
+-   'source': 'sit'}] : 3 real canvases < every 5: no sitting row (the old arithmetic read 40 // 4 = 10 and published)
+
+======================================================================
+FAIL: test_snapshot_writes_canvas_index_and_resume_restores_it (tests.creature.test_a42_b1.M4TheSittersCanvasUnit.test_snapshot_writes_canvas_index_and_resume_restores_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 218, in test_snapshot_writes_canvas_index_and_resume_restores_it
+    self.assertEqual(ledger.get("canvas_index"), 3)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 3
+
+======================================================================
+FAIL: test_voice_loop_fires_at_the_minds_canvas_count_not_the_moment_arithmetic (tests.creature.test_a42_b1.M4TheSittersCanvasUnit.test_voice_loop_fires_at_the_minds_canvas_count_not_the_moment_arithmetic) (ledger={'moments': 2200, 'canvas_index': 400})
+PREREG §2.5 M4: on a toy ledger with 5 moments a canvas + 200 per sleep (400 canvases = 2,200 moments), the exam fired
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 249, in test_voice_loop_fires_at_the_minds_canvas_count_not_the_moment_arithmetic
+    self.assertEqual(bool(seen), fires)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: True != False
+
+======================================================================
+FAIL: test_voice_loop_fires_at_the_minds_canvas_count_not_the_moment_arithmetic (tests.creature.test_a42_b1.M4TheSittersCanvasUnit.test_voice_loop_fires_at_the_minds_canvas_count_not_the_moment_arithmetic) (ledger={'moments': 2600, 'canvas_index': 500})
+PREREG §2.5 M4: on a toy ledger with 5 moments a canvas + 200 per sleep (400 canvases = 2,200 moments), the exam fired
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 251, in test_voice_loop_fires_at_the_minds_canvas_count_not_the_moment_arithmetic
+    self.assertEqual(json.loads((root / "exam" / "LAST.json").read_text())["last_canvas"], 550 if "canvas_index" not in ledger else 500)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 650 != 500
+
+======================================================================
+FAIL: test_status_carries_think_freeze_and_apply_ms_on_every_write (tests.creature.test_a42_b1.M5ThinkTiming.test_status_carries_think_freeze_and_apply_ms_on_every_write)
+#164's law, as tests/creature/test_life_e_think_thread.py pins think_ms: on STATUS from the first write, None on an
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 284, in test_status_carries_think_freeze_and_apply_ms_on_every_write
+    self.assertIn(k, st); self.assertIsNone(st[k])
+    ~~~~~~~~~~~~~^^^^^^^
+AssertionError: 'think_freeze_ms' not found in {'heartbeat_at': '2026-09-23T13:10:46.950Z', 'started_at': '2026-09-23T13:10:46.694Z', 'moments': 80, 'tape_rows': 40, 'journal_rows': 22, 'births': 20, 'edges_born': 0, 'edges_pruned': 0, 'arrivals': 5, 'budget_left': 390, 'births_refused_budget': 0, 'sight_born': 15, 'words_born': 5, 'sight_nmax': 2000, 'words_nmax': 2000, 'sight_capacity': 2000, 'words_capacity': 2000, 'budget_regenerated': 0, 'births_refused_nmax': 0, 'births_refused_frozen': 0, 'births_refused_redundant': 0, 'births_refused_caps': 0, 'cells': 20, 'sight_only_skipped': 0, 'sense_restarts': 0, 'snapshots': 0, 'last_seq': 40, 'mind_ms_median_1min': None, 'mind_ms_per_canvas_1min': None, 'mind_backlog_rows': 0, 'hash_form': 'dense', 'hash_ms_last': 0.467, 'rss_mb': 215.71, 'crash': None, 'thinks': 2, 'parked': 0, 'beliefs': 0, 'revisits': 0, 'extensions': 0, 'clashes': 0, 'predictions_filed': 0, 'predictions_scored': 0, 'think_skipped_for_backlog': 0, 'questions_written': 0, 'questions_answered': 0, 'frames_filed': 0, 'frames_scored': 0, 'frames_true': 0, 'said': 0, 'heard_yes': 0, 'heard_no': 0, 'episodes': 20, 'sleeps': 0, 'outcome_episodes': 0, 'acts_chosen': {}, 'act_mismatches': 0, 'sound_events': 0, 'sound_born': 0, 'sound_cells': 0, 'sound_births_refused': 0, 'voice_rows': 0, 'voice_bound': 0, 'glances_confirmed': 0, 'glances_surprised': 0, 'births_skipped_confirmed': 0, 'glances_dropped': 0, 'runs_by_program': {}, 'runs': 0, 'hands_no_road': 0, 'touch_events': 0, 'smell_events': 0, 'think_waits': 0, 'think_wait_ms': 0.0, 'think_ms_last': None, 'think_ms_median': None, 'evolve_epoch': 0, 'evolve_proposals_seen': 0, 'stage': 1, 'web_fetches': 0, 'web_refused_rate': 0, 'web_hold': False, 'web_refused_hold': 0, 'chats': 0, 'chat_answered': 0, 'chat_abstained': 0, 'chat_refused_form': 0, 'chat_refused_content': 0, 'chat_words_mean': None, 'chat_longest': 0, 'chat_graded': 0, 'chat_graded_right': 0, 'chat_graded_novel': 0}
+
+======================================================================
+FAIL: test_the_clock_stays_in_think_thread (tests.creature.test_a42_b1.M5ThinkTiming.test_the_clock_stays_in_think_thread)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_a42_b1.py", line 303, in test_the_clock_stays_in_think_thread
+    self.assertTrue(callable(getattr(think_thread, "freeze_inputs_timed", None)))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_coarse_rows_confirmed_flag_lands_in_its_canvas_hour (tests.creature.test_lives_check.CoarseRowHour.test_the_coarse_rows_confirmed_flag_lands_in_its_canvas_hour)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_lives_check.py", line 97, in test_the_coarse_rows_confirmed_flag_lands_in_its_canvas_hour
+    self.assertNotIn("", share, "a coarse row must never bucket under the empty hour")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '' unexpectedly found in {'2026-09-23T08': 0.0, '': 0.5, '2026-09-23T09': 0.25} : a coarse row must never bucket under the empty hour
+
+======================================================================
+FAIL: test_the_hours_list_carries_no_empty_hour (tests.creature.test_lives_check.CoarseRowHour.test_the_hours_list_carries_no_empty_hour)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_lives_check.py", line 103, in test_the_hours_list_carries_no_empty_hour
+    self.assertEqual(hours, ["2026-09-23T08", "2026-09-23T09"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['2026-09-23T08', '', '2026-09-23T09'] != ['2026-09-23T08', '2026-09-23T09']
+
+First differing element 1:
+''
+'2026-09-23T09'
+
+First list contains 1 additional elements.
+First extra element 2:
+'2026-09-23T09'
+
+- ['2026-09-23T08', '', '2026-09-23T09']
+?                   ----
+
++ ['2026-09-23T08', '2026-09-23T09']
+
+======================================================================
+FAIL: test_main_reads_the_genome_never_sight_capacity (tests.creature.test_lives_check.SizingUnderGrow.test_main_reads_the_genome_never_sight_capacity) (genome='G0b.genome')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_lives_check.py", line 143, in test_main_reads_the_genome_never_sight_capacity
+    self.assertIn(expect, lines[0]); self.assertNotIn(absent, lines[0])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 'CROSSES NMAX' not found in '[check] SIZING: born 2100 of 2000 capacity (GROW: no cap); rate (last 3 full h) 0/h; projection at 24 h ≈ 2100 → grows past the current capacity (GROW re-allocates: not a refusal) (the plant needs room at hour ≈ 21: 2100)'
+
+======================================================================
+FAIL: test_main_reads_the_genome_never_sight_capacity (tests.creature.test_lives_check.SizingUnderGrow.test_main_reads_the_genome_never_sight_capacity) (genome='ALPHA4.genome')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-b1/tests/creature/test_lives_check.py", line 143, in test_main_reads_the_genome_never_sight_capacity
+    self.assertIn(expect, lines[0]); self.assertNotIn(absent, lines[0])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 'capacity doubles' not found in '[check] SIZING: born 2100 of 2000 capacity (GROW: no cap); rate (last 3 full h) 0/h; projection at 24 h ≈ 2100 → grows past the current capacity (GROW re-allocates: not a refusal) (the plant needs room at hour ≈ 21: 2100)'
+
+----------------------------------------------------------------------
+Ran 25 tests in 5.116s
+
+FAILED (failures=11, errors=8)
+exit 1

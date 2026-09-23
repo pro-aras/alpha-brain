@@ -1,0 +1,5 @@
+[replay_diff] ref-floor-d5f1a6c: 4322 mind rows · after+FLOOR: 4322 mind rows · compared 4322
+[replay_diff] rows differing ONLY in ignored fields ['']: 0 · rows with a non-ignored diff: 4
+[replay_diff] first non-ignored diff (seq, field, ref-floor-d5f1a6c, after+FLOOR): (1029, 'readiness', "{'a': False, 'b': False, 'c': False, 'd': False, 'e': True, 'b_read_proxy': None}", "{'a': {'window': 20, 'n': 0, 'successes': 0, 'bound': 11, 'null': 0.29, 'ok': False, 'block_index': ")
+[replay_diff] keys present on one side only: []
+[replay_diff] IDENTICAL except ['']: False
