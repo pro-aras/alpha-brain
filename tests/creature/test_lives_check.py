@@ -66,3 +66,78 @@ class BirthsByHour(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:1x +0400 — ALPHA4-2-PREREG.md §2.6's two check.py fixes, RED first:
+# (1) the coarse row (creature/mind.py:_coarse_row) writes no `when` — A4L-DROP-REPORT task 3: every coarse row's confirmed flag
+#     landed under the EMPTY hour (alpha4-1: the "" bucket read 0.0253 = 46 / 1818, exactly the coarse-glance count); its hour is its
+#     sibling canvas row's (they share the seq — SLEEP's own "second mind row" pattern); the fix is in check.py ONLY (mind.py's
+#     journal stays byte-identical: M3's regression is INCLUDING hash, and a new key on the coarse row is a format change);
+# (2) the SIZING line under GROW: `status.get("sight_capacity")` is written by EVERY modern body (creature/body.py, GROW or not), so
+#     the 07:38 patch's "else NMAX" branch was dead and «CROSSES NMAX» could never print on a capped genome — the signal is the run's
+#     own $ROOT/GENOME.genome (tools/lives/launch.sh copies it there), parsed, `"GROW" in declared`.
+import contextlib, io, json, tempfile
+
+TREE = Path(__file__).resolve().parents[2]
+
+
+class CoarseRowHour(unittest.TestCase):
+    ROWS = [
+        {"seq": 3, "moment": "w1", "when": "2026-09-23T08:00:01Z", "act": "glance", "glance": 0, "source": "maker", "word": "circle",
+         "births": [["sight", 1, "novelty"]], "confirmed": [False, False, False, False]},
+        # the landed coarse row, verbatim from ref-floor/journal.jsonl minus the digest: no `when`
+        {"seq": 3, "moment": "w1", "act": "coarse", "glance": 4, "fix": None, "windows": None, "hash": "334f", "residual": None, "confirmed": True},
+        {"seq": 9, "moment": "w2", "when": "2026-09-23T09:00:05Z", "act": "glance", "glance": 0, "source": "game", "births": [],
+         "confirmed": [True, False, False, False]},
+        {"seq": 9, "moment": "w2", "act": "coarse", "glance": 4, "fix": None, "windows": None, "hash": "5d", "residual": 0.01, "confirmed": False},
+    ]
+
+    def test_the_coarse_rows_confirmed_flag_lands_in_its_canvas_hour(self):
+        share = check.confirmed_share_by_hour(self.ROWS)
+        self.assertNotIn("", share, "a coarse row must never bucket under the empty hour")
+        self.assertAlmostEqual(share["2026-09-23T08"], 1 / 5, places=6, msg="4 located glances (0 confirmed) + the coarse glance (confirmed)")
+        self.assertAlmostEqual(share["2026-09-23T09"], 1 / 5, places=6)
+
+    def test_the_hours_list_carries_no_empty_hour(self):
+        hours, births, _ = check.births_by_hour(self.ROWS)
+        self.assertEqual(hours, ["2026-09-23T08", "2026-09-23T09"])
+        self.assertEqual([births[h] for h in hours], [1, 0])
+
+    def test_a_row_with_neither_when_nor_a_sibling_keeps_the_old_bucket(self):
+        lone = [{"seq": 77, "moment": "w9", "act": "coarse", "glance": 4, "fix": None, "windows": None, "hash": "0", "residual": None, "confirmed": True}]
+        self.assertEqual(list(check.confirmed_share_by_hour(lone)), [""], "nothing is invented for a row no canvas row can place")
+
+
+class SizingUnderGrow(unittest.TestCase):
+    def test_genome_declares_grow_reads_the_roots_genome_file(self):
+        root = Path(tempfile.mkdtemp())
+        self.assertIsNone(check.genome_declares_grow(root), "no GENOME.genome at the root (an older run): unknown, never a guess")
+        (root / "GENOME.genome").write_text((TREE / "genome" / "G0b.genome").read_text())
+        self.assertIs(check.genome_declares_grow(root), False)
+        (root / "GENOME.genome").write_text((TREE / "genome" / "ALPHA4.genome").read_text())
+        self.assertIs(check.genome_declares_grow(root), True)
+        (root / "GENOME.genome").write_text("not a genome\n")
+        self.assertIsNone(check.genome_declares_grow(root))
+
+    def test_sizing_wording_says_capacity_doubles_under_grow_and_crosses_nmax_without_it(self):
+        kind, crosses = check.sizing_wording(2100.0, 2000, True)
+        self.assertIn("capacity doubles", crosses); self.assertNotIn("CROSSES NMAX", crosses); self.assertIn("GROW", kind)
+        kind, crosses = check.sizing_wording(2100.0, 2000, False)
+        self.assertEqual(crosses, "CROSSES NMAX"); self.assertEqual(kind, "NMAX")
+        kind, crosses = check.sizing_wording(2100.0, 2000, None)
+        self.assertEqual(crosses, "CROSSES NMAX"); self.assertIn("unknown", kind)
+        self.assertTrue(check.sizing_wording(1500.0, 2000, True)[1].startswith("under"))
+        self.assertTrue(check.sizing_wording(1500.0, 2000, False)[1].startswith("under"))
+
+    def test_main_reads_the_genome_never_sight_capacity(self):
+        for genome_name, expect, absent in (("G0b.genome", "CROSSES NMAX", "capacity doubles"), ("ALPHA4.genome", "capacity doubles", "CROSSES NMAX")):
+            with self.subTest(genome=genome_name):
+                root = Path(tempfile.mkdtemp()); (root / "journal").mkdir(); (root / "tape").mkdir(); (root / "exam").mkdir()
+                (root / "STATUS.json").write_text(json.dumps({"moments": 10, "cells": [1, 1], "sight_born": 2100, "sight_nmax": 2000, "sight_capacity": 2000}))
+                (root / "GENOME.genome").write_text((TREE / "genome" / genome_name).read_text())
+                buf = io.StringIO()
+                with contextlib.redirect_stdout(buf):
+                    check.main(["--root", str(root)])
+                lines = [l for l in buf.getvalue().splitlines() if l.startswith("[check] SIZING")]
+                self.assertEqual(len(lines), 1, buf.getvalue()[-800:])
+                self.assertIn(expect, lines[0]); self.assertNotIn(absent, lines[0])

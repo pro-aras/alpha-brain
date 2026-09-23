@@ -63,6 +63,15 @@ def sense_names(genome_text: str):
                 yield parts[1]
 
 
+# edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2.6 (A4L-EXPLORE-REPORT §0 item 10 (a)): a declared key resolves through
+# its OWN RUNS row only. The old rule also accepted the key's BASE (`ACT_VALUE` through `ACT`'s row), so a key the Mind's refusal law
+# refuses (creature/genes.py:unwired — exact keys) read MADE here: the inventory's MADE proved less than it said. The two agree now by
+# construction (tests/creature/test_a42_b1.py: the real registry with WORLD_GAME's own row removed — WORLD's stays — must read NO SITE).
+def site_of(gene: str, wired) -> str:
+    """The RUNS site of one declared key, by its own row only — never its base's."""
+    return "genes.RUNS" if gene in wired else "NO SITE in genes.RUNS"
+
+
 def main(argv) -> int:
     ap = argparse.ArgumentParser(); ap.add_argument("genome"); ap.add_argument("--tree", default=str(Path(__file__).resolve().parent.parent))
     a = ap.parse_args(argv); tree = Path(a.tree); sys.path.insert(0, str(tree))
@@ -79,8 +88,8 @@ def main(argv) -> int:
     ctext = consume_text(tree)
     rows = []; bad = 0
     for gene in sorted(g.declared):
-        base = gene.split("_")[0]
-        site = "genes.RUNS" if (gene in wired or base in wired) else "NO SITE in genes.RUNS"
+        base = gene.split("_")[0]          # the parser's attrs are keyed by the base branch; the RUNS row is the key's own (site_of)
+        site = site_of(gene, wired)
         unread = [x for x in sorted(attrs.get(base, set())) if grep_reads(tree, x) == 0]
         status = "DECLARED-ONLY" if site.startswith("NO") else ("VALUE-UNREAD" if unread else "MADE")
         bad += status == "DECLARED-ONLY"

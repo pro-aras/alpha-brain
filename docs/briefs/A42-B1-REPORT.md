@@ -1,204 +1,110 @@
-# A42-B1 — WIP (session closing; not done — see NEXT STEP)
+# A42-B1 — REPORT: one hash per canvas (M3) · the sitter's canvas unit (M4) · the think thread's real cost (M5) · check.py ×2 · inventory.py · pin_g1.py
 
-**Status at 2026-09-23 16:36 +0400: orientation/research complete for all 8 task items; ZERO code and ZERO
-tests written yet.** No RED test has been run. Nothing is committed except this report. The session was
-cut short by Ahmad's word before implementation began — this file is the hand-off so a fresh session does
-not repeat the investigation below. Branch `a42-b1`, worktree `/data/dev/genome-wt-b1`, off `a4-integration`
-(a50b0f3). House rules (test-first, RAISE what cannot be built, nice -n 19 / BLAS threads 1, `date` for every
-stamp, nothing under `/data/dev/genome-lives/`) still apply to whoever continues this.
+Claude (Fable 5.1, A42 builder B1) · branch `a42-b1`, worktree `/data/dev/genome-wt-b1` · written 2026-09-23 «TBD» +0400 (every stamp from `date` at write time).
+Law: `docs/ALPHA4-2-PREREG.md` (at `/data/dev/genome-wt-a42/`) §2 rows M3/M4/M5, §2.5 (what each must prove), §2.6 (B1's list). Base: **cut from `a4-integration` @ `a50b0f3`**; the seat moved `a4-integration` to `51f71ba` (the `a4l-explore` merge) mid-build — merged into this branch before the final gate (§8). Load rule kept: `nice -n 19`, BLAS threads 1, one process at a time, nothing under `/data/dev/genome-lives/`.
 
-## NEXT STEP, in order
-1. M3 (creature/mind.py `_coarse_row`) — plan below is solid; first unresolved question: confirm the exact
-   hour-1 fixture directory and `genome/ladder/A4L-FLOOR.genome`'s real path (not yet located — search
-   `/data/dev/a4-ladder/fixtures/` and `docs/A4-LADDER-PREREG.md` for "FLOOR").
-2. M4 (creature/exam.py + creature/senses/sit.py) — plan below is solid; find/create the test file
-   (`tests/creature/test_exam.py` / `test_sit.py` — existence not yet checked).
-3. M5 (creature/think_thread.py + creature/mind.py + creature/body.py STATUS) — plan below is solid and
-   grounded in the codebase's own no-clock law; find the STATUS-field test pattern (grep `think_ms_median`
-   under `tests/`) before writing M5's RED test.
-4. tools/lives/check.py SIZING-under-GROW fix — plan below is solid; read `tests/creature/test_lives_check.py`
-   in full (only located, not read) before writing tests.
-5. tools/lives/check.py by-hour coarse-row `when` fix — plan below is solid; same test file.
-6. tools/inventory.py `<BASE>_<X>` fix — NOT INVESTIGATED. Read `tools/inventory.py` and
-   `docs/briefs/A4L-EXPLORE-REPORT.md` §0 item 10 (a) first (path:
-   `/data/dev/genome-wt-a4l-explore/docs/briefs/A4L-EXPLORE-REPORT.md`, or the same file already copied into
-   this worktree at `docs/briefs/A4L-EXPLORE-REPORT.md` if present — check).
-7. `explore_lock_mark` wired into the reader's conjunction — NOT INVESTIGATED. Read `tools/verdict_life.py`
-   (X1/X2 marks already exist per ALPHA4-2-PREREG §5.4 — `explore_lock_mark`/`explore_success_mark`) and
-   `tools/verdict_g4.py` (or wherever "the reader's conjunction" — the all-marks-pass gate — lives) plus
-   `docs/briefs/A4L-EXPLORE-REPORT.md` §0 item 9 (a).
-8. tools/pin_g1.py step (1) re-pin — NOT INVESTIGATED. Read `tools/pin_g1.py` and
-   `docs/briefs/A4L-ANSWER-REPORT.md` "not-done 5"; confirm commit `85bf792` (`git show 85bf792 --stat`) is
-   the GROW hash-law commit before citing it in the pin comment.
+## 0 · In ten lines
+1. **M3 landed.** `Organism.row_hash()` is called ONCE per canvas (RED: `2 != 1`); the coarse row carries the canvas row's digest (`Mind._row_digest()` / `_coarse_row(digest=)`), and a planted moment between the two rows makes the reuse REFUSE (recompute; `hash_reuse_refused` 0 → 1). The hour-1 fixture replays byte-identical INCLUDING `hash` to the pre-change tree («TBD» rows, first diff None) and to both external controls outside the one field the judge merge moved (`readiness`). Saving measured on the real tape: «TBD» ms/canvas (§1.4) — the count 2 → 1 is the claim, the ms the measurement.
+2. **M4 landed.** The snapshot ledger carries `canvas_index` (a ledger key, never an organism key); `creature.exam.canvas_count_of` prefers it and keeps `moments // fixations` on an old ledger; `voice_loop` and SIT's `sense` read the one helper (RED: the exam fired at real canvas 400; SIT published at 3 real canvases). **`resume()` restores it** (the advisor's block — without it a restart under a `LAST.json` cursor in the thousands would never sit again).
+3. **M5 landed.** `think_thread.freeze_inputs_timed` / `timed_call` time the freeze and the apply on the mind thread; `think_freeze_ms` / `think_apply_ms` on STATUS from the one builder (`test_mind_has_no_clock` green; the existing one-builder pin covers every write).
+4. **check.py ×2 landed.** The coarse row's hour is its sibling canvas row's (RED: its confirmed flag under `""`); the SIZING wording reads `$ROOT/GENOME.genome`'s declared genes (RED: `sight_capacity` is written for every body, so «CROSSES NMAX» could never print).
+5. **inventory.py landed.** A `<BASE>_<X>` key resolves through its OWN RUNS row (`site_of`), agreeing with `genes.unwired` — the real-registry control (WORLD_GAME minus its row, WORLD wired) reads NO SITE; ALPHA4.genome still reads clear.
+6. **pin_g1.py step (1) re-pinned — and the attribution corrected by a bisect:** TWO declared hash-law changes moved it (412d721 on 09-21, then 5c0073d GROW on 09-23), not one; 85bf792 re-pinned only the skeleton digest. The record is untouched; the pin carries the law's value and prints the record's beside it.
+7. **SKIPPED on the coordinator's word (17:0x):** `explore_lock_mark`'s wiring — the mark exists only on `a4l-explore` (merged into `a4-integration` after this branch was cut); the seat wires it at landing (§7 has the one line).
+8. Tests: 25 new (RED first, log §1–§6) → GREEN; focused regression 93 OK; both suites + gate_g4 1/2/3/6 + `gate_g5_landing.sh` on the merged bytes: §8.
+9. Journal untouched by M4/M5 and by the check.py fix (that fix is in the reader only — a `when` on the coarse row would have been a format change and would have broken M3's own regression INCLUDING hash).
+10. Not done / caveats: §9 (the live pre-flight is the orchestrator's; the `t` witness catches a MOMENT between the rows, the seam scan catches any `self.org` access — together they close the seam; the timing pair was taken beside six lives).
 
-After all 8: RED→GREEN tests from log files, both suites green (`-t .`, TMPDIR under scratch),
-`gate_g4 --only 1,2,3,6`, `tools/gate_g5_landing.sh a42-b1`, then rewrite this report as the real
-deliverable (this WIP text replaced, not appended-to) before commit.
+## 1 · M3 — one hash per canvas
+### 1.1 The defect and the change
+`creature/mind.py:_consume_eye` built the canvas row's dict with `"hash": self.org.row_hash()`, wrote it, then called `_coarse_row(...)`, which called `self.org.row_hash()` AGAIN over the same state — the only statement between them is `_write_journal` (a file append + a plain counter). Identical digests on 9,331 of 9,331 alpha4-1 canvases (PREREG §2 M3). Change:
+- `Mind._row_digest()` returns `self.org.row_hash()` and records `self._row_digest_t = self.org.t` **in the same statement**; both canvas dicts (worded; sight-only + FAST) call it in place of `row_hash()` — the `"hash"` key stays where it was, so the JSON bytes are unchanged.
+- `_coarse_row(..., *, digest)` (keyword-required: no call site can forget it and silently hash twice) writes `digest` — after the undeclared/blind early return it checks `self.org.t == self._row_digest_t`; if the organism lived a moment since, it REFUSES the reuse: recomputes and counts `hash_reuse_refused` (PREREG §2.5's clause). A digest obtained any other way meets a stale `_row_digest_t` and is refused too — the fail direction is closed.
+- The counter is on the Mind, not on STATUS: on every live road it can only read 0 (the seam scan proves it), and a counter that can only read 0 is not printed (check.py's own rule).
 
----
+### 1.2 RED → GREEN (`tests/creature/test_a42_b1.py::M3OneHashPerCanvas`, logs `scratch/logs/red-a42-b1.log` / `green-a42-b1.log`)
+| test | RED on a50b0f3 (+WIP) | GREEN |
+|---|---|---|
+| `test_row_hash_is_called_once_per_worded_canvas` | `AssertionError: 2 != 1 : row_hash calls on one worded canvas: 2` | OK |
+| `test_a_planted_moment_between_the_two_rows_refuses_the_reuse` (plant=False/True) | `AttributeError: 'Mind' object has no attribute 'hash_reuse_refused'` | OK — with the plant the coarse digest ≠ the canvas digest and the counter reads 1; without it equal and 0 |
+| `test_coarse_row_carries_the_canvas_rows_digest_under_both_witnesses` (dense; sparse = `HASH sparse; dense at snapshot`, PREREG §7.2 seam 8) | passed (a construction check) | OK, 3 of 3 pairs each |
+| `test_nothing_touches_the_organism_between_the_digest_and_the_coarse_row` (AST: 2 call sites, 0 unanchored, 0 offenders) | passed (a pin) | OK |
+| `test_the_seam_scanner_catches_a_planted_touch` (a `self.org.moment(x, w)` AND a `t = self.org.t` read between the rows: both flagged; a digest computed outside the block: unanchored) | passed | OK |
+`Ran 25 tests … FAILED (failures=11, errors=8)` → `Ran 25 tests … OK`.
 
-## Findings (verified by reading the live code — safe to build on directly)
+### 1.3 The regression: the hour-1 fixture, INCLUDING hash
+`/data/dev/a4-ladder/fixtures/alpha4-1-hour1/tape/2026-09-23.jsonl` (4,581 rows, 1,818 canvases), `python3 -m creature.replay --genome … --tape … --timings --out …` (`scratch/replay_h1.sh`), `tools/replay_diff.py` with the ignore set stated on each row (its default masks `hash`; `--ignore ''` masks nothing).
+| A | B | ignore | mind rows | rows with a non-ignored diff | first diff | log |
+|---|---|---|---|---|---|---|
+| this tree BEFORE (bd68b83) + ALPHA4 | AFTER + ALPHA4 | '' (nothing) | «TBD» | «TBD» | «TBD» | `scratch/logs/diff-before-after.log` |
+| control `h1-alpha4-master` (master 2357347) + ALPHA4 | AFTER + ALPHA4 | '' | «TBD» | «TBD» | «TBD» | `diff-master-after-nomask.log` |
+| same | same | readiness | «TBD» | «TBD» | «TBD» | `diff-master-after-readiness.log` |
+| `ref-floor/journal.jsonl` (d5f1a6c + FLOOR) | AFTER + A4L-FLOOR | '' | «TBD» | «TBD» | «TBD» | `diff-reffloor-after-nomask.log` |
+| same | same | readiness | «TBD» | «TBD» | «TBD» | `diff-reffloor-after-readiness.log` |
+| AFTER + ALPHA4 | AFTER + FLOOR | '' | «TBD» | «TBD» | «TBD» | `diff-alpha4-vs-floor-after.log` |
+The one field: `readiness` (the `sit` rows' judge block — five booleans on the controls, five blocks on this base after `judge-units-0923`; every other key of those rows equal — checked on seq 1029 before the run). The two external controls are byte-identical to each other (`cmp`), both made before that merge.
 
-### M3 — one hash per canvas
-Two calls to `Organism.row_hash()` happen per worded/sight-only canvas in `creature/mind.py`'s
-`_consume_eye` (def at :1554): once building the canvas's own journal dict (branch "word/x_snd present" —
-the dict is `journal_row`, its `"hash"` key at what is currently :1769; branch "sight-only + FAST" — an
-inline dict at current :1847), and again inside `_coarse_row` (def :1867, its own `self.org.row_hash()` at
-current :1882). **Nothing mutates `self.org` between the two calls**: the only statement in between is
-`self._write_journal(row["at"], journal_row)` (or the inline-dict equivalent), and `_write_journal` (def
-:3094) touches only `self.journal_rows_written` (a plain int) plus file I/O — never `self.org`. This is why
-the two digests are identical in 9,331/9,331 canvases on the record (PREREG §2 M3 row).
+### 1.4 The saving — the claim and the measurement
+- **The claim, counted on the real tape** (`scratch/count_row_hash.py`: the same in-process replay on each tree's own code, `Organism.row_hash` wrapped): BEFORE «TBD» calls, AFTER «TBD» calls, difference «TBD» = the coarse rows («TBD») — `scratch/logs/count-before.log` / `count-after.log`.
+- **Per-canvas ms** (`timings_compare.py`, the COST builder's instrument, `scratch/logs/timings-before-after.log`): «TBD» — one pair, taken beside six live lives at load ≈ 10–12; the deciles are the honest shape, the total the headline.
+- **The deterministic estimate:** `row_hash()` on the final hour-1 organism («TBD» sight cells alive, dense witness — ALPHA4 declares no HASH) reads «TBD» ms median (30 calls); × 1,818 coarse rows ≈ «TBD» s of the «TBD» s replay. Under COST's sparse witness the PREREG expects ≈ 2 ms a call.
 
-**Fix:** give `_coarse_row` a `digest: str` parameter; both call sites pass the already-computed hash
-(`journal_row["hash"]` for branch 1; hoist branch 2's `self.org.row_hash()` into a local `canvas_hash`
-used in both the dict literal and the `_coarse_row(...)` call) instead of letting `_coarse_row` call
-`row_hash()` itself.
+## 2 · M4 — the sitter's canvas unit
+### 2.1 The defect and the change
+`creature/exam.py:voice_loop` and `creature/senses/sit.py:sense` counted canvases as `ledger["moments"] // fixations` — `org.t` ÷ 4 while a canvas carries 5 moments (the coarse view) and every sleep adds 200 replayed moments: the exam fired every ≈ 400 real canvases against «500». Change (the read sites only — the SIT builder owns the cursor logic on `sit-atomic-0923`):
+- `Mind.snapshot()` writes `"canvas_index": self._canvas_index` into `state/ledger.json` (a LEDGER key; the organism's digest is untouched — `organism.json` carries no such key, asserted).
+- `creature.exam.canvas_count_of(ledger, fixations)`: the ledger's own `canvas_index` when it is an int (a bool or None falls through), else `moments // max(1, fixations)` — the old arithmetic, unchanged. `voice_loop` and `sense` both call it (one definition, #172).
+- **`Mind.resume()` restores `_canvas_index` from the ledger** (0 on an old ledger). Without it a live restart would reset the count to 0 under an `exam/LAST.json` cursor in the thousands and `canvas_count - last_canvas` would stay negative for that many canvases. Side effect, stated: THINK's `_canvas_index % every` boundary phase now also continues across a live restart instead of restarting at 0 — live resume only; a replay starts fresh and is unaffected (§1.3 proves the journal).
 
-**Proofs still to write:**
-- RED: monkeypatch/wrap `Organism.row_hash` with a call counter around one worded canvas's processing;
-  assert count == 2 today (will become 1).
-- GREEN / regression: hour-1 fixture replayed under `genome/ALPHA4.genome` and under (need to confirm
-  exact path) the FLOOR ladder genome, byte-identical INCLUDING `hash` to
-  `/data/dev/genome-wt-induce/scratch/replays/h1-alpha4-master/journal.jsonl` (mask the `readiness` field —
-  the judge branch moved it) and `/data/dev/a4-ladder/fixtures/ref-floor/journal.jsonl`. **Not yet
-  confirmed these two files exist at these paths** — check first (`ls -la` both) before writing the diff
-  harness; likely reuse `creature/replay.py`'s row-compare or `tools/replay_diff.py`.
-- AST/seam test: parse `creature/mind.py`, find `_consume_eye`, and for the statement list between (a) the
-  hash-computing statement and (b) the `_coarse_row(...)` call, assert no `ast.Attribute` node with
-  `.value` naming `self.org` appears (i.e., no `self.org.*` access at all between the two markers). This
-  is the "assert nothing moves between them" the spec asks for.
-- Positive control for the AST sweep itself: run the same scanner against a small synthetic source string
-  that DOES insert a `self.org.moment(...)` call between the two markers, and assert the scanner flags it
-  — proves the seam test isn't vacuously passing.
+### 2.2 RED → GREEN (`M4TheSittersCanvasUnit`)
+| test | RED | GREEN |
+|---|---|---|
+| `canvas_count_of` (both ledger shapes, malformed key, fixations 0) | `ImportError: cannot import name 'canvas_count_of'` | OK |
+| `test_snapshot_writes_canvas_index_and_resume_restores_it` | `AssertionError: None != 3` (no key in the ledger) | OK — ledger 3, resumed `_canvas_index` 3, `state_hash` equal |
+| `test_voice_loop_fires_at_the_minds_canvas_count_not_the_moment_arithmetic` — ledger `{moments 2200, canvas_index 400}` (400 real canvases: 5 a canvas + one sleep's 200), `every 500` | `True != False` — it FIRED at real canvas 400 (2,200 // 4 = 550) | OK — no sitting; `{moments 2600, canvas_index 500}` fires with `last_canvas` 500 (RED read 650); an old ledger `{moments 2200}` fires at 550 both before and after |
+| `test_sit_sense_reads_the_same_canvas_unit` — `{moments 40, canvas_index 3}`, `every 5`, the report already on disk | published at once (40 // 4 = 10) | OK — nothing until `canvas_index` 5, then one row |
+Consequence, PREREG §2 M4's own number, not re-derived: ≈ 25–35 % fewer sittings (≈ 68–82 in 24 h at the snapshot grain instead of alpha4-1's ≈ 108); "proven LIVE by the pre-flight" (§2.5) is the orchestrator's 20-min pre-flight (§7.1 17:15), not this builder's.
 
-### M4 — the sitter's canvas unit
-Confirmed in both readers: `creature/exam.py:108` (inside `voice_loop`) and `creature/senses/sit.py:89`
-(inside `sense`) both compute `canvas_count = moments // max(1, fixations)` from `state/ledger.json`'s
-`"moments"` field (`= org.t`, the raw glance counter). This over-counts: each worded canvas advances `t` by
-5 (4 located glances + 1 coarse) while `fixations` (GAZE's declared count) is 4, and every SLEEP replay
-adds `SLEEP.replay` more moments (not real canvases at all) on top. Net: the exam/SIT cadence fires at
-~400 real canvases instead of 500 (matches PREREG's own claim, and review §4/§7).
+## 3 · M5 — the think thread's real cost
+`think_ms` timed only `decide()` on the frozen copy; the FREEZE (`freeze_inputs`, before the launch) and the APPLY (`_think_apply_plan`, the ONE-WRITER's real writes) land on the mind thread untimed. Change: `creature/think_thread.py` gains `freeze_inputs_timed(mind, item, boundary) -> (frozen, ms)` and `timed_call(fn, *args, **kw) -> (result, ms)` — both clocks live there (the module may import `time`; `creature/mind.py` never does); `_maybe_think_threaded` and `_think_apply_pending` store the floats as `think_freeze_ms_last` / `think_apply_ms_last`; `creature/body.py:_build_status` exports `think_freeze_ms` / `think_apply_ms` beside `think_ms_last` with the same None-safe rounding, on EVERY write — the existing pin `tests/creature/test_a4l_cost_marks.py::test_every_status_write_goes_through_the_one_builder` (4 write sites, all through `_build_status`) is what "every write" rests on.
+| test (`M5ThinkTiming`) | RED | GREEN |
+|---|---|---|
+| `test_status_carries_think_freeze_and_apply_ms_on_every_write` (untreaded G4 genome) | `'think_freeze_ms' not found in {…}` | OK — both keys present, None |
+| `test_a_threaded_run_records_freeze_and_apply_ms_as_floats` (G4 + `; on its own thread; lands next boundary`, 30 canvases) | attribute absent | OK — floats ≥ 0; STATUS carries them rounded |
+| `test_the_clock_stays_in_think_thread` (no `perf_counter`/`monotonic` attribute in mind.py; the helpers exist; `timed_call(time.sleep, 0.02)` ≥ 15 ms) | `False is not true` (no helper) | OK; `TestMindHasNoClock` still OK (focused regression) |
 
-The mind's own true canvas counter is `self._canvas_index` (mind.py :496 init, incremented exactly once
-per `_consume_eye` call at current :1863 — **outside** the branch if/elif/else, so it counts every canvas
-including the "sight-only, FAST undeclared, skip entirely" branch too).
+## 4 · `tools/lives/check.py` — two fixes (`tests/creature/test_lives_check.py`, RED first)
+- **The coarse row's hour.** `_coarse_row` writes no `when` (the landed shape, verbatim from `ref-floor/journal.jsonl`: `{"seq","moment","act":"coarse","glance":4,"fix":null,"windows":null,"hash","residual","confirmed"}`); 1,818 of 1,818 rows lacking `when` on the hour-1 record are coarse rows carrying `confirmed`. `births_by_hour` / `confirmed_share_by_hour` bucketed them under `""` (alpha4-1: the `""` share 0.0253 = 46 / 1818, exactly the coarse count — A4L-DROP-REPORT task 3). Fix in check.py only: `seq_when(rows)` (seq → the canvas row's `when`), `hour_of(d, by_seq)`; a row with neither keeps `""` (nothing invented). RED: `'' unexpectedly found in {'…T08': 0.0, '': 0.5, '…T09': 0.25}` and `hours == ['…T08', '', '…T09']` → GREEN: T08 1/5, T09 1/5, no `""`.
+- **SIZING under GROW.** The 07:38 patch decided on `status.get("sight_capacity") is not None`, but `creature/body.py:338` writes `sight_capacity` for EVERY body — the NMAX branch was dead and «CROSSES NMAX» could never print on a capped genome. Fix: `genome_declares_grow(root)` parses `$ROOT/GENOME.genome` (`tools/lives/launch.sh` copies it there) with the machinery's parser — `"GROW" in declared` (`#OFF GROW` and comments are not declarations); None when absent/unparseable → NMAX wording that says «GROW unknown». `sizing_wording(proj, nmax, grow)`: «capacity doubles (GROW re-allocates: not a refusal)» / «under capacity» under GROW; «CROSSES NMAX» / «under NMAX» otherwise. RED: `check.main` on a root with STATUS `{sight_born 2100, sight_nmax 2000, sight_capacity 2000}` + G0b.genome printed «grows past the current capacity (GROW: no cap)» → GREEN: «CROSSES NMAX» with G0b, «capacity doubles» with ALPHA4.
 
-**Fix:**
-1. `Mind.snapshot()` (mind.py, the `ledger = {...}` dict starting at current :3123) gains
-   `"canvas_index": self._canvas_index` — a ledger-only key, never `org.c` (G's hash-law lesson: this must
-   never move any digest).
-2. `creature/exam.py`'s `voice_loop` reads `ledger.get("canvas_index")`; if present, use it directly as
-   `canvas_count`; else fall back to the current `moments // fixations` arithmetic (an old ledger with no
-   key).
-3. Same fallback pattern in `creature/senses/sit.py`'s `sense()`.
+## 5 · `tools/inventory.py` — a key through its OWN row
+`site_of(gene, wired)`: `"genes.RUNS" if gene in wired else "NO SITE in genes.RUNS"` — the old rule also accepted `gene.split("_")[0]` (the BASE), so `ACT_VALUE` read MADE through `ACT`'s row while `Mind.__init__`'s `genes.unwired` (exact keys) refused the organism (A4L-EXPLORE-REPORT §0 item 10 (a)). RED: `module 'inventory_tool' has no attribute 'site_of'`. GREEN: `site_of("ACT_VALUE", {"ACT"})` → NO SITE; on the REAL registry every ALPHA4 key agrees with `unwired()` (9 underscore keys, each with its own row); the positive control — `WORLD_GAME`'s own row removed while `WORLD` stays wired (`mock.patch.dict`) — reads NO SITE where the old rule read MADE, and `unwired()` names it; `inventory.main(ALPHA4.genome)` → `DECLARED-ONLY 0`, exit 0 (the fix flips nothing on the real genome; CLI log `scratch/logs/inventory-alpha4.log`: «TBD»). On the merged tree `ACT_VALUE` has its own RUNS row (51f71ba), so PREREG §7.1 17:10's reading holds by the exact rule.
 
-**Proofs still to write:** RED on a toy ledger (5 moments/canvas + 200/sleep) showing today's arithmetic
-firing at ~canvas 400 against a declared "at 500"; GREEN with `canvas_index` present firing at the mind's
-real count, AND an old ledger (key absent) still using the fallback unchanged. Confirm (quick sanity, low
-risk) that this change touches no journal/hash parity — exam.py/sit.py run in separate sense threads
-reading files, not mind.py's tape-consume path, so the hour-1 fixture replay should be untouched by
-construction; still worth one confirming run. Report must state the consequence PREREG already gives
-(≈25–35% fewer sittings) rather than re-deriving it.
+## 6 · `tools/pin_g1.py` step (1) — re-pinned, with the attribution measured
+The step replays G0b's 660-moment development life (GAZE off) and compared `org.state_hash()` to the 2026-09-19 record `runs/g0b-20260919-165207/results.json: design.hash_600` (`0d51df0d…`); it read `7686da77…` and asserted (A4L-ANSWER-REPORT "not done" 5 attributed it to «the ALPHA4/GROW hash-law change (85bf792)»). Measured with the step alone (0.5 s a run, `git bisect run` between pin_g1.py's own commit and the pre-GROW commit; every run `nice -n 19`, BLAS 1):
+| commit | date | development hash | vs the record |
+|---|---|---|---|
+| a23df43 (pin_g1.py's own commit, G1) | 2026-09-19 | 0d51df0d… | SAME |
+| 412d721^ | 2026-09-21 | 0d51df0d… | SAME |
+| **412d721** — Builder F: `state_hash` over the live block («pins NOT moved») | 2026-09-21 17:39 | a758bbb4… | DIFFERENT — the FIRST move |
+| 74c661d = 5c0073d^ | 2026-09-23 | a758bbb4… | DIFFERENT |
+| **5c0073d** — ALPHA4-G: GROW, the hash over the live prefix | 2026-09-23 03:33 | 7686da77… | DIFFERENT — the SECOND move |
+| 85bf792 — RE-PIN the skeleton digest (this pin not re-pinned) | 2026-09-23 03:45 | — | — |
+| HEAD (a50b0f3 + this branch) | 2026-09-23 | 7686da77… | DIFFERENT |
+So two declared hash-law changes, not one; citing 85bf792 alone would have been a false attribution (#194's class). The re-pin: `HASH_600_UNDER_THE_HASH_LAW = "7686da77…"` with both commits cited in the step's note; the RECORD is not edited (a record is what it was); the line prints the pin AND the record's value, which must read DIFFERENT (if it ever reads SAME, a hash law was reverted). RED `scratch/logs/pin_g1-red.log`: «TBD». GREEN `scratch/logs/pin_g1-green.log`: «TBD» (steps 2–4 unchanged, `PIN_G1_OK`).
 
-**Not yet checked:** whether `tests/creature/test_exam.py` / `test_sit.py` exist already (need `ls
-tests/creature/ | grep -i 'exam\|sit'`) — decide the right test file before writing.
+## 7 · SKIPPED — `explore_lock_mark` into the reader's conjunction (coordinator, 17:0x)
+`explore_lock_mark` / `explore_success_mark` exist only on `a4l-explore` (`/data/dev/genome-wt-a4l-explore/tools/verdict_life.py:668`), merged into `a4-integration` as 51f71ba AFTER this branch was cut; the seat wires it at landing. For the record, the wiring is one line in `tools/verdict_g4.py:main` beside `M["ACT"] = _vl.act_mark(tape, live, st)`: `M["X1_LOCK"] = _vl.explore_lock_mark(tape, live, "ACT_VALUE" in g.declared)` — the verdict is STRUCTURAL (`partition_marks`: every graded mark whose pass is not True fails), so a mark placed in `M` enters the conjunction by construction; the mark itself reads «not gradable» where the value line is undeclared (L1's own law), and alpha4-1's record is its negative control (PREREG §5.4: must FAIL at 0.97 on `left`).
 
-### M5 — the think thread's real cost (STATUS: think_freeze_ms / think_apply_ms)
-**Hard law, confirmed by reading the code (not assumed):** `creature/mind.py` must never `import time` /
-`datetime` / `random` nor touch `os.urandom` — enforced by an AST sweep,
-`tests/creature/test_mind_parity.py::TestMindHasNoClock::test_mind_has_no_clock` (reads the file's own
-`ast.parse`, fails on any forbidden import or `os.urandom` attribute access). The file's own header comment
-states the reason and the existing workaround pattern: "The actual wall-clock read ... lives in
-creature/think_thread.py, which this law does not bind; this file only ever does ARITHMETIC on the float ms
-numbers that module hands back" — exactly what `wait_for()` (think_thread.py, times `future.result()`) and
-`worker_run()` (times `decide()`) already do for `think_wait_ms`/`think_ms`.
+## 8 · Gates (on the merged bytes: `a42-b1` = this work + `a4-integration` 51f71ba)
+«TBD» — merge commit, conflicts; `tools/gate_g5_landing.sh a42-b1` (gate_g4 1/2/3/6 with the planted controls; both suites `-t .`, TMPDIR on disk; life 3a's tape replayed and diffed against the master control) — the `Ran N … OK` lines from `scratch/landing-a42-b1/`; the hour-1 regression re-run on the merged tree INCLUDING hash.
 
-Two places need timing, per the PREREG (M5 row + review §7 "the freeze and the apply land on the mind
-thread"):
-1. **Freeze** — `_maybe_think_threaded` (mind.py, current :2888): `frozen =
-   think_thread.freeze_inputs(self, item, self._canvas_index)`. Plan: add
-   `think_thread.freeze_inputs_timed(mind, item, boundary) -> (FrozenThinkInputs, freeze_ms)` — a thin
-   wrapper in think_thread.py (where `time` may be imported) that calls the existing `freeze_inputs` and
-   times it; mind.py calls the `_timed` wrapper and stores the float into a new attribute
-   `self.think_freeze_ms_last`.
-2. **Apply** — `_think_apply_pending` (mind.py, current :2925): `applied = self._think_apply_plan(item,
-   plan, launched_at)`. `_think_apply_plan` is a Mind method that performs the real ONE-WRITER writes, so it
-   can't move to think_thread.py — instead add a generic `think_thread.timed_call(fn, *args, **kwargs) ->
-   (result, ms)` helper (the `time.perf_counter()` calls physically live in think_thread.py's frame even
-   though `fn` is a bound Mind method); mind.py calls
-   `applied, apply_ms = think_thread.timed_call(self._think_apply_plan, item, plan, launched_at)` and
-   stores `self.think_apply_ms_last`.
+## 9 · What is NOT done, and the caveats
+- The live pre-flight (PREREG §2.5 M4 «proven LIVE by the pre-flight», §7.1 17:15) is the orchestrator's; nothing here was run beside a live life's root.
+- The `t` witness in `_coarse_row` catches a MOMENT between the two rows (the PREREG's own plant); a write that does not advance `org.t` is caught by the seam scan (any `self.org` access between the digest statement and the call), not by the runtime guard — together they close the seam; neither alone would.
+- The per-canvas timing pair (§1.4) was taken at load ≈ 10–12 beside six lives; the count 2 → 1 and the microbench are the deterministic parts.
+- `creature/senses/sit.py`: three lines of the read site changed (86–89); the SIT builder's cursor edits sit right below — the seat merges SIT first and asked for a re-verification on the merged bytes; `test_sit_sense_reads_the_same_canvas_unit` is the test to re-run then.
+- `hash_reuse_refused` is not on STATUS (a counter that can only read 0 on a live body is not printed); if the seat wants it surfaced, it is one line in `_build_status`.
 
-Init both new attributes (`None` default) near `self.think_ms_last` (mind.py current :478).
-
-STATUS: `creature/body.py`'s `_build_status()` — add, right beside the existing `think_ms_last` /
-`think_ms_median` lines (current :407-408), the identical None-safe/rounded pattern:
-```python
-"think_freeze_ms": (round(float(v), 3) if (v := getattr(self.mind, "think_freeze_ms_last", None)) is not None else None),
-"think_apply_ms": (round(float(v), 3) if (v := getattr(self.mind, "think_apply_ms_last", None)) is not None else None),
-```
-
-**Proofs still to write:** RED (keys absent from `_build_status()`'s output today); GREEN (present on every
-write, `None` when threading never ran); re-run `test_mind_has_no_clock` unchanged/still green (no `import
-time` added to mind.py); confirm the hour-1 fixture journal is untouched (these two numbers are STATUS-only,
-never journaled).
-
-**Not yet checked:** the exact test file for STATUS-field additions (grep `think_ms_median` under `tests/`
-to find the established pattern other builders used for this same kind of #164 addition).
-
-### Tool fix — check.py SIZING line under GROW
-Confirmed bug in the CURRENT code (already touched once, 2026-09-23 07:38 +0400, but still wrong):
-`tools/lives/check.py`'s `cap_kind = "capacity (GROW: no cap)" if status.get("sight_capacity") is not None
-else "NMAX"` tests the wrong thing. `creature/body.py` writes `"sight_capacity": int(org.sight.nmax)`
-**unconditionally** (current :338, no gate on GROW) — so `status.get("sight_capacity")` is not None for
-EVERY modern body regardless of whether the genome declares GROW. The "else NMAX" branch is dead for any
-current run; the tool will never print "CROSSES NMAX" even on a genome with a real, refusing NMAX cap.
-
-Real signal available: `tools/lives/launch.sh` copies the run's genome text to `$ROOT/GENOME.genome`
-(confirmed: `cp "$CODE/$GENOME_REL" "$ROOT/GENOME.genome"`). Fix: add `_genome_declares_grow(root) ->
-Optional[bool]` that parses `root/GENOME.genome` via `genome.machinery.parse_genome` and returns `"GROW" in
-genome.declared`, `None` if the file is missing/unparseable (an older/partial run — treat as False, the
-conservative/old default, for the wording choice). Replace the `sight_capacity` test with this. Use the
-PREREG's own phrase: under confirmed GROW, the crosses-message reads "capacity doubles (GROW re-allocates:
-not a refusal)"; otherwise keep the literal "CROSSES NMAX".
-
-**Not yet checked:** full contents of `tests/creature/test_lives_check.py` (only located it, not read) —
-read it fully before adding tests, to match its existing fixture-building style.
-
-### Tool fix — check.py by-hour buckets for the coarse row (writes no `when`)
-Confirmed via `docs/briefs/A4L-DROP-REPORT.md` (lines 11 and 42, "What is NOT done" + task 3's note):
-`_coarse_row` (creature/mind.py) never writes a `"when"` key — verified by reading its returned dict:
-`{"seq", "moment", "act": "coarse", "glance", "fix": None, "windows": None, "hash", [+residual/confirmed if
-SURPRISE]}`, no "when" anywhere. `check.py`'s `births_by_hour()` / `confirmed_share_by_hour()` bucket every
-row by `(d.get("when") or "")[:13]`, so every coarse row's counts (materially, its `"confirmed"` bool when
-SURPRISE is declared) land under the bogus `""` hour instead of their real hour — verified against
-A4L-DROP-REPORT's own number (the `""` bucket's share, 0.0253, equals exactly 46/1818, the report's own
-coarse-glance confirmed count).
-
-**Fix belongs in check.py only** — NOT in `_coarse_row` (adding a `"when"` key there would change the
-on-disk journal shape and break M3's own "no declared difference on the hour-1 fixture" requirement, since
-that fixture-replay diff is byte-for-byte against a reference journal). Plan: in `check.py`, build a `seq ->
-when` map from every row carrying `"moment"` and a truthy `"when"` (the coarse row shares its triggering
-canvas row's exact `seq` — confirmed at both `_coarse_row(row["seq"], ...)` call sites in mind.py); have
-`births_by_hour`/`confirmed_share_by_hour` look up that map when a row's own `"when"` is missing, before
-taking `[:13]`.
-
-**Not yet checked:** same `tests/creature/test_lives_check.py` file — read it fully, add a fixture row
-shaped like a real coarse row (no "when", "seq" matching a sibling canvas row that has one) and assert its
-confirmed count lands in the sibling's hour, not `""`.
-
-### Tool fixes NOT YET INVESTIGATED AT ALL (no code read)
-- **tools/inventory.py** resolving a `<BASE>_<X>` key only through its OWN RUNS row (A4L-EXPLORE-REPORT §0
-  item 10 (a)). Have not opened either file.
-- **explore_lock_mark wired into the reader's conjunction** (A4L-EXPLORE-REPORT §0 item 9 (a)). PREREG §5.4
-  already names `tools/verdict_life.py:explore_lock_mark` (X1) as built and says "wired into the conjunction
-  by B1" — i.e. this report's own author is on the hook for the wiring; have not opened
-  `tools/verdict_life.py` or found "the reader's conjunction" (likely an all-marks-pass gate in
-  `tools/verdict_g4.py` or `tools/verdict_life.py` itself).
-- **tools/pin_g1.py step (1)** re-pinned with the GROW hash-law commit `85bf792` cited (A4L-ANSWER-REPORT
-  "not-done 5"). Have not opened `tools/pin_g1.py`, that report section, or confirmed `85bf792` in `git log`.
-
-## What was NOT done (raised, not worked around — just not reached)
-Everything above is a plan grounded in the live code, not a guess, but none of it has been implemented,
-tested, or gated yet. No RED test exists. No suite has been run in this worktree. No commit before this one
-exists on `a42-b1`. This is a research hand-off only.
+## 10 · Files
+`creature/mind.py` (M3 `_row_digest`/`_coarse_row(digest=)`, header note, M4 ledger key + resume, M5 the two timed sites + attributes) · `creature/think_thread.py` (`freeze_inputs_timed`, `timed_call`) · `creature/body.py` (two STATUS keys) · `creature/exam.py` (`canvas_count_of`, the read) · `creature/senses/sit.py` (the read) · `tools/lives/check.py` (`seq_when`, `hour_of`, `genome_declares_grow`, `sizing_wording`) · `tools/inventory.py` (`site_of`) · `tools/pin_g1.py` (step 1) · `tests/creature/test_a42_b1.py` (new, 16 tests) · `tests/creature/test_lives_check.py` (+6 tests) · this report. Logs under `scratch/logs/` (gitignored; quoted above).

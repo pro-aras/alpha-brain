@@ -76,6 +76,7 @@ def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_ca
     last_canvas = 0
     last_published_name: Optional[str] = None
     from genome.machinery import parse_genome
+    from creature.exam import canvas_count_of   # M4 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400): the ONE canvas unit, shared with voice_loop
     genome = parse_genome(Path(genome_path).read_text())
     fixations = int(genome.gaze["fixations"]) if genome.gaze else 1
 
@@ -83,10 +84,10 @@ def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_ca
         ledger_path = root / "state" / "ledger.json"
         if ledger_path.exists() and every_canvases > 0:
             try:
-                moments = int(json.loads(ledger_path.read_text()).get("moments", 0))
+                ledger = json.loads(ledger_path.read_text())
             except (json.JSONDecodeError, OSError):
-                moments = 0
-            canvas_count = moments // max(1, fixations)
+                ledger = {}
+            canvas_count = canvas_count_of(ledger, fixations)   # M4: the mind's own count when the ledger carries it, else moments // fixations
             if canvas_count - last_canvas >= every_canvases:
                 # edit: Claude (Fable 5.1), 2026-09-23 03:25 +0400 — the boundary is CONSUMED only when a NEW exam file is seen (below); before this
                 # line advanced `last_canvas` first, so a boundary crossed a few seconds before the voice thread had
