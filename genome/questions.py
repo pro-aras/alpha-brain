@@ -12,7 +12,7 @@ stream and lives here, never in the organism. Questions never change the organis
 """
 from __future__ import annotations
 
-from typing import Dict, List, Sequence, Set, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 import numpy as np
 
@@ -162,7 +162,12 @@ Held = Dict[str, List[List[np.ndarray]]]     # thing -> pictures -> glance featu
 
 
 def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: Held, never: Held,
-                blank_zero: bool = False) -> Dict[str, object]:
+                blank_zero: bool = False, majority: Optional[bool] = None) -> Dict[str, object]:
+    """`majority` (edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:33 +0400 — A4-LADDER-PREREG
+    §2.2 task 3): a read-side override forwarded to every `recall_many` call below — None (the default) reads
+    the genome's own declared law, byte-identical to before this parameter existed; True/False forces ANSWER's
+    majority-of-glances gate on/off regardless of what the genome declares, so a sitter can ask the SAME
+    questions of the SAME organism under both laws with no replay (self_exam.py's `*_old_law` fields)."""
     Ls, Lw = ledgers["sight"], ledgers["words"]
     n = len(things)
     # edit: Claude (Fable 5.1), 2026-09-22 10:3x +0400 — Q3/Q4 draw a DISTRACTOR from the other things (`i % (n - 1)`); one thing has none.
@@ -171,11 +176,14 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
     if n < 2:
         raise ValueError(f"the exam needs at least two things (Q3/Q4 draw a distractor from the others); got {list(things)!r}")
     out: Dict[str, object] = {}
-    q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; per = {t: [0, 0] for t in things}; multi = 0
+    # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:33 +0400 — A4-LADDER-PREREG §2.2 task 2: every
+    # abstain-reason dict below gains "minority" (#235: a widened set is a chain; a reader that does not widen
+    # KeyErrors at the first minority row, since these are plain dicts, not a defaultdict/Counter).
+    q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}; per = {t: [0, 0] for t in things}; multi = 0
     q1_hedged = 0        # L-6: the "unsure" share among the CORRECT answers -- the hedge rate
     for t in things:
         for xs in held[t]:
-            r = org.recall_many("sight", xs); q1_n += 1; per[t][1] += 1
+            r = org.recall_many("sight", xs, majority=majority); q1_n += 1; per[t][1] += 1
             if r["cell"] is None:
                 q1_abst[r["reason"]] += 1
             else:
@@ -187,9 +195,9 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
     out["Q1"] = {"acc": q1_ok / q1_n if q1_n else 0.0, "n": q1_n, "correct": q1_ok, "abstain": q1_abst,
                  "false_abstention": (sum(q1_abst.values()) / q1_n) if q1_n else 0.0, "per_thing": {t: (v[0] / v[1]) if v[1] else 0.0 for t, v in per.items()},
                  "answers_from_multi_word_cells": multi, "hedge_rate": (q1_hedged / q1_ok) if q1_ok else None}
-    q2_ok = 0; q2_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; q2_detail = {}
+    q2_ok = 0; q2_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}; q2_detail = {}
     for t in things:
-        r = org.recall_many("words", [world.encode_word(t, blank_zero)])
+        r = org.recall_many("words", [world.encode_word(t, blank_zero)], majority=majority)
         if r["cell"] is None:
             q2_abst[r["reason"]] += 1; q2_detail[t] = f"abstain:{r['reason']}"
         else:
@@ -201,7 +209,7 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
         for i, xs in enumerate(held[t]):
             truth = (i % 2 == 0)
             word = t if truth else things[(ti + 1 + (i % (n - 1))) % n]
-            r = org.recall_many("sight", xs)
+            r = org.recall_many("sight", xs, majority=majority)
             yes = r["cell"] is not None and Lw.get(r["cell"], set()) == {word}
             if truth and r["cell"] is None: q3_true_abstain += 1
             q3_ok += int(yes == truth); q3_n += 1
@@ -219,9 +227,9 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
     out["Q4"] = {"acc": q4_ok / q4_n if q4_n else 0.0, "n": q4_n, "correct": q4_ok, "ties": q4_ties}
     q5 = {}
     for name, rows in never.items():
-        abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}; graded = _new_graded_counts()
+        abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}; answered = {}; graded = _new_graded_counts()
         for xs in rows:
-            r = org.recall_many("sight", xs)
+            r = org.recall_many("sight", xs, majority=majority)
             graded[_grade_bucket(r)] += 1
             if r["cell"] is None: abst[r["reason"]] += 1
             else:
@@ -232,10 +240,12 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
     return out
 
 
-def ask_plant_glances(org: Organism, ledgers: Dict[str, Ledger], word: str, rows: List[List[np.ndarray]]) -> Dict[str, object]:
-    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}; answered = {}; graded = _new_graded_counts()
+def ask_plant_glances(org: Organism, ledgers: Dict[str, Ledger], word: str, rows: List[List[np.ndarray]],
+                      majority: Optional[bool] = None) -> Dict[str, object]:
+    """`majority`: the same read-side override as `ask_glances` (A4-LADDER-PREREG §2.2 task 3/5)."""
+    Lw = ledgers["words"]; ok = 0; abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}; answered = {}; graded = _new_graded_counts()
     for xs in rows:
-        r = org.recall_many("sight", xs)
+        r = org.recall_many("sight", xs, majority=majority)
         graded[_grade_bucket(r)] += 1
         if r["cell"] is None: abst[r["reason"]] += 1
         else:

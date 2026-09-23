@@ -579,10 +579,18 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"cell own band history (\d+)", a)
                 if not m: raise GenomeError(f"THRESH: cannot read {a!r} (L-6: THRESH cell own band history <n>)")
                 g["declared"]["THRESH"] = {"history": int(m.group(1))}
+            # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:30 +0400 — A4-LADDER-PREREG.md
+            # §2.2: an OPTIONAL trailing "; sure only when a majority of the glances light" clause (GAZE's
+            # "coarse"/SURPRISE's "predicted"/BUDGET's "regenerate" precedent above): absent, this is
+            # byte-identical to the old parse (g["declared"]["ANSWER"] == {"unknown_below": f}, exactly as
+            # every genome that declares the OLD "ANSWER resembles under own-band; unknown below <f>" line
+            # on disk still parses) — the negative control.
             elif gene == "ANSWER":
-                m = re.fullmatch(r"resembles under own-band; unknown below (" + _NUM + r")", a)
-                if not m: raise GenomeError(f"ANSWER: cannot read {a!r} (L-6: ANSWER resembles under own-band; unknown below <f>)")
+                m = re.fullmatch(r"resembles under own-band; unknown below (" + _NUM + r")(; sure only when a majority of the glances light)?", a)
+                if not m: raise GenomeError(f"ANSWER: cannot read {a!r} (L-6/A4L-ANSWER: ANSWER resembles under own-band; unknown below <f>[; sure only when a majority of the glances light])")
                 g["declared"]["ANSWER"] = {"unknown_below": float(m.group(1))}
+                if m.group(2) is not None:
+                    g["declared"]["ANSWER"]["majority"] = True
             # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md
             # #3): SELF — the mind reads its own body readings; a belief about itself when a counter stalls while
             # another moves, births_refused_nmax rises, or the backlog crosses a threshold; THINK is skipped (and
@@ -1493,11 +1501,28 @@ class Organism:
         gap = c_best - c_other
         return gap if gap < self.g.abstain_margin else None
 
-    def recall_many(self, side: str, xs: List[np.ndarray]) -> Dict[str, object]:
+    def recall_many(self, side: str, xs: List[np.ndarray], majority: Optional[bool] = None) -> Dict[str, object]:
         """G1 §1: RECALL over glances. Each glance lights its resonating winners as `recall` does; the evidence for a cell
         on the other side is the SUM over glances of the strongest edge from that glance's lit cells to it; best/second/
         abstain by the same rules over the union of the lit sets. For ONE glance this is `recall`, result for result
-        (pinned in tools/pin_g1.py). Never changes the organism."""
+        (pinned in tools/pin_g1.py). Never changes the organism.
+
+        A4-LADDER-PREREG §2.2 / A4L-ANSWER: ANSWER's own "sure only when a majority of the glances light" clause —
+        `lit_n` (the count of GLANCES, not cells, whose `_lit` resonated at all) must reach `len(xs)//2 + 1` before
+        any cell is returned, confident or abstained-on-edges alike; short of it — but at least one glance lit — the
+        result abstains with the NEW reason "minority", graded (`_attach_grade`) on the same reference cell the
+        normal edge-resolution would have used (`best_l` when an edge exists at all, else the first lit cell — #217's
+        "the same X the old law would have named"), so the ask door renders "I don't know what it is, but it
+        resembles X". `lit_n == 0` stays "novel", exactly as before this clause existed. `majority` is a read-only
+        OVERRIDE (None, the default = the genome's own declared law; True/False forces the gate on/off regardless of
+        what ANSWER declares) — self_exam.py's sitter uses it to read both laws off one snapshot, no replay.
+
+        `lit_n`/`n` are attached to the result ONLY when the majority clause is active (declared, or forced by the
+        override) — a genome that never declares it, and every call to `recall()` itself, gets a dict with neither
+        key, so `recall_many(side, [x])` still differs from `recall(side, x)` by at most those two keys even when
+        the clause IS active (`floor(1/2)+1 == 1`, so a single glance can only ever compare lit_n∈{0,1} against 1 —
+        the gate can never trip, `recall`/`recall_many` still agree on `cell`/`lit`/`reason`/`best`/`second`/`cos`/
+        `grade`/`own_floor`/`resembles_cell`)."""
         area, other = (self.sight, self.words) if side == "sight" else (self.words, self.sight)
         lit_union: List[int] = []; cos_of: Dict[int, float] = {}; best_cos = 0.0
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/ANSWER: the nearest ALIVE cell
@@ -1508,6 +1533,11 @@ class Organism:
         nearest_cell: Optional[int] = None; nearest_val = float("-inf")
         evidence: Dict[int, Tuple[float, int]] = {}                       # other cell -> (summed evidence, lit cell of its first strongest edge)
         n_o = other.n   # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:24 +0400 — ALPHA4-G.md task 1: recall()'s own fix, mirrored here.
+        # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:30 +0400 — A4-LADDER-PREREG §2.2: `lit_n`
+        # counts GLANCES (not cells) whose `_lit` resonated; `majority_declared` folds the genome's own law together
+        # with the read-side override (None = the genome's law).
+        lit_n = 0
+        majority_declared = (bool(self.g.declared.get("ANSWER", {}).get("majority"))) if majority is None else bool(majority)
         for x in xs:
             lit, c = self._lit(area, x)
             if len(c):
@@ -1518,6 +1548,7 @@ class Organism:
                     nearest_cell = int(np.argmax(c))
             if not lit:
                 continue
+            lit_n += 1
             for l in lit:
                 if l not in cos_of:
                     lit_union.append(l); cos_of[l] = float(c[l])
@@ -1533,15 +1564,28 @@ class Organism:
             for j, (v, l) in per_j.items():
                 e = evidence.get(j)
                 evidence[j] = (v, l) if e is None else (e[0] + v, e[1])
+
+        def _finish(result: Dict[str, object]) -> Dict[str, object]:
+            if majority_declared:
+                result["lit_n"] = lit_n; result["n"] = len(xs)
+            return result
+
         if not lit_union:
             result = {"cell": None, "reason": "novel", "lit": None, "best": 0.0, "second": 0.0, "cos": best_cos}
             self._attach_grade(result, side, nearest_cell)
-            return result
+            return _finish(result)
+        cands = sorted(evidence.items(), key=lambda kv: (-kv[1][0], kv[0])) if evidence else []
+        # A4L-ANSWER §2.2: a majority of the ASKED glances must themselves light before any cell -- confident or
+        # already-abstained-on-edges -- is returned; short of it, only the best-lit cell's own resemblance is said.
+        if majority_declared and lit_n < len(xs) // 2 + 1:
+            best_lit = cands[0][1][1] if cands else lit_union[0]
+            result = {"cell": None, "reason": "minority", "lit": best_lit, "best": 0.0, "second": 0.0, "cos": cos_of[best_lit]}
+            self._attach_grade(result, side, best_lit)
+            return _finish(result)
         if not evidence:
             result = {"cell": None, "reason": "noedge", "lit": lit_union[0], "best": 0.0, "second": 0.0, "cos": cos_of[lit_union[0]]}
             self._attach_grade(result, side, lit_union[0])
-            return result
-        cands = sorted(evidence.items(), key=lambda kv: (-kv[1][0], kv[0]))
+            return _finish(result)
         best_id, (best, best_l) = cands[0]
         lit_set = set(lit_union); second = 0.0
         for j, (v, _l) in cands[1:]:
@@ -1551,15 +1595,15 @@ class Organism:
         if second > 0.0 and second / best > self.g.abstain_ratio:
             result = {"cell": None, "reason": "ratio", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l]}
             self._attach_grade(result, side, best_l)
-            return result
+            return _finish(result)
         close = self._margin_close(side, other, best_id, cos_of)
         if close is not None:
             result = {"cell": None, "reason": "close", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l], "margin": close}
             self._attach_grade(result, side, best_l)
-            return result
+            return _finish(result)
         result = {"cell": best_id, "reason": "answer", "lit": best_l, "best": best, "second": second, "cos": cos_of[best_l]}
         self._attach_grade(result, side, best_l)
-        return result
+        return _finish(result)
 
     def edge_many(self, side: str, xs: List[np.ndarray], other_cell: int) -> float:
         """G1 §1: Q3/Q4's edge summed over glances (one glance = `edge`)."""

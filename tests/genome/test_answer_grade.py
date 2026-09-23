@@ -17,6 +17,7 @@ edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:42 +0400 — #2 (docs/bri
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -173,6 +174,201 @@ class TestGradeFormula(unittest.TestCase):
         org = self._wired_org()
         for q in (onehot(0, 64), _unit_mix(0, 1, 0.3)):
             self.assertEqual(org.recall("sight", q), org.recall_many("sight", [q]))
+
+
+# ============================================================================ A4L-ANSWER (A4-LADDER-PREREG §2.2)
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:40 +0400 — the ANSWER line's optional trailing
+# "; sure only when a majority of the glances light" clause. Fast, hermetic toys (mini_genome's pool retina, no
+# GAZE/tower) exercising the STRUCTURAL gate in genome/machinery.py:Organism.recall_many; the real-front controls
+# named in the brief (a seen thing's held-out canvas, the spiral canvas) are run separately on alpha4-1's snapshot
+# fixture (not committed here -- an external, un-tracked fixture copied under scratch/ per the brief's own rule;
+# their numbers are in the builder report, task 0/4).
+def _majority_genome(unknown_below: float = 0.6, theta_n: float | None = None):
+    text = mini_genome().text if theta_n is None else mini_genome(theta_n=theta_n).text
+    text += (f"ANSWER resembles under own-band; unknown below {unknown_below}; "
+             "sure only when a majority of the glances light\n")
+    return parse_genome(text)
+
+
+class TestMajorityClauseParser(unittest.TestCase):
+    def test_parses_with_majority_clause(self) -> None:
+        g = _majority_genome(0.911)
+        self.assertEqual(g.declared["ANSWER"], {"unknown_below": 0.911, "majority": True})
+
+    def test_old_form_still_parses_without_the_majority_key(self) -> None:
+        """The negative control (A4-LADDER-PREREG §1.1): the OLD line, byte-identical, still parses to
+        exactly {"unknown_below": f} -- no "majority" key appears merely because this clause now exists."""
+        g = _answer_genome(0.911)
+        self.assertEqual(g.declared["ANSWER"], {"unknown_below": 0.911})
+
+    def test_missing_article_refuses(self) -> None:
+        with self.assertRaises(GenomeError):
+            parse_genome(mini_genome().text + "ANSWER resembles under own-band; unknown below 0.6; "
+                                                "sure only when majority of the glances light\n")
+
+    def test_wrong_case_refuses(self) -> None:
+        with self.assertRaises(GenomeError):
+            parse_genome(mini_genome().text + "ANSWER resembles under own-band; unknown below 0.6; "
+                                                "Sure Only When A Majority Of The Glances Light\n")
+
+    def test_extra_trailing_word_refuses(self) -> None:
+        with self.assertRaises(GenomeError):
+            parse_genome(mini_genome().text + "ANSWER resembles under own-band; unknown below 0.6; "
+                                                "sure only when a majority of the glances light now\n")
+
+
+class TestRecallManyMajorityGate(unittest.TestCase):
+    """cell0 <-> word0 wired (cos 1.0 to `onehot(0, 64)`/`onehot(0, 208)`); `onehot(50, 64)` is orthogonal
+    (cos 0.0) to cell0's own birth vector, so it never lights (0.0 < theta_n 0.5) -- a clean, deterministic
+    stand-in for GAZE's own "a located glance replaced by a blank canvas" (the brief's control (a)/(b))."""
+
+    def _wired(self, unknown_below: float = 0.6):
+        org = Organism(_majority_genome(unknown_below))
+        xs0, xw0 = onehot(0, 64), onehot(0, 208)
+        org.moment(xs0, xw0); org.moment(xs0, xw0)   # birth, then wired
+        return org
+
+    def _wired_plain(self, unknown_below: float = 0.6):
+        """The SAME organism, but ANSWER carries no majority clause at all -- the negative control."""
+        org = Organism(_answer_genome(unknown_below))
+        xs0, xw0 = onehot(0, 64), onehot(0, 208)
+        org.moment(xs0, xw0); org.moment(xs0, xw0)
+        return org
+
+    def test_majority_met_answers_normally(self) -> None:
+        """5 glances, 3 lit (>= floor(5/2)+1 == 3): the gate does not fire -- reason stays "answer"."""
+        org = self._wired()
+        lit_glance = onehot(0, 64); dark = onehot(50, 64)
+        r = org.recall_many("sight", [lit_glance, lit_glance, lit_glance, dark, dark])
+        self.assertEqual(r["reason"], "answer")
+        self.assertEqual(r["cell"], 0)
+        self.assertEqual((r["lit_n"], r["n"]), (3, 5))
+
+    def test_majority_missed_abstains_minority(self) -> None:
+        """5 glances, only 2 lit (< 3): the WOULD-BE answer becomes an abstention -- new reason "minority",
+        cell None, still graded (own-band) on the resonating cell, resembles rendering the same X."""
+        org = self._wired()
+        lit_glance = onehot(0, 64); dark = onehot(50, 64)
+        r = org.recall_many("sight", [lit_glance, lit_glance, dark, dark, dark])
+        self.assertEqual(r["reason"], "minority")
+        self.assertIsNone(r["cell"])
+        self.assertEqual(r["lit"], 0)
+        self.assertEqual((r["lit_n"], r["n"]), (2, 5))
+        self.assertIn(r["grade"], ("sure", "unsure", "unknown"))
+        self.assertEqual(r["resembles_cell"], 0)
+
+    def test_zero_lit_glances_stays_novel(self) -> None:
+        """lit_n == 0 reads "novel" exactly as before this clause existed -- lit_n/n are still attached
+        (the clause is declared), the reason and every other field are untouched."""
+        org = self._wired()
+        dark = onehot(50, 64)
+        r = org.recall_many("sight", [dark] * 5)
+        self.assertEqual(r["reason"], "novel")
+        self.assertIsNone(r["cell"]); self.assertIsNone(r["lit"])
+        self.assertEqual((r["lit_n"], r["n"]), (0, 5))
+
+    def test_single_glance_can_never_trip_the_gate(self) -> None:
+        """floor(1/2) + 1 == 1: lit_n can only be 0 or 1 with one glance, so "minority" is unreachable --
+        a lighting single glance still answers, a dark one is still "novel", never "minority"."""
+        org = self._wired()
+        self.assertEqual(org.recall_many("sight", [onehot(0, 64)])["reason"], "answer")
+        self.assertEqual(org.recall_many("sight", [onehot(50, 64)])["reason"], "novel")
+
+    def test_undeclared_clause_never_gates_and_carries_no_new_keys(self) -> None:
+        """The plain ANSWER line (no majority clause): even 1 of 5 glances lighting still answers as
+        today, and the result carries neither "lit_n" nor "n" -- the negative control."""
+        org = self._wired_plain()
+        lit_glance = onehot(0, 64); dark = onehot(50, 64)
+        r = org.recall_many("sight", [lit_glance, dark, dark, dark, dark])
+        self.assertEqual(r["reason"], "answer")
+        self.assertNotIn("lit_n", r); self.assertNotIn("n", r)
+
+    def test_minority_names_the_same_cell_the_old_law_would_have_answered(self) -> None:
+        """A2's own promise (the ceiling clause): the abstention's resemblance is the SAME X the old law
+        would have named, not a re-derived or weaker guess -- verified by asking the SAME organism and the
+        SAME glances under both laws via the read-side override."""
+        org = self._wired()
+        xs = [onehot(0, 64), onehot(0, 64), onehot(50, 64), onehot(50, 64), onehot(50, 64)]
+        old = org.recall_many("sight", xs, majority=False)
+        new = org.recall_many("sight", xs, majority=True)
+        self.assertEqual(old["reason"], "answer")
+        self.assertEqual(new["reason"], "minority")
+        self.assertEqual(new["lit"], old["lit"])
+        self.assertEqual(new["cos"], old["cos"])
+        self.assertEqual(new["resembles_cell"], old["lit"])
+
+    def test_minority_falls_back_to_the_first_lit_cell_when_no_edge_exists_at_all(self) -> None:
+        """A sight-only birth (moment_sight -- no word wiring, no edges, ever): the "noedge" branch's own
+        reference (lit_union[0]) is what a minority abstention falls back to when there is no evidence to
+        pick a best-edge cell from at all."""
+        org = Organism(_majority_genome(0.6))
+        xs0 = onehot(0, 64)
+        org.moment_sight(xs0)             # births cell0, wires nothing
+        lit_glance = onehot(0, 64); dark = onehot(50, 64)
+        r = org.recall_many("sight", [lit_glance, dark, dark, dark, dark])
+        self.assertEqual(r["reason"], "minority")
+        self.assertEqual(r["lit"], 0)
+        self.assertEqual((r["lit_n"], r["n"]), (1, 5))
+
+    def test_read_side_override_false_suppresses_a_declared_clause(self) -> None:
+        """self_exam.py's "old law" pass (A4-LADDER-PREREG §2.2 task 3): majority=False reads the OLD law
+        even though the genome declares the new one -- no minority, no lit_n/n keys either."""
+        org = self._wired()
+        lit_glance = onehot(0, 64); dark = onehot(50, 64)
+        r = org.recall_many("sight", [lit_glance, lit_glance, dark, dark, dark], majority=False)
+        self.assertEqual(r["reason"], "answer")
+        self.assertNotIn("lit_n", r); self.assertNotIn("n", r)
+
+    def test_read_side_override_true_forces_the_gate_when_undeclared(self) -> None:
+        """The sitter's `lit_counts_seen` diagnostic (task 3): majority=True reads the NEW law even on a
+        genome that never declared it -- used to count lit glances on every rung's own snapshot."""
+        org = self._wired_plain()
+        lit_glance = onehot(0, 64); dark = onehot(50, 64)
+        r = org.recall_many("sight", [lit_glance, lit_glance, dark, dark, dark], majority=True)
+        self.assertEqual(r["reason"], "minority")
+        self.assertEqual((r["lit_n"], r["n"]), (2, 5))
+
+    def test_recall_many_single_glance_still_matches_recall_with_the_clause_declared(self) -> None:
+        """G1's parity law (#171's class): for ONE glance, recall_many differs from recall by AT MOST the
+        two new keys -- never in cell/lit/reason/best/second/cos/grade/own_floor/resembles_cell -- and
+        those two keys are exactly {lit_n in {0, 1}, n == 1} when the clause is declared."""
+        org = self._wired()
+        for q, want_lit in ((onehot(0, 64), 1), (onehot(50, 64), 0)):
+            single = org.recall("sight", q)
+            many = org.recall_many("sight", [q])
+            self.assertEqual(many.get("lit_n"), want_lit)
+            self.assertEqual(many.get("n"), 1)
+            many_stripped = {k: v for k, v in many.items() if k not in ("lit_n", "n")}
+            self.assertEqual(single, many_stripped)
+
+
+class TestRungGenomeOneDifference(unittest.TestCase):
+    """A4-LADDER-PREREG §1.1: a rung's genome = the floor + ONE mechanism. `difflib` against
+    `A4L-FLOOR.genome` must show exactly the declared ANSWER line + one edit-note header line -- nothing
+    else, and no line of the floor touched (checked byte-for-byte on every OTHER line)."""
+
+    ROOT = Path(__file__).resolve().parents[2]
+
+    def test_diff_is_exactly_the_header_and_the_answer_line(self) -> None:
+        import difflib
+        floor = (self.ROOT / "genome" / "ladder" / "A4L-FLOOR.genome").read_text().splitlines()
+        rung = (self.ROOT / "genome" / "ladder" / "A4L-ANSWER.genome").read_text().splitlines()
+        diff = list(difflib.unified_diff(floor, rung, lineterm=""))
+        added = [l for l in diff if l.startswith("+") and not l.startswith("+++")]
+        removed = [l for l in diff if l.startswith("-") and not l.startswith("---")]
+        self.assertEqual(len(removed), 1, f"exactly one floor line should change: {removed}")
+        self.assertTrue(removed[0].startswith("-ANSWER"), removed[0])
+        self.assertEqual(len(added), 2, f"one changed ANSWER line + one edit-note header: {added}")
+        self.assertTrue(any(l.startswith("+# A4L-ANSWER.genome") for l in added), added)
+        self.assertTrue(any(l.startswith("+ANSWER") and "sure only when a majority of the glances light" in l for l in added), added)
+
+    def test_rung_genome_parses_with_the_clause_declared(self) -> None:
+        g = parse_genome((self.ROOT / "genome" / "ladder" / "A4L-ANSWER.genome").read_text())
+        self.assertEqual(g.declared["ANSWER"], {"unknown_below": 0.911, "majority": True})
+
+    def test_floor_genome_unchanged_undeclared(self) -> None:
+        g = parse_genome((self.ROOT / "genome" / "ladder" / "A4L-FLOOR.genome").read_text())
+        self.assertEqual(g.declared["ANSWER"], {"unknown_below": 0.911})
 
 
 if __name__ == "__main__":
