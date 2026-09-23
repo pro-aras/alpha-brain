@@ -1,6 +1,6 @@
 # JUDGE-UNITS-0923: the READINESS judge in its own units (builder report)
 Written by Claude (Opus 5.5, judge builder), 2026-09-23 11:53 +0400. Branch `judge-units-0923` (worktree `/data/dev/genome-wt-judge`, from master 867e8bc), commits listed in §5. **HELD: not merged.** Law: `docs/ALPHA4-PREREG.md` §4 (amended in place, dated, the old words struck) and §11 finding 1. Evidence: `docs/reviews/ALPHA4-1-FIRST-HOURS-REVIEW.md` §3.
-**Status:** every change RED on 867e8bc and GREEN here (the final judge tests: 12 failures + 19 errors on 867e8bc; 48/48 OK here with the integration seams). Negative control PASS: the hour-1 fixture's journal is byte-identical outside `readiness` (4,318 rows raw + 4 masked, of 4,322), both planted controls CAUGHT. Creature suite `Ran 738 … OK (skipped=1)`. Genome suite `Ran 360 … FAILED (failures=1, …)`: that one failure is a stale pin, identical on master 867e8bc and not this branch's (§3). gate_g4 1/2/3/6 PASS. Found beyond the brief: the old (b) read an input no snapshot persists (§1), and the amended read sample likely reads LOWER than the struck one (§0.3). Code at 56b08dc; this report in the commit after it.
+**Status:** every change RED on 867e8bc and GREEN here (the final judge tests: 12 failures + 19 errors on 867e8bc; 48/48 OK here with the integration seams). Negative control PASS: the hour-1 fixture's journal is byte-identical outside `readiness` (4,318 rows raw + 4 masked, of 4,322), both planted controls CAUGHT. Creature suite `Ran 738 … OK (skipped=1)`. Genome suite `Ran 360 … FAILED (failures=1, …)`: that one failure is a stale pin, identical on master 867e8bc and not this branch's (§3). gate_g4 1/2/3/6 PASS. Found beyond the brief: the old (b) read an input no snapshot persists (§1), and the amended read sample likely reads LOWER than the struck one (§0.3). Code at 56b08dc; this report in the commits after it.
 
 ## 0 · What is NOT done, and why (read first)
 1. **Not merged, not pushed.** By rule: the ladder's landing control (A4-LADDER-PREREG §1.6) needs master unmoved until 22:00. The orchestrator merges after the cutoff; `alpha4-2` carries it. `alpha4-1` lives its 24 h under the struck words; its door cannot open (§11 finding 1).
@@ -17,6 +17,7 @@ Written by Claude (Opus 5.5, judge builder), 2026-09-23 11:53 +0400. Branch `jud
    - §5 WEB's text still says «the four readings» (§4 now says five).
    - A snapshot written by the OLD code resumes under this code with an empty (a) window: the per-act `game_rewards` is in other units and is never converted. This is moot for alpha4-2, a fresh life.
 6. **Registers.** The PENDING row and any SOLUTIONS entry are the orchestrator's. This branch journals the law change only in the PREREG itself (D-A4-J1, under the 2026-09-05 delegation, his to overturn).
+7. **«Both suites green» is not met, by one failure that is master's.** The genome suite reads `FAILED (failures=1)`. The failure is `test_read_lexicon_parser`'s stale pin of the reader's cadence (5 s / 8 words against the deployed 20 s / 4), identical on 867e8bc (§3). It is not fixed here: it is another builder's pin, outside the judge, and the ladder watches master. The one-line fix is named in §3.
 
 ## 1 · The changes, each RED → GREEN
 The final test bytes were run twice:
@@ -125,4 +126,4 @@ It is journaled as decision D-A4-J1 under Ahmad's 2026-09-05 delegation, his to 
 - `creature/exam.py` — the sitter's argv: `--read-words 50 --read-seed 20260923`.
 - `docs/ALPHA4-PREREG.md` — §4 amended.
 - `tests/creature/readiness_rows.py` (new), `tests/creature/test_readiness_units.py` (new), `tests/creature/test_readiness_judge.py` (rewritten).
-- Commits: `56b08dc` (the code, the tests, §4 amended) · the commit after it (this report, and §4's precision edit of 12:04).
+- Commits: `56b08dc` (the code, the tests, §4 amended) · the commits after it (this report, and §4's precision edit of 12:04).
