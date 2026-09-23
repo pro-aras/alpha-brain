@@ -216,7 +216,7 @@ The ladder follows the two ladders the estate already has (Q5) — the WORLDS (d
 - The card shows the staircase as a row of steps: each cleared, current, or not reached, with the bar and the reading at each.
 
 ### 2.4 · Where a stage ends — a mark on the tape, a quiet world, a body that never stops (DIALOGUE (e); the seat to attack)
-1. The world publishes one `stage_end` row and then nothing.
+1. The world publishes one `stage_end` MARK row (§4.2 — the same branch that serves the `snapshot` and `cycle_end` marks inside a stage) and then nothing.
 2. The learner takes in its backlog. It then consumes `stage_end`: it applies any think in flight (what `Mind.close()` does today, without stopping), writes a snapshot, and journals `stage_end` with that snapshot's hash.
 3. The Bench waits for that journal row. The time from the last world row to it is the DRAIN, graded under KEEPS UP.
 4. The record up to `stage_end` is closed WHOLE by construction. The stage's heavy reads (replays, twins, the correction arms) run on COPIES while the learner sits in a silent world. An idle mind uses almost no CPU, so a read beside it starves nothing (#236).
@@ -388,7 +388,8 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
 **The creature's adapter (phase 1):**
 - **The body, unchanged, plus TWO machinery changes behind ONE new genome line.** That line is the Bench genome's one difference against a FLOOR — the ladder law. The two changes:
   - **the DOOR** — `SENSE bench …`, a sense thread like the folder's. It reads `$ROOT/bench/in/<seq>.json` in byte order, advances its cursor only after its row is durable (#230), and publishes ORDINARY rows: `eye`, `ear`, `outcome`, `sound`, `chat`, with `meta.source` = the environment's own name (maker, shelf, game, folder, hands, voice) and `meta.via = bench`. Every existing instrument keyed on `source` keeps its meaning [round 3, R3-3];
-  - **the BOUNDARY** — the mind's `stage_end` branch (§2.4).
+  - **the MARK rows** — one machinery branch in the mind for a `mark` row of four kinds. `snapshot` (published just before every ASK and TEST sitting, so each sitting reads a snapshot taken at a KNOWN row, never one up to 500 moments old) · `cycle_end` · `stage_end` · `stage_start`. On every mark the mind applies any think in flight (what `Mind.close()` does, without stopping), writes a snapshot, and journals the mark with that snapshot's hash (§2.4).
+  - **the item id** — every row the door publishes carries `meta.bench_item`, an opaque counter that lets the ledger map a tape row back to its Bench item (so the replay arms can remove or change exactly the correction instants). It never carries a class, an answer, or the word «test» — and no TEST or PRACTICE item ever passes through the door at all; they are asked of snapshot copies only.
 - **The door refuses:**
   - any key outside its allow-list (a planted `answer` or `truth` key must be refused — the leak control);
   - any sense it does not know;
@@ -397,7 +398,8 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
   - the maker, shelf, folder and game senses OFF — the Bench owns every stimulus, or the ceilings computed at declaration are fiction (the seat, Q3);
   - EVOLVE OFF (§9 D-4);
   - the Gutenberg filter kept for the shelf's lines (his 16:56);
-  - the door ON.
+  - the door ON;
+  - the creature's own lexicon and web doors HELD (`$ROOT/world/HOLD`, ALPHA4 §2) until stage 13. Otherwise they would show words outside the Bench's schedule and spoil every showing count. The creature's own READINESS judge keeps reading and journaling its opinion, which the card prints as data, never as a reason to advance the ladder.
 - **The game:** the Bench runs the BabyAI worker. It publishes the frames through the door with `source: game`, reads the mind's `ACT` file as the game sense does today, and keeps the random chooser's null on the same seed.
 
 **Alpha 3's adapter (phase 2):**
@@ -469,7 +471,8 @@ An adapter is one module per learner kind. It DECLARES its learner's capabilitie
 - **Spaced repetition:** a thing's n-th showing comes after the n-th gap of the declared list, counted in world items, never in wall seconds, so a slow learner is never shown fewer times. REVIEW showings of older things are drawn at the declared share.
 - **The correction queue:** filled from the ASK sitting's graded mistakes (TAUGHT class only). Each correction is released after the declared delay. Its arm (live learner: all corrected; live split for non-replayable learners: by lot, the lot drawn from the PRACTICE stream and recorded) and its re-ask time go to the ledger.
 - **Demonstrations** (game stages): the Bench plays the declared best path in a frame sequence marked `demo`; the learner watches, and its own acts are not sent to the game.
-- **The teacher never does these:** answer the learner's own questions (the world answers by showing — his 09-16 18:46 rule); show a test item; use a name the environment's key does not give.
+- **The learner's OWN questions are answered by the WORLD, by showing** (his 09-16 18:46 explorer rule — the maker does this today: a «what is this?» about a thing it drew is answered by drawing it again with its name). In a Bench life the Bench's world takes over that role. The door reads the learner's question rows (for the creature, `ask/out/`). For a thing the Bench drew, it shows that thing again with its name within the declared window. Each such showing is recorded as an ANSWERED showing, apart from the scheduled ones, so LEARNS counts both kinds and ASKS can see its own loop close. A question the stage's world cannot answer stays open (the creature's PARK road reopens it when a new sense or source arrives).
+- **The teacher never does these:** answer the learner's questions in words of its own; show a test or practice item; use a name the environment's key does not give.
 
 ### 4.6 · The examiner
 **Every sitting runs in this order:**
