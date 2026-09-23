@@ -1,0 +1,141 @@
+test_a_planted_divergence_inside_the_prefix_is_still_caught (tests.creature.test_verdict_reader_lag_0923.ALaggingClosedRecord.test_a_planted_divergence_inside_the_prefix_is_still_caught) ... ok
+test_fixture_premise (tests.creature.test_verdict_reader_lag_0923.ALaggingClosedRecord.test_fixture_premise) ... ok
+test_gather_cuts_the_read_at_the_minds_last_consumed_seq (tests.creature.test_verdict_reader_lag_0923.ALaggingClosedRecord.test_gather_cuts_the_read_at_the_minds_last_consumed_seq) ... ERROR
+test_the_backlog_series_is_read_from_the_body_rows (tests.creature.test_verdict_reader_lag_0923.ALaggingClosedRecord.test_the_backlog_series_is_read_from_the_body_rows) ... ERROR
+test_the_replay_of_the_cut_tape_is_the_live_journal (tests.creature.test_verdict_reader_lag_0923.ALaggingClosedRecord.test_the_replay_of_the_cut_tape_is_the_live_journal) ... FAIL
+test_the_v33_road_diverges_by_the_lag_not_by_the_mind (tests.creature.test_verdict_reader_lag_0923.ALaggingClosedRecord.test_the_v33_road_diverges_by_the_lag_not_by_the_mind) ... ok
+test_no_tail_no_cut_and_the_lag_reads_zero (tests.creature.test_verdict_reader_lag_0923.ARecordWithNoTailReadsAsToday.test_no_tail_no_cut_and_the_lag_reads_zero) ... ERROR
+test_no_tail_replay_is_the_live_journal (tests.creature.test_verdict_reader_lag_0923.ARecordWithNoTailReadsAsToday.test_no_tail_replay_is_the_live_journal) ... ok
+test_a_dead_sense_in_the_unconsumed_tail_still_fails (tests.creature.test_verdict_reader_lag_0923.AliveUnderALag.test_a_dead_sense_in_the_unconsumed_tail_still_fails) ... FAIL
+test_a_mind_behind_its_world_is_alive_and_its_lag_is_printed (tests.creature.test_verdict_reader_lag_0923.AliveUnderALag.test_a_mind_behind_its_world_is_alive_and_its_lag_is_printed) ... FAIL
+test_a_mind_that_stopped_moving_still_fails (tests.creature.test_verdict_reader_lag_0923.AliveUnderALag.test_a_mind_that_stopped_moving_still_fails) ... ok
+test_without_a_lag_the_bar_reads_as_before (tests.creature.test_verdict_reader_lag_0923.AliveUnderALag.test_without_a_lag_the_bar_reads_as_before) ... ok
+test_a_cut_short_of_the_minds_last_seq_never_closes (tests.creature.test_verdict_reader_lag_0923.ClosedWholeIsRelativeToTheCut.test_a_cut_short_of_the_minds_last_seq_never_closes) ... ERROR
+test_no_stop_event_never_closes (tests.creature.test_verdict_reader_lag_0923.ClosedWholeIsRelativeToTheCut.test_no_stop_event_never_closes) ... ERROR
+test_the_cut_at_the_minds_last_seq_closes_though_the_tape_runs_on (tests.creature.test_verdict_reader_lag_0923.ClosedWholeIsRelativeToTheCut.test_the_cut_at_the_minds_last_seq_closes_though_the_tape_runs_on) ... ERROR
+test_the_old_contract_is_unchanged (tests.creature.test_verdict_reader_lag_0923.ClosedWholeIsRelativeToTheCut.test_the_old_contract_is_unchanged) ... ok
+test_both_forms_carry_the_lag_and_the_old_callers_do_not (tests.creature.test_verdict_reader_lag_0923.CostPrintsTheLag.test_both_forms_carry_the_lag_and_the_old_callers_do_not) ... ERROR
+test_a_running_life_never_reads_the_journals_last_row (tests.creature.test_verdict_reader_lag_0923.MindLastConsumed.test_a_running_life_never_reads_the_journals_last_row) ... ERROR
+test_readings_outside_the_tape_are_ignored_and_the_journal_is_the_fallback (tests.creature.test_verdict_reader_lag_0923.MindLastConsumed.test_readings_outside_the_tape_are_ignored_and_the_journal_is_the_fallback) ... ERROR
+test_the_largest_valid_reading_on_a_closed_record (tests.creature.test_verdict_reader_lag_0923.MindLastConsumed.test_the_largest_valid_reading_on_a_closed_record) ... ERROR
+
+======================================================================
+ERROR: test_gather_cuts_the_read_at_the_minds_last_consumed_seq (tests.creature.test_verdict_reader_lag_0923.ALaggingClosedRecord.test_gather_cuts_the_read_at_the_minds_last_consumed_seq)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 137, in test_gather_cuts_the_read_at_the_minds_last_consumed_seq
+    G, L = self.G, self.G["lag"]
+                   ~~~~~~^^^^^^^
+KeyError: 'lag'
+
+======================================================================
+ERROR: test_the_backlog_series_is_read_from_the_body_rows (tests.creature.test_verdict_reader_lag_0923.ALaggingClosedRecord.test_the_backlog_series_is_read_from_the_body_rows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 187, in test_the_backlog_series_is_read_from_the_body_rows
+    bs = self.G["lag"]["backlog_series"]
+         ~~~~~~^^^^^^^
+KeyError: 'lag'
+
+======================================================================
+ERROR: test_no_tail_no_cut_and_the_lag_reads_zero (tests.creature.test_verdict_reader_lag_0923.ARecordWithNoTailReadsAsToday.test_no_tail_no_cut_and_the_lag_reads_zero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 202, in test_no_tail_no_cut_and_the_lag_reads_zero
+    G, L = self.Gf, self.Gf["lag"]
+                    ~~~~~~~^^^^^^^
+KeyError: 'lag'
+
+======================================================================
+ERROR: test_a_cut_short_of_the_minds_last_seq_never_closes (tests.creature.test_verdict_reader_lag_0923.ClosedWholeIsRelativeToTheCut.test_a_cut_short_of_the_minds_last_seq_never_closes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 247, in test_a_cut_short_of_the_minds_last_seq_never_closes
+    self.assertFalse(vg.closed_whole(self.E, 400, 510, mind_last_seq=410))
+                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: closed_whole() got an unexpected keyword argument 'mind_last_seq'. Did you mean 'tape_last_seq'?
+
+======================================================================
+ERROR: test_no_stop_event_never_closes (tests.creature.test_verdict_reader_lag_0923.ClosedWholeIsRelativeToTheCut.test_no_stop_event_never_closes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 250, in test_no_stop_event_never_closes
+    self.assertFalse(vg.closed_whole([{"event": "start"}], 410, 510, mind_last_seq=410))
+                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: closed_whole() got an unexpected keyword argument 'mind_last_seq'. Did you mean 'tape_last_seq'?
+
+======================================================================
+ERROR: test_the_cut_at_the_minds_last_seq_closes_though_the_tape_runs_on (tests.creature.test_verdict_reader_lag_0923.ClosedWholeIsRelativeToTheCut.test_the_cut_at_the_minds_last_seq_closes_though_the_tape_runs_on)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 244, in test_the_cut_at_the_minds_last_seq_closes_though_the_tape_runs_on
+    self.assertTrue(vg.closed_whole(self.E, 410, 510, mind_last_seq=410))
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: closed_whole() got an unexpected keyword argument 'mind_last_seq'. Did you mean 'tape_last_seq'?
+
+======================================================================
+ERROR: test_both_forms_carry_the_lag_and_the_old_callers_do_not (tests.creature.test_verdict_reader_lag_0923.CostPrintsTheLag.test_both_forms_carry_the_lag_and_the_old_callers_do_not)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 323, in test_both_forms_carry_the_lag_and_the_old_callers_do_not
+    m = vg.viii_cost(st, 21.0, 85.0, None, grow=True, lag=self.LS)
+TypeError: viii_cost() got an unexpected keyword argument 'lag'
+
+======================================================================
+ERROR: test_a_running_life_never_reads_the_journals_last_row (tests.creature.test_verdict_reader_lag_0923.MindLastConsumed.test_a_running_life_never_reads_the_journals_last_row)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 229, in test_a_running_life_never_reads_the_journals_last_row
+    m = vg.mind_last_consumed(self.J, {"last_seq": 6}, {"last_seq": 5}, 20, closed=False)
+        ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'verdict_g4_lag' has no attribute 'mind_last_consumed'
+
+======================================================================
+ERROR: test_readings_outside_the_tape_are_ignored_and_the_journal_is_the_fallback (tests.creature.test_verdict_reader_lag_0923.MindLastConsumed.test_readings_outside_the_tape_are_ignored_and_the_journal_is_the_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 233, in test_readings_outside_the_tape_are_ignored_and_the_journal_is_the_fallback
+    m = vg.mind_last_consumed(self.J, {"last_seq": 99}, {"last_seq": True}, 20, closed=True)
+        ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'verdict_g4_lag' has no attribute 'mind_last_consumed'
+
+======================================================================
+ERROR: test_the_largest_valid_reading_on_a_closed_record (tests.creature.test_verdict_reader_lag_0923.MindLastConsumed.test_the_largest_valid_reading_on_a_closed_record)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 222, in test_the_largest_valid_reading_on_a_closed_record
+    m = vg.mind_last_consumed(self.J, {"last_seq": 10}, {"last_seq": 8}, 20, closed=True)
+        ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'verdict_g4_lag' has no attribute 'mind_last_consumed'
+
+======================================================================
+FAIL: test_the_replay_of_the_cut_tape_is_the_live_journal (tests.creature.test_verdict_reader_lag_0923.ALaggingClosedRecord.test_the_replay_of_the_cut_tape_is_the_live_journal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 156, in test_the_replay_of_the_cut_tape_is_the_live_journal
+    self.assertIsNone(compare(got, live), f"first difference {compare(got, live)}")
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (410, '<row count: replay 1 vs --against 2>') is not None : first difference (410, '<row count: replay 1 vs --against 2>')
+
+======================================================================
+FAIL: test_a_dead_sense_in_the_unconsumed_tail_still_fails (tests.creature.test_verdict_reader_lag_0923.AliveUnderALag.test_a_dead_sense_in_the_unconsumed_tail_still_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 307, in test_a_dead_sense_in_the_unconsumed_tail_still_fails
+    self.assertFalse(a["pass"]); self.assertGreater(max(a["max_gap_s_eye_ear"]), 60.0)
+                                 ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 5.0 not greater than 60.0
+
+======================================================================
+FAIL: test_a_mind_behind_its_world_is_alive_and_its_lag_is_printed (tests.creature.test_verdict_reader_lag_0923.AliveUnderALag.test_a_mind_behind_its_world_is_alive_and_its_lag_is_printed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-lag/scratch/master-2357347/tests/creature/test_verdict_reader_lag_0923.py", line 296, in test_a_mind_behind_its_world_is_alive_and_its_lag_is_printed
+    self.assertTrue(a["pass"], a)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: False is not true : {'pass': False, 'hours_on_tape': 2.399, 'bar_hours': 3.0, 'per_hour': {0: {'canvases': 720, 'thinks': 72, 'sleeps': 4, 'snapshots': 3, 'exams': 0}, 1: {'canvases': 720, 'thinks': 72, 'sleeps': 4, 'snapshots': 3, 'exams': 0}, 2: {'canvases': 288, 'thinks': 29, 'sleeps': 2, 'snapshots': 3, 'exams': 0}}, 'every_counter_moved_every_hour': True, 'max_gap_s_eye_ear': [5.0, 5.0], 'sense_restarts': 0, 'crashes': 0, 'stops_before_cut': 0, 'nrestarts': 0, 'note': 'NRestarts read from systemd (--nrestarts / --unit); None = not read'}
+
+----------------------------------------------------------------------
+Ran 20 tests in 40.483s
+
+FAILED (failures=3, errors=10)
