@@ -1,0 +1,149 @@
+{
+ "root_journal": {
+  "mind_rows": 779,
+  "last_mind_seq": 750,
+  "rows_at_last_eye": [
+   [
+    "act"
+   ],
+   [
+    "act",
+    "births",
+    "cells",
+    "confirmed",
+    "edges",
+    "ep",
+    "err",
+    "fix",
+    "glance",
+    "hash",
+    "lr",
+    "moment",
+    "residual",
+    "source",
+    "when",
+    "windows",
+    "word"
+   ],
+   [
+    "act",
+    "confirmed",
+    "fix",
+    "glance",
+    "hash",
+    "moment",
+    "residual",
+    "windows"
+   ]
+  ]
+ },
+ "OLD": {
+  "REPLAY": {
+   "pass": false,
+   "vs_live": [
+    752,
+    "<missing from --against>"
+   ],
+   "two_replays": null,
+   "mind_rows": 883,
+   "closed_whole": true,
+   "plant_seq": 427,
+   "plant_caught": true,
+   "hash_masked": [
+    "hash"
+   ]
+  },
+  "tape_rows": 850,
+  "live_journal_rows": 779,
+  "ALL_jsonl_last_seq": 850,
+  "ALIVE_hours": 0.299,
+  "verdict": "FAIL",
+  "failed": [
+   "vi_knows_unknown",
+   "vii_replay",
+   "W3_2_rules",
+   "DOOR",
+   "PARK",
+   "GRADE",
+   "COARSE",
+   "ALIVE"
+  ]
+ },
+ "NEW": {
+  "REPLAY": {
+   "pass": true,
+   "vs_live": null,
+   "two_replays": null,
+   "mind_rows": 779,
+   "closed_whole": true,
+   "plant_seq": 378,
+   "plant_caught": true,
+   "hash_masked": [
+    "hash"
+   ],
+   "cut_seq": 750
+  },
+  "tape_rows": 750,
+  "tape_rows_world": 850,
+  "live_journal_rows": 779,
+  "ALL_jsonl_last_seq": 750,
+  "ALIVE_hours": 0.299,
+  "ALIVE_reach": {
+   "mind_reach_full_hours": 0,
+   "hours_beyond_the_minds_reach": [
+    0
+   ]
+  },
+  "verdict": "FAIL",
+  "failed": [
+   "vi_knows_unknown",
+   "W3_2_rules",
+   "DOOR",
+   "PARK",
+   "GRADE",
+   "COARSE",
+   "ALIVE"
+  ],
+  "LAG": {
+   "cut": true,
+   "mind_last_seq": 750,
+   "source": "status = ledger = journal",
+   "time_cut_seq": 850,
+   "tape_head_seq": 850,
+   "cut_seq": 750,
+   "rows_unconsumed": 100,
+   "rows_cut_by_lag": 100,
+   "world_hours_unconsumed": 0.0363,
+   "hours_lived": 0.2628,
+   "hours_on_tape_world": 0.2991,
+   "status_backlog_rows": 100,
+   "backlog_reconciles": true
+  },
+  "backlog_series": {
+   "n": 18,
+   "max": 0,
+   "last": 0,
+   "first_over_100": null,
+   "per_hour_max": [
+    0
+   ]
+  },
+  "COST_sleeps_window_end_is": "the mind's last consumed row's tape time (a lag cut: the heartbeat is wall time, a sleep's time is its canvas's tape time)",
+  "QUESTION_hours_lived": 0.263,
+  "EVOLVE_hours_lived": 0.263,
+  "THREAD_lag_note": true
+ },
+ "old_replay_vs_live_below_750": null,
+ "old_replay_first_seq_past_750": 752,
+ "expected": {
+  "old_vs_live": [
+   752,
+   "<missing from --against>"
+  ],
+  "new_vs_live": null,
+  "new_closed_whole": true,
+  "old_closed_whole": true,
+  "lag_rows": 100
+ }
+}
+LAG E2E: PASS
