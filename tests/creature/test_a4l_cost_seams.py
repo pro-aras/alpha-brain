@@ -155,12 +155,35 @@ class TheMindsHashedRowsAllReadTheWitness(unittest.TestCase):
         (the dense digest is the snapshot's, written by Organism.save). An AST pin: a sixth site, or a site left on state_hash, fails."""
         import ast
         src = (Path(__file__).resolve().parents[2] / "creature" / "mind.py").read_text()
-        vals = [v for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Dict)
+        tree = ast.parse(src)
+        vals = [v for n in ast.walk(tree) if isinstance(n, ast.Dict)
                 for k, v in zip(n.keys, n.values) if isinstance(k, ast.Constant) and k.value == "hash"]
         self.assertEqual(len(vals), 5, "the five hashed journal rows")
+        # edit: Claude (Fable 5.1), 2026-09-23 20:28 +0400 — the M3 seam (ALPHA4-2-PREREG §2 M3, builder B1, met at the a4-integration landing): the canvas rows
+        # read the witness through `self._row_digest()` (one `row_hash()` per canvas, its `org.t` recorded), and the coarse row CARRIES that
+        # digest (`_coarse_row(digest=)`, keyword-required, refused and recomputed if the organism lived a moment since). So a hashed value is
+        # one of: a `row_hash()` call, a `_row_digest()` call, or the bare name `digest` inside `_coarse_row` — and `_row_digest` itself
+        # must be the ONE place that calls `row_hash()` for a canvas. A sixth site, a bare `digest` outside `_coarse_row`, or a `_row_digest`
+        # that does not call `row_hash` fails. The witness is still the only digest any journal row carries (the seam-5 test reads the values).
+        parents = {}
+        for n in ast.walk(tree):
+            for c in ast.iter_child_nodes(n): parents[c] = n
+        def enclosing_def(n):
+            while n in parents:
+                n = parents[n]
+                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)): return n.name
+            return None
+        def is_call_to(v, name): return isinstance(v, ast.Call) and isinstance(v.func, ast.Attribute) and v.func.attr == name
         for v in vals:
-            self.assertTrue(isinstance(v, ast.Call) and isinstance(v.func, ast.Attribute) and v.func.attr == "row_hash", ast.dump(v)[:120])
-        dense_calls = [n.lineno for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "state_hash"]
+            ok = is_call_to(v, "row_hash") or is_call_to(v, "_row_digest") or (isinstance(v, ast.Name) and v.id == "digest" and enclosing_def(v) == "_coarse_row")
+            self.assertTrue(ok, ast.dump(v)[:120] + f" in {enclosing_def(v)}")
+        rd = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == "_row_digest"]
+        self.assertEqual(len(rd), 1, "one _row_digest")
+        rh_in_rd = [n for n in ast.walk(rd[0]) if is_call_to(n, "row_hash")]
+        self.assertEqual(len(rh_in_rd), 1, "_row_digest calls row_hash exactly once — the one witness call per canvas (M3)")
+        bare = [v for v in vals if isinstance(v, ast.Name)]
+        self.assertEqual(len(bare), 1, "exactly one hashed row carries the reused digest: the coarse row")
+        dense_calls = [n.lineno for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "state_hash"]
         self.assertEqual(dense_calls, [], "creature/mind.py never computes the dense digest itself (an AST check: a comment cannot trip it, #113)")
 
 

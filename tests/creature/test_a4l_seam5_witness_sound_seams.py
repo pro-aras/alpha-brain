@@ -101,8 +101,23 @@ class VoicedMindUnderHash(unittest.TestCase):
             self.assertEqual({k: v for k, v in a.items() if k != "hash"}, {k: v for k, v in b.items() if k != "hash"})
             if "hash" in a:
                 self.assertNotEqual(a["hash"], b["hash"], "the sparse witness is domain-separated from the dense digest")
-        hashed_s = [j["hash"] for j in js if "hash" in j]
-        hashed_d = [j["hash"] for j in jd if "hash" in j]
+        # edit: Claude (Fable 5.1), 2026-09-23 20:29 +0400 — the M3 seam (ALPHA4-2-PREREG §2 M3, builder B1, met at the a4-integration landing): the coarse row
+        # CARRIES its canvas row's digest (one witness call per canvas; `_coarse_row(digest=)`), so the journal holds one more hashed row per
+        # canvas than the witness has returns. The contract is kept in two halves: every coarse row's hash == its own canvas row's (the row
+        # hashed just before it), and the hashed rows WITHOUT the coarse rows are the witness's own returns, in order.
+        def collapse(rows):
+            out, prev = [], None
+            for j in rows:
+                if "hash" not in j:
+                    continue
+                if j.get("act") == "coarse":
+                    self.assertEqual(j["hash"], prev, "M3: a coarse row carries its canvas row's digest (one hash per canvas)")
+                    continue
+                out.append(j["hash"]); prev = j["hash"]
+            return out
+        hashed_s = collapse(js)
+        hashed_d = collapse(jd)
+        self.assertGreater(sum(1 for j in js if j.get("act") == "coarse" and "hash" in j), 0, "positive control: hashed coarse rows exist (the collapse did something)")
         rec = L["rec"]
         self.assertGreater(sum(1 for j in js if "sound" in j and isinstance(j["sound"], dict) and "winners" in j["sound"]), 0,
                            "positive control: canvases carried a bound sound")
