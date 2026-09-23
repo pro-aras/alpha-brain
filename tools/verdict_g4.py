@@ -33,7 +33,12 @@ WINDOW_SECONDS = 6 * 3600
 # read a record (v3.1 never bumped it — every verdict-8h-v31/results.json said v3); `hash` is a DECLARED volatile field of the vs-live
 # comparison only when the reader's commit is not the life's (a live journal is a record of the code it loaded — #234; life 3b's REPLAY
 # FAIL at 16:49 was a cross-version hash); the two-replays comparison never masks anything.
-READER_VERSION = "tools/verdict_g4.py v3.2 (2026-09-22: v3.1's rules + the version string on the record + `hash` volatile across commits, declared)"
+# edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — v3.3: READER-FIX-0923's eleven fixes (the third hand's review of alpha4-1 §3/§6 +
+# the seat's three from the 2 h smoke), every one reader-only; the mind, the senses and the body untouched.
+READER_VERSION = ("tools/verdict_g4.py v3.3 (2026-09-23: v3.2 + READER-FIX-0923 — EVOLVE's void round apart; COST as §8b's function of cells; ACT's census "
+                  "over the game's acts, ≥ 95 % on the last 100; SENTENCE's missions per episode; QUESTION once per question, the lexicon counted; READ's "
+                  "fixed-seed sample of shelf-only words + its blind twin; THREAD's gaps attributed to sleeps; STAGE's readiness series + the mind's stage "
+                  "events carried; not gradable never failed; the plant clauses not gradable before the plant)")
 
 
 def _git_head(tree) -> "str | None":
@@ -116,7 +121,12 @@ def gather(root: Path, out: Path, hours: float) -> dict:
     journal = []
     for f in sorted((root / "journal").glob("*.jsonl")):
         journal += read_jsonl(f)
-    events = [r for r in journal if "event" in r]
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (8): the MIND's own event rows (the READINESS
+    # judge's `stage` event, creature/mind.py:877) carry a `seq` and NO `at` — `_iso(e["at"])` below raised KeyError on every read of a
+    # life whose door opened. They are cut by seq and carried apart as `mind_events` (STAGE and WEB read them); `events` keeps its
+    # contract (the body's and the exam's rows, every one with `at`); the mind rows and REPLAY's inputs are unchanged.
+    events = [r for r in journal if "event" in r and r.get("at") is not None]
+    mind_events_all = [r for r in journal if "event" in r and r.get("at") is None]
     starts = [e for e in events if e["event"] == "start"]
     assert starts, "no start event in the journal"
     t0 = _iso(starts[0]["at"])
@@ -124,6 +134,7 @@ def gather(root: Path, out: Path, hours: float) -> dict:
     tape_cut = [r for r in tape_rows if _iso(r["at"]) <= t_cut]
     last_seq = tape_cut[-1]["seq"] if tape_cut else 0
     mind_rows = [r for r in journal if "event" not in r and int(r["seq"]) <= last_seq]
+    mind_events = [r for r in mind_events_all if r.get("seq") is not None and int(r["seq"]) <= last_seq]
     events_cut = [e for e in events if _iso(e["at"]) <= t_cut or e["event"] == "stop"]
     (out / "tape").mkdir(parents=True, exist_ok=True)
     pl = out / "tape" / "payload"
@@ -140,6 +151,7 @@ def gather(root: Path, out: Path, hours: float) -> dict:
         if _iso(d["at"]) <= t_cut:
             d["_file"] = f.name; exams.append(d)
     return {"t0": t0, "t_cut": t_cut, "tape": tape_cut, "mind": mind_rows, "events": events_cut, "status": status, "exams": exams,
+            "mind_events": mind_events,
             "closed_whole": closed_whole(events, last_seq, tape_rows[-1]["seq"] if tape_rows else 0),
             "last_seq": last_seq, "hours_on_tape": (_iso(tape_cut[-1]["at"]) - t0).total_seconds() / 3600 if tape_cut else 0.0}
 
@@ -217,6 +229,28 @@ def _nowire(mind: "Mind") -> None:
         mind.predictor = Predictor(mind.org, arm=mind.predictor.arm)
 
 
+def rows_for_spec(rows: List[dict], spec: dict) -> List[dict]:
+    """The rows a twin's mind sees, from its spec — PURE (never mutates `rows`). `until_seq` cuts; `shuffle_words` is T-shuffle (the ear's
+    words permuted across canvases by a fixed rng, the sight stream untouched); `drop_source` removes every row whose `meta.source` is it.
+    edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (11): `drop_source` is READ's blind twin —
+    tools/read_recognised.py:blind_twin_root's own mechanism («a Mind fed the tape with every row whose meta.source == drop_source
+    removed») applied to the reader's CUT tape through the worker road (close/snapshot, seconds, --reuse), where blind_twin_root itself
+    reads the root's WHOLE tape and closes unconditionally. Factored out of worker() so the filter is tested without a Mind."""
+    if spec.get("until_seq"):
+        rows = [r for r in rows if r["seq"] <= spec["until_seq"]]
+    if spec.get("drop_source"):
+        rows = [r for r in rows if (r.get("meta") or {}).get("source") != spec["drop_source"]]
+    if spec.get("shuffle_words"):
+        # T-shuffle: the ear's words permuted across canvases by a fixed rng (the sight stream untouched)
+        rows = list(rows)
+        ears = [i for i, r in enumerate(rows) if r["sense"] == "ear"]
+        words = [rows[i]["meta"]["word"] for i in ears]
+        perm = np.random.default_rng(5).permutation(len(words))
+        for i, j in zip(ears, perm):
+            rows[i] = dict(rows[i]); rows[i]["meta"] = dict(rows[i]["meta"]); rows[i]["meta"]["word"] = words[j]
+    return rows
+
+
 def worker(spec_path: Path) -> int:
     spec = json.loads(Path(spec_path).read_text())
     from creature.mind import Mind
@@ -226,16 +260,7 @@ def worker(spec_path: Path) -> int:
     root = Path(spec["root"]); (root / "tape").mkdir(parents=True, exist_ok=True)
     src_tape = Path(spec["tape"])
     _relink(root / "tape" / "payload", (src_tape.parent / "payload").resolve())
-    rows = read_jsonl(src_tape)
-    if spec.get("until_seq"):
-        rows = [r for r in rows if r["seq"] <= spec["until_seq"]]
-    if spec.get("shuffle_words"):
-        # T-shuffle: the ear's words permuted across canvases by a fixed rng (the sight stream untouched)
-        ears = [i for i, r in enumerate(rows) if r["sense"] == "ear"]
-        words = [rows[i]["meta"]["word"] for i in ears]
-        perm = np.random.default_rng(5).permutation(len(words))
-        for i, j in zip(ears, perm):
-            rows[i] = dict(rows[i]); rows[i]["meta"] = dict(rows[i]["meta"]); rows[i]["meta"]["word"] = words[j]
+    rows = rows_for_spec(read_jsonl(src_tape), spec)
     (root / "tape" / "ALL.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))   # self_exam's disjointness control reads it
     genome_path = Path(spec["genome"])
     if spec.get("one_glance"):
@@ -273,6 +298,13 @@ def worker(spec_path: Path) -> int:
                "sleeps": sum(1 for r in mind_rows if "sleep" in r), "thinks": sum(1 for r in mind_rows if "think" in r),
                "parked": sum(1 for r in mind_rows if "think" in r and r["think"].get("parked")),
                "canvases": n_canvas, "seconds": round(secs, 1), "ms_per_canvas": round(1000 * secs / max(1, n_canvas), 2), "hash": org.state_hash()}
+    if spec.get("drop_source"):
+        # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (11): READ's blind twin is ASKED by the reader
+        # (tools/read_recognised.py:recognised_share on its snapshot); no self-exam is spent on it.
+        summary.update(rows_replayed=len(rows), dropped_source=spec["drop_source"], exam=None, exam_stderr="",
+                       exam_skipped="a drop-source twin: the reader asks its snapshot directly")
+        (root / "summary.json").write_text(json.dumps(summary, default=str))
+        return 0
     if spec.get("one_glance") or "coarse" in spec.get("blind", []):
         from tools import self_exam as _se           # in-process, so the forced mode "one" (or the forced no-coarse) applies to the held-out glances too
         old_argv = sys.argv
@@ -496,8 +528,21 @@ def modulation(G: dict, F: float, regime_step: int = 100) -> dict:
     nb = out.get("null_fake_boundary_w0", {}) or {}
     out["pass_fixed_bars_record"] = bool(graded) and all(x["pass"] for x in graded) and bool(nb.get("no_spike"))
     out["pass"] = bool(graded_regime) and all(x["pass"] for x in graded_regime) and bool(nb.get("no_spike_regime"))
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (9): the mark carries `graded`. Not gradable (pass
+    # None, never in `marks_failed`) when no window changed, when no window's new things reached 10 showings, or when the fake-boundary
+    # null could not be read — alpha4-1's 2 h smoke said «… not gradable» in its reason and was still counted FAILED.
+    out["graded"] = True
     if not out["windows"]:
         out["reason"] = "no window change on this tape yet (e.g. a smoke shorter than the maker's window) — not gradable; the regime band is still derived and printed under 'regime'"
+        out["graded"] = False
+    elif not graded_regime:
+        out["reason"] = "not gradable: no window brought a new thing that reached 10 showings (§18 add. 4) — the windows are printed"
+        out["graded"] = False
+    elif nb.get("no_spike_regime") is None:
+        out["reason"] = "not gradable: the fake-boundary null could not be read (window 0 holds ≤ 200 canvases or no regime band)"
+        out["graded"] = False
+    if not out["graded"]:
+        out["pass"] = None
     return out
 
 
@@ -558,6 +603,20 @@ def main(argv: List[str]) -> int:
     # (A4-LADDER-PREREG §4: «each with its twin set only … LANG + blind-chat»), so it runs OUTSIDE `if not a.skip_twins:` — a read
     # with --skip-twins still grades L1 (the first draft sat inside that block; the advisor's catch before the life).
     specs += chat_twin_specs(g.declared, twins_dir, tape_all, genome_path)
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (11): READ's blind twin (every shelf row dropped) is
+    # one more twin of the set — under --skip-random too (it is not a random twin); skipped with its reason (the clause then reads not
+    # gradable, never FAIL) when SENSE_READ is undeclared, under --skip-twins, or when the cut tape carries no shelf row (it would be the
+    # unblinded twin again — a replay burned to read nothing).
+    shelf_rows_cut = sum(1 for r in G["tape"] if (r.get("meta") or {}).get("source") == "shelf")
+    read_blind_reason: Optional[str] = None
+    if "SENSE_READ" not in g.declared:
+        read_blind_reason = "not gradable: SENSE_READ not declared"
+    elif a.skip_twins:
+        read_blind_reason = "not gradable: --skip-twins (the blind-shelf twin was not run)"
+    elif shelf_rows_cut == 0:
+        read_blind_reason = "not gradable: no shelf rows on the cut tape — the blind twin would equal the unblinded one"
+    else:
+        specs.append({"label": "blind-shelf", "root": str(twins_dir / "blind-shelf"), "tape": str(tape_all), "genome": str(genome_path), "drop_source": "shelf"})
     # edit: Claude (Fable 5.1), 2026-09-22 22:28 +0400 — a CLOSED life read WHOLE (gather's `closed_whole`) ends every whole-tape twin's mind the way the
     # body did; the slice/random twins below cut the tape short and never close (the live mind lands that think at a later boundary).
     for _s in specs:
@@ -640,8 +699,14 @@ def main(argv: List[str]) -> int:
         # a twin that met only 2 words scored .75 on its own 20 questions and .094 on the 160 (the control run, 13:2x)
         t = TW.get(twin, {}); ex = t.get("exam") or {}; return (ex.get("ask_all_words") or {}).get(key, {}).get("acc")
     Q1_ALL = allw["Q1"]["acc"]
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (9): EVERY mark carries `graded` (partition_marks
+    # builds `marks_failed` from graded marks only). A mark read off a twin that did not run (--skip-twins, a worker error) is NOT GRADABLE
+    # with the twin's own error in its reason — never FAIL, never silently PASS.
+    def _twins_missing(*labels) -> Optional[str]:
+        miss = [f"{l} ({TW.get(l, {}).get('error') or ('not run' if l not in TW else 'no exam')})" for l in labels if q(l) is None]
+        return ("not gradable: twin " + ", ".join(miss) + " — the reading does not exist") if miss else None
     M: Dict[str, dict] = {}
-    M["i_knows"] = {"pass": seen["Q1"]["acc"] >= .80 and seen["Q2"]["acc"] >= .80 and seen["Q3"]["acc"] >= .85 and seen["Q4"]["acc"] >= .90,
+    M["i_knows"] = {"graded": True, "pass": seen["Q1"]["acc"] >= .80 and seen["Q2"]["acc"] >= .80 and seen["Q3"]["acc"] >= .85 and seen["Q4"]["acc"] >= .90,
                     "Q1": seen["Q1"]["acc"], "Q2": seen["Q2"]["acc"], "Q3": seen["Q3"]["acc"], "Q4": seen["Q4"]["acc"], "chance_Q1": E["chance_q1"],
                     "all_words": {k: allw[k]["acc"] for k in ("Q1", "Q2", "Q3", "Q4")}, "per_thing_Q1": seen["Q1"]["per_thing"],
                     "live_exam_last": {k: (last_live_exam["ask_seen_words"][k]["acc"] if last_live_exam else None) for k in ("Q1", "Q2", "Q3", "Q4")},
@@ -650,9 +715,12 @@ def main(argv: List[str]) -> int:
                             "T_shuffle_Q1": q("T-shuffle"), "T_nowire_Q1": q("T-nowire"), "bar": "≤ .20"}
     M["iii_growth_matters"] = {"pass": q("T-frozen-10") is not None and q("T-frozen-10") <= Q1_ALL - .30, "T_frozen_10_Q1": q("T-frozen-10"), "T_frozen_50_Q1": q("blind-frozen"),
                                "T_frozen_10_cells": TW.get("T-frozen-10", {}).get("cells"), "Q1": Q1_ALL, "bar": "≥ 30 pp under on all 16 words (the twin FROZEN after 10 cells, G0b's; the 50-cell twin printed — §16 addenda)"}
+    for _k, _labels in (("ii_meeting_real", ("T-shuffle", "T-nowire")), ("iii_growth_matters", ("T-frozen-10",))):
+        _why = _twins_missing(*_labels)
+        M[_k].update(graded=_why is None, **({"pass": None, "reason": _why} if _why else {}))
     c = U["c"]; pruned_share = c["edges_pruned"] / c["edges_born"] if c["edges_born"] else 0.0
     refused = iv_refusals(c)   # §18 addendum 4 (2026-09-22): every CAP refusal counts — budget, nmax, frozen; redundant printed only
-    M["iv_grows_alone"] = {"pass": U["cells_born"] >= 50 and refused["caps_total"] == 0 and pruned_share >= .05 and c["removed_for_disuse"] == 0,
+    M["iv_grows_alone"] = {"graded": True, "pass": U["cells_born"] >= 50 and refused["caps_total"] == 0 and pruned_share >= .05 and c["removed_for_disuse"] == 0,
                            "cells_born": U["cells_born"], "births_refused_budget": c["births_refused_budget"], "refused": refused, "arrivals": U["arrivals"], "budget_left": U["budget_left"],
                            "pruned_share": round(pruned_share, 4), "edges_born": c["edges_born"], "edges_pruned": c["edges_pruned"], "edges_cross": U["edges_cross"],
                            "removed_for_disuse": c["removed_for_disuse"], "bar": "≥ 50 born · 0 refused at ANY cap (budget · nmax · frozen; §18 add. 4) · ≥ 5 % pruned · 0 by disuse"}
@@ -674,15 +742,26 @@ def main(argv: List[str]) -> int:
             q1 = lambda ex: ex["ask_seen_words"]["Q1"]["acc"]
             pairs.append({"window": w, "before": q1(before), "first_after": q1(first_after), "last_in_window": q1(last_in), "drop_pp": round(100 * (q1(before) - q1(last_in)), 1),
                           "files": [before["_file"], first_after["_file"], last_in["_file"]]})
-    M["v_retention"] = {"pass": bool(pairs) and all(p["drop_pp"] <= 5.0 for p in pairs), "pairs": pairs, "bar": "≤ 5 pp on the last-of-window pair (§15)", "note": "no odd window with exams on both sides → not readable" if not pairs else ""}
+    M["v_retention"] = retention_mark(pairs)      # READER-FIX-0923 (9): no pair → not gradable, never FAIL
     p, n = own["plant"], own["null"]
-    M["vi_knows_unknown"] = {"pass": p["answered_rate"] > .5 and n["abstain_rate"] > .5 and (seen["Q5"][world.THING_NEVER]["abstain_rate"] >= .80) and seen["Q1"]["false_abstention"] <= .20,
-                             "plant_zog": p, "null_vex": n, "Q5_spiral_abstain": seen["Q5"][world.THING_NEVER]["abstain_rate"], "false_abstention": seen["Q1"]["false_abstention"],
-                             "bar": "plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20"}
-    M["vii_replay"] = {"pass": R["REPLAY"]["pass"], **{k: v for k, v in R["REPLAY"].items() if k != "pass"}, "bar": "two replays byte-identical; the plant caught"}
+    from tools import verdict_life as _vl
+    _plant_shown = _vl.plant_showings(G["mind"], world.THING_PLANT)   # READER-FIX-0923 (10): one count for (vi), GRADE and SIZING
+    M["vi_knows_unknown"] = vi_mark(p, n, seen["Q5"][world.THING_NEVER]["abstain_rate"], seen["Q1"]["false_abstention"], plant_shown=_plant_shown)
+    M["vii_replay"] = {"graded": True, "pass": R["REPLAY"]["pass"], **{k: v for k, v in R["REPLAY"].items() if k != "pass"}, "bar": "two replays byte-identical; the plant caught"}
     st = G["status"]
     # edit: Claude (Fable 5.1), 2026-09-22 10:3x +0400 — (viii) in ONE unit (#162): the per-row median it read until today is not the probe's ms per canvas
-    M["viii_cost"] = viii_cost(st, R.get("solo_ms_per_canvas_probe") or U["ms_per_canvas"], U["ms_per_canvas"], cpu_ns)
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (2): a GROW life is graded against ALPHA4-PREREG §8b's
+    # FUNCTION of its own final cell count (0.09 ms × cells × 1.5); G4-7 printed beside as `g4_7`; the older records read G4-7 as before.
+    _sleeps_window = None
+    try:
+        _hb = st.get("heartbeat_at")
+        if _hb:
+            _hbt = _iso(_hb)
+            _sleeps_window = sum(1 for _s, _t in _vl.sleep_times(G["tape"], G["mind"]) if 0 <= (_hbt - _t).total_seconds() <= 180)
+    except Exception:
+        _sleeps_window = None
+    M["viii_cost"] = viii_cost(st, R.get("solo_ms_per_canvas_probe") or U["ms_per_canvas"], U["ms_per_canvas"], cpu_ns,
+                               grow=("GROW" in g.declared), sleeps_in_window=_sleeps_window)
     if not a.skip_random:
         comps = []
         for k, t in TW.items():
@@ -694,12 +773,18 @@ def main(argv: List[str]) -> int:
         M["ix_not_luck"] = {"pass": rank is not None and rank <= max(1, len(ranked) // 4) + (1 if len(ranked) % 4 else 0) and rank <= 5,
                             "rank_of_own": rank, "of": len(ranked), "own_composite": next((x["composite"] for x in comps if x["label"] == "slice-own"), None),
                             "best_random": next((x for x in ranked if x["label"] != "slice-own"), None), "slice_seq": slice_seq, "bar": "top quartile of 20 random genomes (rank ≤ 5 of 21), numbers only, on the first slice"}
+        # READER-FIX-0923 (9): no rank = the slice-own twin's exam does not exist — not gradable, its error printed
+        M["ix_not_luck"]["graded"] = rank is not None
+        if rank is None:
+            M["ix_not_luck"].update(**{"pass": None, "reason": "not gradable: no composite for slice-own (%s)" % (TW.get("slice-own", {}).get("error") or "no exam")})
     lx = E["gaze_landing"]; lr = own["random_landing"]
-    M["x_gaze_finds_thing"] = {"pass": lx["rate"] >= .90 and lx["rate"] >= 1.5 * lr["rate"], "gaze_rate": lx["rate"], "random_rate": lr["rate"], "random_ceiling_expected": 0.069,
+    M["x_gaze_finds_thing"] = {"graded": True, "pass": lx["rate"] >= .90 and lx["rate"] >= 1.5 * lr["rate"], "gaze_rate": lx["rate"], "random_rate": lr["rate"], "random_ceiling_expected": 0.069,
                                "ratio": round(lx["rate"] / lr["rate"], 2) if lr["rate"] else None, "bar": "≥ .90 in the first 2 fixations · ≥ 1.5× random"}
     M["xi_gaze_earns_place"] = {"pass": q("T-one-glance") is not None and Q1_ALL - q("T-one-glance") >= .10, "Q1_gaze": Q1_ALL, "Q1_one_glance": q("T-one-glance"),
                                 "Q1_first_fixation_only": q("T-first-fixation"), "Q1_random_gaze": q("blind-gaze"),
                                 "bar": "≥ .10 over G1's one-glance twin (gaze mode 'one': the whole canvas at glance×glance); the first-fixation-only twin printed — §16 addendum"}
+    _why = _twins_missing("T-one-glance")
+    M["xi_gaze_earns_place"].update(graded=_why is None, **({"pass": None, "reason": _why} if _why else {}))
     F = 1.0 - g.theta_n
     # edit: Claude (Sonnet 5, builder H), 2026-09-21 18:44 +0400 — §18 addendum 3: the bar text now names both readings; M["MODULATION"]["pass"] grades on the regime-derived one (modulation()'s own doc)
     M["MODULATION"] = modulation(G, F, regime_step=a.regime_step)
@@ -718,6 +803,8 @@ def main(argv: List[str]) -> int:
     M["TWINS"] = {b: {"Q1": q(f"blind-{b}"), "Q1_seen": ((TW.get(f"blind-{b}", {}).get("exam") or {}).get("ask_seen_words") or {}).get("Q1", {}).get("acc"),
                       "composite": ((TW.get(f"blind-{b}", {}).get("exam") or {}).get("ask_all_words") or {}).get("composite"), "cells": TW.get(f"blind-{b}", {}).get("cells")} for b in BLINDS}
     M["TWINS"]["random_gaze_loses_xi"] = {"pass": q("blind-gaze") is not None and Q1_ALL - q("blind-gaze") >= .10, "margin": None if q("blind-gaze") is None else round(Q1_ALL - q("blind-gaze"), 3)}
+    _why = _twins_missing("blind-gaze")      # READER-FIX-0923 (9)
+    M["TWINS"]["random_gaze_loses_xi"].update(graded=_why is None, **({"pass": None, "reason": _why} if _why else {}))
     M["TWINS"]["no_sleep_v"] = {"graded": False, "reason": "SLEEP's retention is not gradable on drawn worlds (§10)", "no_sleep_Q1": q("blind-sleep")}
     M["TWINS"]["no_curiosity"] = {"graded": False, "reason": "the door mark needs the folder/web door (OFF)"}
     M["TWINS"]["no_park"] = {"graded": False, "reason": "PARK unreadable (folder OFF)"}
@@ -864,7 +951,7 @@ def main(argv: List[str]) -> int:
     # the life's OWN genome (`decl`, already parsed above for "SELF"/"ANSWER") — never guessed from STATUS
     # shape, so a genome that happens to have a small sight_nmax under NMAX is never mistaken for GROW.
     M["SIZING"] = _vl.sizing_mark(st, live, a.sizing_prediction, grow=("GROW" in decl))
-    M["GRADE"] = _vl.grade_mark(own["plant"], own["null"], seen, "ANSWER" in decl)      # §19.3 (builder A's graded answer)
+    M["GRADE"] = _vl.grade_mark(own["plant"], own["null"], seen, "ANSWER" in decl, plant_shown=_plant_shown)      # §19.3; READER-FIX-0923 (10)
     M["SELF"] = _vl.self_mark(tape, bel_rows, live, st, "SELF" in decl)                 # §19.6 (builder A's SELF)
     # edit: Claude (Fable 5.1), 2026-09-22 22:33 +0400 — §19.1 as re-specified: per thing by SOURCE (the eye row's `meta.source` on the tape), the blind-surprise twin's own count
     _src = {int(r["seq"]): ((r.get("meta") or {}).get("source")) for r in tape if r.get("sense") == "eye"}
@@ -899,22 +986,34 @@ def main(argv: List[str]) -> int:
     # (tools/read_recognised.py, recall_many — never mutating, its state_hash pinned inside). The BLIND twin (the same tape with
     # the shelf rows dropped) is NOT run by this reader yet: `recog_blind=None` and the mark says so in its reason ("the blind
     # twin was not run — that clause FAILS") — a reader-only addition owed after alpha4-1's launch, never a loosened bar.
-    _rrecog = None
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (6) + (11): the 50 words are a FIXED-SEED sample over
+    # the whole of HEARD.json that the shelf ALONE heard on the cut tape (`read_sample` — the newest 50 were the least-exposed words; a word
+    # also heard from the lexicon's glosses would let the blind twin answer it), printed; the BLIND twin is the `blind-shelf` twin of the set
+    # (its snapshot asked the same 50 words; its replay seconds printed) or, when it could not run, `read_blind_reason` — not gradable.
+    _rrecog = None; _rblind = None; _rsample = None
     if "SENSE_READ" in decl:
         try:
             import json as _json_r
             from tools import read_recognised as _rr
             _heard_p = root / "read" / "HEARD.json"
             _heard = _json_r.loads(_heard_p.read_text()) if _heard_p.exists() else []
-            _words_r = [str(w) for w in _heard][-50:]
+            _rsample = _vl.read_sample(_heard, tape)
+            _words_r = list(_rsample["words"])
             if len(_words_r) >= 50:
                 _rrecog = _rr.recognised_share(twins_dir / "unblinded-1", genome_path, _words_r)
+                if read_blind_reason is None:
+                    _bt = TW.get("blind-shelf", {})
+                    if _bt.get("error") or not (twins_dir / "blind-shelf" / "state" / "organism.npz").exists():
+                        read_blind_reason = "not gradable: the blind-shelf twin did not run (%s)" % (_bt.get("error") or "no snapshot")
+                    else:
+                        _rblind = _rr.recognised_share(twins_dir / "blind-shelf", genome_path, _words_r)
+                        _rblind["seconds"] = _bt.get("seconds"); _rblind["rows_replayed"] = _bt.get("rows_replayed")
             else:
-                _rrecog = {"n": 0, "share": None, "note": f"only {len(_words_r)} shelf words heard; the mark asks 50"}
+                _rrecog = {"n": 0, "share": None, "note": _rsample.get("note") or f"only {len(_words_r)} shelf words; the mark asks 50"}
         except Exception as e:
             _rrecog = {"n": 0, "share": None, "error": repr(e)}
-    M["READ"] = _vl.read_mark(tape, live, "SENSE_READ" in decl, _rrecog, None)
-    M["THREAD"] = _vl.thread_mark(R["ALIVE"], st, bool((decl.get("THINK") or {}).get("threaded")))   # §19.2 (builder E's thinking thread)
+    M["READ"] = _vl.read_mark(tape, live, "SENSE_READ" in decl, _rrecog, _rblind, sample=_rsample, blind_reason=(None if _rblind is not None else read_blind_reason))
+    M["THREAD"] = _vl.thread_mark(R["ALIVE"], st, bool((decl.get("THINK") or {}).get("threaded")), tape=tape, journal=live)   # §19.2; READER-FIX-0923 (7): gaps attributed to sleeps
     # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §5/§6: EVOLVE. The negative
     # control (brief item 4) is run ONCE, before the life, by `tools/evolve.py --negative-control` with `--out`
     # pointing into the life's own `evolve/` dir — its two files persist as part of the record; this reader loads
@@ -927,14 +1026,19 @@ def main(argv: List[str]) -> int:
             _evolve_nc = {"planted_bad": json.loads(_nc_bad_path.read_text()), "null": json.loads(_nc_null_path.read_text())}
         except (json.JSONDecodeError, OSError):
             _evolve_nc = None
-    M["EVOLVE"] = _vl.evolve_mark(tape, live, "EVOLVE" in decl, float(a.hours), negative_control=_evolve_nc)   # §5/§6 (builder J's proposals/adoptions)
+    M["EVOLVE"] = _vl.evolve_mark(tape, live, "EVOLVE" in decl, float(a.hours), negative_control=_evolve_nc,
+                                  every_h=(decl.get("EVOLVE") or {}).get("every_h"))   # §5/§6; READER-FIX-0923 (1): the void round printed apart
     # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:5x +0400 — ALPHA4-PREREG.md §5: WEB and STAGE (I) —
     # wired the SAME way every other builder's mark above is (a pure function in tools/verdict_life.py, called here
     # with `decl`/`tape`/`live`), so a run of THIS reader against an ALPHA4 life computes them, never leaves them
     # DECLARED-ONLY in the sense #180 exists to catch. Both read «not gradable» on every closed record this reader
     # has ever seen (none declares DOOR_WEB/STAGE_READY) — the control every OTHER mark above already gets for free.
-    M["WEB"] = _vl.web_mark(tape, live, "DOOR_WEB" in decl)
-    M["STAGE"] = _vl.stage_mark(live, "STAGE_READY" in decl)
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (8): the mind's `stage` event rows (gather's
+    # `mind_events`, no `at`) ride beside the mind rows — `live` alone never carried them, so «≤ 1 stage-4 event» and WEB's stage-3 law read 0
+    # events whatever the life did; STAGE prints the readiness series (the `sit` rows' readings, the tape's sit scores joined by seq).
+    _stage_journal = list(live) + list(G.get("mind_events") or [])
+    M["WEB"] = _vl.web_mark(tape, _stage_journal, "DOOR_WEB" in decl)
+    M["STAGE"] = _vl.stage_mark(_stage_journal, "STAGE_READY" in decl, tape=tape)
     # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:00 +0400 — A4-LADDER-PREREG §3.4 L1-L9: `chat_read` (below main) gathers the
     # record and calls the pure marks; lifted out of main() so a test reads the LAST link (#180).
     M["CHAT"] = chat_read(root, tape, live, G["exams"], decl, twins_dir,
@@ -949,14 +1053,16 @@ def main(argv: List[str]) -> int:
     for name, pth in (("eye_photo_g1_gate", ROOT / "runs" / "eye-photo-g1" / "gate.json"),):
         bands[name] = json.loads(pth.read_text()) if pth.exists() else "not on disk"
     M["BANDS"] = bands
-    graded = ["i_knows", "ii_meeting_real", "iii_growth_matters", "iv_grows_alone", "v_retention", "vi_knows_unknown", "vii_replay", "x_gaze_finds_thing", "xi_gaze_earns_place", "MODULATION"] + (["ix_not_luck"] if "ix_not_luck" in M else [])
-    graded += [k for k in ("viii_cost", "W3_2_rules", "W3_1_beliefs", "DOOR", "PARK", "ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD", "EVOLVE", "CHAT") if k in M and M[k].get("graded")]   # §18: graded only when the life declares them; (viii) only when STATUS carries the per-canvas unit
-    failed = [k for k in graded if not M[k].get("pass")] + ([] if R["ALIVE"]["pass"] else ["ALIVE"]) + ([] if M["TWINS"]["random_gaze_loses_xi"]["pass"] else ["TWINS.random_gaze"])
-    R["marks"] = M; R["marks_failed"] = failed; R["verdict"] = "PASS" if not failed else "FAIL"
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (9): the verdict is STRUCTURAL — `failed` = every
+    # GRADED mark whose pass is not True (a hand-kept list of names had left READ/WEB/STAGE out of it and put a «not gradable» MODULATION in
+    # it); the not-gradable marks are their own list with their reasons; a mark missing `graded` is named, and judged by its pass.
+    failed, not_gradable, missing = partition_marks(M, R["ALIVE"])
+    R["marks"] = M; R["marks_failed"] = failed; R["marks_not_gradable"] = not_gradable; R["marks_missing_graded"] = missing
+    R["verdict"] = "PASS" if not failed else "FAIL"
     R["seconds_total"] = round(time.perf_counter() - T0, 1)
     (out / "results.json").write_text(json.dumps(R, indent=1, default=str))
     write_verdict(out, R)
-    print(f"VERDICT {R['verdict']} — failed: {failed or 'none'} — {out} ({R['seconds_total']} s)", flush=True)
+    print(f"VERDICT {R['verdict']} — failed: {failed or 'none'} — not gradable: {[k for k, _r in not_gradable] or 'none'} — {out} ({R['seconds_total']} s)", flush=True)
     return 0
 
 
@@ -1084,7 +1190,7 @@ def w3_2_reason(eligible_n: int, reached_n: int, wrong: list) -> str:
     return (" FAIL on the " + "; ".join(fails)) if fails else ""
 
 
-def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns) -> dict:
+def _viii_g4_7(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns) -> dict:
     """(viii) COST, G4-7, in ONE unit (#162 — found 2026-09-22 on the six 2 h smokes: STATUS.mind_ms_median_1min is the median of
     `mind.consume(row)` over EVERY tape row — ear, outcome, body rows included — while the probe is all rows' time ÷ CANVASES; 0.168 ms
     «vs» 13 ms passed in every life to date). The live number is STATUS.mind_ms_per_canvas_1min (creature/body.py writes it from
@@ -1104,6 +1210,119 @@ def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns) -> dict
     return m
 
 
+# edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (2): ALPHA4-PREREG §8b's COST bar, «stated as a FUNCTION,
+# not a number: 0.09 ms × cells per canvas; the mark reads the 24 h figure against 1.5× that function at the life's own final cell count
+# (the reader prints both). A fixed number would fail by construction on a growing mind.» The pre-flight's figure and the third hand's
+# four points (docs: the review §2 — the ms/cell BENDS: exponents 1.9 and 1.2 between points; the §8b addendum names the cause, the
+# quadratic state hash run twice a canvas), printed beside, never graded.
+PREFLIGHT_MS_PER_CELL = 0.09          # ALPHA4-PREREG §8b (pre-3/pre-4 at 1,579–2,058 cells)
+COST_FACTOR = 1.5                     # ALPHA4-PREREG §5 COST / §8b
+REVIEW_COST_POINTS = [                # ALPHA4-1-FIRST-HOURS-REVIEW §2, «It is not linear.» (ms per cell per canvas)
+    {"ms_per_cell": 0.075, "cells": 1579, "source": "alpha4-pre-4, 118 ms/canvas"},
+    {"ms_per_cell": 0.092, "cells": 2058, "source": "alpha4-pre-3 at 22 min, 190 ms/canvas"},
+    {"ms_per_cell": 0.143, "cells": 3334, "source": "alpha4-pre-3 at 39 min, 476 ms/canvas (a faster reader)"},
+    {"ms_per_cell": 0.155, "cells": 4900, "source": "alpha4-1 live, median of 55 STATUS samples 09:55–10:15 +04 (756 ms/canvas)"},
+]
+
+
+def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns, grow: bool = False,
+              per_cell_ms: float = PREFLIGHT_MS_PER_CELL, factor: float = COST_FACTOR, sleeps_in_window: Optional[int] = None) -> dict:
+    """(viii) COST. A life that declares GROW (ALPHA4: no cap, «the world decides the cell count») is graded against §8b's FUNCTION of its
+    own final cell count — STATUS `mind_ms_per_canvas_1min` ≤ factor × per_cell_ms × STATUS `cells` (alive sight + words,
+    Organism.total_cells) — with the per-cell figure, the cell count, the bar and the review's four points printed; the G4-7 reading is
+    printed beside as `g4_7`. Every other record reads G4-7 exactly as before (its `graded`/`pass` ARE g4_7's — the seven closed records'
+    control). Two honesty prints, never gates: the figure is ONE 1-min window (STATUS's last write — no per-canvas series exists on any
+    record), and `sleeps_in_window` counts the sleep rows whose triggering canvas fell in the 3 min before that write (a sleep minute
+    reads ≈ 2.2×, the review §2)."""
+    g47 = _viii_g4_7(status, solo_ms, unblinded_ms, cpu_ns)
+    if not grow:
+        return {**g47, "form": "G4-7", "g4_7": dict(g47)}
+    per_canvas = status.get("mind_ms_per_canvas_1min"); cells = status.get("cells")
+    m = {"form": "§8b", "graded": False, "pass": None, "live_ms_per_canvas": per_canvas, "cells_alive": cells,
+         "per_cell_ms": (round(per_canvas / cells, 4) if (per_canvas is not None and cells) else None),
+         "preflight_ms_per_cell": per_cell_ms, "factor": factor, "bar_per_cell_ms": round(factor * per_cell_ms, 4),
+         "bar_ms": (round(factor * per_cell_ms * cells, 3) if cells else None),
+         "review_points": REVIEW_COST_POINTS, "rss_mb_last_status": status.get("rss_mb"),
+         "rss_note": "STATUS rss_mb is ru_maxrss — the process's PEAK, not its current size",
+         "live_mind_ms_median_per_row": status.get("mind_ms_median_1min"), "cpu_hours": g47.get("cpu_hours"),
+         "reading_window": "ONE 1-min window: STATUS's last write (heartbeat %s) — no per-canvas series exists on any record" % status.get("heartbeat_at"),
+         "sleeps_in_window": sleeps_in_window, "g4_7": g47,
+         "bar": f"ALPHA4-PREREG §8b: live ms per CANVAS (STATUS.mind_ms_per_canvas_1min) ≤ {factor} × {per_cell_ms} ms × the life's own final alive cells (STATUS cells); G4-7 printed beside, not graded",
+         "reason": ""}
+    if per_canvas is None:
+        m["reason"] = "not graded: STATUS carries no mind_ms_per_canvas_1min (the per-canvas unit, #162)"
+        return m
+    if not cells:
+        m["reason"] = "not graded: STATUS carries no alive cell count (`cells`) — the §8b bar is a function of it"
+        return m
+    m["graded"] = True
+    m["pass"] = bool(per_canvas <= factor * per_cell_ms * cells)
+    return m
+
+
+def retention_mark(pairs: List[dict]) -> dict:
+    """(v) §15's pair: the last exam of each odd window vs the last of the even window before it, ≤ 5 pp. edit: Claude (Opus 5.5,
+    reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (9): with no such pair on the record the mark is NOT GRADABLE (it said
+    «not readable» and was counted FAILED)."""
+    out = {"graded": bool(pairs), "pass": (all(p["drop_pp"] <= 5.0 for p in pairs) if pairs else None), "pairs": pairs,
+           "bar": "≤ 5 pp on the last-of-window pair (§15)", "note": "no odd window with exams on both sides → not readable" if not pairs else ""}
+    if not pairs:
+        out["reason"] = "not gradable: no odd window with exams on both sides (the maker's second window has not closed on this record)"
+    return out
+
+
+def vi_mark(plant: dict, null: dict, q5_abstain: float, false_abstention: float, plant_shown: Optional[int] = None) -> dict:
+    """(vi) knows the unknown: plant majority answered · null majority abstains · Q5 ≥ .80 · false ≤ .20. edit: Claude (Opus 5.5,
+    reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (10), the same fact as GRADE's and SIZING's plant clauses: «plant
+    majority answered» is NOT GRADABLE while the plant was never shown (printed); the other three clauses carry the mark."""
+    from tools.verdict_life import plant_clause
+    pc = plant_clause(plant["answered_rate"] > .5, plant_shown, "plant majority answered")
+    ok_rest = null["abstain_rate"] > .5 and q5_abstain >= .80 and false_abstention <= .20
+    return {"graded": True, "pass": bool(ok_rest and (pc["pass"] if pc["graded"] else True)), "plant_clause": pc, "plant_shown": plant_shown,
+            "plant_zog": plant, "null_vex": null, "Q5_spiral_abstain": q5_abstain, "false_abstention": false_abstention,
+            "bar": "plant majority answered (not gradable while the plant was never shown) · null majority abstains · Q5 ≥ .80 · false ≤ .20"}
+
+
+# READER-FIX-0923 (9): the order the failed list was always printed in (the old hand-kept `graded` list), then every other mark in M's own order.
+_LEGACY_MARK_ORDER = ["i_knows", "ii_meeting_real", "iii_growth_matters", "iv_grows_alone", "v_retention", "vi_knows_unknown", "vii_replay",
+                      "x_gaze_finds_thing", "xi_gaze_earns_place", "MODULATION", "ix_not_luck", "viii_cost", "W3_2_rules", "W3_1_beliefs",
+                      "DOOR", "PARK", "ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS",
+                      "THREAD", "EVOLVE"]
+_MARK_CONTAINERS = ("PLANTS", "TWINS", "BANDS")
+_TWIN_MARK_ALIAS = {"random_gaze_loses_xi": "TWINS.random_gaze"}     # the name the failed list has always used
+
+
+def partition_marks(M: Dict[str, dict], alive: dict) -> Tuple[List[str], List[List[str]], List[str]]:
+    """edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (9): PURE. Returns (failed, not_gradable,
+    missing_graded). Every dict in M except the containers (PLANTS/TWINS/BANDS) is a mark, and so is every TWINS entry carrying `pass` or
+    `graded`; ALIVE is always graded. failed = graded marks whose pass is not True; not_gradable = [name, reason] of marks with graded
+    False — never in failed; a mark without `graded` is named in missing_graded and judged by its pass (a failure is never hidden)."""
+    names = [k for k in _LEGACY_MARK_ORDER if k in M] + [k for k in M if k not in _LEGACY_MARK_ORDER]
+    failed: List[str] = []; not_gradable: List[List[str]] = []; missing: List[str] = []
+    def _one(name: str, m: dict) -> None:
+        if "graded" not in m:
+            missing.append(name)
+            if not m.get("pass"):
+                failed.append(name)
+        elif m["graded"]:
+            if not m.get("pass"):                     # truthiness, as the old list read it (a numpy bool is a pass too)
+                failed.append(name)
+        else:
+            not_gradable.append([name, str(m.get("reason") or "")])
+    for k in names:
+        if k in _MARK_CONTAINERS or not isinstance(M[k], dict):
+            continue
+        _one(k, M[k])
+    if not (alive or {}).get("pass"):
+        failed.append("ALIVE")
+    tw = M.get("TWINS") or {}
+    for k in sorted(tw, key=lambda x: (x not in _TWIN_MARK_ALIAS, x)):
+        m = tw[k]
+        if isinstance(m, dict) and ("pass" in m or "graded" in m):
+            _one(_TWIN_MARK_ALIAS.get(k, f"TWINS.{k}"), m)
+    return failed, not_gradable, missing
+
+
 def write_verdict(out: Path, R: dict) -> None:
     M = R["marks"]; A = R["ALIVE"]
     def pf(x): return "PASS" if x else "FAIL"
@@ -1113,54 +1332,89 @@ def write_verdict(out: Path, R: dict) -> None:
          f"| ALIVE | {A['bar_hours']} h under the unit, NRestarts 0, every counter moved every hour, no sense dead > 60 s | {A['hours_on_tape']} h on tape · moved every hour {A['every_counter_moved_every_hour']} · max gap eye/ear {A['max_gap_s_eye_ear']} s · sense restarts {A['sense_restarts']} · crashes {A['crashes']} · NRestarts {A['nrestarts']} | {pf(A['pass'])} |",
          # edit: Claude (Fable 5.1), 2026-09-22 11:0x +0400 — compare() returns None when EVERY row matches; the old rendering printed "vs live None", which reads as unmeasured (the advisor's read, 2026-09-22 10:5x)
          f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {'identical' if M['vii_replay']['vs_live'] is None else 'DIVERGED at ' + str(M['vii_replay']['vs_live'])} · two replays {'identical' if M['vii_replay']['two_replays'] is None else 'DIVERGED at ' + str(M['vii_replay']['two_replays'])} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']}{(' · masked ' + ','.join(M['vii_replay']['hash_masked']) + ' (reader ' + str(R.get('reader_commit'))[:7] + ' ≠ life ' + str(R.get('life_commit'))[:7] + ')') if M['vii_replay'].get('hash_masked') else ''} | {pf(M['vii_replay']['pass'])} |"]
-    i = M["i_knows"]; L.append(f"| (i) | {i['bar']} | Q1 {i['Q1']:.3f} Q2 {i['Q2']:.3f} Q3 {i['Q3']:.3f} Q4 {i['Q4']:.3f} (chance {i['chance_Q1']}; all words Q1 {i['all_words']['Q1']:.3f}) | {pf(i['pass'])} |")
-    m = M["ii_meeting_real"]; L.append(f"| (ii) | {m['bar']} (all 16 words) | T-shuffle Q1 {m['T_shuffle_Q1']} · T-nowire Q1 {m['T_nowire_Q1']} | {pf(m['pass'])} |")
-    m = M["iii_growth_matters"]; L.append(f"| (iii) | {m['bar']} | T-frozen-10 Q1 {m['T_frozen_10_Q1']} (cells {m['T_frozen_10_cells']}) vs Q1 {m['Q1']:.3f}; the 50-cell twin {m['T_frozen_50_Q1']} | {pf(m['pass'])} |")
-    m = M["iv_grows_alone"]; L.append(f"| (iv) | {m['bar']} | born {m['cells_born']} · refused at caps {m['refused']['caps_total']} (budget {m['refused']['budget']} · nmax {m['refused']['nmax']} · frozen {m['refused']['frozen']}; redundant {m['refused']['redundant']}, not a refusal) (arrivals {m['arrivals']}, budget left {m['budget_left']}) · pruned {m['edges_pruned']}/{m['edges_born']} = {100*m['pruned_share']:.1f} % (cross-thing born {m['edges_cross']['born']} / pruned {m['edges_cross']['pruned']}) · disuse {m['removed_for_disuse']} | {pf(m['pass'])} |")
-    m = M["v_retention"]; L.append(f"| (v) | {m['bar']} | " + ("; ".join(f"w{p['window']}: {p['before']:.3f} → first {p['first_after']:.3f} → last {p['last_in_window']:.3f} ({p['drop_pp']:+.1f} pp drop)" for p in m['pairs']) or m['note']) + f" | {pf(m['pass'])} |")
-    m = M["vi_knows_unknown"]; L.append(f"| (vi) | {m['bar']} | plant zog answered {m['plant_zog']['answered_rate']:.2f} (as {m['plant_zog']['answered_as']}, abstain {m['plant_zog']['abstain']}) · null vex abstains {m['null_vex']['abstain_rate']:.2f} (answered as {m['null_vex']['answered_as']}) · Q5 {m['Q5_spiral_abstain']:.2f} · false {m['false_abstention']:.3f} | {pf(m['pass'])} |")
-    m = M["viii_cost"]; L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo {m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
+    # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (9): every mark row renders through gv() — a not-gradable
+    # mark reads «not graded» with its reason, never FAIL; (2)/(3)/(4)/(5)/(7)/(10)/(11) print their new readings; READ, EVOLVE, WEB, STAGE get rows.
+    def _why(m): return (" — " + str(m.get("reason"))) if (not m.get("graded") and m.get("reason")) else ""
+    i = M["i_knows"]; L.append(f"| (i) | {i['bar']} | Q1 {i['Q1']:.3f} Q2 {i['Q2']:.3f} Q3 {i['Q3']:.3f} Q4 {i['Q4']:.3f} (chance {i['chance_Q1']}; all words Q1 {i['all_words']['Q1']:.3f}) | {gv(i)} |")
+    m = M["ii_meeting_real"]; L.append(f"| (ii) | {m['bar']} (all 16 words) | T-shuffle Q1 {m['T_shuffle_Q1']} · T-nowire Q1 {m['T_nowire_Q1']}{_why(m)} | {gv(m)} |")
+    m = M["iii_growth_matters"]; L.append(f"| (iii) | {m['bar']} | T-frozen-10 Q1 {m['T_frozen_10_Q1']} (cells {m['T_frozen_10_cells']}) vs Q1 {m['Q1']:.3f}; the 50-cell twin {m['T_frozen_50_Q1']}{_why(m)} | {gv(m)} |")
+    m = M["iv_grows_alone"]; L.append(f"| (iv) | {m['bar']} | born {m['cells_born']} · refused at caps {m['refused']['caps_total']} (budget {m['refused']['budget']} · nmax {m['refused']['nmax']} · frozen {m['refused']['frozen']}; redundant {m['refused']['redundant']}, not a refusal) (arrivals {m['arrivals']}, budget left {m['budget_left']}) · pruned {m['edges_pruned']}/{m['edges_born']} = {100*m['pruned_share']:.1f} % (cross-thing born {m['edges_cross']['born']} / pruned {m['edges_cross']['pruned']}) · disuse {m['removed_for_disuse']} | {gv(m)} |")
+    m = M["v_retention"]; L.append(f"| (v) | {m['bar']} | " + ("; ".join(f"w{p['window']}: {p['before']:.3f} → first {p['first_after']:.3f} → last {p['last_in_window']:.3f} ({p['drop_pp']:+.1f} pp drop)" for p in m['pairs']) or m['note']) + f"{_why(m)} | {gv(m)} |")
+    m = M["vi_knows_unknown"]; _pc = m.get("plant_clause") or {}
+    L.append(f"| (vi) | {m['bar']} | plant zog answered {m['plant_zog']['answered_rate']:.2f} (as {m['plant_zog']['answered_as']}, abstain {m['plant_zog']['abstain']}; plant shown {m.get('plant_shown')} — plant clause {'graded' if _pc.get('graded', True) else 'NOT GRADABLE'}) · null vex abstains {m['null_vex']['abstain_rate']:.2f} (answered as {m['null_vex']['answered_as']}) · Q5 {m['Q5_spiral_abstain']:.2f} · false {m['false_abstention']:.3f} | {gv(m)} |")
+    m = M["viii_cost"]
+    if m.get("form") == "§8b":
+        _pts = " · ".join(f"{p['ms_per_cell']} at {p['cells']:,}" for p in m.get("review_points") or [])
+        _g = m.get("g4_7") or {}
+        L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas at {m['cells_alive']} alive cells = {m['per_cell_ms']} ms/cell vs the bar {m['bar_per_cell_ms']} ms/cell ({m['bar_ms']} ms) · the review's points (ms/cell at cells): {_pts} · {m['reading_window']}; sleeps in its last 3 min {m.get('sleeps_in_window')} · RSS {m['rss_mb_last_status']} MB (a peak) · CPU {m['cpu_hours']} h · G4-7 beside (not graded): {gv(_g)} vs solo {_g.get('solo_ms_per_canvas_replay')} ms{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
+    else:
+        L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo {m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
     if "ix_not_luck" in M:
-        m = M["ix_not_luck"]; L.append(f"| (ix) | {m['bar']} | rank {m['rank_of_own']} of {m['of']} (own {m['own_composite']}; best random {m['best_random']}) | {pf(m['pass'])} |")
-    m = M["x_gaze_finds_thing"]; L.append(f"| (x) | {m['bar']} | gaze {m['gaze_rate']:.3f} vs random {m['random_rate']:.3f} (×{m['ratio']}) | {pf(m['pass'])} |")
-    m = M["xi_gaze_earns_place"]; L.append(f"| (xi) | {m['bar']} | Q1 gaze {m['Q1_gaze']:.3f} − one-glance {m['Q1_one_glance']} (first-fixation-only {m['Q1_first_fixation_only']}; random-gaze {m['Q1_random_gaze']}) | {pf(m['pass'])} |")
+        m = M["ix_not_luck"]; L.append(f"| (ix) | {m['bar']} | rank {m['rank_of_own']} of {m['of']} (own {m['own_composite']}; best random {m['best_random']}){_why(m)} | {gv(m)} |")
+    m = M["x_gaze_finds_thing"]; L.append(f"| (x) | {m['bar']} | gaze {m['gaze_rate']:.3f} vs random {m['random_rate']:.3f} (×{m['ratio']}) | {gv(m)} |")
+    m = M["xi_gaze_earns_place"]; L.append(f"| (xi) | {m['bar']} | Q1 gaze {m['Q1_gaze']:.3f} − one-glance {m['Q1_one_glance']} (first-fixation-only {m['Q1_first_fixation_only']}; random-gaze {m['Q1_random_gaze']}){_why(m)} | {gv(m)} |")
     m = M["MODULATION"]; reg = m.get("regime", {}) or {}; nb = m.get("null_fake_boundary_w0", {}) or {}
     L.append(f"| MODULATION | {m['bar']} | windows(regime) {m.get('graded_windows_regime')} · windows(fixed) {m['graded_windows']} · null(regime) {nb.get('no_spike_regime')} · null(fixed) {nb.get('no_spike')} "
              f"· regime band {reg.get('null_band_95')} (n={reg.get('null_ratio_samples')}, share {reg.get('null_share_within_band')}) · regime settle bar {reg.get('settle_bar_err_95')} "
              f"· not gradable (§18 add. 4: no new thing reached 10 showings) {m.get('not_gradable_windows')} "
-             f"· no-predict twin max err {m['no_predict_twin_err']} · fixed-bar record {pf(m.get('pass_fixed_bars_record'))} · {m.get('reason','')} | {pf(m['pass'])} |")
-    L.append(f"| TWINS random-gaze | loses (xi) | margin {M['TWINS']['random_gaze_loses_xi']['margin']} | {pf(M['TWINS']['random_gaze_loses_xi']['pass'])} |")
+             f"· no-predict twin max err {m['no_predict_twin_err']} · fixed-bar record {pf(m.get('pass_fixed_bars_record'))} · {m.get('reason','')} | {gv(m)} |")
+    m = M["TWINS"]["random_gaze_loses_xi"]; L.append(f"| TWINS random-gaze | loses (xi) | margin {m['margin']}{_why(m)} | {gv(m)} |")
     def gv(m): return ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"
     m = M["W3_2_rules"]; L.append(f"| W3-2 rules | {m['bar']} | filed {m['live']['filed']} (induce {m['live']['induce']}, deduce {m['live']['deduce']}, refused {m['live']['refused']}) · scored {m['live']['scored']} · accuracy {m['live']['accuracy']} · words {m['live']['words']} · T-shuffle scored {m['T_shuffle']['scored']} acc {m['T_shuffle']['accuracy']} · parked rules {m['parked_rules']} · clusters: rules reached {m['cluster_control'].get('words_with_rules')} of {m['cluster_control'].get('eligible_words')} eligible words (of {m['cluster_control'].get('words')}), wrong-cell rules {m['cluster_control'].get('wrong_cell_rules')} {m['reason']} | {gv(m)} |")
     m = M["DOOR"]; L.append(f"| DOOR | {m['bar']} | pictures {m['pictures']} (rows {m['folder_rows']}) · words {len(m['folder_words'])} · sight-only {m['sight_only_rows']} (first seq {m['sight_only_first_seq']}) · recognition {m['recognition_of_seen_pictures']} {m['reason']} | {gv(m)} |")
     m = M["W3_1_beliefs"]; L.append(f"| W3-1 beliefs | {m['bar']} | rows {m['rows']} · kinds {m['kinds']} · standing words {m['standing_words']} of {m['words_heard']} heard · max belief rows per word {m['max_belief_rows_per_word']} · extra belief rows {m['extra_belief_rows']} vs clash rows {m['clash_rows']} · unaccounted {m['unaccounted']} | {gv(m)} |")
     m = M["PARK"]; L.append(f"| PARK | {m['bar']} | parked {m['parked']} of {m['thinks']} thinks (rules {m['parked_rules']}) — {m['reason']} | {gv(m)} |")
     # edit: Claude (Fable 5.1), 2026-09-22 19:3x +0400 — THE ONE LIFE's marks (PREREG §19)
-    for _k in ("ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD"):
+    for _k in ("ACT", "SOUND", "SIZING", "GRADE", "SELF", "SURPRISE", "COARSE", "QUESTION", "SENTENCE", "HANDS", "THREAD", "READ", "EVOLVE", "WEB", "STAGE"):
         if _k in M:
             m = M[_k]
             if _k == "THREAD":
-                body = f"max sense gap {m.get('max_gap_s')} s (per hour {m.get('gaps_per_hour')}) · thinks {m.get('thinks')} waits {m.get('think_waits')} (share {m.get('waits_share')}, {m.get('think_wait_ms')} ms) · think ms last {m.get('think_ms_last')} median {m.get('think_ms_median')} — {m['reason']}"
+                body = (f"max sense gap {m.get('max_gap_s')} s (eye/ear {m.get('gaps_per_hour')}) · in the minute after a sleep: max {m.get('max_gap_in_sleep_minutes_s')} s, "
+                        f"{m.get('over_bar_in_sleep_minutes')} over the bar · outside those minutes: max {m.get('max_gap_outside_sleep_minutes_s')} s, {m.get('over_bar_outside_sleep_minutes')} over the bar "
+                        f"({m.get('sleeps_on_record')} sleeps) · thinks {m.get('thinks')} waits {m.get('think_waits')} (share {m.get('waits_share')}, {m.get('think_wait_ms')} ms) · think ms last {m.get('think_ms_last')} median {m.get('think_ms_median')} — {m['reason']}")
             elif _k == "HANDS":
                 body = f"runs {m.get('runs')} (by program {m.get('runs_by_program')}; no road {m.get('hands_no_road')}) · asked {m.get('asked')} recognised {m.get('recognised_share')} vs shuffled shelf {m.get('shuffled_share')} · touch {m.get('touch_events')} smell {m.get('smell_events')} — {m['reason']}"
             elif _k == "QUESTION":
-                body = f"questions {m.get('questions')} (forms {m.get('forms')}; needed {m.get('needed')}) · answered by the world {m.get('answered_rows')} (share {m.get('answered_share')}) · STATUS written {m.get('status_written')} answered {m.get('status_answered')} — {m['reason']}"
+                body = (f"questions {m.get('questions')} (forms {m.get('forms')}; needed {m.get('needed')}) · ANSWERED {m.get('answered')} (share {m.get('answered_share')}): by the maker {m.get('answered_by_maker')}, "
+                        f"by the lexicon {m.get('answered_by_lexicon')}, both {m.get('answered_by_both')} · unanswered {m.get('unanswered')} (about the hands' own pictures, no door answers: {m.get('unanswered_hands_pictures')}; "
+                        f"others by form {m.get('unanswered_other_by_form')}) · rows stamped `answering` {m.get('answered_rows')} (ear+eye) · STATUS written {m.get('status_written')} answered {m.get('status_answered')} — {m['reason']}")
             elif _k == "SENTENCE":
-                body = f"missions {m.get('missions')} · the world's max pair lift {m.get('max_lift')} on «{m.get('max_pair')}» · frames filed {m.get('frames_filed')} scored {m.get('frames_scored')} true {m.get('frames_true')} (precision {m.get('precision')}) · said {m.get('said')} heard yes {m.get('heard_yes')} no {m.get('heard_no')} — {m['reason']}"
+                body = (f"missions {m.get('missions')} (one per game episode; {m.get('missions_per_frame')} per frame, lift {m.get('max_lift_per_frame')}) · the world's max pair lift {m.get('max_lift')} on «{m.get('max_pair')}» · "
+                        f"frames filed {m.get('frames_filed')} scored {m.get('frames_scored')} true {m.get('frames_true')} (precision {m.get('precision')}) · said {m.get('said')} heard yes {m.get('heard_yes')} no {m.get('heard_no')} — {m['reason']}")
+            elif _k == "READ":
+                _s = m.get("reading_sample") or {}; _b = m.get("blind_twin") or {}; _rd = m.get("reading") or {}
+                body = (f"words born from shelf {m.get('words_born_from_shelf')} · frames {(m.get('frames') or {}).get('filed')} (precision vs shuffled {(m.get('frames') or {}).get('precision')}) · "
+                        f"reading {_rd.get('share')} on {_rd.get('n')} words — the sample: seed {_s.get('seed')}, {len(_s.get('words') or [])} of {_s.get('eligible')} eligible "
+                        f"(heard {_s.get('population_heard')}; excluded: heard elsewhere too {len(_s.get('excluded_other_source') or [])}, not on the cut tape {_s.get('excluded_not_on_cut_tape')}) · "
+                        f"blind twin {'share ' + str(_b.get('share')) + ' in ' + str(_b.get('seconds')) + ' s' if _b.get('share') is not None else _b.get('reason')} — {m['reason']}")
+            elif _k == "EVOLVE":
+                body = (f"judged rounds {m.get('judged_rounds')} (needed {m.get('needed')}; every {m.get('every_h')} h → {m.get('rounds_possible')} possible) · void rounds {m.get('void_rounds')} {m.get('void_round_reasons')} · "
+                        f"paired {m.get('paired_readings')} · adoptions {m.get('adoptions')} {m.get('epoch_events')} · max shadow lag {m.get('max_shadow_lag_rows')} rows — {m['reason']}")
+            elif _k == "WEB":
+                body = f"web rows {m.get('web_rows')} · made {m.get('made')} · refused rate {m.get('refused_rate')} hold {m.get('refused_hold')} · untraceable {m.get('untraceable')} · stage 4 reached {m.get('stage4_reached')} — {m['reason']}"
+            elif _k == "STAGE":
+                _ser = " ".join(("".join(k if x.get(k) is True else "·" for k in "abcde")) for x in (m.get("readiness_series") or []))
+                body = (f"stage-4 events {m.get('stage_events')} {m.get('series')} · READINESS at {m.get('readiness_boundaries')} SIT boundaries: held a {(m.get('held') or {}).get('a')} · b {(m.get('held') or {}).get('b')} · "
+                        f"c {(m.get('held') or {}).get('c')} · d {(m.get('held') or {}).get('d')} · e {(m.get('held') or {}).get('e')}; all five {m.get('all_five_held')} (longest run {m.get('longest_all_five_streak')}, 2 open the door) · "
+                        f"per boundary [{_ser}] · {m.get('readiness_note')} — {m['reason']}")
             elif _k == "SURPRISE":
                 body = (f"overall confirmed share {m.get('overall_share')} over {m.get('canvases')} canvases · maker things rising {m.get('things_rising')} of {m.get('things_graded')} (null mean {m.get('null_mean')} p95 {m.get('null_p95')}) · first 500 {m.get('first_500')} → last 500 {m.get('last_500')} (rise {m.get('rise_first_to_last_500')}) · by source {m.get('by_source')} · printed not graded {len(m.get('printed_not_graded') or {})} things · blind-surprise twin confirmed {m.get('twin_confirmed')} · STATUS confirmed {m.get('status_confirmed')} surprised {m.get('status_surprised')} — {m['reason']}")
             elif _k == "COARSE":
                 body = f"Q1 all words {m.get('q1_live')} vs blind-coarse {m.get('q1_blind_coarse')} · house {m.get('house_live')} vs {m.get('house_blind_coarse')} (prediction held {m.get('house_prediction_held')}) · cup {m.get('cup_live')} vs {m.get('cup_blind_coarse')} — {m['reason']}"
             elif _k == "GRADE":
-                body = f"null graded {m['null_graded']} · plant answered {m.get('plant_answered_rate')} graded {m['plant_graded']} · hedge rate on seen words {m['hedge_rate']} — {m['reason']}"
+                _pc = m.get("plant_clause") or {}
+                body = f"null graded {m['null_graded']} · plant answered {m.get('plant_answered_rate')} graded {m['plant_graded']} (plant shown {m.get('plant_shown')}; plant clause {'graded' if _pc.get('graded', True) else 'NOT GRADABLE'}) · hedge rate on seen words {m['hedge_rate']} — {m['reason']}"
             elif _k == "SELF":
                 body = f"self beliefs {m['self_beliefs']} (citing two body rows {m['self_beliefs_citing_two_body_rows']}; words {m['self_words']}) · self thinks {m['self_thinks']} · body rows {m['body_rows']} · skipped for backlog {m['think_skipped_for_backlog']} — {m['reason']}"
             elif _k == "ACT":
-                body = f"mind-chosen {m['mind_chosen']} of {m['game_outcomes']} (share {m['mind_share']}) · mismatches journal {m['mismatches_journal']} status {m['mismatches_status']} · census {m['census']} max {m['max_share']} zero {m['zero_acts']} · shuffled twin diverged {m.get('shuffled_twin_diverged')} · reward mean {m['reward_mean']} success/episode {m['success_per_episode']} (random null {m['random_null_success']}) — {m['reason']}"
+                body = (f"mind-chosen {m['mind_chosen']} of {m['game_outcomes']} (share {m['mind_share']}) · mismatches journal {m['mismatches_journal']} status {m['mismatches_status']} · "
+                        f"the GAME's census {m['census']} max {m['max_share']} zero {m['zero_acts']} · the last {m.get('last_n')} game acts {m.get('census_last100')} max {m.get('max_share_last100')} (the ≥ 95 % clause) · "
+                        f"STATUS acts_chosen (with the mouth's say, printed only) {m.get('census_all')} · shuffled twin diverged {m.get('shuffled_twin_diverged')} · reward mean {m['reward_mean']} success/episode {m['success_per_episode']} (random null {m['random_null_success']}) — {m['reason']}")
             elif _k == "SOUND":
                 body = f"ear-sound rows {m['ear_sound_rows']} · consumed {m['consumed']} · errors {m['errors']} · STATUS sound_events {m['status_sound_events']} — {m['reason']}"
             else:
-                body = f"born {m['sight_born']} of {m['sight_nmax']} · prediction {m['prediction']} · refused at NMAX {m['births_refused_nmax']} · series/h {m['series_sight_births_per_hour']} · plant shown {m['plant_shown_moments']} birthed {m['plant_sight_births']} — {m['reason']}"
+                _pc = m.get("plant_clause") or {}
+                body = f"born {m['sight_born']} of {m['sight_nmax']} · prediction {m['prediction']} · refused at NMAX {m['births_refused_nmax']} · series/h {m['series_sight_births_per_hour']} · plant shown {m['plant_shown_moments']} birthed {m['plant_sight_births']} (plant clause {'graded' if _pc.get('graded', True) else 'NOT GRADABLE'}) — {m['reason']}"
             L.append(f"| {_k} | {m['bar']} | {body} | {gv(m)} |")
     L.append(f"| TWINS no-sleep / no-curiosity / no-park | (v) / door / PARK | {M['TWINS']['no_sleep_v']} · {M['TWINS']['no_curiosity']['reason']} · {M['TWINS']['no_park']['reason']} | not graded |")
     # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:50 +0400 — A4-LADDER-PREREG §3.4: the LANG rung's L1-L9, one row each.
@@ -1177,11 +1431,17 @@ def write_verdict(out: Path, R: dict) -> None:
             L.append(f"| CHAT {_ck} | {m.get('bar', '')} | {json.dumps(nums, default=str)[:600]} {json.dumps(extra, default=str)[:400] if extra else ''} — {m.get('reason')} | {gv(m)} |")
         if isinstance(C.get("disjoint"), dict):
             L.append(f"| CHAT pictures disjoint | §3.3: seed-3 renders never a tape canvas (+ planted control) | {json.dumps(C['disjoint'])} | reported |")
+    L += ["", f"**failed ({len(R['marks_failed'])}):** {', '.join(R['marks_failed']) or 'none'}", "",
+          f"**not gradable ({len(R.get('marks_not_gradable') or [])}) — never in the failed list (READER-FIX-0923 (9)):** "
+          + ("; ".join(f"{k} ({r})" for k, r in (R.get("marks_not_gradable") or [])) or "none")]
+    if R.get("marks_missing_graded"):
+        L += ["", f"**marks carrying no `graded` (judged by their pass):** {R['marks_missing_graded']}"]
     L += ["", "## Twins (each a replay of the same tape blind to one gene; Q1 on all 16 words, the seen-words Q1 beside it)", "", "| twin | Q1 (all) | Q1 (seen) | composite (all) | cells |", "|---|---|---|---|---|"]
     for b in BLINDS:
         t = M["TWINS"][b]; L.append(f"| {b} | {t['Q1']} | {t['Q1_seen']} | {t['composite']} | {t['cells']} |")
     L += ["", "## Plants", "", json.dumps(M["PLANTS"], indent=1, default=str), "", "## BANDS (reported, never gating)", "", json.dumps(M["BANDS"], indent=1, default=str)[:3000],
-          "", "## ALIVE per hour", "", json.dumps(A["per_hour"]), "", f"failed: {R['marks_failed'] or 'none'} · {R['seconds_total']} s"]
+          "", "## ALIVE per hour", "", json.dumps(A["per_hour"]), "",
+          f"failed: {R['marks_failed'] or 'none'} · not gradable: {[k for k, _r in (R.get('marks_not_gradable') or [])] or 'none'} · {R['seconds_total']} s"]
     (out / "VERDICT.md").write_text("\n".join(L) + "\n")
 
 

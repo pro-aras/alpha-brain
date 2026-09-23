@@ -1,0 +1,15 @@
+..........F.
+======================================================================
+FAIL: test_the_real_deployed_line_in_alpha4_genome_parses_identically (tests.genome.test_read_lexicon_parser.TestSenseReadParses.test_the_real_deployed_line_in_alpha4_genome_parses_identically)
+A pin against the ACTUAL bytes of genome/ALPHA4.genome:95 (the trailing comment stripped exactly
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader-fix/scratch/master-a17cb0e/tests/genome/test_read_lexicon_parser.py", line 46, in test_the_real_deployed_line_in_alpha4_genome_parses_identically
+    self.assertEqual(g.declared["SENSE_READ"]["every_s"], 5)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 20 != 5
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.012s
+
+FAILED (failures=1)

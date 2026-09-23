@@ -1,0 +1,108 @@
+....{"moments": 2040, "cells": [380, 16], "words_seen": ["ahmad", "anchor", "ant", "arrow", "ball", "bar", "box", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.062, "disjoint_checked": 57, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 3.0}
+Q1: {"acc": 0.9090909090909091, "n": 33, "correct": 30, "abstain": {"novel": 0, "noedge": 0, "ratio": 1, "close": 0}, "false_abstention": 0.030303030303030304, "per_thing": {"circle": 0.3333333333333333, "square": 0.6666666666666666, "triangle": 1.0, "cross": 1.0, "ring": 1.0, "bar": 1.0, "dot": 1.0, "s
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/tmpzi1cnryc/life/exam/2026-09-23T075356Z.json
+........................{"moments": 45, "cells": [7, 4], "words_seen": ["circle", "diamond", "square", "triangle"], "chance_q1": 0.25, "disjoint_checked": 38, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.3}
+Q1: {"acc": 0.0, "n": 8, "correct": 0, "abstain": {"novel": 1, "noedge": 7, "ratio": 0, "close": 0}, "false_abstention": 1.0, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "diamond": 0.0}, "answers_from_multi_word_cells": 0, "hedge_rate": null}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/tmpd5nhc5uk/exam/2026-09-23T075415Z.json
+............................................................................{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arrow": 0.8, "wave"
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/tmpm74cm3qm/exam/2026-09-23T075539Z.json
+.{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arrow": 0.8, "wave"
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/tmpvyuhvobb/exam/2026-09-23T075541Z.json
+.{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arrow": 0.8, "wave"
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/tmpprtmx58o/exam/2026-09-23T075543Z.json
+.{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 190, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.1}
+Q1: {"acc": 0.9, "n": 110, "correct": 99, "abstain": {"novel": 4, "noedge": 0, "ratio": 1, "close": 0}, "false_abstention": 0.045454545454545456, "per_thing": {"circle": 0.5, "square": 0.9, "triangle": 0.8, "cross": 1.0, "ring": 0.8, "bar": 1.0, "dot": 1.0, "star": 1.0, "arrow": 1.0, "wave": 1.0, "diamo
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/tmp6tgi40aw/exam/2026-09-23T075546Z.json
+..{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arrow": 0.8, "wave"
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/tmpn8gb_kze/exam/2026-09-23T075549Z.json
+.{"moments": 240, "cells": [44, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.6727272727272727, "n": 55, "correct": 37, "abstain": {"novel": 4, "noedge": 11, "ratio": 0, "close": 0}, "false_abstention": 0.2727272727272727, "per_thing": {"circle": 0.4, "square": 0.6, "triangle": 1.0, "cross": 0.4, "ring": 0.6, "bar": 0.0, "dot": 1.0, "star": 1.0, "arrow": 0.6, "wave"
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/tmp12b_03hm/exam/2026-09-23T075550Z.json
+.{"moments": 240, "cells": [9, 1], "words_seen": ["circle"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.09090909090909091, "n": 55, "correct": 5, "abstain": {"novel": 42, "noedge": 0, "ratio": 0, "close": 0}, "false_abstention": 0.7636363636363637, "per_thing": {"circle": 1.0, "square": 0.0, "triangle": 0.0, "cross": 0.0, "ring": 0.0, "bar": 0.0, "dot": 0.0, "star": 0.0, "arrow": 0.0, "wave"
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/tmpblrpo1sj/exam/2026-09-23T075551Z.json
+...........REPLAY identical: 67 mind rows
+DIVERGED at seq 121: hash
+G4-6 row counts by source: {'maker': 120, 'folder': 13}; caught divergence planted at seq 121
+..............................s.../usr/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.BufferedReader name=7>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.BufferedReader name=5>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...............................creature.body: mind crashed at seq 1: RuntimeError('planted')
+creature.body: mind crashed at seq 1: RuntimeError('planted')
+............................................touch toy (real jail): fast rate=0.425 B/ms  slow rate=0.002980 B/ms  ratio=142.8x
+.touch toy (real jail): run1 rate=0.475 B/ms  run2 rate=0.478 B/ms
+..................................................census (200 frames, flat residual): {'toggle': 36, 'right': 31, 'pickup': 23, 'left': 32, 'forward': 24, 'done': 28, 'drop': 26}
+......................................................................................................................................................DIVERGED at seq 202: births
+.REPLAY identical: 200 mind rows
+.REPLAY identical: 225 mind rows
+DIVERGED at seq 410: <row count: replay 1 vs --against 2>
+.....{"moments": 80, "cells": [15, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.1}
+Q1: {"acc": 0.0, "n": 50, "correct": 0, "abstain": {"novel": 1, "noedge": 49, "ratio": 0, "close": 0}, "false_abstention": 1.0, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "bar": 0.0, "diamond": 0.0}, "answers_from_multi_word_cells": 0, "hedge_rate": null}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075905Z.json
+{"moments": 160, "cells": [17, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.0, "n": 50, "correct": 0, "abstain": {"novel": 1, "noedge": 49, "ratio": 0, "close": 0}, "false_abstention": 1.0, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "bar": 0.0, "diamond": 0.0}, "answers_from_multi_word_cells": 0, "hedge_rate": null}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075907Z.json
+{"moments": 240, "cells": [20, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.76, "n": 50, "correct": 38, "abstain": {"novel": 0, "noedge": 1, "ratio": 0, "close": 0}, "false_abstention": 0.02, "per_thing": {"circle": 0.3, "square": 0.6, "triangle": 0.9, "bar": 1.0, "diamond": 1.0}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075909Z.json
+{"moments": 320, "cells": [28, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.74, "n": 50, "correct": 37, "abstain": {"novel": 0, "noedge": 0, "ratio": 6, "close": 0}, "false_abstention": 0.12, "per_thing": {"circle": 0.1, "square": 0.7, "triangle": 1.0, "bar": 1.0, "diamond": 0.9}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075910Z.json
+{"moments": 400, "cells": [33, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.78, "n": 50, "correct": 39, "abstain": {"novel": 0, "noedge": 0, "ratio": 5, "close": 0}, "false_abstention": 0.1, "per_thing": {"circle": 0.2, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.7}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075912Z.json
+{"moments": 480, "cells": [41, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.86, "n": 50, "correct": 43, "abstain": {"novel": 0, "noedge": 0, "ratio": 3, "close": 0}, "false_abstention": 0.06, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.9}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075914Z.json
+{"moments": 560, "cells": [44, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.92, "n": 50, "correct": 46, "abstain": {"novel": 0, "noedge": 0, "ratio": 1, "close": 0}, "false_abstention": 0.02, "per_thing": {"circle": 0.7, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.9}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075916Z.json
+{"moments": 640, "cells": [50, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.9, "n": 50, "correct": 45, "abstain": {"novel": 0, "noedge": 0, "ratio": 2, "close": 0}, "false_abstention": 0.04, "per_thing": {"circle": 0.8, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.7}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075918Z.json
+{"moments": 720, "cells": [52, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.92, "n": 50, "correct": 46, "abstain": {"novel": 0, "noedge": 0, "ratio": 2, "close": 0}, "false_abstention": 0.04, "per_thing": {"circle": 0.8, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.8}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075920Z.json
+{"moments": 800, "cells": [55, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.96, "n": 50, "correct": 48, "abstain": {"novel": 0, "noedge": 0, "ratio": 0, "close": 0}, "false_abstention": 0.0, "per_thing": {"circle": 1.0, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.8}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-reader-fix/scratch/tmp/creature-replay-ge8f4f4a/exam/2026-09-23T075922Z.json
+..REPLAY identical: 171 mind rows
+.....................................................[L-4 toy] corrupted-block: fix=[[12, 5], [12, 4], [11, 4], [11, 5]] truth-cell~(79,25) hit-glances=[0, 1, 2, 3] before=[0.0, 0.0007415330638167461, 9.296274514625225e-07, 0.06408742288282632]/[True, True, True, False] after=[0.08371954193109654, 0.09366498216724184, 0.10785331882211557, 0.09547115212064072]/[False, False, False, False]
+.[L-4 toy] repeated-canvas steady-state residual=[0.0, 0.005646129496512442, 0.15559076280298134, 0.08572088654651866] confirmed=[True, True, False, False]
+.[L-4 toy] confirmed rate: real=0.800 shuffled-expectation=0.469
+....[L-4/L-7 pin] life 3a real tape: 2576 mind rows, replay-deterministic, no residual/confirmed/coarse row anywhere (undeclared genes)
+..............................................................................................................................................[regime-step] life 2: step100 band 1.6644 (n 462) · step25 band 1.6628 (n 1873)
+....................................REPLAY identical: 31 mind rows
+.......REPLAY identical: 100 mind rows
+..................[wave3-rules] NULL: 0 rules ever scored under the word-shuffle -- the meeting itself is what the shuffle destroys (a finding, not a bug); nothing to grade against chance
+.[wave3-rules] NULL predictions_filed=0 predictions_scored=0
+.[wave3-rules] REAL predictions_filed=29 predictions_scored=28
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 33, 34, 45, 46, 50, 51]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"square" resonates cluster [0, 18, 57, 58, 70]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 41, 48, 55, 71]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"arrow" resonates cluster [7, 8, 47, 56]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"star" resonates cluster [19, 24, 68, 77]' n=4 correct=4 acc=1.000
+[wave3-rules] REAL rule accuracy: '"square" resonates cluster [0, 5, 18, 57, 58, 70, 100]' n=1 correct=0 acc=0.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 87, 88, 107, 108, 109, 110, 112, 116]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 27, 41, 48, 55, 71, 79, 84, 97]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64, 87, 88, 107, 108, 109, 110, 112, 116, 118]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 27, 41, 48, 55, 71, 79, 84, 97, 134]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 27, 41, 48, 55, 71, 79, 84, 97, 134, 145]' n=4 correct=3 acc=0.750
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64, 87, 88, 96, 107, 108, 110, 112, 118, 137, 138, 144, 157]' n=3 correct=3 acc=1.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64, 87, 88, 96, 107, 108, 110, 112, 118, 137, 138, 144, 157, 169]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"star" resonates cluster [19, 24, 68, 77, 167]' n=1 correct=1 acc=1.000
+.[wave3-rules] zog pending entries at canvas 600: 0
+[wave3-rules] zog: INDUCE never found a k=5-agreeing rule for it on this run (reported, not forced -- see the report for the per-seed reading)
+.............................................
+----------------------------------------------------------------------
+Ran 751 tests in 635.630s
+
+OK (skipped=1)
