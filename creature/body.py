@@ -413,6 +413,12 @@ class Body:
             "think_wait_ms": round(float(getattr(self.mind, "think_wait_ms", 0.0)), 3),
             "think_ms_last": (round(float(v), 3) if (v := getattr(self.mind, "think_ms_last", None)) is not None else None),
             "think_ms_median": (round(float(v), 3) if (v := self.mind.think_ms_median()) is not None else None),
+            # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M5: the freeze (mind thread, before the launch) and the
+            # apply (mind thread, the ONE-WRITER's writes) are what `think_ms` never timed (review §7); the last value of each, on
+            # EVERY write (#164), None until the threaded road runs (the same getattr-default pattern as think_ms_last above; the
+            # pin tests/creature/test_a4l_cost_marks.py::test_every_status_write_goes_through_the_one_builder covers every write).
+            "think_freeze_ms": (round(float(v), 3) if (v := getattr(self.mind, "think_freeze_ms_last", None)) is not None else None),
+            "think_apply_ms": (round(float(v), 3) if (v := getattr(self.mind, "think_apply_ms_last", None)) is not None else None),
             # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE):
             # the mind computes these (creature/mind.py:_consume_proposal/_maybe_adopt_evolve_proposal) and
             # nothing exported them (#163's class) — on EVERY write (#164), 0 on a genome that never

@@ -1,0 +1,1 @@
+{"tree": "/data/dev/genome-wt-b1", "label": "after", "commit": "bd68b83", "wall_s": 80.6, "row_hash_calls": 1851, "canvas_rows": 1818, "coarse_rows": 1818, "sleep_rows": 3, "epoch_rows": 0, "chat_say_rows": 0, "hash_reuse_refused": 0, "final_sight_alive": 1534, "final_words_alive": 276, "row_hash_ms_median_final_org": 17.77, "row_hash_ms_min": 16.712, "hash_form": "dense"}

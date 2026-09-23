@@ -81,6 +81,20 @@ def genome_for_sitting(root: Path, birth_genome_path: Path) -> Path:
     return Path(path) if path is not None else Path(birth_genome_path)
 
 
+def canvas_count_of(ledger: dict, fixations: int) -> int:
+    """M4 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400; ALPHA4-2-PREREG.md §2 M4): the canvases the mind has consumed, as the snapshot
+    ledger states it — its own `canvas_index` (creature/mind.py counts one per canvas; the coarse view's fifth moment and SLEEP's
+    replayed moments never inflate it); an OLD ledger (no key) keeps the old arithmetic `moments // fixations`, which over-counted
+    (5 moments a canvas + 200 a sleep: the exam fired every ≈ 400 real canvases instead of the genome's 500 — review §4). ONE
+    definition: creature/senses/sit.py's cadence reads this same function (#172: one derivation, never two)."""
+    ci = ledger.get("canvas_index") if isinstance(ledger, dict) else None
+    if isinstance(ci, int) and not isinstance(ci, bool):
+        return ci
+    moments = ledger.get("moments", 0) if isinstance(ledger, dict) else 0
+    moments = int(moments) if isinstance(moments, (int, float)) and not isinstance(moments, bool) else 0
+    return moments // max(1, int(fixations))
+
+
 def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, poll_period: float = 5.0) -> None:
     """The voice's own exam cadence: every `every_canvases` canvases, read from the latest snapshot's
     own "moments" (state/ledger.json) divided by the genome's fixations-per-canvas -- never a counter the
@@ -103,10 +117,10 @@ def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, p
         ledger_path = root / "state" / "ledger.json"
         if ledger_path.exists():
             try:
-                moments = int(json.loads(ledger_path.read_text()).get("moments", 0))
+                ledger = json.loads(ledger_path.read_text())
             except (json.JSONDecodeError, OSError):
-                moments = 0
-            canvas_count = moments // max(1, fixations)
+                ledger = {}
+            canvas_count = canvas_count_of(ledger, fixations)   # M4: the mind's own count when the ledger carries it
             if every_canvases > 0 and canvas_count - last_canvas >= every_canvases:
                 last_canvas = canvas_count
                 # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1: the pointer is written atomically too (tmp + os.replace,

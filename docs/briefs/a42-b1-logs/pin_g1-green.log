@@ -1,0 +1,7 @@
+(1) development hash 7686da77162b6179 vs the pin under the hash law 7686da77162b6179: SAME | vs the 2026-09-19 record 0d51df0db87dbdfd: DIFFERENT (the two hash-law changes: expected)
+(2) recall == recall_many on 397 questions; edge == edge_many on 2280 pairs: SAME
+(3) PPM round-trip SAME; first fixation (8, 11) vs the thing's cell (8, 11) (distance 0); fixations [(8, 11), (8, 12), (7, 12), (7, 10)]
+(3b) planted wrong sha pin: CAUGHT
+(4) save/load state_hash 7686da77162b6179: SAME
+PIN_G1_OK
+exit 0

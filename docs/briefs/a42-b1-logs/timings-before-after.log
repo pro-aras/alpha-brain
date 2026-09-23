@@ -1,0 +1,16 @@
+[timings] before-bd68b83 vs after: 4581 rows, 1818 canvases; totals 81.8 s vs 92.0 s
+| canvases | before-bd68b83 ms/canvas | after ms/canvas | ratio |
+|---|---|---|---|
+| 1–181 | 17.9 | 19.5 | 1.095 |
+| 182–363 | 26.0 | 30.1 | 1.161 |
+| 364–545 | 34.9 | 41.1 | 1.175 |
+| 546–727 | 36.7 | 47.8 | 1.305 |
+| 728–909 | 39.8 | 43.4 | 1.090 |
+| 910–1090 | 53.6 | 65.6 | 1.225 |
+| 1091–1272 | 51.8 | 55.8 | 1.078 |
+| 1273–1454 | 65.8 | 74.9 | 1.137 |
+| 1455–1636 | 63.0 | 72.0 | 1.141 |
+| 1637–1818 | 60.5 | 55.8 | 0.923 |
+| **last 1000** | **57.3** | **63.1** | **1.101** |
+[timings] THINK-boundary eye rows (181): median 101.9 vs 116.6 ms, max 2926 vs 4683 ms, sum 37.8 vs 49.9 s | other eye rows (1637): median 25.8 vs 24.3 ms
+[timings] THINK-boundary rows in the last 1,000 canvases: median 123.1 vs 145.5 ms

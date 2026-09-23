@@ -67,13 +67,33 @@ def chat_status_line(status) -> str:
     return "[check] chat: " + " · ".join(f"{k} {status[k]}" if k in status else f"{k} not recorded" for k in CHAT_KEYS)
 
 
+# edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2.6 (A4L-DROP-REPORT task 3): the coarse row (creature/mind.py:_coarse_row)
+# writes no `when`, so every coarse row's confirmed flag landed under the EMPTY hour (alpha4-1: the "" bucket read 0.0253 = 46 / 1818,
+# exactly the coarse-glance count). Its hour is its sibling canvas row's — the two share the seq (SLEEP's own "second mind row" pattern,
+# creature/replay.py groups by it). Fixed HERE only: the journal's bytes stay (M3's regression is INCLUDING hash; a key on the coarse
+# row is a format change). A row with neither a `when` nor a sibling keeps the old "" bucket — nothing is invented.
+def seq_when(rows) -> dict:
+    """seq -> the `when` of the first moment row carrying one under that seq (the canvas row, DELIVER's own field)."""
+    out = {}
+    for d in rows:
+        if "moment" in d and d.get("when") and "seq" in d:
+            out.setdefault(d["seq"], d["when"])
+    return out
+
+
+def hour_of(d, by_seq) -> str:
+    """The row's hour bucket: its own `when`, else its sibling's (same seq), else "" (the old bucket)."""
+    return (d.get("when") or by_seq.get(d.get("seq")) or "")[:13]
+
+
 def births_by_hour(rows):
     """(hours in first-seen order, {hour: sight births}, {hour: {source: sight births}}) over the moment rows (every glance row counts)."""
+    rows = list(rows); by_seq = seq_when(rows)
     hours = []; by_hour = collections.Counter(); by_source = collections.defaultdict(collections.Counter)
     for d in rows:
         if "moment" not in d:
             continue
-        h = (d.get("when") or "")[:13]
+        h = hour_of(d, by_seq)
         if h not in hours: hours.append(h)
         n = sum(1 for b in d.get("births", []) if b and b[0] == "sight")
         by_hour[h] += n
@@ -83,14 +103,44 @@ def births_by_hour(rows):
 
 def confirmed_share_by_hour(rows):
     """{hour: confirmed glances / graded glances} over the rows carrying `confirmed` (a LIST per glance); an hour with none has no key."""
+    rows = list(rows); by_seq = seq_when(rows)
     conf = collections.Counter(); tot = collections.Counter()
     for d in rows:
         if "moment" not in d or "confirmed" not in d:
             continue
-        h = (d.get("when") or "")[:13]
+        h = hour_of(d, by_seq)   # the coarse row: its canvas row's hour
         flags = d["confirmed"] if isinstance(d["confirmed"], list) else [d["confirmed"]]
         conf[h] += sum(1 for f in flags if f); tot[h] += len(flags)
     return {h: conf[h] / tot[h] for h in tot if tot[h]}
+
+
+# edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2.6 (review §7): the SIZING line under GROW. The 07:38 patch decided
+# GROW-vs-NMAX on `status.get("sight_capacity")`, but creature/body.py writes sight_capacity for EVERY body (GROW or not), so the
+# «NMAX» branch was dead and «CROSSES NMAX» could never print on a capped genome. The signal is the run's OWN genome text —
+# $ROOT/GENOME.genome, which tools/lives/launch.sh copies beside the life — parsed by the machinery's parser (`#OFF GROW` and a
+# comment naming GROW are not declarations). Unknown (no parseable file: an older run) reads as NMAX and says so.
+def genome_declares_grow(root):
+    """True / False from $ROOT/GENOME.genome's declared genes; None when the file is absent or refuses to parse."""
+    p = Path(root) / "GENOME.genome"
+    if not p.exists():
+        return None
+    try:
+        tree = str(Path(__file__).resolve().parents[2])
+        if tree not in sys.path:
+            sys.path.insert(0, tree)
+        from genome.machinery import parse_genome
+        return "GROW" in parse_genome(p.read_text()).declared
+    except Exception:
+        return None
+
+
+def sizing_wording(proj, nmax, grow):
+    """(cap_kind, crosses): under a declared GROW `sight_nmax` is the CURRENT capacity and passing it means «capacity doubles» (a
+    re-allocation, never a refusal); without GROW — or unknown — it is NMAX and passing it is «CROSSES NMAX», a refusal."""
+    if grow is True:
+        return "capacity (GROW: no cap)", ("capacity doubles (GROW re-allocates: not a refusal)" if proj > nmax else "under capacity")
+    kind = "NMAX" if grow is False else "NMAX (GROW unknown: no parseable GENOME.genome at the root)"
+    return kind, ("CROSSES NMAX" if proj > nmax else "under " + kind)
 
 
 def main(argv) -> int:
@@ -142,8 +192,7 @@ def main(argv) -> int:
     if isinstance(born, int) and isinstance(nmax, int):
         left_h = max(0.0, 24.0 - len(hours)); proj = born + rate * left_h
         proj21 = born + rate * max(0.0, 21.0 - len(hours))   # the plant's hour (PREREG §19.11)
-        cap_kind = "capacity (GROW: no cap)" if status.get("sight_capacity") is not None else "NMAX"
-        crosses = ("grows past the current capacity (GROW re-allocates: not a refusal)" if cap_kind.startswith("capacity") else "CROSSES NMAX") if proj > nmax else "under " + cap_kind
+        cap_kind, crosses = sizing_wording(proj, nmax, genome_declares_grow(root))   # Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400: the genome's own declaration, never STATUS.sight_capacity (written for every body)
         print(f"[check] SIZING: born {born} of {nmax} {cap_kind}; rate (last 3 full h) {rate:.0f}/h; projection at 24 h ≈ {proj:.0f} → {crosses} (the plant needs room at hour ≈ 21: {proj21:.0f})")   # edit: Claude (Fable 5.1), 2026-09-23 07:38 +0400 — under GROW STATUS.sight_nmax is the CURRENT capacity, never a cap: the wording said «CROSSES NMAX» on alpha4-1 at 2 h
     else:
         print("[check] SIZING: sight_born/sight_nmax not recorded on STATUS (an older body)")

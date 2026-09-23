@@ -1,0 +1,75 @@
+[inventory] ACT               MADE           genes.RUNS                                                               unread: -
+[inventory] ANSWER            MADE           genes.RUNS                                                               unread: -
+[inventory] ARRIVAL           MADE           genes.RUNS                                                               unread: -
+[inventory] ASK               MADE           genes.RUNS                                                               unread: -
+[inventory] BELIEF            MADE           genes.RUNS                                                               unread: -
+[inventory] BODY              MADE           genes.RUNS                                                               unread: -
+[inventory] CRASH             MADE           genes.RUNS                                                               unread: -
+[inventory] CURIOSITY         MADE           genes.RUNS                                                               unread: -
+[inventory] CYCLE             MADE           genes.RUNS                                                               unread: -
+[inventory] DEDUCE            MADE           genes.RUNS                                                               unread: -
+[inventory] DELIVER           MADE           genes.RUNS                                                               unread: -
+[inventory] DOOR_LEXICON      MADE           genes.RUNS                                                               unread: -
+[inventory] DOOR_WEB          MADE           genes.RUNS                                                               unread: -
+[inventory] EVOLVE            MADE           genes.RUNS                                                               unread: -
+[inventory] EXAM              MADE           genes.RUNS                                                               unread: -
+[inventory] FAST              MADE           genes.RUNS                                                               unread: -
+[inventory] FILE              MADE           genes.RUNS                                                               unread: -
+[inventory] FROZEN            MADE           genes.RUNS                                                               unread: -
+[inventory] GROW              MADE           genes.RUNS                                                               unread: -
+[inventory] HANDS             MADE           genes.RUNS                                                               unread: -
+[inventory] HEART             MADE           genes.RUNS                                                               unread: -
+[inventory] INDUCE            MADE           genes.RUNS                                                               unread: -
+[inventory] MOMENT            MADE           genes.RUNS                                                               unread: -
+[inventory] MOUTH             MADE           genes.RUNS                                                               unread: -
+[inventory] OUTCOME           MADE           genes.RUNS                                                               unread: -
+[inventory] PARK              MADE           genes.RUNS                                                               unread: -
+[inventory] PREDICT           MADE           genes.RUNS                                                               unread: -
+[inventory] QUESTION          MADE           genes.RUNS                                                               unread: -
+[inventory] SELF              MADE           genes.RUNS                                                               unread: -
+[inventory] SENSE_BODY        MADE           genes.RUNS                                                               unread: -
+[inventory] SENSE_GRADE       MADE           genes.RUNS                                                               unread: -
+[inventory] SENSE_READ        MADE           genes.RUNS                                                               unread: -
+[inventory] SENSE_SMELL       MADE           genes.RUNS                                                               unread: -
+[inventory] SENSE_TOUCH       MADE           genes.RUNS                                                               unread: -
+[inventory] SENTENCE          MADE           genes.RUNS                                                               unread: -
+[inventory] SIT               MADE           genes.RUNS                                                               unread: -
+[inventory] SLEEP             MADE           genes.RUNS                                                               unread: -
+[inventory] STAGE_READY       MADE           genes.RUNS                                                               unread: -
+[inventory] SURPRISE          MADE           genes.RUNS                                                               unread: -
+[inventory] TAPE              MADE           genes.RUNS                                                               unread: -
+[inventory] THINK             MADE           genes.RUNS                                                               unread: -
+[inventory] THRESH            MADE           genes.RUNS                                                               unread: -
+[inventory] WORLD             MADE           genes.RUNS                                                               unread: -
+[inventory] WORLD_GAME        MADE           genes.RUNS                                                               unread: -
+[inventory] SENSE colour      MADE           a channel, not a tape row (no publish() names it); its value is read w   unread: -
+[inventory] SENSE body        MADE           published by a sense thread and named in creature/mind.py:consume        unread: -
+[inventory] SENSE ear-sound   MADE           published by a sense thread and named in creature/mind.py:consume        unread: -
+[inventory] SENSE smell       MADE           published by a sense thread and named in creature/mind.py:consume        unread: -
+[inventory] SENSE touch       MADE           published by a sense thread and named in creature/mind.py:consume        unread: -
+[inventory] SENSE read        MADE           a channel, not a tape row (no publish() names it); its value is read w   unread: -
+[inventory] SENSE grade       MADE           published by a sense thread and named in creature/mind.py:consume        unread: -
+[inventory] ABSTAIN           MADE           parsed into Genome fields                                                unread: -
+[inventory] BIRTH             MADE           parsed into Genome fields                                                unread: -
+[inventory] BUDGET            MADE           parsed into Genome fields                                                unread: -
+[inventory] DELTA             MADE           parsed into Genome fields                                                unread: -
+[inventory] GAZE              MADE           parsed into Genome fields                                                unread: -
+[inventory] HEBB              VALUE-UNREAD   parsed into Genome fields                                                unread: hebb_window
+[inventory] KWTA              MADE           parsed into Genome fields                                                unread: -
+[inventory] MEET              MADE           parsed into Genome fields                                                unread: -
+[inventory] MERGE             MADE           parsed into Genome fields                                                unread: -
+[inventory] PRUNE             MADE           parsed into Genome fields                                                unread: -
+[inventory] RECALL            VALUE-UNREAD   parsed into Genome fields                                                unread: recall_k
+[inventory] RETINA            MADE           parsed into Genome fields                                                unread: -
+[inventory] SCALE             MADE           parsed into Genome fields                                                unread: -
+[inventory] SEED              MADE           parsed into Genome fields                                                unread: -
+[inventory] OFF  #OFF BIND     glances per canvas                  # OFF (Builder J, 2026-09-21): the pre-registered bar FAILED
+[inventory] OFF  #OFF TRAITS   contrast head 32 lr 0.01 at sleep   # OFF (PREREG §12; his 17:28 word): a learned head is not a 
+[inventory] OFF  #OFF RETINA   thresh0.25 centre dog3 hogcells8x6 unit   # G-EYE-4: the genome-set front — a TWIN experiment on
+[inventory] OFF  #OFF SCAN     channels lum rg by across fixations       # G-EYE-7: an experiment against the colour block on a
+[inventory] OFF  #OFF ANALOGY   hesse                               # declared; no structure to map yet
+[inventory] OFF  #OFF AUDIENCE  listener-model                      # declared; «why» is its first cell
+[inventory] OFF  #OFF EAR-SOUND cochlear gammatone agc               # E52's front is the SENSE ear-sound line above; this olde
+[inventory] OFF  #OFF READ-EYE  words through the eye               # E43/E47
+[inventory] genome/ALPHA4.genome: 65 rows - DECLARED-ONLY 0 - VALUE-UNREAD 2 - OFF 8 -> clear
+exit 0

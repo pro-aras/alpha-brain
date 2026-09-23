@@ -1,6 +1,8 @@
 # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:58 +0400 — A4L-COST (docs/briefs/A4L-COST.md; A4-LADDER-PREREG §2.1): the five hashed journal rows (the canvas row, a
 # sight-only canvas, the coarse row, the epoch row, the sleep row) read `self.org.row_hash()` — the ONE per-row witness the genome
 # declares (dense = the digest they always carried; sparse under HASH). This file still reads no clock: the organism times its witness.
+# edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M3 (one hash per canvas): the coarse row now CARRIES its canvas row's digest
+# (`_row_digest()` / `_coarse_row(digest=)`) instead of hashing the same state one statement later — four hashed rows are computed, five carried.
 # edit: Claude (Sonnet 5, builder E), 2026-09-21 16:58 +0400 — G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md):
 # PREDICT's word encoding (`xw`) hoisted above the error() call and passed through (word=, xw=, episodes=)
 # so arms "conjunctive"/"episodic"/"comparator" (genome/predict.py) can read them; the default "novelty"
@@ -476,6 +478,12 @@ class Mind:
         self.think_waits: int = 0
         self.think_wait_ms: float = 0.0
         self.think_ms_last: Optional[float] = None
+        # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M5: the freeze (before the launch) and the apply (the
+        # ONE-WRITER's real writes) land on the MIND thread and `think_ms` (decide() on the frozen copy) never saw them; both are timed
+        # by creature/think_thread.py (this file reads no clock — test_mind_has_no_clock), the last value of each exported by
+        # creature/body.py:_build_status as think_freeze_ms / think_apply_ms on every STATUS write (#164). None until the road runs.
+        self.think_freeze_ms_last: Optional[float] = None
+        self.think_apply_ms_last: Optional[float] = None
         self._think_ms_history: List[float] = []
         # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
         # (L-8): the game's own act-choosing policy. `_act_policy_on` is the SAME gate creature/body.py's
@@ -503,6 +511,13 @@ class Mind:
         self.act_weights: Optional[List[float]] = None
         self.act_explored: int = 0
         self._canvas_index: int = 0
+        # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M3 (one hash per canvas): `_row_digest()` records the
+        # moment count its digest witnessed; `_coarse_row` reuses the canvas row's digest only while `org.t` still equals it, else
+        # REFUSES (recomputes) and counts here — 0 on every live road (tests/creature/test_a42_b1.py's seam scan pins that nothing
+        # between the two rows touches the organism); a test's planted moment between them makes it 1. Not on STATUS: a counter that
+        # can only read 0 on a live body is not printed (tools/lives/check.py's own rule).
+        self._row_digest_t: int = -1
+        self.hash_reuse_refused: int = 0
         self._filed_predictions: list = []          # [{"row": FILE's row dict, "due_canvas": int}, ...] awaiting the next showing of their word
         # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
         # words/pairs with a currently FILED-but-not-yet-SCORED rule, so _think_pool never re-files the
@@ -1863,7 +1878,7 @@ class Mind:
                 "cells": [int(self.org.sight.alive.sum()), int(self.org.words.alive.sum())],
                 "edges": [edges_born, edges_pruned],
                 "err": round(err, 4), "lr": round(lr_scale, 3), "ep": ep_id,
-                "hash": self.org.row_hash(),
+                "hash": self._row_digest(),   # M3: the canvas row's digest — the coarse row below carries it (one hash per canvas)
                 **({"arrival": arrival_n} if arrival_n is not None else {}),   # PREREG §15: an event field on the row where an arrival opened
                 # G-EYE-1 (edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400): every glance's window origin, this
                 # episode's when/act/source — EXTRA keys, never touching any key above; a genome that never declares DELIVER
@@ -1882,7 +1897,7 @@ class Mind:
                               "cells": int(self.org.sound.alive.sum()) if self.org.sound is not None else 0}} if snd is not None else {}),
             }
             self._write_journal(row["at"], journal_row)
-            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene)
+            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene, digest=journal_row["hash"])
             if coarse_row is not None:
                 self._write_journal(row["at"], coarse_row)
         elif fast_on:
@@ -1940,16 +1955,17 @@ class Mind:
                         self._wordless_seen[cell] = n
                         if n >= 1:
                             self._maybe_ask(f"sight:{cell}", "what-is", [moment])
-            self._write_journal(row["at"], {
+            sight_row = {   # M3: bound to a name so the coarse row below can carry this row's digest (the same dict, the same bytes)
                 "seq": row["seq"], "moment": moment, "word": None,
-                "err": round(err, 4), "ep": ep_id, "hash": self.org.row_hash(),
+                "err": round(err, 4), "ep": ep_id, "hash": self._row_digest(),
                 **({"windows": [[int(t), int(l)] for (t, l) in g["windows"]], "when": row["at"], "act": "glance",
                     "source": meta.get("source"), "glance": 0} if deliver_on else {}),
                 # L-4: a sight-only canvas has no word, so `predicted` is always None here and no glance
                 # ever confirms — the fields are still journaled (gated the same way) for schema parity.
                 **({"residual": residuals[:len(g["fix"])], "confirmed": confirmed_flags[:len(g["fix"])]} if surprise_gene is not None else {}),
-            })
-            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene)
+            }
+            self._write_journal(row["at"], sight_row)
+            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene, digest=sight_row["hash"])
             if coarse_row is not None:
                 self._write_journal(row["at"], coarse_row)
         else:
@@ -1962,8 +1978,16 @@ class Mind:
         self._maybe_sleep(row)
         self._maybe_think(row)
 
+    def _row_digest(self) -> str:
+        """M3 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400; ALPHA4-2-PREREG.md §2 M3, §2.5): the row's witness digest —
+        `Organism.row_hash()` (the sparse witness under HASH, the dense state_hash otherwise) — and, in the SAME statement, the moment
+        count it stands for. `_coarse_row` reuses this digest for the coarse row of the same canvas while `org.t` is unchanged; a
+        digest obtained any other way meets a stale `_row_digest_t` and is refused (recomputed), so no caller can bypass the guard."""
+        digest, self._row_digest_t = self.org.row_hash(), self.org.t
+        return digest
+
     def _coarse_row(self, seq: object, moment: Optional[str], residuals: list, confirmed_flags: list,
-                     surprise_gene: Optional[dict]) -> Optional[Dict[str, object]]:
+                     surprise_gene: Optional[dict], *, digest: str) -> Optional[Dict[str, object]]:
         """L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): the fifth, whole-canvas
         glance's OWN journal row — SLEEP's own "a second mind row sharing the triggering canvas's own seq"
         pattern (creature.replay's compare() already groups mind rows by seq for exactly this reason).
@@ -1975,9 +1999,16 @@ class Mind:
         gaze_decl = self.genome.gaze or {}
         if "coarse" not in gaze_decl or "coarse" in self.blind:
             return None
+        # M3 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400): `digest` is the canvas row's own (`_row_digest()` in the caller's dict) —
+        # the two rows hashed the same state one statement apart on 9,331 of 9,331 alpha4-1 canvases (ALPHA4-2 review §2). The reuse
+        # is REFUSED — recomputed, counted — if the organism lived a moment since (PREREG §2.5: "a planted write between the two rows
+        # makes the reuse REFUSE, so the reuse can never hide a change"); on the live road nothing between them touches it.
+        if self.org.t != self._row_digest_t:
+            self.hash_reuse_refused += 1
+            digest = self._row_digest()
         idx = len(residuals) - 1
         out: Dict[str, object] = {"seq": seq, "moment": moment, "act": "coarse", "glance": idx,
-                                   "fix": None, "windows": None, "hash": self.org.row_hash()}
+                                   "fix": None, "windows": None, "hash": digest}
         if surprise_gene is not None:
             out["residual"] = residuals[idx]; out["confirmed"] = confirmed_flags[idx]
         return out
@@ -3032,7 +3063,7 @@ class Mind:
             item = dict(item)
             item["body_pair"] = list(self._body_pair)
             self._self_worked_seq = self._body_pair[-1][0]
-        frozen = think_thread.freeze_inputs(self, item, self._canvas_index)
+        frozen, self.think_freeze_ms_last = think_thread.freeze_inputs_timed(self, item, self._canvas_index)   # M5: timed in think_thread (the clock lives there)
         future = self._think_executor.submit(think_thread.worker_run, frozen)
         self._think_pending = {"future": future, "boundary": self._canvas_index, "item": item}
 
@@ -3069,7 +3100,7 @@ class Mind:
             self._think_pending = None
             return
         plan = result.get("plan") or {}
-        applied = self._think_apply_plan(item, plan, launched_at)
+        applied, self.think_apply_ms_last = think_thread.timed_call(self._think_apply_plan, item, plan, launched_at)   # M5: the ONE-WRITER's apply, timed in think_thread
         self._write_journal(row["at"], {
             "seq": row["seq"],
             "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": applied.get("outcome"),
@@ -3271,6 +3302,11 @@ class Mind:
             "last_seq": self.last_seq,
             "moment_word": {str(k): v for k, v in self.moment_word.items()},
             "moments": self.org.t,
+            # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M4: the mind's OWN canvas count — a LEDGER key, never an
+            # organism key (which would move every digest: G's lesson, ALPHA4-PREREG §5 GROW). creature/exam.py:canvas_count_of reads
+            # it (the exam and SIT cadences); `moments // fixations` over-counted (5 moments a canvas + 200 a sleep → ≈ 400 real canvases
+            # per «500»). Restored by resume() below so a live restart continues the count the sitter's LAST.json cursor was set from.
+            "canvas_index": self._canvas_index,
             "ear_pending": dict(self.pending),
             # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: the SAME kind
             # of in-flight state as ear_pending above, same reason (a resume never loses an ear row
@@ -3399,6 +3435,11 @@ class Mind:
             mind.moment_word = {int(k): v for k, v in ledger.get("moment_word", {}).items()}
             mind._heard = {v for v in mind.moment_word.values() if v}     # PREREG §15: the heard-set, re-derived (never persisted separately)
             mind.last_seq = int(ledger.get("last_seq", 0))
+            # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — M4: the canvas count continues across a restart (0 on an old ledger, the old
+            # behaviour). The advisor's block: without this a restart under an exam/LAST.json cursor in the thousands would sit again
+            # only after that many more canvases. Live resume only — a replay starts fresh; note: THINK's `_canvas_index % every`
+            # boundary phase now also continues across a restart instead of restarting at 0 (docs/briefs/A42-B1-REPORT.md).
+            mind._canvas_index = int(ledger.get("canvas_index", 0) or 0)
             mind._last_snapshot_moments = mind.org.t
             # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §3/§4:
             # THE STAGE — "a resume mid-life keeps the stage" (the brief's own test). Absent (a snapshot

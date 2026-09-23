@@ -1,0 +1,5 @@
+[replay_diff] after+ALPHA4: 4322 mind rows · after+FLOOR: 4322 mind rows · compared 4322
+[replay_diff] rows differing ONLY in ignored fields ['']: 0 · rows with a non-ignored diff: 0
+[replay_diff] first non-ignored diff (seq, field, after+ALPHA4, after+FLOOR): None
+[replay_diff] keys present on one side only: []
+[replay_diff] IDENTICAL except ['']: True

@@ -1,0 +1,63 @@
+running '/tmp/claude-1000/-home-ahmad/632ddf9d-dc4c-4a74-86e1-6052f1ce8fe8/scratchpad/bisect_step.sh'
+4a89065 hash 0d51df0db87dbdfd SAME 
+Bisecting: 61 revisions left to test after this (roughly 6 steps)
+[83ee4125655700fb47ffe7960d08797d74f346b2] G5-SEAM-LIFE-PLAN: BIND refused by its own pre-registered bar (J: Q1 0.9625 vs 0.98125) → OFF with its reason; the moment-cadence re-expression is moot; HEBB window 1 is parsed but never read (for the register)
+running '/tmp/claude-1000/-home-ahmad/632ddf9d-dc4c-4a74-86e1-6052f1ce8fe8/scratchpad/bisect_step.sh'
+83ee412 hash a758bbb434c1baef DIFFERENT 
+Bisecting: 29 revisions left to test after this (roughly 5 steps)
+[15c7b1fe711d41259300c5d6e45dbc6ac2df8ee0] G5-SEAM-LIFE-PLAN: the 8 h seam lives — the reader is cadence-agnostic; the plant would never show (15,000 canvases → --plant-after); EXAM every 500; the regime band's sample; SLEEP under BIND; the second unit/root/watch; landing order
+running '/tmp/claude-1000/-home-ahmad/632ddf9d-dc4c-4a74-86e1-6052f1ce8fe8/scratchpad/bisect_step.sh'
+15c7b1f hash 0d51df0db87dbdfd SAME 
+Bisecting: 14 revisions left to test after this (roughly 4 steps)
+[a5decd17eb23772c7254c0c98e171a6c2129d560] Merge branch 'g5-acts' into g5-integration
+running '/tmp/claude-1000/-home-ahmad/632ddf9d-dc4c-4a74-86e1-6052f1ce8fe8/scratchpad/bisect_step.sh'
+a5decd1 hash a758bbb434c1baef DIFFERENT 
+Bisecting: 7 revisions left to test after this (roughly 3 steps)
+[4d7b10f3d26ff423f056b83513b8fcd0b1b4eea3] Pins moved to the live-block digest b0531503… (G4-2 in tools/gate_g4.py and tests/genome/test_pin_skeleton.py) — Builder F's state_hash merged on g5-integration
+running '/tmp/claude-1000/-home-ahmad/632ddf9d-dc4c-4a74-86e1-6052f1ce8fe8/scratchpad/bisect_step.sh'
+4d7b10f hash a758bbb434c1baef DIFFERENT 
+Bisecting: 3 revisions left to test after this (roughly 2 steps)
+[52bfb1db0dc7d8cfaaea829cb97e30965e5c9f48] Merge branch 'g5-repairs' into g5-integration
+running '/tmp/claude-1000/-home-ahmad/632ddf9d-dc4c-4a74-86e1-6052f1ce8fe8/scratchpad/bisect_step.sh'
+52bfb1d hash a758bbb434c1baef DIFFERENT 
+Bisecting: 0 revisions left to test after this (roughly 1 step)
+[0e9be70631e9f163a1aa17c9405f50781826bc61] Organism.load accepts EITHER digest (new live-block or legacy full-array) so closed-life readers (tools/verdict_g4.py's W3-2 reach control, the exam) can still load old-format snapshots.
+running '/tmp/claude-1000/-home-ahmad/632ddf9d-dc4c-4a74-86e1-6052f1ce8fe8/scratchpad/bisect_step.sh'
+0e9be70 hash a758bbb434c1baef DIFFERENT 
+Bisecting: 0 revisions left to test after this (roughly 0 steps)
+[412d721ac37c8ccb2e002b880d93daf282c94575] Builder F (Sonnet 5): state_hash over the live block (35.86 → 7.29 ms; journal identical except hash; new G4-2 digest b0531503…); genome/retina_fast.py (byte-identical on all 17,768 canvases of life 2; 4.1–4.3×); the BIND diagnostic (77.5 % of births on glances 1–3; binding, not clutter); report. Committed by the orchestrator on the builder's branch; pins NOT moved.
+running '/tmp/claude-1000/-home-ahmad/632ddf9d-dc4c-4a74-86e1-6052f1ce8fe8/scratchpad/bisect_step.sh'
+412d721 hash a758bbb434c1baef DIFFERENT 
+412d721ac37c8ccb2e002b880d93daf282c94575 is the first bad commit
+commit 412d721ac37c8ccb2e002b880d93daf282c94575
+Author: Ahmad (via Claude Code) <arasmirza21602@gmail.com>
+Date:   Mon Sep 21 17:39:58 2026 +0400
+
+    Builder F (Sonnet 5): state_hash over the live block (35.86 → 7.29 ms; journal identical except hash; new G4-2 digest b0531503…); genome/retina_fast.py (byte-identical on all 17,768 canvases of life 2; 4.1–4.3×); the BIND diagnostic (77.5 % of births on glances 1–3; binding, not clutter); report. Committed by the orchestrator on the builder's branch; pins NOT moved.
+    
+    Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_01JDfE2sPA8DhxbsZybsTX49
+
+ docs/briefs/G5-F-REPORT.md                 | 180 +++++++++++++++++++++++++++++
+ genome/machinery.py                        |  17 ++-
+ genome/retina_fast.py                      |  87 ++++++++++++++
+ tests/genome/test_retina_fast.py           |  74 ++++++++++++
+ tests/genome/test_state_hash_live_block.py | 134 +++++++++++++++++++++
+ 5 files changed, 490 insertions(+), 2 deletions(-)
+ create mode 100644 docs/briefs/G5-F-REPORT.md
+ create mode 100644 genome/retina_fast.py
+ create mode 100644 tests/genome/test_retina_fast.py
+ create mode 100644 tests/genome/test_state_hash_live_block.py
+bisect found first bad commit
+bisect exit 0
+# bad: [74c661d2cb94b9d32577db7817b4897fe36a637f] ALPHA 4 briefs + PREREG amended on the advisor's five: the reading ceiling toy first, the nursery shelf excludes held-out exam files, BOUNDS excludes shape genes, chunked W growth + the box's total memory, the judge reads only rows and counters; nice on every replay
+# good: [a23df43b2517f8a61a475db65a6130ec4bed5acf] G1: the GAZE gene (Alpha 2's V0.1 organs imported verbatim, sha-pinned), canvases, recall over glances, save/load; pins (1)-(4) PASS (G0b dev hash unchanged 0d51df0d…, K=1 reduction 397/2280 same, PPM round-trip, planted pin caught)
+# good: [4a890659f58f618d3b161421d51266109d0c1aa3] Merge g4-wave3-d into g4-wave3 (staging): W3-2b — PREDICT's error against THIS glance's resonating cell (B13's bars re-run: spike 3/6 by majority, null 9/9 under 1.5x); W3-2 — INDUCE/DEDUCE wired as FILED predictions scored at the due canvas (3 filed/3 scored/0 correct on the 600-canvas toy — the decider's ceiling to be computed, W3-2c owed; the shuffled null 0 scored); FILE/BELIEF gated on presence; skeleton pin unmoved d4b5c6b8
+# bad: [83ee4125655700fb47ffe7960d08797d74f346b2] G5-SEAM-LIFE-PLAN: BIND refused by its own pre-registered bar (J: Q1 0.9625 vs 0.98125) → OFF with its reason; the moment-cadence re-expression is moot; HEBB window 1 is parsed but never read (for the register)
+# good: [15c7b1fe711d41259300c5d6e45dbc6ac2df8ee0] G5-SEAM-LIFE-PLAN: the 8 h seam lives — the reader is cadence-agnostic; the plant would never show (15,000 canvases → --plant-after); EXAM every 500; the regime band's sample; SLEEP under BIND; the second unit/root/watch; landing order
+# bad: [a5decd17eb23772c7254c0c98e171a6c2129d560] Merge branch 'g5-acts' into g5-integration
+# bad: [4d7b10f3d26ff423f056b83513b8fcd0b1b4eea3] Pins moved to the live-block digest b0531503… (G4-2 in tools/gate_g4.py and tests/genome/test_pin_skeleton.py) — Builder F's state_hash merged on g5-integration
+# bad: [52bfb1db0dc7d8cfaaea829cb97e30965e5c9f48] Merge branch 'g5-repairs' into g5-integration
+# bad: [0e9be70631e9f163a1aa17c9405f50781826bc61] Organism.load accepts EITHER digest (new live-block or legacy full-array) so closed-life readers (tools/verdict_g4.py's W3-2 reach control, the exam) can still load old-format snapshots.
+# bad: [412d721ac37c8ccb2e002b880d93daf282c94575] Builder F (Sonnet 5): state_hash over the live block (35.86 → 7.29 ms; journal identical except hash; new G4-2 digest b0531503…); genome/retina_fast.py (byte-identical on all 17,768 canvases of life 2; 4.1–4.3×); the BIND diagnostic (77.5 % of births on glances 1–3; binding, not clutter); report. Committed by the orchestrator on the builder's branch; pins NOT moved.
+# first bad commit: [412d721ac37c8ccb2e002b880d93daf282c94575] Builder F (Sonnet 5): state_hash over the live block (35.86 → 7.29 ms; journal identical except hash; new G4-2 digest b0531503…); genome/retina_fast.py (byte-identical on all 17,768 canvases of life 2; 4.1–4.3×); the BIND diagnostic (77.5 % of births on glances 1–3; binding, not clutter); report. Committed by the orchestrator on the builder's branch; pins NOT moved.

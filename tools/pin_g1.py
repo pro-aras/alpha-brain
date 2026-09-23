@@ -1,5 +1,6 @@
 """pin_g1.py — G1 §1/§5 pins, run BEFORE the toy (edit: Claude (Fable 5.1), 2026-09-19 17:22 +0400).
-(1) G0b's development life replays to its recorded hash with GAZE off (the machinery change moved nothing);
+(1) G0b's development life replays, with GAZE off, to its PINNED hash — re-pinned under the hash law (see the step's own note); the
+    2026-09-19 record's value is printed beside it and must now read DIFFERENT (two declared hash-law changes moved every digest);
 (2) recall_many/edge_many equal recall/edge result for result over G0b's 380 held-out pictures (K=1 reduction);
 (3) a canvas written as PPM P6 and read back by the organ's own reader is the same frame dict; the surprise gaze's
     first fixation on a clean canvas lands on the thing (a planted wrong pin must be caught);
@@ -22,8 +23,17 @@ org = Organism(g); org.new_arrival()
 for t, p in dev:
     org.moment(retina(p, g.retina), world.encode_word(t, g.ear_blank_zero))
 h = org.state_hash()
-print(f"(1) development hash {h[:16]} vs recorded {R['design']['hash_600'][:16]}:", "SAME" if h == R["design"]["hash_600"] else "DIFFERENT")
-assert h == R["design"]["hash_600"]
+# edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — RE-PINNED (ALPHA4-2-PREREG.md §2.6; A4L-ANSWER-REPORT "not done" 5). The record's hash_600
+# (runs/g0b-20260919-165207/results.json, 0d51df0d…) was taken under the state_hash of 2026-09-19. Two DECLARED hash-law changes moved
+# every digest since — MEASURED on this same 660-moment development life, not quoted: 412d721 (2026-09-21 17:39, Builder F: state_hash
+# over the live block; the parent reads the record, the commit reads a758bbb4…) and 5c0073d (2026-09-23 03:33, ALPHA4-G GROW: the hash
+# over the live prefix → 7686da77…, HEAD's value); 85bf792 (03:45) re-pinned the skeleton digest for the second and this pin for
+# neither (docs/briefs/A42-B1-REPORT.md has the bisect). The RECORD is not edited — a record is what it was; this pin carries the law's
+# value, and the record's old value must read DIFFERENT (if it ever reads SAME, a hash law was reverted: re-read this pin first).
+HASH_600_UNDER_THE_HASH_LAW = "7686da77162b6179480b2f5e08220c8ae5ad7d8782337ac6034c1a14085d9881"
+print(f"(1) development hash {h[:16]} vs the pin under the hash law {HASH_600_UNDER_THE_HASH_LAW[:16]}:", "SAME" if h == HASH_600_UNDER_THE_HASH_LAW else "DIFFERENT",
+      f"| vs the 2026-09-19 record {R['design']['hash_600'][:16]}:", "DIFFERENT (the two hash-law changes: expected)" if h != R["design"]["hash_600"] else "SAME (a hash law was reverted?)")
+assert h == HASH_600_UNDER_THE_HASH_LAW
 # (2) K=1 reduction over the 380 held-out pictures, both sides, and the edge road
 n = 0; ne = 0
 for t, pics in held.items():
