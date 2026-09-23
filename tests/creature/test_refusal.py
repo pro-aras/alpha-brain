@@ -247,6 +247,11 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "DOOR_WEB": "DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD",
         "SENSE_GRADE": "SENSE    grade from ask/graded",
         "STAGE_READY": "STAGE    4 world by READY",
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 12:14 +0400 — A4L-VOICE (docs/briefs/A4L-VOICE.md): three rows, matching the three
+        # genes.py RUNS entries added by this task. Caught by this test's own gate on the landing's full suite (the fifth builder it caught).
+        "AREA_SOUND": "AREA     sound  from cochlea cos>=0.975",
+        "MEET_SIGHT_SOUND": "MEET     sight  sound",
+        "MEET_SOUND_WORDS": "MEET     sound  words",
     }
 
     def test_every_runs_gene_parses(self) -> None:
