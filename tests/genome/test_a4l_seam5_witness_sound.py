@@ -136,13 +136,18 @@ class TestSparseEqualsScratchOnVoicedLives(unittest.TestCase):
 
     def test_regime_a_under_grow_with_the_meetings_growing(self) -> None:
         """GROW with the chunk and the initial capacity shrunk (A4L-VOICE's own seam does the same): every Area doubles past its start and
-        BOTH meetings grow by chunks on both axes (`_Pair.grow` via `_grow_pairs`) — == scratch at every moment."""
-        old = (machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK)
-        machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK = 4, 8
+        BOTH meetings grow by chunks on both axes (`_Pair.grow` via `_grow_pairs`) — == scratch at every moment.
+
+        edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:1x +0400 — A42-B3 task 1: the sound axis of each pair now grows by
+        `machinery.SOUND_GROW_CHUNK` (64 by default), independent of `GROW_CHUNK`. Patched down here alongside the other two so the
+        "positive control: ... grew on its sound axis" asserts below stay REAL controls (the sound axis starting at the real
+        SOUND_GROW_CHUNK=64 would clear `> 8` even with ZERO growth, making the assertion pass whether or not growth happened)."""
+        old = (machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK)
+        machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK = 4, 8, 8
         try:
             org, _calls = self._run(VREGIME_A, grow=True)
         finally:
-            machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK = old
+            machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK = old
         ss, sw = org.sound_meets["sight-sound"], org.sound_meets["sound-words"]
         self.assertGreater(ss.W.shape[0], 8, "positive control: sight<->sound grew on its sight axis")
         self.assertGreater(ss.W.shape[1], 8, "positive control: sight<->sound grew on its sound axis")

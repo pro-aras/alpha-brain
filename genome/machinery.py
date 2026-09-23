@@ -696,12 +696,23 @@ def parse_genome(text: str) -> Genome:
             # SENSE eye/ear/colour, which are plain Genome fields) -- SENSE_READ names a real call site
             # (creature/senses/read.py, wired from creature/body.py) that creature/genes.py's RUNS/unwired()
             # law must name, the same convention SENSE_SMELL/SENSE_TOUCH/SENSE_BODY already use.
+            # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:2x +0400 — A42-B3 task 2 (docs/ALPHA4-2-PREREG.md
+            # §2 G10, §2.3: branch A, ADOPTED by Ahmad 2026-09-23 16:56 +0400 -- "yes fix that Gutenberg part"): an
+            # OPTIONAL trailing clause "; gutenberg body only". Absent -> declared["SENSE_READ"] is EXACTLY the five
+            # keys above (byte-identical to every existing genome/test); present -> a sixth key,
+            # "gutenberg_body_only": True, tells creature/senses/read.py's _doc_sentences to keep only the text
+            # between the Project Gutenberg START/END markers (creature/senses/read.py, wired from creature/body.py).
+            # Built UNDECLARED here on purpose -- this line is NOT added to any genome file by this task; the seat
+            # declares it when ready.
             elif gene == "SENSE" and args[0] == "read":
                 rest = " ".join(args[1:])
-                m = re.fullmatch(r"shelf ([A-Za-z0-9_./-]+) curriculum ([A-Za-z0-9_./-]+) every (\d+) s words (\d+) canvas (\d+)", rest)
-                if not m: raise GenomeError(f"SENSE read: cannot read {rest!r} (ALPHA4-PREREG §3: SENSE read shelf <sqlite> curriculum <md> every <n> s words <k> canvas <px>)")
-                g["declared"]["SENSE_READ"] = {"shelf": m.group(1), "curriculum": m.group(2), "every_s": int(m.group(3)),
-                                                "words": int(m.group(4)), "canvas": int(m.group(5))}
+                m = re.fullmatch(r"shelf ([A-Za-z0-9_./-]+) curriculum ([A-Za-z0-9_./-]+) every (\d+) s words (\d+) canvas (\d+)(; gutenberg body only)?", rest)
+                if not m: raise GenomeError(f"SENSE read: cannot read {rest!r} (ALPHA4-PREREG §3: SENSE read shelf <sqlite> curriculum <md> every <n> s words <k> canvas <px>[; gutenberg body only])")
+                d = {"shelf": m.group(1), "curriculum": m.group(2), "every_s": int(m.group(3)),
+                     "words": int(m.group(4)), "canvas": int(m.group(5))}
+                if m.group(6):
+                    d["gutenberg_body_only"] = True
+                g["declared"]["SENSE_READ"] = d
             # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:0x +0400 — ALPHA4-H task 3 (ALPHA4-PREREG.md
             # §3): the FIRST "DOOR" gene word (a brand-new top-level keyword, dispatched on args[0] the same
             # way "SENSE" is -- builder I's `DOOR web ...` is a SIBLING elif on args[0]=="web", landing beside
@@ -995,6 +1006,16 @@ GROW_CHUNK = 2048    # ALPHA4-G task 1: the FIXED chunk W/mask/strikes grow by u
                      # 4096, 6144, …) — the brief's own "capacity = 256" is for Area's per-cell arrays only.
 AREA_INITIAL_CAPACITY = 256    # ALPHA4-G task 1: each Area's own starting capacity under GROW; doubles from here.
 
+# edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:1x +0400 — A42-B3 task 1 (docs/ALPHA4-2-PREREG.md §2 G7,
+# §2.6; the A4L-VOICE report's own §0 item 10): the SOUND axis of each sound meeting (`sight-sound`'s column axis,
+# `sound-words`' row axis) grows in chunks of 64 instead of GROW_CHUNK's 2048 — at real scale (thousands of sight/
+# word cells, a few hundred sound cells) the pair matrices were measured at ≈210 MB per organism per twin; a
+# 64-column chunk on the sound axis is ≈5 MB. The SIGHT/WORDS axis of each pair is UNTOUCHED (still GROW_CHUNK) —
+# only the axis that actually sits on the small, slow-growing sound area shrinks. Hash-neutral by construction:
+# state_hash()/genome/witness.py's sparse digest both slice a pair's live block by `.a.n`/`.b.n` (the CONTENT), never
+# by `.W.shape` (the CAPACITY) — proved in tests/genome/test_a42_b3_sound_chunk.py, not just asserted here.
+SOUND_GROW_CHUNK = 64
+
 
 
 def _json_num(o):
@@ -1019,10 +1040,15 @@ SOUND_TRAIT_DIM = 37
 
 class _Pair:
     """One MEET between area `a` (rows) and area `b` (cols) — W, mask, strikes, and the pair's own birth/prune logs of edges
-    as (moment, a cell, b cell). Capacity is `rows × cols` (GROW: one GROW_CHUNK each, grown by `Organism._grow_pairs`)."""
+    as (moment, a cell, b cell). Capacity is `rows × cols` (GROW: one GROW_CHUNK each on the non-sound axis, one
+    SOUND_GROW_CHUNK each on whichever axis is `sound` — A42-B3 task 1 — grown by `Organism._grow_pairs`)."""
 
     def __init__(self, name: str, a: "Area", b: "Area", rows: int, cols: int):
         self.name, self.a, self.b = name, a, b
+        # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:1x +0400 — A42-B3 task 1: which axis (0/None, 1/None)
+        # is the SOUND area, decided ONCE at construction from the areas themselves (never from the pair's name — a and b
+        # are never both "sound", so at most one of the two checks below can ever set it).
+        self.sound_axis = 0 if a.name == "sound" else (1 if b.name == "sound" else None)
         self.W = np.zeros((rows, cols), dtype=np.float64)
         self.mask = np.zeros((rows, cols), dtype=np.uint8)
         self.strikes = np.zeros((rows, cols), dtype=np.uint8)
@@ -1030,7 +1056,11 @@ class _Pair:
         self.prunes_log: List[Tuple[int, int, int]] = []
 
     def grow(self, axis: int) -> None:
-        shape = list(self.W.shape); shape[axis] += GROW_CHUNK; shape = tuple(shape)
+        # A42-B3 task 1: the sound axis grows by SOUND_GROW_CHUNK; the other axis keeps GROW_CHUNK. This one method is
+        # every pair-grow call site (Organism._grow_pairs AND load()'s direct p.grow(0)/p.grow(1) calls), so both are
+        # fixed by this single branch.
+        chunk = SOUND_GROW_CHUNK if axis == self.sound_axis else GROW_CHUNK
+        shape = list(self.W.shape); shape[axis] += chunk; shape = tuple(shape)
         W = np.zeros(shape, dtype=np.float64); mask = np.zeros(shape, dtype=np.uint8); strikes = np.zeros(shape, dtype=np.uint8)
         sl = tuple(slice(0, s) for s in self.W.shape)
         W[sl] = self.W; mask[sl] = self.mask; strikes[sl] = self.strikes
@@ -1155,11 +1185,15 @@ class Organism:
             self.c_sound = {"births_novelty_sound": 0, "births_error_sound": 0, "births_refused_budget_sound": 0,
                             "births_refused_redundant_sound": 0, "cells_merged_sound": 0}
             cap = GROW_CHUNK if self._grow else genome.nmax
+            # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:1x +0400 — A42-B3 task 1: the SOUND side of
+            # each pair starts at SOUND_GROW_CHUNK (collapses to `cap` under NMAX, since genome.nmax is a plain int
+            # there regardless of which of these two names holds it — byte-identical negative control preserved).
+            sound_cap = SOUND_GROW_CHUNK if self._grow else genome.nmax
             if "MEET_SIGHT_SOUND" in genome.declared:
-                self.sound_meets["sight-sound"] = _Pair("sight-sound", self.sight, self.sound, cap, cap)
+                self.sound_meets["sight-sound"] = _Pair("sight-sound", self.sight, self.sound, cap, sound_cap)
                 self.c_sound.update({"edges_born_sight_sound": 0, "edges_pruned_sight_sound": 0})
             if "MEET_SOUND_WORDS" in genome.declared:
-                self.sound_meets["sound-words"] = _Pair("sound-words", self.sound, self.words, cap, cap)
+                self.sound_meets["sound-words"] = _Pair("sound-words", self.sound, self.words, sound_cap, cap)
                 self.c_sound.update({"edges_born_sound_words": 0, "edges_pruned_sound_words": 0})
 
     # ------------------------------------------------------------------ arrivals & budget
@@ -2411,8 +2445,19 @@ class Organism:
                 pm = (sm.get("pairs") or {}).get(name) or {}
                 p.edges_log = [tuple(r) for r in pm.get("edges_log", [])]
                 p.prunes_log = [tuple(r) for r in pm.get("prunes_log", [])]
-        if o._grow and o.sound_meets:       # the pairs' sight/words axes cover the loaded live cells too (GROW's chunk law)
-            for area in (o.sight, o.words):
+        # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:1x +0400 — A42-B3 task 1 (the hand-back plan's own
+        # flagged asymmetry): `o.sound` added beside sight/words — this loop covered the sight/words axes of every
+        # sound pair against the loaded live cells (a migration safety net for a meeting whose own pair_*_W data was
+        # absent from the snapshot) but never covered the SOUND axis the same way. Hash-neutral (state_hash()/the
+        # sparse witness both slice a pair's live block by `.a.n`/`.b.n`, never `.W.shape`); `o.sound` is guaranteed
+        # not None here since `o.sound_meets` non-empty implies it (Organism.__init__ only ever builds a _Pair when
+        # self.sound exists). tests/genome/test_a42_b3_sound_chunk.py: the one scenario that would actually EXERCISE
+        # this line (a meeting declared at load time but not at save time, sound.n > 0) is refused by the digest-
+        # mismatch check below before the gap ever matters — this line is a defensive, hash-neutral token, not a
+        # reachable-today fix; kept anyway against a future change that might decouple "which meetings are declared"
+        # from the digest.
+        if o._grow and o.sound_meets:       # the pairs' sight/words/sound axes cover the loaded live cells too (GROW's chunk law)
+            for area in (o.sight, o.words, o.sound):
                 if area.n > 0:
                     o._grow_pairs(area, area.n - 1)
         # edit: Claude (Sonnet 5, builder F), 2026-09-21 17:45 +0400 -- the orchestrator's follow-up task

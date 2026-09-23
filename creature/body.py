@@ -751,7 +751,10 @@ def main(argv: List[str]) -> int:
             read_sense_module.sense, shelf_db=str(shelf_override or read_cfg["shelf"]),
             curriculum_md=str(curriculum_override or read_cfg["curriculum"]), root=root, canvas=read_canvas,
             period=float(read_cfg["every_s"]), words=int(read_cfg["words"]), letters=int(genome_for_cli.ear_letters),
-            one_word_moments=read_one_word_moments)
+            one_word_moments=read_one_word_moments,
+            # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:2x +0400 — A42-B3 task 2: SENSE_READ's optional
+            # sixth key, absent -> False (today's behaviour, byte-identical).
+            gutenberg_body_only=bool(read_cfg.get("gutenberg_body_only")))
         body.add_sense("read", rfn)
 
     # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:2x +0400 — ALPHA4-H task 3 (docs/briefs/

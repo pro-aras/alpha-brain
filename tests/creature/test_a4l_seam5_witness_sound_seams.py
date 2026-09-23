@@ -44,8 +44,12 @@ class _VoicedHashLives:
         text = text.replace("SLEEP    every 2500 moments", "SLEEP    every 100 moments")
         g_dense = d / "voice-dense.genome"; g_dense.write_text(text)
         g_sparse = d / "voice-hash.genome"; g_sparse.write_text(text + "\n" + HASH_LINE + "\n")
-        old = (machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK)
-        machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK = 4, 8
+        # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:1x +0400 — A42-B3 task 1: SOUND_GROW_CHUNK patched down
+        # alongside the other two, else the sound axis of each pair starts at the real 64 regardless of this patch and the
+        # "positive control: ... grew on its sound axis" assert below (this class's own docstring: "the sound pairs grow by
+        # chunks") would clear `> 8` with zero growth -- a vacuous control.
+        old = (machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK)
+        machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK = 4, 8, 8
         orig_row = Organism.row_hash
         orig_digest = SparseWitness.digest
         rec = {"sparse": [], "dense": [], "digest_on": []}
@@ -80,7 +84,7 @@ class _VoicedHashLives:
             m_d.close()
         finally:
             Organism.row_hash = orig_row; SparseWitness.digest = orig_digest
-            machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK = old
+            machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK = old
         cls._built = dict(d=d, g_sparse=g_sparse, g_dense=g_dense, root_s=root_s, root_d=root_d, rows=rows, m_s=m_s, m_d=m_d,
                           rec=rec, before=before, things=things)
         return cls._built
@@ -128,12 +132,12 @@ class VoicedMindUnderHash(unittest.TestCase):
         meta = json.loads((L["root_s"] / "state" / "organism.json").read_text())
         meta_d = json.loads((L["root_d"] / "state" / "organism.json").read_text())
         self.assertEqual(meta["state_hash"], meta_d["state_hash"], "dense at snapshot: the sparse life's snapshot carries the dense twin's digest")
-        old = (machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK)
-        machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK = 4, 8
+        old = (machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK)
+        machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK = 4, 8, 8
         try:
             resumed, _last = Mind.resume(L["g_sparse"], L["root_s"])
         finally:
-            machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK = old
+            machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK = old
         self.assertEqual(resumed.org.hash_form, "sparse")
         self.assertEqual(int(resumed.org.sound.n), n_before)
         self.assertEqual(resumed.org.state_hash(), meta["state_hash"])

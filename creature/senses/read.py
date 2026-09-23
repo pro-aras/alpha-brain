@@ -108,11 +108,29 @@ def _load_cursor(cursor_path: Path) -> dict:
         return {}   # a torn cursor from a crash mid-write -- treated as "nothing read yet" (folder.py's own SEEN.json law)
 
 
-def _doc_sentences(base_dir: Path, path: str) -> List[str]:
+# edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:2x +0400 — A42-B3 task 2 (docs/ALPHA4-2-PREREG.md §2.3,
+# branch A, ADOPTED by Ahmad 2026-09-23 16:56 +0400): `gutenberg_body_only` -- when both a "*** START OF" and a
+# LATER "*** END OF" marker are found (Project Gutenberg's own boilerplate delimiters), keep only the text
+# strictly between the two marker LINES (excluding both marker lines themselves -- the START line itself carries
+# "Project Gutenberg eBook" text that must not leak into the sentences); when either marker is absent, or no
+# "*** END OF" is found AFTER the "*** START OF", the WHOLE file is used, byte-identical to `gutenberg_body_only`
+# False (and to this function before this edit).
+_GUTENBERG_START = "*** START OF"
+_GUTENBERG_END = "*** END OF"
+
+
+def _doc_sentences(base_dir: Path, path: str, gutenberg_body_only: bool = False) -> List[str]:
     try:
         text = (base_dir / path).read_text(errors="replace")
     except OSError:
         return []
+    if gutenberg_body_only:
+        start = text.find(_GUTENBERG_START)
+        if start != -1:
+            end = text.find(_GUTENBERG_END, start + len(_GUTENBERG_START))
+            start_line_end = text.find("\n", start) if end != -1 else -1
+            if end != -1 and start_line_end != -1:
+                text = text[start_line_end + 1:end]
     return read_common.split_sentences(text)
 
 
@@ -187,7 +205,7 @@ def _publish_chunk(publish: Callable, doc_id: str, sentence_ix: int, chunk_ix: i
 
 def sense(publish: Callable, stop_event, shelf_db: str, curriculum_md: str, root: Path, canvas: int = 128,
           period: float = 5.0, words: int = 8, letters: int = 8, font_path: str = read_common.DEFAULT_FONT_PATH,
-          one_word_moments: bool = False) -> None:
+          one_word_moments: bool = False, gutenberg_body_only: bool = False) -> None:
     root = Path(root)
     base_dir = Path(shelf_db).resolve().parent   # SHELF.sqlite's own directory -- docs' paths are relative to it (READ FIRST note)
     cursor_path = root / "read" / "CURSOR.json"
@@ -215,7 +233,7 @@ def sense(publish: Callable, stop_event, shelf_db: str, curriculum_md: str, root
             continue
         doc_id, path = docs[doc_ix]
         if cur_doc_ix != doc_ix:
-            cur_sentences = _doc_sentences(base_dir, path)
+            cur_sentences = _doc_sentences(base_dir, path, gutenberg_body_only)
             cur_doc_ix = doc_ix
             cur_chunks = []
         if sentence_ix >= len(cur_sentences):
