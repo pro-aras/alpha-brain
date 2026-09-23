@@ -247,6 +247,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "DOOR_WEB": "DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD",
         "SENSE_GRADE": "SENSE    grade from ask/graded",
         "STAGE_READY": "STAGE    4 world by READY",
+        # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 12:20 +0400 — docs/A4-LADDER-PREREG.md §2.5: one row, matching the
+        # genes.py RUNS entry the rung adds (ACT_VALUE — the second ACT line). Caught by this class on the first landing run.
+        "ACT_VALUE": "ACT      value reward 10; optimism 1",
     }
 
     def test_every_runs_gene_parses(self) -> None:

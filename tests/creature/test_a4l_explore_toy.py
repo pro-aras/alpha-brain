@@ -189,6 +189,47 @@ class TestPureParts(unittest.TestCase):
             self.assertEqual(c.calls, 2)
         self.assertEqual(branches, {True, False})
 
+    def test_sampled_choice_two_draws_and_proportional(self) -> None:
+        """(v-b)/(v-c)'s draw (edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 12:21 +0400): two draws every call, either
+        branch; outside the 10 % branch the act is drawn ∝ value."""
+        class Counting:
+            def __init__(self, rng):
+                self.rng, self.calls = rng, 0
+
+            def random(self):
+                self.calls += 1
+                return self.rng.random()
+
+            def integers(self, lo, hi):
+                self.calls += 1
+                return self.rng.integers(lo, hi)
+
+        vals = [0.05, 0.05, 0.9, 0.05, 0.05, 0.05, 0.05]
+        counts = [0] * 7
+        rng = np.random.default_rng(3)
+        for _ in range(20000):
+            c = Counting(rng)
+            idx, explored = toy.sampled_choice(vals, c, 7)
+            self.assertEqual(c.calls, 2)
+            if not explored:
+                counts[idx] += 1
+        share = counts[2] / sum(counts)
+        self.assertAlmostEqual(share, 0.9 / 1.2, delta=0.01)
+
+    def test_episode_credit_values(self) -> None:
+        pol = toy.EpisodeCredit(1)
+        for act, got, te, tr in (("left", 0.0, False, False), ("forward", 0.0, False, False), ("pickup", 0.6, True, False),
+                                 ("left", 0.0, False, False), ("done", 0.0, False, True)):
+            pol.observe(act, got, te, tr)
+        v = dict(zip(toy.ACT_NAMES, pol.values()))
+        self.assertAlmostEqual(v["left"], 0.3 + toy.EPS, places=12)
+        self.assertAlmostEqual(v["forward"], 0.6 + toy.EPS, places=12)
+        self.assertAlmostEqual(v["pickup"], 0.6 + toy.EPS, places=12)
+        self.assertAlmostEqual(v["done"], 0.0 + toy.EPS, places=12)
+        for a in ("right", "drop", "toggle"):
+            self.assertAlmostEqual(v[a], 1.0 + toy.EPS, places=12)
+        self.assertEqual(pol.episode_acts, [])
+
     def test_null_bound(self) -> None:
         for n, p0 in ((14, 0.29), (24, 0.29), (100, 0.29)):
             k, rate = toy.null_bound(n, p0)

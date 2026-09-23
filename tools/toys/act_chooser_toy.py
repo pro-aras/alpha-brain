@@ -160,6 +160,26 @@ def choose(weights: Sequence[float], rng: np.random.Generator, n_actions: int,
     return tied[pick], False
 
 
+EPS = 0.05                      # (v-b)/(v-c)'s floor ε (the orchestrator's 12:2x +04 message)
+
+
+def sampled_choice(values: Sequence[float], rng: np.random.Generator, n_actions: int,
+                   explore: float = EXPLORE) -> Tuple[int, bool]:
+    """(v-b)/(v-c) — edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 12:21 +0400: the SAME first draw and the same
+    10 % uniform branch as `choose`; otherwise ONE `rng.random()` against the running sum of `values` (probability
+    ∝ value, no argmax) — TWO draws of the act rng on every call, either branch. Every value must be > 0 (the ε floor)."""
+    u = float(rng.random())
+    if u < explore:
+        return int(rng.integers(0, n_actions)), True
+    r = float(rng.random()) * float(sum(values))
+    acc = 0.0
+    for i, v in enumerate(values):
+        acc += v
+        if r < acc:
+            return i, False
+    return len(values) - 1, False
+
+
 def replay_choices(tape_rows: Iterable[Dict[str, object]], journal_rows: Iterable[Dict[str, object]],
                    seed: int, law: str = "old", window: int = WINDOW, optimism: float = 1.0) -> List[Dict[str, object]]:
     """THE PARITY WALK: the game rows of a tape in seq order — on a game `eye` row the chooser's weights and choice
@@ -277,6 +297,68 @@ class FixedDist:
         return self.acts[-1]
 
 
+class RewardSampler(OldChooser):
+    """(v-b) — the orchestrator's first further candidate (12:2x +04), declared in A4L-EXPLORE-TOY.md §5 before its run:
+    the act is DRAWN with probability ∝ (its mean reward over its last 10 outcomes + ε 0.05) — an act with no outcome
+    in its window reads the optimism prior 1.0 (+ ε), as (v) — no argmax; the 10 % uniform draw kept; two draws."""
+    label = "reward-sampled"
+
+    def __init__(self, seed: int, eps: float = EPS, optimism: float = 1.0):
+        super().__init__(seed)
+        self.eps = float(eps)
+        self.optimism = float(optimism)
+
+    def act(self, ring: Ring) -> int:
+        vals = [v + self.eps for v in reward_values(ring, ACT_NAMES, self.optimism)]
+        idx, explored = sampled_choice(vals, self.rng, len(ACT_NAMES))
+        self.calls += 1
+        self.explored += int(explored)
+        return idx
+
+
+class EpisodeCredit(OldChooser):
+    """(v-c) — the orchestrator's second (12:2x +04; «act to episode», the OUTCOME gene's own words): every act taken
+    inside an episode is credited with THAT EPISODE's terminal reward (the success reward on a `terminated` step; 0.0
+    on a truncation) when the episode's terminal outcome is filed — so the credit, like every outcome, reaches the
+    chooser one step late (the life's lag); an act's value = its mean credited reward over its last 20 credited
+    outcomes + ε 0.05, an act with none reads the optimism prior 1.0 (+ ε); drawn ∝ value (`sample=True`) or by the
+    argmax with rng ties (`sample=False` — the control that the SAMPLING carries any gain); the 10 % uniform draw
+    kept; two draws. «Acts taken inside an episode» = the acts whose outcomes that episode's steps filed (the act
+    chosen on a terminal frame belongs to the NEXT episode, where the worker applies it)."""
+    label = "episode-credit"
+
+    def __init__(self, seed: int, window: int = 20, eps: float = EPS, optimism: float = 1.0, sample: bool = True):
+        super().__init__(seed)
+        self.window, self.eps, self.optimism, self.sample = int(window), float(eps), float(optimism), bool(sample)
+        self.credited: Dict[str, collections.deque] = {a: collections.deque(maxlen=self.window) for a in ACT_NAMES}
+        self.episode_acts: List[str] = []
+
+    def observe(self, act: str, got: float, terminated: bool, truncated: bool) -> None:
+        self.episode_acts.append(act)
+        if terminated or truncated:
+            credit = float(got) if terminated else 0.0
+            for a in self.episode_acts:
+                self.credited.setdefault(a, collections.deque(maxlen=self.window)).append(credit)
+            self.episode_acts = []
+
+    def values(self) -> List[float]:
+        out = []
+        for a in ACT_NAMES:
+            c = self.credited.get(a)
+            out.append((sum(c) / len(c) if c else self.optimism) + self.eps)
+        return out
+
+    def act(self, ring: Ring) -> int:
+        vals = self.values()
+        if self.sample:
+            idx, explored = sampled_choice(vals, self.rng, len(ACT_NAMES))
+        else:
+            idx, explored = choose(vals, self.rng, len(ACT_NAMES))
+        self.calls += 1
+        self.explored += int(explored)
+        return idx
+
+
 def make_env(env_id: str = ENV_ID):
     import gymnasium as gym
     import minigrid  # noqa: F401  -- registers the BabyAI ids
@@ -317,6 +399,8 @@ def run_game(policy, base_seed: int, episodes: int, env_id: str = ENV_ID, keep_t
         acts.append(a)
         nxt = policy.act(ring)                            # frame t's eye row: chosen BEFORE outcome t is filed
         filed = ring.record(ACT_NAMES[a], float(r))       # outcome t
+        if hasattr(policy, "observe"):                    # (v-c): the episode's credit, filed with the outcome that ends it
+            policy.observe(ACT_NAMES[a], float(r), bool(te), bool(tr))
         if len(trace) < keep_trace:
             trace.append({"act": ACT_NAMES[a], "act_idx": a, "got": float(r), "surprise": filed["surprise"],
                           "terminated": bool(te), "truncated": bool(tr), "episode": episode, "step": step_total})
@@ -365,6 +449,13 @@ def arm_specs() -> List[Tuple[str, str, object]]:
                       (lambda ff, ss: (lambda s: FixedDist(s, {0: ss, 1: ss, 2: ff})))(f, side)))
     specs.append(("v", "(v) CANDIDATE — mean REWARD of the last 10, optimism 1.0 if untried, 90 % argmax, 10 % uniform",
                   lambda s: RewardChooser(s, 1.0)))
+    # the orchestrator's two further laws (12:2x +04), declared in A4L-EXPLORE-TOY.md §5 before their run
+    specs.append(("v-b", "(v-b) SAMPLE ∝ (mean reward of the last 10 + ε 0.05; untried 1.0 + ε), 10 % uniform",
+                  lambda s: RewardSampler(s)))
+    specs.append(("v-c", "(v-c) EPISODE CREDIT, sampled ∝ (mean credited reward of the last 20 + ε; untried 1.0 + ε), 10 % uniform",
+                  lambda s: EpisodeCredit(s, sample=True)))
+    specs.append(("v-c-argmax", "(v-c control) EPISODE CREDIT, argmax with rng ties, 10 % uniform",
+                  lambda s: EpisodeCredit(s, sample=False)))
     return specs
 
 
@@ -377,7 +468,10 @@ def cmd_arms(a) -> int:
     out: Dict[str, object] = {"env": ENV_ID, "episodes": a.episodes, "seeds": seeds, "max_steps": MAX_STEPS,
                               "lag": "one step (the life's)", "arms": {}}
     print(f"[arms] {ENV_ID} · {a.episodes} episodes × seeds {seeds} · max_steps {MAX_STEPS} · the life's one-step lag")
+    only = set(a.only.split(",")) if getattr(a, "only", None) else None
     for key, label, factory in arm_specs():
+        if only is not None and key not in only:
+            continue
         runs = []
         for s in seeds:
             pol = factory(s)
@@ -399,6 +493,13 @@ def cmd_arms(a) -> int:
         }
     arms = out["arms"]
     grid = {k: v for k, v in arms.items() if k.startswith("iv-")}
+    if only is not None and "ii" in arms:
+        # the --only road (§5's further laws): each arm's difference from (ii) on the pooled episodes, nothing else
+        pooled_ii = arms["ii"]["pooled_success"]
+        out["vs_ii_pooled"] = {k: v["pooled_success"] - pooled_ii for k, v in arms.items() if k != "ii"}
+        Path(a.out).write_text(json.dumps(out, indent=1))
+        print(f"[arms] pooled differences from (ii): " + ", ".join(f"{k} {d:+.3f}" for k, d in out["vs_ii_pooled"].items()) + f"; wrote {a.out}")
+        return 0
     best_key = max(grid, key=lambda k: grid[k]["success_mean"])
     ii = arms["ii"]["success_mean"]
     out["ceiling"] = {"best_iv": best_key, "iv_minus_ii": grid[best_key]["success_mean"] - ii,
@@ -642,6 +743,7 @@ def main(argv: Sequence[str]) -> int:
     r = sub.add_parser("arms")
     r.add_argument("--episodes", type=int, default=1000)
     r.add_argument("--seeds", default=f"{LIFE_SEED},{LIFE_SEED + 1_000_000},{LIFE_SEED + 2_000_000}")
+    r.add_argument("--only", default=None, help="comma-separated arm keys (§5's further laws: ii,v-b,v-c,v-c-argmax)")
     r.add_argument("--out", required=True)
     d = sub.add_parser("lockseries")
     d.add_argument("--episodes", type=int, default=1000)
