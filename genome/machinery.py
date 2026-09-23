@@ -490,9 +490,18 @@ def parse_genome(text: str) -> Genome:
                 # next-token. The old literal no longer parses -- a genome carrying it refuses exactly like
                 # any other unknown value (tests/genome/G4-draft.genome and test_parse_g4.py's own fixture
                 # updated alongside this line, in the same commit).
-                m = re.fullmatch(r"two-word frames from co-occurring words; judged by the eye; never next-token", a)
-                if not m: raise GenomeError(f"SENTENCE: cannot read {a!r} (L-11: SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token)")
+                # edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — G9 (ALPHA4-2-PREREG §2 row G9, §2.5): ONE optional
+                # clause, `judged by the eye on the line`: a SHELF frame is due on the reader's SENTENCE moment (the rendered line,
+                # a multi-word shelf instant), never on a one-word per-word moment of the same chunk, and its evidence is ANY of the
+                # line's located glances (creature/mind.py:_score_due_predictions/_frame_evidence_line). Its ceiling was measured
+                # BEFORE this clause existed (scratch/b2/ceiling.py; A42-B2-REPORT): 0.272 on the 10:54 copy, 0.089 with glance 0
+                # alone. The old text parses to EXACTLY the dict it always did (no new key), pinned by
+                # tests/genome/test_parse_sentence_line.py — every genome on disk is unchanged.
+                m = re.fullmatch(r"two-word frames from co-occurring words; judged by the eye( on the line)?; never next-token", a)
+                if not m: raise GenomeError(f"SENTENCE: cannot read {a!r} (L-11: SENTENCE two-word frames from co-occurring words; judged by the eye[ on the line]; never next-token)")
                 g["declared"]["SENTENCE"] = {"frames": "co-occurring", "judged": "eye", "next_token": False}
+                if m.group(1):
+                    g["declared"]["SENTENCE"]["line"] = True
             elif gene == "QUESTION":
                 # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-10 (docs/briefs/
                 # LIFE-C-QUESTION-SENTENCE.md task 1; NEXT-LIFE-PLAN-2026-09-22.md §4 L-10): a want (a

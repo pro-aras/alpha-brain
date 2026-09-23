@@ -39,7 +39,16 @@ import numpy as np
 from genome.sentence import find_frames
 
 PICTURE_SOURCES = ("maker", "folder", "game", "hands")
-THING_WORD_RULES = ("literal", "heard")
+# edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — A42-B2 PART 2 (ALPHA4-2-PREREG §2.5 "B2 birth-source ledger";
+# the orchestrator's P2-1 decision): rule "ledger" keeps «heard»'s MEANING and loses the ring — the literal set ∩ the mind's
+# `picture_words` LEDGER (creature/mind.py: every word heard on a picture-source canvas, written the moment it is heard, only
+# growing, persisted in the snapshot ledger.json — never org.c, never the births log, both hashed). «heard» reads FAST's ring,
+# which wraps ≈ hour 11.6 of a 24 h life (A4L-LANG-REPORT §2 item 5) and then forgets the oldest picture words although the
+# creature still knows them. Before the wrap the two rules read the SAME set by construction (the hour-1 fixture: the ledger
+# written live == heard_on_pictures(ring), A42-B2-REPORT). THING_WORD_RULE stays "heard": the one-constant switch to "ledger" is
+# the LANG landing's decision (RAISED), not this build's; a snapshot from before this ledger resumes with an EMPTY ledger and is
+# never back-filled from the ring (that proof would be circular).
+THING_WORD_RULES = ("literal", "heard", "ledger")
 THING_WORD_RULE = "heard"          # RAISED (A4L-LANG-REPORT.md): the literal §3.2-item-3 clause is the measured twin
 COMPOSE_CAP = 10000                # paths visited per compose — a runaway walk on a long life's link graph is #236's shape
 
@@ -238,16 +247,12 @@ def heard_on_pictures(episodes) -> Set[str]:
     return out
 
 
-def thing_words(org, ledger_words: Dict[int, Set[str]], episodes, per_canvas: int, rule: str = THING_WORD_RULE) -> Set[str]:
-    """§3.2 item 3's THING-WORDS under `rule`: "literal" — a word whose own word cell (ledger {word}, alive) has a MEET
-    edge (mask 1) to a sight cell first born on a picture source; "heard" (the default, RAISED) — the literal set
-    intersected with `heard_on_pictures`. Read-only on the organism and the store."""
-    if rule not in THING_WORD_RULES:
-        raise ValueError(f"thing_words: unknown rule {rule!r} (one of {THING_WORD_RULES})")
+def _literal(org, ledger_words: Dict[int, Set[str]], bsrc: Dict[int, str]) -> Set[str]:
+    """The literal clause over a given sight-cell -> birth-source map: every word whose own word cell (ledger {word}, alive)
+    has a MEET edge (mask 1) to a sight cell first born on a picture source."""
     ns, nw = int(org.sight.n), int(org.words.n)
     if ns == 0 or nw == 0:
         return set()
-    bsrc = birth_sources(org.births, episodes, per_canvas)
     pic = np.array([bsrc.get(s) in PICTURE_SOURCES for s in range(ns)], dtype=bool)
     if not pic.any():
         return set()
@@ -260,6 +265,31 @@ def thing_words(org, ledger_words: Dict[int, Set[str]], episodes, per_canvas: in
             w = next(iter(ws))
             if w:
                 out.add(w)
+    return out
+
+
+def literal_from_ledger(org, ledger_words: Dict[int, Set[str]], birth_source: Dict[int, str]) -> Set[str]:
+    """A42-B2's TWIN of the literal set: the same clause with the birth source read from the mind's birth-source LEDGER
+    (creature/mind.py: `Mind.birth_source`, written at each birth) instead of the ring. Printed beside «heard» and «ledger»."""
+    return _literal(org, ledger_words, {int(k): str(v) for k, v in (birth_source or {}).items()})
+
+
+def thing_words(org, ledger_words: Dict[int, Set[str]], episodes, per_canvas: int, rule: str = THING_WORD_RULE,
+                picture_words: Optional[Iterable[str]] = None, birth_source: Optional[Dict[int, str]] = None) -> Set[str]:
+    """§3.2 item 3's THING-WORDS under `rule`: "literal" — a word whose own word cell (ledger {word}, alive) has a MEET
+    edge (mask 1) to a sight cell first born on a picture source, the source read from the RING (`birth_sources`); "heard"
+    (the default, RAISED) — the literal set intersected with `heard_on_pictures` (the ring again); "ledger" (A42-B2) — the
+    SAME two halves read from the mind's two ledgers and nothing from the ring: `literal_from_ledger(birth_source)` ∩
+    `picture_words` (the words heard on picture-source canvases, only growing). Rule "ledger" REFUSES without its ledgers
+    (a None would silently read an empty set — an old snapshot has neither key and must be read as such by its caller).
+    Read-only on the organism and the store."""
+    if rule not in THING_WORD_RULES:
+        raise ValueError(f"thing_words: unknown rule {rule!r} (one of {THING_WORD_RULES})")
+    if rule == "ledger":
+        if picture_words is None or birth_source is None:
+            raise ValueError("thing_words: rule 'ledger' needs both ledgers (picture_words, birth_source)")
+        return literal_from_ledger(org, ledger_words, birth_source) & set(str(w) for w in picture_words if w)
+    out = _literal(org, ledger_words, birth_sources(org.births, episodes, per_canvas))
     if rule == "heard":
         out &= heard_on_pictures(episodes)
     return out
