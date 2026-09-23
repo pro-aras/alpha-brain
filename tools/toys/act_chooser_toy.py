@@ -288,8 +288,10 @@ def quiet_reset(env, seed: int):
         return env.reset(seed=int(seed))
 
 
-def run_game(policy, base_seed: int, episodes: int, env_id: str = ENV_ID, keep_trace: int = 0) -> Dict[str, object]:
-    """One life of the game at machine speed under the worker's seed law and the life's one-step lag."""
+def run_game(policy, base_seed: int, episodes: int, env_id: str = ENV_ID, keep_trace: int = 0,
+             max_steps_total: Optional[int] = None) -> Dict[str, object]:
+    """One life of the game at machine speed under the worker's seed law and the life's one-step lag. Stops after
+    `episodes` completed episodes, or (`max_steps_total`, the `lives` diagnostic) after that many env steps."""
     if os.environ.get("BABYAI_DONE_ACTIONS"):
         raise SystemExit("BABYAI_DONE_ACTIONS is set: `done` would change the verifier (minigrid babyai verifier.py:26)")
     env = make_env(env_id)
@@ -305,7 +307,7 @@ def run_game(policy, base_seed: int, episodes: int, env_id: str = ENV_ID, keep_t
     trace: List[Dict[str, object]] = []
     ep_steps, ep_ret, step_total = 0, 0.0, 0
     t0 = time.perf_counter()
-    while episode < episodes:
+    while episode < episodes and (max_steps_total is None or step_total < max_steps_total):
         _obs, r, te, tr, _info = env.step(a)
         step_total += 1
         ep_steps += 1
@@ -327,6 +329,8 @@ def run_game(policy, base_seed: int, episodes: int, env_id: str = ENV_ID, keep_t
         a = nxt
     env.close()
     wall = time.perf_counter() - t0
+    if not per_ep:
+        per_ep.append((ep_steps, ep_ret, False, False))    # a step budget that ended before any episode did
     succ = [1 if (te and rew > 0) else 0 for (_s, rew, te, _tr) in per_ep]
     last100 = collections.Counter(ACT_NAMES[i] for i in acts[-100:])
     top_act, top_n = last100.most_common(1)[0]
@@ -514,6 +518,100 @@ def cmd_calib(a) -> int:
     return 0 if ok else 1
 
 
+def cmd_lockseries(a) -> int:
+    """A DIAGNOSTIC of arm (i), not an arm: the same runs (the same seeds, the same 1,000 episodes — the totals must
+    equal arm (i)'s), read as a SERIES — success per 100 episodes, the life-matched window (seed 20260923's first
+    10 and 12 episodes ARE alpha4-1's, by (0b)), the locked act per 100-step block and every change of it, and
+    which act each success was earned on (the locked act or an explored one)."""
+    seeds = [int(s) for s in a.seeds.split(",")]
+    out: Dict[str, object] = {}
+    for s in seeds:
+        pol = OldChooser(s)
+        r = run_game(pol, s, a.episodes, keep_trace=10 ** 7)
+        tr = r.pop("trace")
+        ep_succ: Dict[int, bool] = {}
+        ep_last: Dict[int, Dict[str, object]] = {}
+        for t in tr:
+            if t["terminated"] or t["truncated"]:
+                ep_succ[t["episode"]] = bool(t["terminated"] and t["got"] > 0)
+                ep_last[t["episode"]] = t
+        eps = sorted(ep_succ)
+        per100 = [round(sum(ep_succ[e] for e in eps[i:i + 100]) / len(eps[i:i + 100]), 3) for i in range(0, len(eps), 100)]
+        blocks = [collections.Counter(t["act"] for t in tr[i:i + 100]).most_common(1)[0] for i in range(0, len(tr) - 99, 100)]
+        tops = [b[0] if b[1] >= 80 else None for b in blocks]
+        changes = sum(1 for x, y in zip(tops, tops[1:]) if x is not None and y is not None and x != y)
+        locked_names = collections.Counter(t for t in tops if t is not None)
+        # which act earned each success, and was it the act locked in that 100-step block?
+        on_locked = 0
+        earned = collections.Counter()
+        for i, t in enumerate(tr):
+            if t["terminated"] and t["got"] > 0:
+                earned[t["act"]] += 1
+                blk = i // 100
+                if blk < len(tops) and tops[blk] == t["act"]:
+                    on_locked += 1
+        row = {"success_rate": r["success_rate"], "successes": r["successes"], "per100": per100,
+               "first10": sum(ep_succ[e] for e in eps[:10]), "first12": sum(ep_succ[e] for e in eps[:12]),
+               "locked_blocks": r["locked_blocks"], "lock_changes": changes, "locked_act_blocks": dict(locked_names.most_common()),
+               "successes_by_act": dict(earned.most_common()), "successes_on_the_locked_act": on_locked}
+        out[str(s)] = row
+        print(f"  seed {s}: success {r['success_rate']:.3f} ({r['successes']}) · first 10 episodes {row['first10']} · first 12 {row['first12']} "
+              f"· per 100 {per100} · locked blocks {r['locked_blocks']} on {row['locked_act_blocks']} · lock changes {changes} "
+              f"· successes by act {row['successes_by_act']} (on the locked act {on_locked})", flush=True)
+    Path(a.out).write_text(json.dumps(out, indent=1))
+    return 0
+
+
+def cmd_lives(a) -> int:
+    """A DIAGNOSTIC for the rung's marks (A4-LADDER-PREREG §2.5, written before the life): `n` FRESH lives of `acts`
+    game steps each (960 = an 8 h life at the game's 30 s cadence), per arm, each on its own seed
+    (base + 1,000 × i: the ≤ 30 episodes a life plays never share a layout with the next life's). Per life:
+    X1 — the largest share one act holds in ANY 100-act window (sliding) that starts after the first `hour` acts
+    (120 = hour 1); X2 — the episodes that END in acts x2_from+1 … acts (240 → 960 = the life's hours 2–8, «hours
+    a–b» read as the ladder reads «hours 0–8»: from a h to b h), their successes, and whether the successes reach
+    the one-sided 95 % bound of the null (p0) at that N. Printed: the share of lives X1 would pass (max share < 0.5)
+    and X2 would pass, the success distribution — the rung's predictions, and X2's ceiling."""
+    keys = a.arms.split(",")
+    specs = {k: f for k, _label, f in arm_specs()}
+    out: Dict[str, object] = {"acts": a.acts, "hour": a.hour, "x2_from": a.x2_from, "lives": a.n, "base": a.base, "p0": a.p0, "arms": {}}
+    for key in keys:
+        rows = []
+        for i in range(a.n):
+            s = a.base + 1000 * i
+            pol = specs[key](s)
+            r = run_game(pol, s, 10 ** 6, keep_trace=a.acts, max_steps_total=a.acts)
+            tr = r.pop("trace")
+            acts = [t["act"] for t in tr]
+            mx = 0.0
+            cnt = collections.Counter(acts[a.hour:a.hour + 100])
+            if len(acts) >= a.hour + 100:
+                mx = max(cnt.values()) / 100.0
+                for j in range(a.hour + 100, len(acts)):
+                    cnt[acts[j]] += 1
+                    cnt[acts[j - 100]] -= 1
+                    mx = max(mx, max(cnt.values()) / 100.0)
+            ends = [t for t in tr[a.x2_from:] if t["terminated"] or t["truncated"]]
+            n_ep = len(ends)
+            k = sum(1 for t in ends if t["terminated"] and t["got"] > 0)
+            kb, _rate = null_bound(n_ep, a.p0)
+            rows.append({"seed": s, "x1_max_share": mx, "x2_episodes": n_ep, "x2_successes": k, "x2_bound_k": kb,
+                         "x2_pass": bool(n_ep > 0 and k >= kb), "x1_pass": bool(mx < 0.5)})
+        x1 = sum(r["x1_pass"] for r in rows) / len(rows)
+        x2 = sum(r["x2_pass"] for r in rows) / len(rows)
+        rates = [r["x2_successes"] / r["x2_episodes"] for r in rows if r["x2_episodes"]]
+        eps = [r["x2_episodes"] for r in rows]
+        mxs = sorted(r["x1_max_share"] for r in rows)
+        out["arms"][key] = {"rows": rows, "x1_pass_share": x1, "x2_pass_share": x2,
+                            "x2_success_mean": statistics.fmean(rates), "x2_success_sd": statistics.pstdev(rates),
+                            "x2_episodes_median": statistics.median(eps), "x2_episodes_range": [min(eps), max(eps)],
+                            "x1_max_share_median": statistics.median(mxs), "x1_max_share_range": [mxs[0], mxs[-1]]}
+        print(f"  {key:7s} {a.n} lives × {a.acts} acts: X1 pass {x1:.2f} (max 100-window share median {statistics.median(mxs):.2f}, "
+              f"range {mxs[0]:.2f}–{mxs[-1]:.2f}) · X2 acts {a.x2_from + 1}–{a.acts}: episodes median {statistics.median(eps)} ({min(eps)}–{max(eps)}), "
+              f"success {statistics.fmean(rates):.3f} ± {statistics.pstdev(rates):.3f} (sd over lives), X2 pass {x2:.2f}", flush=True)
+    Path(a.out).write_text(json.dumps(out, indent=1))
+    return 0
+
+
 def cmd_parity(a) -> int:
     tape_rows = [json.loads(l) for l in Path(a.tape).read_text().splitlines() if l.strip()]
     journal_rows = [json.loads(l) for l in Path(a.journal).read_text().splitlines() if l.strip()]
@@ -543,8 +641,21 @@ def main(argv: Sequence[str]) -> int:
     r.add_argument("--episodes", type=int, default=1000)
     r.add_argument("--seeds", default=f"{LIFE_SEED},{LIFE_SEED + 1_000_000},{LIFE_SEED + 2_000_000}")
     r.add_argument("--out", required=True)
+    d = sub.add_parser("lockseries")
+    d.add_argument("--episodes", type=int, default=1000)
+    d.add_argument("--seeds", default=f"{LIFE_SEED},{LIFE_SEED + 1_000_000},{LIFE_SEED + 2_000_000}")
+    d.add_argument("--out", required=True)
+    v = sub.add_parser("lives")
+    v.add_argument("--arms", default="i,ii,iv-0.5,v")
+    v.add_argument("--n", type=int, default=50)
+    v.add_argument("--acts", type=int, default=960)
+    v.add_argument("--hour", type=int, default=120)
+    v.add_argument("--x2-from", dest="x2_from", type=int, default=240)
+    v.add_argument("--base", type=int, default=30260923)
+    v.add_argument("--p0", type=float, default=0.29)
+    v.add_argument("--out", required=True)
     a = ap.parse_args(list(argv))
-    return {"parity": cmd_parity, "calib": cmd_calib, "arms": cmd_arms}[a.cmd](a)
+    return {"parity": cmd_parity, "calib": cmd_calib, "arms": cmd_arms, "lockseries": cmd_lockseries, "lives": cmd_lives}[a.cmd](a)
 
 
 if __name__ == "__main__":
