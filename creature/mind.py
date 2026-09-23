@@ -493,6 +493,15 @@ class Mind:
         self._act_choices: Dict[int, Dict[str, object]] = {}
         self.acts_chosen: Dict[str, int] = {}
         self.act_mismatches: int = 0
+        # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:59 +0400 — docs/A4-LADDER-PREREG.md §2.5 (A4L-EXPLORE): the
+        # declared VALUE law of the game act chooser (`ACT value reward <n>; optimism <f>` → declared["ACT_VALUE"]); None →
+        # the outcome-weighted law, byte-identical. `act_policy`/`act_weights`/`act_explored`: the law the last choice used,
+        # its weights as journaled, and the choices drawn by the 10 % uniform branch — STATUS on every write (#164), never
+        # read by the mind itself (the journal is unchanged by them).
+        self._act_value: Optional[Dict[str, object]] = self.genome.declared.get("ACT_VALUE")
+        self.act_policy: Optional[str] = None
+        self.act_weights: Optional[List[float]] = None
+        self.act_explored: int = 0
         self._canvas_index: int = 0
         self._filed_predictions: list = []          # [{"row": FILE's row dict, "due_canvas": int}, ...] awaiting the next showing of their word
         # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
@@ -1498,6 +1507,25 @@ class Mind:
                     break
         return out
 
+    def _recent_reflex_gots(self, act: str, k: int = 10) -> List[float]:
+        """edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:59 +0400 — A4L-EXPLORE: `_recent_reflex_residuals`'
+        own walk (the last `k` LIVE outcome_episodes rows whose `word` is `act`, newest first, never past the ring's
+        cap) reading each row's `got` — the payload `_record_reflex` files in x_s[0] (0.0 when a row carried none) —
+        instead of its surprise. [] for an act with no outcome in that window (the value law's «untried»)."""
+        ep = self.outcome_episodes
+        if ep is None:
+            return []
+        out: List[float] = []
+        n = ep.n_written
+        lo = max(0, n - ep.cap)
+        for eid in range(n - 1, lo - 1, -1):
+            rec = ep.get(eid)
+            if rec is not None and rec["word"] == act:
+                out.append(float(rec["x_s"][0]))
+                if len(out) >= k:
+                    break
+        return out
+
     def _maybe_choose_act(self, row: Dict[str, object]) -> None:
         """L-8 (MOTOR-HANDS.md G-MOT-1/G-MOT-4's "replay problem, named"; the plan's §4 L-8): on a game
         eye row, when this genome's ACT vocabulary drives the game (`self._act_policy_on`), choose the
@@ -1512,7 +1540,15 @@ class Mind:
         acts happen to tie -- replay recomputes the identical branch from the identical data either way,
         but a fixed draw count keeps the stream easy to reason about. A pure function of (genome, seed,
         the outcome ring's own live content, this row) -- replay re-derives the identical choice; no
-        clock, no other rng stream, no organism state is read."""
+        clock, no other rng stream, no organism state is read.
+
+        edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:59 +0400 — docs/A4-LADDER-PREREG.md §2.5 (A4L-EXPLORE, the
+        ALPHA4-PREREG §11.2 lock): when `ACT value reward <n>; optimism <f>` is declared, an act's weight is its VALUE —
+        the mean REWARD (`got`) over its last <n> outcomes, <f> for an act with none in that window — instead of its
+        mean |residual| (a surprise that, once one act was rewarded, never let any other act win: 96 of alpha4-1's last
+        100 acts at hour 5). The 10 % uniform draw, the argmax with rng ties, the TWO draws a choice and the rng are
+        unchanged; the journal's `policy` names the law. Undeclared: the loop below is the old one, byte for byte in
+        its effect (the landing's negative control replays the hour-1 fixture identical, `hash` included)."""
         if not self._act_policy_on:
             return
         meta = row.get("meta") or {}
@@ -1524,13 +1560,23 @@ class Mind:
         n_actions = int(n_actions)
         act_names = list(meta.get("act_names") or [str(i) for i in range(n_actions)])[:n_actions]
         weights = []
-        for name in act_names:
-            residuals = self._recent_reflex_residuals(name, k=10)
-            weights.append(sum(residuals) / len(residuals) if residuals else 0.0)
+        if self._act_value is None:
+            for name in act_names:
+                residuals = self._recent_reflex_residuals(name, k=10)
+                weights.append(sum(residuals) / len(residuals) if residuals else 0.0)
+            policy = "outcome-weighted"
+        else:
+            value_window = int(self._act_value["window"])
+            optimism = float(self._act_value["optimism"])
+            for name in act_names:
+                gots = self._recent_reflex_gots(name, k=value_window)
+                weights.append(sum(gots) / len(gots) if gots else optimism)
+            policy = "reward-valued"
 
         u = float(self._act_rng.random())
         if u < 0.1:
             idx = int(self._act_rng.integers(0, n_actions))
+            self.act_explored += 1
         else:
             best = max(weights)
             tied = [i for i, w in enumerate(weights) if w == best]
@@ -1547,10 +1593,12 @@ class Mind:
 
         self._act_choices[seq] = {"idx": idx, "name": act_name}
         self.acts_chosen[act_name] = self.acts_chosen.get(act_name, 0) + 1
+        self.act_policy = policy
+        self.act_weights = [round(w, 6) for w in weights]
         self._write_journal(row["at"], {
             "seq": seq,
             "act": {"game": meta.get("game"), "act": act_name, "act_idx": idx, "seq": seq,
-                    "policy": "outcome-weighted", "weights": [round(w, 6) for w in weights]},
+                    "policy": policy, "weights": [round(w, 6) for w in weights]},
         })
 
     def _check_act_mismatch(self, meta: Dict[str, object]) -> Optional[bool]:

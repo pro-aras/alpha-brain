@@ -178,6 +178,10 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # Two real call sites each (Mind.__init__ builds state; Mind._consume_outcome/_consume_sit/_think_pool/
         # _think_work read the declared value or act on the row) — the same two-site shape PREDICT/FAST already use.
         "ACT": "creature/mind.py:Mind._record_reflex (declared['ACT']['verbs'] read; an outcome/sit row's act tagged in/out of the declared vocabulary)",
+        # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:58 +0400 — docs/A4-LADDER-PREREG.md §2.5: the second ACT
+        # line's own key (never ACT's row by its base name — tools/inventory.py falls back to the base, the generic refusal
+        # in Mind.__init__ does not: this row is what lets the rung's organism start).
+        "ACT_VALUE": "creature/mind.py:Mind._maybe_choose_act (declared['ACT_VALUE'] read: window + optimism — the game act's value = its mean reward over its last `window` outcomes, `optimism` for an act with none; undeclared → the outcome-weighted law, unchanged)",
         "OUTCOME": "creature/mind.py:Mind.__init__ (self.outcome_episodes built) + Mind._consume_outcome/_record_reflex (residual computed via a per-act running expectation; written as a reflex episode, ranked by Episodes.most_surprising) + Mind._think_pool/_think_work ('outcome' pool kind)",
         # edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400 — G-EYE-1/G-MIND-1 (docs/briefs/G5-I-SEAM-DELIVER-MOMENT.md):
         # two rows, both real call sites, gated on their OWN declared presence (an undeclared DELIVER never computes seam0; an
@@ -379,6 +383,9 @@ BOUNDS: Dict[str, dict] = {
     "PARK.reopen_kinds": {"excluded": True, "reason": "not a number — 'reopen on new-sense' is a fixed literal the parser accepts, nothing to mutate"},
     "FROZEN.after": {"excluded": True, "reason": "creature/genes.py RUNS['mind']['FROZEN'] is TWIN-ONLY (read only when 'frozen' in blind) — a live genome never reads it, so a live proposal could never grade a mutation of it"},
     "INDUCE.from_episodes": {"excluded": True, "reason": "named in the brief's own first (pre-exclusion) list but absent from its final 'Mutate RATES and THRESHOLDS only' sentence — read conservatively as not included (raised in the report, not silently guessed)"},
+    # ---- excluded: the A4 ladder's EXPLORE rung (edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:58 +0400) ----
+    "ACT_VALUE.window": {"excluded": True, "reason": "A4L-EXPLORE (A4-LADDER-PREREG §2.5) is a ladder rung whose ONE difference is this line; EVOLVE is #OFF on every rung (§1.2), so nothing here may draw it — a mutable row belongs to a later genome's table, after the rung's verdict"},
+    "ACT_VALUE.optimism": {"excluded": True, "reason": "A4L-EXPLORE (A4-LADDER-PREREG §2.5): as ACT_VALUE.window — the rung's declared law, never mutated inside the experiment that grades it"},
 }
 
 MUTABLE_KEYS: Tuple[str, ...] = tuple(sorted(k for k, v in BOUNDS.items() if not v.get("excluded")))

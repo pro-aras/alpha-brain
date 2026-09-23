@@ -1,0 +1,1414 @@
+{
+ "acts": 960,
+ "hour": 120,
+ "x2_from": 240,
+ "lives": 50,
+ "base": 30260923,
+ "p0": 0.29,
+ "arms": {
+  "v-b": {
+   "rows": [
+    {
+     "seed": 30260923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30261923,
+     "x1_max_share": 0.27,
+     "x2_episodes": 13,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30262923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 13,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30263923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 13,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30264923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30265923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30266923,
+     "x1_max_share": 0.24,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30267923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 16,
+     "x2_successes": 5,
+     "x2_bound_k": 9,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30268923,
+     "x1_max_share": 0.3,
+     "x2_episodes": 15,
+     "x2_successes": 7,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30269923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 15,
+     "x2_successes": 8,
+     "x2_bound_k": 8,
+     "x2_pass": true,
+     "x1_pass": true
+    },
+    {
+     "seed": 30270923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30271923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30272923,
+     "x1_max_share": 0.27,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30273923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 11,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30274923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 11,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30275923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 15,
+     "x2_successes": 7,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30276923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 14,
+     "x2_successes": 6,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30277923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 12,
+     "x2_successes": 3,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30278923,
+     "x1_max_share": 0.24,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30279923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30280923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30281923,
+     "x1_max_share": 0.4,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30282923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30283923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30284923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 14,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30285923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 15,
+     "x2_successes": 6,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30286923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30287923,
+     "x1_max_share": 0.23,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30288923,
+     "x1_max_share": 0.27,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30289923,
+     "x1_max_share": 0.23,
+     "x2_episodes": 12,
+     "x2_successes": 4,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30290923,
+     "x1_max_share": 0.24,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30291923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30292923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30293923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30294923,
+     "x1_max_share": 0.24,
+     "x2_episodes": 12,
+     "x2_successes": 3,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30295923,
+     "x1_max_share": 0.24,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30296923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30297923,
+     "x1_max_share": 0.31,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30298923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 13,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30299923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30300923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30301923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30302923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 15,
+     "x2_successes": 7,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30303923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 13,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30304923,
+     "x1_max_share": 0.27,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30305923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 13,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30306923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 13,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30307923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30308923,
+     "x1_max_share": 0.32,
+     "x2_episodes": 14,
+     "x2_successes": 6,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30309923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    }
+   ],
+   "x1_pass_share": 1.0,
+   "x2_pass_share": 0.02,
+   "x2_success_mean": 0.25291333666333665,
+   "x2_success_sd": 0.11626792352710787,
+   "x2_episodes_median": 13.0,
+   "x2_episodes_range": [
+    11,
+    16
+   ],
+   "x1_max_share_median": 0.26,
+   "x1_max_share_range": [
+    0.23,
+    0.4
+   ]
+  },
+  "v-c": {
+   "rows": [
+    {
+     "seed": 30260923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 15,
+     "x2_successes": 6,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30261923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30262923,
+     "x1_max_share": 0.36,
+     "x2_episodes": 15,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30263923,
+     "x1_max_share": 0.27,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30264923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 14,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30265923,
+     "x1_max_share": 0.31,
+     "x2_episodes": 15,
+     "x2_successes": 7,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30266923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 14,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30267923,
+     "x1_max_share": 0.32,
+     "x2_episodes": 15,
+     "x2_successes": 6,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30268923,
+     "x1_max_share": 0.37,
+     "x2_episodes": 17,
+     "x2_successes": 8,
+     "x2_bound_k": 9,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30269923,
+     "x1_max_share": 0.3,
+     "x2_episodes": 13,
+     "x2_successes": 7,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30270923,
+     "x1_max_share": 0.3,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30271923,
+     "x1_max_share": 0.31,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30272923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 11,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30273923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 16,
+     "x2_successes": 7,
+     "x2_bound_k": 9,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30274923,
+     "x1_max_share": 0.31,
+     "x2_episodes": 11,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30275923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 15,
+     "x2_successes": 8,
+     "x2_bound_k": 8,
+     "x2_pass": true,
+     "x1_pass": true
+    },
+    {
+     "seed": 30276923,
+     "x1_max_share": 0.32,
+     "x2_episodes": 16,
+     "x2_successes": 6,
+     "x2_bound_k": 9,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30277923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30278923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30279923,
+     "x1_max_share": 0.27,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30280923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30281923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 12,
+     "x2_successes": 3,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30282923,
+     "x1_max_share": 0.35,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30283923,
+     "x1_max_share": 0.3,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30284923,
+     "x1_max_share": 0.32,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30285923,
+     "x1_max_share": 0.3,
+     "x2_episodes": 14,
+     "x2_successes": 6,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30286923,
+     "x1_max_share": 0.31,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30287923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30288923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30289923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 15,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30290923,
+     "x1_max_share": 0.33,
+     "x2_episodes": 18,
+     "x2_successes": 9,
+     "x2_bound_k": 9,
+     "x2_pass": true,
+     "x1_pass": true
+    },
+    {
+     "seed": 30291923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30292923,
+     "x1_max_share": 0.34,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30293923,
+     "x1_max_share": 0.27,
+     "x2_episodes": 14,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30294923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 14,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30295923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30296923,
+     "x1_max_share": 0.32,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30297923,
+     "x1_max_share": 0.3,
+     "x2_episodes": 14,
+     "x2_successes": 6,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30298923,
+     "x1_max_share": 0.27,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30299923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 15,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30300923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30301923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30302923,
+     "x1_max_share": 0.33,
+     "x2_episodes": 15,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30303923,
+     "x1_max_share": 0.31,
+     "x2_episodes": 13,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30304923,
+     "x1_max_share": 0.31,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30305923,
+     "x1_max_share": 0.25,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30306923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 16,
+     "x2_successes": 8,
+     "x2_bound_k": 9,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30307923,
+     "x1_max_share": 0.28,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30308923,
+     "x1_max_share": 0.26,
+     "x2_episodes": 13,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    },
+    {
+     "seed": 30309923,
+     "x1_max_share": 0.29,
+     "x2_episodes": 13,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": true
+    }
+   ],
+   "x1_pass_share": 1.0,
+   "x2_pass_share": 0.04,
+   "x2_success_mean": 0.30399776204187967,
+   "x2_success_sd": 0.11189557482496441,
+   "x2_episodes_median": 14.0,
+   "x2_episodes_range": [
+    11,
+    18
+   ],
+   "x1_max_share_median": 0.29,
+   "x1_max_share_range": [
+    0.25,
+    0.37
+   ]
+  },
+  "v-c-argmax": {
+   "rows": [
+    {
+     "seed": 30260923,
+     "x1_max_share": 0.67,
+     "x2_episodes": 11,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30261923,
+     "x1_max_share": 0.7,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30262923,
+     "x1_max_share": 0.72,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30263923,
+     "x1_max_share": 0.67,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30264923,
+     "x1_max_share": 0.95,
+     "x2_episodes": 11,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30265923,
+     "x1_max_share": 0.94,
+     "x2_episodes": 17,
+     "x2_successes": 6,
+     "x2_bound_k": 9,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30266923,
+     "x1_max_share": 0.63,
+     "x2_episodes": 11,
+     "x2_successes": 0,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30267923,
+     "x1_max_share": 0.66,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30268923,
+     "x1_max_share": 0.86,
+     "x2_episodes": 15,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30269923,
+     "x1_max_share": 0.63,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30270923,
+     "x1_max_share": 0.72,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30271923,
+     "x1_max_share": 0.67,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30272923,
+     "x1_max_share": 0.9,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30273923,
+     "x1_max_share": 0.69,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30274923,
+     "x1_max_share": 0.95,
+     "x2_episodes": 11,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30275923,
+     "x1_max_share": 0.67,
+     "x2_episodes": 11,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30276923,
+     "x1_max_share": 0.9,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30277923,
+     "x1_max_share": 0.94,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30278923,
+     "x1_max_share": 0.75,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30279923,
+     "x1_max_share": 0.7,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30280923,
+     "x1_max_share": 0.67,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30281923,
+     "x1_max_share": 0.75,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30282923,
+     "x1_max_share": 0.7,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30283923,
+     "x1_max_share": 0.9,
+     "x2_episodes": 15,
+     "x2_successes": 6,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30284923,
+     "x1_max_share": 0.66,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30285923,
+     "x1_max_share": 0.93,
+     "x2_episodes": 11,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30286923,
+     "x1_max_share": 0.9,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30287923,
+     "x1_max_share": 0.64,
+     "x2_episodes": 11,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30288923,
+     "x1_max_share": 0.74,
+     "x2_episodes": 13,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30289923,
+     "x1_max_share": 0.69,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30290923,
+     "x1_max_share": 0.7,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30291923,
+     "x1_max_share": 0.69,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30292923,
+     "x1_max_share": 0.65,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30293923,
+     "x1_max_share": 0.76,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30294923,
+     "x1_max_share": 0.94,
+     "x2_episodes": 14,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30295923,
+     "x1_max_share": 0.67,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30296923,
+     "x1_max_share": 0.67,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30297923,
+     "x1_max_share": 0.65,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30298923,
+     "x1_max_share": 0.71,
+     "x2_episodes": 11,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30299923,
+     "x1_max_share": 0.75,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30300923,
+     "x1_max_share": 0.71,
+     "x2_episodes": 15,
+     "x2_successes": 5,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30301923,
+     "x1_max_share": 0.69,
+     "x2_episodes": 11,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30302923,
+     "x1_max_share": 0.7,
+     "x2_episodes": 13,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30303923,
+     "x1_max_share": 0.69,
+     "x2_episodes": 12,
+     "x2_successes": 1,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30304923,
+     "x1_max_share": 0.68,
+     "x2_episodes": 13,
+     "x2_successes": 2,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30305923,
+     "x1_max_share": 0.84,
+     "x2_episodes": 15,
+     "x2_successes": 4,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30306923,
+     "x1_max_share": 0.67,
+     "x2_episodes": 14,
+     "x2_successes": 3,
+     "x2_bound_k": 8,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30307923,
+     "x1_max_share": 0.64,
+     "x2_episodes": 11,
+     "x2_successes": 0,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30308923,
+     "x1_max_share": 0.93,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    },
+    {
+     "seed": 30309923,
+     "x1_max_share": 0.79,
+     "x2_episodes": 12,
+     "x2_successes": 2,
+     "x2_bound_k": 7,
+     "x2_pass": false,
+     "x1_pass": false
+    }
+   ],
+   "x1_pass_share": 0.0,
+   "x2_pass_share": 0.0,
+   "x2_success_mean": 0.17516738163796985,
+   "x2_success_sd": 0.08976880104394468,
+   "x2_episodes_median": 13.0,
+   "x2_episodes_range": [
+    11,
+    17
+   ],
+   "x1_max_share_median": 0.7,
+   "x1_max_share_range": [
+    0.63,
+    0.95
+   ]
+  }
+ }
+}
