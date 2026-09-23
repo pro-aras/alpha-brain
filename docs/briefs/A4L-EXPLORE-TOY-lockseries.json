@@ -1,0 +1,104 @@
+{
+ "20260923": {
+  "success_rate": 0.197,
+  "successes": 197,
+  "per100": [
+   0.09,
+   0.24,
+   0.16,
+   0.21,
+   0.26,
+   0.26,
+   0.18,
+   0.21,
+   0.17,
+   0.19
+  ],
+  "first10": 1,
+  "first12": 2,
+  "locked_blocks": [
+   484,
+   561
+  ],
+  "lock_changes": 7,
+  "locked_act_blocks": {
+   "forward": 355,
+   "left": 75,
+   "right": 54
+  },
+  "successes_by_act": {
+   "forward": 134,
+   "right": 32,
+   "left": 31
+  },
+  "successes_on_the_locked_act": 126
+ },
+ "21260923": {
+  "success_rate": 0.196,
+  "successes": 196,
+  "per100": [
+   0.23,
+   0.19,
+   0.19,
+   0.14,
+   0.18,
+   0.18,
+   0.25,
+   0.2,
+   0.19,
+   0.21
+  ],
+  "first10": 1,
+  "first12": 1,
+  "locked_blocks": [
+   427,
+   557
+  ],
+  "lock_changes": 11,
+  "locked_act_blocks": {
+   "forward": 307,
+   "right": 86,
+   "left": 34
+  },
+  "successes_by_act": {
+   "forward": 129,
+   "right": 46,
+   "left": 21
+  },
+  "successes_on_the_locked_act": 119
+ },
+ "22260923": {
+  "success_rate": 0.174,
+  "successes": 174,
+  "per100": [
+   0.06,
+   0.16,
+   0.17,
+   0.17,
+   0.17,
+   0.25,
+   0.19,
+   0.21,
+   0.18,
+   0.18
+  ],
+  "first10": 1,
+  "first12": 1,
+  "locked_blocks": [
+   485,
+   569
+  ],
+  "lock_changes": 2,
+  "locked_act_blocks": {
+   "forward": 333,
+   "left": 117,
+   "right": 35
+  },
+  "successes_by_act": {
+   "forward": 108,
+   "left": 51,
+   "right": 15
+  },
+  "successes_on_the_locked_act": 105
+ }
+}
