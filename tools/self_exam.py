@@ -74,13 +74,34 @@ def tape_canvases(root: Path, n: int):
     return out
 
 
+# edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:43 +0400 — ALPHA4-PREREG §4(b) AMENDED (§11 finding 1): the read
+# proxy tested heard[-N:] — the N NEWEST, least-exposed words the shelf had read (≥ 0.6 in 2 of alpha4-1's 23 sittings,
+# never two in a row). It is now a FIXED-SEED sample over ALL of read/HEARD.json. The sitter (creature/exam.py) passes
+# «--read-words 50 --read-seed 20260923»; the default seed is the same, so the tool run alone reads what the sitter reads.
+READ_SEED_DEFAULT = 20260923
+
+
+def read_sample(heard, n: int, seed: int = READ_SEED_DEFAULT) -> list:
+    """n words drawn WITHOUT replacement, uniformly over ALL the heard words (first-heard order, distinct — creature/senses/
+    read.py:heard_words), by numpy's PCG64 seeded with `seed`, returned in first-heard order. Deterministic for a given
+    heard list and seed; the oldest words are as likely as the newest. Fewer than n heard -> [] (the share then reads None
+    and the judge's (b) fails closed — a proxy on fewer words than its own n is not the proxy)."""
+    heard = list(heard)
+    n = int(n)
+    if n <= 0 or len(heard) < n:
+        return []
+    idx = np.random.default_rng(int(seed)).choice(len(heard), size=n, replace=False)
+    return [heard[i] for i in sorted(int(i) for i in idx)]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", required=True)
     ap.add_argument("--genome", default=str(ROOT / "genome" / "G4-skeleton.genome"))
     ap.add_argument("--held", type=int, default=run_g1.HELD_N if hasattr(run_g1, "HELD_N") else 10)
     ap.add_argument("--check-tape", type=int, default=400)
-    ap.add_argument("--read-words", type=int, default=0, help="ALPHA4: render the last N words the shelf reader HEARD (read/HEARD.json) in the held-out font and report read_share (None when fewer than N heard)")
+    ap.add_argument("--read-words", type=int, default=0, help="ALPHA4 §4(b): render a fixed-seed sample of N of ALL the words the shelf reader HEARD (read/HEARD.json) in the held-out font and report read_share (None when fewer than N heard)")
+    ap.add_argument("--read-seed", type=int, default=READ_SEED_DEFAULT, help="the --read-words sample's seed (the sitter passes 20260923, the default)")
     a = ap.parse_args()
     root = Path(a.root)
     t0 = time.perf_counter()
@@ -139,16 +160,19 @@ def main() -> int:
     # exam's own `organism_hash_unchanged_by_exam` covers it.
     ask_sound_out = sound_exam(org, ledgers, things + arr2, feats, voiced=voiced_counts(root)) if getattr(org, "sound", None) is not None else None
     # edit: Claude (Fable 5.1), 2026-09-23 03:02 +0400 — ALPHA4 §4(b): the reading share as a TAPE FACT. The sitter (off the mind
-    # thread, on the snapshot) renders the last N HEARD shelf words in the HELD-OUT font (tools/read_recognised.py, builder
+    # thread, on the snapshot) renders N HEARD shelf words in the HELD-OUT font (tools/read_recognised.py, builder
     # H's own mark instrument) and reports the share; the SIT row forwards it and the judge reads the row.
+    # (Opus 5.5, 2026-09-23 11:43 +0400: the N are `read_sample`'s fixed-seed draw over ALL heard words, no longer the last N.)
     read_share, read_words_n, read_words_list = None, int(getattr(a, "read_words", 0) or 0), []
+    read_seed, read_heard_n = int(getattr(a, "read_seed", READ_SEED_DEFAULT)), None
     if read_words_n > 0:
         try:
             from creature.senses.read import heard_words as _heard_words
             from tools.read_recognised import recognised_share as _recognised_share
             heard = _heard_words(root)
-            if len(heard) >= read_words_n:
-                read_words_list = heard[-read_words_n:]
+            read_heard_n = len(heard)
+            read_words_list = read_sample(heard, read_words_n, read_seed)     # AMENDED 2026-09-23: was heard[-read_words_n:]
+            if read_words_list:
                 rs = _recognised_share(root, Path(a.genome), read_words_list)
                 read_share = float(rs.get("share")) if isinstance(rs, dict) and rs.get("share") is not None else None
         except Exception as e:   # a sitter never crashes the voice thread: the field reads None, the reason printed
@@ -167,6 +191,7 @@ def main() -> int:
         "lit_counts_seen": lit_counts_seen, "answer_majority_declared": answer_majority_declared, "old_law_note": old_law_note,
         "ask_sound": ask_sound_out,
         "read_share": read_share, "read_words_n": read_words_n, "read_words": read_words_list,
+        "read_seed": read_seed, "read_heard_n": read_heard_n,        # the sample's own numbers beside the share (#164)
         "organism_hash_unchanged_by_exam": org.state_hash() == hash_before, "seconds": round(time.perf_counter() - t0, 1),
     }
     (root / "exam").mkdir(exist_ok=True)

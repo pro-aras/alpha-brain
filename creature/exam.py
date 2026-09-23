@@ -19,6 +19,13 @@ from tools import self_exam
 from .tape import now_iso
 
 
+# edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:43 +0400 — ALPHA4-PREREG §4(b) AMENDED (§11 finding 1): the read
+# proxy on every sitting = a fixed-seed sample of 50 over ALL the heard shelf words (tools/self_exam.py:read_sample), never the
+# 20 NEWEST (heard[-20:], the least-exposed words — ≥ 0.6 in 2 of alpha4-1's first 23 sittings, never two in a row).
+READ_WORDS = 50
+READ_SEED = 20260923
+
+
 def run_exam(root: Path, genome_path: Path, held: int = 10, check_tape: int = 400) -> Dict[str, object]:
     """Runs tools/self_exam.py's own `main()` (its argument parsing reused via a scoped sys.argv swap,
     restored in a finally -- never copying its logic) and returns {"path": <the file it wrote>, "data":
@@ -27,7 +34,8 @@ def run_exam(root: Path, genome_path: Path, held: int = 10, check_tape: int = 40
     root = Path(root)
     old_argv = sys.argv
     try:
-        sys.argv = ["self_exam.py", "--root", str(root), "--genome", str(genome_path), "--held", str(held), "--check-tape", str(check_tape), "--read-words", "20"]   # ALPHA4 §4(b): the reading share on every sitting (Claude (Fable 5.1), 2026-09-23 03:02 +0400)
+        sys.argv = ["self_exam.py", "--root", str(root), "--genome", str(genome_path), "--held", str(held), "--check-tape", str(check_tape),
+                    "--read-words", str(READ_WORDS), "--read-seed", str(READ_SEED)]   # ALPHA4 §4(b): the reading share on every sitting (Claude (Fable 5.1), 2026-09-23 03:02 +0400; 50 seeded words over all heard, Opus 5.5 11:43)
         self_exam.main()
     finally:
         sys.argv = old_argv
