@@ -2339,6 +2339,16 @@ class Mind:
         # `act_seq` == this seq) is consumed — see `_consume_outcome`'s own clearing branch, below.
         # `act_chosen` is journaled BESIDE `think` (the brief's own words: "journaled `act_chosen: {run,
         # program, seq}`") in the SAME row, never a second journal write for one think pass.
+        self._land_hands_run(row, item, result, journal_obj)   # F's hands act — ONE helper for both think roads (the E×F seam)
+        self._write_journal(row["at"], journal_obj)
+
+    def _land_hands_run(self, row: Dict[str, object], item: Dict[str, object], result: Dict[str, object],
+                        journal_obj: Dict[str, object]) -> None:
+        """edit: Claude (Fable 5.1), 2026-09-23 04:21 +0400 — the E×F seam, found by the pre-flight life alpha4-pre-3: builder F put the
+        hands' ACT write in `_maybe_think` (the inline road) and builder E's threaded entry copied the journal write for
+        the non-word/self kinds "byte-identical to the inline road" — WITHOUT this block. Under a threaded genome every
+        hands think journaled «run» and no ACT was ever written: 0 runs, 0 touch rows, the organ declared and dead. Both
+        roads now call this one helper."""
         if item.get("kind") == "hands" and result.get("outcome") == "run":
             program = str(result["program"])
             seq = int(row["seq"])
@@ -2350,7 +2360,6 @@ class Mind:
             self._hands_pending = {"seq": seq, "program": program}
             self.runs_chosen[program] = self.runs_chosen.get(program, 0) + 1
             journal_obj["act_chosen"] = {"act": "run", "program": program, "seq": seq}
-        self._write_journal(row["at"], journal_obj)
 
     # ------------------------------------------------------------------ L-5: THE THINKING THREAD (threaded road)
     def _maybe_think_threaded(self, row: Dict[str, object]) -> None:
@@ -2403,10 +2412,12 @@ class Mind:
         if item.get("kind") not in ("word", "self"):
             result = self._think_work(item)
             self._think_pending = None
-            self._write_journal(row["at"], {
+            journal_obj_t: Dict[str, object] = {
                 "seq": row["seq"],
                 "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": result.get("outcome"), "parked": bool(result.get("parked"))},
-            })
+            }
+            self._land_hands_run(row, item, result, journal_obj_t)   # edit: Claude (Fable 5.1), 2026-09-23 04:21 +0400 — the E×F seam (see the helper)
+            self._write_journal(row["at"], journal_obj_t)
             return
         if item.get("kind") == "self":
             # LIFE-A-ANSWER-SELF.md #3's own law: `_self_worked_seq` is marked the MOMENT the pair is

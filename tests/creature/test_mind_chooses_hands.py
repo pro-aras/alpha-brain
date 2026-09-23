@@ -274,3 +274,41 @@ class TestReplayNeverCallsTheJail(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# edit: Claude (Fable 5.1), 2026-09-23 04:22 +0400 — THE E×F SEAM (found by the pre-flight life alpha4-pre-3, not by any suite): under a
+# THREADED think genome (builder E's road) the non-word/self kinds took a copied journal write that lacked builder F's
+# hands act — six «run» thinks, 0 ACT files, 0 runs, 0 touch rows on the real life. The threaded twin of the test above.
+THINK_THREADED_1 = "THINK    every 1 canvases; on its own thread; lands next boundary"
+BODY_THREADED = "BODY     service creature threads eye ear door mind think voice"
+
+
+def _genome_threaded_with(*lines: str) -> Path:
+    d = Path(tempfile.mkdtemp())
+    p = d / "genome.genome"
+    base = [l for l in G5_GENOME_PATH.read_text().splitlines() if not l.startswith("BODY ") and not l.startswith("THINK ")]
+    p.write_text("\n".join(base) + "\n" + BODY_THREADED + "\n" + "\n".join(lines) + "\n")
+    return p
+
+
+class HandsActOnTheThreadedThinkRoad(unittest.TestCase):
+    def test_a_chosen_hands_item_writes_the_act_file_under_a_threaded_think(self) -> None:
+        gpath = _genome_threaded_with(HANDS_LINE, ACT_LINE, THINK_THREADED_1)
+        root = Path(tempfile.mkdtemp())
+        mind = Mind(gpath, root)
+        self.assertTrue((mind.genome.declared.get("THINK") or {}).get("threaded"), "the genome must run THINK on its own thread")
+        tape = Tape(root)
+        server = _FakeHandsSense(mind, tape, root)
+        served: List[str] = []
+        for i in range(40):
+            _png_row(tape, mind, i)
+            got = server.maybe_serve()
+            if got is not None:
+                served.append(got)
+        try:
+            mind.close()
+        except Exception:
+            pass
+        self.assertGreater(len(served), 0, "under a threaded THINK a chosen hands item must still write ACT (the E×F seam)")
+        act_chosen_rows = [r["act_chosen"] for r in _journal_rows(root) if "act_chosen" in r]
+        self.assertEqual(len(act_chosen_rows), len(served))
