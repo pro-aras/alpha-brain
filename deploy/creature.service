@@ -11,7 +11,11 @@ WorkingDirectory=/data/dev/genome
 Environment=OPENBLAS_NUM_THREADS=1
 Environment=OMP_NUM_THREADS=1
 ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome/run --genome /data/dev/genome/genome/G4.genome
+# edit: Claude (Fable 5.1), 2026-09-23 04:15 +0400 — PREREG §2.6: a MIND crash exits 3 and must NOT be restarted (alpha4-pre-1: one
+# int64 crash at its 2nd sleep became 10 identical crashes in 2 min under Restart=on-failure — #230's loop in this template).
+# A sense crash never exits the process (it restarts in-thread); only a mind crash exits 3.
 Restart=on-failure
+RestartPreventExitStatus=3
 RestartSec=5
 TimeoutStopSec=30
 

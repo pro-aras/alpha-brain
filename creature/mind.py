@@ -190,9 +190,26 @@ def _hands_paths(declared: Dict[str, dict]) -> Tuple[Optional[Path], Optional[Pa
     hands = declared.get("HANDS")
     if hands is None or "shelf" not in hands:
         return None, None
-    jail_path = _mind_repo_root().parent / str(hands["jail"])
+    jail_path = resolve_sibling(str(hands["jail"]))
     shelf_dir = _mind_repo_root() / str(hands["shelf"])
     return jail_path, shelf_dir
+
+
+DEV_ROOT = Path("/data/dev")
+
+
+def resolve_sibling(rel: str) -> Path:
+    """edit: Claude (Fable 5.1), 2026-09-23 04:11 +0400 — a genome path written as a SIBLING of the tree (`alpha3/hands/jail_run`)
+    resolves against the tree's parent when that exists, else against DEV_ROOT. Found by the pre-flight life
+    alpha4-pre-1: a life's checkout lives at /data/dev/genome-lives/<life>/code, whose parent is genome-lives, not
+    /data/dev — the hands read «no road» on all 11 of their thinks, 0 runs, 0 touch rows (a DECLARED-ONLY organ,
+    exactly what his 23:08 rule forbids). Both resolvers (this one for the mind's think road, creature/body.py's
+    for the sense) use this function so they can never disagree again."""
+    first = _mind_repo_root().parent / rel
+    if first.exists():
+        return first
+    second = DEV_ROOT / rel
+    return second if second.exists() else first
 
 
 class Mind:

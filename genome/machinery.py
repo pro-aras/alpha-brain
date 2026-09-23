@@ -866,6 +866,16 @@ GROW_CHUNK = 2048    # ALPHA4-G task 1: the FIXED chunk W/mask/strikes grow by u
 AREA_INITIAL_CAPACITY = 256    # ALPHA4-G task 1: each Area's own starting capacity under GROW; doubles from here.
 
 
+
+def _json_num(o):
+    """json.dumps `default` for the hash and the snapshot meta: numpy integers and floats render as the Python
+    number they equal (byte-identical text to a Python int/float), anything else raises as before."""
+    if isinstance(o, np.integer):
+        return int(o)
+    if isinstance(o, np.floating):
+        return float(o)
+    raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
+
 class Organism:
     """One organism: two areas, one edge matrix, counters. Flags `grow` / `wire` exist for the
     twins T-frozen (grow off after 10 cells) and T-nowire (HEBB off) — defaults ON."""
@@ -1180,7 +1190,7 @@ class Organism:
                     self.W[s, t] = self.g.lr                  # §10 clause 3: born at w = lr
                     self.strikes[s, t] = 0
                     self.c["edges_born"] += 1
-                    self.edges_log.append((self.t, s, t))
+                    self.edges_log.append((self.t, int(s), int(t)))   # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — cast (same crash class as the merge log)
 
     def _delta(self, S: List[int], T: List[int], lr: Optional[float] = None) -> None:
         # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:20 +0400 — ALPHA4-G.md task 1: `tgt_w`/
@@ -1317,7 +1327,7 @@ class Organism:
                         self.prunes_log.append((self.t, int(rows[r_]), int(c_)))
                 W[dead] = 0.0; M[dead] = 0; ST[dead] = 0
                 self.W[sel] = W; self.mask[sel] = M; self.strikes[sel] = ST
-                self.c["edges_pruned"] += k
+                self.c["edges_pruned"] += int(k)   # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — a numpy count in self.c is a numpy int forever: cast
 
     def _merge(self, area: Area, winners: List[int], axis: int) -> None:
         """MERGE cos>THETA_M same-answer: two alike winners with the same answer become one
@@ -1350,7 +1360,7 @@ class Organism:
                 area.alive[b] = 0
                 area.misfires[b] = 0
                 self.c[f"cells_merged_{area.name}"] += 1
-                self.merges.append((self.t, area.name, a, b))
+                self.merges.append((self.t, area.name, int(a), int(b)))   # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — numpy ids cast: json.dumps in state_hash crashed the mind at its 2nd sleep (alpha4-pre-1, seq 2604) — the FIRST real cycle() this road ever ran
 
     def _scale(self) -> None:
         """SCALE every N moments — synaptic scaling: a cell's edge vector is scaled down to unit norm
@@ -1610,7 +1620,7 @@ class Organism:
                 "grow": self._grow, "sight_nmax": self.sight.nmax, "words_nmax": self.words.nmax,
                 "w_shape": list(self.W.shape), "budget_regenerated": self.budget_regenerated,
                 "cycle_baseline_redundant": self._cycle_baseline_redundant, "budget_regen_last_t": self._budget_regen_last_t}
-        path.with_suffix(".json").write_text(json.dumps(meta))
+        path.with_suffix(".json").write_text(json.dumps(meta, default=_json_num))
 
     @classmethod
     def load(cls, path, genome: "Genome") -> "Organism":
@@ -1731,9 +1741,13 @@ class Organism:
         n_s, n_w = self.sight.n, self.words.n
         h.update(self.W[:n_s, :n_w].tobytes()); h.update(self.mask[:n_s, :n_w].tobytes()); h.update(self.strikes[:n_s, :n_w].tobytes())
         h.update(np.int64(self.t).tobytes()); h.update(np.int64(self.budget_left).tobytes())
-        h.update(json.dumps(self.c, sort_keys=True).encode())
-        h.update(json.dumps(self.births).encode()); h.update(json.dumps(self.merges).encode())
-        h.update(json.dumps(self.edges_log).encode()); h.update(json.dumps(self.prunes_log).encode())
+        # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — `default=_json_num`: a numpy integer/float that reaches a counter or a log renders
+        # as the SAME text a Python number would (so the digest is unchanged for every existing record) instead of
+        # aborting the mind mid-sleep (alpha4-pre-1's crash at its 2nd sleep, TypeError int64 — then a 5 s restart loop,
+        # 10 identical crashes, until the unit was stopped by hand: #230's shape in the ONE-life template).
+        h.update(json.dumps(self.c, sort_keys=True, default=_json_num).encode())
+        h.update(json.dumps(self.births, default=_json_num).encode()); h.update(json.dumps(self.merges, default=_json_num).encode())
+        h.update(json.dumps(self.edges_log, default=_json_num).encode()); h.update(json.dumps(self.prunes_log, default=_json_num).encode())
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1): included ONLY once at least one cell has actually pushed a cosine (`own_band_n.any()`) — an
         # untouched ring (all zero, `own_band_n` all zero) is byte-indistinguishable from "THRESH was never

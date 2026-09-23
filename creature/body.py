@@ -563,6 +563,11 @@ def _read_shape_from_argv(argv: List[str]) -> bool:
 # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 2
 # (MOTOR-HANDS.md G-MOT-4): the hands door's own arming, mirroring _declared_folder_dir/_declared_game_
 # config's own shape and gate discipline exactly (C2/C3's convention, reused rather than re-invented).
+
+def _resolve_sibling_for_body(rel: str):
+    from .mind import resolve_sibling
+    return resolve_sibling(rel)
+
 def _declared_hands_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
     """HANDS undeclared, or declared in its SHORT form (no shelf -- the pre-existing "HANDS jail <path>"
     grammar, test_parse_g4.py's own pin) -> None (arms nothing, exactly like a WORLD line with no folder).
@@ -580,7 +585,7 @@ def _declared_hands_config(declared: Dict[str, dict]) -> Optional[Dict[str, obje
     if hands is None or "shelf" not in hands:
         return None
     return {
-        "jail_path": Path(__file__).resolve().parents[2] / str(hands["jail"]),
+        "jail_path": _resolve_sibling_for_body(str(hands["jail"])),   # edit: Claude (Fable 5.1), 2026-09-23 04:11 +0400 — the SAME resolver the mind uses (creature/mind.py:resolve_sibling): a life checkout under genome-lives/<life>/code has no alpha3/ sibling
         "shelf_dir": Path(__file__).resolve().parents[1] / str(hands["shelf"]),
         "cpu": int(hands["cpu"]), "mem": int(hands["mem"]), "wall": int(hands["wall"]),
     }
