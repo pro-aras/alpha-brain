@@ -215,7 +215,18 @@ class TestOnALearnedOrganism(unittest.TestCase):
         hrd = chain.thing_words(self.mind.org, Lw, self.mind.episodes, per_canvas=self.mind._glances_per_canvas(), rule="heard")
         self.assertTrue(hrd <= lit, (hrd, lit))
         self.assertEqual(hrd, set(T.THINGS))
-        self.assertEqual(chain.THING_WORD_RULE, "heard")
+        # edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:5x +0400 — the orchestrator's decision on A42-B2's RAISED item 1: the
+        # rule the mark reads is "ledger" (the two snapshot LEDGERS, nothing from the ring); before the ring wraps it reads EXACTLY
+        # «heard»'s set, and «heard» (the ring rule) and the literal-from-ledger TWIN are still computed on every chat and printed
+        # beside it on the say row (`things`: counts + the two differences, empty before the wrap).
+        self.assertEqual(chain.THING_WORD_RULE, "ledger")
+        led = chain.thing_words(self.mind.org, Lw, self.mind.episodes, per_canvas=self.mind._glances_per_canvas(), rule="ledger",
+                                picture_words=self.mind.picture_words, birth_source=self.mind.birth_source)
+        self.assertEqual(led, hrd, "before the wrap the ledger rule IS the ring rule")
+        self.assertEqual(chain.literal_from_ledger(self.mind.org, Lw, self.mind.birth_source), lit, "the twin IS the literal set before the wrap")
+        say = self._ask("tw1", "what is this", T.held_render("ring", 5))
+        self.assertEqual(say["things"], {"rule": "ledger", "n": len(led), "heard_n": len(hrd), "twin_n": len(lit),
+                                         "heard_minus_rule": [], "rule_minus_heard": []})
 
     def test_the_counters_add_up(self) -> None:
         c = self.mind.chat_counters

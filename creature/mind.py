@@ -615,6 +615,24 @@ class Mind:
         self._last_words_in_instant: List[str] = []    # L-11 task 4 (MOUTH): this canvas's own words, read by _maybe_say
         self._last_glance = None                        # L-11 task 4 (MOUTH): this canvas's own first glance
         self.moment_word: Dict[int, str] = {}              # org.t (per GLANCE, before increment) -> word — build_ledgers' input
+        # edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — A42-B2 PART 2 (ALPHA4-2-PREREG §2.5 "B2 birth-source
+        # ledger"): the words heard while a PICTURE-source canvas (genome/chain.py:PICTURE_SOURCES) was shown, first-heard order,
+        # each once, ONLY GROWING — written in _consume_eye from the eye row's own `meta["source"]` and the instant's (post-blind)
+        # words, the same two facts FAST's ring keeps per episode, so before the ring wraps `set(picture_words) ==
+        # chain.heard_on_pictures(episodes)` exactly (proven on the hour-1 fixture, A42-B2-REPORT) and after it the ledger still
+        # holds what the ring evicted (≈ hour 11.6 of a 24 h life). A LEDGER, like moment_word: persisted in the snapshot's
+        # ledger.json (never org.c, never the births log — both hashed), restored by resume(); read by chain.thing_words(rule=
+        # "ledger", THING_WORD_RULE since 17:5x) through _chat_content, the ring rule and the twin printed beside it on the say
+        # row. A snapshot from before this key resumes EMPTY, never back-filled from the ring.
+        self.picture_words: List[str] = []
+        self._picture_words_set: set = set()
+        # The OTHER half of the same attribution (the PREREG's own name for B2, "the birth-source ledger"): sight cell -> the
+        # source of the canvas it was FIRST born on ("sleep" for a birth inside the sleep replay), written at the birth, on the
+        # three roads that birth (the worded canvas, the sight-only canvas, the sleep step). chain.birth_sources() derives the same
+        # map from the RING (a birth older than the oldest live episode reads "?" — so after the wrap even the LITERAL set forgets
+        # the picture-born cells; the toy's control shows it); this ledger is what rule "ledger" reads instead. Agreement with the
+        # ring on the hour-1 fixture: every sight cell, A42-B2-REPORT.
+        self.birth_source: Dict[int, str] = {}
         self.last_seq: int = 0
         self.sight_only_skipped: int = 0
         self.journal_rows_written: int = 0
@@ -1147,7 +1165,8 @@ class Mind:
                 tuple(sorted(self.acts_chosen.items())), tuple(sorted(self.think_counters.items())),
                 len(self._filed_predictions), len(self._frame_pending), len(self._frames), self._ask_out_n,
                 self._grades_total, self._grades_right, tuple(self._novel_grades), self.stage,
-                tuple(self._last_words_in_instant), self.org.budget_left, self.org.arrivals)
+                tuple(self._last_words_in_instant), self.org.budget_left, self.org.arrivals,
+                len(self.picture_words), len(self.birth_source))     # A42-B2: a chat never writes either ledger
 
     def _chat_content(self, heard: List[str], xs: List[np.ndarray], Ls: Dict[int, set], Lw: Dict[int, set]) -> Dict[str, object]:
         """§3.2 item 3 — the content, grounded, chosen FIRST, one road for every chat: the canvas's glances asked by the
@@ -1156,10 +1175,22 @@ class Mind:
         summed edge from the canvas's lit cells (the Q4 road: edge_many, max over the word's own cells); a tie abstains.
         Reads only."""
         r = self.org.recall_many("sight", xs) if xs else {"cell": None, "reason": "novel", "grade": None, "resembles_cell": None}
-        things = _chain.thing_words(self.org, Lw, self.episodes, per_canvas=self._glances_per_canvas(), rule=_chain.THING_WORD_RULE)
+        # A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400; the rule flipped to "ledger" 17:5x on the orchestrator's word): the
+        # THING-WORDS under THING_WORD_RULE ("ledger": the two LEDGERS, nothing from the ring). The ring rule «heard» and the
+        # literal-from-ledger TWIN are still computed and PRINTED beside it on the say row (`things`, below) — counts and the two
+        # differences, never the full sets — so the ring's forgetting after the wrap (≈ hour 11.6) is a visible difference on the
+        # record, never a silent one. Every read here is read-only (the chat guard and the hash assert it).
+        per_canvas = self._glances_per_canvas()
+        things = _chain.thing_words(self.org, Lw, self.episodes, per_canvas=per_canvas, rule=_chain.THING_WORD_RULE,
+                                    picture_words=self.picture_words, birth_source=self.birth_source)
+        things_heard = _chain.thing_words(self.org, Lw, self.episodes, per_canvas=per_canvas, rule="heard")
+        things_twin = _chain.literal_from_ledger(self.org, Lw, self.birth_source)
         named = list(dict.fromkeys(w for w in heard if w in things))
         out: Dict[str, object] = {"recall": r, "named_things": named, "content": None, "abstain_reason": None,
-                                   "road": "recall", "edges": None}
+                                   "road": "recall", "edges": None,
+                                   "things": {"rule": _chain.THING_WORD_RULE, "n": len(things), "heard_n": len(things_heard),
+                                              "twin_n": len(things_twin), "heard_minus_rule": sorted(things_heard - things),
+                                              "rule_minus_heard": sorted(things - things_heard)}}
         if len(named) >= 2:
             out["road"] = "choose"
             edges = {w: max([self.org.edge_many("sight", xs, c) for c in word_cells(self.org, Lw, w)], default=0.0) for w in named}
@@ -1291,6 +1322,7 @@ class Mind:
                                                                    [[a, b] for a, b in zip(form, form[1:])]],
                "pivot_followers": judged.get("pivot_followers"), "point": point, "abstain_reason": c["abstain_reason"],
                "resembles": resembles, "refused": refused, "road": c["road"], "named_things": c["named_things"],
+               "things": c["things"],      # A42-B2: the rule read + the ring rule and the twin beside it (counts and differences)
                "edges": c["edges"], "grounded": grounded, "form_reason": judged.get("reason"),
                "candidates_n": comp.get("candidates_n"), "truncated": comp.get("truncated"),
                "hash_before": hash_before, "hash_after": hash_after}
@@ -1740,6 +1772,17 @@ class Mind:
             seam0 = {"where": ((int(g["windows"][0][0]), int(g["windows"][0][1])) if "where" not in self.blind else None),
                       "when": row["at"], "act": "glance", "source": meta.get("source"), "glance": 0}
 
+        # edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — A42-B2 PART 2: the picture-words LEDGER (see __init__).
+        # Written from the SAME two facts the episode written below carries — the eye row's own `meta["source"]` (a picture source:
+        # genome/chain.py:PICTURE_SOURCES) and this instant's words AFTER the blind-ear twin cleared them — on BOTH roads below
+        # (a worded canvas and a sight-only one alike, the ring is written on both), so `set(picture_words)` is exactly
+        # chain.heard_on_pictures(episodes) until the ring wraps. A ledger only: no organism state, no journal field, no hash.
+        if words_in_instant and meta.get("source") in _chain.PICTURE_SOURCES:
+            for _pw in words_in_instant:
+                if _pw and _pw not in self._picture_words_set:
+                    self._picture_words_set.add(_pw)
+                    self.picture_words.append(_pw)
+
         # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:36 +0400 — A4L-VOICE task 2/3: the worded road ALSO
         # carries a canvas that has a SOUND and no word (`--blind ear`, or a voiced canvas whose word never came) — «a canvas
         # that carries a SOUND and no word must still run the sight↔sound meeting, never the sight-only road» (the brief's own
@@ -1801,9 +1844,15 @@ class Mind:
             if fast_on and ep_id is not None and confirmed_flags and confirmed_flags[0]:
                 self._confirmed_episodes.add(ep_id)
             if word is not None:
-                self._score_due_predictions(word, g["feats"][0] if g["feats"] else None, words_in_instant=words_in_instant)
+                # A42-B2 G9 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400): the instant's LOCATED glances (g["feats"][:len(fix)];
+                # the whole list when no fixation is located — `one` mode, or BIND's pooled vector) and its source travel with the
+                # call; the scorer reads them ONLY under `SENTENCE …; judged by the eye on the line` — undeclared, every line of
+                # _score_due_predictions is the road it always was (the hour-1 fixture replays identical, A42-B2-REPORT).
+                self._score_due_predictions(word, g["feats"][0] if g["feats"] else None, words_in_instant=words_in_instant,
+                                            glances=(org_feats[:len(g["fix"])] if g["fix"] else list(org_feats)), source=meta.get("source"))
             if snd is not None:
                 self.voice_bound += 1
+            self._ledger_births(births_before, meta.get("source"))      # A42-B2: the birth-source ledger (a ledger only; the row below is unchanged)
             births = [[b[1], int(b[2]), b[3]] for b in self.org.births[births_before:]]
             edges_born = len(self.org.edges_log) - edges_before
             edges_pruned = len(self.org.prunes_log) - prunes_before
@@ -1855,6 +1904,7 @@ class Mind:
                 self.moment_word[self.org.t] = label if label is not None else ""
                 self.org.moment_sight(x)
             births_after = len(self.org.births)
+            self._ledger_births(births_before, meta.get("source"))      # A42-B2: the birth-source ledger, the sight-only road
             xw_blank = encode_word("", self.genome.ear_blank_zero)
             ep_kwargs = seam0 if moment_on else {}
             ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw_blank, word="", surprise=err,
@@ -2022,9 +2072,11 @@ class Mind:
                 if rec is not None:
                     self.moment_word[t0 + i] = rec["word"]
             # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400): `--blind ear` replays with no word
+            births_before_sleep = len(self.org.births)
             result = run_sleep(self.org, self.episodes, n, **({"words": False} if "ear" in self.blind else {}))
             self.sleep_count += 1
             cycled = run_cycle(self.org)
+            self._ledger_births(births_before_sleep, "sleep")     # A42-B2: a birth inside the replay is owned by no canvas — "sleep", chain.birth_sources' own word
             if "TRAITS" in self.genome.declared and _TRAITS_AVAILABLE:
                 Traits.learn(self.episodes)      # per the interface name given for wave 2; unexercised until genome/traits.py lands
             self._write_journal(row["at"], {
@@ -2044,7 +2096,8 @@ class Mind:
 
     # ------------------------------------------------------------------ THINK (A11, PREREG §11.1 step 3)
     def _score_due_predictions(self, word: str, first_glance: Optional[np.ndarray],
-                                 words_in_instant: Optional[List[str]] = None) -> None:
+                                 words_in_instant: Optional[List[str]] = None,
+                                 glances: Optional[List[np.ndarray]] = None, source: Optional[str] = None) -> None:
         """A prediction filed by THINK's kind-(b) work becomes scorable the next time ITS OWN word is
         shown again — "the journal's err/recall on the next canvas with that word" (PREREG's own route
         text). Simplification, documented in the report: the decider "recall == word" is evaluated by a
@@ -2062,6 +2115,18 @@ class Mind:
         still_pending = []
         ledgers = None
         words_in_instant = words_in_instant or []
+        # edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — G9 (ALPHA4-2-PREREG §2 row G9): under `SENTENCE …;
+        # judged by the eye on the line` a SHELF instant scores a frame only when it is a LINE — the reader's sentence moment,
+        # >= 2 distinct words on the canvas (creature/senses/read.py:_publish_chunk publishes every word of a chunk ALONE first,
+        # shown large, then the whole line; a frame was due on w1's one-word canvas, where w2 cannot be: alpha4-1 0 of 63 shelf
+        # frames true, 4 of 4 false on the hour-1 replay) — and its evidence is ANY of the line's located glances
+        # (_frame_evidence_line; the ceiling: 0.272 strict over located glances on the 10:54 copy, 0.089 with glance 0 alone).
+        # SHELF-only by the seat's word: every other source (the game's mission with its picture, a lexicon gloss, a test tape)
+        # keeps today's trigger and today's decider on the same lines below. Undeclared: `line_on` is False and nothing here moves.
+        line_on = self.genome.declared.get("SENTENCE", {}).get("line") is True
+        shelf_line = None
+        if line_on and source == "shelf":
+            shelf_line = len([w for j, w in enumerate(words_in_instant) if w and w not in words_in_instant[:j]]) >= 2
         for entry in self._filed_predictions:
             # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 3 (SENTENCE): a
             # frame entry's target_word is w1, the COLOUR — never equal to `word` (the moment's own word is
@@ -2070,12 +2135,17 @@ class Mind:
             frame_w2 = entry.get("frame_w2")
             if frame_w2 is not None:
                 due = entry["target_word"] in words_in_instant
+                if shelf_line is False:      # G9: a one-word SHELF moment never scores a frame under the clause
+                    due = False
             else:
                 due = entry["target_word"] == word
             if due and self._canvas_index >= entry["due_canvas"]:
                 rule = entry.get("rule")
                 if frame_w2 is not None:
-                    evidence = self._frame_evidence(str(frame_w2), first_glance)
+                    if shelf_line:
+                        evidence = self._frame_evidence_line(str(frame_w2), glances if glances else [first_glance])
+                    else:
+                        evidence = self._frame_evidence(str(frame_w2), first_glance)
                 elif rule is not None:
                     evidence = self._rule_evidence(rule["cluster"], first_glance)
                 else:
@@ -2085,6 +2155,10 @@ class Mind:
                     Lw = ledgers["words"]
                     evidence = r["cell"] is not None and Lw.get(r["cell"], set()) == {word}
                 scored = predict_score(entry["row"], evidence)
+                if line_on and frame_w2 is not None:
+                    # G9: the instant a frame was judged on, stamped on its scored row (the DECLARED replay's own record of shelf
+                    # true/false by source and kind; tools read predictions.jsonl, never the journal) — absent undeclared.
+                    scored["instant"] = {"source": source, "words": list(words_in_instant), "line": bool(shelf_line)}
                 predict_ledger_path = self.run_root / "state" / "predictions.jsonl"
                 predict_ledger_path.parent.mkdir(parents=True, exist_ok=True)
                 with predict_ledger_path.open("a") as f:
@@ -2125,6 +2199,31 @@ class Mind:
         r = self.org.recall("sight", first_glance)
         Lw = ledgers["words"]
         return r["cell"] is not None and Lw.get(r["cell"], set()) == {w2}
+
+    def _ledger_births(self, births_before: int, source: Optional[str]) -> None:
+        """A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400): every SIGHT cell born since `births_before` is filed under
+        `source` in the birth-source ledger, FIRST birth only (an id is never reborn — G4 §3 B7 — so the guard is a formality).
+        A ledger write only: no organism state, no journal field, no hash."""
+        for _t, area, cid, _reason in self.org.births[births_before:]:
+            if area == "sight" and int(cid) not in self.birth_source:
+                self.birth_source[int(cid)] = str(source) if source is not None else ""
+
+    def _frame_evidence_line(self, w2: str, glances: List[np.ndarray]) -> bool:
+        """edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — G9's decider on a LINE: `_frame_evidence`'s strict
+        decider (the answer cell's ledger is exactly {w2}) asked of EVERY located glance of the line — true if any answers w2.
+        The line's MEET binds the canvas's glances to the chunk's LAST word only (`pending` is last-wins), so w2 elsewhere on the
+        line can be read only from what the eye learned of w2 on its own one-word showings — the measured ceiling (A42-B2-REPORT):
+        0.430 when w2 is the last word, 0.183 when it is not; glance 0 alone reads 0.089, below the bar, which is why this asks
+        every glance. A scoring read never changes the organism (Organism.recall's own law)."""
+        ledgers = build_ledgers(self.org, self.moment_word)
+        Lw = ledgers["words"]
+        for x in glances:
+            if x is None:
+                continue
+            r = self.org.recall("sight", x)
+            if r["cell"] is not None and Lw.get(r["cell"], set()) == {w2}:
+                return True
+        return False
 
     def _rule_evidence(self, cluster: List[int], first_glance: np.ndarray) -> bool:
         """W3-2c (edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — PREREG §18): the decider is «the due canvas's first-glance WINNER is in C» —
@@ -3177,6 +3276,10 @@ class Mind:
             # of in-flight state as ear_pending above, same reason (a resume never loses an ear row
             # consumed just before a crash).
             "ear_pending_words": {k: list(v) for k, v in self.pending_words.items()},
+            # A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400): the picture-words LEDGER (see __init__) — a ledger key,
+            # never hashed; first-heard order kept.
+            "picture_words": list(self.picture_words),
+            "birth_source": {str(k): v for k, v in self.birth_source.items()},
             "sight": {str(k): sorted(v) for k, v in ledgers["sight"].items()},
             "words": {str(k): sorted(v) for k, v in ledgers["words"].items()},
             "predictor_last_winner": predictor_last_winner,
@@ -3283,6 +3386,11 @@ class Mind:
             ledger = json.loads(ledger_path.read_text())
             mind.pending = dict(ledger.get("ear_pending", {}))
             mind.pending_words = {k: list(v) for k, v in ledger.get("ear_pending_words", {}).items()}
+            # A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400): the picture-words LEDGER, restored as written; a snapshot
+            # from before this key resumes EMPTY — never back-filled from the ring (RAISED in A42-B2-REPORT).
+            mind.picture_words = [str(w) for w in ledger.get("picture_words", []) if w]
+            mind._picture_words_set = set(mind.picture_words)
+            mind.birth_source = {int(k): str(v) for k, v in (ledger.get("birth_source") or {}).items()}
             # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400): in-flight maker sounds + counts
             mind.pending_sound = {k: {"trait": np.asarray(v["trait"], dtype=np.float64), "seq": int(v["seq"])}
                                   for k, v in (ledger.get("sound_pending") or {}).items()}
