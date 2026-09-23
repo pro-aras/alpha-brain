@@ -108,7 +108,9 @@ def main(argv) -> int:
     born = status.get("sight_born"); nmax = status.get("sight_nmax")
     if isinstance(born, int) and isinstance(nmax, int):
         left_h = max(0.0, 24.0 - len(hours)); proj = born + rate * left_h
-        print(f"[check] SIZING: born {born} of {nmax}; rate (last 3 full h) {rate:.0f}/h; projection at 24 h ≈ {proj:.0f} → {'CROSSES NMAX' if proj > nmax else 'under NMAX'} (the plant needs room at hour ≈ 21: {born + rate * max(0.0, 21.0 - len(hours)):.0f})")
+        cap_kind = "capacity (GROW: no cap)" if status.get("sight_capacity") is not None else "NMAX"
+        crosses = ("grows past the current capacity (GROW re-allocates: not a refusal)" if cap_kind.startswith("capacity") else "CROSSES NMAX") if proj > nmax else "under " + cap_kind
+        print(f"[check] SIZING: born {born} of {nmax} {cap_kind}; rate (last 3 full h) {rate:.0f}/h; projection at 24 h ≈ {proj:.0f} → {crosses} (the plant needs room at hour ≈ 21: {proj21:.0f})")   # edit: Claude (Fable 5.1), 2026-09-23 07:38 +0400 — under GROW STATUS.sight_nmax is the CURRENT capacity, never a cap: the wording said «CROSSES NMAX» on alpha4-1 at 2 h
     else:
         print("[check] SIZING: sight_born/sight_nmax not recorded on STATUS (an older body)")
     # 4. the exam files: the newest, Q1–Q5 and the per-thing misses
