@@ -6,7 +6,7 @@ Builder: Claude (Fable 5.1). Written 2026-09-23 17:05 +0400. Worktree `/data/dev
 
 ## NOT done (read this first)
 
-- **The 10× counts (both ways) — __COUNTS_STATUS__.** They are the last stage of the final gate on the merged bytes `64fb283` (10× the SIT class alone,
+- **The creature suite's 10× — PENDING when this line was written (2026-09-23 17:10 +0400; run 1 of 10 started 17:07, ~810 s each); the 10× alone, `--only 1` and the genome suite are in.** They are the last stage of the final gate on the merged bytes `64fb283` (10× the SIT class alone,
   then `gate_g4 --only 1`, then the genome suite once, then the creature suite 10×, serially, `nice -n 19`, single-threaded BLAS, TMPDIR under
   `scratch/tmp`, waiting while the 1-min load > 12). The numbers are in §4; where a cell says PENDING the run had not finished when this line was written.
 - **The lottery RED did not reproduce at this load.** The old bytes (`a50b0f3`) read **10/10 green** for `TestSitLiveWiring` alone at load ≈ 5
@@ -20,6 +20,15 @@ Builder: Claude (Fable 5.1). Written 2026-09-23 17:05 +0400. Worktree `/data/dev
   (`JSONDecodeError`/`OSError`) feeds the retry counter. The counter lives in memory like the cursors (a restart starts it at 0 — harmless: the
   restart can re-read the same file at most `MAX_TORN_RETRIES` more times).
 - **Not in this branch:** the seam-5 report's other items (1, 3, 4) and its leaked `scratch/tmp` roots (1.1 GB, 1,456 — none deleted, none mine).
+- **The give-up note is a `print`.** Under the body's systemd unit stdout is a pipe, so the line is block-buffered and reaches the journal only when
+  the buffer fills or the process exits — the same property `tools/self_exam.py`'s own `print("read_share: not computed:", ...)` precedent has (a
+  sense has no journal/STATUS channel, and publishing a row it did not read would feed the readiness judge). So: a `grep` of the unit's journal reading
+  0 `sit: gave up` lines is a reading of the buffer, not of the counter (#162's zero-from-a-stream); the counter's proof is `test_b`, which captures
+  the note from stdout in-process. If the note must be seen live, the door is `PYTHONUNBUFFERED`/`-u` on the unit, or a STATUS key — a law change
+  for the seat, not this branch.
+- **Two more `exam`-path sites read on the merged tree and left alone, with the reason:** `creature/replay.py:158–162` `shutil.copy2`s the finished
+  exam files from the replay's work root into its own `out_dir/exam/` AFTER the replay (a post-run copy of complete files into a fresh output root;
+  no reader runs beside it); `tools/creature_watch.py:62`'s `last_path` is `root/watch/last.json`, not an exam file.
 - **`tools/gate_g4.py` had a latent `NameError`-in-waiting:** `_resolve` was annotated `-> Optional[str]` with `Optional` never imported (harmless only
   because of `from __future__ import annotations`). One import line added; noted here because it is a change outside the two functions FIX 2 names.
 
@@ -108,7 +117,20 @@ G4 gates: {'1': 'PASS'}
 Every stage serial, one process at a time, `nice -n 19`, `OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1`, `TMPDIR=scratch/tmp`, waiting while the 1-min
 load > 12 (six lives alive; the rungs close 21:42). Logs: `scratch/sit-atomic/FINAL/{alone,genome,suite}/run-N.log` + `summary.txt`, `FINAL/summary-all.txt`.
 
-__FINAL_GATE__
+**10× `TestSitLiveWiring` alone** (`FINAL/alone/summary.txt`, load 7.1 at start): **10/10** — `Ran 4 tests` / `OK` in every run, all four
+tests `... ok` each time (2.06–2.39 s per run). For the record: the OLD bytes also read 10/10 alone at load ≈ 5 (`red-old-alone/`); the alone count
+does not separate the two trees at this load — the deterministic control in §2 does.
+
+**`gate_g4.py --only 1`** on the merged tree (`FINAL/gate_g4-only1.log`): `G4-1 writer sweep over 20 files: 0 offenders` · `planted offender CAUGHT`
+· `the chat sense's planted offender CAUGHT` · `G4 gates: {'1': 'PASS'}`.
+
+**Genome suite ×1** (`discover -s tests/genome -t .`, `FINAL/genome/run-1.log`): `Ran 522 tests in 138.975s` / `OK (skipped=1, expected failures=6)`.
+
+**Creature suite ×10** (`discover -s tests/creature -t .`, `FINAL/suite/run-N.log`), the suite's own verdict line and the four SIT tests' statuses
+per run, with any load-gate waits:
+
+__CREATURE10__
+
 
 ## 5. Discipline notes
 
