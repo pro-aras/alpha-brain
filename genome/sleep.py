@@ -92,8 +92,10 @@ def cycle(org: Organism) -> bool:
         since_last = org.c["births_refused_redundant"] - org._cycle_baseline_redundant
         if alive == 0 or since_last / alive <= share:
             return False
+    # A42-M6 (edit: Claude (Opus 5.5, M6 builder), 2026-09-23 17:22 +0400): the fast road — the same pairs, the same order, the same
+    # decisions (docs/briefs/A42-M6-REPORT.md; tests/genome/test_merge_fast.py pins it against the old road kept verbatim there).
     for area, axis in ((org.sight, 0), (org.words, 1)):
-        org._merge(area, list(area.alive_ids()), axis=axis)
+        org._merge(area, list(area.alive_ids()), axis=axis, fast=True)
     org._prune(list(org.sight.alive_ids()), list(org.words.alive_ids()))
     # ALPHA4-G task 4: reset the redundant-share baseline only on an ACTUAL run (either form) — a cycle
     # that never fires leaves the "since the last cycle" window open, exactly like the old form's own

@@ -1005,6 +1005,13 @@ GROW_CHUNK = 2048    # ALPHA4-G task 1: the FIXED chunk W/mask/strikes grow by u
                      # chunk (2048×2048, 32 MB for W alone) so the chunk arithmetic stays clean (2048,
                      # 4096, 6144, …) — the brief's own "capacity = 256" is for Area's per-cell arrays only.
 AREA_INITIAL_CAPACITY = 256    # ALPHA4-G task 1: each Area's own starting capacity under GROW; doubles from here.
+# edit: Claude (Opus 5.5, M6 builder), 2026-09-23 17:22 +0400 — A42-M6 (docs/briefs/A42-M6-REPORT.md §1-§2; ALPHA4-2-PREREG §2 row M6): the
+# sleep merge's candidate FILTER. A pair is dropped only when a float64 gemm puts its similarity at or under THETA_M - MARGIN; the
+# old gate's own 1-D `@` (a BLAS ddot, another summation order) differs from any gemm entry by at most 2*gamma_dim*|x||y|
+# (Higham §3.1: 3.2e-14 at dim 144, 4.8e-14 at dim 216 for unit cells), so a dropped pair can never pass the old gate. BLOCK rows
+# per gemm bound the transient memory (512 x n x 8 B: 29 MB at 7,000 alive cells).
+MERGE_FAST_MARGIN = 1e-9
+MERGE_FAST_BLOCK = 512
 
 # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:1x +0400 — A42-B3 task 1 (docs/ALPHA4-2-PREREG.md §2 G7,
 # §2.6; the A4L-VOICE report's own §0 item 10): the SOUND axis of each sound meeting (`sight-sound`'s column axis,
@@ -1850,45 +1857,84 @@ class Organism:
                     w.mark_rows(np.flatnonzero(dead.any(axis=1)) if isinstance(sel[0], slice) else rows[dead.any(axis=1)])
                 self.c["edges_pruned"] += int(k)   # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — a numpy count in self.c is a numpy int forever: cast
 
-    def _merge(self, area: Area, winners: List[int], axis: int) -> None:
+    def _merge(self, area: Area, winners: List[int], axis: int, fast: bool = False) -> None:
         """MERGE cos>THETA_M same-answer: two alike winners with the same answer become one
-        (the lower id is kept, rows averaged over the union of their edges)."""
+        (the lower id is kept, rows averaged over the union of their edges).
+
+        edit: Claude (Opus 5.5, M6 builder), 2026-09-23 17:22 +0400 — A42-M6 (docs/briefs/A42-M6-REPORT.md §1-§2): `fast=True`
+        (genome/sleep.py:cycle only — every alive cell, ≈ n²/2 pairs) walks the pairs `_merge_candidates` returns instead of every pair.
+        Both walks are in the OLD order (i < j over `ws`, lexicographic) and run the OLD body below unchanged — the alive gate, the
+        similarity gate by its own 1-D `@` on the same arrays, `_answer_of` read at visit time, the merge — so the order-dependent
+        cascades (a dead b skipped; a's answer moved by what it absorbed) are the old road's. A pair the filter drops fails the
+        similarity gate in the old road too (the bound at MERGE_FAST_MARGIN), and a pair failing that gate writes nothing; that is the
+        whole licence. `fast=False` (every `moment()` call, a handful of winners): every pair — the old road."""
         ws = sorted(set(w for w in winners if area.alive[w]))
         wit = getattr(self, "_witness", None)    # A4L-COST: the witness learns every row whose MASK a merge changes
-        for i in range(len(ws)):
-            for j in range(i + 1, len(ws)):
-                a, b = ws[i], ws[j]
-                if not (area.alive[a] and area.alive[b]):
-                    continue
-                if float(area.cells[a] @ area.cells[b]) <= self.g.theta_m:
-                    continue
-                aa, ab = self._answer_of(area, a), self._answer_of(area, b)
-                if aa is None or ab is None or aa != ab:
-                    continue
-                if axis == 0:
-                    ma, mb = self.mask[a].astype(np.float64), self.mask[b].astype(np.float64)
-                    den = np.maximum(ma + mb, 1.0)
-                    self.W[a] = (self.W[a] * ma + self.W[b] * mb) / den
-                    self.mask[a] = ((ma + mb) > 0).astype(np.uint8)
-                    self.strikes[a] = np.minimum(self.strikes[a], self.strikes[b])
-                    self.W[b] = 0.0; self.mask[b] = 0; self.strikes[b] = 0
-                    if wit is not None:
-                        wit.mark_rows([a, b])
-                else:
-                    ma, mb = self.mask[:, a].astype(np.float64), self.mask[:, b].astype(np.float64)
-                    den = np.maximum(ma + mb, 1.0)
-                    self.W[:, a] = (self.W[:, a] * ma + self.W[:, b] * mb) / den
-                    self.mask[:, a] = ((ma + mb) > 0).astype(np.uint8)
-                    self.strikes[:, a] = np.minimum(self.strikes[:, a], self.strikes[:, b])
-                    self.W[:, b] = 0.0; self.mask[:, b] = 0; self.strikes[:, b] = 0
-                    if wit is not None:
-                        wit.mark_rows(np.flatnonzero(mb))     # every row of column b moved to column a
-                area.alive[b] = 0
-                area.misfires[b] = 0
-                self.c[f"cells_merged_{area.name}"] += 1
-                self.merges.append((self.t, area.name, int(a), int(b)))   # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — numpy ids cast: json.dumps in state_hash crashed the mind at its 2nd sleep (alpha4-pre-1, seq 2604) — the FIRST real cycle() this road ever ran
-                if self.sound_meets:      # A4L-VOICE (Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400): the merged cell's sound-meeting edges follow it (#235)
-                    self._merge_pair_edges(area, a, b)
+        pairs = self._merge_candidates(area, ws) if fast else ((i, j) for i in range(len(ws)) for j in range(i + 1, len(ws)))
+        for i, j in pairs:
+            a, b = ws[i], ws[j]
+            if not (area.alive[a] and area.alive[b]):
+                continue
+            if float(area.cells[a] @ area.cells[b]) <= self.g.theta_m:
+                continue
+            aa, ab = self._answer_of(area, a), self._answer_of(area, b)
+            if aa is None or ab is None or aa != ab:
+                continue
+            if axis == 0:
+                ma, mb = self.mask[a].astype(np.float64), self.mask[b].astype(np.float64)
+                den = np.maximum(ma + mb, 1.0)
+                self.W[a] = (self.W[a] * ma + self.W[b] * mb) / den
+                self.mask[a] = ((ma + mb) > 0).astype(np.uint8)
+                self.strikes[a] = np.minimum(self.strikes[a], self.strikes[b])
+                self.W[b] = 0.0; self.mask[b] = 0; self.strikes[b] = 0
+                if wit is not None:
+                    wit.mark_rows([a, b])
+            else:
+                ma, mb = self.mask[:, a].astype(np.float64), self.mask[:, b].astype(np.float64)
+                den = np.maximum(ma + mb, 1.0)
+                self.W[:, a] = (self.W[:, a] * ma + self.W[:, b] * mb) / den
+                self.mask[:, a] = ((ma + mb) > 0).astype(np.uint8)
+                self.strikes[:, a] = np.minimum(self.strikes[:, a], self.strikes[:, b])
+                self.W[:, b] = 0.0; self.mask[:, b] = 0; self.strikes[:, b] = 0
+                if wit is not None:
+                    wit.mark_rows(np.flatnonzero(mb))     # every row of column b moved to column a
+            area.alive[b] = 0
+            area.misfires[b] = 0
+            self.c[f"cells_merged_{area.name}"] += 1
+            self.merges.append((self.t, area.name, int(a), int(b)))   # edit: Claude (Fable 5.1), 2026-09-23 04:13 +0400 — numpy ids cast: json.dumps in state_hash crashed the mind at its 2nd sleep (alpha4-pre-1, seq 2604) — the FIRST real cycle() this road ever ran
+            if self.sound_meets:      # A4L-VOICE (Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:31 +0400): the merged cell's sound-meeting edges follow it (#235)
+                self._merge_pair_edges(area, a, b)
+
+    def _merge_candidates(self, area: Area, ws: List[int]):
+        """A42-M6 (edit: Claude (Opus 5.5, M6 builder), 2026-09-23 17:22 +0400): READ-ONLY — the (i, j) index pairs into `ws`, i < j,
+        in the old road's lexicographic order, whose similarity a float64 gemm cannot put at or under THETA_M - MERGE_FAST_MARGIN: a
+        SUPERSET of every pair whose gate `float(cells[a] @ cells[b]) > theta_m` can pass (docs/briefs/A42-M6-REPORT.md §2). It never
+        decides a pair: `_merge` re-reads each one through the old gates. It REFUSES — returns every pair in the old order, the old
+        road — when its bound cannot be shown: a non-finite value in the gathered cells (a NaN passes the old gate), or norms so far
+        from 1 that 8·gamma_dim·max|c|² reaches the margin."""
+        n = len(ws)
+        if n < 2:
+            return []
+        C = area.cells[np.asarray(ws, dtype=np.int64)]           # the rows gate (b) reads, bit-exact (fancy indexing copies values)
+        every = ((i, j) for i in range(n) for j in range(i + 1, n))
+        if not bool(np.isfinite(C).all()):
+            return every
+        d = C.shape[1]
+        u = 2.0 ** -53
+        gamma = d * u / (1.0 - d * u)
+        max_sq = float(np.max(np.einsum("ij,ij->i", C, C)))
+        if not (8.0 * gamma * max_sq < MERGE_FAST_MARGIN):
+            return every
+        lo = float(self.g.theta_m) - MERGE_FAST_MARGIN
+        out: List[Tuple[int, int]] = []
+        for r0 in range(0, n - 1, MERGE_FAST_BLOCK):
+            r1 = min(r0 + MERGE_FAST_BLOCK, n)
+            S = C[r0:r1] @ C[r0:].T                              # rows r0..r1-1 against columns r0..n-1 (the upper part only)
+            keep = ~(S <= lo)                                    # the old gate's own negation: a NaN would be kept (never reached: refused above)
+            keep &= np.arange(r0, n)[None, :] > np.arange(r0, r1)[:, None]      # strict upper triangle: j > i
+            ii, jj = np.nonzero(keep)                            # row-major: i ascending, then j ascending
+            out.extend(zip((ii + r0).tolist(), (jj + r0).tolist()))
+        return out
 
     def _scale(self) -> None:
         """SCALE every N moments — synaptic scaling: a cell's edge vector is scaled down to unit norm
