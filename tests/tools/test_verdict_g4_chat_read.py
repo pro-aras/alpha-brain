@@ -70,5 +70,26 @@ class TestChatRead(unittest.TestCase):
         self.assertFalse(C["graded"]); self.assertFalse(any(C[k]["graded"] for k in ("L1", "L2", "L7")))
 
 
+
+class TestTheTwinRunsUnderSkipTwins(unittest.TestCase):
+    """edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:31 +0400 — the rung's read passes --skip-twins («its twin set only», §4): L1's
+    twin must still run — the spec comes from `chat_twin_specs`, called in main() OUTSIDE `if not a.skip_twins:`."""
+    def test_the_spec_exists_only_under_chat(self) -> None:
+        decl = parse_genome(T.LANG_GENOME.read_text()).declared
+        s = verdict_g4.chat_twin_specs(decl, Path("/t"), Path("/t/tape/ALL.jsonl"), Path("/g"))
+        self.assertEqual([(x["label"], x["blind"]) for x in s], [("blind-chat", ["chat"])])
+        self.assertEqual(verdict_g4.chat_twin_specs(parse_genome(T.FLOOR_GENOME.read_text()).declared, Path("/t"), Path("/a"), Path("/g")), [])
+
+    def test_main_calls_it_outside_the_skip_twins_block(self) -> None:
+        import ast
+        src = (Path(verdict_g4.__file__)).read_text(); tree = ast.parse(src)
+        main = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
+        skip_ifs = [n for n in ast.walk(main) if isinstance(n, ast.If) and "skip_twins" in ast.unparse(n.test)]
+        inside = [c for n in skip_ifs for c in ast.walk(n) if isinstance(c, ast.Call) and "chat_twin_specs" in ast.unparse(c.func)]
+        calls = [c for c in ast.walk(main) if isinstance(c, ast.Call) and "chat_twin_specs" in ast.unparse(c.func)]
+        self.assertEqual(len(calls), 1, "main() builds the blind-chat spec exactly once")
+        self.assertEqual(inside, [], "never inside `if not a.skip_twins:` — a --skip-twins read would lose L1's twin")
+
+
 if __name__ == "__main__":
     unittest.main()

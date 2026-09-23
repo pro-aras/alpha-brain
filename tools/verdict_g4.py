@@ -554,11 +554,10 @@ def main(argv: List[str]) -> int:
                   {"label": "T-one-glance", "root": str(twins_dir / "T-one-glance"), "tape": str(tape_all), "genome": str(genome_path), "one_glance": True},
                   {"label": "T-first-fixation", "root": str(twins_dir / "T-first-fixation"), "tape": str(tape_all), "genome": str(first_fix)},
                   {"label": "T-frozen-10", "root": str(twins_dir / "T-frozen-10"), "tape": str(tape_all), "genome": str(frozen10), "blind": ["frozen"]}]
-        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:50 +0400 — A4L-LANG L1: the READ-ONLY law's twin — every chat row and
-        # every kind-chat grade ignored (the Mind's own `chat` blind; creature/replay.py's tape filter is pinned equal to it by
-        # tests/creature/test_replay_blind_chat.py). Only a life that declares CHAT gets it: every other record reads as before.
-        if "CHAT" in g.declared:
-            specs.append({"label": "blind-chat", "root": str(twins_dir / "blind-chat"), "tape": str(tape_all), "genome": str(genome_path), "blind": ["chat"]})
+    # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:31 +0400 — A4L-LANG L1: the READ-ONLY law's twin is the LANG rung's OWN twin set
+    # (A4-LADDER-PREREG §4: «each with its twin set only … LANG + blind-chat»), so it runs OUTSIDE `if not a.skip_twins:` — a read
+    # with --skip-twins still grades L1 (the first draft sat inside that block; the advisor's catch before the life).
+    specs += chat_twin_specs(g.declared, twins_dir, tape_all, genome_path)
     # edit: Claude (Fable 5.1), 2026-09-22 22:28 +0400 — a CLOSED life read WHOLE (gather's `closed_whole`) ends every whole-tape twin's mind the way the
     # body did; the slice/random twins below cut the tape short and never close (the live mind lands that think at a later boundary).
     for _s in specs:
@@ -967,6 +966,15 @@ def main(argv: List[str]) -> int:
 # blind-chat twin's journal (`twins_dir/blind-chat/mind-journal.jsonl`, run only when CHAT is declared), the pre-life pointing
 # ceiling; the chat pictures checked disjoint from the maker's canvases on the tape. «not gradable» on every record that did not
 # declare CHAT. A summary `graded`/`pass` over L1-L7 for the verdict's failed-list.
+
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:31 +0400 — A4L-LANG L1: the blind-chat twin's worker spec — every chat row and every
+# kind-chat grade ignored (the Mind's own `chat` blind; creature/replay.py's tape filter is pinned equal to it by
+# tests/creature/test_replay_blind_chat.py). Only a life that declares CHAT gets it: every other record reads exactly as before.
+def chat_twin_specs(declared: dict, twins_dir: Path, tape_all: Path, genome_path: Path) -> List[dict]:
+    if "CHAT" not in declared:
+        return []
+    return [{"label": "blind-chat", "root": str(Path(twins_dir) / "blind-chat"), "tape": str(tape_all), "genome": str(genome_path), "blind": ["chat"]}]
+
 def chat_read(root: Path, tape: List[dict], live: List[dict], exams: List[dict], decl: dict, twins_dir: Path,
               pointing_ceiling: Optional[float], t0) -> Dict[str, object]:
     from tools import verdict_life as _vl

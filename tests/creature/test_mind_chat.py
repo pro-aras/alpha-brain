@@ -206,6 +206,17 @@ class TestOnALearnedOrganism(unittest.TestCase):
         self.assertEqual(say["heard"], ["hello", "there"])
         self.assertIn(say["abstain_reason"], (None, "novel", "noedge", "ratio", "close", "not_one_word", "tie"))
 
+    def test_the_thing_word_rule_heard_is_inside_the_literal_rule_and_keeps_every_shown_thing(self) -> None:
+        """edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:31 +0400 — both sides of the RAISED switch (genome/chain.py:THING_WORD_RULE)
+        pinned on a real learned mind: «heard» ⊆ «literal»; every thing the world SHOWED is in «heard»; no filler/shelf word is."""
+        from genome.questions import build_ledgers
+        Lw = build_ledgers(self.mind.org, self.mind.moment_word)["words"]
+        lit = chain.thing_words(self.mind.org, Lw, self.mind.episodes, per_canvas=self.mind._glances_per_canvas(), rule="literal")
+        hrd = chain.thing_words(self.mind.org, Lw, self.mind.episodes, per_canvas=self.mind._glances_per_canvas(), rule="heard")
+        self.assertTrue(hrd <= lit, (hrd, lit))
+        self.assertEqual(hrd, set(T.THINGS))
+        self.assertEqual(chain.THING_WORD_RULE, "heard")
+
     def test_the_counters_add_up(self) -> None:
         c = self.mind.chat_counters
         self.assertEqual(c["chats"], c["answered"] + c["abstained"] + c["refused_content"])
