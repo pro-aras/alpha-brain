@@ -199,10 +199,11 @@ class TestPictureWordsLedger(unittest.TestCase):
         finally:
             twin.close()
 
-    def test_the_constant_still_reads_heard_and_the_new_rule_is_named(self) -> None:
-        """The one-constant switch to "ledger" is the orchestrator's at the LANG landing (RAISED), not this build's."""
-        self.assertEqual(chain.THING_WORD_RULE, "heard")
-        self.assertIn("ledger", chain.THING_WORD_RULES)
+    def test_the_constant_reads_ledger_and_the_ring_rules_stay_named(self) -> None:
+        """The one-constant switch to "ledger" — the orchestrator's decision on A42-B2's RAISED item 1 (2026-09-23 17:5x); the
+        ring rule «heard» and the literal set stay computable (they are the printed twins on every chat's say row)."""
+        self.assertEqual(chain.THING_WORD_RULE, "ledger")
+        self.assertEqual(chain.THING_WORD_RULES, ("literal", "heard", "ledger"))
         with self.assertRaises(ValueError):
             chain.thing_words(self.mind.org, {}, self.mind.episodes, per_canvas=5, rule="no-such-rule")
 

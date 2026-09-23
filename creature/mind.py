@@ -622,7 +622,8 @@ class Mind:
         # chain.heard_on_pictures(episodes)` exactly (proven on the hour-1 fixture, A42-B2-REPORT) and after it the ledger still
         # holds what the ring evicted (≈ hour 11.6 of a 24 h life). A LEDGER, like moment_word: persisted in the snapshot's
         # ledger.json (never org.c, never the births log — both hashed), restored by resume(); read by chain.thing_words(rule=
-        # "ledger") through _chat_content. A snapshot from before this key resumes EMPTY, never back-filled from the ring.
+        # "ledger", THING_WORD_RULE since 17:5x) through _chat_content, the ring rule and the twin printed beside it on the say
+        # row. A snapshot from before this key resumes EMPTY, never back-filled from the ring.
         self.picture_words: List[str] = []
         self._picture_words_set: set = set()
         # The OTHER half of the same attribution (the PREREG's own name for B2, "the birth-source ledger"): sight cell -> the
@@ -1174,13 +1175,22 @@ class Mind:
         summed edge from the canvas's lit cells (the Q4 road: edge_many, max over the word's own cells); a tie abstains.
         Reads only."""
         r = self.org.recall_many("sight", xs) if xs else {"cell": None, "reason": "novel", "grade": None, "resembles_cell": None}
-        # A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400): the picture-words LEDGER is handed in on every call; it is read
-        # only under rule "ledger" (THING_WORD_RULE is still "heard" — the one-constant switch is the LANG landing's, RAISED).
-        things = _chain.thing_words(self.org, Lw, self.episodes, per_canvas=self._glances_per_canvas(), rule=_chain.THING_WORD_RULE,
+        # A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400; the rule flipped to "ledger" 17:5x on the orchestrator's word): the
+        # THING-WORDS under THING_WORD_RULE ("ledger": the two LEDGERS, nothing from the ring). The ring rule «heard» and the
+        # literal-from-ledger TWIN are still computed and PRINTED beside it on the say row (`things`, below) — counts and the two
+        # differences, never the full sets — so the ring's forgetting after the wrap (≈ hour 11.6) is a visible difference on the
+        # record, never a silent one. Every read here is read-only (the chat guard and the hash assert it).
+        per_canvas = self._glances_per_canvas()
+        things = _chain.thing_words(self.org, Lw, self.episodes, per_canvas=per_canvas, rule=_chain.THING_WORD_RULE,
                                     picture_words=self.picture_words, birth_source=self.birth_source)
+        things_heard = _chain.thing_words(self.org, Lw, self.episodes, per_canvas=per_canvas, rule="heard")
+        things_twin = _chain.literal_from_ledger(self.org, Lw, self.birth_source)
         named = list(dict.fromkeys(w for w in heard if w in things))
         out: Dict[str, object] = {"recall": r, "named_things": named, "content": None, "abstain_reason": None,
-                                   "road": "recall", "edges": None}
+                                   "road": "recall", "edges": None,
+                                   "things": {"rule": _chain.THING_WORD_RULE, "n": len(things), "heard_n": len(things_heard),
+                                              "twin_n": len(things_twin), "heard_minus_rule": sorted(things_heard - things),
+                                              "rule_minus_heard": sorted(things - things_heard)}}
         if len(named) >= 2:
             out["road"] = "choose"
             edges = {w: max([self.org.edge_many("sight", xs, c) for c in word_cells(self.org, Lw, w)], default=0.0) for w in named}
@@ -1312,6 +1322,7 @@ class Mind:
                                                                    [[a, b] for a, b in zip(form, form[1:])]],
                "pivot_followers": judged.get("pivot_followers"), "point": point, "abstain_reason": c["abstain_reason"],
                "resembles": resembles, "refused": refused, "road": c["road"], "named_things": c["named_things"],
+               "things": c["things"],      # A42-B2: the rule read + the ring rule and the twin beside it (counts and differences)
                "edges": c["edges"], "grounded": grounded, "form_reason": judged.get("reason"),
                "candidates_n": comp.get("candidates_n"), "truncated": comp.get("truncated"),
                "hash_before": hash_before, "hash_after": hash_after}

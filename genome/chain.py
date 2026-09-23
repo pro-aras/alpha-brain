@@ -45,11 +45,13 @@ PICTURE_SOURCES = ("maker", "folder", "game", "hands")
 # growing, persisted in the snapshot ledger.json — never org.c, never the births log, both hashed). «heard» reads FAST's ring,
 # which wraps ≈ hour 11.6 of a 24 h life (A4L-LANG-REPORT §2 item 5) and then forgets the oldest picture words although the
 # creature still knows them. Before the wrap the two rules read the SAME set by construction (the hour-1 fixture: the ledger
-# written live == heard_on_pictures(ring), A42-B2-REPORT). THING_WORD_RULE stays "heard": the one-constant switch to "ledger" is
-# the LANG landing's decision (RAISED), not this build's; a snapshot from before this ledger resumes with an EMPTY ledger and is
-# never back-filled from the ring (that proof would be circular).
+# written live == heard_on_pictures(ring), A42-B2-REPORT). THING_WORD_RULE = "ledger" since 2026-09-23 17:5x +0400 — the
+# orchestrator's decision on A42-B2's RAISED item 1 («the fix exists to be the rule the mark reads»); the ring rule "heard" and
+# the literal-from-ledger twin are still computed on every chat and printed beside it on the say row (`things`), so the ring's
+# forgetting after the wrap is visible as a difference, never silent. A snapshot from before the ledgers resumes with EMPTY
+# ledgers and is never back-filled from the ring (that proof would be circular): under "ledger" such a mind names no thing.
 THING_WORD_RULES = ("literal", "heard", "ledger")
-THING_WORD_RULE = "heard"          # RAISED (A4L-LANG-REPORT.md): the literal §3.2-item-3 clause is the measured twin
+THING_WORD_RULE = "ledger"         # A42-B2 (the orchestrator's word, 17:5x): the ledgers, never the ring; "heard"/"literal" are the printed twins
 COMPOSE_CAP = 10000                # paths visited per compose — a runaway walk on a long life's link graph is #236's shape
 
 
