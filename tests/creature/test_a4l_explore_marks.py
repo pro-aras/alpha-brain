@@ -129,28 +129,35 @@ class TestX1TheLockAbsent(unittest.TestCase):
 
 
 class TestX2SuccessPerEpisode(unittest.TestCase):
-    def test_an_eight_hour_life_is_not_gradable_by_its_ceiling(self) -> None:
+    """X2 is PRINTED, with no bar (the orchestrator's order, 12:2x +04; #228 (b)) — edit: Claude (Opus 5.5, A4 ladder builder
+    EXPLORE), 2026-09-23 12:26 +0400: an 8 h life's ≈ 13 episodes put the null's 95 % bound (8 / 13 = 0.615) above the state-blind ceiling
+    (0.488), so no bar is set; the numbers are printed beside the ceiling and the age-matched control."""
+
+    def test_an_eight_hour_life_is_printed_with_its_bound_above_the_ceiling(self) -> None:
         ends = [(7200 + 1600 * i, i % 3 == 0) for i in range(13)]            # 13 episodes in hours 2–8, 5 successes
-        m = explore_success_mark(_episodes(ends), True)
+        m = explore_success_mark(_episodes(ends), True, age_matched={"episodes": 12, "successes": 1})
         self.assertEqual(m["episodes"], 13)
         self.assertEqual(m["successes"], 5)
         self.assertEqual(m["bound_k"], _binom_k(13, 0.29))
-        self.assertGreater(m["bound_rate"], m["ceiling"])
+        self.assertTrue(m["bound_above_ceiling"])
         self.assertFalse(m["graded"])
-        self.assertIn("ceiling", m["reason"])
+        self.assertIsNone(m["pass"])
+        self.assertTrue(m["reason"].startswith("printed, no bar"), m["reason"])
+        self.assertIn("0.615", m["reason"])
+        self.assertEqual(m["age_matched"], {"episodes": 12, "successes": 1})
 
-    def test_graded_where_the_bound_is_under_the_ceiling(self) -> None:
+    def test_printed_even_where_the_bound_is_under_the_ceiling(self) -> None:
         k40 = _binom_k(40, 0.29)
-        self.assertLessEqual(k40 / 40, 0.488)
         span = (28800 - 7200) / 41
-        for succ, want in ((k40, True), (k40 - 1, False)):
+        for succ, clears in ((k40, True), (k40 - 1, False)):
             with self.subTest(successes=succ):
                 ends = [(7200 + span * (i + 1), i < succ) for i in range(40)]
                 m = explore_success_mark(_episodes(ends), True)
-                self.assertTrue(m["graded"], m)
-                self.assertEqual(m["episodes"], 40)
-                self.assertEqual(m["successes"], succ)
-                self.assertEqual(m["pass"], want)
+                self.assertFalse(m["graded"])
+                self.assertIsNone(m["pass"])
+                self.assertFalse(m["bound_above_ceiling"])
+                self.assertEqual(m["clears_bound"], clears)
+                self.assertEqual((m["episodes"], m["successes"]), (40, succ))
 
     def test_the_window_is_hours_two_to_eight(self) -> None:
         ends = [(3600, True), (7100, True), (7300, False), (28700, True), (29000, True)]
@@ -170,7 +177,9 @@ class TestX2SuccessPerEpisode(unittest.TestCase):
         first = {"seq": 1, "at": "2026-09-23T00:58:18.639Z", "sense": "ear", "meta": {"source": "maker"}}
         tape = [first] + [dict(r, at=_at(60)) for r in doc["tape_game_rows"]]
         for declared in (False, True):
-            self.assertFalse(explore_success_mark(tape, declared)["graded"])
+            m = explore_success_mark(tape, declared)
+            self.assertFalse(m["graded"])
+            self.assertEqual(m["episodes"], 0)
 
 
 if __name__ == "__main__":

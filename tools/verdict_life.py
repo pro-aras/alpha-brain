@@ -719,14 +719,17 @@ def _binom_bound_k(n: int, p0: float, alpha: float) -> int:
 
 def explore_success_mark(tape: Iterable[dict], value_declared: bool, from_s: float = 7200.0, to_s: float = 28800.0,
                          p0: float = 0.29, alpha: float = 0.05, ceiling: float = 0.488,
-                         toy_candidate: Tuple[float, float] = (0.240, 0.106)) -> Dict[str, object]:
-    """X2 SUCCESS PER EPISODE (§2.5) over hours 2–8: the game episodes whose terminal outcome row (terminated or
-    truncated) falls in [t0 + from_s, t0 + to_s); successes = terminated with reward > 0; the bar is the null's one-sided
-    95 % bound at that N (p0 = L-8's 0.29, reproduced by the toy's (0a) on GoToLocal). Graded ONLY where that bound is at
-    or under the state-blind CEILING the toy measured (forward 0.5: 0.488 ± 0.023, docs/briefs/A4L-EXPLORE-TOY.md §3) —
-    at an 8 h life's N ≈ 13 the bound is 8 / 13 = 0.615, above every state-blind chooser, so the mark reads «not
-    gradable» there by construction (#228 (b), computed before any life). Printed beside it: the toy's candidate reading
-    over 50 fresh 8 h lives (0.240 ± 0.106) — the prediction — and the ceiling."""
+                         toy_candidate: Tuple[float, float] = (0.240, 0.106),
+                         age_matched: Optional[dict] = None) -> Dict[str, object]:
+    """X2 SUCCESS PER EPISODE (§2.5) over hours 2–8 — PRINTED, NO BAR (edit: Claude (Opus 5.5, A4 ladder builder EXPLORE),
+    2026-09-23 12:26 +0400, on the orchestrator's 12:2x +04 order; #228 (b)): the game episodes whose terminal outcome row (terminated or
+    truncated) falls in [t0 + from_s, t0 + to_s); successes = terminated with reward > 0. Printed beside them: the null's
+    one-sided 95 % bound at that N (p0 = L-8's 0.29, reproduced by the toy's (0a) on GoToLocal), the state-blind CEILING
+    the toy measured (forward 0.5: 0.488 ± 0.023, docs/briefs/A4L-EXPLORE-TOY.md §3), whether the bound sits above it
+    (at an 8 h life's N ≈ 13 it does: 8 / 13 = 0.615 — no state-blind chooser can clear it, so no bar is set), the
+    toy's candidate reading over 50 fresh 8 h lives (0.240 ± 0.106 — the prediction) and the age-matched control the
+    orchestrator passes (alpha4-1's own episodes over its hours 2–8). Never graded; «not gradable» where the ACT value
+    line is undeclared (L-1)."""
     tape = list(tape)
     t0 = _first_at_s(tape)
     ends = [r for r in tape if r.get("sense") == "outcome" and _meta(r).get("source") == "game" and r.get("at")
@@ -738,17 +741,16 @@ def explore_success_mark(tape: Iterable[dict], value_declared: bool, from_s: flo
     out: Dict[str, object] = {
         "episodes": n, "successes": k, "success_rate": (round(k / n, 4) if n else None), "p0": p0, "alpha": alpha,
         "bound_k": kb, "bound_rate": (round(kb / n, 4) if n else None), "ceiling": ceiling,
-        "toy_candidate_mean_sd": list(toy_candidate),
-        "bar": f"successes ≥ the one-sided {1 - alpha:.0%} bound of Binomial(N, {p0}) over the episodes ending in hours {from_s / 3600:g}–{to_s / 3600:g}; graded only where that bound ≤ the state-blind ceiling {ceiling}",
+        "bound_above_ceiling": (bool(kb / n > ceiling) if n else None), "clears_bound": (bool(k >= kb) if n else None),
+        "toy_candidate_mean_sd": list(toy_candidate), "age_matched": age_matched,
+        "bar": "none — printed (#228 (b)): at an 8 h life's N the null's 95 % bound sits above the state-blind ceiling",
     }
     if not value_declared:
         out.update(graded=False, **{"pass": None}, reason="not gradable: the ACT value line is not declared on this life (L-1)")
     elif n == 0:
-        out.update(graded=False, **{"pass": None}, reason="not gradable: no game episode ended in the window")
-    elif kb / n > ceiling:
-        out.update(graded=False, **{"pass": None},
-                   reason=f"not gradable: the null's bound at N = {n} ({kb}/{n} = {kb / n:.3f}) exceeds the state-blind ceiling {ceiling} — no state-blind chooser can clear it at this N (#228 (b))")
+        out.update(graded=False, **{"pass": None}, reason="printed, no bar: no game episode ended in hours 2–8")
     else:
-        out.update(graded=True, **{"pass": bool(k >= kb)}, reason="graded (A4L-EXPLORE X2)")
+        out.update(graded=False, **{"pass": None},
+                   reason=(f"printed, no bar (#228 (b)): {k} of {n} episodes; the null's 95 % bound {kb}/{n} = {kb / n:.3f}"
+                           f" {'above' if kb / n > ceiling else 'at or under'} the state-blind ceiling {ceiling}"))
     return out
-
