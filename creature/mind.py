@@ -439,6 +439,13 @@ class Mind:
         # this brief owns is unaffected).
         self.glances_confirmed: int = 0
         self.glances_surprised: int = 0
+        # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+        # (docs/briefs/A4L-DROP.md task 5): every glance actually DROPPED (never reached Organism.moment()
+        # at all — the "; drop confirmed" clause's own cheap moment, one call to Organism.tick() instead).
+        # 0 forever when "drop confirmed" is undeclared (byte-identical to before this task, same class of
+        # gap as glances_confirmed/glances_surprised immediately above — NOT persisted at resume, see the
+        # comment on those two).
+        self.glances_dropped: int = 0
         self._confirmed_episodes: set = set()
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:05 +0400 — D-G12/W3-1 (docs/G4-WAVE3-CLAUSES.md):
         # revisits/extensions/clashes, coded against Builder B's believe() "kind" interface before it lands
@@ -1458,6 +1465,12 @@ class Mind:
         n_confirmed = sum(1 for f in confirmed_flags if f)
         self.glances_confirmed += n_confirmed
         self.glances_surprised += max(0, n_graded - n_confirmed)
+        # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+        # (docs/briefs/A4L-DROP.md task 2): "drop_on" reads the parser's own nested sub-key (genome/machinery.py's
+        # SURPRISE branch: "drop" can only be present when "predicted" is), so this is False on every genome
+        # that predates this task, and False on a genome that declares SURPRISE (with or without "predicted
+        # mind-cell") but not the trailing "; drop confirmed" clause.
+        drop_on = surprise_gene is not None and surprise_gene.get("drop") == "confirmed"
 
         # PREREG §11.1 step 1 (PREDICT): measured once, on the FIRST glance, regardless of whether this
         # canvas has a word — a sight-only canvas is just as surprising or expected as a worded one.
@@ -1521,7 +1534,22 @@ class Mind:
                 # L-4: confirmed_flags[i] is False on every existing genome (SURPRISE undeclared -> floor
                 # is None -> every flag False) — byte-identical to the old bare `self.org.moment(x, xw,
                 # lr_scale=lr_scale)` call.
-                S, T = self.org.moment(x, xw, lr_scale=lr_scale, confirm=confirmed_flags[i])
+                # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md
+                # §2.4 (docs/briefs/A4L-DROP.md task 2): a glance this same "confirmed_flags" already marks
+                # CONFIRMED, under "drop confirmed", is not passed to Organism.moment() at all — Organism.tick()
+                # runs exactly moment_sight()'s tail (t += 1; SCALE at its own multiples; the budget's regen
+                # check), so every moment-denominated cadence keeps its wall-clock meaning (D3). S, T = [], []
+                # for this glance: predictor.note_winners([]) is its own documented no-op (genome/predict.py:120,
+                # "an empty S leaves the last winner as it was") and glance 0's FAST episode below is written
+                # from f0/t_at_f0, captured before this loop, so it is untouched either way. drop_on False
+                # (every genome before this task, and every genome that never declares "; drop confirmed"):
+                # this branch is never taken — byte-identical to the bare `self.org.moment(...)` call below.
+                if drop_on and confirmed_flags[i]:
+                    self.org.tick()
+                    S, T = [], []
+                    self.glances_dropped += 1
+                else:
+                    S, T = self.org.moment(x, xw, lr_scale=lr_scale, confirm=confirmed_flags[i])
                 if predict_on:
                     self.predictor.note_winners(S)
             ep_kwargs = seam0 if moment_on else {}         # G-MIND-1: Episodes stores the seam only once MOMENT declares the columns

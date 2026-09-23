@@ -96,6 +96,16 @@ def main(argv) -> int:
           f"backlog {status.get('mind_backlog_rows', 'not recorded')} sight_born {status.get('sight_born', 'not recorded')}/{status.get('sight_nmax', '?')} "
           f"refused nmax {status.get('births_refused_nmax', 'not recorded')} budget {status.get('births_refused_budget', 'not recorded')}")
     print(chat_status_line(status))   # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:51 +0400 — A4L-LANG task 10
+    # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+    # (docs/briefs/A4L-DROP.md task 5): "STATUS gains glances_dropped ... it must equal glances_confirmed
+    # on the live record while the clause is declared: that equality is a live check the 8 h check.py
+    # reads" — printed here (read-only, no assertion: check.py never raises on a live root, #164's law
+    # applied to a read). "not recorded" on a genome/body that predates this task.
+    gc, gd = status.get("glances_confirmed"), status.get("glances_dropped")
+    eq = "not recorded (glances_dropped absent — an older body, or the clause is undeclared)" if gd is None \
+        else ("OK: dropped == confirmed" if gd == gc else f"MISMATCH: dropped {gd} != confirmed {gc}")
+    print(f"[check] glances confirmed {status.get('glances_confirmed', 'not recorded')} "
+          f"surprised {status.get('glances_surprised', 'not recorded')} dropped {status.get('glances_dropped', 'not recorded')} — {eq}")
     # 1. the body rows on the tape = the STATUS series (every 60 s)
     body = []
     for f in sorted(glob.glob(str(root / "tape" / "*.jsonl"))):
