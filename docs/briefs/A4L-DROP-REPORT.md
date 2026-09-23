@@ -107,4 +107,4 @@ G4 gates: {'1': 'PASS', '2': 'PASS', '3': 'PASS', '6': 'PASS'}
 
 ## Commit
 
-*(sha filled in after the commit below)*
+`14355ff` on branch `a4l-drop` (off master at the dispatch commit `a17cb0e`) — "A4L-DROP: predictive coding as a filter — a CONFIRMED glance never reaches the moment (docs/briefs/A4L-DROP.md)". 10 files changed, 1277 insertions(+), 4 deletions(-).
