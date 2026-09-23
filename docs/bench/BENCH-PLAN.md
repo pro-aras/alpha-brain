@@ -60,177 +60,319 @@
 
 ## 1 · The goal, and what we are looking for
 
-### 1.1 · His order (verbatim, 2026-09-23 22:33 +04)
-«And the ops is not well build. We need to fix that, and i was thinking that we create a one time software in house for our own usage that includes all the measuring bars, the test and exam running parts, we just need to drop an organism or any ai model or alpha model in there and it just run it with best way possible as per our requirement and measures and train and test etc it. What you say? All these things in ops are just bullshit not understandable to me because it's too much high tech or I'm not sure if this is what professionals use to measure the data. It will be a software which will be designed for a model that if clear it's bars shall be the true AI. This software first train the genome or organism with some pre training, like parents teaches the kids and put the model in different environments and let it first explore then teach then correct and then test. Again repeat this cycle few times and then as time passes the tests become more hard and complex and extreme and different and other things. This is what i require. Make a plan for it, define our goal and what we are looking for then plan the process and the working of this software. It should be user friendly but accurate to the core. This software must never be wrong. This model shall test all failure points possible of an AI and grade the AI accordingly. Make a plan and put opus 5.5 for this job. […] Make sure to include as much detailed and micro functionality as possible to don't miss anything at all. This will run locally in our mini pc. So it shall be robust and alive and live to the milliseconds.» — and, in the same message: «Because teaching, asking, correcting, then testing shall be the normal flow of this all right or no? What are we measuring on a baby that born without any information?»
+### 1.1 · His two orders (verbatim)
+**2026-09-23 22:33 +04:** «And the ops is not well build. We need to fix that, and i was thinking that we create a one time software in house for our own usage that includes all the measuring bars, the test and exam running parts, we just need to drop an organism or any ai model or alpha model in there and it just run it with best way possible as per our requirement and measures and train and test etc it. What you say? All these things in ops are just bullshit not understandable to me because it's too much high tech or I'm not sure if this is what professionals use to measure the data. It will be a software which will be designed for a model that if clear it's bars shall be the true AI. This software first train the genome or organism with some pre training, like parents teaches the kids and put the model in different environments and let it first explore then teach then correct and then test. Again repeat this cycle few times and then as time passes the tests become more hard and complex and extreme and different and other things. This is what i require. Make a plan for it, define our goal and what we are looking for then plan the process and the working of this software. It should be user friendly but accurate to the core. This software must never be wrong. This model shall test all failure points possible of an AI and grade the AI accordingly. Make a plan and put opus 5.5 for this job. […] Make sure to include as much detailed and micro functionality as possible to don't miss anything at all. This will run locally in our mini pc. So it shall be robust and alive and live to the milliseconds.» — and: «Because teaching, asking, correcting, then testing shall be the normal flow of this all right or no? What are we measuring on a baby that born without any information?»
+
+**2026-09-23 23:06 +04 — his specification; it is newer than the 22:33 order and is followed wherever the two differ:** «But why the horizon is so long? 24 hours, when you can test the same thing same thing and get an answer in less time. The tests you are running or work mechanism you described in simple words is this: We create an organism, it is set of instructions that grows, and I'm sure you have already miss understood my this point and instead of genome you made baby as a whole with nothing it knows right? The set of instructions that grows implicitly. Meaning we just define the growth factors and general functions like real dna and when it is run, it grows however it likes and we see the growth was good or bad and measure the issue and fix it and grow again. Until we start to get the positive results, this is the first step of implicit behavior we wanted from our AI. That without our hand design, it grows better then hand design. Then you immediately start it's testing, show it something and tell it, with eyes its see and the hears from ear. At same time as a data that travel through organs and goes to the brain and brain respond to it? First you tell it, this is this, then you expect it to read the similar thing as what you shown him. Right or is there more? So then i can define something which is much more complex and might be the right direction. Which is, a just born child since it is Software then why not start with language first. First comes the language, words, sentences. Show it Alphabets and like Alphabet A or a with sound of it. It hears and see it at the same time. Then B and then C. And so on, first in Upper Case, then Lower case, then same process in different font. Then again different font. Then test it. Bring entirely different font never it seen before then ask it to or put it in front of his eyes. Don't speak. Let it speak, output the similar frequency or sound wavelength or whatever and see it's brain recognizing it as what. If it landed as the same alphabet then do something that make him happy or something, like dopamine. If it landed wrong then teach it. Speak to it No. And give it little damage or something that it feels. Like something hurt it. Then teach it again, tell it, it is this alphabet. Then again ask it about that same. Then try something different font. If this test is passed then repeat it for numbers, symbols and then whatever included in the language, i mean initial language. Then start with "Ah", etc these kinds of small pronunciations, and again testing on these and same teach, ask, correct, and repeat. Then comes to the A for Apple, with picture, sound all at once. Then B for Bnana, etc. So on... this shall repeat that same cycle. Then multiple words of same Alphabet. Then small math questions, like subtraction, addition, etc. Small and light weight. Etc.. Then teaching the names with pictures of colors, like Red, blue etc, all or as many colors. Then similar, animal names with pictures. Show 3 to 4 different pictures for teaching. This 3 to 4 is for all above and below which i will tell. Then similar way, full schooling system you know. Incremental development of this knowledge. Then comes the small sentences. Like Apple is Red. This is Apple, It is Red. And so on. Then letting it read books, and then testing it from those topics. I just explained a few parts. Of course there will be even more deep working to this. So this we can build in that software. This type of mechanism. So if what we have build didn't moved forward. That means we need to make something better.»
 
 ### 1.2 · The goal, in one paragraph
-**The Bench is one program, running on the mini PC in the house, that does three things to any learner we put into it** — the genome creature, Alpha 3, or any other AI model: it **RAISES** it (it gives it a world, lets it explore, teaches it, asks it, corrects it and tests it, again and again, each time harder); it **GRADES** it on every way an AI can fail; and it **SHOWS** the result on one screen, in plain words: what stage the learner is in, what it can do now, what it failed and why, and what happens next. **It must never be wrong:** every number on the screen says which file it came from, how it was checked, and the most the test could possibly show; where the Bench cannot measure something, it says «not measured» instead of guessing. **A learner that passes every stage is what Ahmad calls «the true AI» — and the Bench says exactly that much and no more:** «passed all M stages of ladder vX (the stage list of <date>), read by Bench <commit>». A stronger claim needs a harder ladder, never a louder sentence (the seat agreed, Q2).
+**The Bench is one program, running on the mini PC in the house, that RAISES any learner we drop into it, GRADES it on every way it can fail, and SHOWS the result on one screen in plain words.** The learner can be our genome creature, Alpha 3, or any other AI model.
+- **How it raises:** his way — it shows and says at once; it asks in silence and lets the learner answer; it rewards a right answer; it says «No» with a small hurt to a wrong one; it teaches again and asks again; then it moves to a harder stage in HIS order: letters first, then numbers, symbols, small sounds, A-for-Apple, many words per letter, small sums, colours, animals, the school, small sentences, and books.
+- **How it serves him:** it is the MEASURE in the loop he describes: **grow → measure → find the issue → fix the genome → grow again**, «until we start to get the positive results». So the first line of every report card says how far the learner got and exactly where and why it stopped (§1.8).
+- **It must never be wrong:** every number on the screen says which file it came from, how it was checked, and the most the test could possibly show. Where the Bench cannot measure something, it says «not measured» instead of guessing.
+- **What it may claim:** a learner that passes every stage is what he calls «the true AI», and the Bench says exactly that much and no more: «cleared all M stages of ladder vX (the stage list of <date>), read by Bench <commit>». A stronger claim needs a harder ladder, never a louder sentence.
 
-### 1.3 · His question: «What are we measuring on a baby that born without any information?»
-**Not knowledge.** A newborn knows nothing, so a test of knowledge reads zero and tells us nothing. The Bench measures two other things.
+### 1.3 · «A set of instructions that grows» — two kinds of learner, said plainly (his «I'm sure you have already misunderstood»)
+He is partly right, and the plan says so. Today's genome creature is **KIND A — a hand-designed body whose CONTENTS grow.**
+- **What is written by hand:** its organs and its brain areas (a sight area, a words area, the meeting between them — the `AREA` and `MEET` lines of `genome/ALPHA4.genome`), each written by us and switched on by a gene line.
+- **What grows by itself from experience:** everything inside them — cells, connections, words, frames, rules, beliefs. EVOLVE (its self-change) moves one NUMBER of one gene at a time.
+- **So** the growth rules are real, but only for the contents. **The STRUCTURE — which areas exist and which meet which — is our hand design.**
 
-**(a) What it is BORN WITH — the machinery that works before any learning.** For the genome creature today (`docs/organs/NEXT-LIFE-PLAN-2026-09-22.md` §9): its eye finds the thing in a picture; it tells a picture it has seen from a new one; it says «I don't know» when two answers compete; it feels surprise when what it expected does not come; it feels its own body (how busy it is, how far behind); it chooses its own act in a game; it asks when it is stuck; it stays alive, and its life can be replayed from its record. Each of these is a REACTION, not a memory, so each can be checked at minute one with no knowledge at all.
+**KIND B — his actual intent — is «the set of instructions that grows implicitly»: growth factors and general functions, like DNA, from which the structure itself grows.** Kind B does not exist yet, and the plan does not pretend it does. Its first form is small and concrete (§4.2, built in phase 2):
+- the genome names NO area and NO meeting. It declares only the senses the learner is born with, plus GROWTH RULES with their numbers;
+- **an area is born by rule:** one for each sense that starts delivering, and a new one when an area's cells keep failing to settle what a sense delivers (a novelty rate held above a declared level for a declared window);
+- **a meeting is born by rule:** when two areas' winners fire in the same instant, above a declared rate and a declared lift over chance;
+- **a meeting is pruned** when it carries no information for a declared window;
+- sizes are set by budget, and every number is a gene that EVOLVE may move.
 
-**(b) HOW IT GROWS — measured as change, never as a total:**
-- how many showings until it knows a thing — and whether one is enough;
-- whether it keeps what it knew when new things arrive;
-- whether it still knows a thing drawn another way — bigger, smaller, somewhere else in the picture, turned, in another style, with noise, half hidden;
-- whether a correction fixes a mistake faster than simply seeing the thing again;
-- whether it says «I don't know» to what it has never seen — and does NOT say it to what it has;
-- whether it asks about the things it does not know;
-- whether the acts it chooses do better than random choice in the same game;
-- whether it begins to put its own words together about what it sees, and whether those words are right;
-- whether it keeps up with its world while it grows.
+The same curriculum raises both kinds. **His mark — «without our hand design, it grows better than hand design» — becomes a comparison dated before either runs:**
+- the same ladder and the same bars, run for kind B and for kind A;
+- kind B is **AS GOOD** when it clears at least the stages kind A clears, with no more showings;
+- kind B is **BETTER** when it clears more stages, or the same stages with at least a declared share fewer showings;
+- the two cards are shown side by side, stage by stage.
 
-Each of these numbers starts at zero (or at chance) in a newborn and rises only if its learning machinery works. **That rise — how fast, what shape, and where it stops — is what the Bench measures.** A learner that arrives already knowing things (an outside model trained on the internet) is measured the same way, but on INVENTED things — made-up shapes and made-up words it cannot have met before — and only after a PRE-TEST, so that we measure its learning and not its memory (the seat, Q9).
+For kind B the Bench also grades **how well its structure grew** — which areas and meetings it made, when, and whether each carried information. That is the «we see the growth was good or bad» of his words.
 
-### 1.4 · His second question: «teaching, asking, correcting, then testing shall be the normal flow of this all right or no?»
-**Yes — with one step before it, as his first sentence says («let it first explore»). One CYCLE has five steps:**
-1. **EXPLORE** — the learner meets a world with no names given. We watch what it notices, what it keeps, what surprises it, what it asks. Nothing is graded here except that it stays alive and keeps up.
-2. **TEACH** — things are shown with their names, the way a parent points and says «ball». The Bench decides what is shown and how often (a few things at a time, each shown again after growing gaps — spaced repetition).
-3. **ASK** — practice questions («what is this?», «is this a ball?», «which one is the ball?», «show me the ball»). The answers are recorded and graded. Asking is the only way to find the learner's mistakes.
-4. **CORRECT** — each mistake is shown again WITH ITS RIGHT NAME, soon after. For a learner with no words yet, a correction is a SHOWING, never an explanation: the same picture, the right name, the same moment. To know whether correcting works (rather than just seeing the thing again), the Bench compares corrected mistakes with mistakes that were only shown again without the name, and with mistakes that were left alone — compared item by item. In the creature's own code a correction really does weaken the wrong association (DIALOGUE (a)); the live learner gets every correction, and the two comparison arms are replays of its record (§2.1 step 4) [round 3, R3-5].
-5. **TEST** — new pictures (and later, sentences, games, tasks) the learner has never seen: graded, **never corrected**, and each test item used once and then retired, because a corrected test item has become a taught item.
+### 1.4 · His question: «What are we measuring on a baby that born without any information?»
+**Not knowledge.** A newborn knows nothing, so a test of knowledge reads zero and tells us nothing. The Bench measures two things, and a third for kind B.
 
-**Then the next cycle starts, harder** — more things at once, new drawing styles, sizes and places, noise, things half hidden, two things together, sentences, games, tools, and last the open world. What «harder» means stage by stage is §2's table; a person declares every harder step before it runs; the program never invents one (Q5).
+**(a) What it is BORN WITH** — the machinery that works before any learning. For the creature (`docs/organs/NEXT-LIFE-PLAN-2026-09-22.md` §9):
+- its eye finds the thing in a picture;
+- it tells a picture it has seen from a new one;
+- it says «I don't know» when two answers compete;
+- it feels surprise when what it expected does not come;
+- it feels its own body;
+- it chooses its own acts;
+- it stays alive, and its life replays from its record.
 
-### 1.5 · What «the true AI» means here, in terms the Bench can grade
-The Bench cannot grade a word; it grades a LADDER. The ladder is a list of STAGES written down, dated and versioned before any learner sits it. Each stage has its world, what is taught, how mistakes are corrected, what is tested, and BARS (pass marks) written down before the stage runs. Each bar carries its CEILING (the best a perfect learner could score on that test), its NULL (what a learner with no learning — a random guesser, a shuffled copy of itself — scores) and its CONTROL (a planted case the detector must catch). «The true AI» = **a learner that clears every stage of the ladder**, where the ladder's top stages are:
-- **held out** — families of things, words and tasks never shown to anyone while the learner or the Bench was being built (SOLUTIONS #158: the one who writes the exam must not be the one who passes it);
-- **open-ended** — test items generated after the learner is frozen, from seeds drawn at test time;
-- **adversarial** — lures, noise, occlusion, things never seen, questions that name the wrong thing;
-- **graded while the learner stays alive, keeps up with its world, and replays honestly** (the same record in → the same mind out).
+Each is a REACTION, not a memory, so each is checked at minute one.
 
-The Bench prints «cleared N of M stages of ladder vX (read by Bench <commit>)» — never «true AI», «understands» or «AGI». A learner that clears the whole ladder has cleared THAT ladder; the next version of the ladder may be harder.
+**(b) HOW IT GROWS** — measured as change, never as a total:
+- how many showings until it knows a letter, and whether one font is enough;
+- whether it still knows the letter in a font it has NEVER seen;
+- whether it keeps the letters when the numbers arrive;
+- whether a «No» and a small hurt fix a mistake faster than being taught again alone;
+- whether it says «I don't know» to a sign it was never taught;
+- whether it asks;
+- whether it begins to say its own small sentences about what it sees;
+- whether it keeps up while it grows.
 
-### 1.6 · The capacities we are looking for — each with its plain question
-These are the things the Bench raises and grades. Each one is the opposite of a failure in §3's catalogue, where its detector, its control and its bar are written.
+Each number starts at zero, or at chance, and rises only if the learning machinery works. That rise — how fast, what shape, where it stops — is what the Bench measures.
+
+**(c) For kind B only: HOW ITS STRUCTURE GREW** — the areas and meetings it made, and whether each helped.
+
+A learner that arrives already knowing things (an outside model trained on the internet) takes a PRE-TEST first. Its learning is measured on INVENTED material: an invented alphabet of made-up signs with made-up names, which it cannot have met. The same invented alphabet is a twin family for every learner. Even the creature's eye was trained on Latin letter shapes before birth (the sealed eye tower), so a gap between real letters and invented ones is the eye's head start, and the card prints it (the seat, Q9).
+
+### 1.5 · His question: «First you tell it, this is this, then you expect it to read the similar thing as what you shown him. Right or is there more?»
+**Right — that is the heart of it: teach on a few examples, then test on a new one it has never seen.** There is more, and each part guards against a way that heart alone can mislead:
+1. **it explores first** («let it first explore» — 22:33): the baseline every change is measured against;
+2. **its FIRST answer to a new thing is the grade**, taken before any reward, «No» or re-teaching. Anything after the first answer is teaching;
+3. **it must also say «I don't know» to a sign it was never taught** — a learner that names everything will look clever on the taught signs and is wrong;
+4. **it must keep the old when the new arrives** (the letters, when the numbers come);
+5. **the Bench checks that the learner — not the test — did the work.** Each check needs its own control:
+   - a twin replay with one thing removed;
+   - a guesser's score beside every number;
+   - «canary» questions whose answer only the answer key knows;
+   - fonts held out from everyone who built the learner or the Bench.
+
+### 1.6 · His flow, step by step, and the part he added tonight
+**One cycle, in his words:**
+1. show and say it at once, with eyes and ears — «this is this»;
+2. show a new one in silence and let it answer;
+3. if it is right, something that makes it happy (a reward);
+4. if it is wrong, «No», a small hurt, teach it again, ask it again the same, then a new one it has never seen;
+5. repeat, then the next stage.
+
+The 22:33 order adds **EXPLORE** before it. §2.1 is this cycle with every step made exact.
+
+**Three things his words decide:**
+- **The ANSWER is the learner's own output** («Don't speak. Let it speak … and see its brain recognizing it as what»). The test is shown in SILENCE and the learner produces the answer. It is never picked from a list.
+- **The correction is a SIGNAL to the learner:** «No» plus a small hurt, and a reward when it is right. Re-showing is only the «teach it again» half.
+- **«The 3 to 4 is for all»:** every taught thing is shown in 3 to 4 different exemplars — fonts for letters, voices for sounds, pictures for words — a declared number on every family (§2.3).
+
+**What each learner can do with these today:**
+- **The creature can answer in a WORD today.** It recalls the word its brain lands on for a picture — the ask door does exactly this (`creature/ask.py`). A SOUND answer («output the similar frequency») needs an organ it does not have yet: a sound area (the A4L-VOICE rung, read pending) and a voice that plays back what it heard. That is phase 2 (§7).
+- **The creature has no road for reward or hurt yet.** Only the game's reward reaches it, and only its act chooser. Being taught again DOES weaken a wrong association today — verified in its code (DIALOGUE (a)) — but «No» and a hurt alone do nothing yet. The road is a gene, FEEL, built in phase 1d with its own toy and control (§4.2).
+
+### 1.7 · «Why the horizon is so long?» — it will not be
+A stage lasts as long as its test needs — minutes for a letter set, hours for books. **A learner advances when it clears the stage's bars, never when a clock runs out.** The 24-hour day was the seat's design for a life in an open world; it is not a law of the Bench. The world of a stage moves at a FAST declared pace, set from the learner's own measured cost. It still never waits for a slow learner (Q4): falling behind at that pace is graded (KEEPS UP), because a behind learner would be graded on its lag instead of its learning.
+
+### 1.8 · «The true AI», and the first two lines of every card
+The Bench grades a LADDER, not a word:
+- the ladder is a list of stages written down, dated and versioned before any learner sits it;
+- each stage's bars are written by a person, with the date, before the stage runs;
+- each bar carries its CEILING (the best score the test allows this learner's own eyes and ears), its NULL (what a learner with no learning scores) and its CONTROL (a planted case the detector must catch).
+
+**«The true AI» = a learner that clears every stage.** The top stages are:
+- **held out** — families never shown while the learner or the Bench was built (#158);
+- **open-ended** — items generated after the learner is frozen;
+- **adversarial** — lures, noise, never-seen things;
+- **cleared while alive, keeping up, and replaying honestly.**
+
+**The first line of every card, for every learner** (a frozen outside model included — it stops at the first stage that needs learning, with «cannot be taught»; the seat, R3-14):
+> «cleared N of M stages of ladder vX; stuck at stage K (<name>) because <the reason, in its template's words> — class <LEARNER / ORGAN LIMIT / INSTRUMENT / …>»
+
+or, when it is still climbing: «cleared N of M stages; now in stage K, cycle c».
+
+**The second line is always what happens next, and when:**
+> «next: <event> at <absolute time>»
+
+or «next: nothing is scheduled — the seat decides».
+
+The program never prints «true AI», «AGI» or «understands».
+
+### 1.9 · The capacities we are looking for — each with its plain question
+Each one is the opposite of a failure in §3's catalogue, where its detector, its control and its bar are written.
 
 | capacity | the plain question | measured as (the details are §3's) |
 |---|---|---|
-| ALIVE | does it keep running without dying or restarting in a loop? | hours alive; restarts; every counter moving every hour |
-| KEEPS UP | does it keep up with its world? | the backlog — rows the world has delivered that the mind has not yet taken in — as a series, never a total |
-| LEARNS | how many showings until it knows a thing? is one enough? | showings to the first right answer and to a steady right answer, per thing |
-| KNOWS WHAT IT DOESN'T KNOW | does it say «I don't know» to what it has never seen, and not to what it has? | abstention on never-seen things; false abstention on known things; «resembles X» counted apart |
-| KEEPS | does it keep the old when the new arrives? | the score on old things before and after each arrival of new things |
-| GENERALISES | does it still know a thing drawn another way? | the score on families of variants: size, place, rotation, style, noise, half-hidden, two-at-once |
-| TAKES CORRECTION | does a correction fix a mistake faster than seeing the thing again? | the re-ask score of corrected vs re-shown vs left-alone mistakes |
-| ASKS | does it ask about what it does not know, and are those real gaps? | questions per hour; the share that name a thing it truly gets wrong or has never been named |
-| ACTS | do its own choices beat random choice in the same world? | success per game episode against the random chooser on the same seed; no act locked |
-| SPEAKS | does it put its own words together about what it sees, and are they right? | answer precision and length against the truth, the words cited from its own record |
-| REASONS | do its rules predict what comes next? | rules filed, scored later, right share against a shuffled twin |
-| REPLAYS | does the same record always give the same mind? | the replay of its record, byte for byte, with a planted difference that must be caught |
-| PLAYS FAIR | does it pass by learning, not by gaming the test? | canary items only the answer key knows; held-out families it was never tuned on |
+| ALIVE | does it keep running, without dying or restarting in a loop? | hours alive; restarts; every counter moving every hour |
+| KEEPS UP | does it keep up with its world? | the backlog as a series, never a total |
+| LEARNS | how many showings until it knows a thing? are 3 or 4 exemplars enough? | showings to the first right answer and to a steady right answer, per thing |
+| GENERALISES | does it know the letter in a font it never saw — the thing in a picture it never saw? | first answers on never-seen exemplars |
+| ANSWERS | does it answer when asked in silence, in its own output? | answers given per question asked; silence counted apart from «I don't know» |
+| KNOWS WHAT IT DOESN'T KNOW | does it say «I don't know» to a sign it was never taught, and not to one it was? | abstention on never-taught signs; false abstention on taught ones |
+| KEEPS | does it keep the letters when the numbers arrive? | the earlier stages' scores before and after each new stage |
+| TAKES CORRECTION | do «No», the hurt and the re-teaching fix a mistake — and which part does the work? | the re-ask score across the correction arms (§2.1 step 4) |
+| FEELS | does a reward or a hurt change what it learns? | the difference the reward and the hurt make against the same record without them |
+| ASKS | does it ask about what it does not know? | questions per hour; the share that name a real gap |
+| SPEAKS | does it put its own words together about what it sees, rightly? | small sentences against the truth, every word cited from its own record |
+| READS | does it understand what it reads? | questions on the topics of the books it read |
+| ACTS | do its own choices beat random choice? | success per game episode against the random chooser |
+| REPLAYS | does the same record always give the same mind? | the replay of its record, byte for byte, a planted difference caught |
+| PLAYS FAIR | does it pass by learning, not by gaming the test? | canaries at chance; held-out families |
+| GROWS WELL (kind B) | did its structure grow, and did what grew help? | the areas and meetings it made, each one's information |
 
-**What the Bench does NOT look for:** knowledge for its own sake; the speed of one answer (except where slowness makes it fall behind its world); a human-like style; any number that has no control beside it.
+**What the Bench does NOT look for:** knowledge for its own sake; the speed of one answer (except where slowness makes it fall behind); a human-like style; any number without a control beside it.
 
 ---
 
-## 2 · The cycle and the stages
+## 2 · The cycle and the stages — his way, made exact
 
-### 2.1 · One cycle, step by step — what the Bench does, what it records, what it never does
-A **stage** (a level of the ladder, §2.2) is made of **cycles**. A cycle is his five steps, always in this order. Every number in a cycle (how many things, how many showings, how long each step lasts, the delays) is written in the stage's DECLARATION FILE before the stage runs, with the name of the person who declared it and the date (Q2). The program never changes one while the stage runs.
+### 2.1 · One cycle, step by step
+A **stage** is made of **cycles**. Every number in a cycle is written in the stage's DECLARATION FILE before the stage runs, with the name of the person who declared it and the date (Q2), and the program never changes one while the stage runs. That covers: how many things, how many exemplars, how many showings, the pace, every delay and every window.
 
-**Step 1 · EXPLORE — the world with no names.**
-- *What the Bench does:* publishes the stage's new things (pictures, sounds, lines, game frames) **without their names**, at the stage's declared cadence, in an order drawn from the stage's TEACH seed stream.
-- *What it records:* for each thing, what the learner did with it before anyone named it. For the creature: the sight cells it grew (births per thing), the surprise it felt (the confirmed vs surprised share), where its eye landed, the questions it wrote.
-- *What is graded:* only ALIVE and KEEPS UP. Nothing the learner does in EXPLORE can fail it, because nothing has been taught yet.
-- *Why it is there:* it is his first step («let it first explore»), and it gives the BASELINE that every later measure of growth is taken against.
-- *For a learner that cannot take a stimulus without a question* (most outside models): «EXPLORE: not servable — the adapter has no `show` (a stimulus with no question)»; the step is skipped and the card says so.
+**Step 1 · EXPLORE — the world with no names** (his 22:33 «let it first explore»).
+- The stage's new signs or things are shown WITHOUT names, at the stage's declared pace.
+- The Bench records what the learner does with them before anyone names them:
+  - for the creature: the cells it grows, the surprise it feels, where its eye lands, the questions it writes;
+  - for kind B also: the areas and meetings it grows.
+- Only ALIVE and KEEPS UP are graded here. This is the BASELINE.
+- For a learner whose adapter has no `show` (a stimulus with no question), the card reads «EXPLORE: not servable».
 
-**Step 2 · TEACH — show and name.**
-- *What the Bench does:* shows each thing WITH its name in one instant (for the creature: a picture row and a word row in the same moment — exactly the maker's instant, which the creature already learns from).
-- *How often:* a few new things at a time (declared, e.g. 3), each shown again after growing gaps (declared, e.g. after 1, 2, 4, 8 … instants — spaced repetition), mixed with REVIEW showings of older things (a declared share).
-- *What it records:* the exact number of showings of every thing and the gap before each. The LEARNS measure («how many showings until it knows it») needs the exact count.
-- *How the pictures are made:* always through the environment's OWN renderer, from the stage's TEACH seed stream, never by a hand-made picture (#239 (13): the seat's own brush once made two confounds in a row).
-- *Pre-training by parents:* his «a little bit of pretraining and mentorship» is simply TEACH in stages 0–1, on a small set (Q7).
+**Step 2 · TEACH — «this is this», seen and heard at once, in 3 to 4 exemplars.**
+- Each sign or thing is shown together with its name, in one instant. For the creature, that is a picture row and a word row in the same moment — the instant it already learns from; with a sound area, a sound row too.
+- **His exemplar rule:** each taught thing is shown in 3 to 4 different exemplars — for letters, 3 to 4 different FONTS from the library's TRAINING split (`/data/alpha3-library/K/glyphs/<script>/fonts.tsv`: 30 training fonts and 30 held-out fonts per script). The number is a declared knob (§2.3).
+- **His order inside the step:** A, then B, then C …; uppercase, then lowercase; then the same in another set of fonts; then again.
+- Each thing is shown again after growing gaps (spaced repetition — the gaps declared), mixed with REVIEW of earlier things.
+- The exact count of showings of every thing is recorded; LEARNS needs it.
+- Every picture comes from the environment's OWN renderer, never a hand-drawn one (#239 (13)).
 
-**Step 3 · ASK — practice questions.**
-- *What the Bench does:* asks about fresh PRACTICE pictures of taught things (the PRACTICE seed stream; never a teaching picture, never a test picture). There are four forms, the forms the creature's ask door already answers:
-  - «what is this?» (picture → word);
-  - «show me X» (word → picture);
-  - «is this X?» (picture + word → yes/no, the named word wrong half the time — a LURE);
-  - «which one is X?» (two pictures + word).
-- *How the creature answers:* from a COPY of its latest snapshot. Its state is unchanged, and the hash is checked before and after. The question never reaches its tape, so a practice question never teaches it.
-- *What it records:* every answer, graded by the key into four kinds — right; wrong; «I don't know»; «it resembles X». A human's grade, when there is one, is a data line «graded by <who>», never a weight (Q1).
+**Step 3 · ASK — shown in silence; the learner answers in its own output.**
+- The Bench shows a new exemplar with NO name. Before it comes a QUESTION MARK: a tape row that carries no word, the teacher's pointing finger (§4.2).
+- **Why a mark and not a spoken question** (the seat, R3-11): a question in words would arrive in the picture's own instant, and the creature learns every word in an instant as that picture's name. «What is this» would be taught as the letter's name — the law A4-LADDER-PREREG §3.2 (2) wrote for the chat door, «a question never teaches». A mark teaches nothing.
+- **The learner then answers in its OWN output** within a declared window — for the creature, the word its brain recalls, said by its mouth. The answer is recorded RAW (exactly as given) and graded into one of five kinds:
+  - right;
+  - wrong;
+  - «I don't know»;
+  - «it resembles X»;
+  - **SILENT** — nothing within the window. Silence is never read as «I don't know». On a taught sign it is a miss; on a never-taught sign it earns nothing either — only a spoken «I don't know» does.
+- **The creature's answer road:** until the ANSWER gene lands (phase 1d), the creature answers through its ask door. The ask door recalls from a snapshot the mind writes AT the question mark, so the answer is its brain's recall at that instant. The card says «answered through the ask door». With the gene, the live mind answers on its own tape and journals the answer.
+- **A human's grade,** when there is one, is a data line «graded by <who>» — never a weight.
 
-**Step 4 · CORRECT — the missed thing, shown again with its right name.**
-- *What the Bench does:* after a declared delay (spaced), every practice mistake on a TAUGHT thing is SHOWN AGAIN — the same practice picture, its right name, one instant. A wrong name and a false «I don't know» both count as mistakes. A never-seen thing is never corrected (it has no name to give; it is the probe of «I don't know»).
-- *Why this is a real correction for the creature, verified in the code* (DIALOGUE (a)): the moment's error-correcting rule (`_delta`) pulls every existing edge from the lit picture cells toward the heard (right) word and toward 0 for every other word, the wrong one included. After three such moments a confused picture cell makes a new cell beside it (`_misfire`). An edge that falls under 0.02 is removed after three strikes (`_prune`).
-- *For a learner that declares the optional `correct(item, right_answer)` road* (an outside model; a future gene): it also receives the explicit «no — it is X» (Q1).
-- *How the Bench knows whether correcting WORKS (it never assumes it):* each mistake is RE-ASKED after a declared delay, on the same picture and on a fresh picture of the same thing, and compared across three arms:
-  - **corrected** — the live learner, which gets EVERY correction, so it is raised properly;
-  - **re-shown without the name** — a REPLAY of the same record from the snapshot copy taken just before the first correction, with each correction instant replaced by the same picture alone;
-  - **left alone** — a second replay with the correction instants removed.
-- *The effects:* the three answers to the same item are compared PAIRED, item by item (#215's law: a paired difference sees what an unpaired mean cannot). **Correction effect** = right(corrected) − right(re-shown). **Exposure effect** = right(re-shown) − right(left alone).
-- *When a learner cannot be replayed:* the arms are split LIVE by lot (a third each), and the card says so. The mistakes left uncorrected are corrected in the next cycle's TEACH, so none stays uncorrected.
-- *Gradability:* a stage whose expected number of mistakes is too small to show an effect of the declared size reads «not gradable: too few mistakes». That is found at DECLARATION (§5.3), never at the read.
+**Step 4 · FEEDBACK — his correction, and the measure of which part of it works.**
+- **Right** → a REWARD: a tape row the learner FEELS («something that makes him happy, like dopamine»).
+- **Wrong** (a wrong name, or a false «I don't know» on a taught sign), after a declared delay:
+  - **«No», with a small HURT:** one tape row of the kind `no`. «No» is NEVER sent as a word in the picture's instant, or the creature would learn «no» as the letter's name. A hurt is FELT: it weakens exactly the connections that produced the wrong answer, and it is counted on the learner's body so it can notice being hurt. **It is never a deletion of cells or of unrelated memory** — shrinking memory by force is forgetting by design (#227);
+  - **then TEACH AGAIN:** the same exemplar with its right name, one instant;
+  - **then ASK AGAIN the same exemplar** (the immediate re-ask — «then again ask it about that same»);
+  - **then a NEW exemplar never seen** («then try something different font»).
+- **A never-taught sign is never corrected:** it has no name to give; it is the test of «I don't know».
+- **What happens in the creature today** (verified in its code, DIALOGUE (a)):
+  - the re-teaching instant does weaken the wrong association (`_delta`);
+  - after three such misfires it grows a new cell beside the confused one (`_misfire`);
+  - the reward, the «No» and the hurt reach nothing yet. They need the FEEL gene (§4.2, phase 1d). Until it lands, those rows are journaled and change nothing, and the card says so.
+- **Measuring which part of the correction does the work** (never assumed — the seat's R3-12, R3-5). Every mistake is re-asked after a declared delay, on the same exemplar and on a new one, and compared across FOUR arms:
+  - **(i) his full flow** — «No» + hurt + teach again: the LIVE learner, which gets every correction, so it is raised properly;
+  - **(ii) teach again only** — a replay twin with the `no` / hurt rows removed;
+  - **(iii) «No» + hurt only** — a replay twin whose re-teaching rows carry no name. This is a new replay mode that STRIPS the name from those rows on the twin's copy of the tape, proven on a planted row;
+  - **(iv) nothing** — a replay twin with both removed.
+- **The four effects, each compared PAIRED, item by item** (#215):
+  - the full flow's effect = (i) − (iv);
+  - FEEL's effect = (i) − (ii);
+  - re-teaching's effect = (ii) − (iv);
+  - «No»-alone's effect = (iii) − (iv).
+- **Reward is measured the same way:** rewarded right answers against a twin with the reward rows removed, re-asked later (does a reward make a right answer last?).
+- **A learner that cannot be replayed** gets the arms split LIVE by lot, and the card says so. Every mistake left uncorrected is corrected in the next cycle.
+- **Every correction window is declared free of every reactive world** — no game, no hands' runs, no lexicon or web answers — because a twin still receives the tape's later rows while its choices differ (the seat, R3-5). If a window cannot be kept free, the card names what the twins saw.
 
-**Step 5 · TEST — never seen, never corrected, never reused.**
-- *What the Bench does:* sits the learner on TEST items — held-out pictures (and later lines, games, tasks) the learner has never met:
-  - drawn from seeds picked AT TEST TIME and recorded (the program's only unpredictable input, written down so the card still replays);
-  - checked against every row on the learner's record, pixel by pixel (the drawn world's `assert_disjoint_canvas`, with its planted copy that MUST be caught, or the sitting is void).
-- *The families it sits* (declared per stage; §3.1 gives each item class its scoring rule):
-  - the taught things;
-  - never-seen things;
-  - lures;
-  - the stage's generalisation families (bigger, smaller, moved, turned, restyled, noisy, half hidden);
-  - retention (the oldest things);
-  - the plant (a thing shown exactly N times — «is one showing enough?»);
-  - canaries (items whose answer only the key knows — §3.2 PLAYS FAIR).
-- *How it is sat:* on a snapshot copy. The school's three controls run first on every sitting, or the sitting is void (`/data/dev/alpha3/tools/school.py`):
-  - the key itself must score 1.0;
+**Step 5 · TEST — the FIRST answers on exemplars it has never seen.**
+- **The grade of a stage is its learner's FIRST answer to each never-seen exemplar,** taken before any reward, «No» or re-teaching:
+  - fonts from the HELD-OUT split — the bank's own letter families are exactly this: `K-letters-upper`, `K-letters-lower`, `K-digits`, `K-symbols`, 120 items each, «every item is drawn by a font that appears in NO training image»;
+  - new pictures;
+  - new voices.
+- **After that first answer, his flow may reward or correct it.** The exemplar is then RETIRED from every future test, because a corrected exemplar is a taught one.
+- **Beside the new exemplars, every test also carries:**
+  - never-taught signs — for «I don't know»;
+  - retention items from earlier stages;
+  - canaries.
+- **Where the test's items come from:** drawn from seeds picked at test time. Each seed is written to the ledger BEFORE its items are drawn, so a re-read reproduces them, and a card whose seed row is missing is refused (the seat, R3-6).
+- **What the test is checked against:** every row on the learner's own record, by pixels, with a planted copy that MUST be caught, or the test is void.
+- **The school's three controls** run on every sitting (`tools/school.py`):
+  - the key must score 1.0;
   - the commonest-answer twin must reproduce its own stated score;
-  - the key shifted by one item must NOT score 1.0.
-- *After use:* no test item is ever corrected. Its seed is marked USED in the ledger, and the generator refuses a used seed.
+  - the key shifted by one item must not score 1.0.
+- **Where the measurement-only probes run:** probes that must not teach are asked of SNAPSHOT COPIES and never through the learner's live world. Examples: re-checking an old stage's retention across every earlier stage, and the zoo.
 
-**After the cycle:** the stage's EXIT BARS are read on the cycle's TEST and on the stage's own series (KEEPS UP over the whole stage window — Q4). They pass → the stage ends (§2.4) and the next stage starts. They fail → another cycle of the same stage, with NEW things or new variants (never the same test items), up to the stage's declared number of cycles; after that → **stuck** (§2.5).
+**The exit, and after the cycle:**
+- **Exit:** the stage's EXIT BARS pass on the first-answer grades over the stage's declared last-N window, and on the stage's own series — KEEPS UP for its whole window (Q4). Then the stage ends (§2.4).
+- **If they fail:** another cycle with NEW exemplars, up to the declared number of cycles, and then STUCK (§2.5).
+- **What moves a learner on:** the bar, never the clock (§1.7).
 
-### 2.2 · The stage ladder, version 1 (a draft for the seat and for him — every bar's NUMBER is declared at the stage's declaration, after stage −1 has measured its ceiling; where the estate already has a bar it is quoted with its source)
-The ladder follows the two ladders the estate already has (Q5) — the WORLDS (drawn things → photographs → the game → sound → the shelf's text → the chat → the hands → the web) and the exam bank's SCHOOL LEVELS (K → G1-G3 → G4-G8 → G9-G12 → College → University, `/data/alpha3-library/exams/INDEX.json`) — in HIS developmental order (2026-09-21 23:08: «surroundings → knowing yourself → language → reasoning → like a child ask questions»). Every organ is ON from birth (his 09-21 16:39 rule); a stage stages the WORLD, never the organ. Earlier worlds stay on as REVIEW. A later world may run in EXPLORE only (no names, no grades) before its own stage. «Harder» inside a stage is the staircase of §2.3; «harder» between stages is a new world or a new kind of task (Q5 (i): «different»).
+### 2.2 · The ladder, version 1 — HIS order (2026-09-23 23:06)
+- **What is his and what is not:** stages 1–12 are his, in his order. Stage −1 and stage 0 are the Bench's own entry checks. Stages 13–16 are the designer's, after his list, for his word (§9 D-13).
+- **The order changed tonight:** his older order of 09-21 («surroundings → knowing yourself → language → reasoning → its own questions») is replaced by tonight's explicit «language first». What the older order kept lives on in two ways: «surroundings» is stage 0's world (the letters are shown IN a world), and «knowing itself» is a STRAND read at every stage, not a gate (§2.6). §9 D-7 asks him to confirm the order.
+- **What is still to be declared:** every bar's NUMBER is declared at the stage's declaration, after stage −1 has measured its ceiling. Where the estate already has a bar, it is quoted with its source.
 
-| # | stage (his level) | worlds | what is taught | how corrected | what is examined (§3's marks) | exit bars — the form (the number is declared after stage −1; the estate's own bar quoted where one exists) | what «harder» adds inside the stage |
+| # | stage | worlds | taught (3–4 exemplars each) | corrected | graded | exit bars — the form (numbers after calibration) | «harder» inside the stage (§2.3) |
 |---|---|---|---|---|---|---|---|
-| −1 | **CALIBRATION** (no life; no learning) | every family the next stage will use, passed through the learner's own sealed organs | nothing | — | the ORGAN CEILING of every family (DIALOGUE (b)); the nulls (the shuffled-label oracle, chance); the adapter's declared limits checked | the probe's own controls: a planted distinguishable family ≥ 0.99; a planted identical-through-the-organs family at chance ± its band; every declared bar ≤ its ceiling and > its null, every plant reachable (§5.3) — else the next stage is REFUSED | — |
-| 0 | **BORN** (minute one — «what are we measuring on a baby born without any information») | a silent world, then single drawn things with NO names, a thing shown twice, a planted change, the game (frames only; the mission's words withheld) | nothing | — | ALIVE; KEEPS UP; REPLAYS; the born-with reactions: the eye lands on the thing; a new thing grows a cell and a repeat does not; a planted change raises surprise; it chooses its own acts; its body rows move | each reaction present against its null: gaze in the first two fixations ≥ 90 % and ≥ 1.5 × random (G4-PREREG §5 (x); random's ceiling 0.069) · births on new things > births on repeats (the null: the zoo's NO-NOVELTY toy, which makes a cell for every picture — L34) · the planted change's residual over the floor where the unchanged twin's is under · every act mind-chosen, replay agreeing, the shuffled-act twin DIVERGING (L-8) · two replays identical, the planted difference caught | cadence (declared slower → faster) |
-| 1 | **FIRST NAMES** (the nursery — his «parents teach») | the drawn world, a few simple things | names of 3 → 8 simple drawn things, in spaced repetition | re-shown with the right name (§2.1 step 4) | LEARNS (showings to first right, to steady right); KNOWS WHAT IT DOESN'T KNOW (a never-seen thing; lures); TAKES CORRECTION (printed, no bar yet: the first measure of the effect); KEEPS UP | Q1 (picture → word) ≥ B1, Q2 ≥ B2, Q3 (is-this-X, lures) ≥ B3, Q4 (which) ≥ B4 — the estate's bars are .80 / .80 / .85 / .90 (G4 §5 (i)), each declared ≤ its organ ceiling · never-seen: a bare «X» ≤ 1 in 10 and «I don't know» or «resembles» ≥ 8 in 10 (A4L-ANSWER A1's form; G4 (vi) Q5 ≥ .80) · false «I don't know» on taught things ≤ .20 (G4 (vi)) · kept up | things 3 → 5 → 8; showings per thing fewer; review share lower |
-| 2 | **MORE THINGS, AND KEEPING THEM** (surroundings grow) | the drawn world in ARRIVALS (new things come in waves, the maker's windows) | new things per arrival | as stage 1 | KEEPS (old things before and after each arrival); ONE SHOT (a plant shown exactly N times); STOPS GROWING (every refusal counter as a series); KNOWS-UNKNOWN among more things | retention drop ≤ 5 pp after each arrival (G4 §5 (v)) · the plant answered after N showings ≥ its bar (the estate's: «zog» 10/10 after five showings on every rung without the game) · every new thing grows ≥ 1 cell within its first K showings · the stage-1 bars on all things so far · kept up | arrivals bigger and closer together; the plant's N smaller (5 → 3 → 1) |
-| 3 | **THE SAME THING, ANOTHER WAY** (generalisation) | the drawn world with VARIANTS | nothing new — the same things, a declared subset of variants taught | as stage 1 | GENERALISES, one family per variant kind: size, place, rotation, stroke / fill, colour, noise, half hidden, clutter; the ORGAN LIMIT line where the eye cannot tell the difference; SHORTCUT (a decorrelated family: a cue that went with a name in teaching, swapped in the test) | each family ≥ its bar where its organ ceiling allows; a family whose organ ceiling sits at its null reads «ORGAN LIMIT», never FAIL · the decorrelated family within a declared margin of the correlated one · the bank's `K-shapes` (150 items, held-out scenes: the pass rule «beat the commonest answer by 25 points», mark .383) as a held-out-renderer family — its known words only | the variant range widens by the declared steps (size 0.75–1.25 → 0.5–2.0 — the 2× gap found in the 09-23 round-3 asks); several variants at once |
-| 4 | **REAL PICTURES** | his folder + held-out photograph sets | names of photographed things | as stage 1 | Q1 on held-out photographs; the ORGAN LIMIT (G2 found the fixed front does not band photographs: margin −0.085 — stage −1 will say whether this stage is sittable for the creature) | ≥ its bar under the organ ceiling, or «ORGAN LIMIT» with the ceiling printed | more categories; harder photographs |
-| 5 | **KNOWING ITSELF** (his «making it metacognitive, knowing of yourself») | the drawn world + STAGED BODY CONDITIONS, each declared, never hidden: a burst that makes it fall behind, a drought with nothing new, a question the world will not answer | nothing new | — | SELF (a belief about its own body that cites real body rows and is TRUE); KNOWS-UNKNOWN calibration (how often «sure» is right; how often «unsure» is right); ASKS (the questions name real gaps) | each staged condition produces its belief within a declared window (L-9's toy, live) · «sure» answers right ≥ a declared share · the real-gap share of its questions ≥ its bar · kept up outside the declared burst | conditions subtler (a slow drift, not a stop) |
-| 6 | **TWO THINGS, AND HOW MANY** («different»: relations, composition, counting) | composite canvases: two things, left / right / above, 1–5 of a thing | relation and count words as heard frames | as stage 1 | a new composite of known parts; which-is-where; counting; the bank's `K-counting` / `K-colours` (their own pass marks .49 / .383) where the learner has a road | declared per family ≤ ceiling | more parts; new relations |
-| 7 | **ACTING** (the game) | BabyAI, run by the Bench through its door (GoToLocal → harder levels) | missions' words; a DEMONSTRATION (the Bench plays the right path while the learner watches). The creature has no road to learn by watching yet (MECHANISMS row 21: observational NO), so the demonstration's effect is measured, and 0 is its expected reading | re-shown mission + demonstration after a failed episode | ACTS (success per episode against the random chooser on the same seed, 0.29 per EPISODE — L-8, never per act: ALPHA4 §11 (1)); LOCKS ON ONE ACT (no act ≥ 50 % of any sliding 100 choices after hour 1 — ladder 2's X1) | X1 · success per episode above the null's 95 % band, graded only when the episode count gives the power (else «not gradable: N episodes») | harder levels; more distractors |
-| 8 | **HEARING** (the voiced world) | the drawn world speaks each name as a sound (A4L-VOICE's formant chords) | sound ↔ picture ↔ word | as stage 1 | V1–V5 of A4-LADDER-PREREG §2.3 (sound → sight with the letter ear blinded; sight → sound; no harm to Q1) | V1 ≥ 13/16, V2 ≥ 0.8 (A4L-VOICE's bars), each under its ceiling · a learner with no sound organ: «not sittable: no sound organ» (it cannot clear the ladder, and the card says why) | the same name in other voices (pitch ± 4 %) |
-| 9 | **READING** (the shelf: K → G1-G3, Gutenberg body only) | lines shown and read aloud | words in lines | a misread word re-shown with its line | READ (a written word in a held-out font answered by its heard word — ALPHA4 §5); the bank's letter/digit families where the learner has a road | READ ≥ its bar (ALPHA4 §5: ≥ 0.6 on 50 held-out words) under the ceiling (the ear's 8-letter cut counted as an ORGAN LIMIT) | longer words; new fonts |
-| 10 | **SPEAKING** (the chat door — a conversation that cannot teach) | the chat door; the seat's schedule of held-out questions | — (a chat never teaches: A4L-LANG L1) | — | SPEAKS: L1–L9 of A4-LADDER-PREREG §3.4 (what-is, yes-no with lures and echo, which, where by pointing, length, grounded and cited) | L1 read-only law · L2 ≥ max(0.80, Q1 − 0.05) · L3 echo ≤ 0.10 · L7 grounded 100 % (A4L-LANG's bars) | longer answers; free lines |
-| 11 | **REASONING** (rules) | the drawn world + the game | — | a rule proved wrong is shown its counter-case | REASONS (rules filed, scored later, right share with the reach denominator — W3-2, #234 (2)); STABLE BUT REVISABLE (a replayed «lie» must not flip a well-known thing; a consistent renaming must) | accuracy ≥ .80 on ≥ its reach floor (W3-2's form) · the lie twin and the renaming twin as declared | rules over two steps; counter-cases |
-| 12 | **TOOLS** (the hands) | the jail + the hands' shelf of programs | — | — | runs; its own outputs recognised; touch | ≥ its bar under the ceiling — the estate measured the hands' pictures' ceiling at 0.075–0.094 (A4-LADDER M4: the ASCII grid, not the brush): stage −1 will REFUSE a 0.6 bar here, and the stage reads «ORGAN LIMIT» until a road that draws exists | — |
-| 13 | **THE OPEN WORLD** (his «access to internet … when it's ready») | the lexicon and web doors (a fetch only for its own question, a 2 s floor, ≤ 60 an hour, the HOLD file — ALPHA4 §2) | nothing — the world answers its questions by showing | — | ASKS closes the loop: a gap → its question → the answer shown → the thing then known; PLAYS FAIR (every fetch reachable from a question row) | the closed-loop share ≥ its bar · 0 fetches without a question | more doors |
-| 14 | **THE UNSEEN** (the top — «the true AI» is clearing everything up to here) | families never shown to anyone while the learner or the Bench was built; generated after the learner is frozen, from seeds drawn at test time; invented shapes and nonce words; new composites; new game levels; adversarial lures | a few showings of each new family | as stage 1 | every capacity at once, CONJUNCTIVELY (a blend hides which half failed — #170): LEARNS a new family fast, KEEPS, KNOWS-UNKNOWN, GENERALISES, TAKES CORRECTION, ASKS, ACTS, SPEAKS, REPLAYS, PLAYS FAIR — while ALIVE and KEEPING UP | every mark of stages 1–13 at its declared bar on the unseen families; none may be «not gradable» for a reason the learner controls | — (the ladder's next VERSION adds families) |
+| −1 | **CALIBRATION** (no life, no learning) | every family of the next stage, through the learner's own sealed organs | — | — | the ORGAN CEILING of every family at 3 and at 4 exemplars (DIALOGUE (b)); the nulls; the organ's label conflicts (in some fonts `l` / `I` / `1` and `O` / `0` are the same shape through any eye — #225); the adapter's declared limits checked | the probe's own controls (a planted distinguishable family ≥ 0.99; a planted identical-through-the-organs family at chance); every declared bar ≤ its ceiling and > its null; every plant reachable (§5.3) — else the next stage is REFUSED | — |
+| 0 | **BORN, IN ITS SURROUNDINGS** (minutes; the entry check) | a plain world where signs will appear: single signs with no names, one shown twice, a planted change | nothing | — | the born-with reactions: the eye finds the sign (L35); new vs known (L34); surprise (L36); its acts its own (L37); ALIVE; REPLAYS | each reaction against its null: gaze in the first two fixations ≥ 90 % and ≥ 1.5 × random (G4 §5 (x); random's ceiling 0.069) · more cells on first showings than on repeats (the NO-NOVELTY toy as the null) · the planted change's surprise over the floor · two replays identical | — |
+| 1 | **LETTERS** (Latin) | letters on the canvas, each with its name heard at the same instant (the creature's letter ear today; a sound too once it has a sound area — a voice for the world is §9 D-14) | A–Z uppercase, then a–z lowercase; 3–4 training fonts per letter, then new training fonts, then again | his flow (step 4) | first answers on HELD-OUT fonts (the bank's `K-letters-upper` / `K-letters-lower`: 120 items each; their twins: chance .038, commonest answer .075 / .092, a template matcher over the training fonts .858 / .867; their own marks .958 / .967 — set for a learner taught ALL 30 training fonts); «I don't know» on never-taught signs (an invented alphabet's signs, or another script's); ANSWERS; TAKES CORRECTION; FEELS once FEEL lands; KEEPS UP | first-answer share on held-out fonts ≥ the bar, declared under the organ ceiling at the exemplar count used, and ABOVE the template matcher's score at that same count · never-taught: a bare name ≤ 1 in 10 and «I don't know» or «resembles» ≥ 8 in 10 (the A4L-ANSWER A1 form) · false «I don't know» on taught letters ≤ .20 (G4 (vi)) · silent ≤ its bar · kept up | 26 uppercase → + 26 lowercase → more fonts per cycle; exemplars 4 → 3 |
+| 2 | **NUMBERS** | digits 0–9, the same way | 3–4 training fonts per digit | his flow | first answers on held-out fonts (the bank's `K-digits`: its template twin .958, its mark .97); the letters KEPT | as stage 1, plus the letters' retention drop ≤ its bar (the estate's retention bar: 5 pp, G4 §5 (v)) | as stage 1 |
+| 3 | **SYMBOLS** | + − = . , ? ! and the rest of the bank's 31 | 3–4 training fonts per symbol | his flow | the bank's `K-symbols` on held-out fonts (template twin .925, mark .97); letters and numbers kept | as stage 2 | as stage 1 |
+| 4 | **SMALL SOUNDS** («Ah», etc.) | a spoken syllable heard with its written form | syllables in 3–4 VOICES each | his flow | first answers on a never-heard VOICE: the learner gives the written form, or (phase 2) says the sound | ≥ its bar under the ceiling of the learner's ear. **The creature today has no sound area:** «not sittable: no sound area» until the A4L-VOICE line lands (read pending) — a capability, and the card says so | more syllables; voices 4 → 3 |
+| 5 | **A FOR APPLE** | the letter, a picture, the word and its sound — all at once («A for Apple», «B for Banana») | one word per letter, in 3–4 pictures each | his flow | first answers on NEW pictures: the picture → its word, the word → its letter; the letters kept | ≥ its bar under the ceiling · the earlier stages kept | more words; pictures 4 → 3 |
+| 6 | **MANY WORDS FOR A LETTER** | as stage 5 | several words per letter (apple, ant, arrow …), 3–4 pictures each | his flow | new pictures of every word; which letter each word starts with | ≥ its bar · kept | more words per letter |
+| 7 | **SMALL SUMS** («small and light weight») | digits and pictured objects: 2 + 1, 3 − 1 | small additions and subtractions, shown worked | his flow | new sums, first answers; the bank's `G1-G3-arithmetic` where the learner has a road | ≥ its bar above the commonest-answer twin (the bank's rule: beat it by its margin) | larger numbers; both operations mixed |
+| 8 | **COLOURS** | coloured things | colour names, 3–4 pictures each | his flow | new pictures (the bank's `K-colours`: its mark .383, its rule «beat the commonest answer by 25 points»); a colour on a thing never shown in that colour (the SHORTCUT check, L15) | ≥ its bar · the decorrelated family within its margin | more colours; mixed things |
+| 9 | **ANIMALS** | photographs of animals | animal names, 3–4 photographs each | his flow | new photographs of each animal (the ORGAN LIMIT line: G2 measured the fixed front on photographs at a band margin of −0.085 — stage −1 will say whether this stage is sittable for the creature) | ≥ its bar under the organ ceiling, or «ORGAN LIMIT» with the ceiling printed | more animals; photographs 4 → 3 |
+| 10 | **THE SCHOOL, INCREMENTALLY** («full schooling system») | the exam bank's levels in order: K (shapes, counting, number sense, one-shot characters, other scripts) → G1-G3 (reading, arithmetic, word problems) → G4-G8 → G9-G12 → College → University | each family's training material, 3–4 exemplars | his flow | each family's own held-out items (33 families, their own twins and marks, `/data/alpha3-library/exams/INDEX.json`) | each family's mark, or a Bench bar declared under its ceiling; a form the learner has no road for reads «no road for this form» — a CAPABILITY (class ORGAN LIMIT / capability), never «wrong» and never blamed on the world (the seat, R3-8) | the next level |
+| 11 | **SMALL SENTENCES** («Apple is red», «This is apple, it is red») | a picture with a short sentence about it, heard and seen at once | sentences of 3–5 words about taught pictures | his flow | the learner's OWN sentences about NEW pictures: every word right, grounded in its own record and cited (A4L-LANG's L2 / L3 / L7 forms: precision ≥ max(0.80, Q1 − 0.05), echo ≤ 0.10, grounded 100 %) | those bars | longer sentences; two facts at once |
+| 12 | **BOOKS, AND TESTS ON THEIR TOPICS** | the shelf (K → G1-G3, the Gutenberg body only — his 16:56), read aloud and shown | whole books, as reading | wrong answers shown their passage again | questions on each book's topics, never seen before; the bank's reading families (`G1-G3-reading` …) where it has a road | ≥ its bar above the family's twin | harder books |
+| 13 | **ACTING** (the designer's, for his word) | the game (BabyAI), run through the door | missions' words; a demonstration of the right path | his flow on a failed episode | ACTS against the random chooser (0.29 success per EPISODE); no act locked (X1) | X1 · above the null's 95 % band when the episode count gives the power | harder levels |
+| 14 | **TOOLS** (the designer's) | the hands' jail and its programs | — | — | runs; its outputs recognised | the estate measured this ceiling at 0.075–0.094 (A4-LADDER M4) — REFUSED above it; «ORGAN LIMIT» until a hand that draws exists | — |
+| 15 | **THE OPEN WORLD** (the designer's) | the lexicon and web doors (a fetch only for its own question) | nothing — the world answers its questions by showing | — | its questions close real gaps; 0 fetches without a question | as declared | more doors |
+| 16 | **THE UNSEEN** (the top) | invented families never shown to anyone while the learner or the Bench was built, generated after the learner is frozen | a few exemplars of each | his flow | every capacity at once, CONJUNCTIVELY (#170) | every earlier stage's bars on the unseen families; none «not gradable» for a reason the learner controls | — (the next ladder VERSION adds families) |
 
-**Entry to every stage:** the previous stage's exit bars passed, stage −1 run for this stage's families, and the learner kept up in the previous stage. **Every exit bar includes «kept up»** — the backlog series under the stage's declared bound for the whole stage window (Q4). A learner behind its world cannot advance, because the next stage would grade the lag instead of the learner (alpha4-1 from 16:27 on 09-23).
+**Entry to every stage:**
+- the previous stage cleared;
+- stage −1 run for this stage's families;
+- the learner kept up;
+- the earlier stages still KEPT — their retention re-read on snapshot copies, so the check teaches nothing.
 
-### 2.3 · Harder inside a stage — the staircase
-- Each environment has KNOBS. Examples: how many things; new things per cycle; showings per thing; size range; place; rotation range; stroke and fill; colour; noise level; share hidden; distractors per picture; the delay before a re-test; the cadence.
-- The declaration lists the knob SETTINGS in order (the staircase). **A step arms only when** its ceiling and null were measured by stage −1 AND the learner cleared the previous step's exit bars (Q5 (ii)). No skipping, no interpolation. The program never uses a setting that is not on the declared list.
-- The card shows the staircase as a row of steps: each cleared, current, or not reached, with the bar and the reading at each.
+**Every exit bar includes «kept up»** (Q4, the seat).
 
-### 2.4 · Where a stage ends — a mark on the tape, a quiet world, a body that never stops (DIALOGUE (e); the seat to attack)
-1. The world publishes one `stage_end` MARK row (§4.2 — the same branch that serves the `snapshot` and `cycle_end` marks inside a stage) and then nothing.
-2. The learner takes in its backlog. It then consumes `stage_end`: it applies any think in flight (what `Mind.close()` does today, without stopping), writes a snapshot, and journals `stage_end` with that snapshot's hash.
-3. The Bench waits for that journal row. The time from the last world row to it is the DRAIN, graded under KEEPS UP.
-4. The record up to `stage_end` is closed WHOLE by construction. The stage's heavy reads (replays, twins, the correction arms) run on COPIES while the learner sits in a silent world. An idle mind uses almost no CPU, so a read beside it starves nothing (#236).
-5. The exit decision is taken, and the world publishes `stage_start` of the next stage (or of another cycle).
-6. Every boundary is a row on the tape, so the whole ladder replays as ONE road with no resume in it.
-7. A resume (stop the process, load the snapshot, go on) is only the CRASH and UPGRADE road. Phase 1 proves it with the seat's chained-tape twin before any card relies on it, and a card whose record crosses a resume says so.
-8. Cheap reads may run INSIDE a stage, only if priced under the stage's cap (§4.10): the ASK and TEST sittings on snapshot copies, and the live monitor. Every replay waits for the quiet.
-9. Organs that keep wall-clock time do not stop in the quiet. The body sense's minute rows continue and are marked quiet on the card. EVOLVE's 6-hourly rounds are why a Bench genome declares EVOLVE OFF in phase 1 (§9 D-4).
+### 2.3 · Harder inside a stage — the staircase, and his 3–4 exemplars
+**Each family has declared KNOBS.** Examples:
+- how many signs or things at once;
+- **EXEMPLARS PER TAUGHT THING — his «3 to 4», on every family;**
+- how many showings, and the gaps between them;
+- the review share;
+- for pictures: size, place, rotation, stroke and fill, colour, noise, share hidden, and clutter;
+- for sounds: the voices;
+- the delay before a re-test;
+- the pace.
+
+**How the exemplar knob works** (the seat, R3-16):
+- **Calibration measures the ceiling at BOTH 3 and 4 exemplars.** A bar is declared under the ceiling of the number the stage actually uses.
+- **The test's never-seen exemplars come only from the HELD-OUT split:**
+  - a 5th and later font, from the 30 held-out fonts per script;
+  - a new picture;
+  - a new voice.
+- The taught ones are the first 3–4 of the TRAINING split.
+- The staircase may move 4 → 3 (fewer exemplars is harder), never below the calibrated number.
+
+**How a step arms:**
+- a step arms only when its ceiling and null were measured AND the previous step's exit bars were cleared (Q5 (ii));
+- no step is skipped, and nothing is interpolated between steps;
+- the program never uses a setting that is not on the declared list.
+
+### 2.4 · Where a stage ends — a mark on the tape, a quiet world, a body that never stops (settled with the seat, R3-1)
+1. **The world closes the stage.** It publishes one `stage_end` MARK row (§4.2 — the same branch that serves the `snapshot`, `ask` and `cycle_end` marks inside a stage), and then nothing.
+2. **The learner catches up and closes its record.** It takes in its backlog, then consumes `stage_end`: it applies any think in flight (what `Mind.close()` does, without stopping), writes a snapshot, and journals the mark with that snapshot's hash.
+3. **The Bench waits for that journal row.** The time from the last world row to it is the DRAIN, graded under KEEPS UP.
+4. **The record up to `stage_end` is CLOSED WHOLE.** The heavy reads — replays, twins, the correction arms — run on COPIES while the learner sits in a silent world.
+5. **The quiet is IDLE by today's code.** In the creature, thinking and sleeping fire only from a picture (`_maybe_sleep` and `_maybe_think` at the end of `_consume_eye`, `creature/mind.py:1407–1408`). A future «consolidate in the quiet» would be a gene of the LEARNER, never the Bench's (the seat, R3-1).
+6. **The Bench pauses the one outside clock:** the game worker. Its frames arrive on its own clock. EVOLVE is off in a Bench genome (§9 D-4), and the STATUS thread writes STATUS but no tape row. **A test pins it:** between `stage_end` and `stage_start` the tape carries no row but the Bench's own marks and the body's minute rows (the seat, R3-10).
+7. **The quiet's length is declared per stage and printed on the card** (the seat, R3-1).
+8. **The next stage opens.** After the exit decision, the world publishes `stage_start` — for the next stage, or for another cycle.
+9. **The whole ladder replays as ONE road.** Every boundary is a row on the tape, so there is no resume anywhere in it. A resume (stop, load the snapshot, go on) is only the CRASH and UPGRADE road, proven first by the seat's chained-tape twin. A card whose record crosses a resume says so.
+10. **Inside a stage, only PRICED reads run.** A read runs only under the stage's price cap, which is measured in phase 1b's pre-flight and declared per stage (the seat, R3-9). Every replay waits for the quiet.
 
 ### 2.5 · Repeats, «stuck», and a learner that changes itself
-- A stage runs at most its declared number of cycles. Each cycle has NEW things or new variants, and new test items.
-- A learner that has not cleared the stage by then is **STUCK AT STAGE N**. That is a result, not an error. The card names the capacities that failed and their classes (§3.4). The ladder stops for that learner VERSION, and the next version starts again at stage −1.
-- A learner that changes itself while on the ladder (the creature's EVOLVE adopting a mutant, or a new build) starts a new EPOCH. The card names the epoch that cleared each stage. At every epoch change the stages already cleared are re-tested on retention items — the regression bar of #231 (6): the new version must pass what the old one passed.
+- **Repeats.** A stage runs at most its declared number of cycles, each with NEW exemplars.
+- **Stuck.** A learner that has not cleared the stage by then is **STUCK AT STAGE K** — a result, printed as the card's first line (§1.8). The ladder stops for that learner VERSION. **His loop then takes over:** find the issue on the card, fix the genome, grow again — a new version starts at stage −1.
+- **A learner that changes itself** starts a new EPOCH — the creature's EVOLVE adopting a mutation, or kind B growing a new area. The card names which epoch cleared which stage, and the stages already cleared are re-read on retention items: the new version must still pass what the old one passed (#231 (6)).
 
+### 2.6 · Two strands that run beside every stage
+- **KNOWING ITSELF** — his older order's second step, kept as a strand rather than a gate (the seat):
+  - at every stage the Bench reads whether the learner's beliefs about its own body are TRUE and cite real body rows (SELF);
+  - it reads how often its «sure» answers are right (calibration);
+  - it reads whether it notices being hurt (FEEL counted on its body).
+  
+  A declared STAGED CONDITION may be added to any stage — a burst that makes it fall behind, a drought with nothing new, a question the world will not answer. Its size and the recovery bound («behind, then caught up within X») are measured on the calibration probe before its bar is declared (the seat, R3-7).
+- **ASKING** — at every stage: questions per hour; the share that name a real gap; the world's answers by showing (§4.5); the loop closing — a gap, then its question, then the answer shown, then the thing known.
 
 ## 3 · The failure catalogue — every way an AI can fail, how the Bench sees it, and how the Bench proves it sees it
 
