@@ -1,0 +1,6 @@
+blind-shelf twin (hour-1 tape, shelf rows dropped): {'rows_replayed': 2466, 'dropped_source': 'shelf', 'seconds': 28.6, 'canvases': 1986, 'ms_per_canvas': 14.4, 'cells': [851, 22], 'exam_skipped': 'a drop-source twin: the reader asks its snapshot directly'}
+rows the twin saw with source shelf: 0 of 2466
+BLIND twin reading share on the 50 sampled shelf-only words: 0.0 correct 0 of 50 abstained 40
+  what the blind twin answered (non-null): [{'word': 'check', 'answered': 'arrow'}, {'word': 'using', 'answered': 'arrow'}, {'word': 'read', 'answered': 'arrow'}, {'word': 'write', 'answered': 'arrow'}, {'word': 'new', 'answered': 'arrow'}, {'word': 'york', 'answered': 'arrow'}, {'word': 'r', 'answered': 'dot'}, {'word': 'begin', 'answered': 'arrow'}, {'word': 'all', 'answered': 'dot'}, {'word': 'v', 'answered': 'dot'}]
+CONTRAST — alpha4-1's own snapshot fixture (hour ~5.9, 10:54 +04) on the same 50 words: 0.14 correct 7 abstained 19
+the 7 excluded (lexicon-shared) words asked of the blind twin: 0.0 [{'word': 'of', 'answered': None}, {'word': 'and', 'answered': 'arrow'}, {'word': 'with', 'answered': 'arrow'}, {'word': 'or', 'answered': 'arrow'}, {'word': 'to', 'answered': 'arrow'}, {'word': 'more', 'answered': None}, {'word': 'a', 'answered': 'ring'}]
