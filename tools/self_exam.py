@@ -78,7 +78,7 @@ def main() -> int:
     fallback = len(seen_things) < 2
     ask = ask_glances(org, ledgers, things if fallback else seen_things, feats, never, g.ear_blank_zero)
     ask_all = ask_glances(org, ledgers, things + arr2, feats, never, g.ear_blank_zero)
-    # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:2x +0400 — A4-LADDER-PREREG §2.2 task 3:
+    # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:12 +0400 — A4-LADDER-PREREG §2.2 task 3:
     # THE SITTER SITS BOTH LAWS — but only when this genome's ANSWER line actually declares the majority
     # clause (`recall_many`'s own gate would otherwise never fire, so an "old law" pass would be BYTE-
     # IDENTICAL to the new one — a wasted second full ask_glances pass on every OTHER rung's and alpha4-1's

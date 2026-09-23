@@ -177,7 +177,7 @@ class TestGradeFormula(unittest.TestCase):
 
 
 # ============================================================================ A4L-ANSWER (A4-LADDER-PREREG §2.2)
-# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:40 +0400 — the ANSWER line's optional trailing
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:11 +0400 — the ANSWER line's optional trailing
 # "; sure only when a majority of the glances light" clause. Fast, hermetic toys (mini_genome's pool retina, no
 # GAZE/tower) exercising the STRUCTURAL gate in genome/machinery.py:Organism.recall_many; the real-front controls
 # named in the brief (a seen thing's held-out canvas, the spiral canvas) are run separately on alpha4-1's snapshot

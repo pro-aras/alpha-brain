@@ -87,7 +87,7 @@ class TestExamUnchangedOnTheStandardMind(unittest.TestCase):
     # #2): re-pinned after `ask_glances` gained two ADDITIVE keys (Q1's "hedge_rate", Q5's "graded") -- verified
     # the move is additive-only: hashing `data` with those two keys stripped out reproduces the PRIOR golden
     # (331eb985835e8e20588758a490a0f01d91f4a82d92a930294cdf2de35f2fa575) exactly, so no existing computed value moved.
-    # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:38 +0400 — A4-LADDER-PREREG §2.2 task 2:
+    # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:12 +0400 — A4-LADDER-PREREG §2.2 task 2:
     # re-pinned again after every abstain-reason dict in genome/questions.py gained "minority": 0 (#235 — a
     # widened set is a chain; every reader must have the key even on a genome, like this test's G4-skeleton,
     # that never declares the clause and can never populate it). Verified additive-only the same way: hashing
@@ -110,7 +110,7 @@ class TestExamUnchangedOnTheStandardMind(unittest.TestCase):
         self.assertEqual(self.stable_hash(data), self.GOLDEN)
 
 
-# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:3x +0400 — A4-LADDER-PREREG §2.2 task 3:
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:12 +0400 — A4-LADDER-PREREG §2.2 task 3:
 # THE SITTER SITS BOTH LAWS, live end-to-end (not just ask_glances/recall_many in isolation, already
 # covered in tests/genome/test_answer_grade.py) — a real Mind, a real snapshot, run through
 # creature/exam.py:run_exam exactly as the voice thread calls it every EXAM.every canvases.
@@ -153,6 +153,41 @@ class TestSelfExamBothLaws(unittest.TestCase):
         # Q1 old law is well-formed (its own acc in [0, 1]) and structurally present beside the new law
         self.assertIn("acc", data["ask_seen_words_old_law"]["Q1"])
         self.assertGreaterEqual(data["ask_seen_words_old_law"]["Q1"]["acc"], 0.0)
+
+
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:16 +0400 — A4-LADDER-PREREG §2.2 A3/task 5,
+# advisor-caught (every other tool this ladder landed has a pin; answer_readtwin.py had none): a minimal,
+# hermetic test of tools/answer_readtwin.py:read_both_laws on a real built snapshot -- the one road the
+# orchestrator actually drives at 05:00 (a `--snapshot`/`--genome` pair), never the live alpha4-1 root itself.
+class TestAnswerReadtwin(unittest.TestCase):
+    def test_read_both_laws_on_a_real_snapshot(self) -> None:
+        from tools.answer_readtwin import read_both_laws
+        root = Path(tempfile.mkdtemp())
+        mind = _build_snapshot_on(root, list(world.THINGS_11), n=60)
+        h0 = mind.org.state_hash()
+        out = read_both_laws(root, _MAJORITY_GENOME_PATH, held_n=5)
+        self.assertTrue(out["answer_majority_declared"])
+        self.assertTrue(out["organism_unchanged"])
+        self.assertEqual(out["hash_before"], h0); self.assertEqual(out["hash_after"], h0)
+        for law in ("new_law", "old_law"):
+            self.assertIn(law, out)
+            for key in ("zog", "vex", "spiral", "Q1"):
+                self.assertIn(key, out[law], f"{law} missing {key!r}")
+        for thing_key in ("zog", "vex"):
+            self.assertIn("answered_rate", out["new_law"][thing_key])
+            self.assertIn("graded", out["new_law"][thing_key])
+        self.assertIn("acc", out["new_law"]["Q1"])
+
+    def test_read_both_laws_undeclared_genome_both_passes_identical(self) -> None:
+        """The negative control: on a genome that never declares the clause, new_law and old_law read the
+        SAME numbers (the override forces a no-op gate on either side) -- `answer_majority_declared` says so."""
+        from tools.answer_readtwin import read_both_laws
+        root = Path(tempfile.mkdtemp())
+        _build_snapshot_on(root, list(world.THINGS_11), n=60)
+        out = read_both_laws(root, GENOME_PATH, held_n=5)
+        self.assertFalse(out["answer_majority_declared"])
+        self.assertEqual(out["new_law"]["Q1"]["acc"], out["old_law"]["Q1"]["acc"])
+        self.assertEqual(out["new_law"]["spiral"], out["old_law"]["spiral"])
 
 
 if __name__ == "__main__":

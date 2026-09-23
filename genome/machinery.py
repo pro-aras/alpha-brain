@@ -579,7 +579,7 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"cell own band history (\d+)", a)
                 if not m: raise GenomeError(f"THRESH: cannot read {a!r} (L-6: THRESH cell own band history <n>)")
                 g["declared"]["THRESH"] = {"history": int(m.group(1))}
-            # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:30 +0400 — A4-LADDER-PREREG.md
+            # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:10 +0400 — A4-LADDER-PREREG.md
             # §2.2: an OPTIONAL trailing "; sure only when a majority of the glances light" clause (GAZE's
             # "coarse"/SURPRISE's "predicted"/BUDGET's "regenerate" precedent above): absent, this is
             # byte-identical to the old parse (g["declared"]["ANSWER"] == {"unknown_below": f}, exactly as
@@ -1533,7 +1533,7 @@ class Organism:
         nearest_cell: Optional[int] = None; nearest_val = float("-inf")
         evidence: Dict[int, Tuple[float, int]] = {}                       # other cell -> (summed evidence, lit cell of its first strongest edge)
         n_o = other.n   # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 01:24 +0400 — ALPHA4-G.md task 1: recall()'s own fix, mirrored here.
-        # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:30 +0400 — A4-LADDER-PREREG §2.2: `lit_n`
+        # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:10 +0400 — A4-LADDER-PREREG §2.2: `lit_n`
         # counts GLANCES (not cells) whose `_lit` resonated; `majority_declared` folds the genome's own law together
         # with the read-side override (None = the genome's law).
         lit_n = 0

@@ -137,7 +137,7 @@ def grade_mark(plant: dict, null: dict, seen: dict, answer_declared: bool) -> Di
 
 
 # ============================================================================ A4L-ANSWER (A4-LADDER-PREREG §2.2)
-# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:0x +0400 — A1/A2, test-first against the
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:11 +0400 — A1/A2, test-first against the
 # self_exam.py/questions.py shapes this rung lands (#171/#173): the sitter's own exam dicts (each carrying
 # ask_seen_words/ask_all_words/ask_seen_words_old_law/ask_all_words_old_law/lit_counts_seen — task 3) and the
 # reader's one-off plant-shaped asks (genome/questions.py:ask_plant_glances) for the null plant "vex" on the

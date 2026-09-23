@@ -163,7 +163,7 @@ Held = Dict[str, List[List[np.ndarray]]]     # thing -> pictures -> glance featu
 
 def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str], held: Held, never: Held,
                 blank_zero: bool = False, majority: Optional[bool] = None) -> Dict[str, object]:
-    """`majority` (edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:33 +0400 — A4-LADDER-PREREG
+    """`majority` (edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:11 +0400 — A4-LADDER-PREREG
     §2.2 task 3): a read-side override forwarded to every `recall_many` call below — None (the default) reads
     the genome's own declared law, byte-identical to before this parameter existed; True/False forces ANSWER's
     majority-of-glances gate on/off regardless of what the genome declares, so a sitter can ask the SAME
@@ -176,7 +176,7 @@ def ask_glances(org: Organism, ledgers: Dict[str, Ledger], things: Sequence[str]
     if n < 2:
         raise ValueError(f"the exam needs at least two things (Q3/Q4 draw a distractor from the others); got {list(things)!r}")
     out: Dict[str, object] = {}
-    # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 11:33 +0400 — A4-LADDER-PREREG §2.2 task 2: every
+    # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:11 +0400 — A4-LADDER-PREREG §2.2 task 2: every
     # abstain-reason dict below gains "minority" (#235: a widened set is a chain; a reader that does not widen
     # KeyErrors at the first minority row, since these are plain dicts, not a defaultdict/Counter).
     q1_ok = 0; q1_n = 0; q1_abst = {"novel": 0, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}; per = {t: [0, 0] for t in things}; multi = 0

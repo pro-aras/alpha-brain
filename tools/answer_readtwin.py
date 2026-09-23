@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 13:1x +0400 — A4-LADDER-PREREG §2.2 A3/task 5:
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:13 +0400 — A4-LADDER-PREREG §2.2 A3/task 5:
 # the one-off read-twin tool. Run by the ORCHESTRATOR on alpha4-1's CLOSED final snapshot after 05:00 (never by
 # this builder on the live life -- READ-ONLY like every root under genome-lives, never touched here). Both laws
 # on ONE snapshot, no replay: zog (the plant, ask_plant_glances), vex (the null plant), spiral (Q5, via

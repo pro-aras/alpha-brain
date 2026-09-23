@@ -140,7 +140,7 @@ class GradeMark(unittest.TestCase):
         self.assertFalse(grade_mark(unlearned, null, seen, True)["pass"])       # answered 5/10 is the FAIL (L5's cap shape, seam-1's 0/10)
 
 
-# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:1x +0400 — A4-LADDER-PREREG §2.2 A1/A2
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:12 +0400 — A4-LADDER-PREREG §2.2 A1/A2
 # (test-first against self_exam.py's own exam shape, task 3/5).
 def _exam(at, spiral_new, spiral_old=None, lit_counts=None, q1_new=None, q1_old=None):
     """One sitter exam dict, shaped exactly as self_exam.py's `out` (task 3): ask_all_words/Q5/spiral for

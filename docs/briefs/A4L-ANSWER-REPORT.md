@@ -1,6 +1,8 @@
 # A4L-ANSWER — builder report
-Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:1x +0400. Branch `a4l-answer` off master at the
-dispatch commit `a17cb0e`. Brief: `docs/briefs/A4L-ANSWER.md`. Law: `docs/A4-LADDER-PREREG.md` §1, §2.2, §4, §6 M2.
+Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:18 +0400 (edit stamps throughout this rung's diff
+corrected to real `date` output in a follow-up commit after an advisor catch — several had been typed
+estimates, not read; #50's own trap). Branch `a4l-answer` off master at the dispatch commit `a17cb0e`. Brief:
+`docs/briefs/A4L-ANSWER.md`. Law: `docs/A4-LADDER-PREREG.md` §1, §2.2, §4, §6 M2.
 
 ## What is NOT done, and why
 
@@ -59,10 +61,10 @@ Core (`genome/machinery.py` parser + `Organism.recall_many` + `genome/questions.
 `TestRungGenomeOneDifference`), RED confirmed by `git stash` on the three source files (10 ERRORs — every
 test that depends on the clause), GREEN after:
 ```
-Ran 30 tests in 0.03x s
+Ran 30 tests in 0.031s
 OK
 ```
-(the 27+3 genome-pin tests; log `scratch/test_answer_grade_green.log`)
+(the 27+3 genome-pin tests; log `scratch/test_answer_grade_final.log`)
 
 The marks (`tools/verdict_life.py::answer_null_mark/answer_seen_mark`) — `tests/creature/
 test_verdict_life_marks.py::AnswerNullMark/AnswerSeenMark`, RED confirmed by stashing `tools/verdict_life.py`
@@ -84,11 +86,28 @@ Re-pinned `TestExamUnchangedOnTheStandardMind`'s golden hash (an ADDITIVE-only m
 #235's own instruction). Verified additive-only exactly as builder A's own precedent: hashing `data` with
 every `"minority"` key stripped reproduces the PRIOR golden `25e16cd8…` bit for bit; new golden `4598b746…`.
 
+`tools/answer_readtwin.py` (A3's tool) — no pin at first pass (advisor-caught: every other tool this ladder
+landed has one); added `TestAnswerReadtwin` (same file, on a fresh built snapshot): both laws' four sub-keys
+present, `organism_unchanged` true, and a negative control (a genome that never declares the clause reads
+identical `new_law`/`old_law` numbers). Not independently RED-checked (the function was already committed
+and working when these were added — stashing the file reverts only the timestamp fix, not the code — so its
+correctness rests on the already-RED→GREEN-verified primitives it composes, `ask_glances`/`ask_plant_glances`/
+`recall_many`, plus the direct manual run on the real snapshot below); said here, not hidden. GREEN, as part
+of the full `test_exam_one_word.py` file (6 earlier + these 2):
+```
+Ran 8 tests in 12.992s
+OK
+```
+(log `scratch/test_exam_one_word_3.log`)
+
 The four seams (`tests/creature/test_a4l_answer_seams.py`) — ask door, THINK's word work (both the inline
 road and its threaded twin share ONE `recall_many`, so one test covers both), SURPRISE/THRESH (a minority
 abstention never pushes the own-band — proven both empirically and by source inspection of `moment()`), and
 QUESTION (proven by construction that NO consumer today can ever see `reason=="minority"` on a wordless
 sight — grepped exhaustively, both "sight"-kind roads call `recall`/`episodes.nearest`, never `recall_many`).
+The QUESTION proof's own call-site-count assertion is a **tripwire, not a law** (said in the test file too):
+it will correctly break the moment a future builder adds ANY second `recall_many` consumer to either module,
+whether or not it touches a wordless sight, forcing a re-read of this seam rather than silently going stale.
 RED confirmed by stashing the three source files (3 of 6 ERROR; the other 3 are negative controls, correctly
 unaffected either way), GREEN:
 ```
@@ -96,9 +115,17 @@ Ran 6 tests in 2.5s
 OK
 ```
 
-All five of the above together, one run: **`Ran 52 tests in 12.150s` / `OK`** (`scratch/final_targeted_green.log`).
+All of the above together (5 files: `test_answer_grade.py`, `test_verdict_life_marks.py`'s two new classes,
+`test_a4l_answer_seams.py`, `test_exam_one_word.py`), one run: **`Ran 54 tests in 15.452s` / `OK`**
+(`scratch/final_targeted_green2.log`).
 
 ## The numbers
+*(Every script cited by path below — `scratch/task0_measure.py`, `scratch/task0_early.py`,
+`scratch/negative_control.py`, `scratch/tape_twin.py`, `scratch/task4_controls.py` — is this worktree's
+gitignored scratch/, NOT committed; on master after merge they will not exist at those paths. The numbers
+they produced are transcribed whole below, so nothing here depends on re-running them; a reader who wants to
+re-derive one re-copies the fixtures per the brief's own §"read first" step and rebuilds the ~40-line script
+from the invocation shown, or asks this builder to re-post it.)*
 
 **Task 0 — M2 re-derived, my own instrument, `scratch/alpha4-1-snapshot` (moments=55200, sight_alive=4487,
 words_alive=753):**
@@ -142,6 +169,27 @@ headline the whole rung exists to fix:
 | vex | `sure_bare 3/10`, `abstain_with_resemblance 7/10` | `sure_bare 7/10`, `unsure 3/10` |
 | Q1 (seen words) | acc 0.9545, hedge 0.324 | acc 0.9545, hedge 0.324 (unchanged — mature organism clears the ceiling) |
 organism hash unchanged across both passes: **CONFIRMED**.
+
+*Vex above (3/10 sure-bare, new law) sits above the PREREG's own stated ceiling ("vex 1/10 sure-bare", M2 §2.2)
+— not a discrepancy in the mechanism, a discrepancy in the ORGANISM: M2's ceiling was read on the designer's
+09:54 copy; `scratch/alpha4-1-snapshot` is a later (or otherwise distinct) snapshot of the same life with a
+different exact cell/edge population (words_seen_n=753 here vs the designer's copy), so the per-canvas
+lit-count distribution for vex is structurally identical in SHAPE (`{1:5,2:2,3:1,4:1,5:1}`, confirmed exactly
+in task 0) but not in which SPECIFIC canvases land where. A1's own vex clause is defined against "the rung's
+final snapshot" — whichever one that turns out to be — never against the designer's stated number; this run's
+3/10 is simply this snapshot's true reading, printed as such.*
+
+**Cost of sitting both laws** (`tools/self_exam.py`, `--held 10`, `scratch/alpha4-1-snapshot`, same organism):
+```
+FLOOR genome      (old law only, baseline): "seconds": 8.2
+A4L-ANSWER genome (both laws + lit_counts_seen): "seconds": 17.0
+```
+≈ **2.07×**, or **+8.8 s** per sitting on this ~4,500-cell/~750-word organism — paid only when the genome
+declares the majority clause (confirmed: the FLOOR run above, and every other rung's/alpha4-1's own periodic
+`EXAM every 500 canvases` duty, take the untouched, single-law branch — `answer_majority_declared: false`,
+`old_law_note` printed, `ask_seen_words_old_law`/`lit_counts_seen` both `None` — read directly off the written
+exam JSON, not inferred). The orchestrator should weigh this against `EXAM`'s own cadence before this rung's
+launch if the 8 h life's cell count grows well past ~4,500.
 
 ## Gates
 - `python3 -m unittest discover -s tests/genome -t .` (`nice -n 19`, `TMPDIR=scratch/tmp`):

@@ -1,4 +1,4 @@
-# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:4x +0400 — A4-LADDER-PREREG §2.2 task 6: the
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:13 +0400 — A4-LADDER-PREREG §2.2 task 6: the
 # four seams the brief names. ANSWER's majority-of-glances gate lives in ONE place (genome/machinery.py:
 # Organism.recall_many); every seam here is a proof that the gate composes correctly with a REAL consumer,
 # not a re-test of the gate itself (tests/genome/test_answer_grade.py already covers that exhaustively).
@@ -166,7 +166,12 @@ class TestAnswerXQuestion(unittest.TestCase):
         self.assertIn("candidates = self.episodes.nearest(rec[\"x_s\"], 10)", src_mind, "THINK's sight-kind route moved -- re-check this seam")
         src_think_thread = inspect.getsource(think_thread_mod)
         self.assertIn("candidates = frozen.episodes.nearest(rec[\"x_s\"], 10)", src_think_thread)
-        # neither module's "sight"-kind region calls recall_many with more than the eye trigger's single glance
+        # A TRIPWIRE, not a law (Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:16 +0400, advisor-
+        # caught): counting call sites is brittle by nature -- a FUTURE builder adding a legitimate second
+        # recall_many() consumer to either module breaks this assertion whether or not it touches a
+        # wordless-sight road. That is the intended failure mode: it forces a human to re-read this seam's
+        # own reasoning (§ above) rather than silently going stale, not a promise that the count itself is
+        # meaningful in isolation.
         self.assertEqual(src_mind.count("self.org.recall_many("), 1, "a new recall_many call site appeared -- re-audit this seam (task 6)")
         self.assertEqual(src_think_thread.count(".recall_many("), 1, "a new recall_many call site appeared -- re-audit this seam (task 6)")
 
