@@ -1,4 +1,5 @@
-# edit: Claude (Opus 5.5, INDUCE-COST builder), 2026-09-23 14:12 +0400 — new: INDUCE made cheap WITHOUT changing one decision
+# edit: Claude (Opus 5.5, INDUCE-COST builder), 2026-09-23 14:07 +0400 — new: INDUCE made cheap WITHOUT changing one decision
+# (stamp corrected 2026-09-23 15:19 +0400 from `stat` — the file was written 14:05–14:07:11; the first stamp typed here read 14:12, AHEAD of the clock, #50)
 # (docs/briefs/INDUCE-COST-0923-REPORT.md). The finding (A4L-COST-REPORT §0.5): genome/think.py:induce, run on the MIND thread every THINK
 # boundary, was 57.9 % of a canvas at 6,896 x 753 (a 5.03 s median stall a think): a Python scan of the WHOLE ring per distinct word
 # (752 x 10,160 string compares), one gemv per worded episode, a cluster pass per word over every alive sight cell.
