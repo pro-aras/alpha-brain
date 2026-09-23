@@ -1,0 +1,20 @@
+run-g4-attempt1-20260920-0029-0.1 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 144 world 144 | lag {'cut': False, 'mind_last_seq': 324, 'time_cut_seq': 144, 'tape_head_seq': 324}
+run-g4-attempt1-20260920-0029-24 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 324 world 324 | lag {'cut': False, 'mind_last_seq': 324, 'time_cut_seq': 324, 'tape_head_seq': 324}
+run-g4-life1-20260920-0042-24 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 16420 world 16420 | lag {'cut': False, 'mind_last_seq': 16420, 'time_cut_seq': 16420, 'tape_head_seq': 16420}
+run-g4-life1-20260920-0042-6 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 8600 world 8600 | lag {'cut': False, 'mind_last_seq': 16420, 'time_cut_seq': 8600, 'tape_head_seq': 16420}
+run-g4-life2-20260920-1212-24 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 34402 world 34402 | lag {'cut': False, 'mind_last_seq': 35536, 'time_cut_seq': 34402, 'tape_head_seq': 35536}
+run-g4-life2-20260920-1212-6 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 8600 world 8600 | lag {'cut': False, 'mind_last_seq': 35536, 'time_cut_seq': 8600, 'tape_head_seq': 35536}
+run-g4-life3a-20260921-1314-1 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 1673 world 1673 | lag {'cut': False, 'mind_last_seq': 4675, 'time_cut_seq': 1673, 'tape_head_seq': 4675}
+run-g4-life3a-20260921-1314-24 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 4675 world 4675 | lag {'cut': False, 'mind_last_seq': 4675, 'time_cut_seq': 4675, 'tape_head_seq': 4675}
+run-g4-life3b-20260921-1606-24 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 34967 world 34967 | lag {'cut': False, 'mind_last_seq': 36027, 'time_cut_seq': 34967, 'tape_head_seq': 36027}
+run-g4-life3b-20260921-1606-6 | PASS | new keys ['hours_on_tape_world', 'lag', 'tape_world'] | shared leaves differing 0 | tape rows 9223 world 9223 | lag {'cut': False, 'mind_last_seq': 36027, 'time_cut_seq': 9223, 'tape_head_seq': 36027}
+run-g4-attempt1-20260920-0029 0.1 closed_whole False last_seq 144 tape_rows 144 hours_on_tape 0.099
+run-g4-attempt1-20260920-0029 24.0 closed_whole True last_seq 324 tape_rows 324 hours_on_tape 0.2245
+run-g4-life1-20260920-0042 24.0 closed_whole True last_seq 16420 tape_rows 16420 hours_on_tape 11.4554
+run-g4-life1-20260920-0042 6.0 closed_whole False last_seq 8600 tape_rows 8600 hours_on_tape 5.9995
+run-g4-life2-20260920-1212 24.0 closed_whole False last_seq 34402 tape_rows 34402 hours_on_tape 23.9988
+run-g4-life2-20260920-1212 6.0 closed_whole False last_seq 8600 tape_rows 8600 hours_on_tape 5.9986
+run-g4-life3a-20260921-1314 1.0 closed_whole False last_seq 1673 tape_rows 1673 hours_on_tape 0.9987
+run-g4-life3a-20260921-1314 24.0 closed_whole True last_seq 4675 tape_rows 4675 hours_on_tape 2.8309
+run-g4-life3b-20260921-1606 24.0 closed_whole False last_seq 34967 tape_rows 34967 hours_on_tape 23.9999
+run-g4-life3b-20260921-1606 6.0 closed_whole False last_seq 9223 tape_rows 9223 hours_on_tape 5.9997

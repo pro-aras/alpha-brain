@@ -1,0 +1,23 @@
+[gather] root /data/dev/genome-wt-reader-lag/scratch/e2e/lag-old cut at 1.0 h
+[ALIVE] False hours 0.299 moved False gaps [5.0, 5.0]
+[solo] 41.63 ms a canvas over the first 1,000 rows, alone
+[twins] 15 replays, 2 workers, slice_seq 850
+  twin unblinded-1: exit 0
+  twin unblinded-2: exit 0
+  twin blind-sleep: exit 0
+  twin blind-gaze: exit 0
+  twin blind-predict: exit 0
+  twin blind-curiosity: exit 0
+  twin blind-park: exit 0
+  twin blind-frozen: exit 0
+  twin blind-coarse: exit 0
+  twin blind-surprise: exit 0
+  twin T-shuffle: exit 0
+  twin T-nowire: exit 0
+  twin T-one-glance: exit 0
+  twin T-first-fixation: exit 0
+  twin T-frozen-10: exit 0
+[REPLAY] {'pass': False, 'vs_live': (752, '<missing from --against>'), 'two_replays': None, 'mind_rows': 883, 'hash_masked': ['hash'], 'closed_whole': True, 'plant_seq': 427, 'plant_caught': True}
+VERDICT FAIL — failed: ['vi_knows_unknown', 'vii_replay', 'W3_2_rules', 'DOOR', 'PARK', 'GRADE', 'COARSE', 'ALIVE'] — not gradable: ['v_retention', 'MODULATION', 'viii_cost', 'ACT', 'SOUND', 'SIZING', 'SELF', 'SURPRISE', 'QUESTION', 'SENTENCE', 'HANDS', 'EVOLVE', 'READ', 'WEB', 'STAGE', 'TWINS.no_curiosity', 'TWINS.no_park', 'TWINS.no_sleep_v'] — /data/dev/genome-wt-reader-lag/scratch/e2e/lag-old-1 (215.6 s)
+exit=0
+2026-09-23 17:16:42 +0400

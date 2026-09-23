@@ -35,10 +35,18 @@ WINDOW_SECONDS = 6 * 3600
 # FAIL at 16:49 was a cross-version hash); the two-replays comparison never masks anything.
 # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — v3.3: READER-FIX-0923's eleven fixes (the third hand's review of alpha4-1 §3/§6 +
 # the seat's three from the 2 h smoke), every one reader-only; the mind, the senses and the body untouched.
-READER_VERSION = ("tools/verdict_g4.py v3.3 (2026-09-23: v3.2 + READER-FIX-0923 — EVOLVE's void round apart; COST as §8b's function of cells; ACT's census "
-                  "over the game's acts, ≥ 95 % on the last 100; SENTENCE's missions per episode; QUESTION once per question, the lexicon counted; READ's "
-                  "fixed-seed sample of shelf-only words + its blind twin; THREAD's gaps attributed to sleeps; STAGE's readiness series + the mind's stage "
-                  "events carried; not gradable never failed; the plant clauses not gradable before the plant)")
+# edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — v3.4: READER-LAG-0923 — the read is of the life the MIND lived. alpha4-1 crossed
+# its saturation line (2,433 ms a canvas at 7,030 cells at 16:05 against a world of ≈ 0.456 canvases/s); at its stop the body leaves the
+# queue unread, so the live journal ends thousands of rows before the tape's head, and v3.3 replayed rows the mind never lived (REPLAY
+# `<missing from --against>`, `closed_whole` False, every tape mark counting world rows past the mind). Reader-only; the mind, the senses and
+# the body untouched.
+READER_VERSION = ("tools/verdict_g4.py v3.4 (2026-09-23: v3.3 + READER-LAG-0923 — the read is CUT at the mind's last consumed seq when the mind is "
+                  "behind its world (ledger/STATUS last_seq, the journal's last mind row on a closed record): every twin replays the cut tape, "
+                  "closed_whole is judged against the cut, every mark reads the cut; ALIVE reads the world's hours and gaps, the mind's counters over "
+                  "the hours it lived; the unconsumed tail printed under ALIVE, COST and REPLAY; v3.3: EVOLVE's void round apart; COST as §8b's "
+                  "function of cells; ACT's census over the game's acts, ≥ 95 % on the last 100; SENTENCE's missions per episode; QUESTION once per "
+                  "question, the lexicon counted; READ's fixed-seed sample of shelf-only words + its blind twin; THREAD's gaps attributed to sleeps; "
+                  "STAGE's readiness series + the mind's stage events carried; not gradable never failed; the plant clauses not gradable before the plant)")
 
 
 def _git_head(tree) -> "str | None":
@@ -102,17 +110,157 @@ def _relink(link: Path, target: Path) -> None:
         os.symlink(target, link)
 
 
-def closed_whole(events: Sequence[dict], last_seq: int, tape_last_seq: int) -> bool:
+def closed_whole(events: Sequence[dict], last_seq: int, tape_last_seq: int, mind_last_seq: Optional[int] = None) -> bool:
     """edit: Claude (Fable 5.1), 2026-09-22 22:28 +0400 — plan L-1 × L-5: True iff the record is a CLOSED life read WHOLE (a `stop` event in its
     journal and the cut reaching the tape's last row). Then every whole-tape twin ends its mind the way the body did
     (creature/replay.py:run_replay(close=) — the think in flight lands at the last eye row's seq) or the closed journal carries one
-    think row no replay can. A live life, or a cut short of the tape's end, never closes: the live mind lands that think later."""
-    return bool(last_seq) and int(last_seq) == int(tape_last_seq) and any(e.get("event") == "stop" for e in events)
+    think row no replay can. A live life, or a cut short of the tape's end, never closes: the live mind lands that think later.
+
+    edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923: «whole» is relative to what the MIND consumed.
+    A mind behind its world stops with the tape's head rows unconsumed (creature/body.py:stop sets the stop event, the mind thread leaves
+    its `q.get` loop without reading the queue, then `mind.close()` lands the in-flight think at the last eye row ≤ its last seq). With
+    `mind_last_seq` given (gather's `mind_last_consumed`): True iff a `stop` event AND the cut IS the mind's last consumed seq. None = the
+    old contract (the mind consumed the whole tape: `mind_last_seq` = `tape_last_seq`), byte-identical for every existing caller."""
+    if mind_last_seq is None:
+        mind_last_seq = tape_last_seq
+    return bool(last_seq) and int(last_seq) == int(mind_last_seq) and any(e.get("event") == "stop" for e in events)
+
+
+def _seq_or_none(v, tape_last_seq: int) -> Optional[int]:
+    """A seq reading kept only when it is an int inside 1..tape_last_seq (a missing key, a torn file or a seq past the tape is no reading)."""
+    if isinstance(v, bool):
+        return None
+    try:
+        v = int(v)
+    except (TypeError, ValueError):
+        return None
+    return v if 0 < v <= int(tape_last_seq) else None
+
+
+def mind_last_consumed(journal: Sequence[dict], status: dict, ledger: dict, tape_last_seq: int, closed: bool) -> dict:
+    """edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923, PURE: the mind's last CONSUMED seq and the three
+    records it is read from, every one printed, none asserted. The body's `stop` event carries no seq (creature/body.py:_journal_event
+    writes {"seq": None, "at", "event"}). What records the mind's position:
+      · `state/ledger.json` `last_seq` — every snapshot writes it; the last one is `mind.close()`'s, inside `stop()`;
+      · STATUS.json `last_seq` — the status thread writes it every HEART period, and `stop()` writes it last, after `close()`, just before
+        the stop event;
+      · the journal's last MIND-written row — every row carrying a seq (the mind's domain rows and its own `stage` rows; the body's and the
+        exam's event rows carry seq None). A LOWER bound: an ear row journals nothing, so a mind that consumed a trailing ear row sits one
+        past it. On a RUNNING life its last row may be half-written (a sleep row lands after its canvas row), so it is read only on a
+        CLOSED record (a `stop` event), where the journal is complete.
+    The ledger and STATUS are written AFTER the consume of the seq they name returns, so every journal row of every seq ≤ them is on disk
+    when gather reads the journal (it reads them FIRST). M = the largest valid reading; with none valid, the journal's last row (source
+    named). A reading outside 1..tape_last_seq is ignored."""
+    J = max((int(r["seq"]) for r in journal if r.get("seq") is not None), default=0)
+    readings = {"status": _seq_or_none((status or {}).get("last_seq"), tape_last_seq),
+                "ledger": _seq_or_none((ledger or {}).get("last_seq"), tape_last_seq),
+                "journal": (_seq_or_none(J, tape_last_seq) if closed else None)}
+    valid = {k: v for k, v in readings.items() if v is not None}
+    if valid:
+        m = max(valid.values())
+        src = " = ".join(k for k in ("status", "ledger", "journal") if valid.get(k) == m)
+    else:
+        m = min(J, int(tape_last_seq)) if J > 0 else 0
+        src = ("journal (no STATUS/ledger last_seq; a lower bound — an ear row journals nothing)" if m else "none (no mind row, no STATUS/ledger last_seq)")
+    return {"mind_last_seq": int(m), "source": src, "journal_last_mind_seq": J, "status_last_seq": (status or {}).get("last_seq"),
+            "ledger_last_seq": (ledger or {}).get("last_seq"), "closed": bool(closed)}
+
+
+def backlog_series(tape: Sequence[dict], t0: datetime) -> dict:
+    """edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923, PURE: the body's own record of the mind's backlog as
+    a SERIES (#236 — never a total). SENSE body publishes STATUS's `mind_backlog_rows` as `meta.reading.backlog` on a tape row every
+    `period_s` (creature/senses/body_sense.py STATUS_FIELD_MAP), so the series is on the tape — the unconsumed tail included, where it
+    grows. Printed: the max and the last (seq/at), the first row over 100 rows (the brief's line), the max per hour (the row's own `at`), and the mind's
+    `moments` advanced per hour from the same rows (its motion while behind — «a mind behind its world is alive» read, never assumed)."""
+    body = [r for r in tape if r.get("sense") == "body"]
+    out: Dict[str, object] = {"source": "the tape's `body` rows: meta.reading.backlog = STATUS.mind_backlog_rows when the row was published", "body_rows": len(body)}
+    pts: List[Tuple[int, str, int, int]] = []; mom: List[Tuple[int, int]] = []
+    for r in body:
+        rd = (r.get("meta") or {}).get("reading") or {}
+        h = int((_iso(r["at"]) - t0).total_seconds() // 3600)
+        b = rd.get("backlog"); mo = rd.get("moments")
+        if isinstance(b, (int, float)) and not isinstance(b, bool):
+            pts.append((int(r["seq"]), r["at"], h, int(b)))
+        if isinstance(mo, (int, float)) and not isinstance(mo, bool):
+            mom.append((h, int(mo)))
+    if not body:
+        out.update(n=0, max=None, last=None, first_over_100=None, note="no body rows on this tape (SENSE body not declared): no backlog series exists on this record")
+        return out
+    if not pts:
+        out.update(n=0, max=None, last=None, first_over_100=None, note="the body rows carry no `backlog` reading (the genome's SENSE body fields omit it)")
+        return out
+    mx = max(pts, key=lambda p: p[3])
+    first = next((p for p in pts if p[3] > 100), None)
+    n_h = max(0, max(p[2] for p in pts)) + 1
+    per_hour: List[Optional[int]] = [None] * n_h
+    for _s, _a, h, b in pts:
+        if 0 <= h < n_h:
+            per_hour[h] = b if per_hour[h] is None else max(per_hour[h], b)
+    adv: List[Optional[int]] = []
+    if mom:
+        last_by_h: Dict[int, int] = {}
+        for h, mo in mom:
+            last_by_h[h] = mo
+        prev = 0
+        for h in range(max(0, max(last_by_h)) + 1):
+            if h in last_by_h:
+                adv.append(last_by_h[h] - prev); prev = last_by_h[h]
+            else:
+                adv.append(None)
+    out.update(n=len(pts), max=mx[3], max_seq=mx[0], max_at=mx[1], last=pts[-1][3], last_seq=pts[-1][0], last_at=pts[-1][1],
+               first_over_100=({"seq": first[0], "at": first[1], "hour": round((_iso(first[1]) - t0).total_seconds() / 3600, 3), "backlog": first[3]}
+                               if first is not None else None),
+               per_hour_max=per_hour, moments_advanced_per_hour=(adv or None))
+    return out
+
+
+def lag_summary(lag: Optional[dict]) -> dict:
+    """edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923: the unconsumed tail in one dict, printed under ALIVE,
+    COST and REPLAY (never a gate: a mind behind its world is alive; its lag is COST's finding)."""
+    if not lag:
+        return {}
+    bs = lag.get("backlog_series") or {}
+    return {"cut_at_mind_last_seq": bool(lag.get("cut")), "mind_last_seq": lag.get("mind_last_seq"), "mind_last_seq_source": lag.get("source"),
+            "time_cut_seq": lag.get("time_cut_seq"), "tape_head_seq": lag.get("tape_head_seq"),
+            "rows_unconsumed": lag.get("rows_unconsumed"), "rows_cut_by_lag": lag.get("rows_cut_by_lag"),
+            "world_hours_unconsumed": lag.get("world_hours_unconsumed"), "world_hours_cut_by_lag": lag.get("world_hours_cut_by_lag"),
+            "hours_lived": lag.get("hours_lived"), "mind_last_at": lag.get("mind_last_at"), "tape_head_at": lag.get("tape_head_at"),
+            "backlog_max": bs.get("max"), "backlog_max_at": bs.get("max_at"), "backlog_last": bs.get("last"), "backlog_last_at": bs.get("last_at"),
+            "backlog_first_over_100": bs.get("first_over_100"), "backlog_body_rows": bs.get("n"),
+            "status_backlog_rows": lag.get("status_backlog_rows"), "backlog_reconciles": lag.get("backlog_reconciles")}
+
+
+def lag_text(ls: dict) -> str:
+    """The lag in one VERDICT.md clause (READER-LAG-0923)."""
+    if not ls:
+        return "lag not read"
+    first = ls.get("backlog_first_over_100")
+    series = (f"backlog (body rows, n {ls.get('backlog_body_rows')}): max {ls.get('backlog_max')} at {ls.get('backlog_max_at')}, last {ls.get('backlog_last')}, "
+              f"first > 100 {('at ' + str(first.get('at')) + ' (hour ' + str(first.get('hour')) + ', seq ' + str(first.get('seq')) + ')') if first else 'never'}")
+    head = (f"the mind's last consumed seq {ls.get('mind_last_seq')} ({ls.get('mind_last_seq_source')}) of the tape's {ls.get('tape_head_seq')}: "
+            f"{ls.get('rows_unconsumed')} rows / {ls.get('world_hours_unconsumed')} world h unconsumed")
+    cut = (f"; the read is CUT at it ({ls.get('rows_cut_by_lag')} rows / {ls.get('world_hours_cut_by_lag')} world h of the {ls.get('time_cut_seq')}-row window the mind never lived; it lived {ls.get('hours_lived')} h)"
+           if ls.get("cut_at_mind_last_seq") else "; not cut (the mind reached the read's window)")
+    rec = f"; STATUS backlog {ls.get('status_backlog_rows')} (reconciles with the tape: {ls.get('backlog_reconciles')})"
+    return "LAG: " + head + cut + "; " + series + rec
 
 
 def gather(root: Path, out: Path, hours: float) -> dict:
     """Concatenates the root's tape files in seq order into out/tape/ALL.jsonl (payload symlinked, never copied), cut at
-    start + hours; copies the state (a snapshot COPY); reads the journal's mind rows and event rows up to the cut."""
+    start + hours; copies the state (a snapshot COPY); reads the journal's mind rows and event rows up to the cut.
+
+    edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923: the read is of the life THE MIND LIVED. STATUS.json and
+    the ledger are read FIRST (before the tape and the journal: on a running life every journal row of a seq ≤ their `last_seq` is then on
+    disk, and no row they name is missing from the tape as read), then the mind's last consumed seq M (`mind_last_consumed`). When M is
+    short of the time cut the read is CUT at M: ALL.jsonl (every twin's tape), the live journal, the mind's events and every mark read
+    rows ≤ M, and `closed_whole` is judged against M (the mind closed whole relative to what it consumed). `tape_world` — the time cut
+    alone — is kept for ALIVE (the senses lived the whole window; a mind behind its world is alive), and the unconsumed tail is a fact
+    on the record (`lag`: rows and world hours unconsumed, the body rows' backlog series). With no lag every output is today's."""
+    status = json.loads((root / "STATUS.json").read_text()) if (root / "STATUS.json").exists() else {}
+    try:
+        ledger = json.loads((root / "state" / "ledger.json").read_text())
+    except (OSError, json.JSONDecodeError):
+        ledger = {}
     tape_rows = []
     for f in sorted((root / "tape").glob("*.jsonl")):
         tape_rows += read_jsonl(f)
@@ -131,8 +279,15 @@ def gather(root: Path, out: Path, hours: float) -> dict:
     assert starts, "no start event in the journal"
     t0 = _iso(starts[0]["at"])
     t_cut = t0 + timedelta(hours=hours)
-    tape_cut = [r for r in tape_rows if _iso(r["at"]) <= t_cut]
-    last_seq = tape_cut[-1]["seq"] if tape_cut else 0
+    tape_world = [r for r in tape_rows if _iso(r["at"]) <= t_cut]
+    time_cut_seq = tape_world[-1]["seq"] if tape_world else 0
+    tape_last_seq = tape_rows[-1]["seq"] if tape_rows else 0
+    closed = any(e.get("event") == "stop" for e in events)
+    ml = mind_last_consumed(journal, status, ledger, tape_last_seq, closed)
+    M_seq = ml["mind_last_seq"]
+    lag_cut = 0 < M_seq < time_cut_seq
+    last_seq = M_seq if lag_cut else time_cut_seq
+    tape_cut = [r for r in tape_world if r["seq"] <= last_seq]
     mind_rows = [r for r in journal if "event" not in r and int(r["seq"]) <= last_seq]
     mind_events = [r for r in mind_events_all if r.get("seq") is not None and int(r["seq"]) <= last_seq]
     events_cut = [e for e in events if _iso(e["at"]) <= t_cut or e["event"] == "stop"]
@@ -144,22 +299,49 @@ def gather(root: Path, out: Path, hours: float) -> dict:
     st = out / "live-state"; st.mkdir(exist_ok=True)
     for f in ("organism.npz", "organism.json", "ledger.json"):
         shutil.copy2(root / "state" / f, st / f)
-    status = json.loads((root / "STATUS.json").read_text()) if (root / "STATUS.json").exists() else {}
     exams = []
     for f in sorted(p for p in (root / "exam").glob("*.json") if p.name[0].isdigit()):
         d = json.loads(f.read_text())
         if _iso(d["at"]) <= t_cut:
             d["_file"] = f.name; exams.append(d)
+    hours_on_tape = (_iso(tape_cut[-1]["at"]) - t0).total_seconds() / 3600 if tape_cut else 0.0
+    hours_on_tape_world = (_iso(tape_world[-1]["at"]) - t0).total_seconds() / 3600 if tape_world else 0.0
+    at_of = {int(r["seq"]): r["at"] for r in tape_rows}
+    def _hours_between(a, b):
+        return round(max(0.0, (_iso(b) - _iso(a)).total_seconds()) / 3600, 4) if (a and b) else None
+    m_at = at_of.get(M_seq) if M_seq else None
+    head_at = tape_rows[-1]["at"] if tape_rows else None
+    S_seq = ml["status_last_seq"]; bl = status.get("mind_backlog_rows")
+    lag = {"cut": bool(lag_cut), **ml, "time_cut_seq": time_cut_seq, "tape_head_seq": tape_last_seq, "cut_seq": last_seq,
+           "rows_unconsumed": (tape_last_seq - M_seq) if M_seq else None, "rows_cut_by_lag": time_cut_seq - last_seq,
+           "mind_last_at": m_at, "time_cut_at": (tape_world[-1]["at"] if tape_world else None), "tape_head_at": head_at,
+           "world_hours_unconsumed": (_hours_between(m_at, head_at) if M_seq else None),
+           "world_hours_cut_by_lag": (_hours_between(m_at, tape_world[-1]["at"]) if lag_cut else 0.0),
+           "hours_lived": round(hours_on_tape, 4), "hours_on_tape_world": round(hours_on_tape_world, 4),
+           "status_backlog_rows": bl, "status_heartbeat_at": status.get("heartbeat_at"),
+           "backlog_reconciles": (((tape_last_seq - int(S_seq)) == int(bl)) if (closed and isinstance(S_seq, int) and not isinstance(S_seq, bool)
+                                                                               and isinstance(bl, int) and not isinstance(bl, bool)) else None),
+           "backlog_series": backlog_series(tape_world, t0)}
     return {"t0": t0, "t_cut": t_cut, "tape": tape_cut, "mind": mind_rows, "events": events_cut, "status": status, "exams": exams,
-            "mind_events": mind_events,
-            "closed_whole": closed_whole(events, last_seq, tape_rows[-1]["seq"] if tape_rows else 0),
-            "last_seq": last_seq, "hours_on_tape": (_iso(tape_cut[-1]["at"]) - t0).total_seconds() / 3600 if tape_cut else 0.0}
+            "mind_events": mind_events, "tape_world": tape_world, "lag": lag,
+            "closed_whole": closed_whole(events, last_seq, tape_last_seq, mind_last_seq=(M_seq or None)),
+            "last_seq": last_seq, "hours_on_tape": hours_on_tape, "hours_on_tape_world": hours_on_tape_world}
 
 
 # ----------------------------------------------------------------------------- ALIVE
 def alive(G: dict, hours: float, nrestarts: Optional[int]) -> dict:
-    t0 = G["t0"]; at = {r["seq"]: _iso(r["at"]) for r in G["tape"]}
-    n_hours = int(np.ceil(G["hours_on_tape"])) or 1
+    """edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923: the bar is unchanged («every counter moved every
+    hour, no sense dead > 60 s», 24 h on the tape, NRestarts 0); what it READS under a lag is not. The hours on the tape and the sense
+    gaps are the WORLD's (`tape_world`: the time cut alone — the senses lived the whole window, and a sense dead in the unconsumed tail
+    must still fail). The mind's own counters (canvases, thinks, sleeps — keyed by the world hour of the row they consumed) are required
+    in every world hour the mind FULLY lived; the world hours beyond its reach are named, not failed (a mind behind its world is alive —
+    its lag is COST's finding). The snapshots (the body's events, keyed by WALL time) are still required in every hour: a mind that
+    stopped moving still fails. With no lag cut every reading is today's. The lag is printed beside (`lag`)."""
+    world = G.get("tape_world") or G["tape"]
+    hours_world = G.get("hours_on_tape_world", G["hours_on_tape"])
+    lag = G.get("lag") or {}
+    t0 = G["t0"]; at = {r["seq"]: _iso(r["at"]) for r in world}
+    n_hours = int(np.ceil(hours_world)) or 1
     per = {h: {"canvases": 0, "thinks": 0, "sleeps": 0, "snapshots": 0, "exams": 0} for h in range(n_hours)}
     for r in G["mind"]:
         h = int((at[int(r["seq"])] - t0).total_seconds() // 3600)
@@ -172,17 +354,31 @@ def alive(G: dict, hours: float, nrestarts: Optional[int]) -> dict:
         if h in per and e["event"] in ("snapshot", "exam"): per[h][e["event"] + "s"] += 1
     gaps = []
     for sense in ("eye", "ear"):
-        ts = [at[r["seq"]] for r in G["tape"] if r["sense"] == sense]
+        ts = [at[r["seq"]] for r in world if r["sense"] == sense]
         gaps.append(max((b - a).total_seconds() for a, b in zip(ts, ts[1:])) if len(ts) > 1 else 0.0)
     restarts = [e for e in G["events"] if e["event"] == "sense_restart"]
     crashes = [e for e in G["events"] if e["event"] == "crash"] + ([G["status"]] if G["status"].get("crash") else [])
     stops = [e for e in G["events"] if e["event"] == "stop" and _iso(e["at"]) < G["t_cut"]]
     hours_full = [h for h in per if h < int(hours)]
-    moved = all(all(per[h][k] > 0 for k in ("canvases", "thinks", "snapshots", "sleeps")) for h in hours_full) if hours_full else False
-    ok = (G["hours_on_tape"] >= hours - 1 / 60) and moved and (max(gaps) <= 60.0) and not crashes and not stops and (nrestarts in (0, None))
-    return {"pass": bool(ok), "hours_on_tape": round(G["hours_on_tape"], 3), "bar_hours": hours, "per_hour": per, "every_counter_moved_every_hour": moved,
-            "max_gap_s_eye_ear": [round(g, 1) for g in gaps], "sense_restarts": len(restarts), "crashes": len(crashes), "stops_before_cut": len(stops),
-            "nrestarts": nrestarts, "note": "NRestarts read from systemd (--nrestarts / --unit); None = not read"}
+    # READER-LAG-0923: under a lag cut the mind's own counters are graded over the world hours it FULLY lived (h < int(hours lived));
+    # beyond them only the wall-clock snapshots are (the mind still moved in that wall hour — or it did not, and ALIVE fails)
+    reach = int(G["hours_on_tape"]) if lag.get("cut") else None
+    def _moved(h: int) -> bool:
+        ks = ("snapshots",) if (reach is not None and h >= reach) else ("canvases", "thinks", "snapshots", "sleeps")
+        return all(per[h][k] > 0 for k in ks)
+    moved = all(_moved(h) for h in hours_full) if hours_full else False
+    ok = (hours_world >= hours - 1 / 60) and moved and (max(gaps) <= 60.0) and not crashes and not stops and (nrestarts in (0, None))
+    out = {"pass": bool(ok), "hours_on_tape": round(hours_world, 3), "bar_hours": hours, "per_hour": per, "every_counter_moved_every_hour": moved,
+           "max_gap_s_eye_ear": [round(g, 1) for g in gaps], "sense_restarts": len(restarts), "crashes": len(crashes), "stops_before_cut": len(stops),
+           "nrestarts": nrestarts, "note": "NRestarts read from systemd (--nrestarts / --unit); None = not read"}
+    if lag:
+        out["lag"] = lag_summary(lag)
+    if reach is not None:
+        out["mind_reach_full_hours"] = reach
+        out["hours_beyond_the_minds_reach"] = [h for h in hours_full if h >= reach]
+        out["reach_note"] = ("the mind lived %.3f world h of the window: canvases/thinks/sleeps are graded in world hours < %d; in the hours beyond "
+                             "its reach only the wall-clock snapshots are (the body's own record that it kept moving)" % (G["hours_on_tape"], reach))
+    return out
 
 
 # ----------------------------------------------------------------------------- twins (one worker per twin, a fresh root each)
@@ -579,6 +775,9 @@ def main(argv: List[str]) -> int:
     print(f"[gather] root {root} cut at {a.hours} h", flush=True)
     G = gather(root, out, a.hours)
     R["tape_rows"] = len(G["tape"]); R["mind_rows_live"] = len(G["mind"]); R["exams_in_window"] = [e["_file"] for e in G["exams"]]
+    # edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923: the world's window beside the cut, and the lag whole
+    R["tape_rows_world"] = len(G["tape_world"]); R["LAG"] = G["lag"]; LAG_S = lag_summary(G["lag"])
+    print(f"[LAG] {lag_text(LAG_S)}", flush=True)
     R["ALIVE"] = alive(G, a.hours, nrestarts)
     print(f"[ALIVE] {R['ALIVE']['pass']} hours {R['ALIVE']['hours_on_tape']} moved {R['ALIVE']['every_counter_moved_every_hour']} gaps {R['ALIVE']['max_gap_s_eye_ear']}", flush=True)
 
@@ -679,7 +878,8 @@ def main(argv: List[str]) -> int:
     except Exception as e:
         R["replay_plant_error"] = repr(e)
     R["REPLAY"] = {"pass": d_live is None and d_two is None and plant_ok is True, "vs_live": d_live, "two_replays": d_two, "mind_rows": len(u1), "hash_masked": sorted(_ign), "closed_whole": bool(G.get("closed_whole")),
-                   "plant_seq": plant_seq, "plant_caught": plant_ok}
+                   "plant_seq": plant_seq, "plant_caught": plant_ok,
+                   "cut_seq": G["last_seq"], "lag": LAG_S}     # READER-LAG-0923: the replays and the live journal are compared up to the cut; the tail printed
     print(f"[REPLAY] {R['REPLAY']}", flush=True)
 
     # the organism at the cut = the unblinded replay's snapshot (byte-identical to the live one when REPLAY passes)
@@ -746,15 +946,21 @@ def main(argv: List[str]) -> int:
     # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (2): a GROW life is graded against ALPHA4-PREREG §8b's
     # FUNCTION of its own final cell count (0.09 ms × cells × 1.5); G4-7 printed beside as `g4_7`; the older records read G4-7 as before.
     _sleeps_window = None
+    # edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923: a sleep's time is its triggering canvas's TAPE time; STATUS's
+    # heartbeat is WALL time. Under a lag cut the mind's «now» on the tape is its last consumed row's `at`, and that is the window's end.
+    _sw_ref = None
     try:
-        _hb = st.get("heartbeat_at")
+        _hb = G["lag"].get("mind_last_at") if (G["lag"].get("cut") and G["lag"].get("mind_last_at")) else st.get("heartbeat_at")
         if _hb:
-            _hbt = _iso(_hb)
+            _hbt = _iso(_hb); _sw_ref = _hb
             _sleeps_window = sum(1 for _s, _t in _vl.sleep_times(G["tape"], G["mind"]) if 0 <= (_hbt - _t).total_seconds() <= 180)
     except Exception:
         _sleeps_window = None
     M["viii_cost"] = viii_cost(st, R.get("solo_ms_per_canvas_probe") or U["ms_per_canvas"], U["ms_per_canvas"], cpu_ns,
-                               grow=("GROW" in g.declared), sleeps_in_window=_sleeps_window)
+                               grow=("GROW" in g.declared), sleeps_in_window=_sleeps_window,
+                               lag={**LAG_S, "sleeps_window_end": _sw_ref,
+                                    "sleeps_window_end_is": ("the mind's last consumed row's tape time (a lag cut: the heartbeat is wall time, a sleep's time is its canvas's tape time)"
+                                                             if G["lag"].get("cut") else "STATUS heartbeat_at")})
     if not a.skip_random:
         comps = []
         for k, t in TW.items():
@@ -951,6 +1157,8 @@ def main(argv: List[str]) -> int:
     M["SURPRISE"] = _vl.surprise_mark(live, st, "SURPRISE" in decl, source_of=_src, twin_status=TW.get("blind-surprise"))   # §19.1 (builder B's confirmed glances)
     M["COARSE"] = _vl.coarse_mark(allw, (TW.get("blind-coarse", {}).get("exam") or {}).get("ask_all_words"), bool((getattr(g, "gaze", None) or {}).get("coarse")))   # §19.4
     M["QUESTION"] = _vl.question_mark(live, tape, st, float(a.hours), "QUESTION" in decl)   # §19.7 (builder C's question rows; the world's `answering` rows)
+    if G["lag"].get("cut"):      # READER-LAG-0923: the bar keeps --hours; the world hours the mind lived printed beside (the report names it)
+        M["QUESTION"]["hours_lived"] = round(G["hours_on_tape"], 3)
     M["SENTENCE"] = _vl.sentence_mark(tape, st, "SENTENCE" in decl)                        # §19.8 + the ceiling clause (the world's own pair skew)
     # §19.9 HANDS (builder F): the reader ASKS the hands' rendered canvases (up to 50) through the unblinded twin's organism and grades
     # the program's own shape; the shuffled-shelf twin = the same asks with the shapes permuted by a fixed rng.
@@ -1007,6 +1215,10 @@ def main(argv: List[str]) -> int:
             _rrecog = {"n": 0, "share": None, "error": repr(e)}
     M["READ"] = _vl.read_mark(tape, live, "SENSE_READ" in decl, _rrecog, _rblind, sample=_rsample, blind_reason=(None if _rblind is not None else read_blind_reason))
     M["THREAD"] = _vl.thread_mark(R["ALIVE"], st, bool((decl.get("THINK") or {}).get("threaded")), tape=tape, journal=live)   # §19.2; READER-FIX-0923 (7): gaps attributed to sleeps
+    if G["lag"].get("cut"):      # READER-LAG-0923
+        M["THREAD"]["lag_note"] = ("the graded max gap is ALIVE's (the world's window, the unconsumed tail included); the attribution reads the tape the mind "
+                                   "lived (to seq %s), by TAPE time — under a lag a sleep's wall time trails its canvas's tape time by the lag, so the "
+                                   "attribution is approximate there" % G["last_seq"])
     # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §5/§6: EVOLVE. The negative
     # control (brief item 4) is run ONCE, before the life, by `tools/evolve.py --negative-control` with `--out`
     # pointing into the life's own `evolve/` dir — its two files persist as part of the record; this reader loads
@@ -1021,6 +1233,8 @@ def main(argv: List[str]) -> int:
             _evolve_nc = None
     M["EVOLVE"] = _vl.evolve_mark(tape, live, "EVOLVE" in decl, float(a.hours), negative_control=_evolve_nc,
                                   every_h=(decl.get("EVOLVE") or {}).get("every_h"))   # §5/§6; READER-FIX-0923 (1): the void round printed apart
+    if G["lag"].get("cut"):      # READER-LAG-0923: as QUESTION — the bar keeps --hours, the hours lived printed beside
+        M["EVOLVE"]["hours_lived"] = round(G["hours_on_tape"], 3)
     # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:5x +0400 — ALPHA4-PREREG.md §5: WEB and STAGE (I) —
     # wired the SAME way every other builder's mark above is (a pure function in tools/verdict_life.py, called here
     # with `decl`/`tape`/`live`), so a run of THIS reader against an ALPHA4 life computes them, never leaves them
@@ -1176,7 +1390,8 @@ REVIEW_COST_POINTS = [                # ALPHA4-1-FIRST-HOURS-REVIEW §2, «It is
 
 
 def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns, grow: bool = False,
-              per_cell_ms: float = PREFLIGHT_MS_PER_CELL, factor: float = COST_FACTOR, sleeps_in_window: Optional[int] = None) -> dict:
+              per_cell_ms: float = PREFLIGHT_MS_PER_CELL, factor: float = COST_FACTOR, sleeps_in_window: Optional[int] = None,
+              lag: Optional[dict] = None) -> dict:
     """(viii) COST. A life that declares GROW (ALPHA4: no cap, «the world decides the cell count») is graded against §8b's FUNCTION of its
     own final cell count — STATUS `mind_ms_per_canvas_1min` ≤ factor × per_cell_ms × STATUS `cells` (alive sight + words,
     Organism.total_cells) — with the per-cell figure, the cell count, the bar and the review's four points printed; the G4-7 reading is
@@ -1184,9 +1399,11 @@ def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns, grow: b
     control). Two honesty prints, never gates: the figure is ONE 1-min window (STATUS's last write — no per-canvas series exists on any
     record), and `sleeps_in_window` counts the sleep rows whose triggering canvas fell in the 3 min before that write (a sleep minute
     reads ≈ 2.2×, the review §2)."""
+    # edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923: `lag` (gather's lag_summary) is printed on the mark in
+    # both forms — the unconsumed tail is COST's finding (a mind behind its world), never a gate here and never hidden in a pass.
     g47 = _viii_g4_7(status, solo_ms, unblinded_ms, cpu_ns)
     if not grow:
-        return {**g47, "form": "G4-7", "g4_7": dict(g47)}
+        return {**g47, "form": "G4-7", "g4_7": dict(g47), **({"lag": lag} if lag is not None else {})}
     per_canvas = status.get("mind_ms_per_canvas_1min"); cells = status.get("cells")
     m = {"form": "§8b", "graded": False, "pass": None, "live_ms_per_canvas": per_canvas, "cells_alive": cells,
          "per_cell_ms": (round(per_canvas / cells, 4) if (per_canvas is not None and cells) else None),
@@ -1196,7 +1413,7 @@ def viii_cost(status: dict, solo_ms: float, unblinded_ms: float, cpu_ns, grow: b
          "rss_note": "STATUS rss_mb is ru_maxrss — the process's PEAK, not its current size",
          "live_mind_ms_median_per_row": status.get("mind_ms_median_1min"), "cpu_hours": g47.get("cpu_hours"),
          "reading_window": "ONE 1-min window: STATUS's last write (heartbeat %s) — no per-canvas series exists on any record" % status.get("heartbeat_at"),
-         "sleeps_in_window": sleeps_in_window, "g4_7": g47,
+         "sleeps_in_window": sleeps_in_window, "g4_7": g47, **({"lag": lag} if lag is not None else {}),
          "bar": f"ALPHA4-PREREG §8b: live ms per CANVAS (STATUS.mind_ms_per_canvas_1min) ≤ {factor} × {per_cell_ms} ms × the life's own final alive cells (STATUS cells); G4-7 printed beside, not graded",
          "reason": ""}
     if per_canvas is None:
@@ -1277,11 +1494,17 @@ def write_verdict(out: Path, R: dict) -> None:
     M = R["marks"]; A = R["ALIVE"]
     def pf(x): return "PASS" if x else "FAIL"
     def gv(m): return ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"   # hoisted 2026-09-22: (viii) renders through it before its old definition below
+    # edit: Claude (Opus 5.5, reader-lag builder), 2026-09-23 16:26 +0400 — READER-LAG-0923: the lag in the header (when the read is cut) and on the
+    # ALIVE, REPLAY and COST rows (always) — never hidden in a pass.
+    _LS = lag_summary(R.get("LAG")); _cut = bool(_LS.get("cut_at_mind_last_seq"))
+    _alive_reach = (f" · the mind's counters graded over the {A.get('mind_reach_full_hours')} world h it fully lived; beyond its reach (hours {A.get('hours_beyond_the_minds_reach')}) the wall-clock snapshots only"
+                    if A.get("mind_reach_full_hours") is not None else "")
     L = [f"# G4 VERDICT — {R['verdict']}", "", f"root `{R['root']}` · genome `{R['genome']}` (sha {R['genome_sha']}) · read {R['at']} by `{R['reader']}` (PREREG §5 as amended; the reader's rules §16) · {R['hours']} h",
+         *(["", f"**The read is CUT at the mind's last consumed seq {_LS.get('mind_last_seq')}** — it lived {_LS.get('hours_lived')} of the window's world hours; {lag_text(_LS)}"] if _cut else []),
          "", "| mark | bar | reading | verdict |", "|---|---|---|---|",
-         f"| ALIVE | {A['bar_hours']} h under the unit, NRestarts 0, every counter moved every hour, no sense dead > 60 s | {A['hours_on_tape']} h on tape · moved every hour {A['every_counter_moved_every_hour']} · max gap eye/ear {A['max_gap_s_eye_ear']} s · sense restarts {A['sense_restarts']} · crashes {A['crashes']} · NRestarts {A['nrestarts']} | {pf(A['pass'])} |",
+         f"| ALIVE | {A['bar_hours']} h under the unit, NRestarts 0, every counter moved every hour, no sense dead > 60 s | {A['hours_on_tape']} h on tape · moved every hour {A['every_counter_moved_every_hour']}{_alive_reach} · max gap eye/ear {A['max_gap_s_eye_ear']} s · sense restarts {A['sense_restarts']} · crashes {A['crashes']} · NRestarts {A['nrestarts']} · {lag_text(A.get('lag') or _LS)} | {pf(A['pass'])} |",
          # edit: Claude (Fable 5.1), 2026-09-22 11:0x +0400 — compare() returns None when EVERY row matches; the old rendering printed "vs live None", which reads as unmeasured (the advisor's read, 2026-09-22 10:5x)
-         f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {'identical' if M['vii_replay']['vs_live'] is None else 'DIVERGED at ' + str(M['vii_replay']['vs_live'])} · two replays {'identical' if M['vii_replay']['two_replays'] is None else 'DIVERGED at ' + str(M['vii_replay']['two_replays'])} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']}{(' · masked ' + ','.join(M['vii_replay']['hash_masked']) + ' (reader ' + str(R.get('reader_commit'))[:7] + ' ≠ life ' + str(R.get('life_commit'))[:7] + ')') if M['vii_replay'].get('hash_masked') else ''} | {pf(M['vii_replay']['pass'])} |"]
+         f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {'identical' if M['vii_replay']['vs_live'] is None else 'DIVERGED at ' + str(M['vii_replay']['vs_live'])} · two replays {'identical' if M['vii_replay']['two_replays'] is None else 'DIVERGED at ' + str(M['vii_replay']['two_replays'])} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']}{(' · masked ' + ','.join(M['vii_replay']['hash_masked']) + ' (reader ' + str(R.get('reader_commit'))[:7] + ' ≠ life ' + str(R.get('life_commit'))[:7] + ')') if M['vii_replay'].get('hash_masked') else ''} · closed whole {M['vii_replay'].get('closed_whole')} at the cut seq {M['vii_replay'].get('cut_seq')}{(' (the mind' + chr(39) + 's last consumed seq)') if _cut else ''} · {lag_text(M['vii_replay'].get('lag') or _LS)} | {pf(M['vii_replay']['pass'])} |"]
     # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (9): every mark row renders through gv() — a not-gradable
     # mark reads «not graded» with its reason, never FAIL; (2)/(3)/(4)/(5)/(7)/(10)/(11) print their new readings; READ, EVOLVE, WEB, STAGE get rows.
     def _why(m): return (" — " + str(m.get("reason"))) if (not m.get("graded") and m.get("reason")) else ""
@@ -1296,9 +1519,9 @@ def write_verdict(out: Path, R: dict) -> None:
     if m.get("form") == "§8b":
         _pts = " · ".join(f"{p['ms_per_cell']} at {p['cells']:,}" for p in m.get("review_points") or [])
         _g = m.get("g4_7") or {}
-        L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas at {m['cells_alive']} alive cells = {m['per_cell_ms']} ms/cell vs the bar {m['bar_per_cell_ms']} ms/cell ({m['bar_ms']} ms) · the review's points (ms/cell at cells): {_pts} · {m['reading_window']}; sleeps in its last 3 min {m.get('sleeps_in_window')} · RSS {m['rss_mb_last_status']} MB (a peak) · CPU {m['cpu_hours']} h · G4-7 beside (not graded): {gv(_g)} vs solo {_g.get('solo_ms_per_canvas_replay')} ms{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
+        L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas at {m['cells_alive']} alive cells = {m['per_cell_ms']} ms/cell vs the bar {m['bar_per_cell_ms']} ms/cell ({m['bar_ms']} ms) · the review's points (ms/cell at cells): {_pts} · {m['reading_window']}; sleeps in its last 3 min {m.get('sleeps_in_window')} (window end: {(m.get('lag') or {}).get('sleeps_window_end_is', 'STATUS heartbeat_at')}) · RSS {m['rss_mb_last_status']} MB (a peak) · CPU {m['cpu_hours']} h · G4-7 beside (not graded): {gv(_g)} vs solo {_g.get('solo_ms_per_canvas_replay')} ms{(' · ' + m['reason']) if m.get('reason') else ''} · {lag_text(m.get('lag') or _LS)} | {gv(m)} |")
     else:
-        L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo {m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h{(' · ' + m['reason']) if m.get('reason') else ''} | {gv(m)} |")
+        L.append(f"| (viii) COST | {m['bar']} | live {m['live_ms_per_canvas']} ms a canvas (per-row median {m['live_mind_ms_median_per_row']} ms) vs solo {m['solo_ms_per_canvas_replay']} ms a canvas · RSS {m['rss_mb_last_status']} MB · CPU {m['cpu_hours']} h{(' · ' + m['reason']) if m.get('reason') else ''} · {lag_text(m.get('lag') or _LS)} | {gv(m)} |")
     if "ix_not_luck" in M:
         m = M["ix_not_luck"]; L.append(f"| (ix) | {m['bar']} | rank {m['rank_of_own']} of {m['of']} (own {m['own_composite']}; best random {m['best_random']}){_why(m)} | {gv(m)} |")
     m = M["x_gaze_finds_thing"]; L.append(f"| (x) | {m['bar']} | gaze {m['gaze_rate']:.3f} vs random {m['random_rate']:.3f} (×{m['ratio']}) | {gv(m)} |")

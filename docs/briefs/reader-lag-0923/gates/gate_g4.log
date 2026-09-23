@@ -1,0 +1,9 @@
+G4-1 writer sweep over 17 files: 0 offenders
+G4-1 control: planted offender CAUGHT
+G4-2 mind parity: 44f6fa81f9c21c54… vs pin 44f6fa81f9c21c54… → PASS
+G4-2 control (two canvases swapped): 5ad2e7286789af72… → CAUGHT
+G4-3 replay identity: exit 0 → PASS  REPLAY identical: 120 mind rows 
+G4-3 control (payload byte flipped at seq 62): exit 1 → CAUGHT  DIVERGED at seq 62: births
+G4-6 two senses on one tape: exit 0, evidence present, folder rows 13 → PASS  G4-6 row counts by source: {'maker': 120, 'folder': 13}; caught divergence planted at seq 121
+G4 gates: {'1': 'PASS', '2': 'PASS', '3': 'PASS', '6': 'PASS'}
+gate exit=0

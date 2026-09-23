@@ -1,0 +1,13 @@
+verdict old: FAIL ['vi_knows_unknown', 'vii_replay', 'viii_cost', 'W3_2_rules', 'DOOR', 'PARK', 'GRADE', 'COARSE', 'ALIVE']
+verdict new: FAIL ['vi_knows_unknown', 'vii_replay', 'viii_cost', 'W3_2_rules', 'DOOR', 'PARK', 'GRADE', 'COARSE', 'ALIVE']
+not gradable old: ['v_retention', 'MODULATION', 'ACT', 'SOUND', 'SIZING', 'SELF', 'SURPRISE', 'QUESTION', 'SENTENCE', 'HANDS', 'EVOLVE', 'READ', 'WEB', 'STAGE', 'TWINS.no_curiosity', 'TWINS.no_park', 'TWINS.no_sleep_v']
+not gradable new: ['v_retention', 'MODULATION', 'ACT', 'SOUND', 'SIZING', 'SELF', 'SURPRISE', 'QUESTION', 'SENTENCE', 'HANDS', 'EVOLVE', 'READ', 'WEB', 'STAGE', 'TWINS.no_curiosity', 'TWINS.no_park', 'TWINS.no_sleep_v']
+REPLAY old: {'pass': False, 'vs_live': [26, 'act_chosen'], 'two_replays': None, 'mind_rows': 883, 'hash_masked': ['hash'], 'closed_whole': False, 'plant_seq': 427, 'plant_caught': True}
+REPLAY new: {'pass': False, 'vs_live': [26, 'act_chosen'], 'two_replays': None, 'mind_rows': 883, 'hash_masked': ['hash'], 'closed_whole': False, 'plant_seq': 427, 'plant_caught': True, 'cut_seq': 850}
+ALIVE old: {'pass': False, 'hours_on_tape': 0.299, 'every_counter_moved_every_hour': False, 'max_gap_s_eye_ear': [5.0, 5.0]}
+ALIVE new: {'pass': False, 'hours_on_tape': 0.299, 'every_counter_moved_every_hour': False, 'max_gap_s_eye_ear': [5.0, 5.0], 'mind_reach_full_hours': None}
+LAG new: {'cut': False, 'mind_last_seq': 1064, 'source': 'status = ledger = journal', 'time_cut_seq': 850, 'tape_head_seq': 1064, 'cut_seq': 850, 'rows_unconsumed': 0, 'rows_cut_by_lag': 0, 'status_backlog_rows': 0, 'backlog_reconciles': True, 'hours_lived': 0.2991, 'hours_on_tape_world': 0.2991}
+
+8 differing leaves: 8 allowed new lag leaves under ['ALIVE.lag', 'LAG', 'REPLAY.cut_seq', 'REPLAY.lag', 'marks.vii_replay', 'marks.viii_cost', 'tape_rows_world']
+cut-only keys seen: 0 (expected 0)
+LEFTOVER (must be empty): 0
