@@ -131,8 +131,11 @@ class _VoiceGenomeLife:
     def get(cls):
         if cls._built is not None:
             return cls._built
-        old_cap, old_chunk = machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK
-        machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK = 4, 8
+        # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:1x +0400 — A42-B3 task 1: SOUND_GROW_CHUNK shrunk
+        # alongside the other two so this fixture's own docstring ("the sound pairs grow by chunks") stays true of the
+        # SOUND axis specifically too (17 things < the real SOUND_GROW_CHUNK=64 would never cross it otherwise).
+        old_cap, old_chunk, old_sound_chunk = machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK
+        machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK = 4, 8, 8
         try:
             gpath = ROOT / "genome" / "ladder" / "A4L-VOICE.genome"
             things = list(world.THINGS_11) + list(world.THINGS_ARRIVAL2) + [world.THING_PLANT]
@@ -149,7 +152,7 @@ class _VoiceGenomeLife:
                 twin.consume(r)
             twin.close()
         finally:
-            machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK = old_cap, old_chunk
+            machinery.AREA_INITIAL_CAPACITY, machinery.GROW_CHUNK, machinery.SOUND_GROW_CHUNK = old_cap, old_chunk, old_sound_chunk
         cls._built = (gpath, root, rows, m, twin, things)
         return cls._built
 
