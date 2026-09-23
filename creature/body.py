@@ -612,6 +612,18 @@ def _maker_sense_fn(argv: List[str], declared: Dict[str, dict], root: Path):
 
 
 # ============================================================================ CLI
+
+def _web_sense_fn(web_sense, root: Path, web_cfg: Dict[str, object], max_words: int = 8, letters: int = 8, canvas: int = 128, poll_period: float = 2.0):
+    """edit: Claude (Fable 5.1), 2026-09-23 04:03 +0400 — the web door's sense as the body arms it. `root` is bound here (the original
+    inline partial omitted it: `sense()` raised TypeError on every call and the body's crash isolation restarted the
+    door once a second for the whole pre-flight — 62 journaled restarts in three minutes, the mind untouched, the door
+    never open). Pinned by tests/creature/test_web_door_arming.py."""
+    import functools
+    return functools.partial(
+        web_sense.sense, root=root, questions_dir=root / "world" / "questions", hold_file=root / str(web_cfg["hold_file"]),
+        floor_s=float(web_cfg["floor_s"]), per_hour=int(web_cfg["per_hour"]), open_at_stage=int(web_cfg["opens_at_stage"]),
+        max_words=int(max_words), letters=int(letters), canvas=int(canvas), poll_period=float(poll_period))
+
 def main(argv: List[str]) -> int:
     root = Path(argv[argv.index("--root") + 1])
     genome_path = Path(argv[argv.index("--genome") + 1])
@@ -744,11 +756,8 @@ def main(argv: List[str]) -> int:
         from .senses import web as web_sense   # lazily, same discipline as game above
         import functools
         read_cfg = declared.get("SENSE_READ") or {}
-        web_fn = functools.partial(
-            web_sense.sense, questions_dir=root / "world" / "questions", hold_file=root / web_cfg["hold_file"],
-            floor_s=float(web_cfg["floor_s"]), per_hour=int(web_cfg["per_hour"]), open_at_stage=int(web_cfg["opens_at_stage"]),
-            max_words=int(read_cfg.get("words", 8)), letters=int(genome_for_cli.ear_letters),
-            canvas=int(genome_for_cli.gaze["canvas"]) if genome_for_cli.gaze else 128, poll_period=2.0)
+        web_fn = _web_sense_fn(web_sense, root, web_cfg, max_words=int(read_cfg.get("words", 8)), letters=int(genome_for_cli.ear_letters),
+                               canvas=int(genome_for_cli.gaze["canvas"]) if genome_for_cli.gaze else 128, poll_period=2.0)   # edit: Claude (Fable 5.1), 2026-09-23 04:03 +0400 — the partial lacked `root` (the sense restarted every second on the pre-flight life: TypeError missing positional 'root'); bound in a named helper so a test can see it
         body.add_sense("web", web_fn)
 
     body.start()
