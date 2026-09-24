@@ -5,7 +5,7 @@
 # the tape is concatenated into --out, the state is COPIED, every twin lives in its own fresh root under --out.
 """usage: python3 tools/verdict_g4.py --root <run root> --genome genome/G4.genome --out runs/g4-verdict-<stamp>
           [--hours 24] [--random 20] [--slice-hours 6] [--regime-step 100] [--workers 8] [--nrestarts N] [--cpu-ns N] [--unit creature.service]
-          [--skip-twins] [--skip-random]
+          [--skip-twins] [--skip-random] [--identity-root <closed root> [--identity-hours H]] [--control-root <R0's closed root>] [--line-ceiling F]
        python3 tools/verdict_g4.py --worker <spec.json>            (one twin: replay -> snapshot -> self-exam -> summary.json)
 """
 from __future__ import annotations
@@ -44,7 +44,11 @@ WINDOW_SECONDS = 6 * 3600
 # the read CUT at the mind's last consumed seq) merged with a4-integration's v3.3-line ladder additions (A4L-VOICE's twins and HEAR/VOICE_HARM/
 # SOUND_CELLS, A4L-LANG's blind-chat twin and CHAT L1-L9, A4L-COST's HASH and the witness beside COST) — both sides kept whole, the three
 # conflicting hunks (this header, the COST dict, the COST row) resolved additively.
-READER_VERSION = ("tools/verdict_g4.py v3.5 (2026-09-24: v3.4 + a4-integration's ladder marks — A4L-VOICE's voice twins blind-ear/blind-sound/T-shuffle-sound "
+# edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:34 +0400 — v3.5 step 3: the ladder-2 marks named in the version string (A4-LADDER-2-PREREG §2 + ADDENDUM §7(2)).
+READER_VERSION = ("tools/verdict_g4.py v3.5 (2026-09-24: v3.4 + a4-integration's ladder marks + READER-V35's ladder-2 marks — IDENTITY per source stream and at "
+                  "equal per-source canvas counts (--identity-root; the wall-clock band printed), X1_LOCK/X2_SUCCESS wired (+ the window and the census with "
+                  "the got-presence count), LINE from the scorer's own ledger (predictions.jsonl + STATUS, never the journal), NURSERY/NURSERY_READ vs R0 "
+                  "(--control-root), DROP_EQ, CHAT_COUNTERS, ANSWER's A1_NULL/A2_SEEN wired; A4L-VOICE's voice twins blind-ear/blind-sound/T-shuffle-sound "
                   "when AREA sound is declared and the marks HEAR/VOICE_HARM/SOUND_CELLS; A4L-LANG's blind-chat twin and CHAT L1-L9; A4L-COST's HASH mark "
                   "and the per-row witness's form and ms beside COST; v3.4: "
                   "READER-LAG-0923 — the read is CUT at the mind's last consumed seq when the mind is "
@@ -769,6 +773,11 @@ def main(argv: List[str]) -> int:
     # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:50 +0400 — A4L-LANG L5: the WHERE pointing ceiling measured BEFORE the life
     # (task 0 (b), tools/chat_ceiling.py on alpha4-1's 10:54 snapshot copy); the default is that pre-registered number.
     ap.add_argument("--chat-pointing-ceiling", type=float, default=None, help="A4-LADDER-PREREG §3.4 L5: the pre-life pointing ceiling (default: tools/verdict_life.CHAT_POINTING_CEILING_PRELIFE)")
+    # edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:30 +0400 — READER v3.5: the second roots the ladder-2 marks read (read-only; never replayed)
+    ap.add_argument("--identity-root", default=None, help="A4-LADDER-2-PREREG ADDENDUM §7(2): R0b's twin life (a CLOSED root) — the IDENTITY mark compares per source stream and at equal per-source canvas counts; absent = not gradable")
+    ap.add_argument("--identity-hours", type=float, default=None, help="cut the identity root at ITS OWN t0 + H (default: read it whole; its wall-clock reading is at its t0 + --hours)")
+    ap.add_argument("--control-root", default=None, help="A4-LADDER-2-PREREG §3: R0's closed root for R1–R3's one-difference readings (NURSERY's HEARD and READ vs R0; LINE's game frames beside R0's)")
+    ap.add_argument("--line-ceiling", type=float, default=None, help="R2 LINE: the ceiling printed beside (default tools/verdict_life.LINE_CEILING, B2's 0.272)")
     a = ap.parse_args(argv)
     global REUSE; REUSE = bool(a.reuse)
     if a.worker:
@@ -1286,6 +1295,12 @@ def main(argv: List[str]) -> int:
     # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:59 +0400 — A4L-COST (A4-LADDER-PREREG §2.1 C1 (iii)): the reader's own unblinded replay IS a replay under
     # the life's code+genome when the commits agree (hash unmasked); the floor's replay (ii) is the tape twin's (§1.4 (c)), not this reader's.
     M["HASH"] = _vl.hash_law_mark(live, st, "HASH" in decl, replay_same=(u1 if not _ign else None))
+    # edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:30 +0400 — READER v3.5: the ladder-2 marks (A4-LADDER-2-PREREG §2 + ADDENDUM §7(2))
+    M.update(ladder2_read(root, G, tape, live, st, decl, float(a.hours),
+                          identity_root=(Path(a.identity_root).resolve() if a.identity_root else None), identity_hours=a.identity_hours,
+                          control_root=(Path(a.control_root).resolve() if a.control_root else None), line_ceiling=a.line_ceiling,
+                          twins_dir=twins_dir, genome_path=genome_path))
+    print(f"[LADDER-2] " + " · ".join(f"{k} {gv_(M[k])}" for k in ("IDENTITY", "X1_LOCK", "X2_SUCCESS", "LINE", "NURSERY", "NURSERY_READ", "DROP_EQ", "A1_NULL", "A2_SEEN")), flush=True)
     M["PLANTS"]["predict_file_pair"] = {"sight_road_rows": live_pred["sight_road_rows"], "rule_rows_filed": live_pred["filed"], "rule_rows_scored": live_pred["scored"], "status_predictions_filed": st.get("predictions_filed")}
     M["PLANTS"]["park_unanswerable_want"] = {"sight_only_rows": len(sight_only), "first_seq": sight_only[0]["seq"] if sight_only else None, "parked_total": parked}
     M["PLANTS"]["belief_contradiction"] = {"clash_rows": kinds.get("clash", 0), "extension_rows": kinds.get("extension", 0)}
@@ -1347,6 +1362,259 @@ def chat_read(root: Path, tape: List[dict], live: List[dict], exams: List[dict],
     C["graded"] = bool(graded) or ("error" in C and "CHAT" in decl)
     C["pass"] = bool(graded) and all(C[k].get("pass") for k in graded) and "error" not in C
     return C
+
+# edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:30 +0400 — READER v3.5 (A4-LADDER-2-PREREG §2 + ADDENDUM §7(2)): a SECOND closed root read
+# read-only — the identity root (R0b's twin life) or the control root (R0, for R1–R3's one-difference readings). Nothing is replayed, copied or
+# written: the tape, the journal's mind rows, STATUS, the sampler's series, HEARD.json, the exam files and the scorer's ledger, cut by the SAME
+# rule gather uses (t0 = the journal's first start event; the time cut at t0 + hours; the mind's last consumed seq when the mind is behind).
+# hours None = the whole record.
+def gv_(m: dict) -> str:
+    """A mark's verdict word (the renderer's own rule, module-level for the [LADDER-2] progress line)."""
+    return ("PASS" if m.get("pass") else "FAIL") if m.get("graded") else "not graded"
+
+
+def side_record(root: Path, hours: Optional[float] = None) -> dict:
+    root = Path(root)
+    status = json.loads((root / "STATUS.json").read_text()) if (root / "STATUS.json").exists() else {}
+    try:
+        ledger = json.loads((root / "state" / "ledger.json").read_text())
+    except (OSError, json.JSONDecodeError):
+        ledger = {}
+    tape_rows: List[dict] = []
+    for f in sorted((root / "tape").glob("*.jsonl")):
+        tape_rows += read_jsonl(f)
+    tape_rows.sort(key=lambda r: r["seq"])
+    journal: List[dict] = []
+    for f in sorted((root / "journal").glob("*.jsonl")):
+        journal += read_jsonl(f)
+    events = [r for r in journal if "event" in r and r.get("at") is not None]
+    starts = [e for e in events if e["event"] == "start"]
+    t0 = _iso(starts[0]["at"]) if starts else (_iso(tape_rows[0]["at"]) if tape_rows else None)
+    t_cut = (t0 + timedelta(hours=hours)) if (t0 is not None and hours is not None) else None
+    tape_world = [r for r in tape_rows if t_cut is None or _iso(r["at"]) <= t_cut]
+    time_cut_seq = tape_world[-1]["seq"] if tape_world else 0
+    tape_last_seq = tape_rows[-1]["seq"] if tape_rows else 0
+    closed = any(e.get("event") == "stop" for e in events)
+    ml = mind_last_consumed(journal, status, ledger, tape_last_seq, closed)
+    M_seq = ml["mind_last_seq"]
+    lag_cut = 0 < M_seq < time_cut_seq
+    last_seq = M_seq if lag_cut else time_cut_seq
+    mind = [r for r in journal if "event" not in r and r.get("seq") is not None and int(r["seq"]) <= last_seq]
+    series_p = root / "readings" / "status-series.jsonl"
+    series: List[dict] = []
+    if series_p.exists():
+        for l in series_p.read_text().splitlines():
+            try:
+                series.append(json.loads(l))
+            except json.JSONDecodeError:
+                continue
+    heard_p = root / "read" / "HEARD.json"
+    try:
+        heard = json.loads(heard_p.read_text()) if heard_p.exists() else None
+    except (OSError, json.JSONDecodeError):
+        heard = None
+    exams: List[dict] = []
+    for f in sorted(p for p in (root / "exam").glob("*.json") if p.name[:1].isdigit()):
+        try:
+            d = json.loads(f.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        if t_cut is None or _iso(d["at"]) <= t_cut:
+            d["_file"] = f.name; exams.append(d)
+    preds: List[dict] = []
+    pp = root / "state" / "predictions.jsonl"
+    if pp.exists():
+        for l in pp.read_text().splitlines():
+            try:
+                preds.append(json.loads(l))
+            except json.JSONDecodeError:
+                continue
+    tape_cut = [r for r in tape_world if r["seq"] <= last_seq]
+    return {"root": str(root), "t0": t0, "t_cut": t_cut, "hours": hours, "tape": tape_cut, "mind": mind, "status": status, "series": series,
+            "heard": heard, "exams": exams, "predictions": preds, "closed": closed, "last_seq": last_seq, "lag_cut": bool(lag_cut),
+            "hours_on_tape": (round((_iso(tape_cut[-1]["at"]) - t0).total_seconds() / 3600, 3) if (tape_cut and t0 is not None) else 0.0)}
+
+
+def _canvas_seqs(mind_rows: Sequence[dict]) -> List[int]:
+    return [int(r["seq"]) for r in mind_rows if "moment" in r and r.get("glance") == 0 and r.get("source") is not None]
+
+
+def _read_jsonl_tolerant(p: Path) -> List[dict]:
+    out: List[dict] = []
+    if p.exists():
+        for l in p.read_text().splitlines():
+            try:
+                out.append(json.loads(l))
+            except json.JSONDecodeError:
+                continue
+    return out
+
+
+def ladder2_read(root: Path, G: dict, tape: List[dict], live: List[dict], st: dict, decl: dict, hours: float,
+                 identity_root: Optional[Path] = None, identity_hours: Optional[float] = None, control_root: Optional[Path] = None,
+                 line_ceiling: Optional[float] = None, twins_dir: Optional[Path] = None, genome_path: Optional[Path] = None) -> Dict[str, dict]:
+    """edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:30 +0400 — the ladder-2 marks, gathered and graded in one place (a test reads
+    the LAST link, #180): IDENTITY (R0b, --identity-root), X1_LOCK/X2_SUCCESS (R1, R5), LINE (R2), NURSERY/NURSERY_READ (R3, --control-root = R0),
+    DROP_EQ/CHAT_COUNTERS (R5), A1_NULL/A2_SEEN (ladder 1's ANSWER marks, R5). Each reads «not gradable» where its line is undeclared."""
+    from tools import verdict_life as _vl
+    M: Dict[str, dict] = {}
+    t0 = G.get("t0"); t_cut_a = (t0 + timedelta(hours=hours)) if t0 is not None else None
+    series_a = _read_jsonl_tolerant(Path(root) / "readings" / "status-series.jsonl")
+    # R0b IDENTITY
+    if identity_root is not None:
+        try:
+            B = side_record(Path(identity_root), identity_hours)
+            wa = _vl.wall_reading(series_a, st, _canvas_seqs(live), (t_cut_a.timestamp() if t_cut_a is not None else None))
+            tb = (B["t0"] + timedelta(hours=(identity_hours if identity_hours is not None else hours))) if B["t0"] is not None else None
+            wb = _vl.wall_reading(B["series"], B["status"], _canvas_seqs(B["mind"]), (tb.timestamp() if tb is not None else None))
+            M["IDENTITY"] = _vl.identity_mark(tape, live, B["tape"], B["mind"], provided=True, wall=_vl.wall_band(wa, wb),
+                                              label_a=Path(root).name, label_b=Path(identity_root).name)
+            M["IDENTITY"]["identity_root"] = {"root": B["root"], "hours": B["hours"], "hours_on_tape": B["hours_on_tape"], "closed": B["closed"],
+                                              "lag_cut": B["lag_cut"], "last_seq": B["last_seq"]}
+        except Exception as e:
+            M["IDENTITY"] = {"graded": True, "pass": False, "error": repr(e), "bar": "ADDENDUM §7(2)",
+                             "reason": f"the identity read raised on a root that was GIVEN: {e!r} (a given root that cannot be read is a failure, never hidden)"}
+    else:
+        M["IDENTITY"] = _vl.identity_mark([], [], [], [], provided=False)
+    # R1 / R5: X1 the lock absent, X2 success per episode (printed)
+    value_on = "ACT_VALUE" in decl
+    M["X1_LOCK"] = _vl.explore_lock_mark(tape, live, value_on)
+    M["X1_LOCK"]["window"] = _vl.explore_lock_window(tape, live)
+    M["X2_SUCCESS"] = _vl.explore_success_mark(tape, value_on)
+    M["X2_SUCCESS"]["census"] = _vl.explore_x2_census(tape, live, st)
+    # the control (R0) root, read once
+    C = None
+    if control_root is not None:
+        try:
+            C = side_record(Path(control_root), hours)
+        except Exception as e:
+            C = {"error": repr(e)}
+    # R2 LINE
+    preds = _read_jsonl_tolerant(Path(root) / "state" / "predictions.jsonl")
+    ctl_line = None
+    if C is not None and "error" not in C:
+        _cl = _vl.line_mark(C["predictions"], C["status"], True)
+        ctl_line = {"root": C["root"], "status": _cl["status"], "by_instant": _cl["by_instant"], "frame_rows_scored": _cl["frame_rows_scored"],
+                    "note": "R0 (FLOOR) writes no instant stamp: its scored frames read «unstamped» (every source together) — printed beside, never graded"}
+    elif C is not None:
+        ctl_line = {"error": C["error"]}
+    try:
+        _tf = _vl.read_frames(tape)
+    except Exception as e:
+        _tf = {"error": repr(e)}
+    M["LINE"] = _vl.line_mark(preds, st, bool((decl.get("SENTENCE") or {}).get("line")),
+                              ceiling=(line_ceiling if line_ceiling is not None else _vl.LINE_CEILING), tape_frames=_tf, control=ctl_line)
+    M["LINE"]["ledger_note"] = "state/predictions.jsonl read WHOLE (its rows carry no seq to cut by)"
+    # R3 NURSERY
+    body_only = bool((decl.get("SENSE_READ") or {}).get("gutenberg_body_only"))
+    heard_p = Path(root) / "read" / "HEARD.json"
+    try:
+        heard = json.loads(heard_p.read_text()) if heard_p.exists() else []
+    except (OSError, json.JSONDecodeError):
+        heard = []
+    shelf_words = [str((r.get("meta") or {}).get("word")) for r in tape if r.get("sense") == "ear" and (r.get("meta") or {}).get("source") == "shelf"
+                   and (r.get("meta") or {}).get("word") is not None]
+    ctl_heard = (C.get("heard") if (C is not None and "error" not in C) else None)
+    M["NURSERY"] = _vl.nursery_mark(heard, ctl_heard, shelf_words, body_only)
+    M["NURSERY_READ"] = _vl.nursery_read_mark(G.get("exams") or [], (C.get("exams") if (C is not None and "error" not in C) else None), body_only)
+    if C is not None:
+        M["NURSERY"]["control_root"] = C.get("root") or C.get("error")
+    # R5: the live drop equality, the chat door's counters
+    M["DROP_EQ"] = _vl.drop_equality_mark(st, (decl.get("SURPRISE") or {}).get("drop") == "confirmed")
+    M["CHAT_COUNTERS"] = _vl.chat_counters_mark(st, "CHAT" in decl)
+    # ladder 1's ANSWER marks (A4-LADDER-PREREG §2.2) — A2 from the exam files; A1's vex asked on the organism at the cut (the unblinded replay),
+    # both laws, by tools/answer_readtwin.py's own road (the organism's hash asserted unmoved)
+    majority = bool((decl.get("ANSWER") or {}).get("majority"))
+    M["A2_SEEN"] = _vl.answer_seen_mark(G.get("exams") or [], majority)
+    vex_new = vex_old = None; rt = None
+    if majority and twins_dir is not None and genome_path is not None and (Path(twins_dir) / "unblinded-1" / "state" / "organism.npz").exists():
+        try:
+            from tools import answer_readtwin as _art
+            rt = _art.read_both_laws(Path(twins_dir) / "unblinded-1", Path(genome_path))
+            if rt.get("organism_unchanged"):
+                vex_new, vex_old = rt["new_law"]["vex"], rt["old_law"]["vex"]
+        except Exception as e:
+            rt = {"error": repr(e)}
+    M["A1_NULL"] = _vl.answer_null_mark(G.get("exams") or [], vex_new, vex_old, majority)
+    if rt is not None:
+        M["A1_NULL"]["readtwin"] = {k: rt.get(k) for k in ("snapshot", "cells", "moments", "organism_unchanged", "error") if k in rt}
+        if "new_law" in rt:
+            M["A1_NULL"]["readtwin"]["zog_A3"] = {"new": rt["new_law"]["zog"], "old": rt["old_law"]["zog"],
+                                                  "note": "A3 is read on alpha4-1's CLOSED record (the plant is never shown in an 8 h life: PLANT_AFTER 15000) — printed"}
+    return M
+
+
+# edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:31 +0400 — READER v3.5: the ladder-2 marks' VERDICT.md rows (one renderer, testable; every
+# row prints the mark's denominator and reach beside its verdict — #234).
+def ladder2_rows(M: Dict[str, dict], gv=None) -> List[str]:
+    gv = gv or gv_
+    L: List[str] = []
+    def _j(x, n=500):
+        return json.dumps(x, default=str)[:n]
+    m = M.get("IDENTITY")
+    if isinstance(m, dict) and "streams" not in m:      # not given / raised: the reason alone
+        L.append(f"| IDENTITY (R0b) | {m.get('bar')} | {m.get('reason')} | {gv(m)} |")
+    elif isinstance(m, dict):
+        st = m.get("streams") or {}
+        streams = " · ".join(f"{s} {v['identical']}/{v['compared']} (a {v['a']}, b {v['b']}{'; first divergence at ' + str(v['first_divergence']['index']) + ' seq ' + str(v['first_divergence']['seq_a']) + '/' + str(v['first_divergence']['seq_b']) if v.get('first_divergence') else ''}){'' if v.get('graded') else ' [printed]'}"
+                             for s, v in st.items())
+        lm = m.get("last_meeting_point") or {}
+        w = (m.get("wall") or {})
+        wall = ""
+        if w:
+            pc = w.get("per_counter") or {}
+            wall = (f" · WALL-CLOCK (printed, not graded): {m.get('label_a')} at {(w.get('a') or {}).get('at')} vs {m.get('label_b')} at {(w.get('b') or {}).get('at')}, "
+                    f"Δcanvases {w.get('delta_canvases')}: " + "; ".join(f"{k} {v.get('a')} vs {v.get('b')} (Δ {v.get('delta')}, band ±{v.get('band')}, inside {v.get('inside')})" for k, v in pc.items()))
+        body = (f"streams: {streams or 'none'} · meeting points {m.get('meeting_points')} (agree {m.get('meeting_points_agree')}, disagree {m.get('meeting_points_disagree')}) · "
+                f"canvases {m.get('canvases_a')} / {m.get('canvases_b')} · reach {_j(m.get('reach'), 160)} · last meeting point canvas {lm.get('canvas')}: "
+                f"{_j(lm.get('a'), 220)} vs {_j(lm.get('b'), 220)}{(' · ' + m['id_order_note']) if m.get('id_order_note') else ''}{wall} — {m.get('reason')}")
+        L.append(f"| IDENTITY (R0b) | {m.get('bar')} | {body} | {gv(m)} |")
+    m = M.get("X1_LOCK")
+    if isinstance(m, dict):
+        w = (m.get("window") or {}).get("window") or {}
+        L.append(f"| X1_LOCK (R1) | {m.get('bar')} | max share {m.get('max_share')} ({m.get('max_act')}) in choices {w.get('first_choice')}–{w.get('last_choice')} "
+                 f"(seq {w.get('first_seq')}–{w.get('last_seq')}, hour {w.get('first_hour')}–{w.get('last_hour')}; census {_j(w.get('census'), 160)}) · "
+                 f"choices {m.get('choices')} (after hour 1: {m.get('choices_after')}) · policies {_j(m.get('policies'), 120)} — {m.get('reason')} | {gv(m)} |")
+    m = M.get("X2_SUCCESS")
+    if isinstance(m, dict):
+        c = m.get("census") or {}
+        L.append(f"| X2_SUCCESS (R1) | {m.get('bar')} | hours 2–8: {m.get('successes')} of {m.get('episodes')} episodes (null bound {m.get('bound_k')}; ceiling {m.get('ceiling')}) · "
+                 f"whole cut: journal game outcome rows {c.get('journal_game_outcome_rows')} (carrying got {c.get('rows_carrying_got')}; paid {c.get('rewarded_rows')} {c.get('rewards')}) · "
+                 f"tape game outcome rows {c.get('tape_game_outcome_rows')} (with flags {c.get('rows_carrying_flags')}): episodes {c.get('episodes_terminal_rows')} "
+                 f"(terminated {c.get('terminated')}, truncated {c.get('truncated')}), successes {c.get('successes')} = {c.get('success_per_episode')} per episode · "
+                 f"STATUS act_policy {c.get('act_policy')} act_weights {c.get('act_weights')} act_explored {c.get('act_explored')} — {m.get('reason')} | {gv(m)} |")
+    m = M.get("LINE")
+    if isinstance(m, dict):
+        tf = m.get("tape_frames_read") or {}
+        L.append(f"| LINE (R2) | {m.get('bar')} | shelf-line frames {m.get('shelf_line_true')} true of {m.get('shelf_line_scored')} scored (rate {m.get('shelf_true_rate')}; "
+                 f"{m.get('ratio_to_ceiling')}× the ceiling {m.get('ceiling')}) · by instant {_j(m.get('by_instant'), 240)} · frame rows {m.get('frame_rows')} "
+                 f"(filed {m.get('frame_rows_filed')}, scored {m.get('frame_rows_scored')}; reconciles with STATUS {m.get('scored_reconciles_with_status')}) · STATUS {_j(m.get('status'), 120)} · "
+                 f"READ's tape frames (not the scorer): precision {tf.get('precision')} = {tf.get('true_vs_shuffled')} of {tf.get('filed')} filed pairs not also filed by the shuffled twin ({tf.get('shuffled_filed')} filed there) · "
+                 f"R0 beside: {_j(m.get('control'), 240)} — {m.get('reason')} | {gv(m)} |")
+    m = M.get("NURSERY")
+    if isinstance(m, dict):
+        L.append(f"| NURSERY (R3) | {m.get('bar')} | heard {m.get('heard')} words (R0 {m.get('control_heard')}) · header tokens {m.get('header_tokens_n')} {m.get('header_tokens_in_heard')} · "
+                 f"«project gutenb…» bigrams {m.get('project_gutenberg_bigrams_heard')} · first word {m.get('first_word')!r} at R0 index {m.get('shift_measured')} (PREREG guessed {m.get('prereg_shift_guess')}) · "
+                 f"ordered subsequence {m.get('ordered_subsequence')} over {m.get('body_words_matched')} body words (breaks {m.get('order_breaks_n')}) · re-heard header words {m.get('header_shared_reheard')} · "
+                 f"beyond R0 {m.get('beyond_control')} · prefix-equal (stronger) {_j(m.get('stronger_prefix_equal'), 160)} — {m.get('reason')} | {gv(m)} |")
+    m = M.get("NURSERY_READ")
+    if isinstance(m, dict):
+        L.append(f"| NURSERY_READ (R3) | {m.get('bar')} | this {_j(m.get('this'), 160)} vs R0 {_j(m.get('control'), 160)} · Δ {m.get('delta')} band ±{m.get('band')} — {m.get('reason')} | {gv(m)} |")
+    m = M.get("DROP_EQ")
+    if isinstance(m, dict):
+        L.append(f"| DROP_EQ (R5) | {m.get('bar')} | dropped {m.get('glances_dropped')} · confirmed {m.get('glances_confirmed')} · surprised {m.get('glances_surprised')} — {m.get('reason')} | {gv(m)} |")
+    m = M.get("CHAT_COUNTERS")
+    if isinstance(m, dict):
+        from tools.verdict_life import CHAT_COUNTER_KEYS as _CK
+        L.append(f"| CHAT_COUNTERS (R5) | {m.get('bar')} | " + " · ".join(f"{k} {m.get(k)}" for k in _CK) + f" — {m.get('reason')} | {gv(m)} |")
+    for k, name in (("A1_NULL", "A1 NULL (ANSWER)"), ("A2_SEEN", "A2 SEEN (ANSWER)")):
+        m = M.get(k)
+        if isinstance(m, dict):
+            per = m.get("spiral_per_exam") or m.get("per_exam") or []
+            extra = (f" · vex new {_j(m.get('vex_graded'), 120)} old {_j(m.get('vex_old_law_graded'), 120)} · readtwin {_j(m.get('readtwin'), 300)}" if k == "A1_NULL" else "")
+            L.append(f"| {name} | {m.get('bar')} | exams {len(per)}: {_j(per[-3:], 400)}{extra} — {m.get('reason')} | {gv(m)} |")
+    return L
+
 
 def w3_1_beliefs(bel_rows: List[dict], decl: dict, heard: Sequence[str]) -> dict:
     """W3-1 (PREREG §18) as amended 2026-09-22: a word carries ONE raw `belief` row, plus one more for every clash — genome/think.py's
@@ -1702,6 +1970,7 @@ def write_verdict(out: Path, R: dict) -> None:
             L.append(f"| CHAT {_ck} | {m.get('bar', '')} | {json.dumps(nums, default=str)[:600]} {json.dumps(extra, default=str)[:400] if extra else ''} — {m.get('reason')} | {gv(m)} |")
         if isinstance(C.get("disjoint"), dict):
             L.append(f"| CHAT pictures disjoint | §3.3: seed-3 renders never a tape canvas (+ planted control) | {json.dumps(C['disjoint'])} | reported |")
+    L += ladder2_rows(M, gv)   # edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:32 +0400 — READER v3.5: the ladder-2 marks' rows (A4-LADDER-2-PREREG §2)
     L += ["", f"**failed ({len(R['marks_failed'])}):** {', '.join(R['marks_failed']) or 'none'}", "",
           f"**not gradable ({len(R.get('marks_not_gradable') or [])}) — never in the failed list (READER-FIX-0923 (9)):** "
           + ("; ".join(f"{k} ({r})" for k, r in (R.get("marks_not_gradable") or [])) or "none")]

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import collections
 import copy
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple   # edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:26 +0400 — Sequence for the v3.5 marks
 
 import numpy as np
 
@@ -1730,3 +1730,437 @@ def explore_success_mark(tape: Iterable[dict], value_declared: bool, from_s: flo
                    reason=(f"printed, no bar (#228 (b)): {k} of {n} episodes; the null's 95 % bound {kb}/{n} = {kb / n:.3f}"
                            f" {'above' if kb / n > ceiling else 'at or under'} the state-blind ceiling {ceiling}"))
     return out
+
+
+# ================================================================================================= READER v3.5 — the ladder-2 marks
+# edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:26 +0400 — A4-LADDER-2-PREREG §2 (each rung's mark read at 8 h) and its ADDENDUM §7(2)
+# (the identity law's operational form). Pure functions over the landed row shapes (#171/#173); the I/O (a second closed root, predictions.jsonl,
+# HEARD.json, the exam files) is read by tools/verdict_g4.py:side_record and handed in. Every mark prints its DENOMINATOR and REACH (#234) and reads
+# NOT GRADABLE below a declared floor or where its line is undeclared (L-1) — never FAIL for a horizon the world could not reach (#237 (b)).
+
+IDENTITY_SOURCES = ("maker", "game", "shelf", "folder")     # ADDENDUM §7(2) item 1: the world's four eye streams (graded); any other source printed
+
+
+def eye_streams(tape: Iterable[dict]) -> Dict[str, List[Tuple[int, str]]]:
+    """source -> [(seq, sha)] of the tape's EYE rows, each stream in its own (tape) order."""
+    s: Dict[str, List[Tuple[int, str]]] = collections.defaultdict(list)
+    for r in tape:
+        if r.get("sense") == "eye":
+            s[str(_meta(r).get("source"))].append((int(r["seq"]), str(r.get("sha"))))
+    return dict(s)
+
+
+def stream_identity(sa: Dict[str, List[Tuple[int, str]]], sb: Dict[str, List[Tuple[int, str]]],
+                    sources: Sequence[str] = IDENTITY_SOURCES) -> Dict[str, dict]:
+    """Per source: both lengths, the canvases compared (the last canvas BOTH reached = the shorter stream), how many are identical before the
+    first divergence, and the divergence itself (index, both seqs, both sha prefixes). The four world sources are graded; any other source the
+    tapes carry (hands — the creature's own drawings; lexicon — the door) is printed beside, `graded` False."""
+    out: Dict[str, dict] = {}
+    for src in list(sources) + sorted(k for k in set(sa) | set(sb) if k not in sources):
+        a, b = sa.get(src, []), sb.get(src, [])
+        n = min(len(a), len(b))
+        fd = next((i for i in range(n) if a[i][1] != b[i][1]), None)
+        out[src] = {"a": len(a), "b": len(b), "compared": n, "identical": (n if fd is None else fd),
+                    "first_divergence": (None if fd is None else {"index": fd, "seq_a": a[fd][0], "seq_b": b[fd][0],
+                                                                  "sha_a": a[fd][1][:12], "sha_b": b[fd][1][:12]}),
+                    "graded": src in sources}
+    return out
+
+
+def meeting_readings(journal: Iterable[dict]) -> Tuple[Dict[tuple, dict], int]:
+    """The mind's own counters at every canvas row that carries its OWN reading. Key: the per-source canvas counts so far over EVERY eye source
+    the journal names — hands and lexicon included: keyed on the four world sources alone, a hands canvas interleaved on either side of a
+    folder canvas makes two different moments look like one meeting point (a4l2-pre-cost seq 1575/1580 vs a4l-pre-cost 1577/1578: cells 725
+    vs 724 at «the same» four-source counts). Only a canvas row carrying `cells` is a reading: a hands canvas (and a life's very first folder
+    canvas) journals neither `births` nor `cells`, so a reading carried forward over it lags that canvas's own births (the carry-forward's one
+    false hit on the pre-flights). Value: {seq, canvas (1-based, over every source), births (journaled: sight/words on canvas rows + a sleep's
+    consolidation births — a LOWER bound of STATUS's, which counts the hands canvases' births too), cells (the row's own alive count per area —
+    exact), sleeps (sleep rows so far), id_next (the next id per area after the largest id journaled — printed only: two lives that interleave a
+    hands canvas differently give the same births different ids)}. Returns (readings, total canvases)."""
+    out: Dict[tuple, dict] = {}
+    cnt: collections.Counter = collections.Counter(); births: collections.Counter = collections.Counter()
+    idn: collections.Counter = collections.Counter(); sleeps = 0; n = 0
+    for r in journal:
+        if "event" in r:
+            continue
+        sl = r.get("sleep")
+        if isinstance(sl, dict):
+            sleeps += 1
+            births["sleep"] += int(sl.get("births") or 0)
+        if "moment" in r and r.get("glance") == 0 and r.get("source") is not None:
+            for b in r.get("births") or []:
+                births[str(b[0])] += 1
+                try:
+                    idn[str(b[0])] = max(idn[str(b[0])], int(b[1]) + 1)
+                except (TypeError, ValueError, IndexError):
+                    pass
+            cnt[str(r["source"])] += 1
+            n += 1
+            if r.get("cells") is not None:
+                out[tuple(sorted(cnt.items()))] = {"seq": int(r["seq"]), "canvas": n, "births": dict(births),
+                                                   "cells": list(r["cells"]), "sleeps": sleeps, "id_next": dict(idn)}
+    return out, n
+
+
+def _reading_counts(x: dict) -> tuple:
+    return (tuple(sorted((x.get("births") or {}).items())), tuple(x.get("cells") or ()), int(x.get("sleeps") or 0))
+
+
+def identity_mark(tape_a: Iterable[dict], journal_a: Iterable[dict], tape_b: Iterable[dict], journal_b: Iterable[dict],
+                  provided: bool = True, wall: Optional[dict] = None, min_canvases: int = 100, max_listed: int = 10,
+                  label_a: str = "this life", label_b: str = "the identity root") -> Dict[str, object]:
+    """R0b IDENTITY (A4-LADDER-2-PREREG §2 R0b row; its ADDENDUM §7(2) item 1 — «equality is judged PER SOURCE STREAM at equal canvas counts,
+    never per tape or at equal wall-clock»): (1) each world stream (the eye rows of maker/game/shelf/folder, each in its own order, by sha)
+    identical to the last canvas BOTH reached — an identical game stream means the two minds chose the same acts; (2) at EVERY meeting point
+    (`meeting_readings`: a canvas row carrying its own reading in BOTH journals at equal per-source canvas counts over every eye source) the
+    two minds' journaled births (sight/words/sleep), alive cells per area and sleeps are EQUAL. PASS iff (1) and (2). Printed beside, never
+    graded: the id order (differs by sense interleaving), the other streams (hands, lexicon), the reach (the last meeting point's canvas of each
+    life's total) and the wall-clock numbers of both lives with the band (the reference's own per-canvas rate over its last hour × Δcanvases —
+    the pacing differs by minutes between lives). NOT GRADABLE: no second root given; fewer than `min_canvases` canvases on either side; no
+    meeting point at or beyond canvas `min_canvases`."""
+    bar = ("ADDENDUM §7(2): every world stream (eye rows of maker/game/shelf/folder, each in its own order, by sha) identical to the last canvas "
+           "both reached, AND at every meeting point (a canvas row with its own reading in BOTH journals at equal per-source canvas counts over "
+           "every eye source) the journaled births (sight/words/sleep), alive cells per area and sleeps equal; the wall-clock numbers beside with the band")
+    out: Dict[str, object] = {"bar": bar, "label_a": label_a, "label_b": label_b}
+    if not provided:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: no --identity-root given (R0b's reading compares this life with a second CLOSED root)")
+        return out
+    streams = stream_identity(eye_streams(tape_a), eye_streams(tape_b))
+    ra, na = meeting_readings(journal_a)
+    rb, nb = meeting_readings(journal_b)
+    common = sorted((k for k in ra if k in rb), key=lambda k: ra[k]["canvas"])
+    dis = [k for k in common if _reading_counts(ra[k]) != _reading_counts(rb[k])]
+    ids_only = [k for k in common if _reading_counts(ra[k]) == _reading_counts(rb[k]) and ra[k]["id_next"] != rb[k]["id_next"]]
+    last = common[-1] if common else None
+    def _pt(k):
+        return {"counts": dict(k), "canvas": ra[k]["canvas"], "seq_a": ra[k]["seq"], "seq_b": rb[k]["seq"],
+                "a": {kk: ra[k][kk] for kk in ("births", "cells", "sleeps", "id_next")},
+                "b": {kk: rb[k][kk] for kk in ("births", "cells", "sleeps", "id_next")}}
+    graded_streams = {s: v for s, v in streams.items() if v["graded"]}
+    streams_ok = all(v["first_divergence"] is None for v in graded_streams.values())
+    out.update(streams=streams, streams_identical=streams_ok,
+               streams_not_on_either_tape=[s for s, v in graded_streams.items() if v["compared"] == 0],
+               canvases_a=na, canvases_b=nb, readings_a=len(ra), readings_b=len(rb),
+               meeting_points=len(common), meeting_points_agree=len(common) - len(dis), meeting_points_disagree=len(dis),
+               disagreements=[_pt(k) for k in dis[:max_listed]],
+               id_order_differs_at=len(ids_only), id_order_note=("the next-id counter differs at %d meeting points where births, cells and sleeps agree: "
+                                                                "the same births took different ids (a hands canvas births without a journal row, and "
+                                                                "the two lives interleave it differently) — printed, never graded" % len(ids_only)) if ids_only else None,
+               last_meeting_point=(_pt(last) if last is not None else None),
+               reach=({"canvas": ra[last]["canvas"], "of_a": na, "of_b": nb, "share_of_shorter": round(ra[last]["canvas"] / max(1, min(na, nb)), 4)}
+                      if last is not None else None),
+               births_note="journaled births: the canvas rows' `births` + a sleep's consolidation births — a lower bound of STATUS sight_born/births "
+                           "(a hands canvas births with no journal row); the SAME instrument on both lives",
+               wall=wall)
+    if min(na, nb) < min_canvases:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: {na} / {nb} canvases < {min_canvases}")
+        return out
+    why = []
+    if not streams_ok:     # a diverged world stream decides the mark alone — never hidden behind «no meeting point»
+        why.append("streams diverge: " + "; ".join(f"{s} at {v['first_divergence']['index']}" for s, v in graded_streams.items() if v["first_divergence"]))
+    elif last is None or ra[last]["canvas"] < min_canvases:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: the streams are identical but no meeting point lies at or beyond canvas {min_canvases} (the two minds' per-source counts never coincide there)")
+        return out
+    ok = bool(streams_ok and not dis)
+    if dis:
+        k0 = dis[0]
+        why.append(f"{len(dis)} of {len(common)} meeting points disagree (first at canvas {ra[k0]['canvas']}: {label_a} {_reading_counts(ra[k0])} vs {label_b} {_reading_counts(rb[k0])})")
+    out.update(graded=True, **{"pass": ok}, reason=("graded (ADDENDUM §7(2)): " + ("identical — every world stream to the last canvas both reached, and the counts at all "
+                                                                                  f"{len(common)} meeting points" if ok else "; ".join(why))))
+    return out
+
+
+def _series_t(r: dict) -> Optional[float]:
+    for k in ("heartbeat_at", "sampled_at"):
+        if r.get(k):
+            try:
+                return _at_s(r[k])
+            except (TypeError, ValueError):
+                continue
+    return None
+
+
+WALL_KEYS = ("cells", "sight_born", "births", "sleeps")
+
+
+def wall_reading(series: Sequence[dict], status: dict, canvas_seqs: Sequence[int], t_cut: Optional[float]) -> Dict[str, object]:
+    """The life's own exact counters at the wall-clock cut: the last `readings/status-series.jsonl` sample (the sampler's STATUS copies, every 5 min)
+    whose STATUS write (`heartbeat_at`) is at or before `t_cut` — or STATUS.json itself when it is (a closed life's last write) or when no series
+    exists; `canvases` = the journal's canvas rows with seq ≤ that reading's `last_seq`. Also the per-canvas RATE of each counter over the hour
+    before it (the band's rate). `t_cut` None = the latest reading."""
+    import bisect
+    cands = [(t, r) for r in list(series or []) + ([dict(status, _src="STATUS.json")] if status else []) for t in [_series_t(r)] if t is not None]
+    if t_cut is not None:
+        cands = [(t, r) for t, r in cands if t <= t_cut + 1e-6]
+    if not cands:
+        return {"at": None, "source": "no reading at or before the cut"}
+    cands.sort(key=lambda x: x[0])
+    t, r = cands[-1]
+    def _canv(x):
+        ls = x.get("last_seq")
+        return bisect.bisect_right(list(canvas_seqs), int(ls)) if isinstance(ls, int) and not isinstance(ls, bool) else None
+    out: Dict[str, object] = {"at": r.get("heartbeat_at"), "source": r.get("_src", "readings/status-series.jsonl"), "last_seq": r.get("last_seq"),
+                              "canvases": _canv(r), **{k: r.get(k) for k in WALL_KEYS}}
+    prev = [(tt, rr) for tt, rr in cands if tt <= t - 3600.0]
+    rate: Dict[str, Optional[float]] = {}
+    if prev:
+        tp, rp = prev[-1]
+        c1, c0 = _canv(r), _canv(rp)
+        for k in WALL_KEYS:
+            try:
+                rate[k] = round((float(r[k]) - float(rp[k])) / (c1 - c0), 5) if (c1 is not None and c0 is not None and c1 > c0) else None
+            except (TypeError, ValueError, KeyError):
+                rate[k] = None
+        out["rate_window"] = {"from": rp.get("heartbeat_at"), "to": r.get("heartbeat_at"), "canvases": ((c1 - c0) if (c1 is not None and c0 is not None) else None)}
+    out["rate_per_canvas_last_hour"] = rate or None
+    return out
+
+
+def wall_band(wa: dict, wb: dict) -> Dict[str, object]:
+    """The wall-clock comparison (printed, never graded — ADDENDUM §7(2) item 1): Δ = a − b per counter; the band = ceil(|b's own per-canvas
+    rate over its last hour × Δcanvases|) — the difference the pacing alone explains; `inside` per counter."""
+    import math
+    dc = (wa.get("canvases") - wb.get("canvases")) if (isinstance(wa.get("canvases"), int) and isinstance(wb.get("canvases"), int)) else None
+    rates = wb.get("rate_per_canvas_last_hour") or {}
+    per: Dict[str, dict] = {}
+    for k in WALL_KEYS:
+        va, vb = wa.get(k), wb.get(k)
+        if not isinstance(va, (int, float)) or not isinstance(vb, (int, float)):
+            per[k] = {"a": va, "b": vb, "delta": None, "band": None, "inside": None}
+            continue
+        r = rates.get(k)
+        band = (int(math.ceil(abs(r * dc))) if (r is not None and dc is not None) else None)
+        per[k] = {"a": va, "b": vb, "delta": va - vb, "expected_from_pacing": (round(r * dc, 1) if (r is not None and dc is not None) else None),
+                  "band": band, "inside": (abs(va - vb) <= band if band is not None else None)}
+    return {"a": wa, "b": wb, "delta_canvases": dc, "per_counter": per,
+            "band_rule": "ceil(|the identity root's own per-canvas rate over its last hour × Δcanvases|) — the pacing's share (ADDENDUM §7(2) item 1)",
+            "band_note": (None if rates else "no band: the identity root carries no status-series sample an hour before its reading (a pre-flight "
+                                             "or an older record) — the Δ printed alone")}
+
+
+def explore_lock_window(tape: Iterable[dict], journal: Iterable[dict], after_s: float = 3600.0, window: int = 100) -> Dict[str, object]:
+    """X1's window, located (the brief: «print the max share and the window it sat in»): the same choices `explore_lock_mark` reads (journal `act`
+    rows of the game, on game eye rows at or after hour 1), the window of `window` consecutive choices whose top act's share is largest —
+    its first and last choice's seq, their tape time and hour of life, and the act census inside it."""
+    tape = list(tape)
+    t0 = _first_at_s(tape)
+    at_of = {int(r["seq"]): _at_s(r["at"]) for r in tape if r.get("sense") == "eye" and _meta(r).get("source") == "game" and r.get("at")}
+    choices = sorted(((int(j["seq"]), j["act"]) for j in journal if isinstance(j.get("act"), dict) and j["act"].get("game")), key=lambda x: x[0])
+    after = [(s, a) for s, a in choices if t0 is not None and s in at_of and at_of[s] >= t0 + after_s]
+    if len(after) < window:
+        return {"choices_after_hour_1": len(after), "window": None}
+    names = [a.get("act") for _s, a in after]
+    cnt = collections.Counter(names[:window]); best = (cnt.most_common(1)[0][1], 0)
+    for i in range(window, len(names)):
+        cnt[names[i]] += 1; cnt[names[i - window]] -= 1
+        c1 = cnt.most_common(1)[0][1]
+        if c1 > best[0]:
+            best = (c1, i - window + 1)
+    i0 = best[1]; seg = after[i0:i0 + window]
+    return {"choices_after_hour_1": len(after),
+            "window": {"first_choice": i0 + 1, "last_choice": i0 + window, "first_seq": seg[0][0], "last_seq": seg[-1][0],
+                       "first_hour": round((at_of[seg[0][0]] - t0) / 3600.0, 3), "last_hour": round((at_of[seg[-1][0]] - t0) / 3600.0, 3),
+                       "census": dict(collections.Counter(a.get("act") for _s, a in seg).most_common()), "top_share": round(best[0] / window, 4)}}
+
+
+def explore_x2_census(tape: Iterable[dict], journal: Iterable[dict], status: dict) -> Dict[str, object]:
+    """X2's denominators (A4-LADDER-2-PREREG ADDENDUM §7(2) items 3–4: a «never paid» count is computed from the field the CONSUMER reads — the
+    journal's game `outcome.got` — with that field's PRESENCE count beside the zero; BabyAI pays only on the successful terminal step): the
+    journal's game outcome rows, how many carry `got`, how many paid (got > 0, the values listed), and the tape's game outcome rows with the
+    terminal flags (terminated / truncated — the episodes), the rewarded terminal rows, success per episode; the chooser's law as STATUS last
+    wrote it (act_policy, act_weights, act_explored). Printed, never graded."""
+    tape = list(tape); journal = list(journal)
+    j_out = [j["outcome"] for j in journal if isinstance(j.get("outcome"), dict) and j["outcome"].get("source") == "game"]
+    has_got = [o for o in j_out if "got" in o]
+    paid = [o for o in has_got if isinstance(o.get("got"), (int, float)) and not isinstance(o.get("got"), bool) and o["got"] > 0]
+    t_out = [r for r in tape if r.get("sense") == "outcome" and _meta(r).get("source") == "game"]
+    term = [r for r in t_out if _meta(r).get("terminated")]
+    trunc = [r for r in t_out if _meta(r).get("truncated") and not _meta(r).get("terminated")]
+    wins = [r for r in term if float(_meta(r).get("got") or 0.0) > 0]
+    eps = len(term) + len(trunc)
+    return {"journal_game_outcome_rows": len(j_out), "rows_carrying_got": len(has_got), "rewarded_rows": len(paid),
+            "rewards": [round(float(o["got"]), 4) for o in paid][:20],
+            "tape_game_outcome_rows": len(t_out), "rows_carrying_flags": sum(1 for r in t_out if "terminated" in _meta(r) or "truncated" in _meta(r)),
+            "episodes_terminal_rows": eps, "terminated": len(term), "truncated": len(trunc), "successes": len(wins),
+            "success_per_episode": (round(len(wins) / eps, 4) if eps else None),
+            "act_policy": (status or {}).get("act_policy", "not recorded"), "act_weights": (status or {}).get("act_weights", "not recorded"),
+            "act_explored": (status or {}).get("act_explored", "not recorded")}
+
+
+LINE_CEILING = 0.272          # A42-B2-REPORT §1: the strict ceiling on the 6 h snapshot (0.545 on hour 1) — A4-LADDER-2-PREREG §2 R2 row, cleared
+LINE_CEILING_SOURCE = "docs/briefs/A42-B2-REPORT.md §1 (B2's ceiling: 0.272 strict on the 6 h snapshot, 0.545 on hour 1 — measured before the build)"
+
+
+def _line_group(r: dict) -> str:
+    i = r.get("instant")
+    if not isinstance(i, dict):
+        return "unstamped"
+    src = str(i.get("source"))
+    if src == "shelf":
+        return "shelf_line" if i.get("line") else "shelf_word"
+    return src
+
+
+def line_mark(pred_rows: Iterable[dict], status: dict, line_declared: bool, ceiling: float = LINE_CEILING,
+              tape_frames: Optional[dict] = None, control: Optional[dict] = None) -> Dict[str, object]:
+    """R2 LINE (A4-LADDER-2-PREREG §2 R2 row, B2's finding): shelf frames scored TRUE > 0 — read from the scorer's OWN ledger
+    (`state/predictions.jsonl`: a frame row is written when filed, `outcome` null, and again when scored, `outcome` true/false; under
+    `SENTENCE …; judged by the eye on the line; …` the scored row carries `instant: {source, words, line}`) and STATUS `frames_scored`/
+    `frames_true` — NEVER from the journal (the scorer is a read-only road; the LINE genome's journal is IDENTICAL to FLOOR's). Printed beside:
+    the scored frames by the instant they were scored on (shelf line / game / lexicon / unstamped), the realised shelf true-rate and its ratio
+    to B2's ceiling (§7 (4): predicted 0.1×–1×), READ's tape frames vs their shuffled twin (`read_frames` — the tape's co-occurrence, not the
+    scorer: the scorer exposes no shuffled twin), the game frames beside the control's (R0) when given. NOT GRADABLE: the `on the line` clause
+    undeclared (the scorer writes no stamp); no shelf line instant scored a frame on the record (the horizon, #237 (b))."""
+    rows = [r for r in pred_rows if isinstance(r, dict) and (r.get("row") or {}).get("route") == "frame"]
+    scored = [r for r in rows if r.get("outcome") is not None]
+    by: Dict[str, Dict[str, int]] = {}
+    for r in scored:
+        g = by.setdefault(_line_group(r), {"scored": 0, "true": 0})
+        g["scored"] += 1; g["true"] += int(r.get("outcome") is True)
+    sl = by.get("shelf_line", {"scored": 0, "true": 0})
+    rate = (sl["true"] / sl["scored"]) if sl["scored"] else None
+    st = {k: (status or {}).get(k, "not recorded") for k in ("frames_filed", "frames_scored", "frames_true")}
+    out: Dict[str, object] = {
+        "bar": "shelf frames scored TRUE > 0 (state/predictions.jsonl rows stamped instant.source shelf, line True; STATUS frames_scored/frames_true beside — never the journal)",
+        "status": st, "frame_rows": len(rows), "frame_rows_filed": sum(1 for r in rows if r.get("outcome") is None), "frame_rows_scored": len(scored),
+        "scored_reconciles_with_status": (len(scored) == st["frames_scored"]) if isinstance(st["frames_scored"], int) else None,
+        "by_instant": by, "shelf_line_scored": sl["scored"], "shelf_line_true": sl["true"],
+        "shelf_true_rate": (round(rate, 4) if rate is not None else None), "ceiling": ceiling, "ceiling_source": LINE_CEILING_SOURCE,
+        "ratio_to_ceiling": (round(rate / ceiling, 3) if (rate is not None and ceiling) else None),
+        "predicted": "shelf true-rate between 0.1× and 1× the ceiling (§7 (4) as amended 17:53: ≈ the ceiling × the world's co-occurrence rate)",
+        "game": by.get("game"), "tape_frames_read": tape_frames,
+        "shuffled_twin_of_the_scorer": "not exposed by the scorer (its ledger carries no twin); READ's tape frames vs their shuffled twin printed instead",
+        "control": control}
+    if not line_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: SENTENCE's «judged by the eye on the line» clause is not declared on this life (the scorer writes no instant stamp; L-1)")
+    elif sl["scored"] == 0:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: no shelf LINE instant scored a frame on this record ({len(scored)} frame rows scored in all) — the horizon, never FAIL")
+    else:
+        out.update(graded=True, **{"pass": bool(sl["true"] > 0)},
+                   reason=f"graded (R2): {sl['true']} of {sl['scored']} shelf-line frames true ({rate:.3f}; {rate / ceiling:.2f}× the ceiling {ceiling})")
+    return out
+
+
+NURSERY_HEADER_STEMS = ("gutenb", "ebook", "www", "license", "licence")    # the header's tokens (A4-LADDER-2-PREREG §2 R3 row), cut to 8 letters as the reader cuts
+
+
+def _is_header_token(w: str) -> bool:
+    w = str(w).lower()
+    return any(w.startswith(s) for s in NURSERY_HEADER_STEMS)
+
+
+def nursery_mark(heard: Sequence[str], control_heard: Optional[Sequence[str]], shelf_words: Sequence[str], body_only_declared: bool,
+                 prereg_shift: int = 129) -> Dict[str, object]:
+    """R3 NURSERY (A4-LADDER-2-PREREG §2 R3 row; the brief's measured form): `read/HEARD.json` (the shelf reader's first-heard distinct words)
+    carries NONE of the header's tokens — the stems gutenb*/ebook/www*/license*, and «project» where it is the header's «project gutenb…»
+    (the bigram on the shelf's ear-word stream; «project» alone may be a body word) — AND the rung's words are an ORDERED SUBSEQUENCE of R0's
+    body words: every word R0 first heard at or after the SHIFT (the index in R0's HEARD of this life's first word) appears here in R0's
+    order. Printed: the measured shift beside the PREREG's guessed 129 (the reader cuts words to 8 letters and skips non-letters), the words
+    R0 heard first in its header and this life heard in the body (a re-heard word, not a failure), the words R0 never heard (this life read
+    further into the book), and the stronger reading: this life's words minus R0's header words == R0's body words on their common length.
+    NOT GRADABLE: `; gutenberg body only` undeclared; no control HEARD (--control-root); an empty HEARD; this life's first word absent from R0's."""
+    heard = [str(w) for w in (heard or [])]
+    ctl = [str(w) for w in (control_heard or [])]
+    hits = [w for w in heard if _is_header_token(w)]
+    sw = [str(w).lower() for w in (shelf_words or [])]
+    proj_bigrams = sum(1 for i in range(len(sw) - 1) if sw[i] == "project" and sw[i + 1].startswith("gutenb"))
+    out: Dict[str, object] = {
+        "bar": "HEARD.json carries 0 header tokens (gutenb*/ebook/www*/license*, and «project» as the header's «project gutenb…» bigram on the ear stream) AND "
+               "an ordered subsequence of R0's body words (R0's HEARD from the measured shift on)",
+        "heard": len(heard), "header_tokens_in_heard": hits[:20], "header_tokens_n": len(hits), "project_gutenberg_bigrams_heard": proj_bigrams,
+        "project_in_heard": ("project" in heard), "shelf_ear_words": len(sw), "prereg_shift_guess": prereg_shift,
+        "control_heard": (len(ctl) if control_heard is not None else None)}
+    if not body_only_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: SENSE read's «; gutenberg body only» clause is not declared on this life (L-1)")
+        return out
+    if control_heard is None:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: no control HEARD.json (--control-root: R0's closed root) — the header tokens printed")
+        return out
+    if not heard:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: this life's HEARD.json is empty")
+        return out
+    idx = {w: i for i, w in enumerate(ctl)}
+    shift = idx.get(heard[0])
+    out["shift_measured"] = shift
+    out["first_word"] = heard[0]
+    if shift is None:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: this life's first word {heard[0]!r} is absent from R0's HEARD ({len(ctl)} words)")
+        return out
+    body = [(w, idx[w]) for w in heard if w in idx and idx[w] >= shift]
+    breaks = [(a[0], a[1], b[0], b[1]) for a, b in zip(body, body[1:]) if not a[1] < b[1]]
+    header_shared = [w for w in heard if w in idx and idx[w] < shift]
+    beyond = [w for w in heard if w not in idx]
+    hw = set(ctl[:shift]); mine = [w for w in heard if w not in hw]; theirs = ctl[shift:]
+    n = min(len(mine), len(theirs))
+    fd = next((i for i in range(n) if mine[i] != theirs[i]), None)
+    ordered = not breaks
+    out.update(ordered_subsequence=ordered, body_words_matched=len(body), order_breaks=breaks[:10], order_breaks_n=len(breaks),
+               header_shared_reheard=len(header_shared), header_shared_sample=header_shared[:12],
+               beyond_control=len(beyond), beyond_control_sample=beyond[:12],
+               stronger_prefix_equal={"compared": n, "first_mismatch": (None if fd is None else {"index": fd, "this": mine[fd], "control": theirs[fd]})},
+               differs_from_word_1=bool(ctl and heard[0] != ctl[0]))
+    ok = (len(hits) == 0 and proj_bigrams == 0 and ordered)
+    out.update(graded=True, **{"pass": bool(ok)},
+               reason=(f"graded (R3): header tokens {len(hits)} (+ «project gutenb…» bigrams {proj_bigrams}); ordered subsequence {ordered} over {len(body)} body words; "
+                       f"shift measured {shift} (PREREG guessed {prereg_shift})"))
+    return out
+
+
+def nursery_read_mark(exams: Sequence[dict], control_exams: Optional[Sequence[dict]], body_only_declared: bool, z: float = 2.0) -> Dict[str, object]:
+    """R3's third clause (A4-LADDER-2-PREREG §2 R3 row: «READ mark within noise of R0»): the sitter's own reading mark (`read_share` over
+    `read_words_n` HEARD words in the held-out font, every exam file) at this life's LAST exam vs R0's last exam in the same window; within
+    noise = |Δ| ≤ z × the two-sample binomial standard error (z = 2). The samples are different words by design (each life's fixed-seed draw over
+    its OWN HEARD.json) — said. NOT GRADABLE: the clause undeclared; no control exams; either side carries no read_share."""
+    import math
+    def _last(ex):
+        for e in reversed(list(ex or [])):
+            if isinstance(e.get("read_share"), (int, float)) and e.get("read_words_n"):
+                return {"at": e.get("at"), "share": float(e["read_share"]), "n": int(e["read_words_n"]), "file": e.get("_file")}
+        return None
+    a, b = _last(exams), (_last(control_exams) if control_exams is not None else None)
+    out: Dict[str, object] = {"bar": f"this life's last exam read_share within {z:g} × the two-sample binomial SE of R0's last exam's",
+                              "this": a, "control": b, "exams": len(list(exams or [])), "control_exams": (len(list(control_exams)) if control_exams is not None else None),
+                              "note": "each life's sample is its own fixed-seed draw over its OWN HEARD.json — different words by design"}
+    if not body_only_declared:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: «; gutenberg body only» not declared on this life (L-1)")
+        return out
+    if control_exams is None:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: no control exams (--control-root: R0's closed root)")
+        return out
+    if a is None or b is None:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: an exam with read_share is missing on %s" % ("this life" if a is None else "the control"))
+        return out
+    se = math.sqrt(a["share"] * (1 - a["share"]) / a["n"] + b["share"] * (1 - b["share"]) / b["n"])
+    d = a["share"] - b["share"]
+    ok = abs(d) <= z * se + 1e-12
+    out.update(delta=round(d, 4), se=round(se, 4), band=round(z * se, 4), graded=True, **{"pass": bool(ok)},
+               reason=f"graded (R3 READ): {a['share']:.3f} (n {a['n']}) vs R0 {b['share']:.3f} (n {b['n']}): Δ {d:+.3f}, band ±{z * se:.3f}")
+    return out
+
+
+def drop_equality_mark(status: dict, drop_declared: bool) -> Dict[str, object]:
+    """R5's live equality (A4-LADDER-PREREG §2.4 / A4L-DROP task 5; A4-LADDER-2-PREREG ADDENDUM §7(2) item 2): under `; drop confirmed` every
+    CONFIRMED glance is a DROPPED one — STATUS glances_dropped == glances_confirmed. NOT GRADABLE where the clause is undeclared (the body writes
+    glances_dropped 0 on every write — the ordinary reading there) or where STATUS never wrote the key (an older body)."""
+    gc, gd = (status or {}).get("glances_confirmed"), (status or {}).get("glances_dropped")
+    out: Dict[str, object] = {"bar": "STATUS glances_dropped == glances_confirmed while `; drop confirmed` is declared",
+                              "glances_confirmed": gc, "glances_dropped": gd, "glances_surprised": (status or {}).get("glances_surprised")}
+    if gd is None or gc is None:
+        out.update(graded=False, **{"pass": None}, reason="not gradable: STATUS carries no glances_dropped/glances_confirmed (an older body)")
+    elif not drop_declared:
+        out.update(graded=False, **{"pass": None}, reason=f"not gradable: `; drop confirmed` not declared (dropped {gd} — 0 is the ordinary reading)")
+    else:
+        out.update(graded=True, **{"pass": bool(gd == gc)}, reason=f"graded (R5): dropped {gd} {'==' if gd == gc else '!='} confirmed {gc}")
+    return out
+
+
+CHAT_COUNTER_KEYS = ("chats", "chat_answered", "chat_abstained", "chat_refused_form", "chat_refused_content", "chat_graded",
+                     "chat_graded_right", "chat_graded_novel", "chat_words_mean", "chat_longest")
+
+
+def chat_counters_mark(status: dict, chat_declared: bool) -> Dict[str, object]:
+    """R5: the chat door's counters as STATUS last wrote them (A4-LADDER-2-PREREG §2 R5 row) — printed, never graded; «not recorded» for a key an
+    older body never wrote (never a fabricated 0)."""
+    vals = {k: ((status or {})[k] if k in (status or {}) else "not recorded") for k in CHAT_COUNTER_KEYS}
+    return {"bar": "printed, no bar", "declared": bool(chat_declared), **vals, "graded": False, "pass": None,
+            "reason": "printed, no bar (the chat door's counters)" + ("" if chat_declared else " — CHAT not declared on this life")}

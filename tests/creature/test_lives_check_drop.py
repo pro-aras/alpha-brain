@@ -1,4 +1,4 @@
-# edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:14 +0400 — A4-LADDER-2-PREREG ADDENDUM §7(2) item 2: check.py's glances line is gated on
+# edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:34 +0400 (re-stamped from `date`: the first stamp, «05:14», was typed — #50) — A4-LADDER-2-PREREG ADDENDUM §7(2) item 2: check.py's glances line is gated on
 # the genome's OWN `; drop confirmed` clause. The three cases the brief names (declared+equal, declared+unequal, undeclared) on fixture roots,
 # plus «not recorded» (an older body), an unknown genome, the unit.env fallback, and the six ladder-2 genomes themselves (only A4L2-ALL declares).
 """tools/lives/check.py: MISMATCH only when the genome declares `; drop confirmed` AND dropped != confirmed."""
