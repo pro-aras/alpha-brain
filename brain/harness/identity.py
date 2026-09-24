@@ -82,10 +82,17 @@ def run_worker(python: Path, repo_root: Path, arm_module: str, arm_class: str, s
 def identity_test(python: Path, repo_root: Path, arm_module: str, arm_class: str, seed: int, config: Dict[str, Any],
                    tape_rows: Sequence[Dict[str, Any]], out_dir: Path, *,
                    checkpoints: Sequence[int] = (500, 1000, 1500, 2000), n_events: int = 2000,
-                   plant_at_event: int = 1234, planted_row: int = 999999,
+                   plant_at_event: int = 1234, planted_row: int,
                    run_8_threads: bool = True) -> Dict[str, Any]:
     """§3.1's whole clause. Returns a report with a `pass` bool per sub-check and every raw result kept on
-    disk under `out_dir` (never only the verdict — #194)."""
+    disk under `out_dir` (never only the verdict — #194).
+
+    `planted_row` has NO DEFAULT on purpose (found the hard way building A0's own identity test, 2026-09-24):
+    an early draft defaulted it to 999999 as "obviously a different rendering", which is silently WRONG for
+    any real arm — every real glance cache is bounded (a "few thousand" rows at most, §7), so a fixed huge
+    constant is out of range for EVERY real cache, and a conforming arm that validates its own cache rows
+    (as it should) crashes instead of diverging. The caller must pass a row that (a) exists in its OWN
+    cache and (b) differs from whatever the targeted TEACH row already points to."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     checkpoints = sorted(checkpoints)
@@ -116,7 +123,14 @@ def identity_test(python: Path, repo_root: Path, arm_module: str, arm_class: str
     # processed — so the resumed process never re-records `resume_at` itself; that ONE checkpoint is
     # instead verified against the FIRST (pre-resume) run's own snapshot-time state below.
     resume_at = min(c for c in checkpoints if c < n_events) if checkpoints else n_events // 2
-    snap_path = out_dir / "resume.snap"
+    # NO dot-extension on this stem (found the hard way building A0's own identity test, 2026-09-24):
+    # genome.machinery.Organism.save(path) hands `path` STRAIGHT to np.savez_compressed, which APPENDS
+    # ".npz" onto the given name whenever it does not already end in ".npz" (so "resume.snap" -> a file
+    # literally named "resume.snap.npz"), while Organism.load(path, g) reads back via
+    # `path.with_suffix(".npz")`, which REPLACES the last suffix ("resume.snap" -> "resume.npz") — the two
+    # sides silently disagree unless `path` has NO suffix at all to begin with (matching every existing
+    # caller in this codebase, which always calls Organism.save/load with a bare stem like "run/organism").
+    snap_path = out_dir / "resume_snapshot"
     r_first = run_worker(python, repo_root, arm_module, arm_class, seed, config, tape_path, resume_at,
                           [resume_at], out_dir, "resume_first", save_snapshot=snap_path)
     r_resumed = run_worker(python, repo_root, arm_module, arm_class, seed, config, tape_path, n_events,
