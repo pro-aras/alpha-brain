@@ -1,0 +1,24 @@
+[gather] root /data/dev/genome-wt-reader-lag/scratch/e2e/racy-late-729 cut at 1.0 h
+[LAG] LAG: the mind's last consumed seq 729 (journal) of the tape's 850: 121 rows / 0.0445 world h unconsumed; the read is CUT at it (121 rows / 0.0445 world h of the 850-row window the mind never lived; it lived 0.2546 h); backlog (body rows, n 18): max 0 at 2026-09-22T20:39:55.612Z, last 0, first > 100 never; STATUS backlog 121 (reconciles with the tape: False)
+[ALIVE] False hours 0.299 moved True gaps [5.0, 5.0]
+[solo] 39.57 ms a canvas over the first 1,000 rows, alone
+[twins] 15 replays, 2 workers, slice_seq 729
+  twin unblinded-1: exit 0
+  twin unblinded-2: exit 0
+  twin blind-gaze: exit 0
+  twin blind-sleep: exit 0
+  twin blind-predict: exit 0
+  twin blind-curiosity: exit 0
+  twin blind-park: exit 0
+  twin blind-frozen: exit 0
+  twin blind-coarse: exit 0
+  twin blind-surprise: exit 0
+  twin T-shuffle: exit 0
+  twin T-nowire: exit 0
+  twin T-one-glance: exit 0
+  twin T-first-fixation: exit 0
+  twin T-frozen-10: exit 0
+[REPLAY] {'pass': False, 'vs_live': (729, 'act'), 'two_replays': None, 'mind_rows': 757, 'hash_masked': ['hash'], 'closed_whole': True, 'plant_seq': 368, 'plant_caught': True, 'cut_seq': 729, 'lag': {'cut_at_mind_last_seq': True, 'mind_last_seq': 729, 'mind_last_seq_source': 'journal', 'time_cut_seq': 850, 'tape_head_seq': 850, 'rows_unconsumed': 121, 'rows_cut_by_lag': 121, 'world_hours_unconsumed': 0.0445, 'world_hours_cut_by_lag': 0.0445, 'hours_lived': 0.2546, 'mind_last_at': '2026-09-22T20:55:12.160Z', 'tape_head_at': '2026-09-22T20:57:52.367Z', 'backlog_max': 0, 'backlog_max_at': '2026-09-22T20:39:55.612Z', 'backlog_last': 0, 'backlog_last_at': '2026-09-22T20:56:55.633Z', 'backlog_first_over_100': None, 'backlog_body_rows': 18, 'status_backlog_rows': 121, 'backlog_reconciles': False}}
+VERDICT FAIL — failed: ['vi_knows_unknown', 'vii_replay', 'W3_2_rules', 'DOOR', 'PARK', 'GRADE', 'COARSE', 'ALIVE'] — not gradable: ['v_retention', 'MODULATION', 'viii_cost', 'ACT', 'SOUND', 'SIZING', 'SELF', 'SURPRISE', 'QUESTION', 'SENTENCE', 'HANDS', 'EVOLVE', 'READ', 'WEB', 'STAGE', 'TWINS.no_curiosity', 'TWINS.no_park', 'TWINS.no_sleep_v'] — /data/dev/genome-wt-reader-lag/scratch/e2e/racy-late-729-read (162.2 s)
+exit=0
+2026-09-23 17:42:39 +0400
