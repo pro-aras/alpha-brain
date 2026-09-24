@@ -417,23 +417,47 @@ def induce(episodes, k: int, org: Organism) -> List[Dict[str, object]]:
     rules: List[Dict[str, object]] = []
     if episodes is None or len(episodes) == 0:
         return rules
-    words_seen = sorted(set(str(episodes.word[i]) for i in range(len(episodes)) if str(episodes.word[i])))
+    # edit: Claude (Opus 5.5, INDUCE-COST builder), 2026-09-23 14:08 +0400 — INDUCE made cheap WITHOUT changing one decision
+    # (docs/briefs/INDUCE-COST-0923-REPORT.md; pinned against master 2357347's own text by tests/genome/test_induce_cost.py). At alpha4-1's
+    # 10:54 state (6,896 x 753 born, 10,160 episodes) one call cost 4.4-5.0 s on the MIND thread: a Python scan of the WHOLE ring per word
+    # (752 words: 7.6 M `str()` compares), a cluster pass per word over every alive sight cell, and recall() plus a gemv per episode for
+    # words that can never file. Now the ring is walked ONCE (each word's slots, ascending — the order the per-word scan visited them) and
+    # the answer map is inverted ONCE; three exits, read off the emission test `agree >= k and disagree == 0 and C`, skip only work that
+    # cannot file: fewer than k episodes (agree <= slots < k — recall() is not asked, it never writes the organism; the ear's encode_word()
+    # still IS, for every word in order, so an unhearable word raises where it always did), an empty cluster, and every episode after a
+    # word's first counter-example. Every nearest that decides is the SAME `_nearest_in(ids, M, episodes.x_s[i])` call on the same ids/M:
+    # the gemv's own sum order and rounding are untouched. A batched gemm, a per-row dot, or a nearest cached across thinks would be a
+    # DIFFERENT float path (a row's value inside the gemv moves when another row is added or removed — measured, the report §4).
+    slots_of: Dict[str, List[int]] = {}
+    for i in range(len(episodes)):
+        w = str(episodes.word[i])
+        if w:
+            slots_of.setdefault(w, []).append(i)
+    words_seen = sorted(slots_of)
     # edit: Claude (Fable 5.1), 2026-09-22 11:0x +0400 — the alive matrix and each alive cell's answer are read ONCE per call (induce never
     # writes the organism, so they cannot move inside it); before, every episode fancy-indexed a fresh 2 MB copy (see _nearest_in).
     ids = org.sight.alive_ids(); M = org.sight.cells[ids]
     answer_of = {int(c): org._answer_of(org.sight, int(c)) for c in ids}
+    answering: Dict[int, List[int]] = {}   # a word cell -> the alive sight cells whose answer it is (ascending, the order of answer_of's keys)
+    for c in answer_of:
+        if answer_of[c] is not None:
+            answering.setdefault(answer_of[c], []).append(c)
     for word in words_seen:
-        r = org.recall("words", world.encode_word(word, org.g.ear_blank_zero))
+        xw = world.encode_word(word, org.g.ear_blank_zero)   # every word, in order: the ear's refusal (ValueError) is raised exactly where it was
+        slots = slots_of[word]
+        if len(slots) < k:
+            continue  # agree <= len(slots) < k: no rule can be filed — recall is not asked (it never writes the organism)
+        r = org.recall("words", xw)
         word_cell = r["lit"]   # edit: Claude (Fable 5.1), 2026-09-21 15:14 +0400 — was r["cell"], the SIGHT cell the word recalls; _answer_of(sight, c) is a WORDS index, so the
         #                        cluster compared a sight id to a words index (2/21 words clustered on life 3, both the WRONG cells). r["lit"] is the word's own cell.
         if word_cell is None:
             continue  # the organism itself abstains on this word — nothing to cluster against
-        C = sorted(c for c in answer_of if answer_of[c] == word_cell)
+        C = sorted(answering.get(word_cell, []))   # a FRESH list per word: two words can light one word cell, and row["cluster"] must not alias
+        if not C:
+            continue  # an empty cluster files nothing (the `and C` below) — no gemv for it
         agree = disagree = 0
         ep_ids: List[int] = []
-        for i in range(len(episodes)):
-            if str(episodes.word[i]) != word:
-                continue
+        for i in slots:
             nearest = _nearest_in(ids, M, episodes.x_s[i])
             if nearest is None:
                 continue
@@ -442,6 +466,7 @@ def induce(episodes, k: int, org: Organism) -> List[Dict[str, object]]:
                 ep_ids.append(int(episodes.ids[i]))
             else:
                 disagree += 1
+                break  # one counter-example refuses the rule; the episodes after it cannot change that
         if agree >= k and disagree == 0 and C:
             row = _file(
                 claim=f'"{word}" resonates cluster {C}',

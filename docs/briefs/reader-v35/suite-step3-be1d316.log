@@ -1,0 +1,253 @@
+........................................................sssss.../data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp183l957l/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+F/data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmphuziafkx/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+F.....................................................................................................................................................................................................................................................s........./usr/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.BufferedReader name=7>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.BufferedReader name=5>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...............................creature.body: mind crashed at seq 1: RuntimeError('planted')
+creature.body: mind crashed at seq 1: RuntimeError('planted')
+.............................................................................................../data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpchtz6y9u/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmph0y9_0tl/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...../data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpmnzu2jti/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+../data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpxds962ez/bad/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp048elucy/old/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpgugxgygl/nog/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpsh9gc58v/eq/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp5ast8ao8/ne/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpyvove9d6/env/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpp3scfwxj/und/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpppnhin22/und-drop/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................x....xs...........................................................................................................................................................[A42-B3 task 2] pg14640's first body sentence (flag ON): "[Transcriber's Notes: Welcome to the schoolroom of 1900."
+[seam] think outcomes: {'belief': 4, 'no_cell_answers': 5, 'filed': 6}; no_cell_answers=5
+[DROPxSLEEP] sleep boundaries=8 total replayed=40 live glances_dropped=47 tick_calls=47
+[DROPxTHINK] org.t drop=340 floor=340 frozen_t=340
+{"moments": 255, "cells": [67, 17], "words_seen": ["arrow", "bar", "circle", "cross", "cup", "diamond", "dot", "house", "key", "moon", "ring", "square", "star", "tree", "triangle", "wave", "zog"], "chance_q1": 0.059, "disjoint_checked": 57, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.5}
+Q1: {"acc": 0.36363636363636365, "n": 33, "correct": 12, "abstain": {"novel": 0, "noedge": 0, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.030303030303030304, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "cross": 0.0, "ring": 0.0, "bar": 0.0, "dot": 0.3333333333333333, "
+wrote /data/dev/scratch-reader35/tmp/voice-seam-life-xq390qpz/exam/2026-09-24T014130Z.json
+{"moments": 2040, "cells": [380, 16], "words_seen": ["ahmad", "anchor", "ant", "arrow", "ball", "bar", "box", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.062, "disjoint_checked": 57, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 4.1}
+Q1: {"acc": 0.9090909090909091, "n": 33, "correct": 30, "abstain": {"novel": 0, "noedge": 0, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.030303030303030304, "per_thing": {"circle": 0.3333333333333333, "square": 0.6666666666666666, "triangle": 1.0, "cross": 1.0, "ring": 1.0, "bar": 1.0,
+wrote /data/dev/scratch-reader35/tmp/tmpqyw10cas/life/exam/2026-09-24T014136Z.json
+{"moments": 45, "cells": [7, 4], "words_seen": ["circle", "diamond", "square", "triangle"], "chance_q1": 0.25, "disjoint_checked": 38, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.3}
+Q1: {"acc": 0.0, "n": 8, "correct": 0, "abstain": {"novel": 1, "noedge": 7, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 1.0, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "diamond": 0.0}, "answers_from_multi_word_cells": 0, "hedge_rate": null}
+wrote /data/dev/scratch-reader35/tmp/tmp24uktew_/exam/2026-09-24T014201Z.json
+{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/scratch-reader35/tmp/tmpw7blwvvx/exam/2026-09-24T014329Z.json
+{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/scratch-reader35/tmp/tmp201ic6p6/exam/2026-09-24T014332Z.json
+{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/scratch-reader35/tmp/tmp5ullmxbg/exam/2026-09-24T014334Z.json
+{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 190, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.1}
+Q1: {"acc": 0.9, "n": 110, "correct": 99, "abstain": {"novel": 4, "noedge": 0, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.045454545454545456, "per_thing": {"circle": 0.5, "square": 0.9, "triangle": 0.8, "cross": 1.0, "ring": 0.8, "bar": 1.0, "dot": 1.0, "star": 1.0, "arrow": 1.0, "wav
+wrote /data/dev/scratch-reader35/tmp/tmphpplzfih/exam/2026-09-24T014337Z.json
+{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/scratch-reader35/tmp/tmpppgo8sgx/exam/2026-09-24T014342Z.json
+{"moments": 240, "cells": [44, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.6181818181818182, "n": 55, "correct": 34, "abstain": {"novel": 4, "noedge": 8, "ratio": 0, "close": 0, "minority": 7}, "false_abstention": 0.34545454545454546, "per_thing": {"circle": 0.4, "square": 0.6, "triangle": 1.0, "cross": 0.4, "ring": 0.2, "bar": 0.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/scratch-reader35/tmp/tmp4g6p2mps/exam/2026-09-24T014344Z.json
+{"moments": 240, "cells": [44, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.5}
+Q1: {"acc": 0.6727272727272727, "n": 55, "correct": 37, "abstain": {"novel": 4, "noedge": 11, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.2727272727272727, "per_thing": {"circle": 0.4, "square": 0.6, "triangle": 1.0, "cross": 0.4, "ring": 0.6, "bar": 0.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/scratch-reader35/tmp/tmp4zgyecc_/exam/2026-09-24T014345Z.json
+{"moments": 240, "cells": [44, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.5}
+Q1: {"acc": 0.6727272727272727, "n": 55, "correct": 37, "abstain": {"novel": 4, "noedge": 11, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.2727272727272727, "per_thing": {"circle": 0.4, "square": 0.6, "triangle": 1.0, "cross": 0.4, "ring": 0.6, "bar": 0.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/scratch-reader35/tmp/tmpjivg0epf/exam/2026-09-24T014346Z.json
+{"moments": 240, "cells": [9, 1], "words_seen": ["circle"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.5}
+Q1: {"acc": 0.09090909090909091, "n": 55, "correct": 5, "abstain": {"novel": 42, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.7636363636363637, "per_thing": {"circle": 1.0, "square": 0.0, "triangle": 0.0, "cross": 0.0, "ring": 0.0, "bar": 0.0, "dot": 0.0, "star": 0.0, "arro
+wrote /data/dev/scratch-reader35/tmp/tmpazkx8wf1/exam/2026-09-24T014347Z.json
+REPLAY identical: 67 mind rows
+DIVERGED at seq 121: hash
+G4-6 row counts by source: {'maker': 120, 'folder': 13}; caught divergence planted at seq 121
+touch toy (real jail): fast rate=0.423 B/ms  slow rate=0.002981 B/ms  ratio=141.9x
+touch toy (real jail): run1 rate=0.455 B/ms  run2 rate=0.497 B/ms
+census (200 frames, flat residual): {'toggle': 36, 'right': 31, 'pickup': 23, 'left': 32, 'forward': 24, 'done': 28, 'drop': 26}
+DIVERGED at seq 202: births
+REPLAY identical: 201 mind rows
+REPLAY identical: 444 mind rows
+REPLAY identical: 225 mind rows
+DIVERGED at seq 410: <row count: replay 1 vs --against 2>
+{"moments": 80, "cells": [15, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.9}
+Q1: {"acc": 0.0, "n": 50, "correct": 0, "abstain": {"novel": 1, "noedge": 49, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 1.0, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "bar": 0.0, "diamond": 0.0}, "answers_from_multi_word_cells": 0, "hedge_rate": null}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014744Z.json
+{"moments": 160, "cells": [17, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.9}
+Q1: {"acc": 0.0, "n": 50, "correct": 0, "abstain": {"novel": 1, "noedge": 49, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 1.0, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "bar": 0.0, "diamond": 0.0}, "answers_from_multi_word_cells": 0, "hedge_rate": null}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014745Z.json
+{"moments": 240, "cells": [20, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.9}
+Q1: {"acc": 0.76, "n": 50, "correct": 38, "abstain": {"novel": 0, "noedge": 1, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.02, "per_thing": {"circle": 0.3, "square": 0.6, "triangle": 0.9, "bar": 1.0, "diamond": 1.0}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014747Z.json
+{"moments": 320, "cells": [28, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.9}
+Q1: {"acc": 0.74, "n": 50, "correct": 37, "abstain": {"novel": 0, "noedge": 0, "ratio": 6, "close": 0, "minority": 0}, "false_abstention": 0.12, "per_thing": {"circle": 0.1, "square": 0.7, "triangle": 1.0, "bar": 1.0, "diamond": 0.9}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014749Z.json
+{"moments": 400, "cells": [33, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.9}
+Q1: {"acc": 0.78, "n": 50, "correct": 39, "abstain": {"novel": 0, "noedge": 0, "ratio": 5, "close": 0, "minority": 0}, "false_abstention": 0.1, "per_thing": {"circle": 0.2, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.7}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014751Z.json
+{"moments": 480, "cells": [41, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.9}
+Q1: {"acc": 0.86, "n": 50, "correct": 43, "abstain": {"novel": 0, "noedge": 0, "ratio": 3, "close": 0, "minority": 0}, "false_abstention": 0.06, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.9}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014753Z.json
+{"moments": 560, "cells": [44, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.9}
+Q1: {"acc": 0.92, "n": 50, "correct": 46, "abstain": {"novel": 0, "noedge": 0, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.02, "per_thing": {"circle": 0.7, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.9}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014754Z.json
+{"moments": 640, "cells": [50, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.9, "n": 50, "correct": 45, "abstain": {"novel": 0, "noedge": 0, "ratio": 2, "close": 0, "minority": 0}, "false_abstention": 0.04, "per_thing": {"circle": 0.8, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.7}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014756Z.json
+{"moments": 720, "cells": [52, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.92, "n": 50, "correct": 46, "abstain": {"novel": 0, "noedge": 0, "ratio": 2, "close": 0, "minority": 0}, "false_abstention": 0.04, "per_thing": {"circle": 0.8, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.8}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014758Z.json
+{"moments": 800, "cells": [55, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.9}
+Q1: {"acc": 0.96, "n": 50, "correct": 48, "abstain": {"novel": 0, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.0, "per_thing": {"circle": 1.0, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.8}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/scratch-reader35/tmp/creature-replay-3p07z9bl/exam/2026-09-24T014800Z.json
+REPLAY identical: 177 mind rows
+[L-4 toy] corrupted-block: fix=[[12, 5], [12, 4], [11, 4], [11, 5]] truth-cell~(79,25) hit-glances=[0, 1, 2, 3] before=[0.0, 0.0007415330638167461, 9.296274514625225e-07, 0.06408742288282632]/[True, True, True, False] after=[0.08371954193109654, 0.09366498216724184, 0.10785331882211557, 0.09547115212064072]/[False, False, False, False]
+[L-4 toy] repeated-canvas steady-state residual=[0.0, 0.005646129496512442, 0.15559076280298134, 0.08572088654651866] confirmed=[True, True, False, False]
+[L-4 toy] confirmed rate: real=0.800 shuffled-expectation=0.469
+[L-4/L-7 pin] life 3a real tape: 2576 mind rows, replay-deterministic, no residual/confirmed/coarse row anywhere (undeclared genes)
+[regime-step] life 2: step100 band 1.6644 (n 462) · step25 band 1.6628 (n 1873)
+REPLAY identical: 31 mind rows
+REPLAY identical: 100 mind rows
+[wave3-rules] NULL: 0 rules ever scored under the word-shuffle -- the meeting itself is what the shuffle destroys (a finding, not a bug); nothing to grade against chance
+[wave3-rules] NULL predictions_filed=0 predictions_scored=0
+[wave3-rules] REAL predictions_filed=29 predictions_scored=28
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 33, 34, 45, 46, 50, 51]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"square" resonates cluster [0, 18, 57, 58, 70]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 41, 48, 55, 71]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"arrow" resonates cluster [7, 8, 47, 56]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"star" resonates cluster [19, 24, 68, 77]' n=4 correct=4 acc=1.000
+[wave3-rules] REAL rule accuracy: '"square" resonates cluster [0, 5, 18, 57, 58, 70, 100]' n=1 correct=0 acc=0.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 87, 88, 107, 108, 109, 110, 112, 116]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 27, 41, 48, 55, 71, 79, 84, 97]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64, 87, 88, 107, 108, 109, 110, 112, 116, 118]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 27, 41, 48, 55, 71, 79, 84, 97, 134]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 27, 41, 48, 55, 71, 79, 84, 97, 134, 145]' n=4 correct=3 acc=0.750
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64, 87, 88, 96, 107, 108, 110, 112, 118, 137, 138, 144, 157]' n=3 correct=3 acc=1.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64, 87, 88, 96, 107, 108, 110, 112, 118, 137, 138, 144, 157, 169]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"star" resonates cluster [19, 24, 68, 77, 167]' n=1 correct=1 acc=1.000
+[wave3-rules] zog pending entries at canvas 600: 0
+[wave3-rules] zog: INDUCE never found a k=5-agreeing rule for it on this run (reported, not forced -- see the report for the per-seed reading)
+[B13] F=0.0310 (context only — neither bar below reads it, §16 addendum 1)
+[B13] NULL seed=9 thing=circle last50_pre=0.0119 first3_med=0.0152 ratio=1.272 (bar <1.5)
+[B13] NULL seed=9 thing=square last50_pre=0.0119 first3_med=0.0071 ratio=0.594 (bar <1.5)
+[B13] NULL seed=9 thing=triangle last50_pre=0.0119 first3_med=0.0040 ratio=0.333 (bar <1.5)
+[B13] NULL seed=10 thing=circle last50_pre=0.0134 first3_med=0.0155 ratio=1.157 (bar <1.5)
+[B13] NULL seed=10 thing=square last50_pre=0.0134 first3_med=0.0115 ratio=0.853 (bar <1.5)
+[B13] NULL seed=10 thing=triangle last50_pre=0.0134 first3_med=0.0168 ratio=1.249 (bar <1.5)
+[B13] NULL seed=11 thing=circle last50_pre=0.0128 first3_med=0.0164 ratio=1.279 (bar <1.5)
+[B13] NULL seed=11 thing=square last50_pre=0.0128 first3_med=0.0144 ratio=1.123 (bar <1.5)
+[B13] NULL seed=11 thing=triangle last50_pre=0.0128 first3_med=0.0097 ratio=0.756 (bar <1.5)
+[B13] conjunction (spike AND settle): 3/6 — [(9, 'moon', False), (9, 'house', True), (10, 'moon', False), (10, 'house', True), (11, 'moon', True), (11, 'house', False)]
+[B13] seed=9 thing=moon last50_pre=0.0185 first3_med=0.0353 spike_ratio=1.907 (bar >=3.0, FAIL) e_at_10=1.0 settle_ratio=53.95097626926712 (bar <=1.25, FAIL)
+[B13] seed=9 thing=house last50_pre=0.0185 first3_med=1.0000 spike_ratio=53.951 (bar >=3.0, PASS) e_at_10=0.004388073652515478 settle_ratio=0.2367408574946589 (bar <=1.25, PASS)
+[B13] seed=10 thing=moon last50_pre=0.0177 first3_med=0.0168 spike_ratio=0.948 (bar >=3.0, FAIL) e_at_10=0.01062433753147185 settle_ratio=0.5994019761589211 (bar <=1.25, PASS)
+[B13] seed=10 thing=house last50_pre=0.0177 first3_med=1.0000 spike_ratio=56.418 (bar >=3.0, PASS) e_at_10=0.014373961408790104 settle_ratio=0.8109475859684273 (bar <=1.25, PASS)
+[B13] seed=11 thing=moon last50_pre=0.0158 first3_med=1.0000 spike_ratio=63.175 (bar >=3.0, PASS) e_at_10=0.008494453816940695 settle_ratio=0.5366355783409379 (bar <=1.25, PASS)
+[B13] seed=11 thing=house last50_pre=0.0158 first3_med=0.0238 spike_ratio=1.504 (bar >=3.0, FAIL) e_at_10=1.0 settle_ratio=63.17481852343615 (bar <=1.25, FAIL)
+
+[life1 replay] source rows=762 distinct words=15 -> {'belief': 15, 'revisit': 667, 'extension': 79, 'clash': 1, 'clash_refused': 0}
+[life1 replay] folded standing beliefs: 15
+  'bar': source_rows=18 cells=9 episodes=132 revisits=15 extensions=2 clashes=0 1+revisits+extensions=18
+  'star': source_rows=1 cells=3 episodes=3 revisits=0 extensions=0 clashes=0 1+revisits+extensions=1
+  'dot': source_rows=196 cells=53 episodes=841 revisits=172 extensions=23 clashes=0 1+revisits+extensions=196
+  'wave': source_rows=30 cells=38 episodes=294 revisits=24 extensions=5 clashes=0 1+revisits+extensions=30
+  'square': source_rows=35 cells=19 episodes=394 revisits=28 extensions=6 clashes=0 1+revisits+extensions=35
+  'circle': source_rows=68 cells=24 episodes=372 revisits=59 extensions=8 clashes=0 1+revisits+extensions=68
+  'ring': source_rows=62 cells=41 episodes=375 revisits=51 extensions=10 clashes=0 1+revisits+extensions=62
+  'diamond': source_rows=69 cells=48 episodes=409 revisits=6 extensions=4 clashes=1 1+revisits+extensions=11
+  'arrow': source_rows=2 cells=14 episodes=322 revisits=0 extensions=1 clashes=0 1+revisits+extensions=2
+  'cup': source_rows=101 cells=31 episodes=482 revisits=95 extensions=5 clashes=0 1+revisits+extensions=101
+  'house': source_rows=63 cells=8 episodes=507 revisits=61 extensions=1 clashes=0 1+revisits+extensions=63
+  'tree': source_rows=52 cells=10 episodes=456 revisits=51 extensions=0 clashes=0 1+revisits+extensions=52
+  'triangle': source_rows=14 cells=10 episodes=909 revisits=13 extensions=0 clashes=0 1+revisits+extensions=14
+  'key': source_rows=39 cells=7 episodes=433 revisits=38 extensions=0 clashes=0 1+revisits+extensions=39
+  'moon': source_rows=12 cells=9 episodes=514 revisits=11 extensions=0 clashes=0 1+revisits+extensions=12
+
+[M6 cost] toy 4104 alive sight x 390 words: cycle() reference 13497 ms, fast 235 ms (x57.3); merges sight 229 words 10
+..................................................................................................................................................................................xx........................................................x..........x...........................................................................
+======================================================================
+FAIL: test_check_py_prints_a_mismatch (tests.creature.test_a4l_drop_seams.TestStatusGlancesDropped.test_check_py_prints_a_mismatch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader35/tests/creature/test_a4l_drop_seams.py", line 626, in test_check_py_prints_a_mismatch
+    self.assertIn("MISMATCH", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 'MISMATCH' not found in '[check] root /data/dev/scratch-reader35/tmp/tmp183l957l · STATUS moments 100 cells [5, 5] crash None backlog not recorded sight_born not recorded/? refused nmax not recorded budget not recorded\n[check] chat: chats not recorded · chat_answered not recorded · chat_abstained not recorded · chat_refused_form not recorded · chat_refused_content not recorded · chat_words_mean not recorded · chat_longest not recorded · chat_graded not recorded · chat_graded_right not recorded · chat_graded_novel not recorded\n[check] glances confirmed 40 surprised 10 dropped 39 — genome unknown (no parseable GENOME.genome / unit.env genome at the root): the drop clause not read, dropped vs confirmed not compared\n[check] body rows on the tape: 0 (not recorded — the body sense is not on this genome)\n[check] sight births/h: []\n[check] sight births/h by source: \n[check] canvases/h:     []\n[check] confirmed share/h (glances): []   (SURPRISE not journaled on this genome — not recorded)\n[check] journal counts: {}\n[check] SIZING: sight_born/sight_nmax not recorded on STATUS (an older body)\n[check] exam files: 0\n'
+
+======================================================================
+FAIL: test_check_py_prints_the_equality (tests.creature.test_a4l_drop_seams.TestStatusGlancesDropped.test_check_py_prints_the_equality)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader35/tests/creature/test_a4l_drop_seams.py", line 614, in test_check_py_prints_the_equality
+    self.assertIn("OK: dropped == confirmed", out)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'OK: dropped == confirmed' not found in '[check] root /data/dev/scratch-reader35/tmp/tmphuziafkx · STATUS moments 100 cells [5, 5] crash None backlog not recorded sight_born not recorded/? refused nmax not recorded budget not recorded\n[check] chat: chats not recorded · chat_answered not recorded · chat_abstained not recorded · chat_refused_form not recorded · chat_refused_content not recorded · chat_words_mean not recorded · chat_longest not recorded · chat_graded not recorded · chat_graded_right not recorded · chat_graded_novel not recorded\n[check] glances confirmed 40 surprised 10 dropped 40 — genome unknown (no parseable GENOME.genome / unit.env genome at the root): the drop clause not read, dropped vs confirmed not compared\n[check] body rows on the tape: 0 (not recorded — the body sense is not on this genome)\n[check] sight births/h: []\n[check] sight births/h by source: \n[check] canvases/h:     []\n[check] confirmed share/h (glances): []   (SURPRISE not journaled on this genome — not recorded)\n[check] journal counts: {}\n[check] SIZING: sight_born/sight_nmax not recorded on STATUS (an older body)\n[check] exam files: 0\n'
+
+----------------------------------------------------------------------
+Ran 1718 tests in 1075.343s
+
+FAILED (failures=2, skipped=7, expected failures=6)
+[life3a retina identity] 2338/2338 eye canvases byte-identical, max|delta|=0.0
+[B12b, literal 32-row identity] raw=[-0.08740248 -0.13724989  0.03004636  0.08157524  0.00823997] projected=[-0.32565395 -0.08178045 -0.18357541 -0.03094237  0.08078127] max|diff|=0.2383
+[B12, THETA interaction] RAW recall: reason=noedge cos=0.9635992562734164 (THETA_N=0.955)
+[B12, THETA interaction] at init (random orthogonal H) recall: reason=noedge cos=0.9650282453970629
+[B12, THETA interaction] after ONE learn() {'steps': 20, 'batch': 50, 'loss_before': 3.126301486766711, 'loss_after': 1.16555259330799}: recall reason=novel cos=0.7005975004284148
+[B12a] RAW margin 0.0091 (within-median 0.9628, between-p95 0.9537)
+[B12a] 5 sleeps: [{'steps': 20, 'batch': 120, 'loss_before': 4.079109601833773, 'loss_after': 2.3579384859623462}, {'steps': 20, 'batch': 120, 'loss_before': 2.3579384859623462, 'loss_after': 2.0196415653488127}, {'steps': 20, 'batch': 120, 'loss_before': 2.0196415653488127, 'loss_after': 1.714253934289475}, {'steps': 20, 'batch': 120, 'loss_before': 1.714253934289475, 'loss_after': 1.4220967832634952}, {'steps': 20, 'batch': 120, 'loss_before': 1.4220967832634952, 'loss_after': 1.224647397062408}]
+[B12a] LEARNED margin (5 sleeps) -0.1161 (within-median 0.1630, between-p95 0.2791)
+[B12, photographs] BEFORE (raw front) margin -0.0897 (within-median 0.8283, between-p95 0.9181) over 10 words, 200 images
+[B12, photographs] AFTER (toy-world-trained head) margin -0.2915 (within-median 0.4607, between-p95 0.7522)
+[B12a, single sleep] margin 0.0691 vs raw 0.0091 (7.6x)
+[evolve/negctl] shadow consumed 445 rows up to seq 445 (T-2.0h checkpoint)
+[evolve/negctl] shadow consumed 112 more rows to the tape's end (seq 557)
+[evolve/negctl] planted_bad (BIRTH.theta_n=0.5): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] planted_bad incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+[evolve/negctl] null (DELTA.lr=0.051): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] null incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+hands_recognised (taught mind, real circle/square pictures): share=1.000 twin=0.385 n=26 abstained=0
+hands_recognised (REAL jail + REAL ascii-render road, 50 shelf programs): share=0.100 twin=0.060 n=50 abstained=27
+[replay_diff] A: 3 mind rows · B: 3 mind rows · compared 3
+[replay_diff] rows differing ONLY in ignored fields ['hash']: 0 · rows with a non-ignored diff: 1
+[replay_diff] first non-ignored diff (seq, field, A, B): (222, 'readings', "{'a': True}", "{'a': False}")
+[replay_diff] keys present on one side only: []
+[replay_diff] IDENTICAL except ['hash']: False
+[replay_diff] A: 3 mind rows · B: 1 mind rows · compared 1
+[replay_diff] rows differing ONLY in ignored fields ['hash']: 0 · rows with a non-ignored diff: 0
+[replay_diff] first non-ignored diff (seq, field, A, B): None
+[replay_diff] keys present on one side only: []
+[replay_diff] IDENTICAL except ['hash']: False
+[replay_diff] A: 3 mind rows · B: 3 mind rows · compared 3
+[replay_diff] rows differing ONLY in ignored fields ['hash']: 0 · rows with a non-ignored diff: 0
+[replay_diff] first non-ignored diff (seq, field, A, B): None
+[replay_diff] keys present on one side only: []
+[replay_diff] IDENTICAL except ['hash']: True
+full - blind AUC gap: 0.2973 (a large gap means the folder-hash axis, not kind/size, is doing the separating)
+smell channel AUC (same-folder-word vs different, by distance): full kind+size+folder = 0.8339 (4365 same / 42606 diff pairs); folder-BLIND kind+size only = 0.5366 (4365 same / 42606 diff pairs)
+smell_auc: 307/307 folder rows matched (0 unmatched)

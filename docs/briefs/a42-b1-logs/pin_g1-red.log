@@ -1,0 +1,2 @@
+tree /tmp/claude-1000/-home-ahmad/632ddf9d-dc4c-4a74-86e1-6052f1ce8fe8/scratchpad/wt-before dev moments 660 hash 7686da77162b6179480b2f5e08220c8ae5ad7d8782337ac6034c1a14085d9881 recorded 0d51df0db87dbdfdb96fc1b1d702583fea6cdb1306aaf518b39f1f114d8db8d6 DIFFERENT in 0.5s
+exit 0 (the unchanged tools/pin_g1.py step (1) asserts on this: DIFFERENT)

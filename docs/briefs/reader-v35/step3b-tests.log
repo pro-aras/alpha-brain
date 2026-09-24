@@ -1,0 +1,35 @@
+.............................../data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmppzwr9lob/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpagrckanq/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.../data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp15vhdzji/bad/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpmovqtqii/old/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpwicq6_1u/nog/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp42yps94k/eq/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpbc5n75e9/ne/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpg3q3ovcs/env/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp56wgvgi8/und/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp01m1kug7/und-drop/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..
+----------------------------------------------------------------------
+Ran 44 tests in 1.379s
+
+OK

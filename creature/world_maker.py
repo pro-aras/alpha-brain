@@ -19,6 +19,7 @@ import numpy as np
 from PIL import Image
 
 from genome import world
+from genome import voice as voice_module      # A4L-VOICE (Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:35 +0400): the world's voice — pure, no Organism, no memory
 
 WINDOW_SECONDS = 6 * 3600          # PREREG §2.8: windows of 6 h
 DEFAULT_SEED = 20260920            # never 2 (G1's held-out seed); matches docs/G4-DESIGN.md §9's draft SEED
@@ -57,22 +58,54 @@ def _png_bytes(rgb: np.ndarray) -> bytes:
 
 
 def _publish_canvas(publish: Callable, root: Path, moment: str, thing: str, rgb: np.ndarray, truth: Dict[str, object],
-                     answering: Optional[str] = None) -> None:
+                     answering: Optional[str] = None, voice: Optional[str] = None) -> None:
     """ear (word bytes) THEN eye (PNG) — the tape order law (§2.2) — then the truth file, keyed by the
     EYE row's own seq, under root/truth/ (never on the tape, §2.1). `answering`, when given (L-10, the
     QUESTION door), is stamped on BOTH rows' meta -- the plan's own text: "the row's meta carries
     `answering: 'q-<seq>'`" — never touching the shape of an ordinary (unanswering) canvas's meta, which
-    is exactly what it always was (a genome/replay reading an ordinary row sees no new key)."""
+    is exactly what it always was (a genome/replay reading an ordinary row sees no new key).
+
+    edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:35 +0400 — A4L-VOICE task 1 (docs/briefs/A4L-VOICE.md;
+    docs/A4-LADDER-PREREG.md §2.3): `voice="formant"` (WORLD's «; voice formant» clause) — the world SPEAKS the thing's name:
+    its fixed formant chord (genome/voice.py) run through the SAME sealed front the ear door runs, the FIRST event's
+    37-number trait published as ONE `ear-sound` row (source maker, meta word, `moment` = this canvas's own moment)
+    BETWEEN the word's ear row and the canvas's eye row — every row of a moment precedes its eye row (G4 §2.2's order law).
+    The wav is written once per word under root/truth/voice/ for audit; the mind never reads it. None (undeclared, the
+    folder/shelf/game/hands never pass it): exactly the two rows this function always published."""
     ear_meta: Dict[str, object] = {"moment": moment, "source": "maker", "word": thing}
     eye_meta: Dict[str, object] = {"moment": moment, "source": "maker"}
     if answering is not None:
         ear_meta["answering"] = answering
         eye_meta["answering"] = answering
     publish("ear", thing.encode("utf-8"), ear_meta, "txt")
+    if voice == "formant":
+        _publish_voice(publish, root, moment, thing, answering)
+    elif voice is not None:
+        raise ValueError(f"world_maker: unknown voice {voice!r} (only 'formant' is implemented)")
     eye_row = publish("eye", _png_bytes(rgb), eye_meta, "png")
     truth_dir = root / "truth"
     truth_dir.mkdir(parents=True, exist_ok=True)
     (truth_dir / f"{eye_row['seq']:09d}.json").write_text(json.dumps(truth))
+
+
+# edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:35 +0400 — A4L-VOICE task 1: the one voiced row of a canvas.
+def _publish_voice(publish: Callable, root: Path, moment: str, thing: str, answering: Optional[str] = None) -> dict:
+    """ONE `ear-sound` row: the chord's FIRST event (genome.voice.event — the sealed E52 front, exactly the ear door's
+    road: 16-bit PCM, /32768, cochlea.analyse at 16 kHz), payload the 37 float32 the ear door publishes, meta shaped like
+    the ear door's (`when`, `level`) plus `word` and `duration_s`. The audit wav lands once per word under
+    root/truth/voice/<word>.wav (a truth file, never on the tape, never read by the mind)."""
+    ev = voice_module.event(thing)
+    meta: Dict[str, object] = {"moment": moment, "source": "maker", "word": thing, "when": ev["t_s"], "level": ev["level"],
+                               "duration_s": voice_module.DURATION_S, "voice": "formant"}
+    if answering is not None:
+        meta["answering"] = answering
+    row = publish("ear-sound", ev["trait"].astype("float32").tobytes(), meta, "f32")
+    wav_dir = root / "truth" / "voice"
+    wav_path = wav_dir / f"{thing}.wav"
+    if not wav_path.exists():
+        wav_dir.mkdir(parents=True, exist_ok=True)
+        wav_path.write_bytes(voice_module.wav_bytes(thing))
+    return row
 
 
 # ============================================================================ L-10: QUESTION's door
@@ -87,7 +120,7 @@ def _publish_canvas(publish: Callable, root: Path, moment: str, thing: str, rgb:
 _QUESTION_MOMENT_RE = re.compile(r"w(\d{4})i(\d{6})t(\d{9})")
 
 
-def _answer_one_question(publish: Callable, root: Path, seed: int, total: int) -> Optional[int]:
+def _answer_one_question(publish: Callable, root: Path, seed: int, total: int, voice: Optional[str] = None) -> Optional[int]:
     """Answers the FIRST unanswered `what-is` in `root/ask/out/q-*.json` whose `args[0]` names a canvas
     this door drew, by publishing that thing again under a moment carrying the SAME (window, i) but a
     FRESH `total`; renames the question file `<qid>.answered.json`. A question this door cannot answer (no
@@ -128,7 +161,7 @@ def _answer_one_question(publish: Callable, root: Path, seed: int, total: int) -
         qid = qpath.stem
         thing, rgb, truth = make(seed, w_orig, i_used)
         moment = f"w{w_orig:04d}i{i_orig:06d}t{total:09d}"
-        _publish_canvas(publish, root, moment, thing, rgb, truth, answering=qid)
+        _publish_canvas(publish, root, moment, thing, rgb, truth, answering=qid, voice=voice)   # A4L-VOICE: a re-shown thing is voiced too
         qpath.rename(qpath.with_name(f"{qid}.answered.json"))
         return total + 1
     return None
@@ -136,7 +169,7 @@ def _answer_one_question(publish: Callable, root: Path, seed: int, total: int) -
 
 def sense(publish: Callable, stop_event, root: Path, period: float = 5.0, seed: int = DEFAULT_SEED,
           plant_after_canvases: int = PLANT_AFTER_CANVASES, plant_window_s: float = PLANT_WINDOW_S,
-          plant_showings: int = PLANT_SHOWINGS, window_seconds: float = WINDOW_SECONDS) -> None:
+          plant_showings: int = PLANT_SHOWINGS, window_seconds: float = WINDOW_SECONDS, voice: Optional[str] = None) -> None:
     """The world-maker sense thread body: one canvas every `period` s, forever, until `stop_event`. The
     plant (THING_PLANT) shows `plant_showings` times, evenly spaced, in the `plant_window_s` seconds
     after the `plant_after_canvases`-th canvas; THING_NULL and THING_NEVER are never shown (schedule()
@@ -163,7 +196,7 @@ def sense(publish: Callable, stop_event, root: Path, period: float = 5.0, seed: 
         # L-10 (QUESTION): answer at most one pending what-is per tick, BEFORE this tick's own regular
         # canvas -- an EXTRA showing, never a substitute (the schedule's own (window, i) sequence below is
         # completely untouched by this branch: `total` is the only counter it advances).
-        answered_total = _answer_one_question(publish, root, seed, total)
+        answered_total = _answer_one_question(publish, root, seed, total, voice=voice)
         if answered_total is not None:
             total = answered_total
 
@@ -191,6 +224,6 @@ def sense(publish: Callable, stop_event, root: Path, period: float = 5.0, seed: 
             i += 1
 
         moment = f"w{window:04d}i{i:06d}t{total:09d}"
-        _publish_canvas(publish, root, moment, thing, rgb, truth)
+        _publish_canvas(publish, root, moment, thing, rgb, truth, voice=voice)   # A4L-VOICE: WORLD's «; voice formant» (None: undeclared, byte-identical)
         total += 1
         stop_event.wait(period)

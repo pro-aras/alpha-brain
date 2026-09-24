@@ -10,6 +10,7 @@ own — PREREG §2.4, and explicitly asked for here by §11.4) is not in the swe
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Dict, Optional
@@ -17,6 +18,13 @@ from typing import Dict, Optional
 from tools import self_exam
 
 from .tape import now_iso
+
+
+# edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:43 +0400 — ALPHA4-PREREG §4(b) AMENDED (§11 finding 1): the read
+# proxy on every sitting = a fixed-seed sample of 50 over ALL the heard shelf words (tools/self_exam.py:read_sample), never the
+# 20 NEWEST (heard[-20:], the least-exposed words — ≥ 0.6 in 2 of alpha4-1's first 23 sittings, never two in a row).
+READ_WORDS = 50
+READ_SEED = 20260923
 
 
 def run_exam(root: Path, genome_path: Path, held: int = 10, check_tape: int = 400) -> Dict[str, object]:
@@ -27,7 +35,8 @@ def run_exam(root: Path, genome_path: Path, held: int = 10, check_tape: int = 40
     root = Path(root)
     old_argv = sys.argv
     try:
-        sys.argv = ["self_exam.py", "--root", str(root), "--genome", str(genome_path), "--held", str(held), "--check-tape", str(check_tape), "--read-words", "20"]   # ALPHA4 §4(b): the reading share on every sitting (Claude (Fable 5.1), 2026-09-23 03:02 +0400)
+        sys.argv = ["self_exam.py", "--root", str(root), "--genome", str(genome_path), "--held", str(held), "--check-tape", str(check_tape),
+                    "--read-words", str(READ_WORDS), "--read-seed", str(READ_SEED)]   # ALPHA4 §4(b): the reading share on every sitting (Claude (Fable 5.1), 2026-09-23 03:02 +0400; 50 seeded words over all heard, Opus 5.5 11:43)
         self_exam.main()
     finally:
         sys.argv = old_argv
@@ -72,6 +81,20 @@ def genome_for_sitting(root: Path, birth_genome_path: Path) -> Path:
     return Path(path) if path is not None else Path(birth_genome_path)
 
 
+def canvas_count_of(ledger: dict, fixations: int) -> int:
+    """M4 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400; ALPHA4-2-PREREG.md §2 M4): the canvases the mind has consumed, as the snapshot
+    ledger states it — its own `canvas_index` (creature/mind.py counts one per canvas; the coarse view's fifth moment and SLEEP's
+    replayed moments never inflate it); an OLD ledger (no key) keeps the old arithmetic `moments // fixations`, which over-counted
+    (5 moments a canvas + 200 a sleep: the exam fired every ≈ 400 real canvases instead of the genome's 500 — review §4). ONE
+    definition: creature/senses/sit.py's cadence reads this same function (#172: one derivation, never two)."""
+    ci = ledger.get("canvas_index") if isinstance(ledger, dict) else None
+    if isinstance(ci, int) and not isinstance(ci, bool):
+        return ci
+    moments = ledger.get("moments", 0) if isinstance(ledger, dict) else 0
+    moments = int(moments) if isinstance(moments, (int, float)) and not isinstance(moments, bool) else 0
+    return moments // max(1, int(fixations))
+
+
 def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, poll_period: float = 5.0) -> None:
     """The voice's own exam cadence: every `every_canvases` canvases, read from the latest snapshot's
     own "moments" (state/ledger.json) divided by the genome's fixations-per-canvas -- never a counter the
@@ -94,12 +117,17 @@ def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, p
         ledger_path = root / "state" / "ledger.json"
         if ledger_path.exists():
             try:
-                moments = int(json.loads(ledger_path.read_text()).get("moments", 0))
+                ledger = json.loads(ledger_path.read_text())
             except (json.JSONDecodeError, OSError):
-                moments = 0
-            canvas_count = moments // max(1, fixations)
+                ledger = {}
+            canvas_count = canvas_count_of(ledger, fixations)   # M4: the mind's own count when the ledger carries it
             if every_canvases > 0 and canvas_count - last_canvas >= every_canvases:
                 last_canvas = canvas_count
-                last_path.write_text(json.dumps({"last_canvas": last_canvas}))
+                # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1: the pointer is written atomically too (tmp + os.replace,
+                # the same pattern as the report in tools/self_exam.py) — the only other writer under root/exam/. Its one reader is this loop's
+                # own restart read above (a torn read there fell back to 0 and re-sat at once), so this is consistency, not a live defect.
+                tmp = last_path.with_name(last_path.name + ".tmp")
+                tmp.write_text(json.dumps({"last_canvas": last_canvas}))
+                os.replace(str(tmp), str(last_path))
                 run_and_journal(root, genome_for_sitting(root, genome_path))   # the adopted genome, if any (the J × exam seam)
         stop_event.wait(poll_period)

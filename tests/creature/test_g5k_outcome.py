@@ -5,8 +5,10 @@
 # stale on the other — every consume path journals).
 from __future__ import annotations
 
+import contextlib
 import io
 import json
+import os
 import shutil
 import tempfile
 import threading
@@ -307,6 +309,14 @@ class TestSitPreregistrationOnLife2(unittest.TestCase):
         self.assertNotEqual(sit_mod._latest_exam_file(LIFE2_EXAM_COPY).name, "LAST.json")
 
 
+def _write_atomically(path: Path, text: str) -> None:
+    """edit: Claude (Fable 5.1), 2026-09-23 16:55 +0400 — the way tools/self_exam.py now writes an exam report (tmp in the same dir + os.replace, the
+    pattern creature/body.py's `_write_status` uses): a reader can see the old file or the new one, never a torn one."""
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(text)
+    os.replace(str(tmp), str(path))
+
+
 class TestSitLiveWiring(unittest.TestCase):
     def test_sense_publishes_the_newest_exam_files_score_as_they_appear(self) -> None:
         root = Path(tempfile.mkdtemp())
@@ -325,9 +335,14 @@ class TestSitLiveWiring(unittest.TestCase):
         stop = threading.Event()
         t = threading.Thread(target=sit_mod.sense, args=(fake_publish, stop, root, gpath),
                               kwargs={"every_canvases": 5, "poll_period": 0.05}, daemon=True)
+        # edit: Claude (Fable 5.1), 2026-09-23 16:55 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1: the first exam file is COMPLETE before the sense starts and is written
+        # atomically (tmp + os.replace, the way tools/self_exam.py now writes it) — before, it was written with write_text AFTER t.start(), so
+        # the sense's first poll could read the empty file between create and write (a torn read), and the old cursor logic then spent the
+        # boundary on it: "0 != 1, the first publish never came in 5s" (docs/briefs/SEAM5-WITNESS-SOUND-REPORT.md item 2, 2 of 10 alone at load 20).
+        # The torn path itself is exercised deliberately by test_a_torn_first_read_is_retried... below, not left to timing here.
+        _write_atomically(exam_dir / "2026-09-21T000001Z.json", json.dumps({"ask_seen_words": {"Q1": {"acc": 0.80}}}))
         t.start()
         try:
-            (exam_dir / "2026-09-21T000001Z.json").write_text(json.dumps({"ask_seen_words": {"Q1": {"acc": 0.80}}}))
             deadline = time.time() + 5.0
             while len(published) < 1 and time.time() < deadline:
                 time.sleep(0.05)
@@ -372,6 +387,93 @@ class TestSitLiveWiring(unittest.TestCase):
         t.join(timeout=3.0)
         self.assertEqual(published, [], "LAST.json alone (no stamped file) must publish nothing")
         self.assertFalse((exam_dir / "SEEN.json").exists())   # no cursor file written (writer-sweep discipline; in-memory cursor only)
+
+    # edit: Claude (Fable 5.1), 2026-09-23 16:55 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1 (docs/briefs/SEAM5-WITNESS-SOUND-REPORT.md item 2): the two
+    # controls of the cursor law. Under the OLD sit.py `last_canvas = canvas_count` ran BEFORE the read, so a torn first read spent the
+    # boundary and the file was never re-read until the NEXT boundary (at a life's last one: forever) — test_a read 0 published under the old
+    # bytes (the deterministic RED, logged in docs/briefs/SIT-ATOMIC-SWEEP-0923-REPORT.md). test_b is the positive control of the counter:
+    # a file that NEVER parses is given up after sit_mod.MAX_TORN_RETRIES polls (a printed note — a sense has no journal channel), both
+    # cursors advance so it is never re-read, and the next file still publishes — the counter is 5, not infinity.
+    def test_a_torn_first_read_is_retried_and_the_score_published_exactly_once(self) -> None:
+        root = Path(tempfile.mkdtemp())
+        exam_dir = root / "exam"
+        exam_dir.mkdir(parents=True)
+        (root / "state").mkdir(parents=True)
+        (root / "state" / "ledger.json").write_text(json.dumps({"moments": 40}))   # canvas 10 >= every 5: the gate is open from the first poll
+        torn = exam_dir / "2026-09-21T000001Z.json"
+        torn.write_text("")                        # the torn instant (between the voice's create and its write), BEFORE the sense starts
+        published: list = []
+
+        def fake_publish(sense, payload, meta, ext):
+            published.append((sense, json.loads(payload.decode("utf-8")), meta))
+            return {"seq": len(published)}
+
+        stop = threading.Event()
+        t = threading.Thread(target=sit_mod.sense, args=(fake_publish, stop, root, SKELETON_PATH),
+                              kwargs={"every_canvases": 5, "poll_period": 0.2}, daemon=True)
+        t.start()
+        try:
+            time.sleep(0.3)                        # one or two torn polls (t=0, t=0.2) -- well under MAX_TORN_RETRIES, so no give-up
+            self.assertEqual(published, [], "nothing can be published while the file is torn")
+            _write_atomically(torn, json.dumps({"ask_seen_words": {"Q1": {"acc": 0.80}}}))   # the content lands
+            deadline = time.time() + 5.0
+            while len(published) < 1 and time.time() < deadline:
+                time.sleep(0.05)
+            time.sleep(0.5)                        # two more polls: no duplicate re-publish of the same file
+        finally:
+            stop.set()
+            t.join(timeout=3.0)
+        self.assertEqual(len(published), 1, f"the torn file's score must be published exactly once after its content lands: {published}")
+        self.assertEqual(published[0][1]["score"], 0.80)
+        self.assertEqual(published[0][2]["exam_file"], torn.name)
+
+    def test_b_a_file_unreadable_for_five_polls_is_given_up_once_and_the_next_file_still_publishes(self) -> None:
+        root = Path(tempfile.mkdtemp())
+        exam_dir = root / "exam"
+        exam_dir.mkdir(parents=True)
+        (root / "state").mkdir(parents=True)
+        (root / "state" / "ledger.json").write_text(json.dumps({"moments": 40}))   # canvas 10
+        bad = exam_dir / "2026-09-21T000001Z.json"
+        bad.write_text("{not json")              # never heals on its own
+        published: list = []
+
+        def fake_publish(sense, payload, meta, ext):
+            published.append((sense, json.loads(payload.decode("utf-8")), meta))
+            return {"seq": len(published)}
+
+        stop = threading.Event()
+        t = threading.Thread(target=sit_mod.sense, args=(fake_publish, stop, root, SKELETON_PATH),
+                              kwargs={"every_canvases": 5, "poll_period": 0.05}, daemon=True)
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):          # the sense's only channel for the note is print (no journal from a sense)
+                t.start()
+                deadline = time.time() + 5.0
+                while "gave up" not in buf.getvalue() and time.time() < deadline:
+                    time.sleep(0.05)
+            note = buf.getvalue()
+            self.assertIn("gave up", note, f"after {sit_mod.MAX_TORN_RETRIES} unreadable polls the sense must say so: {note!r}")
+            self.assertIn(bad.name, note)
+            self.assertIn(str(sit_mod.MAX_TORN_RETRIES), note)
+            self.assertEqual(published, [])
+            # the abandoned file is never re-read: healed AND with the gate open again, it stays unpublished (the name cursor moved past it)
+            bad.write_text(json.dumps({"ask_seen_words": {"Q1": {"acc": 0.70}}}))
+            (root / "state" / "ledger.json").write_text(json.dumps({"moments": 100}))   # canvas 25: 25 - 10 >= 5, the gate opens
+            time.sleep(0.4)
+            self.assertEqual(published, [], "an abandoned file is never re-read, even after it heals")
+            # a NEWER file is published as usual through the same open gate
+            newer = exam_dir / "2026-09-21T000002Z.json"
+            _write_atomically(newer, json.dumps({"ask_seen_words": {"Q1": {"acc": 0.60}}}))
+            deadline = time.time() + 5.0
+            while len(published) < 1 and time.time() < deadline:
+                time.sleep(0.05)
+        finally:
+            stop.set()
+            t.join(timeout=3.0)
+        self.assertEqual(len(published), 1, f"exactly the newer file: {published}")
+        self.assertEqual(published[0][2]["exam_file"], newer.name)
+        self.assertEqual(published[0][1]["score"], 0.60)
+        self.assertEqual(note.count("gave up"), 1, "one note per abandoned file, not one per poll")
 
 
 class TestSitConsumeReusesOutcomeMechanism(unittest.TestCase):

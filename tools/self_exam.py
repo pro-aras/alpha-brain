@@ -7,7 +7,7 @@
 """usage: python3 tools/self_exam.py --root /data/dev/genome/run [--genome genome/G4-skeleton.genome] [--held 10] [--check-tape 400]"""
 from __future__ import annotations
 
-import argparse, io, json, sys, time
+import argparse, io, json, os, sys, time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -24,8 +24,37 @@ def load_snapshot(root: Path, genome_path: Path):
     g = parse_genome(genome_path.read_text())
     org = Organism.load(root / "state" / "organism", g)
     L = json.loads((root / "state" / "ledger.json").read_text())
-    ledgers = {"sight": {int(k): set(v) for k, v in L["sight"].items()}, "words": {int(k): set(v) for k, v in L["words"].items()}}
+    ledgers = {"sight": {int(k): set(v) for k, v in L["sight"].items()}, "words": {int(k): set(v) for k, v in L["words"].items()},
+               # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:39 +0400): the SOUND ledger (absent -> empty)
+               "sound": {int(k): set(v) for k, v in (L.get("sound") or {}).items()}}
     return g, org, ledgers, L
+
+
+def voiced_counts(root: Path) -> dict:
+    """A4L-VOICE: the maker's sound rows on the tape, per word (the «voiced ≥ 5 times» gradability rule of V1/V2/V5)."""
+    counts: dict = {}
+    for f in sorted((root / "tape").glob("*.jsonl")):
+        for line in f.read_text().splitlines():
+            if '"ear-sound"' not in line:
+                continue
+            r = json.loads(line)
+            m = r.get("meta") or {}
+            if r.get("sense") == "ear-sound" and m.get("source") == "maker" and m.get("word"):
+                counts[m["word"]] = counts.get(m["word"], 0) + 1
+    return counts
+
+
+def sound_exam(org, ledgers, things, feats, voiced=None) -> dict:
+    """A4L-VOICE task 4: ask_sound on the snapshot — the chords are genome/voice.py's (the bytes the maker publishes), the
+    renders the exam's own held-out ones (seed 2), the ±4 % shifted chords printed (V1b). None when there is no sound area."""
+    if getattr(org, "sound", None) is None:
+        return None
+    from genome import voice as _voice
+    from genome.questions import ask_sound as _ask_sound
+    chords = {t: _voice.trait_f32(t) for t in things}
+    shifted = {t: {s: _voice.trait_f32(t, shift=float(s)) for s in ("0.96", "1.04")} for t in things}
+    return {"chords_from": "genome/voice.py formant (sha256(word) -> F1/F2/F3), the sealed E52 front's FIRST event",
+            **_ask_sound(org, ledgers, things, {t: feats[t] for t in things if t in feats}, chords, shifted, voiced=voiced)}
 
 
 def tape_canvases(root: Path, n: int):
@@ -45,13 +74,34 @@ def tape_canvases(root: Path, n: int):
     return out
 
 
+# edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:43 +0400 — ALPHA4-PREREG §4(b) AMENDED (§11 finding 1): the read
+# proxy tested heard[-N:] — the N NEWEST, least-exposed words the shelf had read (≥ 0.6 in 2 of alpha4-1's 23 sittings,
+# never two in a row). It is now a FIXED-SEED sample over ALL of read/HEARD.json. The sitter (creature/exam.py) passes
+# «--read-words 50 --read-seed 20260923»; the default seed is the same, so the tool run alone reads what the sitter reads.
+READ_SEED_DEFAULT = 20260923
+
+
+def read_sample(heard, n: int, seed: int = READ_SEED_DEFAULT) -> list:
+    """n words drawn WITHOUT replacement, uniformly over ALL the heard words (first-heard order, distinct — creature/senses/
+    read.py:heard_words), by numpy's PCG64 seeded with `seed`, returned in first-heard order. Deterministic for a given
+    heard list and seed; the oldest words are as likely as the newest. Fewer than n heard -> [] (the share then reads None
+    and the judge's (b) fails closed — a proxy on fewer words than its own n is not the proxy)."""
+    heard = list(heard)
+    n = int(n)
+    if n <= 0 or len(heard) < n:
+        return []
+    idx = np.random.default_rng(int(seed)).choice(len(heard), size=n, replace=False)
+    return [heard[i] for i in sorted(int(i) for i in idx)]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", required=True)
     ap.add_argument("--genome", default=str(ROOT / "genome" / "G4-skeleton.genome"))
     ap.add_argument("--held", type=int, default=run_g1.HELD_N if hasattr(run_g1, "HELD_N") else 10)
     ap.add_argument("--check-tape", type=int, default=400)
-    ap.add_argument("--read-words", type=int, default=0, help="ALPHA4: render the last N words the shelf reader HEARD (read/HEARD.json) in the held-out font and report read_share (None when fewer than N heard)")
+    ap.add_argument("--read-words", type=int, default=0, help="ALPHA4 §4(b): render a fixed-seed sample of N of ALL the words the shelf reader HEARD (read/HEARD.json) in the held-out font and report read_share (None when fewer than N heard)")
+    ap.add_argument("--read-seed", type=int, default=READ_SEED_DEFAULT, help="the --read-words sample's seed (the sitter passes 20260923, the default)")
     a = ap.parse_args()
     root = Path(a.root)
     t0 = time.perf_counter()
@@ -78,19 +128,51 @@ def main() -> int:
     fallback = len(seen_things) < 2
     ask = ask_glances(org, ledgers, things if fallback else seen_things, feats, never, g.ear_blank_zero)
     ask_all = ask_glances(org, ledgers, things + arr2, feats, never, g.ear_blank_zero)
+    # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:12 +0400 — A4-LADDER-PREREG §2.2 task 3:
+    # THE SITTER SITS BOTH LAWS — but only when this genome's ANSWER line actually declares the majority
+    # clause (`recall_many`'s own gate would otherwise never fire, so an "old law" pass would be BYTE-
+    # IDENTICAL to the new one — a wasted second full ask_glances pass on every OTHER rung's and alpha4-1's
+    # own exam duty, which all share this module via creature/exam.py:run_exam). Undeclared: both keys are
+    # still written (#164 — a stable schema every reader can rely on) as None, with the reason on the
+    # sibling `*_old_law_note` field, never silently omitted.
+    seen_for_ceiling = things if fallback else seen_things
+    answer_majority_declared = bool(g.declared.get("ANSWER", {}).get("majority"))
+    ask_old, ask_all_old, lit_counts_seen, old_law_note = None, None, None, None
+    if answer_majority_declared:
+        ask_old = ask_glances(org, ledgers, things if fallback else seen_things, feats, never, g.ear_blank_zero, majority=False)
+        ask_all_old = ask_glances(org, ledgers, things + arr2, feats, never, g.ear_blank_zero, majority=False)
+        # A2's own per-exam ceiling (task 0/5): the lit-glance distribution over the SAME seen canvases Q1
+        # was just read on — forced ON (majority=True) so it reads the count regardless of the genome's own
+        # law (moot here, since the clause IS declared, but keeps this loop's meaning independent of `ask`'s).
+        lit_counts_seen = {}
+        for t in seen_for_ceiling:
+            for xs in feats.get(t, []):
+                r = org.recall_many("sight", xs, majority=True)
+                n_lit = r.get("lit_n")
+                if n_lit is not None:
+                    lit_counts_seen[n_lit] = lit_counts_seen.get(n_lit, 0) + 1
+    else:
+        old_law_note = "ANSWER's majority clause is not declared on this genome — old law == new law by construction, not sat twice"
     landing = run_g1.landing(held_g, things, first=2)
     hash_before = L.get("state_hash") or org.state_hash()
+    # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:39 +0400): the exam by SOUND (V1/V2/V5/V1b) on the
+    # 16 drawn things — None (the key still written, #164) on a genome with no sound area; sat AFTER hash_before, so the
+    # exam's own `organism_hash_unchanged_by_exam` covers it.
+    ask_sound_out = sound_exam(org, ledgers, things + arr2, feats, voiced=voiced_counts(root)) if getattr(org, "sound", None) is not None else None
     # edit: Claude (Fable 5.1), 2026-09-23 03:02 +0400 — ALPHA4 §4(b): the reading share as a TAPE FACT. The sitter (off the mind
-    # thread, on the snapshot) renders the last N HEARD shelf words in the HELD-OUT font (tools/read_recognised.py, builder
+    # thread, on the snapshot) renders N HEARD shelf words in the HELD-OUT font (tools/read_recognised.py, builder
     # H's own mark instrument) and reports the share; the SIT row forwards it and the judge reads the row.
+    # (Opus 5.5, 2026-09-23 11:43 +0400: the N are `read_sample`'s fixed-seed draw over ALL heard words, no longer the last N.)
     read_share, read_words_n, read_words_list = None, int(getattr(a, "read_words", 0) or 0), []
+    read_seed, read_heard_n = int(getattr(a, "read_seed", READ_SEED_DEFAULT)), None
     if read_words_n > 0:
         try:
             from creature.senses.read import heard_words as _heard_words
             from tools.read_recognised import recognised_share as _recognised_share
             heard = _heard_words(root)
-            if len(heard) >= read_words_n:
-                read_words_list = heard[-read_words_n:]
+            read_heard_n = len(heard)
+            read_words_list = read_sample(heard, read_words_n, read_seed)     # AMENDED 2026-09-23: was heard[-read_words_n:]
+            if read_words_list:
                 rs = _recognised_share(root, Path(a.genome), read_words_list)
                 read_share = float(rs.get("share")) if isinstance(rs, dict) and rs.get("share") is not None else None
         except Exception as e:   # a sitter never crashes the voice thread: the field reads None, the reason printed
@@ -103,12 +185,24 @@ def main() -> int:
         "seen_words_fallback_to_all": fallback,
         "disjoint_checked": disjoint_checked, "disjoint_control_caught": caught,
         "ask_seen_words": ask, "ask_all_words": ask_all, "gaze_landing": landing,
+        # A4-LADDER-PREREG §2.2 task 3 — both laws, one snapshot, no replay; None + a note when the clause
+        # is not declared on this genome (#164: the key is always present).
+        "ask_seen_words_old_law": ask_old, "ask_all_words_old_law": ask_all_old,
+        "lit_counts_seen": lit_counts_seen, "answer_majority_declared": answer_majority_declared, "old_law_note": old_law_note,
+        "ask_sound": ask_sound_out,
         "read_share": read_share, "read_words_n": read_words_n, "read_words": read_words_list,
+        "read_seed": read_seed, "read_heard_n": read_heard_n,        # the sample's own numbers beside the share (#164)
         "organism_hash_unchanged_by_exam": org.state_hash() == hash_before, "seconds": round(time.perf_counter() - t0, 1),
     }
     (root / "exam").mkdir(exist_ok=True)
     p = root / "exam" / (datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ") + ".json")
-    p.write_text(json.dumps(out, indent=1, default=str))
+    # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1 (docs/briefs/SEAM5-WITNESS-SOUND-REPORT.md item 2): written
+    # atomically (tmp in the same dir + os.replace, creature/body.py's `_write_status` pattern) so no reader — creature/senses/sit.py's poll,
+    # tools/lives/view.py, tools/verdict_g4.py — can see the empty or partial file write_text left visible between its create and its write.
+    # The `.json.tmp` name matches no reader's `*.json` glob.
+    tmp = p.with_name(p.name + ".tmp")
+    tmp.write_text(json.dumps(out, indent=1, default=str))
+    os.replace(str(tmp), str(p))
     print(json.dumps({k: out[k] for k in ("moments", "cells", "words_seen", "chance_q1", "disjoint_checked", "disjoint_control_caught",
                                           "organism_hash_unchanged_by_exam", "seconds")}, default=str))
     q = ask.get("q1") or ask.get("Q1") or {k: v for k, v in ask.items() if k.startswith("q1")}

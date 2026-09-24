@@ -172,6 +172,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Sonnet 5, ALPHA4 builder G), 2026-09-23 03:05 +0400 — ALPHA4-G.md task 1: one row,
         # matching the genes.py RUNS entry added by this task (docs/ALPHA4-PREREG.md §2/§3).
         "GROW": "GROW     unbounded",
+        # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 12:13 +0400 — A4L-COST: one row, matching the genes.py RUNS entry added by
+        # docs/briefs/A4L-COST.md (the per-row witness made sparse, A4-LADDER-PREREG §2.1).
+        "HASH": "HASH     sparse; dense at snapshot",
         "EXAM": "EXAM     every 2000 canvases",
         "BODY": "BODY     service creature threads eye ear door mind voice",
         "TAPE": "TAPE     run/tape",
@@ -247,6 +250,17 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "DOOR_WEB": "DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD",
         "SENSE_GRADE": "SENSE    grade from ask/graded",
         "STAGE_READY": "STAGE    4 world by READY",
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 12:15 +0400 — A4L-LANG: one row, matching the genes.py RUNS entry
+        # (CHAT). Caught by this test's own gate on the landing's first full-suite run — the omission this class exists to catch.
+        "CHAT": "CHAT     door chat/in chat/out; chain of frames + one pivot slot; links adjacent 5; pivot 10 distinct 20 instants; at most 6 words; a question never teaches",
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 12:14 +0400 — A4L-VOICE (docs/briefs/A4L-VOICE.md): three rows, matching the three
+        # genes.py RUNS entries added by this task. Caught by this test's own gate on the landing's full suite (the fifth builder it caught).
+        "AREA_SOUND": "AREA     sound  from cochlea cos>=0.975",
+        "MEET_SIGHT_SOUND": "MEET     sight  sound",
+        "MEET_SOUND_WORDS": "MEET     sound  words",
+        # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 12:20 +0400 — docs/A4-LADDER-PREREG.md §2.5: one row, matching the
+        # genes.py RUNS entry the rung adds (ACT_VALUE — the second ACT line). Caught by this class on the first landing run.
+        "ACT_VALUE": "ACT      value reward 10; optimism 1",
     }
 
     def test_every_runs_gene_parses(self) -> None:

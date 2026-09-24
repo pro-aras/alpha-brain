@@ -147,6 +147,104 @@ class GradeMark(unittest.TestCase):
         self.assertFalse(grade_mark(unlearned, null, seen, True)["pass"])       # answered 5/10 is the FAIL (L5's cap shape, seam-1's 0/10)
 
 
+# edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:12 +0400 — A4-LADDER-PREREG §2.2 A1/A2
+# (test-first against self_exam.py's own exam shape, task 3/5).
+def _exam(at, spiral_new, spiral_old=None, lit_counts=None, q1_new=None, q1_old=None):
+    """One sitter exam dict, shaped exactly as self_exam.py's `out` (task 3): ask_all_words/Q5/spiral for
+    the spiral clause, ask_seen_words/Q1 + lit_counts_seen for A2's ceiling."""
+    row = {"at": at, "ask_all_words": {"Q5": {"spiral": {"graded": spiral_new}}},
+           "ask_seen_words": {"Q1": {"acc": q1_new}}, "lit_counts_seen": lit_counts or {}}
+    if spiral_old is not None:
+        row["ask_all_words_old_law"] = {"Q5": {"spiral": {"graded": spiral_old}}}
+    if q1_old is not None:
+        row["ask_seen_words_old_law"] = {"Q1": {"acc": q1_old}}
+    return row
+
+
+class AnswerNullMark(unittest.TestCase):
+    """A1 NULL: the sitter's spiral (Q5) at every exam + the reader's one-off vex, both under the same
+    two clauses grade_mark's null half already uses (sure-bare <= 1/10, soft >= 8/10, a tie fails)."""
+
+    def test_not_gradable_when_majority_not_declared(self):
+        from tools.verdict_life import answer_null_mark
+        m = answer_null_mark([_exam("t0", {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0})], None, None, False)
+        self.assertFalse(m["graded"]); self.assertIsNone(m["pass"])
+
+    def test_not_gradable_when_no_exam_carries_q5(self):
+        from tools.verdict_life import answer_null_mark
+        empty = {"at": "t0", "ask_all_words": {"Q5": {}}, "ask_seen_words": {"Q1": {}}, "lit_counts_seen": {}}
+        m = answer_null_mark([empty], None, None, True)
+        self.assertFalse(m["graded"]); self.assertIn("no Q5", m["reason"])
+
+    def test_not_gradable_before_the_reader_has_asked_vex(self):
+        from tools.verdict_life import answer_null_mark
+        clean_spiral = {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0}
+        m = answer_null_mark([_exam("t0", clean_spiral)], None, None, True)
+        self.assertFalse(m["graded"]); self.assertIn("no vex reading", m["reason"])
+
+    def test_passes_when_every_exam_spiral_and_the_final_vex_clear_the_bar(self):
+        from tools.verdict_life import answer_null_mark
+        clean_spiral = {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0}
+        edge_spiral = {"sure_bare": 1, "unsure": 2, "abstain_with_resemblance": 7, "abstain": 0}   # AT the ceiling (1/10 sure-bare)
+        exams = [_exam("t0", clean_spiral), _exam("t1", edge_spiral)]
+        vex_new = {"graded": {"sure_bare": 1, "unsure": 3, "abstain_with_resemblance": 6, "abstain": 0}}
+        m = answer_null_mark(exams, vex_new, {"graded": {"sure_bare": 9, "unsure": 1, "abstain_with_resemblance": 0, "abstain": 0}}, True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"])
+        self.assertTrue(m["spiral_pass"]); self.assertTrue(m["vex_pass"])
+        self.assertEqual(len(m["spiral_per_exam"]), 2)
+        self.assertEqual(m["spiral_per_exam"][1]["old_law_sure_bare"], None)   # no old-law reading passed for that exam
+
+    def test_one_exam_over_the_line_fails_the_whole_mark(self):
+        """A1 is conjunctive across EVERY exam from hour 1 -- one bad reading fails it, not just the latest."""
+        from tools.verdict_life import answer_null_mark
+        clean_spiral = {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0}
+        bad_spiral = {"sure_bare": 9, "unsure": 1, "abstain_with_resemblance": 0, "abstain": 0}     # ALPHA4's own regression shape
+        exams = [_exam("t0", clean_spiral), _exam("t1", bad_spiral, spiral_old=bad_spiral)]
+        vex = {"graded": {"sure_bare": 0, "unsure": 3, "abstain_with_resemblance": 7, "abstain": 0}}
+        m = answer_null_mark(exams, vex, vex, True)
+        self.assertTrue(m["graded"]); self.assertFalse(m["pass"]); self.assertFalse(m["spiral_pass"])
+        self.assertEqual(m["spiral_per_exam"][1]["old_law_sure_bare"], 9)
+
+    def test_vex_tie_fails(self):
+        from tools.verdict_life import answer_null_mark
+        clean_spiral = {"sure_bare": 0, "unsure": 0, "abstain_with_resemblance": 10, "abstain": 0}
+        tie_vex = {"graded": {"sure_bare": 5, "unsure": 3, "abstain_with_resemblance": 2, "abstain": 0}}
+        m = answer_null_mark([_exam("t0", clean_spiral)], tie_vex, tie_vex, True)
+        self.assertFalse(m["vex_pass"]); self.assertFalse(m["pass"])
+
+
+class AnswerSeenMark(unittest.TestCase):
+    """A2 SEEN: graded only from the first exam whose OWN ceiling (share of seen canvases lighting >= 3
+    of the glances asked) reaches 95 % -- an early organism's low share prints Δ, ungraded (#231 (5))."""
+
+    def test_not_gradable_when_majority_not_declared(self):
+        from tools.verdict_life import answer_seen_mark
+        m = answer_seen_mark([_exam("t0", {}, lit_counts={"5": 10}, q1_new=1.0, q1_old=1.0)], False)
+        self.assertFalse(m["graded"])
+
+    def test_not_gradable_below_the_ceiling(self):
+        """task 0's own early-organism reading: 119/160 (74 %) lighting >= 3 -- below the 95 % ceiling."""
+        from tools.verdict_life import answer_seen_mark
+        early = _exam("t0", {}, lit_counts={"1": 34, "2": 7, "3": 5, "4": 7, "5": 107}, q1_new=0.9, q1_old=0.9)
+        m = answer_seen_mark([early], True)
+        self.assertFalse(m["graded"]); self.assertIn("early-organism", m["reason"])
+        self.assertAlmostEqual(m["per_exam"][0]["share"], 119 / 160)
+
+    def test_passes_once_the_ceiling_holds_and_q1_does_not_regress(self):
+        from tools.verdict_life import answer_seen_mark
+        early = _exam("t0", {}, lit_counts={"1": 34, "2": 7, "3": 5, "4": 7, "5": 107}, q1_new=0.9, q1_old=0.9)
+        mature = _exam("t1", {}, lit_counts={"3": 1, "4": 3, "5": 156}, q1_new=0.98, q1_old=0.981)
+        m = answer_seen_mark([early, mature], True)
+        self.assertTrue(m["graded"]); self.assertTrue(m["pass"])
+        self.assertAlmostEqual(m["per_exam"][1]["share"], 1.0)
+
+    def test_fails_when_q1_regresses_past_the_bound_once_the_ceiling_holds(self):
+        from tools.verdict_life import answer_seen_mark
+        mature_regressed = _exam("t0", {}, lit_counts={"3": 1, "4": 3, "5": 156}, q1_new=0.90, q1_old=0.95)
+        m = answer_seen_mark([mature_regressed], True)
+        self.assertTrue(m["graded"]); self.assertFalse(m["pass"])
+
+
 class SelfMark(unittest.TestCase):
     """PREREG §19.6 against builder A's shapes: belief rows whose word starts with `self:`, cells [], episodes = two body-row seqs."""
 
@@ -654,6 +752,174 @@ class WebMark(unittest.TestCase):
         from tools.verdict_life import web_mark
         m = web_mark([_web_row("refused_rate")], [], True)   # 0 MADE fetches -- the law holds even with no stage-4 event
         self.assertTrue(m["graded"]); self.assertTrue(m["pass"])
+
+
+# edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+# (docs/briefs/A4L-DROP.md task 5): drop_mark + annotate_windows, test-first against synthetic exam
+# dicts shaped like tools/self_exam.py's own JSON (genome/questions.py:ask_glances's Q1..Q5 schema).
+# edit: Claude (Fable 5.1), 2026-09-23 14:32 +0400 — renamed at the integration merge: DROP's helper shadowed ANSWER's `_exam` (#239 (1): two builders, one name)
+def _drop_exam(q1, q2=1.0, q3=1.0, q4=1.0, hedge=0.0, snapshot_last_seq=None, spiral_abstain=0.5, window=None):
+    d = {"ask_seen_words": {"Q1": {"acc": q1, "hedge_rate": hedge}, "Q2": {"acc": q2}, "Q3": {"acc": q3}, "Q4": {"acc": q4},
+                             "Q5": {"spiral": {"abstain_rate": spiral_abstain}}},
+         "snapshot_last_seq": snapshot_last_seq}
+    if window is not None:
+        d["window"] = window
+    return d
+
+
+class DropMark(unittest.TestCase):
+    def test_not_gradable_when_undeclared(self):
+        from tools.verdict_life import drop_mark
+        exams = [_drop_exam(0.9, snapshot_last_seq=10), _drop_exam(0.9, snapshot_last_seq=20)]
+        self.assertFalse(drop_mark(exams, exams, [], [], None)["graded"])
+        self.assertFalse(drop_mark(exams, exams, [], [], {"floor": 0.05})["graded"])
+        self.assertFalse(drop_mark(exams, exams, [], [], {"floor": 0.05, "predicted": "mind-cell"})["graded"])
+
+    def test_not_gradable_with_fewer_than_two_exams(self):
+        from tools.verdict_life import drop_mark
+        declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
+        one = [_drop_exam(0.9, snapshot_last_seq=10)]
+        two = [_drop_exam(0.9, snapshot_last_seq=10), _drop_exam(0.9, snapshot_last_seq=20)]
+        m = drop_mark(one, two, [], [], declared)
+        self.assertFalse(m["graded"]); self.assertIsNone(m["pass"]); self.assertIn("1 floor", m["reason"])
+        m2 = drop_mark([], [], [], [], declared)
+        self.assertFalse(m2["graded"])
+
+    def test_graded_claim_holds_q1_within_bar_no_window_data(self):
+        from tools.verdict_life import drop_mark
+        declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
+        floor = [_drop_exam(0.900, snapshot_last_seq=500), _drop_exam(0.920, snapshot_last_seq=1000), _drop_exam(0.930, snapshot_last_seq=1500)]
+        drop = [_drop_exam(0.905, snapshot_last_seq=500), _drop_exam(0.915, snapshot_last_seq=1000), _drop_exam(0.935, snapshot_last_seq=1500)]
+        m = drop_mark(floor, drop, [], [], declared)
+        self.assertTrue(m["graded"])
+        self.assertTrue(m["claim_q1"])
+        self.assertAlmostEqual(m["max_abs_delta_q1"], 0.005, places=3)
+        self.assertFalse(m["retention"]["readable"], "no 'window' key on any exam — retention must read not-readable, never guessed")
+        self.assertIsNone(m["retention"]["pass"])
+        self.assertTrue(m["pass"], "the claim is judged on what IS readable (Q1) when retention has no window-2 pair on this cut")
+        self.assertEqual(len(m["table"]), 3)
+        self.assertEqual(m["table"][0]["Q1"]["floor"], 0.900); self.assertEqual(m["table"][0]["Q1"]["drop"], 0.905)
+        self.assertAlmostEqual(m["table"][0]["Q1"]["delta"], 0.005, places=3)
+
+    def test_graded_claim_fails_when_a_single_exam_exceeds_the_q1_bar(self):
+        from tools.verdict_life import drop_mark
+        declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
+        floor = [_drop_exam(0.900, snapshot_last_seq=500), _drop_exam(0.920, snapshot_last_seq=1000)]
+        drop = [_drop_exam(0.905, snapshot_last_seq=500), _drop_exam(0.870, snapshot_last_seq=1000)]   # 5 pp drop at exam 2
+        m = drop_mark(floor, drop, [], [], declared)
+        self.assertTrue(m["graded"])
+        self.assertFalse(m["claim_q1"])
+        self.assertFalse(m["pass"])
+
+    def test_retention_graded_with_a_window_2_pair(self):
+        from tools.verdict_life import drop_mark
+        declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
+        floor = [_drop_exam(0.90, snapshot_last_seq=500, window=1), _drop_exam(0.85, snapshot_last_seq=1000, window=2), _drop_exam(0.80, snapshot_last_seq=1500, window=2)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500, window=1), _drop_exam(0.85, snapshot_last_seq=1000, window=2), _drop_exam(0.79, snapshot_last_seq=1500, window=2)]
+        m = drop_mark(floor, drop, [], [], declared)
+        self.assertTrue(m["retention"]["readable"])
+        # floor's own change = 100*(0.80-0.90) = -10.0; drop's own change = 100*(0.79-0.90) = -11.0;
+        # delta = -11.0 - (-10.0) = -1.0 -- DROP retained exactly 1 pp worse than FLOOR, AT the bar (>= -1 pp holds, boundary).
+        self.assertAlmostEqual(m["retention"]["floor_change_pp"], -10.0, places=2)
+        self.assertAlmostEqual(m["retention"]["drop_change_pp"], -11.0, places=2)
+        self.assertAlmostEqual(m["retention"]["delta_pp"], -1.0, places=2)
+        self.assertTrue(m["retention"]["pass"])
+        self.assertTrue(m["pass"])
+
+    def test_retention_fails_the_claim_when_delta_below_bar(self):
+        from tools.verdict_life import drop_mark
+        declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
+        floor = [_drop_exam(0.90, snapshot_last_seq=500, window=1), _drop_exam(0.85, snapshot_last_seq=1000, window=2)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500, window=1), _drop_exam(0.60, snapshot_last_seq=1000, window=2)]   # a huge extra retention loss
+        m = drop_mark(floor, drop, [], [], declared)
+        self.assertTrue(m["retention"]["readable"])
+        self.assertLess(m["retention"]["delta_pp"], -1.0)
+        self.assertFalse(m["retention"]["pass"])
+        self.assertFalse(m["pass"], "Q1 alone may still hold, but the conjunctive claim must fail")
+
+    def test_mismatched_snapshot_rows_between_twins_fails(self):
+        from tools.verdict_life import drop_mark
+        declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
+        floor = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.92, snapshot_last_seq=1000)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.92, snapshot_last_seq=1200)]   # exam 1 landed at a DIFFERENT row
+        m = drop_mark(floor, drop, [], [], declared)
+        self.assertTrue(m["graded"])
+        self.assertFalse(m["pass"])
+        self.assertEqual(len(m["mismatched_snapshot_rows"]), 1)
+
+    def test_d4_ms_saved_printed_no_bar(self):
+        # timings.jsonl carries EVERY tape row (ear/outcome/... beside eye) -- a cheap "ear" row mixed in
+        # must NOT dilute the "per-canvas" (per-EYE-row) mean; measured RED first (a plain mean over all
+        # rows read 23.1 ms on the real fixture where the eye-only mean was 58.2 ms) and fixed by
+        # filtering sense=="eye". Half the rows here are "ear" at a very different ms to prove the filter
+        # has teeth.
+        from tools.verdict_life import drop_mark
+        declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
+        floor = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
+        timings_floor = [{"seq": i, "sense": "eye", "ms": 10.0} for i in range(100)] + [{"seq": i, "sense": "ear", "ms": 0.1} for i in range(100)]
+        timings_drop = [{"seq": i, "sense": "eye", "ms": 8.0} for i in range(100)] + [{"seq": i, "sense": "ear", "ms": 0.1} for i in range(100)]
+        m = drop_mark(floor, drop, timings_floor, timings_drop, declared)
+        self.assertAlmostEqual(m["floor_ms_per_canvas"], 10.0, places=3)
+        self.assertAlmostEqual(m["drop_ms_per_canvas"], 8.0, places=3)
+        self.assertAlmostEqual(m["d4_ms_saved_pct"], 20.0, places=2)
+
+    def test_d4_none_when_no_timings(self):
+        from tools.verdict_life import drop_mark
+        declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
+        floor = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
+        m = drop_mark(floor, floor, [], [], declared)
+        self.assertIsNone(m["d4_ms_saved_pct"])
+
+    def test_d4_per_exam_windowed_ms_isolates_the_growth_curve(self):
+        # task 4's own words: "at every exam row print ... the per-canvas ms of both" -- a per-exam
+        # WINDOW (the canvases strictly after the previous exam's own seq, up to this one's), not one
+        # whole-tape mean, which on a growing organism conflates the drop's own effect with WHICH segment
+        # of the (quadratic, M1) growth curve the mean happened to average over. Two windows, each
+        # size-matched (same seq range, both twins): window 1 cheap on both, window 2 expensive on both,
+        # but floor/drop DIFFER within each window -- the windowed reading must isolate exactly that.
+        from tools.verdict_life import drop_mark
+        declared = {"floor": 0.05, "predicted": "mind-cell", "drop": "confirmed"}
+        floor = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
+        drop = [_drop_exam(0.90, snapshot_last_seq=500), _drop_exam(0.90, snapshot_last_seq=1000)]
+        timings_floor = ([{"seq": i, "sense": "eye", "ms": 10.0} for i in range(1, 501)]
+                          + [{"seq": i, "sense": "eye", "ms": 90.0} for i in range(501, 1001)])
+        timings_drop = ([{"seq": i, "sense": "eye", "ms": 9.0} for i in range(1, 501)]
+                         + [{"seq": i, "sense": "eye", "ms": 100.0} for i in range(501, 1001)])
+        m = drop_mark(floor, drop, timings_floor, timings_drop, declared)
+        self.assertAlmostEqual(m["table"][0]["ms_window"]["floor"], 10.0, places=3)
+        self.assertAlmostEqual(m["table"][0]["ms_window"]["drop"], 9.0, places=3)
+        self.assertAlmostEqual(m["table"][1]["ms_window"]["floor"], 90.0, places=3)
+        self.assertAlmostEqual(m["table"][1]["ms_window"]["drop"], 100.0, places=3)
+        # window 2 (drop slower) and window 1 (drop faster) pull the WHOLE-TAPE mean in opposite
+        # directions -- the windowed reading tells them apart, the aggregate cannot.
+        self.assertNotEqual(m["table"][0]["ms_window"]["drop"] < m["table"][0]["ms_window"]["floor"],
+                             m["table"][1]["ms_window"]["drop"] < m["table"][1]["ms_window"]["floor"])
+
+
+class AnnotateWindows(unittest.TestCase):
+    def test_window_resolved_from_the_nearest_maker_row(self):
+        from tools.verdict_life import annotate_windows
+        tape = [
+            {"seq": 1, "meta": {"moment": "w0000i000001t000000000", "source": "maker"}},
+            {"seq": 2, "meta": {"moment": "f abc", "source": "folder"}},          # a folder row: not a window id
+            {"seq": 3, "meta": {"moment": "w0002i000005t000000010", "source": "maker"}},
+        ]
+        exams = [{"snapshot_last_seq": 1}, {"snapshot_last_seq": 2}, {"snapshot_last_seq": 3}]
+        out = annotate_windows(exams, tape)
+        self.assertEqual(out[0]["window"], 0)
+        self.assertEqual(out[1]["window"], 0, "walks BACK to the nearest maker row (seq 2's own moment is not a window id)")
+        self.assertEqual(out[2]["window"], 2)
+        # never mutates the input
+        self.assertNotIn("window", exams[0])
+
+    def test_window_none_when_unresolvable(self):
+        from tools.verdict_life import annotate_windows
+        tape = [{"seq": 1, "meta": {"moment": "f abc", "source": "folder"}}]
+        out = annotate_windows([{"snapshot_last_seq": 1}], tape)
+        self.assertIsNone(out[0]["window"])
+        out2 = annotate_windows([{"snapshot_last_seq": None}], [])
+        self.assertIsNone(out2[0]["window"])
 
 
 class StageMark(unittest.TestCase):

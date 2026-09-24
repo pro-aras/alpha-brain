@@ -1,0 +1,25 @@
+focused 2026-09-23 17:15:39 +0400
+..........[L-4 toy] corrupted-block: fix=[[12, 5], [12, 4], [11, 4], [11, 5]] truth-cell~(79,25) hit-glances=[0, 1, 2, 3] before=[0.0, 0.0007415330638167461, 9.296274514625225e-07, 0.06408742288282632]/[True, True, True, False] after=[0.08371954193109654, 0.09366498216724184, 0.10785331882211557, 0.09547115212064072]/[False, False, False, False]
+.[L-4 toy] repeated-canvas steady-state residual=[0.0, 0.005646129496512442, 0.15559076280298134, 0.08572088654651866] confirmed=[True, True, False, False]
+.[L-4 toy] confirmed rate: real=0.800 shuffled-expectation=0.469
+....[L-4/L-7 pin] life 3a real tape: 2576 mind rows, replay-deterministic, no residual/confirmed/coarse row anywhere (undeclared genes)
+.................................{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.7}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-b1/scratch/tmp/tmpf3e9m0f9/exam/2026-09-23T131923Z.json
+.{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.3}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-b1/scratch/tmp/tmpm4m33tqc/exam/2026-09-23T131927Z.json
+.{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.2}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-b1/scratch/tmp/tmp40cnyvj9/exam/2026-09-23T131931Z.json
+.{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 190, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.3}
+Q1: {"acc": 0.9, "n": 110, "correct": 99, "abstain": {"novel": 4, "noedge": 0, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.045454545454545456, "per_thing": {"circle": 0.5, "square": 0.9, "triangle": 0.8, "cross": 1.0, "ring": 0.8, "bar": 1.0, "dot": 1.0, "star": 1.0, "arrow": 1.0, "wav
+wrote /data/dev/genome-wt-b1/scratch/tmp/tmpo53xakr1/exam/2026-09-23T131936Z.json
+......................s................DIVERGED at seq 204: births
+.REPLAY identical: 202 mind rows
+.
+----------------------------------------------------------------------
+Ran 93 tests in 276.700s
+
+OK (skipped=1)
+exit 0

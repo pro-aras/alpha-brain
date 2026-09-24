@@ -76,6 +76,12 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # untouched, the negative control test_grow_mechanics.py:TestInitialCapacity pins).
         "GROW": "genome/machinery.py:Organism.__init__ (Area/W initial capacity) + Organism._birth (Area.grow()'s doubling, "
                 "Organism._grow_W()'s fixed +2048 chunks — never a births_refused_nmax refusal)",
+        # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:58 +0400 — A4L-COST (docs/briefs/A4L-COST.md; docs/A4-LADDER-PREREG.md
+        # §2.1): HASH's own row — real call sites, all gated on `"HASH" in declared` at Organism.__init__ (an undeclared HASH builds no
+        # witness, and row_hash() is state_hash(), byte-identical — the negative control).
+        "HASH": "genome/machinery.py:Organism.row_hash (the per-row witness: genome/witness.py's SPARSE digest when declared) + "
+                "Organism._hebb/_prune/_merge (mark the rows whose MASK they change) + creature/mind.py's five hashed journal rows; "
+                "Organism.save keeps the DENSE state_hash in the snapshot meta (load's verification chain unchanged)",
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — L-6 (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1/#2): THRESH's own consumer is Organism.moment's push + Organism.own_floor (both gated on
         # `self.sight.own_band is not None`, itself gated on THRESH's own declared presence at __init__); ANSWER's
@@ -85,7 +91,22 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # than imported, since genome/think.py imports machinery.Organism and an import the other way would be
         # circular; raised in the report, not silently substituted).
         "THRESH": "genome/machinery.py:Organism.moment (the own-band push) + Organism.own_floor (its p5)",
-        "ANSWER": "genome/machinery.py:Organism.recall/recall_many (grade/own_floor/resembles_cell on the sight side)",
+        # edit: Claude (Sonnet 5, A4 ladder builder ANSWER), 2026-09-23 12:10 +0400 — A4-LADDER-PREREG.md §2.2: the
+        # OPTIONAL "; sure only when a majority of the glances light" clause is read at the SAME site
+        # (`declared["ANSWER"]["majority"]`, gated inside Organism.recall_many only -- `recall` is untouched by
+        # construction, one glance can never trip a majority gate) -- no new RUNS row, the existing one still names
+        # the real call site truthfully.
+        "ANSWER": "genome/machinery.py:Organism.recall/recall_many (grade/own_floor/resembles_cell on the sight side; "
+                  "recall_many's own majority-of-glances gate — A4-LADDER-PREREG §2.2 — reason \"minority\")",
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400 — A4L-VOICE (docs/briefs/A4L-VOICE.md task 2;
+        # docs/A4-LADDER-PREREG.md §2.3): the sound area and its two meetings — real call sites, each gated on its own declared
+        # presence (an undeclared AREA sound builds no area, no pair; the hash, save/load and every old road untouched).
+        "AREA_SOUND": "genome/machinery.py:Organism.__init__ (the sound Area, THETA_SOUND read) + Organism.moment (x_snd resonated: novelty "
+                      "birth at THETA_SOUND via _theta, the ONE budget, KWTA, GROW) + creature/mind.py:Mind._consume_ear_sound (a maker-moment "
+                      "sound row held pending) / Mind._consume_eye (bound at its canvas)",
+        "MEET_SIGHT_SOUND": "genome/machinery.py:Organism._sound_meets (HEBB/DELTA/MISFIRE/PRUNE/MERGE over the sight-sound _Pair; SCALE in "
+                            "_scale) + Organism.recall/recall_many(to='sound'|'sight') (the exam's ask_sound V1/V2)",
+        "MEET_SOUND_WORDS": "genome/machinery.py:Organism._sound_meets (the sound-words _Pair, the same rules) + Organism.recall(to='words') (V5)",
     },
     # ---------------------------------------------------------------------------------------- the body
     # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1.7 (docs/G4-WAVE3-CLAUSES.md
@@ -98,7 +119,7 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "TAPE": "creature/tape.py:_resolve_tape_dir, read at Body.__init__ / creature/body.py:Body.start's read_tape (declared['TAPE']['path'] resolves the tape directory)",
         "HEART": "creature/body.py:Body.__init__ -> Body._status_loop (declared['HEART']['every_s'] read into self._status_period_s, the STATUS write period)",
         "CRASH": "creature/body.py:_crash_policy, read at Body.__init__ -> SenseThread.run (restart) + Body._handle_mind_crash (page) — declared['CRASH']'s two sub-facts gate each behaviour",
-        "WORLD": "creature/body.py:main (declared['WORLD']['drawn_every_s']/['arrival_every_h'] read into world_maker.sense's period/window_seconds; ['folder'] arms creature/senses/folder.py behind FOLDER_DOOR_GATED)",
+        "WORLD": "creature/body.py:main (declared['WORLD']['drawn_every_s']/['arrival_every_h'] read into world_maker.sense's period/window_seconds; ['folder'] arms creature/senses/folder.py behind FOLDER_DOOR_GATED; ['voice'] (A4L-VOICE, «; voice formant») read by creature/body.py:_maker_sense_fn into world_maker.sense(voice=) -> _publish_canvas publishes the thing's chord as one ear-sound row)",
         "ASK": "creature/ask.py:_ask_refusal, read at answer() (declared['ASK']['verbs'] read; a verb outside it is refused by name instead of reaching the hardcoded `if q == ...` branches)",
         # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K (docs/briefs/G5-K-ACTS-OUTCOME-SIT-BODY.md):
         # SIT and SENSE_BODY are the two body-side rows (sense threads, gated on their own declared presence at
@@ -157,6 +178,10 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # Two real call sites each (Mind.__init__ builds state; Mind._consume_outcome/_consume_sit/_think_pool/
         # _think_work read the declared value or act on the row) — the same two-site shape PREDICT/FAST already use.
         "ACT": "creature/mind.py:Mind._record_reflex (declared['ACT']['verbs'] read; an outcome/sit row's act tagged in/out of the declared vocabulary)",
+        # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:58 +0400 — docs/A4-LADDER-PREREG.md §2.5: the second ACT
+        # line's own key (never ACT's row by its base name — tools/inventory.py falls back to the base, the generic refusal
+        # in Mind.__init__ does not: this row is what lets the rung's organism start).
+        "ACT_VALUE": "creature/mind.py:Mind._maybe_choose_act (declared['ACT_VALUE'] read: window + optimism — the game act's value = its mean reward over its last `window` outcomes, `optimism` for an act with none; undeclared → the outcome-weighted law, unchanged)",
         "OUTCOME": "creature/mind.py:Mind.__init__ (self.outcome_episodes built) + Mind._consume_outcome/_record_reflex (residual computed via a per-act running expectation; written as a reflex episode, ranked by Episodes.most_surprising) + Mind._think_pool/_think_work ('outcome' pool kind)",
         # edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400 — G-EYE-1/G-MIND-1 (docs/briefs/G5-I-SEAM-DELIVER-MOMENT.md):
         # two rows, both real call sites, gated on their OWN declared presence (an undeclared DELIVER never computes seam0; an
@@ -181,7 +206,12 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # `"residual"` back onto the journal row, and passes `confirm=` into `Organism.moment()` (genome/machinery.py)
         # for a glance whose residual is under the declared floor. Undeclared SURPRISE: predicted stays None, every
         # residual is None, confirm is never True — byte-identical to before this gene existed.
-        "SURPRISE": "creature/mind.py:Mind._consume_eye (Organism.expected_sight() + gaze.glances(predicted=) + Organism.moment(confirm=))",
+        # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+        # (docs/briefs/A4L-DROP.md): the "; drop confirmed" sub-clause's own real call site — a CONFIRMED
+        # glance (declared["SURPRISE"]["drop"] == "confirmed") is routed to Organism.tick() instead of
+        # Organism.moment(confirm=); undeclared "drop": every confirmed glance still reaches
+        # Organism.moment(confirm=True) exactly as before this task.
+        "SURPRISE": "creature/mind.py:Mind._consume_eye (Organism.expected_sight() + gaze.glances(predicted=) + Organism.moment(confirm=) | Organism.tick() when declared['SURPRISE']['drop'] == 'confirmed')",
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 19:32 +0400 — L-9 (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #3): SELF's real call sites -- _consume_body records the (reading, seq) pair a "self" pool item
         # compares; _think_pool appends the "self" kind item (kind-fair with word/sight/due/rule/outcome);
@@ -220,6 +250,15 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # (STAGE 1/2/3 here) stays an undeclared, ungated Genome field exactly as before — this row exists
         # only for the NEW `declared["STAGE_READY"]` key the "by READY" grammar writes.
         "STAGE_READY": "creature/mind.py:Mind._consume_sit (THE READINESS JUDGE, ALPHA4-PREREG §4 (a)-(e); commits self.stage=4 via a journal event, never undone)",
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:28 +0400 — A4L-LANG (docs/A4-LADDER-PREREG.md §3.2; docs/briefs/
+        # A4L-LANG.md): the CHAT gene's real call sites — the door (a SENSE, armed by creature/body.py:main behind
+        # CHAT_DOOR_GATED) publishes `chat` rows and kind-chat `grade` rows; the mind routes every `chat` row to ONE
+        # read-only branch (never the MEET road) and counts kind-chat grades apart from the READINESS judge's (d).
+        "CHAT": "creature/mind.py:Mind._consume_chat (glance the canvas, read — never write — the organism: content by recall_many / "
+                "edge_many among named thing-words, frames/links/pivots from the episodes, genome/chain.py's compose + judge, "
+                "chat/out/<id>.json + ONE say row, hash_before == hash_after asserted) + Mind._consume_grade (kind-chat grades "
+                "counted on STATUS, never the READINESS judge's (d)) + creature/body.py:main (declared['CHAT'] arms "
+                "creature/senses/chat.py behind CHAT_DOOR_GATED)",
     },
 }
 
@@ -344,6 +383,9 @@ BOUNDS: Dict[str, dict] = {
     "PARK.reopen_kinds": {"excluded": True, "reason": "not a number — 'reopen on new-sense' is a fixed literal the parser accepts, nothing to mutate"},
     "FROZEN.after": {"excluded": True, "reason": "creature/genes.py RUNS['mind']['FROZEN'] is TWIN-ONLY (read only when 'frozen' in blind) — a live genome never reads it, so a live proposal could never grade a mutation of it"},
     "INDUCE.from_episodes": {"excluded": True, "reason": "named in the brief's own first (pre-exclusion) list but absent from its final 'Mutate RATES and THRESHOLDS only' sentence — read conservatively as not included (raised in the report, not silently guessed)"},
+    # ---- excluded: the A4 ladder's EXPLORE rung (edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:58 +0400) ----
+    "ACT_VALUE.window": {"excluded": True, "reason": "A4L-EXPLORE (A4-LADDER-PREREG §2.5) is a ladder rung whose ONE difference is this line; EVOLVE is #OFF on every rung (§1.2), so nothing here may draw it — a mutable row belongs to a later genome's table, after the rung's verdict"},
+    "ACT_VALUE.optimism": {"excluded": True, "reason": "A4L-EXPLORE (A4-LADDER-PREREG §2.5): as ACT_VALUE.window — the rung's declared law, never mutated inside the experiment that grades it"},
 }
 
 MUTABLE_KEYS: Tuple[str, ...] = tuple(sorted(k for k, v in BOUNDS.items() if not v.get("excluded")))

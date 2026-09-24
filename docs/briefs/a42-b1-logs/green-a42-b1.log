@@ -1,0 +1,13 @@
+GREEN run 2026-09-23 17:15:32 +0400 commit bd68b83+edits load 8.56 7.70 6.66
+....................../data/dev/genome-wt-b1/tools/lives/check.py:149: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-b1/scratch/tmp/tmpxzoxf7bt/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/data/dev/genome-wt-b1/tools/lives/check.py:149: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-b1/scratch/tmp/tmpud6vawk5/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...
+----------------------------------------------------------------------
+Ran 25 tests in 6.532s
+
+OK
+exit 0

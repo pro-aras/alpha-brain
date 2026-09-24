@@ -41,7 +41,7 @@ from __future__ import annotations
 import copy
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -317,3 +317,22 @@ def worker_run(frozen: FrozenThinkInputs) -> Dict[str, object]:
         error = repr(e)
     think_ms = (time.perf_counter() - t0) * 1000.0
     return {"boundary": frozen.boundary, "item": frozen.item, "plan": plan, "error": error, "think_ms": think_ms}
+
+
+# edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M5 (the think thread's real cost): `think_ms` times only decide()
+# on the frozen copy (worker_run above); the FREEZE (freeze_inputs, before the launch) and the APPLY (Mind._think_apply_plan, the
+# ONE-WRITER's real writes) land on the MIND thread and were never timed. Both clocks live HERE (this module may import time;
+# creature/mind.py never does — its no-clock AST law); the mind stores the floats and creature/body.py exports them on STATUS.
+def freeze_inputs_timed(mind: "object", item: Dict[str, object], boundary: int) -> Tuple[FrozenThinkInputs, float]:
+    """(freeze_inputs(...), freeze_ms) — the same frozen copy, plus how long the mind thread spent making it."""
+    t0 = time.perf_counter()
+    frozen = freeze_inputs(mind, item, boundary)
+    return frozen, (time.perf_counter() - t0) * 1000.0
+
+
+def timed_call(fn, *args, **kwargs) -> Tuple[Any, float]:
+    """(fn(*args, **kwargs), ms). The apply cannot move into this module (it performs the mind's real writes and must stay the
+    ONE-WRITER's own method), so the clock read wraps the call from here instead."""
+    t0 = time.perf_counter()
+    result = fn(*args, **kwargs)
+    return result, (time.perf_counter() - t0) * 1000.0

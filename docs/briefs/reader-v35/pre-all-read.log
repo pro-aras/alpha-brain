@@ -1,0 +1,15 @@
+[gather] root /data/dev/scratch-reader35/a4l2-pre-all-copy cut at 1.0 h
+[LAG] LAG: the mind's last consumed seq 1818 (status = ledger = journal) of the tape's 1818: 0 rows / 0.0 world h unconsumed; not cut (the mind reached the read's window); backlog (body rows, n 21): max 0 at 2026-09-23T16:27:30.217Z, last 0, first > 100 never; STATUS backlog 0 (reconciles with the tape: True)
+[ALIVE] False hours 0.339 moved True gaps [5.1, 5.1]
+[solo] 20.91 ms a canvas over the first 1,000 rows, alone
+[twins] 6 replays, 1 workers, slice_seq 1818
+  twin unblinded-1: exit 0
+  twin unblinded-2: exit 0
+  twin blind-chat: exit 0
+  twin blind-ear: exit 0
+  twin blind-sound: exit 0
+  twin T-shuffle-sound: exit 0
+[REPLAY] {'pass': True, 'vs_live': None, 'two_replays': None, 'mind_rows': 1725, 'hash_masked': ['hash'], 'closed_whole': True, 'plant_seq': 507, 'plant_caught': True, 'cut_seq': 1818, 'lag': {'cut_at_mind_last_seq': False, 'mind_last_seq': 1818, 'mind_last_seq_source': 'status = ledger = journal', 'time_cut_seq': 1818, 'tape_head_seq': 1818, 'rows_unconsumed': 0, 'rows_cut_by_lag': 0, 'world_hours_unconsumed': 0.0, 'world_hours_cut_by_lag': 0.0, 'hours_lived': 0.3393, 'mind_last_at': '2026-09-23T16:47:51.486Z', 'tape_head_at': '2026-09-23T16:47:51.486Z', 'backlog_max': 0, 'backlog_max_at': '2026-09-23T16:27:30.217Z', 'backlog_last': 0, 'backlog_last_at': '2026-09-23T16:47:30.301Z', 'backlog_first_over_100': None, 'backlog_body_rows': 21, 'status_backlog_rows': 0, 'backlog_reconciles': True}}
+[LADDER-2] IDENTITY not graded · X1_LOCK not graded · X2_SUCCESS not graded · LINE not graded · NURSERY PASS · NURSERY_READ PASS · DROP_EQ PASS · A1_NULL PASS · A2_SEEN FAIL
+VERDICT FAIL — failed: ['i_knows', 'DOOR', 'PARK', 'EVOLVE', 'SOUND_CELLS', 'READ', 'A2_SEEN', 'ALIVE'] — not gradable: ['ii_meeting_real', 'iii_growth_matters', 'v_retention', 'xi_gaze_earns_place', 'MODULATION', 'ACT', 'SELF', 'SURPRISE', 'COARSE', 'QUESTION', 'SENTENCE', 'HANDS', 'HEAR', 'WEB', 'CHAT', 'HASH', 'IDENTITY', 'X1_LOCK', 'X2_SUCCESS', 'LINE', 'CHAT_COUNTERS', 'TWINS.random_gaze', 'TWINS.no_curiosity', 'TWINS.no_park', 'TWINS.no_sleep_v'] — /data/dev/scratch-reader35/pre-all-read (150.4 s)
+exit 0

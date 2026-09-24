@@ -347,6 +347,11 @@ class Body:
             # edit: Claude (Fable 5.1), 2026-09-22 10:49 +0400 — rows delivered by the senses and not yet consumed: a mind behind its world
             # (g5-seam-1 sat 6,917 rows behind under the readers' load, 2026-09-22 10:34 +04, and no surface said so — #164, #180)
             "mind_backlog_rows": self.q.qsize(),
+            # edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:58 +0400 — A4L-COST task 5: the per-row witness's FORM and its own cost
+            # (ms of the LAST row hash, measured by the organism — genome/witness.py) on EVERY write (#164): "dense" and the dense digest's
+            # ms on a genome that does not declare HASH (the floor), "sparse" and the sparse digest's ms under it; None before any row.
+            "hash_form": str(getattr(org, "hash_form", "dense")),
+            "hash_ms_last": (round(float(v), 3) if (v := getattr(org, "hash_ms_last", None)) is not None else None),
             "rss_mb": round(_rss_mb(), 2), "crash": crash,
             # edit: Claude (Fable 5.1), 2026-09-19 23:17 +0400 — PREREG §11.1 step 3's STATUS fields, written on EVERY status write (#164):
             # the mind computed them (think_counters) and nothing exported them (#163's class: computing and exporting differ).
@@ -362,13 +367,34 @@ class Body:
             # declares ACT's turn/step verbs or FAST's sound key -- those never build the counters at all.
             "acts_chosen": dict(getattr(self.mind, "acts_chosen", {}) or {}),
             "act_mismatches": int(getattr(self.mind, "act_mismatches", 0)),
+            # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:59 +0400 — docs/A4-LADDER-PREREG.md §2.5 (A4L-EXPLORE):
+            # the game chooser's law, its last weights (the VALUES under `ACT value …`) and its 10 % uniform draws — on EVERY
+            # write (#164); None / None / 0 before any choice and on a genome whose ACT drives no game. The counter the
+            # pre-flight reads MOVES (≈ one choice in ten); the weights move as rewards land and as the untried acts are tried.
+            "act_policy": getattr(self.mind, "act_policy", None),
+            "act_weights": (list(w) if (w := getattr(self.mind, "act_weights", None)) is not None else None),
+            "act_explored": int(getattr(self.mind, "act_explored", 0)),
             "sound_events": int(getattr(self.mind, "sound_events", 0)),
+            # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400 — A4L-VOICE (V4, #164): the sound area's born/
+            # alive cells, its budget refusals, and the world's voice rows consumed/bound — on EVERY write, 0 on a genome without
+            # the area (a voice heard and never bound, or a sound area that never births, is the finding a surface must show).
+            "sound_born": int(org.sound.n) if getattr(org, "sound", None) is not None else 0,
+            "sound_cells": int(org.sound.alive.sum()) if getattr(org, "sound", None) is not None else 0,
+            "sound_births_refused": int((getattr(org, "c_sound", None) or {}).get("births_refused_budget_sound", 0)),
+            "voice_rows": int(getattr(self.mind, "voice_rows", 0)),
+            "voice_bound": int(getattr(self.mind, "voice_bound", 0)),
             # edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400 — L-4 (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md
             # §4): the three counters the mind computed and STATUS never carried (#163's class: computing and exporting
             # differ) — on EVERY write (#164), 0 on a genome that never declares SURPRISE.
             "glances_confirmed": int(getattr(self.mind, "glances_confirmed", 0)),
             "glances_surprised": int(getattr(self.mind, "glances_surprised", 0)),
             "births_skipped_confirmed": int(getattr(org, "births_skipped_confirmed", 0)),
+            # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md
+            # §2.4 (docs/briefs/A4L-DROP.md task 5): "glances_dropped" on EVERY write (#164), 0 on a genome
+            # that never declares "; drop confirmed". Must equal glances_confirmed while the clause is
+            # declared (every confirmed glance IS a dropped one under this rung — the same set, by task 2's
+            # own construction); tools/lives/check.py's own print is the live read of that equality.
+            "glances_dropped": int(getattr(self.mind, "glances_dropped", 0)),
             # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:45 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
             # item 2 (G-MOT-1's census shape, never a total, #165): `runs_by_program` is a dict, one count
             # PER PROGRAM; `runs` is its sum, for a reader that wants the total without summing itself.
@@ -387,6 +413,12 @@ class Body:
             "think_wait_ms": round(float(getattr(self.mind, "think_wait_ms", 0.0)), 3),
             "think_ms_last": (round(float(v), 3) if (v := getattr(self.mind, "think_ms_last", None)) is not None else None),
             "think_ms_median": (round(float(v), 3) if (v := self.mind.think_ms_median()) is not None else None),
+            # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M5: the freeze (mind thread, before the launch) and the
+            # apply (mind thread, the ONE-WRITER's writes) are what `think_ms` never timed (review §7); the last value of each, on
+            # EVERY write (#164), None until the threaded road runs (the same getattr-default pattern as think_ms_last above; the
+            # pin tests/creature/test_a4l_cost_marks.py::test_every_status_write_goes_through_the_one_builder covers every write).
+            "think_freeze_ms": (round(float(v), 3) if (v := getattr(self.mind, "think_freeze_ms_last", None)) is not None else None),
+            "think_apply_ms": (round(float(v), 3) if (v := getattr(self.mind, "think_apply_ms_last", None)) is not None else None),
             # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE):
             # the mind computes these (creature/mind.py:_consume_proposal/_maybe_adopt_evolve_proposal) and
             # nothing exported them (#163's class) — on EVERY write (#164), 0 on a genome that never
@@ -407,6 +439,8 @@ class Body:
             # features) applies here exactly as it did to every other counter in this method — costs
             # nothing to also export it.
             "web_refused_hold": int(getattr(self.mind, "web_refused_hold", 0)),
+            # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG task 10: the ten chat keys (#164)
+            **_chat_status(self.mind),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:
@@ -549,6 +583,47 @@ def _declared_lexicon_config(declared: Dict[str, dict]) -> Optional[Dict[str, ob
     return declared.get("DOOR_LEXICON")
 
 
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG task 2 (docs/briefs/A4L-LANG.md; A4-LADDER-PREREG
+# §3.2 item 1): the chat door's arming, mirroring _declared_read_config's shape and gate discipline exactly (C2/C3's
+# convention); `_chat_sense_fn` is the partial main() hands add_sense, factored out so a test pins its LAST link — the
+# keywords the door actually receives (#180; builder I's web door once lacked `root` and restarted every second).
+def _declared_chat_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """CHAT undeclared -> None (arms nothing). Declared -> its own parsed dict, gated on
+    creature.senses.chat.CHAT_DOOR_GATED so a genome line arms nothing until the code carrying it exists."""
+    from .senses import chat as chat_sense   # lazily, same discipline as read/lexicon above
+    if not chat_sense.CHAT_DOOR_GATED:
+        return None
+    return declared.get("CHAT")
+
+
+def _chat_sense_fn(root: Path, chat_cfg: Dict[str, object], canvas: int, letters: int, period: Optional[float] = None):
+    """The chat door's sense as main() arms it: the door watches `root / <CHAT's in path>`; the canvas is the GAZE
+    canvas the eye reads; `letters` is the EAR's own limit (never a second number invented here)."""
+    import functools
+    from .senses import chat as chat_sense
+    return functools.partial(chat_sense.sense, root=Path(root), in_dir=Path(root) / str(chat_cfg["in"]), canvas=int(canvas),
+                             letters=int(letters), period=float(period if period is not None else chat_sense.DEFAULT_PERIOD_S))
+
+
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG task 10: the ten chat counters, on EVERY STATUS
+# write (#164) through `_build_status` (the one builder the status loop, the crash page and stop() all use) — zeros and
+# None on a genome that never declares CHAT (the mind's `chat_counters` exists on every Mind; getattr covers an older one).
+CHAT_STATUS_KEYS = ("chats", "chat_answered", "chat_abstained", "chat_refused_form", "chat_refused_content",
+                    "chat_words_mean", "chat_longest", "chat_graded", "chat_graded_right", "chat_graded_novel")
+
+
+def _chat_status(mind) -> Dict[str, object]:
+    c = dict(getattr(mind, "chat_counters", {}) or {})
+    answered = int(c.get("answered", 0))
+    return {
+        "chats": int(c.get("chats", 0)), "chat_answered": answered, "chat_abstained": int(c.get("abstained", 0)),
+        "chat_refused_form": int(c.get("refused_form", 0)), "chat_refused_content": int(c.get("refused_content", 0)),
+        "chat_words_mean": (round(int(c.get("words_total", 0)) / answered, 4) if answered else None),
+        "chat_longest": int(c.get("longest", 0)), "chat_graded": int(c.get("graded", 0)),
+        "chat_graded_right": int(c.get("graded_right", 0)), "chat_graded_novel": int(c.get("graded_novel", 0)),
+    }
+
+
 # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:5x +0400 — ALPHA4-H task 0 (docs/briefs/ALPHA4-H.md;
 # ALPHA4-H-REPORT.md's own numbers): factored out of main() so the production decision itself (two-moment
 # by default) has a direct pin, the same convention `_plant_after_from_argv` above already uses.
@@ -612,8 +687,12 @@ def _maker_sense_fn(argv: List[str], declared: Dict[str, dict], root: Path):
     maker_period = float(argv[argv.index("--maker-period") + 1]) if "--maker-period" in argv else default_period
     window_seconds = float(argv[argv.index("--window-seconds") + 1]) if "--window-seconds" in argv else default_window_s
     plant_after = _plant_after_from_argv(argv, world_maker.PLANT_AFTER_CANVASES)
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:35 +0400 — A4L-VOICE task 1: WORLD's «; voice formant» reaches
+    # the maker's partial as `voice=` ONLY when declared, so every genome without the clause gets exactly the partial it always did.
+    voice = (declared.get("WORLD") or {}).get("voice")
+    extra = {"voice": voice} if voice else {}
     return functools.partial(world_maker.sense, root=root, period=maker_period, window_seconds=window_seconds,
-                             plant_after_canvases=plant_after)
+                             plant_after_canvases=plant_after, **extra)
 
 
 # ============================================================================ CLI
@@ -678,7 +757,10 @@ def main(argv: List[str]) -> int:
             read_sense_module.sense, shelf_db=str(shelf_override or read_cfg["shelf"]),
             curriculum_md=str(curriculum_override or read_cfg["curriculum"]), root=root, canvas=read_canvas,
             period=float(read_cfg["every_s"]), words=int(read_cfg["words"]), letters=int(genome_for_cli.ear_letters),
-            one_word_moments=read_one_word_moments)
+            one_word_moments=read_one_word_moments,
+            # edit: Claude (Sonnet 5, ALPHA4-2 builder B3), 2026-09-23 17:2x +0400 — A42-B3 task 2: SENSE_READ's optional
+            # sixth key, absent -> False (today's behaviour, byte-identical).
+            gutenberg_body_only=bool(read_cfg.get("gutenberg_body_only")))
         body.add_sense("read", rfn)
 
     # edit: Claude (Sonnet 5, ALPHA4 builder H), 2026-09-23 01:2x +0400 — ALPHA4-H task 3 (docs/briefs/
@@ -695,6 +777,13 @@ def main(argv: List[str]) -> int:
             lexicon_sense_module.sense, sqlite_path=str(lexicon_override or lex_cfg["sqlite"]), root=root,
             canvas=lex_canvas, period=1.0, words=8, letters=int(genome_for_cli.ear_letters))
         body.add_sense("lexicon", lfn)
+
+    # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG task 2: the chat door, armed from the CHAT line
+    # behind CHAT_DOOR_GATED like the reader; the canvas is the GAZE canvas, the letters the ear's own limit.
+    chat_cfg = _declared_chat_config(declared)
+    if chat_cfg is not None:
+        body.add_sense("chat", _chat_sense_fn(root, chat_cfg, canvas=int(genome_for_cli.gaze["canvas"]) if genome_for_cli.gaze else 128,
+                                              letters=int(genome_for_cli.ear_letters)))
 
     # edit: Claude (Sonnet 5, G5 builder L), 2026-09-21 22:1x +0400 — docs/briefs/G5-L-BABYAI-WORLD-EAR.md
     # item 2: the sound ear, listening AT THE SAME FOLDER DOOR the picture sense watches (the brief's own

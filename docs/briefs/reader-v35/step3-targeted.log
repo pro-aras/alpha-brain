@@ -1,0 +1,38 @@
+............................./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpg8jqpxkz/bad/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp3_t2ubik/old/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpxt1o5klo/nog/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpzrarmezb/eq/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpmfdyths4/ne/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpt2odc8tg/env/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp64zlh0qo/und/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpuyo16y0x/und-drop/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+........./data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpggtvv2lg/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp6d16pi_u/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...../data/dev/genome-wt-reader35/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpsgk77yl2/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.............................................................................................................................................................................................................
+----------------------------------------------------------------------
+Ran 255 tests in 45.630s
+
+OK

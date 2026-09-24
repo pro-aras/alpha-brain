@@ -1,3 +1,8 @@
+# edit: Claude (Opus 5.5, A4 ladder builder COST), 2026-09-23 11:58 +0400 — A4L-COST (docs/briefs/A4L-COST.md; A4-LADDER-PREREG §2.1): the five hashed journal rows (the canvas row, a
+# sight-only canvas, the coarse row, the epoch row, the sleep row) read `self.org.row_hash()` — the ONE per-row witness the genome
+# declares (dense = the digest they always carried; sparse under HASH). This file still reads no clock: the organism times its witness.
+# edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M3 (one hash per canvas): the coarse row now CARRIES its canvas row's digest
+# (`_row_digest()` / `_coarse_row(digest=)`) instead of hashing the same state one statement later — four hashed rows are computed, five carried.
 # edit: Claude (Sonnet 5, builder E), 2026-09-21 16:58 +0400 — G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md):
 # PREDICT's word encoding (`xw`) hoisted above the error() call and passed through (word=, xw=, episodes=)
 # so arms "conjunctive"/"episodic"/"comparator" (genome/predict.py) can read them; the default "novelty"
@@ -58,6 +63,10 @@ from genome.predict import Predictor, file as predict_file, score as predict_sco
 from creature.tape import _resolve_tape_dir   # W3-0b seam: the mind reads payloads where the genome says the tape is
 from genome.questions import build_ledgers, why as questions_why
 from genome.sentence import find_frames
+# edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG (A4-LADDER-PREREG §3.2): the composer/judge/thing-words (pure readers), called
+# through the MODULE (`_chain.compose`, never a bare import) so a planted test double reaches the live branch.
+from genome import chain as _chain
+from genome.questions import word_cells
 from genome.sleep import cycle as run_cycle, sleep as run_sleep
 from genome.world import encode_word
 
@@ -119,6 +128,75 @@ SOUND_TRAIT_DIM = 37
 TOUCH_TRAIT_DIM = 5
 SMELL_TRAIT_DIM = 4
 TOUCH_SMELL_EPISODES_CAP = OUTCOME_EPISODES_CAP
+
+# edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:40 +0400 — ALPHA4-PREREG §4 AMENDED (§11 finding 1; branch
+# judge-units-0923, HELD for alpha4-2). THE READINESS JUDGE's clause (a) in the units of its own null: success per COMPLETED
+# EPISODE. The null is L-8's random worker, measured by G5-G (/data/dev/game-worlds/REPORT-G5-G.md §4.1: uniform over the 7
+# acts, 100 episodes, seeds 101-200, max_steps 64 → success 0.29 per episode). A judge's number, sealed like the judge (§2),
+# never a gene. The bound is COMPUTED from the three (never typed): 10 of 20.
+READY_A_WINDOW = 20        # completed game episodes in (a)'s window — N, fixed and printed on every readiness row
+READY_A_NULL = 0.29        # the random worker's success per episode (L-8's own figure)
+READY_A_ALPHA = 0.05       # the null's one-sided band
+
+
+def binomial_tail(n: int, p: float, k: int) -> float:
+    """P(Binomial(n, p) >= k), exact (math.comb, fsum). Factored out of binomial_bound (below) so family_wise_bound
+    (below) can share it — the same arithmetic, never retyped."""
+    from math import comb, fsum
+    return fsum(comb(n, j) * p ** j * (1.0 - p) ** (n - j) for j in range(k, n + 1))
+
+
+def binomial_bound(n: int, p: float, alpha: float) -> int:
+    """The smallest k with P(Binomial(n, p) >= k) <= alpha — the least number of successes in n trials that a policy no
+    better than the null reaches with probability at most alpha. Exact; n + 1 when even k = n is not rare enough (never,
+    for n >= 1 and p < 1). binomial_bound(20, 0.29, 0.05) == 10: P(X >= 10) = 0.0385, P(X >= 9) = 0.0948. This is the
+    SINGLE-READING bound — right for a judge read ONCE, wrong for one read at every sitting on an overlapping window
+    (see family_wise_bound and READY_A_BLOCK_K below, ALPHA4-2-PREREG §4.3)."""
+    for k in range(n + 2):
+        if binomial_tail(n, p, k) <= alpha:
+            return k
+    return n + 1
+
+
+READY_A_BOUND = binomial_bound(READY_A_WINDOW, READY_A_NULL, READY_A_ALPHA)
+
+
+# edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3 (§0.4 finding 5; recommended
+# by the designer, adopted by the orchestrator under Ahmad's 2026-09-05 delegation). THE FLAW: (a) was read at EVERY
+# sitting on a SLIDING window of the last READY_A_WINDOW completed episodes (READY_A_BOUND computed above), so the 5%
+# bound holds for ONE reading only; over a 24 h life (~30-45 sittings, each an overlapping window) a policy exactly at
+# the null clears it somewhere ~23% of the time (six times the stated alpha) — a family-wise-error problem, #162/#215's
+# class. THE FIX: (a) now reads DISJOINT blocks of READY_A_WINDOW completed mind-chosen episodes — block j = episodes
+# 20j+1 .. 20j+20 in the order they completed (never overlapping) — against a HIGHER k chosen so the FAMILY-WISE rate
+# over the blocks a 24 h life can complete at the null's pace stays under alpha.
+def family_wise_bound(n: int, p: float, alpha: float, blocks: int) -> int:
+    """The smallest k with the FAMILY-WISE rate over `blocks` independent disjoint n-trial blocks —
+    1 - (1 - P(Binomial(n, p) >= k))**blocks — <= alpha. At the adopted parameters (20, 0.29, 0.05, 2) this is 11: the
+    single-block tail at k=11 is 0.0132 (binomial_bound's own k=10 gives 0.0385), and the family-wise rate over the ~2
+    blocks a 24 h life completes at the null's pace is 1-(1-0.0132)**2 = 0.0262 (k=10's family-wise rate, 0.0755, is
+    ABOVE alpha — why k moved). A real function of the null (never a typed 11): family_wise_bound(20, 0.5, 0.05, 2) ==
+    15, a different k at a different null."""
+    for k in range(n + 2):
+        family = 1.0 - (1.0 - binomial_tail(n, p, k)) ** blocks
+        if family <= alpha:
+            return k
+    return n + 1
+
+
+# The blocks a 24 h life completes at the null's pace: the game steps every 30 s (~2,880 steps/24h) and a policy at
+# READY_A_NULL averages ~54 steps/episode (A4L-EXPLORE-TOY §3), so ~53 episodes/24h ~= 2 full 20-episode blocks
+# (ALPHA4-2-PREREG §4.3's own words: "the blocks a 24 h life can complete (2 at the null's rate)"). Not a general
+# claim about every success rate (a policy near the state-blind ceiling finishes episodes faster and completes MORE
+# than 2 blocks/24h — §4.3's own table — which is why this constant is scoped to the null's own pace, the rate (a)'s
+# false-positive risk is actually judged against).
+READY_A_BLOCKS_PER_LIFE = 2
+READY_A_BLOCK_K = family_wise_bound(READY_A_WINDOW, READY_A_NULL, READY_A_ALPHA, READY_A_BLOCKS_PER_LIFE)
+# The SINGLE-BLOCK tail at k = READY_A_BLOCK_K (0.0132) — what `p_null_at_k` prints on every readiness row. Distinct
+# from the FAMILY-WISE rate over READY_A_BLOCKS_PER_LIFE blocks (0.0262, computed above, never stored) that is the
+# actual reason k = 11 was chosen over k = 10 — a single-block tail answers "how surprising is THIS block", the
+# family-wise rate answers "how surprising is a life containing this block among others" (#162's unit-mismatch class:
+# these are two different statistics and neither may stand in for the other unlabelled).
+READY_A_BLOCK_P_NULL = binomial_tail(READY_A_WINDOW, READY_A_NULL, READY_A_BLOCK_K)
 
 
 def _bind_pool(feats: List[np.ndarray]) -> List[np.ndarray]:
@@ -309,6 +387,12 @@ class Mind:
             else None
         )
         self.sound_events: int = 0
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:32 +0400 — A4L-VOICE: the maker's sound rows held until
+        # their canvas's eye row (moment -> {"trait", "seq"}), and two counts on STATUS on every write (#164): maker sound rows
+        # consumed (`voice_rows`) and bound at a canvas (`voice_bound`) — a voice that is heard but never bound is the finding.
+        self.pending_sound: Dict[str, Dict[str, object]] = {}
+        self.voice_rows: int = 0
+        self.voice_bound: int = 0
         # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # items 3/4: touch/smell's own dedicated rings (see the module-level comment on TOUCH_TRAIT_DIM
         # above for why they are not self.outcome_episodes). Gated on their own SENSE_TOUCH/SENSE_SMELL
@@ -394,6 +478,12 @@ class Mind:
         self.think_waits: int = 0
         self.think_wait_ms: float = 0.0
         self.think_ms_last: Optional[float] = None
+        # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M5: the freeze (before the launch) and the apply (the
+        # ONE-WRITER's real writes) land on the MIND thread and `think_ms` (decide() on the frozen copy) never saw them; both are timed
+        # by creature/think_thread.py (this file reads no clock — test_mind_has_no_clock), the last value of each exported by
+        # creature/body.py:_build_status as think_freeze_ms / think_apply_ms on every STATUS write (#164). None until the road runs.
+        self.think_freeze_ms_last: Optional[float] = None
+        self.think_apply_ms_last: Optional[float] = None
         self._think_ms_history: List[float] = []
         # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
         # (L-8): the game's own act-choosing policy. `_act_policy_on` is the SAME gate creature/body.py's
@@ -411,7 +501,23 @@ class Mind:
         self._act_choices: Dict[int, Dict[str, object]] = {}
         self.acts_chosen: Dict[str, int] = {}
         self.act_mismatches: int = 0
+        # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:59 +0400 — docs/A4-LADDER-PREREG.md §2.5 (A4L-EXPLORE): the
+        # declared VALUE law of the game act chooser (`ACT value reward <n>; optimism <f>` → declared["ACT_VALUE"]); None →
+        # the outcome-weighted law, byte-identical. `act_policy`/`act_weights`/`act_explored`: the law the last choice used,
+        # its weights as journaled, and the choices drawn by the 10 % uniform branch — STATUS on every write (#164), never
+        # read by the mind itself (the journal is unchanged by them).
+        self._act_value: Optional[Dict[str, object]] = self.genome.declared.get("ACT_VALUE")
+        self.act_policy: Optional[str] = None
+        self.act_weights: Optional[List[float]] = None
+        self.act_explored: int = 0
         self._canvas_index: int = 0
+        # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M3 (one hash per canvas): `_row_digest()` records the
+        # moment count its digest witnessed; `_coarse_row` reuses the canvas row's digest only while `org.t` still equals it, else
+        # REFUSES (recomputes) and counts here — 0 on every live road (tests/creature/test_a42_b1.py's seam scan pins that nothing
+        # between the two rows touches the organism); a test's planted moment between them makes it 1. Not on STATUS: a counter that
+        # can only read 0 on a live body is not printed (tools/lives/check.py's own rule).
+        self._row_digest_t: int = -1
+        self.hash_reuse_refused: int = 0
         self._filed_predictions: list = []          # [{"row": FILE's row dict, "due_canvas": int}, ...] awaiting the next showing of their word
         # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2 (docs/G4-WAVE3-CLAUSES.md):
         # words/pairs with a currently FILED-but-not-yet-SCORED rule, so _think_pool never re-files the
@@ -432,6 +538,13 @@ class Mind:
         # this brief owns is unaffected).
         self.glances_confirmed: int = 0
         self.glances_surprised: int = 0
+        # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+        # (docs/briefs/A4L-DROP.md task 5): every glance actually DROPPED (never reached Organism.moment()
+        # at all — the "; drop confirmed" clause's own cheap moment, one call to Organism.tick() instead).
+        # 0 forever when "drop confirmed" is undeclared (byte-identical to before this task, same class of
+        # gap as glances_confirmed/glances_surprised immediately above — NOT persisted at resume, see the
+        # comment on those two).
+        self.glances_dropped: int = 0
         self._confirmed_episodes: set = set()
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:05 +0400 — D-G12/W3-1 (docs/G4-WAVE3-CLAUSES.md):
         # revisits/extensions/clashes, coded against Builder B's believe() "kind" interface before it lands
@@ -517,6 +630,24 @@ class Mind:
         self._last_words_in_instant: List[str] = []    # L-11 task 4 (MOUTH): this canvas's own words, read by _maybe_say
         self._last_glance = None                        # L-11 task 4 (MOUTH): this canvas's own first glance
         self.moment_word: Dict[int, str] = {}              # org.t (per GLANCE, before increment) -> word — build_ledgers' input
+        # edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — A42-B2 PART 2 (ALPHA4-2-PREREG §2.5 "B2 birth-source
+        # ledger"): the words heard while a PICTURE-source canvas (genome/chain.py:PICTURE_SOURCES) was shown, first-heard order,
+        # each once, ONLY GROWING — written in _consume_eye from the eye row's own `meta["source"]` and the instant's (post-blind)
+        # words, the same two facts FAST's ring keeps per episode, so before the ring wraps `set(picture_words) ==
+        # chain.heard_on_pictures(episodes)` exactly (proven on the hour-1 fixture, A42-B2-REPORT) and after it the ledger still
+        # holds what the ring evicted (≈ hour 11.6 of a 24 h life). A LEDGER, like moment_word: persisted in the snapshot's
+        # ledger.json (never org.c, never the births log — both hashed), restored by resume(); read by chain.thing_words(rule=
+        # "ledger", THING_WORD_RULE since 17:5x) through _chat_content, the ring rule and the twin printed beside it on the say
+        # row. A snapshot from before this key resumes EMPTY, never back-filled from the ring.
+        self.picture_words: List[str] = []
+        self._picture_words_set: set = set()
+        # The OTHER half of the same attribution (the PREREG's own name for B2, "the birth-source ledger"): sight cell -> the
+        # source of the canvas it was FIRST born on ("sleep" for a birth inside the sleep replay), written at the birth, on the
+        # three roads that birth (the worded canvas, the sight-only canvas, the sleep step). chain.birth_sources() derives the same
+        # map from the RING (a birth older than the oldest live episode reads "?" — so after the wrap even the LITERAL set forgets
+        # the picture-born cells; the toy's control shows it); this ledger is what rule "ledger" reads instead. Agreement with the
+        # ring on the hour-1 fixture: every sight cell, A42-B2-REPORT.
+        self.birth_source: Dict[int, str] = {}
         self.last_seq: int = 0
         self.sight_only_skipped: int = 0
         self.journal_rows_written: int = 0
@@ -533,11 +664,12 @@ class Mind:
         # fresh Organism starts at t=0, so this reads 1 here; `consume()` recomputes it on every row
         # (org.t only ever increases, so this is a monotonic, idempotent refresh, exactly like
         # `stage2_start` is already recomputed from the genome on demand). A "by READY" stage (STAGE_READY
-        # declared) is committed permanently by `_maybe_advance_stage` once §4 (a)-(e) all hold on two
-        # consecutive EXAM boundaries -- "never undone by the mind" (the brief's own words): nothing here
-        # ever LOWERS self.stage.
+        # declared) is committed permanently by `_maybe_advance_stage` once §4 (a)-(e) all hold on ONE
+        # readiness reading at an EXAM boundary (edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:40 +0400 — §4
+        # AMENDED: the streak defined once; each clause spans its own horizon, so the old «two consecutive»
+        # counter, `_stage_ready_streak`, is gone) -- "never undone by the mind" (the brief's own words): nothing
+        # here ever LOWERS self.stage.
         self.stage: int = self._moments_stage()
-        self._stage_ready_streak: int = 0
         # (d): the seat's grades (`grade` tape rows, creature/senses/grade.py) -- ALL of them (since
         # birth, the PREREG's own words), plus the RIGHT flag of the last 10 flagged `novel` (a picture
         # this mind had never seen; "right" there means "correctly said I don't know", the grade
@@ -548,28 +680,46 @@ class Mind:
         # (e): the hold flag, from `hold` tape rows (the SAME grade sense, on every change, including the
         # very first observation — creature/senses/grade.py's own docstring).
         self._hold_active: bool = False
-        # (a): the mind-chosen game rewards, the last 200 of them (condition (a)'s own window) -- appended
-        # in `_consume_outcome` below, gated the SAME way `_check_act_mismatch` already is
-        # (source=="game" and chosen_by=="mind").
-        self._game_rewards: "collections.deque[float]" = collections.deque(maxlen=200)
+        # (a) (edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:40 +0400 — §4 AMENDED: per EPISODE, never per act;
+        # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: DISJOINT blocks, never
+        # a sliding deque). Three fields replace the old sliding `_game_episodes` deque:
+        #   _game_last_episode_step: the (episode, step) of the last COUNTED terminal row — the dedup guard the deque's
+        #     own [-1] used to serve (a sense restart between a publish and its cursor write re-publishes that step,
+        #     #230's cursor law; the SAME row twice must count once).
+        #   _game_block_n / _game_block_successes: episodes counted toward the block CURRENTLY being filled (0..19) and
+        #     its successes so far. Meaningful only before the FIRST block ever completes — once any block has, these
+        #     reset to 0 after each completion and are never read for the reported (a) numbers again (the reading pins
+        #     to _game_last_block below; #180's law: a value computed is not a value read unless something reads it).
+        #   _game_last_block: the latest COMPLETE block, {"block_index": int, "successes": int} — locked in the instant
+        #     it completes (in _consume_outcome), never mutated again except to be REPLACED wholesale when the NEXT
+        #     block completes ("a block once read is never re-read with a different verdict", §4.3).
+        # All persisted in the snapshot ledger (game_last_episode_step/game_block_n/game_block_successes/game_last_block)
+        # so a resumed mind reads the same blocks (replay purity) — see snapshot()/resume() below.
+        self._game_last_episode_step: "Optional[Tuple[object, object]]" = None
+        self._game_block_n: int = 0
+        self._game_block_successes: int = 0
+        self._game_last_block: "Optional[Dict[str, int]]" = None
         # (c): the last TWO `sit` rows' (score, composite) pairs -- `score` is the existing SIT payload
         # (Q1's own accuracy, `creature/senses/sit.py`'s own `_score_of`); `composite` is a NEW field that
         # module's `sense()` gains in this same brief (`_composite_of`) so this judge can read §4(c)'s
         # OTHER number from tape facts too — an older `sit` row (before that field existed) carries no
         # `composite` key, read as None, which fails (c) honestly rather than fabricating a pass.
         self._sit_readings: "collections.deque[tuple]" = collections.deque(maxlen=2)
-        # (b)'s second half is RAISED — see `_read_proxy`'s own docstring below and the builder report.
-        # `_read_proxy_override`: NEVER set by production code; a test pokes this attribute directly so
-        # the streak/commit machinery (conditions a, c, d, e plus (b)'s frame half) can be proven
-        # independently of the one permanently-open question, and so a SIXTH test can prove the judge
-        # stays fail-closed with the override absent (the honest, shipped behaviour).
-        self._read_proxy_override: Optional[bool] = None
+        # (b)'s read half was RAISED when this judge landed and RESOLVED at integration (the sitter's `read_share`, a
+        # TAPE FACT on the SIT row). edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:40 +0400 — the test-only
+        # `_read_proxy_override` that let a test force this door clause True is REMOVED (a production attribute that can
+        # force an internet-door clause is #180's class); tests feed SIT rows that carry `read_share` instead.
         # WEB (I): fetch/refusal counters from `web` tape rows (creature/senses/web.py) — on STATUS on
         # every branch (#164), and the hold flag above doubles as STATUS.web_hold (the SAME `_hold_active`
         # (e) reads — one fact, one name, never two counters that could disagree, #180).
         self.web_fetches: int = 0
         self.web_refused_rate: int = 0
         self.web_refused_hold: int = 0
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG task 10: the chat counters (STATUS's ten chat keys via
+        # creature/body.py:_chat_status, on every write — #164). Present on EVERY Mind (zeros unless CHAT is declared).
+        self.chat_counters: Dict[str, int] = {"chats": 0, "answered": 0, "abstained": 0, "refused_form": 0,
+                                               "refused_content": 0, "words_total": 0, "longest": 0,
+                                               "graded": 0, "graded_right": 0, "graded_novel": 0}
 
         (self.run_root / "journal").mkdir(parents=True, exist_ok=True)
         (self.run_root / "state").mkdir(parents=True, exist_ok=True)
@@ -615,7 +765,10 @@ class Mind:
         # :244-257"). Gates itself on FAST's own "sound" key (self.sound_episodes is None otherwise), the
         # same one-row-carries-no-work-until-armed law every other new sense here already follows.
         elif sense == "ear-sound":
-            self._consume_ear_sound(row)
+            # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:32 +0400 — A4L-VOICE task 3: `--blind sound` (the V3
+            # twin) steps every sound row over whole — no FAST episode, no pending sound, no journal row.
+            if "sound" not in self.blind:
+                self._consume_ear_sound(row)
         # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
         # items 3/4: the two new tape senses (touch/smell), same one-row-carries-no-work-until-armed law.
         elif sense == "touch":
@@ -636,6 +789,11 @@ class Mind:
             self._consume_hold(row)
         elif sense == "web":
             self._consume_web(row)
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG task 3 (A4-LADDER-PREREG §3.2 item 2): a `chat` row goes to ONE
+        # read-only branch and NEVER into the MEET road (it is never an ear/eye row, so pending/moment_word/org.t/
+        # _canvas_index/ARRIVAL/FAST/THINK/SLEEP are never reached from it) — gated inside on CHAT's own presence.
+        elif sense == "chat":
+            self._consume_chat(row)
         # a "door" row (the ask door / other senses not yet armed) carries no organism work here
         self.last_seq = int(row["seq"])
         # ALPHA4-PREREG.md §3: self.stage only ever RISES here (org.t is monotonic; a committed "by READY"
@@ -702,12 +860,38 @@ class Mind:
             result = dict(result)
             result["act_mismatch"] = self._check_act_mismatch(meta)
             # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §4(a):
-            # THE READINESS JUDGE's own window — "the mind-chosen acts' reward over the last 200 acts".
-            # The SAME gate the mismatch check above already uses (source=="game" and chosen_by=="mind"),
-            # so a scheduled/worker-chosen act (no ACT gene driving the game yet) never counts toward it.
-            got = meta.get("got")
-            if got is not None:
-                self._game_rewards.append(float(got))
+            # THE READINESS JUDGE's own window. The SAME gate the mismatch check above already uses
+            # (source=="game" and chosen_by=="mind"), so a scheduled/worker-chosen act never counts toward it.
+            # edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:40 +0400 — §4 AMENDED (§11 finding 1): per EPISODE.
+            # An episode is COMPLETED by the outcome row whose own `terminated` or `truncated` is true (the worker's
+            # gymnasium flags, creature/senses/game.py) and succeeded iff THAT row's own reward `got` > 0 — BabyAI pays
+            # reward only on a successful terminal step (1 - 0.9·steps/max_steps), so the terminal row's `got` IS the
+            # episode's return; never inferred from step counts. A terminal row carrying the same (episode, step) as the
+            # last one counted is ONE episode, never two (a sense restart between a publish and its cursor write
+            # re-publishes that step — the cursor law, #230). The journal's outcome row is untouched (the negative
+            # control: nothing but the readiness rows moves).
+            # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: DISJOINT blocks
+            # of READY_A_WINDOW, never a sliding deque. The dedup guard reads `_game_last_episode_step` (the deque's own
+            # [-1] read the same fact); a counted episode advances the block-in-progress counters and, on the block's
+            # READY_A_WINDOW'th episode, LOCKS `_game_last_block` (never mutated again except wholesale replacement by
+            # the NEXT block completing) and resets the in-progress counters for the block after it.
+            if meta.get("terminated") or meta.get("truncated"):
+                ep, step = meta.get("episode"), meta.get("step")
+                last = self._game_last_episode_step
+                duplicate = (last is not None and ep is not None and step is not None
+                             and last[0] == ep and last[1] == step)
+                if not duplicate:
+                    self._game_last_episode_step = (ep, step)
+                    got = meta.get("got")
+                    success = bool(got is not None and float(got) > 0.0)
+                    self._game_block_n += 1
+                    if success:
+                        self._game_block_successes += 1
+                    if self._game_block_n == READY_A_WINDOW:
+                        block_index = (self._game_last_block["block_index"] + 1) if self._game_last_block else 0
+                        self._game_last_block = {"block_index": block_index, "successes": self._game_block_successes}
+                        self._game_block_n = 0
+                        self._game_block_successes = 0
         # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item
         # 2 (L-12): the OTHER half of `_maybe_think`'s pending gate — a hands outcome row's own `act_seq`
         # (the eye row that chose it) clears `_hands_pending` iff it matches the CURRENT pending choice
@@ -768,62 +952,38 @@ class Mind:
                 best = max(best, idx)
         return best
 
-    def _frames_lift_ok(self) -> "Tuple[int, bool]":
-        """§4(b)'s frame half: `alive` = every frame this mind has EVER filed (`self._frames` — nothing
-        ever removes from it, so "alive" here means "on the record", matching the brief's own reading);
-        each alive frame's CURRENT co-occurrence lift, recomputed from `self.episodes` via the SAME
-        `genome.sentence.find_frames()` the THINK step already calls (never a fresh computation invented
-        for this judge) — "from the mind's own counts" (the brief's own words). `find_frames()` only ever
-        returns a row for a pair that ALREADY clears its own `count > factor * expected` bar (factor=2.0
-        by default, the SAME 2.0 this judge asks for): a frame that no longer clears it is simply ABSENT
-        from the fresh call, which reads as lift-not-met here, never a crash or a fabricated number."""
-        alive = list(self._frames.keys())
-        if not alive or self.episodes is None:
-            return len(alive), False
-        current = {f"{r['w1']}|{r['w2']}": r for r in find_frames(self.episodes)}
-        ok = True
-        for key in alive:
-            row = current.get(key)
-            if row is None:
-                ok = False
-                break
-            expected = row.get("expected") or 0.0
-            if expected > 0 and (row["count"] / expected) < 2.0:
-                ok = False
-                break
-            # expected == 0 with count > 0 is an infinite lift; find_frames() only emits such a row once
-            # it already cleared `count >= min_count`, so its mere presence here satisfies >= 2.0.
-        return len(alive), ok
-
-    # RAISED (2026-09-23, this builder's report): no counter this mind holds lets it compute "the mind's
-    # own answer rate on the last 50 shelf lines" without RE-ASKING the organism at judge time (calling
-    # org.recall_many against stored FAST episodes' own x_s) — a real computation over the organism, not a
-    # read of a counter or a journaled fact, which the advisor's 2026-09-23 00:34 amendment rules out in
-    # as many words: "the judge reads only rows and counters the mind already holds". FAST's episode rows
-    # carry what the ear TOLD the mind at that moment (`word`), never what the mind ANSWERED when it later
-    # saw that glance again — no per-episode "was this read correctly" field exists, and none of
-    # SURPRISE's `confirmed` (word→sight EXPECTATION, not reading), MOUTH's `heard_yes`/`heard_no` (never
-    # fires on a shelf moment — nobody grades the mouth's own frame-sentences against shelf content), or
-    # any other journaled per-moment field fits. Candidate for a future gene: SURPRISE's confirmed-share
-    # computed specifically over shelf-sourced episodes (source=="shelf") — buildable once builder H's
-    # reader lands and a life has run long enough to carry SURPRISE + shelf episodes together; not built
-    # here. `_read_proxy_override` (test-only) exists so the OTHER four conditions can be verified without
-    # this one permanently-open question in the way.
-    _READ_PROXY_RAISE_REASON = ('RAISED: no honest proxy for "the mind\'s own answer rate on the last 50 '
-                                 'shelf lines" exists from counters alone — computing one would mean '
-                                 're-asking the organism at judge time, which the 2026-09-23 00:34 '
-                                 'amendment rules out; see ALPHA4-I-REPORT.md')
+    def _frames_alive(self) -> "List[Tuple[str, Optional[float]]]":
+        """§4(b)'s frame half (edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:41 +0400 — §4 AMENDED, §11 finding 1):
+        the frames ALIVE NOW = every pair `genome.sentence.find_frames()` returns over the mind's own FAST ring — the SAME
+        call THINK's frame kind makes, "from the mind's own counts" — each with its co-occurrence lift count/expected >= 2.0.
+        The ring's horizon IS the definition of alive: a frame whose evidence the ring has evicted is no longer alive, and it
+        no longer BLOCKS. The unamended judge asked all() over every frame EVER FILED (`self._frames`, never pruned) against a
+        20,000-episode ring that wraps ≈ hour 11.6 of alpha4-1 — (b) False for the rest of the life once any early frame's
+        evidence left (#237 (c)'s shape) — and `self._frames` is not in the snapshot, so a resumed mind or an EVOLVE twin
+        read that half against an empty set. Not consulted here any more (MOUTH still says from it). find_frames() emits a
+        row only when count >= 5 and count > 2.0 * expected, so presence already means lift > 2.0; the >= 2.0 check below
+        keeps the LAW's number in the judge, independent of find_frames' default. expected > 0 for every emitted row (both
+        marginals >= 1); guarded anyway — a None lift, never float('inf') (json.dumps would write `Infinity`, invalid JSON
+        for every other reader). Returns [(key "w1|w2", lift)] in find_frames' own order (by (w1, w2))."""
+        if self.episodes is None:
+            return []
+        alive: List[Tuple[str, Optional[float]]] = []
+        for r in find_frames(self.episodes):
+            expected = float(r.get("expected") or 0.0)
+            lift = (float(r["count"]) / expected) if expected > 0 else None
+            if lift is None or lift >= 2.0:
+                alive.append((f"{r['w1']}|{r['w2']}", lift))
+        return alive
 
     def _read_proxy(self) -> Optional[bool]:
-        """§4(b)'s read-proxy half. Always None (RAISED — see `_READ_PROXY_RAISE_REASON` above): treated
-        as NOT held wherever it is read (fail-closed — the PREREG's own stance on an unmet bar: "a life
-        that never opens the door is a FAIL of nothing, it is a reading of the bar"), never as True."""
-        if self._read_proxy_override is not None:
-            return self._read_proxy_override
+        """§4(b)'s read half: the sitter's `read_share` (tools/self_exam.py --read-words 50 --read-seed 20260923 — a fixed-
+        seed sample of 50 over ALL the words the shelf has read aloud, rendered in the held-out font and answered by the
+        snapshot; AMENDED 2026-09-23, it was the 20 NEWEST heard words) read off the last TWO `sit` rows, never computed
+        here. Both >= 0.6 -> True; either under -> False; fewer than two rows, or a row without the number (a sitting with
+        fewer than 50 heard words) -> None, which fails closed wherever it is read."""
         # edit: Claude (Fable 5.1), 2026-09-23 03:02 +0400 — RESOLVED at integration: the share is a TAPE FACT. The exam sitter (off the
-        # mind thread, on the snapshot) renders the last 20 HEARD shelf words in the held-out font and reports
-        # `read_share`; the SIT row carries it; here it is READ, never computed. Both of the last two rows >= 0.6
-        # -> True; a row without the number -> None (fails closed, the shipped stance kept).
+        # mind thread, on the snapshot) reports `read_share`; the SIT row carries it; here it is READ, never computed.
+        # edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:41 +0400 — the test-only override is gone (see __init__).
         if len(self._sit_readings) < 2:
             return None
         shares = [r[2] if len(r) > 2 else None for r in self._sit_readings]
@@ -840,39 +1000,94 @@ class Mind:
                    for r in self._sit_readings)
 
     def _readiness_readings(self) -> Dict[str, object]:
-        """§4 (a)-(e), from TAPE FACTS ONLY — every value below is derived from a counter this mind built
-        by CONSUMING rows (outcome/sit/grade/hold), never by reaching outside the tape or the organism's
-        own already-held state. Returns the five letter keys (bool) PLUS `b_read_proxy` (bool or None —
-        (b)'s "define it, name it, print it": None IS the printed answer, the RAISED clause named above)."""
-        a = len(self._game_rewards) >= 200 and (sum(self._game_rewards) / len(self._game_rewards)) >= 0.35
-        frames_alive, lift_ok = self._frames_lift_ok()
-        read_proxy = self._read_proxy()
-        b = bool(frames_alive >= 3 and lift_ok and read_proxy is True)
-        c = self._sit_composite_ok()
+        """§4 (a)-(e), from TAPE FACTS ONLY — every value below is derived from a counter this mind built by CONSUMING rows
+        (outcome/sit/grade/hold) or from its own FAST ring, never by reaching outside the tape or re-asking the organism;
+        a pure function of those (reading it twice moves nothing and returns the same dict).
+
+        edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:41 +0400 — §4 AMENDED (§11 finding 1): every clause is a
+        BLOCK carrying its NUMBERS beside its verdict `ok` (#164 — the 23 readiness rows of alpha4-1's first hours carried
+        booleans only), written on EVERY reading, the first included; every key on every row:
+          a: success per COMPLETED episode, now over DISJOINT blocks (edit: Claude (Sonnet 5, judge builder B4),
+             2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3, replacing the sliding-window read below). {window, n,
+             successes, bound, null, ok, block_index, block_n, k, p_null_at_k, blocks_complete, k_single_reading} — the
+             reading is the LATEST COMPLETE disjoint block of `window` (block_n, both READY_A_WINDOW) mind-chosen game
+             episodes; `n`/`successes` are that block's own count and tally once any block has completed (frozen — "a
+             block once read is never re-read with a different verdict" — until the NEXT block completes), or the
+             in-progress count toward the block still being filled when NO block has completed yet (n < window, ok
+             always False). `bound` == `k` == READY_A_BLOCK_K (11): the OPERATIVE threshold, the smallest k whose
+             FAMILY-WISE rate over the ~2 disjoint blocks a 24 h life completes at the null's pace stays under alpha
+             (`family_wise_bound`, computed, never typed — changing the null moves it). `p_null_at_k` is the SINGLE-BLOCK
+             tail P(Binomial(window, null) >= k) at that k (0.0132) — NOT the family-wise rate (0.026) that is why k
+             moved off `k_single_reading` (READY_A_BOUND, 10: the smallest k whose SINGLE-reading tail is <= alpha — the
+             bound the held branch used before this amendment, correct for a judge read once, six-fold too loose read at
+             every sitting on an overlapping window). `blocks_complete` counts every block that has ever locked in. The
+             old formula (ok iff the window is full (n == 20) and successes >= bound): success over the SLIDING last
+             `window` completed episodes, re-tested at every sitting — replaced here, not merely renamed.
+          b: {frames_alive, lifts (the top 3 by lift, then by frame), read_share_last2, frames_ok, read_ok, ok} — ok iff
+             >= 3 frames alive in the ring now (`_frames_alive`) AND both of the last two sittings' read_share >= 0.6.
+          c: {composite_last2, q1_last2, ok} — unchanged: both of the last two sittings' composite >= 0.95 and Q1 >= 0.98.
+          d: {answered, right, novel_window_n, novel_right, ok} — unchanged: >= 20 graded since birth, >= 0.8 right, and the
+             last 10 novel grades FULL with >= 8 right.
+          e: {hold, ok} — unchanged: no HOLD."""
+        if self._game_last_block is not None:
+            block_index = self._game_last_block["block_index"]
+            a_n = READY_A_WINDOW
+            a_successes = self._game_last_block["successes"]
+        else:
+            block_index = None
+            a_n = self._game_block_n
+            a_successes = self._game_block_successes
+        blocks_complete = block_index + 1 if block_index is not None else 0
+        a_ok = bool(self._game_last_block is not None and a_successes >= READY_A_BLOCK_K)
+        a = {"window": READY_A_WINDOW, "n": a_n, "successes": a_successes, "bound": READY_A_BLOCK_K,
+             "null": READY_A_NULL, "ok": a_ok,
+             "block_index": block_index, "block_n": READY_A_WINDOW, "k": READY_A_BLOCK_K,
+             "p_null_at_k": READY_A_BLOCK_P_NULL, "blocks_complete": blocks_complete,
+             "k_single_reading": READY_A_BOUND}
+
+        alive = self._frames_alive()
+        top = sorted(alive, key=lambda kv: (-(kv[1] if kv[1] is not None else float("inf")), kv[0]))[:3]
+        shares = [(r[2] if len(r) > 2 else None) for r in self._sit_readings]
+        frames_ok = len(alive) >= 3
+        read_ok = self._read_proxy() is True
+        b = {"frames_alive": len(alive),
+             "lifts": [{"frame": k, "lift": (round(v, 4) if v is not None else None)} for k, v in top],
+             "read_share_last2": shares, "frames_ok": frames_ok, "read_ok": read_ok, "ok": bool(frames_ok and read_ok)}
+
+        c = {"composite_last2": [r[1] for r in self._sit_readings], "q1_last2": [r[0] for r in self._sit_readings],
+             "ok": bool(self._sit_composite_ok())}
+
         # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:5x +0400 — advisor-caught: PREREG §4(d)
         # and §8 point 7 both name TEN as the denominator ("8 of the last 10 grades flagged novel"; "ten
         # of them never-seen pictures, so the judge's (d) can ever be true") — `>= 8` on a maxlen=10 deque
         # let as few as 8 novel grades (all right) satisfy (d) before the window ever filled. `== 10`
         # (never `>`, since the deque's own maxlen caps it) requires the FULL last-10 window before (d)
         # can ever hold, matching the bar's own denominator.
-        d = (self._grades_total >= 20 and (self._grades_right / self._grades_total) >= 0.8
-             and len(self._novel_grades) == 10 and sum(1 for r in self._novel_grades if r) >= 8) if self._grades_total else False
-        e = not self._hold_active
-        return {"a": bool(a), "b": b, "c": bool(c), "d": bool(d), "e": bool(e), "b_read_proxy": read_proxy}
+        novel_right = sum(1 for r in self._novel_grades if r)
+        d_ok = (self._grades_total >= 20 and (self._grades_right / self._grades_total) >= 0.8
+                and len(self._novel_grades) == 10 and novel_right >= 8) if self._grades_total else False
+        d = {"answered": self._grades_total, "right": self._grades_right, "novel_window_n": len(self._novel_grades),
+             "novel_right": novel_right, "ok": bool(d_ok)}
+
+        e = {"hold": bool(self._hold_active), "ok": not self._hold_active}
+        return {"a": a, "b": b, "c": c, "d": d, "e": e}
 
     def _maybe_advance_stage(self, row: Dict[str, object], readings: Dict[str, object]) -> None:
-        """§4: all five hold on TWO CONSECUTIVE exam windows -> ONE journal event, `self.stage` raised to
-        the declared judge's own stage index, NEVER undone by the mind (this method is a no-op forever
-        once `self.stage` has already reached `target_stage` — the streak counter is not even read then)."""
+        """§4 (AMENDED 2026-09-23 — the streak defined ONCE): the door opens on ONE readiness reading whose five clauses all
+        hold — each clause already spans its own horizon ((a) the latest complete disjoint block of 20 completed episodes,
+        ALPHA4-2-PREREG §4.3; (b) the ring now and the last two sittings' read shares; (c) the last two sittings; (d) since
+        birth and the last 10 novel grades; (e) now). The
+        unamended «on two consecutive exam windows» counted (b)'s read half and (c) three sittings deep. ONE journal event
+        carrying the whole reading (the same five blocks the readiness row carries), `self.stage` raised to the declared
+        judge's own stage index, NEVER undone by the mind (a no-op forever once `self.stage` has reached it). Each verdict
+        is read by its own "ok" key, never by a block's truthiness (a non-empty dict is always truthy — #238's SURPRISE mark)."""
         ready_gene = self.genome.declared.get("STAGE_READY")
         if ready_gene is None:
             return
         target_stage = int(ready_gene["stage"])
         if self.stage >= target_stage:
             return
-        all_hold = all(readings[k] is True for k in ("a", "b", "c", "d", "e"))
-        self._stage_ready_streak = (self._stage_ready_streak + 1) if all_hold else 0
-        if self._stage_ready_streak >= 2:
+        if all(readings[k]["ok"] is True for k in ("a", "b", "c", "d", "e")):
             self.stage = target_stage
             self._write_journal(row["at"], {"seq": row["seq"], "event": "stage", "stage": target_stage,
                                               "moment": self.org.t,
@@ -883,6 +1098,22 @@ class Mind:
         """ALPHA4-PREREG.md §4(d): a `grade` tape row (creature/senses/grade.py) — "mentorship enters
         through the tape, so the judge replays". Gated on SENSE_GRADE's own declared presence (the same
         "an unarmed sense's rows carry no organism work" law every other new tape-sense here follows)."""
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG task 3: a kind-"chat" grade (the chat door's republished seat
+        # grade) is routed FIRST under CHAT — counted on STATUS (chat_graded/_right/_novel) and journaled as a grade row
+        # carrying its kind, and NEVER reaching _grades_total/_grades_right/_novel_grades (the READINESS judge's (d)):
+        # a grade on a chat moves nothing in this rung (§3.2 item 2). Such a row exists only where CHAT armed the door;
+        # a genome without CHAT keeps master's road below, unchanged (the negative control).
+        meta0 = row.get("meta") or {}
+        if meta0.get("kind") == "chat" and "CHAT" in self.genome.declared:
+            if "chat" in self.blind:
+                return
+            right_c, novel_c = bool(meta0.get("right")), bool(meta0.get("novel"))
+            self.chat_counters["graded"] += 1
+            self.chat_counters["graded_right"] += int(right_c)
+            self.chat_counters["graded_novel"] += int(novel_c)
+            self._write_journal(row["at"], {"seq": row["seq"], "grade": {"id": meta0.get("id"), "right": right_c,
+                                                                          "novel": novel_c, "kind": "chat"}})
+            return
         if "SENSE_GRADE" not in self.genome.declared:
             return
         meta = row.get("meta") or {}
@@ -923,6 +1154,213 @@ class Mind:
         self._write_journal(row["at"], {"seq": row["seq"],
                                          "web": {"status": status, "question_id": meta.get("question_id")}})
 
+    # ------------------------------------------------------------------ A4L-LANG: THE CHAT (read-only)
+    # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:38 +0400 — A4L-LANG tasks 3/5 (docs/briefs/A4L-LANG.md; A4-LADDER-PREREG §3.2 items 2-6).
+    def _glances_per_canvas(self) -> int:
+        """How many org moments one canvas occupies (the birth-source attribution's own window): 1 under BIND, else the
+        GAZE fixations plus the coarse glance when it is declared and not blinded."""
+        if "BIND" in self.genome.declared:
+            return 1
+        gz = self.genome.gaze or {}
+        return int(gz.get("fixations", 1)) + (1 if (gz.get("coarse") and "coarse" not in self.blind) else 0)
+
+    def _chat_guard(self) -> tuple:
+        """The mind-level road a chat must never touch (the brief's own list), as one comparable value — asserted equal
+        around the branch beside the organism's hash: the clock, the canvas index, the MEET road's pending words, the
+        moment->word ledger, the heard set (ARRIVAL), every ring's size, the sleep cursor, SURPRISE's counts and the
+        predictor's expectation, the act census, the think counters and pending sets, the READINESS tallies, the
+        mouth's current instant."""
+        rings = tuple(getattr(self, k).n_written if getattr(self, k) is not None else None
+                      for k in ("episodes", "outcome_episodes", "sound_episodes", "touch_episodes", "smell_episodes"))
+        lw = self.predictor._last_winner if self.predictor is not None else None
+        return (self.org.t, self._canvas_index, tuple(sorted(self.pending.items())),
+                tuple(sorted((k, tuple(v)) for k, v in self.pending_words.items())), len(self.moment_word),
+                len(self._heard), rings, self._last_sleep_at, self.sleep_count, self.glances_confirmed,
+                self.glances_surprised, (None if lw is None else np.asarray(lw).tobytes()),
+                tuple(sorted(self.acts_chosen.items())), tuple(sorted(self.think_counters.items())),
+                len(self._filed_predictions), len(self._frame_pending), len(self._frames), self._ask_out_n,
+                self._grades_total, self._grades_right, tuple(self._novel_grades), self.stage,
+                tuple(self._last_words_in_instant), self.org.budget_left, self.org.arrivals,
+                len(self.picture_words), len(self.birth_source))     # A42-B2: a chat never writes either ledger
+
+    def _chat_content(self, heard: List[str], xs: List[np.ndarray], Ls: Dict[int, set], Lw: Dict[int, set]) -> Dict[str, object]:
+        """§3.2 item 3 — the content, grounded, chosen FIRST, one road for every chat: the canvas's glances asked by the
+        genome's own answer law (recall_many + ANSWER's grade, unchanged); when the question names >= 2 THING-words
+        (genome/chain.py:thing_words under THING_WORD_RULE — RAISED), the content is chosen AMONG them by the larger
+        summed edge from the canvas's lit cells (the Q4 road: edge_many, max over the word's own cells); a tie abstains.
+        Reads only."""
+        r = self.org.recall_many("sight", xs) if xs else {"cell": None, "reason": "novel", "grade": None, "resembles_cell": None}
+        # A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400; the rule flipped to "ledger" 17:5x on the orchestrator's word): the
+        # THING-WORDS under THING_WORD_RULE ("ledger": the two LEDGERS, nothing from the ring). The ring rule «heard» and the
+        # literal-from-ledger TWIN are still computed and PRINTED beside it on the say row (`things`, below) — counts and the two
+        # differences, never the full sets — so the ring's forgetting after the wrap (≈ hour 11.6) is a visible difference on the
+        # record, never a silent one. Every read here is read-only (the chat guard and the hash assert it).
+        per_canvas = self._glances_per_canvas()
+        things = _chain.thing_words(self.org, Lw, self.episodes, per_canvas=per_canvas, rule=_chain.THING_WORD_RULE,
+                                    picture_words=self.picture_words, birth_source=self.birth_source)
+        things_heard = _chain.thing_words(self.org, Lw, self.episodes, per_canvas=per_canvas, rule="heard")
+        things_twin = _chain.literal_from_ledger(self.org, Lw, self.birth_source)
+        named = list(dict.fromkeys(w for w in heard if w in things))
+        out: Dict[str, object] = {"recall": r, "named_things": named, "content": None, "abstain_reason": None,
+                                   "road": "recall", "edges": None,
+                                   "things": {"rule": _chain.THING_WORD_RULE, "n": len(things), "heard_n": len(things_heard),
+                                              "twin_n": len(things_twin), "heard_minus_rule": sorted(things_heard - things),
+                                              "rule_minus_heard": sorted(things - things_heard)}}
+        if len(named) >= 2:
+            out["road"] = "choose"
+            edges = {w: max([self.org.edge_many("sight", xs, c) for c in word_cells(self.org, Lw, w)], default=0.0) for w in named}
+            ranked = sorted(edges.items(), key=lambda kv: (-kv[1], kv[0]))
+            out["edges"] = [[w, round(float(v), 6)] for w, v in ranked]
+            if ranked[0][1] <= 0.0:
+                out["abstain_reason"] = "no_edge"
+            elif len(ranked) > 1 and ranked[0][1] == ranked[1][1]:
+                out["abstain_reason"] = "tie"
+            else:
+                out["content"] = ranked[0][0]
+            return out
+        if r.get("cell") is None:
+            out["abstain_reason"] = str(r.get("reason"))
+            return out
+        ws = Lw.get(int(r["cell"]), set())
+        if len(ws) == 1 and next(iter(ws)):
+            out["content"] = next(iter(ws))
+        else:
+            out["abstain_reason"] = "not_one_word"     # the answer cell's ledger is not one word (a merged or a sight-only birth)
+        return out
+
+    def _chat_grounded(self, xs: List[np.ndarray], content: str, Lw: Dict[int, set]) -> Dict[str, object]:
+        """§3.2 item 5's content half: MEET-tied to THIS canvas — W > 0 from a sight cell one of its glances lights to
+        one of the content's own word cells. The citation is the strongest such edge."""
+        lit: List[int] = []
+        for x in xs:
+            for l in self.org._lit(self.org.sight, x)[0]:
+                if l not in lit:
+                    lit.append(int(l))
+        best = None
+        for t in word_cells(self.org, Lw, content):
+            for l in lit:
+                if self.org.mask[l, t] == 1 and float(self.org.W[l, t]) > 0.0:
+                    w = float(self.org.W[l, t])
+                    if best is None or w > best[2]:
+                        best = (l, int(t), w)
+        return {"ok": best is not None, "lit": len(lit),
+                 "edge": (None if best is None else [best[0], best[1], round(best[2], 6)])}
+
+    def _chat_point(self, g: Dict[str, object], xs: List[np.ndarray], target: Optional[str], Lw: Dict[int, set]) -> Optional[Dict[str, object]]:
+        """§3.2 item 6: the window of the FIRST located glance whose own single-glance recall is `target` (the question's
+        first thing-word, else the content); None when no located glance answers it."""
+        if not target:
+            return None
+        for i in range(len(g.get("fix") or [])):
+            rr = self.org.recall("sight", xs[i])
+            ws = Lw.get(int(rr["cell"]), set()) if rr.get("cell") is not None else set()
+            if ws == {target}:
+                top, left = g["windows"][i]
+                return {"glance": i, "window": [int(top), int(left)], "word": target}
+        return None
+
+    def _consume_chat(self, row: Dict[str, object]) -> None:
+        """THE READ-ONLY LAW — «a question never teaches» (§3.2 item 2). Glance the canvas (the gaze's deterministic mode,
+        the eye's own road), then READ — never write — the organism: the content (item 3), the point (item 6), the
+        frames/links/pivots from `self.episodes` (the SAME find_frames the think step calls), the composer (item 4), the
+        judge (item 5). Then write chat/out/<id>.json and journal ONE row {seq, say: {kind: "chat", …}}. It touches none
+        of pending/pending_words/moment_word/_heard/org.t/_canvas_index, the rings, SURPRISE's expectation, the
+        predictor, the THINK/SLEEP/SIT/EXAM boundaries, acts_chosen, the reflex ring, think_counters: `_chat_guard` and
+        the organism's state hash are compared around it, and a difference RAISES — the crash law pages; a chat that
+        changed him is a defect, never a result to log and continue."""
+        decl = self.genome.declared.get("CHAT")
+        if decl is None or "chat" in self.blind:
+            return
+        meta = row.get("meta") or {}
+        raw_id = str(meta.get("id") or "")
+        cid = raw_id if re.fullmatch(r"[A-Za-z0-9_-]{1,64}", raw_id) else f"seq{int(row['seq'])}"
+        heard = [str(w) for w in (meta.get("words") or []) if w]
+        guard_before = self._chat_guard()
+        hash_before = self.org.row_hash()   # edit: Claude (Fable 5.1), 2026-09-23 14:32 +0400 — the witness-aware digest (A4L-COST × A4L-LANG at the merge): row_hash IS state_hash when HASH is undeclared, the sparse witness when declared; the guard compares like with like
+
+        payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
+        rgb = np.asarray(Image.open(payload_path).convert("RGB"), dtype=np.uint8)
+        mode = "random" if "gaze" in self.blind else "surprise"
+        g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour)
+        if "coarse" in (self.genome.gaze or {}) and "coarse" in self.blind:
+            g = dict(g); g["feats"] = g["feats"][:-1]
+        xs = list(g["feats"])
+        ledgers = build_ledgers(self.org, self.moment_word)
+        Ls, Lw = ledgers["sight"], ledgers["words"]
+
+        c = self._chat_content(heard, xs, Ls, Lw)
+        content = c["content"]
+        r = c["recall"]
+        grade = r.get("grade")
+        resembles = None
+        if content is None and grade in ("sure", "unsure") and r.get("resembles_cell") is not None:
+            rs = Ls.get(int(r["resembles_cell"]), set())
+            resembles = next(iter(rs)) if len(rs) == 1 else None
+        first_thing = c["named_things"][0] if c["named_things"] else None
+        point = self._chat_point(g, xs, first_thing or content, Lw)
+
+        rows_ = _chain.instants(self.episodes)
+        stats = _chain.store_stats(self.episodes, rows=rows_)
+        frames = find_frames(self.episodes)
+        links = _chain.links(self.episodes, adj=int(decl["links_adjacent"]), stats=stats, frames=frames)
+        pivots = _chain.pivots(self.episodes, distinct=int(decl["pivot_distinct"]), instants=int(decl["pivot_instants"]), stats=stats)
+        comp = _chain.compose(heard, content, links, pivots, stats["follow"], stats["adjacency"], max_words=int(decl["max_words"]))
+        form = list(comp.get("form") or [])
+
+        refused: Optional[str] = None
+        grounded: Optional[Dict[str, object]] = None
+        judged = {"ok": True, "reason": None, "links": [], "cited": [], "pivot_followers": None, "pivot_instants": None}
+        chain_said: List[str] = []
+        if content is not None:
+            grounded = self._chat_grounded(xs, content, Lw)
+            if not grounded["ok"]:
+                refused = "content"
+            else:
+                judged = _chain.judge_form(form, self.episodes, adj=int(decl["links_adjacent"]), distinct=int(decl["pivot_distinct"]),
+                                           instants=int(decl["pivot_instants"]), rows=rows_, frames=frames)
+                if judged["ok"]:
+                    chain_said = list(comp.get("answer") or [content])
+                else:
+                    refused = "form"
+                    chain_said = [content]
+        chain_said = chain_said[: int(decl["max_words"])]
+
+        hash_after = self.org.row_hash()
+        if hash_after != hash_before or self._chat_guard() != guard_before:
+            raise RuntimeError(f"CHAT: a chat changed the organism (id {cid}, seq {row['seq']}): hash {hash_before[:16]}… -> "
+                               f"{hash_after[:16]}…, mind road {'unchanged' if self._chat_guard() == guard_before else 'CHANGED'} — the read-only law (A4-LADDER-PREREG §3.2 item 2)")
+
+        say = {"kind": "chat", "id": cid, "heard": heard, "content": content, "grade": grade, "chain": chain_said,
+               "form": form, "pivot": comp.get("pivot"),
+               "links": judged["links"] if judged["links"] else [[l["w1"], l["w2"], l["adj_count"], l["n_episodes"]]
+                                                                   for l in links if [l["w1"], l["w2"]] in
+                                                                   [[a, b] for a, b in zip(form, form[1:])]],
+               "pivot_followers": judged.get("pivot_followers"), "point": point, "abstain_reason": c["abstain_reason"],
+               "resembles": resembles, "refused": refused, "road": c["road"], "named_things": c["named_things"],
+               "things": c["things"],      # A42-B2: the rule read + the ring rule and the twin beside it (counts and differences)
+               "edges": c["edges"], "grounded": grounded, "form_reason": judged.get("reason"),
+               "candidates_n": comp.get("candidates_n"), "truncated": comp.get("truncated"),
+               "hash_before": hash_before, "hash_after": hash_after}
+        out_dir = self.run_root / str(decl["out"])
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out = {"id": cid, "seq": row["seq"], "at": row["at"], "answer": (chain_said or None), **{k: v for k, v in say.items() if k != "kind"}}
+        tmp = out_dir / f"{cid}.json.tmp"
+        tmp.write_text(json.dumps(out, default=str))
+        os.replace(str(tmp), str(out_dir / f"{cid}.json"))
+        self._write_journal(row["at"], {"seq": row["seq"], "say": say})
+
+        self.chat_counters["chats"] += 1
+        if chain_said:
+            self.chat_counters["answered"] += 1
+            self.chat_counters["words_total"] += len(chain_said)
+            self.chat_counters["longest"] = max(self.chat_counters["longest"], len(chain_said))
+            if refused == "form":
+                self.chat_counters["refused_form"] += 1
+        elif refused == "content":
+            self.chat_counters["refused_content"] += 1
+        else:
+            self.chat_counters["abstained"] += 1
+
     def _consume_body(self, row: Dict[str, object]) -> None:
         """BODY-SENSES.md §4.1: "the readings; the DRIVE is the mind's" -- this gene carries no threshold, so
         there is nothing here to compute beyond recording the reading itself as a journal row (the refusal test in
@@ -956,10 +1394,19 @@ class Mind:
         lesson) and written to the DEDICATED sound_episodes ring (never self.episodes -- dims differ and
         this ring, like K's outcome_episodes, is never replayed through Organism.moment). "sound_episodes
         is None" covers both "FAST undeclared" and "FAST declared without the 'sound' key" -- the twin
-        (#228): the row is stepped over, no journal, no episode, byte-for-byte the pre-L-13 behaviour."""
-        if self.sound_episodes is None:
-            return
+        (#228): the row is stepped over, no journal, no episode, byte-for-byte the pre-L-13 behaviour.
+
+        A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:32 +0400 — docs/briefs/A4L-VOICE.md task 2):
+        a sound row the MAKER published on a canvas's own moment (`source: maker` — the world's voice) is ALSO held pending
+        like a word, when the organism has a sound area (AREA sound declared), and bound at that moment's eye row
+        (`_consume_eye`): the sound area resonates/births and meets sight and words there. Its journal row carries
+        `"pending": True`. A sound row without a maker moment (a wav dropped in his folder: the ear door's `a<sha>e<i>`
+        moments) keeps today's FAST-only road; with no sound area at all (the FLOOR genome — «the voice alone»), every row
+        keeps it, byte-for-byte."""
         meta = row.get("meta") or {}
+        area_on = (self.org.sound is not None and meta.get("source") == "maker" and meta.get("moment") is not None)
+        if self.sound_episodes is None and not area_on:
+            return
         payload_path = _resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]
         try:
             raw = payload_path.read_bytes()
@@ -972,13 +1419,17 @@ class Mind:
             return
         x_s = trait.astype(np.float64)
         x_w = np.zeros(1, dtype=np.float64)
-        ep_id = self.sound_episodes.write(moment=self.org.t, x_s=x_s, x_w=x_w, word="", surprise=0.0)
-        self.sound_events += 1
-        self._write_journal(row["at"], {
-            "seq": row["seq"],
-            "sound": {"moment": meta.get("moment"), "level": meta.get("level"), "when": meta.get("when"),
-                      "file": meta.get("file"), "ep": ep_id},
-        })
+        ep_id = None
+        if self.sound_episodes is not None:
+            ep_id = self.sound_episodes.write(moment=self.org.t, x_s=x_s, x_w=x_w, word="", surprise=0.0)
+            self.sound_events += 1
+        sound_row: Dict[str, object] = {"moment": meta.get("moment"), "level": meta.get("level"), "when": meta.get("when"),
+                                         "file": meta.get("file"), "ep": ep_id}
+        if area_on:
+            self.pending_sound[str(meta.get("moment"))] = {"trait": x_s, "seq": int(row["seq"])}
+            self.voice_rows += 1
+            sound_row["pending"] = True
+        self._write_journal(row["at"], {"seq": row["seq"], "sound": sound_row})
 
     # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md item 3
     # (BODY-SENSES.md §4.6). Mirrors _consume_ear_sound's own shape exactly (dedicated ring, errors=replace's
@@ -1082,6 +1533,25 @@ class Mind:
                     break
         return out
 
+    def _recent_reflex_gots(self, act: str, k: int = 10) -> List[float]:
+        """edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:59 +0400 — A4L-EXPLORE: `_recent_reflex_residuals`'
+        own walk (the last `k` LIVE outcome_episodes rows whose `word` is `act`, newest first, never past the ring's
+        cap) reading each row's `got` — the payload `_record_reflex` files in x_s[0] (0.0 when a row carried none) —
+        instead of its surprise. [] for an act with no outcome in that window (the value law's «untried»)."""
+        ep = self.outcome_episodes
+        if ep is None:
+            return []
+        out: List[float] = []
+        n = ep.n_written
+        lo = max(0, n - ep.cap)
+        for eid in range(n - 1, lo - 1, -1):
+            rec = ep.get(eid)
+            if rec is not None and rec["word"] == act:
+                out.append(float(rec["x_s"][0]))
+                if len(out) >= k:
+                    break
+        return out
+
     def _maybe_choose_act(self, row: Dict[str, object]) -> None:
         """L-8 (MOTOR-HANDS.md G-MOT-1/G-MOT-4's "replay problem, named"; the plan's §4 L-8): on a game
         eye row, when this genome's ACT vocabulary drives the game (`self._act_policy_on`), choose the
@@ -1096,7 +1566,15 @@ class Mind:
         acts happen to tie -- replay recomputes the identical branch from the identical data either way,
         but a fixed draw count keeps the stream easy to reason about. A pure function of (genome, seed,
         the outcome ring's own live content, this row) -- replay re-derives the identical choice; no
-        clock, no other rng stream, no organism state is read."""
+        clock, no other rng stream, no organism state is read.
+
+        edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 11:59 +0400 — docs/A4-LADDER-PREREG.md §2.5 (A4L-EXPLORE, the
+        ALPHA4-PREREG §11.2 lock): when `ACT value reward <n>; optimism <f>` is declared, an act's weight is its VALUE —
+        the mean REWARD (`got`) over its last <n> outcomes, <f> for an act with none in that window — instead of its
+        mean |residual| (a surprise that, once one act was rewarded, never let any other act win: 96 of alpha4-1's last
+        100 acts at hour 5). The 10 % uniform draw, the argmax with rng ties, the TWO draws a choice and the rng are
+        unchanged; the journal's `policy` names the law. Undeclared: the loop below is the old one, byte for byte in
+        its effect (the landing's negative control replays the hour-1 fixture identical, `hash` included)."""
         if not self._act_policy_on:
             return
         meta = row.get("meta") or {}
@@ -1108,13 +1586,23 @@ class Mind:
         n_actions = int(n_actions)
         act_names = list(meta.get("act_names") or [str(i) for i in range(n_actions)])[:n_actions]
         weights = []
-        for name in act_names:
-            residuals = self._recent_reflex_residuals(name, k=10)
-            weights.append(sum(residuals) / len(residuals) if residuals else 0.0)
+        if self._act_value is None:
+            for name in act_names:
+                residuals = self._recent_reflex_residuals(name, k=10)
+                weights.append(sum(residuals) / len(residuals) if residuals else 0.0)
+            policy = "outcome-weighted"
+        else:
+            value_window = int(self._act_value["window"])
+            optimism = float(self._act_value["optimism"])
+            for name in act_names:
+                gots = self._recent_reflex_gots(name, k=value_window)
+                weights.append(sum(gots) / len(gots) if gots else optimism)
+            policy = "reward-valued"
 
         u = float(self._act_rng.random())
         if u < 0.1:
             idx = int(self._act_rng.integers(0, n_actions))
+            self.act_explored += 1
         else:
             best = max(weights)
             tied = [i for i, w in enumerate(weights) if w == best]
@@ -1131,10 +1619,12 @@ class Mind:
 
         self._act_choices[seq] = {"idx": idx, "name": act_name}
         self.acts_chosen[act_name] = self.acts_chosen.get(act_name, 0) + 1
+        self.act_policy = policy
+        self.act_weights = [round(w, 6) for w in weights]
         self._write_journal(row["at"], {
             "seq": seq,
             "act": {"game": meta.get("game"), "act": act_name, "act_idx": idx, "seq": seq,
-                    "policy": "outcome-weighted", "weights": [round(w, 6) for w in weights]},
+                    "policy": policy, "weights": [round(w, 6) for w in weights]},
         })
 
     def _check_act_mismatch(self, meta: Dict[str, object]) -> Optional[bool]:
@@ -1183,6 +1673,20 @@ class Mind:
         # instant's ear rows delivered, in order (popped alongside self.pending above; a moment with one
         # ear row is a one-element list, byte-identical in meaning to `word` alone).
         words_in_instant: List[str] = self.pending_words.pop(moment, []) if moment is not None else []
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:36 +0400 — A4L-VOICE task 3: `--blind ear` (V1's twin).
+        # «The words area never lights»: the ORGANISM hears no word — `word`/`words_in_instant` (and so xw, PREDICT, SURPRISE's
+        # expectation, the episode) are None/[] below, exactly as on a wordless canvas. The RUNNER's bookkeeping still reads the
+        # ear row: `label` is the word the tape carried, used ONLY for the ledger (moment_word — «the sight cell's birth ledger
+        # names the thing», V1's own read) and for ARRIVAL's world clock (a never-heard word opens an arrival, the ONE budget
+        # refreshes). Blind to exactly ONE thing (#228's addendum): without ARRIVAL the twin would have 0 arrivals in 8 h and
+        # its births would be refused by the budget — V1 would then read the budget, not the ear (#228 (a), #238). Not blind:
+        # label == word, every line below byte-for-byte what it was.
+        label = word
+        if "ear" in self.blind:
+            word, words_in_instant = None, []
+        # A4L-VOICE task 2: this canvas's SOUND (the maker's chord, held since its ear-sound row) — bound HERE, at the eye row.
+        snd = self.pending_sound.pop(str(moment), None) if (moment is not None and self.pending_sound) else None
+        x_snd = snd["trait"] if snd is not None else None
         # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 4 (MOUTH): the CURRENT
         # instant's words and first glance, read by _maybe_think -> _maybe_say below (the mouth judges what
         # it says against THIS canvas's own glance, never a stored/replayed one).
@@ -1232,6 +1736,12 @@ class Mind:
         n_confirmed = sum(1 for f in confirmed_flags if f)
         self.glances_confirmed += n_confirmed
         self.glances_surprised += max(0, n_graded - n_confirmed)
+        # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md §2.4
+        # (docs/briefs/A4L-DROP.md task 2): "drop_on" reads the parser's own nested sub-key (genome/machinery.py's
+        # SURPRISE branch: "drop" can only be present when "predicted" is), so this is False on every genome
+        # that predates this task, and False on a genome that declares SURPRISE (with or without "predicted
+        # mind-cell") but not the trailing "; drop confirmed" clause.
+        drop_on = surprise_gene is not None and surprise_gene.get("drop") == "confirmed"
 
         # PREREG §11.1 step 1 (PREDICT): measured once, on the FIRST glance, regardless of whether this
         # canvas has a word — a sight-only canvas is just as surprising or expected as a worded one.
@@ -1277,7 +1787,23 @@ class Mind:
             seam0 = {"where": ((int(g["windows"][0][0]), int(g["windows"][0][1])) if "where" not in self.blind else None),
                       "when": row["at"], "act": "glance", "source": meta.get("source"), "glance": 0}
 
-        if word is not None:
+        # edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — A42-B2 PART 2: the picture-words LEDGER (see __init__).
+        # Written from the SAME two facts the episode written below carries — the eye row's own `meta["source"]` (a picture source:
+        # genome/chain.py:PICTURE_SOURCES) and this instant's words AFTER the blind-ear twin cleared them — on BOTH roads below
+        # (a worded canvas and a sight-only one alike, the ring is written on both), so `set(picture_words)` is exactly
+        # chain.heard_on_pictures(episodes) until the ring wraps. A ledger only: no organism state, no journal field, no hash.
+        if words_in_instant and meta.get("source") in _chain.PICTURE_SOURCES:
+            for _pw in words_in_instant:
+                if _pw and _pw not in self._picture_words_set:
+                    self._picture_words_set.add(_pw)
+                    self.picture_words.append(_pw)
+
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:36 +0400 — A4L-VOICE task 2/3: the worded road ALSO
+        # carries a canvas that has a SOUND and no word (`--blind ear`, or a voiced canvas whose word never came) — «a canvas
+        # that carries a SOUND and no word must still run the sight↔sound meeting, never the sight-only road» (the brief's own
+        # words; #228 (a): else V1's twin can learn nothing by construction). With a word and no sound every line below is
+        # byte-for-byte the old road (x_snd None; `word or label` == word; the episode/score/journal lines unchanged).
+        if word is not None or x_snd is not None:
             births_before = len(self.org.births)
             edges_before = len(self.org.edges_log)
             prunes_before = len(self.org.prunes_log)
@@ -1285,24 +1811,46 @@ class Mind:
             # fresh BEFORE the moment that first meets it (life 1 never called new_arrival: arrivals 0, budget spent once,
             # 419 births refused, nothing born after 07:41 +04). Gated on the gene: an undeclared ARRIVAL changes nothing.
             arrival_n: Optional[int] = None
-            if word not in self._heard:
-                self._heard.add(word)
+            arr_word = word if word is not None else label       # A4L-VOICE: the blind-ear twin keeps the world's arrival clock
+            if arr_word is not None and arr_word not in self._heard:
+                self._heard.add(arr_word)
                 if "ARRIVAL" in self.genome.declared:
                     self.org.new_arrival()
                     arrival_n = int(self.org.arrivals)
+            ledger_word = word if word is not None else (label if label is not None else "")
+            sound_winners: List[int] = []
             for i, x in enumerate(org_feats):
-                self.moment_word[self.org.t] = word          # keyed by the organism's OWN moment counter, one per glance (or one per canvas under BIND)
+                self.moment_word[self.org.t] = ledger_word    # keyed by the organism's OWN moment counter, one per glance (or one per canvas under BIND)
                 # L-4: confirmed_flags[i] is False on every existing genome (SURPRISE undeclared -> floor
                 # is None -> every flag False) — byte-identical to the old bare `self.org.moment(x, xw,
                 # lr_scale=lr_scale)` call.
-                S, T = self.org.moment(x, xw, lr_scale=lr_scale, confirm=confirmed_flags[i])
+                # edit: Claude (Sonnet 5, A4 ladder builder DROP), 2026-09-23 11:19 +0400 — A4-LADDER-PREREG.md
+                # §2.4 (docs/briefs/A4L-DROP.md task 2): a glance this same "confirmed_flags" already marks
+                # CONFIRMED, under "drop confirmed", is not passed to Organism.moment() at all — Organism.tick()
+                # runs exactly moment_sight()'s tail (t += 1; SCALE at its own multiples; the budget's regen
+                # check), so every moment-denominated cadence keeps its wall-clock meaning (D3). S, T = [], []
+                # for this glance: predictor.note_winners([]) is its own documented no-op (genome/predict.py:120,
+                # "an empty S leaves the last winner as it was") and glance 0's FAST episode below is written
+                # from f0/t_at_f0, captured before this loop, so it is untouched either way. drop_on False
+                # (every genome before this task, and every genome that never declares "; drop confirmed"):
+                # this branch is never taken — byte-identical to the bare `self.org.moment(...)` call below.
+                if drop_on and confirmed_flags[i]:
+                    self.org.tick()
+                    S, T = [], []
+                    self.glances_dropped += 1
+                else:
+                    S, T = self.org.moment(x, xw, lr_scale=lr_scale, confirm=confirmed_flags[i], x_snd=x_snd)
+                    if x_snd is not None:   # A4L-VOICE, kept inside the else at the merge (Claude (Fable 5.1)): a DROPPED glance runs no moment, so no sound winners either
+                        sound_winners.extend(u for u in self.org.last_sound_winners if u not in sound_winners)
                 if predict_on:
                     self.predictor.note_winners(S)
             ep_kwargs = seam0 if moment_on else {}         # G-MIND-1: Episodes stores the seam only once MOMENT declares the columns
             # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: words_in_instant/
             # tape_moment are stored UNCONDITIONALLY (not gated on MOMENT — the plan's own words: "MOMENT
             # keys ... gains nothing in the genome"), a fresh pair of Episodes columns exactly like x_s2 above.
-            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw, word=word, surprise=err,
+            ep_id = self.episodes.write(moment=t_at_f0, x_s=f0,
+                                          x_w=(xw if xw is not None else encode_word("", self.genome.ear_blank_zero)),
+                                          word=(word if word is not None else ""), surprise=err,
                                           words_in_instant=words_in_instant, tape_moment=moment,
                                           **ep_kwargs) if fast_on else None
             # L-4: "no think-pool item" — glance 0 is the one FAST's episode is built from (f0 above); if
@@ -1310,7 +1858,16 @@ class Mind:
             # SLEEP/the episodic PREDICT arm, which read the episode ring directly, not the pool.
             if fast_on and ep_id is not None and confirmed_flags and confirmed_flags[0]:
                 self._confirmed_episodes.add(ep_id)
-            self._score_due_predictions(word, g["feats"][0] if g["feats"] else None, words_in_instant=words_in_instant)
+            if word is not None:
+                # A42-B2 G9 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400): the instant's LOCATED glances (g["feats"][:len(fix)];
+                # the whole list when no fixation is located — `one` mode, or BIND's pooled vector) and its source travel with the
+                # call; the scorer reads them ONLY under `SENTENCE …; judged by the eye on the line` — undeclared, every line of
+                # _score_due_predictions is the road it always was (the hour-1 fixture replays identical, A42-B2-REPORT).
+                self._score_due_predictions(word, g["feats"][0] if g["feats"] else None, words_in_instant=words_in_instant,
+                                            glances=(org_feats[:len(g["fix"])] if g["fix"] else list(org_feats)), source=meta.get("source"))
+            if snd is not None:
+                self.voice_bound += 1
+            self._ledger_births(births_before, meta.get("source"))      # A42-B2: the birth-source ledger (a ledger only; the row below is unchanged)
             births = [[b[1], int(b[2]), b[3]] for b in self.org.births[births_before:]]
             edges_born = len(self.org.edges_log) - edges_before
             edges_pruned = len(self.org.prunes_log) - prunes_before
@@ -1321,7 +1878,7 @@ class Mind:
                 "cells": [int(self.org.sight.alive.sum()), int(self.org.words.alive.sum())],
                 "edges": [edges_born, edges_pruned],
                 "err": round(err, 4), "lr": round(lr_scale, 3), "ep": ep_id,
-                "hash": self.org.state_hash(),
+                "hash": self._row_digest(),   # M3: the canvas row's digest — the coarse row below carries it (one hash per canvas)
                 **({"arrival": arrival_n} if arrival_n is not None else {}),   # PREREG §15: an event field on the row where an arrival opened
                 # G-EYE-1 (edit: Claude (Sonnet 5, G5 builder I), 2026-09-21 20:57 +0400): every glance's window origin, this
                 # episode's when/act/source — EXTRA keys, never touching any key above; a genome that never declares DELIVER
@@ -1333,9 +1890,14 @@ class Mind:
                 # (len(g["fix"])); the coarse glance's own residual/confirmed live on its own row, below.
                 # Undeclared SURPRISE: this key is absent, byte-identical to before this gene existed.
                 **({"residual": residuals[:len(g["fix"])], "confirmed": confirmed_flags[:len(g["fix"])]} if surprise_gene is not None else {}),
+                # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:36 +0400): the sound bound at this
+                # canvas — its tape row's seq, the sound winners of its glances, the sound area's alive count. Absent (no key at
+                # all) on every canvas without a sound: a genome/tape without the voice writes exactly the row it always wrote.
+                **({"sound": {"seq": int(snd["seq"]), "winners": [int(u) for u in sound_winners],
+                              "cells": int(self.org.sound.alive.sum()) if self.org.sound is not None else 0}} if snd is not None else {}),
             }
             self._write_journal(row["at"], journal_row)
-            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene)
+            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene, digest=journal_row["hash"])
             if coarse_row is not None:
                 self._write_journal(row["at"], coarse_row)
         elif fast_on:
@@ -1346,10 +1908,18 @@ class Mind:
             # included, or snapshot() KeyErrors the first time such a birth happens (caught by this
             # test, not by inspection) -- word "" here, exactly what the written episode itself carries.
             births_before = len(self.org.births)
+            # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:36 +0400 — A4L-VOICE task 3: under `--blind ear` a
+            # worded canvas with no sound comes here; the runner still books its label (the ledger) and its arrival (the world's
+            # clock). Not blind: `label` is None on this road (no word came), so both lines are no-ops — byte-for-byte the old road.
+            if label is not None and label not in self._heard:
+                self._heard.add(label)
+                if "ARRIVAL" in self.genome.declared:
+                    self.org.new_arrival()
             for x in org_feats:
-                self.moment_word[self.org.t] = ""
+                self.moment_word[self.org.t] = label if label is not None else ""
                 self.org.moment_sight(x)
             births_after = len(self.org.births)
+            self._ledger_births(births_before, meta.get("source"))      # A42-B2: the birth-source ledger, the sight-only road
             xw_blank = encode_word("", self.genome.ear_blank_zero)
             ep_kwargs = seam0 if moment_on else {}
             ep_id = self.episodes.write(moment=t_at_f0, x_s=f0, x_w=xw_blank, word="", surprise=err,
@@ -1385,16 +1955,17 @@ class Mind:
                         self._wordless_seen[cell] = n
                         if n >= 1:
                             self._maybe_ask(f"sight:{cell}", "what-is", [moment])
-            self._write_journal(row["at"], {
+            sight_row = {   # M3: bound to a name so the coarse row below can carry this row's digest (the same dict, the same bytes)
                 "seq": row["seq"], "moment": moment, "word": None,
-                "err": round(err, 4), "ep": ep_id, "hash": self.org.state_hash(),
+                "err": round(err, 4), "ep": ep_id, "hash": self._row_digest(),
                 **({"windows": [[int(t), int(l)] for (t, l) in g["windows"]], "when": row["at"], "act": "glance",
                     "source": meta.get("source"), "glance": 0} if deliver_on else {}),
                 # L-4: a sight-only canvas has no word, so `predicted` is always None here and no glance
                 # ever confirms — the fields are still journaled (gated the same way) for schema parity.
                 **({"residual": residuals[:len(g["fix"])], "confirmed": confirmed_flags[:len(g["fix"])]} if surprise_gene is not None else {}),
-            })
-            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene)
+            }
+            self._write_journal(row["at"], sight_row)
+            coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene, digest=sight_row["hash"])
             if coarse_row is not None:
                 self._write_journal(row["at"], coarse_row)
         else:
@@ -1407,8 +1978,16 @@ class Mind:
         self._maybe_sleep(row)
         self._maybe_think(row)
 
+    def _row_digest(self) -> str:
+        """M3 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400; ALPHA4-2-PREREG.md §2 M3, §2.5): the row's witness digest —
+        `Organism.row_hash()` (the sparse witness under HASH, the dense state_hash otherwise) — and, in the SAME statement, the moment
+        count it stands for. `_coarse_row` reuses this digest for the coarse row of the same canvas while `org.t` is unchanged; a
+        digest obtained any other way meets a stale `_row_digest_t` and is refused (recomputed), so no caller can bypass the guard."""
+        digest, self._row_digest_t = self.org.row_hash(), self.org.t
+        return digest
+
     def _coarse_row(self, seq: object, moment: Optional[str], residuals: list, confirmed_flags: list,
-                     surprise_gene: Optional[dict]) -> Optional[Dict[str, object]]:
+                     surprise_gene: Optional[dict], *, digest: str) -> Optional[Dict[str, object]]:
         """L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): the fifth, whole-canvas
         glance's OWN journal row — SLEEP's own "a second mind row sharing the triggering canvas's own seq"
         pattern (creature.replay's compare() already groups mind rows by seq for exactly this reason).
@@ -1420,9 +1999,16 @@ class Mind:
         gaze_decl = self.genome.gaze or {}
         if "coarse" not in gaze_decl or "coarse" in self.blind:
             return None
+        # M3 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400): `digest` is the canvas row's own (`_row_digest()` in the caller's dict) —
+        # the two rows hashed the same state one statement apart on 9,331 of 9,331 alpha4-1 canvases (ALPHA4-2 review §2). The reuse
+        # is REFUSED — recomputed, counted — if the organism lived a moment since (PREREG §2.5: "a planted write between the two rows
+        # makes the reuse REFUSE, so the reuse can never hide a change"); on the live road nothing between them touches it.
+        if self.org.t != self._row_digest_t:
+            self.hash_reuse_refused += 1
+            digest = self._row_digest()
         idx = len(residuals) - 1
         out: Dict[str, object] = {"seq": seq, "moment": moment, "act": "coarse", "glance": idx,
-                                   "fix": None, "windows": None, "hash": self.org.state_hash()}
+                                   "fix": None, "windows": None, "hash": digest}
         if surprise_gene is not None:
             out["residual"] = residuals[idx]; out["confirmed"] = confirmed_flags[idx]
         return out
@@ -1489,7 +2075,7 @@ class Mind:
             "seq": row["seq"],
             "epoch": {"epoch": self.evolve_epoch, "genome_sha": genome_sha, "moment": self.org.t,
                       "gene": gene_key, "value": value, "proposal_no": proposal.get("no")},
-            "hash": self.org.state_hash(),
+            "hash": self.org.row_hash(),
         })
 
     def _maybe_sleep(self, row: Dict[str, object]) -> None:
@@ -1516,13 +2102,16 @@ class Mind:
                 rec = self.episodes.get(eid)
                 if rec is not None:
                     self.moment_word[t0 + i] = rec["word"]
-            result = run_sleep(self.org, self.episodes, n)
+            # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400): `--blind ear` replays with no word
+            births_before_sleep = len(self.org.births)
+            result = run_sleep(self.org, self.episodes, n, **({"words": False} if "ear" in self.blind else {}))
             self.sleep_count += 1
             cycled = run_cycle(self.org)
+            self._ledger_births(births_before_sleep, "sleep")     # A42-B2: a birth inside the replay is owned by no canvas — "sleep", chain.birth_sources' own word
             if "TRAITS" in self.genome.declared and _TRAITS_AVAILABLE:
                 Traits.learn(self.episodes)      # per the interface name given for wave 2; unexercised until genome/traits.py lands
             self._write_journal(row["at"], {
-                "seq": row["seq"], "sleep": {**result, "cycle": cycled}, "hash": self.org.state_hash(),
+                "seq": row["seq"], "sleep": {**result, "cycle": cycled}, "hash": self.org.row_hash(),
             })
             # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:05 +0400 — W3-3 (docs/G4-WAVE3-CLAUSES.md;
             # genome/curiosity.py's own contract, B10 note 3): one sleep_boundary() call per boundary crossed
@@ -1538,7 +2127,8 @@ class Mind:
 
     # ------------------------------------------------------------------ THINK (A11, PREREG §11.1 step 3)
     def _score_due_predictions(self, word: str, first_glance: Optional[np.ndarray],
-                                 words_in_instant: Optional[List[str]] = None) -> None:
+                                 words_in_instant: Optional[List[str]] = None,
+                                 glances: Optional[List[np.ndarray]] = None, source: Optional[str] = None) -> None:
         """A prediction filed by THINK's kind-(b) work becomes scorable the next time ITS OWN word is
         shown again — "the journal's err/recall on the next canvas with that word" (PREREG's own route
         text). Simplification, documented in the report: the decider "recall == word" is evaluated by a
@@ -1556,6 +2146,18 @@ class Mind:
         still_pending = []
         ledgers = None
         words_in_instant = words_in_instant or []
+        # edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — G9 (ALPHA4-2-PREREG §2 row G9): under `SENTENCE …;
+        # judged by the eye on the line` a SHELF instant scores a frame only when it is a LINE — the reader's sentence moment,
+        # >= 2 distinct words on the canvas (creature/senses/read.py:_publish_chunk publishes every word of a chunk ALONE first,
+        # shown large, then the whole line; a frame was due on w1's one-word canvas, where w2 cannot be: alpha4-1 0 of 63 shelf
+        # frames true, 4 of 4 false on the hour-1 replay) — and its evidence is ANY of the line's located glances
+        # (_frame_evidence_line; the ceiling: 0.272 strict over located glances on the 10:54 copy, 0.089 with glance 0 alone).
+        # SHELF-only by the seat's word: every other source (the game's mission with its picture, a lexicon gloss, a test tape)
+        # keeps today's trigger and today's decider on the same lines below. Undeclared: `line_on` is False and nothing here moves.
+        line_on = self.genome.declared.get("SENTENCE", {}).get("line") is True
+        shelf_line = None
+        if line_on and source == "shelf":
+            shelf_line = len([w for j, w in enumerate(words_in_instant) if w and w not in words_in_instant[:j]]) >= 2
         for entry in self._filed_predictions:
             # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 3 (SENTENCE): a
             # frame entry's target_word is w1, the COLOUR — never equal to `word` (the moment's own word is
@@ -1564,12 +2166,17 @@ class Mind:
             frame_w2 = entry.get("frame_w2")
             if frame_w2 is not None:
                 due = entry["target_word"] in words_in_instant
+                if shelf_line is False:      # G9: a one-word SHELF moment never scores a frame under the clause
+                    due = False
             else:
                 due = entry["target_word"] == word
             if due and self._canvas_index >= entry["due_canvas"]:
                 rule = entry.get("rule")
                 if frame_w2 is not None:
-                    evidence = self._frame_evidence(str(frame_w2), first_glance)
+                    if shelf_line:
+                        evidence = self._frame_evidence_line(str(frame_w2), glances if glances else [first_glance])
+                    else:
+                        evidence = self._frame_evidence(str(frame_w2), first_glance)
                 elif rule is not None:
                     evidence = self._rule_evidence(rule["cluster"], first_glance)
                 else:
@@ -1579,6 +2186,10 @@ class Mind:
                     Lw = ledgers["words"]
                     evidence = r["cell"] is not None and Lw.get(r["cell"], set()) == {word}
                 scored = predict_score(entry["row"], evidence)
+                if line_on and frame_w2 is not None:
+                    # G9: the instant a frame was judged on, stamped on its scored row (the DECLARED replay's own record of shelf
+                    # true/false by source and kind; tools read predictions.jsonl, never the journal) — absent undeclared.
+                    scored["instant"] = {"source": source, "words": list(words_in_instant), "line": bool(shelf_line)}
                 predict_ledger_path = self.run_root / "state" / "predictions.jsonl"
                 predict_ledger_path.parent.mkdir(parents=True, exist_ok=True)
                 with predict_ledger_path.open("a") as f:
@@ -1619,6 +2230,31 @@ class Mind:
         r = self.org.recall("sight", first_glance)
         Lw = ledgers["words"]
         return r["cell"] is not None and Lw.get(r["cell"], set()) == {w2}
+
+    def _ledger_births(self, births_before: int, source: Optional[str]) -> None:
+        """A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400): every SIGHT cell born since `births_before` is filed under
+        `source` in the birth-source ledger, FIRST birth only (an id is never reborn — G4 §3 B7 — so the guard is a formality).
+        A ledger write only: no organism state, no journal field, no hash."""
+        for _t, area, cid, _reason in self.org.births[births_before:]:
+            if area == "sight" and int(cid) not in self.birth_source:
+                self.birth_source[int(cid)] = str(source) if source is not None else ""
+
+    def _frame_evidence_line(self, w2: str, glances: List[np.ndarray]) -> bool:
+        """edit: Claude (Fable 5.1, A42 builder B2), 2026-09-23 17:05 +0400 — G9's decider on a LINE: `_frame_evidence`'s strict
+        decider (the answer cell's ledger is exactly {w2}) asked of EVERY located glance of the line — true if any answers w2.
+        The line's MEET binds the canvas's glances to the chunk's LAST word only (`pending` is last-wins), so w2 elsewhere on the
+        line can be read only from what the eye learned of w2 on its own one-word showings — the measured ceiling (A42-B2-REPORT):
+        0.430 when w2 is the last word, 0.183 when it is not; glance 0 alone reads 0.089, below the bar, which is why this asks
+        every glance. A scoring read never changes the organism (Organism.recall's own law)."""
+        ledgers = build_ledgers(self.org, self.moment_word)
+        Lw = ledgers["words"]
+        for x in glances:
+            if x is None:
+                continue
+            r = self.org.recall("sight", x)
+            if r["cell"] is not None and Lw.get(r["cell"], set()) == {w2}:
+                return True
+        return False
 
     def _rule_evidence(self, cluster: List[int], first_glance: np.ndarray) -> bool:
         """W3-2c (edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — PREREG §18): the decider is «the due canvas's first-glance WINNER is in C» —
@@ -2427,7 +3063,7 @@ class Mind:
             item = dict(item)
             item["body_pair"] = list(self._body_pair)
             self._self_worked_seq = self._body_pair[-1][0]
-        frozen = think_thread.freeze_inputs(self, item, self._canvas_index)
+        frozen, self.think_freeze_ms_last = think_thread.freeze_inputs_timed(self, item, self._canvas_index)   # M5: timed in think_thread (the clock lives there)
         future = self._think_executor.submit(think_thread.worker_run, frozen)
         self._think_pending = {"future": future, "boundary": self._canvas_index, "item": item}
 
@@ -2464,7 +3100,7 @@ class Mind:
             self._think_pending = None
             return
         plan = result.get("plan") or {}
-        applied = self._think_apply_plan(item, plan, launched_at)
+        applied, self.think_apply_ms_last = think_thread.timed_call(self._think_apply_plan, item, plan, launched_at)   # M5: the ONE-WRITER's apply, timed in think_thread
         self._write_journal(row["at"], {
             "seq": row["seq"],
             "think": {"item": item.get("key"), "kind": item.get("kind"), "outcome": applied.get("outcome"),
@@ -2666,11 +3302,20 @@ class Mind:
             "last_seq": self.last_seq,
             "moment_word": {str(k): v for k, v in self.moment_word.items()},
             "moments": self.org.t,
+            # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — ALPHA4-2-PREREG.md §2 M4: the mind's OWN canvas count — a LEDGER key, never an
+            # organism key (which would move every digest: G's lesson, ALPHA4-PREREG §5 GROW). creature/exam.py:canvas_count_of reads
+            # it (the exam and SIT cadences); `moments // fixations` over-counted (5 moments a canvas + 200 a sleep → ≈ 400 real canvases
+            # per «500»). Restored by resume() below so a live restart continues the count the sitter's LAST.json cursor was set from.
+            "canvas_index": self._canvas_index,
             "ear_pending": dict(self.pending),
             # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 task 2: the SAME kind
             # of in-flight state as ear_pending above, same reason (a resume never loses an ear row
             # consumed just before a crash).
             "ear_pending_words": {k: list(v) for k, v in self.pending_words.items()},
+            # A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400): the picture-words LEDGER (see __init__) — a ledger key,
+            # never hashed; first-heard order kept.
+            "picture_words": list(self.picture_words),
+            "birth_source": {str(k): v for k, v in self.birth_source.items()},
             "sight": {str(k): sorted(v) for k, v in ledgers["sight"].items()},
             "words": {str(k): sorted(v) for k, v in ledgers["words"].items()},
             "predictor_last_winner": predictor_last_winner,
@@ -2689,20 +3334,41 @@ class Mind:
             "hands_last_program": self._hands_last_program,
             # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §3/§4:
             # THE STAGE and its judge's own running state — "a resume mid-life keeps the stage" (the
-            # brief's own test); the streak/grade/reward/sit-reading state is persisted too so a resume
-            # does not lose a partial streak or the (d) grade tally it has already earned.
+            # brief's own test); the grade/episode/sit-reading state is persisted too so a resume
+            # does not lose the (d) grade tally or (a)'s window it has already earned.
+            # edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:41 +0400 — §4 AMENDED: "stage_ready_streak" is gone
+            # (the door opens on ONE reading) and (a)'s per-act "game_rewards" became the per-EPISODE "game_episodes"
+            # ([episode, step, success] each, the last READY_A_WINDOW). Neither key is journaled or hashed.
+            # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: the sliding
+            # "game_episodes" deque is gone; the disjoint-block state is four small fields instead (see __init__'s own
+            # comment on _game_last_block/_game_block_n/_game_block_successes/_game_last_episode_step).
             "stage": self.stage,
-            "stage_ready_streak": self._stage_ready_streak,
             "grades_total": self._grades_total,
             "grades_right": self._grades_right,
             "novel_grades": list(self._novel_grades),
             "hold_active": self._hold_active,
-            "game_rewards": list(self._game_rewards),
+            "game_last_episode_step": list(self._game_last_episode_step) if self._game_last_episode_step else None,
+            "game_block_n": self._game_block_n,
+            "game_block_successes": self._game_block_successes,
+            "game_last_block": self._game_last_block,
             "sit_readings": [list(t) for t in self._sit_readings],
             "web_fetches": self.web_fetches,
             "web_refused_rate": self.web_refused_rate,
             "web_refused_hold": self.web_refused_hold,
         }
+        # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:40 +0400 — A4L-LANG task 10: the chat counters survive a restart
+        # (STATUS reads them) — written ONLY under CHAT, so a genome without the gene writes the ledger it always wrote.
+        if "CHAT" in self.genome.declared:
+            ledger["chat_counters"] = dict(self.chat_counters)
+        # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400 — A4L-VOICE: the SOUND ledger (a sound birth is
+        # filed as sound, genome/questions.build_ledgers) and the in-flight maker sounds (the same durability `ear_pending` has,
+        # #230) — written ONLY when the organism has a sound area, so a genome without it writes exactly the ledger it always did.
+        if self.org.sound is not None:
+            ledger["sound"] = {str(k): sorted(v) for k, v in ledgers.get("sound", {}).items()}
+            ledger["sound_pending"] = {k: {"trait": [float(x) for x in v["trait"]], "seq": int(v["seq"])}
+                                       for k, v in self.pending_sound.items()}
+            ledger["voice_rows"] = self.voice_rows
+            ledger["voice_bound"] = self.voice_bound
         ledger_tmp = state_dir / "ledger_tmp.json"
         ledger_tmp.write_text(json.dumps(ledger))
         os.replace(str(ledger_tmp), str(state_dir / "ledger.json"))
@@ -2756,9 +3422,24 @@ class Mind:
             ledger = json.loads(ledger_path.read_text())
             mind.pending = dict(ledger.get("ear_pending", {}))
             mind.pending_words = {k: list(v) for k, v in ledger.get("ear_pending_words", {}).items()}
+            # A42-B2 (edit: Claude (Fable 5.1), 2026-09-23 17:05 +0400): the picture-words LEDGER, restored as written; a snapshot
+            # from before this key resumes EMPTY — never back-filled from the ring (RAISED in A42-B2-REPORT).
+            mind.picture_words = [str(w) for w in ledger.get("picture_words", []) if w]
+            mind._picture_words_set = set(mind.picture_words)
+            mind.birth_source = {int(k): str(v) for k, v in (ledger.get("birth_source") or {}).items()}
+            # A4L-VOICE (edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:34 +0400): in-flight maker sounds + counts
+            mind.pending_sound = {k: {"trait": np.asarray(v["trait"], dtype=np.float64), "seq": int(v["seq"])}
+                                  for k, v in (ledger.get("sound_pending") or {}).items()}
+            mind.voice_rows = int(ledger.get("voice_rows", 0))
+            mind.voice_bound = int(ledger.get("voice_bound", 0))
             mind.moment_word = {int(k): v for k, v in ledger.get("moment_word", {}).items()}
             mind._heard = {v for v in mind.moment_word.values() if v}     # PREREG §15: the heard-set, re-derived (never persisted separately)
             mind.last_seq = int(ledger.get("last_seq", 0))
+            # edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400 — M4: the canvas count continues across a restart (0 on an old ledger, the old
+            # behaviour). The advisor's block: without this a restart under an exam/LAST.json cursor in the thousands would sit again
+            # only after that many more canvases. Live resume only — a replay starts fresh; note: THINK's `_canvas_index % every`
+            # boundary phase now also continues across a restart instead of restarting at 0 (docs/briefs/A42-B1-REPORT.md).
+            mind._canvas_index = int(ledger.get("canvas_index", 0) or 0)
             mind._last_snapshot_moments = mind.org.t
             # edit: Claude (Sonnet 5, ALPHA4 builder I), 2026-09-23 01:04 +0400 — ALPHA4-PREREG.md §3/§4:
             # THE STAGE — "a resume mid-life keeps the stage" (the brief's own test). Absent (a snapshot
@@ -2766,16 +3447,31 @@ class Mind:
             # (never the pre-load org's t=0, which __init__ used to seed `mind.stage` a few lines above
             # this classmethod's own body starts) — the same fallback shape `_last_sleep_at` below uses.
             mind.stage = int(ledger["stage"]) if "stage" in ledger else mind._moments_stage()
-            mind._stage_ready_streak = int(ledger.get("stage_ready_streak", 0))
             mind._grades_total = int(ledger.get("grades_total", 0))
             mind._grades_right = int(ledger.get("grades_right", 0))
             mind._novel_grades = collections.deque(ledger.get("novel_grades", []), maxlen=10)
             mind._hold_active = bool(ledger.get("hold_active", False))
-            mind._game_rewards = collections.deque(ledger.get("game_rewards", []), maxlen=200)
+            # edit: Claude (Opus 5.5, judge builder), 2026-09-23 11:41 +0400 — §4 AMENDED: (a)'s per-EPISODE window (absent
+            # from a snapshot taken before the amendment -> empty: the old per-act "game_rewards" is in other units and is
+            # never converted; the old "stage_ready_streak" is ignored, the door opens on one reading).
+            # edit: Claude (Sonnet 5, judge builder B4), 2026-09-23 14:35 +0400 — ALPHA4-2-PREREG §4.3: the disjoint-block
+            # state (absent from a snapshot taken before THIS amendment -> empty: an old "game_episodes" deque holds only
+            # the last 20 completed episodes with no record of block boundaries, so it cannot be converted into a
+            # disjoint block either — not merely skipped, genuinely impossible to reconstruct; moot for alpha4-2, a fresh
+            # life, ALPHA4-2-PREREG §7.1).
+            gles = ledger.get("game_last_episode_step")
+            mind._game_last_episode_step = tuple(gles) if gles else None
+            mind._game_block_n = int(ledger.get("game_block_n", 0))
+            mind._game_block_successes = int(ledger.get("game_block_successes", 0))
+            mind._game_last_block = ledger.get("game_last_block")
             mind._sit_readings = collections.deque([tuple(x) for x in ledger.get("sit_readings", [])], maxlen=2)
             mind.web_fetches = int(ledger.get("web_fetches", 0))
             mind.web_refused_rate = int(ledger.get("web_refused_rate", 0))
             mind.web_refused_hold = int(ledger.get("web_refused_hold", 0))
+            # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:40 +0400 — A4L-LANG task 10: restored when present (CHAT only).
+            for k_, v_ in (ledger.get("chat_counters") or {}).items():
+                if k_ in mind.chat_counters:
+                    mind.chat_counters[k_] = int(v_)
             # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
             # (L-8): restore the act rng's stream exactly (absent from a snapshot taken before this gene
             # existed -> the freshly-seeded stream __init__ already built, unchanged).

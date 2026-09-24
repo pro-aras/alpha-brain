@@ -66,22 +66,63 @@ def _first_arg_text(call: ast.Call, env: dict) -> Optional[str]:
     return _flatten(call.args[0], env)
 
 
-def _build_env(tree: ast.AST) -> dict:
-    """A same-module `name -> flattened text` map from simple `x = <expr>` assignments (last write
-    wins if reassigned; adequate for this codebase's straight-line style, not real dataflow)."""
-    env: dict = {}
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+# edit: Claude (Fable 5.1), 2026-09-23 17:00 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 2 (docs/briefs/SEAM5-WITNESS-SOUND-REPORT.md item 5): the env is
+# built PER FUNCTION SCOPE — the same change, line for line in its logic, as tools/gate_g4.py's `_scope_map`/`_build_env` (see the note
+# there): one flat module-wide env let a same-named local in another function hide a planted leak from this walker too. A def's env is
+# seeded from its enclosing scope's finished env and takes only its own simple assignments, in source order; a sibling's locals never
+# enter it; class bodies stay transparent (a widening only). `_flatten` is unchanged.
+_SCOPE_NODES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)
+
+
+def _scope_map(tree: ast.AST) -> dict:
+    """node -> its nearest enclosing function scope (the Module node for top-level code). A def/lambda node itself belongs
+    to the scope it is written in; everything under it belongs to the def."""
+    scope_of: dict = {tree: tree}
+
+    def visit(node, scope):
+        for child in ast.iter_child_nodes(node):
+            scope_of[child] = scope
+            visit(child, child if isinstance(child, _SCOPE_NODES) else scope)
+
+    visit(tree, tree)
+    return scope_of
+
+
+def _build_env(tree: ast.AST, scope_of: Optional[dict] = None) -> dict:
+    """`{scope_node: name -> flattened text}` — one env for the Module and one for every def/lambda, from simple
+    `x = <expr>` assignments (last write wins WITHIN a scope, in source order; adequate for this codebase's straight-line
+    style, not real dataflow). A def's env starts as a copy of its enclosing scope's COMPLETE env, then takes the def's own
+    assignments; a sibling function's locals never reach it."""
+    scope_of = scope_of if scope_of is not None else _scope_map(tree)
+    own: dict = {}
+    assigns = (n for n in ast.walk(tree) if isinstance(n, ast.Assign) and len(n.targets) == 1 and isinstance(n.targets[0], ast.Name))
+    for node in sorted(assigns, key=lambda n: (n.lineno, n.col_offset)):
+        own.setdefault(scope_of[node], []).append(node)
+    envs: dict = {}
+
+    def env_of(scope) -> dict:
+        if scope in envs:
+            return envs[scope]
+        env = {} if scope is tree else dict(env_of(scope_of[scope]))     # the enclosing scope's finished env, copied
+        envs[scope] = env
+        for node in own.get(scope, []):
             text = _flatten(node.value, env)
             if text is not None:
                 env[node.targets[0].id] = text
-    return env
+        return env
+
+    env_of(tree)
+    for node in ast.walk(tree):
+        if isinstance(node, _SCOPE_NODES):
+            env_of(node)
+    return envs
 
 
 def find_offenders(path: Path, check_organism_import: bool) -> List[Tuple[str, str]]:
     """[(kind, detail), ...] for one file. kind: "write" | "organism_import"."""
     tree = ast.parse(path.read_text(), filename=str(path))
-    env = _build_env(tree)
+    scope_of = _scope_map(tree)
+    envs = _build_env(tree, scope_of)
     offenders: List[Tuple[str, str]] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
@@ -89,6 +130,7 @@ def find_offenders(path: Path, check_organism_import: bool) -> List[Tuple[str, s
             is_open = isinstance(callee, ast.Name) and callee.id == "open"
             is_write_attr = isinstance(callee, ast.Attribute) and callee.attr in WRITE_METHODS
             if is_open or is_write_attr:
+                env = envs[scope_of[node]]          # FIX 2: the env of THIS call's own scope, not one flat module-wide map
                 text = _first_arg_text(node, env) if is_open else _flatten(callee.value, env)
                 if text and any(bad in text for bad in FORBIDDEN):
                     offenders.append(("write", f"{path.name}: {ast.unparse(node)[:120]}"))
@@ -200,6 +242,69 @@ class TestWriterSweepG41(unittest.TestCase):
         )
         self.assertEqual(find_offenders(clean, check_organism_import=False), [])
         self.assertEqual(find_offenders(clean, check_organism_import=True), [])
+
+    # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:46 +0400 — A4L-VOICE (docs/briefs/A4L-VOICE.md, the writer law):
+    # a planted offender SHAPED like this branch's new module (genome/voice.py's `wav_bytes`, the maker's `_publish_voice` writing the
+    # chord's audit wav) that writes the wav under `state/` instead of `truth/voice/` and imports machinery — caught by BOTH sweeps;
+    # the real genome/voice.py and creature/world_maker.py (which now writes truth/voice/<word>.wav) are clean under both.
+    def test_planted_voice_module_that_writes_memory_is_caught_by_both_sweeps(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        plant = tmp_dir / "planted_voice.py"
+        plant.write_text(
+            "from pathlib import Path\n"
+            "from genome import machinery\n"
+            "def _publish_voice(publish, root, moment, thing, answering=None):\n"
+            "    wav_dir = Path(root) / 'state' / 'voice'\n"
+            "    wav_path = wav_dir / (thing + '.wav')\n"
+            "    wav_path.write_bytes(b'RIFF')\n"
+        )
+        self.assertTrue(find_offenders(plant, check_organism_import=False), "a voice-shaped module writing under 'state' must be caught")
+        self.assertTrue(find_offenders(plant, check_organism_import=True), "and its machinery import too")
+        import importlib
+        gate_g4 = importlib.import_module("tools.gate_g4")
+        self.assertTrue(gate_g4.sweep([plant]), "the SAME plant must be caught by tools/gate_g4.py's own sweep()")
+        self.assertIn("genome/voice.py", gate_g4.SENSE_FILES, "the orchestrator's gate walks the voice module")
+
+    def test_the_real_voice_module_and_the_voiced_maker_pass_both_sweeps(self) -> None:
+        real = [ROOT / "genome" / "voice.py", ROOT / "creature" / "world_maker.py"]
+        for p in real:
+            self.assertEqual(find_offenders(p, check_organism_import=False), [], f"{p} must be clean under this file's own walker")
+            self.assertEqual(find_offenders(p, check_organism_import=True), [], f"{p} must not import Organism/machinery")
+        import importlib
+        gate_g4 = importlib.import_module("tools.gate_g4")
+        self.assertEqual(gate_g4.sweep(real), [])
+
+    # edit: Claude (Fable 5.1), 2026-09-23 16:56 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 2 (docs/briefs/SEAM5-WITNESS-SOUND-REPORT.md item 5): both
+    # sweeps built ONE flat name->text env for the whole module (`ast.walk` over every Assign, last write wins), so a same-named local in a
+    # DIFFERENT function overwrote a leak's binding — the seam-5 builder's own edit (a local `p` in another function) hid COST's planted leak
+    # (`p = root/'state'/'witness.json'; p.write_text(...)`) from BOTH sweeps. The env is now built per function scope (seeded from the
+    # enclosing scope; a sibling's locals never leak in). This plant is the seam-5 shape in miniature. The ORDER is load-bearing for the
+    # control: with the leak FIRST and the innocent binding SECOND the old flat env read [] from both sweeps (the RED, logged in
+    # docs/briefs/SIT-ATOMIC-SWEEP-0923-REPORT.md); with the innocent binding first the old env flagged BOTH writes (a false positive on the
+    # clean one). The fix must read exactly ONE offender — the leak's own line — in either order.
+    @staticmethod
+    def _shadowed_plant(leak_first: bool) -> str:
+        leak = ("def leak(root):\n"
+                "    p = Path(root) / 'state' / 'witness.json'\n"
+                "    p.write_text('{}')\n")
+        clean = ("def clean(root):\n"
+                 "    p = Path(root) / 'truth' / 'note.json'\n"
+                 "    p.write_text('{}')\n")
+        return "from pathlib import Path\n" + (leak + clean if leak_first else clean + leak)
+
+    def test_a_leak_shadowed_by_a_same_named_local_in_another_function_is_caught_by_both_sweeps(self) -> None:
+        import importlib
+        gate_g4 = importlib.import_module("tools.gate_g4")
+        tmp_dir = Path(tempfile.mkdtemp())
+        for leak_first, leak_line in ((True, 4), (False, 7)):
+            plant = tmp_dir / f"planted_shadowed_leak_{leak_first}.py"
+            plant.write_text(self._shadowed_plant(leak_first))
+            mine = find_offenders(plant, check_organism_import=False)
+            self.assertEqual(len(mine), 1, f"leak_first={leak_first}: exactly the leak, never the innocent write, under this file's walker: {mine}")
+            g4 = gate_g4.sweep([plant])
+            self.assertEqual([o[1] for o in g4], [leak_line],
+                             f"leak_first={leak_first}: tools/gate_g4.py's sweep must flag exactly line {leak_line} (the leak), never the clean write: {g4}")
+            self.assertIn("state", g4[0][2])
 
 
 if __name__ == "__main__":
