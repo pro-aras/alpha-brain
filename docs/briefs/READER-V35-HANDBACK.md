@@ -1,5 +1,5 @@
 # READER v3.5 — HAND-BACK (kept current while the lane runs; the last stamp is the state)
-*Claude (Opus 5.5, reader v3.5 builder). Branch `reader-v35` in `/data/dev/genome-wt-reader35` (from a4-integration b84bad8 + master b650ebe). Stamp: 2026-09-24 06:07 +0400.*
+*Claude (Opus 5.5, reader v3.5 builder). Branch `reader-v35` in `/data/dev/genome-wt-reader35` (from a4-integration b84bad8 + master b650ebe). Stamp: 2026-09-24 06:21 +0400.*
 
 ## THE RESULT FIRST
 **IDENTITY (R0b's mark, ADDENDUM §7(2)'s operational form) reads FAIL at 8 h on BOTH pairs the brief named** — a4l2-cost vs a4l-cost and a4l2-floor vs a4l2-cost (same code C2). The stream part reproduces the seat's 2 h numbers EXACTLY (pinned in `TheSeatsTwoHourNumbers`); at 8 h the maker stream diverges (a4l2-floor vs a4l2-cost: a4l2-cost's `answering` canvas q-79, the rest identical one row later; a4l2-cost vs a4l-cost: at maker 2872, near the 4 h arrival) and the counts at equal per-source canvas counts part from canvas 2291 on, on every pair, by ±1–5 (an error birth landing on a neighbouring canvas when the senses interleave differently). The same-code pair shows the same class at the same canvas: **between-LIVES, not the machinery's.** Logs: `/data/dev/scratch-reader35/identity-*.log`, `reproduce-2h-*.log`. The bar is untouched; the classification is in the report.
@@ -10,9 +10,10 @@
 3. Step 3 — the ladder-2 marks (be1d316 + abfd017): IDENTITY, X1_LOCK/X2_SUCCESS, LINE, NURSERY/NURSERY_READ, DROP_EQ, CHAT_COUNTERS, A1_NULL/A2_SEEN; `tests/creature/test_reader_v35_marks.py` (33 tests).
 4. Step 4 (first run, be1d316): `Ran 1718 tests in 1075.343s` · `FAILED (failures=2, skipped=7, expected failures=6)` — the two failures were the DROP builder's check.py fixtures (no genome at the root); fixed in abfd017 (the fixtures carry A4L-DROP.genome; the PREREG decides).
 
+5. Step 4 on the FINAL bytes abfd017: `Ran 1722 tests in 1047.426s` · `OK (skipped=7, expected failures=6)` (docs/briefs/reader-v35/suite-final-abfd017.log).
+
 ## Not done (at this stamp)
-- Step 4's run on the final bytes abfd017 (RUNNING at this stamp: `/data/dev/scratch-reader35/suite.log`, `suite.exit`).
-- Step 5's heavy dry run on the a4l-cost copy (queued after the suite, with `--identity-root` the a4l2-cost copy).
+- Step 5's heavy dry run on the a4l-cost copy — RUNNING since 06:21 (`/data/dev/scratch-reader35/a4l-cost-read.log`); its REPLAY row is the TAPE TWIN (a4l-cost's closed tape under C2's mind code, byte-identical on this branch) that settles the machinery question.
 - The report's last sections.
 
 ## The next command

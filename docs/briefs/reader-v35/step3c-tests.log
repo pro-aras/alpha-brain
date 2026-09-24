@@ -1,0 +1,7 @@
+test_cost_vs_a4l_cost (tests.creature.test_reader_v35_marks.TheSeatsTwoHourNumbers.test_cost_vs_a4l_cost) ... ok
+test_floor_vs_cost (tests.creature.test_reader_v35_marks.TheSeatsTwoHourNumbers.test_floor_vs_cost) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 4.199s
+
+OK

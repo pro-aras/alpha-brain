@@ -1,0 +1,77 @@
+E/data/dev/genome-wt-reader35/tools/lives/check.py:149: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpkqzxfnef/old/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:149: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpjexjwnle/nog/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+F/data/dev/genome-wt-reader35/tools/lives/check.py:149: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmps7jkjl9i/eq/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-reader35/tools/lives/check.py:149: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmppejzg8jl/ne/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.E/data/dev/genome-wt-reader35/tools/lives/check.py:149: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmpe1fnl34z/und/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+F/data/dev/genome-wt-reader35/tools/lives/check.py:149: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/scratch-reader35/tmp/tmp6l580pjp/und-drop/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+FE
+======================================================================
+ERROR: test_a_genome_that_refuses_to_parse_is_unknown (tests.creature.test_lives_check_drop.DropClauseGatesTheComparison.test_a_genome_that_refuses_to_parse_is_unknown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader35/tests/creature/test_lives_check_drop.py", line 88, in test_a_genome_that_refuses_to_parse_is_unknown
+    self.assertIsNone(check.drop_declared(root))
+                      ^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'lives_check_drop' has no attribute 'drop_declared'
+
+======================================================================
+ERROR: test_the_unit_env_names_the_genome_when_no_copy_sits_at_the_root (tests.creature.test_lives_check_drop.DropClauseGatesTheComparison.test_the_unit_env_names_the_genome_when_no_copy_sits_at_the_root)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader35/tests/creature/test_lives_check_drop.py", line 82, in test_the_unit_env_names_the_genome_when_no_copy_sits_at_the_root
+    self.assertIs(check.drop_declared(root), True)
+                  ^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'lives_check_drop' has no attribute 'drop_declared'
+
+======================================================================
+ERROR: test_only_all_declares_the_drop (tests.creature.test_lives_check_drop.TheLadderTwoGenomes.test_only_all_declares_the_drop)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader35/tests/creature/test_lives_check_drop.py", line 99, in test_only_all_declares_the_drop
+    got[g.stem] = check.drop_declared(r)
+                  ^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'lives_check_drop' has no attribute 'drop_declared'
+
+======================================================================
+FAIL: test_an_unknown_genome_is_never_compared (tests.creature.test_lives_check_drop.DropClauseGatesTheComparison.test_an_unknown_genome_is_never_compared)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader35/tests/creature/test_lives_check_drop.py", line 76, in test_an_unknown_genome_is_never_compared
+    self.assertIn("genome unknown", line); self.assertNotIn("MISMATCH", line)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'genome unknown' not found in '[check] glances confirmed 10 surprised not recorded dropped 0 — MISMATCH: dropped 0 != confirmed 10'
+
+======================================================================
+FAIL: test_undeclared_reads_not_declared_never_mismatch (tests.creature.test_lives_check_drop.DropClauseGatesTheComparison.test_undeclared_reads_not_declared_never_mismatch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader35/tests/creature/test_lives_check_drop.py", line 62, in test_undeclared_reads_not_declared_never_mismatch
+    self.assertNotIn("MISMATCH", line)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 'MISMATCH' unexpectedly found in '[check] glances confirmed 20805 surprised not recorded dropped 0 — MISMATCH: dropped 0 != confirmed 20805'
+
+======================================================================
+FAIL: test_undeclared_with_a_drop_is_flagged (tests.creature.test_lives_check_drop.DropClauseGatesTheComparison.test_undeclared_with_a_drop_is_flagged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-reader35/tests/creature/test_lives_check_drop.py", line 68, in test_undeclared_with_a_drop_is_flagged
+    self.assertNotIn("MISMATCH", line); self.assertIn("UNEXPECTED: dropped 3", line)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 'MISMATCH' unexpectedly found in '[check] glances confirmed 10 surprised not recorded dropped 3 — MISMATCH: dropped 3 != confirmed 10'
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.014s
+
+FAILED (failures=3, errors=3)

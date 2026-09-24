@@ -1,0 +1,8 @@
+floor: target {'maker': 1737, 'game': 291, 'shelf': 1945, 'folder': 290} — instants reproducing it: 1, from 2026-09-23T20:08:47.699000+00:00 to 2026-09-23T20:08:47.699000+00:00
+  cut at 2026-09-23T20:08:47.699000+00:00 (A at 2.4228 h of its life): IDENTITY FAIL — graded (ADDENDUM §7(2)): 186 of 2230 meeting points disagree (first at canvas 2291: a4l2-floor-copy ((('sight', 2145), ('sleep', 59), ('words', 333)), (1873, 334), 4) vs a4l2-cost-copy ((('sight', 2146), ('sleep', 59), ('words', 333)), (1874, 334), 4); max |Δ| {'births.sleep': 2, 'births.sight': 4, 'births.words': 0, 'cells[0]': 4, 'cells[1]': 0, 'sleeps': 0}; the last meeting point (canvas 3371) disagrees)
+    maker   1,737/1,737 (a 1,745, b 1,737) first divergence None
+    game    291/291 (a 292, b 291) first divergence None
+    shelf   1,945/1,945 (a 1,952, b 1,945) first divergence None
+    folder  290/290 (a 291, b 290) first divergence None
+    meeting points 2,230 (disagree 186) · reach {'canvas': 3371, 'of_a': 4329, 'of_b': 4310, 'share_of_shorter': 0.7821}
+exit 0

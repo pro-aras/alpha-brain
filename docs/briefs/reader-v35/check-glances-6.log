@@ -1,0 +1,6 @@
+a4l2-floor: [check] glances confirmed 25528 surprised 37482 dropped 0 — not declared (no `; drop confirmed` in the genome; dropped 0 is the ordinary reading)
+a4l2-cost: [check] glances confirmed 25629 surprised 37456 dropped 0 — not declared (no `; drop confirmed` in the genome; dropped 0 is the ordinary reading)
+a4l2-act: [check] glances confirmed 25728 surprised 37252 dropped 0 — not declared (no `; drop confirmed` in the genome; dropped 0 is the ordinary reading)
+a4l2-line: [check] glances confirmed 25654 surprised 37366 dropped 0 — not declared (no `; drop confirmed` in the genome; dropped 0 is the ordinary reading)
+a4l2-nursery: [check] glances confirmed 25590 surprised 37560 dropped 0 — not declared (no `; drop confirmed` in the genome; dropped 0 is the ordinary reading)
+a4l2-all: [check] glances confirmed 22568 surprised 40512 dropped 22568 — OK: dropped == confirmed (declared: `; drop confirmed`)
