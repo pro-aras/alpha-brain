@@ -8,6 +8,7 @@
 3. Composition never appears by itself (SCAN; COGS 16–35 %); it is TRAINED FOR (MLC 2023) or BUILT (NeSS, rule synthesis, NS-CL, LeAR).
 4. Two stores + replay (CLS 1995; CLS-ER 2022) is the continual design; the creature already has the fast store and sleep; the slow store is the missing half.
 5. Grounding-first is a BET (Vong et al. 2024 learned links, not speech; BabyLM 2024's multimodal track beat no text baseline).
+   *Correction (2026-09-24 12:47 +0400, the seat): «beat no text baseline» is the same over-reading the designer withdrew in CONCLUSION §1 — BabyLM 2024's multimodal baselines were themselves image + text models (GIT, Flamingo) and the paper, as read, makes no image + text vs text-only comparison; the honest statement is Zhuang, Fedorenko, Andreas, NAACL 2024: pictures help word learning almost exclusively in the low-data regime; a body that acts and is corrected is untested.*
 6. His 12:01 bar is six world-checked tests per word; the six are adopted by both, verbatim.
 7. The first experiment is on the LETTERS stage, at machine speed, with a hard-gate arm as a first-class candidate, the cells as the floor, and the bars written first. The advisor's ring-read catch (the four sequence families measure REACH, not composition) is accepted by the seat in full.
 
