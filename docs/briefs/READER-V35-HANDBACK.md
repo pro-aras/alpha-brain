@@ -13,7 +13,8 @@
 ## Not done / owed to the seat
 - The merge into master and the re-pin (the seat's, per the brief).
 - The ladder-2 reads themselves with the flags of report §7 (R0b needs `--identity-root`; R3 and R5 need `--control-root`).
-- Scratch to remove when the seat no longer needs the copies: `/data/dev/scratch-reader35` (4.2 GB at 07:27: twelve root copies, the two dry-run outputs, tmp) — the `TheRealPreflights`/`TheSeatsTwoHourNumbers` tests SKIP once it is gone.
+- **Pin v3.5 as a WORKTREE, never an export:** the M1 `readiness` mask needs git ancestry from the reader's tree; an export (no `.git`) masks nothing and every pre-M1 read shows REPLAY diverged on `readiness` (the fail-safe).
+- Scratch to remove when the seat no longer needs the copies: `/data/dev/scratch-reader35` (4.2 GB at 07:27: fourteen root copies — eight pre-flight/ladder-1, six ladder-2 — the two dry-run outputs, tmp) — the `TheRealPreflights`/`TheSeatsTwoHourNumbers` tests SKIP once it is gone.
 
 ## The next command
 `cd /data/dev/genome && git log --oneline -8 reader-v35 && git diff --stat master reader-v35 -- tools tests` (then the seat's merge and re-pin).
