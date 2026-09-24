@@ -164,13 +164,17 @@ class MultiClassTsetlinMachine:
         self.seed = seed
         self.name_cap = name_cap
         self.names: List[str] = []
+        self.names_refused = 0  # #233's law: a cap's refusals are a SERIES, never silently eaten
         self.banks: Dict[str, TsetlinClauseBank] = {
             "YES": TsetlinClauseBank(n_features, C, N, T, s, seed, "tm_yes"),
             "NO": TsetlinClauseBank(n_features, C, N, T, s, seed, "tm_no"),
         }
 
     def hear_name(self, name: str) -> None:
-        if name in self.names or len(self.names) >= self.name_cap:
+        if name in self.names:
+            return
+        if len(self.names) >= self.name_cap:
+            self.names_refused += 1
             return
         self.names.append(name)
         self.banks[name] = TsetlinClauseBank(self.n_features, self.C, self.N, self.T, self.s, self.seed, f"tm_name_{name}")
@@ -193,10 +197,15 @@ class MultiClassTsetlinMachine:
             bank.train(x_bits, y_c=(c == target_class), gen=gen)
 
     def state_dict(self) -> dict:
-        return {"names": list(self.names), "banks": {c: b.state_dict() for c, b in self.banks.items()}}
+        return {
+            "names": list(self.names),
+            "names_refused": self.names_refused,
+            "banks": {c: b.state_dict() for c, b in self.banks.items()},
+        }
 
     def load_state_dict(self, d: dict) -> None:
         self.names = list(d["names"])
+        self.names_refused = d.get("names_refused", 0)
         for name in self.names:
             if name not in self.banks:
                 self.banks[name] = TsetlinClauseBank(self.n_features, self.C, self.N, self.T, self.s, self.seed, f"tm_name_{name}")

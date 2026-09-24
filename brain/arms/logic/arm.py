@@ -92,6 +92,7 @@ class ArmA2:
         self.encoder = StepEncoder(self.cache, self.slots) if self.cache is not None else None
 
         self.names: List[str] = []  # heard names; index = NAME group index (D21)
+        self.names_refused = 0  # #233's law: a cap's refusals are a SERIES, never silently eaten
         self.h_bits = self.net.zero_state()
         self._pending: Dict[int, Dict[str, Any]] = {}
         self._arrival_id = 0
@@ -135,8 +136,11 @@ class ArmA2:
                     self.binariser.observe(s[:GLANCE_DIM])
             self._advance_bits(steps)
             name = row["payload"]["name"]
-            if name not in self.names and len(self.names) < self.name_cap:
-                self.names.append(name)
+            if name not in self.names:
+                if len(self.names) < self.name_cap:
+                    self.names.append(name)
+                else:
+                    self.names_refused += 1
         elif kind == "ASK":
             steps = enc.ask_steps(row["payload"])
             self._advance_bits(steps)
@@ -299,6 +303,7 @@ class ArmA2:
                 "net": self.net.state_dict(),
                 "trainer": self.trainer.state_dict(),
                 "names": self.names,
+                "names_refused": self.names_refused,
                 "h_bits": self.h_bits,
                 "slots": self.slots.to_dict(),
                 "binariser": self.binariser.state_dict(),
@@ -318,6 +323,7 @@ class ArmA2:
         self.net.load_state_dict(d["net"])
         self.trainer.load_state_dict(d["trainer"])
         self.names = list(d["names"])
+        self.names_refused = d.get("names_refused", 0)
         self.h_bits = d["h_bits"]
         self.slots = SlotTable.from_dict(d["slots"])
         self.encoder = StepEncoder(self.cache, self.slots) if self.cache is not None else None
