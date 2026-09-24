@@ -8,7 +8,7 @@
 - **R5 (`why()` for U4a):** BUILD the second form — `why()` cites the TEACH rows the answer READ (the winning naming exemplar's seq and the order positions' seqs) in addition to the FEEDBACK seqs; U4a's grader counts TEACH rows, so D alone becomes gradable. Small; the seat's.
 - **R6 (`candidates_per_sleep`):** declared in the §12 line from the probe's seconds-per-candidate; until then the toys' budgets are printed beside every number.
 - **R7 (fixed-point `sim`):** noted; the identity test proves it.
-- **R8 (order wraps):** the taught order has no wrap — AFTER z and BEFORE a are misuse items (U5) and read NOTHING; D's order atom returns none past the ends.
+- **R8 (the order data wraps — 24 teaching rounds, so `nth(order, index('z')+1)` reads round 2's «a»):** the `order` atom is redefined as the UNIQUE names in first-seen order (one round, no wrap); past its ends it returns none, so AFTER z, TWO_AFTER y/z and BEFORE a are refused alike (U5's misuse items). A one-line change in D's data atom; the seat's, with a test that plants the wrapped reading and asserts it is gone.
 - **R9 (the snapshot seam):** the routers of E′ and F load D's snapshot by sha at each SLEEP (the harness side, the seat's); D exposes `snapshot(path)` and its sha; the seam test: a run of F whose D snapshot is swapped for a planted different one must change F's answers after that sleep.
 
 ## On Builder 2's interim report — nothing raised; the harness pieces not yet built (§9 row 2 items 5–10: the graders, the validator, results/VERDICT, the runner, A4, the twins, the routers and the cells side of the interface arms) are the seat's, built in small committed steps on b1-integration.
