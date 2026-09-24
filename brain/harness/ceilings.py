@@ -160,10 +160,27 @@ def naming_ceiling(script: str, chars: Sequence[str], teach_fonts: Sequence[str]
             return LinearReadoutOracle().fit(Xtr, ytr).predict(Xte)
         null = permutation_null(_fit_predict_pool, Xpool_tr, y_tr, Xpool_te, y_te, seed=seed, n_perm=n_perm)
 
+        # PER-NAME accuracy (the advisor's review, 2026-09-24: a uniform aggregate across all names is
+        # structurally wrong for OTHER_CASE, whose k is "recomputed after stage −1" per §5.2 PRECISELY
+        # because per-letter organ facts vary) — read off the SAME prediction array that produced the
+        # overall best reading, so a family's relation ceiling and its naming ceiling are never built from
+        # two different, silently inconsistent oracle runs.
+        combos = {"nn_fcat": pred_nn_cat, "nn_fpool": pred_nn_pool, "linear_fcat": pred_lin_cat, "linear_fpool": pred_lin_pool}
+        best_combo = max(by_feature, key=lambda k_: by_feature[k_])
+        best_pred = combos[best_combo]
+        per_name_correct: Dict[str, int] = defaultdict(int)
+        per_name_total: Dict[str, int] = defaultdict(int)
+        for p, t in zip(best_pred, y_te):
+            per_name_total[t] += 1
+            if p == t:
+                per_name_correct[t] += 1
+        per_name_accuracy = {t: per_name_correct[t] / per_name_total[t] for t in per_name_total}
+
         out[str(k)] = {
             "organ_ceiling": {"nn": nn_best, "linear": linear_best, "max": max(nn_best, linear_best), "by_feature": by_feature},
             "null": {"mean": null["mean"], "p95": null["p95"]},
             "label_conflicts": sorted(conflicts),
+            "per_name_accuracy": per_name_accuracy, "best_combo": best_combo,
             "n_train": len(y_tr), "n_test": len(y_te),
         }
     out["cache_header"] = header

@@ -77,6 +77,24 @@ class TestNamingCeilingSmoke(unittest.TestCase):
         self.assertGreater(oc["max"], 0.5, "8-way naming with real fonts through the real tower should beat chance")
         self.assertEqual(result["4"]["n_train"], len(chars) * len(teach_fonts))
 
+    def test_per_name_accuracy_is_not_uniform_across_names(self) -> None:
+        """The advisor's review (2026-09-24): a uniform aggregate accuracy across every name is
+        structurally wrong once OTHER_CASE and other per-letter uses need it — per_name_accuracy must be a
+        REAL per-item breakdown, not the aggregate repeated for every key."""
+        chars = list("ABCDEFGHIJ")
+        teach_fonts = fonts.TEACH_FONTS_ORDER
+        test_fonts = fonts.compute()["test"]["latin-upper"][:4]
+        result = naming_ceiling("latin-upper", chars, teach_fonts, test_fonts, SEED, self.cache_dir,
+                                 n_teach_variants=(4,), n_perm=3)
+        per_name = result["4"]["per_name_accuracy"]
+        self.assertEqual(set(per_name), {c.lower() for c in chars})
+        for v in per_name.values():
+            self.assertGreaterEqual(v, 0.0)
+            self.assertLessEqual(v, 1.0)
+        # a real per-item breakdown over only 4 test fonts almost never lands on the exact same float for
+        # every one of 10 classes — the uniform-aggregate bug this test guards against would fail this.
+        self.assertGreater(len(set(per_name.values())), 1, per_name)
+
 
 class TestOtherCaseRemoval(unittest.TestCase):
     def setUp(self) -> None:

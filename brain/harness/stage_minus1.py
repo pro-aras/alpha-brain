@@ -82,15 +82,18 @@ def compute_naming(seed: int, lists: Dict[str, object], cache_dir: Path) -> Dict
 
 
 def _naming_accuracy_by_name(naming_script_result: Dict[str, object], script: str, k: str = "4") -> Dict[str, float]:
-    """A per-CHARACTER accuracy dict isn't directly in naming_ceiling's output (which reports an aggregate
-    accuracy over the whole test set) — for the SMOKE build this module approximates each operand's naming
-    accuracy by the family's own aggregate accuracy at that script (a documented simplification: the full
-    per-character breakdown needs per-item predictions kept alongside naming_ceiling's aggregate, which is a
-    straightforward extension left for the seat/next builder to wire through if a per-letter relation
-    ceiling turns out to matter more than the aggregate does)."""
+    """The REAL per-name accuracy `naming_ceiling` now returns (the advisor's review, 2026-09-24: a uniform
+    aggregate is structurally wrong for OTHER_CASE, whose k is recomputed per-letter after stage −1, §5.2).
+    A name naming_ceiling never scored (a font/char combo the library lacked) falls back to the family's own
+    aggregate — printed as a fallback, never silently merged with the real per-name numbers."""
+    per_name = dict(naming_script_result[k]["per_name_accuracy"])
     agg = naming_script_result[k]["organ_ceiling"]["max"]
     chars = {"latin-upper": names.UPPER, "latin-lower": names.LOWER, "digits": names.DIGIT_CHARS}[script]
-    return {names.name_of(c, script): agg for c in chars}
+    out = {}
+    for c in chars:
+        nm = names.name_of(c, script)
+        out[nm] = per_name.get(nm, agg)
+    return out
 
 
 def compute_relation_ceilings(seed: int, naming_by_name: Dict[str, float]) -> Dict[str, object]:
@@ -189,9 +192,21 @@ def run(seed: int, smoke: bool, out_dir: Path, cache_dir: Path, force: bool = Fa
                                              lists["teach_fonts"][0], seed, cache_dir / "other-case", theta)
         excluded_names = {e["letter"] for e in excluded}
         oc_held = [nm for nm in families.other_case(seed)["held_out"] if nm not in excluded_names]
+        # §5.2: OTHER_CASE is a PICK "among the 26 other-case glyphs of one test font" — relation_ceiling's
+        # "naming accuracy x pick accuracy" (§3.3) needs a SEPARATE pick-discrimination number this module
+        # does not build a real 26-candidate pick simulation for. Declared approximation (flagged for the
+        # seat, not a silent guess): pick_accuracy == the query's own naming accuracy, so the item's ceiling
+        # is naming_accuracy^2 — recognising the query AND telling it apart from 25 candidates are both
+        # modelled as bounded by the same underlying naming capability, never by a bare naming-accuracy^1
+        # that ignores the "and pick correctly among candidates" half of the task entirely.
+        oc_ceilings = [naming_by_name.get(nm, 0.0) ** 2 for nm in oc_held]
+        oc_ceiling = sum(oc_ceilings) / len(oc_ceilings) if oc_ceilings else 0.0
         families_out["OTHER_CASE"] = _normalise(
-            family_relation_ceiling([[nm] for nm in oc_held], naming_by_name),
-            n=len(oc_held), k_min=1, extra={"chance": 1 / 26, "excluded": excluded})
+            oc_ceiling, n=len(oc_held), k_min=1,
+            extra={"chance": 1 / 26, "excluded": excluded,
+                   "pick_approximation": "naming_accuracy**2 (query x candidate-discrimination, both "
+                                          "modelled as the same naming capability — RAISED as a convention, "
+                                          "not a real 26-candidate pick simulation)"})
 
         test_fonts_by_case = {"latin-upper": lists["upper_test_fonts"], "latin-lower": lists["lower_test_fonts"]}
         mirror = families.mirror_symmetric(seed)
