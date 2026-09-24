@@ -81,11 +81,52 @@ def _life_commit(root) -> "str | None":
     return None
 
 
-def replay_ignore_fields(reader_commit, life_commit) -> set:
-    """PURE: the fields the vs-live comparison masks. Same commit (both known, equal, or one a prefix of the other) → none; else {"hash"}."""
+def replay_ignore_fields(reader_commit, life_commit, has_m1=None) -> set:
+    """PURE: the fields the vs-live comparison masks. Same commit (both known, equal, or one a prefix of the other) → none; else {"hash"}.
+
+    edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 07:04 +0400 — READER v3.5, the merge's own consequence: a4-integration's M1 (the readiness judge in its
+    own units, judge-units-0923 `M1_JUDGE_UNITS_COMMIT`) changed the FORM of every `readiness` row (numbers for booleans), and this reader now carries
+    it, so a pre-M1 life (alpha4-1, ladder 1) replayed under it differs in `readiness` on every judge row by construction — measured on a4l-cost's
+    closed 8 h tape: `readiness` is the ONLY differing field besides `hash` (36 of 36 judge rows; 0 row-count mismatches over 31,964 rows).
+    A4-LADDER-2-PREREG §2 declares M1 a machinery difference of the whole ladder and §3 compares across it «masked on `readiness` with the
+    judge-units commit named beside the mask». `has_m1(commit) -> True/False/None` (git ancestry); `readiness` is added iff it PROVES exactly one
+    side carries M1 (an unknown ancestry masks nothing — REPLAY then reads the difference, loudly); None = the v3.2 rule, unchanged."""
     if reader_commit and life_commit and (reader_commit == life_commit or reader_commit.startswith(life_commit) or life_commit.startswith(reader_commit)):
         return set()
-    return {"hash"}
+    out = {"hash"}
+    if has_m1 is not None and reader_commit and life_commit:
+        r, l = has_m1(reader_commit), has_m1(life_commit)
+        if r is not None and l is not None and r != l:
+            out.add("readiness")
+    return out
+
+
+# edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 07:04 +0400 — M1's first code commit (judge-units-0923: «THE READINESS JUDGE in its own units», ALPHA4-PREREG §4
+# AMENDED; merged into a4-integration by 3cedc75 with its tip 76cdc48). The readiness rows change form here.
+M1_JUDGE_UNITS_COMMIT = "56b08dc"
+
+
+def has_commit(tree, ancestor: str, commit: str) -> "bool | None":
+    """True/False: `ancestor` is an ancestor of (or is) `commit` in the repo at `tree`; None when git cannot say (unknown commit, no git)."""
+    try:
+        rc = subprocess.run(["git", "-C", str(tree), "merge-base", "--is-ancestor", ancestor, commit], capture_output=True).returncode
+    except Exception:
+        return None
+    return True if rc == 0 else (False if rc == 1 else None)
+
+
+def readiness_rows_differing(got: Sequence[dict], want: Sequence[dict]) -> Dict[str, int]:
+    """The rows carrying `readiness` on either side (paired by seq, in order) and how many differ in it — printed beside the mask (36 of 36 on a4l-cost:
+    every judge row in other units is the declared M1; a count below the total would be a different fact)."""
+    g: Dict[int, List[dict]] = {}; w: Dict[int, List[dict]] = {}
+    for r in got: g.setdefault(int(r["seq"]), []).append(r)
+    for r in want: w.setdefault(int(r["seq"]), []).append(r)
+    n = k = 0
+    for s in sorted(set(g) & set(w)):
+        for a, b in zip(g[s], w[s]):
+            if "readiness" in a or "readiness" in b:
+                n += 1; k += int(a.get("readiness") != b.get("readiness"))
+    return {"rows_with_readiness": n, "differing": k}
 
 
 def _iso(s: str) -> datetime:
@@ -883,7 +924,9 @@ def main(argv: List[str]) -> int:
     live = replay_mod.read_mind_journal(out / "live-journal.jsonl")
     u1 = replay_mod.read_mind_journal(twins_dir / "unblinded-1" / "mind-journal.jsonl")
     u2 = replay_mod.read_mind_journal(twins_dir / "unblinded-2" / "mind-journal.jsonl")
-    _ign = replay_ignore_fields(R.get("reader_commit"), R.get("life_commit"))
+    # edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 07:04 +0400 — the M1 boundary (replay_ignore_fields' docstring): `readiness` masked iff git proves exactly one side carries it
+    _has_m1 = (lambda c: has_commit(ROOT, M1_JUDGE_UNITS_COMMIT, c))
+    _ign = replay_ignore_fields(R.get("reader_commit"), R.get("life_commit"), has_m1=_has_m1)
     d_live = replay_mod.compare(u1, live, ignore=_ign); d_two = replay_mod.compare(u1, u2)   # v3.2: the two-replays comparison masks nothing
     # the plant: the first 1,000 rows with one eye payload's thing inverted (its cell from the root's truth file) must DIVERGE
     plant_ok = None; plant_seq = None
@@ -915,6 +958,10 @@ def main(argv: List[str]) -> int:
     R["REPLAY"] = {"pass": d_live is None and d_two is None and plant_ok is True, "vs_live": d_live, "two_replays": d_two, "mind_rows": len(u1), "hash_masked": sorted(_ign), "closed_whole": bool(G.get("closed_whole")),
                    "plant_seq": plant_seq, "plant_caught": plant_ok,
                    "cut_seq": G["last_seq"], "lag": LAG_S}     # READER-LAG-0923: the replays and the live journal are compared up to the cut; the tail printed
+    if "readiness" in _ign:     # READER v3.5: the M1 mask, named with its commit, both sides' ancestry and the count it covers (never a silent mask)
+        R["REPLAY"]["readiness_mask"] = {"m1_commit": M1_JUDGE_UNITS_COMMIT, "reader_has_m1": _has_m1(R.get("reader_commit")),
+                                         "life_has_m1": _has_m1(R.get("life_commit")), **readiness_rows_differing(u1, live),
+                                         "rule": "A4-LADDER-2-PREREG §2 (M1 a declared machinery difference) and §3 («masked on readiness with the judge-units commit named»)"}
     print(f"[REPLAY] {R['REPLAY']}", flush=True)
 
     # the organism at the cut = the unblinded replay's snapshot (byte-identical to the live one when REPLAY passes)
@@ -1880,7 +1927,7 @@ def write_verdict(out: Path, R: dict) -> None:
          "", "| mark | bar | reading | verdict |", "|---|---|---|---|",
          f"| ALIVE | {A['bar_hours']} h under the unit, NRestarts 0, every counter moved every hour, no sense dead > 60 s | {A['hours_on_tape']} h on tape · moved every hour {A['every_counter_moved_every_hour']}{_alive_reach} · max gap eye/ear {A['max_gap_s_eye_ear']} s · sense restarts {A['sense_restarts']} · crashes {A['crashes']} · NRestarts {A['nrestarts']} · {lag_text(A.get('lag') or _LS)} | {pf(A['pass'])} |",
          # edit: Claude (Fable 5.1), 2026-09-22 11:0x +0400 — compare() returns None when EVERY row matches; the old rendering printed "vs live None", which reads as unmeasured (the advisor's read, 2026-09-22 10:5x)
-         f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {'identical' if M['vii_replay']['vs_live'] is None else 'DIVERGED at ' + str(M['vii_replay']['vs_live'])} · two replays {'identical' if M['vii_replay']['two_replays'] is None else 'DIVERGED at ' + str(M['vii_replay']['two_replays'])} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']}{(' · masked ' + ','.join(M['vii_replay']['hash_masked']) + ' (reader ' + str(R.get('reader_commit'))[:7] + ' ≠ life ' + str(R.get('life_commit'))[:7] + ')') if M['vii_replay'].get('hash_masked') else ''} · closed whole {M['vii_replay'].get('closed_whole')} at the cut seq {M['vii_replay'].get('cut_seq')}{(' (the mind' + chr(39) + 's last consumed seq)') if _cut else ''} · {lag_text(M['vii_replay'].get('lag') or _LS)} | {pf(M['vii_replay']['pass'])} |"]
+         f"| REPLAY / (vii) | byte-identical mind rows; the plant caught | vs live {'identical' if M['vii_replay']['vs_live'] is None else 'DIVERGED at ' + str(M['vii_replay']['vs_live'])} · two replays {'identical' if M['vii_replay']['two_replays'] is None else 'DIVERGED at ' + str(M['vii_replay']['two_replays'])} · {M['vii_replay']['mind_rows']} rows · plant at seq {M['vii_replay']['plant_seq']} caught {M['vii_replay']['plant_caught']}{(' · masked ' + ','.join(M['vii_replay']['hash_masked']) + ' (reader ' + str(R.get('reader_commit'))[:7] + ' ≠ life ' + str(R.get('life_commit'))[:7] + ')') if M['vii_replay'].get('hash_masked') else ''}{(' · readiness masked across M1 (judge-units ' + str(M['vii_replay']['readiness_mask']['m1_commit']) + ': the reader carries it ' + str(M['vii_replay']['readiness_mask']['reader_has_m1']) + ', the life ' + str(M['vii_replay']['readiness_mask']['life_has_m1']) + '; ' + str(M['vii_replay']['readiness_mask']['differing']) + ' of ' + str(M['vii_replay']['readiness_mask']['rows_with_readiness']) + ' readiness rows differ — A4-LADDER-2-PREREG §3)') if M['vii_replay'].get('readiness_mask') else ''} · closed whole {M['vii_replay'].get('closed_whole')} at the cut seq {M['vii_replay'].get('cut_seq')}{(' (the mind' + chr(39) + 's last consumed seq)') if _cut else ''} · {lag_text(M['vii_replay'].get('lag') or _LS)} | {pf(M['vii_replay']['pass'])} |"]
     # edit: Claude (Opus 5.5, reader-fix builder), 2026-09-23 11:34 +0400 — READER-FIX-0923 (9): every mark row renders through gv() — a not-gradable
     # mark reads «not graded» with its reason, never FAIL; (2)/(3)/(4)/(5)/(7)/(10)/(11) print their new readings; READ, EVOLVE, WEB, STAGE get rows.
     def _why(m): return (" — " + str(m.get("reason"))) if (not m.get("graded") and m.get("reason")) else ""

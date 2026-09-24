@@ -375,3 +375,35 @@ class TheSeatsTwoHourNumbers(unittest.TestCase):
         T = "2026-09-23T20:08:47.699Z"
         got = self._streams(self._cut_at("a4l2-floor-copy", T), self._cut_at("a4l2-cost-copy", T))
         self.assertEqual(got, {"maker": (1737, 1737, None), "game": (291, 291, None), "shelf": (1945, 1945, None), "folder": (290, 290, None)})
+
+
+# edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 07:05 +0400 — the M1 boundary on REPLAY (tools/verdict_g4.py:replay_ignore_fields' docstring): the merge
+# brought a4-integration's readiness judge in its own units into this reader, so a pre-M1 life replays with every judge row in other units.
+class TheM1ReadinessMask(unittest.TestCase):
+    def test_the_v32_rule_is_unchanged_without_the_predicate(self):
+        self.assertEqual(vg.replay_ignore_fields("abc1234", "abc1234"), set())
+        self.assertEqual(vg.replay_ignore_fields("abc1234", "def5678"), {"hash"})
+        self.assertEqual(vg.replay_ignore_fields("abc1234", None), {"hash"})
+
+    def test_readiness_is_masked_only_when_exactly_one_side_carries_m1(self):
+        side = {"post": True, "pre": False, "unknown": None}
+        f = lambda c: side[c]
+        self.assertEqual(vg.replay_ignore_fields("post", "pre", has_m1=f), {"hash", "readiness"})
+        self.assertEqual(vg.replay_ignore_fields("pre", "post", has_m1=f), {"hash", "readiness"})
+        # (two DIFFERENT commits — never one a prefix of the other, which the v3.2 rule reads as the same commit)
+        self.assertEqual(vg.replay_ignore_fields("postA", "postB", has_m1=lambda c: True), {"hash"}, "both carry M1: the same units, nothing more masked")
+        self.assertEqual(vg.replay_ignore_fields("preA", "preB", has_m1=lambda c: False), {"hash"})
+        self.assertEqual(vg.replay_ignore_fields("post", "unknown", has_m1=f), {"hash"}, "an unknown ancestry masks nothing — the difference is read, loudly")
+        self.assertEqual(vg.replay_ignore_fields("same1", "same1", has_m1=f), set(), "the same commit masks nothing at all")
+
+    @unittest.skipUnless(vg.has_commit(TREE, "4d1a100", "4d1a100") is True, "the repo's history is not reachable from this tree")
+    def test_the_real_commits(self):
+        self.assertIs(vg.has_commit(TREE, vg.M1_JUDGE_UNITS_COMMIT, "4d1a100"), True, "C2 (ladder 2) carries M1")
+        for pre in ("633abca", "7bbc995"):          # a4l-cost (ladder 1), alpha4-1
+            self.assertIs(vg.has_commit(TREE, vg.M1_JUDGE_UNITS_COMMIT, pre), False, pre)
+        self.assertIsNone(vg.has_commit(TREE, vg.M1_JUDGE_UNITS_COMMIT, "0000000"))
+
+    def test_the_count_beside_the_mask(self):
+        got = [{"seq": 1, "readiness": {"a": {"k": 11}}}, {"seq": 2, "moment": "x"}, {"seq": 3, "readiness": {"a": {"k": 11}}}]
+        want = [{"seq": 1, "readiness": {"a": False}}, {"seq": 2, "moment": "x"}, {"seq": 3, "readiness": {"a": {"k": 11}}}]
+        self.assertEqual(vg.readiness_rows_differing(got, want), {"rows_with_readiness": 2, "differing": 1})
