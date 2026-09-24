@@ -74,6 +74,23 @@ class RunningBinariser:
             self._rows = []
         return self.thresholds
 
+    def state_dict(self) -> dict:
+        """The PRE-FREEZE accumulated rows are load-bearing state, not scratch — a real bug
+        this file's own resume test caught (ArmA2's resume test diverged at the tape's SLEEP
+        row): a snapshot taken before the first SLEEP, then resumed and continued to that same
+        SLEEP, must freeze on the SAME population the uninterrupted run would have. Persisting
+        only `thresholds` (None pre-freeze) silently truncated that population to whatever the
+        RESUMED run itself re-observed after loading, dropping every TEACH glance seen before
+        the snapshot."""
+        return {
+            "rows": [t.clone() for t in self._rows],
+            "thresholds": self.thresholds.clone() if self.thresholds is not None else None,
+        }
+
+    def load_state_dict(self, d: dict) -> None:
+        self._rows = [t.clone() for t in d["rows"]]
+        self.thresholds = d["thresholds"].clone() if d["thresholds"] is not None else None
+
     def binarise(self, glance: torch.Tensor) -> torch.Tensor:
         thr = self.thresholds if self.thresholds is not None else torch.zeros_like(glance)
         return (glance > thr).float()
@@ -238,6 +255,15 @@ class LogicBPTTTrainer:
         loss.backward()
         torch.nn.utils.clip_grad_norm_(self.params, self.clip)
         self.opt.step()
+
+    def state_dict(self) -> dict:
+        """The SGD momentum buffers are part of the identity law's resume test (PREREG §3.1) —
+        the exact gap brain/arms/soft/engine.py's BPTTTrainer had until ArmA1's own resume test
+        caught it; added here directly, not rediscovered the same way twice."""
+        return self.opt.state_dict()
+
+    def load_state_dict(self, d: dict) -> None:
+        self.opt.load_state_dict(d)
 
 
 def param_count(n_input_bits: int, n_layers: int, n_gates: int, recurrent_bits: int) -> int:

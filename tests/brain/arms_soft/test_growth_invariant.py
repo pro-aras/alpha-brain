@@ -64,7 +64,7 @@ class TestGrowthInvariant(unittest.TestCase):
         for g in ("r", "z", "n"):
             Whh = getattr(engine, f"W_hh_{g}")
             col_block = Whh[: engine.active, active_before:engine.active]
-            self.assertEqual(float(col_block.abs().sum()), 0.0, f"W_hh_{g}: a newborn's outgoing column is not zero")
+            self.assertEqual(float(col_block.detach().abs().sum()), 0.0, f"W_hh_{g}: a newborn's outgoing column is not zero")
 
     def test_hmax_bound_refuses_and_counts_never_eats(self):
         engine = GrowingGRUEngine(input_dim=2, h0=6, hmax=8, seed=1, arrival_budget=100, arrival_regen=1)

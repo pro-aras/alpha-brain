@@ -311,6 +311,38 @@ class GrowingGRUEngine(nn.Module):
             h_new = torch.cat([h_new, pad], dim=-1)
         return h_new
 
+    def extra_state(self) -> dict:
+        """Every plain-Python (non-nn.Parameter) counter that participates in this engine's
+        behaviour — needed ALONGSIDE state_dict() for a faithful snapshot/resume (PREREG §3.1:
+        a resume at event 1,000 must continue identically to an uninterrupted run, which is
+        only true if growth counters, the budget and the birth-error windows survive too)."""
+        return {
+            "active": self.active,
+            "births": self.births,
+            "refused_hmax": self.refused_hmax,
+            "birth_draw_index": self._birth_draw_index,
+            "budget_remaining": self.budget.remaining,
+            "budget_last_regen_step": self.budget._last_regen_step,
+            "budget_refused": self.budget.refused,
+            "budget_granted": self.budget.granted,
+            "err_window": list(self._err_window),
+            "arrival_first200": list(self._arrival_first200),
+            "arrival_baseline": self._arrival_baseline,
+        }
+
+    def load_extra_state(self, d: dict) -> None:
+        self.active = d["active"]
+        self.births = d["births"]
+        self.refused_hmax = d["refused_hmax"]
+        self._birth_draw_index = d["birth_draw_index"]
+        self.budget.remaining = d["budget_remaining"]
+        self.budget._last_regen_step = d["budget_last_regen_step"]
+        self.budget.refused = d["budget_refused"]
+        self.budget.granted = d["budget_granted"]
+        self._err_window = collections.deque(d["err_window"], maxlen=200)
+        self._arrival_first200 = list(d["arrival_first200"])
+        self._arrival_baseline = d["arrival_baseline"]
+
     def state_sha_bytes(self) -> bytes:
         """The raw bytes this engine contributes to an Arm's state_sha (PREREG §3.1): every
         parameter tensor, sorted by name, plus the size fields growth changes (active, births,
@@ -629,6 +661,17 @@ class LocalEligibilityTrainer:
         for e in self.traces:
             e.zero_()
 
+    def state_dict(self) -> dict:
+        """The trace buffers are PART OF THE ARM'S IDENTITY (PREREG §3.1's resume test), not
+        transient: a resumed run whose traces reset to zero diverges from the uninterrupted
+        one at the next local update — caught by this file's own resume test (see the arm-level
+        commit message: the SGD momentum buffers had the identical gap)."""
+        return {"traces": [t.clone() for t in self.traces]}
+
+    def load_state_dict(self, d: dict) -> None:
+        for e, t in zip(self.traces, d["traces"]):
+            e.copy_(t)
+
 
 class BPTTTrainer:
     """The asleep EXACT rule (PREREG §4 row A1): SGD, momentum 0.9, lr 0.01, clip 1.0, over
@@ -646,6 +689,12 @@ class BPTTTrainer:
         loss.backward()
         torch.nn.utils.clip_grad_norm_(self.params, self.clip)
         self.opt.step()
+
+    def state_dict(self) -> dict:
+        return self.opt.state_dict()
+
+    def load_state_dict(self, d: dict) -> None:
+        self.opt.load_state_dict(d)
 
 
 # ───────────────────────── parameter-count formulas (§4.1 matched-parameter solver) ────────────
