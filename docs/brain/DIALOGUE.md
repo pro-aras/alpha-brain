@@ -20,8 +20,15 @@
 | Q10 | designer | letters as a sequence from the ear's word? | yes — the mind decodes the ear row's string; the organ unchanged | — | — |
 | Q11 | designer | a NOTES-MAP of his twelve pages; which items are the letters stage's bar? | yes; the letters bar = relations held out by pair over his five words; page 10's loop later | — | — |
 | Q12 | designer | the probe, the Mac, the tiers, the research's timing | probe at load < 2; no Mac assumed; brain first; the body waits for the conclusion | — | — |
+| Q13 | designer | a machine-written corpus (TinyStories' kind): a teacher in the School, or a borrowed mouth? | his decision; the designer's lean: heard-of text only, after grounding, never the grounded stages' material | — | — |
 
 **A reading note for the transcription (the designer, from the photo of page 10):** the rotated margin reads «If nothing these then search open world for clues and leads. Actively dream leading clues in active memory and predict results. If optimal lead found then test on dummy data if success then test on real data or if required task doesn't include testing but pure knowledge then» — the transcription's two `[?]` there resolve to «Actively dream leading clues in active memory and predict results» (the seat decides whether to amend the transcription).
+
+## His bar of 2026-09-24 12:01 +04 (relayed by the seat) — the measure the research, the conclusion and the design are held to
+«What I'm most anxious about is that what will make it different from others. You or any other ai doesn't understand what it is speaking or doesn't understand the words or language it knows from the core. So that i want it to be different at. Speaking of understanding something from the core and meaning. Not just predicting next word as a token.» The seat's operational reading (the six tests: points · refuses when absent · composes on unseen combinations · explains from its own experience · rejects misuse · learns from one encounter the same day) is adopted in full in `RESEARCH-OPUS.md` §4.1, with a per-substrate table at the letters stage; Q1's four tests are superseded by it. The designer's two sharpenings go to the debate: understanding as a status per word (understood / only heard-of), and a heard word predicted only FROM the world, never from words alone. *(recorded 2026-09-24 12:06 +0400)*
+
+## The research, step 1 of his protocol
+- `RESEARCH-OPUS.md` committed on this branch before the seat's `RESEARCH-SEAT.md` was opened (the protocol's independence).
 
 ## Round 2 — the seat asks the designer
 *(after round 1)*
