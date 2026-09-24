@@ -1,21 +1,19 @@
 # READER v3.5 — HAND-BACK (kept current while the lane runs; the last stamp is the state)
-*Claude (Opus 5.5, reader v3.5 builder). Branch `reader-v35` in `/data/dev/genome-wt-reader35` (from a4-integration b84bad8 + master b650ebe). Stamp: 2026-09-24 06:21 +0400.*
+*Claude (Opus 5.5, reader v3.5 builder). Branch `reader-v35` in `/data/dev/genome-wt-reader35` (from a4-integration b84bad8 + master b650ebe). Stamp: 2026-09-24 07:21 +0400.*
 
-## THE RESULT FIRST
-**IDENTITY (R0b's mark, ADDENDUM §7(2)'s operational form) reads FAIL at 8 h on BOTH pairs the brief named** — a4l2-cost vs a4l-cost and a4l2-floor vs a4l2-cost (same code C2). The stream part reproduces the seat's 2 h numbers EXACTLY (pinned in `TheSeatsTwoHourNumbers`); at 8 h the maker stream diverges (a4l2-floor vs a4l2-cost: a4l2-cost's `answering` canvas q-79, the rest identical one row later; a4l2-cost vs a4l-cost: at maker 2872, near the 4 h arrival) and the counts at equal per-source canvas counts part from canvas 2291 on, on every pair, by ±1–5 (an error birth landing on a neighbouring canvas when the senses interleave differently). The same-code pair shows the same class at the same canvas: **between-LIVES, not the machinery's.** Logs: `/data/dev/scratch-reader35/identity-*.log`, `reproduce-2h-*.log`. The bar is untouched; the classification is in the report.
+## THE RESULT FIRST (paired)
+1. **IDENTITY (R0b) reads FAIL at 8 h on both pairs** (a4l2-cost vs a4l-cost; a4l2-floor vs a4l2-cost, same code): the stream part reproduces the seat's 2 h numbers exactly, then the maker stream parts by the world's own rows (an `answering` canvas; the wall-clock 4 h arrival) and the counts at equal per-source canvas counts part from canvas 2,291 (hour 1.26) on every pair — between LIVES.
+2. **The TAPE TWIN settles the machinery:** a4l-cost's closed 8 h tape replayed under C2's mind code = a4l-cost's live journal on every field of all 31,964 mind rows except M1's `readiness` (36 of 36) and `hash`.
+3. **Decision the merge forced:** REPLAY masks `readiness` across M1 (judge-units 56b08dc), named with the count, iff git proves exactly one side carries it (A4-LADDER-2-PREREG §2/§3) — so the ladder-1 and alpha4-1 reads under v3.5 do not FAIL REPLAY on the declared field. a4l-cost's REPLAY re-graded: PASS with the mask printed.
 
 ## Done
-1. Step 1 — the merge (f90cd08): master's v3.4 [LAG] cut + a4-integration's ladder additions; three hunks of `tools/verdict_g4.py` resolved additively; READER_VERSION v3.5.
-2. Step 2 — `tools/lives/check.py` (ddd09a6): the glances line gated on the genome's own `; drop confirmed` clause; `tests/creature/test_lives_check_drop.py`. On the six closed 8 h copies: five «not declared», ALL «OK: dropped == confirmed» (`check-glances-6.log`).
-3. Step 3 — the ladder-2 marks (be1d316 + abfd017): IDENTITY, X1_LOCK/X2_SUCCESS, LINE, NURSERY/NURSERY_READ, DROP_EQ, CHAT_COUNTERS, A1_NULL/A2_SEEN; `tests/creature/test_reader_v35_marks.py` (33 tests).
-4. Step 4 (first run, be1d316): `Ran 1718 tests in 1075.343s` · `FAILED (failures=2, skipped=7, expected failures=6)` — the two failures were the DROP builder's check.py fixtures (no genome at the root); fixed in abfd017 (the fixtures carry A4L-DROP.genome; the PREREG decides).
+- Step 1 merge (f90cd08) · step 2 check.py (ddd09a6) · step 3 the ladder-2 marks (be1d316, abfd017) · step 5b the M1 mask (d461650) · step 4 suites: on the FINAL code bytes d461650 `Ran 1726 tests in 1056.183s` · `OK (skipped=7, expected failures=6)` (abfd017: `Ran 1722 … OK`) · step 5 the dry run on the a4l-cost copy (run 1 2,290.7 s; re-grade 67.1 s) + IDENTITY on both pairs + the 2 h reproduction + the replay-free marks on all six closed 8 h copies + check.py on them.
+- Report: `docs/briefs/READER-V35-REPORT.md`; evidence under `docs/briefs/reader-v35/` (logs, VERDICTs, the scripts that produced them).
 
-5. Step 4 on the FINAL bytes abfd017: `Ran 1722 tests in 1047.426s` · `OK (skipped=7, expected failures=6)` (docs/briefs/reader-v35/suite-final-abfd017.log).
-
-## Not done (at this stamp)
-- Step 5's heavy dry run on the a4l-cost copy — RUNNING since 06:21 (`/data/dev/scratch-reader35/a4l-cost-read.log`); its REPLAY row is the TAPE TWIN (a4l-cost's closed tape under C2's mind code, byte-identical on this branch) that settles the machinery question.
-- The report's last sections.
+## Not done / owed to the seat
+- The merge into master and the re-pin (the seat's, per the brief).
+- The ladder-2 reads themselves with the flags of report §7 (R0b needs `--identity-root`; R3 and R5 need `--control-root`).
+- Scratch to remove when the seat no longer needs the copies: `/data/dev/scratch-reader35` (4.2 GB at 07:27: twelve root copies, the two dry-run outputs, tmp) — the `TheRealPreflights`/`TheSeatsTwoHourNumbers` tests SKIP once it is gone.
 
 ## The next command
-`cat /data/dev/scratch-reader35/suite.exit; grep -n '^Ran \|^OK\|^FAILED' /data/dev/scratch-reader35/suite.log` — then the dry run:
-`cd /data/dev/genome-wt-reader35 && OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 nice -n 19 python3 tools/verdict_g4.py --root /data/dev/scratch-reader35/a4l-cost-copy --genome /data/dev/scratch-reader35/a4l-cost-copy/code/genome/ladder/A4L-COST.genome --hours 8 --skip-twins --skip-random --workers 1 --identity-root /data/dev/scratch-reader35/a4l2-cost-copy --identity-hours 8 --out /data/dev/scratch-reader35/a4l-cost-read`
+`cd /data/dev/genome && git log --oneline -8 reader-v35 && git diff --stat master reader-v35 -- tools tests` (then the seat's merge and re-pin).

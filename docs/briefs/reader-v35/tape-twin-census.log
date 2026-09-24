@@ -1,0 +1,6 @@
+rows: replay 31964 live 31964
+compare(ignore={hash}): (1027, 'readiness')
+compare(ignore={hash, readiness}): None
+differing rows per field (hash masked): {'readiness': 36} first seq per field: {'readiness': 1027}
+seqs with a row-count mismatch: 0 [] · seqs missing on one side: 0 []
+readiness, first two differing (replay C2 vs live 633abca): [[{"a": {"window": 20, "n": 0, "successes": 0, "bound": 11, "null": 0.29, "ok": false, "block_index": null, "block_n": 20, "k": 11, "p_null_at_k": 0.013172098935193789, "blocks_complete": 0, "k_single_reading": 10}, "b": {"frames_alive": 1, "lifts": [{"frame": "red|box", "lift": 2.4815}], "read_share_last2": [0.6], "frames_ok": false, "read_ok": false, "ok": false}, "c": {"composite_last2": [0.9090909090909091], "q1_last2": [0.8909090909090909], "ok": false}, "d": {"answered": 0, "right": 0, "novel_window_n": 0, "novel_right": 0, "ok": false}, "e": {"hold": false, "ok": true}}, {"a": false, "b
