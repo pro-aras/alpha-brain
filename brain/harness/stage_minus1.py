@@ -238,6 +238,9 @@ def run(seed: int, smoke: bool, out_dir: Path, cache_dir: Path, force: bool = Fa
                 "counts": pools["counts"], "pool_size": pools["pool_size"],
                 "plant_eligible_count": pools["plant_eligible_count"],
                 "plant": pools["plant"],
+                # edit: Claude (Fable 5.1), 2026-09-24 — the tape builder (brain/world/tape.py) reads the
+                # LISTS, not only the counts: which 40 signs are U2's, which 10 U6's refusal check, which 10 U5's.
+                "u2": pools["u2"], "u6_refusal": pools["u6_refusal"], "u5_after_never_taught": pools["u5_after_never_taught"],
             }
         except NeverTaughtError as e:
             report["never_taught_pools_error"] = str(e)

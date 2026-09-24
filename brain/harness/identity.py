@@ -34,19 +34,38 @@ def write_tape_jsonl(tape_rows: Sequence[Dict[str, Any]], path: Path) -> None:
             f.write(canonical_json(row) + "\n")
 
 
-def plant_divergence(tape_rows: Sequence[Dict[str, Any]], at_or_after_event: int, new_glance_row: int) -> List[Dict[str, Any]]:
+def plant_divergence(tape_rows: Sequence[Dict[str, Any]], at_or_after_event: int, new_glance_row: int,
+                     kind: str = "TEACH") -> List[Dict[str, Any]]:
     """§3.1: "a copy of the tape in which the first TEACH row at or after event `at_or_after_event` points
     to a DIFFERENT cache row (its sha recomputed, so the copy is a legitimate tape)". Mutates only that ONE
     row's `glance_row` and recomputes its `sha` — every other row is untouched, so the copy differs from the
     original by exactly one payload field."""
+    # edit: Claude (Fable 5.1), 2026-09-24 18:06 +0400 — SEAT-DECISIONS R3/R21: `kind="ASK"` plants on the first ASK row's
+    # first GLYPH operand instead (the real B1 tape has no TEACH row near event 1,234 — §2.7's counts put
+    # L4's training asks there; a control that cannot fire is void, #228 (a)). `kind="TEACH"` is kept as the
+    # default for the dummy-arm fixture, whose only learning is TEACH. Either way exactly ONE payload field
+    # of ONE row changes, and its sha is recomputed. The returned list carries the landing seq in
+    # the function attribute `plant_divergence.last_planted_seq` (a caller prints where the plant landed — R3).
+    if kind not in ("TEACH", "ASK"):
+        raise IdentityError(f"plant_divergence: kind must be TEACH or ASK, got {kind!r}")
     out = [copy.deepcopy(r) for r in tape_rows]
     for row in out:
-        if row["seq"] >= at_or_after_event and row["kind"] == "TEACH":
-            row["payload"] = dict(row["payload"])
+        if row["seq"] < at_or_after_event or row["kind"] != kind:
+            continue
+        row["payload"] = dict(row["payload"])
+        if kind == "TEACH":
             row["payload"]["glance_row"] = new_glance_row
-            row["sha"] = row_sha(row["payload"])
-            return out
-    raise IdentityError(f"no TEACH row at seq >= {at_or_after_event} to plant a divergence on")
+        else:
+            ops = [dict(op) for op in row["payload"]["operands"]]
+            idx = next((i for i, op in enumerate(ops) if op.get("kind") == "row"), None)
+            if idx is None:
+                continue   # an ASK with no glyph operand (POINT) — keep looking for one that has one
+            ops[idx]["value"] = new_glance_row
+            row["payload"]["operands"] = ops
+        row["sha"] = row_sha(row["payload"])
+        plant_divergence.last_planted_seq = row["seq"]
+        return out
+    raise IdentityError(f"no {kind} row (with a glyph operand) at seq >= {at_or_after_event} to plant a divergence on")
 
 
 def run_worker(python: Path, repo_root: Path, arm_module: str, arm_class: str, seed: int, config: Dict[str, Any],
@@ -83,7 +102,7 @@ def identity_test(python: Path, repo_root: Path, arm_module: str, arm_class: str
                    tape_rows: Sequence[Dict[str, Any]], out_dir: Path, *,
                    checkpoints: Sequence[int] = (500, 1000, 1500, 2000), n_events: int = 2000,
                    plant_at_event: int = 1234, planted_row: int,
-                   run_8_threads: bool = True) -> Dict[str, Any]:
+                   run_8_threads: bool = True, plant_kind: str = "TEACH") -> Dict[str, Any]:
     """§3.1's whole clause. Returns a report with a `pass` bool per sub-check and every raw result kept on
     disk under `out_dir` (never only the verdict — #194).
 
@@ -108,7 +127,8 @@ def identity_test(python: Path, repo_root: Path, arm_module: str, arm_class: str
     twice_answers_match = r1["answers_sha256"] == r2["answers_sha256"]
     twice_state_match = r1["state_sha_at"] == r2["state_sha_at"]
 
-    diverged = plant_divergence(tape_slice, plant_at_event, planted_row)
+    diverged = plant_divergence(tape_slice, plant_at_event, planted_row, kind=plant_kind)
+    planted_seq = getattr(plant_divergence, "last_planted_seq", None)
     diverged_path = out_dir / "tape_diverged.jsonl"
     write_tape_jsonl(diverged, diverged_path)
     r3 = run_worker(python, repo_root, arm_module, arm_class, seed, config, diverged_path, n_events, checkpoints, out_dir, "run_diverged")
@@ -152,7 +172,8 @@ def identity_test(python: Path, repo_root: Path, arm_module: str, arm_class: str
         "pass": overall_pass,
         "twice": {"answers_match": twice_answers_match, "state_match": twice_state_match},
         "planted_divergence": {"early_unchanged": planted_early_ok, "late_diverged": planted_late_ok,
-                                "plant_at_event": plant_at_event, "early_checkpoints": early_cps, "late_checkpoints": late_cps},
+                                "plant_at_event": plant_at_event, "planted_seq": planted_seq, "plant_kind": plant_kind,
+                                "early_checkpoints": early_cps, "late_checkpoints": late_cps},
         "resume": {"ok": resume_ok},
         "threads_finding": threads_finding,   # a FINDING, never a gate (§3.1)
         "out_dir": str(out_dir),
