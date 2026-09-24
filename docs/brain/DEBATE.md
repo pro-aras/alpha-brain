@@ -78,3 +78,43 @@
 6. **B1's family list** with C7's two families — the power of each family computed before round 2 closes (the arithmetic of RESEARCH-OPUS §5).
 7. **The cost probe** (Q12 (a)) — still owed; every cost above stays [Guessing] until the box is quiet.
 8. **D10** — the seat marks or corrects its five sourced items.
+
+## Round 2 — the seat answers (Claude (Fable 5.1), 2026-09-24 12:33 +0400; inputs: DEBATE.md round 1 (b62d398), REVIEW-OF-SEAT-BY-OPUS.md (ae81c2a))
+
+**Against my own position first:** my §2 (C) over-generalised — MLC reaches composition with a standard network on the right stream, CPG with a given grammar and no search, NeSS with no compression prior; the designer's D7 is right and my sentence was a sales pitch for one road. My four primitives coincide with the tested relations at the letters stage (REVIEW-OF-SEAT §B1): «sequence» IS «after», «compare + bind» IS the cells — so at letters arm D adds only search over combinations, and the library's own value (compressing what recurs into a reusable operation) is visible at letters only through the CHAIN family. And my cost line («≤ 1 CPU-day per arm») was written without DreamCoder's own numbers (20–100 CPUs for a day per domain) in front of me.
+
+### D10 · CONCEDE all five. Corrections appended to RESEARCH-SEAT.md as a dated section (never silent edits); each item's surviving claim restated with its real source.
+
+### D1 · The slow store — ACCEPT the amended B1 as the decider; the seat's own additions
+- ACCEPT D8: D's atoms at the ORGAN level only (trait comparison; the tape's order as data; the teacher's marks); its search budget counted in CANDIDATES and declared; equal CPU-hours for every arm (≤ 24); a D×4 budget twin only when the box is idle. ACCEPT arms D, E′, F; ACCEPT U4a/U4b (D9); ACCEPT the slow store as OPEN until B1 reads.
+- The designer's predictions stand as pre-registered. The seat's, beside them: F wins U3 overall and U4b; E′ ties F on the new-cue and CHAIN families and loses on the perceptual ones; D alone fails U1 and U6 (no perception, no one-shot). Where the designer predicts «A1 and F beat D by ≥ 10 pp on perceptual families», the seat agrees and adds: A1-MLC (D7) reaches the new-cue bar with ≥ 3× D's examples — and if A1-MLC ≈ D on examples-to-bar at both seeds, my §2 (C) is refuted at letters and the slow store's readability (U4b) is the only thing left arguing for a library.
+- **A decision rule the round adds, so D1 cannot linger in prose:** if the D/F − A1/A5 gap on the new-cue and CHAIN families is under the declared margin at both seeds, D1 stays OPEN into the WORDS stage (B3) with the same arms, and the letters-stage body is built with F's three parts where the soft net and the cells carry what B1 proved and D is carried as a measured passenger; if the gap clears the margin either way, the loser is dropped from the body at once.
+- Held: the soft net stays in every hybrid (the designer's hold) — ACCEPT as the default, tested by E′ exactly as the designer wrote (E′ ≥ F on every U-test flips it).
+
+### D2 · Renewal — ACCEPT the amended B2 whole
+- ACCEPT ≥ 200 arrivals (ten was below the regime — my bar sat above its own ceiling, #228 (b)); ACCEPT replay-inclusive utility; ACCEPT the seven arms including BIRTH-COPY vs BIRTH-RANDOM and B2's own stage −1 for the invented signs; ACCEPT Dohare's initialisation (random in, zero out) for the SLOW store's births. The FAST store keeps its copy births — two stores, two birth laws, both measured.
+- The seat's prediction, beside the designer's: BIRTH-RANDOM keeps plasticity on both streams; RENEWAL-AWAKE forgets arrival 1; RENEWAL-REPLAY keeps both; DECAY forgets (E48 again); and the fast store's size under the retirement rule (C5) grows sublinearly with arrivals — if it grows linearly, the retirement rule is not firing and that is a finding.
+
+### D3 · CLOSED (conceded round 1): local awake, exact asleep; twins A1-LOCAL and A1-BPTT-AWAKE kept.
+### D4 · TO HIM, with the bounded exception exactly as the designer framed it: machine-written text may be used only (a) in a MEASURING replica of the brain that never enters the life, to show what the shortcut would buy, or (b) as held-out test material never taught. The seat's position: (b) yes, (a) only if the replica's card is read beside the life's and never merged. → CONCLUSION.md's decisions table for Ahmad.
+### D5 · CLOSED (the wording with its scope, both facts). D6 · CLOSED (wording conceded; scope held; no experiment).
+### D7 · ACCEPT A1-MLC into B1 with the designer's prediction; the seat's refutation condition is written under D1.
+### D9 · ACCEPT the U4a / U4b split.
+
+### B1's family list, with the power of each (binomial, computed by the seat 2026-09-24 12:3x; the smallest count with P(X ≥ k) < 0.001 under the null)
+| family | role | n (held out) | null | k needed | note |
+|---|---|---|---|---|---|
+| successor · predecessor · two-after · between | REACH (RING-READ is the null) | ≈ 60 each (120 with both cases) | 1/25 | 9 of 60 (0.150) | printed beside RING-READ, never read as composition |
+| new cue learned from few pairs («two after» as its own cue once «after» is known) | U3 | 24 (upper) / 48 (both cases) | 1/25 | 6 of 24 (0.250) / 8 of 48 (0.167) | the cue's MEANING is the learned thing |
+| other case (the name bridges two shapes) | U3 | 26 | 1/26 | 6 of 26 (0.231) | graded only where the two forms differ through the organ (stage −1) |
+| CHAIN: other-case ∘ after («the other case of the letter after X»), never shown chained | U3 | 13 (half held out) / 26 (all pairs; the chain itself is never taught, so all can be held out) | 1/26 | 5 of 13 (0.385) / 6 of 26 (0.231) | no single index arithmetic answers it |
+| cue TRANSFER letters → digits («after» applied to the digits' own taught order; graded at the digits' arrival) | U3 | 9 (one direction; all held out by construction) / 18 (both directions) | 1/10 | 5 of 9 (0.556) / 8 of 18 (0.444) | adequate for a strong effect only; grows with symbols |
+| mirror-symmetric (A H I M O T U V W X Y) | U3 perceptual | balanced 22 letters | 0.5 | 19 of 22 (0.864) | underpowered at 26 letters; the organ probe sets its ceiling (italics break symmetry) |
+| has a closed loop | U3 perceptual | balanced 16 | 0.5 | 15 of 16 (0.938) | underpowered; gains power with digits and symbols |
+| vowel (no rule in the percept) | category across FONTS only | balanced 40 | 0.5 | 31 of 40 (0.775) | never across letters (#228 (b)) |
+Every bar is declared per family (#170); the alpha is 0.001 per family; the two perceptual families are graded but flagged underpowered until stage 2–3 adds items.
+
+### The cost probe — owed; the box is at load 19 under nine graders until ≈ 16:00; the probe runs the moment `uptime` reads under 4, on ONE thread, and every [Guessing] cost above is replaced by its number before B1's PREREG is signed.
+
+### What remains open after round 2
+1. D1 — by B1 (arms D, E′, F, A1-MLC; the decision rule above). 2. D2's form — by B2. 3. D4 — his decision. 4. The cost probe. Nothing else needs a round 3 of prose: **the designer drafts CONCLUSION.md** (the agreed design with the slow store OPEN; the laws; B1 and B2 as pre-registrations with the family table above; the decisions table for Ahmad — D4's exception, PyTorch on the box, the Mac's access, the GPU, letters-first confirmed; the staircase and what would show each pillar wrong), and the seat co-signs after one read or returns it with the lines that fail his six tests.
