@@ -1,0 +1,327 @@
+"""results.py — results.json · run-facts.json · VERDICT.md for one seed (B1-PREREG.md §8, §6, §4.1, §4.2;
+docs/bench/BENCH-PLAN.md §4.7's partition; SEAT-DECISIONS R26, R27).
+
+edit: Claude (Fable 5.1), 2026-09-24 18:40 +0400 — the seat, alone.
+
+`python -m brain.harness.results --run <run-dir> --tape-dir <tape-dir> [--bars bars.json] [--ceilings ceilings.json]
+[--out docs/brain/b1/<seed>/]` under the venv. Reads every arm directory under the run (the runner's R27 record),
+grades each with `brain.harness.graders` (pure), reads the twins' records for the bands, and writes:
+
+  results.json  — canonical (sorted keys, NO clock), hashed: {prereg_sha, seed, tape_sha, cache_header_sha,
+                  ceilings_sha, bars_line, arms: {<arm>: {controls, marks, partition, cost, size, state_sha_series,
+                  births_series}}, pilot, decisions: {selection, d1_i, d1_ii, d1_iii, mlc_vs_d, grows, ma_isolation,
+                  interface, predictions}, partition, instrument: {key, shifted_key}}.
+  results.sha256 — of results.json's bytes. A re-read reproduces it; a planted one-row change in an
+                  answers.jsonl copy changes it (`tests/brain/harness/test_results.py`).
+  run-facts.json — every clock, load, RSS and pid (from the arms' own run-facts), never hashed.
+  VERDICT.md    — rendered from templates: per family n and the denominator on every line, reach printed where
+                  it applies, VOID / NOT GRADABLE / «no road» in words, never blended; the selection and D1's
+                  three comparisons computed and printed WITH their inputs.
+
+THE INSTRUMENT (0c): KEY must pass every graded TEST mark (the controls C0a/C0e and the tests U1–U6, KEEPS,
+COST) — C0d_CANARY excepted, since KEY answers the canary from the truth by construction (R26) — and
+SHIFTED-KEY must NOT pass them all; otherwise every arm's marks are INSTRUMENT-VOID and the verdict says so
+first. Bars come from the seat's §12 line as `bars.json` (validated against the ceilings by
+`brain.harness.bars`); without one the run is a SMOKE and every mark reads NO_BAR.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import sys
+from pathlib import Path
+from typing import Any, Dict, List, Mapping, Optional, Sequence
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from brain.harness import graders as G  # noqa: E402
+from brain.harness.run import load_tape, load_truth  # noqa: E402
+from brain.protocol import canonical_json  # noqa: E402
+
+RESULTS_VERSION = "b1-results-v1"
+KEY_EXEMPT = ("C0d_CANARY",)
+TWIN_PREFIXES = ("SHUFFLED-NAME:", "SHUFFLED-RELATION:", "FORCED:")
+
+
+class ResultsError(Exception):
+    pass
+
+
+def sha256_bytes(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+
+def sha256_file(p: Path) -> Optional[str]:
+    return sha256_bytes(Path(p).read_bytes()) if Path(p).exists() else None
+
+
+def _series(path: Path, key: str) -> List[Dict[str, Any]]:
+    if not path.exists():
+        return []
+    out = []
+    for l in path.read_text().splitlines():
+        if l.strip():
+            r = json.loads(l)
+            out.append({"where": r.get("where"), "seq": r.get("seq"), key: r.get(key)})
+    return out
+
+
+def shuffled_relation_bands(twin_marks: Mapping[str, Any]) -> Dict[str, float]:
+    """The SHUFFLED-RELATION twin's 95 % band per family: its share + the 95 % binomial half-width on its n."""
+    bands: Dict[str, float] = {}
+    for name, m in twin_marks.items():
+        if not name.startswith("U3_") or m.get("reading") is None:
+            continue
+        fam = name[3:].split("@")[0]
+        n = m["fields"].get("n") or 0
+        share = float(m["reading"])
+        bands[fam] = min(1.0, share + G.half_width_95(max(share, 1e-9), n)) if n else share
+    return bands
+
+
+def assemble(run_dir: Path, tape_dir: Path, bars: Optional[Mapping[str, Any]] = None, ceilings: Optional[Mapping[str, Any]] = None,
+             prereg_path: Optional[Path] = None, bars_line: Optional[str] = None, margins: Optional[Mapping[str, float]] = None) -> Dict[str, Any]:
+    run_dir, tape_dir = Path(run_dir), Path(tape_dir)
+    inputs = json.loads((run_dir / "inputs.json").read_text()) if (run_dir / "inputs.json").exists() else {}
+    seed = int(inputs.get("seed", 0))
+    rows, tape_sha = load_tape(tape_dir)
+    truth = load_truth(tape_dir)["asks"]
+    counts = json.loads((tape_dir / "counts.json").read_text()) if (tape_dir / "counts.json").exists() else {}
+    cache_header = tape_dir / "cache" / "header.json"
+    if not cache_header.exists() and inputs.get("cache_dir"):
+        cache_header = Path(inputs["cache_dir"]) / "header.json"
+    margins = dict(margins or {})
+
+    arm_dirs = sorted(p for p in run_dir.iterdir() if p.is_dir() and (p / "summary.json").exists())
+    names = [p.name.replace("_", ":", 1) if p.name.startswith(("SHUFFLED-NAME_", "SHUFFLED-RELATION_", "FORCED_")) else p.name for p in arm_dirs]
+    records = {n: G.load_record(p) for n, p in zip(names, arm_dirs)}
+
+    # 1. the twins first: SHUFFLED-RELATION bands per BASE arm
+    bands_by_base: Dict[str, Dict[str, float]] = {}
+    for n, rec in records.items():
+        if n.startswith("SHUFFLED-RELATION:"):
+            base = n.split(":", 1)[1]
+            marks = G.grade_arm(rec, truth, rows, bars=None, ceilings=ceilings, tape_counts=counts, seed=seed)
+            bands_by_base[base] = shuffled_relation_bands(marks)
+
+    # 2. every arm's marks
+    arms: Dict[str, Any] = {}
+    for n, rec in records.items():
+        base = n.split(":", 1)[1] if any(n.startswith(p) for p in TWIN_PREFIXES) else n
+        marks = G.grade_arm(rec, truth, rows, bars=bars, ceilings=ceilings, twin_bands=bands_by_base.get(base), tape_counts=counts, seed=seed)
+        part = G.partition(marks)
+        summ = rec["summary"]
+        d = Path(rec["dir"])
+        inputs_sha = {f: sha256_file(d / f) for f in ("answers.jsonl", "why.jsonl", "rules.jsonl", "sittings.json", "feedback.jsonl")}
+        arms[n] = {"marks": marks, "partition": part, "inputs_sha256": inputs_sha,
+                   "cost": summ.get("cost"), "size": summ.get("size"), "final_state_sha": summ.get("final_state_sha"),
+                   "sittings": summ.get("sittings"), "has_why": summ.get("has_why"), "has_rule": summ.get("has_rule"), "twin": summ.get("twin"),
+                   "forced": summ.get("forced"), "state_sha_series": _series(Path(rec["dir"]) / "state_sha.jsonl", "state_sha"),
+                   "births_series": _series(Path(rec["dir"]) / "cost.jsonl", "arm_events"), "missing": rec.get("missing")}
+
+    # 3. the instrument (0c)
+    def test_marks(m: Mapping[str, Any]) -> Dict[str, Any]:
+        return {k: v for k, v in m.items() if v.get("graded") and k not in KEY_EXEMPT}
+
+    instrument: Dict[str, Any] = {"key_present": "KEY" in arms, "shifted_key_present": "SHIFTED-KEY" in arms}
+    if "KEY" in arms:
+        km = test_marks(arms["KEY"]["marks"])
+        instrument["key_failed"] = [k for k, v in km.items() if not v.get("pass")]
+        instrument["key_graded_marks"] = len(km)
+    if "SHIFTED-KEY" in arms:
+        sm = test_marks(arms["SHIFTED-KEY"]["marks"])
+        instrument["shifted_key_failed"] = [k for k, v in sm.items() if not v.get("pass")]
+    instrument["void"] = (not instrument["key_present"]) or bool(instrument.get("key_failed")) or ("SHIFTED-KEY" in arms and not instrument.get("shifted_key_failed"))
+    instrument["why"] = ("KEY missing" if not instrument["key_present"] else
+                         (f"KEY failed {instrument['key_failed']}" if instrument.get("key_failed") else
+                          ("SHIFTED-KEY passed every graded mark — the graders are passable by a shifted answer stream" if ("SHIFTED-KEY" in arms and not instrument.get("shifted_key_failed")) else "")))
+
+    # 4. the decisions (§6, §4.1, §4.2) — computed over the arms present; a missing arm is NAMED, never assumed
+    decisions = _decisions(arms, margins)
+
+    partition_all = {n: a["partition"] for n, a in arms.items()}
+    results = {
+        "version": RESULTS_VERSION, "seed": seed, "tape_sha": tape_sha, "prereg_sha": (sha256_file(prereg_path) if prereg_path else None),
+        "cache_header_sha": sha256_file(cache_header), "ceilings_sha": (sha256_bytes(canonical_json(ceilings).encode()) if ceilings else None),
+        "bars_line": bars_line, "bars": (dict(bars) if bars else None), "margins": margins, "smoke": not bool(bars) or not bool(counts.get("params_are_prereg", False)),
+        "tape_params_are_prereg": counts.get("params_are_prereg"), "arms": arms, "instrument": instrument, "decisions": decisions,
+        "partition": partition_all, "twin_bands": bands_by_base, "pilot": {"a6_partner": None, "inputs": None},
+    }
+    return results
+
+
+def _reading(arms: Mapping[str, Any], arm: str, mark: str) -> Optional[float]:
+    m = (arms.get(arm) or {}).get("marks", {}).get(mark)
+    r = m.get("reading") if m else None
+    return float(r) if isinstance(r, (int, float)) else None
+
+
+def _decisions(arms: Mapping[str, Any], margins: Mapping[str, float]) -> Dict[str, Any]:
+    fams = list(G.U3_LETTER_FAMILIES)
+
+    def u3(arm: str) -> Dict[str, Optional[float]]:
+        return {f: _reading(arms, arm, f"U3_{f}@T_L") for f in fams}
+
+    def diff(a: str, b: str, which: Sequence[str]) -> Dict[str, Any]:
+        if a not in arms or b not in arms:
+            return {"computable": False, "missing": [x for x in (a, b) if x not in arms]}
+        ua, ub = u3(a), u3(b)
+        d = {f: ((ua[f] - ub[f]) if (ua[f] is not None and ub[f] is not None) else None) for f in which}
+        return {"computable": True, "inputs": {a: {f: ua[f] for f in which}, b: {f: ub[f] for f in which}}, "diff_pp": {f: (None if v is None else round(100 * v, 1)) for f, v in d.items()}}
+
+    def all_pass(arm: str) -> Optional[bool]:
+        a = arms.get(arm)
+        if not a:
+            return None
+        return not a["partition"]["failed"]
+
+    m_d1 = margins.get("d1_pp")
+    m_grows = margins.get("grows_pp")
+    m_ma = margins.get("ma_pp")
+    m_if = margins.get("interface_pp")
+    d1_i = diff("F", "A5", ["TWO_AFTER", "CHAIN"])
+    if d1_i.get("computable") and m_d1 is not None:
+        vals = [v for v in d1_i["diff_pp"].values() if v is not None]
+        d1_i["verdict_this_seed"] = ("STAYS" if vals and all(v >= m_d1 for v in vals) else ("DROPPED" if vals and all(v <= -m_d1 for v in vals) else "OPEN"))
+    d1_ii = {"computable": "E′" in arms and "F" in arms}
+    if d1_ii["computable"]:
+        fe, ff = arms["E′"]["marks"], arms["F"]["marks"]
+        worse = [k for k, v in fe.items() if v.get("graded") and ff.get(k, {}).get("graded") and isinstance(v.get("reading"), (int, float))
+                 and isinstance(ff[k].get("reading"), (int, float)) and v["reading"] < ff[k]["reading"]]
+        d1_ii.update({"e_prime_below_f_on": worse, "verdict_this_seed": ("NETWORK DROPPED" if not worse else "network stays")})
+    d1_iii = diff("D", "A1", fams)
+    grows = diff("A1", "A1-FIXED", fams)
+    if grows.get("computable") and m_grows is not None:
+        vals = [v for v in grows["diff_pp"].values() if v is not None]
+        grows["verdict_this_seed"] = "GROWS" if vals and all(v >= m_grows for v in vals) else "growth bought nothing at letters"
+    ma = {"claim": diff("A1-MA", "A1", fams), "isolation": diff("A1-MA", "A1-ATT", fams)}
+    if ma["isolation"].get("computable") and m_ma is not None:
+        vals = [v for v in ma["isolation"]["diff_pp"].values() if v is not None]
+        ma["isolation"]["verdict_this_seed"] = "memory value carries" if vals and all(v >= m_ma for v in vals) else "attention's, not the memory's"
+    interface: Dict[str, Any] = {"arms_present": [a for a in ("A5", "A5-IF1", "A5-IF2", "A5-IF3", "A5-IF4") if a in arms]}
+    if "A5" in arms and len(interface["arms_present"]) > 1:
+        scores = {a: [v for v in (_reading(arms, a, f"U3_{f}@T_L") for f in G.DISCRIMINATING_FAMILIES) if v is not None] for a in interface["arms_present"]}
+        means = {a: (sum(v) / len(v) if v else None) for a, v in scores.items()}
+        interface["mean_discriminating_u3"] = means
+        if m_if is not None and means.get("A5") is not None:
+            best = max((a for a in means if a != "A5" and means[a] is not None), key=lambda a: means[a], default=None)
+            interface["verdict_this_seed"] = (best if best and (means[best] - means["A5"]) * 100 >= m_if else "F keeps IF-0")
+    selection = {"candidates": {a: all_pass(a) for a in ("A5", "A6", "E′", "F") if a in arms}, "rule": "every bar including all six tests at BOTH seeds (§6)",
+                 "this_seed_only": True}
+    return {"selection": selection, "d1_i": d1_i, "d1_ii": d1_ii, "d1_iii": d1_iii, "grows": grows, "ma": ma, "interface": interface,
+            "mlc_vs_d": {"A1-MLC": _examples(arms, "A1-MLC"), "D": _examples(arms, "D"), "A1": _examples(arms, "A1")},
+            "predictions": "DEBATE rounds 1–2 (B1-PREREG.md §6) — read against the arms above by the seat, never by this code"}
+
+
+def _examples(arms: Mapping[str, Any], arm: str) -> Any:
+    m = (arms.get(arm) or {}).get("marks", {}).get("EXAMPLES_TO_BAR_TWO_AFTER")
+    return {"reading": m.get("reading"), "ladder": m.get("fields", {}).get("ladder")} if m else None
+
+
+# ================================================================================================ VERDICT.md
+def _fmt(x: Any) -> str:
+    if isinstance(x, float):
+        return f"{x:.3f}"
+    if isinstance(x, dict):
+        return ", ".join(f"{k} {_fmt(v)}" for k, v in x.items())
+    return str(x)
+
+
+def render_verdict(results: Mapping[str, Any]) -> str:
+    L: List[str] = []
+    L.append(f"# B1 VERDICT — seed {results['seed']} ({'SMOKE — no bars declared' if results.get('smoke') else 'graded'})")
+    L.append("")
+    L.append(f"tape sha `{results['tape_sha'][:16]}…` · results {RESULTS_VERSION} · bars: {results.get('bars_line') or '— none (every mark NO_BAR)'}")
+    inst = results["instrument"]
+    L.append("")
+    L.append(f"## The instrument (0c) — {'VOID: ' + inst.get('why', '') if inst.get('void') else 'sound'}")
+    L.append(f"- KEY: {'present' if inst.get('key_present') else 'MISSING'}; graded marks {inst.get('key_graded_marks')}; failed {inst.get('key_failed')}")
+    L.append(f"- SHIFTED-KEY: {'present' if inst.get('shifted_key_present') else 'missing'}; failed {len(inst.get('shifted_key_failed') or [])} marks")
+    for arm, a in results["arms"].items():
+        L.append("")
+        L.append(f"## {arm}")
+        p = a["partition"]
+        L.append(f"failed {p['failed'] or 'none'} · not gradable {[n for n, _ in p['not_gradable']] or 'none'} · missing-graded {p['missing_graded'] or 'none'}")
+        if a.get("cost"):
+            L.append(f"cost: {_fmt(a['cost'].get('ms_per_event'))} ms per event over {a['cost'].get('arm_events')} events · size {a.get('size')}")
+        L.append("")
+        L.append("| mark | graded | pass | reading | bar | ceiling | null | n / k | note |")
+        L.append("|---|---|---|---|---|---|---|---|---|")
+        for name, m in a["marks"].items():
+            f = m.get("fields") or {}
+            nk = ""
+            if "n" in f:
+                nk = f"{f.get('n')} / {f.get('k', f.get('known', f.get('refused', '')))}"
+            note = m.get("reason_code") or ""
+            if name.startswith("U3_") and (f.get("breakdown_by_class")):
+                note += " · " + "; ".join(f"{c}: {v['right']}/{v['renderings']}" for c, v in f["breakdown_by_class"].items())
+            if m["mark"].startswith("U3_") and m["mark"].split("_", 1)[1].split("@")[0] in G.REACH_FAMILIES:
+                note += " · REACH (read beside RING-READ)"
+            L.append(f"| {name} | {'yes' if m['graded'] else 'no'} | {'PASS' if m['pass'] else ('FAIL' if m['pass'] is False else '—')} | {_fmt(m['reading'])} | {_fmt(m['bar'])} | {_fmt(m['ceiling'])} | {_fmt(m['null'])} | {nk} | {note} |")
+    d = results["decisions"]
+    L.append("")
+    L.append("## The decisions (§6, §4.1, §4.2) — this seed's inputs; the rule needs BOTH seeds")
+    L.append(f"- selection candidates (all bars this seed): {d['selection']['candidates']}")
+    for key, label in (("d1_i", "D1 (i) F − A5 on TWO_AFTER / CHAIN"), ("d1_iii", "D1 (iii) D − A1 (diagnostic)"), ("grows", "GROWS A1 − A1-FIXED")):
+        v = d[key]
+        L.append(f"- {label}: " + (f"diff pp {v['diff_pp']} · inputs {v['inputs']} · {v.get('verdict_this_seed', '')}" if v.get("computable") else f"not computable — missing {v.get('missing')}"))
+    v = d["d1_ii"]
+    L.append(f"- D1 (ii) E′ vs F: " + (f"E′ below F on {v['e_prime_below_f_on']} → {v['verdict_this_seed']}" if v.get("computable") else "not computable — E′ or F missing"))
+    L.append(f"- Memory Attention: claim {d['ma']['claim'].get('diff_pp', d['ma']['claim'].get('missing'))} · isolation {d['ma']['isolation'].get('diff_pp', d['ma']['isolation'].get('missing'))} {d['ma']['isolation'].get('verdict_this_seed', '')}")
+    L.append(f"- interface: {d['interface']}")
+    L.append(f"- examples-to-bar (TWO_AFTER): {d['mlc_vs_d']}")
+    L.append("")
+    L.append("## Reading rules")
+    L.append("- A mark NOT GRADED is never counted as failed; «no road» names a capability the arm does not have; VOID names the instrument, never the arm.")
+    L.append("- REACH families are printed beside RING-READ (reach given the name); the U3 verdict rests on the discriminating families TWO_AFTER · OTHER_CASE · CHAIN.")
+    return "\n".join(L) + "\n"
+
+
+# ================================================================================================ main
+def write_all(results: Mapping[str, Any], out_dir: Path, run_dir: Path) -> Dict[str, str]:
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    blob = canonical_json(results).encode("utf-8")
+    (out_dir / "results.json").write_bytes(blob + b"\n")
+    sha = sha256_bytes(blob)
+    (out_dir / "results.sha256").write_text(sha + "\n")
+    facts = {}
+    for p in sorted(Path(run_dir).iterdir()):
+        if (p / "run-facts.json").exists():
+            facts[p.name] = json.loads((p / "run-facts.json").read_text())
+    (out_dir / "run-facts.json").write_text(json.dumps(facts, sort_keys=True, indent=2) + "\n")
+    (out_dir / "VERDICT.md").write_text(render_verdict(results))
+    return {"results_sha256": sha, "out_dir": str(out_dir)}
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    p = argparse.ArgumentParser()
+    p.add_argument("--run", required=True)
+    p.add_argument("--tape-dir", required=True)
+    p.add_argument("--bars", default=None, help="bars.json from the seat's §12 line")
+    p.add_argument("--ceilings", default=None)
+    p.add_argument("--out", default=None, help="default: <run>/results/")
+    p.add_argument("--prereg", default=str(REPO_ROOT / "docs" / "brain" / "B1-PREREG.md"))
+    ns = p.parse_args(argv)
+    bars_doc = json.loads(Path(ns.bars).read_text()) if ns.bars else None
+    bars = (bars_doc or {}).get("bars") if bars_doc else None
+    margins = (bars_doc or {}).get("margins") if bars_doc else None
+    ceilings = json.loads(Path(ns.ceilings).read_text()) if ns.ceilings else None
+    if bars and ceilings:
+        from brain.harness import bars as B
+        B.validate_bars_line(ceilings.get("families", {}), {k: v for k, v in (bars.get("U3") or {}).items() if isinstance(v, (int, float))})
+    res = assemble(Path(ns.run), Path(ns.tape_dir), bars=bars, ceilings=ceilings, prereg_path=Path(ns.prereg) if Path(ns.prereg).exists() else None,
+                   bars_line=(bars_doc or {}).get("line"), margins=margins)
+    out = Path(ns.out) if ns.out else Path(ns.run) / "results"
+    w = write_all(res, out, Path(ns.run))
+    print(f"[results] seed {res['seed']} · arms {list(res['arms'])} · instrument {'VOID' if res['instrument']['void'] else 'sound'} · results.json sha {w['results_sha256'][:16]}… → {out}")
+    for arm, a in res["arms"].items():
+        print(f"[results]   {arm}: failed {a['partition']['failed']} · not gradable {len(a['partition']['not_gradable'])}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

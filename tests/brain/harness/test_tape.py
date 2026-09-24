@@ -247,5 +247,68 @@ class TestRunnerAndGradersOnTheSmokeTape(unittest.TestCase):
         self.assertIn("U4a_EXPLAINS_EXPERIENCE", ng)      # the dummy has no why(): «no road», never a fail
 
 
+
+class TestResultsOnTheSmokeRun(unittest.TestCase):
+    """edit: Claude (Fable 5.1), 2026-09-24 18:43 +0400 — brain/harness/results.py on the run the class above made: results.json
+    canonical and hashed, the instrument sound (KEY passes every graded test mark, CANARY excepted; SHIFTED-KEY does
+    not), a re-read reproducing the hash, and a planted one-row change in a COPY of an answers.jsonl changing it (§8)."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        from brain.harness import results as RS
+        cls.RS = RS
+        cls.run_dir = _SHARED["root"] / "run"
+        cls.tape_dir = _SHARED["root"] / "a"
+        if not (cls.run_dir / "KEY" / "summary.json").exists():
+            from brain.harness import run as R
+            R.run(SEED, ["KEY", "SHIFTED-KEY", "DUMMY"], cls.run_dir, cls.tape_dir, cls.tape_dir / "cache", log=lambda s: None)
+        cls.res = RS.assemble(cls.run_dir, cls.tape_dir)
+        cls.written = RS.write_all(cls.res, cls.run_dir / "results", cls.run_dir)
+
+    def test_files_instrument_and_reproducibility(self) -> None:
+        out = self.run_dir / "results"
+        for n in ("results.json", "results.sha256", "run-facts.json", "VERDICT.md"):
+            self.assertTrue((out / n).exists(), n)
+        self.assertEqual((out / "results.sha256").read_text().strip(), self.written["results_sha256"])
+        inst = self.res["instrument"]
+        self.assertFalse(inst["void"], inst)
+        self.assertEqual(inst["key_failed"], [])
+        self.assertGreater(len(inst["shifted_key_failed"]), 0)
+        self.assertTrue(self.res["smoke"])           # no bars → a smoke
+        again = self.RS.assemble(self.run_dir, self.tape_dir)
+        from brain.protocol import canonical_json
+        self.assertEqual(canonical_json(again), canonical_json(self.res))     # a re-read reproduces the hash
+        text = (out / "VERDICT.md").read_text()
+        self.assertIn("The instrument (0c) — sound", text)
+        self.assertIn("REACH (read beside RING-READ)", text)
+
+    def test_a_planted_row_change_changes_the_hash(self) -> None:
+        import shutil
+        copy = _SHARED["root"] / "run-planted"
+        if copy.exists():
+            shutil.rmtree(copy)
+        shutil.copytree(self.run_dir, copy, ignore=shutil.ignore_patterns("results"))
+        p = copy / "KEY" / "answers.jsonl"
+        lines = p.read_text().splitlines()
+        # plant on a T_L AFTER item (a graded row): the mark's reading must move, and so must the hash
+        idx = next(i for i, l in enumerate(lines) if json.loads(l).get("sitting") == "T_L" and json.loads(l).get("family") == "AFTER")
+        rec = json.loads(lines[idx])
+        rec["correct"] = False
+        rec["answer"]["kind"] = "SILENT"; rec["answer"]["value"] = None
+        lines[idx] = json.dumps(rec, sort_keys=True, separators=(",", ":"))
+        p.write_text("\n".join(lines) + "\n")
+        planted = self.RS.assemble(copy, self.tape_dir)
+        from brain.protocol import canonical_json
+        h1 = hashlib.sha256(canonical_json(self.res).encode()).hexdigest()
+        h2 = hashlib.sha256(canonical_json(planted).encode()).hexdigest()
+        self.assertNotEqual(h1, h2)
+        self.assertEqual(h1, self.written["results_sha256"])
+        before = self.res["arms"]["KEY"]["marks"]["U3_AFTER@T_L"]["fields"]["renderings"]
+        self.assertNotEqual(planted["arms"]["KEY"]["inputs_sha256"]["answers.jsonl"], self.res["arms"]["KEY"]["inputs_sha256"]["answers.jsonl"])
+        self.assertLess(planted["arms"]["KEY"]["marks"]["U3_AFTER@T_L"]["fields"]["breakdown_by_class"][rec["class"]]["right"],
+                        self.res["arms"]["KEY"]["marks"]["U3_AFTER@T_L"]["fields"]["breakdown_by_class"][rec["class"]]["right"])
+        self.assertEqual(before, planted["arms"]["KEY"]["marks"]["U3_AFTER@T_L"]["fields"]["renderings"])
+
+
 if __name__ == "__main__":
     unittest.main()

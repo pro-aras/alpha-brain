@@ -1,6 +1,7 @@
 """a0.py — ARM A0, THE CELLS (the FLOOR) — B1-PREREG.md §4's table, first row.
 
 edit: Claude (Sonnet 5, B1 builder 2), 2026-09-24 19:2x +0400 — B1-PREREG.md §9 row 1, step 8.
+edit: Claude (Fable 5.1), 2026-09-24 18:42 +0400 — the seat: the sleep fix (replayed moments labelled), R24 forced answers on NAME/POINT abstentions.
 
 `genome.machinery.Organism` under `brain/genomes/B1-CELLS.genome` (= `genome/ALPHA4.genome` with every line
 outside the cells/episodes/sleep removed, §4's table) + `genome.fast.Episodes`. TEACH is the creature's own
@@ -112,7 +113,20 @@ class A0Arm:
 
     def sleep(self, steps: int) -> None:
         t0 = time.perf_counter()
-        genome_sleep.sleep(self.org, self.episodes, steps)
+        # edit: Claude (Fable 5.1), 2026-09-24 18:35 +0400 — the seat's fix of the first A0 crash on a real tape (build_ledgers
+        # KeyError 376 at the first SLEEP): genome.sleep.sleep() calls org.moment() once per replayed episode, so
+        # org.t advances and a replay can BIRTH a cell at a moment this arm's TEACH loop never labelled. The
+        # mind pre-records those moments' words in the SAME order sleep() will replay them
+        # (creature/mind.py, `moment_word[t0 + i]`; Episodes.most_surprising is deterministic on an unchanged
+        # store) — copied here verbatim in shape. `steps` is the tape's SLEEP row value (64, R16); the number of
+        # episodes replayed is the genome's own SLEEP replay count (the machinery's law), never `steps`.
+        n = int(self.g.declared["SLEEP"]["replay"]) if "SLEEP" in self.g.declared else int(steps)
+        t_start = self.org.t
+        for i, eid in enumerate(self.episodes.most_surprising(n)):
+            rec = self.episodes.get(eid)
+            if rec is not None:
+                self._moment_thing[t_start + i] = rec["word"]
+        genome_sleep.sleep(self.org, self.episodes, n)
         self._events += 1
         self._ms += (time.perf_counter() - t0) * 1000.0
 
@@ -145,7 +159,13 @@ class A0Arm:
         glances = self._operand_glances(p["operands"][0])
         r = self.org.recall_many("sight", glances)
         if r["cell"] is None:
-            return Answer(kind=AnswerKind.UNKNOWN, raw={"reason": r["reason"]})
+            # R24 (the seat): the would-be answer for FORCED-ANSWER = the nearest alive cell's name, if the
+            # recall reports one (`nearest`); else no forced answer (the twin reads «no road» on this item).
+            forced = self._forced_from_nearest(r, Lw)
+            raw = {"reason": r["reason"]}
+            if forced:
+                raw["forced"] = forced
+            return Answer(kind=AnswerKind.UNKNOWN, raw=raw)
         names_ = Lw.get(r["cell"], set())
         if not names_:
             return Answer(kind=AnswerKind.UNKNOWN, raw={"reason": "cell has no ledger entry"})
@@ -155,8 +175,20 @@ class A0Arm:
         # reading (§4's table) is what "unsure" names: a real cell, held with less than full confidence.
         grade = genome_questions._grade_bucket(r)
         if grade == "unsure":
-            return Answer(kind=AnswerKind.RESEMBLES, value=nm, raw={"grade": grade})
+            return Answer(kind=AnswerKind.RESEMBLES, value=nm, raw={"grade": grade, "forced": {"kind": AnswerKind.NAME, "value": nm}})
         return Answer(kind=AnswerKind.NAME, value=nm, raw={"grade": grade})
+
+    def _forced_from_nearest(self, r: Mapping[str, Any], Lw) -> Optional[Dict[str, Any]]:
+        """The recall's own nearest-cell reading, when it carries one, as a NAME — never computed by a second
+        road of this arm's making (the twin must force THIS arm's would-be answer, not a new one)."""
+        # recall_many's abstentions carry `lit` — the best LIT cell (None when the glance was novel: nothing lit)
+        for key in ("lit",):
+            c = r.get(key)
+            if isinstance(c, (int, np.integer)) and not isinstance(c, bool):
+                names_ = Lw.get(int(c), set())
+                if names_:
+                    return {"kind": AnswerKind.NAME, "value": sorted(names_)[0]}
+        return None
 
     def _answer_is(self, p: Mapping[str, Any], Lw) -> Answer:
         name_op = next((o for o in p["operands"] if is_name_operand(o)), None)
@@ -185,7 +217,7 @@ class A0Arm:
             if best_idx is None or e > best_val:
                 best_idx, best_val = idx, e
         if best_val <= 0.0:
-            return Answer(kind=AnswerKind.UNKNOWN)
+            return Answer(kind=AnswerKind.UNKNOWN, raw={"forced": {"kind": AnswerKind.PICK, "value": int(best_idx)}} if best_idx is not None else {})
         return Answer(kind=AnswerKind.PICK, value=int(best_idx))
 
     # ------------------------------------------------------------------ U4a: why

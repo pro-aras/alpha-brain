@@ -286,7 +286,7 @@ def binary_perceptual_ceiling(positive_taught: Sequence[Tuple[str, str]], negati
     on the held-out letter-forms ... (per form, majority over its 3 renderings)." Train = one TEACH-font
     rendering per taught form per TEACH font (all 4); test = `n_test_fonts_per_form` SEEDED test fonts (of
     the form's own case) per held-out form, majority-voted."""
-    from .seeds import substream
+    from brain.world.seeds import substream
     libs: Dict[str, GlyphLibrary] = {}
 
     def teach_fonts_fn(_form):
@@ -351,7 +351,7 @@ def vowel_ceiling(vowel_forms: Sequence[Tuple[str, str]], consonant_forms_all: S
     train = ALL 52 forms (vowel_forms + every OTHER letter form, i.e. `consonant_forms_all`, both cases) in
     every TEACH font; test = the 10 vowel forms + `consonant_forms_test`'s 10 seeded consonants, each in
     `n_test_fonts_per_form` seeded TEST fonts of its own case."""
-    from .seeds import substream
+    from brain.world.seeds import substream
     libs: Dict[str, GlyphLibrary] = {}
     all_forms = list(vowel_forms) + list(consonant_forms_all)
 

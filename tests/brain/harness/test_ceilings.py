@@ -118,3 +118,32 @@ class TestOtherCaseRemoval(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPerceptualCeilingsWalkTheFullRunPath(unittest.TestCase):
+    """edit: Claude (Fable 5.1), 2026-09-24 19:03 +0400 — the perceptual ceilings (MIRROR/LOOP's `binary_perceptual_ceiling`,
+    `vowel_ceiling`) were skipped at --smoke and never called by any test: the FULL stage −1 died on 2026-09-24
+    19:0x at a wrong relative import inside them (`from .seeds …` in brain/harness — #173's class, a green suite
+    that never loads the road). This walks both at a tiny scale (two forms, two fonts) under the real organs."""
+
+    def test_binary_and_vowel_ceilings_run_at_smoke_scale(self) -> None:
+        import os
+        import tempfile
+        from pathlib import Path
+        from brain.harness.ceilings import binary_perceptual_ceiling, vowel_ceiling
+        from brain.world import fonts
+        tmp = tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", "/data/dev/brain-runs/tmp"), prefix="ceil-perc-")
+        cache = Path(tmp.name)
+        teach = fonts.TEACH_FONTS_ORDER[:2]
+        f = fonts.compute()
+        test_by_case = {"latin-upper": f["test"]["latin-upper"][:2], "latin-lower": f["test"]["latin-lower"][:2]}
+        pos_t, neg_t = [("latin-upper", "A"), ("latin-upper", "H")], [("latin-upper", "F"), ("latin-lower", "g")]
+        pos_h, neg_h = [("latin-upper", "M")], [("latin-lower", "r")]
+        r = binary_perceptual_ceiling(pos_t, neg_t, pos_h, neg_h, teach, test_by_case, 20261001, cache / "mirror", "mirror")
+        self.assertIn("accuracy", r)
+        self.assertEqual(r["n"], 2)
+        v = vowel_ceiling([("latin-upper", "A"), ("latin-lower", "e")], [("latin-upper", "B"), ("latin-lower", "r"), ("latin-upper", "T")],
+                          [("latin-upper", "B"), ("latin-lower", "r")], teach, test_by_case, 20261001, cache / "vowel")
+        self.assertIn("accuracy", v)
+        self.assertGreater(v["n"], 0)
+        tmp.cleanup()

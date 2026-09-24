@@ -1,3 +1,4 @@
+# edit: Claude (Fable 5.1), 2026-09-24 18:42 +0400 — R24: Answer.raw['forced'] on the three abstain sites (the would-be answer for the FORCED-ANSWER twin); size() below.
 # edit: Claude (Sonnet 5, B1 builder 3), 2026-09-24 18:25 +0400 — the Arm-conforming wrapper
 #   for A1 and every one of Builder 3's soft-gate variants, written AFTER brain/protocol.py
 #   froze at ac7d2ff. ONE class (ArmA1) driven entirely by `config["variant"]`: A1, A1-FIXED,
@@ -415,10 +416,11 @@ class ArmA1:
                     conf = float(probs.max())
                     given_idx = int(logits.argmax())
                     novelty = float(self._recent_world_error())
+                    forced = {"kind": AnswerKind.NAME, "value": self.names.names[given_idx]}   # R24: the would-be answer, for FORCED-ANSWER
                     if self._world_err_hist.hist and novelty > self._world_err_hist.quantile(0.95, default=float("inf")):
-                        ans = Answer(kind=AnswerKind.UNKNOWN, raw={"conf": conf, "novelty": novelty})
+                        ans = Answer(kind=AnswerKind.UNKNOWN, raw={"conf": conf, "novelty": novelty, "forced": forced})
                     elif self._answer_conf_hist.hist and conf < self._answer_conf_hist.quantile(0.05, default=0.0):
-                        ans = Answer(kind=AnswerKind.NOTHING, raw={"conf": conf})
+                        ans = Answer(kind=AnswerKind.NOTHING, raw={"conf": conf, "forced": forced})
                     else:
                         ans = Answer(kind=AnswerKind.NAME, value=self.names.names[given_idx], raw={"conf": conf})
                     entry["given_index"] = given_idx
@@ -431,7 +433,7 @@ class ArmA1:
                 conf = float(probs.max())
                 given_idx = int(logits.argmax())
                 if self._answer_conf_hist.hist and conf < self._answer_conf_hist.quantile(0.05, default=0.0):
-                    ans = Answer(kind=AnswerKind.NOTHING, raw={"conf": conf})
+                    ans = Answer(kind=AnswerKind.NOTHING, raw={"conf": conf, "forced": {"kind": (AnswerKind.YES if given_idx == 1 else AnswerKind.NO), "value": None}})
                 else:
                     ans = Answer(kind=(AnswerKind.YES if given_idx == 1 else AnswerKind.NO), raw={"conf": conf})
                 entry["given_index"] = given_idx
@@ -454,7 +456,7 @@ class ArmA1:
                     conf = float(probs.max())
                     given_idx = int(scores_t.argmax())
                     if self._answer_conf_hist.hist and conf < self._answer_conf_hist.quantile(0.05, default=0.0):
-                        ans = Answer(kind=AnswerKind.NOTHING, raw={"conf": conf})
+                        ans = Answer(kind=AnswerKind.NOTHING, raw={"conf": conf, "forced": {"kind": AnswerKind.PICK, "value": given_idx}})
                     else:
                         ans = Answer(kind=AnswerKind.PICK, value=given_idx, raw={"conf": conf})
                     entry["given_index"] = given_idx
@@ -619,6 +621,19 @@ class ArmA1:
         self.local_trainer.load_state_dict(d["local_trainer"])
         self.bptt_trainer.load_state_dict(d["bptt_trainer"])
         self._pending = {}
+
+    def size(self) -> Dict[str, Any]:
+        """The arm's size for the record (R27; §4.1's matched-parameter twins solve against `n_params_active`):
+        the ALIVE hidden width, the declared ceiling, the names heard, and the total parameter count at the
+        alive width by the engine's own formula (`a1_total_params`) — never a raw `numel()` over HMAX-wide
+        tensors, whose zero columns are not parameters the arm uses."""
+        from brain.arms.soft.engine import a1_total_params
+        from brain.arms.soft.steps import STEP_DIM, GLANCE_DIM, LETTER_DIM, KIND_DIM
+        h = int(self.engine.active)
+        n_names = len(self.names.names)
+        return {"h_alive": h, "hmax": int(self.engine.hmax), "h0": int(getattr(self.engine, "h0", h)), "n_names": n_names,
+                "n_params_active": int(a1_total_params(STEP_DIM, h, GLANCE_DIM, LETTER_DIM, KIND_DIM, n_names)),
+                "variant": self.config.get("variant", "A1")}
 
     def cost(self) -> Dict[str, float]:
         return {"events": self._events, "ms": self._ms}
