@@ -18,6 +18,12 @@ import numpy as np
 
 from .fonts import GLYPH_ROOT, SCRIPTS
 
+# §3.3's never-taught candidate scripts (Hebrew, Arabic, Devanagari, Greek — Cyrillic is OUT, the tower
+# trained on it). Independently checked on this box, 2026-09-24: base-32 font counts 20/12/4/60 (matches
+# §3.3's own "Hebrew 20, Arabic 12, Greek ≈ 60, Devanagari 4" exactly), and both of §2.1's invariants
+# (one line-box height per font, never wider than tall) hold here too — 0 violations in all four.
+NEVER_TAUGHT_SCRIPTS: tuple = ("hebrew", "arabic", "devanagari", "greek")
+
 
 class GlyphsError(Exception):
     pass
@@ -32,8 +38,8 @@ class GlyphLibrary:
     re-derived."""
 
     def __init__(self, script: str):
-        if script not in SCRIPTS:
-            raise GlyphsError(f"unknown script {script!r} (must be one of {SCRIPTS})")
+        if script not in SCRIPTS and script not in NEVER_TAUGHT_SCRIPTS:
+            raise GlyphsError(f"unknown script {script!r} (must be one of {SCRIPTS + NEVER_TAUGHT_SCRIPTS})")
         self.script = script
         self.root = GLYPH_ROOT / script
         idx_path = self.root / "glyphs.idx"

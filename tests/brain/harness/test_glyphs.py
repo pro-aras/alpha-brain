@@ -8,7 +8,7 @@ import numpy as np
 
 from brain.world import fonts
 from brain.world.canvas import CANVAS, THING_SIDE, glyph_box, render_glyph_canvas
-from brain.world.glyphs import GlyphLibrary, GlyphsError
+from brain.world.glyphs import NEVER_TAUGHT_SCRIPTS, GlyphLibrary, GlyphsError
 
 
 class TestGlyphLibrary(unittest.TestCase):
@@ -41,6 +41,26 @@ class TestGlyphLibrary(unittest.TestCase):
             for font in fonts.TEACH_FONTS_ORDER:
                 missing = [c for c in chars if not lib.has(c, font)]
                 self.assertEqual(missing, [], f"{script}/{font} is missing {missing}")
+
+
+class TestNeverTaughtScripts(unittest.TestCase):
+    def test_all_four_load_and_have_base32_rows(self) -> None:
+        for script in NEVER_TAUGHT_SCRIPTS:
+            lib = GlyphLibrary(script)
+            self.assertGreater(len(lib._by_key), 0, script)
+
+    def test_font_counts_match_prereg_section_3_3(self) -> None:
+        expected = {"hebrew": 20, "arabic": 12, "devanagari": 4, "greek": 60}
+        for script, n in expected.items():
+            lib = GlyphLibrary(script)
+            self.assertEqual(len(lib._heights), n, script)
+
+    def test_a_greek_glyph_boxes_like_a_latin_one(self) -> None:
+        lib = GlyphLibrary("greek")
+        any_font = next(iter(lib._heights))
+        any_char = next(c for (c, f) in lib._by_key if f == any_font)
+        box = glyph_box(lib, any_char, any_font)
+        self.assertEqual(box.shape, (THING_SIDE, THING_SIDE))
 
 
 class TestGlyphBoxAndCanvas(unittest.TestCase):
