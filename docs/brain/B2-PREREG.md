@@ -10,7 +10,7 @@
 1. The question (D2): does a brain that learns for life STAY able to learn — and what does keeping plasticity cost the old?
 2. The soft network (B1's A1) with the cells beside it as its episodic store; **the graded answers are the NETWORK's alone**, so the cells' perfect memory cannot hide the network's forgetting.
 3. Two streams per seed: **ARRIVALS** — 200 arrivals of five never-seen signs (CJK ideographs) with invented names; **PERMUTED** — Dohare's Online Permuted MNIST shape: the same ten signs through 800 permutations of the eye's numbers, no signal at a switch.
-4. Seven arms, a ladder from the FLOOR, each one mechanism from its neighbour: FIXED · FIXED + CBP · BIRTH-RANDOM · BIRTH-COPY · BIRTH-RANDOM + RENEWAL-AWAKE · BIRTH-RANDOM + RENEWAL-REPLAY · BIRTH + DECAY.
+4. Seven arms, a ladder from the FLOOR, each one mechanism from its neighbour: FIXED · FIXED + CBP · BIRTH-RANDOM · BIRTH-COPY · BIRTH-RANDOM + RENEWAL-AWAKE · BIRTH-RANDOM + RENEWAL-REPLAY · BIRTH + DECAY. An eighth — memory values with a sparse row update — enters only if B1's Memory Attention twin holds (§4.5).
 5. Plasticity = showings-to-bar on each arrival (and online accuracy per permutation), graded as a SLOPE over the stream with a bootstrap interval — five signs per arrival are too few for any per-arrival bar.
 6. Retention = the tracked arrivals' held-out naming at every tenth arrival, pooled; arrival 1 printed alone beside the pool.
 7. Two positive controls make the marks gradable: FIXED-HOT must show the loss the instrument claims to see; NO-REPLAY must show the forgetting it claims to see.
@@ -93,6 +93,12 @@
 - **(C1) THE INSTRUMENT SEES A LOSS — FIXED-HOT:** FIXED at lr × 10. If NEITHER FIXED nor FIXED-HOT shows a loss of plasticity on a stream (§5.1: a LOSS SHOWN — the whole interval past the band on the loss side), every plasticity mark on that stream reads **NOT GRADABLE — the stream is too short** (CONCLUSION §4.2's rule, with the hot twin as its positive control).
 - **(C2) THE INSTRUMENT SEES FORGETTING — NO-REPLAY:** BIRTH-RANDOM with `sleep()` a no-op. Its pooled drop (§5.2) must EXCEED the retention bar; if it does not, every retention mark reads **NOT GRADABLE — the stream cannot make this network forget**.
 - **(C3) KEY / SHIFTED-KEY** on B2's graders (B1 §5.5 (0c)). **(C4) FROZEN** — `state_sha` before = after every checkpoint sitting. **(C5) DISJOINT** — no held-out rendering's PNG sha on any TEACH row; a planted copy caught.
+
+### 4.5 · A CONDITIONAL eighth arm — memory values against interference (added 2026-09-24 16:06 +0400 on the seat's word; enters only if B1's A1-MA holds its claim AND its isolation at both seeds — B1-PREREG §4.1)
+- **BIRTH-RANDOM + MEMORY VALUES:** arm 3 with A1-MA's read-out (B1 §4.1), its table growing ONE ROW PER NEW NAME (a new token is a new row, zero-initialised, so a birth of a row changes nothing it computes) — one difference from arm 3.
+- **The property it tests** (the seat's note): a row is written only when its token is present — growth without touching the old, against the interference Dohare 2024 and E48 measured. **The paper does not give this for free, in its own words:** «lookup-based computation does not by itself imply sparse gradient storage or sparse optimizer states» — under A1's SGD with momentum 0.9 an ABSENT row keeps moving on its stored momentum, and any weight decay moves every row. So the arm's TABLE is updated by a declared SPARSE rule: plain SGD on the rows present in the step, no momentum and no decay on the table (momentum kept for the rest of the network).
+- **Its twin — the property's control:** the same arm with the table under the network's own momentum (the dense form). The property holds iff the sparse arm's retention drop (§5.2) is below the dense twin's by the declared margin at both seeds, with plasticity no worse.
+- If B1's A1-MA does not hold, this arm is not built and the line says so in the VERDICT.
 
 ## 5 · The marks
 ### 5.1 Plasticity
