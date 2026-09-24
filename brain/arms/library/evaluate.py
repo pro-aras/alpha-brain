@@ -1,6 +1,8 @@
 """evaluate.py — arm D's column-wise evaluator (report §2.7).
 
-edit: Claude (Opus 5.5, B1 builder 1), 2026-09-24 16:55 +0400 — values are arrays over a batch of examples with a
+edit: Claude (Opus 5.5, B1 builder 1), 2026-09-24 17:36 +0400 — the memo now names every value by its provenance and works in every
+context (abstraction bodies, cue ops' programs), so a cue op called from many call sites computes once.
+Earlier: 2026-09-24 16:55 +0400 — values are arrays over a batch of examples with a
 validity mask (a raise on one example marks that example only); every real value (a `sim`, a `b2r`) is an EXACT
 int64 in units of 2**-52, so no answer depends on the batch, the order of a reduction, or the process.
 
@@ -31,20 +33,28 @@ class EvalError(Exception):
 # ---------------------------------------------------------------------------------------------- values
 class Val:
     """A scalar-per-example value. const: `v` is a Python int (or bool) and `ok` a bool; else `v` is an (n,)
-    array and `ok` an (n,) bool array."""
-    __slots__ = ("const", "v", "ok")
+    array and `ok` an (n,) bool array. `key`: an int naming WHICH value this is (its memo key's id) or None —
+    a provenance, never read by the arithmetic."""
+    __slots__ = ("const", "v", "ok", "key")
 
-    def __init__(self, const: bool, v, ok):
-        self.const, self.v, self.ok = const, v, ok
+    def __init__(self, const: bool, v, ok, key=None):
+        self.const, self.v, self.ok, self.key = const, v, ok, key
 
 
 class LVal:
     """A list value. const: `items` a tuple of ints, `ok` a bool; else `mat` (n, K) int64 padded with 0, `lens` (n,)
     int64 and `ok` (n,) bool."""
-    __slots__ = ("const", "items", "mat", "lens", "ok")
+    __slots__ = ("const", "items", "mat", "lens", "ok", "key")
 
-    def __init__(self, const: bool, items=None, mat=None, lens=None, ok=True):
-        self.const, self.items, self.mat, self.lens, self.ok = const, items, mat, lens, ok
+    def __init__(self, const: bool, items=None, mat=None, lens=None, ok=True, key=None):
+        self.const, self.items, self.mat, self.lens, self.ok, self.key = const, items, mat, lens, ok, key
+
+
+def _rekey(val, key: int):
+    """A shallow copy carrying `key` (the arrays are shared, never copied)."""
+    if isinstance(val, LVal):
+        return LVal(val.const, items=val.items, mat=val.mat, lens=val.lens, ok=val.ok, key=key)
+    return Val(val.const, val.v, val.ok, key=key)
 
 
 def _col(val: Val, n: int, dtype=np.int64) -> Tuple[np.ndarray, np.ndarray]:
@@ -102,52 +112,84 @@ class Evaluator:
         self.memo_on = memo
         self.fast_on = fast   # the sim-body fast paths (exact: pinned equal to the loop by a test)
         self.memo: Dict[tuple, object] = {}
-        self._free_cache: Dict[tuple, frozenset] = {}
+        self._vars_cache: Dict[tuple, tuple] = {}
+        self._ids: Dict[object, int] = {}
+        self._next_id = 0          # monotonic: an id is never reused, so a value named before a clear stays named
         self.evals = 0
+        self.top_inputs = {t: _rekey(v, self._intern(("in", t))) for t, v in batch.inputs.items()}
 
     # -- public ---------------------------------------------------------------------------------------------
     def run(self, tree: tuple):
         """The program's value over the batch (a Val, or an LVal for a list-typed tree)."""
         self.evals += 1
         if tree[0] == "compose":
-            return self._apply_f(tree, self._top_operands(), self.b.inputs.get("cands"))
-        return self._ev(tree, [], self.b.inputs, None, top=True)
+            k = self._f_operand_count(tree)
+            return self._apply_f(tree, [self.top_inputs[f"x{i}"] for i in range(k)], self.top_inputs.get("cands"))
+        return self._ev(tree, [], self.top_inputs, None, top=True)
 
-    def _top_operands(self) -> List[object]:
-        ops = []
-        i = 0
-        while f"x{i}" in self.b.inputs:
-            ops.append(self.b.inputs[f"x{i}"])
-            i += 1
-        return ops
+    def _f_operand_count(self, ftree: tuple) -> int:
+        """How many operands (x0, x1, ...) a cue-level function reads: its FIRST function's operands (the batch may
+        carry more inputs than one request uses)."""
+        tok = ftree[0]
+        if dsl.is_cue_ref(tok):
+            ins = list(self.cues[tok[1:]][2].ins)
+            return len([t for t in ins if t != dsl.LG])
+        return self._f_operand_count(ftree[1])
 
     # -- memo -----------------------------------------------------------------------------------------------
-    def _free(self, tree: tuple) -> frozenset:
-        f = self._free_cache.get(tree)
-        if f is None:
-            f = dsl.free_bvars(tree)
-            self._free_cache[tree] = f
-        return f
+    # A subtree's value depends only on the subtree and on the values of its FREE variables (bound variables,
+    # inputs, holes); each value carries an int id naming it, so the memo key is (subtree, the ids of those
+    # values) — valid in ANY context: the top-level program, an abstraction's body, a cue op's program.
+    def _intern(self, obj) -> int:
+        i = self._ids.get(obj)
+        if i is None:
+            i = self._next_id
+            self._next_id += 1
+            self._ids[obj] = i
+        return i
 
-    # env entries: (value, descriptor) — descriptor ('c', int) for a constant binding, ('k', list_key, k) for the
-    # k-th element of a per-example list whose own memo key is list_key; None when not describable.
-    def _memo_key(self, tree: tuple, env: list) -> Optional[tuple]:
-        free = self._free(tree)
-        desc = []
-        for k in sorted(free):
+    def _vars(self, tree: tuple) -> tuple:
+        v = self._vars_cache.get(tree)
+        if v is None:
+            fb = tuple(sorted(dsl.free_bvars(tree)))
+            ins, hs = set(), set()
+            for t in dsl.tokens(tree):
+                if dsl.is_input(t):
+                    ins.add(t)
+                elif dsl.is_hole(t):
+                    hs.add(dsl.hole_index(t))
+            v = (fb, tuple(sorted(ins, key=dsl.input_rank)), tuple(sorted(hs)))
+            self._vars_cache[tree] = v
+        return v
+
+    # env entries: (value, id) — the id names the bound value (a constant element, or the k-th element of a named
+    # per-example list); None when the value has no name (then nothing below it is memoised).
+    def _memo_key(self, tree: tuple, env: list, inputs: Dict[str, object], holes: Optional[List[object]]):
+        fb, ins, hs = self._vars(tree)
+        ids = []
+        for k in fb:
             if k >= len(env):
                 return None
             d = env[-1 - k][1]
             if d is None:
                 return None
-            desc.append((k, d))
-        return (tree, tuple(desc))
+            ids.append(d)
+        for t in ins:
+            v = inputs.get(t)
+            if v is None or v.key is None:
+                return None
+            ids.append(v.key)
+        for i in hs:
+            if holes is None or i >= len(holes) or holes[i].key is None:
+                return None
+            ids.append(holes[i].key)
+        return (tree, tuple(ids))
 
     # -- the recursive core ---------------------------------------------------------------------------------
     def _ev(self, tree: tuple, env: list, inputs: Dict[str, object], holes: Optional[List[object]], top: bool):
         key = None
-        if top and self.memo_on and len(tree) > 1:
-            key = self._memo_key(tree, env)
+        if self.memo_on and len(tree) > 1:
+            key = self._memo_key(tree, env, inputs, holes)
             if key is not None:
                 hit = self.memo.get(key)
                 if hit is not None:
@@ -156,6 +198,8 @@ class Evaluator:
         if key is not None:
             if len(self.memo) >= MEMO_CAP:
                 self.memo.clear()
+                self._ids.clear()
+            val = _rekey(val, self._intern(key))
             self.memo[key] = val
         return val
 
@@ -306,15 +350,16 @@ class Evaluator:
             return val
         d = self.d
         n = self.b.n
+        bid = self._intern(("bridge", val.key)) if val.key is not None else None
         if val.const:
             rows = d.taught.get(int(val.v), ()) if val.ok else ()
             if not rows:
-                return Val(True, 0, False)
-            return Val(True, rows[0], bool(val.ok))
+                return Val(True, 0, False, key=bid)
+            return Val(True, rows[0], bool(val.ok), key=bid)
         v, ok = val.v, val.ok
         idx = np.clip(np.where(ok, v, 0), 0, d.n_names - 1)
         has = (d.taught_len[idx] > 0) & ok
-        return Val(False, d.taught_pad[idx, 0].copy(), has)
+        return Val(False, d.taught_pad[idx, 0].copy(), has, key=bid)
 
     # -- primitives --------------------------------------------------------------------------------------------
     def _sim(self, a: Val, c: Val) -> Val:
@@ -398,7 +443,8 @@ class Evaluator:
             vals, oks = [], []
             all_const = True
             for it in items:
-                env.append((Val(True, it, True), ("c", it)))
+                cid = self._intern(("c", it))
+                env.append((Val(True, it, True, key=cid), cid))
                 r = self._ev(body, env, inputs, holes, top)
                 env.pop()
                 vals.append(r)
@@ -419,7 +465,7 @@ class Evaluator:
         K = lst.mat.shape[1]
         if K == 0:
             return Val(False, np.zeros(n, dtype=np.int64), np.zeros(n, dtype=bool))
-        lkey = self._memo_key(tree[1], env) if (top and self.memo_on) else None
+        lkey = lst.key
         if fast is not None and tok.endswith("G"):
             u = self._ev(dsl.shift(fast, -1, 0), env, inputs, holes, top)
             return self._fast_col(tok, u, lst)
@@ -427,8 +473,8 @@ class Evaluator:
         O = np.ones((n, K), dtype=bool)
         present = np.arange(K)[None, :] < lst.lens[:, None]
         for k in range(K):
-            col = Val(False, lst.mat[:, k].copy(), lst.ok & present[:, k])
-            desc = ("k", lkey, k) if lkey is not None else None
+            desc = self._intern(("k", lkey, k)) if lkey is not None else None
+            col = Val(False, lst.mat[:, k].copy(), lst.ok & present[:, k], key=desc)
             env.append((col, desc))
             r = self._ev(body, env, inputs, holes, top)
             env.pop()

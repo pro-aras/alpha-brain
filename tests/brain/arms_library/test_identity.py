@@ -134,6 +134,44 @@ class TestIdentity(unittest.TestCase):
             self.assertEqual(R["2000"], A["2000"], "resume from the snapshot at 1,000 reaches the same state")
             self.assertTrue(rec["resume_answers_match_A_tail"])
 
+    def test_load_mode_reproduces_D_series(self):
+        """E′ and F «load D's own snapshot at each SLEEP by sha» (B1-PREREG §4): an instance in load mode, fed the
+        same tape, must report D's state_sha after every sleep (the three series the identity test compares);
+        and a snapshot whose bytes were changed must be refused against the library log's sha."""
+        from brain.protocol import Answer, HarnessContract, make_arm
+        from brain.arms.library import LibraryArm
+        rows = load_rows()
+        tape = build_tape(rows, n_rows=1200)
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+
+            def go(cfg):
+                arm = make_arm(LibraryArm, 1, cfg)
+                pend, series = {}, []
+                for r in tape:
+                    k = r["kind"]
+                    if k == "TEACH":
+                        HarnessContract.teach(arm, r)
+                    elif k == "SLEEP":
+                        HarnessContract.sleep(arm, r)
+                        series.append(arm.state_sha())
+                    elif k == "ASK":
+                        pend[r["seq"]] = HarnessContract.training_ask(arm, r)
+                    elif k == "FEEDBACK":
+                        HarnessContract.feedback(arm, r, pend.pop(r["payload"]["ask_seq"], Answer(kind="SILENT")), "NAME")
+                return series
+
+            base = {"cache_dir": str(TOY_DIR / "cache"), "seed": 1, "interpreter": "venv",
+                    "candidates_per_sleep": BUDGET, "max_size": 16}
+            d_series = go(dict(base, run_dir=str(td / "D")))
+            e_series = go(dict(base, run_dir=str(td / "E"), library_load_from=str(td / "D")))
+            self.assertEqual(len(d_series), 2)
+            self.assertEqual(d_series, e_series)
+            snap = td / "D" / "library" / "sleep-1.json"
+            snap.write_text(snap.read_text().replace('"sleep_index":1', '"sleep_index":1 '))
+            with self.assertRaises(Exception):
+                go(dict(base, run_dir=str(td / "E2"), library_load_from=str(td / "D")))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -66,6 +66,10 @@ class LibraryCore:
         self.version = 0
         # derived (never hashed)
         self._data: Optional[Data] = None
+        # the cost probe's recorder (probe.py sets both; nothing in a decision ever reads them): a list that
+        # receives (key, size, seconds) per candidate, and the clock that measures it
+        self.timing: Optional[list] = None
+        self.clock = None
 
     # ------------------------------------------------------------------------------------------ names
     def intern(self, name: str) -> int:
@@ -280,6 +284,9 @@ class LibraryCore:
             if k in self.programs and k not in work:
                 self.programs[k]["score"] = int(rescored.get(k, self.programs[k]["score"]))
                 self.programs[k]["n"] = len(self.examples[k])
+        for k in keys:
+            if k in self.programs:
+                self.programs[k]["best_const"] = self._best_constant(k)
         # compress once
         added = self._compress()
         if added or changed:
@@ -316,8 +323,11 @@ class LibraryCore:
             s["index"] += 1
             sz = dsl.size(tree)
             s["size_reached"] = max(s["size_reached"], sz)
+            t0 = self.clock() if self.timing is not None else None
             val = s["ev"].run(tree)
             score = int(correct_mask(val, s["kind"], s["right"], s["batch"]).sum())
+            if t0 is not None:
+                self.timing.append((s["key"], sz, self.clock() - t0))
             b = s["best"]
             if b is None or score > b["score"]:   # equal score: the earlier (smaller, then lexicographic) stays
                 s["best"] = {"tree": tree, "score": score, "size": sz, "found": self.sleep_index}
@@ -333,6 +343,8 @@ class LibraryCore:
         typer = C.Typer(dict(abs_sigs), cue_sigs)
         corpus = []
         for k in self._ordered_keys(self.programs):
+            if not self.answers_ok(k):
+                continue   # only programs that FIT feed the library (DreamCoder compresses solved tasks only)
             ins = dict(zip(dsl.key_input_tokens(k), dsl.key_sig(k).ins))
             corpus.append(C.Program(k, self.programs[k]["tree"], ins))
         added, new_corpus = C.compress(corpus, typer, len(self.library), self.top_k)
@@ -341,19 +353,37 @@ class LibraryCore:
             self.library.append({"token": token, "body": pat, "sig": sig, "sleep": self.sleep_index, "gain": int(g)})
             out.append({"token": token, "body": dsl.render(pat), "sig": repr(sig), "gain": int(g)})
         for p in new_corpus:
-            if self.programs[p.key]["tree"] != p.tree:
-                self.programs[p.key]["tree"] = p.tree
-                self.programs[p.key]["size"] = dsl.size(p.tree)
+            prog = self.programs[p.key]
+            if prog["tree"] == p.tree:
+                continue
+            # a rewrite must not change what the program computes: re-scored, and refused (logged) if it did
+            before = self.score_program(p.key, prog["tree"])
+            after = self.score_program(p.key, p.tree)
+            if after != before:
+                out.append({"refused_rewrite": p.key, "score_before": before, "score_after": after})
+                continue
+            prog["tree"] = p.tree
+            prog["size"] = dsl.size(p.tree)
         return out
 
     # ------------------------------------------------------------------------------------------ answering
+    def _best_constant(self, key: str) -> int:
+        """How many of the cue's shown answers the best CONSTANT answer would reproduce (the majority-class twin)."""
+        counts: Dict[Any, int] = {}
+        for e in self.examples.get(key, []):
+            counts[e["right"]] = counts.get(e["right"], 0) + 1
+        return max(counts.values()) if counts else 0
+
     def answers_ok(self, key: str) -> bool:
+        """D's own answer floor (report §4 R1). "majority" (default): the program reproduces a STRICT MAJORITY of the
+        cue's shown answers AND more of them than the best constant answer would (the two nulls the PREREG itself
+        uses: §5.1's «known» majority, §5.2's majority-class twin); "all": every shown answer."""
         p = self.programs.get(key)
         if p is None:
             return False
         if self.fit_floor == "all":
             return p["score"] == p["n"]
-        return 2 * p["score"] > p["n"]
+        return 2 * p["score"] > p["n"] and p["score"] > int(p.get("best_const", 0))
 
     def fits_all(self, key: str) -> bool:
         p = self.programs.get(key)
@@ -457,7 +487,7 @@ class LibraryCore:
             "key_first": dict(sorted(self.key_first.items())),
             "programs": {k: {"tree": dsl.to_json(p["tree"]), "score": p["score"], "n": p["n"], "size": p["size"],
                              "found": p["found"], "searched_n": p.get("searched_n"),
-                             "searched_ver": p.get("searched_ver")}
+                             "searched_ver": p.get("searched_ver"), "best_const": int(p.get("best_const", 0))}
                          for k, p in sorted(self.programs.items())},
             "library": [{"token": a["token"], "body": dsl.to_json(a["body"]), "ins": list(a["sig"].ins),
                          "out": a["sig"].out, "sleep": a["sleep"], "gain": a["gain"]} for a in self.library],
@@ -478,7 +508,8 @@ class LibraryCore:
         self.key_first = {k: int(v) for k, v in st["key_first"].items()}
         self.programs = {k: {"tree": dsl.from_json(p["tree"]), "score": p["score"], "n": p["n"],
                              "size": p["size"], "found": p["found"], "searched_n": p.get("searched_n"),
-                             "searched_ver": p.get("searched_ver")} for k, p in st["programs"].items()}
+                             "searched_ver": p.get("searched_ver"), "best_const": int(p.get("best_const", 0))}
+                         for k, p in st["programs"].items()}
         self.library = [{"token": a["token"], "body": dsl.from_json(a["body"]), "sig": Sig(a["ins"], a["out"]),
                          "sleep": a["sleep"], "gain": a["gain"]} for a in st["library"]]
         self.sleep_index = int(st["sleep_index"])

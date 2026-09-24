@@ -64,6 +64,7 @@ class Grammar:
         for s in self.input_syms + self.ref_syms:
             self.arity[s.token] = 0
         self.arity["compose"] = 2
+        self._prod_cache: Dict[tuple, List[Tuple[str, tuple]]] = {}
 
     def token_arity(self, tok: str) -> int:
         if dsl.is_bvar(tok):
@@ -72,7 +73,15 @@ class Grammar:
 
     # -- productions for one hole, in rank order ---------------------------------------------------
     def productions(self, htype: str, env: tuple, is_root: bool) -> List[Tuple[str, tuple]]:
-        """[(token, arg_holes)] in rank order. A hole is (type, env, is_root)."""
+        """[(token, arg_holes)] in rank order. A hole is (type, env, is_root). Cached per hole (pure)."""
+        key = (htype, env, is_root)
+        hit = self._prod_cache.get(key)
+        if hit is None:
+            hit = self._productions(htype, env, is_root)
+            self._prod_cache[key] = hit
+        return hit
+
+    def _productions(self, htype: str, env: tuple, is_root: bool) -> List[Tuple[str, tuple]]:
         out: List[Tuple[str, tuple]] = []
         if htype == dsl.F:
             for s in self.ref_syms:

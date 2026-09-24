@@ -1,6 +1,8 @@
 # B1 · BUILDER 1 (Opus 5.5) — arm D, THE RULE LIBRARY — report
 
-*edit: Claude (Opus 5.5, B1 builder 1), 2026-09-24 16:32 +0400 (amended 2026-09-24 16:38 +0400 after the advisor's review: cue-op
+*edit: Claude (Opus 5.5, B1 builder 1), 2026-09-24 17:39 +0400 — R1 sharpened (the two-null floor), R13, R14, (d) added from
+the rehearsal. Earlier: 2026-09-24 17:10 +0400 — amended after the code landed (R10–R12; the frozen search
+phase; the install rule; the rewrite guard). Earlier: 2026-09-24 16:32 +0400 (amended 2026-09-24 16:38 +0400 after the advisor's review: cue-op
 cycles, the skip/restart rule, PICK membership, `state_sha`'s scope, R9, §4.1) — §1–§4 written ON PAPER while `brain/protocol.py`
 is not yet on `b1-integration` (checked 16:24: `git -C /data/dev/genome-wt-b1int log --oneline -3` → 94546ce, no
 `brain/`). No arm code exists yet; nothing below is a measurement of D except where a command is named.*
@@ -81,6 +83,13 @@ raises. **Declared absent:** `if`, comparisons on reals (`gt`/`lt`), `2` or any 
 map/filter, any access to the teacher's shown answers as data (§4 R4), any access to a cache row's index
 record (the index carries the character — only the glance array is ever read).
 
+**R10 · Additions to the PREREG's combinator list, declared (the seat may strike any):** the row names «λ, apply,
+argmax over a finite set, equality on names, index_of / nth on lists, a small declared set of numeric constants».
+The DSL adds `maxof` (argmax's value — a percept compared against ALL exemplars of a name needs the best score,
+not the best exemplar), `add` / `sub` (without them `index_of` and `nth` compose only to the identity, and «after»
+is inexpressible), `not` / `and` / `or` (his AND / OR; XOR — the toy the dispatch asks for — needs a negation) and
+`b2r` (so argmax can choose by a truth value). None of them is, or computes alone, a tested relation.
+
 λ binders appear only as the function argument of `argmax` / `maxof` (one new bound variable of the list's
 element type); they are forced by the type and are not counted in a program's size.
 
@@ -122,6 +131,14 @@ element type); they are forced by the type and are not counted in a program's si
   (that restart is the library's payoff — AFTER is 8 symbols over `name`, not 14 from scratch); a cue whose
   current program still reproduces every example, new ones included, keeps it untouched. Within ONE sleep, pass 2
   continues a cue's own enumeration where pass 1 stopped (the token set does not change inside a search phase).
+- **The library and the cue programs are FROZEN for a sleep's whole search phase** (implemented): the cue ops a
+  search may call are those of cues that had a program when the sleep began, bound to THOSE programs; programs
+  found in this sleep are installed after every search is done, in the declared cue order, and a new program
+  that would close a reference cycle with one already installed is REFUSED (logged; the incumbent stays). So no
+  cue's search depends on the order the others ran in, and a cue op is never its own caller.
+- **Install rule:** the incumbent program (re-scored on all of the cue's examples) stays unless the search beat it —
+  a higher score, or the same score in fewer symbols (token ranks change between sleeps as the library grows, so
+  no lexicographic comparison is made ACROSS sleeps).
 - **One sleep = one DreamCoder iteration:** search every cue that needs it, THEN compress once (top-k). The
   consequence is computed, not hoped (to be done on the real tape's SLEEP positions): the first sleep that holds
   relation examples must find AFTER from scratch (size 14; 109,058 candidates cumulative before the library) or
@@ -174,7 +191,8 @@ element type); they are forced by the type and are not counted in a program's si
   hole (an abstraction is closed); a hole may not sit under an internal binder if its filler would capture that
   binder's variable. Kept only if the body has ≥ 2 non-hole symbols, ≤ 3 holes, and is well-typed.
 - **Gain** = (the corpus's total size before − after rewriting every match top-down, leftmost-outermost,
-  non-overlapping, by `A(fillers)`) − the size of A's body. **Top-k** (k = 3, declared, not tuned): greedy — take
+  non-overlapping, by `A(fillers)`) − the size of A's body. After the rewrite every changed program is RE-SCORED
+  on its cue's examples and a rewrite that moved a score is refused and logged (a bug detector: none has fired). **Top-k** (k = 3, declared, not tuned): greedy — take
   the best gain > 0 (ties → smaller body, then its text), rewrite the corpus with it, recompute, repeat. Library
   entries are never removed (growth by compression; nothing is erased for disuse — #227).
 - **What it should find at letters (a prediction from the arithmetic, not a measurement):** from NAME, SAME, IS
@@ -187,8 +205,13 @@ element type); they are forced by the type and are not counted in a program's si
 - **R1 · What «fits» means for D's own answer.** The row says «answers with the best-fitting program … (ties →
   the smallest …)» and «no program fits the cue's examples … → NOTHING»; F's router says «fits ALL». Read as
   «reproduces every example», perception noise on a single training rendering (the 1-nearest-exemplar naming
-  inside every relation program) silences D on that cue entirely. Default implemented: D answers when its best
-  program reproduces a STRICT MAJORITY of the cue's examples; `fits_all` (score = n) is exposed for F's router.
+  inside every relation program) silences D on that cue entirely (R13 shows it happening). Default implemented
+  (config `fit_floor`, «majority»): D answers when its best program reproduces a STRICT MAJORITY of the cue's
+  shown answers AND more of them than the best CONSTANT answer would — the two nulls the PREREG itself uses
+  (§5.1's «known» majority; §5.2's majority-class twin). The second clause was added after the rehearsal showed
+  a constant «NO» clearing a bare majority on the imbalanced MIRROR training set. Only programs that clear this
+  floor feed the compressor (DreamCoder compresses solved tasks only). `fit_floor: all` gives the literal
+  reading; `fits_all` (score = n) is exposed for F's router.
 - **R2 · The probes P1–P4 and the sleep points (#228 (a)).** D learns only in sleep, and E′ and F load D's
   snapshot only at a SLEEP. PREREG §2.7's sleeps are after L1, L2, L4, L5 and every 500th event; L5 is ≈ 36 asks +
   36 FEEDBACK rows (3 pairs × 2 cases × 6 rounds), so at most one sleep can fall between P1 and P4. D's (and
@@ -222,6 +245,32 @@ element type); they are forced by the type and are not counted in a program's si
   in the library log's row for that sleep; a config `library_load_from = <that directory>` makes an instance's
   `sleep()` LOAD sleep k's snapshot (verifying the logged sha) instead of searching. The router is Builder 2's;
   the seat settles the path.
+- **R11 · F's router needs one read-only call the protocol does not have:** «D has a program that fits all of
+  the cue's training examples (a compound: all of its parts)». Implemented as `LibraryArm.fits_all(ask_row) ->
+  bool` (read-only; never moves `state_sha`). Builder 2's router calls it or reads the library log's per-cue
+  `score`/`n`; the seat settles which (a seam, like R9).
+- **R12 · The protocol's ASK comment (`brain/protocol.py:158`, frozen at ac7d2ff)** says «one operand for a unary cue, two for AFTER/BEFORE/OTHER_CASE, three
+  for BETWEEN», which disagrees with the PREREG (AFTER / BEFORE take one glyph; BETWEEN two; OTHER_CASE one glyph
+  and a candidate SHEET). `validate_tape_row` enforces neither. D keys every program by the SHAPE it is shown
+  (cue, operand kinds, sheet or not, answer kind), so D is unaffected either way; the tape builder settles it.
+- **R13 · F's router («fits ALL of the cue's training examples») is fragile under perception noise — evidence.**
+  Every relation program embeds D's naming (1-nearest-exemplar over F_pool); ONE misnamed training rendering makes
+  it «not fit all» and F routes the whole cue to A1. The rehearsal's first run (§5.4, old code, alphabetical
+  sheets — commands named there) read AFTER(G)>NAME 31/31 at sleep 6, **40/41 at sleep 7 and 54/55 at sleep 8**:
+  the relation was right; one rendering was misnamed. As examples accumulate, «all named right» becomes rare, so
+  late in L4 F ≈ A5 on the relation families BY THE ROUTER, and D1 (i) (F − A5) would read inside the margin for
+  a reason that is not the library's. Options (the seat's): (a) route by D's own fit floor (R1) instead of «all»;
+  (b) «fits all examples whose operands the CELLS name right» (the partner's naming as the arbiter); (c) keep
+  «all» and read D1 (i) knowing this. D exposes `fits_all` and every cue's score / n in its library log.
+- **R14 · A PICK sheet's ORDER can carry the answer — for every arm that can count.** The rehearsal's first run
+  showed OTHER_CASE's 26-glyph sheet in alphabetical order; at sleep 8 D's search found
+  `nthG(cands, f3(x0))` with f3 = `index_of(order, name(#0))` — «the candidate at my name's position in the
+  alphabet» — reproducing 48/48 shown answers WITHOUT COMPARING A SINGLE SHAPE (CHAIN, composed from it, would
+  inherit the shortcut). If B1's shared sheets («one rendering per glyph per (sitting, font)») are laid out in
+  name order — or in any order aligned with the TEACH order — OTHER_CASE and CHAIN stop testing «the name
+  bridges two shapes». Remedy (the world's, Builder 2 / the seat): a seeded shuffle of every sheet independent of
+  the name order, and a test that the right answer's position on the sheet is uniform over the items. The
+  rehearsal's second run shuffles each sheet per ask.
 - **R8 · The data can wrap.** `order` keeps its repeats (24 rounds of letters), so `nth(order, index_of(order,
   "z") + 1)` = «a» (round 2's first name): D will NOT refuse «AFTER z» or «TWO_AFTER y, z» (U5), while
   «BEFORE a» raises and is refused. A finding of the data atom, recorded, not engineered.
@@ -234,6 +283,12 @@ element type); they are forced by the type and are not counted in a program's si
   reaches a percept ONLY through `sim` on F_pool — per-glance and per-dimension access are gone (a reduction of the
   declared list, chosen because a rule over 144 continuous numbers needs learned thresholds — REVIEW-OF-SEAT §B5 —
   and thresholds are declared absent).
+- **(d) D's perceptual programs are correlational hacks, as R4 predicts.** In the rehearsal the best programs
+  for the YES/NO families were name-level correlates that beat the majority class on TRAINING forms — e.g.
+  MIRROR := «is the letter three after x a vowel?» (`compose(&AFTER, compose(&AFTER, compose(&AFTER, &VOWEL)))`,
+  110/146), VOWEL := «is x named a?» (`@IS(x0, nthN(order, 0))`, 186/216). On held-out FORMS (balanced) such
+  programs sit near 0.5 — the honest reading of «a rule over 144 continuous numbers needs learned thresholds»
+  (REVIEW-OF-SEAT §B5), not a defect to engineer away.
 - **(c) D reads its data memory LIVE.** A program reads `order` / `taught` at answer time, so a TEACH row is usable
   the moment it is recorded — the U6 plant `zog`, taught once in L3, is nameable by the same naming program with
   no sleep between; one exemplar, so its ceiling is the 1-exemplar oracle's (§3.3).

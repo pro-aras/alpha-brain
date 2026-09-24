@@ -131,5 +131,37 @@ class TestParity(unittest.TestCase):
         self.assertGreater(checked, 2000)
 
 
+class TestParityWithLibrary(unittest.TestCase):
+    """The memo names values by provenance in EVERY context (abstraction bodies, cue ops' programs): one evaluator
+    reused across every program up to size 8 of a grammar WITH abstractions and cue ops must give exactly what a
+    fresh, memo-less evaluator gives, program by program."""
+
+    def test_parity_with_abstractions_and_cue_ops(self):
+        data, batch = world()
+        n = batch.n
+        naming = ("argmaxN", ("order",), ("maxofG", ("taught", ("$0",)), ("sim", ("x0",), ("$0",))))
+        after = ("nthN", ("order",), ("add", ("index_of", ("order",), ("@NAME(G)>NAME", ("x0",))), ("1",)))
+        point = ("argmaxG", ("cands",), ("maxofG", ("taught", ("x0",)), ("sim", ("$1",), ("$0",))))
+        abstractions = {"f0": (("maxofG", ("taught", ("#0",)), ("sim", ("#1",), ("$0",))), 2),
+                        "f1": (("nthN", ("order",), ("#0",)), 1)}
+        abs_sigs = [("f0", Sig([dsl.N, dsl.G], dsl.R)), ("f1", Sig([dsl.Z], dsl.N))]
+        cues = {"NAME(G)>NAME": (naming, ("x0",), Sig([dsl.G], dsl.N)),
+                "AFTER(G)>NAME": (after, ("x0",), Sig([dsl.G], dsl.N)),
+                "POINT(N;cands)>PICK": (point, ("x0", "cands"), Sig([dsl.N, dsl.LG], dsl.G))}
+        cue_ops = [(k, v[2]) for k, v in cues.items()]
+        checked = 0
+        for ins, out in (([("x0", dsl.G), ("cands", dsl.LG)], dsl.G), ([("x0", dsl.G), ("x1", dsl.N)], dsl.B)):
+            g = Grammar(abs_sigs, cue_ops, ins, out)
+            en = Enumerator(g, Sig([t for _k, t in ins], out), 8)
+            shared = Evaluator(data, batch, abstractions, cues, memo=True, fast=True)
+            for tree in en.programs():
+                a = shared.run(tree)
+                b = Evaluator(data, batch, abstractions, cues, memo=False, fast=False).run(tree)
+                self.assertEqual(as_col(a, n), as_col(b, n), dsl.render(tree))
+                checked += 1
+        self.assertGreater(checked, 1500)          # 1,834 programs at size <= 8 on 2026-09-24
+        self.assertGreater(len(shared.memo), 0)
+
+
 if __name__ == "__main__":
     unittest.main()
