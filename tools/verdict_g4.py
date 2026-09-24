@@ -1556,7 +1556,15 @@ def ladder2_rows(M: Dict[str, dict], gv=None) -> List[str]:
         L.append(f"| IDENTITY (R0b) | {m.get('bar')} | {m.get('reason')} | {gv(m)} |")
     elif isinstance(m, dict):
         st = m.get("streams") or {}
-        streams = " · ".join(f"{s} {v['identical']}/{v['compared']} (a {v['a']}, b {v['b']}{'; first divergence at ' + str(v['first_divergence']['index']) + ' seq ' + str(v['first_divergence']['seq_a']) + '/' + str(v['first_divergence']['seq_b']) if v.get('first_divergence') else ''}){'' if v.get('graded') else ' [printed]'}"
+        def _fd(v):
+            f = v.get("first_divergence")
+            if not f:
+                return ""
+            ra_ = f.get("realigned") or {}
+            return (f"; first divergence at {f['index']} seq {f['seq_a']}/{f['seq_b']}"
+                    + (f" (a {f.get('tags_a')} / b {f.get('tags_b')})" if (f.get('tags_a') or f.get('tags_b')) else "")
+                    + (f", the rest identical at offset {ra_['offset']:+d} for {ra_['matched']} of {ra_['of']}" if ra_.get('offset') is not None else ""))
+        streams = " · ".join(f"{s} {v['identical']}/{v['compared']} (a {v['a']}, b {v['b']}{_fd(v)}){'' if v.get('graded') else ' [printed]'}"
                              for s, v in st.items())
         lm = m.get("last_meeting_point") or {}
         w = (m.get("wall") or {})
@@ -1565,7 +1573,8 @@ def ladder2_rows(M: Dict[str, dict], gv=None) -> List[str]:
             pc = w.get("per_counter") or {}
             wall = (f" · WALL-CLOCK (printed, not graded): {m.get('label_a')} at {(w.get('a') or {}).get('at')} vs {m.get('label_b')} at {(w.get('b') or {}).get('at')}, "
                     f"Δcanvases {w.get('delta_canvases')}: " + "; ".join(f"{k} {v.get('a')} vs {v.get('b')} (Δ {v.get('delta')}, band ±{v.get('band')}, inside {v.get('inside')})" for k, v in pc.items()))
-        body = (f"streams: {streams or 'none'} · meeting points {m.get('meeting_points')} (agree {m.get('meeting_points_agree')}, disagree {m.get('meeting_points_disagree')}) · "
+        body = (f"streams: {streams or 'none'} · meeting points {m.get('meeting_points')} (agree {m.get('meeting_points_agree')}, disagree {m.get('meeting_points_disagree')}; "
+                f"max |Δ| {_j(m.get('disagreement_max_abs'), 120)}; last agreeing at canvas {m.get('last_agreeing_meeting_point_canvas')}) · "
                 f"canvases {m.get('canvases_a')} / {m.get('canvases_b')} · reach {_j(m.get('reach'), 160)} · last meeting point canvas {lm.get('canvas')}: "
                 f"{_j(lm.get('a'), 220)} vs {_j(lm.get('b'), 220)}{(' · ' + m['id_order_note']) if m.get('id_order_note') else ''}{wall} — {m.get('reason')}")
         L.append(f"| IDENTITY (R0b) | {m.get('bar')} | {body} | {gv(m)} |")

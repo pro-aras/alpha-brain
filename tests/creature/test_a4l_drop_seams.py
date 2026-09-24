@@ -606,6 +606,10 @@ class TestStatusGlancesDropped(unittest.TestCase):
         from tools.lives import check as check_mod
         root = Path(tempfile.mkdtemp())
         (root / "STATUS.json").write_text(json.dumps({"glances_confirmed": 40, "glances_surprised": 10, "glances_dropped": 40, "moments": 100, "cells": [5, 5]}))
+        # edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:42 +0400 — A4-LADDER-2-PREREG ADDENDUM §7(2) item 2 decides: check.py compares dropped with
+        # confirmed only where the genome DECLARES `; drop confirmed` (reader v3.5, tools/lives/check.py:drop_declared). This fixture is a DROP life's
+        # root, so it now carries the DROP genome beside STATUS, as tools/lives/launch.sh's copy does; the assertion below is unchanged.
+        (root / "GENOME.genome").write_text(DROP_GENOME.read_text())
         buf = _io.StringIO()
         with contextlib.redirect_stdout(buf):
             check_mod.main(["--root", str(root)])
@@ -619,6 +623,10 @@ class TestStatusGlancesDropped(unittest.TestCase):
         from tools.lives import check as check_mod
         root = Path(tempfile.mkdtemp())
         (root / "STATUS.json").write_text(json.dumps({"glances_confirmed": 40, "glances_surprised": 10, "glances_dropped": 39, "moments": 100, "cells": [5, 5]}))
+        # edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 05:42 +0400 — A4-LADDER-2-PREREG ADDENDUM §7(2) item 2 decides: check.py compares dropped with
+        # confirmed only where the genome DECLARES `; drop confirmed` (reader v3.5, tools/lives/check.py:drop_declared). This fixture is a DROP life's
+        # root, so it now carries the DROP genome beside STATUS, as tools/lives/launch.sh's copy does; the assertion below is unchanged.
+        (root / "GENOME.genome").write_text(DROP_GENOME.read_text())
         buf = _io.StringIO()
         with contextlib.redirect_stdout(buf):
             check_mod.main(["--root", str(root)])

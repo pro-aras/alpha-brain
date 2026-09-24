@@ -94,6 +94,29 @@ class Identity(unittest.TestCase):
         m = vl.identity_mark(ta, ja, tb, jb, min_canvases=1)
         self.assertFalse(m["pass"], "one mind slept, the other did not: a real difference at the next meeting point")
 
+    def test_an_inserted_answering_row_is_named_and_the_rest_realigned(self):
+        # edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 06:02 +0400 — the 8 h reads: a4l2-cost's maker stream carries an `answering` canvas
+        # (q-79, the world answering the mind's own question) that a4l2-floor's does not; the rest is identical one row later. Still a FAIL
+        # (a different stream to the mind that consumed it) — the diagnosis is printed, the bar untouched.
+        a = [("maker", f"m{i}", [], (1, 1)) for i in range(6)]
+        b = a[:3] + [("maker", "m1", [], (1, 1))] + a[3:]
+        (ta, ja), (tb, jb) = _life(a), _life(b)
+        tb[3]["meta"]["answering"] = "q-79"
+        m = vl.identity_mark(ta, ja, tb, jb, min_canvases=1)
+        self.assertFalse(m["pass"])
+        fd = m["streams"]["maker"]["first_divergence"]
+        self.assertEqual((fd["index"], fd["tags_b"], fd["tags_a"]), (3, {"answering": "q-79"}, {}))
+        self.assertEqual((fd["realigned"]["offset"], fd["realigned"]["whole_rest"]), (1, True))
+        self.assertIn("answering", m["reason"]); self.assertIn("offset +1", m["reason"])
+
+    def test_the_disagreement_magnitudes_are_printed(self):
+        a = [("maker", "m1", [("sight", 0, "n")], (1, 1)), ("maker", "m2", [("sight", 1, "n"), ("sight", 2, "n")], (3, 1)), ("maker", "m3", [], (3, 1))]
+        b = [("maker", "m1", [("sight", 0, "n")], (1, 1)), ("maker", "m2", [], (1, 1)), ("maker", "m3", [], (1, 1))]
+        (ta, ja), (tb, jb) = _life(a), _life(b)
+        m = vl.identity_mark(ta, ja, tb, jb, min_canvases=1)
+        self.assertEqual(m["disagreement_max_abs"]["births.sight"], 2); self.assertEqual(m["disagreement_max_abs"]["cells[0]"], 2)
+        self.assertEqual(m["last_agreeing_meeting_point_canvas"], 1); self.assertFalse(m["last_meeting_point_agrees"])
+
     def test_not_given_and_too_short_are_not_gradable(self):
         self.assertFalse(vl.identity_mark([], [], [], [], provided=False)["graded"])
         (ta, ja), (tb, jb) = self._pair()
@@ -328,3 +351,27 @@ class TheRealPreflights(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 06:02 +0400 — the seat's own 2 h numbers (A4-LADDER-2-PREREG ADDENDUM §7(2) item 1) reproduced by the
+# mark on the CLOSED 8 h copies: each read cut at the wall-clock instant the seat read the live roots (found by the stream counts themselves).
+@unittest.skipUnless(all((SCRATCH / r).exists() for r in ("a4l2-cost-copy", "a4l-cost-copy", "a4l2-floor-copy")), "the 8 h copies are not on this box")
+class TheSeatsTwoHourNumbers(unittest.TestCase):
+    def _cut_at(self, name, iso):
+        from datetime import datetime
+        r = vg.side_record(SCRATCH / name)
+        h = (datetime.fromisoformat(iso.replace("Z", "+00:00")) - r["t0"]).total_seconds() / 3600 + 1e-7
+        return vg.side_record(SCRATCH / name, h)
+
+    def _streams(self, A, B):
+        m = vl.identity_mark(A["tape"], A["mind"], B["tape"], B["mind"])
+        return {s: (m["streams"][s]["identical"], m["streams"][s]["compared"], m["streams"][s]["first_divergence"]) for s in vl.IDENTITY_SOURCES}
+
+    def test_cost_vs_a4l_cost(self):
+        got = self._streams(self._cut_at("a4l2-cost-copy", "2026-09-23T20:01:39.276Z"), vg.side_record(SCRATCH / "a4l-cost-copy"))
+        self.assertEqual(got, {"maker": (1651, 1651, None), "game": (277, 277, None), "shelf": (1851, 1851, None), "folder": (275, 275, None)})
+
+    def test_floor_vs_cost(self):
+        T = "2026-09-23T20:08:47.699Z"
+        got = self._streams(self._cut_at("a4l2-floor-copy", T), self._cut_at("a4l2-cost-copy", T))
+        self.assertEqual(got, {"maker": (1737, 1737, None), "game": (291, 291, None), "shelf": (1945, 1945, None), "folder": (290, 290, None)})

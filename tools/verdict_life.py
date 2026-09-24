@@ -1741,16 +1741,42 @@ def explore_success_mark(tape: Iterable[dict], value_declared: bool, from_s: flo
 IDENTITY_SOURCES = ("maker", "game", "shelf", "folder")     # ADDENDUM §7(2) item 1: the world's four eye streams (graded); any other source printed
 
 
-def eye_streams(tape: Iterable[dict]) -> Dict[str, List[Tuple[int, str]]]:
-    """source -> [(seq, sha)] of the tape's EYE rows, each stream in its own (tape) order."""
-    s: Dict[str, List[Tuple[int, str]]] = collections.defaultdict(list)
+STREAM_TAGS = ("answering", "control", "program", "episode")    # the eye-row meta keys that name WHY a row is in a stream (printed at a divergence)
+
+
+def eye_streams(tape: Iterable[dict]) -> Dict[str, List[Tuple[int, str, dict]]]:
+    """source -> [(seq, sha, tags)] of the tape's EYE rows, each stream in its own (tape) order; tags = the row's meta keys among STREAM_TAGS
+    (edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 06:00 +0400 — the 8 h reads showed the world's streams diverge by INSERTED rows, e.g. the maker's
+    `answering` canvas for the mind's own question; the tags say so at the divergence)."""
+    s: Dict[str, List[Tuple[int, str, dict]]] = collections.defaultdict(list)
     for r in tape:
         if r.get("sense") == "eye":
-            s[str(_meta(r).get("source"))].append((int(r["seq"]), str(r.get("sha"))))
+            m = _meta(r)
+            s[str(m.get("source"))].append((int(r["seq"]), str(r.get("sha")), {k: m[k] for k in STREAM_TAGS if k in m}))
     return dict(s)
 
 
-def stream_identity(sa: Dict[str, List[Tuple[int, str]]], sb: Dict[str, List[Tuple[int, str]]],
+def _realign(a: Sequence[tuple], b: Sequence[tuple], fd: int, max_off: int = 10) -> Dict[str, object]:
+    """After a stream's first divergence at `fd`: the offset in [-max_off, max_off] under which the REST of the two streams agree best
+    (b[k + offset] == a[k] for k ≥ fd — a positive offset = b carries `offset` more rows before the rest), with the matched count. Printed
+    only: a stream identical «up to an inserted row» is still a different stream to the mind that consumed it."""
+    best = None
+    for off in range(-max_off, max_off + 1):
+        n = tot = 0
+        for k in range(fd, len(a)):
+            j = k + off
+            if j < 0 or j >= len(b):
+                continue
+            tot += 1
+            n += int(a[k][1] == b[j][1])
+        if tot and (best is None or n > best[1] or (n == best[1] and abs(off) < abs(best[0]))):
+            best = (off, n, tot)
+    if best is None:
+        return {"offset": None, "matched": 0, "of": 0}
+    return {"offset": best[0], "matched": best[1], "of": best[2], "whole_rest": bool(best[1] == best[2])}
+
+
+def stream_identity(sa: Dict[str, List[tuple]], sb: Dict[str, List[tuple]],
                     sources: Sequence[str] = IDENTITY_SOURCES) -> Dict[str, dict]:
     """Per source: both lengths, the canvases compared (the last canvas BOTH reached = the shorter stream), how many are identical before the
     first divergence, and the divergence itself (index, both seqs, both sha prefixes). The four world sources are graded; any other source the
@@ -1762,7 +1788,9 @@ def stream_identity(sa: Dict[str, List[Tuple[int, str]]], sb: Dict[str, List[Tup
         fd = next((i for i in range(n) if a[i][1] != b[i][1]), None)
         out[src] = {"a": len(a), "b": len(b), "compared": n, "identical": (n if fd is None else fd),
                     "first_divergence": (None if fd is None else {"index": fd, "seq_a": a[fd][0], "seq_b": b[fd][0],
-                                                                  "sha_a": a[fd][1][:12], "sha_b": b[fd][1][:12]}),
+                                                                  "sha_a": a[fd][1][:12], "sha_b": b[fd][1][:12],
+                                                                  "tags_a": (a[fd][2] if len(a[fd]) > 2 else {}), "tags_b": (b[fd][2] if len(b[fd]) > 2 else {}),
+                                                                  "realigned": _realign(a, b, fd)}),
                     "graded": src in sources}
     return out
 
@@ -1800,6 +1828,20 @@ def meeting_readings(journal: Iterable[dict]) -> Tuple[Dict[tuple, dict], int]:
                 out[tuple(sorted(cnt.items()))] = {"seq": int(r["seq"]), "canvas": n, "births": dict(births),
                                                    "cells": list(r["cells"]), "sleeps": sleeps, "id_next": dict(idn)}
     return out, n
+
+
+def _max_abs_deltas(pairs: Sequence[Tuple[dict, dict]]) -> Dict[str, int]:
+    """The largest |a − b| per counter over the disagreeing meeting points (births per kind, cells per area, sleeps) — printed: a ±1 that
+    re-converges (an error birth landing on a neighbouring canvas when the senses interleave differently) reads apart from a growing gap.
+    (edit: Claude (Opus 5.5, reader v3.5 builder), 2026-09-24 06:00 +0400)"""
+    out: Dict[str, int] = {}
+    for x, y in pairs:
+        for k in set(x.get("births") or {}) | set(y.get("births") or {}):
+            out["births." + k] = max(out.get("births." + k, 0), abs(int((x.get("births") or {}).get(k, 0)) - int((y.get("births") or {}).get(k, 0))))
+        for i, (u, v) in enumerate(zip(x.get("cells") or [], y.get("cells") or [])):
+            out[f"cells[{i}]"] = max(out.get(f"cells[{i}]", 0), abs(int(u) - int(v)))
+        out["sleeps"] = max(out.get("sleeps", 0), abs(int(x.get("sleeps") or 0) - int(y.get("sleeps") or 0)))
+    return out
 
 
 def _reading_counts(x: dict) -> tuple:
@@ -1843,6 +1885,9 @@ def identity_mark(tape_a: Iterable[dict], journal_a: Iterable[dict], tape_b: Ite
                canvases_a=na, canvases_b=nb, readings_a=len(ra), readings_b=len(rb),
                meeting_points=len(common), meeting_points_agree=len(common) - len(dis), meeting_points_disagree=len(dis),
                disagreements=[_pt(k) for k in dis[:max_listed]],
+               disagreement_max_abs=_max_abs_deltas([(ra[k], rb[k]) for k in dis]),
+               last_agreeing_meeting_point_canvas=next((ra[k]["canvas"] for k in reversed(common) if _reading_counts(ra[k]) == _reading_counts(rb[k])), None),
+               last_meeting_point_agrees=(bool(_reading_counts(ra[last]) == _reading_counts(rb[last])) if last is not None else None),
                id_order_differs_at=len(ids_only), id_order_note=("the next-id counter differs at %d meeting points where births, cells and sleeps agree: "
                                                                 "the same births took different ids (a hands canvas births without a journal row, and "
                                                                 "the two lives interleave it differently) — printed, never graded" % len(ids_only)) if ids_only else None,
@@ -1857,14 +1902,20 @@ def identity_mark(tape_a: Iterable[dict], journal_a: Iterable[dict], tape_b: Ite
         return out
     why = []
     if not streams_ok:     # a diverged world stream decides the mark alone — never hidden behind «no meeting point»
-        why.append("streams diverge: " + "; ".join(f"{s} at {v['first_divergence']['index']}" for s, v in graded_streams.items() if v["first_divergence"]))
+        why.append("streams diverge: " + "; ".join(
+            f"{s} at {v['first_divergence']['index']}"
+            + (f" (a {v['first_divergence']['tags_a']} / b {v['first_divergence']['tags_b']})" if (v['first_divergence'].get('tags_a') or v['first_divergence'].get('tags_b')) else "")
+            + (f"; the rest identical at offset {v['first_divergence']['realigned']['offset']:+d} for {v['first_divergence']['realigned']['matched']} of {v['first_divergence']['realigned']['of']}"
+               if (v['first_divergence'].get('realigned') or {}).get('offset') is not None else "")
+            for s, v in graded_streams.items() if v["first_divergence"]))
     elif last is None or ra[last]["canvas"] < min_canvases:
         out.update(graded=False, **{"pass": None}, reason=f"not gradable: the streams are identical but no meeting point lies at or beyond canvas {min_canvases} (the two minds' per-source counts never coincide there)")
         return out
     ok = bool(streams_ok and not dis)
     if dis:
         k0 = dis[0]
-        why.append(f"{len(dis)} of {len(common)} meeting points disagree (first at canvas {ra[k0]['canvas']}: {label_a} {_reading_counts(ra[k0])} vs {label_b} {_reading_counts(rb[k0])})")
+        why.append(f"{len(dis)} of {len(common)} meeting points disagree (first at canvas {ra[k0]['canvas']}: {label_a} {_reading_counts(ra[k0])} vs {label_b} {_reading_counts(rb[k0])}; "
+                   f"max |Δ| {out['disagreement_max_abs']}; the last meeting point (canvas {ra[last]['canvas']}) {'agrees' if out['last_meeting_point_agrees'] else 'disagrees'})")
     out.update(graded=True, **{"pass": ok}, reason=("graded (ADDENDUM §7(2)): " + ("identical — every world stream to the last canvas both reached, and the counts at all "
                                                                                   f"{len(common)} meeting points" if ok else "; ".join(why))))
     return out
