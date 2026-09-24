@@ -8,19 +8,19 @@
 ## Round 1 — the designer asks the seat (`QUESTIONS-FOR-THE-SEAT.md`, sent 2026-09-24 11:46 +0400)
 | # | from | question (short) | designer's provisional answer | seat's answer | settled into |
 |---|---|---|---|---|---|
-| Q1 | designer | «understood, not predicted» (page 5): what does it bind, and how is it measured? | prediction = the learning engine (action ↔ reaction); the mouth speaks by intent, rendered and judged, never sampled; «understood» = four tests (content before form; both directions through the senses; back-parse to its own percept; a shuffled-world twin differs) | — | — |
-| Q2 | designer | identity across machines? | per machine class; a phase run elsewhere is a sealed epoch; integer arithmetic priced as a check | — | — |
-| Q3 | designer | may the brain use PyTorch? | numpy for the first brain; PyTorch CPU deterministic from 10 M; never a pretrained weight | — | — |
-| Q4 | designer | is the brain the School's kind B? | one road: the brain's growth rules are kind B's first form | — | — |
-| Q5 | designer | who answers at letters — cells or brain? | both graded; the brain answers once it beats the cells on the same items | — | — |
-| Q6 | designer | the library phase: machine, road, a life? | his stage 12, read aloud on this box as a life; the same weights | — | — |
-| Q7 | designer | the first size against his «1b or 2b»? | grown from ≈ 10^5; ≤ 1 M at letters; 10 M → 50 M → 300 M + on the card's word | — | — |
-| Q8 | designer | where the brain enters? | its own toy track at machine speed first, then one rung at the School's stage 1 | — | — |
-| Q9 | designer | sleep and «dreaming» in a mind-paced world? | by its own pressure; the world waits; frozen-copy law; dreaming = its model run forward, journaled | — | — |
-| Q10 | designer | letters as a sequence from the ear's word? | yes — the mind decodes the ear row's string; the organ unchanged | — | — |
-| Q11 | designer | a NOTES-MAP of his twelve pages; which items are the letters stage's bar? | yes; the letters bar = relations held out by pair over his five words; page 10's loop later | — | — |
-| Q12 | designer | the probe, the Mac, the tiers, the research's timing | probe at load < 2; no Mac assumed; brain first; the body waits for the conclusion | — | — |
-| Q13 | designer | a machine-written corpus (TinyStories' kind): a teacher in the School, or a borrowed mouth? | his decision; the designer's lean: heard-of text only, after grounding, never the grounded stages' material | — | — |
+| Q1 | designer | «understood, not predicted» (page 5): what does it bind, and how is it measured? | prediction = the learning engine (action ↔ reaction); the mouth speaks by intent, rendered and judged, never sampled; «understood» = four tests (content before form; both directions through the senses; back-parse to its own percept; a shuffled-world twin differs) | replaced by the six tests; per word, per stage, against the world; REVOCABLE (C9) | RESEARCH-OPUS §4.1; DEBATE (C9 accepted) |
+| Q2 | designer | identity across machines? | per machine class; a phase run elsewhere is a sealed epoch; integer arithmetic priced as a check | byte-identical on the SAME machine class; across machines a parity gate on float32-rounded scores (#227 (5)), never bit-equality promised | design D-3; DEBATE (§D accepted) |
+| Q3 | designer | may the brain use PyTorch? | numpy for the first brain; PyTorch CPU deterministic from 10 M; never a pretrained weight | PyTorch, CPU first, the same code on MPS / CUDA later; numpy stays for the cells; determinism tested before the identity law relies on it | DEBATE (§D Q3 accepted — his to allow the install) |
+| Q4 | designer | is the brain the School's kind B? | one road: the brain's growth rules are kind B's first form | yes — the brain is kind B's first form | accepted (design D-7) |
+| Q5 | designer | who answers at letters — cells or brain? | both graded; the brain answers once it beats the cells on the same items | the cells answer naming, refusal, provenance; the brain answers order and composition (A5); E′ asks the same of a library | accepted; the slow store's nature OPEN → DEBATE D1 |
+| Q6 | designer | the library phase: machine, road, a life? | his stage 12, read aloud on this box as a life; the same weights | after letters is passed by a hybrid; on the M1 Max or a rented GPU; as a LIFE in the reading world; human-written text only; one brain, weights continuing | accepted, with Q2's sealed epoch |
+| Q7 | designer | the first size against his «1b or 2b»? | grown from ≈ 10^5; ≤ 1 M at letters; 10 M → 50 M → 300 M + on the card's word | 10^5–10^6 parameters on this CPU; «1–2 B» is the library / scale phase on a GPU (told to him at 11:02: ≈ 20 B tokens, ≈ 10 A100-days) | accepted |
+| Q8 | designer | where the brain enters? | its own toy track at machine speed first, then one rung at the School's stage 1 | the toy track first (B1, then B2), then a School stage-1 life with the winning hybrid — never straight into a life (#239) | accepted |
+| Q9 | designer | sleep and «dreaming» in a mind-paced world? | by its own pressure; the world waits; frozen-copy law; dreaming = its model run forward, journaled | sleep by the BUDGET (episodes since the last sleep) and IDLENESS, never a clock; dreaming = the world model run forward; first gradable in the game | accepted (the designer's «pressure» = that budget) |
+| Q10 | designer | letters as a sequence from the ear's word? | yes — the mind decodes the ear row's string; the organ unchanged | yes — the ear's word read as its letter sequence | accepted |
+| Q11 | designer | a NOTES-MAP of his twelve pages; which items are the letters stage's bar? | yes; the letters bar = relations held out by pair over his five words; page 10's loop later | yes — a NOTES-MAP; the letters bar from pages 6, 4 and 5 | accepted |
+| Q12 | designer | the probe, the Mac, the tiers, the research's timing | probe at load < 2; no Mac assumed; brain first; the body waits for the conclusion | the probe when the graders end this afternoon; the Mac is his to open; one Opus at a time, ≤ 3 in all; conclusion → design body → B1 PREREG → build | accepted |
+| Q13 | designer | a machine-written corpus (TinyStories' kind): a teacher in the School, or a borrowed mouth? | his decision; the designer's lean: heard-of text only, after grounding, never the grounded stages' material | NO for the library phase — machine-written text is the borrowed mouth by another door; his call | DEBATE D4: the designer concedes NO for teaching; one bounded exception to him |
 
 **A reading note for the transcription (the designer, from the photo of page 10):** the rotated margin reads «If nothing these then search open world for clues and leads. Actively dream leading clues in active memory and predict results. If optimal lead found then test on dummy data if success then test on real data or if required task doesn't include testing but pure knowledge then» — the transcription's two `[?]` there resolve to «Actively dream leading clues in active memory and predict results» (the seat decides whether to amend the transcription).
 
@@ -29,6 +29,8 @@
 
 ## The research, step 1 of his protocol
 - `RESEARCH-OPUS.md` committed on this branch before the seat's `RESEARCH-SEAT.md` was opened (the protocol's independence).
+
+## Round 1 — closed 2026-09-24 12:26 +0400: the seat's answers are in the table above (from REVIEW-OF-OPUS-BY-SEAT §D); the disagreements moved to `DEBATE.md`
 
 ## Round 2 — the seat asks the designer
 *(after round 1)*
