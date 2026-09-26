@@ -2,12 +2,14 @@
 
 *Drafted by the seat, Claude (Opus 5.5), 2026-09-26 12:43 +0400, on Ahmad's 12:18 word (verbatim: «yes go for the recommended reasoner first and try out the childhood as well»). DRAFT until the seat's dated §9 line, which comes after the price probe (§6). Nothing here is built yet. The reasoner (R-THINK, `RTHINK-PREREG.md`) runs first.*
 
+*Revised by the seat, 2026-09-26 19:03 +0400, before any build or probe (the draft is unsigned): §0.3 quoted counts from B1's VOID 12:09 runs; Q2 moved its core into A1, whose answer head B1's graded record shows cannot move (only corrections train it, and it collapses to «a»), so M3 could only ever read «no transfer» (#228 (a)). M3 now has a mark A1's core CAN move (M3a) and a relation mark read only on a host that can learn relations (M3b); §6 records the box's load.*
+
 ## 0 · In ten lines
 1. **The paper:** «Self-Play Pretraining with Zero Data», arXiv 2609.30063 (read on its own page, 2026-09-26). A generator proposes programs for a universal Turing machine, and a learner predicts their output bytes. The generator is rewarded when a program's gradient lines up with the learner's recent movement, which is its frontier. The paper reports three results: zero-shot loss on natural images, text and melody falls as a power law in self-play compute; in-context learning appears; and «facts about a particular world must ultimately enter through interaction with that world».
 2. **Why it fits us:** it is structure without borrowed text (D-1, the pure road), with facts from the body. That is the childhood before the body's world.
-3. **Why it matters now:** B1's first raw counts show the grown network (A1) at the plain cells' level on the letter-relation questions (A1 322, A0 334 of 3,484 test asks on seed 20261001), while the rule library answers 1,385. The relations are SEQUENCE skills (after, before, between, chains). Sequence skills are exactly what the paper claims a self-play childhood gives.
+3. **Why it matters now:** B1's graded record (both seeds): no learner learned any letter relation, and the grown network (A1) names by collapse to «a». Its answer head is trained only by corrections, never by «this is X». The rule library solves AFTER, BEFORE and BETWEEN once its search budget is real (its re-run ends ≈ 09-27). The relations are SEQUENCE skills (after, before, between, chains), and sequence skills are exactly what the paper claims a self-play childhood gives.
 4. **Q1, does the micro version work here?** At this box's scale, does a self-play learner's zero-shot loss on natural bytes fall faster with compute than a learner fed a FIXED random-program prior and a learner with no childhood? Do reverse, stack and associative recall appear in context?
-5. **Q2, does it help OUR brain?** Does A1, started from the childhood's recurrent core, learn B1's relation families better than A1 from random weights, on the same tape, graded by B1's own graders?
+5. **Q2, does it help OUR brain?** Does A1, started from the childhood's recurrent core, predict B1's tape better than A1 from random weights (M3a, a mark A1's core moves)? And where a host can learn relations at all, does the childhood's core help it learn B1's relation families (M3b)?
 6. **Arms:** P0 no childhood · P1 a fixed prior (random programs, no generator learning) · P2 self-play (the paper's reward) · P2-SHUF, P2 with the reward's sign shuffled per batch (the reward's null).
 7. **Honest scale:** our compute is about 10¹³ effective FLOPs, below the paper's smallest point (10¹⁴). A null here is WEAK evidence against the idea, and §8 says so before any run.
 8. **The learner is A1's own kind,** a GRU core of the width B1's A1 ends at, so Q2 transfers the core itself. A transformer learner would answer a different question.
@@ -38,6 +40,7 @@
   - A1-FIXEDPRIOR: the same, from P1.
   - A1: B1's own run is the random-init arm.
   - B1's graders and bars are used unchanged, and the §12 line of B1-PREREG is law for them.
+  - **M3b's host, A1-TEACH and A1-TEACH-CHILD:** A1-TEACH is A1 with its answer head also trained by TEACH rows (the candidate arm B1's record named). It is built with B2's arms, not by R-PRIOR. R-PRIOR reads it only through M3b's precondition (§4).
 
 ## 3 · Controls — run first; a failing control VOIDS the arm, never «fails» it
 - **(c1) The machine's own test** (§1).
@@ -57,14 +60,19 @@
   - (c) the creature's own tape payload bytes.
   - The printed result is the fitted slope of loss against log compute for P0, P1, P2 and P2-SHUF, each with its standard error. A slope is fitted from the whole checkpoint series, never from two readings (SOLUTIONS #240 (4)).
 - **M2 · in context:** reverse string, stack and associative recall, each at m ∈ {0, 1, 4, 16} examples, exact-match accuracy with n and its interval beside the measured chance (c5).
-- **M3 · our brain:** B1's U3 relation marks (AFTER, BEFORE, BETWEEN, TWO_AFTER, CHAIN) and U1 (a) for A1-CHILD, A1-FIXEDPRIOR and A1, at both seeds. M3 is read only if M1 or M2 shows P2 ahead of P1. A prior that learned nothing cannot be the reason for a transfer.
+- **M3 · our brain.** M3 is read only if M1 or M2 shows P2 ahead of P1: a prior that learned nothing cannot be the reason for a transfer.
+  - **M3a · a mark A1's core can move:** the world head's next-step loss (bits per step) along B1's tape, for A1-CHILD, A1-FIXEDPRIOR and A1 (random init), at both seeds. It is fitted over the whole series, with a slope and a mean over the last third, never two readings (#240 (4)). Every TEACH row trains that head, so this mark is gradable on A1 as signed.
+  - **M3b · the relations, only where a host can learn them:** B1's U3 relation marks (AFTER, BEFORE, BETWEEN, TWO_AFTER, CHAIN) for A1-TEACH-CHILD against A1-TEACH.
+    - **Precondition, run first:** A1-TEACH at random init must read above chance on at least one U3 family at both seeds. Otherwise M3b reads NOT GRADABLE (host), named, and is never read as a failed transfer.
+    - B1's U3 for A1 as signed is printed as descriptive only: its answer head collapses to «a», so no core can move it (#228 (a)).
 
 ## 5 · The decision rule (declared now; the numbers in §9)
 - **ADOPT the childhood** (a CHILDHOOD phase before birth in the genome's birth sequence) only if all three hold at BOTH seeds:
   - P2's M1 slope is steeper than P1's AND P2-SHUF's by the declared margin;
   - M2 is above chance by the declared margin on at least two of the three tasks at m = 16;
-  - A1-CHILD − A1 ≥ 5 pp on U3 overall, with no U3 family worse by more than 5 pp.
-- **A PRIOR BUT NO TRANSFER:** M1 and M2 hold, but M3 fails. The byte-level childhood does not reach the brain's step format; the next road is a childhood trained in the step format itself, which gets its own pre-registration.
+  - M3a: A1-CHILD's world-head loss is below both A1's and A1-FIXEDPRIOR's by the declared margin (§9), fitted over the whole series.
+  - M3b, where gradable: A1-TEACH-CHILD − A1-TEACH ≥ 5 pp on U3 overall, with no U3 family worse by more than 5 pp. Where M3b reads NOT GRADABLE (host), ADOPT rests on M3a and says so.
+- **A PRIOR BUT NO TRANSFER:** M1 and M2 hold, but M3a fails (or M3b fails where it is gradable). The byte-level childhood does not reach the brain's step format; the next road is a childhood trained in the step format itself, which gets its own pre-registration.
 - **NOT AT OUR SCALE:** M1 and M2 do not separate P2 from P1. The null is recorded as weak (§8), and the idea waits for more compute. It is not discarded.
 
 ## 6 · The price probe (before §9; the box must be quiet or the figure says what it ran beside)
@@ -73,6 +81,7 @@
 - The reward's cost per program: one extra backward pass plus the dot product.
 - The machine's steps per second.
 - From these, the seat declares: the budget per arm (≤ 8 CPU-hours), the checkpoint grid, the batch sizes, and the bars' margins, each with its ceiling (#228 (b)).
+- **The box's load (2026-09-26 evening):** B1's four D-family searches run until ≈ 09-27 15:00 at load ≈ 5 on 16 cores. A probe run before then records that load beside every figure, or waits for a quiet box.
 
 ## 7 · The seat's traps for this build (one line each)
 - The Adam preconditioner P_e is read from the optimiser's own state, never recomputed by hand.
