@@ -33,6 +33,7 @@ FINISHED run, the positive control: the snapshot mtimes must reproduce cost.json
 `python3 -m tools.b1.d_projection --budget docs/brain/b1/stage-1/d-budget.json --run-dir <runs/seed/D> [--run-dir …] [--checkpoint 7]`
 `python3 -m tools.b1.d_projection --record <a finished run's arm dir, e.g. runs/20261001.toy-d/D>`
 """
+# edit: Claude (Opus 5.5), 2026-09-27 00:15 +0400 — a process found gone is beaten as GONE (since, last CPU, sleeps closed, «finished» when every sleep closed), never as its last live poll: the r1 watch printed «R · CPU 0.580 h» for 45 min after seed 2's D exited.
 from __future__ import annotations
 
 import argparse
@@ -113,6 +114,7 @@ class Search:
     samples: List[Tuple[float, float]] = field(default_factory=list)   # (epoch s, CPU s) at each poll
     seen: set = field(default_factory=set)
     last: Optional[Tuple[float, str]] = None                          # (CPU s, state) at the latest poll
+    gone_at: Optional[float] = None                                   # the first poll that found the process gone
 
     @property
     def label(self) -> str:
@@ -144,6 +146,8 @@ def poll(budget: dict, searches: List[Search], checkpoint: int, now: float,
             s.start = pt[0]
             s.samples.append((now, pt[1]))
             s.last = (pt[1], pt[2])
+        elif s.pid is not None and s.gone_at is None:
+            s.gone_at = now                     # a gone process is never beaten as its last live poll
         closed = closed_sleeps(s.run_dir)
         for k, mt in closed:
             if k in s.seen:
@@ -194,6 +198,12 @@ def heartbeat(budget: dict, searches: List[Search], now: float) -> List[str]:
                        f"NOT SEEN · sleeps closed {n}")
             continue
         cpu, st = s.last
+        if s.gone_at is not None:
+            last_sleep = max(pred)
+            out.append(f"[d_projection] {time.strftime('%H:%M', time.localtime(now))} beat {s.label}: pid {s.pid} GONE since "
+                       f"{time.strftime('%H:%M:%S', time.localtime(s.gone_at))} · last CPU {cpu / 3600:.3f} h · "
+                       f"{n}/{last_sleep} sleeps closed" + (" (finished)" if n >= last_sleep else ""))
+            continue
         k_next = n + 1
         lb = f" · lower-bound projection {cpu / pred[k_next] * total / 3600:.2f} CPU-h" \
             if k_next in pred and pred[k_next] > 0 and k_next >= 4 else ""

@@ -116,6 +116,26 @@ class TestDProjection(unittest.TestCase):
         self.assertEqual(len(dead), 1)
         self.assertIn("1/17", dead[0])
 
+    def test_a_finished_process_is_beaten_as_gone_not_as_its_last_state(self) -> None:
+        # edit: Claude (Opus 5.5), 2026-09-27 00:15 +0400 — the 09-26 r1 watch printed «pid 1038139 R · CPU 0.580 h» for 45 min after
+        # seed 2's D had EXITED (22:52:56): the heartbeat reprinted the last live poll. A process that is gone is beaten as
+        # GONE, with the sleeps it closed; a finished search (every sleep closed) is not a death.
+        d = self.run_dir("D")
+        for k in range(1, 18):
+            plant_sleep(d, k, T0 + k)
+        s = P.Search(d, pid=1)
+        P.poll(BUDGET, [s], 17, T0 + 30, procs=clock(2088.0))
+        _, fire, _, dead = P.poll(BUDGET, [s], 17, T0 + 40, procs=clock(0.0, alive=False))
+        self.assertIsNone(fire)
+        self.assertEqual(dead, [])
+        beat = P.heartbeat(BUDGET, [s], T0 + 50)[0]
+        self.assertNotIn(" R ", beat)
+        self.assertIn("GONE", beat)
+        self.assertIn("17/17 sleeps closed", beat)
+        alive = P.Search(self.run_dir("SHUFFLED-RELATION_D"), pid=2)
+        P.poll(BUDGET, [alive], 17, T0 + 30, procs=clock(10.0))
+        self.assertIn(" R ", P.heartbeat(BUDGET, [alive], T0 + 50)[0])      # a live one still shows its state
+
     def test_cpu_is_interpolated_between_polls(self) -> None:
         s = P.Search(self.run_dir("D"), pid=1, start=T0, samples=[(T0 + 100, 50.0), (T0 + 200, 150.0)])
         self.assertAlmostEqual(s.cpu_at(T0 + 150)[0], 100.0)
