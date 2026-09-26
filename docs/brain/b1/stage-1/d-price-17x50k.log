@@ -1,0 +1,41 @@
+[price_d] sleep 1 at seq 313: 0.0 s, spent 0
+[price_d] sleep 2 at seq 626: 0.0 s, spent 0
+[price_d] sleep 3 at seq 1128: 13.6 s, spent 49996
+[price_d] sleep 4 at seq 1629: 68.3 s, spent 49998
+[price_d] sleep 5 at seq 2130: 61.5 s, spent 49998
+[price_d] sleep 6 at seq 2631: 91.9 s, spent 49998
+[price_d] sleep 7 at seq 3132: 330.7 s, spent 50000
+[price_d] sleep 8 at seq 3633: 270.7 s, spent 50000
+[price_d] sleep 9 at seq 4078: 302.9 s, spent 50000
+[price_d] sleep 10 at seq 4091: 0.3 s, spent 10
+[price_d] sleep 11 at seq 4232: 284.1 s, spent 50000
+[price_d] sleep 12 at seq 4373: 280.8 s, spent 50000
+[price_d] sleep 13 at seq 4514: 0.3 s, spent 0
+[price_d] sleep 14 at seq 4527: 0.3 s, spent 0
+[price_d] sleep 15 at seq 4540: 0.3 s, spent 0
+[price_d] sleep 16 at seq 6467: 0.3 s, spent 8
+[price_d] sleep 17 at seq 6589: 356.2 s, spent 50000
+[price_d] wrote docs/brain/b1/stage-1/d-price-17x50k.json
+	Command being timed: "/data/dev/venvs/brain/bin/python -m tools.b1.price_d --seed 20261001 --candidates 50000 --sleeps 17 --out docs/brain/b1/stage-1/d-price-17x50k.json"
+	User time (seconds): 2066.96
+	System time (seconds): 1.55
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 34:28.95
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 718244
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 15
+	Minor (reclaiming a frame) page faults: 176407
+	Voluntary context switches: 256
+	Involuntary context switches: 8029
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 248
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

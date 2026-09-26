@@ -40,6 +40,7 @@ FAMILY_NULL = {"AFTER": 1 / 25, "BEFORE": 1 / 25, "BETWEEN": 1 / 25, "TWO_AFTER"
 U5_KINDS = ("after_z", "before_a", "two_after_yz", "between_adjacent", "after_never_taught", "other_case_digit")
 CANARY_NAMES_HEARD_BY_T_L = 27      # 26 letters + zog (§5.3 U6's own denominator for chance)
 NO_RELATION_ROAD = ("A0", "RING-READ")   # §5.5 (0a): they answer no relation cue by design — (0a)/(0a′) NOT APPLICABLE (R38)
+SLEEP_ONLY_RELATIONS = ("D", "E′")       # learn relation cues only in SLEEP (§4 row D; E′ routes them to D) — R39
 
 
 class GraderError(Exception):
@@ -422,7 +423,26 @@ def grade_cost(record: Mapping[str, Any], bound_ms_per_event: Optional[float] = 
 
 
 # ================================================================================================ the controls
-def grade_controls(record: Mapping[str, Any], tape_counts: Optional[Mapping[str, Any]] = None, seed: int = 0) -> Dict[str, Dict[str, Any]]:
+def const_taught_after_last_sleep(tape_rows: Sequence[Mapping[str, Any]]) -> Optional[Dict[str, Any]]:
+    """R39's tape fact: every CONST FEEDBACK row before T_L lies after the last SLEEP before T_L's TEST_BEGIN, so a
+    learner that learns only in sleep cannot hold a CONST program at T_L. None: no T_L sitting, or no CONST teaching."""
+    asks = {r["seq"]: r for r in tape_rows if r["kind"] == "ASK"}
+    tl = [r["seq"] for r in tape_rows if r["kind"] == "TEST_BEGIN" and (r.get("payload") or {}).get("sitting") == "T_L"]
+    if not tl:
+        return None
+    t0 = tl[0]
+    sleeps = [r["seq"] for r in tape_rows if r["kind"] == "SLEEP" and r["seq"] < t0]
+    last = max(sleeps) if sleeps else 0
+    cfb = [r["seq"] for r in tape_rows if r["kind"] == "FEEDBACK" and r["seq"] < t0
+           and ((asks.get(r["payload"]["ask_seq"]) or {}).get("payload") or {}).get("cues") == ["CONST"]]
+    if not cfb:
+        return None
+    return {"unsleepable": min(cfb) > last, "last_sleep_before_T_L": last, "T_L_begins": t0,
+            "const_teaching_seqs": [min(cfb), max(cfb)], "const_feedback_rows": len(cfb)}
+
+
+def grade_controls(record: Mapping[str, Any], tape_counts: Optional[Mapping[str, Any]] = None, seed: int = 0,
+                   const_fact: Optional[Mapping[str, Any]] = None) -> Dict[str, Dict[str, Any]]:
     answers = record["answers"]
     out: Dict[str, Dict[str, Any]] = {}
     # (0a) CONST — 100 %
@@ -449,6 +469,17 @@ def grade_controls(record: Mapping[str, Any], tape_counts: Optional[Mapping[str,
             m = out[key]
             out[key] = _mark(key, reading=m["reading"], graded=False, passed=None, bar=m["bar"], reason_code="NOT_APPLICABLE",
                              fields=dict(m["fields"], why=f"{base} answers no relation cue by design (PREREG §5.5 (0a))"), klass="CONTROL")
+    # edit: Claude (Opus 5.5), 2026-09-26 17:36 +0400 — R39: the tape teaches CONST only in L6, after the last SLEEP before T_L,
+    # so a learner of relation cues that learns ONLY in sleep (D; E′ routes relation cues to D) cannot hold a CONST program
+    # at T_L — a control placed where the mechanism cannot fire (#228 (a)). A FAILED reading there is NOT GRADABLE, named,
+    # the tape fact in its fields. If the tape gives a sleep between the teaching and the sitting, the control is graded.
+    if base in SLEEP_ONLY_RELATIONS and const_fact and const_fact.get("unsleepable") and out["C0a_CONST"]["pass"] is False:
+        m = out["C0a_CONST"]
+        out["C0a_CONST"] = _mark("C0a_CONST", reading=m["reading"], graded=False, passed=None, bar=m["bar"],
+                                 reason_code="NO_SLEEP_BEFORE_SITTING",
+                                 fields=dict(m["fields"], tape=dict(const_fact),
+                                             why=f"{base} learns relation cues only in sleep; CONST is taught after the last sleep before T_L"),
+                                 klass="CONTROL")
     # (0d) CANARY — at chance: pass iff correct <= the smallest k with P(X >= k) < 0.001 under 1/27 (above → a LEAK)
     can = _by_sitting(answers, "T_L", "CONTROL_CANARY")
     n, k = len(can), sum(1 for a in can if a["correct"])
@@ -485,7 +516,7 @@ def grade_arm(record: Mapping[str, Any], truth_asks: Mapping[int, Mapping[str, A
         return (e or {}).get("organ_ceiling", {}).get("max") if e else None
 
     marks: Dict[str, Any] = {}
-    marks.update(grade_controls(record, tape_counts, seed))
+    marks.update(grade_controls(record, tape_counts, seed, const_fact=const_taught_after_last_sleep(tape_rows)))
     marks["U1a_NAME@T_L"] = grade_u1a(answers, "T_L", bars.get("U1a"), {c: ceil_of(f"NAMING_{c}_4fonts") for c in ("latin-upper", "latin-lower")})
     marks["U1b_PICK@T_L"] = grade_u1b(answers, "T_L", bars.get("U1b"))
     marks["U2a_REFUSES@T_L"] = grade_u2a(answers, "T_L")

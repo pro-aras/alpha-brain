@@ -93,7 +93,10 @@ _BASE: Dict[str, ArmSpec] = {
     # n_groups = name_cap + 3 the group readout needs; name_cap 64 holds the world's 63 names (SEAT-DECISIONS R35).
     "A2": ArmSpec("A2", "brain.arms.logic.arm", "ArmA2", {"name_cap": 64, "n_gates": 2077, "n_layers": 4, "recurrent_bits": 256}),
     "A3": ArmSpec("A3", "brain.arms.clauses.arm", "ArmA3", {"C": 200, "T": 50, "s": 5.0}),
-    "D": ArmSpec("D", "brain.arms.library.arm", "LibraryArm"),
+    # edit: Claude (Opus 5.5), 2026-09-26 17:45 +0400 — D's number, which the seat's §12 line of 12:08 omitted (the graded
+    # run of 13:03 ran the arm's toy default of 2,000): §4 row D's formula on prices measured on the tape, all 17 sleeps
+    # at 50,000 and the depth factor at sleep 3 (tools/b1/d_budget.py → docs/brain/b1/stage-1/d-budget.json; R37).
+    "D": ArmSpec("D", "brain.arms.library.arm", "LibraryArm", {"candidates_per_sleep": 703000}),
     # the hybrids (brain/hybrids/router.py): D inside E′ / F loads D's OWN snapshots (R9) — the dependency is named
     "A5": ArmSpec("A5", "brain.hybrids.router", "ArmA5"),
     "A6": ArmSpec("A6", "brain.hybrids.router", "ArmA6", {"partner": "A3"}),
