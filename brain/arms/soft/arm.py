@@ -305,6 +305,14 @@ class ArmA1:
         return self.h
 
     def _fit_teach(self, row: Mapping[str, Any]) -> None:
+        # edit: Claude (Opus 5.5), 2026-09-26 12:47 +0400 — a TEACH row names its thing, and the name is HEARD here (PREREG §4
+        # row A1: «NAME = a classifier over the names HEARD so far (a new name adds an output unit with zero weights)»).
+        # Nothing called `NameAnswerHead.hear_name`, so `n_names` stayed 0 for the whole B1 run of seed 20261001: every
+        # NAME ask read UNKNOWN (2,698 of 2,698 test asks, all five A1 variants), and every NAME FEEDBACK returned early
+        # («a name never heard cannot be a target», D17). The runs were stopped at 12:46 and are re-run on the fix.
+        name = (row.get("payload") or {}).get("name")
+        if name is not None:
+            self.names.hear_name(str(name), active_h=self.engine.active)
         enc = self._require_encoder()
         steps = enc.teach_steps(row["payload"])
         self._advance_steps(steps, detach_between=(self.awake_mode == "local"))
@@ -490,7 +498,12 @@ class ArmA1:
             else:
                 ans = Answer(kind=AnswerKind.NOTHING)
 
-        if learn and ans.kind not in (AnswerKind.UNKNOWN, AnswerKind.NOTHING, AnswerKind.SILENT):
+        # edit: Claude (Opus 5.5), 2026-09-26 12:52 +0400 — EVERY training ask is held for its FEEDBACK, an abstention included.
+        # The old guard dropped the correction whenever the arm said UNKNOWN / NOTHING, so an arm that begins by abstaining
+        # (a Tsetlin machine's zero votes; a gate net under its band) was never corrected and abstained forever: in B1's
+        # seed-20261001 run A2 and A3 answered UNKNOWN to every NAME test ask. The teacher's answer teaches whether or not
+        # the arm answered; the extra «wrongly given» term still needs a given answer (`given_index`).
+        if learn:
             self._pending[int(ask_row["seq"])] = entry
         return ans
 

@@ -87,7 +87,11 @@ _BASE: Dict[str, ArmSpec] = {
     "A1-MA": ArmSpec("A1-MA", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-MA", "ma_n_tokens": 63},
                      config_from={"match_params": ("A1", "size.n_params_active"), "match_n_names": ("A1", "size.n_names")}),
     "A4": ArmSpec("A4", "brain.arms.transformer.a4", "ArmA4", config_from={"match_params": ("A1", "size.n_params_active")}),
-    "A2": ArmSpec("A2", "brain.arms.logic.arm", "ArmA2"),
+    # edit: Claude (Opus 5.5), 2026-09-26 12:59 +0400 — A2 at the PREREG §4 row's size (L 4 × G 2,048, a 256-bit state), not the
+    # arm's toy defaults (2 layers, 38 gates, 16 bits, 16 names) that the first graded run used because no config was passed —
+    # the builder RAISED this to the seat and it was never set. G is 2,077 = 67 × 31, the nearest multiple ≥ 2,048 of the
+    # n_groups = name_cap + 3 the group readout needs; name_cap 64 holds the world's 63 names (SEAT-DECISIONS R35).
+    "A2": ArmSpec("A2", "brain.arms.logic.arm", "ArmA2", {"name_cap": 64, "n_gates": 2077, "n_layers": 4, "recurrent_bits": 256}),
     "A3": ArmSpec("A3", "brain.arms.clauses.arm", "ArmA3", {"C": 200, "T": 50, "s": 5.0}),
     "D": ArmSpec("D", "brain.arms.library.arm", "LibraryArm"),
     # the hybrids (brain/hybrids/router.py): D inside E′ / F loads D's OWN snapshots (R9) — the dependency is named

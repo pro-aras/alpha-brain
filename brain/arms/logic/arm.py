@@ -199,7 +199,10 @@ class ArmA2:
         if valence == VALENCE_NO and given_idx is not None and given_idx != target_idx and given_idx < logits.shape[-1]:
             loss = loss + torch.clamp(logits[given_idx], min=-10.0)
         self.trainer.step(loss)
-        self.net.observe_training_margin(logits.detach())
+        # edit: Claude (Opus 5.5), 2026-09-26 12:55 +0400 — the band's margin is no longer observed HERE, on the RELAXED
+        # logits: `should_abstain` compares it with the DISCRETISED group sums the answer uses (small integers), so a band
+        # from relaxed margins sat above almost every tested margin and A2 abstained on everything (#162: a gate in other
+        # units than its variable). The margin is observed in `_answer_impl`, on the discretised groups, for training asks.
 
     # ------------------------------------------------------------------------------- answer
     def answer(self, ask_row: Mapping[str, Any], learn: bool = False) -> Answer:
@@ -230,7 +233,10 @@ class ArmA2:
                 else:
                     logits = groups[: len(self.names)]
                     given_idx = int(logits.argmax())
-                    if self.net.should_abstain(logits):
+                    abstain = self.net.should_abstain(logits)
+                    if learn:  # the band learns from the SAME discretised margins it is compared with (edit 12:55, above)
+                        self.net.observe_training_margin(logits)
+                    if abstain:
                         ans = Answer(kind=AnswerKind.UNKNOWN)
                     else:
                         ans = Answer(kind=AnswerKind.NAME, value=self.names[given_idx])
@@ -238,7 +244,10 @@ class ArmA2:
             elif family == "YESNO":
                 logits = groups[self.name_cap : self.name_cap + 2]
                 given_idx = int(logits.argmax())
-                if self.net.should_abstain(logits):
+                abstain = self.net.should_abstain(logits)
+                if learn:
+                    self.net.observe_training_margin(logits)
+                if abstain:
                     ans = Answer(kind=AnswerKind.NOTHING)
                 else:
                     ans = Answer(kind=(AnswerKind.NO if given_idx == 0 else AnswerKind.YES))
@@ -253,7 +262,10 @@ class ArmA2:
                         g, hc = self.net(x, hc, discretise=True)
                     scores.append(g[self.name_cap + 2])
                 scores_t = torch.stack(scores) if scores else torch.zeros(0)
-                if scores_t.numel() == 0 or self.net.should_abstain(scores_t):
+                abstain = scores_t.numel() == 0 or self.net.should_abstain(scores_t)
+                if learn and scores_t.numel() > 1:
+                    self.net.observe_training_margin(scores_t)
+                if abstain:
                     ans = Answer(kind=AnswerKind.NOTHING)
                 else:
                     given_idx = int(scores_t.argmax())
@@ -262,7 +274,12 @@ class ArmA2:
             else:
                 ans = Answer(kind=AnswerKind.NOTHING)
 
-        if learn and ans.kind not in (AnswerKind.UNKNOWN, AnswerKind.NOTHING, AnswerKind.SILENT):
+        # edit: Claude (Opus 5.5), 2026-09-26 12:52 +0400 — EVERY training ask is held for its FEEDBACK, an abstention included.
+        # The old guard dropped the correction whenever the arm said UNKNOWN / NOTHING, so an arm that begins by abstaining
+        # (a Tsetlin machine's zero votes; a gate net under its band) was never corrected and abstained forever: in B1's
+        # seed-20261001 run A2 and A3 answered UNKNOWN to every NAME test ask. The teacher's answer teaches whether or not
+        # the arm answered; the extra «wrongly given» term still needs a given answer (`given_index`).
+        if learn:
             self._pending[int(ask_row["seq"])] = entry
         return ans
 

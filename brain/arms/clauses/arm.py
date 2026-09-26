@@ -150,7 +150,9 @@ class ArmA3:
             return
         right = p["right"]
         family = entry["answer_kind"]
-        x = entry["x"]
+        # edit: Claude (Opus 5.5), 2026-09-26 13:01 +0400 — a PICK entry carries no `x` (each candidate is encoded on its own);
+        # the old guard never held an abstained PICK, so `entry["x"]` here was only ever reached by NAME/YESNO entries.
+        x = entry.get("x")
         event_seq = ask_seq
         if family == "NAME":
             if right not in self.tm.names:
@@ -218,7 +220,12 @@ class ArmA3:
             else:
                 ans = Answer(kind=AnswerKind.NOTHING)
 
-        if learn and ans.kind not in (AnswerKind.UNKNOWN, AnswerKind.NOTHING, AnswerKind.SILENT):
+        # edit: Claude (Opus 5.5), 2026-09-26 12:52 +0400 — EVERY training ask is held for its FEEDBACK, an abstention included.
+        # The old guard dropped the correction whenever the arm said UNKNOWN / NOTHING, so an arm that begins by abstaining
+        # (a Tsetlin machine's zero votes; a gate net under its band) was never corrected and abstained forever: in B1's
+        # seed-20261001 run A2 and A3 answered UNKNOWN to every NAME test ask. The teacher's answer teaches whether or not
+        # the arm answered; the extra «wrongly given» term still needs a given answer (`given_index`).
+        if learn:
             self._pending[int(ask_row["seq"])] = entry
         return ans
 
