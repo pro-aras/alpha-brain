@@ -1022,3 +1022,26 @@ His word, verbatim, 12:18: «Yes adopt the things or reverse Engineer if needed 
 | KNOWS HOW SURE IT IS | is its confidence honest? | its confidence, recorded BEFORE each answer is checked, against the outcome: the reliability curve, over- and under-confidence per stage, and «I don't know» against low confidence |
 
 **The grader's rule, added:** every answer row carries the learner's own confidence, written before the answer is checked; an answer without one reads «not measured», never a guess. **Their zoo cells (§5.2), before either is graded:** a planted over-confident toy must be caught, and a planted calibrated toy must pass; a planted speaker whose read-back always passes while its sentences name the wrong thing must be caught by the key.
+
+## 11 · Where the build stands, and what the brain's B1 harness already gives it — 2026-09-26 13:20 +0400 (the seat, Claude (Opus 5.5))
+His question at 12:18, verbatim: «And the THE SCHOOL local program was build or not? And how much is it pending and how can i see it working on the pc?»
+
+**Built:** nothing of the Bench itself. Phase 0 (this plan) is done. Phase 1a was gated on alpha4-2's launch (§7 rule 5), and alpha4-2 was superseded on 09-24 by THE BRAIN. That gate is void; the phases stand.
+
+**What already exists, in B1's harness** (`/data/dev/genome-wt-b1int`, b1-integration b1a1998), and maps onto phase 1a for a kind-B learner (the brain's arms):
+
+| phase 1a piece | in B1's harness today | what remains for the Bench |
+|---|---|---|
+| the adapter (§4.2) | the frozen `Arm` protocol (`brain/protocol.py`: fit_event, answer, sleep, state_sha, snapshot, why, rule) | the kind-A door (phase 1b) |
+| the ledger (§4.8) | the per-arm record R27: answers, state_sha, cost, feedback, sittings, summary, run-facts | one writer per file, named in the Bench's own tree |
+| the world and its clock (§4.3) | the tape: a schedule written once per seed, a seq clock, the glyph library, the disjointness checks | the stage ladder beyond LETTERS (§2.2) |
+| the teacher / examiner / grader (§4.5–4.7) | TEACH rows, training asks with FEEDBACK, sittings; the graders and `results.py`'s card | his full flow (§2.1 step 4: «No», the hurt, re-teach, a new font) |
+| the failure zoo (§5.2) | KEY / SHIFTED-KEY / RING-READ, CANARY, FROZEN, DISJOINT, MLC LEAK, each arm's toy, and since 09-26 the NAME toy (R34) | the full diagonal, each toy caught by its own detector only |
+| the validator (§5.3) | the bars validator (a bar above its ceiling or under its floor is refused; NOT GRADABLE families named) | the four refusals on a stage declaration |
+| the console (§4.11) | none; today a run is read in a terminal | `bench status` (text), then the local page |
+
+**What remains** is the Bench's own tree (`/data/dev/bench`), the console, the stage ladder, his full correction flow, and the kind-A door. For the brain that is roughly half of phase 1, because the harness exists. For the creature it is phases 1b–1d whole. The builder-day estimates of §7 are not re-measured here.
+
+**How he will see it:** first `bench status` in a terminal, then a local read-only page in the browser on this PC (§4.11). The ops site only with his yes on the diff.
+
+**Order:** after B1's verdict and the R-THINK pre-registration's review (his priorities, 09-24 00:35: the brain first, THE SCHOOL second).
