@@ -1011,3 +1011,14 @@ Tonight's and tomorrow's lives, ladders and reads (ladder 2's six lives, alpha4-
 | D-17 | **A SOUND answer** («output the similar frequency or sound wavelength») | phase 2: a voice that plays back the sound it heard with the word; until then it answers in words, which already shows «its brain recognizing it as what» |
 
 **ADOPTED 2026-09-24 00:37 +0400 on his 00:35 word — verbatim «Ok go for the recommended ones in bench's decisions and do check while building other options too so we can have solid thing»: every recommended value above stands (the name is THE SCHOOL); each alternative named in this table is built as a CHECK beside the recommended one — a twin or an experiment under the ladder law, never a second product — so the choice rests on a measurement. His priority order the same minute: Alpha 4 and its genomes/organisms first, THE SCHOOL second, anything else after.** *(edit: Claude (Fable 5.1), 2026-09-24 00:37 +0400)*
+
+
+## 10 · Additions ADOPTED on his word — 2026-09-26 12:22 +0400 (CONCLUSION §9)
+His word, verbatim, 12:18: «Yes adopt the things or reverse Engineer if needed for our goal and nature of the AI we are building.»
+
+| capacity | the plain question | measured as |
+|---|---|---|
+| SAYS WHAT IT MEANS | does each sentence it speaks say what it meant to say? | the examiner's key reads every spoken sentence back: the intended thing and relation named, per sentence; the learner's own read-back result printed beside the key's (a disagreement is an INSTRUMENT finding) |
+| KNOWS HOW SURE IT IS | is its confidence honest? | its confidence, recorded BEFORE each answer is checked, against the outcome: the reliability curve, over- and under-confidence per stage, and «I don't know» against low confidence |
+
+**The grader's rule, added:** every answer row carries the learner's own confidence, written before the answer is checked; an answer without one reads «not measured», never a guess. **Their zoo cells (§5.2), before either is graded:** a planted over-confident toy must be caught, and a planted calibrated toy must pass; a planted speaker whose read-back always passes while its sentences name the wrong thing must be caught by the key.

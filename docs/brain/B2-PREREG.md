@@ -147,3 +147,5 @@
 
 ## 11 · The seat's lines (appended, dated; never edited)
 *(empty — the bars' numbers and the plasticity band after stage −1; the probe's numbers replacing §8; then the signature that makes this PREREG law)*
+
+- **2026-09-26 12:22 +0400 — the seat, on his 12:18 word (CONCLUSION §9, addition 3):** §5.2 prints BWT beside every retention mark — BWT = the mean over the graded arrivals i < N of (acc_i at the end of the stream − acc_i right after arrival i), with n and its interval, and the NO-REPLAY control's BWT beside it: that control must read NEGATIVE, or the instrument cannot see forgetting and the retention marks are INSTRUMENT-VOID. A reader field, no bar. B2 stays DRAFT until the seat's bars line below.
