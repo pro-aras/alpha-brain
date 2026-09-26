@@ -93,7 +93,27 @@ def read_tape(root: Path, declared_path: Optional[str] = None) -> Iterator[Dict[
         return
     for day_file in sorted(tape_dir.glob("*.jsonl")):
         with day_file.open() as f:
-            for line in f:
+            for lineno, line in enumerate(f, 1):
                 line = line.strip()
                 if line:
-                    yield json.loads(line)
+                    try:
+                        row = json.loads(line)
+                    except ValueError as e:
+                        raise TornTapeLine(_torn(day_file, lineno, line, e)) from e
+                    yield row
+
+
+# edit: Claude (Opus 5.5), 2026-09-26 18:54 +0400 — the 09-24 reboot (SOLUTIONS #240): the 22:00 shutdown left zero-filled lines in the
+# day files the lives had open, and every restart died here on a BARE JSONDecodeError («Expecting value: line 1 column 1»)
+# naming neither the file nor the line. A torn line is now NAMED — the file, the line, what it holds — and never skipped: a
+# tape with a hole must not replay as a whole one. A closed record is recovered by cutting it at its first stop row.
+class TornTapeLine(ValueError):
+    """A tape line that does not parse: a write cut by a power-off (NUL-filled) or cut mid-row."""
+
+
+def _torn(day_file: Path, lineno: int, line: str, err: Exception) -> str:
+    nul = line.count("\x00")
+    what = (f"{nul} NUL bytes in {len(line)} characters (a write cut by a power-off)" if nul
+            else f"{len(line)} characters that do not parse as a row ({err}; a write cut mid-row)")
+    return (f"{day_file}: line {lineno} is torn: {what}. A torn line is never skipped; recover a closed record by "
+            f"cutting it at its first stop row (SOLUTIONS #240)")

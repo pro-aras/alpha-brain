@@ -15,7 +15,9 @@ ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome/run --genome
 # int64 crash at its 2nd sleep became 10 identical crashes in 2 min under Restart=on-failure — #230's loop in this template).
 # A sense crash never exits the process (it restarts in-thread); only a mind crash exits 3.
 Restart=on-failure
-RestartPreventExitStatus=3
+# edit: Claude (Opus 5.5), 2026-09-26 18:54 +0400 — SOLUTIONS #240: the body exits 4 (CLOSED_EXIT) when its root carries STOPPED-AT;
+# a closed life is never resumed by a restart, so 4 is never restarted either (3 stays the mind's crash).
+RestartPreventExitStatus=3 4
 RestartSec=5
 TimeoutStopSec=30
 

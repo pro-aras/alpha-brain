@@ -80,6 +80,30 @@ def _rss_mb() -> float:
     return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
 
 
+# edit: Claude (Opus 5.5), 2026-09-26 18:54 +0400 — the 09-24 update reboot (SOLUTIONS #240) started 35 CLOSED lives: every life was
+# enabled at launch and every close only stopped it, so the reboot resumed 16 lives on closed roots for 36 h and 19 more
+# crash-looped. The close road now disables the unit (49cfd31); this is the second wall: a root that carries STOPPED-AT
+# (the close writes it) is never resumed by a restart. `main` exits CLOSED_EXIT, which the unit template never restarts
+# (RestartPreventExitStatus), and `Body.start` raises LifeClosed. Resuming a closed life is a deliberate act: remove STOPPED-AT.
+CLOSED_EXIT = 4
+
+
+class LifeClosed(RuntimeError):
+    """The root carries STOPPED-AT: this life was closed, and a restart never resumes it."""
+
+
+def closed_marker(root: Path) -> Optional[str]:
+    marker = Path(root) / "STOPPED-AT"
+    if not marker.exists():
+        return None
+    try:
+        when = marker.read_text().strip() or "?"
+    except OSError:
+        when = "?"
+    return (f"{marker} exists (closed {when}): a closed life is never resumed by a restart; remove STOPPED-AT "
+            f"deliberately to resume it")
+
+
 class SenseThread(threading.Thread):
     """Runs `fn(publish, stop_event)` forever: `fn` is expected to loop internally until `stop_event` is
     set. An exception from `fn` is journaled as `sense_restart` and, when `restart` is True (the default,
@@ -192,6 +216,10 @@ class Body:
 
     # ------------------------------------------------------------------ startup: resume + replay backlog
     def start(self) -> None:
+        why = closed_marker(self.root)      # SOLUTIONS #240: a closed life is never resumed by a restart
+        if why:
+            self._refused = why
+            raise LifeClosed(why)
         state_ok = (self.root / "state" / "organism.npz").exists()
         if state_ok:
             self.mind, last_seq = Mind.resume(self.genome_path, self.root, blind=self.blind)
@@ -459,6 +487,8 @@ class Body:
         if self._stopped:
             return
         self._stopped = True
+        if getattr(self, "_refused", None):   # a refused start never ran: no STATUS, no journal row in the closed record
+            return
         self.stop_event.set()
         for st in self.sense_threads:
             st.stop()
@@ -710,6 +740,10 @@ def _web_sense_fn(web_sense, root: Path, web_cfg: Dict[str, object], max_words: 
 
 def main(argv: List[str]) -> int:
     root = Path(argv[argv.index("--root") + 1])
+    why = closed_marker(root)          # SOLUTIONS #240: refused before the genome is read or a worker is started
+    if why:
+        print(f"[body] refusing to start: {why}", file=sys.stderr, flush=True)
+        return CLOSED_EXIT
     genome_path = Path(argv[argv.index("--genome") + 1])
     # C1.3/C2: read once, here -- Body.__init__ parses the same text again for its own (TAPE/HEART/
     # CRASH/BODY) purposes; this is the CLI's own copy, used for WORLD's maker period/window and the
