@@ -80,8 +80,12 @@ _BASE: Dict[str, ArmSpec] = {
     "A1-LOCAL": ArmSpec("A1-LOCAL", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-LOCAL"}),
     "A1-BPTT-AWAKE": ArmSpec("A1-BPTT-AWAKE", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-BPTT-AWAKE"}),
     "A1-FIXED": ArmSpec("A1-FIXED", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-FIXED"}, config_from={"fixed_h": ("A1", "final_h")}),
-    "A1-ATT": ArmSpec("A1-ATT", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-ATT"}, config_from={"fixed_h": ("A1", "final_h")}),
-    "A1-MA": ArmSpec("A1-MA", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-MA", "ma_n_tokens": 63}, config_from={"fixed_h": ("A1", "final_h")}),
+    # edit: Claude (Opus 5.5), 2026-09-26 11:58 +0400 — the attention twins are SOLVED to A1's final COUNT (§4.1), never given
+    # A1's width: `fixed_h` = A1's final H put the readout and the wider heads on top of A1's parameters.
+    "A1-ATT": ArmSpec("A1-ATT", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-ATT"},
+                      config_from={"match_params": ("A1", "size.n_params_active"), "match_n_names": ("A1", "size.n_names")}),
+    "A1-MA": ArmSpec("A1-MA", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-MA", "ma_n_tokens": 63},
+                     config_from={"match_params": ("A1", "size.n_params_active"), "match_n_names": ("A1", "size.n_names")}),
     "A4": ArmSpec("A4", "brain.arms.transformer.a4", "ArmA4", config_from={"match_params": ("A1", "size.n_params_active")}),
     "A2": ArmSpec("A2", "brain.arms.logic.arm", "ArmA2"),
     "A3": ArmSpec("A3", "brain.arms.clauses.arm", "ArmA3", {"C": 200, "T": 50, "s": 5.0}),

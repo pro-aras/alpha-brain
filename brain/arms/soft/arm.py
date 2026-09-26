@@ -124,7 +124,26 @@ class ArmA1:
             hmax = h0
             arrival_budget = 0
         elif variant in ("A1-ATT", "A1-MA"):
-            fixed_h = int(self.config["fixed_h"])  # required (§4.1's matched-parameter solve)
+            # edit: Claude (Opus 5.5), 2026-09-26 11:58 +0400 — PREREG §4.1: «each one's H = the largest H whose TOTAL parameter
+            # count ≤ A1's FINAL count on the same seed (both counts printed)». The runner used to pass A1's final H as `fixed_h`,
+            # so a twin carried its readout and its 64-wider answer heads ON TOP of A1's count (+60 % at H 20). Now the runner
+            # passes A1's final count and names (`match_params`, `match_n_names`) and the width is SOLVED here; `fixed_h` stays
+            # for the unit tests that build a twin at a given width.
+            self.match: Optional[Dict[str, Any]] = None
+            if "match_params" in self.config:
+                from brain.arms.soft.engine import largest_H_under, twin_total_params
+                target = int(self.config["match_params"])
+                m_names = int(self.config["match_n_names"])
+                m_d = int(self.config.get("att_d", 64))
+                m_tok = int(self.config.get("ma_n_tokens", 0))
+                count = lambda H: twin_total_params(variant, STEP_DIM, H, GLANCE_DIM, LETTER_DIM, KIND_DIM, m_names, m_d, m_tok)
+                fixed_h = largest_H_under(target, count)
+                if fixed_h <= 0:
+                    raise ValueError(f"{variant}: no positive width fits A1's final count {target} (§4.1) — RAISE to the seat")
+                self.match = {"a1_final_params": target, "a1_final_names": m_names, "solved_h": fixed_h,
+                              "twin_params_at_solved_h": count(fixed_h), "twin_params_at_h_plus_1": count(fixed_h + 1)}
+            else:
+                fixed_h = int(self.config["fixed_h"])
             h0 = hmax = fixed_h
             arrival_budget = 0
             self.attention_mode = "att" if variant == "A1-ATT" else "ma"
@@ -633,13 +652,23 @@ class ArmA1:
         the ALIVE hidden width, the declared ceiling, the names heard, and the total parameter count at the
         alive width by the engine's own formula (`a1_total_params`) — never a raw `numel()` over HMAX-wide
         tensors, whose zero columns are not parameters the arm uses."""
-        from brain.arms.soft.engine import a1_total_params
+        from brain.arms.soft.engine import a1_total_params, twin_total_params
         from brain.arms.soft.steps import STEP_DIM, GLANCE_DIM, LETTER_DIM, KIND_DIM
         h = int(self.engine.active)
         n_names = len(self.names.names)
-        return {"h_alive": h, "hmax": int(self.engine.hmax), "h0": int(getattr(self.engine, "h0", h)), "n_names": n_names,
-                "n_params_active": int(a1_total_params(STEP_DIM, h, GLANCE_DIM, LETTER_DIM, KIND_DIM, n_names)),
-                "variant": self.config.get("variant", "A1")}
+        variant = self.config.get("variant", "A1")
+        # edit: Claude (Opus 5.5), 2026-09-26 11:58 +0400 — an attention twin reports ITS OWN count (the wide heads + the
+        # readout), and the §4.1 match beside it; before, it reported A1's formula at its width and hid the readout.
+        if variant in ("A1-ATT", "A1-MA"):
+            n_params = twin_total_params(variant, STEP_DIM, h, GLANCE_DIM, LETTER_DIM, KIND_DIM, n_names,
+                                         int(self.config.get("att_d", 64)), int(self.config.get("ma_n_tokens", 0)))
+        else:
+            n_params = a1_total_params(STEP_DIM, h, GLANCE_DIM, LETTER_DIM, KIND_DIM, n_names)
+        out = {"h_alive": h, "hmax": int(self.engine.hmax), "h0": int(getattr(self.engine, "h0", h)), "n_names": n_names,
+               "n_params_active": int(n_params), "variant": variant}
+        if getattr(self, "match", None):
+            out["match"] = dict(self.match)
+        return out
 
     def cost(self) -> Dict[str, float]:
         return {"events": self._events, "ms": self._ms}

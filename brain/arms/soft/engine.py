@@ -734,6 +734,25 @@ def a1_total_params(input_dim: int, H: int, glance_dim: int, letter_dim: int, ki
     )
 
 
+def twin_total_params(variant: str, input_dim: int, H: int, glance_dim: int, letter_dim: int, kind_dim: int, n_names: int,
+                      att_d: int = 64, n_tokens: int = 0) -> int:
+    """edit: Claude (Opus 5.5), 2026-09-26 11:58 +0400 — an attention twin's TOTAL parameter count at fixed width H, counted
+    the way the arm is BUILT (checked against the modules' own tensors in tests/brain/arms_soft/test_twin_params.py): the GRU
+    and the world head at H; the answer heads (names, yes/no, pick) at H + att_d, because they read the hidden state with the
+    readout's d-vector appended (arm.py `head_hmax`); and the readout — A1-ATT: WQ, WK, WV (3·d·H); A1-MA: WQ, WK, the E table
+    and the RMSNorm gain (its V = K + RMSNorm(E[s]) never touches the WV the parent class allocates). PREREG §4.1 solves H so
+    this count is ≤ A1's final `n_params_active`; `a1_total_params` alone under-counted a twin by the wide heads + the readout."""
+    hh = H + att_d
+    body = (gru_param_count(input_dim, H)
+            + linear_param_count(H, glance_dim) + linear_param_count(H, letter_dim) + linear_param_count(H, kind_dim)
+            + linear_param_count(hh, n_names) + bilinear_param_count(hh) + linear_param_count(hh, 2))
+    if variant == "A1-ATT":
+        return body + att_readout_param_count(H, att_d)
+    if variant == "A1-MA":
+        return body + ma_readout_param_count(H, n_tokens, att_d)
+    raise ValueError(f"twin_total_params: {variant!r} is not an attention twin")
+
+
 def largest_H_under(target_params: int, params_fn, lo: int = 1, hi: int = 4096) -> int:
     """Binary search for the largest H with params_fn(H) <= target_params. params_fn must be
     non-decreasing in H (true of every formula above: every term is H times a positive
