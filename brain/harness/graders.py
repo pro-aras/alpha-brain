@@ -39,6 +39,7 @@ FAMILY_NULL = {"AFTER": 1 / 25, "BEFORE": 1 / 25, "BETWEEN": 1 / 25, "TWO_AFTER"
                "TRANSFER": 1 / 9, "MIRROR": 0.5, "LOOP": 0.5, "VOWEL": 0.5, "U1b_PICK": 0.25, "U2b_LURES": 0.5}
 U5_KINDS = ("after_z", "before_a", "two_after_yz", "between_adjacent", "after_never_taught", "other_case_digit")
 CANARY_NAMES_HEARD_BY_T_L = 27      # 26 letters + zog (§5.3 U6's own denominator for chance)
+NO_RELATION_ROAD = ("A0", "RING-READ")   # §5.5 (0a): they answer no relation cue by design — (0a)/(0a′) NOT APPLICABLE (R38)
 
 
 class GraderError(Exception):
@@ -439,6 +440,15 @@ def grade_controls(record: Mapping[str, Any], tape_counts: Optional[Mapping[str,
     out["C0a_SAME"] = _mark("C0a_SAME", reading=(eq / n if n else None), graded=n > 0, passed=(n > 0 and eq >= need), bar=(need / n if n else None),
                             fields={"n": n, "equal_to_own_name": eq, "need": need,
                                     "same_answer_kinds": dict(Counter(s["answer"]["kind"] for s, _ in pairs))}, klass="CONTROL")
+    # edit: Claude (Opus 5.5), 2026-09-26 17:33 +0400 — PREREG §5.5 (0a): «A0 and RING-READ answer no relation cue by design
+    # — for them (0a)/(0a′) read NOT APPLICABLE, named.» Both were graded for every arm, so A0, its twins and RING-READ read
+    # FAILED controls on both seeds (SEAT-DECISIONS R38). The reading stays on the record; the mark is not graded.
+    base = str((record.get("summary") or {}).get("arm") or "").split(":", 1)[-1]
+    if base in NO_RELATION_ROAD:
+        for key in ("C0a_CONST", "C0a_SAME"):
+            m = out[key]
+            out[key] = _mark(key, reading=m["reading"], graded=False, passed=None, bar=m["bar"], reason_code="NOT_APPLICABLE",
+                             fields=dict(m["fields"], why=f"{base} answers no relation cue by design (PREREG §5.5 (0a))"), klass="CONTROL")
     # (0d) CANARY — at chance: pass iff correct <= the smallest k with P(X >= k) < 0.001 under 1/27 (above → a LEAK)
     can = _by_sitting(answers, "T_L", "CONTROL_CANARY")
     n, k = len(can), sum(1 for a in can if a["correct"])
