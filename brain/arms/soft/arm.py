@@ -115,6 +115,12 @@ class ArmA1:
         self.attention_mode: Optional[str] = None
 
         if variant == "A1-FIXED":
+            # edit: Claude (Opus 5.5), 2026-09-26 11:52 +0400 — PREREG §4: «A1 at its OWN final H (from the same seed's A1 run)
+            # from the start». The runner passes that H as `fixed_h` (run.py config_from A1's final_h); this branch read only
+            # `h0` (default 64), so the growth null ran at 64 whatever A1 grew to — GROWS would have compared a grown A1 with a
+            # smaller fixed twin. `fixed_h` wins when given; the unit-test path without it keeps `h0`.
+            if "fixed_h" in self.config:
+                h0 = int(self.config["fixed_h"])
             hmax = h0
             arrival_budget = 0
         elif variant in ("A1-ATT", "A1-MA"):

@@ -58,6 +58,13 @@ class TestArmA1AllVariantsConform(unittest.TestCase):
         self.assertEqual(arm.engine.hmax, arm.engine.active, "A1-FIXED must have no room to grow at all")
         self.assertEqual(arm.engine.budget.capacity, 0)
 
+    def test_a1_fixed_takes_the_runners_fixed_h(self):
+        """edit: Claude (Opus 5.5), 2026-09-26 11:52 +0400 — the seam: run.py passes A1's final H as `fixed_h`; A1-FIXED must
+        START at that width (PREREG §4). The base config's h0 is 8, so the pre-fix code read 8 here: the assertion fails on it."""
+        arm = self._check("A1-FIXED", fixed_h=12)
+        self.assertEqual((arm.engine.hmax, arm.engine.active), (12, 12))
+        self.assertEqual(arm.size()["h_alive"], 12)
+
     def test_a1_no_sleep_is_a_noop(self):
         arm = self._check("A1-NO-SLEEP")
         before = arm.state_sha()
