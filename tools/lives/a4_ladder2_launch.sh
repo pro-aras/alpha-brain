@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# edit: Claude (Opus 5.5), 2026-09-26 11:38 +0400 — the close DISABLES the life (disable --now), never only stops it: on 09-24 an update reboot restarted every closed life still enabled (the 09-26 incident, register 11:00).
 # edit: Claude (Fable 5.1), 2026-09-23 17:10 +0400 — LADDER 2's launch + waiters for one rung (A4-LADDER-2-PREREG §2, §5): a life named a4l2-<rung>
 # on the ONE integration commit C2 (§1: one code version for all rungs) with the genome PATH given (genome/ladder2/A4L2-<RUNG>.genome),
 # a STATUS sampler every 5 min into readings/status-series.jsonl, check.py at +2 h / +8 h and the STOP WHOLE at 8 h + 2 min — all three
@@ -17,7 +18,7 @@ for H in 2 8; do AT=$(date -d "+${H} hours" '+%Y-%m-%d %H:%M:%S'); systemd-run -
   /usr/bin/bash -c "cd $ROOT/code && OPENBLAS_NUM_THREADS=1 nice -n 10 python3 tools/lives/check.py --root $ROOT > $RD/check-${H}h.log 2>&1" 2>&1 | tail -1; done
 STOPAT=$(date -d '+482 minutes' '+%Y-%m-%d %H:%M:%S')
 systemd-run --user --on-calendar="$STOPAT" --timer-property=RemainAfterElapse=no --unit="$NAME-stop" --description="stop $NAME WHOLE at 8 h + 2 min = $STOPAT" \
-  /usr/bin/bash -c "systemctl --user stop creature-g5-watch@$NAME.timer; systemctl --user stop creature-g5@$NAME.service; systemctl --user stop $NAME-sampler.timer; date '+%Y-%m-%d %H:%M %z' > $ROOT/STOPPED-AT" 2>&1 | tail -1
+  /usr/bin/bash -c "systemctl --user disable --now creature-g5-watch@$NAME.timer; systemctl --user disable --now creature-g5@$NAME.service; systemctl --user stop $NAME-sampler.timer; date '+%Y-%m-%d %H:%M %z' > $ROOT/STOPPED-AT" 2>&1 | tail -1
 if [ "$HAS_CHAT" -gt 0 ]; then
   systemd-run --user --unit="$NAME-chat" --description="the seat's chat schedule for $NAME (waits until hour 1; one family question every 120 s to hour 8)" \
     /usr/bin/bash -c "cd $ROOT/code && OPENBLAS_NUM_THREADS=1 nice -n 10 python3 tools/chat_seat.py --root $ROOT --schedule --phrasings /data/dev/a4-ladder/fixtures/lang-test-phrasings.json > $RD/chat-schedule.log 2>&1" 2>&1 | tail -1

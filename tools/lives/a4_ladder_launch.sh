@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# edit: Claude (Opus 5.5), 2026-09-26 11:38 +0400 — the close DISABLES the life (disable --now), never only stops it: on 09-24 an update reboot restarted every closed life still enabled (the 09-26 incident, register 11:00).
 # edit: Claude (Fable 5.1), 2026-09-23 13:22 +0400 — THE A4 LADDER'S LAUNCH + WAITERS for one rung (A4-LADDER-PREREG §1.5, §4): the life on the RUNG'S OWN
 # BRANCH COMMIT (§1.3), a STATUS sampler every 5 min into readings/status-series.jsonl, check.py (the life's own checkout, no replay) at +2 h and
 # +8 h, the stop WHOLE at 8 h + 2 min, and for LANG the seat's chat schedule (tools/chat_seat.py --schedule; it waits until hour 1 by itself).
@@ -15,7 +16,7 @@ systemd-run --user --on-active=5min --on-unit-active=5min --unit="$NAME-sampler"
 for H in 2 8; do systemd-run --user --on-calendar="$(date -d "+${H} hours" '+%Y-%m-%d %H:%M:%S')" --timer-property=RemainAfterElapse=no --unit="$NAME-check${H}h" --description="$NAME check.py at +$H h (no replay)" \
   /usr/bin/bash -c "cd $ROOT/code && OPENBLAS_NUM_THREADS=1 nice -n 10 python3 tools/lives/check.py --root $ROOT > $RD/check-${H}h.log 2>&1" 2>&1 | tail -1; done
 systemd-run --user --on-calendar="$(date -d '+482 minutes' '+%Y-%m-%d %H:%M:%S')" --timer-property=RemainAfterElapse=no --unit="$NAME-stop" --description="stop $NAME WHOLE at 8 h + 2 min" \
-  /usr/bin/bash -c "systemctl --user stop creature-g5-watch@$NAME.timer; systemctl --user stop creature-g5@$NAME.service; systemctl --user stop $NAME-sampler.timer; date '+%Y-%m-%d %H:%M %z' > $ROOT/STOPPED-AT" 2>&1 | tail -1
+  /usr/bin/bash -c "systemctl --user disable --now creature-g5-watch@$NAME.timer; systemctl --user disable --now creature-g5@$NAME.service; systemctl --user stop $NAME-sampler.timer; date '+%Y-%m-%d %H:%M %z' > $ROOT/STOPPED-AT" 2>&1 | tail -1
 if [ "$R" = lang ]; then
   systemd-run --user --unit="$NAME-chat" --description="the seat's chat schedule for $NAME (waits until hour 1; one family question every 120 s to hour 8)" \
     /usr/bin/bash -c "cd $ROOT/code && OPENBLAS_NUM_THREADS=1 nice -n 10 python3 tools/chat_seat.py --root $ROOT --schedule --phrasings /data/dev/a4-ladder/fixtures/lang-test-phrasings.json > $RD/chat-schedule.log 2>&1" 2>&1 | tail -1

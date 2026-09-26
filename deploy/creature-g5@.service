@@ -7,9 +7,14 @@
 # edit: Claude (Fable 5.1), 2026-09-21 23:22 +0400 — THE LADDER (his 23:20 word): the genome comes from the life's own unit.env (GENOME=<path>, written by the launch
 # script and kept in the root as the life's record), so one template serves the top rung (G5.genome) and every ladder rung (genome/ladder/L*.genome).
 # edit: Claude (Fable 5.1), 2026-09-22 18:24 +0400 — THE ONE LIFE (docs/organs/NEXT-LIFE-PLAN-2026-09-22.md §6): the plant's canvas comes from unit.env's PLANT_AFTER (15000 for a 24 h life = hour ≈ 21; the 8 h seam lives keep 5000 by the default above).
+# edit: Claude (Opus 5.5), 2026-09-26 11:40 +0400 — a restart CAP: after the 09-24 update reboot, 19 closed lives with a zero-filled tape line
+# crash-looped at start (exit 1, so RestartPreventExitStatus=3 never fired) 4,483–13,132 times each for 36 h. Five failed starts in ten minutes
+# now leave the unit FAILED, which a monitor can see, instead of a loop that reads `active`.
 [Unit]
 Description=creature-g5 %i — an 8 h seam life of the G5 creature (root /data/dev/genome-lives/%i)
 After=network-online.target
+StartLimitIntervalSec=600
+StartLimitBurst=5
 
 [Service]
 Type=simple
