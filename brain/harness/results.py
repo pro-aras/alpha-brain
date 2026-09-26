@@ -12,7 +12,8 @@ grades each with `brain.harness.graders` (pure), reads the twins' records for th
                   births_series}}, pilot, decisions: {selection, d1_i, d1_ii, d1_iii, mlc_vs_d, grows, ma_isolation,
                   interface, predictions}, partition, instrument: {key, shifted_key}}.
   results.sha256 — of results.json's bytes. A re-read reproduces it; a planted one-row change in an
-                  answers.jsonl copy changes it (`tests/brain/harness/test_results.py`).
+                  answers.jsonl copy changes it. (No test pins this: `tests/brain/harness/test_results.py`, named here
+                  since 09-24, never existed — found 2026-09-26 at R40.)
   run-facts.json — every clock, load, RSS and pid (from the arms' own run-facts), never hashed.
   VERDICT.md    — rendered from templates: per family n and the denominator on every line, reach printed where
                   it applies, VOID / NOT GRADABLE / «no road» in words, never blended; the selection and D1's
@@ -23,6 +24,15 @@ COST) — C0d_CANARY excepted, since KEY answers the canary from the truth by co
 SHIFTED-KEY must NOT pass them all; otherwise every arm's marks are INSTRUMENT-VOID and the verdict says so
 first. Bars come from the seat's §12 line as `bars.json` (validated against the ceilings by
 `brain.harness.bars`); without one the run is a SMOKE and every mark reads NO_BAR.
+
+edit: Claude (Opus 5.5), 2026-09-26 18:34 +0400 — R40: PREREG §5.5 «a failing control VOIDS the arm, never "fails" it». Until
+now a failed control was an ordinary failed mark: the selection read a voided candidate as FAILED, and D1, GROWS, Memory
+Attention's comparisons and the interface read the readings of arms §5.5 voids. Now `arm_status` reads every graded
+CONTROL mark; a failure VOIDS the arm unless the arm's own construction guarantees it (the EXEMPT tables, each with
+its source: KEY's canary (R26), SHIFTED-KEY (built to fail), and the relation controls the shuffled twins' transforms
+rewrite (§4, R22, R23)). A VOID arm fails nothing: its would-be failures are kept as `failed_if_read`, its readings stay
+on the record, and no decision reads it. A VOID SHUFFLED-RELATION twin supplies no null, so the U3 marks that needed its
+band read NOT GRADABLE (TWIN_VOID). RESULTS_VERSION → v2.
 """
 from __future__ import annotations
 
@@ -41,9 +51,63 @@ from brain.harness import graders as G  # noqa: E402
 from brain.harness.run import load_tape, load_truth  # noqa: E402
 from brain.protocol import canonical_json  # noqa: E402
 
-RESULTS_VERSION = "b1-results-v1"
+RESULTS_VERSION = "b1-results-v2"
 KEY_EXEMPT = ("C0d_CANARY",)
 TWIN_PREFIXES = ("SHUFFLED-NAME:", "SHUFFLED-RELATION:", "FORCED:")
+
+# R40 — a control an arm's own construction guarantees to fail says nothing about the arm: printed, never voids it
+CONTROL_EXEMPT: Dict[str, Dict[str, str]] = {
+    "KEY": {"C0d_CANARY": "R26: KEY answers the canary from the truth by construction"},
+}
+EXEMPT_EVERY_CONTROL: Dict[str, str] = {
+    "SHIFTED-KEY": "(0c): built to fail the graders; read only by the instrument rule",
+}
+TWIN_CONTROL_EXEMPT: Dict[str, Dict[str, str]] = {
+    "SHUFFLED-RELATION:": {"C0a_CONST": "§4 / R23: every relation FEEDBACK answer is rewritten per cue, CONST's too",
+                           "C0a_SAME": "§4 / R23: every relation FEEDBACK answer is rewritten per cue, SAME's too"},
+    "SHUFFLED-NAME:": {"C0a_CONST": "§4 / R22: every name the tape teaches is mapped, CONST's answer `a` too"},
+}
+
+
+def arm_status(name: str, marks: Mapping[str, Any]) -> Dict[str, Any]:
+    """§5.5: VOID iff a graded CONTROL mark failed that the arm's construction does not guarantee to fail."""
+    by: List[str] = []
+    exempt: Dict[str, str] = {}
+    for k, m in marks.items():
+        if m.get("class") != "CONTROL" or not m.get("graded") or m.get("pass") is not False:
+            continue
+        why = EXEMPT_EVERY_CONTROL.get(name) or CONTROL_EXEMPT.get(name, {}).get(k)
+        if why is None:
+            why = next((t[k] for pre, t in TWIN_CONTROL_EXEMPT.items() if name.startswith(pre) and k in t), None)
+        if why:
+            exempt[k] = why
+        else:
+            by.append(k)
+    return {"void": bool(by), "by": sorted(by), "exempt": exempt}
+
+
+def read_partition(name: str, marks: Mapping[str, Any]) -> Dict[str, Any]:
+    """The graders' partition, read under §5.5: a VOID arm fails nothing (its would-be failures kept as
+    `failed_if_read`); an exempt control is not a failure."""
+    p = G.partition(marks)
+    s = arm_status(name, marks)
+    p["failed"] = [k for k in p["failed"] if k not in s["exempt"]]
+    p.update({"void": s["void"], "void_by": s["by"], "exempt": s["exempt"]})
+    if s["void"]:
+        p["failed_if_read"], p["failed"] = p["failed"], []
+    return p
+
+
+def without_void_twin(marks: Mapping[str, Any], twin_by: Sequence[str]) -> Dict[str, Any]:
+    """A VOID SHUFFLED-RELATION twin supplies no null: every graded U3 mark (which needs its band) reads NOT GRADABLE."""
+    out = dict(marks)
+    for k, m in marks.items():
+        if k.startswith("U3_") and m.get("graded"):
+            out[k] = G._mark(m["mark"], reading=m["reading"], graded=False, passed=None, bar=m.get("bar"),
+                             ceiling=m.get("ceiling"), null=m.get("null"), control=m.get("control"), reason_code="TWIN_VOID",
+                             fields=dict(m.get("fields") or {}, twin_void_by=list(twin_by)), sources=m.get("sources"),
+                             klass=m.get("class", ""))
+    return out
 
 
 class ResultsError(Exception):
@@ -101,10 +165,15 @@ def assemble(run_dir: Path, tape_dir: Path, bars: Optional[Mapping[str, Any]] = 
 
     # 1. the twins first: SHUFFLED-RELATION bands per BASE arm
     bands_by_base: Dict[str, Dict[str, float]] = {}
+    twin_void: Dict[str, List[str]] = {}
     for n, rec in records.items():
         if n.startswith("SHUFFLED-RELATION:"):
             base = n.split(":", 1)[1]
             marks = G.grade_arm(rec, truth, rows, bars=None, ceilings=ceilings, tape_counts=counts, seed=seed)
+            st = arm_status(n, marks)
+            if st["void"]:                     # R40: a VOID twin supplies no null
+                twin_void[base] = st["by"]
+                continue
             bands_by_base[base] = shuffled_relation_bands(marks)
 
     # 2. every arm's marks
@@ -112,7 +181,9 @@ def assemble(run_dir: Path, tape_dir: Path, bars: Optional[Mapping[str, Any]] = 
     for n, rec in records.items():
         base = n.split(":", 1)[1] if any(n.startswith(p) for p in TWIN_PREFIXES) else n
         marks = G.grade_arm(rec, truth, rows, bars=bars, ceilings=ceilings, twin_bands=bands_by_base.get(base), tape_counts=counts, seed=seed)
-        part = G.partition(marks)
+        if base in twin_void and not n.startswith("SHUFFLED-RELATION:"):
+            marks = without_void_twin(marks, twin_void[base])
+        part = read_partition(n, marks)
         summ = rec["summary"]
         d = Path(rec["dir"])
         inputs_sha = {f: sha256_file(d / f) for f in ("answers.jsonl", "why.jsonl", "rules.jsonl", "sittings.json", "feedback.jsonl")}
@@ -148,7 +219,7 @@ def assemble(run_dir: Path, tape_dir: Path, bars: Optional[Mapping[str, Any]] = 
         "cache_header_sha": sha256_file(cache_header), "ceilings_sha": (sha256_bytes(canonical_json(ceilings).encode()) if ceilings else None),
         "bars_line": bars_line, "bars": (dict(bars) if bars else None), "margins": margins, "smoke": not bool(bars) or not bool(counts.get("params_are_prereg", False)),
         "tape_params_are_prereg": counts.get("params_are_prereg"), "arms": arms, "instrument": instrument, "decisions": decisions,
-        "partition": partition_all, "twin_bands": bands_by_base, "pilot": {"a6_partner": None, "inputs": None},
+        "partition": partition_all, "twin_bands": bands_by_base, "twin_void": twin_void, "pilot": {"a6_partner": None, "inputs": None},
     }
     return results
 
@@ -161,6 +232,7 @@ def _reading(arms: Mapping[str, Any], arm: str, mark: str) -> Optional[float]:
 
 def _decisions(arms: Mapping[str, Any], margins: Mapping[str, float]) -> Dict[str, Any]:
     fams = list(G.U3_LETTER_FAMILIES)
+    void = {n: s["by"] for n, s in ((n, arm_status(n, a.get("marks") or {})) for n, a in arms.items()) if s["void"]}   # R40
 
     def u3(arm: str) -> Dict[str, Optional[float]]:
         return {f: _reading(arms, arm, f"U3_{f}@T_L") for f in fams}
@@ -168,14 +240,18 @@ def _decisions(arms: Mapping[str, Any], margins: Mapping[str, float]) -> Dict[st
     def diff(a: str, b: str, which: Sequence[str]) -> Dict[str, Any]:
         if a not in arms or b not in arms:
             return {"computable": False, "missing": [x for x in (a, b) if x not in arms]}
+        if a in void or b in void:
+            return {"computable": False, "void": {x: void[x] for x in (a, b) if x in void}}
         ua, ub = u3(a), u3(b)
         d = {f: ((ua[f] - ub[f]) if (ua[f] is not None and ub[f] is not None) else None) for f in which}
         return {"computable": True, "inputs": {a: {f: ua[f] for f in which}, b: {f: ub[f] for f in which}}, "diff_pp": {f: (None if v is None else round(100 * v, 1)) for f, v in d.items()}}
 
-    def all_pass(arm: str) -> Optional[bool]:
+    def all_pass(arm: str) -> Any:
         a = arms.get(arm)
         if not a:
             return None
+        if arm in void:
+            return "VOID"
         return not a["partition"]["failed"]
 
     m_d1 = margins.get("d1_pp")
@@ -186,7 +262,9 @@ def _decisions(arms: Mapping[str, Any], margins: Mapping[str, float]) -> Dict[st
     if d1_i.get("computable") and m_d1 is not None:
         vals = [v for v in d1_i["diff_pp"].values() if v is not None]
         d1_i["verdict_this_seed"] = ("STAYS" if vals and all(v >= m_d1 for v in vals) else ("DROPPED" if vals and all(v <= -m_d1 for v in vals) else "OPEN"))
-    d1_ii = {"computable": "E′" in arms and "F" in arms}
+    d1_ii: Dict[str, Any] = {"computable": "E′" in arms and "F" in arms and "E′" not in void and "F" not in void}
+    if any(x in void for x in ("E′", "F")):
+        d1_ii["void"] = {x: void[x] for x in ("E′", "F") if x in void}
     if d1_ii["computable"]:
         fe, ff = arms["E′"]["marks"], arms["F"]["marks"]
         worse = [k for k, v in fe.items() if v.get("graded") and ff.get(k, {}).get("graded") and isinstance(v.get("reading"), (int, float))
@@ -201,8 +279,9 @@ def _decisions(arms: Mapping[str, Any], margins: Mapping[str, float]) -> Dict[st
     if ma["isolation"].get("computable") and m_ma is not None:
         vals = [v for v in ma["isolation"]["diff_pp"].values() if v is not None]
         ma["isolation"]["verdict_this_seed"] = "memory value carries" if vals and all(v >= m_ma for v in vals) else "attention's, not the memory's"
-    interface: Dict[str, Any] = {"arms_present": [a for a in ("A5", "A5-IF1", "A5-IF2", "A5-IF3", "A5-IF4") if a in arms]}
-    if "A5" in arms and len(interface["arms_present"]) > 1:
+    interface: Dict[str, Any] = {"arms_present": [a for a in ("A5", "A5-IF1", "A5-IF2", "A5-IF3", "A5-IF4") if a in arms and a not in void],
+                                 "void": {a: void[a] for a in ("A5", "A5-IF1", "A5-IF2", "A5-IF3", "A5-IF4") if a in void}}
+    if "A5" in interface["arms_present"] and len(interface["arms_present"]) > 1:
         scores = {a: [v for v in (_reading(arms, a, f"U3_{f}@T_L") for f in G.DISCRIMINATING_FAMILIES) if v is not None] for a in interface["arms_present"]}
         means = {a: (sum(v) / len(v) if v else None) for a, v in scores.items()}
         interface["mean_discriminating_u3"] = means
@@ -210,9 +289,11 @@ def _decisions(arms: Mapping[str, Any], margins: Mapping[str, float]) -> Dict[st
             best = max((a for a in means if a != "A5" and means[a] is not None), key=lambda a: means[a], default=None)
             interface["verdict_this_seed"] = (best if best and (means[best] - means["A5"]) * 100 >= m_if else "F keeps IF-0")
     selection = {"candidates": {a: all_pass(a) for a in ("A5", "A6", "E′", "F") if a in arms}, "rule": "every bar including all six tests at BOTH seeds (§6)",
+                 "void": {a: void[a] for a in ("A5", "A6", "E′", "F") if a in void},
                  "this_seed_only": True}
     return {"selection": selection, "d1_i": d1_i, "d1_ii": d1_ii, "d1_iii": d1_iii, "grows": grows, "ma": ma, "interface": interface,
-            "mlc_vs_d": {"A1-MLC": _examples(arms, "A1-MLC"), "D": _examples(arms, "D"), "A1": _examples(arms, "A1")},
+            "mlc_vs_d": {a: ({"void": void[a]} if a in void else _examples(arms, a)) for a in ("A1-MLC", "D", "A1")},
+            "void": void,
             "predictions": "DEBATE rounds 1–2 (B1-PREREG.md §6) — read against the arms above by the seat, never by this code"}
 
 
@@ -244,7 +325,14 @@ def render_verdict(results: Mapping[str, Any]) -> str:
         L.append("")
         L.append(f"## {arm}")
         p = a["partition"]
-        L.append(f"failed {p['failed'] or 'none'} · not gradable {[n for n, _ in p['not_gradable']] or 'none'} · missing-graded {p['missing_graded'] or 'none'}")
+        if p.get("void"):
+            L.append(f"**VOID** — failed controls {p['void_by']} (§5.5: a failing control VOIDS the arm, never «fails» it; its marks "
+                     f"are printed for the record and read by no decision) · would-be failures, read by nothing: {p.get('failed_if_read')}")
+            L.append(f"not gradable {[n for n, _ in p['not_gradable']] or 'none'} · missing-graded {p['missing_graded'] or 'none'}")
+        else:
+            L.append(f"failed {p['failed'] or 'none'} · not gradable {[n for n, _ in p['not_gradable']] or 'none'} · missing-graded {p['missing_graded'] or 'none'}")
+        if p.get("exempt"):
+            L.append(f"controls failed by construction, never voiding (R40): {p['exempt']}")
         if a.get("cost"):
             L.append(f"cost: {_fmt(a['cost'].get('ms_per_event'))} ms per event over {a['cost'].get('arm_events')} events · size {a.get('size')}")
         L.append("")
@@ -264,18 +352,27 @@ def render_verdict(results: Mapping[str, Any]) -> str:
     d = results["decisions"]
     L.append("")
     L.append("## The decisions (§6, §4.1, §4.2) — this seed's inputs; the rule needs BOTH seeds")
-    L.append(f"- selection candidates (all bars this seed): {d['selection']['candidates']}")
+    L.append(f"- selection candidates (all bars this seed; VOID = a failed control, §5.5): {d['selection']['candidates']}"
+             + (f" · void by {d['selection']['void']}" if d["selection"].get("void") else ""))
+
+    def why_not(v: Mapping[str, Any]) -> str:
+        return f"VOID {v['void']}" if v.get("void") else f"missing {v.get('missing')}"
+
     for key, label in (("d1_i", "D1 (i) F − A5 on TWO_AFTER / CHAIN"), ("d1_iii", "D1 (iii) D − A1 (diagnostic)"), ("grows", "GROWS A1 − A1-FIXED")):
         v = d[key]
-        L.append(f"- {label}: " + (f"diff pp {v['diff_pp']} · inputs {v['inputs']} · {v.get('verdict_this_seed', '')}" if v.get("computable") else f"not computable — missing {v.get('missing')}"))
+        L.append(f"- {label}: " + (f"diff pp {v['diff_pp']} · inputs {v['inputs']} · {v.get('verdict_this_seed', '')}" if v.get("computable") else f"not computable — {why_not(v)}"))
     v = d["d1_ii"]
-    L.append(f"- D1 (ii) E′ vs F: " + (f"E′ below F on {v['e_prime_below_f_on']} → {v['verdict_this_seed']}" if v.get("computable") else "not computable — E′ or F missing"))
-    L.append(f"- Memory Attention: claim {d['ma']['claim'].get('diff_pp', d['ma']['claim'].get('missing'))} · isolation {d['ma']['isolation'].get('diff_pp', d['ma']['isolation'].get('missing'))} {d['ma']['isolation'].get('verdict_this_seed', '')}")
+    L.append(f"- D1 (ii) E′ vs F: " + (f"E′ below F on {v['e_prime_below_f_on']} → {v['verdict_this_seed']}" if v.get("computable")
+                                      else ("not computable — " + (f"VOID {v['void']}" if v.get("void") else "E′ or F missing"))))
+    ma_c, ma_i = d["ma"]["claim"], d["ma"]["isolation"]
+    L.append(f"- Memory Attention: claim {ma_c['diff_pp'] if ma_c.get('computable') else why_not(ma_c)} · isolation "
+             f"{ma_i['diff_pp'] if ma_i.get('computable') else why_not(ma_i)} {ma_i.get('verdict_this_seed', '')}")
     L.append(f"- interface: {d['interface']}")
     L.append(f"- examples-to-bar (TWO_AFTER): {d['mlc_vs_d']}")
     L.append("")
     L.append("## Reading rules")
-    L.append("- A mark NOT GRADED is never counted as failed; «no road» names a capability the arm does not have; VOID names the instrument, never the arm.")
+    L.append("- A mark NOT GRADED is never counted as failed; «no road» names a capability the arm does not have; INSTRUMENT-VOID (0c) names the "
+             "instrument, never the arm; an arm VOID names a §5.5 control that arm failed — never «failed» (R40).")
     L.append("- REACH families are printed beside RING-READ (reach given the name); the U3 verdict rests on the discriminating families TWO_AFTER · OTHER_CASE · CHAIN.")
     return "\n".join(L) + "\n"
 
@@ -334,7 +431,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     w = write_all(res, out, Path(ns.run))
     print(f"[results] seed {res['seed']} · arms {list(res['arms'])} · instrument {'VOID' if res['instrument']['void'] else 'sound'} · results.json sha {w['results_sha256'][:16]}… → {out}")
     for arm, a in res["arms"].items():
-        print(f"[results]   {arm}: failed {a['partition']['failed']} · not gradable {len(a['partition']['not_gradable'])}")
+        p = a["partition"]
+        print(f"[results]   {arm}: " + (f"VOID by {p['void_by']}" if p.get("void") else f"failed {p['failed']}")
+              + f" · not gradable {len(p['not_gradable'])}")
     return 0
 
 

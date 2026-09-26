@@ -86,3 +86,19 @@
     - an EMPTY `cost.jsonl` beside closed snapshots is read as 4 sleeps.
   - **First live readings (18:22; descriptive, since k < 4):** sleep 3 read r = 0.925 · 0.772 · 0.897 · 0.842 (seed 1 D · SR:D · seed 2 D · SR:D). All four searches were in sleep 4 at 0.547 CPU-h. The check is armed until checkpoint 7; log `/data/dev/brain-runs/b1/runs/d_projection-2026-09-26.log`.
   - **Owed after both units end, not before:** the E′/F loaders import `brain/` when they start, about 09-27 13:00. Then `_Writer` writes line-buffered (or flushes per record), and the launch scripts set `PYTHONUNBUFFERED=1`, so every record and log a run writes can be read while it runs.
+- **R40 (a failing control VOIDS the arm, as §5.5 says — 2026-09-26 18:41 +0400, Claude (Opus 5.5)):** §5.5: «a failing control VOIDS the arm, never «fails» it». `brain/harness/results.py` had no VOID state. A failed control was an ordinary failed mark, so the selection read a voided candidate as FAILED. D1 (i), (ii) and (iii), GROWS, Memory Attention's claim and isolation, and the interface all read the readings of arms §5.5 voids.
+  - **Now:** `arm_status` reads every graded CONTROL mark, and a failure VOIDS the arm.
+    - A VOID arm fails nothing. Its would-be failures are kept as `failed_if_read`, and its readings stay on the record.
+    - Every decision refuses a VOID arm by name. The selection reads `"VOID"`; each comparison reads `computable: false` with `void: {arm: [controls]}`.
+    - A VOID SHUFFLED-RELATION twin supplies no null: the U3 marks that needed its band read NOT GRADABLE (`TWIN_VOID`).
+    - `RESULTS_VERSION` → `b1-results-v2`.
+  - **Exempt, each by its own construction** (the reading is printed and never voids):
+    - KEY's (0d) canary (R26: KEY answers from the truth);
+    - every control of SHIFTED-KEY (built to fail; read only by (0c));
+    - CONST and SAME for the SHUFFLED-RELATION twins (§4 and R23 rewrite every relation FEEDBACK answer, these two cues' too);
+    - CONST for the SHUFFLED-NAME twins (§4 and R22 map every taught name, CONST's `a` too).
+    - SAME is NOT exempt for SHUFFLED-NAME: R22 maps the NAME cue's answers and SAME's through one bijection, so a twin that learns can pass it.
+  - **What it changes on seed 1's committed record** (graded before R38 and R39): A5, E′ and F read VOID (SAME 0.30 · 0.15 · 0.20). The selection's outcome is unchanged (none selected), but its reason is now VOID, not FAILED. At the re-grade D's CONST reads NOT GRADABLE (R39), so D is read unless another of its controls fails.
+  - **Pinned by** `tests/brain/harness/test_results_void.py`, 16 tests. On the old code, 3 FAIL by assertion: the selection read `False` for a candidate with a failed control; D1 was computed over it; seed 1's committed A5, E′ and F read `False`. The other 11 ERROR on the missing API. A negative control computes D1 when every control passes. **End to end** on seed 1's live record, to a scratch dir: exit 0; A5, FORCED:A5 and SHUFFLED-NAME:A5 read VOID by SAME; KEY and SHIFTED-KEY are exempt as named. **Full brain suite on the final bytes:** `Ran 348 tests in 171.407s`, `OK (skipped=3)` (exit 0, read from its own log).
+  - **Found beside it (#194):** `results.py`'s docstring had named `tests/brain/harness/test_results.py` as the pin for the re-read sha since 09-24. The file never existed. The docstring now says so; a re-read reproduction test is owed.
+  - **The code change touched `results.py` only.** It imports `run.py`, never the reverse, so the two running D-family units cannot import it; `graders.py` is untouched.
