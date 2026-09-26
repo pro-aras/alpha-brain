@@ -3,7 +3,7 @@
 # (B1-PREREG.md §8, §4, §6). edit: Claude (Fable 5.1), 2026-09-24 19:02 +0400 — the seat, alone.
 # Usage: tools/b1/run_seed.sh <seed> [max_parallel=6]      (from the b1 tree)
 #   lane 1 (system python, the cells' interpreter until §3.0 decides otherwise): KEY SHIFTED-KEY RING-READ A0 FORCED:A0 SHUFFLED-NAME:A0
-#   lane 2 (venv): A1 → A1-FIXED A1-ATT A1-MA (need A1's size) ; A1-MLC A1-NO-SLEEP A1-LOCAL A1-BPTT-AWAKE ; A2 A3 ; D → E′ F (need D's snapshots) ; A4 (needs A1's size)
+#   lane 2 (venv): A1 → A1-FIXED A1-ATT A1-MA (need A1's size) ; A1-MLC A1-NO-SLEEP A1-LOCAL A1-BPTT-AWAKE ; A2 A3 ; D → E′ F (need D's snapshots) ; SHUFFLED-RELATION:D → SHUFFLED-RELATION:E′ :F ; A4 (needs A1's size)
 #   twins on the hybrids: A5 SHUFFLED-NAME:A1 SHUFFLED-NAME:A5 SHUFFLED-RELATION:A1 SHUFFLED-RELATION:A5 SHUFFLED-RELATION:E′ SHUFFLED-RELATION:F FORCED:A1 FORCED:A5
 # Each arm is its own process (its own log, its own exit read from the process — never a pipe); nothing here decides a bar.
 set -u
@@ -25,7 +25,9 @@ run_arm() {  # $1 interpreter, $2 arm name
 wait_slots() { while [ "$(jobs -rp | wc -l)" -ge "$MAXP" ]; do sleep 5; done; }
 # ---- wave 1: everything with no dependency
 for a in KEY SHIFTED-KEY RING-READ A0 FORCED:A0 SHUFFLED-NAME:A0; do wait_slots; run_arm "$SYS" "$a" & done
-for a in A1 A2 A3 D A1-MLC A1-NO-SLEEP A1-LOCAL A1-BPTT-AWAKE; do wait_slots; run_arm "$VENV" "$a" & done
+# edit: Claude (Opus 5.5), 2026-09-26 17:12 +0400 — SHUFFLED-RELATION:D searches the SHUFFLED tape so that wave 3's
+# SHUFFLED-RELATION:E′ and :F load a library learned on THEIR tape, not the real D's (SEAT-DECISIONS R36).
+for a in A1 A2 A3 D SHUFFLED-RELATION:D A1-MLC A1-NO-SLEEP A1-LOCAL A1-BPTT-AWAKE; do wait_slots; run_arm "$VENV" "$a" & done
 wait
 # ---- wave 2: the arms that read A1's size or D's snapshots
 for a in A1-FIXED A1-ATT A1-MA A4 A5 E′ F; do wait_slots; run_arm "$VENV" "$a" & done

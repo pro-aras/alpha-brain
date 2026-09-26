@@ -1,0 +1,134 @@
+{
+ "candidates_per_sleep": 50000,
+ "interpreter": "/data/dev/venvs/brain/bin/python",
+ "load1_end": 4.220703125,
+ "load1_start": 3.99755859375,
+ "seed": 20261001,
+ "sleeps": [
+  {
+   "cues": [],
+   "s_per_candidate": null,
+   "seq": 313,
+   "sleep": 1,
+   "spent": 0,
+   "wall_s": 0.0
+  },
+  {
+   "cues": [],
+   "s_per_candidate": null,
+   "seq": 626,
+   "sleep": 2,
+   "spent": 0,
+   "wall_s": 0.0
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 14,
+     "n": 34,
+     "perfect": false,
+     "program": "eq(argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x0, b))), nthN(order, 0))",
+     "score": 27,
+     "spent": 7044
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 14,
+     "n": 46,
+     "perfect": false,
+     "program": "eq(argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x0, b))), nthN(order, 0))",
+     "score": 36,
+     "spent": 7044
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 14,
+     "n": 28,
+     "perfect": false,
+     "program": "eq(nthN(order, 0), nthN(order, 1))",
+     "score": 20,
+     "spent": 7044
+    },
+    {
+     "key": "IS(N,G)>YESNO",
+     "max_size_reached": 10,
+     "n": 50,
+     "perfect": true,
+     "program": "eq(argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x1, b))), x0)",
+     "score": 50,
+     "spent": 372
+    },
+    {
+     "key": "POINT(N;cands)>PICK",
+     "max_size_reached": 8,
+     "n": 20,
+     "perfect": true,
+     "program": "argmaxG(cands, \u03bba. maxofG(taught(x0), \u03bbb. sim(b, a)))",
+     "score": 20,
+     "spent": 136
+    },
+    {
+     "key": "AFTER(G)>NAME",
+     "max_size_reached": 11,
+     "n": 14,
+     "perfect": false,
+     "program": "nthN(order, add(add(add(add(1, 1), 1), 1), 1))",
+     "score": 1,
+     "spent": 7044
+    },
+    {
+     "key": "NAME(G)>NAME",
+     "max_size_reached": 8,
+     "n": 29,
+     "perfect": true,
+     "program": "argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x0, b)))",
+     "score": 29,
+     "spent": 90
+    },
+    {
+     "key": "BETWEEN(G,G)>NAME",
+     "max_size_reached": 11,
+     "n": 10,
+     "perfect": false,
+     "program": "nthN(order, add(add(1, 1), 1))",
+     "score": 1,
+     "spent": 7044
+    },
+    {
+     "key": "BEFORE(G)>NAME",
+     "max_size_reached": 11,
+     "n": 9,
+     "perfect": false,
+     "program": "nthN(order, add(1, 1))",
+     "score": 1,
+     "spent": 7044
+    },
+    {
+     "key": "SAME(G)>NAME",
+     "max_size_reached": 8,
+     "n": 8,
+     "perfect": true,
+     "program": "argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x0, b)))",
+     "score": 8,
+     "spent": 90
+    },
+    {
+     "key": "OTHER_CASE(G;cands)>PICK",
+     "max_size_reached": 11,
+     "n": 2,
+     "perfect": false,
+     "program": "argmaxG(cands, \u03bba. sim(x0, a))",
+     "score": 1,
+     "spent": 7044
+    }
+   ],
+   "s_per_candidate": 0.000257,
+   "seq": 1128,
+   "sleep": 3,
+   "spent": 49996,
+   "wall_s": 12.84
+  }
+ ],
+ "tape_sha256": "ce0d65d92ed99e0536e9a0fb943d7f0a0117dc3ff15305591da2372512439a48"
+}

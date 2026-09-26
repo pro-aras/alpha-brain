@@ -122,8 +122,21 @@ def spec_for(name: str) -> ArmSpec:
             s.name = name
             field_, value = _TWIN_PREFIX[prefix]
             setattr(s, field_, value)
+            if field_ == "transform":
+                # edit: Claude (Opus 5.5), 2026-09-26 17:12 +0400 — a TAPE twin's LEARNED-STATE dependency (a library's
+                # snapshots, read through "arm_dir") resolves to the SAME twin of its source arm: SHUFFLED-RELATION:E′
+                # loads SHUFFLED-RELATION:D's library, searched on the shuffled tape. Loading the real D's handed the null
+                # the true relation rules (SEAT-DECISIONS R36). A size match (match_params, fixed_h …) stays on the base
+                # arm: a capacity match is not learned content. A wrapper twin (FORCED) reads the same tape: unchanged.
+                s.config_from = {k: ((f"{prefix}:{src}", fld) if fld == "arm_dir" else (src, fld))
+                                 for k, (src, fld) in s.config_from.items()}
             return s
     raise RunError(f"unknown arm {name!r}; the runner knows: {known_arm_names()}")
+
+
+def arm_dirname(name: str) -> str:
+    """The directory an arm's run lives in under a seed's out root (a twin's ':' becomes '_')."""
+    return name.replace(":", "_")
 
 
 # ================================================================================================ the inputs
@@ -200,7 +213,7 @@ def _rss_mb() -> float:
 
 def _resolve_config_from(spec: ArmSpec, out_root: Path) -> None:
     for key, (base, field_) in spec.config_from.items():
-        summ = out_root / base / "summary.json"
+        summ = out_root / arm_dirname(base) / "summary.json"   # a twin source lives under its '_' name (R36)
         if not summ.exists():
             raise RunError(f"{spec.name} needs {key} from {base}'s run ({summ} missing) — run {base} first on this seed")
         d = json.loads(summ.read_text())
@@ -243,7 +256,7 @@ def run_arm(name: str, seed: int, tape_rows: Sequence[Mapping[str, Any]], tape_s
             if k in _OVERRIDES[name]:
                 del spec.config_from[k]          # an explicit value replaces the dependency on another arm's run
     _resolve_config_from(spec, out_root)
-    out_dir = out_root / name.replace(":", "_")
+    out_dir = out_root / arm_dirname(name)
     out_dir.mkdir(parents=True, exist_ok=True)
     run_dir = out_dir / "arm"
     run_dir.mkdir(exist_ok=True)
