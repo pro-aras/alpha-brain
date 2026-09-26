@@ -1,0 +1,162 @@
+{
+  "bars": {
+    "COST": 307.521,
+    "KEEPS": 5.0,
+    "TRANSFER": 13,
+    "U1a": {
+      "latin-lower": 0.7776,
+      "latin-upper": 0.6692
+    },
+    "U1b": 24,
+    "U2b": 69,
+    "U3": {
+      "AFTER": 8,
+      "BEFORE": 8,
+      "BETWEEN": 8,
+      "CHAIN": 11,
+      "TWO_AFTER": 11
+    },
+    "U4a": 0.5,
+    "U5": 0.8,
+    "U6": 4
+  },
+  "ceilings_sha256": "f5885f29f142475e5f826a03f1698ee41c7c02bc20f7b5f4a445bc845c9ba2e7",
+  "detail": {
+    "AFTER": {
+      "bar": 8,
+      "bar_share": 0.6666666666666666,
+      "ceiling": 0.8863636363636362,
+      "k_min": 4,
+      "n": 12,
+      "rule": "max(k_min/n + hw95, 0.5\u00b7ceiling), capped at the ceiling"
+    },
+    "BEFORE": {
+      "bar": 8,
+      "bar_share": 0.6666666666666666,
+      "ceiling": 0.9166666666666666,
+      "k_min": 4,
+      "n": 12,
+      "rule": "max(k_min/n + hw95, 0.5\u00b7ceiling), capped at the ceiling"
+    },
+    "BETWEEN": {
+      "bar": 8,
+      "bar_share": 0.6666666666666666,
+      "ceiling": 0.7548209366391184,
+      "k_min": 4,
+      "n": 12,
+      "rule": "max(k_min/n + hw95, 0.5\u00b7ceiling), capped at the ceiling"
+    },
+    "CHAIN": {
+      "bar": 11,
+      "bar_share": 0.44,
+      "ceiling": 0.8727272727272728,
+      "k_min": 6,
+      "n": 25,
+      "rule": "max(k_min/n + hw95, 0.5\u00b7ceiling), capped at the ceiling"
+    },
+    "COST": {
+      "bar": 307.521,
+      "counterfactual": {
+        "a0_ms": 1.595,
+        "a1_h512_ms": 33.973,
+        "a1_h64_ms": 11.451,
+        "rule": "3 \u00d7 A0's solo ms/event (the 2026-09-24 draft)",
+        "value": 4.785
+      },
+      "rule": "8 h / 93652 body rows"
+    },
+    "LOOP": {
+      "bar": null,
+      "ceiling": 0.5,
+      "k_min": 13,
+      "n": 14,
+      "not_gradable": true,
+      "why": "ORGAN LIMIT: ceiling 0.500 <= k_min/n + hw95 1.063"
+    },
+    "MIRROR": {
+      "bar": null,
+      "ceiling": 0.5,
+      "k_min": 15,
+      "n": 16,
+      "not_gradable": true,
+      "why": "ORGAN LIMIT: ceiling 0.500 <= k_min/n + hw95 1.056"
+    },
+    "OTHER_CASE": {
+      "bar": null,
+      "ceiling": 0.8611570247933884,
+      "k_min": 3,
+      "n": 5,
+      "not_gradable": true,
+      "why": "ORGAN LIMIT: ceiling 0.861 <= k_min/n + hw95 1.029"
+    },
+    "TRANSFER": {
+      "bar": 13,
+      "bar_share": 0.7222222222222222,
+      "ceiling": 0.869281045751634,
+      "k_min": 8,
+      "n": 18,
+      "rule": "max(k_min/n + hw95, 0.5\u00b7ceiling), capped at the ceiling"
+    },
+    "TWO_AFTER": {
+      "bar": 11,
+      "bar_share": 0.5238095238095238,
+      "ceiling": 0.8614718614718614,
+      "k_min": 6,
+      "n": 21,
+      "rule": "max(k_min/n + hw95, 0.5\u00b7ceiling), capped at the ceiling"
+    },
+    "U1a:latin-lower": {
+      "bar": 0.7776,
+      "ceiling": 0.8776223776223776,
+      "rule": "ceiling \u2212 10 pp, never under 0.5"
+    },
+    "U1a:latin-upper": {
+      "bar": 0.6692,
+      "ceiling": 0.7692307692307693,
+      "rule": "ceiling \u2212 10 pp, never under 0.5"
+    },
+    "VOWEL": {
+      "bar": null,
+      "ceiling": 0.5,
+      "k_min": 31,
+      "n": 40,
+      "not_gradable": true,
+      "why": "ORGAN LIMIT: ceiling 0.500 <= k_min/n + hw95 0.904"
+    }
+  },
+  "line": "\u00a712 (the seat, 2026-09-26 12:08 +0400): bars from ceilings.json by ONE rule \u2014 AFTER k=8 of 12 (ceiling 0.886, k_min 4); BEFORE k=8 of 12 (ceiling 0.917, k_min 4); BETWEEN k=8 of 12 (ceiling 0.755, k_min 4); TWO_AFTER k=11 of 21 (ceiling 0.861, k_min 6); CHAIN k=11 of 25 (ceiling 0.873, k_min 6); TRANSFER k=13 of 18 (ceiling 0.869, k_min 8); NAME latin-upper 0.6692, latin-lower 0.7776; U1b 24/52 \u00b7 U2b 69/104 \u00b7 U6 4/10 \u00b7 U4a 0.5 \u00b7 U5 0.8 \u00b7 KEEPS 5.0 pp \u00b7 COST \u2264 307.521 ms per event (one world-day of alpha4-1's body, 93,652 rows, in 8 wall-hours on one thread; a tape event and a body row taken as one unit of work [Guessing]; the draft 3 \u00d7 A0 = 4.785 ms is NOT used: A1-FIXED at H 64 reads 11.451 ms, so every network-bearing arm would fail it by construction (#228 b)); margins D1 10.0 pp \u00b7 GROWS 5.0 pp \u00b7 MA 3.0 pp at \u2264 +10.0 % cost \u00b7 interface 5.0 pp; NOT GRADABLE (organ limit): OTHER_CASE, MIRROR, LOOP, VOWEL",
+  "margins": {
+    "d1_pp": 10.0,
+    "grows_pp": 5.0,
+    "interface_pp": 5.0,
+    "ma_cost_pct": 10.0,
+    "ma_pp": 3.0
+  },
+  "validation": {
+    "AFTER": {
+      "bar": 0.6666666666666666,
+      "ceiling": 0.8863636363636362,
+      "k_min_over_n": 0.08333333333333333
+    },
+    "BEFORE": {
+      "bar": 0.6666666666666666,
+      "ceiling": 0.9166666666666666,
+      "k_min_over_n": 0.08333333333333333
+    },
+    "BETWEEN": {
+      "bar": 0.6666666666666666,
+      "ceiling": 0.7548209366391184,
+      "k_min_over_n": 0.08333333333333333
+    },
+    "CHAIN": {
+      "bar": 0.44,
+      "ceiling": 0.8727272727272728,
+      "k_min_over_n": 0.04
+    },
+    "TWO_AFTER": {
+      "bar": 0.5238095238095238,
+      "ceiling": 0.8614718614718614,
+      "k_min_over_n": 0.047619047619047616
+    }
+  }
+}

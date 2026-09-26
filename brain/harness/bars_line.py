@@ -10,7 +10,14 @@ typed by hand):
       k_bar = ceil(n · max(k_min/n + hw95(k_min/n, n), 0.5 · ceiling))   capped at floor(n · ceiling), never under k_min
   the NAME bar (a share, per case): ceiling − 0.10, never under 0.5        (U1 (a))
   U1b / U2b / U6: the §5.2/§5.3 k (24 of 52; 69 of 104; 4 of 10) — construction-exact, no ceiling needed
-  U4a: 0.5; U5: 0.8; KEEPS: 5 pp; COST: 3 × A0's solo ms/event (from solo-probe.json when present, else NO bar)
+  U4a: 0.5; U5: 0.8; KEEPS: 5 pp
+  COST (edit: Claude (Opus 5.5), 2026-09-26 12:07 +0400 — the seat's rule, replaced before any graded answer): one
+      world-day of the BODY's events processed in a third of a wall-day on one thread — 8 h / BODY_ROWS_PER_DAY
+      (alpha4-1's 24 h tape: 93,652 rows) = 307.521 ms per event. The draft's 3 × A0's solo ms/event (4.785 ms on the
+      probe) is kept on the record as the counterfactual: A1-FIXED at H 64 reads 11.451 ms (7.2 × A0), so every
+      network-bearing arm would fail COST BY CONSTRUCTION and COST would decide D1 before any learning is graded (#228 b).
+      The bound is feasibility, not pace: his 2026-09-24 10:15 law feeds the mind as fast as it can take it. It binds no
+      arm at hand (A1 at H 512 reads 33.973 ms); the cost checks that bite in B1 are the relative ones (MA ≤ +10 %).
   margins: D1 (i) 10 pp · GROWS 5 pp · A1-MA − A1-ATT 3 pp at ≤ +10 % cost · interface 5 pp
 
 The validator (`brain.harness.bars.validate_bars_line`) refuses a bar above its ceiling or under k_min/n and names
@@ -38,6 +45,14 @@ FAMILY_NULL = {"AFTER": 1 / 25, "BEFORE": 1 / 25, "BETWEEN": 1 / 25, "TWO_AFTER"
                "TRANSFER": 1 / 9, "MIRROR": 0.5, "LOOP": 0.5, "VOWEL": 0.5}
 MARGINS = {"d1_pp": 10.0, "grows_pp": 5.0, "ma_pp": 3.0, "ma_cost_pct": 10.0, "interface_pp": 5.0}
 FIXED = {"U1b": 24, "U2b": 69, "U6": 4, "U4a": 0.5, "U5": 0.8, "KEEPS": 5.0}
+# edit: Claude (Opus 5.5), 2026-09-26 12:07 +0400 — the COST bound's two inputs, each with its source (the docstring).
+BODY_ROWS_PER_DAY = 93652        # alpha4-1's tape at its 24 h stop (check-24h, 2026-09-24 05:33; register 05:36) [Certain]
+BODY_DAY_IN_WALL_HOURS = 8.0     # one world-day processed in a third of a wall-day on one thread
+# [Guessing, said in the line]: a B1 tape event and a body tape row are the same unit of work.
+
+
+def cost_bound_ms() -> float:
+    return round(BODY_DAY_IN_WALL_HOURS * 3600 * 1000 / BODY_ROWS_PER_DAY, 3)
 
 
 def k_min(n: int, p: float, alpha: float = 0.001) -> int:
@@ -86,15 +101,23 @@ def build(ceilings: Dict[str, Any], solo: Optional[Dict[str, Any]] = None) -> Di
             c = float(e["organ_ceiling"]["max"])
             u1a[case] = round(max(0.5, c - 0.10), 4)
             detail[f"U1a:{case}"] = {"ceiling": c, "bar": u1a[case], "rule": "ceiling − 10 pp, never under 0.5"}
-    cost = None
-    if solo and solo.get("probes", {}).get("A0", {}).get("ms_per_event_arm"):
-        cost = round(3.0 * float(solo["probes"]["A0"]["ms_per_event_arm"]), 3)
+    cost = cost_bound_ms()
+    probes = (solo or {}).get("probes", {})
+    a0 = (probes.get("A0") or {}).get("ms_per_event_arm")
+    counterfactual = {"rule": "3 × A0's solo ms/event (the 2026-09-24 draft)", "value": round(3.0 * float(a0), 3) if a0 else None,
+                      "a0_ms": a0, "a1_h64_ms": (probes.get("A1-H64") or {}).get("ms_per_event_arm"),
+                      "a1_h512_ms": (probes.get("A1-H512") or {}).get("ms_per_event_arm")}
+    detail["COST"] = {"bar": cost, "rule": f"{BODY_DAY_IN_WALL_HOURS:g} h / {BODY_ROWS_PER_DAY} body rows", "counterfactual": counterfactual}
     bars = {"U1a": u1a, "U1b": FIXED["U1b"], "U2b": FIXED["U2b"], "U3": u3, "TRANSFER": transfer, "U4a": FIXED["U4a"], "U5": FIXED["U5"],
             "U6": FIXED["U6"], "KEEPS": FIXED["KEEPS"], "COST": cost}
     line = ("§12 (the seat, " + time.strftime("%Y-%m-%d %H:%M %z") + "): bars from ceilings.json by ONE rule — "
             + "; ".join(f"{k} k={v['bar']} of {v['n']} (ceiling {v['ceiling']:.3f}, k_min {v['k_min']})" for k, v in detail.items() if v.get("bar") is not None and "n" in v)
             + "; NAME " + ", ".join(f"{c} {b}" for c, b in u1a.items())
-            + f"; U1b {FIXED['U1b']}/52 · U2b {FIXED['U2b']}/104 · U6 {FIXED['U6']}/10 · U4a {FIXED['U4a']} · U5 {FIXED['U5']} · KEEPS {FIXED['KEEPS']} pp · COST {cost if cost else '— (no solo probe yet)'}"
+            + f"; U1b {FIXED['U1b']}/52 · U2b {FIXED['U2b']}/104 · U6 {FIXED['U6']}/10 · U4a {FIXED['U4a']} · U5 {FIXED['U5']} · KEEPS {FIXED['KEEPS']} pp"
+            + f" · COST ≤ {cost} ms per event (one world-day of alpha4-1's body, {BODY_ROWS_PER_DAY:,} rows, in {BODY_DAY_IN_WALL_HOURS:g} wall-hours on one thread;"
+            + " a tape event and a body row taken as one unit of work [Guessing]"
+            + (f"; the draft 3 × A0 = {counterfactual['value']} ms is NOT used: A1-FIXED at H 64 reads {counterfactual['a1_h64_ms']} ms,"
+               f" so every network-bearing arm would fail it by construction (#228 b)" if counterfactual["value"] else "") + ")"
             + f"; margins D1 {MARGINS['d1_pp']} pp · GROWS {MARGINS['grows_pp']} pp · MA {MARGINS['ma_pp']} pp at ≤ +{MARGINS['ma_cost_pct']} % cost · interface {MARGINS['interface_pp']} pp"
             + "; NOT GRADABLE (organ limit): " + (", ".join(k for k, v in detail.items() if v.get("not_gradable")) or "none"))
     return {"line": line, "bars": bars, "margins": MARGINS, "detail": detail, "ceilings_sha256": B.ceilings_sha256}

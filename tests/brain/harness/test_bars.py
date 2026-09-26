@@ -79,3 +79,25 @@ class TestBarsNotMovedAfterGrading(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCostBoundRule(unittest.TestCase):
+    """edit: Claude (Opus 5.5), 2026-09-26 12:07 +0400 — the seat's COST rule (bars_line.py docstring): 8 wall-hours for one
+    world-day of alpha4-1's body (93,652 rows) = 307.521 ms per event, whatever the solo probe says about A0; the draft
+    3 × A0 is carried beside it as the counterfactual, never as the bar."""
+
+    def test_cost_bar_is_the_body_rule_not_three_times_a0(self) -> None:
+        from brain.harness import bars_line as BL
+        solo = {"probes": {"A0": {"ms_per_event_arm": 1.595}, "A1-H64": {"ms_per_event_arm": 11.451},
+                           "A1-H512": {"ms_per_event_arm": 33.973}}}
+        out = BL.build({"families": {}}, solo)
+        self.assertEqual(out["bars"]["COST"], round(8.0 * 3600 * 1000 / 93652, 3))
+        self.assertEqual(out["bars"]["COST"], 307.521)
+        cf = out["detail"]["COST"]["counterfactual"]
+        self.assertEqual(cf["value"], 4.785)
+        self.assertGreater(cf["a1_h64_ms"], cf["value"], "the counterfactual's reason: A1 at H 64 exceeds 3 × A0")
+        self.assertIn("NOT used", out["line"])
+
+    def test_cost_bar_needs_no_probe(self) -> None:
+        from brain.harness import bars_line as BL
+        self.assertEqual(BL.build({"families": {}}, None)["bars"]["COST"], 307.521)
