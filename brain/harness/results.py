@@ -297,6 +297,21 @@ def write_all(results: Mapping[str, Any], out_dir: Path, run_dir: Path) -> Dict[
     return {"results_sha256": sha, "out_dir": str(out_dir)}
 
 
+def u3_bar_shares(bars_doc: Mapping[str, Any]) -> Dict[str, float]:
+    """edit: Claude (Opus 5.5), 2026-09-26 16:57 +0400 — bars.json stores each U3 bar as a COUNT k of n NAME items (what
+    `grade_u3_family` compares: k >= bar), but `bars.validate_bars_line` compares a SHARE with the family's organ ceiling.
+    The first graded read (seed 20261001) raised «AFTER: declared bar 8 is ABOVE its organ ceiling 0.886» — a count against
+    a share (#162). The shares are k / n with n from bars.json's own `detail`, the arithmetic `bars_line.main` validated with."""
+    bars = (bars_doc or {}).get("bars") or {}
+    detail = (bars_doc or {}).get("detail") or {}
+    out: Dict[str, float] = {}
+    for fam, k in (bars.get("U3") or {}).items():
+        n = (detail.get(fam) or {}).get("n")
+        if isinstance(k, (int, float)) and n:
+            out[fam] = k / n
+    return out
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--run", required=True)
@@ -312,7 +327,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     ceilings = json.loads(Path(ns.ceilings).read_text()) if ns.ceilings else None
     if bars and ceilings:
         from brain.harness import bars as B
-        B.validate_bars_line(ceilings.get("families", {}), {k: v for k, v in (bars.get("U3") or {}).items() if isinstance(v, (int, float))})
+        B.validate_bars_line(ceilings.get("families", {}), u3_bar_shares(bars_doc))
     res = assemble(Path(ns.run), Path(ns.tape_dir), bars=bars, ceilings=ceilings, prereg_path=Path(ns.prereg) if Path(ns.prereg).exists() else None,
                    bars_line=(bars_doc or {}).get("line"), margins=margins)
     out = Path(ns.out) if ns.out else Path(ns.run) / "results"
