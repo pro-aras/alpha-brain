@@ -99,7 +99,12 @@ def build_cache(requests: List[RenderRequest], out_dir: Path, seed: int, recheck
     item_to_row: Dict[str, int] = {}
     truths: Dict[str, Dict[str, object]] = {}
     for req in requests:
-        lib = libs.setdefault(req.script, GlyphLibrary(req.script))
+        # edit: Claude (Opus 5.5), 2026-09-26 11:40 +0400 — ONE library per script: `libs.setdefault(script, GlyphLibrary(script))`
+        # built a fresh library (a 1.4–2.5 MB idx read and parse) for EVERY request, because setdefault evaluates its default
+        # eagerly — 9,707 constructions for the 20261001 tape (8.6 GB read in its first 7 minutes). Same bytes out; pinned in test_build.
+        lib = libs.get(req.script)
+        if lib is None:
+            lib = libs[req.script] = GlyphLibrary(req.script)
         feats, rgb, truth, sha = render_and_glance(req, lib, seed, spec, gaze_cfg, colour)
         row = writer.add(item_id=req.item_id, script=req.script, char=req.char, font=req.font,
                           variant=req.variant, seed=seed, canvas_png_sha256=sha, feats=feats)

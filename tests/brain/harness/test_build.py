@@ -56,6 +56,23 @@ class TestBuildCacheSmoke(unittest.TestCase):
             self.assertEqual(meta["char"], req.char)
             self.assertEqual(meta["font"], req.font)
 
+    def test_one_glyph_library_per_script(self) -> None:
+        """edit: Claude (Opus 5.5), 2026-09-26 11:40 +0400 — the render loop builds ONE GlyphLibrary per script, not one per
+        request (the eager `setdefault` default built 9,707 for the 20261001 tape). 8 requests over 3 scripts → 3 builds; the old
+        loop builds 8, so this test fails on the old code."""
+        from unittest import mock
+        import brain.world.build as B
+        real = B.GlyphLibrary
+        built = []
+
+        def counting(script):
+            built.append(script)
+            return real(script)
+
+        with mock.patch.object(B, "GlyphLibrary", side_effect=counting):
+            build_cache(_small_requests(), self.dir, SEED, recheck_n=2)
+        self.assertEqual(sorted(built), ["digits", "latin-lower", "latin-upper"])
+
     def test_duplicate_item_id_raises(self) -> None:
         reqs = _small_requests()
         reqs.append(RenderRequest(item_id=reqs[0].item_id, script="latin-upper", char="Z", font=FONT))
