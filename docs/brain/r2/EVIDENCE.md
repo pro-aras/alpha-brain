@@ -61,7 +61,7 @@ The raw recipe reproduces A1's failure exactly; standardising the state before t
 | D — the rule library (program search + compression) | 127 / 156 | 128 / 156 |
 | KEY (answers from the truth) | 156 / 156 | 156 / 156 |
 
-**F3 — The letters test (T_L), B1.0 tape:** every network answers ONE name to all 624 U1a asks («a»; A4 seed 2 «k»): U1a 0.038 on both cases against bars 0.778 / 0.669. A0 69–91 / 624, A5 80–97 / 624, D 504–508 / 624 (0.853 / 0.769 on the graded marks). The one-name collapse is a SCHEDULE fact: the CONST control («a», 78 corrections) was taught as a block between the last sleep and T_L (R46 addendum). B1.1 moves it into L4 (R47); B1.1's results are due tonight.
+**F3 — The letters test (T_L), B1.0 tape:** every network answers ONE name to all 624 U1a asks («a»; A4 seed 2 «k»): U1a 0.038 on both cases against bars 0.778 / 0.669. A0 69–91 / 624, A5 80–97 / 624, D 504–508 / 624 (0.853 / 0.769 on the graded marks). The one-name collapse is a SCHEDULE fact: the CONST control («a», 78 corrections) was taught as a block between the last sleep and T_L (R46 addendum). B1.1 moves it into L4 (R47); B1.1's results are due tonight. **CORRECTION (2026-09-27 19:31 +0400, the seat — found by Fable 5.1, confirmed on the records): B1.1 refutes the causal half.** With CONST interleaved, A1 and A1-TEACH still give ONE name to all 624 U1a asks («l» seed 1, «n» seed 2; A2 591 «l» / 460 «n»); the block chose which name, the readout's conditioning (F11, F13) causes the collapse — every test ask starts from the same frozen state.
 
 **F4 — A1-TEACH changes nothing (R46 READING, b1-tape2 5616d8d):** the switch fired (37 of 37 name rows trained vs 27; final states differ), and before the CONST block it still answers 7/156 on both seeds — A1's exact count.
 
