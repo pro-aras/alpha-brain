@@ -51,6 +51,14 @@ decides nothing by itself: R46's own question (does the switch explain A1's NAME
 `u1a`, never computed here. U1a's own reading is a DICT `{case: share}` (`graders.grade_u1a`), never a float, so the
 existing `_reading()` helper (float-or-None) would read None for every arm — `_u1a_reading()` reads the dict directly.
 RESULTS_VERSION → v4.
+
+edit: Claude (Opus 5.5), 2026-09-28 02:32 +0400 — R51 (docs/brain/b1/SEAT-DECISIONS.md): D joins RELATION_TWINNED. R36 made
+SHUFFLED-RELATION:D D's OWN U3 null too (PREREG line 272: «D's own U3 also reads against its band (stricter, never
+looser)»), and R44's list — written from §4's original feed list — omitted D, so a D whose twin search left no record
+(B1.0 seed 1's, stopped VOID by cost at 2026-09-28 02:09:57 under R45) read its U3 PASS on the bar alone. D has no
+RELATION_TWIN_SOURCE entry: its twin is its own search, whose stop marker sits on SHUFFLED-RELATION_D. Pinned by
+tests/brain/harness/test_results_void.py (a scan: every SHUFFLED-RELATION:<base> tools/b1/*.sh launches is twinned
+here) and test_tape.py (D through `assemble`). RESULTS_VERSION → v4.1.
 """
 from __future__ import annotations
 
@@ -69,7 +77,7 @@ from brain.harness import graders as G  # noqa: E402
 from brain.harness.run import arm_dirname, load_tape, load_truth  # noqa: E402
 from brain.protocol import canonical_json  # noqa: E402
 
-RESULTS_VERSION = "b1-results-v4"
+RESULTS_VERSION = "b1-results-v4.1"
 KEY_EXEMPT = ("C0d_CANARY",)
 TWIN_PREFIXES = ("SHUFFLED-NAME:", "SHUFFLED-RELATION:", "FORCED:")
 
@@ -133,7 +141,8 @@ def without_void_twin(marks: Mapping[str, Any], twin_by: Sequence[str], reason_c
 # SHUFFLED-RELATION:D's library (R36), so a stop of that search is a stop of their twins.
 # R46 — A1-TEACH is a plain network like A1 (not a hybrid): it runs its OWN SHUFFLED-RELATION:A1-TEACH search, so it
 # carries no entry in RELATION_TWIN_SOURCE below, exactly like A1.
-RELATION_TWINNED = ("A1", "A1-TEACH", "A5", "E′", "F")
+# R51 — D: its own U3 reads against its own SHUFFLED-RELATION:D search (R36), so D is twinned too, with no source entry.
+RELATION_TWINNED = ("A1", "A1-TEACH", "A5", "D", "E′", "F")
 RELATION_TWIN_SOURCE = {"E′": "SHUFFLED-RELATION:D", "F": "SHUFFLED-RELATION:D"}
 VOID_BY_COST = "VOID-BY-COST.json"
 

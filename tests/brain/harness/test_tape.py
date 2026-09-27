@@ -330,19 +330,23 @@ class TestResultsMissingRelationTwin(unittest.TestCase):
             R.run(SEED, ["KEY", "SHIFTED-KEY", "DUMMY"], run_dir, tape_dir, tape_dir / "cache", log=lambda s: None)
         bars = {"U3": {f: 1 for f in G.U3_LETTER_FAMILIES}, "TRANSFER": 1}
         cls.res = {}
-        for case in ("missing", "by_cost", "twin"):
+        # edit: Claude (Opus 5.5), 2026-09-28 02:32 +0400 — R51: two more cases with KEY's record copied as D (D's own U3 null is its own
+        # SHUFFLED-RELATION:D search, R36): the stop's marker on SHUFFLED-RELATION_D, and DUMMY's record as that twin.
+        for case in ("missing", "by_cost", "twin", "d_by_cost", "d_twin"):
             d = _SHARED["root"] / f"run-r44-{case}"
             if d.exists():
                 shutil.rmtree(d)
             d.mkdir()
             if (run_dir / "inputs.json").exists():
                 shutil.copy(run_dir / "inputs.json", d / "inputs.json")
-            shutil.copytree(run_dir / "KEY", d / "E′")
-            if case == "by_cost":
+            shutil.copytree(run_dir / "KEY", d / ("D" if case.startswith("d_") else "E′"))
+            if case in ("by_cost", "d_by_cost"):
                 (d / "SHUFFLED-RELATION_D").mkdir()
                 (d / "SHUFFLED-RELATION_D" / "VOID-BY-COST.json").write_text(json.dumps({"why": "planted stop (R43)"}) + "\n")
             if case == "twin":
                 shutil.copytree(run_dir / "DUMMY", d / "SHUFFLED-RELATION_E′")
+            if case == "d_twin":
+                shutil.copytree(run_dir / "DUMMY", d / "SHUFFLED-RELATION_D")
             cls.res[case] = RS.assemble(d, tape_dir, bars=bars)
 
     def _marks(self, case: str, u3: bool) -> dict:
@@ -372,6 +376,26 @@ class TestResultsMissingRelationTwin(unittest.TestCase):
             self.assertEqual(u3[k]["reason_code"], "TWIN_VOID", k)
         by = self.res["by_cost"]["twin_void"]["E′"]
         self.assertTrue(by[0].startswith("VOID_BY_COST") and "planted stop" in by[0], by)
+
+    def test_d_reads_its_own_twins_stop_not_gradable(self) -> None:
+        """edit: Claude (Opus 5.5), 2026-09-28 02:32 +0400 — R51, through `assemble`. The positive control first: with DUMMY's record as
+        SHUFFLED-RELATION:D, D's U3 marks are graded against that twin's band. Then the stop: with only the marker on
+        SHUFFLED-RELATION_D, every one of those marks reads NOT GRADABLE, TWIN_VOID by cost — never a pass on the bar alone,
+        which is what B1.0 seed 1's D read at 02:2x before R51. Every mark outside U3 is the same in both."""
+        d_twin = {k: v for k, v in self.res["d_twin"]["arms"]["D"]["marks"].items() if k.startswith("U3_") and v["graded"]}
+        self.assertTrue(d_twin)
+        self.assertEqual(self.res["d_twin"]["twin_void"], {})
+        for k, v in d_twin.items():
+            self.assertIsNotNone(v["fields"].get("twin_band_95"), k)
+        u3 = self.res["d_by_cost"]["arms"]["D"]["marks"]
+        for k in d_twin:
+            self.assertFalse(u3[k]["graded"], k)
+            self.assertIsNone(u3[k]["pass"], k)
+            self.assertEqual(u3[k]["reason_code"], "TWIN_VOID", k)
+        by = self.res["d_by_cost"]["twin_void"]["D"]
+        self.assertTrue(by[0].startswith("VOID_BY_COST: SHUFFLED-RELATION:D") and "planted stop" in by[0], by)
+        outside = lambda case: {k: v for k, v in self.res[case]["arms"]["D"]["marks"].items() if not k.startswith("U3_")}
+        self.assertEqual(outside("d_by_cost"), outside("d_twin"))
 
     def test_every_mark_outside_u3_is_unchanged(self) -> None:
         self.assertEqual(self._marks("missing", False), self._marks("twin", False))

@@ -173,7 +173,9 @@ class TestMissingRelationTwin(unittest.TestCase):
     def test_e_prime_and_f_read_void_by_cost_from_the_search_they_load(self) -> None:
         self._stop_d_twin()
         gaps = R.missing_relation_twins(self.run, ["D", "E′", "F", "A1", "SHUFFLED-RELATION:A1", "A5", "SHUFFLED-RELATION:A5"])
-        self.assertEqual(sorted(gaps), ["E′", "F"])
+        # edit: Claude (Opus 5.5), 2026-09-28 02:32 +0400 — R51: was ["E′", "F"]. With D present and its twin stopped, that pinned R44's
+        # omission of D, whose own U3 null is SHUFFLED-RELATION:D (R36) — a test of an absence that is not the design (#239 (2)).
+        self.assertEqual(sorted(gaps), ["D", "E′", "F"])
         for b in ("E′", "F"):
             self.assertEqual(gaps[b]["reason_code"], "TWIN_VOID", b)
             self.assertTrue(gaps[b]["by"] and gaps[b]["by"][0].startswith("VOID_BY_COST"), gaps[b])
@@ -191,9 +193,40 @@ class TestMissingRelationTwin(unittest.TestCase):
         self._stop_d_twin()
         self.assertEqual(R.missing_relation_twins(self.run, ["A5"])["A5"]["reason_code"], "TWIN_MISSING")
 
-    def test_the_arms_4_does_not_twin_are_never_a_gap(self) -> None:
+    # edit: Claude (Opus 5.5), 2026-09-28 02:32 +0400 — R51. D's own U3 reads against SHUFFLED-RELATION:D's band (R36; PREREG line 272: «D's own
+    # U3 also reads against its band (stricter, never looser)»), so a stop of that search is a gap in D's null as well as in
+    # E′'s and F's. R44's list omitted D, and B1.0 seed 1's D read its U3 PASS on the bar alone after its twin stopped (02:09).
+    def test_d_reads_void_by_cost_from_its_own_twin(self) -> None:
         self._stop_d_twin()
-        self.assertEqual(R.missing_relation_twins(self.run, ["D", "A0", "A2", "A3", "A4", "A1-FIXED", "A1-MA", "KEY", "RING-READ"]), {})
+        gap = R.missing_relation_twins(self.run, ["D"])["D"]
+        self.assertEqual(gap["reason_code"], "TWIN_VOID")
+        self.assertTrue(gap["by"][0].startswith("VOID_BY_COST: SHUFFLED-RELATION:D"), gap)
+        self.assertIn("planted", gap["by"][0])
+
+    def test_d_without_a_twin_record_or_marker_reads_missing(self) -> None:
+        self.assertEqual(R.missing_relation_twins(self.run, ["D"]),
+                         {"D": {"reason_code": "TWIN_MISSING", "by": ["MISSING: no SHUFFLED-RELATION:D record"]}})
+
+    def test_d_with_its_twin_record_present_is_no_gap(self) -> None:
+        self._stop_d_twin()
+        self.assertEqual(R.missing_relation_twins(self.run, ["D", "SHUFFLED-RELATION:D"]), {})
+
+    def test_every_relation_twin_the_runners_launch_is_twinned_in_the_grader(self) -> None:
+        """The structural pin of R51: the list is written by hand, and it omitted D once. Every SHUFFLED-RELATION:<base>
+        a seed runner launches must be read by the grader as <base>'s U3 null, or a stop of it hands <base> a pass on the
+        bar. On the pre-R51 tuple this fails naming exactly D. The first assertion is its own control: a scan that finds
+        nothing would pass the second one trivially (#91)."""
+        import re
+        launched: set = set()
+        for sh in sorted((ROOT / "tools" / "b1").glob("*.sh")):
+            launched |= set(re.findall(r"SHUFFLED-RELATION:([A-Za-z0-9′-]+)", sh.read_text(encoding="utf-8")))
+        self.assertTrue({"A1", "A5", "D", "E′", "F"} <= launched, sorted(launched))
+        self.assertEqual(sorted(launched - set(R.RELATION_TWINNED)), [])
+
+    def test_the_arms_4_does_not_twin_are_never_a_gap(self) -> None:
+        # edit: Claude (Opus 5.5), 2026-09-28 02:32 +0400 — R51: D left this list; it is twinned since R36 (its own SHUFFLED-RELATION:D search).
+        self._stop_d_twin()
+        self.assertEqual(R.missing_relation_twins(self.run, ["A0", "A2", "A3", "A4", "A1-FIXED", "A1-MA", "KEY", "RING-READ"]), {})
 
     def test_a_present_twin_is_no_gap(self) -> None:
         """The positive control: a twin record present is read as before (its band, or R40's control VOID)."""
