@@ -53,9 +53,19 @@ The raw recipe reproduces A1's failure exactly; standardising the state before t
 | **IN-SLDA — F_pool (the unit-normalised mean glance, 144 dims), no network** | **155/156 (99 %) · 565/704 (80 %)** | **153/156 (98 %) · 561/704 (80 %)** |
 | A1-SLDA — the same reader on A1's NAME-ask state | 137/156 (88 %) · 431/704 (61 %) | 141/156 (90 %) · 445/704 (63 %) |
 
-For NAMING at letters the network's state subtracts ≈ 17–19 pp on unseen fonts relative to the organ's own features read by the same reader. [Certain for the numbers; offline, frozen states — the live arm's drift is B1.2's question.]
+For NAMING at letters the network's state subtracts ≈ 17–19 pp on unseen fonts relative to the organ's own features read by the same reader. [Certain for the numbers; offline, frozen states — the live arm's drift is B1.2's question.] **CORRECTION (2026-09-27 19:57 +0400, the seat — a new line, never an edit): the «subtracts 17–19 pp» reading is an instrument artefact.** The probe's shrinkage ε = 1e-4 was ABSOLUTE: on F_pool (features ≈ 0.05) it acted as a moderate shrinkage, on A1's state (within-letter variance ≈ 1e-5 per unit) it swamped the metric and reduced the reader to a near-Euclidean rule. F16 below settles it.
 
 **F15 — COST on B1.1** (`/data/dev/brain-runs/b1.1/runs/<seed>/<arm>/summary.json`, `cost.ms_per_event`, wall time inside the arm, 14 runs sharing the CPU): A1 430 / 436, A1-TEACH 445 / 439 — both with `hmax` 1,024 — against **A1-FIXED 51 / 43** (`hmax` 112, the same live width); D 389 / 498 (B1.0's quieter D-family run: 110); A0 1.7. The bar is 307.521 ms per event. A1's cost is its pre-allocated width (Fable's `probe_cost_hmax.out`), and every wall-time COST reading is inflated by the run's own crowding (#242). [Certain for the numbers.]
+
+**F16 — The streaming-LDA grid (open point 2 settled; B1.1's own tapes and B1.1's A1; `docs/brain/r2/probe_slda_grid.py`, output `probe_slda_grid.out`):** one pass over the 624 TEACH rows; T_L NAME asks (unseen fonts), seeds 1 / 2:
+
+| reader | F_pool (the eye's features) | A1's state |
+|---|---|---|
+| **within-letter covariance** (Hayes & Kanan's own definition), shrinkage RELATIVE (ε · trace Σ / d, ε = 1e-4), raw or standardised | **74 % / 71 %** | **78 % / 75 %** |
+| total scatter (Fable's `probe_review.py` recipe; this row reproduces its 64–68 %, the control) | 64–66 % | 66–69 % |
+| F14's recipe (within, ε ABSOLUTE 1e-4) | 80 % / 80 % | 61–63 % |
+
+Read: (1) a proper one-pass reader names 71–78 % on unseen fonts from EITHER the organ's features or the network's state — the network's own head reads 4 %; (2) the within-letter covariance is worth 8–12 pp over the total scatter; (3) with a scale-free shrinkage the state reads 4 pp ABOVE the raw features — the trunk does not cost naming; F14's opposite reading was the absolute ε; (4) the shrinkage level moves either reader by up to ±6–15 pp, so B1.2 must declare its shrinkage rule BEFORE the run (e.g. an automatic estimator computed on the TEACH rows only), never choose it on T_L (#158). [Certain for the numbers.]
 
 **F2 — Every learned network names at chance before any interference; only the cells and the rule library name** (NAME-cue training asks before the first CONST ask; B1.0 records `/data/dev/brain-runs/b1/runs/<seed>/<arm>/answers.jsonl`; chance = 156 ÷ 26 = 6):
 
