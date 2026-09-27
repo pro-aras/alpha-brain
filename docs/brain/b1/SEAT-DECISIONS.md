@@ -243,3 +243,21 @@
     - (b) the start state — asks processed from a rest state, or the start's offset removed, as a declared switch with its own twin;
     - (c) CONST and SAME for the network arms and for D — D's missing name constant (VERDICT-B1.1).
   - **Tonight at most:** IN-SLDA and its two twins as declared (minutes of compute), to document (1) on the real tapes beside a twin — after the seat's own suite check of 45c883e. The branch stays unmerged.
+- **R51 (D's own U3 null: a missing SHUFFLED-RELATION:D reads NOT GRADABLE, never a pass on the bar — 2026-09-28 02:29 +0400, Claude (Opus 5.5)), declared before the fix and before any re-grade:**
+  - **What happened.** B1.0 seed 1's twin search SHUFFLED-RELATION:D stopped VOID by cost (R45): the watch `b1-dproj-r2` exited 10 at 02:09:07 (sleep 10, 13.32 CPU-h ÷ pred₁₀ 0.7545 h = r 17.65; 17.65 × 1.36 = 24.01 > 24); pid 10091 got SIGTERM at 02:09:57 (exit 143); the marker is `runs/20261001/SHUFFLED-RELATION_D/VOID-BY-COST.json`. The chain ran E′ and F (exit 0) and skipped their twins; the unit ended 02:23:56. Graded with b1-results-v4, E′'s and F's U3 read NOT GRADABLE, TWIN_VOID by cost (R44), but **D's own U3 marks read PASS on the bar alone** (`control.caught` None): the pass by absence R44 was written to remove (#243 (4)).
+  - **Why.** R36 made SHUFFLED-RELATION:D D's own U3 null (PREREG line 272: «D's own U3 also reads against its band (stricter, never looser)»). R44's list `RELATION_TWINNED` (`brain/harness/results.py:136`) was written from §4's original feed list (A1, A5, E′, F) plus A1-TEACH (R46), and omitted D. R44's own test pinned the omission: `test_e_prime_and_f_read_void_by_cost_from_the_search_they_load` passes D with its twin stopped and asserts the gaps are exactly `["E′", "F"]` — a test asserting an absence that is not the design (#239 (2)).
+  - **The fix.**
+    - D joins `RELATION_TWINNED`, with no `RELATION_TWIN_SOURCE` entry: its twin is its own search.
+    - The old assertion becomes `["D", "E′", "F"]`.
+    - A structural pin: every `SHUFFLED-RELATION:<base>` that the seed runners launch (`tools/b1/*.sh`) is in `RELATION_TWINNED`. It must fail on the old tuple, naming exactly D.
+    - An end-to-end case through `assemble`: KEY's record copied as D, with the stop marker on SHUFFLED-RELATION_D, makes D's U3 marks NOT GRADABLE, TWIN_VOID.
+    - `RESULTS_VERSION` b1-results-v4 → **b1-results-v4.1**.
+  - **What it changes:** only a D whose SHUFFLED-RELATION:D left no record.
+    - Every graded U3 mark of D reads NOT GRADABLE, TWIN_VOID by cost, TRANSFER included (R44's letter).
+    - No decision reads D's U3 on B1.0: §6 selects among A5, E′ and F, and D1 (iii) is a diagnostic of readings. Nothing decided moves.
+    - The verdict prints D's seed-1 relation readings beside the marks, as readings, not passes.
+  - **Re-grades with v4.1, each with its control; the v4 records are kept:**
+    - B1.0 seed 1 (the fix);
+    - B1.0 seed 2 as the control: its twin exists, so its record must equal v4's with only `version` and `prereg_sha` masked;
+    - B1.1 seed 2, whose twin was VOID at 18:33, so D's U3 reads NOT GRADABLE there too;
+    - B1.1 seed 1 as the second control (twin complete: equal under the same mask).
