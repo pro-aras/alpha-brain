@@ -119,3 +119,12 @@
     - the same arithmetic re-prices again, with a FLOOR of 50,000 candidates per sleep (where D is known to solve AFTER, BEFORE and BETWEEN);
     - if the re-price would go below the floor, ONLY the twin search stops, VOID by cost: SHUFFLED-RELATION:E′ and :F cannot load a library, so E′'s and F's U3 read NOT GRADABLE (TWIN_VOID, R40). D's search runs on to its end at its current number, and D's own U3 is unaffected, since §4 feeds SHUFFLED-RELATION to A1, A5, E′ and F, not to D.
   - **Relaunched** as `b1-dfam-<seed>-r1` via `tools/b1/relaunch_d_family.sh <seed> fire-s5`, a COPY of `rerun_d_family.sh` whose old-records dir takes a tag (the original refuses while `.toy-d` exists, and a script a running bash holds is never edited). The projection check is re-armed on the re-priced budget, to a new log.
+- **R43 (how R42's SECOND fire is read — declared 2026-09-27 04:20 +0400, Claude (Opus 5.5), BEFORE any second fire; both D searches are COMPLETE at 216,000, seed 1 at 00:26 and seed 2 at 22:52, both exit 0):**
+  - **The arithmetic, fixed now.** The scaled total is 5.89 CPU-h, so a fire is r_k > 24 ÷ 5.89 = 4.0747. The floor is 50,000 = 216,000 ÷ 4.32, so N' = ⌊216,000 ÷ r⌋ (rounded down to a thousand) stays at or above the floor iff r ≤ 4.32. Only r in (4.0747, 4.32] re-prices (N' 50,000–53,000); r > 4.32 stops ONLY the twin, VOID by cost.
+  - **A LOWER-BOUND fire (inside a sleep) is read against the floor at once.** The lower bound cpu ÷ pred_k can only grow until the sleep closes. So:
+    - if at the fire, or at any moment before the sleep closes, it already exceeds 4.32, the re-price would be below the floor whatever the close: the twin stops at once, VOID by cost;
+    - otherwise the seat waits for the sleep to close and reads r_k there, as R42 did.
+    - This saves hours of CPU R42's wait spent, and decides nothing the close could change.
+  - **Per seed.** Each seed's twin is read on its own. A VOID twin at either seed makes E′'s and F's U3 NOT GRADABLE (TWIN_VOID, R40). D's U3 is unaffected. The other seed's twin runs on to its end.
+  - **If r lands in (4.0747, 4.32]:** the shared number is re-priced for BOTH D and its twin at that seed. The verdict's D and its twin run at one number, so the complete D at 216,000 becomes a descriptive companion, like 703,000's.
+  - **The watch now running was started at 00:11 on the old heartbeat code** (it prints a finished search as «R»; fixed in 0fe0270). Its fire and death rules are unchanged, and it is not restarted for a cosmetic fault.
