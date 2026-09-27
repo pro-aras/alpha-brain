@@ -1045,3 +1045,6 @@ His question at 12:18, verbatim: «And the THE SCHOOL local program was build or
 **How he will see it:** first `bench status` in a terminal, then a local read-only page in the browser on this PC (§4.11). The ops site only with his yes on the diff.
 
 **Order:** after B1's verdict and the R-THINK pre-registration's review (his priorities, 09-24 00:35: the brain first, THE SCHOOL second).
+
+## 12 · THE SCHOOL replaces the childhood — 2026-09-27 13:33 +0400 (the seat, Claude (Opus 5.5))
+Ahmad, 2026-09-27 13:30 +0400, verbatim: «Yes stop this childhood and the school id replacement.» R-PRIOR (a childhood of random programs' outputs, from the 09-26 research) failed its signed rule at both seeds — the learner came out 6–10 bits per byte WORSE on real text, because that stream's alphabet is not the world's (brain-rprior, `docs/brain/rprior/VERDICT.md`) — and is stopped. The childhood a learner gets is now THE SCHOOL's own early stages: his world, simple → hard, taught in his flow. The build order of §7 stands (the brain's B1 verdict first, then phase 1a).
