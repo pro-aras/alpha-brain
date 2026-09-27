@@ -1,0 +1,8 @@
+seed 20261001: 624 single-letter TEACH rows; glances per row (5, 144); feature mean 0.048 std 0.068 min 0.000 max 0.416; per-glance norm 1.00
+  nearest class mean [mean  ]: before CONST 135/156 (87 %) · T_L NAME 451/704 (64 %)
+  nearest class mean [concat]: before CONST 135/156 (87 %) · T_L NAME 460/704 (65 %)
+  nearest class mean [last  ]: before CONST 73/156 (47 %) · T_L NAME 251/704 (36 %)
+seed 20261002: 624 single-letter TEACH rows; glances per row (5, 144); feature mean 0.048 std 0.068 min 0.000 max 0.421; per-glance norm 1.00
+  nearest class mean [mean  ]: before CONST 134/156 (86 %) · T_L NAME 443/704 (63 %)
+  nearest class mean [concat]: before CONST 132/156 (85 %) · T_L NAME 455/704 (65 %)
+  nearest class mean [last  ]: before CONST 72/156 (46 %) · T_L NAME 235/704 (33 %)
