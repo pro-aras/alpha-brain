@@ -46,6 +46,17 @@ The states are a tight cloud: the mean distance of a state from the mean state i
 
 The raw recipe reproduces A1's failure exactly; standardising the state before the head — nothing else changed: the same rule, rate, pass and examples — learns the letters. [Certain for the numbers.] **Seed 2 replicates it** (A1, h 111): sgd-raw 6/156 (4 %), 26/704, one answer · sgd-std 124/156 (79 %), 378/704 (54 %) · rls 141/156 (90 %), 464/704 (66 %) · proto 118/156 (76 %), 330/704 (47 %).
 
+**F14 — A streaming-LDA reader on the organ's OWN features, no network, one pass, names 98–99 % taught and 80 % on unseen fonts** (both seeds; `docs/brain/r2/probe_slda.py`, output `probe_slda.out`; the reader of Hayes & Kanan 2020 as quoted in RESEARCH-FABLE.md: running means per name, a new name = its first showing, one shared class-centred covariance, Λ = [(1 − ε)Σ + εI]⁻¹ solved once after the pass):
+
+| one pass over the 624 TEACH rows | seed 1: before CONST · T_L NAME | seed 2 |
+|---|---|---|
+| **IN-SLDA — F_pool (the unit-normalised mean glance, 144 dims), no network** | **155/156 (99 %) · 565/704 (80 %)** | **153/156 (98 %) · 561/704 (80 %)** |
+| A1-SLDA — the same reader on A1's NAME-ask state | 137/156 (88 %) · 431/704 (61 %) | 141/156 (90 %) · 445/704 (63 %) |
+
+For NAMING at letters the network's state subtracts ≈ 17–19 pp on unseen fonts relative to the organ's own features read by the same reader. [Certain for the numbers; offline, frozen states — the live arm's drift is B1.2's question.]
+
+**F15 — COST on B1.1** (`/data/dev/brain-runs/b1.1/runs/<seed>/<arm>/summary.json`, `cost.ms_per_event`, wall time inside the arm, 14 runs sharing the CPU): A1 430 / 436, A1-TEACH 445 / 439 — both with `hmax` 1,024 — against **A1-FIXED 51 / 43** (`hmax` 112, the same live width); D 389 / 498 (B1.0's quieter D-family run: 110); A0 1.7. The bar is 307.521 ms per event. A1's cost is its pre-allocated width (Fable's `probe_cost_hmax.out`), and every wall-time COST reading is inflated by the run's own crowding (#242). [Certain for the numbers.]
+
 **F2 — Every learned network names at chance before any interference; only the cells and the rule library name** (NAME-cue training asks before the first CONST ask; B1.0 records `/data/dev/brain-runs/b1/runs/<seed>/<arm>/answers.jsonl`; chance = 156 ÷ 26 = 6):
 
 | arm (what it is) | seed 1 | seed 2 |

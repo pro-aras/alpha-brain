@@ -1,0 +1,6 @@
+seed 20261001 · one pass over 624 TEACH rows · chance 3.8 %
+  IN-SLDA (F_pool, 144 dims, no network): before CONST 155/156 (99 %) · T_L 565/704 (80 %) · distinct 26
+  A1-SLDA (A1's state, 114 units):        before CONST 137/156 (88 %) · T_L 431/704 (61 %) · distinct 26
+seed 20261002 · one pass over 624 TEACH rows · chance 3.8 %
+  IN-SLDA (F_pool, 144 dims, no network): before CONST 153/156 (98 %) · T_L 561/704 (80 %) · distinct 26
+  A1-SLDA (A1's state, 111 units):        before CONST 141/156 (90 %) · T_L 445/704 (63 %) · distinct 26
