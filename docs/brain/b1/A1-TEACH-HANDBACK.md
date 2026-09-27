@@ -5,6 +5,10 @@ edit: Claude (Sonnet 5, A1-TEACH builder), 2026-09-27 14:17 +0400 — built per 
 R46 (2026-09-27 13:33 +0400) and `docs/brain/B1-PREREG.md` §4 row A1 / §12's 2026-09-27 13:33 line. Final commit of this
 work: **5202613**.
 
+edit: Claude (Sonnet 5, A1-TEACH builder), 2026-09-27 14:24 +0400 — amended after the smoke run's `final_state_sha`,
+`state_sha.jsonl` and NAME-head-weight facts were checked directly (not inferred) against the two run directories;
+added the "For the seat" section (edit-stamp disclosure, the scratch path, test 2's final-vs-series wording).
+
 ## What changed
 
 **`brain/arms/soft/arm.py`**
@@ -127,15 +131,53 @@ Answer-kind table, `U1a_NAME@T_L` (156 asks each: 78 latin-upper + 78 latin-lowe
 | A1 | 156 | `{'NAME': 156}` | 1 → `{'a': 156}` | 6 / 156 (3 upper, 3 lower) |
 | A1-TEACH | 156 | `{'NAME': 156}` | 1 → `{'a': 156}` | 6 / 156 (3 upper, 3 lower) |
 
-**Both arms answer "a" to every single NAME ask, identically.** This is consistent with — not contradicted by — the
-mechanism: with all NAME logits still at their zero init (the argmax of an all-equal vector is its first index, "a",
-exactly as `TestA1TeachPositiveControl` models it), and the SMOKE schedule's `naming_reps=1`/`teach_rounds=1` giving
-each name only a handful of TEACH exposures total, R46's one-training-step-per-TEACH-row has far too few repetitions
-at SMOKE scale to move any logit's rank — my unit test needed ~10 repeats of each name to see a clear rise (item 1),
-and the smoke tape's L1/L2 TEACH phase does not give any single name that many. The 132-vs-131 overall test-ask parity
-is the same story at the aggregate level. This is a scale limitation of the SMOKE fixture, not a defect in the switch
-(the switch's mechanism is directly demonstrated at the unit level, tests 1 and 3); a graded seed's L1/L2 TEACH volume
-(§2.7: `teach_rounds=12`, `naming_reps=3`) is what R46 is actually sized for, and the seat's own gate runs that.
+**Both arms answer "a" to every single NAME ask, identically — but this is not "the switch did nothing", checked
+directly rather than inferred:**
+- `A1/summary.json` vs `A1-TEACH/summary.json`: `final_state_sha` **differs**
+  (`02b7a9f5…` vs `5670b4df…`); `A1-TEACH/summary.json`'s `config.teach_trains_answer` reads `True`, `A1`'s reads
+  absent — the switch reached the arm through the real `make_arm`/`run_arm` path, not only in the unit tests'
+  direct construction.
+- `state_sha.jsonl`: the two series **first diverge at the very first checkpoint after construction** (`sleep`,
+  seq 27 — inside L1's initial TEACH phase, before the tape's first FEEDBACK row exists at all). The mechanism
+  fires from the first TEACH row, exactly as R46 specifies.
+- The NAME head's own weights, read from each arm's final snapshot (`torch.load(.../snapshot/final/state.pt)`):
+  **A1-TEACH has a nonzero incoming row AND a nonzero bias for all 37 of the 37 names ever heard; plain A1 has
+  both for only 27 of the 37** (the other 10 were taught but never subsequently corrected by a FEEDBACK row, so
+  their rows are still exactly at zero-init under A1 — the precise shape of the collapse R46 was written to
+  close). R46 closes that gap completely at this tape: every heard name gets at least one training push under
+  the switch.
+- What is **not** yet shown at SMOKE scale: that accumulated push is enough to overturn "a"'s default rank
+  (all-zero-logit ties break to the first-heard name, exactly as `TestA1TeachPositiveControl` models — "a" was
+  the very first name taught) and produce a correct test-time answer. The SMOKE schedule's `naming_reps=1`/
+  `teach_rounds=1` gives each name only a handful of TEACH exposures; my unit test needed ~10 repeats of a name
+  to see its own probability clear 1/n by a clear margin (item 1). Whether a graded seed's L1/L2 TEACH volume
+  (§2.7: `teach_rounds=12`, `naming_reps=3`) is enough to flip the ranking — R46's actual question — is exactly
+  what U1a's bar-test on a graded seed decides, not something this smoke run can settle either way. The
+  132-vs-131 overall test-ask difference (not U1a-specific) is a real but small effect in the same direction.
+
+## For the seat (not RAISED — nothing here is an unimplementable R46 clause)
+
+- **Edit-stamp integrity:** `date` was read fresh for the file-creation stamps (test files, the docstring edit
+  notes at 13:54/13:55/13:57) and for this hand-back (14:17, and this amendment's 14:24). Four of the small
+  in-body edit comments in `arm.py`/`run.py`/`results.py` (the `__init__` guard, `_fit_teach`'s two comments,
+  the registry entry, the results docstring paragraph) were stamped by hand-incrementing from the 13:57 read
+  (13:58, 13:58, 13:59, 14:00) rather than by a fresh `date` call at each one — the exact trap SOLUTIONS.md #50
+  names and the brief's Seat rules warn against. They are almost certainly within a minute of the truth (the
+  whole edit sequence took under 3 minutes), so rewriting them now with a *later* clock reading would make them
+  *more* wrong, not less — left as committed, disclosed here rather than silently corrected.
+- **The smoke fixture's path is builder-named.** `tests/brain/arms_soft/test_arm_a1_teach.py`'s `SMOKE_DIR`
+  constant is `/data/dev/brain-runs/scratch-a1teach/smoke` — my own sanctioned scratch area, chosen so the ~1
+  minute real-render cost (test_tape.py's own code path; faster here than its ~5 min docstring estimate) is
+  paid once and reused by the Gates-section smoke run above. After a merge into `b1-integration`, this test
+  would run under `genome-wt-b1int` and keep writing to *this builder's* scratch path rather than a neutral
+  one. Not fixed here (a merge-time decision, not an R46 clause) — worth relocating under `TMPDIR` (with a
+  cheap existence check, as now) at or before merge.
+- **Test 2 pins the final `state_sha`, not the whole series the brief names** ("the same `state_sha` series over
+  the same rows"). Over ≥300 deterministic rows with float32/float64 weights, final equality implies series
+  equality here (a divergence at any row k could not un-happen and re-converge to the identical byte sequence
+  at every later row) — so the guarantee the brief asks for does hold, but the test itself only checks the one
+  endpoint rather than a full per-checkpoint diff. Recorded so the wording gap is on the record, not discovered
+  later.
 
 ## Raised
 
