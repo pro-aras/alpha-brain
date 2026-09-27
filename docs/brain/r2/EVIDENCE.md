@@ -71,6 +71,20 @@ Read: (1) a proper one-pass reader names 71–78 % on unseen fonts from EITHER t
 
 **F18 — The reader's refusal bands, calibrated on same-font distances, refuse unseen fonts** (B1.2's builder, `docs/brain/b1/b12/probe_band.out`; B1.1's TEACH rows only, leave-one-TEACH-font-out): the streaming-LDA argmax names 0.84–0.89 of a held-out font; with R49's bands (UNKNOWN beyond the p95 of taught distances, NOTHING under the p5 of training margins) it names 0.51–0.59 (UNKNOWN 0.31–0.40, NOTHING 0.06–0.10, wrong ≤ 3); the prequential reading of the same bands 0.57–0.65. The band's calibration population (same-font showings) is not the mark's population (unseen fonts). [Certain.] *(added 2026-09-27 23:06 +0400, the seat)*
 
+**F19 — IN-SLDA GRADED on B1.1, both seeds (declared in R49; run 23:14 from b1-reader 45c883e, the seat's own suite check 470 OK; graded b1-results-v5, `/data/dev/brain-runs/b1.1/runs/<seed>/results-v5-in-slda/`):** the streaming-LDA reader on the eye's features, no network, 0.34 ms per event.
+
+| mark (bar) | seed 20261001 | seed 20261002 |
+|---|---|---|
+| U1a with R49's bands (0.778 lower / 0.669 upper) | 0.486 / 0.317 — FAIL (UNKNOWN 291, NOTHING 87 of 624) | 0.580 / 0.405 — FAIL (UNKNOWN 242, NOTHING 66) |
+| **U1a of FORCED:IN-SLDA — the same reader's would-be answers, no abstention** | **0.860 / 0.867** — above both bars | **0.881 / 0.846** — above both bars |
+| U1a of SHUFFLED-NAME:IN-SLDA (the grounding null) | 0.017 / 0.024 | 0.059 / 0.053 |
+| **U2a — refuses never-taught signs, with the bands (≥ 32 of 40 refused, ≤ 4 named)** | **38 refused, 0 named — PASS** | **36 refused, 2 named — PASS** |
+| U2a of FORCED:IN-SLDA | 0 refused, 40 named — FAIL | 0 refused, 40 named — FAIL |
+| U6 one meeting (≥ 4 of 10) | 0 / 10 | 0 / 10 (forced 3 / 10) |
+| U1b pick · KEEPS | 0.865 · passes | 0.846 · passes |
+
+Read: the reader NAMES unseen fonts at 85–88 % and REFUSES never-taught signs at 36–38 of 40 — but ONE band does both jobs, so it also refuses 39–47 % of the unseen-font letters it would name right. The design question is now exact: separate «a known letter in a new style» from «a sign never taught» (F18, R50). One showing (U6) does not carry across fonts for this reader. [Certain.] *(added 2026-09-27 23:15 +0400, the seat)*
+
 **F2 — Every learned network names at chance before any interference; only the cells and the rule library name** (NAME-cue training asks before the first CONST ask; B1.0 records `/data/dev/brain-runs/b1/runs/<seed>/<arm>/answers.jsonl`; chance = 156 ÷ 26 = 6):
 
 | arm (what it is) | seed 1 | seed 2 |
