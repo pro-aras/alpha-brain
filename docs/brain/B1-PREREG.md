@@ -290,3 +290,9 @@
   - Twins SHUFFLED-NAME / SHUFFLED-RELATION / FORCED; controls; predictions P1–P10; COST by R48.
   - The reinstatement rule: U1a above the twin's band at both seeds AND a U3 family above its bar → the network is reinstated for naming and order; U1a only → the reader.
   - The offline pre-flight puts every U1a bar below the readers' one-pass readings. No bar moved.
+- **2026-09-27 23:06 +0400 — B1.2 HELD, not launched (SEAT-DECISIONS R50):** the builder's smoke and TEACH-only probes show the declared run would fail for design reasons:
+  - the reader's refusal bands, calibrated on same-font distances, refuse 31–40 % of unseen-font letters;
+  - every test ask starts from one frozen state whose offset the heads' statistics never saw;
+  - the CONST control VOIDs every network arm.
+  
+  The fixes are put to the design (a CONCLUSION-R2 addendum with Fable 5.1) before any B1.2 run. No number is chosen tonight. No bar moved.

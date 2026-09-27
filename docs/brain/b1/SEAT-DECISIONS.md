@@ -222,3 +222,24 @@
   - **The gap:** R49 put the streaming-LDA reader in place of A1's NAME head. That head answers EVERY NAME-kind ask: the NAME cue, and the relation cues whose answer is a name (AFTER, BEFORE, BETWEEN, TWO_AFTER, OTHER_CASE, SAME, CONST, TRANSFER). A class mean is «what this thing looks like». A relation FEEDBACK — «AFTER + glance k → l» — would add k's state to l's mean and pollute it.
   - **The rule:** the reader (A1-NORM-SLDA's, and IN-SLDA's) serves and learns from ONLY the NAME cue (asks with cues [NAME], and the TEACH rows through the virtual NAME ask). In A1-NORM-SLDA every other NAME-kind cue is answered and trained by A1-NORM-TEACH's standardised SGD NAME head, which stays in the arm unchanged. In IN-SLDA every non-NAME cue answers NOTHING, as R49 already says. A1-NORM-RLS is unchanged: a linear map can carry the cue in the state.
   - This is CONCLUSION-R2's own division — the reader for WHAT, the rules for HOW — written into the arm. It is pinned by a test: interleaved NAME and AFTER asks leave the reader's means unchanged by the AFTER feedbacks.
+- **R50 (B1.2 HELD at the builder's smoke — 2026-09-27 23:06 +0400, Claude (Opus 5.5)): NOT LAUNCHED.** The builder (one Opus 5.5, branch `b1-reader` 45c883e, worktree `/data/dev/genome-wt-b12`, hand-back `docs/brain/b1/B12-HANDBACK.md` §0) built R49 and its addendum as written; its own suite reads Ran 470 … OK (skipped=3) on 83ffc63. Its smoke and its TEACH-only probes show the graded run would fail for DESIGN reasons, not brain reasons — so the ≈ 49 CPU-h are not spent to confirm three known outcomes. **No number is chosen tonight** (#158: a fix picked after these readings is a tuned one).
+  - **(1) The reader's bands decide U1a, not the reader** (`docs/brain/b1/b12/probe_band.out`: B1.1's TEACH rows only, leave-one-TEACH-font-out):
+    - the argmax names 0.84–0.89 of an unseen font; with R49's bands 0.51–0.59 (UNKNOWN 31–40 %, NOTHING 6–10 %, almost no wrong names);
+    - the prequential reading gains only 5–7 pp;
+    - on the smoke IN-SLDA refuses 154 of 156 U1a asks, while its would-be answers name 55/76 and 68/78.
+    
+    A band at the p95 of SAME-font distances sits inside an unseen font's distribution — #228 (b)'s class, a threshold calibrated on the wrong population in front of a mark defined on another.
+  - **(2) The frozen T_L start** (`probe_offset.out`): every T_L ask starts from ONE frozen state, while every training state starts from the running state that the head's statistics came from. At T_L the standardised state carries a shared offset greater than 3 × the across-glyph spread in 41–48 of ≈ 77 units, so A1-NORM answers «d» to 156 of 156 at T_L though its training answers held 21 names.
+    - **F13's 84 % was measured from ONE fixed start and could not see this** (brain r2 EVIDENCE F17 and the F13 caveat).
+    - CONCLUSION-R2 §1 (the readout is the defect) stands; §5's P2 is now [Guessing].
+  - **(3) CONST VOIDs the network ladder** (0/4 on the smoke; A1 / A1-TEACH 0/20 on B1.1). A1-NORM-SLDA is also VOID by SAME: after the addendum, SAME and its NAME reference are answered by two different heads — R38's hybrid shape. This is the law working; it is named, not moved.
+  - **The builder's other RAISED items** (quoted; full text in B12-HANDBACK §0):
+    - item 5: «A1-HMAX is not "nothing else differs"» — the heads' init scales with hmax; 499 of 1,704 smoke answers differ;
+    - item 6: «D30 — head_norm's heads read a DETACHED state; no answer-loss gradient reaches the trunk» — a gradient through the standardisation would multiply the trunk's answer gradient by 50–1,000;
+    - item 7: «The brief's "IN-SLDA joins RELATION_TWINNED" contradicts R49» — built to R49 (NOT APPLICABLE);
+    - item 12: «The §2.6 AST sweep did not exist in tests/brain» — now `tests/brain/harness/test_s26_sweep.py`, a planted offender caught.
+  - **Put to the design, with Fable 5.1, before any B1.2 run** (a CONCLUSION-R2 addendum):
+    - (a) what the refusal band is calibrated on — a KNOWN letter in a NEW style against never-taught scripts, the U2 pool's distances measured first;
+    - (b) the start state — asks processed from a rest state, or the start's offset removed, as a declared switch with its own twin;
+    - (c) CONST and SAME for the network arms and for D — D's missing name constant (VERDICT-B1.1).
+  - **Tonight at most:** IN-SLDA and its two twins as declared (minutes of compute), to document (1) on the real tapes beside a twin — after the seat's own suite check of 45c883e. The branch stays unmerged.
