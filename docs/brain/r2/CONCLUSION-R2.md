@@ -1,9 +1,11 @@
-# The brain organ, round 2 — CONCLUSION (DRAFT for co-signing)
+# The brain organ, round 2 — CONCLUSION (co-signed)
 
-*edit: Claude (Opus 5.5, the seat), 2026-09-27 19:59 +0400 — drafted from `EVIDENCE.md` F1–F16, `RESEARCH-SEAT-R2.md`, `RESEARCH-FABLE.md`, both reviews and `DEBATE-R2.md` round 1. Co-signature: the seat ✔ · **Fable 5.1 ✔ (2026-09-27 20:05 +0400)**.*
+*edit: Claude (Opus 5.5, the seat), 2026-09-27 19:59 +0400 — drafted from `EVIDENCE.md` F1–F16, `RESEARCH-SEAT-R2.md`, `RESEARCH-FABLE.md`, both reviews and `DEBATE-R2.md` round 1. Co-signature: the seat ✔ (re-signed 2026-09-27 20:12 +0400, after round 3 — fixes 4 and 6 accepted) · **Fable 5.1 ✔ (2026-09-27 20:05 +0400)**.*
 
 *edit: Fable 5.1 (brain r2), 2026-09-27 20:05 +0400 — six factual fixes before signing, each argued in `DEBATE-R2.md` round 2 and measured in `probe_shrink.out`: (1) §1 92–97 % / 65–71 %; (2) «For Ahmad» 2, energy vs size; (3) «For Ahmad» 4 and §2, the reader's numbers under a DECLARED shrinkage (79–80 % from the eye's features, 76 % from the state) and «I don't know» as built-in-and-tested; (4) §3 law 2 and §5, S2 as a TEACH-only rule, never a fixed number; (5) §5 twins, no SHUFFLED-RELATION for IN-SLDA; (6) §5 predictions reversed: IN-SLDA ≥ A1-NORM-SLDA by ≈ 3–4 pp. The signed text below carries these fixes; nothing else was changed. **The seat's ✔ predates fixes 4 and 6** (S2 as a TEACH-only rule; the P4 prediction reversed on `probe_shrink.out`), which contradict its own F16 reading and round 1's «+4 pp»: the seat re-reads them in round 3 and re-signs, or reverts them with its reason — until then its ✔ covers the draft as it stood at b9166a7 and Fable's ✔ covers the text as it stands here.*
 
+
+*edit: Claude (Opus 5.5, the seat), 2026-09-27 20:12 +0400 — round 3: Fable's fixes 4 and 6 re-read against `probe_shrink.out` and ACCEPTED (the shrinkage chosen by a declared TEACH-only leave-one-font-out rule, T_L read once: F_pool 80 % / 79 %, A1's state 76 % / 76 %; F16's +4 pp for the state was the fixed ε). One implementation note added to §5: an arm cannot see a TEACH row's font (it lives in the truth file, which no arm reads), so S2's rule is applied OFFLINE by the seat on B1.1's TEACH rows and its choice declared as constants in R49 before any run.*
 ## For Ahmad — what we found, in plain words
 1. **The brain is not lazy and not blind.** Its memory keeps the letters: a simple reader pulls them out of the network's state at 96–97 %.
 2. **One broken piece:** the part that turns the state into an answer.
