@@ -27,7 +27,14 @@ SMOKE_SEED = 20261001
 # /data/dev/brain-runs/scratch-a1teach/ only"). Persisted deliberately (never cleaned up by tearDownModule): the
 # Gates section's smoke run (A1 vs A1-TEACH over the whole tape) reuses this SAME tape+cache, so the ~5 minute
 # real render (brain.world.tape.build_tape, the same code test_tape.py's setUpModule uses) is paid once.
-SMOKE_DIR = Path("/data/dev/brain-runs/scratch-a1teach/smoke")
+# edit: Claude (Opus 5.5), 2026-09-27 15:08 +0400 — the builder's flag at merge (R46 hand-back, «For the seat» 2): the fixture lived in the
+# builder's scratch path, and it REUSED any tape found there — after R47 changed the schedule it would have tested a stale
+# old-schedule world. The cache now lives under TMPDIR, keyed by the world code's own bytes (schedule.py + tape.py).
+import hashlib as _hashlib
+import os as _os
+_REPO = Path(__file__).resolve().parents[3]
+_WORLD_SRC = _hashlib.sha256(b"".join((_REPO / "brain" / "world" / f).read_bytes() for f in ("schedule.py", "tape.py"))).hexdigest()[:12]
+SMOKE_DIR = Path(_os.environ.get("TMPDIR", "/data/dev/brain-runs/tmp")) / f"b1-a1teach-smoke-{_WORLD_SRC}"
 
 _SHARED: Dict[str, object] = {}
 

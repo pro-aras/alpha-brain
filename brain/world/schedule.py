@@ -339,6 +339,12 @@ class _Builder:
                     eps.append(("OTHER_CASE", case, nm, rep))   # `case` = the direction's FROM case (R10)
                 for nm in self.same_letters:
                     eps.append(("SAME", case, nm, rep))
+            # edit: Claude (Opus 5.5), 2026-09-27 15:06 +0400 — R47 (B1.1): CONST's training asks join L4's interleave exactly as SAME's
+            # (13 letters per case, `control_reps` times — the counts L6 had). As its own L6 block they were the last 78
+            # corrections before T_L and T_D, all «a», and every network answered «a» to every T_L letter (R46 addendum).
+            for rep in range(self.p.control_reps):
+                for nm in self.const_letters:
+                    eps.append(("CONST", case, nm, rep))
         for fam, spec in (("MIRROR", self.mirror), ("LOOP", self.loop)):
             forms = list(spec["taught"]["positive"]) + list(spec["taught"]["negative"])
             positives = set(spec["positive_forms"])
@@ -355,7 +361,7 @@ class _Builder:
         eps = self._l4_episode_list()
         rng = self._rng("L4:interleave")
         order = [int(i) for i in rng.permutation(len(eps))]
-        font_rng = {fam: self._rng(f"L4:fonts:{fam}") for fam in ("NAME", "POINT", "IS", "AFTER", "BEFORE", "BETWEEN", "OTHER_CASE", "SAME", "MIRROR", "LOOP", "VOWEL")}
+        font_rng = {fam: self._rng(f"L4:fonts:{fam}") for fam in ("NAME", "POINT", "IS", "AFTER", "BEFORE", "BETWEEN", "OTHER_CASE", "SAME", "CONST", "MIRROR", "LOOP", "VOWEL")}
         pick_rng = self._rng("L4:POINT:candidates")
         lure_rng = self._rng("L4:IS:lures")
         tf = self.w.teach_fonts
@@ -422,6 +428,12 @@ class _Builder:
                 iid = self._render("L4:SAME", case, char_of(nm, case), font)
                 self._episode("L4", fam, f"SAME:{nm}:{case}", ["SAME"], [op_row_id(iid)], None, "NAME", nm,
                               klass=case, rendering=[iid], font=font)
+            elif fam == "CONST":                                  # R47 (B1.1): L6's episode, now inside L4
+                _f, case, nm, rep = ep
+                font = draw_font(fam)
+                iid = self._render("L4:CONST", case, char_of(nm, case), font)
+                self._episode("L4", fam, f"CONST:{nm}:{case}", ["CONST"], [op_row_id(iid)], None, "NAME", "a",
+                              klass=case, rendering=[iid], font=font)
             elif fam in ("MIRROR", "LOOP", "VOWEL"):
                 _f, (script, ch), positive, rep = ep
                 font = draw_font(fam)
@@ -466,17 +478,6 @@ class _Builder:
             if r in self.p.probe_after_rounds:
                 probe_k += 1
                 self._probe("L5", f"P{probe_k}")
-
-    def phase_L6(self) -> None:
-        font_rng = self._rng("L6:fonts")
-        tf = self.w.teach_fonts
-        for rep in range(self.p.control_reps):
-            for case in CASES:
-                for nm in self.const_letters:
-                    font = tf[int(font_rng.integers(0, len(tf)))]
-                    iid = self._render("L6:CONST", case, char_of(nm, case), font)
-                    self._episode("L6", "CONST", f"CONST:{nm}:{case}", ["CONST"], [op_row_id(iid)], None, "NAME", "a",
-                                  klass=case, rendering=[iid], font=font)
 
     # ------------------------------------------------------------------------------------------ the sittings
     def _letter_items(self, phase: str, sitting: str) -> None:
@@ -759,8 +760,7 @@ class _Builder:
         self.phase_L1_L2_L3()
         self.phase_L4()
         self.phase_L5()
-        self.phase_L6()
-        self.sitting_T_L()
+        self.sitting_T_L()          # R47 (B1.1): no L6 — CONST is taught inside L4
         self.phase_D()
         self.sitting_T_D()
         self.build_mlc()
@@ -803,9 +803,11 @@ def expected_counts(n_other_case_held: int = 13, n_other_case_taught: int = 13, 
           "AFTER": 13 * 2 * p.relation_reps_per_case, "BEFORE": 13 * 2 * p.relation_reps_per_case,
           "BETWEEN": 12 * 2 * p.relation_reps_per_case, "OTHER_CASE": n_other_case_taught * 2 * p.relation_reps_per_case,
           "MIRROR": (17 - 8 + 35 - 8) * p.perceptual_reps, "LOOP": (15 - 7 + 37 - 7) * p.perceptual_reps,
-          "VOWEL": 52 * p.perceptual_reps, "SAME": p.control_taught_per_case * 2 * p.control_reps}
+          "VOWEL": 52 * p.perceptual_reps, "SAME": p.control_taught_per_case * 2 * p.control_reps,
+          "CONST": p.control_taught_per_case * 2 * p.control_reps}      # R47 (B1.1): CONST inside L4
+
     l5_episodes = 3 * 2 * p.l5_rounds
-    l6_episodes = p.control_taught_per_case * 2 * p.control_reps
+    l6_episodes = 0                                                   # R47 (B1.1): L6 is gone
     two_after_test = 21 * 2 * p.test_renderings_per_case
     letter_block = {"U1a_NAME": 26 * (n_test_fonts_upper + n_test_fonts_lower),
                     "AFTER": 12 * 2 * p.test_renderings_per_case, "BEFORE": 12 * 2 * p.test_renderings_per_case,

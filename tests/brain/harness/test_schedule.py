@@ -67,7 +67,7 @@ class TestCounts(unittest.TestCase):
         for fam, n in e["L4_episodes"].items():
             self.assertEqual(c["episodes"].get(f"L4:{fam}"), n, f"L4 {fam}")
         self.assertEqual(c["episodes"].get("L5:TWO_AFTER"), e["L5_episodes"])
-        self.assertEqual(c["episodes"].get("L6:CONST"), e["L6_episodes"])
+        self.assertEqual(c["episodes"].get("L6:CONST", 0), e["L6_episodes"])   # R47: 0 since B1.1
         for sit in ("T_L", "T_D"):
             for fam, n in e["letter_block"].items():
                 self.assertEqual(c["asks"].get(f"{sit}:{fam}"), n, f"{sit} {fam}")
@@ -109,6 +109,58 @@ class TestCounts(unittest.TestCase):
         self._check(s2, e2)
         self.assertNotIn(held[0], s2.notes["other_case"]["held_out_graded"])
         self.assertEqual(s2.counts["asks"]["T_L:CHAIN"], self.s.counts["asks"]["T_L:CHAIN"])   # R17: CHAIN keeps all 25
+
+
+class TestB11NoBlockBeforeASitting(unittest.TestCase):
+    """edit: Claude (Opus 5.5), 2026-09-27 15:05 +0400 — R47 (B1.1). The L6 block taught CONST («a», 78 corrections) between the last
+    SLEEP and T_L, and phase D carries no correction, so it was the last thing corrected before T_L AND T_D: the networks
+    answered «a» to every T_L letter. CONST's training asks now join L4's interleave exactly as SAME's; L6 is gone. The
+    guard, declared in R47 before the change: before EVERY sitting the last 100 corrections carry >= 10 distinct answers
+    and none above 50 %."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.s = S.build(SEED, _world())
+
+    @staticmethod
+    def _last_corrections(s: S.Schedule, before_seq: int, n: int = 100) -> List[str]:
+        fb = [r for r in s.rows if r["kind"] == "FEEDBACK" and r["seq"] < before_seq]
+        return [r["payload"]["right"] for r in fb[-n:]]
+
+    def test_the_guard_holds_before_every_sitting(self) -> None:
+        sittings = [r for r in self.s.rows if r["kind"] == "TEST_BEGIN"]
+        self.assertEqual(len(sittings), 2 + len(S.PREREG.probe_after_rounds))
+        for r in sittings:
+            last = self._last_corrections(self.s, r["seq"])
+            self.assertEqual(len(last), 100, r["payload"])
+            top = max(last.count(a) for a in set(last))
+            self.assertGreaterEqual(len(set(last)), 10, (r["payload"], sorted(map(str, set(last)))))   # `right` is a name or a PICK index
+            self.assertLessEqual(top, 50, (r["payload"], top))
+
+    def test_const_is_taught_in_L4_and_no_L6_phase_exists(self) -> None:
+        self.assertNotIn("L6", {r["phase"] for r in self.s.rows})
+        self.assertEqual(self.s.counts["episodes"].get("L4:CONST"), S.PREREG.control_taught_per_case * 2 * S.PREREG.control_reps)
+        const_asks = [r for r in self.s.rows if r["kind"] == "ASK" and r["payload"]["cues"] == ["CONST"] and r["phase"] == "L4"]
+        self.assertEqual(len(const_asks), 78)
+        self.assertEqual({r["payload"]["answer_kind"] for r in const_asks}, {"NAME"})
+
+    def test_a_sleep_follows_every_const_training_ask_before_T_L(self) -> None:
+        t_l = next(r["seq"] for r in self.s.rows if r["kind"] == "TEST_BEGIN" and r["phase"] == "T_L")
+        last_const = max(r["seq"] for r in self.s.rows if r["kind"] == "ASK" and r["payload"]["cues"] == ["CONST"] and r["seq"] < t_l)
+        self.assertTrue(any(last_const < q < t_l for q in self.s.sleep_seqs), (last_const, t_l))
+
+    def test_const_is_spread_through_L4_not_a_block(self) -> None:
+        """CONST's L4 training asks span most of L4 (a seeded interleave), and no more than 3 of them are adjacent
+        among L4's corrections; the old L6 was one contiguous run of 78 outside L4."""
+        l4 = [r for r in self.s.rows if r["kind"] == "ASK" and r["phase"] == "L4"]
+        pos = [i for i, r in enumerate(l4) if r["payload"]["cues"] == ["CONST"]]
+        self.assertEqual(len(pos), 78)
+        self.assertGreaterEqual((pos[-1] - pos[0]) / len(l4), 0.5, (pos[0], pos[-1], len(l4)))
+        run = best = 1
+        for a, b in zip(pos, pos[1:]):
+            run = run + 1 if b == a + 1 else 1
+            best = max(best, run)
+        self.assertLessEqual(best, 3, best)
 
 
 class TestIdentityAndShape(unittest.TestCase):

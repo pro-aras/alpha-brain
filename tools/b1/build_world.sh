@@ -7,7 +7,8 @@
 set -u
 SEED="${1:?seed}"; FORCE="${2:-}"
 cd "$(dirname "$0")/../.." || exit 2
-ROOT=/data/dev/brain-runs/b1
+# edit: Claude (Opus 5.5), 2026-09-27 15:08 +0400 — R47 (B1.1): the root is B1_ROOT (default the B1.0 root, unchanged).
+ROOT=${B1_ROOT:-/data/dev/brain-runs/b1}
 LOGDIR=$ROOT/logs; mkdir -p "$LOGDIR"
 TS=$(date +%Y%m%d-%H%M)
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 TMPDIR=/data/dev/brain-runs/tmp
