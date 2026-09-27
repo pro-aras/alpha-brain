@@ -1,0 +1,40 @@
+seed 20261001 · TEACH 624 · before-CONST asks 156 · T_L NAME asks 704 · chance 3.8 %
+  input-NCM : before CONST 135/156 (87 %) · T_L 451/704 (64 %)
+  input-LR  : before CONST 155/156 (99 %) · T_L 514/704 (73 %)
+  A1             (h 114 units; mean distance of a state from the mean state 0.060; |h| mean 0.735)
+    state-NCM : before CONST 96/156 (62 %) · T_L 304/704 (43 %)
+    state-LR  : before CONST 149/156 (96 %) · T_L 485/704 (69 %)
+    arm-head  : before CONST 0/156 (0 %) · T_L 60/704 (9 %) · distinct answers 1
+  A1-BPTT-AWAKE  (h 70 units; mean distance of a state from the mean state 0.060; |h| mean 0.708)
+    state-NCM : before CONST 76/156 (49 %) · T_L 250/704 (36 %)
+    state-LR  : before CONST 144/156 (92 %) · T_L 461/704 (65 %)
+    arm-head  : before CONST 6/156 (4 %) · T_L 26/704 (4 %) · distinct answers 1
+  A1-TEACH       (h 111 units; mean distance of a state from the mean state 0.084; |h| mean 0.642)
+    state-NCM : before CONST 95/156 (61 %) · T_L 298/704 (42 %)
+    state-LR  : before CONST 147/156 (94 %) · T_L 503/704 (71 %)
+    arm-head  : before CONST 0/156 (0 %) · T_L 60/704 (9 %) · distinct answers 1
+  A1-FIXED       (h 114 units; mean distance of a state from the mean state 0.057; |h| mean 0.828)
+    state-NCM : before CONST 95/156 (61 %) · T_L 297/704 (42 %)
+    state-LR  : before CONST 149/156 (96 %) · T_L 487/704 (69 %)
+    arm-head  : before CONST 0/156 (0 %) · T_L 60/704 (9 %) · distinct answers 1
+exit 0
+seed 20261002 · TEACH 624 · before-CONST asks 156 · T_L NAME asks 704 · chance 3.8 %
+  input-NCM : before CONST 134/156 (86 %) · T_L 443/704 (63 %)
+  input-LR  : before CONST 152/156 (97 %) · T_L 509/704 (72 %)
+  A1             (h 111 units; mean distance of a state from the mean state 0.065; |h| mean 0.702)
+    state-NCM : before CONST 110/156 (71 %) · T_L 347/704 (49 %)
+    state-LR  : before CONST 149/156 (96 %) · T_L 493/704 (70 %)
+    arm-head  : before CONST 0/156 (0 %) · T_L 60/704 (9 %) · distinct answers 1
+  A1-BPTT-AWAKE  (h 70 units; mean distance of a state from the mean state 0.052; |h| mean 0.699)
+    state-NCM : before CONST 97/156 (62 %) · T_L 324/704 (46 %)
+    state-LR  : before CONST 152/156 (97 %) · T_L 469/704 (67 %)
+    arm-head  : before CONST 6/156 (4 %) · T_L 25/704 (4 %) · distinct answers 1
+  A1-TEACH       (h 115 units; mean distance of a state from the mean state 0.089; |h| mean 0.579)
+    state-NCM : before CONST 119/156 (76 %) · T_L 367/704 (52 %)
+    state-LR  : before CONST 152/156 (97 %) · T_L 486/704 (69 %)
+    arm-head  : before CONST 0/156 (0 %) · T_L 60/704 (9 %) · distinct answers 1
+  A1-FIXED       (h 111 units; mean distance of a state from the mean state 0.051; |h| mean 0.836)
+    state-NCM : before CONST 86/156 (55 %) · T_L 295/704 (42 %)
+    state-LR  : before CONST 149/156 (96 %) · T_L 486/704 (69 %)
+    arm-head  : before CONST 0/156 (0 %) · T_L 60/704 (9 %) · distinct answers 1
+exit 0

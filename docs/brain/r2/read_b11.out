@@ -1,0 +1,238 @@
+=== seed 20261001 ===
+  A0             NAME train asks n=156: all → right 60/156 (38 %) · distinct 27 · top '<RESEMBLES>' 29 % · non-NAME 77
+                   third 1 (seq 654–1676) → right 21/52 (40 %) · distinct 18 · top '<RESEMBLES>' 33 % · non-NAME 26
+                   third 2 (seq 1680–3038) → right 21/52 (40 %) · distinct 18 · top '<RESEMBLES>' 27 % · non-NAME 27
+                   third 3 (seq 3042–4209) → right 18/52 (35 %) · distinct 20 · top '<RESEMBLES>' 27 % · non-NAME 24
+                 T_L NAME → right 93/704 (13 %) · distinct 24 · top '<UNKNOWN>' 37 % · non-NAME 498
+                 T_D NAME → right 59/624 (9 %) · distinct 27 · top '<RESEMBLES>' 38 % · non-NAME 402
+  A1             NAME train asks n=156: all → right 4/156 (3 %) · distinct 26 · top 'a' 18 % · non-NAME 5
+                   third 1 (seq 654–1676) → right 1/52 (2 %) · distinct 21 · top 'a' 19 % · non-NAME 4
+                   third 2 (seq 1680–3038) → right 2/52 (4 %) · distinct 23 · top 'a' 13 % · non-NAME 1
+                   third 3 (seq 3042–4209) → right 1/52 (2 %) · distinct 17 · top 'a' 21 % · non-NAME 0
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'l' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.082 · last third mean 0.134 · n with conf 156
+  A1-TEACH       NAME train asks n=156: all → right 4/156 (3 %) · distinct 25 · top 'a' 18 % · non-NAME 3
+                   third 1 (seq 654–1676) → right 1/52 (2 %) · distinct 21 · top 'a' 19 % · non-NAME 2
+                   third 2 (seq 1680–3038) → right 2/52 (4 %) · distinct 21 · top 'a' 13 % · non-NAME 1
+                   third 3 (seq 3042–4209) → right 1/52 (2 %) · distinct 17 · top 'a' 21 % · non-NAME 0
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'l' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.083 · last third mean 0.135 · n with conf 156
+  A1-BPTT-AWAKE  NAME train asks n=156: all → right 4/156 (3 %) · distinct 27 · top 'a' 19 % · non-NAME 1
+                   third 1 (seq 654–1676) → right 0/52 (0 %) · distinct 20 · top 'a' 31 % · non-NAME 1
+                   third 2 (seq 1680–3038) → right 3/52 (6 %) · distinct 23 · top 'l' 10 % · non-NAME 0
+                   third 3 (seq 3042–4209) → right 1/52 (2 %) · distinct 21 · top 'a' 19 % · non-NAME 0
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'd' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.045 · last third mean 0.052 · n with conf 156
+  A1-LOCAL       NAME train asks n=156: all → right 5/156 (3 %) · distinct 27 · top 'a' 16 % · non-NAME 15
+                   third 1 (seq 654–1676) → right 3/52 (6 %) · distinct 19 · top 'a' 19 % · non-NAME 9
+                   third 2 (seq 1680–3038) → right 2/52 (4 %) · distinct 21 · top 'a' 12 % · non-NAME 5
+                   third 3 (seq 3042–4209) → right 0/52 (0 %) · distinct 18 · top 'a' 17 % · non-NAME 1
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'l' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top 'zero' 100 % · non-NAME 0
+                 conf on NAME train asks: first third mean 0.105 · last third mean 0.126 · n with conf 156
+  A1-NO-SLEEP    NAME train asks n=156: all → right 3/156 (2 %) · distinct 27 · top 'a' 17 % · non-NAME 5
+                   third 1 (seq 654–1676) → right 1/52 (2 %) · distinct 21 · top 'a' 19 % · non-NAME 4
+                   third 2 (seq 1680–3038) → right 2/52 (4 %) · distinct 22 · top 'a' 15 % · non-NAME 1
+                   third 3 (seq 3042–4209) → right 0/52 (0 %) · distinct 17 · top 'a' 17 % · non-NAME 0
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'l' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.085 · last third mean 0.136 · n with conf 156
+  A1-FIXED       NAME train asks n=156: all → right 3/156 (2 %) · distinct 26 · top 'a' 19 % · non-NAME 2
+                   third 1 (seq 654–1676) → right 1/52 (2 %) · distinct 20 · top 'a' 21 % · non-NAME 1
+                   third 2 (seq 1680–3038) → right 2/52 (4 %) · distinct 21 · top 'l' 15 % · non-NAME 1
+                   third 3 (seq 3042–4209) → right 0/52 (0 %) · distinct 17 · top 'a' 21 % · non-NAME 0
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'l' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.093 · last third mean 0.161 · n with conf 156
+  A1-ATT         NAME train asks n=156: all → right 4/156 (3 %) · distinct 26 · top 'a' 17 % · non-NAME 2
+                   third 1 (seq 654–1676) → right 1/52 (2 %) · distinct 23 · top 'a' 19 % · non-NAME 2
+                   third 2 (seq 1680–3038) → right 3/52 (6 %) · distinct 19 · top 'l' 17 % · non-NAME 0
+                   third 3 (seq 3042–4209) → right 0/52 (0 %) · distinct 17 · top 'a' 17 % · non-NAME 0
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'l' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.114 · last third mean 0.194 · n with conf 156
+  A1-MA          NAME train asks n=156: all → right 5/156 (3 %) · distinct 26 · top 'a' 16 % · non-NAME 2
+                   third 1 (seq 654–1676) → right 2/52 (4 %) · distinct 23 · top 'a' 19 % · non-NAME 2
+                   third 2 (seq 1680–3038) → right 3/52 (6 %) · distinct 18 · top 'l' 15 % · non-NAME 0
+                   third 3 (seq 3042–4209) → right 0/52 (0 %) · distinct 17 · top 'a' 15 % · non-NAME 0
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'l' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.152 · last third mean 0.191 · n with conf 156
+  A1-MLC         NAME train asks n=156: all → right 4/156 (3 %) · distinct 28 · top 'a' 12 % · non-NAME 24
+                   third 1 (seq 654–1676) → right 3/52 (6 %) · distinct 21 · top 'u' 10 % · non-NAME 4
+                   third 2 (seq 1680–3038) → right 1/52 (2 %) · distinct 20 · top 'a' 12 % · non-NAME 7
+                   third 3 (seq 3042–4209) → right 0/52 (0 %) · distinct 20 · top '<UNKNOWN>' 15 % · non-NAME 13
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'l' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.122 · last third mean 0.115 · n with conf 156
+  A2             NAME train asks n=156: all → right 6/156 (4 %) · distinct 28 · top 'a' 13 % · non-NAME 1
+                   third 1 (seq 654–1676) → right 2/52 (4 %) · distinct 23 · top 'a' 17 % · non-NAME 1
+                   third 2 (seq 1680–3038) → right 2/52 (4 %) · distinct 20 · top 'l' 13 % · non-NAME 0
+                   third 3 (seq 3042–4209) → right 2/52 (4 %) · distinct 21 · top 'a' 13 % · non-NAME 0
+                 T_L NAME → right 28/704 (4 %) · distinct 2 · top 'l' 95 % · non-NAME 0
+                 T_D NAME → right 27/624 (4 %) · distinct 2 · top 'l' 95 % · non-NAME 0
+  A3             NAME train asks n=156: all → right 0/156 (0 %) · distinct 2 · top '<UNKNOWN>' 99 % · non-NAME 155
+                   third 1 (seq 654–1676) → right 0/52 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 52
+                   third 2 (seq 1680–3038) → right 0/52 (0 %) · distinct 2 · top '<UNKNOWN>' 98 % · non-NAME 51
+                   third 3 (seq 3042–4209) → right 0/52 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 52
+                 T_L NAME → right 50/704 (7 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 704
+                 T_D NAME → right 0/624 (0 %) · distinct 2 · top '<UNKNOWN>' 100 % · non-NAME 622
+  A4             NAME train asks n=156: all → right 0/156 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 156
+                   third 1 (seq 654–1676) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                   third 2 (seq 1680–3038) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                   third 3 (seq 3042–4209) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                 T_L NAME → right 50/704 (7 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 704
+                 T_D NAME → right 74/624 (12 %) · distinct 9 · top 'e' 52 % · non-NAME 4
+  A5             NAME train asks n=156: all → right 61/156 (39 %) · distinct 26 · top '<RESEMBLES>' 29 % · non-NAME 45
+                   third 1 (seq 654–1676) → right 21/52 (40 %) · distinct 18 · top '<RESEMBLES>' 33 % · non-NAME 17
+                   third 2 (seq 1680–3038) → right 22/52 (42 %) · distinct 18 · top '<RESEMBLES>' 27 % · non-NAME 14
+                   third 3 (seq 3042–4209) → right 18/52 (35 %) · distinct 22 · top '<RESEMBLES>' 27 % · non-NAME 14
+                 T_L NAME → right 80/704 (11 %) · distinct 23 · top 'l' 40 % · non-NAME 236
+                 T_D NAME → right 59/624 (9 %) · distinct 27 · top '<RESEMBLES>' 38 % · non-NAME 402
+  D              NAME train asks n=156: all → right 135/156 (87 %) · distinct 27 · top '<NOTHING>' 13 % · non-NAME 21
+                   third 1 (seq 654–1676) → right 31/52 (60 %) · distinct 20 · top '<NOTHING>' 40 % · non-NAME 21
+                   third 2 (seq 1680–3038) → right 52/52 (100 %) · distinct 26 · top 't' 8 % · non-NAME 0
+                   third 3 (seq 3042–4209) → right 52/52 (100 %) · distinct 25 · top 'r' 8 % · non-NAME 0
+                 T_L NAME → right 530/704 (75 %) · distinct 27 · top 'm' 6 % · non-NAME 0
+                 T_D NAME → right 503/624 (81 %) · distinct 35 · top 'b' 6 % · non-NAME 0
+  E′             NAME train asks n=156: all → right 60/156 (38 %) · distinct 27 · top '<RESEMBLES>' 29 % · non-NAME 77
+                   third 1 (seq 654–1676) → right 21/52 (40 %) · distinct 18 · top '<RESEMBLES>' 33 % · non-NAME 26
+                   third 2 (seq 1680–3038) → right 21/52 (40 %) · distinct 18 · top '<RESEMBLES>' 27 % · non-NAME 27
+                   third 3 (seq 3042–4209) → right 18/52 (35 %) · distinct 20 · top '<RESEMBLES>' 27 % · non-NAME 24
+                 T_L NAME → right 93/704 (13 %) · distinct 24 · top '<UNKNOWN>' 37 % · non-NAME 498
+                 T_D NAME → right 59/624 (9 %) · distinct 27 · top '<RESEMBLES>' 38 % · non-NAME 402
+  F              NAME train asks n=156: all → right 61/156 (39 %) · distinct 26 · top '<RESEMBLES>' 29 % · non-NAME 45
+                   third 1 (seq 654–1676) → right 21/52 (40 %) · distinct 19 · top '<RESEMBLES>' 33 % · non-NAME 17
+                   third 2 (seq 1680–3038) → right 22/52 (42 %) · distinct 19 · top '<RESEMBLES>' 27 % · non-NAME 14
+                   third 3 (seq 3042–4209) → right 18/52 (35 %) · distinct 21 · top '<RESEMBLES>' 27 % · non-NAME 14
+                 T_L NAME → right 80/704 (11 %) · distinct 23 · top 'l' 40 % · non-NAME 236
+                 T_D NAME → right 59/624 (9 %) · distinct 27 · top '<RESEMBLES>' 38 % · non-NAME 402
+  RING-READ      NAME train asks n=156: all → right 0/156 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 156
+                   third 1 (seq 654–1676) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                   third 2 (seq 1680–3038) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                   third 3 (seq 3042–4209) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                 T_L NAME → right 50/704 (7 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 704
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 624
+  tape: NAME corrections per name (min/median/max) 6/6/6 over 26 names, total 156; TEACH rows per name min/max 1/24, total 745; SLEEP rows 18; rows 7932
+=== seed 20261002 ===
+  A0             NAME train asks n=156: all → right 61/156 (39 %) · distinct 28 · top '<RESEMBLES>' 29 % · non-NAME 68
+                   third 1 (seq 694–1982) → right 20/52 (38 %) · distinct 19 · top '<RESEMBLES>' 37 % · non-NAME 26
+                   third 2 (seq 1986–2948) → right 20/52 (38 %) · distinct 18 · top '<RESEMBLES>' 29 % · non-NAME 22
+                   third 3 (seq 2990–4225) → right 21/52 (40 %) · distinct 20 · top '<RESEMBLES>' 21 % · non-NAME 20
+                 T_L NAME → right 115/704 (16 %) · distinct 26 · top '<RESEMBLES>' 38 % · non-NAME 513
+                 T_D NAME → right 57/624 (9 %) · distinct 28 · top '<RESEMBLES>' 40 % · non-NAME 429
+  A1             NAME train asks n=156: all → right 5/156 (3 %) · distinct 26 · top 'a' 18 % · non-NAME 5
+                   third 1 (seq 694–1982) → right 2/52 (4 %) · distinct 19 · top 'a' 23 % · non-NAME 5
+                   third 2 (seq 1986–2948) → right 1/52 (2 %) · distinct 22 · top 'a' 19 % · non-NAME 0
+                   third 3 (seq 2990–4225) → right 2/52 (4 %) · distinct 16 · top 'e' 15 % · non-NAME 0
+                 T_L NAME → right 25/704 (4 %) · distinct 1 · top 'n' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.081 · last third mean 0.126 · n with conf 156
+  A1-TEACH       NAME train asks n=156: all → right 5/156 (3 %) · distinct 26 · top 'a' 14 % · non-NAME 4
+                   third 1 (seq 694–1982) → right 2/52 (4 %) · distinct 21 · top 'a' 13 % · non-NAME 4
+                   third 2 (seq 1986–2948) → right 1/52 (2 %) · distinct 23 · top 'a' 19 % · non-NAME 0
+                   third 3 (seq 2990–4225) → right 2/52 (4 %) · distinct 16 · top 'e' 15 % · non-NAME 0
+                 T_L NAME → right 25/704 (4 %) · distinct 1 · top 'n' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.079 · last third mean 0.128 · n with conf 156
+  A1-BPTT-AWAKE  NAME train asks n=156: all → right 8/156 (5 %) · distinct 28 · top 'a' 19 % · non-NAME 2
+                   third 1 (seq 694–1982) → right 3/52 (6 %) · distinct 19 · top 'a' 29 % · non-NAME 1
+                   third 2 (seq 1986–2948) → right 1/52 (2 %) · distinct 25 · top 'a' 15 % · non-NAME 1
+                   third 3 (seq 2990–4225) → right 4/52 (8 %) · distinct 24 · top 'a' 12 % · non-NAME 0
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'y' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.049 · last third mean 0.050 · n with conf 156
+  A1-LOCAL       NAME train asks n=156: all → right 6/156 (4 %) · distinct 26 · top 'a' 15 % · non-NAME 8
+                   third 1 (seq 694–1982) → right 3/52 (6 %) · distinct 20 · top 'c' 12 % · non-NAME 7
+                   third 2 (seq 1986–2948) → right 1/52 (2 %) · distinct 24 · top 'a' 19 % · non-NAME 1
+                   third 3 (seq 2990–4225) → right 2/52 (4 %) · distinct 17 · top 'a' 15 % · non-NAME 0
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'k' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top 'zero' 100 % · non-NAME 0
+                 conf on NAME train asks: first third mean 0.094 · last third mean 0.146 · n with conf 156
+  A1-NO-SLEEP    NAME train asks n=156: all → right 4/156 (3 %) · distinct 26 · top 'a' 18 % · non-NAME 4
+                   third 1 (seq 694–1982) → right 2/52 (4 %) · distinct 19 · top 'a' 25 % · non-NAME 4
+                   third 2 (seq 1986–2948) → right 1/52 (2 %) · distinct 23 · top 'a' 19 % · non-NAME 0
+                   third 3 (seq 2990–4225) → right 1/52 (2 %) · distinct 16 · top 'e' 15 % · non-NAME 0
+                 T_L NAME → right 25/704 (4 %) · distinct 1 · top 'n' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.079 · last third mean 0.126 · n with conf 156
+  A1-FIXED       NAME train asks n=156: all → right 6/156 (4 %) · distinct 25 · top 'a' 18 % · non-NAME 5
+                   third 1 (seq 694–1982) → right 2/52 (4 %) · distinct 22 · top 'a' 21 % · non-NAME 5
+                   third 2 (seq 1986–2948) → right 2/52 (4 %) · distinct 19 · top 'a' 21 % · non-NAME 0
+                   third 3 (seq 2990–4225) → right 2/52 (4 %) · distinct 16 · top 'e' 15 % · non-NAME 0
+                 T_L NAME → right 25/704 (4 %) · distinct 1 · top 'n' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.084 · last third mean 0.137 · n with conf 156
+  A1-ATT         NAME train asks n=156: all → right 4/156 (3 %) · distinct 27 · top 'a' 21 % · non-NAME 5
+                   third 1 (seq 694–1982) → right 2/52 (4 %) · distinct 21 · top 'a' 15 % · non-NAME 5
+                   third 2 (seq 1986–2948) → right 0/52 (0 %) · distinct 15 · top 'a' 33 % · non-NAME 0
+                   third 3 (seq 2990–4225) → right 2/52 (4 %) · distinct 18 · top 'a' 15 % · non-NAME 0
+                 T_L NAME → right 25/704 (4 %) · distinct 1 · top 'n' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.150 · last third mean 0.166 · n with conf 156
+  A1-MA          NAME train asks n=156: all → right 4/156 (3 %) · distinct 27 · top 'a' 20 % · non-NAME 4
+                   third 1 (seq 694–1982) → right 2/52 (4 %) · distinct 21 · top 'a' 15 % · non-NAME 4
+                   third 2 (seq 1986–2948) → right 0/52 (0 %) · distinct 15 · top 'a' 25 % · non-NAME 0
+                   third 3 (seq 2990–4225) → right 2/52 (4 %) · distinct 18 · top 'a' 19 % · non-NAME 0
+                 T_L NAME → right 25/704 (4 %) · distinct 1 · top 'n' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.190 · last third mean 0.169 · n with conf 156
+  A1-MLC         NAME train asks n=156: all → right 9/156 (6 %) · distinct 27 · top '<UNKNOWN>' 10 % · non-NAME 18
+                   third 1 (seq 694–1982) → right 3/52 (6 %) · distinct 17 · top 'a' 15 % · non-NAME 7
+                   third 2 (seq 1986–2948) → right 3/52 (6 %) · distinct 20 · top '<UNKNOWN>' 13 % · non-NAME 7
+                   third 3 (seq 2990–4225) → right 3/52 (6 %) · distinct 22 · top 't' 21 % · non-NAME 4
+                 T_L NAME → right 24/704 (3 %) · distinct 1 · top 'k' 100 % · non-NAME 0
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+                 conf on NAME train asks: first third mean 0.113 · last third mean 0.106 · n with conf 156
+  A2             NAME train asks n=156: all → right 5/156 (3 %) · distinct 25 · top 'a' 20 % · non-NAME 0
+                   third 1 (seq 694–1982) → right 3/52 (6 %) · distinct 17 · top 'a' 29 % · non-NAME 0
+                   third 2 (seq 1986–2948) → right 1/52 (2 %) · distinct 20 · top 'a' 17 % · non-NAME 0
+                   third 3 (seq 2990–4225) → right 1/52 (2 %) · distinct 20 · top 'f' 13 % · non-NAME 0
+                 T_L NAME → right 29/704 (4 %) · distinct 2 · top 'n' 72 % · non-NAME 0
+                 T_D NAME → right 29/624 (5 %) · distinct 2 · top 'n' 74 % · non-NAME 0
+  A3             NAME train asks n=156: all → right 0/156 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 156
+                   third 1 (seq 694–1982) → right 0/52 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 52
+                   third 2 (seq 1986–2948) → right 0/52 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 52
+                   third 3 (seq 2990–4225) → right 0/52 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 52
+                 T_L NAME → right 50/704 (7 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 704
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<UNKNOWN>' 100 % · non-NAME 624
+  A4             NAME train asks n=156: all → right 0/156 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 156
+                   third 1 (seq 694–1982) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                   third 2 (seq 1986–2948) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                   third 3 (seq 2990–4225) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                 T_L NAME → right 50/704 (7 %) · distinct 2 · top '<NOTHING>' 100 % · non-NAME 703
+                 T_D NAME → right 24/624 (4 %) · distinct 4 · top 'o' 94 % · non-NAME 1
+  A5             NAME train asks n=156: all → right 61/156 (39 %) · distinct 27 · top '<RESEMBLES>' 29 % · non-NAME 45
+                   third 1 (seq 694–1982) → right 20/52 (38 %) · distinct 20 · top '<RESEMBLES>' 37 % · non-NAME 19
+                   third 2 (seq 1986–2948) → right 20/52 (38 %) · distinct 20 · top '<RESEMBLES>' 29 % · non-NAME 15
+                   third 3 (seq 2990–4225) → right 21/52 (40 %) · distinct 22 · top '<RESEMBLES>' 21 % · non-NAME 11
+                 T_L NAME → right 92/704 (13 %) · distinct 25 · top '<RESEMBLES>' 38 % · non-NAME 265
+                 T_D NAME → right 57/624 (9 %) · distinct 28 · top '<RESEMBLES>' 40 % · non-NAME 429
+  D              NAME train asks n=156: all → right 130/156 (83 %) · distinct 27 · top '<NOTHING>' 16 % · non-NAME 25
+                   third 1 (seq 694–1982) → right 27/52 (52 %) · distinct 19 · top '<NOTHING>' 48 % · non-NAME 25
+                   third 2 (seq 1986–2948) → right 51/52 (98 %) · distinct 22 · top 'z' 8 % · non-NAME 0
+                   third 3 (seq 2990–4225) → right 52/52 (100 %) · distinct 23 · top 'q' 8 % · non-NAME 0
+                 T_L NAME → right 530/704 (75 %) · distinct 27 · top 'b' 6 % · non-NAME 0
+                 T_D NAME → right 487/624 (78 %) · distinct 34 · top 'b' 6 % · non-NAME 0
+  E′             NAME train asks n=156: all → right 61/156 (39 %) · distinct 28 · top '<RESEMBLES>' 29 % · non-NAME 68
+                   third 1 (seq 694–1982) → right 20/52 (38 %) · distinct 19 · top '<RESEMBLES>' 37 % · non-NAME 26
+                   third 2 (seq 1986–2948) → right 20/52 (38 %) · distinct 18 · top '<RESEMBLES>' 29 % · non-NAME 22
+                   third 3 (seq 2990–4225) → right 21/52 (40 %) · distinct 20 · top '<RESEMBLES>' 21 % · non-NAME 20
+                 T_L NAME → right 115/704 (16 %) · distinct 26 · top '<RESEMBLES>' 38 % · non-NAME 513
+                 T_D NAME → right 57/624 (9 %) · distinct 28 · top '<RESEMBLES>' 40 % · non-NAME 429
+  F              NAME train asks n=156: all → right 61/156 (39 %) · distinct 27 · top '<RESEMBLES>' 29 % · non-NAME 45
+                   third 1 (seq 694–1982) → right 20/52 (38 %) · distinct 20 · top '<RESEMBLES>' 37 % · non-NAME 19
+                   third 2 (seq 1986–2948) → right 20/52 (38 %) · distinct 19 · top '<RESEMBLES>' 29 % · non-NAME 15
+                   third 3 (seq 2990–4225) → right 21/52 (40 %) · distinct 19 · top '<RESEMBLES>' 21 % · non-NAME 11
+                 T_L NAME → right 95/704 (13 %) · distinct 25 · top '<RESEMBLES>' 38 % · non-NAME 265
+                 T_D NAME → right 57/624 (9 %) · distinct 28 · top '<RESEMBLES>' 40 % · non-NAME 429
+  RING-READ      NAME train asks n=156: all → right 0/156 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 156
+                   third 1 (seq 694–1982) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                   third 2 (seq 1986–2948) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                   third 3 (seq 2990–4225) → right 0/52 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 52
+                 T_L NAME → right 50/704 (7 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 704
+                 T_D NAME → right 0/624 (0 %) · distinct 1 · top '<NOTHING>' 100 % · non-NAME 624
+  tape: NAME corrections per name (min/median/max) 6/6/6 over 26 names, total 156; TEACH rows per name min/max 1/24, total 745; SLEEP rows 18; rows 7932

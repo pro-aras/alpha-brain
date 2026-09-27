@@ -1,0 +1,10 @@
+=== seed 20261001 · TEACH 624 rows in 4 fonts ['DejaVuSansMono-Bold.ttf', 'DejaVuSansMono.ttf', 'UbuntuSans[wdth,wght].ttf', 'cmr10.ttf'] · T_L NAME 704 · A1 state 112 units ===
+  F_pool   : ε 0.0001: cv 82 % / T_L 74 % · ε 0.001: cv 83 % / T_L 74 % · ε 0.01: cv 85 % / T_L 76 % · ε 0.03: cv 86 % / T_L 79 % · ε 0.1: cv 89 % / T_L 80 % · ε 0.3: cv 89 % / T_L 80 %
+  F_pool   : CHOSEN by leave-one-TEACH-font-out ε = 0.1 (cv 89 %) → T_L read once: 80 % (562/704)
+  A1-state : ε 0.0001: cv 82 % / T_L 78 % · ε 0.001: cv 83 % / T_L 77 % · ε 0.01: cv 84 % / T_L 76 % · ε 0.03: cv 84 % / T_L 75 % · ε 0.1: cv 84 % / T_L 73 % · ε 0.3: cv 84 % / T_L 71 %
+  A1-state : CHOSEN by leave-one-TEACH-font-out ε = 0.01 (cv 84 %) → T_L read once: 76 % (534/704)
+=== seed 20261002 · TEACH 624 rows in 4 fonts ['DejaVuSansMono-Bold.ttf', 'DejaVuSansMono.ttf', 'UbuntuSans[wdth,wght].ttf', 'cmr10.ttf'] · T_L NAME 704 · A1 state 111 units ===
+  F_pool   : ε 0.0001: cv 82 % / T_L 71 % · ε 0.001: cv 83 % / T_L 72 % · ε 0.01: cv 86 % / T_L 76 % · ε 0.03: cv 87 % / T_L 77 % · ε 0.1: cv 87 % / T_L 79 % · ε 0.3: cv 87 % / T_L 79 %
+  F_pool   : CHOSEN by leave-one-TEACH-font-out ε = 0.3 (cv 87 %) → T_L read once: 79 % (556/704)
+  A1-state : ε 0.0001: cv 82 % / T_L 75 % · ε 0.001: cv 84 % / T_L 77 % · ε 0.01: cv 84 % / T_L 77 % · ε 0.03: cv 85 % / T_L 76 % · ε 0.1: cv 84 % / T_L 74 % · ε 0.3: cv 83 % / T_L 71 %
+  A1-state : CHOSEN by leave-one-TEACH-font-out ε = 0.03 (cv 85 %) → T_L read once: 76 % (536/704)
