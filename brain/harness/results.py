@@ -42,6 +42,15 @@ names: NOT GRADABLE, TWIN_VOID by cost when the stop's marker (`VOID-BY-COST.jso
 search it loads (E′ and F run no search: their twins load SHUFFLED-RELATION:D's library, R36), TWIN_MISSING otherwise.
 `twin_void` in results.json names every such arm, and VERDICT.md prints them. The arms §4 does not twin keep their U3 on
 the bar alone, as before. RESULTS_VERSION → v3.
+
+edit: Claude (Sonnet 5, A1-TEACH builder), 2026-09-27 14:00 +0400 — R46 (docs/brain/b1/SEAT-DECISIONS.md; PREREG §12's
+2026-09-27 13:33 line): A1-TEACH joins RELATION_TWINNED (its own SHUFFLED-RELATION:A1-TEACH is the null for its U3, like
+A1's). A new DIAGNOSTIC decision `a1_teach` (§_decisions) prints U1a per case (latin-upper, latin-lower) for A1-TEACH, A1
+and SHUFFLED-NAME:A1-TEACH, WITH their inputs — `computable: False` names whichever of the three is missing or VOID. It
+decides nothing by itself: R46's own question (does the switch explain A1's NAME collapse?) is read by the seat from
+`u1a`, never computed here. U1a's own reading is a DICT `{case: share}` (`graders.grade_u1a`), never a float, so the
+existing `_reading()` helper (float-or-None) would read None for every arm — `_u1a_reading()` reads the dict directly.
+RESULTS_VERSION → v4.
 """
 from __future__ import annotations
 
@@ -60,7 +69,7 @@ from brain.harness import graders as G  # noqa: E402
 from brain.harness.run import arm_dirname, load_tape, load_truth  # noqa: E402
 from brain.protocol import canonical_json  # noqa: E402
 
-RESULTS_VERSION = "b1-results-v3"
+RESULTS_VERSION = "b1-results-v4"
 KEY_EXEMPT = ("C0d_CANARY",)
 TWIN_PREFIXES = ("SHUFFLED-NAME:", "SHUFFLED-RELATION:", "FORCED:")
 
@@ -122,7 +131,9 @@ def without_void_twin(marks: Mapping[str, Any], twin_by: Sequence[str], reason_c
 
 # R44 — the arms §4 feeds SHUFFLED-RELATION to (the composition null for U3). E′ and F run no search: their twins load
 # SHUFFLED-RELATION:D's library (R36), so a stop of that search is a stop of their twins.
-RELATION_TWINNED = ("A1", "A5", "E′", "F")
+# R46 — A1-TEACH is a plain network like A1 (not a hybrid): it runs its OWN SHUFFLED-RELATION:A1-TEACH search, so it
+# carries no entry in RELATION_TWIN_SOURCE below, exactly like A1.
+RELATION_TWINNED = ("A1", "A1-TEACH", "A5", "E′", "F")
 RELATION_TWIN_SOURCE = {"E′": "SHUFFLED-RELATION:D", "F": "SHUFFLED-RELATION:D"}
 VOID_BY_COST = "VOID-BY-COST.json"
 
@@ -271,9 +282,40 @@ def _reading(arms: Mapping[str, Any], arm: str, mark: str) -> Optional[float]:
     return float(r) if isinstance(r, (int, float)) else None
 
 
+# R46 — the three arms the a1_teach diagnostic reads (docs/brain/b1/SEAT-DECISIONS.md; PREREG §12's 2026-09-27 13:33 line).
+A1_TEACH_DIAGNOSTIC_ARMS = ("A1-TEACH", "A1", "SHUFFLED-NAME:A1-TEACH")
+
+
+def _u1a_reading(arms: Mapping[str, Any], arm: str) -> Optional[Dict[str, float]]:
+    """U1a's own reading is a DICT `{case: share}` (`graders.grade_u1a`), never a float — `_reading()` above reads
+    None for it (`isinstance({}, (int, float))` is False), which would silently read every arm's U1a as "no
+    reading" (#162's class: an instrument that reads its own None as a negative). Read the dict directly instead."""
+    m = (arms.get(arm) or {}).get("marks", {}).get("U1a_NAME@T_L")
+    r = m.get("reading") if m else None
+    return dict(r) if isinstance(r, dict) else None
+
+
+def _a1_teach_diagnostic(arms: Mapping[str, Any], void: Mapping[str, Any]) -> Dict[str, Any]:
+    """R46: a DIAGNOSTIC of A1's NAME collapse, never a selection candidate (§6's selection never reads this) — U1a
+    per case (latin-upper, latin-lower) for A1-TEACH, A1 and SHUFFLED-NAME:A1-TEACH, printed WITH their inputs.
+    `computable: False` names whichever of the three arms is missing or VOID, rather than silently reading the
+    others alone. It decides nothing by itself: R46's own question (does the switch explain the collapse — does
+    A1-TEACH pass U1a, above its SHUFFLED-NAME twin, at both seeds where A1 fails?) is read by the seat from `u1a`."""
+    missing = [a for a in A1_TEACH_DIAGNOSTIC_ARMS if a not in arms]
+    voided = {a: void[a] for a in A1_TEACH_DIAGNOSTIC_ARMS if a in void}
+    u1a = {a: _u1a_reading(arms, a) for a in A1_TEACH_DIAGNOSTIC_ARMS if a in arms}
+    out: Dict[str, Any] = {"computable": not missing and not voided, "u1a": u1a}
+    if missing:
+        out["missing"] = missing
+    if voided:
+        out["void"] = voided
+    return out
+
+
 def _decisions(arms: Mapping[str, Any], margins: Mapping[str, float]) -> Dict[str, Any]:
     fams = list(G.U3_LETTER_FAMILIES)
     void = {n: s["by"] for n, s in ((n, arm_status(n, a.get("marks") or {})) for n, a in arms.items()) if s["void"]}   # R40
+    a1_teach = _a1_teach_diagnostic(arms, void)   # R46 — a diagnostic; decides nothing by itself
 
     def u3(arm: str) -> Dict[str, Optional[float]]:
         return {f: _reading(arms, arm, f"U3_{f}@T_L") for f in fams}
@@ -334,7 +376,7 @@ def _decisions(arms: Mapping[str, Any], margins: Mapping[str, float]) -> Dict[st
                  "this_seed_only": True}
     return {"selection": selection, "d1_i": d1_i, "d1_ii": d1_ii, "d1_iii": d1_iii, "grows": grows, "ma": ma, "interface": interface,
             "mlc_vs_d": {a: ({"void": void[a]} if a in void else _examples(arms, a)) for a in ("A1-MLC", "D", "A1")},
-            "void": void,
+            "void": void, "a1_teach": a1_teach,
             "predictions": "DEBATE rounds 1–2 (B1-PREREG.md §6) — read against the arms above by the seat, never by this code"}
 
 
@@ -416,6 +458,16 @@ def render_verdict(results: Mapping[str, Any]) -> str:
              f"{ma_i['diff_pp'] if ma_i.get('computable') else why_not(ma_i)} {ma_i.get('verdict_this_seed', '')}")
     L.append(f"- interface: {d['interface']}")
     L.append(f"- examples-to-bar (TWO_AFTER): {d['mlc_vs_d']}")
+    v = d.get("a1_teach") or {}
+    if v.get("computable"):
+        L.append(f"- A1-TEACH (R46 — a diagnostic; decides nothing by itself): U1a {v.get('u1a')}")
+    else:
+        bits = []
+        if v.get("missing"):
+            bits.append(f"missing {v['missing']}")
+        if v.get("void"):
+            bits.append(f"void {v['void']}")
+        L.append(f"- A1-TEACH (R46 — a diagnostic; decides nothing by itself): NOT COMPUTABLE — " + " · ".join(bits) + f" · U1a so far {v.get('u1a')}")
     L.append("")
     L.append("## Reading rules")
     L.append("- A mark NOT GRADED is never counted as failed; «no road» names a capability the arm does not have; INSTRUMENT-VOID (0c) names the "

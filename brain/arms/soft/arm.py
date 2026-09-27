@@ -43,6 +43,17 @@
 #        ("both twins at FIXED width, no births") — ArmA1 forces hmax=h0=config["fixed_h"] and
 #        arrival_budget=0 whenever `variant` is A1-ATT/A1-MA, so growth is structurally
 #        impossible rather than merely unused.
+#   D21. R46's `teach_trains_answer` switch reuses `_fit_feedback`'s own trainer dispatch
+#        (`local_trainer.step`/`bptt_trainer.step`) rather than a new training primitive — the
+#        virtual NAME-head step differs from a real FEEDBACK only in WHERE its target comes from
+#        (the TEACH row's own name, not a later FEEDBACK row) and in running from `h_before`
+#        (captured before this row's own steps) rather than the query state `answer()` peeked at;
+#        everything else — the shared eligibility-trace buffer over EVERY registered parameter,
+#        not only the NAME head's — is identical by design (R46 dispatches it "exactly as
+#        `_fit_feedback` does").
+# edit: Claude (Sonnet 5, A1-TEACH builder), 2026-09-27 13:57 +0400 — R46 (docs/brain/b1/SEAT-DECISIONS.md; B1-PREREG.md
+#   §4 row A1, §12's 2026-09-27 13:33 line; brief docs/dev/briefs/a1-teach.md): the `teach_trains_answer` switch
+#   (default False) and `_teach_answer_step` (D21 above); the A1-ATT/A1-MA construction-time refusal (item 5).
 from __future__ import annotations
 
 import collections
@@ -69,7 +80,7 @@ from brain.arms.soft.steps import (
     GLANCE_DIM, GLANCE_IDX_DIM, KIND_DIM, LETTER_DIM, STEP_DIM, SlotTable, StepEncoder, token_id_of_step,
 )
 from brain.glance_cache import Cache
-from brain.protocol import Answer, AnswerKind, VALENCE_NO, VALENCE_REWARD, canonical_json
+from brain.protocol import Answer, AnswerKind, VALENCE_NO, VALENCE_REWARD, canonical_json, op_row
 
 RING_CAPACITY = 20000  # PREREG §4 row A1: "sampled from its own event ring (the last 20,000 events)"
 
@@ -107,6 +118,15 @@ class ArmA1:
         self.config = dict(config)
         variant = self.config.get("variant", "A1")
         self.variant = variant
+        # edit: Claude (Sonnet 5, A1-TEACH builder), 2026-09-27 13:58 +0400 — R46 item 5: "the switch is only for the
+        # non-attention variants" — refused HERE, at construction, rather than silently ignored or lazily deferred to
+        # the first TEACH row (a declared limit, named in the error, per the brief's "RAISE it and stop").
+        self.teach_trains_answer = bool(self.config.get("teach_trains_answer", False))
+        if self.teach_trains_answer and variant in ("A1-ATT", "A1-MA"):
+            raise ValueError(
+                f"{variant}: teach_trains_answer=True is refused at construction (R46: the switch is only for the "
+                f"non-attention variants) — RAISE to the seat rather than working around it"
+            )
 
         h0 = int(self.config.get("h0", 64))
         hmax = int(self.config.get("hmax", 1024))
@@ -310,6 +330,12 @@ class ArmA1:
         # Nothing called `NameAnswerHead.hear_name`, so `n_names` stayed 0 for the whole B1 run of seed 20261001: every
         # NAME ask read UNKNOWN (2,698 of 2,698 test asks, all five A1 variants), and every NAME FEEDBACK returned early
         # («a name never heard cannot be a target», D17). The runs were stopped at 12:46 and are re-run on the fix.
+        # edit: Claude (Sonnet 5, A1-TEACH builder), 2026-09-27 13:58 +0400 — R46 step 1: h_before is captured HERE,
+        # before ANY of this row's own steps advance self.h — guarded behind the switch (item 4b: guard EVERYTHING,
+        # the clone included; with the switch False this line does not run, so _fit_teach executes exactly today's
+        # code and nothing else — CUE_MARKS' NAME slot is static so ask_steps below never touches the dynamic slot
+        # table either way, but the guard does not rely on that).
+        h_before = self.h.detach().clone() if self.teach_trains_answer else None
         name = (row.get("payload") or {}).get("name")
         if name is not None:
             self.names.hear_name(str(name), active_h=self.engine.active)
@@ -317,6 +343,45 @@ class ArmA1:
         steps = enc.teach_steps(row["payload"])
         self._advance_steps(steps, detach_between=(self.awake_mode == "local"))
         self._ring.append({"row": dict(row), "arrival_id": self._arrival_id})
+        # edit: Claude (Sonnet 5, A1-TEACH builder), 2026-09-27 13:58 +0400 — R46 step 3: ONE NAME-head step as if the
+        # teacher had asked NAME on g and answered x, from h_before (a fresh graph rooted BEFORE this row's own
+        # steps; nothing committed to self.h). Growth, FEEDBACK, sleep and every other road are unchanged — this
+        # call touches only the answer heads' parameters via the shared trainer.
+        if self.teach_trains_answer:
+            self._teach_answer_step(row["payload"], h_before)
+
+    def _teach_answer_step(self, payload: Mapping[str, Any], h_before: torch.Tensor) -> None:
+        """R46 (docs/brain/b1/SEAT-DECISIONS.md; only reached when `teach_trains_answer` is True, and only for the
+        non-attention variants — item 5's ValueError refuses A1-ATT/A1-MA at construction, so `self.attention_mode`
+        is always None here). On a TEACH row {glance_row g, name x}, ONE answer-head step as if the teacher had
+        asked NAME on g and answered x:
+          - the steps are the NAME ask's own road (`StepEncoder.ask_steps`, the exact payload shape of a real NAME
+            ask on the tape — `answer_kind`/`candidate_rows` are carried only for that shape match; `ask_steps`
+            itself reads only `cues`/`operands`);
+          - run with `self.engine.step` from `h_before` (captured at the very start of `_fit_teach`, before step 2
+            advanced anything) — NOT under `torch.no_grad()`: the loss below needs a live autograd graph, exactly
+            as `_fit_feedback`'s own `_query_state_fresh` peek does;
+          - `active_h` is read AFTER step 2, so a birth during this row's own TEACH steps is already reflected;
+          - logits from the NAME head exactly as `_query_state_fresh` computes them for family NAME on a plain
+            (non-attention) variant: `self.names(h, active_h=...)`, using the CURRENT parameters;
+          - the loss and the trainer dispatch are exactly `_fit_feedback`'s own (D17/D21): cross-entropy toward x's
+            index, then ONE step of the variant's own awake trainer. The abstention histories observe nothing;
+            `_pending` and `_ring` are not touched (this is not a real ask — no FEEDBACK will ever follow it)."""
+        enc = self._require_encoder()
+        g = int(payload["glance_row"])
+        x = str(payload["name"])
+        ask_payload = {"answer_kind": "NAME", "candidate_rows": None, "cues": ["NAME"], "operands": [op_row(g)]}
+        h = h_before
+        for step in enc.ask_steps(ask_payload):
+            h = self.engine.step(step, h)
+        active_h = self.engine.active
+        logits = self.names(h, active_h=active_h)
+        target_idx = self.names.names.index(x)  # x was heard in step 2 above (just now, or on an earlier row) — always present
+        loss = F.cross_entropy(logits.unsqueeze(0), torch.tensor([target_idx]))
+        if self.awake_mode == "local":
+            self.local_trainer.step(loss, valence=1.0)
+        else:
+            self.bptt_trainer.step(loss)
 
     def _fit_ask_world_event(self, row: Mapping[str, Any]) -> None:
         # D16: the REAL commit — reprocesses the same steps `answer()` peeked at, this time

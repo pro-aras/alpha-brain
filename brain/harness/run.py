@@ -79,6 +79,11 @@ _BASE: Dict[str, ArmSpec] = {
     "A1-NO-SLEEP": ArmSpec("A1-NO-SLEEP", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-NO-SLEEP"}),
     "A1-LOCAL": ArmSpec("A1-LOCAL", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-LOCAL"}),
     "A1-BPTT-AWAKE": ArmSpec("A1-BPTT-AWAKE", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-BPTT-AWAKE"}),
+    # edit: Claude (Sonnet 5, A1-TEACH builder), 2026-09-27 13:59 +0400 — R46 (docs/brain/b1/SEAT-DECISIONS.md; PREREG
+    # §12's 2026-09-27 13:33 line): a DIAGNOSTIC arm, A1 + the switch (arm.py's teach_trains_answer) — no other config
+    # differs, so its three twins (SHUFFLED-NAME/SHUFFLED-RELATION/FORCED) resolve through spec_for like any other base
+    # arm, with no special-casing here.
+    "A1-TEACH": ArmSpec("A1-TEACH", "brain.arms.soft.arm", "ArmA1", {"variant": "A1", "teach_trains_answer": True}),
     "A1-FIXED": ArmSpec("A1-FIXED", "brain.arms.soft.arm", "ArmA1", {"variant": "A1-FIXED"}, config_from={"fixed_h": ("A1", "final_h")}),
     # edit: Claude (Opus 5.5), 2026-09-26 11:58 +0400 — the attention twins are SOLVED to A1's final COUNT (§4.1), never given
     # A1's width: `fixed_h` = A1's final H put the readout and the wider heads on top of A1's parameters.
