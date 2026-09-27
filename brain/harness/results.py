@@ -33,6 +33,15 @@ its source: KEY's canary (R26), SHIFTED-KEY (built to fail), and the relation co
 rewrite (§4, R22, R23)). A VOID arm fails nothing: its would-be failures are kept as `failed_if_read`, its readings stay
 on the record, and no decision reads it. A VOID SHUFFLED-RELATION twin supplies no null, so the U3 marks that needed its
 band read NOT GRADABLE (TWIN_VOID). RESULTS_VERSION → v2.
+
+edit: Claude (Opus 5.5), 2026-09-27 11:40 +0400 — R44: §4 feeds SHUFFLED-RELATION to A1, A5, E′ and F, and §5 grades U3 as «≥ its bar
+AND above SHUFFLED-RELATION's 95 % band». `graders.grade_u3_family` passes on the bar alone when the band is None, and
+until now a twin was voided only for a failed control (R40): a twin that left NO record — stopped VOID by cost under R43, or
+never run — handed its arm a U3 pass without its null. `missing_relation_twins` now reads that gap for the four arms §4
+names: NOT GRADABLE, TWIN_VOID by cost when the stop's marker (`VOID-BY-COST.json`) is on the twin's directory or on the
+search it loads (E′ and F run no search: their twins load SHUFFLED-RELATION:D's library, R36), TWIN_MISSING otherwise.
+`twin_void` in results.json names every such arm, and VERDICT.md prints them. The arms §4 does not twin keep their U3 on
+the bar alone, as before. RESULTS_VERSION → v3.
 """
 from __future__ import annotations
 
@@ -48,10 +57,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from brain.harness import graders as G  # noqa: E402
-from brain.harness.run import load_tape, load_truth  # noqa: E402
+from brain.harness.run import arm_dirname, load_tape, load_truth  # noqa: E402
 from brain.protocol import canonical_json  # noqa: E402
 
-RESULTS_VERSION = "b1-results-v2"
+RESULTS_VERSION = "b1-results-v3"
 KEY_EXEMPT = ("C0d_CANARY",)
 TWIN_PREFIXES = ("SHUFFLED-NAME:", "SHUFFLED-RELATION:", "FORCED:")
 
@@ -98,15 +107,44 @@ def read_partition(name: str, marks: Mapping[str, Any]) -> Dict[str, Any]:
     return p
 
 
-def without_void_twin(marks: Mapping[str, Any], twin_by: Sequence[str]) -> Dict[str, Any]:
-    """A VOID SHUFFLED-RELATION twin supplies no null: every graded U3 mark (which needs its band) reads NOT GRADABLE."""
+def without_void_twin(marks: Mapping[str, Any], twin_by: Sequence[str], reason_code: str = "TWIN_VOID") -> Dict[str, Any]:
+    """A VOID SHUFFLED-RELATION twin supplies no null: every graded U3 mark (which needs its band) reads NOT GRADABLE.
+    R44: a twin that left no record reads the same, under its own reason (TWIN_MISSING, or TWIN_VOID by cost)."""
     out = dict(marks)
     for k, m in marks.items():
         if k.startswith("U3_") and m.get("graded"):
             out[k] = G._mark(m["mark"], reading=m["reading"], graded=False, passed=None, bar=m.get("bar"),
-                             ceiling=m.get("ceiling"), null=m.get("null"), control=m.get("control"), reason_code="TWIN_VOID",
+                             ceiling=m.get("ceiling"), null=m.get("null"), control=m.get("control"), reason_code=reason_code,
                              fields=dict(m.get("fields") or {}, twin_void_by=list(twin_by)), sources=m.get("sources"),
                              klass=m.get("class", ""))
+    return out
+
+
+# R44 — the arms §4 feeds SHUFFLED-RELATION to (the composition null for U3). E′ and F run no search: their twins load
+# SHUFFLED-RELATION:D's library (R36), so a stop of that search is a stop of their twins.
+RELATION_TWINNED = ("A1", "A5", "E′", "F")
+RELATION_TWIN_SOURCE = {"E′": "SHUFFLED-RELATION:D", "F": "SHUFFLED-RELATION:D"}
+VOID_BY_COST = "VOID-BY-COST.json"
+
+
+def missing_relation_twins(run_dir: Path, names: Sequence[str]) -> Dict[str, Dict[str, Any]]:
+    """R44: an arm §4 twins with SHUFFLED-RELATION whose twin left no graded record has no null — {base: {reason_code, by}}.
+    By cost (TWIN_VOID) when the stop's marker is on the twin's directory or on the search it loads, with the marker's
+    `why`; TWIN_MISSING otherwise. A twin record present is no gap here (its band, or R40's control VOID, as before)."""
+    present = set(names)
+    out: Dict[str, Dict[str, Any]] = {}
+    for base in RELATION_TWINNED:
+        twin = f"SHUFFLED-RELATION:{base}"
+        if base not in present or twin in present:
+            continue
+        stop = None
+        for w in [twin] + ([RELATION_TWIN_SOURCE[base]] if base in RELATION_TWIN_SOURCE else []):
+            f = Path(run_dir) / arm_dirname(w) / VOID_BY_COST
+            if f.exists():
+                stop = (w, str(json.loads(f.read_text()).get("why", "")))
+                break
+        out[base] = ({"reason_code": "TWIN_VOID", "by": [f"VOID_BY_COST: {stop[0]} — {stop[1]}"]} if stop else
+                     {"reason_code": "TWIN_MISSING", "by": [f"MISSING: no {twin} record"]})
     return out
 
 
@@ -166,15 +204,18 @@ def assemble(run_dir: Path, tape_dir: Path, bars: Optional[Mapping[str, Any]] = 
     # 1. the twins first: SHUFFLED-RELATION bands per BASE arm
     bands_by_base: Dict[str, Dict[str, float]] = {}
     twin_void: Dict[str, List[str]] = {}
+    twin_reason: Dict[str, str] = {}
     for n, rec in records.items():
         if n.startswith("SHUFFLED-RELATION:"):
             base = n.split(":", 1)[1]
             marks = G.grade_arm(rec, truth, rows, bars=None, ceilings=ceilings, tape_counts=counts, seed=seed)
             st = arm_status(n, marks)
             if st["void"]:                     # R40: a VOID twin supplies no null
-                twin_void[base] = st["by"]
+                twin_void[base], twin_reason[base] = st["by"], "TWIN_VOID"
                 continue
             bands_by_base[base] = shuffled_relation_bands(marks)
+    for base, gap in missing_relation_twins(run_dir, names).items():   # R44: a twin with no record supplies none either
+        twin_void[base], twin_reason[base] = gap["by"], gap["reason_code"]
 
     # 2. every arm's marks
     arms: Dict[str, Any] = {}
@@ -182,7 +223,7 @@ def assemble(run_dir: Path, tape_dir: Path, bars: Optional[Mapping[str, Any]] = 
         base = n.split(":", 1)[1] if any(n.startswith(p) for p in TWIN_PREFIXES) else n
         marks = G.grade_arm(rec, truth, rows, bars=bars, ceilings=ceilings, twin_bands=bands_by_base.get(base), tape_counts=counts, seed=seed)
         if base in twin_void and not n.startswith("SHUFFLED-RELATION:"):
-            marks = without_void_twin(marks, twin_void[base])
+            marks = without_void_twin(marks, twin_void[base], reason_code=twin_reason[base])
         part = read_partition(n, marks)
         summ = rec["summary"]
         d = Path(rec["dir"])
@@ -321,6 +362,12 @@ def render_verdict(results: Mapping[str, Any]) -> str:
     L.append(f"## The instrument (0c) — {'VOID: ' + inst.get('why', '') if inst.get('void') else 'sound'}")
     L.append(f"- KEY: {'present' if inst.get('key_present') else 'MISSING'}; graded marks {inst.get('key_graded_marks')}; failed {inst.get('key_failed')}")
     L.append(f"- SHIFTED-KEY: {'present' if inst.get('shifted_key_present') else 'missing'}; failed {len(inst.get('shifted_key_failed') or [])} marks")
+    tv = results.get("twin_void") or {}
+    if tv:                                     # R44: a null that is gone is named, never silent
+        L.append("")
+        L.append("## The composition nulls (SHUFFLED-RELATION, §4) — VOID or missing")
+        for b, why in tv.items():
+            L.append(f"- {b}: {why} — its U3 marks read NOT GRADABLE (R40, R44), never a pass on the bar alone")
     for arm, a in results["arms"].items():
         L.append("")
         L.append(f"## {arm}")

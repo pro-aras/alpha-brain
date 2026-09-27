@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -147,6 +148,79 @@ class TestVoidPartitionAndTwinBands(unittest.TestCase):
         self.assertIn("VOID", sec)
         self.assertIn("C0a_SAME", sec)
         self.assertNotIn("failed ['", sec)
+
+
+class TestMissingRelationTwin(unittest.TestCase):
+    """edit: Claude (Opus 5.5), 2026-09-27 11:40 +0400 — R44. §4 feeds SHUFFLED-RELATION to A1, A5, E′ and F (the composition null for
+    U3), and §5 grades U3 as «≥ its bar AND above SHUFFLED-RELATION's 95 % band». `graders.grade_u3_family` passes a mark on
+    the bar alone when the band is None, and `assemble` voided a twin only for a failed control (R40): a twin that left NO
+    record (stopped VOID by cost under R43, or never run) handed its arm a U3 pass without its null. These pin the reading
+    of such a gap: NOT GRADABLE, named — by cost when the stop's marker is on the twin or on the search it loads (E′ and F
+    run no search: their twins load SHUFFLED-RELATION:D's library, R36), missing otherwise."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory(prefix="b1-r44-")
+        self.run = Path(self._tmp.name)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def _stop_d_twin(self) -> None:
+        d = self.run / "SHUFFLED-RELATION_D"
+        d.mkdir()
+        (d / R.VOID_BY_COST).write_text(json.dumps({"why": "planted: the lower bound passed 4.32 in sleep 9 (R43)"}) + "\n")
+
+    def test_e_prime_and_f_read_void_by_cost_from_the_search_they_load(self) -> None:
+        self._stop_d_twin()
+        gaps = R.missing_relation_twins(self.run, ["D", "E′", "F", "A1", "SHUFFLED-RELATION:A1", "A5", "SHUFFLED-RELATION:A5"])
+        self.assertEqual(sorted(gaps), ["E′", "F"])
+        for b in ("E′", "F"):
+            self.assertEqual(gaps[b]["reason_code"], "TWIN_VOID", b)
+            self.assertTrue(gaps[b]["by"] and gaps[b]["by"][0].startswith("VOID_BY_COST"), gaps[b])
+            self.assertIn("SHUFFLED-RELATION:D", gaps[b]["by"][0])
+            self.assertIn("planted", gaps[b]["by"][0])
+
+    def test_a_twin_that_left_no_record_and_no_marker_reads_missing(self) -> None:
+        gaps = R.missing_relation_twins(self.run, ["E′", "A5"])
+        self.assertEqual(sorted(gaps), ["A5", "E′"])
+        for b in ("A5", "E′"):
+            self.assertEqual(gaps[b]["reason_code"], "TWIN_MISSING", b)
+            self.assertEqual(gaps[b]["by"], [f"MISSING: no SHUFFLED-RELATION:{b} record"], b)
+
+    def test_a5s_twin_is_its_own_search_not_ds(self) -> None:
+        self._stop_d_twin()
+        self.assertEqual(R.missing_relation_twins(self.run, ["A5"])["A5"]["reason_code"], "TWIN_MISSING")
+
+    def test_the_arms_4_does_not_twin_are_never_a_gap(self) -> None:
+        self._stop_d_twin()
+        self.assertEqual(R.missing_relation_twins(self.run, ["D", "A0", "A2", "A3", "A4", "A1-FIXED", "A1-MA", "KEY", "RING-READ"]), {})
+
+    def test_a_present_twin_is_no_gap(self) -> None:
+        """The positive control: a twin record present is read as before (its band, or R40's control VOID)."""
+        self._stop_d_twin()
+        names = ["A1", "SHUFFLED-RELATION:A1", "A5", "SHUFFLED-RELATION:A5", "E′", "SHUFFLED-RELATION:E′", "F", "SHUFFLED-RELATION:F"]
+        self.assertEqual(R.missing_relation_twins(self.run, names), {})
+
+    def test_the_gap_reads_through_without_void_twin_with_its_own_reason(self) -> None:
+        m = learner(0.9, 0.8)
+        out = R.without_void_twin(m, ["MISSING: no SHUFFLED-RELATION:E′ record"], reason_code="TWIN_MISSING")
+        for k in ("U3_TWO_AFTER@T_L", "U3_CHAIN@T_L"):
+            self.assertFalse(out[k]["graded"], k)
+            self.assertEqual(out[k]["reason_code"], "TWIN_MISSING", k)
+            self.assertEqual(out[k]["fields"]["twin_void_by"], ["MISSING: no SHUFFLED-RELATION:E′ record"], k)
+        self.assertEqual(R.without_void_twin(m, ["C0e_FROZEN"])["U3_CHAIN@T_L"]["reason_code"], "TWIN_VOID")   # R40's default stands
+
+    def test_the_verdict_names_the_null_that_is_gone(self) -> None:
+        m = R.without_void_twin(learner(0.9, 0.8), ["MISSING: no SHUFFLED-RELATION:E′ record"], reason_code="TWIN_MISSING")
+        res = {"seed": 1, "tape_sha": "0" * 64, "smoke": False, "bars_line": "x",
+               "instrument": {"void": False, "key_present": True, "shifted_key_present": True, "key_graded_marks": 1,
+                              "key_failed": [], "shifted_key_failed": ["U1"]},
+               "arms": {"E′": {"marks": m, "partition": R.read_partition("E′", m), "cost": None, "size": None}},
+               "twin_void": {"E′": ["MISSING: no SHUFFLED-RELATION:E′ record"]},
+               "decisions": R._decisions({"E′": {"marks": m, "partition": R.read_partition("E′", m)}}, {})}
+        text = R.render_verdict(res)
+        self.assertIn("MISSING: no SHUFFLED-RELATION:E′ record", text.split("## E′", 1)[0])
+        self.assertIn("TWIN_MISSING", text)
 
 
 if __name__ == "__main__":

@@ -310,5 +310,73 @@ class TestResultsOnTheSmokeRun(unittest.TestCase):
         self.assertEqual(before, planted["arms"]["KEY"]["marks"]["U3_AFTER@T_L"]["fields"]["renderings"])
 
 
+class TestResultsMissingRelationTwin(unittest.TestCase):
+    """edit: Claude (Opus 5.5), 2026-09-27 11:40 +0400 — R44 through `assemble`, on the smoke run: KEY's record copied as E′ (an arm §4
+    feeds SHUFFLED-RELATION to) and graded with a U3 bar of 1. Before R44, E′'s U3 marks were graded on the bar alone when
+    no twin record existed: no band, a pass without its null. Now: no twin record → NOT GRADABLE (TWIN_MISSING); the R43
+    stop's marker on SHUFFLED-RELATION_D → NOT GRADABLE (TWIN_VOID, by cost); DUMMY's record copied as the twin → graded
+    against its band as before (the positive control). Every mark outside U3 is the same in all three. The marker's name is
+    written as a literal here so that the old code reads the defect, not a missing constant."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        import shutil
+        from brain.harness import graders as G
+        from brain.harness import results as RS
+        run_dir = _SHARED["root"] / "run"
+        tape_dir = _SHARED["root"] / "a"
+        if not (run_dir / "KEY" / "summary.json").exists():
+            from brain.harness import run as R
+            R.run(SEED, ["KEY", "SHIFTED-KEY", "DUMMY"], run_dir, tape_dir, tape_dir / "cache", log=lambda s: None)
+        bars = {"U3": {f: 1 for f in G.U3_LETTER_FAMILIES}, "TRANSFER": 1}
+        cls.res = {}
+        for case in ("missing", "by_cost", "twin"):
+            d = _SHARED["root"] / f"run-r44-{case}"
+            if d.exists():
+                shutil.rmtree(d)
+            d.mkdir()
+            if (run_dir / "inputs.json").exists():
+                shutil.copy(run_dir / "inputs.json", d / "inputs.json")
+            shutil.copytree(run_dir / "KEY", d / "E′")
+            if case == "by_cost":
+                (d / "SHUFFLED-RELATION_D").mkdir()
+                (d / "SHUFFLED-RELATION_D" / "VOID-BY-COST.json").write_text(json.dumps({"why": "planted stop (R43)"}) + "\n")
+            if case == "twin":
+                shutil.copytree(run_dir / "DUMMY", d / "SHUFFLED-RELATION_E′")
+            cls.res[case] = RS.assemble(d, tape_dir, bars=bars)
+
+    def _marks(self, case: str, u3: bool) -> dict:
+        return {k: v for k, v in self.res[case]["arms"]["E′"]["marks"].items() if k.startswith("U3_") == u3}
+
+    def test_the_positive_control_grades_u3_against_the_twins_band(self) -> None:
+        graded = {k: v for k, v in self._marks("twin", True).items() if v["graded"]}
+        self.assertTrue(graded)
+        self.assertEqual(self.res["twin"]["twin_void"], {})
+        for k, v in graded.items():
+            self.assertIsNotNone(v["fields"].get("twin_band_95"), k)
+
+    def test_no_twin_record_reads_not_gradable_never_a_pass_on_the_bar(self) -> None:
+        with_twin = [k for k, v in self._marks("twin", True).items() if v["graded"]]
+        u3 = self._marks("missing", True)
+        for k in with_twin:
+            self.assertFalse(u3[k]["graded"], k)
+            self.assertIsNone(u3[k]["pass"], k)
+            self.assertEqual(u3[k]["reason_code"], "TWIN_MISSING", k)
+        self.assertEqual(self.res["missing"]["twin_void"], {"E′": ["MISSING: no SHUFFLED-RELATION:E′ record"]})
+
+    def test_the_r43_stop_reads_void_by_cost(self) -> None:
+        with_twin = [k for k, v in self._marks("twin", True).items() if v["graded"]]
+        u3 = self._marks("by_cost", True)
+        for k in with_twin:
+            self.assertFalse(u3[k]["graded"], k)
+            self.assertEqual(u3[k]["reason_code"], "TWIN_VOID", k)
+        by = self.res["by_cost"]["twin_void"]["E′"]
+        self.assertTrue(by[0].startswith("VOID_BY_COST") and "planted stop" in by[0], by)
+
+    def test_every_mark_outside_u3_is_unchanged(self) -> None:
+        self.assertEqual(self._marks("missing", False), self._marks("twin", False))
+        self.assertEqual(self._marks("by_cost", False), self._marks("twin", False))
+
+
 if __name__ == "__main__":
     unittest.main()
