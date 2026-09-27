@@ -1,0 +1,40 @@
+=== seed 20261001 ===
+(1) STATE (h 112): ||mean||^2 66.92 · mean ||h-mean||^2 0.0045 · ratio letter/common 1/14,855 · the seat's (0.06/0.735)^2 = 1/150
+    INPUT F_pool (144): ||mean||^2 0.898 · mean ||x-mean||^2 0.1020 · ratio 1/8.8
+(2) STATE sgd-std        : NAME train asks 127/156 (81 %) · distinct 26 · T_L 388/704 (55 %) · distinct 26
+(2) STATE rls            : NAME train asks 148/156 (95 %) · distinct 26 · T_L 483/704 (69 %) · distinct 26
+(2) STATE slda           : NAME train asks 148/156 (95 %) · distinct 26 · T_L 475/704 (67 %) · distinct 26
+(2) STATE imprint-raw    : NAME train asks 79/156 (51 %) · distinct 24 · T_L 199/704 (28 %) · distinct 25
+(2) STATE imprint-scaled : NAME train asks 127/156 (81 %) · distinct 26 · T_L 390/704 (55 %) · distinct 26
+(2) INPUT sgd-std        : NAME train asks 134/156 (86 %) · distinct 26 · T_L 442/704 (63 %) · distinct 26
+(2) INPUT rls            : NAME train asks 151/156 (97 %) · distinct 26 · T_L 471/704 (67 %) · distinct 26
+(2) INPUT slda           : NAME train asks 152/156 (97 %) · distinct 26 · T_L 465/704 (66 %) · distinct 26
+(2) INPUT imprint-raw    : NAME train asks 97/156 (62 %) · distinct 25 · T_L 284/704 (40 %) · distinct 25
+(2) INPUT imprint-scaled : NAME train asks 136/156 (87 %) · distinct 26 · T_L 441/704 (63 %) · distinct 26
+(3) B1.1 A1 T_L NAME conf: n 704 · mean 0.397 · min 0.393 · max 0.398 · answers {'l': 704}
+(3) B1.0 A1 T_L NAME conf: n 704 · mean 0.995 · min 0.994 · max 0.995 · answers {'a': 704}
+(4) F: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 6 · differ 14 · (SAME part, NAME part) {('lib', 'cells'): 13, ('lib', 'net'): 7} · (SAME kind, NAME kind) {('NAME', 'NAME'): 16, ('NAME', 'RESEMBLES'): 4} · e.g. [('SAME:b:latin-lower', 'NAME', 'b', 'NAME', 'l', 'b'), ('SAME:a:latin-upper', 'NAME', 'a', 'NAME', 'l', 'a'), ('SAME:s:latin-upper', 'NAME', 's', 'NAME', 'l', 's')]
+(4) A5: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 10 · differ 10 · (SAME part, NAME part) {('net', 'cells'): 13, ('net', 'net'): 7} · (SAME kind, NAME kind) {('NAME', 'NAME'): 16, ('NAME', 'RESEMBLES'): 4} · e.g. [('SAME:h:latin-lower', 'NAME', 'l', 'NAME', 'h', 'h'), ('SAME:k:latin-lower', 'NAME', 'l', 'RESEMBLES', 'k', 'k'), ('SAME:v:latin-upper', 'NAME', 'l', 'NAME', 'v', 'v')]
+(4) E′: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 6 · differ 14 · (SAME part, NAME part) {('lib', 'cells'): 20} · (SAME kind, NAME kind) {('NAME', 'NAME'): 9, ('NAME', 'UNKNOWN'): 7, ('NAME', 'RESEMBLES'): 4} · e.g. [('SAME:b:latin-lower', 'NAME', 'b', 'NAME', 'l', 'b'), ('SAME:a:latin-upper', 'NAME', 'a', 'UNKNOWN', None, 'a'), ('SAME:s:latin-upper', 'NAME', 's', 'NAME', 'l', 's')]
+(4) D: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 20 · differ 0 · (SAME part, NAME part) {(None, None): 20} · (SAME kind, NAME kind) {('NAME', 'NAME'): 20} · e.g. []
+(4) A0: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 0 · differ 20 · (SAME part, NAME part) {(None, None): 20} · (SAME kind, NAME kind) {('NOTHING', 'NAME'): 9, ('NOTHING', 'UNKNOWN'): 7, ('NOTHING', 'RESEMBLES'): 4} · e.g. [('SAME:b:latin-lower', 'NOTHING', None, 'NAME', 'l', 'b'), ('SAME:a:latin-upper', 'NOTHING', None, 'UNKNOWN', None, 'a'), ('SAME:h:latin-lower', 'NOTHING', None, 'NAME', 'h', 'h')]
+=== seed 20261002 ===
+(1) STATE (h 111): ||mean||^2 64.24 · mean ||h-mean||^2 0.0047 · ratio letter/common 1/13,569 · the seat's (0.06/0.735)^2 = 1/150
+    INPUT F_pool (144): ||mean||^2 0.897 · mean ||x-mean||^2 0.1025 · ratio 1/8.8
+(2) STATE sgd-std        : NAME train asks 126/156 (81 %) · distinct 26 · T_L 390/704 (55 %) · distinct 26
+(2) STATE rls            : NAME train asks 145/156 (93 %) · distinct 26 · T_L 487/704 (69 %) · distinct 26
+(2) STATE slda           : NAME train asks 143/156 (92 %) · distinct 26 · T_L 477/704 (68 %) · distinct 26
+(2) STATE imprint-raw    : NAME train asks 79/156 (51 %) · distinct 25 · T_L 215/704 (31 %) · distinct 24
+(2) STATE imprint-scaled : NAME train asks 126/156 (81 %) · distinct 26 · T_L 390/704 (55 %) · distinct 26
+(2) INPUT sgd-std        : NAME train asks 139/156 (89 %) · distinct 26 · T_L 447/704 (63 %) · distinct 26
+(2) INPUT rls            : NAME train asks 149/156 (96 %) · distinct 26 · T_L 457/704 (65 %) · distinct 26
+(2) INPUT slda           : NAME train asks 151/156 (97 %) · distinct 26 · T_L 450/704 (64 %) · distinct 26
+(2) INPUT imprint-raw    : NAME train asks 94/156 (60 %) · distinct 25 · T_L 288/704 (41 %) · distinct 25
+(2) INPUT imprint-scaled : NAME train asks 139/156 (89 %) · distinct 26 · T_L 449/704 (64 %) · distinct 26
+(3) B1.1 A1 T_L NAME conf: n 704 · mean 0.261 · min 0.259 · max 0.261 · answers {'n': 704}
+(3) B1.0 A1 T_L NAME conf: n 704 · mean 0.994 · min 0.994 · max 0.994 · answers {'a': 704}
+(4) F: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 7 · differ 13 · (SAME part, NAME part) {('lib', 'cells'): 14, ('lib', 'net'): 6} · (SAME kind, NAME kind) {('NAME', 'RESEMBLES'): 7, ('NAME', 'NAME'): 13} · e.g. [('SAME:g:latin-lower', 'NAME', 'g', 'RESEMBLES', 'o', 'g'), ('SAME:m:latin-upper', 'NAME', 'm', 'NAME', 'k', 'm'), ('SAME:r:latin-lower', 'NAME', 'r', 'NAME', 'k', 'r')]
+(4) A5: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 6 · differ 14 · (SAME part, NAME part) {('net', 'cells'): 14, ('net', 'net'): 6} · (SAME kind, NAME kind) {('NAME', 'RESEMBLES'): 7, ('NAME', 'NAME'): 13} · e.g. [('SAME:g:latin-lower', 'NAME', 'y', 'RESEMBLES', 'o', 'g'), ('SAME:u:latin-upper', 'NAME', 'y', 'NAME', 'u', 'u'), ('SAME:a:latin-lower', 'NAME', 'y', 'NAME', 'f', 'a')]
+(4) E′: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 7 · differ 13 · (SAME part, NAME part) {('lib', 'cells'): 20} · (SAME kind, NAME kind) {('NAME', 'RESEMBLES'): 7, ('NAME', 'UNKNOWN'): 6, ('NAME', 'NAME'): 7} · e.g. [('SAME:g:latin-lower', 'NAME', 'g', 'RESEMBLES', 'o', 'g'), ('SAME:m:latin-upper', 'NAME', 'm', 'UNKNOWN', None, 'm'), ('SAME:r:latin-lower', 'NAME', 'r', 'UNKNOWN', None, 'r')]
+(4) D: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 20 · differ 0 · (SAME part, NAME part) {(None, None): 20} · (SAME kind, NAME kind) {('NAME', 'NAME'): 20} · e.g. []
+(4) A0: CONTROL_SAME asks 20 · paired 20 · SAME == NAME on the same rendering 0 · differ 20 · (SAME part, NAME part) {(None, None): 20} · (SAME kind, NAME kind) {('NOTHING', 'RESEMBLES'): 7, ('NOTHING', 'UNKNOWN'): 6, ('NOTHING', 'NAME'): 7} · e.g. [('SAME:g:latin-lower', 'NOTHING', None, 'RESEMBLES', 'o', 'g'), ('SAME:m:latin-upper', 'NOTHING', None, 'UNKNOWN', None, 'm'), ('SAME:u:latin-upper', 'NOTHING', None, 'NAME', 'u', 'u')]
