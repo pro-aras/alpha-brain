@@ -21,6 +21,20 @@ The letters stage as an experiment (`docs/brain/B1-PREREG.md`, signed; `docs/bra
 
 **F1 — The eye's features separate the letters for a reader that does not learn.** Nearest class mean (cosine) over the 5×144 glances of the TEACH rows — the SAME numbers every network arm receives through `StepEncoder` (`cache.glances(row)[i]`) — names **135/156 (87 %) and 134/156 (86 %)** of the NAME training asks before the CONST block, and **451–460/704 (64–65 %) and 443–455/704 (63–65 %)** of T_L's NAME asks on unseen fonts (seeds 1, 2). Only the last glance: 46–47 % and 33–36 %. Each glance is unit-norm; features lie in 0–0.42, mean 0.048. (`docs/brain/r2/probe_centroid.py`, output `probe_centroid.out`.)
 
+**F11 — The network's STATE keeps the letters; its own answer head does not read them** (seed 1; A1's final B1.0 snapshot; every glance run through A1's own NAME-ask road from one fixed start state, no learning; `docs/brain/r2/probe_state.py`, output `probe_state.out` — the other arms and seed 2 are appended there as they finish):
+
+| reader | before CONST (taught fonts) | T_L NAME (unseen fonts) |
+|---|---|---|
+| input, nearest class mean (F1) | 135/156 (87 %) | 451/704 (64 %) |
+| **input, logistic regression** (standardised, full batch, 2,000 steps) | **155/156 (99 %)** | **514/704 (73 %)** |
+| A1's state h (114 units), nearest class mean | 96/156 (62 %) | 304/704 (43 %) |
+| **A1's state h, logistic regression** (same recipe) | **149/156 (96 %)** | **485/704 (69 %)** |
+| **A1's OWN NAME head on that same state** | **0/156** | 60/704 (9 %), one distinct answer |
+
+The states are a tight cloud: the mean distance of a state from the mean state is **0.060**, against a mean |h| of **0.735** per unit (near saturation). The letter sits in those small deviations — a standardised linear reader recovers it at 96 %; the arm's head, trained by a few lr-0.01 steps on RAW states, reads only the shared part and gives one answer. [Certain for the numbers; the reading of why is the debate's.]
+
+**F12 — What a well-trained linear readout of the INPUT reaches:** 99 % on taught fonts, 73 % on unseen fonts (seed 1, table above). The eye gives a simple learner everything it needs; the rule library D reaches 0.853 / 0.769 on U1a (F6).
+
 **F2 — Every learned network names at chance before any interference; only the cells and the rule library name** (NAME-cue training asks before the first CONST ask; B1.0 records `/data/dev/brain-runs/b1/runs/<seed>/<arm>/answers.jsonl`; chance = 156 ÷ 26 = 6):
 
 | arm (what it is) | seed 1 | seed 2 |
