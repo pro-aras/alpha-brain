@@ -1,0 +1,13 @@
+seed 20261001 · A1 final snapshot · h 112 units · names heard 37 · TEACH 624 · NAME train asks 156 · T_L NAME 704
+(a) WORLD letter head after 5 TEACH glances: TEACH rows 24/624 (4 %) · distinct answers 1 · NAME train asks 6/156 (4 %) · distinct answers 1 · T_L 24/704 (3 %) · distinct answers 1
+(b) NAME head on the ask road: NAME train asks 0/156 (0 %) · distinct answers 1 · T_L 0/704 (0 %) · distinct answers 1
+    states on the ask road: mean distance from the mean state 0.063 · |h| mean 0.708 · mean-state norm 8.180
+    state-LR (standardised, full batch): NAME train asks 152/156 · T_L 497/704 · state-NCM: 94/156 · 308/704
+/data/dev/genome-wt-brain2/docs/brain/r2/probe_world_head.py:120: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  f" · |bias| mean {float(getattr(e, f'b_{g}')[:act].abs().mean()):.4f}")
+(c) gate r: ||W_ih||_F 6.269 (mean |w| 0.0354, glance cols 0.0351, one-hot cols 0.0361) · ||W_hh||_F 4.674 (mean |w| 0.0286; initial block rows<64 0.0218; born rows>=64 0.0438) · |bias| mean 0.0296
+(c) gate z: ||W_ih||_F 6.379 (mean |w| 0.0356, glance cols 0.0350, one-hot cols 0.0369) · ||W_hh||_F 5.262 (mean |w| 0.0323; initial block rows<64 0.0316; born rows>=64 0.0427) · |bias| mean 0.1034
+(c) gate n: ||W_ih||_F 11.136 (mean |w| 0.0470, glance cols 0.0425, one-hot cols 0.0574) · ||W_hh||_F 6.534 (mean |w| 0.0409; initial block rows<64 0.0479; born rows>=64 0.0489) · |bias| mean 0.1667
+(d) d = 144: update 316 µs/event · read 45.9 µs/event · the LDA solve (once per sleep) 15.0 ms
+(d) d = 112: update 569 µs/event · read 5.2 µs/event · the LDA solve (once per sleep) 4.0 ms
