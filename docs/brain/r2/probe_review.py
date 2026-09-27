@@ -5,7 +5,7 @@ On B1.1's records, both seeds, A1's FINAL snapshot, the NAME-ask road from one f
  (2) the SAME online readers, one pass over the 624 TEACH rows in tape order, on the STATE and on the INPUT (F_pool: the unit-normalised
      mean glance, the creature's BIND pooling) — does the trunk cost naming for an online reader?  sgd-std · rls · slda (running class
      means + a shared covariance, shrinkage 1e-4, the precision solved at the end of the pass) · imprint (sgd-std whose new row is born
-     from its first standardised example: unscaled, and scaled by 1/d);
+     from its first standardised example: unscaled, unit-norm, and scaled by 1/d);
  (3) A1's OWN confidence at T_L (raw.conf in answers.jsonl), B1.1 and B1.0 — the seat wrote «0/156 answered at 97 % confidence»;
  (4) the hybrids' SAME control: on B1.1's F and A5 records, each SAME ask paired with its SAME_NAME_REF NAME ask on the identical
      rendering (the tape's operand row), the two answers and the parts that gave them (raw.routed_to) — a routing defect, or two namers
@@ -45,7 +45,7 @@ def run_readers(Xt, yt_names, Xp, Xl, names_all):
     """one pass over (Xt, yt) in order; returns {reader: (pred_pre, pred_tl)} as name strings"""
     d = Xt.shape[1]
     out = {}
-    for reader in ("sgd-std", "rls", "slda", "imprint-raw", "imprint-scaled"):
+    for reader in ("sgd-std", "rls", "slda", "imprint-raw", "imprint-unit", "imprint-scaled"):
         w = Welford(d); names = []
         W = np.zeros((0, d)); b = np.zeros(0)                       # sgd heads (rows per name)
         P = np.eye(d + 1) / 0.01; Wr = np.zeros((d + 1, 0))          # rls
@@ -54,15 +54,16 @@ def run_readers(Xt, yt_names, Xp, Xl, names_all):
             w.add(x); z = (x - w.mu) / w.std()
             if y not in names:
                 names.append(y)
-                if reader in ("sgd-std", "imprint-raw", "imprint-scaled"):
+                if reader in ("sgd-std", "imprint-raw", "imprint-unit", "imprint-scaled"):
                     row = np.zeros(d)
                     if reader == "imprint-raw": row = z.copy()
+                    if reader == "imprint-unit": row = z / (np.linalg.norm(z) + 1e-12)
                     if reader == "imprint-scaled": row = z / d
                     W = np.vstack([W, row]); b = np.append(b, 0.0)
                 Wr = np.hstack([Wr, np.zeros((d + 1, 1))])
                 mus[y] = np.zeros(d); cnt[y] = 0
             k = names.index(y)
-            if reader in ("sgd-std", "imprint-raw", "imprint-scaled"):
+            if reader in ("sgd-std", "imprint-raw", "imprint-unit", "imprint-scaled"):
                 logits = W @ z + b; p = np.exp(logits - logits.max()); p /= p.sum(); p[k] -= 1.0
                 W -= 0.01 * np.outer(p, z); b -= 0.01 * p
             elif reader == "rls":
@@ -75,7 +76,7 @@ def run_readers(Xt, yt_names, Xp, Xl, names_all):
                 S += np.outer(z, z); nS += 1
         def finish_pred(X):
             Z = (X - w.mu) / w.std()
-            if reader in ("sgd-std", "imprint-raw", "imprint-scaled"):
+            if reader in ("sgd-std", "imprint-raw", "imprint-unit", "imprint-scaled"):
                 return [names[i] for i in (Z @ W.T + b).argmax(1)]
             if reader == "rls":
                 Za = np.hstack([Z, np.ones((len(Z), 1))]); return [names[i] for i in (Za @ Wr).argmax(1)]

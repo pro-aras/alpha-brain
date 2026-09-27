@@ -5,11 +5,13 @@
 (2) STATE rls            : NAME train asks 148/156 (95 %) · distinct 26 · T_L 483/704 (69 %) · distinct 26
 (2) STATE slda           : NAME train asks 148/156 (95 %) · distinct 26 · T_L 475/704 (67 %) · distinct 26
 (2) STATE imprint-raw    : NAME train asks 79/156 (51 %) · distinct 24 · T_L 199/704 (28 %) · distinct 25
+(2) STATE imprint-unit   : NAME train asks 124/156 (79 %) · distinct 26 · T_L 384/704 (55 %) · distinct 26
 (2) STATE imprint-scaled : NAME train asks 127/156 (81 %) · distinct 26 · T_L 390/704 (55 %) · distinct 26
 (2) INPUT sgd-std        : NAME train asks 134/156 (86 %) · distinct 26 · T_L 442/704 (63 %) · distinct 26
 (2) INPUT rls            : NAME train asks 151/156 (97 %) · distinct 26 · T_L 471/704 (67 %) · distinct 26
 (2) INPUT slda           : NAME train asks 152/156 (97 %) · distinct 26 · T_L 465/704 (66 %) · distinct 26
 (2) INPUT imprint-raw    : NAME train asks 97/156 (62 %) · distinct 25 · T_L 284/704 (40 %) · distinct 25
+(2) INPUT imprint-unit   : NAME train asks 139/156 (89 %) · distinct 26 · T_L 438/704 (62 %) · distinct 26
 (2) INPUT imprint-scaled : NAME train asks 136/156 (87 %) · distinct 26 · T_L 441/704 (63 %) · distinct 26
 (3) B1.1 A1 T_L NAME conf: n 704 · mean 0.397 · min 0.393 · max 0.398 · answers {'l': 704}
 (3) B1.0 A1 T_L NAME conf: n 704 · mean 0.995 · min 0.994 · max 0.995 · answers {'a': 704}
@@ -25,11 +27,13 @@
 (2) STATE rls            : NAME train asks 145/156 (93 %) · distinct 26 · T_L 487/704 (69 %) · distinct 26
 (2) STATE slda           : NAME train asks 143/156 (92 %) · distinct 26 · T_L 477/704 (68 %) · distinct 26
 (2) STATE imprint-raw    : NAME train asks 79/156 (51 %) · distinct 25 · T_L 215/704 (31 %) · distinct 24
+(2) STATE imprint-unit   : NAME train asks 131/156 (84 %) · distinct 26 · T_L 389/704 (55 %) · distinct 26
 (2) STATE imprint-scaled : NAME train asks 126/156 (81 %) · distinct 26 · T_L 390/704 (55 %) · distinct 26
 (2) INPUT sgd-std        : NAME train asks 139/156 (89 %) · distinct 26 · T_L 447/704 (63 %) · distinct 26
 (2) INPUT rls            : NAME train asks 149/156 (96 %) · distinct 26 · T_L 457/704 (65 %) · distinct 26
 (2) INPUT slda           : NAME train asks 151/156 (97 %) · distinct 26 · T_L 450/704 (64 %) · distinct 26
 (2) INPUT imprint-raw    : NAME train asks 94/156 (60 %) · distinct 25 · T_L 288/704 (41 %) · distinct 25
+(2) INPUT imprint-unit   : NAME train asks 138/156 (88 %) · distinct 26 · T_L 448/704 (64 %) · distinct 26
 (2) INPUT imprint-scaled : NAME train asks 139/156 (89 %) · distinct 26 · T_L 449/704 (64 %) · distinct 26
 (3) B1.1 A1 T_L NAME conf: n 704 · mean 0.261 · min 0.259 · max 0.261 · answers {'n': 704}
 (3) B1.0 A1 T_L NAME conf: n 704 · mean 0.994 · min 0.994 · max 0.994 · answers {'a': 704}
