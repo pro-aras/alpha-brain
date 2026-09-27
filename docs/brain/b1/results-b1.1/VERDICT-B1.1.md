@@ -59,3 +59,12 @@ KEY fails nothing; SHIFTED-KEY fails U1b and U2b (a shifted answer stream cannot
   - Every learner fails CONST.
 - **Named, not yet declared:** D's constant gap. A rule library that cannot say «always a» fails the simplest rule there is (his IF / THEN includes «whatever it is, answer a»). The next D declaration adds a name constant to its program language and re-runs D and its twin — the only way D can be READ by the letter.
 - **Tonight:** B1.2 «THE READER» (R49 + its addendum) on these tapes. Its network arms meet the same CONST control; a VOID there reads «not computable» under R49's rule, with the would-be marks printed. IN-SLDA answers NOTHING to every relation cue by design, so CONST is NOT APPLICABLE to it (R38).
+
+## Correction (2026-09-28 02:38 +0400, Claude (Opus 5.5)) — R51
+- **The fault:** the v4 records graded D's own U3 on the bar alone wherever SHUFFLED-RELATION:D left no record. On B1.1 that is seed 2, whose twin was VOID by cost at 18:33. R44's list omitted D, although D's own U3 has been twinned since R36.
+- **The re-grade (b1-results-v4.1, `results-b1.1/<seed>/v4.1/`; the v4 records are kept):**
+  - Seed 2: 29 changed paths, all D's. Every graded U3 mark reads NOT GRADABLE, TWIN_VOID by cost.
+  - Seed 1, the control: 0 changed paths, with `version` and `prereg_sha` masked, graded on v4's arm set (the 23:14 IN-SLDA runs left out; `/data/dev/brain-runs/b1.1/regrade-r51/README.md`).
+- **What changes above:** nothing decided — D is VOID by C0a_CONST at both seeds.
+  - D's would-be U3 readings at seed 2 are readings without a null, as the «Settled» line already says («with its shuffled twin at 0 where it exists (seed 1 here …)»).
+  - The U3 rows of D's table for seed 2 read NOT GRADABLE by R51.
