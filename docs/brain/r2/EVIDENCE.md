@@ -44,7 +44,7 @@ The states are a tight cloud: the mean distance of a state from the mean state i
 | recursive least squares on the running-centred state | 130/156 (83 %) | 447/704 (63 %) | 26 |
 | running class prototypes on the standardised state (nearest, cosine) | 110/156 (71 %) | 331/704 (47 %) | 26 |
 
-The raw recipe reproduces A1's failure exactly; standardising the state before the head — nothing else changed: the same rule, rate, pass and examples — learns the letters. [Certain for the numbers, seed 1 only; seed 2 and the other arms to follow.]
+The raw recipe reproduces A1's failure exactly; standardising the state before the head — nothing else changed: the same rule, rate, pass and examples — learns the letters. [Certain for the numbers.] **Seed 2 replicates it** (A1, h 111): sgd-raw 6/156 (4 %), 26/704, one answer · sgd-std 124/156 (79 %), 378/704 (54 %) · rls 141/156 (90 %), 464/704 (66 %) · proto 118/156 (76 %), 330/704 (47 %).
 
 **F2 — Every learned network names at chance before any interference; only the cells and the rule library name** (NAME-cue training asks before the first CONST ask; B1.0 records `/data/dev/brain-runs/b1/runs/<seed>/<arm>/answers.jsonl`; chance = 156 ÷ 26 = 6):
 

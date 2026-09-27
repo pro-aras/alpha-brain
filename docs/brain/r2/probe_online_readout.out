@@ -3,3 +3,8 @@ seed 20261001 · A1 states (h 114) · one pass over 624 TEACH rows in tape order
   sgd-std : before CONST 131/156 (84 %) · T_L 389/704 (55 %) · distinct T_L answers 26
   rls     : before CONST 130/156 (83 %) · T_L 447/704 (63 %) · distinct T_L answers 26
   proto   : before CONST 110/156 (71 %) · T_L 331/704 (47 %) · distinct T_L answers 26
+seed 20261002 · A1 states (h 111) · one pass over 624 TEACH rows in tape order · chance 3.8 %
+  sgd-raw : before CONST 6/156 (4 %) · T_L 26/704 (4 %) · distinct T_L answers 1
+  sgd-std : before CONST 124/156 (79 %) · T_L 378/704 (54 %) · distinct T_L answers 26
+  rls     : before CONST 141/156 (90 %) · T_L 464/704 (66 %) · distinct T_L answers 26
+  proto   : before CONST 118/156 (76 %) · T_L 330/704 (47 %) · distinct T_L answers 26
