@@ -98,7 +98,9 @@ _BASE: Dict[str, ArmSpec] = {
     # at 50,000 and the depth factor at sleep 3 (tools/b1/d_budget.py → docs/brain/b1/stage-1/d-budget.json; R37).
     # edit: Claude (Opus 5.5), 2026-09-26 22:13 +0400 — R42: B1-PREREG §12's projection rule fired on SHUFFLED-RELATION:D (sleep 5, r = 3.2423);
     # the shared number re-priced 703,000 → 216,000 (tools/b1/d_reprice.py; docs/brain/b1/stage-1/d-budget.json keeps the old and the reading).
-    "D": ArmSpec("D", "brain.arms.library.arm", "LibraryArm", {"candidates_per_sleep": 216000}),
+    # edit: Claude (Opus 5.5), 2026-09-27 12:49 +0400 — R45: the 11:44 outage killed both twin searches mid-sleep after the second fire
+    # (lower bound 4.12, no close); on Ahmad's 12:48 word the shared number goes to the FLOOR, 216,000 → 50,000 (r priced at 4.32).
+    "D": ArmSpec("D", "brain.arms.library.arm", "LibraryArm", {"candidates_per_sleep": 50000}),
     # the hybrids (brain/hybrids/router.py): D inside E′ / F loads D's OWN snapshots (R9) — the dependency is named
     "A5": ArmSpec("A5", "brain.hybrids.router", "ArmA5"),
     "A6": ArmSpec("A6", "brain.hybrids.router", "ArmA6", {"partner": "A3"}),
