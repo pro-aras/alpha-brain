@@ -168,3 +168,53 @@
   - **B1.1 is graded by the letter:** the record's `ms_per_event` against 307.521 (R33), unchanged. Beside every COST mark the verdict prints the run's `load1_at_end` and, where it exists, the same arm's B1.0 reading. A FAIL at load ≥ 8 is annotated «measured under crowding» — descriptive; the mark stands.
   - **A1's growth buffers:** the A1 family's COST FAIL (430–445 ms per event, `hmax` 1,024) is recorded with its cause — A1-FIXED at the same live width reads 43–51 (F15; Fable's `probe_cost_hmax.out`) — a cost of pre-allocation, not of learning.
   - **From B1.2 on**, COST is read from a SOLO probe declared before the run: each arm alone, at load < 2, over a fixed slice of its tape that contains at least one SLEEP; that slice's ms per event is graded against the bar. The crowded run's reading is printed beside it and never graded.
+- **R49 (B1.2 «THE READER» — declared 2026-09-27 20:31 +0400, Claude (Opus 5.5), on Ahmad's 20:27 word «Ok go ahead then, release one builder», from brain r2's CONCLUSION-R2 co-signed by the seat and Fable 5.1 (genome master bb37a4b), BEFORE any code or run):**
+  - **The question:** is the networks' naming failure the READOUT (fixable at no cost), and does the letters brain's namer live in the network's state or over the organ's own features?
+  - **The world:** B1.1's tapes and caches (`/data/dev/brain-runs/b1.1`), both seeds; the frozen `brain.protocol` Arm; no new world; no bar moved. B1.2's records land beside B1.1's in `b1.1/runs/<seed>/` only AFTER B1.1's own grade is written, so the B1.1 verdict is read on B1.1's arms alone.
+  - **Pre-flight — done:**
+    - F13's gate is met (brain r2 `probe_review.out`: standardised SGD 81 %, RLS 93–95 % on B1.1's A1 states).
+    - Per case, the one-pass streaming LDA at the declared ε (`docs/brain/b1/b12/probe_ceilings.out`; the U1a asks plus the 20 SAME_NAME_REF letters):
+      - F_pool: 0.870 / 0.875 (seed 1), 0.844 / 0.886 (seed 2);
+      - A1's state: 0.818 / 0.842, 0.830 / 0.835 — upper / lower each.
+    - Every bar (0.669 upper, 0.778 lower) sits below the offline reading. A full-batch logistic regression reads LOWER (0.74–0.84: it fits the 4 TEACH fonts), so it is not a ceiling.
+  - **The arms** — config switches on `ArmA1` unless named; each ONE difference from its neighbour:
+    - A1 and A1-TEACH — B1.1's records, the controls that must still fail;
+    - → **A1-NORM** (`head_norm`: every answer head reads the state standardised by per-unit running statistics);
+    - → **A1-NORM-TEACH** (+ R46's `teach_trains_answer`);
+    - → **A1-NORM-RLS** (the NAME head by recursive least squares on the centred state);
+    - → **A1-NORM-SLDA** (the NAME head a streaming LDA: **S1** the WITHIN-letter covariance; **S2** the relative shrinkage ε a declared constant, A1's state 0.01 (seed 1) / 0.03 (seed 2) — the TEACH-only leave-one-font-out rule's choice, applied offline by the seat, since no arm may read a TEACH row's font);
+    - **IN-SLDA** — the same reader on F_pool (the unit-normalised mean of the 5 glances), no network; ε 0.1 / 0.3; every relation cue NOTHING; a harness arm reading the cache, never the truth;
+    - **A1-STD-IN** — the input glances standardised by running statistics, the heads raw, from A1-TEACH;
+    - **A1-HMAX** — A1-NORM-TEACH at `hmax` = its own final H + 64: the cost twin.
+  - **The learned-state law:** every running statistic, P, W, μ, Σ and Λ is in `state_sha`, in `snapshot` / `load`, and FROZEN under `answer(learn=False)`. A sitting where one moves is VOID (control 0e).
+  - **Twins:**
+    - SHUFFLED-NAME, SHUFFLED-RELATION and FORCED for A1-NORM-TEACH, A1-NORM-RLS and A1-NORM-SLDA;
+    - SHUFFLED-NAME and FORCED for IN-SLDA (no relation road: its U3 is NOT APPLICABLE, R38);
+    - SHUFFLED-NAME for A1-NORM and A1-STD-IN; none for A1-HMAX.
+  - **Controls:**
+    - identity — every switch off ≡ A1, byte for byte;
+    - freezing (0e);
+    - the conditioning toy — a raw head gives one answer, `head_norm` separates;
+    - S1's toy — a planted total-scatter twin reads lower;
+    - S2's scale invariance; one-showing naming; the band's UNKNOWN;
+    - KEY / SHIFTED-KEY, CANARY, CONST / SAME, and the §3.1 replay identity on every new arm;
+    - the road control — each arm's offline one-pass reader on its own final states within 10 pp of its live U1a on taught fonts.
+  - **COST:** by R48 — a solo probe per new arm, load < 2, a fixed slice with at least one SLEEP.
+  - **Predictions, on the record:**
+    - **P1** A1 and A1-TEACH at chance, one T_L answer.
+    - **P2** A1-NORM-TEACH: U1a ≥ 0.40 on both cases at both seeds, ≥ 20 distinct answers, above its SHUFFLED-NAME band.
+    - **P3** A1-NORM under A1-NORM-TEACH by ≥ 10 pp.
+    - **P4** IN-SLDA ≥ A1-NORM-SLDA by ≈ 3–4 pp on U1a; A1-NORM-RLS under both.
+    - **P5** U6: IN-SLDA and A1-NORM-SLDA name `zog` ≥ 4 of 10.
+    - **P6** U2a: IN-SLDA refuses ≥ 32 of 40; FORCED:IN-SLDA fails it.
+    - **P7** U3 on the network arms under every bar (the trunk's objective is the next defect).
+    - **P8** KEEPS ≤ 5 pp for the SLDA arms.
+    - **P9** COST solo: IN-SLDA < 5 ms per event; A1-HMAX under 307.
+    - **P10** A1-STD-IN above A1 and under A1-NORM-TEACH.
+  - **The decision:**
+    - above the SHUFFLED-NAME twin's band at both seeds on U1a AND a U3 family above its bar and its SHUFFLED-RELATION band at both seeds → the network is REINSTATED for naming and order;
+    - U1a only → the READER is reinstated and the network's order claim stays open;
+    - neither → the network stays a passenger.
+    
+    The namer of the hybrids' next declaration is the better of IN-SLDA and A1-NORM-SLDA on U1a at both seeds; a tie goes to IN-SLDA (network-free, cheaper).
+  - **Built** by ONE Opus 5.5 builder (brief `/data/dev/briefs/b12-reader.md`), test-first, in `/data/dev/genome-wt-b12` (branch `b1-reader` from b1-tape2), and gated by the seat. **Cost:** ≈ 34 network runs × ≈ 1.45 h ≈ 49 CPU-h — A1-NORM-RLS is cut first if the night runs short — plus IN-SLDA's minutes; ≈ 3.5–5 h wall on 14 slots, launched after B1.1's last units end and its grade is written.

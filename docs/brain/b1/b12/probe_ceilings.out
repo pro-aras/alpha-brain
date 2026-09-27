@@ -1,0 +1,10 @@
+seed 20261001 · U1a asks 704 · bars: latin-lower 0.778, latin-upper 0.669 (bars.json)
+  CEILING F_pool (standardised LR, full batch) : {'latin-upper': '264/347 (0.761)', 'latin-lower': '250/297 (0.842)'}
+  CEILING A1 state (112 units)               : {'latin-upper': '255/347 (0.735)', 'latin-lower': '242/297 (0.815)'}
+  one-pass SLDA F_pool at ε 0.1            : {'latin-upper': '302/347 (0.870)', 'latin-lower': '260/297 (0.875)'}
+  one-pass SLDA A1 state at ε 0.01         : {'latin-upper': '284/347 (0.818)', 'latin-lower': '250/297 (0.842)'}
+seed 20261002 · U1a asks 704 · bars: latin-lower 0.778, latin-upper 0.669 (bars.json)
+  CEILING F_pool (standardised LR, full batch) : {'latin-upper': '264/347 (0.761)', 'latin-lower': '247/297 (0.832)'}
+  CEILING A1 state (111 units)               : {'latin-upper': '266/347 (0.767)', 'latin-lower': '238/297 (0.801)'}
+  one-pass SLDA F_pool at ε 0.3            : {'latin-upper': '293/347 (0.844)', 'latin-lower': '263/297 (0.886)'}
+  one-pass SLDA A1 state at ε 0.03         : {'latin-upper': '288/347 (0.830)', 'latin-lower': '248/297 (0.835)'}
