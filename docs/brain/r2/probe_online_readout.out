@@ -1,0 +1,5 @@
+seed 20261001 · A1 states (h 114) · one pass over 624 TEACH rows in tape order · chance 3.8 %
+  sgd-raw : before CONST 6/156 (4 %) · T_L 26/704 (4 %) · distinct T_L answers 1
+  sgd-std : before CONST 131/156 (84 %) · T_L 389/704 (55 %) · distinct T_L answers 26
+  rls     : before CONST 130/156 (83 %) · T_L 447/704 (63 %) · distinct T_L answers 26
+  proto   : before CONST 110/156 (71 %) · T_L 331/704 (47 %) · distinct T_L answers 26

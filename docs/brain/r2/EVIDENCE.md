@@ -35,6 +35,17 @@ The states are a tight cloud: the mean distance of a state from the mean state i
 
 **F12 — What a well-trained linear readout of the INPUT reaches:** 99 % on taught fonts, 73 % on unseen fonts (seed 1, table above). The eye gives a simple learner everything it needs; the rule library D reaches 0.853 / 0.769 on U1a (F6).
 
+**F13 — One change to the readout turns chance into 84 %, in ONE pass of the same examples** (seed 1; A1's final states as in F11; four ONLINE readers see the 624 single-letter TEACH rows once, in tape order — 24 showings per letter, what the tape gives; `docs/brain/r2/probe_online_readout.py`, output `probe_online_readout.out`):
+
+| online reader, one pass | before CONST | T_L NAME (unseen fonts) | distinct T_L answers |
+|---|---|---|---|
+| **A1's own recipe** (zero-init rows, cross-entropy SGD lr 0.01, RAW state) | 6/156 (4 %) | 26/704 (4 %) | 1 |
+| **the same rule, the state standardised by its running mean / std** (Welford) | **131/156 (84 %)** | **389/704 (55 %)** | 26 |
+| recursive least squares on the running-centred state | 130/156 (83 %) | 447/704 (63 %) | 26 |
+| running class prototypes on the standardised state (nearest, cosine) | 110/156 (71 %) | 331/704 (47 %) | 26 |
+
+The raw recipe reproduces A1's failure exactly; standardising the state before the head — nothing else changed: the same rule, rate, pass and examples — learns the letters. [Certain for the numbers, seed 1 only; seed 2 and the other arms to follow.]
+
 **F2 — Every learned network names at chance before any interference; only the cells and the rule library name** (NAME-cue training asks before the first CONST ask; B1.0 records `/data/dev/brain-runs/b1/runs/<seed>/<arm>/answers.jsonl`; chance = 156 ÷ 26 = 6):
 
 | arm (what it is) | seed 1 | seed 2 |
