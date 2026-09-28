@@ -107,3 +107,10 @@ So that ONE grader serves the bench and the body, and rung 1's gate compares lik
 - The organs' road: `point` → `{"point": k | None, "none": b, "none_i": b}` or `{"point": None, "none": None, "unheard": […]}`; `what` → `{"emit": […]}`; `say` → `{"spoken": […] | None, "reason", "target", "readback_point": None}`.
 - Every journaled answer row also carries `fix` (the canvas's located fixation cells, in glance order) and `hyps` (the eye's hypotheses as member lists, indices into `fix`). The grader maps a pointed hypothesis to a thing and reads coverage from these and the truth file, never from the offline caches.
 - Sent to builders A and C at the stamp above.
+
+## 9 · ADDENDUM 2 (the seat, 2026-09-28 20:27 +0400) — the fingertip, the truth rows, one tape day
+- An ask that carries `box` also carries `centroid: [cy, cx]`, the pointed thing's rendered ink centroid (`W.render_scene(scene)[1][target]`). `pointer_hypothesis(box, centroid, fix, hyps)` breaks a tie by the nearest mean position to `(cy / 8 − 0.5, cx / 8 − 0.5)`: `marks.thing_hypothesis`'s own arithmetic. (The box centre and the ink centroid differ by up to a pixel or two; a tie must break as the scored run's did.)
+- A truth file's `scene_dict` = `scene.to_dict()` plus `centroids` for all things and `row`. A sitting truth file's `items` are the offline item dicts themselves, without `hyp`.
+- A tape's day file rolls at 00:00 UTC (04:00 local) and `creature/replay.py:run_replay` reads ONE day file. `make_tape.py` and every fixture write an explicit `at` (a fixed date, +1 ms per row). **A live life tonight must close before 04:00 +04, or its replay reads the tape directory whole** (builder C: an additive road, if needed).
+- **The glance caches are pinned to the bytes of `genome/machinery.py`** (`brain/scene/cache.py:check_code`), which the parser branches changed. The caches are REDRAWN under the new code into `/data/dev/brain-runs/organ/scene/` and proven byte-identical to the scored caches; nobody relaxes `check_code`. No builder edits a file of `cache.WORLD_CODE`.
+- Sent to builders A, B and C at the stamp above.
