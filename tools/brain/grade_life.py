@@ -143,6 +143,8 @@ class Life:
         self.brain_rows = [j for j in self.journal if j.get("kind") == "brain"]
         # the tape, indexed
         self.asks: Dict[str, Dict[str, object]] = {}          # item → the ask's payload (+ its tape row)
+        self.why_repeats_asked = 0
+        self.why_repeats_answered = 0
         self.moment_eye: Dict[str, Dict[str, object]] = {}    # moment → the eye row
         self.moment_words: Dict[str, List[str]] = collections.defaultdict(list)
         self.train_moment: Dict[int, str] = {}                # scene index → moment
@@ -153,6 +155,11 @@ class Life:
             if r["sense"] == "ask":
                 p = json.loads((self.tape_dir / r["payload"]).read_text(encoding="utf-8"))
                 if p.get("item") is not None:
+                    # edit: Claude (Fable 5.1, the seat), 2026-09-28 21:23 +0400 — a `why` is asked in EVERY sitting under one item name
+                    # («M4:<word>»); PREREG §3 grades the FRESH sitting's, which comes first on the tape: the first ask stands
+                    if str(p["item"]) in self.asks and p.get("form") == "why":
+                        self.why_repeats_asked += 1
+                        continue
                     self.asks[str(p["item"])] = {**p, "_moment": meta.get("moment"), "_seq": int(r["seq"])}
             elif r["sense"] == "ear":
                 self.moment_words[str(meta.get("moment"))].append(str(meta.get("word")))
@@ -167,6 +174,9 @@ class Life:
                 continue
             k = str(j.get("item"))
             if k in self.answer_of:
+                if j.get("form") == "why":               # a later sitting's repeat of a `why`: counted, never graded
+                    self.why_repeats_answered += 1
+                    continue
                 dup.append(k)
             self.answer_of[k] = j
         if dup:
@@ -185,6 +195,8 @@ class Life:
         return {"tape_rows": len(self.rows), "scene_rows_by_sense": dict(c), "train_scenes": len(self.train_moment),
                 "asks_on_tape": len(self.asks), "answers_in_journal": len(self.answers), "answers_by": dict(by),
                 "answers_by_form": dict(forms), "brain_rows": len(self.brain_rows),
+                "why_repeats_asked_in_later_sittings": self.why_repeats_asked,
+                "why_repeats_answered": self.why_repeats_answered,
                 "asks_without_answer": sorted(k for k in self.asks if k not in self.answer_of and
                                               self.asks[k].get("form") not in ("begin", "end"))[:10],
                 "n_asks_without_answer": sum(1 for k in self.asks if k not in self.answer_of and

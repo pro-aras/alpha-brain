@@ -69,9 +69,16 @@ def main() -> int:
     gate: Dict[str, dict] = json.loads(Path(a.gate_answers).read_text())
     life: Dict[str, dict] = {}
     dup = 0
+    why_repeats = 0
     for r in _rows(Path(a.journal)):
         if r.get("kind") == "answer" and r.get("item") is not None and r.get("by") == a.by:
-            dup += int(str(r["item"]) in life)
+            if str(r["item"]) in life:
+                # edit: Claude (Fable 5.1, the seat), 2026-09-28 21:23 +0400 — a `why` is asked again in a later sitting under one item
+                # name; the first stands (PREREG §3). Any OTHER item answered twice is a fault and is counted.
+                if r.get("form") == "why":
+                    why_repeats += 1
+                    continue
+                dup += 1
             life[str(r["item"])] = json.loads(json.dumps(r.get("answer")))
     if a.plant:
         k = sorted(x for x in life if x.startswith("M1:") and isinstance((life[x].get("raw") or {}).get("best"), float))[0]
@@ -96,7 +103,7 @@ def main() -> int:
     tot = {k: sum(p[k] for p in per.values()) for k in ("gate", "found", "equal")}
     ok = tot["gate"] > 0 and tot["gate"] == tot["found"] == tot["equal"] and dup == 0
     lines = [f"PARITY · the life ({a.journal}) against rung 1 ({a.gate_answers}) · verdict {'EQUAL' if ok else 'DIFFERENT'}",
-             f"  the gate answered {tot['gate']} · found in the life {tot['found']} · equal {tot['equal']} · items answered twice in the life {dup} · answers in the life by «{a.by}» {len(life)}",
+             f"  the gate answered {tot['gate']} · found in the life {tot['found']} · equal {tot['equal']} · items answered twice in the life {dup} (a later sitting's `why` repeats, not counted: {why_repeats}) · answers in the life by «{a.by}» {len(life)}",
              "  mark            gate   found   equal  first difference"]
     for mark in sorted(per):
         p = per[mark]
