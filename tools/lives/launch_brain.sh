@@ -8,6 +8,7 @@
 # tools/lives/launch.sh's own precedent for the seam lives).
 set -euo pipefail
 NAME="${1:?life name}"; COMMIT="${2:?commit}"; GENOME_REL="${3:?genome rel path, e.g. genome/brain/BRAIN-LEAN.genome}"
+BODY_ARGS="${4:-}"   # edit: Claude (Fable 5.1, the seat), 2026-09-28 21:10 +0400 — the life's extra body arguments (the full organism: "--folder /data/dev/genome/world --plant-after 15000"); empty for a lean life
 SOURCE_REPO=/data/dev/genome-wt-organ   # the INTEGRATION worktree — every builder's worktree shares the same .git object store, so any of them names a valid `git worktree add` source; this is the one the contract names
 LIVES=/data/dev/genome-lives; ROOT="$LIVES/$NAME"; CODE="$ROOT/code"
 
@@ -26,7 +27,7 @@ bash "$CODE/deploy/install.sh" | tail -2
 mkdir -p "$ROOT"
 date "+%Y-%m-%d %H:%M %z" > "$ROOT/STARTED-AT"
 echo "$COMMIT" > "$ROOT/CODE-COMMIT"
-printf "GENOME=%s\n" "$CODE/$GENOME_REL" > "$ROOT/unit.env"
+printf "GENOME=%s\nBODY_ARGS=%s\n" "$CODE/$GENOME_REL" "$BODY_ARGS" > "$ROOT/unit.env"
 cp "$CODE/$GENOME_REL" "$ROOT/GENOME.genome"
 
 # 4. enable + start the life

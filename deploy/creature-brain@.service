@@ -18,8 +18,12 @@ WorkingDirectory=/data/dev/genome-lives/%i/code
 Environment=OPENBLAS_NUM_THREADS=1
 Environment=OMP_NUM_THREADS=1
 Environment=PYTHONUNBUFFERED=1
+# edit: Claude (Fable 5.1, the seat), 2026-09-28 21:10 +0400 — BODY_ARGS: the life's own extra body arguments, from unit.env (empty for a
+# lean life). The full organism needs the folder door's directory (his pictures live in /data/dev/genome/world, outside every
+# checkout) and the plant's canvas, as creature-g5@ passes them. Unbraced, so systemd splits it into words; empty adds none.
+Environment=BODY_ARGS=
 EnvironmentFile=/data/dev/genome-lives/%i/unit.env
-ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome-lives/%i --genome ${GENOME}
+ExecStart=/usr/bin/python3 -m creature.body --root /data/dev/genome-lives/%i --genome ${GENOME} $BODY_ARGS
 # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:44 +0400 — PREREG §2.6 (creature-g5@'s own law, kept
 # whole): a MIND crash exits 3 and must NOT be restarted; a sense crash never exits the process.
 Restart=on-failure
