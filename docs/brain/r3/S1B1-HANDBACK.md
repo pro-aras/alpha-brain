@@ -35,7 +35,9 @@
   - The lr law STANDS: A-RW 0.990 / 0.980 / 0.981 against A-RW-LR10's 0.891 / 0.905 / 0.919.
   - T2 not refuted: M3 0.966 / 0.982 / 1.000 — **the words compose on the six held-out pairs.**
   - **T3 REFUTED at all three seeds:** TRUTH 0.671 / 0.716 / 0.600 < 0.80, n ≥ 70, M1 passing.
-  - T4′: none of its three clauses fires.
+  - **T4′ — the one prediction the PREREG made in bold failed at every seed.** §3 predicted A-RW's M2b ≥ 0.80 under the diagonal band.
+    - The diagonal band reads **0.188 / 0.146 / 0.229**: above (ii)'s Euclidean 0.062 / 0.104 / 0.083 and above S1a's logistic 0.000 / 0.083 / 0.104, but far under the oracle's 0.958 / 0.938 / 0.917.
+    - So none of T4′'s three clauses fires. Not «(ii) no worse than the law», because the diagonal helped a little; not «(ii) above the law»; and not «M2b ≥ 0.80», the learner refusing from its own store.
   - One-meeting: n/g, no, no.
 - **Beside S1a on the IDENTICAL items (A-RW):**
 
@@ -340,7 +342,8 @@ The diff, the unit's report against the re-graded one:
 
 What they say [Likely; the numbers are Certain as printed]:
 - **(a) M2a's distance «none» refuses about half the absent phrases, and the gaze is not the cause.** Scenes whose referent the gaze missed are 8 % of τ_none's population. Calibrating without them (0.982 against 0.999) moves refusal only from 0.522 to 0.547. The word bands admit a thing in view for most absent phrases.
-  - From the same state, reading (i) (S1a's τ_point rule at lr 0.01) refuses 0.892 / 0.845 / 0.880 with false refusal 0.068 / 0.055 / 0.057. That would meet M2a's bar at every seed, as a reading.
+  - From the same state, reading (i) (S1a's τ_point rule at lr 0.01) refuses 0.892 / 0.845 / 0.880 with false refusal 0.068 / 0.055 / 0.057. That would meet M2a's bar at every seed, **as a reading only**: the law's «none» chose the distance, and the distance is what failed; the learner does not pass M2a.
+- **The counterfactuals in (a) and (b″) RULE MECHANISMS OUT; they are not proposals.** A covered-only τ moves refusal by 0.025; a Σ-log-p tie-break moves TRUTH by 0.026.
 - **(b) The false spoken words are mostly wrong words, not ambiguous ones.** 20 of 25 false phrases are false of the TARGET itself; 14 of those had one hypothesis in view, where the read-back cannot test a word. The learner HOLDS a uniquely true word in 74 of 78 items. The held set is broad (the same band that fails M2b), and nothing in the mouth prefers the true word when the read-back cannot discriminate.
 - **(c) N-SHUF above chance is not fixation-count salience.** The mechanism is open (§5.5).
 
