@@ -263,10 +263,15 @@ class Brain:
             raise BrainError(f"ask: no such form {form!r}")
         if glance is None:
             raise BrainError(f"ask: form {form!r} needs its canvas's glance")
+        # edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:49 +0400 — a pointing / naming / saying ask without its `item` or `test_seed`
+        # REFUSES by name: a default would build a wrong tie generator silently (visible only on an exact tie).
+        missing = [k for k in ("item", "test_seed") if payload.get(k) is None]
+        if missing:
+            raise BrainError(f"ask: form {form!r} needs {missing} (the item's tie generator is substream(test_seed, 'tie:<item>'))")
         hyps, X = things_in_view(glance)
         fix = [(int(y), int(x)) for y, x in glance["fix"]]
-        item = str(payload.get("item"))
-        ts = int(payload.get("test_seed", 0))
+        item = str(payload["item"])
+        ts = int(payload["test_seed"])
         if form == "point":
             return self._point(list(payload.get("phrase") or []), hyps, X, fix, item, ts)
         box = payload.get("box")
@@ -473,10 +478,12 @@ class _Encoder:
             return v
         if isinstance(v, np.integer):
             return {"t": "npi", "d": v.dtype.str, "v": int(v)}
-        if isinstance(v, float):
-            return {"t": "f", "v": repr(v)}
+        # edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:49 +0400 — np.floating BEFORE float: np.float64 subclasses float, and
+        # repr(np.float64(x)) is «np.float64(x)» under numpy 2, which float() cannot read back.
         if isinstance(v, np.floating):
             return {"t": "npf", "d": v.dtype.str, "v": repr(float(v))}
+        if isinstance(v, float):
+            return {"t": "f", "v": repr(v)}
         if isinstance(v, tuple):
             return {"t": "tuple", "v": [self.enc(x) for x in v]}
         if isinstance(v, list):

@@ -340,6 +340,18 @@ class Life(unittest.TestCase):
                             "word": None, "test_seed": 1}, g)
         self.assertNotEqual(b["kind"], "misuse")
 
+    def test_an_ask_without_item_or_test_seed_refuses_by_name(self):
+        from genome import brain as B
+        g, words, _t, boxes = toy_scene(10_001)
+        for form, extra in (("point", {"phrase": words}), ("what", {"box": boxes[0]}), ("say", {"box": boxes[0]})):
+            for drop in ("item", "test_seed"):
+                p = {"form": form, "item": "X:1", "mark": "M1", "test_seed": 1, **extra}
+                p.pop(drop)
+                with self.subTest(form=form, drop=drop):
+                    with self.assertRaises(B.BrainError) as cm:
+                        self.brain.ask(p, g)
+                    self.assertIn(drop, str(cm.exception))
+
     def test_unheard(self):
         g, _w, _t, _b = toy_scene(10_001)
         a = self.brain.ask({"form": "point", "item": "P:u", "mark": "M1", "phrase": ["zog", "sa"], "box": None,
@@ -452,6 +464,21 @@ class SaveLoad(unittest.TestCase):
                     live(b, 120, start=n)
                     self.assertEqual(b.state_hash(), straight.state_hash())
                     self.assertEqual(answers(b), answers(straight))
+
+    def test_numpy_scalars_in_the_state_round_trip(self):
+        # edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:49 +0400 — np.float64 subclasses float: it must keep its own encoding
+        from genome import brain as B
+        a = B.Brain(CFG)
+        live(a, 45)
+        a.L.probe = [np.float64(1.5), np.float32(0.25), np.int64(7), np.bool_(True), float("inf"), float("nan")]
+        with tempfile.TemporaryDirectory() as d:
+            a.save(Path(d) / "b")
+            b = B.Brain.load(Path(d) / "b", CFG)
+        got = b.L.probe
+        self.assertEqual([type(v) for v in got], [np.float64, np.float32, np.int64, np.bool_, float, float])
+        self.assertEqual(got[:5], a.L.probe[:5])
+        self.assertTrue(np.isnan(got[5]))
+        self.assertEqual(b.state_hash(), a.state_hash())
 
     def test_load_refuses_another_cfg(self):
         from genome import brain as B
