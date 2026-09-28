@@ -723,7 +723,7 @@ def sizing_mark(status: dict, journal: Iterable[dict], prediction: Optional[floa
     born is printed with no band."""
     per_hour: "collections.OrderedDict[str, int]" = collections.OrderedDict(); plant_births = 0; plant_shown = 0
     for j in journal:
-        if "moment" in j:
+        if "moment" in j and "kind" not in j:      # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:40 +0400 — BRAIN-IN-BODY: an `answer`/`brain` row is no canvas row
             h = (j.get("when") or "")[:13]
             n = sum(1 for b in (j.get("births") or []) if b and b[0] == "sight")
             per_hour[h] = per_hour.get(h, 0) + n

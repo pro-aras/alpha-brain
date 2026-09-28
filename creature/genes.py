@@ -259,6 +259,12 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
                 "chat/out/<id>.json + ONE say row, hash_before == hash_after asserted) + Mind._consume_grade (kind-chat grades "
                 "counted on STATUS, never the READINESS judge's (d)) + creature/body.py:main (declared['CHAT'] arms "
                 "creature/senses/chat.py behind CHAT_DOOR_GATED)",
+        # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:26 +0400 — BRAIN-IN-BODY (docs/brain/body/INTERFACE-BRAIN-ORGAN.md §4): the
+        # brain organ's real call sites in the mind. WORLD_SCENE (the scene sense, the body layer) is builder B's row, not this one.
+        "BRAIN": "creature/mind.py:Mind.__init__ (genome.brain.Brain(declared['BRAIN']) unless --blind brain) + Mind._consume_ask "
+                 "(the `ask` tape sense: begin/end/why at once, point/what/say held to their canvas) + Mind._consume_eye -> "
+                 "Mind._brain_canvas (asks answered by the brain, else creature/organs_road.py; else brain.learn on a heard canvas) "
+                 "+ Mind.snapshot/resume (state/brain.npz|json, the pending asks) + Mind.brain_status (STATUS)",
     },
 }
 

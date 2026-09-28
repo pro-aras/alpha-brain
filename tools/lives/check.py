@@ -31,7 +31,7 @@ def journal_counts(rows) -> collections.Counter:
     for d in rows:
         if "event" in d:
             continue
-        if "moment" in d:
+        if "moment" in d and "kind" not in d:      # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:40 +0400 — BRAIN-IN-BODY: an `answer`/`brain` row (top-level "kind") is no canvas row
             c["moments"] += 1
             if d.get("glance") == 0: c["canvases"] += 1
         if d.get("act") == "coarse": c["coarse_rows"] += 1
@@ -91,7 +91,7 @@ def births_by_hour(rows):
     rows = list(rows); by_seq = seq_when(rows)
     hours = []; by_hour = collections.Counter(); by_source = collections.defaultdict(collections.Counter)
     for d in rows:
-        if "moment" not in d:
+        if "moment" not in d or "kind" in d:      # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:40 +0400 — BRAIN-IN-BODY: an `answer`/`brain` row opens no hour
             continue
         h = hour_of(d, by_seq)
         if h not in hours: hours.append(h)
