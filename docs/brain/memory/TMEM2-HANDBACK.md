@@ -208,3 +208,174 @@ cpu 22.9 s
 - The crash: `/data/dev/brain-runs/scene-tmem2/gate-crash-1741/`.
 - The pins: `/data/dev/brain-runs/scene-tmem2/code-15b047e` (the gate's) and `code-96a00bd` (the crashed launch's).
 - Nothing was written under `/data/dev/brain-runs/scene-s1b1r/`, and no unit other than `scene-tmem2-gate` was launched.
+
+---
+
+## 10 · AMENDMENT 1 — built test-first, re-gated: STOP again at step 3; the rule sets almost nothing aside
+
+*edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:33 +0400 — appended; §0–§9 above are the 17:51 record the amendment cites (2b7d800), unchanged. That STOP's gate files now sit in `/data/dev/brain-runs/scene-tmem2/gate-1751-stop/` (moved aside before the re-gate; §9's `gate/` paths read there).*
+
+### 10.1 · The answer
+- **THE FIRST GATE, re-run under PREREG-TMEM2 + AMENDMENT 1: STOP at step 3.** The same five words read truth-free cal_20 below truth-fed by more than 0.10, and the free row's cal_20 did not move on any of the 13 words:
+
+  | word | truth-free | truth-fed |
+  |---|---|---|
+  | big | 0.70 | 0.90 |
+  | circle | 0.70 | 1.00 |
+  | green | 0.75 | 0.95 |
+  | small | 0.80 | 0.95 |
+  | square | 0.80 | 1.00 |
+
+- **No unit ran.** Steps 0, 1, 2, 4 and 5 passed: identity 3 of 3 with every planted change caught, the toy with the set-aside clause, the wiring pin, and the price at 1.1 CPU-min.
+- **The rule barely fires.** It set aside:
+  - of the claims whose referent the gaze never saw: 45 / 1,924 = **0.023** (seed 20261101), 34 / 1,896 = **0.018** (20261102), 52 / 1,893 = **0.027** (20261103);
+  - of the claims whose referent it saw (the false-unseen rate): 29 / 15,479 = **0.002**, 46 / 15,418 = **0.003**, 29 / 15,475 = **0.002**. That is far BELOW the predicted 0.05–0.08. It is not #162's rule that sets everything aside; it is the opposite.
+- **Why (the diagnostic, §10.5):** the check is right. It agrees with an independent recomputation on 17,403 of 17,403 claims, and it reproduces the gate's counts. But the READER's band holds nearly every word of a type at every thing:
+  - shape: 5.4 of 6 words;
+  - colour: 4.8 of 5;
+  - size: 2.0 of 2.
+
+  The said word's d / band at the attributed thing has a median of 0.59–0.64 in every class, with or without a seen referent. So «w's own band holds h*» is true about 98 % of the time whatever the eye saw, and it cannot separate class C.
+- **RAISED, not fixed:** the rule reads a band that does not discriminate between the words of a type. The same band decides every claim's CONFIDENT. The coordinator decides. I propose no fix.
+
+### 10.2 · The build
+- **Commits on `scene-tmem2`:**
+  - **8767cf6** — the rule (`health.grades`), the claim record carrying its held words, the row's `unseen` count, the toy's set-aside clause, both rows graded through the rule, the two readings, step 3's residual print, step 5 a STOP, and the amendment's sha checked beside the law's. The unit also requires both shas in `gate.json`.
+  - **95a6439** — the read-only diagnostic `tools/scene/diag_tmem2_amend1.py`, with its predictions committed before its run. It is PIN-guarded to code-8767cf6.
+  - this section.
+- **Red on 2b7d800:** `Ran 24 tests … FAILED (failures=2, errors=8)`. Log: `redcheck-2b7d800/red.log`.
+- **Green:**
+  - the T-MEM-2 modules: `Ran 42 tests … OK`;
+  - the scene suite on the amended bytes: `Ran 204 tests in 51.733s` / `OK` (log `logs/suite-scene-sys-amend1-precommit.log`);
+  - the suites on the final commit: §10.6.
+- **The old instrument:** `tools/scene/diag_tmem2_step3.py` (e213b09) is PIN-guarded to code-15b047e and reads a grade as a bool. It is a historical instrument for that pin only; it does not run from the new one.
+- **The pin the gate ran:** `/data/dev/brain-runs/scene-tmem2/code-8767cf6`. Verified from the pin before the launch:
+  - PREREG-TMEM2 b785b54f… and AMENDMENT 1 6da8ff67…;
+  - the control's report.txt b695ae5c…;
+  - 42 of 42 of S1b-1R's caches accepted by `check_code`;
+  - the 13 WORLD_CODE files unchanged since 0b1857b.
+
+### 10.3 · Declared readings of the amendment
+1. **«w's own band holds h*»** is read from the claim step's own «what is this?» at h*: the held words that made the claim CONFIDENT, now carried in the claim record, in the same learner state.
+   - It follows that a confirmation is never set aside: b = w is held at h* by its own confidence.
+   - The alternative, re-reading the band after `train_scene`, differs only by one scene's update of the standardisation statistics. The reader's μ, Λ and bands change only at reading points.
+2. **Both rows go through the rule.** The truth-fed row applies it at the referent's hypothesis: one difference, the hypothesis, so it is the ceiling of the AMENDED row.
+   - The alternative applies the rule to the truth-free row only. Its fed row is exactly the 17:51 gate's (same life, same claims): big 0.900, circle 1.000, green 0.950, small 0.950, square 1.000.
+   - Against the unchanged free row, that alternative gives the SAME five faults. **The verdict is STOP under both readings.** Mine is the stricter reading: it removes only refutations from the fed row, so the fed row's cal_20 can only stay or rise.
+3. **The two readings count gradable claims of the truth-free row** (graded or set aside); that is the headline figure. The scene-level figure is printed beside it: a scene counts as set aside when all its gradable claims are.
+   - Every training scene has a referent (30,000 of 30,000), so «never seen» is the same as `referent_index` returning None.
+4. **A set-aside claim is counted under the claimed word b_T(h*)** (the row's `unseen`). It is never a MISSED of the said word.
+5. **Step 5 is a STOP** when the unit's price exceeds 300 CPU-s.
+
+### 10.4 · The amended gate (18:23:11 – 18:24:18 +0400, exit 3, 66 s wall, 66 CPU-s, from code-8767cf6) — `gate/gate.txt`, verbatim
+```
+== THE FIRST GATE (PREREG-TMEM2 §7 + AMENDMENT 1 §4; each step a STOP on a miss; printed whole) ==
+   the law: PREREG-TMEM2 b785b54f97c6c2bc… · AMENDMENT 1 6da8ff679a317166… · code 8767cf6339ee28120887dcdf2a3f37cdeb52e2de
+0. the CONTROL's record: /data/dev/brain-runs/scene-s1b1r/report.txt sha as recorded (b695ae5c94d13a85…)
+1. THE IDENTITY (S1b-1R's A-RW-R record at 10,000; canonical JSON; the planted one-byte change first):
+   20261101: point = (188211 bytes; planted CAUGHT) · LAW = (72118 bytes; planted CAUGHT) · summary = (1465 bytes; planted CAUGHT) · cpu 21.9 s → PASS
+   20261102: point = (187763 bytes; planted CAUGHT) · LAW = (75822 bytes; planted CAUGHT) · summary = (1458 bytes; planted CAUGHT) · cpu 21.9 s → PASS
+   20261103: point = (187927 bytes; planted CAUGHT) · LAW = (75263 bytes; planted CAUGHT) · summary = (1464 bytes; planted CAUGHT) · cpu 22.1 s → PASS
+2. the row's toy (A 95 %, B 50 %, 200 graded claims each): seed 0: cal_20 A 0.95 B 0.65 · kept {'A': True, 'B': False} · the null {'A': False, 'B': True} · an ungraded claim moves nothing True · a claim set aside «unseen» moves nothing True · seed 1: cal_20 A 1.00 B 0.45 · kept {'A': True, 'B': False} · the null {'A': False, 'B': True} · an ungraded claim moves nothing True · a claim set aside «unseen» moves nothing True · seed 2: cal_20 A 0.95 B 0.50 · kept {'A': True, 'B': False} · the null {'A': False, 'B': True} · an ungraded claim moves nothing True · a claim set aside «unseen» moves nothing True → PASS
+3. agreement and coverage on seed 20261101's stream (claims on 9750 scenes), AFTER AMENDMENT 1's rule — per word: graded truth-free / truth-fed · set aside «unseen» truth-free / truth-fed · cal_20 truth-free / truth-fed · the residual (free − fed):
+   big        2151 /  1845 ·    4 /    3 · 0.700 / 0.900 · -0.200  REVERSED BY > 0.10 — the declared instrument fault
+   blue        819 /   768 ·    6 /    3 · 0.900 / 0.950 · -0.050  reversed (a reading)
+   circle     1781 /  1453 ·    7 /    0 · 0.700 / 1.000 · -0.300  REVERSED BY > 0.10 — the declared instrument fault
+   cross      1361 /  1263 ·    3 /    0 · 1.000 / 1.000 · +0.000
+   green      1051 /   922 ·   12 /    7 · 0.750 / 0.950 · -0.200  REVERSED BY > 0.10 — the declared instrument fault
+   red         692 /   634 ·   16 /    8 · 1.000 / 1.000 · +0.000
+   ring       1239 /  1174 ·   14 /    9 · 0.950 / 0.950 · +0.000
+   small      2222 /  2009 ·    0 /    0 · 0.800 / 0.950 · -0.150  REVERSED BY > 0.10 — the declared instrument fault
+   square     1257 /  1056 ·    9 /    1 · 0.800 / 1.000 · -0.200  REVERSED BY > 0.10 — the declared instrument fault
+   star       1567 /  1438 ·    1 /    0 · 1.000 / 1.000 · +0.000
+   triangle   1514 /  1382 ·    2 /    0 · 0.950 / 1.000 · -0.050  reversed (a reading)
+   white       899 /   760 ·    0 /    0 · 0.700 / 0.800 · -0.100  reversed (a reading)
+   yellow      776 /   634 ·    0 /    0 · 0.850 / 0.950 · -0.100  reversed (a reading)
+   the residual within 0.05 on 6 of 13 words (predicted: most [Likely]; a reading)
+   «no row»: none · reversed: ['big', 'blue', 'circle', 'green', 'small', 'square', 'triangle', 'white', 'yellow'] · the fault (> 0.10): ['big', 'circle', 'green', 'small', 'square'] → MISS
+   AMENDMENT 1's readings (offline, the tape's truth; readings, never bars), every gate life:
+      20261101: the metacognition-of-perception reading (the referent never seen): claims set aside 45 / 1924 = 0.023 (scenes 11 / 977 = 0.011) · the false-unseen rate (the referent seen): 29 / 15479 = 0.002 (scenes 8 / 8042 = 0.001; predicted 0.05–0.08)
+      20261102: the metacognition-of-perception reading (the referent never seen): claims set aside 34 / 1896 = 0.018 (scenes 11 / 995 = 0.011) · the false-unseen rate (the referent seen): 46 / 15418 = 0.003 (scenes 14 / 8002 = 0.002; predicted 0.05–0.08)
+      20261103: the metacognition-of-perception reading (the referent never seen): claims set aside 52 / 1893 = 0.027 (scenes 22 / 986 = 0.022) · the false-unseen rate (the referent seen): 29 / 15475 = 0.002 (scenes 7 / 8064 = 0.001; predicted 0.05–0.08)
+4. the smoke — seed 20261101's fresh items under all four roads (the tables whole):
+      big       claims  6311 · graded  2151 (fed  1845) · unseen    4 (fed    3) · cal_20 0.700 / 0.900 · |diff| 0.200 · median |Δ| 0.050 · drift 9 / 9 · missed  279 · gate not held lately · oracle 0.984
+      blue      claims  2520 · graded   819 (fed   768) · unseen    6 (fed    3) · cal_20 0.900 / 0.950 · |diff| 0.050 · median |Δ| 0.100 · drift 1 / 1 · missed  221 · gate open · oracle 1.000
+      circle    claims  2572 · graded  1781 (fed  1453) · unseen    7 (fed    0) · cal_20 0.700 / 1.000 · |diff| 0.300 · median |Δ| 0.100 · drift 4 / 4 · missed   30 · gate not held lately · oracle 1.000
+      cross     claims  2190 · graded  1361 (fed  1263) · unseen    3 (fed    0) · cal_20 1.000 / 1.000 · |diff| 0.000 · median |Δ| 0.050 · drift 5 / 5 · missed  127 · gate open · oracle 1.000
+      green     claims  3436 · graded  1051 (fed   922) · unseen   12 (fed    7) · cal_20 0.750 / 0.950 · |diff| 0.200 · median |Δ| 0.100 · drift 4 / 4 · missed  142 · gate not held lately · oracle 0.900
+      red       claims  2124 · graded   692 (fed   634) · unseen   16 (fed    8) · cal_20 1.000 / 1.000 · |diff| 0.000 · median |Δ| 0.050 · drift 4 / 3 · missed  159 · gate open · oracle 0.871
+      ring      claims  1682 · graded  1239 (fed  1174) · unseen   14 (fed    9) · cal_20 0.950 / 0.950 · |diff| 0.000 · median |Δ| 0.050 · drift 5 / 1 · missed  576 · gate open · oracle 0.886
+      small     claims  6768 · graded  2222 (fed  2009) · unseen    0 (fed    0) · cal_20 0.800 / 0.950 · |diff| 0.150 · median |Δ| 0.050 · drift 5 / 5 · missed  247 · gate open · oracle 0.886
+      square    claims  1887 · graded  1257 (fed  1056) · unseen    9 (fed    1) · cal_20 0.800 / 1.000 · |diff| 0.200 · median |Δ| 0.050 · drift 7 / 5 · missed   28 · gate open · oracle 1.000
+      star      claims  2505 · graded  1567 (fed  1438) · unseen    1 (fed    0) · cal_20 1.000 / 1.000 · |diff| 0.000 · median |Δ| 0.050 · drift 7 / 6 · missed   62 · gate open · oracle 1.000
+      triangle  claims  2380 · graded  1514 (fed  1382) · unseen    2 (fed    0) · cal_20 0.950 / 1.000 · |diff| 0.050 · median |Δ| 0.050 · drift 4 / 4 · missed   55 · gate open · oracle 1.000
+      white     claims  2715 · graded   899 (fed   760) · unseen    0 (fed    0) · cal_20 0.700 / 0.800 · |diff| 0.100 · median |Δ| 0.050 · drift 6 / 6 · missed  171 · gate not held lately · oracle 0.762
+      yellow    claims  2212 · graded   776 (fed   634) · unseen    0 (fed    0) · cal_20 0.850 / 0.950 · |diff| 0.100 · median |Δ| 0.100 · drift 0 / 0 · missed  116 · gate open · oracle 1.000
+   AMENDMENT 1's readings (offline, the tape's truth; readings, never bars): 20261101: the metacognition-of-perception reading (the referent never seen): claims set aside 45 / 1924 = 0.023 (scenes 11 / 977 = 0.011) · the false-unseen rate (the referent seen): 29 / 15479 = 0.002 (scenes 8 / 8042 = 0.001; predicted 0.05–0.08)
+   the roads (S1b-1R's graders, covered targets): SPOKEN · TRUTH (n) · ×spoken · READ-BACK · SPEAK2 spoken · TRUTH-NEED (n) · MINIMAL (n) · ORDER (n) · DECLINE (reading) · M2b (the band, unchanged)
+      CONTROL          0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 2, 'the read-back': 1} · SPEAK2 {'no sayable word': 7, 'the read-back': 1, 'no believed-unique phrase': 4} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 3}
+      LAW              0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 2, 'the read-back': 1} · SPEAK2 {'no sayable word': 7, 'the read-back': 1, 'no believed-unique phrase': 4} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 3}
+      HEALTH-MOUTH     0.737 · 0.804 (n 56) · 0.592 · 1.000 · 0.489 · 0.174 (n 23) · 1.000 (n 49) · 1.000 (n 5) · DECLINE 0.676 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 5, 'the read-back': 2, 'not held lately': 2} · SPEAK2 {'no believed-unique phrase': 13, 'not held lately': 3, 'no sayable word': 7, 'the read-back': 1} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 5} · the row refused {'big:not held lately': 52, 'circle:not held lately': 21, 'green:not held lately': 25, 'white:not held lately': 20}
+      HEALTH-ORACLE    0.803 · 0.836 (n 61) · 0.671 · 1.000 · 0.681 · 0.281 (n 32) · 1.000 (n 60) · 1.000 (n 10) · DECLINE 0.676 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 3, 'the read-back': 1} · SPEAK2 {'no believed-unique phrase': 7, 'no sayable word': 7, 'the read-back': 1} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 4} · the row refused {'white:not held lately': 20}
+      HEALTH-TRUTHFED  0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 2, 'the read-back': 1} · SPEAK2 {'no sayable word': 7, 'the read-back': 1, 'no believed-unique phrase': 4} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 3}
+      NULL             0.750 · 0.807 (n 57) · 0.605 · 1.000 · 0.468 · 0.227 (n 22) · 1.000 (n 51) · 1.000 (n 5) · DECLINE 0.919 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 6, 'the read-back': 1, 'not held lately': 1} · SPEAK2 {'no believed-unique phrase': 18, 'no sayable word': 7} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 8} · the row refused {'blue:not held lately': 22, 'green:not held lately': 25, 'small:not held lately': 45, 'yellow:not held lately': 15}
+   the decision (over the CONTROL's spoken phrases on SPEAK + SPEAK2, covered): ERROR-RECALL (declined + replaced true / errors) · TRUE-RETENTION (true / true):
+      CONTROL          ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+      HEALTH-MOUTH     ER 0.171 (6 + 0 / 35) · TR 0.790 (49 / 62)
+      HEALTH-ORACLE    ER 0.057 (2 + 0 / 35) · TR 0.968 (60 / 62)
+      HEALTH-TRUTHFED  ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+      NULL             ER 0.200 (7 + 0 / 35) · TR 0.823 (51 / 62)
+      calibration of the truth-free row (the law's): ECE 0.106 · type-2 AUROC 0.567 · n 453 (errors 33; no row 0) · curve [0.7: n 159 conf 0.71 acc 0.91] [0.8: n 119 conf 0.81 acc 0.92] [0.9: n 175 conf 0.97 acc 0.95]
+      calibration of the truth-fed row (its ceiling): ECE 0.017 · type-2 AUROC 0.635 · n 453 (errors 33; no row 0) · curve [0.8: n 42 conf 0.80 acc 0.76] [0.9: n 411 conf 0.96 acc 0.94]
+      calibration of the deranged rows (the floor): ECE 0.142 · type-2 AUROC 0.464 · n 453 (errors 33; no row 0) · curve [0.7: n 166 conf 0.71 acc 0.92] [0.8: n 96 conf 0.81 acc 0.99] [0.9: n 191 conf 0.96 acc 0.90]
+      the CONTROL re-graded vs S1b-1R's report.json: TRUTH [0.8225806451612904, 0.8225806451612904] · SPOKEN [0.8157894736842105, 0.8157894736842105] · TRUTH-NEED [0.3142857142857143, 0.3142857142857143] → EQUAL
+   the wiring pin (READ-BACK 1.000 wherever something was spoken): PASS
+5. the price, solo (the three lives above ran one at a time): lives 21.9 / 21.9 / 22.1 CPU-s · one seed's grading 0.3 CPU-s → the unit ≈ 67 CPU-s ≈ 1.1 CPU-min against ≤ 5 declared → within → PASS
+GATE: STOP — the declared sign reversed by > 0.10 (step 3) · 66 s wall · 66 CPU-s
+```
+
+The amendment's predictions, read:
+- **The residual** «within 0.05 on most words» [Likely]: 6 of 13 words. REFUTED.
+- **The false-unseen rate** «≈ 0.05–0.08» [Likely]: 0.002 / 0.003 / 0.002. REFUTED, by being far below the range.
+- **The metacognition-of-perception reading:** no prediction was written. It reads 0.023 / 0.018 / 0.027: by this rule, the learner does not know when its eye missed the referent.
+
+### 10.5 · The diagnostic (18:27 +0400, 29.0 CPU-s, from code-8767cf6; read-only; it changes no verdict) — `gate-diag-amend1/diag.txt`, verbatim
+```
+== T-MEM-2 AMENDMENT 1 DIAGNOSTIC (seed 20261101; pin 8767cf6; identity PASS; read-only, the gate's verdict unchanged) ==
+0. the gate's readings reproduced: never seen 45 / 1924 (gate 45 / 1924) · seen 29 / 15479 (gate 29 / 15479) → EQUAL
+1. the rule's check (the said word among the held words at h*) against d_w(h*) ≤ band_w recomputed from the claim step's distances: 17403 / 17403 agree
+2. per class — gradable · set aside · the said word's d_w / band_w at h*: p10 / median / p90 · held (≤ 1) · the type's words the band holds at h* (mean, of the type's n):
+   A:  14181 ·   28 · 0.462 / 0.593 / 0.828 ·  14153 · shape 5.41 of 6 · colour 4.81 of 5 · size 1.98 of 2
+   B:   1298 ·    1 · 0.470 / 0.598 / 0.847 ·   1297 · shape 5.41 of 6 · colour 4.82 of 5 · size 1.98 of 2
+   C:   1924 ·   45 · 0.497 / 0.644 / 0.871 ·   1879 · shape 5.40 of 6 · colour 4.80 of 5 · size 1.98 of 2
+3. class C by type — gradable · set aside · refuted (graded) · d_w / band_w median:
+   shape    951 ·   27 ·   812 · 0.654
+   colour   494 ·   16 ·   380 · 0.646
+   size     479 ·    2 ·   200 · 0.614
+cpu 29.0 s
+```
+
+The predictions, read:
+- **P1 holds:** the rule's check agrees with the recomputation on 17,403 of 17,403 claims, and both counts reproduce, so there is no build fault.
+- **P2 holds:** in class C the median d / band is 0.644, so the band holds the seen distractor.
+- **P3 holds, and more strongly than written:** the band holds 5.4 of the 6 shapes and 4.8 of the 5 colours at a thing.
+- **P4 holds:** 1.98 of the 2 sizes.
+
+The band in the claims (S1b-1R's READER: a weighted 0.90 band over responsibility-weighted distances) is wide enough to hold nearly every word of a type. So the band cannot tell the thing the parent meant from a seen neighbour of the same type.
+
+### 10.6 · The suites on the final code (95a6439)
+- **The whole brain suite under the venv:** `Ran 606 tests in 266.232s` / `OK (skipped=3)`, with 0 ERROR/FAIL blocks. Log: `logs/suite-venv-95a6439.log`.
+- **The scene package under /usr/bin/python3:** `Ran 204 tests in 54.930s` / `OK`, with 0 ERROR/FAIL blocks. Log: `logs/suite-scene-sys-95a6439.log`.
+
+### 10.7 · Files
+- **The amended gate:** `/data/dev/brain-runs/scene-tmem2/gate/` — `gate.txt`, `gate.json`, `journal.txt`, and `lives/<ws>/life/`.
+- **The diagnostic:** `/data/dev/brain-runs/scene-tmem2/gate-diag-amend1/` — `diag.txt`, `diag.json`, `run.log`, and `lives/`.
+- **The 17:51 STOP:** `/data/dev/brain-runs/scene-tmem2/gate-1751-stop/`.
+- **The pins:** `code-8767cf6` (the amended gate's) and `code-15b047e` (the 17:51 gate's).
+- **Untouched:** nothing was written under `/data/dev/brain-runs/scene-s1b1r/`. No unit other than `scene-tmem2-gate` was launched, and it is reset.
