@@ -261,6 +261,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 12:20 +0400 — docs/A4-LADDER-PREREG.md §2.5: one row, matching the
         # genes.py RUNS entry the rung adds (ACT_VALUE — the second ACT line). Caught by this class on the first landing run.
         "ACT_VALUE": "ACT      value reward 10; optimism 1",
+        # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:26 +0400 — BRAIN-IN-BODY: one row, matching the genes.py RUNS entry (BRAIN, the mind layer).
+        "BRAIN": ("BRAIN    word-map lr 0.01; reader eps 0.3; none 0.95; conformal 0.90; young 3; "
+                  "calibrate at 250 500 1000 2000 5000 10000 and before a sitting; replay none; hears scene"),
     }
 
     def test_every_runs_gene_parses(self) -> None:
