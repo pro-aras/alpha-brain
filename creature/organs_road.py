@@ -70,6 +70,16 @@ def pointer_hypothesis(box: Sequence[int], centroid: Optional[Sequence[float]], 
     return min(best, key=lambda i: ((hyps[i].pos[0] - cy) ** 2 + (hyps[i].pos[1] - cx) ** 2, i))
 
 
+def _pointer():
+    """The ONE pointer rule: genome/brain.py's (builder A's organ) when it is on the tree — INTERFACE §4 «import it from
+    genome/brain.py» — else this module's copy; tests/creature/test_brain_mind.py pins the two equal on 400 random cases."""
+    try:
+        from genome.brain import pointer_hypothesis as p
+        return p
+    except ImportError:
+        return pointer_hypothesis
+
+
 def _one_name(r: Dict[str, object], Lw: Dict[int, set]) -> Optional[str]:
     """The answer cell's own name: exactly one non-empty word in the words ledger, else None."""
     if r.get("cell") is None:
@@ -123,7 +133,7 @@ def _pointed(payload, fix, located, hyps):
     box = payload.get("box")
     if box is None or not hyps:
         return None, None
-    k = pointer_hypothesis(box, payload.get("centroid"), fix, hyps)
+    k = _pointer()(box, payload.get("centroid"), fix, hyps)
     return k, (None if k is None else [located[i] for i in hyps[k].members])
 
 

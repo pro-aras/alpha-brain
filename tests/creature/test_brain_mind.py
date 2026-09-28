@@ -193,7 +193,7 @@ class TestBrainRoad(_Tape, unittest.TestCase):
         self.assertEqual(st["scenes"], self.info["n_train"])
         self.assertEqual(st["asks_answered"], self.info["asks"])
         self.assertEqual(st["asks_by"], {"brain": self.info["asks"], "organs": 0})
-        self.assertEqual(st["learned"], self.info["n_train"])
+        self.assertEqual(st["learn_rows"], self.info["n_train"])
         json.dumps(st)
 
     def test_state_files_and_ledger(self) -> None:

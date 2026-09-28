@@ -1459,10 +1459,10 @@ class Mind:
             cache["view"] = view
         hash_before, guard_before = self.org.row_hash(), self._chat_guard()
         detail = None
-        if self.brain is not None and form != "end":
+        if self.brain is not None:
             by, answer = "brain", _jsonable(self.brain.ask(payload, g))
         else:
-            by = "brain" if self.brain is not None else "organs"
+            by = "organs"
             answer, detail = self._organs_answer(form, payload, view, cache)
         if self.org.row_hash() != hash_before or self._chat_guard() != guard_before:
             raise RuntimeError(f"ASK: answering {payload.get('item')!r} (form {form}, seq {ask['seq']}) by the {by} changed the organism "
@@ -1506,8 +1506,8 @@ class Mind:
             return None
         base = _jsonable(self.brain.summary()) if self.brain is not None else {"brain": None, "blind": "brain" in self.blind}
         return {**base, "asks_answered": self.asks_answered, "asks_by": dict(self.asks_by),
-                "asks_pending": sum(len(v) for v in self.pending_asks.values()), "learned": self.brain_learned,
-                "refused": self.brain_refused, "restored": self.brain_restored}
+                "asks_pending": sum(len(v) for v in self.pending_asks.values()), "learn_rows": self.brain_learned,
+                "refused_rows": self.brain_refused, "restored": self.brain_restored}
 
     def _consume_body(self, row: Dict[str, object]) -> None:
         """BODY-SENSES.md §4.1: "the readings; the DRIVE is the mind's" -- this gene carries no threshold, so

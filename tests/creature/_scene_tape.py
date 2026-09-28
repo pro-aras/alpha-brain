@@ -238,6 +238,8 @@ class FakeBrain:
             if did:
                 self.calibrate()
             return {"kind": "begun", "calibrated": did, "raw": {"calibrated": did}}
+        if form == "end":
+            return {"kind": "end", "raw": {"kind": "end"}}
         if form == "why":
             w = payload["word"]
             if self.counts.get(w, 0) < int(self.cfg["young"]):
