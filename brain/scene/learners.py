@@ -14,10 +14,13 @@ referent arrives as an INDEX ARGUMENT from the caller (run.py), which is the onl
   LDAReader   SUPERSEDED by AMENDMENT 2 (kept for the first gate's diagnosis scripts only): one type-blind StreamingLDA
               over every word as a class; per-word Mahalanobis distances under one shared Λ.
   TypedLDAReader  P-ORACLE / ORACLE-TRUTH as AMENDMENT 2 §1 rules them: one StreamingLDA per word TYPE (the word → type
-              map passed in by the caller), pointing by the within-type posterior, conformal 0.90 posterior bands.
+              map passed in by the caller), pointing by the within-type posterior, «none» by the pointing score's
+              conformal 0.90 threshold, «what is this?» by the conformal 0.90 DISTANCE band under the type's own Λ.
 
 edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:05 +0400 — AMENDMENT 2 §1 (PREREG-R3-TONIGHT-AMEND-2.md, genome-wt-brain3 d54e6c0):
 TypedLDAReader added; LDAReader kept, superseded.
+edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:07 +0400 — AMENDMENT 2 as CO-SIGNED (Fable 5.1, 74be9e0): «none» on the pointing score's
+conformal threshold; «what is this?» by the DISTANCE band under the word's own type's Λ.
 """
 from __future__ import annotations
 
@@ -490,12 +493,13 @@ class TypedLDAReader:
       · p(w | x) = the posterior WITHIN w's type: the softmax over that type's classes of the reader's own discriminant
         (StreamingLDA's scores; equal class priors, as the reader is built — declared).
       · pointing = argmax over things of Σ_{w ∈ phrase} log p(w | x) (ties by the item's generator);
-      · the BANDS: per word, τ_w = the conformal 0.90 lower threshold of p(w | x) over w's training referents; a word with
-        n < 9 referents takes the median τ of the calibrated words (declared, the episodic rule's fallback);
-      · «what is this?» emits every heard word with p(w | x) ≥ τ_w; «none» when the POINTED thing has p(w | x) < τ_w for
-        some word of the phrase (declared: the bands are read at the thing the pointing chose, as A-RW reads τ_point at
-        its best thing);
-      · per-type naming (the instrument verdict) = the forced argmax of the type's posterior over the grader's words."""
+      · «none» (as CO-SIGNED, Fable 5.1 13:02): the best phrase score Σ log p below τ_point = the conformal 0.90
+        threshold of the said-phrase scores on the training referents (the builder's rule, on the new score);
+      · «what is this?» (as CO-SIGNED) KEEPS the DISTANCE band, under the word's own type's Λ: emit w when d_w(x) ≤ band_w,
+        the conformal 0.90 threshold of d_w over w's training referents (n < 9 → the median band of the calibrated
+        words) — a posterior sums to 1 over the taught words and cannot refuse a never-taught shape;
+      · per-type naming (the instrument verdict) = the FORCED argmax of the type's posterior over the grader's words
+        (= argmin d within the type; no band)."""
 
     def __init__(self, eps: float, word_types: Dict[str, str]):
         self.eps = float(eps)
@@ -504,8 +508,9 @@ class TypedLDAReader:
         self.train_x: List[np.ndarray] = []
         self.train_words: List[Tuple[str, ...]] = []
         self.skipped = 0
-        self.band: Dict[str, float] = {}
+        self.band: Dict[str, float] = {}                     # the DISTANCE band per word (what is this?)
         self.band_fallback: List[str] = []
+        self.tau_point: Optional[float] = None               # «none»: the pointing score's conformal threshold
         self.calib_n: Dict[str, int] = {}
 
     def type_of(self, w: str) -> str:
@@ -552,25 +557,43 @@ class TypedLDAReader:
         t = self.type_of(w)
         return self._log_post(t, X)[:, self.readers[t].names.index(w)]
 
+    def _dist(self, t: str, X: np.ndarray) -> np.ndarray:
+        """(H, K_t) Mahalanobis distances to type t's class means under ITS OWN metric (Λ_t after a sleep)."""
+        r = self.readers[t]
+        X = np.atleast_2d(np.asarray(X, dtype=np.float64))
+        dL, L = r._metric()
+        Mu = np.stack([m[:dL] for m in r.means])
+        Xd = X[:, :dL]
+        XL = Xd @ L
+        d2 = np.einsum("ij,ij->i", XL, Xd)[:, None] - 2.0 * (XL @ Mu.T) + np.einsum("kj,jl,kl->k", Mu, L, Mu)[None, :]
+        return np.sqrt(np.maximum(d2, 0.0))
+
     def prepare(self) -> Dict[str, object]:
         for t in sorted(self.readers):
             self.readers[t].sleep()
         per: Dict[str, List[float]] = {w: [] for w in self.names}
+        pts: List[float] = []
         if self.train_x:
             X = np.stack(self.train_x)
             lp = {t: self._log_post(t, X) for t in self.readers}
+            dd = {t: self._dist(t, X) for t in self.readers}
             col = {w: (t, self.readers[t].names.index(w)) for t in self.readers for w in self.readers[t].names}
             for i, ws in enumerate(self.train_words):
+                sc = 0.0
                 for w in ws:
                     t, k = col[w]
-                    per[w].append(float(np.exp(lp[t][i, k])))
-        raw = {w: conformal_lower(v) for w, v in per.items()}
+                    per[w].append(float(dd[t][i, k]))
+                    sc += float(lp[t][i, k])
+                pts.append(sc)
+        raw = {w: conformal_upper(v) for w, v in per.items()}
         good = [b for b in raw.values() if b is not None]
-        fallback = float(np.median(good)) if good else 1.0
+        fallback = float(np.median(good)) if good else float("inf")
         self.band = {w: (b if b is not None else fallback) for w, b in raw.items()}
         self.band_fallback = [w for w, b in raw.items() if b is None]
-        self.calib_n = {f"word:{w}": len(v) for w, v in per.items()}
-        return {"band": dict(self.band), "band_fallback": list(self.band_fallback), "n": dict(self.calib_n)}
+        self.tau_point = conformal_lower(pts)
+        self.calib_n = {"point": len(pts), **{f"word:{w}": len(v) for w, v in per.items()}}
+        return {"band": dict(self.band), "band_fallback": list(self.band_fallback), "tau_point": self.tau_point,
+                "n": dict(self.calib_n)}
 
     def answer_point(self, X: np.ndarray, phrase: Sequence[str], rng: np.random.Generator) -> Dict[str, object]:
         unheard = [w for w in phrase if not self.heard(w)]
@@ -579,15 +602,16 @@ class TypedLDAReader:
         lps = {w: self.log_posterior(X, w) for w in dict.fromkeys(phrase)}
         s = np.sum([lps[w] for w in phrase], axis=0)
         k = pick(s, rng, "max")
-        none = any(float(np.exp(lps[w][k])) < self.band.get(w, 1.0) for w in phrase)
-        return {"point": k, "none": bool(none), "best": float(s[k])}
+        best = float(s[k])
+        none = bool(self.tau_point is not None and best < self.tau_point)
+        return {"point": k, "none": none, "best": best}
 
     def what_is_this(self, x: np.ndarray) -> List[str]:
         out = []
         for t in sorted(self.readers):
-            lp = self._log_post(t, x)[0]
+            d = self._dist(t, x)[0]
             for k, w in enumerate(self.readers[t].names):
-                if float(np.exp(lp[k])) >= self.band.get(w, 1.0):
+                if float(d[k]) <= self.band.get(w, float("inf")):
                     out.append(w)
         return out
 
@@ -606,7 +630,7 @@ class TypedLDAReader:
         return {"eps": self.eps, "types": {t: self.names_of(t) for t in sorted(self.readers)},
                 "counts": {t: list(self.readers[t].counts) for t in sorted(self.readers)},
                 "train_scenes": len(self.train_x), "skipped": self.skipped, "band": dict(self.band),
-                "band_fallback": list(self.band_fallback), "calib_n": dict(self.calib_n)}
+                "band_fallback": list(self.band_fallback), "tau_point": self.tau_point, "calib_n": dict(self.calib_n)}
 
 
 # ================================================================================================ the feeds

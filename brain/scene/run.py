@@ -338,7 +338,12 @@ def grade_seed(root: Path, ws: int, arms: Sequence[str] = ARMS, log=print) -> Di
             for t in TYPE_WORDS:
                 rows = [(A.get(it["item_id"]) or {}).get("name") for it in items["NAME"]]
                 ok = [nm[t] == it[t] for nm, it in zip(rows, items["NAME"]) if nm is not None and nm.get(t) is not None]
-                names[t] = {"acc": (sum(ok) / len(ok) if ok else None), "n": len(ok)}
+                # the conformal promise, checked (declared reading): how often «what is this?» emits the thing's TRUE word
+                # of this type on the one-thing test scenes — a 0.90 band should emit it ≈ 0.90 of the time
+                em = [it[t] in (A.get(it["item_id"]) or {}).get("emit") for it in items["NAME"]
+                      if (A.get(it["item_id"]) or {}).get("emit") is not None]
+                names[t] = {"acc": (sum(ok) / len(ok) if ok else None), "n": len(ok),
+                            "emit_true": (sum(em) / len(em) if em else None), "n_emit": len(em)}
             out["arms"][arm]["rp"][str(rp)] = {
                 "M1": M.summarise_pointing(g1), "M2a": M.grade_m2a(items["M2a"], A),
                 "M2b": M.grade_m2b(items["M2b"], A, None if kind == "truth" else m2b_cov),
@@ -456,7 +461,9 @@ def print_seed_table(marks: Dict[str, object], log=print) -> List[str]:
         lines.append(f"   {arm:<14} M2a refusal {_f(m2a['refusal'])} (n {m2a['n']}) · false refusal (graded M1 covered) "
                      f"{_f(R['M1']['graded']['false_refusal'])} · M2b {_f(m2b['graded']['correct'])} (n {m2b['graded']['n']}; "
                      f"«I don't know» {_f(m2b['graded']['idk'])}; diamond {_f(m2b['diamond']['correct'])}) · {m6s} "
-                     f"· NAME shape {_f(nm['shape']['acc'])} colour {_f(nm['colour']['acc'])} size {_f(nm['size']['acc'])}")
+                     f"· NAME shape {_f(nm['shape']['acc'])} colour {_f(nm['colour']['acc'])} size {_f(nm['size']['acc'])} "
+                     f"· «what is this?» emits the true word (the 0.90 promise) shape {_f(nm['shape'].get('emit_true'))} "
+                     f"colour {_f(nm['colour'].get('emit_true'))} size {_f(nm['size'].get('emit_true'))}")
     for s in W.M2B_SHAPES:
         lines.append(f"   M2b {s:<6} " + " ".join(f"{arm} {_f(marks['arms'][arm]['rp'][top]['M2b'][f'shape:{s}']['correct'])}" for arm in arms)
                      + f" · A-RW emitted {marks['arms']['A-RW']['rp'][top]['M2b'][f'shape:{s}']['shape_words_emitted']}")
@@ -720,7 +727,8 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
         b = arms[a]
         lines.append(f"   {a:<14} M1 covered {_f(b['graded']['covered'])} · all {_f(b['graded']['all'])} · size2 "
                      f"{_f(b['size2']['covered'])} (chance {_f(b['size2']['chance_covered'])}) · size3 {_f(b['size3']['covered'])} "
-                     f"(chance {_f(b['size3']['chance_covered'])}) · size1 sanity {_f(b['size1']['covered'])}"
+                     f"(chance {_f(b['size3']['chance_covered'])}) · size1 sanity {_f(b['size1']['covered'])} · pooled (all sizes) "
+                     f"{_f(b['all']['covered'])}"
                      + ("" if a == "N-SHUF" else (" · a reading arm, no bar" if a in READING_ARMS else
                                                   f" · beats N-SHUF: {'yes' if beat[a] else 'NO'}")))
     lines.append(f"   (the brief's step 6: ORACLE-TRUTH < 0.95 → STOP; the signed PREREG's and AMENDMENT 2's STOP is the "

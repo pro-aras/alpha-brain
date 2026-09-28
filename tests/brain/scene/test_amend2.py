@@ -7,6 +7,7 @@
 #   §3 M6 counts at a seed only if the one meeting reached the learner (≥ 1 fixation on the dax at its scene).
 #   §4 a word never heard reads NOT GRADABLE, never 0.0.
 #   §5 the reading arm A-RW-LR01: A-RW with lr 0.01, one difference, no bar.
+# edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:07 +0400 — AMENDMENT 2 as CO-SIGNED (Fable 5.1, 74be9e0, sha 6e58191f…): «none» on the pointing score's conformal threshold; «what is this?» keeps the DISTANCE band under the type's own Λ.
 from __future__ import annotations
 
 import unittest
@@ -83,23 +84,49 @@ class TestTypedReader(unittest.TestCase):
             self.assertEqual(a["point"], int(np.argmax(s)))
             self.assertEqual(a["point"], want, phrase)
 
-    def test_bands_none_and_what_is_this(self) -> None:
+    def test_none_reads_the_pointing_score_against_its_conformal_threshold(self) -> None:
+        """AMENDMENT 2 §1 as co-signed (Fable 5.1, 13:02): «none» = the best phrase score Σ log p(w | x) below the
+        conformal 0.90 threshold of the said-phrase scores on the training referents (the builder's rule, new score)."""
         rng = np.random.default_rng(3)
         Rd, thing = _typed_world(rng, n=600)
         info = Rd.prepare()
-        for w in ("red", "blue", "circle", "star", "big", "small"):
-            tau = Rd.band[w]
-            self.assertTrue(0.0 < tau <= 1.0, (w, tau))                        # a lower threshold on p(w | x)
-            self.assertGreaterEqual(info["n"][f"word:{w}"], 9)
-        x = thing("red", "circle", "small")
-        em = Rd.what_is_this(x)
-        self.assertIn("red", em)
-        self.assertIn("circle", em)
-        self.assertNotIn("blue", em)
-        # «none»: the pointed thing fails a band of the phrase — a red circle and a blue star, asked «blue circle»
+        scores = [sum(float(Rd.log_posterior(x[None, :], w)[0]) for w in ws) for x, ws in zip(Rd.train_x, Rd.train_words)]
+        self.assertAlmostEqual(Rd.tau_point, Lr.conformal_lower(scores), places=12)
+        self.assertEqual(info["n"]["point"], len(scores))
         X = np.stack([thing("red", "circle", "big"), thing("blue", "star", "big")])
+        for phrase in (["blue", "circle"], ["red", "circle"], ["star"], ["small", "red", "star"]):
+            a = Rd.answer_point(X, phrase, np.random.default_rng(0))
+            self.assertEqual(a["none"], a["best"] < Rd.tau_point, phrase)
         self.assertTrue(Rd.answer_point(X, ["blue", "circle"], np.random.default_rng(0))["none"])
         self.assertFalse(Rd.answer_point(X, ["red", "circle"], np.random.default_rng(0))["none"])
+
+    def test_what_is_this_keeps_the_distance_band_under_the_types_own_metric(self) -> None:
+        """AMENDMENT 2 §1 as co-signed: «what is this?» emits w when d_w(x) ≤ w's conformal 0.90 DISTANCE band over its
+        training referents, d under w's own type's Λ — a posterior sums to 1 over the taught words and cannot refuse a
+        never-taught shape; the distance band can (the far thing below emits NOTHING)."""
+        rng = np.random.default_rng(5)
+        # n = 6,000 scenes: the band is calibrated IN-SAMPLE under a metric fitted to the same referents, so it covers a
+        # fresh thing near 0.90 only when a type's referents far outnumber the 144 dims — measured on this world, fresh
+        # «red» coverage 0.007 / 0.587 / 0.820 at 147 / 450 / 1,471 red referents (a reading for the hand-back, not a bug)
+        Rd, thing = _typed_world(rng, n=6000)
+        info = Rd.prepare()
+        for w in ("red", "blue", "circle", "star", "big", "small"):
+            t = Rd.type_of(w)
+            k = Rd.readers[t].names.index(w)
+            d = [float(Rd._dist(t, x[None, :])[0, k]) for x, ws in zip(Rd.train_x, Rd.train_words) if w in ws]
+            self.assertAlmostEqual(Rd.band[w], Lr.conformal_upper(d), places=12)
+            self.assertGreaterEqual(info["n"][f"word:{w}"], 9)
+        # a conformal 0.90 band covers ≈ 90 % of fresh things of its word (one draw alone would be a 1-in-10 flake):
+        ems = [Rd.what_is_this(thing("red", "circle", "small")) for _ in range(300)]
+        rate = lambda w: sum(w in e for e in ems) / len(ems)
+        self.assertGreater(rate("red"), 0.7)
+        self.assertGreater(rate("circle"), 0.7)
+        self.assertLess(rate("blue"), 0.05)
+        self.assertLess(rate("star"), 0.05)
+        far = thing("red", "circle", "small") + 40.0 * rng.normal(size=144)
+        self.assertEqual(Rd.what_is_this(far), [])
+        lp = float(Rd.log_posterior(far[None, :], Rd.name_forced(far, ["circle", "star"]))[0])
+        self.assertGreater(np.exp(lp), 0.5)                  # the posterior alone would have named it
 
     def test_unheard_word_is_not_answered(self) -> None:
         rng = np.random.default_rng(4)
