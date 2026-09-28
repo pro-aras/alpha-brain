@@ -20,6 +20,9 @@ edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:05 +0400 — AMENDMENT 2 (do
 d54e6c0, sha checked beside the signed PREREG's): P-ORACLE / ORACLE-TRUTH read with the TYPE-AWARE reader (the word types
 passed in from here — the oracle may know them); M1's bars on the 2- and 3-thing items; M6 only where the meeting was seen;
 an unheard word NOT GRADABLE; the reading arm A-RW-LR01 (lr 0.01, no bar) beside A-RW. Six arms × three seeds.
+edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:17 +0400 — after the full run: a mark with n < 30 at a seed READS UNDERPOWERED
+(the signed PREREG); M2a's CEILING-BOUND read per half (the learner's failing half must be one the oracle fails
+too — declared, RAISED); the report's «all seeds» counts a seed only where the mark reads PASS.
 """
 from __future__ import annotations
 
@@ -390,10 +393,10 @@ def bars_for(marks: Dict[str, object], rp: str = str(W.N_TRAIN)) -> Dict[str, ob
     m2a = A["A-RW"]["M2a"]["all"]
     fr = m1("A-RW")["false_refusal"]
     po2, po_fr = A["P-ORACLE"]["M2a"]["all"]["refusal"], m1("P-ORACLE")["false_refusal"]
-    ok2 = _ge(m2a["refusal"], M.BARS["M2a_refusal"]) and _le(fr, M.BARS["M2a_false_refusal"])
-    ceil2 = (po2 is not None and po2 < M.BARS["M2a_refusal"]) or (po_fr is not None and po_fr > M.BARS["M2a_false_refusal"])
+    v2 = M.m2a_verdict(m2a["refusal"], fr, po2, po_fr)          # CEILING-BOUND read per half (declared, RAISED)
     r["M2a"] = {"value": m2a["refusal"], "n": m2a["n"], "false_refusal": fr, "n_fr": m1("A-RW")["n_fr"], "p_oracle": po2,
-                "p_oracle_fr": po_fr, "pass": ok2, "ceiling_bound": (not ok2) and ceil2}
+                "p_oracle_fr": po_fr, "pass": v2["pass"], "ceiling_bound": v2["ceiling_bound"],
+                "failing_halves": v2["failing_halves"], "whole_bar_ceiling": v2["whole_bar_ceiling"]}
     m2b = A["A-RW"]["M2b"]["graded"]
     po3 = A["P-ORACLE"]["M2b"]["graded"]["correct"]
     ok3 = _ge(m2b["correct"], M.BARS["M2b"])
@@ -483,8 +486,12 @@ def print_seed_table(marks: Dict[str, object], log=print) -> List[str]:
 
 
 def _verdict(b: Dict[str, object]) -> str:
+    """NOT GRADABLE, then UNDERPOWERED (the signed PREREG: «a mark with n < 30 items per seed reads UNDERPOWERED» —
+    whatever its value), then PASS / CEILING-BOUND / FAIL."""
     if b.get("not_gradable"):
         return "NOT GRADABLE"
+    if b.get("underpowered"):
+        return "UNDERPOWERED"
     if b["pass"]:
         return "PASS"
     return "CEILING-BOUND" if b.get("ceiling_bound") else "FAIL"
@@ -512,7 +519,9 @@ def report(root: Path, log=print) -> Dict[str, object]:
         lines.append(f"          size1 (sanity): {_f(m1['sanity_size1']['value'])} (n {m1['sanity_size1']['n']})")
         m2a, m2b, m6, ns = b["M2a"], b["M2b"], b["M6"], b["N-SHUF"]
         lines.append(f"          M2a refusal {_f(m2a['value'])} (n {m2a['n']}) · false refusal {_f(m2a['false_refusal'])} (n {m2a['n_fr']}) "
-                     f"· P-ORACLE {_f(m2a['p_oracle'])} / {_f(m2a['p_oracle_fr'])} → {_verdict(m2a)}")
+                     f"· P-ORACLE {_f(m2a['p_oracle'])} / {_f(m2a['p_oracle_fr'])} → {_verdict(m2a)}"
+                     + (f" (the learner fails: {', '.join(m2a['failing_halves'])}; the whole-bar reading: "
+                        f"{'CEILING-BOUND' if m2a['whole_bar_ceiling'] else 'FAIL'})" if not m2a["pass"] else ""))
         lines.append(f"          M2b {_f(m2b['value'])} (n {m2b['n']}) · P-ORACLE {_f(m2b['p_oracle'])} → {_verdict(m2b)} · diamond (apart) "
                      f"{_f(m2b['diamond'])} · P-ORACLE {_f(m2b['diamond_p_oracle'])}")
         if m6.get("not_gradable"):
@@ -527,11 +536,16 @@ def report(root: Path, log=print) -> Dict[str, object]:
         if und:
             lines.append(f"          UNDERPOWERED (n < 30): {', '.join(und)}")
     grad6 = [ws for ws in W.WORLD_SEEDS if not out["seeds"][str(ws)]["M6"].get("not_gradable")]
-    allpass = {k: all(out["seeds"][str(ws)][k]["pass"] for ws in W.WORLD_SEEDS) for k in ("M1", "M2a", "M2b", "N-SHUF")}
-    allpass["M6"] = bool(grad6) and all(out["seeds"][str(ws)]["M6"]["pass"] for ws in grad6)
+    # a seed counts for a mark only when that mark READS PASS there (UNDERPOWERED, CEILING-BOUND and FAIL do not)
+    reads = {k: {ws: (_verdict(out["seeds"][str(ws)][k]) if k != "N-SHUF" else ("PASS" if out["seeds"][str(ws)][k]["pass"] else "FAIL"))
+                 for ws in W.WORLD_SEEDS} for k in ("M1", "M2a", "M2b", "M6", "N-SHUF")}
+    allpass = {k: all(reads[k][ws] == "PASS" for ws in W.WORLD_SEEDS) for k in ("M1", "M2a", "M2b", "N-SHUF")}
+    allpass["M6"] = bool(grad6) and all(reads["M6"][ws] == "PASS" for ws in grad6)
+    lines.append("per seed: " + " · ".join(f"{k} " + "/".join(reads[k][ws] for ws in W.WORLD_SEEDS) for k in reads))
     lines.append("every bar at all 3 seeds (M6 at the seeds where the meeting was seen: " + ", ".join(map(str, grad6)) + "): "
                  + " · ".join(f"{k} {'PASS' if v else 'no'}" for k, v in allpass.items())
                  + f" → S1a {'PASSES' if all(allpass.values()) else 'does not pass'}")
+    out["reads"] = {k: {str(ws): v for ws, v in d.items()} for k, d in reads.items()}
     lines.append("refutations: T1 (A-RW M1 < 0.6 × P-ORACLE-RW) " + " ".join(
         f"{ws}:{'REFUTED' if out['seeds'][str(ws)]['T1_refuted'] else 'no'}" for ws in W.WORLD_SEEDS)
         + " · one-meeting (M6 < 0.5 while M1 passes) " + " ".join(

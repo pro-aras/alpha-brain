@@ -21,6 +21,9 @@ listed in docs/brain/r3/S1A-HANDBACK.md; those that can move a bar are RAISED th
 edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:05 +0400 — AMENDMENT 2 (PREREG-R3-TONIGHT-AMEND-2.md, genome-wt-brain3 d54e6c0): §2 M1
 is graded on the 2- and 3-thing items (the «graded» block; the one-thing items a sanity reading); §3 meeting_seen(); §4 an
 unheard word makes an item NOT GRADABLE (excluded, counted as n_unheard), never 0.0.
+edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:17 +0400 — after the full run: a mark with n < 30 at a seed READS UNDERPOWERED
+(the signed PREREG); M2a's CEILING-BOUND read per half (the learner's failing half must be one the oracle fails
+too — declared, RAISED); the report's «all seeds» counts a seed only where the mark reads PASS.
 """
 from __future__ import annotations
 
@@ -225,6 +228,22 @@ def summarise_pointing(g: Sequence[Dict[str, object]]) -> Dict[str, object]:
         if rows:
             res[f"tpl:{tpl}"] = block(rows)
     return res
+
+
+def m2a_verdict(refusal: Optional[float], false_refusal: Optional[float], po_refusal: Optional[float],
+                po_false_refusal: Optional[float]) -> Dict[str, object]:
+    """M2a's bar is CONJUNCTIVE (refusal ≥ 0.80 AND false refusal ≤ 0.10). Declared reading (RAISED), after the full run:
+    CEILING-BOUND is read PER HALF — the bar reads CEILING-BOUND only when every half the learner fails is a half P-ORACLE
+    fails too; a half the oracle reaches is the learner's own FAIL (#170: a blend hides which half failed). The whole-bar
+    reading (P-ORACLE fails the conjunction) is returned beside, as `whole_bar_ceiling`."""
+    ok = lambda v, lo=None, hi=None: v is not None and (lo is None or v >= lo) and (hi is None or v <= hi)
+    halves = {"refusal": (ok(refusal, lo=BARS["M2a_refusal"]), ok(po_refusal, lo=BARS["M2a_refusal"])),
+              "false_refusal": (ok(false_refusal, hi=BARS["M2a_false_refusal"]), ok(po_false_refusal, hi=BARS["M2a_false_refusal"]))}
+    failing = [h for h, (mine, _po) in halves.items() if not mine]
+    return {"pass": not failing, "failing_halves": failing,
+            "ceiling_bound": bool(failing) and all(not halves[h][1] for h in failing),
+            "whole_bar_ceiling": not (halves["refusal"][1] and halves["false_refusal"][1]),
+            "halves": {h: {"learner": a, "p_oracle": b} for h, (a, b) in halves.items()}}
 
 
 def meeting_seen(dax_row: Dict[str, object]) -> bool:
