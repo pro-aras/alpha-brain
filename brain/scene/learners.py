@@ -24,6 +24,9 @@ conformal threshold; «what is this?» by the DISTANCE band under the word's own
 edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:08 +0400 — PREREG-S1B1R «the repair» (§1 a–e): the ear's type cover and one-word counts,
 the READER (RWLearner.calibrate_r / reader_distances, pooled_covariance, shrunk_inverse), production maturity, the ROADS
 (RWRoad, OracleRoad) and the believed-names mouth (produce_believed). Additive — S1b-1's roads are byte-for-byte kept.
+edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:24 +0400 — BRAIN-IN-BODY (docs/brain/body/INTERFACE-BRAIN-ORGAN.md §3): two ADDITIVE
+knobs with the old defaults, so genome/brain.py can read the BRAIN line's `young` and `conformal`: RWLearner.p_from (a class
+attribute = P_FROM_MEETING) read where the module constant was, and RWLearner.calibrate(..., level=CONFORMAL).
 """
 from __future__ import annotations
 
@@ -228,6 +231,11 @@ def _maximal_cliques(nodes: Sequence[str], adj: Dict[str, set]) -> List[Tuple[st
 
 # ================================================================================================ A-RW (and P-ORACLE-RW)
 class RWLearner:
+    # edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:24 +0400 — BRAIN-IN-BODY: the genome's `young` (INTERFACE §3) reaches the
+    # learner's maturity through this CLASS attribute (default P_FROM_MEETING = 3, so every existing caller reads 3 as before);
+    # genome/brain.py sets it on its own instance. Every site below that read the module constant reads self.p_from / L.p_from.
+    p_from: int = P_FROM_MEETING
+
     def __init__(self, lr: float = LR, oracle: bool = False, dim: int = RW_DIM):
         self.lr = float(lr)
         self.oracle = bool(oracle)
@@ -387,7 +395,7 @@ class RWLearner:
         """log p_w(t) as the learner ANSWERS: a word with fewer than 3 meetings by its prototype and band (p = 1 inside,
         0 outside → 0 / −inf); from its 3rd meeting on, log σ(v_w · z + b_w). (H, W)."""
         out = log_sigmoid(Z @ self.V.T + self.b[None, :])
-        for j in np.flatnonzero(self.meetings < P_FROM_MEETING):
+        for j in np.flatnonzero(self.meetings < self.p_from):
             if self.proto_w[j] <= 0:
                 out[:, j] = -np.inf
                 continue
@@ -421,7 +429,7 @@ class RWLearner:
                 out[w] = {"mu": None, "sigma": None, "band": None, "young": True, "floor_count": None}
                 continue
             mu = self.prototype(j)
-            if self.meetings[j] < P_FROM_MEETING or not self.store_z[j]:
+            if self.meetings[j] < self.p_from or not self.store_z[j]:
                 out[w] = {"mu": mu, "sigma": np.ones(self.dim), "band": self.band(j), "young": True, "floor_count": None}
                 continue
             Z = np.concatenate(self.store_z[j], axis=0)
@@ -466,7 +474,8 @@ class RWLearner:
             cols.append(np.full(D.shape[0], np.inf) if b is None else D[:, j] / max(float(b), 1e-12))
         return np.max(np.stack(cols, axis=1), axis=1)
 
-    def calibrate(self, scenes: Sequence[Tuple[np.ndarray, Sequence[str], Optional[int]]]) -> Dict[str, object]:
+    def calibrate(self, scenes: Sequence[Tuple[np.ndarray, Sequence[str], Optional[int]]],
+                  level: float = CONFORMAL) -> Dict[str, object]:
         """At a reading point (declared: under the CURRENT state, over every training scene seen so far):
         τ_point = the conformal 0.90 threshold of the best phrase score of the phrase said in each training scene;
         τ_word(w) = the conformal 0.90 threshold of p_w on the thing with the highest responsibility for w (the
@@ -502,8 +511,10 @@ class RWLearner:
                     col = Pm[:, j]
                     h = int(np.argmax(col))                  # the highest responsibility = the highest p_w (proportional rule)
                 per_word[w].append(float(np.exp(lp[h, j])))
-        self.tau_point = conformal_lower(pts)
-        self.tau_word = {w: conformal_lower(v) for w, v in per_word.items()}
+        # edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:24 +0400 — `level` (default CONFORMAL = 0.90, every existing caller unchanged) is
+        # the genome's `conformal` (INTERFACE §3): τ_point's and τ_word's conformal level.
+        self.tau_point = conformal_lower(pts, level)
+        self.tau_word = {w: conformal_lower(v, level) for w, v in per_word.items()}
         self._bands_cache = bands
         # the refusal by distance (the law and reading (ii)) and its phrase-level «none»
         self.refusal = {m: self._refusal_states(m) for m in ("diag", "euclid")}
@@ -587,7 +598,7 @@ class RWLearner:
     # -- PREREG-S1B1R §1 (a)–(c) (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:08 +0400): additive; S1b-1's roads never read these
     def mature_words(self) -> List[str]:
         """The words of ≥ 3 meetings (P_FROM_MEETING): the only words the learner EMITS (§1 c) and the vertices of its types."""
-        return [w for j, w in enumerate(self.words) if self.meetings[j] >= P_FROM_MEETING]
+        return [w for j, w in enumerate(self.words) if self.meetings[j] >= self.p_from]
 
     def calibrate_r(self, eps: float, world_types: Optional[Dict[str, str]] = None) -> Dict[str, object]:
         """At a reading point, AFTER calibrate() (never changing what it set): the learned TYPES — the ear's greedy cover of
@@ -1048,7 +1059,7 @@ class RWRoad:
             out = [w for w in L.words if w in st["word"] and st["word"][w]["band"] is not None
                    and D[L.index[w]] <= st["word"][w]["band"]]
         if self.mature:
-            out = [w for w in out if L.meetings[L.index[w]] >= P_FROM_MEETING]
+            out = [w for w in out if L.meetings[L.index[w]] >= L.p_from]
         return out
 
     def answer_point(self, X: np.ndarray, phrase: Sequence[str], rng: np.random.Generator) -> Dict[str, object]:
@@ -1071,7 +1082,7 @@ class RWRoad:
         lp = L.logp_answer(Z, getattr(L, "_bands_cache", None))
         out: List[List[Optional[str]]] = []
         for T in self.types():
-            cand = [w for w in T if w in L.index and L.meetings[L.index[w]] >= P_FROM_MEETING]
+            cand = [w for w in T if w in L.index and L.meetings[L.index[w]] >= L.p_from]
             if not cand:
                 out.append([None] * Z.shape[0])
                 continue
