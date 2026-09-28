@@ -38,6 +38,13 @@ def _fake():
     return mock.patch.object(MM, "_brain_class", lambda: S.FakeBrain)
 
 
+def _replay(genome, tape, out, under: Path, **kw):
+    """creature.replay.run_replay with its `creature-replay-*` work root made UNDER `under` (it never removes that root itself —
+    pre-existing), so the class's own tearDown removes it: the tests leave no temp root behind."""
+    with mock.patch.object(tempfile, "tempdir", str(under)):
+        return RP.run_replay(genome, tape, out, **kw)
+
+
 class _Tape:
     """One fixture tape per class, in a fresh root (#212); every mind gets its own fresh root linked to it."""
     tape_root: Path
@@ -210,6 +217,26 @@ class TestBrainRoad(_Tape, unittest.TestCase):
         self.assertEqual(led["asks"]["pending"], {})
 
 
+class TestOtherBlindsLeaveTheBrainItsInput(_Tape, unittest.TestCase):
+    """Declared readings, run: `--blind coarse` strips the ORGANISM's coarse glance, never the brain's (FakeBrain.learn asserts
+    the coarse glance is present — its own assertion is the pin); `--blind ear` deafens the ORGANISM, the brain hears the tape."""
+
+    def _learn_rows(self, root):
+        return [r for r in S.journal(root) if r.get("kind") == "brain" and r.get("act") == "learn"]
+
+    def test_blind_coarse(self) -> None:
+        m, root = self.run_mind(blind=frozenset({"coarse"}))
+        self.assertEqual(len(self._learn_rows(root)), self.info["n_train"])
+
+    def test_blind_ear(self) -> None:
+        _m0, r0 = self.run_mind()
+        _m1, r1 = self.run_mind(blind=frozenset({"ear"}))
+        a, b = self._learn_rows(r0), self._learn_rows(r1)
+        self.assertEqual(len(b), self.info["n_train"])
+        self.assertEqual([r["words"] for r in a], [r["words"] for r in b])
+        self.assertTrue(all(r["words"] for r in b))
+
+
 # ------------------------------------------------------------------------------------------------ THE ORGANS' ROAD (the twin)
 class TestOrgansRoad(_Tape, unittest.TestCase):
     RAW_KEYS = {"point": [{"point", "none", "none_i"}, {"point", "none", "unheard"}],
@@ -341,7 +368,7 @@ class TestReplayAndResume(_Tape, unittest.TestCase):
         outs = []
         with _fake():
             for k in range(2):
-                outs.append(RP.run_replay(gp, self.info["tape"], self.tmp / f"replay{k}", close=True))
+                outs.append(_replay(gp, self.info["tape"], self.tmp / f"replay{k}", self.tmp, close=True))
         self.assertEqual(outs[0].read_bytes(), outs[1].read_bytes())
         got = RP.read_mind_journal(outs[0])
         want = [r for r in S.journal(live) if RP.is_mind_row(r)]
@@ -351,7 +378,7 @@ class TestReplayAndResume(_Tape, unittest.TestCase):
     def test_blind_brain_replay_equals_the_blind_live(self) -> None:
         m, live = self.run_mind(blind=BLIND)
         with _fake():
-            out = RP.run_replay(live.parent / "g.genome", self.info["tape"], self.tmp / "replay-blind", blind=BLIND, close=True)
+            out = _replay(live.parent / "g.genome", self.info["tape"], self.tmp / "replay-blind", self.tmp, blind=BLIND, close=True)
         self.assertIsNone(RP.compare(RP.read_mind_journal(out), [r for r in S.journal(live) if RP.is_mind_row(r)]))
 
     def test_resumed_from_a_snapshot_between_an_ask_and_its_eye_row(self) -> None:
@@ -400,8 +427,8 @@ class TestReplayDirectory(unittest.TestCase):
                 finally:
                     m.close()
                 self.assertEqual(len(list((root / "journal").glob("*.jsonl"))), 2)
-                out = RP.run_replay(gp, tr / "tape", tmp / "replay", close=True)
-                one = RP.run_replay(gp, info["days"][0], tmp / "replay-one-day", close=True)
+                out = _replay(gp, tr / "tape", tmp / "replay", tmp, close=True)
+                one = _replay(gp, info["days"][0], tmp / "replay-one-day", tmp, close=True)
             want = [r for r in S.journal(root) if RP.is_mind_row(r)]
             self.assertIsNone(RP.compare(RP.read_mind_journal(out), want))
             self.assertIsNotNone(RP.compare(RP.read_mind_journal(one), want), "one day file is not the whole life")
@@ -420,7 +447,7 @@ class TestEndToEndRealBrain(_Tape, unittest.TestCase):
         for a in ans:
             self.assertIn("raw", a["answer"], a)
         self.assertEqual(sum(1 for r in S.journal(rb) if r.get("act") == "learn"), self.info["n_train"])
-        out = RP.run_replay(rb.parent / "g.genome", self.info["tape"], self.tmp / "replay-real", close=True)
+        out = _replay(rb.parent / "g.genome", self.info["tape"], self.tmp / "replay-real", self.tmp, close=True)
         self.assertIsNone(RP.compare(RP.read_mind_journal(out), [r for r in S.journal(rb) if RP.is_mind_row(r)]))
         mo, ro = self.run_mind(blind=BLIND, fake=False)
         self.assertEqual([json.dumps(r) for r in S.journal(rb) if not S.is_brain_row(r)],
