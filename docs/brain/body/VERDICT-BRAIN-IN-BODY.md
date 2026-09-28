@@ -117,6 +117,6 @@
 - **Not tested tonight:** a life longer than 40 minutes; a world that changes (the rooms of T-MEM-1); the brain's own replay in sleep (`replay none` at rung 1).
 
 ## The tests of record
-On the final code (`brain-organ-final` c1093cf; every commit after it changes documents and records only — checked by diff): scene `Ran 368 … OK` · brain `Ran 770 … OK (skipped=3)` · genome `Ran 614 … OK (skipped=1, expected failures=6)` · creature `Ran 1176 … OK (skipped=6)` · tools `Ran 62 … OK` (`records/suites-final-c1093cf.txt`). The lean lives and the full life ran on 98299ae and bc45156, whose suites are in `records/suites-bc45156.txt`.
+On the final code (`brain-organ-final` c1093cf; every commit after it changes documents and records, and one guard line in the shell script `tools/brain/rung2_replays.sh` that no suite runs — checked by diff): scene `Ran 368 … OK` · brain `Ran 770 … OK (skipped=3)` · genome `Ran 614 … OK (skipped=1, expected failures=6)` · creature `Ran 1176 … OK (skipped=6)` · tools `Ran 62 … OK` (`records/suites-final-c1093cf.txt`). The lean lives and the full life ran on 98299ae and bc45156, whose suites are in `records/suites-bc45156.txt`.
 
 *Closed by Claude (Fable 5.1, the seat), 2026-09-29 00:20 +0400.*
