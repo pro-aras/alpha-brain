@@ -92,4 +92,4 @@ Nothing could not be built as written. The declared readings above were sent bef
 Each line is read from its log, and each log has 0 `ERROR:` / `FAIL:` blocks:
 - **venv, the whole brain suite:** `Ran 594 tests in 268.073s` / `OK (skipped=3)` — log `/data/dev/brain-runs/scene-s1c2/logs/suite-venv-e3cc2ed.log`. That is S1c's 575 plus the 19 new tests.
 - **/usr/bin/python3, the scene package:** `Ran 192 tests in 52.947s` / `OK` — log `…/logs/suite-scene-sys-e3cc2ed.log`.
-- **Red on the parent 2679fb3:** the 19 new tests `FAILED (errors=8)` — the new pickers are missing, and run_s1c2 does not exist there. Log `…/logs/redcheck-2679fb3.log`.
+- **Red on the parent 2679fb3:** the two new test modules `Ran 8 tests` / `FAILED (errors=8)`. The 7 picker tests error on the missing classes, and the 12 runner tests fail as one import error, because run_s1c2 does not exist there. Log `…/logs/redcheck-2679fb3.log`.
