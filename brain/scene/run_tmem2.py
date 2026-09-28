@@ -710,7 +710,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--root-out", default=str(TMEM2_ROOT))
     a = ap.parse_args(argv)
     root_in, root_out = Path(a.root_in), Path(a.root_out)
-    log = R.Log(root_out / "logs" / f"{a.cmd}.log")
+    log = R.Log(root_out / "logs" / (f"{a.cmd}-{a.world_seed}.log" if a.world_seed else f"{a.cmd}.log"))   # three lives never share a log
     check_prereg_tmem2()
     if a.cmd == "first-gate":
         g = first_gate_tmem2(root_in, root_out, log=log)
