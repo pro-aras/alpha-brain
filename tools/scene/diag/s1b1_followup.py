@@ -8,8 +8,9 @@
 #        (training does not depend on the reading points' calibrations; the M1 pointing reads the state at 10,000), M1 on
 #        the identical graded covered items; priced first, ≤ 8 at once, each wave waiting on its own pids;
 #   (A3) the within-type mouth counterfactual on SPEAK: the forced name of ONE declared type (shape, colour, size), and a
-#        fourth reading choosing the type by the within-type posterior margin, on the ONE-hypothesis items (margin +∞) and on
-#        the several-hypothesis items; the law's own TRUTH reproduced first as the control.
+#        fourth reading choosing the type by the within-type posterior margin, on the ONE-hypothesis items (X has one row, so
+#        the read-back margin is +∞ — the converse does not hold: see A3′) and on the several-hypothesis items; the law's own
+#        TRUTH reproduced first as the control. (label corrected: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 14:43 +0400)
 # Run from a pinned copy:  cd /data/dev/brain-runs/scene/code-<sha> && PYTHONPATH=$PWD OPENBLAS_NUM_THREADS=1 \
 #   TMPDIR=/data/dev/brain-runs/tmp nice -n 19 /usr/bin/python3 -B tools/scene/diag/s1b1_followup.py all
 from __future__ import annotations
@@ -211,7 +212,7 @@ def a3() -> None:
             a = ans[it["item_id"]]
             if a.get("spoken") is not None:
                 tab.setdefault("the law (spoken)", []).append(M.unique_true(a["spoken"], things, t, range(len(things))))
-        for key, label in (("one", "ONE hypothesis in view (margin +∞)"), ("several", "SEVERAL hypotheses in view")):
+        for key, label in (("one", "ONE hypothesis in view (X has one row; the read-back margin is then +∞, but +∞ does not imply one row — A3′)"), ("several", "SEVERAL hypotheses in view")):
             tab = tables[key]
             if not tab:
                 print(f"      {label}: no items")
@@ -257,6 +258,7 @@ def a3_dax() -> None:
         import collections
         c = collections.Counter()
         cf = []
+        same = 0   # the control: the law's own mouth, re-run here with the same rng factory, must reproduce the unit's spoken phrase
         for it in K_["SPEAK"]:
             q = q_by[it["item_id"]]
             if q.get("hyp") is None:
@@ -269,14 +271,20 @@ def a3_dax() -> None:
             sp = a.get("spoken")
             if sp is not None:
                 true = M.unique_true(sp, things, t, range(len(things)))
+                cause = ("true" if true else "false of the target" if not W.phrase_true_of(sp, things[t])
+                         else "also true of another")
                 c[("«dax»" if sp == ["dax"] else "other", "1 hyp" if X.shape[0] == 1 else "≥2 hyp",
-                   "+∞" if a["margin"] == float("inf") else "finite", "true" if true else "false")] += 1
+                   "+∞" if a["margin"] == float("inf") else "finite", cause)] += 1
+            law = Lr.produce(L, X, int(q["hyp"]), lambda it=it: M.tie_rng(W.TEST_SEEDS[ws], it["item_id"]))
+            same += law.get("spoken") == sp
             b = Lr.produce(_NoYoungWords(L), X, int(q["hyp"]), lambda it=it: M.tie_rng(W.TEST_SEEDS[ws], it["item_id"]))
             if b.get("spoken") is not None:
                 cf.append(M.unique_true(b["spoken"], things, t, range(len(things))))
         n_sp = sum(c.values())
         n_dax = sum(v for k, v in c.items() if k[0] == "«dax»")
-        print(f"   {ws}: spoken {n_sp}, of which «dax» {n_dax} (all false: {all(k[3] == 'false' for k in c if k[0] == '«dax»')}); "
+        print(f"   {ws}: the control — the law's mouth re-run here reproduces the unit's spoken phrase on {same} of "
+              f"{sum(1 for it in K_['SPEAK'] if q_by[it['item_id']].get('hyp') is not None)} items")
+        print(f"   {ws}: spoken {n_sp}, of which «dax» {n_dax} (all false: {all(k[3] != 'true' for k in c if k[0] == '«dax»')}); "
               + " · ".join(f"{'/'.join(k)} {v}" for k, v in sorted(c.items())))
         print(f"            the counterfactual mouth without the young words: TRUTH {np.mean(cf):.3f} (n {len(cf)}) — the unit's {UNIT_TRUTH[ws]:.3f}")
 
