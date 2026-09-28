@@ -100,3 +100,10 @@ Reads the life's tape, its journal's `answer` rows and `root/truth/scene/`, and 
 
 ## 7 · Hand-back
 Each builder stops at `docs/brain/body/HANDBACK-<A|B|C>.md`: what was built, the suites' own `Ran N … OK` lines read from log files written on the final commit, every clause RAISED, every number with its file. A report is read against its own completed run.
+
+## 8 · ADDENDUM 1 (the seat, 2026-09-28 20:23 +0400) — every answer carries the offline graders' own fields
+So that ONE grader serves the bench and the body, and rung 1's gate compares like with like:
+- Every answer (`Brain.ask`'s return, and the organs' road's) carries `raw`: the offline function's own return under the offline field names, exactly as `answers_10000.json` stores it. `point` → `RWLearner.answer_point`'s dict. `what` → `{"emit": […]}` (NAME items also `"name": {type: forced name}`); an unseen pointer → `{"emit": None, "uncovered": True}`. `say` → `produce_believed`'s dict; an unseen pointer → `{"spoken": None, "reason": "uncovered", "uncovered": True}`. A misuse answer → `raw = {"point": None, "misuse": [a, b]}` and `raw_forced` = what `answer_point` would have returned without the misuse check. `why` → the answer itself.
+- The organs' road: `point` → `{"point": k | None, "none": b, "none_i": b}` or `{"point": None, "none": None, "unheard": […]}`; `what` → `{"emit": […]}`; `say` → `{"spoken": […] | None, "reason", "target", "readback_point": None}`.
+- Every journaled answer row also carries `fix` (the canvas's located fixation cells, in glance order) and `hyps` (the eye's hypotheses as member lists, indices into `fix`). The grader maps a pointed hypothesis to a thing and reads coverage from these and the truth file, never from the offline caches.
+- Sent to builders A and C at the stamp above.
