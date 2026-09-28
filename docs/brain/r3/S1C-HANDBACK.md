@@ -4,6 +4,7 @@
 
 ## 0 · The verdict: THE FIRST GATE STOPPED at step 2 — K is not flat
 - **K (i) MISS:** K's mean own block-drop after block 20 is **6.084** (3 visits in blocks 21–60). The bound is 0.05 × L_K's level = **0.274**. The miss holds under every reading of «level»: the bound is 0.190 for L_K at block 60 and 0.581 for the largest L_K in 21–60.
+  - **The reading the seat's signed line did NOT choose would PASS** (information for a ruling, not a proposal). The line makes the drop read over K's OWN visited blocks, and that law is what was applied. Read over ALL blocks 21–60 instead, the mean block-drop is (L_K(20) 9.303 − L_K(60) 3.801) / 40 = **0.138 ≤ 0.274**. That figure is an endpoint reading of a series that swings between 1.60 and 11.63 in those blocks (#240 (4)). The interference in §1 is exactly what separates the two readings.
 - **K (ii) passes:** L_K(60) 3.801 ≤ min L_R(60) 4.623.
 - **N passes:** |mean drop| 0.137 ≤ 0.404.
 - **R1–R3 pass:** 1.257 ≥ 3 × 0.137 = 0.410. The other reading of «3 × that» (≥ 3 × 0.05 × L_N's level = 1.211) passes too.
