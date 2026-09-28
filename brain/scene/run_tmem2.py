@@ -588,7 +588,9 @@ def step3(free: Dict[str, Dict[str, object]], fed: Dict[str, Dict[str, object]],
 def bars_tmem2(marks: Dict[int, Dict[str, object]]) -> Dict[str, object]:
     """§5 and §6 over the three seeds' marks."""
     seeds = sorted(marks)
-    out: Dict[str, object] = {"B1": {}, "B3": {}, "per_seed": {}, "refute": {}}
+    out: Dict[str, object] = {"B1": {}, "B3": {}, "per_seed": {}, "refute": {"per_seed": {}}}
+    # (edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:50 +0400 — the per-seed refutations sit under "per_seed": a dict that
+    # mixed the seeds (ints) with the two pooled names (strs) crashed run.dump's sort_keys at the unit's report step, 18:48)
     pooled = {n: {"er_hits": 0, "n_err": 0, "tr_hits": 0, "n_true": 0} for n in GRADED_ROADS}
     conf, corr = [], []
     for ws in seeds:
@@ -606,7 +608,7 @@ def bars_tmem2(marks: Dict[int, Dict[str, object]]) -> Dict[str, object]:
                 pooled[n][k] += d[k]
         dec = mk["decision"]
         n_rev = [w for w, v in mk["words"].items() if v["abs_diff"] is not None and v["abs_diff"] > 0.10]
-        out["refute"][ws] = {
+        out["refute"]["per_seed"][ws] = {
             "a_silence": bool(mo["HEALTH-MOUTH"]["spoken"] is not None and mo["CONTROL"]["spoken"] is not None
                               and mo["HEALTH-MOUTH"]["spoken"] < B1_SPOKEN * mo["CONTROL"]["spoken"]
                               and (mo["HEALTH-MOUTH"]["truth"] or 0) > (mo["CONTROL"]["truth"] or 0)),
@@ -717,12 +719,13 @@ def report_tmem2(root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, log=pr
     y = b["B4"]
     lines.append(f"POOLED B4 type-2 AUROC(the truth-free row) {_f(y['auroc'])} ≥ 0.70 (errors {y['n_err']}; chance 0.50) → {y['verdict']}")
     rf = b["refute"]
-    lines.append("refutations (§6): (a) the row buys silence " + " ".join(f"{ws}:{'YES' if rf[ws]['a_silence'] else 'no'}" for ws in W.WORLD_SEEDS)
+    rs = rf["per_seed"]
+    lines.append("refutations (§6): (a) the row buys silence " + " ".join(f"{ws}:{'YES' if rs[ws]['a_silence'] else 'no'}" for ws in W.WORLD_SEEDS)
                  + f" · (b) the NULL ≈ HEALTH-MOUTH (the null clause not met) {'YES — the gate refuses, it does not know' if rf['b_null_like_mouth'] else 'no'}"
                  + f" · (c) CEILING-BOUND {'YES' if rf['c_ceiling'] else 'no'}"
-                 + " · (d) the rows disagree by > 0.10 on ≥ 3 words " + " ".join(f"{ws}:{'YES ' + str(rf[ws]['d_disagree_words']) if rf[ws]['d_fires'] else 'no (' + str(len(rf[ws]['d_disagree_words'])) + ')'}" for ws in W.WORLD_SEEDS))
+                 + " · (d) the rows disagree by > 0.10 on ≥ 3 words " + " ".join(f"{ws}:{'YES ' + str(rs[ws]['d_disagree_words']) if rs[ws]['d_fires'] else 'no (' + str(len(rs[ws]['d_disagree_words'])) + ')'}" for ws in W.WORLD_SEEDS))
     lines.append("the declared sign (§6: truth-free cal_20 ≥ truth-fed on every word): " + " ".join(
-        f"{ws}: reversed {rf[ws]['sign_reversed'] or 'none'}" + (f" — FAULT (> 0.10) {rf[ws]['sign_fault']}" if rf[ws]["sign_fault"] else "") for ws in W.WORLD_SEEDS))
+        f"{ws}: reversed {rs[ws]['sign_reversed'] or 'none'}" + (f" — FAULT (> 0.10) {rs[ws]['sign_fault']}" if rs[ws]["sign_fault"] else "") for ws in W.WORLD_SEEDS))
     b1s = "/".join(b["B1"][ws]["verdict"] for ws in W.WORLD_SEEDS)
     b3s = "/".join(b["B3"][ws]["verdict"] for ws in W.WORLD_SEEDS)
     lines.append(f"per seed: B1 {b1s} · B3 {b3s} · pooled: B2 {b['B2']['verdict']} · B4 {b['B4']['verdict']}")

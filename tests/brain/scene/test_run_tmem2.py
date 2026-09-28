@@ -122,6 +122,23 @@ class TestLifeEndToEnd(unittest.TestCase):
             self.assertLessEqual(p[k]["scenes_set_aside"], p[k]["phrases_none"])
         self.assertTrue(all("cal20_fed_kept" in v for v in self.marks["words"].values()))
 
+    def test_the_report_reads_three_seeds_and_writes_its_record(self) -> None:
+        """(edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:49 +0400) the unit's REPORT step crashed at 18:48 — run.dump's
+        sort_keys over bars_tmem2's refutations, a dict mixing the seeds (ints) with two pooled names (strs) — after all three
+        lives and graders had passed. No test had run the report: it needs three seeds' marks. Here the three are copies of
+        this life's, and the whole report is built, written and read back."""
+        import shutil
+        for ws in T.W.WORLD_SEEDS[1:]:
+            (self.root_out / str(ws)).mkdir(parents=True, exist_ok=True)
+            shutil.copy(self.root_out / str(WS) / "marks.json", self.root_out / str(ws) / "marks.json")
+        T.report_tmem2(self.root_in, self.root_out, log=lambda s: None)
+        rep = json.loads((self.root_out / "report.json").read_text())
+        self.assertEqual(set(rep["bars"]["refute"]["per_seed"]), {str(ws) for ws in T.W.WORLD_SEEDS})
+        self.assertIn("c_ceiling", rep["bars"]["refute"])
+        txt = (self.root_out / "report.txt").read_text()
+        self.assertTrue(txt.startswith("T-MEM-2 report"))
+        self.assertIn("refutations (§6)", txt)
+
 
 class TestIdentityComparator(unittest.TestCase):
     def test_canonical_json_and_a_planted_byte(self) -> None:
