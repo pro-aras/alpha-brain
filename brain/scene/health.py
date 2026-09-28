@@ -5,6 +5,10 @@ edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 17:30 +0400 — new module.
 edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:18 +0400 — PREREG-TMEM2 AMENDMENT 1 (final a7dceea, sha 6da8ff67…): a claim is
 graded ONLY IF the said word's own band holds the thing it is attributed to; otherwise UNGRADED «about a thing I did not see»,
 counted under the claimed word (the row's `unseen`); the claim record carries the held words it was made from.
+edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:43 +0400 — PREREG-TMEM2 AMENDMENT 2 (final b1e2b15, sha 76d8ac86…) REPLACES
+AMENDMENT 1's rule: «a thing I did not see» is the learner's own M2a «none» (heard_none: the LAW road's pointing for the
+parent's phrase over the scene's seen hypotheses, τ_point, before train_scene); when it fires, every claim the phrase would
+grade is set aside (grades(..., set_aside=True)). No band rule; the held words stay in the claim record, read by no rule.
 
 THE FENCE: like learners.py this module imports numpy, math, typing and brain.scene.learners only — never the world, the
 cache's reader of scene specs or the graders (tests/brain/scene/test_truth_fence.py). What the law grades AGAINST the world —
@@ -15,8 +19,9 @@ computed by run_tmem2.py and reaches this module only as plain arguments (an ind
                  name of every hypothesis, and whether it is CONFIDENT (the band holds it).
   attribution()  §2 the learner's OWN attribution of each said word, read-only, after train_scene (h* = the argmax of the
                  responsibilities it just stored; the episodic write's thing for a word's first meeting).
-  grades()       ITS GRADE, FILED UNDER THE CLAIMED WORD (the co-signed edit): (b_T(h*), confirmed, the said word) — and, by
-                 AMENDMENT 1, only when the said word's own band holds h*; else (b_T(h*), None, the said word): set aside.
+  grades()       ITS GRADE, FILED UNDER THE CLAIMED WORD (the co-signed edit): (b_T(h*), confirmed, the said word) — or, by
+                 AMENDMENT 2, when the phrase's «none» fired, (b_T(h*), None, the said word): set aside, «unseen».
+  heard_none()   AMENDMENT 2: the learner's own «this phrase fits nothing I see» — the LAW road's M2a pointing, read-only.
   HealthRow      one word's row: n_claims, its graded outcomes in order, cal_20 (the last 20 graded), the consecutive
                  20-claim windows, Δ, median |Δ|, the drift READING in both forms; the said word's MISSED count apart.
   HealthBook     the rows of every word, fed claims and grades.
@@ -52,7 +57,8 @@ def claims(road: "Lr.RWRoad", X: np.ndarray) -> Dict[str, object]:
     learned type T (the road's types: the ear's cover at the last reading point), the believed name b_T(h) of every
     hypothesis h (`RWRoad.believed`) and whether it is CONFIDENT (`RWRoad.sayable` ≡ the word is among the hypothesis's
     held words; the held words are read once per hypothesis). Nothing is written. AMENDMENT 1: the record carries those held
-    words per hypothesis (sorted) — the band's own «what is this?» that the rule of the grade reads."""
+    words per hypothesis (sorted) — the band's own «what is this?»; AMENDMENT 2 replaced the rule that read them, and the
+    record keeps them, read by no rule."""
     X = np.atleast_2d(X)
     types = [tuple(t) for t in road.types()]
     believed = road.believed(X)
@@ -60,6 +66,16 @@ def claims(road: "Lr.RWRoad", X: np.ndarray) -> Dict[str, object]:
     confident = [[believed[k][h] is not None and believed[k][h] in held[h] for h in range(X.shape[0])]
                  for k in range(len(types))]
     return {"types": types, "believed": believed, "confident": confident, "held": [tuple(sorted(s)) for s in held]}
+
+
+def heard_none(road: "Lr.RWRoad", X: np.ndarray, phrase: Sequence[str], rng: np.random.Generator) -> Dict[str, object]:
+    """AMENDMENT 2 §2 — the learner's own «this phrase fits nothing I see», read-only, after the parent's phrase is heard and
+    BEFORE train_scene: the LAW road's pointing for the phrase over the scene's SEEN hypotheses, exactly as M2a asks it
+    (`RWRoad.answer_point`: the best Σ log p_w over the things, «none» = S1a's τ_point rule, S1b-1R's none_i, under the current
+    state). `none` is True / False; None when a word of the phrase was never heard (no pointing — nothing is set aside)."""
+    a = road.answer_point(np.atleast_2d(X), list(phrase), rng)
+    none = a.get("none") if a.get("point") is not None else None
+    return {"none": None if none is None else bool(none), "best": a.get("best"), "unheard": a.get("unheard")}
 
 
 def attribution(L: "Lr.RWLearner", raw: np.ndarray, words: Sequence[str], new: Sequence[str]) -> Dict[str, Optional[int]]:
@@ -86,17 +102,17 @@ def attribution(L: "Lr.RWLearner", raw: np.ndarray, words: Sequence[str], new: S
     return out
 
 
-def grades(claim_rec: Dict[str, object], attributed: Dict[str, Optional[int]]) -> List[Tuple[str, bool, str]]:
+def grades(claim_rec: Dict[str, object], attributed: Dict[str, Optional[int]],
+           set_aside: bool = False) -> List[Tuple[str, Optional[bool], str]]:
     """§2 ITS GRADE, as co-signed — FILED UNDER THE CLAIMED WORD: for each said word w of a learned type T with an attributed
     hypothesis h*, the claim about h* in T, IF IT WAS CONFIDENT, is confirmed iff b_T(h*) = w and refuted iff b_T(h*) is
     another word of T; returned as (the claimed word b_T(h*), confirmed, the said word w). A said word of no learned type, an
     unattributed word, or a claim that was not confident: ungraded (nothing returned).
-    AMENDMENT 1 — the rule: the claim is graded ONLY IF w's own band holds h* (w among the held words the claim step read at
-    h*: the READER under the learner's state when it saw the thing); otherwise it is set aside, «about a thing I did not
-    see», returned as (b_T(h*), None, w). A confirmation is never set aside (b = w is held at h* by its confidence)."""
+    AMENDMENT 2 — the rule (replacing AMENDMENT 1's band rule): when the phrase's «none» fired (`set_aside`), every claim
+    this phrase would grade is set aside, «about a thing I did not see», returned as (b_T(h*), None, w); otherwise graded
+    as above. What was never gradable stays ungraded either way."""
     types = claim_rec["types"]
     where = {w: k for k, T in enumerate(types) for w in T}
-    held = claim_rec["held"]
     out: List[Tuple[str, Optional[bool], str]] = []
     for w, h in attributed.items():
         k = where.get(w)
@@ -106,7 +122,7 @@ def grades(claim_rec: Dict[str, object], attributed: Dict[str, Optional[int]]) -
         if h >= len(conf) or not conf[h]:
             continue
         b = claim_rec["believed"][k][h]
-        out.append((b, (b == w) if w in held[h] else None, w))
+        out.append((b, None if set_aside else (b == w), w))
     return out
 
 

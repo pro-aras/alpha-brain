@@ -7,6 +7,11 @@ edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:18 +0400 — PREREG-TMEM
 graded through the rule (health.grades; the truth-fed row at the referent's hypothesis — one difference, the hypothesis); the
 two readings beside it, offline (the metacognition-of-perception reading and the false-unseen rate); step 3 read after the
 rule; step 5's price a STOP when OVER; the amendment's sha checked with the law's.
+edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:43 +0400 — PREREG-TMEM2 AMENDMENT 2 (final b1e2b15, sha 76d8ac86…): the rule is
+the learner's own M2a «none» (the hook HEARS the parent's phrase before train_scene: health.heard_none with its own generator
+`tmem2-none:<scene>`), set aside on the truth-free row only; the truth-fed row carries NO rule, and its twin restricted to the
+claims the rule keeps is printed beside it (Fable's edit); the readings per claim, scene and phrase; the second amendment's sha
+checked with the law's and the first's.
 
   python3 -m brain.scene.run_tmem2 first-gate              THE FIRST GATE (§7): 3 lives solo, the toy, agreement, the smoke, the price
   python3 -m brain.scene.run_tmem2 life --world-seed W     one HEALTH life; its identity checked at the end (exit 3 on a miss)
@@ -46,6 +51,8 @@ PREREG_TMEM2_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/memory/PREREG-TM
 PREREG_TMEM2_SHA256 = "b785b54f97c6c2bc300ce07cdc26aaa716bf9c7fcb3e7cc183294480b5fd2914"
 PREREG_TMEM2_AMEND1_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/memory/PREREG-TMEM2-AMEND-1.md")
 PREREG_TMEM2_AMEND1_SHA256 = "6da8ff679a317166c7a4e82bf9efd183785b5ecb90ad1bcb6fbae90d241386e6"   # final, a7dceea
+PREREG_TMEM2_AMEND2_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/memory/PREREG-TMEM2-AMEND-2.md")
+PREREG_TMEM2_AMEND2_SHA256 = "76d8ac86c0af8320b1b96fa48621cf6a016e0c4037437489edbd186b56c758bf"   # final, b1e2b15
 S1B1R_REPORT_SHA256 = "b695ae5c94d13a85a3d05a1b58f553306f776726e2e66fd042b7302741a219a3"
 HEALTH_ROADS: Tuple[str, ...] = ("HEALTH-MOUTH", "HEALTH-ORACLE", "HEALTH-TRUTHFED", "NULL")
 GRADED_ROADS: Tuple[str, ...] = ("CONTROL",) + HEALTH_ROADS
@@ -72,6 +79,9 @@ def check_prereg_tmem2() -> str:
     am = hashlib.sha256(Path(PREREG_TMEM2_AMEND1_PATH).read_bytes()).hexdigest()
     if am != PREREG_TMEM2_AMEND1_SHA256:
         raise TMem2Error(f"PREREG-TMEM2-AMEND-1 sha256 {am} ≠ the final {PREREG_TMEM2_AMEND1_SHA256} — STOP and hand back")
+    am2 = hashlib.sha256(Path(PREREG_TMEM2_AMEND2_PATH).read_bytes()).hexdigest()
+    if am2 != PREREG_TMEM2_AMEND2_SHA256:
+        raise TMem2Error(f"PREREG-TMEM2-AMEND-2 sha256 {am2} ≠ the final {PREREG_TMEM2_AMEND2_SHA256} — STOP and hand back")
     return got
 
 
@@ -97,16 +107,33 @@ def perception_rates(p: Dict[str, Dict[str, int]]) -> Dict[str, Optional[float]]
     u, s = p["unseen"], p["seen"]
     return {"metacognition": r(u["set_aside"], u["gradable"]), "false_unseen": r(s["set_aside"], s["gradable"]),
             "metacognition_scenes": r(u["scenes_set_aside"], u["scenes"]),
-            "false_unseen_scenes": r(s["scenes_set_aside"], s["scenes"])}
+            "false_unseen_scenes": r(s["scenes_set_aside"], s["scenes"]),
+            "metacognition_phrases": r(u.get("phrases_none", 0), u.get("phrases", 0)),        # AMENDMENT 2: per phrase heard
+            "false_unseen_phrases": r(s.get("phrases_none", 0), s.get("phrases", 0))}
+
+
+def kept_residuals(free: Dict[str, Dict[str, object]], kept: Dict[str, Dict[str, object]], words: Sequence[str]) -> Dict[str, object]:
+    """AMENDMENT 2 §3 (Fable's edit), a READING never a stop: the residual cal_20 truth-free − truth-fed with the fed row
+    RESTRICTED to the claims the rule keeps (one population); the words more than 0.10 below it printed."""
+    res: Dict[str, Optional[float]] = {}
+    below: List[str] = []
+    for w in words:
+        cf, ck = (free.get(w) or {}).get("cal20"), (kept.get(w) or {}).get("cal20")
+        res[w] = (cf - ck) if cf is not None and ck is not None else None
+        if res[w] is not None and -res[w] > STEP3_TOL + 1e-9:
+            below.append(w)
+    return {"residual": res, "below": below}
 
 
 def perception_line(ws, p: Dict[str, Dict[str, int]]) -> str:
     q = perception_rates(p)
     u, s = p["unseen"], p["seen"]
     return (f"{ws}: the metacognition-of-perception reading (the referent never seen): claims set aside {u['set_aside']} / "
-            f"{u['gradable']} = {_f(q['metacognition'])} (scenes {u['scenes_set_aside']} / {u['scenes']} = {_f(q['metacognition_scenes'])})"
+            f"{u['gradable']} = {_f(q['metacognition'])} (scenes {u['scenes_set_aside']} / {u['scenes']} = {_f(q['metacognition_scenes'])};"
+            f" phrases «none» {u.get('phrases_none', 0)} / {u.get('phrases', 0)} = {_f(q['metacognition_phrases'])}; predicted ≈ 0.8)"
             f" · the false-unseen rate (the referent seen): {s['set_aside']} / {s['gradable']} = {_f(q['false_unseen'])} "
-            f"(scenes {s['scenes_set_aside']} / {s['scenes']} = {_f(q['false_unseen_scenes'])}; predicted 0.05–0.08)")
+            f"(scenes {s['scenes_set_aside']} / {s['scenes']} = {_f(q['false_unseen_scenes'])}; phrases «none» {s.get('phrases_none', 0)} / "
+            f"{s.get('phrases', 0)} = {_f(q['false_unseen_phrases'])}; predicted 0.05–0.08)")
 
 
 def check_control(root_in: Path) -> Dict[str, object]:
@@ -175,14 +202,16 @@ class _Hook:
     the ceiling of the row; the referent's hypothesis by marks.thing_hypothesis, the oracle arms' own mapping). Inactive
     until the first reading point at which the READER has types (§2)."""
 
-    def __init__(self, L: "Lr.RWLearner", train: "R.Things", truth: Sequence[Dict[str, object]]):
-        self.L, self.train, self.truth = L, train, truth
+    def __init__(self, L: "Lr.RWLearner", train: "R.Things", truth: Sequence[Dict[str, object]], ws: int = 0):
+        self.L, self.train, self.truth, self.ws = L, train, truth, ws
         self.free, self.fed = H.HealthBook(), H.HealthBook()
+        self.fed_kept = H.HealthBook()          # AMENDMENT 2 §3 (Fable's edit): the fed row on the claims the rule keeps
         self.active = False
         self.n_scenes = 0
         # AMENDMENT 1 §3, offline (the tape's truth; never read by a road): the truth-free row's gradable claims — graded or set
         # aside by the rule — by whether the gaze saw the scene's referent
-        self.perception = {k: {"gradable": 0, "set_aside": 0, "scenes": 0, "scenes_set_aside": 0} for k in ("seen", "unseen")}
+        self.perception = {k: {"gradable": 0, "set_aside": 0, "scenes": 0, "scenes_set_aside": 0, "phrases": 0, "phrases_none": 0}
+                           for k in ("seen", "unseen")}
 
     def before(self, i: int, X: np.ndarray):
         if not self.active or np.atleast_2d(X).shape[0] == 0:
@@ -193,20 +222,36 @@ class _Hook:
         self.n_scenes += 1
         return rec
 
+    def heard(self, i: int, X: np.ndarray, words: Sequence[str], rec) -> None:
+        """AMENDMENT 2 §2: the parent's phrase heard, BEFORE train_scene — the learner's own «none» for it (the LAW road's M2a
+        pointing over the scene's seen hypotheses), with the hook's OWN generator (`tmem2-none:<scene>`; drawn only on a
+        tie of the pointing, and «none» reads the best score, not the pick). Read-only."""
+        if rec is None:
+            return
+        rec["heard"] = H.heard_none(Lr.RWRoad(self.L), X, words, substream(self.ws, f"tmem2-none:{i}"))
+        rec["none"] = rec["heard"]["none"] is True
+
     def after(self, i: int, X: np.ndarray, words: Sequence[str], new: Sequence[str], rec) -> None:
         if rec is None:
             return
-        g = H.grades(rec, H.attribution(self.L, X, words, new))           # through AMENDMENT 1's rule, at h*
+        none = rec.get("none") is True
+        g = H.grades(rec, H.attribution(self.L, X, words, new), set_aside=none)   # AMENDMENT 2: «none» sets the phrase aside
         self.free.add_grades(g)
         ref = R.referent_index("A-RW", self.train, self.truth[i])
-        self.fed.add_grades(H.grades(rec, {w: ref for w in dict.fromkeys(words)}))   # the SAME rule, at the referent's hypothesis
-        if g and self.truth[i].get("referent") is not None:              # every training scene has one (declared)
+        fed = H.grades(rec, {w: ref for w in dict.fromkeys(words)})              # the truth-fed row: NO rule (AMENDMENT 2 §2)
+        self.fed.add_grades(fed)
+        if not none:
+            self.fed_kept.add_grades(fed)                                         # … and on the claims the rule keeps
+        if self.truth[i].get("referent") is not None:                            # every training scene has one (declared)
             p = self.perception["unseen" if ref is None else "seen"]
-            n_aside = sum(1 for _b, ok, _w in g if ok is None)
-            p["gradable"] += len(g)
-            p["set_aside"] += n_aside
-            p["scenes"] += 1
-            p["scenes_set_aside"] += int(n_aside == len(g))
+            p["phrases"] += 1
+            p["phrases_none"] += int(none)
+            if g:
+                n_aside = sum(1 for _b, ok, _w in g if ok is None)
+                p["gradable"] += len(g)
+                p["set_aside"] += n_aside
+                p["scenes"] += 1
+                p["scenes_set_aside"] += int(n_aside == len(g))
 
 
 def train_hooked(L: "Lr.RWLearner", train: "R.Things", rows, ws: int, seen: list, hook: _Hook) -> None:
@@ -216,6 +261,7 @@ def train_hooked(L: "Lr.RWLearner", train: "R.Things", rows, ws: int, seen: list
         X = train.for_arm("A-RW", i)
         words = train.p.words(i)
         rec = hook.before(i, X)
+        hook.heard(i, X, words, rec)                                        # AMENDMENT 2: the phrase heard, before training
         known = set(L.index)
         L.train_scene(X, words, referent=None, rng=substream(ws, f"episodic:{i}"))
         seen.append((X, words, None))
@@ -311,7 +357,7 @@ def run_life(ws: int, root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, e
     train = R.Things(C.ScenePercepts(C.cache_dir(root_in, ws, "train")))
     truth = C.load_truth(C.cache_dir(root_in, ws, "train"))
     L = R.make_learner("A-RW", Lr.LR_S1B1, eps)
-    hook = _Hook(L, train, truth)
+    hook = _Hook(L, train, truth, ws)
     seen: list = []
     done = 0
     rps = sorted(r for r in rps if r <= n_train)
@@ -320,6 +366,7 @@ def run_life(ws: int, root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, e
     rec: Dict[str, object] = {"world_seed": ws, "test_seed": Q["test_seed"], "eps": eps, "rps": rps, "n_train": n_train,
                               "root_in": str(root_in), "prereg_tmem2_sha256": PREREG_TMEM2_SHA256,
                               "prereg_tmem2_amend1_sha256": PREREG_TMEM2_AMEND1_SHA256,
+                              "prereg_tmem2_amend2_sha256": PREREG_TMEM2_AMEND2_SHA256,
                               "prereg_s1b1r_sha256": R.PREREG_S1B1R_SHA256, "code": R.code_identity(), "rows_by_rp": {}}
     for rp in rps:
         train_hooked(L, train, range(done, rp), ws, seen, hook)
@@ -327,7 +374,7 @@ def run_life(ws: int, root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, e
         final = rp == rps[-1]
         R.prepare("A-RW", L, seen)
         L.calibrate_r(eps, R.WORD_TYPES if final else None)
-        rec["rows_by_rp"][str(rp)] = {"free": _compact(hook.free), "fed": _compact(hook.fed)}
+        rec["rows_by_rp"][str(rp)] = {"free": _compact(hook.free), "fed": _compact(hook.fed), "fed_kept": _compact(hook.fed_kept)}
         hook.active = True
         log(f"[life {ws}] reading point {rp}: claims on {hook.n_scenes} scenes · cpu {time.process_time() - t_cpu:.1f} s")
     preds = name_predictions(L, Q, K, things)
@@ -340,7 +387,8 @@ def run_life(ws: int, root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, e
         answers["roads"][name] = answer_road(H.HealthRoad(L, gates[name]), L, Q["questions"], things, Q["test_seed"])
     idn = identity(answers, L.summary(), root_in, ws, rps[-1])
     R.dump(out / f"answers_{rps[-1]:05d}.json", {"world_seed": ws, "rp": rps[-1], **answers})
-    rec.update({"rows": {"free": hook.free.summary(), "fed": hook.fed.summary()}, "claim_scenes": hook.n_scenes,
+    rec.update({"rows": {"free": hook.free.summary(), "fed": hook.fed.summary(), "fed_kept": hook.fed_kept.summary()},
+                "claim_scenes": hook.n_scenes,
                 "perception": hook.perception,
                 "name_preds": preds, "oracle_accuracy": acc, "perm": perm, "identity": idn,
                 "types": [list(t) for t in Lr.RWRoad(L).types()],
@@ -410,9 +458,10 @@ def word_table(rec: Dict[str, object]) -> Dict[str, Dict[str, object]]:
     """§2 printed per word at the last reading point: n_claims, n_graded, cal_20 truth-free and truth-fed, |difference|,
     median |Δ|, the drift READING's firings (both forms), the said word's MISSED count, and the gate's state."""
     free, fed = rec["rows"]["free"], rec["rows"]["fed"]
+    kept = rec["rows"].get("fed_kept", {})
     out = {}
     for w in TRAINED:
-        f, g = free.get(w, {}), fed.get(w, {})
+        f, g, k = free.get(w, {}), fed.get(w, {}), kept.get(w, {})
         cf, cg = f.get("cal20"), g.get("cal20")
         gate = "open" if (f.get("n_graded", 0) >= H.GATE_N and cf is not None and cf >= H.GATE_CAL) else (
             H.REASON_NO_ROW if f.get("n_graded", 0) < H.GATE_N else H.REASON_NOT_HELD)
@@ -423,7 +472,9 @@ def word_table(rec: Dict[str, object]) -> Dict[str, Dict[str, object]]:
                   "drift_firings_floor": f.get("drift_firings_floor", 0), "missed": f.get("missed", 0), "gate": gate,
                   "oracle_accuracy": rec["oracle_accuracy"].get(w),
                   "unseen": f.get("unseen", 0), "unseen_fed": g.get("unseen", 0),                     # AMENDMENT 1 §3
-                  "residual": (cf - cg if cf is not None and cg is not None else None)}
+                  "residual": (cf - cg if cf is not None and cg is not None else None),
+                  "cal20_fed_kept": k.get("cal20"), "n_graded_fed_kept": k.get("n_graded", 0),         # AMENDMENT 2 §3
+                  "residual_kept": (cf - k["cal20"] if cf is not None and k.get("cal20") is not None else None)}
     return out
 
 
@@ -450,6 +501,7 @@ def grade_seed_tmem2(root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, ws
                               "TRUTH-NEED": [mo["truth_need"], b["TRUTH-NEED"]["value"]]}
             ctrl_vs_report["equal"] = all(a == c for a, c in ctrl_vs_report.values())
     out = {"prereg_tmem2_sha256": PREREG_TMEM2_SHA256, "prereg_tmem2_amend1_sha256": PREREG_TMEM2_AMEND1_SHA256,
+           "prereg_tmem2_amend2_sha256": PREREG_TMEM2_AMEND2_SHA256,
            "perception": rec["perception"], "world_seed": ws, "test_seed": W.FRESH_TEST_SEEDS[ws], "rp": rp,
            "roads": {n: {k: v for k, v in g.items() if k != "rows"} for n, g in graded.items()}, "decision": dec,
            "calibration": {k: calibration(rec, k) for k in ("free", "fed", "null")}, "words": word_table(rec),
@@ -597,10 +649,10 @@ def seed_lines(mk: Dict[str, object]) -> List[str]:
              f"{k} {'=' if v['same'] else '≠'} ({v['n_bytes']} bytes; planted {'CAUGHT' if v['planted_caught'] else 'NOT CAUGHT'})"
              for k, v in idn["parts"].items()) + f" → {'PASS' if idn['pass'] else 'MISS'}",
          f"the learned types: " + " ".join("(" + " ".join(t) + ")" for t in mk["types"]) + f" · claims recorded on {mk['claim_scenes']} training scenes",
-         "the rows at 10,000 (per word: confident claims · graded · set aside «unseen» (AMENDMENT 1) · cal_20 truth-free / truth-fed · |diff| · median |Δ| · drift firings unfloored / floored 1/20 · the said word's MISSED · the gate · the oracle's accuracy):"]
+         "the rows at 10,000 (per word: confident claims · graded · set aside «unseen» · cal_20 truth-free / truth-fed (the fed row on the claims the rule keeps) · |diff| · median |Δ| · drift firings unfloored / floored 1/20 · the said word's MISSED · the gate · the oracle's accuracy):"]
     for w, v in mk["words"].items():
         L.append(f"   {w:<9} claims {v['n_claims']:>5} · graded {v['n_graded']:>5} (fed {v['n_graded_fed']:>5}) · unseen {v.get('unseen', 0):>4} (fed {v.get('unseen_fed', 0):>4})"
-                 f" · cal_20 {_f(v['cal20_free'])} / {_f(v['cal20_fed'])}"
+                 f" · cal_20 {_f(v['cal20_free'])} / {_f(v['cal20_fed'])} (kept {_f(v.get('cal20_fed_kept'))})"
                  f" · |diff| {_f(v['abs_diff'])} · median |Δ| {_f(v['median_abs_delta'])} · drift {v['drift_firings']} / {v['drift_firings_floor']}"
                  f" · missed {v['missed']:>4} · gate {v['gate']} · oracle {_f(v['oracle_accuracy'])}")
     if mk.get("perception"):
@@ -632,12 +684,13 @@ def seed_lines(mk: Dict[str, object]) -> List[str]:
 def report_tmem2(root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, log=print) -> Dict[str, object]:
     """THE GRADER READING THE LAW AS WRITTEN (and as ruled): every seed's tables, §5's bars, §6's refutations and readings."""
     marks = {ws: json.loads((Path(root_out) / str(ws) / "marks.json").read_text()) for ws in W.WORLD_SEEDS}
-    lines = [f"T-MEM-2 report · PREREG-TMEM2 sha {PREREG_TMEM2_SHA256} · AMENDMENT 1 sha {PREREG_TMEM2_AMEND1_SHA256} · PREREG-S1B1R {R.PREREG_S1B1R_SHA256[:16]}… · the control's report.txt {S1B1R_REPORT_SHA256[:16]}…", ""]
+    lines = [f"T-MEM-2 report · PREREG-TMEM2 sha {PREREG_TMEM2_SHA256} · AMENDMENT 1 sha {PREREG_TMEM2_AMEND1_SHA256} · AMENDMENT 2 sha {PREREG_TMEM2_AMEND2_SHA256} · PREREG-S1B1R {R.PREREG_S1B1R_SHA256[:16]}… · the control's report.txt {S1B1R_REPORT_SHA256[:16]}…", ""]
     for ws in W.WORLD_SEEDS:
         lines += seed_lines(marks[ws])
         lines.append("")
     b = bars_tmem2(marks)
-    pooled = {k: {f: sum(marks[ws]["perception"][k][f] for ws in W.WORLD_SEEDS) for f in ("gradable", "set_aside", "scenes", "scenes_set_aside")}
+    pooled = {k: {f: sum(marks[ws]["perception"][k].get(f, 0) for ws in W.WORLD_SEEDS)
+                  for f in ("gradable", "set_aside", "scenes", "scenes_set_aside", "phrases", "phrases_none")}
               for k in ("seen", "unseen")}
     lines.append("== AMENDMENT 1's READINGS (offline, the tape's truth; readings, never bars) ==")
     lines += [perception_line(ws, marks[ws]["perception"]) for ws in W.WORLD_SEEDS] + [perception_line("pooled", pooled), ""]
@@ -676,7 +729,8 @@ def report_tmem2(root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, log=pr
     lines.append(f"A PASS is B1–B4, or B2 CEILING-BOUND with B1, B3, B4 met → T-MEM-2 {'PASSES' if b['passes'] else 'does not pass'}")
     for l in lines:
         log(l)
-    out = {"prereg_tmem2_sha256": PREREG_TMEM2_SHA256, "prereg_tmem2_amend1_sha256": PREREG_TMEM2_AMEND1_SHA256, "bars": b,
+    out = {"prereg_tmem2_sha256": PREREG_TMEM2_SHA256, "prereg_tmem2_amend1_sha256": PREREG_TMEM2_AMEND1_SHA256,
+           "prereg_tmem2_amend2_sha256": PREREG_TMEM2_AMEND2_SHA256, "bars": b,
            "perception": {"per_seed": {ws: marks[ws]["perception"] for ws in W.WORLD_SEEDS}, "pooled": pooled}, "lines": lines}
     R.dump(Path(root_out) / "report.json", out)
     (Path(root_out) / "report.txt").write_text("\n".join(lines) + "\n")
@@ -690,9 +744,10 @@ def gate_or_chosen_tmem2(root_out: Path = TMEM2_ROOT) -> Dict[str, object]:
         raise TMem2Error(f"{p} missing — THE FIRST GATE runs before the unit")
     g = json.loads(p.read_text())
     if (g.get("verdict") != "PROCEED" or g.get("prereg_tmem2_sha256") != PREREG_TMEM2_SHA256
-            or g.get("prereg_tmem2_amend1_sha256") != PREREG_TMEM2_AMEND1_SHA256):
+            or g.get("prereg_tmem2_amend1_sha256") != PREREG_TMEM2_AMEND1_SHA256
+            or g.get("prereg_tmem2_amend2_sha256") != PREREG_TMEM2_AMEND2_SHA256):
         raise TMem2Error(f"THE FIRST GATE reads {g.get('verdict')!r} under sha {g.get('prereg_tmem2_sha256')} / AMENDMENT 1 "
-                         f"{g.get('prereg_tmem2_amend1_sha256')} — no unit")
+                         f"{g.get('prereg_tmem2_amend1_sha256')} / AMENDMENT 2 {g.get('prereg_tmem2_amend2_sha256')} — no unit")
     return g
 
 
@@ -709,9 +764,9 @@ def first_gate_tmem2(root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, lo
     lives_root = gdir / "lives"
     ctl = check_control(root_in)
     out: Dict[str, object] = {"prereg_tmem2_sha256": PREREG_TMEM2_SHA256, "prereg_tmem2_amend1_sha256": PREREG_TMEM2_AMEND1_SHA256,
-                              "code": R.code_identity(), "control": ctl}
-    lines = ["== THE FIRST GATE (PREREG-TMEM2 §7 + AMENDMENT 1 §4; each step a STOP on a miss; printed whole) ==",
-             f"   the law: PREREG-TMEM2 {PREREG_TMEM2_SHA256[:16]}… · AMENDMENT 1 {PREREG_TMEM2_AMEND1_SHA256[:16]}… · code {out['code']['code_sha_file']}",
+                              "prereg_tmem2_amend2_sha256": PREREG_TMEM2_AMEND2_SHA256, "code": R.code_identity(), "control": ctl}
+    lines = ["== THE FIRST GATE (PREREG-TMEM2 §7 + AMENDMENT 1 §4 + AMENDMENT 2 §4; each step a STOP on a miss; printed whole) ==",
+             f"   the law: PREREG-TMEM2 {PREREG_TMEM2_SHA256[:16]}… · AMENDMENT 1 {PREREG_TMEM2_AMEND1_SHA256[:16]}… · AMENDMENT 2 {PREREG_TMEM2_AMEND2_SHA256[:16]}… · code {out['code']['code_sha_file']}",
              f"0. the CONTROL's record: {ctl['report']} sha {'as recorded' if ctl['ok'] else 'CHANGED'} ({(ctl['sha'] or '')[:16]}…)"]
     stop: List[str] = [] if ctl["ok"] else ["the control's record changed"]
     lives = {}
@@ -738,21 +793,26 @@ def first_gate_tmem2(root_in: Path = S1B1R_ROOT, root_out: Path = TMEM2_ROOT, lo
     rec0 = lives[ws0]
     s3 = step3(rec0["rows"]["free"], rec0["rows"]["fed"], TRAINED)
     out["step3"] = s3
-    lines.append(f"3. agreement and coverage on seed {ws0}'s stream (claims on {rec0['claim_scenes']} scenes), AFTER AMENDMENT 1's rule — per word:"
-                 " graded truth-free / truth-fed · set aside «unseen» truth-free / truth-fed · cal_20 truth-free / truth-fed · the residual (free − fed):")
+    kr = kept_residuals(rec0["rows"]["free"], rec0["rows"]["fed_kept"], TRAINED)
+    out["kept"] = kr
+    lines.append(f"3. agreement and coverage on seed {ws0}'s stream (claims on {rec0['claim_scenes']} scenes), AFTER AMENDMENT 2's rule — per word:"
+                 " graded truth-free / truth-fed / fed-kept · set aside «unseen» (truth-free) · cal_20 truth-free / truth-fed (the whole row: the STOP) / fed-kept"
+                 " (the claims the rule keeps: a reading) · the residual free − fed · free − fed-kept:")
     near = []
     for w in TRAINED:
-        f, g = rec0["rows"]["free"].get(w, {}), rec0["rows"]["fed"].get(w, {})
-        cf, cg = f.get("cal20"), g.get("cal20")
+        f, g, k = rec0["rows"]["free"].get(w, {}), rec0["rows"]["fed"].get(w, {}), rec0["rows"]["fed_kept"].get(w, {})
+        cf, cg, ck = f.get("cal20"), g.get("cal20"), k.get("cal20")
         res = (cf - cg) if cf is not None and cg is not None else None
+        rk = kr["residual"][w]
         if res is not None and abs(res) <= RESIDUAL_NEAR + 1e-9:
             near.append(w)
-        lines.append(f"   {w:<9} {f.get('n_graded', 0):>5} / {g.get('n_graded', 0):>5} · {f.get('unseen', 0):>4} / {g.get('unseen', 0):>4} · {_f(cf)} / {_f(cg)} · "
-                     + (f"{res:+.3f}" if res is not None else "  —  ")
+        lines.append(f"   {w:<9} {f.get('n_graded', 0):>5} / {g.get('n_graded', 0):>5} / {k.get('n_graded', 0):>5} · {f.get('unseen', 0):>4} · {_f(cf)} / {_f(cg)} / {_f(ck)} · "
+                     + (f"{res:+.3f}" if res is not None else "  —  ") + " · " + (f"{rk:+.3f}" if rk is not None else "  —  ")
                      + ("  «no row»" if w in s3["no_row"] else "") + ("  reversed (a reading)" if w in s3["reversed"] and w not in s3["fault"] else "")
-                     + ("  REVERSED BY > 0.10 — the declared instrument fault" if w in s3["fault"] else ""))
+                     + ("  REVERSED BY > 0.10 — the declared instrument fault" if w in s3["fault"] else "")
+                     + ("  [> 0.10 below the kept fed row — a reading]" if w in kr["below"] else ""))
     out["residual_near"] = near
-    lines.append(f"   the residual within {RESIDUAL_NEAR:.2f} on {len(near)} of {len(TRAINED)} words (predicted: most [Likely]; a reading)")
+    lines.append(f"   the residual (free − the whole fed row) within {RESIDUAL_NEAR:.2f} on {len(near)} of {len(TRAINED)} words; more than 0.10 below the kept fed row (a reading): {kr['below'] or 'none'}")
     lines.append(f"   «no row»: {s3['no_row'] or 'none'} · reversed: {s3['reversed'] or 'none'} · the fault (> 0.10): {s3['fault'] or 'none'} → {'MISS' if s3['stop'] else 'PASS'}")
     out["perception"] = {ws: lives[ws]["perception"] for ws in W.WORLD_SEEDS}
     lines.append("   AMENDMENT 1's readings (offline, the tape's truth; readings, never bars), every gate life:")

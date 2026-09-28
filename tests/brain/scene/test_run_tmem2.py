@@ -108,6 +108,20 @@ class TestLifeEndToEnd(unittest.TestCase):
         self.assertEqual(self.marks["perception"], p)
         self.assertTrue(all({"unseen", "unseen_fed"} <= set(v) for v in self.marks["words"].values()))
 
+    def test_amend2_none_the_fed_row_and_its_kept_twin_on_a_real_life(self) -> None:
+        """AMENDMENT 2 (edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:41 +0400): the truth-fed row carries no rule (nothing
+        set aside); its twin restricted to the claims the rule keeps is a sub-population of it, word by word; every phrase of a
+        claim scene is counted once in the readings, and the phrases «none» fired on bound the scenes set aside."""
+        rows = self.rec["rows"]
+        self.assertEqual(sum(r.get("unseen", 0) for r in rows["fed"].values()), 0)
+        for w, r in rows["fed_kept"].items():
+            self.assertLessEqual(r["n_graded"], rows["fed"][w]["n_graded"], w)
+        p = self.rec["perception"]
+        self.assertEqual(p["seen"]["phrases"] + p["unseen"]["phrases"], self.rec["claim_scenes"])
+        for k in ("seen", "unseen"):
+            self.assertLessEqual(p[k]["scenes_set_aside"], p[k]["phrases_none"])
+        self.assertTrue(all("cal20_fed_kept" in v for v in self.marks["words"].values()))
+
 
 class TestIdentityComparator(unittest.TestCase):
     def test_canonical_json_and_a_planted_byte(self) -> None:
