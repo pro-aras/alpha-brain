@@ -517,7 +517,9 @@ def parse_genome(text: str) -> Genome:
                 m = re.fullmatch(r"say one frame per think; journaled", a)
                 if not m: raise GenomeError(f"MOUTH: cannot read {a!r} (L-11: MOUTH say one frame per think; journaled)")
                 g["declared"]["MOUTH"] = {"say": "one frame per think", "journaled": True}
-            elif gene == "WORLD" and (not args or args[0] != "game"):
+            # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY: "scene" joins "game" as a shape this branch does not take
+            # (the drawn world's own grammar and dict are untouched; `WORLD scene …` has its own branch below).
+            elif gene == "WORLD" and (not args or args[0] not in ("game", "scene")):
                 # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:25 +0400 — A4L-VOICE task 1: an OPTIONAL trailing
                 # "; voice <kind>" clause (GAZE's "coarse"/BUDGET's "regenerate" precedent) — absent, the dict is EXACTLY the four
                 # keys every pin reads (no "voice" key at all); present, only "formant" is implemented (anything else refuses by
@@ -793,6 +795,56 @@ def parse_genome(text: str) -> Genome:
                     raise GenomeError(f"CHAT: at most {max_w} words leaves no room for a slot after a frame (>= 2 needed)")
                 g["declared"]["CHAT"] = {"in": d_in, "out": d_out, "links_adjacent": adj_, "pivot_distinct": piv_d,
                                           "pivot_instants": piv_i, "max_words": max_w, "teaches": False}
+            # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY (docs/brain/body/INTERFACE-BRAIN-ORGAN.md §1; his 09-24 11:24 word
+            # «we can grow a brain as well. Just like we grew the organs»): `WORLD scene …` — a THIRD shape of the WORLD gene (the
+            # `game` branch is the precedent): the scene-talk world, where a parent names ONE thing in view (brain/scene/world.py).
+            # Stored under its OWN declared key `WORLD_SCENE`; read by creature/body.py:main, which arms creature/senses/scene.py.
+            # Every literal is fixed and every number is consumed; the parser never imports the world (the sense checks the seed).
+            elif gene == "WORLD" and args[0] == "scene":
+                m = re.fullmatch(r"scene seed (\d+); train (\d+); sitting ((?:[a-z0-9]+)(?: [a-z0-9]+)*); "
+                                 r"feed (max backlog (\d+)|every (\d+) ms); utterance (true|shuffled (\d+))", a)
+                if not m:
+                    raise GenomeError(f"WORLD scene: cannot read {a!r} (BRAIN-IN-BODY: WORLD scene seed <s>; train <n>; sitting <set>[ <set>…]|none; "
+                                      f"feed max backlog <k>|every <n> ms; utterance true|shuffled <k>)")
+                sets_ = m.group(3).split()
+                known_ = ("fresh", "s1b1")
+                if sets_ != ["none"] and (any(x not in known_ for x in sets_) or len(set(sets_)) != len(sets_)):
+                    raise GenomeError(f"WORLD scene: sitting takes 'none' or distinct sets from {known_}, got {sets_}")
+                if int(m.group(2)) < 1:
+                    raise GenomeError("WORLD scene: train must be >= 1")
+                if m.group(5) is not None:
+                    if int(m.group(5)) < 1:
+                        raise GenomeError("WORLD scene: feed max backlog must be >= 1")
+                    feed_ = {"mode": "max", "backlog": int(m.group(5))}
+                else:
+                    feed_ = {"mode": "every", "ms": int(m.group(6))}
+                g["declared"]["WORLD_SCENE"] = {
+                    "seed": int(m.group(1)), "train": int(m.group(2)), "sitting": [] if sets_ == ["none"] else sets_, "feed": feed_,
+                    "utterance": "true" if m.group(7) == "true" else {"shuffled": int(m.group(8))}}
+            # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY: THE BRAIN GENE, one line = one organ (genome/brain.py), grown inside
+            # the mind beside MEET (a new consumer of the eye's glances and the ear's words, never a replacement). The values are
+            # the scored learner's own (S1b-1R: lr 0.01, eps 0.3, «none» at 0.95, conformal 0.90, a word under 3 meetings is young).
+            # Every number is read by genome/brain.py; a mis-spelt form refuses BY NAME.
+            elif gene == "BRAIN":
+                m = re.fullmatch(r"word-map lr (\d+(?:\.\d+)?); reader eps (\d+(?:\.\d+)?); none (0\.\d+); conformal (0\.\d+); "
+                                 r"young (\d+); calibrate at ((?:\d+)(?: \d+)*) and before a sitting; replay (none|uniform|strong); "
+                                 r"hears ((?:[a-z][a-z0-9-]*)(?: [a-z][a-z0-9-]*)*)", a)
+                if not m:
+                    raise GenomeError(f"BRAIN: cannot read {a!r} (BRAIN-IN-BODY: BRAIN word-map lr <f>; reader eps <f>; none <0.f>; conformal <0.f>; "
+                                      f"young <n>; calibrate at <n>[ <n>…] and before a sitting; replay none|uniform|strong; hears <source>[ <source>…])")
+                lr_, eps_ = float(m.group(1)), float(m.group(2))
+                at_ = [int(x) for x in m.group(6).split()]
+                if not (0.0 < lr_ <= 1.0) or eps_ <= 0.0:
+                    raise GenomeError(f"BRAIN: lr must be in (0, 1] and eps > 0, got lr {lr_} eps {eps_}")
+                if int(m.group(5)) < 1:
+                    raise GenomeError("BRAIN: young must be >= 1 meeting")
+                if any(b <= a_ for a_, b in zip(at_, at_[1:])) or at_[0] < 1:
+                    raise GenomeError(f"BRAIN: calibrate at takes strictly rising scene counts >= 1, got {at_}")
+                hears_ = m.group(8).split()
+                if len(set(hears_)) != len(hears_):
+                    raise GenomeError(f"BRAIN: hears names a source twice: {hears_}")
+                g["declared"]["BRAIN"] = {"lr": lr_, "eps": eps_, "none_level": float(m.group(3)), "conformal": float(m.group(4)),
+                                           "young": int(m.group(5)), "calibrate_at": at_, "replay": m.group(7), "hears": hears_}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:
