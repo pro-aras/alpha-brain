@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 # edit: Claude (Fable 5.1, the seat), 2026-09-28 20:30 +0400 — BRAIN-IN-BODY: the grader of a life (PREREG-BRAIN-IN-BODY §3, INTERFACE §6).
+# edit: Claude (Fable 5.1, the seat), 2026-09-28 20:40 +0400 — brought under the SIGNED PREREG (12bdea6, §3 and §8's three differences): M4's
+# null keeps the cited episodes and draws among THEIR hyps; a citation maps to a thing by M1's rule over fix / hyps; the sign
+# test is ONE-sided; every pointing is read FORCED (a `point: None` → a uniform draw over the row's hyps by the item's tie
+# generator; a «misuse» answer on a pointing mark → its `raw_forced`); the twin must be ABLE (its forced M1 above the null's
+# p95) or the pair reads VOID; the twin's M3 pair pools both sets; the life's M1 and M3 are read against the null's p95.
 """tools/brain/grade_life.py — the six marks of ONE life, read from its own tape, its journal and its truth files.
 
     PYTHONPATH=<repo> /usr/bin/python3 -B tools/brain/grade_life.py --root <life root> [--journal <journal.jsonl | dir>]
@@ -245,9 +250,13 @@ class _Rows:
 
 
 def offline_answers(life: Life, ctx: SetCtx) -> Dict[str, object]:
-    """The life's answers in the scored file's own shape: {"point": {item: raw}, "roads": {"LAW": {item: raw}}}."""
+    """The life's answers in the scored file's own shape: {"point": {item: raw}, "roads": {"LAW": {item: raw}}}.
+    PREREG §3 «read FORCED»: on M1 / M2a / M3 / M6 a «misuse» answer is read by its `raw_forced` (what the pointing would
+    have been — the false misuse itself is counted by M5's control), and a `point: None` that is not «unheard» is read as a
+    uniform draw over the row's hypotheses by the item's own tie generator (marks.tie_rng). Both are counted."""
     point: Dict[str, Dict[str, object]] = {}
     road: Dict[str, Dict[str, object]] = {}
+    forced = collections.Counter()
     for mark, items in ctx.items.items():
         for it in items:
             a = life.answer_of.get(str(it["item_id"]))
@@ -256,8 +265,23 @@ def offline_answers(life: Life, ctx: SetCtx) -> Dict[str, object]:
             raw = a.get("raw")
             if raw is None:
                 raise GradeError(f"answer {it['item_id']} carries no `raw` (INTERFACE addendum 1)")
+            if mark in ("M1", "M2a", "M3", "M6"):
+                if raw.get("misuse") is not None:
+                    forced[f"{mark}:misuse→raw_forced"] += 1
+                    raw = dict(a.get("raw_forced") or {"point": None})
+                if raw.get("point") is None and not raw.get("unheard"):
+                    hyps = a.get("hyps") or []
+                    ts = (life.asks.get(str(it["item_id"])) or {}).get("test_seed")
+                    if hyps and ts is not None:
+                        raw = dict(raw)
+                        raw["point"] = int(M.tie_rng(int(ts), str(it["item_id"])).integers(len(hyps)))
+                        raw["forced_by_grader"] = True
+                        raw.setdefault("none", True)
+                        raw.setdefault("none_i", True)
+                        forced[f"{mark}:None→uniform"] += 1
             (point if mark in POINT_MARKS else road)[str(it["item_id"])] = raw
-    return {"point": point, "roads": {LAW: road}, "m2a_keys": {LAW: "none_i"}, "mouths": {LAW: "believed"}}
+    return {"point": point, "roads": {LAW: road}, "m2a_keys": {LAW: "none_i"}, "mouths": {LAW: "believed"},
+            "forced": dict(forced)}
 
 
 class _Ctx:
@@ -378,81 +402,82 @@ def grade_m5(life: Life, sc: SetCtx, A: Dict[str, object]) -> Dict[str, object]:
     return out
 
 
-def _thing_at(pos: Sequence[float], things: Sequence[W.Thing], margin: int = 4) -> Optional[int]:
-    """The thing under a position given in grid cells (a hypothesis' mean position): its pixel centre inside a box ± 4 px."""
-    py, px = (float(pos[0]) + 0.5) * CELL_PX, (float(pos[1]) + 0.5) * CELL_PX
-    hit = [i for i, t in enumerate(things)
-           if t.top - margin <= py < t.top + t.side + margin and t.left - margin <= px < t.left + t.side + margin]
-    return hit[0] if len(hit) == 1 else None
+def _cited_thing(ep: Dict[str, object], things: Sequence[W.Thing], hyp: Optional[int] = None) -> Optional[int]:
+    """M1's own rule for ONE cited episode: the thing the cited hypothesis is on — marks.hyp_label over the things its
+    member fixations land on (world.fixation_thing). None: no thing, or a tie between two things."""
+    fix, hyps = ep.get("fix") or [], ep.get("hyps") or []
+    h = ep.get("hyp") if hyp is None else hyp
+    if h is None or not (0 <= int(h) < len(hyps)):
+        return None
+    ft = fix_things(fix, things)
+    return M.hyp_label(M.hyp_counts([hyps[int(h)]], ft)[0])
 
 
 def grade_m4a(life: Life) -> Dict[str, object]:
-    """PREREG §3 test 4a. EXIST: every cited moment is a training moment of THIS tape whose ear rows carry the word.
-    CARRY: the thing under the cited position truly has the word's property (the world's own `word_true_of`).
-    The shuffled-citation twin: the same number of citations drawn at random from the moments where the word was heard,
-    each with a position drawn at random among that canvas's THINGS' centres — 20 draws; the brain's pooled CARRY must sit
-    above the twin's 95th percentile. (The twin points at true things' centres, never at empty space: it is blind to which
-    thing the word was about, and to nothing else.)"""
-    heard_at: Dict[str, List[str]] = collections.defaultdict(list)
-    for i, m in sorted(life.train_moment.items()):
-        for w in dict.fromkeys(life.moment_words.get(m, [])):
-            heard_at[w].append(m)
-    per_word = {}
-    n_cited = n_exist = n_carry = 0
+    """PREREG §3 test 4a, graded on the FRESH sitting's `why` answers.
+    EXIST (a wiring pin, never evidence): every cited moment is a training moment of THIS tape whose ear rows carry the word.
+    ELIGIBLE: every cited episode had ≥ 2 hypotheses in view (the PREREG's population; a citation outside it is counted and
+    fails the mark's reading rule).
+    CARRY: the cited hypothesis' thing truly has the word's property (`world.word_true_of`); no thing = not CARRY.
+    THE NULL: draw k = 1..20 — each cited episode's hypothesis replaced by one drawn uniformly among that episode's `hyps`,
+    generator substream(ws, "m4-null:<k>"), in citation order. CARRY must be ≥ 0.90 and above the draws' 95th percentile."""
+    from brain.world.seeds import substream
+    per_word: Dict[str, Dict[str, object]] = {}
+    cited: List[Tuple[str, Dict[str, object], List[W.Thing]]] = []      # in citation order: (word, episode, its things)
+    n_cited = n_exist = n_elig = n_carry = 0
     unknown = []
-    for item, ask in sorted(life.asks.items()):
+    for item, ask in sorted(life.asks.items(), key=lambda kv: kv[1]["_seq"]):
         if ask.get("form") != "why":
             continue
         word = str(ask.get("word"))
         a = life.answer_of.get(item)
-        if a is None:
+        if a is None or word in per_word:
             continue
-        ans = a.get("answer") or {}
+        ans = a.get("answer") or a.get("raw") or {}
         if ans.get("kind") != "because":
             unknown.append(word)
-            per_word[word] = {"kind": ans.get("kind"), "heard": len(heard_at.get(word, []))}
+            per_word[word] = {"kind": ans.get("kind")}
             continue
         eps = list(ans.get("episodes") or [])
         if len(eps) > M4_MAX_CITED:
             raise GradeError(f"«why {word}» cites {len(eps)} episodes (> {M4_MAX_CITED})")
-        ex = ca = 0
+        ex = el = ca = 0
         for e in eps:
             m = str(e.get("moment"))
             eye = life.moment_eye.get(m)
             real = eye is not None and (eye.get("meta") or {}).get("kind") == "train" and word in life.moment_words.get(m, [])
             ex += int(real)
-            if real:
-                things = things_of_dict(life.truth_of_eye(eye)["scene_dict"])
-                k = _thing_at(e.get("pos") or (-9, -9), things)
-                ca += int(k is not None and W.word_true_of(word, things[k]))
-        per_word[word] = {"kind": "because", "cited": len(eps), "exist": ex, "carry": ca, "heard": len(heard_at.get(word, []))}
-        n_cited, n_exist, n_carry = n_cited + len(eps), n_exist + ex, n_carry + ca
-    # the shuffled-citation twin
+            things = things_of_dict(life.truth_of_eye(eye)["scene_dict"]) if real else []
+            elig = len(e.get("hyps") or []) >= 2
+            el += int(elig)
+            k = _cited_thing(e, things) if real else None
+            ca += int(k is not None and W.word_true_of(word, things[k]))
+            cited.append((word, e, things))
+        per_word[word] = {"kind": "because", "cited": len(eps), "exist": ex, "eligible": el, "carry": ca}
+        n_cited, n_exist, n_elig, n_carry = n_cited + len(eps), n_exist + ex, n_elig + el, n_carry + ca
     twin = []
-    for d in range(M4_TWIN_DRAWS):
-        rng = np.random.default_rng([int(life.ws) & 0xFFFFFFFF, 0x4D34, d])
-        tot = hit = 0
-        for word, pw in sorted(per_word.items()):
-            if pw.get("kind") != "because" or not heard_at.get(word):
+    for d in range(1, M4_TWIN_DRAWS + 1):
+        rng = substream(int(life.ws), f"m4-null:{d}")
+        hit = 0
+        for word, e, things in cited:
+            hyps = e.get("hyps") or []
+            if not hyps:
                 continue
-            ms = heard_at[word]
-            for _ in range(int(pw["cited"])):
-                m = ms[int(rng.integers(len(ms)))]
-                things = things_of_dict(life.truth_of_eye(life.moment_eye[m])["scene_dict"])
-                k = int(rng.integers(len(things)))
-                tot += 1
-                hit += int(W.word_true_of(word, things[k]))
-        twin.append(hit / tot if tot else None)
-    tv = sorted(v for v in twin if v is not None)
-    p95 = (tv[min(len(tv) - 1, int(math.ceil(0.95 * len(tv))) - 1)] if tv else None)
+            k = _cited_thing(e, things, hyp=int(rng.integers(len(hyps)))) if things else None
+            hit += int(k is not None and W.word_true_of(word, things[k]))
+        twin.append(hit / len(cited) if cited else None)
+    tv = [v for v in twin if v is not None]
+    p95 = float(np.percentile(np.asarray(tv), 95)) if tv else None
     exist = (n_exist / n_cited) if n_cited else None
     carry = (n_carry / n_cited) if n_cited else None
     out = {"words_asked": len(per_word), "words_explained": sum(1 for v in per_word.values() if v.get("kind") == "because"),
-           "words_unknown": sorted(unknown), "n_cited": n_cited, "exist": exist, "carry": carry,
-           "twin_carry": twin, "twin_p95": p95, "twin_median": (tv[len(tv) // 2] if tv else None),
-           "bars": {"exist": 1.0, "carry": 0.90, "carry_above": "the twin's 95th percentile"}, "per_word": per_word}
+           "words_unknown": sorted(unknown), "n_cited": n_cited, "exist": exist, "eligible": n_elig, "carry": carry,
+           "null_carry": twin, "null_p95": p95, "null_median": (float(np.median(np.asarray(tv))) if tv else None),
+           "bars": {"exist": 1.0, "carry": 0.90, "carry_above": "the null's 95th percentile (20 draws)"}, "per_word": per_word}
     if not n_cited:
         out["verdict"] = "NOT GRADABLE — no citation"
+    elif n_elig != n_cited:
+        out["verdict"] = f"FAIL — {n_cited - n_elig} citations are of episodes with < 2 hypotheses (outside the PREREG's population)"
     elif n_cited < M.UNDERPOWERED_N:
         out["verdict"] = f"UNDERPOWERED (n {n_cited})"
     else:
@@ -462,17 +487,17 @@ def grade_m4a(life: Life) -> Dict[str, object]:
 
 # ------------------------------------------------------------------------------------------------ the pairing (the twin)
 def sign_test(b: int, c: int) -> float:
-    """Exact two-sided sign test on the discordant pairs (b: first right, second wrong; c: the reverse)."""
+    """Exact ONE-sided sign test on the discordant pairs (PREREG §3: «the brain better»): P(X ≥ b), X ~ Bin(b + c, 1/2),
+    b = the first right and the second wrong, c = the reverse. No discordant pair → 1.0."""
     n = b + c
     if n == 0:
         return 1.0
-    k = min(b, c)
-    tail = sum(math.comb(n, i) for i in range(0, k + 1)) / (2.0 ** n)
-    return float(min(1.0, 2.0 * tail))
+    return float(sum(math.comb(n, i) for i in range(b, n + 1)) / (2.0 ** n))
 
 
 def pair(rows_a: Sequence[Dict[str, object]], rows_b: Sequence[Dict[str, object]], graded_only: bool) -> Dict[str, object]:
-    """Paired on the SAME items, covered and gradable in BOTH (the coverage is the eye's, so it is the same canvas fact)."""
+    """Paired on the SAME items, covered and gradable in BOTH (the coverage is the eye's, so it is the same canvas fact).
+    `rows_*` may hold several sets' rows (M3 pools both sets, PREREG §3)."""
     B = {r["item_id"]: r for r in rows_b}
     both = [(r, B[r["item_id"]]) for r in rows_a if r["item_id"] in B]
     if graded_only:
@@ -502,7 +527,7 @@ def grade(root: Path, journal: Optional[Path], scored: Path, label: str, genome:
         sc = SetCtx(life, tset)
         A = offline_answers(life, sc)
         g = R.grade_answers_r(_Ctx(sc, ms["seen"]), "A-RW-R", A)
-        per_set[tset] = {"n_items": {m: len(v) for m, v in sc.items.items()}, "marks": g}
+        per_set[tset] = {"n_items": {m: len(v) for m, v in sc.items.items()}, "marks": g, "forced": A.get("forced", {})}
         m6_rows[tset] = pointing_rows(sc, A, "M6")
         item_rows[tset] = {m: pointing_rows(sc, A, m) for m in ("M1", "M3", "M6")}
         if tset == GRADED_SET:
@@ -539,6 +564,14 @@ def grade(root: Path, journal: Optional[Path], scored: Path, label: str, genome:
         out["bars"] = R.bars_r(marks, rp=rp)
         out["bars_rp"] = rp
         out["scored_marks"] = str(sm_path)
+        # THE NULL (PREREG §3): the life's M1 (graded, covered) and M3 (covered) against the 20 derangements' 95th percentile
+        nl = marks.get("nulls") or {}
+        m1v = mine["M1"]["graded"].get("covered")
+        m3b = mine["M3"].get("all", mine["M3"])
+        m3v = m3b.get("covered") if isinstance(m3b, dict) else None
+        p1, p3 = (nl.get("summary_m1") or {}).get("p95"), (nl.get("summary_m3") or {}).get("p95")
+        out["null"] = {"K": nl.get("K"), "m1": m1v, "m1_p95": p1, "m1_above": (m1v is not None and p1 is not None and m1v > p1),
+                       "m3": m3v, "m3_p95": p3, "m3_above": (m3v is not None and p3 is not None and m3v > p3)}
     else:
         out["bars"] = None
         out["bars_why"] = f"no {GRADED_SET} sitting in this life, or no scored record at {sm_path}"
@@ -572,7 +605,7 @@ def report_lines(g: Dict[str, object]) -> List[str]:
         mk = ps["marks"]
         m1, m3 = mk["M1"]["graded"], mk["M3"].get("all", mk["M3"])
         rd = mk["roads"][LAW]
-        L.append(f"  SET {tset}{' (READINGS ONLY)' if tset != GRADED_SET else ''}: items {ps['n_items']}")
+        L.append(f"  SET {tset}{' (READINGS ONLY)' if tset != GRADED_SET else ''}: items {ps['n_items']} · read forced {ps.get('forced')}")
         L.append(f"    M1 covered {_f(m1.get('covered'))} (n {m1.get('n_covered')}) · over ALL items {_f(m1.get('all'))} "
                  f"(n {m1.get('n_all')}) · coverage {_f(m1.get('coverage'))} · chance {_f(m1.get('chance_covered'))}")
         L.append(f"    M3 covered {_f(m3.get('covered'))} (n {m3.get('n_covered')}) · over ALL {_f(m3.get('all'))}")
@@ -581,10 +614,15 @@ def report_lines(g: Dict[str, object]) -> List[str]:
     p = g["M6_pooled"]
     L.append(f"  TEST 6 · M6 POOLED over {p['sets']}: covered {_f(p['covered'])} (n {p['n_covered']} of {p['n_items']}; "
              f"chance {_f(p['chance_covered'])}; bar {p['bar']}, n ≥ {p['n_bar']}) → {p['verdict']}")
+    if g.get("null"):
+        z = g["null"]
+        L.append(f"  THE NULL ({z['K']} shuffled-utterance draws, the scored record's): M1 {_f(z['m1'])} vs p95 {_f(z['m1_p95'])} → "
+                 f"{'ABOVE' if z['m1_above'] else 'NOT ABOVE'} · M3 {_f(z['m3'])} vs p95 {_f(z['m3_p95'])} → "
+                 f"{'ABOVE' if z['m3_above'] else 'NOT ABOVE'}")
     a = g["M4a"]
     L.append(f"  TEST 4a · EXPLAIN: words asked {a['words_asked']} · explained {a['words_explained']} · «unknown» {a['words_unknown']} · "
-             f"citations {a['n_cited']} · EXIST {_f(a['exist'])} (bar 1.000) · CARRY {_f(a['carry'])} (bar 0.90) · "
-             f"shuffled-citation twin median {_f(a['twin_median'])}, p95 {_f(a['twin_p95'])} → {a['verdict']}")
+             f"citations {a['n_cited']} (of episodes with ≥ 2 hypotheses: {a['eligible']}) · EXIST {_f(a['exist'])} (a wiring pin, bar 1.000) · "
+             f"CARRY {_f(a['carry'])} (bar 0.90) · the null's median {_f(a['null_median'])}, p95 {_f(a['null_p95'])} → {a['verdict']}")
     L.append("  TEST 4b · RULE: NOT BUILT tonight (PREREG §3)")
     if g.get("M5"):
         f = g["M5"]
@@ -613,16 +651,26 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if a.pair_with:
         other = json.loads(Path(a.pair_with).read_text())
         prs = {}
-        for mark, graded_only in (("M1", True), ("M3", False)):
-            prs[mark] = pair(g["items"][GRADED_SET][mark], other["items"][GRADED_SET][mark], graded_only)
+        # ABLE (#228; PREREG §3): the second's FORCED M1 on the fresh set must be above the null's p95, or «first > second»
+        # only says the first can point — the pair then reads VOID, never PASS
+        o_m1 = other["sets"][GRADED_SET]["marks"]["M1"]["graded"].get("covered")
+        p95 = (g.get("null") or {}).get("m1_p95")
+        able = o_m1 is not None and p95 is not None and o_m1 > p95
+        lines.append(f"  THE SECOND IS ABLE? its forced M1 {_f(o_m1)} vs the null's p95 {_f(p95)} → {'ABLE' if able else 'NOT ABLE — every pair reads VOID'}"
+                     f" · its answers read forced: {other['sets'][GRADED_SET].get('forced')}")
+        for mark, graded_only, sets in (("M1", True, (GRADED_SET,)), ("M3", False, M6_POOLED_SETS)):
+            ra = [r for s_ in sets for r in g["items"].get(s_, {}).get(mark, [])]
+            rb = [r for s_ in sets for r in other["items"].get(s_, {}).get(mark, [])]
+            prs[mark] = pair(ra, rb, graded_only)
             p = prs[mark]
+            p["sets"] = list(sets)
             ok = p["n"] >= M.UNDERPOWERED_N and p["diff"] is not None and p["diff"] >= 0.10 and p["p"] < 0.001
-            p["verdict"] = ("VOID — the second answers nothing" if p["second_answered"] in (None, 0.0) else
-                            "PASS" if ok else "FAIL")
-            lines.append(f"  PAIRED {mark}: {g['label']} {_f(p['first'])} vs {other['label']} {_f(p['second'])} on n {p['n']} · "
-                         f"diff {_f(p['diff'])} · discordant {p['first_only']} / {p['second_only']} · exact sign test p {p['p']:.2e} · "
-                         f"the second answered {_f(p['second_answered'])} → {p['verdict']} (bar: diff ≥ 0.10 and p < 0.001)")
-        g["paired"] = {"with": a.pair_with, **prs}
+            p["verdict"] = "VOID" if not able else ("PASS" if ok else "FAIL")
+            lines.append(f"  PAIRED {mark} over {list(sets)}: {g['label']} {_f(p['first'])} vs {other['label']} {_f(p['second'])} on n {p['n']} · "
+                         f"diff {_f(p['diff'])} · discordant {p['first_only']} / {p['second_only']} · exact one-sided sign test p {p['p']:.2e} "
+                         f"→ {p['verdict']} (bar: diff ≥ 0.10 and p < 0.001)")
+        lines.append("  NOT COMPARED with the second, by construction: test 4 (its `why` answers «unknown») and test 5 (it has no misuse act)")
+        g["paired"] = {"with": a.pair_with, "able": able, **prs}
     (out / "grade.json").write_text(json.dumps(g, indent=1, sort_keys=True, default=R._jsonable if hasattr(R, "_jsonable") else str))
     (out / "report.txt").write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
