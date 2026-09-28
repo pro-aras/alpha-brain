@@ -54,6 +54,49 @@ class GradeError(Exception):
     pass
 
 
+# edit: Claude (Fable 5.1, the seat), 2026-09-28 21:04 +0400 — the seam test (brain-organ a417b69): the journal keeps `Brain.ask`'s return WHOLE
+# under `answer`, so `raw` / `raw_forced` sit inside it; `begin` / `end` rows carry no item; NAME's forced names are keyed by
+# the brain's LEARNED type (its words joined with «|») and are mapped to the world's type names HERE, on the truth side.
+def raw_of(a: Optional[Dict[str, object]]) -> Dict[str, object]:
+    if not a:
+        return {}
+    ans = a.get("answer") or {}
+    r = ans.get("raw") if isinstance(ans, dict) else None
+    return dict(r) if isinstance(r, dict) else dict(a.get("raw") or {})
+
+
+def forced_of(a: Optional[Dict[str, object]]) -> Dict[str, object]:
+    if not a:
+        return {}
+    ans = a.get("answer") or {}
+    r = ans.get("raw_forced") if isinstance(ans, dict) else None
+    return dict(r) if isinstance(r, dict) else dict(a.get("raw_forced") or {})
+
+
+def world_type_of_key(key: str) -> str:
+    """A learned type's key («circle|cross|…») → the world's name for it: the type most of its words have. A key that is
+    already a world type name passes through."""
+    if key in W.WORD_TYPES:
+        return key
+    kinds = collections.Counter(W.word_type(w) for w in key.split("|"))
+    return kinds.most_common(1)[0][0]
+
+
+def name_by_world_type(raw: Dict[str, object]) -> Dict[str, object]:
+    nm = raw.get("name")
+    if not isinstance(nm, dict):
+        return raw
+    out = dict(raw)
+    mapped: Dict[str, object] = {}
+    for k, v in nm.items():
+        t = world_type_of_key(str(k))
+        if t in mapped:
+            raise GradeError(f"two learned types map to the world's {t!r}: {sorted(nm)}")
+        mapped[t] = v
+    out["name"] = mapped
+    return out
+
+
 # ------------------------------------------------------------------------------------------------ reading a life
 def _jsonl(path: Path) -> List[Dict[str, object]]:
     out = []
@@ -120,6 +163,8 @@ class Life:
         self.answer_of: Dict[str, Dict[str, object]] = {}
         dup = []
         for j in self.answers:
+            if j.get("item") is None:          # `begin` / `end`: acknowledgements, no item
+                continue
             k = str(j.get("item"))
             if k in self.answer_of:
                 dup.append(k)
@@ -262,13 +307,15 @@ def offline_answers(life: Life, ctx: SetCtx) -> Dict[str, object]:
             a = life.answer_of.get(str(it["item_id"]))
             if a is None:
                 continue
-            raw = a.get("raw")
-            if raw is None:
+            raw = raw_of(a)
+            if not raw:
                 raise GradeError(f"answer {it['item_id']} carries no `raw` (INTERFACE addendum 1)")
+            if mark == "NAME":
+                raw = name_by_world_type(raw)
             if mark in ("M1", "M2a", "M3", "M6"):
                 if raw.get("misuse") is not None:
                     forced[f"{mark}:misuse→raw_forced"] += 1
-                    raw = dict(a.get("raw_forced") or {"point": None})
+                    raw = forced_of(a) or {"point": None}
                 if raw.get("point") is None and not raw.get("unheard"):
                     hyps = a.get("hyps") or []
                     ts = (life.asks.get(str(it["item_id"])) or {}).get("test_seed")
@@ -343,7 +390,9 @@ def grade_m6_pooled(per_set_rows: Dict[str, List[Dict[str, object]]], seen: Opti
            "all": (float(np.mean([r["correct"] for r in grad])) if grad else None),
            "chance_covered": (float(np.mean([r["chance"] for r in cov])) if cov else None),
            "bar": M.BARS["M6"], "n_bar": M.UNDERPOWERED_N, "meeting_seen": seen}
-    if seen is not True:
+    if seen is None:
+        out["verdict"] = "NOT GRADABLE — this life holds no «dax» meeting (its training stream ends before it)"
+    elif seen is not True:
         out["verdict"] = "NOT GRADABLE — the one meeting was not seen by the gaze (an organ limit)"
     elif not cov or out["n_unheard"] == len(rows):
         out["verdict"] = "NOT GRADABLE — no covered gradable item"
@@ -363,11 +412,11 @@ def grade_m5(life: Life, sc: SetCtx, A: Dict[str, object]) -> Dict[str, object]:
         a = life.answer_of.get(str(it["item_id"]))
         if a is None:
             continue
-        raw = a.get("raw") or {}
+        raw = raw_of(a)
         named = raw.get("misuse") is not None
-        none = bool(raw.get("none_i")) if raw.get("point") is not None else False
+        none = bool(raw.get("none_i")) if raw.get("point") is not None else bool(raw.get("none"))
         unheard = bool(raw.get("unheard"))
-        forced = a.get("raw_forced") or {}
+        forced = forced_of(a)
         rows.append({"item_id": it["item_id"], "kind_of_pair": it.get("kind_of_pair"), "phrase": it.get("phrase"),
                      "named": named, "none": none, "unheard": unheard, "refused": named or none,
                      "forced_point": forced.get("point"), "n_things": it.get("n_things")})
@@ -381,7 +430,7 @@ def grade_m5(life: Life, sc: SetCtx, A: Dict[str, object]) -> Dict[str, object]:
         for it in sc.items.get(mark, []):
             a = life.answer_of.get(str(it["item_id"]))
             if a is not None:
-                valid.append({"item_id": it["item_id"], "mark": mark, "misuse": (a.get("raw") or {}).get("misuse") is not None})
+                valid.append({"item_id": it["item_id"], "mark": mark, "misuse": raw_of(a).get("misuse") is not None})
     m3v = [v for v in valid if v["mark"] == "M3"]
     out = {"n_items": len(items), "n_answered": len(rows), "n_unheard": len(rows) - len(grad),
            "refused": rate(grad, "refused")[0], "named": rate(grad, "named")[0], "n": len(grad),
@@ -433,7 +482,7 @@ def grade_m4a(life: Life) -> Dict[str, object]:
         a = life.answer_of.get(item)
         if a is None or word in per_word:
             continue
-        ans = a.get("answer") or a.get("raw") or {}
+        ans = a.get("answer") or raw_of(a)
         if ans.get("kind") != "because":
             unknown.append(word)
             per_word[word] = {"kind": ans.get("kind")}
@@ -534,17 +583,20 @@ def grade(root: Path, journal: Optional[Path], scored: Path, label: str, genome:
             out["M5"] = grade_m5(life, sc, A)
             # the pointer: the brain's recorded target against the grader's own reading with the truth
             bad = []
+            checked = 0
             for it_id, want in sc.ptr.items():
                 a = life.answer_of.get(it_id)
                 if a is None:
                     continue
-                raw = a.get("raw") or {}
-                got = raw.get("target") if "target" in raw else (None if raw.get("uncovered") else a.get("pointer"))
-                if "target" in raw and got != want:
+                raw = raw_of(a)
+                ans = a.get("answer") or {}
+                got = ans.get("hyp") if "hyp" in ans else raw.get("target")
+                if raw.get("uncovered") or ans.get("kind") == "unseen":
+                    got = None
+                checked += 1
+                if got != want:
                     bad.append((it_id, got, want))
-            out["pointer"] = {"checked": sum(1 for k in sc.ptr if (life.answer_of.get(k) or {}).get("raw", {}).get("target") is not None
-                                             or (life.answer_of.get(k) or {}).get("raw", {}).get("uncovered")),
-                              "mismatches": len(bad), "first": bad[:3]}
+            out["pointer"] = {"checked": checked, "mismatches": len(bad), "first": bad[:3]}
     out["sets"] = per_set
     out["items"] = item_rows
     out["M6_pooled"] = grade_m6_pooled(m6_rows, ms["seen"])
@@ -665,10 +717,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             p = prs[mark]
             p["sets"] = list(sets)
             ok = p["n"] >= M.UNDERPOWERED_N and p["diff"] is not None and p["diff"] >= 0.10 and p["p"] < 0.001
-            p["verdict"] = "VOID" if not able else ("PASS" if ok else "FAIL")
+            # a pair with no item gradable in BOTH is NOT COMPARED (PREREG §3: a mark the second cannot answer by construction
+            # is never a first's win); under n 30 it is UNDERPOWERED — printed with its numbers, never PASS or FAIL
+            p["verdict"] = ("VOID" if not able else
+                            "NOT COMPARED — no item is gradable in both" if p["n"] == 0 else
+                            f"UNDERPOWERED (n {p['n']} < {M.UNDERPOWERED_N})" if p["n"] < M.UNDERPOWERED_N else
+                            "PASS" if ok else "FAIL")
+            p["second_unheard"] = sum(1 for r in rb if not r["gradable"])
+            p["second_items"] = len(rb)
             lines.append(f"  PAIRED {mark} over {list(sets)}: {g['label']} {_f(p['first'])} vs {other['label']} {_f(p['second'])} on n {p['n']} · "
                          f"diff {_f(p['diff'])} · discordant {p['first_only']} / {p['second_only']} · exact one-sided sign test p {p['p']:.2e} "
-                         f"→ {p['verdict']} (bar: diff ≥ 0.10 and p < 0.001)")
+                         f"→ {p['verdict']} (bar: diff ≥ 0.10 and p < 0.001) · the second heard every word of "
+                         f"{p['second_items'] - p['second_unheard']} of {p['second_items']} phrases")
         lines.append("  NOT COMPARED with the second, by construction: test 4 (its `why` answers «unknown») and test 5 (it has no misuse act)")
         g["paired"] = {"with": a.pair_with, "able": able, **prs}
     (out / "grade.json").write_text(json.dumps(g, indent=1, sort_keys=True, default=R._jsonable if hasattr(R, "_jsonable") else str))
