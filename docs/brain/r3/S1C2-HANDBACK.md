@@ -33,7 +33,7 @@ PROGRESS+REPLAY on the replay learner (O = ORACLE+REPLAY, RANDOM = RANDOM+REPLAY
   - the learnable rooms' own mean drops shrink 40–65 % (R1 0.81 → 0.32, R2 0.92 → 0.49, R3 0.63 → 0.36 at seed 20261301);
   - N's barely moves (0.29 → 0.27 / 0.36 → 0.31 / 0.54 → 0.44);
   - N's drop as a fraction of the learnable rooms' therefore RISES: 0.38 → 0.71, 0.41 → 0.70, 0.70 → 1.22;
-  - the replay's own change per room, POST_b − PRE_(b+1), is ≈ 0 for N (+0.001 / +0.027 / −0.024) against R1's +0.12 / +0.28 / +0.29.
+  - the replay's own change per room, POST_b − PRE_(b+1), under the same paired RANDOM+REPLAY picks is smallest for N (+0.013 / +0.023 / +0.004) against R1's +0.049 / +0.068 / +0.068 (read from RANDOM+REPLAY's records; PROGRESS+REPLAY's own life, in the report's forgetting line, reads N +0.001 / +0.027 / −0.024 against R1 +0.12 / +0.28 / +0.29).
   
   PROGRESS+REPLAY accordingly spends MORE of its life in N than bare PROGRESS (0.34 / 0.29 / 0.34 against 0.18 / 0.21 / 0.20) and never leaves it (LEAVE_N 193–200). The mechanism's own prediction — «N's re-learning drop shrinks toward 0 and its fraction falls» — reads the other way at every seed.
 - **ERROR+REPLAY stays trapped** [Certain]: SHARE_N 0.852 / 0.857 / 0.852, above RANDOM+REPLAY's band at every seed. The 1990 rule's trap is error-seeking, not forgetting, so (e) does not fire.
