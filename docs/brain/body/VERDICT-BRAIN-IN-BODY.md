@@ -75,7 +75,7 @@
 
 - **The backlog clause was the seat's bar, and it was set wrong.** It counted the scene world's rows only. The full organism's other worlds publish on their own clocks and no feed gates them. While a canvas cost 165–730 ms their rows queued beside the scene's. A perfect mechanism exceeds that bar. The clause reads NOT MET; it is not read as a failure of the organism. The mind never fell behind in the older sense: the backlog returned to 8 after every excursion and the life ended with 0.
 - **Named organs that did little:** the web door stayed closed (stage 3; 0 fetches; no outward call was made). EVOLVE proposed once and adopted nothing (epoch 0). 98 questions were written and 2 were answered by the world.
-- **The price.** A canvas cost 28 ms at birth, 205 ms by the end of training and up to 803 ms in the sitting. The lean life at the same seed cost 27 → about 120 ms. In the sitting every answer hashes the organism before and after (the read-only law); at 8,400 cells that is the cost.
+- **The price** (the mind's time per canvas, a one-minute mean, from each life's `SERIES.tsv`). The full organism: 28 ms at birth, 205 ms by the end of training, up to 803 ms in the sitting. The lean life at the same seed: 27 ms, 82 ms, up to 275 ms. In the sitting every answer hashes the organism before and after (the read-only law); at 8,400 cells that is the cost.
 - The tape had no tail at the close (38,173 rows on the tape, 38,173 lived), so the cut changed nothing here. The pre-flight read the same.
 - The full organism's pre-flight at 20261101 (300 scenes) passed the same checks: 4,470 rows identical, no disturbance, 1,721 of 1,721 answers equal to the lean pre-flight's.
 
