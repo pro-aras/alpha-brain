@@ -230,7 +230,7 @@ cpu 22.9 s
 - **The rule barely fires.** It set aside:
   - of the claims whose referent the gaze never saw: 45 / 1,924 = **0.023** (seed 20261101), 34 / 1,896 = **0.018** (20261102), 52 / 1,893 = **0.027** (20261103);
   - of the claims whose referent it saw (the false-unseen rate): 29 / 15,479 = **0.002**, 46 / 15,418 = **0.003**, 29 / 15,475 = **0.002**. That is far BELOW the predicted 0.05–0.08. It is not #162's rule that sets everything aside; it is the opposite.
-- **Why (the diagnostic, §10.5):** the check is right. It agrees with an independent recomputation on 17,403 of 17,403 claims, and it reproduces the gate's counts. But the READER's band holds nearly every word of a type at every thing:
+- **Why (the diagnostic, §10.5):** the check is right. It agrees with an independent recomputation on 17,403 of 17,403 claims, and it reproduces the gate's counts. But the READER's band holds nearly every word of a type at the attributed thing h*, in all three classes alike:
   - shape: 5.4 of 6 words;
   - colour: 4.8 of 5;
   - size: 2.0 of 2.
