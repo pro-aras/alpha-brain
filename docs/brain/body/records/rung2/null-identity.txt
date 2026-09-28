@@ -1,0 +1,3 @@
+NULL IDENTITY · offline items 455 · found in the replay 455 · POINTING equal 455 · WHOLE equal 0
+  keys that differ, by count: {'none_fit': 455, 'none_ii_fit': 455, 'none_i': 48, 'none': 68, 'none_ii': 65}
+  first pointing difference: —

@@ -1,0 +1,2 @@
+JOURNAL DIFF · dropped kinds ['brain'] · kept rows a 24471 · b 24471 · verdict IDENTICAL
+  the last organism hash: a e8ebf0092f2b8c83948ead809c4f50bb63bce625272c3cd62ee34c246cbc50df · b e8ebf0092f2b8c83948ead809c4f50bb63bce625272c3cd62ee34c246cbc50df · equal

@@ -1,0 +1,5 @@
+scene exit=0: Ran 340 tests in 154.855s · OK
+brainvenv exit=0: Ran 742 tests in 428.190s · OK (skipped=2)
+genome exit=0: Ran 601 tests in 194.417s · OK (skipped=1, expected failures=6)
+creature exit=0: Ran 1176 tests in 1028.897s · OK (skipped=6)
+tools exit=0: Ran 62 tests in 138.524s · OK
