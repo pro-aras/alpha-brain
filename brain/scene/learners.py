@@ -21,6 +21,9 @@ edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:05 +0400 — AMENDMENT 2 §1
 TypedLDAReader added; LDAReader kept, superseded.
 edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:07 +0400 — AMENDMENT 2 as CO-SIGNED (Fable 5.1, 74be9e0): «none» on the pointing score's
 conformal threshold; «what is this?» by the DISTANCE band under the word's own type's Λ.
+edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:08 +0400 — PREREG-S1B1R «the repair» (§1 a–e): the ear's type cover and one-word counts,
+the READER (RWLearner.calibrate_r / reader_distances, pooled_covariance, shrunk_inverse), production maturity, the ROADS
+(RWRoad, OracleRoad) and the believed-names mouth (produce_believed). Additive — S1b-1's roads are byte-for-byte kept.
 """
 from __future__ import annotations
 
@@ -150,6 +153,7 @@ class Ear:
         self.pos_sum: Dict[str, float] = {}
         self.pos_n: Dict[str, int] = {}
         self.co: Dict[Tuple[str, str], int] = {}
+        self.alone: Dict[str, int] = {}                  # PREREG-S1B1R §1 (e) 4: the one-word utterances per word
 
     def hear(self, words: Sequence[str]) -> None:
         ws = list(words)
@@ -165,6 +169,8 @@ class Ear:
         for a in range(len(u)):
             for b in range(a + 1, len(u)):
                 self.co[(u[a], u[b])] = self.co.get((u[a], u[b]), 0) + 1
+        if L == 1:                                       # additive (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:08 +0400)
+            self.alone[ws[0]] = self.alone.get(ws[0], 0) + 1
 
     def key(self, w: str) -> float:
         n = self.pos_n.get(w, 0)
@@ -185,6 +191,39 @@ class Ear:
     def summary(self) -> Dict[str, object]:
         return {"keys": {w: self.key(w) for w in sorted(self.first, key=self.first.get)},
                 "first": dict(self.first), "pairs_heard": len(self.co)}
+
+    def cover(self, words: Sequence[str]) -> List[Tuple[str, ...]]:
+        """PREREG-S1B1R §1 (a) (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:08 +0400): the TYPE COVER of `words` (the learner passes
+        its MATURE words) from the EXCLUSION graph — an edge (w, w′) iff c(w, w′) = 0, never heard in one utterance. GREEDY:
+        the LARGEST maximal clique of the remaining words becomes a type (ties → the lexicographically smallest sorted
+        tuple), its words are removed, and so on; a word left alone is its own type. Types in the order taken."""
+        rest = sorted(set(words))
+        types: List[Tuple[str, ...]] = []
+        while rest:
+            adj = {w: {u for u in rest if u != w and self.count(w, u) == 0} for w in rest}
+            best = min(_maximal_cliques(rest, adj), key=lambda c: (-len(c), c))
+            types.append(best)
+            rest = [w for w in rest if w not in best]
+        return types
+
+
+def _maximal_cliques(nodes: Sequence[str], adj: Dict[str, set]) -> List[Tuple[str, ...]]:
+    """Every maximal clique of the graph on `nodes` (Bron–Kerbosch with a pivot; every choice in sorted order, so nothing
+    depends on string hashing). Each clique as a sorted tuple."""
+    out: List[Tuple[str, ...]] = []
+
+    def bk(R: List[str], P: List[str], X: List[str]) -> None:
+        if not P and not X:
+            out.append(tuple(sorted(R)))
+            return
+        pivot = max(P + X, key=lambda u: (sum(1 for v in P if v in adj[u]), u))
+        for v in [v for v in P if v not in adj[pivot]]:
+            bk(R + [v], [u for u in P if u in adj[v]], [u for u in X if u in adj[v]])
+            P = [u for u in P if u != v]
+            X = X + [v]
+
+    bk([], sorted(nodes), [])
+    return out
 
 
 # ================================================================================================ A-RW (and P-ORACLE-RW)
@@ -530,6 +569,69 @@ class RWLearner:
                 "tau_word": {w: t for w, t in self.tau_word.items()}, "calib_n": dict(self.calib_n),
                 "tau_none": dict(self.tau_none), "ear": self.ear.summary()}
 
+    # -- PREREG-S1B1R §1 (a)–(c) (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:08 +0400): additive; S1b-1's roads never read these
+    def mature_words(self) -> List[str]:
+        """The words of ≥ 3 meetings (P_FROM_MEETING): the only words the learner EMITS (§1 c) and the vertices of its types."""
+        return [w for j, w in enumerate(self.words) if self.meetings[j] >= P_FROM_MEETING]
+
+    def calibrate_r(self, eps: float, world_types: Optional[Dict[str, str]] = None) -> Dict[str, object]:
+        """At a reading point, AFTER calibrate() (never changing what it set): the learned TYPES — the ear's greedy cover of
+        the MATURE words (§1 a) — and THE READER per type (§1 b), in `self.reader["ear"]`; with `world_types` (a word → type
+        map the CALLER passes — the learner never holds one: R-TT) the world's types over the same mature words in
+        `self.reader["world"]`. Returns the printable record: the types, the one-alone type and its counts, the bands."""
+        mature = self.mature_words()
+        self.reader = {"ear": self._reader_state(self.ear.cover(mature), eps)}
+        if world_types is not None:
+            groups: Dict[str, List[str]] = {}
+            for w in mature:
+                groups.setdefault(world_types[w], []).append(w)
+            self.reader["world"] = self._reader_state(sorted((tuple(sorted(v)) for v in groups.values()),
+                                                             key=lambda c: (-len(c), c)), eps)
+
+        def rec(st):
+            return {"types": [list(t) for t in st["types"]], "one_alone": st["one_alone"],
+                    "alone_counts": list(st["alone_counts"]), "bands": {w: v["band"] for w, v in st["word"].items()}}
+        out = {"eps": eps, "mature": mature, **rec(self.reader["ear"])}
+        if "world" in self.reader:
+            out["world"] = rec(self.reader["world"])
+        return out
+
+    def _reader_state(self, types: Sequence[Tuple[str, ...]], eps: float) -> Dict[str, object]:
+        """Per type T: Σ_T (pooled_covariance), Λ_T = shrunk_inverse(Σ_T, ε) (slda's own form); per word w ∈ T: μ_w (S1a's
+        prototype), B_w = the responsibility-weighted 0.90 quantile (BAND_Q, weighted_quantile) of d_w over w's OWN store;
+        the ONE-ALONE type = the type whose words the ear heard alone most often (ties → the earlier type; none heard → None)."""
+        st: Dict[str, object] = {"types": [tuple(t) for t in types], "lam": [], "word": {}, "eps": float(eps)}
+        for k, T in enumerate(st["types"]):
+            S = pooled_covariance(self, T)
+            lam = None if S is None else shrunk_inverse(S, eps)
+            st["lam"].append(lam)
+            for w in T:
+                j = self.index[w]
+                if lam is None or self.proto_w[j] <= 0 or not self.store_z[j]:
+                    st["word"][w] = {"type": k, "mu": None, "band": None}
+                    continue
+                mu = self.prototype(j)
+                D = np.concatenate(self.store_z[j], axis=0) - mu[None, :]
+                d = np.sqrt(np.maximum(np.einsum("ij,jk,ik->i", D, lam, D), 0.0))
+                q = weighted_quantile(d, np.concatenate(self.store_r[j], axis=0), BAND_Q)
+                st["word"][w] = {"type": k, "mu": mu, "band": float("inf") if q is None else q}
+        counts = [int(sum(self.ear.alone.get(w, 0) for w in T)) for T in st["types"]]
+        st["alone_counts"] = counts
+        st["one_alone"] = int(np.argmax(counts)) if counts and max(counts) > 0 else None
+        return st
+
+    def reader_distances(self, Z: np.ndarray, mode: str = "ear") -> np.ndarray:
+        """(H, W) d_w(z) = √((z − μ_w)ᵀ Λ_T (z − μ_w)) under the READER state `mode`; +inf for a word outside it."""
+        Z = np.atleast_2d(Z)
+        D = np.full((Z.shape[0], len(self.words)), np.inf)
+        st = self.reader[mode]
+        for w, v in st["word"].items():
+            if v["mu"] is None:
+                continue
+            E = Z - v["mu"][None, :]
+            D[:, self.index[w]] = np.sqrt(np.maximum(np.einsum("ij,jk,ik->i", E, st["lam"][v["type"]], E), 0.0))
+        return D
+
 
 # ================================================================================================ the LDA oracle reader
 class LDAReader:
@@ -872,6 +974,204 @@ def produce(arm, X: np.ndarray, target: int, rng_factory) -> Dict[str, object]:
     _rank, phrase, point, margin = accepted[0]
     return {"spoken": list(phrase), "reason": None, "held": held, "readback_point": point, "target": int(target),
             "margin": margin, "n_candidates": len(cands), "n_accepted": len(accepted)}
+
+
+# ================================================================================================ S1b-1R «the repair»
+# edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:08 +0400 — PREREG-S1B1R §1 (sha 879a22fb…) with AMENDMENT 1 (a198f0b4…): the READER's
+# pieces, the ROADS (one per reading, over one learned state) and the mouth that says what it BELIEVES. Additive: S1b-1's
+# classes, `produce` and every S1b-1 road above are byte-for-byte as they were.
+def pooled_covariance(L: "RWLearner", words: Sequence[str]) -> Optional[np.ndarray]:
+    """§1 (b): Σ_T = Σ_{w∈T} Σ_i r_i (z_i − μ_w)(z_i − μ_w)ᵀ / Σ_{w∈T} Σ_i r_i over the words' OWN stores (store_z, store_r
+    as stored — the inputs the diagonal band reads), μ_w = the word's prototype. None when the words hold no weight."""
+    num = np.zeros((L.dim, L.dim))
+    den = 0.0
+    for w in words:
+        j = L.index[w]
+        if L.proto_w[j] <= 0 or not L.store_z[j]:
+            continue
+        R = np.concatenate(L.store_r[j], axis=0)
+        D = np.concatenate(L.store_z[j], axis=0) - L.prototype(j)[None, :]
+        num += (D * R[:, None]).T @ D
+        den += float(R.sum())
+    return num / den if den > 0 else None
+
+
+def shrunk_inverse(S: np.ndarray, eps: float) -> np.ndarray:
+    """Λ = [(1 − ε)Σ + ε (tr Σ / d) I]⁻¹ — slda.StreamingLDA.sleep's own shrinkage form (a zero or non-finite trace → I,
+    its D27)."""
+    d = S.shape[0]
+    tr = float(np.trace(S))
+    if not np.isfinite(tr) or tr <= 0.0:
+        return np.eye(d)
+    return np.linalg.inv((1.0 - eps) * S + eps * (tr / d) * np.eye(d))
+
+
+class RWRoad:
+    """ONE ROAD of PREREG-S1B1R §1 / §3 over an RWLearner's state — a road never changes the learner, so every reading is
+    one difference on one learned state. The law A-RW-R is RWRoad(L): types from the ear, the READER band, production
+    maturity, «none» = S1a's τ_point (S1b-1's none_i). The readings swap one argument back: types="world" (R-TT), band="diag"
+    (R-DIAG), none="dist" (R-NONE-DIST); R-OLDMOUTH is the law's road under S1b-1's `produce`. S1B1-ROADS (the item-change
+    control, AMENDMENT 1 §4 b) = RWRoad(L, types=None, band="diag", mature=False, none="dist") under `produce`: S1b-1's A-RW."""
+
+    def __init__(self, L: "RWLearner", types: Optional[str] = "ear", band: str = "reader", mature: bool = True,
+                 none: str = "tau_point"):
+        if band not in ("reader", "diag") or none not in ("tau_point", "dist") or types not in (None, "ear", "world"):
+            raise ValueError(f"no such road: types={types!r} band={band!r} none={none!r}")
+        self.L, self.mode, self.band, self.mature, self.none = L, types, band, bool(mature), none
+        self.ear = L.ear
+
+    def held_words(self, x: np.ndarray) -> List[str]:
+        """The road's «what is this?» (§1 b, c): every word whose band — the READER's per learned type, or S1b-1's diagonal
+        — holds the thing; with production maturity, only the MATURE words (a young word is never emitted)."""
+        L = self.L
+        Z = L.stats.standardise(np.atleast_2d(x))[:1]
+        if self.band == "diag":
+            out = L.held(Z, "diag")
+        else:
+            st = L.reader[self.mode]
+            D = L.reader_distances(Z, self.mode)[0]
+            out = [w for w in L.words if w in st["word"] and st["word"][w]["band"] is not None
+                   and D[L.index[w]] <= st["word"][w]["band"]]
+        if self.mature:
+            out = [w for w in out if L.meetings[L.index[w]] >= P_FROM_MEETING]
+        return out
+
+    def answer_point(self, X: np.ndarray, phrase: Sequence[str], rng: np.random.Generator) -> Dict[str, object]:
+        """The learner's own pointing, unchanged (young words point as S1a's); «none» is the road's: τ_point (none_i, §1 d)
+        or S1b-1's distance flag."""
+        a = self.L.answer_point(X, phrase, rng)
+        if self.none == "tau_point" and a.get("point") is not None:
+            a = dict(a)
+            a["none"] = a["none_i"]
+        return a
+
+    def types(self) -> List[Tuple[str, ...]]:
+        return list(self.L.reader[self.mode]["types"])
+
+    def believed(self, X: np.ndarray) -> List[List[Optional[str]]]:
+        """Per learned type T, per hypothesis h: b_T(h) = the argmax over T's MATURE words of the learner's own log p_w(h)
+        (the delta-rule score name_forced reads); an exact tie → the first word of T's sorted tuple."""
+        L = self.L
+        Z = L.stats.standardise(np.atleast_2d(X))
+        lp = L.logp_answer(Z, getattr(L, "_bands_cache", None))
+        out: List[List[Optional[str]]] = []
+        for T in self.types():
+            cand = [w for w in T if w in L.index and L.meetings[L.index[w]] >= P_FROM_MEETING]
+            if not cand:
+                out.append([None] * Z.shape[0])
+                continue
+            cols = lp[:, [L.index[w] for w in cand]]
+            out.append([cand[int(k)] for k in np.argmax(cols, axis=1)])
+        return out
+
+    def sayable(self, x: np.ndarray, w: str) -> bool:
+        return w in self.held_words(x)
+
+    def one_alone(self) -> Optional[int]:
+        return self.L.reader[self.mode]["one_alone"]
+
+
+class OracleRoad:
+    """P-ORACLE / ORACLE-TRUTH through the new mouth (PREREG-S1B1R §3): its believed names are its per-type FORCED names
+    (the argmax of its within-type posterior over its MATURE classes — ≥ 3 showings; an exact tie → the reader's class
+    order); SAYABLE = its own per-type distance band holds the thing; its pointing and «none» (its τ_point at 0.95) are its
+    own; it knows the types (the caller's order). The one-alone type from its ear, as the learner's."""
+
+    def __init__(self, R: "TypedLDAReader", order: Sequence[str] = ("shape", "colour", "size")):
+        self.R, self.ear = R, R.ear
+        self.order = [t for t in order if t in R.readers]
+
+    def _mature(self, t: str) -> List[int]:
+        r = self.R.readers[t]
+        return [k for k, c in enumerate(r.counts) if c >= P_FROM_MEETING]
+
+    def types(self) -> List[Tuple[str, ...]]:
+        return [tuple(sorted(self.R.readers[t].names[k] for k in self._mature(t))) for t in self.order]
+
+    def believed(self, X: np.ndarray) -> List[List[Optional[str]]]:
+        X = np.atleast_2d(X)
+        out: List[List[Optional[str]]] = []
+        for t in self.order:
+            ks = self._mature(t)
+            if not ks:
+                out.append([None] * X.shape[0])
+                continue
+            lp = self.R._log_post(t, X)[:, ks]
+            out.append([self.R.readers[t].names[ks[int(k)]] for k in np.argmax(lp, axis=1)])
+        return out
+
+    def sayable(self, x: np.ndarray, w: str) -> bool:
+        return w in self.R.what_is_this(x)
+
+    def held_words(self, x: np.ndarray) -> List[str]:
+        return self.R.what_is_this(x)
+
+    def answer_point(self, X: np.ndarray, phrase: Sequence[str], rng: np.random.Generator) -> Dict[str, object]:
+        return self.R.answer_point(X, phrase, rng)
+
+    def one_alone(self) -> Optional[int]:
+        counts = [sum(self.ear.alone.get(w, 0) for w in T) for T in self.types()]
+        return int(np.argmax(counts)) if counts and max(counts) > 0 else None
+
+
+def produce_believed(road, X: np.ndarray, target: int, rng_factory) -> Dict[str, object]:
+    """THE MOUTH SAYS WHAT IT BELIEVES (PREREG-S1B1R §1 e as Fable's edit reads it) — the SAME code for every arm, over
+    its ROAD (`types()`, `believed(X)`, `sayable(x, w)`, `answer_point(X, phrase, rng)` with the road's «none», `ear`,
+    `one_alone()`):
+      1. per learned type T the BELIEVED name b_T(h) of every hypothesis; b_T(target) is SAYABLE iff the road's band holds
+         the target — otherwise T is silent for it;
+      2. a candidate = a non-empty subset of the sayable believed names; believed-UNIQUE iff no OTHER hypothesis has, for
+         every word of it, the same believed name in that word's type (categorical: no δ, no continuous margin; the
+         others' names are their argmax names, no band — AMENDMENT 1 §4 g);
+      3. ACCEPTED iff believed-unique AND the read-back — the arm's own pointing, a fresh item tie generator per candidate,
+         an exact tie broken by it as everywhere — puts the target first AND «none» does not fire;
+      4. spoken = the SHORTEST accepted; ties → the largest read-back margin (+∞ with one hypothesis in view) → a candidate
+         holding a word of the type the ear hears ALONE most often → the ear's order keys → first-heard; the phrase is in
+         the ear's order;
+      5. none accepted → «I cannot say it yet», one reason (declared priority): «no sayable word»; «no believed-unique
+         phrase»; «none» when a believed-unique candidate read back to the target with «none» firing; else «the read-back».
+    The read-back's point and the target are RECORDED, so the grader re-checks the wiring (READ-BACK 1.000)."""
+    X = np.atleast_2d(X)
+    t = int(target)
+    n_hyp = X.shape[0]
+    types = [tuple(T) for T in road.types()]
+    B = road.believed(X)
+    base: Dict[str, object] = {"target": t, "believed": {str(k): B[k][t] for k in range(len(types)) if B[k][t] is not None},
+                               "sayable": [], "n_candidates": 0, "n_unique": 0, "n_accepted": 0}
+    say = [(k, B[k][t]) for k in range(len(types)) if B[k][t] is not None and road.sayable(X[t], B[k][t])]
+    base["sayable"] = [w for _k, w in say]
+    if not say:
+        return {"spoken": None, "reason": "no sayable word", **base}
+    cands = [[say[i] for i in range(len(say)) if mask >> i & 1] for mask in range(1, 1 << len(say))]
+    uniq = [c for c in cands if not any(all(B[k][h] == w for k, w in c) for h in range(n_hyp) if h != t)]
+    base["n_candidates"], base["n_unique"] = len(cands), len(uniq)
+    if not uniq:
+        return {"spoken": None, "reason": "no believed-unique phrase", **base}
+    one = road.one_alone()
+    ear = road.ear
+    accepted = []
+    fired = 0
+    for c in uniq:
+        phrase = ear.order([w for _k, w in c])
+        a = road.answer_point(X, phrase, rng_factory())
+        if a.get("point") is None or int(a["point"]) != t:
+            continue
+        if a.get("none"):
+            fired += 1
+            continue
+        sc = np.asarray(a["scores"], dtype=np.float64)
+        others = np.delete(sc, t)
+        margin = float(sc[t] - np.max(others)) if others.size else float("inf")
+        alone = 0 if (one is not None and any(k == one for k, _w in c)) else 1
+        rank = (len(phrase), -margin, alone, tuple(ear.key(w) for w in phrase),
+                tuple(ear.first.get(w, 10 ** 6) for w in phrase))
+        accepted.append((rank, phrase, int(a["point"]), margin))
+    base["n_accepted"] = len(accepted)
+    if not accepted:
+        return {"spoken": None, "reason": "none" if fired else "the read-back", **base}
+    accepted.sort(key=lambda z: z[0])
+    _rank, phrase, point, margin = accepted[0]
+    return {"spoken": list(phrase), "reason": None, "readback_point": point, "margin": margin, **base}
 
 
 # ================================================================================================ the feeds
