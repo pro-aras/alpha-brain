@@ -60,3 +60,34 @@
 ## The finding about the body
 `creature/mind.py` keeps `self.pending[moment]` as ONE word and overwrites it at every ear row. An utterance «small green circle» reaches the organism's cells as «circle». In two months of lives no colour or size word ever reached the word cells. It was found because the twin answered «unheard» on 8 of 8 asks in the first fixture (builder C, `HANDBACK-C.md` §7). It is not changed tonight: it is the organism's own law, and changing it changes every life's record.
 
+## Rung 3 — the full organism, tested as one
+`BRAIN-FULL-20261102.genome` = ALPHA4 whole (every organ on) + the scene world + the brain, under the real unit, commit bc45156. Records: `records/rung3/`.
+
+| mark | the bar | what was read | verdict |
+|---|---|---|---|
+| ALIVE: the unit | exit clean, 0 restarts, 0 mind crashes, 0 sense restarts | ended clean after 2,377 s; NRestarts 0; crash none; sense restarts 0 | **PASS** |
+| ALIVE: the mind behind its world | ≤ the feed's bound + one moment (13 rows), as a series | 236 readings; 19 at most; over 13 at 8 readings | **NOT MET by its letter** |
+| EVERY ORGAN MOVES | each counter rises | 1,286 thinks · 27 sleeps · 12,867 episodes · 8,728 cells born · 23 exam sits · 198 runs of the hands · 451 predictions filed · 191 frames filed · 180 sayings · 1 EVOLVE proposal | **PASS** |
+| — the worlds that fed it | — | the scene world 11,464 canvases · the maker 472 · the shelf reader 562 · the game 81 · the folder 80 · the hands 198 · the lexicon door 10 | — |
+| THE BRAIN IS THE SAME BRAIN | its answers equal the lean life's at the same seed, item by item | **2,989 of 2,989 equal** | **PASS** |
+| NO DISTURBANCE | every row that is not the brain's is identical with and without it | 28,026 rows identical; final hash equal; a planted character is caught | **PASS** |
+| REPLAY IDENTITY | the life replays to itself | 41,039 rows identical | **PASS** |
+
+- **The backlog clause was the seat's bar, and it was set wrong.** It counted the scene world's rows only. The full organism's other worlds publish on their own clocks and no feed gates them. While a canvas cost 165–730 ms their rows queued beside the scene's. A perfect mechanism exceeds that bar. The clause reads NOT MET; it is not read as a failure of the organism. The mind never fell behind in the older sense: the backlog returned to 8 after every excursion and the life ended with 0.
+- **Named organs that did little:** the web door stayed closed (stage 3; 0 fetches; no outward call was made). EVOLVE proposed once and adopted nothing (epoch 0). 98 questions were written and 2 were answered by the world.
+- **The price.** A canvas cost 28 ms at birth, 205 ms by the end of training and up to 803 ms in the sitting. The lean life at the same seed cost 27 → about 120 ms. In the sitting every answer hashes the organism before and after (the read-only law); at 8,400 cells that is the cost.
+- The tape had no tail at the close (38,173 rows on the tape, 38,173 lived), so the cut changed nothing here. The pre-flight read the same.
+- The full organism's pre-flight at 20261101 (300 scenes) passed the same checks: 4,470 rows identical, no disturbance, 1,721 of 1,721 answers equal to the lean pre-flight's.
+
+## The failing parts, after tonight
+| part | where it stands | its cause, from the record | what is dated |
+|---|---|---|---|
+| test 2, «I don't know» about a never-taught shape | **FAILS** 0.646 / 0.708 / 0.729 (bar 0.80); houses and trees | the brain's own store of which thing each word was about | F-M2B, the reader from its CONFIDENT meetings only. Not started: «confident» needs a threshold and no record says where. **2026-09-29** |
+| test 6, a new word from one meeting | **REPAIRED on the bench, where the eye saw the meeting** (below) | a young word answered by an inside / outside test; one meeting stores colour, size and place with the shape | adopted as `young 3 nearest` |
+| test 6 at 20261101 | **NOT GRADABLE** | the eye never looked at the new thing in its one scene | the look-again act. **2026-09-30** |
+| test 4b, a readable rule | **NOT BUILT** | — | **2026-09-30** |
+| speaking when a second word is needed | FAILS at two seeds (0.314, 0.375) | the eye never looked at the other thing | the look-again act |
+| the body's word road | keeps the LAST word of an utterance only | `self.pending[moment]` is one word | his word is needed: it changes every life's record |
+| the growing network | out of the brain | it cannot read out its answers (4–7 % live) | not dated |
+| the creature's SLEEP rule (replay by surprise) | unchanged; the brain has no replay at rung 1 | the worst rule measured (T-MEM-1) | the A/B on a closed tape. **2026-09-29** |
+
