@@ -54,9 +54,13 @@ class TestRow(unittest.TestCase):
 
 
 class TestGrades(unittest.TestCase):
+    # "held" (AMENDMENT 1; edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:19 +0400): the band's «what is this?» per hypothesis, which
+    # the claim record now carries — every said word below is held where it is attributed, so these expectations stand; the
+    # rule's own rows (a said word its band refuses there is set aside) are in test_tmem2_amend1.py
     REC = {"types": [("circle", "star"), ("blue", "red")],
            "believed": [["circle", "star", "circle"], ["red", "red", "blue"]],
-           "confident": [[True, True, False], [True, False, True]]}
+           "confident": [[True, True, False], [True, False, True]],
+           "held": [("circle", "red", "star"), ("star",), ("blue",)]}
 
     def test_filed_under_the_claimed_word(self) -> None:
         # «star» said about h0, believed a circle (confident) → a REFUTATION filed under «circle»; «red» said about h1 → the

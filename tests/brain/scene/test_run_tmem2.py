@@ -95,6 +95,19 @@ class TestLifeEndToEnd(unittest.TestCase):
         self.assertEqual(cal["free"]["n_pred"] + cal["free"]["n_excluded"], len(self.rec["name_preds"]))
         self.assertTrue(all(p["type"] in ("shape", "colour", "size") for p in self.rec["name_preds"]))
 
+    def test_amend1_the_rule_and_its_readings_on_a_real_life(self) -> None:
+        """AMENDMENT 1 (edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:16 +0400): every set-aside claim of the truth-free
+        row is counted in exactly one of the two readings (the referent seen / never seen); the marks carry them and the
+        per-word counts."""
+        p = self.rec["perception"]
+        self.assertEqual(set(p), {"seen", "unseen"})
+        free_unseen = sum(r.get("unseen", 0) for r in self.rec["rows"]["free"].values())
+        self.assertEqual(p["seen"]["set_aside"] + p["unseen"]["set_aside"], free_unseen)
+        free_graded = sum(r["n_graded"] for r in self.rec["rows"]["free"].values())
+        self.assertEqual(p["seen"]["gradable"] + p["unseen"]["gradable"], free_graded + free_unseen)
+        self.assertEqual(self.marks["perception"], p)
+        self.assertTrue(all({"unseen", "unseen_fed"} <= set(v) for v in self.marks["words"].values()))
+
 
 class TestIdentityComparator(unittest.TestCase):
     def test_canonical_json_and_a_planted_byte(self) -> None:

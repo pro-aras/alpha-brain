@@ -2,6 +2,9 @@
 the per-word HEALTH row, kept WITHOUT the world, and the road whose `sayable` consults it.
 
 edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 17:30 +0400 — new module.
+edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 18:18 +0400 — PREREG-TMEM2 AMENDMENT 1 (final a7dceea, sha 6da8ff67…): a claim is
+graded ONLY IF the said word's own band holds the thing it is attributed to; otherwise UNGRADED «about a thing I did not see»,
+counted under the claimed word (the row's `unseen`); the claim record carries the held words it was made from.
 
 THE FENCE: like learners.py this module imports numpy, math, typing and brain.scene.learners only — never the world, the
 cache's reader of scene specs or the graders (tests/brain/scene/test_truth_fence.py). What the law grades AGAINST the world —
@@ -12,7 +15,8 @@ computed by run_tmem2.py and reaches this module only as plain arguments (an ind
                  name of every hypothesis, and whether it is CONFIDENT (the band holds it).
   attribution()  §2 the learner's OWN attribution of each said word, read-only, after train_scene (h* = the argmax of the
                  responsibilities it just stored; the episodic write's thing for a word's first meeting).
-  grades()       ITS GRADE, FILED UNDER THE CLAIMED WORD (the co-signed edit): (b_T(h*), confirmed, the said word).
+  grades()       ITS GRADE, FILED UNDER THE CLAIMED WORD (the co-signed edit): (b_T(h*), confirmed, the said word) — and, by
+                 AMENDMENT 1, only when the said word's own band holds h*; else (b_T(h*), None, the said word): set aside.
   HealthRow      one word's row: n_claims, its graded outcomes in order, cal_20 (the last 20 graded), the consecutive
                  20-claim windows, Δ, median |Δ|, the drift READING in both forms; the said word's MISSED count apart.
   HealthBook     the rows of every word, fed claims and grades.
@@ -39,6 +43,7 @@ DRIFT_K = 2.0               # the drift READING: Δ ≥ −2 × median |Δ| (out
 DRIFT_FLOOR = 1.0 / WINDOW  # its alternative form: the median floored at 1/20 (printed beside)
 REASON_NO_ROW = "no row"
 REASON_NOT_HELD = "not held lately"
+REASON_UNSEEN = "about a thing I did not see"   # AMENDMENT 1: a claim set aside — the said word does not fit the thing
 
 
 # ------------------------------------------------------------------------------------------------ a claim and its grade
@@ -46,14 +51,15 @@ def claims(road: "Lr.RWRoad", X: np.ndarray) -> Dict[str, object]:
     """§2 A CLAIM, read-only, BEFORE the parent's phrase is heard: the LAW road's own step 1 on the scene's hypotheses — per
     learned type T (the road's types: the ear's cover at the last reading point), the believed name b_T(h) of every
     hypothesis h (`RWRoad.believed`) and whether it is CONFIDENT (`RWRoad.sayable` ≡ the word is among the hypothesis's
-    held words; the held words are read once per hypothesis). Nothing is written."""
+    held words; the held words are read once per hypothesis). Nothing is written. AMENDMENT 1: the record carries those held
+    words per hypothesis (sorted) — the band's own «what is this?» that the rule of the grade reads."""
     X = np.atleast_2d(X)
     types = [tuple(t) for t in road.types()]
     believed = road.believed(X)
     held = [set(road.held_words(X[h])) for h in range(X.shape[0])]
     confident = [[believed[k][h] is not None and believed[k][h] in held[h] for h in range(X.shape[0])]
                  for k in range(len(types))]
-    return {"types": types, "believed": believed, "confident": confident}
+    return {"types": types, "believed": believed, "confident": confident, "held": [tuple(sorted(s)) for s in held]}
 
 
 def attribution(L: "Lr.RWLearner", raw: np.ndarray, words: Sequence[str], new: Sequence[str]) -> Dict[str, Optional[int]]:
@@ -84,10 +90,14 @@ def grades(claim_rec: Dict[str, object], attributed: Dict[str, Optional[int]]) -
     """§2 ITS GRADE, as co-signed — FILED UNDER THE CLAIMED WORD: for each said word w of a learned type T with an attributed
     hypothesis h*, the claim about h* in T, IF IT WAS CONFIDENT, is confirmed iff b_T(h*) = w and refuted iff b_T(h*) is
     another word of T; returned as (the claimed word b_T(h*), confirmed, the said word w). A said word of no learned type, an
-    unattributed word, or a claim that was not confident: ungraded (nothing returned)."""
+    unattributed word, or a claim that was not confident: ungraded (nothing returned).
+    AMENDMENT 1 — the rule: the claim is graded ONLY IF w's own band holds h* (w among the held words the claim step read at
+    h*: the READER under the learner's state when it saw the thing); otherwise it is set aside, «about a thing I did not
+    see», returned as (b_T(h*), None, w). A confirmation is never set aside (b = w is held at h* by its confidence)."""
     types = claim_rec["types"]
     where = {w: k for k, T in enumerate(types) for w in T}
-    out: List[Tuple[str, bool, str]] = []
+    held = claim_rec["held"]
+    out: List[Tuple[str, Optional[bool], str]] = []
     for w, h in attributed.items():
         k = where.get(w)
         if k is None or h is None:
@@ -96,19 +106,21 @@ def grades(claim_rec: Dict[str, object], attributed: Dict[str, Optional[int]]) -
         if h >= len(conf) or not conf[h]:
             continue
         b = claim_rec["believed"][k][h]
-        out.append((b, b == w, w))
+        out.append((b, (b == w) if w in held[h] else None, w))
     return out
 
 
 # ------------------------------------------------------------------------------------------------ the row
 class HealthRow:
     """One word's row (§2): its CONFIDENT claims (n_claims), the graded ones in order (1 confirmed, 0 refuted), and the said
-    word's MISSED count (the parent said this word about a thing believed to be another — a reading, never in the gate)."""
+    word's MISSED count (the parent said this word about a thing believed to be another — a reading, never in the gate).
+    AMENDMENT 1: `unseen` counts its claims set aside «about a thing I did not see» (never graded, never in cal_20)."""
 
     def __init__(self) -> None:
         self.n_claims = 0
         self.outcomes: List[int] = []
         self.missed = 0
+        self.unseen = 0
 
     @property
     def n_graded(self) -> int:
@@ -152,7 +164,7 @@ class HealthRow:
         return {"n_claims": self.n_claims, "n_graded": self.n_graded, "cal20": self.cal20(), "windows": self.windows(),
                 "delta_last": self.delta_last(), "median_abs_delta": self.median_abs_delta(),
                 "drift_firings": self.drift_firings(), "drift_firings_floor": self.drift_firings(DRIFT_FLOOR),
-                "missed": self.missed, "confirmed": int(sum(self.outcomes))}
+                "missed": self.missed, "confirmed": int(sum(self.outcomes)), "unseen": self.unseen}
 
 
 class HealthBook:
@@ -173,8 +185,11 @@ class HealthBook:
                 if claim_rec["confident"][k][h]:
                     self.row(b).n_claims += 1
 
-    def add_grades(self, graded: Sequence[Tuple[str, bool, str]]) -> None:
+    def add_grades(self, graded: Sequence[Tuple[str, Optional[bool], str]]) -> None:
         for b, ok, w in graded:
+            if ok is None:                                   # AMENDMENT 1: set aside — counted under the claimed word only
+                self.row(b).unseen += 1
+                continue
             self.row(b).outcomes.append(1 if ok else 0)
             if not ok:
                 self.row(w).missed += 1
@@ -285,7 +300,7 @@ def auroc(conf: Sequence[float], correct: Sequence[int]) -> Optional[float]:
 def row_toy(seed: int, n: int = 200) -> Dict[str, object]:
     """THE FIRST GATE step 2 (§7): two words, A's confident claims confirmed with probability 0.95, B's with 0.50, n graded
     each (seed `seed`): the gate must keep A and refuse B; the deranged null (for two words, the swap) must flip them; one
-    more ungraded claim must move nothing."""
+    more ungraded claim must move nothing — and (AMENDMENT 1) one claim set aside «unseen» moves nothing but its count."""
     rng = np.random.default_rng(seed)
     book = HealthBook()
     for _ in range(n):
@@ -300,6 +315,13 @@ def row_toy(seed: int, n: int = 200) -> Dict[str, object]:
     for w in ("A", "B"):
         book.row(w).n_claims += 1
     after = {w: (book.rows[w].n_graded, book.rows[w].cal20(), row_gate(book.rows[w])) for w in ("A", "B")}
+    missed = book.row("other").missed
+    for w in ("A", "B"):
+        book.add_grades([(w, None, "other")])
+    after_unseen = {w: (book.rows[w].n_graded, book.rows[w].cal20(), row_gate(book.rows[w])) for w in ("A", "B")}
+    unseen_ok = (after_unseen == after and all(book.rows[w].unseen == 1 for w in ("A", "B"))
+                 and book.row("other").missed == missed)
     return {"seed": seed, "keeps": keeps, "null": null, "perm": perm, "ungraded_moves_nothing": before == after,
+            "unseen_moves_nothing": unseen_ok,
             "n_graded": {w: book.rows[w].n_graded for w in ("A", "B")},
             "cal20": {w: book.rows[w].cal20() for w in ("A", "B")}}
