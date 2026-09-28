@@ -359,10 +359,11 @@ Run on **302db7d**, the last commit that touches anything but this file (`git di
 Script `tools/scene/diag/s1b1_followup.py` (run from the pinned copy of 6064165); its whole output is `/data/dev/brain-runs/scene-s1b1/gate/diag_followup.out`, copied beside the script as `tools/scene/diag/s1b1_followup.out`. Every control reproduced the unit: N-SHUF's own draw (0.651 / 0.597 / 0.469), the law's TRUTH (0.671 / 0.716 / 0.600), and the law's spoken phrase on every SPEAK item (78/78, 80/80, 72/72).
 
 **The correction.** §6 (b) says «14 of those had one hypothesis in view, where the read-back cannot test a word». That is FALSE. (b′) labelled a +∞ read-back margin as «one hypothesis». A word of fewer than 3 meetings answers by its band (p ∈ {0, 1}), so its margin is +∞ with several hypotheses in view, and it wins the mouth's margin tie-break. The true split at seed 20261101, by X's rows:
-- 20 of 25 false phrases are false of the target (this part stands).
-- Of those 20, **4** had one hypothesis in view (3 other words, 1 «dax»).
-- **11 are «dax»** (10 of them with ≥ 2 hypotheses in view), and every spoken «dax» is false: 11 / 5 / 13 per seed.
-- 6 are other words with ≥ 2 hypotheses and a finite margin.
+- 20 of 25 false phrases are false of the target (this part stands). They split into three parts, 3 + 11 + 6 = 20:
+  - 3 other words with one hypothesis in view;
+  - **11 «dax»**, 10 of them with ≥ 2 hypotheses in view and 1 with one (so 4 of the 20 had one hypothesis, not 14);
+  - 6 other words with ≥ 2 hypotheses and a finite margin.
+- Every spoken «dax» is false, at every seed: 11 / 5 / 13.
 
 The sentence «nothing in the mouth prefers the true word» is also wrong in kind: the mouth prefers the young word. A counterfactual mouth with the words of < 3 meetings dropped from HELD reads TRUTH 0.816 / 0.757 / 0.700 against the law's 0.671 / 0.716 / 0.600. This is a reading that names the mechanism, not a proposal.
 
