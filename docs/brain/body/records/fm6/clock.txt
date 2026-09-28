@@ -1,0 +1,17 @@
+2026-09-28 23:13:53 +0400 start at e7271f9
+23:19:46 cache-r exit 0
+23:19:46 questions-held-20261101 exit 0
+23:19:47 questions-held-20261102 exit 0
+23:19:47 questions-held-20261103 exit 0
+23:19:49 cache-identity exit 0
+23:20:05 rung1-20261101 exit 0
+23:20:05 rung1-20261103 exit 0
+23:20:05 rung1-20261102 exit 0
+23:20:05 rung1-planted exit 0 (must be non-zero)
+23:20:39 gate-fm6-20261101 exit 0
+23:20:39 gate-fm6-20261103 exit 0
+23:20:39 gate-fm6-20261102 exit 0
+23:21:13 gate-fm6-planted exit 0
+23:21:13 gate-fm6-pool exit 0
+2026-09-28 23:21:13 +0400 done
+NOTE (the seat): the lines «rung1-planted exit 0» and «gate-fm6-<ws> exit 0» of this clock are NOT the gates' exits: the script read the exit status after a date call inside the same string, which is always 0. The gates were judged from their own output files (fm6-<ws>.txt, rung1-again-*.txt), where the planted rung-1 gate reads FAIL (1,713 of 2,222 equal).

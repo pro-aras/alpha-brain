@@ -1,0 +1,3 @@
+caches compared 42 · differing 0
+CONTROL (one bit flipped in the redrawn glances.npy, in memory): CAUGHT ['glances.npy']
+equal caches: 42

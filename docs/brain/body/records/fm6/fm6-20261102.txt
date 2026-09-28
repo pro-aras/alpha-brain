@@ -1,0 +1,16 @@
+GATE F-M6 (AMENDMENT 1 §2) · world seed 20261102 · IDENTITY PASS
+  trained 10000 scenes, law and fix in lockstep · learn rows differing 0 · meeting_seen True
+  IDENTITY (asks that are not a pointing on ONE young word, decided from the LAW's state: the whole answer equal)
+    fresh  compared  1280 · equal  1280 · first —
+           young one-word pointings 42 (rule acted 42, point moved 6) · equal but the pointing and the new fields 42 · first — · rule acted outside them 0 · PASS
+    s1b1   compared   858 · equal   858 · first —
+           young one-word pointings 42 (rule acted 42, point moved 8) · equal but the pointing and the new fields 42 · first — · rule acted outside them 0 · PASS
+    held   compared  1277 · equal  1277 · first —
+           young one-word pointings 84 (rule acted 84, point moved 20) · equal but the pointing and the new fields 84 · first — · rule acted outside them 0 · PASS
+  M6 on held · law: covered 0.746 (n 59 of 84; chance 0.477; unheard 0) · reads PASS (bar 0.7, n ≥ 30)
+  M6 on held · fix: covered 0.932 (n 59 of 84; chance 0.477; unheard 0) · reads PASS (bar 0.7, n ≥ 30)
+  paired (covered, gradable in both) n 59 · b (fix right, law wrong) 13 · c (law right, fix wrong) 2 · one-sided exact sign p 0.004 (this seed alone; the gate's clause is POOLED: --pool)
+  M6 clause at this seed: PASS
+  READING (not a clause) M6 on the used set fresh: law 21/27 = 0.778 · fix 26/27 = 0.963 · b 5 c 0
+  READING (not a clause) M6 on the used set s1b1: law 22/29 = 0.759 · fix 26/29 = 0.897 · b 5 c 1
+  cpu 33.2 s · wall 33.2 s

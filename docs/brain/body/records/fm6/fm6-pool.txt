@@ -1,0 +1,3 @@
+GATE F-M6 · POOLED over [20261102, 20261103] (of [20261102, 20261103]; 20261101 and unseen meetings are not pooled)
+  covered items 115 · law 0.670 · fix 0.870 · gap 0.200 (bar ≥ 0.1) · discordant b 27 / c 4 (p < 0.001 needs ≥ 10, all for the fix) · one-sided exact sign p 1.7e-05 → PASS
+  the other clauses, per seed: IDENTITY {'20261102': True, '20261103': True} · M6 {'20261102': 'PASS', '20261103': 'PASS'}

@@ -1,0 +1,4 @@
+GATE «BRAIN ALONE» · world seed 20261102 · verdict PASS
+  compared 2222 · equal 2222 · counts equal to the scored file's: True · learner.summary() vs the scored record: equal
+  pointer pin (M2b/NAME/SPEAK/SPEAK2/DECLINE vs questions.json hyp): compared 425 · equal 425 · mismatches 0
+  NAME.name (the organ's learned-type keys mapped to the world's types, here): compared 165 · equal 165 · first —
