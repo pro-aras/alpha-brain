@@ -19,7 +19,9 @@ TMP = Path(os.environ.get("TMPDIR", "/data/dev/brain-runs/tmp"))
 
 class TestRoots(unittest.TestCase):
     def test_this_slice_writes_its_own_root_and_reads_s1b1s(self) -> None:
-        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-s1b1r"))
+        # edit: Claude (Fable 5.1, the seat), 2026-09-28 20:49 +0400 — the organ tree's fresh root; S1b-1R's root is now the record
+        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ"))
+        self.assertEqual(C.S1B1R_RUNS, Path("/data/dev/brain-runs/scene-s1b1r"))
         self.assertEqual(C.S1B1_RUNS, Path("/data/dev/brain-runs/scene-s1b1"))
         self.assertEqual(C.S1A_RUNS, Path("/data/dev/brain-runs/scene"))
 

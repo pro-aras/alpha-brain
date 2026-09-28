@@ -12,7 +12,7 @@ from pathlib import Path
 
 from brain.scene import cache as C, learners as Lr, marks as M, run as R, world as W
 
-CACHES = Path("/data/dev/brain-runs/organ/scene")     # redrawn under this code, byte-identical to the scored caches
+CACHES = C.RUNS                                       # the tree's fresh root: redrawn under this code, array-identical to the scored caches
 SCORED = Path("/data/dev/brain-runs/scene-s1b1r")
 
 

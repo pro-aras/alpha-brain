@@ -46,7 +46,7 @@ from . import run as R
 from . import world as W
 
 TMEM2_ROOT = Path("/data/dev/brain-runs/scene-tmem2")
-S1B1R_ROOT = C.RUNS                                  # /data/dev/brain-runs/scene-s1b1r — READ, never written
+S1B1R_ROOT = C.RUNS                                  # the tree's run root (since BRAIN-IN-BODY: scene-organ, S1b-1R's record copied + the caches redrawn) — READ, never written   (edit: Claude (Fable 5.1, the seat), 2026-09-28 20:49 +0400)
 PREREG_TMEM2_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/memory/PREREG-TMEM2.md")
 PREREG_TMEM2_SHA256 = "b785b54f97c6c2bc300ce07cdc26aaa716bf9c7fcb3e7cc183294480b5fd2914"
 PREREG_TMEM2_AMEND1_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/memory/PREREG-TMEM2-AMEND-1.md")

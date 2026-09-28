@@ -43,7 +43,13 @@ from . import world as W
 # (S1B1_RUNS) is READ as plain files only (the identity test, S1b-1's report). Two TEST SETS per world seed share ONE
 # training cache: S1b-1's own ("s1b1": 2026120x at S1b-1's relative paths) and the fresh one ("fresh": 2026140x under
 # <root>/<ws>/fresh/, with SPEAK2).
-RUNS = Path("/data/dev/brain-runs/scene-s1b1r")
+# edit: Claude (Fable 5.1, the seat), 2026-09-28 20:49 +0400 — BRAIN-IN-BODY: the BRAIN / WORLD scene parser branches changed genome/machinery.py's
+# bytes, so check_code refuses S1b-1R's caches (its own rule, as at every slice before). This tree's run root is FRESH
+# (RUNS = scene-organ): every cache is redrawn there by THIS code and proven array-identical to the scored ones
+# (tools/brain/diag/cache_identity.py); the scored record's plain files (keys, questions, arms, marks, the gate, the nulls) are
+# COPIED into it. S1b-1R's own root (S1B1R_RUNS) is the RECORD: read as plain files only, never written.
+RUNS = Path("/data/dev/brain-runs/scene-organ")
+S1B1R_RUNS = Path("/data/dev/brain-runs/scene-s1b1r")
 S1B1_RUNS = Path("/data/dev/brain-runs/scene-s1b1")
 S1A_RUNS = Path("/data/dev/brain-runs/scene")
 N_LOCATED = 4

@@ -54,7 +54,7 @@ from brain.world.seeds import substream     # noqa: E402
 from genome import brain as B               # noqa: E402
 from genome.machinery import parse_genome   # noqa: E402
 
-GLANCES_ROOT = Path("/data/dev/brain-runs/organ/scene")
+GLANCES_ROOT = Path("/data/dev/brain-runs/scene-organ")   # edit: Claude (Fable 5.1, the seat), 2026-09-28 20:49 +0400 — the tree's fresh root (cache.RUNS); the first redraw at organ/scene was drawn before cache.py's RUNS moved
 SCORED_ROOT = Path("/data/dev/brain-runs/scene-s1b1r")
 OUT = Path("/data/dev/brain-runs/organ/gate-alone")
 TSET = "fresh"
