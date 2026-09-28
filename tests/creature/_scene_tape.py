@@ -57,11 +57,12 @@ def png(rgb: np.ndarray) -> bytes:
 
 
 class _Clock:
-    def __init__(self) -> None:
+    def __init__(self, t0: datetime = T0) -> None:
         self.k = 0
+        self.t0 = t0
 
     def __call__(self) -> str:
-        t = T0 + timedelta(milliseconds=self.k)
+        t = self.t0 + timedelta(milliseconds=self.k)
         self.k += 1
         return t.isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
@@ -80,10 +81,12 @@ def _ask(tape: Tape, clock: _Clock, moment: str, payload: Dict[str, object], met
     return tape.publish("ask", json.dumps(payload).encode(), {"moment": moment, "source": "scene", **meta_extra}, "json", at=clock())
 
 
-def build(root: Path, ws: int = WS, n_train: int = 60, sitting_set: str = "fresh", per_split: int = 2) -> Dict[str, object]:
-    """Write the tape under root/tape (+ truth). Returns {"tape": day file, "asks": n, "eyes": n, "said": [words, first-heard]}."""
+def build(root: Path, ws: int = WS, n_train: int = 60, sitting_set: str = "fresh", per_split: int = 2,
+          t0: datetime = T0, one_day: bool = True) -> Dict[str, object]:
+    """Write the tape under root/tape (+ truth). Returns {"tape": day file, "asks": n, "eyes": n, "said": [words, first-heard]}.
+    `t0`/`one_day` False: a tape that crosses 00:00 UTC (two day files) for the replay-directory test."""
     tape = Tape(root)
-    clock = _Clock()
+    clock = _Clock(t0)
     said: List[str] = []
     n_asks = n_eyes = 0
     for i in range(n_train):
@@ -159,8 +162,8 @@ def build(root: Path, ws: int = WS, n_train: int = 60, sitting_set: str = "fresh
     _ask(tape, clock, f"sc{ws}q-{sitting_set}-end", {"form": "end", "set": sitting_set}, {"form": "end"})
     n_asks += 1
     days = sorted((root / "tape").glob("*.jsonl"))
-    assert len(days) == 1, days
-    return {"tape": days[0], "asks": n_asks, "eyes": n_eyes, "said": said, "n_train": n_train}
+    assert (len(days) == 1) if one_day else (len(days) > 1), days
+    return {"tape": days[0], "days": days, "asks": n_asks, "eyes": n_eyes, "said": said, "n_train": n_train}
 
 
 def link_root(tape_root: Path, run_root: Path) -> Path:
