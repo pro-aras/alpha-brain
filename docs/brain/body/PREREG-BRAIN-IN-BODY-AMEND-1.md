@@ -13,9 +13,9 @@
 
 **Added:** light work may run beside a life: reading, editing, and unit tests of at most 60 seconds on ONE core at nice 19. Never a replay, a cache draw, a suite, a gate or a second life.
 
-**Why this is safe, from the record:**
-- A life's content does not depend on the load. The pre-flight life replays to itself (3,386 rows identical), and its 1,721 answers equal the replay of a separately made tape of the same world.
-- The scene world feeds by the mind's own backlog, so a slower mind makes a longer life, not a different one.
+**Why this is safe, from the record — and where it stops:**
+- **A LEAN life's content does not depend on the load.** The pre-flight life replays to itself (3,386 rows identical), and its 1,721 answers equal the replay of a separately made tape of the same world. Its only world feeds by the mind's own backlog, so a slower mind makes a longer life, not a different one.
+- **In the FULL organism only the BRAIN's answers are load-independent.** The maker, the reader and the game keep their own wall clocks, so a slower mind meets their rows at other places between the scene's rows. The organism's cells then differ from run to run. The brain hears the scene world alone, in the scene's own order, so its answers do not.
 - The life's load and its backlog are written every 10 s in `SERIES.tsv`. A disturbance is visible there.
 
 **What it does not cover:** a price. A life's cost per canvas is read only from a life that ran alone.
