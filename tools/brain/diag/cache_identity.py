@@ -3,6 +3,10 @@ import hashlib, json, sys
 from pathlib import Path
 import numpy as np
 A = Path("/data/dev/brain-runs/scene-s1b1r"); B = Path("/data/dev/brain-runs/scene-organ")
+# edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:24 +0400 — optional argv[1]: the redrawn root to compare (F-M6's fresh root,
+# /data/dev/brain-runs/scene-organ-fm6); with no argument, the root it compared before.
+if len(sys.argv) > 1:
+    B = Path(sys.argv[1])
 SEEDS = (20261101, 20261102, 20261103)
 S1 = ("train", "test", "m2b", "m6", "m3", "speak", "decline"); FR = ("test", "m2b", "m6", "m3", "speak", "decline", "speak2")
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
