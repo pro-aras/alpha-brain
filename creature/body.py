@@ -183,6 +183,9 @@ class Body:
         self.crash: Optional[Dict[str, object]] = None
         self._mind_times: "collections.deque[tuple[float, float]]" = collections.deque(maxlen=200000)
         self.mind: Optional[Mind] = None
+        # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:38 +0400 — BRAIN-IN-BODY §5: set by main() only
+        # when WORLD_SCENE is armed (creature/senses/scene.py:Progress); None otherwise, read by _build_status.
+        self.scene_progress = None
         self._mind_thread: Optional[threading.Thread] = None
         self._status_thread: Optional[threading.Thread] = None
         self._ask_thread: Optional[threading.Thread] = None
@@ -469,6 +472,13 @@ class Body:
             "web_refused_hold": int(getattr(self.mind, "web_refused_hold", 0)),
             # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:34 +0400 — A4L-LANG task 10: the ten chat keys (#164)
             **_chat_status(self.mind),
+            # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:39 +0400 — BRAIN-IN-BODY §5, on EVERY write (#164):
+            # "scene" is the sense's own progress (None -> zeros/False, never omitted -- a genome without WORLD_SCENE
+            # still carries the key); "brain" is the organ's summary, present ONLY IF the mind has grown one
+            # (INTERFACE §4's Mind.brain_status(), builder C's landing -- getattr covers a Mind that predates it).
+            "scene": (self.scene_progress.snapshot() if self.scene_progress is not None
+                      else {"published_moments": 0, "train_done": False, "sitting_done": {}, "ended": False}),
+            "brain": (self.mind.brain_status() if hasattr(self.mind, "brain_status") else None),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:
@@ -543,6 +553,17 @@ def _declared_game_config(declared: Dict[str, dict]) -> Optional[Dict[str, objec
 
 # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE): the
 # worker's own arming, mirroring _declared_game_config's own shape and gate discipline exactly.
+# edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:37 +0400 — BRAIN-IN-BODY §5: the scene-talk world's own
+# arming, mirroring _declared_game_config's own shape and gate discipline exactly (C2/C3's convention).
+def _declared_scene_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """WORLD_SCENE undeclared -> None (arms nothing). WORLD_SCENE declared -> its own parsed dict, gated on
+    creature.senses.scene.SCENE_DOOR_GATED so a genome line arms nothing until the code carrying it exists."""
+    from .senses import scene as scene_sense   # lazily, same discipline as game/evolve/web above
+    if not scene_sense.SCENE_DOOR_GATED:
+        return None
+    return declared.get("WORLD_SCENE")
+
+
 def _declared_evolve_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
     """EVOLVE undeclared -> None (arms nothing). EVOLVE declared -> its own parsed dict, gated on
     creature.senses.evolve.EVOLVE_DOOR_GATED so a genome line arms nothing until the code carrying it
@@ -708,6 +729,22 @@ def _plant_after_from_argv(argv: List[str], default: int) -> int:
     return int(argv[argv.index("--plant-after") + 1])
 
 
+# edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:41 +0400 — BRAIN-IN-BODY §5 (INTERFACE-BRAIN-ORGAN.md): the
+# maker world stays armed exactly as today for every genome that declares a drawn WORLD line (verified by
+# tests/creature/test_scene_arming.py's own grep-and-count pin against every genome/**/*.genome and test fixture
+# genome, with and without this change) EXCEPT one new shape: a genome that declares WORLD_SCENE and NO drawn WORLD
+# line at all — a pure scene-talk life, which never wants the maker's own things/canvases mixed onto its tape.
+# `--maker` forces it back on (e.g. for a mixed-world experiment); `--no-maker` stays the one existing override,
+# unchanged, and wins over everything. Factored out as a pure function (C1.3/C2's own convention) so it is testable
+# without the CLI's signal-driven loop.
+def _maker_should_arm(declared: Dict[str, dict], argv: List[str]) -> bool:
+    if "--no-maker" in argv:
+        return False
+    if "WORLD_SCENE" in declared and "WORLD" not in declared and "--maker" not in argv:
+        return False
+    return True
+
+
 def _maker_sense_fn(argv: List[str], declared: Dict[str, dict], root: Path):
     """The maker sense's partial exactly as main() runs it: WORLD's `drawn every`/`arrivals every` (or the
     --maker-period / --window-seconds overrides) and --plant-after (default world_maker.PLANT_AFTER_CANVASES)."""
@@ -750,13 +787,26 @@ def main(argv: List[str]) -> int:
     # folder door's directory below.
     genome_for_cli = parse_genome(genome_path.read_text())
     declared = genome_for_cli.declared
-    no_maker = "--no-maker" in argv
 
     body = Body(root, genome_path)
-    if not no_maker:
+    if _maker_should_arm(declared, argv):
         plant = os.environ.get("CREATURE_PLANT_EXCEPTION")
         fn = _maker_sense_fn(argv, declared, root)   # WORLD's period/window (+ CLI overrides) + --plant-after
         body.add_sense("maker", fn, plant=plant)
+
+    # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:37 +0400 — BRAIN-IN-BODY §5: the scene-talk world's
+    # sense, armed from declared['WORLD_SCENE'] behind SCENE_DOOR_GATED (C2/C3's own convention). `progress` is an
+    # in-process, thread-safe counters object (creature/senses/scene.py:Progress) the sense updates and
+    # Body._build_status reads — the SAME instance both places, held on `body` so a method call can reach it without
+    # widening SenseThread's own signature.
+    scene_cfg = _declared_scene_config(declared)
+    if scene_cfg is not None:
+        from .senses import scene as scene_sense
+        import functools
+        body.scene_progress = scene_sense.Progress()
+        scene_fn = functools.partial(scene_sense.sense, root=root, cfg=scene_cfg, backlog=lambda: body.q.qsize(),
+                                     progress=body.scene_progress)
+        body.add_sense("scene", scene_fn)
 
     # C2: --folder PATH stays an explicit override for tests, regardless of the gate (A12's own road,
     # unchanged); otherwise the door arms only from the genome's own WORLD line, behind FOLDER_DOOR_GATED.
