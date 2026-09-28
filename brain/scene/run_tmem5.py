@@ -754,7 +754,8 @@ def fd_pin(L: CX.CtxLearner, raw: np.ndarray, words: Sequence[str], room: str, h
         err["b"] = max(err["b"], abs(db[j] - n_b) / max(1.0, abs(db[j])))
     j, k = np.unravel_index(int(np.argmax(np.abs(dV))), dV.shape)
     doubled = abs(dV[j, k] * L.g[room] - numV[j, k]) / max(1.0, abs(dV[j, k]))
-    return {"room": room, "g": float(L.g[room]), "max_err": err, "pass": max(err.values()) <= FD_TOL,
+    err = {k: float(v) for k, v in err.items()}
+    return {"room": room, "g": float(L.g[room]), "max_err": err, "pass": bool(max(err.values()) <= FD_TOL),
             "planted_doubled_err": float(doubled), "planted_doubled_caught": bool(doubled > FD_TOL),
             "step": {"dV_max": float(np.abs(dV).max()), "dg": float(dg), "dc_max": float(np.abs(dc).max())}}
 
@@ -850,7 +851,7 @@ def fd_step(data, seed: int) -> Dict[str, object]:
                 LL.g[room] = gv
             pins[f"{room}@{'own g' if gv is None else 'g 0.5'}"] = {**fd_pin(LL, raw, words, room), "scene": i, "words": words}
     ok = all(p["pass"] for p in pins.values()) and all(p["planted_doubled_caught"] for k, p in pins.items() if k.endswith("g 0.5"))
-    return {"pins": pins, "pass": ok}
+    return {"pins": pins, "pass": bool(ok)}
 
 
 def first_gate5(root: Path = ROOT, log=print) -> Dict[str, object]:

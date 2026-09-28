@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import unittest
 from unittest import mock
 
@@ -32,6 +33,7 @@ from brain.scene import context as CX
 from brain.scene import learners as Lr
 from brain.scene import pickers as PK
 from brain.scene import rooms as RM
+from brain.scene import run as R
 from brain.scene import run_s1c as S
 from brain.scene import run_s1c2 as S2
 from brain.scene import run_tmem5 as T5
@@ -494,6 +496,8 @@ class TestGatePins(unittest.TestCase):
     def test_the_chain_rule_step(self) -> None:
         s3 = T5.fd_step(self.data, self.data.seed)
         self.assertTrue(s3["pass"], s3)
+        json.dumps(s3, default=R._jsonable)       # the gate's record is written (a numpy.bool stopped the first re-gate's dump)
+        self.assertIs(type(s3["pass"]), bool)
         self.assertEqual(sorted(s3["pins"]), ["N@g 0.5", "N@own g", "R2@g 0.5", "R2@own g"])
         for k, pin in s3["pins"].items():
             self.assertGreaterEqual(pin["scene"], 1000)

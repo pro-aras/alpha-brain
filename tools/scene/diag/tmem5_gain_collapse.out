@@ -1,0 +1,66 @@
+control: the diagnostic life's gains equal the gate's step-4 record at every block: True
+lr_g 0.005 · the gains at block 60: R1 0.096 R2 0.820 R3 1.113 N 0.000 · scenes per act {'R1': 120, 'R2': 90, 'R3': 180, 'N': 210}
+
+R1: Σ over its scenes of the gain's step ÷ lr_g = -180.78 (words SAID in the scene +187.25 · words NOT said -368.03)
+   yellow    said    +8.55 · not said   -42.87 · total   -34.32
+   red       said    +5.23 · not said   -38.20 · total   -32.97
+   square    said   +43.93 · not said   -72.69 · total   -28.76
+   green     said   +17.79 · not said   -41.04 · total   -23.24
+   white     said    +4.88 · not said   -26.15 · total   -21.27
+   blue      said    +4.19 · not said   -23.59 · total   -19.41
+   cross     said    +0.00 · not said   -19.29 · total   -19.29
+   triangle  said    +0.00 · not said   -14.67 · total   -14.67
+   big       said   +17.37 · not said   -31.27 · total   -13.91
+   small     said   +16.20 · not said   -21.85 · total    -5.65
+   star      said    +0.00 · not said    -1.07 · total    -1.07
+   circle    said   +69.12 · not said   -52.82 · total   +16.30
+   ring      said    +0.00 · not said   +17.49 · total   +17.49
+   |c_R1| 1.208 · c_R1 per word: yellow -0.36 circle -0.02 small -0.23 big -0.26 square -0.15 green -0.33 blue -0.38 white -0.37 red -0.37 triangle -0.42 cross -0.42 ring -0.38 star -0.40
+
+R2: Σ over its scenes of the gain's step ÷ lr_g = -36.03 (words SAID in the scene +36.34 · words NOT said -72.36)
+   cross     said   +13.05 · not said   -24.76 · total   -11.71
+   big       said    +0.82 · not said   -10.57 · total    -9.76
+   triangle  said   +10.52 · not said   -17.60 · total    -7.08
+   small     said    +3.56 · not said    -9.94 · total    -6.37
+   green     said    +0.89 · not said    -6.35 · total    -5.46
+   white     said    +0.89 · not said    -5.55 · total    -4.66
+   blue      said    +3.76 · not said    -8.27 · total    -4.51
+   red       said    +2.85 · not said    -7.04 · total    -4.19
+   yellow    said    +0.00 · not said    -0.05 · total    -0.05
+   star      said    +0.00 · not said    +0.76 · total    +0.76
+   square    said    +0.00 · not said    +3.15 · total    +3.15
+   circle    said    +0.00 · not said    +5.78 · total    +5.78
+   ring      said    +0.00 · not said    +8.07 · total    +8.07
+   |c_R2| 0.810 · c_R2 per word: yellow -0.28 circle -0.26 small -0.16 big -0.18 square -0.27 green -0.21 blue -0.25 white -0.29 red -0.23 triangle -0.09 cross -0.12 ring -0.22 star -0.26
+
+R3: Σ over its scenes of the gain's step ÷ lr_g = +22.53 (words SAID in the scene -19.02 · words NOT said +41.55)
+   big       said   -12.43 · not said   -19.06 · total   -31.49
+   ring      said    +6.18 · not said   -28.78 · total   -22.61
+   small     said    -9.61 · not said    -1.89 · total   -11.50
+   star      said   +20.31 · not said   -30.86 · total   -10.55
+   blue      said    -5.25 · not said    +2.73 · total    -2.52
+   white     said    -5.25 · not said    +4.67 · total    -0.59
+   red       said    -5.58 · not said    +8.91 · total    +3.34
+   yellow    said    -5.39 · not said    +9.46 · total    +4.07
+   green     said    -1.99 · not said    +9.34 · total    +7.35
+   cross     said    +0.00 · not said   +20.08 · total   +20.08
+   circle    said    +0.00 · not said   +20.92 · total   +20.92
+   square    said    +0.00 · not said   +22.90 · total   +22.90
+   triangle  said    +0.00 · not said   +23.14 · total   +23.14
+   |c_R3| 0.888 · c_R3 per word: yellow -0.25 circle -0.29 small -0.16 big -0.18 square -0.29 green -0.25 blue -0.25 white -0.28 red -0.28 triangle -0.28 cross -0.34 ring -0.11 star -0.14
+
+N: Σ over its scenes of the gain's step ÷ lr_g = -208.07 (words SAID in the scene +0.10 · words NOT said -208.18)
+   triangle  said    -2.39 · not said   -33.46 · total   -35.85
+   square    said    -1.40 · not said   -29.95 · total   -31.35
+   circle    said    -3.30 · not said   -27.70 · total   -31.00
+   yellow    said    -5.76 · not said   -19.49 · total   -25.25
+   white     said    -3.41 · not said   -15.29 · total   -18.70
+   star      said    -3.50 · not said   -11.15 · total   -14.65
+   blue      said    -0.90 · not said   -13.16 · total   -14.05
+   red       said    +2.04 · not said   -12.97 · total   -10.93
+   cross     said    +6.11 · not said   -15.46 · total    -9.36
+   green     said    +5.04 · not said   -11.43 · total    -6.39
+   small     said    +2.70 · not said    -7.96 · total    -5.25
+   big       said    +4.94 · not said    -8.10 · total    -3.16
+   ring      said    -0.07 · not said    -2.06 · total    -2.13
+   |c_N| 1.813 · c_N per word: yellow -0.53 circle -0.50 small -0.47 big -0.36 square -0.49 green -0.52 blue -0.59 white -0.53 red -0.55 triangle -0.55 cross -0.44 ring -0.47 star -0.48
