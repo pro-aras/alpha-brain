@@ -13,6 +13,10 @@ declare -A P=()
 for WS in $SEEDS; do
   R=/data/dev/genome-lives/brain-lean-$WS; CODE=$R/code
   [ -f $R/STOPPED-AT ] || { echo "STOP: $R is not closed" | tee -a $OUT/clock.txt; exit 3; }
+  # edit: Claude (Fable 5.1, the seat), 2026-09-29 00:24 +0400 — the reviewer's B2, left LOUD: this reads the FIRST journal day file only. Every
+  # rung-2 life stayed inside one UTC day (one day file each — checked), so it held. A life that crosses 00:00 UTC must go
+  # the rung-3 road instead: tools/brain/cut_tape.py writes the live journal as ONE file (rung3_replays.sh).
+  [ "$(ls $R/journal/*.jsonl | wc -l)" = "1" ] || { echo "STOP: $R has more than one journal day file — use the cut-tape road" | tee -a $OUT/clock.txt; exit 3; }
   J=$(ls $R/journal/*.jsonl | head -1)
   ( cd $CODE && PYTHONPATH=$CODE nice -n 10 /usr/bin/python3 -B -m creature.replay --genome $R/GENOME.genome --tape $R/tape --out $OUT/$WS/identity --closed --against $J > $L/identity-$WS.log 2>&1 ) &
   P["identity-$WS"]=$!
