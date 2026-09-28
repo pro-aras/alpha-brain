@@ -9,7 +9,9 @@ DEST="${HOME}/.config/systemd/user"
 mkdir -p "${DEST}"
 
 # edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — the templated seam-life units (creature-g5@, creature-g5-watch@) installed beside the 24 h life's.
-for f in creature.service creature-watch.service creature-watch.timer creature-g5@.service creature-g5-watch@.service creature-g5-watch@.timer; do
+# edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:45 +0400 — BRAIN-IN-BODY §5: creature-brain@.service added to the fixed
+# copy list (this script's own behaviour for every existing unit here is unchanged — one more name appended, nothing removed).
+for f in creature.service creature-watch.service creature-watch.timer creature-g5@.service creature-g5-watch@.service creature-g5-watch@.timer creature-brain@.service; do
     cp "${HERE}/${f}" "${DEST}/${f}"
     echo "installed ${DEST}/${f}"
 done
@@ -22,3 +24,4 @@ echo "Next step, when the gates pass:"
 echo "  systemctl --user enable --now creature.service"
 echo "  systemctl --user enable --now creature-watch.timer"
 echo "A seam life <name> (root /data/dev/genome-lives/<name>): systemctl --user enable --now creature-g5@<name>.service creature-g5-watch@<name>.timer"
+echo "A brain-in-body life <name> (root /data/dev/genome-lives/<name>): systemctl --user enable --now creature-brain@<name>.service"
