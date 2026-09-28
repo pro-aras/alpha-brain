@@ -1,6 +1,10 @@
 """tools/brain/gate_alone.py — THE GATE «BRAIN ALONE» (docs/brain/body/INTERFACE-BRAIN-ORGAN.md §3; PREREG-BRAIN-IN-BODY §2).
 
 edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:52 +0400 — new tool.
+edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:49 +0400 — CORRECTION (#50): the «20:52» above was TYPED, not read from `date`;
+the tool was written between the 20:26 and the 20:36 clock reads (its first run, the price, at ~20:36; first commit 6fa0b41 at
+20:38). The «20:44» note below was likewise typed before the 20:44 read (that edit was made between 20:39 and 20:44).
+Docstring-only correction.
 
 The organ (genome/brain.py's Brain, configured by the genome's own BRAIN line as machinery.parse_genome reads it) is fed the
 scored run's training canvases IN ORDER through the SAME call the mind makes — `Brain.learn(glance, words, moment=, scene=,
