@@ -18,9 +18,9 @@
 
 Tests (new): `tests/genome/test_parse_brain.py` (2 added), `tests/brain/scene/test_learners_fm6.py`, `tests/genome/test_brain_fm6.py`, `tests/genome/test_brain_genomes.py` (class `LeanNearest`), `tests/brain/scene/test_world_fm6.py`, `tests/brain/scene/test_gate_fm6.py`; `tests/brain/scene/test_cache_s1b1r.py`'s RUNS pin moved. Fixtures computed by the UNCHANGED code before any edit: `tests/brain/scene/fixtures/m6_scenes_pre_fm6.json` (m6 0–41 at 2026120x / 2026140x), `tests/brain/scene/fixtures/world_pre_fm6.json` (m6 0–41 at 2026150x; a sample of every split of fresh and s1b1), `tests/genome/fixtures_brain_law_pre_fm6.json` (the law organ's state hash, learn rows, answers, summary on the toy life).
 
-Commits: `52d7662` (fixtures) → `e4f175a` (items 1–2) → `dac238c` (items 3, 6) → `1ab55f8` (world fixture) → `f920130` (item 4) → `fcb0181` (item 5) → this hand-back.
+Commits: `52d7662` (fixtures) → `e4f175a` (items 1–2) → `dac238c` (items 3, 6) → `1ab55f8` (world fixture) → `f920130` (item 4) → `fcb0181` (item 5) → `7ff41ad` (hand-back) → `ebd6cca` (gate_fm6: M6 READINGS on the used sets — the last code commit) → this hand-back update.
 
-## 2 · Test modules, on `fcb0181` (the last code commit; this hand-back adds docs only)
+## 2 · Test modules, on `fcb0181`, and the F-M6 modules again on `ebd6cca` (the last code commit: it touched only `tools/brain/gate_fm6.py` and its test)
 
 Each run alone: `env -u PYTHONPATH OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 TMPDIR=/data/dev/brain-runs/organ/tmp-f nice -n 19 timeout 60 /usr/bin/python3 -m unittest <module>`; logs in `/data/dev/brain-runs/organ/tmp-f/final-fcb0181/<module>.log`.
 
@@ -45,6 +45,15 @@ tests.brain.scene.test_marks             Ran 10 tests in 0.151s  OK
 tests.brain.scene.test_truth_fence       Ran 3 tests in 0.095s   OK
 tests.brain.scene.test_gate_fm6          Ran 7 tests in 1.946s   OK
 tests.creature.test_brain_mind           Ran 32 tests in 50.471s OK   ← 50 s of the 60 s limit
+```
+Re-run on `ebd6cca` (logs in `/data/dev/brain-runs/organ/tmp-f/final-ebd6cca/<module>.log`):
+```
+tests.brain.scene.test_gate_fm6          Ran 7 tests in 2.052s   OK
+tests.brain.scene.test_learners_fm6      Ran 11 tests in 0.817s  OK
+tests.genome.test_brain_fm6              Ran 10 tests in 0.847s  OK
+tests.brain.scene.test_world_fm6         Ran 10 tests in 5.033s  OK
+tests.genome.test_parse_brain            Ran 7 tests in 0.012s   OK
+tests.genome.test_brain_genomes          Ran 8 tests in 0.036s   OK
 ```
 RED logs, each saved BEFORE its implementation edit: `/data/dev/brain-runs/organ/tmp-f/red-test_parse_brain.log` (FAILED failures=5 errors=1), `red-test_learners_fm6.log` (FAILED failures=1 errors=3), `red-test_brain_fm6.log` (FAILED failures=1 errors=4), `red-test_world_fm6.log` (FAILED failures=1 errors=8).
 **Not run (heavy, the seat's):** the scene suite as a whole (`discover`), `test_run_s1b1r` and the other run modules that build 80-scene caches and run arms, every creature suite beyond the two above.
@@ -85,6 +94,7 @@ for ws in 20261101 20261102 20261103; do /usr/bin/python3 tools/brain/gate_fm6.p
 [Guessing ≈ 1–1.5 CPU-min a seed: two organs' learning ≈ 2 × 13 s plus three sittings twice]. Read `gate-fm6/<ws>/fm6.txt`:
 - IDENTITY: every set `compared` = `equal`, young asks equal-but-pointing, «rule acted outside them 0», PASS. Expect ≈ 1,300 asks a set a seed; the young one-word pointings are the 84 held / 42 fresh / 42 s1b1 M6 items (plus any M1 T1 item whose shape word is young — expected none at 10,000 scenes). The exit code is 0 only on IDENTITY PASS.
 - M6 on held: fix covered ≥ 0.70 with n ≥ 30 at 20261102 and 20261103; law beside (a reading); meeting_seen True at both, False at 20261101 (NOT GRADABLE there as signed).
+- **THE POSITIVE CONTROL (a READING, not a clause): «READING (not a clause) M6 on the used set fresh»** must reproduce DIAG-M6's own table (`docs/brain/body/DIAG-M6.md`, the fresh set): at 20261102 law **21/27** (0.778), fix **26/27** (0.963); at 20261103 law **14/29** (0.483), fix **22/29** (0.759); at 20261101 law 19/29, fix 3/29 (0.103). The built rule is DIAG's distance (its standardise, prototype, Λ of the one-alone type, einsum); the only difference is an exact-tie draw (`pick(d, rng, "min")` against DIAG's bare `argmin`), which moves nothing unless two float distances tie exactly. **A mismatch means the built rule is not DIAG's rule, and a held PASS would then be a reading about a different fix — stop and report.** The law's fresh numbers must also equal rung 1's own M6 (the law is the scored brain).
 - the plant: `planted.txt` IDENTITY FAIL, exit 0.
 - `--pool`: gap ≥ 0.10 and p < 0.001 → PASS (exit 0).
 
