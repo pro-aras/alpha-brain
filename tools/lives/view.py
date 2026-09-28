@@ -97,7 +97,7 @@ def render(root: Path, tail_bytes: int, ascii_only: bool) -> str:
     jr = _tail_rows(Path(journals[-1]), tail_bytes) if journals else []
     eyes = [r for r in tape if r.get("sense") == "eye"]; last_eye = eyes[-1] if eyes else None
     outcomes = [r for r in tape if r.get("sense") == "outcome"]
-    moments = [r for r in jr if "moment" in r and r.get("act") != "coarse"]
+    moments = [r for r in jr if "moment" in r and r.get("act") != "coarse" and "kind" not in r]   # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:40 +0400 — BRAIN-IN-BODY: not the `answer`/`brain` rows
     thinks = [r for r in jr if isinstance(r.get("think"), dict)]
     acts = [r for r in jr if isinstance(r.get("act"), dict)]
     says = [r for r in jr if "say" in r]; questions = [r for r in jr if "question" in r]; hands = [r for r in jr if "act_chosen" in r]

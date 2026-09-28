@@ -1441,7 +1441,12 @@ class Mind:
             return
         out = _jsonable(self.brain.learn(g, list(words), moment=str(moment), scene=int(meta["scene"]), world_seed=int(meta["world_seed"])))
         self.brain_learned += 1
-        self._write_journal(row["at"], {"kind": "brain", "act": "learn", **base, **out})
+        # PREREG-BRAIN-IN-BODY (the seat, 20:4x): every learn row carries the canvas's located fixations and the eye's hypotheses (member
+        # lists into `fix`) — the grader reads from it whether the one «dax» meeting was seen. The brain's own keys win if it returns them.
+        from brain.scene import eye as _eye
+        fix = [[int(y), int(x)] for (y, x) in (g.get("fix") or [])]
+        view = {"fix": fix, "hyps": [[int(i) for i in m] for m in _eye.groups([tuple(f) for f in fix])]}
+        self._write_journal(row["at"], {"kind": "brain", "act": "learn", **base, **view, **out})
         if out.get("calibrated"):
             self._write_journal(row["at"], {"kind": "brain", "act": "calibrate", **base, "summary": _jsonable(self.brain.summary())})
 

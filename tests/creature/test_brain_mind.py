@@ -4,6 +4,7 @@
 """The ask sense, the eye hook, THE ORGANS' ROAD, `--blind brain`, snapshot/resume/replay of the brain and the held asks."""
 from __future__ import annotations
 
+import collections
 import json
 import shutil
 import tempfile
@@ -162,7 +163,11 @@ class TestBrainRoad(_Tape, unittest.TestCase):
                 words_by_moment.setdefault(r["meta"]["moment"], []).append(r["meta"]["word"])
         for r in learn:
             self.assertEqual(r["words"], words_by_moment[r["moment"]], "the tape's words, in the parent's order")
-        self.assertEqual(self.m.brain.summary()["scenes"], self.info["n_train"])
+        self.assertEqual(self.m.brain_learned, self.info["n_train"])
+        from brain.scene import eye
+        for r in learn:                      # PREREG: every learn row carries the canvas's fix and the eye's hypotheses
+            self.assertIsInstance(r["fix"], list)
+            self.assertEqual(r["hyps"], [list(m) for m in eye.groups([tuple(f) for f in r["fix"]])])
 
     def test_held_asks_answered_on_their_canvas_before_it(self) -> None:
         eye_by_moment = {r["meta"]["moment"]: r for r in self.rows if r["sense"] == "eye"}
@@ -231,6 +236,17 @@ class TestOrgansRoad(_Tape, unittest.TestCase):
             if a["form"] == "why":
                 raw = a["answer"]["raw"]
                 self.assertEqual(raw, {k: v for k, v in a["answer"].items() if k != "raw"})
+
+    def test_every_canvas_answer_carries_fix_and_hyps_point_none_included(self) -> None:
+        """PREREG §3: a `point: None` answer is graded FORCED (a uniform draw over the row's `hyps`) — so it carries them."""
+        pts = [a for a in self.J if a.get("kind") == "answer" and a["form"] == "point"]
+        self.assertTrue(pts)
+        for a in (r for r in self.J if r.get("kind") == "answer" and r["form"] in ("point", "what", "say")):
+            self.assertIsInstance(a["fix"], list, a); self.assertIsInstance(a["hyps"], list, a)
+            self.assertEqual(sorted(i for h in a["hyps"] for i in h), list(range(len(a["fix"]))))
+        none_n = sum(1 for a in pts if a["answer"]["raw"]["point"] is None)
+        print(f"\n[organs' road on the fixture] point None on {none_n} of {len(pts)} point asks: "
+              f"{sorted(collections.Counter(a['answer']['kind'] for a in pts).items())}")
 
     def test_a_real_attempt_some_organs_answers_name_something(self) -> None:
         """#228: the twin must still be able to DO the thing — on this 60-scene fixture it says shape names on SPEAK and cites
@@ -301,6 +317,20 @@ class TestNonInterference(_Tape, unittest.TestCase):
         with mock.patch.object(MM, "_brain_class", gone):
             m = MM.Mind(gp, root, blind=BLIND)       # the twin never needs the organ
             m.close()
+
+
+# ------------------------------------------------------------------------------------------------ the chain: the lives' readers
+class TestReadersCountNoAskRow(_Tape, unittest.TestCase):
+    def test_check_counts_and_hours_are_those_of_the_journal_without_the_new_rows(self) -> None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("lives_check_c", S.ROOT / "tools" / "lives" / "check.py")
+        check = importlib.util.module_from_spec(spec); spec.loader.exec_module(check)
+        m, root = self.run_mind()
+        J = S.journal(root)
+        plain = [r for r in J if not S.is_brain_row(r)]
+        self.assertLess(len(plain), len(J))
+        self.assertEqual(check.journal_counts(J), check.journal_counts(plain))
+        self.assertEqual(check.births_by_hour(J), check.births_by_hour(plain))
 
 
 # ------------------------------------------------------------------------------------------------ replay and resume
