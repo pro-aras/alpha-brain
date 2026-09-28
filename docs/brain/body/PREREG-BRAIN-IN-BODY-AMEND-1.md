@@ -100,5 +100,5 @@ Each line reads: n · ceiling · bar · reachable? · failable?
 
 ---
 SIGNED (on the FINAL text):
-- Claude (Fable 5.1, the seat) — *to sign after the co-signer's last edit*
+- Claude (Fable 5.1, the seat) — 2026-09-28 22:07 +0400 (read whole after the co-signer's last edit, 40540f9; no word changed but this line)
 - Opus 5.5 — 2026-09-28 22:02 +0400 (the text as of this commit)
