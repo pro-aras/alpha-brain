@@ -379,3 +379,335 @@ The band in the claims (S1b-1R's READER: a weighted 0.90 band over responsibilit
 - **The 17:51 STOP:** `/data/dev/brain-runs/scene-tmem2/gate-1751-stop/`.
 - **The pins:** `code-8767cf6` (the amended gate's) and `code-15b047e` (the 17:51 gate's).
 - **Untouched:** nothing was written under `/data/dev/brain-runs/scene-s1b1r/`. No unit other than `scene-tmem2-gate` was launched, and it is reset.
+
+---
+
+## 11 · AMENDMENT 2 — built test-first, gated PROCEED, the unit ran: T-MEM-2 does not pass
+
+*edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 19:00 +0400 — appended. The law: PREREG-TMEM2 (b785b54f…), AMENDMENT 1 (6da8ff67…) and AMENDMENT 2 (final b1e2b15, sha 76d8ac86…), all three checked by the runner and required of the gate by the unit.*
+
+*Gate records moved aside:*
+- *§10's `gate/` (18:23, AMENDMENT 1's STOP) → `gate-1823-amend1-stop/`;*
+- *the 18:45 PROCEED under code-0c811b9 → `gate-1845-amend2-proceed/`.*
+
+### 11.1 · The answer
+**The unit `scene-tmem2` ran 18:53:27–18:53:57 +0400 (exit 0, from code-00dc818). T-MEM-2 does not pass.**
+
+| bar | result |
+|---|---|
+| B1 | PASS on all three seeds, but «met by the control» on all three. HEALTH-MOUTH's marks equal the CONTROL's on every seed. |
+| B2 | CEILING-BOUND. HEALTH-ORACLE's pooled ERROR-RECALL is 0.077 (6 / 78), under 0.30, so the control's errors are the gaze's. HEALTH-MOUTH's is 0.000. |
+| B3 | PASS. ECE 0.032 / 0.041 / 0.036, with the NULL's 0.022 / 0.023 / 0.049 printed beside. |
+| B4 | FAIL. Pooled type-2 AUROC 0.495 over 93 errors (chance 0.50). |
+
+A pass needs B4, so T-MEM-2 does not pass.
+
+**Why it fails:**
+- **The gate never closed.** After AMENDMENT 2, the truth-free row reads cal_20 ≥ 0.80 for every trained word on every seed. So HEALTH-MOUTH = CONTROL = NULL on all three seeds: it declined 0 of the 78 errors and kept all 222 true phrases.
+- **The row cannot tell which names are wrong.** Its 13 per-word confidences (0.80–1.00 on the truth-free row) are calibrated in aggregate (ECE ≤ 0.041). They are blind to which believed name is wrong (AUROC 0.495).
+- **A perfect per-word gate would not have helped.** HEALTH-ORACLE catches 6 of 78 errors: the errors are not the words'.
+
+**Refutations (§6):**
+- (a) The row buys silence: no.
+- (b) The null clause is not met: YES. The NULL equals HEALTH-MOUTH because the gate refuses nothing.
+- (c) CEILING-BOUND: YES.
+- (d) The rows disagree by more than 0.10 on ≥ 3 words: no (0 / 1 / 2 words).
+
+**The declared sign (§6), read on every seed:**
+- Seed 20261103 reads circle and square at truth-free 0.850 against truth-fed 1.000. That is more than 0.10, the instrument-fault form, and the kept fed row reads 1.000 for both too.
+- The gate's step 3 reads seed 20261101 only, as §7 says, and passed there: no word more than 0.10 below; circle exactly −0.100.
+- This is printed as the report prints it; it is not a stop.
+
+**AMENDMENT 2's readings** (offline, per gradable claim; per scene and per phrase beside):
+
+| reading | 20261101 | 20261102 | 20261103 | pooled | predicted |
+|---|---|---|---|---|---|
+| metacognition-of-perception | 0.769 | 0.775 | 0.740 | 0.761 | ≈ 0.8 |
+| false-unseen, per claim | 0.099 | 0.108 | 0.083 | 0.096 | 0.05–0.08 |
+| false-unseen, per phrase | 0.075 | 0.085 | 0.066 | 0.075 | — |
+
+The false-unseen rate per claim sits above the predicted range. Per phrase it sits within the range. A phrase with more claims is set aside more often when «none» fires on a seen referent.
+
+### 11.2 · The build
+- **Commits on `scene-tmem2`:**
+  - **0c811b9** — AMENDMENT 2, test-first:
+    - `health.heard_none`;
+    - `health.grades(..., set_aside=)`, with AMENDMENT 1's band rule removed;
+    - the hook's `heard` step, between the claims and `train_scene`;
+    - the truth-fed row with no rule, and its kept twin;
+    - the readings per claim, scene and phrase;
+    - the three shas.
+  - **00dc818** — the report fix, test-first.
+  - this section.
+- **Red:**
+  - AMENDMENT 2's rows on 75ef77e: `Ran 30 tests … FAILED (failures=4, errors=7)` (log `redcheck-75ef77e/red.log`);
+  - the report test on 0c811b9: `Ran 16 tests … FAILED (errors=1)`, the same TypeError as the unit's (log `redcheck-0c811b9/red.log`).
+- **Green:**
+  - the T-MEM-2 modules: `Ran 48 tests … OK`;
+  - the scene suite on the fixed bytes: `Ran 211 tests in 51.490s` / `OK`;
+  - the suites on the final commit: §11.6.
+- **Declared readings of AMENDMENT 2:**
+  1. **The pointing.** «None» is `RWRoad.answer_point`: the LAW road, with «none» = S1b-1R's none_i, the best phrase score below τ_point.
+     - It runs over the scene's hypotheses (the things the gaze landed on), with the phrase exactly as said.
+     - It runs in the state before `train_scene`: the ear has not heard the phrase and the statistics have not observed the scene's things.
+     - Its generator is the hook's own, `substream(ws, "tmem2-none:<scene>")`. It is drawn only on a tie of the pick, and «none» reads the best score, not the pick.
+  2. **A phrase with a never-heard word** points at nothing («none» None), so nothing is set aside. This is the «dax» scene only.
+  3. **The truth-fed row carries no rule.** Its kept twin (Fable's edit) is the fed grades from scenes where «none» did not fire. Both are printed, and step 3's STOP reads the whole fed row, unchanged.
+  4. **The readings count gradable claims of the truth-free row**, graded or set aside, as the amendment defines them. Beside them, per scene (every gradable claim set aside) and per phrase heard.
+  5. **The claim record still carries AMENDMENT 1's held words**, read by no rule.
+- **The unit's first launch** (18:47:54, from code-0c811b9) ran the three lives (identity PASS) and all three graders, then crashed at the REPORT step:
+  - the error was `TypeError: '<' not supported between instances of 'str' and 'int'`: run.dump's `sort_keys` over bars_tmem2's refutations, a dict mixing the seeds (ints) with two pooled names (strs);
+  - no test had run the report before, because it needs three seeds' marks;
+  - fixed test-first in 00dc818: the per-seed refutations now sit under `per_seed`;
+  - the crashed unit's outputs are kept in `unit-1847-report-crash/`. Its marks equal the final unit's on all three seeds, apart from the life CPU;
+  - the gate was re-run from code-00dc818 (18:51:54 – 18:53:16, PROCEED). Its gate.txt equals the 18:45 gate's except for the lives' CPU seconds. Then the unit ran.
+
+### 11.3 · THE FIRST GATE under AMENDMENT 2 (from code-00dc818) — `gate/gate.txt`, verbatim
+```
+== THE FIRST GATE (PREREG-TMEM2 §7 + AMENDMENT 1 §4 + AMENDMENT 2 §4; each step a STOP on a miss; printed whole) ==
+   the law: PREREG-TMEM2 b785b54f97c6c2bc… · AMENDMENT 1 6da8ff679a317166… · AMENDMENT 2 76d8ac86c0af8320… · code 00dc818a45a50d39edb24a227a6383fe90130cab
+0. the CONTROL's record: /data/dev/brain-runs/scene-s1b1r/report.txt sha as recorded (b695ae5c94d13a85…)
+1. THE IDENTITY (S1b-1R's A-RW-R record at 10,000; canonical JSON; the planted one-byte change first):
+   20261101: point = (188211 bytes; planted CAUGHT) · LAW = (72118 bytes; planted CAUGHT) · summary = (1465 bytes; planted CAUGHT) · cpu 25.9 s → PASS
+   20261102: point = (187763 bytes; planted CAUGHT) · LAW = (75822 bytes; planted CAUGHT) · summary = (1458 bytes; planted CAUGHT) · cpu 25.7 s → PASS
+   20261103: point = (187927 bytes; planted CAUGHT) · LAW = (75263 bytes; planted CAUGHT) · summary = (1464 bytes; planted CAUGHT) · cpu 25.9 s → PASS
+2. the row's toy (A 95 %, B 50 %, 200 graded claims each): seed 0: cal_20 A 0.95 B 0.65 · kept {'A': True, 'B': False} · the null {'A': False, 'B': True} · an ungraded claim moves nothing True · a claim set aside «unseen» moves nothing True · seed 1: cal_20 A 1.00 B 0.45 · kept {'A': True, 'B': False} · the null {'A': False, 'B': True} · an ungraded claim moves nothing True · a claim set aside «unseen» moves nothing True · seed 2: cal_20 A 0.95 B 0.50 · kept {'A': True, 'B': False} · the null {'A': False, 'B': True} · an ungraded claim moves nothing True · a claim set aside «unseen» moves nothing True → PASS
+3. agreement and coverage on seed 20261101's stream (claims on 9750 scenes), AFTER AMENDMENT 2's rule — per word: graded truth-free / truth-fed / fed-kept · set aside «unseen» (truth-free) · cal_20 truth-free / truth-fed (the whole row: the STOP) / fed-kept (the claims the rule keeps: a reading) · the residual free − fed · free − fed-kept:
+   big        1660 /  1848 /  1625 ·  495 · 0.850 / 0.900 / 0.900 · -0.050 · -0.050  reversed (a reading)
+   blue        661 /   771 /   652 ·  164 · 0.900 / 0.950 / 0.950 · -0.050 · -0.050  reversed (a reading)
+   circle     1487 /  1453 /  1380 ·  301 · 0.900 / 1.000 / 1.000 · -0.100 · -0.100  reversed (a reading)
+   cross      1221 /  1263 /  1182 ·  143 · 1.000 / 1.000 / 1.000 · +0.000 · +0.000
+   green       846 /   929 /   820 ·  217 · 1.000 / 0.950 / 1.000 · +0.050 · +0.000
+   red         541 /   642 /   535 ·  167 · 1.000 / 1.000 / 1.000 · +0.000 · +0.000
+   ring       1117 /  1183 /  1078 ·  136 · 0.900 / 0.900 / 0.900 · +0.000 · +0.000
+   small      1801 /  2009 /  1761 ·  421 · 0.900 / 0.950 / 0.900 · -0.050 · +0.000  reversed (a reading)
+   square     1065 /  1057 /  1002 ·  201 · 0.950 / 1.000 / 1.000 · -0.050 · -0.050  reversed (a reading)
+   star       1373 /  1438 /  1330 ·  195 · 1.000 / 1.000 / 1.000 · +0.000 · +0.000
+   triangle   1341 /  1382 /  1292 ·  175 · 0.950 / 1.000 / 1.000 · -0.050 · -0.050  reversed (a reading)
+   white       705 /   760 /   696 ·  194 · 0.900 / 0.800 / 0.850 · +0.100 · +0.050
+   yellow      576 /   634 /   567 ·  200 · 0.900 / 0.950 / 0.950 · -0.050 · -0.050  reversed (a reading)
+   the residual (free − the whole fed row) within 0.05 on 11 of 13 words; more than 0.10 below the kept fed row (a reading): none
+   «no row»: none · reversed: ['big', 'blue', 'circle', 'small', 'square', 'triangle', 'yellow'] · the fault (> 0.10): none → PASS
+   AMENDMENT 1's readings (offline, the tape's truth; readings, never bars), every gate life:
+      20261101: the metacognition-of-perception reading (the referent never seen): claims set aside 1480 / 1924 = 0.769 (scenes 647 / 977 = 0.662; phrases «none» 673 / 1039 = 0.648; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1529 / 15479 = 0.099 (scenes 594 / 8042 = 0.074; phrases «none» 656 / 8711 = 0.075; predicted 0.05–0.08)
+      20261102: the metacognition-of-perception reading (the referent never seen): claims set aside 1469 / 1896 = 0.775 (scenes 670 / 995 = 0.673; phrases «none» 701 / 1056 = 0.664; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1661 / 15418 = 0.108 (scenes 658 / 8002 = 0.082; phrases «none» 742 / 8694 = 0.085; predicted 0.05–0.08)
+      20261103: the metacognition-of-perception reading (the referent never seen): claims set aside 1401 / 1893 = 0.740 (scenes 619 / 986 = 0.628; phrases «none» 640 / 1028 = 0.623; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1280 / 15475 = 0.083 (scenes 501 / 8064 = 0.062; phrases «none» 572 / 8722 = 0.066; predicted 0.05–0.08)
+4. the smoke — seed 20261101's fresh items under all four roads (the tables whole):
+      big       claims  6311 · graded  1660 (fed  1848) · unseen  495 (fed    0) · cal_20 0.850 / 0.900 (kept 0.900) · |diff| 0.050 · median |Δ| 0.050 · drift 3 / 3 · missed  151 · gate open · oracle 0.984
+      blue      claims  2520 · graded   661 (fed   771) · unseen  164 (fed    0) · cal_20 0.900 / 0.950 (kept 0.950) · |diff| 0.050 · median |Δ| 0.050 · drift 1 / 1 · missed   48 · gate open · oracle 1.000
+      circle    claims  2572 · graded  1487 (fed  1453) · unseen  301 (fed    0) · cal_20 0.900 / 1.000 (kept 1.000) · |diff| 0.100 · median |Δ| 0.050 · drift 5 / 5 · missed   18 · gate open · oracle 1.000
+      cross     claims  2190 · graded  1221 (fed  1263) · unseen  143 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 6 / 1 · missed   32 · gate open · oracle 1.000
+      green     claims  3436 · graded   846 (fed   929) · unseen  217 (fed    0) · cal_20 1.000 / 0.950 (kept 1.000) · |diff| 0.050 · median |Δ| 0.050 · drift 1 / 1 · missed   43 · gate open · oracle 0.900
+      red       claims  2124 · graded   541 (fed   642) · unseen  167 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.100 · drift 0 / 0 · missed   57 · gate open · oracle 0.871
+      ring      claims  1682 · graded  1117 (fed  1183) · unseen  136 (fed    0) · cal_20 0.900 / 0.900 (kept 0.900) · |diff| 0.000 · median |Δ| 0.050 · drift 5 / 0 · missed  198 · gate open · oracle 0.886
+      small     claims  6768 · graded  1801 (fed  2009) · unseen  421 (fed    0) · cal_20 0.900 / 0.950 (kept 0.900) · |diff| 0.050 · median |Δ| 0.050 · drift 2 / 2 · missed   84 · gate open · oracle 0.886
+      square    claims  1887 · graded  1065 (fed  1057) · unseen  201 (fed    0) · cal_20 0.950 / 1.000 (kept 1.000) · |diff| 0.050 · median |Δ| 0.050 · drift 0 / 0 · missed   16 · gate open · oracle 1.000
+      star      claims  2505 · graded  1373 (fed  1438) · unseen  195 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 1 / 0 · missed   24 · gate open · oracle 1.000
+      triangle  claims  2380 · graded  1341 (fed  1382) · unseen  175 (fed    0) · cal_20 0.950 / 1.000 (kept 1.000) · |diff| 0.050 · median |Δ| 0.000 · drift 14 / 2 · missed   16 · gate open · oracle 1.000
+      white     claims  2715 · graded   705 (fed   760) · unseen  194 (fed    0) · cal_20 0.900 / 0.800 (kept 0.850) · |diff| 0.100 · median |Δ| 0.050 · drift 4 / 4 · missed  114 · gate open · oracle 0.762
+      yellow    claims  2212 · graded   576 (fed   634) · unseen  200 (fed    0) · cal_20 0.900 / 0.950 (kept 0.950) · |diff| 0.050 · median |Δ| 0.050 · drift 0 / 0 · missed   71 · gate open · oracle 1.000
+   AMENDMENT 1's readings (offline, the tape's truth; readings, never bars): 20261101: the metacognition-of-perception reading (the referent never seen): claims set aside 1480 / 1924 = 0.769 (scenes 647 / 977 = 0.662; phrases «none» 673 / 1039 = 0.648; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1529 / 15479 = 0.099 (scenes 594 / 8042 = 0.074; phrases «none» 656 / 8711 = 0.075; predicted 0.05–0.08)
+   the roads (S1b-1R's graders, covered targets): SPOKEN · TRUTH (n) · ×spoken · READ-BACK · SPEAK2 spoken · TRUTH-NEED (n) · MINIMAL (n) · ORDER (n) · DECLINE (reading) · M2b (the band, unchanged)
+      CONTROL          0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 2, 'the read-back': 1} · SPEAK2 {'no sayable word': 7, 'the read-back': 1, 'no believed-unique phrase': 4} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 3}
+      LAW              0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 2, 'the read-back': 1} · SPEAK2 {'no sayable word': 7, 'the read-back': 1, 'no believed-unique phrase': 4} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 3}
+      HEALTH-MOUTH     0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 2, 'the read-back': 1} · SPEAK2 {'no sayable word': 7, 'the read-back': 1, 'no believed-unique phrase': 4} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 3}
+      HEALTH-ORACLE    0.803 · 0.836 (n 61) · 0.671 · 1.000 · 0.681 · 0.281 (n 32) · 1.000 (n 60) · 1.000 (n 10) · DECLINE 0.676 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 3, 'the read-back': 1} · SPEAK2 {'no believed-unique phrase': 7, 'no sayable word': 7, 'the read-back': 1} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 4} · the row refused {'white:not held lately': 20}
+      HEALTH-TRUTHFED  0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 2, 'the read-back': 1} · SPEAK2 {'no sayable word': 7, 'the read-back': 1, 'no believed-unique phrase': 4} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 3}
+      NULL             0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                       reasons SPEAK {'no sayable word': 11, 'no believed-unique phrase': 2, 'the read-back': 1} · SPEAK2 {'no sayable word': 7, 'the read-back': 1, 'no believed-unique phrase': 4} · DECLINE {'no sayable word': 5, 'no believed-unique phrase': 3}
+   the decision (over the CONTROL's spoken phrases on SPEAK + SPEAK2, covered): ERROR-RECALL (declined + replaced true / errors) · TRUE-RETENTION (true / true):
+      CONTROL          ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+      HEALTH-MOUTH     ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+      HEALTH-ORACLE    ER 0.057 (2 + 0 / 35) · TR 0.968 (60 / 62)
+      HEALTH-TRUTHFED  ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+      NULL             ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+      calibration of the truth-free row (the law's): ECE 0.032 · type-2 AUROC 0.502 · n 453 (errors 33; no row 0) · curve [0.8: n 63 conf 0.85 acc 0.98] [0.9: n 390 conf 0.93 acc 0.92]
+      calibration of the truth-fed row (its ceiling): ECE 0.012 · type-2 AUROC 0.654 · n 453 (errors 33; no row 0) · curve [0.8: n 42 conf 0.80 acc 0.76] [0.9: n 411 conf 0.95 acc 0.94]
+      calibration of the deranged rows (the floor): ECE 0.022 · type-2 AUROC 0.511 · n 453 (errors 33; no row 0) · curve [0.8: n 26 conf 0.85 acc 1.00] [0.9: n 427 conf 0.94 acc 0.92]
+      the CONTROL re-graded vs S1b-1R's report.json: TRUTH [0.8225806451612904, 0.8225806451612904] · SPOKEN [0.8157894736842105, 0.8157894736842105] · TRUTH-NEED [0.3142857142857143, 0.3142857142857143] → EQUAL
+   the wiring pin (READ-BACK 1.000 wherever something was spoken): PASS
+5. the price, solo (the three lives above ran one at a time): lives 25.9 / 25.7 / 25.9 CPU-s · one seed's grading 0.3 CPU-s → the unit ≈ 78 CPU-s ≈ 1.3 CPU-min against ≤ 5 declared → within → PASS
+GATE: PROCEED · 78 s wall · 78 CPU-s
+```
+
+### 11.4 · The unit's report — `report.txt`, verbatim
+```
+T-MEM-2 report · PREREG-TMEM2 sha b785b54f97c6c2bc300ce07cdc26aaa716bf9c7fcb3e7cc183294480b5fd2914 · AMENDMENT 1 sha 6da8ff679a317166c7a4e82bf9efd183785b5ecb90ad1bcb6fbae90d241386e6 · AMENDMENT 2 sha 76d8ac86c0af8320b1b96fa48621cf6a016e0c4037437489edbd186b56c758bf · PREREG-S1B1R 879a22fbe5341330… · the control's report.txt b695ae5c94d13a85…
+
+== T-MEM-2 · world seed 20261101 (fresh test seed 20261401) ==
+the identity with S1b-1R's A-RW-R record at 10,000 (canonical JSON; the planted byte first): LAW = (72118 bytes; planted CAUGHT) · point = (188211 bytes; planted CAUGHT) · summary = (1465 bytes; planted CAUGHT) → PASS
+the learned types: (circle cross ring square star triangle) (blue green red white yellow) (big small) · claims recorded on 9750 training scenes
+the rows at 10,000 (per word: confident claims · graded · set aside «unseen» · cal_20 truth-free / truth-fed (the fed row on the claims the rule keeps) · |diff| · median |Δ| · drift firings unfloored / floored 1/20 · the said word's MISSED · the gate · the oracle's accuracy):
+   big       claims  6311 · graded  1660 (fed  1848) · unseen  495 (fed    0) · cal_20 0.850 / 0.900 (kept 0.900) · |diff| 0.050 · median |Δ| 0.050 · drift 3 / 3 · missed  151 · gate open · oracle 0.984
+   blue      claims  2520 · graded   661 (fed   771) · unseen  164 (fed    0) · cal_20 0.900 / 0.950 (kept 0.950) · |diff| 0.050 · median |Δ| 0.050 · drift 1 / 1 · missed   48 · gate open · oracle 1.000
+   circle    claims  2572 · graded  1487 (fed  1453) · unseen  301 (fed    0) · cal_20 0.900 / 1.000 (kept 1.000) · |diff| 0.100 · median |Δ| 0.050 · drift 5 / 5 · missed   18 · gate open · oracle 1.000
+   cross     claims  2190 · graded  1221 (fed  1263) · unseen  143 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 6 / 1 · missed   32 · gate open · oracle 1.000
+   green     claims  3436 · graded   846 (fed   929) · unseen  217 (fed    0) · cal_20 1.000 / 0.950 (kept 1.000) · |diff| 0.050 · median |Δ| 0.050 · drift 1 / 1 · missed   43 · gate open · oracle 0.900
+   red       claims  2124 · graded   541 (fed   642) · unseen  167 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.100 · drift 0 / 0 · missed   57 · gate open · oracle 0.871
+   ring      claims  1682 · graded  1117 (fed  1183) · unseen  136 (fed    0) · cal_20 0.900 / 0.900 (kept 0.900) · |diff| 0.000 · median |Δ| 0.050 · drift 5 / 0 · missed  198 · gate open · oracle 0.886
+   small     claims  6768 · graded  1801 (fed  2009) · unseen  421 (fed    0) · cal_20 0.900 / 0.950 (kept 0.900) · |diff| 0.050 · median |Δ| 0.050 · drift 2 / 2 · missed   84 · gate open · oracle 0.886
+   square    claims  1887 · graded  1065 (fed  1057) · unseen  201 (fed    0) · cal_20 0.950 / 1.000 (kept 1.000) · |diff| 0.050 · median |Δ| 0.050 · drift 0 / 0 · missed   16 · gate open · oracle 1.000
+   star      claims  2505 · graded  1373 (fed  1438) · unseen  195 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 1 / 0 · missed   24 · gate open · oracle 1.000
+   triangle  claims  2380 · graded  1341 (fed  1382) · unseen  175 (fed    0) · cal_20 0.950 / 1.000 (kept 1.000) · |diff| 0.050 · median |Δ| 0.000 · drift 14 / 2 · missed   16 · gate open · oracle 1.000
+   white     claims  2715 · graded   705 (fed   760) · unseen  194 (fed    0) · cal_20 0.900 / 0.800 (kept 0.850) · |diff| 0.100 · median |Δ| 0.050 · drift 4 / 4 · missed  114 · gate open · oracle 0.762
+   yellow    claims  2212 · graded   576 (fed   634) · unseen  200 (fed    0) · cal_20 0.900 / 0.950 (kept 0.950) · |diff| 0.050 · median |Δ| 0.050 · drift 0 / 0 · missed   71 · gate open · oracle 1.000
+AMENDMENT 1's readings (offline, the tape's truth; readings, never bars): 20261101: the metacognition-of-perception reading (the referent never seen): claims set aside 1480 / 1924 = 0.769 (scenes 647 / 977 = 0.662; phrases «none» 673 / 1039 = 0.648; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1529 / 15479 = 0.099 (scenes 594 / 8042 = 0.074; phrases «none» 656 / 8711 = 0.075; predicted 0.05–0.08)
+the roads (S1b-1R's graders, covered targets): SPOKEN · TRUTH (n) · ×spoken · READ-BACK · SPEAK2 spoken · TRUTH-NEED (n) · MINIMAL (n) · ORDER (n) · DECLINE (reading) · M2b (the band, unchanged)
+   CONTROL          0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                    reasons SPEAK {'no believed-unique phrase': 2, 'no sayable word': 11, 'the read-back': 1} · SPEAK2 {'no believed-unique phrase': 4, 'no sayable word': 7, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 3, 'no sayable word': 5}
+   LAW              0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                    reasons SPEAK {'no believed-unique phrase': 2, 'no sayable word': 11, 'the read-back': 1} · SPEAK2 {'no believed-unique phrase': 4, 'no sayable word': 7, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 3, 'no sayable word': 5}
+   HEALTH-MOUTH     0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                    reasons SPEAK {'no believed-unique phrase': 2, 'no sayable word': 11, 'the read-back': 1} · SPEAK2 {'no believed-unique phrase': 4, 'no sayable word': 7, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 3, 'no sayable word': 5}
+   HEALTH-ORACLE    0.803 · 0.836 (n 61) · 0.671 · 1.000 · 0.681 · 0.281 (n 32) · 1.000 (n 60) · 1.000 (n 10) · DECLINE 0.676 · M2b 0.646
+                    reasons SPEAK {'no believed-unique phrase': 3, 'no sayable word': 11, 'the read-back': 1} · SPEAK2 {'no believed-unique phrase': 7, 'no sayable word': 7, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 4, 'no sayable word': 5} · the row refused {'white:not held lately': 20}
+   HEALTH-TRUTHFED  0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                    reasons SPEAK {'no believed-unique phrase': 2, 'no sayable word': 11, 'the read-back': 1} · SPEAK2 {'no believed-unique phrase': 4, 'no sayable word': 7, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 3, 'no sayable word': 5}
+   NULL             0.816 · 0.823 (n 62) · 0.671 · 1.000 · 0.745 · 0.314 (n 35) · 1.000 (n 62) · 1.000 (n 12) · DECLINE 0.649 · M2b 0.646
+                    reasons SPEAK {'no believed-unique phrase': 2, 'no sayable word': 11, 'the read-back': 1} · SPEAK2 {'no believed-unique phrase': 4, 'no sayable word': 7, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 3, 'no sayable word': 5}
+the decision (over the CONTROL's spoken phrases on SPEAK + SPEAK2, covered): ERROR-RECALL (declined + replaced true / errors) · TRUE-RETENTION (true / true):
+   CONTROL          ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+   HEALTH-MOUTH     ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+   HEALTH-ORACLE    ER 0.057 (2 + 0 / 35) · TR 0.968 (60 / 62)
+   HEALTH-TRUTHFED  ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+   NULL             ER 0.000 (0 + 0 / 35) · TR 1.000 (62 / 62)
+   calibration of the truth-free row (the law's): ECE 0.032 · type-2 AUROC 0.502 · n 453 (errors 33; no row 0) · curve [0.8: n 63 conf 0.85 acc 0.98] [0.9: n 390 conf 0.93 acc 0.92]
+   calibration of the truth-fed row (its ceiling): ECE 0.012 · type-2 AUROC 0.654 · n 453 (errors 33; no row 0) · curve [0.8: n 42 conf 0.80 acc 0.76] [0.9: n 411 conf 0.95 acc 0.94]
+   calibration of the deranged rows (the floor): ECE 0.022 · type-2 AUROC 0.511 · n 453 (errors 33; no row 0) · curve [0.8: n 26 conf 0.85 acc 1.00] [0.9: n 427 conf 0.94 acc 0.92]
+   the CONTROL re-graded vs S1b-1R's report.json: TRUTH [0.8225806451612904, 0.8225806451612904] · SPOKEN [0.8157894736842105, 0.8157894736842105] · TRUTH-NEED [0.3142857142857143, 0.3142857142857143] → EQUAL
+
+== T-MEM-2 · world seed 20261102 (fresh test seed 20261402) ==
+the identity with S1b-1R's A-RW-R record at 10,000 (canonical JSON; the planted byte first): LAW = (75822 bytes; planted CAUGHT) · point = (187763 bytes; planted CAUGHT) · summary = (1458 bytes; planted CAUGHT) → PASS
+the learned types: (circle cross ring square star triangle) (blue green red white yellow) (big small) · claims recorded on 9750 training scenes
+the rows at 10,000 (per word: confident claims · graded · set aside «unseen» · cal_20 truth-free / truth-fed (the fed row on the claims the rule keeps) · |diff| · median |Δ| · drift firings unfloored / floored 1/20 · the said word's MISSED · the gate · the oracle's accuracy):
+   big       claims  6288 · graded  1671 (fed  1848) · unseen  505 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 6 / 3 · missed  132 · gate open · oracle 0.961
+   blue      claims  2569 · graded   650 (fed   753) · unseen  154 (fed    0) · cal_20 1.000 / 0.900 (kept 1.000) · |diff| 0.100 · median |Δ| 0.050 · drift 1 / 1 · missed   44 · gate open · oracle 0.791
+   circle    claims  2503 · graded  1439 (fed  1411) · unseen  288 (fed    0) · cal_20 0.950 / 1.000 (kept 1.000) · |diff| 0.050 · median |Δ| 0.050 · drift 4 / 4 · missed   34 · gate open · oracle 1.000
+   cross     claims  2236 · graded  1276 (fed  1313) · unseen  155 (fed    0) · cal_20 0.950 / 1.000 (kept 1.000) · |diff| 0.050 · median |Δ| 0.050 · drift 11 / 0 · missed   32 · gate open · oracle 1.000
+   green     claims  3349 · graded   875 (fed  1005) · unseen  226 (fed    0) · cal_20 0.950 / 1.000 (kept 1.000) · |diff| 0.050 · median |Δ| 0.050 · drift 4 / 4 · missed   43 · gate open · oracle 0.931
+   red       claims  2168 · graded   546 (fed   639) · unseen  152 (fed    0) · cal_20 0.900 / 0.750 (kept 0.850) · |diff| 0.150 · median |Δ| 0.050 · drift 2 / 2 · missed   41 · gate open · oracle 0.884
+   ring      claims  1628 · graded  1060 (fed  1156) · unseen  159 (fed    0) · cal_20 0.950 / 0.900 (kept 0.950) · |diff| 0.050 · median |Δ| 0.050 · drift 2 / 2 · missed  217 · gate open · oracle 1.000
+   small     claims  6622 · graded  1753 (fed  2005) · unseen  453 (fed    0) · cal_20 1.000 / 0.950 (kept 0.950) · |diff| 0.050 · median |Δ| 0.050 · drift 4 / 4 · missed   82 · gate open · oracle 0.932
+   square    claims  1813 · graded  1038 (fed  1019) · unseen  198 (fed    0) · cal_20 0.950 / 1.000 (kept 1.000) · |diff| 0.050 · median |Δ| 0.050 · drift 4 / 4 · missed   28 · gate open · oracle 1.000
+   star      claims  2415 · graded  1306 (fed  1375) · unseen  217 (fed    0) · cal_20 0.900 / 1.000 (kept 1.000) · |diff| 0.100 · median |Δ| 0.050 · drift 2 / 1 · missed    9 · gate open · oracle 0.964
+   triangle  claims  2367 · graded  1340 (fed  1393) · unseen  185 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.000 · drift 9 / 0 · missed   19 · gate open · oracle 1.000
+   white     claims  2580 · graded   697 (fed   770) · unseen  218 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 2 / 2 · missed  112 · gate open · oracle 0.793
+   yellow    claims  2213 · graded   533 (fed   617) · unseen  220 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 3 / 2 · missed   71 · gate open · oracle 0.905
+AMENDMENT 1's readings (offline, the tape's truth; readings, never bars): 20261102: the metacognition-of-perception reading (the referent never seen): claims set aside 1469 / 1896 = 0.775 (scenes 670 / 995 = 0.673; phrases «none» 701 / 1056 = 0.664; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1661 / 15418 = 0.108 (scenes 658 / 8002 = 0.082; phrases «none» 742 / 8694 = 0.085; predicted 0.05–0.08)
+the roads (S1b-1R's graders, covered targets): SPOKEN · TRUTH (n) · ×spoken · READ-BACK · SPEAK2 spoken · TRUTH-NEED (n) · MINIMAL (n) · ORDER (n) · DECLINE (reading) · M2b (the band, unchanged)
+   CONTROL          0.875 · 0.968 (n 63) · 0.847 · 1.000 · 0.891 · 0.561 (n 41) · 0.988 (n 84) · 1.000 (n 25) · DECLINE 0.649 · M2b 0.708
+                    reasons SPEAK {'no believed-unique phrase': 1, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 1, 'no sayable word': 4} · DECLINE {'no sayable word': 2}
+   LAW              0.875 · 0.968 (n 63) · 0.847 · 1.000 · 0.891 · 0.561 (n 41) · 0.988 (n 84) · 1.000 (n 25) · DECLINE 0.649 · M2b 0.708
+                    reasons SPEAK {'no believed-unique phrase': 1, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 1, 'no sayable word': 4} · DECLINE {'no sayable word': 2}
+   HEALTH-MOUTH     0.875 · 0.968 (n 63) · 0.847 · 1.000 · 0.891 · 0.561 (n 41) · 0.988 (n 84) · 1.000 (n 25) · DECLINE 0.649 · M2b 0.708
+                    reasons SPEAK {'no believed-unique phrase': 1, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 1, 'no sayable word': 4} · DECLINE {'no sayable word': 2}
+   HEALTH-ORACLE    0.819 · 0.932 (n 59) · 0.764 · 1.000 · 0.696 · 0.562 (n 32) · 0.986 (n 73) · 1.000 (n 19) · DECLINE 0.946 · M2b 0.708
+                    reasons SPEAK {'no believed-unique phrase': 4, 'no sayable word': 8, 'the read-back': 1} · SPEAK2 {'no believed-unique phrase': 9, 'no sayable word': 4, 'not held lately': 1} · DECLINE {'no believed-unique phrase': 11, 'no sayable word': 2} · the row refused {'blue:not held lately': 14, 'white:not held lately': 29}
+   HEALTH-TRUTHFED  0.847 · 0.951 (n 61) · 0.806 · 1.000 · 0.826 · 0.526 (n 38) · 1.000 (n 78) · 1.000 (n 21) · DECLINE 0.703 · M2b 0.708
+                    reasons SPEAK {'no believed-unique phrase': 2, 'no sayable word': 8, 'not held lately': 1} · SPEAK2 {'no believed-unique phrase': 4, 'no sayable word': 4} · DECLINE {'no believed-unique phrase': 1, 'no sayable word': 2} · the row refused {'red:not held lately': 16}
+   NULL             0.875 · 0.968 (n 63) · 0.847 · 1.000 · 0.891 · 0.561 (n 41) · 0.988 (n 84) · 1.000 (n 25) · DECLINE 0.649 · M2b 0.708
+                    reasons SPEAK {'no believed-unique phrase': 1, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 1, 'no sayable word': 4} · DECLINE {'no sayable word': 2}
+the decision (over the CONTROL's spoken phrases on SPEAK + SPEAK2, covered): ERROR-RECALL (declined + replaced true / errors) · TRUE-RETENTION (true / true):
+   CONTROL          ER 0.000 (0 + 0 / 20) · TR 1.000 (84 / 84)
+   HEALTH-MOUTH     ER 0.000 (0 + 0 / 20) · TR 1.000 (84 / 84)
+   HEALTH-ORACLE    ER 0.200 (4 + 0 / 20) · TR 0.869 (73 / 84)
+   HEALTH-TRUTHFED  ER 0.000 (0 + 0 / 20) · TR 0.929 (78 / 84)
+   NULL             ER 0.000 (0 + 0 / 20) · TR 1.000 (84 / 84)
+   calibration of the truth-free row (the law's): ECE 0.041 · type-2 AUROC 0.430 · n 495 (errors 34; no row 0) · curve [0.9: n 495 conf 0.97 acc 0.93]
+   calibration of the truth-fed row (its ceiling): ECE 0.046 · type-2 AUROC 0.609 · n 495 (errors 34; no row 0) · curve [0.7: n 43 conf 0.75 acc 0.88] [0.9: n 452 conf 0.97 acc 0.94]
+   calibration of the deranged rows (the floor): ECE 0.023 · type-2 AUROC 0.441 · n 495 (errors 34; no row 0) · curve [0.9: n 495 conf 0.95 acc 0.93]
+   the CONTROL re-graded vs S1b-1R's report.json: TRUTH [0.9682539682539683, 0.9682539682539683] · SPOKEN [0.875, 0.875] · TRUTH-NEED [0.5609756097560976, 0.5609756097560976] → EQUAL
+
+== T-MEM-2 · world seed 20261103 (fresh test seed 20261403) ==
+the identity with S1b-1R's A-RW-R record at 10,000 (canonical JSON; the planted byte first): LAW = (75263 bytes; planted CAUGHT) · point = (187927 bytes; planted CAUGHT) · summary = (1464 bytes; planted CAUGHT) → PASS
+the learned types: (circle cross ring square star triangle) (blue green red white yellow) (big small) · claims recorded on 9750 training scenes
+the rows at 10,000 (per word: confident claims · graded · set aside «unseen» · cal_20 truth-free / truth-fed (the fed row on the claims the rule keeps) · |diff| · median |Δ| · drift firings unfloored / floored 1/20 · the said word's MISSED · the gate · the oracle's accuracy):
+   big       claims  6514 · graded  1812 (fed  1945) · unseen  449 (fed    0) · cal_20 0.900 / 0.900 (kept 0.900) · |diff| 0.000 · median |Δ| 0.050 · drift 8 / 2 · missed  140 · gate open · oracle 0.947
+   blue      claims  2671 · graded   679 (fed   778) · unseen  138 (fed    0) · cal_20 0.900 / 1.000 (kept 0.900) · |diff| 0.100 · median |Δ| 0.050 · drift 2 / 2 · missed   46 · gate open · oracle 1.000
+   circle    claims  2640 · graded  1524 (fed  1475) · unseen  275 (fed    0) · cal_20 0.850 / 1.000 (kept 1.000) · |diff| 0.150 · median |Δ| 0.050 · drift 10 / 5 · missed   20 · gate open · oracle 1.000
+   cross     claims  2249 · graded  1286 (fed  1323) · unseen  141 (fed    0) · cal_20 0.950 / 1.000 (kept 1.000) · |diff| 0.050 · median |Δ| 0.000 · drift 15 / 0 · missed   37 · gate open · oracle 0.963
+   green     claims  3430 · graded   898 (fed   980) · unseen  188 (fed    0) · cal_20 0.950 / 0.900 (kept 0.950) · |diff| 0.050 · median |Δ| 0.050 · drift 2 / 2 · missed   60 · gate open · oracle 0.943
+   red       claims  2102 · graded   534 (fed   607) · unseen  137 (fed    0) · cal_20 0.850 / 0.850 (kept 0.800) · |diff| 0.000 · median |Δ| 0.000 · drift 1 / 0 · missed   51 · gate open · oracle 0.913
+   ring      claims  1749 · graded  1218 (fed  1268) · unseen  116 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 3 / 1 · missed  226 · gate open · oracle 1.000
+   small     claims  6581 · graded  1697 (fed  1867) · unseen  370 (fed    0) · cal_20 0.800 / 0.750 (kept 0.800) · |diff| 0.050 · median |Δ| 0.050 · drift 4 / 4 · missed  106 · gate open · oracle 0.898
+   square    claims  1813 · graded  1051 (fed  1017) · unseen  157 (fed    0) · cal_20 0.850 / 1.000 (kept 1.000) · |diff| 0.150 · median |Δ| 0.050 · drift 1 / 1 · missed   14 · gate open · oracle 1.000
+   star      claims  2519 · graded  1410 (fed  1437) · unseen  185 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 3 / 2 · missed   19 · gate open · oracle 1.000
+   triangle  claims  2307 · graded  1253 (fed  1290) · unseen  170 (fed    0) · cal_20 1.000 / 1.000 (kept 1.000) · |diff| 0.000 · median |Δ| 0.050 · drift 0 / 0 · missed   20 · gate open · oracle 1.000
+   white     claims  2610 · graded   711 (fed   746) · unseen  186 (fed    0) · cal_20 1.000 / 0.950 (kept 1.000) · |diff| 0.050 · median |Δ| 0.050 · drift 3 / 3 · missed  123 · gate open · oracle 0.821
+   yellow    claims  2226 · graded   614 (fed   660) · unseen  169 (fed    0) · cal_20 0.900 / 0.900 (kept 0.900) · |diff| 0.000 · median |Δ| 0.050 · drift 1 / 1 · missed   57 · gate open · oracle 1.000
+AMENDMENT 1's readings (offline, the tape's truth; readings, never bars): 20261103: the metacognition-of-perception reading (the referent never seen): claims set aside 1401 / 1893 = 0.740 (scenes 619 / 986 = 0.628; phrases «none» 640 / 1028 = 0.623; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1280 / 15475 = 0.083 (scenes 501 / 8064 = 0.062; phrases «none» 572 / 8722 = 0.066; predicted 0.05–0.08)
+the roads (S1b-1R's graders, covered targets): SPOKEN · TRUTH (n) · ×spoken · READ-BACK · SPEAK2 spoken · TRUTH-NEED (n) · MINIMAL (n) · ORDER (n) · DECLINE (reading) · M2b (the band, unchanged)
+   CONTROL          0.882 · 0.955 (n 67) · 0.842 · 1.000 · 0.727 · 0.375 (n 32) · 1.000 (n 76) · 1.000 (n 13) · DECLINE 0.658 · M2b 0.729
+                    reasons SPEAK {'no believed-unique phrase': 1, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 5, 'no sayable word': 6, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 2, 'no sayable word': 5, 'the read-back': 1}
+   LAW              0.882 · 0.955 (n 67) · 0.842 · 1.000 · 0.727 · 0.375 (n 32) · 1.000 (n 76) · 1.000 (n 13) · DECLINE 0.658 · M2b 0.729
+                    reasons SPEAK {'no believed-unique phrase': 1, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 5, 'no sayable word': 6, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 2, 'no sayable word': 5, 'the read-back': 1}
+   HEALTH-MOUTH     0.882 · 0.955 (n 67) · 0.842 · 1.000 · 0.727 · 0.375 (n 32) · 1.000 (n 76) · 1.000 (n 13) · DECLINE 0.658 · M2b 0.729
+                    reasons SPEAK {'no believed-unique phrase': 1, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 5, 'no sayable word': 6, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 2, 'no sayable word': 5, 'the read-back': 1}
+   HEALTH-ORACLE    0.882 · 0.955 (n 67) · 0.842 · 1.000 · 0.727 · 0.375 (n 32) · 1.000 (n 76) · 1.000 (n 13) · DECLINE 0.658 · M2b 0.729
+                    reasons SPEAK {'no believed-unique phrase': 1, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 5, 'no sayable word': 6, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 2, 'no sayable word': 5, 'the read-back': 1}
+   HEALTH-TRUTHFED  0.868 · 0.955 (n 66) · 0.829 · 1.000 · 0.568 · 0.240 (n 25) · 1.000 (n 69) · 1.000 (n 7) · DECLINE 0.658 · M2b 0.729
+                    reasons SPEAK {'no believed-unique phrase': 2, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 13, 'no sayable word': 6} · DECLINE {'no believed-unique phrase': 3, 'no sayable word': 5, 'the read-back': 1} · the row refused {'small:not held lately': 48}
+   NULL             0.882 · 0.955 (n 67) · 0.842 · 1.000 · 0.727 · 0.375 (n 32) · 1.000 (n 76) · 1.000 (n 13) · DECLINE 0.658 · M2b 0.729
+                    reasons SPEAK {'no believed-unique phrase': 1, 'no sayable word': 8} · SPEAK2 {'no believed-unique phrase': 5, 'no sayable word': 6, 'the read-back': 1} · DECLINE {'no believed-unique phrase': 2, 'no sayable word': 5, 'the read-back': 1}
+the decision (over the CONTROL's spoken phrases on SPEAK + SPEAK2, covered): ERROR-RECALL (declined + replaced true / errors) · TRUE-RETENTION (true / true):
+   CONTROL          ER 0.000 (0 + 0 / 23) · TR 1.000 (76 / 76)
+   HEALTH-MOUTH     ER 0.000 (0 + 0 / 23) · TR 1.000 (76 / 76)
+   HEALTH-ORACLE    ER 0.000 (0 + 0 / 23) · TR 1.000 (76 / 76)
+   HEALTH-TRUTHFED  ER 0.043 (1 + 0 / 23) · TR 0.908 (69 / 76)
+   NULL             ER 0.000 (0 + 0 / 23) · TR 1.000 (76 / 76)
+   calibration of the truth-free row (the law's): ECE 0.036 · type-2 AUROC 0.553 · n 489 (errors 26; no row 0) · curve [0.8: n 153 conf 0.82 acc 0.93] [0.9: n 336 conf 0.95 acc 0.96]
+   calibration of the truth-fed row (its ceiling): ECE 0.032 · type-2 AUROC 0.680 · n 489 (errors 26; no row 0) · curve [0.7: n 88 conf 0.75 acc 0.90] [0.8: n 23 conf 0.85 acc 0.91] [0.9: n 378 conf 0.96 acc 0.96]
+   calibration of the deranged rows (the floor): ECE 0.049 · type-2 AUROC 0.516 · n 489 (errors 26; no row 0) · curve [0.8: n 163 conf 0.83 acc 0.96] [0.9: n 326 conf 0.94 acc 0.94]
+   the CONTROL re-graded vs S1b-1R's report.json: TRUTH [0.9552238805970149, 0.9552238805970149] · SPOKEN [0.881578947368421, 0.881578947368421] · TRUTH-NEED [0.375, 0.375] → EQUAL
+
+== AMENDMENT 1's READINGS (offline, the tape's truth; readings, never bars) ==
+20261101: the metacognition-of-perception reading (the referent never seen): claims set aside 1480 / 1924 = 0.769 (scenes 647 / 977 = 0.662; phrases «none» 673 / 1039 = 0.648; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1529 / 15479 = 0.099 (scenes 594 / 8042 = 0.074; phrases «none» 656 / 8711 = 0.075; predicted 0.05–0.08)
+20261102: the metacognition-of-perception reading (the referent never seen): claims set aside 1469 / 1896 = 0.775 (scenes 670 / 995 = 0.673; phrases «none» 701 / 1056 = 0.664; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1661 / 15418 = 0.108 (scenes 658 / 8002 = 0.082; phrases «none» 742 / 8694 = 0.085; predicted 0.05–0.08)
+20261103: the metacognition-of-perception reading (the referent never seen): claims set aside 1401 / 1893 = 0.740 (scenes 619 / 986 = 0.628; phrases «none» 640 / 1028 = 0.623; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 1280 / 15475 = 0.083 (scenes 501 / 8064 = 0.062; phrases «none» 572 / 8722 = 0.066; predicted 0.05–0.08)
+pooled: the metacognition-of-perception reading (the referent never seen): claims set aside 4350 / 5713 = 0.761 (scenes 1936 / 2958 = 0.654; phrases «none» 2014 / 3123 = 0.645; predicted ≈ 0.8) · the false-unseen rate (the referent seen): 4470 / 46372 = 0.096 (scenes 1753 / 24108 = 0.073; phrases «none» 1970 / 26127 = 0.075; predicted 0.05–0.08)
+
+== T-MEM-2 BARS (fresh seeds; the ceiling beside every bar; the ruled forms of B2's null clause and B3's power) ==
+20261101 B1 TRUTH(HEALTH-MOUTH) 0.823 (n 62) ≥ 0.752 (0.90 × HEALTH-ORACLE 0.836) AND SPOKEN 0.816 ≥ 0.653 (0.80 × CONTROL 0.816) → PASS · the CONTROL's TRUTH 0.823 — «met by the control»: NOT evidence for the gate (B2 carries the claim)
+         B3 ECE(the truth-free row) 0.032 ≤ 0.10 (n 453 predictions; errors 33) → PASS · the NULL 0.022 (the floor) · the truth-fed row 0.012 (the row's ceiling)
+         the decision per seed: CONTROL ER 0.000 (n 35) TR 1.000 (n 62) · HEALTH-MOUTH ER 0.000 (n 35) TR 1.000 (n 62) · HEALTH-ORACLE ER 0.057 (n 35) TR 0.968 (n 62) · HEALTH-TRUTHFED ER 0.000 (n 35) TR 1.000 (n 62) · NULL ER 0.000 (n 35) TR 1.000 (n 62)
+         B4 per seed (a reading; the bar is pooled): AUROC 0.502 (errors 33)
+20261102 B1 TRUTH(HEALTH-MOUTH) 0.968 (n 63) ≥ 0.839 (0.90 × HEALTH-ORACLE 0.932) AND SPOKEN 0.875 ≥ 0.700 (0.80 × CONTROL 0.875) → PASS · the CONTROL's TRUTH 0.968 — «met by the control»: NOT evidence for the gate (B2 carries the claim)
+         B3 ECE(the truth-free row) 0.041 ≤ 0.10 (n 495 predictions; errors 34) → PASS · the NULL 0.023 (the floor) · the truth-fed row 0.046 (the row's ceiling)
+         the decision per seed: CONTROL ER 0.000 (n 20) TR 1.000 (n 84) · HEALTH-MOUTH ER 0.000 (n 20) TR 1.000 (n 84) · HEALTH-ORACLE ER 0.200 (n 20) TR 0.869 (n 84) · HEALTH-TRUTHFED ER 0.000 (n 20) TR 0.929 (n 84) · NULL ER 0.000 (n 20) TR 1.000 (n 84)
+         B4 per seed (a reading; the bar is pooled): AUROC 0.430 (errors 34)
+20261103 B1 TRUTH(HEALTH-MOUTH) 0.955 (n 67) ≥ 0.860 (0.90 × HEALTH-ORACLE 0.955) AND SPOKEN 0.882 ≥ 0.705 (0.80 × CONTROL 0.882) → PASS · the CONTROL's TRUTH 0.955 — «met by the control»: NOT evidence for the gate (B2 carries the claim)
+         B3 ECE(the truth-free row) 0.036 ≤ 0.10 (n 489 predictions; errors 26) → PASS · the NULL 0.049 (the floor) · the truth-fed row 0.032 (the row's ceiling)
+         the decision per seed: CONTROL ER 0.000 (n 23) TR 1.000 (n 76) · HEALTH-MOUTH ER 0.000 (n 23) TR 1.000 (n 76) · HEALTH-ORACLE ER 0.000 (n 23) TR 1.000 (n 76) · HEALTH-TRUTHFED ER 0.043 (n 23) TR 0.908 (n 76) · NULL ER 0.000 (n 23) TR 1.000 (n 76)
+         B4 per seed (a reading; the bar is pooled): AUROC 0.553 (errors 26)
+POOLED B2 ERROR-RECALL(HEALTH-MOUTH) 0.000 ≥ 0.054 (0.70 × HEALTH-ORACLE 0.077) AND TRUE-RETENTION 1.000 ≥ 0.90 AND the NULL 0.000 below by ≥ its half-width 0.000 (gap 0.000) · n errors 78 → CEILING-BOUND — the control's errors are the gaze's, not the words' (CEILING-BOUND: the oracle's own recall < 0.30) · clauses {'recall': False, 'retention': True, 'null': False}
+       pooled decision: CONTROL ER 0.000 (0/78) TR 1.000 (222/222) · HEALTH-MOUTH ER 0.000 (0/78) TR 1.000 (222/222) · HEALTH-ORACLE ER 0.077 (6/78) TR 0.941 (209/222) · HEALTH-TRUTHFED ER 0.013 (1/78) TR 0.941 (209/222) · NULL ER 0.000 (0/78) TR 1.000 (222/222)
+POOLED B4 type-2 AUROC(the truth-free row) 0.495 ≥ 0.70 (errors 93; chance 0.50) → FAIL
+refutations (§6): (a) the row buys silence 20261101:no 20261102:no 20261103:no · (b) the NULL ≈ HEALTH-MOUTH (the null clause not met) YES — the gate refuses, it does not know · (c) CEILING-BOUND YES · (d) the rows disagree by > 0.10 on ≥ 3 words 20261101:no (0) 20261102:no (1) 20261103:no (2)
+the declared sign (§6: truth-free cal_20 ≥ truth-fed on every word): 20261101: reversed ['big', 'blue', 'circle', 'small', 'square', 'triangle', 'yellow'] 20261102: reversed ['circle', 'cross', 'green', 'square', 'star'] 20261103: reversed ['blue', 'circle', 'cross', 'square'] — FAULT (> 0.10) ['circle', 'square']
+per seed: B1 PASS/PASS/PASS · B3 PASS/PASS/PASS · pooled: B2 CEILING-BOUND · B4 FAIL
+A PASS is B1–B4, or B2 CEILING-BOUND with B1, B3, B4 met → T-MEM-2 does not pass
+```
+
+### 11.5 · Price
+- **The gate:** 78 CPU-s. Its step 5 prices the unit at ≈ 78 CPU-s ≈ 1.3 CPU-min, against ≤ 5 declared.
+- **The unit:** 18:53:27 – 18:53:57, three lives at once. systemd reports 1 min 22.654 s of CPU (≈ 83 CPU-s ≈ 1.4 CPU-min) over 29.9 s of wall time, within ≤ 5 CPU-min.
+
+### 11.6 · The suites on the final code (00dc818)
+- **The whole brain suite under the venv:** `Ran 613 tests in 272.143s` / `OK (skipped=3)`, with 0 ERROR/FAIL blocks. Log: `logs/suite-venv-00dc818.log`.
+- **The scene package under /usr/bin/python3:** `Ran 211 tests in 52.432s` / `OK`. Log: `logs/suite-scene-sys-00dc818.log`.
+
+### 11.7 · Files
+- **The unit:** `/data/dev/brain-runs/scene-tmem2/`:
+  - `report.txt` and `report.json`;
+  - `<ws>/life/{record.json, answers_10000.json}` and `<ws>/marks.json` for each seed;
+  - `logs/full-run.log` and `logs/unit-journal.txt`.
+- **The gate:** `gate/` (gate.txt, gate.json, journal.txt, lives/).
+- **The crashed first launch:** `unit-1847-report-crash/`.
+- **The earlier gates:** `gate-1751-stop/`, `gate-1823-amend1-stop/` and `gate-1845-amend2-proceed/`.
+- **The pins:** `code-00dc818` (the gate's and the unit's), `code-0c811b9`, `code-8767cf6`, `code-15b047e` and `code-96a00bd`.
+- **Untouched:** nothing was written under `/data/dev/brain-runs/scene-s1b1r/`. No unit other than `scene-tmem2-gate` and `scene-tmem2` was launched.
