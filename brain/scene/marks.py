@@ -194,10 +194,34 @@ def grade_pointing(items: Sequence[Dict[str, object]], answers: Dict[str, Dict[s
         # AMENDMENT 2 §4: an item whose phrase holds a word the arm never heard is NOT GRADABLE — excluded from every
         # rate and counted apart as n_unheard, never scored 0.0
         gradable = not bool((a or {}).get("unheard"))
-        out.append({"item_id": it["item_id"], "covered": cov, "correct": bool(corr), "gradable": gradable,
-                    "none": (None if a is None else a.get("none")), "answered": a is not None and a.get("point") is not None,
-                    "chance": 1.0 / max(1, n_opts), "n_things": it["n_things"], "types": it.get("types", []),
-                    "template": it.get("template")})
+        row_out = {"item_id": it["item_id"], "covered": cov, "correct": bool(corr), "gradable": gradable,
+                   "none": (None if a is None else a.get("none")), "answered": a is not None and a.get("point") is not None,
+                   "chance": 1.0 / max(1, n_opts), "n_things": it["n_things"], "types": it.get("types", []),
+                   "template": it.get("template")}
+        for key in ("none_i", "none_ii"):          # PREREG-S1B1 §3: the readings, carried when the arm answered them
+            if a is not None and key in a:
+                row_out[key] = a.get(key)
+        out.append(row_out)
+    return out
+
+
+def _pointing_block(rows):
+    """One block of a pointing grade (S1a's rates, lifted to module level for M3 — edit: Claude (Opus 5.5, S1b-1 builder),
+    2026-09-28 13:48 +0400 — byte-for-byte the same arithmetic)."""
+    un = sum(1 for r in rows if not r["gradable"])
+    rows = [r for r in rows if r["gradable"]]
+    cov = [r for r in rows if r["covered"]]
+    acc_c, n_c = _rate(r["correct"] for r in cov)
+    acc_a, n_a = _rate(r["correct"] for r in rows)
+    ch_c = float(np.mean([r["chance"] for r in cov])) if cov else None
+    ch_a = float(np.mean([r["chance"] for r in rows])) if rows else None
+    fr, n_fr = _rate(bool(r["none"]) for r in cov if r["none"] is not None)
+    out = {"covered": acc_c, "n_covered": n_c, "all": acc_a, "n_all": n_a, "coverage": (n_c / n_a if n_a else None),
+           "chance_covered": ch_c, "chance_all": ch_a, "false_refusal": fr, "n_fr": n_fr, "n_unheard": un}
+    for key in ("none_i", "none_ii"):                # PREREG-S1B1 §3: the readings' false refusal, from the same answers
+        if any(key in r for r in cov):
+            v, n = _rate(bool(r[key]) for r in cov if r.get(key) is not None)
+            out[f"false_refusal_{key[5:]}"] = v
     return out
 
 
@@ -205,17 +229,7 @@ def summarise_pointing(g: Sequence[Dict[str, object]]) -> Dict[str, object]:
     """Blocks of the pointing grade. AMENDMENT 2 §2: «graded» = the 2- and 3-thing items (the bars read it); «size1» is
     the one-thing sanity reading; the per-type and per-template rows are over the graded items (declared). Every rate
     counts GRADABLE items only (§4); a block with none reads None, with n_unheard beside it."""
-    def block(rows):
-        un = sum(1 for r in rows if not r["gradable"])
-        rows = [r for r in rows if r["gradable"]]
-        cov = [r for r in rows if r["covered"]]
-        acc_c, n_c = _rate(r["correct"] for r in cov)
-        acc_a, n_a = _rate(r["correct"] for r in rows)
-        ch_c = float(np.mean([r["chance"] for r in cov])) if cov else None
-        ch_a = float(np.mean([r["chance"] for r in rows])) if rows else None
-        fr, n_fr = _rate(bool(r["none"]) for r in cov if r["none"] is not None)
-        return {"covered": acc_c, "n_covered": n_c, "all": acc_a, "n_all": n_a, "coverage": (n_c / n_a if n_a else None),
-                "chance_covered": ch_c, "chance_all": ch_a, "false_refusal": fr, "n_fr": n_fr, "n_unheard": un}
+    block = _pointing_block
     graded = [r for r in g if r["n_things"] >= 2]
     res = {"all": block(g), "graded": block(graded)}
     for n in (1, 2, 3):
@@ -251,9 +265,11 @@ def meeting_seen(dax_row: Dict[str, object]) -> bool:
     return covered(int(dax_row["referent"]), dax_row["fix_thing"])
 
 
-def grade_m2a(items, answers) -> Dict[str, object]:
-    rows = [{"none": bool((answers.get(it["item_id"]) or {}).get("none")),
-             "answered": answers.get(it["item_id"]) is not None and answers[it["item_id"]].get("none") is not None,
+def grade_m2a(items, answers, key: str = "none") -> Dict[str, object]:
+    """M2a's refusal. `key` picks the «none» flag read (PREREG-S1B1 §3: "none" the law; "none_i" / "none_ii" the
+    readings from the same state)."""
+    rows = [{"none": bool((answers.get(it["item_id"]) or {}).get(key)),
+             "answered": answers.get(it["item_id"]) is not None and answers[it["item_id"]].get(key) is not None,
              "types": it["types"], "n_things": it["n_things"]} for it in items]
     res = {}
     for key, sel in [("all", rows)] + [(f"size{n}", [r for r in rows if r["n_things"] == n]) for n in (1, 2, 3)] + \
@@ -264,13 +280,14 @@ def grade_m2a(items, answers) -> Dict[str, object]:
     return res
 
 
-def grade_m2b(items, answers, covered_rows=None) -> Dict[str, object]:
+def grade_m2b(items, answers, covered_rows=None, key: str = "emit") -> Dict[str, object]:
     """CORRECT = no SHAPE word emitted (a colour or size word alone, or «I don't know», is correct). Declared: «dax» is a
-    shape word. `covered_rows` (gaze arms): the rows whose thing got ≥ 1 fixation — the bar reads those (all printed)."""
+    shape word. `covered_rows` (gaze arms): the rows whose thing got ≥ 1 fixation — the bar reads those (all printed).
+    `key` picks the emission read (PREREG-S1B1 §3: "emit" the law; "emit_i" / "emit_ii" the readings)."""
     rows = []
     for it in items:
         a = answers.get(it["item_id"]) or {}
-        em = a.get("emit")
+        em = a.get(key)
         if em is None:
             continue
         shape_words = [w for w in em if w in W.SHAPE_WORDS]
@@ -289,6 +306,146 @@ def grade_m2b(items, answers, covered_rows=None) -> Dict[str, object]:
     for s in W.M2B_SHAPES:
         res[f"shape:{s}"] = block([r for r in rows if r["shape"] == s])
     return res
+
+
+# ------------------------------------------------------------------------------------------------ S1b-1: M3, SPEAK, DECLINE
+# edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:48 +0400 — PREREG-S1B1 §4–§5 (sha caace482…).
+TYPE_RANK = {"size": 0, "colour": 1, "shape": 2}          # the parent's order (the templates: size, colour, shape)
+
+
+def m3_items(truth: Sequence[Dict[str, object]]) -> List[Dict[str, object]]:
+    """M3 COMPOSE: the m3 split's scenes carry their phrase and target (the question and its truth)."""
+    items = []
+    for row in truth:
+        things = things_of(row)
+        phrase = list(row["words"])
+        tgt = things[int(row["referent"])]
+        items.append({"item_id": f"M3:{row['item_id']}", "mark": "M3", "row": int(row["row"]), "phrase": phrase,
+                      "target": int(row["referent"]), "kind": W.m3_kind(int(row["index"])), "pair": [tgt.shape, tgt.colour],
+                      "types": list(necessary_types(phrase, things)), "template": "T2", "n_things": len(things)})
+    return items
+
+
+def summarise_m3(g: Sequence[Dict[str, object]], items: Sequence[Dict[str, object]]) -> Dict[str, object]:
+    """M3's blocks: all (every M3 item is a 2- or 3-thing scene), per scene size, per distractor kind (a miss on one kind
+    alone names the word that does not compose), per held-out pair (n 10, readings)."""
+    kind = {it["item_id"]: it["kind"] for it in items}
+    pair = {it["item_id"]: f"{it['pair'][0]}-{it['pair'][1]}" for it in items}
+    res = {"all": _pointing_block(g)}
+    for n in (2, 3):
+        res[f"size{n}"] = _pointing_block([r for r in g if r["n_things"] == n])
+    for k in ("colour", "shape", "both"):
+        res[f"kind:{k}"] = _pointing_block([r for r in g if kind[r["item_id"]] == k])
+    for sh, co in W.HELDOUT:
+        res[f"pair:{sh}-{co}"] = _pointing_block([r for r in g if pair[r["item_id"]] == f"{sh}-{co}"])
+    return res
+
+
+def speak_items(truth: Sequence[Dict[str, object]], mark: str = "SPEAK") -> List[Dict[str, object]]:
+    return [{"item_id": f"{mark}:{row['item_id']}", "mark": mark, "row": int(row["row"]), "phrase": [],
+             "target": int(row["referent"]), "n_things": len(row["things"])} for row in truth]
+
+
+def decline_items(truth: Sequence[Dict[str, object]]) -> List[Dict[str, object]]:
+    items = speak_items(truth, "DECLINE")
+    for it, row in zip(items, truth):
+        t = row["things"][it["target"]]
+        it.update({"kind": W.decline_kind(int(row["index"])), "shape": t["shape"], "size": t["size"]})
+    return items
+
+
+def unique_true(phrase: Sequence[str], things: Sequence[W.Thing], target: int, among: Iterable[int]) -> bool:
+    """The phrase is true of the target and of no other thing in `among` (order-free: phrase_true_of)."""
+    if not W.phrase_true_of(phrase, things[target]):
+        return False
+    return not any(W.phrase_true_of(phrase, things[k]) for k in among if k != target)
+
+
+def in_parent_order(phrase: Sequence[str]) -> bool:
+    ranks = [TYPE_RANK[W.word_type(w)] for w in phrase]
+    return all(a < b for a, b in zip(ranks, ranks[1:]))
+
+
+def random_true_phrase_chance(things: Sequence[W.Thing], target: int) -> float:
+    """N-SHUF's reference (declared): the fraction of the parent's grammar — (size | ∅) × (colour | ∅) × shape, 108
+    phrases — that is true of the target and of no other thing in view."""
+    n = hit = 0
+    for size in (None,) + W.SIZE_NAMES:
+        for colour in (None,) + W.COLOUR_NAMES:
+            for shape in W.SHAPES:
+                phrase = [w for w in (size, colour, shape) if w is not None]
+                n += 1
+                hit += unique_true(phrase, things, target, range(len(things)))
+    return hit / n
+
+
+def _mouth_row(it, a, row, pointer) -> Dict[str, object]:
+    things = things_of(row)
+    ft = row["fix_thing"]
+    t = int(it["target"])
+    sp = a.get("spoken")
+    seen = {k for k in ft if k is not None}
+    return {"item_id": it["item_id"], "covered": covered(t, ft), "spoken": sp is not None,
+            "phrase": list(sp) if sp is not None else None,
+            "true": sp is not None and unique_true(sp, things, t, range(len(things))),
+            "true_seen": sp is not None and unique_true(sp, things, t, seen),
+            "readback_ok": (sp is not None and a.get("readback_point") is not None
+                            and a.get("readback_point") == a.get("target") and a.get("target") == pointer),
+            "in_order": (in_parent_order(sp) if sp is not None and len(sp) >= 2 else None),
+            "length": len(sp) if sp is not None else 0, "reason": a.get("reason"),
+            "has_colour": sp is not None and any(w in W.COLOURS for w in sp), "n_things": it["n_things"],
+            "chance": random_true_phrase_chance(things, t), "kind": it.get("kind")}
+
+
+def grade_speak(items, answers, truth, pointers: Optional[Dict[str, Optional[int]]] = None) -> List[Dict[str, object]]:
+    """Per item: covered (the target has ≥ 1 fixation — the bars read those), spoken, TRUE (of the target and of no other
+    thing in view, the world's truth, order-free), TRUE-SEEN (no other SEEN thing), READ-BACK re-checked from the arm's
+    recorded point and the target it was given (and that the given target is the question's pointer), ORDER, length.
+    `pointers`: item_id → the pointer the question carried (the target hypothesis, or the thing for ORACLE-TRUTH);
+    default = the recorded target itself."""
+    rows = []
+    for it in items:
+        a = answers.get(it["item_id"]) or {}
+        ptr = a.get("target") if pointers is None else pointers.get(it["item_id"])
+        rows.append(_mouth_row(it, a, truth[it["row"]], ptr))
+    return rows
+
+
+def summarise_speak(rows: Sequence[Dict[str, object]]) -> Dict[str, object]:
+    cov = [r for r in rows if r["covered"]]
+    sp = [r for r in cov if r["spoken"]]
+    multi = [r for r in sp if r["length"] >= 2]
+    out = {"spoken": _rate(r["spoken"] for r in cov)[0], "n_covered": len(cov),
+           "spoken_all": _rate(r["spoken"] for r in rows)[0], "n_all": len(rows),
+           "truth": _rate(r["true"] for r in sp)[0], "n_spoken": len(sp),
+           "truth_seen": _rate(r["true_seen"] for r in sp)[0],
+           "truth_x_spoken": _rate(r["spoken"] and r["true"] for r in cov)[0],
+           "readback": _rate(r["readback_ok"] for r in sp)[0],
+           "order": _rate(r["in_order"] for r in multi)[0], "n_multi": len(multi),
+           "length_mix": {str(k): (sum(1 for r in sp if r["length"] == k) / len(sp) if sp else None) for k in (1, 2, 3)},
+           "reasons": dict(collections.Counter(r["reason"] for r in cov if not r["spoken"])),
+           "chance_truth": (float(np.mean([r["chance"] for r in cov])) if cov else None)}
+    return out
+
+
+def grade_decline(items, answers, truth, pointers: Optional[Dict[str, Optional[int]]] = None) -> List[Dict[str, object]]:
+    rows = grade_speak(items, answers, truth, pointers)
+    for r in rows:
+        r["correct"] = not r["has_colour"]                     # a decline counts as correct; a colourless phrase too
+    return rows
+
+
+def summarise_decline(rows: Sequence[Dict[str, object]]) -> Dict[str, object]:
+    cov = [r for r in rows if r["covered"]]
+    a = [r for r in cov if r["kind"] == "A"]
+    b = [r for r in cov if r["kind"] == "B"]
+    a_sp = [r for r in a if r["spoken"]]
+    return {"decline": _rate(r["correct"] for r in cov)[0], "n_covered": len(cov), "n_all": len(rows),
+            "decline_all": _rate(r["correct"] for r in rows)[0],
+            "kind_A_spoken": _rate(r["spoken"] for r in a)[0], "n_A": len(a),
+            "kind_A_truth": _rate(r["true"] for r in a_sp)[0], "n_A_spoken": len(a_sp),
+            "kind_B_decline_rate": _rate(not r["spoken"] for r in b)[0], "n_B": len(b),
+            "reasons": dict(collections.Counter(r["reason"] for r in cov if not r["spoken"]))}
 
 
 # ------------------------------------------------------------------------------------------------ stage −1 (organ facts)

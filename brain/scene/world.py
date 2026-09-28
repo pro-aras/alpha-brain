@@ -56,6 +56,11 @@ READING_POINTS: Tuple[int, ...] = (250, 500, 1_000, 2_000, 5_000, 10_000)
 GATE_N, STAGE_N = 300, 300
 TOY_TRAIN_N, TOY_TEST_N = 1_000, 200
 M6_TWO, M6_THREE = 28, 14                          # 42 scenes, «2 or 3 things in a 2:1 mix»
+# PREREG-S1B1 §4–§5 (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:42 +0400): the three new test splits
+M3_TWO, M3_THREE = 40, 20                          # M3 COMPOSE: 60 (10 per held-out pair)
+SPEAK_TWO, SPEAK_THREE = 64, 32                    # SPEAK: 96
+DECLINE_TWO, DECLINE_THREE = 32, 16                # DECLINE: 48 (kind A 32 · kind B 16)
+_TWIN_REDRAWS = 1000
 TEMPLATES: Tuple[str, ...] = ("T1", "T2", "T3", "T4")
 WORD_TYPES: Tuple[str, ...] = ("colour", "shape", "size")
 
@@ -274,6 +279,114 @@ def m6_scene(test_seed: int, index: int) -> Scene:
     return Scene("m6", index, test_seed, _place(attrs, rng), (DAX_WORD,), pos, None)
 
 
+# ------------------------------------------------------------------------------------------------ S1b-1's new splits
+# edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:42 +0400 — PREREG-S1B1 §1 «New, per test seed»: M3 / SPEAK / DECLINE scenes from
+# named substreams of the TEST seed, placed by _place (≥ 24 px), drawn by render_scene, the parent silent. S1a's split
+# functions above are untouched (their specs and canvases are the S1a caches', TESTED at the gate). A thing whose triple
+# (shape, colour, size) equals another's is a TWIN and the scene's attributes are redrawn from the SAME generator. The
+# item kinds are functions of the index (m3_kind, decline_kind) — no Scene field is added, so S1a's truth rows stay equal.
+def _has_twin(attrs: Sequence[Tuple[str, str, str]]) -> bool:
+    return len(set(attrs)) < len(attrs)
+
+
+def m3_kind(index: int) -> str:
+    """The distractor kind of M3 item `index`: 2-thing i even «colour» (a distractor shares the target's colour — the
+    SHAPE word is necessary), 2-thing i odd «shape» (shares the shape — the COLOUR word is necessary), 3-thing «both»."""
+    if index < M3_TWO:
+        return "colour" if index % 2 == 0 else "shape"
+    return "both"
+
+
+def decline_kind(index: int) -> str:
+    """DECLINE item `index`: kind B = 2-thing i even (the distractor shares the target's shape and size — the colour is
+    the only difference, the right act is to decline); kind A = 2-thing i odd and every 3-thing item (other shapes)."""
+    return "B" if (index < DECLINE_TWO and index % 2 == 0) else "A"
+
+
+def m3_scene(test_seed: int, index: int) -> Scene:
+    """M3 COMPOSE (§4): the target's pair = HELDOUT[index mod 6] (never in training), its size uniform; distractors are
+    trained (ALLOWED) things, sizes uniform — a colour-sharer's shape uniform among the shapes allowed with the target's
+    colour, a shape-sharer's colour uniform among the colours allowed with its shape (neither can be the target's pair,
+    which is held out). Declared draw order: the target's size, the distractors ([colour-sharer, shape-sharer] for
+    3-thing), the target's index among the things, the placement. The phrase «⟨colour⟩ ⟨shape⟩» and the target ride on
+    the scene as its words and referent (the question and its truth, as the M6 split carries them)."""
+    if not 0 <= index < M3_TWO + M3_THREE:
+        raise WorldError(f"m3 index {index} out of range")
+    rng = substream(test_seed, f"scene:m3:{index}")
+    shape, colour = HELDOUT[index % len(HELDOUT)]
+    target = (shape, colour, SIZE_NAMES[int(rng.integers(len(SIZE_NAMES)))])
+
+    def colour_sharer() -> Tuple[str, str, str]:
+        shapes = [sh for sh in SHAPES if (sh, colour) in ALLOWED]
+        return (shapes[int(rng.integers(len(shapes)))], colour, SIZE_NAMES[int(rng.integers(len(SIZE_NAMES)))])
+
+    def shape_sharer() -> Tuple[str, str, str]:
+        colours = [c for c in COLOUR_NAMES if (shape, c) in ALLOWED]
+        return (shape, colours[int(rng.integers(len(colours)))], SIZE_NAMES[int(rng.integers(len(SIZE_NAMES)))])
+
+    kind = m3_kind(index)
+    others = [colour_sharer()] if kind == "colour" else [shape_sharer()] if kind == "shape" else [colour_sharer(), shape_sharer()]
+    n = len(others) + 1
+    pos = int(rng.integers(n))
+    attrs = others[:pos] + [target] + others[pos:]
+    if _has_twin(attrs):
+        raise WorldError("an M3 scene with a twin — impossible, the target's pair is held out")
+    return Scene("m3", index, test_seed, _place(attrs, rng), (colour, shape), pos, "T2")
+
+
+def speak_scene(test_seed: int, index: int) -> Scene:
+    """SPEAK (§5): 2 things (i < 64) or 3, trained things only, twins redrawn from the same generator; the target a thing
+    drawn uniformly (the scene's referent); the learner hears nothing. Declared draw order: attributes (redrawn while a
+    twin), the placement, the target."""
+    if not 0 <= index < SPEAK_TWO + SPEAK_THREE:
+        raise WorldError(f"speak index {index} out of range")
+    rng = substream(test_seed, f"scene:speak:{index}")
+    n = 2 if index < SPEAK_TWO else 3
+    for _ in range(_TWIN_REDRAWS):
+        attrs = [_trained_attrs(rng) for _ in range(n)]
+        if not _has_twin(attrs):
+            break
+    else:
+        raise WorldError("no twin-free SPEAK scene drawn")
+    things = _place(attrs, rng)
+    return Scene("speak", index, test_seed, things, (), int(rng.integers(n)), None)
+
+
+def decline_scene(test_seed: int, index: int) -> Scene:
+    """DECLINE (§5): the target is PURPLE (never in training) with a trained shape and a uniform size; kind B (2-thing,
+    i even): the distractor shares the target's shape and size, its colour uniform among the colours allowed with that
+    shape; kind A: trained distractors of OTHER shapes (a trained draw rejected while its shape is the target's). Twins
+    redrawn from the same generator. Declared draw order: the target's shape and size, the distractors, the target's
+    index, the placement."""
+    if not 0 <= index < DECLINE_TWO + DECLINE_THREE:
+        raise WorldError(f"decline index {index} out of range")
+    rng = substream(test_seed, f"scene:decline:{index}")
+    n = 2 if index < DECLINE_TWO else 3
+    kind = decline_kind(index)
+    for _ in range(_TWIN_REDRAWS):
+        shape = SHAPES[int(rng.integers(len(SHAPES)))]
+        size = SIZE_NAMES[int(rng.integers(len(SIZE_NAMES)))]
+        target = (shape, PURPLE[0], size)
+        if kind == "B":
+            colours = [c for c in COLOUR_NAMES if (shape, c) in ALLOWED]
+            others = [(shape, colours[int(rng.integers(len(colours)))], size)]
+        else:
+            others = []
+            for _k in range(n - 1):
+                for _r in range(_TWIN_REDRAWS):
+                    a = _trained_attrs(rng)
+                    if a[0] != shape:
+                        break
+                others.append(a)
+        if not _has_twin(others + [target]):
+            break
+    else:
+        raise WorldError("no twin-free DECLINE scene drawn")
+    pos = int(rng.integers(n))
+    attrs = others[:pos] + [target] + others[pos:]
+    return Scene("decline", index, test_seed, _place(attrs, rng), (), pos, None)
+
+
 def toy_train_scene(index: int) -> Scene:
     """The toy (THE FIRST GATE 1): 1,000 ONE-thing scenes of seed 20261099, the parent speaking (no ambiguity)."""
     rng = substream(TOY_SEED, f"scene:toy-train:{index}")
@@ -299,7 +412,8 @@ def stage_scene(index: int) -> Scene:
 
 def split_size(split: str) -> int:
     sizes = {"train": N_TRAIN, "test": N_TEST, "m2b": (len(M2B_SHAPES) + 1) * M2B_PER_SHAPE, "m6": M6_TWO + M6_THREE,
-             "toy-train": TOY_TRAIN_N, "toy-test": TOY_TEST_N, "stage": STAGE_N}
+             "toy-train": TOY_TRAIN_N, "toy-test": TOY_TEST_N, "stage": STAGE_N,
+             "m3": M3_TWO + M3_THREE, "speak": SPEAK_TWO + SPEAK_THREE, "decline": DECLINE_TWO + DECLINE_THREE}
     if split not in sizes:
         raise WorldError(f"no such split: {split!r}")
     return sizes[split]
@@ -311,7 +425,9 @@ def scenes_for(split: str, seed: int, limit: Optional[int] = None) -> List[Scene
     n = split_size(split) if limit is None else min(int(limit), split_size(split))
     make = {"train": lambda i: train_scene(seed, i), "test": lambda i: test_scene(seed, i),
             "m2b": lambda i: m2b_scene(seed, i), "m6": lambda i: m6_scene(seed, i),
-            "toy-train": toy_train_scene, "toy-test": toy_test_scene, "stage": stage_scene}[split]
+            "toy-train": toy_train_scene, "toy-test": toy_test_scene, "stage": stage_scene,
+            "m3": lambda i: m3_scene(seed, i), "speak": lambda i: speak_scene(seed, i),
+            "decline": lambda i: decline_scene(seed, i)}[split]
     return [make(i) for i in range(n)]
 
 

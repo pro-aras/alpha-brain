@@ -42,6 +42,12 @@ CONFORMAL = 0.90              # τ_point, τ_word, P-ORACLE's bands: the conform
 P_FROM_MEETING = 3            # fewer than 3 meetings → answers by prototype and band; from the 3rd on, by p_w
 EPS_GRID = (1e-4, 1e-3, 1e-2, 3e-2, 1e-1, 3e-1)   # R49's ε grid (probe_shrink), chosen on the toy seed only
 RW_DIM = 146
+# PREREG-S1B1 (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:45 +0400): the law's constants — the classes keep S1a's defaults
+# (so S1a's pins still read S1a's law); run.py passes these explicitly
+LR_S1B1 = 0.01                # A-RW's law (A-RW-LR10 keeps 0.1 as a reading arm)
+SIGMA_FLOOR = 1e-3            # σ_w floored per dimension
+NONE_LEVEL = 0.95             # the phrase-level «none» (learner τ_none, oracle τ_point)
+NONE_MIN_VIEW = 2             # calibrated on training scenes with ≥ 2 hypotheses (≥ 2 things for ORACLE-TRUTH)
 
 
 # ------------------------------------------------------------------------------------------------ small pieces
@@ -132,6 +138,55 @@ class RunningStandardiser:
         return np.clip((np.atleast_2d(X) - self.mean) / self.sd(), -CLIP, CLIP)
 
 
+# ================================================================================================ the EAR (PREREG-S1B1 §5)
+class Ear:
+    """What every arm learns from what it HEARS (PREREG-S1B1 §5), the same code for every arm: the ORDER KEY (per word, the
+    running mean of its relative position i / (L − 1) over the heard utterances of length L ≥ 2 that carry it; a word
+    never heard in such an utterance → 0.5), the order words were FIRST heard (the key's tie-break), and the EXCLUSION
+    counts c(w, w′) = the heard utterances carrying both words (order-free)."""
+
+    def __init__(self) -> None:
+        self.first: Dict[str, int] = {}
+        self.pos_sum: Dict[str, float] = {}
+        self.pos_n: Dict[str, int] = {}
+        self.co: Dict[Tuple[str, str], int] = {}
+
+    def hear(self, words: Sequence[str]) -> None:
+        ws = list(words)
+        for w in ws:
+            if w not in self.first:
+                self.first[w] = len(self.first)
+        L = len(ws)
+        if L >= 2:
+            for i, w in enumerate(ws):
+                self.pos_sum[w] = self.pos_sum.get(w, 0.0) + i / (L - 1)
+                self.pos_n[w] = self.pos_n.get(w, 0) + 1
+        u = sorted(set(ws))
+        for a in range(len(u)):
+            for b in range(a + 1, len(u)):
+                self.co[(u[a], u[b])] = self.co.get((u[a], u[b]), 0) + 1
+
+    def key(self, w: str) -> float:
+        n = self.pos_n.get(w, 0)
+        return self.pos_sum[w] / n if n else 0.5
+
+    def order(self, words: Sequence[str]) -> List[str]:
+        """Ascending order key; ties by the order the words were first heard (never-heard words last, by name)."""
+        return sorted(words, key=lambda w: (self.key(w), self.first.get(w, len(self.first) + 10 ** 6), w))
+
+    def count(self, a: str, b: str) -> int:
+        return self.co.get((a, b) if a < b else (b, a), 0)
+
+    def excluded(self, words: Sequence[str]) -> bool:
+        """The learned EXCLUSION: a set holding any pair never heard together (c = 0) is not said."""
+        u = list(words)
+        return any(self.count(u[i], u[j]) == 0 for i in range(len(u)) for j in range(i + 1, len(u)))
+
+    def summary(self) -> Dict[str, object]:
+        return {"keys": {w: self.key(w) for w in sorted(self.first, key=self.first.get)},
+                "first": dict(self.first), "pairs_heard": len(self.co)}
+
+
 # ================================================================================================ A-RW (and P-ORACLE-RW)
 class RWLearner:
     def __init__(self, lr: float = LR, oracle: bool = False, dim: int = RW_DIM):
@@ -154,6 +209,10 @@ class RWLearner:
         self.tau_point: Optional[float] = None
         self.tau_word: Dict[str, Optional[float]] = {}
         self.calib_n: Dict[str, int] = {}
+        self.ear = Ear()                                  # PREREG-S1B1 §5: the order key and the exclusion
+        self.refusal: Dict[str, Dict[str, Dict[str, object]]] = {"diag": {}, "euclid": {}}
+        self.tau_none: Dict[str, Optional[float]] = {"diag": None, "euclid": None}
+        self.none_level, self.none_min_view = NONE_LEVEL, NONE_MIN_VIEW
 
     # -- words ---------------------------------------------------------------------------------
     def _add_word(self, w: str) -> int:
@@ -206,6 +265,7 @@ class RWLearner:
         of the thing hypothesis the caller marks; None in A-RW / N-SHUF (never read there)."""
         raw = np.atleast_2d(np.asarray(raw, dtype=np.float64))
         self.scenes += 1
+        self.ear.hear(words)                             # hearing is independent of seeing (PREREG-S1B1 §5)
         if raw.shape[0] == 0:
             return
         self.stats.observe(raw)
@@ -293,12 +353,76 @@ class RWLearner:
             logp = self.logp_answer(Z)
         return logp[:, [self.index[w] for w in phrase]].sum(axis=1)
 
+    # -- refusal by DISTANCE (PREREG-S1B1 §3) -------------------------------------------------------
+    def _refusal_states(self, mode: str) -> Dict[str, Dict[str, object]]:
+        """Per word, from the learner's OWN store (store_z, store_r — the standardised inputs and responsibilities as they
+        were stored at each meeting; declared, RAISED: the store is not re-standardised): μ_w = S1a's prototype; σ_w =
+        the responsibility-weighted SD per dimension about μ_w, floored at 1e-3 ("diag") or ≡ 1 ("euclid", reading
+        (ii)); d_w(z) = ‖(z − μ_w) / σ_w‖; B_w = the responsibility-weighted 0.90 quantile of d_w over w's own things
+        (S1a's BAND_Q and weighted_quantile). A word with fewer than 3 meetings keeps S1a's answer whole: Euclidean
+        distance to its prototype, S1a's episodic / 0.90 band. A word with no prototype holds nothing."""
+        out: Dict[str, Dict[str, object]] = {}
+        for j, w in enumerate(self.words):
+            if self.proto_w[j] <= 0:
+                out[w] = {"mu": None, "sigma": None, "band": None, "young": True, "floor_count": None}
+                continue
+            mu = self.prototype(j)
+            if self.meetings[j] < P_FROM_MEETING or not self.store_z[j]:
+                out[w] = {"mu": mu, "sigma": np.ones(self.dim), "band": self.band(j), "young": True, "floor_count": None}
+                continue
+            Z = np.concatenate(self.store_z[j], axis=0)
+            R = np.concatenate(self.store_r[j], axis=0)
+            tot = float(R.sum())
+            sd = np.sqrt((R[:, None] * (Z - mu[None, :]) ** 2).sum(axis=0) / tot) if tot > 0 else np.zeros(self.dim)
+            sigma = np.maximum(sd, SIGMA_FLOOR) if mode == "diag" else np.ones(self.dim)
+            d = np.linalg.norm((Z - mu[None, :]) / sigma[None, :], axis=1)
+            q = weighted_quantile(d, R, BAND_Q)
+            out[w] = {"mu": mu, "sigma": sigma, "band": float("inf") if q is None else q, "young": False,
+                      "floor_count": int((sd < SIGMA_FLOOR).sum())}
+        return out
+
+    def distances(self, Z: np.ndarray, mode: str = "diag") -> np.ndarray:
+        """(H, W) d_w(z) under the refusal state of `mode` (inf for a word with no prototype)."""
+        Z = np.atleast_2d(Z)
+        D = np.full((Z.shape[0], len(self.words)), np.inf)
+        st = self.refusal.get(mode, {})
+        for j, w in enumerate(self.words):
+            r = st.get(w)
+            if r is None or r["mu"] is None:
+                continue
+            D[:, j] = np.linalg.norm((Z - r["mu"][None, :]) / r["sigma"][None, :], axis=1)
+        return D
+
+    def held(self, Z: np.ndarray, mode: str = "diag") -> List[str]:
+        """HELD(z): every word whose band holds the thing — emitted WHOLE, no pruning (PREREG-S1B1 §3)."""
+        D = self.distances(np.atleast_2d(Z)[:1], mode)[0]
+        st = self.refusal.get(mode, {})
+        return [w for j, w in enumerate(self.words)
+                if st.get(w) is not None and st[w]["band"] is not None and D[j] <= st[w]["band"]]
+
+    def phrase_fit(self, Z: np.ndarray, phrase: Sequence[str], mode: str = "diag") -> np.ndarray:
+        """f(t) = max over the phrase's words of d_w(z_t) / B_w (inf when a word holds nothing)."""
+        D = self.distances(Z, mode)
+        st = self.refusal.get(mode, {})
+        cols = []
+        for w in phrase:
+            j = self.index[w]
+            r = st.get(w)
+            b = None if r is None else r["band"]
+            cols.append(np.full(D.shape[0], np.inf) if b is None else D[:, j] / max(float(b), 1e-12))
+        return np.max(np.stack(cols, axis=1), axis=1)
+
     def calibrate(self, scenes: Sequence[Tuple[np.ndarray, Sequence[str], Optional[int]]]) -> Dict[str, object]:
         """At a reading point (declared: under the CURRENT state, over every training scene seen so far):
         τ_point = the conformal 0.90 threshold of the best phrase score of the phrase said in each training scene;
         τ_word(w) = the conformal 0.90 threshold of p_w on the thing with the highest responsibility for w (the
         referent in P-ORACLE-RW) in each training scene where w was said. A threshold with too few scores (n < 9) is
-        None and answers conservatively (declared: «what is this?» then emits w only at p = 1)."""
+        None and answers conservatively (declared: «what is this?» then emits w only at p = 1). — S1a's rules, kept
+        whole as READING (i) (PREREG-S1B1 §3).
+        PREREG-S1B1 §3 (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:45 +0400): the refusal states («diag» the law, «euclid»
+        reading (ii)) from the store, and τ_none per mode = the conformal 0.95 UPPER threshold of f(t*) = min_t f(t) for
+        the phrase said in each training scene that showed ≥ 2 hypotheses (the learner's own count), under the current
+        state (the raw inputs re-standardised, as S1a's calibrate)."""
         bands = self.bands()
         pts: List[float] = []
         per_word: Dict[str, List[float]] = {w: [] for w in self.words}
@@ -326,24 +450,48 @@ class RWLearner:
                 per_word[w].append(float(np.exp(lp[h, j])))
         self.tau_point = conformal_lower(pts)
         self.tau_word = {w: conformal_lower(v) for w, v in per_word.items()}
-        self.calib_n = {"point": len(pts), **{f"word:{w}": len(v) for w, v in per_word.items()}}
         self._bands_cache = bands
-        return {"tau_point": self.tau_point, "tau_word": dict(self.tau_word), "n": dict(self.calib_n)}
+        # the refusal by distance (the law and reading (ii)) and its phrase-level «none»
+        self.refusal = {m: self._refusal_states(m) for m in ("diag", "euclid")}
+        fits: Dict[str, List[float]] = {"diag": [], "euclid": []}
+        for raw, words, _ref in scenes:
+            raw = np.atleast_2d(raw)
+            if raw.shape[0] < self.none_min_view or not words or any(w not in self.index for w in words):
+                continue
+            Z = self.stats.standardise(raw)
+            for m in fits:
+                fits[m].append(float(np.min(self.phrase_fit(Z, list(dict.fromkeys(words)), m))))
+        self.tau_none = {m: conformal_upper(v, self.none_level) for m, v in fits.items()}
+        self.calib_n = {"point": len(pts), "none": len(fits["diag"]),
+                        **{f"word:{w}": len(v) for w, v in per_word.items()}}
+        floor = {w: st["floor_count"] for w, st in self.refusal["diag"].items()}
+        return {"tau_point": self.tau_point, "tau_word": dict(self.tau_word), "tau_none": dict(self.tau_none),
+                "bands": {m: {w: st["band"] for w, st in self.refusal[m].items()} for m in self.refusal},
+                "sigma_floor_count": floor, "n": dict(self.calib_n)}
 
     def answer_point(self, raw: np.ndarray, phrase: Sequence[str], rng: np.random.Generator) -> Dict[str, object]:
-        """M1 / M2a / M6: the forced pointing (argmax, ties by the item's generator) and the «none» flag
-        (best < τ_point)."""
+        """M1 / M2a / M3 / M6 / the read-back: the forced pointing (argmax of Σ log p_w(t), ties by the item's generator
+        — S1a's rule, unchanged: refusing is a separate job from pointing) with the score vector, and three «none»
+        flags from the same state: the LAW (PREREG-S1B1 §3: f(t*) > τ_none, the diagonal distance), reading (i)
+        S1a's (best < τ_point) and reading (ii) (the Euclidean fit)."""
         Z = self.stats.standardise(np.atleast_2d(raw))
         s = self.phrase_scores(Z, phrase, self.logp_answer(Z, getattr(self, "_bands_cache", None)))
         if s is None:
             return {"point": None, "none": None, "best": None, "unheard": [w for w in phrase if w not in self.index]}
         k = pick(s, rng, "max")
         best = float(s[k])
-        none = bool(self.tau_point is not None and best < self.tau_point)
-        return {"point": k, "none": none, "best": best}
+        words = list(dict.fromkeys(phrase))
+        flags = {}
+        for m, key in (("diag", "none"), ("euclid", "none_ii")):
+            tau = self.tau_none.get(m)
+            f = self.phrase_fit(Z, words, m)
+            flags[key] = bool(tau is not None and float(np.min(f)) > tau)
+            flags[key + "_fit"] = float(np.min(f))
+        return {"point": k, "best": best, "scores": [float(v) for v in s],
+                "none_i": bool(self.tau_point is not None and best < self.tau_point), **flags}
 
-    def what_is_this(self, raw_thing: np.ndarray) -> List[str]:
-        """M2b: every word w with p_w(t) ≥ τ_word(w) (τ None → 1.0, declared); [] means «I don't know»."""
+    def what_is_this_s1a(self, raw_thing: np.ndarray) -> List[str]:
+        """READING (i): S1a's «what is this?» — every word w with p_w(t) ≥ τ_word(w) (τ None → 1.0)."""
         Z = self.stats.standardise(np.atleast_2d(raw_thing))
         lp = self.logp_answer(Z, getattr(self, "_bands_cache", None))[0]
         out = []
@@ -353,6 +501,18 @@ class RWLearner:
             if float(np.exp(lp[j])) >= tau:
                 out.append(w)
         return out
+
+    def what_is_this(self, raw_thing: np.ndarray) -> List[str]:
+        """THE LAW (PREREG-S1B1 §3): HELD(z) under the per-word diagonal distance, whole; [] means «I don't know»."""
+        return self.held(self.stats.standardise(np.atleast_2d(raw_thing)), "diag")
+
+    def what_is_this_readings(self, raw_thing: np.ndarray) -> Dict[str, List[str]]:
+        Z = self.stats.standardise(np.atleast_2d(raw_thing))
+        return {"law": self.held(Z, "diag"), "i": self.what_is_this_s1a(raw_thing), "ii": self.held(Z, "euclid")}
+
+    def held_words(self, raw_thing: np.ndarray) -> List[str]:
+        """The mouth's HELD (§5 step 1): the law's held words for the target."""
+        return self.what_is_this(raw_thing)
 
     def name_forced(self, raw_thing: np.ndarray, type_words: Sequence[str]) -> Optional[str]:
         """A READING (never a bar): the forced argmax of p_w(t) over the words of one type the grader names."""
@@ -367,7 +527,8 @@ class RWLearner:
         return {"words": list(self.words), "meetings": [int(m) for m in self.meetings], "scenes": self.scenes,
                 "skipped_said": self.skipped_said, "lr": self.lr, "oracle": self.oracle,
                 "stats_n": self.stats.n, "tau_point": self.tau_point,
-                "tau_word": {w: t for w, t in self.tau_word.items()}, "calib_n": dict(self.calib_n)}
+                "tau_word": {w: t for w, t in self.tau_word.items()}, "calib_n": dict(self.calib_n),
+                "tau_none": dict(self.tau_none), "ear": self.ear.summary()}
 
 
 # ================================================================================================ the LDA oracle reader
@@ -501,12 +662,19 @@ class TypedLDAReader:
       · per-type naming (the instrument verdict) = the FORCED argmax of the type's posterior over the grader's words
         (= argmin d within the type; no band)."""
 
-    def __init__(self, eps: float, word_types: Dict[str, str]):
+    def __init__(self, eps: float, word_types: Dict[str, str], point_level: float = CONFORMAL,
+                 point_min_view: Optional[int] = None):
+        """point_level / point_min_view: τ_point's conformal level and population — S1a's defaults (0.90, every training
+        referent); PREREG-S1B1 §3 passes 0.95 and ≥ 2 hypotheses (≥ 2 things for ORACLE-TRUTH)."""
         self.eps = float(eps)
         self.word_types = dict(word_types)
+        self.point_level = float(point_level)
+        self.point_min_view = point_min_view
         self.readers: Dict[str, StreamingLDA] = {}
         self.train_x: List[np.ndarray] = []
         self.train_words: List[Tuple[str, ...]] = []
+        self.train_nview: List[Optional[int]] = []
+        self.ear = Ear()
         self.skipped = 0
         self.band: Dict[str, float] = {}                     # the DISTANCE band per word (what is this?)
         self.band_fallback: List[str] = []
@@ -527,11 +695,12 @@ class TypedLDAReader:
     def heard(self, w: str) -> bool:
         return w in self.word_types and w in self.names_of(self.type_of(w))
 
-    def train_scene(self, x_ref: Optional[np.ndarray], words: Sequence[str]) -> None:
+    def train_scene(self, x_ref: Optional[np.ndarray], words: Sequence[str], n_view: Optional[int] = None) -> None:
         ws = tuple(dict.fromkeys(words))
         if not ws:
             return
         types = [self.type_of(w) for w in ws]                # refuse before any observation
+        self.ear.hear(words)                                 # PREREG-S1B1 §5: the oracle hears every utterance, seen or not
         if x_ref is None:
             self.skipped += 1                                # the referent had no hypothesis — nothing seen
             return
@@ -543,6 +712,7 @@ class TypedLDAReader:
             r.observe(x, w)
         self.train_x.append(x)
         self.train_words.append(ws)
+        self.train_nview.append(n_view)
 
     def _log_post(self, t: str, X: np.ndarray) -> np.ndarray:
         """(H, K_t) log posterior over type t's classes, in the reader's class order."""
@@ -584,16 +754,18 @@ class TypedLDAReader:
                     t, k = col[w]
                     per[w].append(float(dd[t][i, k]))
                     sc += float(lp[t][i, k])
-                pts.append(sc)
+                nv = self.train_nview[i] if i < len(self.train_nview) else None
+                if self.point_min_view is None or nv is None or nv >= self.point_min_view:
+                    pts.append(sc)
         raw = {w: conformal_upper(v) for w, v in per.items()}
         good = [b for b in raw.values() if b is not None]
         fallback = float(np.median(good)) if good else float("inf")
         self.band = {w: (b if b is not None else fallback) for w, b in raw.items()}
         self.band_fallback = [w for w, b in raw.items() if b is None]
-        self.tau_point = conformal_lower(pts)
+        self.tau_point = conformal_lower(pts, self.point_level)
         self.calib_n = {"point": len(pts), **{f"word:{w}": len(v) for w, v in per.items()}}
         return {"band": dict(self.band), "band_fallback": list(self.band_fallback), "tau_point": self.tau_point,
-                "n": dict(self.calib_n)}
+                "point_level": self.point_level, "point_min_view": self.point_min_view, "n": dict(self.calib_n)}
 
     def answer_point(self, X: np.ndarray, phrase: Sequence[str], rng: np.random.Generator) -> Dict[str, object]:
         unheard = [w for w in phrase if not self.heard(w)]
@@ -604,7 +776,19 @@ class TypedLDAReader:
         k = pick(s, rng, "max")
         best = float(s[k])
         none = bool(self.tau_point is not None and best < self.tau_point)
-        return {"point": k, "none": none, "best": best}
+        return {"point": k, "none": none, "best": best, "scores": [float(v) for v in s]}
+
+    def held_words(self, x: np.ndarray) -> List[str]:
+        """The mouth's HELD (PREREG-S1B1 §5): the oracle's own «what is this?» — its per-type distance bands."""
+        return self.what_is_this(x)
+
+    def colour_fit(self, x: np.ndarray) -> Dict[str, float]:
+        """The organ fact of DECLINE (PREREG-S1B1 §5): d_w / B_w of a thing for every colour word, under the colour Λ."""
+        t = "colour"
+        if t not in self.readers:
+            return {}
+        d = self._dist(t, x)[0]
+        return {w: float(d[k]) / max(self.band.get(w, float("inf")), 1e-12) for k, w in enumerate(self.readers[t].names)}
 
     def what_is_this(self, x: np.ndarray) -> List[str]:
         out = []
@@ -630,7 +814,64 @@ class TypedLDAReader:
         return {"eps": self.eps, "types": {t: self.names_of(t) for t in sorted(self.readers)},
                 "counts": {t: list(self.readers[t].counts) for t in sorted(self.readers)},
                 "train_scenes": len(self.train_x), "skipped": self.skipped, "band": dict(self.band),
-                "band_fallback": list(self.band_fallback), "tau_point": self.tau_point, "calib_n": dict(self.calib_n)}
+                "band_fallback": list(self.band_fallback), "tau_point": self.tau_point, "calib_n": dict(self.calib_n),
+                "point_level": self.point_level, "point_min_view": self.point_min_view, "ear": self.ear.summary()}
+
+
+# ================================================================================================ the MOUTH (PREREG-S1B1 §5)
+def _subsets(words: Sequence[str]) -> List[List[str]]:
+    ws = list(words)
+    out = []
+    for mask in range(1, 1 << len(ws)):
+        out.append([ws[i] for i in range(len(ws)) if mask >> i & 1])
+    return out
+
+
+def produce(arm, X: np.ndarray, target: int, rng_factory) -> Dict[str, object]:
+    """The SAME production code for every arm (PREREG-S1B1 §5), parameterised by the arm's `held_words(x)`,
+    `answer_point(X, phrase, rng)` and `ear`; the builder types no phrase.
+      1. HELD = the words whose band holds the target, whole;
+      2. candidates = every non-empty subset of HELD not EXCLUDED by the ear (a pair never heard together), each in the
+         ear's ORDER;
+      3. the READ-BACK: each candidate through the arm's own pointing (a fresh item tie generator per candidate —
+         declared); ACCEPTED iff the scores' maximum is UNIQUE and on the target and «none» did not fire;
+      4. spoken = the shortest accepted; then the largest read-back margin (the target's score − the best other); then,
+         declared, the candidate's (order keys, first-heard) sequence;
+      5. none accepted → «I cannot say it yet», one reason (declared priority): «no held word» when HELD is empty; else
+         «none fired» when some candidate read back uniquely on the target but «none» fired; else «no unique read-back».
+    The read-back's point and the target given are both RECORDED, so the grader re-checks the wiring on every spoken
+    phrase (READ-BACK = 1.000 by construction; a reading below it is a broken road)."""
+    X = np.atleast_2d(X)
+    held = list(arm.held_words(X[int(target)]))
+    if not held:
+        return {"spoken": None, "reason": "no held word", "held": [], "n_candidates": 0, "n_accepted": 0,
+                "target": int(target)}
+    ear = arm.ear
+    cands = [ear.order(c) for c in _subsets(held) if not ear.excluded(c)]
+    accepted = []
+    fired = 0
+    for c in cands:
+        a = arm.answer_point(X, c, rng_factory())
+        if a.get("point") is None:
+            continue
+        sc = np.asarray(a["scores"], dtype=np.float64)
+        top = np.flatnonzero(sc == np.max(sc))
+        if not (top.size == 1 and int(top[0]) == int(target)):
+            continue
+        if a.get("none"):
+            fired += 1
+            continue
+        others = np.delete(sc, int(target))
+        margin = float(sc[int(target)] - np.max(others)) if others.size else float("inf")
+        rank = (len(c), -margin, tuple(ear.key(w) for w in c), tuple(ear.first.get(w, 10 ** 6) for w in c))
+        accepted.append((rank, c, int(a["point"]), margin))
+    if not accepted:
+        return {"spoken": None, "reason": "none fired" if fired else "no unique read-back", "held": held,
+                "n_candidates": len(cands), "n_accepted": 0, "target": int(target)}
+    accepted.sort(key=lambda t: t[0])
+    _rank, phrase, point, margin = accepted[0]
+    return {"spoken": list(phrase), "reason": None, "held": held, "readback_point": point, "target": int(target),
+            "margin": margin, "n_candidates": len(cands), "n_accepted": len(accepted)}
 
 
 # ================================================================================================ the feeds
