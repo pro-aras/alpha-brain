@@ -7,6 +7,8 @@ SHA=$(git rev-parse --short=7 "${1:-HEAD}")
 DEST=/data/dev/brain-runs/scene/code-$SHA
 [ -e "$DEST" ] && { echo "$DEST exists"; exit 0; }
 mkdir -p "$DEST"
-git archive "$SHA" brain genome tools/scene | tar -x -C "$DEST"
+# edit: Claude (Opus 5.5, S1c builder), 2026-09-28 15:12 +0400 — the scene tests ride with the pin (S1c's FIRST GATE runs the truth
+# fence's own test module from the pinned copy; earlier pins are untouched: a pin is written once)
+git archive "$SHA" brain genome tools/scene tests/__init__.py tests/brain/__init__.py tests/brain/scene | tar -x -C "$DEST"
 git rev-parse "$SHA" > "$DEST/CODE_SHA"
 echo "$DEST"
