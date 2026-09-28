@@ -2,21 +2,22 @@
 
 *Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:45 +0400. Branch `brain-organ-a` (worktree `/data/dev/genome-wt-organ-a`), from 1ac149f. The law read: INTERFACE-BRAIN-ORGAN.md §0–§3, §7 with the seat's addenda 1–2 (brain-organ 6be6774 / a33758a), and PREREG-BRAIN-IN-BODY.md as SIGNED (brain-organ 12bdea6, sha256 e39b512e…), which is law over the INTERFACE.*
 *edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:45 +0400 — new file (the hand-back).*
+*edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:53 +0400 — after a707b90 (an ask without item / test_seed refuses; the encoder's np.floating order; the gate's typed stamps corrected): the gate re-run on a707b90 and every table re-copied from its output files; the suites re-run on a707b90; the price line cites each figure to its own file.*
 
 ## 1 · What exists
 | file | what |
 |---|---|
 | `genome/brain.py` | `class Brain` — `__init__(cfg)`, `hears`, `learn`, `calibrate`, `ask`, `summary`, `state_hash`, `save`, `load` (INTERFACE §3); module-level `pointer_hypothesis(box, centroid, fix, hyps)`, `things_in_view(glance)`, `tie_rng(test_seed, item)`, `check_cfg`, `BrainError`. Rung 1 = S1b-1R's A-RW-R, the LAW road, T-MEM-2's «none» hook read-only. No new learning rule. |
-| `tests/genome/test_brain_organ.py` | 34 tests: the truth fence (AST, planted offenders caught), the tie generator = `marks.tie_rng`, every BRAIN key required, every value READ and moving behaviour (one test each), the pointer (±4 px half-open, centroid tie-break, 200 random cases = `marks.thing_hypothesis`), an ask never teaches, `raw` per form, M4 (≥ 2-hypothesis pool, cited episodes heard the word, deterministic, never-heard / young / one-hypothesis-only → unknown), M5, save / load (hash round-trip; resume at 0 / 35 / 40 / 77 = the straight life, answers and hash). Test-first: red on a missing module (`logs/a-red-1.log`), the PREREG's M4 tests red on the previous `brain.py` (`logs/a-red-2-m4-on-old-brain.log`, failures=2 errors=6). |
+| `tests/genome/test_brain_organ.py` | 36 tests: the truth fence (AST, planted offenders caught), the tie generator = `marks.tie_rng`, every BRAIN key required, every value READ and moving behaviour (one test each), the pointer (±4 px half-open, centroid tie-break, 200 random cases = `marks.thing_hypothesis`), an ask never teaches, `raw` per form, M4 (≥ 2-hypothesis pool, cited episodes heard the word, deterministic, never-heard / young / one-hypothesis-only → unknown), M5, save / load (hash round-trip; resume at 0 / 35 / 40 / 77 = the straight life, answers and hash). Test-first: red on a missing module (`logs/a-red-1.log`), the PREREG's M4 tests red on the previous `brain.py` (`logs/a-red-2-m4-on-old-brain.log`, failures=2 errors=6); an ask without `item` / `test_seed` refusing by name and numpy scalars in the state, red on the previous `brain.py` (`logs/a-red-3-keys-and-encoder-on-old-brain.log`, failures=6 errors=1). |
 | `tools/brain/gate_alone.py` | THE GATE «BRAIN ALONE» (below). `--world-seed`, `--glances-root` (default `/data/dev/brain-runs/organ/scene`, the seat's redraw), `--scored-root` (default `/data/dev/brain-runs/scene-s1b1r`, read only; the tool refuses an `--out` under it), `--out`, `--plant`, `--limit` (price), `--save`. |
 | `brain/scene/learners.py` | two ADDITIVE knobs (§6). |
 
-Commits: 0560d11 (the organ, API complete — for builder C), 6fa0b41 (the gate), f48fd2b (the signed PREREG's M4 / learn-row / older-set changes), then this hand-back.
+Commits: 0560d11 (the organ, API complete — for builder C), 6fa0b41 (the gate), f48fd2b (the signed PREREG's M4 / learn-row / older-set changes), b98ec50 (this hand-back, first), a707b90 (missing ask keys refuse; the encoder's order; the gate's typed stamps corrected), then this hand-back's update.
 
 **How the mind calls it (for builder C).** `learn(glance, words, moment=, scene=, world_seed=)` returns `{n_hyp, words, attributed, none, calibrated, fix, hyps}` (`fix` = the canvas's located cells, `hyps` = member lists — PREREG §3 row M6). `ask(payload, glance)` returns §2's digest keys PLUS `raw` (the offline function's own return, offline field names) on every form, `raw_forced` on a misuse answer, and `hyp` on `what` / `say` (the pointer's hypothesis). `payload` needs `form`, `item`, `test_seed` (point / what / say), `phrase` (point), `box` + `centroid` (what / say), `mark` (`NAME` adds `raw.name`), `word` (why). `calibrate()` returns a small JSON-able record (at, τ_point, τ_none, types, mature, bands). `save(base)` writes `<base>.npz` + `<base>.json` (the JSON carries the state hash; `load` refuses a file whose bytes do not hash to it, and refuses a different BRAIN config by name).
 
 ## 2 · THE GATE — verdict PASS at all three seeds; the planted control FAILS
-The organ is fed the redrawn caches in order through `Brain.learn` (the glance rebuilt in `genome.gaze.glances`'s shape: located glances then the coarse one; the BRAIN line read by `machinery.parse_genome`), then answers through `Brain.ask` with the payloads a sitting carries (box and centroid from the canvas's truth row, in the gate only). Every answer's `raw` is compared with the scored file after one JSON round-trip (NaN = NaN). The fresh set against `fresh/arms/A-RW-R/answers_10000.json` (the `point` block and the LAW road); the OLDER set's pointing against `arms/A-RW/answers_10000.json`'s `answers` (PREREG §2). `learner.summary()` is compared with the scored record's at 10000. Price: 1,000 scenes = 1.2 s CPU; a whole seed ≈ 18 s CPU (`logs/a-gate-price.log`). The tables below are the output files, copied whole.
+The organ is fed the redrawn caches in order through `Brain.learn` (the glance rebuilt in `genome.gaze.glances`'s shape: located glances then the coarse one; the BRAIN line read by `machinery.parse_genome`), then answers through `Brain.ask` with the payloads a sitting carries (box and centroid from the canvas's truth row, in the gate only). Every answer's `raw` is compared with the scored file after one JSON round-trip (NaN = NaN). The fresh set against `fresh/arms/A-RW-R/answers_10000.json` (the `point` block and the LAW road); the OLDER set's pointing against `arms/A-RW/answers_10000.json`'s `answers` (PREREG §2). `learner.summary()` is compared with the scored record's at 10000. Price: 1,000 scenes = 1.2 s CPU, projected ≈ 12 s CPU a seed (`logs/a-gate-price.log`); measured 18.2–18.3 s CPU a whole seed with its sitting (`gate.txt`, last line) — the projection under-read because the later calibrations grow with the list of scenes seen. The tables below are the output files, copied whole.
 
 **20261101** — `/data/dev/brain-runs/organ/gate-alone/20261101/gate.txt`
 
@@ -57,8 +58,8 @@ GATE «BRAIN ALONE» · world seed 20261101 · verdict PASS
     triangle  because  episodes  1687 · citable (≥ 2 hyps)   891 · cited 8 · exist 8 · carry 0.875 · base 0.9741863075196409
     white     because  episodes  1006 · citable (≥ 2 hyps)   491 · cited 8 · exist 8 · carry 1.0 · base 0.9572301425661914
     yellow    because  episodes   809 · citable (≥ 2 hyps)   344 · cited 8 · exist 8 · carry 1.0 · base 0.9505813953488372
-  STATE at 10000 scenes: 36449634 B npz + 5836690 B json = 42286324 B · write 0.87 s · load 0.86 s · hash round-trip True
-  cpu 18.2 s · wall 18.2 s
+  STATE at 10000 scenes: 36449634 B npz + 5836690 B json = 42286324 B · write 0.91 s · load 0.89 s · hash round-trip True
+  cpu 18.4 s · wall 18.4 s
 ```
 
 **20261102** — `/data/dev/brain-runs/organ/gate-alone/20261102/gate.txt`
@@ -100,8 +101,8 @@ GATE «BRAIN ALONE» · world seed 20261102 · verdict PASS
     triangle  because  episodes  1714 · citable (≥ 2 hyps)   856 · cited 8 · exist 8 · carry 1.0 · base 0.9661214953271028
     white     because  episodes  1044 · citable (≥ 2 hyps)   500 · cited 8 · exist 8 · carry 1.0 · base 0.906
     yellow    because  episodes   825 · citable (≥ 2 hyps)   370 · cited 8 · exist 8 · carry 1.0 · base 0.9081081081081082
-  STATE at 10000 scenes: 36414266 B npz + 5849465 B json = 42263731 B · write 0.86 s · load 0.87 s · hash round-trip True
-  cpu 18.2 s · wall 18.2 s
+  STATE at 10000 scenes: 36414266 B npz + 5849465 B json = 42263731 B · write 0.87 s · load 0.88 s · hash round-trip True
+  cpu 18.4 s · wall 18.4 s
 ```
 
 **20261103** — `/data/dev/brain-runs/organ/gate-alone/20261103/gate.txt`
@@ -143,8 +144,8 @@ GATE «BRAIN ALONE» · world seed 20261103 · verdict PASS
     triangle  because  episodes  1573 · citable (≥ 2 hyps)   798 · cited 8 · exist 8 · carry 0.875 · base 0.9661654135338346
     white     because  episodes  1005 · citable (≥ 2 hyps)   494 · cited 8 · exist 8 · carry 0.875 · base 0.9412955465587044
     yellow    because  episodes   849 · citable (≥ 2 hyps)   381 · cited 8 · exist 8 · carry 1.0 · base 0.9501312335958005
-  STATE at 10000 scenes: 36645842 B npz + 5841061 B json = 42486903 B · write 0.84 s · load 0.87 s · hash round-trip True
-  cpu 18.3 s · wall 18.3 s
+  STATE at 10000 scenes: 36645842 B npz + 5841061 B json = 42486903 B · write 0.88 s · load 0.88 s · hash round-trip True
+  cpu 18.6 s · wall 18.6 s
 ```
 
 **The planted control** (scene 100's utterance `['big', 'blue', 'triangle']` → `['blue', 'blue', 'triangle']`) — `/data/dev/brain-runs/organ/gate-alone/20261101/planted.txt` (first lines):
@@ -198,7 +199,7 @@ Per word (citable ≥ 2-hyp episodes, 344–1,232 per mature word; «dax» → u
 ## 5 · save / load (INTERFACE §3)
 - Round trip: `state_hash()` equal after `load` (tests at 0 / 35 / 40 / 77 scenes of a toy life; and at 10,000 in the gate at every seed).
 - Resume identity: a Brain saved at scene n, loaded, and fed scenes n… answers every form exactly as the straight life and ends at the same hash (the test).
-- **The 10,000-scene state: 42.3 / 42.3 / 42.5 MB (npz 36.4–36.6 MB + json 5.8 MB); write 0.84–0.87 s; load 0.86–0.87 s** (`gate.txt`, STATE line). Most of it is the learner's own store (standardised and raw rows per meeting, T-MEM-1's `store_x` included — nothing on the LAW road reads it, it is kept so a resumed brain is the same object) and the calibration list; identical arrays share their bytes in the file. Encoding: every array flattened into one pool per dtype (a handful of npz entries), dicts as ordered pairs, tuples kept, floats by `repr` (inf / nan exact).
+- **The 10,000-scene state: 42.3 / 42.3 / 42.5 MB (npz 36.4–36.6 MB + json 5.8 MB); write 0.87–0.91 s; load 0.88–0.89 s** (`gate.txt`, STATE line). Most of it is the learner's own store (standardised and raw rows per meeting, T-MEM-1's `store_x` included — nothing on the LAW road reads it, it is kept so a resumed brain is the same object) and the calibration list; identical arrays share their bytes in the file. Encoding: every array flattened into one pool per dtype (a handful of npz entries), dicts as ordered pairs, tuples kept, floats by `repr` (inf / nan exact).
 
 ## 6 · What changed in `brain/scene/*.py`, and why
 Only `brain/scene/learners.py`, additive, old defaults (no file of `cache.WORLD_CODE` was touched):
@@ -206,19 +207,19 @@ Only `brain/scene/learners.py`, additive, old defaults (no file of `cache.WORLD_
 - `RWLearner.calibrate(scenes, level=CONFORMAL)` — τ_point's and τ_word's level, from the BRAIN line's `conformal`.
 - Proof it changes nothing for the old callers: the scene suite reads the same 311 tests with the same 8 errors before and after (below), and the gate reproduces the scored run byte for byte at all three seeds.
 
-## 7 · The suites, read from their own log files, on the final code commit f48fd2b (this hand-back commit adds only this file)
-- `tests/genome`: `Ran 592 tests in 141.632s` · `OK (skipped=1, expected failures=6)` — `/data/dev/brain-runs/organ/logs/a-final-genome.log` (baseline on 1ac149f: Ran 558, OK — `a-baseline-genome.log`).
-- `tests/brain/scene`: `Ran 311 tests in 57.476s` · `FAILED (errors=8)` — `/data/dev/brain-runs/organ/logs/a-final-scene.log`. **The same 8 errors as the baseline on 1ac149f** (`a-baseline-scene.log`: Ran 311, FAILED (errors=8)); all 8 read `SceneCacheError: /data/dev/brain-runs/scene-s1b1r/20261101/cache/… was drawn by other code: ['genome/machinery.py']` (8 of 8 in both logs). RAISED below.
+## 7 · The suites, read from their own log files, on the final code commit a707b90 (the hand-back commits add only this file)
+- `tests/genome`: `Ran 594 tests in 143.660s` · `OK (skipped=1, expected failures=6)` — `/data/dev/brain-runs/organ/logs/a-final-genome.log` (baseline on 1ac149f: Ran 558, OK — `a-baseline-genome.log`).
+- `tests/brain/scene`: `Ran 311 tests in 57.247s` · `FAILED (errors=8)` — `/data/dev/brain-runs/organ/logs/a-final-scene.log`. **The same 8 errors as the baseline on 1ac149f** (`a-baseline-scene.log`: Ran 311, FAILED (errors=8)); all 8 read `SceneCacheError: /data/dev/brain-runs/scene-s1b1r/20261101/cache/… was drawn by other code: ['genome/machinery.py']` (8 of 8 in both logs). RAISED below.
 
 ## 8 · RAISED
 1. **The scene suite is not «Ran 340 … OK» on this branch, and was not before my first edit**: Ran 311, FAILED (errors=8) on 1ac149f itself — eight tests read the scored root `/data/dev/brain-runs/scene-s1b1r`, whose caches `check_code` refuses since the BRAIN parser changed `genome/machinery.py`. Not caused by this work; not worked around (no WORLD_CODE file touched, `check_code` untouched). Its fix is the seat's (point those tests at the redrawn root, or accept the refusal by name).
 2. **NAME's `raw.name`** cannot carry the scored file's keys (`shape` / `colour` / `size` are the WORLD's type names; the organ holds none). The organ keys each forced name by its LEARNED type's words joined with «|» (`"big|small"`, `"blue|green|red|white|yellow"`, …). The gate maps them to the world's types on the truth side and they equal the scored `name` on 151 / 165 / 163 of 151 / 165 / 163. The grader must map them the same way (or read `emit` only, which is the `what` answer).
 3. **`none 0.95` moves only the reading flag.** `none_level` sets τ_none, the DISTANCE «none» (`raw.none`, `raw.none_fit` — S1b-1's reading). The LAW's refusal (`kind: "none"`, M2a) is τ_point = `none_i`, at `conformal 0.90`. Both values are read and both move behaviour (tests), but a genome that changes `none` does not change the LAW's M2a.
 4. **`young` is the learner's maturity, not only M4's.** Through `p_from` it moves which words are typed, emitted, believed and pointed by p_w vs band — the scored constant it names. A genome with `young` ≠ 3 is a different learner.
-5. **Declared answers outside §2's table**: a `point` on a canvas with 0 hypotheses → `{kind: "none", reason: "nothing in view", raw: {point: None, none: None, best: None, n_hyp: 0}}` (`answer_point` cannot score an empty set); `what` before the first calibration → `unknown` (emit []), `say` → `{kind: "declined", reason: "not calibrated"}`. None occurred in the gate (0 of 2,209–2,222).
+5. **Declared answers outside §2's table** (and one refusal: a `point` / `what` / `say` ask without `item` or `test_seed` raises `BrainError` by name — a default would build a wrong tie generator silently): a `point` on a canvas with 0 hypotheses → `{kind: "none", reason: "nothing in view", raw: {point: None, none: None, best: None, n_hyp: 0}}` (`answer_point` cannot score an empty set); `what` before the first calibration → `unknown` (emit []), `say` → `{kind: "declined", reason: "not calibrated"}`. None occurred in the gate (0 of 2,209–2,222).
 6. **Key names for builder C's journal row**: the `point` answer's own `fix` is §2's (the POINTED hypothesis' member cells), while Addendum 1's row-level `fix` / `hyps` are the CANVAS's. If the row is built by merging the answer dict flat, the two collide — keep the answer under its own key.
 7. **The M4 null's «citation order»** is read here as the words in sorted order, each word's citations in the answer's order. The draws (and so the p95) depend on it; the grader must use the same order to reproduce §4's numbers.
-8. **The state is ~42 MB per snapshot at 10,000 scenes** (write 0.85 s). The snapshot cadence is the body's (B / C) to set with that price.
+8. **The state is ~42 MB per snapshot at 10,000 scenes** (write ≈ 0.9 s). The snapshot cadence is the body's (B / C) to set with that price.
 9. **Module name**: `genome/brain.py` shares its name with the top-level package `brain`. Under `-m` and absolute imports this is safe; a script run BY PATH from inside `genome/` would put `genome/` on `sys.path[0]` and shadow the package (#104 / #167). A grep found no such script today.
 10. **`learn`'s «none»** is None until the first calibration (T-MEM-2's hook was inactive before the first reading point) and None when a word of the phrase was never heard or nothing is in view: 251 None per seed = 250 before scene 250 + the «dax» scene.
 
