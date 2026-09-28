@@ -116,3 +116,22 @@ class TestCodeCheck(unittest.TestCase):
             (d / "scene_header.json").write_text(json.dumps(sh))
             with self.assertRaises(cache.SceneCacheError):
                 cache.ScenePercepts(d)
+
+
+class TestIdentityWithS1a(unittest.TestCase):
+    """PREREG-S1B1 §1 (a): a redrawn cache must carry the SAME specs, canvas shas and glances as S1a's — the checker reads
+    both as plain files; a planted one-row canvas-sha change is caught."""
+
+    def test_identity_and_a_planted_change(self) -> None:
+        with tempfile.TemporaryDirectory(dir=str(TMP), prefix="scene-ident-") as td:
+            a, b = Path(td) / "a", Path(td) / "b"
+            cache.build("m6", 20261101, a, limit=3, recheck_n=1)
+            cache.build("m6", 20261101, b, limit=3, recheck_n=1)
+            self.assertTrue(cache.identity_with(b, a)["same"])
+            rows = [json.loads(l) for l in (b / "index.jsonl").read_text().splitlines()]
+            rows[1]["canvas_png_sha256"] = "0" * 64
+            (b / "index.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+            res = cache.identity_with(b, a)
+            self.assertFalse(res["same"])
+            self.assertEqual(res["canvas_sha_diff"], 1)
+

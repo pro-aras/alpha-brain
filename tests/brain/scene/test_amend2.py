@@ -139,7 +139,7 @@ class TestTypedReader(unittest.TestCase):
     def test_the_oracle_arms_use_the_typed_reader_and_the_learners_never_see_types(self) -> None:
         for arm in ("P-ORACLE", "ORACLE-TRUTH"):
             self.assertIsInstance(R.make_learner(arm, 0.1, 0.3), Lr.TypedLDAReader)
-        for arm in ("A-RW", "N-SHUF", "P-ORACLE-RW", "A-RW-LR01"):
+        for arm in ("A-RW", "N-SHUF", "P-ORACLE-RW", "A-RW-LR10"):     # PREREG-S1B1 §6: the reading arm is now lr 0.1
             L = R.make_learner(arm, 0.1, 0.3)
             self.assertIsInstance(L, Lr.RWLearner)
             self.assertFalse(hasattr(L, "word_types"))
@@ -185,13 +185,19 @@ class TestM6Meeting(unittest.TestCase):
 
 
 class TestReadingArm(unittest.TestCase):
-    def test_a_rw_lr01_is_a_rw_at_lr_001_and_carries_no_bar(self) -> None:
-        self.assertIn("A-RW-LR01", R.ARMS)
-        L = R.make_learner("A-RW-LR01", 0.1, 0.3)
-        self.assertEqual(L.lr, 0.01)
+    """AMENDMENT 2 §5's reading arm, as PREREG-S1B1 §2 turns it (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:55 +0400): A-RW's
+    law is lr 0.01 now, and S1a's law (lr 0.1) is the reading arm A-RW-LR10 — one difference, no bar."""
+
+    def test_the_law_is_001_and_a_rw_lr10_is_s1as_law_as_a_reading(self) -> None:
+        self.assertIn("A-RW-LR10", R.ARMS)
+        L = R.make_learner("A-RW-LR10", 0.01, 0.3)
+        self.assertEqual(L.lr, 0.1)
         self.assertFalse(L.oracle)
-        self.assertEqual(R.make_learner("A-RW", 0.1, 0.3).lr, 0.1)
-        self.assertIn("A-RW-LR01", R.READING_ARMS)
+        self.assertEqual(R.make_learner("A-RW", 0.1, 0.3).lr, 0.01)
+        self.assertEqual(R.make_learner("N-SHUF", 0.1, 0.3).lr, 0.01)
+        self.assertEqual(R.make_learner("P-ORACLE-RW", 0.1, 0.3).lr, 0.01)
+        self.assertIn("A-RW-LR10", R.READING_ARMS)
+        self.assertNotIn("A-RW-LR01", R.ARMS)
 
 
 if __name__ == "__main__":

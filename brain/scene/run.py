@@ -40,21 +40,29 @@ import numpy as np
 
 from brain.world.seeds import substream
 
-from . import AMEND2_SHA256, PREREG_SHA256
+from . import AMEND2_SHA256, PREREG_S1B1_SHA256, PREREG_SHA256
 from . import cache as C
 from . import learners as Lr
 from . import marks as M
 from . import world as W
 
-ARMS: Tuple[str, ...] = ("A-RW", "A-RW-LR01", "N-SHUF", "P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH")
-RW_ARMS = ("A-RW", "A-RW-LR01", "N-SHUF", "P-ORACLE-RW")
+# PREREG-S1B1 §6 (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:51 +0400): six arms × three seeds; A-RW's law is lr 0.01, S1a's
+# law (lr 0.1) is the READING arm A-RW-LR10; N-SHUF and P-ORACLE-RW run at the law's lr.
+ARMS: Tuple[str, ...] = ("A-RW", "A-RW-LR10", "N-SHUF", "P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH")
+RW_ARMS = ("A-RW", "A-RW-LR10", "N-SHUF", "P-ORACLE-RW")
 LDA_ARMS = ("P-ORACLE", "ORACLE-TRUTH")
 ORACLE_ARMS = ("P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH")        # the only arms whose feed carries a referent index
-READING_ARMS = ("A-RW-LR01",)                                     # AMENDMENT 2 §5: printed beside A-RW, no bar
-ARM_LR = {"A-RW-LR01": 0.01}                                      # its ONE difference from A-RW
+READING_ARMS = ("A-RW-LR10",)                                     # printed beside A-RW on every mark, no bar
+ARM_LR = {"A-RW": Lr.LR_S1B1, "A-RW-LR10": Lr.LR, "N-SHUF": Lr.LR_S1B1, "P-ORACLE-RW": Lr.LR_S1B1}
 PREREG_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-R3-TONIGHT.md")
 AMEND2_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-R3-TONIGHT-AMEND-2.md")
+PREREG_S1B1_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-S1B1.md")
+TEST_SPLITS = C.TEST_SPLITS
 TYPE_WORDS = {"shape": list(W.SHAPES), "colour": list(W.COLOUR_NAMES), "size": list(W.SIZE_NAMES)}
+# PREREG-S1B1 §4, §5, §9: the new bars' fractions and refutation constants
+M3_VS_PORACLE, SPOKEN_VS_PORACLE, TRUTH_VS_PORACLE, ORDER_VS_PORACLE, DECLINE_VS_PORACLE = 0.80, 0.80, 0.90, 0.95, 0.90
+DECLINE_ORGAN = 0.80                  # P-ORACLE's DECLINE below it → CEILING-BOUND (purple inside a trained colour's band)
+T3_REFUTE = 0.80
 WORD_TYPES = {w: W.word_type(w) for w in W.VOCAB}                 # what the ORACLE may know (AMENDMENT 2 §1)
 
 
@@ -70,6 +78,9 @@ def check_prereg() -> str:
     am = hashlib.sha256(AMEND2_PATH.read_bytes()).hexdigest()
     if am != AMEND2_SHA256:
         raise RunError(f"AMENDMENT 2 sha256 {am} ≠ the one this code implements {AMEND2_SHA256} — STOP and hand back")
+    s1 = hashlib.sha256(PREREG_S1B1_PATH.read_bytes()).hexdigest()
+    if s1 != PREREG_S1B1_SHA256:
+        raise RunError(f"PREREG-S1B1 sha256 {s1} ≠ the co-signed {PREREG_S1B1_SHA256} — STOP and hand back")
     return got
 
 
@@ -197,30 +208,56 @@ def build_questions(root: Path, ws: int) -> Dict[str, object]:
         mem, pos = th_test.members(it["row"])
         hyp = M.thing_hypothesis(0, mem, pos, r["fix_thing"], tuple(r["centroids"][0]))
         q["NAME"].append({**M.question(it), "split": "test", "hyp": hyp})
+    # PREREG-S1B1 §4–§5: M3 (a phrase, like M1), SPEAK / DECLINE (a POINTER to the target: its hypothesis for the gaze
+    # arms, the thing itself for ORACLE-TRUTH — «this one», never its name); a target without a hypothesis is uncovered
+    tr = {s: C.load_truth(C.cache_dir(root, ws, s)) for s in ("m3", "speak", "decline")}
+    th = {s: Things(C.ScenePercepts(C.cache_dir(root, ws, s))) for s in ("speak", "decline")}
+    m3 = M.m3_items(tr["m3"])
+    speak = M.speak_items(tr["speak"])
+    decline = M.decline_items(tr["decline"])
+    q["M3"] = [{**M.question(it), "split": "m3"} for it in m3]
+    for mark, items, split in (("SPEAK", speak, "speak"), ("DECLINE", decline, "decline")):
+        q[mark] = []
+        for it in items:
+            r = tr[split][it["row"]]
+            mem, pos = th[split].members(it["row"])
+            hyp = M.thing_hypothesis(it["target"], mem, pos, r["fix_thing"], tuple(r["centroids"][it["target"]]))
+            it["hyp"] = hyp
+            q[mark].append({**M.question(it), "split": split, "hyp": hyp, "thing": it["target"]})
     out["questions"] = q
-    keys["items"] = {"M1": m1, "M2a": m2a, "M2b": m2b, "M6": m6, "NAME": name}
+    out["prereg_s1b1_sha256"] = keys["prereg_s1b1_sha256"] = PREREG_S1B1_SHA256
+    keys["items"] = {"M1": m1, "M2a": m2a, "M2b": m2b, "M6": m6, "NAME": name, "M3": m3, "SPEAK": speak, "DECLINE": decline}
     d = seed_root(root, ws)
     dump(d / "questions.json", out)
     dump(d / "keys.json", keys)
-    return {"M1": len(m1), "M2a": len(m2a), "M2b": len(m2b), "M6": len(m6), "NAME": len(name)}
+    return {"M1": len(m1), "M2a": len(m2a), "M2b": len(m2b), "M6": len(m6), "NAME": len(name), "M3": len(m3),
+            "SPEAK": len(speak), "DECLINE": len(decline)}
 
 
 # ------------------------------------------------------------------------------------------------ answering
 def answer_all(arm: str, learner, questions: Dict[str, List[Dict[str, object]]], things: Dict[str, Things],
                test_seed: int) -> Dict[str, Dict[str, object]]:
     ans: Dict[str, Dict[str, object]] = {}
-    for mark in ("M1", "M2a", "M6"):
+    for mark in ("M1", "M2a", "M6", "M3"):
         for q in questions.get(mark, []):
             X = things[q["split"]].for_arm(arm, q["row"])
             a = learner.answer_point(X, q["phrase"], M.tie_rng(test_seed, q["item_id"]))
             ans[q["item_id"]] = a
+
+    def emits(x) -> Dict[str, List[str]]:
+        # the law's «what is this?», and for the RW arms readings (i) and (ii) from the same state (PREREG-S1B1 §3)
+        if arm in RW_ARMS:
+            r = learner.what_is_this_readings(x)
+            return {"emit": r["law"], "emit_i": r["i"], "emit_ii": r["ii"]}
+        return {"emit": learner.what_is_this(x)}
+
     for q in questions.get("M2b", []):
         k = 0 if arm == "ORACLE-TRUTH" else q.get("hyp")
         if k is None:
             ans[q["item_id"]] = {"emit": None, "uncovered": True}
             continue
         X = things[q["split"]].for_arm(arm, q["row"])
-        ans[q["item_id"]] = {"emit": learner.what_is_this(X[int(k)])}
+        ans[q["item_id"]] = emits(X[int(k)])
     for q in questions.get("NAME", []):
         k = 0 if arm == "ORACLE-TRUTH" else q.get("hyp")
         if k is None:
@@ -228,17 +265,31 @@ def answer_all(arm: str, learner, questions: Dict[str, List[Dict[str, object]]],
             continue
         X = things[q["split"]].for_arm(arm, q["row"])
         ans[q["item_id"]] = {"name": {t: learner.name_forced(X[int(k)], ws) for t, ws in TYPE_WORDS.items()},
-                             "emit": learner.what_is_this(X[int(k)])}
+                             **emits(X[int(k)])}
+    # PREREG-S1B1 §5: the SAME production code for every arm; its read-backs use the item's own tie generator
+    for mark in ("SPEAK", "DECLINE"):
+        for q in questions.get(mark, []):
+            k = q.get("thing") if arm == "ORACLE-TRUTH" else q.get("hyp")
+            if k is None:
+                ans[q["item_id"]] = {"spoken": None, "reason": "uncovered", "uncovered": True}
+                continue
+            X = things[q["split"]].for_arm(arm, q["row"])
+            a = Lr.produce(learner, X, int(k), lambda q=q: M.tie_rng(test_seed, q["item_id"]))
+            if mark == "DECLINE" and arm in LDA_ARMS:
+                a["colour_fit"] = learner.colour_fit(X[int(k)])     # the organ fact (§5): d_w / B_w per colour word
+            ans[q["item_id"]] = a
     return ans
 
 
 def make_learner(arm: str, lr: float, eps: float):
-    """`lr` is A-RW's (the gate's); A-RW-LR01 overrides it with its own (ARM_LR — its one difference). The oracle arms
-    read with the TYPE-AWARE reader (AMENDMENT 2 §1), handed the word types from here; no RW arm ever holds them."""
+    """PREREG-S1B1 §6: every RW arm takes its OWN lr from ARM_LR (A-RW 0.01, the law; A-RW-LR10 0.1, S1a's law as a
+    reading; N-SHUF and P-ORACLE-RW 0.01) — `lr` is kept in the signature for the callers and the gate's record. The
+    oracle arms read with the TYPE-AWARE reader (AMENDMENT 2 §1), handed the word types from here (no RW arm ever holds
+    them), τ_point at conformal 0.95 over training scenes with ≥ 2 hypotheses / things (PREREG-S1B1 §3)."""
     if arm in RW_ARMS:
         return Lr.RWLearner(lr=ARM_LR.get(arm, lr), oracle=(arm == "P-ORACLE-RW"))
     if arm in LDA_ARMS:
-        return Lr.TypedLDAReader(eps, WORD_TYPES)
+        return Lr.TypedLDAReader(eps, WORD_TYPES, point_level=Lr.NONE_LEVEL, point_min_view=Lr.NONE_MIN_VIEW)
     raise RunError(f"no such arm: {arm!r}")
 
 
@@ -256,7 +307,8 @@ def train_arm(arm: str, learner, things: Things, words_of, truth: Optional[Seque
             if seen is not None:
                 seen.append((X, words, ref if arm == "P-ORACLE-RW" else None))
         else:
-            learner.train_scene(Lr.feed_oracle(X, ref), words)
+            # n_view: the scene's hypotheses (P-ORACLE) or things (ORACLE-TRUTH) — τ_point's population (PREREG-S1B1 §3)
+            learner.train_scene(Lr.feed_oracle(X, ref), words, n_view=int(np.atleast_2d(X).shape[0]))
 
 
 def prepare(arm: str, learner, seen: Optional[list]) -> Dict[str, object]:
@@ -265,9 +317,9 @@ def prepare(arm: str, learner, seen: Optional[list]) -> Dict[str, object]:
     return learner.prepare()
 
 
-def gate_or_chosen() -> Dict[str, object]:
-    """The first gate's choices (lr, ε), read from its record — the full run never re-chooses them."""
-    p = C.RUNS / "gate" / "gate.json"
+def gate_or_chosen(root: Path = C.RUNS) -> Dict[str, object]:
+    """The first gate's choices (lr, ε), read from its record under `root` — the full run never re-chooses them."""
+    p = Path(root) / "gate" / "gate.json"
     if not p.exists():
         raise RunError(f"{p} missing — THE FIRST GATE runs before any full stream")
     g = json.loads(p.read_text())
@@ -280,7 +332,7 @@ def run_arm(arm: str, root: Path, ws: int, n_train: int = W.N_TRAIN, reading_poi
             lr: Optional[float] = None, eps: Optional[float] = None, out: Optional[Path] = None, log=print) -> Dict[str, object]:
     t_wall, t_cpu = time.perf_counter(), time.process_time()
     if lr is None or eps is None:
-        g = gate_or_chosen()
+        g = gate_or_chosen(root)
         lr = g["lr"] if lr is None else lr
         eps = g["eps"] if eps is None else eps
     out = Path(out) if out is not None else seed_root(root, ws) / "arms" / arm
@@ -288,7 +340,7 @@ def run_arm(arm: str, root: Path, ws: int, n_train: int = W.N_TRAIN, reading_poi
     Q = json.loads((seed_root(root, ws) / "questions.json").read_text())
     if Q["prereg_sha256"] != PREREG_SHA256:
         raise RunError("questions were written under another PREREG")
-    things = {s: Things(C.ScenePercepts(C.cache_dir(root, ws, s))) for s in ("test", "m2b", "m6")}
+    things = {s: Things(C.ScenePercepts(C.cache_dir(root, ws, s))) for s in TEST_SPLITS}
     train = Things(C.ScenePercepts(C.cache_dir(root, ws, "train")))
     truth = C.load_truth(C.cache_dir(root, ws, "train")) if arm in ORACLE_ARMS else None
     if arm == "N-SHUF":
@@ -301,7 +353,8 @@ def run_arm(arm: str, root: Path, ws: int, n_train: int = W.N_TRAIN, reading_poi
     done = 0
     record = {"arm": arm, "world_seed": ws, "lr": ARM_LR.get(arm, lr) if arm in RW_ARMS else None, "gate_lr": lr,
               "eps": eps if arm in LDA_ARMS else None, "n_train": n_train, "prereg_sha256": PREREG_SHA256,
-              "amend2_sha256": AMEND2_SHA256, "code": code_identity(), "reading_points": {}}
+              "amend2_sha256": AMEND2_SHA256, "prereg_s1b1_sha256": PREREG_S1B1_SHA256, "code": code_identity(),
+              "reading_points": {}}
     for rp in sorted(r for r in reading_points if r <= n_train):
         train_arm(arm, learner, train, words_of, truth, range(done, rp), ws, seen)
         done = rp
@@ -319,38 +372,58 @@ def run_arm(arm: str, root: Path, ws: int, n_train: int = W.N_TRAIN, reading_poi
 
 # ------------------------------------------------------------------------------------------------ grading
 def grade_seed(root: Path, ws: int, arms: Sequence[str] = ARMS, log=print) -> Dict[str, object]:
+    """Every arm at every reading point, every mark of PREREG-S1B1 §7 (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:53 +0400):
+    S1a's M1 / M2a / M2b / M6 / NAME (the law, and for the RW arms readings (i) and (ii) from the same state), M3, SPEAK,
+    DECLINE (with P-ORACLE's purple organ fact)."""
     K = json.loads((seed_root(root, ws) / "keys.json").read_text())
+    Q = json.loads((seed_root(root, ws) / "questions.json").read_text())["questions"]
     items = K["items"]
-    truth = {s: C.load_truth(C.cache_dir(root, ws, s)) for s in ("test", "m2b", "m6")}
-    things = {s: Things(C.ScenePercepts(C.cache_dir(root, ws, s))) for s in ("test", "m2b", "m6")}
+    truth = {s: C.load_truth(C.cache_dir(root, ws, s)) for s in TEST_SPLITS}
+    things = {s: Things(C.ScenePercepts(C.cache_dir(root, ws, s))) for s in TEST_SPLITS}
     m2b_cov = {it["row"] for it in items["M2b"] if M.covered(0, truth["m2b"][it["row"]]["fix_thing"])}
     tr = C.load_truth(C.cache_dir(root, ws, "train"))
     seen = M.meeting_seen(tr[W.DAX_INDEX]) if len(tr) > W.DAX_INDEX else None      # AMENDMENT 2 §3
-    out = {"prereg_sha256": PREREG_SHA256, "amend2_sha256": AMEND2_SHA256, "world_seed": ws, "meeting_seen": seen,
-           "arms": {}}
+    ptr_gaze = {q["item_id"]: q.get("hyp") for m in ("SPEAK", "DECLINE") for q in Q.get(m, [])}
+    ptr_truth = {q["item_id"]: q.get("thing") for m in ("SPEAK", "DECLINE") for q in Q.get(m, [])}
+    out = {"prereg_sha256": PREREG_SHA256, "amend2_sha256": AMEND2_SHA256, "prereg_s1b1_sha256": PREREG_S1B1_SHA256,
+           "world_seed": ws, "meeting_seen": seen, "arms": {}}
     for arm in arms:
         d = seed_root(root, ws) / "arms" / arm
         rec = json.loads((d / "record.json").read_text())
         kind = "truth" if arm == "ORACLE-TRUTH" else "gaze"
+        ptr = ptr_truth if kind == "truth" else ptr_gaze
         out["arms"][arm] = {"lr": rec["lr"], "eps": rec["eps"], "cpu_s": rec["cpu_s"], "wall_s": rec["wall_s"], "rp": {}}
         for rp in sorted(int(k) for k in rec["reading_points"]):
             A = json.loads((d / f"answers_{rp:05d}.json").read_text())["answers"]
             g1 = M.grade_pointing(items["M1"], A, truth["test"], things["test"].members, kind)
             g6 = M.grade_pointing(items["M6"], A, truth["m6"], things["m6"].members, kind)
+            g3 = M.grade_pointing(items["M3"], A, truth["m3"], things["m3"].members, kind)
             names = {}
             for t in TYPE_WORDS:
                 rows = [(A.get(it["item_id"]) or {}).get("name") for it in items["NAME"]]
                 ok = [nm[t] == it[t] for nm, it in zip(rows, items["NAME"]) if nm is not None and nm.get(t) is not None]
-                # the conformal promise, checked (declared reading): how often «what is this?» emits the thing's TRUE word
-                # of this type on the one-thing test scenes — a 0.90 band should emit it ≈ 0.90 of the time
-                em = [it[t] in (A.get(it["item_id"]) or {}).get("emit") for it in items["NAME"]
-                      if (A.get(it["item_id"]) or {}).get("emit") is not None]
-                names[t] = {"acc": (sum(ok) / len(ok) if ok else None), "n": len(ok),
-                            "emit_true": (sum(em) / len(em) if em else None), "n_emit": len(em)}
+                names[t] = {"acc": (sum(ok) / len(ok) if ok else None), "n": len(ok)}
+                for key in ("emit", "emit_i", "emit_ii"):
+                    em = [it[t] in (A.get(it["item_id"]) or {}).get(key) for it in items["NAME"]
+                          if (A.get(it["item_id"]) or {}).get(key) is not None]
+                    names[t]["true_" + key] = (sum(em) / len(em) if em else None)
+                names[t]["emit_true"] = names[t]["true_emit"]
+            dc_rows = M.grade_decline(items["DECLINE"], A, truth["decline"], ptr)
+            organ = None
+            if arm in LDA_ARMS:
+                fits = [(A.get(it["item_id"]) or {}).get("colour_fit") for it, r in zip(items["DECLINE"], dc_rows) if r["covered"]]
+                fits = [f for f in fits if f]
+                organ = {w: {"mean_d_over_B": float(np.mean([f[w] for f in fits if w in f])),
+                             "inside_band": float(np.mean([f[w] <= 1.0 for f in fits if w in f])), "n": len(fits)}
+                         for w in W.COLOUR_NAMES if any(w in f for f in fits)}
             out["arms"][arm]["rp"][str(rp)] = {
-                "M1": M.summarise_pointing(g1), "M2a": M.grade_m2a(items["M2a"], A),
-                "M2b": M.grade_m2b(items["M2b"], A, None if kind == "truth" else m2b_cov),
-                "M6": M.summarise_pointing(g6), "NAME": names,
+                "M1": M.summarise_pointing(g1), "M6": M.summarise_pointing(g6), "M3": M.summarise_m3(g3, items["M3"]),
+                "M2a": {k: M.grade_m2a(items["M2a"], A, key) for k, key in (("law", "none"), ("i", "none_i"), ("ii", "none_ii"))},
+                "M2b": {k: M.grade_m2b(items["M2b"], A, None if kind == "truth" else m2b_cov, key)
+                        for k, key in (("law", "emit"), ("i", "emit_i"), ("ii", "emit_ii"))},
+                "NAME": names,
+                "SPEAK": M.summarise_speak(M.grade_speak(items["SPEAK"], A, truth["speak"], ptr)),
+                "DECLINE": M.summarise_decline(dc_rows), "organ_purple": organ,
                 "calibration": rec["reading_points"][str(rp)]["calibration"]}
     dump(seed_root(root, ws) / "marks.json", out)
     log(f"[grade {ws}] written {seed_root(root, ws) / 'marks.json'}")
@@ -369,10 +442,32 @@ def _le(v, bar) -> bool:
     return v is not None and bar is not None and v <= bar
 
 
+def _frac(k, v):
+    return None if v is None else k * v
+
+
+def s1a_beside(ws: int, rp: str = str(W.N_TRAIN)) -> Optional[Dict[str, object]]:
+    """S1a's A-RW (and P-ORACLE) readings on the IDENTICAL items (S1a's own marks.json under its run root; the item ids
+    are TESTED equal at the gate) — printed beside every re-read line (PREREG-S1B1 §7)."""
+    p = C.S1A_RUNS / str(ws) / "marks.json"
+    if not p.exists():
+        return None
+    mk = json.loads(p.read_text())
+    out = {}
+    for arm in ("A-RW", "P-ORACLE"):
+        R = mk["arms"].get(arm, {}).get("rp", {}).get(rp)
+        if R is None:
+            continue
+        out[arm] = {"M1": R["M1"]["graded"]["covered"], "M2a_refusal": R["M2a"]["all"]["refusal"],
+                    "M2a_false_refusal": R["M1"]["graded"]["false_refusal"], "M2b": R["M2b"]["graded"]["correct"],
+                    "M6": R["M6"]["all"]["covered"]}
+    out["meeting_seen"] = mk.get("meeting_seen")
+    return out
+
+
 def bars_for(marks: Dict[str, object], rp: str = str(W.N_TRAIN)) -> Dict[str, object]:
-    """The bars at `rp` for one seed, P-ORACLE's reading beside every mark — the signed PREREG's bars as AMENDMENT 2
-    reads them: M1 on the 2- and 3-thing items (pooled = the verdict line; per scene size printed with its own mark,
-    declared), M6 only where the meeting was seen, a reading of None (nothing gradable) never a 0.0."""
+    """PREREG-S1B1 §7's bars for one seed, at `rp`, P-ORACLE's reading beside every mark (a fraction of the oracle on the
+    SAME items, #228 (b)); a mark with n < 30 reads UNDERPOWERED; a reading of nothing reads NOT GRADABLE, never 0.0."""
     A = {a: marks["arms"][a]["rp"].get(rp) for a in marks["arms"]}
     m1 = lambda arm, key="graded": A[arm]["M1"][key]
     r: Dict[str, object] = {}
@@ -380,29 +475,40 @@ def bars_for(marks: Dict[str, object], rp: str = str(W.N_TRAIN)) -> Dict[str, ob
     for key in ("graded", "size2", "size3"):
         a = m1("A-RW", key)
         prw, po = m1("P-ORACLE-RW", key)["covered"], m1("P-ORACLE", key)["covered"]
-        bar_rw = None if prw is None else M.BARS["M1_vs_PORACLE_RW"] * prw
-        bar_lda = None if po is None else M.BARS["M1_vs_PORACLE"] * po
+        bar_rw, bar_lda = _frac(M.BARS["M1_vs_PORACLE_RW"], prw), _frac(M.BARS["M1_vs_PORACLE"], po)
         rows[key] = {"value": a["covered"], "n": a["n_covered"], "all": a["all"], "n_all": a["n_all"],
                      "coverage": a["coverage"], "chance": a["chance_covered"], "p_oracle": po, "p_oracle_rw": prw,
                      "bar_rw": bar_rw, "bar_lda": bar_lda, "pass": _ge(a["covered"], bar_rw) and _ge(a["covered"], bar_lda),
-                     "lr01": m1("A-RW-LR01", key)["covered"] if "A-RW-LR01" in A else None,
+                     "lr10": m1("A-RW-LR10", key)["covered"] if "A-RW-LR10" in A else None,
                      "oracle_truth": m1("ORACLE-TRUTH", key)["covered"], "n_unheard": a["n_unheard"]}
     r["M1"] = dict(rows["graded"])
     r["M1"]["by_size"] = {"size2": rows["size2"], "size3": rows["size3"]}
     r["M1"]["sanity_size1"] = {"value": m1("A-RW", "size1")["covered"], "n": m1("A-RW", "size1")["n_covered"]}
-    m2a = A["A-RW"]["M2a"]["all"]
+    # M2a — the law (per half), the readings beside
+    law = A["A-RW"]["M2a"]["law"]["all"]
     fr = m1("A-RW")["false_refusal"]
-    po2, po_fr = A["P-ORACLE"]["M2a"]["all"]["refusal"], m1("P-ORACLE")["false_refusal"]
-    v2 = M.m2a_verdict(m2a["refusal"], fr, po2, po_fr)          # CEILING-BOUND read per half (declared, RAISED)
-    r["M2a"] = {"value": m2a["refusal"], "n": m2a["n"], "false_refusal": fr, "n_fr": m1("A-RW")["n_fr"], "p_oracle": po2,
+    po2, po_fr = A["P-ORACLE"]["M2a"]["law"]["all"]["refusal"], m1("P-ORACLE")["false_refusal"]
+    v2 = M.m2a_verdict(law["refusal"], fr, po2, po_fr)
+    r["M2a"] = {"value": law["refusal"], "n": law["n"], "false_refusal": fr, "n_fr": m1("A-RW")["n_fr"], "p_oracle": po2,
                 "p_oracle_fr": po_fr, "pass": v2["pass"], "ceiling_bound": v2["ceiling_bound"],
-                "failing_halves": v2["failing_halves"], "whole_bar_ceiling": v2["whole_bar_ceiling"]}
-    m2b = A["A-RW"]["M2b"]["graded"]
-    po3 = A["P-ORACLE"]["M2b"]["graded"]["correct"]
+                "failing_halves": v2["failing_halves"], "whole_bar_ceiling": v2["whole_bar_ceiling"],
+                "expected_false_refusal": 1.0 - Lr.NONE_LEVEL,
+                "reading_i": {"refusal": A["A-RW"]["M2a"]["i"]["all"]["refusal"], "false_refusal": m1("A-RW").get("false_refusal_i")},
+                "reading_ii": {"refusal": A["A-RW"]["M2a"]["ii"]["all"]["refusal"], "false_refusal": m1("A-RW").get("false_refusal_ii")},
+                "lr10": {"refusal": A["A-RW-LR10"]["M2a"]["law"]["all"]["refusal"], "false_refusal": m1("A-RW-LR10")["false_refusal"]}}
+    # M2b — the law; CEILING-BOUND when the oracle reads below the absolute bar
+    m2b = A["A-RW"]["M2b"]["law"]["graded"]
+    po3 = A["P-ORACLE"]["M2b"]["law"]["graded"]["correct"]
     ok3 = _ge(m2b["correct"], M.BARS["M2b"])
     r["M2b"] = {"value": m2b["correct"], "n": m2b["n"], "p_oracle": po3, "pass": ok3,
                 "ceiling_bound": (not ok3) and po3 is not None and po3 < M.BARS["M2b"],
-                "diamond": A["A-RW"]["M2b"]["diamond"]["correct"], "diamond_p_oracle": A["P-ORACLE"]["M2b"]["diamond"]["correct"]}
+                "diamond": A["A-RW"]["M2b"]["law"]["diamond"]["correct"],
+                "diamond_p_oracle": A["P-ORACLE"]["M2b"]["law"]["diamond"]["correct"],
+                "reading_i": A["A-RW"]["M2b"]["i"]["graded"]["correct"], "reading_ii": A["A-RW"]["M2b"]["ii"]["graded"]["correct"],
+                "lr10": A["A-RW-LR10"]["M2b"]["law"]["graded"]["correct"],
+                "shape_words": A["A-RW"]["M2b"]["law"]["graded"]["shape_words_emitted"],
+                "idk": A["A-RW"]["M2b"]["law"]["graded"]["idk"]}
+    # M6 — only where the meeting was seen
     seen = marks.get("meeting_seen")
     m6 = A["A-RW"]["M6"]["all"]
     po6 = A["P-ORACLE"]["M6"]["all"]["covered"]
@@ -417,72 +523,83 @@ def bars_for(marks: Dict[str, object], rp: str = str(W.N_TRAIN)) -> Dict[str, ob
         ok6 = _ge(m6["covered"], M.BARS["M6"])
         r["M6"] = {"value": m6["covered"], "n": m6["n_covered"], "all": m6["all"], "n_all": m6["n_all"], "p_oracle": po6,
                    "chance": m6["chance_covered"], "pass": ok6, "not_gradable": False,
-                   "ceiling_bound": (not ok6) and (po6 is None or po6 < M.BARS["M6"]),
-                   "by_size": {f"size{n}": A["A-RW"]["M6"][f"size{n}"]["covered"] for n in (2, 3)}}
+                   "ceiling_bound": (not ok6) and (po6 is None or po6 < M.BARS["M6"])}
+    # M3 COMPOSE (§4)
+    a3 = A["A-RW"]["M3"]["all"]
+    p3 = A["P-ORACLE"]["M3"]["all"]["covered"]
+    bar3 = _frac(M3_VS_PORACLE, p3)
+    r["M3"] = {"value": a3["covered"], "n": a3["n_covered"], "all": a3["all"], "n_all": a3["n_all"], "chance": a3["chance_covered"],
+               "p_oracle": p3, "bar": bar3, "pass": _ge(a3["covered"], bar3),
+               "p_oracle_rw": A["P-ORACLE-RW"]["M3"]["all"]["covered"],
+               "p_oracle_rw_090": _frac(0.90, A["P-ORACLE-RW"]["M3"]["all"]["covered"]),
+               "lr10": A["A-RW-LR10"]["M3"]["all"]["covered"],
+               "by_kind": {k: A["A-RW"]["M3"][f"kind:{k}"]["covered"] for k in ("colour", "shape", "both")},
+               "by_kind_p_oracle": {k: A["P-ORACLE"]["M3"][f"kind:{k}"]["covered"] for k in ("colour", "shape", "both")},
+               "by_size": {f"size{n}": A["A-RW"]["M3"][f"size{n}"]["covered"] for n in (2, 3)},
+               "by_pair": {f"{sh}-{co}": A["A-RW"]["M3"][f"pair:{sh}-{co}"]["covered"] for sh, co in W.HELDOUT}}
+    # SPEAK (§5) — fractions of P-ORACLE on the same items; READ-BACK is the wiring pin
+    sp, psp = A["A-RW"]["SPEAK"], A["P-ORACLE"]["SPEAK"]
+    b_sp = _frac(SPOKEN_VS_PORACLE, psp["spoken"])
+    r["SPOKEN"] = {"value": sp["spoken"], "n": sp["n_covered"], "p_oracle": psp["spoken"], "bar": b_sp,
+                   "pass": _ge(sp["spoken"], b_sp), "all": sp["spoken_all"], "reasons": sp["reasons"],
+                   "lr10": A["A-RW-LR10"]["SPEAK"]["spoken"], "n_shuf": A["N-SHUF"]["SPEAK"]["spoken"]}
+    b_tr = _frac(TRUTH_VS_PORACLE, psp["truth"])
+    r["TRUTH"] = {"value": sp["truth"], "n": sp["n_spoken"], "p_oracle": psp["truth"], "n_p_oracle": psp["n_spoken"],
+                  "bar": b_tr, "pass": _ge(sp["truth"], b_tr), "truth_seen": sp["truth_seen"],
+                  "truth_x_spoken": sp["truth_x_spoken"], "p_oracle_truth_x_spoken": psp["truth_x_spoken"],
+                  "lr10": A["A-RW-LR10"]["SPEAK"]["truth"], "n_shuf": A["N-SHUF"]["SPEAK"]["truth"],
+                  "n_shuf_chance": A["N-SHUF"]["SPEAK"]["chance_truth"]}
+    r["READ-BACK"] = {"value": sp["readback"], "n": sp["n_spoken"], "pass": sp["readback"] == 1.0 if sp["readback"] is not None else False,
+                      "p_oracle": psp["readback"], "not_gradable": ("nothing spoken" if sp["readback"] is None else False)}
+    b_or = _frac(ORDER_VS_PORACLE, psp["order"])
+    r["ORDER"] = {"value": sp["order"], "n": sp["n_multi"], "p_oracle": psp["order"], "bar": b_or,
+                  "pass": _ge(sp["order"], b_or), "length_mix": sp["length_mix"], "parent_mix": {"1": 0.25, "2": 0.5, "3": 0.25},
+                  "not_gradable": ("no multi-word phrase spoken" if sp["order"] is None else False)}
+    # DECLINE (§5): reads only with SPOKEN at its bar; CEILING-BOUND if the oracle reads < 0.80
+    dc, pdc = A["A-RW"]["DECLINE"], A["P-ORACLE"]["DECLINE"]
+    b_dc = _frac(DECLINE_VS_PORACLE, pdc["decline"])
+    if not r["SPOKEN"]["pass"]:
+        r["DECLINE"] = {"value": dc["decline"], "n": dc["n_covered"], "p_oracle": pdc["decline"], "bar": b_dc, "pass": False,
+                        "not_gradable": "the mouth is silent (SPOKEN below its bar)", "ceiling_bound": False}
+    else:
+        okd = _ge(dc["decline"], b_dc)
+        r["DECLINE"] = {"value": dc["decline"], "n": dc["n_covered"], "p_oracle": pdc["decline"], "bar": b_dc, "pass": okd,
+                        "not_gradable": False,
+                        "ceiling_bound": (not okd) and pdc["decline"] is not None and pdc["decline"] < DECLINE_ORGAN}
+    r["DECLINE"].update({"kind_A_spoken": dc["kind_A_spoken"], "kind_A_truth": dc["kind_A_truth"],
+                         "kind_B_decline_rate": dc["kind_B_decline_rate"], "reasons": dc["reasons"],
+                         "organ_purple": A["P-ORACLE"].get("organ_purple"), "lr10": A["A-RW-LR10"]["DECLINE"]["decline"]})
+    # the nulls
     ns = m1("N-SHUF")
-    r["N-SHUF"] = {"value": ns["covered"], "chance": ns["chance_covered"],
-                   "bar": None if ns["chance_covered"] is None else ns["chance_covered"] + M.BARS["NSHUF_over_chance"],
-                   "pass": _le(ns["covered"], None if ns["chance_covered"] is None else ns["chance_covered"] + M.BARS["NSHUF_over_chance"]),
-                   "by_size": {k: {"value": m1("N-SHUF", k)["covered"], "chance": m1("N-SHUF", k)["chance_covered"]}
-                               for k in ("size2", "size3")}}
-    for k in ("M1", "M2a", "M2b", "M6"):
+    nbar = None if ns["chance_covered"] is None else ns["chance_covered"] + M.BARS["NSHUF_over_chance"]
+    r["N-SHUF"] = {"value": ns["covered"], "chance": ns["chance_covered"], "bar": nbar, "pass": _le(ns["covered"], nbar)}
+    n3 = A["N-SHUF"]["M3"]["all"]
+    r["N-SHUF-M3"] = {"value": n3["covered"], "chance": n3["chance_covered"],
+                      "bar": None if n3["chance_covered"] is None else n3["chance_covered"] + M.BARS["NSHUF_over_chance"],
+                      "pass": _le(n3["covered"], None if n3["chance_covered"] is None else n3["chance_covered"] + M.BARS["NSHUF_over_chance"])}
+    for k in ("M1", "M2a", "M2b", "M6", "M3", "SPOKEN", "TRUTH", "DECLINE"):
         r[k]["underpowered"] = (not r[k].get("not_gradable")) and (r[k]["n"] or 0) < M.UNDERPOWERED_N
+    r["ORDER"]["underpowered"] = False
+    r["READ-BACK"]["underpowered"] = False
+    # the refutations (§9), per seed; the lr law's is read across seeds in the report
     prw = r["M1"]["p_oracle_rw"]
-    r["T1_refuted"] = bool(r["M1"]["value"] is not None and prw is not None and r["M1"]["value"] < M.T1_REFUTE * prw)
-    r["one_meeting_refuted"] = bool((not r["M6"].get("not_gradable")) and r["M6"]["value"] is not None
-                                    and r["M6"]["value"] < M.M6_REFUTE and r["M1"]["pass"])
+    m1p = r["M1"]["pass"]
+    r["refute"] = {
+        "T1": bool(r["M1"]["value"] is not None and prw is not None and r["M1"]["value"] < M.T1_REFUTE * prw),
+        "lr_below_lr10": bool(r["M1"]["value"] is not None and r["M1"]["lr10"] is not None and r["M1"]["value"] < r["M1"]["lr10"]),
+        "T2": bool(m1p and r["M3"]["value"] is not None and p3 is not None and r["M3"]["value"] < M.T1_REFUTE * p3),
+        "T3": bool(m1p and r["TRUTH"]["value"] is not None and (r["TRUTH"]["n"] or 0) >= M.UNDERPOWERED_N and r["TRUTH"]["value"] < T3_REFUTE),
+        "T4p_spread_is_the_limit": bool(r["M2b"]["value"] is not None and r["M2b"]["value"] < M.BARS["M2b"]
+                                        and (po3 or 0) >= M.BARS["M2b"] and r["M2b"]["reading_ii"] is not None
+                                        and r["M2b"]["reading_ii"] <= r["M2b"]["value"]),
+        "T4p_ii_above_law_by_005": bool(r["M2b"]["reading_ii"] is not None and r["M2b"]["value"] is not None
+                                        and r["M2b"]["reading_ii"] >= r["M2b"]["value"] + 0.05),
+        "T4p_learner_refuses": bool(r["M2b"]["value"] is not None and r["M2b"]["value"] >= M.BARS["M2b"]),
+        "one_meeting": bool((not r["M6"].get("not_gradable")) and r["M6"]["value"] is not None and r["M6"]["value"] < M.M6_REFUTE and m1p)}
     return r
 
 
-def print_seed_table(marks: Dict[str, object], log=print) -> List[str]:
-    ws = marks["world_seed"]
-    arms = [a for a in ARMS if a in marks["arms"]]
-    lines = [f"== S1a marks · world seed {ws} (test seed {W.TEST_SEEDS[ws]}) · the one meeting seen: {marks.get('meeting_seen')} =="]
-    rps = sorted(int(k) for k in marks["arms"]["A-RW"]["rp"])
-    lines.append("M1 (covered, the GRADED 2- and 3-thing items) by reading point — A-RW-LR01 is a reading arm (no bar):")
-    lines.append("   arm            " + " ".join(f"{rp:>7d}" for rp in rps))
-    for arm in arms:
-        vals = [marks["arms"][arm]["rp"][str(rp)]["M1"]["graded"]["covered"] for rp in rps]
-        lines.append(f"   {arm:<14} " + " ".join(f"{_f(v):>7}" for v in vals))
-    top = str(max(rps))
-    lines.append(f"At {top} scenes — M1 (covered · all) per block; chance and n from A-RW's items; size1 is the sanity reading:")
-    for key in ["graded", "size2", "size3", "size1", "type:colour", "type:shape", "type:size", "type:none",
-                "tpl:T1", "tpl:T2", "tpl:T3", "tpl:T4"]:
-        cells = []
-        for arm in arms:
-            b = marks["arms"][arm]["rp"][top]["M1"].get(key)
-            cells.append(f"{arm} —" if b is None else f"{arm} {_f(b['covered'])}·{_f(b['all'])}")
-        b0 = marks["arms"]["A-RW"]["rp"][top]["M1"].get(key) or {}
-        lines.append(f"   {key:<12} cov {_f(b0.get('coverage'))} chance {_f(b0.get('chance_covered'))} n {b0.get('n_covered')}/{b0.get('n_all')} | "
-                     + " | ".join(cells))
-    for arm in arms:
-        R = marks["arms"][arm]["rp"][top]
-        m2a, m2b, m6 = R["M2a"]["all"], R["M2b"], R["M6"]["all"]
-        nm = R["NAME"]
-        m6s = (f"M6 covered {_f(m6['covered'])} all {_f(m6['all'])} (n {m6['n_covered']}/{m6['n_all']}, chance {_f(m6['chance_covered'])}, unheard {m6['n_unheard']})"
-               if marks.get("meeting_seen") is True else "M6 NOT GRADABLE (the meeting was never seen)")
-        lines.append(f"   {arm:<14} M2a refusal {_f(m2a['refusal'])} (n {m2a['n']}) · false refusal (graded M1 covered) "
-                     f"{_f(R['M1']['graded']['false_refusal'])} · M2b {_f(m2b['graded']['correct'])} (n {m2b['graded']['n']}; "
-                     f"«I don't know» {_f(m2b['graded']['idk'])}; diamond {_f(m2b['diamond']['correct'])}) · {m6s} "
-                     f"· NAME shape {_f(nm['shape']['acc'])} colour {_f(nm['colour']['acc'])} size {_f(nm['size']['acc'])} "
-                     f"· «what is this?» emits the true word (the 0.90 promise) shape {_f(nm['shape'].get('emit_true'))} "
-                     f"colour {_f(nm['colour'].get('emit_true'))} size {_f(nm['size'].get('emit_true'))}")
-    for s in W.M2B_SHAPES:
-        lines.append(f"   M2b {s:<6} " + " ".join(f"{arm} {_f(marks['arms'][arm]['rp'][top]['M2b'][f'shape:{s}']['correct'])}" for arm in arms)
-                     + f" · A-RW emitted {marks['arms']['A-RW']['rp'][top]['M2b'][f'shape:{s}']['shape_words_emitted']}")
-    if marks.get("meeting_seen") is True:
-        for n in (2, 3):
-            lines.append(f"   M6 size{n}: " + " ".join(f"{arm} {_f(marks['arms'][arm]['rp'][top]['M6'][f'size{n}']['covered'])}" for arm in arms)
-                         + f" · chance {_f(marks['arms']['A-RW']['rp'][top]['M6'][f'size{n}']['chance_covered'])}")
-    gap = []
-    for key in ("graded", "size2", "size3"):
-        a = marks["arms"]["ORACLE-TRUTH"]["rp"][top]["M1"][key]["covered"]
-        b = marks["arms"]["P-ORACLE"]["rp"][top]["M1"][key]["covered"]
-        gap.append(f"{key} {_f(None if a is None or b is None else a - b)}")
-    lines.append("   the gaze's cost ORACLE-TRUTH − P-ORACLE on M1 (covered): " + " · ".join(gap))
-    for l in lines:
-        log(l)
-    return lines
+MARK_ORDER = ("M1", "M2a", "M2b", "M6", "M3", "SPOKEN", "TRUTH", "READ-BACK", "ORDER", "DECLINE", "N-SHUF", "N-SHUF-M3")
 
 
 def _verdict(b: Dict[str, object]) -> str:
@@ -497,62 +614,127 @@ def _verdict(b: Dict[str, object]) -> str:
     return "CEILING-BOUND" if b.get("ceiling_bound") else "FAIL"
 
 
+def print_seed_table(marks: Dict[str, object], log=print) -> List[str]:
+    ws = marks["world_seed"]
+    arms = [a for a in ARMS if a in marks["arms"]]
+    lines = [f"== S1b-1 marks · world seed {ws} (test seed {W.TEST_SEEDS[ws]}) · the one meeting seen: {marks.get('meeting_seen')} =="]
+    rps = sorted(int(k) for k in marks["arms"]["A-RW"]["rp"])
+    lines.append("M1 (covered, the graded 2- and 3-thing items) / M3 (covered) by reading point — A-RW-LR10 is S1a's law, a reading:")
+    lines.append("   arm            " + " ".join(f"{rp:>11d}" for rp in rps))
+    for arm in arms:
+        vals = [(marks["arms"][arm]["rp"][str(rp)]["M1"]["graded"]["covered"], marks["arms"][arm]["rp"][str(rp)]["M3"]["all"]["covered"]) for rp in rps]
+        lines.append(f"   {arm:<14} " + " ".join(f"{_f(a)}/{_f(b)}" for a, b in vals))
+    top = str(max(rps))
+    lines.append(f"At {top} scenes (covered · all), chance and n from A-RW's items:")
+    for key in ["graded", "size2", "size3", "size1"]:
+        b0 = marks["arms"]["A-RW"]["rp"][top]["M1"][key]
+        lines.append(f"   M1 {key:<8} cov {_f(b0.get('coverage'))} chance {_f(b0.get('chance_covered'))} n {b0.get('n_covered')}/{b0.get('n_all')} | "
+                     + " | ".join(f"{a} {_f(marks['arms'][a]['rp'][top]['M1'][key]['covered'])}·{_f(marks['arms'][a]['rp'][top]['M1'][key]['all'])}" for a in arms))
+    for key in ["all", "kind:colour", "kind:shape", "kind:both", "size2", "size3"] + [f"pair:{sh}-{co}" for sh, co in W.HELDOUT]:
+        b0 = marks["arms"]["A-RW"]["rp"][top]["M3"][key]
+        lines.append(f"   M3 {key:<22} chance {_f(b0.get('chance_covered'))} n {b0.get('n_covered')}/{b0.get('n_all')} | "
+                     + " | ".join(f"{a} {_f(marks['arms'][a]['rp'][top]['M3'][key]['covered'])}" for a in arms))
+    for arm in arms:
+        R = marks["arms"][arm]["rp"][top]
+        g = R["M1"]["graded"]
+        m2a = R["M2a"]
+        m2b = R["M2b"]
+        nm = R["NAME"]
+        rw = arm in RW_ARMS
+        lines.append(f"   {arm:<14} M2a refusal {_f(m2a['law']['all']['refusal'])} false {_f(g['false_refusal'])}"
+                     + (f" [(i) {_f(m2a['i']['all']['refusal'])}/{_f(g.get('false_refusal_i'))} · (ii) {_f(m2a['ii']['all']['refusal'])}/{_f(g.get('false_refusal_ii'))}]" if rw else "")
+                     + f" · M2b {_f(m2b['law']['graded']['correct'])} (idk {_f(m2b['law']['graded']['idk'])}; diamond {_f(m2b['law']['diamond']['correct'])})"
+                     + (f" [(i) {_f(m2b['i']['graded']['correct'])} · (ii) {_f(m2b['ii']['graded']['correct'])}]" if rw else "")
+                     + " · M6 " + (f"{_f(R['M6']['all']['covered'])} (n {R['M6']['all']['n_covered']})" if marks.get("meeting_seen") is True else "NOT GRADABLE")
+                     + f" · NAME emits the true word: shape {_f(nm['shape']['true_emit'])} colour {_f(nm['colour']['true_emit'])} size {_f(nm['size']['true_emit'])}"
+                     + (f" [(i) {_f(nm['shape']['true_emit_i'])}/{_f(nm['colour']['true_emit_i'])}/{_f(nm['size']['true_emit_i'])}]" if rw else ""))
+        sp, dc = R["SPEAK"], R["DECLINE"]
+        lines.append(f"   {'':<14} SPEAK spoken {_f(sp['spoken'])} (n {sp['n_covered']}; all {_f(sp['spoken_all'])}) · truth {_f(sp['truth'])} (n {sp['n_spoken']}; seen {_f(sp['truth_seen'])}; ×spoken {_f(sp['truth_x_spoken'])})"
+                     f" · read-back {_f(sp['readback'])} · order {_f(sp['order'])} (n {sp['n_multi']}) · lengths {sp['length_mix']} · reasons {sp['reasons']}"
+                     f" · DECLINE {_f(dc['decline'])} (n {dc['n_covered']}; A spoken {_f(dc['kind_A_spoken'])} truth {_f(dc['kind_A_truth'])}; B decline {_f(dc['kind_B_decline_rate'])})")
+    org = marks["arms"]["P-ORACLE"]["rp"][top].get("organ_purple")
+    if org:
+        lines.append("   the organ fact (P-ORACLE's colour d_w / B_w of the purple targets): " + " · ".join(
+            f"{w} mean {v['mean_d_over_B']:.2f} inside {v['inside_band']:.2f}" for w, v in org.items()))
+    for l in lines:
+        log(l)
+    return lines
+
+
 def report(root: Path, log=print) -> Dict[str, object]:
-    out = {"prereg_sha256": PREREG_SHA256, "amend2_sha256": AMEND2_SHA256, "seeds": {}}
-    lines: List[str] = []
+    out = {"prereg_sha256": PREREG_SHA256, "amend2_sha256": AMEND2_SHA256, "prereg_s1b1_sha256": PREREG_S1B1_SHA256, "seeds": {}}
+    lines: List[str] = [f"S1b-1 report · PREREG-S1B1 sha {PREREG_S1B1_SHA256} · PREREG-R3-TONIGHT {PREREG_SHA256[:16]}… · AMEND-2 {AMEND2_SHA256[:16]}…", ""]
     for ws in W.WORLD_SEEDS:
         mk = json.loads((seed_root(root, ws) / "marks.json").read_text())
         lines += print_seed_table(mk, log=lambda s: None)
-        out["seeds"][str(ws)] = bars_for(mk)
+        b = bars_for(mk)
+        b["s1a"] = s1a_beside(ws)
+        out["seeds"][str(ws)] = b
         lines.append("")
-    lines.append("== S1a BARS at 10,000 scenes (A-RW; P-ORACLE's reading beside every mark; M1 on the 2- and 3-thing items) ==")
+    lines.append("== S1b-1 BARS at 10,000 scenes (A-RW, the law lr 0.01; P-ORACLE beside every mark; S1a's A-RW on the identical items beside) ==")
     for ws in W.WORLD_SEEDS:
         b = out["seeds"][str(ws)]
+        s1a = (b.get("s1a") or {}).get("A-RW", {})
         m1 = b["M1"]
-        lines.append(f"{ws} M1 covered {_f(m1['value'])} (all {_f(m1['all'])}; n {m1['n']}/{m1['n_all']}; chance {_f(m1['chance'])}) "
-                     f"bars ≥ {_f(m1['bar_rw'])} (0.90 × P-ORACLE-RW {_f(m1['p_oracle_rw'])}) and ≥ {_f(m1['bar_lda'])} "
-                     f"(0.80 × P-ORACLE {_f(m1['p_oracle'])}) → {_verdict(m1)} · ORACLE-TRUTH {_f(m1['oracle_truth'])} · "
-                     f"A-RW-LR01 {_f(m1['lr01'])} (reading)")
+        lines.append(f"{ws} M1 {_f(m1['value'])} (all {_f(m1['all'])}; n {m1['n']}/{m1['n_all']}; chance {_f(m1['chance'])}) bars ≥ {_f(m1['bar_rw'])} (0.90 × P-ORACLE-RW {_f(m1['p_oracle_rw'])}) "
+                     f"and ≥ {_f(m1['bar_lda'])} (0.80 × P-ORACLE {_f(m1['p_oracle'])}) → {_verdict(m1)} · A-RW-LR10 {_f(m1['lr10'])} · S1a {_f(s1a.get('M1'))}")
         for k, v in m1["by_size"].items():
-            lines.append(f"          {k}: {_f(v['value'])} (n {v['n']}, chance {_f(v['chance'])}) bars {_f(v['bar_rw'])} · {_f(v['bar_lda'])} "
-                         f"(P-ORACLE-RW {_f(v['p_oracle_rw'])}, P-ORACLE {_f(v['p_oracle'])}) → {_verdict(v)} · A-RW-LR01 {_f(v['lr01'])}")
-        lines.append(f"          size1 (sanity): {_f(m1['sanity_size1']['value'])} (n {m1['sanity_size1']['n']})")
-        m2a, m2b, m6, ns = b["M2a"], b["M2b"], b["M6"], b["N-SHUF"]
-        lines.append(f"          M2a refusal {_f(m2a['value'])} (n {m2a['n']}) · false refusal {_f(m2a['false_refusal'])} (n {m2a['n_fr']}) "
+            lines.append(f"          M1 {k}: {_f(v['value'])} (n {v['n']}, chance {_f(v['chance'])}) → {_verdict(v)} · A-RW-LR10 {_f(v['lr10'])}")
+        m2a = b["M2a"]
+        lines.append(f"          M2a refusal {_f(m2a['value'])} (n {m2a['n']}) · false refusal {_f(m2a['false_refusal'])} (n {m2a['n_fr']}; expected {m2a['expected_false_refusal']:.2f}) "
                      f"· P-ORACLE {_f(m2a['p_oracle'])} / {_f(m2a['p_oracle_fr'])} → {_verdict(m2a)}"
-                     + (f" (the learner fails: {', '.join(m2a['failing_halves'])}; the whole-bar reading: "
-                        f"{'CEILING-BOUND' if m2a['whole_bar_ceiling'] else 'FAIL'})" if not m2a["pass"] else ""))
-        lines.append(f"          M2b {_f(m2b['value'])} (n {m2b['n']}) · P-ORACLE {_f(m2b['p_oracle'])} → {_verdict(m2b)} · diamond (apart) "
-                     f"{_f(m2b['diamond'])} · P-ORACLE {_f(m2b['diamond_p_oracle'])}")
-        if m6.get("not_gradable"):
-            lines.append(f"          M6 NOT GRADABLE — {m6['not_gradable']}")
-        else:
-            lines.append(f"          M6 covered {_f(m6['value'])} (all {_f(m6['all'])}; n {m6['n']}/{m6['n_all']}; chance {_f(m6['chance'])}) "
-                         f"· P-ORACLE {_f(m6['p_oracle'])} → {_verdict(m6)}")
-        lines.append(f"          N-SHUF M1 {_f(ns['value'])} ≤ chance {_f(ns['chance'])} + 0.05 = {_f(ns['bar'])} → {'PASS' if ns['pass'] else 'FAIL'} "
-                     f"(size2 {_f(ns['by_size']['size2']['value'])} vs {_f(ns['by_size']['size2']['chance'])}; "
-                     f"size3 {_f(ns['by_size']['size3']['value'])} vs {_f(ns['by_size']['size3']['chance'])})")
-        und = [k for k in ("M1", "M2a", "M2b", "M6") if b[k].get("underpowered")]
-        if und:
-            lines.append(f"          UNDERPOWERED (n < 30): {', '.join(und)}")
+                     + (f" (the learner fails: {', '.join(m2a['failing_halves'])}; whole-bar: {'CEILING-BOUND' if m2a['whole_bar_ceiling'] else 'FAIL'})" if not m2a["pass"] else "")
+                     + f" · (i) {_f(m2a['reading_i']['refusal'])}/{_f(m2a['reading_i']['false_refusal'])} · (ii) {_f(m2a['reading_ii']['refusal'])}/{_f(m2a['reading_ii']['false_refusal'])}"
+                     + f" · A-RW-LR10 {_f(m2a['lr10']['refusal'])}/{_f(m2a['lr10']['false_refusal'])} · S1a {_f(s1a.get('M2a_refusal'))}/{_f(s1a.get('M2a_false_refusal'))}")
+        m2b = b["M2b"]
+        lines.append(f"          M2b {_f(m2b['value'])} (n {m2b['n']}; «I don't know» {_f(m2b['idk'])}) · P-ORACLE {_f(m2b['p_oracle'])} → {_verdict(m2b)} · (i) {_f(m2b['reading_i'])} · (ii) {_f(m2b['reading_ii'])} "
+                     f"· A-RW-LR10 {_f(m2b['lr10'])} · S1a {_f(s1a.get('M2b'))} · diamond (apart) {_f(m2b['diamond'])} · P-ORACLE {_f(m2b['diamond_p_oracle'])} · shape words said {m2b['shape_words']}")
+        m6 = b["M6"]
+        lines.append("          M6 " + (f"NOT GRADABLE — {m6['not_gradable']}" if m6.get("not_gradable") else
+                                          f"{_f(m6['value'])} (all {_f(m6['all'])}; n {m6['n']}/{m6['n_all']}; chance {_f(m6['chance'])}) · P-ORACLE {_f(m6['p_oracle'])} → {_verdict(m6)}")
+                     + f" · S1a {_f(s1a.get('M6'))}")
+        m3 = b["M3"]
+        lines.append(f"          M3 {_f(m3['value'])} (all {_f(m3['all'])}; n {m3['n']}/{m3['n_all']}; chance {_f(m3['chance'])}) bar ≥ {_f(m3['bar'])} (0.80 × P-ORACLE {_f(m3['p_oracle'])}) → {_verdict(m3)} "
+                     f"· kinds colour {_f(m3['by_kind']['colour'])} shape {_f(m3['by_kind']['shape'])} both {_f(m3['by_kind']['both'])} · P-ORACLE-RW {_f(m3['p_oracle_rw'])} (0.90× {_f(m3['p_oracle_rw_090'])}, a reading) · A-RW-LR10 {_f(m3['lr10'])}")
+        s, t, rb, o, dcl = b["SPOKEN"], b["TRUTH"], b["READ-BACK"], b["ORDER"], b["DECLINE"]
+        lines.append(f"          SPOKEN {_f(s['value'])} (n {s['n']}) ≥ {_f(s['bar'])} (0.80 × P-ORACLE {_f(s['p_oracle'])}) → {_verdict(s)} · reasons {s['reasons']} · A-RW-LR10 {_f(s['lr10'])} · N-SHUF {_f(s['n_shuf'])}")
+        lines.append(f"          TRUTH {_f(t['value'])} (n {t['n']}) ≥ {_f(t['bar'])} (0.90 × P-ORACLE {_f(t['p_oracle'])}, n {t['n_p_oracle']}) → {_verdict(t)} · seen {_f(t['truth_seen'])} · ×spoken {_f(t['truth_x_spoken'])} "
+                     f"(P-ORACLE {_f(t['p_oracle_truth_x_spoken'])}) · A-RW-LR10 {_f(t['lr10'])} · N-SHUF {_f(t['n_shuf'])} vs a random true phrase {_f(t['n_shuf_chance'])}")
+        lines.append(f"          READ-BACK {_f(rb['value'])} (n {rb['n']}; the wiring pin = 1.000) → {_verdict(rb) if rb['value'] is None or rb['value'] == 1.0 else 'BROKEN ROAD'} · "
+                     f"ORDER {_f(o['value'])} (n {o['n']}) ≥ {_f(o['bar'])} (0.95 × P-ORACLE {_f(o['p_oracle'])}) → {_verdict(o)} · lengths {o['length_mix']} vs the parent's {o['parent_mix']}")
+        lines.append(f"          DECLINE {_f(dcl['value'])} (n {dcl['n']}) ≥ {_f(dcl['bar'])} (0.90 × P-ORACLE {_f(dcl['p_oracle'])}) → {_verdict(dcl)} · kind A spoken {_f(dcl['kind_A_spoken'])} truth {_f(dcl['kind_A_truth'])} "
+                     f"· kind B decline {_f(dcl['kind_B_decline_rate'])} · A-RW-LR10 {_f(dcl['lr10'])}")
+        ns, n3 = b["N-SHUF"], b["N-SHUF-M3"]
+        lines.append(f"          N-SHUF M1 {_f(ns['value'])} ≤ {_f(ns['bar'])} → {'PASS' if ns['pass'] else 'FAIL'} · M3 {_f(n3['value'])} ≤ {_f(n3['bar'])} → {'PASS' if n3['pass'] else 'FAIL'}")
+    reads = {k: {ws: (_verdict(out["seeds"][str(ws)][k]) if k not in ("N-SHUF", "N-SHUF-M3") else ("PASS" if out["seeds"][str(ws)][k]["pass"] else "FAIL"))
+                 for ws in W.WORLD_SEEDS} for k in MARK_ORDER}
+    for ws in W.WORLD_SEEDS:
+        rb = out["seeds"][str(ws)]["READ-BACK"]
+        if rb["value"] is not None and rb["value"] != 1.0:
+            reads["READ-BACK"][ws] = "BROKEN ROAD"
     grad6 = [ws for ws in W.WORLD_SEEDS if not out["seeds"][str(ws)]["M6"].get("not_gradable")]
-    # a seed counts for a mark only when that mark READS PASS there (UNDERPOWERED, CEILING-BOUND and FAIL do not)
-    reads = {k: {ws: (_verdict(out["seeds"][str(ws)][k]) if k != "N-SHUF" else ("PASS" if out["seeds"][str(ws)][k]["pass"] else "FAIL"))
-                 for ws in W.WORLD_SEEDS} for k in ("M1", "M2a", "M2b", "M6", "N-SHUF")}
-    allpass = {k: all(reads[k][ws] == "PASS" for ws in W.WORLD_SEEDS) for k in ("M1", "M2a", "M2b", "N-SHUF")}
+    allpass = {k: all(reads[k][ws] == "PASS" for ws in W.WORLD_SEEDS) for k in MARK_ORDER if k != "M6"}
     allpass["M6"] = bool(grad6) and all(reads["M6"][ws] == "PASS" for ws in grad6)
-    lines.append("per seed: " + " · ".join(f"{k} " + "/".join(reads[k][ws] for ws in W.WORLD_SEEDS) for k in reads))
-    lines.append("every bar at all 3 seeds (M6 at the seeds where the meeting was seen: " + ", ".join(map(str, grad6)) + "): "
-                 + " · ".join(f"{k} {'PASS' if v else 'no'}" for k, v in allpass.items())
-                 + f" → S1a {'PASSES' if all(allpass.values()) else 'does not pass'}")
-    out["reads"] = {k: {str(ws): v for ws, v in d.items()} for k, d in reads.items()}
-    lines.append("refutations: T1 (A-RW M1 < 0.6 × P-ORACLE-RW) " + " ".join(
-        f"{ws}:{'REFUTED' if out['seeds'][str(ws)]['T1_refuted'] else 'no'}" for ws in W.WORLD_SEEDS)
-        + " · one-meeting (M6 < 0.5 while M1 passes) " + " ".join(
-        f"{ws}:{'REFUTED' if out['seeds'][str(ws)]['one_meeting_refuted'] else ('n/g' if out['seeds'][str(ws)]['M6'].get('not_gradable') else 'no')}"
-        for ws in W.WORLD_SEEDS))
+    lines.append("per seed: " + " · ".join(f"{k} " + "/".join(reads[k][ws] for ws in W.WORLD_SEEDS) for k in MARK_ORDER))
+    lines.append("every bar at all 3 seeds (M6 where the meeting was seen: " + ", ".join(map(str, grad6)) + "): "
+                 + " · ".join(f"{k} {'PASS' if allpass[k] else 'no'}" for k in MARK_ORDER)
+                 + f" → S1b-1 {'PASSES' if all(allpass.values()) else 'does not pass'}")
+    ref = {ws: out["seeds"][str(ws)]["refute"] for ws in W.WORLD_SEEDS}
+    lr_revert = sum(ref[ws]["lr_below_lr10"] for ws in W.WORLD_SEEDS) >= 2
+    ii_above = sum(ref[ws]["T4p_ii_above_law_by_005"] for ws in W.WORLD_SEEDS) >= 2
+    lines.append("refutations (§9): T1 " + " ".join(f"{ws}:{'REFUTED' if ref[ws]['T1'] else 'no'}" for ws in W.WORLD_SEEDS)
+                 + f" · the lr law (A-RW below A-RW-LR10 on M1 at ≥ 2 seeds) {'REVERTS' if lr_revert else 'stands'} "
+                 + "(" + " ".join(f"{ws}:{'below' if ref[ws]['lr_below_lr10'] else 'not below'}" for ws in W.WORLD_SEEDS) + ")"
+                 + " · T2 " + " ".join(f"{ws}:{'REFUTED' if ref[ws]['T2'] else 'no'}" for ws in W.WORLD_SEEDS)
+                 + " · T3 " + " ".join(f"{ws}:{'REFUTED' if ref[ws]['T3'] else 'no'}" for ws in W.WORLD_SEEDS)
+                 + " · T4′ spread-is-the-limit " + " ".join(f"{ws}:{'yes' if ref[ws]['T4p_spread_is_the_limit'] else 'no'}" for ws in W.WORLD_SEEDS)
+                 + f" · (ii) above the law by ≥ 0.05 at ≥ 2 seeds: {'yes — the plain band is the next law' if ii_above else 'no'}"
+                 + " · the learner refuses (M2b ≥ 0.80) " + " ".join(f"{ws}:{'yes' if ref[ws]['T4p_learner_refuses'] else 'no'}" for ws in W.WORLD_SEEDS)
+                 + " · one-meeting " + " ".join(f"{ws}:{'REFUTED' if ref[ws]['one_meeting'] else ('n/g' if out['seeds'][str(ws)]['M6'].get('not_gradable') else 'no')}" for ws in W.WORLD_SEEDS))
     out["all_pass"] = allpass
+    out["reads"] = {k: {str(ws): v for ws, v in d.items()} for k, d in reads.items()}
     out["m6_gradable_seeds"] = grad6
+    out["lr_law_reverts"] = lr_revert
     for l in lines:
         log(l)
     dump(Path(root) / "report.json", out)
@@ -615,54 +797,143 @@ def _per_type_naming(reader, things: Things, truth_rows, arm: str = "P-ORACLE") 
     return {t: (sum(v) / len(v) if v else None, len(v)) for t, v in ok.items()}
 
 
+def gate_eye_fixture() -> Dict[str, object]:
+    """Step 1: the seat's eye fixture under /usr/bin/python3 with THIS tree first on sys.path (S1a's first test)."""
+    repo = str(Path(__file__).resolve().parents[2])
+    fx = "/data/dev/genome-wt-brain3/docs/brain/r3/seat_eye_fixture.py"
+    code = (f"import sys, runpy\nsys.path.insert(0, {repo!r})\nrunpy.run_path({fx!r}, run_name='__main__')\n"
+            "import brain\nprint('MODULE', brain.__file__)\n")
+    env = dict(os.environ, OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1", PYTHONDONTWRITEBYTECODE="1")
+    env.pop("PYTHONPATH", None)
+    p = subprocess.run(["/usr/bin/python3", "-B", "-c", code], capture_output=True, text=True, env=env, cwd=repo, timeout=300)
+    rows = [l for l in p.stdout.splitlines() if l.startswith("row ")]
+    ok = [l.endswith("png-sha match True · glances byte-equal True") for l in rows]
+    mod = [l.split(" ", 1)[1] for l in p.stdout.splitlines() if l.startswith("MODULE ")]
+    return {"rows": len(rows), "equal": sum(ok), "pass": p.returncode == 0 and len(rows) == 3 and all(ok)
+            and bool(mod) and mod[0].startswith(repo), "module": mod[0] if mod else None}
+
+
+def gate_identity(root: Path) -> Dict[str, object]:
+    """Step 2 (PREREG-S1B1 §1): (a) every redrawn S1a cache (train / test / m2b / m6 of each world seed, and the toy and
+    stage −1) carries S1a's scene specs, canvas shas and glances; (b) the M1 / M2a / M2b / M6 / NAME item ids — with
+    their phrase and target — equal S1a's keys.json; stage −1's printed text equals S1a's byte for byte."""
+    res = {"caches": {}, "items": {}, "stage_text_equal": None}
+    for ws in W.WORLD_SEEDS:
+        for split in ("train", "test", "m2b", "m6"):
+            res["caches"][f"{ws}/{split}"] = C.identity_with(C.cache_dir(root, ws, split), C.cache_dir(C.S1A_RUNS, ws, split))
+        kn = json.loads((seed_root(root, ws) / "keys.json").read_text())["items"]
+        ko = json.loads((seed_root(C.S1A_RUNS, ws) / "keys.json").read_text())["items"]
+        for mark in ("M1", "M2a", "M2b", "M6", "NAME"):
+            a = [(it["item_id"], it.get("phrase"), it.get("target")) for it in kn[mark]]
+            b = [(it["item_id"], it.get("phrase"), it.get("target")) for it in ko[mark]]
+            res["items"][f"{ws}/{mark}"] = {"n": len(a), "same": a == b}
+    for split in ("toy-train", "toy-test", "stage"):
+        res["caches"][split] = C.identity_with(C.cache_dir(root, None, split), C.cache_dir(C.S1A_RUNS, None, split))
+    new_t = (Path(root) / "stage" / "stage_minus1.txt")
+    old_t = (C.S1A_RUNS / "stage" / "stage_minus1.txt")
+    res["stage_text_equal"] = new_t.exists() and old_t.exists() and new_t.read_bytes() == old_t.read_bytes()
+    res["pass"] = (all(v["same"] for v in res["caches"].values()) and all(v["same"] for v in res["items"].values())
+                   and bool(res["stage_text_equal"]))
+    return res
+
+
+def gate_lockin() -> Dict[str, object]:
+    """Step 4 (§2): the machinery toy of tests/brain/scene/test_learners_s1b1.py — planted directions, ambiguous 2-thing
+    scenes, seeds 11 / 12, 1,500 scenes — lr 0.01 must read > 0.90 and lr 0.1 on the SAME scenes ≥ 0.10 below it."""
+    rng = np.random.default_rng(11)
+    dirs = {w: rng.normal(size=Lr.RW_DIM) for w in ("a", "b", "c", "d")}
+    scenes = []
+    for _ in range(1500):
+        ws = rng.choice(list(dirs), size=2, replace=False)
+        raw = np.stack([dirs[w] + 0.3 * rng.normal(size=Lr.RW_DIM) for w in ws])
+        scenes.append((raw, [str(ws[rng.integers(2)])]))
+
+    def acc(lr):
+        L = Lr.RWLearner(lr=lr)
+        for k, (raw, ws) in enumerate(scenes):
+            L.train_scene(raw, ws, rng=np.random.default_rng(k))
+        r2 = np.random.default_rng(12)
+        ok = 0
+        for k in range(200):
+            ws = r2.choice(list(dirs), size=2, replace=False)
+            raw = np.stack([dirs[w] + 0.3 * r2.normal(size=Lr.RW_DIM) for w in ws])
+            ok += L.answer_point(raw, [str(ws[0])], np.random.default_rng(k))["point"] == 0
+        return ok / 200
+
+    a001, a01 = acc(Lr.LR_S1B1), acc(Lr.LR)
+    return {"lr_001": a001, "lr_01": a01, "pass": a001 > 0.90 and a001 - a01 >= 0.10}
+
+
+def gate_order_key() -> Dict[str, object]:
+    """Step 5 (§5): the ORDER KEY learned from seed 20261101's first 300 utterances reads size < colour < shape for
+    every word; a shuffled-position control (each utterance permuted by a seeded generator) fails the pin."""
+    ws0 = W.WORLD_SEEDS[0]
+    utts = [W.train_scene(ws0, i).words for i in range(W.GATE_N)]
+    heard = sorted({w for u in utts for w in u})
+
+    def pin(ear):
+        k = {t: [ear.key(w) for w in heard if W.word_type(w) == t] for t in ("size", "colour", "shape")}
+        return bool(all(k.values()) and max(k["size"]) < min(k["colour"]) and max(k["colour"]) < min(k["shape"])), k
+
+    ear = Lr.Ear()
+    for u in utts:
+        ear.hear(u)
+    ok, keys = pin(ear)
+    rng = np.random.default_rng(ws0)
+    ctrl = Lr.Ear()
+    for u in utts:
+        ctrl.hear(tuple(u[k] for k in rng.permutation(len(u))))
+    cok, _ck = pin(ctrl)
+    return {"pin": ok, "control_fails": not cok, "keys": {t: [round(v, 3) for v in vs] for t, vs in keys.items()},
+            "pass": ok and not cok}
+
+
 def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, object]:
+    """THE FIRST GATE of PREREG-S1B1 §8 (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:55 +0400) — nine steps; each of steps
+    1–8 stops the run on a miss; step 9 is printed. Needs every cache and every seed's questions under `root`."""
     check_prereg()
     t0 = time.perf_counter()
-    out: Dict[str, object] = {"prereg_sha256": PREREG_SHA256, "amend2_sha256": AMEND2_SHA256, "code": code_identity()}
-    lines = ["== THE FIRST GATE (PREREG-R3-TONIGHT §S1a, as AMENDMENT 2 reads it) =="]
-    # --- 1. the toy
-    for split in ("toy-train", "toy-test"):
-        d = C.cache_dir(root, None, split)
-        if not d.exists():
-            C.build(split, None, d, log=log)
+    out: Dict[str, object] = {"prereg_sha256": PREREG_SHA256, "amend2_sha256": AMEND2_SHA256,
+                              "prereg_s1b1_sha256": PREREG_S1B1_SHA256, "code": code_identity()}
+    lines = ["== THE FIRST GATE (PREREG-S1B1 §8; each step stops the run on a miss) =="]
+    stop: List[str] = []
+    # 1. the eye
+    eye = gate_eye_fixture()
+    out["eye"] = eye
+    lines.append(f"1. the eye fixture under /usr/bin/python3 from this tree: {eye['equal']}/{eye['rows']} byte-equal (module {eye['module']}) → {'PASS' if eye['pass'] else 'MISS'}")
+    if not eye["pass"]:
+        stop.append("the eye fixture")
+    # 2. identity with S1a
+    idn = gate_identity(root)
+    out["identity"] = idn
+    bad_c = [k for k, v in idn["caches"].items() if not v["same"]]
+    bad_i = [k for k, v in idn["items"].items() if not v["same"]]
+    lines.append(f"2. identity with S1a: {len(idn['caches']) - len(bad_c)}/{len(idn['caches'])} caches carry S1a's specs, canvas shas and glances "
+                 f"(rows {sum(v['rows_new'] for v in idn['caches'].values())}); {len(idn['items']) - len(bad_i)}/{len(idn['items'])} item sets equal S1a's keys; "
+                 f"stage −1's text byte-equal: {idn['stage_text_equal']} → {'PASS' if idn['pass'] else 'MISS ' + str(bad_c + bad_i)}")
+    if not idn["pass"]:
+        stop.append("the identity with S1a")
+    # 3. the toy at lr 0.01, no fallback
     tr = Things(C.ScenePercepts(C.cache_dir(root, None, "toy-train")))
     te = Things(C.ScenePercepts(C.cache_dir(root, None, "toy-test")))
     te_truth = C.load_truth(C.cache_dir(root, None, "toy-test"))
     tr_truth = C.load_truth(C.cache_dir(root, None, "toy-train"))
     items = M.m1_items(te_truth, W.TOY_SEED, mark="TOY")
     rows = list(range(len(tr.p)))
-
-    def toy_run(lr):
-        L = Lr.RWLearner(lr=lr)
-        seen: list = []
-        train_arm("A-RW", L, tr, tr.p.words, None, rows, W.TOY_SEED, seen)
-        L.calibrate(seen)
-        return _toy_m1(L, "A-RW", items, te, te_truth)
-
-    toy = {"items": len(items), "runs": {}}
-    r = toy_run(Lr.LR)
-    toy["runs"][str(Lr.LR)] = r
-    lr = Lr.LR
-    if r["covered"] < M.TOY_BAR:
-        for g in Lr.LR_GRID:
-            if str(g) not in toy["runs"]:
-                toy["runs"][str(g)] = toy_run(g)
-        best = max(toy["runs"].items(), key=lambda kv: (kv[1]["covered"], float(kv[0]) == Lr.LR, -float(kv[0])))
-        lr = float(best[0])
-        toy["fallback"] = True
-    else:
-        toy["fallback"] = False
-    toy["lr"] = lr
-    toy["m1_covered"] = toy["runs"][str(lr)]["covered"]
-    toy["pass"] = toy["m1_covered"] >= M.TOY_BAR
-    lines.append(f"1. THE TOY: A-RW trained on {len(rows)} one-thing scenes (seed {W.TOY_SEED}), M1 on {len(items)} two-thing "
-                 f"items: " + " · ".join(f"lr {k}: covered {_f(v['covered'])} (n {v['n_covered']}) all {_f(v['all'])} chance {_f(v['chance_covered'])}"
-                                         for k, v in toy["runs"].items())
-                 + f" → lr {lr} {'PASS' if toy['pass'] else 'FAIL'} (bar ≥ {M.TOY_BAR}; fallback grid {'used' if toy['fallback'] else 'not needed'})")
-    # --- ε for P-ORACLE, on the toy seed only
+    L = Lr.RWLearner(lr=Lr.LR_S1B1)
+    seen: list = []
+    train_arm("A-RW", L, tr, tr.p.words, None, rows, W.TOY_SEED, seen)
+    L.calibrate(seen)
+    toy = _toy_m1(L, "A-RW", items, te, te_truth)
+    toy_pass = _ge(toy["covered"], M.TOY_BAR)
+    out["toy"] = {"lr": Lr.LR_S1B1, "m1": toy, "pass": toy_pass}
+    lines.append(f"3. THE TOY at lr {Lr.LR_S1B1} (no fallback): M1 covered {_f(toy['covered'])} (n {toy['n_covered']}; all {_f(toy['all'])}; chance {_f(toy['chance_covered'])}) "
+                 f"≥ {M.TOY_BAR} → {'PASS' if toy_pass else 'MISS'}")
+    if not toy_pass:
+        stop.append("the toy at lr 0.01")
     eps_rows = {}
     for eps in Lr.EPS_GRID:
-        R = make_learner("P-ORACLE", Lr.LR, eps)            # AMENDMENT 2 §1: the TYPE-AWARE reader, ε on the toy as before
+        R = make_learner("P-ORACLE", Lr.LR_S1B1, eps)
         train_arm("P-ORACLE", R, tr, tr.p.words, tr_truth, rows, W.TOY_SEED)
         R.prepare()
         nm = _per_type_naming(R, te, te_truth)
@@ -670,17 +941,23 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
                               "m1": _toy_m1(R, "P-ORACLE", items, te, te_truth)["covered"]}
     best = max(eps_rows.items(), key=lambda kv: (kv[1]["mean"], float(kv[0])))
     eps = float(best[0])
-    out["eps_choice"] = {"grid": eps_rows, "eps": eps, "rule": "max mean per-type forced naming on the toy's two-thing "
-                         "scenes' covered things; ties → the larger ε"}
-    lines.append("   P-ORACLE's ε on the toy seed only (mean per-type forced naming · toy M1): " + " · ".join(
-        f"{k}: {v['mean']:.3f} · {v['m1']:.3f}" for k, v in eps_rows.items()) + f" → ε {eps}")
-    out["toy"] = toy
-    out["lr"], out["eps"] = lr, eps
-    if toy_only:
-        for l in lines:
-            log(l)
-        return out
-    # --- 2. the instrument verdict: P-ORACLE's per-type naming, leave-one-scene-out, on the gate's one-thing scenes
+    out["eps_choice"] = {"grid": eps_rows, "eps": eps}
+    lines.append("   P-ORACLE's ε on the toy seed (S1a's rule): " + " · ".join(f"{k}: {v['mean']:.3f} · {v['m1']:.3f}" for k, v in eps_rows.items()) + f" → ε {eps}")
+    # 4. the lock-in pin
+    lk = gate_lockin()
+    out["lockin"] = lk
+    lines.append(f"4. the lock-in pin (machinery toy, seeds 11 / 12, 1,500 scenes): lr 0.01 {lk['lr_001']:.3f} · lr 0.1 {lk['lr_01']:.3f} "
+                 f"(> 0.90 and ≥ 0.10 below) → {'PASS' if lk['pass'] else 'MISS'}")
+    if not lk["pass"]:
+        stop.append("the lock-in pin")
+    # 5. the ORDER-KEY pin
+    ok = gate_order_key()
+    out["order_key"] = ok
+    lines.append(f"5. the ORDER-KEY pin on seed {W.WORLD_SEEDS[0]}'s first {W.GATE_N} utterances: keys size {ok['keys']['size']} < colour {ok['keys']['colour']} "
+                 f"< shape {ok['keys']['shape']}: {ok['pin']}; the shuffled control fails: {ok['control_fails']} → {'PASS' if ok['pass'] else 'MISS'}")
+    if not ok["pass"]:
+        stop.append("the order-key pin")
+    # 6. S1a's instrument verdict, re-read on the fresh gate caches
     ws = W.WORLD_SEEDS[0]
     trs = Things(C.ScenePercepts(C.cache_dir(root, ws, "train")))
     trs_truth = C.load_truth(C.cache_dir(root, ws, "train"))
@@ -688,7 +965,7 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
     one = [i for i in gate_rows if len(trs_truth[i]["things"]) == 1]
     loo = {t: [] for t in TYPE_WORDS}
     for i in one:
-        R = make_learner("P-ORACLE", lr, eps)               # AMENDMENT 2 §1: the verdict RE-READ with the type-aware reader
+        R = make_learner("P-ORACLE", Lr.LR_S1B1, eps)
         train_arm("P-ORACLE", R, trs, trs.p.words, trs_truth, [j for j in gate_rows if j != i], ws)
         R.prepare()
         nm = _per_type_naming(R, trs, [trs_truth[i]])
@@ -696,70 +973,76 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
             if n:
                 loo[t].append(v)
     th = M.verdict_thresholds()
+    s1a_gate = C.S1A_RUNS / "gate" / "gate.json"
+    s1a_v = json.loads(s1a_gate.read_text()).get("instrument", {}) if s1a_gate.exists() else {}
     verdict = {}
     for t in TYPE_WORDS:
         v = float(np.mean(loo[t])) if loo[t] else None
-        verdict[t] = {"p_oracle": v, "n": len(loo[t]), "probe_all144": M.PROBE_ALL144[t], "threshold": th[t],
-                      "fires": v is None or v < th[t], "best_subset": M.PROBE_SUBSET[t]}
+        verdict[t] = {"p_oracle": v, "n": len(loo[t]), "threshold": th[t], "fires": v is None or v < th[t],
+                      "s1a": (s1a_v.get(t) or {}).get("p_oracle")}
     out["instrument"] = verdict
-    lines.append(f"2. THE INSTRUMENT VERDICT: P-ORACLE (ε {eps}) per-type naming, leave-one-scene-out on the {len(one)} "
-                 f"one-thing scenes among the first {W.GATE_N} of seed {ws}:")
-    for t, v in verdict.items():
-        lines.append(f"   {t:<6} {_f(v['p_oracle'])} (n {v['n']}) vs 0.90 × probe {v['probe_all144']} = {v['threshold']:.4f} → "
-                     f"{'FIRES' if v['fires'] else 'does not fire'} · best-subset probe {v['best_subset'][0]} {v['best_subset'][1]} (read by no verdict)")
-    # --- 3. the arms × 300 scenes vs N-SHUF on M1 (seed 1's test items; AMENDMENT 2: the graded 2- and 3-thing items)
-    Qf = seed_root(root, ws) / "questions.json"
-    if not Qf.exists():
-        build_questions(root, ws)
-    Q = json.loads(Qf.read_text())
-    K = json.loads((seed_root(root, ws) / "keys.json").read_text())
-    tt = Things(C.ScenePercepts(C.cache_dir(root, ws, "test")))
-    t_truth = C.load_truth(C.cache_dir(root, ws, "test"))
-    perm = Lr.nshuf_permutation(substream(ws, "n-shuf-permutation"), len(trs.p))
-    arms = {}
-    for arm in ARMS:
-        L = make_learner(arm, lr, eps)
-        seen: list = []
-        words_of = (lambda i: trs.p.words(int(perm[i]))) if arm == "N-SHUF" else trs.p.words
-        train_arm(arm, L, trs, words_of, trs_truth if arm in ORACLE_ARMS else None, gate_rows, ws, seen)
-        prepare(arm, L, seen)
-        ans = answer_all(arm, L, {"M1": Q["questions"]["M1"]}, {"test": tt}, Q["test_seed"])
-        g = M.grade_pointing(K["items"]["M1"], ans, t_truth, tt.members, "truth" if arm == "ORACLE-TRUTH" else "gaze")
-        arms[arm] = M.summarise_pointing(g)
-    # AMENDMENT 2 §2: «beats N-SHUF» is read on the GRADED 2- and 3-thing items; the reading arm carries no bar
-    ns_cov = arms["N-SHUF"]["graded"]["covered"]
-    beat = {a: (arms[a]["graded"]["covered"] is not None and ns_cov is not None and arms[a]["graded"]["covered"] > ns_cov)
-            for a in ARMS if a != "N-SHUF" and a not in READING_ARMS}
-    out["arms300"] = {a: arms[a]["graded"] for a in ARMS}
-    out["arms300_blocks"] = {a: {k: arms[a][k] for k in ("graded", "size1", "size2", "size3", "all")} for a in ARMS}
-    out["beat_nshuf"] = beat
-    g0 = arms["A-RW"]["graded"]
-    lines.append(f"3. {len(ARMS)} ARMS × {W.GATE_N} scenes of seed {ws}, M1 on its GRADED 2- and 3-thing test items "
-                 f"(n {g0['n_all']}, covered {g0['n_covered']}; chance covered {_f(g0['chance_covered'])}) — per size and the "
-                 f"one-thing sanity reading beside:")
-    for a in ARMS:
-        b = arms[a]
-        lines.append(f"   {a:<14} M1 covered {_f(b['graded']['covered'])} · all {_f(b['graded']['all'])} · size2 "
-                     f"{_f(b['size2']['covered'])} (chance {_f(b['size2']['chance_covered'])}) · size3 {_f(b['size3']['covered'])} "
-                     f"(chance {_f(b['size3']['chance_covered'])}) · size1 sanity {_f(b['size1']['covered'])} · pooled (all sizes) "
-                     f"{_f(b['all']['covered'])}"
-                     + ("" if a == "N-SHUF" else (" · a reading arm, no bar" if a in READING_ARMS else
-                                                  f" · beats N-SHUF: {'yes' if beat[a] else 'NO'}")))
-    lines.append(f"   (the brief's step 6: ORACLE-TRUTH < 0.95 → STOP; the signed PREREG's and AMENDMENT 2's STOP is the "
-                 f"instrument verdict. ORACLE-TRUTH reads {_f(arms['ORACLE-TRUTH']['graded']['covered'])} on the graded items, "
-                 f"{_f(arms['ORACLE-TRUTH']['all']['covered'])} on all.)")
     fired = [t for t, v in verdict.items() if v["fires"]]
-    stop = []
+    same = all(v["s1a"] is not None and abs(v["p_oracle"] - v["s1a"]) < 1e-12 for v in verdict.values())
+    lines.append(f"6. S1a's instrument verdict re-read on the fresh caches (LOO on the {len(one)} one-thing gate scenes): " + " · ".join(
+        f"{t} {_f(v['p_oracle'])} vs {v['threshold']:.4f} (S1a {_f(v['s1a'])})" for t, v in verdict.items())
+        + f" → {'PROCEED' if not fired else 'FIRES ' + str(fired)}; equal to S1a's: {same}")
     if fired:
         stop.append(f"the instrument verdict fires for {fired}")
-    if not toy["pass"]:
-        stop.append("A-RW fails its own toy after the fallback grid")
+    if not same:
+        stop.append("the instrument verdict differs from S1a's on identical caches — an instrument fault")
+    # 7. the arms × 300 scenes vs N-SHUF on the graded M1
+    Q = json.loads((seed_root(root, ws) / "questions.json").read_text())
+    K = json.loads((seed_root(root, ws) / "keys.json").read_text())
+    tt = {s: Things(C.ScenePercepts(C.cache_dir(root, ws, s))) for s in TEST_SPLITS}
+    t_truth = C.load_truth(C.cache_dir(root, ws, "test"))
+    perm = Lr.nshuf_permutation(substream(ws, "n-shuf-permutation"), len(trs.p))
+    arms, learners = {}, {}
+    for arm in ARMS:
+        Lx = make_learner(arm, Lr.LR_S1B1, eps)
+        seen = []
+        words_of = (lambda i: trs.p.words(int(perm[i]))) if arm == "N-SHUF" else trs.p.words
+        train_arm(arm, Lx, trs, words_of, trs_truth if arm in ORACLE_ARMS else None, gate_rows, ws, seen)
+        cal = prepare(arm, Lx, seen)
+        ans = answer_all(arm, Lx, {"M1": Q["questions"]["M1"]}, tt, Q["test_seed"])
+        g = M.grade_pointing(K["items"]["M1"], ans, t_truth, tt["test"].members, "truth" if arm == "ORACLE-TRUTH" else "gaze")
+        arms[arm] = M.summarise_pointing(g)
+        learners[arm] = (Lx, cal)
+    ns_cov = arms["N-SHUF"]["graded"]["covered"]
+    must = ("A-RW", "P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH")
+    beat = {a: (arms[a]["graded"]["covered"] is not None and ns_cov is not None and arms[a]["graded"]["covered"] > ns_cov) for a in must}
+    out["arms300"] = {a: {k: arms[a][k] for k in ("graded", "size2", "size3", "size1", "all")} for a in ARMS}
+    out["beat_nshuf"] = beat
+    g0 = arms["A-RW"]["graded"]
+    lines.append(f"7. {len(ARMS)} arms × {W.GATE_N} scenes of seed {ws}, M1 on the graded 2- and 3-thing items (n {g0['n_all']}, covered {g0['n_covered']}; chance {_f(g0['chance_covered'])}):")
+    for a in ARMS:
+        b = arms[a]
+        lines.append(f"   {a:<14} {_f(b['graded']['covered'])} (size2 {_f(b['size2']['covered'])} · size3 {_f(b['size3']['covered'])} · pooled all sizes {_f(b['all']['covered'])})"
+                     + ("" if a == "N-SHUF" else (" · a reading arm" if a in READING_ARMS else f" · beats N-SHUF: {'yes' if beat.get(a) else 'NO'}")))
+    miss7 = [a for a, v in beat.items() if not v]
+    if miss7:
+        stop.append(f"{miss7} do not beat N-SHUF at 300 scenes")
+    # 8. the SPEAK road's smoke on the 300-scene A-RW (the wiring pin)
+    L_rw, _cal = learners["A-RW"]
+    sq = {m: Q["questions"][m] for m in ("SPEAK", "DECLINE")}
+    ans = answer_all("A-RW", L_rw, sq, tt, Q["test_seed"])
+    ptr = {q["item_id"]: q.get("hyp") for m in sq for q in sq[m]}
+    sp = M.summarise_speak(M.grade_speak(K["items"]["SPEAK"], ans, C.load_truth(C.cache_dir(root, ws, "speak")), ptr))
+    dc = M.summarise_decline(M.grade_decline(K["items"]["DECLINE"], ans, C.load_truth(C.cache_dir(root, ws, "decline")), ptr))
+    rb_ok = sp["readback"] == 1.0 and sp["n_spoken"] > 0
+    out["speak_smoke"] = {"speak": sp, "decline": dc, "pass": rb_ok}
+    lines.append(f"8. the SPEAK road's smoke (A-RW at {W.GATE_N} scenes): spoken {_f(sp['spoken'])} (n {sp['n_covered']}) · READ-BACK {_f(sp['readback'])} on {sp['n_spoken']} spoken "
+                 f"(the wiring pin = 1.000) · truth {_f(sp['truth'])} (no bar at {W.GATE_N}) · reasons {sp['reasons']} · DECLINE reasons {dc['reasons']} → {'PASS' if rb_ok else 'MISS'}")
+    if not rb_ok:
+        stop.append("the wiring pin (READ-BACK) on the SPEAK smoke")
+    # 9. the σ-floor count per word (printed)
+    floor = _cal.get("sigma_floor_count", {})
+    out["sigma_floor_count"] = floor
+    lines.append("9. per word, the dimensions of σ_w at the 1e-3 floor (A-RW at 300; printed): " + " · ".join(f"{w} {c}" for w, c in floor.items()))
     out["verdict"] = "STOP" if stop else "PROCEED"
     out["stop_reasons"] = stop
-    out["results_not_stops"] = [f"{a} does not beat N-SHUF" for a, b in beat.items() if not b]
+    out["lr"], out["eps"] = Lr.LR_S1B1, eps
     out["wall_s"] = time.perf_counter() - t0
-    lines.append(f"GATE: {out['verdict']}" + (f" — {'; '.join(stop)}" if stop else "")
-                 + (f" · RESULTS (not stops): {'; '.join(out['results_not_stops'])}" if out["results_not_stops"] else ""))
+    lines.append(f"GATE: {out['verdict']}" + (f" — {'; '.join(stop)}" if stop else ""))
     for l in lines:
         log(l)
     out["lines"] = lines
@@ -768,14 +1051,36 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
     return out
 
 
+def cache_all(root: Path, log=print) -> Dict[str, object]:
+    """Every cache under `root`, one at a time (the eye's price, solo): stage −1, the toy, each world seed (train and
+    its six test splits); then each seed's questions and keys."""
+    rec = {}
+    t = time.process_time()
+    stage_minus1(root, log=lambda s: None)
+    rec["stage"] = time.process_time() - t
+    for split in ("toy-train", "toy-test"):
+        d = C.cache_dir(root, None, split)
+        t = time.process_time()
+        if not d.exists():
+            C.build(split, None, d, log=log)
+        rec[split] = time.process_time() - t
+    for ws in W.WORLD_SEEDS:
+        t = time.process_time()
+        C.build_world_seed(root, ws, log=log)
+        rec[str(ws)] = time.process_time() - t
+        build_questions(root, ws)
+    log(f"[cache-all] CPU-s per step: {rec}")
+    return rec
+
+
 # ------------------------------------------------------------------------------------------------ the price
 def price(root: Path, n: int = 2000, log=print) -> Dict[str, object]:
     """Solo (A-RW, seed 1), then the launch's shape (6 arms × 3 seeds at once, nice 19), each over the first `n` scenes
     with the reading points ≤ n; CPU seconds read from each process's own record, extrapolated ×(10,000 / n)."""
-    g = gate_or_chosen()
+    g = gate_or_chosen(root)
     tmp = Path(root) / "price"
     rps = [r for r in W.READING_POINTS if r <= n]
-    base = [sys.executable, "-B", "-m", "brain.scene.run", "arm", "--n", str(n), "--rps", ",".join(map(str, rps))]
+    base = [sys.executable, "-B", "-m", "brain.scene.run", "arm", "--root", str(root), "--n", str(n), "--rps", ",".join(map(str, rps))]
     env = dict(os.environ, OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1", PYTHONUNBUFFERED="1")
     cwd = str(Path(__file__).resolve().parents[2])
 
@@ -818,7 +1123,7 @@ def price(root: Path, n: int = 2000, log=print) -> Dict[str, object]:
 # ------------------------------------------------------------------------------------------------ CLI
 def main(argv: Optional[Sequence[str]] = None) -> int:
     ap = argparse.ArgumentParser(prog="brain.scene.run")
-    ap.add_argument("cmd", choices=["cache", "cache-world", "questions", "stage", "first-gate", "toy", "arm", "grade",
+    ap.add_argument("cmd", choices=["cache", "cache-world", "cache-all", "questions", "stage", "first-gate", "arm", "grade",
                                     "report", "price"])
     ap.add_argument("--split")
     ap.add_argument("--world-seed", type=int)
@@ -840,8 +1145,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         log(f"[questions {a.world_seed}] {build_questions(root, a.world_seed)}")
     elif a.cmd == "stage":
         stage_minus1(root, log=log)
-    elif a.cmd == "toy":
-        first_gate(root, log=log, toy_only=True)
+    elif a.cmd == "cache-all":
+        cache_all(root, log=log)
     elif a.cmd == "first-gate":
         g = first_gate(root, log=log)
         return 0 if g["verdict"] == "PROCEED" else 3

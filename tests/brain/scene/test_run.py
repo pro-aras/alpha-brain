@@ -3,6 +3,7 @@
 # oracle arms' referent is the referent's thing hypothesis; A-RW and N-SHUF never load the truth file (checked by
 # spying on cache.load_truth).
 # edit: Claude (Opus 5.5, S1a builder), 2026-09-28 12:59 +0400 — AMENDMENT 2: the reading arm never loads the truth; M6 without the meeting reads NOT GRADABLE (never 0.0); the bars read the graded 2–3-thing items.
+# edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:55 +0400 — PREREG-S1B1: the smoke builds the three new splits; the reading arm is A-RW-LR10; the bars' set is §7's.
 from __future__ import annotations
 
 import json
@@ -27,7 +28,8 @@ class TestRunEndToEnd(unittest.TestCase):
         TMP.mkdir(parents=True, exist_ok=True)
         cls._td = tempfile.TemporaryDirectory(dir=str(TMP), prefix="scene-run-test-")
         cls.root = Path(cls._td.name)
-        for split, lim in (("train", 60), ("test", 24), ("m2b", None), ("m6", None)):
+        for split, lim in (("train", 60), ("test", 24), ("m2b", None), ("m6", None), ("m3", None), ("speak", None),
+                           ("decline", None)):          # PREREG-S1B1: the three new test splits too
             C.build(split, WS, C.cache_dir(cls.root, WS, split), limit=lim, recheck_n=2)
         cls.counts = R.build_questions(cls.root, WS)
         cls.loads = {}
@@ -57,7 +59,7 @@ class TestRunEndToEnd(unittest.TestCase):
     def test_only_oracle_arms_load_the_truth(self) -> None:
         self.assertEqual(self.loads["A-RW"], [])
         self.assertEqual(self.loads["N-SHUF"], [])
-        self.assertEqual(self.loads["A-RW-LR01"], [])                  # AMENDMENT 2 §5: the reading arm is A-RW's feed
+        self.assertEqual(self.loads["A-RW-LR10"], [])                  # the reading arm is A-RW's feed (PREREG-S1B1 §6)
         for arm in ("P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH"):
             self.assertTrue(any(p.endswith("/train") for p in self.loads[arm]), arm)
 
@@ -76,11 +78,12 @@ class TestRunEndToEnd(unittest.TestCase):
             self.assertEqual(m1["n_all"], self.counts["M1"])
             self.assertTrue(0.0 <= m1["all"] <= 1.0)
         b = R.bars_for(mk, rp="60")
-        self.assertEqual(set(b), {"M1", "M2a", "M2b", "M6", "N-SHUF", "T1_refuted", "one_meeting_refuted"})
+        self.assertEqual(set(b), {"M1", "M2a", "M2b", "M6", "M3", "SPOKEN", "TRUTH", "READ-BACK", "ORDER", "DECLINE",
+                                  "N-SHUF", "N-SHUF-M3", "refute"})              # PREREG-S1B1 §7's marks
         self.assertTrue(b["M2b"]["underpowered"] is False)
         lines = R.print_seed_table(mk, log=lambda s: None)
-        self.assertTrue(any("M1 (covered, the GRADED 2- and 3-thing items) by reading point" in l for l in lines))
-        self.assertTrue(any(l.strip().startswith("A-RW-LR01") for l in lines))           # AMENDMENT 2 §5: printed beside
+        self.assertTrue(any("by reading point" in l and "graded 2- and 3-thing" in l for l in lines))
+        self.assertTrue(any(l.strip().startswith("A-RW-LR10") for l in lines))           # the reading arm printed beside
 
     def test_amend2_m6_without_the_meeting_reads_not_gradable_never_zero(self) -> None:
         """AMENDMENT 2 §3–§4: this 60-scene stream never reaches the meeting (scene 2,700), so M6 is NOT GRADABLE at
@@ -100,6 +103,26 @@ class TestRunEndToEnd(unittest.TestCase):
         g = self.marks["arms"]["A-RW"]["rp"]["60"]["M1"]["graded"]
         self.assertEqual(b["M1"]["value"], g["covered"])
         self.assertEqual(b["M1"]["n"], g["n_covered"])
+
+    def test_s1b1_the_wiring_pin_on_the_smoke(self) -> None:
+        """PREREG-S1B1 §5: READ-BACK is 1.000 by construction on every arm's spoken phrases — re-checked by the grader
+        from the recorded point and the pointer the question carried; a reading below 1.000 is a broken road."""
+        for arm in R.ARMS:
+            for rp in ("30", "60"):
+                sp = self.marks["arms"][arm]["rp"][rp]["SPEAK"]
+                self.assertIn(sp["readback"], (1.0, None), (arm, rp, sp))
+                if sp["readback"] is None:
+                    self.assertEqual(sp["n_spoken"], 0)
+        spoken = sum(self.marks["arms"][a]["rp"]["60"]["SPEAK"]["n_spoken"] for a in R.ARMS)
+        self.assertGreater(spoken, 0)                                       # the pin was READ, not vacuous
+
+    def test_s1b1_m3_speak_decline_are_graded_for_every_arm(self) -> None:
+        for arm in R.ARMS:
+            R60 = self.marks["arms"][arm]["rp"]["60"]
+            self.assertEqual(R60["M3"]["all"]["n_all"], 60)
+            self.assertEqual(R60["SPEAK"]["n_all"], 96)
+            self.assertEqual(R60["DECLINE"]["n_all"], 48)
+            self.assertEqual(set(R60["M2a"]), {"law", "i", "ii"})
 
     def test_oracle_truth_points_among_the_true_things(self) -> None:
         A = json.loads((self.root / str(WS) / "arms" / "ORACLE-TRUTH" / "answers_00060.json").read_text())["answers"]

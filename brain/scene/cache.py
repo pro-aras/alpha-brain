@@ -35,8 +35,13 @@ from brain.world.seeds import substream
 from . import PREREG_SHA256, eye
 from . import world as W
 
-RUNS = Path("/data/dev/brain-runs/scene")
+# edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:50 +0400 — PREREG-S1B1 §1: world.py's bytes change, so check_code refuses
+# S1a's caches; S1b-1's run root is FRESH and every cache is redrawn there; S1a's root is read (as plain files) only by the
+# identity test and for S1a's numbers beside.
+RUNS = Path("/data/dev/brain-runs/scene-s1b1")
+S1A_RUNS = Path("/data/dev/brain-runs/scene")
 N_LOCATED = 4
+TEST_SPLITS = ("test", "m2b", "m6", "m3", "speak", "decline")
 
 
 class SceneCacheError(Exception):
@@ -77,7 +82,7 @@ def cache_dir(root: Path, world_seed: Optional[int], split: str) -> Path:
 def split_seed(split: str, world_seed: Optional[int]) -> int:
     if split == "train":
         return int(world_seed)
-    if split in ("test", "m2b", "m6"):
+    if split in TEST_SPLITS:
         return W.TEST_SEEDS[int(world_seed)]
     if split in ("toy-train", "toy-test"):
         return W.TOY_SEED
@@ -265,7 +270,7 @@ def assert_disjoint(train_shas: Iterable[str], test_shas: Iterable[str]) -> int:
 def build_world_seed(root: Path, world_seed: int, log=None) -> Dict[str, object]:
     """train (world seed) + test, m2b, m6 (its test seed), each written once, then the disjointness record."""
     out = {}
-    for split in ("train", "test", "m2b", "m6"):
+    for split in ("train",) + TEST_SPLITS:
         d = cache_dir(root, world_seed, split)
         if d.exists():
             out[split] = json.loads((d / "scene_header.json").read_text())
@@ -275,8 +280,34 @@ def build_world_seed(root: Path, world_seed: int, log=None) -> Dict[str, object]
             log(f"[cache {split} {world_seed}] written: {out[split]['rows']} rows")
     tr = ScenePercepts(cache_dir(root, world_seed, "train")).shas()
     rec = {"prereg_sha256": PREREG_SHA256, "world_seed": world_seed, "train_canvases": len(tr), "checked": {}}
-    for split in ("test", "m2b", "m6"):
+    for split in TEST_SPLITS:
         rec["checked"][split] = assert_disjoint(tr, ScenePercepts(cache_dir(root, world_seed, split)).shas())
     rec["overlap"] = 0
     (Path(root) / str(world_seed) / "cache" / "disjoint.json").write_text(json.dumps(rec, sort_keys=True, indent=2) + "\n")
     return rec
+
+
+# ------------------------------------------------------------------------------------------------ identity with S1a
+SPEC_KEYS = ("item_id", "split", "index", "seed", "things", "words", "referent", "template", "centroids", "fix", "fix_thing")
+
+
+def _jsonl(p: Path) -> List[Dict[str, object]]:
+    return [json.loads(l) for l in Path(p).read_text(encoding="utf-8").splitlines() if l.strip()]
+
+
+def identity_with(d_new: Path, d_old: Path) -> Dict[str, object]:
+    """PREREG-S1B1 §1 (a): a redrawn cache carries the SAME scene specs and the SAME canvas shas as S1a's — read from
+    S1a's OWN files (index.jsonl, truth.jsonl, header.json) as plain JSON, never through ScenePercepts (whose
+    check_code refuses S1a's world bytes by design) and never assumed. The glances' npy sha is compared too (identical
+    canvases through an identical eye must give identical glances)."""
+    old_i, new_i = _jsonl(Path(d_old) / "index.jsonl"), _jsonl(Path(d_new) / "index.jsonl")
+    old_t, new_t = _jsonl(Path(d_old) / "truth.jsonl"), _jsonl(Path(d_new) / "truth.jsonl")
+    ho = json.loads((Path(d_old) / "header.json").read_text())
+    hn = json.loads((Path(d_new) / "header.json").read_text())
+    sha_diff = [k for k, (a, b) in enumerate(zip(old_i, new_i)) if a["canvas_png_sha256"] != b["canvas_png_sha256"]
+                or a["item_id"] != b["item_id"]]
+    spec_diff = [k for k, (a, b) in enumerate(zip(old_t, new_t)) if any(a.get(key) != b.get(key) for key in SPEC_KEYS)]
+    return {"rows_old": len(old_i), "rows_new": len(new_i), "canvas_sha_diff": len(sha_diff), "spec_diff": len(spec_diff),
+            "npy_equal": ho.get("npy_sha256") == hn.get("npy_sha256"),
+            "same": (len(old_i) == len(new_i) and len(old_t) == len(new_t) and not sha_diff and not spec_diff
+                     and ho.get("npy_sha256") == hn.get("npy_sha256"))}
