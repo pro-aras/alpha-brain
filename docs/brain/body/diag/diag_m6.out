@@ -1,0 +1,30 @@
+===== ws 20261101  dax scene index 2699
+  said: ['dax']  referent thing: 1
+  things: [('square', 'green', 'big'), ('moon', 'blue', 'small')]
+  fixations → thing: [0, 0, 0, 0]
+  hypotheses: members [[0, 1, 2, 3]]  labels (thing each hypothesis is on): [0]
+  attribution after the meeting: {'dax': 0}
+  moon is thing [1] ; hypotheses on the moon: [] ; WRITTEN TO: 0 → thing 0
+  M6 fresh: {'wrong': 10, 'correct': 19, 'uncovered': 13}  wrong answers land on shapes: {'circle': 1, 'triangle': 4, 'star': 2, 'cross': 2, 'ring': 1}  colours: {'white': 3, 'green': 3, 'yellow': 1, 'blue': 2, 'red': 1}
+  the moon at the meeting was: ('moon', 'blue', 'small')
+  M6 test moons' colours: {'white': 10, 'yellow': 10, 'blue': 11, 'red': 6, 'green': 5}
+===== ws 20261102  dax scene index 2699
+  said: ['dax']  referent thing: 1
+  things: [('ring', 'yellow', 'big'), ('moon', 'red', 'small')]
+  fixations → thing: [0, 1, 0, 0]
+  hypotheses: members [[0, 2, 3], [1]]  labels (thing each hypothesis is on): [0, 1]
+  attribution after the meeting: {'dax': 1}
+  moon is thing [1] ; hypotheses on the moon: [1] ; WRITTEN TO: 1 → thing 1
+  M6 fresh: {'uncovered': 15, 'correct': 21, 'wrong': 6}  wrong answers land on shapes: {'circle': 3, 'triangle': 3}  colours: {'white': 2, 'blue': 1, 'red': 3}
+  the moon at the meeting was: ('moon', 'red', 'small')
+  M6 test moons' colours: {'blue': 14, 'green': 7, 'white': 9, 'yellow': 5, 'red': 7}
+===== ws 20261103  dax scene index 2699
+  said: ['dax']  referent thing: 1
+  things: [('ring', 'white', 'small'), ('moon', 'blue', 'small')]
+  fixations → thing: [0, 1, 0, 0]
+  hypotheses: members [[0, 2, 3], [1]]  labels (thing each hypothesis is on): [0, 1]
+  attribution after the meeting: {'dax': 1}
+  moon is thing [1] ; hypotheses on the moon: [1] ; WRITTEN TO: 1 → thing 1
+  M6 fresh: {'wrong': 15, 'correct': 14, 'uncovered': 13}  wrong answers land on shapes: {'triangle': 2, 'star': 4, 'ring': 2, 'cross': 5, 'circle': 2}  colours: {'blue': 5, 'yellow': 1, 'red': 4, 'green': 3, 'white': 2}
+  the moon at the meeting was: ('moon', 'blue', 'small')
+  M6 test moons' colours: {'blue': 10, 'yellow': 13, 'red': 8, 'white': 8, 'green': 3}
