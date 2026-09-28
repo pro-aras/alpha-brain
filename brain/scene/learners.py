@@ -241,6 +241,10 @@ class RWLearner:
         self.proto_sum = np.zeros((0, dim))
         self.proto_w = np.zeros(0)
         self.store_z: List[List[np.ndarray]] = []      # per word: its things' standardised inputs (per meeting)
+        # edit: Claude (Opus 5.5, T-MEM-1 builder), 2026-09-28 17:17 +0400 — PREREG-TMEM1 §2 (the store's own coordinates): the RAW rows beside Z and
+        # the storage time (the scene counter at the meeting), per word per meeting. Additive: nothing S1a–S1c-2 reads them.
+        self.store_x: List[List[np.ndarray]] = []
+        self.store_t: List[List[int]] = []
         self.store_r: List[List[np.ndarray]] = []      # per word: their responsibilities
         self.episodic_band: List[float] = []
         self.scenes = 0
@@ -264,6 +268,8 @@ class RWLearner:
         self.proto_sum = np.vstack([self.proto_sum, np.zeros((1, self.dim))])
         self.proto_w = np.append(self.proto_w, 0.0)
         self.store_z.append([])
+        self.store_x.append([])
+        self.store_t.append([])
         self.store_r.append([])
         self.episodic_band.append(float("inf"))
         return i
@@ -299,7 +305,7 @@ class RWLearner:
         return pick(D.min(axis=1), rng, "max")
 
     def train_scene(self, raw: np.ndarray, words: Sequence[str], referent: Optional[int] = None,
-                    rng: Optional[np.random.Generator] = None) -> None:
+                    rng: Optional[np.random.Generator] = None, project=None) -> None:
         """One scene: its things' raw inputs (H, 146) and the parent's words. `referent` (P-ORACLE-RW only) is the index
         of the thing hypothesis the caller marks; None in A-RW / N-SHUF (never read there)."""
         raw = np.atleast_2d(np.asarray(raw, dtype=np.float64))
@@ -332,6 +338,8 @@ class RWLearner:
                     self.proto_w[i] = 1.0
                     self.store_z[i].append(Z[t_star][None, :].copy())
                     self.store_r[i].append(np.ones(1))
+                    self.store_x[i].append(raw[t_star][None, :].copy())
+                    self.store_t[i].append(self.scenes)
                 self.episodic_band[i] = band0
         if not self.words:
             return
@@ -354,9 +362,11 @@ class RWLearner:
                     R[int(oracle_ref), j] = 1.0
         upd = self.lr * e[:, None] * (R.T @ Z)
         upd[skip] = 0.0
-        self.V += upd
         db = self.lr * e * R.sum(axis=0)
         db[skip] = 0.0
+        if project is not None:                          # T-MEM-1's GATE (edit: Claude (Opus 5.5, T-MEM-1 builder), 2026-09-28 17:17 +0400): the
+            upd, db = project(self, upd, db)             # step projected before it is applied; None = S1a–S1c-2's step, value for value
+        self.V += upd
         self.b += db
         # 3. prototypes: a said word's things, weighted by the responsibilities of this update (a new word's first
         #    meeting contributed its episodic thing instead)
@@ -368,6 +378,8 @@ class RWLearner:
                 self.proto_w[j] += float(r.sum())
                 self.store_z[j].append(Z.copy())
                 self.store_r[j].append(r.copy())
+                self.store_x[j].append(raw.copy())
+                self.store_t[j].append(self.scenes)
             self.meetings[j] += 1
 
     # -- answering -----------------------------------------------------------------------------

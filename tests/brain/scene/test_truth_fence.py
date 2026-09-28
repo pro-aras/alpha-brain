@@ -23,6 +23,9 @@ ALLOW = {
     "eye.py": {"__future__", "dataclasses", "typing", "numpy", "genome", "genome.gaze", "genome.machinery",
                "brain.world", "brain.world.organs", "brain.world.build"},
     "pickers.py": {"__future__", "math", "dataclasses", "typing", "numpy", "brain.world.seeds", "brain.scene.learners"},
+    # edit: Claude (Opus 5.5, T-MEM-1 builder), 2026-09-28 17:25 +0400 — memory.py (the store read back) is LEARNER side: it reads only what
+    # the learner holds (its store, its ear, its statistics) and the loss's arithmetic from pickers.py.
+    "memory.py": {"__future__", "math", "typing", "numpy", "brain.scene.learners", "brain.scene.pickers"},
 }
 # the WORLD side's reverse fence: no world module imports a learner, a picker or a runner
 WORLD_SIDE = ("world.py", "rooms.py")
