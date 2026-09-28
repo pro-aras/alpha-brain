@@ -391,7 +391,10 @@ class RWLearner:
             if self.proto_w[j] <= 0:
                 out[:, j] = -np.inf
                 continue
-            bj = bands[j] if bands is not None else self.band(int(j))
+            # a word NEWER than the reading point's band cache (met between reading points — T-MEM-2's claims read the road
+            # there) takes its band fresh, the function the cache is built from; every call that worked before is unchanged
+            # (edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 17:42 +0400)
+            bj = bands[j] if (bands is not None and j < len(bands)) else self.band(int(j))
             d = np.linalg.norm(Z - self.prototype(int(j))[None, :], axis=1)
             out[:, j] = np.where(d <= bj, 0.0, -np.inf)
         return out

@@ -29,6 +29,8 @@ ALLOW = {
     # edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 18:27 +0400 — context.py (the CONTEXT learner: its own act as context) is LEARNER side: the
     # learner's own module and the loss's clip from pickers.py, never the world, the rooms, the cache or the marks.
     "context.py": {"__future__", "typing", "numpy", "brain.scene.learners", "brain.scene.pickers"},
+    # edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 17:30 +0400 — PREREG-TMEM2: the HEALTH row is kept WITHOUT the world
+    "health.py": {"__future__", "math", "typing", "numpy", "brain.scene.learners"},
 }
 # the WORLD side's reverse fence: no world module imports a learner, a picker or a runner
 WORLD_SIDE = ("world.py", "rooms.py")
