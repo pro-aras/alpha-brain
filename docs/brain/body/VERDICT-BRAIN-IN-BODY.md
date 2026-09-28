@@ -93,7 +93,7 @@
 | 20261101 | NOT GRADABLE: the eye never saw the meeting. The fix points at the thing the word was written to (the square): 0.018 on the moon | | as signed |
 
 - **The controls.** The fix made to act on mature words too → IDENTITY fails (88 / 90 / 77 answers moved). The readings on the used sets reproduce the diagnosis exactly (21 → 26 of 27; 14 → 22 of 29). Rung 1 was run again on the fix's commit under the old rule: 2,209 / 2,222 / 2,221 equal. The caches were redrawn in a fresh root and are array-identical to the scored ones (42 compared, 0 differing, a planted bit caught).
-- **The fixed brain in the body** (`brain-lean-nearest-20261102`, the real unit, commit 5e0c329): ended clean in 862 s, 0 restarts. **PARITY with the fixed brain's bench answers: 2,222 of 2,222.** Against the old rule's answers only the 84 «dax» pointings differ; every other mark is equal, answer by answer.
+- **The fixed brain in the body** (`brain-lean-nearest-20261102`, the real unit, commit 5e0c329): ended clean in 862 s, 0 restarts. **PARITY with the fixed brain's bench answers: 2,222 of 2,222.** Against the old rule's answers only the 84 «dax» pointings differ; every other mark is equal, answer by answer. The life replays to itself (34,477 rows identical).
 - **Its own test-6 reading, 0.929 (n 56), is NOT evidence for the fix.** Those are the scenes the fix was diagnosed on. The evidence is the gate above.
 - **What the fix does not do.** It cannot help a meeting the eye never saw. It does not touch «I don't know».
 
@@ -109,3 +109,13 @@
 | the growing network | out of the brain | it cannot read out its answers (4–7 % live) | not dated |
 | the creature's SLEEP rule (replay by surprise) | unchanged; the brain has no replay at rung 1 | the worst rule measured (T-MEM-1) | the A/B on a closed tape. **2026-09-29** |
 
+## What was and was not shown
+- **Shown:** the brain is one organ; it lives in the creature; it is the same brain on the bench, in a lean body and in the full organism; it does not disturb the other organs; every life replays to itself; four of his six tests pass in the body; one failing test was repaired and the repair was graded on scenes never used.
+- **Not shown:** that the brain understands. Test 5 shows grammar. Test 4a shows that it can point to the episodes that taught it a word; it does not yet state a rule. Every test ran in ONE small world of coloured shapes with one parent.
+- **Not shown:** that the organism USES its brain. The brain answers when asked. The creature's own thinking, speaking and curiosity do not read it yet. That wiring is the next build, after his word on the body's word road.
+- **Not tested tonight:** a life longer than 40 minutes; a world that changes (the rooms of T-MEM-1); the brain's own replay in sleep (`replay none` at rung 1).
+
+## The tests of record
+On the final code (`brain-organ-final` c1093cf; every commit after it changes documents and records only — checked by diff): scene `Ran 368 … OK` · brain `Ran 770 … OK (skipped=3)` · genome `Ran 614 … OK (skipped=1, expected failures=6)` · creature `Ran 1176 … OK (skipped=6)` · tools `Ran 62 … OK` (`records/suites-final-c1093cf.txt`). The lean lives and the full life ran on 98299ae and bc45156, whose suites are in `records/suites-bc45156.txt`.
+
+*Closed by Claude (Fable 5.1, the seat), 2026-09-29 00:20 +0400.*
