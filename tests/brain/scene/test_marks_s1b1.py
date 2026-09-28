@@ -123,3 +123,34 @@ class TestDeclineGrading(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPostRunReadings(unittest.TestCase):
+    """After the unit (code-dee656e), two readings the report printed against the PREREG's own words:
+    DECLINE's organ clause — «P-ORACLE's DECLINE < 0.80 → CEILING-BOUND (purple inside a trained colour's band)» — holds
+    whatever the learner reads (the report had applied it only when the learner failed its fraction bar); and T4′'s
+    «spread is the limit» fires when reading (ii) is NO WORSE than the law, (ii) ≥ the law (the report had it reversed)."""
+
+    def test_decline_organ_clause_holds_whatever_the_learner_reads(self) -> None:
+        from brain.scene import run as R
+        v = R.decline_reading(0.778, 0.722, spoken_pass=True)
+        self.assertTrue(v["ceiling_bound"])
+        self.assertFalse(v["pass"])
+        self.assertTrue(v["fraction_met"])                                     # 0.778 ≥ 0.90 × 0.722, printed beside
+        self.assertEqual(R._verdict({**v, "underpowered": False}), "CEILING-BOUND")
+        v = R.decline_reading(0.90, 0.95, spoken_pass=True)
+        self.assertTrue(v["pass"] and not v["ceiling_bound"])
+        v = R.decline_reading(0.90, 0.95, spoken_pass=False)
+        self.assertTrue(v["not_gradable"])
+        self.assertEqual(R._verdict({**v, "underpowered": False}), "NOT GRADABLE")
+
+    def test_t4p_clauses(self) -> None:
+        from brain.scene import run as R
+        c = R.t4p_reading(0.188, 0.062, 0.958)                                 # (ii) WORSE than the law: the clause is silent
+        self.assertEqual((c["spread_is_the_limit"], c["ii_above_by_005"], c["learner_refuses"]), (False, False, False))
+        c = R.t4p_reading(0.20, 0.22, 0.95)                                    # (ii) no worse → the spread is the limit
+        self.assertEqual((c["spread_is_the_limit"], c["ii_above_by_005"]), (True, False))
+        c = R.t4p_reading(0.20, 0.26, 0.95)
+        self.assertEqual((c["spread_is_the_limit"], c["ii_above_by_005"]), (True, True))
+        self.assertFalse(R.t4p_reading(0.20, 0.30, 0.70)["spread_is_the_limit"])  # the oracle below 0.80: not this clause
+        self.assertTrue(R.t4p_reading(0.85, 0.10, 0.95)["learner_refuses"])

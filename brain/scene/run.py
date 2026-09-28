@@ -465,6 +465,31 @@ def s1a_beside(ws: int, rp: str = str(W.N_TRAIN)) -> Optional[Dict[str, object]]
     return out
 
 
+def decline_reading(value: Optional[float], p_oracle: Optional[float], spoken_pass: bool) -> Dict[str, object]:
+    """DECLINE's verdict pieces, in PREREG-S1B1 §5's own order (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 14:13 +0400 — after the
+    unit, the organ clause is read as written): the guard (DECLINE reads only when SPOKEN meets its bar, else NOT
+    GRADABLE); the ORGAN CLAUSE (P-ORACLE's DECLINE < 0.80 → CEILING-BOUND — purple inside a trained colour's band —
+    whatever the learner reads); then the fraction bar (≥ 0.90 × P-ORACLE), whose reading is printed beside either way."""
+    bar = _frac(DECLINE_VS_PORACLE, p_oracle)
+    met = _ge(value, bar)
+    if not spoken_pass:
+        return {"bar": bar, "fraction_met": met, "pass": False, "ceiling_bound": False,
+                "not_gradable": "the mouth is silent (SPOKEN below its bar)"}
+    organ = p_oracle is not None and p_oracle < DECLINE_ORGAN
+    return {"bar": bar, "fraction_met": met, "pass": met and not organ, "ceiling_bound": organ, "not_gradable": False}
+
+
+def t4p_reading(m2b_law: Optional[float], m2b_ii: Optional[float], p_oracle: Optional[float]) -> Dict[str, bool]:
+    """T4′'s three clauses (PREREG-S1B1 §3, §9), per seed: «spread is the limit» = M2b < 0.80 while P-ORACLE ≥ 0.80 and
+    reading (ii) is NO WORSE than the law ((ii) ≥ the law); «(ii) above the law by ≥ 0.05» (read at ≥ 2 seeds in the
+    report); «the learner refuses» = M2b ≥ 0.80. (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 14:13 +0400 — the report had the
+    first clause's comparison reversed.)"""
+    have = m2b_law is not None and m2b_ii is not None
+    return {"spread_is_the_limit": bool(have and m2b_law < M.BARS["M2b"] and (p_oracle or 0) >= M.BARS["M2b"] and m2b_ii >= m2b_law),
+            "ii_above_by_005": bool(have and m2b_ii >= m2b_law + 0.05),
+            "learner_refuses": bool(m2b_law is not None and m2b_law >= M.BARS["M2b"])}
+
+
 def bars_for(marks: Dict[str, object], rp: str = str(W.N_TRAIN)) -> Dict[str, object]:
     """PREREG-S1B1 §7's bars for one seed, at `rp`, P-ORACLE's reading beside every mark (a fraction of the oracle on the
     SAME items, #228 (b)); a mark with n < 30 reads UNDERPOWERED; a reading of nothing reads NOT GRADABLE, never 0.0."""
@@ -557,15 +582,8 @@ def bars_for(marks: Dict[str, object], rp: str = str(W.N_TRAIN)) -> Dict[str, ob
                   "not_gradable": ("no multi-word phrase spoken" if sp["order"] is None else False)}
     # DECLINE (§5): reads only with SPOKEN at its bar; CEILING-BOUND if the oracle reads < 0.80
     dc, pdc = A["A-RW"]["DECLINE"], A["P-ORACLE"]["DECLINE"]
-    b_dc = _frac(DECLINE_VS_PORACLE, pdc["decline"])
-    if not r["SPOKEN"]["pass"]:
-        r["DECLINE"] = {"value": dc["decline"], "n": dc["n_covered"], "p_oracle": pdc["decline"], "bar": b_dc, "pass": False,
-                        "not_gradable": "the mouth is silent (SPOKEN below its bar)", "ceiling_bound": False}
-    else:
-        okd = _ge(dc["decline"], b_dc)
-        r["DECLINE"] = {"value": dc["decline"], "n": dc["n_covered"], "p_oracle": pdc["decline"], "bar": b_dc, "pass": okd,
-                        "not_gradable": False,
-                        "ceiling_bound": (not okd) and pdc["decline"] is not None and pdc["decline"] < DECLINE_ORGAN}
+    r["DECLINE"] = {"value": dc["decline"], "n": dc["n_covered"], "p_oracle": pdc["decline"],
+                    **decline_reading(dc["decline"], pdc["decline"], bool(r["SPOKEN"]["pass"]))}
     r["DECLINE"].update({"kind_A_spoken": dc["kind_A_spoken"], "kind_A_truth": dc["kind_A_truth"],
                          "kind_B_decline_rate": dc["kind_B_decline_rate"], "reasons": dc["reasons"],
                          "organ_purple": A["P-ORACLE"].get("organ_purple"), "lr10": A["A-RW-LR10"]["DECLINE"]["decline"]})
@@ -589,12 +607,8 @@ def bars_for(marks: Dict[str, object], rp: str = str(W.N_TRAIN)) -> Dict[str, ob
         "lr_below_lr10": bool(r["M1"]["value"] is not None and r["M1"]["lr10"] is not None and r["M1"]["value"] < r["M1"]["lr10"]),
         "T2": bool(m1p and r["M3"]["value"] is not None and p3 is not None and r["M3"]["value"] < M.T1_REFUTE * p3),
         "T3": bool(m1p and r["TRUTH"]["value"] is not None and (r["TRUTH"]["n"] or 0) >= M.UNDERPOWERED_N and r["TRUTH"]["value"] < T3_REFUTE),
-        "T4p_spread_is_the_limit": bool(r["M2b"]["value"] is not None and r["M2b"]["value"] < M.BARS["M2b"]
-                                        and (po3 or 0) >= M.BARS["M2b"] and r["M2b"]["reading_ii"] is not None
-                                        and r["M2b"]["reading_ii"] <= r["M2b"]["value"]),
-        "T4p_ii_above_law_by_005": bool(r["M2b"]["reading_ii"] is not None and r["M2b"]["value"] is not None
-                                        and r["M2b"]["reading_ii"] >= r["M2b"]["value"] + 0.05),
-        "T4p_learner_refuses": bool(r["M2b"]["value"] is not None and r["M2b"]["value"] >= M.BARS["M2b"]),
+        **{f"T4p_{k}" if k != "ii_above_by_005" else "T4p_ii_above_law_by_005": v
+           for k, v in t4p_reading(r["M2b"]["value"], r["M2b"]["reading_ii"], po3).items()},
         "one_meeting": bool((not r["M6"].get("not_gradable")) and r["M6"]["value"] is not None and r["M6"]["value"] < M.M6_REFUTE and m1p)}
     return r
 
@@ -702,7 +716,9 @@ def report(root: Path, log=print) -> Dict[str, object]:
                      f"(P-ORACLE {_f(t['p_oracle_truth_x_spoken'])}) · A-RW-LR10 {_f(t['lr10'])} · N-SHUF {_f(t['n_shuf'])} vs a random true phrase {_f(t['n_shuf_chance'])}")
         lines.append(f"          READ-BACK {_f(rb['value'])} (n {rb['n']}; the wiring pin = 1.000) → {_verdict(rb) if rb['value'] is None or rb['value'] == 1.0 else 'BROKEN ROAD'} · "
                      f"ORDER {_f(o['value'])} (n {o['n']}) ≥ {_f(o['bar'])} (0.95 × P-ORACLE {_f(o['p_oracle'])}) → {_verdict(o)} · lengths {o['length_mix']} vs the parent's {o['parent_mix']}")
-        lines.append(f"          DECLINE {_f(dcl['value'])} (n {dcl['n']}) ≥ {_f(dcl['bar'])} (0.90 × P-ORACLE {_f(dcl['p_oracle'])}) → {_verdict(dcl)} · kind A spoken {_f(dcl['kind_A_spoken'])} truth {_f(dcl['kind_A_truth'])} "
+        lines.append(f"          DECLINE {_f(dcl['value'])} (n {dcl['n']}) ≥ {_f(dcl['bar'])} (0.90 × P-ORACLE {_f(dcl['p_oracle'])}; the fraction {'met' if dcl.get('fraction_met') else 'not met'}) → {_verdict(dcl)}"
+                     + (" (the organ clause: P-ORACLE < 0.80 — purple inside a trained colour's band)" if dcl.get("ceiling_bound") else "")
+                     + f" · kind A spoken {_f(dcl['kind_A_spoken'])} truth {_f(dcl['kind_A_truth'])} "
                      f"· kind B decline {_f(dcl['kind_B_decline_rate'])} · A-RW-LR10 {_f(dcl['lr10'])}")
         ns, n3 = b["N-SHUF"], b["N-SHUF-M3"]
         lines.append(f"          N-SHUF M1 {_f(ns['value'])} ≤ {_f(ns['bar'])} → {'PASS' if ns['pass'] else 'FAIL'} · M3 {_f(n3['value'])} ≤ {_f(n3['bar'])} → {'PASS' if n3['pass'] else 'FAIL'}")
