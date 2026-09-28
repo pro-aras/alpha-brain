@@ -26,6 +26,9 @@ ALLOW = {
     # edit: Claude (Opus 5.5, T-MEM-1 builder), 2026-09-28 17:25 +0400 — memory.py (the store read back) is LEARNER side: it reads only what
     # the learner holds (its store, its ear, its statistics) and the loss's arithmetic from pickers.py.
     "memory.py": {"__future__", "math", "typing", "numpy", "brain.scene.learners", "brain.scene.pickers"},
+    # edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 18:27 +0400 — context.py (the CONTEXT learner: its own act as context) is LEARNER side: the
+    # learner's own module and the loss's clip from pickers.py, never the world, the rooms, the cache or the marks.
+    "context.py": {"__future__", "typing", "numpy", "brain.scene.learners", "brain.scene.pickers"},
 }
 # the WORLD side's reverse fence: no world module imports a learner, a picker or a runner
 WORLD_SIDE = ("world.py", "rooms.py")
