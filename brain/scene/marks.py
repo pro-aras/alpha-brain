@@ -448,6 +448,108 @@ def summarise_decline(rows: Sequence[Dict[str, object]]) -> Dict[str, object]:
             "reasons": dict(collections.Counter(r["reason"] for r in cov if not r["spoken"]))}
 
 
+# ------------------------------------------------------------------------------------------------ S1b-1R: SPEAK2, MINIMAL, the null
+# edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:13 +0400 — PREREG-S1B1R §5 (sha 879a22fb…) with AMENDMENT 1 §2 (a198f0b4…). Additive:
+# S1b-1's graders above are untouched (grade_mouth_r CALLS grade_speak and adds fields beside its rows).
+def speak2_items(truth: Sequence[Dict[str, object]]) -> List[Dict[str, object]]:
+    """SPEAK2, the NEED items: a POINTER to the target (as SPEAK); the kind (CS / SC / SS) rides on the item (the grader's
+    side — the learner is never told it)."""
+    items = speak_items(truth, "SPEAK2")
+    for it, row in zip(items, truth):
+        it["kind"] = W.speak2_kind(int(row["index"]))
+    return items
+
+
+def minimal_true(phrase: Sequence[str], things: Sequence[W.Thing], target: int) -> Optional[bool]:
+    """MINIMAL (§5, Fable's edit): for a phrase TRUE of the target and of no other thing in view, whether NO proper non-empty
+    subset of it is also true and unique; None for any other phrase (it is not counted — a false one-word mouth cannot pass
+    MINIMAL by absence; TRUTH-NEED carries that failure)."""
+    every = range(len(things))
+    if not unique_true(phrase, things, target, every):
+        return None
+    ws = list(phrase)
+    for mask in range(1, (1 << len(ws)) - 1):
+        if unique_true([ws[i] for i in range(len(ws)) if mask >> i & 1], things, target, every):
+            return False
+    return True
+
+
+def grade_mouth_r(items, answers, truth, pointers: Optional[Dict[str, Optional[int]]] = None) -> List[Dict[str, object]]:
+    """S1b-1's `grade_speak` rows, with MINIMAL beside each spoken phrase (and the kind the item carries)."""
+    rows = grade_speak(items, answers, truth, pointers)
+    for it, r in zip(items, rows):
+        sp = (answers.get(it["item_id"]) or {}).get("spoken")
+        r["minimal"] = None if sp is None else minimal_true(sp, things_of(truth[it["row"]]), int(it["target"]))
+    return rows
+
+
+def _mix(rows) -> Dict[str, Optional[float]]:
+    sp = [r for r in rows if r["covered"] and r["spoken"]]
+    return {str(k): (sum(1 for r in sp if r["length"] == k) / len(sp) if sp else None) for k in (1, 2, 3)}
+
+
+def summarise_mouth_r(speak_rows: Sequence[Dict[str, object]], speak2_rows: Sequence[Dict[str, object]]) -> Dict[str, object]:
+    """PREREG-S1B1R §5's mouth marks, on COVERED targets: SPOKEN / TRUTH / TRUTH-SEEN / TRUTH × SPOKEN / READ-BACK on SPEAK
+    (S1b-1's summary, kept whole under "speak"); TRUTH-NEED (and SPOKEN) on SPEAK2; MINIMAL over SPEAK + SPEAK2 (of the
+    spoken phrases true of the target and unique in view, the fraction with no proper non-empty subset also true and
+    unique); ORDER over SPEAK + SPEAK2's spoken multi-word phrases; the length mixes; per kind of SPEAK2: TRUTH-NEED,
+    MINIMAL, ORDER, the length mix, n; the reasons."""
+    sp = summarise_speak(speak_rows) if speak_rows else None
+    both = list(speak_rows) + list(speak2_rows)
+    cov2 = [r for r in speak2_rows if r["covered"]]
+    spk2 = [r for r in cov2 if r["spoken"]]
+    covb = [r for r in both if r["covered"] and r["spoken"]]
+    mn = [r["minimal"] for r in covb if r.get("minimal") is not None]
+    multi = [r for r in covb if r["length"] >= 2]
+    out = {"speak": sp,
+           "spoken": None if sp is None else sp["spoken"], "n_spoken_cov": None if sp is None else sp["n_covered"],
+           "truth": None if sp is None else sp["truth"], "n_truth": None if sp is None else sp["n_spoken"],
+           "readback_speak": None if sp is None else sp["readback"],
+           "spoken2": _rate(r["spoken"] for r in cov2)[0], "n_cov2": len(cov2),
+           "truth_need": _rate(r["true"] for r in spk2)[0], "n_truth_need": len(spk2),
+           "truth_need_seen": _rate(r["true_seen"] for r in spk2)[0],
+           "readback2": _rate(r["readback_ok"] for r in spk2)[0],
+           "readback_all": _rate(r["readback_ok"] for r in covb)[0], "n_readback_all": len(covb),
+           "minimal": _rate(mn)[0], "n_minimal": len(mn),
+           "order": _rate(r["in_order"] for r in multi)[0], "n_order": len(multi),
+           "length_mix": _mix(both), "length_mix_speak": _mix(speak_rows), "length_mix_speak2": _mix(speak2_rows),
+           "reasons2": dict(collections.Counter(r["reason"] for r in cov2 if not r["spoken"])),
+           "kinds": {}}
+    for k in W.SPEAK2_KINDS:
+        rk = [r for r in cov2 if r.get("kind") == k]
+        sk = [r for r in rk if r["spoken"]]
+        mk = [r["minimal"] for r in sk if r.get("minimal") is not None]
+        ok = [r["in_order"] for r in sk if r["length"] >= 2]
+        out["kinds"][k] = {"n_cov": len(rk), "spoken": _rate(r["spoken"] for r in rk)[0],
+                           "truth_need": _rate(r["true"] for r in sk)[0], "n_spoken": len(sk),
+                           "minimal": _rate(mk)[0], "n_minimal": len(mk), "order": _rate(ok)[0], "n_order": len(ok),
+                           "length_mix": _mix(rk),
+                           "reasons": dict(collections.Counter(r["reason"] for r in rk if not r["spoken"]))}
+    return out
+
+
+def target_mix(items: Sequence[Dict[str, object]], truth: Sequence[Dict[str, object]]) -> Dict[str, Dict[str, Dict[str, int]]]:
+    """AMENDMENT 1 §2: the ACHIEVED target mix per kind (the rejection makes the target uniform only over the trained things
+    that admit the kind) — counts of the targets' shapes, colours and sizes."""
+    out: Dict[str, Dict[str, Dict[str, int]]] = {}
+    for it in items:
+        t = truth[it["row"]]["things"][int(it["target"])]
+        m = out.setdefault(it["kind"], {"shape": {}, "colour": {}, "size": {}})
+        for key in ("shape", "colour", "size"):
+            m[key][t[key]] = m[key].get(t[key], 0) + 1
+    return out
+
+
+def null_summary(values: Sequence[float]) -> Dict[str, Optional[float]]:
+    """§1 (f): the null's distribution over its K draws — min / median / max / the 95th percentile (numpy's default linear
+    rule)."""
+    v = np.asarray([x for x in values if x is not None], dtype=np.float64)
+    if v.size == 0:
+        return {"n": 0, "min": None, "median": None, "max": None, "p95": None}
+    return {"n": int(v.size), "min": float(v.min()), "median": float(np.median(v)), "max": float(v.max()),
+            "p95": float(np.percentile(v, 95))}
+
+
 # ------------------------------------------------------------------------------------------------ stage −1 (organ facts)
 def loo_ncm(X: np.ndarray, y: Sequence[str]) -> Optional[float]:
     """Leave-one-out nearest-class-mean (the seat's probe's own rule: a class seen only in the left-out item is absent)."""
