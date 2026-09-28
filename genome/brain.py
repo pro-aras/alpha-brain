@@ -31,6 +31,9 @@ Where each BRAIN value is read (no VALUE-UNREAD):
   conformal    RWLearner.calibrate(level=) — τ_point (the LAW's «none») and τ_word.
   young        RWLearner.p_from — the learner's maturity (fewer meetings answer by prototype and band; only mature words
                are typed, emitted, believed); and M4: a word under `young` meetings is «unknown».
+  young_rule   (optional; edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:20 +0400 — AMENDMENT 1 §2) RWLearner.young_rule — absent
+               = the law; "nearest" (`young <n> nearest`) = a pointing ask on ONE young word points at the hypothesis nearest
+               the word's prototype under the reader's one-alone metric (RWLearner.answer_point / _young_nearest).
   calibrate_at the scene counts at which learn() calibrates (and `begin` calibrates when scenes were learned since).
   replay       "none" is the only rule rung 1 runs; "uniform" / "strong" refuse by name.
   hears        hears(source): the sources whose canvases the brain learns from.
@@ -57,6 +60,11 @@ from brain.scene import learners as Lr
 from brain.world.seeds import substream
 
 CFG_KEYS = ("lr", "eps", "none_level", "conformal", "young", "calibrate_at", "replay", "hears")
+# edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:20 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2: `young_rule` is an OPTIONAL key (the
+# parser declares it only under `young <n> nearest`); absent or "band" = the law and leaves NO trace in the cfg or the learner's
+# vars (so a law brain's state hash, save file and summary are what they were); "nearest" = F-M6; any other word refuses by name.
+CFG_OPTIONAL = ("young_rule",)
+YOUNG_RULES = ("band", "nearest")
 REPLAY_BUILT = ("none",)
 REPLAY_KNOWN = ("none", "uniform", "strong")
 WHY_MAX = 8                    # M4: up to 8 episodes
@@ -146,13 +154,18 @@ def check_cfg(cfg: Dict[str, object]) -> Dict[str, object]:
     if not isinstance(cfg, dict):
         raise BrainError(f"BRAIN: the config is not a dict: {cfg!r}")
     missing = [k for k in CFG_KEYS if k not in cfg]
-    extra = sorted(k for k in cfg if k not in CFG_KEYS)
+    extra = sorted(k for k in cfg if k not in CFG_KEYS + CFG_OPTIONAL)
     if missing or extra:
         raise BrainError(f"BRAIN: missing {missing}, unknown {extra} (the keys are {list(CFG_KEYS)})")
     out = {"lr": float(cfg["lr"]), "eps": float(cfg["eps"]), "none_level": float(cfg["none_level"]),
            "conformal": float(cfg["conformal"]), "young": int(cfg["young"]),
            "calibrate_at": [int(x) for x in cfg["calibrate_at"]], "replay": str(cfg["replay"]),
            "hears": [str(x) for x in cfg["hears"]]}
+    rule = cfg.get("young_rule", "band")
+    if rule not in YOUNG_RULES:
+        raise BrainError(f"BRAIN: young_rule {rule!r} is no rule (known: {list(YOUNG_RULES)}; AMENDMENT 1 §2)")
+    if rule == "nearest":
+        out["young_rule"] = "nearest"
     if out["replay"] not in REPLAY_KNOWN:
         raise BrainError(f"BRAIN: replay {out['replay']!r} is no rule (known: {list(REPLAY_KNOWN)})")
     if out["replay"] not in REPLAY_BUILT:
@@ -177,6 +190,8 @@ class Brain:
         self.L = Lr.RWLearner(lr=self.cfg["lr"])
         self.L.p_from = self.cfg["young"]                 # an INSTANCE attribute: the class default stays P_FROM_MEETING
         self.L.none_level = self.cfg["none_level"]
+        if self.cfg.get("young_rule") == "nearest":     # F-M6 (AMENDMENT 1 §2): an INSTANCE attribute, set only off the law
+            self.L.young_rule = "nearest"
         self.seen: List[Tuple[np.ndarray, List[str], None]] = []   # the calibration list (run.train_arm's `seen`)
         self.moments: List[str] = []                      # per scene learned: its tape moment
         self.canvas: List[List[object]] = []              # per scene learned: [its located cells, its hypotheses' member lists]
@@ -375,9 +390,14 @@ class Brain:
     # -- the status and the state --------------------------------------------------------------
     def summary(self) -> Dict[str, object]:
         L = self.L
-        return _plain({"learned": self.n_learned, "calibrations": self.n_calibrations, "calibrated_at": self.calibrated_at,
-                       "words": len(L.words), "mature": len(L.mature_words()), "types": [list(t) for t in self.types()],
-                       "tau_point": L.tau_point, "episodes": sum(len(v) for v in self.episodes.values())})
+        out = {"learned": self.n_learned, "calibrations": self.n_calibrations, "calibrated_at": self.calibrated_at,
+               "words": len(L.words), "mature": len(L.mature_words()), "types": [list(t) for t in self.types()],
+               "tau_point": L.tau_point, "episodes": sum(len(v) for v in self.episodes.values())}
+        # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:20 +0400 — the rule is NAMED when it is not the law (a law life's journaled
+        # summary rows stay byte-identical: creature/mind.py journals this dict at every calibration)
+        if self.cfg.get("young_rule") == "nearest":
+            out["young_rule"] = "nearest"
+        return _plain(out)
 
     def _state(self) -> Tuple[Dict[str, object], Dict[str, np.ndarray]]:
         enc = _Encoder()
@@ -410,6 +430,11 @@ class Brain:
         want = check_cfg(cfg)
         if meta.get("version") != STATE_VERSION:
             raise BrainError(f"load: state version {meta.get('version')!r}, this organ reads {STATE_VERSION}")
+        # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:20 +0400 — a brain saved under one young rule never loads under the other
+        saved_rule, want_rule = meta["cfg"].get("young_rule", "band"), want.get("young_rule", "band")
+        if saved_rule != want_rule:
+            raise BrainError(f"load: the saved brain lived under young_rule {saved_rule!r}, not {want_rule!r} — a resume never "
+                             f"changes the genome (AMENDMENT 1 §2)")
         if meta["cfg"] != want:
             raise BrainError(f"load: the saved brain lived under {meta['cfg']}, not {want} — a resume never changes the genome")
         with np.load(str(base) + ".npz") as z:

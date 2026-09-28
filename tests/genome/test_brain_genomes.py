@@ -96,6 +96,24 @@ class MindConstructsUnderTwin(unittest.TestCase):
         self.assertFalse(hasattr(m, "brain_status") and callable(getattr(m, "brain_status", None)) and m.brain_status() is not None)
 
 
+# edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:21 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2: the fixed life's genome is
+# BRAIN-LEAN-20261102.genome with exactly `young 3` → `young 3 nearest` (one text line, one parsed value).
+class LeanNearest(unittest.TestCase):
+    def test_differs_from_lean_20261102_by_young_rule_alone(self):
+        lives = BRAIN_DIR / "lives"
+        a = (lives / "BRAIN-LEAN-20261102.genome").read_text()
+        b = (lives / "BRAIN-LEAN-NEAREST-20261102.genome").read_text()
+        la, lb = a.splitlines(), b.splitlines()
+        self.assertEqual(len(la), len(lb))
+        diff = [(x, y) for x, y in zip(la, lb) if x != y]
+        self.assertEqual(len(diff), 1)
+        self.assertEqual(diff[0][0].replace("young 3;", "young 3 nearest;"), diff[0][1])
+        da, db = parse_genome(a).declared, parse_genome(b).declared
+        self.assertEqual({k: v for k, v in db.items() if k != "BRAIN"}, {k: v for k, v in da.items() if k != "BRAIN"})
+        self.assertEqual(db["BRAIN"], {**da["BRAIN"], "young_rule": "nearest"})
+        self.assertNotIn("young_rule", da["BRAIN"])
+
+
 class Preflight(unittest.TestCase):
     def test_preflight_is_300_scenes_fresh_only(self):
         declared = parse_genome((BRAIN_DIR / "BRAIN-LEAN-PREFLIGHT.genome").read_text()).declared
