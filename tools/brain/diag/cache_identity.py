@@ -2,7 +2,7 @@
 import hashlib, json, sys
 from pathlib import Path
 import numpy as np
-A = Path("/data/dev/brain-runs/scene-s1b1r"); B = Path("/data/dev/brain-runs/organ/scene")
+A = Path("/data/dev/brain-runs/scene-s1b1r"); B = Path("/data/dev/brain-runs/scene-organ")
 SEEDS = (20261101, 20261102, 20261103)
 S1 = ("train", "test", "m2b", "m6", "m3", "speak", "decline"); FR = ("test", "m2b", "m6", "m3", "speak", "decline", "speak2")
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
