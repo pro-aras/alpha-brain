@@ -1,0 +1,36 @@
+(A1) THE RESIDUAL TRUTH OF N-SHUF'S STREAM — how often a deranged utterance is still true of ≥ 1 thing in the scene it was paired with (the unit's own derangement), beside the independent-draws base rate (200,000 random (utterance, scene) pairs of the same stream, substream '<seed>:a1-base') and the true stream
+   20261101: deranged phrase true of ≥ 1 thing 0.1236 (n 10000) · base rate 0.1355 · the true stream 1.0000
+            per word type — deranged: colour 0.3231 · shape 0.2674 · size 0.6748 | base: colour 0.3287 · shape 0.2787 · size 0.6778 | true: colour 1.0000 · shape 1.0000 · size 1.0000
+   20261102: deranged phrase true of ≥ 1 thing 0.1354 (n 10000) · base rate 0.1339 · the true stream 1.0000
+            per word type — deranged: colour 0.3171 · shape 0.2775 · size 0.6759 | base: colour 0.3271 · shape 0.2790 · size 0.6801 | true: colour 1.0000 · shape 1.0000 · size 1.0000
+   20261103: deranged phrase true of ≥ 1 thing 0.1377 (n 10000) · base rate 0.1354 · the true stream 1.0000
+            per word type — deranged: colour 0.3265 · shape 0.2833 · size 0.6712 | base: colour 0.3308 · shape 0.2802 · size 0.6756 | true: colour 1.0000 · shape 1.0000 · size 1.0000
+(A2) THE NULL'S DISTRIBUTION — the price: one N-SHUF run (seed 20261101, k 1) solo 3.0 CPU-s (3.4 s wall) → 33 runs ≈ 1.6 CPU-min (the limit 40)
+   20261101: k=0 (the unit's own) 0.651 — the unit's report 0.651 (reproduced); chance 0.544 + 0.05 = 0.594; n 192
+            k=1..10: 0.542 0.620 0.578 0.380 0.604 0.557 0.557 0.479 0.448 0.609 → min 0.380 · median 0.557 · max 0.620 · 95th pct 0.615 · above chance + 0.05 in 3/10 · the unit's draw is above 10/10 fresh draws
+   20261102: k=0 (the unit's own) 0.597 — the unit's report 0.597 (reproduced); chance 0.543 + 0.05 = 0.593; n 201
+            k=1..10: 0.488 0.502 0.537 0.453 0.592 0.612 0.483 0.582 0.552 0.577 → min 0.453 · median 0.545 · max 0.612 · 95th pct 0.603 · above chance + 0.05 in 1/10 · the unit's draw is above 9/10 fresh draws
+   20261103: k=0 (the unit's own) 0.469 — the unit's report 0.469 (reproduced); chance 0.540 + 0.05 = 0.590; n 211
+            k=1..10: 0.531 0.569 0.512 0.464 0.583 0.507 0.512 0.507 0.578 0.488 → min 0.464 · median 0.512 · max 0.583 · 95th pct 0.581 · above chance + 0.05 in 0/10 · the unit's draw is above 1/10 fresh draws
+   all 33 runs: 1.8 CPU-min
+(A3) THE WITHIN-TYPE MOUTH COUNTERFACTUAL on SPEAK — A-RW (lr 0.01) retrained to 10,000 per seed; TRUTH = the word is true of the target and of no other thing in view (the world's truth). Readings: the forced name of ONE declared type (name_forced over shape / colour / size), and the type chosen by the within-type posterior margin (q = p_w / Σ_type p_w; top − runner-up; declared). The law's own TRUTH on the same items beside.
+   CAVEAT: NAME's 0.93–0.95 («what is this?» emits the true word) is read on ONE-THING test scenes; the SPEAK items are 2- and 3-thing scenes (a different population), and a word true of the target may also be true of another thing.
+   20261101: the control — the law's TRUTH re-read 0.671 (n 76) vs the unit's 0.671 (reproduced)
+      ONE hypothesis in view (X has one row; the read-back margin is then +∞, but +∞ does not imply one row — A3′): shape 0.800 (n 5) · colour 0.200 (n 5) · size 0.800 (n 5) · by margin 0.600 (n 5) · the law (spoken) 0.000 (n 5) · the margin chose {'shape': 2, 'colour': 2, 'size': 1}
+      SEVERAL hypotheses in view: shape 0.767 (n 73) · colour 0.548 (n 73) · size 0.384 (n 73) · by margin 0.603 (n 73) · the law (spoken) 0.718 (n 71) · the margin chose {'shape': 27, 'colour': 6, 'size': 40}
+   20261102: the control — the law's TRUTH re-read 0.716 (n 74) vs the unit's 0.716 (reproduced)
+      ONE hypothesis in view (X has one row; the read-back margin is then +∞, but +∞ does not imply one row — A3′): shape 0.800 (n 10) · colour 0.500 (n 10) · size 0.400 (n 10) · by margin 0.400 (n 10) · the law (spoken) 0.222 (n 9) · the margin chose {'shape': 3, 'colour': 2, 'size': 5}
+      SEVERAL hypotheses in view: shape 0.800 (n 70) · colour 0.686 (n 70) · size 0.386 (n 70) · by margin 0.629 (n 70) · the law (spoken) 0.785 (n 65) · the margin chose {'shape': 25, 'colour': 13, 'size': 32}
+   20261103: the control — the law's TRUTH re-read 0.600 (n 70) vs the unit's 0.600 (reproduced)
+      ONE hypothesis in view (X has one row; the read-back margin is then +∞, but +∞ does not imply one row — A3′): shape 1.000 (n 8) · colour 0.875 (n 8) · size 0.750 (n 8) · by margin 0.875 (n 8) · the law (spoken) 0.375 (n 8) · the margin chose {'shape': 2, 'colour': 4, 'size': 2}
+      SEVERAL hypotheses in view: shape 0.734 (n 64) · colour 0.656 (n 64) · size 0.312 (n 64) · by margin 0.484 (n 64) · the law (spoken) 0.629 (n 62) · the margin chose {'shape': 20, 'colour': 8, 'size': 36}
+(A3′) A-RW's SPOKEN phrases at 10,000, by (the word is «dax» or not) × (hypotheses in view) × (margin) × TRUE — and a COUNTERFACTUAL mouth with the words of < 3 meetings dropped from HELD (a reading, not a proposal)
+   20261101: the control — the law's mouth re-run here reproduces the unit's spoken phrase on 78 of 78 items
+   20261101: spoken 76, of which «dax» 11 (all false: True); other/1 hyp/+∞/also true of another 1 · other/1 hyp/+∞/false of the target 3 · other/≥2 hyp/finite/also true of another 4 · other/≥2 hyp/finite/false of the target 6 · other/≥2 hyp/finite/true 51 · «dax»/1 hyp/+∞/false of the target 1 · «dax»/≥2 hyp/+∞/false of the target 10
+            the counterfactual mouth without the young words: TRUTH 0.816 (n 76) — the unit's 0.671
+   20261102: the control — the law's mouth re-run here reproduces the unit's spoken phrase on 80 of 80 items
+   20261102: spoken 74, of which «dax» 5 (all false: True); other/1 hyp/+∞/also true of another 2 · other/1 hyp/+∞/false of the target 5 · other/1 hyp/+∞/true 2 · other/≥2 hyp/finite/also true of another 1 · other/≥2 hyp/finite/false of the target 8 · other/≥2 hyp/finite/true 51 · «dax»/≥2 hyp/+∞/false of the target 5
+            the counterfactual mouth without the young words: TRUTH 0.757 (n 74) — the unit's 0.716
+   20261103: the control — the law's mouth re-run here reproduces the unit's spoken phrase on 72 of 72 items
+   20261103: spoken 70, of which «dax» 13 (all false: True); other/1 hyp/+∞/also true of another 1 · other/1 hyp/+∞/false of the target 4 · other/1 hyp/+∞/true 3 · other/≥2 hyp/finite/also true of another 4 · other/≥2 hyp/finite/false of the target 6 · other/≥2 hyp/finite/true 39 · «dax»/≥2 hyp/+∞/false of the target 13
+            the counterfactual mouth without the young words: TRUTH 0.700 (n 70) — the unit's 0.600

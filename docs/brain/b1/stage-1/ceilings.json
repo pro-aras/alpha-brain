@@ -1,0 +1,1642 @@
+{
+  "controls": {
+    "distinguishable": {
+      "accuracy": 1.0,
+      "bar": 0.99,
+      "n": 30,
+      "pass": true
+    },
+    "identical": {
+      "accuracy": 0.43333333333333335,
+      "band_95": 0.17892270211835426,
+      "chance": 0.5,
+      "n": 30,
+      "pass": true
+    },
+    "pass": true
+  },
+  "families": {
+    "AFTER": {
+      "chance": 0.04,
+      "k_min": 1,
+      "n": 12,
+      "organ_ceiling": {
+        "linear": 0.8863636363636362,
+        "max": 0.8863636363636362,
+        "nn": 0.8863636363636362
+      }
+    },
+    "BEFORE": {
+      "chance": 0.04,
+      "k_min": 1,
+      "n": 12,
+      "organ_ceiling": {
+        "linear": 0.9166666666666666,
+        "max": 0.9166666666666666,
+        "nn": 0.9166666666666666
+      }
+    },
+    "BETWEEN": {
+      "chance": 0.04,
+      "k_min": 1,
+      "n": 12,
+      "organ_ceiling": {
+        "linear": 0.7548209366391184,
+        "max": 0.7548209366391184,
+        "nn": 0.7548209366391184
+      }
+    },
+    "CHAIN": {
+      "chance": 0.04,
+      "k_min": 1,
+      "n": 25,
+      "organ_ceiling": {
+        "linear": 0.8727272727272728,
+        "max": 0.8727272727272728,
+        "nn": 0.8727272727272728
+      }
+    },
+    "LOOP": {
+      "chance": 0.5,
+      "k_min": 1,
+      "n": 14,
+      "organ_ceiling": {
+        "linear": 0.5,
+        "max": 0.5,
+        "nn": 0.5
+      }
+    },
+    "MIRROR": {
+      "chance": 0.5,
+      "k_min": 1,
+      "n": 16,
+      "organ_ceiling": {
+        "linear": 0.5,
+        "max": 0.5,
+        "nn": 0.5
+      }
+    },
+    "NAMING_digits_3fonts": {
+      "chance": 0.0,
+      "k_min": 1,
+      "label_conflicts": [
+        [
+          "eight",
+          "six"
+        ],
+        [
+          "eight",
+          "zero"
+        ],
+        [
+          "nine",
+          "zero"
+        ],
+        [
+          "one",
+          "seven"
+        ],
+        [
+          "three",
+          "eight"
+        ],
+        [
+          "three",
+          "nine"
+        ]
+      ],
+      "n": 170,
+      "null": {
+        "mean": 0.09529411764705883,
+        "p95": 0.2041176470588236
+      },
+      "organ_ceiling": {
+        "linear": 0.8117647058823529,
+        "max": 0.8529411764705882,
+        "nn": 0.8529411764705882
+      }
+    },
+    "NAMING_digits_4fonts": {
+      "chance": 0.0,
+      "k_min": 1,
+      "label_conflicts": [
+        [
+          "eight",
+          "six"
+        ],
+        [
+          "one",
+          "seven"
+        ],
+        [
+          "three",
+          "eight"
+        ],
+        [
+          "three",
+          "nine"
+        ]
+      ],
+      "n": 170,
+      "null": {
+        "mean": 0.1261764705882353,
+        "p95": 0.24794117647058825
+      },
+      "organ_ceiling": {
+        "linear": 0.8764705882352941,
+        "max": 0.8764705882352941,
+        "nn": 0.8647058823529412
+      }
+    },
+    "NAMING_latin-lower_3fonts": {
+      "chance": 0.0,
+      "k_min": 1,
+      "label_conflicts": [
+        [
+          "h",
+          "b"
+        ],
+        [
+          "h",
+          "k"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "l",
+          "i"
+        ],
+        [
+          "l",
+          "j"
+        ],
+        [
+          "n",
+          "m"
+        ],
+        [
+          "q",
+          "g"
+        ],
+        [
+          "t",
+          "f"
+        ],
+        [
+          "t",
+          "l"
+        ],
+        [
+          "u",
+          "w"
+        ],
+        [
+          "v",
+          "w"
+        ]
+      ],
+      "n": 286,
+      "null": {
+        "mean": 0.033741258741258745,
+        "p95": 0.0632867132867133
+      },
+      "organ_ceiling": {
+        "linear": 0.7762237762237763,
+        "max": 0.8741258741258742,
+        "nn": 0.8741258741258742
+      }
+    },
+    "NAMING_latin-lower_4fonts": {
+      "chance": 0.0,
+      "k_min": 1,
+      "label_conflicts": [
+        [
+          "h",
+          "b"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "i",
+          "l"
+        ],
+        [
+          "l",
+          "i"
+        ],
+        [
+          "l",
+          "j"
+        ],
+        [
+          "n",
+          "m"
+        ],
+        [
+          "q",
+          "g"
+        ],
+        [
+          "t",
+          "f"
+        ],
+        [
+          "u",
+          "n"
+        ]
+      ],
+      "n": 286,
+      "null": {
+        "mean": 0.035314685314685325,
+        "p95": 0.08811188811188812
+      },
+      "organ_ceiling": {
+        "linear": 0.8356643356643356,
+        "max": 0.8776223776223776,
+        "nn": 0.8776223776223776
+      }
+    },
+    "NAMING_latin-upper_3fonts": {
+      "chance": 0.0,
+      "k_min": 1,
+      "label_conflicts": [
+        [
+          "c",
+          "g"
+        ],
+        [
+          "e",
+          "b"
+        ],
+        [
+          "f",
+          "i"
+        ],
+        [
+          "g",
+          "c"
+        ],
+        [
+          "h",
+          "m"
+        ],
+        [
+          "h",
+          "w"
+        ],
+        [
+          "h",
+          "z"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "i",
+          "l"
+        ],
+        [
+          "j",
+          "i"
+        ],
+        [
+          "m",
+          "w"
+        ],
+        [
+          "n",
+          "w"
+        ],
+        [
+          "p",
+          "b"
+        ],
+        [
+          "r",
+          "b"
+        ],
+        [
+          "r",
+          "z"
+        ],
+        [
+          "t",
+          "i"
+        ],
+        [
+          "v",
+          "t"
+        ],
+        [
+          "v",
+          "y"
+        ],
+        [
+          "x",
+          "z"
+        ]
+      ],
+      "n": 338,
+      "null": {
+        "mean": 0.02899408284023669,
+        "p95": 0.06627218934911244
+      },
+      "organ_ceiling": {
+        "linear": 0.6952662721893491,
+        "max": 0.7337278106508875,
+        "nn": 0.7337278106508875
+      }
+    },
+    "NAMING_latin-upper_4fonts": {
+      "chance": 0.0,
+      "k_min": 1,
+      "label_conflicts": [
+        [
+          "b",
+          "s"
+        ],
+        [
+          "c",
+          "g"
+        ],
+        [
+          "e",
+          "b"
+        ],
+        [
+          "f",
+          "i"
+        ],
+        [
+          "f",
+          "p"
+        ],
+        [
+          "g",
+          "c"
+        ],
+        [
+          "h",
+          "z"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "i",
+          "l"
+        ],
+        [
+          "j",
+          "i"
+        ],
+        [
+          "m",
+          "w"
+        ],
+        [
+          "n",
+          "w"
+        ],
+        [
+          "q",
+          "o"
+        ],
+        [
+          "r",
+          "z"
+        ],
+        [
+          "u",
+          "c"
+        ],
+        [
+          "u",
+          "e"
+        ],
+        [
+          "v",
+          "y"
+        ],
+        [
+          "x",
+          "z"
+        ]
+      ],
+      "n": 338,
+      "null": {
+        "mean": 0.041272189349112434,
+        "p95": 0.08062130177514794
+      },
+      "organ_ceiling": {
+        "linear": 0.7633136094674556,
+        "max": 0.7692307692307693,
+        "nn": 0.7692307692307693
+      }
+    },
+    "OTHER_CASE": {
+      "chance": 0.038461538461538464,
+      "excluded": [
+        {
+          "cosine": 0.9790383772042478,
+          "letter": "b"
+        },
+        {
+          "cosine": 0.9803468224653171,
+          "letter": "c"
+        },
+        {
+          "cosine": 0.9763876960454504,
+          "letter": "h"
+        },
+        {
+          "cosine": 0.9768635577012286,
+          "letter": "k"
+        },
+        {
+          "cosine": 0.9618419751934494,
+          "letter": "m"
+        },
+        {
+          "cosine": 0.980483701219458,
+          "letter": "o"
+        },
+        {
+          "cosine": 0.9889887438238675,
+          "letter": "p"
+        },
+        {
+          "cosine": 0.9759840936303943,
+          "letter": "q"
+        },
+        {
+          "cosine": 0.9670347191589289,
+          "letter": "s"
+        },
+        {
+          "cosine": 0.9687376066196192,
+          "letter": "u"
+        },
+        {
+          "cosine": 0.9817700222899794,
+          "letter": "v"
+        },
+        {
+          "cosine": 0.9827372864329953,
+          "letter": "w"
+        },
+        {
+          "cosine": 0.9809731853309306,
+          "letter": "x"
+        },
+        {
+          "cosine": 0.9717971801424563,
+          "letter": "y"
+        },
+        {
+          "cosine": 0.9718401876152613,
+          "letter": "z"
+        }
+      ],
+      "k_min": 1,
+      "n": 5,
+      "organ_ceiling": {
+        "linear": 0.8611570247933884,
+        "max": 0.8611570247933884,
+        "nn": 0.8611570247933884
+      },
+      "pick_approximation": "naming_accuracy**2 (query x candidate-discrimination, both modelled as the same naming capability \u2014 RAISED as a convention, not a real 26-candidate pick simulation)"
+    },
+    "TRANSFER_AFTER": {
+      "chance": 0.04,
+      "k_min": 1,
+      "n": 9,
+      "organ_ceiling": {
+        "linear": 0.869281045751634,
+        "max": 0.869281045751634,
+        "nn": 0.869281045751634
+      }
+    },
+    "TRANSFER_BEFORE": {
+      "chance": 0.04,
+      "k_min": 1,
+      "n": 9,
+      "organ_ceiling": {
+        "linear": 0.869281045751634,
+        "max": 0.869281045751634,
+        "nn": 0.869281045751634
+      }
+    },
+    "TWO_AFTER": {
+      "chance": 0.04,
+      "k_min": 1,
+      "n": 21,
+      "organ_ceiling": {
+        "linear": 0.8614718614718614,
+        "max": 0.8614718614718614,
+        "nn": 0.8614718614718614
+      }
+    },
+    "VOWEL": {
+      "chance": 0.5,
+      "k_min": 1,
+      "n": 40,
+      "organ_ceiling": {
+        "linear": 0.5,
+        "max": 0.5,
+        "nn": 0.5
+      }
+    }
+  },
+  "input_shas": {
+    "prereg": null
+  },
+  "naming_raw": {
+    "digits": {
+      "3": {
+        "best_combo": "nn_fpool",
+        "label_conflicts": [
+          [
+            "eight",
+            "six"
+          ],
+          [
+            "eight",
+            "zero"
+          ],
+          [
+            "nine",
+            "zero"
+          ],
+          [
+            "one",
+            "seven"
+          ],
+          [
+            "three",
+            "eight"
+          ],
+          [
+            "three",
+            "nine"
+          ]
+        ],
+        "n_test": 170,
+        "n_train": 30,
+        "null": {
+          "mean": 0.09529411764705883,
+          "p95": 0.2041176470588236
+        },
+        "organ_ceiling": {
+          "by_feature": {
+            "linear_fcat": 0.8117647058823529,
+            "linear_fpool": 0.788235294117647,
+            "nn_fcat": 0.8411764705882353,
+            "nn_fpool": 0.8529411764705882
+          },
+          "linear": 0.8117647058823529,
+          "max": 0.8529411764705882,
+          "nn": 0.8529411764705882
+        },
+        "per_name_accuracy": {
+          "eight": 0.9411764705882353,
+          "five": 0.8823529411764706,
+          "four": 1.0,
+          "nine": 0.7647058823529411,
+          "one": 1.0,
+          "seven": 0.9411764705882353,
+          "six": 0.7647058823529411,
+          "three": 0.35294117647058826,
+          "two": 0.8823529411764706,
+          "zero": 1.0
+        }
+      },
+      "4": {
+        "best_combo": "linear_fcat",
+        "label_conflicts": [
+          [
+            "eight",
+            "six"
+          ],
+          [
+            "one",
+            "seven"
+          ],
+          [
+            "three",
+            "eight"
+          ],
+          [
+            "three",
+            "nine"
+          ]
+        ],
+        "n_test": 170,
+        "n_train": 40,
+        "null": {
+          "mean": 0.1261764705882353,
+          "p95": 0.24794117647058825
+        },
+        "organ_ceiling": {
+          "by_feature": {
+            "linear_fcat": 0.8764705882352941,
+            "linear_fpool": 0.8764705882352941,
+            "nn_fcat": 0.8411764705882353,
+            "nn_fpool": 0.8647058823529412
+          },
+          "linear": 0.8764705882352941,
+          "max": 0.8764705882352941,
+          "nn": 0.8647058823529412
+        },
+        "per_name_accuracy": {
+          "eight": 0.23529411764705882,
+          "five": 0.8823529411764706,
+          "four": 1.0,
+          "nine": 0.9411764705882353,
+          "one": 0.7647058823529411,
+          "seven": 1.0,
+          "six": 1.0,
+          "three": 0.9411764705882353,
+          "two": 1.0,
+          "zero": 1.0
+        }
+      },
+      "cache_header": {
+        "genome_sha": "a68870a8481664405fa7a82119e4a92304ee76bcb6d1b2f5d878d267948c9bfd",
+        "interpreter": {
+          "PIL": "12.1.1",
+          "executable": "/usr/bin/python3",
+          "numpy": "2.3.5",
+          "python": "3.14.4",
+          "scipy": "1.16.3"
+        },
+        "library_versions": {
+          "PIL": "12.1.1",
+          "executable": "/usr/bin/python3",
+          "numpy": "2.3.5",
+          "python": "3.14.4",
+          "scipy": "1.16.3"
+        },
+        "npy_sha256": "0259835ce56282c8d816f8ead83bef242c9c7f8f8e6e42091d83bb7dcb9cf160",
+        "organ_pins": {
+          "eye-tower-g2/tower.bin": "6abc6d7553d8b8c7529b4b1802e6f6b5c758c89d4abc0be01a2e6299fbb301f6",
+          "genome/retina_fast.py": "90305a986e6b489cacdbe652392ed8557317a8d38de9b68ad4c1aa0a26e9008d",
+          "organs/gaze.py": "2ccea9b449efd4452cb3c4fc0a5d4d439e456b18bc365595f3c90c6fe230ae73",
+          "organs/retina.py": "aa95693dcd29f1f5d9432160ac7f5a520db9cbec5719f73112b7b6337fa81dc4"
+        },
+        "row_count": 210,
+        "seed": 20261001
+      },
+      "header_row_count": 210
+    },
+    "latin-lower": {
+      "3": {
+        "best_combo": "nn_fcat",
+        "label_conflicts": [
+          [
+            "h",
+            "b"
+          ],
+          [
+            "h",
+            "k"
+          ],
+          [
+            "i",
+            "j"
+          ],
+          [
+            "l",
+            "i"
+          ],
+          [
+            "l",
+            "j"
+          ],
+          [
+            "n",
+            "m"
+          ],
+          [
+            "q",
+            "g"
+          ],
+          [
+            "t",
+            "f"
+          ],
+          [
+            "t",
+            "l"
+          ],
+          [
+            "u",
+            "w"
+          ],
+          [
+            "v",
+            "w"
+          ]
+        ],
+        "n_test": 286,
+        "n_train": 78,
+        "null": {
+          "mean": 0.033741258741258745,
+          "p95": 0.0632867132867133
+        },
+        "organ_ceiling": {
+          "by_feature": {
+            "linear_fcat": 0.7762237762237763,
+            "linear_fpool": 0.7447552447552448,
+            "nn_fcat": 0.8741258741258742,
+            "nn_fpool": 0.8671328671328671
+          },
+          "linear": 0.7762237762237763,
+          "max": 0.8741258741258742,
+          "nn": 0.8741258741258742
+        },
+        "per_name_accuracy": {
+          "a": 0.9090909090909091,
+          "b": 1.0,
+          "c": 0.8181818181818182,
+          "d": 0.9090909090909091,
+          "e": 0.8181818181818182,
+          "f": 0.5454545454545454,
+          "g": 0.9090909090909091,
+          "h": 0.9090909090909091,
+          "i": 0.7272727272727273,
+          "j": 1.0,
+          "k": 1.0,
+          "l": 0.36363636363636365,
+          "m": 1.0,
+          "n": 1.0,
+          "o": 1.0,
+          "p": 1.0,
+          "q": 0.8181818181818182,
+          "r": 0.9090909090909091,
+          "s": 0.9090909090909091,
+          "t": 0.6363636363636364,
+          "u": 1.0,
+          "v": 0.8181818181818182,
+          "w": 0.8181818181818182,
+          "x": 1.0,
+          "y": 0.9090909090909091,
+          "z": 1.0
+        }
+      },
+      "4": {
+        "best_combo": "nn_fcat",
+        "label_conflicts": [
+          [
+            "h",
+            "b"
+          ],
+          [
+            "i",
+            "j"
+          ],
+          [
+            "i",
+            "l"
+          ],
+          [
+            "l",
+            "i"
+          ],
+          [
+            "l",
+            "j"
+          ],
+          [
+            "n",
+            "m"
+          ],
+          [
+            "q",
+            "g"
+          ],
+          [
+            "t",
+            "f"
+          ],
+          [
+            "u",
+            "n"
+          ]
+        ],
+        "n_test": 286,
+        "n_train": 104,
+        "null": {
+          "mean": 0.035314685314685325,
+          "p95": 0.08811188811188812
+        },
+        "organ_ceiling": {
+          "by_feature": {
+            "linear_fcat": 0.8356643356643356,
+            "linear_fpool": 0.8111888111888111,
+            "nn_fcat": 0.8776223776223776,
+            "nn_fpool": 0.8741258741258742
+          },
+          "linear": 0.8356643356643356,
+          "max": 0.8776223776223776,
+          "nn": 0.8776223776223776
+        },
+        "per_name_accuracy": {
+          "a": 1.0,
+          "b": 1.0,
+          "c": 0.8181818181818182,
+          "d": 0.9090909090909091,
+          "e": 0.9090909090909091,
+          "f": 0.6363636363636364,
+          "g": 0.9090909090909091,
+          "h": 0.9090909090909091,
+          "i": 0.7272727272727273,
+          "j": 0.9090909090909091,
+          "k": 1.0,
+          "l": 0.36363636363636365,
+          "m": 1.0,
+          "n": 1.0,
+          "o": 1.0,
+          "p": 1.0,
+          "q": 0.8181818181818182,
+          "r": 0.9090909090909091,
+          "s": 0.9090909090909091,
+          "t": 0.9090909090909091,
+          "u": 0.6363636363636364,
+          "v": 0.8181818181818182,
+          "w": 0.8181818181818182,
+          "x": 1.0,
+          "y": 0.9090909090909091,
+          "z": 1.0
+        }
+      },
+      "cache_header": {
+        "genome_sha": "a68870a8481664405fa7a82119e4a92304ee76bcb6d1b2f5d878d267948c9bfd",
+        "interpreter": {
+          "PIL": "12.1.1",
+          "executable": "/usr/bin/python3",
+          "numpy": "2.3.5",
+          "python": "3.14.4",
+          "scipy": "1.16.3"
+        },
+        "library_versions": {
+          "PIL": "12.1.1",
+          "executable": "/usr/bin/python3",
+          "numpy": "2.3.5",
+          "python": "3.14.4",
+          "scipy": "1.16.3"
+        },
+        "npy_sha256": "beee2916e6d9401365f63bb0f9a7e202c0f148ed9a226fc083794b90ba436c48",
+        "organ_pins": {
+          "eye-tower-g2/tower.bin": "6abc6d7553d8b8c7529b4b1802e6f6b5c758c89d4abc0be01a2e6299fbb301f6",
+          "genome/retina_fast.py": "90305a986e6b489cacdbe652392ed8557317a8d38de9b68ad4c1aa0a26e9008d",
+          "organs/gaze.py": "2ccea9b449efd4452cb3c4fc0a5d4d439e456b18bc365595f3c90c6fe230ae73",
+          "organs/retina.py": "aa95693dcd29f1f5d9432160ac7f5a520db9cbec5719f73112b7b6337fa81dc4"
+        },
+        "row_count": 390,
+        "seed": 20261001
+      },
+      "header_row_count": 390
+    },
+    "latin-upper": {
+      "3": {
+        "best_combo": "nn_fpool",
+        "label_conflicts": [
+          [
+            "c",
+            "g"
+          ],
+          [
+            "e",
+            "b"
+          ],
+          [
+            "f",
+            "i"
+          ],
+          [
+            "g",
+            "c"
+          ],
+          [
+            "h",
+            "m"
+          ],
+          [
+            "h",
+            "w"
+          ],
+          [
+            "h",
+            "z"
+          ],
+          [
+            "i",
+            "j"
+          ],
+          [
+            "i",
+            "l"
+          ],
+          [
+            "j",
+            "i"
+          ],
+          [
+            "m",
+            "w"
+          ],
+          [
+            "n",
+            "w"
+          ],
+          [
+            "p",
+            "b"
+          ],
+          [
+            "r",
+            "b"
+          ],
+          [
+            "r",
+            "z"
+          ],
+          [
+            "t",
+            "i"
+          ],
+          [
+            "v",
+            "t"
+          ],
+          [
+            "v",
+            "y"
+          ],
+          [
+            "x",
+            "z"
+          ]
+        ],
+        "n_test": 338,
+        "n_train": 78,
+        "null": {
+          "mean": 0.02899408284023669,
+          "p95": 0.06627218934911244
+        },
+        "organ_ceiling": {
+          "by_feature": {
+            "linear_fcat": 0.6804733727810651,
+            "linear_fpool": 0.6952662721893491,
+            "nn_fcat": 0.7100591715976331,
+            "nn_fpool": 0.7337278106508875
+          },
+          "linear": 0.6952662721893491,
+          "max": 0.7337278106508875,
+          "nn": 0.7337278106508875
+        },
+        "per_name_accuracy": {
+          "a": 0.9230769230769231,
+          "b": 0.9230769230769231,
+          "c": 0.7692307692307693,
+          "d": 0.7692307692307693,
+          "e": 0.6153846153846154,
+          "f": 0.46153846153846156,
+          "g": 0.7692307692307693,
+          "h": 0.6923076923076923,
+          "i": 0.6923076923076923,
+          "j": 0.5384615384615384,
+          "k": 0.7692307692307693,
+          "l": 0.9230769230769231,
+          "m": 0.5384615384615384,
+          "n": 0.7692307692307693,
+          "o": 0.9230769230769231,
+          "p": 0.7692307692307693,
+          "q": 0.6153846153846154,
+          "r": 0.46153846153846156,
+          "s": 0.7692307692307693,
+          "t": 0.6153846153846154,
+          "u": 1.0,
+          "v": 0.46153846153846156,
+          "w": 0.9230769230769231,
+          "x": 0.7692307692307693,
+          "y": 0.7692307692307693,
+          "z": 0.8461538461538461
+        }
+      },
+      "4": {
+        "best_combo": "nn_fpool",
+        "label_conflicts": [
+          [
+            "b",
+            "s"
+          ],
+          [
+            "c",
+            "g"
+          ],
+          [
+            "e",
+            "b"
+          ],
+          [
+            "f",
+            "i"
+          ],
+          [
+            "f",
+            "p"
+          ],
+          [
+            "g",
+            "c"
+          ],
+          [
+            "h",
+            "z"
+          ],
+          [
+            "i",
+            "j"
+          ],
+          [
+            "i",
+            "l"
+          ],
+          [
+            "j",
+            "i"
+          ],
+          [
+            "m",
+            "w"
+          ],
+          [
+            "n",
+            "w"
+          ],
+          [
+            "q",
+            "o"
+          ],
+          [
+            "r",
+            "z"
+          ],
+          [
+            "u",
+            "c"
+          ],
+          [
+            "u",
+            "e"
+          ],
+          [
+            "v",
+            "y"
+          ],
+          [
+            "x",
+            "z"
+          ]
+        ],
+        "n_test": 338,
+        "n_train": 104,
+        "null": {
+          "mean": 0.041272189349112434,
+          "p95": 0.08062130177514794
+        },
+        "organ_ceiling": {
+          "by_feature": {
+            "linear_fcat": 0.7633136094674556,
+            "linear_fpool": 0.7633136094674556,
+            "nn_fcat": 0.7514792899408284,
+            "nn_fpool": 0.7692307692307693
+          },
+          "linear": 0.7633136094674556,
+          "max": 0.7692307692307693,
+          "nn": 0.7692307692307693
+        },
+        "per_name_accuracy": {
+          "a": 0.9230769230769231,
+          "b": 0.8461538461538461,
+          "c": 0.7692307692307693,
+          "d": 0.7692307692307693,
+          "e": 0.6923076923076923,
+          "f": 0.38461538461538464,
+          "g": 0.7692307692307693,
+          "h": 0.8461538461538461,
+          "i": 0.8461538461538461,
+          "j": 0.7692307692307693,
+          "k": 0.6923076923076923,
+          "l": 1.0,
+          "m": 0.6923076923076923,
+          "n": 0.8461538461538461,
+          "o": 0.9230769230769231,
+          "p": 0.8461538461538461,
+          "q": 0.5384615384615384,
+          "r": 0.5384615384615384,
+          "s": 0.8461538461538461,
+          "t": 0.8461538461538461,
+          "u": 0.6153846153846154,
+          "v": 0.6923076923076923,
+          "w": 1.0,
+          "x": 0.7692307692307693,
+          "y": 0.6923076923076923,
+          "z": 0.8461538461538461
+        }
+      },
+      "cache_header": {
+        "genome_sha": "a68870a8481664405fa7a82119e4a92304ee76bcb6d1b2f5d878d267948c9bfd",
+        "interpreter": {
+          "PIL": "12.1.1",
+          "executable": "/usr/bin/python3",
+          "numpy": "2.3.5",
+          "python": "3.14.4",
+          "scipy": "1.16.3"
+        },
+        "library_versions": {
+          "PIL": "12.1.1",
+          "executable": "/usr/bin/python3",
+          "numpy": "2.3.5",
+          "python": "3.14.4",
+          "scipy": "1.16.3"
+        },
+        "npy_sha256": "14622f6a3a92ea02c872b2ac370be3631492f2b0ff878605c3f2f603df864b75",
+        "organ_pins": {
+          "eye-tower-g2/tower.bin": "6abc6d7553d8b8c7529b4b1802e6f6b5c758c89d4abc0be01a2e6299fbb301f6",
+          "genome/retina_fast.py": "90305a986e6b489cacdbe652392ed8557317a8d38de9b68ad4c1aa0a26e9008d",
+          "organs/gaze.py": "2ccea9b449efd4452cb3c4fc0a5d4d439e456b18bc365595f3c90c6fe230ae73",
+          "organs/retina.py": "aa95693dcd29f1f5d9432160ac7f5a520db9cbec5719f73112b7b6337fa81dc4"
+        },
+        "row_count": 442,
+        "seed": 20261001
+      },
+      "header_row_count": 442
+    }
+  },
+  "never_taught_pool_size": 122,
+  "never_taught_pools": {
+    "counts": {
+      "plant": 1,
+      "u2": 40,
+      "u5": 10,
+      "u6_refusal": 10
+    },
+    "plant": {
+      "char": "\u03b2",
+      "font": "C059-BdIta.otf",
+      "max_cos_to_teach": 0.9402173687041282,
+      "n_fonts_available": 60,
+      "script": "greek"
+    },
+    "plant_eligible_count": 74,
+    "pool_size": 122,
+    "u2": [
+      {
+        "char": "\u091a",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.93967239578471,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u0634",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.8733476584963439,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u063a",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.957479628947167,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u0917",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9583019149873154,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u03a0",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9552399535257369,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u0934",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.943680950908494,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u05d1",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9324769472705474,
+        "n_fonts_available": 20,
+        "script": "hebrew"
+      },
+      {
+        "char": "\u03b1",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9590315576638238,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u03c8",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9332222578335265,
+        "n_fonts_available": 59,
+        "script": "greek"
+      },
+      {
+        "char": "\u0639",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9461997440641271,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u0923",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9394228756896003,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u0939",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9533150665312835,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u090d",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9356051307023178,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u0910",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9391684885927307,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u03a3",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9333928476549942,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u0637",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.8787151396719111,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u0399",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9585654814668267,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u090b",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.8952405835176775,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u0927",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9581838377125524,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u0920",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9551221319395922,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u03a8",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9109047792000591,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u090c",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9319774079223581,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u062a",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.8532733167720026,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u0905",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9313170137927516,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u091d",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9307913356479596,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u05e6",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9364411217635217,
+        "n_fonts_available": 20,
+        "script": "hebrew"
+      },
+      {
+        "char": "\u05d2",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9562191354935843,
+        "n_fonts_available": 20,
+        "script": "hebrew"
+      },
+      {
+        "char": "\u03c9",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9423434772611994,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u03b9",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9551034433093715,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u0393",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9474735627894919,
+        "n_fonts_available": 59,
+        "script": "greek"
+      },
+      {
+        "char": "\u092e",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.956416426635696,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u0935",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9419422260636625,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u0645",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9304442618858408,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u0930",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9476378176091176,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u0913",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.8706310708647507,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u05e0",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9505590632231141,
+        "n_fonts_available": 20,
+        "script": "hebrew"
+      },
+      {
+        "char": "\u0635",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.8506309265291319,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u062b",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9003061277373285,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u0919",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9350138176548934,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u090a",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9181155280906881,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      }
+    ],
+    "u5_after_never_taught": [
+      {
+        "char": "\u03bc",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9464864978638691,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u092d",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9500127617258942,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u092b",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9293812589621298,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u039e",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9488905069232232,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u064a",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.930683005045184,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u03c3",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9425485611591417,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u0395",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9461181538776129,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u062c",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9592158172739333,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      },
+      {
+        "char": "\u05e2",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9567968636251751,
+        "n_fonts_available": 20,
+        "script": "hebrew"
+      },
+      {
+        "char": "\u0648",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9456794760001375,
+        "n_fonts_available": 12,
+        "script": "arabic"
+      }
+    ],
+    "u6_refusal": [
+      {
+        "char": "\u092c",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9344298352024221,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u0396",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9454456649094243,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u03be",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9488791418018988,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u05e9",
+        "font": "DejaVuSans-Bold.ttf",
+        "max_cos_to_teach": 0.9363902641151713,
+        "n_fonts_available": 20,
+        "script": "hebrew"
+      },
+      {
+        "char": "\u03c1",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9534876232938183,
+        "n_fonts_available": 59,
+        "script": "greek"
+      },
+      {
+        "char": "\u039c",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9347471714442351,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u0925",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.95109296810469,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      },
+      {
+        "char": "\u03a1",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9532714916812537,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u03b5",
+        "font": "C059-BdIta.otf",
+        "max_cos_to_teach": 0.9585886770469795,
+        "n_fonts_available": 60,
+        "script": "greek"
+      },
+      {
+        "char": "\u0915",
+        "font": "NotoSansDevanagari-Bold.ttf",
+        "max_cos_to_teach": 0.9081842623522977,
+        "n_fonts_available": 4,
+        "script": "devanagari"
+      }
+    ]
+  },
+  "relation_ceilings": {
+    "AFTER": 0.8863636363636362,
+    "BEFORE": 0.9166666666666666,
+    "BETWEEN": 0.7548209366391184,
+    "CHAIN": 0.8727272727272728,
+    "OTHER_CASE": 0.909090909090909,
+    "TRANSFER_AFTER": 0.869281045751634,
+    "TRANSFER_BEFORE": 0.869281045751634,
+    "TWO_AFTER": 0.8614718614718614
+  },
+  "seed": 20261001,
+  "smoke": false,
+  "theta": 0.9594968717398733
+}

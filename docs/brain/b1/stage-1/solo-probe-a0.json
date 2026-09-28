@@ -1,0 +1,23 @@
+{
+  "events": 1000,
+  "interpreter": "/usr/bin/python3",
+  "load1_at_end": 0.583984375,
+  "load1_at_start": 0.583984375,
+  "nice": 0,
+  "probes": {
+    "A0": {
+      "arm_events": 1187,
+      "arm_ms": 1893.7,
+      "events": 1000,
+      "ms_per_event_arm": 1.595,
+      "ms_per_event_wall": 1.897,
+      "wall_s": 1.897
+    }
+  },
+  "tape_sha256": "ce0d65d92ed99e0536e9a0fb943d7f0a0117dc3ff15305591da2372512439a48",
+  "threads": {
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1"
+  }
+}

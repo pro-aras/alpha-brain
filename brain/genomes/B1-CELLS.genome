@@ -1,0 +1,61 @@
+# B1-CELLS.genome — A0, THE CELLS (B1-PREREG.md §4's table, first row).
+#
+# = genome/ALPHA4.genome with every line that reaches outside the cells, their episodes and their sleep
+# REMOVED (the doors, the hands, the mouth, the think thread, the world, the body) — §4's own words. Built
+# by Claude (Sonnet 5, B1 builder 2), 2026-09-24, via the empirical parse-and-fix loop the PREREG's own
+# advisor review recommended: start from ALPHA4.genome, remove every line outside the cells/episodes/sleep,
+# then let genome.machinery.parse_genome's own required-field list (and Organism's own construction) say
+# which lines the parser needs kept whole. Nothing here is retyped from memory — every kept line is
+# ALPHA4.genome's own line, byte for byte (comments trimmed of ALPHA4-specific cross-references that no
+# longer apply once the removed genes are gone).
+#
+# REMOVED, by category (ALPHA4.genome's own line, for the record — never silently dropped):
+#   BODY, TAPE, HEART, CRASH                    — the body/service layer (no body in B1, no threads, no crash policy)
+#   SURPRISE, DELIVER                            — the mind's own expected-glance residual wiring (_consume_eye);
+#                                                   A0 calls Organism.moment() directly on cached glances, never
+#                                                   through the body's SURPRISE-wired _consume_eye path
+#   SENSE body, SENSE ear-sound, SENSE smell, SENSE touch, SENSE read shelf, SENSE grade — senses the toy has none of
+#   #OFF BIND, #OFF TRAITS, #OFF (the RETINA/SCAN alternatives) — already off in ALPHA4.genome; kept off
+#   PREDICT, CURIOSITY, PARK, SELF               — the mind's own modulation/attention/metacognition layer
+#   INDUCE, DEDUCE, BELIEF, THINK                — the thinking THREAD (§4's table: A0 answers relation cues
+#                                                   with NOTHING, "no road" — it has no thinking organ)
+#   EXAM, SIT                                    — the mind's own self-exam duty (B1 grades through its OWN harness)
+#   SENTENCE, MOUTH, QUESTION                    — the mouth / question-asking machinery (the world's speech)
+#   WORLD (both lines), HANDS, ACT, OUTCOME       — the body's world/hands (B1's world is the harness's tape)
+#   DOOR lexicon, DOOR web                        — the mentorship doors
+#   GROW's paired CYCLE line is KEPT (below) — consolidation is part of the cells' own machinery, not the body
+#   EVOLVE                                        — the genome-mutation duty (a live-body mechanism)
+#
+# KEPT (every line below is ALPHA4.genome's own text for that gene):
+SEED     20260923
+SENSE    eye    32x32 grey
+RETINA   thresh0.25 centre tower:eye-tower-g2 sqrt unit
+GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border coarse 32
+SENSE    ear    letters 8
+SENSE    colour rg by 4x4 under the glance fixed-gain
+AREA     sight  from retina
+AREA     words  from ear
+AREA     episodes from fast
+MEET     sight  words
+BIRTH    novelty  cos<0.952
+BIRTH    error    misfires 3
+BUDGET   400 per arrival; regenerate 1 per 60 moments
+ARRIVAL  never-heard word
+KWTA     5
+HEBB     window 1
+DELTA    lr 0.05
+PRUNE    w<0.02 after 3 chances
+MERGE    cos>0.9969 same-answer
+SCALE    every 1250 moments
+THRESH   cell own band history 30
+ANSWER   resembles under own-band; unknown below 0.911
+FAST     episodes 20000 keys sight words surprise sound
+MOMENT   keys sight words surprise where when act source
+SLEEP    every 2500 moments replay 200 by surprise
+ABSTAIN  second/best > 0.85
+RECALL   k=3
+ASK      what-is show is which why
+STAGE    1 senses   moments 0..200
+STAGE    2 meet     moments 200..
+GROW     unbounded
+CYCLE    consolidate when redundant > 0.05 of alive
