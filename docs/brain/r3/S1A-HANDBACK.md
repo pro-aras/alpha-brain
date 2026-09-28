@@ -5,7 +5,7 @@
 ## 0 · The verdict: THE FIRST GATE says STOP. No full stream was run.
 
 - **The instrument verdict fires for COLOUR.** P-ORACLE's per-type naming, leave-one-scene-out on the 113 one-thing scenes among the first 300 of seed 20261101, reads colour **0.832 = 94/113**, against 0.90 × the probe's 0.933 = **0.8397**. One item decides it: 95/113 = 0.8407 would not fire.
-- **The brief's own stop fires too.** Step 6 says ORACLE-TRUTH < 0.95 on 300 scenes → STOP; ORACLE-TRUTH reads **0.790**.
+- **The brief's own stop (ORACLE-TRUTH < 0.95) fires only under the builder's declared POINTING rule.** ORACLE-TRUTH reads **0.790** under it, but **0.986** under the reader's own posterior (§2b, RAISED). So the STOP rests on the instrument verdict alone. That verdict is the same under every pointing rule: for a fixed thing, d²_k = xᵀΛx − 2δ_k(x), so the forced argmin within a type does not depend on the rule.
 - Under the builder's declared reader, the firing is **a property of the reader, not of the features** (§3):
   - the same 113 scenes read colour 0.929 by the probe's own nearest-class-mean;
   - a type-aware Σ (a diagnostic, read by no verdict) reads 0.894;
@@ -51,9 +51,31 @@ GATE: STOP — the instrument verdict fires for ['colour']
 ```
 
 Readings from the gate:
-- **ORACLE-TRUTH reads BELOW P-ORACLE** (0.790 vs 0.815). One forced window at the centroid is compared against a hypothesis that averages 1–4 fixations. So «the organ's ceiling without the gaze» is not a ceiling at 300 scenes. Stage −1 agrees: forced-window shape NCM 0.667, against 0.756 for the hypothesis.
+- **P-ORACLE and ORACLE-TRUTH read BELOW A-RW** (0.815 and 0.790 against 0.890) under the declared pointing rule. §2b shows the cause is that rule, not the reader's features.
+- **ORACLE-TRUTH reads a little below P-ORACLE under both rules:**
+  - 0.790 vs 0.815 under rule (a), 0.986 vs 0.994 under rule (b);
+  - one forced window at the centroid is compared against a hypothesis that averages 1–4 fixations;
+  - stage −1 agrees: forced-window shape NCM 0.667, against 0.756 for the hypothesis.
 - **N-SHUF reads under its own chance** (0.713 vs 0.758 on covered items). Chance is high because most items are one-thing scenes with a single hypothesis.
 - **ε landed at the grid's end** (0.3, R49's grid {1e-4 … 0.3}). ε 0.6 and 0.9 give the same colour reading (0.832), so ε does not move the verdict (§3).
+
+## 2b · The oracles' POINTING rule (diagnostic, read by no verdict; `tools/scene/diag/diag_pointing.py`, output `/data/dev/brain-runs/scene/gate/diag_pointing.out`)
+
+```
+eps 0.3 toy M1 (a) argmin Σ d² [declared]: covered 0.669 (n 169) · all 0.577
+eps 0.3 toy M1 (b) argmax Σ log posterior: covered 0.994 (n 169) · all 0.857
+eps 0.3 toy M1 (c) argmax Σ δ (Λ-norm removed): covered 0.698 (n 169) · all 0.602
+   the things' own Λ-norm xᵀΛx on the toy test: min 212.3 median 294.0 max 530.3
+gate 300 · P-ORACLE     rule (a): M1 covered 0.815 (n 362) · all 0.739
+gate 300 · P-ORACLE     rule (b): M1 covered 0.994 (n 362) · all 0.902
+gate 300 · ORACLE-TRUTH rule (a): M1 covered 0.790 (n 362) · all 0.777
+gate 300 · ORACLE-TRUTH rule (b): M1 covered 0.986 (n 362) · all 0.987
+```
+
+- **The declared rule (a) is not a ceiling for M1.** It compares Σ_w d_w(x)² across DIFFERENT things. Removing each thing's Λ-norm (c) barely helps.
+- **The reader's own posterior over words (b) works.** Σ_w log p(w | x), where p is the LDA's softmax over its classes, is A-RW's pointing rule (Σ log p_w(t)) with the reader's p. It reads 0.994 on the toy and 0.994 / 0.986 at the gate.
+- Rule (a) reproduces the gate's own 0.815 / 0.790 exactly, so the diagnostic is on the gate's items and tie generators.
+- **The rule was not changed after the gate.** P-ORACLE's «none» threshold is calibrated on the same score, so it moves with the rule (RAISED, §6 item 1b).
 
 ## 3 · The diagnosis of the colour verdict (diagnostics, read by no verdict)
 
@@ -133,6 +155,7 @@ That is an anecdote, not measured by colour. The images are in `/data/dev/brain-
    - per-type naming: the forced argmin over the grader's word set for that type.
 
    This reading is what makes the verdict fire (§3). R49's `answer()` bands are not used.
+1b. **RAISED — the oracles' POINTING rule** (P-ORACLE and ORACLE-TRUTH): argmin over things of Σ_w d_w². As built, it reads BELOW A-RW on M1 (toy 0.669 against 0.959; gate 0.815 against 0.890). The reader's posterior Σ log p(w | x) reads 0.994 (§2b). «Every mark prints P-ORACLE's reading on the SAME items as its ceiling» needs a rule that is a ceiling. This is the seat's ruling, with item 1.
 2. **RAISED — the verdict's protocol.** «On the first gate's scenes» is read as leave-one-scene-out on the one-thing scenes among the gate's 300: P-ORACLE is fitted on the other 299 with the referent marked. This is like-for-like with the probe's LOO NCM.
 3. **RAISED — ε.** R49's grid, chosen on the toy seed by the max mean per-type forced naming over the toy's 200 two-thing scenes' covered things; ties go to the larger ε. It chose 0.3, the grid's end. ORACLE-TRUTH shares it.
 4. **RAISED — no canvas-wide noise.** σ 0.05 is render()'s own picture noise (the PREREG's words under Things). The ground is black plus render_canvas's three clutter strokes, maxed in.
@@ -159,7 +182,7 @@ That is an anecdote, not measured by colour. The images are in `/data/dev/brain-
 15. **RAISED — brief vs the signed PREREG.** PREREG followed:
     - 5 arms, not 4;
     - the toy at 1,000 one-thing / 200 two-thing / ≥ 0.90, not 200 / ≥ 0.95;
-    - STOP = the instrument verdict, where the brief says ORACLE-TRUTH < 0.95. Both fire here.
+    - STOP = the instrument verdict, where the brief says ORACLE-TRUTH < 0.95. The verdict fires under every pointing rule; the brief's condition fires only under the declared pointing rule (0.790), not under the posterior (0.986, §2b).
 
     STOP was read where the PREREG says STOP (the verdict) or «must» (the toy after its grid). «Each beat N-SHUF» is a RESULT; all four beat it.
 16. **A reading on lr.** On a synthetic machinery toy (4 words on planted directions, ambiguous 2-thing scenes), lr 0.1 on the standardised 146-dim input LOCKS IN early random assignments: one update moves a logit by ≈ 0.1 · e · r · ‖z‖² ≈ 3.6. At 0.01 the same code learns. The PREREG's toy passed at 0.1 (0.959, no ambiguity). The risk is the ambiguous stream; A-RW read 0.890 at 300 scenes.
@@ -194,7 +217,7 @@ That is an anecdote, not measured by colour. The images are in `/data/dev/brain-
 
 ## 8 · Prices (measured; the launch-shape arm price was NOT taken — the gate refuses the run)
 
-- **The eye / cache, solo, idle box** (load 1.2, 12:26): seed 1's 10,498 canvases took 91.9 CPU-s user and 1:32 wall, ≈ 8.8 ms a canvas. That covers render, `glances`, png sha, the forced windows and the 10-row self-check. RSS was 247 MB.
+- **The eye / cache, solo, idle box** (load 1.2, 12:26): seed 1's 10,498 canvases took 91.9 CPU-s user and 1:32 wall, ≈ 8.8 ms a canvas. That covers render, `glances`, png sha, the forced windows and the 10-row self-check. max RSS was 246,512 kB (/usr/bin/time).
 - **Stage −1's 300 canvases:** 3.2 s.
 - **THE FIRST GATE:** 19.4 s wall, covering the toy caches (1,200 canvases), the toy, 6 ε fits, 113 LOO fits, and 5 arms × 300 with their answers.
 - **Load fact:** at 12:22, with Test B's 8 pricing processes running (load 9), the seat's own `seat_eye_probe.py` read **48.6 ms a call**, against 5.7 ms idle.
@@ -206,7 +229,11 @@ That is an anecdote, not measured by colour. The images are in `/data/dev/brain-
 
 ## 9 · What a PROCEED needs (none of it done by the builder)
 
-1. A ruling on P-ORACLE's reader, recorded on the PREREG (a dated amendment, a new sha passed to the builder). The reader is type-blind as built, or a per-type Σ. The verdict's protocol is LOO on the gate's scenes as built, or another. And the verdict thresholds, if the reader changes.
+1. A ruling on P-ORACLE's reader, recorded on the PREREG (a dated amendment, a new sha passed to the builder), covering:
+   - the reader: type-blind as built, or a per-type Σ;
+   - the verdict's protocol: LOO on the gate's scenes as built, or another;
+   - the oracles' pointing rule: (a) as built, or the posterior (b);
+   - the verdict thresholds, if the reader changes.
 2. `python3 -m brain.scene.run first-gate` re-run (≈ 20 s) until `gate.json` reads PROCEED.
 3. `tools/scene/pin_code.sh <sha>`, then `run.py price`, then the unit:
    ```
@@ -226,6 +253,12 @@ That is an anecdote, not measured by colour. The images are in `/data/dev/brain-
 
 None: the gate stopped the run before any full stream. `report.txt` does not exist.
 
-## 11 · The suite on the final code
+## 11 · Candidate lessons for the seat to fold (SOLUTIONS; the builder touches nothing outside its worktree)
+
+- **A ceiling reader pooled across word TYPES is not a ceiling for the minority type.** One LDA with a Σ pooled over every word class lets the always-said type's within-class scatter set the metric. Here the shape words carry the colour variation, and colour naming drops from NCM 0.929 to 0.832. Read a multi-type reader per type against a per-type-Σ twin before a verdict rests on it (#228's family: a control blind to the wrong thing).
+- **Comparing a Mahalanobis likelihood across DIFFERENT things is not the reader's pointing rule.** The reader's posterior over its classes is (toy M1 0.669 → 0.994). A «ceiling» that reads below the learner is the tell (#162: a filter reporting on itself).
+- **A one-meeting test needs its meeting SEEN.** At seed 1 the gaze put 0 of 4 fixations on the moon, so M6 there grades the gaze. Print a mechanism mark's REACH (was the thing ever perceived?) beside the mark (#234 (2)).
+
+## 12 · The suite on the final code
 
 @@SUITE@@
