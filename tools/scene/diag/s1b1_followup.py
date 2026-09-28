@@ -222,6 +222,65 @@ def a3() -> None:
                   + f" · the margin chose {chosen}")
 
 
+class _NoYoungWords:
+    """A COUNTERFACTUAL arm for the mouth only (edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 14:39 +0400): the learner with every word
+    of fewer than 3 meetings (P_FROM_MEETING) dropped from HELD — everything else is the learner's own."""
+
+    def __init__(self, L):
+        self.L, self.ear = L, L.ear
+
+    def held_words(self, x):
+        return [w for w in self.L.held_words(x) if self.L.meetings[self.L.index[w]] >= Lr.P_FROM_MEETING]
+
+    def answer_point(self, X, phrase, rng):
+        return self.L.answer_point(X, phrase, rng)
+
+
+def a3_dax() -> None:
+    """(A3′) the spoken phrases broken down (a CORRECTION to S1B1-HANDBACK §6 (b), which read a +∞ read-back margin as «one
+    hypothesis in view»): a word with < 3 meetings («dax») answers by its band, p ∈ {0, 1}, so when its band holds the target
+    and not the others its read-back margin is +∞ and it wins the margin tie-break among one-word candidates."""
+    print("(A3′) A-RW's SPOKEN phrases at 10,000, by (the word is «dax» or not) × (hypotheses in view) × (margin) × TRUE — and a "
+          "COUNTERFACTUAL mouth with the words of < 3 meetings dropped from HELD (a reading, not a proposal)")
+    for ws in W.WORLD_SEEDS:
+        train = R.Things(C.ScenePercepts(C.cache_dir(ROOT, ws, "train")))
+        L = R.make_learner("A-RW", Lr.LR_S1B1, 0.3)
+        seen: list = []
+        R.train_arm("A-RW", L, train, train.p.words, None, range(W.N_TRAIN), ws, seen)
+        L.calibrate(seen)
+        Q = json.loads((ROOT / str(ws) / "questions.json").read_text())["questions"]
+        K_ = json.loads((ROOT / str(ws) / "keys.json").read_text())["items"]
+        st = R.Things(C.ScenePercepts(C.cache_dir(ROOT, ws, "speak")))
+        tr = C.load_truth(C.cache_dir(ROOT, ws, "speak"))
+        q_by = {q["item_id"]: q for q in Q["SPEAK"]}
+        A = json.loads((ROOT / str(ws) / "arms" / "A-RW" / "answers_10000.json").read_text())["answers"]
+        import collections
+        c = collections.Counter()
+        cf = []
+        for it in K_["SPEAK"]:
+            q = q_by[it["item_id"]]
+            if q.get("hyp") is None:
+                continue
+            X = st.for_arm("A-RW", q["row"])
+            row = tr[it["row"]]
+            things = M.things_of(row)
+            t = int(it["target"])
+            a = A[it["item_id"]]
+            sp = a.get("spoken")
+            if sp is not None:
+                true = M.unique_true(sp, things, t, range(len(things)))
+                c[("«dax»" if sp == ["dax"] else "other", "1 hyp" if X.shape[0] == 1 else "≥2 hyp",
+                   "+∞" if a["margin"] == float("inf") else "finite", "true" if true else "false")] += 1
+            b = Lr.produce(_NoYoungWords(L), X, int(q["hyp"]), lambda it=it: M.tie_rng(W.TEST_SEEDS[ws], it["item_id"]))
+            if b.get("spoken") is not None:
+                cf.append(M.unique_true(b["spoken"], things, t, range(len(things))))
+        n_sp = sum(c.values())
+        n_dax = sum(v for k, v in c.items() if k[0] == "«dax»")
+        print(f"   {ws}: spoken {n_sp}, of which «dax» {n_dax} (all false: {all(k[3] == 'false' for k in c if k[0] == '«dax»')}); "
+              + " · ".join(f"{'/'.join(k)} {v}" for k, v in sorted(c.items())))
+        print(f"            the counterfactual mouth without the young words: TRUTH {np.mean(cf):.3f} (n {len(cf)}) — the unit's {UNIT_TRUTH[ws]:.3f}")
+
+
 def main(argv) -> int:
     cmd = argv[1] if len(argv) > 1 else "all"
     if cmd == "a2-run":
@@ -234,6 +293,8 @@ def main(argv) -> int:
         a2()
     if cmd in ("a3", "all"):
         a3()
+    if cmd in ("a3dax", "a3", "all"):
+        a3_dax()
     return 0
 
 
