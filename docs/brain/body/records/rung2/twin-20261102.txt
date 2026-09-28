@@ -1,0 +1,37 @@
+LIFE twin · world seed 20261102 · root /data/dev/genome-lives/brain-lean-20261102
+  tape rows 34477 · scene rows {'ear': 20006, 'eye': 11464, 'ask': 3007} · training scenes 10000
+  asks on the tape 2989 · answers in the journal 3007 {'organs': 3007} · asks without an answer 0 []
+  the one «dax» meeting: seen = True (the grader's own look (genome.gaze.glances, the life's genome, predicted=None)); things [('ring', 'yellow', 'big'), ('moon', 'red', 'small')]; fixations → thing [0, 1, 0, 0]
+  the pointer: checked 425 · mismatches 221 [('M2b:m2b:20261402:00000', None, 0), ('M2b:m2b:20261402:00001', None, 0), ('M2b:m2b:20261402:00002', None, 0)]
+  THE BARS (S1b-1R's own rules; oracle readings = the scored record at this seed; reading point 10000):
+    M1           {"value": 0.7837837837837838, "n": 37, "all": 0.6590909090909091, "p_oracle": 1.0, "pass": false, "underpowered": false}
+    NULL-M1      {"value": 0.7837837837837838, "n": 20, "bar": 0.6662234042553191, "pass": true, "not_gradable": false, "underpowered": false}
+    NULL-M3      {"value": null, "n": 20, "bar": 0.6896551724137931, "pass": false, "not_gradable": false, "underpowered": false}
+    M2a          {"value": null, "n": 0, "p_oracle": 1.0, "pass": false, "underpowered": true, "ceiling_bound": false, "false_refusal": 0.43243243243243246}
+    M2b          {"value": 0.8333333333333334, "n": 48, "p_oracle": 0.9375, "pass": true, "underpowered": false, "ceiling_bound": false}
+    M3           {"value": null, "n": 0, "all": null, "bar": 0.8, "p_oracle": 1.0, "pass": false, "not_gradable": false, "underpowered": true}
+    M6           {"value": 0.5185185185185185, "n": 27, "all": 0.3333333333333333, "p_oracle": 1.0, "pass": false, "not_gradable": false, "underpowered": true, "ceiling_bound": false}
+    SPOKEN       {"value": 0.5555555555555556, "n": 72, "bar": 0.7222222222222223, "p_oracle": 0.9027777777777778, "pass": false, "not_gradable": false, "underpowered": false}
+    TRUTH        {"value": 0.7, "n": 40, "bar": 0.9, "p_oracle": 1.0, "pass": false, "not_gradable": false, "underpowered": false}
+    TRUTH-NEED   {"value": 0.0, "n": 29, "bar": 0.5175, "p_oracle": 0.575, "pass": false, "not_gradable": false, "underpowered": true}
+    MINIMAL      {"value": 1.0, "n": 28, "bar": 0.9, "p_oracle": 1.0, "pass": true, "not_gradable": false, "underpowered": true}
+    ORDER        {"value": null, "n": 0, "bar": 0.95, "p_oracle": 1.0, "pass": false, "not_gradable": "no multi-word phrase spoken", "underpowered": false}
+    READ-BACK    {"value": 0.0, "n": 69, "p_oracle": 1.0, "pass": false, "not_gradable": false, "underpowered": false}
+    DECLINE      {"value": 1.0, "n": 37, "p_oracle": 0.6216216216216216, "pass": null, "not_gradable": false, "underpowered": false}
+    refute       {}
+  SET fresh: items {'M1': 395, 'M2a': 400, 'NAME': 165, 'M5': 400, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48, 'SPEAK2': 60} · read forced {'M1:None→uniform': 37, 'M6:None→uniform': 42}
+    M1 covered 0.784 (n 37) · over ALL items 0.659 (n 44) · coverage 0.841 · chance 0.613
+    M3 covered n/a (n 0) · over ALL n/a
+    M2a refusal n/a (n 0) · false refusal 0.432
+    M2b 0.833 (n 48) · over ALL 0.833
+  SET s1b1 (READINGS ONLY): items {'M1': 398, 'M2a': 400, 'NAME': 153, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48} · read forced {'M1:None→uniform': 44, 'M6:None→uniform': 41}
+    M1 covered 0.636 (n 44) · over ALL items 0.538 (n 52) · coverage 0.846 · chance 0.545
+    M3 covered n/a (n 0) · over ALL n/a
+    M2a refusal n/a (n 0) · false refusal 0.523
+    M2b 0.938 (n 48) · over ALL 0.938
+  TEST 6 · M6 POOLED over {'fresh': 42, 's1b1': 42}: covered 0.411 (n 56 of 84; chance 0.470; bar 0.7, n ≥ 30) → FAIL
+  THE NULL (20 shuffled-utterance draws, the scored record's): M1 0.784 vs p95 0.666 → ABOVE · M3 n/a vs p95 0.690 → NOT ABOVE
+  TEST 4a · EXPLAIN: words asked 14 · explained 7 · «unknown» ['big', 'blue', 'green', 'red', 'small', 'white', 'yellow'] · citations 0 (of episodes with ≥ 2 hypotheses: 0) · EXIST n/a (a wiring pin, bar 1.000) · CARRY n/a (bar 0.90) · the null's median n/a, p95 n/a → NOT GRADABLE — no citation
+  TEST 4b · RULE: NOT BUILT tonight (PREREG §3)
+  TEST 5 · MISUSE: refused 0.608 (bar 0.90) · named misuse 0.000 (bar 0.80) · n 125 (unheard 275) · valid phrases called misuse 0.000 of 455 (bar ≤ 0.05) · never-heard pairs called misuse 0 of 60 (bar 0) → FAIL
+    by kind: {"shape": {"refused": 0.608, "named": 0.0, "n": 125}}

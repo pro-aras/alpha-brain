@@ -1,0 +1,12 @@
+ENDED-CLEAN
+close exit 0
+wall seconds 34
+ActiveEnterTimestamp=Mon 2026-09-28 21:24:54 +04
+Result=success
+NRestarts=0
+ExecMainStatus=0
+--- after close
+ActiveExitTimestamp=
+Result=success
+NRestarts=0
+ExecMainStatus=0

@@ -1,0 +1,112 @@
+{
+ "backlog": {
+  "distribution": {
+   "0": 2,
+   "4": 1,
+   "5": 1,
+   "6": 3,
+   "7": 1,
+   "8": 74,
+   "9": 58,
+   "10": 51,
+   "11": 20,
+   "12": 13,
+   "13": 4,
+   "14": 3,
+   "15": 2,
+   "16": 1,
+   "18": 1,
+   "19": 1
+  },
+  "max": 19,
+  "over_13": 8,
+  "over_8": 154,
+  "readings": 236
+ },
+ "brain": {
+  "asks_answered": 3007,
+  "asks_by": {
+   "brain": 3007,
+   "organs": 0
+  },
+  "asks_pending": 0,
+  "calibrated_at": 10000,
+  "calibrations": 6,
+  "episodes": 20006,
+  "learn_rows": 10000,
+  "learned": 10000,
+  "mature": 13,
+  "refused_rows": 0,
+  "restored": null,
+  "tau_point": -5.035274862251475,
+  "types": [
+   [
+    "circle",
+    "cross",
+    "ring",
+    "square",
+    "star",
+    "triangle"
+   ],
+   [
+    "blue",
+    "green",
+    "red",
+    "white",
+    "yellow"
+   ],
+   [
+    "big",
+    "small"
+   ]
+  ],
+  "words": 14
+ },
+ "rows_by_sense_and_source": {
+  "ask/scene": 3007,
+  "body/body": 40,
+  "ear/folder": 79,
+  "ear/game": 162,
+  "ear/lexicon": 75,
+  "ear/maker": 472,
+  "ear/scene": 20006,
+  "ear/shelf": 884,
+  "eye/folder": 80,
+  "eye/game": 81,
+  "eye/hands": 198,
+  "eye/lexicon": 10,
+  "eye/maker": 472,
+  "eye/scene": 11464,
+  "eye/shelf": 562,
+  "hold/grade": 1,
+  "outcome/game": 80,
+  "outcome/hands": 198,
+  "proposal/None": 1,
+  "sit/sit": 23,
+  "smell/smell": 80,
+  "touch/hands": 198
+ },
+ "status": {
+  "beliefs": 18,
+  "births": 8728,
+  "cells": 8405,
+  "crash": null,
+  "episodes": 12867,
+  "evolve_epoch": 0,
+  "evolve_proposals_seen": 1,
+  "frames_filed": 191,
+  "predictions_filed": 451,
+  "predictions_scored": 432,
+  "questions_answered": 2,
+  "questions_written": 98,
+  "runs": 198,
+  "said": 180,
+  "sense_restarts": 0,
+  "sleeps": 27,
+  "snapshots": 140,
+  "stage": 3,
+  "think_skipped_for_backlog": 0,
+  "thinks": 1286,
+  "web_fetches": 0
+ }
+}

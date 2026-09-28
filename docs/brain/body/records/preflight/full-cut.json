@@ -1,0 +1,11 @@
+{
+ "root": "/data/dev/genome-lives/brain-full-pre-1",
+ "ledger_last_seq": 3560,
+ "tape_rows": 3560,
+ "lived_rows": 3560,
+ "tail_rows": 0,
+ "tail_by_sense": {},
+ "tape_day_files": 1,
+ "journal_day_files": 1,
+ "live_mind_rows": 4470
+}

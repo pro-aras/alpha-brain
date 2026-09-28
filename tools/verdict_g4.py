@@ -398,7 +398,7 @@ def alive(G: dict, hours: float, nrestarts: Optional[int]) -> dict:
     for r in G["mind"]:
         h = int((at[int(r["seq"])] - t0).total_seconds() // 3600)
         if h not in per: continue
-        if "moment" in r: per[h]["canvases"] += 1
+        if "moment" in r and "kind" not in r: per[h]["canvases"] += 1      # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:40 +0400 — BRAIN-IN-BODY: not the `answer`/`brain` rows
         elif "think" in r: per[h]["thinks"] += 1
         elif "sleep" in r: per[h]["sleeps"] += 1
     for e in G["events"]:
@@ -543,7 +543,7 @@ def worker(spec_path: Path) -> int:
     for f in sorted((root / "journal").glob("*.jsonl")):
         mind_rows += [r for r in read_jsonl(f) if "event" not in r]
     (root / "mind-journal.jsonl").write_text("".join(json.dumps(r) + "\n" for r in mind_rows))
-    n_canvas = sum(1 for r in mind_rows if "moment" in r)
+    n_canvas = sum(1 for r in mind_rows if "moment" in r and "kind" not in r)   # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:40 +0400 — BRAIN-IN-BODY: not the `answer`/`brain` rows
     summary = {"label": spec["label"], "arrivals": org.arrivals, "budget_left": org.budget_left, "births": len(org.births), "c": org.c,
                "glances_confirmed": getattr(mind, "glances_confirmed", None), "glances_surprised": getattr(mind, "glances_surprised", None),   # edit: Claude (Fable 5.1), 2026-09-22 22:33 +0400 — §19.1's twin clause reads the blind-surprise twin's own count
                "closed": bool(spec.get("close")),

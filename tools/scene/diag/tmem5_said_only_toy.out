@@ -1,0 +1,20 @@
+control: the probe's said-only toy equals the gate's toy record (lr_g 0.005, seeds 0–2) at every block: True
+
+(1) the gain's terms per scene under the SAID-only rule (seeds 0–2 pooled; mean ± sd; the unsaid term is what the rule drops):
+   A1 H = 1: n  599 · said term +0.5372 ± 0.6621 · unsaid term -0.7275 ± 1.0486
+   A1 H = 2: n  600 · said term +0.4294 ± 0.4056 · unsaid term -1.9237 ± 1.7292
+   A1 H = 3: n  300 · said term +0.3637 ± 0.2932 · unsaid term -2.5273 ± 1.9961
+   A1 all: said +688.5 · unsaid -2348.1 (sums over its scenes)
+   A2 H = 1: n  600 · said term +0.5198 ± 0.6203 · unsaid term -0.6596 ± 1.0180
+   A2 H = 2: n  588 · said term +0.4276 ± 0.4246 · unsaid term -1.8194 ± 1.6279
+   A2 H = 3: n  310 · said term +0.3442 ± 0.3348 · unsaid term -2.3755 ± 1.9505
+   A2 all: said +670.0 · unsaid -2201.9 (sums over its scenes)
+   B H = 1: n  598 · said term -0.2129 ± 1.0303 · unsaid term -0.7721 ± 1.0452
+   B H = 2: n  599 · said term +0.1687 ± 0.6672 · unsaid term -1.3440 ± 1.1841
+   B H = 3: n  303 · said term +0.2693 ± 0.5222 · unsaid term -2.0131 ± 1.3508
+   B all: said +55.3 · unsaid -1876.8 (sums over its scenes)
+
+(2) the SAME rebuilt toy under the OLD all-words gain (lr_g 0.005):
+   seed 0: g_B's last-10 mean 0.0203 · g_A1 0.6005, g_A2 0.9830 (minima 0.472 / 0.948) · ends A1 0.696 A2 0.948 B 0.000 · the toy passes: False
+   seed 1: g_B's last-10 mean 0.0368 · g_A1 0.9404, g_A2 0.6837 (minima 0.891 / 0.437) · ends A1 0.928 A2 0.690 B 0.000 · the toy passes: False
+   seed 2: g_B's last-10 mean 0.0453 · g_A1 0.8250, g_A2 0.7838 (minima 0.765 / 0.686) · ends A1 0.831 A2 0.815 B 0.054 · the toy passes: False

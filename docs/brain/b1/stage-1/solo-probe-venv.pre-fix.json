@@ -1,0 +1,53 @@
+{
+  "events": 1000,
+  "interpreter": "/data/dev/venvs/brain/bin/python",
+  "load1_at_end": 0.7978515625,
+  "load1_at_start": 0.54248046875,
+  "nice": 0,
+  "probes": {
+    "A1-H512": {
+      "arm_events": 1313,
+      "arm_ms": 14977.9,
+      "events": 1000,
+      "ms_per_event_arm": 11.407,
+      "ms_per_event_wall": 14.981,
+      "size": {
+        "h0": 64,
+        "h_alive": 64,
+        "hmax": 64,
+        "n_names": 0,
+        "n_params_active": 68020,
+        "variant": "A1-FIXED"
+      },
+      "wall_s": 14.981
+    },
+    "A1-H64": {
+      "arm_events": 1313,
+      "arm_ms": 14994.8,
+      "events": 1000,
+      "ms_per_event_arm": 11.42,
+      "ms_per_event_wall": 14.998,
+      "size": {
+        "h0": 64,
+        "h_alive": 64,
+        "hmax": 64,
+        "n_names": 0,
+        "n_params_active": 68020,
+        "variant": "A1-FIXED"
+      },
+      "wall_s": 14.998
+    },
+    "D": {
+      "candidates": 100,
+      "events_before_sleep": 1000,
+      "seconds_per_candidate": 0.0029,
+      "sleep_wall_s": 0.294
+    }
+  },
+  "tape_sha256": "ce0d65d92ed99e0536e9a0fb943d7f0a0117dc3ff15305591da2372512439a48",
+  "threads": {
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1"
+  }
+}

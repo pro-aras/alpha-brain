@@ -1,0 +1,16 @@
+PREDICTIONS (written before the run): (1) on covered M6 items the score vector for «dax» holds only 0.0 and -inf; (2) where exactly ONE hypothesis is inside the band the law is right nearly always; (3) where 0 or >= 2 are inside, the law is at chance; (4) pointing at the hypothesis NEAREST the prototype beats the law at seed 20261103.
+===== ws 20261101: «dax» meetings 1 · band 15.099 · covered M6 items 29
+  score values over the covered items: {'0.0': 2, '-inf': 57}
+  THE LAW by how many hypotheses fall inside the band: {'none inside': '19/27', 'one inside': '0/2'}
+  THE LAW 19/29 = 0.655   ·   NEAREST-PROTOTYPE 5/29 = 0.172
+  rank of the moon's hypothesis by distance to the prototype (0 = nearest): {1: 20, 0: 5, 2: 4}
+===== ws 20261102: «dax» meetings 1 · band 14.693 · covered M6 items 27
+  score values over the covered items: {'-inf': 37, '0.0': 22}
+  THE LAW by how many hypotheses fall inside the band: {'none inside': '3/7', 'one inside': '17/18', 'two or more inside': '1/2'}
+  THE LAW 21/27 = 0.778   ·   NEAREST-PROTOTYPE 24/27 = 0.889
+  rank of the moon's hypothesis by distance to the prototype (0 = nearest): {0: 24, 1: 2, 2: 1}
+===== ws 20261103: «dax» meetings 1 · band 14.772 · covered M6 items 29
+  score values over the covered items: {'0.0': 37, '-inf': 26}
+  THE LAW by how many hypotheses fall inside the band: {'none inside': '3/6', 'one inside': '4/10', 'two or more inside': '7/13'}
+  THE LAW 14/29 = 0.483   ·   NEAREST-PROTOTYPE 16/29 = 0.552
+  rank of the moon's hypothesis by distance to the prototype (0 = nearest): {0: 16, 1: 11, 2: 2}

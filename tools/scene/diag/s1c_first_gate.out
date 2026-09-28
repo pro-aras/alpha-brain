@@ -1,0 +1,9 @@
+THE FIRST GATE (S1c, seed 20261301) — PREREG-S1C a552515af334… · AMENDMENT 1 825f4ad8086f… · PREREG-S1B1 caace482d890… · code 72c97632deb483cf0ff6d0b4f45c816d19c5e888
+1. the room pools read: R1 2000+40 · R2 2000+40 · R3 2000+40 · N 2000+40 · K 2000+1 · U 2000+40 (H = 0 windows: 0) · the fixed test set: NAME 472, M1 1193 (graded 2–3 721) · per-word n 57–238 · no room canvas is a test canvas (1200 checked) · the truth fence's sweep (rooms.py + pickers.py): Ran 3, OK
+2. RANDOM over 60 blocks, blocks 21–60 (visits N 11, K 3, R1–R3 16):
+   N: |mean drop| 0.1368 ≤ 0.05 × level 8.076 = 0.4038 → PASS
+   R1–R3: mean drop 1.2573 ≥ 3 × |N's| = 0.4105 → PASS (the other reading, ≥ 3 × 0.05 × L_N's level = 1.2113: PASS)
+   K: (i) mean drop 6.0845 ≤ 0.05 × level 5.483 = 0.2741 → MISS · (ii) L_K(60) 3.801 ≤ min L_R(60) 4.623 → PASS
+   U: last-20 mean 6.588 ≥ 2 × R1–R3's 5.882 = 11.765 → U DROPPED (its bars with it)
+   the room-by-block table of L_k (every 10th boundary): b0: R1 13.41 R2 12.88 R3 12.50 N 11.91 K 9.01 U 14.17 | b10: R1 14.24 R2 9.60 R3 9.31 N 11.33 K 4.21 U 13.25 | b20: R1 8.59 R2 8.19 R3 8.32 N 9.31 K 9.30 U 9.21 | b30: R1 5.71 R2 8.10 R3 9.36 N 8.17 K 6.84 U 8.08 | b40: R1 5.15 R2 6.53 R3 9.36 N 8.11 K 3.76 U 7.78 | b50: R1 5.66 R2 6.55 R3 5.76 N 7.61 K 4.92 U 6.75 | b60: R1 4.62 R2 6.38 R3 5.47 N 7.51 K 3.80 U 6.22
+   STOP at step 2

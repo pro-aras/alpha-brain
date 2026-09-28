@@ -152,6 +152,14 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # judge's (d)/(e) read.
         "DOOR_WEB": "creature/body.py:main (declared['DOOR_WEB'] read; arms creature/senses/web.py behind WEB_DOOR_GATED) + creature/mind.py:Mind._consume_web (fetch/refusal counters + the hold flag)",
         "SENSE_GRADE": "creature/body.py:Body.start (declared['SENSE_GRADE'] read; starts creature/senses/grade.py:sense) + creature/mind.py:Mind._consume_grade/_consume_hold (the seat's grades + the hold flag, both read by the READINESS judge)",
+        # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:40 +0400 — BRAIN-IN-BODY §5 (docs/brain/body/
+        # INTERFACE-BRAIN-ORGAN.md): the scene-talk world's own row — two real call sites (body arms the sense;
+        # creature/senses/scene.py:plan/sense builds and publishes the tape rows of §2). declared['WORLD_SCENE'] ALSO
+        # gates whether the maker world arms at all (creature/body.py:main's own scene_only check): a genome that
+        # declares WORLD_SCENE with no drawn WORLD line gets no maker sense, unless --maker forces it.
+        "WORLD_SCENE": "creature/body.py:main (declared['WORLD_SCENE'] read via _declared_scene_config; arms "
+                       "creature/senses/scene.py behind SCENE_DOOR_GATED; also gates the maker's own arming) + "
+                       "creature/senses/scene.py:plan/sense (the training stream + one sitting per declared set)",
     },
     # ---------------------------------------------------------------------------------------- the mind
     "mind": {
@@ -259,6 +267,12 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
                 "chat/out/<id>.json + ONE say row, hash_before == hash_after asserted) + Mind._consume_grade (kind-chat grades "
                 "counted on STATUS, never the READINESS judge's (d)) + creature/body.py:main (declared['CHAT'] arms "
                 "creature/senses/chat.py behind CHAT_DOOR_GATED)",
+        # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:26 +0400 — BRAIN-IN-BODY (docs/brain/body/INTERFACE-BRAIN-ORGAN.md §4): the
+        # brain organ's real call sites in the mind. WORLD_SCENE (the scene sense, the body layer) is builder B's row, not this one.
+        "BRAIN": "creature/mind.py:Mind.__init__ (genome.brain.Brain(declared['BRAIN']) unless --blind brain) + Mind._consume_ask "
+                 "(the `ask` tape sense: begin/end/why at once, point/what/say held to their canvas) + Mind._consume_eye -> "
+                 "Mind._brain_canvas (asks answered by the brain, else creature/organs_road.py; else brain.learn on a heard canvas) "
+                 "+ Mind.snapshot/resume (state/brain.npz|json, the pending asks) + Mind.brain_status (STATUS)",
     },
 }
 

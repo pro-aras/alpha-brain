@@ -109,7 +109,10 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     last eye row's seq (creature/body.py:stop) — or the closed journal carries one think row the replay cannot. A MID-tape cut keeps
     the default False: the live mind lands that think at a later boundary, outside the cut, and a close here would invent a row."""
     tape_path = Path(tape_path)
-    tape_root = tape_path.parent
+    # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:57 +0400 — BRAIN-IN-BODY (the seat's addendum 2): a life whose tape crosses 00:00
+    # UTC lives in TWO day files, and this function read one. Additive: a DIRECTORY (the tape dir) replays every day file in it, in
+    # order (sorted by seq below); a FILE path is exactly the old road (its parent is the tape dir).
+    tape_root = tape_path if tape_path.is_dir() else tape_path.parent
     work_root = Path(tempfile.mkdtemp(prefix="creature-replay-"))
     # edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — W3-0b seam (Builder C's finding 5): the work root's tape dir follows the genome's own
     # TAPE path (creature/tape.py:_resolve_tape_dir; byte-identical for the default `run/tape`), so a Mind reading payloads under
@@ -123,7 +126,10 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
         os.symlink(payload_src.resolve(), work_tape / "payload")
 
     mind = Mind(genome_path, work_root, blind=blind)
-    rows = sorted(_read_jsonl(tape_path), key=lambda r: r["seq"])
+    if tape_path.is_dir():
+        rows = sorted((r for f in sorted(tape_path.glob("*.jsonl")) for r in _read_jsonl(f)), key=lambda r: r["seq"])
+    else:
+        rows = sorted(_read_jsonl(tape_path), key=lambda r: r["seq"])
     if "chat" in blind:          # edit: Claude (Opus 5.5, A4 ladder builder LANG), 2026-09-23 11:41 +0400 — the blind-chat twin (L1)
         rows = [r for r in rows if not is_chat_row(r)]
     out_dir = Path(out_dir)

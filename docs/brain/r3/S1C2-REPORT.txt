@@ -1,0 +1,126 @@
+S1c-2 «netted progress and rehearsal» — the report · PREREG-S1C2 5e4585c11c94… (with PREREG-S1C a552515af334… and AMENDMENT 1 92188d04cd4d…) · THE LAW'S WORLD ['R1', 'R2', 'R3', 'N'] · 200 blocks × 10 scenes · 196 policy blocks · R = 10
+
+THE IDENTITY CONTROL (S1c's five arms and its 20 band lives re-run at every seed against S1c's records; every field but ['cpu_s', 'wall_s', 'code', 'prereg', 'world']): 75 of 75 EQUAL
+   the masked fields of PROGRESS@20261301 (S1c | this tree): cpu_s: 1.6562664270000003 | 1.6620124329999997 · wall_s: 1.6563761234283447 | 1.6621124744415283 · code: {'code_sha_file': '2679fb30d64ba5f80dbc951587de484 | {'code_sha_file': 'e3cc2ed24ddf2f17dfd47616dc7b09f · prereg: {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 | {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 · world: law | None
+   the masked fields of RANDOM@20261301 (S1c | this tree): cpu_s: 1.618348857 | 1.6182485290000002 · wall_s: 1.6184329986572266 | 1.618333339691162 · code: {'code_sha_file': '2679fb30d64ba5f80dbc951587de484 | {'code_sha_file': 'e3cc2ed24ddf2f17dfd47616dc7b09f · prereg: {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 | {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 · world: law | None
+   the masked fields of ERROR@20261301 (S1c | this tree): cpu_s: 1.629507887 | 1.6797130809999998 · wall_s: 1.629643201828003 | 1.6799373626708984 · code: {'code_sha_file': '2679fb30d64ba5f80dbc951587de484 | {'code_sha_file': 'e3cc2ed24ddf2f17dfd47616dc7b09f · prereg: {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 | {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 · world: law | None
+   the masked fields of ORACLE@20261301 (S1c | this tree): cpu_s: 28.34024926 | 31.532820222 · wall_s: 28.343572854995728 | 31.548447847366333 · code: {'code_sha_file': '2679fb30d64ba5f80dbc951587de484 | {'code_sha_file': 'e3cc2ed24ddf2f17dfd47616dc7b09f · prereg: {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 | {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 · world: law | None
+   the masked fields of NULL@20261301 (S1c | this tree): cpu_s: 2.257371663 | 1.6499897220000002 · wall_s: 2.2574939727783203 | 1.6500816345214844 · code: {'code_sha_file': '2679fb30d64ba5f80dbc951587de484 | {'code_sha_file': 'e3cc2ed24ddf2f17dfd47616dc7b09f · prereg: {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 | {'amend1_s1c_sha256': '92188d04cd4de52eede4b1d2288 · world: law | None
+
+PROGRESS-NET on the bare learner (O = ORACLE, RANDOM = RANDOM with its 20-life band, NULL = NULL-NET): VERDICT FAIL
+   20261301: A 0.406 vs 0.80 × O 0.600 FAIL · A above the band [0.533, 0.629] (n 20; O 0.750) FAIL · SHARE_N 0.362 vs 0.076 FAIL · LEAVE_N 193 vs 50 FAIL · the positive control +0.220 PASS · NULL meets X's bars: False
+   20261302: A 0.415 vs 0.80 × O 0.560 FAIL · A above the band [0.529, 0.598] (n 20; O 0.700) FAIL · SHARE_N 0.276 vs 0.055 FAIL · LEAVE_N 148 vs 50 FAIL · the positive control +0.155 PASS · NULL meets X's bars: True
+   20261303: A 0.453 vs 0.80 × O 0.592 FAIL · A above the band [0.522, 0.598] (n 20; O 0.740) FAIL · SHARE_N 0.199 vs 0.060 FAIL · LEAVE_N 169 vs 50 FAIL · the positive control +0.180 PASS · NULL meets X's bars: False
+PROGRESS+REPLAY on the replay learner (O = ORACLE+REPLAY, RANDOM = RANDOM+REPLAY with its 20-life band, NULL = NULL+REPLAY): VERDICT FAIL
+   20261301: A 0.540 vs 0.80 × O 0.578 FAIL · A above the band [0.594, 0.666] (n 20; O 0.723) FAIL · SHARE_N 0.337 vs 0.050 FAIL · LEAVE_N 193 vs 50 FAIL · the positive control +0.123 PASS · NULL meets X's bars: False
+   20261302: A 0.525 vs 0.80 × O 0.540 FAIL · A above the band [0.567, 0.608] (n 20; O 0.675) FAIL · SHARE_N 0.291 vs 0.050 FAIL · LEAVE_N 195 vs 50 FAIL · the positive control +0.083 PASS · NULL meets X's bars: False
+   20261303: A 0.506 vs 0.80 × O 0.559 FAIL · A above the band [0.585, 0.614] (n 20; O 0.699) FAIL · SHARE_N 0.342 vs 0.050 FAIL · LEAVE_N 200 vs 50 FAIL · the positive control +0.113 PASS · NULL meets X's bars: False
+
+per seed, every arm (A · S12 · SHARE [R1 R2 R3 N] · explore apart · LEAVE_N · lock-in · M1 · wl@200 · N's drop / the learnable rooms' · the FULL-STEP and BLOCK off-diagonal · the buffer's N-share):
+ seed 20261301:
+   PROGRESS           A 0.593 · S12 990 · SHARE [0.281 0.245 0.189 0.184] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 200 · lock-in 10 (R2) · M1 0.929 · wl@200 7 · N/R drop 0.375 · off-diag FULL 0.2062 BLOCK 0.2062 · CPU 1.7 s
+   RANDOM             A 0.530 · S12 ∞ · SHARE [0.245 0.184 0.270 0.301] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 197 · lock-in 5 (N) · M1 0.969 · wl@200 9 · N/R drop 0.379 · off-diag FULL 0.1621 BLOCK 0.1621 · CPU 1.6 s
+   ERROR              A 0.143 · S12 ∞ · SHARE [0.077 0.056 0.061 0.704] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 200 · lock-in 16 (N) · M1 0.780 · wl@200 1 · N/R drop 0.023 · off-diag FULL 0.2978 BLOCK 0.2978 · CPU 1.7 s
+   ORACLE             A 0.750 · S12 700 · SHARE [0.388 0.347 0.240 0.026] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 169 · lock-in 9 (R1) · M1 0.987 · wl@200 12 · N/R drop 0.883 · off-diag FULL 0.0921 BLOCK 0.0921 · CPU 31.5 s
+   NULL               A 0.208 · S12 ∞ · SHARE [0.000 0.000 0.286 0.612] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 193 · lock-in 95 (N) · M1 0.892 · wl@200 3 · N/R drop 0.182 · off-diag FULL 0.2685 BLOCK 0.2685 · CPU 1.6 s
+   PROGRESS-NET       A 0.406 · S12 1190 · SHARE [0.071 0.398 0.066 0.362] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 193 · lock-in 60 (N) · M1 0.925 · wl@200 7 · N/R drop 0.275 · off-diag FULL 0.2674 BLOCK 0.2674 · CPU 2.2 s
+   NULL-NET           A 0.638 · S12 830 · SHARE [0.179 0.332 0.296 0.092] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 153 · lock-in 20 (R1) · M1 0.974 · wl@200 11 · N/R drop 1.598 · off-diag FULL 0.0586 BLOCK 0.0586 · CPU 1.7 s
+   PROGRESS-UCB       A 0.521 · S12 1220 · SHARE [0.158 0.296 0.199 0.245] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 193 · lock-in 7 (N) · M1 0.932 · wl@200 5 · N/R drop 0.321 · off-diag FULL 0.2090 BLOCK 0.2090 · CPU 2.4 s
+   PROGRESS+REPLAY    A 0.540 · S12 1210 · SHARE [0.097 0.291 0.173 0.337] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 193 · lock-in 28 (N) · M1 0.975 · wl@200 11 · N/R drop 0.329 · off-diag FULL 0.0653 BLOCK 0.1905 · buffer N 0.249 · CPU 2.6 s
+   ERROR+REPLAY       A 0.274 · S12 ∞ · SHARE [0.036 0.005 0.005 0.852] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 200 · lock-in 95 (N) · M1 0.921 · wl@200 6 · N/R drop 0.038 · off-diag FULL 0.2891 BLOCK 0.3919 · buffer N 0.249 · CPU 3.6 s
+   RANDOM+REPLAY      A 0.600 · S12 1550 · SHARE [0.245 0.184 0.270 0.301] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 197 · lock-in 5 (N) · M1 0.982 · wl@200 10 · N/R drop 0.712 · off-diag FULL 0.0478 BLOCK 0.1007 · buffer N 0.249 · CPU 2.6 s
+   ORACLE+REPLAY      A 0.723 · S12 980 · SHARE [0.194 0.490 0.316 0.000] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 4 · lock-in 43 (R2) · M1 0.978 · wl@200 11 · N/R drop 3.545 · off-diag FULL -0.1521 BLOCK -0.2269 · buffer N 0.249 · CPU 37.4 s
+   NULL+REPLAY        A 0.449 · S12 ∞ · SHARE [0.000 0.872 0.010 0.015] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 8 · lock-in 43 (R2) · M1 0.940 · wl@200 6 · N/R drop 3.125 · off-diag FULL 0.1593 BLOCK 0.1061 · buffer N 0.249 · CPU 2.6 s
+   PROGRESS+REPLAY-V  A 0.530 · S12 ∞ · SHARE [0.097 0.286 0.148 0.367] · explore [0.020 0.036 0.010 0.036] · LEAVE_N 197 · lock-in 13 (N) · M1 0.917 · wl@200 4 · N/R drop 0.397 · off-diag FULL 0.0978 BLOCK 0.1749 · buffer N 0.262 · CPU 2.5 s
+ seed 20261302:
+   PROGRESS           A 0.498 · S12 1960 · SHARE [0.153 0.316 0.219 0.214] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 179 · lock-in 11 (N) · M1 0.955 · wl@200 8 · N/R drop 0.276 · off-diag FULL 0.1653 BLOCK 0.1653 · CPU 2.2 s
+   RANDOM             A 0.545 · S12 ∞ · SHARE [0.281 0.260 0.235 0.224] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 199 · lock-in 6 (R2) · M1 0.960 · wl@200 7 · N/R drop 0.405 · off-diag FULL 0.1944 BLOCK 0.1944 · CPU 1.7 s
+   ERROR              A 0.145 · S12 ∞ · SHARE [0.097 0.046 0.026 0.735] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 199 · lock-in 15 (N) · M1 0.783 · wl@200 0 · N/R drop 0.040 · off-diag FULL 0.3448 BLOCK 0.3448 · CPU 2.2 s
+   ORACLE             A 0.700 · S12 270 · SHARE [0.403 0.296 0.296 0.005] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 191 · lock-in 6 (R3) · M1 0.988 · wl@200 9 · N/R drop 0.640 · off-diag FULL -0.0514 BLOCK -0.0514 · CPU 30.8 s
+   NULL               A 0.531 · S12 ∞ · SHARE [0.031 0.699 0.097 0.077] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 19 · lock-in 36 (R2) · M1 0.940 · wl@200 10 · N/R drop 2.102 · off-diag FULL -0.0995 BLOCK -0.0995 · CPU 1.7 s
+   PROGRESS-NET       A 0.415 · S12 1900 · SHARE [0.056 0.097 0.474 0.276] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 148 · lock-in 37 (N) · M1 0.939 · wl@200 13 · N/R drop 3.691 · off-diag FULL 0.0056 BLOCK 0.0056 · CPU 1.6 s
+   NULL-NET           A 0.681 · S12 880 · SHARE [0.112 0.342 0.403 0.046] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 200 · lock-in 31 (R3) · M1 0.897 · wl@200 8 · N/R drop 2.363 · off-diag FULL -0.0768 BLOCK -0.0768 · CPU 1.7 s
+   PROGRESS-UCB       A 0.519 · S12 ∞ · SHARE [0.214 0.240 0.219 0.230] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 188 · lock-in 7 (R3) · M1 0.950 · wl@200 8 · N/R drop 0.461 · off-diag FULL 0.1935 BLOCK 0.1935 · CPU 1.7 s
+   PROGRESS+REPLAY    A 0.525 · S12 ∞ · SHARE [0.092 0.352 0.168 0.291] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 195 · lock-in 23 (N) · M1 0.977 · wl@200 11 · N/R drop 0.339 · off-diag FULL 0.0263 BLOCK 0.1441 · buffer N 0.255 · CPU 2.6 s
+   ERROR+REPLAY       A 0.259 · S12 ∞ · SHARE [0.036 0.010 0.000 0.857] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 200 · lock-in 48 (N) · M1 0.843 · wl@200 2 · N/R drop 0.044 · off-diag FULL 0.1834 BLOCK 0.2967 · buffer N 0.255 · CPU 2.6 s
+   RANDOM+REPLAY      A 0.592 · S12 ∞ · SHARE [0.281 0.260 0.235 0.224] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 199 · lock-in 6 (R2) · M1 0.972 · wl@200 9 · N/R drop 0.703 · off-diag FULL 0.0628 BLOCK 0.1312 · buffer N 0.255 · CPU 2.6 s
+   ORACLE+REPLAY      A 0.675 · S12 1520 · SHARE [0.536 0.332 0.133 0.000] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 4 · lock-in 29 (R1) · M1 0.980 · wl@200 10 · N/R drop 0.349 · off-diag FULL -0.0247 BLOCK -0.0592 · buffer N 0.255 · CPU 36.8 s
+   NULL+REPLAY        A 0.517 · S12 1970 · SHARE [0.071 0.204 0.551 0.077] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 19 · lock-in 37 (R3) · M1 0.985 · wl@200 11 · N/R drop 2.347 · off-diag FULL -0.0431 BLOCK 0.0233 · buffer N 0.255 · CPU 2.6 s
+   PROGRESS+REPLAY-V  A 0.520 · S12 ∞ · SHARE [0.153 0.327 0.112 0.311] · explore [0.020 0.015 0.036 0.026] · LEAVE_N 198 · lock-in 23 (R2) · M1 0.949 · wl@200 6 · N/R drop 0.513 · off-diag FULL 0.0377 BLOCK 0.1545 · buffer N 0.274 · CPU 2.5 s
+ seed 20261303:
+   PROGRESS           A 0.523 · S12 ∞ · SHARE [0.138 0.352 0.219 0.199] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 169 · lock-in 11 (N) · M1 0.980 · wl@200 11 · N/R drop 0.329 · off-diag FULL 0.1598 BLOCK 0.1598 · CPU 1.6 s
+   RANDOM             A 0.560 · S12 ∞ · SHARE [0.255 0.270 0.219 0.255] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 199 · lock-in 7 (R2) · M1 0.969 · wl@200 7 · N/R drop 0.698 · off-diag FULL 0.1862 BLOCK 0.1862 · CPU 1.6 s
+   ERROR              A 0.145 · S12 ∞ · SHARE [0.071 0.071 0.066 0.699] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 200 · lock-in 10 (N) · M1 0.776 · wl@200 1 · N/R drop 0.037 · off-diag FULL 0.3686 BLOCK 0.3686 · CPU 1.7 s
+   ORACLE             A 0.740 · S12 1160 · SHARE [0.311 0.418 0.260 0.010] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 15 · lock-in 10 (R2) · M1 0.988 · wl@200 10 · N/R drop 1.149 · off-diag FULL -0.0052 BLOCK -0.0052 · CPU 31.2 s
+   NULL               A 0.154 · S12 ∞ · SHARE [0.000 0.000 0.199 0.709] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 200 · lock-in 43 (N) · M1 0.712 · wl@200 1 · N/R drop 0.097 · off-diag FULL -0.2217 BLOCK -0.2217 · CPU 1.7 s
+   PROGRESS-NET       A 0.453 · S12 1270 · SHARE [0.291 0.306 0.112 0.199] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 169 · lock-in 40 (R1) · M1 0.969 · wl@200 10 · N/R drop 0.301 · off-diag FULL 0.0930 BLOCK 0.0930 · CPU 1.7 s
+   NULL-NET           A 0.283 · S12 1900 · SHARE [0.061 0.117 0.240 0.490] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 182 · lock-in 43 (N) · M1 0.972 · wl@200 10 · N/R drop 0.251 · off-diag FULL 0.1277 BLOCK 0.1277 · CPU 1.7 s
+   PROGRESS-UCB       A 0.498 · S12 ∞ · SHARE [0.214 0.250 0.168 0.276] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 195 · lock-in 9 (R2) · M1 0.952 · wl@200 8 · N/R drop 0.512 · off-diag FULL 0.2138 BLOCK 0.2138 · CPU 1.7 s
+   PROGRESS+REPLAY    A 0.506 · S12 1310 · SHARE [0.102 0.352 0.112 0.342] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 200 · lock-in 12 (N) · M1 0.897 · wl@200 5 · N/R drop 0.478 · off-diag FULL 0.0456 BLOCK 0.1398 · buffer N 0.246 · CPU 2.6 s
+   ERROR+REPLAY       A 0.247 · S12 ∞ · SHARE [0.036 0.020 0.000 0.852] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 200 · lock-in 43 (N) · M1 0.906 · wl@200 4 · N/R drop 0.052 · off-diag FULL 0.1684 BLOCK 0.2906 · buffer N 0.246 · CPU 2.6 s
+   RANDOM+REPLAY      A 0.585 · S12 ∞ · SHARE [0.255 0.270 0.219 0.255] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 199 · lock-in 7 (R2) · M1 0.964 · wl@200 8 · N/R drop 1.216 · off-diag FULL 0.0524 BLOCK 0.1033 · buffer N 0.246 · CPU 3.6 s
+   ORACLE+REPLAY      A 0.699 · S12 460 · SHARE [0.327 0.378 0.296 0.000] · explore [0.000 0.000 0.000 0.000] · LEAVE_N 4 · lock-in 9 (R2) · M1 0.977 · wl@200 10 · N/R drop 0.916 · off-diag FULL -0.1238 BLOCK -0.0756 · buffer N 0.246 · CPU 36.3 s
+   NULL+REPLAY        A 0.445 · S12 1900 · SHARE [0.000 0.199 0.709 0.000] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 4 · lock-in 51 (R3) · M1 0.974 · wl@200 9 · N/R drop 2.520 · off-diag FULL 0.0396 BLOCK 0.0764 · buffer N 0.246 · CPU 2.6 s
+   PROGRESS+REPLAY-V  A 0.456 · S12 ∞ · SHARE [0.107 0.291 0.117 0.393] · explore [0.026 0.026 0.026 0.015] · LEAVE_N 181 · lock-in 34 (N) · M1 0.970 · wl@200 10 · N/R drop 0.500 · off-diag FULL 0.0580 BLOCK 0.1590 · buffer N 0.308 · CPU 2.5 s
+
+the readings (no bar):
+   20261301: ERROR+REPLAY's SHARE_N 0.852 vs [0.191, 0.296] (n 20) ABOVE · the replay's own gain, A(RANDOM+REPLAY) vs the bare RANDOM band 0.600 vs [0.533, 0.629] (n 20) inside
+      the FORGETTING reading (ruled: the FULL-STEP table's 12 off-diagonal entries, PRE_(b+1) − PRE_b): PROGRESS+REPLAY +0.0653 vs PROGRESS-S1C +0.2062 · the BLOCK table's (the interference before the repair): +0.1905 vs +0.2062 · the replay's own change per room (POST_b − PRE_(b+1), mean): N +0.0012 R1 +0.1187 R2 +0.0457 R3 +0.0826
+      PROGRESS+REPLAY: the buffer's N-share 0.249 · replayed per room {'N': 498, 'R1': 488, 'R2': 503, 'R3': 511}
+      PROGRESS+REPLAY-V: the buffer's N-share 0.262 · replayed per room {'N': 523, 'R1': 459, 'R2': 605, 'R3': 413}
+      ERROR+REPLAY: the buffer's N-share 0.249 · replayed per room {'N': 498, 'R1': 488, 'R2': 503, 'R3': 511}
+      RANDOM+REPLAY: the buffer's N-share 0.249 · replayed per room {'N': 498, 'R1': 488, 'R2': 503, 'R3': 511}
+      ORACLE+REPLAY: the buffer's N-share 0.249 · replayed per room {'N': 498, 'R1': 488, 'R2': 503, 'R3': 511}
+      NULL+REPLAY: the buffer's N-share 0.249 · replayed per room {'N': 498, 'R1': 488, 'R2': 503, 'R3': 511}
+      PROGRESS-NET: negative-net rooms per boundary mean 3.15, max 4 · the longest negative run per room {'N': 44, 'R1': 124, 'R2': 60, 'R3': 99}
+      NULL-NET: negative-net rooms per boundary mean 1.43, max 4 · the longest negative run per room {'N': 18, 'R1': 25, 'R2': 27, 'R3': 19}
+      PROGRESS-UCB: A 0.521 · SHARE_N 0.245 · LEAVE_N 193 · lock-in 7 · the bonus's share of the score at the pick (declared: bonus / (|est| + bonus)) 0.677
+   20261302: ERROR+REPLAY's SHARE_N 0.857 vs [0.193, 0.286] (n 20) ABOVE · the replay's own gain, A(RANDOM+REPLAY) vs the bare RANDOM band 0.592 vs [0.529, 0.598] (n 20) inside
+      the FORGETTING reading (ruled: the FULL-STEP table's 12 off-diagonal entries, PRE_(b+1) − PRE_b): PROGRESS+REPLAY +0.0263 vs PROGRESS-S1C +0.1653 · the BLOCK table's (the interference before the repair): +0.1441 vs +0.1653 · the replay's own change per room (POST_b − PRE_(b+1), mean): N +0.0272 R1 +0.2848 R2 -0.0493 R3 +0.0548
+      PROGRESS+REPLAY: the buffer's N-share 0.255 · replayed per room {'N': 509, 'R1': 500, 'R2': 524, 'R3': 467}
+      PROGRESS+REPLAY-V: the buffer's N-share 0.274 · replayed per room {'N': 547, 'R1': 312, 'R2': 730, 'R3': 411}
+      ERROR+REPLAY: the buffer's N-share 0.255 · replayed per room {'N': 509, 'R1': 500, 'R2': 524, 'R3': 467}
+      RANDOM+REPLAY: the buffer's N-share 0.255 · replayed per room {'N': 509, 'R1': 500, 'R2': 524, 'R3': 467}
+      ORACLE+REPLAY: the buffer's N-share 0.255 · replayed per room {'N': 509, 'R1': 500, 'R2': 524, 'R3': 467}
+      NULL+REPLAY: the buffer's N-share 0.255 · replayed per room {'N': 509, 'R1': 500, 'R2': 524, 'R3': 467}
+      PROGRESS-NET: negative-net rooms per boundary mean 3.03, max 4 · the longest negative run per room {'N': 53, 'R1': 113, 'R2': 58, 'R3': 46}
+      NULL-NET: negative-net rooms per boundary mean 1.54, max 3 · the longest negative run per room {'N': 38, 'R1': 66, 'R2': 5, 'R3': 32}
+      PROGRESS-UCB: A 0.519 · SHARE_N 0.230 · LEAVE_N 188 · lock-in 7 · the bonus's share of the score at the pick (declared: bonus / (|est| + bonus)) 0.692
+   20261303: ERROR+REPLAY's SHARE_N 0.852 vs [0.199, 0.286] (n 20) ABOVE · the replay's own gain, A(RANDOM+REPLAY) vs the bare RANDOM band 0.585 vs [0.522, 0.598] (n 20) inside
+      the FORGETTING reading (ruled: the FULL-STEP table's 12 off-diagonal entries, PRE_(b+1) − PRE_b): PROGRESS+REPLAY +0.0456 vs PROGRESS-S1C +0.1598 · the BLOCK table's (the interference before the repair): +0.1398 vs +0.1598 · the replay's own change per room (POST_b − PRE_(b+1), mean): N -0.0240 R1 +0.2926 R2 -0.0803 R3 +0.0276
+      PROGRESS+REPLAY: the buffer's N-share 0.246 · replayed per room {'N': 492, 'R1': 512, 'R2': 479, 'R3': 517}
+      PROGRESS+REPLAY-V: the buffer's N-share 0.308 · replayed per room {'N': 617, 'R1': 235, 'R2': 727, 'R3': 421}
+      ERROR+REPLAY: the buffer's N-share 0.246 · replayed per room {'N': 492, 'R1': 512, 'R2': 479, 'R3': 517}
+      RANDOM+REPLAY: the buffer's N-share 0.246 · replayed per room {'N': 492, 'R1': 512, 'R2': 479, 'R3': 517}
+      ORACLE+REPLAY: the buffer's N-share 0.246 · replayed per room {'N': 492, 'R1': 512, 'R2': 479, 'R3': 517}
+      NULL+REPLAY: the buffer's N-share 0.246 · replayed per room {'N': 492, 'R1': 512, 'R2': 479, 'R3': 517}
+      PROGRESS-NET: negative-net rooms per boundary mean 3.06, max 4 · the longest negative run per room {'N': 68, 'R1': 44, 'R2': 52, 'R3': 92}
+      NULL-NET: negative-net rooms per boundary mean 1.51, max 3 · the longest negative run per room {'N': 24, 'R1': 42, 'R2': 51, 'R3': 26}
+      PROGRESS-UCB: A 0.498 · SHARE_N 0.276 · LEAVE_N 195 · lock-in 9 · the bonus's share of the score at the pick (declared: bonus / (|est| + bonus)) 0.648
+
+the 4 × 4 tables (the mean change of each room's L_j during a block in k), per seed — PROGRESS-S1C (bare; BLOCK = FULL-STEP) and PROGRESS+REPLAY (BLOCK | FULL-STEP):
+   20261301 block in R1: PROGRESS R1 -1.1760 R2 0.6181 R3 0.4178 N -0.0200 | +REPLAY BLOCK R1 -1.1050 R2 0.5256 R3 0.3746 N -0.0043 | FULL R1 -0.9310 R2 0.2708 R3 0.2161 N -0.0201
+   20261301 block in R2: PROGRESS R1 0.8800 R2 -0.8995 R3 0.1029 N 0.1565 | +REPLAY BLOCK R1 0.2992 R2 -0.4485 R3 -0.0055 N 0.0829 | FULL R1 0.2308 R2 -0.3771 R3 -0.0949 N 0.0766
+   20261301 block in R3: PROGRESS R1 0.3157 R2 0.0055 R3 -0.7675 N 0.0891 | +REPLAY BLOCK R1 0.2480 R2 0.0420 R3 -0.4959 N 0.1320 | FULL R1 -0.1197 R2 0.0663 R3 -0.3504 N -0.0193
+   20261301 block in N : PROGRESS R1 0.0027 R2 0.0884 R3 -0.1829 N -0.3650 | +REPLAY BLOCK R1 0.1621 R2 0.1996 R3 0.2300 N -0.1934 | FULL R1 0.0290 R2 0.0838 R3 0.0640 N -0.1103
+   20261302 block in R1: PROGRESS R1 -1.7294 R2 0.2233 R3 0.1379 N -0.1694 | +REPLAY BLOCK R1 -0.2736 R2 0.0999 R3 0.0543 N 0.0989 | FULL R1 -0.2853 R2 0.0604 R3 0.0152 N 0.0258
+   20261302 block in R2: PROGRESS R1 1.0136 R2 -0.6784 R3 0.2625 N 0.1400 | +REPLAY BLOCK R1 0.6034 R2 -0.4818 R3 0.0739 N 0.0594 | FULL R1 0.1232 R2 -0.3263 R3 0.0219 N -0.0386
+   20261302 block in R3: PROGRESS R1 0.0518 R2 0.3868 R3 -0.6583 N 0.0743 | +REPLAY BLOCK R1 0.1349 R2 0.0877 R3 -0.4236 N 0.0712 | FULL R1 -0.2548 R2 0.2042 R3 -0.3348 N 0.0448
+   20261302 block in N : PROGRESS R1 -0.3937 R2 0.1745 R3 0.0824 N -0.2523 | +REPLAY BLOCK R1 0.0672 R2 0.1608 R3 0.2173 N -0.1454 | FULL R1 -0.0225 R2 0.0757 R3 0.0601 N -0.0744
+   20261303 block in R1: PROGRESS R1 -1.2222 R2 0.2542 R3 0.1160 N 0.0043 | +REPLAY BLOCK R1 -0.0993 R2 0.0627 R3 0.0429 N 0.1063 | FULL R1 -0.0738 R2 0.0827 R3 0.0641 N 0.0946
+   20261303 block in R2: PROGRESS R1 0.6347 R2 -0.7044 R3 0.2955 N 0.0525 | +REPLAY BLOCK R1 0.4386 R2 -0.5482 R3 -0.0743 N -0.0406 | FULL R1 -0.1026 R2 -0.3282 R3 -0.0083 N -0.0538
+   20261303 block in R3: PROGRESS R1 -0.2999 R2 0.6155 R3 -0.8270 N 0.0653 | +REPLAY BLOCK R1 0.3473 R2 0.1408 R3 -0.4956 N 0.1732 | FULL R1 0.0367 R2 0.2070 R3 -0.3964 N 0.1192
+   20261303 block in N : PROGRESS R1 -0.0392 R2 0.0789 R3 0.1403 N -0.2800 | +REPLAY BLOCK R1 0.1323 R2 0.1223 R3 0.2265 N -0.2132 | FULL R1 -0.0071 R2 0.0827 R3 0.0321 N -0.1059
+
+the refutations (§6; decided at block 200 — one «holds» where it holds at all 3 seeds, declared as in S1c):
+   (a) SHARE_N(NET) inside or above RANDOM's band: 20261301 holds · 20261302 holds · 20261303 holds → REFUTED
+   (b) SHARE_N(NET) passes its bar but A(NET) below RANDOM's band: 20261301 does not hold · 20261302 does not hold · 20261303 does not hold → not refuted
+   (c) PROGRESS+REPLAY's FULL-STEP off-diagonal not below PROGRESS-S1C's: 20261301 does not hold · 20261302 does not hold · 20261303 does not hold → not refuted
+   (d) A(PROGRESS+REPLAY) inside RANDOM+REPLAY's band while the positive control holds: 20261301 does not hold · 20261302 does not hold · 20261303 does not hold → not refuted
+   (e) ERROR+REPLAY's SHARE_N below RANDOM+REPLAY's band: 20261301 does not hold · 20261302 does not hold · 20261303 does not hold → not refuted
+the predictions (§6, from the mechanism; tags as written):
+   20261301: (N) SHARE_N(NET) 0.362, LEAVE_N(NET) 193 [Guessing] · (R) the FULL-STEP off-diagonal +0.0653 < PROGRESS-S1C's +0.2062 [Likely]: True · LEAVE_N(+REPLAY) 193 ≤ 50 [Likely] · ERROR+REPLAY's SHARE_N 0.852 (stays trapped [Likely])
+   20261302: (N) SHARE_N(NET) 0.276, LEAVE_N(NET) 148 [Guessing] · (R) the FULL-STEP off-diagonal +0.0263 < PROGRESS-S1C's +0.1653 [Likely]: True · LEAVE_N(+REPLAY) 195 ≤ 50 [Likely] · ERROR+REPLAY's SHARE_N 0.857 (stays trapped [Likely])
+   20261303: (N) SHARE_N(NET) 0.199, LEAVE_N(NET) 169 [Guessing] · (R) the FULL-STEP off-diagonal +0.0456 < PROGRESS-S1C's +0.1598 [Likely]: True · LEAVE_N(+REPLAY) 200 ≤ 50 [Likely] · ERROR+REPLAY's SHARE_N 0.852 (stays trapped [Likely])
+
+per-word n on the fixed test set: big 238 blue 89 circle 82 cross 64 green 134 red 83 ring 105 small 234 square 57 star 87 triangle 77 white 88 yellow 78

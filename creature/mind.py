@@ -243,6 +243,28 @@ def _mind_repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
+# edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:28 +0400 — BRAIN-IN-BODY (docs/brain/body/INTERFACE-BRAIN-ORGAN.md §3/§4): the brain
+# organ's class, imported LAZILY (only a genome that declares BRAIN, unblinded, ever calls this) so every other genome's Mind imports
+# exactly what it always did. One function, so a test double reaches Mind.__init__ and Mind.resume alike.
+def _brain_class():
+    from genome.brain import Brain
+    return Brain
+
+
+def _jsonable(v):
+    """numpy scalars/arrays → plain Python for the journal (json.dumps is bare there); ±inf/nan kept as floats (json writes
+    Infinity, as the scored files hold it); no key or list is re-ordered."""
+    if isinstance(v, dict):
+        return {(k if isinstance(k, str) else str(_jsonable(k))): _jsonable(x) for k, x in v.items()}
+    if isinstance(v, (list, tuple)):
+        return [_jsonable(x) for x in v]
+    if isinstance(v, np.ndarray):
+        return _jsonable(v.tolist())
+    if isinstance(v, np.generic):
+        return v.item()
+    return v
+
+
 # edit: Claude (Sonnet 5, ALPHA4 builder J), 2026-09-23 00:52 +0400 — ALPHA4-PREREG.md §6 (EVOLVE): the
 # genome a resumed Mind rebuilds from. `Mind._maybe_adopt_evolve_proposal` writes `GENOME.v<n>.genome` under
 # `run_root` at every adoption; a process restart must rebuild from the HIGHEST such file, never from the
@@ -721,6 +743,24 @@ class Mind:
                                                "refused_content": 0, "words_total": 0, "longest": 0,
                                                "graded": 0, "graded_right": 0, "graded_novel": 0}
 
+        # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:28 +0400 — BRAIN-IN-BODY (INTERFACE §4): the brain, a NEW consumer beside
+        # MEET (it replaces nothing). None without a BRAIN line or under `--blind brain` (the twin: the asks go to the organs' road).
+        # `pending_asks`: moment -> the asks held for that moment's eye row, in tape order (saved in the snapshot like ear_pending).
+        # `asks_answered`/`asks_by`: counts for STATUS (brain_status). A BRAIN line whose organ is not on this tree refuses BY NAME.
+        self.brain = None
+        self.brain_restored: Optional[bool] = None
+        if "BRAIN" in self.genome.declared and "brain" not in self.blind:
+            try:
+                brain_cls = _brain_class()
+            except ImportError as e:
+                raise GenomeError(f"BRAIN declared but genome/brain.py cannot be imported ({e}): the organism does not start")
+            self.brain = brain_cls(dict(self.genome.declared["BRAIN"]))
+        self.pending_asks: Dict[str, List[Dict[str, object]]] = {}
+        self.asks_answered: int = 0
+        self.asks_by: Dict[str, int] = {"brain": 0, "organs": 0}
+        self.brain_learned: int = 0
+        self.brain_refused: int = 0
+
         (self.run_root / "journal").mkdir(parents=True, exist_ok=True)
         (self.run_root / "state").mkdir(parents=True, exist_ok=True)
 
@@ -794,6 +834,10 @@ class Mind:
         # _canvas_index/ARRIVAL/FAST/THINK/SLEEP are never reached from it) — gated inside on CHAT's own presence.
         elif sense == "chat":
             self._consume_chat(row)
+        # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:28 +0400 — BRAIN-IN-BODY (INTERFACE §2/§4): the scene world's `ask` rows.
+        # Gated on the ROWS, never on the gene: the twin genome (no BRAIN line) answers the same sitting by the organs' road.
+        elif sense == "ask":
+            self._consume_ask(row)
         # a "door" row (the ask door / other senses not yet armed) carries no organism work here
         self.last_seq = int(row["seq"])
         # ALPHA4-PREREG.md §3: self.stage only ever RISES here (org.t is monotonic; a committed "by READY"
@@ -1361,6 +1405,121 @@ class Mind:
         else:
             self.chat_counters["abstained"] += 1
 
+    # ------------------------------------------------------------------ BRAIN-IN-BODY: the ask sense and the brain organ
+    # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:34 +0400 — docs/brain/body/INTERFACE-BRAIN-ORGAN.md §2/§4 and the seat's two
+    # addenda (every answer carries `raw` in the offline graders' names; every answer row carries `fix` + `hyps`; a box ask carries the
+    # thing's `centroid`). An answer row's `seq` is the ASK row's seq, `eye_seq` the canvas it was answered on (None: canvas-less),
+    # `at` the row the answer was MADE on (the eye row's for a held ask). One `answer` row per `ask` row, brain or organs.
+    def _consume_ask(self, row: Dict[str, object]) -> None:
+        """An `ask` tape row: its JSON payload read where the genome says the tape is (as `_consume_eye` reads its PNG). A
+        canvas-less form (`begin`, `end`, `why`) is answered at once; any other is held for its moment's eye row, in tape order."""
+        meta = row.get("meta") or {}
+        payload = json.loads((_resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]).read_text())
+        ask = {"seq": int(row["seq"]), "at": row["at"], "moment": meta.get("moment"), "payload": payload}
+        if payload.get("form") in ("begin", "end", "why"):
+            self._answer_ask(ask, None, str(row["at"]), None, {})
+        else:
+            self.pending_asks.setdefault(str(meta.get("moment")), []).append(ask)
+
+    def _brain_canvas(self, row: Dict[str, object], moment: Optional[str], g: Dict[str, object], words: List[str]) -> None:
+        """INTERFACE §4, the eye hook: held asks → answered here, and the brain does NOT learn from this canvas («an ask never
+        teaches»); else a present brain that hears the eye row's source learns the instant's words (the TAPE's words, in order)."""
+        meta = row.get("meta") or {}
+        asks = self.pending_asks.pop(str(moment), None) if moment is not None else None
+        if asks:
+            cache: Dict[str, object] = {}
+            for ask in asks:
+                self._answer_ask(ask, g, str(row["at"]), int(row["seq"]), cache)
+            return
+        if self.brain is None or not words or not self.brain.hears(meta.get("source")):
+            return
+        base = {"moment": moment, "seq": row["seq"], "at": row["at"]}
+        if meta.get("scene") is None or meta.get("world_seed") is None:
+            self.brain_refused += 1      # a malformed scene row is named on the record, never learned from and never a crash loop (#230)
+            self._write_journal(row["at"], {"kind": "brain", "act": "refused", **base,
+                                            "reason": "an eye row the brain hears carries no scene / world_seed"})
+            return
+        out = _jsonable(self.brain.learn(g, list(words), moment=str(moment), scene=int(meta["scene"]), world_seed=int(meta["world_seed"])))
+        self.brain_learned += 1
+        # PREREG-BRAIN-IN-BODY (the seat, 20:4x): every learn row carries the canvas's located fixations and the eye's hypotheses (member
+        # lists into `fix`) — the grader reads from it whether the one «dax» meeting was seen. The brain's own keys win if it returns them.
+        from brain.scene import eye as _eye
+        fix = [[int(y), int(x)] for (y, x) in (g.get("fix") or [])]
+        view = {"fix": fix, "hyps": [[int(i) for i in m] for m in _eye.groups([tuple(f) for f in fix])]}
+        self._write_journal(row["at"], {"kind": "brain", "act": "learn", **base, **view, **out})
+        if out.get("calibrated"):
+            self._write_journal(row["at"], {"kind": "brain", "act": "calibrate", **base, "summary": _jsonable(self.brain.summary())})
+
+    def _answer_ask(self, ask: Dict[str, object], g: Optional[Dict[str, object]], at: str, eye_seq: Optional[int],
+                    cache: Dict[str, object]) -> None:
+        """One ask → one `answer` journal row. By the brain when there is one (its `ask` return journaled WHOLE), else by THE
+        ORGANS' ROAD (creature/organs_road.py). Read-only either way: the organism's row hash and the mind's road (`_chat_guard`,
+        the chat's own list) are compared around the answer and a difference RAISES — an answer that changed him is a defect."""
+        payload = ask["payload"]
+        form = str(payload.get("form"))
+        view = None
+        if g is not None:
+            from creature import organs_road as _road
+            view = cache.get("view") or _road.eye_view(g)
+            cache["view"] = view
+        hash_before, guard_before = self.org.row_hash(), self._chat_guard()
+        detail = None
+        if self.brain is not None:
+            by = "brain"
+            try:
+                answer = _jsonable(self.brain.ask(payload, g))
+            except Exception as e:                 # the organ's own refusal of a malformed ask (genome.brain.BrainError) is ANSWERED
+                if type(e).__name__ != "BrainError":   # as refused, by name, never a crash: one bad row must not become a crash loop (#230)
+                    raise
+                answer = {"kind": "refused", "reason": str(e), "raw": {"refused": str(e)}}
+        else:
+            by = "organs"
+            answer, detail = self._organs_answer(form, payload, view, cache)
+        if self.org.row_hash() != hash_before or self._chat_guard() != guard_before:
+            raise RuntimeError(f"ASK: answering {payload.get('item')!r} (form {form}, seq {ask['seq']}) by the {by} changed the organism "
+                               f"or the mind's road — the read-only law (INTERFACE-BRAIN-ORGAN §4)")
+        self._write_journal(at, {"kind": "answer", "by": by, "item": payload.get("item"), "mark": payload.get("mark"), "form": form,
+                                 "answer": answer, "moment": ask["moment"], "seq": ask["seq"], "eye_seq": eye_seq, "at": at,
+                                 "fix": (None if view is None else [[int(y), int(x)] for (y, x) in view[0]]),
+                                 "hyps": (None if view is None else [[int(i) for i in h.members] for h in view[2]]),
+                                 "detail": _jsonable(detail)})
+        self.asks_answered += 1
+        self.asks_by[by] = self.asks_by.get(by, 0) + 1
+
+    def _organs_answer(self, form: str, payload: Dict[str, object], view, cache: Dict[str, object]):
+        """THE ORGANS' ROAD (INTERFACE §4): -> (answer with `raw`, detail). `begin`/`end` are acknowledgements (the organs have
+        nothing to calibrate)."""
+        from creature import organs_road as _road
+        if form in ("begin", "end"):
+            a: Dict[str, object] = {"kind": form, "set": payload.get("set")}
+            a["raw"] = dict(a)
+            return a, None
+        if "ledgers" not in cache:
+            cache["ledgers"] = build_ledgers(self.org, self.moment_word)
+        ledgers = cache["ledgers"]
+        if form == "why":
+            return _road.answer_why(self.org, ledgers, self.episodes, payload)
+        fix, located, hyps = view if view is not None else ([], None, [])
+        if form == "point":
+            return _road.answer_point(self.org, ledgers["words"], payload, fix, located, hyps)
+        if form == "what":
+            return _road.answer_what(self.org, ledgers["words"], payload, fix, located, hyps)
+        if form == "say":
+            return _road.answer_say(self.org, ledgers["words"], payload, fix, located, hyps)
+        a = {"kind": "refused", "reason": f"no such form: {form!r}"}
+        a["raw"] = dict(a)
+        return a, None
+
+    def brain_status(self) -> Optional[Dict[str, object]]:
+        """STATUS (INTERFACE §4): the brain's `summary()` plus the ask counts; for the twin (BRAIN declared and blinded, or asks
+        answered by the organs) the counts alone; None when this mind has neither a brain nor an ask (every other genome)."""
+        if self.brain is None and "BRAIN" not in self.genome.declared and not self.asks_answered and not self.pending_asks:
+            return None
+        base = _jsonable(self.brain.summary()) if self.brain is not None else {"brain": None, "blind": "brain" in self.blind}
+        return {**base, "asks_answered": self.asks_answered, "asks_by": dict(self.asks_by),
+                "asks_pending": sum(len(v) for v in self.pending_asks.values()), "learn_rows": self.brain_learned,
+                "refused_rows": self.brain_refused, "restored": self.brain_restored}
+
     def _consume_body(self, row: Dict[str, object]) -> None:
         """BODY-SENSES.md §4.1: "the readings; the DRIVE is the mind's" -- this gene carries no threshold, so
         there is nothing here to compute beyond recording the reading itself as a journal row (the refusal test in
@@ -1682,6 +1841,7 @@ class Mind:
         # its births would be refused by the budget — V1 would then read the budget, not the ear (#228 (a), #238). Not blind:
         # label == word, every line below byte-for-byte what it was.
         label = word
+        tape_words: List[str] = list(words_in_instant)    # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:31 +0400 — the brain hears the TAPE's words (its own blind is `--blind brain`, never `--blind ear`)
         if "ear" in self.blind:
             word, words_in_instant = None, []
         # A4L-VOICE task 2: this canvas's SOUND (the maker's chord, held since its ear-sound row) — bound HERE, at the eye row.
@@ -1704,6 +1864,7 @@ class Mind:
         # SENSE colour is declared (Genome.colour, machinery.py) — a complete no-op call otherwise, byte-
         # identical to every existing pin.
         g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour, predicted=predicted)
+        g_eye = g     # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:31 +0400 — the glance BEFORE the organism's blind-coarse strip (which rebinds `g`, never mutates this dict): the brain's input
         # L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): --blind coarse drops the
         # fifth (coarse) feature from THIS mind's own learning road entirely — genome/gaze.py has no notion
         # of "blind" (a Mind-only concept), so it always appends the coarse feature when the gene is
@@ -1714,6 +1875,13 @@ class Mind:
             g["feats"] = g["feats"][:-1]
             if g.get("residual") is not None:
                 g["residual"] = g["residual"][:-1]
+        # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:31 +0400 — BRAIN-IN-BODY (INTERFACE §4): asks held for this moment are answered
+        # (by the brain, else the organs' road — read-only, asserted) and the brain does NOT learn from this canvas; else a present brain
+        # that hears this source learns the instant's words. BEFORE the organism's road (an answer reads the organism as it was before
+        # this canvas), and above org_feats/_row_digest, so nothing here can move org.t between the canvas row and its coarse row.
+        # Neither branch runs without a brain or a held ask: every genome and tape without them is byte-identical.
+        if self.brain is not None or self.pending_asks:
+            self._brain_canvas(row, moment, g_eye, tape_words)
         # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-2/BIND (_bind_pool, above):
         # undeclared (the common case today) this is g["feats"] itself, unchanged — every existing `for x
         # in g["feats"]:` loop below now reads `org_feats` instead, with IDENTICAL contents when BIND is
@@ -3369,6 +3537,17 @@ class Mind:
                                        for k, v in self.pending_sound.items()}
             ledger["voice_rows"] = self.voice_rows
             ledger["voice_bound"] = self.voice_bound
+        # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:36 +0400 — BRAIN-IN-BODY (INTERFACE §4): the held asks (the same durability
+        # ear_pending has) and the ask/brain counts — written ONLY when BRAIN is declared or an ask was ever seen, so every other genome
+        # writes exactly the ledger it always did. The brain's own state is written below, beside the organism's.
+        if "BRAIN" in self.genome.declared or self.pending_asks or self.asks_answered:
+            ledger["asks"] = {"pending": {k: list(v) for k, v in self.pending_asks.items()}, "answered": self.asks_answered,
+                              "by": dict(self.asks_by), "learned": self.brain_learned, "refused": self.brain_refused}
+        if self.brain is not None:
+            brain_tmp = state_dir / "brain_tmp"
+            self.brain.save(brain_tmp)
+            os.replace(str(brain_tmp) + ".npz", str(state_dir / "brain.npz"))
+            os.replace(str(brain_tmp) + ".json", str(state_dir / "brain.json"))
         ledger_tmp = state_dir / "ledger_tmp.json"
         ledger_tmp.write_text(json.dumps(ledger))
         os.replace(str(ledger_tmp), str(state_dir / "ledger.json"))
@@ -3472,6 +3651,21 @@ class Mind:
             for k_, v_ in (ledger.get("chat_counters") or {}).items():
                 if k_ in mind.chat_counters:
                     mind.chat_counters[k_] = int(v_)
+            # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:36 +0400 — BRAIN-IN-BODY: the held asks, the counts, and the brain's
+            # state (state/brain.npz|json) beside the organism's. A snapshot without the brain's files (from before the gene) resumes a
+            # NEWBORN brain and says so: `brain_restored` False on STATUS, never silent.
+            asks_ = ledger.get("asks") or {}
+            mind.pending_asks = {str(k): list(v) for k, v in (asks_.get("pending") or {}).items()}
+            mind.asks_answered = int(asks_.get("answered", 0))
+            mind.asks_by = {"brain": 0, "organs": 0, **{str(k): int(v) for k, v in (asks_.get("by") or {}).items()}}
+            mind.brain_learned = int(asks_.get("learned", 0))
+            mind.brain_refused = int(asks_.get("refused", 0))
+            if mind.brain is not None:
+                if (state_dir / "brain.npz").exists() and (state_dir / "brain.json").exists():
+                    mind.brain = _brain_class().load(state_dir / "brain", dict(mind.genome.declared["BRAIN"]))
+                    mind.brain_restored = True
+                else:
+                    mind.brain_restored = False
             # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
             # (L-8): restore the act rng's stream exactly (absent from a snapshot taken before this gene
             # existed -> the freshly-seeded stream __init__ already built, unchanged).

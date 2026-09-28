@@ -1,0 +1,37 @@
+GATE «BRAIN ALONE» · world seed 20261102 · verdict PASS
+  compared 2222 · equal 2222 · counts equal to the scored file's: True · learner.summary() vs the scored record: equal
+  pointer pin (M2b/NAME/SPEAK/SPEAK2/DECLINE vs questions.json hyp): compared 425 · equal 425 · mismatches 0
+  mark      compared   equal  scored n  first difference
+  M1             395     395       395  —
+  M2a            400     400       400  —
+  M6              42      42        42  —
+  M3              60      60        60  —
+  M2b             56      56        56  —
+  NAME           165     165       165  —
+  SPEAK           96      96        96  —
+  SPEAK2          60      60        60  —
+  DECLINE         48      48        48  —
+  the OLDER set's pointing (test seeds 2026120x) vs scene-s1b1r/<ws>/arms/A-RW/answers_10000.json:
+  M1             398     398       398  —
+  M2a            400     400       400  —
+  M6              42      42        42  —
+  M3              60      60        60  —
+  NAME.name (the organ's learned-type keys mapped to the world's types, here): compared 165 · equal 165 · first —
+  answers flagged misuse (M5) among these items: 0 · learn «none» {'True': 1443, 'False': 8306, 'None': 251} · calibrated at [250, 500, 1000, 2000, 5000, 10000] · begin False
+  M5 (a) same-world-type ordered pairs flagged 52/52 = 1.0 · (b) M1+M3 phrases falsely flagged 0/455 = 0.0 · (c) held-out pairs flagged 0/12 (M3 phrases of them 0/60) · ear types [['circle', 'cross', 'ring', 'square', 'star', 'triangle'], ['blue', 'green', 'red', 'white', 'yellow'], ['big', 'small']]
+  M4a (PREREG §3, ≥ 2 hypotheses): cited 104 · EXIST 1.0 · CARRY 0.9807692307692307 · null (20 draws, m4-null:<k>) median 0.5192307692307693 p95 0.5769230769230769 · reads PASS (bar CARRY ≥ 0.90 and > p95) · the rule's base rate over all ≥ 2-hypothesis attributed episodes 0.9284111550379314 · cited fix ≠ cache 0
+    big       because  episodes  2497 · citable (≥ 2 hyps)  1183 · cited 8 · exist 8 · carry 1.0 · base 0.9509721048182587
+    blue      because  episodes   994 · citable (≥ 2 hyps)   457 · cited 8 · exist 8 · carry 1.0 · base 0.8905908096280087
+    circle    because  episodes  1667 · citable (≥ 2 hyps)   773 · cited 8 · exist 8 · carry 0.875 · base 0.9883570504527813
+    cross     because  episodes  1668 · citable (≥ 2 hyps)   828 · cited 8 · exist 8 · carry 1.0 · base 0.9504830917874396
+    dax       unknown  episodes     1 · citable (≥ 2 hyps)     1 · cited 0 · exist 0 · carry None · base 1.0
+    green     because  episodes  1242 · citable (≥ 2 hyps)   589 · cited 8 · exist 8 · carry 1.0 · base 0.9303904923599321
+    red       because  episodes   871 · citable (≥ 2 hyps)   409 · cited 8 · exist 8 · carry 0.875 · base 0.8655256723716381
+    ring      because  episodes  2077 · citable (≥ 2 hyps)   723 · cited 8 · exist 8 · carry 1.0 · base 0.7123098201936376
+    small     because  episodes  2533 · citable (≥ 2 hyps)  1204 · cited 8 · exist 8 · carry 1.0 · base 0.9401993355481728
+    square    because  episodes  1255 · citable (≥ 2 hyps)   601 · cited 8 · exist 8 · carry 1.0 · base 0.9767054908485857
+    star      because  episodes  1618 · citable (≥ 2 hyps)   865 · cited 8 · exist 8 · carry 1.0 · base 0.9861271676300578
+    triangle  because  episodes  1714 · citable (≥ 2 hyps)   856 · cited 8 · exist 8 · carry 1.0 · base 0.9661214953271028
+    white     because  episodes  1044 · citable (≥ 2 hyps)   500 · cited 8 · exist 8 · carry 1.0 · base 0.906
+    yellow    because  episodes   825 · citable (≥ 2 hyps)   370 · cited 8 · exist 8 · carry 1.0 · base 0.9081081081081082
+  cpu 15.1 s · wall 15.1 s

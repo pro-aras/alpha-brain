@@ -1,0 +1,19 @@
+PREDICTIONS (written before the run): (1) the one-alone type is the SHAPE type at every seed; (2) nearest under the one-alone type's metric reads >= 0.85 at 20261102 and 20261103; (3) the colour type's and the size type's metrics read LOWER than the shape type's at both; (4) at 20261101 (the meeting was written to the square) every metric stays low.
+===== ws 20261101: the ear's types [['circle', 'cross', 'ring', 'square', 'star', 'triangle'], ['blue', 'green', 'red', 'white', 'yellow'], ['big', 'small']]
+  named by the world (for the reader of this printout only): ['shape', 'colour', 'size'] · heard alone [2514, 0, 0] · one-alone = type 0 (shape)
+  NEAREST under euclid                             5/29 = 0.172
+  NEAREST under type 0 = shape                     3/29 = 0.103
+  NEAREST under type 1 = colour                    3/29 = 0.103
+  NEAREST under type 2 = size                      3/29 = 0.103
+===== ws 20261102: the ear's types [['circle', 'cross', 'ring', 'square', 'star', 'triangle'], ['blue', 'green', 'red', 'white', 'yellow'], ['big', 'small']]
+  named by the world (for the reader of this printout only): ['shape', 'colour', 'size'] · heard alone [2502, 0, 0] · one-alone = type 0 (shape)
+  NEAREST under euclid                             24/27 = 0.889
+  NEAREST under type 0 = shape                     26/27 = 0.963
+  NEAREST under type 1 = colour                    24/27 = 0.889
+  NEAREST under type 2 = size                      23/27 = 0.852
+===== ws 20261103: the ear's types [['circle', 'cross', 'ring', 'square', 'star', 'triangle'], ['blue', 'green', 'red', 'white', 'yellow'], ['big', 'small']]
+  named by the world (for the reader of this printout only): ['shape', 'colour', 'size'] · heard alone [2555, 0, 0] · one-alone = type 0 (shape)
+  NEAREST under euclid                             16/29 = 0.552
+  NEAREST under type 0 = shape                     22/29 = 0.759
+  NEAREST under type 1 = colour                    22/29 = 0.759
+  NEAREST under type 2 = size                      22/29 = 0.759

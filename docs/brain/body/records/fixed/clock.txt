@@ -1,0 +1,8 @@
+2026-09-29 00:07:19 +0400 start
+parity-vs-fix exit 0
+parity-vs-fix-planted exit 1 (must be 1)
+parity-vs-law exit 1 (expected 1: only the young-word pointings may differ)
+grade-fixed exit 0
+journal day files 1
+identity exit 0
+2026-09-29 00:20:21 +0400 done

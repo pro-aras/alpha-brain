@@ -1,0 +1,5 @@
+at	uptime_load	active	tape_seq	mind_last_seq	backlog	moments	cells	scene_published	train_done	ended	brain_learned	asks_answered	ms_per_canvas_1min	rss_mb	sense_restarts	crash
+21:25:15	0.65	active	2546	881	8	1445	455	293	False	False	289	0	32.6809	765.91	0	None
+21:25:25	0.70	active	3396	2685	8	1500	455	719	True	False	300	1360	27.2533	789.16	0	None
+21:25:35	0.59	active	3396	3396	0	1500	455	1077	True	True	300	1723	21.9433	805.66	0	None
+21:25:45	0.57	active	3396	3396	0	1500	455	1077	True	True	300	1723	21.9433	805.66	0	None

@@ -1,0 +1,617 @@
+{
+ "candidates_per_sleep": 50000,
+ "interpreter": "/data/dev/venvs/brain/bin/python",
+ "load1_end": 7.14892578125,
+ "load1_start": 4.55517578125,
+ "seed": 20261001,
+ "sleeps": [
+  {
+   "cues": [],
+   "s_per_candidate": null,
+   "seq": 313,
+   "sleep": 1,
+   "spent": 0,
+   "wall_s": 0.0
+  },
+  {
+   "cues": [],
+   "s_per_candidate": null,
+   "seq": 626,
+   "sleep": 2,
+   "spent": 0,
+   "wall_s": 0.0
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 14,
+     "n": 34,
+     "perfect": false,
+     "program": "eq(argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x0, b))), nthN(order, 0))",
+     "score": 27,
+     "spent": 7044
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 14,
+     "n": 46,
+     "perfect": false,
+     "program": "eq(argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x0, b))), nthN(order, 0))",
+     "score": 36,
+     "spent": 7044
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 14,
+     "n": 28,
+     "perfect": false,
+     "program": "eq(nthN(order, 0), nthN(order, 1))",
+     "score": 20,
+     "spent": 7044
+    },
+    {
+     "key": "IS(N,G)>YESNO",
+     "max_size_reached": 10,
+     "n": 50,
+     "perfect": true,
+     "program": "eq(argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x1, b))), x0)",
+     "score": 50,
+     "spent": 372
+    },
+    {
+     "key": "POINT(N;cands)>PICK",
+     "max_size_reached": 8,
+     "n": 20,
+     "perfect": true,
+     "program": "argmaxG(cands, \u03bba. maxofG(taught(x0), \u03bbb. sim(b, a)))",
+     "score": 20,
+     "spent": 136
+    },
+    {
+     "key": "AFTER(G)>NAME",
+     "max_size_reached": 11,
+     "n": 14,
+     "perfect": false,
+     "program": "nthN(order, add(add(add(add(1, 1), 1), 1), 1))",
+     "score": 1,
+     "spent": 7044
+    },
+    {
+     "key": "NAME(G)>NAME",
+     "max_size_reached": 8,
+     "n": 29,
+     "perfect": true,
+     "program": "argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x0, b)))",
+     "score": 29,
+     "spent": 90
+    },
+    {
+     "key": "BETWEEN(G,G)>NAME",
+     "max_size_reached": 11,
+     "n": 10,
+     "perfect": false,
+     "program": "nthN(order, add(add(1, 1), 1))",
+     "score": 1,
+     "spent": 7044
+    },
+    {
+     "key": "BEFORE(G)>NAME",
+     "max_size_reached": 11,
+     "n": 9,
+     "perfect": false,
+     "program": "nthN(order, add(1, 1))",
+     "score": 1,
+     "spent": 7044
+    },
+    {
+     "key": "SAME(G)>NAME",
+     "max_size_reached": 8,
+     "n": 8,
+     "perfect": true,
+     "program": "argmaxN(order, \u03bba. maxofG(taught(a), \u03bbb. sim(x0, b)))",
+     "score": 8,
+     "spent": 90
+    },
+    {
+     "key": "OTHER_CASE(G;cands)>PICK",
+     "max_size_reached": 11,
+     "n": 2,
+     "perfect": false,
+     "program": "argmaxG(cands, \u03bba. sim(x0, a))",
+     "score": 1,
+     "spent": 7044
+    }
+   ],
+   "s_per_candidate": 0.000272,
+   "seq": 1128,
+   "sleep": 3,
+   "spent": 49996,
+   "wall_s": 13.59
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 62,
+     "perfect": false,
+     "program": "or(f1(x0), @IS(N,G)>YESNO(@BETWEEN(G,G)>NAME(x0, x0), x0))",
+     "score": 55,
+     "spent": 15641
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 93,
+     "perfect": false,
+     "program": "f1(x0)",
+     "score": 75,
+     "spent": 15641
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 64,
+     "perfect": false,
+     "program": "compose(&AFTER(G)>NAME, &LOOP(G)>YESNO)",
+     "score": 46,
+     "spent": 15641
+    },
+    {
+     "key": "AFTER(G)>NAME",
+     "max_size_reached": 8,
+     "n": 21,
+     "perfect": true,
+     "program": "nthN(order, add(index_of(order, f0(x0)), 1))",
+     "score": 21,
+     "spent": 883
+    },
+    {
+     "key": "BETWEEN(G,G)>NAME",
+     "max_size_reached": 8,
+     "n": 15,
+     "perfect": true,
+     "program": "nthN(order, add(index_of(order, f0(x0)), 1))",
+     "score": 15,
+     "spent": 1288
+    },
+    {
+     "key": "BEFORE(G)>NAME",
+     "max_size_reached": 8,
+     "n": 18,
+     "perfect": true,
+     "program": "nthN(order, sub(index_of(order, f0(x0)), 1))",
+     "score": 18,
+     "spent": 899
+    },
+    {
+     "key": "OTHER_CASE(G;cands)>PICK",
+     "max_size_reached": 3,
+     "n": 12,
+     "perfect": true,
+     "program": "compose(&NAME(G)>NAME, &POINT(N;cands)>PICK)",
+     "score": 12,
+     "spent": 5
+    }
+   ],
+   "s_per_candidate": 0.001366,
+   "seq": 1629,
+   "sleep": 4,
+   "spent": 49998,
+   "wall_s": 68.31
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 10,
+     "n": 100,
+     "perfect": false,
+     "program": "f1(x0)",
+     "score": 84,
+     "spent": 16666
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 139,
+     "perfect": false,
+     "program": "f1(x0)",
+     "score": 118,
+     "spent": 16666
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 86,
+     "perfect": false,
+     "program": "compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, &LOOP(G)>YESNO)))",
+     "score": 73,
+     "spent": 16666
+    }
+   ],
+   "s_per_candidate": 0.001229,
+   "seq": 2130,
+   "sleep": 5,
+   "spent": 49998,
+   "wall_s": 61.46
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 10,
+     "n": 132,
+     "perfect": false,
+     "program": "or(f1(x0), @IS(N,G)>YESNO(nthN(order, 1), x0))",
+     "score": 113,
+     "spent": 16666
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 186,
+     "perfect": false,
+     "program": "compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, &MIRROR(G)>YESNO)))",
+     "score": 159,
+     "spent": 16666
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 118,
+     "perfect": false,
+     "program": "compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, &LOOP(G)>YESNO)))",
+     "score": 101,
+     "spent": 16666
+    }
+   ],
+   "s_per_candidate": 0.001838,
+   "seq": 2631,
+   "sleep": 6,
+   "spent": 49998,
+   "wall_s": 91.88
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 10,
+     "n": 171,
+     "perfect": false,
+     "program": "or(f1(x0), @IS(N,G)>YESNO(nthN(order, 1), x0))",
+     "score": 146,
+     "spent": 12500
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 235,
+     "perfect": false,
+     "program": "f1(x0)",
+     "score": 199,
+     "spent": 12500
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 10,
+     "n": 147,
+     "perfect": false,
+     "program": "compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, &LOOP(G)>YESNO))))",
+     "score": 127,
+     "spent": 12500
+    },
+    {
+     "key": "OTHER_CASE(G;cands)>PICK",
+     "max_size_reached": 9,
+     "n": 27,
+     "perfect": false,
+     "program": "compose(&NAME(G)>NAME, &POINT(N;cands)>PICK)",
+     "score": 26,
+     "spent": 12500
+    }
+   ],
+   "s_per_candidate": 0.006614,
+   "seq": 3132,
+   "sleep": 7,
+   "spent": 50000,
+   "wall_s": 330.72
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 10,
+     "n": 198,
+     "perfect": false,
+     "program": "or(f1(x0), @IS(N,G)>YESNO(nthN(order, 1), x0))",
+     "score": 170,
+     "spent": 12500
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 273,
+     "perfect": false,
+     "program": "f1(x0)",
+     "score": 234,
+     "spent": 12500
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 189,
+     "perfect": false,
+     "program": "compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, &LOOP(G)>YESNO))))",
+     "score": 159,
+     "spent": 12500
+    },
+    {
+     "key": "OTHER_CASE(G;cands)>PICK",
+     "max_size_reached": 9,
+     "n": 30,
+     "perfect": false,
+     "program": "compose(&NAME(G)>NAME, &POINT(N;cands)>PICK)",
+     "score": 29,
+     "spent": 12500
+    }
+   ],
+   "s_per_candidate": 0.005413,
+   "seq": 3633,
+   "sleep": 8,
+   "spent": 50000,
+   "wall_s": 270.67
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 10,
+     "n": 228,
+     "perfect": false,
+     "program": "or(f1(x0), @IS(N,G)>YESNO(nthN(order, 1), x0))",
+     "score": 198,
+     "spent": 12500
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 312,
+     "perfect": false,
+     "program": "f1(x0)",
+     "score": 264,
+     "spent": 12500
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 216,
+     "perfect": false,
+     "program": "compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, compose(&AFTER(G)>NAME, &LOOP(G)>YESNO))))",
+     "score": 180,
+     "spent": 12500
+    },
+    {
+     "key": "OTHER_CASE(G;cands)>PICK",
+     "max_size_reached": 9,
+     "n": 36,
+     "perfect": false,
+     "program": "compose(&NAME(G)>NAME, &POINT(N;cands)>PICK)",
+     "score": 35,
+     "spent": 12500
+    }
+   ],
+   "s_per_candidate": 0.006058,
+   "seq": 4078,
+   "sleep": 9,
+   "spent": 50000,
+   "wall_s": 302.92
+  },
+  {
+   "cues": [
+    {
+     "key": "TWO_AFTER(G)>NAME",
+     "max_size_reached": 3,
+     "n": 6,
+     "perfect": true,
+     "program": "compose(&AFTER(G)>NAME, &AFTER(G)>NAME)",
+     "score": 6,
+     "spent": 10
+    }
+   ],
+   "s_per_candidate": 0.025805,
+   "seq": 4091,
+   "sleep": 10,
+   "spent": 10,
+   "wall_s": 0.26
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 228,
+     "perfect": false,
+     "program": "or(f1(x0), @IS(N,G)>YESNO(nthN(order, 1), x0))",
+     "score": 198,
+     "spent": 12500
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 312,
+     "perfect": false,
+     "program": "f1(x0)",
+     "score": 264,
+     "spent": 12500
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 216,
+     "perfect": false,
+     "program": "compose(&TWO_AFTER(G)>NAME, compose(&TWO_AFTER(G)>NAME, &LOOP(G)>YESNO))",
+     "score": 180,
+     "spent": 12500
+    },
+    {
+     "key": "OTHER_CASE(G;cands)>PICK",
+     "max_size_reached": 9,
+     "n": 36,
+     "perfect": false,
+     "program": "compose(&NAME(G)>NAME, &POINT(N;cands)>PICK)",
+     "score": 35,
+     "spent": 12500
+    }
+   ],
+   "s_per_candidate": 0.005682,
+   "seq": 4232,
+   "sleep": 11,
+   "spent": 50000,
+   "wall_s": 284.08
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 228,
+     "perfect": false,
+     "program": "or(f1(x0), @IS(N,G)>YESNO(nthN(order, 1), x0))",
+     "score": 198,
+     "spent": 12500
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 312,
+     "perfect": false,
+     "program": "f1(x0)",
+     "score": 264,
+     "spent": 12500
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 216,
+     "perfect": false,
+     "program": "compose(&TWO_AFTER(G)>NAME, compose(&TWO_AFTER(G)>NAME, &LOOP(G)>YESNO))",
+     "score": 180,
+     "spent": 12500
+    },
+    {
+     "key": "OTHER_CASE(G;cands)>PICK",
+     "max_size_reached": 9,
+     "n": 36,
+     "perfect": false,
+     "program": "compose(&NAME(G)>NAME, &POINT(N;cands)>PICK)",
+     "score": 35,
+     "spent": 12500
+    }
+   ],
+   "s_per_candidate": 0.005615,
+   "seq": 4373,
+   "sleep": 12,
+   "spent": 50000,
+   "wall_s": 280.76
+  },
+  {
+   "cues": [],
+   "s_per_candidate": null,
+   "seq": 4514,
+   "sleep": 13,
+   "spent": 0,
+   "wall_s": 0.28
+  },
+  {
+   "cues": [],
+   "s_per_candidate": null,
+   "seq": 4527,
+   "sleep": 14,
+   "spent": 0,
+   "wall_s": 0.28
+  },
+  {
+   "cues": [],
+   "s_per_candidate": null,
+   "seq": 4540,
+   "sleep": 15,
+   "spent": 0,
+   "wall_s": 0.28
+  },
+  {
+   "cues": [
+    {
+     "key": "CONST(G)>NAME",
+     "max_size_reached": 3,
+     "n": 78,
+     "perfect": true,
+     "program": "nthN(order, 0)",
+     "score": 78,
+     "spent": 8
+    }
+   ],
+   "s_per_candidate": 0.036838,
+   "seq": 6467,
+   "sleep": 16,
+   "spent": 8,
+   "wall_s": 0.29
+  },
+  {
+   "cues": [
+    {
+     "key": "LOOP(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 228,
+     "perfect": false,
+     "program": "or(f1(x0), @IS(N,G)>YESNO(nthN(order, 1), x0))",
+     "score": 198,
+     "spent": 10000
+    },
+    {
+     "key": "VOWEL(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 312,
+     "perfect": false,
+     "program": "f1(x0)",
+     "score": 264,
+     "spent": 10000
+    },
+    {
+     "key": "MIRROR(G)>YESNO",
+     "max_size_reached": 9,
+     "n": 216,
+     "perfect": false,
+     "program": "compose(&TWO_AFTER(G)>NAME, compose(&TWO_AFTER(G)>NAME, &LOOP(G)>YESNO))",
+     "score": 180,
+     "spent": 10000
+    },
+    {
+     "key": "AFTER(G)>NAME",
+     "max_size_reached": 9,
+     "n": 78,
+     "perfect": false,
+     "program": "f2(x0)",
+     "score": 77,
+     "spent": 10000
+    },
+    {
+     "key": "OTHER_CASE(G;cands)>PICK",
+     "max_size_reached": 9,
+     "n": 36,
+     "perfect": false,
+     "program": "compose(&NAME(G)>NAME, &POINT(N;cands)>PICK)",
+     "score": 35,
+     "spent": 10000
+    }
+   ],
+   "s_per_candidate": 0.007123,
+   "seq": 6589,
+   "sleep": 17,
+   "spent": 50000,
+   "wall_s": 356.16
+  }
+ ],
+ "tape_sha256": "ce0d65d92ed99e0536e9a0fb943d7f0a0117dc3ff15305591da2372512439a48"
+}

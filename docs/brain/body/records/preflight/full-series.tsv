@@ -1,0 +1,6 @@
+at	load	active	asks_on_tape	asks_answered	backlog	moments	cells	scene_published	train_done	ended	brain_learned	ms_per_canvas_1min	rss_mb	sense_restarts	crash	thinks	sleeps	episodes	snapshots	births	rows_by_sense
+22:31:02	1.76	active	913	188	0	1870	759	357	True	False	300	24.5547	386.96	0	None	37	0	374	3	759	{"ask": 913, "body": 1, "ear": 627, "eye": 599, "hold": 1, "outcome": 17, "proposal": 1, "smell": 1, "touch": 16}
+22:31:12	1.96	active	1473	915	8	3200	918	575	True	False	300	30.3274	394.47	0	None	60	1	600	5	918	{"ask": 1473, "body": 1, "ear": 637, "eye": 866, "hold": 1, "outcome": 22, "proposal": 1, "sit": 1, "smell": 1, "touch": 21}
+22:31:22	2.12	active	1721	1495	8	4640	1362	854	True	False	300	32.0898	394.47	0	None	88	1	888	8	1362	{"ask": 1721, "body": 1, "ear": 642, "eye": 1111, "hold": 1, "outcome": 28, "proposal": 1, "sit": 1, "smell": 2, "touch": 26}
+22:31:32	2.02	active	1723	1723	0	5960	1676	1077	True	True	300	34.2729	452.95	0	None	111	2	1112	11	1676	{"ask": 1723, "body": 1, "ear": 652, "eye": 1119, "hold": 1, "outcome": 29, "proposal": 1, "sit": 1, "smell": 2, "touch": 27}
+22:31:42	1.95	active	1723	1723	0	5995	1695	1077	True	True	300	34.1851	453.88	0	None	111	2	1119	11	1695	{"ask": 1723, "body": 1, "ear": 654, "eye": 1121, "hold": 1, "outcome": 29, "proposal": 1, "sit": 1, "smell": 2, "touch": 27}

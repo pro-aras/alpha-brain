@@ -1,0 +1,78 @@
+the control: the re-run reproduces the gate's step-2 claims exactly: True
+per block: the room · L_K before → after (ΔL_K) · L_U after · the learnable rooms' mean L after:
+   b 1 R1 L_K  9.011 →  8.712 (-0.299) · L_U 14.580 · R̄ 12.940
+   b 2 R2 L_K  8.712 →  7.048 (-1.664) · L_U 14.604 · R̄ 13.149
+   b 3 R3 L_K  7.048 →  6.654 (-0.395) · L_U 16.147 · R̄ 13.868
+   b 4 N  L_K  6.654 →  6.114 (-0.540) · L_U 13.799 · R̄ 12.361
+   b 5 K  L_K  6.114 →  1.837 (-4.277) · L_U 16.321 · R̄ 13.827
+   b 6 U  L_K  1.837 →  3.795 (+1.958) · L_U 16.767 · R̄ 13.004
+   b 7 U  L_K  3.795 →  4.506 (+0.711) · L_U 16.904 · R̄ 13.254
+   b 8 K  L_K  4.506 →  2.277 (-2.228) · L_U 19.496 · R̄ 14.822
+   b 9 K  L_K  2.277 →  2.026 (-0.252) · L_U 22.767 · R̄ 17.035
+   b10 U  L_K  2.026 →  4.212 (+2.187) · L_U 13.251 · R̄ 11.051
+   b11 U  L_K  4.212 →  6.996 (+2.784) · L_U 11.327 · R̄  9.951
+   b12 R1 L_K  6.996 → 11.178 (+4.182) · L_U 10.715 · R̄  9.439
+   b13 K  L_K 11.178 →  3.550 (-7.629) · L_U 13.661 · R̄ 11.059
+   b14 N  L_K  3.550 →  5.431 (+1.881) · L_U 12.079 · R̄ 10.210
+   b15 K  L_K  5.431 →  3.142 (-2.289) · L_U 15.600 · R̄ 12.597
+   b16 N  L_K  3.142 →  6.086 (+2.944) · L_U 10.829 · R̄  9.383
+   b17 U  L_K  6.086 →  9.264 (+3.177) · L_U  9.321 · R̄  8.480
+   b18 N  L_K  9.264 →  9.927 (+0.664) · L_U  8.971 · R̄  8.285
+   b19 R3 L_K  9.927 →  8.159 (-1.768) · L_U  9.501 · R̄  8.190
+   b20 N  L_K  8.159 →  9.303 (+1.144) · L_U  9.212 · R̄  8.366
+   b21 R2 L_K  9.303 →  9.330 (+0.028) · L_U  8.630 · R̄  7.933
+   b22 N  L_K  9.330 → 11.629 (+2.299) · L_U  9.017 · R̄  8.300
+   b23 N  L_K 11.629 → 10.561 (-1.068) · L_U  9.739 · R̄  9.174
+   b24 U  L_K 10.561 →  9.496 (-1.065) · L_U  8.447 · R̄  8.283
+   b25 N  L_K  9.496 →  9.991 (+0.495) · L_U  8.184 · R̄  8.111
+   b26 N  L_K  9.991 → 10.241 (+0.250) · L_U  8.182 · R̄  8.037
+   b27 K  L_K 10.241 →  2.629 (-7.612) · L_U  9.468 · R̄  8.456
+   b28 U  L_K  2.629 →  3.599 (+0.970) · L_U  8.442 · R̄  7.883
+   b29 U  L_K  3.599 →  3.431 (-0.169) · L_U  7.803 · R̄  7.732
+   b30 R1 L_K  3.431 →  6.843 (+3.412) · L_U  8.076 · R̄  7.724
+   b31 N  L_K  6.843 →  6.800 (-0.043) · L_U  7.608 · R̄  7.357
+   b32 R1 L_K  6.800 →  7.432 (+0.632) · L_U  7.882 · R̄  7.336
+   b33 N  L_K  7.432 →  7.401 (-0.031) · L_U  7.619 · R̄  7.391
+   b34 R2 L_K  7.401 →  7.736 (+0.336) · L_U  7.399 · R̄  6.641
+   b35 U  L_K  7.736 →  7.909 (+0.173) · L_U  7.231 · R̄  6.824
+   b36 R1 L_K  7.909 → 10.037 (+2.128) · L_U  7.522 · R̄  6.926
+   b37 N  L_K 10.037 →  9.076 (-0.962) · L_U  7.244 · R̄  6.850
+   b38 K  L_K  9.076 →  2.090 (-6.986) · L_U  7.910 · R̄  7.021
+   b39 R1 L_K  2.090 →  3.067 (+0.978) · L_U  8.522 · R̄  7.177
+   b40 U  L_K  3.067 →  3.765 (+0.698) · L_U  7.785 · R̄  7.012
+   b41 U  L_K  3.765 →  3.098 (-0.667) · L_U  7.062 · R̄  6.948
+   b42 U  L_K  3.098 →  4.691 (+1.593) · L_U  6.771 · R̄  6.060
+   b43 R1 L_K  4.691 →  5.867 (+1.176) · L_U  7.225 · R̄  6.163
+   b44 R2 L_K  5.867 →  5.745 (-0.122) · L_U  7.019 · R̄  5.830
+   b45 N  L_K  5.745 →  4.973 (-0.772) · L_U  6.723 · R̄  5.876
+   b46 N  L_K  4.973 →  4.923 (-0.050) · L_U  6.664 · R̄  6.194
+   b47 R3 L_K  4.923 →  4.038 (-0.885) · L_U  6.639 · R̄  5.790
+   b48 R3 L_K  4.038 →  3.470 (-0.569) · L_U  6.633 · R̄  5.752
+   b49 N  L_K  3.470 →  4.187 (+0.718) · L_U  6.511 · R̄  5.945
+   b50 R1 L_K  4.187 →  4.923 (+0.736) · L_U  6.754 · R̄  5.988
+   b51 U  L_K  4.923 →  5.254 (+0.331) · L_U  6.380 · R̄  5.940
+   b52 K  L_K  5.254 →  1.598 (-3.656) · L_U  6.918 · R̄  6.033
+   b53 N  L_K  1.598 →  2.044 (+0.446) · L_U  6.146 · R̄  5.816
+   b54 R1 L_K  2.044 →  2.479 (+0.435) · L_U  6.347 · R̄  5.749
+   b55 R3 L_K  2.479 →  2.464 (-0.015) · L_U  6.497 · R̄  5.532
+   b56 U  L_K  2.464 →  2.873 (+0.409) · L_U  6.332 · R̄  5.837
+   b57 R1 L_K  2.873 →  3.416 (+0.543) · L_U  6.435 · R̄  5.837
+   b58 R3 L_K  3.416 →  3.115 (-0.301) · L_U  6.708 · R̄  5.594
+   b59 U  L_K  3.115 →  3.286 (+0.171) · L_U  5.773 · R̄  5.273
+   b60 R1 L_K  3.286 →  3.801 (+0.515) · L_U  6.222 · R̄  5.493
+K's visits: blocks [5, 8, 9, 13, 15, 27, 38, 52]; its own drops [4.277, 2.228, 0.252, 7.629, 2.289, 7.612, 6.986, 3.656]
+L_K's rise over the other rooms' blocks between K's visits (from after K's block to before the next): [(5, 7, 2.669), (8, 8, 0.0), (9, 12, 9.153), (13, 14, 1.881), (15, 26, 7.099), (27, 37, 6.446), (38, 51, 3.164), (52, 60, 2.204)]
+the K column of the interference — the mean ΔL_K per block in each room (n): R1 +1.313 (11) · R2 -0.356 (4) · R3 -0.655 (6) · N +0.461 (16) · K -4.366 (8) · U +0.884 (15)
+(i) under three readings of «L_K's level»: the gate's (mean over boundaries 21–60) 5.483 → bound 0.274 · L_K at 60 3.801 → bound 0.190 · the largest L_K in 21–60 11.629 → bound 0.581 — K's mean own drop 6.084
+after block 51 (U): L_K 5.254 (the table 5.254, |Δ| 0.0e+00)
+   L_K per word (K's window says «red star»): blue 0.68 big 0.67 cross 0.55 white 0.52 yellow 0.50 ring 0.50 red 0.34 triangle 0.32 circle 0.31 small 0.28 square 0.27 star 0.20 green 0.11
+   L_U per word: green 0.78 small 0.58 star 0.57 ring 0.56 cross 0.51 triangle 0.48 circle 0.47 yellow 0.46 red 0.45 big 0.42 white 0.39 blue 0.37 square 0.36
+   the learnable rooms' mean per word: big 0.62 green 0.55 small 0.52 cross 0.50 star 0.45 white 0.44 ring 0.44 yellow 0.43 red 0.43 circle 0.42 blue 0.41 square 0.37 triangle 0.35
+after block 52 (K): L_K 1.598 (the table 1.598, |Δ| 2.2e-16)
+   L_K per word (K's window says «red star»): ring 0.17 blue 0.16 cross 0.15 red 0.14 big 0.13 white 0.12 yellow 0.12 star 0.12 small 0.11 triangle 0.11 circle 0.10 square 0.10 green 0.07
+   L_U per word: green 0.80 ring 0.62 small 0.62 star 0.59 yellow 0.55 cross 0.53 triangle 0.51 circle 0.50 red 0.48 big 0.46 white 0.45 blue 0.41 square 0.40
+   the learnable rooms' mean per word: big 0.65 green 0.57 cross 0.54 small 0.50 yellow 0.47 white 0.44 ring 0.44 star 0.43 red 0.42 blue 0.42 circle 0.41 square 0.38 triangle 0.36
+after block 60 (R1): L_K 3.801 (the table 3.801, |Δ| 0.0e+00)
+   L_K per word (K's window says «red star»): ring 0.56 cross 0.46 big 0.36 white 0.35 blue 0.31 small 0.31 triangle 0.26 red 0.25 yellow 0.25 square 0.23 green 0.18 star 0.16 circle 0.12
+   L_U per word: ring 0.72 star 0.63 green 0.56 cross 0.54 triangle 0.48 small 0.46 red 0.45 yellow 0.45 circle 0.43 blue 0.42 big 0.41 white 0.36 square 0.31
+   the learnable rooms' mean per word: big 0.61 small 0.58 green 0.46 red 0.45 yellow 0.42 white 0.42 blue 0.42 star 0.39 cross 0.39 square 0.36 triangle 0.35 ring 0.34 circle 0.29

@@ -1,0 +1,10 @@
+2026-09-28 23:13:53 +0400 start
+cut exit 0
+identity exit 0
+blind exit 0
+2026-09-28 23:51:46 +0400 replays done
+disturbance exit 0
+disturbance-planted exit 1 (must be 1)
+grade-full exit 0
+same-brain exit 0
+2026-09-28 23:51:50 +0400 readers done

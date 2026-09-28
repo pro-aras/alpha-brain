@@ -1,0 +1,29 @@
+2026-09-28 22:12:31 +0400 replays start
+twin-20261101 exit 0
+twin-20261102 exit 0
+twin-20261103 exit 0
+identity-20261101 exit 0
+identity-20261102 exit 0
+identity-20261103 exit 0
+null-20261102 exit 0
+blind-20261102 exit 0
+2026-09-28 22:30:06 +0400 replays done (fail=0)
+parity-20261101 exit 0
+parity-planted-20261101 exit 1 (must be 1)
+disturbance-20261101 exit 0
+grade-twin-20261101 exit 0
+grade-brain-20261101 exit 0
+parity-20261102 exit 0
+parity-planted-20261102 exit 1 (must be 1)
+disturbance-20261102 exit 0
+grade-twin-20261102 exit 0
+grade-brain-20261102 exit 0
+parity-20261103 exit 0
+parity-planted-20261103 exit 1 (must be 1)
+disturbance-20261103 exit 0
+grade-twin-20261103 exit 0
+grade-brain-20261103 exit 0
+twin-vs-blind-20261102 exit 0
+null-identity-20261102 exit 0
+grade-null-20261102 exit 0
+2026-09-28 22:30:22 +0400 readers done

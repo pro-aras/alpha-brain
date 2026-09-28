@@ -1,0 +1,16 @@
+PARITY · the life (/data/dev/genome-lives/brain-lean-20261103/journal) against rung 1 (/data/dev/brain-runs/organ/gate-alone-merged-f17a596/20261103/20261103/gate-answers.json) · verdict EQUAL
+  the gate answered 2221 · found in the life 2221 · equal 2221 · items answered twice in the life 0 (a later sitting's `why` repeats, not counted: 14) · answers in the life by «brain» 2984
+  mark            gate   found   equal  first difference
+  DECLINE           48      48      48  —
+  M1               398     398     398  —
+  M2a              400     400     400  —
+  M2b               56      56      56  —
+  M3                60      60      60  —
+  M6                42      42      42  —
+  NAME             163     163     163  —
+  SPEAK             96      96      96  —
+  SPEAK2            60      60      60  —
+  older/M1         396     396     396  —
+  older/M2a        400     400     400  —
+  older/M3          60      60      60  —
+  older/M6          42      42      42  —

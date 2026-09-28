@@ -1,0 +1,26 @@
+{
+ "answers_sha256": "e694bcfe32ac62de2dadd4362424adaa056f0682854f429a270c5469f75e436c",
+ "learned_sha256": "052296cef564da08fba344b4517b62e1ee29cae78c923f4a35f5857481c609fb",
+ "note": "the LAW brain on test_brain_organ's toy life (120 scenes, CFG) BEFORE F-M6, brain-organ bc45156 (edit: Claude (Opus 5.5, F-M6 builder))",
+ "state_hash": "e3abcb6ae4ef9f879c257f68e919c8407664a9b2bb889c9005dda6f5e3a02c0d",
+ "summary": {
+  "calibrated_at": 120,
+  "calibrations": 3,
+  "episodes": 164,
+  "learned": 120,
+  "mature": 5,
+  "tau_point": -1.3323102304303478,
+  "types": [
+   [
+    "sa",
+    "sb",
+    "sc"
+   ],
+   [
+    "cg",
+    "cr"
+   ]
+  ],
+  "words": 5
+ }
+}
