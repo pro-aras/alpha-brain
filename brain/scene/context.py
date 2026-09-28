@@ -7,7 +7,8 @@ ce41448, sha 30121082…, final) §1:
   every parameter by the SAME delta rule from the same error e_w and responsibilities R_{t,w}:
     ΔV_w  = lr · e_w · g_r · Σ_t R_{t,w} z_t          — the chain rule's factor g_r, applied ONCE, here and nowhere else;
     Δb_w  = lr · e_w · Σ_t R_{t,w}                    — S1b-1's step, unchanged;
-    Δg_r  = lr_g · Σ_w e_w · Σ_t R_{t,w} (v_w · z_t)  — lr_g = 0.001 (declared by the PREREG);
+    Δg_r  = lr_g · Σ_w e_w · Σ_t R_{t,w} (v_w · z_t)  — lr_g = 0.005 (PREREG-TMEM5 AMENDMENT 2 §2.3; the PREREG's 0.001 failed the
+                                                          fixed-point toy on N's budget);
     Δc_{r,w} = lr · e_w · Σ_t R_{t,w}.
 The episodic write, the prototypes and the stores read the same responsibilities (now from the context logits). With the
 context FROZEN (g ≡ 1, c ≡ 0, neither learned) every number is S1c's A-RW's, bit for bit: x · 1.0 and x + 0.0 are exact — the
@@ -27,7 +28,10 @@ import numpy as np
 from .learners import LR_S1B1, RWLearner, sigmoid
 from .pickers import P_CLIP
 
-LR_G = 0.001
+# edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 18:45 +0400 — PREREG-TMEM5 AMENDMENT 2 (brain-design-3 3c28401, sha 8638072d…, final) §2.3:
+# lr_g = 0.005, the smallest value of the gate's grid whose toy passes both clauses read with the MEMORY bar's own statistic at
+# all three seeds (tools/scene/diag/tmem5_toy_lr_grid.out); THE FIRST GATE stopped at 0.001 (g_B 0.31 / 0.32 / 0.24 after 500).
+LR_G = 0.005
 
 
 class CtxLearner(RWLearner):
