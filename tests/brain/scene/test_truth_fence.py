@@ -17,6 +17,8 @@ ALLOW = {
     "slda.py": {"__future__", "collections", "hashlib", "json", "typing", "numpy"},
     "eye.py": {"__future__", "dataclasses", "typing", "numpy", "genome", "genome.gaze", "genome.machinery",
                "brain.world", "brain.world.organs", "brain.world.build"},
+    # edit: Claude (Opus 5.5, T-MEM-2 builder), 2026-09-28 17:30 +0400 — PREREG-TMEM2: the HEALTH row is kept WITHOUT the world
+    "health.py": {"__future__", "math", "typing", "numpy", "brain.scene.learners"},
 }
 FORBIDDEN_WORDS = ("truth", "fix_thing")
 
