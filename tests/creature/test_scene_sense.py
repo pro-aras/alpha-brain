@@ -102,6 +102,52 @@ class Determinism(unittest.TestCase):
         self.assertGreater(moved, 0, "a derangement (k=1) must move at least one canvas's words in 50 scenes")
 
 
+class M5(unittest.TestCase):
+    """PREREG-BRAIN-IN-BODY.md §3's M5 row: one item per FRESH `test`-split scene, its phrase never true of
+    any thing in its own scene (structurally — two distinct words of the SAME type can never both hold of
+    one thing), «dax» never used, and every kind reachable."""
+
+    def test_400_items_one_per_fresh_test_row_none_true_of_any_thing_no_dax(self):
+        moments = S.plan(_cfg(train=1, sitting=("fresh",)))
+        m5 = []
+        for m in moments:
+            if m["truth"] is None:
+                continue
+            t = m["truth"]()
+            if t.get("kind") == "sitting" and t.get("set") == "fresh" and t.get("split") == "test":
+                m5 += [it for it in t["items"] if it["mark"] == "M5"]
+        self.assertEqual(len(m5), 400)
+        by_kind = {}
+        false_count = 0
+        for it in m5:
+            by_kind[it["kind_of_pair"]] = by_kind.get(it["kind_of_pair"], 0) + 1
+            self.assertNotIn(W.DAX_WORD, it["phrase"])
+            self.assertEqual(len(set(it["phrase"])), 2, "the pair must be two DISTINCT words")
+        # verify against the scene's own things (word_true_of) that no M5 phrase is true of anything in view
+        for m in moments:
+            if m["truth"] is None:
+                continue
+            t = m["truth"]()
+            if not (t.get("kind") == "sitting" and t.get("set") == "fresh" and t.get("split") == "test"):
+                continue
+            things = [W.Thing(x["shape"], x["colour"], x["size"], x["top"], x["left"]) for x in t["scene_dict"]["things"]]
+            for it in [i for i in t["items"] if i["mark"] == "M5"]:
+                if any(W.phrase_true_of(it["phrase"], th) for th in things):
+                    false_count += 1
+        print("M5 by kind:", by_kind, "phrases true of some thing (must be 0):", false_count)
+        self.assertEqual(false_count, 0)
+        self.assertEqual(set(by_kind), {"colour", "shape", "size"})
+
+    def test_s1b1_set_carries_no_m5(self):
+        moments = S.plan(_cfg(train=1, sitting=("s1b1",)))
+        for m in moments:
+            if m["truth"] is None:
+                continue
+            t = m["truth"]()
+            if t.get("kind") == "sitting":
+                self.assertFalse(any(it["mark"] == "M5" for it in t["items"]))
+
+
 class Refusals(unittest.TestCase):
     def test_seed_outside_world_seeds_is_refused_by_name(self):
         with self.assertRaises(ValueError) as cm:

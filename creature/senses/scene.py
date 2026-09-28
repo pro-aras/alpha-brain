@@ -48,13 +48,11 @@ DECLARED READINGS (raised in HANDBACK-B, none fixed by INTERFACE-BRAIN-ORGAN.md 
   - `why`'s `moment` id: `sc<ws>q-<set>-why-<word>` (INTERFACE names the payload/meta shape but not the id;
     every published word is <= 8 letters a-z, `genome.world.encode_word`'s own alphabet, so it is always a
     safe moment-string component).
-  - M5 (no PREREG file for it exists on this worktree — RAISED; built exactly to the builder brief's own
-    spec): kind cycles `("colour", "shape", "size")` by `row_index % 3`; the pair is drawn without
-    replacement from that kind's names (`substream(ts, f"m5-item:{item_id}")`); "every third item" is read
-    as `row_index % 3 == 2` — which, by the cycle above, is always the "size" kind (the two conditions
-    coincide; noted, not hidden) — its extra word is drawn from one of the OTHER two types (uniform), one
-    word of that type; the whole phrase is emitted in the fixed order (size, colour, shape). Since
-    `W.SIZE_NAMES` has exactly two members, every size-kind pair is `{"big", "small"}` in drawn order.
+  - M5 is now LAW, not a builder declaration: `docs/brain/body/PREREG-BRAIN-IN-BODY.md` §3's M5 row (signed
+    2026-09-28 20:38 +0400) supersedes the seat's earlier per-message spec this module first carried. One
+    item per FRESH regular `test`-split scene (400 per seed, none on the older "s1b1" set); the TYPE drawn
+    UNIFORMLY over the three (colour, shape, size), then two DISTINCT words of that type drawn UNIFORMLY (a
+    uniform order — no fixed "parent order"); NO third word; «dax» never used.
 
 A pure SENSE (G4-1's writer sweep): writes only the tape (through `publish`), `root/truth/scene/*.json` and
 its own cursor `root/scene/SCENE-CURSOR` (written AFTER a moment's rows are durable — #230's cursor law, the
@@ -92,7 +90,6 @@ _TEST_SPLITS: Tuple[str, ...] = ("test", "m2b", "m6", "m3", "speak", "decline")
 _FRESH_EXTRA: Tuple[str, ...] = ("speak2",)
 
 _M5_KINDS: Tuple[str, ...] = ("colour", "shape", "size")
-_M5_ORDER: Tuple[str, ...] = ("size", "colour", "shape")
 
 
 def _m5_words(kind: str) -> Tuple[str, ...]:
@@ -141,25 +138,21 @@ def _name_items(truth_rows: Sequence[Dict[str, object]]) -> List[Dict[str, objec
 
 
 def _m5_items(truth_rows: Sequence[Dict[str, object]], ts: int) -> List[Dict[str, object]]:
+    """PREREG-BRAIN-IN-BODY.md §3, row M5 (signed 2026-09-28 20:38 +0400 — LAW, supersedes the earlier draft
+    this module carried): one item per FRESH regular `test`-split scene; the TYPE drawn UNIFORMLY over the
+    three (colour, shape, size); two DISTINCT words of that type drawn UNIFORMLY (in a uniform order — no
+    fixed "parent order"); NO third word; «dax» never used (`_m5_words("shape")` is `W.SHAPES`, the trained
+    six, never `DAX_WORD`)."""
     items = []
     for row in truth_rows:
         r = int(row["row"])
         item_id = f"M5:{row['item_id']}"
-        kind = _M5_KINDS[r % 3]
         rng = substream(ts, f"m5-item:{item_id}")
+        kind = _M5_KINDS[int(rng.integers(len(_M5_KINDS)))]
         words = _m5_words(kind)
         idx = rng.choice(len(words), size=2, replace=False)
         pair = [words[int(i)] for i in idx]
-        by_type: Dict[str, List[str]] = {"size": [], "colour": [], "shape": []}
-        by_type[kind] = list(pair)
-        if r % 3 == 2:      # DECLARED: "every third item" == the size-kind item, by the cycle above
-            other = [k for k in _M5_KINDS if k != kind]
-            extra_kind = other[int(rng.integers(len(other)))]
-            extra_words = _m5_words(extra_kind)
-            extra = extra_words[int(rng.integers(len(extra_words)))]
-            by_type[extra_kind].append(extra)
-        phrase = [w for t in _M5_ORDER for w in by_type[t]]
-        items.append({"item_id": item_id, "mark": "M5", "row": r, "phrase": phrase, "kind_of_pair": kind,
+        items.append({"item_id": item_id, "mark": "M5", "row": r, "phrase": list(pair), "kind_of_pair": kind,
                       "pair": pair, "n_things": len(row["things"])})
     return items
 
