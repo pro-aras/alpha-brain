@@ -6,7 +6,7 @@
 
 ## In plain words
 1. **There is now ONE brain, and it is inside the body.** It is declared by one line of the genome (`BRAIN …`), grown inside the creature's mind beside its other organs, fed by the creature's own eye and ear, and it answers through the tape. Before tonight the code sat on about fifteen branches and no life had ever run with a brain.
-2. **It does NOT pass all six of your tests.** It passes tests 1, 3, 4a and 5 at every world seed. It fails half of test 2 («I don't know» about a shape it was never taught). Test 6 (a new word from one meeting) passes at one seed, fails at one, and cannot be graded at one. The second half of test 4 (stating a readable rule) is not built.
+2. **It does NOT pass all six of your tests.** It passes tests 1, 3, 4a and 5 at every world seed. It fails half of test 2 («I don't know» about a shape it was never taught). Test 6 (a new word from one meeting) passed at one seed and failed at one; its cause was found and repaired tonight, and with the repair it passes at both seeds where the eye saw the meeting (0.932 and 0.804 on scenes never used before). At the third seed the eye never looked at the new thing, and nothing can be graded there. The second half of test 4 (stating a readable rule) is not built.
 3. **What it scored in the body equals what it scored on the bench, answer by answer.** Nothing was gained or lost by moving it into the creature. That was the prediction, written before any run.
 4. **One finding about the BODY, met on the way:** the creature's own word road keeps only the LAST word of what it hears. Its cells never learned a colour or a size word. So the old organs cannot even be asked most questions.
 5. **The brain does not disturb the organs.** With the brain's own rows set aside, every other row of the mind is identical with and without it.
@@ -78,6 +78,24 @@
 - **The price** (the mind's time per canvas, a one-minute mean, from each life's `SERIES.tsv`). The full organism: 28 ms at birth, 205 ms by the end of training, up to 803 ms in the sitting. The lean life at the same seed: 27 ms, 82 ms, up to 275 ms. In the sitting every answer hashes the organism before and after (the read-only law); at 8,400 cells that is the cost.
 - The tape had no tail at the close (38,173 rows on the tape, 38,173 lived), so the cut changed nothing here. The pre-flight read the same.
 - The full organism's pre-flight at 20261101 (300 scenes) passed the same checks: 4,470 rows identical, no disturbance, 1,721 of 1,721 answers equal to the lean pre-flight's.
+
+## The fix for test 6 (F-M6) — found, built, gated, adopted
+**The cause** (`DIAG-M6.md`). A word met fewer than 3 times answered by an inside / outside test, not by a distance. When no thing or several things fell inside, the item's tie generator chose: a coin toss. And one meeting stores the thing's colour, size and place with its shape.
+
+**The fix, one difference** (`young 3 nearest`, AMENDMENT 1 §2). A young word points at the thing NEAREST its stored meeting, measured with the metric the brain's own reader learned from its shape words. Nothing else changes: the scores, the «none» thresholds, the learning and every mature word are the old rule's.
+
+**The gate, on test scenes never drawn before the amendment was signed** (test seeds 2026150x, 84 items a seed; `records/fm6/`):
+| clause | 20261102 | 20261103 | verdict |
+|---|---|---|---|
+| IDENTITY: every answer that is not a pointing on one young word is equal to the old rule's | 1,280 + 858 + 1,277 asks, all equal | 1,281 + 856 + 1,280, all equal | **PASS** |
+| test 6, where the eye covered the thing | old rule 0.746 → **0.932** (n 59) | old rule 0.589 → **0.804** (n 56) | **PASS** (bar 0.70, n ≥ 30) |
+| above the old rule, pooled | 0.670 → 0.870 on 115 items; 27 items moved to right, 4 to wrong; exact one-sided sign test p = 1.7e-05 | | **PASS** (bar: gap ≥ 0.10, p < 0.001) |
+| 20261101 | NOT GRADABLE: the eye never saw the meeting. The fix points at the thing the word was written to (the square): 0.018 on the moon | | as signed |
+
+- **The controls.** The fix made to act on mature words too → IDENTITY fails (88 / 90 / 77 answers moved). The readings on the used sets reproduce the diagnosis exactly (21 → 26 of 27; 14 → 22 of 29). Rung 1 was run again on the fix's commit under the old rule: 2,209 / 2,222 / 2,221 equal. The caches were redrawn in a fresh root and are array-identical to the scored ones (42 compared, 0 differing, a planted bit caught).
+- **The fixed brain in the body** (`brain-lean-nearest-20261102`, the real unit, commit 5e0c329): ended clean in 862 s, 0 restarts. **PARITY with the fixed brain's bench answers: 2,222 of 2,222.** Against the old rule's answers only the 84 «dax» pointings differ; every other mark is equal, answer by answer.
+- **Its own test-6 reading, 0.929 (n 56), is NOT evidence for the fix.** Those are the scenes the fix was diagnosed on. The evidence is the gate above.
+- **What the fix does not do.** It cannot help a meeting the eye never saw. It does not touch «I don't know».
 
 ## The failing parts, after tonight
 | part | where it stands | its cause, from the record | what is dated |
