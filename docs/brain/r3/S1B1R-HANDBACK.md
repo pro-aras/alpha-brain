@@ -113,6 +113,7 @@ per seed: M1 PASS/PASS/PASS · NULL-M1 PASS/PASS/PASS · NULL-M3 PASS/PASS/PASS 
   - The oracle's tree is weaker too (0.875 / 0.625 / 0.500).
   - Arrow, wave, cup and key read 0.875–1.000.
   - The one-difference readings put the limit on the store's attributions (T5's own rule): P-ORACLE-RW 0.896 / 0.875 / 0.833. The ear's types are not the limit (R-TT = the law), and the READER's form is not either.
+  - A reading beside it, which T5's three-way rule does not explain: the exact-attribution P-ORACLE-RW (0.896 / 0.875 / 0.833) still sits 0.083 / 0.063 / 0.063 below P-ORACLE's typed LDA distance band (0.979 / 0.938 / 0.896) on the same items. Exact attributions through the READER do not close the whole gap to the oracle. This is not a re-grade.
 
 ## 4 · THE FIRST GATE, as it printed (`/data/dev/brain-runs/scene-s1b1r/gate/gate.txt`; the unit `scene-s1b1r-gate` from code-33347e8)
 
