@@ -319,3 +319,112 @@ def make_picker(name: str, rooms: Sequence[str], seed: int, gain_fn=None, prefix
             raise PickerError("the ORACLE needs its gain callback")
         return OraclePicker(rooms, seed, gain_fn)
     raise PickerError(f"no such picker: {name!r}")
+
+
+# ================================================================================================ S1c-2 (PREREG-S1C2 §2)
+# edit: Claude (Opus 5.5, S1c-2 builder), 2026-09-28 16:15 +0400 — PREREG-S1C2 (genome-wt-brain3 141a8cd, sha 5e4585c1…) §2: PROGRESS-NET and
+# its NULL (the credit of room k's reading to π(k)), PROGRESS-UCB (a reading). S1c's classes above are unchanged byte for byte;
+# the new ones read the PRE readings the life hands them (`wants_readings`).
+class NetPicker(_Picker):
+    """PROGRESS-NET: net_k = PRE_{v_k}(k) − PRE_now(k) — room k's loss just before its last visit minus its loss NOW (the
+    latest PRE reading), re-read at every boundary (so it refreshes without a visit and cannot freeze); no smoothing; a room
+    never visited has no estimate and is picked first (the least recently visited among such rooms, then by name); ε and the
+    tie rule are PROGRESS's. With `credit` (the NULL's π) room k's reading is credited to credit[k]."""
+    name = "PROGRESS-NET"
+    uses_eps = True
+    wants_readings = True
+
+    def __init__(self, rooms: Sequence[str], seed: int, credit: Optional[Dict[str, str]] = None):
+        super().__init__(rooms, seed)
+        self.credit = dict(credit) if credit is not None else {r: r for r in self.rooms}
+        self.pre_at_visit: Dict[str, float] = {}
+        self.pre_now: Dict[str, float] = {}
+
+    def net(self) -> Dict[str, Optional[float]]:
+        return {r: (self.pre_at_visit[r] - self.pre_now[r] if r in self.pre_at_visit and r in self.pre_now else None)
+                for r in self.rooms}
+
+    def estimates(self) -> Dict[str, Optional[float]]:
+        n = self.net()
+        return {self.credit[r]: n[r] for r in self.rooms}
+
+    def observe(self, block: int, room: str, drop: float, drift: float, pre_before: Optional[Dict[str, float]] = None,
+                pre_after: Optional[Dict[str, float]] = None) -> Optional[str]:
+        if pre_before is None or pre_after is None:
+            raise PickerError("PROGRESS-NET reads the PRE readings: the life must hand them over")
+        self.pre_at_visit[room] = float(pre_before[room])
+        self.pre_now = {r: float(pre_after[r]) for r in self.rooms}
+        return self.credit[room]
+
+    def pick(self, block: int, ctx: Context) -> Tuple[str, str]:
+        e = self._explore(block)
+        if e is not None:
+            return e
+        est = self.estimates()
+        undefined = [r for r in self.rooms if est[r] is None]
+        if undefined:
+            return min(undefined, key=lambda r: (ctx.last_visit.get(r, 0), r)), "policy"
+        return argmax_lrv(est, ctx.last_visit), "policy"
+
+
+class NullNetPicker(NetPicker):
+    """NULL-NET: PROGRESS-NET with the credit of every bracket misassigned (room k's readings credited to π(k), π the seed's
+    derangement from `null:seed`) — blind to WHERE only. The pin RAISES if a credit would land on the room that produced it."""
+    name = "NULL-NET"
+
+    def __init__(self, rooms: Sequence[str], seed: int, credit: Optional[Dict[str, str]] = None, allow_identity: bool = False):
+        pi = dict(credit) if credit is not None else null_derangement(seed, rooms)
+        self.allow_identity = bool(allow_identity)
+        if not self.allow_identity and not is_derangement(pi):
+            raise PickerError(f"the null's credit map is not a derangement: {pi}")
+        super().__init__(rooms, seed, credit=pi)
+        self.pi = self.credit
+
+    def observe(self, block: int, room: str, drop: float, drift: float, pre_before: Optional[Dict[str, float]] = None,
+                pre_after: Optional[Dict[str, float]] = None) -> Optional[str]:
+        if not self.allow_identity and self.pi[room] == room:
+            raise PickerError(f"block {block}: the null's credit would land on the room that produced it ({room})")
+        return super().observe(block, room, drop, drift, pre_before=pre_before, pre_after=pre_after)
+
+
+class UCBPicker(ProgressPicker):
+    """PROGRESS-UCB (a READING): score_k = est_k + c · √(2 ln t / n_k); est_k S1c's PROGRESS estimate (the mean of the last 2
+    drops), c the running mean |drop| over every bracketed drop so far, n_k the room's visits so far, t the policy blocks so
+    far INCLUDING the one being picked (declared: t = block − the round-robin's length ≥ 1, so ln t is defined at the first
+    policy pick). A room unvisited for long gains score without a visit."""
+    name = "PROGRESS-UCB"
+
+    def __init__(self, rooms: Sequence[str], seed: int, n_round_robin: int):
+        super().__init__(rooms, seed)
+        self.n_rr = int(n_round_robin)
+        self.visits: Dict[str, int] = {r: 0 for r in self.rooms}
+        self.abs_drops: List[float] = []
+        self.last_pick: Dict[str, object] = {}
+
+    def c(self) -> float:
+        return float(np.mean(self.abs_drops)) if self.abs_drops else 0.0
+
+    def observe(self, block: int, room: str, drop: float, drift: float, **kw) -> Optional[str]:
+        self.visits[room] += 1
+        self.abs_drops.append(abs(float(drop)))
+        return super().observe(block, room, drop, drift)
+
+    def scores(self, block: int) -> Tuple[Dict[str, float], Dict[str, float]]:
+        t = int(block) - self.n_rr
+        if t < 1 or any(self.visits[r] < 1 for r in self.rooms):
+            raise PickerError(f"UCB at block {block}: t = {t}, visits {self.visits} — the bonus is undefined")
+        est = super().estimates()
+        c = self.c()
+        bonus = {r: c * math.sqrt(2.0 * math.log(t) / self.visits[r]) for r in self.rooms}
+        return {r: float(est[r]) + bonus[r] for r in self.rooms}, bonus
+
+    def pick(self, block: int, ctx: Context) -> Tuple[str, str]:
+        e = self._explore(block)
+        if e is not None:
+            self.last_pick = {}
+            return e
+        score, bonus = self.scores(block)
+        room = argmax_lrv(score, ctx.last_visit)
+        self.last_pick = {"t": int(block) - self.n_rr, "c": self.c(), "score": score, "bonus": bonus,
+                          "est": super().estimates(), "room": room}
+        return room, "policy"
