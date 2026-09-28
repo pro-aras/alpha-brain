@@ -43,6 +43,26 @@ class SceneCacheError(Exception):
     pass
 
 
+_REPO = Path(__file__).resolve().parents[2]
+# the code that DRAWS a cache: a cache is read only by the same bytes of these files (check_code)
+WORLD_CODE = ("brain/scene/world.py", "brain/scene/eye.py", "brain/scene/cache.py", "brain/world/seeds.py",
+              "brain/world/build.py", "brain/world/organs.py", "brain/glance_cache.py", "genome/world.py", "genome/gaze.py",
+              "genome/machinery.py", "genome/eye.py", "genome/retina_fast.py", "genome/ALPHA4.genome")
+
+
+def code_shas() -> Dict[str, str]:
+    return {rel: sha256_file(_REPO / rel) for rel in WORLD_CODE}
+
+
+def check_code(d: Path) -> None:
+    """Refuse a cache drawn by other bytes of the world / eye / cache code than the ones running now."""
+    sh = json.loads((Path(d) / "scene_header.json").read_text())
+    now = code_shas()
+    bad = [k for k, v in sh.get("code", {}).items() if now.get(k) != v] + [k for k in now if k not in sh.get("code", {})]
+    if bad:
+        raise SceneCacheError(f"{d} was drawn by other code: {bad} — rebuild it (a cache is read only by its own code)")
+
+
 def cache_dir(root: Path, world_seed: Optional[int], split: str) -> Path:
     """<root>/<world seed>/cache/<split> for a world seed's train/test/m2b/m6; <root>/toy/cache/<split>; <root>/stage/cache/stage."""
     if split in ("toy-train", "toy-test"):
@@ -92,9 +112,7 @@ def build(split: str, world_seed: Optional[int], out_dir: Path, limit: Optional[
     if out_dir.exists():
         raise SceneCacheError(f"{out_dir} exists — a cache is written once (remove it by hand to rebuild)")
     seed = split_seed(split, world_seed)
-    scenes = W.scenes_for(split, seed)
-    if limit is not None:
-        scenes = scenes[:limit]
+    scenes = W.scenes_for(split, seed, limit)
     tmp = out_dir.with_name(out_dir.name + ".building")
     if tmp.exists():
         shutil.rmtree(tmp)
@@ -140,7 +158,7 @@ def build(split: str, world_seed: Optional[int], out_dir: Path, limit: Optional[
             f.write(_canonical(r) + "\n")
     checked = _self_check(scenes, tmp, seed, split, recheck_n, spec, gcfg, colour)
     sh = {"prereg_sha256": PREREG_SHA256, "split": split, "seed": seed, "world_seed": world_seed, "rows": n,
-          "limit": limit, "heldout": [list(p) for p in W.HELDOUT], "interpreter": versions,
+          "limit": limit, "heldout": [list(p) for p in W.HELDOUT], "interpreter": versions, "code": code_shas(),
           "glance_header": header, "self_check_rows": checked,
           "files": {p.name: sha256_file(p) for p in sorted(tmp.iterdir()) if p.is_file()}}
     (tmp / "scene_header.json").write_text(json.dumps(sh, sort_keys=True, indent=2) + "\n")
@@ -189,6 +207,7 @@ class ScenePercepts:
         self.forced_centroid = np.asarray(fc["centroid"])
         self.hear = [json.loads(l) for l in (self.dir / "hear.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
         self.header = json.loads((self.dir / "scene_header.json").read_text())
+        check_code(self.dir)
         if len(self.hear) != len(self.glances) or self.fix.shape[0] != len(self.glances):
             raise SceneCacheError(f"{self.dir}: sidecars disagree with the glance cache on the row count")
         starts = np.searchsorted(self.forced_row, np.arange(len(self.glances) + 1))

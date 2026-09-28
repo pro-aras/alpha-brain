@@ -348,6 +348,15 @@ class RWLearner:
                 out.append(w)
         return out
 
+    def name_forced(self, raw_thing: np.ndarray, type_words: Sequence[str]) -> Optional[str]:
+        """A READING (never a bar): the forced argmax of p_w(t) over the words of one type the grader names."""
+        cand = [w for w in type_words if w in self.index]
+        if not cand:
+            return None
+        Z = self.stats.standardise(np.atleast_2d(raw_thing))
+        lp = self.logp_answer(Z, getattr(self, "_bands_cache", None))[0]
+        return cand[int(np.argmax([lp[self.index[w]] for w in cand]))]
+
     def summary(self) -> Dict[str, object]:
         return {"words": list(self.words), "meetings": [int(m) for m in self.meetings], "scenes": self.scenes,
                 "skipped_said": self.skipped_said, "lr": self.lr, "oracle": self.oracle,

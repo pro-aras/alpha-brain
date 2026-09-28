@@ -103,3 +103,16 @@ class TestDisjoint(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCodeCheck(unittest.TestCase):
+    def test_a_cache_drawn_by_other_code_is_refused(self) -> None:
+        with tempfile.TemporaryDirectory(dir=str(TMP), prefix="scene-codecheck-") as td:
+            d = Path(td) / "m6"
+            cache.build("m6", 20261101, d, limit=2, recheck_n=1)
+            cache.ScenePercepts(d)                                   # its own code: read
+            sh = json.loads((d / "scene_header.json").read_text())
+            sh["code"]["brain/scene/world.py"] = "0" * 64            # the planted offender: another world.py
+            (d / "scene_header.json").write_text(json.dumps(sh))
+            with self.assertRaises(cache.SceneCacheError):
+                cache.ScenePercepts(d)

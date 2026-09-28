@@ -297,23 +297,22 @@ def stage_scene(index: int) -> Scene:
     return Scene("stage", index, STAGE_SEED, things, (), None, None)
 
 
-def scenes_for(split: str, seed: int) -> List[Scene]:
-    """Every scene of one cache: train (world seed) · test / m2b / m6 (test seed) · toy-train / toy-test · stage."""
-    if split == "train":
-        return train_stream(seed)
-    if split == "test":
-        return [test_scene(seed, i) for i in range(N_TEST)]
-    if split == "m2b":
-        return [m2b_scene(seed, i) for i in range((len(M2B_SHAPES) + 1) * M2B_PER_SHAPE)]
-    if split == "m6":
-        return [m6_scene(seed, i) for i in range(M6_TWO + M6_THREE)]
-    if split == "toy-train":
-        return [toy_train_scene(i) for i in range(TOY_TRAIN_N)]
-    if split == "toy-test":
-        return [toy_test_scene(i) for i in range(TOY_TEST_N)]
-    if split == "stage":
-        return [stage_scene(i) for i in range(STAGE_N)]
-    raise WorldError(f"no such split: {split!r}")
+def split_size(split: str) -> int:
+    sizes = {"train": N_TRAIN, "test": N_TEST, "m2b": (len(M2B_SHAPES) + 1) * M2B_PER_SHAPE, "m6": M6_TWO + M6_THREE,
+             "toy-train": TOY_TRAIN_N, "toy-test": TOY_TEST_N, "stage": STAGE_N}
+    if split not in sizes:
+        raise WorldError(f"no such split: {split!r}")
+    return sizes[split]
+
+
+def scenes_for(split: str, seed: int, limit: Optional[int] = None) -> List[Scene]:
+    """Every scene of one cache (or its first `limit`): train (world seed) · test / m2b / m6 (test seed) · toy-train /
+    toy-test · stage. Each scene is a function of (seed, index) alone, so a prefix is the full stream's prefix."""
+    n = split_size(split) if limit is None else min(int(limit), split_size(split))
+    make = {"train": lambda i: train_scene(seed, i), "test": lambda i: test_scene(seed, i),
+            "m2b": lambda i: m2b_scene(seed, i), "m6": lambda i: m6_scene(seed, i),
+            "toy-train": toy_train_scene, "toy-test": toy_test_scene, "stage": stage_scene}[split]
+    return [make(i) for i in range(n)]
 
 
 # ------------------------------------------------------------------------------------------------ pixels
