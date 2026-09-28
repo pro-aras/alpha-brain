@@ -568,8 +568,10 @@ def pair(rows_a: Sequence[Dict[str, object]], rows_b: Sequence[Dict[str, object]
     c = sum(1 for x, y in both if y["correct"] and not x["correct"])
     a = float(np.mean([x["correct"] for x, _ in both])) if both else None
     t = float(np.mean([y["correct"] for _, y in both])) if both else None
+    own = (float(np.mean([not y.get("forced", False) for _, y in both])) if both else None)
     return {"n": len(both), "first": a, "second": t, "diff": (a - t if both else None), "first_only": b, "second_only": c,
-            "p": sign_test(b, c), "second_answered": (float(np.mean([y["answered"] for _, y in both])) if both else None)}
+            "p": sign_test(b, c), "second_answered": (float(np.mean([y["answered"] for _, y in both])) if both else None),
+            "second_own_pointing": own, "smallest_passable_gap": (10.0 / len(both) if both else None)}
 
 
 # ------------------------------------------------------------------------------------------------ one life's grade
@@ -591,6 +593,11 @@ def grade(root: Path, journal: Optional[Path], scored: Path, label: str, genome:
         per_set[tset] = {"n_items": {m: len(v) for m, v in sc.items.items()}, "marks": g, "forced": A.get("forced", {})}
         m6_rows[tset] = pointing_rows(sc, A, "M6")
         item_rows[tset] = {m: pointing_rows(sc, A, m) for m in ("M1", "M3", "M6")}
+        # AMENDMENT 1 §3 rule 1 (edit: Claude (Fable 5.1, the seat), 2026-09-28 22:08 +0400): which pointings were the grader's own uniform
+        # draws (a `point: None` read forced) — printed with every pair, so a PASS cannot hide a twin that never pointed
+        for rows_ in item_rows[tset].values():
+            for r_ in rows_:
+                r_["forced"] = bool((A["point"].get(r_["item_id"]) or {}).get("forced_by_grader"))
         if tset == GRADED_SET:
             out["M5"] = grade_m5(life, sc, A)
             # the pointer: the brain's recorded target against the grader's own reading with the truth
@@ -717,12 +724,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         prs = {}
         # ABLE (#228; PREREG §3): the second's FORCED M1 on the fresh set must be above the null's p95, or «first > second»
         # only says the first can point — the pair then reads VOID, never PASS
-        o_m1 = other["sets"][GRADED_SET]["marks"]["M1"]["graded"].get("covered")
+        o_g = other["sets"][GRADED_SET]["marks"]["M1"]["graded"]
+        o_m1, o_n = o_g.get("covered"), o_g.get("n_covered")
         p95 = (g.get("null") or {}).get("m1_p95")
         able = o_m1 is not None and p95 is not None and o_m1 > p95
-        lines.append(f"  THE SECOND IS ABLE? its forced M1 {_f(o_m1)} vs the null's p95 {_f(p95)} → {'ABLE' if able else 'NOT ABLE — every pair reads VOID'}"
-                     f" · its answers read forced: {other['sets'][GRADED_SET].get('forced')}")
-        for mark, graded_only, sets in (("M1", True, (GRADED_SET,)), ("M3", False, M6_POOLED_SETS)):
+        lines.append(f"  THE SECOND IS ABLE? its forced M1 {_f(o_m1)} on n {o_n} (the items whose every word it heard) vs the null's p95 "
+                     f"{_f(p95)} → {'ABLE' if able else 'NOT ABLE — every pair reads VOID'} · its answers read forced: "
+                     f"{other['sets'][GRADED_SET].get('forced')}")
+        # AMENDMENT 1 §3 rule 1: BOTH pairs pool the fresh and the older set (population moved, bar unchanged)
+        for mark, graded_only, sets in (("M1", True, M6_POOLED_SETS), ("M3", False, M6_POOLED_SETS)):
             ra = [r for s_ in sets for r in g["items"].get(s_, {}).get(mark, [])]
             rb = [r for s_ in sets for r in other["items"].get(s_, {}).get(mark, [])]
             prs[mark] = pair(ra, rb, graded_only)
@@ -739,8 +749,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             p["second_items"] = len(rb)
             lines.append(f"  PAIRED {mark} over {list(sets)}: {g['label']} {_f(p['first'])} vs {other['label']} {_f(p['second'])} on n {p['n']} · "
                          f"diff {_f(p['diff'])} · discordant {p['first_only']} / {p['second_only']} · exact one-sided sign test p {p['p']:.2e} "
-                         f"→ {p['verdict']} (bar: diff ≥ 0.10 and p < 0.001) · the second heard every word of "
-                         f"{p['second_items'] - p['second_unheard']} of {p['second_items']} phrases")
+                         f"→ {p['verdict']} (bar: diff ≥ 0.10 and p < 0.001; at this n the smallest passable gap is "
+                         f"{_f(p['smallest_passable_gap'])}) · the second heard every word of "
+                         f"{p['second_items'] - p['second_unheard']} of {p['second_items']} phrases · it pointed ON ITS OWN on "
+                         f"{_f(p['second_own_pointing'])} of the paired items"
+                         + ("" if p["second_own_pointing"] is None or p["second_own_pointing"] >= 0.5 or not str(p["verdict"]).startswith("PASS")
+                            else " — READ AS «the brain points where the organs' road does not», never «adds over the cells»"))
         lines.append("  NOT COMPARED with the second, by construction: test 4 (its `why` answers «unknown») and test 5 (it has no misuse act)")
         g["paired"] = {"with": a.pair_with, "able": able, **prs}
     (out / "grade.json").write_text(json.dumps(g, indent=1, sort_keys=True, default=R._jsonable if hasattr(R, "_jsonable") else str))
