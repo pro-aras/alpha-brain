@@ -3,6 +3,11 @@
 # module can read the truth.»). The learner modules (learners.py, its slda.py, and eye.py's segmentation) may import
 # only the allow-listed modules and may not name the truth file; two planted offenders (an import of the world / the
 # cache's truth reader, and a literal naming truth.jsonl) must be CAUGHT by the same checker.
+# edit: Claude (Opus 5.5, S1c builder), 2026-09-28 15:06 +0400 — PREREG-S1C §6 THE FIRST GATE 1 («the truth fence's AST sweep covers rooms.py
+# and pickers.py»): pickers.py joins the learner side (numpy, math, dataclasses, typing, the named substreams and the
+# learner's own module — never the world, the rooms, the cache or the marks; a planted `from . import rooms` is CAUGHT);
+# rooms.py is WORLD side and the reverse fence holds for it (it never imports a learner, a picker or a runner; a planted
+# `from .pickers import …` is CAUGHT). Test-first: red on scene-s1b1 7706371 (neither file exists there).
 from __future__ import annotations
 
 import ast
@@ -17,7 +22,26 @@ ALLOW = {
     "slda.py": {"__future__", "collections", "hashlib", "json", "typing", "numpy"},
     "eye.py": {"__future__", "dataclasses", "typing", "numpy", "genome", "genome.gaze", "genome.machinery",
                "brain.world", "brain.world.organs", "brain.world.build"},
+    "pickers.py": {"__future__", "math", "dataclasses", "typing", "numpy", "brain.world.seeds", "brain.scene.learners"},
 }
+# the WORLD side's reverse fence: no world module imports a learner, a picker or a runner
+WORLD_SIDE = ("world.py", "rooms.py")
+LEARNER_OR_RUNNER = {"brain.scene.learners", "brain.scene.pickers", "brain.scene.slda", "brain.scene.run",
+                     "brain.scene.run_s1c", "brain.scene.marks"}
+
+
+def imports_of(path: Path) -> set:
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    out = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            out.update(a.name for a in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            mod = node.module or ""
+            if node.level:
+                mod = "brain.scene" + ("." + mod if mod else "")
+            out.update([mod] if node.module else [f"{mod}.{a.name}" for a in node.names])
+    return out
 FORBIDDEN_WORDS = ("truth", "fix_thing")
 
 
@@ -74,6 +98,16 @@ class TestTruthFence(unittest.TestCase):
             self.assertTrue(any(s.startswith("literal") for s in v), v)
             p.write_text("def f(t):\n    return t.fix_thing\n")
             self.assertEqual(violations(p, ALLOW["learners.py"]), ["name fix_thing"])
+            p.write_text("from . import rooms\nimport numpy as np\n")
+            self.assertEqual(violations(p, ALLOW["pickers.py"]), ["from-import brain.scene.rooms"])
+
+    def test_the_world_side_never_imports_a_learner(self) -> None:
+        for name in WORLD_SIDE:
+            self.assertEqual(imports_of(SCENE / name) & LEARNER_OR_RUNNER, set(), name)
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "world_offender.py"
+            p.write_text("from .pickers import window_loss\nfrom . import world\n")
+            self.assertEqual(imports_of(p) & LEARNER_OR_RUNNER, {"brain.scene.pickers"})
 
 
 if __name__ == "__main__":
