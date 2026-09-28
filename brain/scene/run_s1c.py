@@ -55,7 +55,8 @@ PREREG_S1C_SHA256 = "a552515af334424b474cca7c96b72d87076d8c0d1a539208e6a5538ce4e
 # edit: Claude (Opus 5.5, S1c builder), 2026-09-28 15:36 +0400 — Fable 5.1 co-signed §1–§5 at 2daeb66 (the SIGNED block only; no clause changed), so the
 # text on disk — the one the gate implements — is 92188d04…; the lock stays until the coordinator confirms that sha.
 AMEND1_S1C_SHA256 = "92188d04cd4de52eede4b1d2288c239ddd284d20ce93cce01545c98eb444f451"
-AMEND1_COSIGNED = False
+# edit: Claude (Opus 5.5, S1c builder), 2026-09-28 15:38 +0400 — the coordinator confirmed 92188d04 as AMEND-1 co-signed (Fable 5.1, 2daeb66): the lock opens
+AMEND1_COSIGNED = True
 # AMENDMENT 1 §5: THE LAW'S WORLD (the round-robin in this order) and the K READING WORLD beside it; the pools both read
 WORLDS: Dict[str, Tuple[str, ...]] = {"law": ("R1", "R2", "R3", "N"), "k": ("R1", "R2", "R3", "N", "K")}
 POOL_ROOMS: Tuple[str, ...] = ("R1", "R2", "R3", "N", "K")

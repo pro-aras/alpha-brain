@@ -29,12 +29,16 @@ class TestWorldsAndShas(unittest.TestCase):
         self.assertEqual(S.AMEND1_S1C_SHA256, "92188d04cd4de52eede4b1d2288c239ddd284d20ce93cce01545c98eb444f451")   # co-signed, 2daeb66
         self.assertEqual(S.check_prereg()["amend1_s1c"], S.AMEND1_S1C_SHA256)
 
-    def test_the_unit_is_locked_until_the_cosigned_sha(self) -> None:
-        self.assertFalse(S.AMEND1_COSIGNED)
-        for argv in (["run", "--world", "law", "--picker", "RANDOM", "--seed", "20261301"],
-                     ["band", "--world", "k", "--seed", "20261301", "--k", "1-1"]):
-            with self.assertRaises(S.S1cError):
-                S.main(argv + ["--root", "/nonexistent/s1c-lock-test"])
+    def test_the_lock_refuses_while_closed_and_opens_on_the_cosigned_sha(self) -> None:
+        # edit: Claude (Opus 5.5, S1c builder), 2026-09-28 15:37 +0400 — the coordinator confirmed 92188d04 as AMEND-1 co-signed: the lock opens
+        from unittest import mock
+        self.assertTrue(S.AMEND1_COSIGNED)
+        self.assertIsNone(S.require_unit_unlocked())
+        with mock.patch.object(S, "AMEND1_COSIGNED", False):
+            for argv in (["run", "--world", "law", "--picker", "RANDOM", "--seed", "20261301"],
+                         ["band", "--world", "k", "--seed", "20261301", "--k", "1-1"]):
+                with self.assertRaises(S.S1cError):
+                    S.main(argv + ["--root", "/nonexistent/s1c-lock-test"])
 
 
 def _run(rooms, n_blocks=60, k_rise=0.0):
