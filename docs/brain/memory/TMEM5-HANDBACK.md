@@ -14,7 +14,7 @@
 - **No unit ran.** Tonight's finding is THE FIRST GATE's stop at step 2 under AMENDMENT 3.
 
 ## 0 · The finding (AMENDMENT 3 §3: «if the new toy fails at every grid value, STOP and hand back — that is the finding»)
-**Neither gain rule separates the noise room on a toy that has what the life has:** two learnable rooms sharing words, a noise room, and 1–3 things per scene with ONE named.
+**Neither gain rule passes a toy that has what the life has** (two learnable rooms sharing words, a noise room, 1–3 things per scene with ONE named): the all-words gain separates B but drags a learnable room under 0.8 at every seed; the said-only gain keeps the learnable rooms but never separates B.
 
 | the gain's step | the noise room B | the learnable rooms | the toy |
 |---|---|---|---|
@@ -103,7 +103,11 @@
   - «rate» if it is at or over the slowest;
   - «undecided» otherwise.
 
-## 4 · Suites and prices
+## 4 · Suites, prices, and where each diagnosis's control now looks
+- **The diagnoses' `.out` files are the record.** Each ran from a pin, against the gate record of its own gate. Two of those records have since been moved into `gate-archive/`, so a RERUN must point its control at the archived path:
+  - `tmem5_toy_lr_grid.py` ran on code-efed314 against what is now `gate-archive/gate-stop-lrg0001/step2/toy.json`;
+  - `tmem5_gain_collapse.py` ran on code-f2f2892 against what is now `gate-archive/gate-f2f2892-lrg0005-allwords/step4/RANDOM-CTX-60.json`;
+  - `tmem5_said_only_toy.py` ran on code-9e23231 against the current `gate/step2/toy.json`.
 - **The suites on the final code commit** (1541261 = 9e23231's code + the stop's records): venv `Ran 695 tests in 304.710s` / `OK (skipped=3)`; scene `Ran 293 tests in 91.408s` / `OK` (logs `/data/dev/brain-runs/scene-tmem5/suites/*-1541261.log`).
 - **Every gate's step 1** (the frozen identity) read EQUAL.
 - **The red checks:**
