@@ -48,14 +48,21 @@ from . import world as W
 # (RUNS = scene-organ): every cache is redrawn there by THIS code and proven array-identical to the scored ones
 # (tools/brain/diag/cache_identity.py); the scored record's plain files (keys, questions, arms, marks, the gate, the nulls) are
 # COPIED into it. S1b-1R's own root (S1B1R_RUNS) is the RECORD: read as plain files only, never written.
-RUNS = Path("/data/dev/brain-runs/scene-organ")
+# edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:24 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2 «the hidden cost»: F-M6 changes
+# genome/machinery.py, brain/scene/world.py and this file (all WORLD_CODE), so check_code refuses every cache under scene-organ; this
+# tree's run root is FRESH again (RUNS = scene-organ-fm6): every cache is redrawn there (cache-r, now with the «held» set) and the
+# fresh and older sets' caches are proven array-identical to the scored ones (tools/brain/diag/cache_identity.py <this root>).
+RUNS = Path("/data/dev/brain-runs/scene-organ-fm6")
+SCENE_ORGAN_RUNS = Path("/data/dev/brain-runs/scene-organ")   # rung 1's redraw (the pre-F-M6 code), read as plain files only
 S1B1R_RUNS = Path("/data/dev/brain-runs/scene-s1b1r")
 S1B1_RUNS = Path("/data/dev/brain-runs/scene-s1b1")
 S1A_RUNS = Path("/data/dev/brain-runs/scene")
 N_LOCATED = 4
 TEST_SPLITS = ("test", "m2b", "m6", "m3", "speak", "decline")
 FRESH_SPLITS = TEST_SPLITS + ("speak2",)
-_SET_SPLITS = {"s1b1": TEST_SPLITS, "fresh": FRESH_SPLITS}
+# edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2: the NEW test set «held» (test seeds
+# 2026150x) draws every split as the fresh set does, SPEAK2 included, under <root>/<ws>/held/cache/<split>; its M6 holds 84.
+_SET_SPLITS = {"s1b1": TEST_SPLITS, "fresh": FRESH_SPLITS, "held": FRESH_SPLITS}
 
 
 class SceneCacheError(Exception):
@@ -144,7 +151,7 @@ def build(split: str, world_seed: Optional[int], out_dir: Path, limit: Optional[
     if out_dir.exists():
         raise SceneCacheError(f"{out_dir} exists — a cache is written once (remove it by hand to rebuild)")
     seed = split_seed(split, world_seed, tset)
-    scenes = W.scenes_for(split, seed, limit)
+    scenes = W.scenes_for(split, seed, limit, tset=tset if split in test_splits(tset) else None)   # F-M6: the set's own size
     tmp = out_dir.with_name(out_dir.name + ".building")
     if tmp.exists():
         shutil.rmtree(tmp)
@@ -313,6 +320,20 @@ def build_world_seed(root: Path, world_seed: int, log=None, tset: str = "s1b1") 
            "test_seed": W.TEST_SETS[tset][int(world_seed)], "train_canvases": len(tr), "checked": {}}
     for split in splits:
         rec["checked"][split] = assert_disjoint(tr, ScenePercepts(cache_dir(root, world_seed, split, tset)).shas())
+    # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400 — AMENDMENT 1 §2: the «held» set's canvases are also checked against the
+    # OLDER sets' canvases of the same root (every split of «s1b1» and «fresh» whose cache is present; the ones read are recorded)
+    if tset == "held":
+        old = []
+        rec["checked_vs_old"] = {}
+        for ot in ("s1b1", "fresh"):
+            for split in test_splits(ot):
+                d = cache_dir(root, world_seed, split, ot)
+                if (d / "scene_header.json").exists():
+                    old.extend(json.loads(l)["canvas_png_sha256"] for l in (d / "index.jsonl").read_text().splitlines() if l.strip())
+                    rec["checked_vs_old"][f"{ot}/{split}"] = True
+        for split in splits:
+            assert_disjoint(old, ScenePercepts(cache_dir(root, world_seed, split, tset)).shas())
+        rec["old_canvases"] = len(old)
     rec["overlap"] = 0
     (cache_dir(root, world_seed, splits[0], tset).parent / "disjoint.json").write_text(json.dumps(rec, sort_keys=True, indent=2) + "\n")
     return rec

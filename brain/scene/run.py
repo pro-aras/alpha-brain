@@ -1116,7 +1116,7 @@ def cache_r(root: Path, log=print) -> Dict[str, object]:
             C.build(split, None, d, log=log)
         rec[split] = {"cpu_s": time.process_time() - t, "wall_s": time.perf_counter() - w}
     for ws in W.WORLD_SEEDS:
-        for tset in ("s1b1", "fresh"):
+        for tset in CACHE_R_TSETS:
             t, w = time.process_time(), time.perf_counter()
             dj = C.build_world_seed(root, ws, log=log, tset=tset)
             rec[f"{ws}/{tset}"] = {"cpu_s": time.process_time() - t, "wall_s": time.perf_counter() - w,
@@ -1184,6 +1184,10 @@ R_ARMS: Tuple[str, ...] = ("A-RW-R", "P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH")
 R_TRAIN_AS = {"A-RW-R": "A-RW", "P-ORACLE-RW": "P-ORACLE-RW", "P-ORACLE": "P-ORACLE", "ORACLE-TRUTH": "ORACLE-TRUTH"}
 R_READINGS: Tuple[str, ...] = ("R-TT", "R-DIAG", "R-OLDMOUTH", "R-NONE-DIST", "S1B1-ROADS")
 R_TSET = "fresh"
+# edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2: cache_r draws the NEW test set «held»
+# (2026150x) after the two it drew before (their order and caches unchanged); build_questions_r / r_seed_root take a test set
+# (default R_TSET — every existing caller unchanged).
+CACHE_R_TSETS: Tuple[str, ...] = ("s1b1", "fresh", "held")
 NULL_K = 20                     # §1 (f): K = 20 derangements per seed (keys null:<seed>:k, k = 1..20); k = 0 is S1b-1's draw
 NULL_PCT = 95                   # the bar: A-RW-R above the null's 95th percentile (numpy's default linear rule)
 TRUTH_NEED_VS_PORACLE, MINIMAL_VS_PORACLE = 0.90, 0.90
@@ -1200,9 +1204,10 @@ STEP2_MARKS = ("M1", "M3", "M6", "M2a", "M2b", "SPOKEN", "TRUTH", "READ-BACK")
 PARENT_MIX = {"1": 0.25, "2": 0.5, "3": 0.25}
 
 
-def r_seed_root(root: Path, ws: int) -> Path:
-    """The FRESH test set's records of one world seed: <root>/<ws>/fresh/ (questions, keys, arms, nulls, marks)."""
-    return Path(root) / str(ws) / R_TSET
+def r_seed_root(root: Path, ws: int, tset: str = R_TSET) -> Path:
+    """The FRESH test set's records of one world seed: <root>/<ws>/fresh/ (questions, keys, arms, nulls, marks); another test
+    set's (F-M6: «held») under <root>/<ws>/<tset>/."""
+    return Path(root) / str(ws) / tset
 
 
 def types_check(cover: Sequence[Sequence[str]], words: Sequence[str]) -> Dict[str, object]:
@@ -1298,16 +1303,20 @@ def speak2_pin_rows(rows: Sequence[Dict[str, object]]) -> Dict[str, object]:
 
 
 # ------------------------------------------------------------------------------------------------ the fresh questions
-def build_questions_r(root: Path, ws: int) -> Dict[str, int]:
+def build_questions_r(root: Path, ws: int, tset: str = R_TSET) -> Dict[str, int]:
     """The FRESH test set's questions and keys (§2): S1b-1's own generators and counts on test seed 2026140x, and SPEAK2 (a
     POINTER to the target — its hypothesis for the gaze arms, the thing for ORACLE-TRUTH; the kind stays in the keys).
-    S1b-1's build_questions is untouched (the gate's step 2 uses it on S1b-1's own set)."""
-    ts = W.FRESH_TEST_SEEDS[ws]
-    cd = lambda s: C.cache_dir(root, ws, s, R_TSET)
+    S1b-1's build_questions is untouched (the gate's step 2 uses it on S1b-1's own set).
+    edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400 — `tset` (default R_TSET, unchanged): «held» writes the NEW set's questions
+    and keys (AMENDMENT 1 §2) under <root>/<ws>/held/ by the same generators, from the held caches."""
+    if tset not in ("fresh", "held"):
+        raise SystemExit(f"questions-r writes the fresh or the held set, not {tset!r}")
+    ts = W.TEST_SETS[tset][ws]
+    cd = lambda s: C.cache_dir(root, ws, s, tset)
     shas = {"prereg_sha256": PREREG_SHA256, "prereg_s1b1_sha256": PREREG_S1B1_SHA256,
             "prereg_s1b1r_sha256": PREREG_S1B1R_SHA256, "amend1_sha256": S1B1R_AMEND1_SHA256}
-    out = {**shas, "world_seed": ws, "test_seed": ts, "test_set": R_TSET}
-    keys = {**shas, "world_seed": ws, "test_seed": ts, "test_set": R_TSET}
+    out = {**shas, "world_seed": ws, "test_seed": ts, "test_set": tset}
+    keys = {**shas, "world_seed": ws, "test_seed": ts, "test_set": tset}
     tt = C.load_truth(cd("test"))
     tr = {s: C.load_truth(cd(s)) for s in ("m2b", "m6", "m3", "speak", "decline", "speak2")}
     th = {s: Things(C.ScenePercepts(cd(s))) for s in ("test", "m2b", "speak", "decline", "speak2")}
@@ -1342,7 +1351,7 @@ def build_questions_r(root: Path, ws: int) -> Dict[str, int]:
     out["questions"] = q
     keys["items"] = {"M1": m1, "M2a": m2a, "M2b": m2b, "M6": m6, "NAME": name, "M3": m3, "SPEAK": speak, "DECLINE": decline,
                      "SPEAK2": speak2}
-    d = r_seed_root(root, ws)
+    d = r_seed_root(root, ws, tset)
     dump(d / "questions.json", out)
     dump(d / "keys.json", keys)
     return {k: len(v) for k, v in keys["items"].items()}
@@ -2262,6 +2271,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--lr", type=float)                  # S1b-1R gate step 2: S1b-1's arms before any gate record exists
     ap.add_argument("--eps", type=float)
     ap.add_argument("--ks", default="0-%d" % NULL_K)     # S1b-1R: the null draws (k = 0 is S1b-1's own)
+    ap.add_argument("--tset", default=R_TSET)          # F-M6 (AMENDMENT 1 §2): questions-r --tset held
     a = ap.parse_args(argv)
     root = Path(a.root)
     log = Log(root / "logs" / f"{a.cmd}.log")
@@ -2294,7 +2304,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     elif a.cmd == "cache-r":
         cache_r(root, log=log)
     elif a.cmd == "questions-r":
-        log(f"[questions-r {a.world_seed}] {build_questions_r(root, a.world_seed)}")
+        log(f"[questions-r {a.world_seed} {a.tset}] {build_questions_r(root, a.world_seed, a.tset)}")
     elif a.cmd == "arm-r":
         rps = [int(x) for x in a.rps.split(",") if x]
         run_arm_r(a.arm, root, a.world_seed, n_train=a.n, reading_points=rps, eps=a.eps,

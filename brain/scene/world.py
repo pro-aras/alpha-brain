@@ -69,7 +69,12 @@ _TWIN_REDRAWS = 1000
 # world seed (the graded marks are read on these alone; 2026130x are S1c's world seeds — a different role), beside S1b-1's
 # own test set; SPEAK2, the NEED items: 60 THREE-thing scenes per seed in three kinds of 20.
 FRESH_TEST_SEEDS: Dict[int, int] = {20261101: 20261401, 20261102: 20261402, 20261103: 20261403}
-TEST_SETS: Dict[str, Dict[int, int]] = {"s1b1": TEST_SEEDS, "fresh": FRESH_TEST_SEEDS}
+# edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2 (sha 45abeca2…): THE NEW TEST SET
+# «held» — test seeds never drawn before the amendment was signed, one per world seed; every split drawn as on the fresh set
+# (brain/scene/cache.py: SPEAK2 included); M6 holds 84 items there (M6_HELD), 42 on the fresh and older sets.
+HELD_TEST_SEEDS: Dict[int, int] = {20261101: 20261501, 20261102: 20261502, 20261103: 20261503}
+TEST_SETS: Dict[str, Dict[int, int]] = {"s1b1": TEST_SEEDS, "fresh": FRESH_TEST_SEEDS, "held": HELD_TEST_SEEDS}
+M6_HELD = 2 * (M6_TWO + M6_THREE)                   # 84 on «held»: items 0..41 are today's, 42..83 the same rule on i − 42
 SPEAK2_PER_KIND = 20
 SPEAK2_KINDS: Tuple[str, ...] = ("CS", "SC", "SS")                      # i 0–19 · 20–39 · 40–59
 SPEAK2_KIND_TYPES: Dict[str, Tuple[str, str]] = {"CS": ("colour", "shape"), "SC": ("size", "colour"), "SS": ("size", "shape")}
@@ -278,12 +283,25 @@ def m2b_scene(test_seed: int, index: int) -> Scene:
     return Scene("m2b", index, test_seed, _place(attrs, rng), (), None, None)
 
 
+def test_set_of(test_seed: int) -> Optional[str]:
+    """The name of the test set a test seed belongs to (None for any other seed). edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400."""
+    for name, m in TEST_SETS.items():
+        if int(test_seed) in m.values():
+            return name
+    return None
+
+
 def m6_scene(test_seed: int, index: int) -> Scene:
     """M6: «dax» (a moon) in 42 scenes with 2 or 3 things in a 2:1 mix (items 0..27 two things, 28..41 three things);
-    the others are trained things; the moon's colour and size uniform over the trained ones (declared); the phrase «dax»."""
-    if not 0 <= index < M6_TWO + M6_THREE:
+    the others are trained things; the moon's colour and size uniform over the trained ones (declared); the phrase «dax».
+    edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400 — AMENDMENT 1 §2: on a «held» test seed M6 holds 84 items; item i ≥ 42
+    follows the same rule on i − 42 (two things below 28, else three) and draws from its OWN stream `scene:m6:<i>`; items 0..41
+    are byte for byte what they were (tests/brain/scene/test_world_fm6.py against the pre-fix fixtures). Any other seed keeps 42."""
+    top = M6_HELD if test_set_of(test_seed) == "held" else M6_TWO + M6_THREE
+    if not 0 <= index < top:
         raise WorldError(f"m6 index {index} out of range")
-    n = 2 if index < M6_TWO else 3
+    rule_i = index if index < M6_TWO + M6_THREE else index - (M6_TWO + M6_THREE)
+    n = 2 if rule_i < M6_TWO else 3
     rng = substream(test_seed, f"scene:m6:{index}")
     others = [_trained_attrs(rng) for _ in range(n - 1)]
     moon = (DAX_SHAPE, COLOUR_NAMES[int(rng.integers(len(COLOUR_NAMES)))], SIZE_NAMES[int(rng.integers(len(SIZE_NAMES)))])
@@ -479,8 +497,11 @@ def stage_scene(index: int) -> Scene:
     return Scene("stage", index, STAGE_SEED, things, (), None, None)
 
 
-def split_size(split: str) -> int:
-    sizes = {"train": N_TRAIN, "test": N_TEST, "m2b": (len(M2B_SHAPES) + 1) * M2B_PER_SHAPE, "m6": M6_TWO + M6_THREE,
+def split_size(split: str, tset: Optional[str] = None) -> int:
+    """edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400 — `tset` (AMENDMENT 1 §2): «m6» holds 84 on «held», 42 on any other
+    set (and with no set named, as before)."""
+    sizes = {"train": N_TRAIN, "test": N_TEST, "m2b": (len(M2B_SHAPES) + 1) * M2B_PER_SHAPE,
+             "m6": M6_HELD if tset == "held" else M6_TWO + M6_THREE,
              "toy-train": TOY_TRAIN_N, "toy-test": TOY_TEST_N, "stage": STAGE_N,
              "m3": M3_TWO + M3_THREE, "speak": SPEAK_TWO + SPEAK_THREE, "decline": DECLINE_TWO + DECLINE_THREE,
              "speak2": SPEAK2_PER_KIND * len(SPEAK2_KINDS)}
@@ -489,10 +510,15 @@ def split_size(split: str) -> int:
     return sizes[split]
 
 
-def scenes_for(split: str, seed: int, limit: Optional[int] = None) -> List[Scene]:
+def scenes_for(split: str, seed: int, limit: Optional[int] = None, tset: Optional[str] = None) -> List[Scene]:
     """Every scene of one cache (or its first `limit`): train (world seed) · test / m2b / m6 (test seed) · toy-train /
-    toy-test · stage. Each scene is a function of (seed, index) alone, so a prefix is the full stream's prefix."""
-    n = split_size(split) if limit is None else min(int(limit), split_size(split))
+    toy-test · stage. Each scene is a function of (seed, index) alone, so a prefix is the full stream's prefix.
+    edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400 — `tset`: the split's size on that test set; None → the set the
+    test seed belongs to (so a «held» seed gives 84 M6 scenes and every older caller keeps its count)."""
+    if tset is None and split not in ("train", "toy-train", "toy-test", "stage"):
+        tset = test_set_of(seed)
+    size = split_size(split, tset)
+    n = size if limit is None else min(int(limit), size)
     make = {"train": lambda i: train_scene(seed, i), "test": lambda i: test_scene(seed, i),
             "m2b": lambda i: m2b_scene(seed, i), "m6": lambda i: m6_scene(seed, i),
             "toy-train": toy_train_scene, "toy-test": toy_test_scene, "stage": stage_scene,

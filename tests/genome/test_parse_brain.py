@@ -46,6 +46,25 @@ class ParseBrain(unittest.TestCase):
         self.assertEqual(d["WORLD_SCENE"], {"seed": 20261102, "train": 300, "sitting": [], "feed": {"mode": "every", "ms": 50},
                                             "utterance": {"shuffled": 7}})
 
+    # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:16 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2: `young <n> nearest` sets
+    # young_rule = "nearest"; `young <n>` keeps the law and its declared dict carries NO young_rule key (byte-identical to today's);
+    # any other word after the count refuses BY NAME.
+    def test_young_nearest(self):
+        d = parse_genome(with_lines(BRAIN_LINE.replace("young 3;", "young 3 nearest;"))).declared["BRAIN"]
+        law = parse_genome(with_lines(BRAIN_LINE)).declared["BRAIN"]
+        self.assertEqual(d, {**law, "young_rule": "nearest"})
+        self.assertNotIn("young_rule", law)
+        self.assertEqual(set(d) - set(law), {"young_rule"})
+
+    def test_young_other_word_refuses_by_name(self):
+        for w in ("band", "near", "Nearest", "nearest2", "euclid"):
+            with self.subTest(word=w):
+                with self.assertRaises(GenomeError) as cm:
+                    parse_genome(with_lines(BRAIN_LINE.replace("young 3;", f"young 3 {w};")))
+                self.assertTrue(str(cm.exception).startswith("BRAIN"), str(cm.exception))
+                self.assertIn("young", str(cm.exception))
+                self.assertIn(repr(w), str(cm.exception))
+
     def test_refusals_by_name(self):
         bad = {
             "BRAIN": [BRAIN_LINE.replace("word-map", "wordmap"), BRAIN_LINE.replace("lr 0.01", "lr 0"),
