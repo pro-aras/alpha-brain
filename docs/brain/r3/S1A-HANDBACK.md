@@ -501,12 +501,15 @@ refutations: T1 (A-RW M1 < 0.6 × P-ORACLE-RW) 20261101:no 20261102:no 20261103:
 
 ### 13.5 · What the marks say [the numbers are Certain as printed; the readings Likely]
 
-- **M1 PASSES at all three seeds** on the graded 2- and 3-thing items: A-RW 0.891 / 0.905 / 0.919, against 0.90 × P-ORACLE-RW ≈ 0.87 and 0.80 × P-ORACLE = 0.80. Every scene size passes too. T1 (A-RW < 0.6 × P-ORACLE-RW) is not refuted at any seed. **Words ground in this eye's space from ambiguous scenes by the delta rule.**
-- **M2a FAILS at all three seeds**, on the REFUSAL half (0.603 / 0.497 / 0.598 < 0.80), which P-ORACLE reaches (1.000 / 1.000 / 0.998). The false-refusal half passes (0.099 / 0.075 / 0.043).
+- **M1 PASSES at all three seeds** on the graded 2- and 3-thing items: A-RW 0.891 / 0.905 / 0.919, against 0.90 × P-ORACLE-RW ≈ 0.87 and 0.80 × P-ORACLE = 0.80. Every scene size passes too. T1's refutation (A-RW < 0.6 × P-ORACLE-RW) does not fire at any seed. What that means for T1 is the seat's to write.
+- **M2a reads FAIL at all three seeds under the builder's per-half reading (RAISED, §13.6).** A-RW fails the REFUSAL half (0.603 / 0.497 / 0.598 < 0.80), which P-ORACLE reaches (1.000 / 1.000 / 0.998); its false-refusal half passes (0.099 / 0.075 / 0.043).
+  - The signed text read literally («P-ORACLE reads below the bar» → CEILING-BOUND) reads the whole conjunction: FAIL / CEILING-BOUND / CEILING-BOUND, because P-ORACLE's own false refusal is 0.078 / 0.119 / 0.109.
+  - The headline in `report.txt` is the builder's reading; the literal one is printed beside it on every M2a line.
 - **M2b FAILS at all three seeds:** 0.000 / 0.083 / 0.104. A-RW names never-taught shapes with a taught shape word; A-RW emitted mostly cross, ring and square. P-ORACLE's DISTANCE band refuses them (0.958 / 0.938 / 0.917).
   - So T4′ («refusing is a separate job») is NOT refuted in this world: A-RW's naming band cannot refuse, and a distance band can.
   - Diamond, read apart, gives A-RW 0.000 / 0.125 / 0.000 and P-ORACLE 0.500 / 0.500 / 0.625.
-- **M6** reads NOT GRADABLE at 20261101 (the meeting was never seen), UNDERPOWERED at 20261102 (0.724 on 29 covered items), and PASS at 20261103 (0.812, n 32). P-ORACLE reads 1.000 at both gradable seeds. The one-meeting write is not refuted.
+- **M6** reads NOT GRADABLE at 20261101 (the meeting was never seen), UNDERPOWERED at 20261102 (0.724 on 29 covered items), and PASS at 20261103 (0.812, n 32). P-ORACLE reads 1.000 at both gradable seeds, and the one-meeting refutation does not fire.
+  - **The UNDERPOWERED edge is by design, not by chance.** The PREREG fixed 42 items (28 two-thing + 14 three-thing). At stage −1's recall (0.836 / 0.721) that is ≈ 23.4 + 10.1 ≈ 33 covered items expected. Seeds 2 and 3 read 29 and 32, so any seed can land under 30. Re-rolling will not fix the item count.
 - **N-SHUF stays at chance** at all three seeds (0.552 ≤ 0.594; 0.587 ≤ 0.593, a margin of 0.006; 0.479 ≤ 0.590).
 - **S1a does not pass** (M2a, M2b and M6's seed 2).
 - **The reading arm A-RW-LR01 (lr 0.01, no bar) shows that the lock-in happens on the real stream.**
