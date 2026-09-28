@@ -1,5 +1,6 @@
 #!/bin/bash
 # edit: Claude (Opus 5.5, S1a builder), 2026-09-28 12:25 +0400 — S1a's FULL RUN as ONE user unit (PREREG-R3-TONIGHT §S1a; brief step 8).
+# edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:04 +0400 — AMENDMENT 2: six arms (+ A-RW-LR01, a reading arm) × three seeds = 18 at once.
 # Run from a PINNED copy of the code (tools/scene/pin_code.sh), never from a worktree a builder may still edit:
 #   systemd-run --user --unit=scene-s1a -p Restart=no -p Nice=19 --setenv=PYTHONUNBUFFERED=1 \
 #       --setenv=OPENBLAS_NUM_THREADS=1 --setenv=OMP_NUM_THREADS=1 --setenv=TMPDIR=/data/dev/brain-runs/tmp \
@@ -11,7 +12,7 @@ CODE="$(cd "$(dirname "$0")/../.." && pwd)"
 ROOT=/data/dev/brain-runs/scene
 PY=/usr/bin/python3
 SEEDS="20261101 20261102 20261103"
-ARMS="A-RW N-SHUF P-ORACLE-RW P-ORACLE ORACLE-TRUTH"
+ARMS="A-RW A-RW-LR01 N-SHUF P-ORACLE-RW P-ORACLE ORACLE-TRUTH"
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 export TMPDIR=/data/dev/brain-runs/tmp
 mkdir -p "$ROOT/logs" "$TMPDIR"
@@ -42,7 +43,7 @@ for ws in $SEEDS; do
   $PY -B -m brain.scene.run questions --world-seed "$ws" >> "$LOG" 2>&1 || { say "STOP: questions $ws failed"; exit 2; }
 done
 
-# (3) the launch's shape: 5 arms × 3 seeds at once
+# (3) the launch's shape: 6 arms × 3 seeds at once (AMENDMENT 2 §5 adds the reading arm A-RW-LR01)
 declare -A AP=()
 for ws in $SEEDS; do
   for arm in $ARMS; do
@@ -50,7 +51,7 @@ for ws in $SEEDS; do
     AP["$ws/$arm"]=$!
   done
 done
-say "15 arms started: $(for k in "${!AP[@]}"; do printf '%s=%s ' "$k" "${AP[$k]}"; done)"
+say "18 arms started: $(for k in "${!AP[@]}"; do printf '%s=%s ' "$k" "${AP[$k]}"; done)"
 fail=0
 for k in "${!AP[@]}"; do
   wait "${AP[$k]}"; rc=$?

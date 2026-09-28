@@ -7,14 +7,19 @@ edit: Claude (Opus 5.5, S1a builder), 2026-09-28 12:20 +0400 — new module.
   python3 -m brain.scene.run cache-world --world-seed W           train + test + m2b + m6 and the disjointness record
   python3 -m brain.scene.run questions --world-seed W             the questions (what an arm hears) and the keys (grader)
   python3 -m brain.scene.run stage                                stage −1's organ facts (printed only)
-  python3 -m brain.scene.run first-gate                           the toy, ε, the instrument verdict, 5 arms × 300 vs N-SHUF
+  python3 -m brain.scene.run first-gate                           the toy, ε, the instrument verdict, 6 arms × 300 vs N-SHUF
   python3 -m brain.scene.run arm --arm A --world-seed W           one arm over its stream, answering at every reading point
   python3 -m brain.scene.run grade --world-seed W                 the marks of every arm at every reading point
   python3 -m brain.scene.run report                               the headline table across seeds, the bars, the verdicts
-  python3 -m brain.scene.run price                                solo, then the launch's shape (5 arms × 3 seeds at once)
+  python3 -m brain.scene.run price                                solo, then the launch's shape (6 arms × 3 seeds at once)
 
 Only this module and marks.py read the truth. The truth enters an ORACLE arm's feed here, as an index (the referent's
 thing hypothesis, or the referent thing for ORACLE-TRUTH), and A-RW / N-SHUF never have it read on their behalf.
+
+edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:05 +0400 — AMENDMENT 2 (docs/brain/r3/PREREG-R3-TONIGHT-AMEND-2.md in genome-wt-brain3,
+d54e6c0, sha checked beside the signed PREREG's): P-ORACLE / ORACLE-TRUTH read with the TYPE-AWARE reader (the word types
+passed in from here — the oracle may know them); M1's bars on the 2- and 3-thing items; M6 only where the meeting was seen;
+an unheard word NOT GRADABLE; the reading arm A-RW-LR01 (lr 0.01, no bar) beside A-RW. Six arms × three seeds.
 """
 from __future__ import annotations
 
@@ -32,17 +37,22 @@ import numpy as np
 
 from brain.world.seeds import substream
 
-from . import PREREG_SHA256
+from . import AMEND2_SHA256, PREREG_SHA256
 from . import cache as C
 from . import learners as Lr
 from . import marks as M
 from . import world as W
 
-ARMS: Tuple[str, ...] = ("A-RW", "N-SHUF", "P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH")
-RW_ARMS = ("A-RW", "N-SHUF", "P-ORACLE-RW")
+ARMS: Tuple[str, ...] = ("A-RW", "A-RW-LR01", "N-SHUF", "P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH")
+RW_ARMS = ("A-RW", "A-RW-LR01", "N-SHUF", "P-ORACLE-RW")
 LDA_ARMS = ("P-ORACLE", "ORACLE-TRUTH")
+ORACLE_ARMS = ("P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH")        # the only arms whose feed carries a referent index
+READING_ARMS = ("A-RW-LR01",)                                     # AMENDMENT 2 §5: printed beside A-RW, no bar
+ARM_LR = {"A-RW-LR01": 0.01}                                      # its ONE difference from A-RW
 PREREG_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-R3-TONIGHT.md")
+AMEND2_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-R3-TONIGHT-AMEND-2.md")
 TYPE_WORDS = {"shape": list(W.SHAPES), "colour": list(W.COLOUR_NAMES), "size": list(W.SIZE_NAMES)}
+WORD_TYPES = {w: W.word_type(w) for w in W.VOCAB}                 # what the ORACLE may know (AMENDMENT 2 §1)
 
 
 class RunError(Exception):
@@ -54,6 +64,9 @@ def check_prereg() -> str:
     got = hashlib.sha256(PREREG_PATH.read_bytes()).hexdigest()
     if got != PREREG_SHA256:
         raise RunError(f"PREREG sha256 {got} ≠ the signed {PREREG_SHA256} — STOP and hand back")
+    am = hashlib.sha256(AMEND2_PATH.read_bytes()).hexdigest()
+    if am != AMEND2_SHA256:
+        raise RunError(f"AMENDMENT 2 sha256 {am} ≠ the one this code implements {AMEND2_SHA256} — STOP and hand back")
     return got
 
 
@@ -217,10 +230,12 @@ def answer_all(arm: str, learner, questions: Dict[str, List[Dict[str, object]]],
 
 
 def make_learner(arm: str, lr: float, eps: float):
+    """`lr` is A-RW's (the gate's); A-RW-LR01 overrides it with its own (ARM_LR — its one difference). The oracle arms
+    read with the TYPE-AWARE reader (AMENDMENT 2 §1), handed the word types from here; no RW arm ever holds them."""
     if arm in RW_ARMS:
-        return Lr.RWLearner(lr=lr, oracle=(arm == "P-ORACLE-RW"))
+        return Lr.RWLearner(lr=ARM_LR.get(arm, lr), oracle=(arm == "P-ORACLE-RW"))
     if arm in LDA_ARMS:
-        return Lr.LDAReader(eps)
+        return Lr.TypedLDAReader(eps, WORD_TYPES)
     raise RunError(f"no such arm: {arm!r}")
 
 
@@ -231,7 +246,7 @@ def train_arm(arm: str, learner, things: Things, words_of, truth: Optional[Seque
     for i in rows:
         X = things.for_arm(arm, i)
         words = words_of(i)
-        ref = referent_index(arm, things, truth[i]) if arm in ("P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH") else None
+        ref = referent_index(arm, things, truth[i]) if arm in ORACLE_ARMS else None
         if arm in RW_ARMS:
             learner.train_scene(X, words, referent=ref if arm == "P-ORACLE-RW" else None,
                                 rng=substream(seed, f"episodic:{i}"))
@@ -272,7 +287,7 @@ def run_arm(arm: str, root: Path, ws: int, n_train: int = W.N_TRAIN, reading_poi
         raise RunError("questions were written under another PREREG")
     things = {s: Things(C.ScenePercepts(C.cache_dir(root, ws, s))) for s in ("test", "m2b", "m6")}
     train = Things(C.ScenePercepts(C.cache_dir(root, ws, "train")))
-    truth = C.load_truth(C.cache_dir(root, ws, "train")) if arm in ("P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH") else None
+    truth = C.load_truth(C.cache_dir(root, ws, "train")) if arm in ORACLE_ARMS else None
     if arm == "N-SHUF":
         perm = Lr.nshuf_permutation(substream(ws, "n-shuf-permutation"), len(train.p))
         words_of = lambda i: train.p.words(int(perm[i]))
@@ -281,8 +296,9 @@ def run_arm(arm: str, root: Path, ws: int, n_train: int = W.N_TRAIN, reading_poi
     learner = make_learner(arm, lr, eps)
     seen: list = []
     done = 0
-    record = {"arm": arm, "world_seed": ws, "lr": lr, "eps": eps, "n_train": n_train, "prereg_sha256": PREREG_SHA256,
-              "code": code_identity(), "reading_points": {}}
+    record = {"arm": arm, "world_seed": ws, "lr": ARM_LR.get(arm, lr) if arm in RW_ARMS else None, "gate_lr": lr,
+              "eps": eps if arm in LDA_ARMS else None, "n_train": n_train, "prereg_sha256": PREREG_SHA256,
+              "amend2_sha256": AMEND2_SHA256, "code": code_identity(), "reading_points": {}}
     for rp in sorted(r for r in reading_points if r <= n_train):
         train_arm(arm, learner, train, words_of, truth, range(done, rp), ws, seen)
         done = rp
@@ -305,7 +321,10 @@ def grade_seed(root: Path, ws: int, arms: Sequence[str] = ARMS, log=print) -> Di
     truth = {s: C.load_truth(C.cache_dir(root, ws, s)) for s in ("test", "m2b", "m6")}
     things = {s: Things(C.ScenePercepts(C.cache_dir(root, ws, s))) for s in ("test", "m2b", "m6")}
     m2b_cov = {it["row"] for it in items["M2b"] if M.covered(0, truth["m2b"][it["row"]]["fix_thing"])}
-    out = {"prereg_sha256": PREREG_SHA256, "world_seed": ws, "arms": {}}
+    tr = C.load_truth(C.cache_dir(root, ws, "train"))
+    seen = M.meeting_seen(tr[W.DAX_INDEX]) if len(tr) > W.DAX_INDEX else None      # AMENDMENT 2 §3
+    out = {"prereg_sha256": PREREG_SHA256, "amend2_sha256": AMEND2_SHA256, "world_seed": ws, "meeting_seen": seen,
+           "arms": {}}
     for arm in arms:
         d = seed_root(root, ws) / "arms" / arm
         rec = json.loads((d / "record.json").read_text())
@@ -318,7 +337,7 @@ def grade_seed(root: Path, ws: int, arms: Sequence[str] = ARMS, log=print) -> Di
             names = {}
             for t in TYPE_WORDS:
                 rows = [(A.get(it["item_id"]) or {}).get("name") for it in items["NAME"]]
-                ok = [nm[t] == it[t] for nm, it in zip(rows, items["NAME"]) if nm is not None]
+                ok = [nm[t] == it[t] for nm, it in zip(rows, items["NAME"]) if nm is not None and nm.get(t) is not None]
                 names[t] = {"acc": (sum(ok) / len(ok) if ok else None), "n": len(ok)}
             out["arms"][arm]["rp"][str(rp)] = {
                 "M1": M.summarise_pointing(g1), "M2a": M.grade_m2a(items["M2a"], A),
@@ -334,87 +353,119 @@ def _f(v, nd=3) -> str:
     return "  —  " if v is None else f"{v:.{nd}f}"
 
 
+def _ge(v, bar) -> bool:
+    return v is not None and bar is not None and v >= bar
+
+
+def _le(v, bar) -> bool:
+    return v is not None and bar is not None and v <= bar
+
+
 def bars_for(marks: Dict[str, object], rp: str = str(W.N_TRAIN)) -> Dict[str, object]:
-    """The PREREG's bars at 10,000 scenes for one seed, P-ORACLE's reading beside every mark."""
+    """The bars at `rp` for one seed, P-ORACLE's reading beside every mark — the signed PREREG's bars as AMENDMENT 2
+    reads them: M1 on the 2- and 3-thing items (pooled = the verdict line; per scene size printed with its own mark,
+    declared), M6 only where the meeting was seen, a reading of None (nothing gradable) never a 0.0."""
     A = {a: marks["arms"][a]["rp"].get(rp) for a in marks["arms"]}
-    r = {}
-    m1 = A["A-RW"]["M1"]["all"]
-    po_rw = A["P-ORACLE-RW"]["M1"]["all"]["covered"]
-    po = A["P-ORACLE"]["M1"]["all"]["covered"]
-    ns = A["N-SHUF"]["M1"]["all"]
-    r["M1"] = {"value": m1["covered"], "n": m1["n_covered"], "all": m1["all"], "n_all": m1["n_all"],
-               "coverage": m1["coverage"], "p_oracle": po, "p_oracle_rw": po_rw,
-               "bar_rw": M.BARS["M1_vs_PORACLE_RW"] * po_rw, "bar_lda": M.BARS["M1_vs_PORACLE"] * po,
-               "pass": (m1["covered"] >= M.BARS["M1_vs_PORACLE_RW"] * po_rw and m1["covered"] >= M.BARS["M1_vs_PORACLE"] * po)}
+    m1 = lambda arm, key="graded": A[arm]["M1"][key]
+    r: Dict[str, object] = {}
+    rows = {}
+    for key in ("graded", "size2", "size3"):
+        a = m1("A-RW", key)
+        prw, po = m1("P-ORACLE-RW", key)["covered"], m1("P-ORACLE", key)["covered"]
+        bar_rw = None if prw is None else M.BARS["M1_vs_PORACLE_RW"] * prw
+        bar_lda = None if po is None else M.BARS["M1_vs_PORACLE"] * po
+        rows[key] = {"value": a["covered"], "n": a["n_covered"], "all": a["all"], "n_all": a["n_all"],
+                     "coverage": a["coverage"], "chance": a["chance_covered"], "p_oracle": po, "p_oracle_rw": prw,
+                     "bar_rw": bar_rw, "bar_lda": bar_lda, "pass": _ge(a["covered"], bar_rw) and _ge(a["covered"], bar_lda),
+                     "lr01": m1("A-RW-LR01", key)["covered"] if "A-RW-LR01" in A else None,
+                     "oracle_truth": m1("ORACLE-TRUTH", key)["covered"], "n_unheard": a["n_unheard"]}
+    r["M1"] = dict(rows["graded"])
+    r["M1"]["by_size"] = {"size2": rows["size2"], "size3": rows["size3"]}
+    r["M1"]["sanity_size1"] = {"value": m1("A-RW", "size1")["covered"], "n": m1("A-RW", "size1")["n_covered"]}
     m2a = A["A-RW"]["M2a"]["all"]
-    fr = A["A-RW"]["M1"]["all"]["false_refusal"]
-    po2 = A["P-ORACLE"]["M2a"]["all"]["refusal"]
-    po_fr = A["P-ORACLE"]["M1"]["all"]["false_refusal"]
-    ok2 = m2a["refusal"] >= M.BARS["M2a_refusal"] and fr <= M.BARS["M2a_false_refusal"]
-    ceil2 = po2 < M.BARS["M2a_refusal"] or po_fr > M.BARS["M2a_false_refusal"]
-    r["M2a"] = {"value": m2a["refusal"], "n": m2a["n"], "false_refusal": fr, "p_oracle": po2, "p_oracle_fr": po_fr,
-                "pass": ok2, "ceiling_bound": (not ok2) and ceil2}
+    fr = m1("A-RW")["false_refusal"]
+    po2, po_fr = A["P-ORACLE"]["M2a"]["all"]["refusal"], m1("P-ORACLE")["false_refusal"]
+    ok2 = _ge(m2a["refusal"], M.BARS["M2a_refusal"]) and _le(fr, M.BARS["M2a_false_refusal"])
+    ceil2 = (po2 is not None and po2 < M.BARS["M2a_refusal"]) or (po_fr is not None and po_fr > M.BARS["M2a_false_refusal"])
+    r["M2a"] = {"value": m2a["refusal"], "n": m2a["n"], "false_refusal": fr, "n_fr": m1("A-RW")["n_fr"], "p_oracle": po2,
+                "p_oracle_fr": po_fr, "pass": ok2, "ceiling_bound": (not ok2) and ceil2}
     m2b = A["A-RW"]["M2b"]["graded"]
     po3 = A["P-ORACLE"]["M2b"]["graded"]["correct"]
-    ok3 = m2b["correct"] >= M.BARS["M2b"]
+    ok3 = _ge(m2b["correct"], M.BARS["M2b"])
     r["M2b"] = {"value": m2b["correct"], "n": m2b["n"], "p_oracle": po3, "pass": ok3,
-                "ceiling_bound": (not ok3) and po3 < M.BARS["M2b"],
+                "ceiling_bound": (not ok3) and po3 is not None and po3 < M.BARS["M2b"],
                 "diamond": A["A-RW"]["M2b"]["diamond"]["correct"], "diamond_p_oracle": A["P-ORACLE"]["M2b"]["diamond"]["correct"]}
+    seen = marks.get("meeting_seen")
     m6 = A["A-RW"]["M6"]["all"]
     po6 = A["P-ORACLE"]["M6"]["all"]["covered"]
-    ok6 = m6["covered"] >= M.BARS["M6"]
-    r["M6"] = {"value": m6["covered"], "n": m6["n_covered"], "all": m6["all"], "n_all": m6["n_all"], "p_oracle": po6,
-               "chance": m6["chance_covered"], "pass": ok6, "ceiling_bound": (not ok6) and po6 < M.BARS["M6"]}
+    if seen is not True:
+        why = "the meeting was never seen (0 fixations on the dax at its scene)" if seen is False else "no meeting in this stream"
+        r["M6"] = {"value": None, "n": 0, "not_gradable": why, "pass": False, "ceiling_bound": False, "p_oracle": None,
+                   "chance": None, "all": None, "n_all": 0}
+    elif m6["covered"] is None:
+        r["M6"] = {"value": None, "n": 0, "not_gradable": f"the learner never heard «dax» (n_unheard {m6['n_unheard']})",
+                   "pass": False, "ceiling_bound": False, "p_oracle": po6, "chance": None, "all": None, "n_all": 0}
+    else:
+        ok6 = _ge(m6["covered"], M.BARS["M6"])
+        r["M6"] = {"value": m6["covered"], "n": m6["n_covered"], "all": m6["all"], "n_all": m6["n_all"], "p_oracle": po6,
+                   "chance": m6["chance_covered"], "pass": ok6, "not_gradable": False,
+                   "ceiling_bound": (not ok6) and (po6 is None or po6 < M.BARS["M6"]),
+                   "by_size": {f"size{n}": A["A-RW"]["M6"][f"size{n}"]["covered"] for n in (2, 3)}}
+    ns = m1("N-SHUF")
     r["N-SHUF"] = {"value": ns["covered"], "chance": ns["chance_covered"],
-                   "bar": ns["chance_covered"] + M.BARS["NSHUF_over_chance"],
-                   "pass": ns["covered"] <= ns["chance_covered"] + M.BARS["NSHUF_over_chance"]}
+                   "bar": None if ns["chance_covered"] is None else ns["chance_covered"] + M.BARS["NSHUF_over_chance"],
+                   "pass": _le(ns["covered"], None if ns["chance_covered"] is None else ns["chance_covered"] + M.BARS["NSHUF_over_chance"]),
+                   "by_size": {k: {"value": m1("N-SHUF", k)["covered"], "chance": m1("N-SHUF", k)["chance_covered"]}
+                               for k in ("size2", "size3")}}
     for k in ("M1", "M2a", "M2b", "M6"):
-        n = r[k]["n"]
-        r[k]["underpowered"] = n < M.UNDERPOWERED_N
-    r["T1_refuted"] = m1["covered"] < M.T1_REFUTE * po_rw
-    r["one_meeting_refuted"] = (m6["covered"] < M.M6_REFUTE) and r["M1"]["pass"]
+        r[k]["underpowered"] = (not r[k].get("not_gradable")) and (r[k]["n"] or 0) < M.UNDERPOWERED_N
+    prw = r["M1"]["p_oracle_rw"]
+    r["T1_refuted"] = bool(r["M1"]["value"] is not None and prw is not None and r["M1"]["value"] < M.T1_REFUTE * prw)
+    r["one_meeting_refuted"] = bool((not r["M6"].get("not_gradable")) and r["M6"]["value"] is not None
+                                    and r["M6"]["value"] < M.M6_REFUTE and r["M1"]["pass"])
     return r
 
 
 def print_seed_table(marks: Dict[str, object], log=print) -> List[str]:
     ws = marks["world_seed"]
-    lines = [f"== S1a marks · world seed {ws} (test seed {W.TEST_SEEDS[ws]}) =="]
+    arms = [a for a in ARMS if a in marks["arms"]]
+    lines = [f"== S1a marks · world seed {ws} (test seed {W.TEST_SEEDS[ws]}) · the one meeting seen: {marks.get('meeting_seen')} =="]
     rps = sorted(int(k) for k in marks["arms"]["A-RW"]["rp"])
-    lines.append("M1 (covered) by reading point:")
+    lines.append("M1 (covered, the GRADED 2- and 3-thing items) by reading point — A-RW-LR01 is a reading arm (no bar):")
     lines.append("   arm            " + " ".join(f"{rp:>7d}" for rp in rps))
-    for arm in ARMS:
-        vals = [marks["arms"][arm]["rp"][str(rp)]["M1"]["all"]["covered"] for rp in rps]
+    for arm in arms:
+        vals = [marks["arms"][arm]["rp"][str(rp)]["M1"]["graded"]["covered"] for rp in rps]
         lines.append(f"   {arm:<14} " + " ".join(f"{_f(v):>7}" for v in vals))
     top = str(max(rps))
-    lines.append(f"At {top} scenes — M1 by scene size / word type (covered · all · coverage · chance · n covered):")
-    for key in ["all", "size1", "size2", "size3", "type:colour", "type:shape", "type:size", "type:none",
+    lines.append(f"At {top} scenes — M1 (covered · all) per block; chance and n from A-RW's items; size1 is the sanity reading:")
+    for key in ["graded", "size2", "size3", "size1", "type:colour", "type:shape", "type:size", "type:none",
                 "tpl:T1", "tpl:T2", "tpl:T3", "tpl:T4"]:
         cells = []
-        for arm in ARMS:
+        for arm in arms:
             b = marks["arms"][arm]["rp"][top]["M1"].get(key)
-            if b is None:
-                cells.append(f"{arm}: —")
-                continue
-            cells.append(f"{arm} {_f(b['covered'])}·{_f(b['all'])}")
+            cells.append(f"{arm} —" if b is None else f"{arm} {_f(b['covered'])}·{_f(b['all'])}")
         b0 = marks["arms"]["A-RW"]["rp"][top]["M1"].get(key) or {}
-        lines.append(f"   {key:<12} cov {_f(b0.get('coverage'))} chance {_f(b0.get('chance_covered'))} n {b0.get('n_covered')}/{b0.get('n_all')} | " + " | ".join(cells))
-    for arm in ARMS:
+        lines.append(f"   {key:<12} cov {_f(b0.get('coverage'))} chance {_f(b0.get('chance_covered'))} n {b0.get('n_covered')}/{b0.get('n_all')} | "
+                     + " | ".join(cells))
+    for arm in arms:
         R = marks["arms"][arm]["rp"][top]
         m2a, m2b, m6 = R["M2a"]["all"], R["M2b"], R["M6"]["all"]
         nm = R["NAME"]
-        lines.append(f"   {arm:<14} M2a refusal {_f(m2a['refusal'])} (n {m2a['n']}) · false refusal on M1 covered "
-                     f"{_f(R['M1']['all']['false_refusal'])} · M2b {_f(m2b['graded']['correct'])} (n {m2b['graded']['n']}; "
-                     f"«I don't know» {_f(m2b['graded']['idk'])}; diamond {_f(m2b['diamond']['correct'])}) · M6 covered "
-                     f"{_f(m6['covered'])} all {_f(m6['all'])} (n {m6['n_covered']}/{m6['n_all']}, chance {_f(m6['chance_covered'])}) "
+        m6s = (f"M6 covered {_f(m6['covered'])} all {_f(m6['all'])} (n {m6['n_covered']}/{m6['n_all']}, chance {_f(m6['chance_covered'])}, unheard {m6['n_unheard']})"
+               if marks.get("meeting_seen") is True else "M6 NOT GRADABLE (the meeting was never seen)")
+        lines.append(f"   {arm:<14} M2a refusal {_f(m2a['refusal'])} (n {m2a['n']}) · false refusal (graded M1 covered) "
+                     f"{_f(R['M1']['graded']['false_refusal'])} · M2b {_f(m2b['graded']['correct'])} (n {m2b['graded']['n']}; "
+                     f"«I don't know» {_f(m2b['graded']['idk'])}; diamond {_f(m2b['diamond']['correct'])}) · {m6s} "
                      f"· NAME shape {_f(nm['shape']['acc'])} colour {_f(nm['colour']['acc'])} size {_f(nm['size']['acc'])}")
     for s in W.M2B_SHAPES:
-        lines.append(f"   M2b {s:<6} " + " ".join(f"{arm} {_f(marks['arms'][arm]['rp'][top]['M2b'][f'shape:{s}']['correct'])}" for arm in ARMS)
+        lines.append(f"   M2b {s:<6} " + " ".join(f"{arm} {_f(marks['arms'][arm]['rp'][top]['M2b'][f'shape:{s}']['correct'])}" for arm in arms)
                      + f" · A-RW emitted {marks['arms']['A-RW']['rp'][top]['M2b'][f'shape:{s}']['shape_words_emitted']}")
-    for n in (2, 3):
-        lines.append(f"   M6 size{n}: " + " ".join(f"{arm} {_f(marks['arms'][arm]['rp'][top]['M6'][f'size{n}']['covered'])}" for arm in ARMS)
-                     + f" · chance {_f(marks['arms']['A-RW']['rp'][top]['M6'][f'size{n}']['chance_covered'])}")
+    if marks.get("meeting_seen") is True:
+        for n in (2, 3):
+            lines.append(f"   M6 size{n}: " + " ".join(f"{arm} {_f(marks['arms'][arm]['rp'][top]['M6'][f'size{n}']['covered'])}" for arm in arms)
+                         + f" · chance {_f(marks['arms']['A-RW']['rp'][top]['M6'][f'size{n}']['chance_covered'])}")
     gap = []
-    for key in ("all", "size1", "size2", "size3"):
+    for key in ("graded", "size2", "size3"):
         a = marks["arms"]["ORACLE-TRUTH"]["rp"][top]["M1"][key]["covered"]
         b = marks["arms"]["P-ORACLE"]["rp"][top]["M1"][key]["covered"]
         gap.append(f"{key} {_f(None if a is None or b is None else a - b)}")
@@ -424,37 +475,63 @@ def print_seed_table(marks: Dict[str, object], log=print) -> List[str]:
     return lines
 
 
+def _verdict(b: Dict[str, object]) -> str:
+    if b.get("not_gradable"):
+        return "NOT GRADABLE"
+    if b["pass"]:
+        return "PASS"
+    return "CEILING-BOUND" if b.get("ceiling_bound") else "FAIL"
+
+
 def report(root: Path, log=print) -> Dict[str, object]:
-    out = {"prereg_sha256": PREREG_SHA256, "seeds": {}}
+    out = {"prereg_sha256": PREREG_SHA256, "amend2_sha256": AMEND2_SHA256, "seeds": {}}
     lines: List[str] = []
     for ws in W.WORLD_SEEDS:
         mk = json.loads((seed_root(root, ws) / "marks.json").read_text())
         lines += print_seed_table(mk, log=lambda s: None)
         out["seeds"][str(ws)] = bars_for(mk)
-    lines.append("== S1a BARS at 10,000 scenes (A-RW; P-ORACLE's reading beside every mark) ==")
-    lines.append("seed      M1 covered (all)   [bar vs P-ORACLE-RW · vs P-ORACLE]     M2a refusal / false   M2b            M6 covered (all)      N-SHUF (≤ chance+0.05)")
+        lines.append("")
+    lines.append("== S1a BARS at 10,000 scenes (A-RW; P-ORACLE's reading beside every mark; M1 on the 2- and 3-thing items) ==")
     for ws in W.WORLD_SEEDS:
         b = out["seeds"][str(ws)]
-        lines.append(
-            f"{ws}  {_f(b['M1']['value'])} ({_f(b['M1']['all'])}) [{_f(b['M1']['bar_rw'])} · {_f(b['M1']['bar_lda'])}] "
-            f"P-OR {_f(b['M1']['p_oracle'])} P-OR-RW {_f(b['M1']['p_oracle_rw'])} {'PASS' if b['M1']['pass'] else 'FAIL'}   "
-            f"{_f(b['M2a']['value'])} / {_f(b['M2a']['false_refusal'])} P-OR {_f(b['M2a']['p_oracle'])} "
-            f"{'PASS' if b['M2a']['pass'] else ('CEILING-BOUND' if b['M2a']['ceiling_bound'] else 'FAIL')}   "
-            f"{_f(b['M2b']['value'])} P-OR {_f(b['M2b']['p_oracle'])} {'PASS' if b['M2b']['pass'] else ('CEILING-BOUND' if b['M2b']['ceiling_bound'] else 'FAIL')}   "
-            f"{_f(b['M6']['value'])} ({_f(b['M6']['all'])}) P-OR {_f(b['M6']['p_oracle'])} "
-            f"{'PASS' if b['M6']['pass'] else ('CEILING-BOUND' if b['M6']['ceiling_bound'] else 'FAIL')}   "
-            f"{_f(b['N-SHUF']['value'])} ≤ {_f(b['N-SHUF']['bar'])} {'PASS' if b['N-SHUF']['pass'] else 'FAIL'}")
-        und = [k for k in ("M1", "M2a", "M2b", "M6") if b[k]["underpowered"]]
+        m1 = b["M1"]
+        lines.append(f"{ws} M1 covered {_f(m1['value'])} (all {_f(m1['all'])}; n {m1['n']}/{m1['n_all']}; chance {_f(m1['chance'])}) "
+                     f"bars ≥ {_f(m1['bar_rw'])} (0.90 × P-ORACLE-RW {_f(m1['p_oracle_rw'])}) and ≥ {_f(m1['bar_lda'])} "
+                     f"(0.80 × P-ORACLE {_f(m1['p_oracle'])}) → {_verdict(m1)} · ORACLE-TRUTH {_f(m1['oracle_truth'])} · "
+                     f"A-RW-LR01 {_f(m1['lr01'])} (reading)")
+        for k, v in m1["by_size"].items():
+            lines.append(f"          {k}: {_f(v['value'])} (n {v['n']}, chance {_f(v['chance'])}) bars {_f(v['bar_rw'])} · {_f(v['bar_lda'])} "
+                         f"(P-ORACLE-RW {_f(v['p_oracle_rw'])}, P-ORACLE {_f(v['p_oracle'])}) → {_verdict(v)} · A-RW-LR01 {_f(v['lr01'])}")
+        lines.append(f"          size1 (sanity): {_f(m1['sanity_size1']['value'])} (n {m1['sanity_size1']['n']})")
+        m2a, m2b, m6, ns = b["M2a"], b["M2b"], b["M6"], b["N-SHUF"]
+        lines.append(f"          M2a refusal {_f(m2a['value'])} (n {m2a['n']}) · false refusal {_f(m2a['false_refusal'])} (n {m2a['n_fr']}) "
+                     f"· P-ORACLE {_f(m2a['p_oracle'])} / {_f(m2a['p_oracle_fr'])} → {_verdict(m2a)}")
+        lines.append(f"          M2b {_f(m2b['value'])} (n {m2b['n']}) · P-ORACLE {_f(m2b['p_oracle'])} → {_verdict(m2b)} · diamond (apart) "
+                     f"{_f(m2b['diamond'])} · P-ORACLE {_f(m2b['diamond_p_oracle'])}")
+        if m6.get("not_gradable"):
+            lines.append(f"          M6 NOT GRADABLE — {m6['not_gradable']}")
+        else:
+            lines.append(f"          M6 covered {_f(m6['value'])} (all {_f(m6['all'])}; n {m6['n']}/{m6['n_all']}; chance {_f(m6['chance'])}) "
+                         f"· P-ORACLE {_f(m6['p_oracle'])} → {_verdict(m6)}")
+        lines.append(f"          N-SHUF M1 {_f(ns['value'])} ≤ chance {_f(ns['chance'])} + 0.05 = {_f(ns['bar'])} → {'PASS' if ns['pass'] else 'FAIL'} "
+                     f"(size2 {_f(ns['by_size']['size2']['value'])} vs {_f(ns['by_size']['size2']['chance'])}; "
+                     f"size3 {_f(ns['by_size']['size3']['value'])} vs {_f(ns['by_size']['size3']['chance'])})")
+        und = [k for k in ("M1", "M2a", "M2b", "M6") if b[k].get("underpowered")]
         if und:
             lines.append(f"          UNDERPOWERED (n < 30): {', '.join(und)}")
-    allpass = {k: all(out['seeds'][str(ws)][k]['pass'] for ws in W.WORLD_SEEDS) for k in ("M1", "M2a", "M2b", "M6", "N-SHUF")}
-    lines.append("every bar at all 3 seeds: " + " · ".join(f"{k} {'PASS' if v else 'no'}" for k, v in allpass.items())
+    grad6 = [ws for ws in W.WORLD_SEEDS if not out["seeds"][str(ws)]["M6"].get("not_gradable")]
+    allpass = {k: all(out["seeds"][str(ws)][k]["pass"] for ws in W.WORLD_SEEDS) for k in ("M1", "M2a", "M2b", "N-SHUF")}
+    allpass["M6"] = bool(grad6) and all(out["seeds"][str(ws)]["M6"]["pass"] for ws in grad6)
+    lines.append("every bar at all 3 seeds (M6 at the seeds where the meeting was seen: " + ", ".join(map(str, grad6)) + "): "
+                 + " · ".join(f"{k} {'PASS' if v else 'no'}" for k, v in allpass.items())
                  + f" → S1a {'PASSES' if all(allpass.values()) else 'does not pass'}")
     lines.append("refutations: T1 (A-RW M1 < 0.6 × P-ORACLE-RW) " + " ".join(
         f"{ws}:{'REFUTED' if out['seeds'][str(ws)]['T1_refuted'] else 'no'}" for ws in W.WORLD_SEEDS)
         + " · one-meeting (M6 < 0.5 while M1 passes) " + " ".join(
-        f"{ws}:{'REFUTED' if out['seeds'][str(ws)]['one_meeting_refuted'] else 'no'}" for ws in W.WORLD_SEEDS))
+        f"{ws}:{'REFUTED' if out['seeds'][str(ws)]['one_meeting_refuted'] else ('n/g' if out['seeds'][str(ws)]['M6'].get('not_gradable') else 'no')}"
+        for ws in W.WORLD_SEEDS))
     out["all_pass"] = allpass
+    out["m6_gradable_seeds"] = grad6
     for l in lines:
         log(l)
     dump(Path(root) / "report.json", out)
@@ -520,8 +597,8 @@ def _per_type_naming(reader, things: Things, truth_rows, arm: str = "P-ORACLE") 
 def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, object]:
     check_prereg()
     t0 = time.perf_counter()
-    out: Dict[str, object] = {"prereg_sha256": PREREG_SHA256, "code": code_identity()}
-    lines = ["== THE FIRST GATE (PREREG-R3-TONIGHT §S1a) =="]
+    out: Dict[str, object] = {"prereg_sha256": PREREG_SHA256, "amend2_sha256": AMEND2_SHA256, "code": code_identity()}
+    lines = ["== THE FIRST GATE (PREREG-R3-TONIGHT §S1a, as AMENDMENT 2 reads it) =="]
     # --- 1. the toy
     for split in ("toy-train", "toy-test"):
         d = C.cache_dir(root, None, split)
@@ -564,7 +641,7 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
     # --- ε for P-ORACLE, on the toy seed only
     eps_rows = {}
     for eps in Lr.EPS_GRID:
-        R = Lr.LDAReader(eps)
+        R = make_learner("P-ORACLE", Lr.LR, eps)            # AMENDMENT 2 §1: the TYPE-AWARE reader, ε on the toy as before
         train_arm("P-ORACLE", R, tr, tr.p.words, tr_truth, rows, W.TOY_SEED)
         R.prepare()
         nm = _per_type_naming(R, te, te_truth)
@@ -590,7 +667,7 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
     one = [i for i in gate_rows if len(trs_truth[i]["things"]) == 1]
     loo = {t: [] for t in TYPE_WORDS}
     for i in one:
-        R = Lr.LDAReader(eps)
+        R = make_learner("P-ORACLE", lr, eps)               # AMENDMENT 2 §1: the verdict RE-READ with the type-aware reader
         train_arm("P-ORACLE", R, trs, trs.p.words, trs_truth, [j for j in gate_rows if j != i], ws)
         R.prepare()
         nm = _per_type_naming(R, trs, [trs_truth[i]])
@@ -609,7 +686,7 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
     for t, v in verdict.items():
         lines.append(f"   {t:<6} {_f(v['p_oracle'])} (n {v['n']}) vs 0.90 × probe {v['probe_all144']} = {v['threshold']:.4f} → "
                      f"{'FIRES' if v['fires'] else 'does not fire'} · best-subset probe {v['best_subset'][0]} {v['best_subset'][1]} (read by no verdict)")
-    # --- 3. five arms × 300 scenes vs N-SHUF on M1 (seed 1's test items)
+    # --- 3. the arms × 300 scenes vs N-SHUF on M1 (seed 1's test items; AMENDMENT 2: the graded 2- and 3-thing items)
     Qf = seed_root(root, ws) / "questions.json"
     if not Qf.exists():
         build_questions(root, ws)
@@ -623,22 +700,32 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
         L = make_learner(arm, lr, eps)
         seen: list = []
         words_of = (lambda i: trs.p.words(int(perm[i]))) if arm == "N-SHUF" else trs.p.words
-        train_arm(arm, L, trs, words_of, trs_truth if arm in ("P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH") else None,
-                  gate_rows, ws, seen)
+        train_arm(arm, L, trs, words_of, trs_truth if arm in ORACLE_ARMS else None, gate_rows, ws, seen)
         prepare(arm, L, seen)
         ans = answer_all(arm, L, {"M1": Q["questions"]["M1"]}, {"test": tt}, Q["test_seed"])
         g = M.grade_pointing(K["items"]["M1"], ans, t_truth, tt.members, "truth" if arm == "ORACLE-TRUTH" else "gaze")
-        arms[arm] = M.summarise_pointing(g)["all"]
-    beat = {a: arms[a]["covered"] > arms["N-SHUF"]["covered"] for a in ARMS if a != "N-SHUF"}
-    out["arms300"] = arms
+        arms[arm] = M.summarise_pointing(g)
+    # AMENDMENT 2 §2: «beats N-SHUF» is read on the GRADED 2- and 3-thing items; the reading arm carries no bar
+    ns_cov = arms["N-SHUF"]["graded"]["covered"]
+    beat = {a: (arms[a]["graded"]["covered"] is not None and ns_cov is not None and arms[a]["graded"]["covered"] > ns_cov)
+            for a in ARMS if a != "N-SHUF" and a not in READING_ARMS}
+    out["arms300"] = {a: arms[a]["graded"] for a in ARMS}
+    out["arms300_blocks"] = {a: {k: arms[a][k] for k in ("graded", "size1", "size2", "size3", "all")} for a in ARMS}
     out["beat_nshuf"] = beat
-    lines.append(f"3. FIVE ARMS × {W.GATE_N} scenes of seed {ws}, M1 on its {arms['A-RW']['n_all']} test items "
-                 f"(covered {arms['A-RW']['n_covered']}; chance covered {_f(arms['A-RW']['chance_covered'])}):")
+    g0 = arms["A-RW"]["graded"]
+    lines.append(f"3. {len(ARMS)} ARMS × {W.GATE_N} scenes of seed {ws}, M1 on its GRADED 2- and 3-thing test items "
+                 f"(n {g0['n_all']}, covered {g0['n_covered']}; chance covered {_f(g0['chance_covered'])}) — per size and the "
+                 f"one-thing sanity reading beside:")
     for a in ARMS:
-        lines.append(f"   {a:<14} M1 covered {_f(arms[a]['covered'])} · all {_f(arms[a]['all'])}"
-                     + ("" if a == "N-SHUF" else f" · beats N-SHUF: {'yes' if beat[a] else 'NO'}"))
-    lines.append(f"   (the brief's step 6 asked for ORACLE-TRUTH < 0.95 → STOP; the signed PREREG's STOP is the instrument "
-                 f"verdict. ORACLE-TRUTH reads {_f(arms['ORACLE-TRUTH']['covered'])} here.)")
+        b = arms[a]
+        lines.append(f"   {a:<14} M1 covered {_f(b['graded']['covered'])} · all {_f(b['graded']['all'])} · size2 "
+                     f"{_f(b['size2']['covered'])} (chance {_f(b['size2']['chance_covered'])}) · size3 {_f(b['size3']['covered'])} "
+                     f"(chance {_f(b['size3']['chance_covered'])}) · size1 sanity {_f(b['size1']['covered'])}"
+                     + ("" if a == "N-SHUF" else (" · a reading arm, no bar" if a in READING_ARMS else
+                                                  f" · beats N-SHUF: {'yes' if beat[a] else 'NO'}")))
+    lines.append(f"   (the brief's step 6: ORACLE-TRUTH < 0.95 → STOP; the signed PREREG's and AMENDMENT 2's STOP is the "
+                 f"instrument verdict. ORACLE-TRUTH reads {_f(arms['ORACLE-TRUTH']['graded']['covered'])} on the graded items, "
+                 f"{_f(arms['ORACLE-TRUTH']['all']['covered'])} on all.)")
     fired = [t for t, v in verdict.items() if v["fires"]]
     stop = []
     if fired:
@@ -661,7 +748,7 @@ def first_gate(root: Path, log=print, toy_only: bool = False) -> Dict[str, objec
 
 # ------------------------------------------------------------------------------------------------ the price
 def price(root: Path, n: int = 2000, log=print) -> Dict[str, object]:
-    """Solo (A-RW, seed 1), then the launch's shape (5 arms × 3 seeds at once, nice 19), each over the first `n` scenes
+    """Solo (A-RW, seed 1), then the launch's shape (6 arms × 3 seeds at once, nice 19), each over the first `n` scenes
     with the reading points ≤ n; CPU seconds read from each process's own record, extrapolated ×(10,000 / n)."""
     g = gate_or_chosen()
     tmp = Path(root) / "price"
@@ -695,7 +782,7 @@ def price(root: Path, n: int = 2000, log=print) -> Dict[str, object]:
     cpu_shape = sum(r["cpu_s"] or 0 for r in shape)
     lines = [f"== PRICE (first {n} scenes, reading points {rps}; × {k:.0f} to 10,000) ==",
              f"solo A-RW seed {W.WORLD_SEEDS[0]}: cpu {solo[0]['cpu_s']:.1f} s, wall {solo_wall:.1f} s → ≈ {solo[0]['cpu_s'] * k / 60:.1f} CPU-min per arm-seed",
-             f"launch shape 5 arms × 3 seeds at once: cpu {cpu_shape:.1f} s total (per process "
+             f"launch shape {len(ARMS)} arms × 3 seeds at once: cpu {cpu_shape:.1f} s total (per process "
              + ", ".join(f"{r['arm']}/{r['seed']} {r['cpu_s']:.1f}" for r in shape) + f"), wall {shape_wall:.1f} s "
              f"→ ≈ {cpu_shape * k / 3600:.2f} CPU-h and ≈ {shape_wall * k / 60:.1f} min wall for the arms at 10,000"]
     for l in lines:

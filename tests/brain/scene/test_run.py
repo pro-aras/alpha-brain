@@ -2,6 +2,7 @@
 # → questions (no keys in them) → every arm over a short stream with two reading points → the grader → the bars. The
 # oracle arms' referent is the referent's thing hypothesis; A-RW and N-SHUF never load the truth file (checked by
 # spying on cache.load_truth).
+# edit: Claude (Opus 5.5, S1a builder), 2026-09-28 12:59 +0400 — AMENDMENT 2: the reading arm never loads the truth; M6 without the meeting reads NOT GRADABLE (never 0.0); the bars read the graded 2–3-thing items.
 from __future__ import annotations
 
 import json
@@ -56,6 +57,7 @@ class TestRunEndToEnd(unittest.TestCase):
     def test_only_oracle_arms_load_the_truth(self) -> None:
         self.assertEqual(self.loads["A-RW"], [])
         self.assertEqual(self.loads["N-SHUF"], [])
+        self.assertEqual(self.loads["A-RW-LR01"], [])                  # AMENDMENT 2 §5: the reading arm is A-RW's feed
         for arm in ("P-ORACLE-RW", "P-ORACLE", "ORACLE-TRUTH"):
             self.assertTrue(any(p.endswith("/train") for p in self.loads[arm]), arm)
 
@@ -77,7 +79,27 @@ class TestRunEndToEnd(unittest.TestCase):
         self.assertEqual(set(b), {"M1", "M2a", "M2b", "M6", "N-SHUF", "T1_refuted", "one_meeting_refuted"})
         self.assertTrue(b["M2b"]["underpowered"] is False)
         lines = R.print_seed_table(mk, log=lambda s: None)
-        self.assertTrue(any("M1 (covered) by reading point" in l for l in lines))
+        self.assertTrue(any("M1 (covered, the GRADED 2- and 3-thing items) by reading point" in l for l in lines))
+        self.assertTrue(any(l.strip().startswith("A-RW-LR01") for l in lines))           # AMENDMENT 2 §5: printed beside
+
+    def test_amend2_m6_without_the_meeting_reads_not_gradable_never_zero(self) -> None:
+        """AMENDMENT 2 §3–§4: this 60-scene stream never reaches the meeting (scene 2,700), so M6 is NOT GRADABLE at
+        the seed, and every arm's M6 answers are «unheard» — no 0.0 anywhere."""
+        self.assertIsNone(self.marks["meeting_seen"])
+        b = R.bars_for(self.marks, rp="60")
+        self.assertIsNone(b["M6"]["value"])
+        self.assertTrue(b["M6"]["not_gradable"])
+        self.assertFalse(b["M6"]["pass"])
+        for arm in R.ARMS:
+            m6 = self.marks["arms"][arm]["rp"]["60"]["M6"]["all"]
+            self.assertIsNone(m6["covered"], arm)
+            self.assertEqual(m6["n_unheard"], 42, arm)
+
+    def test_amend2_bars_read_the_graded_items(self) -> None:
+        b = R.bars_for(self.marks, rp="60")
+        g = self.marks["arms"]["A-RW"]["rp"]["60"]["M1"]["graded"]
+        self.assertEqual(b["M1"]["value"], g["covered"])
+        self.assertEqual(b["M1"]["n"], g["n_covered"])
 
     def test_oracle_truth_points_among_the_true_things(self) -> None:
         A = json.loads((self.root / str(WS) / "arms" / "ORACLE-TRUTH" / "answers_00060.json").read_text())["answers"]

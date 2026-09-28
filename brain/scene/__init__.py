@@ -12,3 +12,6 @@ edit: Claude (Opus 5.5, S1a builder), 2026-09-28 12:00 +0400 — new package.
   run.py       stage −1, the toy, THE FIRST GATE, the prices, the full run, the grader
 """
 PREREG_SHA256 = "18250d201b6aecbdc95058267f6cab163ca1450e82f4f1d8f9724a1849215968"
+# edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:05 +0400 — AMENDMENT 2 (docs/brain/r3/PREREG-R3-TONIGHT-AMEND-2.md, genome-wt-brain3
+# d54e6c0), the sha of the text this code implements; checked at every run beside the signed PREREG's.
+AMEND2_SHA256 = "414b320179a74aade87cfda0896637b43f28af1cf8700b0a8a88ae23fb164ed3"

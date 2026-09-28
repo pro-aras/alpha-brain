@@ -17,6 +17,10 @@ listed in docs/brain/r3/S1A-HANDBACK.md; those that can move a bar are RAISED th
     thing (pointing to it is wrong for every target). A thing's hypothesis (the oracles' referent) = the hypothesis
     with the most fixations on it (a tie → the nearest mean position to the thing's centroid, in cells).
   · COVERED = the target has ≥ 1 fixation. M1 and M6's bars read COVERED items (the learner); ALL is printed beside.
+
+edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:05 +0400 — AMENDMENT 2 (PREREG-R3-TONIGHT-AMEND-2.md, genome-wt-brain3 d54e6c0): §2 M1
+is graded on the 2- and 3-thing items (the «graded» block; the one-thing items a sanity reading); §3 meeting_seen(); §4 an
+unheard word makes an item NOT GRADABLE (excluded, counted as n_unheard), never 0.0.
 """
 from __future__ import annotations
 
@@ -184,7 +188,10 @@ def grade_pointing(items: Sequence[Dict[str, object]], answers: Dict[str, Dict[s
             if a is not None and a.get("point") is not None:
                 lab = hyp_label(hyp_counts(members, ft)[int(a["point"])])
             corr = lab is not None and lab == it["target"]
-        out.append({"item_id": it["item_id"], "covered": cov, "correct": bool(corr),
+        # AMENDMENT 2 §4: an item whose phrase holds a word the arm never heard is NOT GRADABLE — excluded from every
+        # rate and counted apart as n_unheard, never scored 0.0
+        gradable = not bool((a or {}).get("unheard"))
+        out.append({"item_id": it["item_id"], "covered": cov, "correct": bool(corr), "gradable": gradable,
                     "none": (None if a is None else a.get("none")), "answered": a is not None and a.get("point") is not None,
                     "chance": 1.0 / max(1, n_opts), "n_things": it["n_things"], "types": it.get("types", []),
                     "template": it.get("template")})
@@ -192,25 +199,37 @@ def grade_pointing(items: Sequence[Dict[str, object]], answers: Dict[str, Dict[s
 
 
 def summarise_pointing(g: Sequence[Dict[str, object]]) -> Dict[str, object]:
+    """Blocks of the pointing grade. AMENDMENT 2 §2: «graded» = the 2- and 3-thing items (the bars read it); «size1» is
+    the one-thing sanity reading; the per-type and per-template rows are over the graded items (declared). Every rate
+    counts GRADABLE items only (§4); a block with none reads None, with n_unheard beside it."""
     def block(rows):
+        un = sum(1 for r in rows if not r["gradable"])
+        rows = [r for r in rows if r["gradable"]]
         cov = [r for r in rows if r["covered"]]
         acc_c, n_c = _rate(r["correct"] for r in cov)
         acc_a, n_a = _rate(r["correct"] for r in rows)
         ch_c = float(np.mean([r["chance"] for r in cov])) if cov else None
+        ch_a = float(np.mean([r["chance"] for r in rows])) if rows else None
         fr, n_fr = _rate(bool(r["none"]) for r in cov if r["none"] is not None)
         return {"covered": acc_c, "n_covered": n_c, "all": acc_a, "n_all": n_a, "coverage": (n_c / n_a if n_a else None),
-                "chance_covered": ch_c, "false_refusal": fr, "n_fr": n_fr}
-    res = {"all": block(g)}
+                "chance_covered": ch_c, "chance_all": ch_a, "false_refusal": fr, "n_fr": n_fr, "n_unheard": un}
+    graded = [r for r in g if r["n_things"] >= 2]
+    res = {"all": block(g), "graded": block(graded)}
     for n in (1, 2, 3):
         res[f"size{n}"] = block([r for r in g if r["n_things"] == n])
     for t in W.WORD_TYPES:
-        res[f"type:{t}"] = block([r for r in g if t in r["types"]])
-    res["type:none"] = block([r for r in g if not r["types"]])
+        res[f"type:{t}"] = block([r for r in graded if t in r["types"]])
+    res["type:none"] = block([r for r in graded if not r["types"]])
     for tpl in W.TEMPLATES:
-        rows = [r for r in g if r["template"] == tpl]
+        rows = [r for r in graded if r["template"] == tpl]
         if rows:
             res[f"tpl:{tpl}"] = block(rows)
     return res
+
+
+def meeting_seen(dax_row: Dict[str, object]) -> bool:
+    """AMENDMENT 2 §3: the one meeting reached the learner iff the dax (the dax scene's referent) got ≥ 1 fixation."""
+    return covered(int(dax_row["referent"]), dax_row["fix_thing"])
 
 
 def grade_m2a(items, answers) -> Dict[str, object]:

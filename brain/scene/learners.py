@@ -11,10 +11,13 @@ referent arrives as an INDEX ARGUMENT from the caller (run.py), which is the onl
               things in view, the delta rule with PROPORTIONAL responsibility, a prototype and a band per word, the
               episodic write for a new word. `oracle=True` is P-ORACLE-RW: A-RW's own code with a said word's
               responsibility 1 on the referent the caller marks (one difference).
-  LDAReader   P-ORACLE / ORACLE-TRUTH: the streaming LDA reader (slda.StreamingLDA, one type-blind reader over every word
-              as a class) on the 144 features, fed each said word with its referent marked; its answers read the
-              per-word Mahalanobis distances under the shared Λ, with bands calibrated conformally at 0.90 on its
-              training things.
+  LDAReader   SUPERSEDED by AMENDMENT 2 (kept for the first gate's diagnosis scripts only): one type-blind StreamingLDA
+              over every word as a class; per-word Mahalanobis distances under one shared Λ.
+  TypedLDAReader  P-ORACLE / ORACLE-TRUTH as AMENDMENT 2 §1 rules them: one StreamingLDA per word TYPE (the word → type
+              map passed in by the caller), pointing by the within-type posterior, conformal 0.90 posterior bands.
+
+edit: Claude (Opus 5.5, S1a builder), 2026-09-28 13:05 +0400 — AMENDMENT 2 §1 (PREREG-R3-TONIGHT-AMEND-2.md, genome-wt-brain3 d54e6c0):
+TypedLDAReader added; LDAReader kept, superseded.
 """
 from __future__ import annotations
 
@@ -470,6 +473,140 @@ class LDAReader:
     def summary(self) -> Dict[str, object]:
         return {"eps": self.eps, "names": self.names, "counts": list(self.lda.counts), "train_scenes": len(self.train_x),
                 "skipped": self.skipped, "band": dict(self.band), "q_point": self.q_point, "calib_n": dict(self.calib_n)}
+
+
+# ================================================================================================ the TYPE-AWARE oracle reader
+def _logsumexp_rows(S: np.ndarray) -> np.ndarray:
+    m = np.max(S, axis=1, keepdims=True)
+    return m + np.log(np.sum(np.exp(S - m), axis=1, keepdims=True))
+
+
+class TypedLDAReader:
+    """P-ORACLE and ORACLE-TRUTH as AMENDMENT 2 §1 rules them (PREREG-R3-TONIGHT-AMEND-2.md, 2026-09-28 12:56 +0400; it
+    supersedes LDAReader above, which stays only for the diagnosis scripts of the first gate):
+      · ONE StreamingLDA PER WORD TYPE (the 6 shapes compete with each other; the 5 colours; the 2 sizes), each with its
+        own within-class covariance, one ε for all three (chosen on the toy seed). The word → type map is PASSED IN by the
+        caller — the oracle may know the types, the learners never do, and this module still imports no world.
+      · p(w | x) = the posterior WITHIN w's type: the softmax over that type's classes of the reader's own discriminant
+        (StreamingLDA's scores; equal class priors, as the reader is built — declared).
+      · pointing = argmax over things of Σ_{w ∈ phrase} log p(w | x) (ties by the item's generator);
+      · the BANDS: per word, τ_w = the conformal 0.90 lower threshold of p(w | x) over w's training referents; a word with
+        n < 9 referents takes the median τ of the calibrated words (declared, the episodic rule's fallback);
+      · «what is this?» emits every heard word with p(w | x) ≥ τ_w; «none» when the POINTED thing has p(w | x) < τ_w for
+        some word of the phrase (declared: the bands are read at the thing the pointing chose, as A-RW reads τ_point at
+        its best thing);
+      · per-type naming (the instrument verdict) = the forced argmax of the type's posterior over the grader's words."""
+
+    def __init__(self, eps: float, word_types: Dict[str, str]):
+        self.eps = float(eps)
+        self.word_types = dict(word_types)
+        self.readers: Dict[str, StreamingLDA] = {}
+        self.train_x: List[np.ndarray] = []
+        self.train_words: List[Tuple[str, ...]] = []
+        self.skipped = 0
+        self.band: Dict[str, float] = {}
+        self.band_fallback: List[str] = []
+        self.calib_n: Dict[str, int] = {}
+
+    def type_of(self, w: str) -> str:
+        return self.word_types[w]                            # KeyError: a word of no declared type is refused
+
+    def names_of(self, t: str) -> List[str]:
+        r = self.readers.get(t)
+        return list(r.names) if r is not None else []
+
+    @property
+    def names(self) -> List[str]:
+        return [w for t in sorted(self.readers) for w in self.readers[t].names]
+
+    def heard(self, w: str) -> bool:
+        return w in self.word_types and w in self.names_of(self.type_of(w))
+
+    def train_scene(self, x_ref: Optional[np.ndarray], words: Sequence[str]) -> None:
+        ws = tuple(dict.fromkeys(words))
+        if not ws:
+            return
+        types = [self.type_of(w) for w in ws]                # refuse before any observation
+        if x_ref is None:
+            self.skipped += 1                                # the referent had no hypothesis — nothing seen
+            return
+        x = np.asarray(x_ref, dtype=np.float64)
+        for w, t in zip(ws, types):
+            r = self.readers.get(t)
+            if r is None:
+                r = self.readers[t] = StreamingLDA(self.eps)
+            r.observe(x, w)
+        self.train_x.append(x)
+        self.train_words.append(ws)
+
+    def _log_post(self, t: str, X: np.ndarray) -> np.ndarray:
+        """(H, K_t) log posterior over type t's classes, in the reader's class order."""
+        r = self.readers[t]
+        X = np.atleast_2d(np.asarray(X, dtype=np.float64))
+        dL, L = r._metric()
+        Mu = np.stack([m[:dL] for m in r.means])
+        S = X[:, :dL] @ (Mu @ L).T - 0.5 * np.einsum("kj,jl,kl->k", Mu, L, Mu)[None, :]
+        return S - _logsumexp_rows(S)
+
+    def log_posterior(self, X: np.ndarray, w: str) -> np.ndarray:
+        t = self.type_of(w)
+        return self._log_post(t, X)[:, self.readers[t].names.index(w)]
+
+    def prepare(self) -> Dict[str, object]:
+        for t in sorted(self.readers):
+            self.readers[t].sleep()
+        per: Dict[str, List[float]] = {w: [] for w in self.names}
+        if self.train_x:
+            X = np.stack(self.train_x)
+            lp = {t: self._log_post(t, X) for t in self.readers}
+            col = {w: (t, self.readers[t].names.index(w)) for t in self.readers for w in self.readers[t].names}
+            for i, ws in enumerate(self.train_words):
+                for w in ws:
+                    t, k = col[w]
+                    per[w].append(float(np.exp(lp[t][i, k])))
+        raw = {w: conformal_lower(v) for w, v in per.items()}
+        good = [b for b in raw.values() if b is not None]
+        fallback = float(np.median(good)) if good else 1.0
+        self.band = {w: (b if b is not None else fallback) for w, b in raw.items()}
+        self.band_fallback = [w for w, b in raw.items() if b is None]
+        self.calib_n = {f"word:{w}": len(v) for w, v in per.items()}
+        return {"band": dict(self.band), "band_fallback": list(self.band_fallback), "n": dict(self.calib_n)}
+
+    def answer_point(self, X: np.ndarray, phrase: Sequence[str], rng: np.random.Generator) -> Dict[str, object]:
+        unheard = [w for w in phrase if not self.heard(w)]
+        if unheard:
+            return {"point": None, "none": None, "best": None, "unheard": unheard}
+        lps = {w: self.log_posterior(X, w) for w in dict.fromkeys(phrase)}
+        s = np.sum([lps[w] for w in phrase], axis=0)
+        k = pick(s, rng, "max")
+        none = any(float(np.exp(lps[w][k])) < self.band.get(w, 1.0) for w in phrase)
+        return {"point": k, "none": bool(none), "best": float(s[k])}
+
+    def what_is_this(self, x: np.ndarray) -> List[str]:
+        out = []
+        for t in sorted(self.readers):
+            lp = self._log_post(t, x)[0]
+            for k, w in enumerate(self.readers[t].names):
+                if float(np.exp(lp[k])) >= self.band.get(w, 1.0):
+                    out.append(w)
+        return out
+
+    def name_forced(self, x: np.ndarray, type_words: Sequence[str]) -> Optional[str]:
+        cand = [w for w in type_words if self.heard(w)]
+        if not cand:
+            return None
+        t = self.type_of(cand[0])
+        if any(self.type_of(w) != t for w in cand):
+            raise ValueError(f"forced naming over words of several types: {cand}")
+        lp = self._log_post(t, x)[0]
+        names = self.readers[t].names
+        return cand[int(np.argmax([lp[names.index(w)] for w in cand]))]
+
+    def summary(self) -> Dict[str, object]:
+        return {"eps": self.eps, "types": {t: self.names_of(t) for t in sorted(self.readers)},
+                "counts": {t: list(self.readers[t].counts) for t in sorted(self.readers)},
+                "train_scenes": len(self.train_x), "skipped": self.skipped, "band": dict(self.band),
+                "band_fallback": list(self.band_fallback), "calib_n": dict(self.calib_n)}
 
 
 # ================================================================================================ the feeds
