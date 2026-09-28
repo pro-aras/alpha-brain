@@ -235,6 +235,11 @@ class RWLearner:
     # learner's maturity through this CLASS attribute (default P_FROM_MEETING = 3, so every existing caller reads 3 as before);
     # genome/brain.py sets it on its own instance. Every site below that read the module constant reads self.p_from / L.p_from.
     p_from: int = P_FROM_MEETING
+    # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:18 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2 (sha 45abeca2…): F-M6's switch, a CLASS
+    # attribute whose default "band" is the LAW (every existing caller unchanged); genome/brain.py sets the INSTANCE attribute to
+    # "nearest" only under `young <n> nearest` (so a law learner's vars() — and every state hash — is unchanged). Read by
+    # answer_point alone.
+    young_rule: str = "band"
 
     def __init__(self, lr: float = LR, oracle: bool = False, dim: int = RW_DIM):
         self.lr = float(lr)
@@ -543,8 +548,17 @@ class RWLearner:
         s = self.phrase_scores(Z, phrase, self.logp_answer(Z, getattr(self, "_bands_cache", None)))
         if s is None:
             return {"point": None, "none": None, "best": None, "unheard": [w for w in phrase if w not in self.index]}
-        k = pick(s, rng, "max")
-        best = float(s[k])
+        # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:18 +0400 — AMENDMENT 1 §2: under young_rule "nearest", a ONE-young-word
+        # phrase chooses `point` by _young_nearest (None = a fall-back: the law's pick below, drawing the generator exactly as
+        # the law does). `best` = max(s) is the law's number whichever tied index the law would pick; the fix never draws the
+        # law's pick, and draws the generator only on an exact DISTANCE tie.
+        near = self._young_nearest(Z, phrase, rng)
+        if near is None:
+            k = pick(s, rng, "max")
+            best = float(s[k])
+        else:
+            k, young_d = near
+            best = float(np.max(s))
         words = list(dict.fromkeys(phrase))
         flags = {}
         for m, key in (("diag", "none"), ("euclid", "none_ii")):
@@ -552,8 +566,38 @@ class RWLearner:
             f = self.phrase_fit(Z, words, m)
             flags[key] = bool(tau is not None and float(np.min(f)) > tau)
             flags[key + "_fit"] = float(np.min(f))
-        return {"point": k, "best": best, "scores": [float(v) for v in s],
-                "none_i": bool(self.tau_point is not None and best < self.tau_point), **flags}
+        out = {"point": k, "best": best, "scores": [float(v) for v in s],
+               "none_i": bool(self.tau_point is not None and best < self.tau_point), **flags}
+        if near is not None:
+            out["young_d"] = [float(v) for v in young_d]
+            out["point_rule"] = "nearest"
+        return out
+
+    def _young_nearest(self, Z: np.ndarray, phrase: Sequence[str], rng: np.random.Generator):
+        """F-M6 (PREREG-BRAIN-IN-BODY AMENDMENT 1 §2, edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:18 +0400): (point, distances) when
+        the rule ACTS, else None (the law points). It acts only when young_rule is "nearest" AND the phrase is ONE word AND that
+        word is heard and young (meetings < p_from). Nearest, exactly: d(h) = √((z_h − μ_w)ᵀ Λ (z_h − μ_w)), μ_w = the word's
+        prototype (the responsibility-weighted mean of its stored meetings; one meeting → that meeting), Λ =
+        reader["ear"]["lam"][one_alone] (the pooled covariance of the type its ear heard alone most, shrunk at the BRAIN line's
+        eps by calibrate_r) — tools/brain/diag/diag_m6_metric.py's distance; an exact tie → pick(d, rng, "min"). The four
+        fall-backs to the law: no reader yet (never calibrate_r'd), one_alone None, that type's Λ None, proto_w 0. Read-only."""
+        rule = self.young_rule
+        if rule not in ("band", "nearest"):
+            raise ValueError(f"young_rule {rule!r}: the rules are 'band' (the law) and 'nearest' (F-M6)")
+        if rule != "nearest" or len(phrase) != 1:
+            return None
+        j = self.index.get(phrase[0])
+        if j is None or int(self.meetings[j]) >= self.p_from:
+            return None
+        st = (getattr(self, "reader", None) or {}).get("ear")
+        if st is None or st.get("one_alone") is None:
+            return None
+        lam = st["lam"][st["one_alone"]]
+        if lam is None or self.proto_w[j] <= 0:
+            return None
+        E = Z - self.prototype(int(j))[None, :]
+        d = np.sqrt(np.maximum(np.einsum("ij,jk,ik->i", E, lam, E), 0.0))
+        return pick(d, rng, "min"), d
 
     def what_is_this_s1a(self, raw_thing: np.ndarray) -> List[str]:
         """READING (i): S1a's «what is this?» — every word w with p_w(t) ≥ τ_word(w) (τ None → 1.0)."""

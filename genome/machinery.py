@@ -826,25 +826,35 @@ def parse_genome(text: str) -> Genome:
             # the scored learner's own (S1b-1R: lr 0.01, eps 0.3, «none» at 0.95, conformal 0.90, a word under 3 meetings is young).
             # Every number is read by genome/brain.py; a mis-spelt form refuses BY NAME.
             elif gene == "BRAIN":
+                # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:16 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2 (sha 45abeca2…): `young <n>
+                # nearest` → young_rule "nearest" (a young word POINTS at the hypothesis nearest its prototype under the reader's
+                # one-alone metric; genome/brain.py → RWLearner.young_rule); `young <n>` keeps the law and declares NO young_rule key,
+                # so every existing genome's declared dict is byte-identical. Any other word after the count refuses BY NAME. The
+                # optional word is group 6 below; the groups after it moved by one.
                 m = re.fullmatch(r"word-map lr (\d+(?:\.\d+)?); reader eps (\d+(?:\.\d+)?); none (0\.\d+); conformal (0\.\d+); "
-                                 r"young (\d+); calibrate at ((?:\d+)(?: \d+)*) and before a sitting; replay (none|uniform|strong); "
+                                 r"young (\d+)(?: ([^;\s]+))?; calibrate at ((?:\d+)(?: \d+)*) and before a sitting; replay (none|uniform|strong); "
                                  r"hears ((?:[a-z][a-z0-9-]*)(?: [a-z][a-z0-9-]*)*)", a)
+                if m and m.group(6) is not None and m.group(6) != "nearest":
+                    raise GenomeError(f"BRAIN: young takes 'nearest' or nothing after its count, got {m.group(6)!r} "
+                                      f"(AMENDMENT 1 §2: `young <n>` is the law, `young <n> nearest` the F-M6 rule)")
                 if not m:
                     raise GenomeError(f"BRAIN: cannot read {a!r} (BRAIN-IN-BODY: BRAIN word-map lr <f>; reader eps <f>; none <0.f>; conformal <0.f>; "
                                       f"young <n>; calibrate at <n>[ <n>…] and before a sitting; replay none|uniform|strong; hears <source>[ <source>…])")
                 lr_, eps_ = float(m.group(1)), float(m.group(2))
-                at_ = [int(x) for x in m.group(6).split()]
+                at_ = [int(x) for x in m.group(7).split()]
                 if not (0.0 < lr_ <= 1.0) or eps_ <= 0.0:
                     raise GenomeError(f"BRAIN: lr must be in (0, 1] and eps > 0, got lr {lr_} eps {eps_}")
                 if int(m.group(5)) < 1:
                     raise GenomeError("BRAIN: young must be >= 1 meeting")
                 if any(b <= a_ for a_, b in zip(at_, at_[1:])) or at_[0] < 1:
                     raise GenomeError(f"BRAIN: calibrate at takes strictly rising scene counts >= 1, got {at_}")
-                hears_ = m.group(8).split()
+                hears_ = m.group(9).split()
                 if len(set(hears_)) != len(hears_):
                     raise GenomeError(f"BRAIN: hears names a source twice: {hears_}")
                 g["declared"]["BRAIN"] = {"lr": lr_, "eps": eps_, "none_level": float(m.group(3)), "conformal": float(m.group(4)),
-                                           "young": int(m.group(5)), "calibrate_at": at_, "replay": m.group(7), "hears": hears_}
+                                           "young": int(m.group(5)), "calibrate_at": at_, "replay": m.group(8), "hears": hears_}
+                if m.group(6) == "nearest":
+                    g["declared"]["BRAIN"]["young_rule"] = "nearest"
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:
