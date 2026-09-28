@@ -139,6 +139,40 @@ def is_young_point(law: "B.Brain", payload: Dict[str, object]) -> bool:
     return j is not None and int(law.L.meetings[j]) < int(law.cfg["young"])
 
 
+def grade_m6(K, law_ans, fix_ans, groot: Path, ws: int, tset: str, pre: str) -> Dict[str, object]:
+    """M6 for the law and the fix on one test set: marks.grade_pointing's own rows over the set's m6 cache (the answers' `raw`,
+    keyed `<pre><item>`); covered accuracy · n · chance · unheard per organ; the paired items (covered, gradable in both) and
+    their discordants b (fix right, law wrong) and c (law right, fix wrong) with the one-sided exact sign p."""
+    T6 = C.load_truth(C.cache_dir(groot, ws, "m6", tset))
+    P6 = C.ScenePercepts(C.cache_dir(groot, ws, "m6", tset))
+
+    def members_of(row: int):
+        hs = P6.hypotheses(row)
+        return [h.members for h in hs], [tuple(h.pos) for h in hs]
+
+    rows = {}
+    for who, ans in (("law", law_ans), ("fix", fix_ans)):
+        A = {it["item_id"]: (ans.get(pre + it["item_id"]) or {}).get("raw") for it in K}
+        rows[who] = M.grade_pointing(K, {k: v for k, v in A.items() if v is not None}, T6, members_of, "gaze")
+    out: Dict[str, object] = {"n_items": len(K), "test_set": tset}
+    for who in ("law", "fix"):
+        cov = [r for r in rows[who] if r["gradable"] and r["covered"]]
+        acc = (sum(r["correct"] for r in cov) / len(cov)) if cov else None
+        out[who] = {"covered": acc, "n_covered": len(cov), "right": sum(r["correct"] for r in cov),
+                    "chance_covered": (float(np.mean([r["chance"] for r in cov])) if cov else None),
+                    "n_unheard": sum(1 for r in rows[who] if not r["gradable"])}
+        out[who]["reads"] = ("UNDERPOWERED" if len(cov) < M.UNDERPOWERED_N else ("PASS" if acc >= M.BARS["M6"] else "FAIL"))
+    pairs = [(rl, rf) for rl, rf in zip(rows["law"], rows["fix"]) if rl["item_id"] == rf["item_id"]
+             and rl["gradable"] and rf["gradable"] and rl["covered"]]
+    b = sum(1 for rl, rf in pairs if rf["correct"] and not rl["correct"])
+    c = sum(1 for rl, rf in pairs if rl["correct"] and not rf["correct"])
+    out.update({"paired_n": len(pairs), "b_fix_only": b, "c_law_only": c, "sign_p": binom_tail(b, b + c),
+                "items": [{"item_id": rl["item_id"], "covered": rl["covered"], "gradable": rl["gradable"] and rf["gradable"],
+                           "law": rl["correct"], "fix": rf["correct"], "chance": rl["chance"]}
+                          for rl, rf in zip(rows["law"], rows["fix"])]})
+    return out
+
+
 # ------------------------------------------------------------------------------------------------ one seed
 def run_seed(ws: int, groot: Path, sroot: Path, out: Path, do_plant: bool = False, cfg_over: Optional[Dict] = None,
              log=print) -> Dict[str, object]:
@@ -220,34 +254,19 @@ def run_seed(ws: int, groot: Path, sroot: Path, out: Path, do_plant: bool = Fals
         ident[sname] = blk
     res["identity"] = ident
     res["identity_pass"] = all(b["pass"] for b in ident.values())
-    # -- M6 on held ---------------------------------------------------------------------------------------------
-    K = json.loads((groot / str(ws) / "held" / "keys.json").read_text())["items"]["M6"]
-    Tm6 = C.load_truth(C.cache_dir(groot, ws, "m6", "held"))
-    Pm6 = C.ScenePercepts(C.cache_dir(groot, ws, "m6", "held"))
-
-    def members_of(row: int):
-        hs = Pm6.hypotheses(row)
-        return [h.members for h in hs], [tuple(h.pos) for h in hs]
-
-    rows = {}
-    for who in ("law", "fix"):
-        A = {it["item_id"]: (answers[who]["held"].get(it["item_id"]) or {}).get("raw") for it in K}
-        rows[who] = M.grade_pointing(K, {k: v for k, v in A.items() if v is not None}, Tm6, members_of, "gaze")
-    m6 = {"n_items": len(K)}
-    for who in ("law", "fix"):
-        cov = [r for r in rows[who] if r["gradable"] and r["covered"]]
-        acc = (sum(r["correct"] for r in cov) / len(cov)) if cov else None
-        m6[who] = {"covered": acc, "n_covered": len(cov), "chance_covered": (float(np.mean([r["chance"] for r in cov])) if cov else None),
-                   "n_unheard": sum(1 for r in rows[who] if not r["gradable"])}
-        m6[who]["reads"] = ("UNDERPOWERED" if len(cov) < M.UNDERPOWERED_N else ("PASS" if acc >= M.BARS["M6"] else "FAIL"))
-    pairs = [(rl, rf) for rl, rf in zip(rows["law"], rows["fix"]) if rl["item_id"] == rf["item_id"]
-             and rl["gradable"] and rf["gradable"] and rl["covered"]]
-    b = sum(1 for rl, rf in pairs if rf["correct"] and not rl["correct"])
-    c = sum(1 for rl, rf in pairs if rl["correct"] and not rf["correct"])
-    m6.update({"paired_n": len(pairs), "b_fix_only": b, "c_law_only": c, "sign_p": binom_tail(b, b + c),
-               "items": [{"item_id": rl["item_id"], "covered": rl["covered"], "gradable": rl["gradable"] and rf["gradable"],
-                          "law": rl["correct"], "fix": rf["correct"], "chance": rl["chance"]}
-                         for rl, rf in zip(rows["law"], rows["fix"])]})
+    # -- M6 on held (the clauses) and on fresh / s1b1 (READINGS: DIAG-M6's positive control) --------------------
+    Kh = json.loads((groot / str(ws) / "held" / "keys.json").read_text())["items"]["M6"]
+    m6 = grade_m6(Kh, answers["law"]["held"], answers["fix"]["held"], groot, ws, "held", "")
+    # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:35 +0400 — the READINGS on the used sets, never a clause: DIAG-M6 read, on the
+    # FRESH set, the law 21/27 (20261102) and 14/29 (20261103) and «nearest under the one-alone metric» 26/27 and 22/29; the
+    # built rule must reproduce those numbers there, or it is not DIAG's rule (and a held PASS would be a reading of another fix)
+    readings = {}
+    for tset, kpath, pre in (("fresh", sroot / str(ws) / "fresh" / "keys.json", ""), ("s1b1", sroot / str(ws) / "keys.json", "older/")):
+        K = json.loads(kpath.read_text())["items"]["M6"]
+        r = grade_m6(K, answers["law"]["gate"], answers["fix"]["gate"], groot, ws, tset, pre)
+        r.pop("items")
+        readings[tset] = r
+    res["M6_readings_used_sets"] = readings
     m6["bar"], m6["n_bar"] = M.BARS["M6"], M.UNDERPOWERED_N
     if ws in NOT_GRADABLE_SEEDS:
         m6["verdict"] = "NOT GRADABLE (as signed: at 20261101 the eye never saw the meeting)"
@@ -298,6 +317,10 @@ def seed_lines(res: Dict[str, object]) -> List[str]:
     L.append(f"  paired (covered, gradable in both) n {m['paired_n']} · b (fix right, law wrong) {m['b_fix_only']} · c (law right, fix wrong) "
              f"{m['c_law_only']} · one-sided exact sign p {_f(m['sign_p'])} (this seed alone; the gate's clause is POOLED: --pool)")
     L.append(f"  M6 clause at this seed: {m['verdict']}")
+    for tset, r in (res.get("M6_readings_used_sets") or {}).items():
+        L.append(f"  READING (not a clause) M6 on the used set {tset}: law {r['law']['right']}/{r['law']['n_covered']} = "
+                 f"{_f(r['law']['covered'])} · fix {r['fix']['right']}/{r['fix']['n_covered']} = {_f(r['fix']['covered'])} · "
+                 f"b {r['b_fix_only']} c {r['c_law_only']}")
     L.append(f"  cpu {res['cpu_s']:.1f} s · wall {res['wall_s']:.1f} s")
     return L
 

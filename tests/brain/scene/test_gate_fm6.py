@@ -87,6 +87,13 @@ class TestGateTiny(unittest.TestCase):
         self.assertIn("NOT GRADABLE", m["verdict"])                    # 40 scenes hold no «dax» meeting
         self.assertIsNone(self.res["meeting_seen"])
         self.assertEqual(len(m["items"]), 2)
+        # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:35 +0400 — the READINGS on the used sets (DIAG-M6's positive control at full size)
+        rd = self.res["M6_readings_used_sets"]
+        self.assertEqual(set(rd), {"fresh", "s1b1"})
+        for r in rd.values():
+            self.assertEqual(r["n_items"], 2)
+            self.assertIn("covered", r["law"])
+            self.assertNotIn("items", r)
 
     def test_refuses_to_write_under_a_root(self):
         for bad in (C.S1B1R_RUNS / "x", C.RUNS / "y", Path("/data/dev/genome-lives/brain-lean-20261102/z"), C.SCENE_ORGAN_RUNS):
