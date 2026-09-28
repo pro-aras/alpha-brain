@@ -7,8 +7,8 @@ ce41448, sha 30121082…, final) §1:
   every parameter by the SAME delta rule from the same error e_w and responsibilities R_{t,w}:
     ΔV_w  = lr · e_w · g_r · Σ_t R_{t,w} z_t          — the chain rule's factor g_r, applied ONCE, here and nowhere else;
     Δb_w  = lr · e_w · Σ_t R_{t,w}                    — S1b-1's step, unchanged;
-    Δg_r  = lr_g · Σ_w e_w · Σ_t R_{t,w} (v_w · z_t)  — lr_g = 0.005 (PREREG-TMEM5 AMENDMENT 2 §2.3; the PREREG's 0.001 failed the
-                                                          fixed-point toy on N's budget);
+    Δg_r  = lr_g · Σ_{w SAID} e_w · Σ_t R_{t,w} (v_w · z_t)  — AMENDMENT 3 §2: the gain reads POSITIVE evidence only (the words the
+                                                          parent said), never silence; lr_g as the gate's toy sizes it;
     Δc_{r,w} = lr · e_w · Σ_t R_{t,w}.
 The episodic write, the prototypes and the stores read the same responsibilities (now from the context logits). With the
 context FROZEN (g ≡ 1, c ≡ 0, neither learned) every number is S1c's A-RW's, bit for bit: x · 1.0 and x + 0.0 are exact — the
@@ -18,6 +18,12 @@ edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 18:12 +0400 — PREREG-TMEM
 the ACT beside every stored row (`store_c`, per word per meeting, the context the learner was in when it stored it — its own
 efference copy, never the world's), so A-READ+WHERE can key the store by (word, room); `row_contexts` lists them in
 memory.StoreRows.from_learner's row order.
+
+edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 19:04 +0400 — PREREG-TMEM5 AMENDMENT 3 (brain-design-3 b90e180, sha 035d29f2…, final) §2: the
+gain's step sums over the SAID words only — the noisy-OR reads every unsaid word as FALSE of every thing in view, but the parent
+names ONE thing of 1–3, so silence about the unnamed things pulled a LEARNABLE room's gain down (the gate's R1: 0.988 → 0.096 by
+block 60; tools/scene/diag/tmem5_gain_collapse.out). V's step (g_r by the chain rule), b and c keep the FULL error. The gain's
+step is −lr_g · ∂/∂g of the SAID words' part of the loss (`said_loss`), which the finite-difference pin checks.
 """
 from __future__ import annotations
 
@@ -108,7 +114,8 @@ class CtxLearner(RWLearner):
         R = np.where(S[None, :] > 0, Pm / np.where(S > 0, S, 1.0)[None, :], 1.0 / Z.shape[0])
         upd = self.lr * e[:, None] * (R.T @ Z) * g           # the chain rule's g_r, ONCE
         db = self.lr * e * R.sum(axis=0)
-        dg = self.lr_g * float(np.sum(e * np.sum(R * Mz, axis=0))) if (self.learn_gain and room is not None) else 0.0
+        dg = (self.lr_g * float(np.sum((e * np.sum(R * Mz, axis=0))[y > 0]))          # AMENDMENT 3: the SAID words only
+              if (self.learn_gain and room is not None) else 0.0)
         dc = self.lr * e * R.sum(axis=0) if (self.learn_bias and room is not None) else None
         if project is not None:
             upd, db = project(self, upd, db)
@@ -130,6 +137,16 @@ class CtxLearner(RWLearner):
                 self.store_t[j].append(self.scenes)
                 self.store_c[j].append(room)
             self.meetings[j] += 1
+
+    def said_loss(self, raw: np.ndarray, words: Sequence[str], room: Optional[str]) -> float:
+        """−Σ_{w said} log P(w | scene) under context `room`: the part of the scene's cross-entropy the gain's step descends
+        (AMENDMENT 3 §2 — the finite-difference pin's L for g)."""
+        Z = self.stats.standardise(np.atleast_2d(raw))
+        g, c = self._gc(room)
+        Pm = sigmoid((Z @ self.V.T) * g + self.b[None, :] + c[None, :])
+        P = np.clip(1.0 - np.prod(1.0 - Pm, axis=0), 1e-300, 1.0 - 1e-16)
+        y = np.array([1.0 if w in words else 0.0 for w in self.words])
+        return -float(np.sum(y * np.log(P)))
 
     def scene_loss(self, raw: np.ndarray, words: Sequence[str], room: Optional[str]) -> float:
         """The cross-entropy of ONE scene over the heard words under context `room` (the finite-difference pin's L)."""

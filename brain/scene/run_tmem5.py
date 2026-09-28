@@ -8,7 +8,7 @@ ce41448, sha 30121082…, final) and its AMENDMENT 1 (brain-design-3 95b6e48, sh
 readings ruled — «ruled» below; the context null's VOID clause re-set on the bar's own window; NULL-CTX + REPLAY added; the
 null's four gains printed). It extends PREREG-S1C (a552515a…) + AMENDMENT 1 (92188d04…) + PREREG-S1C2 (5e4585c1…): everything
 not named is theirs (run_s1c.py, run_s1c2.py, pickers.py). The pools are scene-tmem1's (redrawn under the merged code and
-TESTED equal to S1c's); the learner is context.py's CtxLearner at lr 0.01, lr_g 0.005 (AMENDMENT 2).
+TESTED equal to S1c's); the learner is context.py's CtxLearner at lr 0.01 and its lr_g (sized on the toy, AMENDMENTS 2–3).
 
 edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 18:45 +0400 — PREREG-TMEM5 AMENDMENT 2 (brain-design-3 3c28401, sha 8638072d…, final), after
 THE FIRST GATE stopped at step 2 (the toy at lr_g 0.001): lr_g = 0.005 (context.LR_G); the toy read with the MEMORY bar's own
@@ -16,6 +16,16 @@ statistic — g_B's mean over its LAST 10 B-blocks ≤ 0.1 × g_A's last-10 mean
 last-10 mean), g_A's minimum and a dip after block 100 printed; the life's g_N read three ways (met ≤ 0.1 · ḡ_R / slow ≤ 0.3 /
 above 0.3), its slope printed, and beside «slow» the REALISED N-budget (the scenes g_N trained on) against the toy's first
 passages (Fable's edit), the reading naming which cause it is.
+
+edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 19:09 +0400 — PREREG-TMEM5 AMENDMENT 3 (brain-design-3 b90e180, sha 035d29f2…, final), after the
+re-gate's step 4 showed a LEARNABLE room's gain collapsing (g_R1 0.988 → 0.096 by block 60 — the noisy-OR read the parent's
+silence about the unnamed things as evidence; tools/scene/diag/tmem5_gain_collapse.out): the gain learns from the SAID words only
+(context.py); the toy rebuilt with what the life has — TWO learnable rooms A1, A2 sharing the colour and size words, B by N's
+rule, 1–3 things with ONE named, 500 scenes per room — and lr_g re-sized on it: the smallest of {0.001, 0.002, 0.005, 0.01}
+passing at all three seeds (the whole grid printed; the law's LR_G must equal it, or THE FIRST GATE stops); step 4 prints every
+room's g trajectory and STOPS when a learnable room's g falls under 0.5 by block 60; every g threshold is relative to ḡ_R
+(the MEMORY clause 0.1 · ḡ_R, the «slow» band to 0.3 · ḡ_R, refutation (a) at 0.3 · ḡ_R), ḡ_R printed at block 60 and at the
+end (a ḡ_R that doubles after block 60 is named the positive-only rule's drift).
 
   python3 -m brain.scene.run_tmem5 check                           the shas
   python3 -m brain.scene.run_tmem5 first-gate                      THE FIRST GATE (seed 20261301), steps 1–5
@@ -62,6 +72,8 @@ AMEND1_TMEM5_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/memory/PREREG-TM
 AMEND1_TMEM5_SHA256 = "ab9a5fca939c258f940b2191529404f12fb80f06d8b9fdbf37fd5b468ea36d00"      # final: both sign, 95b6e48
 AMEND2_TMEM5_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/memory/PREREG-TMEM5-AMEND-2.md")
 AMEND2_TMEM5_SHA256 = "8638072d721e42f6de4d125c0e45919c05138f639e8df369807d575b152a3cc5"      # final: both sign, 3c28401
+AMEND3_TMEM5_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/memory/PREREG-TMEM5-AMEND-3.md")
+AMEND3_TMEM5_SHA256 = "035d29f20ef5fe6dabe113a439f3046da214ce2fc7b9e2715d399e5e026cf256"      # final: both sign, b90e180
 ROOT = Path("/data/dev/brain-runs/scene-tmem5")
 POOLS_ROOT = T1.ROOT                 # scene-tmem1's pools: redrawn under the merged code, TESTED equal to S1c's
 S1C_ROOT = S.ROOT                    # the identity records (S1c's own runs)
@@ -75,7 +87,9 @@ MEMORY_AFTER = 20                    # the MEMORY fraction reads blocks 21–200
 G_LAST = 10                          # g_N (and each learnable room's gain) over its own last 10 blocks
 BAR_N_FRACTION = 0.3
 BAR_G_RATIO = 0.1
-REFUTE_G = 0.3                       # §5: g_N > 0.3 at block 200 with biases present, at ≥ 2 seeds
+REFUTE_RATIO = 0.3                   # §5 as AMENDMENT 3 §3 re-reads it: g_N > 0.3 · ḡ_R at block 200, with biases, at ≥ 2 seeds
+DRIFT_FACTOR = 2.0                   # AMENDMENT 3 §3: a ḡ_R that doubles after block 60 is the positive-only rule's drift (a reading)
+STEP4_FLOOR = 0.5                    # AMENDMENT 3 §3: a learnable room's g under 0.5 by block 60 under RANDOM-CTX is a STOP
 SLOPE_AFTER = 100                    # AMENDMENT 2 §3: g_N's slope printed over the whole life and over blocks 101–200
 LEAVE_BAR, SHARE_ALLOWANCE, POSITIVE_CONTROL, A_VS_ORACLE = S.BAR_LEAVE_N, S.BAR_SHARE_ALLOWANCE, S.BAR_POSITIVE_CONTROL, S.BAR_A_VS_ORACLE
 # THE TOY (§3 step 2 with Fable's edit: B receives the scenes N receives in a RANDOM-CTX life); its construction is DECLARED
@@ -85,10 +99,16 @@ LEAVE_BAR, SHARE_ALLOWANCE, POSITIVE_CONTROL, A_VS_ORACLE = S.BAR_LEAVE_N, S.BAR
 # the things; exactly 50 of the 200 blocks in B (500 scenes) at positions drawn from the toy's seed. AMENDMENT 2 §2: the toy is
 # read with the MEMORY bar's own statistic (g_B's last-10 mean over its B-blocks ≤ 0.1 × g_A's last-10 mean over its A-blocks)
 # and «g_A stays ≥ 0.8» at the END (g_A's last-10 mean); g_A's minimum over the 200 blocks and after block 100 are printed.
+# AMENDMENT 3 §3 rebuilt it with what the life has: TWO learnable rooms (A1, A2: disjoint shapes — three each, so B's shape
+# words all exist in a learnable room — and the SHARED colour and size words), B by N's rule, 1–3 things with ONE named, 50
+# blocks per room (500 scenes each, a RANDOM life's budget) in an order drawn from the seed; lr_g re-sized on it (TOY_GRID).
 TOY_SEEDS: Tuple[int, ...] = (0, 1, 2)
-TOY_ROOMS: Tuple[str, ...] = ("A", "B")
-TOY_BLOCKS = 200
-TOY_B_BLOCKS = 50
+TOY_ROOMS: Tuple[str, ...] = ("A1", "A2", "B")
+TOY_SHAPES: Dict[str, Tuple[str, ...]] = {"A1": ("circle", "square", "triangle"), "A2": ("cross", "ring", "star")}
+TOY_BLOCKS_PER_ROOM = 50
+TOY_BLOCKS = TOY_BLOCKS_PER_ROOM * len(TOY_ROOMS)
+TOY_B_BLOCKS = TOY_BLOCKS_PER_ROOM
+TOY_GRID: Tuple[float, ...] = (0.001, 0.002, 0.005, 0.01)
 TOY_SIGNAL = 3.0
 TOY_GB_BAR = 0.1                     # since AMENDMENT 2 the level of the printed first passage (the bar is the MEMORY statistic)
 TOY_GA_BAR = 0.8
@@ -130,12 +150,13 @@ class Tmem5Error(Exception):
 
 
 def check_prereg() -> Dict[str, str]:
-    """PREREG-TMEM5 and its AMENDMENTS 1 and 2 (final) beside the laws they extend (PREREG-TMEM1 and CONCLUSION-MEMORY for the
+    """PREREG-TMEM5 and its AMENDMENTS 1–3 (final) beside the laws they extend (PREREG-TMEM1 and CONCLUSION-MEMORY for the
     READER, PREREG-S1C2, PREREG-S1C, AMENDMENT 1 of S1c, PREREG-S1B1 — run_tmem1.check_prereg)."""
     got = dict(T1.check_prereg())
     for key, path, want in (("prereg_tmem5", PREREG_TMEM5_PATH, PREREG_TMEM5_SHA256),
                             ("amend1_tmem5", AMEND1_TMEM5_PATH, AMEND1_TMEM5_SHA256),
-                            ("amend2_tmem5", AMEND2_TMEM5_PATH, AMEND2_TMEM5_SHA256)):
+                            ("amend2_tmem5", AMEND2_TMEM5_PATH, AMEND2_TMEM5_SHA256),
+                            ("amend3_tmem5", AMEND3_TMEM5_PATH, AMEND3_TMEM5_SHA256)):
         g = hashlib.sha256(path.read_bytes()).hexdigest()
         if g != want:
             raise Tmem5Error(f"{key} sha256 {g[:12]}… ≠ {want[:12]}… — STOP and hand back")
@@ -145,12 +166,12 @@ def check_prereg() -> Dict[str, str]:
 
 def prereg_header() -> Dict[str, str]:
     return {**T1.prereg_header(), "prereg_tmem5_sha256": PREREG_TMEM5_SHA256, "amend1_tmem5_sha256": AMEND1_TMEM5_SHA256,
-            "amend2_tmem5_sha256": AMEND2_TMEM5_SHA256}
+            "amend2_tmem5_sha256": AMEND2_TMEM5_SHA256, "amend3_tmem5_sha256": AMEND3_TMEM5_SHA256}
 
 
 # ================================================================================================ the learner and the context
 def new_ctx_learner(kind: str, rooms: Sequence[str] = ROOMS) -> CX.CtxLearner:
-    """The context learner at the law's lr 0.01 and lr_g 0.005 (AMENDMENT 2): `ctx` learns g and c; `bias` only c (BIAS-ONLY, g ≡ 1);
+    """The context learner at the law's lr 0.01 and lr_g (context.LR_G, sized on the toy — AMENDMENT 3): `ctx` learns g and c; `bias` only c (BIAS-ONLY, g ≡ 1);
     `gain` only g (the toy's print); `frozen` neither (S1c's A-RW bit for bit — the identity)."""
     gain, bias = LEARNER_KINDS[kind]
     return CX.CtxLearner(rooms, lr=Lr.LR_S1B1, lr_g=CX.LR_G, learn_gain=gain, learn_bias=bias)
@@ -388,13 +409,14 @@ def slope(traj: Sequence[Tuple[int, float]], after: int = 0) -> Dict[str, object
 
 
 def gain_state(g_n: Optional[float], g_r: Optional[float]) -> Optional[str]:
-    """AMENDMENT 2 §3's three-way reading of g_N (its last-10 mean): «met» ≤ 0.1 · ḡ_R; «slow» up to 0.3 (the gain clause
-    FAILS, the mechanism is not refuted); «above 0.3» (refutation (a) reads g_N at block 200, as §5 writes it)."""
+    """AMENDMENT 2 §3's three-way reading of g_N (its last-10 mean), every threshold relative to ḡ_R (AMENDMENT 3 §3): «met»
+    ≤ 0.1 · ḡ_R; «slow» up to 0.3 · ḡ_R (the gain clause FAILS, the mechanism is not refuted); «above 0.3·ḡ_R» (refutation
+    (a) reads g_N at block 200 against 0.3 · ḡ_R, as §5 writes it)."""
     if g_n is None or g_r is None:
         return None
     if g_n <= BAR_G_RATIO * g_r:
         return "met"
-    return "slow" if g_n <= REFUTE_G else "above 0.3"
+    return "slow" if g_n <= REFUTE_RATIO * g_r else "above 0.3·ḡ_R"
 
 
 def slow_cause(budget: Optional[int], passages: Sequence[Optional[int]]) -> str:
@@ -420,6 +442,9 @@ def marks5(run: Dict[str, object]) -> Dict[str, object]:
     out["slope_after_100"] = slope(out["trajectory"]["N"], after=SLOPE_AFTER)
     out["trained_under"] = dict(run.get("trained_under", {}))
     out["budget_N"] = out["trained_under"].get("N")
+    out["g_R_at_60"] = float(np.mean([ctx[GATE4_BLOCKS - 1]["g"][k] for k in LEARNABLE])) if len(ctx) >= GATE4_BLOCKS else None
+    out["drift"] = bool(out["g_R_at_60"] is not None and out["g_R_at_end"] is not None
+                        and out["g_R_at_end"] >= DRIFT_FACTOR * out["g_R_at_60"])
     out["A"] = run["marks"]["A"]
     out["A_gR"] = (float(np.mean([c["wl_gR"] for c in ctx])) / len(VOCAB)) if ctx else None
     out["c_N_norm_end"] = float(ctx[-1]["c_norm"]["N"]) if ctx else None
@@ -524,7 +549,7 @@ def memory_verdict(per_seed: Dict[int, Dict[str, object]]) -> Dict[str, object]:
             denom.append(s)
         fails += ([f"fraction@{s}"] if f_state == "FAIL" else []) + ([f"g_N@{s}"] if g_state == "FAIL" else [])
         out["seeds"][s] = {"g_reading": gain_state(gN, gR), "slope": X.get("slope"), "slope_after_100": X.get("slope_after_100"),
-                           "budget_N": X.get("budget_N"),
+                           "budget_N": X.get("budget_N"), "g_R_at_60": X.get("g_R_at_60"), "drift": X.get("drift"),
                            "fraction": X["n_fraction"], "f_state": f_state, "g_N": gN, "g_N_sd": sd, "g_N_n": X["g_N_n"],
                            "g_R": gR, "g_R_at_end": X["g_R_at_end"], "bar_g": bar_g, "g_state": g_state, "noisy": noise,
                            "trajectory_N": X["trajectory"]["N"], "g_N_at_end": X.get("g_N_at_end"),
@@ -596,13 +621,14 @@ def curiosity_verdict(per_seed: Dict[int, Dict[str, object]]) -> Dict[str, objec
     return out
 
 
-# ================================================================================================ THE TOY (§3 step 2)
+# ================================================================================================ THE TOY (§3 step 2, AMENDMENT 3 §3)
 _TOY_TYPES: Dict[str, Tuple[str, ...]] = {"shape": W.SHAPES, "colour": W.COLOUR_NAMES, "size": W.SIZE_NAMES}
 
 
 class ToyWorld:
-    """The fixed-point toy's two rooms (the construction is declared above, ruled (8)): room A's words name a thing in view;
-    room B's words are drawn AFTER its things and never read them."""
+    """The fixed-point toy (the construction is declared above, ruled (8), rebuilt by AMENDMENT 3 §3): TWO learnable rooms
+    whose things carry disjoint shapes and the SHARED colour and size words, the parent naming ONE thing of 1–3 (its act);
+    room B with things of every shape and N's utterance, drawn AFTER its things and never reading them."""
 
     def __init__(self, seed: int):
         g = np.random.default_rng([TOY_TAG, int(seed), 0])
@@ -610,8 +636,8 @@ class ToyWorld:
         self.seed = int(seed)
         self.proto = {w: g.normal(size=d) * (TOY_SIGNAL / np.sqrt(d)) for w in VOCAB}
 
-    def thing(self, rng: np.random.Generator) -> Tuple[str, str, str]:
-        return (W.SHAPES[int(rng.integers(len(W.SHAPES)))], W.COLOUR_NAMES[int(rng.integers(len(W.COLOUR_NAMES)))],
+    def thing(self, rng: np.random.Generator, shapes: Sequence[str] = W.SHAPES) -> Tuple[str, str, str]:
+        return (shapes[int(rng.integers(len(shapes)))], W.COLOUR_NAMES[int(rng.integers(len(W.COLOUR_NAMES)))],
                 W.SIZE_NAMES[int(rng.integers(len(W.SIZE_NAMES)))])
 
     def x(self, t: Tuple[str, str, str], rng: np.random.Generator) -> np.ndarray:
@@ -619,94 +645,132 @@ class ToyWorld:
         return np.concatenate([f, rng.uniform(0.0, 128.0, size=2) / Lr.POS_SCALE])
 
     def scene(self, room: str, rng: np.random.Generator) -> Tuple[np.ndarray, Tuple[str, ...], List[Tuple[str, str, str]]]:
+        if room not in TOY_ROOMS:
+            raise Tmem5Error(f"no toy room {room!r}")
         k = W._n_things(rng)
-        attrs = [self.thing(rng) for _ in range(k)]
+        attrs = [self.thing(rng, TOY_SHAPES.get(room, W.SHAPES)) for _ in range(k)]
         X = np.stack([self.x(t, rng) for t in attrs])
         tpl = W.TEMPLATES[int(rng.integers(len(W.TEMPLATES)))]
         slots = RM.SLOT_TYPES[tpl]
-        if room == "A":
+        if room in TOY_SHAPES:
             t = attrs[int(rng.integers(k))]
             val = {"shape": t[0], "colour": t[1], "size": t[2]}
             words = tuple(val[s] for s in slots)
-        elif room == "B":
-            words = tuple(_TOY_TYPES[s][int(rng.integers(len(_TOY_TYPES[s])))] for s in slots)
         else:
-            raise Tmem5Error(f"no toy room {room!r}")
+            words = tuple(_TOY_TYPES[s][int(rng.integers(len(_TOY_TYPES[s])))] for s in slots)
         return X, words, attrs
 
 
 def toy_order(seed: int) -> List[str]:
-    """The toy's 200 blocks: exactly 50 in B (500 scenes, N's visits in a RANDOM-CTX life), at positions from the seed."""
+    """The toy's blocks: exactly 50 per room (500 scenes each — a RANDOM life's budget), in an order drawn from the seed."""
     g = np.random.default_rng([TOY_TAG, int(seed), 1])
-    b_at = {int(i) for i in g.choice(TOY_BLOCKS, size=TOY_B_BLOCKS, replace=False)}
-    return ["B" if i in b_at else "A" for i in range(TOY_BLOCKS)]
+    base = [r for r in TOY_ROOMS for _ in range(TOY_BLOCKS_PER_ROOM)]
+    return [base[int(i)] for i in g.permutation(len(base))]
 
 
-def toy_life(seed: int, learn_bias: bool = True) -> Dict[str, object]:
-    """One toy life of the context learner (lr 0.01, lr_g 0.001; with biases = the law's learner, without = gain only):
-    g_A and g_B after every block, the first block (and B-scene count) at which g_B ≤ 0.1, and the toy's difficulty (A's
-    forced naming by the shared map on fresh one-thing things)."""
+def toy_life(seed: int, learn_bias: bool = True, lr_g: Optional[float] = None) -> Dict[str, object]:
+    """One toy life of the context learner (lr 0.01; lr_g the law's unless given; with biases = the law's learner, without =
+    gain only): every room's g after every block, the first block (and B-scene count) at which g_B ≤ 0.1, and the toy's
+    difficulty (the forced naming of fresh one-thing A1 and A2 things by the shared map)."""
     cpu0 = time.process_time()
+    lr_g = CX.LR_G if lr_g is None else float(lr_g)
     world = ToyWorld(seed)
     order = toy_order(seed)
-    L = CX.CtxLearner(TOY_ROOMS, lr=Lr.LR_S1B1, lr_g=CX.LR_G, learn_gain=True, learn_bias=learn_bias)
+    L = CX.CtxLearner(TOY_ROOMS, lr=Lr.LR_S1B1, lr_g=lr_g, learn_gain=True, learn_bias=learn_bias)
     rng = np.random.default_rng([TOY_TAG, int(seed), 2])
-    gA, gB, nB, first = [], [], 0, None
+    g: Dict[str, List[float]] = {r: [] for r in TOY_ROOMS}
+    nB, first = 0, None
     for b, room in enumerate(order, start=1):
         L.set_context(room)
         for i in range(PK.BLOCK):
             X, words, _a = world.scene(room, rng)
             L.train_scene(X, words, rng=np.random.default_rng([TOY_TAG, int(seed), 3, b, i]))
             nB += int(room == "B")
-        gA.append(float(L.g["A"]))
-        gB.append(float(L.g["B"]))
+        for r in TOY_ROOMS:
+            g[r].append(float(L.g[r]))
         if first is None and L.g["B"] <= TOY_GB_BAR:
             first = [b, nB]
     ev = np.random.default_rng([TOY_TAG, int(seed), 4])
     acc: Dict[str, List[bool]] = {t: [] for t in _TOY_TYPES}
-    for _ in range(TOY_EVAL_N):
-        t = world.thing(ev)
+    for i in range(TOY_EVAL_N):
+        t = world.thing(ev, TOY_SHAPES[("A1", "A2")[i % 2]])
         x = world.x(t, ev)
         for k, (typ, ws) in enumerate(_TOY_TYPES.items()):
             acc[typ].append(L.name_forced(x, ws) == t[k])
     b_blocks = [i for i, r in enumerate(order, start=1) if r == "B"]
-    return {"seed": int(seed), "learn_bias": bool(learn_bias), "order": order, "g_A": gA, "g_B": gB, "g_B_end": gB[-1],
-            "g_B_min": min(gB), "g_A_min": min(gA), "g_A_end": gA[-1], "n_B_scenes": nB, "first_g_B_le_bar": first,
-            "g_B_at_B_blocks": [gB[b - 1] for b in b_blocks], "naming_A": {t: float(np.mean(v)) for t, v in acc.items()},
-            "c_B_norm": float(np.linalg.norm(L.c["B"])), "cpu_s": time.process_time() - cpu0}
+    return {"seed": int(seed), "learn_bias": bool(learn_bias), "lr_g": lr_g, "order": order, "g": g,
+            "g_end": {r: g[r][-1] for r in TOY_ROOMS}, "g_min": {r: min(g[r]) for r in TOY_ROOMS}, "n_B_scenes": nB,
+            "first_g_B_le_bar": first, "g_B_at_B_blocks": [g["B"][b - 1] for b in b_blocks],
+            "naming_A": {t: float(np.mean(v)) for t, v in acc.items()}, "c_B_norm": float(np.linalg.norm(L.c["B"])),
+            "cpu_s": time.process_time() - cpu0}
 
 
 def toy_reading(run: Dict[str, object]) -> Dict[str, object]:
-    """AMENDMENT 2 §2: the toy read with the MEMORY bar's own statistic — g_B's mean over its LAST 10 B-blocks ≤ 0.1 × g_A's
-    mean over its last 10 A-blocks (each value read after its block) — and «g_A stays ≥ 0.8» at the END (g_A's last-10
-    mean). Printed beside: g_B's end value, the sd of its last 10 (the noise floor), g_A's minimum over the 200 blocks (the
-    map's youth) and after block 100 (a late dip, apart)."""
-    order, gA, gB = run["order"], run["g_A"], run["g_B"]
-    bb = [b for b, r in enumerate(order, start=1) if r == "B"][-TOY_LAST:]
-    aa = [b for b, r in enumerate(order, start=1) if r == "A"][-TOY_LAST:]
-    g_b = [gB[b - 1] for b in bb]
-    g_a = [gA[b - 1] for b in aa]
-    out = {"g_B_last10": float(np.mean(g_b)), "g_B_last10_sd": float(np.std(g_b, ddof=1)), "g_A_last10": float(np.mean(g_a)),
-           "g_B_end": float(gB[-1]), "g_A_min": float(min(gA)), "g_A_min_after_100": float(min(gA[TOY_LATE:])),
-           "g_A_argmin": int(np.argmin(gA)) + 1}
-    out["bar_B"] = BAR_G_RATIO * out["g_A_last10"]
-    out["pass_B"] = out["g_B_last10"] <= out["bar_B"]
-    out["pass_A"] = out["g_A_last10"] >= TOY_GA_BAR
+    """AMENDMENT 3 §3 (on AMENDMENT 2 §2's statistic): g_B's mean over its LAST 10 B-blocks ≤ 0.1 × the mean of g_A1's and
+    g_A2's last-10 means (each over its own room's blocks, each value read after its block) AND both g_A last-10 means ≥ 0.8.
+    Printed beside: every room's end value, g_B's last-10 sd (the noise floor), each learnable room's minimum over the life
+    (the map's youth) and after block 100 (a late dip, apart)."""
+    order, g = run["order"], run["g"]
+    last = {r: [g[r][b - 1] for b in [b for b, q in enumerate(order, start=1) if q == r][-TOY_LAST:]] for r in TOY_ROOMS}
+    g_a = {r: float(np.mean(last[r])) for r in TOY_SHAPES}
+    out = {"g_B_last10": float(np.mean(last["B"])), "g_B_last10_sd": float(np.std(last["B"], ddof=1)), "g_A_last10": g_a,
+           "g_A_last10_mean": float(np.mean(list(g_a.values()))), "g_end": {r: float(g[r][-1]) for r in TOY_ROOMS},
+           "g_A_min": {r: float(min(g[r])) for r in TOY_SHAPES},
+           "g_A_min_after_100": {r: float(min(g[r][TOY_LATE:])) for r in TOY_SHAPES},
+           "g_A_argmin": {r: int(np.argmin(g[r])) + 1 for r in TOY_SHAPES}}
+    out["bar_B"] = BAR_G_RATIO * out["g_A_last10_mean"]
+    out["pass_B"] = bool(out["g_B_last10"] <= out["bar_B"])
+    out["pass_A"] = bool(all(v >= TOY_GA_BAR for v in g_a.values()))
     out["pass"] = bool(out["pass_B"] and out["pass_A"])
     return out
 
 
+def smallest_passing(grid_pass: Dict[float, bool], grid: Sequence[float] = TOY_GRID) -> Optional[float]:
+    """AMENDMENT 3 §3: the smallest lr_g of the grid whose toy passes at all three seeds; None when none does (a STOP)."""
+    for lr in sorted(grid):
+        if grid_pass.get(lr):
+            return lr
+    return None
+
+
+def toy_grid(grid: Sequence[float] = TOY_GRID, seeds: Sequence[int] = TOY_SEEDS) -> Dict[str, object]:
+    out = {}
+    for lr in grid:
+        runs = {s: toy_life(s, True, lr) for s in seeds}
+        rd = {s: toy_reading(r) for s, r in runs.items()}
+        out[lr] = {"runs": runs, "per_seed": rd, "pass": all(v["pass"] for v in rd.values())}
+    return {"grid": out, "smallest": smallest_passing({lr: v["pass"] for lr, v in out.items()}, grid)}
+
+
 def toy_gate() -> Dict[str, object]:
-    runs = {s: {"bias": toy_life(s, True), "gain_only": toy_life(s, False)} for s in TOY_SEEDS}
-    per = {s: toy_reading(r["bias"]) for s, r in runs.items()}
-    return {"runs": runs, "per_seed": per, "pass": all(v["pass"] for v in per.values())}
+    """THE FIRST GATE 2 (AMENDMENT 3 §3): the whole grid printed; the law's LR_G must be its smallest passing value (a STOP
+    otherwise — and when none passes, that is the night's finding); the gain-only toy at the law's lr_g, a print."""
+    tg = toy_grid()
+    gain_only = {s: toy_life(s, False) for s in TOY_SEEDS}
+    law = tg["grid"].get(CX.LR_G)
+    passages = {s: ((law["runs"][s]["first_g_B_le_bar"] or [None, None])[1] if law else None) for s in TOY_SEEDS}
+    return {"grid": tg["grid"], "smallest": tg["smallest"], "law": CX.LR_G, "gain_only": gain_only, "first_passage": passages,
+            "pass": bool(tg["smallest"] is not None and tg["smallest"] == CX.LR_G)}
+
+
+def learnable_dips(run: Dict[str, object], upto: int = GATE4_BLOCKS, floor: float = STEP4_FLOOR) -> Dict[str, float]:
+    """AMENDMENT 3 §3's STOP rule for step 4: every LEARNABLE room whose g (read after each block) falls under 0.5 at any
+    block up to 60, with its minimum."""
+    out = {}
+    for k in LEARNABLE:
+        vals = [float(c["g"][k]) for c in run["ctx_record"][:upto]]
+        if vals and min(vals) < floor:
+            out[k] = min(vals)
+    return out
 
 
 # ================================================================================================ the chain-rule pin (§3 step 3)
 def fd_pin(L: CX.CtxLearner, raw: np.ndarray, words: Sequence[str], room: str, h: float = FD_H) -> Dict[str, object]:
     """The step on ONE one-thing scene (where the delta rule IS the cross-entropy's gradient) against −rate · ∂L/∂θ by
     central differences at the post-observation standardisation, for every coordinate of V, g_room, c_room and b; an error
-    passes at ≤ FD_TOL · max(1, |step|). The planted offender: V's step scaled by g_room a SECOND time."""
+    passes at ≤ FD_TOL · max(1, |step|). V, b and c descend the FULL loss; g descends the SAID words' part of it (AMENDMENT
+    3 §2, `said_loss`). Two planted offenders: V's step scaled by g_room a SECOND time, and the OLD gain step over EVERY word
+    (the full loss's ∂/∂g) — each must be CAUGHT."""
     raw = np.atleast_2d(np.asarray(raw, dtype=np.float64))
     if raw.shape[0] != 1:
         raise Tmem5Error("the chain-rule pin reads ONE thing: only there is the delta rule the loss's own gradient")
@@ -720,12 +784,13 @@ def fd_pin(L: CX.CtxLearner, raw: np.ndarray, words: Sequence[str], room: str, h
     P.stats.observe(raw)
     P.set_context(room)
 
-    def num(get, put, rate):
+    def num(get, put, rate, loss=None):
+        f = P.scene_loss if loss is None else loss
         x0 = get()
         put(x0 + h)
-        up = P.scene_loss(raw, words, room)
+        up = f(raw, words, room)
         put(x0 - h)
-        dn = P.scene_loss(raw, words, room)
+        dn = f(raw, words, room)
         put(x0)
         return -rate * (up - dn) / (2.0 * h)
 
@@ -740,8 +805,10 @@ def fd_pin(L: CX.CtxLearner, raw: np.ndarray, words: Sequence[str], room: str, h
 
     def put_g(v):
         P.g[room] = v
-    n_g = num(lambda: float(P.g[room]), put_g, P.lr_g)
+    n_g = num(lambda: float(P.g[room]), put_g, P.lr_g, P.said_loss)                  # the SAID words' part (AMENDMENT 3)
     err["g"] = abs(dg - n_g) / max(1.0, abs(dg))
+    n_g_all = num(lambda: float(P.g[room]), put_g, P.lr_g)                             # the OLD rule: every word's term
+    old_rule = abs(n_g_all - n_g) / max(1.0, abs(dg))
     for j in range(len(dc)):
         def put_c(v, j=j):
             P.c[room][j] = v
@@ -757,7 +824,9 @@ def fd_pin(L: CX.CtxLearner, raw: np.ndarray, words: Sequence[str], room: str, h
     err = {k: float(v) for k, v in err.items()}
     return {"room": room, "g": float(L.g[room]), "max_err": err, "pass": bool(max(err.values()) <= FD_TOL),
             "planted_doubled_err": float(doubled), "planted_doubled_caught": bool(doubled > FD_TOL),
-            "step": {"dV_max": float(np.abs(dV).max()), "dg": float(dg), "dc_max": float(np.abs(dc).max())}}
+            "planted_all_words_err": float(old_rule), "planted_all_words_caught": bool(old_rule > FD_TOL),
+            "step": {"dV_max": float(np.abs(dV).max()), "dg": float(dg), "dc_max": float(np.abs(dc).max()),
+                     "dg_all_words": float(n_g_all)}}
 
 
 def fd_scene(data, room: str, known: Sequence[str], start: int = 1000) -> Tuple[int, np.ndarray, List[str]]:
@@ -850,7 +919,8 @@ def fd_step(data, seed: int) -> Dict[str, object]:
             if gv is not None:
                 LL.g[room] = gv
             pins[f"{room}@{'own g' if gv is None else 'g 0.5'}"] = {**fd_pin(LL, raw, words, room), "scene": i, "words": words}
-    ok = all(p["pass"] for p in pins.values()) and all(p["planted_doubled_caught"] for k, p in pins.items() if k.endswith("g 0.5"))
+    ok = (all(p["pass"] for p in pins.values()) and all(p["planted_doubled_caught"] for k, p in pins.items() if k.endswith("g 0.5"))
+          and all(p["planted_all_words_caught"] for p in pins.values()))
     return {"pins": pins, "pass": bool(ok)}
 
 
@@ -899,42 +969,50 @@ def first_gate5(root: Path = ROOT, log=print) -> Dict[str, object]:
             say(f"   the masked fields of {a} (S1c | this tree): " + " · ".join(f"{k}: {v[0]} | {v[1]}" for k, v in side[a].items()))
     if not (pools["same"] and tset["same"] and fence["ok"]) or any(diffs.values()):
         return stop("step 1")
-    # 2. the fixed-point toy
+    # 2. the fixed-point toy (AMENDMENT 3 §3: two learnable rooms and B; lr_g sized on it from the grid)
     toy = toy_gate()
     R.dump(gdir / "step2" / "toy.json", toy)
-    out["step2"] = {"per_seed": toy["per_seed"], "pass": toy["pass"],
-                    "first_passage": {s: (r["bias"]["first_g_B_le_bar"] or [None, None])[1] for s, r in toy["runs"].items()},
-                    "gain_only": {s: {"g_B_end": r["gain_only"]["g_B_end"], "g_B_min": r["gain_only"]["g_B_min"],
-                                      "g_A_min": r["gain_only"]["g_A_min"]} for s, r in toy["runs"].items()}}
-    say(f"2. the fixed-point toy (declared construction: signal {TOY_SIGNAL}, 13 words, S1's 1–3-thing mix; room B's words "
-        f"independent of its things; {TOY_BLOCKS} blocks, {TOY_B_BLOCKS} in B = {TOY_B_BLOCKS * PK.BLOCK} B-scenes; lr_g {CX.LR_G}, "
-        f"AMENDMENT 2): with biases, read with the MEMORY bar's own statistic — g_B's mean over its last {TOY_LAST} B-blocks ≤ "
-        f"{BAR_G_RATIO} × g_A's last-{TOY_LAST} mean — AND g_A's last-{TOY_LAST} mean ≥ {TOY_GA_BAR} (at the END), at seeds {list(TOY_SEEDS)}:")
-    for s, r in toy["runs"].items():
-        b, g, rd = r["bias"], r["gain_only"], toy["per_seed"][s]
-        tr = ", ".join(f"{v:.3f}" for v in b["g_B_at_B_blocks"][4::5])
-        fp = b["first_g_B_le_bar"]
-        say(f"   seed {s}: g_B's last-{TOY_LAST} mean {rd['g_B_last10']:.4f} (sd {rd['g_B_last10_sd']:.4f}) vs {BAR_G_RATIO} × g_A's "
-            f"{rd['g_A_last10']:.4f} = {rd['bar_B']:.4f} {'PASS' if rd['pass_B'] else 'MISS'} · g_A's last-{TOY_LAST} mean "
-            f"{rd['g_A_last10']:.4f} ≥ {TOY_GA_BAR} {'PASS' if rd['pass_A'] else 'MISS'} → {'PASS' if rd['pass'] else 'MISS'} · beside: "
-            f"g_B at the end {rd['g_B_end']:.4f} (first ≤ {TOY_GB_BAR} at block {fp[0] if fp else '—'}"
-            f"{', after ' + str(fp[1]) + ' B-scenes' if fp else ''}) · g_A's minimum {rd['g_A_min']:.4f} (block {rd['g_A_argmin']}), after "
-            f"block {TOY_LATE} {rd['g_A_min_after_100']:.4f} · |c_B| {b['c_B_norm']:.3f} · the toy's difficulty (A's forced naming, one "
-            f"thing): " + " ".join(f"{t} {v:.3f}" for t, v in b["naming_A"].items())
-            + f" · g_B after every 5th B-block: {tr} · WITHOUT biases (gain only, a print): g_B end {g['g_B_end']:.4f}, min "
-            f"{g['g_B_min']:.4f}, g_A min {g['g_A_min']:.4f} · CPU {b['cpu_s'] + g['cpu_s']:.1f} s")
+    out["step2"] = {"smallest": toy["smallest"], "law": toy["law"], "pass": toy["pass"], "first_passage": toy["first_passage"],
+                    "grid": {str(lr): {"pass": v["pass"], "per_seed": v["per_seed"]} for lr, v in toy["grid"].items()},
+                    "gain_only": {s: {"g_end": r["g_end"], "g_min": r["g_min"]} for s, r in toy["gain_only"].items()}}
+    say(f"2. the fixed-point toy (declared construction, AMENDMENT 3 §3: TWO learnable rooms A1 {list(TOY_SHAPES['A1'])} and A2 "
+        f"{list(TOY_SHAPES['A2'])} sharing the colour and size words, the parent naming ONE thing of 1–3; B by N's rule; "
+        f"{TOY_BLOCKS_PER_ROOM} blocks per room = {TOY_BLOCKS_PER_ROOM * PK.BLOCK} scenes each; signal {TOY_SIGNAL}; the gain from the "
+        f"SAID words only): with biases, g_B's last-{TOY_LAST} mean ≤ {BAR_G_RATIO} × the mean of g_A1's and g_A2's last-{TOY_LAST} means "
+        f"AND both ≥ {TOY_GA_BAR}, at seeds {list(TOY_SEEDS)} — the whole grid of lr_g {list(TOY_GRID)}:")
+    for lr, v in toy["grid"].items():
+        for s_, r in v["runs"].items():
+            rd = v["per_seed"][s_]
+            fp = r["first_g_B_le_bar"]
+            say(f"   lr_g {lr:<6} seed {s_}: g_B's last-{TOY_LAST} mean {rd['g_B_last10']:.4f} (sd {rd['g_B_last10_sd']:.4f}) vs "
+                f"{BAR_G_RATIO} × {rd['g_A_last10_mean']:.4f} = {rd['bar_B']:.4f} {'PASS' if rd['pass_B'] else 'MISS'} · g_A1 "
+                f"{rd['g_A_last10']['A1']:.4f}, g_A2 {rd['g_A_last10']['A2']:.4f} ≥ {TOY_GA_BAR} {'PASS' if rd['pass_A'] else 'MISS'} → "
+                f"{'PASS' if rd['pass'] else 'MISS'} · beside: the ends " + " ".join(f"{q} {x:.3f}" for q, x in rd["g_end"].items())
+                + f" · g_B first ≤ {TOY_GB_BAR} at " + (f"block {fp[0]} after {fp[1]} B-scenes" if fp else "—") + " · the learnable "
+                f"minima " + " ".join(f"{q} {rd['g_A_min'][q]:.3f} (block {rd['g_A_argmin'][q]}; after block {TOY_LATE} "
+                                      f"{rd['g_A_min_after_100'][q]:.3f})" for q in TOY_SHAPES)
+                + " · naming " + " ".join(f"{t} {x:.3f}" for t, x in r["naming_A"].items()) + f" · CPU {r['cpu_s']:.1f} s")
+        say(f"   lr_g {lr}: {'PASSES' if v['pass'] else 'misses'} at all three seeds")
+    say(f"   the smallest passing lr_g: {toy['smallest']} · the law's context.LR_G: {toy['law']} → {'EQUAL' if toy['pass'] else 'NOT EQUAL'}"
+        f" · WITHOUT biases at the law's lr_g (gain only, a print): " + " · ".join(
+            f"seed {s_} ends " + " ".join(f"{q} {x:.3f}" for q, x in r["g_end"].items()) for s_, r in toy["gain_only"].items()))
+    if toy["smallest"] is None:
+        return stop("step 2 — the rebuilt toy fails at every lr_g of the grid (AMENDMENT 3 §3: that is the night's finding)")
     if not toy["pass"]:
-        return stop("step 2 (lr_g is the knob, never the bar: a STOP and an amendment)")
+        return stop(f"step 2 — the law's LR_G {toy['law']} is not the grid's smallest passing value {toy['smallest']}")
     # 3. the chain-rule pin
     s3 = fd_step(data, GATE_SEED)
     pins, ok3 = s3["pins"], s3["pass"]
     out["step3"] = s3
     say(f"3. the chain-rule pin — the step on one one-thing scene against −rate · ∂L/∂θ by central differences (h {FD_H:g}), every "
-        f"coordinate of V, g, c, b, to {FD_TOL:g} (a learner of 12 round-robin blocks):")
+        f"coordinate of V, g, c, b, to {FD_TOL:g}; V, b, c on the full loss, g on the SAID words' part (AMENDMENT 3 §2) (a learner of "
+        f"12 round-robin blocks):")
     for k, p in pins.items():
         say(f"   {k} (visit {p['scene']}, «{' '.join(p['words'])}», g {p['g']:.4f}): max error V {p['max_err']['V']:.2e} · g "
             f"{p['max_err']['g']:.2e} · c {p['max_err']['c']:.2e} · b {p['max_err']['b']:.2e} → {'PASS' if p['pass'] else 'MISS'} · the "
-            f"planted doubled factor: error {p['planted_doubled_err']:.2e} ({'CAUGHT' if p['planted_doubled_caught'] else 'not caught'})")
+            f"planted doubled factor: error {p['planted_doubled_err']:.2e} ({'CAUGHT' if p['planted_doubled_caught'] else 'not caught'})"
+            f" · the planted OLD gain step over every word: error {p['planted_all_words_err']:.2e} "
+            f"({'CAUGHT' if p['planted_all_words_caught'] else 'not caught'})")
     if not ok3:
         return stop("step 3")
     # 4. the instrument under RANDOM-CTX (a print)
@@ -944,7 +1022,9 @@ def first_gate5(root: Path = ROOT, log=print) -> Dict[str, object]:
     old60 = _load(S1C_ROOT / "gate" / "step2-law-RANDOM60.json")
     bf = n_fraction(old60["record"]) if old60 is not None else None
     gtr = r60["marks5"]["trajectory"]
-    out["step4"] = {"fraction": nf, "blind": bf, "g_N": gtr["N"], "g_end": r60["marks5"]["g_end"]}
+    dips = learnable_dips(r60)
+    out["step4"] = {"fraction": nf, "blind": bf, "g_N": gtr["N"], "g_end": r60["marks5"]["g_end"], "trajectory": gtr,
+                    "learnable_dips": dips, "g_R_at_60": r60["marks5"]["g_R_at_60"], "pass": not dips}
     say(f"4. the instrument under RANDOM-CTX over {GATE4_BLOCKS} blocks (a PRINT): N's own mean drop over its blocks 21–{GATE4_BLOCKS} "
         f"{S._fmt(nf['num'], 4)} (n {nf['n_N']}) · the learnable rooms' {S._fmt(nf['den'], 4)} (n {nf['n_R']}) · the fraction "
         f"{S._fmt(nf['fraction'])}" + (f" · the context-blind RANDOM of S1c's gate, same picks and window: {S._fmt(bf['num'], 4)} / "
@@ -952,7 +1032,15 @@ def first_gate5(root: Path = ROOT, log=print) -> Dict[str, object]:
     say("   g_N after each N-block: " + ", ".join(f"b{b} {v:.4f}" for b, v in gtr["N"]) + " · the gains at block "
         f"{GATE4_BLOCKS}: " + " ".join(f"{r} {v:.4f}" for r, v in r60["marks5"]["g_end"].items())
         + f" · the scenes each act trained on by block {GATE4_BLOCKS}: {r60['trained_under']} · g_N's slope per 100 blocks "
-        f"{_slope_txt(r60['marks5']['slope'])}")
+        f"{_slope_txt(r60['marks5']['slope'])} · ḡ_R at block {GATE4_BLOCKS}: {S._fmt(r60['marks5']['g_R_at_60'], 4)}")
+    say(f"   every room's g after each block (AMENDMENT 3 §3; a learnable room under {STEP4_FLOOR} by block {GATE4_BLOCKS} is a STOP):")
+    for q in ROOMS:
+        say(f"   {q:<2}: " + ", ".join(f"{c['g'][q]:.3f}" for c in r60["ctx_record"]))
+    if dips:
+        say("   the learnable rooms under the floor (their minima): " + " · ".join(f"{q} {v:.4f}" for q, v in dips.items())
+            + (" — for R3 the cause to record is the shared size words' early misfit (AMENDMENT 3 §1, Fable's edit): a learner fact"
+               if "R3" in dips else ""))
+        return stop("step 4 (a learnable room's gain under 0.5 by block 60 — AMENDMENT 3 §3)")
     # 5. the smoke of every arm, read whole, and the instrument's pins
     smoke = {a: life5(data, test, a, n_blocks=SMOKE_BLOCKS) for a in ARMS}
     for a, r in smoke.items():
@@ -1039,13 +1127,14 @@ def identity_at_the_run(runs) -> Dict[str, object]:
 
 
 def refutations5(runs) -> Dict[str, object]:
-    """§5 (decided at block 200): (a) g_N > 0.3 at block 200 with biases present (RANDOM-CTX), at ≥ 2 seeds; (b) the
+    """§5 (decided at block 200): (a) g_N > 0.3 · ḡ_R at block 200 with biases present (RANDOM-CTX; AMENDMENT 3 §3), at ≥ 2
+    seeds; (b) the
     context null's N fraction < 0.3 (SHUFFLED-CTX under RANDOM — AMENDMENT 1 §2: the same clause as its VOID) at ≥ 2
     seeds, with its four gains at block 200 printed beside it."""
     a, b = {}, {}
     for s in SEEDS:
         x, n = runs[s][MEMORY_ARM], runs[s][MEMORY_NULL]
-        a[s] = None if x is None else x["marks5"]["g_N_at_end"] > REFUTE_G
+        a[s] = None if (x is None or x["marks5"]["g_R"] is None) else x["marks5"]["g_N_at_end"] > REFUTE_RATIO * x["marks5"]["g_R"]
         f = None if n is None else n["marks5"]["n_fraction"]["fraction"]
         b[s] = None if f is None else f < BAR_N_FRACTION
     return {"a": a, "a_refuted": sum(1 for v in a.values() if v) >= 2, "b": b, "b_refuted": sum(1 for v in b.values() if v) >= 2}
@@ -1061,6 +1150,8 @@ def report(root: Path = ROOT, log=print) -> Dict[str, object]:
     shas = check_prereg()
     gate = gate_ok(root)
     passages = list((gate.get("step2", {}).get("first_passage") or {}).values())
+    law_toy = (gate.get("step2", {}).get("grid") or {}).get(str(CX.LR_G), {}).get("per_seed", {})
+    toy_ends = {s_: {q: v["g_end"][q] for q in TOY_SHAPES} for s_, v in law_toy.items()}
     runs, bands = load_all(root)
     seeds = list(SEEDS)
     L: List[str] = []
@@ -1098,7 +1189,11 @@ def report(root: Path = ROOT, log=print) -> Dict[str, object]:
                  f"(S1c's record) {S._fmt(d['blind_fraction'])} · null − blind {S._fmt(d['null_minus_blind'])} · the null's four gains at "
                  f"block 200: " + " ".join(f"{r} {v:.4f}" for r, v in d["null_g_end"].items()))
         cause = slow_cause(d["budget_N"], passages) if d["g_reading"] == "slow" else None
-        L.append(f"      g_N three ways (AMENDMENT 2 §3): {d['g_reading']} · its slope per 100 blocks {_slope_txt(d['slope'])} over every "
+        L.append(f"      ḡ_R at block {GATE4_BLOCKS} {S._fmt(d['g_R_at_60'], 4)} and at block 200 {S._fmt(d['g_R_at_end'], 4)}"
+                 + (" — it DOUBLED after block 60: the positive-only rule's drift (AMENDMENT 3 §3), a reading" if d["drift"] else "")
+                 + f" · the toy's g_A end values at lr_g {CX.LR_G}: " + " · ".join(
+                     f"seed {s_} " + " ".join(f"{q} {x:.3f}" for q, x in v.items()) for s_, v in toy_ends.items()))
+        L.append(f"      g_N three ways (AMENDMENT 2 §3, relative to ḡ_R by AMENDMENT 3 §3): {d['g_reading']} · its slope per 100 blocks {_slope_txt(d['slope'])} over every "
                  f"N-block, {_slope_txt(d['slope_after_100'])} over blocks {SLOPE_AFTER + 1}–200 · the REALISED N-budget: {d['budget_N']} scenes "
                  f"trained under N (the toy's {TOY_B_BLOCKS * PK.BLOCK}; its first passages to {TOY_GB_BAR} at lr_g {CX.LR_G}: {passages} "
                  f"B-scenes)" + (f" → «slow» names: {cause}" if cause else ""))
@@ -1186,7 +1281,7 @@ def report(root: Path = ROOT, log=print) -> Dict[str, object]:
     L.append("")
     rf = refutations5(runs)
     L.append("the refutations (§5, decided at block 200):")
-    L.append(f"   (a) g_N > {REFUTE_G} at block 200 with biases present (RANDOM-CTX): " + " · ".join(
+    L.append(f"   (a) g_N > {REFUTE_RATIO} · ḡ_R at block 200 with biases present (RANDOM-CTX; AMENDMENT 3 §3): " + " · ".join(
         f"{s} {'holds' if v else 'does not hold' if v is not None else 'NOT GRADABLE'}" for s, v in rf["a"].items())
              + f" → {'REFUTED: the contradiction is not the mechanism; S1c-2 WHERE reading was a correlate' if rf['a_refuted'] else 'not refuted'}")
     L.append(f"   (b) the context null's N fraction < {BAR_N_FRACTION} (SHUFFLED-CTX under RANDOM): " + " · ".join(

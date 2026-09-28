@@ -20,6 +20,10 @@
 # own statistic (g_B's last-10 mean ≤ 0.1 × g_A's last-10 mean) and «g_A stays ≥ 0.8» at the END (its last-10 mean; the minimum
 # and a dip after block 100 printed); the life's g_N read three ways (met / slow / above 0.3) with its slope, and beside «slow»
 # the REALISED N-budget (the scenes g_N trained on) against the toy's first passages. Red on d452470.
+# edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 19:09 +0400 — PREREG-TMEM5 AMENDMENT 3 (brain-design-3 b90e180, sha 035d29f2…, final): the gain
+# from the SAID words (the pin's plant: the old all-words step, CAUGHT); the toy rebuilt — A1, A2 sharing words, B, 50 blocks each —
+# and read with both learnable rooms' last-10 means; the grid's smallest passing lr_g; step 4's STOP rule; every g threshold
+# relative to ḡ_R, ḡ_R at block 60 and the drift. Red on 7069da0.
 from __future__ import annotations
 
 import copy
@@ -49,6 +53,10 @@ class TestLaw(unittest.TestCase):
         self.assertEqual(got["amend1_tmem5"], "ab9a5fca939c258f940b2191529404f12fb80f06d8b9fdbf37fd5b468ea36d00")
         self.assertEqual(got["prereg_s1c2"], S2.PREREG_S1C2_SHA256)
         self.assertEqual(got["amend2_tmem5"], T5.AMEND2_TMEM5_SHA256)
+        self.assertEqual(got["amend3_tmem5"], "035d29f20ef5fe6dabe113a439f3046da214ce2fc7b9e2715d399e5e026cf256")
+        with mock.patch.object(T5, "AMEND3_TMEM5_SHA256", "0" * 64):
+            with self.assertRaises(T5.Tmem5Error):
+                T5.check_prereg()
         with mock.patch.object(T5, "AMEND2_TMEM5_SHA256", "0" * 64):
             with self.assertRaises(T5.Tmem5Error):
                 T5.check_prereg()
@@ -75,10 +83,12 @@ class TestLaw(unittest.TestCase):
         self.assertEqual(T5.CURIOSITY["PROGRESS-CTX+REPLAY"],
                          ("ctx-replay", "ORACLE-CTX+REPLAY", "RANDOM-CTX+REPLAY", "NULL-CTX+REPLAY"))
         self.assertEqual(T5.BAND_LEARNERS, {"ctx": "RANDOM-CTX", "ctx-replay": "RANDOM-CTX+REPLAY"})
-        self.assertEqual((T5.R_REPLAY, T5.MEMORY_AFTER, T5.G_LAST, T5.BAR_N_FRACTION, T5.BAR_G_RATIO, T5.REFUTE_G),
+        self.assertEqual((T5.R_REPLAY, T5.MEMORY_AFTER, T5.G_LAST, T5.BAR_N_FRACTION, T5.BAR_G_RATIO, T5.REFUTE_RATIO),
                          (10, 20, 10, 0.3, 0.1, 0.3))
-        self.assertEqual((T5.TOY_BLOCKS, T5.TOY_B_BLOCKS, T5.TOY_GB_BAR, T5.TOY_GA_BAR, T5.TOY_SEEDS), (200, 50, 0.1, 0.8, (0, 1, 2)))
-        self.assertEqual((CX.LR_G, T5.FD_TOL), (0.005, 1e-6))                  # AMENDMENT 2 §2.3
+        self.assertEqual((T5.TOY_BLOCKS, T5.TOY_B_BLOCKS, T5.TOY_GB_BAR, T5.TOY_GA_BAR, T5.TOY_SEEDS), (150, 50, 0.1, 0.8, (0, 1, 2)))
+        self.assertEqual((T5.TOY_ROOMS, T5.TOY_GRID, T5.STEP4_FLOOR, T5.DRIFT_FACTOR), (("A1", "A2", "B"), (0.001, 0.002, 0.005, 0.01), 0.5, 2.0))
+        self.assertIn(CX.LR_G, T5.TOY_GRID)                                    # AMENDMENT 3 §3: sized on the toy's grid
+        self.assertEqual(T5.FD_TOL, 1e-6)
         self.assertEqual(T5.ROOMS, LAW)
         self.assertEqual(T5.WHERE_ARMS, ("RANDOM-CTX", "PROGRESS-CTX"))
 
@@ -86,7 +96,7 @@ class TestLaw(unittest.TestCase):
         for kind, (gain, bias) in T5.LEARNER_KINDS.items():
             L = T5.new_ctx_learner(kind)
             self.assertIsInstance(L, CX.CtxLearner)
-            self.assertEqual((L.learn_gain, L.learn_bias, L.lr, L.lr_g, L.oracle, L.rooms), (gain, bias, 0.01, 0.005, False, list(LAW)))
+            self.assertEqual((L.learn_gain, L.learn_bias, L.lr, L.lr_g, L.oracle, L.rooms), (gain, bias, 0.01, CX.LR_G, False, list(LAW)))
 
 
 class TestShuffle(unittest.TestCase):
@@ -146,8 +156,9 @@ class TestGainThreeWay(unittest.TestCase):
         self.assertEqual(T5.gain_state(0.08, 0.9), "met")
         self.assertEqual(T5.gain_state(0.09, 0.9), "met")
         self.assertEqual(T5.gain_state(0.10, 0.9), "slow")
-        self.assertEqual(T5.gain_state(0.30, 0.9), "slow")
-        self.assertEqual(T5.gain_state(0.31, 0.9), "above 0.3")
+        self.assertEqual(T5.gain_state(0.27, 0.9), "slow")                   # 0.3 · ḡ_R = 0.27 (AMENDMENT 3 §3)
+        self.assertEqual(T5.gain_state(0.28, 0.9), "above 0.3·ḡ_R")
+        self.assertEqual(T5.gain_state(0.45, 1.8), "slow")                   # a drifted ḡ_R moves every threshold with it
         self.assertIsNone(T5.gain_state(None, 0.9))
 
     def test_the_slope(self) -> None:
@@ -198,7 +209,7 @@ class TestMemoryVerdict(unittest.TestCase):
         v = T5.memory_verdict(self._ps())
         self.assertEqual(v["seeds"][1]["g_reading"], "met")
         slow = T5.memory_verdict(self._ps({(2, "X"): _m5(0.1, 0.2, 0.005, 1.0), (3, "X"): _m5(0.1, 0.35, 0.005, 1.0)}))
-        self.assertEqual((slow["seeds"][2]["g_reading"], slow["seeds"][3]["g_reading"], slow["verdict"]), ("slow", "above 0.3", "FAIL"))
+        self.assertEqual((slow["seeds"][2]["g_reading"], slow["seeds"][3]["g_reading"], slow["verdict"]), ("slow", "above 0.3·ḡ_R", "FAIL"))
         self.assertAlmostEqual(v["seeds"][1]["null_minus_blind"], 0.0)
         self.assertEqual(v["seeds"][1]["null_g_end"], {"R1": 1.0, "R2": 1.0, "R3": 1.0, "N": 0.9})
 
@@ -235,10 +246,13 @@ class TestCuriosityVerdict(unittest.TestCase):
 
 
 class TestToy(unittest.TestCase):
-    def test_bs_words_are_independent_of_its_things_and_as_parent_is_true(self) -> None:
+    """AMENDMENT 3 §3: the toy rebuilt with what the life has — two learnable rooms sharing words, B by N's rule."""
+
+    def test_the_rooms_words(self) -> None:
         w = T5.ToyWorld(0)
         rng = np.random.default_rng(5)
         said_p, n_p, said_a, n_a, miss_a = 0, 0, 0, 0, 0
+        colours = {"A1": set(), "A2": set()}
         for _ in range(4000):
             X, words, attrs = w.scene("B", rng)
             self.assertEqual(X.shape, (len(attrs), Lr.RW_DIM))
@@ -249,41 +263,70 @@ class TestToy(unittest.TestCase):
             else:
                 n_a += 1
                 said_a += int("red" in words)
-            Xa, wa, aa = w.scene("A", rng)
-            miss_a += sum(1 for x in wa if x not in {a for t in aa for a in t})
-        self.assertEqual(miss_a, 0)                                          # A: every word names a thing in view
+            for room in ("A1", "A2"):
+                Xa, wa, aa = w.scene(room, rng)
+                self.assertTrue(all(t[0] in T5.TOY_SHAPES[room] for t in aa))              # the room's own shapes
+                miss_a += sum(1 for x in wa if x not in {a for t in aa for a in t})
+                colours[room] |= {x for x in wa if x in ("red", "blue", "green", "yellow", "white")}
+        self.assertEqual(miss_a, 0)                                          # A1, A2: every word names a thing in view
         self.assertGreater(min(n_p, n_a), 500)
         self.assertAlmostEqual(said_p / n_p, said_a / n_a, delta=0.03)      # B: «red» said as often with or without red
         self.assertAlmostEqual((said_p + said_a) / (n_p + n_a), 0.5 * 0.2, delta=0.02)   # T2/T4 carry a colour; 1 of 5
+        self.assertEqual(colours["A1"], colours["A2"])                      # the colour words are SHARED
+        self.assertFalse(set(T5.TOY_SHAPES["A1"]) & set(T5.TOY_SHAPES["A2"]))
+        self.assertEqual(set(T5.TOY_SHAPES["A1"]) | set(T5.TOY_SHAPES["A2"]), set(RM.VOCAB13[7:]))
+        with self.assertRaises(T5.Tmem5Error):
+            w.scene("A", rng)
+
+    def _run(self, gB, gA1, gA2):
+        order = ["A1", "A2", "B"] * 50                                       # B at blocks 3, 6, …, 150
+        return {"order": order, "g": {"A1": gA1, "A2": gA2, "B": gB}}
 
     def test_the_toy_is_read_with_the_bars_own_statistic(self) -> None:
-        order = (["A"] * 3 + ["B"]) * 50                                   # B at blocks 4, 8, …, 200
-        gA = [1.0] * 200
-        gA[29] = 0.5                                                         # an early dip (block 30): printed, not graded
-        gA[149] = 0.7                                                        # a dip after block 100: printed apart
-        gB = [1.0 - 0.004 * b for b in range(1, 201)]                    # 0.2 at block 200: the last-10 mean ≈ 0.27
-        rd = T5.toy_reading({"order": order, "g_A": gA, "g_B": gB})
-        bb = [b for b in range(4, 201, 4)][-10:]
-        aa = [b for b in range(1, 201) if b % 4][-10:]
+        gA1 = [1.0] * 150
+        gA1[29] = 0.5                                                        # an early dip (block 30): printed, not graded
+        gA1[119] = 0.7                                                       # a dip after block 100: printed apart
+        gA2 = [0.9] * 150
+        gB = [1.0 - 0.005 * b for b in range(1, 151)]                       # 0.25 at block 150: the last-10 mean ≈ 0.32
+        rd = T5.toy_reading(self._run(gB, gA1, gA2))
+        bb = list(range(3, 151, 3))[-10:]
+        a1 = list(range(1, 151, 3))[-10:]
+        a2 = list(range(2, 151, 3))[-10:]
         self.assertAlmostEqual(rd["g_B_last10"], float(np.mean([gB[b - 1] for b in bb])))
-        self.assertAlmostEqual(rd["g_A_last10"], float(np.mean([gA[b - 1] for b in aa])))
+        self.assertAlmostEqual(rd["g_A_last10"]["A1"], float(np.mean([gA1[b - 1] for b in a1])))
+        self.assertAlmostEqual(rd["g_A_last10"]["A2"], float(np.mean([gA2[b - 1] for b in a2])))
+        self.assertAlmostEqual(rd["g_A_last10_mean"], (rd["g_A_last10"]["A1"] + rd["g_A_last10"]["A2"]) / 2)
         self.assertAlmostEqual(rd["g_B_last10_sd"], float(np.std([gB[b - 1] for b in bb], ddof=1)))
-        self.assertEqual((rd["g_A_min"], rd["g_A_min_after_100"], rd["g_B_end"]), (0.5, 0.7, gB[-1]))
+        self.assertEqual((rd["g_A_min"]["A1"], rd["g_A_min_after_100"]["A1"]), (0.5, 0.7))
         self.assertTrue(rd["pass_A"])
-        self.assertEqual(rd["pass_B"], rd["g_B_last10"] <= 0.1 * rd["g_A_last10"])
-        self.assertFalse(rd["pass_B"])                                       # 0.27 > 0.1 × 1.0
-        low = T5.toy_reading({"order": order, "g_A": [0.79] * 200, "g_B": [0.0] * 200})
-        self.assertEqual((low["pass_A"], low["pass_B"], low["pass"]), (False, True, False))
-        ok = T5.toy_reading({"order": order, "g_A": [0.9] * 200, "g_B": [0.05] * 200})
+        self.assertFalse(rd["pass_B"])                                       # ≈ 0.32 > 0.1 × 0.95
+        self.assertEqual(rd["pass_B"], rd["g_B_last10"] <= 0.1 * rd["g_A_last10_mean"])
+        one_low = T5.toy_reading(self._run([0.0] * 150, [0.95] * 150, [0.79] * 150))
+        self.assertEqual((one_low["pass_A"], one_low["pass_B"], one_low["pass"]), (False, True, False))   # BOTH must hold
+        ok = T5.toy_reading(self._run([0.05] * 150, [0.9] * 150, [0.85] * 150))
         self.assertTrue(ok["pass"])
 
-    def test_the_schedule_is_fifty_b_blocks_of_two_hundred(self) -> None:
+    def test_the_schedule_is_fifty_blocks_per_room(self) -> None:
         for s in T5.TOY_SEEDS:
             order = T5.toy_order(s)
-            self.assertEqual(len(order), 200)
-            self.assertEqual(order.count("B"), 50)
+            self.assertEqual(len(order), 150)
+            self.assertEqual([order.count(r) for r in T5.TOY_ROOMS], [50, 50, 50])
             self.assertEqual(order, T5.toy_order(s))
         self.assertNotEqual(T5.toy_order(0), T5.toy_order(1))
+
+    def test_the_smallest_passing_lr_g(self) -> None:
+        self.assertEqual(T5.smallest_passing({0.001: False, 0.002: True, 0.005: True, 0.01: False}), 0.002)
+        self.assertEqual(T5.smallest_passing({0.001: False, 0.002: False, 0.005: False, 0.01: True}), 0.01)
+        self.assertIsNone(T5.smallest_passing({0.001: False, 0.002: False, 0.005: False, 0.01: False}))
+        self.assertEqual(T5.smallest_passing({0.01: True, 0.001: True}), 0.001)
+
+    def test_the_step4_stop_rule(self) -> None:
+        ctx = [{"g": {"R1": 1.0 - 0.01 * b, "R2": 0.9, "R3": 1.2, "N": 0.0}} for b in range(1, 101)]
+        dips = T5.learnable_dips({"ctx_record": ctx})
+        self.assertEqual(sorted(dips), ["R1"])                               # R1 0.49 at block 51 (N is not a learnable room)
+        self.assertAlmostEqual(dips["R1"], 1.0 - 0.60)
+        late = [{"g": {"R1": 1.0 if b <= 60 else 0.1, "R2": 0.9, "R3": 1.2, "N": 0.0}} for b in range(1, 101)]
+        self.assertEqual(T5.learnable_dips({"ctx_record": late}), {})       # after block 60: not the gate's
 
 
 def _stream(n=80, seed=3):
@@ -399,6 +442,14 @@ class TestLife5(unittest.TestCase):
         self.assertIn("marks5", r)
         self.assertEqual(r["marks5"]["g_end"], r["ctx_record"][-1]["g"])
 
+    def test_gbar_at_block_60_and_the_drift(self) -> None:
+        r = T5.life5(self.data, self.test, "RANDOM-CTX", LAW, n_blocks=60)
+        m5 = r["marks5"]
+        self.assertAlmostEqual(m5["g_R_at_60"], float(np.mean([r["ctx_record"][59]["g"][k] for k in ("R1", "R2", "R3")])))
+        self.assertFalse(m5["drift"])                                        # at block 60 ḡ_R is its own block-60 value
+        short = T5.life5(self.data, self.test, "RANDOM-CTX", LAW, n_blocks=20)
+        self.assertIsNone(short["marks5"]["g_R_at_60"])
+
     def _spy(self, arm, n):
         calls = []
         orig = CX.CtxLearner.train_scene
@@ -501,6 +552,7 @@ class TestGatePins(unittest.TestCase):
         self.assertEqual(sorted(s3["pins"]), ["N@g 0.5", "N@own g", "R2@g 0.5", "R2@own g"])
         for k, pin in s3["pins"].items():
             self.assertGreaterEqual(pin["scene"], 1000)
+            self.assertTrue(pin["planted_all_words_caught"])                  # the OLD gain step over every word
             if k.endswith("g 0.5"):
                 self.assertTrue(pin["planted_doubled_caught"])
 

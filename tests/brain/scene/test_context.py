@@ -6,6 +6,9 @@
 # scene-tmem1 2609670 (context.py does not exist there).
 # edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 18:12 +0400 — PREREG-TMEM5-AMEND-1 (95b6e48, sha ab9a5fca…) §4 (10): the stored ACT
 # beside every row is the context the learner was in at the meeting, and row_contexts aligns with StoreRows' rows.
+# edit: Claude (Opus 5.5, T-MEM-5 builder), 2026-09-28 19:04 +0400 — PREREG-TMEM5 AMENDMENT 3 (b90e180, sha 035d29f2…) §2: the gain's step is
+# −lr_g · ∂/∂g of the SAID words' part of the loss (the pin now reads said_loss for g; V, b, c still the full loss), and the
+# OLD all-words gain step is a planted offender the pin CATCHES. Red on 7069da0.
 from __future__ import annotations
 
 import copy
@@ -83,8 +86,14 @@ class TestChainRule(unittest.TestCase):
             P.V[j, kk] += h; up = loss(); P.V[j, kk] -= 2 * h; dn = loss(); P.V[j, kk] += h
             self.assertAlmostEqual(dV[j, kk], -L.lr * (up - dn) / (2 * h), delta=1e-6 * max(1.0, abs(dV[j, kk])))
         g0 = P.g[room]
+
+        def said():
+            return P.said_loss(raw, words, room)
+        P.g[room] = g0 + h; up = said(); P.g[room] = g0 - h; dn = said(); P.g[room] = g0
+        self.assertAlmostEqual(dg, -L.lr_g * (up - dn) / (2 * h), delta=1e-6 * max(1.0, abs(dg)))     # the SAID part only
         P.g[room] = g0 + h; up = loss(); P.g[room] = g0 - h; dn = loss(); P.g[room] = g0
-        self.assertAlmostEqual(dg, -L.lr_g * (up - dn) / (2 * h), delta=1e-6 * max(1.0, abs(dg)))
+        old_rule = -L.lr_g * (up - dn) / (2 * h)                                                   # every word's term
+        self.assertGreater(abs(dg - old_rule), 1e-6)                                               # the old step: CAUGHT
         for jj in (P.index["red"], P.index["big"]):
             P.c[room][jj] += h; up = loss(); P.c[room][jj] -= 2 * h; dn = loss(); P.c[room][jj] += h
             self.assertAlmostEqual(dc[jj], -L.lr * (up - dn) / (2 * h), delta=1e-6 * max(1.0, abs(dc[jj])))
