@@ -427,6 +427,33 @@ class TestEndToEndRealBrain(_Tape, unittest.TestCase):
                          [json.dumps(r) for r in S.journal(ro) if not S.is_brain_row(r)])
         self.assertEqual(mb.org.state_hash(), mo.org.state_hash())
 
+    def test_a_malformed_ask_is_answered_refused_never_a_crash(self) -> None:
+        """#230: the organ's BrainError on a malformed ask (a form it does not know) is journaled as a refused answer by name."""
+        tmp = self.tmp / "malformed"
+        tr = tmp / "tape-root"; tr.mkdir(parents=True)
+        from creature.tape import Tape
+        tape = Tape(tr)
+        row = tape.publish("ask", json.dumps({"form": "sing", "item": "X:1", "mark": "X"}).encode(),
+                           {"moment": "scX-sing", "source": "scene", "form": "sing"}, "json", at="2026-09-28T12:00:00.000Z")
+        from brain.scene import world as W
+        eye = tape.publish("eye", S.png(W.render_scene(W.test_scene(20261401, 0))[0]),
+                           {"moment": "scX-sing", "source": "scene", "kind": "sitting", "set": "fresh", "split": "test", "row": 0},
+                           "png", at="2026-09-28T12:00:00.001Z")
+        row2 = tape.publish("ask", json.dumps({"form": "why", "item": "M4:circle", "mark": "M4", "word": "circle"}).encode(),
+                            {"moment": "scX-why", "source": "scene", "form": "why"}, "json", at="2026-09-28T12:00:00.002Z")
+        root = S.link_root(tr, tmp / "r")
+        gp = S.write_genome(tmp / "g.genome")
+        m = MM.Mind(gp, root)
+        try:
+            for r in (row, eye, row2):
+                m.consume(r)
+        finally:
+            m.close()
+        ans = [r for r in S.journal(root) if r.get("kind") == "answer"]
+        self.assertEqual([(a["form"], a["answer"]["kind"]) for a in ans], [("sing", "refused"), ("why", "unknown")])
+        self.assertIn("sing", ans[0]["answer"]["reason"])
+        self.assertEqual(m.pending_asks, {})
+
     def test_resume_mid_sitting_equals_the_whole_life(self) -> None:
         whole, rw = self.run_mind(fake=False)
         cut = next(k for k, r in enumerate(self.rows) if r["sense"] == "ask" and json.loads(

@@ -1465,7 +1465,13 @@ class Mind:
         hash_before, guard_before = self.org.row_hash(), self._chat_guard()
         detail = None
         if self.brain is not None:
-            by, answer = "brain", _jsonable(self.brain.ask(payload, g))
+            by = "brain"
+            try:
+                answer = _jsonable(self.brain.ask(payload, g))
+            except Exception as e:                 # the organ's own refusal of a malformed ask (genome.brain.BrainError) is ANSWERED
+                if type(e).__name__ != "BrainError":   # as refused, by name, never a crash: one bad row must not become a crash loop (#230)
+                    raise
+                answer = {"kind": "refused", "reason": str(e), "raw": {"refused": str(e)}}
         else:
             by = "organs"
             answer, detail = self._organs_answer(form, payload, view, cache)
