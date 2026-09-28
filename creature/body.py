@@ -75,6 +75,18 @@ def _crash_policy(declared: Dict[str, dict]) -> "tuple[bool, bool]":
     return crash.get("sense") == "restart journal", crash.get("mind") == "page"
 
 
+# edit: Claude (Fable 5.1, the seat), 2026-09-28 21:43 +0400 — BRAIN-IN-BODY: the brain's STATUS field, read from another thread than the one that
+# changes it (see _build_status). Never raises.
+def _brain_status_guarded(mind) -> Optional[Dict[str, object]]:
+    fn = getattr(mind, "brain_status", None)
+    if fn is None:
+        return None
+    try:
+        return fn()
+    except Exception as e:      # a read torn by the mind thread's own write: reported, never fatal to the STATUS thread
+        return {"error": repr(e)}
+
+
 def _rss_mb() -> float:
     # ru_maxrss is KB on Linux, bytes on macOS; this box is Linux (see the environment banner).
     return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
@@ -482,7 +494,11 @@ class Body:
             # the same defensive convention every other STATUS field in this method already uses.
             "scene": (sp.snapshot() if (sp := getattr(self, "scene_progress", None)) is not None
                       else {"published_moments": 0, "train_done": False, "sitting_done": {}, "ended": False}),
-            "brain": (self.mind.brain_status() if hasattr(self.mind, "brain_status") else None),
+            # edit: Claude (Fable 5.1, the seat), 2026-09-28 21:43 +0400 — the reviewer's R2 (REVIEW-BEFORE-RUNG3): this runs on the STATUS thread
+            # while the mind thread learns and answers; brain_status() walks dicts the mind thread grows. One «dictionary
+            # changed size during iteration» here would END the status thread (its loop has no guard): STATUS would freeze
+            # while the unit reads active (#179, #230). A failed read is carried as its own error and the next write tries again.
+            "brain": _brain_status_guarded(self.mind),
         }
 
     def _write_status(self, status: Dict[str, object]) -> None:
