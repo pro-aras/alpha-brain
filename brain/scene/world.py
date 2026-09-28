@@ -15,6 +15,10 @@ their box on a black 128 × 128 ground, then the maker world's three faint clutt
 code and constants) taken by maximum. Declared (a READING, RAISED): no canvas-wide noise is added — the PREREG names
 σ 0.05 under the things (render's own words), and the ground as «a black ground with the maker world's three faint
 clutter strokes».
+
+edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 15:58 +0400 — PREREG-S1B1R §2 (sha 879a22fb…) with AMENDMENT 1 (sha a198f0b4…): the FRESH
+test seeds and the two test sets (S1b-1's own and the fresh), and SPEAK2 (speak2_kind, speak2_pin, speak2_scene). Additive:
+every generator S1b-1 drew is byte-for-byte as it was (the gate's step 2 re-draws S1b-1's caches and TESTS it).
 """
 from __future__ import annotations
 
@@ -61,6 +65,15 @@ M3_TWO, M3_THREE = 40, 20                          # M3 COMPOSE: 60 (10 per held
 SPEAK_TWO, SPEAK_THREE = 64, 32                    # SPEAK: 96
 DECLINE_TWO, DECLINE_THREE = 32, 16                # DECLINE: 48 (kind A 32 · kind B 16)
 _TWIN_REDRAWS = 1000
+# PREREG-S1B1R §2 with AMENDMENT 1 §2, §4 (h) (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 15:58 +0400): the FRESH test seeds, one per
+# world seed (the graded marks are read on these alone; 2026130x are S1c's world seeds — a different role), beside S1b-1's
+# own test set; SPEAK2, the NEED items: 60 THREE-thing scenes per seed in three kinds of 20.
+FRESH_TEST_SEEDS: Dict[int, int] = {20261101: 20261401, 20261102: 20261402, 20261103: 20261403}
+TEST_SETS: Dict[str, Dict[int, int]] = {"s1b1": TEST_SEEDS, "fresh": FRESH_TEST_SEEDS}
+SPEAK2_PER_KIND = 20
+SPEAK2_KINDS: Tuple[str, ...] = ("CS", "SC", "SS")                      # i 0–19 · 20–39 · 40–59
+SPEAK2_KIND_TYPES: Dict[str, Tuple[str, str]] = {"CS": ("colour", "shape"), "SC": ("size", "colour"), "SS": ("size", "shape")}
+_SPEAK2_TRIES = 100_000
 TEMPLATES: Tuple[str, ...] = ("T1", "T2", "T3", "T4")
 WORD_TYPES: Tuple[str, ...] = ("colour", "shape", "size")
 
@@ -387,6 +400,62 @@ def decline_scene(test_seed: int, index: int) -> Scene:
     return Scene("decline", index, test_seed, _place(attrs, rng), (), pos, None)
 
 
+# ------------------------------------------------------------------------------------------------ S1b-1R's NEED items
+# edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 15:58 +0400 — PREREG-S1B1R §2 as AMENDMENT 1 §2 rules it (the S1b-1R builder's RAISED
+# clause: a need for two words takes three things). S1b-1's generators above are untouched.
+def speak2_kind(index: int) -> str:
+    """SPEAK2 item `index`'s kind: CS (i 0–19; «⟨colour⟩ ⟨shape⟩» the only unique 2-word phrase), SC (i 20–39; «⟨size⟩
+    ⟨colour⟩»), SS (i 40–59; «⟨size⟩ ⟨shape⟩»)."""
+    if not 0 <= index < SPEAK2_PER_KIND * len(SPEAK2_KINDS):
+        raise WorldError(f"speak2 index {index} out of range")
+    return SPEAK2_KINDS[index // SPEAK2_PER_KIND]
+
+
+def _unique_of(words: Sequence[str], things: Sequence[Thing], target: int) -> bool:
+    """True of the target and of no other thing in view (order-free, the world's truth)."""
+    if not phrase_true_of(words, things[target]):
+        return False
+    return not any(phrase_true_of(words, u) for k, u in enumerate(things) if k != target)
+
+
+def speak2_pin(things: Sequence[Thing], target: int, kind: str) -> Dict[str, object]:
+    """AMENDMENT 1 §2's pins on one scene: the §2 pin (no single word of the target unique; some 2-word phrase unique) AND
+    the kind's pin (the kind's 2-word phrase unique; the kind's other two 2-word phrases NOT unique). Returns every word's
+    and pair's uniqueness and `pass`."""
+    t = things[target]
+    word = {"size": t.size, "colour": t.colour, "shape": t.shape}
+    single = {typ: _unique_of([w], things, target) for typ, w in word.items()}
+    pairs = {(a, b): _unique_of([word[a], word[b]], things, target)
+             for a, b in (("size", "colour"), ("size", "shape"), ("colour", "shape"))}
+    own = SPEAK2_KIND_TYPES[kind]
+    key = own if own in pairs else (own[1], own[0])
+    ok = (not any(single.values())) and pairs[key] and not any(v for k, v in pairs.items() if k != key)
+    return {"single": single, "pairs": {f"{a}+{b}": v for (a, b), v in pairs.items()}, "kind": kind,
+            "kind_pair": f"{key[0]}+{key[1]}", "pass": bool(ok)}
+
+
+def speak2_scene(test_seed: int, index: int) -> Scene:
+    """SPEAK2 (PREREG-S1B1R §2 / AMENDMENT 1 §2): THREE trained things, no twins; the item is drawn WHOLE — the target and
+    both distractors, each a trained draw (`_trained_attrs`) — by REJECTION from its own substream `scene:speak2:<i>`
+    until `speak2_pin` holds for its kind (so the target's draw is uniform only over the trained things that admit the
+    kind; the achieved mix is printed per kind). Declared draw order: [target, distractor, distractor] per try; after
+    acceptance, the target's index among the things (uniform), then the placement. The learner hears nothing."""
+    kind = speak2_kind(index)
+    rng = substream(test_seed, f"scene:speak2:{index}")
+    for _ in range(_SPEAK2_TRIES):
+        attrs = [_trained_attrs(rng) for _ in range(3)]
+        if _has_twin(attrs):
+            continue
+        if speak2_pin([Thing(s, c, z, 0, 0) for s, c, z in attrs], 0, kind)["pass"]:
+            break
+    else:
+        raise WorldError(f"no SPEAK2 {kind} scene drawn in {_SPEAK2_TRIES} tries")
+    target, others = attrs[0], attrs[1:]
+    pos = int(rng.integers(3))
+    attrs = others[:pos] + [target] + others[pos:]
+    return Scene("speak2", index, test_seed, _place(attrs, rng), (), pos, None)
+
+
 def toy_train_scene(index: int) -> Scene:
     """The toy (THE FIRST GATE 1): 1,000 ONE-thing scenes of seed 20261099, the parent speaking (no ambiguity)."""
     rng = substream(TOY_SEED, f"scene:toy-train:{index}")
@@ -413,7 +482,8 @@ def stage_scene(index: int) -> Scene:
 def split_size(split: str) -> int:
     sizes = {"train": N_TRAIN, "test": N_TEST, "m2b": (len(M2B_SHAPES) + 1) * M2B_PER_SHAPE, "m6": M6_TWO + M6_THREE,
              "toy-train": TOY_TRAIN_N, "toy-test": TOY_TEST_N, "stage": STAGE_N,
-             "m3": M3_TWO + M3_THREE, "speak": SPEAK_TWO + SPEAK_THREE, "decline": DECLINE_TWO + DECLINE_THREE}
+             "m3": M3_TWO + M3_THREE, "speak": SPEAK_TWO + SPEAK_THREE, "decline": DECLINE_TWO + DECLINE_THREE,
+             "speak2": SPEAK2_PER_KIND * len(SPEAK2_KINDS)}
     if split not in sizes:
         raise WorldError(f"no such split: {split!r}")
     return sizes[split]
@@ -427,7 +497,7 @@ def scenes_for(split: str, seed: int, limit: Optional[int] = None) -> List[Scene
             "m2b": lambda i: m2b_scene(seed, i), "m6": lambda i: m6_scene(seed, i),
             "toy-train": toy_train_scene, "toy-test": toy_test_scene, "stage": stage_scene,
             "m3": lambda i: m3_scene(seed, i), "speak": lambda i: speak_scene(seed, i),
-            "decline": lambda i: decline_scene(seed, i)}[split]
+            "decline": lambda i: decline_scene(seed, i), "speak2": lambda i: speak2_scene(seed, i)}[split]
     return [make(i) for i in range(n)]
 
 

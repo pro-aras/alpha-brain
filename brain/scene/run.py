@@ -40,7 +40,7 @@ import numpy as np
 
 from brain.world.seeds import substream
 
-from . import AMEND2_SHA256, PREREG_S1B1_SHA256, PREREG_SHA256
+from . import AMEND2_SHA256, PREREG_S1B1_SHA256, PREREG_S1B1R_SHA256, PREREG_SHA256, S1B1R_AMEND1_SHA256
 from . import cache as C
 from . import learners as Lr
 from . import marks as M
@@ -57,6 +57,9 @@ ARM_LR = {"A-RW": Lr.LR_S1B1, "A-RW-LR10": Lr.LR, "N-SHUF": Lr.LR_S1B1, "P-ORACL
 PREREG_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-R3-TONIGHT.md")
 AMEND2_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-R3-TONIGHT-AMEND-2.md")
 PREREG_S1B1_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-S1B1.md")
+# PREREG-S1B1R (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:00 +0400): the law this slice builds and its AMENDMENT 1
+PREREG_S1B1R_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-S1B1R.md")
+S1B1R_AMEND1_PATH = Path("/data/dev/genome-wt-brain3/docs/brain/r3/PREREG-S1B1R-AMEND-1.md")
 TEST_SPLITS = C.TEST_SPLITS
 TYPE_WORDS = {"shape": list(W.SHAPES), "colour": list(W.COLOUR_NAMES), "size": list(W.SIZE_NAMES)}
 # PREREG-S1B1 §4, §5, §9: the new bars' fractions and refutation constants
@@ -81,6 +84,13 @@ def check_prereg() -> str:
     s1 = hashlib.sha256(PREREG_S1B1_PATH.read_bytes()).hexdigest()
     if s1 != PREREG_S1B1_SHA256:
         raise RunError(f"PREREG-S1B1 sha256 {s1} ≠ the co-signed {PREREG_S1B1_SHA256} — STOP and hand back")
+    # PREREG-S1B1R and its AMENDMENT 1 (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:00 +0400): checked at every run command
+    r = hashlib.sha256(PREREG_S1B1R_PATH.read_bytes()).hexdigest()
+    if r != PREREG_S1B1R_SHA256:
+        raise RunError(f"PREREG-S1B1R sha256 {r} ≠ the co-signed {PREREG_S1B1R_SHA256} — STOP and hand back")
+    a1 = hashlib.sha256(S1B1R_AMEND1_PATH.read_bytes()).hexdigest()
+    if a1 != S1B1R_AMEND1_SHA256:
+        raise RunError(f"PREREG-S1B1R AMENDMENT 1 sha256 {a1} ≠ the co-signed {S1B1R_AMEND1_SHA256} — STOP and hand back")
     return got
 
 
@@ -1089,6 +1099,33 @@ def cache_all(root: Path, log=print) -> Dict[str, object]:
     return rec
 
 
+def cache_r(root: Path, log=print) -> Dict[str, object]:
+    """PREREG-S1B1R / AMENDMENT 1 §4 (c) (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:00 +0400): every cache this slice reads,
+    drawn ONCE under its fresh root by THIS code, one at a time: the toy (P-ORACLE's ε, S1a's rule), then per world seed the
+    ONE training cache, S1b-1's own test set (2026120x — the gate's step 2 re-runs S1b-1's arms on it) and the FRESH test set
+    (2026140x, with SPEAK2 — the graded marks). No questions here (run.py writes them; they are pure functions of the
+    caches). CPU and wall seconds per step are recorded."""
+    check_prereg()
+    rec: Dict[str, object] = {}
+    for split in ("toy-train", "toy-test"):
+        d = C.cache_dir(root, None, split)
+        t, w = time.process_time(), time.perf_counter()
+        if not d.exists():
+            C.build(split, None, d, log=log)
+        rec[split] = {"cpu_s": time.process_time() - t, "wall_s": time.perf_counter() - w}
+    for ws in W.WORLD_SEEDS:
+        for tset in ("s1b1", "fresh"):
+            t, w = time.process_time(), time.perf_counter()
+            dj = C.build_world_seed(root, ws, log=log, tset=tset)
+            rec[f"{ws}/{tset}"] = {"cpu_s": time.process_time() - t, "wall_s": time.perf_counter() - w,
+                                   "test_seed": dj["test_seed"], "checked": dj["checked"], "overlap": dj["overlap"]}
+            log(f"[cache-r] {ws}/{tset}: cpu {rec[f'{ws}/{tset}']['cpu_s']:.1f} s · disjoint {dj['checked']}")
+    rec["cpu_s_total"] = sum(v["cpu_s"] for v in rec.values() if isinstance(v, dict))
+    log(f"[cache-r] CPU-s in all: {rec['cpu_s_total']:.1f}")
+    dump(Path(root) / "logs" / "cache-r.json", rec)
+    return rec
+
+
 # ------------------------------------------------------------------------------------------------ the price
 def price(root: Path, n: int = 2000, log=print) -> Dict[str, object]:
     """Solo (A-RW, seed 1), then the launch's shape (6 arms × 3 seeds at once, nice 19), each over the first `n` scenes
@@ -1140,7 +1177,7 @@ def price(root: Path, n: int = 2000, log=print) -> Dict[str, object]:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     ap = argparse.ArgumentParser(prog="brain.scene.run")
     ap.add_argument("cmd", choices=["cache", "cache-world", "cache-all", "questions", "stage", "first-gate", "arm", "grade",
-                                    "report", "price"])
+                                    "report", "price", "cache-r"])
     ap.add_argument("--split")
     ap.add_argument("--world-seed", type=int)
     ap.add_argument("--arm")
@@ -1176,6 +1213,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         report(root, log=log)
     elif a.cmd == "price":
         price(root, n=a.n if a.n != W.N_TRAIN else 2000, log=log)
+    elif a.cmd == "cache-r":
+        cache_r(root, log=log)
     return 0
 
 

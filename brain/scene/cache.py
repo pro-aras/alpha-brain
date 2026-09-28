@@ -38,14 +38,29 @@ from . import world as W
 # edit: Claude (Opus 5.5, S1b-1 builder), 2026-09-28 13:50 +0400 — PREREG-S1B1 §1: world.py's bytes change, so check_code refuses
 # S1a's caches; S1b-1's run root is FRESH and every cache is redrawn there; S1a's root is read (as plain files) only by the
 # identity test and for S1a's numbers beside.
-RUNS = Path("/data/dev/brain-runs/scene-s1b1")
+# edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 15:59 +0400 — PREREG-S1B1R / AMENDMENT 1 §4 (c): world.py's bytes change again, so
+# check_code refuses S1b-1's caches; this slice's run root is FRESH (RUNS) and every cache is redrawn there; S1b-1's root
+# (S1B1_RUNS) is READ as plain files only (the identity test, S1b-1's report). Two TEST SETS per world seed share ONE
+# training cache: S1b-1's own ("s1b1": 2026120x at S1b-1's relative paths) and the fresh one ("fresh": 2026140x under
+# <root>/<ws>/fresh/, with SPEAK2).
+RUNS = Path("/data/dev/brain-runs/scene-s1b1r")
+S1B1_RUNS = Path("/data/dev/brain-runs/scene-s1b1")
 S1A_RUNS = Path("/data/dev/brain-runs/scene")
 N_LOCATED = 4
 TEST_SPLITS = ("test", "m2b", "m6", "m3", "speak", "decline")
+FRESH_SPLITS = TEST_SPLITS + ("speak2",)
+_SET_SPLITS = {"s1b1": TEST_SPLITS, "fresh": FRESH_SPLITS}
 
 
 class SceneCacheError(Exception):
     pass
+
+
+def test_splits(tset: str = "s1b1") -> tuple:
+    """The test splits of a test set: S1b-1's six; the fresh set's seven (SPEAK2 added)."""
+    if tset not in _SET_SPLITS:
+        raise SceneCacheError(f"no such test set: {tset!r}")
+    return _SET_SPLITS[tset]
 
 
 _REPO = Path(__file__).resolve().parents[2]
@@ -68,27 +83,32 @@ def check_code(d: Path) -> None:
         raise SceneCacheError(f"{d} was drawn by other code: {bad} — rebuild it (a cache is read only by its own code)")
 
 
-def cache_dir(root: Path, world_seed: Optional[int], split: str) -> Path:
-    """<root>/<world seed>/cache/<split> for a world seed's train/test/m2b/m6; <root>/toy/cache/<split>; <root>/stage/cache/stage."""
+def cache_dir(root: Path, world_seed: Optional[int], split: str, tset: str = "s1b1") -> Path:
+    """<root>/<world seed>/cache/<split> for a world seed's train and S1b-1's test set; <root>/<world seed>/fresh/cache/<split>
+    for the fresh test set (PREREG-S1B1R; the train cache is ONE per world seed, shared); <root>/toy/cache/<split>;
+    <root>/stage/cache/stage."""
     if split in ("toy-train", "toy-test"):
         return Path(root) / "toy" / "cache" / split
     if split == "stage":
         return Path(root) / "stage" / "cache" / split
     if world_seed is None:
         raise SceneCacheError(f"split {split!r} needs a world seed")
-    return Path(root) / str(world_seed) / "cache" / split
+    if split == "train" or tset == "s1b1":
+        return Path(root) / str(world_seed) / "cache" / split
+    test_splits(tset)
+    return Path(root) / str(world_seed) / tset / "cache" / split
 
 
-def split_seed(split: str, world_seed: Optional[int]) -> int:
+def split_seed(split: str, world_seed: Optional[int], tset: str = "s1b1") -> int:
     if split == "train":
         return int(world_seed)
-    if split in TEST_SPLITS:
-        return W.TEST_SEEDS[int(world_seed)]
+    if split in test_splits(tset):
+        return W.TEST_SETS[tset][int(world_seed)]
     if split in ("toy-train", "toy-test"):
         return W.TOY_SEED
     if split == "stage":
         return W.STAGE_SEED
-    raise SceneCacheError(f"no such split: {split!r}")
+    raise SceneCacheError(f"no such split in the {tset!r} test set: {split!r}")
 
 
 def _versions() -> Dict[str, str]:
@@ -110,13 +130,14 @@ def _scene_percepts(scene: W.Scene, spec, gcfg, colour):
 
 
 def build(split: str, world_seed: Optional[int], out_dir: Path, limit: Optional[int] = None,
-          recheck_n: int = 10, log=None) -> Dict[str, object]:
+          recheck_n: int = 10, log=None, tset: str = "s1b1") -> Dict[str, object]:
     """Render + glance every scene of (split, seed) once, write the cache, self-check `recheck_n` rows (fresh render +
-    fresh glances must equal the cached bytes). Returns scene_header.json's dict."""
+    fresh glances must equal the cached bytes). Returns scene_header.json's dict. `tset` picks the test set's seed for a
+    test split (PREREG-S1B1R: "s1b1" S1b-1's own, "fresh" the fresh one); it is recorded in the header."""
     out_dir = Path(out_dir)
     if out_dir.exists():
         raise SceneCacheError(f"{out_dir} exists — a cache is written once (remove it by hand to rebuild)")
-    seed = split_seed(split, world_seed)
+    seed = split_seed(split, world_seed, tset)
     scenes = W.scenes_for(split, seed, limit)
     tmp = out_dir.with_name(out_dir.name + ".building")
     if tmp.exists():
@@ -163,7 +184,7 @@ def build(split: str, world_seed: Optional[int], out_dir: Path, limit: Optional[
             f.write(_canonical(r) + "\n")
     checked = _self_check(scenes, tmp, seed, split, recheck_n, spec, gcfg, colour)
     sh = {"prereg_sha256": PREREG_SHA256, "split": split, "seed": seed, "world_seed": world_seed, "rows": n,
-          "limit": limit, "heldout": [list(p) for p in W.HELDOUT], "interpreter": versions, "code": code_shas(),
+          "limit": limit, "test_set": tset, "heldout": [list(p) for p in W.HELDOUT], "interpreter": versions, "code": code_shas(),
           "glance_header": header, "self_check_rows": checked,
           "files": {p.name: sha256_file(p) for p in sorted(tmp.iterdir()) if p.is_file()}}
     (tmp / "scene_header.json").write_text(json.dumps(sh, sort_keys=True, indent=2) + "\n")
@@ -267,23 +288,27 @@ def assert_disjoint(train_shas: Iterable[str], test_shas: Iterable[str]) -> int:
     return k
 
 
-def build_world_seed(root: Path, world_seed: int, log=None) -> Dict[str, object]:
-    """train (world seed) + test, m2b, m6 (its test seed), each written once, then the disjointness record."""
+def build_world_seed(root: Path, world_seed: int, log=None, tset: str = "s1b1") -> Dict[str, object]:
+    """train (world seed) + the test set's splits (its test seed), each written once, then the disjointness record (beside
+    the test set's caches: <root>/<ws>/cache/disjoint.json for S1b-1's set, <root>/<ws>/fresh/cache/disjoint.json for the
+    fresh one — PREREG-S1B1R)."""
     out = {}
-    for split in ("train",) + TEST_SPLITS:
-        d = cache_dir(root, world_seed, split)
+    splits = test_splits(tset)
+    for split in ("train",) + splits:
+        d = cache_dir(root, world_seed, split, tset)
         if d.exists():
             out[split] = json.loads((d / "scene_header.json").read_text())
             continue
-        out[split] = build(split, world_seed, d, log=log)
+        out[split] = build(split, world_seed, d, log=log, tset=tset)
         if log is not None:
-            log(f"[cache {split} {world_seed}] written: {out[split]['rows']} rows")
+            log(f"[cache {split} {world_seed} {tset}] written: {out[split]['rows']} rows")
     tr = ScenePercepts(cache_dir(root, world_seed, "train")).shas()
-    rec = {"prereg_sha256": PREREG_SHA256, "world_seed": world_seed, "train_canvases": len(tr), "checked": {}}
-    for split in TEST_SPLITS:
-        rec["checked"][split] = assert_disjoint(tr, ScenePercepts(cache_dir(root, world_seed, split)).shas())
+    rec = {"prereg_sha256": PREREG_SHA256, "world_seed": world_seed, "test_set": tset,
+           "test_seed": W.TEST_SETS[tset][int(world_seed)], "train_canvases": len(tr), "checked": {}}
+    for split in splits:
+        rec["checked"][split] = assert_disjoint(tr, ScenePercepts(cache_dir(root, world_seed, split, tset)).shas())
     rec["overlap"] = 0
-    (Path(root) / str(world_seed) / "cache" / "disjoint.json").write_text(json.dumps(rec, sort_keys=True, indent=2) + "\n")
+    (cache_dir(root, world_seed, splits[0], tset).parent / "disjoint.json").write_text(json.dumps(rec, sort_keys=True, indent=2) + "\n")
     return rec
 
 
