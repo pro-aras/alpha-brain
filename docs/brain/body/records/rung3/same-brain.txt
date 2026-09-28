@@ -1,0 +1,12 @@
+THE BRAIN IS THE SAME BRAIN · the full organism vs the lean life · items 2989 · equal 2989 · verdict EQUAL
+  DECLINE  items    96 · equal    96 · first difference —
+  M1       items   793 · equal   793 · first difference —
+  M2a      items   800 · equal   800 · first difference —
+  M2b      items   112 · equal   112 · first difference —
+  M3       items   120 · equal   120 · first difference —
+  M4       items    14 · equal    14 · first difference —
+  M5       items   400 · equal   400 · first difference —
+  M6       items    84 · equal    84 · first difference —
+  NAME     items   318 · equal   318 · first difference —
+  SPEAK    items   192 · equal   192 · first difference —
+  SPEAK2   items    60 · equal    60 · first difference —

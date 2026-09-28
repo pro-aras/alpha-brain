@@ -1,0 +1,37 @@
+LIFE full · world seed 20261102 · root /data/dev/genome-lives/brain-full-20261102
+  tape rows 38173 · scene rows {'ear': 20006, 'eye': 11464, 'ask': 3007} · training scenes 10000
+  asks on the tape 2989 · answers in the journal 3007 {'brain': 3007} · asks without an answer 0 []
+  the one «dax» meeting: seen = True (the brain's learn row); things [('ring', 'yellow', 'big'), ('moon', 'red', 'small')]; fixations → thing [0, 1, 0, 0]
+  the pointer: checked 425 · mismatches 0 []
+  THE BARS (S1b-1R's own rules; oracle readings = the scored record at this seed; reading point 10000):
+    M1           {"value": 0.9893617021276596, "n": 188, "all": 0.808695652173913, "p_oracle": 1.0, "pass": true, "underpowered": false}
+    NULL-M1      {"value": 0.9893617021276596, "n": 20, "bar": 0.6662234042553191, "pass": true, "not_gradable": false, "underpowered": false}
+    NULL-M3      {"value": 1.0, "n": 20, "bar": 0.6896551724137931, "pass": true, "not_gradable": false, "underpowered": false}
+    M2a          {"value": 0.81, "n": 400, "p_oracle": 1.0, "pass": true, "underpowered": false, "ceiling_bound": false, "false_refusal": 0.05851063829787234}
+    M2b          {"value": 0.7083333333333334, "n": 48, "p_oracle": 0.9375, "pass": false, "underpowered": false, "ceiling_bound": false}
+    M3           {"value": 1.0, "n": 58, "all": 0.9666666666666667, "bar": 0.8, "p_oracle": 1.0, "pass": true, "not_gradable": false, "underpowered": false}
+    M6           {"value": 0.7777777777777778, "n": 27, "all": 0.5, "p_oracle": 1.0, "pass": true, "not_gradable": false, "underpowered": true, "ceiling_bound": false}
+    SPOKEN       {"value": 0.875, "n": 72, "bar": 0.7222222222222223, "p_oracle": 0.9027777777777778, "pass": true, "not_gradable": false, "underpowered": false}
+    TRUTH        {"value": 0.9682539682539683, "n": 63, "bar": 0.9, "p_oracle": 1.0, "pass": true, "not_gradable": false, "underpowered": false}
+    TRUTH-NEED   {"value": 0.5609756097560976, "n": 41, "bar": 0.5175, "p_oracle": 0.575, "pass": true, "not_gradable": false, "underpowered": false}
+    MINIMAL      {"value": 0.9880952380952381, "n": 84, "bar": 0.9, "p_oracle": 1.0, "pass": true, "not_gradable": false, "underpowered": false}
+    ORDER        {"value": 1.0, "n": 25, "bar": 0.95, "p_oracle": 1.0, "pass": true, "not_gradable": false, "underpowered": true}
+    READ-BACK    {"value": 1.0, "n": 104, "p_oracle": 1.0, "pass": true, "not_gradable": false, "underpowered": false}
+    DECLINE      {"value": 0.6486486486486487, "n": 37, "p_oracle": 0.6216216216216216, "pass": null, "not_gradable": false, "underpowered": false}
+    refute       {}
+  SET fresh: items {'M1': 395, 'M2a': 400, 'NAME': 165, 'M5': 400, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48, 'SPEAK2': 60} · read forced {}
+    M1 covered 0.989 (n 188) · over ALL items 0.809 (n 230) · coverage 0.817 · chance 0.550
+    M3 covered 1.000 (n 58) · over ALL 0.967
+    M2a refusal 0.810 (n 400) · false refusal 0.059
+    M2b 0.708 (n 48) · over ALL 0.708
+  SET s1b1 (READINGS ONLY): items {'M1': 398, 'M2a': 400, 'NAME': 153, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48} · read forced {}
+    M1 covered 0.980 (n 201) · over ALL items 0.804 (n 245) · coverage 0.820 · chance 0.543
+    M3 covered 0.982 (n 57) · over ALL 0.933
+    M2a refusal 0.845 (n 400) · false refusal 0.055
+    M2b 0.583 (n 48) · over ALL 0.583
+  TEST 6 · M6 POOLED over {'fresh': 42, 's1b1': 42}: covered 0.768 (n 56 of 84; chance 0.470; bar 0.7, n ≥ 30) → PASS
+  THE NULL (20 shuffled-utterance draws, the scored record's): M1 0.989 vs p95 0.666 → ABOVE · M3 1.000 vs p95 0.690 → ABOVE
+  TEST 4a · EXPLAIN: words asked 14 · explained 13 · «unknown» ['dax'] · citations 104 (of episodes with ≥ 2 hypotheses: 104) · EXIST 1.000 (a wiring pin, bar 1.000) · CARRY 0.981 (bar 0.90) · the null's median 0.514, p95 0.578 → PASS
+  TEST 4b · RULE: NOT BUILT tonight (PREREG §3)
+  TEST 5 · MISUSE: refused 1.000 (bar 0.90) · named misuse 1.000 (bar 0.80) · n 400 (unheard 0) · valid phrases called misuse 0.000 of 455 (bar ≤ 0.05) · never-heard pairs called misuse 0 of 60 (bar 0) → PASS
+    by kind: {"colour": {"refused": 1.0, "named": 1.0, "n": 142}, "shape": {"refused": 1.0, "named": 1.0, "n": 125}, "size": {"refused": 1.0, "named": 1.0, "n": 133}}

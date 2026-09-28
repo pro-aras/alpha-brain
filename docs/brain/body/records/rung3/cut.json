@@ -1,0 +1,11 @@
+{
+ "root": "/data/dev/genome-lives/brain-full-20261102",
+ "ledger_last_seq": 38173,
+ "tape_rows": 38173,
+ "lived_rows": 38173,
+ "tail_rows": 0,
+ "tail_by_sense": {},
+ "tape_day_files": 1,
+ "journal_day_files": 1,
+ "live_mind_rows": 41039
+}
