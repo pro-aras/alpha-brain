@@ -476,7 +476,11 @@ class Body:
             # "scene" is the sense's own progress (None -> zeros/False, never omitted -- a genome without WORLD_SCENE
             # still carries the key); "brain" is the organ's summary, present ONLY IF the mind has grown one
             # (INTERFACE §4's Mind.brain_status(), builder C's landing -- getattr covers a Mind that predates it).
-            "scene": (self.scene_progress.snapshot() if self.scene_progress is not None
+            # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 21:00 +0400 — `getattr` (never `self.scene_progress`
+            # directly): tests/creature/test_a4l_voice_seams.py and test_verdict_reader_lag_0923.py call
+            # `Body._build_status` unbound against a mock/SimpleNamespace stand-in that predates this attribute --
+            # the same defensive convention every other STATUS field in this method already uses.
+            "scene": (sp.snapshot() if (sp := getattr(self, "scene_progress", None)) is not None
                       else {"published_moments": 0, "train_done": False, "sitting_done": {}, "ended": False}),
             "brain": (self.mind.brain_status() if hasattr(self.mind, "brain_status") else None),
         }

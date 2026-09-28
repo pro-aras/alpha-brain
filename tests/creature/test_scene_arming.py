@@ -53,7 +53,9 @@ class MakerShouldArm(unittest.TestCase):
 
     def test_every_real_genome_files_maker_arming_is_unchanged(self):
         """Every genome/**/*.genome and test fixture genome that carries a drawn `^WORLD ` line today keeps its
-        maker armed under the new gate (none of them declare WORLD_SCENE — verified by count, both printed)."""
+        maker armed under the new gate; the only genomes whose behaviour CHANGES are this builder's own
+        genome/brain/*.genome files (WORLD_SCENE declared, no drawn WORLD) — asserted explicitly to now
+        suppress the maker, never silently excluded from the count."""
         from genome.machinery import parse_genome
         files = _every_genome_text()
         self.assertGreater(len(files), 0, "no genome files found — the glob is broken")
@@ -61,6 +63,7 @@ class MakerShouldArm(unittest.TestCase):
                                  for line in text.splitlines() if line.startswith("WORLD ") or line.startswith("WORLD\t"))
         unchanged = 0
         checked = 0
+        scene_genomes = 0
         for path, text in files:
             try:
                 declared = parse_genome(text).declared
@@ -69,12 +72,23 @@ class MakerShouldArm(unittest.TestCase):
             checked += 1
             old_would_arm = True   # the OLD code: `if not no_maker: arm` — unconditional
             new_would_arm = B._maker_should_arm(declared, [])
-            if "WORLD_SCENE" not in declared:
-                self.assertEqual(old_would_arm, new_would_arm, msg=f"{path}: behaviour changed for a non-scene genome")
+            if "WORLD_SCENE" not in declared or "WORLD" in declared:
+                # either no WORLD_SCENE at all, or (BRAIN-FULL.genome's own shape) BOTH a drawn WORLD and
+                # WORLD_SCENE declared together — the gate only suppresses a SCENE-ONLY genome, so both cases
+                # must arm exactly as before.
+                self.assertEqual(old_would_arm, new_would_arm, msg=f"{path}: behaviour changed unexpectedly")
                 unchanged += 1
+            else:
+                # this builder's own scene-only genome/brain/*.genome files — the NEW shape the gate exists
+                # for (WORLD_SCENE declared, no drawn WORLD). Each must now SUPPRESS the maker: a real,
+                # intended behaviour change, asserted explicitly rather than silently dropped from the count.
+                scene_genomes += 1
+                self.assertFalse(new_would_arm, msg=f"{path}: a scene-only genome must suppress the maker")
         print(f"maker-arming count: {len(files)} genome files, {drawn_world_lines} carry a `WORLD ` line, "
-              f"{checked} parsed, {unchanged} non-scene genomes verified byte-for-byte unchanged")
-        self.assertEqual(unchanged, checked, "every parseable genome here declares no WORLD_SCENE, so all must be unchanged")
+              f"{checked} parsed, {unchanged} non-scene genomes verified byte-for-byte unchanged, "
+              f"{scene_genomes} scene-only genomes verified to now suppress the maker")
+        self.assertEqual(unchanged + scene_genomes, checked,
+                         "every parseable genome here either has no WORLD_SCENE (unchanged) or is a scene-only genome (now suppressed) — no third case")
 
 
 if __name__ == "__main__":
