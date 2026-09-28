@@ -284,7 +284,10 @@ class Life(unittest.TestCase):
 
     def test_learn_return(self):
         r = self.learned[50]
-        self.assertEqual(set(r), {"n_hyp", "words", "attributed", "none", "calibrated"})
+        self.assertEqual(set(r), {"n_hyp", "words", "attributed", "none", "calibrated", "fix", "hyps"})
+        g, _w, _t, _b = toy_scene(50)
+        self.assertEqual(r["fix"], [list(c) for c in g["fix"]])                 # PREREG §3 row M6: the learn row's cells
+        self.assertEqual(r["hyps"], [[k] for k in range(len(g["fix"]))])         # one fixation per thing, never merged
         self.assertIsNone(self.learned[10]["none"])                     # no «none» before the first calibration
         self.assertIn(self.learned[60]["none"], (True, False, None))
         self.assertTrue(any(r["none"] is not None for r in self.learned[40:]))
@@ -394,9 +397,34 @@ class Explain(unittest.TestCase):
                     self.assertEqual(e["scene"], scene)
                     self.assertIn(w, words)
                     g, _w, _t, _b = toy_scene(scene)
-                    self.assertIn([int(v) for v in e["pos"]], [list(c) for c in g["fix"]])
+                    self.assertEqual(e["fix"], [list(c) for c in g["fix"]])
+                    self.assertGreaterEqual(len(e["hyps"]), 2)                   # PREREG §3 row M4a: ≥ 2 hypotheses in view
+                    self.assertEqual(e["pos"], [float(v) for v in g["fix"][e["hyps"][e["hyp"]][0]]])
                 self.assertEqual(a["rule"]["over"], [e["moment"] for e in a["episodes"]])
                 self.assertEqual(a, self.why(w))                          # deterministic
+
+    def test_the_rule_strongest_first_among_two_or_more_hypotheses(self):
+        from genome import brain as B
+        b = self.brain
+        for w in SHAPES + COLOURS:
+            pool = [e for e in b.episodes[w] if len(b.canvas[int(e[0])][1]) >= 2]
+            want = [b.moments[int(e[0])] for e in sorted(pool, key=lambda e: (-e[4], e[0]))[:B.WHY_MAX]]
+            self.assertEqual(self.why(w)["rule"]["over"], want)
+            self.assertTrue(any(len(b.canvas[int(e[0])][1]) == 1 for e in b.episodes[w]))   # 1-hypothesis episodes exist …
+            self.assertTrue(all(e["moment"] in want for e in self.why(w)["episodes"]))        # … and are never cited
+
+    def test_only_one_hypothesis_episodes_is_unknown(self):
+        from genome import brain as B
+        b = B.Brain(CFG)
+        k = 0
+        for i in range(400):
+            g, words, things, _b = toy_scene(i)
+            if len(things) == 1:
+                b.learn(g, words, moment=f"m{i}", scene=i, world_seed=WS)
+                k += 1
+        self.assertGreater(k, 40)
+        for w in SHAPES + COLOURS:
+            self.assertEqual(b.ask({"form": "why", "item": "Y", "mark": "M4", "word": w}, None)["kind"], "unknown")
 
     def test_never_heard_and_young_are_unknown(self):
         self.assertEqual(self.why("never")["kind"], "unknown")

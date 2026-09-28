@@ -34,6 +34,12 @@ Where each BRAIN value is read (no VALUE-UNREAD):
   calibrate_at the scene counts at which learn() calibrates (and `begin` calibrates when scenes were learned since).
   replay       "none" is the only rule rung 1 runs; "uniform" / "strong" refuse by name.
   hears        hears(source): the sources whose canvases the brain learns from.
+
+edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:39 +0400 — PREREG-BRAIN-IN-BODY (signed, 12bdea6, sha256 e39b512e…) moves the contract:
+M4 `why` cites ONLY among the word's episodes with ≥ 2 hypotheses in view (a 1-hypothesis episode stores responsibility exactly
+1, so the unrestricted rule cited only those); each cited episode carries `hyp` and that moment's `fix` and `hyps`; `learn`
+returns the canvas's `fix` and `hyps` (the grader reads whether the one «dax» meeting was seen). The brain keeps, per scene
+learned, its moment, scene index, located cells and hypotheses' member lists.
 """
 from __future__ import annotations
 
@@ -54,6 +60,7 @@ CFG_KEYS = ("lr", "eps", "none_level", "conformal", "young", "calibrate_at", "re
 REPLAY_BUILT = ("none",)
 REPLAY_KNOWN = ("none", "uniform", "strong")
 WHY_MAX = 8                    # M4: up to 8 episodes
+WHY_MIN_HYPS = 2               # M4: cited only among episodes with ≥ 2 hypotheses in view (PREREG §3, row M4a)
 CELL_PX = 8                    # a fixation cell's centre pixel: cell * 8 + 4 (world.fixation_thing's arithmetic)
 BOX_MARGIN = 4                 # the box ± 4 px
 FEATS = 144
@@ -172,6 +179,7 @@ class Brain:
         self.L.none_level = self.cfg["none_level"]
         self.seen: List[Tuple[np.ndarray, List[str], None]] = []   # the calibration list (run.train_arm's `seen`)
         self.moments: List[str] = []                      # per scene learned: its tape moment
+        self.canvas: List[List[object]] = []              # per scene learned: [its located cells, its hypotheses' member lists]
         self.scenes: List[int] = []                       # per scene learned: its scene index
         # M4's store: per word, its episodes [learn order, hypothesis, pos y, pos x, responsibility]
         self.episodes: Dict[str, List[List[float]]] = {}
@@ -205,6 +213,9 @@ class Brain:
         order = len(self.moments)
         self.moments.append(str(moment))
         self.scenes.append(int(scene))
+        fix_l = [[int(y), int(x)] for y, x in glance["fix"]]
+        hyps_l = [[int(m) for m in h.members] for h in hyps]
+        self.canvas.append([fix_l, hyps_l])
         new = [w for w in dict.fromkeys(words) if w not in known]
         att = H.attribution(self.L, X, words, new)
         for w, h in att.items():
@@ -218,7 +229,7 @@ class Brain:
             self.calibrate()
             calibrated = True
         return {"n_hyp": int(X.shape[0]), "words": words, "attributed": {w: (None if h is None else int(h)) for w, h in att.items()},
-                "none": none, "calibrated": calibrated}
+                "none": none, "calibrated": calibrated, "fix": fix_l, "hyps": hyps_l}
 
     def calibrate(self) -> Dict[str, object]:
         """The reading point: τ_point / τ_word at `conformal`, the refusal states and τ_none at `none_level`, over EVERY scene
@@ -335,15 +346,21 @@ class Brain:
         return {"|".join(T): self.L.name_forced(x, list(T)) for T in self.types()}
 
     def why(self, word: str) -> Dict[str, object]:
-        """M4 · explain: «unknown» when the word was never heard or is young (< `young` meetings) or has no attributed episode;
-        else up to 8 episodes FROM ITS OWN STORE where it heard the word and attributed it (health.attribution's reading),
-        strongest responsibility first, ties by the earlier moment: each {moment, scene, pos}; rule.over = the cited
-        moments, rule.band = the word's READER band (the LAW's «what is this?»)."""
+        """M4 · explain (PREREG §3 row M4a over INTERFACE §3): «unknown» when the word was never heard or is young (< `young`
+        meetings) or has no attributed episode with ≥ 2 hypotheses in view; else up to 8 episodes FROM ITS OWN STORE where it
+        heard the word and attributed it (health.attribution's reading), chosen among the episodes with ≥ 2 hypotheses in
+        view, strongest responsibility first, ties by the earlier moment: each {moment, scene, hyp, pos, fix, hyps};
+        rule.over = the cited moments, rule.band = the word's READER band (the LAW's «what is this?»)."""
         j = self.L.index.get(word)
-        if j is None or int(self.L.meetings[j]) < self.cfg["young"] or not self.episodes.get(word):
+        if j is None or int(self.L.meetings[j]) < self.cfg["young"]:
             return {"kind": "unknown", "word": word}
-        eps_ = sorted(self.episodes[word], key=lambda e: (-e[4], e[0]))[:WHY_MAX]
-        cited = [{"moment": self.moments[int(e[0])], "scene": self.scenes[int(e[0])], "pos": [e[2], e[3]]} for e in eps_]
+        pool = [e for e in self.episodes.get(word, []) if len(self.canvas[int(e[0])][1]) >= WHY_MIN_HYPS]
+        if not pool:
+            return {"kind": "unknown", "word": word}
+        eps_ = sorted(pool, key=lambda e: (-e[4], e[0]))[:WHY_MAX]
+        cited = [{"moment": self.moments[int(e[0])], "scene": self.scenes[int(e[0])], "hyp": int(e[1]), "pos": [e[2], e[3]],
+                  "fix": [list(c) for c in self.canvas[int(e[0])][0]], "hyps": [list(m) for m in self.canvas[int(e[0])][1]]}
+                 for e in eps_]
         band = None
         if self.n_calibrations:
             wst = self.L.reader["ear"]["word"].get(word)
@@ -362,6 +379,7 @@ class Brain:
         learner = {k: enc.enc(v) for k, v in sorted(vars(self.L).items())}
         meta = {"version": STATE_VERSION, "cfg": self.cfg, "learner": learner,
                 "brain": {"seen": enc.enc(self.seen), "moments": list(self.moments), "scenes": list(self.scenes),
+                          "canvas": self.canvas,
                           "episodes": enc.enc(self.episodes), "n_calibrations": self.n_calibrations,
                           "calibrated_at": self.calibrated_at}}
         return meta, enc.arrays()
@@ -402,6 +420,7 @@ class Brain:
         b.seen = [tuple(t) for t in dec.dec(bb["seen"])]
         b.moments = list(bb["moments"])
         b.scenes = [int(s) for s in bb["scenes"]]
+        b.canvas = [[[list(c) for c in f], [list(m) for m in hs]] for f, hs in bb["canvas"]]
         b.episodes = dec.dec(bb["episodes"])
         b.n_calibrations = int(bb["n_calibrations"])
         b.calibrated_at = bb["calibrated_at"]

@@ -21,11 +21,14 @@ this tree's code and proven byte-identical to the scored ones); questions, keys 
   --limit N          price: learn N scenes only, no sitting; prints the projected cost of a whole seed.
   --save             after the sitting: save the 10,000-scene state, print its size and write time, reload, hash-compare.
 
+edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:44 +0400 — PREREG-BRAIN-IN-BODY (signed, 12bdea6): the gate also compares the
+OLDER set's POINTING answers (M1, M2a, M3, M6 of test seeds 2026120x, caches <glances-root>/<ws>/cache/<split>) against
+<scored-root>/<ws>/arms/A-RW/answers_10000.json's `answers`; M4's reading follows §3 row M4a (citations among ≥ 2-hypothesis
+episodes; CARRY by marks.hyp_label over fix_thing; the null `m4-null:<k>`).
+
 Beside the verdict (READINGS, the truth read here only, never in the organ): M5 on the final learner — (a) every ordered pair
 of two different mature words of one world type flagged; (b) M1 + M3 phrases falsely flagged; (c) the six held-out
-colour × shape pairs — and M4's ceiling reading: per word the citable episodes and the share of cited episodes whose position
-lies on a thing that carries the word (grade_life.py's `_thing_at` arithmetic), beside the shuffled-citation twin (20 draws,
-grade_life.py's own rule) and a second twin (8 random heard episodes with the brain's own attribution).
+colour × shape pairs — and M4a's ceiling as PREREG §3 grades it (m4_reading).
 """
 from __future__ import annotations
 
@@ -128,14 +131,6 @@ def world_type_of_key(key: str) -> str:
     return ts.pop() if len(ts) == 1 else "mixed:" + key
 
 
-def _thing_at(pos: Sequence[float], things: Sequence[W.Thing], margin: int = 4) -> Optional[int]:
-    """tools/brain/grade_life.py's own: the thing under a position in grid cells (its pixel centre inside a box ± 4 px)."""
-    py, px = (float(pos[0]) + 0.5) * 8, (float(pos[1]) + 0.5) * 8
-    hit = [i for i, t in enumerate(things)
-           if t.top - margin <= py < t.top + t.side + margin and t.left - margin <= px < t.left + t.side + margin]
-    return hit[0] if len(hit) == 1 else None
-
-
 # ------------------------------------------------------------------------------------------------ one seed
 def run_seed(ws: int, groot: Path, sroot: Path, out: Path, plant: bool = False, limit: Optional[int] = None,
              save: bool = False, log=print) -> Dict[str, object]:
@@ -235,15 +230,43 @@ def run_seed(ws: int, groot: Path, sroot: Path, out: Path, plant: bool = False, 
             elif blk["first"] is None:
                 blk["first"] = d
         table[mark] = blk
+    # -- the OLDER set's POINTING (PREREG §2, signed 12bdea6): M1, M2a, M3, M6 of test seeds 2026120x against
+    #    arms/A-RW/answers_10000.json's `answers` (pointing is road-free; A-RW-R trains as A-RW); its what / say are no reference
+    Qo = json.loads((sroot / str(ws) / "questions.json").read_text())
+    So = json.loads((sroot / str(ws) / "arms" / "A-RW" / f"answers_{RP:05d}.json").read_text())["answers"]
+    tso = int(Qo["test_seed"])
+    brain.ask({"form": "begin", "set": "s1b1", "test_seed": tso}, None)
+    Po: Dict[str, "C.ScenePercepts"] = {}
+    older: Dict[str, Dict[str, object]] = {}
+    for mark in POINT_MARKS:
+        blk = {"compared": 0, "equal": 0, "first": None, "scored_n": sum(1 for k in So if k.startswith(mark + ":"))}
+        for q in Qo["questions"].get(mark, []):
+            item, row, split = q["item_id"], int(q["row"]), q["split"]
+            if split not in Po:
+                Po[split] = C.ScenePercepts(C.cache_dir(groot, ws, split, "s1b1"))
+            g = glance_of(Po[split], row)
+            a = canon(brain.ask({"form": "point", "item": item, "mark": mark, "phrase": list(q["phrase"]), "box": None,
+                                 "word": None, "test_seed": tso}, g))
+            answers["older/" + item] = a
+            if a.get("kind") == "misuse":
+                misuse_flags.append("older/" + item)
+            blk["compared"] += 1
+            d = first_diff(canon(So.get(item)), a.get("raw"), "older/" + item)
+            if d is None:
+                blk["equal"] += 1
+            elif blk["first"] is None:
+                blk["first"] = d
+        older[mark] = blk
     end = brain.ask({"form": "end"}, None)
     # -- the verdict ----------------------------------------------------------------------------------
-    total_c = sum(b["compared"] for b in table.values())
-    total_e = sum(b["equal"] for b in table.values())
-    counts_ok = all(b["compared"] == b["scored_n"] and b["compared"] > 0 for b in table.values())
+    blocks = list(table.values()) + list(older.values())
+    total_c = sum(b["compared"] for b in blocks)
+    total_e = sum(b["equal"] for b in blocks)
+    counts_ok = all(b["compared"] == b["scored_n"] and b["compared"] > 0 for b in blocks)
     summ = {"brain": canon(brain.L.summary()), "scored": canon(rec_scored["reading_points"][str(RP)]["summary"])}
     summ_diff = first_diff(summ["scored"], summ["brain"], "summary")
     ok = counts_ok and total_c > 0 and total_c == total_e and not pin["mismatches"] and summ_diff is None
-    res.update({"begin": begin, "end": end, "table": table, "pin": {**pin, "mismatches": pin["mismatches"][:20],
+    res.update({"begin": begin, "end": end, "table": table, "older": older, "pin": {**pin, "mismatches": pin["mismatches"][:20],
                                                                         "n_mismatches": len(pin["mismatches"])},
                 "name_forced_mapped": name_block, "misuse_flags": misuse_flags, "summary_diff": summ_diff,
                 "compared": total_c, "equal": total_e, "counts_ok": counts_ok,
@@ -277,6 +300,9 @@ def table_lines(res: Dict[str, object]) -> List[str]:
          f"  {'mark':8s} {'compared':>9s} {'equal':>7s} {'scored n':>9s}  first difference"]
     for mark, b in res["table"].items():
         L.append(f"  {mark:8s} {b['compared']:9d} {b['equal']:7d} {b['scored_n']:9d}  {b['first'] or '—'}")
+    L.append("  the OLDER set's pointing (test seeds 2026120x) vs scene-s1b1r/<ws>/arms/A-RW/answers_10000.json:")
+    for mark, b in res["older"].items():
+        L.append(f"  {mark:8s} {b['compared']:9d} {b['equal']:7d} {b['scored_n']:9d}  {b['first'] or '—'}")
     nb = res["name_forced_mapped"]
     L.append(f"  NAME.name (the organ's learned-type keys mapped to the world's types, here): compared {nb['compared']} · "
              f"equal {nb['equal']} · first {nb['first'] or '—'}")
@@ -288,17 +314,13 @@ def table_lines(res: Dict[str, object]) -> List[str]:
              f"(c) held-out pairs flagged {m5['c']['flagged']}/{m5['c']['n']} (M3 phrases of them {m5['c']['m3_flagged']}/"
              f"{m5['c']['m3_n']}) · ear types {m5['types']}")
     m4 = res["M4"]
-    L.append(f"  M4 ceiling: cited {m4['n_cited']} · CARRY {m4['carry']} · twin (grade_life's, 20 draws) median "
-             f"{m4['twin_median']} p95 {m4['twin_p95']} · twin (8 random heard, own attribution) {m4['twin_own']} · "
-             f"all attributed episodes {m4['all_attributed']}")
-    L.append(f"  M4 why: cited at r = 1.0 {m4['cited_r1']}/{m4['n_cited']} · cited that are the word's FIRST meeting "
-             f"{m4['cited_first_meeting']} · readings (never the organ's rule): CARRY with ties by the LATER moment "
-             f"{m4['carry_ties_later']} · CARRY without the first meeting {m4['carry_without_first']}")
+    L.append(f"  M4a (PREREG §3, ≥ 2 hypotheses): cited {m4['n_cited']} · EXIST {m4['exist']} · CARRY {m4['carry']} · null (20 draws, "
+             f"m4-null:<k>) median {m4['null_median']} p95 {m4['null_p95']} · reads {m4['reads']} (bar CARRY ≥ 0.90 and > p95) · "
+             f"the rule's base rate over all ≥ 2-hypothesis attributed episodes {m4['base_carry']} · cited fix ≠ cache "
+             f"{m4['fix_join_mismatches']}")
     for w, pw in m4["per_word"].items():
-        L.append(f"    {w:9s} citable {pw['citable']:5d} · heard {pw['heard']:5d} · cited {pw['cited']} · carry {pw['carry']} · "
-                 f"twin_own {pw['twin_own']} · all {pw['all']}"
-                 + (f" · r=1.0 episodes {pw['episodes_r1']} · cited r=1.0 {pw['cited_r1']} · cited first meeting "
-                    f"{pw['cited_first_meeting']} · carry ties-later {pw['carry_ties_later']}" if pw["kind"] == "because" else ""))
+        L.append(f"    {w:9s} {pw['kind']:8s} episodes {pw['episodes']:5d} · citable (≥ 2 hyps) {pw['citable']:5d} · cited "
+                 f"{pw['cited']} · exist {pw['exist']} · carry {pw['carry']} · base {pw['base_carry']}")
     if res.get("save"):
         s = res["save"]
         L.append(f"  STATE at {res['n_train']} scenes: {s['bytes_npz']} B npz + {s['bytes_json']} B json = {s['bytes']} B · "
@@ -327,87 +349,64 @@ def m5_reading(brain: "B.Brain", Q: Dict[str, object]) -> Dict[str, object]:
 
 
 def m4_reading(brain: "B.Brain", ws: int, train: "C.ScenePercepts", truth: Sequence[Dict[str, object]]) -> Dict[str, object]:
-    """M4's ceiling (INTERFACE §3 step 5): per word, the citable episodes, and CARRY = the share of the brain's cited episodes
-    whose cited position lies on a thing carrying the word (grade_life.py's `_thing_at` + the world's word_true_of); the
-    shuffled-citation twin exactly as grade_life.py draws it (20 draws: per word the same number of citations, a heard
-    moment and a random THING of that canvas); and a second twin — 8 episodes drawn at random among the brain's own
-    attributed episodes of the word (its own attribution, not its ranking); and the share over ALL attributed episodes."""
-    words = sorted(brain.episodes)
-    heard: Dict[str, List[int]] = {}
-    for i in range(brain.n_learned):
-        for w in dict.fromkeys(train.words(i)):
-            heard.setdefault(w, []).append(i)
+    """M4's ceiling as PREREG §3 row M4a grades it (signed 12bdea6), on the rung-1 learner: every word the parent said, asked
+    «why»; EXIST = each cited moment is a training moment whose utterance carries the word (a wiring pin); CARRY = the cited
+    hypothesis' thing — marks.hyp_label over the truth row's fix_thing of the cited hypothesis' member cells (M1's own rule;
+    no thing = not CARRY) — truly has the word's property (world.word_true_of); pooled over the words. THE NULL: 20 draws,
+    draw k: each cited episode's hypothesis replaced by one drawn uniformly among that episode's `hyps`, generator
+    substream(ws, "m4-null:<k>"), in citation order (the words in sorted order, each word's citations in the answer's order);
+    the bar reads CARRY ≥ 0.90 and above the draws' 95th percentile (grade_life.py's percentile rule). Beside: the share of
+    ALL of a word's attributed ≥ 2-hypothesis episodes that carry (the rule's own base rate), and, per word, the citable
+    counts. The cited `fix` must equal the cache's cells for that scene (the join)."""
+    import collections
+    words = sorted(set(w for i in range(brain.n_learned) for w in train.words(i)))
 
-    def carries(w: str, scene: int, pos) -> bool:
-        things = M.things_of(truth[scene])
-        k = _thing_at(pos, things)
-        return k is not None and w in W.VOCAB and W.word_true_of(w, things[k])
+    def carries(w: str, scene: int, members: Sequence[int]) -> bool:
+        tr = truth[scene]
+        lab = M.hyp_label(collections.Counter(tr["fix_thing"][m] for m in members if tr["fix_thing"][m] is not None))
+        return lab is not None and w in W.VOCAB and W.word_true_of(w, M.things_of(tr)[lab])
 
-    per = {}
-    extra = {"later": 0, "nofirst": 0, "nofirst_n": 0, "r1": 0, "first": 0}
-    n_cited = n_carry = 0
-    tot_own = hit_own = tot_all = hit_all = 0
+    per: Dict[str, Dict[str, object]] = {}
+    cited_all = []                           # (word, scene, hyps) in citation order, for the null
+    n_cited = n_exist = n_carry = 0
+    fix_join_bad = 0
+    base_n = base_hit = 0
     for w in words:
         a = brain.why(w)
-        eps = brain.episodes[w]
-        all_hits = sum(int(carries(w, brain.scenes[int(e[0])], (e[2], e[3]))) for e in eps)
-        tot_all += len(eps)
-        hit_all += all_hits
-        if a["kind"] != "because":
-            per[w] = {"citable": len(eps), "heard": len(heard.get(w, [])), "cited": 0, "carry": None, "twin_own": None,
-                      "all": (all_hits / len(eps)) if eps else None, "kind": a["kind"]}
-            continue
-        c = sum(int(carries(w, e["scene"], e["pos"])) for e in a["episodes"])
-        # WHY the cited set is what it is (readings for the seat, never the organ's rule): how many cited tie at r = 1.0 (a
-        # one-hypothesis canvas, or the first meeting's episodic write), how many are the word's FIRST meeting, and CARRY
-        # under the same rule with ties broken by the LATER moment, and without the first meeting
-        top = sorted(eps, key=lambda e: (-e[4], e[0]))[:len(a["episodes"])]
-        later = sorted(eps, key=lambda e: (-e[4], -e[0]))[:len(a["episodes"])]
-        nofirst = sorted(eps[1:], key=lambda e: (-e[4], e[0]))[:len(a["episodes"])]
-        cr1 = sum(1 for e in top if e[4] == 1.0)
-        cfirst = sum(1 for e in top if int(e[0]) == int(eps[0][0]))
-        c_later = sum(int(carries(w, brain.scenes[int(e[0])], (e[2], e[3]))) for e in later)
-        c_nofirst = sum(int(carries(w, brain.scenes[int(e[0])], (e[2], e[3]))) for e in nofirst)
-        n_r1 = sum(1 for e in eps if e[4] == 1.0)
-        rng = substream(ws, f"m4-twin-own:{w}")
-        pick = rng.choice(len(eps), size=min(8, len(eps)), replace=False)
-        own = sum(int(carries(w, brain.scenes[int(eps[int(k)][0])], (eps[int(k)][2], eps[int(k)][3]))) for k in pick)
-        tot_own += len(pick)
-        hit_own += own
-        per[w] = {"citable": len(eps), "heard": len(heard.get(w, [])), "cited": len(a["episodes"]),
-                  "carry": c / len(a["episodes"]), "twin_own": own / len(pick), "all": all_hits / len(eps), "kind": "because",
-                  "episodes_r1": n_r1, "cited_r1": cr1, "cited_first_meeting": cfirst,
-                  "carry_ties_later": c_later / len(later), "carry_without_first": c_nofirst / max(len(nofirst), 1)}
-        n_cited += len(a["episodes"])
-        n_carry += c
-        extra["later"] += c_later
-        extra["nofirst"] += c_nofirst
-        extra["nofirst_n"] += len(nofirst)
-        extra["r1"] += cr1
-        extra["first"] += cfirst
-    twin = []
-    for d in range(M4_TWIN_DRAWS):
-        rng = np.random.default_rng([int(ws) & 0xFFFFFFFF, 0x4D34, d])          # grade_life.py's own generator
-        tot = hit = 0
-        for w, pw in sorted(per.items()):
-            if pw["kind"] != "because" or not heard.get(w):
-                continue
-            ms = heard[w]
-            for _ in range(int(pw["cited"])):
-                m = ms[int(rng.integers(len(ms)))]
-                things = M.things_of(truth[m])
-                k = int(rng.integers(len(things)))
-                tot += 1
-                hit += int(W.word_true_of(w, things[k]))
-        twin.append(hit / tot if tot else None)
-    tv = sorted(v for v in twin if v is not None)
-    p95 = tv[min(len(tv) - 1, int(math.ceil(0.95 * len(tv))) - 1)] if tv else None
-    return {"n_cited": n_cited, "carry": (n_carry / n_cited) if n_cited else None, "twin": twin, "twin_p95": p95,
-            "twin_median": tv[len(tv) // 2] if tv else None, "twin_own": (hit_own / tot_own) if tot_own else None,
-            "all_attributed": (hit_all / tot_all) if tot_all else None, "per_word": per,
-            "cited_r1": extra["r1"], "cited_first_meeting": extra["first"],
-            "carry_ties_later": (extra["later"] / n_cited) if n_cited else None,
-            "carry_without_first": (extra["nofirst"] / extra["nofirst_n"]) if extra["nofirst_n"] else None}
+        pool = [e for e in brain.episodes.get(w, []) if len(brain.canvas[int(e[0])][1]) >= 2]
+        ph = sum(int(carries(w, brain.scenes[int(e[0])], brain.canvas[int(e[0])][1][int(e[1])])) for e in pool)
+        base_n += len(pool)
+        base_hit += ph
+        row = {"kind": a["kind"], "citable": len(pool), "episodes": len(brain.episodes.get(w, [])),
+               "base_carry": (ph / len(pool)) if pool else None, "cited": 0, "exist": 0, "carry": None}
+        if a["kind"] == "because":
+            ex = ca = 0
+            for e in a["episodes"]:
+                sc = int(e["scene"])
+                ex += int(w in train.words(sc) and e["moment"] == f"sc{ws}t{sc:06d}")
+                fix_c, _loc = train.located(sc)
+                fix_join_bad += int([list(c) for c in fix_c] != e["fix"])
+                ca += int(carries(w, sc, e["hyps"][int(e["hyp"])]))
+                cited_all.append((w, sc, e["hyps"]))
+            row.update({"cited": len(a["episodes"]), "exist": ex, "carry": ca / len(a["episodes"])})
+            n_cited, n_exist, n_carry = n_cited + len(a["episodes"]), n_exist + ex, n_carry + ca
+        per[w] = row
+    null = []
+    for k in range(1, 21):
+        rng = substream(ws, f"m4-null:{k}")
+        hit = 0
+        for w, sc, hyps in cited_all:
+            h = int(rng.integers(len(hyps)))
+            hit += int(carries(w, sc, hyps[h]))
+        null.append(hit / len(cited_all) if cited_all else None)
+    nv = sorted(v for v in null if v is not None)
+    p95 = nv[min(len(nv) - 1, int(math.ceil(0.95 * len(nv))) - 1)] if nv else None
+    carry = (n_carry / n_cited) if n_cited else None
+    return {"n_cited": n_cited, "exist": (n_exist / n_cited) if n_cited else None, "carry": carry, "null": null,
+            "null_p95": p95, "null_median": nv[len(nv) // 2] if nv else None,
+            "base_carry": (base_hit / base_n) if base_n else None, "fix_join_mismatches": fix_join_bad,
+            "reads": ("PASS" if carry is not None and carry >= 0.90 and p95 is not None and carry > p95 else "FAIL")
+            if n_cited else "NOT GRADABLE", "per_word": per}
 
 
 def save_reading(brain: "B.Brain", base: Path) -> Dict[str, object]:
