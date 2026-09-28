@@ -56,7 +56,17 @@ Readings from the gate:
   - 0.790 vs 0.815 under rule (a), 0.986 vs 0.994 under rule (b);
   - one forced window at the centroid is compared against a hypothesis that averages 1–4 fixations;
   - stage −1 agrees: forced-window shape NCM 0.667, against 0.756 for the hypothesis.
-- **N-SHUF reads under its own chance** (0.713 vs 0.758 on covered items). Chance is high because most items are one-thing scenes with a single hypothesis.
+- **The pooled M1 line hides the test: its 170 one-thing items are trivially right for every arm.** Per scene size (`tools/scene/diag/diag_gate_sizes.py`, the gate's own code and items; its pooled rows equal gate.json's, output `/data/dev/brain-runs/scene/gate/diag_gate_sizes.out`):
+  ```
+  A-RW           pooled covered 0.890 (gate.json 0.890, SAME) · size1: 1.000 vs chance 1.000 (n 170) · size2: 0.801 vs chance 0.585 (n 136) · size3: 0.768 vs chance 0.446 (n 56)
+  N-SHUF         pooled covered 0.713 (gate.json 0.713, SAME) · size1: 1.000 vs chance 1.000 (n 170) · size2: 0.493 vs chance 0.585 (n 136) · size3: 0.375 vs chance 0.446 (n 56)
+  P-ORACLE-RW    pooled covered 0.914 (gate.json 0.914, SAME) · size1: 1.000 vs chance 1.000 (n 170) · size2: 0.838 vs chance 0.585 (n 136) · size3: 0.839 vs chance 0.446 (n 56)
+  P-ORACLE       pooled covered 0.815 (gate.json 0.815, SAME) · size1: 1.000 vs chance 1.000 (n 170) · size2: 0.669 vs chance 0.585 (n 136) · size3: 0.607 vs chance 0.446 (n 56)
+  ORACLE-TRUTH   pooled covered 0.790 (gate.json 0.790, SAME) · size1: 1.000 vs chance 1.000 (n 170) · size2: 0.640 vs chance 0.500 (n 136) · size3: 0.518 vs chance 0.333 (n 56)
+  ```
+  - **N-SHUF sits systematically BELOW 1/n on the multi-thing items** (0.493 vs 0.585; 0.375 vs 0.446). The pooled «≤ chance + 0.05» bar is met through the trivially-right items.
+  - **A-RW is well above chance where there is a choice** (0.801 and 0.768).
+  - A gaze arm's chance at size 2 is 0.585, not 0.5: when only the target is covered, the scene shows one hypothesis and the pointing is trivially right.
 - **ε landed at the grid's end** (0.3, R49's grid {1e-4 … 0.3}). ε 0.6 and 0.9 give the same colour reading (0.832), so ε does not move the verdict (§3).
 
 ## 2b · The oracles' POINTING rule (diagnostic, read by no verdict; `tools/scene/diag/diag_pointing.py`, output `/data/dev/brain-runs/scene/gate/diag_pointing.out`)
@@ -126,6 +136,13 @@ At seed 1 the scene has one hypothesis, the green square. The consequence per ar
 - **ORACLE-TRUTH:** it sees the moon.
 
 So M6 at seed 1 is a gaze fact, never a test of the one-meeting write. The image is `/data/dev/brain-runs/scene/look/train-20261101-02699.png`, with the fixations drawn.
+
+**A defect in the grader as built, to fix with any PROCEED.** At seed 1, P-ORACLE's M6 would print as **0.0** with n = the covered items:
+- `answer_point` returns `point: None` (with `unheard: ["dax"]`) for a word never heard;
+- `grade_pointing` scores that as not correct;
+- `bars_for` then reads 0.0 < 0.70 → CEILING-BOUND.
+
+That is the right verdict for the wrong reason: a zero reported by the instrument, not a measured reading (#162's class). The grader must read `unheard` as NOT GRADABLE by name, never as a score (#243 (4)).
 
 ## 5 · Stage −1, as printed (`/data/dev/brain-runs/scene/stage/stage_minus1.txt`)
 
@@ -219,13 +236,12 @@ That is an anecdote, not measured by colour. The images are in `/data/dev/brain-
 
 - **The eye / cache, solo, idle box** (load 1.2, 12:26): seed 1's 10,498 canvases took 91.9 CPU-s user and 1:32 wall, ≈ 8.8 ms a canvas. That covers render, `glances`, png sha, the forced windows and the 10-row self-check. max RSS was 246,512 kB (/usr/bin/time).
 - **Stage −1's 300 canvases:** 3.2 s.
-- **THE FIRST GATE:** 19.4 s wall, covering the toy caches (1,200 canvases), the toy, 6 ε fits, 113 LOO fits, and 5 arms × 300 with their answers.
-- **Load fact:** at 12:22, with Test B's 8 pricing processes running (load 9), the seat's own `seat_eye_probe.py` read **48.6 ms a call**, against 5.7 ms idle.
+- **THE FIRST GATE:** 19.4 s wall at load 1.5 (12:28), covering the toy caches (1,200 canvases), the toy, 6 ε fits, 113 LOO fits, and 5 arms × 300 with their answers.
+- **Load fact:** at 12:22, with Test B's 8 pricing processes running (load 9), the seat's own `seat_eye_probe.py` read **48.6 ms a call**, against 5.7 ms idle. The builder's smoke timings from 12:17–12:22 were read during that load and are not quoted as prices.
+- **No arm price at 10,000 scenes was taken.** The gate refuses the run, and `run.py price` reads `gate.json`.
 - **After a ruling:**
-  - seeds 2–3's caches are one command each (≈ 92 CPU-s each), or the unit's first wave builds them;
+  - seeds 2–3's caches are one command each (≈ 92 CPU-s each at idle), or the unit's first wave builds them;
   - `run.py price` (solo, then 5 × 3 at once) is one command.
-
-  Estimate, not a price [Likely]: the arms are ≈ 1 s per 60 scenes in the smoke test, so the full run is well under the PREREG's 1 CPU-h.
 
 ## 9 · What a PROCEED needs (none of it done by the builder)
 
@@ -255,9 +271,9 @@ None: the gate stopped the run before any full stream. `report.txt` does not exi
 
 ## 11 · Candidate lessons for the seat to fold (SOLUTIONS; the builder touches nothing outside its worktree)
 
-- **A ceiling reader pooled across word TYPES is not a ceiling for the minority type.** One LDA with a Σ pooled over every word class lets the always-said type's within-class scatter set the metric. Here the shape words carry the colour variation, and colour naming drops from NCM 0.929 to 0.832. Read a multi-type reader per type against a per-type-Σ twin before a verdict rests on it (#228's family: a control blind to the wrong thing).
-- **Comparing a Mahalanobis likelihood across DIFFERENT things is not the reader's pointing rule.** The reader's posterior over its classes is (toy M1 0.669 → 0.994). A «ceiling» that reads below the learner is the tell (#162: a filter reporting on itself).
-- **A one-meeting test needs its meeting SEEN.** At seed 1 the gaze put 0 of 4 fixations on the moon, so M6 there grades the gaze. Print a mechanism mark's REACH (was the thing ever perceived?) beside the mark (#234 (2)).
+- **A ceiling reader pooled across word TYPES is not a ceiling for the minority type.** One LDA with a Σ pooled over every word class lets the always-said type's within-class scatter set the metric. Here the shape words carry the colour variation, and colour naming drops from NCM 0.929 to 0.832. Read a multi-type reader per type against a per-type-Σ twin before a verdict rests on it (in #228's family, as the SOLUTIONS index reads it: a control blind to the wrong thing).
+- **Comparing a Mahalanobis likelihood across DIFFERENT things is not the reader's pointing rule.** The reader's posterior over its classes is (toy M1 0.669 → 0.994). A «ceiling» that reads below the learner is the tell (#162's family, as the index reads it: a filter reporting on itself).
+- **A one-meeting test needs its meeting SEEN.** At seed 1 the gaze put 0 of 4 fixations on the moon, so M6 there grades the gaze. Print a mechanism mark's REACH (was the thing ever perceived?) beside the mark (#234 (2), as the index reads it).
 
 ## 12 · The suite on the final code
 
