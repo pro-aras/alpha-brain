@@ -353,3 +353,30 @@ Run on **302db7d**, the last commit that touches anything but this file (`git di
 - **The whole brain suite under the venv:** `Ran 520 tests in 234.892s` / `OK (skipped=3)`; log `/data/dev/brain-runs/scene-s1b1/logs/suite-venv-302db7d.log`. That is 487 at S1a's final, plus S1b-1's 33 new tests.
 - **The scene package under /usr/bin/python3:** `Ran 118 tests in 20.709s` / `OK`; log `/data/dev/brain-runs/scene-s1b1/logs/suite-scene-sys-302db7d.log`.
 - **Red on the parents:** 4093ff9 (29 of the 48 new/changed tests, §1.1); dee656e (the 2 post-run reading tests).
+
+## 8 · CORRECTION to §6 (b), and the follow-up readings (added 2026-09-28 14:45 +0400 by Claude (Opus 5.5, S1b-1 builder); read by no verdict)
+
+Script `tools/scene/diag/s1b1_followup.py` (run from the pinned copy of 6064165); its whole output is `/data/dev/brain-runs/scene-s1b1/gate/diag_followup.out`, copied beside the script as `tools/scene/diag/s1b1_followup.out`. Every control reproduced the unit: N-SHUF's own draw (0.651 / 0.597 / 0.469), the law's TRUTH (0.671 / 0.716 / 0.600), and the law's spoken phrase on every SPEAK item (78/78, 80/80, 72/72).
+
+**The correction.** §6 (b) says «14 of those had one hypothesis in view, where the read-back cannot test a word». That is FALSE. (b′) labelled a +∞ read-back margin as «one hypothesis». A word of fewer than 3 meetings answers by its band (p ∈ {0, 1}), so its margin is +∞ with several hypotheses in view, and it wins the mouth's margin tie-break. The true split at seed 20261101, by X's rows:
+- 20 of 25 false phrases are false of the target (this part stands).
+- Of those 20, **4** had one hypothesis in view (3 other words, 1 «dax»).
+- **11 are «dax»** (10 of them with ≥ 2 hypotheses in view), and every spoken «dax» is false: 11 / 5 / 13 per seed.
+- 6 are other words with ≥ 2 hypotheses and a finite margin.
+
+The sentence «nothing in the mouth prefers the true word» is also wrong in kind: the mouth prefers the young word. A counterfactual mouth with the words of < 3 meetings dropped from HELD reads TRUTH 0.816 / 0.757 / 0.700 against the law's 0.671 / 0.716 / 0.600. This is a reading that names the mechanism, not a proposal.
+
+**(A1) N-SHUF's stream is no truer than chance.** A deranged utterance is true of ≥ 1 thing in its paired scene 0.124 / 0.135 / 0.138 of the time, against the independent-draws base rate of 0.136 / 0.134 / 0.135 (1.000 for the true stream). Per type it is the same. Seed 20261103 does not differ.
+
+**(A2) §5.5's «N-SHUF above chance» was the draw.** Over 10 fresh derangements per seed, N-SHUF's M1 ranges 0.380–0.620 (medians 0.557 / 0.545 / 0.512); 4 of 30 draws clear chance + 0.05. The unit's own draw sat above 10/10, 9/10 and 1/10 of the fresh draws. One derangement per seed cannot tell a null above chance from a null's spread. Price: 33 runs, 1.8 CPU-min.
+
+**(A3) The within-type forced name on SPEAK** (TRUTH; caveat: NAME's 0.93–0.95 is read on one-thing scenes, and SPEAK is 2–3-thing scenes):
+- One hypothesis in view (n 5 / 10 / 8), shape · colour · size · by margin · the law:
+  - 0.800 · 0.200 · 0.800 · 0.600 · 0.000
+  - 0.800 · 0.500 · 0.400 · 0.400 · 0.222
+  - 1.000 · 0.875 · 0.750 · 0.875 · 0.375
+- Several hypotheses (n 73 / 70 / 64):
+  - 0.767 · 0.548 · 0.384 · 0.603 · 0.718
+  - 0.800 · 0.686 · 0.386 · 0.629 · 0.785
+  - 0.734 · 0.656 · 0.312 · 0.484 · 0.629
+- On several hypotheses, the margin chose size most often (40 / 32 / 36), and size is the worst forced type.
