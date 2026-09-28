@@ -40,7 +40,7 @@ Three rungs, in his order. Each rung changes ONE thing.
 | 6 one meeting | **M6**: point at «dax», pooled over both sets, where the gaze covered it | ≥ 0.70 with n ≥ 30 | NOT GRADABLE at 20261101: the gaze never looked at the dax in its one scene (an organ limit, read from the training tape before any ask). Chance is printed | weak: 0.778 (n 27), 0.483 (n 29, chance 0.471) |
 | speech | SPOKEN, TRUTH, TRUTH-NEED, MINIMAL, ORDER, READ-BACK, DECLINE | S1b-1R's own | TRUTH-NEED and ORDER are gaze-bound (the need is seen on 23–27 of 60); READ-BACK is a wiring pin, never evidence; DECLINE is organ-bound | as S1b-1R: TRUTH fails at seed 1, TRUTH-NEED at 2 seeds, ORDER underpowered |
 
-**M4 and M5 bars were set at 20:25, before builder A's first measurement reached the seat.** Builder A measures their ceilings on the rung-1 learners. Because rung 1 proves those learners ARE the life's brain, that measurement is the result, one step early. It is reported as such. No bar moves after it is read.
+**M4 and M5 bars were set at 20:21 +0400, before builder A's first measurement reached the seat.** Builder A measures their ceilings on the rung-1 learners. Because rung 1 proves those learners ARE the life's brain, that measurement is the result, one step early. It is reported as such. No bar moves after it is read.
 
 **M4b (a readable rule that re-derives answers on unseen items) is NOT BUILT tonight.** Reason: the word map's rule is a prototype and a band; a grader that rebuilds it from the cited episodes alone is a second build. It goes on the calendar with a date at the wrap.
 
