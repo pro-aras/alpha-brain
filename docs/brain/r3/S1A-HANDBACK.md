@@ -22,7 +22,10 @@
 | 2cb0d38 | step 2: `eye.py` (one `glances` call a scene; union-find hypotheses; the forced window pinned byte-for-byte to the eye) and `cache.py` (brain.glance_cache + sidecars, written once) |
 | 2716457 | steps 4–5: `learners.py` (A-RW, P-ORACLE-RW, the LDA reader, the feeds), `slda.py` (StreamingLDA copied from genome-wt-b12 45c883e, text-pinned), the AST truth fence with planted offenders |
 | d102d80 | `marks.py`, `run.py` (stage −1, the toy, THE FIRST GATE, arms, grader, report, price), `tools/scene/run_s1a.sh` (the unit), `pin_code.sh`; a cache is read only by the code that drew it |
-| (this commit) | the diagnosis scripts `tools/scene/diag/*.py` and this hand-back |
+| fa0dfd1 | THE FIRST GATE's STOP recorded; the diagnosis scripts (`tools/scene/diag/diag_verdict*.py`); this hand-back |
+| 043efc6 | the oracles' pointing rule RAISED (`diag_pointing.py`) |
+| d6f28e2 | the gate's M1 per scene size (`diag_gate_sizes.py`); the grader's «unheard → 0.0» defect; prices with their load |
+| (the final commit) | §12's suite lines — this file only |
 
 The runs read a pinned copy: `/data/dev/brain-runs/scene/code-d102d80` (`CODE_SHA` d102d80…). The eye fixture re-run from that copy reproduced B1.1 3/3, with the modules' own `__file__` inside the copy.
 
@@ -277,4 +280,10 @@ None: the gate stopped the run before any full stream. `report.txt` does not exi
 
 ## 12 · The suite on the final code
 
-@@SUITE@@
+Run on **d6f28e2**, the last commit that touches anything but this file (`git diff --stat d6f28e2..HEAD` names only this .md). Each line is read from its log, never from a pipe, and each log has 0 `ERROR:` / `FAIL:` blocks:
+- **The whole brain suite under the venv**: `Ran 471 tests in 223.442s` / `OK (skipped=3)`.
+  - Command: `OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 TMPDIR=/data/dev/brain-runs/tmp nice -n 19 /data/dev/venvs/brain/bin/python -m unittest discover -s tests/brain -t .`; log `/data/dev/brain-runs/scene/logs/suite-venv-d6f28e2.log`.
+  - The 69 scene tests are inside the 471: 474 cases are discovered, and test_fonts' class-level SkipTest under the venv counts its class as one skip.
+- **The scene package under /usr/bin/python3**: `Ran 69 tests in 8.359s` / `OK`; log `/data/dev/brain-runs/scene/logs/suite-scene-sys-d6f28e2.log`.
+- **The same two on 043efc6**: 471 in 229.755 s OK (skipped=3), and 69 in 8.448 s OK. On fa0dfd1: 471 in 223.506 s OK (skipped=3).
+- **The new tests on f393e5a (the base)** are red: `Ran 10 tests … FAILED (errors=8)`; log `/data/dev/brain-runs/scene/redcheck-f393e5a/red.log`.
