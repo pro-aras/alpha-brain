@@ -402,6 +402,9 @@ def part_b(brain: "B.Brain", things, eps: float, nones: Sequence[Optional[bool]]
                                                    ("jn", "hard", 0.9), ("jn", "hard", 0.95), ("an", "hard", 0.9), ("rN", "hard", 0.9),
                                                    ("oracle", "hard", 0.0))
             for rb in (0, 1, 2, 3, 5)]
+    if grid_name == "look":          # edit: Claude (Fable 5.1, the seat), 2026-09-29 15:15 +0400 — tools/brain/diag/probe_lookagain.py's cells
+        grid = [("r", "soft", 0.0, 0, 0), ("r", "hard", 0.0, 0, 0), ("rn", "soft", 0.0, 0, 0), ("rn", "hard", 0.0, 0, 0),
+                ("rn", "hard", 0.9, 0, 0), ("rn", "hard", 0.95, 0, 0), ("oracle", "hard", 0.0, 0, 0)]
     if grid_name == "dose":
         grid = [("dose", "hard", c, 0, 0) for c in DOSES]
     if grid_name == "m2b":
