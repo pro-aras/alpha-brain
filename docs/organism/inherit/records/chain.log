@@ -1,0 +1,13 @@
+2026-09-29 20:41:40 +0400 chain start; waiting for the suites and the null parent
+2026-09-29 20:56:42 +0400 null parent: ENDED-CLEAN · its brain pair: /data/dev/genome-lives/inh-nullparent-20261102/state/brain.json /data/dev/genome-lives/inh-nullparent-20261102/state/brain.npz 
+2026-09-29 20:57:38 +0400 inh-c-t1 exit 0 · ENDED-CLEAN
+2026-09-29 20:57:38 +0400 inh-b-t1 exit 0 · ENDED-CLEAN
+2026-09-29 20:58:34 +0400 inh-n-t1 exit 0 · ENDED-CLEAN
+2026-09-29 20:59:44 +0400 inh-c-t1000 exit 0 · ENDED-CLEAN
+2026-09-29 21:01:40 +0400 inh-b-t1000 exit 0 · ENDED-CLEAN
+2026-09-29 21:01:51 +0400 inh-n-t1000 exit 0 · ENDED-CLEAN
+2026-09-29 21:19:55 +0400 inh-c-t10000 exit 0 · ENDED-CLEAN
+2026-09-29 21:19:55 +0400 inh-b-t10000 exit 0 · ENDED-CLEAN
+2026-09-29 21:19:55 +0400 reader exit 0
+2026-09-29 21:23:05 +0400 I7 exit 0
+2026-09-29 21:23:05 +0400 chain end

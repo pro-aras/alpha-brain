@@ -1,0 +1,11 @@
+before-kill 2026-09-29T17:21:27.793Z learned 11505 learn_rows 1505 restored None inherited {'learned': 10000, 'hash': '5c1642730dfe710f0a8462abb55ed0f2f370af2bf792f00e93943d551fdffe8a'} crash None
+    PID STAT COMMAND
+  51044 Ssl  /usr/bin/python3 -m creature.body --root /data/dev/genome-lives/inh-c-kill --genome /data/dev/genome-lives/inh-c-kill/GENOME.genome
+
+ActiveState=active
+NRestarts=1
+
+after 2026-09-29T17:22:08.692Z learned 12000 learn_rows 2000 restored True inherited {'learned': 10000, 'hash': '5c1642730dfe710f0a8462abb55ed0f2f370af2bf792f00e93943d551fdffe8a'} crash None
+after 2026-09-29T17:22:18.694Z learned 12173 learn_rows 2173 restored True inherited {'learned': 10000, 'hash': '5c1642730dfe710f0a8462abb55ed0f2f370af2bf792f00e93943d551fdffe8a'} crash None
+after 2026-09-29T17:22:38.700Z learned 12500 learn_rows 2500 restored True inherited {'learned': 10000, 'hash': '5c1642730dfe710f0a8462abb55ed0f2f370af2bf792f00e93943d551fdffe8a'} crash None
+I7 PASS

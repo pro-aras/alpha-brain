@@ -1,0 +1,37 @@
+LIFE brain · world seed 20261103 · root /data/dev/genome-lives/inh-b-t1
+  tape rows 4445 · scene rows {'ear': 2, 'eye': 1465, 'ask': 2978} · training scenes 1
+  asks on the tape 2972 · answers in the journal 2978 {'brain': 2978} · asks without an answer 0 []
+  the one «dax» meeting: seen = None (the life has no training scene 2699 (train 1)); things None; fixations → thing None
+  the pointer: checked 423 · mismatches 0 []
+  THE BARS (S1b-1R's own rules; oracle readings = the scored record at this seed; reading point 10000):
+    M1           {"value": 0.7, "n": 10, "all": 0.7, "p_oracle": 1.0, "pass": false, "underpowered": true}
+    NULL-M1      {"value": 0.7, "n": 20, "bar": 0.625, "pass": true, "not_gradable": false, "underpowered": false}
+    NULL-M3      {"value": null, "n": 20, "bar": 0.6732758620689655, "pass": false, "not_gradable": false, "underpowered": false}
+    M2a          {"value": null, "n": 0, "p_oracle": 0.995, "pass": false, "underpowered": true, "ceiling_bound": false, "false_refusal": 0.0}
+    M2b          {"value": 1.0, "n": 48, "p_oracle": 0.8958333333333334, "pass": true, "underpowered": false, "ceiling_bound": false}
+    M3           {"value": null, "n": 0, "all": null, "bar": 0.8, "p_oracle": 1.0, "pass": false, "not_gradable": false, "underpowered": true}
+    M6           {"value": null, "n": 0, "all": null, "p_oracle": null, "pass": false, "not_gradable": "no meeting in this stream", "underpowered": false, "ceiling_bound": false}
+    SPOKEN       {"value": 0.0, "n": 76, "bar": 0.7263157894736842, "p_oracle": 0.9078947368421053, "pass": false, "not_gradable": false, "underpowered": false}
+    TRUTH        {"value": null, "n": 0, "bar": 0.8217391304347825, "p_oracle": 0.9130434782608695, "pass": false, "not_gradable": "nothing to read", "underpowered": false}
+    TRUTH-NEED   {"value": null, "n": 0, "bar": 0.39, "p_oracle": 0.43333333333333335, "pass": false, "not_gradable": "nothing to read", "underpowered": false}
+    MINIMAL      {"value": null, "n": 0, "bar": 0.9, "p_oracle": 1.0, "pass": false, "not_gradable": "nothing to read", "underpowered": false}
+    ORDER        {"value": null, "n": 0, "bar": 0.95, "p_oracle": 1.0, "pass": false, "not_gradable": "no multi-word phrase spoken", "underpowered": false}
+    READ-BACK    {"value": null, "n": 0, "p_oracle": 1.0, "pass": false, "not_gradable": "nothing spoken", "underpowered": false}
+    DECLINE      {"value": 1.0, "n": 38, "p_oracle": 0.631578947368421, "pass": null, "not_gradable": false, "underpowered": false}
+    refute       {}
+  SET fresh: items {'M1': 398, 'M2a': 400, 'M5': 400, 'NAME': 163, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48, 'SPEAK2': 60} · read forced {}
+    M1 covered 0.700 (n 10) · over ALL items 0.700 (n 10) · coverage 1.000 · chance 0.650
+    M3 covered n/a (n 0) · over ALL n/a
+    M2a refusal n/a (n 0) · false refusal 0.000
+    M2b 1.000 (n 48) · over ALL 1.000
+  SET s1b1 (READINGS ONLY): items {'M1': 396, 'M2a': 400, 'NAME': 149, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48} · read forced {}
+    M1 covered 0.889 (n 9) · over ALL items 0.889 (n 9) · coverage 1.000 · chance 0.648
+    M3 covered n/a (n 0) · over ALL n/a
+    M2a refusal n/a (n 0) · false refusal 0.000
+    M2b 1.000 (n 48) · over ALL 1.000
+  TEST 6 · M6 POOLED over {'fresh': 42, 's1b1': 42}: covered n/a (n 0 of 84; chance n/a; bar 0.7, n ≥ 30) → NOT GRADABLE — this life holds no «dax» meeting (its training stream ends before it)
+  THE NULL (20 shuffled-utterance draws, the scored record's): M1 0.700 vs p95 0.625 → ABOVE · M3 n/a vs p95 0.673 → NOT ABOVE
+  TEST 4a · EXPLAIN: words asked 2 · explained 0 · «unknown» ['circle', 'small'] · citations 0 (of episodes with ≥ 2 hypotheses: 0) · EXIST n/a (a wiring pin, bar 1.000) · CARRY n/a (bar 0.90) · the null's median n/a, p95 n/a → NOT GRADABLE — no citation
+  TEST 4b · RULE: NOT BUILT tonight (PREREG §3)
+  TEST 5 · MISUSE: refused n/a (bar 0.90) · named misuse n/a (bar 0.80) · n 0 (unheard 400) · valid phrases called misuse 0.000 of 458 (bar ≤ 0.05) · never-heard pairs called misuse 0 of 60 (bar 0) → UNDERPOWERED (n 0)
+    by kind: {}
