@@ -135,6 +135,12 @@ FAIL: test_61_questions_60_fetches_1_refused_rate (tests.creature.test_web_door.
 == tools exit=0
 Ran 80 tests in 268.505s
 OK
+
+the creature suite's ONE failure above was a wall-clock test (60 fetches in 2.0 s) run beside the gate's phase 2 (load about 15): 46 were made.
+that test alone on an idle box: 3 runs, 3 OK (2.0 s each; /data/dev/brain-runs/day0929/wordroad/logs/webdoor-alone-{1,2,3}.log).
+the creature suite WHOLE again on 0ca9a74, 14:52:59 to 15:08:44 +0400, load 1 to 3: exit 0
+Ran 1199 tests in 945.466s
+OK (skipped=6)
 ```
 
 ## What follows (the seat, under his 2026-09-29 00:48 word; his to overturn)
