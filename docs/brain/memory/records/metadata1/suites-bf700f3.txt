@@ -1,0 +1,11 @@
+the suites on bf700f3 (2026-09-29 21:40:22 +0400 → 2026-09-29 22:04:27 +0400), one at a time, BLAS threads 1
+== creature exit=0
+Ran 1239 tests in 1150.543s
+OK (skipped=6)
+== genome exit=0
+Ran 649 tests in 148.651s
+OK (skipped=1, expected failures=6)
+== tools exit=0
+Ran 92 tests in 142.384s
+OK
+scene and brain (venv) were NOT re-run on bf700f3: bf700f3 differs from 5ca4da0 by tests/creature/_scene_tape.py and documents only; their record on 5ca4da0 is final-suites-5ca4da0.txt (368 OK, 770 OK).
