@@ -855,6 +855,15 @@ def parse_genome(text: str) -> Genome:
                                            "young": int(m.group(5)), "calibrate_at": at_, "replay": m.group(8), "hears": hears_}
                 if m.group(6) == "nearest":
                     g["declared"]["BRAIN"]["young_rule"] = "nearest"
+            # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §1: the gene HEAR. ONE form; any other word refuses by name.
+            # `words every` = the organism meets every word of an utterance (Organism.moment's list form, above); `thing last` =
+            # the sight ledger's thing, the journal's word and the episode's word stay the LAST word; `arrival last` = an arrival
+            # opens on a never-heard LAST word, as it always did. Absent: every row of every life is what it was.
+            elif gene == "HEAR":
+                m = re.fullmatch(r"every word; thing last; arrival last", a)
+                if not m:
+                    raise GenomeError(f"HEAR: cannot read {a!r} (PREREG-WORD-ROAD §1: HEAR every word; thing last; arrival last)")
+                g["declared"]["HEAR"] = {"words": "every", "thing": "last", "arrival": "last"}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:
@@ -1184,6 +1193,9 @@ class Organism:
         # moments_sight_only immediately above: a plain attribute, never a self.c key, so state_hash is
         # unmoved for every genome that never declares SURPRISE (or never confirms).
         self.births_skipped_confirmed = 0
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:46 +0400 — PREREG-WORD-ROAD §1.5: a word cell two words of ONE moment lit (a plain
+        # attribute like the line above: never self.c, never hashed, so no pin moves).
+        self.hear_shared_cell = 0
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
         # #1): allocated on `sight` ONLY, only when declared -- an undeclared THRESH leaves Area.own_band at None,
         # touching no byte of anything (`moment()`'s push is gated on this same presence, one line below).
@@ -1470,7 +1482,29 @@ class Organism:
         sound-and-no-word road — `--blind ear`, or a voiced canvas whose word never came) resonates no word: the words area
         never lights, the sight↔words road does not run, and the sight↔sound meeting still forms."""
         S = self._resonate(self.sight, x_s, confirm=confirm)
-        T = self._resonate(self.words, x_w, confirm=confirm) if x_w is not None else []
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:46 +0400 — PREREG-WORD-ROAD §1.3 / §1.5 (the gene HEAR's organism half): `x_w` may be a
+        # LIST of word vectors — the words the organism meets in this ONE moment, in the order spoken. T is then the UNION, in
+        # that order, of each word's own winners (its novelty birth included, from the ONE budget); `lit_by` keeps, per winner,
+        # the vector of the word that lit it (an error birth beside a word cell holds ITS word, never the last one's). A cell two
+        # words lit keeps the earlier word and is counted (`hear_shared_cell`, a plain attribute: never self.c, never hashed —
+        # 0 on every genome on disk: two distinct words' cosine is <= 0.875 and every words floor is >= 0.9, WALK §C.3). A single
+        # vector (every caller before this edit) takes the old line below, byte for byte; a list of ONE vector is the same road.
+        lit_by: Optional[Dict[int, np.ndarray]] = None
+        if isinstance(x_w, (list, tuple)):
+            if x_snd is not None:
+                raise ValueError("Organism.moment: several words beside a sound is HEAR stage 2 (PREREG-WORD-ROAD §2)")
+            T, lit_by = [], {}
+            for xv in x_w:
+                for t_ in self._resonate(self.words, xv, confirm=confirm):
+                    if t_ in lit_by:
+                        if not np.array_equal(lit_by[t_], xv):
+                            self.hear_shared_cell += 1
+                        continue
+                    lit_by[t_] = xv
+                    T.append(t_)
+            x_w = x_w[-1] if len(x_w) else None          # the name the one-vector readers below would see: the LAST word's
+        else:
+            T = self._resonate(self.words, x_w, confirm=confirm) if x_w is not None else []
         U = (self._resonate(self.sound, x_snd, confirm=confirm)
              if (x_snd is not None and self.sound is not None) else [])
         # edit: Claude (Sonnet 5, LIFE builder A), 2026-09-22 18:43 +0400 — L-6/THRESH (docs/briefs/LIFE-A-ANSWER-SELF.md
@@ -1485,7 +1519,10 @@ class Organism:
         # floor drifts up. Found RED by the seam test on the merged bytes before this guard existed (6 != 5).
         if self.sight.own_band is not None and S and T and not confirm:
             s0 = S[0]
-            if self._answer_of(self.sight, s0) == T[0]:
+            # PREREG-WORD-ROAD §1.6 (edit: Claude (Fable 5.1, the seat), 2026-09-29 12:46 +0400): under a LIST the established answer may be ANY
+            # word cell of the moment (T is in spoken order, so T[0] would be the FIRST word's cell); one vector: T[0], as it was.
+            a0 = self._answer_of(self.sight, s0)
+            if (a0 in T) if lit_by is not None else (a0 == T[0]):
                 self._own_band_push(s0, float(self.sight.cos(x_s)[s0]))
         w_ran = False
         if self.wire and self.t >= self.g.stage2_start and S and T:
@@ -1493,7 +1530,7 @@ class Organism:
             self._hebb(S, T)
             self._delta(S, T, lr=self.g.lr * lr_scale)
             if not confirm:
-                S, T = self._misfire(S, T, x_s, x_w)
+                S, T = self._misfire(S, T, x_s, x_w, lit_by)
                 self._prune(S, T)
                 self._merge(self.sight, S, axis=0)
                 self._merge(self.words, T, axis=1)
@@ -1868,11 +1905,15 @@ class Organism:
         s = int(np.argmax(np.where(m, row, -np.inf)))
         return self.sight.cells[s].copy()
 
-    def _misfire(self, S, T, x_s, x_w):
+    def _misfire(self, S, T, x_s, x_w, lit_by=None):
         """BIRTH error misfires N: a cell whose strongest edge is not among this moment's winners on
-        the other side misfires; N misfires → a cell is born beside it holding the current input."""
-        for area, winners, other, x in ((self.sight, S, T, x_s), (self.words, T, S, x_w)):
+        the other side misfires; N misfires → a cell is born beside it holding the current input.
+        PREREG-WORD-ROAD §1.5 (edit: Claude (Fable 5.1, the seat), 2026-09-29 12:46 +0400): `lit_by` (a moment of SEVERAL words only; None on
+        every call before this edit) maps a word winner to the vector of the word that lit it — «the current input» of a word
+        cell is ITS word's vector. A word cell born by an error birth in this very loop is lit by the same word."""
+        for area, winners, other, x_area in ((self.sight, S, T, x_s), (self.words, T, S, x_w)):
             for cid in list(winners):
+                x = lit_by[cid] if (lit_by is not None and area is self.words) else x_area
                 ans = self._answer_of(area, cid)
                 if ans is None:
                     continue
@@ -1890,6 +1931,8 @@ class Organism:
                         new = self._birth(area, x, "error")
                         if new is not None and new not in winners:
                             winners.append(new)
+                            if lit_by is not None and area is self.words:
+                                lit_by[new] = x
         return S, T
 
     def _prune(self, S: List[int], T: List[int]) -> None:

@@ -312,6 +312,11 @@ def resolve_sibling(rel: str) -> Path:
     return second if second.exists() else first
 
 
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §2: the declared genes HEAR may stand beside at STAGE 1.
+HEAR_STAGE_1 = frozenset({"HEAR", "BRAIN", "ANSWER", "ARRIVAL", "ASK", "BODY", "CRASH", "DELIVER", "HEART", "TAPE", "THRESH",
+                          "WORLD_SCENE"})
+
+
 class Mind:
     """genome_path: the genome file (read once, text + parsed). run_root: the SAME root the body's Tape
     uses — payload bytes for a tape row live at run_root/tape/<row.payload>. blind: gene names this mind
@@ -364,6 +369,21 @@ class Mind:
         if "SURPRISE" in self.genome.declared and self.genome.declared["SURPRISE"].get("predicted") != "mind-cell":
             raise GenomeError("SURPRISE floor declared without 'predicted mind-cell': no consumer names this "
                                "form (W3-0) — the organism does not start")
+
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §2: the gene HEAR, STAGE 1 = the lean body. An ALLOW-list:
+        # HEAR starts only beside the genes whose consumers the law covers today (the genes of genome/brain/BRAIN-LEAN-TWIN.genome,
+        # and BRAIN); beside any other declared gene, and beside `--blind ear` (the twin's own word bookkeeping is last-word),
+        # the organism does not start — by name, so a consumer that was never widened cannot run by oversight.
+        self._hear: bool = "HEAR" in self.genome.declared
+        self.hear_words_refused: int = 0
+        if self._hear:
+            not_yet = sorted(k for k in self.genome.declared if k not in HEAR_STAGE_1)
+            if not_yet:
+                raise GenomeError(f"HEAR declared beside {', '.join(not_yet)}: its consumer does not meet every word yet "
+                                   f"(HEAR stage 2, PREREG-WORD-ROAD §2) — the organism does not start")
+            if "ear" in self.blind:
+                raise GenomeError("--blind ear beside HEAR: the blind twin's ledger and arrival clock read ONE word "
+                                   "(HEAR stage 2, PREREG-WORD-ROAD §2) — the organism does not start")
 
         # PREREG §11.1 step 5: "frozen" is a TWIN-ONLY blind — it changes how the Organism itself is
         # built, not a per-step gate. FROZEN's own parser clause is not on master yet (A10); absent, its
@@ -771,6 +791,11 @@ class Mind:
         property keeps that convention instead of reaching into a leading-underscore field from outside
         the class."""
         return self._hold_active
+
+    def ledgers(self) -> Dict[str, Dict[int, set]]:
+        """The runner's ledgers (genome/questions.py:build_ledgers) as THIS mind reads them: under the gene HEAR a word cell is
+        named by the word its own vector holds (PREREG-WORD-ROAD §1.9); without it, the ledger it always was."""
+        return build_ledgers(self.org, self.moment_word, words_by_vector=self._hear)
 
     # ------------------------------------------------------------------ consume
     def consume(self, row: Dict[str, object]) -> None:
@@ -1329,7 +1354,7 @@ class Mind:
         if "coarse" in (self.genome.gaze or {}) and "coarse" in self.blind:
             g = dict(g); g["feats"] = g["feats"][:-1]
         xs = list(g["feats"])
-        ledgers = build_ledgers(self.org, self.moment_word)
+        ledgers = self.ledgers()
         Ls, Lw = ledgers["sight"], ledgers["words"]
 
         c = self._chat_content(heard, xs, Ls, Lw)
@@ -1495,7 +1520,7 @@ class Mind:
             a["raw"] = dict(a)
             return a, None
         if "ledgers" not in cache:
-            cache["ledgers"] = build_ledgers(self.org, self.moment_word)
+            cache["ledgers"] = self.ledgers()
         ledgers = cache["ledgers"]
         if form == "why":
             return _road.answer_why(self.org, ledgers, self.episodes, payload)
@@ -1856,6 +1881,28 @@ class Mind:
         # canvas — encode_word is pure, so computing it here changes nothing else (word is None on a
         # sight-only canvas, xw stays None, exactly as arm "comparator"/"conjunctive" expect).
         xw = encode_word(word, self.genome.ear_blank_zero) if word is not None else None
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §1.1 (the gene HEAR): W, the words the organism MEETS at this
+        # canvas = the instant's ear rows in tape order, each distinct word once (its first place). `word` (the LAST word) stays
+        # the thing: the ledger, the journal's `word`, ARRIVAL. A word the ear refuses that is NOT last (over 8 letters, or a
+        # letter outside a–z) is left out BY NAME and counted; the last word's own refusal is what it always was.
+        hear_words: Optional[List[str]] = None
+        hear_xws: Optional[List[np.ndarray]] = None
+        hear_refused: List[str] = []
+        if self._hear and word is not None:
+            hear_words, hear_xws = [], []
+            for w in dict.fromkeys(words_in_instant):
+                if w == word:
+                    hear_words.append(w); hear_xws.append(xw)
+                    continue
+                try:
+                    xv = encode_word(w, self.genome.ear_blank_zero)
+                except ValueError:
+                    hear_refused.append(w)
+                    self.hear_words_refused += 1
+                    continue
+                hear_words.append(w); hear_xws.append(xv)
+            if word not in hear_words:                       # a blank last word («») is no entry of words_in_instant: met as it always was
+                hear_words.append(word); hear_xws.append(xw)
         surprise_gene = self.genome.declared.get("SURPRISE")
         # L-4: read-only, never births (Organism.expected_sight's own guarantee) — None when SURPRISE is
         # undeclared, xw is None (sight-only or an unknown word), or the word's own cell has no edge yet.
@@ -2007,7 +2054,8 @@ class Mind:
                     S, T = [], []
                     self.glances_dropped += 1
                 else:
-                    S, T = self.org.moment(x, xw, lr_scale=lr_scale, confirm=confirmed_flags[i], x_snd=x_snd)
+                    S, T = self.org.moment(x, (hear_xws if hear_xws is not None else xw), lr_scale=lr_scale,
+                                           confirm=confirmed_flags[i], x_snd=x_snd)
                     if x_snd is not None:   # A4L-VOICE, kept inside the else at the merge (Claude (Fable 5.1)): a DROPPED glance runs no moment, so no sound winners either
                         sound_winners.extend(u for u in self.org.last_sound_winners if u not in sound_winners)
                 if predict_on:
@@ -2041,6 +2089,9 @@ class Mind:
             edges_pruned = len(self.org.prunes_log) - prunes_before
             journal_row = {
                 "seq": row["seq"], "moment": moment, "word": word,
+                # PREREG-WORD-ROAD §1.10 (the gene HEAR): the words the organism met at this canvas; absent without the line
+                **({"words": list(hear_words), **({"words_refused": list(hear_refused)} if hear_refused else {})}
+                   if hear_words is not None else {}),
                 "fix": [[int(y), int(x)] for (y, x) in g["fix"]],
                 "births": births,
                 "cells": [int(self.org.sight.alive.sum()), int(self.org.words.alive.sum())],
@@ -2111,7 +2162,7 @@ class Mind:
                 # under r["cell"] on a real (STAGE-1) tape.
                 cell = r.get("lit")
                 if cell is not None:
-                    ledgers = build_ledgers(self.org, self.moment_word)
+                    ledgers = self.ledgers()
                     if ledgers["sight"].get(cell) == {""}:
                         # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — the FIRST canvas
                         # that births this cell is sighting #1 (never counted here — births_after !=
@@ -2349,7 +2400,7 @@ class Mind:
                     evidence = self._rule_evidence(rule["cluster"], first_glance)
                 else:
                     if ledgers is None:
-                        ledgers = build_ledgers(self.org, self.moment_word)
+                        ledgers = self.ledgers()
                     r = self.org.recall("sight", first_glance)
                     Lw = ledgers["words"]
                     evidence = r["cell"] is not None and Lw.get(r["cell"], set()) == {word}
@@ -2394,7 +2445,7 @@ class Mind:
         words). Simplified to `recall` over the due canvas's first glance (the same simplification
         `_score_due_predictions`'s pre-existing sight-road already makes for "recall == word", documented
         there); a scoring read never changes the organism."""
-        ledgers = build_ledgers(self.org, self.moment_word)
+        ledgers = self.ledgers()
         r = self.org.recall("sight", first_glance)
         Lw = ledgers["words"]
         return r["cell"] is not None and Lw.get(r["cell"], set()) == {w2}
@@ -2414,7 +2465,7 @@ class Mind:
         line can be read only from what the eye learned of w2 on its own one-word showings — the measured ceiling (A42-B2-REPORT):
         0.430 when w2 is the last word, 0.183 when it is not; glance 0 alone reads 0.089, below the bar, which is why this asks
         every glance. A scoring read never changes the organism (Organism.recall's own law)."""
-        ledgers = build_ledgers(self.org, self.moment_word)
+        ledgers = self.ledgers()
         Lw = ledgers["words"]
         for x in glances:
             if x is None:
@@ -2548,7 +2599,7 @@ class Mind:
             "seq": self._ask_out_n, "at": self._cur_at,
         }
         if why_word is not None:
-            ledgers = build_ledgers(self.org, self.moment_word)
+            ledgers = self.ledgers()
             record = questions_why(self.org, ledgers, self.episodes, why_word)
             payload["why"] = {
                 "cells": [[area, int(c)] for area, c in record["cells"]],
@@ -2757,7 +2808,7 @@ class Mind:
             word_ask = lambda: self._maybe_ask_word(f"parked:word:{word}", word)   # noqa: E731 — local, read only by dead_end() below
             if not _THINK_LAWS_AVAILABLE:
                 return dead_end(word, "think_laws_unavailable", ask_on_park=word_ask)
-            ledgers = build_ledgers(self.org, self.moment_word)
+            ledgers = self.ledgers()
             record = questions_why(self.org, ledgers, self.episodes, word)
             rec = self.episodes.get(item["episode"]) if self.episodes is not None else None
             if rec is None:
@@ -3327,7 +3378,7 @@ class Mind:
             # threaded and inline roads can genuinely diverge in CONTENT (revisit/extension/clash, never
             # whether a row is written at all) when births/merges land between launch and apply — named in
             # the report, not hidden.
-            ledgers = build_ledgers(self.org, self.moment_word) if item.get("kind") == "word" else None
+            ledgers = self.ledgers() if item.get("kind") == "word" else None
             extra_kwargs: Dict[str, object] = {}
             if "ledgers" in _BELIEVE_KWARGS:
                 extra_kwargs["ledgers"] = ledgers
@@ -3462,7 +3513,7 @@ class Mind:
         os.replace(str(tmp_base) + ".npz", str(state_dir / "organism.npz"))
         os.replace(str(tmp_base) + ".json", str(state_dir / "organism.json"))
 
-        ledgers = build_ledgers(self.org, self.moment_word)
+        ledgers = self.ledgers()
         predictor_last_winner = None
         if self.predictor is not None and self.predictor._last_winner is not None:
             predictor_last_winner = self.predictor._last_winner.tolist()      # A9: PREDICT's state (its last winner) lives in the mind and is saved in the snapshot (PREREG §11.1 step 1)

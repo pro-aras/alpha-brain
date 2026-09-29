@@ -22,7 +22,28 @@ from .machinery import Organism, retina
 Ledger = Dict[int, Set[str]]     # cell id -> the set of things (or words) it was born on
 
 
-def build_ledgers(org: Organism, moment_thing: Dict[int, str]) -> Dict[str, Ledger]:
+def word_of_vector(v: np.ndarray, blank_zero: bool = False) -> str:
+    """The word a words-area vector HOLDS (edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §1.9): the ear's code
+    (genome/world.py:encode_word) is one-hot per letter slot, so a word cell — which stores its birth input — decodes to
+    exactly one word. Refuses BY NAME a vector that is no word's code (the round trip must be exact)."""
+    v = np.asarray(v, dtype=np.float64)
+    width = 26 if blank_zero else 27
+    if v.shape != (world.WORD_SLOTS * width,):
+        raise ValueError(f"word_of_vector: a vector of shape {v.shape} is not the ear's code ({world.WORD_SLOTS} x {width})")
+    letters = []
+    for i in range(world.WORD_SLOTS):
+        seg = v[i * width:(i + 1) * width]
+        k = int(np.argmax(seg))
+        if seg[k] <= 0.0 or k == 26:
+            break
+        letters.append(world.LETTERS[k])
+    word = "".join(letters)
+    if not np.allclose(world.encode_word(word, blank_zero), v, rtol=0.0, atol=1e-12):
+        raise ValueError(f"word_of_vector: the vector is not the code of {word!r} — a word cell holds something that is no word")
+    return word
+
+
+def build_ledgers(org: Organism, moment_thing: Dict[int, str], words_by_vector: bool = False) -> Dict[str, Ledger]:
     """From the organism's birth log (moment, area, cell, reason) and the runner's own map of
     moment → thing shown, derive which thing each cell was born on. Merges union the sets.
 
@@ -33,7 +54,14 @@ def build_ledgers(org: Organism, moment_thing: Dict[int, str]) -> Dict[str, Ledg
     sight: Ledger = {}
     words: Ledger = {}
     sound: Ledger = {}
+    # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §1.9: `words_by_vector` (the gene HEAR; False on every call
+    # before this edit, byte for byte the old ledger). Under it several word cells are born at ONE moment (a moment meets
+    # every word of its utterance), and `moment_thing[m]` names only the LAST word — so a WORD cell is named by the word its
+    # own vector holds. The sight ledger and the sound ledger are untouched (`thing last`).
     for m, area, cid, _reason in org.births:
+        if words_by_vector and area not in ("sight", "sound"):
+            words.setdefault(cid, set()).add(word_of_vector(org.words.cells[cid], org.g.ear_blank_zero))
+            continue
         (sight if area == "sight" else (sound if area == "sound" else words)).setdefault(cid, set()).add(moment_thing[m])
     for _m, area, kept, dropped in org.merges:
         L = sight if area == "sight" else (sound if area == "sound" else words)
