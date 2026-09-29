@@ -9,7 +9,8 @@
 set -euo pipefail
 NAME="${1:?life name}"; COMMIT="${2:?commit}"; GENOME_REL="${3:?genome rel path, e.g. genome/brain/BRAIN-LEAN.genome}"
 BODY_ARGS="${4:-}"   # edit: Claude (Fable 5.1, the seat), 2026-09-28 21:10 +0400 — the life's extra body arguments (the full organism: "--folder /data/dev/genome/world --plant-after 15000"); empty for a lean life
-SOURCE_REPO=/data/dev/genome-wt-organ   # the INTEGRATION worktree — every builder's worktree shares the same .git object store, so any of them names a valid `git worktree add` source; this is the one the contract names
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 20:15 +0400 — the integration worktree genome-wt-organ is gone; the source is the repo this script lies in (every worktree shares one object store).
+SOURCE_REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 LIVES=/data/dev/genome-lives; ROOT="$LIVES/$NAME"; CODE="$ROOT/code"
 
 [ -e "$ROOT" ] && { echo "root exists: $ROOT — refusing (a life's root is never reused)"; exit 2; }

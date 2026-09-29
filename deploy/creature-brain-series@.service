@@ -1,0 +1,8 @@
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 20:14 +0400 — THE LONG LIFE: one SERIES line per run (%i = the life's name); reads STATUS only, never closes the life.
+[Unit]
+Description=creature-brain-series %i — one line of the life's SERIES.tsv
+
+[Service]
+Type=oneshot
+WorkingDirectory=/data/dev/genome-lives/%i/code
+ExecStart=/usr/bin/python3 tools/lives/series_brain.py --root /data/dev/genome-lives/%i
