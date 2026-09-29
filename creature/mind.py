@@ -790,6 +790,18 @@ class Mind:
             except ImportError as e:
                 raise GenomeError(f"BRAIN declared but genome/brain.py cannot be imported ({e}): the organism does not start")
             self.brain = brain_cls(dict(self.genome.declared["BRAIN"]))
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:35 +0400 — PREREG-INHERIT §3: a root that holds inherit/brain.json|npz gives the NEWBORN its
+        # parent's brain (the learner and the aligned lists; the cited episodes emptied). With no pair this is the old birth,
+        # untouched. `brain_inherited` is STATUS's; the one journal row is written before the life's first row is consumed.
+        self.brain_inherited: Optional[Dict[str, object]] = None
+        self._inherit_row_due = False
+        _pair = self.run_root / "inherit" / "brain"
+        if self.brain is not None and (Path(str(_pair) + ".json").exists() or Path(str(_pair) + ".npz").exists()):
+            try:
+                self.brain, self.brain_inherited = brain_cls.inherit(_pair, dict(self.genome.declared["BRAIN"]))
+            except Exception as e:
+                raise GenomeError(f"{e} (root {self.run_root})")
+            self._inherit_row_due = True
         self.pending_asks: Dict[str, List[Dict[str, object]]] = {}
         self.asks_answered: int = 0
         self.asks_by: Dict[str, int] = {"brain": 0, "organs": 0}
@@ -822,6 +834,9 @@ class Mind:
 
     # ------------------------------------------------------------------ consume
     def consume(self, row: Dict[str, object]) -> None:
+        if self._inherit_row_due:            # PREREG-INHERIT §3: one row, the life's first
+            self._inherit_row_due = False
+            self._write_journal(row["at"], {"kind": "inherit", "seq": row["seq"], **self.brain_inherited})
         sense = row["sense"]
         meta = row.get("meta") or {}
         moment = meta.get("moment")
@@ -1580,6 +1595,8 @@ class Mind:
                "refused_rows": self.brain_refused, "restored": self.brain_restored}
         if self._drive is not None:            # PREREG-BRAIN-DRIVES: the turn counts, only under the gene
             out["turns"] = dict(self.brain_turns)
+        if self.brain_inherited is not None:   # PREREG-INHERIT §3: only a child carries the field
+            out["inherited"] = dict(self.brain_inherited)
         return out
 
     def _consume_body(self, row: Dict[str, object]) -> None:
@@ -3757,6 +3774,7 @@ class Mind:
                 if (state_dir / "brain.npz").exists() and (state_dir / "brain.json").exists():
                     mind.brain = _brain_class().load(state_dir / "brain", dict(mind.genome.declared["BRAIN"]))
                     mind.brain_restored = True
+                    mind._inherit_row_due = False      # PREREG-INHERIT §3: the inherit row is in the journal of the life that saved
                 else:
                     mind.brain_restored = False
             # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
