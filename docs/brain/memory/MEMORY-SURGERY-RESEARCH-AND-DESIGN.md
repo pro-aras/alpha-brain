@@ -137,3 +137,33 @@ M-6 states its own limit: it gives the look of a written word and its neighbours
 - Generative Agents: https://arxiv.org/pdf/2304.03442
 
 *The seat read the search summaries and abstracts of these sources tonight, not the full papers. Each is to be read whole before its law is signed.*
+
+## 13 · ADDENDUM 1 — what the fuller reading adds (2026-09-29 21:02 +0400, the seat, alone)
+
+Read tonight beyond the abstracts: Vetere et al. 2019 in its open copy (https://pmc.ncbi.nlm.nih.gov/articles/PMC7592289/), the retinal-wave pre-training paper (PLOS Computational Biology, 10.1371/journal.pcbi.1012830), and the abstract of Tse et al. 2007 in full. Read through a summarising reader, not line by line: the numbers below are to be checked against the papers' own text before a law quotes them.
+
+### 13.1 · From Vetere 2019
+
+| What they did | What the build takes from it |
+|---|---|
+| Ten pairings in one session made the memory | An implant is a small number of authored experiences, not thousands. M-1 reads 10, 100 and 1,000. |
+| Controls: the sight alone, the reward alone, and the two given a day apart | Three controls for every implant: the look with no word, the word with no look, and the look and the word UNPAIRED. The shuffled null of §9 is the third; the first two are added. |
+| The mice avoided the smell of the driven cell and were indifferent to another smell | SPECIFICITY is a mark of its own: an implant of one word must leave the other words' answers unmoved. |
+| Eighteen brain regions answered alike for the real and the made memory | The made memory must be read by the SAME tests as a lived one, never by a test written for it. |
+| Their stated limit: the pattern for a complex stimulus cannot be predicted in advance | This is why every authored experience passes through the brain's own eye: the eye writes the code, we do not guess it. |
+
+### 13.2 · From the retinal-wave pre-training paper
+
+- Networks pre-trained on simulated waves learned natural video faster, and the gain was TEMPORARY: the network without pre-training caught up.
+- The build's prediction, written before any read: a given memory is a HEAD START. The marks at birth will show a large gain; the marks after a full childhood will show little or none. The first INHERIT readings agree at birth (0.804 for the child against 10 items answered by the blank). The reading after 10,000 scenes is still to come.
+- So the value of memory surgery is not judged by the end state alone. It is judged by (a) what the newborn can do on day one, (b) how much less life it needs to reach a bar, and (c) whether it can hold things life would never teach (M-2, the moon).
+- Their control «weights shuffled after pre-training» is taken as a fourth control for road 3: a knowledge implant with its values shuffled.
+
+### 13.3 · The second law, sketched (NOT signed)
+
+METADATA 2 defines what METADATA 1 left: `confirmed`, `contradicted`, `uses`, and the weight of a given memory.
+
+- A LIVED meeting of word w CONFIRMS the given memories of w when the thing the brain attributes w to lies inside w's band as the given memories alone would draw it. It CONTRADICTS them when the attributed thing lies outside that band AND inside the band the lived meetings draw.
+- The counts are kept per word and per run, never per episode: a run is the unit that has an author.
+- A run whose contradictions pass its confirmations is DEMOTED: its episodes stay in the store and leave the prototype. Nothing is deleted.
+- Its marks wait for road 2 and M-3: a false implant must be demoted by life, and a true one must not.
