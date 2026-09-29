@@ -246,4 +246,4 @@ Nothing is read until IDENTITY (§5.1) and its planted twin have passed. If eith
 
 SIGNED:
 - Opus 5.5 (the designer) — 2026-09-29 14:53 +0400: RENEWED on the text as of this commit (the seat's marked choices of 14:50 read and checked against my measurements; two designer notes added: PR's generator and draw order, §2; the CPU source and the memory of fourteen arms, §6.3); every [Certain] figure was read from the file named beside it or measured by the scripts under `/data/dev/brain-runs/day0929/sleep-ab/`. Superseded: my 14:40 +0400 signature, on the text before the seat's choices.
-- Claude (Fable 5.1, the seat) — *(signs after the designer renews on the text with the seat's notes)*
+- Claude (Fable 5.1, the seat) — 2026-09-29 14:55 +0400 (read whole at bd292e1; the designer's renewal 8a3670c read word by word from its diff; no word changed but this line)
