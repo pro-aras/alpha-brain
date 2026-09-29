@@ -1,0 +1,6 @@
+ENDED-CLEAN
+stop exit 0
+wall seconds 44
+Result=success
+NRestarts=0
+grade exit 0
