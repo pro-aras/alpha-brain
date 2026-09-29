@@ -69,6 +69,29 @@ from genome import chain as _chain
 from genome.questions import word_cells
 from genome.sleep import cycle as run_cycle, sleep as run_sleep
 from genome.world import encode_word
+from genome import web as _web
+import traceback as _traceback
+
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 23:37 +0400 — his 23:20 word («add all these features today so it runs for few days»): THE KNOWLEDGE WEB
+# and THE SELF, live, as BOOKKEEPING (KW-1 / KW-2, docs/brain/memory/kweb/). A mind with a brain grows two webs from every heard word
+# (L, and N the steered sprouts; WEB_BETA edges a known word; the spent consolidation test) and a self node from the brain's own turns
+# and learns, with the claims placed below. Nothing is journaled; both ride in the snapshot (state/web.json). An error inside them
+# switches them OFF and is shown (STATUS web_error, web/ERROR.txt); it never reaches the mind.
+WEB_BETA = 10
+WEB_REACH = 20
+SELF_SHAPES = frozenset({"circle", "cross", "ring", "square", "star", "triangle"})
+
+
+def _self_claims():
+    """The memories about itself placed at birth (source implanted-knowledge, author the seat): KW-1's five (PREREG-KW-1 §4.3, verbatim)
+    and one it had never been asked (B1: its own speed)."""
+    a = "the seat"
+    return [_web.Claim("T1", "I look at no more than four places on a canvas.", "always", 0.05, author=a),
+            _web.Claim("T2", "The parent says at most one word of each kind at a time.", "always", 0.05, author=a),
+            _web.Claim("T3", "Usually, what I expect is what the parent says.", "usually", 0.70, author=a),
+            _web.Claim("F1", "I see every thing the parent names.", "always", 0.05, author=a),
+            _web.Claim("F2", "The parent always says three words.", "always", 0.05, author=a),
+            _web.Claim("B1", "My mind keeps up with what I sense.", "usually", 0.90, author=a)]
 
 # A11 (PREREG §11.2): genome.curiosity / genome.think are not yet on master at the time this file was
 # written — imported defensively so creature/mind.py never breaks when they land, and never stubbed here
@@ -805,6 +828,21 @@ class Mind:
         # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:52 +0400 — PREREG-METADATA-1 §2: the scenes this life learns carry its own name as author.
         if self.brain is not None:
             self.brain.author = self.run_root.name
+        # the KNOWLEDGE WEB and the SELF (his 23:20 word; bookkeeping, above WEB_BETA): only a mind with a brain grows them
+        self.webs: Optional[Dict[str, object]] = None
+        self.self_node = None
+        self.web_error: Optional[str] = None
+        self.web_restored: Optional[bool] = None
+        self._self_kinds: Tuple[int, Optional[List[set]]] = (-1, None)
+        if self.brain is not None:
+            try:
+                self.webs = {r: _web.Web(r, beta=WEB_BETA, seed=int(self.genome.seed), spend="harmonic", reach=WEB_REACH,
+                                         author=self.run_root.name) for r in ("L", "N")}
+                self.self_node = _web.SelfNode(author=self.run_root.name)
+                for c in _self_claims():
+                    self.self_node.place(c)
+            except Exception as e:           # pragma: no cover — a construction bug must not stop a life
+                self._web_fail(e)
         self.pending_asks: Dict[str, List[Dict[str, object]]] = {}
         self.asks_answered: int = 0
         self.asks_by: Dict[str, int] = {"brain": 0, "organs": 0}
@@ -853,6 +891,8 @@ class Mind:
             w = meta.get("word")
             if w:
                 self.pending_words.setdefault(moment, []).append(w)
+                if self.webs is not None:
+                    self._web_hear(str(w))
         elif sense == "eye":
             self._consume_eye(row, moment)
         # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: the three new tape senses. Each method
@@ -866,6 +906,8 @@ class Mind:
             self._consume_sit(row)
         elif sense == "body":
             self._consume_body(row)
+            if self.self_node is not None:
+                self._self_body(row)
         # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:48 +0400 — LIFE-D-ACT-SOUND.md item 3
         # (L-13): the branch the brief's own READ FIRST line named as missing ("no ear-sound branch --
         # :244-257"). Gates itself on FAST's own "sound" key (self.sound_episodes is None otherwise), the
@@ -1514,8 +1556,11 @@ class Mind:
             self.brain_turns["turns"] += 1
             self.brain_turns["said"] += turn["say"] is not None
             self.brain_turns["asked"] += turn["ask"] is not None
+            surprise = self.brain.surprise(turn, list(words))
             self._write_journal(row["at"], {"kind": "brain", "act": "turn", **base, **_jsonable(turn), "heard": list(words),
-                                            "surprise": self.brain.surprise(turn, list(words))})
+                                            "surprise": surprise})
+            if self.self_node is not None:
+                self._self_turn(turn, list(words), surprise, int(meta["scene"]))
         out = _jsonable(self.brain.learn(g, list(words), moment=str(moment), scene=int(meta["scene"]), world_seed=int(meta["world_seed"])))
         self.brain_learned += 1
         # PREREG-BRAIN-IN-BODY (the seat, 20:4x): every learn row carries the canvas's located fixations and the eye's hypotheses (member
@@ -1524,9 +1569,74 @@ class Mind:
         fix = [[int(y), int(x)] for (y, x) in (g.get("fix") or [])]
         view = {"fix": fix, "hyps": [[int(i) for i in m] for m in _eye.groups([tuple(f) for f in fix])]}
         self._write_journal(row["at"], {"kind": "brain", "act": "learn", **base, **view, **out})
+        if self.self_node is not None:
+            self._self_canvas(len(fix), int(meta["scene"]))
         if out.get("calibrated"):
             self._write_journal(row["at"], {"kind": "brain", "act": "calibrate", **base, "summary": _jsonable(self.brain.summary())})
             self.write_census()                 # PREREG-METADATA-1 §2: a file, never a journal row
+
+    # -- the KNOWLEDGE WEB and the SELF (his 23:20 word): bookkeeping that can fail only OFF ----------------------------------
+    def _web_fail(self, e: BaseException) -> None:
+        self.web_error = f"{type(e).__name__}: {e}"
+        self.webs = None
+        self.self_node = None
+        try:
+            d = self.run_root / "web"
+            d.mkdir(parents=True, exist_ok=True)
+            with (d / "ERROR.txt").open("a") as f:
+                f.write(f"moment {getattr(self.org, 't', None)} · {self.web_error}\n{''.join(_traceback.format_exception(e))}\n")
+        except Exception:
+            pass
+
+    def _web_hear(self, word: str) -> None:
+        try:
+            for w in self.webs.values():
+                w.hear(word)
+        except Exception as e:
+            self._web_fail(e)
+
+    def _self_kinds_now(self) -> Optional[List[set]]:
+        n = int(self.brain.n_calibrations) if self.brain is not None else 0
+        if n == 0:
+            return None
+        if self._self_kinds[0] != n:
+            self._self_kinds = (n, [set(k) for k in self.brain.types()])
+        return self._self_kinds[1]
+
+    def _self_turn(self, turn: Dict[str, object], heard: List[str], surprise: Optional[float], scene: int) -> None:
+        try:
+            node = self.self_node
+            expected = [list(h) for h in (turn.get("expected") or [])]
+            node.turn(heard, expected, surprise)
+            C = node.claims
+            kinds = self._self_kinds_now()
+            if kinds:
+                C["T2"].observe(all(sum(1 for w in heard if w in k) <= 1 for k in kinds), at=scene)
+            if surprise is not None:
+                C["T3"].observe(surprise == 0, at=scene)
+                shapes = [w for w in heard if w in SELF_SHAPES]
+                if shapes:
+                    union = {x for h in expected for x in h}
+                    C["F1"].observe(any(w in union for w in shapes), at=scene)
+            C["F2"].observe(len(heard) == 3, at=scene)
+        except Exception as e:
+            self._web_fail(e)
+
+    def _self_canvas(self, n_fix: int, scene: int) -> None:
+        try:
+            self.self_node.canvas(n_fix)
+            self.self_node.claims["T1"].observe(n_fix <= 4, at=scene)
+        except Exception as e:
+            self._web_fail(e)
+
+    def _self_body(self, row: Dict[str, object]) -> None:
+        try:
+            reading = ((row.get("meta") or {}).get("reading") or {})
+            bl = reading.get("backlog")
+            if bl is not None:
+                self.self_node.claims["B1"].observe(int(bl) <= 50, at=int(row["seq"]))
+        except Exception as e:
+            self._web_fail(e)
 
     def _answer_ask(self, ask: Dict[str, object], g: Optional[Dict[str, object]], at: str, eye_seq: Optional[int],
                     cache: Dict[str, object]) -> None:
@@ -1601,6 +1711,23 @@ class Mind:
             out["turns"] = dict(self.brain_turns)
         if self.brain_inherited is not None:   # PREREG-INHERIT §3: only a child carries the field
             out["inherited"] = dict(self.brain_inherited)
+        # the KNOWLEDGE WEB and the SELF (his 23:20 word): counts and lengths only — this runs on the STATUS thread, which must never
+        # walk a dict the mind thread is growing (#245)
+        webs, node = self.webs, self.self_node        # one reference each: the mind thread may switch them off between two reads
+        try:
+            if webs is not None or self.web_error is not None:
+                out["web"] = {k: {"t": w.t, "nodes": len(w.nodes), "edges": len(w.edges), "cap": w.cap(),
+                                  "consolidated": int(w.stats["consolidated"]), "replaced": int(w.stats["replaced"]),
+                                  "removed_missed": int(w.stats["removed_missed"])} for k, w in list((webs or {}).items())}
+                out["web_error"] = self.web_error
+                out["web_restored"] = self.web_restored
+            if node is not None:
+                lv = node.lived
+                out["self"] = {"claims": {k: [c.state, c.confirmed, c.contradicted] for k, c in list(node.claims.items())},
+                               "canvases": int(lv["canvases"]), "turns_expecting": int(lv["turns_expecting"]),
+                               "expect_confirmed": int(lv["expect_confirmed"])}
+        except Exception as e:                        # a STATUS read never takes the status thread down
+            out["web_status_error"] = f"{type(e).__name__}: {e}"
         if self.brain is not None:             # PREREG-METADATA-1 §2: the census's totals (the whole census is the file)
             c = self.brain.census()
             out["census"] = {"scenes": c["scenes"], "scenes_by_source": c["scenes_by_source"], "n_words": c["n_words"],
@@ -3675,6 +3802,15 @@ class Mind:
             self.brain.save(brain_tmp)
             os.replace(str(brain_tmp) + ".npz", str(state_dir / "brain.npz"))
             os.replace(str(brain_tmp) + ".json", str(state_dir / "brain.json"))
+        if self.webs is not None or self.self_node is not None:     # the KNOWLEDGE WEB and the SELF (his 23:20 word), before the ledger
+            try:
+                web_state = {"version": 1, "webs": {k: w.to_dict() for k, w in (self.webs or {}).items()},
+                             "self": (self.self_node.to_dict() if self.self_node is not None else None)}
+                web_tmp = state_dir / "web_tmp.json"
+                web_tmp.write_text(json.dumps(web_state, sort_keys=True, separators=(",", ":")))
+                os.replace(str(web_tmp), str(state_dir / "web.json"))
+            except Exception as e:
+                self._web_fail(e)
         ledger_tmp = state_dir / "ledger_tmp.json"
         ledger_tmp.write_text(json.dumps(ledger))
         os.replace(str(ledger_tmp), str(state_dir / "ledger.json"))
@@ -3799,6 +3935,20 @@ class Mind:
                     mind.brain.author = Path(run_root).name   # PREREG-METADATA-1 §2
                 else:
                     mind.brain_restored = False
+            if mind.webs is not None:          # the KNOWLEDGE WEB and the SELF (his 23:20 word): restored when saved; a bad file starts them fresh, said
+                wp = state_dir / "web.json"
+                if wp.exists():
+                    try:
+                        wst = json.loads(wp.read_text())
+                        mind.webs = {k: _web.Web.from_dict(v) for k, v in wst["webs"].items()}
+                        if wst.get("self"):
+                            mind.self_node = _web.SelfNode.from_dict(wst["self"])
+                        mind.web_restored = True
+                    except Exception as e:
+                        mind.web_error = f"restore failed, started fresh: {type(e).__name__}: {e}"
+                        mind.web_restored = False
+                else:
+                    mind.web_restored = False
             # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
             # (L-8): restore the act rng's stream exactly (absent from a snapshot taken before this gene
             # existed -> the freshly-seeded stream __init__ already built, unchanged).
