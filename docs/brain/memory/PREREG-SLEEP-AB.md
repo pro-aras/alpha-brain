@@ -64,7 +64,8 @@ Each arm is ONE genome text: `code/genome/ALPHA4.genome` (the file `unit.env` ra
 | **S** by surprise (the law) | `SLEEP    every 2500 moments replay 200 by surprise` | yes (it is the line) |
 | **U(d)** uniform, d = 1 … 10 | `SLEEP    every 2500 moments replay 200 uniform seed <d>` | no: the branch's parser |
 | **P** protect the strong | `SLEEP    every 2500 moments replay 200 strong` | no: the branch's parser |
-| **N** none | `SLEEP    every 2500 moments replay 0 by surprise` | **yes**: `replay (\d+)` takes 0 |
+| **N** none | `SLEEP    every 2500 moments replay 0 by surprise` | **yes**: `replay (\d+)` takes 0 *(seat, 2026-09-29 14:50 +0400: checked under the life's own code; it parses to `{"every": 2500, "replay": 0}`)* |
+| **PR** P's own null *(seat, 2026-09-29 14:50 +0400: ADDED, §5.6)* | `SLEEP    every 2500 moments replay 200 balanced seed 1` | no: the branch's parser |
 
 **What every arm keeps.** The boundary rule is the law's: a sleep fires after the canvas at which `org.t` crosses the next multiple of 2,500. At a boundary the mind runs, in order: the replay, `cycle()`, curiosity's `sleep_boundary()`, EVOLVE's adoption point (`creature/mind.py:1495–1542`). A replayed moment is an ordinary `Organism.moment`: HEBB, DELTA, MISFIRE, PRUNE, MERGE, births. The arms differ in ONE thing: the ordered list of episode ids handed to the replay.
 
@@ -91,6 +92,8 @@ Measured on the two law-arm states on disk [Certain, `measure/ring.json`]: at se
 **Rejected: the brief's example** (rank every self-consistent episode by its own edge `W[s0, w0]`, take the top 200). At seq 51,303 its 200 fall on 4 words («is» 114, «arrow» 68, «y» 11, «z» 7); at 93,188 on 3. It protects a few saturated memories. T-MEM-1's gate protected EVERY strong word. **Why tier 2:** at the first sleeps few words can have 20 ring rows; without tier 2, P would replay fewer than 200 and its clock would drift from S's (below).
 
 **A limit of P, measured.** STRONG is read on STORED episodes. At seq 51,303 tree is 385 of 398 self-consistent and house 362 of 400, while the held-out exam read tree 0.0 and house 0.2 at the end of w2. [Certain] So P can keep a thing «strong» that no longer generalises. Whether rehearsing the stored episodes restores held-out naming is what the A/B measures.
+
+**PR — P's own null** *(seat, 2026-09-29 14:50 +0400)*. The same fill as P with the STRONG test removed and nothing read from the organism: tier 1 = every word with ≥ 20 live ring episodes, in an order drawn by `default_rng([20260923, 1, k])`; a word's episodes in an order drawn by the same generator; one episode from each word in turn, round after round, until 200; if slots remain, the words with fewer than 20, the same way. PR is word-balanced rehearsal with no «strong» in it. P against PR is what «the strong» adds.
 
 **N — none.** `replay 0` parses (`machinery.py:387`). `most_surprising(0)` returns `[]` (`fast.py:186`). The boundary still runs `cycle()`, curiosity and the EVOLVE point; nothing is replayed. **N runs on the life's own code, unchanged.** **Rejected: the line ABSENT.** `_maybe_sleep` then returns at once (`mind.py:1501`). That also removes CYCLE's consolidation pass (57 of 80 sleeps on 09-23 ran it), curiosity's window close and EVOLVE's adoption point: four mechanisms, not one.
 
@@ -136,6 +139,7 @@ Measured on the two law-arm states on disk [Certain, `measure/ring.json`]: at se
 | N | branch (its line also runs on 7bbc995) | ≤ 50,094 | `--exam-every 500 --read-list --timings` | the floor |
 | P | branch | ≤ 50,094 | same | protect the strong |
 | U(1) … U(10) | branch | ≤ 50,094 | same | ten draws |
+| PR | branch | ≤ 50,094 | same | P's own null *(seat, 2026-09-29 14:50 +0400)* |
 | S′ planted | branch, `replay 199` | ≤ 2,000 | `--against` | must DIVERGE at seq 1,271 |
 | U(1) twice | branch | ≤ 6,000 | — | determinism |
 
@@ -181,7 +185,7 @@ Each control is blind to ONE thing, and each says what it must still be able to 
    - both: `organism_hash_unchanged_by_exam` true; 34.3 s and 32.5 s a sitting at 9,172 alive sight cells, on a crowded box.
    So the exam sees a lost association in THIS organism at its largest, thing by thing.
 5. **U IS A DISTRIBUTION.** Ten draws, d = 1 … 10, printed as a band (min, max, mean). S, P and N are read against the band, never against one draw (#244 (2)).
-6. **Not run, and what it leaves open.** P's own null: the same round-robin over RANDOM words with ≥ 20 ring rows, their episodes drawn at random. Without it, a P win cannot be split into «the strong» against «word-balanced rehearsal». (T-MEM-1's GATE beat GATE-RANDOM at 1 of 3 seeds.) Priced in §6.3 if the seat wants it.
+6. **P's own null, PR.** The same round-robin over RANDOM words with ≥ 20 ring rows, their episodes drawn at random (§2). Without it, a P win cannot be split into «the strong» against «word-balanced rehearsal». (T-MEM-1's GATE beat GATE-RANDOM at 1 of 3 seeds.) *(seat, 2026-09-29 14:50 +0400: the draft left it «not run»; it RUNS. With lever H it costs about 1 CPU-h, and a control blind to exactly one thing is what P's claim needs (#228's fifth gate). It is ONE draw: a P win over PR is read against U's ten-draw band for its size.)*
 
 ## 6 · The price
 
@@ -212,6 +216,7 @@ Each control is blind to ONE thing, and each says what it must still be able to 
 | + P's own null (§5.6) | ≈ 3.5 | ≈ 6 | +1 | + 3.5 |
 | + controls (S′ to 2,000 rows; U(1) twice to 6,000) | — | — | — | + ≈ 0.2 |
 
+- **THE SEAT'S CHOICES** *(Claude (Fable 5.1), 2026-09-29 14:50 +0400)*: (1) **the 12 h cut**, as proposed; (2) **U × 10**; (3) **PR runs**; (4) **lever H is TAKEN for N, P, PR and every U**: S keeps its hash (identity needs it). So 14 arms: S ≈ 3.5 CPU-h and thirteen at ≈ 1.0, ≈ 17 CPU-h solo-equivalent. (5) **The launch shape:** the arms start only after the word road's gate has ended and no suite runs; each arm is its own user unit (`systemd-run --user`, BLAS threads 1, nice 10), so it outlives the session; at most 14 at once on the 16 threads. (6) **The price is re-measured in THAT shape** (#242): each arm's own `timings.jsonl` gives its CPU; the report prints the load beside it. No mark here reads a cost, so crowding moves the wall clock and nothing else.
 - **At 4 arms at a time** on this 16-thread box, 45 CPU-h is ≈ 12 h of wall before crowding, ≈ 15–20 h with it (#236, #242). The price is for THAT shape only if it is re-measured in it. [Likely]
 - **Lever H (the seat's choice, not in the arms' definition).** The per-row state hash is output only; nothing in the mind reads it. The arms U, P and N do not need it: they are compared by their marks, never by journal identity. A replay-only switch in `creature/mind.py` that writes `"hash": null` on mind rows cuts each of them to ≈ 1.0 CPU-h (the canvas work, CYCLE, the snapshots, the exams and P's selection remain). Its cost: one more file on the branch, outside the SLEEP rule. Its proof: U(1) over the first 6,000 rows with and without the switch, journals identical except `hash`; S always runs with the hash (identity). The snapshot's own digest stays (the exam's load gate).
 
@@ -225,7 +230,7 @@ Each control is blind to ONE thing, and each says what it must still be able to 
   - identity of rows 51,543–93,188.
 
 ## 7 · The decision rule
-Nothing is read until IDENTITY (§5.1) and its planted twin have passed. If either fails, the A/B is VOID and says which. Then: **the SLEEP line of the next life CHANGES to rule X (P or U)** when READ-W0-out is gradable and X recognises more of the 224 than S at the cut's end by z ≥ 2 (for U: the ten draws' mean does, and ≥ 8 of the 10 draws each beat S), AND X loses no more of the 13 maker things than S does plus one (a thing is «lost» when its level at the end of its unshown window is ≤ 0.2 after ≥ 0.8 at the end of its learning window); if both P and U qualify, P is taken only if it also beats U's mean by z ≥ 2, else U, the simpler rule. **The line CHANGES to `replay 0`** when S recognises fewer of the 224 than N by z ≥ 2 and neither P nor U beats N: the law's rehearsal only harms here. **The line is KEPT** when no rule clears those bars and S is not worse than N by z ≥ 2 nor by more than one lost thing. **«This world cannot tell»** is the reading when N forgets nothing measurable (§5.3) and S does not differ from N; or when READ-W0-out is UNDERPOWERED (fewer than 30 of the 224 recognised by S at the end-w0 sitting) and the maker readings of S, P and N all lie inside U's ten-draw band. The maker marks never change the line alone: they are UNDERPOWERED (13 things). They can only VETO a change (the «plus one» clause). READ-W0-in, SER and each arm's CPU are printed beside the verdict; they decide nothing.
+Nothing is read until IDENTITY (§5.1) and its planted twin have passed. If either fails, the A/B is VOID and says which. Then: **the SLEEP line of the next life CHANGES to rule X (P or U)** when READ-W0-out is gradable and X recognises more of the 224 than S at the cut's end by z ≥ 2 (for U: the ten draws' mean does, and ≥ 8 of the 10 draws each beat S), AND X loses no more of the 13 maker things than S does plus one (a thing is «lost» when its level at the end of its unshown window is ≤ 0.2 after ≥ 0.8 at the end of its learning window); if both P and U qualify, P is taken only if it also beats U's mean by z ≥ 2 AND beats PR, its own null, by z ≥ 2 *(seat, 2026-09-29 14:50 +0400: the PR clause added; a P that does not beat PR is word-balanced rehearsal, and U is the simpler rule that has it)*, else U, the simpler rule. **The line CHANGES to `replay 0`** when S recognises fewer of the 224 than N by z ≥ 2 and neither P nor U beats N: the law's rehearsal only harms here. **The line is KEPT** when no rule clears those bars and S is not worse than N by z ≥ 2 nor by more than one lost thing. **«This world cannot tell»** is the reading when N forgets nothing measurable (§5.3) and S does not differ from N; or when READ-W0-out is UNDERPOWERED (fewer than 30 of the 224 recognised by S at the end-w0 sitting) and the maker readings of S, P and N all lie inside U's ten-draw band. The maker marks never change the line alone: they are UNDERPOWERED (13 things). They can only VETO a change (the «plus one» clause). READ-W0-in, SER and each arm's CPU are printed beside the verdict; they decide nothing.
 
 ## 8 · What this does not claim
 - **It is not a life.** The tape is the law arm's world. The game frames followed the LAW's acts. The `sit` rows return the LAW's exam scores to every arm as a sense (the reflex ring). The door answers answer the LAW's questions. An arm is «what this mind learns from this stream», never «what it would have lived».
@@ -237,7 +242,8 @@ Nothing is read until IDENTITY (§5.1) and its planted twin have passed. If eith
 - **The law's win on its own 51 words is a property of the frozen set** (§0.1), which ends when the ring wraps. It is printed, never read as the law's merit in a longer life.
 - **P is one definition of «protect the strong».** Its STRONG test reads stored episodes (§2). It is not T-MEM-1's gate.
 - **Nothing here reads the on-disk `state/`.** It is the resurrected organism.
+- *(seat)* **One fact stands whatever the A/B reads:** for its first 12 hours the law rehearsed ONE fixed set of 200 episodes, the first ≈ 15 minutes of the life, at every sleep (§0.1). The seat checked its two causes under the life's own code: the stored surprise is never updated, and ties go to the smaller id. That is reported to him as a finding of its own.
 
 SIGNED:
 - Opus 5.5 (the designer) — 2026-09-29 14:40 +0400: signed on this text; every [Certain] figure was read from the file named beside it or measured by the scripts under `/data/dev/brain-runs/day0929/sleep-ab/`.
-- Claude (Fable 5.1, the seat) — 
+- Claude (Fable 5.1, the seat) — *(signs after the designer renews on the text with the seat's notes)*
