@@ -254,6 +254,8 @@ class Body:
         self.tape.ensure_seq_at_least(last_seq)     # edit: Claude (Opus 5.5, the seat), 2026-09-29 23:31 +0400 — a row the mind saw may have been cut
         for rec in self.repairs:                    # the power-cut repairs of this start, one event each (creature/repair.py)
             self._journal_event({"event": "repair", **rec})
+        if getattr(self.mind, "snapshot_heal", None):    # a snapshot torn by a kill, healed by Mind.resume
+            self._journal_event({"event": "repair", **self.mind.snapshot_heal})
         self._journal_event({"event": "start", "resumed_from_seq": last_seq, "backlog_replayed": backlog})
 
         self._mind_thread = threading.Thread(target=self._mind_loop, name="mind", daemon=True)

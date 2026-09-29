@@ -46,6 +46,7 @@ import inspect
 import json
 import os
 import re
+import shutil
 import statistics
 from pathlib import Path
 from typing import Callable, Dict, FrozenSet, List, Optional, Tuple
@@ -80,6 +81,69 @@ import traceback as _traceback
 WEB_BETA = 10
 WEB_REACH = 20
 SELF_SHAPES = frozenset({"circle", "cross", "ring", "square", "star", "triangle"})
+
+
+class SnapshotCrash(RuntimeError):
+    """Raised only by the test hook `_crash_after_renames`: the process «dies» inside a snapshot's renames."""
+
+
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 23:54 +0400 — his 23:20 word; the days life's pre-flight died on a snapshot TORN by a kill (organism.* from
+# moment 5,700, ledger.json from 5,200: every restart `KeyError: 5204`). A snapshot is now a GENERATION (see Mind.snapshot); a resume
+# that finds its files disagreeing heals here BEFORE anything loads, and says so (repairs/REPAIRS.jsonl, and the body journals it).
+def _fingerprint(p: Path) -> List[int]:
+    s = p.stat()
+    return [int(s.st_size), int(s.st_mtime_ns)]
+
+
+def _generation_t(d: Path) -> Optional[int]:
+    """The moment a state directory's generation stands at, or None when it is torn: with SNAPSHOT.json, EVERY file it lists must be
+    there with the size and write time it recorded (a file renamed from another generation differs), and the organism, the ledger
+    and the marker must name one moment; without it (a life saved before generations), the organism and the ledger must agree."""
+    try:
+        o = int(json.loads((d / "organism.json").read_text())["t"])
+        l = int(json.loads((d / "ledger.json").read_text())["moments"])
+        if not (d / "organism.npz").exists():
+            return None
+        if (d / "SNAPSHOT.json").exists():
+            gen = json.loads((d / "SNAPSHOT.json").read_text())
+            if int(gen["t"]) != o:
+                return None
+            for name, fp in (gen.get("prints") or {}).items():
+                if not (d / name).exists() or _fingerprint(d / name) != list(fp):
+                    return None
+    except Exception:
+        return None
+    return o if o == l else None
+
+
+def _heal_torn_snapshot(run_root: Path) -> Optional[Dict[str, object]]:
+    from creature import repair as _repair
+    st = Path(run_root) / "state"
+    if not any((st / n).exists() for n in ("organism.npz", "organism.json", "ledger.json", "SNAPSHOT.json")):
+        return None                                    # a life with no snapshot yet: nothing to heal
+    if _generation_t(st) is not None:
+        return None
+    stamp = _repair._now().replace(":", "").replace("-", "")
+    q = Path(run_root) / _repair.QDIR
+    q.mkdir(parents=True, exist_ok=True)
+    rec: Dict[str, object] = {"at": _repair._now(), "kind": "torn_snapshot", "file": "state", "offset": None, "bytes": None,
+                              "nul_bytes": None, "lines": None, "sha256": None}
+    prev = st / "prev"
+    kept = q / f"state.torn.{stamp}"
+    if prev.exists() and _generation_t(prev) is not None:
+        kept.mkdir()
+        names = json.loads((prev / "SNAPSHOT.json").read_text())["files"] + ["SNAPSHOT.json"]
+        for n in names:
+            if (st / n).exists():
+                shutil.copy2(str(st / n), str(kept / n))
+            if (prev / n).exists():
+                os.replace(str(prev / n), str(st / n))
+        rec.update({"restored": "prev", "t": _generation_t(st), "quarantine": str(kept.relative_to(run_root))})
+    else:
+        os.replace(str(st), str(kept))
+        rec.update({"restored": "none: rebuilt from the tape", "t": None, "quarantine": str(kept.relative_to(run_root))})
+    _repair._record(Path(run_root), rec)
+    return rec
 
 
 def _self_claims():
@@ -833,6 +897,8 @@ class Mind:
         self.self_node = None
         self.web_error: Optional[str] = None
         self.web_restored: Optional[bool] = None
+        self.snapshot_heal: Optional[Dict[str, object]] = None     # set by resume() when a torn snapshot was healed
+        self._crash_after_renames: Optional[int] = None            # a TEST hook: «die» after this many renames of a snapshot
         self._self_kinds: Tuple[int, Optional[List[set]]] = (-1, None)
         if self.brain is not None:
             try:
@@ -3709,10 +3775,13 @@ class Mind:
         an ear row consumed just before a crash."""
         state_dir = self.run_root / "state"
         state_dir.mkdir(parents=True, exist_ok=True)
+        # edit: Claude (Opus 5.5, the seat), 2026-09-29 23:54 +0400 — a snapshot is a GENERATION (his 23:20 word; the pre-flight's torn snapshot): every file
+        # is written under a staged name FIRST, the complete generation already on disk is kept as hard links in state/prev/, then the
+        # staged files are renamed back to back and SNAPSHOT.json {t, last_seq, files} LAST. A resume heals a torn one (_heal_torn_snapshot).
+        staged: List[Tuple[Path, Path]] = []
         tmp_base = state_dir / "organism_tmp"
         self.org.save(tmp_base)
-        os.replace(str(tmp_base) + ".npz", str(state_dir / "organism.npz"))
-        os.replace(str(tmp_base) + ".json", str(state_dir / "organism.json"))
+        staged += [(Path(str(tmp_base) + ".npz"), state_dir / "organism.npz"), (Path(str(tmp_base) + ".json"), state_dir / "organism.json")]
 
         ledgers = self.ledgers()
         predictor_last_winner = None
@@ -3800,36 +3869,54 @@ class Mind:
         if self.brain is not None:
             brain_tmp = state_dir / "brain_tmp"
             self.brain.save(brain_tmp)
-            os.replace(str(brain_tmp) + ".npz", str(state_dir / "brain.npz"))
-            os.replace(str(brain_tmp) + ".json", str(state_dir / "brain.json"))
-        if self.webs is not None or self.self_node is not None:     # the KNOWLEDGE WEB and the SELF (his 23:20 word), before the ledger
+            staged += [(Path(str(brain_tmp) + ".npz"), state_dir / "brain.npz"), (Path(str(brain_tmp) + ".json"), state_dir / "brain.json")]
+        if self.webs is not None or self.self_node is not None:     # the KNOWLEDGE WEB and the SELF (his 23:20 word)
             try:
                 web_state = {"version": 1, "webs": {k: w.to_dict() for k, w in (self.webs or {}).items()},
                              "self": (self.self_node.to_dict() if self.self_node is not None else None)}
                 web_tmp = state_dir / "web_tmp.json"
                 web_tmp.write_text(json.dumps(web_state, sort_keys=True, separators=(",", ":")))
-                os.replace(str(web_tmp), str(state_dir / "web.json"))
+                staged.append((web_tmp, state_dir / "web.json"))
             except Exception as e:
                 self._web_fail(e)
+        # A9 / G5-K / L-13 / LIFE-F: the episode rings (Episodes.save is atomic onto the path it is given: here, a STAGED path)
+        for ring, name in ((self.episodes, "episodes.npz"), (self.outcome_episodes, "outcome_episodes.npz"),
+                           (self.sound_episodes, "sound_episodes.npz"), (self.touch_episodes, "touch_episodes.npz"),
+                           (self.smell_episodes, "smell_episodes.npz")):
+            if ring is not None:
+                sp = state_dir / (name + ".staged")
+                ring.save(sp)
+                staged.append((sp, state_dir / name))
         ledger_tmp = state_dir / "ledger_tmp.json"
         ledger_tmp.write_text(json.dumps(ledger))
-        os.replace(str(ledger_tmp), str(state_dir / "ledger.json"))
-
-        if self.episodes is not None:      # A9: FAST's episodes are saved with the snapshot (Episodes.save is already atomic: tmp + os.replace internally)
-            self.episodes.save(state_dir / "episodes.npz")
-        if self.outcome_episodes is not None:   # G5-K: the reflex ring — same class, same atomic save; never hashed (state_hash reads only org.c/cells/W)
-            self.outcome_episodes.save(state_dir / "outcome_episodes.npz")
-        if self.sound_episodes is not None:   # LIFE builder D (L-13): the sound ring — same class, same atomic save; never hashed
-            self.sound_episodes.save(state_dir / "sound_episodes.npz")
-        # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:34 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md
-        # items 3/4: the touch/smell rings — same class, same atomic save; never hashed.
-        if self.touch_episodes is not None:
-            self.touch_episodes.save(state_dir / "touch_episodes.npz")
-        if self.smell_episodes is not None:
-            self.smell_episodes.save(state_dir / "smell_episodes.npz")
+        staged.append((ledger_tmp, state_dir / "ledger.json"))
+        gen_tmp = state_dir / "SNAPSHOT_tmp.json"
+        gen_tmp.write_text(json.dumps({"t": int(self.org.t), "last_seq": int(self.last_seq or 0),
+                                       "files": [f.name for _s, f in staged],
+                                       "prints": {f.name: _fingerprint(s) for s, f in staged}}, sort_keys=True))
+        self._keep_prev_generation(state_dir)
+        for i, (s, f) in enumerate(staged):
+            if self._crash_after_renames is not None and i >= self._crash_after_renames:
+                raise SnapshotCrash(f"the test hook: stopped after {i} renames")
+            os.replace(str(s), str(f))
+        os.replace(str(gen_tmp), str(state_dir / "SNAPSHOT.json"))
 
         self._last_snapshot_moments = self.org.t
         self.snapshot_count += 1
+
+    def _keep_prev_generation(self, state_dir: Path) -> None:
+        """Hard-link the COMPLETE generation now on disk into state/prev/ (a torn one is never kept)."""
+        gen = state_dir / "SNAPSHOT.json"
+        if not gen.exists() or _generation_t(state_dir) is None:
+            return
+        tmpd, prev = state_dir / "prev_tmp", state_dir / "prev"
+        shutil.rmtree(tmpd, ignore_errors=True)
+        tmpd.mkdir()
+        for n in json.loads(gen.read_text())["files"] + ["SNAPSHOT.json"]:
+            if (state_dir / n).exists():
+                os.link(str(state_dir / n), str(tmpd / n))
+        shutil.rmtree(prev, ignore_errors=True)
+        os.replace(str(tmpd), str(prev))
 
     def close(self) -> None:
         # edit: Claude (Sonnet 5, LIFE builder E), 2026-09-22 20:43 +0400 — L-5: a tape can end (or a life
@@ -3855,8 +3942,10 @@ class Mind:
         (birth) `genome_path`, so a process restart after an adoption does not silently revert to pre-
         adoption gene values; `evolve_epoch` is restored to that same n (never re-derived from a persisted
         counter — the files on disk ARE the count)."""
+        heal = _heal_torn_snapshot(Path(run_root))       # his 23:20 word: a snapshot torn by a kill is healed BEFORE anything loads
         evolve_epoch, evolved_path = _latest_evolved_genome(Path(run_root))
         mind = cls(evolved_path if evolved_path is not None else genome_path, run_root, blind=blind)
+        mind.snapshot_heal = heal
         mind.evolve_epoch = evolve_epoch
         state_dir = Path(run_root) / "state"
         npz, meta, ledger_path = state_dir / "organism.npz", state_dir / "organism.json", state_dir / "ledger.json"
