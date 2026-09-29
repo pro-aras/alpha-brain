@@ -1,6 +1,10 @@
 # edit: Claude (Opus 5.5, the seat), 2026-09-29 22:52 +0400 — PREREG-KW-1 §2 and §4.3 (docs/brain/memory/kweb/, signed 865adcf): THE KNOWLEDGE WEB.
 # edit: Claude (Opus 5.5, the seat), 2026-09-29 22:49 +0400 — PREREG-KW-1 AMENDMENT 1: consolidation = c >= k AND k spaced occasions AND a Poisson tail
 # P(X >= c | E) < alpha (the signed lift test passed chance bursts); `m` leaves, `gap` and `alpha` enter; edges carry `occ`.
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 23:34 +0400 — KW-2 (VERDICT-KW-1 «What changes» 2; his 23:20 «what you decided seems right»), for a LIFE
+# of days: rule N (one sprout a heard word, to its recent context, judged only after); `spend` (the consolidation test spends its error,
+# alpha / (k (k + 1)) at an edge's k-th look); `beta` (a budget of beta edges per known word, growing with the vocabulary); the victim
+# found by an INDEX equal to KW-1's scan (`check_victims` asserts it); Claim/SelfNode load back. KW-1's defaults are unchanged.
 """genome/web.py — a web of heard words, every fact about it kept (never inferred), grown by one of six rules.
 
 NODES are heard words: `n` (times heard), `first`, `last` (the order of life, 1-based, in words heard), `source`, `author`.
@@ -26,16 +30,19 @@ after `min_events`; a demoted claim keeps its counts.
 """
 from __future__ import annotations
 
+import heapq
 import json
 import math
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
-RULES = ("H", "F", "L", "S", "R", "S0")
-RULE_TAG = {"H": 0, "F": 1, "L": 2, "S": 3, "R": 4, "S0": 5}
-REMOVING = ("L", "S", "R", "S0")
-VERSION = 1
+RULES = ("H", "F", "L", "S", "R", "S0", "N")
+RULE_TAG = {"H": 0, "F": 1, "L": 2, "S": 3, "R": 4, "S0": 5, "N": 6}
+REMOVING = ("L", "S", "R", "S0", "N")
+SPROUTING = ("R", "N")
+VERSION = 2
+READS = (1, 2)
 
 
 class WebError(Exception):
@@ -62,12 +69,22 @@ def poisson_sf(c: int, E: float) -> float:
 
 class Web:
     def __init__(self, rule: str, budget: Optional[int] = None, seed: int = 0, *, d: int = 3, k: int = 3, gap: Optional[int] = None,
-                 alpha: float = 1e-3, p: float = 0.5, z: int = 10, source: str = "lived", author: Optional[str] = None):
+                 alpha: float = 1e-3, p: float = 0.5, z: int = 10, source: str = "lived", author: Optional[str] = None,
+                 beta: Optional[float] = None, spend: Optional[str] = None, reach: int = 20, check_victims: bool = False):
         if rule not in RULES:
             raise WebError(f"rule {rule!r} is not one of {RULES}")
-        if rule != "H" and (budget is None or int(budget) < 1):
-            raise WebError(f"rule {rule} needs a budget >= 1, got {budget!r}")
-        self.rule, self.budget, self.seed = rule, (None if rule == "H" else int(budget)), int(seed)
+        if rule != "H":
+            if budget is not None and beta is not None:
+                raise WebError(f"rule {rule}: a fixed budget OR a per-word beta, not both")
+            if (budget is None or int(budget) < 1) and (beta is None or float(beta) <= 0):
+                raise WebError(f"rule {rule} needs a budget >= 1 or a beta > 0, got budget {budget!r} beta {beta!r}")
+        if spend not in (None, "harmonic"):
+            raise WebError(f"spend {spend!r} is not None | 'harmonic'")
+        self.rule, self.budget, self.seed = rule, (None if rule == "H" or budget is None else int(budget)), int(seed)
+        self.beta = None if rule == "H" or beta is None else float(beta)
+        self.spend, self.reach, self.check_victims = spend, int(reach), bool(check_victims)
+        self.context: List[str] = []                     # N: the last `reach` distinct words, most recent first
+        self._heap: List[Tuple[int, int, Tuple[str, str]]] = []
         self.d, self.k, self.p, self.z = int(d), int(k), float(p), int(z)
         self.gap = 2 * self.d if gap is None else int(gap)
         self.alpha = float(alpha)
@@ -83,19 +100,50 @@ class Web:
                       "sprouted": 0, "sprout_existing": 0, "consolidated": 0, "evidence": 0}
 
     # -- the edges --------------------------------------------------------------------------------
+    def cap(self) -> Optional[int]:
+        """The budget now: fixed, or beta edges per known word (at least 1)."""
+        if self.budget is not None:
+            return self.budget
+        if self.beta is not None:
+            return max(1, int(self.beta * len(self.nodes)))
+        return None
+
+    def _push(self, key: Tuple[str, str]) -> None:
+        e = self.edges[key]
+        if e["state"] == "silent":
+            heapq.heappush(self._heap, (int(e["c"]), int(e["touch"]), key))
+            if len(self._heap) > 4 * len(self.edges) + 1024:
+                self._heap = [(int(v["c"]), int(v["touch"]), kk) for kk, v in self.edges.items() if v["state"] == "silent"]
+                heapq.heapify(self._heap)
+
+    def _scan_victim(self) -> Optional[Tuple[str, str]]:
+        best, victim = None, None
+        for kk, e in self.edges.items():
+            if e["state"] != "silent":
+                continue
+            cand = (e["c"], e["touch"], kk)
+            if best is None or cand < best:
+                best, victim = cand, kk
+        return victim
+
+    def _index_victim(self) -> Optional[Tuple[str, str]]:
+        while self._heap:
+            c, touch, kk = self._heap[0]
+            e = self.edges.get(kk)
+            if e is not None and e["state"] == "silent" and e["c"] == c and e["touch"] == touch:
+                return kk
+            heapq.heappop(self._heap)
+        return None
+
     def _new_edge(self, key: Tuple[str, str], c: int) -> bool:
-        if self.budget is not None and len(self.edges) >= self.budget:
+        cap = self.cap()
+        if cap is not None and len(self.edges) >= cap:
             if self.rule == "F":
                 self.stats["refused"] += 1
                 return False
-            victim = None
-            best = None
-            for kk, e in self.edges.items():
-                if e["state"] != "silent":
-                    continue
-                cand = (e["c"], e["touch"], kk)
-                if best is None or cand < best:
-                    best, victim = cand, kk
+            victim = self._index_victim()
+            if self.check_victims:
+                assert victim == self._scan_victim(), (victim, self._scan_victim())
             if victim is None:
                 self.stats["refused"] += 1
                 return False
@@ -103,11 +151,12 @@ class Web:
             self.stats["replaced"] += 1
         t = self.t
         self.edges[key] = {"c": int(c), "occ": (1 if c else 0), "t0": t, "last": (t if c else None), "touch": t, "miss": [0, 0],
-                           "state": "silent", "consolidated_at": None, "source": self.source, "author": self.author}
+                           "state": "silent", "consolidated_at": None, "source": self.source, "author": self.author, "looks": 0}
         for w in key:
             self._adj.setdefault(w, set()).add(key)
         if c:
             self._check(key)
+        self._push(key)
         return True
 
     def _drop(self, key: Tuple[str, str]) -> None:
@@ -124,7 +173,9 @@ class Web:
         t = self.t
         fa, fb = self.nodes[key[0]]["n"] / t, self.nodes[key[1]]["n"] / t
         E = 2 * self.d * fa * fb * max(1, t - e["t0"] + 1)
-        if poisson_sf(int(e["c"]), E) < self.alpha:
+        e["looks"] = int(e.get("looks", 0)) + 1
+        a = self.alpha if self.spend is None else self.alpha / (e["looks"] * (e["looks"] + 1))
+        if poisson_sf(int(e["c"]), E) < a:
             e["state"], e["consolidated_at"] = "consolidated", t
             self.stats["consolidated"] += 1
 
@@ -137,6 +188,7 @@ class Web:
         e["miss"] = [0, 0]
         self.stats["evidence"] += 1
         self._check(key)
+        self._push(key)
 
     def _event(self, a: str, b: str, touched: set) -> None:
         """One pair event (a != b), under the rule. R never makes an edge here; S0 redirects before calling."""
@@ -146,7 +198,7 @@ class Web:
             self._evidence(key)
             touched.add(key)
             return
-        if self.rule == "R":
+        if self.rule in SPROUTING:
             return
         self.stats["offered"] += 1
         if self.rule in ("S", "S0") and self.rng.random() >= self.p:
@@ -177,11 +229,17 @@ class Web:
                 self._event(self.order[int(i)], self.order[int(j)], touched)
             else:
                 self._event(u, w, touched)
+        x = None
         if self.rule == "R" and len(self.order) >= 2:
             while True:
                 x = self.order[int(self.rng.integers(len(self.order)))]
                 if x != w:
                     break
+        elif self.rule == "N":
+            cands = [y for y in self.context if y != w]
+            if cands:
+                x = cands[int(self.rng.integers(len(cands)))]
+        if x is not None:
             key = _key(w, x)
             self.stats["sprouted"] += 1
             if key in self.edges:
@@ -200,6 +258,8 @@ class Web:
                     self._drop(key)
                     self.stats["removed_missed"] += 1
         self.recent = ([w] + [x for x in self.recent if x != w])[: self.d]
+        if self.rule == "N":
+            self.context = ([w] + [x for x in self.context if x != w])[: self.reach]
 
     # -- reading --------------------------------------------------------------------------------
     def consolidated(self) -> List[Tuple[str, str]]:
@@ -218,6 +278,7 @@ class Web:
     def to_dict(self) -> Dict[str, object]:
         return {"version": VERSION, "rule": self.rule, "budget": self.budget, "seed": self.seed, "d": self.d, "k": self.k,
                 "gap": self.gap, "alpha": self.alpha, "p": self.p, "z": self.z, "source": self.source, "author": self.author, "t": self.t,
+                "beta": self.beta, "spend": self.spend, "reach": self.reach, "context": self.context,
                 "nodes": self.nodes, "order": self.order, "recent": self.recent,
                 "edges": [[a, b, e] for (a, b), e in sorted(self.edges.items())],
                 "rng": self.rng.bit_generator.state, "stats": self.stats}
@@ -227,16 +288,23 @@ class Web:
 
     @classmethod
     def loads(cls, s: str) -> "Web":
-        st = json.loads(s)
-        if st.get("version") != VERSION:
-            raise WebError(f"loads: version {st.get('version')!r}, this module reads {VERSION}")
+        return cls.from_dict(json.loads(s))
+
+    @classmethod
+    def from_dict(cls, st: Dict[str, object]) -> "Web":
+        if st.get("version") not in READS:
+            raise WebError(f"loads: version {st.get('version')!r}, this module reads {READS}")
         w = cls(st["rule"], st["budget"], st["seed"], d=st["d"], k=st["k"], gap=st["gap"], alpha=st["alpha"], p=st["p"], z=st["z"],
-                source=st["source"], author=st["author"])
+                source=st["source"], author=st["author"], beta=st.get("beta"), spend=st.get("spend"), reach=st.get("reach", 20))
         w.t, w.nodes, w.order, w.recent, w.stats = st["t"], st["nodes"], st["order"], st["recent"], st["stats"]
+        w.context = list(st.get("context") or [])
         for a, b, e in st["edges"]:
+            e.setdefault("looks", 0)
             w.edges[(a, b)] = e
             w._adj.setdefault(a, set()).add((a, b))
             w._adj.setdefault(b, set()).add((a, b))
+        w._heap = [(int(v["c"]), int(v["touch"]), kk) for kk, v in w.edges.items() if v["state"] == "silent"]
+        heapq.heapify(w._heap)
         w.rng.bit_generator.state = st["rng"]
         return w
 
@@ -267,7 +335,7 @@ def recount_errors(web: Web, words: Sequence[str]) -> List[str]:
         return errs
     for key, e in web.edges.items():
         ts = events.get(key, [])
-        made_by_pair = e["t0"] in ts and web.rule != "R"
+        made_by_pair = e["t0"] in ts and web.rule not in SPROUTING
         after = [t for t in ts if t > e["t0"]]
         c = (1 if made_by_pair else 0) + len(after)
         last = (after[-1] if after else (e["t0"] if made_by_pair else None))
@@ -320,6 +388,13 @@ class Claim:
                 "share_confirmed": (self.confirmed / n if n else None), "state": self.state,
                 "first_demoted_at": self.first_demoted_at, "first_event_at": self.first_event_at, "min_events": self.min_events}
 
+    @classmethod
+    def from_dict(cls, d: Dict[str, object]) -> "Claim":
+        c = cls(d["id"], d["text"], d["quantifier"], d["level"], source=d["source"], author=d["author"], min_events=d["min_events"])
+        c.confirmed, c.contradicted, c.state = int(d["confirmed"]), int(d["contradicted"]), d["state"]
+        c.first_demoted_at, c.first_event_at = d["first_demoted_at"], d["first_event_at"]
+        return c
+
 
 # edit: Claude (Opus 5.5, the seat), 2026-09-29 22:55 +0400 — PREREG-KW-1 §4.3: THE SELF NODE: the claims placed in it and what its life measures.
 class SelfNode:
@@ -358,4 +433,11 @@ class SelfNode:
     def to_dict(self) -> Dict[str, object]:
         return {"author": self.author, "claims": {k: c.to_dict() for k, c in sorted(self.claims.items())},
                 "lived": json.loads(json.dumps(self.lived))}
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, object]) -> "SelfNode":
+        n = cls(author=d.get("author"))
+        n.claims = {k: Claim.from_dict(v) for k, v in (d.get("claims") or {}).items()}
+        n.lived = json.loads(json.dumps(d.get("lived") or n.lived))
+        return n
 
