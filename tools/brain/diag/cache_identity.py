@@ -40,6 +40,19 @@ for ws in SEEDS:
                 bad += 1; print(f"DIFF {ws}/{rel}/{s}: {d}")
             else:
                 print(f"equal {ws}/{rel}/{s}  rows {rows}")
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 13:17 +0400 — optional argv[2]: an EARLIER redraw that holds the «held» set (test seeds
+# 2026150x, first drawn under F-M6 — the scored root has none): the held caches of the redrawn root against that root's.
+if len(sys.argv) > 2:
+    H = Path(sys.argv[2])
+    for ws in SEEDS:
+        for s in FR:
+            da, db = H / str(ws) / "held/cache" / s, B / str(ws) / "held/cache" / s
+            d = compare(da, db); n += 1
+            rows = len(np.load(db / "glances.npy", mmap_mode="r"))
+            if d:
+                bad += 1; print(f"DIFF {ws}/held/cache/{s}: {d}")
+            else:
+                print(f"equal {ws}/held/cache/{s}  rows {rows}")
 print(f"caches compared {n} · differing {bad}")
 d = compare(A / "20261102/cache/train", B / "20261102/cache/train", plant=True)
 print("CONTROL (one bit flipped in the redrawn glances.npy, in memory):", "CAUGHT " + str(d) if d else "MISSED")

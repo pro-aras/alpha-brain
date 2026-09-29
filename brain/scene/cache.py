@@ -52,7 +52,13 @@ from . import world as W
 # genome/machinery.py, brain/scene/world.py and this file (all WORLD_CODE), so check_code refuses every cache under scene-organ; this
 # tree's run root is FRESH again (RUNS = scene-organ-fm6): every cache is redrawn there (cache-r, now with the «held» set) and the
 # fresh and older sets' caches are proven array-identical to the scored ones (tools/brain/diag/cache_identity.py <this root>).
-RUNS = Path("/data/dev/brain-runs/scene-organ-fm6")
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 13:17 +0400 — PREREG-WORD-ROAD §5: the gene HEAR changes genome/machinery.py (the parser branch,
+# Organism.moment's list form) and this file, both WORLD_CODE, so check_code refuses every cache under scene-organ-fm6; this
+# tree's run root is FRESH again (RUNS = scene-organ-hear): every cache is redrawn there (cache-r) and proven array-identical
+# to the scored ones and, for the «held» set, to F-M6's (tools/brain/diag/cache_identity.py <this root> <F-M6's root>). No eye
+# or world line changed: the redraw is the pin's price, not a new world.
+RUNS = Path("/data/dev/brain-runs/scene-organ-hear")
+FM6_RUNS = Path("/data/dev/brain-runs/scene-organ-fm6")       # F-M6's redraw (the pre-HEAR code), read as plain files only
 SCENE_ORGAN_RUNS = Path("/data/dev/brain-runs/scene-organ")   # rung 1's redraw (the pre-F-M6 code), read as plain files only
 S1B1R_RUNS = Path("/data/dev/brain-runs/scene-s1b1r")
 S1B1_RUNS = Path("/data/dev/brain-runs/scene-s1b1")

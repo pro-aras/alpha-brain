@@ -98,8 +98,25 @@ def read_mind_journal(path: Path) -> List[Dict[str, object]]:
     return [r for r in _read_jsonl(path) if is_mind_row(r)]
 
 
+def _counters(mind: Mind, row: Dict[str, object], canvases: int) -> Dict[str, object]:
+    """edit: Claude (Fable 5.1, the seat), 2026-09-29 13:07 +0400 — PREREG-WORD-ROAD §4 mark G: one READ of the replayed organism's own counters
+    (Organism.summary: cells, births, every refusal counter), its budget and arrivals, and the word cells by the word each one
+    holds (the mind's own ledgers). Read-only: nothing here writes the mind or the organism."""
+    org = mind.org
+    Lw = mind.ledgers()["words"]
+    names: Dict[str, int] = {}
+    for cid, ws in Lw.items():
+        if org.words.alive[cid]:
+            for w in ws:
+                names[w] = names.get(w, 0) + 1
+    return json.loads(json.dumps({"seq": row.get("seq"), "canvases": canvases, **org.summary(), "arrivals": org.arrivals,
+                                  "budget_left": org.budget_left, "hear_shared_cell": getattr(org, "hear_shared_cell", None),
+                                  "hear_words_refused": getattr(mind, "hear_words_refused", None),
+                                  "word_cells": dict(sorted(names.items()))}, default=int))
+
+
 def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenSet[str] = frozenset(), close: bool = False,
-               timings: bool = False, exam_every: int = 0) -> Path:
+               timings: bool = False, exam_every: int = 0, counters_every: int = 0) -> Path:
     """Feeds `tape_path`'s rows (one day file, sorted by seq -- defensive, they are already in order) to
     a fresh Mind in a temporary root whose tape/payload is a symlink to the source tape's own payload
     directory (never copied: replay never writes to the source tape). Returns DIR/journal.jsonl's path.
@@ -143,6 +160,12 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     # control is the same journal with exam_every 0.
     import time as _time
     tf = (out_dir / "timings.jsonl").open("w") if timings else None
+    # `counters_every` (edit: Claude (Fable 5.1, the seat), 2026-09-29 13:07 +0400 — PREREG-WORD-ROAD §4 mark G): every N canvases THAT CARRIED A
+    # WORD (the organism's worded moments), and once after the last row, one row of DIR/counters.jsonl (`_counters`, above).
+    # Outside the mind's road like the two instruments above: the journal is byte-identical with or without it (pinned by
+    # tests/creature/test_hear_mind.py).
+    cf = (out_dir / "counters.jsonl").open("w") if counters_every > 0 else None
+    worded, moment_has_word = 0, set()
     eye_rows = 0
     exam_dir = out_dir / "exam"
     for row in rows:
@@ -151,6 +174,15 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
         if tf is not None:
             tf.write(json.dumps({"seq": row.get("seq"), "sense": row.get("sense"), "source": (row.get("meta") or {}).get("source"),
                                  "ms": round((_time.perf_counter() - t0) * 1000.0, 3)}) + "\n")
+        if cf is not None:
+            m_ = (row.get("meta") or {}).get("moment")
+            if row.get("sense") == "ear":
+                moment_has_word.add(m_)
+            elif row.get("sense") == "eye" and m_ in moment_has_word:
+                moment_has_word.discard(m_)
+                worded += 1
+                if worded % counters_every == 0:
+                    cf.write(json.dumps(_counters(mind, row, worded)) + "\n")
         if exam_every > 0 and row.get("sense") == "eye":
             eye_rows += 1
             if eye_rows % exam_every == 0:
@@ -159,6 +191,9 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
                 _exam_module.run_exam(work_root, genome_path, held=10, check_tape=0)
     if tf is not None:
         tf.close()
+    if cf is not None:
+        cf.write(json.dumps({**_counters(mind, rows[-1] if rows else {}, worded), "final": True}) + "\n")
+        cf.close()
     if close:
         mind.close()
     if exam_every > 0 and (work_root / "exam").exists():
@@ -217,7 +252,8 @@ def main(argv: List[str]) -> int:
 
     exam_every = int(argv[argv.index("--exam-every") + 1]) if "--exam-every" in argv else 0
     out_journal = run_replay(genome_path, tape_path, out_dir, blind=blind, close="--closed" in argv,   # --closed: the tape is a closed life's whole record
-                             timings="--timings" in argv, exam_every=exam_every)   # A4 ladder instruments (2026-09-23 10:58 +0400)
+                             timings="--timings" in argv, exam_every=exam_every,
+                             counters_every=(int(argv[argv.index("--counters-every") + 1]) if "--counters-every" in argv else 0))   # A4 ladder instruments (2026-09-23 10:58 +0400)
 
     if "--against" in argv:
         against_path = Path(argv[argv.index("--against") + 1])

@@ -1,0 +1,23 @@
+the five suites on 0ca9a74 (2026-09-29 14:19:37 +0400 → 2026-09-29 14:43:55 +0400), BLAS threads 1
+== scene exit=0
+Ran 368 tests in 231.572s
+OK
+== brainvenv exit=0
+Ran 770 tests in 697.275s
+OK (skipped=2)
+== genome exit=0
+Ran 629 tests in 303.208s
+OK (skipped=1, expected failures=6)
+== creature exit=1
+Ran 1199 tests in 1455.716s
+FAILED (failures=1, skipped=6)
+FAIL: test_61_questions_60_fetches_1_refused_rate (tests.creature.test_web_door.TestWebDoorGating.test_61_questions_60_fetches_1_refused_rate)
+== tools exit=0
+Ran 80 tests in 268.505s
+OK
+
+the creature suite's ONE failure above was a wall-clock test (60 fetches in 2.0 s) run beside the gate's phase 2 (load about 15): 46 were made.
+that test alone on an idle box: 3 runs, 3 OK (2.0 s each; /data/dev/brain-runs/day0929/wordroad/logs/webdoor-alone-{1,2,3}.log).
+the creature suite WHOLE again on 0ca9a74, 14:52:59 to 15:08:44 +0400, load 1 to 3: exit 0
+Ran 1199 tests in 945.466s
+OK (skipped=6)

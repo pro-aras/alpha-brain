@@ -122,5 +122,40 @@ class Preflight(unittest.TestCase):
         self.assertEqual(declared["BRAIN"]["calibrate_at"], [250])
 
 
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 11:58 +0400 — his 2026-09-29 00:48 word («go for the best decisions which would work for the AI
+# we want to build»), decision 2: `young 3 nearest` (F-M6, AMENDMENT 1 §2, gate PASS on never-used scenes) is the LAW of the next brain
+# lives, so every template a life is seeded from carries it. The pre-flight template too: a pre-flight runs the law of the life it
+# pre-flights. The closed lives' own genomes under lives/ are RECORDS and are not touched (LeanNearest above pins the pair).
+class TemplatesCarryNearest(unittest.TestCase):
+    TEMPLATES = ("BRAIN-LEAN.genome", "BRAIN-FULL.genome", "BRAIN-LEAN-PREFLIGHT.genome")
+
+    def test_every_brain_template_declares_young_3_nearest(self):
+        for name in self.TEMPLATES:
+            with self.subTest(name=name):
+                brain = parse_genome((BRAIN_DIR / name).read_text()).declared["BRAIN"]
+                self.assertEqual(brain["young"], 3)
+                self.assertEqual(brain.get("young_rule"), "nearest")
+
+    def test_the_change_is_the_young_rule_alone(self):
+        # each template's parsed BRAIN equals the closed life's law (lives/BRAIN-LEAN-20261101.genome) plus the rule, except
+        # the pre-flight's own declared calibration schedule
+        law = parse_genome((BRAIN_DIR / "lives" / "BRAIN-LEAN-20261101.genome").read_text()).declared["BRAIN"]
+        self.assertNotIn("young_rule", law)
+        for name in self.TEMPLATES:
+            with self.subTest(name=name):
+                brain = dict(parse_genome((BRAIN_DIR / name).read_text()).declared["BRAIN"])
+                want = {**law, "young_rule": "nearest"}
+                if name == "BRAIN-LEAN-PREFLIGHT.genome":
+                    want["calibrate_at"] = [250]
+                self.assertEqual(brain, want)
+
+    def test_the_closed_lives_genomes_are_untouched(self):
+        lives = BRAIN_DIR / "lives"
+        for name in ("BRAIN-LEAN-20261101.genome", "BRAIN-LEAN-20261102.genome", "BRAIN-LEAN-20261103.genome",
+                     "BRAIN-FULL-20261102.genome"):
+            with self.subTest(name=name):
+                self.assertNotIn("young_rule", parse_genome((lives / name).read_text()).declared["BRAIN"])
+
+
 if __name__ == "__main__":
     unittest.main()
