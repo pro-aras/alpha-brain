@@ -90,6 +90,18 @@ By the number of things in the scene, four fixations see the named thing: one th
 4. **So F-M2B was closed too early in one sense and rightly in another:** alone it is not a fix (DIAG-M2B stands); beside the look it is the other half of one.
 5. **The arm the training rows choose,** by the rule «the highest worst-seed refusal on the proxy among the arms whose hold, size and colour rates fall by no more than 0.02 at any seed»: **one look at blobs of ≥ 6 cells, the reader from the meetings where «none» did not fire.** It also wastes the fewest looks (0.27 a scene; 0.05–0.07 where every thing was already seen).
 
+**The reader's change has two halves, and both carry** *(the seat, 2026-09-29 15:26 +0400; one look at blobs of ≥ 6 cells; the proxy; `/data/dev/brain-runs/day0929/lookagain/halves/`)*:
+
+| the reader's store | never-taught shape refused | a taught shape held by its own name |
+|---|---|---|
+| every meeting, every thing in view weighed by responsibility (the law's reader) | 0.273 / 0.266 / 0.335 | 0.945 / 0.934 / 0.939 |
+| every meeting, the attributed thing alone | 0.616 / 0.655 / 0.693 | 0.931 / 0.931 / 0.929 |
+| the meetings where «none» did not fire, weighed by responsibility | 0.406 / 0.408 / 0.430 | 0.934 / 0.921 / 0.931 |
+| **the meetings where «none» did not fire, the attributed thing alone** | **0.756 / 0.806 / 0.805** | 0.914 / 0.905 / 0.920 |
+| THE TRUE referent (a reading) | 0.759 / 0.821 / 0.804 | 0.930 / 0.919 / 0.931 |
+
+So a control for the fix's gate is at hand: the same reader with the «none» flags ignored must read lower.
+
 ## 4 · What this does not show
 - **§1 and §2 are geometry.** §3 is the bench on training rows and on test sets already read. None of it is a gate: the fix is graded on a test set never used, after its law is signed.
 - **§3 reads test 2b only.** What the look does to tests 1, 2a, 3 and 6, and to the mouth, is not read here.
