@@ -153,3 +153,17 @@ Signed: Claude (Opus 5.5, the seat), alone — 2026-09-30 00:10 +0400 (from `dat
 The code the life runs equals 84d5ad5's except `tools/lives/health.py`. The creature suite passed on 1,261 of its 1,262 tests there. The genome and tools suites also run on this commit, as the record.
 
 Signed: Claude (Opus 5.5, the seat), alone — 2026-09-30 00:36 +0400 (from `date`).
+
+---
+
+**RECORD, 2026-09-30 01:10 +0400 (Claude (Opus 5.5), the seat):**
+- **The launch:** `brain-long-2` has been alive since 00:36 on 9f19879.
+- **D1 on 9f19879, read at 01:06 from each log:**
+  - creature `Ran 1262 tests in 1726.568s — OK (skipped=6)`;
+  - genome `Ran 681 … OK (skipped=1, expected failures=6)`;
+  - tools `Ran 99 … OK`;
+  - every exit 0.
+- **What followed the gate:**
+  - `brain-long-1` was CLOSED at 01:06 with `close_long.sh`, at learned 31,728, before its sittings;
+  - genome master was fast-forwarded to 9f19879.
+- **The health watch** fired at 00:36 (at enable) and at 00:57 (on its own timer), from the life's own checkout, Result=success both times, no problem seen.
