@@ -1,0 +1,11 @@
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 23:42 +0400 — every 20 min, and 4 min after a boot (a power cut must not end the life).
+[Unit]
+Description=creature-brain-health %i, every 20 min and at boot
+
+[Timer]
+OnBootSec=4min
+OnUnitActiveSec=20min
+AccuracySec=30sec
+
+[Install]
+WantedBy=timers.target

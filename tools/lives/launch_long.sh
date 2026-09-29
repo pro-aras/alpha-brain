@@ -18,6 +18,7 @@ MemoryMax=20G
 FEOF
 echo "[launch_long $NAME] fence: $(grep -c Memory "$DROP/fence.conf") lines in $DROP/fence.conf"
 bash "$HERE/launch_brain.sh" "$NAME" "$COMMIT" "$GENOME_REL" "$BODY_ARGS"
-systemctl --user enable --now "creature-g5-watch@$NAME.timer" "creature-brain-series@$NAME.timer"
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 23:42 +0400 — + the health watch and bounded recovery (his 23:20 word)
+systemctl --user enable --now "creature-g5-watch@$NAME.timer" "creature-brain-series@$NAME.timer" "creature-brain-health@$NAME.timer"
 systemctl --user show "creature-brain@$NAME.service" -p MemoryHigh -p MemoryMax -p ActiveState
 systemctl --user list-timers --no-pager | grep -F "$NAME" || true

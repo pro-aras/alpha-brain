@@ -4,5 +4,6 @@
 set -euo pipefail
 NAME="${1:?life name}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-systemctl --user disable --now "creature-g5-watch@$NAME.timer" "creature-brain-series@$NAME.timer"
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 23:42 +0400 — + the health watch (a timer that outlived its life would restart nothing, but #240: nothing stays enabled)
+systemctl --user disable --now "creature-g5-watch@$NAME.timer" "creature-brain-series@$NAME.timer" "creature-brain-health@$NAME.timer" 2>&1 | grep -v "not loaded" || true
 bash "$HERE/close_brain.sh" "$NAME"

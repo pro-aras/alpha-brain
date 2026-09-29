@@ -1,0 +1,9 @@
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 23:42 +0400 — his 23:20 word: the health watch of a days-long life (%i = its name): HEALTH.md, HEALTH.jsonl,
+# and the bounded recovery (a failed life restarted at most 4 times a day; a frozen one at most once in 6 h; never a closed one).
+[Unit]
+Description=creature-brain-health %i — the watch and the bounded recovery of a days-long life
+
+[Service]
+Type=oneshot
+WorkingDirectory=/data/dev/genome-lives/%i/code
+ExecStart=/usr/bin/python3 -B tools/lives/health.py --root /data/dev/genome-lives/%i --unit creature-brain@%i.service --recover
