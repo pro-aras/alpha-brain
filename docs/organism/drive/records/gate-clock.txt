@@ -1,0 +1,21 @@
+2026-09-29 17:06:42 +0400 the gate starts at c68da99; PREREG sha256 a5fdea1e45e36e3f; load 19.22 19.74 18.67
+17:56:06 bench-jb-20261103 exit 0; load 30.08 31.50 31.33
+17:56:07 bench-jb-20261102 exit 0; load 30.08 31.50 31.33
+17:56:07 bench-jb-20261101 exit 0; load 30.08 31.50 31.33
+17:56:38 bench-g-20261104 exit 0; load 29.02 31.08 31.20
+17:56:38 bench-j-20261101 exit 0; load 29.02 31.08 31.20
+17:56:38 bench-j-20261103 exit 0; load 29.02 31.08 31.20
+17:56:38 bench-j-20261102 exit 0; load 29.02 31.08 31.20
+--- THE BOX STOPPED HARD at 18:59 (no shutdown record) and came back at 19:00. Complete before it: every bench run; the pair of 20261102 (off exit 0, on exit 0).
+2026-09-29 19:11:49 +0400 the gate RESUMES at c68da99; load 0.11 0.11 0.06
+19:26:48 on-20261103 done; load 3.93 4.71 3.28
+19:26:58 on-20261101 done; load 3.55 4.60 3.26
+19:26:58 plant-20261102 done; load 3.55 4.60 3.26
+19:26:58 off-20261101 done; load 3.55 4.60 3.26
+19:26:58 off-20261103 done; load 3.55 4.60 3.26
+off-20261101 replay exit 0 · on-20261101 replay exit 0
+off-20261102 replay exit 0 · on-20261102 replay exit 0
+off-20261103 replay exit 0 · on-20261103 replay exit 0
+plant-20261102 replay exit 1 (it must not be 0)
+2026-09-29 19:26:58 +0400 the runs are done (an ON replay failed: 0)
+19:27:06 the reader exit 0

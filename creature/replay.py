@@ -170,10 +170,14 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     exam_dir = out_dir / "exam"
     for row in rows:
         t0 = _time.perf_counter() if tf is not None else None
+        c0 = _time.process_time() if tf is not None else None
         mind.consume(row)
         if tf is not None:
+            # edit: Claude (Fable 5.1, the seat), 2026-09-29 16:38 +0400 — PREREG-BRAIN-DRIVES §4 mark C: `cpu_ms` beside the wall `ms` (the
+            # process's own CPU for this row; on a crowded box the wall reading prices the box, SOLUTIONS #243 (5)). One key added.
             tf.write(json.dumps({"seq": row.get("seq"), "sense": row.get("sense"), "source": (row.get("meta") or {}).get("source"),
-                                 "ms": round((_time.perf_counter() - t0) * 1000.0, 3)}) + "\n")
+                                 "ms": round((_time.perf_counter() - t0) * 1000.0, 3),
+                                 "cpu_ms": round((_time.process_time() - c0) * 1000.0, 3)}) + "\n")
         if cf is not None:
             m_ = (row.get("meta") or {}).get("moment")
             if row.get("sense") == "ear":

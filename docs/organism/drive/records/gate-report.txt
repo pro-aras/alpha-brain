@@ -1,0 +1,16 @@
+PREREG-BRAIN-DRIVES — the gate, read from /data/dev/brain-runs/day0929/drive/runs and /data/dev/brain-runs/day0929/drive/bench
+
+  I1  PASS
+  I2  PASS
+  JB  PASS
+  J   PASS
+  S   PASS
+  U   PASS
+  R   PASS
+  D   PASS
+  E   PASS
+  C   PASS
+  the identity plant's exit: 1 (it must not be 0)
+  the planted say caught: True
+  ADOPT: True
+

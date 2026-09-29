@@ -864,6 +864,16 @@ def parse_genome(text: str) -> Genome:
                 if not m:
                     raise GenomeError(f"HEAR: cannot read {a!r} (PREREG-WORD-ROAD §1: HEAR every word; thing last; arrival last)")
                 g["declared"]["HEAR"] = {"words": "every", "thing": "last", "arrival": "last"}
+            # edit: Claude (Fable 5.1, the seat), 2026-09-29 16:29 +0400 — PREREG-BRAIN-DRIVES §2.1 (signed 3aa380b): the gene DRIVE. ONE form; any other
+            # word refuses by name. The brain takes its TURN at every canvas it hears, BEFORE it hears: it expects, it says
+            # (`says 1`), it asks (`asks 1`); read by creature/mind.py:_brain_canvas → genome/brain.py:Brain.turn. Absent: every row
+            # of every life is what it was. DRIVE beside no BRAIN line is refused where the whole genome is known (Mind.__init__).
+            elif gene == "DRIVE":
+                m = re.fullmatch(r"brain turn before hearing; says ([01]); asks ([01])", a)
+                if not m:
+                    raise GenomeError(f"DRIVE: cannot read {a!r} (PREREG-BRAIN-DRIVES §2.1: DRIVE brain turn before hearing; "
+                                      f"says 0|1; asks 0|1)")
+                g["declared"]["DRIVE"] = {"says": int(m.group(1)), "asks": int(m.group(2))}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:

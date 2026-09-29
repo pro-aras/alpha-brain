@@ -1,0 +1,6 @@
+2026-09-29 16:40:51 +0400 start at cbfe46a; load 14.86 14.82 14.82
+16:40:51 rsync exit 0
+17:01:08 cache-r exit 0
+17:01:44 cache-identity exit 0
+17:06:20 cache-new-world exit 0
+2026-09-29 17:06:20 +0400 done; load 19.67 19.87 18.68

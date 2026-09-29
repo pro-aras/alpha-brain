@@ -57,8 +57,11 @@ class LeanVsTwin(unittest.TestCase):
         lean_code = [l for l in lean_only if not l.startswith("#")]
         twin_code = [l for l in twin_only if not l.startswith("#")]
         self.assertEqual(twin_code, [])
-        self.assertEqual(len(lean_code), 1)
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 19:28 +0400 — PREREG-BRAIN-DRIVES §6 (the gate passed): the lean template carries the brain's
+        # two lines, BRAIN and DRIVE (the turn is the brain's; the twin has no brain and so no turn). Was: the BRAIN line alone.
+        self.assertEqual(len(lean_code), 2)
         self.assertTrue(lean_code[0].startswith("BRAIN "), lean_code[0])
+        self.assertTrue(lean_code[1].startswith("DRIVE "), lean_code[1])
 
 
 class FullEqualsAlpha4PlusTwo(unittest.TestCase):
@@ -67,7 +70,8 @@ class FullEqualsAlpha4PlusTwo(unittest.TestCase):
         full_declared = parse_genome((BRAIN_DIR / "BRAIN-FULL.genome").read_text()).declared
         extra = set(full_declared) - set(alpha4_declared)
         missing = set(alpha4_declared) - set(full_declared)
-        self.assertEqual(extra, {"BRAIN", "WORLD_SCENE"})
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 19:28 +0400 — PREREG-BRAIN-DRIVES §6: + DRIVE (was BRAIN and WORLD_SCENE alone)
+        self.assertEqual(extra, {"BRAIN", "DRIVE", "WORLD_SCENE"})
         self.assertEqual(missing, set())
         for k in alpha4_declared:
             if k == "SEED":
@@ -155,6 +159,29 @@ class TemplatesCarryNearest(unittest.TestCase):
                      "BRAIN-FULL-20261102.genome"):
             with self.subTest(name=name):
                 self.assertNotIn("young_rule", parse_genome((lives / name).read_text()).declared["BRAIN"])
+
+
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 19:27 +0400 — PREREG-BRAIN-DRIVES §6: the gate passed, so every template a life is seeded from carries
+# the DRIVE line. The closed lives' own genomes under lives/ are RECORDS: those of the lives that were LIVED carry no DRIVE line
+# (the gate's ON genomes, named ...-DRIVE-..., are the gate's own records).
+class TemplatesCarryDrive(unittest.TestCase):
+    TEMPLATES = ("BRAIN-LEAN.genome", "BRAIN-FULL.genome", "BRAIN-LEAN-PREFLIGHT.genome")
+
+    def test_every_brain_template_declares_the_turn(self):
+        for name in self.TEMPLATES:
+            with self.subTest(name=name):
+                self.assertEqual(parse_genome((BRAIN_DIR / name).read_text()).declared["DRIVE"], {"says": 1, "asks": 1})
+
+    def test_the_lived_lives_genomes_are_untouched(self):
+        lives = BRAIN_DIR / "lives"
+        for name in ("BRAIN-LEAN-20261101.genome", "BRAIN-LEAN-20261102.genome", "BRAIN-LEAN-20261103.genome",
+                     "BRAIN-FULL-20261102.genome", "BRAIN-LEAN-NEAREST-20261102.genome"):
+            with self.subTest(name=name):
+                self.assertNotIn("DRIVE", parse_genome((lives / name).read_text()).declared)
+
+    def test_the_twin_template_carries_no_turn(self):
+        # the twin is lived under `--blind brain`: no brain, no turn; its template declares no DRIVE line
+        self.assertNotIn("DRIVE", parse_genome((BRAIN_DIR / "BRAIN-LEAN-TWIN.genome").read_text()).declared)
 
 
 if __name__ == "__main__":

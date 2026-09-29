@@ -795,6 +795,14 @@ class Mind:
         self.asks_by: Dict[str, int] = {"brain": 0, "organs": 0}
         self.brain_learned: int = 0
         self.brain_refused: int = 0
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 16:28 +0400 — PREREG-BRAIN-DRIVES §2.1 / §2.4: the gene DRIVE. The brain takes its TURN at
+        # every canvas it hears, before it hears. Refused BY NAME beside no BRAIN line (a turn needs a brain); under `--blind brain`
+        # there is no brain and no turn (the twin). The counts are STATUS's and the snapshot's, written only under the gene.
+        self._drive: Optional[Dict[str, int]] = self.genome.declared.get("DRIVE")
+        if self._drive is not None and "BRAIN" not in self.genome.declared:
+            raise GenomeError("DRIVE declared beside no BRAIN line: the turn is the brain's (PREREG-BRAIN-DRIVES §2.1) — "
+                               "the organism does not start")
+        self.brain_turns: Dict[str, int] = {"turns": 0, "said": 0, "asked": 0}
 
         (self.run_root / "journal").mkdir(parents=True, exist_ok=True)
         (self.run_root / "state").mkdir(parents=True, exist_ok=True)
@@ -1479,6 +1487,17 @@ class Mind:
             self._write_journal(row["at"], {"kind": "brain", "act": "refused", **base,
                                             "reason": "an eye row the brain hears carries no scene / world_seed"})
             return
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 16:28 +0400 — PREREG-BRAIN-DRIVES §2.4: under DRIVE the brain takes its turn BEFORE it
+        # learns from this canvas (it expects, it says, it asks — read-only, genome/brain.py:Brain.turn), its surprise is read
+        # against the instant's words, and ONE row is journaled ahead of the learn row. The learning below is untouched.
+        if self._drive is not None:
+            turn = self.brain.turn(g, scene=int(meta["scene"]), world_seed=int(meta["world_seed"]),
+                                   says=int(self._drive["says"]), asks=int(self._drive["asks"]))
+            self.brain_turns["turns"] += 1
+            self.brain_turns["said"] += turn["say"] is not None
+            self.brain_turns["asked"] += turn["ask"] is not None
+            self._write_journal(row["at"], {"kind": "brain", "act": "turn", **base, **_jsonable(turn), "heard": list(words),
+                                            "surprise": self.brain.surprise(turn, list(words))})
         out = _jsonable(self.brain.learn(g, list(words), moment=str(moment), scene=int(meta["scene"]), world_seed=int(meta["world_seed"])))
         self.brain_learned += 1
         # PREREG-BRAIN-IN-BODY (the seat, 20:4x): every learn row carries the canvas's located fixations and the eye's hypotheses (member
@@ -1556,9 +1575,12 @@ class Mind:
         if self.brain is None and "BRAIN" not in self.genome.declared and not self.asks_answered and not self.pending_asks:
             return None
         base = _jsonable(self.brain.summary()) if self.brain is not None else {"brain": None, "blind": "brain" in self.blind}
-        return {**base, "asks_answered": self.asks_answered, "asks_by": dict(self.asks_by),
-                "asks_pending": sum(len(v) for v in self.pending_asks.values()), "learn_rows": self.brain_learned,
-                "refused_rows": self.brain_refused, "restored": self.brain_restored}
+        out = {**base, "asks_answered": self.asks_answered, "asks_by": dict(self.asks_by),
+               "asks_pending": sum(len(v) for v in self.pending_asks.values()), "learn_rows": self.brain_learned,
+               "refused_rows": self.brain_refused, "restored": self.brain_restored}
+        if self._drive is not None:            # PREREG-BRAIN-DRIVES: the turn counts, only under the gene
+            out["turns"] = dict(self.brain_turns)
+        return out
 
     def _consume_body(self, row: Dict[str, object]) -> None:
         """BODY-SENSES.md §4.1: "the readings; the DRIVE is the mind's" -- this gene carries no threshold, so
@@ -3609,6 +3631,8 @@ class Mind:
         if "BRAIN" in self.genome.declared or self.pending_asks or self.asks_answered:
             ledger["asks"] = {"pending": {k: list(v) for k, v in self.pending_asks.items()}, "answered": self.asks_answered,
                               "by": dict(self.asks_by), "learned": self.brain_learned, "refused": self.brain_refused}
+            if self._drive is not None:        # PREREG-BRAIN-DRIVES: written only under the gene (every other ledger is what it was)
+                ledger["asks"]["turns"] = dict(self.brain_turns)
         if self.brain is not None:
             brain_tmp = state_dir / "brain_tmp"
             self.brain.save(brain_tmp)
@@ -3726,6 +3750,9 @@ class Mind:
             mind.asks_by = {"brain": 0, "organs": 0, **{str(k): int(v) for k, v in (asks_.get("by") or {}).items()}}
             mind.brain_learned = int(asks_.get("learned", 0))
             mind.brain_refused = int(asks_.get("refused", 0))
+            for k_, v_ in (asks_.get("turns") or {}).items():     # PREREG-BRAIN-DRIVES: restored when present (DRIVE only)
+                if k_ in mind.brain_turns:
+                    mind.brain_turns[k_] = int(v_)
             if mind.brain is not None:
                 if (state_dir / "brain.npz").exists() and (state_dir / "brain.json").exists():
                     mind.brain = _brain_class().load(state_dir / "brain", dict(mind.genome.declared["BRAIN"]))

@@ -387,6 +387,67 @@ class Brain:
             band = None if wst is None else wst["band"]
         return {"kind": "because", "word": word, "episodes": cited, "rule": {"over": [c["moment"] for c in cited], "band": band}}
 
+    # -- the brain's own turn -------------------------------------------------------------------
+    # edit: Claude (Fable 5.1, the seat), 2026-09-29 16:27 +0400 — PREREG-BRAIN-DRIVES §2.2 / §2.3 (signed 3aa380b, sha256 a5fdea1e…): THE TURN.
+    # What the brain does BY ITSELF at a canvas, before it hears: it expects, it says, it asks. READ-ONLY: no call below
+    # writes the learner (the LAW road's reads and the scored mouth's read-backs), pinned by the state hash around every turn
+    # (tests/genome/test_brain_turn.py). Nothing here reads the world's truth.
+    def turn(self, glance: Dict[str, object], *, scene: int, world_seed: int, says: int = 1, asks: int = 1) -> Dict[str, object]:
+        """One turn (PREREG-BRAIN-DRIVES §2.2):
+          things / members / cells   the eye's hypotheses, each with the indices of its fixations and their cells;
+          order      the hypotheses by their number of fixations, most first, ties by the lower index;
+          held       per hypothesis, the LAW road's held words;
+          expected   per hypothesis, its forced name in each learned type (RWRoad.believed), a type with no mature word → None;
+          say        (says 1) the first hypothesis in `order` for which the scored mouth speaks (learners.produce_believed, the
+                     read-back included; the tie generator of hypothesis h is substream(world_seed, "turn-say:<scene>:<h>"));
+          ask        (asks 1) the first hypothesis in `order` with NO held word.
+        Before the first calibration, or with nothing in view, the turn ends with its `reason` and says and asks nothing."""
+        if says not in (0, 1) or asks not in (0, 1):
+            raise BrainError(f"turn: says and asks each take 0 or 1, got says {says!r} asks {asks!r}")
+        hyps, X = things_in_view(glance)
+        n = int(X.shape[0])
+        fix = [[int(y), int(x)] for y, x in glance["fix"]]
+        members = [[int(m) for m in h.members] for h in hyps]
+        cells = [[list(fix[m]) for m in ms] for ms in members]
+        order = sorted(range(n), key=lambda h: (-len(members[h]), h))
+        out: Dict[str, object] = {"scene": int(scene), "n_hyp": n, "order": order, "members": members, "held": [], "expected": [],
+                                  "say": None, "ask": None, "reason": None}
+        if n == 0:
+            out["reason"] = "nothing in view"
+            return out
+        if not self.n_calibrations:
+            out["reason"] = "not calibrated"
+            return out
+        road = self.road()
+        out["held"] = [list(road.held_words(X[h])) for h in range(n)]
+        Bv = road.believed(X)
+        out["expected"] = [[Bv[k][h] for k in range(len(Bv))] for h in range(n)]
+        if says:
+            for h in order:
+                a = Lr.produce_believed(road, X, h, lambda h=h: substream(int(world_seed), f"turn-say:{int(scene)}:{h}"))
+                if a.get("spoken"):
+                    m = a.get("margin")
+                    out["say"] = {"hyp": int(h), "fix": cells[h], "pos": [float(hyps[h].pos[0]), float(hyps[h].pos[1])],
+                                  "words": [str(w) for w in a["spoken"]], "readback": int(a["readback_point"]),
+                                  "margin": (float(m) if m is not None and math.isfinite(float(m)) else None)}
+                    break
+        if asks:
+            for h in order:
+                if not out["held"][h]:
+                    out["ask"] = {"hyp": int(h), "fix": cells[h], "pos": [float(hyps[h].pos[0]), float(hyps[h].pos[1])]}
+                    break
+        return out
+
+    @staticmethod
+    def surprise(turn: Dict[str, object], words: Sequence[str]) -> Optional[float]:
+        """PREREG-BRAIN-DRIVES §2.3: with U the distinct words of the utterance, 1 − (the largest number of U's words that ONE
+        hypothesis's expected names hold) / |U|. None when the turn holds no expectation or the utterance no word."""
+        U = list(dict.fromkeys(str(w) for w in words))
+        if not U or not turn.get("expected"):
+            return None
+        got = max(len(set(U) & {w for w in e if w is not None}) for e in turn["expected"])
+        return 1.0 - got / len(U)
+
     # -- the status and the state --------------------------------------------------------------
     def summary(self) -> Dict[str, object]:
         L = self.L
