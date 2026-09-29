@@ -279,6 +279,11 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
                 "row's `words`) + Mind.ledgers -> genome/questions.py:build_ledgers, which reads the line from the organism's own "
                 "genome (no caller's flag): a word cell is named by the word its own vector holds + creature/organs_road.py:"
                 "answer_point (each phrase word's own scores in the answer's detail)",
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 16:28 +0400 — PREREG-BRAIN-DRIVES §2 (the gene DRIVE, stage 1: the brain's own turn).
+        "DRIVE": "creature/mind.py:Mind.__init__ (refused beside no BRAIN line) + Mind._consume_eye -> Mind._brain_canvas (on a "
+                 "canvas the brain hears that is no ask canvas: genome/brain.py:Brain.turn(says, asks) BEFORE the brain learns, "
+                 "Brain.surprise against the instant's words, ONE journal row kind brain act turn) + Mind.brain_status / "
+                 "Mind.snapshot / Mind.resume (the turn counts)",
     },
 }
 

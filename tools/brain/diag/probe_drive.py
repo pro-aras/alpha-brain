@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # edit: Claude (Fable 5.1, the seat), 2026-09-29 16:18 +0400 — new tool: STAGE −1 of «the brain takes its turn» (docs/organism/HUMAN-MECHANISM-MAP-2026-09-29.md §5 step 1).
-"""tools/brain/diag/probe_drive.py --ws WS [--n 10000] [--out DIR] [--nulls 10]
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 16:39 +0400 — PREREG-BRAIN-DRIVES §3 (signed 3aa380b): the probe now calls the PRODUCTION turn
+# (genome/brain.py: Brain.turn, Brain.surprise) — runs G and J; `--genome` reads the BRAIN line of a life's own genome (mark JB's
+# bench side); control 1 (the planted say), mark D's exact test and the readings of §4 are added. Stage −1's own turn is kept
+# below as `turn_stage1` and BOTH are taken at every canvas: they must agree (the join of the function itself).
+"""tools/brain/diag/probe_drive.py --ws WS [--n 10000] [--out DIR] [--nulls 10] [--genome G]
 
 Read on the BENCH, on TRAINING rows alone, with no production code changed: what the brain would SAY and ASK by itself at
 every canvas, and what it EXPECTS before it hears — measured against the bench's truth, so the law's bars can be set at
@@ -45,6 +49,17 @@ WINDOW = 1000
 
 
 def turn(brain: "B.Brain", glance: Dict[str, object], scene: int, ws: int) -> Dict[str, object]:
+    """THE PRODUCTION TURN, in the probe's own field names (`expect` = its held words, `believed` = its expected names)."""
+    t = brain.turn(glance, scene=scene, world_seed=ws)
+    say = None
+    if t["say"] is not None:
+        say = {"hyp": t["say"]["hyp"], "words": list(t["say"]["words"]), "margin": t["say"]["margin"],
+               "margin_inf": t["say"]["margin"] is None}
+    return {"n_hyp": t["n_hyp"], "order": t["order"], "members": t["members"], "expect": t["held"], "believed": t["expected"],
+            "say": say, "ask": (None if t["ask"] is None else {"hyp": t["ask"]["hyp"]}), "reason": t["reason"], "raw": t}
+
+
+def turn_stage1(brain: "B.Brain", glance: Dict[str, object], scene: int, ws: int) -> Dict[str, object]:
     hyps, X = B.things_in_view(glance)
     n = int(X.shape[0])
     out: Dict[str, object] = {"n_hyp": n, "order": [], "expect": [], "believed": [], "say": None, "ask": None, "reason": None}
@@ -102,9 +117,15 @@ def main() -> int:
     ap.add_argument("--n", type=int, default=10000)
     ap.add_argument("--nulls", type=int, default=10)
     ap.add_argument("--out", default="/data/dev/brain-runs/day0929/drive/stage-1")
+    ap.add_argument("--genome", default=None, help="read the BRAIN line of this genome (default: the template's, as stage -1)")
+    ap.add_argument("--tag", default="")
     a = ap.parse_args()
     t0 = time.process_time()
-    cfg = P.brain_cfg()
+    if a.genome:
+        from genome.machinery import parse_genome
+        cfg = dict(parse_genome(Path(a.genome).read_text()).declared["BRAIN"])
+    else:
+        cfg = P.brain_cfg()
     d = C.cache_dir(C.RUNS, a.ws, "train")
     C.check_code(d)
     train = C.ScenePercepts(d)
@@ -112,12 +133,25 @@ def main() -> int:
     n = min(a.n, len(train))
     brain = B.Brain(cfg)
     rows: List[Dict[str, object]] = []
+    bench_rows: List[Dict[str, object]] = []
     for i in range(n):
         g = GA.glance_of(train, i)
         h0 = brain.state_hash() if i in (300, 3000) else None        # the turn never learns: checked at two canvases
         t = turn(brain, g, i, a.ws)
         if h0 is not None and brain.state_hash() != h0:
             raise RuntimeError(f"the turn changed the brain at canvas {i}")
+        t1 = turn_stage1(brain, g, i, a.ws)
+        for k in ("n_hyp", "order", "expect", "believed", "ask", "reason"):
+            if t1[k] != t[k]:
+                raise RuntimeError(f"canvas {i}: the production turn and stage -1's differ at {k!r}: {t[k]!r} against {t1[k]!r}")
+        if (t1["say"] or {}).get("words") != (t["say"] or {}).get("words") or (t1["say"] or {}).get("hyp") != (t["say"] or {}).get("hyp"):
+            raise RuntimeError(f"canvas {i}: the production say and stage -1's differ: {t['say']!r} against {t1['say']!r}")
+        sp = B.Brain.surprise(t["raw"], train.words(i))
+        if sp != surprise_of(t, train.words(i), "believed"):
+            raise RuntimeError(f"canvas {i}: the production surprise {sp!r} is not the probe's")
+        bench_rows.append({"scene": i, "n_hyp": t["n_hyp"], "order": t["order"], "members": t["members"], "held": t["expect"],
+                           "expected": t["believed"], "say": t["raw"]["say"], "ask": t["raw"]["ask"], "reason": t["reason"],
+                           "surprise": sp, "heard": list(train.words(i))})
         tr = truth[i]
         U = train.words(i)
         things = tr["things"]
@@ -228,7 +262,45 @@ def main() -> int:
                 v.append(1.0 - got / len(U))
             acc.append(float(np.mean(v)) if v else None)
 
-    res = {"world_seed": a.ws, "scenes": n, "cfg": cfg, "cpu_s": time.process_time() - t0, "cpu_s_learning_and_turns": cpu_learn,
+    # CONTROL 1 (PREREG §5.1): every say's words replaced by a word of the same kind that is FALSE of the thing — S must read < 0.05
+    from brain.scene import world as W
+    kinds = [list(W.SHAPES), list(W.COLOUR_NAMES), list(W.SIZE_NAMES)]
+    planted_true = planted_n = 0
+    for r in said_rows:
+        tw = set(r["hyps"][r["say"]["hyp"]]["true"])
+        words = []
+        for w in r["say"]["words"]:
+            kind = next((k for k in kinds if w in k), None)
+            false = [x for x in (kind or []) if x not in tw]
+            words.append(false[0] if false else w)
+        planted_n += 1
+        planted_true += all(w in tw for w in words)
+    # MARK D's exact test (one-sided: the forced names are right MORE often where it holds a word)
+    from scipy import stats as _st
+    dz = doubt(rows)
+    d_tab = [[round(dz["undoubted"]["right"] * dz["undoubted"]["believed_names"]), dz["undoubted"]["believed_names"]],
+             [round(dz["doubted"]["right"] * dz["doubted"]["believed_names"]), dz["doubted"]["believed_names"]]]
+    d_p = float(_st.fisher_exact([[d_tab[0][0], d_tab[0][1] - d_tab[0][0]], [d_tab[1][0], d_tab[1][1] - d_tab[1][0]]],
+                                 alternative="greater")[1])
+    # THE READINGS (never graded): its spoken vocabulary as it grows; the first true say; the surprise's fitted slope
+    vocab, first_true, seen_words = [], None, set()
+    for s0 in range(0, n, WINDOW):
+        for r in rows[s0:s0 + WINDOW]:
+            if r["say"] is not None and r["say"]["true"]:
+                if first_true is None:
+                    first_true = {"canvas": r["i"], "words": r["say"]["words"]}
+                seen_words.update(r["say"]["words"])
+        vocab.append({"to": min(n, s0 + WINDOW), "distinct_words_said_truly": len(seen_words), "words": sorted(seen_words)})
+    ser = [(w["from"], w["mean"]) for w in window_series(surprise_by("surprise_believed")) if w["mean"] is not None]
+    slope = None
+    if len(ser) >= 3:
+        lr_ = _st.linregress([x for x, _y in ser], [y for _x, y in ser])
+        slope = {"per_1000_canvases": float(lr_.slope * 1000.0), "se": float(lr_.stderr * 1000.0), "windows": len(ser)}
+
+    res = {"world_seed": a.ws, "scenes": n, "cfg": cfg,
+           "control_planted_say": {"n": planted_n, "true": (planted_true / planted_n if planted_n else None)},
+           "D": {"difference": dz["undoubted"]["right"] - dz["doubted"]["right"], "p_exact_one_sided": d_p, "table": d_tab},
+           "readings": {"spoken_vocabulary": vocab, "first_true_say": first_true, "surprise_slope": slope}, "cpu_s": time.process_time() - t0, "cpu_s_learning_and_turns": cpu_learn,
            "first_calibrated_canvas": next((r["i"] for r in rows if r["calibrated"]), None),
            "says": says(rows), "says_series": window_series(says),
            "asks": asks(rows), "asks_series": window_series(asks),
@@ -241,6 +313,7 @@ def main() -> int:
            "by_things_in_scene": {str(k): says([r for r in rows if r["n_things"] == k]) for k in (1, 2, 3)}}
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
+    (out / f"drive-{a.ws}-n{n}{a.tag}-bench.jsonl").write_text("\n".join(json.dumps(r, default=GA._np) for r in bench_rows) + "\n")
     (out / f"drive-{a.ws}-n{n}.json").write_text(json.dumps(res, indent=1, sort_keys=True, default=GA._np))
     (out / f"drive-{a.ws}-n{n}-rows.jsonl").write_text("\n".join(json.dumps(r, default=GA._np) for r in rows) + "\n")
     s = res["says"]

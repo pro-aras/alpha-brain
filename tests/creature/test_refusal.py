@@ -267,6 +267,8 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Fable 5.1, the seat), 2026-09-29 13:23 +0400 — PREREG-WORD-ROAD §1: one row, matching the genes.py RUNS entry (HEAR, the
         # mind layer). Caught by this class's own gate on the first full creature suite after the gene landed (2dbc1d8: 2 failures).
         "HEAR": "HEAR     every word; thing last; arrival last",
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 16:28 +0400 — PREREG-BRAIN-DRIVES §2.1: one row, matching the genes.py RUNS entry (DRIVE).
+        "DRIVE": "DRIVE    brain turn before hearing; says 1; asks 1",
         # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:56 +0400 — BRAIN-IN-BODY §5 (docs/brain/body/
         # INTERFACE-BRAIN-ORGAN.md): one row, matching the genes.py RUNS entry added by this task (WORLD_SCENE).
         # Caught by this class's own gate on the first full-suite run after landing — the omission this class
