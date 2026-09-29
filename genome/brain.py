@@ -484,6 +484,30 @@ class Brain:
             np.savez(f, **arrays)
         Path(str(base) + ".json").write_text(json.dumps(meta, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
 
+    # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:35 +0400 — PREREG-INHERIT §2 / §3: a newborn takes its parent's brain.
+    @classmethod
+    def inherit(cls, base: Path, cfg: Dict[str, object]) -> Tuple["Brain", Dict[str, object]]:
+        """PREREG-INHERIT §2: the parent's saved pair <base>.json|npz -> (the child's brain, {learned, hash}). What passes: the
+        learner and the four index-aligned lists (`seen`, `moments`, `scenes`, `canvas`). What does not: `episodes`, the store the
+        brain CITES — a child cites only what it lived. Every refusal names the inheritance."""
+        base = Path(base)
+        j, z = Path(str(base) + ".json"), Path(str(base) + ".npz")
+        if not (j.exists() and z.exists()):
+            raise BrainError(f"inherit: the pair is not whole ({j.name} {'present' if j.exists() else 'absent'}, "
+                             f"{z.name} {'present' if z.exists() else 'absent'}) — the organism does not start")
+        try:
+            saved_hash = json.loads(j.read_text(encoding="utf-8")).get("state_hash")
+            if not saved_hash:
+                raise BrainError("the pair carries no state hash")
+            b = cls.load(base, cfg)
+        except BrainError as e:
+            raise BrainError(f"inherit: {e}")
+        except Exception as e:
+            raise BrainError(f"inherit: the pair cannot be read ({e!r})")
+        info = {"learned": int(b.n_learned), "hash": str(saved_hash)}
+        b.episodes = {}
+        return b, info
+
     @classmethod
     def load(cls, base: Path, cfg: Dict[str, object]) -> "Brain":
         base = Path(base)

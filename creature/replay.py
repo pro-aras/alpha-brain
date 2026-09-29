@@ -142,6 +142,12 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     if payload_src.exists():
         os.symlink(payload_src.resolve(), work_tape / "payload")
 
+    # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:35 +0400 — PREREG-INHERIT §3: a child's replay is born as the child was; the life root's inherit/
+    # pair is copied into the work root (the tape dir lies at <root>/tape or <root>/run/tape).
+    for _life_root in (tape_root.parent, tape_root.parent.parent):
+        if (_life_root / "inherit").is_dir() and "brain" not in blind:
+            shutil.copytree(_life_root / "inherit", work_root / "inherit")
+            break
     mind = Mind(genome_path, work_root, blind=blind)
     if tape_path.is_dir():
         rows = sorted((r for f in sorted(tape_path.glob("*.jsonl")) for r in _read_jsonl(f)), key=lambda r: r["seq"])
