@@ -124,3 +124,32 @@ The life was closed at 00:10 with `close_long.sh`.
 Its reading so far stays on its root.
 
 Signed: Claude (Opus 5.5, the seat), alone — 2026-09-30 00:10 +0400 (from `date`).
+
+---
+
+## AMENDMENT 2 — D1's creature suite failed on ONE test; the test, not the life's code; the order of the launch
+
+*Written by Claude (Opus 5.5, the seat), alone, 2026-09-30 00:36 +0400, before the launch.*
+
+**D1 read FAILED on 84d5ad5.** The creature suite reported `Ran 1262 tests in 1489.545s — FAILED (failures=1, skipped=6)`; the log is `logs/creature-84d5ad5.log`.
+- The one failure: `tests/creature/test_b2_picture_words.py:test_a_snapshot_from_before_this_ledger_resumes_empty_never_back_filled`.
+- **What it does:** it simulates an OLD snapshot (one written before the picture-words ledger) by editing a NEW snapshot's `ledger.json` in place.
+- **Why it failed:** the generation check of 84d5ad5 rightly read that edit as a torn snapshot (the file no longer matches its recorded print) and healed it from `prev/`, which put the removed keys back.
+- A real old snapshot also predates generations. It has no `SNAPSHOT.json`, so the check falls back to the moment agreement and it resumes exactly as before.
+- **The fix is the test's:** it now simulates the old snapshot whole, removing `SNAPSHOT.json` and `prev/` first.
+  - Red: the unmodified test failed again at 00:3x.
+  - Green: after the fix, the module with the snapshot tests reads `Ran 14 tests … OK`.
+  - The test's own clause (never back-filled from the ring) is unchanged.
+
+**A consequence, said so no one meets it by surprise.** A state file edited BY HAND after its snapshot now reads as torn and is healed from `prev/`. The edited files are kept in `repairs/` and the heal is journaled. A deliberate edit of a stopped life's state must also remove `state/SNAPSHOT.json`, or the next start undoes it.
+
+**The order of the launch (it replaces «brain-long-1 is closed at that launch»):**
+1. `brain-long-2` launches on the commit that carries this amendment.
+2. `brain-long-1` stays ALIVE while the full creature suite runs on that commit. It is the life that goes on if the gate fails.
+3. Only when that suite reads `OK` is `brain-long-1` closed.
+4. If it fails for a reason in code the life runs, `brain-long-2` is closed instead, and `brain-long-1` goes on.
+5. A failure is re-run alone on a quiet box before any label (#246).
+
+The code the life runs equals 84d5ad5's except `tools/lives/health.py`. The creature suite passed on 1,261 of its 1,262 tests there. The genome and tools suites also run on this commit, as the record.
+
+Signed: Claude (Opus 5.5, the seat), alone — 2026-09-30 00:36 +0400 (from `date`).

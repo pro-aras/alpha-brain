@@ -188,6 +188,12 @@ class TestPictureWordsLedger(unittest.TestCase):
         """RAISED in the report: an old snapshot has no key; rule "ledger" then reads literal ∩ {} = {} — the ring is never used to
         back-fill it (that would make the proof circular, A42-B2-REPORT P2-1)."""
         self.mind.snapshot()
+        # edit: Claude (Opus 5.5, the seat), 2026-09-30 00:32 +0400 — a snapshot from before this ledger is also from before snapshot
+        # GENERATIONS (84d5ad5): it has no SNAPSHOT.json and no prev/. Editing a NEW snapshot's ledger in place is a tear that the resume
+        # heals from prev/ (creature/mind.py:_heal_torn_snapshot), which put the keys back and failed this test on 84d5ad5. So the old
+        # snapshot is simulated whole: the generation's two files go first, then the keys.
+        (self.root / "state" / "SNAPSHOT.json").unlink()
+        shutil.rmtree(self.root / "state" / "prev", ignore_errors=True)
         p = self.root / "state" / "ledger.json"
         ledger = json.loads(p.read_text()); ledger.pop("picture_words"); ledger.pop("birth_source"); p.write_text(json.dumps(ledger))
         twin, _seq = Mind.resume(self.genome, self.root)
