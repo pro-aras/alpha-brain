@@ -19,6 +19,8 @@
 | G2 DETERMINISTIC | S twice at one seed: byte-identical; S at another seed: different | PASS |
 | G3 BUDGET | 150 budgeted toy runs and 42 shelf runs: no run held more than B edges | PASS |
 
+**A difference between the law and the code, recorded here (2026-09-29 23:11 +0400):** PREREG-KW-1 §2.1 breaks a tie between replacement victims by «the oldest `last`»; `genome/web.py` breaks it by `touch` (the last evidence OR the making), because R's sprouts carry `last = None` until their first evidence. So a sprout never confirmed can be a victim, oldest first. No mark reads the tie-break; it was seen at the build and was not recorded until the review.
+
 ## The toy (V 60 words, planted sets of 117 to 120 pairs, B = 120, 10 seeds)
 
 | Rule | Recall of the planted pairs | Precision | Consolidated | NULL world: consolidated (all false) | CHANGE world: new set | CHANGE world: old set |
