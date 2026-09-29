@@ -1,0 +1,94 @@
+THE WORD ROAD — the gate's marks (PREREG-WORD-ROAD §4)
+
+SEED 20261101
+  I1 the line absent: twin replay exit 0 (rows 24475) · BRAIN replay exit 0 (rows 34481) → PASS
+  I2 the plant: first difference [6, 'births'] · the first multi-word canvas {'scene': 1, 'moment': 'sc20261101t000001', 'words': ['small', 'yellow', 'circle'], 'eye_seq': 6} → PASS
+  A M1: ON answerable 794 of 794 (1.000; unheard words {}) · OFF 181 of 794 (0.228) → PASS
+  A M3: ON answerable 120 of 120 (1.000; unheard words {}) · OFF 0 of 120 (0.000) → PASS
+  P M1 (NEEDED n 79; kinds {'both': 26, 'size': 24, 'colour': 29}): the whole phrase 0.671 · the shape word alone 0.620 · gap 0.051 (pairs 5 for, 1 against; p 1.09e-01) · «none» read forced: 15 of the whole phrase, 22 of the shape word alone
+      readings, never graded: chance 0.532 (right 53, exact p 5.21e-03) · a shape-only road 0.568 · the most-fixations pointer 0.525
+  P M3 (NEEDED n 77; kinds {'colour': 77}): the whole phrase 0.325 · the shape word alone 0.286 · gap 0.039 (pairs 6 for, 3 against; p 2.54e-01) · «none» read forced: 25 of the whole phrase, 36 of the shape word alone
+      readings, never graded: chance 0.489 (right 25, exact p 9.99e-01) · a shape-only road 0.565 · the most-fixations pointer 0.526
+  P: NEEDED items with an «unheard» phrase (no pair): 0 []
+  K (n 80): ON 0.738 · OFF 0.750 · ON − OFF -0.013 ± 0.012 (pairs 0 / 1; sign test «ON lower» p 0.5000)
+  K2 (n 96; unseen in both 0): ON 0.958 · OFF 0.896 · ON − OFF 0.062 ± 0.025 · «I don't know» share ON 0.885 OFF 0.896 · words emitted by kind ON {'shape': 4, 'colour': 7} OFF {'shape': 10}
+  G: words heard 14 · canvases read 10000 · canvases where the word cells born are not the words first heard 0 [] · word cells ON 14 OFF 7 · shared cells 0 · words the ear refused 0 → PASS
+      readings: sight cells ON / OFF 1.000 · refused by budget ON / OFF 1.008 · refused redundant ON / OFF 1.937 · refused by the cap {'on': 0, 'off': 0}
+      series (every 1,000 worded canvases): canvases · sight cells ON/OFF · refused by budget ON/OFF · redundant ON/OFF
+          1000 · 505 / 508 · 1511 / 1512 · 1199 / 615
+          2000 · 587 / 590 · 3143 / 3164 · 2514 / 1282
+          3000 · 1022 / 1016 · 4187 / 4219 · 4011 / 2051
+          4000 · 1149 / 1148 · 5176 / 5220 · 5481 / 2826
+          5000 · 1231 / 1230 · 6111 / 6132 · 7059 / 3639
+          6000 · 1312 / 1313 · 7016 / 7029 · 8579 / 4444
+          7000 · 1396 / 1397 · 7847 / 7826 · 10138 / 5260
+          8000 · 1479 / 1480 · 8617 / 8557 · 11775 / 6099
+          9000 · 1562 / 1562 · 9373 / 9295 · 13397 / 6934
+         10000 · 1646 / 1646 · 10093 / 10009 · 15046 / 7767
+         10000 · 1646 / 1646 · 10093 / 10009 · 15046 / 7767
+  C: ms per training canvas, scenes 9000–9999: ON 94.30 (n 1000) · OFF 68.98 (n 1000) · ratio 1.367 (bar ≤ 1.5) → PASS
+
+SEED 20261102
+  I1 the line absent: twin replay exit 0 (rows 24471) · BRAIN replay exit 0 (rows 34477) → PASS
+  I2 the plant: first difference [3, 'births'] · the first multi-word canvas {'scene': 0, 'moment': 'sc20261102t000000', 'words': ['small', 'star'], 'eye_seq': 3} → PASS
+  A M1: ON answerable 793 of 793 (1.000; unheard words {}) · OFF 178 of 793 (0.224) → PASS
+  A M3: ON answerable 120 of 120 (1.000; unheard words {}) · OFF 0 of 120 (0.000) → PASS
+  P M1 (NEEDED n 73; kinds {'both': 30, 'colour': 24, 'size': 19}): the whole phrase 0.521 · the shape word alone 0.507 · gap 0.014 (pairs 2 for, 1 against; p 5.00e-01) · «none» read forced: 16 of the whole phrase, 19 of the shape word alone
+      readings, never graded: chance 0.527 (right 38, exact p 5.97e-01) · a shape-only road 0.587 · the most-fixations pointer 0.541
+  P M3 (NEEDED n 75; kinds {'colour': 75}): the whole phrase 0.293 · the shape word alone 0.280 · gap 0.013 (pairs 5 for, 4 against; p 5.00e-01) · «none» read forced: 25 of the whole phrase, 42 of the shape word alone
+      readings, never graded: chance 0.498 (right 22, exact p 1.00e+00) · a shape-only road 0.587 · the most-fixations pointer 0.580
+  P: NEEDED items with an «unheard» phrase (no pair): 0 []
+  K (n 81): ON 0.728 · OFF 0.704 · ON − OFF 0.025 ± 0.017 (pairs 2 / 0; sign test «ON lower» p 1.0000)
+  K2 (n 96; unseen in both 0): ON 0.917 · OFF 0.885 · ON − OFF 0.031 ± 0.018 · «I don't know» share ON 0.885 OFF 0.885 · words emitted by kind ON {'shape': 8, 'colour': 3} OFF {'shape': 11}
+  G: words heard 14 · canvases read 10000 · canvases where the word cells born are not the words first heard 0 [] · word cells ON 14 OFF 7 · shared cells 0 · words the ear refused 0 → PASS
+      readings: sight cells ON / OFF 1.000 · refused by budget ON / OFF 1.002 · refused redundant ON / OFF 1.931 · refused by the cap {'on': 0, 'off': 0}
+      series (every 1,000 worded canvases): canvases · sight cells ON/OFF · refused by budget ON/OFF · redundant ON/OFF
+          1000 · 499 / 501 · 1466 / 1494 · 1174 / 632
+          2000 · 582 / 582 · 3115 / 3160 · 2432 / 1291
+          3000 · 1006 / 1008 · 4169 / 4226 · 3895 / 2054
+          4000 · 1139 / 1141 · 5148 / 5203 · 5400 / 2824
+          5000 · 1222 / 1224 · 6056 / 6109 · 6889 / 3608
+          6000 · 1305 / 1306 · 7009 / 7055 · 8427 / 4404
+          7000 · 1389 / 1390 · 7895 / 7930 · 10017 / 5203
+          8000 · 1471 / 1470 · 8701 / 8710 · 11581 / 6021
+          9000 · 1554 / 1553 · 9532 / 9524 · 13229 / 6826
+         10000 · 1637 / 1637 · 10297 / 10272 · 14813 / 7673
+         10000 · 1637 / 1637 · 10297 / 10272 · 14813 / 7673
+  C: ms per training canvas, scenes 9000–9999: ON 92.81 (n 1000) · OFF 69.38 (n 1000) · ratio 1.338 (bar ≤ 1.5) → PASS
+
+SEED 20261103
+  I1 the line absent: twin replay exit 0 (rows 24466) · BRAIN replay exit 0 (rows 34472) → PASS
+  I2 the plant: first difference [3, 'births'] · the first multi-word canvas {'scene': 0, 'moment': 'sc20261103t000000', 'words': ['small', 'circle'], 'eye_seq': 3} → PASS
+  A M1: ON answerable 794 of 794 (1.000; unheard words {}) · OFF 170 of 794 (0.214) → PASS
+  A M3: ON answerable 120 of 120 (1.000; unheard words {}) · OFF 0 of 120 (0.000) → PASS
+  P M1 (NEEDED n 76; kinds {'colour': 37, 'size': 12, 'both': 27}): the whole phrase 0.618 · the shape word alone 0.500 · gap 0.118 (pairs 9 for, 0 against; p 1.95e-03) · «none» read forced: 15 of the whole phrase, 19 of the shape word alone
+      readings, never graded: chance 0.537 (right 47, exact p 8.13e-02) · a shape-only road 0.601 · the most-fixations pointer 0.592
+  P M3 (NEEDED n 74; kinds {'colour': 74}): the whole phrase 0.297 · the shape word alone 0.257 · gap 0.041 (pairs 6 for, 3 against; p 2.54e-01) · «none» read forced: 25 of the whole phrase, 38 of the shape word alone
+      readings, never graded: chance 0.505 (right 22, exact p 1.00e+00) · a shape-only road 0.581 · the most-fixations pointer 0.554
+  P: NEEDED items with an «unheard» phrase (no pair): 0 []
+  K (n 74): ON 0.743 · OFF 0.743 · ON − OFF 0.000 ± 0.000 (pairs 0 / 0; sign test «ON lower» p 1.0000)
+  K2 (n 96; unseen in both 0): ON 0.958 · OFF 0.885 · ON − OFF 0.073 ± 0.030 · «I don't know» share ON 0.854 OFF 0.885 · words emitted by kind ON {'colour': 10, 'shape': 4} OFF {'shape': 11}
+  G: words heard 14 · canvases read 10000 · canvases where the word cells born are not the words first heard 0 [] · word cells ON 14 OFF 7 · shared cells 0 · words the ear refused 0 → PASS
+      readings: sight cells ON / OFF 1.000 · refused by budget ON / OFF 1.002 · refused redundant ON / OFF 1.934 · refused by the cap {'on': 0, 'off': 0}
+      series (every 1,000 worded canvases): canvases · sight cells ON/OFF · refused by budget ON/OFF · redundant ON/OFF
+          1000 · 530 / 527 · 1498 / 1570 · 1213 / 614
+          2000 · 613 / 610 · 3210 / 3299 · 2464 / 1253
+          3000 · 1053 / 1049 · 4333 / 4419 · 3957 / 2015
+          4000 · 1173 / 1170 · 5245 / 5330 · 5514 / 2824
+          5000 · 1256 / 1253 · 6210 / 6276 · 7036 / 3621
+          6000 · 1339 / 1336 · 7091 / 7112 · 8686 / 4457
+          7000 · 1422 / 1420 · 7911 / 7941 · 10240 / 5267
+          8000 · 1505 / 1503 · 8728 / 8732 · 11780 / 6073
+          9000 · 1587 / 1586 · 9518 / 9525 · 13376 / 6913
+         10000 · 1670 / 1670 · 10249 / 10228 · 14984 / 7749
+         10000 · 1670 / 1670 · 10249 / 10228 · 14984 / 7749
+  C: ms per training canvas, scenes 9000–9999: ON 93.14 (n 1000) · OFF 68.66 (n 1000) · ratio 1.356 (bar ≤ 1.5) → PASS
+
+POOLED
+  P M1: n 228 · the whole phrase 0.605 · the shape word alone 0.544 · gap 0.061 (bar ≥ 0.1) · pairs 16 for, 2 against · p 6.56e-04 (bar < 0.001) · above 0 at every seed: True · NULL-10 ON 0.521 against the draws' max 0.644 ([0.479, 0.507, 0.644, 0.534, 0.507, 0.425, 0.548, 0.521, 0.507, 0.493]): above every draw False → FAIL
+  P M3: n 226 · the whole phrase 0.305 · the shape word alone 0.274 · gap 0.031 (bar ≥ 0.1) · pairs 17 for, 10 against · p 1.24e-01 (bar < 0.001) · above 0 at every seed: True · NULL-10 ON 0.293 against the draws' max 0.520 ([0.413, 0.44, 0.413, 0.453, 0.387, 0.427, 0.427, 0.36, 0.4, 0.52]): above every draw False → FAIL
+  K: n 235 · ON 0.736 · OFF 0.732 · ON − OFF 0.004 ± 0.007 (bar ≥ -0.05; pairs 2 / 1; sign test «ON lower» p 0.8750) → PASS
+  K2: n 288 · ON 0.944 · OFF 0.889 · ON − OFF 0.056 ± 0.014 (bar ≥ -0.05; pairs 17 / 1; sign test «ON lower» p 1.0000) → PASS
+
+THE MARKS: I1 PASS · I2 PASS · A PASS · P FAIL · K PASS · K2 PASS · G PASS · C PASS
+THE DECISION RULE (§4): HEAR is NOT adopted

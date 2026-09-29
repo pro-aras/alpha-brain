@@ -1,0 +1,17 @@
+the five suites on 0ca9a74 (2026-09-29 14:19:37 +0400 → 2026-09-29 14:43:55 +0400), BLAS threads 1
+== scene exit=0
+Ran 368 tests in 231.572s
+OK
+== brainvenv exit=0
+Ran 770 tests in 697.275s
+OK (skipped=2)
+== genome exit=0
+Ran 629 tests in 303.208s
+OK (skipped=1, expected failures=6)
+== creature exit=1
+Ran 1199 tests in 1455.716s
+FAILED (failures=1, skipped=6)
+FAIL: test_61_questions_60_fetches_1_refused_rate (tests.creature.test_web_door.TestWebDoorGating.test_61_questions_60_fetches_1_refused_rate)
+== tools exit=0
+Ran 80 tests in 268.505s
+OK
