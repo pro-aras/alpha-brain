@@ -34,6 +34,20 @@ the 0.10 beyond the 0.90 band, so the hold rate falls 0.09 a round, the exact-at
 confident rule without it passes 0.49 on the proxy (the exact-attribution reader: 0.77–0.84). ROBUST k: the MEAN and the
 COVARIANCE are fitted on each word's INLIERS (its rows inside its own band), k rounds, while the BAND stays the weighted 0.90
 quantile over ALL the kept rows under the final metric — the band's quantile is the law's, only the metric is cleaned.
+edit: Claude (Fable 5.1, the seat), 2026-09-29 12:49 +0400 — the fourth run's finding: ROBUST does not help (0.37–0.41 against 0.40–0.46
+without it). `--grid dose` is the DOSE-RESPONSE: the exact-attribution reader with a share c of its multi-hypothesis rows
+replaced by a WRONG hypothesis of the same view (drawn by substream(ws, "dose:<c>")), c in DOSES — how right must the store
+be for the reader to refuse a shape it was never taught? (A reading: the truth is the bench's.)
+edit: Claude (Fable 5.1, the seat), 2026-09-29 12:51 +0400 — the dose-response's finding: the reader needs a store about 0.98–0.99 right; the
+responsibilities, frozen at each meeting by a learner that was then YOUNG, reach 0.96. `--grid point` is the record's second
+option read through the LEARNER, not the reader: every learned scene is pointed at AGAIN by the learner as it stands at the
+reading point (its own law: `RWRoad.answer_point` over the scene's raw view and the parent's phrase, «none» = τ_point); a
+meeting is kept when «none» does not fire and the best thing leads the second by >= tau (log units); its row is the pointed
+thing, weight 1. "pt" reads the organ's own calibration list (`Brain.seen`: every scene's raw view and words).
+edit: Claude (Fable 5.1, the seat), 2026-09-29 12:52 +0400 — `--grid m2b --fit 10000`: THE PROXY AGAINST THE REAL MARK, on test sets ALREADY READ
+(the fresh set 2026140x and the older 2026120x; never the gate's): the brain learns all 10,000 scenes as the scored run did,
+and each reader answers the m2b split's «what is this?» items by M2b's own rule (CORRECT = no shape word holds the thing).
+THE CONTROL: the law reader here must read the record's own M2b (0.646 / 0.708 / 0.729 on the fresh set).
 FILTERS: "r" = max r >= tau; "rn" = "r" and the meeting's «none» was not True (a meeting before the first reading
 point has none = None and is KEPT); "rN" = "r" and the meeting's «none» was False (those early meetings DROPPED)."""
 from __future__ import annotations
@@ -64,6 +78,8 @@ FORMS = ("soft", "hard")
 FILTERS = ("r", "rn", "rN")
 SCENE_FILTERS = ("jn", "an")
 TRIMS = (0, 1, 2)
+DOSES = (0.0, 0.01, 0.02, 0.04, 0.06, 0.08, 0.12, 0.16)
+MARGINS = (0.0, 0.5, 1.0, 2.0, 4.0, 8.0)
 
 
 def keeps(flt: str, tau: float, r: np.ndarray, none) -> bool:
@@ -186,15 +202,37 @@ def scene_info(L: "Lr.RWLearner") -> Dict[int, Dict[str, object]]:
     return out
 
 
+def repoint(brain: "B.Brain", ws: int) -> Dict[int, Dict[str, object]]:
+    """Per learned scene: the learner's pointing NOW (the law road) for the parent's phrase over the scene's own raw view."""
+    from brain.world.seeds import substream as _sub
+    road = brain.road()
+    out: Dict[int, Dict[str, object]] = {}
+    for i, (X, words, _n) in enumerate(brain.seen):
+        X = np.atleast_2d(X)
+        if X.shape[0] == 0:
+            continue
+        a = road.answer_point(X, list(dict.fromkeys(words)), _sub(int(ws), f"repoint:{i}"))
+        if a.get("point") is None:
+            continue
+        s = sorted((float(v) for v in a["scores"]), reverse=True)
+        margin = (s[0] - s[1]) if len(s) > 1 else float("inf")
+        if not np.isfinite(s[0]):
+            continue
+        out[i] = {"n": int(X.shape[0]), "h": int(a["point"]), "none": bool(a["none"]), "margin": float(margin)}
+    return out
+
+
 class Reader:
     """The READER's state (learners.RWLearner._reader_state's own arithmetic) over a FILTERED store. tau 0.0 + «soft» is the
     law's state, value for value (checked in main against the brain's own reader)."""
 
     def __init__(self, L: "Lr.RWLearner", types, eps: float, tau: float, form: str, drop: Optional[str] = None,
-                 flt: str = "r", nones: Optional[Sequence[Optional[bool]]] = None, true_h=None, info=None, trim: int = 0, robust: int = 0):
+                 flt: str = "r", nones: Optional[Sequence[Optional[bool]]] = None, true_h=None, info=None, trim: int = 0, robust: int = 0, dose_seed: int = 0):
         self.L, self.types, self.eps = L, [tuple(t) for t in types], float(eps)
         self.rows: Dict[str, Tuple[np.ndarray, np.ndarray]] = {}
         self.kept: Dict[str, Tuple[int, int]] = {}
+        from brain.world.seeds import substream as _sub
+        dose_rng = _sub(int(dose_seed), f"dose:{tau}") if flt == "dose" else None
         for T in self.types:
             for w in T:
                 if w == drop:
@@ -203,12 +241,21 @@ class Reader:
                 Zs, Rs, n_all, n_kept = [], [], 0, 0
                 for z, r, t in zip(L.store_z[j], L.store_r[j], L.store_t[j]):
                     n_all += 1
-                    if flt == "oracle":
+                    if flt in ("oracle", "dose"):
                         h = true_h(int(t) - 1, len(r))
                         if h is None:
                             continue
+                        if flt == "dose" and len(r) > 1 and float(dose_rng.random()) < tau:
+                            h = [k for k in range(len(r)) if k != h][int(dose_rng.integers(len(r) - 1))]
                         n_kept += 1
                         Zs.append(z[h][None, :]); Rs.append(np.ones(1))
+                        continue
+                    if flt == "pt":
+                        si = info.get(int(t) - 1)
+                        if si is None or si["n"] != len(r) or si["none"] or si["margin"] < tau:
+                            continue
+                        n_kept += 1
+                        Zs.append(z[si["h"]][None, :]); Rs.append(np.ones(1))
                         continue
                     if flt in SCENE_FILTERS:
                         si = info.get(int(t) - 1)
@@ -335,7 +382,8 @@ def validation_things(train, truth, lo: int, hi: int, L) -> List[Dict[str, objec
     return out, counts
 
 
-def part_b(brain: "B.Brain", things, eps: float, nones: Sequence[Optional[bool]], truth=None) -> Dict[str, object]:
+def part_b(brain: "B.Brain", things, eps: float, nones: Sequence[Optional[bool]], truth=None, grid_name: str = "full",
+           ws: int = 0) -> Dict[str, object]:
     L = brain.L
     types = brain.L.reader["ear"]["types"]
     shapes = [w for w in W.SHAPES if w in L.index and L.meetings[L.index[w]] >= L.p_from]
@@ -354,9 +402,60 @@ def part_b(brain: "B.Brain", things, eps: float, nones: Sequence[Optional[bool]]
                                                    ("jn", "hard", 0.9), ("jn", "hard", 0.95), ("an", "hard", 0.9), ("rN", "hard", 0.9),
                                                    ("oracle", "hard", 0.0))
             for rb in (0, 1, 2, 3, 5)]
+    if grid_name == "dose":
+        grid = [("dose", "hard", c, 0, 0) for c in DOSES]
+    if grid_name == "m2b":
+        info_pt = repoint(brain, ws)
+        out["m2b"] = {}
+        cells = [("r", "soft", 0.0), ("rn", "hard", 0.0), ("rn", "hard", 0.9), ("rn", "hard", 0.95), ("rN", "hard", 0.95),
+                 ("jn", "hard", 0.95), ("an", "hard", 0.9), ("pt", "hard", 2.0), ("pt", "hard", 4.0), ("oracle", "hard", 0.0)]
+        readers = {f"{f}:{fo}@{ta}": Reader(L, types, eps, ta, fo, flt=f, nones=nones, true_h=true_h,
+                                            info=(info_pt if f == "pt" else info), dose_seed=ws) for f, fo, ta in cells}
+        for tset in ("fresh", "s1b1"):
+            d = C.cache_dir(C.RUNS, ws, "m2b", tset)
+            C.check_code(d)
+            P_, T_ = C.ScenePercepts(d), C.load_truth(d)
+            items = []
+            for row in range(len(P_)):
+                tr = T_[row]
+                th = tr["things"][0]
+                g = GA.glance_of(P_, row)
+                hyps, X, _members = hyp_of(g)
+                box = [int(th["top"]), int(th["left"]), int(th["side"])]
+                h = B.pointer_hypothesis(box, [float(v) for v in tr["centroids"][0]], g["fix"], hyps)
+                covered = M.covered(0, tr["fix_thing"])
+                items.append({"shape": th["shape"], "graded": th["shape"] in W.M2B_SHAPES, "covered": bool(covered),
+                              "z": None if h is None else L.stats.standardise(X[h][None, :])[0]})
+            blk = {"n_items": len(items), "graded": sum(1 for x in items if x["graded"]),
+                   "graded_covered": sum(1 for x in items if x["graded"] and x["covered"]), "readers": {}}
+            for name, rd in readers.items():
+                sel = [x for x in items if x["graded"] and x["covered"] and x["z"] is not None]
+                ok = [not any(w in W.SHAPE_WORDS for w in rd.held(x["z"])) for x in sel]
+                per = {}
+                for s in W.M2B_SHAPES:
+                    ss = [o for o, x in zip(ok, sel) if x["shape"] == s]
+                    per[s] = (sum(ss) / len(ss)) if ss else None
+                blk["readers"][name] = {"n": len(sel), "correct": (sum(ok) / len(ok)) if ok else None, "per_shape": per}
+            out["m2b"][tset] = blk
+        grid = []
+    if grid_name == "point":
+        info = repoint(brain, ws)
+        grid = [("pt", "hard", m, 0, 0) for m in MARGINS] + [("r", "soft", 0.0, 0, 0), ("oracle", "hard", 0.0, 0, 0)]
+        rp = []
+        for i, si in info.items():
+            lab = labels_of(brain.canvas[i][1], truth[i]["fix_thing"])
+            rp.append((si["none"], si["margin"], lab[si["h"]] == int(truth[i]["referent"]), int(truth[i]["referent"]) in lab))
+        out["repoint"] = {"scenes": len(info), "none_fired": sum(1 for x in rp if x[0]),
+                          "none_fired_when_referent_unseen": _rate(x[0] for x in rp if not x[3]),
+                          "none_fired_when_referent_seen": _rate(x[0] for x in rp if x[3]),
+                          "by_margin": {str(m): {"kept": sum(1 for x in rp if not x[0] and x[1] >= m),
+                                                 "kept_share": sum(1 for x in rp if not x[0] and x[1] >= m) / len(rp),
+                                                 "right_among_kept": _rate(x[2] for x in rp if not x[0] and x[1] >= m)}
+                                        for m in MARGINS}}
     for flt, form, tau, trim, robust in grid:
         if True:
-            full = Reader(L, types, eps, tau, form, flt=flt, nones=nones, true_h=true_h, info=info, trim=trim, robust=robust)
+            full = Reader(L, types, eps, tau, form, flt=flt, nones=nones, true_h=true_h, info=info, trim=trim, robust=robust,
+                          dose_seed=ws)
             cell = {"kept": {w: list(v) for w, v in full.kept.items()}, "bands": dict(full.band)}
             th, fn, sz, co, n = 0, 0, 0, 0, 0
             for x in things:
@@ -372,7 +471,7 @@ def part_b(brain: "B.Brain", things, eps: float, nones: Sequence[Optional[bool]]
             tot_c, tot_n = 0, 0
             for s in shapes:
                 loo = Reader(L, types, eps, tau, form, drop=s, flt=flt, nones=nones, true_h=true_h, info=info, trim=trim,
-                             robust=robust)
+                             robust=robust, dose_seed=ws)
                 sel = [x for x in things if x["shape"] == s]
                 c = sum(1 for x in sel if not any(w in W.SHAPE_WORDS for w in loo.held(x["z"])))
                 per[s] = {"n": len(sel), "correct": c / len(sel) if sel else None}
@@ -389,6 +488,7 @@ def main() -> int:
     ap.add_argument("--ws", type=int, required=True)
     ap.add_argument("--fit", type=int, default=8000)
     ap.add_argument("--out", default="/data/dev/brain-runs/day0929/fm2b")
+    ap.add_argument("--grid", default="full", choices=("full", "dose", "point", "m2b"))
     a = ap.parse_args()
     t0 = time.process_time()
     cfg = brain_cfg()
@@ -396,7 +496,7 @@ def main() -> int:
     C.check_code(d)
     train = C.ScenePercepts(d)
     truth = C.load_truth(d)
-    if not (0 < a.fit < len(train)):
+    if not (0 < a.fit < len(train)) and not (a.grid == "m2b" and a.fit == len(train)):
         raise SystemExit(f"--fit {a.fit} must leave validation rows (the training stream holds {len(train)})")
     brain = B.Brain(cfg)
     nones: List[Optional[bool]] = []
@@ -417,12 +517,12 @@ def main() -> int:
     res = {"world_seed": a.ws, "fit": a.fit, "validation": [a.fit, len(train)], "cfg": {k: cfg[k] for k in ("lr", "eps", "young")},
            "young_rule": cfg.get("young_rule"), "mature": L.mature_words(), "control_law_reader": control,
            "validation_counts": counts, "none_at_learning": {str(v): sum(1 for x in nones if x is v) for v in (True, False, None)},
-           "A": part_a(brain, truth, a.fit, nones), "B": part_b(brain, things, float(cfg["eps"]), nones, truth),
+           "A": part_a(brain, truth, a.fit, nones), "B": part_b(brain, things, float(cfg["eps"]), nones, truth, a.grid, a.ws),
            "cpu_s": None}
     res["cpu_s"] = time.process_time() - t0
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
-    p = out / f"probe-{a.ws}-fit{a.fit}.json"
+    p = out / (f"probe-{a.ws}-fit{a.fit}.json" if a.grid == "full" else f"probe-{a.ws}-fit{a.fit}-{a.grid}.json")
     p.write_text(json.dumps(res, indent=1, sort_keys=True, default=GA._np))
     print(f"[probe {a.ws}] wrote {p} · cpu {res['cpu_s']:.1f} s · control: {control['words_compared']} words, "
           f"{len(diffs)} band differences, max |mu diff| {mu_diff}")
