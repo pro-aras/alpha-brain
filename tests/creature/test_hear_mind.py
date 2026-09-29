@@ -54,11 +54,15 @@ class _Lives(unittest.TestCase):
         shutil.rmtree(cls.tmp, ignore_errors=True)
 
     @classmethod
-    def live(cls, hear: bool, rows=None, blind=frozenset(), extra: str = ""):
+    def live(cls, hear: bool, rows=None, blind=frozenset(), extra: str = "", swap=None):
         cls.n += 1
         root = S.link_root(cls.tape_root, cls.tmp / f"run{cls.n}" / "r")
         gp = root.parent / "g.genome"
-        gp.write_text(genome_text(hear, extra))
+        text = genome_text(hear, extra)
+        if swap is not None:
+            assert text.count(swap[0]) == 1, (text.count(swap[0]), swap[0])
+            text = text.replace(swap[0], swap[1])
+        gp.write_text(text)
         m = MM.Mind(gp, root, blind=blind)
         try:
             for row in (cls.rows if rows is None else rows):
@@ -158,6 +162,44 @@ class TheOrganismMeetsEveryWord(_Lives):
         self.assertEqual([w for w in on if w in said], [], "ON: no word the tape said is «unheard»")
         self.assertEqual(sorted(set(on)), sorted(set(off) - said), "a word the tape never said stays unheard in both")
 
+    # edit: Claude (Fable 5.1, the seat), 2026-09-29 13:11 +0400 — the co-signer's OPEN POINTS 1 and 2 (PREREG-WORD-ROAD §8), test-first.
+    def test_a_point_answer_carries_each_words_own_scores_under_the_line_only(self) -> None:
+        def points(root):
+            return [r for r in S.journal(root) if r.get("kind") == "answer" and r.get("form") == "point"
+                    and r["answer"]["raw"].get("point") is not None]
+        on, off = points(self.on_root), points(self.off_root)
+        self.assertGreater(len(on), 0)
+        multi = 0
+        for r in on:
+            by = r["detail"]["scores_by_word"]
+            n_h = len(r["detail"]["scores"])
+            self.assertEqual(len(by), len(by and r["detail"]["cells"]))
+            for w, v in by.items():
+                self.assertEqual(len(v), n_h, w)
+            total = [round(sum(by[w][k] for w in by), 6) for k in range(n_h)]
+            self.assertEqual(total, r["detail"]["scores"])
+            multi += len(by) > 1
+        self.assertGreater(multi, 0, "this fixture must hold a pointed phrase of several words")
+        self.assertEqual(sum(1 for r in off if "scores_by_word" in (r.get("detail") or {})), 0)
+
+    def test_the_ledgers_choice_is_read_from_the_genome_not_from_a_callers_flag(self) -> None:
+        from genome.questions import build_ledgers
+        plain = build_ledgers(self.on.org, self.on.moment_word)
+        self.assertEqual({c: sorted(s) for c, s in plain["words"].items()},
+                         {c: sorted(s) for c, s in self.on.ledgers()["words"].items()})
+        self.assertEqual(sorted({w for s in plain["words"].values() for w in s}), sorted(self.info["said"]))
+        last = {ws[-1] for ws in self.said.values()}
+        off = build_ledgers(self.off.org, self.off.moment_word)
+        self.assertTrue({w for s in off["words"].values() for w in s} <= last)
+
+    def test_the_think_threads_frozen_shadow_names_the_same_words(self) -> None:
+        from creature.think_thread import freeze_recall_view
+        from genome.questions import build_ledgers
+        shadow = freeze_recall_view(self.on.org)
+        self.assertIsNot(shadow.words.cells, self.on.org.words.cells)
+        got = build_ledgers(shadow, dict(self.on.moment_word))["words"]
+        self.assertEqual({c: sorted(s) for c, s in got.items()}, {c: sorted(s) for c, s in self.on.ledgers()["words"].items()})
+
     def test_the_same_life_twice_is_the_same_journal(self) -> None:
         _m, root = self.live(True)
         self.assertEqual(S.journal_bytes(root), S.journal_bytes(self.on_root))
@@ -219,6 +261,22 @@ class Refusals(_Lives):
     def test_the_same_gene_without_the_line_starts(self) -> None:
         m, _root = self.live(False, rows=[], extra="SURPRISE floor 0.05 predicted mind-cell\n")
         self.assertIsNotNone(m)
+
+    def test_refused_beside_a_words_floor_two_words_can_share(self) -> None:
+        # two distinct words' cosine is at most 0.875 (7 of 8 letter slots): a words floor at or under it lets two words light
+        # one cell, and §1.5 / §1.9 rest on «a word cell is lit by exactly one word»
+        with self.assertRaises(GenomeError) as e:
+            self.live(True, rows=[], extra="", swap=("BIRTH    novelty  cos<0.952", "BIRTH    novelty  cos<0.875"))
+        self.assertIn("words floor", str(e.exception))
+        self.assertIn("HEAR", str(e.exception))
+        m, _r = self.live(False, rows=[], swap=("BIRTH    novelty  cos<0.952", "BIRTH    novelty  cos<0.875"))
+        self.assertIsNotNone(m, "without the line the same genome starts")
+
+    def test_refused_beside_blank_zero(self) -> None:
+        with self.assertRaises(GenomeError) as e:
+            self.live(True, rows=[], swap=("SENSE    ear    letters 8", "SENSE    ear    letters 8 blank=zero"))
+        self.assertIn("blank=zero", str(e.exception))
+        self.assertIn("HEAR", str(e.exception))
 
     def test_blind_ear_is_refused_beside_the_line(self) -> None:
         with self.assertRaises(GenomeError) as e:

@@ -108,11 +108,22 @@ def answer_point(org, Lw: Dict[int, set], payload: Dict[str, object], fix, locat
     if not phrase or not hyps:
         detail["scores"] = []
         return _none(), detail
+    # edit: Claude (Fable 5.1, the seat), 2026-09-29 13:13 +0400 — PREREG-WORD-ROAD §4 mark P (the co-signer's OPEN POINT 1): under the gene HEAR
+    # the answer's DETAIL carries each phrase word's OWN score per hypothesis, unrounded, so the gate's reader can point AGAIN
+    # by any part of the phrase (the shape word alone) in the SAME cells — a paired control inside one organism. Read-only, in
+    # the detail alone: the answer, its `raw` and the organism are what they were; without the line the detail is what it was.
     scores = []
+    by_word: Optional[Dict[str, List[float]]] = {w: [] for w in phrase} if "HEAR" in org.g.declared else None
     for h in hyps:
         xs = [located[i] for i in h.members]
-        scores.append(float(sum(max(org.edge_many("sight", xs, c) for c in cells[w]) for w in phrase)))
+        vals = [max(org.edge_many("sight", xs, c) for c in cells[w]) for w in phrase]
+        scores.append(float(sum(vals)))
+        if by_word is not None:
+            for w, v in zip(phrase, vals):
+                by_word[w].append(float(v))
     detail["scores"] = [round(s, 6) for s in scores]
+    if by_word is not None:
+        detail["scores_by_word"] = by_word
     top = max(scores)
     if top <= 0.0:
         return _none(), detail

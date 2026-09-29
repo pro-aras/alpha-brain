@@ -43,7 +43,7 @@ def word_of_vector(v: np.ndarray, blank_zero: bool = False) -> str:
     return word
 
 
-def build_ledgers(org: Organism, moment_thing: Dict[int, str], words_by_vector: bool = False) -> Dict[str, Ledger]:
+def build_ledgers(org: Organism, moment_thing: Dict[int, str]) -> Dict[str, Ledger]:
     """From the organism's birth log (moment, area, cell, reason) and the runner's own map of
     moment → thing shown, derive which thing each cell was born on. Merges union the sets.
 
@@ -54,8 +54,12 @@ def build_ledgers(org: Organism, moment_thing: Dict[int, str], words_by_vector: 
     sight: Ledger = {}
     words: Ledger = {}
     sound: Ledger = {}
-    # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §1.9: `words_by_vector` (the gene HEAR; False on every call
-    # before this edit, byte for byte the old ledger). Under it several word cells are born at ONE moment (a moment meets
+    # edit (the co-signer's OPEN POINT 2, 2026-09-29 13:13 +0400): the choice is read HERE, from the organism's own genome (`org.g.declared`),
+    # never from a caller's flag — twelve production call sites compute a ledger, and one forgotten flag would read the old
+    # ledger in silence. A frozen shadow organism shares `g` (creature/think_thread.py), so it reads the same choice.
+    words_by_vector = "HEAR" in org.g.declared
+    # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §1.9: `words_by_vector` (the gene HEAR; False under every genome
+    # without the line, byte for byte the old ledger). Under it several word cells are born at ONE moment (a moment meets
     # every word of its utterance), and `moment_thing[m]` names only the LAST word — so a WORD cell is named by the word its
     # own vector holds. The sight ledger and the sound ledger are untouched (`thing last`).
     for m, area, cid, _reason in org.births:

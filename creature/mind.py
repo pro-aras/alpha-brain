@@ -313,6 +313,7 @@ def resolve_sibling(rel: str) -> Path:
 
 
 # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §2: the declared genes HEAR may stand beside at STAGE 1.
+HEAR_TWO_WORDS_COS = 0.875          # 7 of 8 letter slots shared: the largest cosine of two distinct words (WALK §C.3, measured)
 HEAR_STAGE_1 = frozenset({"HEAR", "BRAIN", "ANSWER", "ARRIVAL", "ASK", "BODY", "CRASH", "DELIVER", "HEART", "TAPE", "THRESH",
                           "WORLD_SCENE"})
 
@@ -383,6 +384,20 @@ class Mind:
                                    f"(HEAR stage 2, PREREG-WORD-ROAD §2) — the organism does not start")
             if "ear" in self.blind:
                 raise GenomeError("--blind ear beside HEAR: the blind twin's ledger and arrival clock read ONE word "
+                                   "(HEAR stage 2, PREREG-WORD-ROAD §2) — the organism does not start")
+            # edit: Claude (Fable 5.1, the seat), 2026-09-29 13:13 +0400 — the co-signer's note on §2: the law's own facts rest on three PARSED
+            # FIELDS outside `declared`, so the fence covers them too, each by name. Two distinct words of 8 letter slots have
+            # cosine <= 7/8: a words floor at or under it lets two words light ONE cell (§1.5's «the word that lit it», §1.9's
+            # decode); the decode reads the 27-symbol code.
+            floor = self.genome.theta_words if self.genome.theta_words is not None else self.genome.theta_n
+            if float(floor) <= HEAR_TWO_WORDS_COS:
+                raise GenomeError(f"HEAR declared beside a words floor of {floor}: two words can light one cell at or under "
+                                   f"{HEAR_TWO_WORDS_COS} (PREREG-WORD-ROAD §2) — the organism does not start")
+            if int(self.genome.ear_letters) != 8:
+                raise GenomeError(f"HEAR declared beside SENSE ear letters {self.genome.ear_letters}: the law is measured at 8 "
+                                   "(PREREG-WORD-ROAD §2) — the organism does not start")
+            if self.genome.ear_blank_zero:
+                raise GenomeError("HEAR declared beside SENSE ear … blank=zero: no life was ever lived under that code "
                                    "(HEAR stage 2, PREREG-WORD-ROAD §2) — the organism does not start")
 
         # PREREG §11.1 step 5: "frozen" is a TWIN-ONLY blind — it changes how the Organism itself is
@@ -795,7 +810,7 @@ class Mind:
     def ledgers(self) -> Dict[str, Dict[int, set]]:
         """The runner's ledgers (genome/questions.py:build_ledgers) as THIS mind reads them: under the gene HEAR a word cell is
         named by the word its own vector holds (PREREG-WORD-ROAD §1.9); without it, the ledger it always was."""
-        return build_ledgers(self.org, self.moment_word, words_by_vector=self._hear)
+        return build_ledgers(self.org, self.moment_word)
 
     # ------------------------------------------------------------------ consume
     def consume(self, row: Dict[str, object]) -> None:
