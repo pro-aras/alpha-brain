@@ -276,8 +276,9 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         # edit: Claude (Fable 5.1, the seat), 2026-09-29 12:59 +0400 — PREREG-WORD-ROAD §1 (the gene HEAR, stage 1: the lean body).
         "HEAR": "creature/mind.py:Mind.__init__ (the stage-1 allow-list; --blind ear refused) + Mind._consume_eye (every distinct "
                 "word of the instant encoded, in order -> Organism.moment's LIST form: the words side is the union; the journal "
-                "row's `words`) + Mind.ledgers (genome/questions.py:build_ledgers(words_by_vector=True): a word cell is named by "
-                "the word its own vector holds)",
+                "row's `words`) + Mind.ledgers -> genome/questions.py:build_ledgers, which reads the line from the organism's own "
+                "genome (no caller's flag): a word cell is named by the word its own vector holds + creature/organs_road.py:"
+                "answer_point (each phrase word's own scores in the answer's detail)",
     },
 }
 

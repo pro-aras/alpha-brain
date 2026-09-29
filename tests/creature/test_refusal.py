@@ -264,6 +264,9 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:26 +0400 — BRAIN-IN-BODY: one row, matching the genes.py RUNS entry (BRAIN, the mind layer).
         "BRAIN": ("BRAIN    word-map lr 0.01; reader eps 0.3; none 0.95; conformal 0.90; young 3; "
                   "calibrate at 250 500 1000 2000 5000 10000 and before a sitting; replay none; hears scene"),
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 13:23 +0400 — PREREG-WORD-ROAD §1: one row, matching the genes.py RUNS entry (HEAR, the
+        # mind layer). Caught by this class's own gate on the first full creature suite after the gene landed (2dbc1d8: 2 failures).
+        "HEAR": "HEAR     every word; thing last; arrival last",
         # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:56 +0400 — BRAIN-IN-BODY §5 (docs/brain/body/
         # INTERFACE-BRAIN-ORGAN.md): one row, matching the genes.py RUNS entry added by this task (WORLD_SCENE).
         # Caught by this class's own gate on the first full-suite run after landing — the omission this class

@@ -126,6 +126,31 @@ class RepointIsTheRoadsOwnAnswer(unittest.TestCase):
         self.assertGreaterEqual(n, 8)
         self.assertGreater(differ, 0, "the fixture must hold an item where the shape word alone points elsewhere")
 
+    def test_the_planted_control_two_hypotheses_scores_swapped_is_caught(self) -> None:
+        # PREREG §4 P, the co-signer's renewal (3): a planted swap of two hypotheses' scores must break the reproduction
+        bad = n = 0
+        for payload, full, detail, _alone in self._cases():
+            by = detail["scores_by_word"]
+            if len(next(iter(by.values()))) < 2 or full["raw"]["point"] is None:
+                continue
+            swapped = {w: [vs[1], vs[0]] + list(vs[2:]) for w, vs in by.items()}
+            got = WG.repoint(swapped, payload["phrase"], payload["phrase"], WG.tie_of(payload["test_seed"], payload["item"]))
+            n += 1
+            bad += got != full["raw"]["point"]
+        self.assertGreater(n, 0)
+        self.assertGreater(bad, 0)
+
+    def test_a_none_is_read_forced_by_the_items_own_generator(self) -> None:
+        from brain.scene import marks as M
+        self.assertEqual(WG.forced(2, 3, 20261401, "M1:x"), 2, "a named hypothesis is itself")
+        self.assertIsNone(WG.forced(None, 0, 20261401, "M1:x"))
+        for item in ("M1:test:20261401:00000", "M3:m3:20261401:00007"):
+            want = int(M.tie_rng(20261401, item).integers(3))
+            self.assertEqual(WG.forced(None, 3, 20261401, item), want)
+            self.assertEqual(WG.forced(None, 3, 20261401, item), want, "the same draw every time: a fresh generator")
+        draws = {WG.forced(None, 3, 20261401, f"M1:test:20261401:{k:05d}") for k in range(40)}
+        self.assertEqual(draws, {0, 1, 2}, "and it is a draw over every hypothesis")
+
     def test_the_planted_control_a_rounded_score_is_caught(self) -> None:
         # scores rounded to 1 decimal (a reader fed rounded values): at least one re-pointing must differ from the road's
         bad = 0

@@ -12,8 +12,11 @@ Reads the gate's replays (PREREG-WORD-ROAD §3) and writes the marks of §4. It 
   <runs>/<null seed>/null-<k>/life/ (a made tape) · null-<k>/on/journal.jsonl · null-<k>/GENOME.genome
 
 THE RULES THIS READER APPLIES (each is the PREREG's, or is said here because the PREREG leaves it to the reader):
-  · a pointing is RIGHT when it names a hypothesis whose fixations fall mostly on the target (marks.hyp_label); «none»
-    (no hypothesis named) and «unheard» are NOT right — in both arms of every pair. No forced draw is made here.
+  · a pointing is RIGHT when it names a hypothesis whose fixations fall mostly on the target (marks.hyp_label).
+  · a «none» is read FORCED in BOTH arms, as the grader reads it (tools/brain/grade_life.py:offline_answers; PREREG §4 P, the
+    co-signer's renewal): a uniform draw over the row's hypotheses by the item's own generator,
+    marks.tie_rng(test_seed, item).integers(len(hyps)). The «none»s are counted beside each rate.
+  · an «unheard» phrase has no pair (it carries no scores): such items are COUNTED and printed, never dropped in silence.
   · «the shape word alone» = the answer's own `scores_by_word`, summed over the phrase's SHAPE words in phrase order (the
     world's types are the reader's, brain/scene/world.py:word_type); «none» when the top sum is <= 0; an exact tie by the item's
     own generator (marks.tie_rng(test_seed, item)) — the organs' road's own three lines (creature/organs_road.py:answer_point).
@@ -112,6 +115,16 @@ def tie_of(test_seed: int, item: str) -> Callable[[int], int]:
     return lambda n: int(M.tie_rng(int(test_seed), str(item)).integers(n))
 
 
+def forced(point: Optional[int], n_hyp: int, test_seed: int, item: str) -> Optional[int]:
+    """The grader's FORCED reading of a «none»: a uniform draw over the row's hypotheses by the item's own generator (a fresh
+    generator, as offline_answers builds it). A named hypothesis is itself; no hypothesis in view → None."""
+    if point is not None:
+        return int(point)
+    if n_hyp <= 0:
+        return None
+    return int(M.tie_rng(int(test_seed), str(item)).integers(int(n_hyp)))
+
+
 # ================================================================================================ one arm of one seed
 class Arm:
     def __init__(self, root: Path, journal: Path, genome: Path):
@@ -176,6 +189,8 @@ def mark_a(on: Arm, off: Arm) -> Dict[str, object]:
 def p_rows(on: Arm) -> Dict[str, List[Dict[str, object]]]:
     """Per test, the NEEDED items of ON with both pointings and the readings' per-item figures."""
     rows: Dict[str, List[Dict[str, object]]] = {"M1": [], "M3": []}
+    unheard: List[Dict[str, object]] = []
+    rows["unheard"] = unheard
     for mark in ("M1", "M3"):
         for tset, it, tr, lab, mem, phrase, a, ask in on.point_items(mark):
             if not needed(it, tr, phrase):
@@ -188,7 +203,8 @@ def p_rows(on: Arm) -> Dict[str, List[Dict[str, object]]]:
             by = det.get("scores_by_word")
             shape_words = [w for w in phrase if W.word_type(w) == "shape"]
             if raw.get("unheard"):
-                full, alone = None, None                    # mark A fails then; here the pair is wrong / wrong
+                unheard.append({"item": item, "mark": mark, "words": list(raw["unheard"])})
+                continue                                    # no scores, so no pair: counted and printed (mark A fails then)
             else:
                 if by is None or set(by) != set(phrase):
                     raise GateError(f"{item}: ON's answer carries no scores_by_word for its phrase {phrase} (got {by and sorted(by)})")
@@ -202,8 +218,11 @@ def p_rows(on: Arm) -> Dict[str, List[Dict[str, object]]]:
             sizes = [len(m) for m in mem]
             most = [i for i, s in enumerate(sizes) if s == max(sizes)]
             kinds = {W.word_type(w) for w in phrase} - {"shape"}
-            rows[mark].append({"item": item, "tset": tset, "n_hyp": len(lab), "full": is_right(full, lab, tgt),
-                               "alone": is_right(alone, lab, tgt), "full_none": full is None, "alone_none": alone is None,
+            ts = int(ask["test_seed"])
+            rows[mark].append({"item": item, "tset": tset, "n_hyp": len(lab),
+                               "full": is_right(forced(full, len(lab), ts, item), lab, tgt),
+                               "alone": is_right(forced(alone, len(lab), ts, item), lab, tgt),
+                               "full_none": full is None, "alone_none": alone is None,
                                "chance": 1.0 / len(lab) if lab else 0.0,
                                "shape_only_road": float(np.mean([lab[i] == tgt for i in same])),
                                "most_fixations": float(np.mean([lab[i] == tgt for i in most])),
@@ -397,7 +416,7 @@ def read_seed(runs: Path, ws: int, log=print) -> Dict[str, object]:
     g_off = json.loads((run / "grade-off" / "grade.json").read_text())
     rows = p_rows(on)
     res = {"world_seed": ws, "I": mark_i(run, on, off), "A": mark_a(on, off),
-           "P": {m: p_block(rows[m]) for m in ("M1", "M3")}, "P_rows": rows,
+           "P": {m: p_block(rows[m]) for m in ("M1", "M3")}, "P_rows": rows, "P_unheard": rows["unheard"],
            "K": mark_k(g_on, g_off), "K2": mark_k2(on, off), "G": mark_g(on, off, run), "C": mark_c(on, off, run)}
     log(f"[gate {ws}] read: P items {len(rows['M1'])} / {len(rows['M3'])} · K n {res['K']['n']} · K2 n {res['K2']['n']}")
     return res
@@ -473,10 +492,11 @@ def report(res: Dict[str, object]) -> str:
             p = s["P"][m]
             rc = p["reading_chance"]
             L.append(f"  P {m} (NEEDED n {p['n']}; kinds {p['kinds']}): the whole phrase {f(p['full'])} · the shape word alone "
-                     f"{f(p['alone'])} · gap {f(p['gap'])} (pairs {p['f']} for, {p['u']} against; p {p['p']:.2e}) · «none» "
-                     f"{p['full_none']} / {p['alone_none']}")
+                     f"{f(p['alone'])} · gap {f(p['gap'])} (pairs {p['f']} for, {p['u']} against; p {p['p']:.2e}) · «none» read "
+                     f"forced: {p['full_none']} of the whole phrase, {p['alone_none']} of the shape word alone")
             L.append(f"      readings, never graded: chance {f(rc['chance'])} (right {rc['right']}, exact p {rc['p_exact']:.2e}) · "
                      f"a shape-only road {f(p['reading_shape_only_road'])} · the most-fixations pointer {f(p['reading_most_fixations'])}")
+        L.append(f"  P: NEEDED items with an «unheard» phrase (no pair): {len(s['P_unheard'])} {s['P_unheard'][:3]}")
         k = s["K"]
         L.append(f"  K (n {k['n']}): ON {f(k['a'])} · OFF {f(k['b'])} · ON − OFF {f(k['diff'])} ± {f(k['se'])} (pairs {k['f']} / {k['u']}; "
                  f"sign test «ON lower» p {f(k['p_a_lower'], 4)})")
