@@ -7,7 +7,9 @@ Writes <root>/HEALTH.md (overwritten: the state NOW, and every PROBLEM it sees, 
 <root>/HEALTH.jsonl (the history). It reads; with --recover it may also act, and every act is one line of <root>/RECOVERY.log:
   - the life's unit FAILED (it gave up after 5 starts in 10 minutes) or is inactive while its root is not closed → `reset-failed` + `start`,
     at most 4 times in any 24 hours;
-  - the unit active but its heartbeat older than 90 minutes (frozen) → `restart`, at most once in 6 hours (and within the 4 a day).
+  - the unit active but its heartbeat older than 90 minutes (frozen) → `restart`, at most once in 6 hours (and within the 4 a day);
+  - the unit active, its heartbeat fresh, but its moments and last_seq unchanged across an hour of watches (a STUCK mind: the heartbeat
+    is the body's own status thread, so a hung mind thread keeps it fresh) → `restart`, sharing the once-in-6-hours with «frozen».
 It never acts on a CLOSED life (STOPPED-AT). It never raises: a check that fails is itself reported."""
 from __future__ import annotations
 
@@ -24,6 +26,9 @@ MAX_RECOVERIES_24H = 4
 FROZEN_S = 90 * 60
 FROZEN_GAP_S = 6 * 3600
 STALE_S = 15 * 60
+STUCK_S = 60 * 60       # edit: Claude (Opus 5.5, the seat), 2026-09-30 00:16 +0400 — no motion for an hour = a stuck mind (a calibration at
+                        # 20,000 scenes paused learning 0.3 s on brain-long-1; the clock worlds publish every 10–60 s, so a healthy mind moves)
+HISTORY_ROWS = 12       # the watches read back from HEALTH.jsonl (four hours at 20 min)
 
 
 def sh(*a):
@@ -67,7 +72,46 @@ def last_line(p):
         return None
 
 
-def recover(root: Path, unit: str, problems, st_unit, hb_age) -> list:
+def parse_at(s):
+    """A watch's own `at` (HEALTH.jsonl, "%Y-%m-%d %H:%M:%S %z") as epoch seconds; None when it cannot be read."""
+    try:
+        return datetime.strptime(str(s), "%Y-%m-%d %H:%M:%S %z").timestamp()
+    except Exception:
+        return None
+
+
+def recent_rows(p, n=HISTORY_ROWS) -> list:
+    """The last n watches of HEALTH.jsonl, oldest first; an unreadable line is skipped."""
+    out = []
+    try:
+        lines = [l for l in Path(p).read_text().splitlines() if l.strip()][-n:]
+    except Exception:
+        return out
+    for l in lines:
+        try:
+            out.append(json.loads(l))
+        except Exception:
+            continue
+    return out
+
+
+def stuck_since(rows, moments, last_seq, now_t):
+    """Seconds since the OLDEST watch of the unbroken recent run that saw the same moments and last_seq as now; None when the mind moved
+    since the last watch, when there is no history, or when the position is unread (an unread STATUS is never «no motion»)."""
+    if moments is None or last_seq is None:
+        return None
+    oldest = None
+    for r in reversed(rows):
+        if r.get("moments") != moments or r.get("last_seq") != last_seq:
+            break
+        t = parse_at(r.get("at"))
+        if t is None:
+            break
+        oldest = t
+    return None if oldest is None else max(0.0, now_t - oldest)
+
+
+def recover(root: Path, unit: str, problems, st_unit, hb_age, stuck_s=None) -> list:
     acts = []
     if (root / "STOPPED-AT").exists():
         return acts
@@ -75,7 +119,7 @@ def recover(root: Path, unit: str, problems, st_unit, hb_age) -> list:
     rec = read_json(rec_path) or {"acts": []}
     now = time.time()
     recent = [a for a in rec["acts"] if now - a["at"] < 24 * 3600]
-    last_frozen = max([a["at"] for a in rec["acts"] if a.get("why") == "frozen"] or [0])
+    last_frozen = max([a["at"] for a in rec["acts"] if a.get("why") in ("frozen", "no motion")] or [0])
     active = st_unit.get("ActiveState")
     why = None
     if active == "failed" or (active == "inactive" and st_unit.get("UnitFileState") == "enabled"):
@@ -83,6 +127,9 @@ def recover(root: Path, unit: str, problems, st_unit, hb_age) -> list:
         cmds = [["systemctl", "--user", "reset-failed", unit], ["systemctl", "--user", "start", unit]]
     elif active == "active" and hb_age is not None and hb_age > FROZEN_S and now - last_frozen > FROZEN_GAP_S:
         why = "frozen"
+        cmds = [["systemctl", "--user", "restart", unit]]
+    elif active == "active" and stuck_s is not None and stuck_s >= STUCK_S and now - last_frozen > FROZEN_GAP_S:
+        why = "no motion"               # edit: Claude (Opus 5.5, the seat), 2026-09-30 00:16 +0400 — a hung mind thread keeps the heartbeat fresh
         cmds = [["systemctl", "--user", "restart", unit]]
     if why is None:
         return acts
@@ -130,6 +177,11 @@ def main(argv=None) -> int:
         prev = json.loads(pl) if pl else None
     except Exception:
         prev = None
+    try:
+        stuck_s = stuck_since(recent_rows(hist), s.get("moments"), s.get("last_seq"), time.time()) if s else None
+    except Exception:
+        stuck_s = None
+    facts["stuck_s"] = stuck_s
     keys = ("moments", "tape_rows", "last_seq", "mind_backlog_rows", "mind_ms_per_canvas_1min", "rss_mb", "cells", "crash",
             "sense_restarts", "hash_form", "hash_ms_last", "think_ms_median", "stage")
     for k in keys:
@@ -177,6 +229,9 @@ def main(argv=None) -> int:
             problems.append(f"its heartbeat is {hb_age / 60:.0f} minutes old")
         if prev and prev.get("moments") is not None and s.get("moments") == prev.get("moments") and s.get("tape_rows") == prev.get("tape_rows"):
             problems.append("no motion since the last watch (moments and tape rows unchanged)")
+        if stuck_s is not None and stuck_s >= STUCK_S:
+            problems.append(f"no motion for {stuck_s / 60:.0f} minutes (moments {s.get('moments')}, last_seq {s.get('last_seq')}, "
+                            f"backlog {s.get('mind_backlog_rows')}): a stuck mind")
         if (s.get("mind_backlog_rows") or 0) > 500:
             problems.append(f"the mind is {s.get('mind_backlog_rows')} rows behind its senses")
         if (s.get("rss_mb") or 0) > 14000:
@@ -185,8 +240,12 @@ def main(argv=None) -> int:
             problems.append(f"a crash is recorded: {str(s.get('crash'))[:200]}")
         if facts.get("web_error"):
             problems.append(f"the knowledge web switched itself off: {facts['web_error'][:200]}")
-        if prev and st_unit.get("NRestarts") and prev.get("unit", {}).get("NRestarts") and st_unit.get("NRestarts") != prev["unit"]["NRestarts"]:
-            problems.append(f"the unit restarted since the last watch (NRestarts {prev['unit']['NRestarts']} → {st_unit['NRestarts']})")
+        try:        # edit: Claude (Opus 5.5, the seat), 2026-09-30 00:17 +0400 — an INCREASE only: `reset-failed` (the watch's own act, or a close) sets it to 0
+            n_now, n_prev = int(st_unit.get("NRestarts")), int(((prev or {}).get("unit") or {}).get("NRestarts"))
+        except (TypeError, ValueError):
+            n_now = n_prev = None
+        if n_now is not None and n_now > n_prev:
+            problems.append(f"the unit restarted since the last watch (NRestarts {n_prev} → {n_now})")
         if prev and facts.get("repairs") is not None and prev.get("repairs") is not None and facts["repairs"] > prev["repairs"]:
             problems.append(f"a power-cut repair ran at a start ({facts['repairs'] - prev['repairs']} new; see repairs/REPAIRS.jsonl)")
         if page:
@@ -198,7 +257,7 @@ def main(argv=None) -> int:
     acts = []
     if a.recover:
         try:
-            acts = recover(root, a.unit, problems, st_unit, hb_age)
+            acts = recover(root, a.unit, problems, st_unit, hb_age, stuck_s=stuck_s)
         except Exception as e:
             problems.append(f"the recovery step failed: {e!r}")
     facts["problems"] = problems
