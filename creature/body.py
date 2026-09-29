@@ -26,6 +26,7 @@ from genome.machinery import GenomeError, parse_genome
 from . import ask as ask_module
 from .mind import Mind
 from .tape import Tape, now_iso, read_tape
+from . import repair as _repair
 
 STATUS_PERIOD_S = 10.0
 RESTART_BACKOFF_S = 1.0
@@ -184,6 +185,10 @@ class Body:
         self._crash_restart_on, self._crash_page_on = _crash_policy(self._declared)
         self._tape_declared_path: Optional[str] = self._declared.get("TAPE", {}).get("path")
         self.root.mkdir(parents=True, exist_ok=True)
+        # edit: Claude (Opus 5.5, the seat), 2026-09-29 23:31 +0400 — his 23:20 word: THE POWER-CUT REPAIR (creature/repair.py), before the tape is opened
+        # and before anything appends: a torn TAIL of every append-only JSON-lines file of an OPEN life is cut, kept and recorded; start()
+        # journals each repair. A closed life's record is never written (SOLUTIONS #240), so a root carrying STOPPED-AT is not repaired.
+        self.repairs: List[Dict[str, object]] = [] if closed_marker(self.root) else _repair.repair_life(self.root, self._tape_declared_path)
         self.tape = Tape(self.root, declared_path=self._tape_declared_path)
         self.q: "queue.Queue[Dict[str, object]]" = queue.Queue()
         self._publish_lock = threading.Lock()
@@ -246,6 +251,9 @@ class Body:
             if row["seq"] > last_seq:
                 self._consume(row)
                 backlog += 1
+        self.tape.ensure_seq_at_least(last_seq)     # edit: Claude (Opus 5.5, the seat), 2026-09-29 23:31 +0400 — a row the mind saw may have been cut
+        for rec in self.repairs:                    # the power-cut repairs of this start, one event each (creature/repair.py)
+            self._journal_event({"event": "repair", **rec})
         self._journal_event({"event": "start", "resumed_from_seq": last_seq, "backlog_replayed": backlog})
 
         self._mind_thread = threading.Thread(target=self._mind_loop, name="mind", daemon=True)

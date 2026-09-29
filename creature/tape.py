@@ -56,10 +56,20 @@ class Tape:
         self._seq = self._read_seq()
 
     def _read_seq(self) -> int:
+        # edit: Claude (Opus 5.5, the seat), 2026-09-29 23:31 +0400 — his 23:20 word: a power cut can empty or zero-fill SEQ mid-rewrite (it is
+        # rewritten after every row), and an emptied SEQ restarted the seq at 1. The seq is now the LARGER of what SEQ says (read
+        # tolerantly) and the last whole row on the tape; the body lifts it further to the mind's own last_seq (ensure_seq_at_least).
+        from .repair import last_row_seq
+        n = 0
         if self.seq_path.exists():
-            t = self.seq_path.read_text().strip()
-            return int(t) if t else 0
-        return 0
+            t = self.seq_path.read_bytes().replace(b"\x00", b"").strip()
+            n = int(t) if t.isdigit() else 0
+        return max(n, last_row_seq(self.tape_dir))
+
+    def ensure_seq_at_least(self, n: int) -> None:
+        """The next row's seq is above `n` (the mind's last_seq at a resume: a row the mind saw may have been lost in a cut)."""
+        with self._lock:
+            self._seq = max(self._seq, int(n))
 
     def publish(self, sense: str, payload: bytes, meta: Dict[str, object], ext: str, at: Optional[str] = None) -> Dict[str, object]:
         """Append one tape row. `at`: a UTC ISO string (ms) or None → now (the ONLY wall-clock read in the
