@@ -319,3 +319,43 @@ class Claim:
                 "author": self.author, "confirmed": self.confirmed, "contradicted": self.contradicted,
                 "share_confirmed": (self.confirmed / n if n else None), "state": self.state,
                 "first_demoted_at": self.first_demoted_at, "first_event_at": self.first_event_at, "min_events": self.min_events}
+
+
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 22:55 +0400 — PREREG-KW-1 §4.3: THE SELF NODE: the claims placed in it and what its life measures.
+class SelfNode:
+    """The organism's memories about itself: `claims` (each a Claim, placed with its source and author) and `lived` (what its own
+    record measures: canvases and fixations a canvas; turns that carried an expectation and how many the parent confirmed; per heard
+    word, how often the word named something it expected that word for)."""
+
+    def __init__(self, author: Optional[str] = None):
+        self.author = author
+        self.claims: Dict[str, Claim] = {}
+        self.lived: Dict[str, object] = {"canvases": 0, "fix": {}, "turns_expecting": 0, "expect_confirmed": 0, "words": {}}
+
+    def place(self, claim: "Claim") -> None:
+        self.claims[claim.id] = claim
+
+    def canvas(self, n_fix: int) -> None:
+        self.lived["canvases"] += 1
+        k = str(int(n_fix))
+        self.lived["fix"][k] = self.lived["fix"].get(k, 0) + 1
+
+    def turn(self, heard: Sequence[str], expected: Sequence[Sequence[str]], surprise: Optional[float]) -> None:
+        if surprise is None:
+            return
+        self.lived["turns_expecting"] += 1
+        self.lived["expect_confirmed"] += int(surprise == 0)
+        union = {w for h in expected for w in h}
+        for w in dict.fromkeys(str(x) for x in heard):
+            hc = self.lived["words"].setdefault(w, [0, 0])
+            hc[0] += 1
+            hc[1] += int(w in union)
+
+    def reliability(self, word: str) -> Optional[float]:
+        hc = self.lived["words"].get(word)
+        return (hc[1] / hc[0]) if hc and hc[0] else None
+
+    def to_dict(self) -> Dict[str, object]:
+        return {"author": self.author, "claims": {k: c.to_dict() for k, c in sorted(self.claims.items())},
+                "lived": json.loads(json.dumps(self.lived))}
+

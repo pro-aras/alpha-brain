@@ -299,5 +299,49 @@ class SelfClaims(unittest.TestCase):
         self.assertEqual(u.state, "demoted")
 
 
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 22:54 +0400 — PREREG-KW-1 §4.3 K10: the SELF node's lived rates equal a recount written here.
+class SelfNodeLived(unittest.TestCase):
+    def test_the_lived_rates_equal_a_recount(self):
+        rng = random.Random(5)
+        shapes = ["circle", "ring", "star"]
+        node = Wb.SelfNode(author="t")
+        turns = []
+        for i in range(400):
+            node.canvas(rng.choice([3, 4, 4, 4]))
+            heard = [rng.choice(["big", "small"]), rng.choice(shapes)][: rng.choice([1, 2])]
+            expected = [[rng.choice(shapes), "big"], [rng.choice(shapes), "small"]] if i > 20 else []
+            surprise = None if not expected else (0.0 if all(any(w in h for h in expected) for w in heard) else 0.5)
+            node.turn(heard, expected, surprise)
+            turns.append((heard, expected, surprise))
+        fix = {}
+        n_exp = ok = 0
+        words = {}
+        for heard, expected, surprise in turns:
+            if surprise is None:
+                continue
+            n_exp += 1
+            ok += int(surprise == 0)
+            union = {w for h in expected for w in h}
+            for w in dict.fromkeys(heard):
+                hc = words.setdefault(w, [0, 0])
+                hc[0] += 1
+                hc[1] += int(w in union)
+        lv = node.to_dict()["lived"]
+        self.assertEqual(lv["canvases"], 400)
+        self.assertEqual(sum(lv["fix"].values()), 400)
+        self.assertEqual((lv["turns_expecting"], lv["expect_confirmed"]), (n_exp, ok))
+        self.assertEqual(lv["words"], words)
+        w0 = next(iter(words))
+        self.assertAlmostEqual(node.reliability(w0), words[w0][1] / words[w0][0])
+        self.assertIsNone(node.reliability("never-heard"))
+
+    def test_placed_claims_keep_their_source_and_author(self):
+        node = Wb.SelfNode(author="life-x")
+        node.place(Wb.Claim("T1", "x", "always", 0.05, source="implanted-knowledge", author="the seat"))
+        d = node.to_dict()
+        self.assertEqual(d["claims"]["T1"]["source"], "implanted-knowledge")
+        self.assertEqual(d["claims"]["T1"]["author"], "the seat")
+
+
 if __name__ == "__main__":
     unittest.main()
