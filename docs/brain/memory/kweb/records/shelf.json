@@ -1,0 +1,1591 @@
+{
+ "G1": [
+  {
+   "errors": 0,
+   "first": [],
+   "rule": "H"
+  },
+  {
+   "errors": 0,
+   "first": [],
+   "rule": "F"
+  },
+  {
+   "errors": 0,
+   "first": [],
+   "rule": "L"
+  },
+  {
+   "errors": 0,
+   "first": [],
+   "rule": "S"
+  },
+  {
+   "errors": 0,
+   "first": [],
+   "rule": "R"
+  },
+  {
+   "errors": 0,
+   "first": [],
+   "rule": "S0"
+  }
+ ],
+ "G1_plant_caught": true,
+ "G3": true,
+ "head": {
+  "B": 1652,
+  "V_grow": 826,
+  "bad_lines": 0,
+  "grow": 9133,
+  "held_out": 6089,
+  "held_out_strong_pairs": 1522,
+  "words": 15222
+ },
+ "runs": [
+  {
+   "consolidated": 560,
+   "edges_used": 423,
+   "enrichment": 1.7989713492027057,
+   "expected": 922.7495483659053,
+   "graph": {
+    "clustering": 0.39662170894038823,
+    "edges": 560,
+    "hubs": [
+     [
+      81,
+      "the"
+     ],
+     [
+      44,
+      "a"
+     ],
+     [
+      40,
+      "and"
+     ],
+     [
+      30,
+      "in"
+     ],
+     [
+      25,
+      "to"
+     ],
+     [
+      25,
+      "is"
+     ],
+     [
+      24,
+      "you"
+     ],
+     [
+      24,
+      "it"
+     ]
+    ],
+    "largest_component": 245,
+    "max_degree": 81,
+    "mean_degree": 4.46215139442231,
+    "mean_path": 3.324255603880897,
+    "nodes": 251,
+    "random_clustering": 0.01784860557768924,
+    "random_path": 3.694395774218743
+   },
+   "live": 8832,
+   "observed": 1660.0,
+   "peak": 8832,
+   "recall_strong": 0.06307490144546649,
+   "rule": "H",
+   "seed": 1,
+   "stats": {
+    "consolidated": 560,
+    "events": 26492,
+    "evidence": 17660,
+    "offered": 8832,
+    "realised": 8832,
+    "refused": 0,
+    "removed_missed": 0,
+    "replaced": 0,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real",
+   "top": [
+    [
+     158,
+     [
+      "in",
+      "the"
+     ]
+    ],
+    [
+     106,
+     [
+      "of",
+      "the"
+     ]
+    ],
+    [
+     85,
+     [
+      "is",
+      "the"
+     ]
+    ],
+    [
+     80,
+     [
+      "the",
+      "to"
+     ]
+    ],
+    [
+     64,
+     [
+      "on",
+      "the"
+     ]
+    ],
+    [
+     49,
+     [
+      "is",
+      "it"
+     ]
+    ],
+    [
+     49,
+     [
+      "has",
+      "the"
+     ]
+    ],
+    [
+     46,
+     [
+      "a",
+      "is"
+     ]
+    ],
+    [
+     42,
+     [
+      "pond",
+      "the"
+     ]
+    ],
+    [
+     41,
+     [
+      "and",
+      "to"
+     ]
+    ],
+    [
+     40,
+     [
+      "in",
+      "it"
+     ]
+    ],
+    [
+     39,
+     [
+      "it",
+      "to"
+     ]
+    ],
+    [
+     38,
+     [
+      "a",
+      "has"
+     ]
+    ],
+    [
+     35,
+     [
+      "will",
+      "you"
+     ]
+    ],
+    [
+     35,
+     [
+      "at",
+      "the"
+     ]
+    ],
+    [
+     33,
+     [
+      "man",
+      "the"
+     ]
+    ],
+    [
+     32,
+     [
+      "hen",
+      "the"
+     ]
+    ],
+    [
+     32,
+     [
+      "girl",
+      "illustra"
+     ]
+    ],
+    [
+     30,
+     [
+      "the",
+      "words"
+     ]
+    ],
+    [
+     29,
+     [
+      "is",
+      "on"
+     ]
+    ],
+    [
+     29,
+     [
+      "do",
+      "you"
+     ]
+    ],
+    [
+     28,
+     [
+      "letters",
+      "the"
+     ]
+    ],
+    [
+     28,
+     [
+      "a",
+      "with"
+     ]
+    ],
+    [
+     27,
+     [
+      "i",
+      "will"
+     ]
+    ],
+    [
+     27,
+     [
+      "dog",
+      "the"
+     ]
+    ]
+   ]
+  },
+  {
+   "consolidated": 123,
+   "edges_used": 69,
+   "enrichment": 1.7296150507757437,
+   "expected": 259.5953358515356,
+   "live": 1652,
+   "observed": 449.0,
+   "peak": 1652,
+   "recall_strong": 0.011169513797634692,
+   "rule": "F",
+   "seed": 1,
+   "stats": {
+    "consolidated": 123,
+    "events": 26492,
+    "evidence": 4522,
+    "offered": 21970,
+    "realised": 1652,
+    "refused": 20318,
+    "removed_missed": 0,
+    "replaced": 0,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 303,
+   "edges_used": 215,
+   "enrichment": 1.7021951192101743,
+   "expected": 584.5393332238458,
+   "live": 1652,
+   "observed": 995.0,
+   "peak": 1652,
+   "recall_strong": 0.03153745072273324,
+   "rule": "L",
+   "seed": 1,
+   "stats": {
+    "consolidated": 303,
+    "events": 26492,
+    "evidence": 10594,
+    "offered": 15898,
+    "realised": 15898,
+    "refused": 0,
+    "removed_missed": 394,
+    "replaced": 13852,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 326,
+   "edges_used": 236,
+   "enrichment": 1.7359513800344237,
+   "expected": 624.4414517983242,
+   "graph": {
+    "clustering": 0.38584480481826433,
+    "edges": 326,
+    "hubs": [
+     [
+      63,
+      "the"
+     ],
+     [
+      33,
+      "a"
+     ],
+     [
+      22,
+      "and"
+     ],
+     [
+      17,
+      "is"
+     ],
+     [
+      15,
+      "illustra"
+     ],
+     [
+      14,
+      "to"
+     ],
+     [
+      14,
+      "has"
+     ],
+     [
+      13,
+      "in"
+     ]
+    ],
+    "largest_component": 166,
+    "max_degree": 63,
+    "mean_degree": 3.4680851063829787,
+    "mean_path": 3.5350127783862724,
+    "nodes": 188,
+    "random_clustering": 0.018545909659802025,
+    "random_path": 4.210703617565179
+   },
+   "live": 1652,
+   "observed": 1084.0,
+   "peak": 1652,
+   "recall_strong": 0.03613666228646518,
+   "rule": "S",
+   "seed": 1,
+   "stats": {
+    "consolidated": 326,
+    "events": 26492,
+    "evidence": 9339,
+    "offered": 17153,
+    "realised": 8740,
+    "refused": 0,
+    "removed_missed": 463,
+    "replaced": 6625,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real",
+   "top": [
+    [
+     156,
+     [
+      "in",
+      "the"
+     ]
+    ],
+    [
+     106,
+     [
+      "of",
+      "the"
+     ]
+    ],
+    [
+     64,
+     [
+      "on",
+      "the"
+     ]
+    ],
+    [
+     48,
+     [
+      "has",
+      "the"
+     ]
+    ],
+    [
+     45,
+     [
+      "a",
+      "the"
+     ]
+    ],
+    [
+     42,
+     [
+      "pond",
+      "the"
+     ]
+    ],
+    [
+     42,
+     [
+      "is",
+      "it"
+     ]
+    ],
+    [
+     42,
+     [
+      "a",
+      "is"
+     ]
+    ],
+    [
+     36,
+     [
+      "the",
+      "to"
+     ]
+    ],
+    [
+     36,
+     [
+      "a",
+      "has"
+     ]
+    ],
+    [
+     32,
+     [
+      "will",
+      "you"
+     ]
+    ],
+    [
+     32,
+     [
+      "man",
+      "the"
+     ]
+    ],
+    [
+     31,
+     [
+      "girl",
+      "illustra"
+     ]
+    ],
+    [
+     31,
+     [
+      "at",
+      "the"
+     ]
+    ],
+    [
+     30,
+     [
+      "the",
+      "words"
+     ]
+    ],
+    [
+     29,
+     [
+      "is",
+      "on"
+     ]
+    ],
+    [
+     29,
+     [
+      "hen",
+      "the"
+     ]
+    ],
+    [
+     29,
+     [
+      "do",
+      "you"
+     ]
+    ],
+    [
+     28,
+     [
+      "a",
+      "and"
+     ]
+    ],
+    [
+     27,
+     [
+      "dog",
+      "the"
+     ]
+    ],
+    [
+     27,
+     [
+      "a",
+      "with"
+     ]
+    ],
+    [
+     25,
+     [
+      "letters",
+      "the"
+     ]
+    ],
+    [
+     25,
+     [
+      "illustra",
+      "script"
+     ]
+    ],
+    [
+     25,
+     [
+      "can",
+      "it"
+     ]
+    ],
+    [
+     24,
+     [
+      "the",
+      "then"
+     ]
+    ]
+   ]
+  },
+  {
+   "consolidated": 345,
+   "edges_used": 251,
+   "enrichment": 1.7038372746486246,
+   "expected": 703.7056988011163,
+   "live": 1652,
+   "observed": 1199.0,
+   "peak": 1652,
+   "recall_strong": 0.03876478318002628,
+   "rule": "S",
+   "seed": 2,
+   "stats": {
+    "consolidated": 345,
+    "events": 26492,
+    "evidence": 9413,
+    "offered": 17079,
+    "realised": 8533,
+    "refused": 0,
+    "removed_missed": 438,
+    "replaced": 6443,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 349,
+   "edges_used": 258,
+   "enrichment": 1.7897769025013979,
+   "expected": 670.4746263754305,
+   "live": 1652,
+   "observed": 1200.0,
+   "peak": 1652,
+   "recall_strong": 0.04007884362680683,
+   "rule": "S",
+   "seed": 3,
+   "stats": {
+    "consolidated": 349,
+    "events": 26492,
+    "evidence": 9487,
+    "offered": 17005,
+    "realised": 8555,
+    "refused": 0,
+    "removed_missed": 440,
+    "replaced": 6463,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 348,
+   "edges_used": 253,
+   "enrichment": 1.7349090652978452,
+   "expected": 666.8937428149117,
+   "live": 1652,
+   "observed": 1157.0,
+   "peak": 1652,
+   "recall_strong": 0.04007884362680683,
+   "rule": "S",
+   "seed": 4,
+   "stats": {
+    "consolidated": 348,
+    "events": 26492,
+    "evidence": 9470,
+    "offered": 17022,
+    "realised": 8382,
+    "refused": 0,
+    "removed_missed": 416,
+    "replaced": 6314,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 338,
+   "edges_used": 249,
+   "enrichment": 1.7647407644690556,
+   "expected": 689.0530464772535,
+   "live": 1652,
+   "observed": 1216.0,
+   "peak": 1652,
+   "recall_strong": 0.04139290407358739,
+   "rule": "S",
+   "seed": 5,
+   "stats": {
+    "consolidated": 338,
+    "events": 26492,
+    "evidence": 9479,
+    "offered": 17013,
+    "realised": 8594,
+    "refused": 0,
+    "removed_missed": 448,
+    "replaced": 6494,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 352,
+   "edges_used": 259,
+   "enrichment": 1.8558463635274407,
+   "expected": 657.9208408605674,
+   "live": 1652,
+   "observed": 1221.0,
+   "peak": 1652,
+   "recall_strong": 0.04204993429697766,
+   "rule": "S",
+   "seed": 6,
+   "stats": {
+    "consolidated": 352,
+    "events": 26492,
+    "evidence": 9426,
+    "offered": 17066,
+    "realised": 8504,
+    "refused": 0,
+    "removed_missed": 419,
+    "replaced": 6433,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 340,
+   "edges_used": 257,
+   "enrichment": 1.7307349232157994,
+   "expected": 706.6362292658888,
+   "live": 1652,
+   "observed": 1223.0,
+   "peak": 1652,
+   "recall_strong": 0.04139290407358739,
+   "rule": "S",
+   "seed": 7,
+   "stats": {
+    "consolidated": 340,
+    "events": 26492,
+    "evidence": 9507,
+    "offered": 16985,
+    "realised": 8456,
+    "refused": 0,
+    "removed_missed": 454,
+    "replaced": 6350,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 356,
+   "edges_used": 261,
+   "enrichment": 1.6637057396007429,
+   "expected": 772.973230415503,
+   "live": 1652,
+   "observed": 1286.0,
+   "peak": 1652,
+   "recall_strong": 0.04139290407358739,
+   "rule": "S",
+   "seed": 8,
+   "stats": {
+    "consolidated": 356,
+    "events": 26492,
+    "evidence": 9525,
+    "offered": 16967,
+    "realised": 8481,
+    "refused": 0,
+    "removed_missed": 419,
+    "replaced": 6410,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 355,
+   "edges_used": 269,
+   "enrichment": 1.7729669920729283,
+   "expected": 693.7523402857609,
+   "live": 1652,
+   "observed": 1230.0,
+   "peak": 1652,
+   "recall_strong": 0.042706964520367936,
+   "rule": "S",
+   "seed": 9,
+   "stats": {
+    "consolidated": 355,
+    "events": 26492,
+    "evidence": 9523,
+    "offered": 16969,
+    "realised": 8455,
+    "refused": 0,
+    "removed_missed": 415,
+    "replaced": 6388,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 355,
+   "edges_used": 265,
+   "enrichment": 1.7345587072191193,
+   "expected": 703.9254393168004,
+   "live": 1652,
+   "observed": 1221.0,
+   "peak": 1652,
+   "recall_strong": 0.04007884362680683,
+   "rule": "S",
+   "seed": 10,
+   "stats": {
+    "consolidated": 355,
+    "events": 26492,
+    "evidence": 9591,
+    "offered": 16901,
+    "realised": 8457,
+    "refused": 0,
+    "removed_missed": 419,
+    "replaced": 6386,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 30,
+   "edges_used": 25,
+   "enrichment": 1.660416804389502,
+   "expected": 119.24716702249961,
+   "live": 1652,
+   "observed": 198.0,
+   "peak": 1652,
+   "recall_strong": 0.0032851511169513796,
+   "rule": "R",
+   "seed": 1,
+   "stats": {
+    "consolidated": 30,
+    "events": 26492,
+    "evidence": 1790,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 223,
+    "replaced": 6849,
+    "sprout_existing": 408,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 37,
+   "edges_used": 28,
+   "enrichment": 2.563009156726373,
+   "expected": 101.44325833470194,
+   "live": 1652,
+   "observed": 260.0,
+   "peak": 1652,
+   "recall_strong": 0.005913272010512484,
+   "rule": "R",
+   "seed": 2,
+   "stats": {
+    "consolidated": 37,
+    "events": 26492,
+    "evidence": 1550,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 200,
+    "replaced": 6854,
+    "sprout_existing": 426,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 39,
+   "edges_used": 29,
+   "enrichment": 1.7729103846583385,
+   "expected": 164.70093611430448,
+   "live": 1652,
+   "observed": 292.0,
+   "peak": 1652,
+   "recall_strong": 0.005913272010512484,
+   "rule": "R",
+   "seed": 3,
+   "stats": {
+    "consolidated": 39,
+    "events": 26492,
+    "evidence": 1882,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 222,
+    "replaced": 6884,
+    "sprout_existing": 374,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 39,
+   "edges_used": 30,
+   "enrichment": 1.6228383552446535,
+   "expected": 144.80801445229105,
+   "live": 1652,
+   "observed": 235.0,
+   "peak": 1652,
+   "recall_strong": 0.003942181340341655,
+   "rule": "R",
+   "seed": 4,
+   "stats": {
+    "consolidated": 39,
+    "events": 26492,
+    "evidence": 1771,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 218,
+    "replaced": 6841,
+    "sprout_existing": 421,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 36,
+   "edges_used": 28,
+   "enrichment": 1.2973210123905135,
+   "expected": 188.85071440302184,
+   "live": 1652,
+   "observed": 245.0,
+   "peak": 1652,
+   "recall_strong": 0.0019710906701708277,
+   "rule": "R",
+   "seed": 5,
+   "stats": {
+    "consolidated": 36,
+    "events": 26492,
+    "evidence": 1838,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 216,
+    "replaced": 6856,
+    "sprout_existing": 408,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 41,
+   "edges_used": 33,
+   "enrichment": 1.897394416393308,
+   "expected": 176.03087534898998,
+   "live": 1652,
+   "observed": 334.0,
+   "peak": 1652,
+   "recall_strong": 0.00788436268068331,
+   "rule": "R",
+   "seed": 6,
+   "stats": {
+    "consolidated": 41,
+    "events": 26492,
+    "evidence": 1886,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 197,
+    "replaced": 6893,
+    "sprout_existing": 390,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 33,
+   "edges_used": 26,
+   "enrichment": 1.6674846428111172,
+   "expected": 91.75496797503696,
+   "live": 1652,
+   "observed": 153.0,
+   "peak": 1652,
+   "recall_strong": 0.0032851511169513796,
+   "rule": "R",
+   "seed": 7,
+   "stats": {
+    "consolidated": 33,
+    "events": 26492,
+    "evidence": 1556,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 209,
+    "replaced": 6874,
+    "sprout_existing": 397,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 33,
+   "edges_used": 28,
+   "enrichment": 1.6955367685372416,
+   "expected": 137.41960913122026,
+   "live": 1652,
+   "observed": 233.0,
+   "peak": 1652,
+   "recall_strong": 0.005913272010512484,
+   "rule": "R",
+   "seed": 8,
+   "stats": {
+    "consolidated": 33,
+    "events": 26492,
+    "evidence": 1733,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 204,
+    "replaced": 6910,
+    "sprout_existing": 366,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 36,
+   "edges_used": 22,
+   "enrichment": 1.625180186355271,
+   "expected": 158.1363113811792,
+   "live": 1652,
+   "observed": 257.0,
+   "peak": 1652,
+   "recall_strong": 0.0032851511169513796,
+   "rule": "R",
+   "seed": 9,
+   "stats": {
+    "consolidated": 36,
+    "events": 26492,
+    "evidence": 1789,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 206,
+    "replaced": 6892,
+    "sprout_existing": 382,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 34,
+   "edges_used": 24,
+   "enrichment": 1.5086956863732184,
+   "expected": 125.27377237641649,
+   "live": 1652,
+   "observed": 189.0,
+   "peak": 1652,
+   "recall_strong": 0.003942181340341655,
+   "rule": "R",
+   "seed": 10,
+   "stats": {
+    "consolidated": 34,
+    "events": 26492,
+    "evidence": 1638,
+    "offered": 0,
+    "realised": 0,
+    "refused": 0,
+    "removed_missed": 192,
+    "replaced": 6890,
+    "sprout_existing": 398,
+    "sprouted": 9132
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 65,
+   "edges_used": 4,
+   "enrichment": 0.0,
+   "expected": 2.7925767777960253,
+   "live": 1652,
+   "observed": 0.0,
+   "peak": 1652,
+   "recall_strong": 0.0,
+   "rule": "S0",
+   "seed": 1,
+   "stats": {
+    "consolidated": 65,
+    "events": 26492,
+    "evidence": 579,
+    "offered": 25913,
+    "realised": 12927,
+    "refused": 0,
+    "removed_missed": 57,
+    "replaced": 11218,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 79,
+   "edges_used": 4,
+   "enrichment": 0.0,
+   "expected": 1.4623090819510594,
+   "live": 1652,
+   "observed": 0.0,
+   "peak": 1652,
+   "recall_strong": 0.0,
+   "rule": "S0",
+   "seed": 2,
+   "stats": {
+    "consolidated": 79,
+    "events": 26492,
+    "evidence": 670,
+    "offered": 25822,
+    "realised": 13017,
+    "refused": 0,
+    "removed_missed": 64,
+    "replaced": 11301,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 66,
+   "edges_used": 7,
+   "enrichment": 0.80034174553102,
+   "expected": 1.2494662506158647,
+   "live": 1652,
+   "observed": 1.0,
+   "peak": 1652,
+   "recall_strong": 0.0,
+   "rule": "S0",
+   "seed": 3,
+   "stats": {
+    "consolidated": 66,
+    "events": 26492,
+    "evidence": 618,
+    "offered": 25874,
+    "realised": 12955,
+    "refused": 0,
+    "removed_missed": 67,
+    "replaced": 11236,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 65,
+   "edges_used": 10,
+   "enrichment": 0.674756205673759,
+   "expected": 2.964033503038265,
+   "live": 1652,
+   "observed": 2.0,
+   "peak": 1652,
+   "recall_strong": 0.0,
+   "rule": "S0",
+   "seed": 4,
+   "stats": {
+    "consolidated": 65,
+    "events": 26492,
+    "evidence": 638,
+    "offered": 25854,
+    "realised": 12930,
+    "refused": 0,
+    "removed_missed": 76,
+    "replaced": 11202,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 69,
+   "edges_used": 9,
+   "enrichment": 0.0,
+   "expected": 1.6436196419773361,
+   "live": 1652,
+   "observed": 0.0,
+   "peak": 1652,
+   "recall_strong": 0.0,
+   "rule": "S0",
+   "seed": 5,
+   "stats": {
+    "consolidated": 69,
+    "events": 26492,
+    "evidence": 609,
+    "offered": 25883,
+    "realised": 12906,
+    "refused": 0,
+    "removed_missed": 82,
+    "replaced": 11172,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 59,
+   "edges_used": 4,
+   "enrichment": 5.125420875420875,
+   "expected": 0.7804237148957136,
+   "live": 1652,
+   "observed": 4.0,
+   "peak": 1652,
+   "recall_strong": 0.000657030223390276,
+   "rule": "S0",
+   "seed": 6,
+   "stats": {
+    "consolidated": 59,
+    "events": 26492,
+    "evidence": 614,
+    "offered": 25878,
+    "realised": 12907,
+    "refused": 0,
+    "removed_missed": 61,
+    "replaced": 11194,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 59,
+   "edges_used": 7,
+   "enrichment": 0.0,
+   "expected": 0.5596978157332896,
+   "live": 1652,
+   "observed": 0.0,
+   "peak": 1652,
+   "recall_strong": 0.0,
+   "rule": "S0",
+   "seed": 7,
+   "stats": {
+    "consolidated": 59,
+    "events": 26492,
+    "evidence": 564,
+    "offered": 25928,
+    "realised": 13079,
+    "refused": 0,
+    "removed_missed": 70,
+    "replaced": 11357,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 55,
+   "edges_used": 8,
+   "enrichment": 0.0,
+   "expected": 4.272622762358352,
+   "live": 1652,
+   "observed": 0.0,
+   "peak": 1652,
+   "recall_strong": 0.0,
+   "rule": "S0",
+   "seed": 8,
+   "stats": {
+    "consolidated": 55,
+    "events": 26492,
+    "evidence": 566,
+    "offered": 25926,
+    "realised": 13002,
+    "refused": 0,
+    "removed_missed": 60,
+    "replaced": 11290,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 68,
+   "edges_used": 8,
+   "enrichment": 1.51537254001072,
+   "expected": 8.57874856298243,
+   "live": 1652,
+   "observed": 13.0,
+   "peak": 1652,
+   "recall_strong": 0.000657030223390276,
+   "rule": "S0",
+   "seed": 9,
+   "stats": {
+    "consolidated": 68,
+    "events": 26492,
+    "evidence": 605,
+    "offered": 25887,
+    "realised": 12961,
+    "refused": 0,
+    "removed_missed": 61,
+    "replaced": 11248,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 64,
+   "edges_used": 6,
+   "enrichment": 3.590212264150944,
+   "expected": 0.8356051896863195,
+   "live": 1652,
+   "observed": 3.0,
+   "peak": 1652,
+   "recall_strong": 0.000657030223390276,
+   "rule": "S0",
+   "seed": 10,
+   "stats": {
+    "consolidated": 64,
+    "events": 26492,
+    "evidence": 568,
+    "offered": 25924,
+    "realised": 12834,
+    "refused": 0,
+    "removed_missed": 57,
+    "replaced": 11125,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "real"
+  },
+  {
+   "consolidated": 106,
+   "edges_used": 76,
+   "enrichment": 0.9515690183847237,
+   "expected": 99.83511249794711,
+   "live": 18157,
+   "observed": 95.0,
+   "peak": 18157,
+   "recall_strong": 0.0032851511169513796,
+   "rule": "H",
+   "seed": 1,
+   "stats": {
+    "consolidated": 106,
+    "events": 27158,
+    "evidence": 9001,
+    "offered": 18157,
+    "realised": 18157,
+    "refused": 0,
+    "removed_missed": 0,
+    "replaced": 0,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 86,
+   "edges_used": 72,
+   "enrichment": 0.9740947112972979,
+   "expected": 242.27623583511254,
+   "live": 1652,
+   "observed": 236.0,
+   "peak": 1652,
+   "recall_strong": 0.002628120893561104,
+   "rule": "S",
+   "seed": 1,
+   "stats": {
+    "consolidated": 86,
+    "events": 27158,
+    "evidence": 3988,
+    "offered": 23170,
+    "realised": 11750,
+    "refused": 0,
+    "removed_missed": 449,
+    "replaced": 9649,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 85,
+   "edges_used": 70,
+   "enrichment": 0.8950517099730977,
+   "expected": 244.67860075546074,
+   "live": 1652,
+   "observed": 219.0,
+   "peak": 1652,
+   "recall_strong": 0.0019710906701708277,
+   "rule": "S",
+   "seed": 2,
+   "stats": {
+    "consolidated": 85,
+    "events": 27158,
+    "evidence": 4042,
+    "offered": 23116,
+    "realised": 11618,
+    "refused": 0,
+    "removed_missed": 459,
+    "replaced": 9507,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 71,
+   "edges_used": 60,
+   "enrichment": 0.9941224489795921,
+   "expected": 217.2770569880111,
+   "live": 1652,
+   "observed": 216.0,
+   "peak": 1652,
+   "recall_strong": 0.001314060446780552,
+   "rule": "S",
+   "seed": 3,
+   "stats": {
+    "consolidated": 71,
+    "events": 27158,
+    "evidence": 3911,
+    "offered": 23247,
+    "realised": 11602,
+    "refused": 0,
+    "removed_missed": 465,
+    "replaced": 9485,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 82,
+   "edges_used": 69,
+   "enrichment": 0.8784424398072304,
+   "expected": 275.48760059123015,
+   "live": 1652,
+   "observed": 242.0,
+   "peak": 1652,
+   "recall_strong": 0.000657030223390276,
+   "rule": "S",
+   "seed": 4,
+   "stats": {
+    "consolidated": 82,
+    "events": 27158,
+    "evidence": 3924,
+    "offered": 23234,
+    "realised": 11496,
+    "refused": 0,
+    "removed_missed": 475,
+    "replaced": 9369,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 88,
+   "edges_used": 70,
+   "enrichment": 1.0604574769372568,
+   "expected": 245.17720479553296,
+   "live": 1652,
+   "observed": 260.0,
+   "peak": 1652,
+   "recall_strong": 0.002628120893561104,
+   "rule": "S",
+   "seed": 5,
+   "stats": {
+    "consolidated": 88,
+    "events": 27158,
+    "evidence": 3971,
+    "offered": 23187,
+    "realised": 11699,
+    "refused": 0,
+    "removed_missed": 444,
+    "replaced": 9603,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 90,
+   "edges_used": 74,
+   "enrichment": 0.9497702128954694,
+   "expected": 259.01001806536385,
+   "live": 1652,
+   "observed": 246.0,
+   "peak": 1652,
+   "recall_strong": 0.001314060446780552,
+   "rule": "S",
+   "seed": 6,
+   "stats": {
+    "consolidated": 90,
+    "events": 27158,
+    "evidence": 3930,
+    "offered": 23228,
+    "realised": 11534,
+    "refused": 0,
+    "removed_missed": 432,
+    "replaced": 9450,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 92,
+   "edges_used": 76,
+   "enrichment": 0.9205672472181905,
+   "expected": 244.41451798324852,
+   "live": 1652,
+   "observed": 225.0,
+   "peak": 1652,
+   "recall_strong": 0.002628120893561104,
+   "rule": "S",
+   "seed": 7,
+   "stats": {
+    "consolidated": 92,
+    "events": 27158,
+    "evidence": 3922,
+    "offered": 23236,
+    "realised": 11617,
+    "refused": 0,
+    "removed_missed": 454,
+    "replaced": 9511,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 74,
+   "edges_used": 62,
+   "enrichment": 1.1186055056243285,
+   "expected": 197.56741665298082,
+   "live": 1652,
+   "observed": 221.0,
+   "peak": 1652,
+   "recall_strong": 0.002628120893561104,
+   "rule": "S",
+   "seed": 8,
+   "stats": {
+    "consolidated": 74,
+    "events": 27158,
+    "evidence": 3851,
+    "offered": 23307,
+    "realised": 11650,
+    "refused": 0,
+    "removed_missed": 441,
+    "replaced": 9557,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 81,
+   "edges_used": 68,
+   "enrichment": 0.9475410018284787,
+   "expected": 236.40137953686977,
+   "live": 1652,
+   "observed": 224.0,
+   "peak": 1652,
+   "recall_strong": 0.002628120893561104,
+   "rule": "S",
+   "seed": 9,
+   "stats": {
+    "consolidated": 81,
+    "events": 27158,
+    "evidence": 3925,
+    "offered": 23233,
+    "realised": 11588,
+    "refused": 0,
+    "removed_missed": 472,
+    "replaced": 9464,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  },
+  {
+   "consolidated": 82,
+   "edges_used": 70,
+   "enrichment": 0.908332388327285,
+   "expected": 243.3030054196092,
+   "live": 1652,
+   "observed": 221.0,
+   "peak": 1652,
+   "recall_strong": 0.0019710906701708277,
+   "rule": "S",
+   "seed": 10,
+   "stats": {
+    "consolidated": 82,
+    "events": 27158,
+    "evidence": 3990,
+    "offered": 23168,
+    "realised": 11622,
+    "refused": 0,
+    "removed_missed": 455,
+    "replaced": 9515,
+    "sprout_existing": 0,
+    "sprouted": 0
+   },
+   "stream": "shuffled"
+  }
+ ]
+}
