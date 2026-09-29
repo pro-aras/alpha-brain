@@ -161,6 +161,85 @@ class RepointIsTheRoadsOwnAnswer(unittest.TestCase):
         self.assertGreater(bad, 0)
 
 
+class EndToEnd(unittest.TestCase):
+    """The whole reader on a small MADE life (60 training scenes of the real scene sense, by tools/brain/make_tape.py, and its
+    whole sitting over both test sets): the two replays with their instruments, the grader on each, then every mark read
+    and the report written. It pins that the reader RUNS and that its counts agree with the journals; the values of a
+    60-scene life mean nothing and are not asserted."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        import re
+        from creature import replay as RP
+        from tools.brain import grade_life as G
+        from tools.brain import make_tape as MT
+        cls.tmp = Path(tempfile.mkdtemp(prefix="wordroad-e2e-"))
+        cls.root = cls.tmp / "life"
+        cls.root.mkdir()
+        cls.rundir = cls.tmp / "runs" / str(S.WS)
+        line = f"WORLD    scene seed {S.WS}; train {TH.N_TRAIN}; sitting fresh s1b1; feed max backlog 8; utterance true"
+        cls.genomes = []
+        for name, hear in (("off", False), ("on", True)):
+            gp = cls.tmp / f"{name}.genome"
+            text = re.sub(r"^WORLD    scene .*$", line, TH.TWIN, count=1, flags=re.M) + ("\n" + TH.HEAR_LINE + "\n" if hear else "\n")
+            gp.write_text(text)
+            cls.genomes.append(gp)
+        MT.make(cls.genomes[0], cls.root)
+        said = []
+        for r in S.rows(cls.root):
+            if r["sense"] == "ear" and r["meta"]["word"] not in said:
+                said.append(r["meta"]["word"])
+        cls.info = {"said": said}
+        for name, gp in zip(("off", "on"), cls.genomes):
+            with mock.patch.object(tempfile, "tempdir", str(cls.tmp)):
+                RP.run_replay(gp, cls.root / "tape", cls.rundir / name, close=True, timings=True, counters_every=20)
+            rc = G.main(["--root", str(cls.root), "--journal", str(cls.rundir / name / "journal.jsonl"), "--genome", str(gp),
+                         "--label", "twin", "--out", str(cls.rundir / f"grade-{name}")])
+            assert rc in (0, 1), rc
+        (cls.rundir / "i1-twin.exit").write_text("0\n")
+        (cls.rundir / "i1-brain.exit").write_text("0\n")
+        cls.seed = WG.read_seed(cls.tmp / "runs", S.WS, log=lambda *_a: None, root=cls.root, genomes=tuple(cls.genomes),
+                                cost_scenes=(40, 60), n_words=len(cls.info["said"]))
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(cls.tmp, ignore_errors=True)
+
+    def test_every_mark_is_read(self) -> None:
+        s = self.seed
+        self.assertEqual(sorted(k for k in s if k != "world_seed"), ["A", "C", "G", "I", "K", "K2", "P", "P_rows", "P_unheard"])
+        self.assertTrue(s["I"]["I2"]["pass"], s["I"]["I2"])
+        self.assertEqual(s["A"]["M1"]["on"]["n"], s["A"]["M1"]["off"]["n"])
+        self.assertGreater(s["A"]["M1"]["on"]["n"], 0)
+        self.assertGreater(s["A"]["M1"]["off"]["unheard"], 0)
+        self.assertEqual(s["C"]["on"]["n"], 20)
+        self.assertEqual(s["C"]["off"]["n"], 20)
+        self.assertTrue(s["G"]["pass"], s["G"]["on"]["canvases_wrong"])
+        self.assertEqual(len(s["G"]["word_cells_on"]), len(self.info["said"]))
+        self.assertEqual([r["canvases"] for r in s["G"]["series"]["on"]], [20, 40, 60, 60])
+
+    def test_the_report_and_the_verdict_are_written(self) -> None:
+        v = WG.verdict([self.seed], None, S.WS)
+        self.assertIn("ADOPT", v)
+        self.assertFalse(v["P_pass"], "no NULL-10 was read: P cannot pass")
+        txt = WG.report({"seeds": [self.seed], "nulls": None, "verdict": v, "bars": WG.BARS})
+        for word in ("I1", "I2", "A M1", "P M1", "K (n", "K2 (n", "G:", "C:", "THE DECISION RULE"):
+            self.assertIn(word, txt)
+        json.dumps({"seeds": [self.seed], "verdict": v}, default=WG._np)
+
+    def test_a_null_tape_of_the_same_items_is_read(self) -> None:
+        d = self.tmp / "runs" / str(S.WS) / "null-1"
+        (d / "on").mkdir(parents=True)
+        shutil.copy(self.rundir / "on" / "journal.jsonl", d / "on" / "journal.jsonl")
+        (d / "life").symlink_to(self.root, target_is_directory=True)
+        shutil.copy(self.genomes[1], d / "GENOME.genome")
+        items = {m: [r["item"] for r in self.seed["P_rows"][m]] for m in ("M1", "M3")}
+        n = WG.read_nulls(self.tmp / "runs", S.WS, 1, items)
+        self.assertEqual(len(n["draws"]), 1)
+        with self.assertRaises(WG.GateError):
+            WG.read_nulls(self.tmp / "runs", S.WS, 1, {"M1": ["not-an-item"], "M3": items["M3"]})
+
+
 class Populations(unittest.TestCase):
     THINGS = [{"shape": "circle", "colour": "red", "size": "big"}, {"shape": "circle", "colour": "blue", "size": "big"},
               {"shape": "star", "colour": "red", "size": "small"}]

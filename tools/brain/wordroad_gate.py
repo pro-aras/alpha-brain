@@ -127,9 +127,10 @@ def forced(point: Optional[int], n_hyp: int, test_seed: int, item: str) -> Optio
 
 # ================================================================================================ one arm of one seed
 class Arm:
-    def __init__(self, root: Path, journal: Path, genome: Path):
+    def __init__(self, root: Path, journal: Path, genome: Path, tsets: Sequence[str] = TSETS):
         self.life = G.Life(root, journal, genome)
-        self.sc = {t: G.SetCtx(self.life, t) for t in TSETS}
+        self.tsets = tuple(tsets)
+        self.sc = {t: G.SetCtx(self.life, t) for t in self.tsets}
 
     def labels(self, tset: str, split: str, row: int) -> Tuple[List[Optional[int]], Dict[str, object], List[List[int]]]:
         tr = self.sc[tset].truth[split][int(row)]
@@ -139,7 +140,7 @@ class Arm:
     def point_items(self, mark: str):
         """Every pointing item of `mark` over both test sets: (tset, item, truth row, labels, members, phrase, answer)."""
         split = G.SetCtx.split_of(mark)
-        for tset in TSETS:
+        for tset in self.tsets:
             for it in self.sc[tset].items.get(mark, []):
                 lab, tr, mem = self.labels(tset, split, int(it["row"]))
                 ask = self.life.asks[str(it["item_id"])]
@@ -245,7 +246,7 @@ def p_block(rows: Sequence[Dict[str, object]]) -> Dict[str, object]:
 
 def mark_k(on_grade: Dict[str, object], off_grade: Dict[str, object]) -> Dict[str, object]:
     a, b, ids = [], [], []
-    for tset in TSETS:
+    for tset in [t for t in TSETS if t in off_grade["items"]]:
         off = {r["item_id"]: r for r in off_grade["items"][tset]["M1"]}
         on = {r["item_id"]: r for r in on_grade["items"][tset]["M1"]}
         if set(on) != set(off):
@@ -269,7 +270,7 @@ def mark_k2(on: Arm, off: Arm) -> Dict[str, object]:
     said = {"on": collections.Counter(), "off": collections.Counter()}
     idk = {"on": 0, "off": 0}
     skipped = 0
-    for tset in TSETS:
+    for tset in off.tsets:
         for it in off.sc[tset].items.get("M2b", []):
             if not it.get("graded"):
                 continue
@@ -323,7 +324,7 @@ def series(path: Path) -> List[Dict[str, object]]:
     return [json.loads(l) for l in Path(path).read_text().splitlines() if l.strip()]
 
 
-def mark_g(on: Arm, off: Arm, run: Path) -> Dict[str, object]:
+def mark_g(on: Arm, off: Arm, run: Path, n_words: int = BARS["words"]) -> Dict[str, object]:
     jon = G.read_journal(run / "on" / "journal.jsonl")
     joff = G.read_journal(run / "off" / "journal.jsonl")
     fh_on, fh_off = first_hearings(on, jon), first_hearings(off, joff)
@@ -332,7 +333,7 @@ def mark_g(on: Arm, off: Arm, run: Path) -> Dict[str, object]:
     if not fin_on.get("final") or not fin_off.get("final"):
         raise GateError("counters.jsonl has no final row")
     names = fin_on["word_cells"]
-    ok = (not fh_on["canvases_wrong"] and fh_on["words_heard"] == BARS["words"] and len(names) == BARS["words"]
+    ok = (not fh_on["canvases_wrong"] and fh_on["words_heard"] == n_words and len(names) == n_words
           and set(names) == set(fh_on["first_heard_at_scene"]))
     keys = ("canvases", "cells_sight", "cells_words", "cells_born_sight", "cells_born_words", "edges_alive", "births_refused_budget",
             "births_refused_nmax", "births_refused_redundant", "births_skipped_confirmed", "budget_left", "arrivals")
@@ -373,12 +374,12 @@ def canvas_ms(arm: Arm, timings: Path, lo: int, hi: int) -> Dict[str, object]:
             "median_ms": float(np.median(per)) if per else None}
 
 
-def mark_c(on: Arm, off: Arm, run: Path) -> Dict[str, object]:
-    a = canvas_ms(on, run / "on" / "timings.jsonl", *COST_SCENES)
-    b = canvas_ms(off, run / "off" / "timings.jsonl", *COST_SCENES)
+def mark_c(on: Arm, off: Arm, run: Path, scenes: Tuple[int, int] = COST_SCENES) -> Dict[str, object]:
+    a = canvas_ms(on, run / "on" / "timings.jsonl", *scenes)
+    b = canvas_ms(off, run / "off" / "timings.jsonl", *scenes)
     ratio = (a["mean_ms"] / b["mean_ms"]) if (a["mean_ms"] and b["mean_ms"]) else None
-    full = COST_SCENES[1] - COST_SCENES[0]
-    return {"on": a, "off": b, "ratio": ratio, "bar": BARS["C"],
+    full = scenes[1] - scenes[0]
+    return {"on": a, "off": b, "ratio": ratio, "bar": BARS["C"], "scenes": list(scenes),
             "pass": bool(ratio is not None and ratio <= BARS["C"] and a["n"] == full and b["n"] == full)}
 
 
@@ -386,9 +387,9 @@ def mark_i(run: Path, on: Arm, off: Arm) -> Dict[str, object]:
     out: Dict[str, object] = {}
     for name in ("i1-twin", "i1-brain"):
         p = run / f"{name}.exit"
+        j = run / ("off" if name == "i1-twin" else "brain") / "journal.jsonl"
         out[name] = {"exit": int(p.read_text().strip()) if p.exists() else None,
-                     "rows": (sum(1 for _ in (run / ("off" if name == "i1-twin" else "brain") / "journal.jsonl").open())
-                              if (run / ("off" if name == "i1-twin" else "brain") / "journal.jsonl").exists() else None)}
+                     "rows": len(j.read_text().splitlines()) if j.exists() else None}
     out["I1_pass"] = bool(out["i1-twin"]["exit"] == 0 and out["i1-brain"]["exit"] == 0)
     jon = RP.read_mind_journal(run / "on" / "journal.jsonl")
     joff = RP.read_mind_journal(run / "off" / "journal.jsonl")
@@ -406,18 +407,24 @@ def mark_i(run: Path, on: Arm, off: Arm) -> Dict[str, object]:
 
 
 # ================================================================================================ the gate
-def read_seed(runs: Path, ws: int, log=print) -> Dict[str, object]:
+def read_seed(runs: Path, ws: int, log=print, root: Optional[Path] = None, genomes: Optional[Tuple[Path, Path]] = None,
+              tsets: Sequence[str] = TSETS, cost_scenes: Tuple[int, int] = COST_SCENES,
+              n_words: int = BARS["words"]) -> Dict[str, object]:
+    """One seed's marks. The keyword arguments exist for the reader's own end-to-end test on a small made life; the gate
+    calls it with none of them (the closed life's root, the gate's two genomes, both test sets, scenes 9,000–9,999, 14 words)."""
     run = runs / str(ws)
-    root = LIVES / f"brain-lean-{ws}"
+    root = (LIVES / f"brain-lean-{ws}") if root is None else Path(root)
     code = ROOT / "genome" / "brain" / "lives"
-    off = Arm(root, run / "off" / "journal.jsonl", code / f"BRAIN-LEAN-TWIN-{ws}.genome")
-    on = Arm(root, run / "on" / "journal.jsonl", code / f"BRAIN-LEAN-TWIN-HEAR-{ws}.genome")
+    g_off, g_on = genomes if genomes is not None else (code / f"BRAIN-LEAN-TWIN-{ws}.genome", code / f"BRAIN-LEAN-TWIN-HEAR-{ws}.genome")
+    off = Arm(root, run / "off" / "journal.jsonl", g_off, tsets)
+    on = Arm(root, run / "on" / "journal.jsonl", g_on, tsets)
     g_on = json.loads((run / "grade-on" / "grade.json").read_text())
     g_off = json.loads((run / "grade-off" / "grade.json").read_text())
     rows = p_rows(on)
     res = {"world_seed": ws, "I": mark_i(run, on, off), "A": mark_a(on, off),
            "P": {m: p_block(rows[m]) for m in ("M1", "M3")}, "P_rows": rows, "P_unheard": rows["unheard"],
-           "K": mark_k(g_on, g_off), "K2": mark_k2(on, off), "G": mark_g(on, off, run), "C": mark_c(on, off, run)}
+           "K": mark_k(g_on, g_off), "K2": mark_k2(on, off), "G": mark_g(on, off, run, n_words),
+           "C": mark_c(on, off, run, cost_scenes)}
     log(f"[gate {ws}] read: P items {len(rows['M1'])} / {len(rows['M3'])} · K n {res['K']['n']} · K2 n {res['K2']['n']}")
     return res
 
@@ -518,7 +525,7 @@ def report(res: Dict[str, object]) -> str:
             L.append(f"        {a['canvases']:>6} · {a['cells_sight']} / {b['cells_sight']} · {a['births_refused_budget']} / "
                      f"{b['births_refused_budget']} · {a['births_refused_redundant']} / {b['births_refused_redundant']}")
         c = s["C"]
-        L.append(f"  C: ms per training canvas, scenes {COST_SCENES[0]}–{COST_SCENES[1] - 1}: ON {f(c['on']['mean_ms'], 2)} (n {c['on']['n']}) · "
+        L.append(f"  C: ms per training canvas, scenes {c['scenes'][0]}–{c['scenes'][1] - 1}: ON {f(c['on']['mean_ms'], 2)} (n {c['on']['n']}) · "
                  f"OFF {f(c['off']['mean_ms'], 2)} (n {c['off']['n']}) · ratio {f(c['ratio'])} (bar ≤ {c['bar']}) → "
                  f"{'PASS' if c['pass'] else 'FAIL'}")
         L.append("")
