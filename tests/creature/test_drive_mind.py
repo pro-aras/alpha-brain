@@ -19,7 +19,11 @@ from genome.machinery import GenomeError, parse_genome
 from tests.creature import _scene_tape as S
 
 ROOT = Path(__file__).resolve().parents[2]
-LEAN = (ROOT / "genome" / "brain" / "BRAIN-LEAN.genome").read_text()
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 19:28 +0400 — the template carries the DRIVE line since the gate passed; these lives are built from
+# the template WITHOUT it (OFF) and with the line under test appended (ON), so the template's own line is taken out first.
+_TEMPLATE = (ROOT / "genome" / "brain" / "BRAIN-LEAN.genome").read_text()
+LEAN, _n = re.subn(r"^DRIVE    .*\n", "", _TEMPLATE, count=1, flags=re.M)
+assert _n == 1, "the lean template carries one DRIVE line"
 DRIVE_LINE = "DRIVE    brain turn before hearing; says 1; asks 1"
 AT = "calibrate at 250 500 1000 2000 5000 10000"
 N_TRAIN = 120

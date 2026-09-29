@@ -57,8 +57,11 @@ class LeanVsTwin(unittest.TestCase):
         lean_code = [l for l in lean_only if not l.startswith("#")]
         twin_code = [l for l in twin_only if not l.startswith("#")]
         self.assertEqual(twin_code, [])
-        self.assertEqual(len(lean_code), 1)
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 19:28 +0400 — PREREG-BRAIN-DRIVES §6 (the gate passed): the lean template carries the brain's
+        # two lines, BRAIN and DRIVE (the turn is the brain's; the twin has no brain and so no turn). Was: the BRAIN line alone.
+        self.assertEqual(len(lean_code), 2)
         self.assertTrue(lean_code[0].startswith("BRAIN "), lean_code[0])
+        self.assertTrue(lean_code[1].startswith("DRIVE "), lean_code[1])
 
 
 class FullEqualsAlpha4PlusTwo(unittest.TestCase):
@@ -67,7 +70,8 @@ class FullEqualsAlpha4PlusTwo(unittest.TestCase):
         full_declared = parse_genome((BRAIN_DIR / "BRAIN-FULL.genome").read_text()).declared
         extra = set(full_declared) - set(alpha4_declared)
         missing = set(alpha4_declared) - set(full_declared)
-        self.assertEqual(extra, {"BRAIN", "WORLD_SCENE"})
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 19:28 +0400 — PREREG-BRAIN-DRIVES §6: + DRIVE (was BRAIN and WORLD_SCENE alone)
+        self.assertEqual(extra, {"BRAIN", "DRIVE", "WORLD_SCENE"})
         self.assertEqual(missing, set())
         for k in alpha4_declared:
             if k == "SEED":
