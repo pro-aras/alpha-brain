@@ -1,0 +1,133 @@
+{
+ "calibrations": 6,
+ "given_only_words": [],
+ "n_words": 14,
+ "runs": [
+  {
+   "author": null,
+   "end": 10000,
+   "first_moment": "sc20261102t000000",
+   "last_moment": "sc20261102t009999",
+   "source": "lived",
+   "start": 0
+  }
+ ],
+ "scenes": 10000,
+ "scenes_by_source": {
+  "lived": 10000
+ },
+ "words": {
+  "big": {
+   "episodes_by_source": {
+    "lived": 2497
+   },
+   "kind": 2,
+   "mature": true,
+   "meetings": 2497
+  },
+  "blue": {
+   "episodes_by_source": {
+    "lived": 994
+   },
+   "kind": 1,
+   "mature": true,
+   "meetings": 994
+  },
+  "circle": {
+   "episodes_by_source": {
+    "lived": 1667
+   },
+   "kind": 0,
+   "mature": true,
+   "meetings": 1667
+  },
+  "cross": {
+   "episodes_by_source": {
+    "lived": 1668
+   },
+   "kind": 0,
+   "mature": true,
+   "meetings": 1668
+  },
+  "dax": {
+   "episodes_by_source": {
+    "lived": 1
+   },
+   "kind": null,
+   "mature": false,
+   "meetings": 1
+  },
+  "green": {
+   "episodes_by_source": {
+    "lived": 1242
+   },
+   "kind": 1,
+   "mature": true,
+   "meetings": 1242
+  },
+  "red": {
+   "episodes_by_source": {
+    "lived": 871
+   },
+   "kind": 1,
+   "mature": true,
+   "meetings": 871
+  },
+  "ring": {
+   "episodes_by_source": {
+    "lived": 2077
+   },
+   "kind": 0,
+   "mature": true,
+   "meetings": 2077
+  },
+  "small": {
+   "episodes_by_source": {
+    "lived": 2533
+   },
+   "kind": 2,
+   "mature": true,
+   "meetings": 2533
+  },
+  "square": {
+   "episodes_by_source": {
+    "lived": 1255
+   },
+   "kind": 0,
+   "mature": true,
+   "meetings": 1255
+  },
+  "star": {
+   "episodes_by_source": {
+    "lived": 1618
+   },
+   "kind": 0,
+   "mature": true,
+   "meetings": 1618
+  },
+  "triangle": {
+   "episodes_by_source": {
+    "lived": 1714
+   },
+   "kind": 0,
+   "mature": true,
+   "meetings": 1714
+  },
+  "white": {
+   "episodes_by_source": {
+    "lived": 1044
+   },
+   "kind": 1,
+   "mature": true,
+   "meetings": 1044
+  },
+  "yellow": {
+   "episodes_by_source": {
+    "lived": 825
+   },
+   "kind": 1,
+   "mature": true,
+   "meetings": 825
+  }
+ }
+}

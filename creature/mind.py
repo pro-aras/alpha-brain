@@ -790,6 +790,21 @@ class Mind:
             except ImportError as e:
                 raise GenomeError(f"BRAIN declared but genome/brain.py cannot be imported ({e}): the organism does not start")
             self.brain = brain_cls(dict(self.genome.declared["BRAIN"]))
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:35 +0400 — PREREG-INHERIT §3: a root that holds inherit/brain.json|npz gives the NEWBORN its
+        # parent's brain (the learner and the aligned lists; the cited episodes emptied). With no pair this is the old birth,
+        # untouched. `brain_inherited` is STATUS's; the one journal row is written before the life's first row is consumed.
+        self.brain_inherited: Optional[Dict[str, object]] = None
+        self._inherit_row_due = False
+        _pair = self.run_root / "inherit" / "brain"
+        if self.brain is not None and (Path(str(_pair) + ".json").exists() or Path(str(_pair) + ".npz").exists()):
+            try:
+                self.brain, self.brain_inherited = brain_cls.inherit(_pair, dict(self.genome.declared["BRAIN"]))
+            except Exception as e:
+                raise GenomeError(f"{e} (root {self.run_root})")
+            self._inherit_row_due = True
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:52 +0400 — PREREG-METADATA-1 §2: the scenes this life learns carry its own name as author.
+        if self.brain is not None:
+            self.brain.author = self.run_root.name
         self.pending_asks: Dict[str, List[Dict[str, object]]] = {}
         self.asks_answered: int = 0
         self.asks_by: Dict[str, int] = {"brain": 0, "organs": 0}
@@ -822,6 +837,9 @@ class Mind:
 
     # ------------------------------------------------------------------ consume
     def consume(self, row: Dict[str, object]) -> None:
+        if self._inherit_row_due:            # PREREG-INHERIT §3: one row, the life's first
+            self._inherit_row_due = False
+            self._write_journal(row["at"], {"kind": "inherit", "seq": row["seq"], **self.brain_inherited})
         sense = row["sense"]
         meta = row.get("meta") or {}
         moment = meta.get("moment")
@@ -1508,6 +1526,7 @@ class Mind:
         self._write_journal(row["at"], {"kind": "brain", "act": "learn", **base, **view, **out})
         if out.get("calibrated"):
             self._write_journal(row["at"], {"kind": "brain", "act": "calibrate", **base, "summary": _jsonable(self.brain.summary())})
+            self.write_census()                 # PREREG-METADATA-1 §2: a file, never a journal row
 
     def _answer_ask(self, ask: Dict[str, object], g: Optional[Dict[str, object]], at: str, eye_seq: Optional[int],
                     cache: Dict[str, object]) -> None:
@@ -1580,7 +1599,25 @@ class Mind:
                "refused_rows": self.brain_refused, "restored": self.brain_restored}
         if self._drive is not None:            # PREREG-BRAIN-DRIVES: the turn counts, only under the gene
             out["turns"] = dict(self.brain_turns)
+        if self.brain_inherited is not None:   # PREREG-INHERIT §3: only a child carries the field
+            out["inherited"] = dict(self.brain_inherited)
+        if self.brain is not None:             # PREREG-METADATA-1 §2: the census's totals (the whole census is the file)
+            c = self.brain.census()
+            out["census"] = {"scenes": c["scenes"], "scenes_by_source": c["scenes_by_source"], "n_words": c["n_words"],
+                             "given_only_words": c["given_only_words"]}
         return out
+
+    def write_census(self) -> None:
+        """PREREG-METADATA-1 §2: the census as a FILE, <root>/census/<scenes learned>.json. Never a journal row."""
+        if self.brain is None:
+            return
+        d = self.run_root / "census"
+        d.mkdir(parents=True, exist_ok=True)
+        c = self.brain.census()
+        p = d / f"{int(c['scenes']):08d}.json"
+        tmp = p.with_suffix(".tmp")
+        tmp.write_text(json.dumps(c, sort_keys=True) + "\n", encoding="utf-8")
+        tmp.replace(p)
 
     def _consume_body(self, row: Dict[str, object]) -> None:
         """BODY-SENSES.md §4.1: "the readings; the DRIVE is the mind's" -- this gene carries no threshold, so
@@ -3670,6 +3707,7 @@ class Mind:
             self._think_apply_pending({"at": self._cur_at, "seq": self._cur_seq})
         if self._think_executor is not None:
             self._think_executor.shutdown(wait=True)
+        self.write_census()                     # PREREG-METADATA-1 §2: the census at close
         self.snapshot()
 
     @classmethod
@@ -3757,6 +3795,8 @@ class Mind:
                 if (state_dir / "brain.npz").exists() and (state_dir / "brain.json").exists():
                     mind.brain = _brain_class().load(state_dir / "brain", dict(mind.genome.declared["BRAIN"]))
                     mind.brain_restored = True
+                    mind._inherit_row_due = False      # PREREG-INHERIT §3: the inherit row is in the journal of the life that saved
+                    mind.brain.author = Path(run_root).name   # PREREG-METADATA-1 §2
                 else:
                     mind.brain_restored = False
             # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2

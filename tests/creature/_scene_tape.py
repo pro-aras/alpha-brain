@@ -264,6 +264,15 @@ class FakeBrain:
     def summary(self) -> Dict[str, object]:
         return {"scenes": len(self.rows), "words": len(self.counts), "calibrations": self.calibrations}
 
+    # edit: Claude (Fable 5.1, the seat), 2026-09-29 21:38 +0400 — PREREG-METADATA-1: the organ's interface grew by `census()` (the mind writes it at
+    # every calibration and at close). The stand-in answers in the organ's own shape: everything it holds it lived.
+    def census(self) -> Dict[str, object]:
+        n = len(self.rows)
+        return {"scenes": n, "scenes_by_source": ({"lived": n} if n else {}), "n_words": len(self.counts),
+                "words": {w: {"meetings": int(c), "episodes_by_source": {"lived": int(c)}, "mature": True, "kind": None}
+                          for w, c in sorted(self.counts.items())},
+                "given_only_words": [], "calibrations": self.calibrations, "runs": []}
+
     def _state(self) -> Dict[str, object]:
         return {"counts": self.counts, "rows": self.rows, "calibrations": self.calibrations, "since": self.since}
 

@@ -72,7 +72,11 @@ WHY_MIN_HYPS = 2               # M4: cited only among episodes with ≥ 2 hypoth
 CELL_PX = 8                    # a fixation cell's centre pixel: cell * 8 + 4 (world.fixation_thing's arithmetic)
 BOX_MARGIN = 4                 # the box ± 4 px
 FEATS = 144
-STATE_VERSION = 1
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 20:52 +0400 — PREREG-METADATA-1 §2: version 2 carries `segments` (the source and the author of every
+# scene learned); a version 1 state still LOADS, read as one run `lived` by an unknown author.
+STATE_VERSION = 2
+READS_VERSIONS = (1, 2)
+SOURCES = ("lived", "prenatal", "implanted-episode", "implanted-knowledge", "inherited")
 
 
 class BrainError(Exception):
@@ -200,6 +204,64 @@ class Brain:
         self.episodes: Dict[str, List[List[float]]] = {}
         self.n_calibrations = 0
         self.calibrated_at: Optional[int] = None          # the count learned at the last calibration
+        # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:52 +0400 — PREREG-METADATA-1 §2: the runs over the order of life, each
+        # {start, end, source, author, first_moment, last_moment}; `author` is the life's own name (the mind sets it); `_run` is
+        # the source and author of the scenes learned NEXT (lived by this life unless a surgery opened another run).
+        self.segments: List[Dict[str, object]] = []
+        self.author: Optional[str] = None
+        self._run: Optional[Tuple[str, Optional[str]]] = None
+
+    # -- the source of every memory, and the census (PREREG-METADATA-1) ------------------------
+    def begin_run(self, source: str, author: Optional[str]) -> None:
+        """The scenes learned from now on carry this source and author, until `end_run()`."""
+        if source not in SOURCES:
+            raise BrainError(f"begin_run: source {source!r} is not one of {SOURCES}")
+        self._run = (str(source), None if author is None else str(author))
+
+    def end_run(self) -> None:
+        self._run = None
+
+    def note_learned(self, moment: str) -> None:
+        """One scene was appended to the order of life: the last run is extended, or a new one opened."""
+        source, author = self._run if self._run is not None else ("lived", self.author)
+        order = self.n_learned - 1
+        last = self.segments[-1] if self.segments else None
+        if last is not None and last["end"] == order and last["source"] == source and last["author"] == author:
+            last["end"] = order + 1
+            last["last_moment"] = str(moment)
+        else:
+            self.segments.append({"start": order, "end": order + 1, "source": source, "author": author,
+                                  "first_moment": str(moment), "last_moment": str(moment)})
+
+    def source_of(self, order: int) -> Dict[str, object]:
+        for s in self.segments:
+            if s["start"] <= order < s["end"]:
+                return s
+        raise BrainError(f"source_of: no run holds order {order} (runs {[(s['start'], s['end']) for s in self.segments]})")
+
+    def census(self) -> Dict[str, object]:
+        """What the brain holds, counted by source. Pure: it reads the learner's stores and the runs, it writes nothing."""
+        L = self.L
+        kinds = {w: i for i, t in enumerate(self.types()) for w in t} if self.n_calibrations else {}
+        mature = set(L.mature_words())
+        words: Dict[str, object] = {}
+        given_only: List[str] = []
+        for w in L.words:
+            j = L.index[w]
+            by: Dict[str, int] = {}
+            for t in L.store_t[j]:
+                src = str(self.source_of(int(t) - 1)["source"])
+                by[src] = by.get(src, 0) + 1
+            words[w] = {"meetings": int(L.meetings[j]), "episodes_by_source": dict(sorted(by.items())),
+                        "mature": w in mature, "kind": kinds.get(w)}
+            if by and not by.get("lived"):
+                given_only.append(w)
+        scenes_by: Dict[str, int] = {}
+        for s in self.segments:
+            scenes_by[str(s["source"])] = scenes_by.get(str(s["source"]), 0) + int(s["end"]) - int(s["start"])
+        return _plain({"scenes": self.n_learned, "scenes_by_source": scenes_by, "n_words": len(L.words), "words": words,
+                       "given_only_words": given_only, "calibrations": self.n_calibrations,
+                       "runs": [dict(s) for s in self.segments]})
 
     # -- the mind's questions ------------------------------------------------------------------
     def hears(self, source: Optional[str]) -> bool:
@@ -239,6 +301,7 @@ class Brain:
             j = self.L.index[w]
             r = 1.0 if w in new else float(self.L.store_r[j][-1][h])
             self.episodes.setdefault(w, []).append([order, int(h), float(hyps[h].pos[0]), float(hyps[h].pos[1]), r])
+        self.note_learned(str(moment))          # PREREG-METADATA-1 §2: the scene's source and author
         calibrated = False
         if self.n_learned in self.cfg["calibrate_at"]:
             self.calibrate()
@@ -376,6 +439,12 @@ class Brain:
             return {"kind": "unknown", "word": word}
         pool = [e for e in self.episodes.get(word, []) if len(self.canvas[int(e[0])][1]) >= WHY_MIN_HYPS]
         if not pool:
+            # PREREG-METADATA-1 §2: a word with no citable episode of its own, met in a GIVEN run, is named as given. A brain
+            # whose every run is lived never enters here with a hit, so its answer is the old one.
+            given = [self.source_of(int(t) - 1) for t in self.L.store_t[j]]
+            given = [s for s in given if s["source"] != "lived"]
+            if given:
+                return {"kind": "given", "word": word, "source": str(given[0]["source"]), "author": given[0]["author"]}
             return {"kind": "unknown", "word": word}
         eps_ = sorted(pool, key=lambda e: (-e[4], e[0]))[:WHY_MAX]
         cited = [{"moment": self.moments[int(e[0])], "scene": self.scenes[int(e[0])], "hyp": int(e[1]), "pos": [e[2], e[3]],
@@ -460,18 +529,23 @@ class Brain:
             out["young_rule"] = "nearest"
         return _plain(out)
 
-    def _state(self) -> Tuple[Dict[str, object], Dict[str, np.ndarray]]:
+    def _state(self, version: int = STATE_VERSION) -> Tuple[Dict[str, object], Dict[str, np.ndarray]]:
         enc = _Encoder()
         learner = {k: enc.enc(v) for k, v in sorted(vars(self.L).items())}
-        meta = {"version": STATE_VERSION, "cfg": self.cfg, "learner": learner,
+        meta = {"version": int(version), "cfg": self.cfg, "learner": learner,
                 "brain": {"seen": enc.enc(self.seen), "moments": list(self.moments), "scenes": list(self.scenes),
                           "canvas": self.canvas,
                           "episodes": enc.enc(self.episodes), "n_calibrations": self.n_calibrations,
                           "calibrated_at": self.calibrated_at}}
+        if version >= 2:
+            meta["brain"]["segments"] = [dict(s) for s in self.segments]
         return meta, enc.arrays()
 
     def state_hash(self) -> str:
-        meta, arrays = self._state()
+        """The hash of what the brain LEARNED: the version 1 form of the state, as every pin before METADATA 1 took it.
+        edit: Claude (Fable 5.1, the seat), 2026-09-29 20:54 +0400 — PREREG-METADATA-1 AMENDMENT 1: the runs (who gave a memory) are not
+        learning; they are covered by the saved FILE's own hash (`save`), which is taken over the whole version 2 state."""
+        meta, arrays = self._state(version=1)
         return _hash(meta, arrays)
 
     def save(self, base: Path) -> None:
@@ -484,13 +558,40 @@ class Brain:
             np.savez(f, **arrays)
         Path(str(base) + ".json").write_text(json.dumps(meta, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
 
+    # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:35 +0400 — PREREG-INHERIT §2 / §3: a newborn takes its parent's brain.
+    @classmethod
+    def inherit(cls, base: Path, cfg: Dict[str, object]) -> Tuple["Brain", Dict[str, object]]:
+        """PREREG-INHERIT §2: the parent's saved pair <base>.json|npz -> (the child's brain, {learned, hash}). What passes: the
+        learner and the four index-aligned lists (`seen`, `moments`, `scenes`, `canvas`). What does not: `episodes`, the store the
+        brain CITES — a child cites only what it lived. Every refusal names the inheritance."""
+        base = Path(base)
+        j, z = Path(str(base) + ".json"), Path(str(base) + ".npz")
+        if not (j.exists() and z.exists()):
+            raise BrainError(f"inherit: the pair is not whole ({j.name} {'present' if j.exists() else 'absent'}, "
+                             f"{z.name} {'present' if z.exists() else 'absent'}) — the organism does not start")
+        try:
+            saved_hash = json.loads(j.read_text(encoding="utf-8")).get("state_hash")
+            if not saved_hash:
+                raise BrainError("the pair carries no state hash")
+            b = cls.load(base, cfg)
+        except BrainError as e:
+            raise BrainError(f"inherit: {e}")
+        except Exception as e:
+            raise BrainError(f"inherit: the pair cannot be read ({e!r})")
+        info = {"learned": int(b.n_learned), "hash": str(saved_hash)}
+        b.episodes = {}
+        for s in b.segments:                    # PREREG-METADATA-1 §2: what the parent LIVED the child INHERITED; a gift stays a gift
+            if s["source"] == "lived":
+                s["source"] = "inherited"
+        return b, info
+
     @classmethod
     def load(cls, base: Path, cfg: Dict[str, object]) -> "Brain":
         base = Path(base)
         meta = json.loads(Path(str(base) + ".json").read_text(encoding="utf-8"))
         want = check_cfg(cfg)
-        if meta.get("version") != STATE_VERSION:
-            raise BrainError(f"load: state version {meta.get('version')!r}, this organ reads {STATE_VERSION}")
+        if meta.get("version") not in READS_VERSIONS:
+            raise BrainError(f"load: state version {meta.get('version')!r}, this organ reads {READS_VERSIONS}")
         # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:20 +0400 — a brain saved under one young rule never loads under the other
         saved_rule, want_rule = meta["cfg"].get("young_rule", "band"), want.get("young_rule", "band")
         if saved_rule != want_rule:
@@ -515,6 +616,14 @@ class Brain:
         b.episodes = dec.dec(bb["episodes"])
         b.n_calibrations = int(bb["n_calibrations"])
         b.calibrated_at = bb["calibrated_at"]
+        if "segments" in bb:
+            b.segments = [dict(s) for s in bb["segments"]]
+        elif b.n_learned:                       # a version 1 state: one run, lived, its author unknown (PREREG-METADATA-1 §2)
+            b.segments = [{"start": 0, "end": b.n_learned, "source": "lived", "author": None,
+                           "first_moment": b.moments[0], "last_moment": b.moments[-1]}]
+        covered = sum(int(s["end"]) - int(s["start"]) for s in b.segments)
+        if covered != b.n_learned:
+            raise BrainError(f"load: the runs cover {covered} scenes, the brain learned {b.n_learned}")
         return b
 
 
