@@ -1,0 +1,16 @@
+the five suites on bb44d3a (2026-09-29 20:37:25 +0400 → 2026-09-29 20:56:37 +0400), BLAS threads 1
+== scene exit=0
+Ran 368 tests in 120.589s
+OK
+== brainvenv exit=0
+Ran 770 tests in 363.116s
+OK (skipped=3)
+== genome exit=0
+Ran 649 tests in 161.798s
+OK (skipped=1, expected failures=6)
+== creature exit=0
+Ran 1228 tests in 1149.230s
+OK (skipped=6)
+== tools exit=0
+Ran 92 tests in 153.322s
+OK
