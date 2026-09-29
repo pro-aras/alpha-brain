@@ -18,7 +18,7 @@
 - **Nodes** = heard words. Each carries `n` (times heard), `first`, `last` (the order of life, 1-based, counted in words heard), `source`, `author`.
 - **Events.** Each heard word pairs with each of the previous `d = 3` DISTINCT words (a 4-word window, the shelf reader's own chunk; the temporal-context link of the research §1.2).
 - **Edges** (unordered pairs) carry `c` (evidence: pair events while the edge exists), `t0` (when it was made), `last` (its last evidence), `state` (`silent` or `consolidated`), `source`, `author`.
-- **Consolidation** (every rule, one test): an edge becomes `consolidated` when `c ≥ k = 3` AND its lift `c / E ≥ m = 3`, where `E = 2 · d · f_a · f_b · L`, `f` = a word's share of all words heard so far, `L` = words heard since the edge was made (at least 1). Lift, not a raw count: in a small vocabulary every pair co-occurs by chance (§6.2).
+- **Consolidation** (every rule, one test): an edge becomes `consolidated` when `c ≥ k = 3` AND its lift `c / E ≥ m = 3`, where `E = 2 · d · f_a · f_b · L`, `f` = a word's share of all words heard so far, `L` = words heard since the edge was made (at least 1). Lift, not a raw count: in a small vocabulary every pair co-occurs by chance (§6.2). **SUPERSEDED by AMENDMENT 1 (below), before any run.**
 - **The budget** `B = 2 · V`, `V` = the distinct words of the stream the web grows on, counted BEFORE any rule runs.
 
 ### 2.1 The rules (one difference each)
@@ -118,3 +118,20 @@
 10. **The revision before any build (22:4x):** the first text removed a silent edge after a fixed `W = 2 · V` words (120 in the toy). By arithmetic, a word of median frequency in the toy (Zipf rank 30, about 1 word in 140) needs 1,400 to 2,800 words to co-occur 3 times with an associate; a fixed 120 would have removed rare words' TRUE edges before they could repeat: a gate placed where the mechanism cannot fire (#228 (a)). It is now «missed chances» (`z = 10` hearings of each word apart). The first text also gave removal to S, R and S0 but not to L, so S would have differed from L in two things; L now removes the same way.
 
 Signed: Claude (Opus 5.5, the seat), alone — 2026-09-29 22:43 +0400 (the revised text; nothing was built or run under the first).
+
+## AMENDMENT 1 — the consolidation test (2026-09-29 22:48 +0400, the seat, alone; before ANY run of the law's worlds)
+
+**What was found, and where.** Building `genome/web.py` test-first, one unit test (S against S0) failed. The diagnosis ran on the TEST'S OWN small stream (V 40, 6,000 words, seeds 3, 5, 8), never on the law's toy, shelf or self record. Under the signed test (c ≥ 3 and lift ≥ 3, checked at every evidence event), H consolidated 206–255 edges on the real stream at precision 0.23–0.26 (chance 0.10) and **210–223 on the same stream SHUFFLED**, where no association exists. A ratio checked at every event, with the result kept forever, passes chance bursts: a pair of rare words has a small E, so three early co-occurrences clear «lift ≥ 3» (optional stopping). A web built on that test would be mostly noise, and every mark of §4 would compare noise with noise.
+
+**The test now (every rule):** an edge becomes `consolidated` when
+1. `c ≥ k = 3`, AND
+2. its evidence came on at least `k = 3` separate OCCASIONS: an evidence event more than `g = 2 · d = 6` words after the edge's previous evidence starts a new occasion (the evidence that makes an edge is its first occasion; a massed burst is one occasion: the spacing effect of the research §1.3), AND
+3. the Poisson upper tail `P(X ≥ c | E) < α = 0.001`, with `E` as before (the count the two words' frequencies predict over the edge's life).
+
+**How α was chosen, said plainly.** Two values were tried on the test's stream only: α 0.001 kept H's recall near the old test's (0.67–0.70) with precision 0.78–0.82 and cut the shuffled stream's consolidations from 210–223 to 17–21; α 0.0001 cut them to 1–2 at the price of about a third of the recall. 0.001 is taken. Spacing alone (lift + 3 occasions) cut the shuffled consolidations only to 161–183.
+
+**What else changes.** Nothing in §3 or §4: the rules, the budgets, the worlds, the seeds and every bar stand. `m` (the lift) leaves the web; `g` and `α` enter it. G1's recount adds each live edge's occasions.
+
+**S0's known leak, measured on the test's stream under the OLD test:** S0 draws its random pair among the words known SO FAR, and words enter the vocabulary in the order the associations bring them, so early random evidence falls on associated pairs more than chance (recall 0.167 against 0.099 expected; 0.115 on the shuffled stream). K3 keeps its bar; the verdict prints S0 on the shuffled toy stream beside it.
+
+Signed: Claude (Opus 5.5, the seat), alone — 2026-09-29 22:48 +0400.
