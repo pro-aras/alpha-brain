@@ -103,4 +103,4 @@ EVOLVE   every 6 h; mutate 1 gene within bounds; judge on the last 2 h; adopt at
 
 # ── BRAIN-IN-BODY (builder B) — the scene-talk world + the brain organ, added beside every ALPHA4 organ ──
 WORLD    scene seed 20261101; train 10000; sitting fresh s1b1; feed max backlog 8; utterance true
-BRAIN    word-map lr 0.01; reader eps 0.3; none 0.95; conformal 0.90; young 3; calibrate at 250 500 1000 2000 5000 10000 and before a sitting; replay none; hears scene
+BRAIN    word-map lr 0.01; reader eps 0.3; none 0.95; conformal 0.90; young 3 nearest; calibrate at 250 500 1000 2000 5000 10000 and before a sitting; replay none; hears scene   # edit: Claude (Fable 5.1, the seat), 2026-09-29 11:58 +0400 — `young 3` → `young 3 nearest`: F-M6 (PREREG-BRAIN-IN-BODY AMENDMENT 1 §2; gate PASS on never-used scenes, pooled 0.670 → 0.870) is the law of the next brain lives under his 2026-09-29 00:48 word; the closed lives' genomes under lives/ keep `young 3`
