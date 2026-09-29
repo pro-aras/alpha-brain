@@ -1,0 +1,33 @@
+first calibrated canvas        250 / 250 / 250
+canvases after it              9750 / 9750 / 9750
+SAID (count)                   9264 / 9230 / 9275
+SAY RATE                       0.950 / 0.947 / 0.951
+graded (a thing under target)  9264 / 9230 / 9275  not graded 0 / 0 / 0
+TRUE                           0.978 / 0.974 / 0.979
+UNIQUE-TRUE                    0.945 / 0.938 / 0.946
+null TRUE: max of 10 draws     0.209 / 0.211 / 0.209  min 0.194 / 0.198 / 0.199
+two or more words (count)      43 / 31 / 30  lengths [{'1': 9221, '2': 43, '3': 0}, {'1': 9199, '2': 31, '3': 0}, {'1': 9245, '2': 29, '3': 1}]
+margin +inf (count)            4918 / 4900 / 4820
+about the parent's thing       0.662 / 0.662 / 0.663
+  scenes of 1 thing(s): said 3639 / 3622 / 3592 rate 0.935 / 0.931 / 0.932 true 0.988 / 0.988 / 0.991 unique 0.988 / 0.988 / 0.991
+  scenes of 2 thing(s): said 3775 / 3684 / 3848 rate 0.955 / 0.953 / 0.961 true 0.973 / 0.967 / 0.970 unique 0.942 / 0.933 / 0.940
+  scenes of 3 thing(s): said 1850 / 1924 / 1835 rate 0.972 / 0.965 / 0.970 true 0.966 / 0.964 / 0.975 unique 0.864 / 0.851 / 0.869
+ASKED (count)                  977 / 1010 / 937  rate 0.100 / 0.104 / 0.096
+believed names right, doubted   0.800 / 0.805 / 0.802  names 3018 / 3162 / 2913  hyps 1006 / 1054 / 971
+believed names right, undoubted 0.922 / 0.919 / 0.919  names 41640 / 41502 / 42003  hyps 13880 / 13834 / 14001
+surprise_believed              0.134 / 0.139 / 0.134  n 9750 / 9750 / 9750  every word expected 0.785 / 0.778 / 0.783
+   null mean: min..max of 10   0.685 / 0.685 / 0.682 .. 0.690 / 0.691 / 0.693
+surprise_held                  0.055 / 0.057 / 0.055  n 9750 / 9750 / 9750  every word expected 0.931 / 0.928 / 0.930
+   null mean: min..max of 10   0.086 / 0.093 / 0.090 .. 0.090 / 0.095 / 0.094
+series, windows of 1,000 canvases (seed 20261101 / 02 / 03):
+      0  say rate 0.928 / 0.916 / 0.936  true 0.968 / 0.943 / 0.954  unique 0.938 / 0.900 / 0.913  ask rate 0.119 / 0.153 / 0.128  surprise 0.171 / 0.172 / 0.173
+   1000  say rate 0.935 / 0.952 / 0.946  true 0.965 / 0.961 / 0.976  unique 0.933 / 0.914 / 0.946  ask rate 0.106 / 0.102 / 0.095  surprise 0.149 / 0.140 / 0.156
+   2000  say rate 0.956 / 0.951 / 0.943  true 0.969 / 0.978 / 0.969  unique 0.930 / 0.940 / 0.924  ask rate 0.106 / 0.096 / 0.108  surprise 0.144 / 0.147 / 0.153
+   3000  say rate 0.950 / 0.942 / 0.943  true 0.982 / 0.985 / 0.992  unique 0.939 / 0.951 / 0.965  ask rate 0.103 / 0.106 / 0.093  surprise 0.128 / 0.136 / 0.136
+   4000  say rate 0.950 / 0.946 / 0.956  true 0.981 / 0.983 / 0.988  unique 0.957 / 0.948 / 0.961  ask rate 0.100 / 0.098 / 0.098  surprise 0.133 / 0.139 / 0.117
+   5000  say rate 0.960 / 0.959 / 0.955  true 0.982 / 0.976 / 0.965  unique 0.947 / 0.943 / 0.933  ask rate 0.099 / 0.095 / 0.098  surprise 0.137 / 0.142 / 0.142
+   6000  say rate 0.953 / 0.954 / 0.961  true 0.982 / 0.966 / 0.984  unique 0.953 / 0.932 / 0.957  ask rate 0.095 / 0.101 / 0.082  surprise 0.120 / 0.139 / 0.129
+   7000  say rate 0.952 / 0.952 / 0.951  true 0.983 / 0.978 / 0.979  unique 0.955 / 0.942 / 0.943  ask rate 0.095 / 0.089 / 0.089  surprise 0.120 / 0.139 / 0.106
+   8000  say rate 0.964 / 0.947 / 0.950  true 0.983 / 0.983 / 0.983  unique 0.951 / 0.947 / 0.948  ask rate 0.095 / 0.105 / 0.099  surprise 0.112 / 0.121 / 0.112
+   9000  say rate 0.948 / 0.940 / 0.968  true 0.977 / 0.982 / 0.991  unique 0.942 / 0.950 / 0.958  ask rate 0.089 / 0.103 / 0.079  surprise 0.138 / 0.127 / 0.131
+cpu s 151 / 146 / 150

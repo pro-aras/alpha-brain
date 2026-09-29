@@ -1,0 +1,769 @@
+{
+ "G": {
+  "D": {
+   "bar": 0.05,
+   "difference": 0.12091657191453797,
+   "n_doubted": 3396,
+   "n_undoubted": 41367,
+   "p_exact_one_sided": 1.0792390454664777e-96,
+   "pass": true,
+   "right_doubted": 0.7968197879858657,
+   "right_undoubted": 0.9177363599004037,
+   "table": [
+    [
+     37964,
+     41367
+    ],
+    [
+     2706,
+     3396
+    ]
+   ]
+  },
+  "E": {
+   "bar": 0.2,
+   "mean": 0.14494017094017095,
+   "n": 9750,
+   "null_draws": 10,
+   "null_min": 0.6832136752136753,
+   "pass": true
+  },
+  "R": {
+   "bar": 0.85,
+   "lowest_window": {
+    "canvases": 750,
+    "from": 0,
+    "rate": 0.9026666666666666,
+    "to": 1000
+   },
+   "overall": 0.9476923076923077,
+   "pass": true,
+   "windows": 10
+  },
+  "S": {
+   "bar": 0.95,
+   "n": 9240,
+   "not_graded": 0,
+   "null_draws": 10,
+   "null_max": 0.20573593073593074,
+   "pass": true,
+   "true": 0.9715367965367966
+  },
+  "U": {
+   "bar": 0.9,
+   "n": 9240,
+   "pass": true,
+   "unique_true": 0.939935064935065
+  },
+  "about_the_parents_thing": 0.6551948051948052,
+  "asks": {
+   "asked": 1092,
+   "asked_a_thing": 1091,
+   "canvases": 9750,
+   "rate": 0.112
+  },
+  "by_things_in_scene": {
+   "1": {
+    "about_the_parents_thing": 1.0,
+    "canvases": 3890,
+    "graded": 3618,
+    "margin_inf": 3617,
+    "no_thing_under_the_target": 0,
+    "rate": 0.9300771208226221,
+    "said": 3618,
+    "true": 0.9831398562741847,
+    "two_or_more_words": 0,
+    "unique_true": 0.9831398562741847
+   },
+   "2": {
+    "about_the_parents_thing": 0.4893387314439946,
+    "canvases": 3877,
+    "graded": 3705,
+    "margin_inf": 1045,
+    "no_thing_under_the_target": 0,
+    "rate": 0.9556358008769668,
+    "said": 3705,
+    "true": 0.9676113360323887,
+    "two_or_more_words": 0,
+    "unique_true": 0.9354925775978408
+   },
+   "3": {
+    "about_the_parents_thing": 0.3249869587897757,
+    "canvases": 1983,
+    "graded": 1917,
+    "margin_inf": 220,
+    "no_thing_under_the_target": 0,
+    "rate": 0.9667170953101362,
+    "said": 1917,
+    "true": 0.9572248304642671,
+    "two_or_more_words": 28,
+    "unique_true": 0.86697965571205
+   }
+  },
+  "control_planted_say": {
+   "bar": 0.05,
+   "caught": true,
+   "n": 9240,
+   "true": 0.0
+  },
+  "null": {
+   "draws": 10,
+   "says_true": [
+    0.19837662337662337,
+    0.20194805194805196,
+    0.20573593073593074,
+    0.19935064935064936,
+    0.20205627705627704,
+    0.2025974025974026,
+    0.20032467532467532,
+    0.19404761904761905,
+    0.19924242424242425,
+    0.20108225108225108
+   ],
+   "surprise_believed": [
+    0.6894358974358975,
+    0.6898290598290598,
+    0.6896068376068376,
+    0.6892991452991454,
+    0.6901025641025641,
+    0.6889059829059829,
+    0.6874700854700855,
+    0.6832136752136753,
+    0.6867863247863248,
+    0.6898119658119658
+   ],
+   "surprise_held": [
+    0.0847008547008547,
+    0.08830769230769231,
+    0.08586324786324787,
+    0.08538461538461538,
+    0.0847008547008547,
+    0.08526495726495728,
+    0.08620512820512821,
+    0.08297435897435898,
+    0.08464957264957265,
+    0.08393162393162394
+   ]
+  },
+  "readings": {
+   "first_true_say": {
+    "canvas": 251,
+    "words": [
+     "circle"
+    ]
+   },
+   "spoken_vocabulary": [
+    {
+     "distinct_words_said_truly": 13,
+     "to": 1000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    },
+    {
+     "distinct_words_said_truly": 13,
+     "to": 2000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    },
+    {
+     "distinct_words_said_truly": 13,
+     "to": 3000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    },
+    {
+     "distinct_words_said_truly": 13,
+     "to": 4000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    },
+    {
+     "distinct_words_said_truly": 13,
+     "to": 5000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    },
+    {
+     "distinct_words_said_truly": 13,
+     "to": 6000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    },
+    {
+     "distinct_words_said_truly": 13,
+     "to": 7000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    },
+    {
+     "distinct_words_said_truly": 13,
+     "to": 8000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    },
+    {
+     "distinct_words_said_truly": 13,
+     "to": 9000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    },
+    {
+     "distinct_words_said_truly": 13,
+     "to": 10000,
+     "words": [
+      "big",
+      "blue",
+      "circle",
+      "cross",
+      "green",
+      "red",
+      "ring",
+      "small",
+      "square",
+      "star",
+      "triangle",
+      "white",
+      "yellow"
+     ]
+    }
+   ],
+   "surprise_slope": {
+    "per_1000_canvases": -0.007995959595959596,
+    "se": 0.0015028249425254926,
+    "windows": 10
+   }
+  },
+  "say_lengths": {
+   "1": 9212,
+   "2": 27,
+   "3": 1
+  },
+  "says_series": [
+   {
+    "about_the_parents_thing": 0.6351550960118169,
+    "canvases": 750,
+    "from": 0,
+    "graded": 677,
+    "margin_inf": 346,
+    "no_thing_under_the_target": 0,
+    "rate": 0.9026666666666666,
+    "said": 677,
+    "to": 1000,
+    "true": 0.9394387001477105,
+    "two_or_more_words": 4,
+    "unique_true": 0.9010339734121122
+   },
+   {
+    "about_the_parents_thing": 0.6454352441613588,
+    "canvases": 1000,
+    "from": 1000,
+    "graded": 942,
+    "margin_inf": 483,
+    "no_thing_under_the_target": 0,
+    "rate": 0.942,
+    "said": 942,
+    "to": 2000,
+    "true": 0.9660297239915074,
+    "two_or_more_words": 3,
+    "unique_true": 0.9331210191082803
+   },
+   {
+    "about_the_parents_thing": 0.6441393875395988,
+    "canvases": 1000,
+    "from": 2000,
+    "graded": 947,
+    "margin_inf": 505,
+    "no_thing_under_the_target": 0,
+    "rate": 0.947,
+    "said": 947,
+    "to": 3000,
+    "true": 0.9757127771911299,
+    "two_or_more_words": 3,
+    "unique_true": 0.9408658922914467
+   },
+   {
+    "about_the_parents_thing": 0.6719409282700421,
+    "canvases": 1000,
+    "from": 3000,
+    "graded": 948,
+    "margin_inf": 500,
+    "no_thing_under_the_target": 0,
+    "rate": 0.948,
+    "said": 948,
+    "to": 4000,
+    "true": 0.9831223628691983,
+    "two_or_more_words": 1,
+    "unique_true": 0.9556962025316456
+   },
+   {
+    "about_the_parents_thing": 0.6373165618448637,
+    "canvases": 1000,
+    "from": 4000,
+    "graded": 954,
+    "margin_inf": 490,
+    "no_thing_under_the_target": 0,
+    "rate": 0.954,
+    "said": 954,
+    "to": 5000,
+    "true": 0.9696016771488469,
+    "two_or_more_words": 2,
+    "unique_true": 0.929769392033543
+   },
+   {
+    "about_the_parents_thing": 0.6498422712933754,
+    "canvases": 1000,
+    "from": 5000,
+    "graded": 951,
+    "margin_inf": 518,
+    "no_thing_under_the_target": 0,
+    "rate": 0.951,
+    "said": 951,
+    "to": 6000,
+    "true": 0.9747634069400631,
+    "two_or_more_words": 7,
+    "unique_true": 0.9442691903259727
+   },
+   {
+    "about_the_parents_thing": 0.6558577405857741,
+    "canvases": 1000,
+    "from": 6000,
+    "graded": 956,
+    "margin_inf": 513,
+    "no_thing_under_the_target": 0,
+    "rate": 0.956,
+    "said": 956,
+    "to": 7000,
+    "true": 0.9686192468619247,
+    "two_or_more_words": 3,
+    "unique_true": 0.9351464435146444
+   },
+   {
+    "about_the_parents_thing": 0.6694736842105263,
+    "canvases": 1000,
+    "from": 7000,
+    "graded": 950,
+    "margin_inf": 516,
+    "no_thing_under_the_target": 0,
+    "rate": 0.95,
+    "said": 950,
+    "to": 8000,
+    "true": 0.9778947368421053,
+    "two_or_more_words": 3,
+    "unique_true": 0.9557894736842105
+   },
+   {
+    "about_the_parents_thing": 0.6557550158394931,
+    "canvases": 1000,
+    "from": 8000,
+    "graded": 947,
+    "margin_inf": 494,
+    "no_thing_under_the_target": 0,
+    "rate": 0.947,
+    "said": 947,
+    "to": 9000,
+    "true": 0.9714889123548046,
+    "two_or_more_words": 1,
+    "unique_true": 0.9398099260823654
+   },
+   {
+    "about_the_parents_thing": 0.6807851239669421,
+    "canvases": 1000,
+    "from": 9000,
+    "graded": 968,
+    "margin_inf": 517,
+    "no_thing_under_the_target": 0,
+    "rate": 0.968,
+    "said": 968,
+    "to": 10000,
+    "true": 0.9793388429752066,
+    "two_or_more_words": 1,
+    "unique_true": 0.9524793388429752
+   }
+  ],
+  "surprise_series": [
+   {
+    "expected_every_word": 0.668,
+    "from": 0,
+    "mean": 0.20200000000000004,
+    "n": 750,
+    "to": 1000
+   },
+   {
+    "expected_every_word": 0.72,
+    "from": 1000,
+    "mean": 0.17883333333333334,
+    "n": 1000,
+    "to": 2000
+   },
+   {
+    "expected_every_word": 0.75,
+    "from": 2000,
+    "mean": 0.15383333333333335,
+    "n": 1000,
+    "to": 3000
+   },
+   {
+    "expected_every_word": 0.787,
+    "from": 3000,
+    "mean": 0.1328333333333333,
+    "n": 1000,
+    "to": 4000
+   },
+   {
+    "expected_every_word": 0.761,
+    "from": 4000,
+    "mean": 0.1535,
+    "n": 1000,
+    "to": 5000
+   },
+   {
+    "expected_every_word": 0.769,
+    "from": 5000,
+    "mean": 0.1476666666666667,
+    "n": 1000,
+    "to": 6000
+   },
+   {
+    "expected_every_word": 0.795,
+    "from": 6000,
+    "mean": 0.134,
+    "n": 1000,
+    "to": 7000
+   },
+   {
+    "expected_every_word": 0.812,
+    "from": 7000,
+    "mean": 0.11683333333333334,
+    "n": 1000,
+    "to": 8000
+   },
+   {
+    "expected_every_word": 0.788,
+    "from": 8000,
+    "mean": 0.12983333333333336,
+    "n": 1000,
+    "to": 9000
+   },
+   {
+    "expected_every_word": 0.82,
+    "from": 9000,
+    "mean": 0.11433333333333334,
+    "n": 1000,
+    "to": 10000
+   }
+  ],
+  "two_or_more_words": 28,
+  "world_seed": 20261104
+ },
+ "bars": {
+  "C": 1.5,
+  "D": 0.05,
+  "D_p": 0.001,
+  "E": 0.2,
+  "R": 0.85,
+  "S": 0.95,
+  "U": 0.9,
+  "planted": 0.05
+ },
+ "seeds": [
+  {
+   "C": {
+    "bar": 1.5,
+    "canvases": 10000,
+    "off": {
+     "last_1000_mean_cpu_ms": 86.790764,
+     "mean_cpu_ms": 62.589632200000004,
+     "mean_wall_ms": 63.92092879999999,
+     "median_cpu_ms": 26.6025,
+     "missing": 0,
+     "n": 10000
+    },
+    "on": {
+     "last_1000_mean_cpu_ms": 92.968036,
+     "mean_cpu_ms": 68.59264329999999,
+     "mean_wall_ms": 68.63564480000001,
+     "median_cpu_ms": 32.402,
+     "missing": 0,
+     "n": 10000
+    },
+    "pass": true,
+    "ratio": 1.0959106307066617
+   },
+   "I1": {
+    "exit": 0,
+    "pass": true,
+    "rows": 34481
+   },
+   "I2": {
+    "first_difference": null,
+    "pass": true,
+    "rows_off": 34481,
+    "rows_on": 44481,
+    "turn_rows": 10000
+   },
+   "J": {
+    "differing": [],
+    "keys_read": 13,
+    "pass": true
+   },
+   "JB": {
+    "bench_rows": 10000,
+    "differing_by_key": {},
+    "equal": 10000,
+    "first_difference": null,
+    "pass": true,
+    "turn_rows": 10000
+   },
+   "turn_rows": {
+    "mean_bytes": 607.2098,
+    "rows": 10000,
+    "total_mb": 6.072098
+   },
+   "world_seed": 20261101
+  },
+  {
+   "C": {
+    "bar": 1.5,
+    "canvases": 10000,
+    "off": {
+     "last_1000_mean_cpu_ms": 191.47663799999998,
+     "mean_cpu_ms": 135.7091903,
+     "mean_wall_ms": 474.9298565,
+     "median_cpu_ms": 67.01050000000001,
+     "missing": 0,
+     "n": 10000
+    },
+    "on": {
+     "last_1000_mean_cpu_ms": 204.25959100000003,
+     "mean_cpu_ms": 149.0213476,
+     "mean_wall_ms": 520.1591521,
+     "median_cpu_ms": 80.3485,
+     "missing": 0,
+     "n": 10000
+    },
+    "pass": true,
+    "ratio": 1.0980932630323124
+   },
+   "I1": {
+    "exit": 0,
+    "pass": true,
+    "plant_exit": 1,
+    "rows": 34477
+   },
+   "I2": {
+    "first_difference": null,
+    "pass": true,
+    "rows_off": 34477,
+    "rows_on": 44477,
+    "turn_rows": 10000
+   },
+   "J": {
+    "differing": [],
+    "keys_read": 13,
+    "pass": true
+   },
+   "JB": {
+    "bench_rows": 10000,
+    "differing_by_key": {},
+    "equal": 10000,
+    "first_difference": null,
+    "pass": true,
+    "turn_rows": 10000
+   },
+   "turn_rows": {
+    "mean_bytes": 603.7174,
+    "rows": 10000,
+    "total_mb": 6.037174
+   },
+   "world_seed": 20261102
+  },
+  {
+   "C": {
+    "bar": 1.5,
+    "canvases": 10000,
+    "off": {
+     "last_1000_mean_cpu_ms": 87.09931599999999,
+     "mean_cpu_ms": 62.70722320000001,
+     "mean_wall_ms": 63.8454718,
+     "median_cpu_ms": 26.7485,
+     "missing": 0,
+     "n": 10000
+    },
+    "on": {
+     "last_1000_mean_cpu_ms": 91.69610200000001,
+     "mean_cpu_ms": 67.49617409999999,
+     "mean_wall_ms": 67.54525109999999,
+     "median_cpu_ms": 31.359499999999997,
+     "missing": 0,
+     "n": 10000
+    },
+    "pass": true,
+    "ratio": 1.0763700042134856
+   },
+   "I1": {
+    "exit": 0,
+    "pass": true,
+    "rows": 34472
+   },
+   "I2": {
+    "first_difference": null,
+    "pass": true,
+    "rows_off": 34472,
+    "rows_on": 44472,
+    "turn_rows": 10000
+   },
+   "J": {
+    "differing": [],
+    "keys_read": 13,
+    "pass": true
+   },
+   "JB": {
+    "bench_rows": 10000,
+    "differing_by_key": {},
+    "equal": 10000,
+    "first_difference": null,
+    "pass": true,
+    "turn_rows": 10000
+   },
+   "turn_rows": {
+    "mean_bytes": 607.165,
+    "rows": 10000,
+    "total_mb": 6.07165
+   },
+   "world_seed": 20261103
+  }
+ ],
+ "verdict": {
+  "ADOPT": true,
+  "C": true,
+  "D": true,
+  "E": true,
+  "I1": true,
+  "I1_plant_exit": 1,
+  "I2": true,
+  "J": true,
+  "JB": true,
+  "R": true,
+  "S": true,
+  "U": true,
+  "control_planted_say_caught": true,
+  "wiring": true
+ }
+}
