@@ -11,6 +11,7 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 from typing import Dict, List
 
 import creature.mind as MM
@@ -180,6 +181,32 @@ class TheOrganismMeetsEveryWord(_Lives):
         mine = [json.dumps(r, sort_keys=True) for r in S.journal(rr) if "hash" in r]
         whole = [json.dumps(r, sort_keys=True) for r in S.journal(self.on_root) if "hash" in r]
         self.assertEqual(mine, whole)
+
+
+class TheReplaysCounters(_Lives):
+    """PREREG-WORD-ROAD §4 mark G's instrument: creature.replay --counters-every N."""
+
+    def test_the_journal_is_the_same_with_and_without_the_counters(self) -> None:
+        from creature import replay as RP
+        gp = self.tmp / "counters.genome"
+        gp.write_text(genome_text(True))
+        outs = []
+        for k, every in enumerate((0, 20)):
+            out = self.tmp / f"replay-counters-{k}"
+            with mock.patch.object(tempfile, "tempdir", str(self.tmp)):
+                RP.run_replay(gp, self.info["tape"], out, close=True, counters_every=every)
+            outs.append(out)
+        self.assertEqual((outs[0] / "journal.jsonl").read_bytes(), (outs[1] / "journal.jsonl").read_bytes())
+        self.assertFalse((outs[0] / "counters.jsonl").exists())
+        rows = [json.loads(l) for l in (outs[1] / "counters.jsonl").read_text().splitlines()]
+        self.assertEqual([r["canvases"] for r in rows], [20, 40, 60, 60])
+        self.assertTrue(rows[-1]["final"])
+        self.assertEqual(sorted(rows[-1]["word_cells"]), sorted(self.info["said"]))
+        for key in ("births_refused_budget", "births_refused_nmax", "births_refused_redundant", "budget_left", "arrivals",
+                    "cells_sight", "cells_words", "hear_shared_cell", "hear_words_refused"):
+            self.assertIn(key, rows[-1])
+        self.assertEqual(rows[-1]["cells_words"], int(self.on.org.words.alive.sum()))
+        self.assertEqual(rows[-1]["births_refused_budget"], int(self.on.org.c["births_refused_budget"]))
 
 
 class Refusals(_Lives):
