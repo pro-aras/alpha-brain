@@ -1,0 +1,193 @@
+{
+ "K10": true,
+ "K10_plant_caught": true,
+ "K11": {
+  "auroc": 0.7023921938936103,
+  "items": 398,
+  "null_auroc": [
+   0.6666666666666666,
+   0.4577274158010702,
+   0.7657223796033994,
+   0.3842618822788794,
+   0.4948064211520302,
+   0.4284230406043437,
+   0.5836638338054768,
+   0.6587976078061064,
+   0.5796663519043123,
+   0.6555240793201134,
+   0.5567516525023607,
+   0.34727730563424614,
+   0.39354737173434057,
+   0.5312873780295877,
+   0.4198300283286119,
+   0.5198300283286119,
+   0.4795404469625433,
+   0.7199874095058231,
+   0.6876927919420838,
+   0.6307208057916274
+  ],
+  "null_p95": 0.7199874095058231,
+  "reliability": {
+   "big": 0.8972929936305732,
+   "blue": 0.7797619047619048,
+   "circle": 0.9785801713586292,
+   "cross": 0.9133089133089133,
+   "dax": 0.0,
+   "green": 0.8549180327868853,
+   "red": 0.7836477987421384,
+   "ring": 0.696798493408663,
+   "small": 0.8728200765631646,
+   "square": 0.9556313993174061,
+   "star": 0.9555690809494827,
+   "triangle": 0.9395318595578673,
+   "white": 0.7745901639344263,
+   "yellow": 0.843065693430657
+  },
+  "right": 353,
+  "wrong": 45
+ },
+ "claims": {
+  "F1": {
+   "author": "the seat",
+   "confirmed": 8710,
+   "contradicted": 1039,
+   "first_demoted_at": 279,
+   "first_event_at": 250,
+   "id": "F1",
+   "level": 0.05,
+   "min_events": 30,
+   "quantifier": "always",
+   "share_confirmed": 0.8934249666632476,
+   "source": "implanted-knowledge",
+   "state": "demoted",
+   "text": "I see every thing the parent names."
+  },
+  "F2": {
+   "author": "the seat",
+   "confirmed": 2508,
+   "contradicted": 7492,
+   "first_demoted_at": 29,
+   "first_event_at": 0,
+   "id": "F2",
+   "level": 0.05,
+   "min_events": 30,
+   "quantifier": "always",
+   "share_confirmed": 0.2508,
+   "source": "implanted-knowledge",
+   "state": "demoted",
+   "text": "The parent always says three words."
+  },
+  "T1": {
+   "author": "the seat",
+   "confirmed": 10000,
+   "contradicted": 0,
+   "first_demoted_at": null,
+   "first_event_at": 0,
+   "id": "T1",
+   "level": 0.05,
+   "min_events": 30,
+   "quantifier": "always",
+   "share_confirmed": 1.0,
+   "source": "implanted-knowledge",
+   "state": "trusted",
+   "text": "I look at no more than four places on a canvas."
+  },
+  "T2": {
+   "author": "the seat",
+   "confirmed": 9750,
+   "contradicted": 0,
+   "first_demoted_at": null,
+   "first_event_at": 250,
+   "id": "T2",
+   "level": 0.05,
+   "min_events": 30,
+   "quantifier": "always",
+   "share_confirmed": 1.0,
+   "source": "implanted-knowledge",
+   "state": "trusted",
+   "text": "The parent says at most one word of each kind at a time."
+  },
+  "T3": {
+   "author": "the seat",
+   "confirmed": 7630,
+   "contradicted": 2120,
+   "first_demoted_at": 522,
+   "first_event_at": 250,
+   "id": "T3",
+   "level": 0.7,
+   "min_events": 30,
+   "quantifier": "usually",
+   "share_confirmed": 0.7825641025641026,
+   "source": "implanted-knowledge",
+   "state": "trusted",
+   "text": "Usually, what I expect is what the parent says."
+  }
+ },
+ "lived": {
+  "canvases": 10000,
+  "expect_confirmed": 7630,
+  "fix": {
+   "4": 10000
+  },
+  "turns_expecting": 9750,
+  "words": {
+   "big": [
+    2512,
+    2254
+   ],
+   "blue": [
+    1008,
+    786
+   ],
+   "circle": [
+    1634,
+    1599
+   ],
+   "cross": [
+    1638,
+    1496
+   ],
+   "dax": [
+    1,
+    0
+   ],
+   "green": [
+    1220,
+    1043
+   ],
+   "red": [
+    795,
+    623
+   ],
+   "ring": [
+    2124,
+    1480
+   ],
+   "small": [
+    2351,
+    2052
+   ],
+   "square": [
+    1172,
+    1120
+   ],
+   "star": [
+    1643,
+    1570
+   ],
+   "triangle": [
+    1538,
+    1445
+   ],
+   "white": [
+    976,
+    756
+   ],
+   "yellow": [
+    822,
+    693
+   ]
+  }
+ },
+ "root": "/data/dev/genome-lives/inh-b-t10000"
+}

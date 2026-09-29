@@ -1,0 +1,7 @@
+the genome and tools suites on c3e2014 (the code of the merge; the later commits add documents only), one at a time, BLAS threads 1, finished 2026-09-29 23:04:22 +0400
+== genome exit=0
+Ran 671 tests in 187.483s
+OK (skipped=1, expected failures=6)
+== tools exit=0
+Ran 92 tests in 170.964s
+OK
