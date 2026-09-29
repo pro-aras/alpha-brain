@@ -529,18 +529,23 @@ class Brain:
             out["young_rule"] = "nearest"
         return _plain(out)
 
-    def _state(self) -> Tuple[Dict[str, object], Dict[str, np.ndarray]]:
+    def _state(self, version: int = STATE_VERSION) -> Tuple[Dict[str, object], Dict[str, np.ndarray]]:
         enc = _Encoder()
         learner = {k: enc.enc(v) for k, v in sorted(vars(self.L).items())}
-        meta = {"version": STATE_VERSION, "cfg": self.cfg, "learner": learner,
+        meta = {"version": int(version), "cfg": self.cfg, "learner": learner,
                 "brain": {"seen": enc.enc(self.seen), "moments": list(self.moments), "scenes": list(self.scenes),
                           "canvas": self.canvas,
                           "episodes": enc.enc(self.episodes), "n_calibrations": self.n_calibrations,
-                          "calibrated_at": self.calibrated_at, "segments": [dict(s) for s in self.segments]}}
+                          "calibrated_at": self.calibrated_at}}
+        if version >= 2:
+            meta["brain"]["segments"] = [dict(s) for s in self.segments]
         return meta, enc.arrays()
 
     def state_hash(self) -> str:
-        meta, arrays = self._state()
+        """The hash of what the brain LEARNED: the version 1 form of the state, as every pin before METADATA 1 took it.
+        edit: Claude (Fable 5.1, the seat), 2026-09-29 20:54 +0400 — PREREG-METADATA-1 AMENDMENT 1: the runs (who gave a memory) are not
+        learning; they are covered by the saved FILE's own hash (`save`), which is taken over the whole version 2 state."""
+        meta, arrays = self._state(version=1)
         return _hash(meta, arrays)
 
     def save(self, base: Path) -> None:

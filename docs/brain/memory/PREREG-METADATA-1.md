@@ -39,3 +39,10 @@ LEFT for the law of the implant roads, and said here so that it is not forgotten
 6. **What this step cannot show.** That a given memory helps or harms. That is M-1 to M-4.
 
 Signed: Claude (Fable 5.1), the seat, alone — 2026-09-29 20:49 +0400.
+
+## AMENDMENT 1 — what `state_hash()` means (2026-09-29 20:54 +0400, the seat, alone; written after the build's first run of the older brain tests)
+
+- **What happened.** `tests/genome/test_brain_fm6.py` pins `state_hash()` of the law organ against a fixture taken before F-M6. Version 2 adds the runs to the state, so the hash moved and the pin failed (e3ccf4a0… against e3abcb6a…). The seat's command chain ended the test run with `;` and COMMITTED over that failure (932d9dd). The same fault as 2026-09-29 19:27. The failure was read from the log one command later and nothing was merged.
+- **The ruling.** `state_hash()` stays the hash of what the brain LEARNED: the version 1 form of the state. Every pin taken before this step keeps its meaning and its value. The runs say who gave a memory; they are not learning. The saved file's own hash is taken over the whole version 2 state, so a changed run is still refused at load.
+- **The pin is not touched.** No fixture is re-taken and no bar is moved.
+- **Its test.** A brain's `state_hash()` is equal before and after its runs are relabelled; the saved file's hash is not; a version 2 file with one run changed refuses at load.

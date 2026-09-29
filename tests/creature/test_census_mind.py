@@ -198,6 +198,27 @@ class CensusMind(unittest.TestCase):
         finally:
             m.close()
 
+    # -- AMENDMENT 1 -----------------------------------------------------------------------------
+    def test_the_learning_hash_ignores_the_runs_and_the_file_hash_does_not(self):
+        cfg = dict(self.life.genome.declared["BRAIN"])
+        b = Brain.load(self.pair / "brain", cfg)
+        h = b.state_hash()
+        b.segments[0]["source"] = "inherited"
+        self.assertEqual(b.state_hash(), h, "who gave a memory is not learning")
+        out = self.tmp / "relabelled"
+        out.mkdir()
+        b.save(out / "brain")
+        f0 = json.loads((self.pair / "brain.json").read_text())["state_hash"]
+        f1 = json.loads((out / "brain.json").read_text())["state_hash"]
+        self.assertNotEqual(f0, f1, "the file's hash covers the runs")
+        bad = out / "brain.json"
+        t = bad.read_text()
+        t2 = t.replace('"source":"inherited"', '"source":"lived"', 1)
+        self.assertNotEqual(t, t2, "the plant changed the bytes")
+        bad.write_text(t2)
+        with self.assertRaises(BrainError):
+            Brain.load(out / "brain", cfg)
+
     def test_a_saved_state_keeps_its_segments(self):
         b = Brain.load(self.pair / "brain", dict(self.life.genome.declared["BRAIN"]))
         self.assertEqual([(s["start"], s["end"], s["source"]) for s in b.segments], [(0, N_TRAIN, "lived")])
