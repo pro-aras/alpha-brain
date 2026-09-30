@@ -212,14 +212,15 @@ class FakeBrain:
     def _digest(self, glance) -> float:
         return round(float(np.asarray(glance["feats"][0], dtype=np.float64).sum()), 9)
 
-    def learn(self, glance, words, *, moment, scene, world_seed) -> Dict[str, object]:
+    def learn(self, glance, words, *, moment, scene, world_seed, world=None) -> Dict[str, object]:
+        # edit: Claude (Fable 5.1, the seat), 2026-09-30 10:3x +0400 — PREREG-HEARS-2 §1: the organ's interface grew by `world=` (a stand-in is a consumer, #248 (3))
         fix = [list(map(int, f)) for f in glance["fix"]]
         if len(glance["feats"]) != len(fix) + 1:
             raise AssertionError(f"FakeBrain: expected the coarse glance beside {len(fix)} located, got {len(glance['feats'])}")
         for w in words:
             self.counts[w] = self.counts.get(w, 0) + 1
         self.rows.append({"moment": moment, "scene": int(scene), "words": list(words), "fix0": fix[0] if fix else None,
-                          "d": self._digest(glance)})
+                          "d": self._digest(glance), **({"world": str(world)} if world not in (None, "scene") else {})})
         self.since += 1
         calibrated = len(self.rows) in list(self.cfg["calibrate_at"])
         if calibrated:
