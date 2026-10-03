@@ -602,6 +602,39 @@ class Cost(Tmp):
         self.assertIn("end_epoch", str(cm.exception))
 
 
+class RestartsOnTheMakerSeries(Tmp):
+    """AMENDMENT 3 §A3.4: the maker restarts at window 0 after any restart of the body, so every restart is NAMED on the maker series (the journal's `start` rows with resumed_from_seq > 0)."""
+
+    def _rows_with_a_restart(self):
+        rows = maker_journal()
+        turns = [k for k, r in enumerate(rows) if r.get("world") == "maker" and r.get("act") == "turn"]
+        rows.insert(turns[40], {"seq": None, "at": "t", "event": "start", "resumed_from_seq": 5000, "backlog_replayed": 3})    # the body resumed before the 41st maker turn
+        rows.insert(0, {"seq": None, "at": "t", "event": "start", "resumed_from_seq": 0, "backlog_replayed": 0})                 # the LAUNCH's own start row is not a restart
+        return rows
+
+    def test_the_start_rows_are_read_beside_the_brain_rows_and_only_a_resume_is_a_restart(self) -> None:
+        p = write_jsonl(self.mk("hears-read-restart-") / "j.jsonl", self._rows_with_a_restart())
+        rows = H.read_brain_and_starts(p)
+        self.assertEqual(sum(1 for r in rows if r.get("event") == "start"), 2)
+        g = H.g_reading(rows)
+        self.assertEqual(g["restarts"], [{"maker_turn_index": 40, "resumed_from_seq": 5000}])
+        self.assertEqual(g["maker_turns"], 120)                          # the start rows change no count of the brain's turns
+        self.assertEqual([w["restarts_inside"] for w in g["series"]["windows"]], [1, 0])   # windows of 100 maker turns: the restart before turn index 40 is in the first
+        clean = H.g_reading(H.read_brain_and_starts(write_jsonl(self.mk("hears-read-restart-") / "c.jsonl", maker_journal())))
+        self.assertEqual(clean["restarts"], [])
+
+    def test_the_whole_reader_names_the_restart_on_the_series(self) -> None:
+        d = self.mk("hears-read-restart-")
+        off, on = write_grade(d / "off", make_grade("off")), write_grade(d / "on", make_grade("on"))
+        j = write_jsonl(d / "on-j.jsonl", self._rows_with_a_restart())
+        self.assertEqual(H.main(["--off", str(off.parent), "--on", str(on.parent), "--on-journal", str(j), "--out", str(d / "out")]), 0)
+        o = json.loads((d / "out" / "hears.json").read_text())
+        self.assertEqual(o["G"]["restarts"], [{"maker_turn_index": 40, "resumed_from_seq": 5000}])
+        txt = (d / "out" / "hears.txt").read_text()
+        self.assertIn("restart", txt)
+        self.assertIn("maker restarts", txt)
+
+
 class CostWithoutTheCalibrations(Tmp):
     """The advisor's point: a calibration (~0.3 ms x the scenes learned, 3 s at 10,000) is run by `Brain.learn` on the canvas that reaches the count, and ON reaches each count on a DIFFERENT canvas than OFF
     (the maker's canvases are learned too) — one can land on a maker canvas in ON alone. The ratios are read again with every canvas that carries a calibration row (either arm) left out of BOTH arms."""

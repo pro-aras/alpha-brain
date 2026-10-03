@@ -575,6 +575,21 @@ def i2_control(off_rows, i1_rows, real_pass: bool) -> Dict[str, object]:
 
 
 # ------------------------------------------------------------------------------------------------ T and G · from ON's journal
+def read_brain_and_starts(path) -> List[Dict[str, object]]:
+    """worlds_read.read_journal's rows (the brain's) PLUS the body's `start` event rows — the maker restarts at window 0 after any restart of the body (AMENDMENT 3 §A3.4), so a restart must be
+    visible on the maker series. A file or a directory of day files."""
+    p = Path(path)
+    out: List[Dict[str, object]] = []
+    for f in (sorted(p.glob("*.jsonl")) if p.is_dir() else [p]):
+        with f.open(encoding="utf-8") as fh:
+            for line in fh:
+                if '"brain"' in line or '"start"' in line:
+                    r = json.loads(line)
+                    if r.get("kind") == "brain" or r.get("event") == "start":
+                        out.append(r)
+    return out
+
+
 def _brain(rows):
     return [r for r in rows if r.get("kind", "brain") == "brain"]
 
@@ -598,8 +613,13 @@ def walk(rows) -> Dict[str, object]:
     learn_count: Dict[str, int] = collections.Counter()
     side: Dict[str, str] = {}
     turns: List[Dict[str, object]] = []
+    restarts: List[Dict[str, object]] = []
     for r in _brain(rows):
         act, w = r.get("act"), r.get("world") or "scene"
+        if r.get("event") == "start":
+            if int(r.get("resumed_from_seq") or 0) > 0:            # the launch's own start row (resumed_from_seq 0) is no restart
+                restarts.append({"maker_turn_index": len(turns), "resumed_from_seq": r.get("resumed_from_seq")})
+            continue
         if act == "calibrate":
             summ = r.get("summary") or {}
             groups = [[str(x) for x in g] for g in (summ.get("types") or [])]
@@ -631,7 +651,7 @@ def walk(rows) -> Dict[str, object]:
                           "meeting": (None if prior is None else prior + 1), "typed": bool(word is not None and word in typed),
                           "before_first_calibration": not cals, "side": (side.get(word) if word is not None else None),
                           "surprise": r.get("surprise")})
-    return {"turns": turns, "calibrations": cals, "learn_count": dict(learn_count), "typed_last": sorted(typed), "groups_last": groups}
+    return {"turns": turns, "calibrations": cals, "learn_count": dict(learn_count), "typed_last": sorted(typed), "groups_last": groups, "restarts": restarts}
 
 
 def _null(arm: List[Dict[str, object]], draws: int, seed: int) -> List[int]:
@@ -695,6 +715,8 @@ def g_reading(rows, k: int = LAST_K, young: int = YOUNG) -> Dict[str, object]:
     mturns = [r for r in _brain(rows) if r.get("act") == "turn" and r.get("world") == "maker"]
     if mturns:
         series = WR.read(mturns, window=100)["worlds"].get("maker")
+        for w_ in series["windows"]:                  # the windows that contain a restart are marked (AMENDMENT 3 §A3.4)
+            w_["restarts_inside"] = sum(1 for x in W["restarts"] if w_["from"] <= min(x["maker_turn_index"], len(turns) - 1) < w_["from"] + w_["n"])
     return {"maker_turns": len(turns), "k": k,
             "last_k": {"k": k, "n": n, "fewer_than_k": n < k, "agreed": agreed, "agree_over_all": ((agreed / n) if n else None), "said": said,
                        "say_rate": ((said / n) if n else None), "typed": typed, "ceiling": ((typed / n) if n else None),
@@ -705,7 +727,7 @@ def g_reading(rows, k: int = LAST_K, young: int = YOUNG) -> Dict[str, object]:
             "typed_maker_words": tm,
             "prediction_every_typed_maker_word_said_truly": (None if not tm else all(v["first_agreed_say_turn"] is not None for v in tm.values())),
             "calibrations": cals, "last_calibration": (cals[-1] if cals else None),
-            "maker_words": maker_words, "n_maker_words": len(maker_words), "young": young, "series": series}
+            "maker_words": maker_words, "n_maker_words": len(maker_words), "young": young, "restarts": W["restarts"], "series": series}
 
 
 # ------------------------------------------------------------------------------------------------ the report
@@ -770,11 +792,15 @@ def report(o: Dict[str, object]) -> List[str]:
         L.append(f"    calibrations (at, mature) {[(c['calibrated_at'], c['mature']) for c in g['calibrations']]} · the last: learned {_f(lc and lc['learned'])} mature "
                  f"{_f(lc and lc['mature'])} · maker words {g['n_maker_words']}: "
                  + ", ".join(f"{w} {v['meetings']}{'✓' if v['typed_at_last_calibration'] else '✗'}" for w, v in g["maker_words"].items()))
+        rs = g.get("restarts") or []
+        L.append(f"    maker restarts (AMENDMENT 3 §A3.4: the maker restarts at window 0 after any restart of the body; its arrivals and its first pictures begin again): "
+                 + (", ".join(f"before maker turn {x['maker_turn_index']} (resumed from seq {x['resumed_from_seq']})" for x in rs) if rs else "none in this journal"))
         sr = g.get("series")
         if sr:
             for w_ in sr["windows"]:
                 L.append(f"    maker window from {w_['from']:5d} n {w_['n']:4d} say {_f(w_['say_rate'])} agreed/said {_f(w_['agree_rate'])} ask {_f(w_['ask_rate'])} "
-                         f"surprise {_f(w_['surprise'])} distinct {w_['distinct_said']}")
+                         f"surprise {_f(w_['surprise'])} distinct {w_['distinct_said']}"
+                         + (f" · RESTART inside ×{w_['restarts_inside']}" if w_.get("restarts_inside") else ""))
     x = o["X"]
     L.append(f"  X · EXIST by any hand: ON exist {_f(x['exist'])} over {_f(x['n_cited'])} citations (with a truth {_f(x['n_with_truth'])}) · cited by world "
              f"{x['cited_by_world'] if x['cited_by_world'] is not None else 'NOT RECORDED by this grade'} · maker citations {_f(x['maker_citations'])} "
@@ -858,7 +884,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if a.tape:
         o["splits"] = splits(off, on, tape_index(a.tape))
     if a.on_journal:
-        rows = WR.read_journal(Path(a.on_journal))
+        rows = read_brain_and_starts(a.on_journal)
         o["T"], o["G"] = t_reading(rows), g_reading(rows)
     if do_cost:
         cal_off = read_calibration_seqs(a.off_journal) if a.off_journal else None
