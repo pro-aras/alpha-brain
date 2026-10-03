@@ -1,0 +1,55 @@
+S1 scene-shuffled (G6's sampler, 3,000 moments, words shuffled, seed 1): 1800 train / 1200 held moments, 3532 train words, V 13, 100 null draws
+rule       seed   |F|       G(F) NULL-1 mean      sd        q95  verdict  NULL-2 q95         M        D         C     T=D+C         L firings
+WEB-H         0     2     -35.19      -38.43    2.54     -34.16    QUIET      -35.49      2.16    20.43    -42.97    -22.54     14.80      11
+WEB-S         1     3     -73.41      -70.24    3.94     -63.79    QUIET      -67.35      0.72    44.60    -96.53    -51.93     22.20      21
+WEB-S         2     0       0.00        0.00    0.00       0.00    EMPTY        0.00      0.00     0.00      0.00      0.00      0.00       0
+WEB-S         3     0       0.00        0.00    0.00       0.00    EMPTY        0.00      0.00     0.00      0.00      0.00      0.00       0
+WEB-S         4     2     -35.19      -38.26    2.51     -34.52    QUIET      -35.74      2.16    20.43    -42.97    -22.54     14.80      11
+WEB-S         5     2     -35.62      -38.10    2.77     -33.62    QUIET      -34.98      1.21    20.40    -42.43    -22.02     14.80      13
+WEB-S         6     1     -22.33      -22.67    1.77     -19.62    QUIET      -19.62     -0.28    13.62    -28.27    -14.64      7.40       9
+WEB-S         7     1     -22.33      -22.81    1.64     -20.55    QUIET      -19.62     -0.28    13.62    -28.27    -14.64      7.40       9
+WEB-S         8     1     -23.87      -23.66    4.20     -16.31    QUIET      -19.07     -1.22    14.61    -29.86    -15.25      7.40       8
+WEB-S         9     2     -33.70      -33.71    2.59     -29.78    QUIET      -36.60      2.27    20.46    -41.63    -21.17     14.80       8
+WEB-S        10     2     -42.33      -40.77    2.61     -36.95    QUIET      -40.52      1.49    27.25    -56.28    -29.02     14.80      11
+SENTENCE      0     0       0.00        0.00    0.00       0.00    EMPTY        0.00      0.00     0.00      0.00      0.00      0.00       0
+MDL-GREEDY    0     0       0.00        0.00    0.00       0.00    EMPTY        0.00      0.00     0.00      0.00      0.00      0.00       0
+
+S2 ALPHA4-regime i.i.d. (84,275 moments, Zipf shelf tail): 50565 train / 33710 held moments, 67613 train words, V 3142, 100 null draws
+rule       seed   |F|       G(F) NULL-1 mean      sd        q95  verdict  NULL-2 q95         M        D         C     T=D+C         L firings
+WEB-H         0   235   -6006.62    -5838.82   12.11   -5819.57    QUIET    -6021.54      1.44   116.69   -664.54   -547.85   5460.21      80
+WEB-S         1   578  -16716.45   -16388.97   29.77  -16347.73    QUIET   -16972.16   -847.91  1339.13  -3777.89  -2438.75  13429.79    1058
+WEB-S         2   593  -17112.60   -16777.52   33.10  -16723.57    QUIET   -17350.53   -849.42  1361.30  -3846.17  -2484.87  13778.32    1082
+WEB-S         3   604  -17365.11   -17062.18   35.42  -17004.73    QUIET   -17606.10   -834.03  1356.13  -3853.32  -2497.18  14033.90    1098
+WEB-S         4   600  -17191.65   -16875.50   31.09  -16826.68    QUIET   -17400.37   -781.40  1337.90  -3807.18  -2469.29  13940.96    1067
+WEB-S         5   590  -16947.52   -16678.86   28.14  -16632.30    QUIET   -17219.00   -787.49  1337.29  -3788.71  -2451.42  13708.61    1058
+WEB-S         6   612  -17643.26   -17340.02   32.80  -17290.82    QUIET   -17872.01   -852.60  1402.40  -3973.28  -2570.88  14219.78    1091
+WEB-S         7   594  -17059.25   -16769.87   31.82  -16720.51    QUIET   -17371.21   -754.95  1369.54  -3872.29  -2502.75  13801.55    1032
+WEB-S         8   608  -17483.64   -17173.92   32.67  -17124.56    QUIET   -17739.34   -807.97  1399.12  -3947.96  -2548.84  14126.84    1080
+WEB-S         9   598  -17192.57   -16864.46   33.81  -16808.58    QUIET   -17486.79   -807.22  1343.73  -3834.59  -2490.86  13894.49    1032
+WEB-S        10   593  -17069.99   -16765.37   34.62  -16708.58    QUIET   -17322.27   -793.11  1375.41  -3873.97  -2498.56  13778.32    1048
+SENTENCE      0     4    -105.23      -97.97    1.13     -96.68    QUIET     -108.50      4.18     8.41    -24.89    -16.47     92.94       2
+MDL-GREEDY    0     0       0.00        0.00    0.00       0.00    EMPTY        0.00      0.00     0.00      0.00      0.00      0.00       0
+
+	Command being timed: "env PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python3 -B -u -m tools.toys.frames.synthetic check --out docs/research/toys/records/frames/noise-check"
+	User time (seconds): 243.31
+	System time (seconds): 0.22
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 4:03.59
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 215292
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 48251
+	Voluntary context switches: 1
+	Involuntary context switches: 1525
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 568
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
