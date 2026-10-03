@@ -246,6 +246,39 @@ class TestStageSlice(_Synthetic):
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
 
+    # edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 20:49 +0400 — two gaps the instrument's own mutation sweep named before it ran
+    # (a verifier that never reads payload CONTENT; a stager that skips a hole instead of refusing it).
+    def test_verify_catches_a_changed_payload_byte(self) -> None:
+        tmp = Path(tempfile.mkdtemp(prefix="evolve-cal-plant-"))
+        try:
+            plant = tmp / "slice"
+            shutil.copytree(self.slice_root, plant)
+            pay = sorted((plant / "tape" / "payload").iterdir())[5]
+            b = bytearray(pay.read_bytes())
+            before = bytes(b)
+            b[len(b) // 2] ^= 1
+            self.assertNotEqual(bytes(b), before, "the plant changed the bytes")
+            pay.write_bytes(bytes(b))
+            v = cal.verify_staged_slice(self.root, None, plant)
+            self.assertFalse(v["equal"])
+            self.assertIn("payload/" + pay.name, v["payload_mismatches"])
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_a_missing_source_payload_is_refused_not_skipped(self) -> None:
+        tmp = Path(tempfile.mkdtemp(prefix="evolve-cal-hole-"))
+        try:
+            life = tmp / "life"
+            shutil.copytree(self.root, life)
+            victim = next(p for p in sorted((life / "tape" / "payload").iterdir()) if int(p.name.split(".")[0]) > self.cp_last_seq)
+            self.assertTrue(victim.exists())
+            victim.unlink()
+            self.assertFalse(victim.exists(), "the plant removed the file")
+            with self.assertRaises(FileNotFoundError):
+                cal.stage_slice(life, None, self.cp_last_seq, self.to_seq, tmp / "s")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
     def test_staging_refuses_a_non_empty_destination(self) -> None:
         with self.assertRaises(FileExistsError):
             cal.stage_slice(self.root, None, self.cp_last_seq, self.to_seq, self.slice_root)
@@ -394,6 +427,13 @@ class TestRunTwin(_Synthetic):
             lines = f.read().splitlines()
         self.assertEqual(len(lines), r["journal_rows"])
         self.assertEqual(hashlib.sha256("\n".join(lines).encode()).hexdigest(), r["journal_sha256"])
+
+    def test_state_hash_is_the_snapshots_own_digest(self) -> None:
+        # the reading's dense hash is the organism's state_hash AFTER close, equal to the digest the close wrote into its own snapshot
+        r = self._run("sh", "incumbent", keep_state=True)
+        meta = json.loads((self.tmp / "out" / "sh" / "root" / "state" / "organism.json").read_text())
+        self.assertEqual(len(meta["state_hash"]), 64)
+        self.assertEqual(r["state_hash"], meta["state_hash"])
 
     def test_the_same_twin_twice_is_bit_identical(self) -> None:
         a = self._run("same-a", "incumbent")
