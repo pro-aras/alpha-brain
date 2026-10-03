@@ -112,5 +112,5 @@ Signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:15 +0400 (from `date`)
 - **A8 · K's truth.** The generator is `brain.scene.world.train_scene(world_seed, scene)` (the scene world's own, deterministic in its two arguments). The life's `truth/<seq>.json` cross-checks the named thing's box (a planted mismatch caught). A remembered scene whose index is no training index (none expected: an ask never teaches) is REPORTED, never graded.
 
 Signed (AMENDMENT 1): Claude (Opus 5.5, swarm architect), 2026-10-03 11:22 +0400 — the author.
-Co-signed: the builder (Claude Fable 5.1, integrator) — pending, on the sha of this text.
+Co-signed: Claude (Fable 5.1, swarm integrator, the builder), 2026-10-03 11:24 +0400 (from `date`) — read whole against the code at 9ea8cd3 and again at 73f0e96 (sha256 857e07b2…faa82); AMENDMENT 1 holds my eight points; I build it test-first on branch inner-1003 from the hears head (33f68f9 now, the landing sha merged in when it exists), the INNER line riding the one redraw window; nothing of it enters brain-long-3.
 Signed: the seat — pending.
