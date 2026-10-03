@@ -417,5 +417,87 @@ class TestReadings(unittest.TestCase):
         self.assertIn("OPEN-LOOP RANKING PROBE", text)
 
 
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 15:20 +0400 — two more READINGS, added while writing the RESULT (no bar or class depends on them): the law's prediction P4
+# («no arm reaches R-ONLY's A at any seed») failed at ONE seed (20261305: L-hist-ema, all ten replicates, SHARE_N 0.000, A 0.702 against R-ONLY's 0.700) and the report printed no
+# per-seed number that could say why; a figure the RESULT cites must come from the report. (1) the per-seed A and SHARE_N of every arm; (2) the FIRST POLICY PICK: the
+# estimates at block 5 (the first policy pick; blocks 1-4 are the round-robin, identical for every replicate of a cell) and whether N is the greedy choice — a greedy rule with
+# one reading per room falls the way its first reading points. Written FIRST.
+class TestFirstPick(unittest.TestCase):
+    def mk(self, n_top, est=None, a=0.5, sn=0.2):
+        """a life summary carrying the first policy pick's estimates: N the top estimate if n_top, else R2 (the same shape `summarise_life` writes)."""
+        e = est or ({"R1": 0.1, "R2": 0.2, "R3": 0.0, "N": 0.9} if n_top else {"R1": 0.1, "R2": 0.9, "R3": 0.0, "N": -1.0})
+        out = life(a, sn)
+        out["est_first"] = e
+        out["first_policy"] = "N" if n_top else "R2"
+        return out
+
+    def arms(self):
+        arms = world(PLANTED)
+        for cell in ("L-hist-ema", "L-hist-last2", "C-hist-ema"):
+            arms[cell] = {s: [self.mk(n_top=(s != 20261305 or cell == "C-hist-ema"), a=(0.70 if (s == 20261305 and cell != "C-hist-ema") else 0.15), sn=(0.0 if (s == 20261305 and cell != "C-hist-ema") else 0.70)) for _ in range(10)] for s in SEEDS}
+        return arms
+
+    def test_per_seed_returns_one_value_per_seed_in_seed_order(self):
+        arms = self.arms()
+        t = RP.per_seed(arms, SEEDS, "A")
+        self.assertEqual(len(t["L-hist-ema"]), 10)
+        self.assertAlmostEqual(t["L-hist-ema"][SEEDS.index(20261305)], 0.70, places=9)        # the planted anomaly sits at the fifth seed
+        self.assertAlmostEqual(t["L-hist-ema"][0], 0.15, places=9)
+        sn = RP.per_seed(arms, SEEDS, "SN")
+        self.assertAlmostEqual(sn["L-hist-ema"][SEEDS.index(20261305)], 0.0, places=9)
+        self.assertAlmostEqual(sn["L-hist-ema"][1], 0.70, places=9)
+
+    def test_first_top_counts_read_the_greedy_choice_at_block_5(self):
+        arms = self.arms()
+        c = RP.first_top_counts(arms, SEEDS, ("L-hist-ema", "C-hist-ema"))
+        self.assertEqual(c["L-hist-ema"][20261305], (0, 10))                                  # N is never the top estimate at the anomalous seed
+        self.assertEqual(c["L-hist-ema"][20261301], (10, 10))
+        self.assertEqual(c["C-hist-ema"][20261305], (10, 10))                                 # the control cell is not anomalous there
+        self.assertEqual(sum(v[0] for v in c["L-hist-ema"].values()), 90)
+
+    def test_first_top_counts_ignore_a_life_with_no_estimates(self):
+        arms = self.arms()
+        arms["L-hist-ema"][20261301][0]["est_first"] = {"R1": None, "R2": None, "R3": None, "N": None}   # an arm with no estimate yet (RANDOM-like)
+        c = RP.first_top_counts(arms, SEEDS, ("L-hist-ema",))
+        self.assertEqual(c["L-hist-ema"][20261301], (9, 9))                                   # nine lives had estimates, all nine put N on top
+
+    def test_a_tie_for_the_top_estimate_counts_for_n_only_when_n_wins_the_tie_break(self):
+        arms = world(PLANTED)
+        arms["L-hist-ema"] = {s: [self.mk(False, est={"R1": 0.5, "R2": 0.5, "R3": 0.0, "N": 0.5})] * 10 for s in SEEDS}
+        c = RP.first_top_counts(arms, SEEDS, ("L-hist-ema",))
+        self.assertEqual(c["L-hist-ema"][20261301], (0, 10))                                  # a tie is not N «on top»: the law's tie-break is the least recently visited, and N was visited LAST of the round-robin
+
+    def test_summarise_life_carries_the_first_policy_pick_on_a_real_short_life(self):
+        from brain.scene import run_s1c as S
+        from tools.toys.common import pools as POOLS
+        from tools.toys.cp import life as LF
+        if not all(POOLS.present(POOLS.ROOT, 20261301).values()):
+            self.skipTest("pools absent")
+        rooms = list(S.WORLDS["law"])
+        data = S.RoomData(POOLS.ROOT, 20261301, rooms)
+        rec = LF.life_cp(data, S.FixedTestSet(), ES.make_arm("C-hist-ema", rooms, 20261301, 0), "C-hist-ema", rooms, n_blocks=12)
+        s = RP.summarise_life(rec)
+        self.assertIn(s["first_policy"], ("R1", "R2", "R3", "N"))
+        self.assertEqual(set(s["est_first"]), {"R1", "R2", "R3", "N"})
+        self.assertTrue(all(v is not None for v in s["est_first"].values()))                  # after the round-robin every room has a reward
+        row5 = next(x for x in rec["record"] if x["block"] == 5)
+        self.assertEqual(s["est_first"], row5["est"])                                         # exactly the record's block-5 estimates
+        self.assertEqual(s["first_policy"], row5["room"])
+
+    def test_the_render_prints_the_per_seed_tables_and_the_first_pick_table(self):
+        arms = self.arms()
+        an = RP.analyse(arms, SEEDS, draws=2000)
+        rows = [{"block": b, "room": "N" if b % 4 == 0 else "R1", "own": {"total": 1.0, "bias": 0.7, "weight": 0.1, "stats": 0.05},
+                 "hist": {"total": 0.5, "bias": 0.3, "weight": 0.05, "stats": 0.02}} for b in range(1, 201)]
+        counts = {a: sum(len(v) for v in arms[a].values()) for a in arms}
+        text = "\n".join(RP.render(an, arms, rows, counts, SEEDS))
+        self.assertIn("PER-SEED A", text)
+        self.assertIn("PER-SEED SHARE_N", text)
+        self.assertIn("THE FIRST POLICY PICK", text)
+        import re
+        lines = [l for l in text.splitlines() if l.strip().startswith("L-hist-ema") and re.search(r"(^|\s)0/10(\s|$)", l)]
+        self.assertEqual(len(lines), 1, lines)                                                # the anomalous seed's cell «0/10» (not «10/10») is visible in ONE printed row
+
+
 if __name__ == "__main__":
     unittest.main()

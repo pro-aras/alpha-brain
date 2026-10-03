@@ -254,6 +254,47 @@ def ranking_probe(lives: Sequence[Mapping[str, object]], key: str = "dL", kind: 
     return {"p_N": (hits / tot) if tot else float("nan"), "n": int(tot), "skipped": int(skipped), "p_dealt": (dh / dt) if dt else float("nan"), "kind": kind, "key": key}
 
 
+# ====================================================================================================== TWO MORE READINGS (per-seed tables; the first policy pick)
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 15:22 +0400 — written for the RESULT after prediction P4 failed at one seed (red-first: TestFirstPick).
+def per_seed(arms, seeds: Sequence[int], key: str) -> Dict[str, List[float]]:
+    """arm -> [the mean of `key` over the arm's replicates, one value per seed in the given order] (a seed the arm lacks is skipped: NaN)."""
+    out: Dict[str, List[float]] = {}
+    for arm, by_seed in arms.items():
+        out[arm] = [float(np.mean([l[key] for l in by_seed[s]])) if by_seed.get(s) else float("nan") for s in sorted(seeds)]
+    return out
+
+
+def first_top_counts(arms, seeds: Sequence[int], cells: Sequence[str]) -> Dict[str, Dict[int, Tuple[int, int]]]:
+    """cell -> seed -> (the lives whose estimate for N is STRICTLY the largest at the first policy pick (block 5), the lives that had estimates there). A tie is not N on top:
+    the law's tie-break is the least recently visited room, and N is the last room of the round-robin (so the most recently visited at block 5). Lives with no estimate
+    (an estimate is None) are not counted."""
+    out: Dict[str, Dict[int, Tuple[int, int]]] = {}
+    for cell in cells:
+        out[cell] = {}
+        for s in sorted(seeds):
+            n_top = n_all = 0
+            for l in arms[cell].get(s, []):
+                e = l.get("est_first")
+                if not e or any(v is None for v in e.values()):
+                    continue
+                n_all += 1
+                best = max(e.values())
+                if e["N"] == best and sum(1 for v in e.values() if v == best) == 1:
+                    n_top += 1
+            out[cell][s] = (n_top, n_all)
+    return out
+
+
+def first_margin(arms, seeds: Sequence[int], cell: str) -> List[Optional[float]]:
+    """Per seed, the first replicate's estimate for N minus its best R room's at block 5 (None if it had none)."""
+    out: List[Optional[float]] = []
+    for s in sorted(seeds):
+        ls = arms[cell].get(s, [])
+        e = ls[0].get("est_first") if ls else None
+        out.append(None if (not e or any(v is None for v in e.values())) else float(e["N"] - max(e["R1"], e["R2"], e["R3"])))
+    return out
+
+
 STAGE2_REPS = 10                    # the law's stage 2: 10 replicates × 10 seeds for each arm's NULL
 
 
@@ -462,6 +503,9 @@ def summarise_life(rec: Mapping[str, object]) -> Dict[str, object]:
         out["histN"] = [float(hw[min(len(hw) - 1, b - 1)]) for b in range(20, 201, 20)]
     # the per-visit own-window drops of L (the record's `drop`) and of C (the C table's change in the visited room), for the signal readings (edit: 12:31 +0400)
     C = ex.get("C")
+    fp = next((x for x in rows if x["block"] > n_rr), None)                # the first policy pick and the estimates it was made from (edit: 15:22 +0400)
+    out["first_policy"] = fp["room"] if fp else None
+    out["est_first"] = dict(fp["est"]) if fp and isinstance(fp.get("est"), dict) else None
     out["vis"] = None
     if C and len(C) == len(rows) + 1:
         out["vis"] = {"room": [x["room"] for x in rows], "dL": [float(x["drop"]) for x in rows],
@@ -551,6 +595,22 @@ def render(an: Mapping[str, object], arms, decomp, counts, seeds: Sequence[int])
             parts = [f"within {w} = {lvl}: {e[lvl]['mean']:+.4f} [{e[lvl]['ci95'][0]:+.4f}, {e[lvl]['ci95'][1]:+.4f}] +{e[lvl]['pos']}/−{e[lvl]['neg']}" for lvl in (lo_w, hi_w)]
             d = e["diff"]
             L.append(f"      {f} ({hi_f} − {lo_f}) " + " · ".join(parts) + f" · interaction {d['mean']:+.4f} [{d['ci95'][0]:+.4f}, {d['ci95'][1]:+.4f}]")
+    L.append("")
+    # ---- per-seed tables and the first policy pick (added 15:22 +0400; readings, no bar)
+    for key, label in (("A", "A"), ("SN", "SHARE_N")):
+        L.append(f"PER-SEED {label} (mean over the arm's replicates; seeds {seeds[0]}–{seeds[-1]} in order; ORACLE is one life a seed):")
+        tab = per_seed(arms, seeds, key)
+        for arm in list(NINE) + ["RANDOM", "R-ONLY", "ERROR", "N-ONLY", "ORACLE"] + [a for a in sorted(arms) if a.startswith("NULL-")]:
+            if arm in tab:
+                L.append(f"   {arm:18s} " + " ".join(f"{v:6.3f}" for v in tab[arm]))
+    cells_fp = [c for c in ("L-own-last2", "L-own-ema", "L-hist-last2", "L-hist-ema", "C-own-last2", "C-own-ema", "C-hist-last2", "C-hist-ema") if c in arms]
+    L.append("THE FIRST POLICY PICK (block 5; blocks 1–4 are the round-robin, so every replicate of a cell has the same estimates there): the lives whose estimate for N is STRICTLY the largest "
+             "(ties are not N on top), per seed; then, for replicate 0, the estimate for N minus the best R room's. A greedy rule with one reading per room falls the way its first reading points:")
+    ftc = first_top_counts(arms, seeds, cells_fp)
+    for cell in cells_fp:
+        L.append(f"   {cell:14s} N top   " + " ".join(f"{ftc[cell][s][0]}/{ftc[cell][s][1]}".rjust(6) for s in seeds))
+        fm = first_margin(arms, seeds, cell)
+        L.append(f"   {'':14s} N − bestR " + " ".join(("—" if v is None else f"{v:+.2f}").rjust(6) for v in fm))
     L.append("")
     # ---- predictions and refutations
     ho = len(an["held_out_seeds"])
