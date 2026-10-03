@@ -1,0 +1,38 @@
+PHASE 0 — S1c's ORACLE decision points, law world, seeds [20261301, 20261302, 20261303] (root /data/dev/brain-runs/scene-s1c)
+presence: policy rows 588 · carrying `gains` 588 · round-robin rows (no gains, not decisions) 12
+
+== WORDS-LEARNED gain of the room's next block (words): the true one-step gain by room, all 588 decisions
+   R1: mean -0.4320  sd 1.0238  share>0 0.15  share<0 0.44
+   R2: mean -0.1565  sd 0.9633  share>0 0.21  share<0 0.32
+   R3: mean -0.4830  sd 1.1685  share>0 0.18  share<0 0.45
+   N: mean -1.5476  sd 1.3284  share>0 0.04  share<0 0.78
+   value of a RANDOM pick -0.6548 · of a uniform pick over R1-R3 only (never N) -0.3571 · of the BEST-room pick +0.3588 · of the WORST-room pick -1.7976 · of the ORACLE's own pick +0.0374
+   the share of the whole spread (best - random) that «never N» captures: 0.294
+   PLANT-PERFECT  value +0.3588 (must equal the best-room value +0.3588) -> CAUGHT/OK
+   PLANT-ANTI     value -1.7976 (must equal the worst-room value -1.7976) -> CAUGHT/OK
+   signal            argmax value     null mean±sd       z  argmin value  picks N  best room     n
+   ERROR                  -1.3724   -0.6543±0.0400  -17.97       -0.2500     0.89       0.17   588
+   L-own-last2            -0.9626   -0.6545±0.0399   -7.73       -0.6735     0.49       0.34   588
+   L-hist-last2           -1.3588   -0.6541±0.0394  -17.89       -0.4269     0.71       0.19   588
+   L-own-ema0.1           -0.4847   -0.6526±0.0399   +4.20       -0.9643     0.26       0.47   588
+   L-hist-ema0.1          -1.3963   -0.6549±0.0399  -18.60       -0.3929     0.92       0.19   588
+   L-own-ema0.3           -0.8231   -0.6547±0.0391   -4.30       -0.7041     0.43       0.38   588
+   L-hist-ema0.3          -1.4626   -0.6559±0.0404  -19.98       -0.4048     0.94       0.17   588
+
+== M1 gain of the room's next block: the true one-step gain by room, all 588 decisions
+   R1: mean -0.0036  sd 0.0185  share>0 0.27  share<0 0.68
+   R2: mean -0.0070  sd 0.0166  share>0 0.22  share<0 0.69
+   R3: mean -0.0060  sd 0.0107  share>0 0.21  share<0 0.74
+   N: mean -0.0223  sd 0.0179  share>0 0.04  share<0 0.95
+   value of a RANDOM pick -0.0097 · of a uniform pick over R1-R3 only (never N) -0.0055 · of the BEST-room pick +0.0039 · of the WORST-room pick -0.0256 · of the ORACLE's own pick +0.0014
+   the share of the whole spread (best - random) that «never N» captures: 0.307
+   PLANT-PERFECT  value +0.0039 (must equal the best-room value +0.0039) -> CAUGHT/OK
+   PLANT-ANTI     value -0.0256 (must equal the worst-room value -0.0256) -> CAUGHT/OK
+   signal            argmax value     null mean±sd       z  argmin value  picks N  best room     n
+   ERROR                  -0.0170   -0.0097±0.0006  -12.27       -0.0066     0.89       0.09   588
+   L-own-last2            -0.0123   -0.0097±0.0006   -4.32       -0.0109     0.49       0.23   588
+   L-hist-last2           -0.0186   -0.0098±0.0006  -14.67       -0.0070     0.71       0.10   588
+   L-own-ema0.1           -0.0108   -0.0097±0.0006   -1.75       -0.0152     0.26       0.23   588
+   L-hist-ema0.1          -0.0222   -0.0097±0.0006  -20.94       -0.0056     0.92       0.05   588
+   L-own-ema0.3           -0.0125   -0.0097±0.0006   -4.58       -0.0110     0.43       0.20   588
+   L-hist-ema0.3          -0.0220   -0.0097±0.0006  -20.19       -0.0049     0.94       0.05   588
