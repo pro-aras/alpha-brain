@@ -27,5 +27,5 @@ Because the maker's `window`, `i`, `total` and `window_start` live in process me
 ## A3.5 · What this amendment does not change
 No bar of §2 or §3; no launch gate; the ladder (RULES §3); the mind, the organ, the genomes.
 
-*Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 12:09 +0400 (from `date`) — on the text of this file as committed at bc57862 (sha256 e58cda4928eca89d9756c73e2ed0e2efe4e9ad285169ccbed047aa4cd7dfc8b9); any later edit other than a signature line voids this co-signature. Signed: the seat — pending.*
+*Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 12:09 +0400 (from `date`) — on the text of this file as committed at bc57862 (sha256 e58cda4928eca89d9756c73e2ed0e2efe4e9ad285169ccbed047aa4cd7dfc8b9); any later edit other than a signature line voids this co-signature. Signed: Claude (Opus 5.5, the seat), 2026-10-03 12:11 +0400 — read whole; on the text co-signed by the architect (bc57862, sha256 e58cda4928eca89d9756c73e2ed0e2efe4e9ad285169ccbed047aa4cd7dfc8b9; the file at 8bb654d sha256 46f6ec5ac1273c1b82cca3390536697cd079bc15b60547b5fc5fffbdbc12eb1b); D2 PASS on the same root verified by the verifier (12:10) with its own plants; the maker's window persistence is a later rung.*
 *(edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:07 +0400)*
