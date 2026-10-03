@@ -34,3 +34,10 @@ TO REPEAT (from /data/dev/genome-wt-poller-1003, each heavy job through /data/de
       SLOT_MEM=6G slot <lane> g2 -- python3 -B docs/organism/days/poller/records/g2_run.py --out <dir> --work <scratch> [--only ck1,final|--skip-bl3];  python3 -B records/g2_combine.py --in <g2.jsonl> ... --out <prefix>
   G1  bash /data/dev/swarm/2026-10-03/int/landing_gate.sh replays <clean worktree at the fix sha> <label>;  python3 -B records/g1_nonvacuous.py --label <label> [--plant]
   G6  bash /data/dev/swarm/2026-10-03/int/split_suite.sh <tree> creature <prefix> 1424 'test_[a-f]*.py' 'test_[g-r]*.py' 'test_[s-z]*.py' (SLOT_MEM=10G; 12G for part 2); one_suite.sh for genome/tools/scene/brain;  python3 -B records/g6_read.py --dir <suites dir>
+
+UPDATE 2026-10-03 23:29 +0400 (hears; appended, nothing above edited):
+G6 FINAL     the creature part-2 failure is relabelled STALL-SUSPECT (the verifier's wording: a stalled sense thread in a process at its 10G cgroup cap, with swap; the test was never on a poller's path: its genome declares no EXAM and no SIT). The AUTHORITATIVE re-run
+             of part 2 on the same clean tree at 9d43829 with SLOT_MEM=12G: build/g6/suites/creature-9d43829.part2.rerun.log «Ran 559 tests in 568.508s, OK (skipped=1)», exit 0 (.rerun.exit), memory.peak 9,195,180,032 bytes (well under the 12G cap);
+             started 23:19:22 after the hold lifted (after_hold.log). build/g6/g6_read.final.out: RESULT OK (every suite at its baseline count, creature 444 / 559 / 421 = 1424 = 1390 + 34, the first run's FAIL printed above its re-run).
+G1, G2 VERIFIED by the verifier (board 23:00) from these committed files.
+PART B   started 23:28:52 (the cost worktree; results will be appended here and committed on cost-profile-1003 under docs/organism/days/poller/records/bench/).

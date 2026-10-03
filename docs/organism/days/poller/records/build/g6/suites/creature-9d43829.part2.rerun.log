@@ -1,0 +1,91 @@
+# suite creature on 9d43829ab9f57c9288d4ae8d54c34fe139565ad5 (/data/dev/genome-wt-poller-g1) under /usr/bin/python3, started 2026-10-03 23:19:22 +0400 · memory.peak = the slot scope's running maximum since its creation (exact for this run only if it exceeds every earlier run in the same scope) · PART pattern test_[g-r]*.py
+REPLAY identical: 67 mind rows
+DIVERGED at seq 121: hash
+G4-6 row counts by source: {'maker': 120, 'folder': 13}; caught divergence planted at seq 121
+................................s........./usr/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.BufferedReader name=7>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.BufferedReader name=5>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...............................creature.body: mind crashed at seq 1: RuntimeError('planted')
+creature.body: mind crashed at seq 1: RuntimeError('planted')
+............................................touch toy (real jail): fast rate=0.434 B/ms  slow rate=0.002979 B/ms  ratio=145.6x
+.touch toy (real jail): run1 rate=0.357 B/ms  run2 rate=0.472 B/ms
+.........................................................[inner-mind] hops 6 · sources {'web': 6}
+............................................................../data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmpz5by2wgq/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmpg7n8expr/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...../data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmp0ksmihsn/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+../data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmphznt5knq/bad/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmpr47dshhd/old/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmp_kj9kibq/nog/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmplg9nl8ys/eq/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmpady0c3yu/ne/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmpzkx2mytj/env/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmpv8x0r38f/und/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmpxni7d0_r/und-drop/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+........................census (200 frames, flat residual): {'toggle': 36, 'right': 31, 'pickup': 23, 'left': 32, 'forward': 24, 'done': 28, 'drop': 26}
+...........................................................................................................................................................................................................................................................................DIVERGED at seq 204: births
+.REPLAY identical: 203 mind rows
+...REPLAY identical: 444 mind rows
+...REPLAY identical: 225 mind rows
+DIVERGED at seq 410: <row count: replay 1 vs --against 2>
+.....{"moments": 80, "cells": [15, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.0, "n": 50, "correct": 0, "abstain": {"novel": 1, "noedge": 49, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 1.0, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "bar": 0.0, "diamond": 0.0}, "answers_from_multi_word_cells": 0, "hedge_rate": null}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192819Z.json
+{"moments": 160, "cells": [17, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.9}
+Q1: {"acc": 0.0, "n": 50, "correct": 0, "abstain": {"novel": 1, "noedge": 49, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 1.0, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "bar": 0.0, "diamond": 0.0}, "answers_from_multi_word_cells": 0, "hedge_rate": null}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192821Z.json
+{"moments": 240, "cells": [20, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.76, "n": 50, "correct": 38, "abstain": {"novel": 0, "noedge": 1, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.02, "per_thing": {"circle": 0.3, "square": 0.6, "triangle": 0.9, "bar": 1.0, "diamond": 1.0}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192823Z.json
+{"moments": 320, "cells": [28, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.74, "n": 50, "correct": 37, "abstain": {"novel": 0, "noedge": 0, "ratio": 6, "close": 0, "minority": 0}, "false_abstention": 0.12, "per_thing": {"circle": 0.1, "square": 0.7, "triangle": 1.0, "bar": 1.0, "diamond": 0.9}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192825Z.json
+{"moments": 400, "cells": [33, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.78, "n": 50, "correct": 39, "abstain": {"novel": 0, "noedge": 0, "ratio": 5, "close": 0, "minority": 0}, "false_abstention": 0.1, "per_thing": {"circle": 0.2, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.7}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192827Z.json
+{"moments": 480, "cells": [41, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.86, "n": 50, "correct": 43, "abstain": {"novel": 0, "noedge": 0, "ratio": 3, "close": 0, "minority": 0}, "false_abstention": 0.06, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.9}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192829Z.json
+{"moments": 560, "cells": [44, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.92, "n": 50, "correct": 46, "abstain": {"novel": 0, "noedge": 0, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.02, "per_thing": {"circle": 0.7, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.9}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192830Z.json
+{"moments": 640, "cells": [50, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.9, "n": 50, "correct": 45, "abstain": {"novel": 0, "noedge": 0, "ratio": 2, "close": 0, "minority": 0}, "false_abstention": 0.04, "per_thing": {"circle": 0.8, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.7}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192832Z.json
+{"moments": 720, "cells": [52, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.92, "n": 50, "correct": 46, "abstain": {"novel": 0, "noedge": 0, "ratio": 2, "close": 0, "minority": 0}, "false_abstention": 0.04, "per_thing": {"circle": 0.8, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.8}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192834Z.json
+{"moments": 800, "cells": [55, 5], "words_seen": ["bar", "circle", "diamond", "square", "triangle"], "chance_q1": 0.2, "disjoint_checked": 0, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.0}
+Q1: {"acc": 0.96, "n": 50, "correct": 48, "abstain": {"novel": 0, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.0, "per_thing": {"circle": 1.0, "square": 1.0, "triangle": 1.0, "bar": 1.0, "diamond": 0.8}, "answers_from_multi_word_cells": 0, "hedge_rate": 0.0}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/creature-replay-cv3nsvpf/exam/2026-10-03T192836Z.json
+..REPLAY identical: 175 mind rows
+...
+----------------------------------------------------------------------
+Ran 559 tests in 568.508s
+
+OK (skipped=1)
+# ended 2026-10-03 23:28:52 +0400 exit 0 · memory.peak 9195180032 bytes · cgroup /sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/slot-hears-g6-part2-rerun-1389241.scope
