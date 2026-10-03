@@ -1,0 +1,120 @@
+TOY B — THE NULL SPACE · seeds 20261301–20261310 (10)
+lives on disk: ANTI-OWM@0.01 10 · FREEZE-OLD@1 10 · FREEZE-OLD@2 10 · FREEZE-OLD@3 10 · LRSHRINK@0.125 10 · LRSHRINK@0.25 10 · LRSHRINK@0.5 10 · NSCL@0.001 10 · NSCL@0.01 10 · NSCL@0.1 10 · OWM-BM@0.01 10 · OWM-NB@0.01 10 · OWM-OLDONLY@0.01 10 · OWM-RESTD@0.01 10 · OWM@0.001 10 · OWM@0.01 10 · OWM@0.1 10 · PLAIN 10 · RANDRANK@0.001 100 · RANDRANK@0.01 100 · RANDRANK@0.1 100 · ROT@0.001 100 · ROT@0.01 100 · ROT@0.1 100 · SHRINK-NSCL@0.001 10 · SHRINK-NSCL@0.01 10 · SHRINK-NSCL@0.1 10 · SHRINK-OWM@0.001 10 · SHRINK-OWM@0.01 10 · SHRINK-OWM@0.1 10 · STD-ONLY@1 10 · STD-ONLY@2 10 · STD-ONLY@3 10
+GRADABILITY (decided first): (c1) PLAIN forgets (BWT_3 ≤ −0.15 and BWT_4 ≤ −0.50) at 10 of 10 seeds → PASS; (c2) the ceiling is above the noise (Δ_3, Δ_4 each ≥ 2 paired SE) at 10 of 10 → PASS; gradable seeds 10 → GRADABLE
+
+arm             B-PROTECT  B-NULLSP  B-SHRINK  B-PLASTIC   class                     removed share (BWT_2/3/4)   BWT_3 BWT_4   plast2 plast3
+OWM@0.1           10/10 Y   10/10 Y   10/10 Y    10/10 Y   NULL-SPACE-PROTECTS      -3.08 / +1.75 / +0.95   -0.029 -0.215   0.998 1.000
+OWM@0.01          10/10 Y   10/10 Y   10/10 Y    10/10 Y   NULL-SPACE-PROTECTS      -2.72 / +1.84 / +1.29   -0.016 -0.015   0.999 1.000
+OWM@0.001         10/10 Y   10/10 Y    9/10 Y    10/10 Y   NULL-SPACE-PROTECTS      -2.30 / +1.82 / +1.29   -0.019 -0.014   0.999 0.999
+NSCL@0.1          10/10 Y   10/10 Y   10/10 Y    10/10 Y   NULL-SPACE-PROTECTS      -2.70 / +1.72 / +1.11   -0.033 -0.124   0.998 0.997
+NSCL@0.01         10/10 Y   10/10 Y   10/10 Y    10/10 Y   NULL-SPACE-PROTECTS      -2.36 / +1.74 / +1.27   -0.031 -0.027   0.997 0.999
+NSCL@0.001        10/10 Y   10/10 Y    8/10 Y    10/10 Y   NULL-SPACE-PROTECTS      -2.18 / +1.69 / +1.27   -0.038 -0.026   0.998 0.985
+
+PLANTED CONTROLS: PB1 ANTI-OWM must LOSE to PLAIN on BWT_3: at 10 of 10 seeds → CAUGHT · PB4 every arm equals PLAIN through block 50: yes
+
+THE FRONTIER (mean over seeds [and draws]): PLASTICITY_2, PLASTICITY_3, BWT_3, BWT_4, CPU of a life, lives
+   ANTI-OWM@0.01      0.991 0.985   -0.386 -0.819     1.49 s  n 10
+   FREEZE-OLD@1       0.797 0.618   -0.626 -0.477     1.27 s  n 10
+   FREEZE-OLD@2       0.997 0.515   -0.325 -0.222     1.29 s  n 10
+   FREEZE-OLD@3       0.997 0.968   -0.287 -0.188     1.19 s  n 10
+   LRSHRINK@0.125     0.995 1.000   -0.222 -0.150     1.24 s  n 10
+   LRSHRINK@0.25      0.997 1.000   -0.232 -0.499     1.19 s  n 10
+   LRSHRINK@0.5       0.999 0.999   -0.252 -0.730     1.17 s  n 10
+   NSCL@0.001         0.998 0.985   -0.038 -0.026     1.38 s  n 10
+   NSCL@0.01          0.997 0.999   -0.031 -0.027     1.41 s  n 10
+   NSCL@0.1           0.998 0.997   -0.033 -0.124     1.41 s  n 10
+   OWM-BM@0.01        0.998 1.000   -0.018 -0.022     1.35 s  n 10
+   OWM-NB@0.01        0.999 1.000   -0.048 -0.026     1.35 s  n 10
+   OWM-OLDONLY@0.01   0.996 0.968   -0.105 -0.082     1.39 s  n 10
+   OWM-RESTD@0.01     0.999 1.000   -0.036 -0.026     1.93 s  n 10
+   OWM@0.001          0.999 0.999   -0.019 -0.014     1.35 s  n 10
+   OWM@0.01           0.999 1.000   -0.016 -0.015     1.27 s  n 10
+   OWM@0.1            0.998 1.000   -0.029 -0.215     1.31 s  n 10
+   PLAIN              0.997 0.968   -0.287 -0.792     1.36 s  n 10
+   RANDRANK@0.001     0.993 0.996   -0.296 -0.378     1.32 s  n 100
+   RANDRANK@0.01      0.997 0.989   -0.287 -0.752     1.28 s  n 100
+   RANDRANK@0.1       0.998 0.972   -0.286 -0.786     1.29 s  n 100
+   ROT@0.001          0.997 1.000   -0.266 -0.246     1.32 s  n 100
+   ROT@0.01           0.998 0.997   -0.278 -0.689     1.31 s  n 100
+   ROT@0.1            0.998 0.979   -0.284 -0.771     1.29 s  n 100
+   SHRINK-NSCL@0.001  0.999 1.000   -0.254 -0.072     1.25 s  n 10
+   SHRINK-NSCL@0.01   0.998 0.999   -0.262 -0.521     1.31 s  n 10
+   SHRINK-NSCL@0.1    0.998 0.982   -0.274 -0.706     1.24 s  n 10
+   SHRINK-OWM@0.001   0.998 1.000   -0.247 -0.067     1.28 s  n 10
+   SHRINK-OWM@0.01    0.999 1.000   -0.259 -0.278     1.27 s  n 10
+   SHRINK-OWM@0.1     0.998 0.993   -0.268 -0.634     1.28 s  n 10
+   STD-ONLY@1         0.257 0.000   -0.061 -0.041     1.35 s  n 10
+   STD-ONLY@2         0.997 0.004   -0.139 -0.091     1.27 s  n 10
+   STD-ONLY@3         0.997 0.968   -0.287 -0.188     1.20 s  n 10
+
+PER-ARM, mean ± sd over the lives (the seeds; for ROT and RANDRANK the seeds × 10 draws): BWT_3, BWT_4, PLASTICITY_2, PLASTICITY_3; [min, max] of the BWTs
+   ANTI-OWM@0.01      BWT_3 -0.386 ± 0.047 [-0.477, -0.324] · BWT_4 -0.819 ± 0.062 [-0.917, -0.729] · plast2 0.991 ± 0.008 · plast3 0.985 ± 0.029
+   FREEZE-OLD@1       BWT_3 -0.626 ± 0.038 [-0.663, -0.528] · BWT_4 -0.477 ± 0.065 [-0.590, -0.345] · plast2 0.797 ± 0.102 · plast3 0.618 ± 0.193
+   FREEZE-OLD@2       BWT_3 -0.325 ± 0.090 [-0.480, -0.199] · BWT_4 -0.222 ± 0.072 [-0.327, -0.107] · plast2 0.997 ± 0.003 · plast3 0.515 ± 0.197
+   FREEZE-OLD@3       BWT_3 -0.287 ± 0.042 [-0.352, -0.224] · BWT_4 -0.188 ± 0.027 [-0.235, -0.147] · plast2 0.997 ± 0.003 · plast3 0.968 ± 0.048
+   LRSHRINK@0.125     BWT_3 -0.222 ± 0.019 [-0.245, -0.195] · BWT_4 -0.150 ± 0.037 [-0.223, -0.114] · plast2 0.995 ± 0.006 · plast3 1.000 ± 0.000
+   LRSHRINK@0.25      BWT_3 -0.232 ± 0.023 [-0.273, -0.199] · BWT_4 -0.499 ± 0.050 [-0.570, -0.411] · plast2 0.997 ± 0.005 · plast3 1.000 ± 0.000
+   LRSHRINK@0.5       BWT_3 -0.252 ± 0.028 [-0.313, -0.216] · BWT_4 -0.730 ± 0.066 [-0.838, -0.657] · plast2 0.999 ± 0.003 · plast3 0.999 ± 0.002
+   NSCL@0.001         BWT_3 -0.038 ± 0.013 [-0.061, -0.018] · BWT_4 -0.026 ± 0.009 [-0.045, -0.012] · plast2 0.998 ± 0.003 · plast3 0.985 ± 0.009
+   NSCL@0.01          BWT_3 -0.031 ± 0.016 [-0.057, -0.007] · BWT_4 -0.027 ± 0.016 [-0.065, -0.005] · plast2 0.997 ± 0.005 · plast3 0.999 ± 0.002
+   NSCL@0.1           BWT_3 -0.033 ± 0.022 [-0.075, -0.007] · BWT_4 -0.124 ± 0.047 [-0.229, -0.071] · plast2 0.998 ± 0.003 · plast3 0.997 ± 0.006
+   OWM-BM@0.01        BWT_3 -0.018 ± 0.017 [-0.046, +0.011] · BWT_4 -0.022 ± 0.007 [-0.031, -0.011] · plast2 0.998 ± 0.003 · plast3 1.000 ± 0.000
+   OWM-NB@0.01        BWT_3 -0.048 ± 0.016 [-0.075, -0.021] · BWT_4 -0.026 ± 0.013 [-0.052, -0.005] · plast2 0.999 ± 0.003 · plast3 1.000 ± 0.000
+   OWM-OLDONLY@0.01   BWT_3 -0.105 ± 0.053 [-0.189, -0.032] · BWT_4 -0.082 ± 0.038 [-0.157, -0.031] · plast2 0.996 ± 0.005 · plast3 0.968 ± 0.048
+   OWM-RESTD@0.01     BWT_3 -0.036 ± 0.015 [-0.054, -0.011] · BWT_4 -0.026 ± 0.013 [-0.045, -0.002] · plast2 0.999 ± 0.002 · plast3 1.000 ± 0.000
+   OWM@0.001          BWT_3 -0.019 ± 0.015 [-0.043, +0.007] · BWT_4 -0.014 ± 0.010 [-0.029, +0.000] · plast2 0.999 ± 0.003 · plast3 0.999 ± 0.002
+   OWM@0.01           BWT_3 -0.016 ± 0.013 [-0.043, +0.000] · BWT_4 -0.015 ± 0.012 [-0.045, +0.002] · plast2 0.999 ± 0.003 · plast3 1.000 ± 0.000
+   OWM@0.1            BWT_3 -0.029 ± 0.012 [-0.057, -0.014] · BWT_4 -0.215 ± 0.041 [-0.299, -0.166] · plast2 0.998 ± 0.003 · plast3 1.000 ± 0.000
+   PLAIN              BWT_3 -0.287 ± 0.042 [-0.352, -0.224] · BWT_4 -0.792 ± 0.054 [-0.891, -0.710] · plast2 0.997 ± 0.003 · plast3 0.968 ± 0.048
+   RANDRANK@0.001     BWT_3 -0.296 ± 0.062 [-0.454, -0.153] · BWT_4 -0.378 ± 0.072 [-0.584, -0.219] · plast2 0.993 ± 0.007 · plast3 0.996 ± 0.004
+   RANDRANK@0.01      BWT_3 -0.287 ± 0.045 [-0.399, -0.181] · BWT_4 -0.752 ± 0.061 [-0.865, -0.613] · plast2 0.997 ± 0.005 · plast3 0.989 ± 0.020
+   RANDRANK@0.1       BWT_3 -0.286 ± 0.043 [-0.381, -0.213] · BWT_4 -0.786 ± 0.056 [-0.891, -0.686] · plast2 0.998 ± 0.004 · plast3 0.972 ± 0.045
+   ROT@0.001          BWT_3 -0.266 ± 0.045 [-0.388, -0.167] · BWT_4 -0.246 ± 0.051 [-0.382, -0.116] · plast2 0.997 ± 0.005 · plast3 1.000 ± 0.001
+   ROT@0.01           BWT_3 -0.278 ± 0.041 [-0.381, -0.188] · BWT_4 -0.689 ± 0.059 [-0.807, -0.593] · plast2 0.998 ± 0.004 · plast3 0.997 ± 0.007
+   ROT@0.1            BWT_3 -0.284 ± 0.043 [-0.377, -0.213] · BWT_4 -0.771 ± 0.057 [-0.867, -0.669] · plast2 0.998 ± 0.004 · plast3 0.979 ± 0.039
+   SHRINK-NSCL@0.001  BWT_3 -0.254 ± 0.029 [-0.317, -0.206] · BWT_4 -0.072 ± 0.023 [-0.122, -0.045] · plast2 0.999 ± 0.002 · plast3 1.000 ± 0.000
+   SHRINK-NSCL@0.01   BWT_3 -0.262 ± 0.033 [-0.331, -0.209] · BWT_4 -0.521 ± 0.041 [-0.598, -0.460] · plast2 0.998 ± 0.003 · plast3 0.999 ± 0.002
+   SHRINK-NSCL@0.1    BWT_3 -0.274 ± 0.036 [-0.338, -0.227] · BWT_4 -0.706 ± 0.057 [-0.803, -0.620] · plast2 0.998 ± 0.003 · plast3 0.982 ± 0.033
+   SHRINK-OWM@0.001   BWT_3 -0.247 ± 0.029 [-0.302, -0.195] · BWT_4 -0.067 ± 0.027 [-0.128, -0.024] · plast2 0.998 ± 0.005 · plast3 1.000 ± 0.000
+   SHRINK-OWM@0.01    BWT_3 -0.259 ± 0.028 [-0.320, -0.213] · BWT_4 -0.278 ± 0.040 [-0.323, -0.173] · plast2 0.999 ± 0.003 · plast3 1.000 ± 0.000
+   SHRINK-OWM@0.1     BWT_3 -0.268 ± 0.035 [-0.338, -0.216] · BWT_4 -0.634 ± 0.048 [-0.707, -0.570] · plast2 0.998 ± 0.003 · plast3 0.993 ± 0.015
+   STD-ONLY@1         BWT_3 -0.061 ± 0.051 [-0.165, +0.036] · BWT_4 -0.041 ± 0.033 [-0.108, +0.024] · plast2 0.257 ± 0.081 · plast3 0.000 ± 0.000
+   STD-ONLY@2         BWT_3 -0.139 ± 0.051 [-0.235, -0.064] · BWT_4 -0.091 ± 0.033 [-0.155, -0.043] · plast2 0.997 ± 0.003 · plast3 0.004 ± 0.005
+   STD-ONLY@3         BWT_3 -0.287 ± 0.042 [-0.352, -0.224] · BWT_4 -0.188 ± 0.027 [-0.235, -0.147] · plast2 0.997 ± 0.003 · plast3 0.968 ± 0.048
+
+THE PAIRED STANDARD ERROR (T-MEM-1's rule; pairs per task 139 / 141 / 192, so 10 discordant pairs = a gap of 0.072 / 0.071 / 0.052):
+   OWM@0.1     against PLAIN, BWT_3: gap +0.257 (SE 0.025); the smallest gap/SE over the seeds 9.4 (the bar is 2.0)
+   OWM@0.1     against PLAIN, BWT_4: gap +0.577 (SE 0.024); the smallest gap/SE over the seeds 19.2 (the bar is 2.0)
+   OWM@0.01    against PLAIN, BWT_3: gap +0.271 (SE 0.026); the smallest gap/SE over the seeds 8.4 (the bar is 2.0)
+   OWM@0.01    against PLAIN, BWT_4: gap +0.777 (SE 0.019); the smallest gap/SE over the seeds 34.1 (the bar is 2.0)
+   OWM@0.001   against PLAIN, BWT_3: gap +0.268 (SE 0.026); the smallest gap/SE over the seeds 8.0 (the bar is 2.0)
+   OWM@0.001   against PLAIN, BWT_4: gap +0.778 (SE 0.019); the smallest gap/SE over the seeds 34.1 (the bar is 2.0)
+   NSCL@0.1    against PLAIN, BWT_3: gap +0.253 (SE 0.026); the smallest gap/SE over the seeds 7.3 (the bar is 2.0)
+   NSCL@0.1    against PLAIN, BWT_4: gap +0.668 (SE 0.023); the smallest gap/SE over the seeds 24.0 (the bar is 2.0)
+   NSCL@0.01   against PLAIN, BWT_3: gap +0.256 (SE 0.026); the smallest gap/SE over the seeds 7.3 (the bar is 2.0)
+   NSCL@0.01   against PLAIN, BWT_4: gap +0.765 (SE 0.019); the smallest gap/SE over the seeds 32.0 (the bar is 2.0)
+   NSCL@0.001  against PLAIN, BWT_3: gap +0.249 (SE 0.027); the smallest gap/SE over the seeds 7.1 (the bar is 2.0)
+   NSCL@0.001  against PLAIN, BWT_4: gap +0.766 (SE 0.020); the smallest gap/SE over the seeds 31.6 (the bar is 2.0)
+
+THE NULLS' DRAWS against the arm they null (the arm's value; the draws' mean, and how many of the 10 draws the arm beat, mean over seeds):
+   OWM@0.1     BWT_3 -0.029 · ROT@0.1        draws mean -0.284 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   OWM@0.1     BWT_4 -0.215 · ROT@0.1        draws mean -0.771 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   OWM@0.01    BWT_3 -0.016 · ROT@0.01       draws mean -0.278 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   OWM@0.01    BWT_4 -0.015 · ROT@0.01       draws mean -0.689 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   OWM@0.001   BWT_3 -0.019 · ROT@0.001      draws mean -0.266 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   OWM@0.001   BWT_4 -0.014 · ROT@0.001      draws mean -0.246 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   NSCL@0.1    BWT_3 -0.033 · RANDRANK@0.1   draws mean -0.286 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   NSCL@0.1    BWT_4 -0.124 · RANDRANK@0.1   draws mean -0.786 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   NSCL@0.01   BWT_3 -0.031 · RANDRANK@0.01  draws mean -0.287 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   NSCL@0.01   BWT_4 -0.027 · RANDRANK@0.01  draws mean -0.752 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   NSCL@0.001  BWT_3 -0.038 · RANDRANK@0.001 draws mean -0.296 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+   NSCL@0.001  BWT_4 -0.026 · RANDRANK@0.001 draws mean -0.378 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
+
+CAPACITY, mean over the seeds, per room boundary j (the rooms 1..j protected): OWM's trace(I − P_j) beside NSCL's removed rank 147 − d_j (and its null dimension d_j); alpha_tau
+   tau 0.1    alpha    3473.5 · after rooms 1..1: OWM   13.1 | NSCL removed   6.9 (null dim 140.1) · after rooms 1..2: OWM   24.0 | NSCL removed   9.9 (null dim 137.1) · after rooms 1..3: OWM   30.8 | NSCL removed  11.5 (null dim 135.5)
+   tau 0.01   alpha     347.4 · after rooms 1..1: OWM   43.0 | NSCL removed  38.2 (null dim 108.8) · after rooms 1..2: OWM   67.1 | NSCL removed  44.8 (null dim 102.2) · after rooms 1..3: OWM   79.0 | NSCL removed  49.4 (null dim  97.6)
+   tau 0.001  alpha      34.7 · after rooms 1..1: OWM   89.5 | NSCL removed  90.5 (null dim  56.5) · after rooms 1..2: OWM  118.2 | NSCL removed 114.8 (null dim  32.2) · after rooms 1..3: OWM  127.1 | NSCL removed 124.1 (null dim  22.9)
+
+THE COST OF A LIFE (CPU-s, mean over the lives, measured under the box's load — a reading, #243 (5)): PLAIN 1.36 · OWM@0.01 1.27 · NSCL@0.01 1.41 · ROT@0.01 1.31 · OWM-RESTD@0.01 1.93
+
+HEADLINE: NULL-SPACE-PROTECTS

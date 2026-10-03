@@ -1,0 +1,111 @@
+TOY A — COMPRESSION PROGRESS · seeds 20261301–20261310 (10) · held-out seeds 20261304–20261310 (7)
+lives on disk: C-hist-ema 100 · C-hist-last2 100 · C-own-ema 100 · C-own-last2 100 · ERROR 100 · L-hist-ema 100 · L-hist-last2 100 · L-own-ema 100 · L-own-last2 100 · LP-OUDEYER 100 · N-ONLY 10 · ORACLE 10 · R-ONLY 200 · RANDOM 200
+THE NULL (RANDOM's 20 lives a seed split 10/10, 10000 draws): sd of D_null 0.00385 (A), 0.00431 (SHARE_N); smallest passing D 0.00983 (A, upper 1 − 0.0056), largest passing Dn -0.01092 (SHARE_N, lower 0.0056); on the 7 held-out seeds 0.01248
+
+THE CONTROLS (the world can show it):
+   PC1 R-ONLY beats RANDOM: G = +0.1585, positive at 10 of 10 seeds → PASS  (per seed +0.158 +0.125 +0.150 +0.189 +0.159 +0.161 +0.125 +0.162 +0.173 +0.183)
+   PC2 ERROR is trapped: SHARE_N > 0.5 at 10 of 10 seeds → PASS
+   PC3 N-ONLY loses: A below RANDOM's 2.5 % band edge at 10 of 10 seeds → PASS
+   CEILING: G 0.1585 ≥ 3 × the smallest passing D 0.0295 → PASS;  GRADABLE: True
+
+arm                 A  SHARE_N  late N        D     p_A  sgn  BEAT       Dn     p_N  sgn  LEAVE  esc.share  sdA×  sdN×  flags
+L-own-last2     0.505    0.224   0.254  -0.0497  1.0000  1/10 False  -0.0233  0.0001  8/10   True     -0.314  1.80  1.58  
+L-own-ema       0.579    0.162   0.229  +0.0239  0.0001  7/10 False  -0.0857  0.0001 10/10   True     +0.151  2.15  1.79  SD-FLAGGED (sign count only, ≥ 9 of 10)
+L-hist-last2    0.191    0.626   0.505  -0.3634  1.0000  0/10 False  +0.3785  1.0000  0/10  False     -2.293  3.05  3.95  SD-FLAGGED (sign count only, ≥ 9 of 10)
+L-hist-ema      0.184    0.649   0.644  -0.3711  1.0000  1/10 False  +0.4019  1.0000  1/10  False     -2.341  0.89  1.28  
+C-own-last2     0.595    0.106   0.150  +0.0397  0.0001  9/10  True  -0.1418  0.0001 10/10   True     +0.250  1.38  1.13  
+C-own-ema       0.646    0.051   0.095  +0.0909  0.0001 10/10  True  -0.1967  0.0001 10/10   True     +0.573  0.81  0.56  
+C-hist-last2    0.671    0.001   0.001  +0.1163  0.0001 10/10  True  -0.2464  0.0001 10/10   True     +0.734  1.28  0.06  
+C-hist-ema      0.684    0.000   0.000  +0.1288  0.0001 10/10  True  -0.2476  0.0001 10/10   True     +0.812  0.63  0.00  
+LP-OUDEYER      0.496    0.211   0.196  -0.0589  1.0000  0/10 False  -0.0369  0.0001  8/10  False     -0.372  4.05  3.93  SD-FLAGGED (sign count only, ≥ 9 of 10)
+RANDOM          0.555    0.248   (reference)
+R-ONLY          0.713    0.000   (reference)
+ERROR           0.147    0.706   (reference)
+N-ONLY          0.017    1.000   (reference)
+ORACLE          0.725    0.011   (reference)
+
+THE HELD-OUT READING of the ema cells (seeds 20261304–20261310 alone; ≥ 6 of 7 (7 of 7 if SD-flagged) and p' ≤ 0.0056 on the 7-seed null; smallest passing D' 0.01248):
+   L-own-ema    D' +0.0256 p' 0.0001 signs 5/7 BEAT False · Dn' -0.0833 p' 0.0001 signs 7/7 LEAVE True → counted BEAT False LEAVE True
+   L-hist-ema   D' -0.3601 p' 1.0000 signs 1/7 BEAT False · Dn' +0.4075 p' 1.0000 signs 1/7 LEAVE False → counted BEAT False LEAVE False
+   C-own-ema    D' +0.1051 p' 0.0001 signs 7/7 BEAT True · Dn' -0.2067 p' 0.0001 signs 7/7 LEAVE True → counted BEAT True LEAVE True
+   C-hist-ema   D' +0.1356 p' 0.0001 signs 7/7 BEAT True · Dn' -0.2491 p' 0.0001 signs 7/7 LEAVE True → counted BEAT True LEAVE True
+
+THE FACTORIAL'S MAIN EFFECTS on A (mean over the other factors' cells of high − low; loss C−L, scope hist−own, time ema−last2):
+   loss   mean +0.2840  se 0.0207  positive at 10 / negative at 0 of 10 seeds  95% CI [+0.2428, +0.3190]
+   scope  mean -0.1485  se 0.0181  positive at 0 / negative at 10 of 10 seeds  95% CI [-0.1771, -0.1101]
+   time   mean +0.0324  se 0.0128  positive at 9 / negative at 1 of 10 seeds  95% CI [+0.0119, +0.0590]
+THE FACTORIAL'S MAIN EFFECTS on SHARE_N (mean over the other factors' cells of high − low; loss C−L, scope hist−own, time ema−last2):
+   loss   mean -0.3760  se 0.0281  positive at 0 / negative at 10 of 10 seeds  95% CI [-0.4219, -0.3178]
+   scope  mean +0.1835  se 0.0229  positive at 10 / negative at 0 of 10 seeds  95% CI [+0.1358, +0.2209]
+   time   mean -0.0238  se 0.0159  positive at 4 / negative at 6 of 10 seeds  95% CI [-0.0565, +0.0022]
+
+PREDICTIONS (written before any life) and REFUTATIONS:
+   P1 L-hist-last2: SHARE_N ≥ 0.5 at 8/10 seeds (held-out 6/7); below RANDOM's band at 0/10 (held-out 0/7) → P1 HOLDS; refuted-by-escape no
+   P1 L-hist-ema: SHARE_N ≥ 0.5 at 8/10 seeds (held-out 6/7); below RANDOM's band at 1/10 (held-out 1/7) → P1 HOLDS; refuted-by-escape no
+   P2 L-own-ema vs L-own-last2: SHARE_N 0.162 vs 0.224 (lower); A inside RANDOM's band at 6/10 seeds
+   P2 C-own-ema vs C-own-last2: SHARE_N 0.051 vs 0.106 (lower); A inside RANDOM's band at 3/10 seeds
+   P3 the cells passing BOTH counted bars: ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] (predicted: the C-hist cells only)
+   P4 seeds at which an arm's A reaches R-ONLY's: L-own-last2 0 · L-own-ema 0 · L-hist-last2 0 · L-hist-ema 1 · C-own-last2 0 · C-own-ema 0 · C-hist-last2 0 · C-hist-ema 0 · LP-OUDEYER 0 (predicted: none) → does not hold
+   P5 LP-OUDEYER D -0.0589 vs L-own-last2 D -0.0497 (difference 0.0092 against the smallest passing D 0.0098) → ≈
+   H-quantity (loss): main effect on SHARE_N -0.3760, negative at 10/10 seeds, CI [-0.4219, -0.3178] → supported
+   H-quantity (scope): main effect on SHARE_N +0.1835, negative at 0/10 seeds, CI [+0.1358, +0.2209] → not supported
+   H-time: main effect on SHARE_N -0.0238 and on A +0.0324 against the null's -0.0109 / +0.0098 → not refuted
+
+THE DROP'S ANATOMY over RANDOM's lives (single-factor drops from the state before a block toward the state after it; own window and history-wide):
+   the 196 policy blocks (5-200) — the READING THAT DECIDES:
+      N blocks, own  (n 9706): total +0.4658 = bias +0.0467 + weight +0.4419 + stats +0.0053 + interaction -0.0280   share_bias +0.100
+      N blocks, hist (n 9706): total +0.0590 = bias +0.0458 + weight +0.0344 + stats +0.0044 + interaction -0.0255   share_bias +0.776
+      R1–R3 blocks, own  (n 29494): total +0.9236 = bias +0.0512 + weight +0.9328 + stats +0.0216 + interaction -0.0820   share_bias +0.055
+      R1–R3 blocks, hist (n 29494): total +0.0492 = bias +0.0397 + weight +0.0647 + stats +0.0060 + interaction -0.0612   share_bias +0.806
+   §0 item 4's mechanism (the bias part is the MAJORITY of the drop in N's blocks): REFUTED — the bias part is not the majority in N blocks
+   all blocks (1-200):
+      N blocks, own  (n 9906): total +0.4757 = bias +0.0525 + weight +0.4603 + stats +0.0066 + interaction -0.0437   share_bias +0.110
+      N blocks, hist (n 9906): total +0.0766 = bias +0.0518 + weight +0.0607 + stats +0.0058 + interaction -0.0417   share_bias +0.676
+      R1–R3 blocks, own  (n 30094): total +0.9646 = bias +0.0536 + weight +0.9219 + stats +0.0220 + interaction -0.0330   share_bias +0.056
+      R1–R3 blocks, hist (n 30094): total +0.0413 = bias +0.0422 + weight +0.0218 + stats +0.0060 + interaction -0.0287   share_bias +1.021
+   blocks ≥ 21:
+      N blocks, own  (n 8935): total +0.4033 = bias +0.0289 + weight +0.3831 + stats +0.0007 + interaction -0.0095   share_bias +0.072
+      N blocks, hist (n 8935): total +0.0142 = bias +0.0285 + weight -0.0066 + stats +0.0006 + interaction -0.0084   share_bias +2.013
+      R1–R3 blocks, own  (n 27065): total +0.6126 = bias +0.0323 + weight +0.6050 + stats +0.0043 + interaction -0.0291   share_bias +0.053
+      R1–R3 blocks, hist (n 27065): total +0.0337 = bias +0.0240 + weight +0.0255 + stats +0.0005 + interaction -0.0163   share_bias +0.711
+
+THE EAR'S OWN TYPE COVER (first block at which all 13 words are heard AND Ear.cover over the heard words equals the vocabulary map; 'never' if never):
+   20261301: lives 141 · first-correct block min 5 / median 7 / max 18 · never-correct lives 0 · wrong at block 200 in 0
+   20261302: lives 141 · first-correct block min 5 / median 8 / max 56 · never-correct lives 0 · wrong at block 200 in 0
+   20261303: lives 141 · first-correct block min 5 / median 5 / max 7 · never-correct lives 0 · wrong at block 200 in 0
+   20261304: lives 141 · first-correct block min 5 / median 5 / max 9 · never-correct lives 0 · wrong at block 200 in 0
+   20261305: lives 141 · first-correct block min 4 / median 4 / max 4 · never-correct lives 0 · wrong at block 200 in 0
+   20261306: lives 141 · first-correct block min 5 / median 6 / max 32 · never-correct lives 0 · wrong at block 200 in 0
+   20261307: lives 141 · first-correct block min 5 / median 9 / max 44 · never-correct lives 0 · wrong at block 200 in 0
+   20261308: lives 141 · first-correct block min 5 / median 6 / max 18 · never-correct lives 0 · wrong at block 200 in 0
+   20261309: lives 141 · first-correct block min 5 / median 5 / max 7 · never-correct lives 0 · wrong at block 200 in 0
+   20261310: lives 141 · first-correct block min 3 / median 3 / max 3 · never-correct lives 0 · wrong at block 200 in 0
+N'S HISTORY WEIGHT n_N / Σ n_j at blocks 20, 40, … 200 (mean over lives):
+   L-own-last2    0.193 0.200 0.204 0.212 0.218 0.226 0.235 0.239 0.245 0.249
+   L-own-ema      0.069 0.072 0.090 0.106 0.121 0.133 0.147 0.160 0.174 0.187
+   L-hist-last2   0.594 0.709 0.754 0.760 0.754 0.746 0.722 0.692 0.665 0.642
+   L-hist-ema     0.671 0.691 0.676 0.665 0.661 0.667 0.668 0.664 0.663 0.665
+   C-own-last2    0.079 0.065 0.071 0.078 0.090 0.102 0.113 0.121 0.126 0.132
+   C-own-ema      0.069 0.045 0.040 0.036 0.037 0.043 0.050 0.057 0.067 0.079
+   C-hist-last2   0.069 0.047 0.042 0.036 0.034 0.033 0.032 0.031 0.030 0.030
+   C-hist-ema     0.069 0.045 0.040 0.034 0.032 0.031 0.031 0.030 0.029 0.029
+   LP-OUDEYER     0.244 0.212 0.225 0.242 0.249 0.253 0.253 0.244 0.237 0.235
+   RANDOM         0.243 0.249 0.255 0.253 0.251 0.248 0.247 0.248 0.248 0.248
+   ERROR          0.302 0.434 0.521 0.582 0.623 0.657 0.683 0.698 0.712 0.720
+LEARNED PER ROOM (mean over the 200 boundaries of the pooled forced-naming accuracy of the room's own shape words; the minimum over rooms; final accuracy):
+   L-own-last2    R1 0.782 R2 0.906 R3 0.805 · min 0.740 · final R1 0.836 R2 0.892 R3 0.723
+   L-own-ema      R1 0.790 R2 0.950 R3 0.919 · min 0.787 · final R1 0.865 R2 0.930 R3 0.866
+   L-hist-last2   R1 0.515 R2 0.485 R3 0.440 · min 0.355 · final R1 0.698 R2 0.670 R3 0.604
+   L-hist-ema     R1 0.533 R2 0.511 R3 0.358 · min 0.318 · final R1 0.552 R2 0.500 R3 0.395
+   C-own-last2    R1 0.888 R2 0.937 R3 0.860 · min 0.840 · final R1 0.893 R2 0.910 R3 0.774
+   C-own-ema      R1 0.852 R2 0.942 R3 0.935 · min 0.849 · final R1 0.929 R2 0.932 R3 0.871
+   C-hist-last2   R1 0.874 R2 0.969 R3 0.944 · min 0.863 · final R1 0.924 R2 0.990 R3 0.932
+   C-hist-ema     R1 0.875 R2 0.972 R3 0.957 · min 0.869 · final R1 0.957 R2 0.992 R3 0.967
+   LP-OUDEYER     R1 0.802 R2 0.799 R3 0.756 · min 0.694 · final R1 0.826 R2 0.819 R3 0.766
+   RANDOM         R1 0.899 R2 0.917 R3 0.895 · min 0.880 · final R1 0.945 R2 0.951 R3 0.920
+   R-ONLY         R1 0.960 R2 0.972 R3 0.970 · min 0.956 · final R1 0.991 R2 0.993 R3 0.982
+   ERROR          R1 0.604 R2 0.503 R3 0.494 · min 0.453 · final R1 0.479 R2 0.416 R3 0.545
+   N-ONLY         R1 0.200 R2 0.183 R3 0.179 · min 0.158 · final R1 0.153 R2 0.186 R3 0.171
+
+VERDICT CLASS: FIXED-PENDING-STAGE-2  (arms passing the counted BEAT: ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · the counted LEAVE: ['L-own-last2', 'L-own-ema', 'C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · both: ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · beat without leaving: none)
+STAGE 2 (the credit-derangement NULL, 10 replicates × 10 seeds, for each arm that passes BEAT): ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema']

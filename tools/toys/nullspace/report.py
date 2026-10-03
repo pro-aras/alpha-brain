@@ -196,8 +196,60 @@ def render(an: Mapping[str, object], summ, seeds: Sequence[int], counts: Optiona
         f = an["frontier"][a]
         L.append(f"   {a:18s} {f['plast2']:.3f} {f['plast3']:.3f}   {f['bwt3']:+.3f} {f['bwt4']:+.3f}   {f['cpu']:6.2f} s  n {f['n']}")
     L.append("")
+    L.extend(detail(summ, seeds))
+    L.append("")
     L.append(f"HEADLINE: {an['headline']}")
     return L
+
+
+def detail(summ, seeds: Sequence[int]) -> List[str]:
+    """The numbers behind the table (edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 12:04 +0400 — added after the unit finished, before the RESULT; no bar or class depends on it):
+    per-arm spread across seeds, the null draws' ranges, the paired SEs and the smallest passing gap, the capacity beside the rank."""
+    out: List[str] = []
+    seeds = sorted(seeds)
+
+    def vals(arm: str, key: str, j: int) -> np.ndarray:
+        return np.array([l[key][j] for s in seeds for l in summ[arm][s]])
+
+    out.append("PER-ARM, mean ± sd over the lives (the seeds; for ROT and RANDRANK the seeds × 10 draws): BWT_3, BWT_4, PLASTICITY_2, PLASTICITY_3; [min, max] of the BWTs")
+    for arm in sorted(summ):
+        if arm.startswith(("LRSHRINK", "FREEZE", "STD", "SHRINK", "ANTI")) or arm in ("PLAIN",) or arm.split("@")[0] in ("OWM", "NSCL", "ROT", "RANDRANK", "OWM-NB", "OWM-RESTD", "OWM-BM", "OWM-OLDONLY"):
+            b3, b4, p2, p3 = vals(arm, "bwt", 3), vals(arm, "bwt", 4), vals(arm, "plast", 2), vals(arm, "plast", 3)
+            out.append(f"   {arm:18s} BWT_3 {b3.mean():+.3f} ± {b3.std():.3f} [{b3.min():+.3f}, {b3.max():+.3f}] · BWT_4 {b4.mean():+.3f} ± {b4.std():.3f} [{b4.min():+.3f}, {b4.max():+.3f}] · "
+                       f"plast2 {p2.mean():.3f} ± {p2.std():.3f} · plast3 {p3.mean():.3f} ± {p3.std():.3f}")
+    out.append("")
+    npair = {i: len(summ["PLAIN"][seeds[0]][0]["pairs"][READ[2]][i]) for i in (1, 2)}
+    npair[3] = len(summ["PLAIN"][seeds[0]][0]["pairs"][READ[3]][3])
+    out.append(f"THE PAIRED STANDARD ERROR (T-MEM-1's rule; pairs per task {npair[1]} / {npair[2]} / {npair[3]}, so 10 discordant pairs = a gap of {10 / npair[1]:.3f} / {10 / npair[2]:.3f} / {10 / npair[3]:.3f}):")
+    for arm in ("OWM@0.1", "OWM@0.01", "OWM@0.001", "NSCL@0.1", "NSCL@0.01", "NSCL@0.001"):
+        if arm not in summ:
+            continue
+        for j in (3, 4):
+            d = [paired(summ[arm][s][0], summ["PLAIN"][s][0], j) for s in seeds]
+            ratio = [x / y for x, y in d]
+            out.append(f"   {arm:11s} against PLAIN, BWT_{j}: gap {np.mean([x for x, _y in d]):+.3f} (SE {np.mean([y for _x, y in d]):.3f}); the smallest gap/SE over the seeds {min(ratio):.1f} (the bar is 2.0)")
+    out.append("")
+    out.append("THE NULLS' DRAWS against the arm they null (the arm's value; the draws' mean, and how many of the 10 draws the arm beat, mean over seeds):")
+    for fam, null in (("OWM", "ROT"), ("NSCL", "RANDRANK")):
+        for t in TAUS:
+            a, n = f"{fam}@{t}", f"{null}@{t}"
+            for j in (3, 4):
+                beat = [10 - (rank_among(summ[a][s][0]["bwt"][j], [l["bwt"][j] for l in summ[n][s]]) - 1) for s in seeds]
+                out.append(f"   {a:11s} BWT_{j} {np.mean([summ[a][s][0]['bwt'][j] for s in seeds]):+.3f} · {n:14s} draws mean {np.mean([l['bwt'][j] for s in seeds for l in summ[n][s]]):+.3f} · "
+                           f"the arm beat {np.mean(beat):.1f} of 10 draws on average (min over seeds {min(beat)})")
+    out.append("")
+    out.append("CAPACITY, mean over the seeds, per room boundary j (the rooms 1..j protected): OWM's trace(I − P_j) beside NSCL's removed rank 147 − d_j (and its null dimension d_j); alpha_tau")
+    for t in TAUS:
+        a, n = f"OWM@{t}", f"NSCL@{t}"
+        if a in summ and summ[a][seeds[0]][0].get("capacity"):
+            cap = {j: np.mean([summ[a][s][0]["capacity"][str(j)] for s in seeds]) for j in (1, 2, 3)}
+            dims = {j: np.mean([summ[n][s][0]["nscl_dims"][str(j)] for s in seeds]) for j in (1, 2, 3)}
+            al = np.mean([summ[a][s][0]["alpha"] for s in seeds])
+            out.append(f"   tau {t:6s} alpha {al:9.1f} · " + " · ".join(f"after rooms 1..{j}: OWM {cap[j]:6.1f} | NSCL removed {147 - dims[j]:5.1f} (null dim {dims[j]:5.1f})" for j in (1, 2, 3)))
+    out.append("")
+    out.append("THE COST OF A LIFE (CPU-s, mean over the lives, measured under the box's load — a reading, #243 (5)): " +
+               " · ".join(f"{a} {np.mean([l['cpu'] for s in seeds for l in summ[a][s]]):.2f}" for a in ("PLAIN", "OWM@0.01", "NSCL@0.01", "ROT@0.01", "OWM-RESTD@0.01") if a in summ))
+    return out
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
