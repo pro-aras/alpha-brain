@@ -1,0 +1,19 @@
+test_evolve_cal_analyse (unittest.loader._FailedTest.test_evolve_cal_analyse) ... ERROR
+
+======================================================================
+ERROR: test_evolve_cal_analyse (unittest.loader._FailedTest.test_evolve_cal_analyse)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_evolve_cal_analyse
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_analyse.py", line 17, in <module>
+    import tools.evolve_cal_analyse as an
+ModuleNotFoundError: No module named 'tools.evolve_cal_analyse'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)
+scope memory.peak 50659328 bytes
