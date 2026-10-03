@@ -22,7 +22,11 @@ SIGNED: Dict[str, Tuple[str, str]] = {
     "nullspace": ("PREREG-TOY-NULLSPACE.md", "d15a6353d6b62e7ba74c407e2a220054c127250c7b4ee07f55d4564bc40ac2ca"),
     "frames": ("PREREG-TOY-FRAMES.md", "a9787ef8026e8e6d8ab41f16d088bb5259f5cf9f5d64de7176da848a2a52c31a"),
 }
-SIGNATURE_PREFIX = b"- Co-signed:"
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 15:45 +0400 — a signature line is a line that STARTS (column 0, case-sensitive, colon required) with one of these: the toys laws' «- Co-signed:» and the architect's
+# «Signed:» / «Co-signed:» (Toy D). The laws' all-caps «SIGNED:» header and any prose line beginning «Signed» without the colon stay INSIDE the signed text, so no pinned sha moves
+# (red-first: tests/tools/test_toys_common.py). The seat's signature REPLACES the placeholder «Signed: the seat — pending.»: both are dropped.
+SIGNATURE_PREFIXES = (b"- Co-signed:", b"- Signed:", b"Co-signed:", b"Signed:")
+SIGNATURE_PREFIX = SIGNATURE_PREFIXES[0]        # kept for any importer of the old name
 
 
 class PreregError(Exception):
@@ -30,7 +34,7 @@ class PreregError(Exception):
 
 
 def signed_sha(path: Path) -> str:
-    kept = b"\n".join(line for line in Path(path).read_bytes().split(b"\n") if not line.startswith(SIGNATURE_PREFIX))
+    kept = b"\n".join(line for line in Path(path).read_bytes().split(b"\n") if not line.startswith(SIGNATURE_PREFIXES))
     return hashlib.sha256(kept).hexdigest()
 
 

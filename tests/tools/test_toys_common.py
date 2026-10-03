@@ -71,6 +71,47 @@ class TestPrereg(unittest.TestCase):
         finally:
             shutil.rmtree(d)
 
+    def test_both_families_of_signature_lines_are_dropped(self):
+        # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 15:45 +0400 — Toy D's law (the architect's) signs with «Signed:» / «Co-signed:» at the line start, the toys laws with «- Co-signed:»;
+        # written FIRST (red: the second family is not yet dropped). The seat's signature REPLACES the placeholder line «Signed: the seat — pending.» — both are dropped, so it cannot move the sha.
+        d = Path(tempfile.mkdtemp())
+        try:
+            base = d / "base.md"
+            base.write_bytes(b"a\nb\n")
+            sig = d / "sig.md"
+            sig.write_bytes(b"a\nb\nSigned: the author, 15:35\nCo-signed: the builder, pending\n- Signed: x\n- Co-signed: y\nSigned: the seat \xe2\x80\x94 pending.\n")
+            self.assertEqual(PR.signed_sha(sig), PR.signed_sha(base))
+            swapped = d / "swapped.md"
+            swapped.write_bytes(b"a\nb\nSigned: the author, 15:35\nCo-signed: the builder, 15:50\nSigned: the seat, 15:59 (the placeholder replaced)\n")
+            self.assertEqual(PR.signed_sha(swapped), PR.signed_sha(base))
+        finally:
+            shutil.rmtree(d)
+
+    def test_a_body_line_beginning_signed_without_the_colon_stays_in_the_text(self):
+        d = Path(tempfile.mkdtemp())
+        try:
+            base = d / "base.md"
+            base.write_bytes(b"a\nb\n")
+            body = d / "body.md"
+            body.write_bytes(b"a\nSigned off by the whole team.\nb\n")                  # prose, no colon: part of the law
+            self.assertNotEqual(PR.signed_sha(body), PR.signed_sha(base))
+            caps = d / "caps.md"
+            caps.write_bytes(b"a\nb\nSIGNED:\n")                                          # the laws' own all-caps header stays inside the signed text (case-sensitive)
+            self.assertNotEqual(PR.signed_sha(caps), PR.signed_sha(base))
+            mid = d / "mid.md"
+            mid.write_bytes(b"a\n  Signed: indented text is not a signature line\nb\n")
+            self.assertNotEqual(PR.signed_sha(mid), PR.signed_sha(base))
+        finally:
+            shutil.rmtree(d)
+
+    def test_the_four_pinned_shas_do_not_move_under_the_wider_rule(self):
+        got = PR.check(["cp", "cp_amend1", "nullspace", "frames"])
+        self.assertEqual(got["frames"], "a9787ef8026e8e6d8ab41f16d088bb5259f5cf9f5d64de7176da848a2a52c31a")
+        for name in ("PREREG-TOY-CP.md", "PREREG-TOY-CP-AMEND-1.md", "PREREG-TOY-NULLSPACE.md", "PREREG-TOY-FRAMES.md"):
+            lines = (DOCS / name).read_bytes().split(b"\n")
+            for ln in lines:
+                self.assertFalse(ln.startswith((b"Signed:", b"Co-signed:", b"- Signed:")), (name, ln[:60]))      # no existing law has a line the wider rule would newly drop
+
     def test_header_carries_the_signed_shas(self):
         h = PR.header(["cp", "cp_amend1"])
         self.assertEqual(h["prereg_cp_sha256"], PR.SIGNED["cp"][1])
