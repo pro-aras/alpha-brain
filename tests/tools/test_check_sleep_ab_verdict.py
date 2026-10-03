@@ -129,6 +129,15 @@ class Decide(unittest.TestCase):
         self.assertEqual(C.decide(m, p, b)[0], "KEEP")
 
 
+    def test_an_ungradable_reading_with_n_beating_s_by_z_two_fits_no_clause_the_keep_clause_is_not_gated_by_the_bar(self):
+        m, p, b = base()
+        p["N vs S"] = pr(9, 0)                                 # PLANT: N recognises 9 more of the 224 than S (z 3.0) while S is ungradable (17 < 30)
+        self.assertEqual(p["N vs S"]["out"]["z"], 3.0)
+        self.assertNotEqual(p["N vs S"]["out"]["z"], base()[1]["N vs S"]["out"]["z"], "the plant must change the bytes")
+        v, steps = C.decide(m, p, b)
+        self.assertEqual(v, "NO CLAUSE FIRES")                 # replay 0 needs a gradable bar; KEEP needs S not worse than N by z >= 2
+        self.assertIn("S worse than N by z ≥ 2: True", {s["step"]: s for s in steps}["5"]["reading"])
+
 @unittest.skipUnless(HAVE_RUNS, "the A/B's run folder is not on this box")
 class RawAgainstReading(unittest.TestCase):
     @classmethod

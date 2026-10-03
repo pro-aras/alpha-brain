@@ -19,7 +19,7 @@
 3. **The controls (CTL)** were read from their own files (block below), not from the reader's one-line summary.
 4. **Every figure in this document (DOC).** The blocks between `GEN` markers are rewritten by the script and checked verbatim; every other number is found in `READING.json`, `READING.txt`, the law or a block; a negative number must be found as a negative; every «A of B» must be a pair some source carries. Planted faults are caught: a transposed decimal, a pair that is no pair, a sign that no source has, a hand-edited block, a missing block, a flipped verdict word (`tests/tools/test_check_sleep_ab_verdict.py`), and five deliberate breaks of the checker each turned at least one test red.
    - Command, from the worktree root: `PYTHONPATH=. python3 -B tools/brain/check_sleep_ab_verdict.py --doc docs/brain/memory/VERDICT-SLEEP-AB.md`; it ends `CHECK PASSED` only when RAW, CTL, LAW and DOC all hold.
-5. **One gap in the instrument of record, found on the way and not repaired.** In `tools/sleep_ab_read.py` the un-gradable branch returns KEEP without testing §7's KEEP clause (S not worse than N). The clause holds here (step 5), so the reader's KEEP and §7's KEEP agree. The reader stays as it was run: changing the instrument after the read would change what was read.
+5. **One gap in the instrument of record, found on the way and not repaired.** In `tools/sleep_ab_read.py` the un-gradable branch returns KEEP without testing §7's KEEP clause (S not worse than N). The clause holds here (step 5), so the reader's KEEP and §7's KEEP agree. The checker's walk gates the CHANGE rules and the `replay 0` rule on gradability and does not gate the KEEP clause's own two tests (z, and the count of lost things); for an ungradable reading in which S is worse than N by z ≥ 2 or by more than one lost thing it returns NO CLAUSE FIRES, a case §7 names no reading for, where the reader returns KEEP. The checker prints that disagreement as a LAW MISMATCH and the tests drive both forms. The reader stays as it was run: changing the instrument after the read would change what was read.
 
 ## The controls
 
@@ -194,7 +194,7 @@ What the table says, and no more:
 2. **«≥ 8 of the 10 draws each beat S».** Read as «each recognises more of the 224 than S», this reading's U draws score 10 of 10; read as «each by z ≥ 2», 4 of 10. With the gate met (S at the bar, in the tests), the first reading changes the line to U and the second keeps it. The law must say which.
 3. **«the maker readings of S, P and N all lie inside U's band».** Say whether R-A, R-B or both; here S's R-A and the R-B of all three lie outside, so the answer did not matter, and it could.
 4. **The veto for U.** «U loses no more than S plus one», per draw or by the ten draws' mean: here 0 either way.
-5. **The un-gradable branch of the reader** must test §7's KEEP clause and the `replay 0` clause before it returns KEEP.
+5. **The un-gradable branch of the reader** must test §7's KEEP clause and the `replay 0` clause before it returns KEEP, and the law must say whether gradability gates the KEEP clause's own z test: as written, an ungradable reading with S worse than N by z ≥ 2 fits no clause (KEEP needs S not worse; `replay 0` needs a gradable bar). Here both readings give KEEP.
 6. **The price** from the figures above, in the launch's shape, with the gate's pilot inside it.
 
 ## What changes
