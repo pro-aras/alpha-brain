@@ -1,0 +1,2 @@
+1774:2026-10-03 21:48:39 +0400 START claims origin-bl3-rehearsal slot 7 pid 1183521 avail 16883MB waited 0s cap 4G swap 512M unit slot-claims-origin-bl3-rehearsal-1183521
+1776:2026-10-03 21:50:13 +0400 END   claims origin-bl3-rehearsal slot 7 exit 0 cap 4G peak 2319MB swap 0MB

@@ -1,0 +1,12 @@
+{
+ "ask_digest": "f0d7517b1bf9055fdba371f58dd42bb1e8ad86553f2401aef12e24ecb42162b5",
+ "canvas_digest": "42b89af3416b0bb9d09cacc7486d433c6ad8cdd15844db310c73eefdffb174d7",
+ "n_asks": 3011,
+ "n_canvases": 1464,
+ "root": "/data/dev/genome-lives/brain-long-2",
+ "scored": {
+  "path": "/data/dev/brain-runs/scene-s1b1r/20261101/fresh/marks.json",
+  "sha256": "32bf108387834c21c1f3a51b53ec62284341c153622a991ed184e04dbfc79631"
+ },
+ "world_scene_line_sha": "b096d05a6a389130945606045a92fb3c7185776ad7a4ae7f797086446c1ebcc1"
+}
