@@ -24,6 +24,7 @@ import argparse
 import gzip
 import hashlib
 import json
+import math
 import os
 import re
 import resource
@@ -355,6 +356,111 @@ def compare_twins(rows_a: Sequence[dict], rows_b: Sequence[dict]) -> dict:
     return {"identical": n_a == n_b and rows_diff == 0, "n_a": n_a, "n_b": n_b, "rows_differing": rows_diff,
             "discrete_diff_rows": disc_rows, "first_diff": first_diff, "equal_prefix": first_diff if first_diff is not None else n,
             "diff_key_counts": dict(key_counts), "by_decile": deciles}
+
+
+# ============================================================================ the bands (PREREG-EVOLVE-CAL A1 (i), A2.2, A4, A7; scipy)
+# edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 21:10 +0400 — tests first: tests/tools/test_evolve_cal_bands_build.py.
+ALPHA_SIDE = 0.0083      # one-sided per side per dimension: 0.025 family-wise over three dimensions
+NORMAL_P = 0.01          # Shapiro–Wilk: a null not normal at p < 0.01 uses its rank band
+Q1_GRID = 1.0 / 110      # q1_seen is correct / 110 held-out items
+
+
+def make_band(dim: str, values: Sequence[float], grid: Optional[float] = None, alpha_side: float = ALPHA_SIDE,
+              normal_p: float = NORMAL_P) -> dict:
+    """The band of ONE dimension from its merit-neutral null (the incumbent + the twins' readings on one slice).
+    A4 (i): σ̂ is the sample SD (n − 1 df). A4 (ii): the production Δ is a difference of two draws, centred at 0 with σ_Δ = √2 σ̂, and the edge is
+    t(n − 1, 1 − alpha_side) · σ_Δ. A1 (i): fewer than 3 distinct values or σ̂ = 0 → NO band. A4 (iii): not normal at p < normal_p → the rank band, the
+    range of the null's readings (Δ outside ± range is «outside all draws»). A None reading in the null is refused, never dropped."""
+    import statistics
+    from scipy import stats
+    if any(v is None for v in values):
+        raise ValueError(f"make_band({dim}): a None reading in the null is refused, not dropped")
+    vals = [float(v) for v in values]
+    n = len(vals)
+    if n < 3:
+        raise ValueError(f"make_band({dim}): {n} values (need at least 3)")
+    distinct, sigma = len(set(vals)), statistics.stdev(vals)
+    t = float(stats.t.ppf(1.0 - alpha_side, n - 1))
+    base = {"dim": dim, "n": n, "df": n - 1, "distinct": distinct, "sigma_hat": sigma, "mean": statistics.fmean(vals), "min": min(vals), "max": max(vals),
+            "range": max(vals) - min(vals), "grid": grid, "alpha_side": alpha_side, "t": t, "values": vals}
+    if distinct < 3 or not (sigma > 0.0):
+        return {**base, "kind": "none", "edge": None, "normality": None,
+                "reason": f"the null held {distinct} distinct value(s), σ̂ = {sigma:.6g}: fewer than 3 distinct values or σ = 0 gives NO band (A1 (i)); the dimension does not gate"}
+    W, p = stats.shapiro(vals)
+    norm = {"test": "shapiro", "W": float(W), "p": float(p)}
+    if p < normal_p:
+        out = {**base, "kind": "rank", "edge": None, "normality": norm,
+               "note": "rank band: the null is not normal at p < 0.01, so a Δ outside ± the range of the null's readings is outside all draws; its error at n = 21 is "
+                       "1/22 ≈ 4.5 % per side per dimension — the 0.025 family-wise holds only for the normal band (A4 (iii))"}
+        half = out["range"]
+    else:
+        edge = t * (2.0 ** 0.5) * sigma
+        out = {**base, "kind": "normal", "edge": edge, "normality": norm,
+               "note": f"normal band: edge = t({n - 1}, 1 − {alpha_side}) · √2 · σ̂ = {t:.4f} · {2 ** 0.5:.4f} · {sigma:.6g} (A4 (ii))"}
+        half = edge
+    if grid:
+        out["edge_grid"] = half / grid
+        out["min_clear_grid"] = math.floor(round(half / grid, 9)) + 1
+    return out
+
+
+def variance_ratio_test(a: Sequence[float], b: Sequence[float], alpha: float = 0.05, two_sided: bool = True) -> dict:
+    """F = var(a) / var(b) with (n_a − 1, n_b − 1) df. Two-sided (A7's transfer test): different iff F > F_(1 − alpha/2)(df_a, df_b) or F < 1 / F_(1 − alpha/2)(df_b, df_a);
+    one-sided (A2.2's «larger»): different iff F > F_(1 − alpha)(df_a, df_b). A zero variance against a spread is different (F = 0 or ∞); two zero variances are not."""
+    import statistics
+    from scipy import stats
+    na, nb = len(a), len(b)
+    va, vb = statistics.variance(a), statistics.variance(b)
+    dfa, dfb = na - 1, nb - 1
+    tail = alpha / 2 if two_sided else alpha
+    hi = float(stats.f.ppf(1.0 - tail, dfa, dfb))
+    lo = (1.0 / float(stats.f.ppf(1.0 - tail, dfb, dfa))) if two_sided else 0.0
+    if va == 0 and vb == 0:
+        F, different, wider = float("nan"), False, None
+    elif vb == 0:
+        F, different, wider = float("inf"), True, "a"
+    elif va == 0:
+        F = 0.0
+        different, wider = (True, "b") if two_sided else (False, None)
+    else:
+        F = va / vb
+        different = F > hi or (two_sided and F < lo)
+        wider = ("a" if F > hi else ("b" if (two_sided and F < lo) else None)) if different else None
+    return {"F": F, "df": (dfa, dfb), "f_crit_hi": hi, "f_crit_lo": lo, "alpha": alpha, "two_sided": two_sided, "different": bool(different),
+            "wider": wider, "var_a": va, "var_b": vb}
+
+
+def frames_band(eps_values: Sequence[float], seed_values: Optional[Sequence[float]]) -> dict:
+    """A2.2: one band rule for every dimension, `frames_filed` included: the ε twins' null gives the band; the seed twins' σ̂ is printed beside it and RULES only where it
+    is larger by a one-sided F-test at p < 0.05 (the wider band then applies, and the record says why)."""
+    eps = make_band("frames_filed", eps_values, grid=1.0)
+    if not seed_values:
+        return {"rules": "eps", "band": eps, "eps": eps, "seed": None, "f_test": None}
+    seed = make_band("frames_filed", seed_values, grid=1.0)
+    f = variance_ratio_test(seed_values, eps_values, alpha=0.05, two_sided=False)
+    if f["different"] and f["wider"] == "a":
+        return {"rules": "seed", "band": seed, "eps": eps, "seed": seed, "f_test": f}
+    return {"rules": "eps", "band": eps, "eps": eps, "seed": seed, "f_test": f}
+
+
+def make_bands(null: Dict[str, Sequence[float]], slice_name: str, scope: str, seed_frames: Optional[Sequence[float]] = None,
+               alpha_side: float = ALPHA_SIDE) -> dict:
+    """The BANDS file (validated): q1_seen on its 1/110 grid, frames_filed on whole frames, confirmed_share continuous, and the cost on ln(CPU-seconds)."""
+    from tools import evolve_bands
+    for d in evolve_bands.GATED:
+        if d not in null:
+            raise ValueError(f"make_bands: the null of {d!r} is missing")
+    fr = frames_band(null["frames_filed"], seed_frames)
+    dims = {"q1_seen": make_band("q1_seen", null["q1_seen"], grid=Q1_GRID, alpha_side=alpha_side),
+            "frames_filed": {**fr["band"], "rule": fr["rules"]},
+            "confirmed_share": make_band("confirmed_share", null["confirmed_share"], grid=None, alpha_side=alpha_side)}
+    if "ln_cpu" in null:
+        dims["ln_cpu"] = make_band("ln_cpu", null["ln_cpu"], grid=None, alpha_side=alpha_side)
+    n = len(null["q1_seen"])
+    out = {"law": "docs/organism/evolve/PREREG-EVOLVE-CAL.md (A1–A8)", "slice": slice_name, "n": n, "df": n - 1, "alpha_side": alpha_side,
+           "cost_policy_cap": evolve_bands.COST_POLICY_CAP, "scope": scope, "dims": dims, "frames_rule": fr["rules"], "frames_f_test": fr["f_test"]}
+    evolve_bands.validate_bands(out)
+    return out
 
 
 # ============================================================================ CLI

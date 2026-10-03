@@ -146,6 +146,7 @@ class TestRound(_Life):
         self.assertEqual(p["gate"]["dims"]["q1_seen"]["incumbent"], 100 / 110)
         self.assertEqual(p["gate"]["dims"]["q1_seen"]["mutant"], 108 / 110)
         self.assertEqual(p["gate"]["verdict"], "IMPROVED")
+        self.assertEqual(p["verdict"], "REFUSED", "an IMPROVED round is not a PASS: the confirmation round decides (edit 21:05, a gap the sweep named)")
         def grade_bad(mind, twin_root, genome_path, tape_slice, wall_s, cpu_s=None, machine=None):
             return crafted(108) if Path(twin_root).name == "incumbent" else crafted(100)
         with unittest.mock.patch.object(ev, "grade_twin", side_effect=grade_bad):
@@ -167,6 +168,22 @@ class TestRound(_Life):
             q = self.judge(forced_mutation=("KWTA.k", 8), bands=bands())
         self.assertFalse(q["gate"]["cost"]["regressed"], "a load change moves wall, not the process CPU")
         self.assertEqual(q["gate"]["verdict"], "IMPROVED")
+
+    def test_the_twins_cpu_seconds_come_from_process_time_around_each_twin(self) -> None:
+        # edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 21:05 +0400 — pins D6: the CPU handed to grade_twin is the process_time delta around
+        # EACH twin (incumbent 7.0 s, mutant 12.0 s here), never the wall time
+        seen = {}
+        def grade(mind, twin_root, genome_path, tape_slice, wall_s, cpu_s=None, machine=None):
+            seen[Path(twin_root).name] = (wall_s, cpu_s, machine)
+            return crafted(100)
+        ticks = iter([100.0, 107.0, 200.0, 212.0, 300.0, 400.0])
+        with unittest.mock.patch.object(ev.time, "process_time", side_effect=lambda: next(ticks)), \
+                unittest.mock.patch.object(ev, "grade_twin", side_effect=grade):
+            self.judge(forced_mutation=("KWTA.k", 8))
+        self.assertEqual(seen["incumbent"][1], 7.0)
+        self.assertEqual(seen["mutant"][1], 12.0)
+        self.assertNotEqual(seen["incumbent"][1], seen["incumbent"][0], "CPU is not the wall time")
+        self.assertEqual(sorted(seen["mutant"][2]), ["load0", "load1", "psi0", "psi1"])
 
     def test_an_unforced_round_draws_through_the_redraw(self) -> None:
         inc_text = (self.cps / "1" / "GENOME.genome").read_text()
