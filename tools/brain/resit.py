@@ -1303,9 +1303,10 @@ def _utc_stamp() -> str:
     return time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
 
 
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 17:47 +0400 — DAILY mode (run_daily, scan_life_events, daily_refusal_row): one series row a day from a COPY of the live life's state/prev; the flags refusal of daily mode
+# is a row and exit 0 (law R4); gate mode keeps exit 2.
 def cmd_run(argv: Sequence[str]) -> int:
     a = parse_run_args(argv)
-    flags = check_flags(sys.flags.dont_write_bytecode, sys.flags.isolated, os.environ)
     root = Path(a.root)
     items_root = Path(a.items_root) if a.items_root else root
     code = Path(a.code) if a.code else root / "code"
@@ -1313,9 +1314,191 @@ def cmd_run(argv: Sequence[str]) -> int:
     if inside is not None:
         raise Refused(f"--out {a.out} lies inside {inside}: nothing is ever written under a life (R5); give an OUT elsewhere")
     a.stamp = a.stamp or _utc_stamp()
+    try:
+        flags = check_flags(sys.flags.dont_write_bytecode, sys.flags.isolated, os.environ)
+    except ResitError as e:
+        if a.mode == "daily":          # law R4: in daily mode a refusal is a ROW and exit 0 — a timer must not loop
+            return daily_refusal_row(a, str(e))
+        raise
     if a.mode == "gate":
         return run_gate(a, flags, root, items_root, code)
-    raise ResitError(f"refused: --mode {a.mode} is not built yet (the law builds the gate first; daily and origin follow R1)")
+    if a.mode == "daily":
+        return run_daily(a, flags, root, items_root, code)
+    raise ResitError(f"refused: --mode {a.mode} is not built yet (the law builds the gate first, then daily; origin follows the signed v4)")
+
+
+def daily_refusal_row(a: argparse.Namespace, reason: str) -> int:
+    """A refusal before the run's own row could be built (the orchestrator's flags): still one series line, exit 0."""
+    row = {"kind": "daily", "stamp": a.stamp, "refused": reason, "reader_sha256": sha256_file(RESIT_PY)}
+    append_series(a.out, row)
+    print(json.dumps({"refused": reason, "class": "daily-row", "series": str(Path(a.out) / "RESIT.jsonl")}))
+    return 0
+
+
+def scan_life_events(journal_dir) -> Dict[str, object]:
+    """The epoch rows and the `start` event rows of a LIVE journal, streamed line by line — nothing else is parsed or kept (a live journal is hundreds of thousands of rows and is being
+    appended). A line that does not end in `}` is a half-written (or zero-filled) line and is COUNTED, never parsed: the live file's last line may be torn."""
+    epochs: List[Dict[str, object]] = []
+    starts: List[Dict[str, object]] = []
+    torn = lines = 0
+    for f in sorted(Path(journal_dir).glob("*.jsonl")):
+        with f.open(encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                lines += 1
+                s = line.rstrip()
+                if not s:
+                    continue
+                if not s.endswith("}"):
+                    torn += 1
+                    continue
+                if '"epoch"' in s:
+                    try:
+                        d = json.loads(s)
+                    except ValueError:
+                        torn += 1
+                        continue
+                    e = d.get("epoch") if isinstance(d, dict) else None
+                    if isinstance(e, dict) and "genome_sha" in e and "epoch" in e:
+                        epochs.append({"seq": int(d["seq"]), **e})
+                elif '"event"' in s and '"start"' in s:
+                    try:
+                        d = json.loads(s)
+                    except ValueError:
+                        torn += 1
+                        continue
+                    if isinstance(d, dict) and d.get("event") == "start":
+                        starts.append(d)
+    return {"epochs": epochs, "starts": starts, "torn_lines": torn, "lines_read": lines}
+
+
+def run_daily(a: argparse.Namespace, flags: Mapping[str, object], root: Path, items_root: Path, code: Path) -> int:
+    """One series row a day (law §1, §4). The LIFE (`root`) is live: only `state/prev` is copied and only epoch and start rows of its journal are read. The items are a CLOSED life's
+    (`items_root`, pinned), the grader is pinned and given the ITEMS genome (v4: one grader configuration). Every refusal or skip is a ROW and exit 0; an unexpected defect is a row
+    with its traceback and exit 1 (visible to systemd, never a loop)."""
+    cpu0, t0 = time.process_time(), time.time()
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    run_dir = out / "days" / a.stamp
+    status_path = a.status or (str(root / "STATUS.json") if (root / "STATUS.json").exists() else None)
+    row: Dict[str, object] = {"kind": "daily", "stamp": a.stamp, "reader_sha256": sha256_file(RESIT_PY), "flags": dict(flags), "root": str(root), "items_root": str(items_root),
+                              "code": os.path.realpath(code)}
+    row["live_load"] = {"start": status_reading(status_path)}
+    rc = 0
+    marker_ns: Optional[int] = None
+    try:
+        run_dir.mkdir(parents=True, exist_ok=True)
+        marker = run_dir / MARKER_NAME
+        marker.write_text(a.stamp + "\n")
+        marker_ns = marker.stat().st_mtime_ns
+        row["code_commit"] = git_info(code)
+        # the pinned items, a closed life's
+        items_genome = items_root / "GENOME.genome"
+        genome_text = items_genome.read_text()
+        tape_decl = tape_decl_of(genome_text)
+        scan = scan_items(items_root, tape_decl)
+        if not scan["n_asks"]:
+            raise Skipped(f"no sitting ask on the tape of {items_root}")
+        ws = world_seed_of(genome_text)
+        marks_json = Path(a.scored) / str(ws) / "fresh" / "marks.json" if ws is not None else None
+        scored_pin = {"path": str(marks_json) if marks_json and marks_json.exists() else None,
+                      "sha256": sha256_file(marks_json) if marks_json and marks_json.exists() else None}
+        pinned_before = (out / "ITEMS.json").exists()
+        pin_items(out, scan, scored=scored_pin, world_line_sha=world_scene_line_sha(genome_text), items_root=items_root)
+        row["items"] = {"n_asks": scan["n_asks"], "n_canvases": scan["n_canvases"], "ask_digest": scan["ask_digest"], "canvas_digest": scan["canvas_digest"],
+                        "world_seed": ws, "scored": scored_pin, "pin": "checked" if pinned_before else "written"}
+        item_class = item_class_map(scan["asks"])
+        ijs = scan_journal(items_root / "journal")
+        row["restart_duplicates"] = collapse_duplicates(ijs["answers"])["restart_duplicates"]
+        ginfo = grader_info(a.grader_code)
+        row["grader"] = {**ginfo, "pin": check_grader_pin(out, ginfo, write=False)}
+        # the live life: its copy of state/prev, and the genome in force at that copy's last seq (S1)
+        ev = scan_life_events(root / "journal")
+        copy_dir = run_dir / "copy"
+        st = copy_state_prev(root, copy_dir, sleep_s=a.copy_retry_sleep_s)
+        row["state"] = {k: st[k] for k in ("source", "last_seq", "t", "prints_ok", "attempts", "files", "prints")}
+        row["state"]["copy_dir"] = str(copy_dir)
+        gf = genome_in_force(root, ev["epochs"], upto_seq=int(st["last_seq"]))
+        life_lines = grader_line_hashes(gf["path"].read_text())
+        grader_lines = grader_line_hashes(genome_text)
+        origin = load_origin(out)
+        eye = eye_changed(life_lines, origin=(origin.get("genome_lines") if origin else None), grader=grader_lines)
+        row["genome"] = {"epoch": gf["epoch"], "path": str(gf["path"]), "sha256": gf["sha256"], "epoch_row": gf["epoch_row"], "lines": life_lines,
+                         "grader": {"path": str(items_genome), "sha256": sha256_file(items_genome), "lines": grader_lines}, "eye": eye}
+        row["eye_changed"] = bool(eye["eye_changed"])
+        # the children
+        cache = Path(a.cache) if a.cache else out / "glances.pkl"
+        cold = not cache.exists()
+        cap = a.cpu_cap_s or (CPU_CAP_COLD_S if cold else CPU_CAP_WARM_S)
+        spec = {"code": str(code), "items_root": str(items_root), "tape_decl": tape_decl, "states": [{"name": "*", "dir": str(copy_dir), "genome": str(gf["path"])}],
+                "out_dir": str(run_dir), "glance_cache": str(cache), "check_turn": None}
+        ach = run_child("answer", spec, run_dir, cpu_cap_s=cap)
+        require_child_ok(ach, cap)
+        ameta = json.loads((run_dir / "answer-meta.json").read_text())
+        row["subject"] = {"modules_digest": ameta["modules_digest"], "n_modules": len(ameta["modules"]), "python": ameta["python"]}
+        row["eye_pin"] = ameta["eye_pin"]
+        row["state"].update({k: ameta["states"][0].get(k) for k in ("state_hash", "n_learned", "calibrated_at_load", "calibrated_at_end", "state_hash_end")})
+        row["answer_meta"] = {"glance_cache": ameta["glance_cache"], "asks_seen": ameta["asks_seen"], "answered": ameta["answered"], "unanswered": ameta["unanswered"]}
+        gspec = {"grader_code": str(a.grader_code), "items_root": str(items_root), "journal": str(run_dir / "answers.jsonl"), "scored": str(a.scored), "label": a.stamp,
+                 "genome": str(items_genome), "out_dir": str(run_dir), "m2a_rows": True}
+        gch = run_child("grade", gspec, run_dir, cpu_cap_s=cap)
+        require_child_ok(gch, cap)
+        gmeta = json.loads((run_dir / "grade-meta.json").read_text())
+        row["grader"]["modules_digest"] = gmeta["modules_digest"]
+        row["grader"]["pin"] = check_grader_pin(out, {**ginfo, "modules_digest": gmeta["modules_digest"]})
+        grade = json.loads((run_dir / "grade.json").read_text())
+        extra = json.loads((run_dir / "items_extra.json").read_text())
+        row["answers_sha256"] = sha256_file(run_dir / "answers.jsonl")
+        row["grade_sha256"] = sha256_file(run_dir / "grade.json")
+        row["m6_reading"] = {"M6_pooled": grade.get("M6_pooled"), "read_by": (grade.get("meeting") or {}).get("read_by"), "meeting_seen": (grade.get("meeting") or {}).get("seen")}
+        # the tables, the partition (R6), the vectors, the pairing against the origin
+        records = records_from_grade(grade, extra.get("m2a"), item_class)
+        row["marks"] = class_tables(records)
+        row["partition"] = partition_check(records, grade)
+        require_partition(row["partition"])
+        row["marks_aggregate"] = {s: {m: dict(zip(("n", "k", "items"), _grade_aggregate(grade, s, m) or (None, None, None))) for m in records} for s in (grade.get("sets") or {})}
+        m5 = grade.get("M5") or {}
+        row["marks_aggregate"]["M5"] = {k: m5.get(k) for k in ("n", "refused", "named", "verdict")}
+        vec = vectors_from_records(records)
+        row["vectors"], row["item_class"] = vec["vectors"], vec["item_class"]
+        pair = pair_with_origin({"vectors": vec["vectors"], "item_class": vec["item_class"]}, origin)
+        row["vs_origin"], row["vs_origin_note"] = pair["vs_origin"], pair["note"]
+        if origin is not None and eye["eye_changed"]:
+            row["vs_origin_label"] = "EYE-CHANGED reading (an anomaly, AM2): the pairing is printed only as a reading; no verdict copy is read through it"
+        row["post_origin_learned"] = (post_origin_learned(int(row["state"]["n_learned"]), int(origin["origin_n_learned_fresh_begin"])) if origin else None)
+        row["restarts_between"] = (restarts_info(ev["starts"], int(origin["begin_seq_fresh"]), int(st["last_seq"])) if origin else None)
+        row["journal_events"] = {"epochs": len(ev["epochs"]), "start_rows": len(ev["starts"]), "torn_lines": ev["torn_lines"], "lines_read": ev["lines_read"]}
+        series = out / "RESIT.jsonl"
+        prior = [json.loads(l) for l in series.read_text().splitlines() if l.strip()] if series.exists() else []
+        prior = [r for r in prior if r.get("kind") == "daily" and "refused" not in r and "skipped" not in r]
+        flagged = flag_verdict_copy(prior + [dict(row)])[-1]
+        for k in ("verdict_copy", "verdict_copy_note"):
+            if k in flagged:
+                row[k] = flagged[k]
+        row["cpu"] = {"answer_s": ach["cpu_s"], "grade_s": gch["cpu_s"], "orchestrator_s": round(time.process_time() - cpu0, 3), "cap_s": cap, "cold": cold,
+                      "answer_self_s": ameta.get("cpu_s"), "grade_self_s": gmeta.get("cpu_s")}
+        row["cpu"]["total_s"] = round(ach["cpu_s"] + gch["cpu_s"] + row["cpu"]["orchestrator_s"], 3)
+        row["memory"] = {"answer_maxrss_mb": ach["maxrss_mb"], "grade_maxrss_mb": gch["maxrss_mb"], "orchestrator_maxrss_mb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0, 1)}
+    except Skipped as e:
+        row["skipped"] = str(e)
+    except ResitError as e:
+        row["refused"] = str(e)
+    except Exception as e:                      # a defect of the reader: the row carries it, the unit fails visibly (exit 1), nothing loops
+        import traceback
+        row["refused"], row["error"], row["traceback"] = f"ERROR: {type(e).__name__}: {e}", True, traceback.format_exc()[-3000:]
+        rc = 1
+    finally:
+        row["live_load"]["end"] = status_reading(status_path)
+        if marker_ns is not None:
+            row["nothing_written"] = dict(newer_than(_outermost([items_root]), marker_ns), checked=True,
+                                          scope="the CLOSED items root only; the live root is written by its own life and cannot be checked by a find (it is only read)")
+        row["wall_s"] = round(time.time() - t0, 3)
+        append_series(out, row)
+    msg = {"stamp": a.stamp, "series": str(out / "RESIT.jsonl")}
+    for k in ("refused", "skipped", "verdict_copy", "verdict_copy_note"):
+        if k in row:
+            msg[k] = row[k]
+    print(json.dumps(msg))
+    return rc
 
 
 def run_gate(a: argparse.Namespace, flags: Mapping[str, object], root: Path, items_root: Path, code: Path) -> int:
@@ -1477,6 +1660,139 @@ def run_gate(a: argparse.Namespace, flags: Mapping[str, object], root: Path, ite
         short["r1b"] = {k: row["r1b"].get(k) for k in ("equal", "n_leaves")}
     print(json.dumps(short, default=str))
     return rc
+
+
+# ================================================================================================ Part 4 — the SERIES helpers (law §2, §4, R6; §1.2 v4)
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 17:42 +0400 — the phrase-class tables of §2 built from the grader's own per-item rows, the per-item vectors the pairing of §4 reads, R6's partition check against
+# the grade's own aggregates, and the grader/life genome line hashes of §1.2 (v4) with EYE-CHANGED's two forms. Pure: no life, no numpy.
+GRADER_EYE_LINES = ("retina", "gaze", "colour")                    # the eye lines grade_life.py reads (meeting_seen's own look)
+WITHIN_LIFE_LINES = ("retina", "gaze", "colour", "brain")           # AM2: EVOLVE cannot move any of them
+AGAINST_GRADER_LINES = ("retina", "gaze", "colour", "world_scene", "tape")     # v4 §1.2 (ii): every line the grader reads from its genome argument, BRAIN excluded
+
+
+def item_class_map(asks: Sequence[Mapping[str, object]]) -> Dict[str, str]:
+    """{item name: phrase class} for the asks of the three class marks (M1, M2a, M3) — the key of every table and vector is the ITEM NAME."""
+    return {str(a["item"]): str(a["class"]) for a in asks if a.get("item") is not None and "class" in a}
+
+
+def records_from_grade(grade: Mapping[str, object], m2a_rows: Optional[Mapping[str, Sequence[Mapping[str, object]]]],
+                       item_class: Mapping[str, str]) -> Dict[str, Dict[str, List[Dict[str, object]]]]:
+    """{mark: {set: [{"item", "class", "in_g", "correct", "gradable", "covered"}]}} from the PINNED grader's own per-item rows: M1 and M3 from `grade["items"][set][mark]`
+    (covered and gradable = in the graded population, `correct` its pointing), M2a from the GRADE child's items_extra rows (answered = in it, `refused` = right). An item with no
+    class is refused by name — never binned (R6)."""
+    out: Dict[str, Dict[str, List[Dict[str, object]]]] = {m: {} for m in CLASS_MARKS}
+
+    def klass(item: str, mark: str, s: str) -> str:
+        c = item_class.get(item)
+        if c is None:
+            raise ResitError(f"refused: item {item} ({mark}, set {s}) has no phrase class — a phrase is never binned by guess (R6)")
+        return c
+
+    for s, per in (grade.get("items") or {}).items():
+        for mark in ("M1", "M3"):
+            recs = []
+            for r in per.get(mark, []):
+                item = str(r["item_id"])
+                gradable, covered = bool(r["gradable"]), bool(r["covered"])
+                recs.append({"item": item, "class": klass(item, mark, s), "in_g": gradable and covered, "correct": bool(r["correct"]), "gradable": gradable, "covered": covered})
+            out[mark][s] = recs
+    for s, rows in (m2a_rows or {}).items():
+        recs = []
+        for r in rows:
+            item = str(r["item_id"])
+            answered = bool(r["answered"])
+            recs.append({"item": item, "class": klass(item, "M2a", s), "in_g": answered, "correct": bool(r["refused"]) if answered else False, "gradable": answered, "covered": answered})
+        out["M2a"][s] = recs
+    return {m: v for m, v in out.items() if any(v.values())}
+
+
+def class_tables(records: Mapping[str, Mapping[str, Sequence[Mapping[str, object]]]]) -> Dict[str, Dict[str, object]]:
+    """Per mark: the class table of each set and the table pooled over the sets (HEARS-2 A2.2's reading unit): items, n, k, left_out, rate, 10 / n, UNDERPOWERED, n/a."""
+    out: Dict[str, Dict[str, object]] = {}
+    for mark, per_set in records.items():
+        out[mark] = {"sets": {s: class_rates(recs) for s, recs in per_set.items()}, "pooled": class_rates([r for recs in per_set.values() for r in recs])}
+    return out
+
+
+def _grade_aggregate(grade: Mapping[str, object], s: str, mark: str) -> Optional[Tuple[int, int, Optional[int]]]:
+    """The grade's OWN aggregate (n, k, n_items) of a mark in a set: M1 `graded` covered rate over n_covered, M3 `all` covered over n_covered, M2a `LAW` refusal over n."""
+    st = (grade.get("sets") or {}).get(s) or {}
+    m = st.get("marks") or {}
+    if mark == "M1":
+        a, nk, rk = _dig(m, "M1", "graded"), "n_covered", "covered"
+    elif mark == "M3":
+        a, nk, rk = _dig(m, "M3", "all"), "n_covered", "covered"
+    else:
+        a, nk, rk = _dig(m, "roads", "LAW", "M2a", "all"), "n", "refusal"
+    if a is _ABSENT or not isinstance(a, dict) or nk not in a:
+        return None
+    n = int(a[nk])
+    rate = a.get(rk)
+    k = 0 if rate is None else rate * n
+    if abs(k - round(k)) > 1e-6:
+        return (n, -1, (st.get("n_items") or {}).get(mark))
+    return (n, int(round(k)), (st.get("n_items") or {}).get(mark))
+
+
+def partition_check(records: Mapping[str, Mapping[str, Sequence[Mapping[str, object]]]], grade: Mapping[str, object]) -> Dict[str, object]:
+    """R6: per mark and set the classes' items sum to the set's items (the grade's own `n_items` when it carries it) and the classes' (k, n) sum to the grade's OWN aggregate (k, n).
+    FAIL CLOSED: a mark whose aggregate the grade does not carry cannot be proven and reads not-ok."""
+    rows: List[Dict[str, object]] = []
+    for mark, per_set in records.items():
+        for s, recs in per_set.items():
+            t = class_rates(recs)
+            items_c, n_c, k_c = sum(v["items"] for v in t.values()), sum(v["n"] for v in t.values()), sum(v["k"] for v in t.values())
+            agg = _grade_aggregate(grade, s, mark)
+            row: Dict[str, object] = {"mark": mark, "set": s, "items_classes": items_c, "n_classes": n_c, "k_classes": k_c, "n_agg": None, "k_agg": None, "items_agg": None, "note": ""}
+            if agg is None:
+                row["ok"], row["note"] = False, "the grade carries no aggregate for this mark: the partition cannot be proven"
+            else:
+                row["n_agg"], row["k_agg"], row["items_agg"] = agg
+                row["ok"] = bool(n_c == agg[0] and k_c == agg[1] and (agg[2] is None or items_c == agg[2]) and items_c == len(recs))
+                if agg[1] < 0:
+                    row["note"] = "the aggregate's rate × n is not an integer"
+            rows.append(row)
+    return {"ok": all(r["ok"] for r in rows), "rows": rows}
+
+
+def require_partition(res: Mapping[str, object]) -> None:
+    bad = [r for r in res["rows"] if not r["ok"]]
+    if bad:
+        raise Refused("R6 PARTITION: the classes do not sum to the grade's own aggregate for " + "; ".join(
+            f"{b['mark']}/{b['set']} (classes n {b['n_classes']} k {b['k_classes']} items {b['items_classes']}, grade n {b['n_agg']} k {b['k_agg']} items {b['items_agg']}{' — ' + b['note'] if b['note'] else ''})"
+            for b in bad[:4]))
+
+
+def vectors_from_records(records: Mapping[str, Mapping[str, Sequence[Mapping[str, object]]]]) -> Dict[str, object]:
+    """Per mark, by ITEM NAME: 1 right, 0 wrong, None not in the graded population (left out of every pairing). Plus each item's class. The pairing of §4 reads only these."""
+    vec: Dict[str, Dict[str, Optional[int]]] = {m: {} for m in records}
+    item_class: Dict[str, str] = {}
+    for mark, per_set in records.items():
+        for recs in per_set.values():
+            for r in recs:
+                vec[mark][str(r["item"])] = (1 if r["correct"] else 0) if r["in_g"] else None
+                item_class[str(r["item"])] = str(r["class"])
+    return {"vectors": vec, "item_class": item_class}
+
+
+def grader_line_hashes(genome_text: str) -> Dict[str, str]:
+    """The hashes of every genome line the GRADER reads from its genome argument (`WORLD scene`, `TAPE`, RETINA, GAZE, SENSE colour) and of the BRAIN line (a reading: the grader never reads it),
+    comment- and whitespace-normalised, plus the whole file's."""
+    h = genome_line_hashes(genome_text)
+    tape = [n for n in (_norm_line(l) for l in genome_text.splitlines()) if n.split()[:1] == ["TAPE"]]
+    return {**h, "world_scene": world_scene_line_sha(genome_text), "tape": sha256_bytes("\n".join(tape).encode("utf-8"))}
+
+
+def eye_changed(life: Mapping[str, str], *, origin: Optional[Mapping[str, str]], grader: Optional[Mapping[str, str]]) -> Dict[str, object]:
+    """EYE-CHANGED, v4 §1.2: form (i) within the life — any of RETINA, GAZE, SENSE colour, BRAIN of this row's in-force genome differs from the ORIGIN's (AM2; undetermined with no origin yet);
+    form (ii) against the grader — any of RETINA, GAZE, SENSE colour, WORLD scene, TAPE differs from the grader genome's. The BRAIN line is NOT compared across lives (it differs by the ladder's
+    design and the grader never reads it); its hashes are printed as a reading."""
+    within = [k for k in WITHIN_LIFE_LINES if origin is not None and life[k] != origin[k]]
+    against = [k for k in AGAINST_GRADER_LINES if grader is not None and life[k] != grader[k]]
+    return {"within_life": (None if origin is None else bool(within)), "within_life_lines": within, "against_grader": bool(against), "against_grader_lines": against,
+            "eye_changed": bool(within or against),
+            "brain_reading": {"life": life["brain"], "grader": (grader["brain"] if grader else None), "origin": (origin["brain"] if origin else None)},
+            "note": "NO ORIGIN: form (i) cannot be determined yet" if origin is None else ""}
 
 
 if __name__ == "__main__":

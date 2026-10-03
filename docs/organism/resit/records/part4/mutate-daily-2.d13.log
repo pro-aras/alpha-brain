@@ -1,0 +1,3 @@
+CAUGHT    D13 R6: an item with no class is given one instead of being refused  [FAILED (failures=1)]  (24 s)
+restored: sha256 equal (53a5bb115e74c6e7)
+survivors: []

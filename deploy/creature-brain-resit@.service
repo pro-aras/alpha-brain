@@ -1,0 +1,20 @@
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 17:53 +0400 — PREREG-RESIT-READER v4 §1.0: the daily OFFLINE re-sit of a life's saved brain (%i = the life's name). WRITTEN, NOT ENABLED — the seat enables it
+# for brain-long-3 after launch (`systemctl --user enable --now creature-brain-resit@brain-long-3.timer`) and fixes the two paths that are the seat's: the reader checkout (below: master's) and the
+# PINNED grader checkout (a detached checkout of the commit carrying HEARS-2 A4's grader, d2fe75b or later: `git worktree add --detach /data/dev/brain-runs/resit/grader-d2fe75b d2fe75b`).
+# It READS: a copy of the live life's state/prev, its journal's epoch and start rows, its STATUS.json; it WRITES only under /data/dev/brain-runs/resit/%i (never under a life). The items are brain-long-2's
+# CLOSED root (the same seed's fixed sittings, pinned in ITEMS.json on the first run).
+# Own cgroup: CPUWeight=10 and Nice=15 (`nice` divides a cgroup, never the box, SOLUTIONS #247 (4)). MemoryMax is set from the MEASURED peaks of R1/R2 (records/r1-brain-long-2, records/rruns-brain-long-2):
+# answer child 1,337 MB peak RSS, grade child 643 MB, the slot cgroup peak 2,035 MB with page cache; 4G is twice that. RLIMIT_CPU is the reader's own (R7: 30 CPU-min cold, 8 warm).
+[Unit]
+Description=creature-brain-resit %i — a daily OFFLINE re-sit of the saved brain on the fixed sittings (reads only)
+
+[Service]
+Type=oneshot
+CPUWeight=10
+Nice=15
+MemoryMax=4G
+MemorySwapMax=512M
+Environment=OPENBLAS_NUM_THREADS=1
+Environment=OMP_NUM_THREADS=1
+WorkingDirectory=/data/dev/genome
+ExecStart=/usr/bin/python3 -B -I /data/dev/genome/tools/brain/resit.py run --mode daily --root /data/dev/genome-lives/%i --code /data/dev/genome-lives/%i/code --items-root /data/dev/genome-lives/brain-long-2 --grader-code /data/dev/brain-runs/resit/grader-d2fe75b --out /data/dev/brain-runs/resit/%i --scored /data/dev/brain-runs/scene-s1b1r --status /data/dev/genome-lives/%i/STATUS.json
