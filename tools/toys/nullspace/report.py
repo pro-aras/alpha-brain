@@ -183,8 +183,9 @@ def render(an: Mapping[str, object], summ, seeds: Sequence[int], counts: Optiona
     L.append(f"{'arm':14s} {'B-PROTECT':>10s} {'B-NULLSP':>9s} {'B-SHRINK':>9s} {'B-PLASTIC':>10s}   class                     removed share (BWT_2/3/4)   BWT_3 BWT_4   plast2 plast3")
     for name, a in an["arms"].items():
         sh = a["removed_share"]
-        L.append(f"{name:14s} {a['B_PROTECT']['n']:>5d}/10 {'Y' if a['B_PROTECT']['ok'] else '·'} {a['B_NULLSPACE']['n']:>4d}/10 {'Y' if a['B_NULLSPACE']['ok'] else '·'} "
-                 f"{a['B_SHRINK']['n']:>4d}/10 {'Y' if a['B_SHRINK']['ok'] else '·'} {a['B_PLASTIC']['n']:>5d}/10 {'Y' if a['B_PLASTIC']['ok'] else '·'}   {a['class']:24s} "
+        ns_ = len(seeds)
+        L.append(f"{name:14s} {a['B_PROTECT']['n']:>5d}/{ns_} {'Y' if a['B_PROTECT']['ok'] else '·'} {a['B_NULLSPACE']['n']:>4d}/{ns_} {'Y' if a['B_NULLSPACE']['ok'] else '·'} "
+                 f"{a['B_SHRINK']['n']:>4d}/{ns_} {'Y' if a['B_SHRINK']['ok'] else '·'} {a['B_PLASTIC']['n']:>5d}/{ns_} {'Y' if a['B_PLASTIC']['ok'] else '·'}   {a['class']:24s} "
                  f"{sh.get(2, float('nan')):+.2f} / {sh.get(3, float('nan')):+.2f} / {sh.get(4, float('nan')):+.2f}   {a['bwt'][3]:+.3f} {a['bwt'][4]:+.3f}   {a['plast'][2]:.3f} {a['plast'][3]:.3f}")
     L.append("")
     L.append("PLANTED CONTROLS: " + (f"PB1 ANTI-OWM must LOSE to PLAIN on BWT_3: at {an['PB1']['n']} of {len(seeds)} seeds → {'CAUGHT' if an['PB1']['ok'] else 'NOT CAUGHT (the mark is blind to the projector)'}" if an["PB1"] else "PB1 absent")
