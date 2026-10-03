@@ -1,5 +1,5 @@
-4d5efe1001db5e5ef865b4fd918603d0457623bc9c946903173eb7fdde603e2f  ./INDEX.md
-d59bcee551cfdb2fe71364e17c5d0cc5857fc6380141d4370c76f738b07b842c  ./make_bl3_index.py
+b12650cc4a06ace57abd69583b714ff12befb06b866738caf1749ccd2a8e8e0c  ./INDEX.md
+9f669c13523f1f18b652daae8495e74bcc6945d524115d52d4d1c1483e8af819  ./make_bl3_index.py
 9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  ./measure/measure.exit
 c7d8eebad8010859edf439eb78178e487cedf8708b92b140050ffb795c208ecf  ./measure/measure.json
 ef95ac9ed8fd2fd13dd66940e7ac16d9c6e6a2c335f59ce0d473fcca67c173fa  ./measure/measure_source_copy.py
@@ -20,6 +20,7 @@ f2b0599575b7caebe622d73c5493785f27d9b5e7f8d7c663c0632f411d582ee7  ./production/O
 e2bb0a6bc49e22aa25ba0536efad833365a1e62d5ee631530fbeb9107962bec2  ./production/RESIT.md
 d180aa7a849b928dbaa5aa5eee82103b3c9054363c4a8863dd44e0995096c714  ./production/run_bl3_origin_production.sh
 21447aedad992ddc7266f1402e823cfd0fb5a12a7744c975b5bbed15e32f19d7  ./production/slot-ledger-lines.txt
+2927633a5c9d17b9ea00ea019ebde3174ae899e4707d4a2fe828063e13dbabb0  ./production/state-copy-untouched.txt
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./production/stderr.txt
 7b781ce35cc8167d0b2c99d4f4181fa0274de1c1509ff6ef059653527b001c81  ./production/stdout.txt
 07755951a6bf7eb18b99e68253b8531bc09d04d45f7918b824bb56a4fedfc39e  ./production/time.txt
