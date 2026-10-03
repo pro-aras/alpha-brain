@@ -1,0 +1,9 @@
+SPLIT creature on 9d43829ab9f57c9288d4ae8d54c34fe139565ad5 (/data/dev/genome-wt-poller-g1) · 2026-10-03 22:16:39 +0400 · parts 3 · cap 10G swap 1G · expected Ran 1424
+files 137 under tests/creature (test*.py, recursive; 0 in subdirectories) · patterns ['test_[a-f]*.py', 'test_[g-r]*.py', 'test_[s-z]*.py'] · files per pattern [40, 53, 44] · in exactly one pattern: 137
+PARTITION EXACT
+slot exit 1 at 2026-10-03 22:44:10 +0400
+part 1 (test_[a-f]*.py): exit 0 · Ran 444 tests in 660.414s OK (skipped=5)  · memory.peak 8310222848 bytes
+part 2 (test_[g-r]*.py): exit 1 · Ran 559 tests in 572.074s FAILED (failures=1, skipped=1)  · memory.peak 10737418240 bytes
+FAIL: test_declared_run_tape2_moves_the_directory (tests.creature.test_gene_values.TestTapeDeclaredPath.test_declared_run_tape2_moves_the_directory)
+part 3 (test_[s-z]*.py): exit 0 · Ran 421 tests in 413.171s OK  · memory.peak 10737418240 bytes
+SUM Ran 1424 vs expected 1424 · every part exit 0: NO · split verdict exit 1

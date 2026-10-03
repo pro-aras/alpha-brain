@@ -1,0 +1,23 @@
+# suite brain on 9d43829ab9f57c9288d4ae8d54c34fe139565ad5 (/data/dev/genome-wt-poller-g1) under /data/dev/venvs/brain/bin/python, started 2026-10-03 22:30:14 +0400 · memory.peak = the slot scope's running maximum since its creation (exact for this run only if it exceeds every earlier run in the same scope)
+................................................................................................/data/dev/genome-wt-poller-g1/brain/arms/transformer/a4.py:226: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  confidences.append(float(torch.softmax(logits, -1).max()))
+...................................................................................[record] /data/dev/genome-wt-poller-g1/scratch/tmp/tmpx0e83pnj/20261001/D: 4 closed snapshots · 4 SLEEP rows in cost.jsonl
+  sleep  1 seq   100: mtime−mtime₁     0.000 s · wall_s−wall_s₁     0.000 s · diff +0.000 s · arm_ms/1000     0.018 s · wall_s     0.020 s
+  sleep  2 seq   200: mtime−mtime₁     0.010 s · wall_s−wall_s₁     0.010 s · diff +0.000 s · arm_ms/1000     0.027 s · wall_s     0.030 s
+  sleep  3 seq   300: mtime−mtime₁     1.480 s · wall_s−wall_s₁     1.480 s · diff -0.000 s · arm_ms/1000     1.350 s · wall_s     1.500 s
+  sleep  4 seq   400: mtime−mtime₁     3.080 s · wall_s−wall_s₁     3.080 s · diff -0.000 s · arm_ms/1000     2.790 s · wall_s     3.100 s
+[record] worst |mtime clock − cost clock| = 0.000 s (tolerance 0.25 s) → PASS
+[record] /data/dev/genome-wt-poller-g1/scratch/tmp/tmpx0e83pnj/20261001/D: 4 closed snapshots · 4 SLEEP rows in cost.jsonl
+  sleep  1 seq   100: mtime−mtime₁     0.000 s · wall_s−wall_s₁     0.000 s · diff +0.000 s · arm_ms/1000     0.018 s · wall_s     0.020 s
+  sleep  2 seq   200: mtime−mtime₁     0.010 s · wall_s−wall_s₁     0.010 s · diff +0.000 s · arm_ms/1000     0.027 s · wall_s     0.030 s
+  sleep  3 seq   300: mtime−mtime₁     2.480 s · wall_s−wall_s₁     1.480 s · diff +1.000 s · arm_ms/1000     1.350 s · wall_s     1.500 s
+  sleep  4 seq   400: mtime−mtime₁     3.080 s · wall_s−wall_s₁     3.080 s · diff -0.000 s · arm_ms/1000     2.790 s · wall_s     3.100 s
+[record] worst |mtime clock − cost clock| = 1.000 s (tolerance 0.25 s) → FAIL
+...................................................s............................................................................................................................................s.............s.............................................................................................................................................................................................................................................................................................[grade-tmem2 20261101] written
+....................................................................................................
+----------------------------------------------------------------------
+Ran 770 tests in 415.890s
+
+OK (skipped=3)
+# ended 2026-10-03 22:37:15 +0400 exit 0 · memory.peak 985944064 bytes · cgroup /sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/slot-hears-g6-brain-1311435.scope

@@ -1,0 +1,48 @@
+G2 over 40 saved states, from the runs' own rows: recorded 40 of 40
+presence: the ledger carried canvas_index in 40 of 40; the ORIGINAL manifest carried it in 0 of 40 (the old-format premise: 0)
+started 40 of 40; read 40; compared 40; DIFFERING 0
+road before (the old reader on the original copy) = ledger on 40 of 40; road after Mind.resume + Mind.snapshot() under the OVERLAY = snapshot on 40 of 40
+the ablated-system guard (the key stripped from the new manifest) fell to the ledger road on 40 of 40; the +1 plant was reported DIFFERENT on 40 of 40
+every check of a state holds on 40 of 40; copies verified file by file (size and mtime_ns): 1026 files, 0 mismatches
+resume 537.1 s + snapshot 660.9 s in all; the largest process HWM 4280.0 MB
+RESULT: OK
+  ck1           moments 8215 canvas_index 1523 old ledger:1523 new snapshot:1523 resume 0.86s snapshot 1.16s hwm 366.0 MB OK
+  ck2           moments 190225 canvas_index 35005 old ledger:35005 new snapshot:35005 resume 5.27s snapshot 6.16s hwm 1589.0 MB OK
+  ck3           moments 284965 canvas_index 52473 old ledger:52473 new snapshot:52473 resume 9.73s snapshot 9.21s hwm 2229.0 MB OK
+  ck4           moments 333110 canvas_index 61302 old ledger:61302 new snapshot:61302 resume 9.25s snapshot 10.4s hwm 2392.0 MB OK
+  ck5           moments 350790 canvas_index 64558 old ledger:64558 new snapshot:64558 resume 10.19s snapshot 10.11s hwm 2448.0 MB OK
+  ck6           moments 359680 canvas_index 66216 old ledger:66216 new snapshot:66216 resume 9.74s snapshot 11.02s hwm 2462.0 MB OK
+  ck7           moments 371530 canvas_index 68386 old ledger:68386 new snapshot:68386 resume 10.12s snapshot 10.65s hwm 2487.0 MB OK
+  ck8           moments 380780 canvas_index 70076 old ledger:70076 new snapshot:70076 resume 10.91s snapshot 11.62s hwm 2505.0 MB OK
+  ck9           moments 389840 canvas_index 71768 old ledger:71768 new snapshot:71768 resume 12.09s snapshot 11.71s hwm 2527.0 MB OK
+  ck10          moments 399240 canvas_index 73488 old ledger:73488 new snapshot:73488 resume 11.76s snapshot 11.94s hwm 2545.0 MB OK
+  ck11          moments 408550 canvas_index 75190 old ledger:75190 new snapshot:75190 resume 12.8s snapshot 12.5s hwm 2558.0 MB OK
+  ck12          moments 417855 canvas_index 76891 old ledger:76891 new snapshot:76891 resume 12.37s snapshot 13.25s hwm 2577.0 MB OK
+  ck13          moments 428180 canvas_index 78796 old ledger:78796 new snapshot:78796 resume 12.52s snapshot 13.44s hwm 2595.0 MB OK
+  ck14          moments 437185 canvas_index 80477 old ledger:80477 new snapshot:80477 resume 11.44s snapshot 13.95s hwm 2612.0 MB OK
+  ck15          moments 446285 canvas_index 82137 old ledger:82137 new snapshot:82137 resume 12.18s snapshot 13.76s hwm 2634.0 MB OK
+  ck16          moments 455520 canvas_index 83824 old ledger:83824 new snapshot:83824 resume 12.24s snapshot 15.82s hwm 2654.0 MB OK
+  ck17          moments 464265 canvas_index 85453 old ledger:85453 new snapshot:85453 resume 12.7s snapshot 17.57s hwm 2671.0 MB OK
+  ck18          moments 473385 canvas_index 87117 old ledger:87117 new snapshot:87117 resume 12.97s snapshot 18.5s hwm 2687.0 MB OK
+  ck19          moments 482330 canvas_index 88786 old ledger:88786 new snapshot:88786 resume 12.8s snapshot 17.36s hwm 2706.0 MB OK
+  ck20          moments 491385 canvas_index 90437 old ledger:90437 new snapshot:90437 resume 13.09s snapshot 16.49s hwm 2723.0 MB OK
+  ck21          moments 500710 canvas_index 92142 old ledger:92142 new snapshot:92142 resume 13.28s snapshot 18.42s hwm 2744.0 MB OK
+  ck22          moments 509795 canvas_index 93839 old ledger:93839 new snapshot:93839 resume 13.22s snapshot 16.64s hwm 2748.0 MB OK
+  ck23          moments 519145 canvas_index 95549 old ledger:95549 new snapshot:95549 resume 13.24s snapshot 18.85s hwm 2755.0 MB OK
+  ck24          moments 528430 canvas_index 97246 old ledger:97246 new snapshot:97246 resume 13.0s snapshot 16.21s hwm 2764.0 MB OK
+  ck25          moments 537370 canvas_index 98914 old ledger:98914 new snapshot:98914 resume 13.01s snapshot 19.36s hwm 2769.0 MB OK
+  ck26          moments 546145 canvas_index 100509 old ledger:100509 new snapshot:100509 resume 13.41s snapshot 21.39s hwm 2825.0 MB OK
+  ck27          moments 555230 canvas_index 102166 old ledger:102166 new snapshot:102166 resume 13.53s snapshot 20.83s hwm 2867.0 MB OK
+  ck28          moments 564085 canvas_index 103817 old ledger:103817 new snapshot:103817 resume 18.15s snapshot 21.06s hwm 3475.0 MB OK
+  ck29          moments 573305 canvas_index 105501 old ledger:105501 new snapshot:105501 resume 16.05s snapshot 22.37s hwm 3583.0 MB OK
+  ck30          moments 582285 canvas_index 107177 old ledger:107177 new snapshot:107177 resume 16.03s snapshot 18.81s hwm 3607.0 MB OK
+  ck31          moments 592085 canvas_index 108977 old ledger:108977 new snapshot:108977 resume 17.78s snapshot 18.49s hwm 3772.0 MB OK
+  ck32          moments 601185 canvas_index 110637 old ledger:110637 new snapshot:110637 resume 16.77s snapshot 22.13s hwm 3828.0 MB OK
+  ck33          moments 610280 canvas_index 112296 old ledger:112296 new snapshot:112296 resume 17.91s snapshot 22.37s hwm 3840.0 MB OK
+  ck34          moments 619245 canvas_index 113969 old ledger:113969 new snapshot:113969 resume 17.89s snapshot 23.42s hwm 3941.0 MB OK
+  ck35          moments 628330 canvas_index 115626 old ledger:115626 new snapshot:115626 resume 17.8s snapshot 20.28s hwm 4058.0 MB OK
+  ck36          moments 637195 canvas_index 117279 old ledger:117279 new snapshot:117279 resume 20.53s snapshot 24.06s hwm 4036.0 MB OK
+  ck37          moments 646355 canvas_index 118951 old ledger:118951 new snapshot:118951 resume 18.78s snapshot 23.43s hwm 4143.0 MB OK
+  ck38          moments 655485 canvas_index 120617 old ledger:120617 new snapshot:120617 resume 18.2s snapshot 26.91s hwm 4280.0 MB OK
+  final         moments 660885 canvas_index 121617 old ledger:121617 new snapshot:121617 resume 24.21s snapshot 25.02s hwm 4027.0 MB OK
+  bl3-fallback  moments 303200 canvas_index 55800 old ledger:55800 new snapshot:55800 resume 9.26s snapshot 14.2s hwm 2327.0 MB OK

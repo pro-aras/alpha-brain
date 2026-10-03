@@ -1,0 +1,453 @@
+....FFFF.F..F....F.EEEEEEEEEEEEEEEEEEEEEEEEEEEF.
+======================================================================
+ERROR: test_a_key_that_is_not_a_count_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road) (key=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 468, in test_a_key_that_is_not_a_count_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a bool is not a count (True would read 1), and neither is a str, a float, a list")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_key_that_is_not_a_count_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road) (key=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 468, in test_a_key_that_is_not_a_count_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a bool is not a count (True would read 1), and neither is a str, a float, a list")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_key_that_is_not_a_count_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road) (key=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 468, in test_a_key_that_is_not_a_count_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a bool is not a count (True would read 1), and neither is a str, a float, a list")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_key_that_is_not_a_count_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road) (key='520')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 468, in test_a_key_that_is_not_a_count_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a bool is not a count (True would read 1), and neither is a str, a float, a list")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_key_that_is_not_a_count_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road) (key=520.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 468, in test_a_key_that_is_not_a_count_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a bool is not a count (True would read 1), and neither is a str, a float, a list")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_key_that_is_not_a_count_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road) (key=[520])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 468, in test_a_key_that_is_not_a_count_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a bool is not a count (True would read 1), and neither is a str, a float, a list")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_key_that_is_not_a_count_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road) (key={'n': 520})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 468, in test_a_key_that_is_not_a_count_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a bool is not a count (True would read 1), and neither is a str, a float, a list")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_keyless_manifest_never_stands_in_t_over_fixations (tests.creature.test_poller_cursor.TestReaderRoads.test_a_keyless_manifest_never_stands_in_t_over_fixations)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 458, in test_a_keyless_manifest_never_stands_in_t_over_fixations
+    count, road = self.now(fx)
+                  ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_keyless_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_a_keyless_manifest_takes_the_ledger_road)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 448, in test_a_keyless_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"))
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_torn_ledger_is_zero_not_a_crash (tests.creature.test_poller_cursor.TestReaderRoads.test_a_torn_ledger_is_zero_not_a_crash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 488, in test_a_torn_ledger_is_zero_not_a_crash
+    self.assertEqual(self.now(fx), (0, "ledger"))
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_an_unreadable_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road) (manifest='not json')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 476, in test_an_unreadable_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a missing/unreadable/non-UTF-8/non-JSON manifest falls through to the ledger")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_an_unreadable_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road) (manifest='not utf-8')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 476, in test_an_unreadable_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a missing/unreadable/non-UTF-8/non-JSON manifest falls through to the ledger")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_an_unreadable_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road) (manifest='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 476, in test_an_unreadable_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a missing/unreadable/non-UTF-8/non-JSON manifest falls through to the ledger")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_an_unreadable_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road) (manifest='truncated')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 476, in test_an_unreadable_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a missing/unreadable/non-UTF-8/non-JSON manifest falls through to the ledger")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_an_unreadable_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road) (manifest='a list')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 476, in test_an_unreadable_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a missing/unreadable/non-UTF-8/non-JSON manifest falls through to the ledger")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_an_unreadable_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road) (manifest='a string')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 476, in test_an_unreadable_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a missing/unreadable/non-UTF-8/non-JSON manifest falls through to the ledger")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_an_unreadable_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road) (manifest='null')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 476, in test_an_unreadable_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a missing/unreadable/non-UTF-8/non-JSON manifest falls through to the ledger")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_an_unreadable_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road) (manifest='a dict without the key')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 476, in test_an_unreadable_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"), "a missing/unreadable/non-UTF-8/non-JSON manifest falls through to the ledger")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_an_unreadable_manifest_takes_the_ledger_road (tests.creature.test_poller_cursor.TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 478, in test_an_unreadable_manifest_takes_the_ledger_road
+    self.assertEqual(self.now(fx), (520, "ledger"))
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_no_files_is_none_road_and_the_state_directory_may_be_absent (tests.creature.test_poller_cursor.TestReaderRoads.test_no_files_is_none_road_and_the_state_directory_may_be_absent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 482, in test_no_files_is_none_road_and_the_state_directory_may_be_absent
+    self.assertEqual(self.now(fx), (None, "none"), "no state directory at all: the tick is skipped, as today when ledger.json does not exist")
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_the_manifest_is_read_afresh_every_call (tests.creature.test_poller_cursor.TestReaderRoads.test_the_manifest_is_read_afresh_every_call)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 495, in test_the_manifest_is_read_afresh_every_call
+    self.assertEqual(self.now(fx), (520, "snapshot"))
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_the_reader_lags_by_at_most_a_snapshot_and_never_leads (tests.creature.test_poller_cursor.TestReaderRoads.test_the_reader_lags_by_at_most_a_snapshot_and_never_leads)
+§2.2: the ledger is renamed before the manifest, so a poll between the two sees the NEW ledger and the OLD manifest: the new reader
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 508, in test_the_reader_lags_by_at_most_a_snapshot_and_never_leads
+    count, road = self.now(fx)
+                  ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_the_snapshot_road_never_opens_the_ledger (tests.creature.test_poller_cursor.TestReaderRoads.test_the_snapshot_road_never_opens_the_ledger)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 442, in test_the_snapshot_road_never_opens_the_ledger
+    got = self.now(fx)
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_the_snapshot_road_reads_the_manifest_key (tests.creature.test_poller_cursor.TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 431, in test_the_snapshot_road_reads_the_manifest_key
+    self.assertEqual(self.now(fx), (520, "snapshot"))
+                     ~~~~~~~~^^^^
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 427, in now
+    return exam_module.canvas_count_now(fx.state, FIXATIONS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'creature.exam' has no attribute 'canvas_count_now'. Did you mean: 'canvas_count_of'?
+
+======================================================================
+ERROR: test_a_real_replay_completes_with_the_readers_raising_and_leaves_a_keyed_manifest (tests.creature.test_poller_cursor.TestReadersOffTheReplaysRoad.test_a_real_replay_completes_with_the_readers_raising_and_leaves_a_keyed_manifest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 727, in test_a_real_replay_completes_with_the_readers_raising_and_leaves_a_keyed_manifest
+    with p1, p2, p3, mock.patch.object(tempfile, "tempdir", str(work)):
+                 ^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1510, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1480, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'creature.exam' from '/data/dev/genome-wt-poller-1003/creature/exam.py'> does not have the attribute 'canvas_count_now'
+
+======================================================================
+ERROR: test_the_same_patch_makes_a_direct_call_raise_the_positive_control (tests.creature.test_poller_cursor.TestReadersOffTheReplaysRoad.test_the_same_patch_makes_a_direct_call_raise_the_positive_control)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 741, in test_the_same_patch_makes_a_direct_call_raise_the_positive_control
+    with p1, p2, p3:
+                 ^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1510, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1480, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'creature.exam' from '/data/dev/genome-wt-poller-1003/creature/exam.py'> does not have the attribute 'canvas_count_now'
+
+======================================================================
+ERROR: test_manifest_canvas_index_follows_a_second_snapshot (tests.creature.test_poller_cursor.TestWriter.test_manifest_canvas_index_follows_a_second_snapshot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 401, in test_manifest_canvas_index_follows_a_second_snapshot
+    first = self._read(root)[0]["canvas_index"]
+            ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'canvas_index'
+
+======================================================================
+FAIL: test_s1_sit_sense_manifest_and_ledger_agree (tests.creature.test_poller_cursor.TestLoopEquivalence.test_s1_sit_sense_manifest_and_ledger_agree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 566, in test_s1_sit_sense_manifest_and_ledger_agree
+    self.assertEqual((new["ledger"], new["manifest"]), (0, polls), f"the new sense parses the ledger 0 times and reads the manifest {polls} of {polls} polls")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 0) != (0, 7)
+
+First differing element 0:
+7
+0
+
+- (7, 0)
++ (0, 7) : the new sense parses the ledger 0 times and reads the manifest 7 of 7 polls
+
+======================================================================
+FAIL: test_s1_voice_loop_manifest_and_ledger_agree (tests.creature.test_poller_cursor.TestLoopEquivalence.test_s1_voice_loop_manifest_and_ledger_agree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 552, in test_s1_voice_loop_manifest_and_ledger_agree
+    self.assertEqual((new["ledger"], new["manifest"]), (0, polls), f"the new loop parses the ledger 0 times and reads the manifest once per poll ({polls} of {polls})")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (7, 0) != (0, 7)
+
+First differing element 0:
+7
+0
+
+- (7, 0)
++ (0, 7) : the new loop parses the ledger 0 times and reads the manifest once per poll (7 of 7)
+
+======================================================================
+FAIL: test_s2_the_manifest_and_the_ledger_diverge_sit_sense (tests.creature.test_poller_cursor.TestLoopEquivalence.test_s2_the_manifest_and_the_ledger_diverge_sit_sense)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 583, in test_s2_the_manifest_and_the_ledger_diverge_sit_sense
+    self.assertEqual(new["pubs"], [(0, EXAM_A, 0.8)])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != [(0, '2026-10-03T000001Z.json', 0.8)]
+
+Second list contains 1 additional elements.
+First extra element 0:
+(0, '2026-10-03T000001Z.json', 0.8)
+
+- []
++ [(0, '2026-10-03T000001Z.json', 0.8)]
+
+======================================================================
+FAIL: test_s2_the_manifest_and_the_ledger_diverge_voice_loop (tests.creature.test_poller_cursor.TestLoopEquivalence.test_s2_the_manifest_and_the_ledger_diverge_voice_loop)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 574, in test_s2_the_manifest_and_the_ledger_diverge_voice_loop
+    self.assertEqual(new["fires"], [(0, 600)], "NEW reads the manifest: 600 >= 500, at the first poll")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != [(0, 600)]
+
+Second list contains 1 additional elements.
+First extra element 0:
+(0, 600)
+
+- []
++ [(0, 600)] : NEW reads the manifest: 600 >= 500, at the first poll
+
+======================================================================
+FAIL: test_s4_no_manifest_is_the_old_road (tests.creature.test_poller_cursor.TestLoopEquivalence.test_s4_no_manifest_is_the_old_road)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 610, in test_s4_no_manifest_is_the_old_road
+    self.assertEqual((new["ledger"], new["manifest"], old["ledger"]), (3, 3, 3), "ledger parses equal OLD's; the manifest was tried each poll and missing")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (3, 0, 3) != (3, 3, 3)
+
+First differing element 1:
+0
+3
+
+- (3, 0, 3)
+?     ^
+
++ (3, 3, 3)
+?     ^
+ : ledger parses equal OLD's; the manifest was tried each poll and missing
+
+======================================================================
+FAIL: test_s7_neither_file_skips_the_tick (tests.creature.test_poller_cursor.TestLoopEquivalence.test_s7_neither_file_skips_the_tick)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 645, in test_s7_neither_file_skips_the_tick
+    self.assertEqual((new["ledger"], new["manifest"]), (0, 3), "NEW tried the manifest at all 3 polls (two misses, then the key) and never opened the ledger")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (1, 0) != (0, 3)
+
+First differing element 0:
+1
+0
+
+- (1, 0)
++ (0, 3) : NEW tried the manifest at all 3 polls (two misses, then the key) and never opened the ledger
+
+======================================================================
+FAIL: test_the_real_loops_are_not_the_reference (tests.creature.test_poller_cursor.TestPinsAndMapping.test_the_real_loops_are_not_the_reference)
+A reference identical to the code under test compares nothing (#171): the fixed loops must differ from the pinned old ones.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 348, in test_the_real_loops_are_not_the_reference
+    self.assertNotEqual(inspect.getsource(exam_module.voice_loop).strip(), OLD_VOICE_LOOP_SRC.strip())
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, poll_period: float = 5.0) -> None:\n    """The voice\'s own exam cadence: every `every_canvases` canvases, read from the latest snapshot\'s\n    own "moments" (state/ledger.json) divided by the genome\'s fixations-per-canvas -- never a counter the\n    mind hands over live (the voice never touches the mind\'s objects, PREREG §2.7\'s own law, unbroken\n    here). A cursor (run/exam/LAST.json) survives a restart so a re-armed voice does not immediately\n    re-run the exam it already ran just before a crash."""\n    root = Path(root)\n    last_path = root / "exam" / "LAST.json"\n    last_path.parent.mkdir(parents=True, exist_ok=True)\n    last_canvas = 0\n    if last_path.exists():\n        try:\n            last_canvas = int(json.loads(last_path.read_text()).get("last_canvas", 0))\n        except (json.JSONDecodeError, OSError):\n            last_canvas = 0\n    from genome.machinery import parse_genome\n    genome = parse_genome(Path(genome_path).read_text())\n    fixations = int(genome.gaze["fixations"]) if genome.gaze else 1\n    while not stop_event.is_set():\n        ledger_path = root / "state" / "ledger.json"\n        if ledger_path.exists():\n            try:\n                ledger = json.loads(ledger_path.read_text())\n            except (json.JSONDecodeError, OSError):\n                ledger = {}\n            canvas_count = canvas_count_of(ledger, fixations)   # M4: the mind\'s own count when the ledger carries it\n            if every_canvases > 0 and canvas_count - last_canvas >= every_canvases:\n                last_canvas = canvas_count\n                # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1: the pointer is written atomically too (tmp + os.replace,\n                # the same pattern as the report in tools/self_exam.py) — the only other writer under root/exam/. Its one reader is this loop\'s\n                # own restart read above (a torn read there fell back to 0 and re-sat at once), so this is consistency, not a live defect.\n                tmp = last_path.with_name(last_path.name + ".tmp")\n                tmp.write_text(json.dumps({"last_canvas": last_canvas}))\n                os.replace(str(tmp), str(last_path))\n                run_and_journal(root, genome_for_sitting(root, genome_path))   # the adopted genome, if any (the J × exam seam)\n        stop_event.wait(poll_period)' == 'def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, poll_period: float = 5.0) -> None:\n    """The voice\'s own exam cadence: every `every_canvases` canvases, read from the latest snapshot\'s\n    own "moments" (state/ledger.json) divided by the genome\'s fixations-per-canvas -- never a counter the\n    mind hands over live (the voice never touches the mind\'s objects, PREREG §2.7\'s own law, unbroken\n    here). A cursor (run/exam/LAST.json) survives a restart so a re-armed voice does not immediately\n    re-run the exam it already ran just before a crash."""\n    root = Path(root)\n    last_path = root / "exam" / "LAST.json"\n    last_path.parent.mkdir(parents=True, exist_ok=True)\n    last_canvas = 0\n    if last_path.exists():\n        try:\n            last_canvas = int(json.loads(last_path.read_text()).get("last_canvas", 0))\n        except (json.JSONDecodeError, OSError):\n            last_canvas = 0\n    from genome.machinery import parse_genome\n    genome = parse_genome(Path(genome_path).read_text())\n    fixations = int(genome.gaze["fixations"]) if genome.gaze else 1\n    while not stop_event.is_set():\n        ledger_path = root / "state" / "ledger.json"\n        if ledger_path.exists():\n            try:\n                ledger = json.loads(ledger_path.read_text())\n            except (json.JSONDecodeError, OSError):\n                ledger = {}\n            canvas_count = canvas_count_of(ledger, fixations)   # M4: the mind\'s own count when the ledger carries it\n            if every_canvases > 0 and canvas_count - last_canvas >= every_canvases:\n                last_canvas = canvas_count\n                # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1: the pointer is written atomically too (tmp + os.replace,\n                # the same pattern as the report in tools/self_exam.py) — the only other writer under root/exam/. Its one reader is this loop\'s\n                # own restart read above (a torn read there fell back to 0 and re-sat at once), so this is consistency, not a live defect.\n                tmp = last_path.with_name(last_path.name + ".tmp")\n                tmp.write_text(json.dumps({"last_canvas": last_canvas}))\n                os.replace(str(tmp), str(last_path))\n                run_and_journal(root, genome_for_sitting(root, genome_path))   # the adopted genome, if any (the J × exam seam)\n        stop_event.wait(poll_period)'
+
+======================================================================
+FAIL: test_manifest_carries_the_ledgers_canvas_index (tests.creature.test_poller_cursor.TestWriter.test_manifest_carries_the_ledgers_canvas_index)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-poller-1003/tests/creature/test_poller_cursor.py", line 389, in test_manifest_carries_the_ledgers_canvas_index
+    self.assertIn("canvas_index", manifest, "the manifest carries the cursor (an OLD-format manifest has no key)")
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'canvas_index' not found in {'files': ['organism.npz', 'organism.json', 'episodes.npz', 'ledger.json'], 'last_seq': 6, 'prints': {'episodes.npz': [16171, 1791049944558159387], 'ledger.json': [2982, 1791049944559494008], 'organism.json': [2990, 1791049944499675989], 'organism.npz': [43421, 1791049944499157820]}, 't': 15} : the manifest carries the cursor (an OLD-format manifest has no key)
+
+----------------------------------------------------------------------
+Ran 34 tests in 1.319s
+
+FAILED (failures=8, errors=27)

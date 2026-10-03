@@ -1,0 +1,12 @@
+22:38:35 genome-wt-poller-base rc=0 load=9.04 8.49 8.71 OK 
+22:38:38 genome-wt-poller-g1 rc=0 load=8.95 8.48 8.71 OK 
+22:38:41 genome-wt-poller-base rc=0 load=8.80 8.46 8.70 OK 
+22:38:44 genome-wt-poller-g1 rc=0 load=8.80 8.46 8.70 OK 
+22:38:47 genome-wt-poller-base rc=0 load=8.57 8.41 8.69 OK 
+22:38:50 genome-wt-poller-g1 rc=0 load=8.29 8.36 8.67 OK 
+22:38:53 genome-wt-poller-base rc=0 load=8.29 8.36 8.67 OK 
+22:38:57 genome-wt-poller-g1 rc=0 load=8.18 8.33 8.66 OK 
+22:39:00 genome-wt-poller-base rc=0 load=8.01 8.30 8.64 OK 
+22:39:03 genome-wt-poller-g1 rc=0 load=8.01 8.30 8.64 OK 
+22:39:06 genome-wt-poller-base rc=0 load=7.93 8.27 8.63 OK 
+22:39:09 genome-wt-poller-g1 rc=0 load=7.93 8.27 8.63 OK 

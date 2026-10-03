@@ -1,0 +1,9 @@
+genome    exit 0 · Ran 713 (baseline 714) · OK (skipped=1, expected failures=6) · peak 889012224 · NOT OK
+tools     exit 0 · Ran 384 (baseline 384) · OK (skipped=25) · peak 1060323328 · OK
+scene     exit 0 · Ran 368 (baseline 368) · OK · peak 321830912 · OK
+brain     exit 0 · Ran 770 (baseline 770) · OK (skipped=3) · peak 985944064 · OK
+creature part 1 exit 0 · Ran 444 (baseline 444 = 444) · OK (skipped=5) · peak 8310222848 · OK
+creature part 2 exit 1 · Ran 559 (baseline 525 + 34 added = 559) · None · peak 10737418240 · NOT OK
+creature part 3 exit 0 · Ran 421 (baseline 421 = 421) · OK · peak 10737418240 · OK
+creature SUM Ran 1424 vs expected 1390 + 34 = 1424 · the split verdict exit 1 · NOT OK
+PLANT: CAUGHT: a baseline one test off reads NOT OK on the genome line while its own log is clean

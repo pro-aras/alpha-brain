@@ -1,0 +1,5 @@
+[1/1] bl3-fallback: {"label": "bl3-fallback", "ok": true, "moments": 303200, "reference": 55800, "road_old": "ledger", "road_new": "snapshot", "n_new": 55800, "resume_s": 9.26, "snapshot_s": 14.2, "hwm_mb": 2327.0, "error": null}  (27s)
+G2 SUMMARY: started 1 of 1; recorded 1; the ledger carried canvas_index in 1 of 1 (presence); compared 1; DIFFERING 0
+road before (old format) = ledger on 1 of 1; road after resume+snapshot = snapshot on 1 of 1; ablation (key stripped) -> ledger on 1 of 1; plant reported DIFFERENT on 1 of 1
+every check of a state holds on 1 of 1; wall 27 s
+RESULT: OK

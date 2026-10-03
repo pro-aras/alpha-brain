@@ -1,0 +1,8 @@
+[first_diff] PLANTED: kept row 20519 of side b (seq 19624), one digit at char 211 of 234
+FIRST_DIFF · a /data/dev/swarm/2026-10-03/int/full-cut/live-journal.jsonl · kept 41039 (dropped non-mind 0, blank 0)
+FIRST_DIFF · b /data/dev/swarm/2026-10-03/int/logs/poller-fix-9d43829-id-full/journal.jsonl · kept 41039 (dropped non-mind 0, blank 0)
+FIRST_DIFF · byte-identical kept lines: False · first differing kept line 20519
+FIRST_DIFF · verdict DIFFERENT · first difference at seq 19624 (row 2 of that seq; kept row 20519 of b): field 'residual'
+  a[residual] = 0.42068970707870523
+  b[residual] = 0.4206897070787051
+FIRST_DIFF · plant CAUGHT at the planted row

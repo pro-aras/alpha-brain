@@ -1,0 +1,8 @@
+[first_diff] PLANTED: kept row 17240 of side b (seq 17231), one digit at char 265 of 304
+FIRST_DIFF · a /data/dev/swarm/2026-10-03/int/lean/journal/2026-09-28.jsonl · kept 34481 (dropped non-mind 103, blank 0)
+FIRST_DIFF · b /data/dev/swarm/2026-10-03/int/logs/poller-fix-9d43829-id-lean/journal.jsonl · kept 34481 (dropped non-mind 0, blank 0)
+FIRST_DIFF · byte-identical kept lines: False · first differing kept line 17240
+FIRST_DIFF · verdict DIFFERENT · first difference at seq 17231 (row 0 of that seq; kept row 17240 of b): field 'attributed'
+  a[attributed] = {"blue": 1, "triangle": 0}
+  b[attributed] = {"blue": 1, "triangle": 1}
+FIRST_DIFF · plant CAUGHT at the planted row

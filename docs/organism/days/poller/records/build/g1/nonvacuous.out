@@ -1,0 +1,11 @@
+full: tape /data/dev/swarm/2026-10-03/int/full-cut/tape last seq 38173; replay clock start 2026-10-03 22:04:48; keyed candidates 3
+   no    /data/dev/swarm/2026-10-03/int/tmp/creature-replay-7n4hkk6j: manifest canvas_index 11464 == ledger 11464: True; manifest t 50000 (ledger moments 50000); last_seq 34443 (tape's 38173)
+   no    /data/dev/swarm/2026-10-03/int/tmp/creature-replay-azpw77vj: manifest canvas_index 11464 == ledger 11464: True; manifest t 50000 (ledger moments 50000); last_seq 34443 (tape's 38173)
+   MATCH /data/dev/swarm/2026-10-03/int/tmp/creature-replay-t7yg6oei: manifest canvas_index 12867 == ledger 12867: True; manifest t 69735 (ledger moments 69735); last_seq 38173 (tape's 38173)
+   full: NOT VACUOUS: a keyed work root of an ON replay of this tape, key equal to its ledger, last_seq at the tape end
+lean: tape /data/dev/swarm/2026-10-03/int/lean/tape last seq 34443; replay clock start 2026-10-03 22:05:18; keyed candidates 3
+   MATCH /data/dev/swarm/2026-10-03/int/tmp/creature-replay-7n4hkk6j: manifest canvas_index 11464 == ledger 11464: True; manifest t 50000 (ledger moments 50000); last_seq 34443 (tape's 34443)
+   MATCH /data/dev/swarm/2026-10-03/int/tmp/creature-replay-azpw77vj: manifest canvas_index 11464 == ledger 11464: True; manifest t 50000 (ledger moments 50000); last_seq 34443 (tape's 34443)
+   no    /data/dev/swarm/2026-10-03/int/tmp/creature-replay-t7yg6oei: manifest canvas_index 12867 == ledger 12867: True; manifest t 69735 (ledger moments 69735); last_seq 38173 (tape's 34443)
+   lean: NOT VACUOUS: a keyed work root of an ON replay of this tape, key equal to its ledger, last_seq at the tape end
+RESULT: OK: both identity replays are NON-VACUOUS
