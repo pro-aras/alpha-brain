@@ -3,3 +3,5 @@
 2026-10-03 23:16:54 +0400 a3b-red2 exit 1: Ran 93 tests in 0.368s FAILED (failures=8, errors=2) 
 2026-10-03 23:18:42 +0400 a3b-green-all exit 0: Ran 216 tests in 106.312s OK 
 2026-10-03 23:18:42 +0400 a3b-arith exit 0
+2026-10-03 23:30:33 +0400 a3b-sweeps done: analyse exit 0 queue exit 0 bands exit 1 twin exit 0 ALL SWEEPS RAN 
+chain end

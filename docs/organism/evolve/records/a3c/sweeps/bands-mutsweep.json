@@ -1,0 +1,438 @@
+{
+ "module": "tools/evolve_bands.py",
+ "tests": "tests.tools.test_evolve_cal_gate",
+ "results": [
+  {
+   "name": "position-below-not-strict",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_an_edge_that_is_a_whole_number_of_items_needs_one_more",
+   "failing": [
+    "test_an_edge_that_is_a_whole_number_of_items_needs_one_more"
+   ]
+  },
+  {
+   "name": "position-above-not-strict",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_an_edge_that_is_a_whole_number_of_items_needs_one_more",
+   "failing": [
+    "test_a_continuous_band_has_no_grid",
+    "test_a_rank_band_is_outside_all_draws_by_the_null_range",
+    "test_an_edge_that_is_a_whole_number_of_items_needs_one_more",
+    "test_float_noise_in_a_grid_difference_does_not_move_a_reading_across_the_edge"
+   ]
+  },
+  {
+   "name": "grid-difference-not-rounded",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_float_noise_in_a_grid_difference_does_not_move",
+   "failing": [
+    "test_float_noise_in_a_grid_difference_does_not_move_a_reading_across_the_edge"
+   ]
+  },
+  {
+   "name": "rank-band-reads-the-edge",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_rank_band_is_outside_all_draws_by_the_null_range",
+   "failing": [
+    "test_a_rank_band_is_outside_all_draws_by_the_null_range"
+   ]
+  },
+  {
+   "name": "no-band-gates-as-within",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_dimension_without_a_band_does_not_position",
+   "failing": [
+    "test_a_dimension_with_no_band_does_not_gate",
+    "test_a_dimension_without_a_band_does_not_position",
+    "test_a_none_band_without_the_legacy_field_still_does_not_gate"
+   ]
+  },
+  {
+   "name": "missing-reads-as-within",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_dimension_without_a_band_does_not_position",
+   "failing": [
+    "test_a_dimension_without_a_band_does_not_position",
+    "test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension",
+    "test_a_missing_reading_is_neither_regression_nor_improvement"
+   ]
+  },
+  {
+   "name": "delta-is-incumbent-minus-mutant",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_swapping_the_two_sides_flips_the_verdict",
+   "failing": [
+    "test_a_cheaper_mutant_is_never_cost_regressed",
+    "test_a_dimension_with_no_band_does_not_gate",
+    "test_a_missing_reading_is_neither_regression_nor_improvement",
+    "test_a_reading_below_its_band_is_regressed_even_beside_one_above",
+    "test_c2_and_c3_stay_reachable_under_a_prime",
+    "test_cost_regressed_needs_the_band_and_the_policy_cap",
+    "test_cpu_missing_on_a_side_is_a_missing_cost_not_a_regression",
+    "test_one_reading_above_its_band_with_none_below_is_improved",
+    "test_swapping_the_two_sides_flips_the_verdict",
+    "test_the_reason_names_the_edges_in_items",
+    "test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them",
+    "test_the_verdict_regresses_on_one_item_and_improves_only_on_two",
+    "test_without_a_cost_band_the_policy_cap_alone_decides"
+   ]
+  },
+  {
+   "name": "a-reading-below-does-not-regress",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_reading_below_its_band_is_regressed_even_beside_one_above",
+   "failing": [
+    "test_a_fall_beside_a_rise_regresses",
+    "test_a_reading_below_its_band_is_regressed_even_beside_one_above",
+    "test_c2_and_c3_stay_reachable_under_a_prime",
+    "test_swapping_the_two_sides_flips_the_verdict",
+    "test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them",
+    "test_the_verdict_regresses_on_one_item_and_improves_only_on_two"
+   ]
+  },
+  {
+   "name": "the-cost-never-regresses",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_cost_regressed_needs_the_band_and_the_policy_cap",
+   "failing": [
+    "test_cost_regressed_needs_the_band_and_the_policy_cap",
+    "test_without_a_cost_band_the_policy_cap_alone_decides"
+   ]
+  },
+  {
+   "name": "cost-band-alone-regresses",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_cost_regressed_needs_the_band_and_the_policy_cap",
+   "failing": [
+    "test_cost_regressed_needs_the_band_and_the_policy_cap",
+    "test_without_a_cost_band_the_policy_cap_alone_decides"
+   ]
+  },
+  {
+   "name": "cost-cap-alone-regresses",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_cost_regressed_needs_the_band_and_the_policy_cap",
+   "failing": [
+    "test_cost_regressed_needs_the_band_and_the_policy_cap",
+    "test_the_bands_high_side_decides_not_the_cap_alone_even_under_an_absurdly_low_cap"
+   ]
+  },
+  {
+   "name": "a-cheaper-mutant-regresses",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_bands_high_side_decides_not_the_cap_alone",
+   "failing": [
+    "test_the_bands_high_side_decides_not_the_cap_alone_even_under_an_absurdly_low_cap"
+   ]
+  },
+  {
+   "name": "missing-cpu-regresses",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_cpu_missing_on_a_side",
+   "failing": [
+    "test_cpu_missing_on_a_side_is_a_missing_cost_not_a_regression"
+   ]
+  },
+  {
+   "name": "cost-ratio-inverted",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_cost_regressed_needs_the_band_and_the_policy_cap",
+   "failing": [
+    "test_a_cheaper_mutant_is_never_cost_regressed",
+    "test_cost_regressed_needs_the_band_and_the_policy_cap",
+    "test_the_bands_high_side_decides_not_the_cap_alone_even_under_an_absurdly_low_cap",
+    "test_without_a_cost_band_the_policy_cap_alone_decides"
+   ]
+  },
+  {
+   "name": "improved-without-evidence",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_nothing_outside_any_band_is_no_evidence",
+   "failing": [
+    "test_a_dimension_with_no_band_does_not_gate",
+    "test_a_missing_reading_is_neither_regression_nor_improvement",
+    "test_nothing_outside_any_band_is_no_evidence",
+    "test_reward_and_act_and_sentence_never_enter_the_bar",
+    "test_the_records_one_adoption_reads_no_evidence",
+    "test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them",
+    "test_the_verdict_regresses_on_one_item_and_improves_only_on_two"
+   ]
+  },
+  {
+   "name": "presence-always-two",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_presence_counts_the_sides_that_carry_the_field",
+   "failing": [
+    "test_each_dead_dimension_is_printed_with_its_reason_and_presence_count",
+    "test_presence_counts_the_sides_that_carry_the_field"
+   ]
+  },
+  {
+   "name": "equal-always-true",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_presence_counts_the_sides_that_carry_the_field",
+   "failing": [
+    "test_presence_counts_the_sides_that_carry_the_field"
+   ]
+  },
+  {
+   "name": "confirm-ignores-overlap",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_an_overlapping_confirmation_slice_is_not_a_confirmation",
+   "failing": [
+    "test_an_overlapping_confirmation_slice_is_not_a_confirmation_and_keeps_the_pending"
+   ]
+  },
+  {
+   "name": "confirm-overlap-boundary-off-by-one",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_second_slice_may_start_exactly_where_the_first_ended",
+   "failing": [
+    "test_the_second_slice_may_start_exactly_where_the_first_ended"
+   ]
+  },
+  {
+   "name": "confirm-ignores-the-mutation",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_different_mutation_is_not_a_confirmation",
+   "failing": [
+    "test_a_different_mutation_is_not_a_confirmation"
+   ]
+  },
+  {
+   "name": "confirm-ignores-the-second-verdict",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_no_evidence_or_regressed_the_second_time_does_not_adopt",
+   "failing": [
+    "test_no_evidence_or_regressed_the_second_time_does_not_adopt"
+   ]
+  },
+  {
+   "name": "confirm-ignores-the-first-verdict",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_first_round_that_was_not_improved_has_nothing_to_confirm",
+   "failing": [
+    "test_a_first_round_that_was_not_improved_has_nothing_to_confirm"
+   ]
+  },
+  {
+   "name": "validate-allows-a-negative-edge",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_malformed_file_is_refused_by_name",
+   "failing": [
+    "test_a_malformed_file_is_refused_by_name"
+   ]
+  },
+  {
+   "name": "validate-allows-an-unknown-kind",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_malformed_file_is_refused_by_name",
+   "failing": [
+    "test_a_malformed_file_is_refused_by_name"
+   ]
+  },
+  {
+   "name": "validate-allows-a-missing-gated-dimension",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_malformed_file_is_refused_by_name",
+   "failing": [
+    "test_a_malformed_file_is_refused_by_name"
+   ]
+  },
+  {
+   "name": "min-clear-off-by-one",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_reason_names_the_edges_in_items",
+   "failing": [
+    "test_the_reason_names_the_edges_in_items"
+   ]
+  },
+  {
+   "name": "legacy-field-ignored",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension",
+   "failing": [
+    "test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin",
+    "test_a_fall_beside_a_rise_regresses",
+    "test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension",
+    "test_c2_and_c3_stay_reachable_under_a_prime",
+    "test_integer_frames_rise_at_one_frame_and_fall_at_any",
+    "test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them",
+    "test_the_verdict_regresses_on_one_item_and_improves_only_on_two"
+   ]
+  },
+  {
+   "name": "legacy-fall-needs-the-margin",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension",
+   "failing": [
+    "test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin",
+    "test_a_fall_beside_a_rise_regresses",
+    "test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension",
+    "test_integer_frames_rise_at_one_frame_and_fall_at_any",
+    "test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them",
+    "test_the_verdict_regresses_on_one_item_and_improves_only_on_two"
+   ]
+  },
+  {
+   "name": "legacy-any-rise-improves",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension",
+   "failing": [
+    "test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin",
+    "test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension",
+    "test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them",
+    "test_the_verdict_regresses_on_one_item_and_improves_only_on_two"
+   ]
+  },
+  {
+   "name": "legacy-margin-is-strict",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin",
+   "failing": [
+    "test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin",
+    "test_integer_frames_rise_at_one_frame_and_fall_at_any"
+   ]
+  },
+  {
+   "name": "legacy-margin-without-slack",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin",
+   "failing": [
+    "test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin"
+   ]
+  },
+  {
+   "name": "legacy-no-grid-rounding",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension",
+   "failing": [
+    "test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension"
+   ]
+  },
+  {
+   "name": "legacy-read-on-a-measured-band",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_legacy_field_is_read_only_on_a_none_band",
+   "failing": [
+    "test_the_legacy_field_is_read_only_on_a_none_band"
+   ]
+  },
+  {
+   "name": "legacy-entry-drops-the-margin",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_verdict_regresses_on_one_item_and_improves_only_on_two",
+   "failing": [
+    "test_the_verdict_regresses_on_one_item_and_improves_only_on_two"
+   ]
+  },
+  {
+   "name": "validate-allows-legacy-on-a-measured-band",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere",
+   "failing": [
+    "test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere"
+   ]
+  },
+  {
+   "name": "validate-allows-a-negative-legacy-margin",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere",
+   "failing": [
+    "test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere"
+   ]
+  },
+  {
+   "name": "validate-allows-a-bool-legacy-margin",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere",
+   "failing": [
+    "test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere"
+   ]
+  },
+  {
+   "name": "validate-allows-any-legacy-fall",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere",
+   "failing": [
+    "test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere"
+   ]
+  },
+  {
+   "name": "strict-loader-lets-reading-a-through",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_worker_refuses_a_band_file_whose_bandless_dimension_has_no_legacy_tolerance",
+   "failing": [
+    "test_the_strict_loader_checks_every_gated_dimension_not_only_the_first",
+    "test_the_worker_refuses_a_band_file_whose_bandless_dimension_has_no_legacy_tolerance"
+   ]
+  },
+  {
+   "name": "strict-loader-is-not-the-default",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_worker_refuses_a_band_file_whose_bandless_dimension_has_no_legacy_tolerance",
+   "failing": [
+    "test_the_strict_loader_checks_every_gated_dimension_not_only_the_first",
+    "test_the_worker_refuses_a_band_file_whose_bandless_dimension_has_no_legacy_tolerance"
+   ]
+  },
+  {
+   "name": "strict-loader-checks-only-the-first-dimension",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_strict_loader_checks_every_gated_dimension_not_only_the_first",
+   "failing": [
+    "test_the_strict_loader_checks_every_gated_dimension_not_only_the_first"
+   ]
+  },
+  {
+   "name": "strict-loader-demands-legacy-of-a-measured-band",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_round_trip_through_json_validates",
+   "failing": [
+    "test_a_round_trip_through_json_validates"
+   ]
+  }
+ ]
+}

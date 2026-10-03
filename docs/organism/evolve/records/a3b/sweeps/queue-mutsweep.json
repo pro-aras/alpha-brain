@@ -1,0 +1,83 @@
+{
+ "module": "tools/evolve_cal_queue.py",
+ "tests": "tests.tools.test_evolve_cal_queue",
+ "results": [
+  {
+   "name": "eps-list-accepts-any-level",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused",
+   "failing": [
+    "test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused"
+   ]
+  },
+  {
+   "name": "eps-list-counts-from-zero",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one",
+   "failing": [
+    "test_the_level_tags_match_the_existing_lists",
+    "test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one",
+    "test_without_the_incumbent_there_is_no_inc_line_and_two_digit_numbering_reaches_twenty"
+   ]
+  },
+  {
+   "name": "eps-list-allows-ninety-nine",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused",
+   "failing": [
+    "test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused"
+   ]
+  },
+  {
+   "name": "eps-list-allows-zero",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused",
+   "failing": [
+    "test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused"
+   ]
+  },
+  {
+   "name": "eps-list-drops-the-incumbent",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one",
+   "failing": [
+    "test_the_cli_writes_the_file_and_refuses_to_overwrite_one",
+    "test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one"
+   ]
+  },
+  {
+   "name": "level-tag-takes-the-absolute-exponent",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_level_tags_match_the_existing_lists",
+   "failing": [
+    "test_the_level_tags_match_the_existing_lists",
+    "test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one",
+    "test_without_the_incumbent_there_is_no_inc_line_and_two_digit_numbering_reaches_twenty"
+   ]
+  },
+  {
+   "name": "cli-overwrites-a-list",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_cli_writes_the_file_and_refuses_to_overwrite_one",
+   "failing": [
+    "test_the_cli_writes_the_file_and_refuses_to_overwrite_one"
+   ]
+  },
+  {
+   "name": "cli-ignores-the-prefix",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_cli_writes_the_file_and_refuses_to_overwrite_one",
+   "failing": [
+    "test_the_cli_writes_the_file_and_refuses_to_overwrite_one"
+   ]
+  }
+ ]
+}

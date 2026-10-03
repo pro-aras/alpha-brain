@@ -1,0 +1,144 @@
+# c-red3 on 7ab03ecba9bb41b10d72285a7b38887ac36a58b5, started 2026-10-03 23:46:59 +0400
+...............................EEEEEEEEEE...FFEEF............................................................
+======================================================================
+ERROR: test_a_frames_filed_only_difference_is_not_a_move_for_the_selection_note (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_a_frames_filed_only_difference_is_not_a_move_for_the_selection_note)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 584, in test_a_frames_filed_only_difference_is_not_a_move_for_the_selection_note
+    self.assertFalse(an.null_provenance(rd(), only_frames)["selected_on_a_move"])
+                     ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'null_provenance'
+
+======================================================================
+ERROR: test_a_twin_without_a_variant_is_counted_not_hidden_and_does_not_stop_the_bands (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_a_twin_without_a_variant_is_counted_not_hidden_and_does_not_stop_the_bands)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 587, in test_a_twin_without_a_variant_is_counted_not_hidden_and_does_not_stop_the_bands
+    p = an.null_provenance(rd(), [rd() for _ in range(5)])
+        ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'null_provenance'
+
+======================================================================
+ERROR: test_every_band_carries_the_provenance_beside_it (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_every_band_carries_the_provenance_beside_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 593, in test_every_band_carries_the_provenance_beside_it
+    self.assertEqual(b["null"]["epsilon"], 0.01)
+                     ~^^^^^^^^
+KeyError: 'null'
+
+======================================================================
+ERROR: test_fewer_than_nine_twins_have_no_terciles_and_say_so (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_fewer_than_nine_twins_have_no_terciles_and_say_so)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 559, in test_fewer_than_nine_twins_have_no_terciles_and_say_so
+    p = an.null_provenance(rd(), [ev(k) for k in range(1, 9)])
+        ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'null_provenance'
+
+======================================================================
+ERROR: test_the_label_is_strict_exactly_twice_the_bottom_tercile_is_not_a_growth (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_the_label_is_strict_exactly_twice_the_bottom_tercile_is_not_a_growth)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 552, in test_the_label_is_strict_exactly_twice_the_bottom_tercile_is_not_a_growth
+    twice = an.null_provenance(rd(), self.twenty(spread=lambda k: 2 if k >= 15 else 1))
+            ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'null_provenance'
+
+======================================================================
+ERROR: test_the_perturbation_is_printed_as_one_plus_k_epsilon (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_the_perturbation_is_printed_as_one_plus_k_epsilon)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 529, in test_the_perturbation_is_printed_as_one_plus_k_epsilon
+    p = an.null_provenance(rd(), self.twenty())
+        ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'null_provenance'
+
+======================================================================
+ERROR: test_the_rms_by_tercile_is_printed_and_a_growing_top_tercile_is_labelled (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_the_rms_by_tercile_is_printed_and_a_growing_top_tercile_is_labelled)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 544, in test_the_rms_by_tercile_is_printed_and_a_growing_top_tercile_is_labelled
+    p = an.null_provenance(rd(), self.twenty())            # q1_seen 0, 1, 2 items away from the incumbent in the three terciles
+        ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'null_provenance'
+
+======================================================================
+ERROR: test_the_selection_note_says_a_null_with_a_mover_is_conditioned_on_a_move (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_the_selection_note_says_a_null_with_a_mover_is_conditioned_on_a_move)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 573, in test_the_selection_note_says_a_null_with_a_mover_is_conditioned_on_a_move
+    moved = an.null_provenance(rd(), self.twenty())
+            ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'null_provenance'
+
+======================================================================
+ERROR: test_twenty_twins_split_into_terciles_of_7_7_6_by_perturbation (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_twenty_twins_split_into_terciles_of_7_7_6_by_perturbation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 538, in test_twenty_twins_split_into_terciles_of_7_7_6_by_perturbation
+    t = an.null_provenance(rd(), self.twenty())["terciles"]
+        ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'null_provenance'
+
+======================================================================
+ERROR: test_twins_of_two_levels_are_a_range_with_no_single_epsilon (tests.tools.test_evolve_cal_analyse.TestNullProvenance.test_twins_of_two_levels_are_a_range_with_no_single_epsilon)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 566, in test_twins_of_two_levels_are_a_range_with_no_single_epsilon
+    p = an.null_provenance(rd(), six)
+        ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'null_provenance'
+
+======================================================================
+ERROR: test_the_ruled_stage_b_rule_is_m_and_is_what_the_decision_applies (tests.tools.test_evolve_cal_analyse.TestRuledBuild.test_the_ruled_stage_b_rule_is_m_and_is_what_the_decision_applies)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 463, in test_the_ruled_stage_b_rule_is_m_and_is_what_the_decision_applies
+    self.assertEqual(an.STAGE_B_RULE, "M")
+                     ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'STAGE_B_RULE'
+
+======================================================================
+ERROR: test_the_strict_loader_checks_every_gated_dimension_not_only_the_first (tests.tools.test_evolve_cal_analyse.TestRuledBuild.test_the_strict_loader_checks_every_gated_dimension_not_only_the_first)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 505, in test_the_strict_loader_checks_every_gated_dimension_not_only_the_first
+    del b["dims"][stripped]["legacy"]
+        ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+KeyError: 'legacy'
+
+======================================================================
+FAIL: test_readings_a_and_b_are_never_the_default (tests.tools.test_evolve_cal_analyse.TestRuledBuild.test_readings_a_and_b_are_never_the_default)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 486, in test_readings_a_and_b_are_never_the_default
+    self.assertEqual(inspect.signature(an.bands_from_twins).parameters["degenerate"].default, "legacy")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'none' != 'legacy'
+- none
++ legacy
+
+
+======================================================================
+FAIL: test_the_default_for_a_bandless_dimension_is_the_legacy_tolerance_in_every_branch (tests.tools.test_evolve_cal_analyse.TestRuledBuild.test_the_default_for_a_bandless_dimension_is_the_legacy_tolerance_in_every_branch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 475, in test_the_default_for_a_bandless_dimension_is_the_legacy_tolerance_in_every_branch
+    self.assertIn("legacy", b["dims"][d], d)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'legacy' not found in {'dim': 'q1_seen', 'n': 21, 'df': 20, 'distinct': 1, 'sigma_hat': 0.0, 'mean': 0.9454545454545455, 'min': 0.9454545454545454, 'max': 0.9454545454545454, 'range': 0.0, 'grid': 0.00909090909090909, 'alpha_side': 0.0083, 't': 2.6144354208011977, 'values': [0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454, 0.9454545454545454], 'kind': 'none', 'edge': None, 'normality': None, 'reason': 'the null held 1 distinct value(s), σ̂ = 0: fewer than 3 distinct values or σ = 0 gives NO band (A1 (i)); the dimension does not gate', 'ceiling_items': 6, 'ceiling_note': "the incumbent reads 104 of 110: at most 6 items of improvement; an IMPROVED on q1_seen is reachable iff the band's edge (no band items) is below 6", 'ceiling': {'reading': 104, 'unit': 'items of 110', 'up_room': 6, 'down_room': 104, 'improved_reachable': True, 'regressed_reachable': True, 'basis': 'no band: the legacy tolerance (A′): any fall regresses, a rise needs its margin', 'note': 'reading 104 (items of 110); legacy margin 1.1 items of 110; room up 6, room down 104; both sides reachable'}} : q1_seen
+
+======================================================================
+FAIL: test_the_worker_refuses_a_band_file_whose_bandless_dimension_has_no_legacy_tolerance (tests.tools.test_evolve_cal_analyse.TestRuledBuild.test_the_worker_refuses_a_band_file_whose_bandless_dimension_has_no_legacy_tolerance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red3/tests/tools/test_evolve_cal_analyse.py", line 495, in test_the_worker_refuses_a_band_file_whose_bandless_dimension_has_no_legacy_tolerance
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 109 tests in 0.420s
+
+FAILED (failures=3, errors=12)
