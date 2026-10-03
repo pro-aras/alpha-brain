@@ -106,5 +106,42 @@ class TestRun(unittest.TestCase):
         self.assertFalse(out.exists())
 
 
+# edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 22:5x +0400 — AMENDMENT 3b A3b.4 (the verifier's E4), tests FIRST: N2 in the non-degenerate branch needs epsilon twins at the
+# chosen level on S2 (`N2-S2.tsv` is seed twins only: a seed twin never moves q1_seen or confirmed_share, so F = infinity by construction); the list is written from the chosen level.
+class TestEpsList(unittest.TestCase):
+    def test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one(self) -> None:
+        text = q.eps_list(0.001, 6, prefix="s2-", with_incumbent=True)
+        tmp = Path(tempfile.mkdtemp())
+        entries = q.read_list(lst(tmp, text))
+        self.assertEqual(entries[0], ("s2-inc", "incumbent", None))
+        self.assertEqual([e[0] for e in entries[1:]], [f"s2-eps1e-3-k0{k}" for k in range(1, 7)])
+        self.assertEqual([e[1] for e in entries[1:]], [f"eps:0.001:{k}" for k in range(1, 7)])
+        self.assertTrue(all(e[2] is None for e in entries), "full slice: no rows limit")
+
+    def test_the_level_tags_match_the_existing_lists(self) -> None:
+        for level, tag, variant in ((1e-4, "1e-4", "eps:0.0001:1"), (1e-3, "1e-3", "eps:0.001:1"), (1e-2, "1e-2", "eps:0.01:1")):
+            entries = q.read_list(lst(Path(tempfile.mkdtemp()), q.eps_list(level, 1)))
+            self.assertEqual(entries, [(f"eps{tag}-k01", variant, None)])
+
+    def test_without_the_incumbent_there_is_no_inc_line_and_two_digit_numbering_reaches_twenty(self) -> None:
+        entries = q.read_list(lst(Path(tempfile.mkdtemp()), q.eps_list(1e-2, 20)))
+        self.assertEqual(len(entries), 20)
+        self.assertEqual((entries[0][0], entries[-1][0]), ("eps1e-2-k01", "eps1e-2-k20"))
+        self.assertNotIn("incumbent", [e[1] for e in entries])
+
+    def test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused(self) -> None:
+        for level, n in ((1e-5, 5), (0.002, 5), (1e-3, 0), (1e-3, 21), (1e-3, -1)):
+            with self.assertRaises(ValueError, msg=f"{level} {n}"):
+                q.eps_list(level, n)
+
+    def test_the_cli_writes_the_file_and_refuses_to_overwrite_one(self) -> None:
+        tmp = Path(tempfile.mkdtemp())
+        out = tmp / "N2-S2-eps.tsv"
+        self.assertEqual(q.main(["make-eps-list", "--eps", "0.001", "--n", "6", "--prefix", "s2-", "--with-incumbent", "--out", str(out)]), 0)
+        self.assertEqual(q.read_list(out)[0], ("s2-inc", "incumbent", None))
+        with self.assertRaises(FileExistsError):
+            q.main(["make-eps-list", "--eps", "0.001", "--n", "6", "--out", str(out)])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -483,6 +483,73 @@ class TestCompareKeyed(unittest.TestCase):
         self.assertEqual(r["moment"]["matched"], 2)
         self.assertEqual(r["other"]["outcome"], {"matched": 2, "differing": 1, "only_a": 0, "only_b": 0})
 
+    # ---- AMENDMENT 3b A3b.1 (the verifier's E1): an UNMATCHED moment row is a FLIP; the other kinds' discrete payloads are counted and named OUTSIDE it.
+    # edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 22:5x +0400 — tests FIRST (the verifier's plants, v7_plants.out: a twin whose act at one seq differs, and a
+    # twin missing two of four moment rows, both read EQUAL under A3.4 because only `discrete_differing` was read).
+    def four(self):
+        return [self.moment(1), self.moment(2), self.moment(3), self.moment(4)]
+
+    def test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips(self) -> None:
+        a = self.four()
+        b = json.loads(json.dumps(a))
+        before = json.dumps(b[2], sort_keys=True)
+        b[2]["act"] = "wait"
+        self.assertNotEqual(json.dumps(b[2], sort_keys=True), before, "the plant changed the bytes")
+        r = cal.compare_twins_keyed(a, b)
+        m = r["moment"]
+        self.assertEqual((m["matched"], m["only_a"], m["only_b"], m["discrete_differing"]), (3, 1, 1, 0), "the key (seq, glance, act) no longer matches: unmatched, not differing")
+        self.assertEqual(m["flips"], 2, "an unmatched moment row is a FLIP: the organism did something else at that seq")
+
+    def test_a_twin_missing_two_of_four_moment_rows_has_two_flips(self) -> None:
+        a = self.four()
+        b = [x for x in json.loads(json.dumps(a)) if x["seq"] in (1, 4)]
+        self.assertEqual(len(b), 2, "the plant removed two rows")
+        m = cal.compare_twins_keyed(a, b)["moment"]
+        self.assertEqual((m["only_a"], m["only_b"], m["discrete_differing"], m["flips"]), (2, 0, 0, 2))
+
+    def test_flips_is_the_discrete_rows_plus_the_unmatched_rows(self) -> None:
+        a = self.four()
+        b = json.loads(json.dumps(a))
+        b[1]["cells"] = [11, 5]                       # a matched row with a discrete difference (the control the verifier named: a changed count IS counted)
+        b[2]["act"] = "wait"                          # one unmatched row on each side
+        m = cal.compare_twins_keyed(a, b)["moment"]
+        self.assertEqual((m["discrete_differing"], m["only_a"], m["only_b"]), (1, 1, 1))
+        self.assertEqual(m["flips"], m["discrete_differing"] + m["only_a"] + m["only_b"])
+        self.assertEqual(m["flips"], 3)
+
+    def test_no_difference_and_float_or_hash_only_differences_are_zero_flips(self) -> None:
+        a = self.four()
+        self.assertEqual(cal.compare_twins_keyed(a, json.loads(json.dumps(a)))["moment"]["flips"], 0)
+        b = json.loads(json.dumps(a))
+        b[0]["hash"] = "other"
+        b[1]["err"] = 0.5000001
+        self.assertEqual(cal.compare_twins_keyed(a, b)["moment"]["flips"], 0, "a digest and a float are readings of the state, not discrete outcomes")
+
+    def other_rows(self):
+        return self.four() + [{"seq": 5, "sleep": {"births": 25, "cycle": True, "merged": 21, "pruned": 189, "replayed": 200}, "hash": "s5"},
+                              {"seq": 6, "think": {"outcome": "no_cell_answers", "n": 3}}]
+
+    def test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips(self) -> None:
+        a = self.other_rows()
+        b = json.loads(json.dumps(a))
+        b[4]["sleep"]["pruned"] = 190
+        b[5]["think"]["outcome"] = "belief"
+        r = cal.compare_twins_keyed(a, b)
+        self.assertEqual(r["moment"]["flips"], 0, "sleep and think rows are OUTSIDE the flip count (A3b.1)")
+        self.assertEqual(r["other_discrete"], {"sleep": {"rows": 1, "paths": {"sleep.pruned": 1}}, "think": {"rows": 1, "paths": {"think.outcome": 1}}})
+
+    def test_a_digest_only_difference_of_another_kind_is_not_a_discrete_payload(self) -> None:
+        a = self.other_rows()
+        b = json.loads(json.dumps(a))
+        b[4]["hash"] = "other"
+        r = cal.compare_twins_keyed(a, b)
+        self.assertEqual(r["other"]["sleep"]["differing"], 1, "the row differs")
+        self.assertEqual(r["other_discrete"], {}, "but only in the state digest: no discrete payload moved")
+
+    def test_identical_journals_have_no_other_discrete_entry(self) -> None:
+        a = self.other_rows()
+        self.assertEqual(cal.compare_twins_keyed(a, json.loads(json.dumps(a)))["other_discrete"], {})
+
 
 class TestRunTwin(_Synthetic):
     def _run(self, name: str, variant: str, **kw) -> dict:
