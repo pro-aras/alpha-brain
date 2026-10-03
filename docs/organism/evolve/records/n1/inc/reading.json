@@ -1,0 +1,2281 @@
+{
+ "act_graded": true,
+ "act_pass": true,
+ "build_s": 17.825,
+ "code": {
+  "dirty": false,
+  "git_head": "74b0fc18a972193a677a3e863b09ce3788576de5"
+ },
+ "confirmed_graded": true,
+ "confirmed_share": 0.4134,
+ "cpu_s": 2715.749,
+ "detail": {
+  "act": {
+   "bar": "mind-chosen = 100 % of \u2265 100 game outcomes \u00b7 mismatches 0 \u00b7 census over the GAME's acts: no act \u2265 95 % of the last 100 game acts, no reachable act at 0 over the life \u00b7 the shuffled-act plant diverges \u00b7 reward printed, no bar",
+   "census": {
+    "done": 1,
+    "drop": 2,
+    "forward": 4,
+    "left": 1,
+    "pickup": 3,
+    "right": 123,
+    "toggle": 1
+   },
+   "census_all": {
+    "done": 1,
+    "drop": 2,
+    "forward": 4,
+    "left": 1,
+    "pickup": 3,
+    "right": 123,
+    "say": 8,
+    "toggle": 1
+   },
+   "census_last100": {
+    "done": 1,
+    "drop": 1,
+    "forward": 1,
+    "left": 1,
+    "pickup": 2,
+    "right": 93,
+    "toggle": 1
+   },
+   "census_source": "the tape's mind-chosen game outcome rows (seq order): the game's own acts; census_all = STATUS acts_chosen (with the mouth's say), printed only",
+   "choices_journaled": 135,
+   "episodes": 2,
+   "game_outcomes": 135,
+   "graded": true,
+   "last_n": 100,
+   "max_share": 0.9111,
+   "max_share_last100": 0.93,
+   "mind_chosen": 135,
+   "mind_share": 1.0,
+   "mismatches_journal": 0,
+   "mismatches_status": 0,
+   "pass": true,
+   "random_null_success": 0.29,
+   "reachable_acts": [
+    "left",
+    "right",
+    "forward",
+    "pickup",
+    "drop",
+    "toggle",
+    "done"
+   ],
+   "reason": "graded (\u00a719.5; the \u2265 95 % clause on the last 100 game acts)",
+   "reward_mean": 0.0,
+   "success_per_episode": 0.0,
+   "successes": 0,
+   "zero_acts": []
+  },
+  "sentence": {
+   "bar": "\u2265 3 frames \u00b7 precision \u2265 0.8 \u00b7 not gradable under 100 missions or when the world's max pair lift < 2 (the ceiling clause)",
+   "frames_filed": 26,
+   "frames_scored": 10,
+   "frames_true": 0,
+   "graded": false,
+   "heard_no": 8,
+   "heard_yes": 0,
+   "max_lift": null,
+   "max_lift_per_frame": 1.0,
+   "max_pair": null,
+   "max_pair_per_frame": "green box",
+   "missions": 3,
+   "missions_per_frame": 135,
+   "missions_unit": "one per game episode (a run of object rows with one (game, episode))",
+   "pairs": 2,
+   "pass": null,
+   "precision": 0.0,
+   "reason": "not gradable: 3 missions < 100 (one per game episode; 135 frames)",
+   "rows_without_episode": 0,
+   "said": 8
+  },
+  "surprise": {
+   "bar": "maker things with \u2265 30 showings: first-3 share < last-20 for \u2265 80 % and > the shuffled null's p95 \u00b7 last-500 \u2212 first-500 share \u2265 0.10 \u00b7 the blind-surprise twin confirms 0 glances",
+   "by_source": {
+    "game": {
+     "confirmed": 180,
+     "glances": 540,
+     "share": 0.3333,
+     "things": 1
+    },
+    "hands": {
+     "confirmed": 0,
+     "glances": 108,
+     "share": 0.0,
+     "things": 0
+    },
+    "lexicon": {
+     "confirmed": 0,
+     "glances": 4,
+     "share": 0.0,
+     "things": 1
+    },
+    "maker": {
+     "confirmed": 1690,
+     "glances": 3152,
+     "share": 0.5362,
+     "things": 14
+    },
+    "shelf": {
+     "confirmed": 1207,
+     "glances": 3640,
+     "share": 0.3316,
+     "things": 332
+    }
+   },
+   "canvases": 1861,
+   "clause_rise": false,
+   "clause_things": false,
+   "clause_twin": false,
+   "first_500": 0.4305,
+   "graded": true,
+   "last_500": 0.396,
+   "null_mean": 3.67,
+   "null_p95": 6,
+   "overall_share": 0.4134,
+   "pass": false,
+   "printed_not_graded": {
+    "a@shelf": {
+     "first3": 0.6666666666666666,
+     "rest": 0.6923076923076923,
+     "showings": 16,
+     "source": "shelf"
+    },
+    "about@shelf": {
+     "first3": 0.08333333333333333,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "acquire@lexicon": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "lexicon"
+    },
+    "air@shelf": {
+     "first3": 0.625,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "all@shelf": {
+     "first3": 1.0,
+     "rest": 0.65,
+     "showings": 8,
+     "source": "shelf"
+    },
+    "always@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "an@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "and@shelf": {
+     "first3": 0.0,
+     "rest": 0.08333333333333333,
+     "showings": 36,
+     "source": "shelf"
+    },
+    "annoy@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "apt@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "are@shelf": {
+     "first3": 0.75,
+     "rest": 0.5,
+     "showings": 12,
+     "source": "shelf"
+    },
+    "armstron@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "arrow": {
+     "first3": 0.5833333333333334,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "maker"
+    },
+    "as@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "at@shelf": {
+     "first3": 0.5833333333333334,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "bar": {
+     "first3": 0.4166666666666667,
+     "rest": 0.8333333333333334,
+     "showings": 6,
+     "source": "maker"
+    },
+    "be@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "became@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "bee@shelf": {
+     "first3": 0.16666666666666666,
+     "rest": 0.0,
+     "showings": 8,
+     "source": "shelf"
+    },
+    "beehives@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "bees@shelf": {
+     "first3": 0.0,
+     "rest": 0.25,
+     "showings": 6,
+     "source": "shelf"
+    },
+    "before@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "being@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "belongs@shelf": {
+     "first3": 0.08333333333333333,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "between@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "blame@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "blossoms@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "books@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "box@game": {
+     "first3": 0.4166666666666667,
+     "rest": 0.3314393939393939,
+     "showings": 135,
+     "source": "game"
+    },
+    "boxes@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "boy@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "brings@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "broke@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "broken@shelf": {
+     "first3": 0.4166666666666667,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "build@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "busy@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "but@shelf": {
+     "first3": 0.75,
+     "rest": 0.5833333333333334,
+     "showings": 6,
+     "source": "shelf"
+    },
+    "buzz@shelf": {
+     "first3": 0.16666666666666666,
+     "rest": 0.0,
+     "showings": 20,
+     "source": "shelf"
+    },
+    "by@shelf": {
+     "first3": 0.625,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "called@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "came@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "can@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "careless@shelf": {
+     "first3": 0.0,
+     "rest": 0.125,
+     "showings": 5,
+     "source": "shelf"
+    },
+    "cells@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "children@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "cloudy@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "clover@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "columbin@shelf": {
+     "first3": 0.0,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "comes@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "coming@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "corner@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "could@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "covered@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "creature@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "daffo@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "daffodil@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "daisy@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "dash@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "daughter@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "day@shelf": {
+     "first3": 0.16666666666666666,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "days@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "de@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "dead@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "defense@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "diamond": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "maker"
+    },
+    "did@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "dil@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "divided@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "do@shelf": {
+     "first3": 0.8333333333333334,
+     "rest": 0.5,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "does@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "dog@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "doll@shelf": {
+     "first3": 0.6666666666666666,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "doth@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "douglas@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "dreary@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "dress@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "driven@shelf": {
+     "first3": 0.25,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "drones@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "each@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "easi@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "eat@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "ef@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "effects@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "end@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "equal@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "ever@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "every@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "evil@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "exercise@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "far@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "fects@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "feet@shelf": {
+     "first3": 0.3333333333333333,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "fellow@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "fense@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "first@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "flower@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "flowers@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "for@shelf": {
+     "first3": 0.75,
+     "rest": 1.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "found@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "four@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "fragrant@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "friends@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "from@shelf": {
+     "first3": 0.75,
+     "rest": 0.75,
+     "showings": 5,
+     "source": "shelf"
+    },
+    "gather@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "gave@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "gay@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "get@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "gets@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "getting@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "girl@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "glass@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "go@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "good@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "great@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "growing@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "habit@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "had@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "half@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "handle@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "hangs@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "happy@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "harder@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "hardly@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "harm@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "harshly@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "have@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "having@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "he@shelf": {
+     "first3": 1.0,
+     "rest": 0.75,
+     "showings": 12,
+     "source": "shelf"
+    },
+    "heedless@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "her@shelf": {
+     "first3": 0.5,
+     "rest": 0.6333333333333333,
+     "showings": 18,
+     "source": "shelf"
+    },
+    "hes@shelf": {
+     "first3": 0.3333333333333333,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "high@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "his@shelf": {
+     "first3": 0.5833333333333334,
+     "rest": 0.75,
+     "showings": 5,
+     "source": "shelf"
+    },
+    "hive@shelf": {
+     "first3": 0.0,
+     "rest": 0.28125,
+     "showings": 11,
+     "source": "shelf"
+    },
+    "home@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "honey@shelf": {
+     "first3": 0.3333333333333333,
+     "rest": 0.3125,
+     "showings": 7,
+     "source": "shelf"
+    },
+    "hour@shelf": {
+     "first3": 0.3333333333333333,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "house@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "how@shelf": {
+     "first3": 0.3333333333333333,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "humming@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "i@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "idle@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "if@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "illustra@shelf": {
+     "first3": 0.5,
+     "rest": 0.5,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "improve@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "in@shelf": {
+     "first3": 0.6666666666666666,
+     "rest": 0.8,
+     "showings": 13,
+     "source": "shelf"
+    },
+    "inside@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "into@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "is@shelf": {
+     "first3": 1.0,
+     "rest": 0.78125,
+     "showings": 11,
+     "source": "shelf"
+    },
+    "it@shelf": {
+     "first3": 1.0,
+     "rest": 1.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "its@shelf": {
+     "first3": 0.5833333333333334,
+     "rest": 0.75,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "join@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "jolly@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "just@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "keep@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "kernel@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "killed@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "kindswor@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "know@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "last@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "laughing@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "lazy@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "leaving@shelf": {
+     "first3": 0.16666666666666666,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "left@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "legs@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "lesson@shelf": {
+     "first3": 0.16666666666666666,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "levies@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "lies@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "life@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "light@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "lilies@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "little@shelf": {
+     "first3": 0.3333333333333333,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "live@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "look@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "lost@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "ly@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "maam@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "make@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "makes@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "making@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "marian@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "mary@shelf": {
+     "first3": 0.25,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "may@shelf": {
+     "first3": 0.08333333333333333,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "meadow@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "mornings@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "mother@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "mrs@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "much@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "mud@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "my@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "nearly@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "never@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "nicest@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "night@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "no@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "not@shelf": {
+     "first3": 0.5833333333333334,
+     "rest": 0.625,
+     "showings": 7,
+     "source": "shelf"
+    },
+    "nothing@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "noy@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "nut@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "of@shelf": {
+     "first3": 1.0,
+     "rest": 0.7205882352941176,
+     "showings": 20,
+     "source": "shelf"
+    },
+    "often@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "oh@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "on@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "one@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "only@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "open@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "opening@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "or@shelf": {
+     "first3": 0.5833333333333334,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "other@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "others@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "out@shelf": {
+     "first3": 0.25,
+     "rest": 0.25,
+     "showings": 5,
+     "source": "shelf"
+    },
+    "over@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "own@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "parts@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "pay@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "pet@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "picked@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "picking@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "pinks@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "place@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "places@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "played@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "playthin@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "pleasant@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "pretty@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "promised@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "proper@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "putting@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "quarrel@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "quarrels@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "queen@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "queens@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "quite@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "ran@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "roof@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "room@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "roses@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "round@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "safe@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "said@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "saw@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "scent@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "script@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "see@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "settling@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "shall@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "shape@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "sharp@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "she@shelf": {
+     "first3": 0.5833333333333334,
+     "rest": 0.3333333333333333,
+     "showings": 6,
+     "source": "shelf"
+    },
+    "shell@shelf": {
+     "first3": 0.25,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "shining@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "sides@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "singing@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "sitting@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "six@shelf": {
+     "first3": 0.625,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "size@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "slate@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "sloped@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "smelling@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "so@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "some@shelf": {
+     "first3": 0.16666666666666666,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "song@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "spend@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "spoiled@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "square": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 2,
+     "source": "maker"
+    },
+    "square@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "star": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "maker"
+    },
+    "stay@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "stings@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "stop@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "summer@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "sunny@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "sweetsme@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "takes@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "tax@shelf": {
+     "first3": 0.25,
+     "rest": 0.75,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "than@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "that@shelf": {
+     "first3": 0.25,
+     "rest": 0.3333333333333333,
+     "showings": 6,
+     "source": "shelf"
+    },
+    "the@shelf": {
+     "first3": 1.0,
+     "rest": 0.8035714285714286,
+     "showings": 45,
+     "source": "shelf"
+    },
+    "their@shelf": {
+     "first3": 0.4166666666666667,
+     "rest": 0.5,
+     "showings": 6,
+     "source": "shelf"
+    },
+    "them@shelf": {
+     "first3": 0.3333333333333333,
+     "rest": 0.0,
+     "showings": 5,
+     "source": "shelf"
+    },
+    "then@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "they@shelf": {
+     "first3": 0.5,
+     "rest": 0.4375,
+     "showings": 11,
+     "source": "shelf"
+    },
+    "things@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "think@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "this@shelf": {
+     "first3": 0.75,
+     "rest": 0.16666666666666666,
+     "showings": 6,
+     "source": "shelf"
+    },
+    "thistle@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "three@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "through@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "till@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "time@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "tis@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "to@shelf": {
+     "first3": 1.0,
+     "rest": 0.8409090909090909,
+     "showings": 14,
+     "source": "shelf"
+    },
+    "together@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "toiling@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "told@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "took@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "torn@shelf": {
+     "first3": 0.08333333333333333,
+     "rest": 0.5,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "toys@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "treasure@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "tree@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "triangle": {
+     "first3": 0.3333333333333333,
+     "rest": null,
+     "showings": 3,
+     "source": "maker"
+    },
+    "trouble@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "two@shelf": {
+     "first3": 0.4166666666666667,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "un@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "under@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "unhappy@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "up@shelf": {
+     "first3": 0.75,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "use@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "used@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "very@shelf": {
+     "first3": 0.08333333333333333,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "was@shelf": {
+     "first3": 0.5,
+     "rest": 0.25,
+     "showings": 5,
+     "source": "shelf"
+    },
+    "wax@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "way@shelf": {
+     "first3": 0.16666666666666666,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "we@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "weary@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "weeds@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "well@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "went@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "where@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "which@shelf": {
+     "first3": 0.5,
+     "rest": 0.5,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "while@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "who@shelf": {
+     "first3": 0.25,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "will@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "wings@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "winter@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "wise@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "with@shelf": {
+     "first3": 0.25,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "wooden@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "work@shelf": {
+     "first3": 0.25,
+     "rest": 0.2727272727272727,
+     "showings": 14,
+     "source": "shelf"
+    },
+    "worker@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "workers@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "worse@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "would@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "xxi@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "xxii@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "xxiii@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "yard@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "yellow@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "yet@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "you@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    }
+   },
+   "reason": "graded (\u00a719.1 as re-specified 2026-09-22 22:33 +0400); the blind-surprise twin was not run \u2014 the twin clause FAILS",
+   "rise_first_to_last_500": -0.0345,
+   "source_known": false,
+   "status_confirmed": 3208,
+   "status_surprised": 5452,
+   "things": {
+    "circle": {
+     "first3": 0.25,
+     "last20": 0.6125,
+     "rising": true,
+     "showings": 90
+    },
+    "cross": {
+     "first3": 0.5833,
+     "last20": 0.25,
+     "rising": false,
+     "showings": 90
+    },
+    "cup": {
+     "first3": 0.0,
+     "last20": 0.2125,
+     "rising": true,
+     "showings": 96
+    },
+    "dot": {
+     "first3": 1.0,
+     "last20": 0.9125,
+     "rising": false,
+     "showings": 103
+    },
+    "house": {
+     "first3": 0.5833,
+     "last20": 0.5,
+     "rising": false,
+     "showings": 102
+    },
+    "key": {
+     "first3": 0.5,
+     "last20": 0.4875,
+     "rising": false,
+     "showings": 95
+    },
+    "moon": {
+     "first3": 0.9167,
+     "last20": 0.65,
+     "rising": false,
+     "showings": 93
+    },
+    "tree": {
+     "first3": 0.5833,
+     "last20": 0.55,
+     "rising": false,
+     "showings": 100
+    }
+   },
+   "things_graded": 8,
+   "things_rising": 2,
+   "twin_confirmed": null
+  }
+ },
+ "frames_filed": 26,
+ "from_seq": 304002,
+ "genome_sha256": "fd15f9e3fb7bbbb3917d329ff7c9912f84e1ae8f7c8bd5e48ba7450e8aa927b2",
+ "journal_rows": 4395,
+ "journal_sha256": "17cf30cfbca686a135e3f06d037ef15407cf74837157626d847d4910ef653f43",
+ "label": "inc",
+ "load0": [
+  8.03,
+  5.23,
+  3.85
+ ],
+ "load1": [
+  6.41,
+  8.23,
+  8.59
+ ],
+ "maxrss_kb": 6494316,
+ "psi0": {
+  "cpu_full_avg10": 0.0,
+  "cpu_some_avg10": 0.0,
+  "memory_full_avg10": 0.0,
+  "memory_some_avg10": 0.0
+ },
+ "psi1": {
+  "cpu_full_avg10": 0.0,
+  "cpu_some_avg10": 0.0,
+  "memory_full_avg10": 0.0,
+  "memory_some_avg10": 0.0
+ },
+ "q1_seen": 0.9454545454545454,
+ "reward_mean": 0.0,
+ "row_hash": "fd024586f42d44445335ff71864c0275f6aa988014dcfaa4a26ee69a820d20d6",
+ "rows_consumed": 4665,
+ "sentence_graded": false,
+ "sentence_pass": null,
+ "state_hash": "97a21ff59e45e723635b09262fdb43b1ba3f0bf27008817642ef90acbb638a58",
+ "tape_rows": 4665,
+ "to_seq": 308667,
+ "variant": "incumbent",
+ "wall_s": 2732.983
+}
