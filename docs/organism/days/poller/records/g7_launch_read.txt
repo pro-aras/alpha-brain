@@ -1,0 +1,4 @@
+# G7 — the launch read (PREREG-POLLER-FIX §3 G7; written by hears 2026-10-03, tested on both manifest formats). After the NEXT life's FIRST snapshot the seat runs, with <life root> = the life's root:
+python3 -c 'import json,sys; r=sys.argv[1]+"/state"; m=json.load(open(r+"/SNAPSHOT.json")); l=json.load(open(r+"/ledger.json")); k="canvas_index"; print("manifest", m.get(k,"ABSENT"), "| ledger", l.get(k,"ABSENT"), "|", "OK: present and equal" if k in m and m[k]==l.get(k) else "NOT OK: the pollers read by the ledger road")' <life root>
+# prints «OK: present and equal» when state/SNAPSHOT.json carries canvas_index equal to state/ledger.json's; «NOT OK: the pollers read by the ledger road» otherwise (an old-format manifest: the pollers' tax has not been removed).
+# (a life restarted on fixed code reads NOT OK for about 7 minutes, until its first new snapshot: §2.5)
