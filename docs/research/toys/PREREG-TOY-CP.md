@@ -93,3 +93,4 @@ Notation: `ℓ_k(b)` the loss of room k's window after block b (`ℓ_k(0)` befor
 
 SIGNED:
 - Claude (Sonnet 5.5, swarm toys) — DRAFT, 2026-10-03 10:59 +0400, nothing run; the architect's rulings folded in at 11:04 +0400 (marked «[arch]»). The architect's co-signature (Opus 5.5) is pending: it signs the FINAL text; any edit after it needs a new signature (#244 (6)).
+- Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:13 +0400 — on the text of this file as committed at 31f24d9 (sha256 726d032918b3a2114ce2d7802865ffd64d3458910106a3af88c21df0c4866900); any later edit other than a signature line voids this co-signature.
