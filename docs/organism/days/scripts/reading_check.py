@@ -59,7 +59,7 @@ def load_series():
         for k in ("moments", "tape_rows", "cells", "sleeps", "snapshots", "thinks", "said"):
             d[k] = int(d[k])
         d["ms"] = float(d["mind_ms_per_canvas_1min"])
-        d["rss"] = float(d["rss_mb"])
+        d["peak"] = float(d["rss_mb"])      # STATUS `rss_mb` is getrusage(RUSAGE_SELF).ru_maxrss (creature/body.py:91-93): a PEAK that can only rise
         d["mem"] = int(d["unit"].split("MemoryCurrent=")[1]) if "MemoryCurrent=" in d["unit"] else None
         d["restarts"] = int(d["unit"].split("NRestarts=")[1].split()[0])
         out.append(d)
@@ -122,23 +122,30 @@ def series():
     check(max(d["restarts"] for d in S) == 0 and not (LIVE / "RECOVERY.log").exists() and not (LIVE / "repairs").exists() and sum(1 for r in hl if r.get("problems")) == 0,
           "0 unit restarts, 0 repairs, no RECOVERY.log, no repairs/, no HEALTH problem row: the life never needed a repair")
     # --- 2. memory
-    print("\n-- memory (RSS and the cgroup's MemoryCurrent), by 6 h windows (UTC)")
+    print("\n-- memory: the process's PEAK RSS (ru_maxrss: a high-water mark that only rises), the cgroup's MemoryCurrent (the CURRENT figure, page cache included) and swap, by 6 h windows (UTC)")
     def sixh(d):
         h = d["hb"]; return "%s %02d" % (h.strftime("%m-%d"), h.hour // 6 * 6)
     by = collections.OrderedDict()
     for d in S:
         by.setdefault(sixh(d), []).append(d)
-    print("  window(UTC)  n   cells(med)  rss_MB(med)  cgroup_GB(med)  load(med)")
+    hl_by = collections.defaultdict(list)
+    for r_ in hl:
+        t_ = iso(r_["at"].replace(" +0400", "+04:00").replace(" ", "T")) if " " in r_["at"] else iso(r_["at"])
+        t_ = t_.astimezone(dt.timezone.utc)
+        hl_by["%s %02d" % (t_.strftime("%m-%d"), t_.hour // 6 * 6)].append(r_)
+    print("  window(UTC)  n   cells(med)  peak_RSS_MB(med)  MemoryCurrent_GB(med)  swap_GB(med/max)  load(med)")
     for k, v in by.items():
-        print("  %-11s %3d  %9d  %10.0f  %13.2f  %8.2f" % (k, len(v), statistics.median(d["cells"] for d in v), statistics.median(d["rss"] for d in v),
-                                                         statistics.median(d["mem"] for d in v if d["mem"]) / 1e9, statistics.median(d["load"] for d in v)))
-    post = [d for d in S if d["hb"] >= iso(SCENE_END_Z) + dt.timedelta(hours=4)]
-    c = np.array([d["cells"] for d in post], float); r = np.array([d["rss"] for d in post], float)
-    A = np.vstack([np.ones_like(c), c]).T
-    (a0, b0), res, *_ = np.linalg.lstsq(A, r, rcond=None)
-    resid = r - A @ np.array([a0, b0])
-    print("  RSS vs cells after 05:30 09-30 (n %d): rss_MB = %.0f + %.4f x cells  (%.1f KB a cell), residual sd %.0f MB, cells %d -> %d, rss %.0f -> %.0f MB" % (
-        len(post), a0, b0, b0 * 1024, resid.std(), post[0]["cells"], post[-1]["cells"], post[0]["rss"], post[-1]["rss"]))
+        sw = [x["swap_used_gb"] for x in hl_by.get(k, []) if x.get("swap_used_gb") is not None]
+        print("  %-11s %3d  %9d  %15.0f  %20.2f  %7.2f / %4.2f  %8.2f" % (k, len(v), statistics.median(d["cells"] for d in v), statistics.median(d["peak"] for d in v),
+                                                         statistics.median(d["mem"] for d in v if d["mem"]) / 1e9, statistics.median(sw) if sw else float("nan"), max(sw) if sw else float("nan"), statistics.median(d["load"] for d in v)))
+    mem_gb = [d["mem"] / 1e9 for d in S if d["mem"]]
+    iM = int(np.argmax(mem_gb))
+    print("  MemoryCurrent (current, not peak): max %.2f GB at %s, last %.2f GB; the peak RSS only rose: %.0f -> %.0f MB" % (max(mem_gb), [d for d in S if d["mem"]][iM]["at"][5:16], mem_gb[-1], S[0]["peak"], S[-1]["peak"]))
+    rises = [(S[i + 1]["peak"] - S[i]["peak"], i) for i in range(len(S) - 1) if S[i + 1]["peak"] - S[i]["peak"] >= 100]
+    check(all(S[i + 1]["peak"] >= S[i]["peak"] for i in range(len(S) - 1)), "the peak RSS never falls in 983 samples: it is a high-water mark, so it says nothing about usage going up or down")
+    print("  new peaks of at least 100 MB between consecutive samples after 06:00Z 09-30: %d ; the largest: %s" % (
+        len([1 for dr, i in rises if S[i]["hb"] >= iso("2026-09-30T06:00:00Z")]),
+        ", ".join("%s +%.0f MB" % (S[i]["at"][5:16], dr) for dr, i in sorted(rises, reverse=True)[:3])))
     # --- 3. cost per canvas
     print("\n-- the cost per canvas: every one-minute window CLASSIFIED by what it contained, then the quiet ones fitted")
     sl_ts = sorted(sl_t); sn_ts = sorted(snap_t)
@@ -230,13 +237,13 @@ def series():
     beta_2 = np.linalg.lstsq(X2, np.log(mq), rcond=None)[0]
     vif = 1.0 / (1.0 - r_cm ** 2)
     print("  CELLS vs MOMENTS as the driver (quiet windows): corr(log cells, log moments) = %.4f (variance inflation %.0f) ; exponent vs cells alone %.2f, vs moments alone %.2f ; both together: cells %.2f, moments %.2f — this series cannot separate them" % (r_cm, vif, b_cells, b_mom, beta_2[1], beta_2[2]))
-    # the RSS steps: the two largest rises between consecutive samples, with what moved beside them
-    rss_steps = sorted(((S[i + 1]["rss"] - S[i]["rss"], i) for i in range(len(S) - 1)), reverse=True)[:2]
+    # the new PEAKS: the two largest rises of the high-water mark between consecutive samples, with what moved beside them
+    rss_steps = sorted(((S[i + 1]["peak"] - S[i]["peak"], i) for i in range(len(S) - 1)), reverse=True)[:2]
     for dr, i in rss_steps:
-        print("  RSS step %s -> %s: %+.0f MB (%.0f -> %.0f) with cells %d -> %d, births %s -> %s, sleeps %d -> %d, snapshots %d -> %d" % (
-            S[i]["at"][5:16], S[i + 1]["at"][11:16], dr, S[i]["rss"], S[i + 1]["rss"], S[i]["cells"], S[i + 1]["cells"], S[i]["births"], S[i + 1]["births"],
+        print("  new PEAK %s -> %s: %+.0f MB (%.0f -> %.0f) with cells %d -> %d, births %s -> %s, sleeps %d -> %d, snapshots %d -> %d" % (
+            S[i]["at"][5:16], S[i + 1]["at"][11:16], dr, S[i]["peak"], S[i + 1]["peak"], S[i]["cells"], S[i + 1]["cells"], S[i]["births"], S[i + 1]["births"],
             S[i]["sleeps"], S[i + 1]["sleeps"], S[i]["snapshots"], S[i + 1]["snapshots"]))
-    check(sum(dr for dr, _ in rss_steps) > 1800 and abs(S[rss_steps[0][1] + 1]["cells"] - S[rss_steps[0][1]]["cells"]) < 50, "the RSS rose by about 2 GB in two samples while cells did not move: a step (an allocator high-water mark or a doubled array first touched), not a smooth function of cells")
+    check(sum(dr for dr, _ in rss_steps) > 1800 and abs(S[rss_steps[0][1] + 1]["cells"] - S[rss_steps[0][1]]["cells"]) < 50, "the peak RSS rose by about 2 GB in two consecutive samples while cells did not move: a new high-water mark (a transient allocation), not a function of cells")
     # load bands among the quiet windows
     bands = [(0, 2.5), (2.5, 6), (6, 100)]
     for lo, hi in bands:
@@ -298,7 +305,7 @@ def _avg_clustering(adj):
 
 def _path_len(adj, sample=150, seed=3):
     """mean shortest path over `sample` BFS sources inside the largest component"""
-    nodes = list(adj)
+    nodes = sorted(adj, key=str)                 # sorted: str hashing is randomised per process, so set/dict order must not decide the sample (the verifier's catch)
     seen = set(); comps = []
     for s in nodes:
         if s in seen:
@@ -310,7 +317,7 @@ def _path_len(adj, sample=150, seed=3):
                     seen.add(v); comp.append(v)
             i += 1
         comps.append(comp)
-    big = max(comps, key=len)
+    big = sorted(max(comps, key=lambda c: (len(c), sorted(c, key=str)[0])), key=str)
     rng = np.random.default_rng(seed)
     srcs = [big[int(i)] for i in rng.choice(len(big), size=min(sample, len(big)), replace=False)]
     tot = 0; cnt = 0
