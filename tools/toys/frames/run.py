@@ -33,7 +33,8 @@ from . import verdicts as VD
 REPO = ST.REPO
 ROOT = ST.ROOT
 RUNS = ROOT / "runs"
-LAW_KEYS = ["frames", "frames_amend1"]
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 18:20 +0400 — AMENDMENT-2 is a third pinned text (the unit and the gates REFUSE a text that differs from any of the three).
+LAW_KEYS = ["frames", "frames_amend1", "frames_amend2"]
 GATE_MODE = "amend1"
 CONDITIONS: Tuple[Tuple[str, str, Optional[int], str], ...] = (
     ("ALPHA4", "plain", None, "alpha4"),

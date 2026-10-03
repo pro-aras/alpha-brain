@@ -97,6 +97,27 @@ class TestPrereg(unittest.TestCase):
         h = PR.header(["frames", "frames_amend1"])
         self.assertEqual(h["prereg_frames_amend1_sha256"], want)
 
+    def test_the_frames_amendment_2_is_pinned_and_a_planted_edit_of_its_gate_is_refused(self):
+        # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 18:21 +0400 — Toy C's AMENDMENT-2 (G4's second, ALPHA4-regime stream), text at d7f6772, co-signed by the architect 18:18 (c30dbb6) and signed by the seat 18:20
+        # (d407dca); written FIRST (red: no «frames_amend2» pin yet).
+        want = "948d77044a4aff3cdb1ab32f02191b806fb650c80b83a1f43be4d9eb074ccfec"
+        got = PR.check(["frames", "frames_amend1", "frames_amend2"])
+        self.assertEqual(got["frames_amend2"], want)
+        self.assertEqual(got["frames_amend1"], "158660bbfe6a1fd0c551dabc1308dbd4f89fc90a07fd9c58d19e163e9b4abce0")      # the other pins are untouched
+        d = Path(tempfile.mkdtemp())
+        try:
+            src = DOCS / "PREREG-TOY-FRAMES-AMEND-2.md"
+            text = src.read_bytes()
+            self.assertIn(b"All four rules must pass the amend1 gate", text)
+            bad = d / "PREREG-TOY-FRAMES-AMEND-2.md"
+            bad.write_bytes(text.replace(b"All four rules must pass the amend1 gate", b"All four rules may pass the amend1 gate", 1))        # the plant: the requirement on stream (B)
+            self.assertNotEqual(bad.read_bytes(), text)
+            with self.assertRaises(PR.PreregError):
+                PR.check(["frames_amend2"], root=d)
+        finally:
+            shutil.rmtree(d)
+        self.assertEqual(PR.header(["frames_amend2"])["prereg_frames_amend2_sha256"], want)
+
     def test_both_families_of_signature_lines_are_dropped(self):
         # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 15:45 +0400 — Toy D's law (the architect's) signs with «Signed:» / «Co-signed:» at the line start, the toys laws with «- Co-signed:»;
         # written FIRST (red: the second family is not yet dropped). The seat's signature REPLACES the placeholder line «Signed: the seat — pending.» — both are dropped, so it cannot move the sha.

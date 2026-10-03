@@ -83,13 +83,15 @@ class TestUnit(unittest.TestCase):
         names = sorted(p.name for p in self.out.glob("*.json"))
         self.assertEqual(names, ["ALPHA4+PLANT.json", "ALPHA4+SHUFFLE.json", "ALPHA4.json", "RESULTS.json", "SCENE+PLANT.json", "SCENE.json"])
 
-    def test_each_record_carries_both_signed_shas_the_code_sha_and_the_gate_mode(self):
+    def test_each_record_carries_all_three_signed_shas_the_code_sha_and_the_gate_mode(self):
+        # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 18:21 +0400 — AMENDMENT-2 is a third pinned text: every record carries its sha too (written FIRST, red: the runner pins two texts).
         for name, kind in (("ALPHA4", "plain"), ("ALPHA4+PLANT", "plant"), ("ALPHA4+SHUFFLE", "shuffle"), ("SCENE", "plain"), ("SCENE+PLANT", "plant")):
             c = json.loads((self.out / f"{name}.json").read_text())
             self.assertEqual((c["name"], c["kind"]), (name, kind))
             h = c["header"]
             self.assertEqual(h["prereg_frames_sha256"], PR.SIGNED["frames"][1])
             self.assertEqual(h["prereg_frames_amend1_sha256"], PR.SIGNED["frames_amend1"][1])
+            self.assertEqual(h["prereg_frames_amend2_sha256"], PR.SIGNED["frames_amend2"][1])
             self.assertIn("toys_git_sha", h)
             self.assertIn("toys_tree_dirty", h)
             self.assertEqual(h["gate_mode"], "amend1")
@@ -139,7 +141,7 @@ class TestRefusals(unittest.TestCase):
             make_copies(d / "copies")
             docs = d / "docs"
             docs.mkdir()
-            for name in ("PREREG-TOY-FRAMES.md", "PREREG-TOY-FRAMES-AMEND-1.md"):
+            for name in ("PREREG-TOY-FRAMES.md", "PREREG-TOY-FRAMES-AMEND-1.md", "PREREG-TOY-FRAMES-AMEND-2.md"):
                 shutil.copy(PR.DOCS / name, docs / name)
             amend = docs / "PREREG-TOY-FRAMES-AMEND-1.md"
             text = amend.read_bytes()
