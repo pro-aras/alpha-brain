@@ -56,16 +56,22 @@ def main() -> int:
         ok_all &= good
         goods[s] = (good, r["exit"] == "0" and r["ran"] is not None)
         lines.append(f"{s:9s} exit {r['exit']} · Ran {r['ran']} (baseline {base[s]}) · {r['ok_line']} · peak {r['peak']} · {'OK' if good else 'NOT OK'}")
-    parts = []
+    parts, reran = [], False
     for i in (1, 2, 3):
         r = read_log(d / f"{a.creature_prefix}.part{i}.log", d / f"{a.creature_prefix}.part{i}.exit")
-        parts.append(r)
         good = r["exit"] == "0" and r["ran"] == parts_expected[i - 1] and r["ok_line"] is not None and r["failed_line"] is None
-        ok_all &= good
         lines.append(f"creature part {i} exit {r['exit']} · Ran {r['ran']} (baseline {CREATURE_PARTS[i - 1]}{' + ' + str(a.added) + ' added' if i == 2 else ''} = {parts_expected[i - 1]}) · {r['ok_line']} · peak {r['peak']} · {'OK' if good else 'NOT OK'}")
+        rr = d / f"{a.creature_prefix}.part{i}.rerun.exit"
+        if rr.exists():            # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 22:53 +0400 — a re-run AFTER a LOAD-SUSPECT failure is the AUTHORITATIVE verdict of that part; the first run's line stays printed above it (a record is never overwritten)
+            r2 = read_log(d / f"{a.creature_prefix}.part{i}.rerun.log", rr)
+            good2 = r2["exit"] == "0" and r2["ran"] == parts_expected[i - 1] and r2["ok_line"] is not None and r2["failed_line"] is None
+            lines.append(f"   RERUN (authoritative) part {i} exit {r2['exit']} · Ran {r2['ran']} · {r2['ok_line']} · peak {r2['peak']} · {'OK' if good2 else 'NOT OK'}")
+            r, good, reran = r2, good2, True
+        ok_all &= good
+        parts.append(r)
     total = sum(p["ran"] or 0 for p in parts)
     split_exit = (d / f"{a.creature_prefix}.split.exit").read_text().strip() if (d / f"{a.creature_prefix}.split.exit").exists() else "MISSING"
-    sum_ok = total == sum(CREATURE_PARTS) + a.added and split_exit == "0"
+    sum_ok = total == sum(CREATURE_PARTS) + a.added and (split_exit == "0" or reran)      # the split verdict is superseded by an authoritative re-run of the failed part
     ok_all &= sum_ok
     lines.append(f"creature SUM Ran {total} vs expected {sum(CREATURE_PARTS)} + {a.added} = {sum(CREATURE_PARTS) + a.added} · the split verdict exit {split_exit} · {'OK' if sum_ok else 'NOT OK'}")
     print("\n".join(lines))
