@@ -1,0 +1,948 @@
+{
+ "file": "tools/toys/frames/gates.py",
+ "module": "tools.toys.frames.gates",
+ "mutants": [
+  {
+   "kind": "identity",
+   "name": "CONTROL-identity"
+  },
+  {
+   "kind": "broken",
+   "name": "CONTROL-broken"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_a_copy_changed_where_only_the_manifest_can_see_it_is_named"
+   ],
+   "name": "g1-manifest-verify-off",
+   "new": "bad = []",
+   "old": "bad = ST.verify_copies(copies, man)",
+   "why": "the manifest is read but never verified: a changed copy goes unseen"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_a_copy_changed_where_only_the_manifest_can_see_it_is_named"
+   ],
+   "name": "g1-manifest-report-off",
+   "new": "failures += []",
+   "old": "failures += [f\"copy {rel}: no longer hashes to its manifest\" for rel in bad]",
+   "why": "a mismatch is computed and dropped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_a_copies_directory_without_a_manifest_is_named"
+   ],
+   "name": "g1-manifest-missing-silent",
+   "new": "pass",
+   "old": "failures.append(\"no MANIFEST.json in the copies directory\")",
+   "why": "a copies directory without a manifest passes g1"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_a_copy_changed_where_only_the_manifest_can_see_it_is_named"
+   ],
+   "name": "g1-copies-verified-ignores-bad",
+   "new": "out[\"copies_verified\"] = len(man)",
+   "old": "out[\"copies_verified\"] = len(man) - len(bad)",
+   "why": "the verified count ignores the bad copies"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_it_passes_when_every_count_is_the_expected_one_and_the_copies_hash_to_their_manifest"
+   ],
+   "name": "g1-cmp-inverted",
+   "new": "    if got == want:",
+   "old": "    if got != want:",
+   "why": "every count comparison inverted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_every_count_the_law_names_is_checked_one_at_a_time"
+   ],
+   "name": "g1-alpha-moments-skip",
+   "new": "pass",
+   "old": "_cmp(failures, \"alpha4.moments\", c[\"moments\"], ea[\"moments\"])",
+   "why": "the total moment count is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_every_count_the_law_names_is_checked_one_at_a_time"
+   ],
+   "name": "g1-alpha-words-skip",
+   "new": "pass",
+   "old": "_cmp(failures, \"alpha4.words\", c[\"words\"], ea[\"words\"])",
+   "why": "the total word count is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_every_count_the_law_names_is_checked_one_at_a_time"
+   ],
+   "name": "g1-per-source-skip",
+   "new": "pass",
+   "old": "_cmp(failures, f\"alpha4.{src}.{k}\", got[k], v)",
+   "why": "the per-source counts are not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_an_expected_source_missing_from_the_copies_is_named"
+   ],
+   "name": "g1-source-absent-silent",
+   "new": "pass",
+   "old": "failures.append(f\"alpha4.{src}: the source is absent\")",
+   "why": "an expected source missing from the copies passes"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_every_count_the_law_names_is_checked_one_at_a_time"
+   ],
+   "name": "g1-scene-moments-skip",
+   "new": "pass",
+   "old": "_cmp(failures, \"scene.moments\", len(sc), es[\"moments\"])",
+   "why": "the scene moment count is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_every_count_the_law_names_is_checked_one_at_a_time"
+   ],
+   "name": "g1-scene-per-moment-skip",
+   "new": "pass",
+   "old": "_cmp(failures, \"scene.per_moment\", dict(sorted(Counter(len(m.words) for m in sc).items())), es[\"per_moment\"])",
+   "why": "the scene words-a-moment histogram is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_every_count_the_law_names_is_checked_one_at_a_time"
+   ],
+   "name": "g1-dax-skip",
+   "new": "if False:",
+   "old": "if got != (SC.DAX_WORD,):",
+   "why": "the \u00abdax\u00bb scene is not checked at its index"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_every_count_the_law_names_is_checked_one_at_a_time"
+   ],
+   "name": "g1-says-skip",
+   "new": "pass",
+   "old": "_cmp(failures, \"says (rows, yes, distinct frames)\", got_says, tuple(expected[\"says\"]))",
+   "why": "the says count is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_a_plant_token_found_in_a_real_stream_is_named"
+   ],
+   "name": "g1-plant-check-off",
+   "new": "if False:",
+   "old": "if any(t.values()):",
+   "why": "a plant token found in a real stream is not a failure"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_a_plant_token_found_in_a_real_stream_is_named"
+   ],
+   "name": "g1-plant-alpha-skip",
+   "new": "\"ALPHA4\": {},",
+   "old": "\"ALPHA4\": PL.plant_token_occurrences(a4),",
+   "why": "ALPHA4's plant tokens are not counted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_a_plant_token_found_in_the_real_scene_stream_is_named"
+   ],
+   "name": "g1-plant-scene-skip",
+   "new": "\"SCENE\": {}}",
+   "old": "\"SCENE\": PL.plant_token_occurrences(sc)}",
+   "why": "SCENE's plant tokens are not counted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_an_unreadable_copy_is_named_and_g1_says_not_ok"
+   ],
+   "name": "g1-streamerror-not-named",
+   "new": "pass",
+   "old": "failures.append(f\"a copy cannot be read: {e}\")",
+   "why": "an unreadable copy is not named"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_an_unreadable_copy_is_named_and_g1_says_not_ok"
+   ],
+   "name": "g1-streamerror-ok-true",
+   "new": "return {\"ok\": True, \"failures\": failures, **out}",
+   "old": "return {\"ok\": False, \"failures\": failures, **out}",
+   "why": "an unreadable copy reads ok"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_it_passes_when_every_count_is_the_expected_one_and_the_copies_hash_to_their_manifest"
+   ],
+   "name": "g1-chi2-dropped",
+   "new": "\"plant_tokens\": tokens}",
+   "old": "\"plant_tokens\": tokens, \"chi2\": chi}",
+   "why": "the chi-square fit is not carried"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG1.test_every_count_the_law_names_is_checked_one_at_a_time"
+   ],
+   "name": "g1-ok-const",
+   "new": "return {\"ok\": True, \"failures\": failures, **out}",
+   "old": "return {\"ok\": not failures, \"failures\": failures, **out}",
+   "why": "g1 always ok"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g2_fails_when_the_real_store_disagrees_with_a_correct_stand_in"
+   ],
+   "name": "g2-drop-equality",
+   "new": "ok = frames == [[\"blue\", \"ball\"], [\"green\", \"key\"], [\"red\", \"box\"]]",
+   "old": "ok = a == b and frames == [[\"blue\", \"ball\"], [\"green\", \"key\"], [\"red\", \"box\"]]",
+   "why": "the stand-in is no longer compared with the real store"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g2_fails_when_both_stores_agree_on_a_wrong_frame_set"
+   ],
+   "name": "g2-drop-frames-clause",
+   "new": "ok = a == b",
+   "old": "ok = a == b and frames == [[\"blue\", \"ball\"], [\"green\", \"key\"], [\"red\", \"box\"]]",
+   "why": "the known store's frames are no longer checked"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g2_fails_when_the_real_store_disagrees_with_a_correct_stand_in",
+    "TestG2G3.test_g2_fails_when_the_stand_in_disagrees_with_a_correct_real_store",
+    "TestG2G3.test_g2_fails_when_both_stores_agree_on_a_wrong_frame_set"
+   ],
+   "name": "g2-ok-const",
+   "new": "ok = True",
+   "old": "ok = a == b and frames == [[\"blue\", \"ball\"], [\"green\", \"key\"], [\"red\", \"box\"]]",
+   "why": "g2 always ok"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g2_fails_when_the_stand_in_disagrees_with_a_correct_real_store"
+   ],
+   "name": "g2-stand-in-reads-real",
+   "new": "b = find_frames(real)",
+   "old": "b = find_frames(RL.StandIn(ms))",
+   "why": "the stand-in store is never exercised"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g2_the_stand_in_store_equals_the_real_episodes_store"
+   ],
+   "name": "g2-real-store-unwritten",
+   "new": "pass",
+   "old": "real.write(0, np.zeros(2), np.zeros(2), \"\", 0.0, words_in_instant=list(m))",
+   "why": "the real store stays empty"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_pins_its_tolerance_from_both_sides_for_every_compared_key"
+   ],
+   "name": "g3-tol-1e-8",
+   "new": "worst < 1e-8 and not problems",
+   "old": "worst < 1e-9 and not problems",
+   "why": "the tolerance loosened ten-fold"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_pins_its_tolerance_from_both_sides_for_every_compared_key"
+   ],
+   "name": "g3-tol-1e-3",
+   "new": "worst < 1e-3 and not problems",
+   "old": "worst < 1e-9 and not problems",
+   "why": "the tolerance loosened a million-fold"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_pins_its_tolerance_from_both_sides_for_every_compared_key"
+   ],
+   "name": "g3-tol-1e-10",
+   "new": "worst < 1e-10 and not problems",
+   "old": "worst < 1e-9 and not problems",
+   "why": "the tolerance tightened ten-fold"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_fails_when_the_greedys_trace_has_a_problem"
+   ],
+   "name": "g3-problems-ignored",
+   "new": "worst < 1e-9",
+   "old": "worst < 1e-9 and not problems",
+   "why": "the greedy's incremental-gain problems are ignored"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_pins_its_tolerance_from_both_sides_for_every_compared_key"
+   ],
+   "name": "g3-key-G-dropped",
+   "new": "for key in (\"bits0\", \"bitsF\", \"L\"):",
+   "old": "for key in (\"G\", \"bits0\", \"bitsF\", \"L\"):",
+   "why": "G is not compared with its recount"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_pins_its_tolerance_from_both_sides_for_every_compared_key"
+   ],
+   "name": "g3-key-bits0-dropped",
+   "new": "for key in (\"G\", \"bitsF\", \"L\"):",
+   "old": "for key in (\"G\", \"bits0\", \"bitsF\", \"L\"):",
+   "why": "bits0 is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_pins_its_tolerance_from_both_sides_for_every_compared_key"
+   ],
+   "name": "g3-key-bitsF-dropped",
+   "new": "for key in (\"G\", \"bits0\", \"L\"):",
+   "old": "for key in (\"G\", \"bits0\", \"bitsF\", \"L\"):",
+   "why": "bitsF is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_pins_its_tolerance_from_both_sides_for_every_compared_key"
+   ],
+   "name": "g3-key-L-dropped",
+   "new": "for key in (\"G\", \"bits0\", \"bitsF\"):",
+   "old": "for key in (\"G\", \"bits0\", \"bitsF\", \"L\"):",
+   "why": "L is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_pins_its_tolerance_from_both_sides_for_every_compared_key"
+   ],
+   "name": "g3-abs-dropped",
+   "new": "worst = max(worst, getattr(fast, key) - slow[key])",
+   "old": "worst = max(worst, abs(getattr(fast, key) - slow[key]))",
+   "why": "a recount larger than the fast value goes unseen"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_fails_when_the_token_counts_disagree"
+   ],
+   "name": "g3-counts-compare-off",
+   "new": "if False:",
+   "old": "if (fast.N, fast.K, fast.V, fast.n_held_words) != (slow[\"N\"], slow[\"K\"], slow[\"V\"], slow[\"n_held_words\"]):",
+   "why": "the token counts are not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_fails_when_the_token_counts_disagree"
+   ],
+   "name": "g3-counts-no-penalty",
+   "new": "worst = max(worst, 0.0)",
+   "old": "worst = max(worst, 1.0)",
+   "why": "a count mismatch carries no penalty"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_the_fast_compressor_and_the_greedys_incremental_gain_equal_their_recounts"
+   ],
+   "name": "g3-cases-not-counted",
+   "new": "cases += 0",
+   "old": "cases += 1",
+   "why": "the compared cases are not counted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG2G3.test_g3_the_fast_compressor_and_the_greedys_incremental_gain_equal_their_recounts"
+   ],
+   "name": "g3-mdl-steps-dropped",
+   "new": "steps += 0",
+   "old": "steps += r.info[\"steps\"]",
+   "why": "the greedy's steps are not counted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_a_required_rule_failing_its_plant_gate_stops_g4_naming_the_stream_and_the_rule"
+   ],
+   "name": "g4-rule-check-off",
+   "new": "if False:",
+   "old": "if not s[\"gates\"][rule][\"pass\"]:",
+   "why": "a required rule may fail its plant gate"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_a_plant_that_does_not_beat_null2_stops_g4_and_prints_both_numbers"
+   ],
+   "name": "g4-beats2-off",
+   "new": "if False:",
+   "old": "if not s[\"plant_beats_null2\"]:",
+   "why": "PLANT-BEATS-NULL-2 is not enforced"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_a_plant_that_does_not_beat_null2_stops_g4_and_prints_both_numbers"
+   ],
+   "name": "g4-beats2-silent",
+   "new": "pass",
+   "old": "failures.append(f\"G4 stream {key}: PLANT-BEATS-NULL-2 fails (B {s['B']:.2f}, q95 {s['null2_q95']:.2f})\")",
+   "why": "the failure is dropped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_each_conjunct_of_the_parse_breaking_control_stops_g4"
+   ],
+   "name": "g4-ctrl-caught-dropped",
+   "new": "if not (c[\"bytes_changed\"] and c[\"gate_honest\"] and not c[\"gate_broken\"]):",
+   "old": "if not (c[\"caught\"] and c[\"bytes_changed\"] and c[\"gate_honest\"] and not c[\"gate_broken\"]):",
+   "why": "`caught` is not required"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_each_conjunct_of_the_parse_breaking_control_stops_g4"
+   ],
+   "name": "g4-ctrl-bytes-dropped",
+   "new": "if not (c[\"caught\"] and c[\"gate_honest\"] and not c[\"gate_broken\"]):",
+   "old": "if not (c[\"caught\"] and c[\"bytes_changed\"] and c[\"gate_honest\"] and not c[\"gate_broken\"]):",
+   "why": "the plant's changed-bytes assertion is not required"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_each_conjunct_of_the_parse_breaking_control_stops_g4"
+   ],
+   "name": "g4-ctrl-honest-dropped",
+   "new": "if not (c[\"caught\"] and c[\"bytes_changed\"] and not c[\"gate_broken\"]):",
+   "old": "if not (c[\"caught\"] and c[\"bytes_changed\"] and c[\"gate_honest\"] and not c[\"gate_broken\"]):",
+   "why": "the honest gate need not pass"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_each_conjunct_of_the_parse_breaking_control_stops_g4"
+   ],
+   "name": "g4-ctrl-broken-dropped",
+   "new": "if not (c[\"caught\"] and c[\"bytes_changed\"] and c[\"gate_honest\"]):",
+   "old": "if not (c[\"caught\"] and c[\"bytes_changed\"] and c[\"gate_honest\"] and not c[\"gate_broken\"]):",
+   "why": "the broken gate may pass"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_each_conjunct_of_the_parse_breaking_control_stops_g4"
+   ],
+   "name": "g4-ctrl-or",
+   "new": "if not (c[\"caught\"] or c[\"bytes_changed\"] or c[\"gate_honest\"] or not c[\"gate_broken\"]):",
+   "old": "if not (c[\"caught\"] and c[\"bytes_changed\"] and c[\"gate_honest\"] and not c[\"gate_broken\"]):",
+   "why": "the four conditions are alternatives"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_each_conjunct_of_the_parse_breaking_control_stops_g4"
+   ],
+   "name": "g4-ctrl-off",
+   "new": "if False:",
+   "old": "if not (c[\"caught\"] and c[\"bytes_changed\"] and c[\"gate_honest\"] and not c[\"gate_broken\"]):",
+   "why": "the control is not enforced"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_each_conjunct_of_the_parse_breaking_control_stops_g4"
+   ],
+   "name": "g4-ctrl-silent",
+   "new": "pass",
+   "old": "failures.append(f\"G4 stream {key}: the gate's parse-breaking control is not caught ({c})\")",
+   "why": "the failure is dropped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_a_required_rule_failing_its_plant_gate_stops_g4_naming_the_stream_and_the_rule"
+   ],
+   "name": "g4-ok-const",
+   "new": "return {\"ok\": True, \"failures\": failures, \"streams\": streams, \"draws\": draws}",
+   "old": "return {\"ok\": not failures, \"failures\": failures, \"streams\": streams, \"draws\": draws}",
+   "why": "g4 always ok"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_stream_a_as_signed_prints_web_s_failure_and_does_not_fail_the_gate"
+   ],
+   "name": "g4-required-A-adds-web-s",
+   "new": "\"A\": (\"WEB-H\", \"WEB-S\", \"SENTENCE\", \"MDL-GREEDY\")",
+   "old": "\"A\": (\"WEB-H\", \"SENTENCE\", \"MDL-GREEDY\")",
+   "why": "WEB-S required on the small-vocabulary stream"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_both_streams_every_required_rule_keeps_the_plant_and_both_controls_are_caught"
+   ],
+   "name": "g4-required-B-drops-web-s",
+   "new": "\"B\": (\"WEB-H\", \"SENTENCE\", \"MDL-GREEDY\")",
+   "old": "\"B\": (\"WEB-H\", \"WEB-S\", \"SENTENCE\", \"MDL-GREEDY\")",
+   "why": "WEB-S not required on the ALPHA4-regime stream"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_both_streams_every_required_rule_keeps_the_plant_and_both_controls_are_caught"
+   ],
+   "name": "g4-mode-law",
+   "new": "gates = VD.plant_gates(cond, \"law\")",
+   "old": "gates = VD.plant_gates(cond, \"amend1\")",
+   "why": "the gate runs in the base text's mode"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_both_streams_every_required_rule_keeps_the_plant_and_both_controls_are_caught"
+   ],
+   "name": "g4-control-unplanted",
+   "new": "\"control\": PL.plant_gate_control(list(moments))}",
+   "old": "\"control\": PL.plant_gate_control(planted)}",
+   "why": "the control is built on the stream without its plants"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_the_defaults_are_the_signed_streams"
+   ],
+   "name": "g4-default-scene-moments",
+   "new": "scene_moments: int = 2999",
+   "old": "scene_moments: int = 3000",
+   "why": "stream A is not the signed 3,000 moments"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_the_defaults_are_the_signed_streams"
+   ],
+   "name": "g4-default-alpha-moments",
+   "new": "alpha_moments: int = 19_999",
+   "old": "alpha_moments: int = 20_000",
+   "why": "stream B is not the signed 20,000 moments"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_the_defaults_are_the_signed_streams"
+   ],
+   "name": "g4-default-scene-every",
+   "new": "scene_every: int = PL.PLANT_EVERY[\"ALPHA4\"]",
+   "old": "scene_every: int = PL.PLANT_EVERY[\"SCENE\"]",
+   "why": "stream A's plant cadence is not SCENE's"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_the_defaults_are_the_signed_streams"
+   ],
+   "name": "g4-default-alpha-every",
+   "new": "alpha_every: int = PL.PLANT_EVERY[\"SCENE\"]",
+   "old": "alpha_every: int = PL.PLANT_EVERY[\"ALPHA4\"]",
+   "why": "stream B's plant cadence is not ALPHA4's"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_g4_draws_stream_a_from_replicate_seed_1_and_stream_b_from_alpha_seed_1"
+   ],
+   "name": "g4-replicate-seed",
+   "new": "np.random.default_rng([SC.SEED_ROOT, SC.G6_TAG, 2])",
+   "old": "np.random.default_rng([SC.SEED_ROOT, SC.G6_TAG, 1])",
+   "why": "stream A is not the signed replicate seed 1"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG4.test_the_defaults_are_the_signed_streams"
+   ],
+   "name": "g4-default-draws",
+   "new": "def g4(draws: int = 99,",
+   "old": "def g4(draws: int = 100,",
+   "why": "the null draws are not the law's 100"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG5.test_g5_arithmetic_and_the_ceiling_boundaries_on_stubbed_clocks"
+   ],
+   "name": "g5-cpu-gt-ge",
+   "new": "if pred_unit_min >= cpu_ceiling_min:",
+   "old": "if pred_unit_min > cpu_ceiling_min:",
+   "why": "a price exactly at the ceiling stops"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG5.test_g5_arithmetic_and_the_ceiling_boundaries_on_stubbed_clocks"
+   ],
+   "name": "g5-rss-gt-ge",
+   "new": "if pred_rss_mb >= rss_ceiling_mb:",
+   "old": "if pred_rss_mb > rss_ceiling_mb:",
+   "why": "a memory exactly at the ceiling stops"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG5.test_g5_arithmetic_and_the_ceiling_boundaries_on_stubbed_clocks"
+   ],
+   "name": "g5-rss-slope-dropped",
+   "new": "pred_rss_mb = b[\"peak_rss_kb\"] / 1024.0",
+   "old": "pred_rss_mb = (b[\"peak_rss_kb\"] + rss_slope * max(0, 100 - b[\"draws\"])) / 1024.0",
+   "why": "memory is not extrapolated to 100 draws"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG5.test_g5_arithmetic_and_the_ceiling_boundaries_on_stubbed_clocks"
+   ],
+   "name": "g5-peak-min",
+   "new": "min(p[\"peak_rss_kb\"] for p in pilots) / 1024.0",
+   "old": "max(p[\"peak_rss_kb\"] for p in pilots) / 1024.0",
+   "why": "the reported peak is the smaller pilot's"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG5.test_the_pilot_extrapolates_cpu_linearly_in_the_draws_and_reports_peak_memory"
+   ],
+   "name": "g5-unit-factor",
+   "new": "pred_unit_min = 4 * pred_alpha / 60.0",
+   "old": "pred_unit_min = 5 * pred_alpha / 60.0",
+   "why": "the unit is priced as four ALPHA4 conditions, not five"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG5.test_g5_defaults_are_the_laws_ceilings"
+   ],
+   "name": "g5-default-cpu-ceiling",
+   "new": "cpu_ceiling_min: float = 400.0",
+   "old": "cpu_ceiling_min: float = 40.0",
+   "why": "the CPU ceiling is not the law's 40 min"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG5.test_g5_defaults_are_the_laws_ceilings"
+   ],
+   "name": "g5-default-rss-ceiling",
+   "new": "rss_ceiling_mb: float = 10240.0",
+   "old": "rss_ceiling_mb: float = 1024.0",
+   "why": "the memory ceiling is not 1 GB"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-violation-off",
+   "new": "if False:",
+   "old": "if r[\"violation\"]:",
+   "why": "a replicate above G_max + 20 is not a failure"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-cheat-caught-dropped",
+   "new": "if not (cheat[\"bitsF_cheat\"] != cheat[\"bitsF_honest\"]):",
+   "old": "if not (cheat[\"caught\"] and cheat[\"bitsF_cheat\"] != cheat[\"bitsF_honest\"]):",
+   "why": "an uncaught cheat passes"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-cheat-bytes-dropped",
+   "new": "if not cheat[\"caught\"]:",
+   "old": "if not (cheat[\"caught\"] and cheat[\"bitsF_cheat\"] != cheat[\"bitsF_honest\"]):",
+   "why": "a cheat that changed no bytes passes"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-cheat-or",
+   "new": "if not (cheat[\"caught\"] or cheat[\"bitsF_cheat\"] != cheat[\"bitsF_honest\"]):",
+   "old": "if not (cheat[\"caught\"] and cheat[\"bitsF_cheat\"] != cheat[\"bitsF_honest\"]):",
+   "why": "the cheat's two conditions are alternatives"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-cheat-off",
+   "new": "if False:",
+   "old": "if not (cheat[\"caught\"] and cheat[\"bitsF_cheat\"] != cheat[\"bitsF_honest\"]):",
+   "why": "the cheat is not enforced"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-sum-tol-loose",
+   "new": "if abs(ex[\"sum_p\"] - 1.0) >= 1e-6:",
+   "old": "if abs(ex[\"sum_p\"] - 1.0) >= 1e-12:",
+   "why": "the support-sum tolerance loosened"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-sum-tol-tight",
+   "new": "if abs(ex[\"sum_p\"] - 1.0) >= 1e-13:",
+   "old": "if abs(ex[\"sum_p\"] - 1.0) >= 1e-12:",
+   "why": "the support-sum tolerance tightened"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-entropy-tol-loose",
+   "new": "abs(ex[\"entropy\"] - 6.0774) >= 5e-3",
+   "old": "abs(ex[\"entropy\"] - 6.0774) >= 5e-5",
+   "why": "the entropy tolerance loosened"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-entropy-dropped",
+   "new": "",
+   "old": "abs(ex[\"entropy\"] - 6.0774) >= 5e-5 or ",
+   "why": "the entropy is not checked"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-hgl-tol-loose",
+   "new": "abs(ex[\"h_given_length\"] - 4.5774) >= 5e-3",
+   "old": "abs(ex[\"h_given_length\"] - 4.5774) >= 5e-5",
+   "why": "H(utterance | length) tolerance loosened"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-hgl-dropped",
+   "new": "",
+   "old": "or abs(ex[\"h_given_length\"] - 4.5774) >= 5e-5 ",
+   "why": "H(utterance | length) is not checked"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-hl-tol-loose",
+   "new": "abs(ex[\"h_length\"] - 1.5) >= 1e-6",
+   "old": "abs(ex[\"h_length\"] - 1.5) >= 1e-12",
+   "why": "H(length) tolerance loosened"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-hl-dropped",
+   "new": "",
+   "old": "or abs(ex[\"h_length\"] - 1.5) >= 1e-12 ",
+   "why": "H(length) is not checked"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-support-dropped",
+   "new": "",
+   "old": "or ex[\"support_size\"] != 90",
+   "why": "the support size is not checked"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_each_failure_is_named_and_the_tolerances_are_pinned_from_both_sides"
+   ],
+   "name": "g6-min-margin-max",
+   "new": "\"min_margin\": max(r[\"margin\"] for r in reps)",
+   "old": "\"min_margin\": min(r[\"margin\"] for r in reps)",
+   "why": "the printed margin is the largest, not the smallest"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_runs_the_laws_twenty_replicates_of_ten_thousand_moments"
+   ],
+   "name": "g6-replicates-from-zero",
+   "new": "for k in range(0, replicates)]",
+   "old": "for k in range(1, replicates + 1)]",
+   "why": "the replicates are 0-19, not the law's 1-20"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_runs_the_laws_twenty_replicates_of_ten_thousand_moments"
+   ],
+   "name": "g6-default-replicates",
+   "new": "def g6(replicates: int = 19,",
+   "old": "def g6(replicates: int = 20,",
+   "why": "not the law's twenty replicates"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestG6.test_g6_runs_the_laws_twenty_replicates_of_ten_thousand_moments"
+   ],
+   "name": "g6-default-moments",
+   "new": "n_moments: int = 9_999) -> Dict[str, object]:\n    reps",
+   "old": "n_moments: int = 10_000) -> Dict[str, object]:\n    reps",
+   "why": "not the law's 10,000 moments"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestRunGates.test_a_changed_law_text_stops_the_gates_before_anything_is_written"
+   ],
+   "name": "rg-law-check-off",
+   "new": "pass",
+   "old": "PR.check(RN.LAW_KEYS, root=prereg_root)",
+   "why": "the gates run against a changed law text"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestRunGates.test_a_gate_that_fails_without_a_failure_list_is_named_by_its_label_and_the_record_says_not_passed"
+   ],
+   "name": "rg-failure-label-off",
+   "new": "[]",
+   "old": "([] if r[\"ok\"] else [f\"{name} failed\"])",
+   "why": "a gate that fails without a failure list leaves the record PASSED"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestRunGates.test_a_failing_gate_writes_passed_false_and_exits_nonzero"
+   ],
+   "name": "rg-passed-const",
+   "new": "res.update({\"passed\": True,",
+   "old": "res.update({\"passed\": not failures,",
+   "why": "the record always says passed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestRunGates.test_a_failing_gate_writes_passed_false_and_exits_nonzero"
+   ],
+   "name": "rg-exit-const",
+   "new": "return 0",
+   "old": "return 0 if not failures else 1",
+   "why": "the exit code is always 0"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestRunGates.test_the_log_names_each_gate_in_order_and_every_failure"
+   ],
+   "name": "rg-log-status",
+   "new": "log(f\"[gates] {name}: OK\")",
+   "old": "log(f\"[gates] {name}: {'OK' if r['ok'] else 'FAILED'}\")",
+   "why": "the log reads OK for a failed gate"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestRunGates.test_the_log_names_each_gate_in_order_and_every_failure"
+   ],
+   "name": "rg-log-failures-off",
+   "new": "    for f in failures:\n        pass",
+   "old": "    for f in failures:\n        log(f\"[gates] FAILURE: {f}\")",
+   "why": "the failures are not printed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestRunGates.test_the_gates_record_carries_all_three_signed_shas_and_the_gate_mode"
+   ],
+   "name": "rg-header-prereg-dropped",
+   "new": "\"header\": {**RN.code_header(), \"gate_mode\": RN.GATE_MODE}",
+   "old": "\"header\": {**PR.header(RN.LAW_KEYS), **RN.code_header(), \"gate_mode\": RN.GATE_MODE}",
+   "why": "the record carries no signed sha"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestRunGates.test_the_gates_record_carries_all_three_signed_shas_and_the_gate_mode"
+   ],
+   "name": "rg-header-mode-dropped",
+   "new": "\"header\": {**PR.header(RN.LAW_KEYS), **RN.code_header()}",
+   "old": "\"header\": {**PR.header(RN.LAW_KEYS), **RN.code_header(), \"gate_mode\": RN.GATE_MODE}",
+   "why": "the record carries no gate mode"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestRunGates.test_the_log_names_each_gate_in_order_and_every_failure"
+   ],
+   "name": "rg-gate-order",
+   "new": "(\"g2\", g2), (\"g1\", lambda: g1(copies, expected)),",
+   "old": "(\"g1\", lambda: g1(copies, expected)), (\"g2\", g2),",
+   "why": "g2 runs before g1"
+  }
+ ],
+ "source_sha256": "082de1268b46ab087895165e699b76f65d56ea3d282f5955abd0fe5d1c666cb8",
+ "tests": "tests.tools.test_toys_frames_gates"
+}

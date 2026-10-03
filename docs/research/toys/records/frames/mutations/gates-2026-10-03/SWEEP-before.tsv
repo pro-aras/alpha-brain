@@ -1,0 +1,96 @@
+verdict	mutant	secs	failing_tests	detail
+CONTROL-OK	CONTROL-identity	18.6		
+CONTROL-OK	CONTROL-broken	15.6	TestG1.test_a_count_one_off_is_named;TestG1.test_a_per_source_count_one_off_is_named;TestG1.test_a_scene_histogram_or_says_count_one_off_is_named;TestRunGates.test_a_failing_gate_writes_passed_false_and_exits_nonzero	
+SURVIVED	g1-manifest-verify-off	18.7		
+SURVIVED	g1-manifest-report-off	19.7		
+SURVIVED	g1-manifest-missing-silent	19.1		
+SURVIVED	g1-copies-verified-ignores-bad	19.3		
+CAUGHT	g1-cmp-inverted	18.3	TestG1.test_a_count_one_off_is_named;TestG1.test_a_per_source_count_one_off_is_named;TestG1.test_a_plant_token_found_in_a_real_stream_is_named;TestG1.test_a_scene_histogram_or_says_count_one_off_is_named;TestG1.test_it_passes_when_every_count_is_the_expected_one_and_the_copies_hash_to_their_manifest;TestRunGates.test_a_failing_gate_writes_passed_false_and_exits_nonzero;TestRunGates.test_gates_json_says_passed_on_fixtures_and_the_unit_accepts_it	
+CAUGHT-UNEXPECTED	g1-alpha-moments-skip	18.2	TestG1.test_a_count_one_off_is_named;TestRunGates.test_a_failing_gate_writes_passed_false_and_exits_nonzero	named test(s) did not fail: ['TestG1.test_every_count_the_law_names_is_checked_one_at_a_time']
+SURVIVED	g1-alpha-words-skip	18.6		
+CAUGHT-UNEXPECTED	g1-per-source-skip	18.6	TestG1.test_a_per_source_count_one_off_is_named	named test(s) did not fail: ['TestG1.test_every_count_the_law_names_is_checked_one_at_a_time']
+SURVIVED	g1-source-absent-silent	19.5		
+CAUGHT-UNEXPECTED	g1-scene-moments-skip	19.0	TestG1.test_a_scene_histogram_or_says_count_one_off_is_named	named test(s) did not fail: ['TestG1.test_every_count_the_law_names_is_checked_one_at_a_time']
+SURVIVED	g1-scene-per-moment-skip	18.7		
+CAUGHT-UNEXPECTED	g1-dax-skip	18.9	TestG1.test_the_dax_moment_is_checked_at_its_index_when_the_law_names_one	named test(s) did not fail: ['TestG1.test_every_count_the_law_names_is_checked_one_at_a_time']
+CAUGHT-UNEXPECTED	g1-says-skip	18.7	TestG1.test_a_scene_histogram_or_says_count_one_off_is_named	named test(s) did not fail: ['TestG1.test_every_count_the_law_names_is_checked_one_at_a_time']
+CAUGHT	g1-plant-check-off	19.0	TestG1.test_a_plant_token_found_in_a_real_stream_is_named	
+CAUGHT	g1-plant-alpha-skip	18.6	TestG1.test_a_plant_token_found_in_a_real_stream_is_named;TestG1.test_it_passes_when_every_count_is_the_expected_one_and_the_copies_hash_to_their_manifest	
+CAUGHT-UNEXPECTED	g1-plant-scene-skip	18.6	TestG1.test_it_passes_when_every_count_is_the_expected_one_and_the_copies_hash_to_their_manifest	named test(s) did not fail: ['TestG1.test_a_plant_token_found_in_the_real_scene_stream_is_named']
+SURVIVED	g1-streamerror-not-named	19.0		
+CAUGHT-UNEXPECTED	g1-streamerror-ok-true	18.6	TestG1.test_a_corrupted_copy_is_named_by_its_path	named test(s) did not fail: ['TestG1.test_an_unreadable_copy_is_named_and_g1_says_not_ok']
+CAUGHT	g1-chi2-dropped	18.5	TestG1.test_it_passes_when_every_count_is_the_expected_one_and_the_copies_hash_to_their_manifest	
+CAUGHT-UNEXPECTED	g1-ok-const	17.9	TestG1.test_a_count_one_off_is_named;TestG1.test_a_per_source_count_one_off_is_named;TestG1.test_a_plant_token_found_in_a_real_stream_is_named;TestG1.test_the_dax_moment_is_checked_at_its_index_when_the_law_names_one;TestRunGates.test_a_failing_gate_writes_passed_false_and_exits_nonzero	named test(s) did not fail: ['TestG1.test_every_count_the_law_names_is_checked_one_at_a_time']
+SURVIVED	g2-drop-equality	18.2		
+SURVIVED	g2-drop-frames-clause	18.1		
+SURVIVED	g2-ok-const	18.3		
+SURVIVED	g2-stand-in-reads-real	18.4		
+CAUGHT	g2-real-store-unwritten	18.8	TestG2G3.test_g2_the_stand_in_store_equals_the_real_episodes_store;TestRunGates.test_gates_json_says_passed_on_fixtures_and_the_unit_accepts_it	
+SURVIVED	g3-tol-1e-8	18.4		
+SURVIVED	g3-tol-1e-3	18.1		
+SURVIVED	g3-tol-1e-10	18.3		
+SURVIVED	g3-problems-ignored	18.1		
+SURVIVED	g3-key-G-dropped	18.3		
+SURVIVED	g3-key-bits0-dropped	18.7		
+SURVIVED	g3-key-bitsF-dropped	19.8		
+SURVIVED	g3-key-L-dropped	19.9		
+SURVIVED	g3-abs-dropped	19.5		
+SURVIVED	g3-counts-compare-off	18.3		
+SURVIVED	g3-counts-no-penalty	18.5		
+CAUGHT	g3-cases-not-counted	18.3	TestG2G3.test_g3_the_fast_compressor_and_the_greedys_incremental_gain_equal_their_recounts	
+CAUGHT	g3-mdl-steps-dropped	19.0	TestG2G3.test_g3_the_fast_compressor_and_the_greedys_incremental_gain_equal_their_recounts	
+CAUGHT-UNEXPECTED	g4-rule-check-off	19.3	TestG4.test_a_required_rule_that_fails_on_stream_b_stops_the_gate;TestG4.test_a_stream_too_short_to_carry_the_plant_fails_and_says_so	named test(s) did not fail: ['TestG4.test_a_required_rule_failing_its_plant_gate_stops_g4_naming_the_stream_and_the_rule']
+SURVIVED	g4-beats2-off	19.5		
+SURVIVED	g4-beats2-silent	19.2		
+SURVIVED	g4-ctrl-caught-dropped	18.7		
+SURVIVED	g4-ctrl-bytes-dropped	18.6		
+SURVIVED	g4-ctrl-honest-dropped	18.8		
+SURVIVED	g4-ctrl-broken-dropped	18.9		
+SURVIVED	g4-ctrl-or	18.9		
+SURVIVED	g4-ctrl-off	18.5		
+SURVIVED	g4-ctrl-silent	18.6		
+CAUGHT-UNEXPECTED	g4-ok-const	18.6	TestG4.test_a_required_rule_that_fails_on_stream_b_stops_the_gate;TestG4.test_a_stream_too_short_to_carry_the_plant_fails_and_says_so	named test(s) did not fail: ['TestG4.test_a_required_rule_failing_its_plant_gate_stops_g4_naming_the_stream_and_the_rule']
+CAUGHT	g4-required-A-adds-web-s	18.3	TestG4.test_both_streams_every_required_rule_keeps_the_plant_and_both_controls_are_caught;TestG4.test_stream_a_as_signed_prints_web_s_failure_and_does_not_fail_the_gate;TestRunGates.test_gates_json_says_passed_on_fixtures_and_the_unit_accepts_it	
+CAUGHT	g4-required-B-drops-web-s	18.3	TestG4.test_both_streams_every_required_rule_keeps_the_plant_and_both_controls_are_caught	
+CAUGHT	g4-mode-law	18.1	TestG4.test_both_streams_every_required_rule_keeps_the_plant_and_both_controls_are_caught;TestG4.test_stream_a_as_signed_prints_web_s_failure_and_does_not_fail_the_gate;TestRunGates.test_gates_json_says_passed_on_fixtures_and_the_unit_accepts_it	
+CAUGHT	g4-control-unplanted	18.9	TestG4.test_both_streams_every_required_rule_keeps_the_plant_and_both_controls_are_caught;TestG4.test_stream_a_as_signed_prints_web_s_failure_and_does_not_fail_the_gate;TestRunGates.test_gates_json_says_passed_on_fixtures_and_the_unit_accepts_it	
+SURVIVED	g4-default-scene-moments	18.6		
+SURVIVED	g4-default-alpha-moments	18.9		
+CAUGHT-UNEXPECTED	g4-default-scene-every	17.6	TestG4.test_stream_a_as_signed_prints_web_s_failure_and_does_not_fail_the_gate	named test(s) did not fail: ['TestG4.test_the_defaults_are_the_signed_streams']
+SURVIVED	g4-default-alpha-every	19.4		
+CAUGHT-UNEXPECTED	g4-replicate-seed	18.2	TestG4.test_stream_a_as_signed_prints_web_s_failure_and_does_not_fail_the_gate	named test(s) did not fail: ['TestG4.test_the_defaults_are_the_signed_streams']
+SURVIVED	g4-default-draws	18.1		
+SURVIVED	g5-cpu-gt-ge	18.5		
+SURVIVED	g5-rss-gt-ge	18.4		
+SURVIVED	g5-rss-slope-dropped	18.5		
+SURVIVED	g5-peak-min	18.2		
+CAUGHT	g5-unit-factor	17.3	TestG5.test_the_pilot_extrapolates_cpu_linearly_in_the_draws_and_reports_peak_memory	
+SURVIVED	g5-default-cpu-ceiling	18.1		
+SURVIVED	g5-default-rss-ceiling	18.0		
+SURVIVED	g6-violation-off	18.4		
+SURVIVED	g6-cheat-caught-dropped	18.7		
+SURVIVED	g6-cheat-bytes-dropped	18.8		
+SURVIVED	g6-cheat-or	18.9		
+SURVIVED	g6-cheat-off	18.8		
+SURVIVED	g6-sum-tol-loose	18.5		
+SURVIVED	g6-sum-tol-tight	18.5		
+SURVIVED	g6-entropy-tol-loose	18.5		
+SURVIVED	g6-entropy-dropped	18.6		
+SURVIVED	g6-hgl-tol-loose	18.7		
+SURVIVED	g6-hgl-dropped	18.4		
+SURVIVED	g6-hl-tol-loose	18.5		
+SURVIVED	g6-hl-dropped	19.2		
+SURVIVED	g6-support-dropped	18.8		
+SURVIVED	g6-min-margin-max	18.6		
+SURVIVED	g6-replicates-from-zero	18.7		
+SURVIVED	g6-default-replicates	18.9		
+SURVIVED	g6-default-moments	18.8		
+SURVIVED	rg-law-check-off	19.1		
+SURVIVED	rg-failure-label-off	18.5		
+CAUGHT	rg-passed-const	18.8	TestRunGates.test_a_failing_gate_writes_passed_false_and_exits_nonzero	
+CAUGHT	rg-exit-const	18.5	TestRunGates.test_a_failing_gate_writes_passed_false_and_exits_nonzero	
+SURVIVED	rg-log-status	19.1		
+SURVIVED	rg-log-failures-off	19.3		
+SURVIVED	rg-header-prereg-dropped	19.1		
+SURVIVED	rg-header-mode-dropped	18.9		
+CAUGHT-UNEXPECTED	rg-gate-order	19.0	TestG5.test_the_pilot_extrapolates_cpu_linearly_in_the_draws_and_reports_peak_memory	named test(s) did not fail: ['TestRunGates.test_the_log_names_each_gate_in_order_and_every_failure']
