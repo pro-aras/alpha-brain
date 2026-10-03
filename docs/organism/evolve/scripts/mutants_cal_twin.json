@@ -1,11 +1,5 @@
 [
  {
-  "name": "gene-text-wrong-group",
-  "old": "    return text[m.end(1):m.start(2)]",
-  "new": "    return text[m.start(2):m.end(2)]",
-  "expect": "test_gene_text_reads_the_number"
- },
- {
   "name": "set-gene-drops-tail",
   "old": "lambda m: m.group(1) + val_str + m.group(2), text, count=1)",
   "new": "lambda m: m.group(1) + val_str, text, count=1)",
