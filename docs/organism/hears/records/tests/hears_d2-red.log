@@ -1,0 +1,20 @@
+E
+======================================================================
+ERROR: tests.tools.test_hears_d2_read (unittest.loader._FailedTest.tests.tools.test_hears_d2_read)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.tools.test_hears_d2_read
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_d2_read.py", line 16, in <module>
+    from tools.lives import hears_d2_read as D
+ImportError: cannot import name 'hears_d2_read' from 'tools.lives' (unknown location)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

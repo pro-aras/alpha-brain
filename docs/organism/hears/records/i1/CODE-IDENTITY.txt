@@ -1,0 +1,4 @@
+55ef469288cd09e5a8bfce06350c30253e1a87bd
+310c21a1cabee48b6cfa3f5cd181f4f77b7334a8
+109a320cc8107fc3bba67e240fb5b932f8a0cb66
+?? tools/brain/hears_read.py

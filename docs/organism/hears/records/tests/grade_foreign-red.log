@@ -1,0 +1,109 @@
+EE.E.EEEE
+======================================================================
+ERROR: test_a_foreign_word_becomes_the_world_word_that_is_true_of_nothing_in_view_and_is_counted (tests.tools.test_grade_foreign_words.SaidPhrases.test_a_foreign_word_becomes_the_world_word_that_is_true_of_nothing_in_view_and_is_counted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_grade_foreign_words.py", line 47, in test_a_foreign_word_becomes_the_world_word_that_is_true_of_nothing_in_view_and_is_counted
+    out, n = G.world_words(["big", "arrow"])
+             ^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.grade_life' has no attribute 'world_words'
+
+======================================================================
+ERROR: test_a_single_foreign_word_phrase_is_not_true_of_the_target (tests.tools.test_grade_foreign_words.SaidPhrases.test_a_single_foreign_word_phrase_is_not_true_of_the_target)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_grade_foreign_words.py", line 61, in test_a_single_foreign_word_phrase_is_not_true_of_the_target
+    sp, n = G.world_words(["arrow"])
+            ^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.grade_life' has no attribute 'world_words'
+
+======================================================================
+ERROR: test_the_scored_functions_run_on_the_adapted_phrase_and_read_it_as_a_wrong_shape (tests.tools.test_grade_foreign_words.SaidPhrases.test_the_scored_functions_run_on_the_adapted_phrase_and_read_it_as_a_wrong_shape)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_grade_foreign_words.py", line 52, in test_the_scored_functions_run_on_the_adapted_phrase_and_read_it_as_a_wrong_shape
+    sp, _ = G.world_words(["big", "arrow"])
+            ^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.grade_life' has no attribute 'world_words'
+
+======================================================================
+ERROR: test_a_learned_type_holding_the_makers_words_is_still_the_shape_type (tests.tools.test_grade_foreign_words.TypeKeys.test_a_learned_type_holding_the_makers_words_is_still_the_shape_type)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_grade_foreign_words.py", line 22, in test_a_learned_type_holding_the_makers_words_is_still_the_shape_type
+    self.assertEqual(G.world_type_of_key(key), "shape")          # the vote is over the words the world knows (it raised on «arrow» before)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/data/dev/genome-wt-hears/tools/brain/grade_life.py", line 81, in world_type_of_key
+    kinds = collections.Counter(W.word_type(w) for w in key.split("|"))
+  File "/usr/lib/python3.14/collections/__init__.py", line 614, in __init__
+    self.update(iterable, **kwds)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/collections/__init__.py", line 709, in update
+    _count_elements(self, iterable)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/data/dev/genome-wt-hears/tools/brain/grade_life.py", line 81, in <genexpr>
+    kinds = collections.Counter(W.word_type(w) for w in key.split("|"))
+                                ~~~~~~~~~~~^^^
+  File "/data/dev/genome-wt-hears/brain/scene/world.py", line 101, in word_type
+    raise WorldError(f"not a word of this world: {w!r}")
+brain.scene.world.WorldError: not a word of this world: 'arrow'
+
+======================================================================
+ERROR: test_a_type_with_no_word_of_the_world_has_no_world_type (tests.tools.test_grade_foreign_words.TypeKeys.test_a_type_with_no_word_of_the_world_has_no_world_type)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_grade_foreign_words.py", line 30, in test_a_type_with_no_word_of_the_world_has_no_world_type
+    self.assertIsNone(G.world_type_of_key("arrow|bar|wave"))
+                      ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/data/dev/genome-wt-hears/tools/brain/grade_life.py", line 81, in world_type_of_key
+    kinds = collections.Counter(W.word_type(w) for w in key.split("|"))
+  File "/usr/lib/python3.14/collections/__init__.py", line 614, in __init__
+    self.update(iterable, **kwds)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/collections/__init__.py", line 709, in update
+    _count_elements(self, iterable)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/data/dev/genome-wt-hears/tools/brain/grade_life.py", line 81, in <genexpr>
+    kinds = collections.Counter(W.word_type(w) for w in key.split("|"))
+                                ~~~~~~~~~~~^^^
+  File "/data/dev/genome-wt-hears/brain/scene/world.py", line 101, in word_type
+    raise WorldError(f"not a word of this world: {w!r}")
+brain.scene.world.WorldError: not a word of this world: 'arrow'
+
+======================================================================
+ERROR: test_the_name_road_skips_a_type_of_foreign_words_and_counts_it (tests.tools.test_grade_foreign_words.TypeKeys.test_the_name_road_skips_a_type_of_foreign_words_and_counts_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_grade_foreign_words.py", line 34, in test_the_name_road_skips_a_type_of_foreign_words_and_counts_it
+    out, skipped = G.name_by_world_type(raw, count=True)
+                   ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+TypeError: name_by_world_type() got an unexpected keyword argument 'count'
+
+======================================================================
+ERROR: test_two_learned_types_for_one_world_type_is_still_an_error (tests.tools.test_grade_foreign_words.TypeKeys.test_two_learned_types_for_one_world_type_is_still_an_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_grade_foreign_words.py", line 42, in test_two_learned_types_for_one_world_type_is_still_an_error
+    G.name_by_world_type({"name": {"circle|star": "star", "cross|square|arrow": "cross"}})
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/dev/genome-wt-hears/tools/brain/grade_life.py", line 92, in name_by_world_type
+    t = world_type_of_key(str(k))
+  File "/data/dev/genome-wt-hears/tools/brain/grade_life.py", line 81, in world_type_of_key
+    kinds = collections.Counter(W.word_type(w) for w in key.split("|"))
+  File "/usr/lib/python3.14/collections/__init__.py", line 614, in __init__
+    self.update(iterable, **kwds)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/collections/__init__.py", line 709, in update
+    _count_elements(self, iterable)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/data/dev/genome-wt-hears/tools/brain/grade_life.py", line 81, in <genexpr>
+    kinds = collections.Counter(W.word_type(w) for w in key.split("|"))
+                                ~~~~~~~~~~~^^^
+  File "/data/dev/genome-wt-hears/brain/scene/world.py", line 101, in word_type
+    raise WorldError(f"not a word of this world: {w!r}")
+brain.scene.world.WorldError: not a word of this world: 'arrow'
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.007s
+
+FAILED (errors=7)

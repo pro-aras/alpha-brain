@@ -1,0 +1,6 @@
+......maker-arming count: 82 genome files, 107 carry a `WORLD ` line, 81 parsed, 54 non-scene genomes verified byte-for-byte unchanged, 27 scene-only genomes verified to now suppress the maker
+....
+----------------------------------------------------------------------
+Ran 10 tests in 0.042s
+
+OK

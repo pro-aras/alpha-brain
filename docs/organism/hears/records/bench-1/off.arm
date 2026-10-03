@@ -1,0 +1,10 @@
+label off
+start_epoch 1791012126.751878678
+start_iso 2026-10-03 11:22:06 +0400
+loadavg_start 5.35 5.99 6.20 5/1054 490008
+pressure_cpu_start some avg10=0.00 avg60=0.16 avg300=0.07 total=346307634|full avg10=0.00 avg60=0.00 avg300=0.00 total=0|
+end_epoch 1791014858.204794140
+end_iso 2026-10-03 12:07:38 +0400
+loadavg_end 9.04 8.98 8.70 9/1117 590184
+pressure_cpu_end some avg10=0.42 avg60=0.16 avg300=0.08 total=353446180|full avg10=0.00 avg60=0.00 avg300=0.00 total=0|
+exit 0
