@@ -1,0 +1,4 @@
+2026-10-03 18:08:51 +0400 START claims daily-smoke slot 6 pid 933678 avail 15318MB waited 0s cap 4G swap 512M unit slot-claims-daily-smoke-933678
+2026-10-03 18:09:42 +0400 END   claims daily-smoke slot 6 exit 0 cap 4G peak 1531MB swap 0MB
+2026-10-03 18:13:48 +0400 START claims daily-smoke2 slot 2 pid 942055 avail 21658MB waited 0s cap 4G swap 512M unit slot-claims-daily-smoke2-942055
+2026-10-03 18:14:44 +0400 END   claims daily-smoke2 slot 2 exit 0 cap 4G peak 2013MB swap 0MB
