@@ -1,0 +1,55 @@
+{
+ "at": "2026-10-03T08:03:15.682838+00:00",
+ "bench_genome_sha256": "f94a7b6a6f9a9c0b4b2ffc9364acbdcb6d7f28cea2172c04deb9984188f4d4fc",
+ "counts": {
+  "chain": 0,
+  "n": 1000,
+  "said": 940,
+  "skipped": {
+   "backlog": 1,
+   "no backlog reading": 1
+  },
+  "turns": 1000
+ },
+ "cpu_ms_per_row": 6.85,
+ "cpu_s_load": 18.961,
+ "cpu_s_rows": 6.85,
+ "gen": "/data/dev/swarm/2026-10-03/int/bl2-gen/prev",
+ "gen_last_seq": 330367,
+ "genome": "/data/dev/swarm/2026-10-03/int/bl2-inputs/GENOME.v1.genome",
+ "genome_sha256": "fd15f9e3fb7bbbb3917d329ff7c9912f84e1ae8f7c8bd5e48ba7450e8aa927b2",
+ "inhibit": 2,
+ "inner_rows": 1000,
+ "mature": [
+  "big",
+  "blue",
+  "circle",
+  "cross",
+  "green",
+  "red",
+  "ring",
+  "small",
+  "square",
+  "star",
+  "triangle",
+  "white",
+  "yellow"
+ ],
+ "n": 1000,
+ "plant": null,
+ "prints_after": {
+  "brain": "8ff3bc7520625186b8e1d0ac3df6b95c8b577617a3e63d49fe2060bb2e532c5f",
+  "self": "1ab1a8098d8ca4ae37b614cc5343fd4d08bc7de8cd298084ab23c529b421515e",
+  "web_L": "ee16563e071fcc284ec6a16cab87e2ea672bd830527ac3ac8fd852e031900779"
+ },
+ "prints_before": {
+  "brain": "8ff3bc7520625186b8e1d0ac3df6b95c8b577617a3e63d49fe2060bb2e532c5f",
+  "self": "1f7a1e2738ae9a6ccf950158fde2f7b81de7330bf611e1f455a5022453366e2e",
+  "web_L": "ee16563e071fcc284ec6a16cab87e2ea672bd830527ac3ac8fd852e031900779"
+ },
+ "read_only": false,
+ "restart": 5,
+ "resume_last_seq": 330367,
+ "rule": "lift",
+ "seed": 20261101
+}
