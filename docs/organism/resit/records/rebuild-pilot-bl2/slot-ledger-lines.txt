@@ -1,0 +1,4 @@
+2026-10-03 18:03:49 +0400 START claims pilot-p1 slot 6 pid 922050 avail 14992MB waited 0s cap 6G swap 512M unit slot-claims-pilot-p1-922050
+2026-10-03 18:05:12 +0400 END   claims pilot-p1 slot 6 exit 0 cap 6G peak 342MB swap 0MB
+2026-10-03 18:07:21 +0400 START claims pilot-p2 slot 1 pid 930285 avail 15621MB waited 0s cap 8G swap 512M unit slot-claims-pilot-p2-930285
+2026-10-03 18:25:44 +0400 END   claims pilot-p2 slot 1 exit 0 cap 8G peak 983MB swap 2MB

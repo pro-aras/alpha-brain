@@ -1,0 +1,1 @@
+{"pilot": "/data/dev/brain-runs/resit-gate/rebuild-pilot-bl2/p1/pilot.json", "rows_replayed": 5000, "stopped": "rows", "cpu_replay_s": 74.609, "verdict_vs_line": "UNDER", "central_cpu_h": 1.521, "range_cpu_h": [0.763, 1.521], "central_rss_mb": 1314}
