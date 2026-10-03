@@ -74,7 +74,10 @@ class Gain:
 class Scorer:
     """Scores frame sets against ONE train/held-out split. Holds no state a call changes: gain(F) is a pure function of F."""
 
-    def __init__(self, train: Sequence[Sequence[str]], held: Sequence[Sequence[str]]):
+    def __init__(self, train: Sequence[Sequence[str]], held: Sequence[Sequence[str]], parse=None):
+        # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 17:57 +0400 — the optional `parse` hook (default: parse_moment, behaviour unchanged): AMENDMENT-1 §1.4's gate control needs a compressor whose
+        # parse never fires a frame, and a hook is cleaner than patching a module at run time.
+        self._parse = parse if parse is not None else parse_moment
         self.train: List[Tuple[str, ...]] = [tuple(m) for m in train]
         self.held: List[Tuple[str, ...]] = [tuple(m) for m in held]
         if not self.train:
@@ -104,7 +107,7 @@ class Scorer:
         held_tokens: Counter = Counter()
         vocab = self.vocab
         for m in self.held:
-            for t in parse_moment(m, frames):
+            for t in self._parse(m, frames):
                 if isinstance(t, str) and t != END and t not in vocab:
                     t = UNK
                 held_tokens[t] += 1
@@ -120,7 +123,7 @@ class Scorer:
             return Gain(0.0, 0.0, self._bits0, self._bits0, self._n0, self.V + 2, self.V, self.n_held_words)
         cF: Counter = Counter()
         for m in self.train:
-            cF.update(parse_moment(m, F))
+            cF.update(self._parse(m, F))
         n = sum(cF.values())
         k = self.V + len(F) + 2
         bits_f = self._held_bits(cF, n, k, F)

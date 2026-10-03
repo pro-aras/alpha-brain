@@ -6,6 +6,7 @@
 """
 from __future__ import annotations
 
+import math
 import unittest
 
 import numpy as np
@@ -89,6 +90,124 @@ class TestPlantTokens(unittest.TestCase):
         sc = ST.scene_moments(ST.load_moments(sorted((ST.COPIES / "brain-full-20261102" / "tape").glob("*.jsonl"))))
         for name, ms in (("ALPHA4", a4), ("SCENE", sc)):
             self.assertEqual(PL.plant_token_occurrences(ms), {t: 0 for t in ST.PLANT}, name)
+
+
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 17:56 +0400 — STAGE 4a: AMENDMENT-1 §1's PLANT gate: per rule (i) keeps the planted frame, (A) the whole-set G, (C) the frame's marginal credit inside the rule's own
+# set; per stream (B) G({F*}) and the architect's expected value, PLANT-BEATS-NULL-2, and the gate's own parse-breaking control. Each number is compared with the SLOW recount.
+from tests.tools.test_toys_frames_null import multiword_stream                     # a planted stream of 1-3-word moments (real adjacent bigrams exist)
+from tools.toys.frames import null as NL
+
+
+def planted_scorer(seed: int = 1):
+    tr, he = ST.split(multiword_stream(seed))
+    return CO.Scorer([m.words for m in tr], [m.words for m in he]), tr, he
+
+
+class TestPlantReading(unittest.TestCase):
+    def test_keeps_A_and_the_marginal_credit_equal_the_slow_recount(self):
+        sc, tr, he = planted_scorer()
+        junk = {("w00", "w01"), ("w01", "w02")}
+        F = {ST.PLANT} | junk
+        r = PL.plant_reading(sc, F)
+        slow_all = CO.slow_gain(sc.train, sc.held, F)["G"]
+        slow_without = CO.slow_gain(sc.train, sc.held, junk)["G"]
+        self.assertTrue(r["kept"])
+        self.assertAlmostEqual(r["A"], slow_all, places=9)
+        self.assertAlmostEqual(r["C"], slow_all - slow_without, places=9)
+        self.assertGreater(r["C"], 0.0)                                                          # the plant pays inside a set that also holds junk (it is a frequent, adjacent plant)
+
+    def test_a_set_that_does_not_keep_the_plant_has_no_marginal_credit(self):
+        sc, _tr, _he = planted_scorer()
+        r = PL.plant_reading(sc, {("w00", "w01")})
+        self.assertFalse(r["kept"])
+        self.assertIsNone(r["C"])
+        self.assertAlmostEqual(r["A"], CO.slow_gain(sc.train, sc.held, {("w00", "w01")})["G"], places=9)
+
+    def test_the_empty_set_keeps_nothing_and_has_g_zero(self):
+        sc, _tr, _he = planted_scorer()
+        r = PL.plant_reading(sc, set())
+        self.assertEqual((r["kept"], r["A"], r["C"]), (False, 0.0, None))
+
+
+class TestPlantStreamBlock(unittest.TestCase):
+    def test_B_the_expected_value_the_decomposition_and_plant_beats_null2(self):
+        sc, tr, he = planted_scorer()
+        b = PL.plant_stream_block(sc, PL.n_plants(tr), PL.n_plants(he), null_draws=100)
+        slow = CO.slow_gain(sc.train, sc.held, {ST.PLANT})
+        self.assertAlmostEqual(b["B"], slow["G"], places=9)
+        self.assertEqual((b["plants_train"], b["plants_held"], b["V"], b["N0"]), (PL.n_plants(tr), PL.n_plants(he), sc.V, sc.n0))
+        self.assertAlmostEqual(b["expected_first_order"], PL.n_plants(he) * math.log2(sc.n0 / PL.n_plants(tr)) - 2 * math.log2(sc.V), places=12)
+        d = b["decomposition"]
+        self.assertAlmostEqual(d["M"] + d["D"] + d["C"] - d["L"], slow["G"], places=8)
+        n2 = NL.null2(sc, {ST.PLANT}, rule_tag=5, seed=0, draws=100)
+        self.assertAlmostEqual(b["null2_of_plant"]["q95"], n2.q95, places=12)
+        self.assertEqual(tuple(b["null2_of_plant"]["values"]), n2.values)                       # the whole draw sequence (here the fallback pool is ONE bigram, so no key shows in the values)
+        self.assertEqual(PL.PLANT_NULL_TAG, 5)                                                  # the signed number: AMENDMENT-1 §4 (a) gives the PLANT gate's NULL-2 of the one-frame set the tag 5
+        self.assertEqual(b["plant_beats_null2"], bool(b["B"] >= n2.q95))
+        self.assertTrue(b["plant_beats_null2"])                                                    # a frequent plant beats NULL-2 (the fallback bins hold only weak real bigrams)
+        self.assertGreater(b["null2_of_plant"]["fallbacks"], 0)
+
+
+class TestGateModes(unittest.TestCase):
+    def rows(self, kept, C, A=1.0):
+        return [{"seed": i + 1, "kept": kept[i], "C": C[i], "A": A if not isinstance(A, list) else A[i]} for i in range(len(kept))]
+
+    def test_amend1_deterministic_rule_needs_keeps_and_B_and_C(self):
+        G = PL.gate_passes
+        ok = [{"seed": 0, "kept": True, "C": 5.0, "A": -100.0}]
+        self.assertTrue(G("WEB-H", ok, B=3.0, mode="amend1")["pass"])                                # the whole-set A is NOT read in this mode: junk cannot fail it
+        self.assertFalse(G("WEB-H", ok, B=0.0, mode="amend1")["pass"])                               # B must be > 0
+        self.assertFalse(G("WEB-H", ok, B=-1.0, mode="amend1")["pass"])
+        self.assertFalse(G("WEB-H", [{"seed": 0, "kept": True, "C": 0.0, "A": 9.0}], B=3.0, mode="amend1")["pass"])    # C must be > 0
+        self.assertFalse(G("WEB-H", [{"seed": 0, "kept": False, "C": None, "A": 9.0}], B=3.0, mode="amend1")["pass"])  # it must keep the frame
+
+    def test_amend1_web_s_counts_a_seed_only_when_it_keeps_and_its_C_is_positive_at_nine_of_ten(self):
+        G = PL.gate_passes
+        nine = self.rows([True] * 9 + [False], [1.0] * 9 + [None])
+        eight = self.rows([True] * 8 + [False, True], [1.0] * 8 + [None, -1.0])                      # the tenth keeps the frame but its C is negative: not counted
+        self.assertTrue(G("WEB-S", nine, B=3.0, mode="amend1")["pass"])
+        self.assertEqual(G("WEB-S", nine, B=3.0, mode="amend1")["n_counted"], 9)
+        self.assertFalse(G("WEB-S", eight, B=3.0, mode="amend1")["pass"])
+        self.assertEqual(G("WEB-S", eight, B=3.0, mode="amend1")["n_counted"], 8)
+        self.assertFalse(G("WEB-S", nine, B=0.0, mode="amend1")["pass"])                             # B is seed-independent and must hold
+
+    def test_law_mode_reads_the_whole_set(self):
+        G = PL.gate_passes
+        junk = [{"seed": 0, "kept": True, "C": 5.0, "A": -100.0}]
+        self.assertFalse(G("SENTENCE", junk, B=3.0, mode="law")["pass"])                             # the base text's clause: the junk sinks it
+        self.assertTrue(G("SENTENCE", [{"seed": 0, "kept": True, "C": -9.0, "A": 2.0}], B=-5.0, mode="law")["pass"])
+        web = self.rows([True] * 10, [None] * 10, A=[1.0] * 9 + [-1.0])
+        self.assertTrue(G("WEB-S", web, B=0.0, mode="law")["pass"])                                  # 9 of 10 seeds keep the frame with A > 0
+        web8 = self.rows([True] * 10, [None] * 10, A=[1.0] * 8 + [-1.0, -1.0])
+        self.assertFalse(G("WEB-S", web8, B=0.0, mode="law")["pass"])
+
+    def test_an_unknown_mode_is_refused(self):
+        with self.assertRaises(ValueError):
+            PL.gate_passes("WEB-H", [{"seed": 0, "kept": True, "C": 1.0, "A": 1.0}], B=1.0, mode="loose")
+
+
+class TestTheGatesOwnControl(unittest.TestCase):
+    def test_a_compressor_whose_parse_never_fires_reads_B_and_C_at_most_zero_and_is_caught(self):
+        ms = multiword_stream(2)
+        c = PL.plant_gate_control(ms)
+        self.assertGreater(c["B_honest"], 0.0)                                                      # the plant pays under the honest parse (so the control is a plant, not a coincidence)
+        self.assertGreater(c["C_honest"], 0.0)
+        self.assertLessEqual(c["B_broken"], 0.0)
+        self.assertLessEqual(c["C_broken"], 0.0)
+        self.assertTrue(c["caught"])
+        self.assertTrue(c["bytes_changed"])                                                         # the broken parse's train token counts differ from the honest parse's
+        self.assertEqual(c["gate_honest"], True)
+        self.assertEqual(c["gate_broken"], False)
+
+    def test_the_scorer_honours_a_custom_parse_and_the_default_is_unchanged(self):
+        train, held = [["a", "b"], ["a", "b"], ["c"]], [["a", "b"], ["a", "d"], ["c"]]
+        F = {("a", "b")}
+        default = CO.Scorer(train, held).gain(F)
+        explicit = CO.Scorer(train, held, parse=CO.parse_moment).gain(F)
+        self.assertEqual(default, explicit)
+        never = CO.Scorer(train, held, parse=lambda words, frames: list(words) + [CO.END]).gain(F)
+        self.assertNotEqual(never.N, default.N)                                                      # no frame token ever formed: N counts every word
+        self.assertEqual(never.N, 5 + 3)                                                             # 5 train words (a b a b c) + 3 END
 
 
 if __name__ == "__main__":
