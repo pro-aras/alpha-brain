@@ -76,7 +76,9 @@ def forced_of(a: Optional[Dict[str, object]]) -> Dict[str, object]:
 # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:13 +0400 — AMENDMENT 4: found by the bench's read stage (the grader crashed on the ON arm's journal, «WorldError: not a word of this world: 'arrow'»). The grader was
 # written for a brain that hears ONE world, so every word of a learned type and of a said phrase was a scene word. With `hears scene maker` a learned type holds the maker's words and the brain may SAY one on a scene canvas;
 # the scene world cannot type those words. They are adapted HERE, never in the scored modules: a type is voted by the words the world knows (a type with none has no world type: skipped and counted); a foreign word in a SAID
-# phrase is read as the world's one shape word that is true of nothing a sitting shows (dax: the maker names shapes, and a foreign shape is wrong), counted. A grade of a one-world life is unchanged (nothing is foreign).
+# phrase is read as the world's one shape word that is true of nothing a SPEAK, SPEAK2 or DECLINE scene shows (dax: the maker names shapes, and a foreign shape is wrong), counted. A grade of a one-world life is unchanged (nothing is foreign).
+# edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:28 +0400 — the first wording said «a sitting»; M6's scenes DO show the moon (dax IS true there) but M6 takes no said phrase, and the SPEAK, SPEAK2 and DECLINE scenes of every test seed carry 0 moons
+# (enumerated by tests/tools/test_grade_foreign_words.py, with M6 as the plant that the check can see one).
 def world_type_of_key(key: str) -> Optional[str]:
     """A learned type's key («circle|cross|…») → the world's name for it: the type most of its WORLD words have. A key that is
     already a world type name passes through. None: the key holds no word of this world (a type of another hand's words)."""
@@ -109,8 +111,8 @@ def name_by_world_type(raw: Dict[str, object], count: bool = False):
 
 def world_words(words: Sequence[str]) -> Tuple[List[str], int]:
     """A phrase the brain SAID, made gradable by the scene world: a word the world cannot type (another hand's) is read as DAX_WORD — a shape word that is
-    true of nothing a sitting shows (only the one dax canvas of training carries the dax shape), so the phrase is not TRUE and its ORDER is read with a shape
-    where the foreign word stood. Returns (the phrase, how many words were foreign)."""
+    true of nothing a SPEAK, SPEAK2 or DECLINE scene shows (the moon, the dax shape, is drawn only in training scene 2,700 and in M6's scenes; M6 takes no said phrase),
+    so the phrase is not TRUE and its ORDER is read with a shape where the foreign word stood. Returns (the phrase, how many words were foreign)."""
     out, n = [], 0
     for w in words:
         if w in W.VOCAB:

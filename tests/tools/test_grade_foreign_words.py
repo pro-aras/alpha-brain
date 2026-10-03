@@ -1,7 +1,8 @@
 # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:17 +0400 — found by the bench's read stage: tools/brain/grade_life.py crashed on the ON arm's journal («WorldError: not a word of this world: 'arrow'»). The grader was written for a brain that hears ONE
 # world, so every word of a learned type and of a said phrase was a scene word; with `hears scene maker` the brain's types hold the maker's words (arrow, bar, diamond …) and it may SAY one on a scene canvas.
 # The scene world cannot type those words, so the grader adapts them HERE (never in the scored modules): a type is voted by the words the world knows, a type with none is skipped and counted, and a foreign word in a SAID
-# phrase is read as the world's one shape word that is true of nothing a sitting shows (dax), counted. The tests run the SCORED functions on the adapted phrase.
+# phrase is read as the world's one shape word that is true of nothing a SPEAK, SPEAK2 or DECLINE scene shows (dax; the moon is drawn only in training scene 2,700 and in M6's scenes, and M6 takes no said phrase), counted.
+# The tests run the SCORED functions on the adapted phrase.
 """tests/tools/test_grade_foreign_words.py — tools/brain/grade_life.py's handling of words the scene world cannot type."""
 from __future__ import annotations
 
@@ -62,10 +63,22 @@ class SaidPhrases(unittest.TestCase):
         self.assertEqual((sp, n), ([W.DAX_WORD], 1))
         self.assertFalse(M.unique_true(sp, things(), 0, range(2)))
 
-    def test_the_dax_stand_in_is_true_of_nothing_a_scene_shows(self) -> None:
-        # the stand-in must not accidentally be TRUE of a thing in a sitting: only the one dax canvas of training carries the dax shape
-        for shape in W.SHAPES:
-            self.assertFalse(W.word_true_of(W.DAX_WORD, W.Thing(shape, "red", "big", 0, 0)), shape)
+    def test_the_dax_stand_in_is_true_of_no_thing_a_said_phrase_is_graded_against(self) -> None:
+        # PIN BY ENUMERATION (edit 12:28 +0400; the first wording said «a sitting» and M6's sitting DOES show the moon): the stand-in must not accidentally be TRUE of a thing a said phrase is
+        # graded against. Those are the SPEAK, SPEAK2 and DECLINE scenes (the only marks that take a said phrase); the moon (the dax shape) is drawn only in training scene 2,700 and in M6's scenes.
+        seeds = sorted(set(W.TEST_SEEDS.values()) | set(W.FRESH_TEST_SEEDS.values()))
+        seen_things = 0
+        for seed in seeds:
+            for split in ("speak", "speak2", "decline"):
+                for sc in W.scenes_for(split, seed):
+                    for t in sc.things:
+                        seen_things += 1
+                        self.assertFalse(W.word_true_of(W.DAX_WORD, t), (seed, split, sc.index))
+        self.assertGreater(seen_things, 2000)                                                  # a presence count: the enumeration walked things, it did not pass over nothing
+        # the PLANT that the check can see a moon: M6's scenes carry it, and there the stand-in WOULD be true
+        m6 = [t for sc in W.scenes_for("m6", seeds[0]) for t in sc.things if t.shape == W.DAX_SHAPE]
+        self.assertGreater(len(m6), 0)
+        self.assertTrue(W.word_true_of(W.DAX_WORD, m6[0]))
 
 
 if __name__ == "__main__":
