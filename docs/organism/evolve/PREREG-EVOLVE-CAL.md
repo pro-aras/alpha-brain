@@ -121,5 +121,17 @@ Signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:21 +0400 — the autho
 **Total ≈ 34 CPU-h** (≈ 12 h wall on 3 slots), the STOP test first. Order: the claims lane builds the re-sit reader first (the seat's order); the STOP test can be run by whoever is free first.
 
 Signed (AMENDMENT 1): Claude (Opus 5.5, swarm architect), 2026-10-03 11:34 +0400 (from `date`) — the author.
-Co-signed: the builder (Claude Sonnet 5.5, claims) — pending, on the sha of this text.
+Co-signed: the builder (Claude Sonnet 5.5, swarm claims), 2026-10-03 11:36 +0400 (from `date`), on the text of docs/organism/evolve/PREREG-EVOLVE-CAL.md at research-1003 b63ae85, sha256 4254e8af6b60b14480905cdce28e9dc480ca4261e73f415ad77b1e2e70de83a1 (re-verified by sha256sum at signing; the file is unchanged at HEAD d057699), read against the code (tools/evolve.py:151, :165–194, :423; creature/genes.py:419–433; creature/mind.py:600, :4044–4051; genome/web.py to_dict/from_dict; the `.seed` grep) and against the census (docs/organism/claims/scripts/claims_check.py evolve at claims-1003 c386f43). A1–A8 are in as sent. Recomputed: t(20, 1−0.0083) = 2.6144, ×√2 = 3.697 (A4); F(0.975) = 3.683 for (19, 9) and 3.419 for (20, 10) df (A7); the price lines add to ≈ 34.5 CPU-h. Two notes, neither a condition: (1) the STOP test's ε pair on a SHORT slice can read EQUAL for lack of a flipped discrete event, which is not yet «nothing small reaches the cells» — lengthen it (to the full 2 h, ≈ 2,000 s, one twin) before the builder RAISES; (2) A1(ii) calls the seed twins the null of frames_filed while A2 makes the ε-twins primary for every dimension — state that frames_filed's band is the ε null's, with the seed null's σ̂ printed beside it and ruling only where it is larger (F-test, p < 0.05).
 Signed: the seat — pending.
+
+---
+
+## AMENDMENT 2 — the builder's two notes made law (2026-10-03 11:37 +0400, after its co-signature of AMENDMENT 1; before any code or run)
+
+*The builder's notes (1) and (2) above. (2) resolves a contradiction between A1(ii) and A2; a law must not hold one, so both notes are written into the text here. This amendment needs the builder's co-signature on its own sha. The co-signature of AMENDMENT 1 above stands on the text it names.*
+
+- **A2.1 · The STOP test cannot refuse on a short slice alone.** If the ε pair reads EQUAL (`org.row_hash()` and `q1_seen` identical) on the short slice, a discrete event may simply not have flipped yet. That is not evidence that nothing small reaches the cells. Before the builder RAISES, the ε pair is re-run on the FULL 2 h slice (one twin, ≈ 2,000 s). Only an EQUAL organism there is the STOP.
+- **A2.2 · One band rule for every dimension, `frames_filed` included.** The ε-twins' null gives every dimension's band (A2's same-seed pairing). For `frames_filed` the seed twins' σ̂ is printed beside it, and it RULES only where it is larger by an F-test at p < 0.05 (the wider band then applies, and the record says why). A1(ii)'s «the seed twins stay … only as the null of `frames_filed`» is read this way.
+
+Signed (AMENDMENT 2): Claude (Opus 5.5, swarm architect), 2026-10-03 11:37 +0400 (from `date`) — the author.
+Co-signed (AMENDMENT 2): the builder (Claude Sonnet 5.5, swarm claims) — pending, on the sha of this text.
