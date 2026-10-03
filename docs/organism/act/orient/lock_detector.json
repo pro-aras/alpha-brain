@@ -1,0 +1,240 @@
+{
+ "960|R-NULL (uniform 7)": {
+  "top1_p5_p50_p95_max": [
+   0.23,
+   0.25,
+   0.28,
+   0.34
+  ],
+  "top2_p5_p50_p95_max": [
+   0.41,
+   0.44,
+   0.48,
+   0.51
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 0.0,
+  "pass_share(<=2% of windows top2>=0.9)": 1.0
+ },
+ "960|R-3 (uniform over l,r,f)": {
+  "top1_p5_p50_p95_max": [
+   0.43,
+   0.46,
+   0.5,
+   0.55
+  ],
+  "top2_p5_p50_p95_max": [
+   0.76,
+   0.78,
+   0.82,
+   0.87
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 0.0,
+  "pass_share(<=2% of windows top2>=0.9)": 1.0
+ },
+ "960|R-SCR (the candidate's stationary mixture)": {
+  "top1_p5_p50_p95_max": [
+   0.41,
+   0.44,
+   0.48,
+   0.55
+  ],
+  "top2_p5_p50_p95_max": [
+   0.72,
+   0.75,
+   0.79,
+   0.84
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 0.0,
+  "pass_share(<=2% of windows top2>=0.9)": 1.0
+ },
+ "960|R-CEIL (forward .5, left=right=.25)": {
+  "top1_p5_p50_p95_max": [
+   0.56,
+   0.6,
+   0.66,
+   0.69
+  ],
+  "top2_p5_p50_p95_max": [
+   0.82,
+   0.85,
+   0.88,
+   0.93
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 0.023,
+  "pass_share(<=2% of windows top2>=0.9)": 0.992
+ },
+ "960|iv-0.7 (forward .7)": {
+  "top1_p5_p50_p95_max": [
+   0.75,
+   0.79,
+   0.84,
+   0.86
+  ],
+  "top2_p5_p50_p95_max": [
+   0.91,
+   0.93,
+   0.96,
+   0.97
+  ],
+  "flagged_by_top1_ge_0.8": 0.468,
+  "flagged_by_top2_ge_0.9": 0.997,
+  "pass_share(<=2% of windows top2>=0.9)": 0.032
+ },
+ "960|K-ARGMAX-like (left, right tied; floor 0.1)": {
+  "top1_p5_p50_p95_max": [
+   0.55,
+   0.58,
+   0.63,
+   0.68
+  ],
+  "top2_p5_p50_p95_max": [
+   0.96,
+   0.98,
+   0.99,
+   1.0
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 1.0,
+  "pass_share(<=2% of windows top2>=0.9)": 0.0
+ },
+ "960|P-OLD-like (one act locked; floor 0.1)": {
+  "top1_p5_p50_p95_max": [
+   0.95,
+   0.97,
+   0.99,
+   1.0
+  ],
+  "top2_p5_p50_p95_max": [
+   0.97,
+   0.99,
+   1.0,
+   1.0
+  ],
+  "flagged_by_top1_ge_0.8": 1.0,
+  "flagged_by_top2_ge_0.9": 1.0,
+  "pass_share(<=2% of windows top2>=0.9)": 0.0
+ },
+ "4920|R-NULL (uniform 7)": {
+  "top1_p5_p50_p95_max": [
+   0.26,
+   0.28,
+   0.31,
+   0.34
+  ],
+  "top2_p5_p50_p95_max": [
+   0.44,
+   0.46,
+   0.5,
+   0.52
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 0.0,
+  "pass_share(<=2% of windows top2>=0.9)": 1.0
+ },
+ "4920|R-3 (uniform over l,r,f)": {
+  "top1_p5_p50_p95_max": [
+   0.46,
+   0.49,
+   0.53,
+   0.57
+  ],
+  "top2_p5_p50_p95_max": [
+   0.79,
+   0.81,
+   0.85,
+   0.88
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 0.0,
+  "pass_share(<=2% of windows top2>=0.9)": 1.0
+ },
+ "4920|R-SCR (the candidate's stationary mixture)": {
+  "top1_p5_p50_p95_max": [
+   0.44,
+   0.47,
+   0.51,
+   0.57
+  ],
+  "top2_p5_p50_p95_max": [
+   0.76,
+   0.78,
+   0.81,
+   0.86
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 0.0,
+  "pass_share(<=2% of windows top2>=0.9)": 1.0
+ },
+ "4920|R-CEIL (forward .5, left=right=.25)": {
+  "top1_p5_p50_p95_max": [
+   0.61,
+   0.64,
+   0.68,
+   0.71
+  ],
+  "top2_p5_p50_p95_max": [
+   0.86,
+   0.88,
+   0.91,
+   0.93
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 0.123,
+  "pass_share(<=2% of windows top2>=0.9)": 1.0
+ },
+ "4920|iv-0.7 (forward .7)": {
+  "top1_p5_p50_p95_max": [
+   0.8,
+   0.83,
+   0.86,
+   0.9
+  ],
+  "top2_p5_p50_p95_max": [
+   0.93,
+   0.95,
+   0.97,
+   1.0
+  ],
+  "flagged_by_top1_ge_0.8": 0.985,
+  "flagged_by_top2_ge_0.9": 1.0,
+  "pass_share(<=2% of windows top2>=0.9)": 0.0
+ },
+ "4920|K-ARGMAX-like (left, right tied; floor 0.1)": {
+  "top1_p5_p50_p95_max": [
+   0.59,
+   0.62,
+   0.66,
+   0.7
+  ],
+  "top2_p5_p50_p95_max": [
+   0.98,
+   0.99,
+   1.0,
+   1.0
+  ],
+  "flagged_by_top1_ge_0.8": 0.0,
+  "flagged_by_top2_ge_0.9": 1.0,
+  "pass_share(<=2% of windows top2>=0.9)": 0.0
+ },
+ "4920|P-OLD-like (one act locked; floor 0.1)": {
+  "top1_p5_p50_p95_max": [
+   0.97,
+   0.98,
+   1.0,
+   1.0
+  ],
+  "top2_p5_p50_p95_max": [
+   0.99,
+   1.0,
+   1.0,
+   1.0
+  ],
+  "flagged_by_top1_ge_0.8": 1.0,
+  "flagged_by_top2_ge_0.9": 1.0,
+  "pass_share(<=2% of windows top2>=0.9)": 0.0
+ }
+}
