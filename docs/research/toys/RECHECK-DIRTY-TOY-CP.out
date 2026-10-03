@@ -1,0 +1,23 @@
+records flagged dirty: 426 of 1820
+   C-hist-ema         seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   C-hist-last2       seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   C-own-ema          seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   C-own-last2        seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   ERROR              seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   L-hist-ema         seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   L-hist-last2       seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   L-own-ema          seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   L-own-last2        seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   LP-OUDEYER         seed 20261306 rep 05  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   N-ONLY             seed 20261306 rep 00  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   ORACLE             seed 20261306 rep 00  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   R-ONLY             seed 20261306 rep 11  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   RANDOM             seed 20261306 rep 11  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   C-hist-ema         seed 20261303 rep 01  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   C-hist-last2       seed 20261303 rep 01  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   C-own-ema          seed 20261303 rep 01  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   C-own-last2        seed 20261303 rep 01  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   ERROR              seed 20261303 rep 01  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+   L-hist-ema         seed 20261303 rep 01  stored header f672fa87 dirty True  →  EQUAL in every field but the masked
+PLANT: C-hist-ema seed 20261306 rep 05 against the re-run of the same arm and replicate at seed 20261301: CAUGHT (differs at cursor, extra, m1_end, m1_end_value)
+RECHECK: ALL EQUAL, control caught · 20 lives re-run, 0 differ

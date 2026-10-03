@@ -310,5 +310,112 @@ class TestStage2(unittest.TestCase):
         self.assertNotIn("VERDICT CLASS: FIXED-PENDING-STAGE-2", text)
 
 
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 12:30 +0400 — two READINGS added after the unit and before the RESULT (no bar, no class depends on them; the law's main
+# effects alone would misstate the scope effect, which has the OPPOSITE sign for L and for C, and say nothing about WHY the quantity matters). Written FIRST.
+#  · simple_effects: the effect of one factor within each level of another (the interaction), per seed, with a bootstrap interval over seeds.
+#  · signal_stats / ranking_probe: on RANDOM's own visit streams (an unbiased sample of every room), the per-visit own-window drop of L and of C in N against R1-R3
+#    (mean, sd, cv), and the OPEN-LOOP ranking probe — how often «argmax of the last-2 / EMA estimate» would name N — with a dealt null (room labels permuted) and planted signals.
+class TestReadings(unittest.TestCase):
+    def cells(self, f, seed=5):
+        rng = np.random.default_rng(seed)
+        return {RP.cell_name(l, s, t): {sd: f(l, s, t) + float(rng.normal(0, 0.01)) for sd in SEEDS}
+                for l in ("L", "C") for s in ("own", "hist") for t in ("last2", "ema")}
+
+    def test_simple_effects_find_a_planted_interaction(self):
+        cells = self.cells(lambda l, s, t: 0.5 + (0.2 if l == "C" else 0.0) + (0.0 if s == "own" else (-0.30 if l == "L" else 0.05)))
+        se = RP.simple_effects(cells, SEEDS, "scope", "loss")
+        self.assertAlmostEqual(se["L"]["mean"], -0.30, delta=0.02)
+        self.assertAlmostEqual(se["C"]["mean"], 0.05, delta=0.02)
+        self.assertAlmostEqual(se["diff"]["mean"], 0.35, delta=0.03)
+        self.assertEqual(se["L"]["neg"], 10)
+        self.assertEqual(se["C"]["pos"], 10)
+        self.assertGreater(se["diff"]["ci95"][0], 0.0)                       # the interaction's interval excludes zero
+        self.assertEqual(len(se["diff"]["per_seed"]), 10)
+
+    def test_no_interaction_gives_a_difference_that_includes_zero(self):
+        cells = self.cells(lambda l, s, t: 0.5 + (0.2 if l == "C" else 0.0) + (0.0 if s == "own" else -0.10))
+        se = RP.simple_effects(cells, SEEDS, "scope", "loss")
+        self.assertAlmostEqual(se["L"]["mean"], se["C"]["mean"], delta=0.02)
+        lo, hi = se["diff"]["ci95"]
+        self.assertLess(lo, 0.0)
+        self.assertGreater(hi, 0.0)
+
+    def test_simple_effects_of_the_loss_within_each_scope(self):
+        cells = self.cells(lambda l, s, t: 0.5 + (0.2 if (l == "C" and s == "hist") else 0.0))
+        se = RP.simple_effects(cells, SEEDS, "loss", "scope")
+        self.assertAlmostEqual(se["own"]["mean"], 0.0, delta=0.02)
+        self.assertAlmostEqual(se["hist"]["mean"], 0.2, delta=0.02)
+        self.assertAlmostEqual(se["diff"]["mean"], 0.2, delta=0.03)
+
+    def visits(self, dN, dR, n=60, seed=3, key="dL"):
+        """RANDOM-like lives: the room of each block uniform over the four; the own-window drop of each visit drawn from (mean, sd) by class N / R."""
+        rng = np.random.default_rng(seed)
+        out = []
+        for _ in range(n):
+            rooms = [("R1", "R2", "R3", "N")[int(rng.integers(4))] for _ in range(200)]
+            d = [float(rng.normal(*(dN if r == "N" else dR))) for r in rooms]
+            out.append({"vis": {"room": rooms, "dL": d, "dC": list(d)}})
+        return out
+
+    def test_signal_stats_read_the_mean_sd_and_cv_by_class(self):
+        lives = self.visits((0.5, 0.5), (0.9, 1.9))
+        st = RP.signal_stats(lives, min_block=5)
+        n_, r_ = st["L"]["N"], st["L"]["R"]
+        self.assertAlmostEqual(n_["mean"], 0.5, delta=0.05)
+        self.assertAlmostEqual(n_["sd"], 0.5, delta=0.05)
+        self.assertAlmostEqual(r_["mean"], 0.9, delta=0.1)
+        self.assertAlmostEqual(r_["sd"], 1.9, delta=0.1)
+        self.assertAlmostEqual(r_["cv"], 1.9 / 0.9, delta=0.3)
+        self.assertGreater(n_["n"], 1000)
+        self.assertGreater(r_["n"], 3 * 1000 * 0.9)                              # three R rooms to one N
+
+    def test_the_ranking_probe_reads_a_planted_perfect_signal_as_never_N(self):
+        lives = self.visits((-1.0, 0.05), (1.0, 0.05))
+        for kind in ("last2", "ema"):
+            p = RP.ranking_probe(lives, key="dL", kind=kind)
+            self.assertLess(p["p_N"], 0.02, (kind, p))
+            self.assertAlmostEqual(p["p_dealt"], 0.25, delta=0.06)               # the dealt null is blind to rooms: about 1 of 4
+            self.assertGreater(p["n"], 5000)
+
+    def test_the_ranking_probe_reads_a_planted_trap_as_always_N(self):
+        lives = self.visits((5.0, 0.05), (1.0, 0.05))
+        p = RP.ranking_probe(lives, key="dL", kind="last2")
+        self.assertGreater(p["p_N"], 0.98, p)
+
+    def test_the_ranking_probe_of_a_signal_with_no_room_structure_is_about_a_quarter(self):
+        lives = self.visits((0.7, 0.5), (0.7, 0.5))
+        for kind in ("last2", "ema"):
+            p = RP.ranking_probe(lives, key="dL", kind=kind)
+            self.assertAlmostEqual(p["p_N"], 0.25, delta=0.06, msg=(kind, p))
+
+    def test_a_noisy_signal_ranks_N_first_more_often_than_the_same_means_with_little_noise(self):
+        clean = RP.ranking_probe(self.visits((0.5, 0.15), (0.9, 0.15)), key="dL", kind="last2")["p_N"]
+        noisy = RP.ranking_probe(self.visits((0.5, 0.5), (0.9, 1.9)), key="dL", kind="last2")["p_N"]
+        # the analytic values (the first draft of this test guessed «a gap of 0.10», which the code refused — the code was right, the guess was not): with the last-2 mean of
+        # a visit's drop, N's estimate ~ N(0.5, 0.5/√2) and each R room's ~ N(0.9, 1.9/√2), P(N has the maximum of the four) = E_x[Φ((x − 0.9)/1.344)³] = 0.0691; clean (sd 0.15): 8e-5
+        self.assertLess(clean, 0.01)
+        self.assertAlmostEqual(noisy, 0.0691, delta=0.025)
+        self.assertGreater(noisy - clean, 0.04)                                  # the signal-to-noise mechanism, on a planted world
+
+    def test_a_probe_skips_the_blocks_where_a_room_has_no_estimate_yet(self):
+        lives = [{"vis": {"room": ["R1"] * 200, "dL": [1.0] * 200, "dC": [1.0] * 200}}]          # R2, R3 and N are never visited
+        p = RP.ranking_probe(lives, key="dL", kind="last2")
+        self.assertEqual(p["n"], 0)
+        self.assertEqual(p["skipped"], 200 - 39)                                 # blocks 40..200 are all skipped
+
+    def test_the_render_prints_the_two_readings(self):
+        arms = world(PLANTED)
+        for s in SEEDS:                                                           # RANDOM's lives carry the visit streams
+            arms["RANDOM"][s] = [dict(l, **self.visits((0.5, 0.5), (0.9, 1.9), n=1, seed=s)[0]) for l in arms["RANDOM"][s]]
+        an = RP.analyse(arms, SEEDS, draws=2000)
+        rows = [{"block": b, "room": "N" if b % 4 == 0 else "R1", "own": {"total": 1.0, "bias": 0.7, "weight": 0.1, "stats": 0.05},
+                 "hist": {"total": 0.5, "bias": 0.3, "weight": 0.05, "stats": 0.02}} for b in range(1, 201)]
+        counts = {a: sum(len(v) for v in arms[a].values()) for a in arms}
+        text = "\n".join(RP.render(an, arms, rows, counts, SEEDS))
+        self.assertIn("THE SIMPLE EFFECTS", text)
+        self.assertIn("THE PER-VISIT SIGNAL", text)
+        self.assertIn("OPEN-LOOP RANKING PROBE", text)
+
+
 if __name__ == "__main__":
     unittest.main()

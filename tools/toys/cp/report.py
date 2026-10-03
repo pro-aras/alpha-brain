@@ -151,6 +151,109 @@ def _bar(D: float, null: np.ndarray, per_seed: Sequence[float], sign: int, flagg
     return {"D": float(D), "p": float(p), "signs": int(signs), "n": len(per_seed), "smallest": float(thr), "ok": bool(ok)}
 
 
+# ====================================================================================================== TWO READINGS (after the unit, before the RESULT)
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 12:31 +0400 — no bar and no class depends on them (red-first: tests/tools/test_toys_cp_analyse.py::TestReadings).
+ROOMS4: Tuple[str, ...] = ("R1", "R2", "R3", "N")
+PROBE_SEED = 20261005
+EMA_PROBE_A = 0.1                   # the toy's declared EMA (estimators.EMA_A)
+
+
+def _effect_summary(per: Sequence[float], rng, boot: int) -> Dict[str, object]:
+    arr = np.array(per, dtype=np.float64)
+    se = float(arr.std(ddof=1) / math.sqrt(len(arr))) if len(arr) > 1 else float("nan")
+    bs = np.array([arr[rng.integers(len(arr), size=len(arr))].mean() for _ in range(boot)])
+    return {"per_seed": [float(x) for x in arr], "mean": float(arr.mean()), "se": se, "pos": int((arr > 0).sum()), "neg": int((arr < 0).sum()),
+            "ci95": (float(np.quantile(bs, 0.025)), float(np.quantile(bs, 0.975)))}
+
+
+def simple_effects(cells: Mapping[str, Mapping[int, float]], seeds: Sequence[int], factor: str, within: str, boot: int = 10000) -> Dict[str, Dict[str, object]]:
+    """The effect of `factor` (high − low) WITHIN each level of `within`, averaged over the third factor's two levels: per seed, the across-seed mean, its standard error,
+    the positive / negative seed counts and a 95 % bootstrap interval over seeds; and «diff» = (the effect within the high level) − (within the low level), the interaction.
+    The main effect is the mean of the two simple effects; when they differ in sign the main effect alone misleads (here: scope, for L and for C)."""
+    lo_f, hi_f, pf = FACTORS[factor]
+    lo_w, hi_w, pw = FACTORS[within]
+    seeds = sorted(seeds)
+    rng = np.random.default_rng(BOOT_SEED + 1)
+    per: Dict[str, List[float]] = {lo_w: [], hi_w: []}
+    for lvl in (lo_w, hi_w):
+        for s in seeds:
+            effs = []
+            for name in cells:
+                parts = name.split("-")
+                if parts[pf] == lo_f and parts[pw] == lvl:
+                    hp = list(parts)
+                    hp[pf] = hi_f
+                    effs.append(cells["-".join(hp)][s] - cells[name][s])
+            per[lvl].append(float(np.mean(effs)))
+    out: Dict[str, Dict[str, object]] = {lo_w: _effect_summary(per[lo_w], rng, boot), hi_w: _effect_summary(per[hi_w], rng, boot)}
+    out["diff"] = _effect_summary([h - l for h, l in zip(per[hi_w], per[lo_w])], rng, boot)
+    return out
+
+
+def signal_stats(lives: Sequence[Mapping[str, object]], min_block: int = 5) -> Dict[str, Dict[str, Dict[str, float]]]:
+    """The per-visit OWN-WINDOW drop of L (key dL) and of C (key dC) on RANDOM's lives, N's visits against R1-R3's: n, mean, sd, cv = sd / |mean|, and the share of positive
+    drops. RANDOM visits every room uniformly, so its streams are an unbiased sample of each room's signal."""
+    out: Dict[str, Dict[str, Dict[str, float]]] = {}
+    for key, name in (("dL", "L"), ("dC", "C")):
+        d: Dict[str, List[float]] = {"N": [], "R": []}
+        for l in lives:
+            v = l["vis"]
+            for b, (r, x) in enumerate(zip(v["room"], v[key]), start=1):
+                if b >= min_block:
+                    d["N" if r == "N" else "R"].append(float(x))
+        out[name] = {}
+        for cls, xs in d.items():
+            a = np.array(xs, dtype=np.float64)
+            m, sd = float(a.mean()), float(a.std(ddof=1))
+            out[name][cls] = {"n": int(len(a)), "mean": m, "sd": sd, "cv": (sd / abs(m)) if m != 0 else float("inf"), "pos": float((a > 0).mean())}
+    return out
+
+
+def ranking_probe(lives: Sequence[Mapping[str, object]], key: str = "dL", kind: str = "last2", min_block: int = 40, draws: int = 20,
+                  seed: int = PROBE_SEED, a: float = EMA_PROBE_A) -> Dict[str, float]:
+    """The OPEN-LOOP RANKING PROBE: on each life's own visit stream, at every block ≥ `min_block`, which room has the highest estimate (kind «last2»: the mean of the room's
+    last two own-window drops; «ema»: the EMA of its drops, a = 0.1 — the toy's two time scales), and how often is it N? Blocks at which a room has no estimate yet are
+    SKIPPED (counted). The dealt null permutes the room labels of each life's visits (the drops stay, the addresses are chance): p_dealt is its mean over `draws` draws.
+    A reading of the SIGNAL'S separability with the policy taken out of the loop — a policy that follows an estimate changes which rooms it sees."""
+    rng = np.random.default_rng(seed)
+
+    def one(rooms: Sequence[str], drops: Sequence[float]) -> Tuple[int, int, int]:
+        last: Dict[str, List[float]] = {r: [] for r in ROOMS4}
+        ema: Dict[str, Optional[float]] = {r: None for r in ROOMS4}
+        hits = tot = skipped = 0
+        for b, (r, d) in enumerate(zip(rooms, drops), start=1):
+            last[r] = (last[r] + [float(d)])[-2:]
+            ema[r] = float(d) if ema[r] is None else (1.0 - a) * ema[r] + a * float(d)
+            if b < min_block:
+                continue
+            if kind == "last2":
+                if any(len(last[x]) < 2 for x in ROOMS4):
+                    skipped += 1
+                    continue
+                est = {x: float(np.mean(last[x])) for x in ROOMS4}
+            else:
+                if any(ema[x] is None for x in ROOMS4):
+                    skipped += 1
+                    continue
+                est = {x: float(ema[x]) for x in ROOMS4}
+            best = max(ROOMS4, key=lambda x: est[x])
+            hits += 1 if best == "N" else 0
+            tot += 1
+        return hits, tot, skipped
+
+    hits = tot = skipped = 0
+    dh = dt = 0
+    for l in lives:
+        v = l["vis"]
+        h, t, sk = one(v["room"], v[key])
+        hits, tot, skipped = hits + h, tot + t, skipped + sk
+        for _ in range(draws):
+            perm = [v["room"][i] for i in rng.permutation(len(v["room"]))]
+            h2, t2, _sk = one(perm, v[key])
+            dh, dt = dh + h2, dt + t2
+    return {"p_N": (hits / tot) if tot else float("nan"), "n": int(tot), "skipped": int(skipped), "p_dealt": (dh / dt) if dt else float("nan"), "kind": kind, "key": key}
+
+
 STAGE2_REPS = 10                    # the law's stage 2: 10 replicates × 10 seeds for each arm's NULL
 
 
@@ -255,6 +358,7 @@ def analyse(arms: Mapping[str, Mapping[int, Sequence[Dict[str, object]]]], seeds
     # ---- the factorial's main effects
     cellsA = {c: {s: float(np.mean([l["A"] for l in arms[c][s]])) for s in seeds} for c in ES_CELLS()}
     cellsN = {c: {s: float(np.mean([l["SN"] for l in arms[c][s]])) for s in seeds} for c in ES_CELLS()}
+    simple = {key: {f"{f}|{w}": simple_effects(cells, seeds, f, w, boot=4000) for f in FACTORS for w in FACTORS if f != w} for key, cells in (("A", cellsA), ("SN", cellsN))}
     # ---- the verdict (§5): classes decided on the COUNTED bars (an ema cell counts only if it also holds on seeds 04-10)
     beat_arms = [a for a in NINE if out_arms[a]["BEAT_counted"]]
     leave_arms = [a for a in NINE if out_arms[a]["LEAVE_counted"]]
@@ -281,7 +385,7 @@ def analyse(arms: Mapping[str, Mapping[int, Sequence[Dict[str, object]]]], seeds
         cls = "FIXED" if fixed_arms else "NOT-FIXED-ALL-VOID"          # all VOID: every arm that passed both bars has a NULL that passes BEAT (the law names no class for it)
     verdict.update({"class": cls, "fixed_arms": fixed_arms, "void_arms": [a for a in both if a in stage2["arms"] and stage2["arms"][a]["void"]], "stage2_missing": stage2["missing"]})
     return {"seeds": seeds, "held_out_seeds": held, "controls": controls, "arms": out_arms, "main_effects_A": main_effects(cellsA, seeds), "main_effects_SN": main_effects(cellsN, seeds),
-            "verdict": verdict, "stage2": stage2,
+            "simple": simple, "verdict": verdict, "stage2": stage2,
             "null": {"draws": draws, "sd_A": float(np.std(null_A)), "q99_A": smallest_D, "sd_N": float(np.std(null_N)),
                      "q_lower_N": smallest_passing_lower(null_N), "sd_A_ho": float(np.std(null_A_ho)), "q99_A_ho": smallest_passing(null_A_ho)}}
 
@@ -356,6 +460,12 @@ def summarise_life(rec: Mapping[str, object]) -> Dict[str, object]:
     hw = ex.get("hist_w_N")
     if hw:
         out["histN"] = [float(hw[min(len(hw) - 1, b - 1)]) for b in range(20, 201, 20)]
+    # the per-visit own-window drops of L (the record's `drop`) and of C (the C table's change in the visited room), for the signal readings (edit: 12:31 +0400)
+    C = ex.get("C")
+    out["vis"] = None
+    if C and len(C) == len(rows) + 1:
+        out["vis"] = {"room": [x["room"] for x in rows], "dL": [float(x["drop"]) for x in rows],
+                      "dC": [float(C[b - 1][x["room"]] - C[b][x["room"]]) for b, x in enumerate(rows, start=1)]}
     return out
 
 
@@ -430,6 +540,18 @@ def render(an: Mapping[str, object], arms, decomp, counts, seeds: Sequence[int])
             neg = sum(1 for v in e["per_seed"] if v < 0)
             L.append(f"   {f:6s} mean {e['mean']:+.4f}  se {e['se']:.4f}  positive at {e['signs']} / negative at {neg} of {len(seeds)} seeds  95% CI [{e['ci95'][0]:+.4f}, {e['ci95'][1]:+.4f}]")
     L.append("")
+    L.append("THE SIMPLE EFFECTS (the effect of one factor WITHIN each level of another, mean over the third factor's cells, per seed; positive / negative seeds; 95% CI over seeds; "
+             "«interaction» = within the high level minus within the low level; added after the unit, no bar depends on it):")
+    for key, label in (("A", "A"), ("SN", "SHARE_N")):
+        L.append(f"   on {label}:")
+        for f, w in (("scope", "loss"), ("loss", "scope"), ("time", "loss"), ("time", "scope"), ("loss", "time"), ("scope", "time")):
+            e = an["simple"][key][f"{f}|{w}"]
+            lo_f, hi_f, _pf = FACTORS[f]
+            lo_w, hi_w, _pw = FACTORS[w]
+            parts = [f"within {w} = {lvl}: {e[lvl]['mean']:+.4f} [{e[lvl]['ci95'][0]:+.4f}, {e[lvl]['ci95'][1]:+.4f}] +{e[lvl]['pos']}/−{e[lvl]['neg']}" for lvl in (lo_w, hi_w)]
+            d = e["diff"]
+            L.append(f"      {f} ({hi_f} − {lo_f}) " + " · ".join(parts) + f" · interaction {d['mean']:+.4f} [{d['ci95'][0]:+.4f}, {d['ci95'][1]:+.4f}]")
+    L.append("")
     # ---- predictions and refutations
     ho = len(an["held_out_seeds"])
     L.append("PREDICTIONS (written before any life) and REFUTATIONS:")
@@ -476,6 +598,22 @@ def render(an: Mapping[str, object], arms, decomp, counts, seeds: Sequence[int])
         if mb == 5:
             L.append(f"   §0 item 4's mechanism (the bias part is the MAJORITY of the drop in N's blocks): {'HOLDS' if an_['mechanism_holds'] else 'REFUTED — the bias part is not the majority in N blocks'}")
     L.append("")
+    # ---- the per-visit signal and the open-loop ranking probe (added after the unit; readings, no bar)
+    rl = [l for s in seeds for l in arms["RANDOM"][s] if l.get("vis")]
+    if rl:
+        st = signal_stats(rl)
+        L.append(f"THE PER-VISIT SIGNAL (RANDOM's {len(rl)} lives; the own-window drop of the visited room per visit, blocks ≥ 5; N's visits against R1–R3's; cv = sd / |mean|):")
+        for q in ("L", "C"):
+            n_, r_ = st[q]["N"], st[q]["R"]
+            L.append(f"   {q}: N  n {n_['n']:6d} mean {n_['mean']:+.4f} sd {n_['sd']:.4f} cv {n_['cv']:.2f} positive {n_['pos']:.3f} · R1–R3 n {r_['n']:6d} mean {r_['mean']:+.4f} sd {r_['sd']:.4f} "
+                     f"cv {r_['cv']:.2f} positive {r_['pos']:.3f} · mean ratio N/R {n_['mean'] / r_['mean']:.3f}")
+        L.append("OPEN-LOOP RANKING PROBE (on each of RANDOM's visit streams, at every block ≥ 40: how often would «argmax of the room's last-2 / EMA(0.1) own-window drop» name N? the policy is out of the "
+                 "loop, so this is the signal's separability, not a prediction of a life; dealt null = the visits' room labels permuted, 10 draws a life; chance 0.25):")
+        for q, key in (("L", "dL"), ("C", "dC")):
+            for kind in ("last2", "ema"):
+                p = ranking_probe(rl, key=key, kind=kind, draws=10)
+                L.append(f"   {q} {kind:5s}: argmax is N at {p['p_N']:.3f} of {p['n']} scored (life, block) pairs (skipped {p['skipped']}); dealt null {p['p_dealt']:.3f}")
+        L.append("")
     # ---- the ear, N's history weight, learned per room
     L.append("THE EAR'S OWN TYPE COVER (first block at which all 13 words are heard AND Ear.cover over the heard words equals the vocabulary map; 'never' if never):")
     for s in seeds:

@@ -39,6 +39,22 @@ THE FACTORIAL'S MAIN EFFECTS on SHARE_N (mean over the other factors' cells of h
    scope  mean +0.1835  se 0.0229  positive at 10 / negative at 0 of 10 seeds  95% CI [+0.1358, +0.2209]
    time   mean -0.0238  se 0.0159  positive at 4 / negative at 6 of 10 seeds  95% CI [-0.0565, +0.0022]
 
+THE SIMPLE EFFECTS (the effect of one factor WITHIN each level of another, mean over the third factor's cells, per seed; positive / negative seeds; 95% CI over seeds; «interaction» = within the high level minus within the low level; added after the unit, no bar depends on it):
+   on A:
+      scope (hist − own) within loss = L: -0.3543 [-0.4065, -0.2763] +0/−10 · within loss = C: +0.0573 [+0.0416, +0.0734] +10/−0 · interaction +0.4116 [+0.3288, +0.4642]
+      loss (C − L) within scope = own: +0.0782 [+0.0535, +0.1036] +10/−0 · within scope = hist: +0.4898 [+0.4091, +0.5443] +10/−0 · interaction +0.4116 [+0.3288, +0.4642]
+      time (ema − last2) within loss = L: +0.0329 [-0.0073, +0.0841] +7/−3 · within loss = C: +0.0318 [+0.0198, +0.0446] +9/−1 · interaction -0.0011 [-0.0576, +0.0405]
+      time (ema − last2) within scope = own: +0.0624 [+0.0421, +0.0804] +9/−1 · within scope = hist: +0.0024 [-0.0319, +0.0495] +5/−5 · interaction -0.0600 [-0.1006, -0.0129]
+      loss (C − L) within time = last2: +0.2846 [+0.2647, +0.3070] +10/−0 · within time = ema: +0.2834 [+0.2137, +0.3357] +10/−0 · interaction -0.0011 [-0.0576, +0.0405]
+      scope (hist − own) within time = last2: -0.1185 [-0.1367, -0.0997] +0/−10 · within time = ema: -0.1785 [-0.2244, -0.1191] +1/−9 · interaction -0.0600 [-0.1006, -0.0129]
+   on SHARE_N:
+      scope (hist − own) within loss = L: +0.4447 [+0.3389, +0.5239] +10/−0 · within loss = C: -0.0778 [-0.0968, -0.0582] +0/−10 · interaction -0.5224 [-0.6091, -0.4065]
+      loss (C − L) within scope = own: -0.1147 [-0.1439, -0.0855] +0/−10 · within scope = hist: -0.6372 [-0.7202, -0.5252] +0/−10 · interaction -0.5224 [-0.6091, -0.4065]
+      time (ema − last2) within loss = L: -0.0195 [-0.0863, +0.0354] +6/−4 · within loss = C: -0.0281 [-0.0402, -0.0160] +2/−8 · interaction -0.0085 [-0.0683, +0.0658]
+      time (ema − last2) within scope = own: -0.0587 [-0.0757, -0.0382] +1/−9 · within scope = hist: +0.0111 [-0.0538, +0.0631] +7/−3 · interaction +0.0698 [+0.0042, +0.1296]
+      loss (C − L) within time = last2: -0.3717 [-0.3989, -0.3418] +0/−10 · within time = ema: -0.3802 [-0.4507, -0.2868] +0/−10 · interaction -0.0085 [-0.0683, +0.0658]
+      scope (hist − own) within time = last2: +0.1486 [+0.1265, +0.1701] +10/−0 · within time = ema: +0.2183 [+0.1400, +0.2822] +9/−1 · interaction +0.0698 [+0.0042, +0.1296]
+
 PREDICTIONS (written before any life) and REFUTATIONS:
    P1 L-hist-last2: SHARE_N ≥ 0.5 at 8/10 seeds (held-out 6/7); below RANDOM's band at 0/10 (held-out 0/7) → P1 HOLDS; refuted-by-escape no
    P1 L-hist-ema: SHARE_N ≥ 0.5 at 8/10 seeds (held-out 6/7); below RANDOM's band at 1/10 (held-out 1/7) → P1 HOLDS; refuted-by-escape no
@@ -68,6 +84,15 @@ THE DROP'S ANATOMY over RANDOM's lives (single-factor drops from the state befor
       N blocks, hist (n 8935): total +0.0142 = bias +0.0285 + weight -0.0066 + stats +0.0006 + interaction -0.0084   share_bias +2.013
       R1–R3 blocks, own  (n 27065): total +0.6126 = bias +0.0323 + weight +0.6050 + stats +0.0043 + interaction -0.0291   share_bias +0.053
       R1–R3 blocks, hist (n 27065): total +0.0337 = bias +0.0240 + weight +0.0255 + stats +0.0005 + interaction -0.0163   share_bias +0.711
+
+THE PER-VISIT SIGNAL (RANDOM's 200 lives; the own-window drop of the visited room per visit, blocks ≥ 5; N's visits against R1–R3's; cv = sd / |mean|):
+   L: N  n   9706 mean +0.4658 sd 0.5049 cv 1.08 positive 0.957 · R1–R3 n  29494 mean +0.9236 sd 1.9016 cv 2.06 positive 0.931 · mean ratio N/R 0.504
+   C: N  n   9706 mean +0.0423 sd 0.0461 cv 1.09 positive 0.832 · R1–R3 n  29494 mean +0.0829 sd 0.0668 cv 0.81 positive 0.940 · mean ratio N/R 0.510
+OPEN-LOOP RANKING PROBE (on each of RANDOM's visit streams, at every block ≥ 40: how often would «argmax of the room's last-2 / EMA(0.1) own-window drop» name N? the policy is out of the loop, so this is the signal's separability, not a prediction of a life; dealt null = the visits' room labels permuted, 10 draws a life; chance 0.25):
+   L last2: argmax is N at 0.272 of 32200 scored (life, block) pairs (skipped 0); dealt null 0.252
+   L ema  : argmax is N at 0.075 of 32200 scored (life, block) pairs (skipped 0); dealt null 0.262
+   C last2: argmax is N at 0.156 of 32200 scored (life, block) pairs (skipped 0); dealt null 0.254
+   C ema  : argmax is N at 0.040 of 32200 scored (life, block) pairs (skipped 0); dealt null 0.261
 
 THE EAR'S OWN TYPE COVER (first block at which all 13 words are heard AND Ear.cover over the heard words equals the vocabulary map; 'never' if never):
    20261301: lives 181 · first-correct block min 5 / median 7 / max 69 · never-correct lives 0 · wrong at block 200 in 0
