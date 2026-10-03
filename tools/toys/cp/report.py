@@ -285,6 +285,17 @@ def first_top_counts(arms, seeds: Sequence[int], cells: Sequence[str]) -> Dict[s
     return out
 
 
+def lock_in(arms, seeds: Sequence[int]) -> Dict[str, Dict[str, float]]:
+    """arm -> {n, mean, median, max} of the LONGEST RUN of one room among the policy blocks (S1c's `longest_run`), over the arm's lives; an arm with no life that carries it is
+    absent. (edit: 15:30 +0400; red-first: TestLockIn.) A reading: RANDOM's own is what chance gives."""
+    out: Dict[str, Dict[str, float]] = {}
+    for arm, by_seed in arms.items():
+        v = [l["lock"] for s in sorted(seeds) for l in by_seed.get(s, []) if l.get("lock") is not None]
+        if v:
+            out[arm] = {"n": len(v), "mean": float(np.mean(v)), "median": float(np.median(v)), "max": max(v)}
+    return out
+
+
 def first_margin(arms, seeds: Sequence[int], cell: str) -> List[Optional[float]]:
     """Per seed, the first replicate's estimate for N minus its best R room's at block 5 (None if it had none)."""
     out: List[Optional[float]] = []
@@ -611,6 +622,11 @@ def render(an: Mapping[str, object], arms, decomp, counts, seeds: Sequence[int])
         L.append(f"   {cell:14s} N top   " + " ".join(f"{ftc[cell][s][0]}/{ftc[cell][s][1]}".rjust(6) for s in seeds))
         fm = first_margin(arms, seeds, cell)
         L.append(f"   {'':14s} N − bestR " + " ".join(("—" if v is None else f"{v:+.2f}").rjust(6) for v in fm))
+    L.append("LOCK-IN (the longest run of ONE room among the policy blocks, mean / median / max over the arm's lives; RANDOM's is what chance gives; added 15:30 +0400, a reading):")
+    lk = lock_in(arms, seeds)
+    for arm in list(NINE) + ["RANDOM", "R-ONLY", "ERROR", "N-ONLY", "ORACLE"] + [a for a in sorted(arms) if a.startswith("NULL-")]:
+        if arm in lk:
+            L.append(f"   {arm:18s} n {lk[arm]['n']:4d}   mean {lk[arm]['mean']:6.1f}   median {lk[arm]['median']:5.1f}   max {lk[arm]['max']:4d}")
     L.append("")
     # ---- predictions and refutations
     ho = len(an["held_out_seeds"])

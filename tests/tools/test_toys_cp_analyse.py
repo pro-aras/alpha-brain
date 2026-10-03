@@ -499,5 +499,49 @@ class TestFirstPick(unittest.TestCase):
         self.assertEqual(len(lines), 1, lines)                                                # the anomalous seed's cell «0/10» (not «10/10») is visible in ONE printed row
 
 
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 15:30 +0400 — a third reading, found while writing the RESULT: it said the stage-2 NULLs «lock into one room», and the report
+# printed the NULLs' longest run with no reference (RANDOM's is 4.5 blocks, the NULLs' 38-40). The LOCK-IN reading prints it for every arm, so the claim has its comparison. Written FIRST.
+class TestLockIn(unittest.TestCase):
+    def test_lock_in_stats_are_the_mean_median_and_max_of_the_longest_run(self):
+        arms = {"X": {s: [dict(life(0.5, 0.2), lock=v) for v in (3, 5, 10)] for s in SEEDS}}
+        st = RP.lock_in(arms, SEEDS)
+        self.assertAlmostEqual(st["X"]["mean"], 6.0, places=9)
+        self.assertEqual(st["X"]["median"], 5.0)
+        self.assertEqual(st["X"]["max"], 10)
+        self.assertEqual(st["X"]["n"], 30)
+
+    def test_a_life_with_no_longest_run_is_not_counted(self):
+        arms = {"X": {SEEDS[0]: [dict(life(0.5, 0.2), lock=None), dict(life(0.5, 0.2), lock=8)]}}
+        st = RP.lock_in(arms, SEEDS)
+        self.assertEqual(st["X"]["n"], 1)
+        self.assertEqual(st["X"]["max"], 8)
+
+    def test_an_arm_with_no_lives_with_a_run_is_absent(self):
+        arms = {"X": {SEEDS[0]: [dict(life(0.5, 0.2), lock=None)]}}
+        self.assertNotIn("X", RP.lock_in(arms, SEEDS))
+
+    def test_the_render_prints_the_lock_in_reading_with_random_as_the_reference(self):
+        arms = world(PLANTED)
+        for s in SEEDS:
+            arms["RANDOM"][s] = [dict(l, lock=4) for l in arms["RANDOM"][s]]
+            arms["C-hist-ema"][s] = [dict(l, lock=30) for l in arms["C-hist-ema"][s]]
+        an = RP.analyse(arms, SEEDS, draws=2000)
+        rows = [{"block": b, "room": "N" if b % 4 == 0 else "R1", "own": {"total": 1.0, "bias": 0.7, "weight": 0.1, "stats": 0.05},
+                 "hist": {"total": 0.5, "bias": 0.3, "weight": 0.05, "stats": 0.02}} for b in range(1, 201)]
+        counts = {a: sum(len(v) for v in arms[a].values()) for a in arms}
+        text = "\n".join(RP.render(an, arms, rows, counts, SEEDS))
+        self.assertIn("LOCK-IN", text)
+        section = text.split("LOCK-IN", 1)[1].split("PREDICTIONS", 1)[0]                           # only the lock-in section: «RANDOM» and the cells also appear in other tables
+        self.assertIn("max", section.splitlines()[0])                                             # the header names what is printed
+        rnd = [l for l in section.splitlines() if l.strip().startswith("RANDOM")]
+        cell = [l for l in section.splitlines() if l.strip().startswith("C-hist-ema")]
+        self.assertEqual(len(rnd), 1)
+        self.assertEqual(len(cell), 1)
+        self.assertIn("mean    4.0", rnd[0])
+        self.assertIn("max    4", rnd[0])
+        self.assertIn("mean   30.0", cell[0])
+        self.assertIn("max   30", cell[0])
+
+
 if __name__ == "__main__":
     unittest.main()
