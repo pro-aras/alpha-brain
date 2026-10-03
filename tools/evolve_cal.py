@@ -47,22 +47,8 @@ _SEED_RE = re.compile(r"^(SEED\s+)(\d+)(.*)$", re.MULTILINE)
 
 
 # ============================================================================ genome variants (ONE number, nothing else)
-def _spec(key: str) -> dict:
-    spec = BOUNDS.get(key)
-    if spec is None or spec.get("excluded"):
-        raise ValueError(f"evolve_cal: {key!r} is not a mutable BOUNDS entry ({(spec or {}).get('reason', 'unknown key')})")
-    return spec
-
-
-def gene_text(text: str, key: str) -> str:
-    """The number text the genome currently carries for `key`, read with BOUNDS' own pattern (group 1 = the fixed text up to the
-    number, group 2 = everything after it). Exactly one match, or ValueError."""
-    spec = _spec(key)
-    ms = list(spec["pattern"].finditer(text))
-    if len(ms) != 1:
-        raise ValueError(f"evolve_cal: BOUNDS[{key!r}]'s pattern matched {len(ms)} times in the genome text (need exactly 1)")
-    m = ms[0]
-    return text[m.end(1):m.start(2)]
+_spec = ev.bounds_spec          # one implementation, in the worker (tools/evolve.py): the proposer's redraw reads the same numbers
+gene_text = ev.gene_text        # The number text the genome currently carries for `key` (BOUNDS' own pattern; exactly one match, or ValueError)
 
 
 def set_gene_text(text: str, key: str, val_str: str) -> str:

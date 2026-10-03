@@ -62,7 +62,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from creature.genes import BOUNDS, mutate_genome_text          # noqa: E402
+from creature.genes import BOUNDS, MUTABLE_KEYS, apply_mutation, mutate_genome_text          # noqa: E402
 from creature.mind import Mind                                 # noqa: E402
 from creature.tape import read_tape                            # noqa: E402
 from genome.machinery import GenomeError, parse_genome         # noqa: E402
@@ -79,6 +79,59 @@ MARGINS: Dict[str, float] = {
     "frames_filed": 1,
 }
 COST_RATIO_BAR = 1.2
+
+
+# ============================================================================ the proposer's redraw (PREREG-EVOLVE-CAL D8 + A8)
+# edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 20:56 +0400 — D8: `creature.genes.draw_mutation(seed, epoch, proposal_no)` cannot see the
+# incumbent, so on brain-long-2 proposal #3 drew `BIRTH.misfires 3` — the incumbent's own value — and cost ≈ 2 × 3,950 s to refuse a mutant identical to
+# its incumbent. The redraw lives HERE (the worker), not in creature/ (organism code stays untouched): when the drawn value equals the number the
+# incumbent text already carries, the SAME generator's next gene draw and value draw are taken, and so on until they differ. `draw_stream` repeats
+# `draw_mutation`'s body to continue ONE generator; tests/tools/test_evolve_cal_gate.py pins its first element to `draw_mutation`'s over a grid
+# that reaches both kinds of gene, so the two cannot drift apart.
+def bounds_spec(key: str) -> dict:
+    spec = BOUNDS.get(key)
+    if spec is None or spec.get("excluded"):
+        raise ValueError(f"evolve: {key!r} is not a mutable BOUNDS entry ({(spec or {}).get('reason', 'unknown key')})")
+    return spec
+
+
+def gene_text(text: str, key: str) -> str:
+    """The number text the genome currently carries for `key`, read with BOUNDS' own pattern (group 1 = the fixed text up to the number, group 2 =
+    everything after it). Exactly one match, or ValueError."""
+    ms = list(bounds_spec(key)["pattern"].finditer(text))
+    if len(ms) != 1:
+        raise ValueError(f"evolve: BOUNDS[{key!r}]'s pattern matched {len(ms)} times in the genome text (need exactly 1)")
+    m = ms[0]
+    return text[m.end(1):m.start(2)]
+
+
+def draw_stream(seed: int, epoch: int, proposal_no: int):
+    """`creature.genes.draw_mutation`'s draws, CONTINUED: (gene, value) pairs from ONE generator seeded on (seed, epoch, proposal_no)."""
+    rng = np.random.default_rng([int(seed), int(epoch), int(proposal_no)])
+    while True:
+        key = MUTABLE_KEYS[int(rng.integers(0, len(MUTABLE_KEYS)))]
+        spec = BOUNDS[key]
+        if spec["kind"] == "int":
+            value: object = int(rng.integers(int(spec["lo"]), int(spec["hi"]) + 1))
+        else:
+            value = round(float(rng.uniform(spec["lo"], spec["hi"])), int(spec["decimals"]))
+        yield key, value
+
+
+def _printed_value(key: str, value: object) -> str:
+    spec = BOUNDS[key]
+    return str(int(round(value))) if spec["kind"] == "int" else f"{float(value):.{int(spec['decimals'])}f}"
+
+
+def mutate_distinct(text: str, seed: int, epoch: int, proposal_no: int, max_draws: int = 1000):
+    """(mutant_text, gene, value, draws): the first draw of the stream whose printed value differs from the incumbent text's own number.
+    `draws` is 1 when nothing collided. Bounded: a text that no draw can differ from raises instead of looping."""
+    for n, (key, value) in enumerate(draw_stream(seed, epoch, proposal_no), start=1):
+        if float(_printed_value(key, value)) != float(gene_text(text, key)):
+            return apply_mutation(text, key, value), key, value, n
+        if n >= max_draws:
+            raise RuntimeError(f"evolve: {max_draws} draws on (seed {seed}, epoch {epoch}, proposal {proposal_no}) all equal the incumbent's own values")
+    raise RuntimeError("evolve: the draw stream ended")      # unreachable: the stream is infinite
 
 
 # ============================================================================ grading (never re-implemented)
