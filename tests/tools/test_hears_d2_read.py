@@ -179,6 +179,22 @@ class NothingToGrade(Tmp):
         self.assertEqual(r["maker_rows_after_last_resume"], 0)
         self.assertEqual(r["verdict"], "NOT GRADABLE")
 
+    def test_one_bracketed_resume_is_enough_a_maker_silent_before_the_first_kill_is_still_gradable(self) -> None:
+        # the maker publishes nothing before the FIRST resume, but the second resume has maker rows on both sides: the read grades that one
+        rows = [_start(0)] + [_learn(f"s{i}", 100 + i) for i in range(4)] + [_start(500)]
+        rows += [_learn("m0", 600, "maker", 0, WS), _learn("m1", 601, "maker", 1, WS), _start(700), _learn("m1", 701, "maker", 1, WS), _learn("m2", 702, "maker", 2, WS)]
+        root = build(self.mk(), rows, {})
+        r = D.analyse_root(root)
+        self.assertEqual((r["resumes"], r["maker_rows_before_first_resume"], r["maker_rows_after_last_resume"]), (2, 0, 2))
+        self.assertEqual(r["bracketed_resumes"], 1)
+        self.assertEqual(r["verdict"], "PASS", r)
+        # and a resume with maker rows on one side only is never bracketed
+        rows2 = [_start(0), _learn("m0", 100, "maker", 0, WS), _start(500), _learn("s0", 600)]
+        r2 = D.analyse_root(build(self.mk(), rows2, {}))
+        self.assertEqual(r2["bracketed_resumes"], 0)
+        self.assertEqual(r2["verdict"], "NOT GRADABLE")
+        self.assertIn("both before and after", r2["why"])
+
     def test_a_root_with_no_journal_is_an_error_naming_the_path(self) -> None:
         d = self.mk()
         (d / "GENOME.genome").write_text(GENOME.read_text())
@@ -191,7 +207,7 @@ class BlindRead(Tmp):
     def test_a_read_that_cannot_see_its_own_plants_fails_even_when_the_life_looks_clean(self) -> None:
         # found by the mutation sweep (a mutant that ignored a MISSED control survived): the verdict itself must turn a blind read into FAIL
         root = build(self.mk(), timeline())
-        blind = lambda rows_, ws_, cen_: {"resumes": 1, "resume_rows": [11], "maker_rows": 10, "maker_moments": 8, "relearned_rows": 2, "maker_rows_before_first_resume": 5,
+        blind = lambda rows_, ws_, cen_: {"resumes": 1, "resume_rows": [11], "bracketed_resumes": 1, "maker_rows": 10, "maker_moments": 8, "relearned_rows": 2, "maker_rows_before_first_resume": 5,
                                             "maker_rows_after_last_resume": 5, "first_maker_row_after_each_resume": [], "census": [], "violations": []}
         orig = D.check
         try:

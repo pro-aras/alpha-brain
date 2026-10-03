@@ -114,7 +114,9 @@ def check(rows: Sequence[Dict[str, object]], world_seed: Optional[int], census: 
         cen.append(e)
         if not e["ok"]:
             violations.append({"kind": "census", **e})
-    return {"resumes": len(resumes), "resume_rows": resumes, "maker_rows": len(maker), "maker_moments": len(seen), "relearned_rows": relearned,
+    maker_ix = [i for i, _ in maker]
+    bracketed = [ri for ri in resumes if any(i < ri for i in maker_ix) and any(i > ri for i in maker_ix)]   # a resume with maker rows on BOTH sides is gradable
+    return {"resumes": len(resumes), "resume_rows": resumes, "bracketed_resumes": len(bracketed), "maker_rows": len(maker), "maker_moments": len(seen), "relearned_rows": relearned,
             "maker_rows_before_first_resume": (sum(1 for i, _ in maker if i < resumes[0]) if resumes else 0),
             "maker_rows_after_last_resume": (sum(1 for i, _ in maker if i > resumes[-1]) if resumes else 0),
             "first_maker_row_after_each_resume": [first_after[k] for k in sorted(first_after)], "census": cen, "violations": violations}
@@ -166,7 +168,7 @@ def analyse_root(root) -> Dict[str, object]:
     ws = world_seed_of(seed, MAKER)
     census = read_census(root)
     res = check(rows, ws, census)
-    gradable = bool(res["resumes"] and res["maker_rows_before_first_resume"] and res["maker_rows_after_last_resume"])
+    gradable = bool(res["bracketed_resumes"])
     res.update({"root": str(root), "journal_rows": len(rows), "torn_lines": torn, "genome_seed": seed, "world_seed_expected": ws, "census_files": len(census),
                 "controls": run_controls(rows, ws, census), "gradable": gradable})
     why = ""
@@ -174,8 +176,7 @@ def analyse_root(root) -> Dict[str, object]:
         verdict = "FAIL"
     elif not gradable:
         verdict = "NOT GRADABLE"
-        why = ("no resume event in the journal" if not res["resumes"] else
-               "no maker learn row before the first resume" if not res["maker_rows_before_first_resume"] else "no maker learn row after the last resume")
+        why = ("no resume event in the journal" if not res["resumes"] else "no resume has a maker learn row both before and after it")
     else:
         verdict = "PASS"
     if verdict == "PASS" and any(v == "MISSED" for v in res["controls"].values()):
@@ -186,7 +187,7 @@ def analyse_root(root) -> Dict[str, object]:
 
 def report(r: Dict[str, object]) -> List[str]:
     L = [f"D2 · HEARS-2 pre-flight read of {r['root']} (read-only)",
-         f"  journal rows {r['journal_rows']} (torn lines {r['torn_lines']}) · resume events {r['resumes']} at rows {r['resume_rows']} · maker learn rows {r['maker_rows']} "
+         f"  journal rows {r['journal_rows']} (torn lines {r['torn_lines']}) · resume events {r['resumes']} at rows {r['resume_rows']} (with maker rows on both sides: {r['bracketed_resumes']}) · maker learn rows {r['maker_rows']} "
          f"(before the first resume {r['maker_rows_before_first_resume']}, after the last {r['maker_rows_after_last_resume']}) · distinct maker moments {r['maker_moments']} · rows learned twice {r['relearned_rows']}"]
     for f in r["first_maker_row_after_each_resume"]:
         L.append(f"  (a) the count continues: the first maker row after the resume at row {f['resume_row']} (resumed_from_seq {f['resumed_from_seq']}): moment {f['moment']} scene {f['scene']} "
