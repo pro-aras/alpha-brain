@@ -1,0 +1,8 @@
+2026-10-03 22:12:22 +0400 START toys gates-real slot 2 pid 1269023 avail 19152MB waited 0s cap 2G swap 512M unit slot-toys-gates-real-1269023
+2026-10-03 22:25:09 +0400 END   toys gates-real slot 2 exit 1 cap 2G peak 241MB swap 6MB
+2026-10-03 22:27:42 +0400 START toys g5-cost-diag slot 5 pid 1302328 avail 19631MB waited 0s cap 2G swap 512M unit slot-toys-g5-cost-diag-1302328
+2026-10-03 22:28:09 +0400 END   toys g5-cost-diag slot 5 exit 0 cap 2G peak 215MB swap 0MB
+2026-10-03 22:29:03 +0400 START toys g5-cost-prof slot 5 pid 1308549 avail 17753MB waited 0s cap 2G swap 512M unit slot-toys-g5-cost-prof-1308549
+2026-10-03 22:29:11 +0400 END   toys g5-cost-prof slot 5 exit 0 cap 2G peak 151MB swap 0MB
+2026-10-03 22:30:37 +0400 START toys g5-cost-count slot 3 pid 1312293 avail 13195MB waited 0s cap 2G swap 512M unit slot-toys-g5-cost-count-1312293
+2026-10-03 22:30:49 +0400 END   toys g5-cost-count slot 3 exit 0 cap 2G peak 219MB swap 0MB

@@ -1,0 +1,7 @@
+[gates] g1: OK
+[gates] g2: OK
+[gates] g3: OK
+[gates] g4: OK
+[gates] g5: FAILED
+[gates] g6: OK
+[gates] FAILURE: G5: the predicted unit CPU 182.1 min exceeds the ceiling 40.0 min
