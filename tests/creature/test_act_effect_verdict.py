@@ -211,5 +211,30 @@ class TestPrintedReadings(unittest.TestCase):
         self.assertIn("R-WALK", v["next_law_cases"])
 
 
+class TestMergeBenches(unittest.TestCase):
+    """The bench runs in two halves (two slots); the verdict merges them and refuses anything that would blur a number."""
+
+    def test_two_halves_are_united(self) -> None:
+        full = bench()
+        keys = list(full["arms"])
+        a = {"seeds": SEEDS, "arms": {k: full["arms"][k] for k in keys[:5]}}
+        b = {"seeds": SEEDS, "arms": {k: full["arms"][k] for k in keys[5:]}}
+        merged = V.merge_benches([a, b])
+        self.assertEqual(sorted(merged["arms"]), sorted(keys))
+        self.assertEqual(merged["seeds"], SEEDS)
+
+    def test_different_seeds_are_refused(self) -> None:
+        a = {"seeds": SEEDS, "arms": {"C-SCR": _arm(NULL)}}
+        b = {"seeds": SEEDS[::-1], "arms": {"R-SCR": _arm(NULL)}}
+        with self.assertRaises(ValueError):
+            V.merge_benches([a, b])
+
+    def test_an_arm_in_both_halves_is_refused(self) -> None:
+        a = {"seeds": SEEDS, "arms": {"C-SCR": _arm(NULL)}}
+        b = {"seeds": SEEDS, "arms": {"C-SCR": _arm(R3)}}
+        with self.assertRaises(ValueError):
+            V.merge_benches([a, b])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -51,6 +51,20 @@ def paired_t(d: Sequence[float]) -> float:
     return mean(d) / (s / math.sqrt(len(d))) if s > 0 else (math.inf if mean(d) > 0 else 0.0)
 
 
+def merge_benches(benches: Sequence[Dict[str, object]]) -> Dict[str, object]:
+    """# edit: Claude (Sonnet 5.5, swarm act), 2026-10-03 11:49 +0400 — the bench runs in halves (two slots); united here, and refused if the halves disagree on the seeds or hold the same arm twice."""
+    seeds = benches[0].get("seeds")
+    arms: Dict[str, object] = {}
+    for b in benches:
+        if b.get("seeds") != seeds:
+            raise ValueError("the bench halves were run on different seeds")
+        for k, v in b["arms"].items():
+            if k in arms:
+                raise ValueError(f"arm {k!r} appears in two halves")
+            arms[k] = v
+    return {"seeds": seeds, "arms": arms}
+
+
 def verdict(statusquo: Dict[str, object], bench: Dict[str, object], bench2: Dict[str, object], lives: Dict[str, object], equiv: Dict[str, object],
             unit_tests_ok: bool) -> Dict[str, object]:
     sq = statusquo["arms"]
@@ -132,15 +146,15 @@ def _fmt(v: Dict[str, object]) -> str:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--statusquo", required=True)
-    ap.add_argument("--bench", required=True)
-    ap.add_argument("--bench2", required=True)
+    ap.add_argument("--bench", required=True, nargs="+", help="one or more halves of the bench (united)")
+    ap.add_argument("--bench2", required=True, nargs="+", help="the second run of R-NULL and C-SCR (M7)")
     ap.add_argument("--lives", required=True)
     ap.add_argument("--equiv", required=True)
     ap.add_argument("--unit-tests-ok", action="store_true", help="assert that tests/creature/test_act_effect_toy.py read OK on the code that produced the files (the caller reads the log)")
     ap.add_argument("--out", required=True)
     a = ap.parse_args(list(argv) if argv is not None else None)
     load = lambda p: json.loads(Path(p).read_text())
-    v = verdict(load(a.statusquo), load(a.bench), load(a.bench2), load(a.lives), load(a.equiv), a.unit_tests_ok)
+    v = verdict(load(a.statusquo), merge_benches([load(p) for p in a.bench]), merge_benches([load(p) for p in a.bench2]), load(a.lives), load(a.equiv), a.unit_tests_ok)
     Path(a.out).write_text(json.dumps(v, indent=1))
     print(_fmt(v))
     return 0 if v["admit"] else 1
