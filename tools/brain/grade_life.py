@@ -73,28 +73,52 @@ def forced_of(a: Optional[Dict[str, object]]) -> Dict[str, object]:
     return dict(r) if isinstance(r, dict) else dict(a.get("raw_forced") or {})
 
 
-def world_type_of_key(key: str) -> str:
-    """A learned type's key («circle|cross|…») → the world's name for it: the type most of its words have. A key that is
-    already a world type name passes through."""
+# edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:13 +0400 — AMENDMENT 4: found by the bench's read stage (the grader crashed on the ON arm's journal, «WorldError: not a word of this world: 'arrow'»). The grader was
+# written for a brain that hears ONE world, so every word of a learned type and of a said phrase was a scene word. With `hears scene maker` a learned type holds the maker's words and the brain may SAY one on a scene canvas;
+# the scene world cannot type those words. They are adapted HERE, never in the scored modules: a type is voted by the words the world knows (a type with none has no world type: skipped and counted); a foreign word in a SAID
+# phrase is read as the world's one shape word that is true of nothing a sitting shows (dax: the maker names shapes, and a foreign shape is wrong), counted. A grade of a one-world life is unchanged (nothing is foreign).
+def world_type_of_key(key: str) -> Optional[str]:
+    """A learned type's key («circle|cross|…») → the world's name for it: the type most of its WORLD words have. A key that is
+    already a world type name passes through. None: the key holds no word of this world (a type of another hand's words)."""
     if key in W.WORD_TYPES:
         return key
-    kinds = collections.Counter(W.word_type(w) for w in key.split("|"))
-    return kinds.most_common(1)[0][0]
+    kinds = collections.Counter(W.word_type(w) for w in key.split("|") if w in W.VOCAB)
+    return kinds.most_common(1)[0][0] if kinds else None
 
 
-def name_by_world_type(raw: Dict[str, object]) -> Dict[str, object]:
+def name_by_world_type(raw: Dict[str, object], count: bool = False):
+    """The brain's NAME answers keyed by its learned types → keyed by the world's type names. A learned type with no word of this world (the maker's
+    words only) has no world type and is skipped; `count=True` returns (raw, how many were skipped)."""
     nm = raw.get("name")
     if not isinstance(nm, dict):
-        return raw
+        return (raw, 0) if count else raw
     out = dict(raw)
     mapped: Dict[str, object] = {}
+    skipped = 0
     for k, v in nm.items():
         t = world_type_of_key(str(k))
+        if t is None:
+            skipped += 1
+            continue
         if t in mapped:
             raise GradeError(f"two learned types map to the world's {t!r}: {sorted(nm)}")
         mapped[t] = v
     out["name"] = mapped
-    return out
+    return (out, skipped) if count else out
+
+
+def world_words(words: Sequence[str]) -> Tuple[List[str], int]:
+    """A phrase the brain SAID, made gradable by the scene world: a word the world cannot type (another hand's) is read as DAX_WORD — a shape word that is
+    true of nothing a sitting shows (only the one dax canvas of training carries the dax shape), so the phrase is not TRUE and its ORDER is read with a shape
+    where the foreign word stood. Returns (the phrase, how many words were foreign)."""
+    out, n = [], 0
+    for w in words:
+        if w in W.VOCAB:
+            out.append(str(w))
+        else:
+            out.append(W.DAX_WORD)
+            n += 1
+    return out, n
 
 
 # ------------------------------------------------------------------------------------------------ reading a life
@@ -333,7 +357,15 @@ def offline_answers(life: Life, ctx: SetCtx) -> Dict[str, object]:
             if not raw:
                 raise GradeError(f"answer {it['item_id']} carries no `raw` (INTERFACE addendum 1)")
             if mark == "NAME":
-                raw = name_by_world_type(raw)
+                raw, skipped = name_by_world_type(raw, count=True)
+                if skipped:
+                    forced["NAME:foreign_type_skipped"] += skipped
+            if mark not in POINT_MARKS and isinstance(raw.get("spoken"), list):
+                adapted, nf = world_words(raw["spoken"])                 # AMENDMENT 4: a foreign (maker) word the brain SAID
+                if nf:
+                    raw = dict(raw)
+                    raw["spoken"] = adapted
+                    forced[f"{mark}:foreign_word→dax"] += nf
             if mark in ("M1", "M2a", "M3", "M6"):
                 if raw.get("misuse") is not None:
                     forced[f"{mark}:misuse→raw_forced"] += 1
