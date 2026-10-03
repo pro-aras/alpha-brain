@@ -163,6 +163,32 @@ class TestAnalyse(unittest.TestCase):
         self.assertIsNotNone(s["ear_end_ok"])
         self.assertIn(s["ear_full_first"], [None] + list(range(1, 31)))
 
+    def test_load_all_reads_a_tree_of_real_records(self):
+        """The loader on records written by the real life (found by the smoke on the unit's own files: `Path` was never imported in report.py)."""
+        import tempfile
+        import shutil
+        from pathlib import Path as P
+        from brain.scene import run_s1c as S
+        from tools.toys.common import pools as POOLS
+        from tools.toys.cp import life as LF
+        from tools.toys.cp import run as RUN
+        if not all(POOLS.present(POOLS.ROOT, 20261301).values()):
+            self.skipTest("pools absent")
+        rooms = list(S.WORLDS["law"])
+        data, test = S.RoomData(POOLS.ROOT, 20261301, rooms), S.FixedTestSet()
+        root = P(tempfile.mkdtemp())
+        try:
+            for arm, rep in (("RANDOM", 1), ("L-own-ema", 0)):
+                rec = LF.life_cp(data, test, ES.make_arm(arm, rooms, 20261301, rep), arm, rooms, n_blocks=12, decompose=(arm == "RANDOM"), rep=rep)
+                RUN.write_json(root / arm / "20261301" / f"{rep:02d}.json", rec)
+            arms, decomp, counts = RP.load_all(root, [20261301])
+            self.assertEqual(counts, {"RANDOM": 1, "L-own-ema": 1})
+            self.assertEqual(len(decomp), 12)                                   # RANDOM's anatomy rows
+            self.assertEqual(set(arms), {"RANDOM", "L-own-ema"})
+            self.assertTrue(0.0 <= arms["RANDOM"][20261301][0]["A"] <= 1.0)
+        finally:
+            shutil.rmtree(root)
+
     def test_the_anatomy_summary_reads_the_planted_split(self):
         rows = []
         for b in range(5, 205):

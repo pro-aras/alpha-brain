@@ -12,6 +12,7 @@ the SAME per-seed draws restricted to seeds 20261304–10. p(E) = (1 + #{D_null 
 from __future__ import annotations
 
 import math
+from pathlib import Path
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
@@ -356,7 +357,7 @@ def render(an: Mapping[str, object], arms, decomp, counts, seeds: Sequence[int])
             flags.append("SD-FLAGGED (sign count only, ≥ 9 of 10)")
         if a["CONTAMINATED"]:
             flags.append("CONTAMINATED")
-        L.append(f"{arm:14s} {a['A']:6.3f} {a['SN']:8.3f} {late:7.3f} {a['D']:+8.4f} {a['p_A']:7.4f} {a['sign_A']:2d}/10 {str(a['BEAT']):>5s} {a['Dn']:+8.4f} {a['p_N']:7.4f} {a['sign_N']:2d}/10 "
+        L.append(f"{arm:14s} {a['A']:6.3f} {a['SN']:8.3f} {late:7.3f} {a['D']:+8.4f} {a['p_A']:7.4f} {a['sign_A']:2d}/{len(seeds)} {str(a['BEAT']):>5s} {a['Dn']:+8.4f} {a['p_N']:7.4f} {a['sign_N']:2d}/{len(seeds)} "
                  f"{str(a['LEAVE']):>6s} {a['escaped_share']:+10.3f} {a['sd_ratio_A']:5.2f} {a['sd_ratio_N']:5.2f}  {' · '.join(flags)}")
     for ref in ("RANDOM", "R-ONLY", "ERROR", "N-ONLY", "ORACLE"):
         if ref in arms:
@@ -388,12 +389,12 @@ def render(an: Mapping[str, object], arms, decomp, counts, seeds: Sequence[int])
         over_ho = sum(1 for s in an["held_out_seeds"] if sn[s] >= 0.5)
         below = sum(1 for s in seeds if sn[s] < rand_band_N[s])
         below_ho = sum(1 for s in an["held_out_seeds"] if sn[s] < rand_band_N[s])
-        L.append(f"   P1 {arm}: SHARE_N ≥ 0.5 at {over}/10 seeds (held-out {over_ho}/{ho}); below RANDOM's band at {below}/10 (held-out {below_ho}/{ho}) → "
+        L.append(f"   P1 {arm}: SHARE_N ≥ 0.5 at {over}/{len(seeds)} seeds (held-out {over_ho}/{ho}); below RANDOM's band at {below}/{len(seeds)} (held-out {below_ho}/{ho}) → "
                  f"P1 {'HOLDS' if over >= 8 and over_ho >= 6 else 'does not hold'}; refuted-by-escape {'YES' if below >= 8 and below_ho >= 6 else 'no'}")
     for loss in ("L", "C"):
         e, l2 = f"{loss}-own-ema", f"{loss}-own-last2"
         inside = sum(1 for s in seeds if rand_band_A[s][0] <= float(np.mean([l["A"] for l in arms[e][s]])) <= rand_band_A[s][1])
-        L.append(f"   P2 {e} vs {l2}: SHARE_N {A[e]['SN']:.3f} vs {A[l2]['SN']:.3f} ({'lower' if A[e]['SN'] < A[l2]['SN'] else 'not lower'}); A inside RANDOM's band at {inside}/10 seeds")
+        L.append(f"   P2 {e} vs {l2}: SHARE_N {A[e]['SN']:.3f} vs {A[l2]['SN']:.3f} ({'lower' if A[e]['SN'] < A[l2]['SN'] else 'not lower'}); A inside RANDOM's band at {inside}/{len(seeds)} seeds")
     L.append(f"   P3 the cells passing BOTH counted bars: {V['both'] or 'none'} (predicted: the C-hist cells only)")
     reach = {a: sum(1 for s in seeds if np.mean([l['A'] for l in arms[a][s]]) >= np.mean([l['A'] for l in arms['R-ONLY'][s]])) for a in NINE}
     L.append("   P4 seeds at which an arm's A reaches R-ONLY's: " + " · ".join(f"{a} {n}" for a, n in reach.items()) + f" (predicted: none) → {'HOLDS' if not any(reach.values()) else 'does not hold'}")
@@ -402,7 +403,7 @@ def render(an: Mapping[str, object], arms, decomp, counts, seeds: Sequence[int])
     for f in ("loss", "scope"):
         e = an["main_effects_SN"][f]
         neg = sum(1 for v in e["per_seed"] if v < 0)
-        L.append(f"   H-quantity ({f}): main effect on SHARE_N {e['mean']:+.4f}, negative at {neg}/10 seeds, CI [{e['ci95'][0]:+.4f}, {e['ci95'][1]:+.4f}] → "
+        L.append(f"   H-quantity ({f}): main effect on SHARE_N {e['mean']:+.4f}, negative at {neg}/{len(seeds)} seeds, CI [{e['ci95'][0]:+.4f}, {e['ci95'][1]:+.4f}] → "
                  f"{'supported' if neg >= 8 and e['ci95'][1] < 0 else 'not supported'}")
     et, ea = an["main_effects_SN"]["time"], an["main_effects_A"]["time"]
     inside_t = abs(et["mean"]) <= abs(an["null"]["q_lower_N"]) and abs(ea["mean"]) <= an["null"]["q99_A"]
