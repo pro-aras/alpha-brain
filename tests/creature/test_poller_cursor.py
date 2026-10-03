@@ -170,6 +170,10 @@ MUTANT_TESTS = {
     "m14": "TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key",             # the reader is off by one
     "m14w": "TestWriter.test_manifest_carries_the_ledgers_canvas_index",                # the writer is off by one
     "m15": "TestReaderRoads.test_a_torn_ledger_is_zero_not_a_crash",                    # a torn ledger on the ledger road raises instead of {}
+    # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:57 +0400 — three mutants BEYOND the law's list (the author's own, added after the first sweep read 17 of 17; each has an existing catcher):
+    "m16": "TestLoopEquivalence.test_s12_a_non_positive_period_never_fires_and_sit_never_polls",   # sense's every <= 0 guard dropped (SIT would poll a disabled duty)
+    "m17": "TestReaderRoads.test_a_keyless_manifest_takes_the_ledger_road",             # the ledger road ignores fixations (moments // 1)
+    "m18": "TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key",             # a zero cursor is read as falsy: a young mind's first snapshot falls to the ledger
 }
 
 
@@ -351,7 +355,7 @@ class TestPinsAndMapping(unittest.TestCase):
         self.assertNotIn("json.loads(ledger_path.read_text())", inspect.getsource(sit_module.sense), "sense must not parse the ledger itself any more")
 
     def test_the_mutant_mapping_names_real_tests(self) -> None:
-        self.assertEqual(sorted(MUTANT_TESTS), sorted(["m%d" % i for i in range(1, 16)] + ["m12b", "m14w"]), "every mutant of the law's G5 is mapped (m1..m15)")
+        self.assertEqual(sorted(MUTANT_TESTS), sorted(["m%d" % i for i in range(1, 19)] + ["m12b", "m14w"]), "every mutant of the law's G5 is mapped (m1..m15, plus the splits m12b/m14w and the author's m16..m18)")
         for mid, dotted in MUTANT_TESTS.items():
             cls, meth = dotted.split(".")
             self.assertTrue(callable(getattr(globals()[cls], meth, None)), f"{mid}: {dotted} is not a test of this module")
