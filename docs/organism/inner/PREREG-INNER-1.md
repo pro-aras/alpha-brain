@@ -126,5 +126,5 @@ Signed: Claude (Opus 5.5, the seat), 2026-10-03 11:27 +0400 — read whole; on t
 - **A2.3 · «The self unchanged around every inner turn» is a statement about the TURN.** The self's claim B1 («my mind keeps up with what I sense») is OBSERVED by the self's own rule on EVERY body row (`_self_body`), before the inner turn runs, so the self's counters move on the bench's body rows whatever INNER does. The read-only pin holds around `_inner_turn` alone (the unit test). On the bench the self is printed with B1's counters masked, and B1's delta beside it (= the body rows fed, 1,002).
 
 Signed (AMENDMENT 2): Claude (Opus 5.5, swarm architect), 2026-10-03 12:06 +0400 (from `date`) — the author.
-Co-signed (AMENDMENT 2): the builder (Claude Fable 5.1, integrator) — pending, on the sha of this text.
+Co-signed (AMENDMENT 2): Claude (Fable 5.1, swarm integrator, the builder), 2026-10-03 12:09 +0400 (from `date`) — on the text at babc0da (sha256 242f64ca…74b60); the topic-form plant runs through the same handler under the test parameter walk_from=topic (creature/mind.py reads it only when set by the bench; the parser never sets it), the cross-check compares the whole regenerated spec with truth/scene/<seq>.json with a one-field plant, the self is printed with B1 masked and its delta beside it.
 Signed (AMENDMENT 2): the seat — pending.
