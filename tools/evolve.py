@@ -148,7 +148,11 @@ def grade_twin(mind: Mind, twin_root: Path, genome_path: Path, tape_slice: List[
     journal_rows = _read_journal_rows(twin_root)
     status = _twin_status(mind)
     declared = mind.genome.declared
-    sm = surprise_mark(tape_slice, journal_rows, status, "SURPRISE" in declared)
+    # edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 20:40 +0400 — PREREG-EVOLVE-CAL §1 D3 (the E3 call-site shift): the call read
+    # `surprise_mark(tape_slice, journal_rows, status, declared)` against the signature `surprise_mark(journal, status, surprise_declared, ...)`,
+    # every argument one place off, so `confirmed_share` read «not gradable» on 13 of 13 rounds (the twin journals carry `confirmed` on every
+    # moment row). Pinned by tests/tools/test_evolve_cal_d3.py (RED on the shifted line, GREEN here).
+    sm = surprise_mark(journal_rows, status, "SURPRISE" in declared)
     sen = sentence_mark(tape_slice, status, "SENTENCE" in declared)
     am = (act_mark(tape_slice, journal_rows, status) if "ACT" in declared
           else {"graded": False, "pass": None, "reason": "not gradable: ACT not declared"})

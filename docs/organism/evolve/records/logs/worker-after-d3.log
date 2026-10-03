@@ -1,0 +1,30 @@
+test_two_hours (tests.tools.test_evolve_worker.TestHoursBetween.test_two_hours) ... ok
+test_zero (tests.tools.test_evolve_worker.TestHoursBetween.test_zero) ... ok
+test_a_real_slice_is_graded_and_the_bar_reads_a_verdict (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_a_real_slice_is_graded_and_the_bar_reads_a_verdict) ... ok
+test_no_checkpoint_old_enough_is_not_gradable (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_no_checkpoint_old_enough_is_not_gradable) ... ok
+test_shadow_lag_rows_is_present_even_when_not_gradable (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_shadow_lag_rows_is_present_even_when_not_gradable) ... ok
+test_shadow_lag_rows_is_the_gap_to_the_given_tape_head (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_shadow_lag_rows_is_the_gap_to_the_given_tape_head) ... ok
+test_write_proposal_and_next_proposal_no (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_write_proposal_and_next_proposal_no) ... ok
+test_planted_bad_and_null_are_both_refused (tests.tools.test_evolve_worker.TestNegativeControlOnSyntheticTape.test_planted_bad_and_null_are_both_refused) ... [evolve/negctl] shadow consumed 445 rows up to seq 445 (T-2.0h checkpoint)
+[evolve/negctl] shadow consumed 112 more rows to the tape's end (seq 557)
+[evolve/negctl] planted_bad (BIRTH.theta_n=0.5): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] planted_bad incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+[evolve/negctl] null (DELTA.lr=0.051): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] null incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+ok
+test_a_regression_on_one_mark_refuses_even_if_another_improves (tests.tools.test_evolve_worker.TestRegressionBar.test_a_regression_on_one_mark_refuses_even_if_another_improves) ... ok
+test_cost_at_exactly_1_2x_passes_the_cost_clause (tests.tools.test_evolve_worker.TestRegressionBar.test_cost_at_exactly_1_2x_passes_the_cost_clause) ... ok
+test_cost_over_1_2x_refuses_even_with_an_improvement (tests.tools.test_evolve_worker.TestRegressionBar.test_cost_over_1_2x_refuses_even_with_an_improvement) ... ok
+test_graded_pass_regressing_to_fail_refuses (tests.tools.test_evolve_worker.TestRegressionBar.test_graded_pass_regressing_to_fail_refuses) ... ok
+test_improvement_with_no_regression_passes (tests.tools.test_evolve_worker.TestRegressionBar.test_improvement_with_no_regression_passes) ... ok
+test_missing_readings_on_either_side_are_neither_regression_nor_improvement (tests.tools.test_evolve_worker.TestRegressionBar.test_missing_readings_on_either_side_are_neither_regression_nor_improvement) ... ok
+test_no_improvement_refuses (tests.tools.test_evolve_worker.TestRegressionBar.test_no_improvement_refuses) ... ok
+test_advance_shadow_up_to_seq_stops_there (tests.tools.test_evolve_worker.TestShadowAndCheckpoints.test_advance_shadow_up_to_seq_stops_there) ... ok
+test_build_advance_checkpoint_and_find_near (tests.tools.test_evolve_worker.TestShadowAndCheckpoints.test_build_advance_checkpoint_and_find_near) ... ok
+test_shadow_resumes_and_is_epoch_aware (tests.tools.test_evolve_worker.TestShadowAndCheckpoints.test_shadow_resumes_and_is_epoch_aware) ... ok
+test_slice_bounds_are_exclusive_inclusive (tests.tools.test_evolve_worker.TestTapeSlice.test_slice_bounds_are_exclusive_inclusive) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 57.770s
+
+OK
