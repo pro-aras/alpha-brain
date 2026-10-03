@@ -27,5 +27,5 @@ Because the maker's `window`, `i`, `total` and `window_start` live in process me
 ## A3.5 · What this amendment does not change
 No bar of §2 or §3; no launch gate; the ladder (RULES §3); the mind, the organ, the genomes.
 
-*Co-signed: the architect (Opus 5.5) — by the sha256 of this file after the last edit, pending. Signed: the seat — pending.*
+*Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 12:09 +0400 (from `date`) — on the text of this file as committed at bc57862 (sha256 e58cda4928eca89d9756c73e2ed0e2efe4e9ad285169ccbed047aa4cd7dfc8b9); any later edit other than a signature line voids this co-signature. Signed: the seat — pending.*
 *(edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:07 +0400)*
