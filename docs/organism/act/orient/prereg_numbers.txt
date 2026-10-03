@@ -1,0 +1,38 @@
+== reward per step under uniform play (probe 1: 32565 steps, 600 episodes, success 0.2717)
+  left     rewarded  30 / n  4648 = 0.00645   10-outcome window holds a reward 0.063 of the time
+  right    rewarded  37 / n  4734 = 0.00782   10-outcome window holds a reward 0.075 of the time
+  forward  rewarded  96 / n  4641 = 0.02069   10-outcome window holds a reward 0.189 of the time
+  pickup   rewarded   0 / n  4746 = 0.00000   10-outcome window holds a reward 0.000 of the time
+  drop     rewarded   0 / n  4573 = 0.00000   10-outcome window holds a reward 0.000 of the time
+  toggle   rewarded   0 / n  4591 = 0.00000   10-outcome window holds a reward 0.000 of the time
+  done     rewarded   0 / n  4632 = 0.00000   10-outcome window holds a reward 0.000 of the time
+  total rewarded 163 over 32565 steps = 0.00501/step -> 4.8 rewards in 960 acts, 24.6 in 4,920
+  steps of EACH act to rank forward over left at z = 3: 1,206
+  steps of EACH act to rank forward over right at z = 3: 1,549
+== the effect signal (probe 2, same-episode pairs, uniform play)
+  left     n  4548  p_changed 1.000  p_novel 0.487
+  right    n  4656  p_changed 1.000  p_novel 0.490
+  forward  n  4555  p_changed 0.637  p_novel 0.577
+  pickup   n  4678  p_changed 0.090  p_novel 0.060
+  drop     n  4476  p_changed 0.071  p_novel 0.044
+  toggle   n  4508  p_changed 0.027  p_novel 0.027
+  done     n  4547  p_changed 0.000  p_novel 0.000
+  boundary outcomes excluded 597 of 32565 = 0.0183
+  lowest live-act rate 0.637 / highest dead-act rate 0.090 = factor 7.1
+== misclassification of the SCREEN (window 10, live iff rate >= 0.3, i.e. >= 3 changes of 10)
+  left     true rate 1.000: P(judged DEAD at one evaluation) = 0.0000   P(judged LIVE) = 1.0000
+  right    true rate 1.000: P(judged DEAD at one evaluation) = 0.0000   P(judged LIVE) = 1.0000
+  forward  true rate 0.637: P(judged DEAD at one evaluation) = 0.0062   P(judged LIVE) = 0.9938
+  pickup   true rate 0.090: P(judged DEAD at one evaluation) = 0.9460   P(judged LIVE) = 0.0540
+  drop     true rate 0.071: P(judged DEAD at one evaluation) = 0.9706   P(judged LIVE) = 0.0294
+  toggle   true rate 0.027: P(judged DEAD at one evaluation) = 0.9980   P(judged LIVE) = 0.0020
+  done     true rate 0.000: P(judged DEAD at one evaluation) = 1.0000   P(judged LIVE) = 0.0000
+== the candidate's stationary mixture (the landed 10 % uniform draw + uniform over the live set {left, right, forward})
+  P(left) = P(right) = P(forward) = 0.3143; P(each no-op) = 0.0143; no-op total 0.0571
+== startup: acts until EVERY act has >= 10 outcomes under uniform choice (7 acts, 20,000 trials)
+  mean 102.4, median 100, p5 83, p95 131
+== sample size for the smallest detectable seed-level gap (paired t, 12 seeds, p < 0.001 one-sided)
+  SD of paired seed-wise differences 0.0156: smallest detectable gap 0.0200
+  SD of paired seed-wise differences 0.0197: smallest detectable gap 0.0252
+  SD of paired seed-wise differences 0.0211: smallest detectable gap 0.0270
+  sign test over 12 seeds: P(>= 11 positive) = 0.00317, P(12 positive) = 0.00024

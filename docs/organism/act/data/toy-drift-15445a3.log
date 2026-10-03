@@ -1,0 +1,20 @@
+test_first_120_steps (tests.creature.test_a4l_explore_toy.TestHarnessReplaysTheLifesFirstHour.test_first_120_steps) ... ok
+test_a_wrong_seed_is_caught (tests.creature.test_a4l_explore_toy.TestHourOneFixtureParity.test_a_wrong_seed_is_caught)
+The control that the check checks: the same history under another seed reproduces the (zero) weights ... ok
+test_every_act_row_reproduced (tests.creature.test_a4l_explore_toy.TestHourOneFixtureParity.test_every_act_row_reproduced) ... ok
+test_constants (tests.creature.test_a4l_explore_toy.TestPinnedToTheMind.test_constants) ... ok
+test_the_copied_lines_are_still_the_minds (tests.creature.test_a4l_explore_toy.TestPinnedToTheMind.test_the_copied_lines_are_still_the_minds) ... ok
+test_candidate_values_optimism_and_window (tests.creature.test_a4l_explore_toy.TestPureParts.test_candidate_values_optimism_and_window) ... ok
+test_episode_credit_values (tests.creature.test_a4l_explore_toy.TestPureParts.test_episode_credit_values) ... ok
+test_null_bound (tests.creature.test_a4l_explore_toy.TestPureParts.test_null_bound) ... ok
+test_old_weights_residual_law (tests.creature.test_a4l_explore_toy.TestPureParts.test_old_weights_residual_law)
+The surprise is |got − the act's running mean BEFORE this outcome|; the first outcome files 0.0. ... ok
+test_sampled_choice_two_draws_and_proportional (tests.creature.test_a4l_explore_toy.TestPureParts.test_sampled_choice_two_draws_and_proportional)
+(v-b)/(v-c)'s draw (edit: Claude (Opus 5.5, A4 ladder builder EXPLORE), 2026-09-23 12:21 +0400): two draws every call, either ... ok
+test_two_draws_every_call_either_branch (tests.creature.test_a4l_explore_toy.TestPureParts.test_two_draws_every_call_either_branch) ... ok
+test_nonzero_weights_reproduced (tests.creature.test_a4l_explore_toy.TestRealMindNonzeroWeights.test_nonzero_weights_reproduced) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 3.290s
+
+OK

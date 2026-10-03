@@ -1,0 +1,11 @@
+files 4 · game eye rows 4524 (carrying sha 4524) · game outcome rows 4523 (carrying act 4523, got 4523)
+duplicate eye rows skipped 0 · outcome rows with no previous frame (unknown) 0 · episode-BOUNDARY outcomes excluded 73 · chosen_by {'mind': 4523}
+per act (the LIVE life's own play: 10 % uniform + 90 % the locked act):
+  left     n    98  changed    98  effect rate 1.000
+  right    n  3836  changed  3836  effect rate 1.000
+  forward  n   103  changed    61  effect rate 0.592
+  pickup   n   115  changed     6  effect rate 0.052
+  drop     n   110  changed     2  effect rate 0.018
+  toggle   n   103  changed     1  effect rate 0.010
+  done     n    85  changed     0  effect rate 0.000
+total outcomes compared 4450
