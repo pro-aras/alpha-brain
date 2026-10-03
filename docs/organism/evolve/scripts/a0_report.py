@@ -2,7 +2,7 @@
 # edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 23:15 +0400 — PREREG-EVOLVE-CAL A3.6 (1) as amended by A3b.2: Stage A0's reader. It reads the incumbent and the epsilon twins of the FULL S1, prints WHICH of the three readings
 # moved in each twin (the verifier's limit 1), the keyed comparison with the incumbent (moment flips = discrete + unmatched rows, A3b.1; other kinds' discrete payloads named OUTSIDE it), the replication of the incumbent's journal
 # against the production worker's RECORDED round-13 journal with its plant, and the slot ledger's END line (cap, peak, exit) and the anon sampler's maxima for each twin.
-"""docs/organism/evolve/scripts/a0_report.py — Stage A0's report.
+"""docs/organism/evolve/scripts/a0_report.py — the N1 STAGE READER (Stage A0's report, and the level choice and the ruled Stage B rule over every epsilon twin present; tests/tools/test_evolve_cal_n1_report.py).
 
 usage: PYTHONPATH=. python3 -B docs/organism/evolve/scripts/a0_report.py --dir <n1 out root> --recorded <round-13 incumbent journal (.jsonl.gz or a dir of .jsonl)> --out report.json [--ledger L] [--sampler anon.csv]
 
@@ -119,10 +119,32 @@ def main(argv=None) -> int:
             records[sub.name] = an.twin_record(sub.name, r, cmpk)
     out["twins"] = twins
     out["epsilon_twins"] = sorted(eps_readings)
-    if eps_readings:
-        out["a0_decision"] = an.a0_decision(inc_r, eps_readings)
-        if len(eps_readings) >= 6:
-            out["a0plus_decision"] = an.a0plus_decision(inc_r, eps_readings)
+    # ---- the stages (A3.6 as amended by A3b): A0 = the k = 1 twins at 1e-3 and 1e-2; A0+ = k = 1..3 at both levels (six); the level choice over EVERY epsilon twin present (the smallest level
+    # at which a twin MOVES); Stage B = the ruled rule M over the chosen level's first five twins. Every decision is the tested function's own output; missing twins are SAID, never assumed.
+    by_vk = {}
+    for label, r in eps_readings.items():
+        lk = an._eps_k(r)
+        if lk is not None:
+            by_vk[lk] = (label, r)
+    a0_keys = [(0.001, 1), (0.01, 1)]
+    out["a0_twins"] = [by_vk[k][0] for k in a0_keys if k in by_vk]
+    out["a0_missing"] = [f"eps:{k[0]!r}:{k[1]}" for k in a0_keys if k not in by_vk]
+    if not out["a0_missing"]:
+        out["a0_decision"] = an.a0_decision(inc_r, {by_vk[k][0]: by_vk[k][1] for k in a0_keys})
+    six_keys = [(lv, k) for lv in (0.001, 0.01) for k in (1, 2, 3)]
+    out["a0plus_twins"] = [by_vk[k][0] for k in six_keys if k in by_vk]
+    if all(k in by_vk for k in six_keys):
+        out["a0plus_decision"] = an.a0plus_decision(inc_r, {by_vk[k][0]: by_vk[k][1] for k in six_keys})
+    levels = {}
+    for label, rec in records.items():
+        lk = an._eps_k(eps_readings[label])
+        if lk is not None:
+            levels.setdefault(lk[0], []).append(rec)
+    out["choose_level"] = an.choose_level(inc_r, levels) if levels else {"chosen": None, "per_level": {}, "flat_factor": an.FLAT_FACTOR, "flatness_note": None}
+    chosen = out["choose_level"]["chosen"]
+    if chosen is not None:
+        five = [by_vk[(chosen, k)][1] for k in range(1, 6) if (chosen, k) in by_vk]
+        out["stage_b"] = an.stage_b_decision(inc_r, five) if len(five) == 5 else {"insufficient": f"{len(five)} of the first five twins at {chosen!r} are present"}
     # ---- the memory price (RULES 6d): the ledger's END line of each twin, the sampler's maxima
     labels = [a.incumbent] + sorted(twins)
     out["ledger_end"] = {lab: ledger_end(Path(a.ledger), lab) for lab in labels}
@@ -133,7 +155,13 @@ def main(argv=None) -> int:
         t = twins[name]
         print(f"{name:16s} {t['variant']:16s} q1 {t['q1_seen_items']} cs {t['confirmed_share']} frames {t['frames_filed']} moved {t['moved_dims']} flips {t['moment']['flips']} "
               f"(discrete {t['moment']['discrete_differing']}, unmatched {t['moment']['only_a'] + t['moment']['only_b']}) equals {t['equals_incumbent']} other_discrete {t['other_discrete']}")
-    print("a0_decision:", json.dumps(out.get("a0_decision"), sort_keys=True, default=str))
+    print("a0_decision:", json.dumps(out.get("a0_decision"), sort_keys=True, default=str), "· a0_missing:", out["a0_missing"])
+    if "a0plus_decision" in out:
+        print("a0plus_decision:", json.dumps(out["a0plus_decision"], sort_keys=True, default=str))
+    cl = out["choose_level"]
+    print("choose_level: chosen", cl["chosen"], "· per level:", json.dumps({str(e): {k: v[k] for k in ("n", "twins_moved", "flips", "twins_equal_to_incumbent", "flip_without_move", "spread_grows")} for e, v in cl["per_level"].items()}, sort_keys=True))
+    if "stage_b" in out:
+        print("stage_b (rule M):", json.dumps(out["stage_b"], sort_keys=True, default=str))
     return 0
 
 

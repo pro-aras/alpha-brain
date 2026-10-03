@@ -1,0 +1,184 @@
+{"incumbent": {"build_s": 17.0, "code": {"dirty": false, "git_head": "x"}, "confirmed_share": 0.45, "cpu_s": 2000.0, "frames_filed": 26, "journal_rows": 5, "load0": null, "load1": null, "maxrss_kb": 6000000, "psi0": null, "psi1": null, "q1_seen": 0.9454545454545454, "row_hash": "r-inc", "rows_consumed": 5, "state_hash": "s-inc", "variant": "incumbent", "wall_s": 2005.0}, "replication_plant": {"caught": true, "row": 0}, "replication_vs_recorded": {"diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 5, "first_diff": null, "first_discrete_diff": null, "first_row_seq_mine_recorded": [100, 100], "identical": true, "incumbent_rows": 5, "keyed_full": {"diff_key_counts": {}, "differing": 0, "discrete_differing": 0, "first_discrete_seq": null, "flips": 0, "matched": 5, "only_a": 0, "only_b": 0}, "last_row_seq_mine_recorded": [104, 104], "n_a": 5, "n_b": 5, "recorded_rows": 5, "rows_differing": 0}}
+eps1e-2-k01      eps:0.01:1       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k02      eps:0.01:2       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k03      eps:0.01:3       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k04      eps:0.01:4       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k05      eps:0.01:5       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k01      eps:0.001:1      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k02      eps:0.001:2      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k03      eps:0.001:3      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k04      eps:0.001:4      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k05      eps:0.001:5      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k01      eps:0.0001:1     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k02      eps:0.0001:2     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k03      eps:0.0001:3     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k04      eps:0.0001:4     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k05      eps:0.0001:5     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+a0_decision: {"frames_only": false, "moved": {}, "n_twins": 15, "non_degenerate": false, "release_dims": []}
+E{"incumbent": {"build_s": 17.0, "code": {"dirty": false, "git_head": "x"}, "confirmed_share": 0.45, "cpu_s": 2000.0, "frames_filed": 26, "journal_rows": 5, "load0": null, "load1": null, "maxrss_kb": 6000000, "psi0": null, "psi1": null, "q1_seen": 0.9454545454545454, "row_hash": "r-inc", "rows_consumed": 5, "state_hash": "s-inc", "variant": "incumbent", "wall_s": 2005.0}, "replication_plant": {"caught": true, "row": 0}, "replication_vs_recorded": {"diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 5, "first_diff": null, "first_discrete_diff": null, "first_row_seq_mine_recorded": [100, 100], "identical": true, "incumbent_rows": 5, "keyed_full": {"diff_key_counts": {}, "differing": 0, "discrete_differing": 0, "first_discrete_seq": null, "flips": 0, "matched": 5, "only_a": 0, "only_b": 0}, "last_row_seq_mine_recorded": [104, 104], "n_a": 5, "n_b": 5, "recorded_rows": 5, "rows_differing": 0}}
+eps1e-3-k01      eps:0.001:1      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+a0_decision: {"frames_only": false, "moved": {}, "n_twins": 1, "non_degenerate": false, "release_dims": []}
+F{"incumbent": {"build_s": 17.0, "code": {"dirty": false, "git_head": "x"}, "confirmed_share": 0.45, "cpu_s": 2000.0, "frames_filed": 26, "journal_rows": 5, "load0": null, "load1": null, "maxrss_kb": 6000000, "psi0": null, "psi1": null, "q1_seen": 0.9454545454545454, "row_hash": "r-inc", "rows_consumed": 5, "state_hash": "s-inc", "variant": "incumbent", "wall_s": 2005.0}, "replication_plant": {"caught": true, "row": 0}, "replication_vs_recorded": {"diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 5, "first_diff": null, "first_discrete_diff": null, "first_row_seq_mine_recorded": [100, 100], "identical": true, "incumbent_rows": 5, "keyed_full": {"diff_key_counts": {}, "differing": 0, "discrete_differing": 0, "first_discrete_seq": null, "flips": 0, "matched": 5, "only_a": 0, "only_b": 0}, "last_row_seq_mine_recorded": [104, 104], "n_a": 5, "n_b": 5, "recorded_rows": 5, "rows_differing": 0}}
+eps1e-2-k01      eps:0.01:1       q1 106 cs 0.45 frames 26 moved ['q1_seen'] flips 0 (discrete 0, unmatched 0) equals False other_discrete {}
+eps1e-2-k02      eps:0.01:2       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k03      eps:0.01:3       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k04      eps:0.01:4       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k05      eps:0.01:5       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k01      eps:0.001:1      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k02      eps:0.001:2      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k03      eps:0.001:3      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k04      eps:0.001:4      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k05      eps:0.001:5      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k01      eps:0.0001:1     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k02      eps:0.0001:2     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k03      eps:0.0001:3     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k04      eps:0.0001:4     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k05      eps:0.0001:5     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+a0_decision: {"frames_only": false, "moved": {"q1_seen": ["eps1e-2-k01"]}, "n_twins": 15, "non_degenerate": true, "release_dims": ["q1_seen"]}
+.{"incumbent": {"build_s": 17.0, "code": {"dirty": false, "git_head": "x"}, "confirmed_share": 0.45, "cpu_s": 2000.0, "frames_filed": 26, "journal_rows": 5, "load0": null, "load1": null, "maxrss_kb": 6000000, "psi0": null, "psi1": null, "q1_seen": 0.9454545454545454, "row_hash": "r-inc", "rows_consumed": 5, "state_hash": "s-inc", "variant": "incumbent", "wall_s": 2005.0}, "replication_plant": {"caught": true, "row": 0}, "replication_vs_recorded": {"diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 5, "first_diff": null, "first_discrete_diff": null, "first_row_seq_mine_recorded": [100, 100], "identical": true, "incumbent_rows": 5, "keyed_full": {"diff_key_counts": {}, "differing": 0, "discrete_differing": 0, "first_discrete_seq": null, "flips": 0, "matched": 5, "only_a": 0, "only_b": 0}, "last_row_seq_mine_recorded": [104, 104], "n_a": 5, "n_b": 5, "recorded_rows": 5, "rows_differing": 0}}
+eps1e-2-k01      eps:0.01:1       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k02      eps:0.01:2       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k03      eps:0.01:3       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k04      eps:0.01:4       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k05      eps:0.01:5       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k01      eps:0.001:1      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k02      eps:0.001:2      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k03      eps:0.001:3      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k04      eps:0.001:4      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k05      eps:0.001:5      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k01      eps:0.0001:1     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k02      eps:0.0001:2     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k03      eps:0.0001:3     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k04      eps:0.0001:4     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k05      eps:0.0001:5     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+seed01           seed:1           q1 104 cs 0.45 frames 2 moved None flips 0 (discrete 0, unmatched 0) equals None other_discrete {}
+a0_decision: {"frames_only": false, "moved": {}, "n_twins": 15, "non_degenerate": false, "release_dims": []}
+E{"incumbent": {"build_s": 17.0, "code": {"dirty": false, "git_head": "x"}, "confirmed_share": 0.45, "cpu_s": 2000.0, "frames_filed": 26, "journal_rows": 5, "load0": null, "load1": null, "maxrss_kb": 6000000, "psi0": null, "psi1": null, "q1_seen": 0.9454545454545454, "row_hash": "r-inc", "rows_consumed": 5, "state_hash": "s-inc", "variant": "incumbent", "wall_s": 2005.0}, "replication_plant": {"caught": true, "row": 0}, "replication_vs_recorded": {"diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 5, "first_diff": null, "first_discrete_diff": null, "first_row_seq_mine_recorded": [100, 100], "identical": true, "incumbent_rows": 5, "keyed_full": {"diff_key_counts": {}, "differing": 0, "discrete_differing": 0, "first_discrete_seq": null, "flips": 0, "matched": 5, "only_a": 0, "only_b": 0}, "last_row_seq_mine_recorded": [104, 104], "n_a": 5, "n_b": 5, "recorded_rows": 5, "rows_differing": 0}}
+eps1e-2-k01      eps:0.01:1       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k02      eps:0.01:2       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k03      eps:0.01:3       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k04      eps:0.01:4       q1 106 cs 0.45 frames 26 moved ['q1_seen'] flips 0 (discrete 0, unmatched 0) equals False other_discrete {}
+eps1e-2-k05      eps:0.01:5       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k01      eps:0.001:1      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k02      eps:0.001:2      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k03      eps:0.001:3      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k04      eps:0.001:4      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k05      eps:0.001:5      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k01      eps:0.0001:1     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k02      eps:0.0001:2     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k03      eps:0.0001:3     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k04      eps:0.0001:4     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k05      eps:0.0001:5     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+a0_decision: {"frames_only": false, "moved": {"q1_seen": ["eps1e-2-k04"]}, "n_twins": 15, "non_degenerate": true, "release_dims": ["q1_seen"]}
+E{"incumbent": {"build_s": 17.0, "code": {"dirty": false, "git_head": "x"}, "confirmed_share": 0.45, "cpu_s": 2000.0, "frames_filed": 26, "journal_rows": 5, "load0": null, "load1": null, "maxrss_kb": 6000000, "psi0": null, "psi1": null, "q1_seen": 0.9454545454545454, "row_hash": "r-inc", "rows_consumed": 5, "state_hash": "s-inc", "variant": "incumbent", "wall_s": 2005.0}, "replication_plant": {"caught": true, "row": 0}, "replication_vs_recorded": {"diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 5, "first_diff": null, "first_discrete_diff": null, "first_row_seq_mine_recorded": [100, 100], "identical": true, "incumbent_rows": 5, "keyed_full": {"diff_key_counts": {}, "differing": 0, "discrete_differing": 0, "first_discrete_seq": null, "flips": 0, "matched": 5, "only_a": 0, "only_b": 0}, "last_row_seq_mine_recorded": [104, 104], "n_a": 5, "n_b": 5, "recorded_rows": 5, "rows_differing": 0}}
+eps1e-2-k01      eps:0.01:1       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k02      eps:0.01:2       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k03      eps:0.01:3       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k04      eps:0.01:4       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k05      eps:0.01:5       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k01      eps:0.001:1      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k02      eps:0.001:2      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k03      eps:0.001:3      q1 103 cs 0.45 frames 26 moved ['q1_seen'] flips 0 (discrete 0, unmatched 0) equals False other_discrete {}
+eps1e-3-k04      eps:0.001:4      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k05      eps:0.001:5      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k01      eps:0.0001:1     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k02      eps:0.0001:2     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k03      eps:0.0001:3     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k04      eps:0.0001:4     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k05      eps:0.0001:5     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+a0_decision: {"frames_only": false, "moved": {"q1_seen": ["eps1e-3-k03"]}, "n_twins": 15, "non_degenerate": true, "release_dims": ["q1_seen"]}
+E{"incumbent": {"build_s": 17.0, "code": {"dirty": false, "git_head": "x"}, "confirmed_share": 0.45, "cpu_s": 2000.0, "frames_filed": 26, "journal_rows": 5, "load0": null, "load1": null, "maxrss_kb": 6000000, "psi0": null, "psi1": null, "q1_seen": 0.9454545454545454, "row_hash": "r-inc", "rows_consumed": 5, "state_hash": "s-inc", "variant": "incumbent", "wall_s": 2005.0}, "replication_plant": {"caught": true, "row": 0}, "replication_vs_recorded": {"diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 5, "first_diff": null, "first_discrete_diff": null, "first_row_seq_mine_recorded": [100, 100], "identical": true, "incumbent_rows": 5, "keyed_full": {"diff_key_counts": {}, "differing": 0, "discrete_differing": 0, "first_discrete_seq": null, "flips": 0, "matched": 5, "only_a": 0, "only_b": 0}, "last_row_seq_mine_recorded": [104, 104], "n_a": 5, "n_b": 5, "recorded_rows": 5, "rows_differing": 0}}
+eps1e-2-k01      eps:0.01:1       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k02      eps:0.01:2       q1 106 cs 0.45 frames 26 moved ['q1_seen'] flips 0 (discrete 0, unmatched 0) equals False other_discrete {}
+eps1e-2-k03      eps:0.01:3       q1 107 cs 0.45 frames 26 moved ['q1_seen'] flips 0 (discrete 0, unmatched 0) equals False other_discrete {}
+eps1e-2-k04      eps:0.01:4       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k05      eps:0.01:5       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k01      eps:0.001:1      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k02      eps:0.001:2      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k03      eps:0.001:3      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k04      eps:0.001:4      q1 103 cs 0.45 frames 26 moved ['q1_seen'] flips 0 (discrete 0, unmatched 0) equals False other_discrete {}
+eps1e-3-k05      eps:0.001:5      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k01      eps:0.0001:1     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k02      eps:0.0001:2     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k03      eps:0.0001:3     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k04      eps:0.0001:4     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k05      eps:0.0001:5     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+a0_decision: {"frames_only": false, "moved": {"q1_seen": ["eps1e-2-k02", "eps1e-2-k03", "eps1e-3-k04"]}, "n_twins": 15, "non_degenerate": true, "release_dims": ["q1_seen"]}
+E{"incumbent": {"build_s": 17.0, "code": {"dirty": false, "git_head": "x"}, "confirmed_share": 0.45, "cpu_s": 2000.0, "frames_filed": 26, "journal_rows": 5, "load0": null, "load1": null, "maxrss_kb": 6000000, "psi0": null, "psi1": null, "q1_seen": 0.9454545454545454, "row_hash": "r-inc", "rows_consumed": 5, "state_hash": "s-inc", "variant": "incumbent", "wall_s": 2005.0}, "replication_plant": {"caught": true, "row": 0}, "replication_vs_recorded": {"diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 5, "first_diff": null, "first_discrete_diff": null, "first_row_seq_mine_recorded": [100, 100], "identical": true, "incumbent_rows": 5, "keyed_full": {"diff_key_counts": {}, "differing": 0, "discrete_differing": 0, "first_discrete_seq": null, "flips": 0, "matched": 5, "only_a": 0, "only_b": 0}, "last_row_seq_mine_recorded": [104, 104], "n_a": 5, "n_b": 5, "recorded_rows": 5, "rows_differing": 0}}
+eps1e-2-k01      eps:0.01:1       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k02      eps:0.01:2       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k03      eps:0.01:3       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k04      eps:0.01:4       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-2-k05      eps:0.01:5       q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k01      eps:0.001:1      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k02      eps:0.001:2      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k03      eps:0.001:3      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k04      eps:0.001:4      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-3-k05      eps:0.001:5      q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k01      eps:0.0001:1     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k02      eps:0.0001:2     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k03      eps:0.0001:3     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k04      eps:0.0001:4     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+eps1e-4-k05      eps:0.0001:5     q1 104 cs 0.45 frames 26 moved [] flips 0 (discrete 0, unmatched 0) equals True other_discrete {}
+a0_decision: {"frames_only": false, "moved": {}, "n_twins": 15, "non_degenerate": false, "release_dims": []}
+{"incumbent": {"build_s": 17.0, "code": {"dirty": false, "git_head": "x"}, "confirmed_share": 0.45, "cpu_s": 2000.0, "frames_filed": 26, "journal_rows": 5, "load0": null, "load1": null, "maxrss_kb": 6000000, "psi0": null, "psi1": null, "q1_seen": 0.9454545454545454, "row_hash": "r-inc", "rows_consumed": 5, "state_hash": "s-inc", "variant": "incumbent", "wall_s": 2005.0}, "replication_plant": {"caught": true, "row": 0}, "replication_vs_recorded": {"diff_key_counts": {"cells": 1}, "discrete_diff_rows": 1, "equal_prefix": 2, "first_diff": 2, "first_discrete_diff": 2, "first_row_seq_mine_recorded": [100, 100], "identical": false, "incumbent_rows": 5, "keyed_full": {"diff_key_counts": {"cells": 1}, "differing": 1, "discrete_differing": 1, "first_discrete_seq": 102, "flips": 1, "matched": 5, "only_a": 0, "only_b": 0}, "last_row_seq_mine_recorded": [104, 104], "n_a": 5, "n_b": 5, "recorded_rows": 5, "rows_differing": 1}}
+a0_decision: null
+.
+======================================================================
+ERROR: test_a0plus_is_decided_over_the_six_twins_k1_to_k3_at_the_two_levels (tests.tools.test_evolve_cal_n1_report.TestStageReader.test_a0plus_is_decided_over_the_six_twins_k1_to_k3_at_the_two_levels)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_n1_report.py", line 80, in test_a0plus_is_decided_over_the_six_twins_k1_to_k3_at_the_two_levels
+    self.assertEqual(len(d["a0plus_twins"]), 6)
+                         ~^^^^^^^^^^^^^^^^
+KeyError: 'a0plus_twins'
+
+======================================================================
+ERROR: test_a_seed_twin_is_listed_and_decides_nothing (tests.tools.test_evolve_cal_n1_report.TestStageReader.test_a_seed_twin_is_listed_and_decides_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_n1_report.py", line 112, in test_a_seed_twin_is_listed_and_decides_nothing
+    self.assertIsNone(d["choose_level"]["chosen"])
+                      ~^^^^^^^^^^^^^^^^
+KeyError: 'choose_level'
+
+======================================================================
+ERROR: test_stage_b_is_the_ruled_rule_m_over_the_chosen_levels_first_five_twins (tests.tools.test_evolve_cal_n1_report.TestStageReader.test_stage_b_is_the_ruled_rule_m_over_the_chosen_levels_first_five_twins)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_n1_report.py", line 102, in test_stage_b_is_the_ruled_rule_m_over_the_chosen_levels_first_five_twins
+    self.assertEqual(d["choose_level"]["chosen"], 0.01)
+                     ~^^^^^^^^^^^^^^^^
+KeyError: 'choose_level'
+
+======================================================================
+ERROR: test_the_a0_decision_reads_only_the_two_a0_twins_not_every_epsilon_twin_present (tests.tools.test_evolve_cal_n1_report.TestStageReader.test_the_a0_decision_reads_only_the_two_a0_twins_not_every_epsilon_twin_present)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_n1_report.py", line 66, in test_the_a0_decision_reads_only_the_two_a0_twins_not_every_epsilon_twin_present
+    self.assertEqual(sorted(d["a0_twins"]), ["eps1e-2-k01", "eps1e-3-k01"])
+                            ~^^^^^^^^^^^^
+KeyError: 'a0_twins'
+
+======================================================================
+ERROR: test_the_level_choice_is_the_smallest_level_at_which_a_twin_moves (tests.tools.test_evolve_cal_n1_report.TestStageReader.test_the_level_choice_is_the_smallest_level_at_which_a_twin_moves)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_n1_report.py", line 92, in test_the_level_choice_is_the_smallest_level_at_which_a_twin_moves
+    self.assertEqual(d["choose_level"]["chosen"], 0.001)
+                     ~^^^^^^^^^^^^^^^^
+KeyError: 'choose_level'
+
+======================================================================
+FAIL: test_a_missing_a0_twin_is_said_not_assumed (tests.tools.test_evolve_cal_n1_report.TestStageReader.test_a_missing_a0_twin_is_said_not_assumed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_n1_report.py", line 121, in test_a_missing_a0_twin_is_said_not_assumed
+    self.assertIsNone(d.get("a0_decision"))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'frames_only': False, 'moved': {}, 'n_twins': 1, 'non_degenerate': False, 'release_dims': []} is not None
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.067s
+
+FAILED (failures=1, errors=5)
