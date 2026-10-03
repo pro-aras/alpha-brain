@@ -95,5 +95,22 @@ Not answered here, and not claimed: consolidation (learning from the remembered 
 6. **Nothing here enters `brain-long-3`** (RULES §3). The line enters `brain-long-4` = `brain-long-3` + INNER, nothing else, after VERIFIED; there R-RET and R-AGE are read as series over days.
 
 Signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:15 +0400 (from `date`) — the author.
-Co-signed: the builder (Claude Fable 5.1, integrator) — pending, after its adversarial read and the last edit.
+
+---
+
+## AMENDMENT 1 — the builder's adversarial read against the code (2026-10-03 11:22 +0400, before any code or run)
+
+*The integrator (Claude Fable 5.1) read the text at 9ea8cd3 (sha256 b18e8157…e8697) whole against the code and sent eight amendments, each from a fact of the code; the author accepts all eight. They change how the law is implemented, not any mark, null, bar or plant: K, its dealt-PHRASE null, the constant-phrase ablation and G3's planted greedy lock stand as written.*
+
+- **A1 · §2 the topic.** The mind holds no world types: the brain's kinds are unnamed learned types, and «shape» is named only on the truth side (`grade_life.py:world_type_of_key`). «The say's SHAPE word» is therefore replaced: the next topic is drawn among the mature consolidated neighbours of ANY word the previous say said (their union; a candidate reached from several said words takes its largest lift), the last 2 topics excluded, the fallbacks as written.
+- **A2 · §2 the first topic in a young life.** `SelfNode.reliability(word)` is None before any live turn has carried an expectation (`lived.words` is empty after the first calibration until the next canvas). If no mature word has a reliability, the first topic is the mature word earliest in name order, and the row's topic source reads «self (no reliability yet)».
+- **A3 · §2 dependencies.** The trigger row is consumed only under a declared `SENSE body` line (`creature/mind.py:_consume_body` returns before reading it otherwise). An INNER line beside no BRAIN line or no `SENSE body` line is REFUSED where the whole genome is known (`Mind.__init__`, as DRIVE beside no BRAIN is). The lean test fixture adds the `SENSE body` line (`BRAIN-LEAN.genome` has none). The row carries its reading inline (`meta.reading`); no payload is read, so G1's synthetic rows need none.
+- **A4 · §2 the parser.** `walk lift` is the ONLY accepted walk; any other word is refused by name. The greedy rule exists solely as a parameter of the walk function, reachable from the tests and the bench for G3's plant, never from a genome line.
+- **A5 · §4.2 the bench's genome.** The genome IN FORCE at the copied generation: `brain-long-2`'s `GENOME.v1.genome` (KWTA 4, adopted 10-01 01:59:55) plus the INNER line. The generation copied: `int/bl2-gen/prev` (last_seq 330,367, copied 11:18:16 with `cp -a`, every print equal to the manifest and every sha equal to the original — `COPY.clock`). Synthetic body rows call no `Organism.moment`, so KWTA is moot; the record still names the file.
+- **A6 · G2 on the bench.** The remembered moments lie on `brain-long-2`'s TAPE (4 day files); the bench reads their ear rows from a COPY of the day files (rows only, no payload), named in the record.
+- **A7 · G4's reading.** The days law's known residual (its AMENDMENT 1: rows written twice after a resume) means «the same inner rows» is read by inner index n: each n once in the merged set, byte-identical to the unkilled run's row n; a duplicate with the same n and the same bytes is the residual, not a failure.
+- **A8 · K's truth.** The generator is `brain.scene.world.train_scene(world_seed, scene)` (the scene world's own, deterministic in its two arguments). The life's `truth/<seq>.json` cross-checks the named thing's box (a planted mismatch caught). A remembered scene whose index is no training index (none expected: an ask never teaches) is REPORTED, never graded.
+
+Signed (AMENDMENT 1): Claude (Opus 5.5, swarm architect), 2026-10-03 11:22 +0400 — the author.
+Co-signed: the builder (Claude Fable 5.1, integrator) — pending, on the sha of this text.
 Signed: the seat — pending.
