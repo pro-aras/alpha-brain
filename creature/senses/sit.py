@@ -83,18 +83,15 @@ def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_ca
     torn_name: Optional[str] = None      # the file the last failed read was of, and how many consecutive polls it has failed (FIX 1)
     torn_count = 0
     from genome.machinery import parse_genome
-    from creature.exam import canvas_count_of   # M4 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400): the ONE canvas unit, shared with voice_loop
+    from creature.exam import canvas_count_now   # M4 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400): the ONE canvas unit, shared with voice_loop (POLLER-FIX: via canvas_count_now, which wraps canvas_count_of)
     genome = parse_genome(Path(genome_path).read_text())
     fixations = int(genome.gaze["fixations"]) if genome.gaze else 1
 
     while not stop_event.is_set():
-        ledger_path = root / "state" / "ledger.json"
-        if ledger_path.exists() and every_canvases > 0:
-            try:
-                ledger = json.loads(ledger_path.read_text())
-            except (json.JSONDecodeError, OSError):
-                ledger = {}
-            canvas_count = canvas_count_of(ledger, fixations)   # M4: the mind's own count when the ledger carries it, else moments // fixations
+        # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX: the ONE read changed. It was `json.loads(state/ledger.json)` + canvas_count_of every poll (only when every > 0);
+        # canvas_count_now reads the snapshot manifest's own canvas_index (the ledger road, the old code verbatim, only for a life saved before the key existed). every <= 0 still never reads.
+        canvas_count, _road = canvas_count_now(root / "state", fixations) if every_canvases > 0 else (None, "none")   # M4: the mind's own count; None = neither manifest key nor ledger (tick skipped)
+        if canvas_count is not None:
             if canvas_count - last_canvas >= every_canvases:
                 # edit: Claude (Fable 5.1), 2026-09-23 03:25 +0400 — the boundary is CONSUMED only when a NEW exam file is seen (below); before this
                 # line advanced `last_canvas` first, so a boundary crossed a few seconds before the voice thread had

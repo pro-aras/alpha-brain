@@ -4062,6 +4062,8 @@ class Mind:
         staged.append((ledger_tmp, state_dir / "ledger.json"))
         gen_tmp = state_dir / "SNAPSHOT_tmp.json"
         gen_tmp.write_text(json.dumps({"t": int(self.org.t), "last_seq": int(self.last_seq or 0),
+                                       # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX (docs/organism/days/PREREG-POLLER-FIX.md §2, option A): the very integer the ledger above carries (the same variable, nothing runs between), in the file renamed LAST and atomically, so the two 5-second pollers (creature/exam.py canvas_count_now) read ~40 bytes instead of parsing the whole ledger
+                                       "canvas_index": ledger["canvas_index"],
                                        "files": [f.name for _s, f in staged],
                                        "prints": {f.name: _fingerprint(s) for s, f in staged}}, sort_keys=True))
         self._keep_prev_generation(state_dir)
