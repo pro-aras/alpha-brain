@@ -48,6 +48,18 @@ def n_plants(part: Sequence[ST.Moment]) -> int:
     return sum(1 for m in part if m.source == "plant")
 
 
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 17:09 +0400 — G1's plant-token premise: how often each plant token occurs as a word of a REAL (non-plant) moment (law §3 calls both «in no vocabulary»; AMENDMENT-1).
+def plant_token_occurrences(moments: Sequence[ST.Moment]) -> Dict[str, int]:
+    out = {t: 0 for t in ST.PLANT}
+    for m in moments:
+        if m.source == "plant":
+            continue
+        for w in m.words:
+            if w in out:
+                out[w] += 1
+    return out
+
+
 def first_order_saving(plants_held: int, n_train_tokens: int, plants_train: int, V: int) -> Optional[float]:
     """The architect's expected value of the planted frame's gain (17:0x ruling): n_held_plants x log2(N_train / n_train_plants) − 2 log2 V (None without a train plant)."""
     if plants_train < 1:

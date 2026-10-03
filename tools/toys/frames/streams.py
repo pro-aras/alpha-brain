@@ -36,7 +36,9 @@ SOURCES: Dict[str, Path] = {
     "brain-full-20261102": Path("/data/dev/genome-lives/brain-full-20261102"),
 }
 SUBDIRS: Tuple[str, ...] = ("tape", "journal")
-PLANT: Tuple[str, str] = ("zzq", "xxv")        # the law's §3 PLANT: two tokens in no vocabulary
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 17:09 +0400 — the second plant token xxv -> qxk (AMENDMENT-1): the law's §3 calls both tokens «in no vocabulary», but xxv is a REAL word of alpha4-1's
+# shelf text (a chapter heading, 4 moments: docs/research/toys/records/frames/ORIENT-plant_tokens_outside.out); zzq and qxk occur in no row of either stream (G1 counts it every run).
+PLANT: Tuple[str, str] = ("zzq", "qxk")        # the law's §3 PLANT: two tokens in no vocabulary
 SHUFFLE_TAG = 7                                # default_rng([20261103, 7, seed]): the law names seed 1 and no key; this key is mine (printed in the report header)
 SEED_ROOT = 20261103
 

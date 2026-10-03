@@ -1,0 +1,42 @@
+{
+ "ALPHA4": {
+  "G": 3119.5382395976144,
+  "K": 2241,
+  "L": 22.255988641952786,
+  "N": 118921,
+  "V": 2238,
+  "bits0": 491540.77633278974,
+  "bitsF": 488398.9821045502,
+  "control_plain_G": -23.200236283414263,
+  "control_plain_L": 22.25340894568638,
+  "control_plain_bitsF_minus_bits0": 0.946827337727882,
+  "every": 100,
+  "expected_first_order": 2635.1972281223175,
+  "n_held": 34047,
+  "n_moments": 85117,
+  "n_train": 51070,
+  "n_train_tokens_empty": 119426,
+  "plants_held": 337,
+  "plants_train": 505
+ },
+ "SCENE": {
+  "G": 2580.7982678852713,
+  "K": 19,
+  "L": 8.0,
+  "N": 19100,
+  "V": 16,
+  "bits0": 46119.60648515426,
+  "bitsF": 43530.80821726899,
+  "control_plain_G": -8.589524465825018,
+  "control_plain_L": 7.614709844115208,
+  "control_plain_bitsF_minus_bits0": 0.974814621709811,
+  "every": 10,
+  "expected_first_order": 2006.8357274940881,
+  "n_held": 4400,
+  "n_moments": 11000,
+  "n_train": 6600,
+  "n_train_tokens_empty": 19700,
+  "plants_held": 400,
+  "plants_train": 600
+ }
+}

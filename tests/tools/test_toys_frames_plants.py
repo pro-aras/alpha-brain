@@ -66,5 +66,30 @@ class TestPerfectReading(unittest.TestCase):
         self.assertLess(r["G"], 0.0)
 
 
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 17:09 +0400 — the plant tokens' premise («two tokens in no vocabulary», law §3) is a GATE now: xxv is a REAL word of alpha4-1's shelf text (a chapter
+# heading, 4 moments: docs/research/toys/records/frames/ORIENT-plant_tokens_outside.out), so the second plant token is replaced (AMENDMENT-1) and every run counts both tokens' real occurrences.
+class TestPlantTokens(unittest.TestCase):
+    def test_occurrences_are_counted_outside_the_plant_moments_only(self):
+        first, second = ST.PLANT
+        ms = [ST.Moment("shelf", "a", ("lesson", second), (1.0, 2.0)), ST.Moment("shelf", "b", ("x",), (3.0,)), ST.Moment("shelf", "c", (first, "y"), (4.0, 5.0))]
+        self.assertEqual(PL.plant_token_occurrences(ms), {first: 1, second: 1})
+        planted = ST.with_plant(ms, 1)                                              # three plant moments added: they must not be counted
+        self.assertEqual(sum(1 for m in planted if m.source == "plant"), 3)
+        self.assertEqual(PL.plant_token_occurrences(planted), {first: 1, second: 1})
+        self.assertEqual(PL.plant_token_occurrences([ST.Moment("shelf", "d", ("w",), (6.0,))]), {first: 0, second: 0})
+
+    def test_the_plant_is_two_distinct_tokens(self):
+        self.assertEqual(len(ST.PLANT), 2)
+        self.assertNotEqual(*ST.PLANT)
+
+    @unittest.skipUnless((ST.COPIES / "alpha4-1" / "tape").is_dir() and (ST.COPIES / "brain-full-20261102" / "tape").is_dir(), "the copies are not made yet")
+    def test_the_plant_tokens_occur_in_no_real_stream_G1(self):
+        """G1 (law §7, extended by AMENDMENT-1): both plant tokens occur in ZERO rows of every copied stream (the premise «in no vocabulary» is read, not assumed)."""
+        a4 = ST.load_moments(sorted((ST.COPIES / "alpha4-1" / "tape").glob("*.jsonl")))
+        sc = ST.scene_moments(ST.load_moments(sorted((ST.COPIES / "brain-full-20261102" / "tape").glob("*.jsonl"))))
+        for name, ms in (("ALPHA4", a4), ("SCENE", sc)):
+            self.assertEqual(PL.plant_token_occurrences(ms), {t: 0 for t in ST.PLANT}, name)
+
+
 if __name__ == "__main__":
     unittest.main()
