@@ -9,17 +9,19 @@
 #   LIFE_GENOME  the closed life's GENOME.genome (copy)                  default <repo>/scratch/GENOME-full.genome
 #   TAPE         the life's tape CUT at the lived seq, payload copied    default <repo>/scratch/cut-full/tape
 #   TRUTH_SRC    the life's truth/ directory (copied into the grading root)  default /data/dev/genome-lives/brain-full-20261102/truth
-#   I1_JOURNAL   the identity replay's journal (the replay under the life's own genome, no DRIVE)  default <repo>/scratch/i1/identity/journal.jsonl
+#   I1_JOURNAL   the identity replay's journal (the replay under the life's own genome, no DRIVE)  REQUIRED by `read`, no default (the reader refuses an empty one)
 # OFF = the life's genome + `DRIVE brain turn before hearing; says 1; asks 1` (the life predates DRIVE); ON = OFF with `hears scene maker`: ONE token apart.
 # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 11:15 +0400 — the free-slot check reads the slot LOCKS, not the slot-N.who records (a killed job leaves its record behind); the read stage's
 # grading root, X plant + regrade and hears_read were dry-run on the real live journal (the identity journal) before this commit; the arms stage is first exercised at the launch.
+# edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 11:48 +0400 — `read` REQUIRES I1_JOURNAL (the first default named a run that never finished; the advisor and the verifier both saw it fail there) and refuses an empty
+# one; the `arms` stage's free-slot precheck follows the swarm gate's 5 slots (SLOT_N default 5). The bench pair was launched by the 33f68f9 version of this file; the replays' own command (the `arm` stage) and the genome construction are unchanged by this edit.
 set -u
 SELF=$(readlink -f "$0")
 REPO=$(cd "$(dirname "$SELF")/../.." && pwd)
 LIFE_GENOME=${LIFE_GENOME:-$REPO/scratch/GENOME-full.genome}
 TAPE=${TAPE:-$REPO/scratch/cut-full/tape}
 TRUTH_SRC=${TRUTH_SRC:-/data/dev/genome-lives/brain-full-20261102/truth}
-I1_JOURNAL=${I1_JOURNAL:-$REPO/scratch/i1/identity/journal.jsonl}
+I1_JOURNAL=${I1_JOURNAL:-}          # REQUIRED by `read`: the replay under the life's own genome (no DRIVE) — no default (the first default pointed at a run that never finished)
 SLOT=${SLOT:-/data/dev/swarm/bin/slot}
 LANE=${LANE:-hears}
 export REPO TAPE TMPDIR=$REPO/scratch/tmp PYTHONPATH=$REPO PYTHONUNBUFFERED=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
@@ -62,7 +64,7 @@ if [ "$cmd" = "arms" ]; then
   [ "$(diff "$OUT/GENOME-off.genome" "$OUT/GENOME-on.genome" | grep -c '^[<>]')" = 2 ] || { echo "STOP: ON differs from OFF by more than one line"; exit 3; }
   grep -q '; hears scene maker$' "$OUT/GENOME-on.genome" || { echo "STOP: ON does not hear the maker"; exit 3; }
   # free slots are counted from the LOCKS (a killed job leaves its slot-N.who record behind; the lock is what the slot gate honours)
-  total=${SLOT_N:-6}
+  total=${SLOT_N:-5}                   # the swarm's slot gate (/data/dev/swarm/bin/slot) has run 5 slots since 11:4x; the first version assumed 6
   busy=0
   for i in $(seq 1 "$total"); do
     exec {sfd}>"/data/dev/swarm/slots/slot-$i.lock"
@@ -83,6 +85,7 @@ if [ "$cmd" = "arms" ]; then
 fi
 
 if [ "$cmd" = "read" ]; then
+  [ -s "$I1_JOURNAL" ] || { echo "STOP: set I1_JOURNAL to the identity replay's journal.jsonl (the replay under the life's own genome, no DRIVE); got '${I1_JOURNAL}'"; exit 3; }
   C=$OUT/clock.txt
   step() { echo "$1 exit $2" >> "$C"; }
   # the grading root: the cut tape (a symlink to the HEARS copy), the truth (a copy), the life's genome — never the life's own root

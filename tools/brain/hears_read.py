@@ -436,7 +436,56 @@ def _canvas_side(tm, seqs_by_moment) -> Dict[str, object]:
     return {"n": len(cpu), "missing": missing, "mean_cpu_ms": (sum(cpu) / len(cpu)) if cpu else None, "median_cpu_ms": _median(cpu)}
 
 
-def cost(tape_dir, off_t, on_t, off_arm=None, on_arm=None) -> Dict[str, object]:
+def read_calibration_seqs(path) -> set:
+    """The tape seqs at which a journal records `kind: brain, act: calibrate` (the canvas that reached a count, or the `begin` ask of a sitting). A file or a directory of day files."""
+    p = Path(path)
+    files = sorted(p.glob("*.jsonl")) if p.is_dir() else [p]
+    out: set = set()
+    for f in files:
+        with f.open(encoding="utf-8") as fh:
+            for line in fh:
+                if '"calibrate"' not in line:
+                    continue
+                try:
+                    r = json.loads(line)
+                except ValueError:
+                    continue
+                if r.get("kind") == "brain" and r.get("act") == "calibrate" and r.get("seq") is not None:
+                    out.add(int(r["seq"]))
+    return out
+
+
+def _excluding_calibrations(pops, t_off, t_on, cal_off, cal_on, barred) -> Dict[str, object]:
+    """The ratios of cost() read AGAIN with every canvas (and every row) that carries a calibration in EITHER arm left out of BOTH arms. A calibration costs about 0.3 ms × the scenes learned (3 s at
+    10,000) and runs on the canvas that reaches its count; ON reaches each count on a different canvas than OFF (the maker's canvases are learned too), so one can land on a maker canvas in ON alone.
+    `same_verdict_as_barred` says whether every population's pass flag is what the barred reading gave: if it is NOT, an AMENDMENT is to be raised, not a choice made (AMENDMENT 1 §A1.2)."""
+    cal = set(cal_off) | set(cal_on)
+    pop_of = {s: name for name, sb in pops.items() for ss in sb.values() for s in ss}
+
+    def where(cs):
+        by = collections.Counter(pop_of.get(s, "other") for s in cs)
+        return {"n": len(cs), "by_population": dict(sorted(by.items()))}
+
+    out: Dict[str, object] = {"calibration_rows": {"off": where(set(cal_off)), "on": where(set(cal_on)), "union": len(cal)}, "populations": {}}
+    for name, sb in pops.items():
+        kept = {m: ss for m, ss in sb.items() if not (set(ss) & cal)}
+        a, b = _canvas_side(t_off, kept), _canvas_side(t_on, kept)
+        rm = (b["mean_cpu_ms"] / a["mean_cpu_ms"]) if a["mean_cpu_ms"] and b["mean_cpu_ms"] else None
+        rd = (b["median_cpu_ms"] / a["median_cpu_ms"]) if a["median_cpu_ms"] and b["median_cpu_ms"] else None
+        passed = bool(rm is not None and rd is not None and rm <= COST_BAR and rd <= COST_BAR and a["n"] == b["n"] == len(kept) and len(kept) > 0)
+        out["populations"][name] = {"canvases": len(kept), "dropped": len(sb) - len(kept), "off": a, "on": b, "ratio_mean": rm, "ratio_median": rd, "pass": passed}
+    ca = [float(r["cpu_ms"]) for s, r in t_off.items() if "cpu_ms" in r and s not in cal]
+    cb = [float(r["cpu_ms"]) for s, r in t_on.items() if "cpu_ms" in r and s not in cal]
+    ra = (sum(cb) / len(cb)) / (sum(ca) / len(ca)) if ca and cb and sum(ca) > 0 else None
+    out["all_rows"] = {"off": {"rows": len(ca), "mean_cpu_ms": (sum(ca) / len(ca)) if ca else None}, "on": {"rows": len(cb), "mean_cpu_ms": (sum(cb) / len(cb)) if cb else None},
+                       "ratio_mean": ra, "pass": bool(ra is not None and ra <= COST_BAR and len(ca) == len(cb) > 0)}
+    flags = {**{n: p["pass"] for n, p in out["populations"].items()}, "all_rows": out["all_rows"]["pass"]}
+    out["populations_pass"] = all(flags.values())
+    out["same_verdict_as_barred"] = all(flags[n] == barred[n]["pass"] for n in flags)
+    return out
+
+
+def cost(tape_dir, off_t, on_t, off_arm=None, on_arm=None, cal_off=None, cal_on=None) -> Dict[str, object]:
     cv = _canvases(tape_dir)
     pops = {"maker": {m: d["seqs"] for m, d in cv.items() if d["source"] == "maker"},
             "scene_train": {m: d["seqs"] for m, d in cv.items() if d["source"] == "scene" and d["kind"] == "train"}}
@@ -457,6 +506,8 @@ def cost(tape_dir, off_t, on_t, off_arm=None, on_arm=None) -> Dict[str, object]:
     out["populations"]["all_rows"] = {"off": {"rows": len(ca), "mean_cpu_ms": (sum(ca) / len(ca)) if ca else None},
                                       "on": {"rows": len(cb), "mean_cpu_ms": (sum(cb) / len(cb)) if cb else None}, "ratio_mean": ra, "pass": p_all}
     out["populations_pass"] = bool(ok and p_all)
+    if cal_off is not None and cal_on is not None:
+        out["excluding_calibrations"] = _excluding_calibrations(pops, t_off, t_on, cal_off, cal_on, out["populations"])
     out["launch"] = launch(off_arm, on_arm) if (off_arm and on_arm) else None
     out["verdict"] = ("NOT READ" if out["launch"] is None else "VOID" if out["launch"]["void"] else "PASS" if out["populations_pass"] else "FAIL")
     out["pass"] = out["verdict"] == "PASS"
@@ -753,6 +804,16 @@ def report(o: Dict[str, object]) -> List[str]:
                 L.append(f"    {name:12s} canvases {p['canvases']} · timed off {p['off']['n']} (missing {p['off']['missing']}) on {p['on']['n']} (missing {p['on']['missing']}) · "
                          f"cpu_ms mean off {_f(p['off']['mean_cpu_ms'])} on {_f(p['on']['mean_cpu_ms'])} · median off {_f(p['off']['median_cpu_ms'])} on {_f(p['on']['median_cpu_ms'])} · "
                          f"ratio mean {_f(p['ratio_mean'])} median {_f(p['ratio_median'])} → {'PASS' if p['pass'] else 'FAIL'}")
+        ex = c.get("excluding_calibrations")
+        if ex:
+            cr = ex["calibration_rows"]
+            L.append(f"    the same ratios with every canvas that carries a CALIBRATION (either arm) left out of both arms (a calibration ≈ 0.3 ms × the scenes learned runs on the canvas that reaches the count; "
+                     f"ON reaches each count on another canvas than OFF): calibration rows OFF {cr['off']['n']} {cr['off']['by_population']} · ON {cr['on']['n']} {cr['on']['by_population']}")
+            for name, p in ex["populations"].items():
+                L.append(f"      {name:12s} canvases kept {p['canvases']} (dropped {p['dropped']}) · ratio mean {_f(p['ratio_mean'])} median {_f(p['ratio_median'])} → {'PASS' if p['pass'] else 'FAIL'}")
+            L.append(f"      all_rows     rows off {ex['all_rows']['off']['rows']} on {ex['all_rows']['on']['rows']} · ratio {_f(ex['all_rows']['ratio_mean'])} → {'PASS' if ex['all_rows']['pass'] else 'FAIL'}")
+            L.append(f"      the verdict of every population is {'THE SAME as' if ex['same_verdict_as_barred'] else 'NOT the same as'} the barred reading"
+                     f"{'' if ex['same_verdict_as_barred'] else ' — an AMENDMENT is to be raised, not a choice made'}")
     i = o.get("I2")
     if i:
         L.append(f"  I2 · OFF without its turn rows vs the replay under the life's own genome: OFF rows {i['rows_off']} (turn rows dropped {i['turn_rows_dropped']}) → compared "
@@ -800,7 +861,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         rows = WR.read_journal(Path(a.on_journal))
         o["T"], o["G"] = t_reading(rows), g_reading(rows)
     if do_cost:
-        o["C"] = cost(a.tape, a.off_timings, a.on_timings, a.off_arm, a.on_arm)
+        cal_off = read_calibration_seqs(a.off_journal) if a.off_journal else None
+        cal_on = read_calibration_seqs(a.on_journal) if a.on_journal else None
+        o["C"] = cost(a.tape, a.off_timings, a.on_timings, a.off_arm, a.on_arm, cal_off, cal_on)
     if all(i2_args):
         off_rows = [json.loads(line) for line in Path(a.off_journal).read_text().splitlines() if line.strip()]
         i1_rows = [json.loads(line) for line in Path(a.i1_journal).read_text().splitlines() if line.strip()]

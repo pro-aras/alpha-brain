@@ -602,6 +602,113 @@ class Cost(Tmp):
         self.assertIn("end_epoch", str(cm.exception))
 
 
+class CostWithoutTheCalibrations(Tmp):
+    """The advisor's point: a calibration (~0.3 ms x the scenes learned, 3 s at 10,000) is run by `Brain.learn` on the canvas that reaches the count, and ON reaches each count on a DIFFERENT canvas than OFF
+    (the maker's canvases are learned too) — one can land on a maker canvas in ON alone. The ratios are read again with every canvas that carries a calibration row (either arm) left out of BOTH arms."""
+
+    def _five(self, spike=0.0, cal_on=(), cal_off=()):
+        rows = []
+        for i in range(5):
+            rows += [(2 * i + 1, "ear", "maker", f"m{i}", None), (2 * i + 2, "eye", "maker", f"m{i}", None)]
+        tape = write_tape(self.d / "tape5", rows)
+        off = {s: 5.0 for s in range(1, 11)}
+        on = {**off, 6: 5.0 + spike}                                       # canvas m2's eye row (seq 6) carries the spike in ON
+        return H.cost(tape, write_timings(self.d / "off5.jsonl", off, rows), write_timings(self.d / "on5.jsonl", on, rows), cal_off=set(cal_off), cal_on=set(cal_on))
+
+    def setUp(self) -> None:
+        self.d = self.mk("hears-read-cal-")
+
+    def test_a_calibration_that_lands_on_one_maker_canvas_in_on_alone_moves_the_mean_and_the_exclusion_removes_it(self) -> None:
+        c = self._five(spike=3000.0, cal_on={6})
+        mk = c["populations"]["maker"]
+        self.assertAlmostEqual(mk["ratio_median"], 1.0)
+        self.assertGreater(mk["ratio_mean"], 1.5)                          # the spike alone: the maker MEAN fails, the median does not
+        self.assertFalse(mk["pass"])
+        ex = c["excluding_calibrations"]
+        exm = ex["populations"]["maker"]
+        self.assertEqual((exm["canvases"], exm["off"]["n"], exm["on"]["n"]), (4, 4, 4))     # m2 left out of BOTH arms: the populations stay identical
+        self.assertAlmostEqual(exm["ratio_mean"], 1.0)
+        self.assertTrue(exm["pass"])
+        self.assertFalse(ex["same_verdict_as_barred"], "the verdict differs with and without the calibration rows: an AMENDMENT is to be raised, not a choice made")
+        self.assertEqual(ex["calibration_rows"]["on"], {"n": 1, "by_population": {"maker": 1}})
+        self.assertEqual(ex["calibration_rows"]["off"]["n"], 0)
+
+    def test_the_exclusion_reading_holds_the_median_and_the_mean_to_the_bar_as_the_barred_one_does(self) -> None:
+        rows = []
+        for i in range(5):
+            rows += [(2 * i + 1, "ear", "maker", f"m{i}", None), (2 * i + 2, "eye", "maker", f"m{i}", None)]
+        tape = write_tape(self.d / "tape5m", rows)
+        for name, off_c, on_c in (("A mean ok, median fails", [10, 10, 10, 10, 200], [20, 20, 20, 20, 200]), ("B median ok, mean fails", [10] * 5, [10, 10, 10, 10, 100])):
+            off = {s: off_c[(s - 1) // 2] / 2 for s in range(1, 11)}
+            on = {s: on_c[(s - 1) // 2] / 2 for s in range(1, 11)}
+            c = H.cost(tape, write_timings(self.d / f"off{name[0]}.jsonl", off, rows), write_timings(self.d / f"on{name[0]}.jsonl", on, rows), cal_off=set(), cal_on={999})
+            self.assertFalse(c["populations"]["maker"]["pass"], name)
+            self.assertFalse(c["excluding_calibrations"]["populations"]["maker"]["pass"], name)         # a calibration seq on no canvas: the same population, the same verdict
+            self.assertTrue(c["excluding_calibrations"]["same_verdict_as_barred"], name)
+
+    def test_a_calibration_in_each_arm_on_a_different_canvas_drops_both_canvases_from_both_arms(self) -> None:
+        # OFF calibrates on canvas m1's eye row (seq 4), ON on m2's (seq 6): leaving out only ONE arm's canvas would leave the other arm's spike in a population the two arms no longer share
+        rows = []
+        for i in range(5):
+            rows += [(2 * i + 1, "ear", "maker", f"m{i}", None), (2 * i + 2, "eye", "maker", f"m{i}", None)]
+        tape = write_tape(self.d / "tape5u", rows)
+        off = {s: 5.0 for s in range(1, 11)}
+        on = dict(off)
+        off[4] += 3000.0
+        on[6] += 3000.0
+        c = H.cost(tape, write_timings(self.d / "off5u.jsonl", off, rows), write_timings(self.d / "on5u.jsonl", on, rows), cal_off={4}, cal_on={6})
+        exm = c["excluding_calibrations"]["populations"]["maker"]
+        self.assertEqual((exm["canvases"], exm["dropped"], exm["off"]["n"], exm["on"]["n"]), (3, 2, 3, 3))
+        self.assertAlmostEqual(exm["ratio_mean"], 1.0)
+        self.assertEqual(c["excluding_calibrations"]["calibration_rows"]["union"], 2)
+
+    def test_without_a_spike_the_two_readings_agree(self) -> None:
+        c = self._five(spike=0.0, cal_on={6}, cal_off={6})
+        self.assertTrue(c["excluding_calibrations"]["same_verdict_as_barred"])
+        self.assertEqual(c["excluding_calibrations"]["populations"]["maker"]["canvases"], 4)
+
+    def test_a_calibration_on_an_ask_row_belongs_to_no_canvas_and_leaves_only_the_whole_replay(self) -> None:
+        rows = [(1, "ear", "maker", "m0", None), (2, "eye", "maker", "m0", None), (3, "ask", "scene", "a0", None)]
+        tape = write_tape(self.d / "tape-ask", rows)
+        off = {1: 5.0, 2: 5.0, 3: 5.0}
+        on = {1: 5.0, 2: 5.0, 3: 5.0 + 3000.0}                             # ON's `begin` calibration on an ask row
+        c = H.cost(tape, write_timings(self.d / "off-a.jsonl", off, rows), write_timings(self.d / "on-a.jsonl", on, rows), cal_off=set(), cal_on={3})
+        ex = c["excluding_calibrations"]
+        self.assertEqual(ex["calibration_rows"]["on"], {"n": 1, "by_population": {"other": 1}})
+        self.assertGreater(c["populations"]["all_rows"]["ratio_mean"], 1.5)
+        self.assertAlmostEqual(ex["all_rows"]["ratio_mean"], 1.0)
+        self.assertEqual(ex["all_rows"]["on"]["rows"], 2)
+
+    def test_the_reading_is_absent_when_the_calibration_rows_are_not_given(self) -> None:
+        d = self.d
+        tape = write_tape(d / "tape")
+        c = H.cost(tape, write_timings(d / "off.jsonl", OFF_CPU), write_timings(d / "on.jsonl", ON_CPU))
+        self.assertNotIn("excluding_calibrations", c)
+
+    def test_the_calibration_seqs_are_read_from_the_journal_rows_that_are_calibrations_only(self) -> None:
+        rows = [_turn(10, "scene", ["star"], ["star"]), _learn(10, "scene", ["star"]), _calibrate(10, ALL_TYPES, 250), _calibrate(20, ALL_TYPES, 500),
+                {"kind": "answer", "item": "x", "seq": 30, "answer": {"note": "calibrate"}}]
+        p = write_jsonl(self.d / "j.jsonl", rows)
+        self.assertEqual(H.read_calibration_seqs(p), {10, 20})
+
+    def test_the_whole_reader_prints_it_beside_c(self) -> None:
+        d = self.d
+        i1 = [{"seq": s, "word": "w", "hash": f"h{s}"} for s in range(1, 5)]
+        off_j = [x for r in i1 for x in (r, _turn(r["seq"], "scene", ["star"], ["star"]))]
+        a = {"off": write_grade(d / "off", make_grade("off")), "on": write_grade(d / "on", make_grade("on")), "tape": write_tape(d / "tape"),
+             "off_t": write_timings(d / "off-t.jsonl", OFF_CPU), "on_t": write_timings(d / "on-t.jsonl", CHEAP_MAKER),
+             "off_arm": write_arm(d / "off.arm", 1000.0, 3000.0), "on_arm": write_arm(d / "on.arm", 1000.0, 3000.0),
+             "on_j": write_jsonl(d / "on-j.jsonl", maker_journal()), "off_j": write_jsonl(d / "off-j.jsonl", off_j + [_calibrate(7, ALL_TYPES, 250)]), "i1_j": write_jsonl(d / "i1.jsonl", i1 + [_calibrate(7, ALL_TYPES, 250)])}
+        argv = ["--off", str(a["off"].parent), "--on", str(a["on"].parent), "--tape", str(a["tape"]), "--off-timings", str(a["off_t"]), "--on-timings", str(a["on_t"]),
+                "--off-arm", str(a["off_arm"]), "--on-arm", str(a["on_arm"]), "--on-journal", str(a["on_j"]), "--off-journal", str(a["off_j"]), "--i1-journal", str(a["i1_j"]),
+                "--out", str(d / "out")]
+        H.main(argv)
+        o = json.loads((d / "out" / "hears.json").read_text())
+        self.assertEqual(o["C"]["excluding_calibrations"]["calibration_rows"]["off"]["n"], 1)
+        self.assertEqual(o["C"]["excluding_calibrations"]["calibration_rows"]["on"]["n"], 2)       # maker_journal() carries two calibrate rows (seq 106 and 227)
+        self.assertIn("calibration", (d / "out" / "hears.txt").read_text().split("C · COST")[1])
+
+
 # ------------------------------------------------------------------------------------------------ I2: the token absent changes nothing
 class I2(unittest.TestCase):
     def _rows(self):
