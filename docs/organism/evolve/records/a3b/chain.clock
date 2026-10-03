@@ -1,0 +1,5 @@
+2026-10-03 23:07:02 +0400 chain queued: RED1 5a36a7aade6fe256888ab68a9e894123416227e4, RED2 5dcd28a2ae1d068bc362fb816f323e9c8288e51c, GREEN 5b306627b08bd4aaa409ee9938b765c973bd00f7
+2026-10-03 23:16:52 +0400 a3b-red1 exit 1: Ran 104 tests in 17.213s FAILED (failures=7, errors=34) 
+2026-10-03 23:16:54 +0400 a3b-red2 exit 1: Ran 93 tests in 0.368s FAILED (failures=8, errors=2) 
+2026-10-03 23:18:42 +0400 a3b-green-all exit 0: Ran 216 tests in 106.312s OK 
+2026-10-03 23:18:42 +0400 a3b-arith exit 0
