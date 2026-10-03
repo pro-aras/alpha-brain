@@ -1,5 +1,6 @@
-b12650cc4a06ace57abd69583b714ff12befb06b866738caf1749ccd2a8e8e0c  ./INDEX.md
-9f669c13523f1f18b652daae8495e74bcc6945d524115d52d4d1c1483e8af819  ./make_bl3_index.py
+9ddc1d6b332a4823ee687edec1558783343b002cf06ed4fbb47b9094e83ab86b  ./INDEX.md
+c73bf194659df16eedc689743dbb79c474af5e79d78ef004e812652380ad04c6  ./make_bl3_index.py
+b965ba338ac7b4ab8db8acef3f61b78e95a612822f68b5aa53a0a4ecc2e7da90  ./measure/function-compare.txt
 9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  ./measure/measure.exit
 c7d8eebad8010859edf439eb78178e487cedf8708b92b140050ffb795c208ecf  ./measure/measure.json
 ef95ac9ed8fd2fd13dd66940e7ac16d9c6e6a2c335f59ce0d473fcca67c173fa  ./measure/measure_source_copy.py

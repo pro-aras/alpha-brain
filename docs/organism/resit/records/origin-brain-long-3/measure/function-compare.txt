@@ -1,0 +1,9 @@
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 22:17 +0400 (from `date`) — the measure step ran the reader a82ea77 (measure.json reader_sha256 44f8786a…); the production origin ran 916f741. These are the functions the measure exercises, compared by source text between the two commits.
+whole file equal: False
+build_source_copy      EQUAL
+verify_source_copy     EQUAL
+dax_index_of           EQUAL
+sha256_file            EQUAL
+atomic_write           EQUAL
+r9_cross_check         CHANGED (the separate-counts change of 916f741: not used by the measure)
+r9_reading             CHANGED (the separate-counts change of 916f741: not used by the measure)
