@@ -1,0 +1,467 @@
+{
+ "rows": [
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "                                       \"canvas_index\": ledger[\"canvas_",
+     "file": "creature/mind.py",
+     "sha256_clean": "97affea00695efed",
+     "sha256_mutated": "6dfc14cac53b482d"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: 'canvas_index' not found in {'files': ['organism.npz', 'organism.json', 'episodes.npz', 'ledger.json'], 'last_seq': 6, 'prints': {'episodes.npz': [16171, ",
+   "id": "m1",
+   "named_test": "TestWriter.test_manifest_carries_the_ledgers_canvas_index",
+   "seconds": 0.9,
+   "verdict": "CAUGHT",
+   "what": "the writer omits the key"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "\"canvas_index\": ledger[\"canvas_index\"],",
+     "file": "creature/mind.py",
+     "sha256_clean": "97affea00695efed",
+     "sha256_mutated": "eb07f852861eef84"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: 15 != 3 : the very integer the ledger written in the same call carries",
+   "id": "m2",
+   "named_test": "TestWriter.test_manifest_carries_the_ledgers_canvas_index",
+   "seconds": 0.9,
+   "verdict": "CAUGHT",
+   "what": "the writer writes self.org.t (moments, not canvases)"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "\"canvas_index\": ledger[\"canvas_index\"],",
+     "file": "creature/mind.py",
+     "sha256_clean": "97affea00695efed",
+     "sha256_mutated": "09d4a6c1d8dc66f4"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: <class 'str'> is not <class 'int'> : an int, never a bool/str/float: '3'",
+   "id": "m3",
+   "named_test": "TestWriter.test_manifest_carries_the_ledgers_canvas_index",
+   "seconds": 0.9,
+   "verdict": "CAUGHT",
+   "what": "the writer writes str(canvas_index)"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "    if isinstance(ci, int) and not isinstance(ci, bool):\n        retur",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "740d7ee972fad9d7"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (None, 'none') != (520, 'snapshot')",
+   "id": "m4",
+   "named_test": "TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "the reader ignores the key"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "    ledger_path = state_dir / \"ledger.json\"\n    if ledger_path.exists(",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "74ad54fc91f47e02"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: 550 == 550 : t counts MOMENTS (5 a canvas): moments // fixations is the over-count M4 removed (S3)",
+   "id": "m5",
+   "named_test": "TestReaderRoads.test_a_keyless_manifest_never_stands_in_t_over_fixations",
+   "seconds": 0.5,
+   "verdict": "CAUGHT",
+   "what": "the reader takes t // fixations when the key is absent"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "    if isinstance(ci, int) and not isinstance(ci, bool):\n        retur",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "5f54fe51c1af334d"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (True, 'snapshot') != (520, 'ledger')",
+   "id": "m6",
+   "named_test": "TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road",
+   "seconds": 0.7,
+   "verdict": "CAUGHT",
+   "what": "the reader accepts a bool"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "    except (OSError, ValueError):\n        manifest = None\n",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "cde5caf09adb8554"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (0, 'snapshot') != (520, 'ledger')",
+   "id": "m7",
+   "named_test": "TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "an unparsable manifest yields 0 instead of the ledger road"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "    ledger_path = state_dir / \"ledger.json\"\n    if ledger_path.exists(",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "0a254f17d5a41968"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (None, 'none') != (520, 'ledger')",
+   "id": "m8",
+   "named_test": "TestReaderRoads.test_a_keyless_manifest_takes_the_ledger_road",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "the ledger road only when the manifest is MISSING, not when it lacks the key"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "    if isinstance(ci, int) and not isinstance(ci, bool):\n        retur",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "be6785c74fa183c4"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (1, 1) != (0, 1)",
+   "id": "m9",
+   "named_test": "TestReaderRoads.test_the_snapshot_road_never_opens_the_ledger",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "the snapshot road still parses the ledger (road says snapshot)"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "        canvas_count, _road = canvas_count_now(root / \"state\", fixatio",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "36cbc18714d39583"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (7, 7) != (0, 7)",
+   "id": "m10",
+   "named_test": "TestLoopEquivalence.test_s1_voice_loop_manifest_and_ledger_agree",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "voice_loop still calls json.loads(ledger)"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "        canvas_count, _road = canvas_count_now(root / \"state\", fixatio",
+     "file": "creature/senses/sit.py",
+     "sha256_clean": "5f5f111a76db4f50",
+     "sha256_mutated": "35037b4eb3d20287"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (7, 7) != (0, 7)",
+   "id": "m11",
+   "named_test": "TestLoopEquivalence.test_s1_sit_sense_manifest_and_ledger_agree",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "sense still calls json.loads(ledger)"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "canvas_count_now(root / \"state\", fixations)",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "fb11a1d02277c662"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Lists differ: [] != [(1, 520), (5, 1030)]",
+   "id": "m12",
+   "named_test": "TestLoopEquivalence.test_s1_voice_loop_manifest_and_ledger_agree",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "voice_loop passes root for root/state"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "canvas_count_now(root / \"state\", fixations)",
+     "file": "creature/senses/sit.py",
+     "sha256_clean": "5f5f111a76db4f50",
+     "sha256_mutated": "cab31a4084c5e359"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Lists differ: [] != [(1, '2026-10-03T000001Z.json', 0.8), (5, '2026-10-03T000002Z.json', 0.8)]",
+   "id": "m12b",
+   "named_test": "TestLoopEquivalence.test_s1_sit_sense_manifest_and_ledger_agree",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "sense passes root for root/state"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "def canvas_count_now(state_dir: Path, fixations: int)",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "1efe43b8e229f67a"
+    },
+    {
+     "anchor": "return ci, \"snapshot\"",
+     "file": "creature/exam.py",
+     "sha256_clean": "1efe43b8e229f67a",
+     "sha256_mutated": "18aa53a6b22b8179"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (520, 'snapshot') != (1030, 'snapshot')",
+   "id": "m13",
+   "named_test": "TestReaderRoads.test_the_manifest_is_read_afresh_every_call",
+   "seconds": 0.7,
+   "verdict": "CAUGHT",
+   "what": "the manifest read is cached (stale forever)"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "return ci, \"snapshot\"",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "318f556f7d8812ab"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (521, 'snapshot') != (520, 'snapshot')",
+   "id": "m14",
+   "named_test": "TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "the reader is off by one"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "\"canvas_index\": ledger[\"canvas_index\"],",
+     "file": "creature/mind.py",
+     "sha256_clean": "97affea00695efed",
+     "sha256_mutated": "ac5369d392b0d228"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: 4 != 3 : the very integer the ledger written in the same call carries",
+   "id": "m14w",
+   "named_test": "TestWriter.test_manifest_carries_the_ledgers_canvas_index",
+   "seconds": 1.0,
+   "verdict": "CAUGHT",
+   "what": "the writer is off by one"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": " if every_canvases > 0 else (None, \"none\")",
+     "file": "creature/senses/sit.py",
+     "sha256_clean": "5f5f111a76db4f50",
+     "sha256_mutated": "4a0511950ef10135"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: ([(0, '2026-10-03T000001Z.json', 0.8)], []) != ([], [])",
+   "id": "m16",
+   "named_test": "TestLoopEquivalence.test_s12_a_non_positive_period_never_fires_and_sit_never_polls",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "sense's every <= 0 guard dropped (SIT would poll a disabled duty)"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "return canvas_count_of(ledger, fixations), \"ledger\"",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "c93bd67edf190d8a"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (2200, 'ledger') != (550, 'ledger')",
+   "id": "m17",
+   "named_test": "TestReaderRoads.test_a_keyless_manifest_takes_the_ledger_road",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "the ledger road ignores fixations"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "    if isinstance(ci, int) and not isinstance(ci, bool):\n        retur",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "ba1b4bc0738cdbcc"
+    }
+   ],
+   "exit": 1,
+   "first_error": "AssertionError: Tuples differ: (None, 'none') != (0, 'snapshot')",
+   "id": "m18",
+   "named_test": "TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "a zero cursor is read as falsy"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "        try:\n            ledger = json.loads(ledger_path.read_text())\n",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "020cba1457936419"
+    }
+   ],
+   "exit": 1,
+   "first_error": "json.decoder.JSONDecodeError: Expecting ',' delimiter: line 1 column 15 (char 14)",
+   "id": "m15",
+   "named_test": "TestReaderRoads.test_a_torn_ledger_is_zero_not_a_crash",
+   "seconds": 0.6,
+   "verdict": "CAUGHT",
+   "what": "a torn ledger on the ledger road raises instead of {}"
+  },
+  {
+   "as_expected": true,
+   "edits": [
+    {
+     "anchor": "this reader lags by at most one",
+     "file": "creature/exam.py",
+     "sha256_clean": "d8ab65476faf33b9",
+     "sha256_mutated": "d2d7e61ec89c0152"
+    }
+   ],
+   "exit": 0,
+   "first_error": "",
+   "id": "m0",
+   "named_test": "TestLoopEquivalence.test_s1_voice_loop_manifest_and_ledger_agree",
+   "seconds": 0.6,
+   "verdict": "SURVIVED",
+   "what": "EQUIVALENT (docstring only): \u00abat most one\u00bb -> \u00abat most 1\u00bb"
+  }
+ ],
+ "summary": {
+  "caught": 20,
+  "clean_controls": {
+   "TestLoopEquivalence.test_s12_a_non_positive_period_never_fires_and_sit_never_polls": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestLoopEquivalence.test_s1_sit_sense_manifest_and_ledger_agree": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestLoopEquivalence.test_s1_voice_loop_manifest_and_ledger_agree": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestReaderRoads.test_a_keyless_manifest_never_stands_in_t_over_fixations": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestReaderRoads.test_a_keyless_manifest_takes_the_ledger_road": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestReaderRoads.test_a_torn_ledger_is_zero_not_a_crash": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestReaderRoads.test_the_manifest_is_read_afresh_every_call": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestReaderRoads.test_the_snapshot_road_never_opens_the_ledger": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   },
+   "TestWriter.test_manifest_carries_the_ledgers_canvas_index": {
+    "exit": 0,
+    "ok": true,
+    "ran": "1"
+   }
+  },
+  "clean_whole_module": {
+   "exit": 0,
+   "ok": true,
+   "ran": "34"
+  },
+  "fix_sha": "7291ca828390d08f822a8836edccecb2d16cba6a",
+  "mutants": 20,
+  "negative_plant_m0": "SURVIVED",
+  "ok": true,
+  "overlay_imports": [
+   "/data/dev/genome-wt-poller-1003/scratch/tmp/poller-mutants-6b3gls14/overlay/creature/exam.py",
+   "/data/dev/genome-wt-poller-1003/scratch/tmp/poller-mutants-6b3gls14/overlay/creature/mind.py",
+   "/data/dev/genome-wt-poller-1003/scratch/tmp/poller-mutants-6b3gls14/overlay/creature/senses/sit.py"
+  ]
+ }
+}
