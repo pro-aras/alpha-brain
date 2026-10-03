@@ -365,14 +365,14 @@ def webs_and_self():
     sys.path.insert(0, str(ROOT))
     from genome import web as W
     st = json.load(open(WEBDIR / "STATUS.json")); sw = st["brain"]["web"]; T = sw["L"]["t"]
-    words = []; ats = []
+    words = []; ats = []; src_of = collections.defaultdict(set)
     for fn in sorted(glob.glob(str(WEBDIR / "*.jsonl"))):
         for line in open(fn):
             d = json.loads(line)
             if d.get("sense") == "ear":
                 w = (d.get("meta") or {}).get("word")
                 if w:
-                    words.append(str(w)); ats.append(d["at"])
+                    words.append(str(w)); ats.append(d["at"]); src_of[str(w)].add((d.get("meta") or {}).get("source"))
     print("ear words on the tape copy %d ; STATUS web L t %d (heartbeat %s)" % (len(words), T, st.get("heartbeat_at")))
     check(len(words) >= T, "the tape copy holds every word STATUS's web has heard")
     words = words[:T]; ats = ats[:T]
@@ -416,6 +416,17 @@ def webs_and_self():
                 er_c.append(_avg_clustering(a)); er_p.append(_path_len(a, seed=s)[0])
             print("  %s %-19s nodes %5d edges %6d components %3d (largest %d): clustering %.3f vs random %.3f ; mean path %.2f vs random %.2f" % (
                 r, label, len(nodes_in), len(edges), ncomp, big, cl, float(np.mean(er_c)), pl, float(np.mean(er_p))))
+    # what the web holds: hubs, the strongest consolidated edges, and how many consolidated edges touch a word ever heard from a grounded world
+    Lw = webs["L"]
+    deg = {w: len(Lw._adj.get(w, ())) for w in Lw.nodes}
+    hubs = sorted(deg.items(), key=lambda kv: -kv[1])[:8]
+    top = sorted(((int(Lw.edges[k]["c"]), k) for k in Lw.consolidated()), reverse=True)[:8]
+    grounded = lambda w: bool(src_of.get(w, set()) & {"scene", "game", "maker"})
+    cons = Lw.consolidated()
+    both = sum(1 for a, b in cons if grounded(a) and grounded(b)); one = sum(1 for a, b in cons if grounded(a) != grounded(b)); none_ = len(cons) - both - one
+    print("\n-- what Web L holds: top hubs by degree %s ; strongest consolidated edges (evidence c) %s" % (hubs, [(k, c) for c, k in top]))
+    print("  consolidated edges of L: %d ; both words ever heard from the scene/game/maker worlds: %d ; one: %d ; neither (shelf and lexicon words only): %d ; words in L: %d of which grounded %d" % (
+        len(cons), both, one, none_, len(Lw.nodes), sum(1 for w in Lw.nodes if grounded(w))))
     # item 4: L against N on its own speech (K6): the webs as they stood at a snapshot, read against the words heard AFTER it
     print("\n-- L against N on its own speech (PREREG-KW-1 K6 enrichment): consolidated edges at a snapshot, read against the words heard AFTER it; K7: the same on the held-out words SHUFFLED")
     rng = np.random.default_rng(11)
@@ -428,6 +439,16 @@ def webs_and_self():
             print("  snapshot after %6d words (%s UTC), held-out %6d words: web %s: %5d consolidated edges, %5d with both words in the held-out part: enrichment %.2f ; shuffled control %.2f" % (
                 t0, ats[t0 - 1][5:16], len(held), r, tot, used, e, e0))
             check(e0 <= 1.5 or used == 0, "K7: the shuffled held-out words read %.2f (≤ 1.5): the instrument finds no association in a shuffle (web %s, snapshot %d)" % (e0, r, t0))
+            cls = {"grounded-grounded": [], "grounded-shelf": [], "shelf-shelf": []}
+            for a, b in snaps[t0][r]:
+                ga, gb = grounded(a), grounded(b)
+                cls["grounded-grounded" if (ga and gb) else ("shelf-shelf" if not (ga or gb) else "grounded-shelf")].append((a, b))
+            parts = []
+            for name, edges in cls.items():
+                ee, uu, tt = enrichment(edges, held)
+                ee0, _, _ = enrichment(edges, shuf)
+                parts.append("%s: %d edges (%d usable) enrichment %s (shuffled %s)" % (name, tt, uu, ("%.2f" % ee) if uu else "n/a", ("%.2f" % ee0) if uu else "n/a"))
+            print("      by edge class — " + " | ".join(parts))
     # item 5: the self
     print("\n-- the self (state/web.json copy, snapshot t %s)" % json.load(open(DD / "SNAPSHOT.json")).get("t"))
     wj = json.load(open(DD / "web.json")); sn = W.SelfNode.from_dict(wj["self"])
