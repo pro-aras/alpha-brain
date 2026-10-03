@@ -1,0 +1,100 @@
+diff --git a/creature/exam.py b/creature/exam.py
+index bf6a031..a4aaeb9 100644
+--- a/creature/exam.py
++++ b/creature/exam.py
+@@ -95,6 +95,36 @@ def canvas_count_of(ledger: dict, fixations: int) -> int:
+     return moments // max(1, int(fixations))
+ 
+ 
++# edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX (docs/organism/days/PREREG-POLLER-FIX.md §2.1, option A): the two 5-second pollers
++# (voice_loop below, creature/senses/sit.py sense) parsed the WHOLE state/ledger.json (6-13 MB, 150-540 ms holding the GIL, growing with the life) every
++# poll to read ONE integer. Mind.snapshot() now writes that integer into state/SNAPSHOT.json too (< 1 KB, renamed LAST, atomic); this reads it from there.
++def canvas_count_now(state_dir: Path, fixations: int) -> tuple[Optional[int], str]:
++    """The canvases the mind has consumed as of its last snapshot, and the ROAD that said so — `(count | None, road)`:
++    "snapshot": the manifest's own `canvas_index` (state/SNAPSHOT.json), an int and not a bool (the very integer the ledger written in the same call
++        carries). Any OSError or ValueError reading it (missing, unreadable, non-UTF-8, non-JSON) falls through to the next road.
++    "ledger": the OLD road, verbatim — a manifest without the key (every life saved before this change) parses state/ledger.json (`{}` on a torn or
++        unreadable one) and reads `canvas_count_of` of it. NEVER `t // fixations` from the manifest: `t` counts moments (5 a canvas), the over-count M4 removed.
++    "none": no key and no ledger — `(None, "none")`; the callers skip the tick exactly as they always skipped a missing ledger.
++    The manifest is renamed after the ledger, so a poll between the two sees the new ledger and the old manifest: this reader lags by at most one
++    poll and never leads."""
++    state_dir = Path(state_dir)
++    try:
++        manifest = json.loads((state_dir / "SNAPSHOT.json").read_text())
++    except (OSError, ValueError):
++        manifest = None
++    ci = manifest.get("canvas_index") if isinstance(manifest, dict) else None
++    if isinstance(ci, int) and not isinstance(ci, bool):
++        return ci, "snapshot"
++    ledger_path = state_dir / "ledger.json"
++    if ledger_path.exists():
++        try:
++            ledger = json.loads(ledger_path.read_text())
++        except (json.JSONDecodeError, OSError):
++            ledger = {}
++        return canvas_count_of(ledger, fixations), "ledger"
++    return None, "none"
++
++
+ def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, poll_period: float = 5.0) -> None:
+     """The voice's own exam cadence: every `every_canvases` canvases, read from the latest snapshot's
+     own "moments" (state/ledger.json) divided by the genome's fixations-per-canvas -- never a counter the
+@@ -114,13 +144,10 @@ def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, p
+     genome = parse_genome(Path(genome_path).read_text())
+     fixations = int(genome.gaze["fixations"]) if genome.gaze else 1
+     while not stop_event.is_set():
+-        ledger_path = root / "state" / "ledger.json"
+-        if ledger_path.exists():
+-            try:
+-                ledger = json.loads(ledger_path.read_text())
+-            except (json.JSONDecodeError, OSError):
+-                ledger = {}
+-            canvas_count = canvas_count_of(ledger, fixations)   # M4: the mind's own count when the ledger carries it
++        # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX: the ONE read changed. It was `json.loads(state/ledger.json)` + canvas_count_of every poll;
++        # canvas_count_now reads the snapshot manifest's own canvas_index (the ledger road, the old code verbatim, only for a life saved before the key existed).
++        canvas_count, _road = canvas_count_now(root / "state", fixations)   # M4: the mind's own count (None when there is neither a manifest key nor a ledger: the tick is skipped)
++        if canvas_count is not None:
+             if every_canvases > 0 and canvas_count - last_canvas >= every_canvases:
+                 last_canvas = canvas_count
+                 # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1: the pointer is written atomically too (tmp + os.replace,
+diff --git a/creature/mind.py b/creature/mind.py
+index 7216a51..f44b450 100644
+--- a/creature/mind.py
++++ b/creature/mind.py
+@@ -4062,6 +4062,8 @@ class Mind:
+         staged.append((ledger_tmp, state_dir / "ledger.json"))
+         gen_tmp = state_dir / "SNAPSHOT_tmp.json"
+         gen_tmp.write_text(json.dumps({"t": int(self.org.t), "last_seq": int(self.last_seq or 0),
++                                       # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX (docs/organism/days/PREREG-POLLER-FIX.md §2, option A): the very integer the ledger above carries (the same variable, nothing runs between), in the file renamed LAST and atomically, so the two 5-second pollers (creature/exam.py canvas_count_now) read ~40 bytes instead of parsing the whole ledger
++                                       "canvas_index": ledger["canvas_index"],
+                                        "files": [f.name for _s, f in staged],
+                                        "prints": {f.name: _fingerprint(s) for s, f in staged}}, sort_keys=True))
+         self._keep_prev_generation(state_dir)
+diff --git a/creature/senses/sit.py b/creature/senses/sit.py
+index add9a79..e567fed 100644
+--- a/creature/senses/sit.py
++++ b/creature/senses/sit.py
+@@ -83,18 +83,15 @@ def sense(publish: Callable, stop_event, root: Path, genome_path: Path, every_ca
+     torn_name: Optional[str] = None      # the file the last failed read was of, and how many consecutive polls it has failed (FIX 1)
+     torn_count = 0
+     from genome.machinery import parse_genome
+-    from creature.exam import canvas_count_of   # M4 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400): the ONE canvas unit, shared with voice_loop
++    from creature.exam import canvas_count_now   # M4 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400): the ONE canvas unit, shared with voice_loop (POLLER-FIX: via canvas_count_now, which wraps canvas_count_of)
+     genome = parse_genome(Path(genome_path).read_text())
+     fixations = int(genome.gaze["fixations"]) if genome.gaze else 1
+ 
+     while not stop_event.is_set():
+-        ledger_path = root / "state" / "ledger.json"
+-        if ledger_path.exists() and every_canvases > 0:
+-            try:
+-                ledger = json.loads(ledger_path.read_text())
+-            except (json.JSONDecodeError, OSError):
+-                ledger = {}
+-            canvas_count = canvas_count_of(ledger, fixations)   # M4: the mind's own count when the ledger carries it, else moments // fixations
++        # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX: the ONE read changed. It was `json.loads(state/ledger.json)` + canvas_count_of every poll (only when every > 0);
++        # canvas_count_now reads the snapshot manifest's own canvas_index (the ledger road, the old code verbatim, only for a life saved before the key existed). every <= 0 still never reads.
++        canvas_count, _road = canvas_count_now(root / "state", fixations) if every_canvases > 0 else (None, "none")   # M4: the mind's own count; None = neither manifest key nor ledger (tick skipped)
++        if canvas_count is not None:
+             if canvas_count - last_canvas >= every_canvases:
+                 # edit: Claude (Fable 5.1), 2026-09-23 03:25 +0400 — the boundary is CONSUMED only when a NEW exam file is seen (below); before this
+                 # line advanced `last_canvas` first, so a boundary crossed a few seconds before the voice thread had
