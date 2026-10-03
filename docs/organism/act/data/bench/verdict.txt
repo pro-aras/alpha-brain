@@ -12,4 +12,4 @@ PREREG-ACT-EFFECT verdict — ADMIT: False · VOID: False
   M9: PASS {'what': 'unit test (tests/creature/test_act_effect_toy.py TestBoundaryRuleM9)'}
   C-SCR per-act outcomes (known / excluded / total), summed over the seeds: left 183457/3806/187263; right 183419/3861/187280; forward 165079/3561/168640; pickup 10502/221/10723; drop 8483/174/8657; toggle 8441/167/8608; done 8405/198/8603
   alternatives (printed, never admitted): A-PROP +0.098 vs null, -0.064 vs R-3; A-UCB -0.041 vs null, -0.203 vs R-3; A-RATE +0.094 vs null, -0.068 vs R-3; A-BOTH +0.119 vs null, -0.043 vs R-3; R-WSLS +0.124 vs null, -0.038 vs R-3; R-WALK +0.285 vs null, +0.123 vs R-3 [clears R-3 p95]; A-VAL -0.002 vs null, -0.164 vs R-3; A-SMP +0.013 vs null, -0.149 vs R-3
-verdict exit 1 (1 = not admitted)
+verdict exit 1

@@ -1,0 +1,5 @@
+kind                                                                       forward_dead_time      m2_pass_960     m2_pass_4920          m3_pass         m4a_pass         m4b_pass       m4b_median    forward_share       noop_share
+iid at forward 0.568                                                                 0.0039           0.9867           0.9617           1.0000           0.9967           0.9783           1.0000           0.3122           0.0592
+block bootstrap, block 50 (forward + no-ops from the recorded series)                0.1566           0.7483           0.2150           1.0000           0.9967           0.7083           1.0000           0.2664           0.0608
+block bootstrap, block 100 (forward + no-ops from the recorded series)               0.1629           0.7467           0.1767           1.0000           0.9933           0.6833           1.0000           0.2649           0.0607
+block bootstrap, block 200 (forward + no-ops from the recorded series)               0.1631           0.7283           0.1633           1.0000           0.9867           0.6733           1.0000           0.2646           0.0609

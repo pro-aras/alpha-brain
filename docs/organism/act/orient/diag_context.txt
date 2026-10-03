@@ -1,0 +1,7 @@
+previous (act, effect)     next          n  P(novel)  P(change)  P(reward step)
+('turn', 1)                turn      18459     0.217      1.000          0.0027
+('turn', 1)                forward    9084     0.478      0.658          0.0150
+('forward', 1)             turn       5077     0.752      1.000          0.0173
+('forward', 1)             forward    2484     0.558      0.663          0.0213
+('forward', 0)             turn       3928     0.330      1.000          0.0064
+('forward', 0)             forward    1960     0.000      0.000          0.0000

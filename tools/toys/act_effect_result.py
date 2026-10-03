@@ -22,12 +22,23 @@ def classify(measured: float, bar: float, iid: float, emp: float, n: int) -> str
     if measured >= bar - 1e-12:
         return "passes"
     se = math.sqrt(max(measured * (1.0 - measured), 1e-9) / max(1, n))
+    # edit: Claude (Sonnet 5.5, swarm act), 2026-10-03 12:24 +0400 — a reading more than 2 SE ABOVE the empirical ceiling: that «ceiling» (a block bootstrap that holds forward's dead stretches fixed in forward-outcome
+    # index) is not a ceiling for a chooser whose turns between forward draws re-draw the facing; the cell says the cause is NOT classed by these two instruments (iid above, bootstrap below, the lives between)
+    if measured > emp + 2.0 * se:
+        side = "below" if measured < iid - 1e-12 else "at or above"
+        return (f"reading ABOVE the empirical ceiling ({measured:.3f} > {emp:.3f} + 2 SE {2 * se:.3f}) and {side} the iid ceiling {iid:.3f}: the bootstrap holds forward's dead stretches fixed in forward-outcome index, "
+                f"so it is not a ceiling for a chooser whose turns between forward draws re-draw the facing; arithmetic vs mechanism NOT classed by these two instruments")
     parts: List[str] = []
     if emp < bar - 1e-12:
         parts.append(f"bar above its empirical ceiling ({emp:.3f} < {bar:.2f}; iid ceiling {iid:.3f}): the law's iid arithmetic")
     if measured < emp - 2.0 * se:
         parts.append(f"BELOW the empirical ceiling ({measured:.3f} < {emp:.3f} - 2 SE {2 * se:.3f}): mechanism (the hard screen's feedback trap)")
     return "; ".join(parts) if parts else f"inside the empirical ceiling's reach ({measured:.3f} vs {emp:.3f}, 2 SE {2 * se:.3f}): sampling noise"
+
+
+def _f(x: Optional[float], places: int) -> str:
+    """A figure to a fixed number of places; a missing one is «n/a» (never 0, never a guess)."""
+    return "n/a" if x is None else f"{float(x):.{places}f}"
 
 
 def _row(ceil_rows: Sequence[Dict[str, object]], needle: str) -> Optional[Dict[str, object]]:
@@ -55,7 +66,8 @@ def render(verdict: Dict[str, object], bench: Dict[str, object], lives: Dict[str
     m3 = m["M3"]
     out.append(f"| M3 no-ops (with M1 and M2) | share of lives ≤ 0.25: {m3['le_0.25_share']:.3f}; median no-op share {m3['median']:.3f}; alone {m3['alone']} | ≥ 0.95, jointly | {'PASS' if m3['pass'] else 'FAIL'} |")
     m4 = m["M4"]
-    out.append(f"| M4 learned set | (a) no-ops judged dead ≥ 0.95 in {m4['a_share']} of lives (median {m4['a_median']}); (b) forward live ≥ 0.95 in {m4['b_share']} (median {m4['b_median']}); exact-set median {m4['exact_set_median']}; latency {m4['latency']} | each ≥ 0.90 | {'PASS' if m4['pass'] else 'FAIL'} |")
+    # edit: Claude (Sonnet 5.5, swarm act), 2026-10-03 12:21 +0400 — every M4 figure is printed to a fixed number of places (the first render printed 0.9895833333333333); a missing value prints «n/a», never a guess
+    out.append(f"| M4 learned set | (a) no-ops judged dead ≥ 0.95 in {_f(m4['a_share'], 2)} of lives (median {_f(m4['a_median'], 3)}); (b) forward live ≥ 0.95 in {_f(m4['b_share'], 2)} (median {_f(m4['b_median'], 3)}); exact-set median {_f(m4['exact_set_median'], 4)}; latency {m4['latency']} | each ≥ 0.90 | {'PASS' if m4['pass'] else 'FAIL'} |")
     m5 = m["M5"]["plants"]
     out.append(f"| M5 plants | P-DEAL {m5['P-DEAL']['over_null']:+.4f} over the null, no-op ≥ 0.5 in {m5['P-DEAL']['noop_ge_0.5_share']:.2f} of lives (caught {m5['P-DEAL']['caught']}); K-ARGMAX lock-pass {m5['K-ARGMAX']['pass_960']:.2f} / {m5['K-ARGMAX']['pass_full']:.2f} (caught {m5['K-ARGMAX']['caught']}); P-OLD {m5['P-OLD']['pass_960']:.2f} / {m5['P-OLD']['pass_full']:.2f} (caught {m5['P-OLD']['caught']}) | P-DEAL ≤ null + 0.02; the lock plants ≤ 0.05 | {'PASS' if m['M5']['pass'] else 'FAIL'} |")
     out.append(f"| M6 / M9 unit tests | {m['M6']['what']}; {m['M9']['what']} | green | {'PASS' if m['M6']['pass'] else 'FAIL'} |")

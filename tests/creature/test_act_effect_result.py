@@ -4,6 +4,7 @@
 #   = «inside the empirical ceiling's reach»; a miss below that = «BELOW the empirical ceiling» (mechanism: the hard screen's feedback trap).
 from __future__ import annotations
 
+import re
 import unittest
 
 from tests.creature import test_act_effect_verdict as tv
@@ -31,6 +32,21 @@ class TestClassify(unittest.TestCase):
         c = R.classify(0.30, 0.90, iid=1.0, emp=0.70, n=50)
         self.assertIn("bar above its empirical ceiling", c)
         self.assertIn("BELOW the empirical ceiling", c)
+
+    def test_a_reading_above_the_empirical_ceiling_is_not_classed_by_these_instruments(self) -> None:
+        # edit: Claude (Sonnet 5.5, swarm act), 2026-10-03 12:23 +0400 — the bench's own lives read ABOVE the block-bootstrap «ceilings» (M2 960: 0.92 vs 0.747): the bootstrap holds forward's dead stretches fixed in
+        # forward-outcome index, and a chooser that turns between forward draws re-draws the facing, so the bootstrap is not a ceiling for it; the cell must say so instead of «the law's iid arithmetic»
+        c = R.classify(0.92, 0.95, iid=0.987, emp=0.747, n=50)
+        self.assertIn("ABOVE the empirical ceiling", c)
+        self.assertIn("NOT classed", c)
+        self.assertNotIn("the law's iid arithmetic", c)
+        self.assertNotIn("BELOW the empirical ceiling", c)
+
+    def test_a_reading_above_the_empirical_ceiling_but_inside_two_se_keeps_the_arithmetic_class(self) -> None:
+        # measured 0.78, empirical 0.75, n 50: 2 SE = 0.117, so 0.78 is not ABOVE the ceiling in any sense the lives can resolve
+        c = R.classify(0.78, 0.95, iid=1.0, emp=0.75, n=50)
+        self.assertIn("bar above its empirical ceiling", c)
+        self.assertNotIn("NOT classed", c)
 
     def test_the_gap_is_named(self) -> None:
         # iid 1.00, empirical 0.80: a measured 0.78 against a bar 0.95 is inside the iid-to-empirical gap's arithmetic
@@ -68,6 +84,32 @@ class TestRender(unittest.TestCase):
         md = R.render(verdict, b, lv, ceil, transfer=None, oracle=None, equiv={"pass": True, "steps": 20000, "mismatches": 0})
         self.assertIn("bar above its empirical ceiling", md)
         self.assertIn("BELOW the empirical ceiling", md)
+
+    def test_a_row_whose_reading_is_above_the_empirical_ceiling_says_not_classed(self) -> None:
+        verdict, b, lv, ceil = self._inputs()
+        lv["arms"]["C-SCR"]["summary"]["h4920"]["lock_pass_share"] = 0.48
+        ceil["rows"][1]["m2_pass_4920"] = 0.18
+        verdict = V.verdict(tv.statusquo(), tv.bench(), tv.bench(), lv, {"pass": True, "steps": 20000, "mismatches": 0}, True)
+        md = R.render(verdict, b, lv, ceil, transfer=None, oracle=None, equiv={"pass": True, "steps": 20000, "mismatches": 0})
+        row = [l for l in md.splitlines() if l.startswith("| M2 (4920")][0]
+        self.assertIn("NOT classed", row)
+
+    def test_no_raw_long_float_reaches_the_document(self) -> None:
+        # edit: Claude (Sonnet 5.5, swarm act), 2026-10-03 12:20 +0400 — the first real render printed `exact-set median 0.9895833333333333`: every figure is printed to a fixed number of places
+        verdict, b, lv, ceil = self._inputs()
+        verdict["marks"]["M4"]["exact_set_median"] = 0.9895833333333333
+        verdict["marks"]["M4"]["a_median"] = 0.9895833333333333
+        verdict["marks"]["M4"]["b_median"] = 0.9895833333333333
+        verdict["marks"]["M4"]["a_share"] = 0.7999999999999999
+        verdict["marks"]["M4"]["b_share"] = 0.7999999999999999
+        md = R.render(verdict, b, lv, ceil, transfer=None, oracle=None, equiv={"pass": True, "steps": 20000, "mismatches": 0})
+        self.assertIsNone(re.search(r"\d\.\d{7,}", md), "a raw float with 7+ decimals reached the RESULT document")
+
+    def test_a_missing_exact_set_median_prints_as_not_available(self) -> None:
+        verdict, b, lv, ceil = self._inputs()
+        verdict["marks"]["M4"]["exact_set_median"] = None
+        md = R.render(verdict, b, lv, ceil, transfer=None, oracle=None, equiv={"pass": True, "steps": 20000, "mismatches": 0})
+        self.assertIn("exact-set median n/a", md)
 
     def test_a_shortfall_that_only_the_arithmetic_explains(self) -> None:
         verdict, b, lv, ceil = self._inputs()
