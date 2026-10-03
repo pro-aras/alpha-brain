@@ -6,6 +6,8 @@
 # on the maker canvases (median AND mean), the whole replay and the scene canvases, A1.3 T's maker-only comparison struck and the shared arm read against a dealt-targets null at k 3
 # and k 1, A1.4 G's two clauses replaced (every typed maker word said truly; agreed over ALL of exactly the last 100), A1.5 the discordant items split by phrase class and position.
 # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 11:15 +0400 — found by running it on the real live journal: `--tape` alone serves the splits (the cost needs the two timings files beside it).
+# edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:23 +0400 — AMENDMENT 4 §A4.5: the first full bench reading flipped ONE bar of the grade between the arms (TRUTH-NEED PASS → FAIL) and printed nothing about it, because
+# «the six tests' verdicts» name seven bars and TRUTH-NEED is not one: `bar_flips` now reads EVERY bar of the grade in both arms and lists the ones whose pass flag differs (a reading: no exit code moves).
 """tools/brain/hears_read.py — what the bench of PREREG-HEARS-2 (§2 + AMENDMENT 1) reads, from the two arms' grades, timings, journals and launch records.
 
     PYTHONPATH=<repo> python3 -B tools/brain/hears_read.py --off <grade dir> --on <grade dir> --out <dir>
@@ -18,7 +20,8 @@
 Marks (the law's names):
   P   the scene words, paired item by item on the fresh and the s1b1 sittings and pooled: M1 (the graded population, two or three things), M3, M6 over the items COVERED and
       GRADABLE in BOTH arms (grade_life.pair()'s own rule), with the discordant counts, the smallest gap the n can pass (10 / n, #245 (5)) and the one-sided exact sign tests; the
-      rates the grade holds only as rates (M2a, M2b, false refusal) beside their own 10 / n; the six tests' verdicts OFF → ON; the discordant items SPLIT by phrase class (a shape
+      rates the grade holds only as rates (M2a, M2b, false refusal) beside their own 10 / n; the six tests' verdicts OFF → ON and EVERY bar of the grade whose pass flag differs (A4.5);
+      the discordant items SPLIT by phrase class (a shape
       word only / a colour or size word / «white») and by position in the sitting (thirds; A1.5). A READING: no bar.
   T   TRANSFER (A1.3): the SHARED words' first k maker meetings (k = 3 and k = 1) read as agreed / ALL turns against a dealt-targets null (the maker's words permuted among the same
       canvases, the says fixed); the maker-only arm is struck as a comparison and read as an over-extension table. A reading with a stated line.
@@ -201,6 +204,51 @@ def verdicts(off, on) -> Dict[str, Dict[str, object]]:
                 d[side + "_detail"] = full
         out[name] = d
     return out
+
+
+def _bars_of(g) -> Optional[Dict[str, Dict[str, object]]]:
+    b = g.get("bars")
+    if not isinstance(b, dict):
+        return None
+    return {k: v for k, v in b.items() if isinstance(v, dict) and "pass" in v}
+
+
+def bar_flips(off, on) -> Dict[str, object]:
+    """EVERY bar of the grade (`grade["bars"]`, the scored sitting's), read in both arms, and the ones whose pass flag DIFFERS. «The six tests' verdicts» name seven bars; the grade holds fourteen, and the bench's first
+    reading flipped TRUTH-NEED (SPEAK2) between the arms with no line saying so. A pass of None (a mark that is a reading, not a bar) is not a verdict, so None in both arms is no flip and None → a verdict is one. A bar
+    present in one arm only, or a grade without bars, makes the reading NOT COMPARABLE and says which; it is never a clean «none». The smallest passing gap is 10 / the smaller n (the cautious one)."""
+    bo, bn = _bars_of(off), _bars_of(on)
+    if bo is None or bn is None:
+        missing = " and ".join(name for name, b in (("OFF", bo), ("ON", bn)) if b is None)
+        return {"comparable": False, "why": f"the grade of {missing} carries no bars", "flips": [], "n_off": len(bo or {}), "n_on": len(bn or {}), "only_off": [], "only_on": []}
+    only_off, only_on = sorted(set(bo) - set(bn)), sorted(set(bn) - set(bo))
+    flips = []
+    for k in sorted(set(bo) & set(bn)):
+        a, b = bo[k], bn[k]
+        if a.get("pass") != b.get("pass"):
+            ns = [n for n in (a.get("n"), b.get("n")) if isinstance(n, (int, float)) and n > 0]
+            flips.append({"name": k, "off_pass": a.get("pass"), "on_pass": b.get("pass"), "off_value": a.get("value"), "on_value": b.get("value"),
+                          "off_n": a.get("n"), "on_n": b.get("n"), "smallest_passing_gap": (10.0 / min(ns) if ns else None)})
+    return {"comparable": not only_off and not only_on, "flips": flips, "n_off": len(bo), "n_on": len(bn), "only_off": only_off, "only_on": only_on}
+
+
+def bar_flips_lines(f: Dict[str, object]) -> List[str]:
+    if f.get("why"):
+        return [f"  P · every bar of the grade, OFF → ON: NOT READ ({f['why']})"]
+    head = (f"  P · every bar of the grade, OFF → ON ({f['n_off']} read in OFF, {f['n_on']} in ON; a pass of None is a reading, not a bar), "
+            f"whose pass flag DIFFERS: ")
+    if f["flips"]:
+        parts = []
+        for x in f["flips"]:
+            gap = f"10 / {int(min(n for n in (x['off_n'], x['on_n']) if isinstance(n, (int, float)) and n > 0))} = {x['smallest_passing_gap']:.3f}" if x["smallest_passing_gap"] is not None else "10 / n not computable"
+            parts.append(f"{x['name']} {_fmt_verdict(x['off_pass'])}→{_fmt_verdict(x['on_pass'])} (OFF {_f(x['off_value'])} n {_f(x['off_n'])} · ON {_f(x['on_value'])} n {_f(x['on_n'])} "
+                         f"· smallest passing gap {gap} on the smaller n)")
+        head += " · ".join(parts)
+    else:
+        head += "none"
+    if not f["comparable"]:
+        head += f" · NOT COMPARABLE: bars only in OFF {f['only_off']} / only in ON {f['only_on']}"
+    return [head]
 
 
 def p_control(off, on) -> Dict[str, object]:
@@ -758,6 +806,7 @@ def report(o: Dict[str, object]) -> List[str]:
             L.append(f"    {tset:6s} {name:13s} OFF {_f(d['off'])} (n {_f(d['n_off'])}) · ON {_f(d['on'])} (n {_f(d['n_on'])}) · gap {_sg(d['gap'])} · "
                      f"smallest passing gap {_f(d['smallest_passing_gap'])}")
     L.append("  P · the six tests' verdicts, OFF → ON: " + " · ".join(f"{k} {v['off']}→{v['on']}{' (CHANGED)' if v['changed'] else ''}" for k, v in o["verdicts"].items()))
+    L.extend(bar_flips_lines(o["bar_flips"]))
     sp = o.get("splits")
     if sp:
         L.append("  P · the discordant items split (A1.5; pooled over both sittings; each cell: paired n, ON-right / OFF-right):")
@@ -879,7 +928,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     off, on = load_grade(a.off), load_grade(a.on)
     plant = load_grade(a.on_plant) if a.on_plant else None
     o: Dict[str, object] = {"labels": {"off": off.get("label"), "on": on.get("label")}, "pairs": pairs(off, on), "aggregates": aggregates(off, on),
-                            "verdicts": verdicts(off, on), "X": x_mark(off, on, plant)}
+                            "verdicts": verdicts(off, on), "bar_flips": bar_flips(off, on), "X": x_mark(off, on, plant)}
     o["controls"] = {"P": p_control(off, on), "I2": None}
     if a.tape:
         o["splits"] = splits(off, on, tape_index(a.tape))

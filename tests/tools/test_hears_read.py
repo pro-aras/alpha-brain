@@ -433,6 +433,71 @@ class AggregatesAndVerdicts(unittest.TestCase):
         self.assertEqual(sorted(v), ["1", "2a", "2b", "3", "4a", "5", "6"])
 
 
+# edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:22 +0400 — AMENDMENT 4 §A4.5: the bench's first full reading flipped ONE bar of the grade between the arms (TRUTH-NEED, SPEAK2: OFF 0.561 n 41 PASS → ON 0.389 n 36 FAIL) and the reader said
+# nothing, because «the six tests' verdicts» are seven named bars and TRUTH-NEED is not one of them. `bar_flips` reads EVERY bar of the grade in both arms and lists the ones whose pass flag differs, with the count read beside the «none».
+class BarFlips(unittest.TestCase):
+    def test_no_flip_reads_none_and_counts_the_bars_it_read(self) -> None:
+        f = H.bar_flips(make_grade("off"), make_grade("on"))
+        self.assertEqual(f["flips"], [])
+        self.assertEqual((f["n_off"], f["n_on"]), (5, 5))                                   # the presence count beside the «none»
+        self.assertTrue(f["comparable"])
+
+    def test_a_flipped_bar_outside_the_six_tests_is_listed_with_both_values_and_the_smaller_n(self) -> None:
+        off = make_grade("off", bar_pass={"TRUTH-NEED": True})
+        on = make_grade("on", bar_pass={"TRUTH-NEED": False})
+        off["bars"]["TRUTH-NEED"].update({"value": 0.561, "n": 41})
+        on["bars"]["TRUTH-NEED"].update({"value": 0.389, "n": 36})
+        f = H.bar_flips(off, on)
+        self.assertEqual([x["name"] for x in f["flips"]], ["TRUTH-NEED"])
+        x = f["flips"][0]
+        self.assertEqual((x["off_pass"], x["on_pass"], x["off_n"], x["on_n"]), (True, False, 41, 36))
+        self.assertAlmostEqual(x["smallest_passing_gap"], 10 / 36)                           # 10 / n over the SMALLER n, the cautious one
+        self.assertEqual((f["n_off"], f["n_on"]), (6, 6))
+        self.assertNotIn("TRUTH-NEED", H.verdicts(off, on))                                  # the six tests never carried it: that is why the reader had been silent
+
+    def test_every_one_of_the_seven_named_bars_that_flips_is_listed_too(self) -> None:
+        f = H.bar_flips(make_grade("off"), make_grade("on", bar_pass={"M1": False, "M6": False}))
+        self.assertEqual([x["name"] for x in f["flips"]], ["M1", "M6"])
+
+    def test_a_pass_of_none_in_both_arms_is_not_a_flip_and_none_to_a_verdict_is(self) -> None:
+        off, on = make_grade("off", bar_pass={"DECLINE": None}), make_grade("on", bar_pass={"DECLINE": None})
+        self.assertEqual(H.bar_flips(off, on)["flips"], [])
+        f = H.bar_flips(off, make_grade("on", bar_pass={"DECLINE": True}))
+        self.assertEqual([(x["name"], x["off_pass"], x["on_pass"]) for x in f["flips"]], [("DECLINE", None, True)])
+
+    def test_an_entry_of_bars_that_is_not_a_bar_is_not_counted_and_is_no_difference(self) -> None:
+        # the real grade's bars hold «refute», a dict with no pass flag: it is not one of the fourteen bars
+        off, on = make_grade("off"), make_grade("on")
+        off["bars"]["refute"], on["bars"]["refute"] = {"note": "a"}, {"note": "b"}
+        f = H.bar_flips(off, on)
+        self.assertEqual((f["flips"], f["n_off"], f["n_on"], f["comparable"]), ([], 5, 5, True))
+
+    def test_a_bar_present_in_one_arm_only_is_not_comparable_and_is_named(self) -> None:
+        f = H.bar_flips(make_grade("off", bar_pass={"ORDER": True}), make_grade("on"))
+        self.assertFalse(f["comparable"])
+        self.assertEqual((f["only_off"], f["only_on"]), (["ORDER"], []))
+
+    def test_a_grade_with_no_bars_is_not_read_and_says_why_it_is_never_a_none(self) -> None:
+        on = make_grade("on")
+        on["bars"] = None                                                                     # the grader writes bars: None when there is no scored record
+        f = H.bar_flips(make_grade("off"), on)
+        self.assertFalse(f["comparable"])
+        self.assertIn("ON", f["why"])
+        self.assertEqual(f["flips"], [])
+        self.assertIn("NOT READ", "\n".join(H.bar_flips_lines(f)))
+
+    def test_the_lines_say_none_beside_the_count_and_the_flip_with_both_ns(self) -> None:
+        none_lines = "\n".join(H.bar_flips_lines(H.bar_flips(make_grade("off"), make_grade("on"))))
+        self.assertIn("none", none_lines)
+        self.assertIn("5 read in OFF", none_lines)
+        off, on = make_grade("off", bar_pass={"TRUTH-NEED": True}), make_grade("on", bar_pass={"TRUTH-NEED": False})
+        off["bars"]["TRUTH-NEED"].update({"value": 0.561, "n": 41})
+        on["bars"]["TRUTH-NEED"].update({"value": 0.389, "n": 36})
+        txt = "\n".join(H.bar_flips_lines(H.bar_flips(off, on)))
+        for needle in ("TRUTH-NEED PASS→FAIL", "OFF 0.561 n 41", "ON 0.389 n 36", "10 / 36 = 0.278"):
+            self.assertIn(needle, txt)
+
+
 # ------------------------------------------------------------------------------------------------ X: EXIST by any hand, and the plant
 class ExistByAnyHand(Tmp):
     def _m4a(self, exist=1.0, n=10, by_world=None):
@@ -956,6 +1021,22 @@ class EndToEnd(Tmp):
         d, argv = self._bench(on_cpu=CHEAP_MAKER)
         self.assertEqual(H.main(argv), 0)
         self.assertEqual(json.loads((d / "out" / "hears.json").read_text())["bars"]["C"], "PASS")
+
+    def test_a_flipped_grade_bar_is_printed_and_written_and_changes_no_exit_code(self) -> None:
+        # P is a reading, no bar: a TRUTH-NEED flip must be SEEN in hears.txt and hears.json and must not move the exit (AMENDMENT 4 §A4.5)
+        d, argv = self._bench(on_cpu=CHEAP_MAKER)
+        off_g = make_grade("off", bar_pass={"TRUTH-NEED": True})
+        on_g = make_grade("on", bar_pass={"TRUTH-NEED": False})
+        off_g["bars"]["TRUTH-NEED"].update({"value": 0.561, "n": 41})
+        on_g["bars"]["TRUTH-NEED"].update({"value": 0.389, "n": 36})
+        write_grade(d / "off", off_g)
+        write_grade(d / "on", on_g)
+        self.assertEqual(H.main(argv), 0)
+        o = json.loads((d / "out" / "hears.json").read_text())
+        self.assertEqual([x["name"] for x in o["bar_flips"]["flips"]], ["TRUTH-NEED"])
+        txt = (d / "out" / "hears.txt").read_text()
+        self.assertIn("TRUTH-NEED PASS→FAIL", txt)
+        self.assertIn("whose pass flag DIFFERS", txt)
 
     def test_arms_that_barely_overlap_void_c_and_fail_the_exit_however_good_the_numbers(self) -> None:
         d, argv = self._bench(on_cpu=CHEAP_MAKER, arm_on=(1500.0, 3600.0))
