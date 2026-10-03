@@ -874,6 +874,24 @@ def parse_genome(text: str) -> Genome:
                     raise GenomeError(f"DRIVE: cannot read {a!r} (PREREG-BRAIN-DRIVES §2.1: DRIVE brain turn before hearing; "
                                       f"says 0|1; asks 0|1)")
                 g["declared"]["DRIVE"] = {"says": int(m.group(1)), "asks": int(m.group(2))}
+            # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:26 +0400 — PREREG-INNER-1 §2 + AMENDMENT 1 A4 (research-1003 @ 9c589b2; the signed
+            # text sha256 857e07b2…faa82): the gene INNER — THE INNER TURN. ONE form; every value READ (creature/mind.py:_inner_turn):
+            # the trigger is the SENSE body row whose reading.backlog is 0 (a tape fact; one turn per such row, none before the first
+            # calibration), `walk lift` is the ONLY walk the genome accepts (the greedy rule is a test parameter of the walk function,
+            # never a genome value), `inhibit <n>` = the last n topics excluded from the next draw, `restart <m>` = a chain of m thoughts
+            # that begins at the SELF's least reliable word. Absent: no row, no ledger key, no STATUS key. Refused by name beside no
+            # BRAIN line or no SENSE body line where the whole genome is known (Mind.__init__). This file is PINNED (brain/scene/cache.py's
+            # WORLD_CODE): the branch's price is the one redraw window the integrator runs for ACT, SLEEP and INNER together.
+            elif gene == "INNER":
+                m = re.fullmatch(r"every body row when idle; walk (lift); inhibit (\d+); restart (\d+)", a)
+                if not m:
+                    raise GenomeError(f"INNER: cannot read {a!r} (PREREG-INNER-1 §2: INNER every body row when idle; walk lift; "
+                                      f"inhibit <n>; restart <m>)")
+                if int(m.group(3)) < 1:
+                    raise GenomeError(f"INNER: cannot read {a!r}: restart must be >= 1 (a chain of at least one thought) "
+                                      f"(PREREG-INNER-1 §2: INNER every body row when idle; walk lift; inhibit <n>; restart <m>)")
+                g["declared"]["INNER"] = {"trigger": "body idle", "walk": m.group(1), "inhibit": int(m.group(2)),
+                                          "restart": int(m.group(3))}
             else:
                 raise GenomeError(f"unknown gene {gene!r} ({line!r}) — the machinery does not know it; the organism does not start")
         except (IndexError, ValueError) as e:

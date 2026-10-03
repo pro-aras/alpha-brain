@@ -284,6 +284,13 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
                  "canvas the brain hears that is no ask canvas: genome/brain.py:Brain.turn(says, asks) BEFORE the brain learns, "
                  "Brain.surprise against the instant's words, ONE journal row kind brain act turn) + Mind.brain_status / "
                  "Mind.snapshot / Mind.resume (the turn counts)",
+        # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:26 +0400 — PREREG-INNER-1 §2 (research-1003 @ 9c589b2; the signed text
+        # sha256 857e07b2…faa82): the gene INNER — the inner turn, read-only, on a SENSE body row whose reading.backlog is 0.
+        "INNER": "creature/mind.py:Mind.__init__ (refused beside no BRAIN line or no SENSE body line) + Mind.consume (a body row) -> "
+                 "Mind._inner_turn (eligibility by the row's own reading; the chain: the SELF's least reliable word, then a seeded "
+                 "random walk on the WEB's lift with inhibition of return; one remembered scene drawn among those that carried the "
+                 "topic; genome/brain.py:Brain.turn_remembered, read-only; Brain.surprise against the words heard then; ONE journal "
+                 "row kind brain act inner) + Mind.brain_status / Mind.snapshot / Mind.resume (the chain state, ledger['inner'])",
     },
 }
 
