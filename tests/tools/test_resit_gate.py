@@ -74,13 +74,13 @@ def write_snapshot(prev: Path, last_seq: int = 9000, t: int = 5) -> None:
 class StubLife:
     """A stub LIFE root on disk plus a stub grader checkout, an OUT dir, and the reference grade (the stub grader's own, on the life's journal)."""
 
-    def __init__(self, base: Path, *, epoch_seq: int = None, extra_rows=(), state_calibrated_at: int = 10, tape_spec=None):
+    def __init__(self, base: Path, *, epoch_seq: int = None, extra_rows=(), state_calibrated_at: int = 10, tape_spec=None, genome: str = GENOME):
         self.base = base
         self.root = base / "life"
         self.root.mkdir()
         self.code = self.root / "code"
         build_stub(self.code)
-        (self.root / "GENOME.genome").write_text(GENOME)
+        (self.root / "GENOME.genome").write_text(genome)
         write_tape(self.root, tape_spec or sitting_spec(), seq0=1000)          # ear 1001, eye 1002 (not a sitting), begin-fresh 1003, … (the first ask is 1003)
         self.prev = write_state(self.root / "state" / "prev", v=(1.0, 2.0, 3.0), n_learned=10, calibrated_at=state_calibrated_at)
         write_snapshot(self.prev)

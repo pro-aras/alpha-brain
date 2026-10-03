@@ -51,6 +51,10 @@ SIZE_WORDS = ("big", "small")
 CLASSES = ("shape_only", "colour_or_size", "white")
 CLASS_MARKS = ("M1", "M2a", "M3")                 # the marks the series splits by phrase class (law §2)
 READ_ONLY_ACTS = ("turn", "refused")              # R9 / AM1 (b): every other act of a `kind: "brain"` row moves the brain or may — the set FAILS CLOSED
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 20:41 +0400 — the verifier's finding on c887b50 (law erratum E1): `begin` is EARLY by construction, so R9's «n_early = 0 reads UNTESTED» could never fire on a real set. UNTESTED reads
+# n_early_tested: the EARLY items OTHER than the structural forms below (an equal acknowledgement tests nothing). ONE definition and ONE wording, used by classify_early_late and r9_cross_check.
+STRUCTURAL_FORMS = ("begin", "end")
+UNTESTED_NOTE = "R9 UNTESTED for this set (no tested EARLY item): its begin state is verified only by R10c"
 UNDERPOWERED_N = 30
 VERDICT_COPY_LEARNED = 8640                       # HEARS-2 A2.2: one day of maker-only feed
 EYE_LINE_PREFIXES = ("RETINA", "GAZE", "SENSE.colour", "BRAIN")
@@ -297,16 +301,15 @@ def verify_prints(dest, prints: Mapping[str, Sequence[int]], names: Sequence[str
             raise Refused(f"{n}: mtime_ns {st.st_mtime_ns} is not the manifest's {mt}")
 
 
-def copy_state_prev(root, dest, *, retries: int = 3, sleep_s: float = 20.0, sleeper: Callable[[float], None] = time.sleep,
-                    after_copy: Optional[Callable[[], None]] = None) -> Dict[str, object]:
-    """Copy <root>/state/prev/{brain.json, brain.npz} (the last COMPLETE snapshot generation, hard links, replaced at every snapshot) into `dest` and
-    CHECK the copies against prev/SNAPSHOT.json's prints. A generation replaced during the copy is retried (`retries` tries, `sleep_s` apart, no sleep
-    after the last), then REFUSED by name. No state/prev: Skipped. The live root is only read."""
-    prev = Path(root) / "state" / "prev"
+def copy_state_dir(prev, dest, *, retries: int = 3, sleep_s: float = 20.0, sleeper: Callable[[float], None] = time.sleep,
+                   after_copy: Optional[Callable[[], None]] = None, label: str = "") -> Dict[str, object]:
+    """copy_state_prev's logic on any directory carrying SNAPSHOT.json + brain.json + brain.npz (a live life's state/prev, or the seat's read-only copy of it): the files are copied, their
+    (size, mtime_ns) prints checked against SNAPSHOT.json, a generation replaced during the copy retried then REFUSED."""
+    prev = Path(prev)
     snapf = prev / "SNAPSHOT.json"
     names = ("brain.json", "brain.npz")
     if not snapf.exists() or not all((prev / n).exists() for n in names):
-        raise Skipped(f"no usable state/prev under {root} (SNAPSHOT.json and {list(names)} must all exist)")
+        raise Skipped(f"no usable state/prev under {label or prev} (SNAPSHOT.json and {list(names)} must all exist)")
     dest = Path(dest)
     dest.mkdir(parents=True, exist_ok=True)
     last: Optional[Exception] = None
@@ -330,8 +333,16 @@ def copy_state_prev(root, dest, *, retries: int = 3, sleep_s: float = 20.0, slee
     raise Refused(f"state/prev could not be copied whole in {retries} tries ({last})")
 
 
+def copy_state_prev(root, dest, *, retries: int = 3, sleep_s: float = 20.0, sleeper: Callable[[float], None] = time.sleep,
+                    after_copy: Optional[Callable[[], None]] = None) -> Dict[str, object]:
+    """Copy <root>/state/prev/{brain.json, brain.npz} (the last COMPLETE snapshot generation, hard links, replaced at every snapshot) into `dest` and
+    CHECK the copies against prev/SNAPSHOT.json's prints. A generation replaced during the copy is retried (`retries` tries, `sleep_s` apart, no sleep
+    after the last), then REFUSED by name. No state/prev: Skipped. The live root is only read."""
+    return copy_state_dir(Path(root) / "state" / "prev", dest, retries=retries, sleep_s=sleep_s, sleeper=sleeper, after_copy=after_copy, label=str(root))
+
+
 # ================================================================================================ items: the tape's asks and canvases (law §1.3)
-def scan_items(root, tape_decl: Optional[str]) -> Dict[str, object]:
+def scan_items(root, tape_decl: Optional[str], verify_canvas_bytes: bool = False) -> Dict[str, object]:
     """Read a life's tape (read-only, plain JSON) for the sittings: every `ask` row (its payload, set, item, mark, phrase and class) and every sitting
     canvas (an eye row of kind `sitting`). The digests carry CONTENT only — payload bytes, moments, canvas shas — never a seq, so the same seed's
     sittings on two lives hash alike."""
@@ -376,6 +387,10 @@ def scan_items(root, tape_decl: Optional[str]) -> Dict[str, object]:
                     if form == "end":
                         cur = None
                 elif sense == "eye" and meta.get("kind") == "sitting":
+                    if verify_canvas_bytes:       # v4 R15: the canvas digest alone trusts the row's `sha` field, while the glance is computed from the PNG
+                        got = sha256_file(tape / r["payload"])
+                        if got != r.get("sha"):
+                            raise Refused(f"tape eye row seq {r['seq']}: its payload {r['payload']} hashes to sha {got[:12]}…, not the row's {str(r.get('sha'))[:12]}…")
                     canvases.append({"seq": int(r["seq"]), "moment": meta.get("moment"), "sha": r.get("sha")})
                     ch.update(str(meta.get("moment")).encode("utf-8") + b"\0" + str(r.get("sha")).encode("utf-8") + b"\n")
     return {"asks": asks, "canvases": canvases, "sets": sets, "n_asks": len(asks), "n_canvases": len(canvases),
@@ -455,12 +470,13 @@ def answering_seq(row: Mapping[str, object]) -> int:
 
 def classify_early_late(js: Mapping[str, object], begin_seq_by_set: Mapping[str, int]) -> Dict[str, object]:
     """R9 (AM1 a–c): an item is EARLY iff NO `kind: "brain"` row whose act is NOT in {turn, refused} has begin_seq < seq < answering_seq; else LATE.
-    Fail-closed: any other act (learn, calibrate, a future sleep rehearsal, an unknown one) makes it LATE. n_early is per set; 0 reads UNTESTED."""
+    Fail-closed: any other act (learn, calibrate, a future sleep rehearsal, an unknown one) makes it LATE. n_early (every EARLY item) and n_early_tested (those other than the structural forms begin
+    and end) are both counted per set; a set with n_early_tested = 0 reads UNTESTED (erratum E1: `begin` is EARLY by construction, so «n_early = 0» alone could never fire)."""
     moving = sorted(s for s, a in js["brain_rows"] if a not in READ_ONLY_ACTS)
     sets = sorted(begin_seq_by_set.items(), key=lambda kv: kv[1])
     begins = [b for _, b in sets]
     by_ask: Dict[int, str] = {}
-    per_set: Dict[str, Dict[str, object]] = {s: {"n_early": 0, "n_late": 0} for s, _ in sets}
+    per_set: Dict[str, Dict[str, object]] = {s: {"n_early": 0, "n_late": 0, "n_early_tested": 0} for s, _ in sets}
     for seq, group in js["answers"].items():
         i = bisect.bisect_right(begins, int(seq)) - 1
         if i < 0:
@@ -471,8 +487,11 @@ def classify_early_late(js: Mapping[str, object], begin_seq_by_set: Mapping[str,
         early = not (lo < hi)
         by_ask[int(seq)] = "EARLY" if early else "LATE"
         per_set[setname]["n_early" if early else "n_late"] += 1
+        if early and row.get("form") not in STRUCTURAL_FORMS:
+            per_set[setname]["n_early_tested"] += 1
     for s, d in per_set.items():
-        d["note"] = "R9 UNTESTED for this set (n_early = 0): its begin state is verified only by R10c" if d["n_early"] == 0 else ""
+        d["untested"] = d["n_early_tested"] == 0
+        d["note"] = UNTESTED_NOTE if d["untested"] else ""
     return {"by_ask_seq": by_ask, "by_set": per_set}
 
 
@@ -591,7 +610,7 @@ def append_series(out_dir, row: Mapping[str, object]) -> None:
     for r in rows:
         lines.append("| {} | {} | {} | {} | {} | {} | {} |".format(
             r.get("stamp"), r.get("kind"), (r.get("state") or {}).get("n_learned", ""), r.get("post_origin_learned", ""), r.get("eye_changed", ""),
-            r.get("verdict_copy", r.get("verdict_copy_note", "")), r.get("refused") or r.get("skipped") or ""))
+            r.get("verdict_copy", r.get("verdict_copy_note", "")), r.get("refused") or r.get("skipped") or r.get("r9_reading") or ""))        # an origin row says what R9 showed (law R9: «the series row says so»)
     atomic_write(out / "RESIT.md", "\n".join(lines) + "\n")
 
 
@@ -747,6 +766,9 @@ def cmd_answer(spec_path: str) -> int:
         except Exception as e:
             raise Refused(f"state {entry['dir']}: Brain.load refused it ({type(e).__name__}: {e})")
         h_load = b.state_hash()
+        exp = entry.get("expect_state_hash")           # R4 (d): the rebuild's sidecar says what the state's hash must be; a tampered ORIGIN.json (or another state) is refused by name
+        if exp is not None and h_load != exp:
+            raise Refused(f"R4 d: the loaded state's hash {h_load[:12]}… is not the sidecar's state_hash {str(exp)[:12]}… — a tampered ORIGIN.json or another state")
         # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 16:54 +0400 — R3's PLANT: the COPY's word map nudged in memory, V += eps * std(V) * u (u seeded standard normal; scale-free), the state
         # hash ASSERTED to move (a plant that changes nothing is refused, #247 (5)); the files on disk are never touched.
         nudge = spec.get("nudge")
@@ -1281,6 +1303,9 @@ def parse_run_args(argv: Sequence[str]) -> argparse.Namespace:
     ap.add_argument("--cpu-cap-s", type=int, help="override R7's cap (tests)")
     ap.add_argument("--m2a-rows", action="store_true", help="also take the per-item M2a rows from the pinned grader's own functions")
     ap.add_argument("--copy-retry-sleep-s", type=float, default=20.0)
+    ap.add_argument("--state", action="append", default=[], help="origin mode: [SET=]DIR — a rebuilt state (brain.json + brain.npz + ORIGIN.json + GENOME.in-force.genome) per sitting set, or the seat's copy of state/prev")
+    ap.add_argument("--origin-kind", choices=("rebuilt", "fallback_copy"), default="rebuilt")
+    ap.add_argument("--reason", help="a fallback origin needs the seat's words, recorded verbatim")
     return ap.parse_args(list(argv))
 
 
@@ -1324,7 +1349,9 @@ def cmd_run(argv: Sequence[str]) -> int:
         return run_gate(a, flags, root, items_root, code)
     if a.mode == "daily":
         return run_daily(a, flags, root, items_root, code)
-    raise ResitError(f"refused: --mode {a.mode} is not built yet (the law builds the gate first, then daily; origin follows the signed v4)")
+    if a.mode == "origin":
+        return run_origin(a, flags, root, items_root, code)
+    raise ResitError(f"refused: --mode {a.mode} is not built")
 
 
 def daily_refusal_row(a: argparse.Namespace, reason: str) -> int:
@@ -1464,6 +1491,9 @@ def run_daily(a: argparse.Namespace, flags: Mapping[str, object], root: Path, it
         row["vs_origin"], row["vs_origin_note"] = pair["vs_origin"], pair["note"]
         if origin is not None and eye["eye_changed"]:
             row["vs_origin_label"] = "EYE-CHANGED reading (an anomaly, AM2): the pairing is printed only as a reading; no verdict copy is read through it"
+        if origin is not None and origin.get("origin_kind") == "fallback_copy":      # law section 1.1 S3: every row paired against a fallback prints its label
+            row["vs_origin_fallback_label"] = FALLBACK_LABEL
+            row["vs_origin_fallback_reason"] = origin.get("reason")
         row["post_origin_learned"] = (post_origin_learned(int(row["state"]["n_learned"]), int(origin["origin_n_learned_fresh_begin"])) if origin else None)
         row["restarts_between"] = (restarts_info(ev["starts"], int(origin["begin_seq_fresh"]), int(st["last_seq"])) if origin else None)
         row["journal_events"] = {"epochs": len(ev["epochs"]), "start_rows": len(ev["starts"]), "torn_lines": ev["torn_lines"], "lines_read": ev["lines_read"]}
@@ -1659,6 +1689,566 @@ def run_gate(a: argparse.Namespace, flags: Mapping[str, object], root: Path, ite
         short["r1a"] = {k: row["r1a"][k] for k in ("n_resit", "n_equal", "n_diff", "n_missing_life_row")}
         short["r1b"] = {k: row["r1b"].get(k) for k in ("equal", "n_leaves")}
     print(json.dumps(short, default=str))
+    return rc
+
+
+# ================================================================================================ Part 5 — the ORIGIN's source copy and ITEMS-MATCH (law v4 §1.6, R15, R16)
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 18:19 +0400 — the SOURCE COPY of a live life's tape (complete lines only, cut after the last sitting's end ask, the payloads the grader reads, truth whole, journal,
+# genomes, a MANIFEST whose sha256 goes into the row) and ITEMS-MATCH on that copy. Standard library only; the life's files are only read.
+def sitting_sets_of(genome_text: str) -> List[str]:
+    """The set names of the `WORLD scene … sitting <names>; …` line (e.g. ['fresh', 's1b1'])."""
+    for line in genome_text.splitlines():
+        body = line.split("#", 1)[0].strip()
+        w = body.split()
+        if len(w) >= 2 and w[0] == "WORLD" and w[1] == "scene":
+            for seg in body.split(";"):
+                sw = seg.split()
+                if "sitting" in sw:
+                    return sw[sw.index("sitting") + 1:]
+    return []
+
+
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 20:29 +0400 — `dax_index_of` raised a raw FileNotFoundError (an ERROR row, exit 2 with status ERROR) when the pinned grader checkout held no brain/scene/world.py; a missing
+# pinned input is a NAMED refusal (R4, #230). The common failure of 24 of the 26 origin tests was exactly this read on a stub grader that had no such file (the stub now has one; TestDaxIndex pins the function).
+def dax_index_of(grader_code) -> int:
+    """The scene index of the one «dax» meeting, read from the PINNED grader checkout's brain/scene/world.py (`DAX_SCENE = 2700` is 1-based, so the index is 2699). Refused by name when the file is absent or unreadable
+    or holds no DAX_SCENE line."""
+    path = Path(grader_code) / "brain" / "scene" / "world.py"
+    try:
+        text = path.read_text()
+    except OSError as e:
+        raise Refused(f"the pinned grader checkout {grader_code} has no readable {path} ({type(e).__name__}): the grader's own look at the dax canvas cannot be provisioned") from e
+    m = re.search(r"^DAX_SCENE\s*=\s*(\d+)", text, re.M)
+    if not m:
+        raise Refused(f"{grader_code}/brain/scene/world.py has no DAX_SCENE line: the grader's own look at the dax canvas cannot be provisioned")
+    return int(m.group(1)) - 1
+
+
+def items_match(scan: Mapping[str, object], pin: Mapping[str, object], world_line_sha: str) -> None:
+    """R15 (ITEMS-MATCH): the life's own sittings, scanned on the SOURCE COPY, equal the pinned items — n_asks, n_canvases, ask_digest, canvas_digest and the WORLD scene line. A difference REFUSES
+    by name (the series would not be about the life's sittings). The digests carry content only (moment, payload bytes, canvas sha), never a seq."""
+    got = {"n_asks": scan["n_asks"], "n_canvases": scan["n_canvases"], "ask_digest": scan["ask_digest"], "canvas_digest": scan["canvas_digest"], "world_scene_line_sha": world_line_sha}
+    for field, v in got.items():
+        if pin.get(field) != v:
+            raise Refused(f"ITEMS-MATCH: {field} of the life's own sittings is {v!r}, the pinned items hold {pin.get(field)!r} — the series would not be about the pinned sittings")
+
+
+def _manifest_text(dest: Path) -> Tuple[str, int, int]:
+    lines: List[str] = []
+    total = 0
+    for p in sorted((q for q in dest.rglob("*") if q.is_file() and q.name != "MANIFEST"), key=lambda q: str(q.relative_to(dest))):
+        sz = p.stat().st_size
+        total += sz
+        lines.append(f"{p.relative_to(dest)} {sz} {sha256_file(p)}")
+    return "\n".join(lines) + "\n", len(lines), total
+
+
+def build_source_copy(root, dest, *, dax_index: int) -> Dict[str, object]:
+    """v4 §1.6. Builds `dest` from the life at `root` with read-only opens: (i) tape/*.jsonl, complete lines only, cut after the LAST sitting set's `end` ask; (ii) the payload files named by the
+    kept ask rows, the sitting eye rows and the dax training eye row (copied, never symlinked); (iii) truth/scene whole; (iv) journal/*.jsonl, complete lines only; (v) GENOME.genome and every
+    GENOME.v<n>.genome; then MANIFEST (sorted `<path> <size> <sha256>`) and `source_copy_sha256` = the sha256 of its text. A sitting that is not complete on the tape is Skipped, with nothing written."""
+    t0 = time.time()
+    root, dest = Path(root), Path(dest)
+    if dest.exists() and any(dest.iterdir()):
+        raise Refused(f"the source copy's destination {dest} exists and is not empty")
+    genome_text = (root / "GENOME.genome").read_text()
+    sets = sitting_sets_of(genome_text)
+    if not sets:
+        raise Refused(f"{root}/GENOME.genome has no `WORLD scene … sitting <sets>` line: the sittings to cut at are unknown")
+    tape = resolve_tape_dir(root, tape_decl_of(genome_text))
+    days = sorted(tape.glob("*.jsonl"))
+    # pass 1: the cut — the row of the last sitting set's end ask (nothing is written until it is found)
+    n_end = 0
+    cut_seq: Optional[int] = None
+    for day in days:
+        with day.open(encoding="utf-8", errors="replace") as f:
+            for line in f:
+                s = line.rstrip()
+                if not s or not s.endswith("}") or '"sense": "ask"' not in s:
+                    continue
+                r = json.loads(s)
+                meta = r.get("meta") or {}
+                form = meta.get("form")
+                if form is None:
+                    form = json.loads((tape / r["payload"]).read_text()).get("form")
+                if form == "end":
+                    n_end += 1
+                    if n_end == len(sets):
+                        cut_seq = int(r["seq"])
+                        break
+        if cut_seq is not None:
+            break
+    if cut_seq is None:
+        raise Skipped(f"the sittings are not complete on the tape of {root} yet: {n_end} of {len(sets)} sets ({sets}) have ended")
+    # pass 2: the copy
+    (dest / "tape" / "payload").mkdir(parents=True, exist_ok=True)
+    rows = torn_tape = 0
+    need: List[str] = []
+    for day in days:
+        kept: List[str] = []
+        done = False
+        with day.open(encoding="utf-8", errors="replace") as f:
+            for line in f:
+                s = line.rstrip()
+                if not s.strip():
+                    continue
+                if not s.endswith("}"):
+                    torn_tape += 1
+                    continue
+                r = json.loads(s)
+                if int(r["seq"]) > cut_seq:
+                    done = True
+                    break
+                kept.append(s)
+                rows += 1
+                meta = r.get("meta") or {}
+                if r.get("sense") == "ask" or (r.get("sense") == "eye" and (meta.get("kind") == "sitting" or (meta.get("kind") == "train" and meta.get("scene") == dax_index))):
+                    need.append(r["payload"])
+        if kept:
+            (dest / "tape" / day.name).write_text("\n".join(kept) + "\n", encoding="utf-8")
+        if done:
+            break
+    for rel in need:
+        src = tape / rel
+        if not src.is_file():
+            raise Refused(f"the life's tape names {rel} and {src} does not exist")
+        out = dest / "tape" / rel
+        out.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, out)
+    truth_src = root / "truth" / "scene"
+    n_truth = 0
+    if truth_src.is_dir():
+        shutil.copytree(truth_src, dest / "truth" / "scene")
+        n_truth = sum(1 for _ in (dest / "truth" / "scene").iterdir())
+    torn_journal = 0
+    jfiles: List[str] = []
+    (dest / "journal").mkdir(parents=True, exist_ok=True)
+    for jf in sorted((root / "journal").glob("*.jsonl")):
+        kept = []
+        with jf.open(encoding="utf-8", errors="replace") as f:
+            for line in f:
+                s = line.rstrip()
+                if not s.strip():
+                    continue
+                if not s.endswith("}"):
+                    torn_journal += 1
+                    continue
+                kept.append(s)
+        (dest / "journal" / jf.name).write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
+        jfiles.append(jf.name)
+    genomes = []
+    for g in [root / "GENOME.genome"] + sorted(root.glob("GENOME.v*.genome")):
+        shutil.copyfile(g, dest / g.name)
+        genomes.append(g.name)
+    manifest, n_entries, total = _manifest_text(dest)
+    (dest / "MANIFEST").write_text(manifest, encoding="utf-8")
+    return {"dest": str(dest), "cut_seq": cut_seq, "rows": rows, "torn_lines_tape": torn_tape, "torn_lines_journal": torn_journal, "payloads_kept": len(need), "truth_files": n_truth,
+            "journal_files": jfiles, "genomes": genomes, "manifest_path": str(dest / "MANIFEST"), "source_copy_sha256": sha256_bytes(manifest.encode("utf-8")), "n_manifest_entries": n_entries,
+            "bytes": total, "build_s": round(time.time() - t0, 3), "sitting_sets": sets}
+
+
+def verify_source_copy(dest, expected_sha256: str) -> List[str]:
+    """R16: re-hash the copy against its MANIFEST and the manifest against the sha256 in the row. Returns the problems (empty = the copy is the bytes both children read): a changed, added or
+    removed file, or a manifest whose text hashes to something else."""
+    dest = Path(dest)
+    problems: List[str] = []
+    mp = dest / "MANIFEST"
+    if not mp.is_file():
+        return ["MANIFEST is missing"]
+    text = mp.read_text(encoding="utf-8")
+    if sha256_bytes(text.encode("utf-8")) != expected_sha256:
+        problems.append("MANIFEST's text does not hash to the sha256 recorded in the row")
+    listed: Dict[str, Tuple[int, str]] = {}
+    for line in text.splitlines():
+        rel, size, h = line.rsplit(" ", 2)
+        listed[rel] = (int(size), h)
+    present = {str(q.relative_to(dest)) for q in dest.rglob("*") if q.is_file() and q.name != "MANIFEST"}
+    # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 20:47 +0400 — R16 says the copy is a COPY, «never a symlink into the life»; the manifest hashes THROUGH a link, so a payload replaced by a symlink to the live
+    # tape reads clean under every other check here (found by the first mutation sweep of origin mode: C08 survived). A symlink anywhere in the copy is a problem.
+    for q in sorted(dest.rglob("*")):
+        if q.is_symlink():
+            problems.append(f"{q.relative_to(dest)}: a symlink — a COPY never points into the life (R16)")
+    for rel in sorted(present - set(listed)):
+        problems.append(f"{rel}: a file the MANIFEST does not list")
+    for rel, (size, h) in sorted(listed.items()):
+        f = dest / rel
+        if not f.is_file():
+            problems.append(f"{rel}: listed in the MANIFEST and missing")
+        elif f.stat().st_size != size or sha256_file(f) != h:
+            problems.append(f"{rel}: its bytes differ from the MANIFEST's")
+    return problems
+
+
+# ================================================================================================ Part 6 — ORIGIN mode (law v4 §1.1 S2/S3, §1.6, §4.1, R4 d/g/h/i/k, R8 a, R9, R15, R16)
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 18:26 +0400 — the brain AT the life's sittings (rebuilt states, or the labelled fallback copy), answered and graded over the LIFE's OWN sittings taken from a
+# SOURCE COPY of its tape (option A), ITEMS-MATCH first and before any child, the cross-check R9 against the life's own rows (exact for a rebuilt origin, a labelled reading for a fallback), and ORIGIN.json
+# written ONCE. Every refusal exits 2 and leaves an attempt record under OUT/origin/<stamp>/; only a complete origin is a series line.
+FALLBACK_LABEL = "FALLBACK ORIGIN — late by at most one snapshot"
+REBUILT_FILES = ("brain.json", "brain.npz", "ORIGIN.json", "GENOME.in-force.genome")
+
+
+def parse_state_specs(specs: Sequence[str]) -> List[Tuple[Optional[str], Path]]:
+    """`--state [SET=]DIR` -> [(SET or None, DIR)]."""
+    out: List[Tuple[Optional[str], Path]] = []
+    for sp in specs:
+        if "=" in sp and not sp.startswith("/"):
+            name, d = sp.split("=", 1)
+            out.append((name, Path(d)))
+        else:
+            out.append((None, Path(sp)))
+    return out
+
+
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 20:29 +0400 — law §1.1 S2 says «a bare `--state DIR` serves every set»; run_origin refused every bare DIR before it reached the provenance check (R4 d), so a pair of
+# unknown provenance was refused for the WRONG reason (the assignment message, which never names ORIGIN.json). The assignment is now this pure function; a bare DIR is then checked per set like any other.
+def states_by_set(specs: Sequence[Tuple[Optional[str], Path]], ordered: Sequence[str]) -> Dict[str, Path]:
+    """S2: `--state SET=DIR` once per sitting set, or ONE bare `--state DIR` that serves every set (§1.1). A bare DIR is then held to the same provenance check as any other (`check_rebuilt_dir`): its sidecar
+    names ONE set and ONE begin seq, so on a life with several sets it is refused where the sidecar names another set. A bare DIR beside named ones, two bare DIRs, a set named twice, a name that is no
+    sitting set, or a sitting set left without a state are refused by name."""
+    bare = [d for nm, d in specs if nm is None]
+    named = [(nm, d) for nm, d in specs if nm is not None]
+    if bare and named:
+        raise Refused(f"--state: a bare DIR serves every set and cannot be mixed with SET=DIR (got the bare {bare[0]} beside {[nm for nm, _ in named]})")
+    if len(bare) > 1:
+        raise Refused(f"--state: more than one bare DIR ({[str(d) for d in bare]}): a bare DIR serves every set, so a second one is ambiguous")
+    if bare:
+        return {s: bare[0] for s in ordered}
+    names = [nm for nm, _ in named]
+    twice = sorted({nm for nm in names if names.count(nm) > 1})
+    if twice:
+        raise Refused(f"--state: the set(s) {twice} are named twice")
+    if set(names) != set(ordered):
+        raise Refused(f"a rebuilt origin needs one `--state SET=DIR` for every sitting set {list(ordered)}; got {[(n, str(d)) for n, d in named]}")
+    return dict(named)
+
+
+def tape_chain_digest(tape_dir, below_seq: int) -> str:
+    """sha256 over «seq NUL sha NEWLINE» of the tape's rows with seq below `below_seq`, in tape order — the digest a rebuild's sidecar carries (`tape_digest`) and the origin recomputes."""
+    h = hashlib.sha256()
+    for f in sorted(Path(tape_dir).glob("*.jsonl")):
+        with f.open(encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                s = line.rstrip()
+                if not s or not s.endswith("}"):
+                    continue
+                r = json.loads(s)
+                if int(r["seq"]) >= below_seq:
+                    return h.hexdigest()
+                h.update(f"{r['seq']}\0{r.get('sha')}\n".encode("utf-8"))
+    return h.hexdigest()
+
+
+def check_rebuilt_dir(d: Path, setname: str, begin_seq: int, copy_tape: Path) -> Dict[str, object]:
+    """R4 (d), S2: a rebuilt state is a brain.json + brain.npz pair WITH its ORIGIN.json and GENOME.in-force.genome; the sidecar must name this set, this tape position and this tape's rows (the chain
+    digest recomputed on the SOURCE COPY), and the genome file must hash to what it says. A bare pair of unknown provenance is never an origin. (The state's own hash is checked by the child at load.)"""
+    for n in REBUILT_FILES:
+        if not (d / n).is_file():
+            raise Refused(f"rebuilt state {d}: {n} is missing — a bare pair of unknown provenance (no ORIGIN.json) is never an origin (R4 d)")
+    side = json.loads((d / "ORIGIN.json").read_text())
+    if side.get("set") != setname:
+        raise Refused(f"rebuilt state {d}: its ORIGIN.json names the set {side.get('set')!r}, not {setname!r}")
+    if int(side.get("begin_seq", -1)) != int(begin_seq):
+        raise Refused(f"rebuilt state {d}: its begin_seq {side.get('begin_seq')} is not the life's {begin_seq} for set {setname!r} — the rebuild was of another tape")
+    dig = tape_chain_digest(copy_tape, int(begin_seq))
+    if side.get("tape_digest") != dig:
+        raise Refused(f"rebuilt state {d}: its tape_digest {str(side.get('tape_digest'))[:12]}… is not the life's rows below {begin_seq} ({dig[:12]}…) — the rebuild replayed another tape")
+    if sha256_file(d / "GENOME.in-force.genome") != side.get("genome_in_force_sha"):
+        raise Refused(f"rebuilt state {d}: GENOME.in-force.genome does not hash to the sidecar's genome_in_force_sha")
+    return side
+
+
+def copy_dir_verified(src: Path, dest: Path, names: Sequence[str]) -> None:
+    """S2: a state outside any manifest of mtimes is copied and VERIFIED by sha256 against the source."""
+    dest.mkdir(parents=True, exist_ok=True)
+    for n in names:
+        shutil.copyfile(src / n, dest / n)
+        if sha256_file(dest / n) != sha256_file(src / n):
+            raise Refused(f"the copy of {src / n} does not hash like its source")
+
+
+def _thirds(items: Sequence[Mapping[str, object]]) -> List[List[Mapping[str, object]]]:
+    n = len(items)
+    return [list(items[i * n // 3:(i + 1) * n // 3]) for i in range(3)]
+
+
+def r9_cross_check(origin_rows: Sequence[Mapping[str, object]], life_rows: Mapping[int, Mapping[str, object]], by_ask_seq: Mapping[int, str], asks: Sequence[Mapping[str, object]],
+                   *, refusing: bool) -> Dict[str, object]:
+    """R9 (law v4, origin mode): the origin's answer rows — taken over the life's own sittings, so their seq, eye_seq and at are the life's own — against the LIFE's own rows (the LAST row with that
+    ask seq in its journal). EARLY items (no brain-moving row between the set's begin and the answering seq, the fail-closed act set) must be equal in every key but `hash`; LATE items are printed
+    as discordant counts by thirds of the sitting's items in order. `n_early_tested` leaves out the structural forms `begin` and `end` (an equal acknowledgement tests nothing); a set with none
+    reads «R9 UNTESTED for this set». For a rebuilt origin an EARLY difference refuses; for a fallback copy (late by construction) the whole thing is a labelled reading."""
+    set_of = {int(a["seq"]): a["set"] for a in asks}
+    form_of = {int(a["seq"]): a.get("form") for a in asks}
+    sets: List[str] = []
+    for a in asks:
+        if a["set"] is not None and a["set"] not in sets:
+            sets.append(a["set"])
+    per: Dict[str, List[Dict[str, object]]] = {s: [] for s in sets}
+    early_total = early_equal = late_total = late_disc = missing = 0
+    first_diff: Optional[Dict[str, object]] = None
+    early_diffs: List[Dict[str, object]] = []
+    for r in sorted(origin_rows, key=lambda x: int(x["seq"])):
+        seq = int(r["seq"])
+        life = life_rows.get(seq)
+        klass = by_ask_seq.get(seq)
+        if life is None or klass is None:
+            missing += 1
+            continue
+        same = rows_equal(r, life)
+        s = set_of.get(seq)
+        per.setdefault(s, []).append({"seq": seq, "class": klass, "same": same, "form": form_of.get(seq), "item": r.get("item")})
+        if klass == "EARLY":
+            early_total += 1
+            early_equal += int(same)
+            if not same:
+                d = {"seq": seq, "item": r.get("item"), "form": r.get("form"), "differing_keys": _differing_keys(r, life), "origin": dict(r), "life": dict(life)}
+                early_diffs.append(d)
+                first_diff = first_diff or d
+        else:
+            late_total += 1
+            late_disc += int(not same)
+    by_set: Dict[str, Dict[str, object]] = {}
+    thirds: Dict[str, List[int]] = {}
+    for s, rows in per.items():
+        n_early = sum(1 for x in rows if x["class"] == "EARLY")
+        tested = sum(1 for x in rows if x["class"] == "EARLY" and x["form"] not in STRUCTURAL_FORMS)
+        by_set[s] = {"n_early": n_early, "n_late": sum(1 for x in rows if x["class"] == "LATE"), "n_early_tested": tested, "untested": tested == 0,
+                     "note": UNTESTED_NOTE if tested == 0 else ""}
+        thirds[s] = [sum(1 for x in t if x["class"] == "LATE" and not x["same"]) for t in _thirds(rows)]
+    # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 20:53 +0400 — the other direction of «missing»: the life's answer rows of SITTING asks that the origin never answered. The loop above sees only origin rows, so an origin
+    # that skipped an item compared equal on the rest; the count is printed (#168) and a rebuilt origin REFUSES on it.
+    origin_seqs = {int(r["seq"]) for r in origin_rows}
+    not_resat = sorted(seq for seq, s in set_of.items() if s is not None and seq in life_rows and seq not in origin_seqs)
+    return {"refusing": bool(refusing), "early_total": early_total, "early_equal": early_equal, "early_diff_count": len(early_diffs), "first_early_diff": first_diff,
+            "early_diffs_first_five": early_diffs[:5], "late_total": late_total, "late_discordant": late_disc, "late_by_thirds": thirds, "by_set": by_set, "n_without_a_life_row_or_class": missing,
+            "life_rows_not_resat": len(not_resat), "first_life_row_not_resat": (not_resat[0] if not_resat else None),
+            "label": ("" if refusing else f"{FALLBACK_LABEL}: R9 is a READING here (the copy is later than the sittings by construction), never a refusal")}
+
+
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 20:41 +0400 — the verifier's ask on c887b50 (law R9: «the series row says so»): the ONE line of the origin ROW that says what R9 showed. A set with no tested EARLY item reads UNTESTED
+# FIRST and «NOT A PASS»; the line is built from the r9 block's own per-set flags, never from an exit code.
+def r9_reading(r9: Mapping[str, object]) -> Tuple[str, List[str]]:
+    """(the line, the UNTESTED sets in order). Rebuilt: «R9 EXACT: k of n EARLY items equal the life's rows in every key but hash (tested EARLY items per set …)» — with an UNTESTED set the line opens with
+    «R9 UNTESTED for set(s) … NOT A PASS …» and the exactness is stated «on the other sets». Fallback (late by construction): «R9 is a READING: d of n EARLY items differ …», never «EXACT»."""
+    by_set = r9["by_set"]
+    untested = [s for s, v in by_set.items() if v["untested"]]
+    tested = ", ".join(f"{s} {v['n_early_tested']}" for s, v in by_set.items())
+    late = f"LATE items {r9['late_total']}, discordant {r9['late_discordant']}"
+    gaps = []                                              # #168: the cases the comparison could NOT see are printed beside it, never only the cases it did
+    if r9.get("life_rows_not_resat"):
+        gaps.append(f"{r9['life_rows_not_resat']} of the life's own answer rows have no origin row")
+    if r9.get("n_without_a_life_row_or_class"):
+        gaps.append(f"{r9['n_without_a_life_row_or_class']} origin rows had no life row or class")
+    late = late + "".join(f"; {g}" for g in gaps)
+    parts: List[str] = []
+    if untested:
+        parts.append(f"R9 UNTESTED for set(s) {', '.join(untested)} (no tested EARLY item) — NOT A PASS for them: their begin state is verified only by R10c")
+    if r9["refusing"]:
+        # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 21:05 +0400 — the planted run read «R9 EXACT on the other sets: 6 of 6 EARLY items», but the 6 held the untested set's own begin row: the denominator is every EARLY item,
+        # begin and end included, and the line now says so (#168); with an UNTESTED set the exactness is «where tested», never a pass for the set that was not.
+        parts.append(("R9 EXACT where tested: " if untested else "R9 EXACT: ")
+                     + f"{r9['early_equal']} of {r9['early_total']} EARLY items (begin and end included) equal the life's own rows in every key but hash (tested EARLY items per set: {tested}); {late}")
+    else:
+        parts.append(f"R9 is a READING (a fallback copy is late by construction): {r9['early_diff_count']} of {r9['early_total']} EARLY items differ from the life's own rows (tested EARLY items per set: {tested}); {late}")
+    return " · ".join(parts), untested                      # not «|»: the line is a cell of RESIT.md's table
+
+
+def require_all_answered(ameta: Mapping[str, object], n_asks: int) -> None:
+    """An origin answers EVERY ask of the life's own sittings (found by reading: the first origin mode wrote an origin whose ANSWER child had skipped an ask — 9 answered of 10 — and every comparison that remained was
+    equal). `answered` is the answer rows written, `unanswered` the held asks whose canvas never came; both must say the copy's `n_asks` were answered (#168: started / completed / still-open)."""
+    answered, unanswered = int(ameta["answered"]), int(ameta["unanswered"])
+    if unanswered or answered != int(n_asks):
+        raise Refused(f"the origin did not answer every ask of the life's own sittings: {answered} answered of {n_asks} asks on the source copy, {unanswered} held ask(s) never reached their canvas — an origin that skipped items is no origin")
+
+
+def _attempt(run_dir: Path, rec: Mapping[str, object]) -> None:
+    atomic_write(run_dir / "origin.json", json.dumps(dict(rec), indent=1, sort_keys=True, default=str) + "\n")
+
+
+def run_origin(a: argparse.Namespace, flags: Mapping[str, object], root: Path, items_root: Path, code: Path) -> int:
+    """The origin (law §4.1): written ONCE, from rebuilt states (S2) or the labelled fallback (S3). Everything cheap that can refuse runs BEFORE the children: the written-once rule, the kind and
+    reason, the pinned items, the grader's pre-pin, the SOURCE COPY of the life, ITEMS-MATCH on it, the life's journal (R4 k), the states' provenance (R4 d)."""
+    cpu0, t0 = time.process_time(), time.time()
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    run_dir = out / "origin" / a.stamp
+    run_dir.mkdir(parents=True, exist_ok=True)
+    marker = run_dir / MARKER_NAME
+    marker.write_text(a.stamp + "\n")
+    status_path = a.status or (str(root / "STATUS.json") if (root / "STATUS.json").exists() else None)
+    row: Dict[str, object] = {"kind": "origin", "stamp": a.stamp, "reader_sha256": sha256_file(RESIT_PY), "flags": dict(flags), "root": str(root), "items_root": str(items_root),
+                              "code": os.path.realpath(code), "origin_kind": a.origin_kind, "reason": a.reason}
+    row["live_load"] = {"start": status_reading(status_path)}
+    rec: Dict[str, object] = {"status": "RUNNING", "stamp": a.stamp}
+    rc = 2
+    try:
+        if (out / "ORIGIN.json").exists():
+            raise Refused(f"{out / 'ORIGIN.json'} exists: the origin is written once and never replaced (R4 g)")
+        kind = check_origin_kind(a.origin_kind, a.reason)
+        specs = parse_state_specs(a.state)
+        check_origin_source(from_state_prev=not specs, origin_kind=a.origin_kind)
+        row["code_commit"] = git_info(code)
+        # the pinned items (a closed life's), pinned here if no earlier run did
+        items_genome = items_root / "GENOME.genome"
+        genome_text = items_genome.read_text()
+        ws = world_seed_of(genome_text)
+        marks_json = Path(a.scored) / str(ws) / "fresh" / "marks.json" if ws is not None else None
+        scored_pin = {"path": str(marks_json) if marks_json and marks_json.exists() else None, "sha256": sha256_file(marks_json) if marks_json and marks_json.exists() else None}
+        if not (out / "ITEMS.json").exists():
+            iscan = scan_items(items_root, tape_decl_of(genome_text), verify_canvas_bytes=True)
+            pin_items(out, iscan, scored=scored_pin, world_line_sha=world_scene_line_sha(genome_text), items_root=items_root)
+        pin = json.loads((out / "ITEMS.json").read_text())
+        ginfo = grader_info(a.grader_code)
+        row["grader"] = {**ginfo, "pin": check_grader_pin(out, ginfo, write=False)}
+        # the SOURCE COPY of the life, and ITEMS-MATCH on it — FIRST, before either child is started
+        src = run_dir / "src"
+        sc = build_source_copy(root, src, dax_index=dax_index_of(a.grader_code))
+        row["source_copy"] = {k: sc[k] for k in ("source_copy_sha256", "bytes", "rows", "cut_seq", "build_s", "n_manifest_entries", "manifest_path", "torn_lines_tape", "torn_lines_journal",
+                                                 "payloads_kept", "truth_files")}
+        row["source_copy"]["sha256"] = sc["source_copy_sha256"]
+        copy_text = (src / "GENOME.genome").read_text()
+        copy_decl = tape_decl_of(copy_text)
+        try:
+            cscan = scan_items(src, copy_decl, verify_canvas_bytes=True)
+            items_match(cscan, pin, world_scene_line_sha(copy_text))
+        except Refused as e:
+            raise Refused(str(e) if str(e).startswith("ITEMS-MATCH") else f"ITEMS-MATCH: {e}")
+        row["items_match"] = {"ok": True, "n_asks": cscan["n_asks"], "n_canvases": cscan["n_canvases"], "ask_digest": cscan["ask_digest"], "canvas_digest": cscan["canvas_digest"]}
+        item_class = item_class_map(cscan["asks"])
+        # the life's own journal, from the copy
+        js = scan_journal(src / "journal")
+        dup = collapse_duplicates(js["answers"])
+        row["restart_duplicates"] = dup["restart_duplicates"]
+        require_no_divergent(dup)
+        sets = {s: v for s, v in cscan["sets"].items() if v["begin_seq"] is not None}
+        begins = {s: int(v["begin_seq"]) for s, v in sets.items()}
+        ordered = [s for s, _ in sorted(begins.items(), key=lambda kv: kv[1])]
+        early_late = classify_early_late(js, begins)
+        windows = {s: (int(v["begin_seq"]), int(v["end_seq"])) for s, v in sets.items() if v["end_seq"] is not None}
+        # the states
+        states_dir = run_dir / "states"
+        entries: List[Dict[str, object]] = []
+        state_notes: List[Dict[str, object]] = []
+        if a.origin_kind == "rebuilt":
+            by_set = states_by_set(specs, ordered)
+            for s in ordered:
+                side = check_rebuilt_dir(by_set[s], s, begins[s], src / "tape")
+                copy_dir_verified(by_set[s], states_dir / s, REBUILT_FILES)
+                entries.append({"name": s, "dir": str(states_dir / s), "genome": str(states_dir / s / "GENOME.in-force.genome"), "expect_state_hash": side["state_hash"]})
+                state_notes.append({"set": s, "source": str(by_set[s]), "sidecar": side})
+        else:
+            if len(specs) > 1:
+                raise Refused("a fallback origin takes one state: the seat's copy of state/prev (or none, to copy the live life's own)")
+            if specs:
+                st = copy_state_dir(specs[0][1], states_dir / "fallback", sleep_s=a.copy_retry_sleep_s)
+            else:
+                st = copy_state_prev(root, states_dir / "fallback", sleep_s=a.copy_retry_sleep_s)
+            gf = genome_in_force(src, js["epochs"], upto_seq=int(st["last_seq"]))
+            entries.append({"name": "*", "dir": str(states_dir / "fallback"), "genome": str(gf["path"])})
+            state_notes.append({"set": "*", "source": st["source"], "snapshot": {k: st[k] for k in ("last_seq", "t", "prints_ok", "attempts")}, "genome_epoch": gf["epoch"]})
+        row["items"] = {"n_asks": cscan["n_asks"], "n_canvases": cscan["n_canvases"], "world_seed": ws, "scored": scored_pin, "pin": "checked"}
+        # the children
+        cache = Path(a.cache) if a.cache else out / "glances.pkl"
+        cold = not cache.exists()
+        cap = a.cpu_cap_s or (CPU_CAP_COLD_S if cold else CPU_CAP_WARM_S)
+        spec = {"code": str(code), "items_root": str(src), "tape_decl": copy_decl, "states": entries, "out_dir": str(run_dir), "glance_cache": str(cache), "check_turn": None}
+        ach = run_child("answer", spec, run_dir, cpu_cap_s=cap)
+        require_child_ok(ach, cap)
+        ameta = json.loads((run_dir / "answer-meta.json").read_text())
+        require_all_answered(ameta, cscan["n_asks"])                                                  # BEFORE the grade children are spent: an origin that skipped an ask is no origin
+        row["subject"] = {"modules_digest": ameta["modules_digest"], "n_modules": len(ameta["modules"]), "python": ameta["python"]}
+        row["eye_pin"] = ameta["eye_pin"]
+        smeta = {m["name"]: m for m in ameta["states"]}
+        gspec = {"grader_code": str(a.grader_code), "items_root": str(src), "journal": str(run_dir / "answers.jsonl"), "scored": str(a.scored), "label": a.stamp,
+                 "genome": str(items_genome), "out_dir": str(run_dir), "m2a_rows": True}
+        gch = run_child("grade", gspec, run_dir, cpu_cap_s=cap)
+        require_child_ok(gch, cap)
+        lspec = {**gspec, "journal": str(src / "journal"), "label": a.stamp + "-life", "out_dir": str(run_dir / "life-grade")}
+        lch = run_child("grade", lspec, run_dir / "life-grade", cpu_cap_s=cap)
+        require_child_ok(lch, cap)
+        gmeta = json.loads((run_dir / "grade-meta.json").read_text())
+        row["grader"]["modules_digest"] = gmeta["modules_digest"]
+        row["grader"]["pin"] = check_grader_pin(out, {**ginfo, "modules_digest": gmeta["modules_digest"]})
+        grade = json.loads((run_dir / "grade.json").read_text())
+        extra = json.loads((run_dir / "items_extra.json").read_text())
+        lgrade = json.loads((run_dir / "life-grade" / "grade.json").read_text())
+        lextra = json.loads((run_dir / "life-grade" / "items_extra.json").read_text())
+        row["answers_sha256"] = sha256_file(run_dir / "answers.jsonl")
+        row["grade_sha256"] = sha256_file(run_dir / "grade.json")
+        records = records_from_grade(grade, extra.get("m2a"), item_class)
+        row["marks"] = class_tables(records)
+        row["partition"] = partition_check(records, grade)
+        require_partition(row["partition"])
+        lrecords = records_from_grade(lgrade, lextra.get("m2a"), item_class)
+        lpart = partition_check(lrecords, lgrade)
+        row["life_own"] = {"marks": class_tables(lrecords), "partition": lpart, "grade_sha256": sha256_file(run_dir / "life-grade" / "grade.json")}
+        require_partition(lpart)
+        vec = vectors_from_records(records)
+        row["vectors"], row["item_class"] = vec["vectors"], vec["item_class"]
+        # R9
+        resit_rows = [json.loads(l) for l in (run_dir / "answers.jsonl").read_text().splitlines() if l.strip()]
+        r9 = r9_cross_check(resit_rows, dup["rows"], early_late["by_ask_seq"], cscan["asks"], refusing=(a.origin_kind == "rebuilt"))
+        r9["act_census"] = act_census(js["brain_rows"], windows)
+        row["r9"] = r9
+        row["r9_reading"], row["r9_untested_sets"] = r9_reading(r9)
+        if r9["refusing"] and r9["early_diff_count"]:
+            fd = r9["first_early_diff"]
+            raise Refused(f"R9: {r9['early_diff_count']} EARLY item(s) differ from the life's own rows — the reader or the rebuild is wrong; no later read is believed. First: ask seq {fd['seq']}, "
+                          f"item {fd['item']!r}, keys {fd['differing_keys']}")
+        if r9["refusing"] and r9["life_rows_not_resat"]:
+            raise Refused(f"R9: {r9['life_rows_not_resat']} of the life's own answer rows have no origin row (first ask seq {r9['first_life_row_not_resat']}) — the origin skipped an item the life answered; no later read is believed")
+        # the genomes in force and EYE-CHANGED (the origin's own sets against each other, and against the grader)
+        grader_lines = grader_line_hashes(genome_text)
+        set_lines = {}
+        for ent, note in zip(entries, state_notes):
+            set_lines[ent["name"]] = grader_line_hashes(Path(ent["genome"]).read_text())
+        first_lines = set_lines[ordered[0] if a.origin_kind == "rebuilt" else "*"]
+        eyes = {nm: eye_changed(ln, origin=first_lines, grader=grader_lines) for nm, ln in set_lines.items()}
+        row["genome"] = {"sets": {nm: {"path": ent["genome"], "lines": set_lines[nm], "eye": eyes[nm]} for nm, ent in ((e["name"], e) for e in entries)},
+                         "grader": {"path": str(items_genome), "sha256": sha256_file(items_genome), "lines": grader_lines}}
+        row["eye_changed"] = any(e["eye_changed"] for e in eyes.values())
+        row["genome_lines"] = first_lines
+        # the states' provenance
+        fresh_name = ordered[0] if a.origin_kind == "rebuilt" else "*"
+        row["states"] = [{**n, "state_hash": smeta[n["set"]]["state_hash"], "n_learned": smeta[n["set"]]["n_learned"], "calibrated_at_load": smeta[n["set"]]["calibrated_at_load"],
+                          "genome_sha256": smeta[n["set"]]["genome_sha256"]} for n in state_notes]
+        row["origin_n_learned_fresh_begin"] = int(smeta[fresh_name]["n_learned"])
+        row["begin_seq_fresh"] = begins[ordered[0]]
+        row["begin_seqs"] = begins
+        row["answer_meta"] = {"glance_cache": ameta["glance_cache"], "asks_seen": ameta["asks_seen"], "answered": ameta["answered"], "unanswered": ameta["unanswered"]}
+        if a.origin_kind == "fallback_copy":
+            row["label"] = FALLBACK_LABEL
+        ver = verify_source_copy(src, sc["source_copy_sha256"])
+        row["source_copy"]["verify"] = ver
+        if ver:
+            raise Refused(f"the source copy changed during the run: {ver[:3]}")
+        row["cpu"] = {"answer_s": ach["cpu_s"], "grade_s": gch["cpu_s"], "life_grade_s": lch["cpu_s"], "orchestrator_s": round(time.process_time() - cpu0, 3), "cap_s": cap, "cold": cold}
+        row["cpu"]["total_s"] = round(ach["cpu_s"] + gch["cpu_s"] + lch["cpu_s"] + row["cpu"]["orchestrator_s"], 3)
+        row["memory"] = {"answer_maxrss_mb": ach["maxrss_mb"], "grade_maxrss_mb": gch["maxrss_mb"], "life_grade_maxrss_mb": lch["maxrss_mb"],
+                         "orchestrator_maxrss_mb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0, 1)}
+        row["live_load"]["end"] = status_reading(status_path)
+        row["wall_s"] = round(time.time() - t0, 3)
+        write_origin(out, row)
+        append_series(out, row)
+        rec.update({"status": "ORIGIN WRITTEN", "origin": str(out / "ORIGIN.json")})
+        rc = 0
+    except NotGradable as e:
+        rec.update({"status": "NOT GRADABLE", "reason": str(e)})
+    except Skipped as e:
+        rec.update({"status": "SKIPPED", "reason": str(e)})
+    except ResitError as e:
+        rec.update({"status": "REFUSED", "reason": str(e)})
+    except Exception as e:
+        import traceback
+        rec.update({"status": "ERROR", "reason": f"{type(e).__name__}: {e}", "traceback": traceback.format_exc()[-3000:]})
+    finally:
+        rec["live_load_end"] = status_reading(status_path)
+        rec["wall_s"] = round(time.time() - t0, 3)
+        _attempt(run_dir, rec)
+    msg = {"status": rec["status"], "attempt": str(run_dir / "origin.json")}
+    if rc != 0:
+        msg["reason"] = msg["refused"] = rec.get("reason")
+    print(json.dumps(msg, default=str))
     return rc
 
 

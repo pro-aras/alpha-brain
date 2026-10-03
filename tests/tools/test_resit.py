@@ -1,6 +1,8 @@
 # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 15:41 +0400 — PREREG-RESIT-READER (branch resit-1003; the law's text b02cf10, sha256 f6390b0d…, signed by the author, the architect 15:30 and the seat 15:31):
 # tools/brain/resit.py's PURE parts, written BEFORE the reader. Each test reads what the law says; every plant asserts that it changed the bytes (#247 (5)) and is CAUGHT.
 # The children (ANSWER, GRADE), the orchestrator and R1 itself are tested in test_resit_children.py and by the real run.
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 20:39 +0400 — the VERIFIER's finding on c887b50: test_n_early_is_printed_per_set_and_zero_reads_untested used a fixture with NO begin row, so it pinned a clause («n_early = 0
+# reads UNTESTED») that cannot fire on real data: `begin` is EARLY by construction. Rebuilt on the REAL shape (begin, two held items, a why, an end); n_early_tested (begin and end left out) is what UNTESTED reads (law erratum E1).
 """tests/tools/test_resit.py — the re-sit reader's pure helpers (flags, canonical rows, phrase classes, pairing, the genome in force, state copies,
 items and journal scans, R9's early/late split, restarts, the verdict-copy flag, the series store)."""
 from __future__ import annotations
@@ -752,15 +754,38 @@ class TestEarlyLate(Tmp):
         self.assertEqual(self.classify(answers, [(12, "refused")])["by_ask_seq"][11], "EARLY")
         self.assertEqual(self.classify(answers, [(12, "turn"), (12, "refused"), (12, "turn")])["by_ask_seq"][11], "EARLY")
 
-    def test_n_early_is_printed_per_set_and_zero_reads_untested(self) -> None:
-        answers = {11: [ans(11, "M1:a", eye_seq=13)], 14: [ans(14, "M1:b", eye_seq=16)]}
-        got = self.classify(answers, [(12, "learn"), (15, "learn")])
-        self.assertEqual(got["by_set"]["fresh"]["n_early"], 0)
-        self.assertEqual(got["by_set"]["fresh"]["n_late"], 2)
-        self.assertIn("UNTESTED", got["by_set"]["fresh"]["note"])
-        got2 = self.classify(answers, [(15, "learn")])
-        self.assertEqual(got2["by_set"]["fresh"]["n_early"], 1)
-        self.assertNotIn("UNTESTED", got2["by_set"]["fresh"]["note"])
+    def sitting(self) -> dict:
+        """The REAL shape of a sitting: a begin ask (answered at its own row), two held items, a why, an end."""
+        return {10: [ans(10, None, form="begin", mark=None)], 11: [ans(11, "M1:a", eye_seq=13)], 14: [ans(14, "M1:b", eye_seq=16)],
+                17: [ans(17, "M4:red", form="why", mark="M4")], 20: [ans(20, None, form="end", mark=None)]}
+
+    def test_n_early_and_n_early_tested_are_both_printed_begin_and_end_test_nothing(self) -> None:
+        got = self.classify(self.sitting(), [(25, "learn")])                                     # the brain moves only after the sitting: all five answers are EARLY
+        d = got["by_set"]["fresh"]
+        self.assertEqual((d["n_early"], d["n_early_tested"], d["n_late"], d["untested"]), (5, 3, 0, False))
+        self.assertEqual(d["note"], "")
+
+    def test_a_set_whose_only_early_item_is_begin_reads_untested_the_real_shape(self) -> None:
+        # a learn right after begin: begin stays EARLY (nothing lies strictly between begin and its own seq); every other answer is LATE. The old clause («n_early = 0») could never fire here: n_early is 1.
+        got = self.classify(self.sitting(), [(12, "learn"), (15, "learn")])
+        d = got["by_set"]["fresh"]
+        self.assertEqual((d["n_early"], d["n_early_tested"], d["n_late"]), (1, 0, 4))
+        self.assertTrue(d["untested"])
+        self.assertIn("UNTESTED", d["note"])
+
+    def test_one_tested_early_item_is_enough_to_be_tested(self) -> None:
+        got = self.classify(self.sitting(), [(15, "learn")])                                     # M1:a (11 -> 13) lies before the learn; M1:b, the why and the end do not
+        d = got["by_set"]["fresh"]
+        self.assertEqual((d["n_early"], d["n_early_tested"], d["n_late"]), (2, 1, 3))
+        self.assertFalse(d["untested"])
+        self.assertNotIn("UNTESTED", d["note"])
+
+    def test_begin_and_end_alone_test_nothing_an_equal_acknowledgement_is_not_a_test(self) -> None:
+        answers = {10: [ans(10, None, form="begin", mark=None)], 20: [ans(20, None, form="end", mark=None)]}
+        d = self.classify(answers, [])["by_set"]["fresh"]
+        self.assertEqual((d["n_early"], d["n_early_tested"]), (2, 0))
+        self.assertTrue(d["untested"], "both structural forms are left out, not only begin")
+        self.assertIn("UNTESTED", d["note"])
 
     def test_answers_before_their_sets_begin_are_not_classified(self) -> None:
         answers = {5: [ans(5, "M1:old", eye_seq=6)], 11: [ans(11, "M1:a", eye_seq=13)]}

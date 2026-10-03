@@ -24,9 +24,15 @@ import json
 from pathlib import Path
 
 
+def _rows(journal):
+    p = Path(journal)
+    files = sorted(p.glob("*.jsonl")) if p.is_dir() else [p]               # a journal is a DIRECTORY of day files (a live life) or one file (a replay), as the real grader's read_journal
+    return [json.loads(l) for f in files for l in f.read_text().splitlines() if l.strip()]
+
+
 class Life:
     def __init__(self, root, journal, genome=None):
-        rows = [json.loads(l) for l in Path(journal).read_text().splitlines() if l.strip()]
+        rows = _rows(journal)
         self.answers = [r for r in rows if r.get("kind") == "answer"]
         self.cfg = {"sitting": ["fresh", "s1b1"]}
 
@@ -53,8 +59,7 @@ def _rate(xs):
 
 
 def grade(root, journal, scored, label, genome=None):
-    rows = [json.loads(l) for l in Path(journal).read_text().splitlines() if l.strip()]
-    rows = [r for r in rows if r.get("kind") == "answer"]
+    rows = [r for r in _rows(journal) if r.get("kind") == "answer"]
     pts = [r for r in rows if r["form"] == "point"]
     sets, items = {}, {}
     for s in ("fresh", "s1b1"):
