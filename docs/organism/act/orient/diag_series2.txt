@@ -1,0 +1,28 @@
+== window 20, smooth weight clip((rate-0.1)/(0.3-0.1))
+  forward under random-3       forward  p 0.568 windows  13787: rate<lo 0.0010 (iid 0.0000) · lo<=rate<hi 0.0437 · rate>=hi 0.9553 · E[weight] 0.9798 (iid 0.9987) · P(weight=0) 0.0036
+  every act under uniform-7    left     p 1.000 windows   6769: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0000 · rate>=hi 1.0000 · E[weight] 1.0000 (iid 1.0000) · P(weight=0) 0.0000
+  every act under uniform-7    right    p 1.000 windows   6923: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0000 · rate>=hi 1.0000 · E[weight] 1.0000 (iid 1.0000) · P(weight=0) 0.0000
+  every act under uniform-7    forward  p 0.632 windows   6791: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0105 · rate>=hi 0.9895 · E[weight] 0.9955 (iid 0.9998) · P(weight=0) 0.0004
+  every act under uniform-7    pickup   p 0.091 windows   6905: rate<lo 0.4805 (iid 0.4476) · lo<=rate<hi 0.4957 · rate>=hi 0.0238 · E[weight] 0.1246 (iid 0.1021) · P(weight=0) 0.7167
+  every act under uniform-7    drop     p 0.073 windows   6738: rate<lo 0.5815 (iid 0.5665) · lo<=rate<hi 0.4010 · rate>=hi 0.0175 · E[weight] 0.0902 (iid 0.0608) · P(weight=0) 0.7928
+  every act under uniform-7    toggle   p 0.029 windows   6712: rate<lo 0.8935 (iid 0.8879) · lo<=rate<hi 0.1065 · rate>=hi 0.0000 · E[weight] 0.0071 (iid 0.0054) · P(weight=0) 0.9774
+  every act under uniform-7    done     p 0.000 windows   6845: rate<lo 1.0000 (iid 1.0000) · lo<=rate<hi 0.0000 · rate>=hi 0.0000 · E[weight] 0.0000 (iid 0.0000) · P(weight=0) 1.0000
+== window 20, smooth weight clip((rate-0.05)/(0.25-0.05))
+  forward under random-3       forward  p 0.568 windows  13787: rate<lo 0.0001 (iid 0.0000) · lo<=rate<hi 0.0228 · rate>=hi 0.9770 · E[weight] 0.9907 (iid 0.9997) · P(weight=0) 0.0010
+  every act under uniform-7    left     p 1.000 windows   6769: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0000 · rate>=hi 1.0000 · E[weight] 1.0000 (iid 1.0000) · P(weight=0) 0.0000
+  every act under uniform-7    right    p 1.000 windows   6923: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0000 · rate>=hi 1.0000 · E[weight] 1.0000 (iid 1.0000) · P(weight=0) 0.0000
+  every act under uniform-7    forward  p 0.632 windows   6791: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0047 · rate>=hi 0.9953 · E[weight] 0.9981 (iid 1.0000) · P(weight=0) 0.0000
+  every act under uniform-7    pickup   p 0.091 windows   6905: rate<lo 0.2206 (iid 0.1495) · lo<=rate<hi 0.7227 · rate>=hi 0.0568 · E[weight] 0.2486 (iid 0.2384) · P(weight=0) 0.4805
+  every act under uniform-7    drop     p 0.073 windows   6738: rate<lo 0.3310 (iid 0.2203) · lo<=rate<hi 0.6232 · rate>=hi 0.0459 · E[weight] 0.1904 (iid 0.1686) · P(weight=0) 0.5815
+  every act under uniform-7    toggle   p 0.029 windows   6712: rate<lo 0.5577 (iid 0.5573) · lo<=rate<hi 0.4417 · rate>=hi 0.0006 · E[weight] 0.0337 (iid 0.0334) · P(weight=0) 0.8935
+  every act under uniform-7    done     p 0.000 windows   6845: rate<lo 1.0000 (iid 1.0000) · lo<=rate<hi 0.0000 · rate>=hi 0.0000 · E[weight] 0.0000 (iid 0.0000) · P(weight=0) 1.0000
+== window 30, smooth weight clip((rate-0.1)/(0.3-0.1))
+  forward under random-3       forward  p 0.568 windows  13757: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0239 · rate>=hi 0.9761 · E[weight] 0.9919 (iid 0.9998) · P(weight=0) 0.0003
+  every act under uniform-7    left     p 1.000 windows   6739: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0000 · rate>=hi 1.0000 · E[weight] 1.0000 (iid 1.0000) · P(weight=0) 0.0000
+  every act under uniform-7    right    p 1.000 windows   6893: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0000 · rate>=hi 1.0000 · E[weight] 1.0000 (iid 1.0000) · P(weight=0) 0.0000
+  every act under uniform-7    forward  p 0.632 windows   6761: rate<lo 0.0000 (iid 0.0000) · lo<=rate<hi 0.0027 · rate>=hi 0.9973 · E[weight] 0.9989 (iid 1.0000) · P(weight=0) 0.0000
+  every act under uniform-7    pickup   p 0.091 windows   6875: rate<lo 0.5148 (iid 0.4806) · lo<=rate<hi 0.4764 · rate>=hi 0.0089 · E[weight] 0.1025 (iid 0.0813) · P(weight=0) 0.7030
+  every act under uniform-7    drop     p 0.073 windows   6708: rate<lo 0.6255 (iid 0.6248) · lo<=rate<hi 0.3706 · rate>=hi 0.0039 · E[weight] 0.0677 (iid 0.0435) · P(weight=0) 0.7955
+  every act under uniform-7    toggle   p 0.029 windows   6682: rate<lo 0.9407 (iid 0.9455) · lo<=rate<hi 0.0593 · rate>=hi 0.0000 · E[weight] 0.0031 (iid 0.0020) · P(weight=0) 0.9853
+  every act under uniform-7    done     p 0.000 windows   6815: rate<lo 1.0000 (iid 1.0000) · lo<=rate<hi 0.0000 · rate>=hi 0.0000 · E[weight] 0.0000 (iid 0.0000) · P(weight=0) 1.0000
+forward effect ACF (per forward outcome) under random-3: [(1, 0.304), (2, 0.109), (3, 0.06), (5, 0.043), (8, 0.019), (12, 0.008), (20, -0.001), (30, 0.005)]

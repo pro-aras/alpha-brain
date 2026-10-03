@@ -211,6 +211,41 @@ class TestPrintedReadings(unittest.TestCase):
         self.assertIn("R-WALK", v["next_law_cases"])
 
 
+class TestPresenceCounts(unittest.TestCase):
+    """#168 / the architect's ruling (c): every live/dead verdict prints, per act, the outcomes with a KNOWN effect, the EXCLUDED ones and the total."""
+
+    def _with_counts(self):
+        def m(sq, b, b2, lv, eq):
+            for r in b["arms"]["C-SCR"]["runs"]:
+                r["effect_counts"] = {a: {"known": 10, "excluded": 2, "total": 12} for a in V.ACT_NAMES}
+        return m
+
+    def test_counts_are_summed_over_the_seeds_and_reconcile(self) -> None:
+        v = run(mutate=self._with_counts())
+        c = v["readings"]["c_scr_effect_counts"]
+        self.assertEqual(sorted(c), sorted(V.ACT_NAMES))
+        for a, row in c.items():
+            self.assertEqual(row, {"known": 120, "excluded": 24, "total": 144}, a)
+            self.assertEqual(row["known"] + row["excluded"], row["total"])
+
+    def test_a_run_without_counts_reads_none_never_zero(self) -> None:
+        v = run()
+        self.assertIsNone(v["readings"]["c_scr_effect_counts"])
+
+    def test_counts_that_do_not_reconcile_are_a_defect(self) -> None:
+        def m(sq, b, b2, lv, eq):
+            for r in b["arms"]["C-SCR"]["runs"]:
+                r["effect_counts"] = {a: {"known": 10, "excluded": 2, "total": 13} for a in V.ACT_NAMES}
+        with self.assertRaises(ValueError):
+            run(mutate=m)
+
+    def test_counts_on_only_some_runs_are_refused(self) -> None:
+        def m(sq, b, b2, lv, eq):
+            b["arms"]["C-SCR"]["runs"][0]["effect_counts"] = {a: {"known": 10, "excluded": 2, "total": 12} for a in V.ACT_NAMES}
+        with self.assertRaises(ValueError):
+            run(mutate=m)
+
+
 class TestMergeBenches(unittest.TestCase):
     """The bench runs in two halves (two slots); the verdict merges them and refuses anything that would blur a number."""
 

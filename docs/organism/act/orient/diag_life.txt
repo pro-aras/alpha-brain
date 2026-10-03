@@ -1,0 +1,12 @@
+seed 30261923 acts 1500 episodes 32 successes 13
+  left     known  455 excluded  12  change rate 1.000
+  right    known  465 excluded   8  change rate 1.000
+  forward  known  400 excluded   8  change rate 0.568
+  pickup   known   36 excluded   0  change rate 0.028
+  drop     known   36 excluded   1  change rate 0.000
+  toggle   known   38 excluded   2  change rate 0.000
+  done     known   38 excluded   1  change rate 0.000
+forward judged dead at choices: 156 of 1501
+dead stretches (start, end, length): [(190, 260, 71), (266, 350, 85)]
+forward known effects (first 60): [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
+forward (count, rate) per 100 acts: [(9, 0.89), (22, 0.18), (4, 0.5), (17, 0.71), (25, 0.64), (37, 0.62), (41, 0.59), (26, 0.42), (33, 0.39), (27, 0.74), (38, 0.55), (35, 0.69), (26, 0.81), (26, 0.62), (34, 0.35)]

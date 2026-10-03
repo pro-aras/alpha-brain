@@ -1,0 +1,17 @@
+E
+======================================================================
+ERROR: test_act_effect_empirical (unittest.loader._FailedTest.test_act_effect_empirical)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_act_effect_empirical
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_empirical.py", line 13, in <module>
+    from tools.toys import act_effect_empirical as E
+ImportError: cannot import name 'act_effect_empirical' from 'tools.toys' (unknown location)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

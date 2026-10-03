@@ -31,6 +31,7 @@ PLANT_PASS_MAX = 0.05                  # P-OLD, K-ARGMAX: at most 5 % of lives p
 DEAL_MAX_OVER_NULL = 0.02
 DEAL_NOOP_SHARE = 0.5
 EPS = 1e-12
+ACT_NAMES = ["left", "right", "forward", "pickup", "drop", "toggle", "done"]
 NEW_ALTERNATIVES = ("A-PROP", "A-UCB", "A-RATE", "A-BOTH", "R-WSLS", "R-WALK")
 
 
@@ -63,6 +64,26 @@ def merge_benches(benches: Sequence[Dict[str, object]]) -> Dict[str, object]:
                 raise ValueError(f"arm {k!r} appears in two halves")
             arms[k] = v
     return {"seeds": seeds, "arms": arms}
+
+
+def presence_counts(arm: Dict[str, object]) -> Optional[Dict[str, Dict[str, int]]]:
+    """Per act, the outcomes with a KNOWN effect, the EXCLUDED ones (the silent-reset boundary, a life's start) and the total, summed over the seeds (#168). None when a run carries no counts —
+    never zeros. A row where known + excluded != total is a defect of the instrument and raises."""
+    runs = arm.get("runs", [])
+    have = [("effect_counts" in r) for r in runs]
+    if not runs or not any(have):
+        return None
+    if not all(have):
+        raise ValueError("presence counts are on some runs and missing on others (never summed over a part)")
+    out = {a: {"known": 0, "excluded": 0, "total": 0} for a in ACT_NAMES}
+    for r in runs:
+        for a in ACT_NAMES:
+            c = r["effect_counts"][a]
+            if c["known"] + c["excluded"] != c["total"]:
+                raise ValueError(f"presence counts do not reconcile for {a!r} (seed {r.get('seed')}): {c}")
+            for k in ("known", "excluded", "total"):
+                out[a][k] += int(c[k])
+    return out
 
 
 def verdict(statusquo: Dict[str, object], bench: Dict[str, object], bench2: Dict[str, object], lives: Dict[str, object], equiv: Dict[str, object],
@@ -126,7 +147,7 @@ def verdict(statusquo: Dict[str, object], bench: Dict[str, object], bench2: Dict
     readings = {"null_mean": mean(null), "null_sd": sd(null), "r3_mean": mean(r3), "r3_sd": sd(r3), "r3_seedwise_p95": r3_p95, "ceiling_mean": mean(ceil), "r_scr_mean": mean(r_scr),
                 "c_scr_mean": mean(c), "c_scr_minus_null": mean(d), "c_scr_minus_r3": mean(c) - mean(r3), "c_scr_minus_r_scr": mean(c) - mean(r_scr),
                 "null2_minus_null_sd": null_diff_sd, "smallest_detectable_gap_seed_level": T_CRIT_P001[n - 1] * sd(d) / math.sqrt(n), "paired_diff_sd_vs_null": sd(d),
-                "c_scr_per_seed": c}
+                "c_scr_per_seed": c, "c_scr_effect_counts": presence_counts(arms["C-SCR"])}
     return {"marks": marks, "admit": admit, "void": void, "readings": readings, "alternatives": alts,
             "next_law_cases": [k for k, v in alts.items() if v["clears_r3_seedwise_p95"] and k != "C-SCR"]}
 
@@ -139,6 +160,9 @@ def _fmt(v: Dict[str, object]) -> str:
     for k, x in m.items():
         extra = {kk: vv for kk, vv in x.items() if kk != "pass" and not isinstance(vv, (dict, list))}
         lines.append(f"  {k}: {'PASS' if x['pass'] else 'FAIL'} {extra}")
+    cnt = r.get("c_scr_effect_counts")
+    if cnt:
+        lines.append("  C-SCR per-act outcomes (known / excluded / total), summed over the seeds: " + "; ".join(f"{a} {x['known']}/{x['excluded']}/{x['total']}" for a, x in cnt.items()))
     lines.append("  alternatives (printed, never admitted): " + "; ".join(f"{k} {x['minus_null']:+.3f} vs null, {x['minus_r3']:+.3f} vs R-3{' [clears R-3 p95]' if x['clears_r3_seedwise_p95'] else ''}" for k, x in v["alternatives"].items()))
     return "\n".join(lines)
 
