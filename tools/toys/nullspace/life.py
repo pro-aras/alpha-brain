@@ -34,6 +34,26 @@ def new_learner(lr_scale: float = 1.0):
     return Lr.RWLearner(lr=Lr.LR_S1B1 * float(lr_scale), oracle=False)
 
 
+def learner_rows(data, blocks_per_room: int = NP.BLOCKS_PER_ROOM) -> Dict[str, np.ndarray]:
+    """G4's measurement: the rows [z || 1] a learner ACTUALLY receives in T-MEM-1's sequential order — an unhooked training pass in which, after each `train_scene`, the learner's
+    own running statistics standardise the scene's inputs (the statistics the update just used: observe first, then standardise). Compared with the pre-pass's rows by the gate.
+    edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 11:48 +0400 — added with run.py's gate."""
+    L = S.new_learner()
+    rooms = list(ROOMS)
+    got: Dict[str, List[np.ndarray]] = {r: [] for r in rooms}
+    cursor = {r: 0 for r in rooms}
+    for block in range(1, len(rooms) * blocks_per_room + 1):
+        room = rooms[(block - 1) // blocks_per_room]
+        for i in range(cursor[room], cursor[room] + PK.BLOCK):
+            X, words = data.visit_scene(room, i)
+            L.train_scene(X, words, referent=None, rng=episodic_rng(data.seed, room, i))
+            Xa = np.atleast_2d(np.asarray(X, dtype=np.float64))
+            if Xa.shape[0]:
+                got[room].append(np.hstack([L.stats.standardise(Xa), np.ones((Xa.shape[0], 1))]))
+        cursor[room] += PK.BLOCK
+    return {r: np.vstack(v) for r, v in got.items()}
+
+
 def life_ns(data, test, arm: NP.Arm, label: str, n_blocks: int = 200, rep: Optional[int] = None,
             prereg: Optional[Dict[str, str]] = None) -> Dict[str, object]:
     cpu0, wall0 = time.process_time(), time.time()
