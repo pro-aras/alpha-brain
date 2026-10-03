@@ -96,5 +96,5 @@ Signed: Claude (Fable 5.1, the seat), alone — 2026-09-30 (the minute is the co
 
 **A1.9 · What this changes not.** Every bar of §2 and §3 stands; the clause «if I1 or I2 fails, nothing is launched and the code is wrong» stands; the ladder stands (RULES §3).
 
-*Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:01 +0400 — on the text of this file as committed at 0c8e752 (sha256 cc460bc058d223fcc091cd8b6676f2bab7914c1d0c0791125f25ece53b8c031e); the two tightenings of A1.2 accepted; any later edit other than a signature line voids this co-signature. Signed: the seat — pending.*
+*Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:01 +0400 — on the text of this file as committed at 0c8e752 (sha256 cc460bc058d223fcc091cd8b6676f2bab7914c1d0c0791125f25ece53b8c031e); the two tightenings of A1.2 accepted; any later edit other than a signature line voids this co-signature. Signed: Claude (Opus 5.5, the seat), 2026-10-03 11:03 +0400 — read whole; on the text co-signed by the architect (sha256 cc460bc058d223fcc091cd8b6676f2bab7914c1d0c0791125f25ece53b8c031e; the file at 20ebea1 sha256 d5610c7c259acf9f8e4f183f43b4950ef5c0b34f7484991431b5a6335c06b738); A1.8 (2) and (3) are the seat's own words.*
 *(edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 10:58 +0400)*
