@@ -117,16 +117,20 @@ def run(a) -> int:
     # around _inner_turn alone is tests/creature/test_inner_mind.py's.
     read_only = (before["brain"] == after["brain"] and before["web_L"] == after["web_L"] and before["self_but_B1"] == after["self_but_B1"])
     b1_delta = int(after["B1_observed"]) - int(before["B1_observed"])
+    # B1 is observed on every body row that CARRIES a reading (creature/mind.py:_self_body: `if bl is not None`): the n eligible rows and
+    # the backlog-1 plant, not the no-reading plant → n + 1 (a first run expected n + 2 and read its own expectation as a failure)
+    rows_with_reading = n + 1
     rec = {"n": n, "rule": str(a.rule), "walk_from": str(a.walk_from), "plant": plant, "inhibit": int(a.inhibit), "restart": int(a.restart),
            "genome": str(a.genome), "genome_sha256": sha256_file(Path(a.genome)), "bench_genome_sha256": sha256_file(gp), "gen": str(a.gen),
            "gen_last_seq": gen_manifest.get("last_seq"), "resume_last_seq": int(last_seq), "mature": sorted(str(w) for w in mind.brain.L.mature_words()),
            "seed": int(mind.genome.seed), "counts": st, "inner_rows": len(rows), "prints_before": before, "prints_after": after,
-           "read_only": read_only, "B1_observed_delta": b1_delta, "body_rows_fed": n + 2, "cpu_s_load": round(t_load, 3),
+           "read_only": read_only, "B1_observed_delta": b1_delta, "body_rows_fed": n + 2, "body_rows_with_reading": rows_with_reading,
+           "cpu_s_load": round(t_load, 3),
            "cpu_s_rows": round(t_rows, 3), "cpu_ms_per_row": round(1000.0 * t_rows / max(n, 1), 3), "at": datetime.now(timezone.utc).isoformat()}
     (out / "RUN.json").write_text(json.dumps(rec, indent=1, sort_keys=True) + "\n")
-    print(f"[inner-bench run] rows {len(rows)} of {n} eligible · counts {st} · read-only {read_only} (B1 observed +{b1_delta} on {n + 2} body rows) · "
-          f"{rec['cpu_ms_per_row']} ms/row (load {rec['cpu_s_load']} s) · plant {plant}")
-    return 0 if (read_only and b1_delta == n + 2) else 1
+    print(f"[inner-bench run] rows {len(rows)} of {n} eligible · counts {st} · read-only {read_only} (B1 observed +{b1_delta} on {rows_with_reading} "
+          f"body rows with a reading, of {n + 2} fed) · {rec['cpu_ms_per_row']} ms/row (load {rec['cpu_s_load']} s) · plant {plant}")
+    return 0 if (read_only and b1_delta == rows_with_reading) else 1
 
 
 def prints(mind) -> Dict[str, object]:
