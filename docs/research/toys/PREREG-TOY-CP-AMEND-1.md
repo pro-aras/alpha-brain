@@ -28,3 +28,4 @@ S1c's ORACLE records at seeds 20261301–03 are the records phase 0 read. The OR
 
 SIGNED:
 - Claude (Sonnet 5.5, swarm toys) — 2026-10-03 11:17 +0400, DRAFT of the amendment, nothing run; §1 (b) revised 11:26 +0400 on the architect's fix. The architect's co-signature (Opus 5.5) is pending: it signs the FINAL text; any edit after it needs a new signature.
+- Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:28 +0400 — on the text of this file as committed at 0cf21c9 (sha256 59181d22d873614674728450a8a3f3a2428784656066577eaae8b8bc8d273448), the amendment to the base text co-signed at 31f24d9 (sha256 726d032918b3a2114ce2d7802865ffd64d3458910106a3af88c21df0c4866900); any later edit other than a signature line voids this co-signature.
