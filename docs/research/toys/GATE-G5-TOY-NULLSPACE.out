@@ -1,0 +1,17 @@
+G5 price, solo lives at seed 20261301; box load 6.96 7.80 7.62 (a CPU-second here is inflated by what else runs, #243 (5))
+   pre-pass (rows, Grams)        0.10 CPU-s a seed
+   PLAIN                         1.14 CPU-s
+   OWM@0.01                      1.35 CPU-s
+   NSCL@0.01                     1.36 CPU-s
+   ROT@0.01                      1.29 CPU-s
+   RANDRANK@0.01                 1.35 CPU-s
+   SHRINK-OWM@0.01               1.20 CPU-s
+   STD-ONLY@2                    1.18 CPU-s
+   FREEZE-OLD@2                  1.17 CPU-s
+   LRSHRINK@0.5                  1.36 CPU-s
+   OWM-NB@0.01                   1.32 CPU-s
+   OWM-RESTD@0.01                1.93 CPU-s
+   OWM-BM@0.01                   1.28 CPU-s
+   OWM-OLDONLY@0.01              1.34 CPU-s
+   ANTI-OWM@0.01                 1.42 CPU-s
+G5: stage 1 = 870 lives ≈ 19.0 CPU-min at these prices (the PREREG estimated ≈ 33)

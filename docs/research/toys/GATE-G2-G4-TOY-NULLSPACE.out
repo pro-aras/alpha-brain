@@ -1,0 +1,19 @@
+G2/G4 seed 20261301: rates_rw                                                     EQUAL
+G2/G4 seed 20261301: pairs                                                        EQUAL
+G2/G4 seed 20261301: table                                                        EQUAL
+G2/G4 seed 20261301: first_meet                                                   EQUAL
+G2/G4 seed 20261301: record rows                                                  EQUAL
+G2/G4 seed 20261301: G4 pre-pass rows == a learner's (max abs difference 0.0e+00) EQUAL
+G2/G4 seed 20261302: rates_rw                                                     EQUAL
+G2/G4 seed 20261302: pairs                                                        EQUAL
+G2/G4 seed 20261302: table                                                        EQUAL
+G2/G4 seed 20261302: first_meet                                                   EQUAL
+G2/G4 seed 20261302: record rows                                                  EQUAL
+G2/G4 seed 20261302: G4 pre-pass rows == a learner's (max abs difference 0.0e+00) EQUAL
+G2/G4 seed 20261303: rates_rw                                                     EQUAL
+G2/G4 seed 20261303: pairs                                                        EQUAL
+G2/G4 seed 20261303: table                                                        EQUAL
+G2/G4 seed 20261303: first_meet                                                   EQUAL
+G2/G4 seed 20261303: record rows                                                  EQUAL
+G2/G4 seed 20261303: G4 pre-pass rows == a learner's (max abs difference 0.0e+00) EQUAL
+G2/G4: ALL EQUAL

@@ -1,0 +1,12 @@
+G5 price, solo lives at seed 20261301; box load 7.08 7.12 6.85 (a CPU-second here is inflated by what else runs, #243 (5))
+   RANDOM          4.14 CPU-s (with the drop's anatomy)
+   R-ONLY          2.10 CPU-s
+   N-ONLY          2.22 CPU-s
+   ERROR           2.10 CPU-s
+   L-own-last2     2.04 CPU-s
+   L-hist-ema      2.21 CPU-s
+   C-own-last2     2.31 CPU-s
+   C-hist-ema      2.52 CPU-s
+   LP-OUDEYER      2.75 CPU-s
+   ORACLE         38.49 CPU-s
+G5: stage 1 = 1420 lives ≈ 64.4 CPU-min at these prices (the PREREG estimated 45-55 + 5 for the ORACLE)
