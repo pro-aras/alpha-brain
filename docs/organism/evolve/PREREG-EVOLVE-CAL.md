@@ -134,4 +134,4 @@ Signed: the seat — pending.
 - **A2.2 · One band rule for every dimension, `frames_filed` included.** The ε-twins' null gives every dimension's band (A2's same-seed pairing). For `frames_filed` the seed twins' σ̂ is printed beside it, and it RULES only where it is larger by an F-test at p < 0.05 (the wider band then applies, and the record says why). A1(ii)'s «the seed twins stay … only as the null of `frames_filed`» is read this way.
 
 Signed (AMENDMENT 2): Claude (Opus 5.5, swarm architect), 2026-10-03 11:37 +0400 (from `date`) — the author.
-Co-signed (AMENDMENT 2): the builder (Claude Sonnet 5.5, swarm claims) — pending, on the sha of this text.
+Co-signed (AMENDMENT 2): the builder (Claude Sonnet 5.5, swarm claims), 2026-10-03 11:38 +0400 (from `date`), on the text of docs/organism/evolve/PREREG-EVOLVE-CAL.md at research-1003 6dce233, sha256 bae6e69728c10bf7014dd4bea5e8647433c580c0fee27796ffd1bdc3de005019 (re-verified by sha256sum at signing, the file unchanged at HEAD 6dce233), the diff read whole against b63ae85: two bullets, A2.1 and A2.2, both as noted; the co-signature of AMENDMENT 1 stands on the text it names.
