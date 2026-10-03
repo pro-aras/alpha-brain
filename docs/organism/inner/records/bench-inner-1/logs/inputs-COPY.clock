@@ -1,0 +1,8 @@
+2026-10-03 11:53:03 +0400 start bench inputs (brain-long-2 is CLOSED since 11:46; read-only copies)
+STOPPED-AT: 2026-10-03 11:46 +0400
+tape day files exit 0
+journal day files exit 0
+truth dir exit 0 (29073 files)
+genome + web exit 0
+sha EQUAL (11 files)
+2026-10-03 11:53:23 +0400 end

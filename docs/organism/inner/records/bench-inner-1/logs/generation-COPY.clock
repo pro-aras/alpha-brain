@@ -1,0 +1,4 @@
+2026-10-03 11:18:16 +0400 start (cp -a, prints preserved)
+try 1 cp -a exit 0
+generation last_seq 330367 files 11 prints torn: none · sha vs original now: all equal
+2026-10-03 11:18:17 +0400 end

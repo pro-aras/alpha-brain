@@ -1,0 +1,1 @@
+[inner-bench run] rows 1000 of 1000 eligible · counts {'turns': 1000, 'said': 940, 'skipped': {'backlog': 1, 'no backlog reading': 1}, 'n': 1000, 'chain': 0} · read-only True (B1 observed +1001 on 1001 body rows with a reading, of 1002 fed) · 6.719 ms/row (load 16.71 s) · plant None
