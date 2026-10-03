@@ -1,0 +1,55 @@
+# suite creature on 9d43829ab9f57c9288d4ae8d54c34fe139565ad5 (/data/dev/genome-wt-poller-g1) under /usr/bin/python3, started 2026-10-03 22:16:39 +0400 · memory.peak = the slot scope's running maximum since its creation (exact for this run only if it exceeds every earlier run in the same scope) · PART pattern test_[a-f]*.py
+........................[A42-B3 task 2] pg14640's first body sentence (flag ON): "[Transcriber's Notes: Welcome to the schoolroom of 1900."
+........[seam] think outcomes: {'filed': 6, 'no_cell_answers': 5, 'belief': 4}; no_cell_answers=5
+....................[DROPxSLEEP] sleep boundaries=8 total replayed=40 live glances_dropped=47 tick_calls=47
+.[DROPxTHINK] org.t drop=340 floor=340 frozen_t=340
+...sssss.../data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmp5tm6an2i/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-poller-g1/tools/lives/check.py:208: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/dev/genome-wt-poller-g1/scratch/tmp/tmpftrpmj1n/STATUS.json' mode='r' encoding='UTF-8'>
+  status = json.load(open(root / "STATUS.json")) if (root / "STATUS.json").exists() else {}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...................................................{"moments": 255, "cells": [67, 17], "words_seen": ["arrow", "bar", "circle", "cross", "cup", "diamond", "dot", "house", "key", "moon", "ring", "square", "star", "tree", "triangle", "wave", "zog"], "chance_q1": 0.059, "disjoint_checked": 57, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.5}
+Q1: {"acc": 0.36363636363636365, "n": 33, "correct": 12, "abstain": {"novel": 0, "noedge": 0, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.030303030303030304, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "cross": 0.0, "ring": 0.0, "bar": 0.0, "dot": 0.3333333333333333, "
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/voice-seam-life-t4ypbd0v/exam/2026-10-03T181940Z.json
+....................................................................................................{"moments": 139880, "cells": [2122, 31], "words_seen": ["", "ahmad", "anchor", "ant", "arrow", "ball", "bar", "barrel", "bass", "beaver", "bonsai", "box", "brain", "buddha", "camera", "cannon", "circle", "cross", "cup", "diamond", "dot", "house", "key", "moon", "ring", "square", "star", "tree", "triangle", "wave", "zog"], "chance_q1": 0.032, "disjoint_checked": 57, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 18.0}
+Q1: {"acc": 0.9393939393939394, "n": 33, "correct": 31, "abstain": {"novel": 0, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.0, "per_thing": {"circle": 1.0, "square": 1.0, "triangle": 1.0, "cross": 1.0, "ring": 1.0, "bar": 1.0, "dot": 1.0, "star": 1.0, "arrow": 1.0, "wave":
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmpfscxb_e0/life/exam/2026-10-03T182128Z.json
+..................................{"moments": 45, "cells": [7, 4], "words_seen": ["circle", "diamond", "square", "triangle"], "chance_q1": 0.25, "disjoint_checked": 38, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.4}
+Q1: {"acc": 0.0, "n": 8, "correct": 0, "abstain": {"novel": 1, "noedge": 7, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 1.0, "per_thing": {"circle": 0.0, "square": 0.0, "triangle": 0.0, "diamond": 0.0}, "answers_from_multi_word_cells": 0, "hedge_rate": null}
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmpw_koyor1/exam/2026-10-03T182204Z.json
+......................................
+[organs' road on the fixture] point None on 8 of 8 point asks: [('unheard', 8)]
+......................................................................................................................................{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmpfs7e24_y/exam/2026-10-03T182708Z.json
+.{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmp6dounek1/exam/2026-10-03T182710Z.json
+.{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmppnvrftc0/exam/2026-10-03T182713Z.json
+.{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 190, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 1.2}
+Q1: {"acc": 0.9, "n": 110, "correct": 99, "abstain": {"novel": 4, "noedge": 0, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.045454545454545456, "per_thing": {"circle": 0.5, "square": 0.9, "triangle": 0.8, "cross": 1.0, "ring": 0.8, "bar": 1.0, "dot": 1.0, "star": 1.0, "arrow": 1.0, "wav
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmp7qvfs6j3/exam/2026-10-03T182719Z.json
+....{"moments": 500, "cells": [70, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.8727272727272727, "n": 55, "correct": 48, "abstain": {"novel": 3, "noedge": 1, "ratio": 1, "close": 0, "minority": 0}, "false_abstention": 0.09090909090909091, "per_thing": {"circle": 0.4, "square": 1.0, "triangle": 1.0, "cross": 0.8, "ring": 0.6, "bar": 1.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmpe_o3senr/exam/2026-10-03T182725Z.json
+.{"moments": 240, "cells": [44, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.7}
+Q1: {"acc": 0.6181818181818182, "n": 55, "correct": 34, "abstain": {"novel": 4, "noedge": 8, "ratio": 0, "close": 0, "minority": 7}, "false_abstention": 0.34545454545454546, "per_thing": {"circle": 0.4, "square": 0.6, "triangle": 1.0, "cross": 0.4, "ring": 0.2, "bar": 0.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmpysojazbd/exam/2026-10-03T182726Z.json
+.{"moments": 240, "cells": [44, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.6727272727272727, "n": 55, "correct": 37, "abstain": {"novel": 4, "noedge": 11, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.2727272727272727, "per_thing": {"circle": 0.4, "square": 0.6, "triangle": 1.0, "cross": 0.4, "ring": 0.6, "bar": 0.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmpeczf9266/exam/2026-10-03T182727Z.json
+.{"moments": 240, "cells": [44, 11], "words_seen": ["arrow", "bar", "circle", "cross", "diamond", "dot", "ring", "square", "star", "triangle", "wave"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.6727272727272727, "n": 55, "correct": 37, "abstain": {"novel": 4, "noedge": 11, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.2727272727272727, "per_thing": {"circle": 0.4, "square": 0.6, "triangle": 1.0, "cross": 0.4, "ring": 0.6, "bar": 0.0, "dot": 1.0, "star": 1.0, "arro
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmpxbz0_v1e/exam/2026-10-03T182729Z.json
+.{"moments": 240, "cells": [9, 1], "words_seen": ["circle"], "chance_q1": 0.091, "disjoint_checked": 95, "disjoint_control_caught": true, "organism_hash_unchanged_by_exam": true, "seconds": 0.6}
+Q1: {"acc": 0.09090909090909091, "n": 55, "correct": 5, "abstain": {"novel": 42, "noedge": 0, "ratio": 0, "close": 0, "minority": 0}, "false_abstention": 0.7636363636363637, "per_thing": {"circle": 1.0, "square": 0.0, "triangle": 0.0, "cross": 0.0, "ring": 0.0, "bar": 0.0, "dot": 0.0, "star": 0.0, "arro
+wrote /data/dev/genome-wt-poller-g1/scratch/tmp/tmp6hb_ddu5/exam/2026-10-03T182731Z.json
+...........
+----------------------------------------------------------------------
+Ran 444 tests in 660.414s
+
+OK (skipped=5)
+# ended 2026-10-03 22:27:41 +0400 exit 0 · memory.peak 8310222848 bytes · cgroup /sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/slot-hears-split-creature-1277647.scope

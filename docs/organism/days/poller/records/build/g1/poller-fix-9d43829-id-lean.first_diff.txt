@@ -1,0 +1,4 @@
+FIRST_DIFF · a /data/dev/swarm/2026-10-03/int/lean/journal/2026-09-28.jsonl · kept 34481 (dropped non-mind 103, blank 0)
+FIRST_DIFF · b /data/dev/swarm/2026-10-03/int/logs/poller-fix-9d43829-id-lean/journal.jsonl · kept 34481 (dropped non-mind 0, blank 0)
+FIRST_DIFF · byte-identical kept lines: True
+FIRST_DIFF · verdict IDENTICAL · 34481 rows field by field

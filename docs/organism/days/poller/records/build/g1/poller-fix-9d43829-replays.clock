@@ -1,0 +1,10 @@
+2026-10-03 22:04:48 +0400 replays start on 9d43829ab9f57c9288d4ae8d54c34fe139565ad5
+id-lean slot exit 0
+plant genome: 2 changed lines (must be 2 = one line out, one in)
+id-full slot exit 0
+plant-lean slot exit 1
+first_diff full exit 0
+first_diff --plant full exit 1 (1 = caught)
+first_diff lean exit 0
+first_diff --plant lean exit 1 (1 = caught)
+2026-10-03 22:50:57 +0400 replays end

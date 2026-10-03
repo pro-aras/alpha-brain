@@ -1,0 +1,107 @@
+# edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:42 +0400 — BRAIN-IN-BODY §5 (docs/brain/body/INTERFACE-BRAIN-ORGAN.md; PREREG-BRAIN-IN-BODY.md, signed): rung 1's lean body — the BRAIN organ + the scene world, nothing else. Started from genome/ALPHA4.genome's text; every line not in the lean list is turned #OFF WITH ITS REASON on the line (never deleted). NMAX 8000 was ADDED (RAISED in HANDBACK-B): the lean list names neither GROW nor NMAX and the parser refuses without one of the two.
+# LIFE.genome — THE ONE LIFE (his 17:44 word: «one genome carrying all the things, grown and verified after 24 hours of testings …
+# a proper one organism, that has ability to be intelligent when it is born as primitive»). DRAFT, NOT LIVE — the law of this file is
+# docs/organs/NEXT-LIFE-PLAN-2026-09-22.md (§4 the laws L-1..L-14, §5 the line table, §6 the marks, §8 the launch sequence).
+# = genome/G5.genome (the six seam lives' file) + every line the plan switches ON; every DRAFT line is re-checked against the LANDED
+# parser at the pre-flight, and any line whose builder has not landed by the launch is turned #OFF WITH ITS REASON ON THE LINE —
+# never removed, never silently. NMAX and the game's cadence are written by the pre-flight (L-3), not by hand.
+# edit: Claude (Fable 5.1), 2026-09-22 18:2x +0400.
+SEED     20261101   # BRAIN-IN-BODY (builder B): matches WORLD scene's seed below -- a life at another world seed changes SEED and the WORLD scene seed together
+# BODY
+BODY     service creature threads eye ear door mind think voice   # DRAFT (builder E, L-5): `think` = the thinking thread; refuses until the machinery names it
+TAPE     run/tape
+HEART    every 10 s
+CRASH    sense restart journal; mind page
+# SENSES
+SENSE    eye    32x32 grey
+RETINA   thresh0.25 centre tower:eye-tower-g2 sqrt unit           # the FIXED front — his 17:28 word: traits are DATA the eye captures
+GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border coarse 32   # DRAFT (builder B, L-7): + ONE whole-canvas glance a canvas, tagged act coarse
+#OFF SURPRISE floor 0.05 predicted mind-cell                            # DRAFT (builder B, L-4): the mind's expected cell reaches the eye; the eye stamps the residual; a glance under the floor is a CONFIRMED (cheap) moment — his 17:28 word: keep the gate on   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): the offline scored brain never used a surprise/predicted gate -- rung 1 is the LAW road as it scored
+DELIVER  where fixation when instant act glance
+SENSE    ear    letters 8
+SENSE    colour rg by 4x4 under the glance fixed-gain
+#OFF SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss backlog refused_nmax   # DRAFT (builder A): + backlog (#236); + refused_nmax (L-9/SELF's «I have no room» trigger needs it; STATUS already carries births_refused_nmax)   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): STATUS's own sense-body republish is not part of rung 1's world
+#OFF SENSE    ear-sound wav 16000 mono                                  # DRAFT (builder D, L-13): consumed into FAST; its own AREA is rung 2 (the world's voice)   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no sound world here -- the scene-talk world has no audio
+#OFF SENSE    smell kind size folder age                                # DRAFT (builder F, L-12): the folder door's cheap channel before a picture is opened   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no folder/hands door here
+#OFF SENSE    touch from hands: exit rate stalls retries bytes          # DRAFT (builder F, L-12): the hands' door   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no hands door here
+#OFF BIND     glances per canvas                  # OFF (Builder J, 2026-09-21): the pre-registered bar FAILED — Q1 0.9625 on life 2's replay vs the first-fixation twin's 0.98125
+#OFF TRAITS   contrast head 32 lr 0.01 at sleep   # OFF (PREREG §12; his 17:28 word): a learned head is not a trait; the front is fixed data
+#OFF RETINA   thresh0.25 centre dog3 hogcells8x6 unit   # G-EYE-4: the genome-set front — a TWIN experiment on the closed tapes first (predicted to lose: G0 −0.19)
+#OFF SCAN     channels lum rg by across fixations       # G-EYE-7: an experiment against the colour block on a coloured world that repeats (the game's tapes)
+# AREAS + MEET
+AREA     sight  from retina
+AREA     words  from ear
+#OFF AREA     episodes from fast   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): FAST is off -- no episode ring to feed it
+MEET     sight  words
+# GROW / WIRE / SHRINK
+BIRTH    novelty  cos<0.952
+BIRTH    error    misfires 3
+BUDGET   400 per arrival; regenerate 1 per 60 moments   # builder G (landed 85bf792): the anti-flood LAW as a rate (his «no cap»); seam-2 read 0 births from 22:04 under the reset-only form
+ARRIVAL  never-heard word
+# NMAX removed — ALPHA4 (his 00:17 word «no cap»): GROW unbounded below; builder G makes the parser accept the absence of NMAX when GROW is declared
+NMAX     8000   # ADDED (BRAIN-IN-BODY builder B, RAISED in HANDBACK-B): the lean list names neither GROW nor NMAX ("the GROW / WIRE / SHRINK laws" is BUDGET/ARRIVAL/KWTA/HEBB/DELTA/PRUNE/MERGE/SCALE, the ALPHA4 section header, not the specific GROW gene); the parser refuses "genome lacks ['nmax']" without one of the two -- a fixed cap is the smaller change (GROW unbounded's own hash-over-live-prefix machinery is untested here)
+KWTA     5
+HEBB     window 1                                 # the window IS one moment by construction (wiring happens inside `moment`); any other value refuses
+DELTA    lr 0.06
+PRUNE    w<0.02 after 3 chances
+MERGE    cos>0.9969 same-answer
+SCALE    every 1250 moments                       # re-based for five moments a canvas (L-7): the wall-clock cadence of G5's 1000 kept
+# CYCLE grow to 0.9 nmax — REMOVED for ALPHA4 (builder G: a cycle keyed on a cap that does not exist is refused under GROW); the redundancy form is below
+THRESH   cell own band history 30                 # DRAFT (builder A, L-6): each cell keeps the cosines of the glances it answered; its p5 is its own floor (BCM's shape, ADAPTS)
+ANSWER   resembles under own-band; unknown below 0.911   # DRAFT (builder A, L-6): «X» / «I don't know what it is, but it resembles X» / «I don't know»; 0.911 = gate G-a's between-p95 on this front
+# MEMORY, fast and slow
+#OFF FAST     episodes 20000 keys sight words surprise sound   # DRAFT (builder D): + sound (the ear-sound trait)   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): rung 1 (S1b-1R's A-RW-R) keeps its own store (genome/brain.py), not the organism's episode ring
+#OFF MOMENT   keys sight words surprise where when act source   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): FAST is off
+#OFF SLEEP    every 2500 moments replay 200 by surprise        # re-based for five moments a canvas (L-7): G5's 2000 kept in wall-clock   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no consolidation pass -- the brain calibrates on its OWN calibrate_at schedule (the BRAIN line), never the organism's sleep
+# PREDICT — the one modulator
+#OFF PREDICT  next glance; error scales delta 0.5..2.0; ranks replay; grades act; error comparator   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no surprise/predicted gate here
+#OFF FILE     claim route decider due   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): THINK is off -- nothing files a claim
+# ATTENTION / CURIOSITY / METACOGNITION
+#OFF CURIOSITY interests 50 operators recombine generalize specialize bridge   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no operator pool here
+#OFF PARK     after 3 identical dead-ends reopen on new-sense   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no want-parking here
+#OFF SELF     from body; beliefs about itself; skip thinks when backlog > 200   # DRAFT (builder A, L-9): the mind reads its own numbers and acts on one of them   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no body sense to compare against
+# THINKING
+#OFF INDUCE   rule from 5 episodes no counter   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): THINK is off
+#OFF DEDUCE   one step   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): THINK is off
+#OFF BELIEF   clash opens never overwrites   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): THINK is off
+#OFF THINK    every 10 canvases; on its own thread; lands next boundary   # DRAFT (builder E, L-5): launched on a frozen copy at a boundary; applied at the next; the mind waits if late — replay identical by construction   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): rung 1 has no thinking-organ pool -- the BRAIN organ is the mind's whole reasoning tonight
+#OFF EXAM     every 500 canvases   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no voice/exam thread -- the sitting IS the exam, run through the scene door
+#OFF SIT      exam every 500 canvases; the score returns as a sense   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): EXAM is off
+#OFF FROZEN   after 50 cells   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): TWIN-ONLY gene (creature/genes.py), never read by a live genome
+# LANGUAGE
+#OFF SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token   # DRAFT (builder C, L-11): a frame = two words that met in one instant ≥ 5 times, FILED with its episodes   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no two-word-frame road here -- SPEAK/SPEAK2/DECLINE are the BRAIN organ's own mouth
+#OFF MOUTH    say one frame per think; journaled                                              # DRAFT (builder C, L-11): the mouth says a frame as an `is` question the next frame grades   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): SENTENCE is off
+#OFF QUESTION from wants; forms what-is is which; to the world door                          # DRAFT (builder C, L-10): a wordless sight's 2nd showing, a failed rule, a clash, a park → a question row the world answers by showing   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no want-driven world-door questions here -- the scene sense's own asks are canvas-authored, not mind-authored
+# HANDS + WORLD
+#OFF WORLD    drawn every 5 s arrivals every 4 h; folder world/; web 0 per hour by curiosity   # 24 h = six windows; the plant by the unit's PLANT_AFTER=15000 (hour ≈ 21); web 0 = the web door is implemented by nothing   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): the maker world is not this life's world -- WORLD scene replaces it
+#OFF WORLD    game babyai-gotolocal every 30 s; seed 20260923; frames pov 7x7 tile 32; consequence: his act chooses the next frame   # DRAFT: cadence written by the pre-flight (L-3); the ACT is the MIND's (builder D, L-8)   # PRE-FLIGHT 2026-09-23 04:36 +0400: 15 s → 30 s (the game's states are the unbounded novelty source; seam-2 spent 599 births on it in 5 h at 5 s)   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no game world here
+#OFF HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20          # DRAFT (builder F, L-12): rung 1 — choose from the shelf; the output rendered as a canvas the eye sees   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no hands door here
+#OFF ACT      glance open ask turn step say run                                                # DRAFT (builders C, D, F): the whole vocabulary; an act with no road yet journals «no road»   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no act vocabulary -- nothing chooses acts in a scene-talk life
+#OFF OUTCOME  act to episode; error grades it; ranks replay   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): ACT is off
+# ANSWER
+ABSTAIN  second/best > 0.85
+RECALL   k=3                                      # parsed and REQUIRED by the parser's own list; the value reaches no call site (recall_many lights every resonating cell) — the inventory prints it VALUE-UNREAD; kept because the machinery refuses a genome without it, said here, not hidden
+ASK      what-is show is which why                # `why` = the addresses questions.why() returns (builder A); `next` dropped — no mechanism predicts a next thing
+# STAGES
+STAGE    1 senses   moments 0..200
+STAGE    2 meet     moments 200..
+#OFF ANALOGY   hesse                               # declared; no structure to map yet
+#OFF AUDIENCE  listener-model                      # declared; «why» is its first cell
+#OFF EAR-SOUND cochlear gammatone agc               # E52's front is the SENSE ear-sound line above; this older spelling stays off
+#OFF READ-EYE  words through the eye               # E43/E47
+# THETA_N / THETA_M are written by gate G-a at the pre-flight on THIS front (the coarse row included); the machinery refuses to start until they are numbers.
+
+# ── ALPHA 4 — the additions (docs/ALPHA4-PREREG.md §3); every builder landed on the integration tree by 2026-09-23 03:46 +0400 ──
+#OFF GROW     unbounded                                    # builder G (landed 85bf792): NMAX gone; areas grow by doubling; W/mask/strikes sparse; the hash over the live prefix   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): capacity growth is not exercised by rung 1 -- NMAX below sets a fixed, generous cap instead (its own reason)
+#OFF CYCLE    consolidate when redundant > 0.05 of alive   # builder G (landed 85bf792): REPLACES the "grow to 0.9 nmax" form above once G lands (the old line is then removed)   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): GROW is off -- no redundancy-consolidation pass to run
+#OFF SENSE    read shelf /data/alpha3-library/SHELF.sqlite curriculum /data/alpha3-library/CURRICULUM.md every 20 s words 4 canvas 128   # builder H (landed): a sentence SHOWN (rendered on the canvas) and HEARD (its words as ear rows) on one moment   # PRE-FLIGHT 2026-09-23 04:57 +0400: the shelf's rendered words were 2,024 of 2,527 sight births/h (9× any other source); at 3,334 cells the mind read 476 ms/canvas and a backlog of 21 under 5 s/8 words (pre-3, 39 min) — 20 s / 4 words keeps the mind ahead of its world for most of the day [Likely]; L-3: the cadence is the knob, never a cap   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no shelf reader here
+#OFF DOOR     lexicon /data/alpha2-library/lexicon-enwiktionary-20260901.sqlite answers what-is by showing                              # builder H (landed): the mind's what-is → the gloss, shown and heard; nobody answers him   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no lexicon door here
+#OFF DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD                          # builder I (landed): fetches only what a QUESTION names; data, never instructions   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no web door here
+#OFF SENSE    grade from ask/graded                        # builder I (landed): the seat's grades (ask/graded/<id>.json) and the HOLD flag as TAPE rows — mentorship enters through the tape, so the judge's (d)/(e) replay (added 2026-09-23 03:46 +0400: the line was missing from the draft; I built the parser branch and the sense)   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no seat-grading door here
+#OFF STAGE    3 nursery moments 200..                      # builder I (landed): the game + the shelf + the folder + the ask door; the web door CLOSED   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): rung 1 has no nursery stage -- STAGE 1/2 are kept, nothing advances past 2
+#OFF STAGE    4 world by READY                             # builder I (landed): the READINESS judge (PREREG §4) at exam boundaries, from tape facts; one event row; never undone by the mind   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): rung 1 has no READINESS judge -- STAGE_READY is not wired without ASK/SENSE_GRADE et al.
+#OFF EVOLVE   every 6 h; mutate 1 gene within bounds; judge on the last 2 h; adopt at sleep under the regression bar   # builder J (landed): PREREG §6; ships as "propose" if adoption is not replay-safe by the landing   # OFF (BRAIN-IN-BODY builder B, rung 1 lean list): no self-mutation here -- rung 1 is the fixed LAW road
+
+# ── BRAIN-IN-BODY (builder B, docs/brain/body/INTERFACE-BRAIN-ORGAN.md §5) — the scene-talk world + the brain organ ──
+WORLD    scene seed 20261101; train 10000; sitting fresh s1b1; feed max backlog 8; utterance true
+BRAIN    word-map lr 0.01; reader eps 0.3; none 0.95; conformal 0.90; young 3; calibrate at 250 500 1000 2000 5000 10000 and before a sitting; replay none; hears scene
