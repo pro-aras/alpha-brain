@@ -1,0 +1,45 @@
+test_stage_commands_run_and_the_verify_flag_reads_the_source_again (tests.tools.test_evolve_cal_twin.TestCli.test_stage_commands_run_and_the_verify_flag_reads_the_source_again) ... {"first_seq": 75, "last_seq": 118, "n_payloads": 44, "n_rows": 44, "payload_bytes": 323605, "rows_sha256": "455b2c5ffa7b63ad4b448e12af62a9bc5a128a5c8d42c28490f3366e26690bef"}
+VERIFY {"equal": true, "extra_rows": 0, "missing_payloads": [], "payload_mismatches": [], "row_mismatches": 0, "rows_checked": 44}
+{"bytes": 240874, "n_files": 12}
+VERIFY {"equal": true, "extra": [], "mismatches": [], "missing": [], "n_files": 12}
+ok
+test_the_twin_and_compare_commands_run_end_to_end (tests.tools.test_evolve_cal_twin.TestCli.test_the_twin_and_compare_commands_run_end_to_end) ... {"confirmed_share": null, "cpu_s": 0.438, "frames_filed": 0, "journal_rows": 7, "journal_sha256": "f81ed4efcc692edbc8fd6e0a19522719954fe362a330f8e588c4a1c5389cc0ed", "maxrss_kb": 205012, "q1_seen": 0.35, "rows_consumed": 12, "state_hash": "5622ee6779653b6d337e1f9d39a2f292c1a3bc095948ff71f913df7b3b9c7900", "variant": "incumbent", "wall_s": 0.438}
+{"confirmed_share": null, "cpu_s": 0.438, "frames_filed": 0, "journal_rows": 7, "journal_sha256": "f81ed4efcc692edbc8fd6e0a19522719954fe362a330f8e588c4a1c5389cc0ed", "maxrss_kb": 205012, "q1_seen": 0.35, "rows_consumed": 12, "state_hash": "5622ee6779653b6d337e1f9d39a2f292c1a3bc095948ff71f913df7b3b9c7900", "variant": "incumbent", "wall_s": 0.439}
+{"a": {"label": null, "variant": "incumbent"}, "b": {"label": null, "variant": "incumbent"}, "confirmed_share": [null, null], "frames_filed": [0, 0], "journal": {"by_decile": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 7, "first_diff": null, "identical": true, "n_a": 7, "n_b": 7, "rows_differing": 0}, "q1_seen": [0.35, 0.35], "row_hash_equal": true, "state_hash_equal": true}
+ok
+test_a_discrete_difference_is_counted_and_located (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_a_discrete_difference_is_counted_and_located) ... ok
+test_a_float_only_difference_is_a_difference_but_not_a_discrete_one (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_a_float_only_difference_is_a_difference_but_not_a_discrete_one) ... ok
+test_different_lengths_are_not_identical_and_say_so (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_different_lengths_are_not_identical_and_say_so) ... ok
+test_identical_journals_are_identical (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_identical_journals_are_identical) ... ok
+test_comment_lines_are_never_edited (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_comment_lines_are_never_edited) ... ok
+test_eps_variant_refuses_a_perturbation_that_changes_nothing_or_makes_no_sense (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_eps_variant_refuses_a_perturbation_that_changes_nothing_or_makes_no_sense) ... ok
+test_eps_variant_scales_delta_lr_and_nothing_else (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_eps_variant_scales_delta_lr_and_nothing_else) ... ok
+test_gene_text_reads_the_number_the_bounds_pattern_names (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_gene_text_reads_the_number_the_bounds_pattern_names) ... ok
+test_gene_text_refuses_an_unknown_or_excluded_key_and_a_missing_line (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_gene_text_refuses_an_unknown_or_excluded_key_and_a_missing_line) ... ok
+test_seed_variant_adds_k_to_the_seed_and_keeps_the_trailing_comment (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_seed_variant_adds_k_to_the_seed_and_keeps_the_trailing_comment) ... ok
+test_set_gene_text_changes_exactly_one_line_and_exactly_the_number (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_set_gene_text_changes_exactly_one_line_and_exactly_the_number) ... ok
+test_set_gene_text_refuses_a_non_number (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_set_gene_text_refuses_a_non_number) ... ok
+test_the_eps_genome_still_parses_and_carries_the_perturbed_rate (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_the_eps_genome_still_parses_and_carries_the_perturbed_rate) ... ok
+test_the_seed_genome_still_parses_with_the_new_seed (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_the_seed_genome_still_parses_with_the_new_seed) ... ok
+test_variant_dispatch (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_variant_dispatch) ... ok
+test_a_planted_change_in_one_twin_is_caught_by_the_comparison (tests.tools.test_evolve_cal_twin.TestRunTwin.test_a_planted_change_in_one_twin_is_caught_by_the_comparison) ... ok
+test_a_twin_writes_its_readings_and_cleans_its_state_copy (tests.tools.test_evolve_cal_twin.TestRunTwin.test_a_twin_writes_its_readings_and_cleans_its_state_copy) ... ok
+test_rows_limit_cuts_the_slice (tests.tools.test_evolve_cal_twin.TestRunTwin.test_rows_limit_cuts_the_slice) ... ok
+test_the_same_twin_twice_is_bit_identical (tests.tools.test_evolve_cal_twin.TestRunTwin.test_the_same_twin_twice_is_bit_identical) ... ok
+test_the_variant_reaches_the_twins_genome_file (tests.tools.test_evolve_cal_twin.TestRunTwin.test_the_variant_reaches_the_twins_genome_file) ... ok
+test_stage_copies_every_file_and_the_manifest_hashes_them (tests.tools.test_evolve_cal_twin.TestStageCheckpoint.test_stage_copies_every_file_and_the_manifest_hashes_them) ... ok
+test_stage_refuses_a_non_empty_destination (tests.tools.test_evolve_cal_twin.TestStageCheckpoint.test_stage_refuses_a_non_empty_destination) ... ok
+test_verify_catches_a_flipped_byte_and_an_extra_file (tests.tools.test_evolve_cal_twin.TestStageCheckpoint.test_verify_catches_a_flipped_byte_and_an_extra_file) ... ok
+test_a_declared_run_tape_path_resolves_like_the_tape_does (tests.tools.test_evolve_cal_twin.TestStageSlice.test_a_declared_run_tape_path_resolves_like_the_tape_does) ... ok
+test_every_payload_a_row_names_was_copied_byte_for_byte (tests.tools.test_evolve_cal_twin.TestStageSlice.test_every_payload_a_row_names_was_copied_byte_for_byte) ... ok
+test_staging_refuses_a_non_empty_destination (tests.tools.test_evolve_cal_twin.TestStageSlice.test_staging_refuses_a_non_empty_destination) ... ok
+test_the_manifest_names_what_was_staged (tests.tools.test_evolve_cal_twin.TestStageSlice.test_the_manifest_names_what_was_staged) ... ok
+test_the_staged_tape_holds_exactly_the_slice_rows_and_reads_through_the_shared_reader (tests.tools.test_evolve_cal_twin.TestStageSlice.test_the_staged_tape_holds_exactly_the_slice_rows_and_reads_through_the_shared_reader) ... ok
+test_verify_catches_a_deleted_payload_and_a_changed_row (tests.tools.test_evolve_cal_twin.TestStageSlice.test_verify_catches_a_deleted_payload_and_a_changed_row) ... ok
+test_verify_reads_the_source_again_and_agrees (tests.tools.test_evolve_cal_twin.TestStageSlice.test_verify_reads_the_source_again_and_agrees) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 15.838s
+
+OK
+scope memory.peak 184066048 bytes
