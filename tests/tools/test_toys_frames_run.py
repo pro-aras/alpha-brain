@@ -6,12 +6,15 @@
 """
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
 from typing import List
+from unittest import mock
 
 import numpy as np
 
@@ -214,6 +217,75 @@ class TestSceneBlock(unittest.TestCase):
         cond = EV.evaluate_condition(tr, he, name="SCENE", draws=5, web_seeds=(1,), kind="plain")
         with self.assertRaises(SC.CeilingStop):
             RN.scene_block(bad, cond)
+
+
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 21:41 +0400 — STAGE 6c, written FIRST (red: `gates` printed «see gates.py» and exited 64). `_main` is the command line of the unit: `gates` must hand the copies and the runs directory to
+# gates.run_gates and exit with ITS code (a failed gate must stop a shell chain), `unit` must pass its options to run_unit and still refuse without a passed GATES.json, `status` must list what is on disk. gates is imported INSIDE the
+# branch (gates imports run: a top-level import is circular), so the tests patch tools.toys.frames.gates.run_gates, the name the branch looks up at call time.
+class TestCli(unittest.TestCase):
+    def test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code(self):
+        from tools.toys.frames import gates as GT
+        for want in (0, 1):
+            seen = []
+
+            def fake(copies, out, **kw):
+                seen.append((copies, out, kw))
+                return want
+
+            with self.subTest(code=want):
+                with mock.patch.object(GT, "run_gates", fake):
+                    code = RN._main(["gates", "--copies", "/x/copies", "--out", "/x/runs"])
+                self.assertEqual(code, want)                                                              # the gate's own code, never a constant
+                self.assertEqual(seen, [(Path("/x/copies"), Path("/x/runs"), {})])
+
+    def test_gates_defaults_to_the_runners_copies_and_runs_directories(self):
+        from tools.toys.frames import gates as GT
+        seen = []
+        with mock.patch.object(GT, "run_gates", lambda copies, out, **kw: seen.append((copies, out)) or 0):
+            self.assertEqual(RN._main(["gates"]), 0)
+        self.assertEqual(seen, [(ST.COPIES, RN.RUNS)])
+
+    def test_the_unit_command_passes_its_options_to_run_unit(self):
+        seen = []
+
+        def fake(copies, out, draws=100, only=None, **kw):
+            seen.append((copies, out, draws, only))
+            return 7
+
+        with mock.patch.object(RN, "run_unit", fake):
+            self.assertEqual(RN._main(["unit", "--copies", "/c", "--out", "/o", "--draws", "9", "--only", "ALPHA4,SCENE"]), 7)
+            self.assertEqual(RN._main(["unit", "--copies", "/c", "--out", "/o"]), 7)
+        self.assertEqual(seen, [(Path("/c"), Path("/o"), 9, ["ALPHA4", "SCENE"]), (Path("/c"), Path("/o"), 100, None)])    # the law's 100 draws by default; no --only = every condition
+
+    def test_the_unit_command_still_refuses_without_a_passed_gates_record(self):
+        d = Path(tempfile.mkdtemp())
+        try:
+            make_copies(d / "copies")
+            with self.assertRaises(RN.RunError):
+                RN._main(["unit", "--copies", str(d / "copies"), "--out", str(d / "runs"), "--draws", "5"])
+        finally:
+            shutil.rmtree(d)
+
+    def test_status_lists_each_condition_and_the_two_records(self):
+        d = Path(tempfile.mkdtemp())
+        try:
+            def status():
+                buf = io.StringIO()
+                with contextlib.redirect_stdout(buf):
+                    code = RN._main(["status", "--out", str(d)])
+                return code, buf.getvalue().splitlines()
+
+            code, lines = status()
+            self.assertEqual(code, 0)
+            self.assertEqual(lines, [f"{name}: missing" for name in ("ALPHA4", "ALPHA4+PLANT", "ALPHA4+SHUFFLE", "SCENE", "SCENE+PLANT")] + ["RESULTS.json: missing; GATES.json: missing"])
+            (d / "SCENE.json").write_text("{}")
+            (d / "GATES.json").write_text("{}")
+            code, lines = status()
+            self.assertEqual(lines, ["ALPHA4: missing", "ALPHA4+PLANT: missing", "ALPHA4+SHUFFLE: missing", "SCENE: on disk", "SCENE+PLANT: missing", "RESULTS.json: missing; GATES.json: on disk"])
+            (d / "RESULTS.json").write_text("{}")
+            self.assertEqual(status()[1][-1], "RESULTS.json: on disk; GATES.json: on disk")
+        finally:
+            shutil.rmtree(d)
 
 
 if __name__ == "__main__":

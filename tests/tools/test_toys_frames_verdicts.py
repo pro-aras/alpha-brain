@@ -182,6 +182,22 @@ class TestEyeReading(unittest.TestCase):
         self.assertAlmostEqual(r["rate_not_kept"], 1 / 3, places=12)
         self.assertEqual(r["kept_never_said"], 1)                                                       # (zz, yy)
 
+    # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 21:39 +0400 — the law's §4 asks for «the cells' 40 distinct said frames, EACH with its says and its yes-count»; the reading carried only the
+    # aggregates. Written FIRST (red: KeyError 'frames'): the per-frame table, sorted (most says first, ties by the frame's text), the pair as a list or None for a said text that is not two words.
+    def test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count(self):
+        says = [("red box", "yes", 1), ("red box", "yes", 2), ("red box", "no", 3), ("to the", "no", 4), ("to the", "no", 5), ("the letters", "no", 6), ("blue ball", "yes", 7), ("one two three", "no", 8)]
+        c = cond("ALPHA4", [rec("MDL-GREEDY", 0, 1, 1.0, q1=0.0, frames=[["red", "box"]])])
+        e = VD.eye_reading(c, says)
+        self.assertEqual(e["frames"], [{"frame": "red box", "pair": ["red", "box"], "says": 3, "yes": 2},
+                                       {"frame": "to the", "pair": ["to", "the"], "says": 2, "yes": 0},
+                                       {"frame": "blue ball", "pair": ["blue", "ball"], "says": 1, "yes": 1},
+                                       {"frame": "one two three", "pair": None, "says": 1, "yes": 0},
+                                       {"frame": "the letters", "pair": ["the", "letters"], "says": 1, "yes": 0}])
+        self.assertEqual(len(e["frames"]), e["distinct_said"])                                           # every distinct said frame is in the table
+        self.assertEqual(sum(f["says"] for f in e["frames"]), e["says"])                                 # and the table's says and yes-counts add up to the totals
+        self.assertEqual(sum(f["yes"] for f in e["frames"]), e["yes"])
+        self.assertEqual(VD.eye_reading(c, [])["frames"], [])                                            # no says: an empty table (and a base rate of None, as before)
+
     def test_an_empty_set_has_no_rate(self):
         c = cond("ALPHA4", [rec("SENTENCE", 0, 0, 0.0, q1=0.0, frames=[])])
         r = VD.eye_reading(c, [("red box", "yes", 1)])["records"][0]

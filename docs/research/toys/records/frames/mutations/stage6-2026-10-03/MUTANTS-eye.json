@@ -1,0 +1,106 @@
+{
+ "file": "tools/toys/frames/verdicts.py",
+ "module": "tools.toys.frames.verdicts",
+ "mutants": [
+  {
+   "kind": "identity",
+   "name": "CONTROL-identity"
+  },
+  {
+   "kind": "broken",
+   "name": "CONTROL-broken"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count"
+   ],
+   "name": "eye-sort-says",
+   "new": "key=lambda kv: (kv[1][\"says\"], kv[0]))",
+   "old": "key=lambda kv: (-kv[1][\"says\"], kv[0]))",
+   "why": "fewest says first"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count"
+   ],
+   "name": "eye-sort-ties",
+   "new": "key=lambda kv: (-kv[1][\"says\"],))",
+   "old": "key=lambda kv: (-kv[1][\"says\"], kv[0]))",
+   "why": "ties in the order the says came (not alphabetical)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count"
+   ],
+   "name": "eye-sort-ties-rev",
+   "new": "key=lambda kv: (-kv[1][\"says\"], tuple(-ord(c) for c in kv[0])))",
+   "old": "key=lambda kv: (-kv[1][\"says\"], kv[0]))",
+   "why": "ties in reverse alphabetical order"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count"
+   ],
+   "name": "eye-pair-list",
+   "new": "\"pair\": e[\"pair\"]",
+   "old": "\"pair\": (list(e[\"pair\"]) if e[\"pair\"] is not None else None)",
+   "why": "the pair stays a tuple"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count"
+   ],
+   "name": "eye-pair-none",
+   "new": "\"pair\": (list(e[\"pair\"]) if e[\"pair\"] is not None else [])",
+   "old": "\"pair\": (list(e[\"pair\"]) if e[\"pair\"] is not None else None)",
+   "why": "a said text that is not two words has an empty pair"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count"
+   ],
+   "name": "eye-frame-text",
+   "new": "{\"frame\": text.upper(), \"pair\"",
+   "old": "{\"frame\": text, \"pair\"",
+   "why": "the frame text is upper-cased"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count"
+   ],
+   "name": "eye-says",
+   "new": "\"says\": e[\"yes\"], \"yes\": e[\"yes\"]}\n              for text",
+   "old": "\"says\": e[\"says\"], \"yes\": e[\"yes\"]}\n              for text",
+   "why": "says prints the yes count"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count"
+   ],
+   "name": "eye-yes",
+   "new": "\"says\": e[\"says\"], \"yes\": e[\"says\"]}\n              for text",
+   "old": "\"says\": e[\"says\"], \"yes\": e[\"yes\"]}\n              for text",
+   "why": "yes prints the says count"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count"
+   ],
+   "name": "eye-key-dropped",
+   "new": "\"base_rate\": (total_yes / total_says if total_says else None), \"records\": recs}",
+   "old": "\"base_rate\": (total_yes / total_says if total_says else None), \"frames\": frames, \"records\": recs}",
+   "why": "the table is not returned"
+  }
+ ],
+ "source_sha256": "650460c21e0d91939184146a0e1f28a9ce2b56d24ca1850661d7cfbb0b15a13e",
+ "tests": "tests.tools.test_toys_frames_verdicts"
+}

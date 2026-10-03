@@ -1,0 +1,104 @@
+##### cli-gates-64
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -194,3 +194,3 @@
+     from . import gates as GT
+-    return GT.run_gates(Path(a.copies), out)
++    print('gates: see tools/toys/frames/gates.py', file=sys.stderr); return 64
+ 
+##### cli-gates-const
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -194,3 +194,3 @@
+     from . import gates as GT
+-    return GT.run_gates(Path(a.copies), out)
++    return 0
+ 
+##### cli-gates-copies
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -194,3 +194,3 @@
+     from . import gates as GT
+-    return GT.run_gates(Path(a.copies), out)
++    return GT.run_gates(out, out)
+ 
+##### cli-gates-out
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -194,3 +194,3 @@
+     from . import gates as GT
+-    return GT.run_gates(Path(a.copies), out)
++    return GT.run_gates(Path(a.copies), Path(a.copies))
+ 
+##### cli-status-code
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -187,3 +187,3 @@
+         print(f"RESULTS.json: {'on disk' if (out / 'RESULTS.json').exists() else 'missing'}; GATES.json: {'on disk' if (out / 'GATES.json').exists() else 'missing'}")
+-        return 0
++        return 1
+     if a.cmd == "unit":
+##### cli-status-results
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -186,3 +186,3 @@
+             print(f"{name}: {'on disk' if (out / f'{name}.json').exists() else 'missing'}")
+-        print(f"RESULTS.json: {'on disk' if (out / 'RESULTS.json').exists() else 'missing'}; GATES.json: {'on disk' if (out / 'GATES.json').exists() else 'missing'}")
++        print(f"RESULTS.json: {'on disk' if (out / 'GATES.json').exists() else 'missing'}; GATES.json: {'on disk' if (out / 'GATES.json').exists() else 'missing'}")
+         return 0
+##### cli-status-text
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -185,3 +185,3 @@
+         for name, *_ in CONDITIONS:
+-            print(f"{name}: {'on disk' if (out / f'{name}.json').exists() else 'missing'}")
++            print(f"{name}: {'missing' if (out / f'{name}.json').exists() else 'on disk'}")
+         print(f"RESULTS.json: {'on disk' if (out / 'RESULTS.json').exists() else 'missing'}; GATES.json: {'on disk' if (out / 'GATES.json').exists() else 'missing'}")
+##### cli-unit-copies
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -190,3 +190,3 @@
+         only = [x for x in a.only.split(",") if x] or None
+-        return run_unit(Path(a.copies), out, draws=a.draws, only=only)
++        return run_unit(out, out, draws=a.draws, only=only)
+     # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 21:41 +0400 — the `gates` command (red-first: tests/tools/test_toys_frames_run.py TestCli): G1-G6 on the copies, exit with run_gates' own code; gates is imported here, not at the top,
+##### cli-unit-draws
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -180,3 +180,3 @@
+     ap.add_argument("--only", default="")
+-    ap.add_argument("--draws", type=int, default=100)
++    ap.add_argument("--draws", type=int, default=99)
+     a = ap.parse_args(list(argv))
+##### cli-unit-draws-pass
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -190,3 +190,3 @@
+         only = [x for x in a.only.split(",") if x] or None
+-        return run_unit(Path(a.copies), out, draws=a.draws, only=only)
++        return run_unit(Path(a.copies), out, only=only)
+     # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 21:41 +0400 — the `gates` command (red-first: tests/tools/test_toys_frames_run.py TestCli): G1-G6 on the copies, exit with run_gates' own code; gates is imported here, not at the top,
+##### cli-unit-only
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -189,3 +189,3 @@
+     if a.cmd == "unit":
+-        only = [x for x in a.only.split(",") if x] or None
++        only = [x for x in a.only.split(",")] or None
+         return run_unit(Path(a.copies), out, draws=a.draws, only=only)
+##### cli-unit-only-none
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -189,3 +189,3 @@
+     if a.cmd == "unit":
+-        only = [x for x in a.only.split(",") if x] or None
++        only = None
+         return run_unit(Path(a.copies), out, draws=a.draws, only=only)
+##### CONTROL-broken
+--- a/tools/toys/frames/run.py
++++ b/tools/toys/frames/run.py
+@@ -69,2 +69,3 @@
+ def write_json(path: Path, obj) -> None:
++    raise RuntimeError('BROKEN CONTROL')
+     path.parent.mkdir(parents=True, exist_ok=True)
+##### CONTROL-identity

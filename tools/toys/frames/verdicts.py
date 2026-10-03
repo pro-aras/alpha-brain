@@ -140,7 +140,11 @@ def eye_reading(cond: Dict[str, object], says: Sequence[Tuple[str, str, object]]
         recs.append({"rule": r["rule"], "seed": r["seed"], "n_frames": len(kept), "said_kept": len(in_k), "says_kept": says_k, "yes_kept": yes_k,
                      "rate_kept": (yes_k / says_k if says_k else None), "says_not_kept": says_n, "yes_not_kept": yes_n, "rate_not_kept": (yes_n / says_n if says_n else None),
                      "kept_never_said": len(kept - said_pairs)})
-    return {"distinct_said": len(said), "says": total_says, "yes": total_yes, "base_rate": (total_yes / total_says if total_says else None), "records": recs}
+    # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 21:40 +0400 — the law's §4 «each [distinct said frame] with its says and its yes-count»: the per-frame table (red-first: tests/tools/test_toys_frames_verdicts.py,
+    # KeyError 'frames'), most says first, ties by the frame's text; `pair` is the two words as a list, None for a said text that is not two words.
+    frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
+              for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]
+    return {"distinct_said": len(said), "says": total_says, "yes": total_yes, "base_rate": (total_yes / total_says if total_says else None), "frames": frames, "records": recs}
 
 
 def jaccard(a: Iterable, b: Iterable) -> Optional[float]:

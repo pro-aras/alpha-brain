@@ -189,8 +189,10 @@ def _main(argv: Sequence[str]) -> int:
     if a.cmd == "unit":
         only = [x for x in a.only.split(",") if x] or None
         return run_unit(Path(a.copies), out, draws=a.draws, only=only)
-    print("gates: see tools/toys/frames/gates.py", file=sys.stderr)
-    return 64
+    # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 21:41 +0400 — the `gates` command (red-first: tests/tools/test_toys_frames_run.py TestCli): G1-G6 on the copies, exit with run_gates' own code; gates is imported here, not at the top,
+    # because gates imports this module (a top-level import would be circular).
+    from . import gates as GT
+    return GT.run_gates(Path(a.copies), out)
 
 
 if __name__ == "__main__":

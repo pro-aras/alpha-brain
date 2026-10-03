@@ -1,0 +1,80 @@
+##### CONTROL-broken
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -30,2 +30,3 @@
+ def _need(rule: str, n: int) -> int:
++    raise RuntimeError('BROKEN CONTROL')
+     return -(-WEB_S_MIN * n // 10) if rule == "WEB-S" else n
+##### CONTROL-identity
+##### eye-frame-text
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -144,3 +144,3 @@
+     # KeyError 'frames'), most says first, ties by the frame's text; `pair` is the two words as a list, None for a said text that is not two words.
+-    frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
++    frames = [{"frame": text.upper(), "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
+               for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]
+##### eye-key-dropped
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -146,3 +146,3 @@
+               for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]
+-    return {"distinct_said": len(said), "says": total_says, "yes": total_yes, "base_rate": (total_yes / total_says if total_says else None), "frames": frames, "records": recs}
++    return {"distinct_said": len(said), "says": total_says, "yes": total_yes, "base_rate": (total_yes / total_says if total_says else None), "records": recs}
+ 
+##### eye-pair-list
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -144,3 +144,3 @@
+     # KeyError 'frames'), most says first, ties by the frame's text; `pair` is the two words as a list, None for a said text that is not two words.
+-    frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
++    frames = [{"frame": text, "pair": e["pair"], "says": e["says"], "yes": e["yes"]}
+               for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]
+##### eye-pair-none
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -144,3 +144,3 @@
+     # KeyError 'frames'), most says first, ties by the frame's text; `pair` is the two words as a list, None for a said text that is not two words.
+-    frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
++    frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else []), "says": e["says"], "yes": e["yes"]}
+               for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]
+##### eye-says
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -144,3 +144,3 @@
+     # KeyError 'frames'), most says first, ties by the frame's text; `pair` is the two words as a list, None for a said text that is not two words.
+-    frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
++    frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["yes"], "yes": e["yes"]}
+               for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]
+##### eye-sort-says
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -145,3 +145,3 @@
+     frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
+-              for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]
++              for text, e in sorted(said.items(), key=lambda kv: (kv[1]["says"], kv[0]))]
+     return {"distinct_said": len(said), "says": total_says, "yes": total_yes, "base_rate": (total_yes / total_says if total_says else None), "frames": frames, "records": recs}
+##### eye-sort-ties
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -145,3 +145,3 @@
+     frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
+-              for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]
++              for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"],))]
+     return {"distinct_said": len(said), "says": total_says, "yes": total_yes, "base_rate": (total_yes / total_says if total_says else None), "frames": frames, "records": recs}
+##### eye-sort-ties-rev
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -145,3 +145,3 @@
+     frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
+-              for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]
++              for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], tuple(-ord(c) for c in kv[0])))]
+     return {"distinct_said": len(said), "says": total_says, "yes": total_yes, "base_rate": (total_yes / total_says if total_says else None), "frames": frames, "records": recs}
+##### eye-yes
+--- a/tools/toys/frames/verdicts.py
++++ b/tools/toys/frames/verdicts.py
+@@ -144,3 +144,3 @@
+     # KeyError 'frames'), most says first, ties by the frame's text; `pair` is the two words as a list, None for a said text that is not two words.
+-    frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["yes"]}
++    frames = [{"frame": text, "pair": (list(e["pair"]) if e["pair"] is not None else None), "says": e["says"], "yes": e["says"]}
+               for text, e in sorted(said.items(), key=lambda kv: (-kv[1]["says"], kv[0]))]

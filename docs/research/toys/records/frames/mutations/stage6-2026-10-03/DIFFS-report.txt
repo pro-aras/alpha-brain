@@ -1,0 +1,1001 @@
+##### CONTROL-broken
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -77,3 +77,3 @@
+ def num(x: Optional[float], nd: int = 2) -> str:
+-    return "none" if x is None else f"{x:.{nd}f}"
++    raise RuntimeError("BROKEN CONTROL")
+ 
+##### CONTROL-identity
+##### rp-cond-every
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -267,3 +267,3 @@
+         c = rep["conds"][name]
+-        L.append(f"{name:<16}{c['kind']:<9}{str(c.get('every') or '-'):>6}{str(c['n_train_moments']) + '/' + str(c['n_held_moments']):>22}{str(c['n_train_words']) + '/' + str(c['n_held_words']):>20}"
++        L.append(f"{name:<16}{c['kind']:<9}{str(c.get('every')):>6}{str(c['n_train_moments']) + '/' + str(c['n_held_moments']):>22}{str(c['n_train_words']) + '/' + str(c['n_held_words']):>20}"
+                  f"{c['V']:>7}{c['N0']:>9}{c['draws']:>7}{num(c.get('cpu_seconds'), 1):>9}{num((c.get('peak_rss_kb') or 0) / 1024.0, 0):>9}")
+##### rp-cond-peak
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -268,3 +268,3 @@
+         L.append(f"{name:<16}{c['kind']:<9}{str(c.get('every') or '-'):>6}{str(c['n_train_moments']) + '/' + str(c['n_held_moments']):>22}{str(c['n_train_words']) + '/' + str(c['n_held_words']):>20}"
+-                 f"{c['V']:>7}{c['N0']:>9}{c['draws']:>7}{num(c.get('cpu_seconds'), 1):>9}{num((c.get('peak_rss_kb') or 0) / 1024.0, 0):>9}")
++                 f"{c['V']:>7}{c['N0']:>9}{c['draws']:>7}{num(c.get('cpu_seconds'), 1):>9}{num((c.get('peak_rss_kb') or 0) / 1000.0, 0):>9}")
+     return L
+##### rp-cond-words
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -267,3 +267,3 @@
+         c = rep["conds"][name]
+-        L.append(f"{name:<16}{c['kind']:<9}{str(c.get('every') or '-'):>6}{str(c['n_train_moments']) + '/' + str(c['n_held_moments']):>22}{str(c['n_train_words']) + '/' + str(c['n_held_words']):>20}"
++        L.append(f"{name:<16}{c['kind']:<9}{str(c.get('every') or '-'):>6}{str(c['n_train_moments']) + '/' + str(c['n_held_moments']):>22}{str(c['n_held_words']) + '/' + str(c['n_train_words']):>20}"
+                  f"{c['V']:>7}{c['N0']:>9}{c['draws']:>7}{num(c.get('cpu_seconds'), 1):>9}{num((c.get('peak_rss_kb') or 0) / 1024.0, 0):>9}")
+##### rp-counts-mean-decimals
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -107,3 +107,3 @@
+         return str(int(xs[0]))
+-    return f"{sum(xs) / len(xs):.1f} ({int(min(xs))} to {int(max(xs))})"
++    return f"{sum(xs) / len(xs):.2f} ({int(min(xs))} to {int(max(xs))})"
+ 
+##### rp-counts-minmax-swap
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -107,3 +107,3 @@
+         return str(int(xs[0]))
+-    return f"{sum(xs) / len(xs):.1f} ({int(min(xs))} to {int(max(xs))})"
++    return f"{sum(xs) / len(xs):.1f} ({int(max(xs))} to {int(min(xs))})"
+ 
+##### rp-counts-single-float
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -106,3 +106,3 @@
+     if len(xs) == 1:
+-        return str(int(xs[0]))
++        return f"{xs[0]:.1f}"
+     return f"{sum(xs) / len(xs):.1f} ({int(min(xs))} to {int(max(xs))})"
+##### rp-crit-beats
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -370,3 +370,3 @@
+     L = ["== 6 · CRITERION-MATTERS (NULL-2) (a reading, no bar: G(F) > q95 of NULL-2 AND G(F) > 0; WEB-S: seeds of ten; gated by PLANT-BEATS-NULL-2)",
+-         f"PLANT-BEATS-NULL-2: ALPHA4+PLANT {beats['ALPHA4+PLANT']}, SCENE+PLANT {beats['SCENE+PLANT']}"]
++         f"PLANT-BEATS-NULL-2: ALPHA4+PLANT {beats['ALPHA4+PLANT']}, SCENE+PLANT {beats['ALPHA4+PLANT']}"]
+     for rule in RULES:
+##### rp-crit-verdict
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -376,3 +376,3 @@
+         cr = res["grade"]["alpha4"][rule]["criterion"]
+-        L.append(f"CRITERION-MATTERS {rule}: {cr['verdict']} — {cr['n_pass']} of {cr['n']} seeds (need {cr['need']})")
++        L.append(f"CRITERION-MATTERS {rule}: {cr['verdict']} — {cr['n']} of {cr['n_pass']} seeds (need {cr['need']})")
+         L.append(f"    G {spread([r['gain']['G'] for r in rs])}; {_null_row(rs, 'null2')}")
+##### rp-eye-base
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -390,3 +390,3 @@
+     L = ["== 7 · THE EYE'S READING (ALPHA4: the cells' said frames against each rule's kept set; a reading, never a bar)",
+-         f"the cells said {eye['distinct_said']} distinct frames, {eye['says']} says, {eye['yes']} confirmed by the eye: base rate {num(eye['base_rate'], 4)}"]
++         f"the cells said {eye['distinct_said']} distinct frames, {eye['says']} says, {eye['yes']} confirmed by the eye: base rate {num(eye['base_rate'], 3)}"]
+     for rule in RULES:
+##### rp-eye-kept-rate
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -396,3 +396,3 @@
+         L.append(f"  {rule}: keeps {counts([r['said_kept'] for r in er])} of the {eye['distinct_said']} said frames; pooled yes-rate of the says of the frames it KEEPS "
+-                 f"{spread([r['rate_kept'] for r in er if r['rate_kept'] is not None], 3)} (says kept {counts([r['says_kept'] for r in er])}) against those it does not keep "
++                 f"{spread([r['rate_not_kept'] for r in er if r['rate_not_kept'] is not None], 3)} (says kept {counts([r['says_kept'] for r in er])}) against those it does not keep "
+                  f"{spread([r['rate_not_kept'] for r in er if r['rate_not_kept'] is not None], 3)} (says not kept {counts([r['says_not_kept'] for r in er])}); "
+##### rp-eye-never
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -398,3 +398,3 @@
+                  f"{spread([r['rate_not_kept'] for r in er if r['rate_not_kept'] is not None], 3)} (says not kept {counts([r['says_not_kept'] for r in er])}); "
+-                 f"frames it keeps that the cells never said {counts([r['kept_never_said'] for r in er])} of |F| {counts([r['n_frames'] for r in er])}")
++                 f"frames it keeps that the cells never said {counts([r['said_kept'] for r in er])} of |F| {counts([r['n_frames'] for r in er])}")
+     frames = eye.get("frames")
+##### rp-eye-none-off
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -141,3 +141,3 @@
+     frames = eye.get("frames")
+-    if frames is None:
++    if False:
+         return None
+##### rp-eye-pair-none
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -407,3 +407,3 @@
+             for rule in RULES:
+-                if pair is None:
++                if pair is not None:
+                     flags.append(f"{rule} -")
+##### rp-eye-says-plus
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -145,3 +145,3 @@
+     for f in frames:
+-        for i in range(int(f["says"])):
++        for i in range(int(f["says"]) + 1):
+             says.append((f["frame"], "yes" if i < int(f["yes"]) else "no", len(says)))
+##### rp-eye-true
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -147,3 +147,3 @@
+             says.append((f["frame"], "yes" if i < int(f["yes"]) else "no", len(says)))
+-    return _roundtrip(VD.eye_reading(rep["conds"]["ALPHA4"], says)) == eye
++    return True
+ 
+##### rp-eye-webs
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -410,3 +410,3 @@
+                 elif rule == "WEB-S":
+-                    flags.append(f"{rule} {sum(1 for s in sets[rule] if pair in s)}/{len(sets[rule])}")
++                    flags.append(f"{rule} {sum(1 for s in sets[rule] if pair in s)}/{len(sets[rule]) + 1}")
+                 else:
+##### rp-eye-yes-le
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -146,3 +146,3 @@
+         for i in range(int(f["says"])):
+-            says.append((f["frame"], "yes" if i < int(f["yes"]) else "no", len(says)))
++            says.append((f["frame"], "yes" if i <= int(f["yes"]) else "no", len(says)))
+     return _roundtrip(VD.eye_reading(rep["conds"]["ALPHA4"], says)) == eye
+##### rp-g1-chi
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -238,3 +238,3 @@
+              f"says {tuple(g1.get('says', ()))} (rows, yes, distinct frames); plant tokens in real rows: ALPHA4 {g1.get('plant_tokens', {}).get('ALPHA4')}, SCENE {g1.get('plant_tokens', {}).get('SCENE')}")
+-    L.append("   χ² fit of SCENE to the generator (each p > 0.001 gates G_max): " + ", ".join(f"{k} p {num((c2.get(k) or {}).get('p'), 3)}" for k in ("length", "shape", "colour", "size", "pairs"))
++    L.append("   χ² fit of SCENE to the generator (each p > 0.001 gates G_max): " + ", ".join(f"{k} p {num((c2.get(k) or {}).get('p'), 2)}" for k in ("length", "shape", "colour", "size", "pairs"))
+              + f"; held-out pairs seen {c2.get('heldout_pairs_seen')}; «dax» excluded {c2.get('dax_excluded')}; G_max gated: {c2.get('gated')}")
+##### rp-g1-ok
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -236,3 +236,3 @@
+     c2 = g1.get("chi2", {})
+-    L.append(f"G1 {'OK' if g1['ok'] else 'FAILED'}: {g1.get('copies_verified')} copies verified; ALPHA4 {g1['alpha4']['moments']} moments / {g1['alpha4']['words']} words; SCENE {g1['scene']['moments']} moments; "
++    L.append(f"G1 {'FAILED' if g1['ok'] else 'OK'}: {g1.get('copies_verified')} copies verified; ALPHA4 {g1['alpha4']['moments']} moments / {g1['alpha4']['words']} words; SCENE {g1['scene']['moments']} moments; "
+              f"says {tuple(g1.get('says', ()))} (rows, yes, distinct frames); plant tokens in real rows: ALPHA4 {g1.get('plant_tokens', {}).get('ALPHA4')}, SCENE {g1.get('plant_tokens', {}).get('SCENE')}")
+##### rp-g1-words
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -236,3 +236,3 @@
+     c2 = g1.get("chi2", {})
+-    L.append(f"G1 {'OK' if g1['ok'] else 'FAILED'}: {g1.get('copies_verified')} copies verified; ALPHA4 {g1['alpha4']['moments']} moments / {g1['alpha4']['words']} words; SCENE {g1['scene']['moments']} moments; "
++    L.append(f"G1 {'OK' if g1['ok'] else 'FAILED'}: {g1.get('copies_verified')} copies verified; ALPHA4 {g1['alpha4']['words']} moments / {g1['alpha4']['moments']} words; SCENE {g1['scene']['moments']} moments; "
+              f"says {tuple(g1.get('says', ()))} (rows, yes, distinct frames); plant tokens in real rows: ALPHA4 {g1.get('plant_tokens', {}).get('ALPHA4')}, SCENE {g1.get('plant_tokens', {}).get('SCENE')}")
+##### rp-g2-frames
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -241,3 +241,3 @@
+     g2 = g["g2"]
+-    L.append(f"G2 {'OK' if g2['ok'] else 'FAILED'}: find_frames on the stand-in store equals the call on the real Episodes store: {g2.get('n_rows')} rows, frames {g2.get('frames')}")
++    L.append(f"G2 {'OK' if g2['ok'] else 'FAILED'}: find_frames on the stand-in store equals the call on the real Episodes store: {g2.get('n_rows')} rows, frames {g2.get('n_rows')}")
+     g3 = g["g3"]
+##### rp-g3-fmt
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -243,3 +243,3 @@
+     g3 = g["g3"]
+-    L.append(f"G3 {'OK' if g3['ok'] else 'FAILED'}: {g3.get('compressor_cases')} compressor cases, max |fast − slow| {g3.get('max_abs_diff'):.3g} (bar 1e-9); the greedy's {g3.get('mdl_steps')} steps over {g3.get('mdl_seeds')} seeds, problems {g3.get('mdl_problems') or 'none'}")
++    L.append(f"G3 {'OK' if g3['ok'] else 'FAILED'}: {g3.get('compressor_cases')} compressor cases, max |fast − slow| {g3.get('max_abs_diff'):.4g} (bar 1e-9); the greedy's {g3.get('mdl_steps')} steps over {g3.get('mdl_seeds')} seeds, problems {g3.get('mdl_problems') or 'none'}")
+     g4 = g["g4"]
+##### rp-g3-steps
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -243,3 +243,3 @@
+     g3 = g["g3"]
+-    L.append(f"G3 {'OK' if g3['ok'] else 'FAILED'}: {g3.get('compressor_cases')} compressor cases, max |fast − slow| {g3.get('max_abs_diff'):.3g} (bar 1e-9); the greedy's {g3.get('mdl_steps')} steps over {g3.get('mdl_seeds')} seeds, problems {g3.get('mdl_problems') or 'none'}")
++    L.append(f"G3 {'OK' if g3['ok'] else 'FAILED'}: {g3.get('compressor_cases')} compressor cases, max |fast − slow| {g3.get('max_abs_diff'):.3g} (bar 1e-9); the greedy's {g3.get('mdl_seeds')} steps over {g3.get('mdl_steps')} seeds, problems {g3.get('mdl_problems') or 'none'}")
+     g4 = g["g4"]
+##### rp-g4-control
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -222,3 +222,3 @@
+     c = s.get("control", {})
+-    L.append(f"    the gate's parse-breaking control: caught {c.get('caught')}, bytes changed {c.get('bytes_changed')}; honest gate (B {num(c.get('B_honest'))}, C {num(c.get('C_honest'))}) "
++    L.append(f"    the gate's parse-breaking control: caught {c.get('bytes_changed')}, bytes changed {c.get('caught')}; honest gate (B {num(c.get('B_honest'))}, C {num(c.get('C_honest'))}) "
+              f"{c.get('gate_honest')}, broken gate (B {num(c.get('B_broken'))}, C {num(c.get('C_broken'))}) {c.get('gate_broken')}")
+##### rp-g4-header
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -213,3 +213,3 @@
+     L = [f"  stream {key}: {s.get('label')}: {s.get('n_moments')} moments, a plant after every {s.get('every')}th ({s['plants'][0]} train / {s['plants'][1]} held plants); "
+-         f"V {s.get('V')}, budget B = 2V = {s.get('budget')}; B = G({{F*}}) {num(s.get('B'))}; PLANT-BEATS-NULL-2 {s.get('plant_beats_null2')} (NULL-2 q95 {num(s.get('null2_q95'))})"]
++         f"V {s.get('budget')}, budget B = 2V = {s.get('V')}; B = G({{F*}}) {num(s.get('B'))}; PLANT-BEATS-NULL-2 {s.get('plant_beats_null2')} (NULL-2 q95 {num(s.get('null2_q95'))})"]
+     required = list(s.get("required", []))
+##### rp-g4-pass
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -220,3 +220,3 @@
+         tag = "REQUIRED" if rule in required else "PRINTED, not required"
+-        L.append(f"    {rule} {g['n_counted']} of {g['n_seeds']} seeds count (need {g['need']}): gate {'PASS' if g['pass'] else 'FAIL'} — {tag}")
++        L.append(f"    {rule} {g['n_counted']} of {g['n_seeds']} seeds count (need {g['need']}): gate {'FAIL' if g['pass'] else 'PASS'} — {tag}")
+     c = s.get("control", {})
+##### rp-g4-tag
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -219,3 +219,3 @@
+             continue
+-        tag = "REQUIRED" if rule in required else "PRINTED, not required"
++        tag = "PRINTED, not required" if rule in required else "REQUIRED"
+         L.append(f"    {rule} {g['n_counted']} of {g['n_seeds']} seeds count (need {g['need']}): gate {'PASS' if g['pass'] else 'FAIL'} — {tag}")
+##### rp-g5-ceiling
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -250,3 +250,3 @@
+     L.append(f"G5 {'OK' if g5['ok'] else 'FAILED'}: pilots " + "; ".join(f"{p['draws']} draws {num(p['cpu_seconds'], 1)} CPU-s, peak {num(p['peak_rss_kb'] / 1024.0, 0)} MB" for p in g5.get("pilots", []))
+-             + f"; slope {num(g5.get('cpu_slope_per_draw'), 3)} CPU-s a draw; predicted unit {num(g5.get('predicted_unit_cpu_minutes'), 1)} CPU-min (ceiling {num(g5.get('cpu_ceiling_min'), 1)}); "
++             + f"; slope {num(g5.get('cpu_slope_per_draw'), 3)} CPU-s a draw; predicted unit {num(g5.get('predicted_unit_cpu_minutes'), 1)} CPU-min (ceiling {num(g5.get('rss_ceiling_mb'), 1)}); "
+              f"predicted peak {num(g5.get('predicted_peak_rss_mb'), 0)} MB (ceiling {num(g5.get('rss_ceiling_mb'), 0)}); measured peak {num(g5.get('peak_rss_mb'), 0)} MB")
+##### rp-g5-slope
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -250,3 +250,3 @@
+     L.append(f"G5 {'OK' if g5['ok'] else 'FAILED'}: pilots " + "; ".join(f"{p['draws']} draws {num(p['cpu_seconds'], 1)} CPU-s, peak {num(p['peak_rss_kb'] / 1024.0, 0)} MB" for p in g5.get("pilots", []))
+-             + f"; slope {num(g5.get('cpu_slope_per_draw'), 3)} CPU-s a draw; predicted unit {num(g5.get('predicted_unit_cpu_minutes'), 1)} CPU-min (ceiling {num(g5.get('cpu_ceiling_min'), 1)}); "
++             + f"; slope {num(g5.get('cpu_slope_per_draw'), 2)} CPU-s a draw; predicted unit {num(g5.get('predicted_unit_cpu_minutes'), 1)} CPU-min (ceiling {num(g5.get('cpu_ceiling_min'), 1)}); "
+              f"predicted peak {num(g5.get('predicted_peak_rss_mb'), 0)} MB (ceiling {num(g5.get('rss_ceiling_mb'), 0)}); measured peak {num(g5.get('peak_rss_mb'), 0)} MB")
+##### rp-g5-unit
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -250,3 +250,3 @@
+     L.append(f"G5 {'OK' if g5['ok'] else 'FAILED'}: pilots " + "; ".join(f"{p['draws']} draws {num(p['cpu_seconds'], 1)} CPU-s, peak {num(p['peak_rss_kb'] / 1024.0, 0)} MB" for p in g5.get("pilots", []))
+-             + f"; slope {num(g5.get('cpu_slope_per_draw'), 3)} CPU-s a draw; predicted unit {num(g5.get('predicted_unit_cpu_minutes'), 1)} CPU-min (ceiling {num(g5.get('cpu_ceiling_min'), 1)}); "
++             + f"; slope {num(g5.get('cpu_slope_per_draw'), 3)} CPU-s a draw; predicted unit {num(g5.get('predicted_unit_cpu_minutes'), 2)} CPU-min (ceiling {num(g5.get('cpu_ceiling_min'), 1)}); "
+              f"predicted peak {num(g5.get('predicted_peak_rss_mb'), 0)} MB (ceiling {num(g5.get('rss_ceiling_mb'), 0)}); measured peak {num(g5.get('peak_rss_mb'), 0)} MB")
+##### rp-g6-entropy
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -257,3 +257,3 @@
+              f"{sum(1 for r in g6.get('replicates', []) if r.get('violation'))}; the planted cheat: caught {ch.get('caught')} (G {num(ch.get('G_cheat'))} against G_max {num(ch.get('G_max'))} + 20); "
+-             f"exact checks: support sums to {ex.get('sum_p')!r}, entropy {num(ex.get('entropy'), 4)}, H(length) {num(ex.get('h_length'), 4)}, H(utterance | length) {num(ex.get('h_given_length'), 4)}, support {ex.get('support_size')}")
++             f"exact checks: support sums to {ex.get('sum_p')!r}, entropy {num(ex.get('entropy'), 3)}, H(length) {num(ex.get('h_length'), 4)}, H(utterance | length) {num(ex.get('h_given_length'), 4)}, support {ex.get('support_size')}")
+     return L
+##### rp-g6-reps
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -255,3 +255,3 @@
+     ch = g6.get("cheat", {})
+-    L.append(f"G6 {'OK' if g6['ok'] else 'FAILED'}: {len(g6.get('replicates', []))} replicates, smallest margin G_max − G(F_oracle) {num(g6.get('min_margin'))}, violations "
++    L.append(f"G6 {'OK' if g6['ok'] else 'FAILED'}: {len(g6.get('cheat', {}))} replicates, smallest margin G_max − G(F_oracle) {num(g6.get('min_margin'))}, violations "
+              f"{sum(1 for r in g6.get('replicates', []) if r.get('violation'))}; the planted cheat: caught {ch.get('caught')} (G {num(ch.get('G_cheat'))} against G_max {num(ch.get('G_max'))} + 20); "
+##### rp-g6-viol
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -256,3 +256,3 @@
+     L.append(f"G6 {'OK' if g6['ok'] else 'FAILED'}: {len(g6.get('replicates', []))} replicates, smallest margin G_max − G(F_oracle) {num(g6.get('min_margin'))}, violations "
+-             f"{sum(1 for r in g6.get('replicates', []) if r.get('violation'))}; the planted cheat: caught {ch.get('caught')} (G {num(ch.get('G_cheat'))} against G_max {num(ch.get('G_max'))} + 20); "
++             f"{sum(1 for r in g6.get('replicates', []) if not r.get('violation'))}; the planted cheat: caught {ch.get('caught')} (G {num(ch.get('G_cheat'))} against G_max {num(ch.get('G_max'))} + 20); "
+              f"exact checks: support sums to {ex.get('sum_p')!r}, entropy {num(ex.get('entropy'), 4)}, H(length) {num(ex.get('h_length'), 4)}, H(utterance | length) {num(ex.get('h_given_length'), 4)}, support {ex.get('support_size')}")
+##### rp-gain-adj
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -343,3 +343,3 @@
+         gn = gv["gain"]
+-        adj = [r["adjacency"]["train_adjacent_share"] for r in rs if r["adjacency"]["train_adjacent_share"] is not None]
++        adj = [r["adjacency"]["train_adjacent_share"] for r in rs if r["adjacency"]["train_adjacent_share"] is None]
+         L.append(f"GAIN {rule}: {gv['gain_verdict']} — gate first {'ok' if gv['gate_first_ok'] else 'NOT ok'} (plant gate {'pass' if gv['plant_gate']['pass'] else 'FAIL'}, "
+##### rp-gain-anatomy-T
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -351,3 +351,3 @@
+         an = [r["anatomy"] for r in rs]
+-        L.append(f"    anatomy G = M + D + C − L: M {spread([a['M'] for a in an])}, D {spread([a['D'] for a in an])}, C {spread([a['C'] for a in an])}, L {spread([a['L'] for a in an])}; T = D + C {spread([a['T'] for a in an])}")
++        L.append(f"    anatomy G = M + D + C − L: M {spread([a['M'] for a in an])}, D {spread([a['D'] for a in an])}, C {spread([a['C'] for a in an])}, L {spread([a['L'] for a in an])}; T = D + C {spread([a['D'] for a in an])}")
+         if rule == "WEB-S":
+##### rp-gain-L
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -347,3 +347,3 @@
+         L.append(f"    |F| {counts([r['n_frames'] for r in rs])}; share with a within-moment adjacent train occurrence {spread(adj, 3)}; G {spread([r['gain']['G'] for r in rs])} bits "
+-                 f"= {spread([r['gain']['per_word'] for r in rs], 5)} a held-out word; L {spread([r['gain']['L'] for r in rs])}; held adjacency: zero-firing frames {counts([r['adjacency']['held_adjacent_zero'] for r in rs])}, "
++                 f"= {spread([r['gain']['per_word'] for r in rs], 5)} a held-out word; L {spread([r['gain']['G'] for r in rs])}; held adjacency: zero-firing frames {counts([r['adjacency']['held_adjacent_zero'] for r in rs])}, "
+                  f"firings {counts([r['adjacency']['held_firings'] for r in rs])}")
+##### rp-gain-perword
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -347,3 +347,3 @@
+         L.append(f"    |F| {counts([r['n_frames'] for r in rs])}; share with a within-moment adjacent train occurrence {spread(adj, 3)}; G {spread([r['gain']['G'] for r in rs])} bits "
+-                 f"= {spread([r['gain']['per_word'] for r in rs], 5)} a held-out word; L {spread([r['gain']['L'] for r in rs])}; held adjacency: zero-firing frames {counts([r['adjacency']['held_adjacent_zero'] for r in rs])}, "
++                 f"= {spread([r['gain']['per_word'] for r in rs], 4)} a held-out word; L {spread([r['gain']['L'] for r in rs])}; held adjacency: zero-firing frames {counts([r['adjacency']['held_adjacent_zero'] for r in rs])}, "
+                  f"firings {counts([r['adjacency']['held_firings'] for r in rs])}")
+##### rp-gain-seed-beats
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -355,3 +355,3 @@
+                 n1 = null_of(r, "null1")
+-                L.append(f"      WEB-S seed {r['seed']}: |F| {r['n_frames']}, G {num(r['gain']['G'])}, NULL-1 q95 {num(n1.get('q95'))}, beats q95 {n1.get('beats_q95')}")
++                L.append(f"      WEB-S seed {r['seed']}: |F| {r['n_frames']}, G {num(r['gain']['G'])}, NULL-1 q95 {num(n1.get('q95'))}, beats q95 {n1.get('q95')}")
+     mdl = recs(a4, "MDL-GREEDY")
+##### rp-gain-seed-lines
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -352,3 +352,3 @@
+         L.append(f"    anatomy G = M + D + C − L: M {spread([a['M'] for a in an])}, D {spread([a['D'] for a in an])}, C {spread([a['C'] for a in an])}, L {spread([a['L'] for a in an])}; T = D + C {spread([a['T'] for a in an])}")
+-        if rule == "WEB-S":
++        if False:
+             for r in rs:
+##### rp-gain-signp
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -345,3 +345,3 @@
+         L.append(f"GAIN {rule}: {gv['gain_verdict']} — gate first {'ok' if gv['gate_first_ok'] else 'NOT ok'} (plant gate {'pass' if gv['plant_gate']['pass'] else 'FAIL'}, "
+-                 f"shuffle {'quiet' if gv['shuffle_quiet']['quiet'] else 'LOUD'}); {gn['n_pass']} of {gn['n']} seeds pass (need {gn['need']}; exact sign p {num(gn['exact_sign_p'], 4)}); {gn['no_null']} without a null")
++                 f"shuffle {'quiet' if gv['shuffle_quiet']['quiet'] else 'LOUD'}); {gn['n_pass']} of {gn['n']} seeds pass (need {gn['need']}; exact sign p {num(gn['exact_sign_p'], 3)}); {gn['no_null']} without a null")
+         L.append(f"    |F| {counts([r['n_frames'] for r in rs])}; share with a within-moment adjacent train occurrence {spread(adj, 3)}; G {spread([r['gain']['G'] for r in rs])} bits "
+##### rp-gain-trace-cut
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -360,3 +360,3 @@
+         L.append(f"MDL-GREEDY took {len(tr)} steps; its first {min(15, len(tr))} picks (frame, train Δ bits, train firings):")
+-        for t in tr[:15]:
++        for t in tr[:14]:
+             L.append(f"      {' '.join(t['frame'])}  Δ {num(t['delta'])}  fires {t['fires']}")
+##### rp-gain-trace-head
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -359,3 +359,3 @@
+         tr = mdl[0]["info"]["trace"]
+-        L.append(f"MDL-GREEDY took {len(tr)} steps; its first {min(15, len(tr))} picks (frame, train Δ bits, train firings):")
++        L.append(f"MDL-GREEDY took {len(tr)} steps; its first {len(tr)} picks (frame, train Δ bits, train firings):")
+         for t in tr[:15]:
+##### rp-gain-trace-off
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -357,3 +357,3 @@
+     mdl = recs(a4, "MDL-GREEDY")
+-    if mdl and mdl[0].get("info", {}).get("trace"):
++    if False:
+         tr = mdl[0]["info"]["trace"]
+##### rp-g-cpu
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -233,3 +233,3 @@
+         return L
+-    L.append(f"GATES.json: passed {g.get('passed')} (failures: {g.get('failures') or 'none'}); gate mode {g['header'].get('gate_mode')}; {num(g.get('cpu_seconds'), 1)} CPU-s; peak RSS {num((g.get('peak_rss_kb') or 0) / 1024.0, 0)} MB")
++    L.append(f"GATES.json: passed {g.get('passed')} (failures: {g.get('failures') or 'none'}); gate mode {g['header'].get('gate_mode')}; {num(g.get('cpu_seconds'), 2)} CPU-s; peak RSS {num((g.get('peak_rss_kb') or 0) / 1024.0, 0)} MB")
+     g1 = g["g1"]
+##### rp-g-passed
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -233,3 +233,3 @@
+         return L
+-    L.append(f"GATES.json: passed {g.get('passed')} (failures: {g.get('failures') or 'none'}); gate mode {g['header'].get('gate_mode')}; {num(g.get('cpu_seconds'), 1)} CPU-s; peak RSS {num((g.get('peak_rss_kb') or 0) / 1024.0, 0)} MB")
++    L.append(f"GATES.json: passed {g.get('failures')} (failures: {g.get('failures') or 'none'}); gate mode {g['header'].get('gate_mode')}; {num(g.get('cpu_seconds'), 1)} CPU-s; peak RSS {num((g.get('peak_rss_kb') or 0) / 1024.0, 0)} MB")
+     g1 = g["g1"]
+##### rp-grade-law-key
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -129,3 +129,3 @@
+     again_law = json.loads(json.dumps(VD.grade(conds, "law")))
+-    return again == res["grade"], again_law == res["grade_law"]
++    return again == res["grade"], again_law == res["grade"]
+ 
+##### rp-grade-mode
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -127,3 +127,3 @@
+     conds, res = rep["conds"], rep["results"]
+-    again = json.loads(json.dumps(VD.grade(conds, res["mode"])))
++    again = json.loads(json.dumps(VD.grade(conds, "law")))
+     again_law = json.loads(json.dumps(VD.grade(conds, "law")))
+##### rp-grade-true
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -129,3 +129,3 @@
+     again_law = json.loads(json.dumps(VD.grade(conds, "law")))
+-    return again == res["grade"], again_law == res["grade_law"]
++    return True, True
+ 
+##### rp-g-rss
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -233,3 +233,3 @@
+         return L
+-    L.append(f"GATES.json: passed {g.get('passed')} (failures: {g.get('failures') or 'none'}); gate mode {g['header'].get('gate_mode')}; {num(g.get('cpu_seconds'), 1)} CPU-s; peak RSS {num((g.get('peak_rss_kb') or 0) / 1024.0, 0)} MB")
++    L.append(f"GATES.json: passed {g.get('passed')} (failures: {g.get('failures') or 'none'}); gate mode {g['header'].get('gate_mode')}; {num(g.get('cpu_seconds'), 1)} CPU-s; peak RSS {num((g.get('peak_rss_kb') or 0) / 1000.0, 0)} MB")
+     g1 = g["g1"]
+##### rp-kept-sets-pair
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -121,3 +121,3 @@
+ def kept_sets(cond: Dict[str, object], rule: str) -> List[frozenset]:
+-    return [frozenset(tuple(f) for f in r["frames"]) for r in recs(cond, rule)]
++    return [frozenset(tuple(f)[:1] for f in r["frames"]) for r in recs(cond, rule)]
+ 
+##### rp-law-conds
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -171,3 +171,3 @@
+     keys = [f"prereg_{k}_sha256" for k in ("frames", "frames_amend1", "frames_amend2")]
+-    out = [(name, all(rep["conds"][name]["header"].get(k) == h.get(k) for k in keys)) for name in CONDITIONS]
++    out = [(name, True) for name in CONDITIONS]
+     if rep["gates"] is not None:
+##### rp-law-gates-off
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -172,3 +172,3 @@
+     out = [(name, all(rep["conds"][name]["header"].get(k) == h.get(k) for k in keys)) for name in CONDITIONS]
+-    if rep["gates"] is not None:
++    if False:
+         out.append(("GATES.json", all(rep["gates"]["header"].get(k) == h.get(k) for k in keys)))
+##### rp-law-gates-true
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -173,3 +173,3 @@
+     if rep["gates"] is not None:
+-        out.append(("GATES.json", all(rep["gates"]["header"].get(k) == h.get(k) for k in keys)))
++        out.append(("GATES.json", True))
+     return out
+##### rp-law-key-dropped
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -170,3 +170,3 @@
+     h = rep["results"].get("header", {})
+-    keys = [f"prereg_{k}_sha256" for k in ("frames", "frames_amend1", "frames_amend2")]
++    keys = [f"prereg_{k}_sha256" for k in ("frames", "frames_amend1")]
+     out = [(name, all(rep["conds"][name]["header"].get(k) == h.get(k) for k in keys)) for name in CONDITIONS]
+##### rp-load-cond-silent
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -59,3 +59,3 @@
+         if not p.is_file():
+-            raise ReportError(f"{p.name}: the condition record is missing from {root.name}")
++            continue
+         conds[name] = json.loads(p.read_text())
+##### rp-load-results-silent
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -64,3 +64,3 @@
+     if not p.is_file():
+-        raise ReportError(f"RESULTS.json is missing from {root.name}")
++        pass
+     results = json.loads(p.read_text())
+##### rp-main-out
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -557,3 +557,3 @@
+     ap.add_argument("--root", default=str(RN.RUNS))
+-    ap.add_argument("--out", default=str(DEFAULT_OUT))
++    ap.add_argument("--out", default=str(DEFAULT_OUT.with_suffix(".bak")))
+     a = ap.parse_args(list(argv) if argv is not None else None)
+##### rp-main-print
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -563,3 +563,3 @@
+     out.write_text(text)
+-    print(f"wrote {out.name}: {len(text)} bytes, sha256 {hashlib.sha256(text.encode()).hexdigest()}")
++    print(f"wrote {out.name}: {len(text)} bytes, sha256 {hashlib.sha256(text.encode()).hexdigest()[:8]}")
+     return 0
+##### rp-main-root
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -556,3 +556,3 @@
+     ap = argparse.ArgumentParser(description="TOY C's report: every figure of RESULT-TOY-FRAMES.md, rendered from the runner's records")
+-    ap.add_argument("--root", default=str(RN.RUNS))
++    ap.add_argument("--root", default=str(ST.COPIES))
+     ap.add_argument("--out", default=str(DEFAULT_OUT))
+##### rp-null-error-text
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -117,3 +117,3 @@
+     n = rec.get(key) or {}
+-    return str(n["error"]) if "error" in n else None
++    return None
+ 
+##### rp-null-fallbacks
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -328,3 +328,3 @@
+     out = (f"{label} mean {spread([n['mean'] for n in ns])} sd {spread([n['sd'] for n in ns])} q95 {spread([n['q95'] for n in ns])} "
+-           f"z {spread([n['z'] for n in ns if n.get('z') is not None])} fallbacks {sum(n.get('fallbacks', 0) for n in ns)}")
++           f"z {spread([n['z'] for n in ns if n.get('z') is not None])} fallbacks {max(n.get('fallbacks', 0) for n in ns)}")
+     if errs:
+##### rp-null-label
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -321,3 +321,3 @@
+ def _null_row(rs: List[Dict[str, object]], key: str) -> str:
+-    label = key.upper().replace("NULL", "NULL-")
++    label = key.upper()
+     ns = [null_of(r, key) for r in rs]
+##### rp-null-of-error
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -112,3 +112,3 @@
+     n = rec.get(key) or {}
+-    return {} if "error" in n else n
++    return n
+ 
+##### rp-null-z
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -328,3 +328,3 @@
+     out = (f"{label} mean {spread([n['mean'] for n in ns])} sd {spread([n['sd'] for n in ns])} q95 {spread([n['q95'] for n in ns])} "
+-           f"z {spread([n['z'] for n in ns if n.get('z') is not None])} fallbacks {sum(n.get('fallbacks', 0) for n in ns)}")
++           f"z {spread([n['sd'] for n in ns])} fallbacks {sum(n.get('fallbacks', 0) for n in ns)}")
+     if errs:
+##### rp-num-none
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -77,3 +77,3 @@
+ def num(x: Optional[float], nd: int = 2) -> str:
+-    return "none" if x is None else f"{x:.{nd}f}"
++    return "-" if x is None else f"{x:.{nd}f}"
+ 
+##### rp-overlaps-drop-last
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -151,3 +151,3 @@
+ def check_overlaps(rep: Dict[str, object]) -> bool:
+-    return _roundtrip({name: VD.overlaps(rep["conds"][name]) for name in CONDITIONS}) == rep["results"]["overlaps"]
++    return _roundtrip({name: VD.overlaps(rep["conds"][name]) for name in CONDITIONS[:-1]}) == rep["results"]["overlaps"]
+ 
+##### rp-overlaps-true
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -151,3 +151,3 @@
+ def check_overlaps(rep: Dict[str, object]) -> bool:
+-    return _roundtrip({name: VD.overlaps(rep["conds"][name]) for name in CONDITIONS}) == rep["results"]["overlaps"]
++    return True
+ 
+##### rp-ovl-fmt
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -424,3 +424,3 @@
+         ov = rep["results"]["overlaps"][name]
+-        L.append(f"{name}: " + "; ".join(f"{k} {num(v, 3)}" for k, v in sorted(ov.items())))
++        L.append(f"{name}: " + "; ".join(f"{k} {num(v, 2)}" for k, v in sorted(ov.items())))
+     return L
+##### rp-pc1-ge
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -466,3 +466,3 @@
+     mean_s = sum(G["WEB-S"]) / len(G["WEB-S"])
+-    holds = mdl >= max(G["WEB-H"][0], mean_s, G["SENTENCE"][0])
++    holds = mdl > max(G["WEB-H"][0], mean_s, G["SENTENCE"][0])
+     out.append(("P-C1", "holds" if holds else "does not hold",
+##### rp-pc1-mean
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -465,3 +465,3 @@
+     mdl = G["MDL-GREEDY"][0]
+-    mean_s = sum(G["WEB-S"]) / len(G["WEB-S"])
++    mean_s = max(G["WEB-S"])
+     holds = mdl >= max(G["WEB-H"][0], mean_s, G["SENTENCE"][0])
+##### rp-pc2-beat
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -475,3 +475,3 @@
+         n1 = null_of(r, "null1")
+-        b = bool(n1) and r["gain"]["G"] > n1["q95"]
++        b = bool(n1) and r["gain"]["G"] >= n1["q95"]
+         below = r["gain"]["G"] < mdl
+##### rp-pc2-below
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -476,3 +476,3 @@
+         b = bool(n1) and r["gain"]["G"] > n1["q95"]
+-        below = r["gain"]["G"] < mdl
++        below = r["gain"]["G"] <= mdl
+         ok2 = ok2 and b and below
+##### rp-pc2-need
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -481,3 +481,3 @@
+     beat = sum(1 for r in rs if null_of(r, "null1") and r["gain"]["G"] > null_of(r, "null1")["q95"])
+-    need = -(-WEB_S_MIN * len(rs) // 10)
++    need = -(-WEB_S_MIN * len(rs) // 5)
+     below_s = mean_s < mdl
+##### rp-pc3-frac
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -33,3 +33,3 @@
+ # the readings' own constants (fixed before the unit ran; a reading, never a bar)
+-P_C3_FRACTION = 0.10                      # «every G ≪ G_max» is read as G <= 0.10 x G_max on plain SCENE
++P_C3_FRACTION = 0.11                      # «every G ≪ G_max» is read as G <= 0.10 x G_max on plain SCENE
+ P_C4_MIN_SAYS = 5                         # a said frame is GROUNDED if the eye confirmed >= 50 % of >= 5 says, a FUNCTION pair if >= 5 says and 0 confirmed
+##### rp-pc3-gmax
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -488,3 +488,3 @@
+     gm = res["scene"]["G_max"]
+-    if gm is None or gm <= 0:
++    if gm is None or gm < 0:
+         out.append(("P-C3", "not readable", f"[Guessing] on SCENE every G ≪ G_max: G_max {num(gm)} is not positive"))
+##### rp-pc3-le
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -492,3 +492,3 @@
+         ratios = {rule: mean([r["gain"]["G"] for r in recs(sc, rule)]) / gm for rule in RULES if recs(sc, rule)}
+-        ok3 = all(v <= P_C3_FRACTION for v in ratios.values())
++        ok3 = all(v < P_C3_FRACTION for v in ratios.values())
+         out.append(("P-C3", "holds" if ok3 else "does not hold",
+##### rp-pc4-both
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -510,3 +510,3 @@
+     else:
+-        out.append(("P-C4", "holds" if (kept_g and kept_f) else "does not hold",
++        out.append(("P-C4", "holds" if (kept_g or kept_f) else "does not hold",
+                     f"[Likely] the eye's reading splits MDL's frames (reading: it keeps >= 1 GROUNDED said frame (>= {P_C4_MIN_SAYS} says, >= {P_C4_GROUNDED_RATE:.0%} confirmed) AND >= 1 FUNCTION-WORD pair (>= {P_C4_MIN_SAYS} says, 0 confirmed)): {base}"))
+##### rp-pc4-function
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -501,3 +501,3 @@
+     grounded = [f for f in said if f["says"] >= P_C4_MIN_SAYS and f["yes"] / f["says"] >= P_C4_GROUNDED_RATE]
+-    function = [f for f in said if f["says"] >= P_C4_MIN_SAYS and f["yes"] == 0]
++    function = [f for f in said if f["says"] >= P_C4_MIN_SAYS and f["yes"] <= 1]
+     kept_g = [f["frame"] for f in grounded if tuple(f["pair"]) in mdl_kept]
+##### rp-pc4-ge
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -500,3 +500,3 @@
+     mdl_kept = kept_sets(a4, "MDL-GREEDY")[0]
+-    grounded = [f for f in said if f["says"] >= P_C4_MIN_SAYS and f["yes"] / f["says"] >= P_C4_GROUNDED_RATE]
++    grounded = [f for f in said if f["says"] >= P_C4_MIN_SAYS and f["yes"] / f["says"] > P_C4_GROUNDED_RATE]
+     function = [f for f in said if f["says"] >= P_C4_MIN_SAYS and f["yes"] == 0]
+##### rp-pc4-rate
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -35,3 +35,3 @@
+ P_C4_MIN_SAYS = 5                         # a said frame is GROUNDED if the eye confirmed >= 50 % of >= 5 says, a FUNCTION pair if >= 5 says and 0 confirmed
+-P_C4_GROUNDED_RATE = 0.5
++P_C4_GROUNDED_RATE = 0.4
+ P_C5_PAIRS = (("the", "letters"), ("a", "big"), ("to", "the"))
+##### rp-pc4-says
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -34,3 +34,3 @@
+ P_C3_FRACTION = 0.10                      # «every G ≪ G_max» is read as G <= 0.10 x G_max on plain SCENE
+-P_C4_MIN_SAYS = 5                         # a said frame is GROUNDED if the eye confirmed >= 50 % of >= 5 says, a FUNCTION pair if >= 5 says and 0 confirmed
++P_C4_MIN_SAYS = 4                         # a said frame is GROUNDED if the eye confirmed >= 50 % of >= 5 says, a FUNCTION pair if >= 5 says and 0 confirmed
+ P_C4_GROUNDED_RATE = 0.5
+##### rp-pc5-all
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -515,3 +515,3 @@
+     game_kept = sorted(" ".join(p) for p in sent if p[0] in GAME_COLOURS and p[1] in GAME_OBJECTS)
+-    ok5 = all(k for _p, k in named) and len(game_kept) >= 1
++    ok5 = any(k for _p, k in named) and len(game_kept) >= 1
+     out.append(("P-C5", "holds" if ok5 else "does not hold",
+##### rp-pc5-colours
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -37,3 +37,3 @@
+ P_C5_PAIRS = (("the", "letters"), ("a", "big"), ("to", "the"))
+-GAME_COLOURS = ("green", "yellow", "grey", "purple", "red", "blue")
++GAME_COLOURS = ("green", "yellow", "grey", "red", "blue")
+ GAME_OBJECTS = ("box", "key", "ball")
+##### rp-pc5-game
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -515,3 +515,3 @@
+     game_kept = sorted(" ".join(p) for p in sent if p[0] in GAME_COLOURS and p[1] in GAME_OBJECTS)
+-    ok5 = all(k for _p, k in named) and len(game_kept) >= 1
++    ok5 = all(k for _p, k in named)
+     out.append(("P-C5", "holds" if ok5 else "does not hold",
+##### rp-pc5-objects
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -38,3 +38,3 @@
+ GAME_COLOURS = ("green", "yellow", "grey", "purple", "red", "blue")
+-GAME_OBJECTS = ("box", "key", "ball")
++GAME_OBJECTS = ("box", "ball")
+ WEB_S_MIN = VD.WEB_S_MIN
+##### rp-pc5-pairs
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -36,3 +36,3 @@
+ P_C4_GROUNDED_RATE = 0.5
+-P_C5_PAIRS = (("the", "letters"), ("a", "big"), ("to", "the"))
++P_C5_PAIRS = (("the", "letters"), ("a", "big"))
+ GAME_COLOURS = ("green", "yellow", "grey", "purple", "red", "blue")
+##### rp-pc6-above
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -530,3 +530,3 @@
+         inside = mdl <= n2["q95"]
+-        above = mdl > n2["q95"]
++        above = mdl >= n2["q95"]
+         others = [z[r] for r in ("WEB-H", "WEB-S", "SENTENCE")]
+##### rp-pc6-inside
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -529,3 +529,3 @@
+             z[rule] = mean(zs) if zs else None
+-        inside = mdl <= n2["q95"]
++        inside = mdl < n2["q95"]
+         above = mdl > n2["q95"]
+##### rp-pc6-nearer
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -532,3 +532,3 @@
+         others = [z[r] for r in ("WEB-H", "WEB-S", "SENTENCE")]
+-        nearer = z["MDL-GREEDY"] is not None and all(v is not None and v < z["MDL-GREEDY"] for v in others)
++        nearer = z["MDL-GREEDY"] is not None and all(v is not None and v <= z["MDL-GREEDY"] for v in others)
+         out.append(("P-C6", "architect's guess " + ("holds" if inside else "does not hold") + "; mine " + ("holds" if (above and nearer) else "does not hold"),
+##### rp-plant-b2
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -284,3 +284,3 @@
+                  f" = {num(d.get('G'))} (T = D + C = {num(d.get('T'))}; denominator effect {num(d.get('delta'), 5)} bits a token; {d.get('firings')} held firings)")
+-        L.append(f"  PLANT-BEATS-NULL-2 {name}: {ps['plant_beats_null2']} (B {num(ps['B'])} against NULL-2 of {{F*}}: mean {num(n2.get('mean'))}, sd {num(n2.get('sd'))}, q95 {num(n2.get('q95'))}, "
++        L.append(f"  PLANT-BEATS-NULL-2 {name}: {ps['plant_beats_null2']} (B {num(ps['B'])} against NULL-2 of {{F*}}: mean {num(n2.get('sd'))}, sd {num(n2.get('mean'))}, q95 {num(n2.get('q95'))}, "
+                  f"fallbacks {n2.get('fallbacks')}, {n2.get('draws')} draws)")
+##### rp-plant-C
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -294,3 +294,3 @@
+             A = [r["plant"]["A"] for r in rs]
+-            C = [r["plant"]["C"] for r in rs if r["plant"]["C"] is not None]
++            C = [r["plant"]["C"] for r in rs if r["plant"]["C"] is None]
+             L.append(f"  plant gate {name} {rule}: {'PASS' if pg['pass'] else 'FAIL'} — {pg['n_counted']} of {pg['n_seeds']} seeds count (need {pg['need']}); keeps F* at {kept} of {len(rs)}; "
+##### rp-plant-first-scene
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -300,3 +300,3 @@
+         if rule in res["grade"]["alpha4"]:
+-            L.append(f"  {rule}: ALPHA4 {'gradable' if res['grade']['alpha4'][rule]['plant_gate']['pass'] else 'NOT GRADABLE'} on the plant; SCENE {'gradable' if res['grade']['scene'][rule]['gradable'] else 'NOT GRADABLE'}")
++            L.append(f"  {rule}: ALPHA4 {'gradable' if res['grade']['alpha4'][rule]['plant_gate']['pass'] else 'NOT GRADABLE'} on the plant; SCENE {'gradable' if res['grade']['alpha4'][rule]['plant_gate']['pass'] else 'NOT GRADABLE'}")
+     return L
+##### rp-plant-kept
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -292,3 +292,3 @@
+             lg = res["grade_law"][side][rule]["plant_gate"]
+-            kept = sum(1 for r in rs if r["plant"]["kept"])
++            kept = sum(1 for r in rs if not r["plant"]["kept"])
+             A = [r["plant"]["A"] for r in rs]
+##### rp-plant-law
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -296,3 +296,3 @@
+             L.append(f"  plant gate {name} {rule}: {'PASS' if pg['pass'] else 'FAIL'} — {pg['n_counted']} of {pg['n_seeds']} seeds count (need {pg['need']}); keeps F* at {kept} of {len(rs)}; "
+-                     f"(A) whole-set G {spread(A)}; (C) F*'s marginal credit {spread(C)}; the base text's clause (keeps AND (A) > 0): {'pass' if lg['pass'] else 'fail'} (a reading)")
++                     f"(A) whole-set G {spread(A)}; (C) F*'s marginal credit {spread(C)}; the base text's clause (keeps AND (A) > 0): {'fail' if lg['pass'] else 'pass'} (a reading)")
+     L.append("GATE FIRST: a rule that fails its plant gate on a stream is NOT GRADABLE there:")
+##### rp-plant-side
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -290,3 +290,3 @@
+                 continue
+-            pg = res["grade"][side][rule]["plant_gate"]
++            pg = res["grade"]["alpha4"][rule]["plant_gate"]
+             lg = res["grade_law"][side][rule]["plant_gate"]
+##### rp-prov-code-one
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -192,3 +192,3 @@
+     code = sorted({str(c["header"].get("toys_git_sha")) for c in conds.values()} | {str(h.get("toys_git_sha"))})
+-    L.append(f"code sha across the five conditions and RESULTS.json: {'one' if len(code) == 1 else str(len(code)) + ' DIFFERENT'} ({', '.join(code)})")
++    L.append(f"code sha across the five conditions and RESULTS.json: {'one' if len(code) != 1 else str(len(code)) + ' DIFFERENT'} ({', '.join(code)})")
+     if gates is not None:
+##### rp-prov-dirty
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -186,3 +186,3 @@
+     L = ["== 0 · PROVENANCE"]
+-    L.append(f"gate mode: {res.get('mode')}; code sha (RESULTS.json): {h.get('toys_git_sha')}; the toy's tree differed from it when the unit ran: {h.get('toys_tree_dirty')}")
++    L.append(f"gate mode: {res.get('mode')}; code sha (RESULTS.json): {h.get('toys_git_sha')}; the toy's tree differed from it when the unit ran: {h.get('toys_git_sha')}")
+     keys = ("frames", "frames_amend1", "frames_amend2")
+##### rp-prov-gates-absent
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -205,3 +205,3 @@
+         L.append(f"{sha}  {name}")
+-    if gates is None:
++    if False:
+         L.append("GATES.json: not present")
+##### rp-prov-gates-same
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -194,3 +194,3 @@
+     if gates is not None:
+-        L.append(f"code sha of GATES.json: {gates['header'].get('toys_git_sha')} ({'the same' if gates['header'].get('toys_git_sha') == h.get('toys_git_sha') else 'DIFFERENT from the unit'})")
++        L.append(f"code sha of GATES.json: {gates['header'].get('toys_git_sha')} ({'the same' if gates['header'].get('toys_git_sha') != h.get('toys_git_sha') else 'DIFFERENT from the unit'})")
+     ok_a, ok_l = grade_ok(rep)
+##### rp-prov-sha
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -186,3 +186,3 @@
+     L = ["== 0 · PROVENANCE"]
+-    L.append(f"gate mode: {res.get('mode')}; code sha (RESULTS.json): {h.get('toys_git_sha')}; the toy's tree differed from it when the unit ran: {h.get('toys_tree_dirty')}")
++    L.append(f"gate mode: {res.get('mode')}; code sha (RESULTS.json): {h.get('toys_tree_dirty')}; the toy's tree differed from it when the unit ran: {h.get('toys_tree_dirty')}")
+     keys = ("frames", "frames_amend1", "frames_amend2")
+##### rp-prov-signed-key
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -189,3 +189,3 @@
+     for k in keys:
+-        L.append(f"signed text {k}: sha256 {h.get(f'prereg_{k}_sha256')}")
++        L.append(f"signed text {k}: sha256 {h.get('prereg_frames_sha256')}")
+     L.append("signed texts: every record carries RESULTS.json's three: " + "; ".join(f"{name} {_yn(ok)}" for name, ok in law_flags(rep)))
+##### rp-render-end
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -551,3 +551,3 @@
+              sec_predictions(rep)]
+-    return "\n\n".join("\n".join(p) for p in parts) + "\n"
++    return "\n\n".join("\n".join(p) for p in parts) + "\n\n"
+ 
+##### rp-render-join
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -551,3 +551,3 @@
+              sec_predictions(rep)]
+-    return "\n\n".join("\n".join(p) for p in parts) + "\n"
++    return "\n".join("\n".join(p) for p in parts) + "\n"
+ 
+##### rp-render-order
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -549,3 +549,3 @@
+ def render(rep: Dict[str, object]) -> str:
+-    parts = [sec_provenance(rep), sec_gates(rep), sec_conditions(rep), sec_plant(rep), sec_shuffle(rep), sec_gain(rep), sec_criterion(rep), sec_eye(rep), sec_overlaps(rep), sec_scene(rep),
++    parts = [sec_gates(rep), sec_provenance(rep), sec_conditions(rep), sec_plant(rep), sec_shuffle(rep), sec_gain(rep), sec_criterion(rep), sec_eye(rep), sec_overlaps(rep), sec_scene(rep),
+              sec_predictions(rep)]
+##### rp-scene-ceiling
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -437,3 +437,3 @@
+              + f"; held-out pairs seen {ch.get('heldout_pairs_seen')}; G_max gated: {sb['gmax_gated']}")
+-    L.append(f"THE CEILING: G_max {num(sb['G_max'])} bits (bits(held | empty) {num(sb['bits0'])} minus the generator's own code length); the expected form bits(empty) − 6.0774 · N_utt {num(sb['expected_form'])}; "
++    L.append(f"THE CEILING: G_max {num(sb['bits0'])} bits (bits(held | empty) {num(sb['G_max'])} minus the generator's own code length); the expected form bits(empty) − 6.0774 · N_utt {num(sb['expected_form'])}; "
+              f"entropy {num(sb['entropy'], 4)}; H(utterance | length) {num(sb['h_given_length'], 4)} (a reference for a code handed the lengths, never a gate); STOP {sb['stop']}")
+##### rp-scene-chi
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -435,3 +435,3 @@
+     ch = sb["chi2"]
+-    L.append(f"generator fit (G1 χ²): " + ", ".join(f"{k} p {num((ch.get(k) or {}).get('p'), 3)} (n {(ch.get(k) or {}).get('n')})" for k in ("length", "shape", "colour", "size", "pairs"))
++    L.append(f"generator fit (G1 χ²): " + ", ".join(f"{k} p {num((ch.get(k) or {}).get('p'), 2)} (n {(ch.get(k) or {}).get('n')})" for k in ("length", "shape", "colour", "size", "pairs"))
+              + f"; held-out pairs seen {ch.get('heldout_pairs_seen')}; G_max gated: {sb['gmax_gated']}")
+##### rp-scene-G
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -161,3 +161,3 @@
+     for row, r in zip(sb["rows"], recs_):
+-        if (row["rule"], row["seed"]) != (r["rule"], r["seed"]) or row["G"] != r["gain"]["G"] or abs(row["margin"] - (sb["G_max"] - r["gain"]["G"])) > 1e-9:
++        if (row["rule"], row["seed"]) != (r["rule"], r["seed"]) or False or abs(row["margin"] - (sb["G_max"] - r["gain"]["G"])) > 1e-9:
+             return False
+##### rp-scene-grad
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -448,3 +448,3 @@
+             continue
+-        L.append(f"SCENE {rule}: {'gradable' if res['grade']['scene'][rule]['gradable'] else 'NOT GRADABLE'} (SCENE+PLANT plant gate: {res['grade']['scene'][rule]['plant_gate']['n_counted']} of "
++        L.append(f"SCENE {rule}: {'NOT GRADABLE' if res['grade']['scene'][rule]['gradable'] else 'gradable'} (SCENE+PLANT plant gate: {res['grade']['scene'][rule]['plant_gate']['n_counted']} of "
+                  f"{res['grade']['scene'][rule]['plant_gate']['n_seeds']} seeds count, need {res['grade']['scene'][rule]['plant_gate']['need']})")
+##### rp-scene-id
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -161,3 +161,3 @@
+     for row, r in zip(sb["rows"], recs_):
+-        if (row["rule"], row["seed"]) != (r["rule"], r["seed"]) or row["G"] != r["gain"]["G"] or abs(row["margin"] - (sb["G_max"] - r["gain"]["G"])) > 1e-9:
++        if False or row["G"] != r["gain"]["G"] or abs(row["margin"] - (sb["G_max"] - r["gain"]["G"])) > 1e-9:
+             return False
+##### rp-scene-len
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -158,3 +158,3 @@
+     recs_ = sc["records"]
+-    if len(sb["rows"]) != len(recs_):
++    if False:
+         return False
+##### rp-scene-margin
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -161,3 +161,3 @@
+     for row, r in zip(sb["rows"], recs_):
+-        if (row["rule"], row["seed"]) != (r["rule"], r["seed"]) or row["G"] != r["gain"]["G"] or abs(row["margin"] - (sb["G_max"] - r["gain"]["G"])) > 1e-9:
++        if (row["rule"], row["seed"]) != (r["rule"], r["seed"]) or row["G"] != r["gain"]["G"] or abs(row["margin"] - (sb["G_max"] - r["gain"]["G"])) > 1e9:
+             return False
+##### rp-scene-oracle-margin
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -164,3 +164,3 @@
+     o = sb["oracle"]
+-    return abs(o["margin"] - (sb["G_max"] - o["G"])) <= 1e-9 and _roundtrip(VD.oracle_recall(sc, SC.oracle_frames())) == o["recall"]
++    return True and _roundtrip(VD.oracle_recall(sc, SC.oracle_frames())) == o["recall"]
+ 
+##### rp-scene-recall
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -164,3 +164,3 @@
+     o = sb["oracle"]
+-    return abs(o["margin"] - (sb["G_max"] - o["G"])) <= 1e-9 and _roundtrip(VD.oracle_recall(sc, SC.oracle_frames())) == o["recall"]
++    return abs(o["margin"] - (sb["G_max"] - o["G"])) <= 1e-9 and True
+ 
+##### rp-scene-recall-fmt
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -443,3 +443,3 @@
+     L.append(f"G(F_oracle) {num(o['G'])} ({o['n_frames']} frames; margin to G_max {num(o['margin'])}; violation {o['violation']}); each rule's recall of F_oracle: "
+-             + ", ".join(f"{k} {num(v, 3)}" for k, v in sorted(o["recall"].items())))
++             + ", ".join(f"{k} {num(v, 2)}" for k, v in sorted(o["recall"].items())))
+     for rule in RULES:
+##### rp-scene-viol
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -440,3 +440,3 @@
+     for r in sb["rows"]:
+-        L.append(f"  {r['rule']:<11}seed {r['seed']:>2}  G {num(r['G'])}  margin to G_max {num(r['margin'])}  {'VIOLATION' if r['violation'] else 'under G_max + 20'}")
++        L.append(f"  {r['rule']:<11}seed {r['seed']:>2}  G {num(r['G'])}  margin to G_max {num(r['margin'])}  {'under G_max + 20' if r['violation'] else 'VIOLATION'}")
+     o = sb["oracle"]
+##### rp-sha-truncated
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -48,3 +48,3 @@
+ def _sha256(path: Path) -> str:
+-    return hashlib.sha256(path.read_bytes()).hexdigest()
++    return hashlib.sha256(path.read_bytes()).hexdigest()[:63]
+ 
+##### rp-shuffle-q95
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -315,3 +315,3 @@
+         L.append(f"SHUFFLE-QUIET {rule}: {'QUIET' if sq['quiet'] else 'LOUD'} — {sq['n_quiet']} of {sq['n']} (need {sq['need']}); empty sets {sq['empty']}; |F| {counts([r['n_frames'] for r in rs])}; "
+-                 f"G {spread([r['gain']['G'] for r in rs])}; NULL-1 q95 {spread([null_of(r, 'null1').get('q95') for r in rs if null_of(r, 'null1')])}")
++                 f"G {spread([r['gain']['G'] for r in rs])}; NULL-1 q95 {spread([null_of(r, 'null1').get('mean') for r in rs if null_of(r, 'null1')])}")
+     return L
+##### rp-shuffle-quiet
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -314,3 +314,3 @@
+         sq = res["grade"]["alpha4"][rule]["shuffle_quiet"]
+-        L.append(f"SHUFFLE-QUIET {rule}: {'QUIET' if sq['quiet'] else 'LOUD'} — {sq['n_quiet']} of {sq['n']} (need {sq['need']}); empty sets {sq['empty']}; |F| {counts([r['n_frames'] for r in rs])}; "
++        L.append(f"SHUFFLE-QUIET {rule}: {'LOUD' if sq['quiet'] else 'QUIET'} — {sq['n_quiet']} of {sq['n']} (need {sq['need']}); empty sets {sq['empty']}; |F| {counts([r['n_frames'] for r in rs])}; "
+                  f"G {spread([r['gain']['G'] for r in rs])}; NULL-1 q95 {spread([null_of(r, 'null1').get('q95') for r in rs if null_of(r, 'null1')])}")
+##### rp-signed-plus
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -81,3 +81,3 @@
+ def signed(x: Optional[float], nd: int = 2) -> str:
+-    return "none" if x is None else f"{x:+.{nd}f}"
++    return "none" if x is None else f"{x:.{nd}f}"
+ 
+##### rp-spread-empty
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -95,3 +95,3 @@
+     if not xs:
+-        return "none"
++        return "n/a"
+     if len(xs) == 1:
+##### rp-spread-mean-max
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -98,3 +98,3 @@
+         return num(xs[0], nd)
+-    return f"{num(mean(xs), nd)} ({num(min(xs), nd)} to {num(max(xs), nd)})"
++    return f"{num(max(xs), nd)} ({num(min(xs), nd)} to {num(max(xs), nd)})"
+ 
+##### rp-spread-minmax-swap
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -98,3 +98,3 @@
+         return num(xs[0], nd)
+-    return f"{num(mean(xs), nd)} ({num(min(xs), nd)} to {num(max(xs), nd)})"
++    return f"{num(mean(xs), nd)} ({num(max(xs), nd)} to {num(min(xs), nd)})"
+ 
+##### rp-spread-single-nd
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -97,3 +97,3 @@
+     if len(xs) == 1:
+-        return num(xs[0], nd)
++        return num(xs[0])
+     return f"{num(mean(xs), nd)} ({num(min(xs), nd)} to {num(max(xs), nd)})"
+##### rp-yn-inverted
+--- a/tools/toys/frames/report.py
++++ b/tools/toys/frames/report.py
+@@ -178,3 +178,3 @@
+ def _yn(ok: Optional[bool]) -> str:
+-    return "yes" if ok else "NO"
++    return "NO" if ok else "yes"
+ 

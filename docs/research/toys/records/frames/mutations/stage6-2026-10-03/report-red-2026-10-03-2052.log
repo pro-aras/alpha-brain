@@ -1,0 +1,17 @@
+E
+======================================================================
+ERROR: test_toys_frames_report (unittest.loader._FailedTest.test_toys_frames_report)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_toys_frames_report
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_report.py", line 15, in <module>
+    from tools.toys.frames import report as RP
+ImportError: cannot import name 'report' from 'tools.toys.frames' (unknown location)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

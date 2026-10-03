@@ -1,0 +1,35 @@
+gates: see tools/toys/frames/gates.py
+Fgates: see tools/toys/frames/gates.py
+Fgates: see tools/toys/frames/gates.py
+F...
+======================================================================
+FAIL: test_gates_defaults_to_the_runners_copies_and_runs_directories (tests.tools.test_toys_frames_run.TestCli.test_gates_defaults_to_the_runners_copies_and_runs_directories)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_run.py", line 245, in test_gates_defaults_to_the_runners_copies_and_runs_directories
+    self.assertEqual(RN._main(["gates"]), 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 64 != 0
+
+======================================================================
+FAIL: test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code (tests.tools.test_toys_frames_run.TestCli.test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code) (code=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_run.py", line 238, in test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code
+    self.assertEqual(code, want)                                                              # the gate's own code, never a constant
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: 64 != 0
+
+======================================================================
+FAIL: test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code (tests.tools.test_toys_frames_run.TestCli.test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code) (code=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_run.py", line 238, in test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code
+    self.assertEqual(code, want)                                                              # the gate's own code, never a constant
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: 64 != 1
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.087s
+
+FAILED (failures=3)
