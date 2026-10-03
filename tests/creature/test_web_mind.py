@@ -77,7 +77,7 @@ class WebInTheMind(unittest.TestCase):
         learns = [r for r in S.journal(self.root) if r.get("kind") == "brain" and r.get("act") == "learn"]
         self.assertEqual(node.lived["canvases"], len(learns))
         self.assertEqual(node.claims["T1"].confirmed + node.claims["T1"].contradicted, len(learns))
-        self.assertEqual(sorted(node.claims), ["B1", "F1", "F2", "T1", "T2", "T3"])
+        self.assertEqual(sorted(node.claims), ["B1", "F1", "F2", "M1", "T1", "T2", "T3"])   # edit: Claude (Fable 5.1, the seat), 2026-09-30 10:3x +0400 — PREREG-HEARS-2 §1: M1, the maker's claim
         self.assertEqual(node.claims["F2"].source, "implanted-knowledge")
 
     def test_the_snapshot_holds_them_and_a_resume_goes_on_identically(self):

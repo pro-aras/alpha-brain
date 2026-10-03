@@ -1,0 +1,98 @@
+[
+ {
+  "structure": "all_scene",
+  "scenes": 10000,
+  "grown_by": 0,
+  "grow_cpu_s": 0.0,
+  "grow_cpu_ms_per_scene": null,
+  "calibrate_wall_s_first": 3.325,
+  "calibrate_cpu_s_first": 3.307,
+  "calibrate_wall_s_second": 3.058,
+  "calibrate_cpu_s_second": 3.058,
+  "peak_rss_mb": 281
+ },
+ {
+  "structure": "all_scene",
+  "scenes": 20000,
+  "grown_by": 10000,
+  "grow_cpu_s": 1.44,
+  "grow_cpu_ms_per_scene": 0.144,
+  "calibrate_wall_s_first": 6.215,
+  "calibrate_cpu_s_first": 6.214,
+  "calibrate_wall_s_second": 6.232,
+  "calibrate_cpu_s_second": 6.231,
+  "peak_rss_mb": 334
+ },
+ {
+  "structure": "all_scene",
+  "scenes": 50000,
+  "grown_by": 30000,
+  "grow_cpu_s": 4.63,
+  "grow_cpu_ms_per_scene": 0.154,
+  "calibrate_wall_s_first": 16.65,
+  "calibrate_cpu_s_first": 16.648,
+  "calibrate_wall_s_second": 15.307,
+  "calibrate_cpu_s_second": 15.306,
+  "peak_rss_mb": 618
+ },
+ {
+  "structure": "all_scene",
+  "scenes": 100000,
+  "grown_by": 50000,
+  "grow_cpu_s": 7.5,
+  "grow_cpu_ms_per_scene": 0.15,
+  "calibrate_wall_s_first": 30.451,
+  "calibrate_cpu_s_first": 30.445,
+  "calibrate_wall_s_second": 30.122,
+  "calibrate_cpu_s_second": 30.119,
+  "peak_rss_mb": 1096
+ },
+ {
+  "structure": "maker_like",
+  "scenes": 10000,
+  "grown_by": 0,
+  "grow_cpu_s": 0.0,
+  "grow_cpu_ms_per_scene": null,
+  "calibrate_wall_s_first": 3.102,
+  "calibrate_cpu_s_first": 3.102,
+  "calibrate_wall_s_second": 3.105,
+  "calibrate_cpu_s_second": 3.102,
+  "peak_rss_mb": 1096
+ },
+ {
+  "structure": "maker_like",
+  "scenes": 20000,
+  "grown_by": 10000,
+  "grow_cpu_s": 1.14,
+  "grow_cpu_ms_per_scene": 0.114,
+  "calibrate_wall_s_first": 5.218,
+  "calibrate_cpu_s_first": 5.194,
+  "calibrate_wall_s_second": 4.067,
+  "calibrate_cpu_s_second": 4.066,
+  "peak_rss_mb": 1096
+ },
+ {
+  "structure": "maker_like",
+  "scenes": 50000,
+  "grown_by": 30000,
+  "grow_cpu_s": 3.6,
+  "grow_cpu_ms_per_scene": 0.12,
+  "calibrate_wall_s_first": 7.464,
+  "calibrate_cpu_s_first": 7.461,
+  "calibrate_wall_s_second": 7.435,
+  "calibrate_cpu_s_second": 7.432,
+  "peak_rss_mb": 1096
+ },
+ {
+  "structure": "maker_like",
+  "scenes": 100000,
+  "grown_by": 50000,
+  "grow_cpu_s": 5.88,
+  "grow_cpu_ms_per_scene": 0.118,
+  "calibrate_wall_s_first": 12.176,
+  "calibrate_cpu_s_first": 12.174,
+  "calibrate_wall_s_second": 12.189,
+  "calibrate_cpu_s_second": 12.188,
+  "peak_rss_mb": 1096
+ }
+]

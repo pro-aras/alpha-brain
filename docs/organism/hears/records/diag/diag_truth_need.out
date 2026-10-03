@@ -1,0 +1,32 @@
+CONTROL off: rebuilt TRUTH-NEED n 41 value 0.5609756097560976 · the grade holds n 41 value 0.5609756097560976 → REPRODUCED
+CONTROL on: rebuilt TRUTH-NEED n 36 value 0.3888888888888889 · the grade holds n 36 value 0.3888888888888889 → REPRODUCED
+items: off 60 on 60 union 60 same ids True
+covered in OFF 46 in ON 46 in both 46
+{'spoke_both': 36, 'only_off': 5, 'only_on': 0, 'neither': 5}
+spoke in both n 36: both true 13 · both false 16 · ON-right only 1 · OFF-right only 6 · smallest passing gap 10/n = 0.278
+sign test (ON worse = OFF-right more) p = 0.0625
+  OFF right, ON wrong
+     SPEAK2:speak2:20261402:00019 kind CS · OFF ['green', 'ring'] True · ON ['white'] False
+     SPEAK2:speak2:20261402:00023 kind SC · OFF ['small', 'red'] True · ON ['yellow'] False
+     SPEAK2:speak2:20261402:00027 kind SC · OFF ['small', 'white'] True · ON ['white'] False
+     SPEAK2:speak2:20261402:00031 kind SC · OFF ['small', 'white'] True · ON ['white'] False
+     SPEAK2:speak2:20261402:00033 kind SC · OFF ['big', 'green'] True · ON ['big'] False
+     SPEAK2:speak2:20261402:00046 kind SS · OFF ['big', 'triangle'] True · ON ['yellow'] False
+  ON right, OFF wrong
+     SPEAK2:speak2:20261402:00032 kind SC · OFF ['small'] False · ON ['small', 'green'] True
+  only_off (spoke in one arm only):
+     SPEAK2:speak2:20261402:00020 kind SC · spoke ['big', 'white'] true True · other arm reason the read-back
+     SPEAK2:speak2:20261402:00042 kind SS · spoke ['small', 'cross'] true True · other arm reason no believed-unique phrase
+     SPEAK2:speak2:20261402:00044 kind SS · spoke ['big', 'cross'] true True · other arm reason the read-back
+     SPEAK2:speak2:20261402:00052 kind SS · spoke ['big'] true False · other arm reason the read-back
+     SPEAK2:speak2:20261402:00058 kind SS · spoke ['big', 'square'] true True · other arm reason no believed-unique phrase
+  only_on (spoke in one arm only):
+off spoken covered 41 true 23 length mix {1: 18, 2: 23, 3: 0}
+    kind CS n 12 true 5
+    kind SC n 13 true 8
+    kind SS n 16 true 10
+on spoken covered 36 true 14 length mix {1: 22, 2: 14, 3: 0}
+    kind CS n 12 true 4
+    kind SC n 12 true 4
+    kind SS n 12 true 6
+reasons not spoken among covered: {'off': {'no sayable word': 4, 'no believed-unique phrase': 1}, 'on': {'no sayable word': 4, 'the read-back': 3, 'no believed-unique phrase': 3}}

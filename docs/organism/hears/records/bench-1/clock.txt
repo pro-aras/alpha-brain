@@ -1,0 +1,30 @@
+2026-10-03 12:09:03 +0400 read start
+grade-off exit 0
+grade-on exit 1
+worlds-on exit 0
+xplant-make exit 0
+grade-xplant exit 1
+i2-journal_diff exit 0
+i2-journal_diff-planted exit 1 (must be 1)
+hears_read exit 2
+2026-10-03 12:09:13 +0400 read done
+2026-10-03 12:14:16 +0400 read start
+grade-off exit 0
+grade-on exit 0
+worlds-on exit 0
+xplant-make exit 0
+grade-xplant exit 0
+i2-journal_diff exit 0
+i2-journal_diff-planted exit 1 (must be 1)
+hears_read exit 0
+2026-10-03 12:14:32 +0400 read done
+2026-10-03 12:24:46 +0400 read start
+grade-off exit 0
+grade-on exit 0
+worlds-on exit 0
+xplant-make exit 0
+grade-xplant exit 0
+i2-journal_diff exit 0
+i2-journal_diff-planted exit 1 (must be 1)
+hears_read exit 0
+2026-10-03 12:25:00 +0400 read done
