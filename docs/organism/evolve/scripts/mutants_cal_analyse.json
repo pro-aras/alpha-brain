@@ -1,0 +1,104 @@
+[
+ {
+  "name": "equal-ignores-a-missing-reading",
+  "old": "        if x is None or y is None or x != y:\n            return False\n    return True",
+  "new": "        if x is not None and y is not None and x != y:\n            return False\n    return True",
+  "expect": "test_a_missing_reading_is_not_equal"
+ },
+ {
+  "name": "equal-reads-two-dimensions",
+  "old": "    for d in GATED:\n        x, y = a.get(d), b.get(d)",
+  "new": "    for d in GATED[:2]:\n        x, y = a.get(d), b.get(d)",
+  "expect": "test_equal_readings_are_equal_and_any_gated_difference_is_not"
+ },
+ {
+  "name": "null-drops-a-none-reading",
+  "old": "                raise ValueError(f\"null_arrays: a twin carries no {d!r} reading (refused, not dropped)\")",
+  "new": "                continue",
+  "expect": "test_a_none_reading_is_refused_not_dropped"
+ },
+ {
+  "name": "null-incumbent-last",
+  "old": "    for r in [inc, *twins]:\n        for d in GATED:\n            if r.get(d) is None:",
+  "new": "    for r in [*twins, inc]:\n        for d in GATED:\n            if r.get(d) is None:",
+  "expect": "test_the_null_is_the_incumbent_plus_the_twins"
+ },
+ {
+  "name": "cost-null-not-logged",
+  "old": "        out[\"ln_cpu\"].append(math.log(float(r[\"cpu_s\"])))",
+  "new": "        out[\"ln_cpu\"].append(float(r[\"cpu_s\"]))",
+  "expect": "test_the_null_is_the_incumbent_plus_the_twins"
+ },
+ {
+  "name": "a0-always-non-degenerate",
+  "old": "    return {\"non_degenerate\": bool(moved), \"moved\": moved, \"n_twins\": len(eps_twins)}",
+  "new": "    return {\"non_degenerate\": True, \"moved\": moved, \"n_twins\": len(eps_twins)}",
+  "expect": "test_a0_is_non_degenerate_iff_an_epsilon_twin_moved_a_reading"
+ },
+ {
+  "name": "a0plus-accepts-fewer-than-six",
+  "old": "    if n < 6:",
+  "new": "    if n < 1:",
+  "expect": "test_a0plus_refuses_fewer_than_six_twins"
+ },
+ {
+  "name": "a0plus-bound-with-n-minus-one",
+  "old": "\"upper_bound_p\": 1.0 - 0.05 ** (1.0 / n)}",
+  "new": "\"upper_bound_p\": 1.0 - 0.05 ** (1.0 / (n - 1))}",
+  "expect": "test_a0plus_reads_degenerate_only_if_all_six_equal_and_prints_the_bound"
+ },
+ {
+  "name": "stage-b-two-distinct-values",
+  "old": "    dims = [d for d in GATED if len({x[d] for x in [inc, *five_twins] if x.get(d) is not None}) >= 3]",
+  "new": "    dims = [d for d in GATED if len({x[d] for x in [inc, *five_twins] if x.get(d) is not None}) >= 2]",
+  "expect": "test_stage_b_runs_only_where_a_band_could_exist"
+ },
+ {
+  "name": "choose-ignores-the-discrete-flip",
+  "old": "        equal = sum(1 for t in tw if t.get(\"discrete_differing\", 0) == 0 and readings_equal(inc, t[\"reading\"]))",
+  "new": "        equal = sum(1 for t in tw if readings_equal(inc, t[\"reading\"]))",
+  "expect": "test_a_level_that_flips_a_discrete_outcome_but_moves_no_reading_still_differs"
+ },
+ {
+  "name": "choose-ignores-the-readings",
+  "old": "        equal = sum(1 for t in tw if t.get(\"discrete_differing\", 0) == 0 and readings_equal(inc, t[\"reading\"]))",
+  "new": "        equal = sum(1 for t in tw if t.get(\"discrete_differing\", 0) == 0)",
+  "expect": "test_a_level_whose_readings_move_but_whose_journal_does_not_still_differs"
+ },
+ {
+  "name": "choose-picks-the-largest-flipping-level",
+  "old": "    chosen: Optional[float] = flipping[0] if flipping else None",
+  "new": "    chosen: Optional[float] = flipping[-1] if flipping else None",
+  "expect": "test_the_chosen_level_is_the_smallest_whose_twins_differ_in_a_discrete_outcome"
+ },
+ {
+  "name": "growth-factor-too-wide",
+  "old": "GROWTH_FACTOR = 2.0 ",
+  "new": "GROWTH_FACTOR = 100.0 ",
+  "expect": "test_a_chosen_level_whose_spread_is_larger_than_the_next_smaller_flipping_level_is_a_merit_step"
+ },
+ {
+  "name": "seed-null-without-the-incumbent",
+  "old": "        seed_frames = [float(x[\"frames_filed\"]) for x in [inc, *seed_twins]]",
+  "new": "        seed_frames = [float(x[\"frames_filed\"]) for x in seed_twins]",
+  "expect": "test_the_seed_twins_give_frames_filed_its_band_where_the_epsilon_null_is_flat"
+ },
+ {
+  "name": "reading-b-without-the-floor",
+  "old": "                rng = max(float(band[\"range\"]), floors[d])",
+  "new": "                rng = float(band[\"range\"])",
+  "expect": "test_reading_b_a_degenerate_dimension_gates_at_its_own_resolution"
+ },
+ {
+  "name": "reading-b-never-applied",
+  "old": "    if degenerate == \"range\":\n        for d in GATED:",
+  "new": "    if False:\n        for d in GATED:",
+  "expect": "test_reading_b_a_degenerate_dimension_gates_at_its_own_resolution"
+ },
+ {
+  "name": "ceiling-is-the-reading",
+  "old": "        ceiling = Q1_ITEMS - round(q1 * Q1_ITEMS)",
+  "new": "        ceiling = round(q1 * Q1_ITEMS)",
+  "expect": "test_the_ceiling_of_q1_seen_is_printed_beside_its_band"
+ }
+]

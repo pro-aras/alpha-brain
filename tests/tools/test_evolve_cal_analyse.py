@@ -104,6 +104,13 @@ class TestChooseLevel(unittest.TestCase):
         self.assertEqual(c["per_level"][1e-4]["twins_equal_to_incumbent"], 5)
         self.assertEqual(c["per_level"][1e-3]["twins_equal_to_incumbent"], 3)
 
+    def test_a_level_that_flips_a_discrete_outcome_but_moves_no_reading_still_differs(self) -> None:
+        # the shape of the real ladder at 1e-3 and 1e-2: edges / cells flipped in the journal, q1_seen, frames and confirmed_share equal to the incumbent's
+        c = an.choose_level(rd(), self.levels({1e-4: (0, 0), 1e-3: (2, 0), 1e-2: (5, 0)}))
+        self.assertEqual(c["chosen"], 1e-3)
+        self.assertEqual(c["per_level"][1e-3]["twins_equal_to_incumbent"], 3)
+        self.assertEqual(c["per_level"][1e-4]["twins_equal_to_incumbent"], 5)
+
     def test_a_level_whose_readings_move_but_whose_journal_does_not_still_differs(self) -> None:
         lv = self.levels({1e-4: (0, 0), 1e-3: (0, 0), 1e-2: (0, 0)})
         lv[1e-3][2] = {"label": "x", "reading": rd(q1=102), "discrete_differing": 0}
@@ -161,6 +168,7 @@ class TestBandsFromTwins(unittest.TestCase):
         b = an.bands_from_twins(rd(), flat, seed_twins=seeds, slice_name="S1", scope="x", degenerate="none")
         self.assertEqual(b["dims"]["frames_filed"]["kind"], "normal")
         self.assertEqual(b["dims"]["frames_filed"]["rule"], "seed")
+        self.assertEqual(b["dims"]["frames_filed"]["n"], 11, "the seed null is the incumbent + the 10 seed twins")
         self.assertEqual(b["frames_rule"], "seed")
 
     def test_the_ceiling_of_q1_seen_is_printed_beside_its_band(self) -> None:
