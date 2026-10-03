@@ -16,7 +16,9 @@ from __future__ import annotations
 
 import json
 import math
+import tempfile
 import unittest
+from pathlib import Path
 
 import tools.evolve_bands as eb
 import tools.evolve_cal as cal
@@ -446,6 +448,159 @@ class TestBandsFromTwins(unittest.TestCase):
         self.assertTrue(low["dims"]["q1_seen"]["ceiling"]["regressed_reachable"], "1 of 110: a fall of one item is still ANY fall, which the legacy tolerance regresses")
         zero = an.bands_from_twins(rd(q1=0), flat, seed_twins=None, slice_name="S1", scope="x", degenerate="none")
         self.assertFalse(zero["dims"]["q1_seen"]["ceiling"]["regressed_reachable"], "0 of 110: nothing left to fall")
+
+
+# edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 23:41 +0400 — THE SEAT'S RULING ON A3b (23:36), tests FIRST: (1) Stage B's rule is M; (2) A′ applies to EVERY dimension left without a measured band, in every branch,
+# and reading A is never the default («a calibration never loosens»); (3) the verifier's limits 2 and 3 are PRINTED beside every band: the twins' perturbation (1 + k × epsilon), the RMS deviation by k-tercile with its
+# label, and the selection note (epsilon* was selected because a twin moved: the null is conditioned on a move).
+def ev(k, level=0.01, **kw):
+    """An epsilon twin's reading carrying its variant `eps:<level>:<k>` as run_twin writes it."""
+    return rd(variant=f"eps:{level!r}:{k}", **kw)
+
+
+class TestRuledBuild(unittest.TestCase):
+    def test_the_ruled_stage_b_rule_is_m_and_is_what_the_decision_applies(self) -> None:
+        self.assertEqual(an.STAGE_B_RULE, "M")
+        inc = rd()
+        one = [rd()] * 4 + [rd(q1=103)]
+        self.assertEqual(an.stage_b_decision(inc, one), an.stage_b_condition(inc, one, rule="M"))
+        self.assertTrue(an.stage_b_decision(inc, one)["run"], "rule S would stop here (two distinct values): the ruled rule M runs Stage B")
+        self.assertFalse(an.stage_b_decision(inc, [rd()] * 5)["run"], "no twin moved: M does not run Stage B either")
+
+    def test_the_default_for_a_bandless_dimension_is_the_legacy_tolerance_in_every_branch(self) -> None:
+        flat = [rd(cpu=2000.0 + 15 * i) for i in range(20)]
+        b = an.bands_from_twins(rd(), flat, seed_twins=None, slice_name="S1", scope="x")           # the degenerate branch: nothing moved
+        for d in an.GATED:
+            self.assertEqual(b["dims"][d]["kind"], "none", d)
+            self.assertIn("legacy", b["dims"][d], d)
+        self.assertTrue(b["degenerate_reading"].startswith("A′"))
+        part = [rd(q1=104 + (i % 5) - 2, cpu=2000.0 + 15 * i) for i in range(20)]                  # PARTIAL degeneracy: q1_seen moves, the other two do not
+        b = an.bands_from_twins(rd(), part, seed_twins=None, slice_name="S1", scope="x")
+        self.assertEqual(b["dims"]["q1_seen"]["kind"], "normal")
+        self.assertNotIn("legacy", b["dims"]["q1_seen"], "a dimension with a measured band carries no legacy field")
+        for d in ("confirmed_share", "frames_filed"):
+            self.assertEqual((b["dims"][d]["kind"], b["dims"][d]["legacy"]["fall"]), ("none", "any"), d)
+
+    def test_readings_a_and_b_are_never_the_default(self) -> None:
+        import inspect
+        self.assertEqual(inspect.signature(an.bands_from_twins).parameters["degenerate"].default, "legacy")
+
+    def test_the_worker_refuses_a_band_file_whose_bandless_dimension_has_no_legacy_tolerance(self) -> None:
+        # «a calibration never loosens»: reading A, written by an older default, must not reach the gate
+        flat = [rd(cpu=2000.0 + 15 * i) for i in range(20)]
+        a = an.bands_from_twins(rd(), flat, seed_twins=None, slice_name="S1", scope="x", degenerate="none")
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "BANDS.json"
+            p.write_text(json.dumps(a))
+            with self.assertRaises(ValueError):
+                eb.load_bands(p)
+            self.assertEqual(eb.load_bands(p, strict=False)["dims"]["q1_seen"]["kind"], "none", "the analysis tools may still read it, explicitly")
+            p.write_text(json.dumps(an.bands_from_twins(rd(), flat, seed_twins=None, slice_name="S1", scope="x")))
+            self.assertIn("legacy", eb.load_bands(p)["dims"]["q1_seen"])
+
+    def test_the_strict_loader_checks_every_gated_dimension_not_only_the_first(self) -> None:
+        flat = [rd(cpu=2000.0 + 15 * i) for i in range(20)]
+        for stripped in ("q1_seen", "frames_filed", "confirmed_share"):
+            b = an.bands_from_twins(rd(), flat, seed_twins=None, slice_name="S1", scope="x")
+            del b["dims"][stripped]["legacy"]
+            with tempfile.TemporaryDirectory() as d:
+                p = Path(d) / "BANDS.json"
+                p.write_text(json.dumps(b))
+                with self.assertRaises(ValueError, msg=stripped):
+                    eb.load_bands(p)
+
+    def test_a_cost_band_without_a_measured_band_needs_no_legacy_field(self) -> None:
+        # the cost has its own policy cap (1.2) when it has no band: it is not a gated dimension and A′ is not asked of it
+        b = an.bands_from_twins(rd(), [rd(cpu=2000.0) for _ in range(20)], seed_twins=None, slice_name="S1", scope="x")
+        self.assertEqual(b["dims"]["ln_cpu"]["kind"], "none")
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "BANDS.json"
+            p.write_text(json.dumps(b))
+            self.assertEqual(eb.load_bands(p)["dims"]["ln_cpu"]["kind"], "none")
+
+
+class TestNullProvenance(unittest.TestCase):
+    @staticmethod
+    def twenty(level=0.01, spread=lambda k: (k - 1) // 7):
+        """Twenty epsilon twins k = 1..20 at one level; twin k reads q1_seen `spread(k)` items from the incumbent's (a growing top tercile by default: 0, 1, 2)."""
+        return [ev(k, level, q1=104 + spread(k), cpu=2000.0 + 10 * k) for k in range(1, 21)]
+
+    def test_the_perturbation_is_printed_as_one_plus_k_epsilon(self) -> None:
+        p = an.null_provenance(rd(), self.twenty())
+        self.assertEqual((p["epsilon"], p["levels"], p["n_twins"]), (0.01, [0.01], 20))
+        self.assertAlmostEqual(p["perturbation"][0], 1.01, places=9)
+        self.assertAlmostEqual(p["perturbation"][1], 1.20, places=9)
+        self.assertIn("1 + k", p["perturbation_note"])
+        self.assertIn("1.01", p["perturbation_note"])
+        self.assertIn("1.2", p["perturbation_note"])
+
+    def test_twenty_twins_split_into_terciles_of_7_7_6_by_perturbation(self) -> None:
+        t = an.null_provenance(rd(), self.twenty())["terciles"]
+        self.assertEqual([x["n"] for x in t], [7, 7, 6])
+        self.assertEqual([x["k"] for x in t], [[1, 7], [8, 14], [15, 20]])
+        self.assertAlmostEqual(t[2]["perturbation"][1], 1.20, places=9)
+
+    def test_the_rms_by_tercile_is_printed_and_a_growing_top_tercile_is_labelled(self) -> None:
+        p = an.null_provenance(rd(), self.twenty())            # q1_seen 0, 1, 2 items away from the incumbent in the three terciles
+        self.assertEqual([round(x["rms_dev"]["q1_seen"], 6) for x in p["terciles"]], [0.0, 1.0, 2.0])
+        self.assertTrue(p["top_tercile_grows"]["q1_seen"], "2 items against a bottom tercile of 0: the top tercile grows")
+        self.assertFalse(p["top_tercile_grows"]["confirmed_share"], "confirmed_share never moved")
+        flat = an.null_provenance(rd(), self.twenty(spread=lambda k: 1))
+        self.assertFalse(flat["top_tercile_grows"]["q1_seen"], "1, 1, 1: flat")
+
+    def test_the_label_is_strict_exactly_twice_the_bottom_tercile_is_not_a_growth(self) -> None:
+        twice = an.null_provenance(rd(), self.twenty(spread=lambda k: 2 if k >= 15 else 1))
+        self.assertEqual([round(x["rms_dev"]["q1_seen"], 6) for x in twice["terciles"]], [1.0, 1.0, 2.0])
+        self.assertFalse(twice["top_tercile_grows"]["q1_seen"])
+        thrice = an.null_provenance(rd(), self.twenty(spread=lambda k: 3 if k >= 15 else 1))
+        self.assertTrue(thrice["top_tercile_grows"]["q1_seen"])
+
+    def test_fewer_than_nine_twins_have_no_terciles_and_say_so(self) -> None:
+        p = an.null_provenance(rd(), [ev(k) for k in range(1, 9)])
+        self.assertIsNone(p["terciles"])
+        self.assertIn("fewer than 9", p["tercile_note"])
+        self.assertEqual(an.null_provenance(rd(), [ev(k) for k in range(1, 10)])["terciles"][0]["n"], 3)
+
+    def test_twins_of_two_levels_are_a_range_with_no_single_epsilon(self) -> None:
+        six = [ev(1, 0.001), ev(2, 0.001), ev(3, 0.001), ev(1, 0.01), ev(2, 0.01), ev(3, 0.01)]
+        p = an.null_provenance(rd(), six)
+        self.assertIsNone(p["epsilon"])
+        self.assertEqual(p["levels"], [0.001, 0.01])
+        self.assertAlmostEqual(p["perturbation"][0], 1.001, places=9)
+        self.assertAlmostEqual(p["perturbation"][1], 1.03, places=9)
+
+    def test_the_selection_note_says_a_null_with_a_mover_is_conditioned_on_a_move(self) -> None:
+        moved = an.null_provenance(rd(), self.twenty())
+        self.assertTrue(moved["selected_on_a_move"])
+        self.assertIn("conditioned on a move", moved["selection_note"])
+        self.assertIn("wider than the true noise", moved["selection_note"])
+        flat = an.null_provenance(rd(), self.twenty(spread=lambda k: 0))
+        self.assertFalse(flat["selected_on_a_move"])
+        self.assertIn("no twin moved", flat["selection_note"])
+        self.assertNotIn("conditioned on a move", flat["selection_note"])
+
+    def test_a_frames_filed_only_difference_is_not_a_move_for_the_selection_note(self) -> None:
+        only_frames = [ev(k, 0.01, frames=26 + (k % 3)) for k in range(1, 21)]
+        self.assertFalse(an.null_provenance(rd(), only_frames)["selected_on_a_move"])
+
+    def test_a_twin_without_a_variant_is_counted_not_hidden_and_does_not_stop_the_bands(self) -> None:
+        p = an.null_provenance(rd(), [rd() for _ in range(5)])
+        self.assertEqual((p["unparsed"], p["n_twins"], p["epsilon"], p["terciles"]), (5, 5, None, None))
+        self.assertIn("variant unknown for 5 of 5", p["perturbation_note"])
+
+    def test_every_band_carries_the_provenance_beside_it(self) -> None:
+        b = an.bands_from_twins(rd(), self.twenty(), seed_twins=None, slice_name="S1", scope="x")
+        self.assertEqual(b["null"]["epsilon"], 0.01)
+        self.assertTrue(set(b["dims"]) >= set(an.GATED) | {"ln_cpu"})
+        for d, band in b["dims"].items():
+            notes = " | ".join(band["null_notes"])
+            self.assertIn("conditioned on a move", notes, d)
+            self.assertIn("1 + k", notes, d)
+        q = " | ".join(b["dims"]["q1_seen"]["null_notes"])
+        self.assertIn("k-tercile", q)
+        self.assertIn("GROWS", q, "the top tercile of q1_seen grows in this fixture, and the label is printed beside its band")
+        c = " | ".join(b["dims"]["confirmed_share"]["null_notes"])
+        self.assertNotIn("GROWS", c)
 
 
 if __name__ == "__main__":
