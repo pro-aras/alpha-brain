@@ -30,6 +30,7 @@ ROOT = Path(__file__).resolve().parents[4]          # docs/organism/claims/scrip
 JDIR = ROOT / "scratch" / "br2"
 TDIR = ROOT / "scratch" / "br2tape"
 EDIR = ROOT / "scratch" / "br2evolve"
+ASKDIR = ROOT / "scratch" / "br2ask"            # cp -rp of root/ask/in and root/ask/out
 PDF_STATUS_AT = "2026-10-01T19:04"                   # the PDF's STATUS read, pinned by `said`==1790 and right==2307 (see `mouth`/`motor`)
 
 
@@ -309,6 +310,17 @@ def mouth(J, T):
     after = sum(1 for _, d in spoken2 if d["heard"] == "no")
     print("  PLANT (flip one `heard` no->yes in a copy): no-count %d -> %d" % (before, after))
     check(spoken2[victim_i][1] != spoken[victim_i][1] and after == before - 1, "the planted heard-flip is CAUGHT (and changed the row)")
+    # the world door never answered a mouth question: ask/in is empty, ask/out holds the questions (the mouth's `is`, the mind's own)
+    qf = [json.load(open(p)) for p in sorted(glob.glob(str(ASKDIR / "out" / "q-*.json")))]
+    in_files = sorted(os.listdir(ASKDIR / "in"))
+    byfrom = collections.Counter(q.get("from") for q in qf)
+    print("  ask/out question files %d (by `from` %s; `q` %s) ; ask/in (the door's answers) %d files" % (len(qf), dict(byfrom), dict(collections.Counter(q.get("q") for q in qf)), len(in_files)))
+    def door_answered_none(listing):
+        return len(listing) == 0 and byfrom["mouth"] >= len(spoken) and byfrom["mouth"] > 0
+    check(door_answered_none(in_files),
+          "the world door has answered NONE of the mouth's `is` questions (ask/in holds 0 files; ask/out holds the mouth's %d): «rejected» is not a door's verdict" % byfrom["mouth"])
+    planted_in = in_files + ["q-0.json"]
+    check(planted_in != in_files and not door_answered_none(planted_in), "PLANT (one fake answer file added to a copy of the listing) is CAUGHT: the zero-answers test fails on it")
     st = json.load(open(JDIR / "STATUS.json")) if (JDIR / "STATUS.json").exists() else {}
     if st:
         b = (st.get("brain") or {}).get("turns") or {}
@@ -395,6 +407,12 @@ def evolve(J, T):
     print("  journal `epoch` rows: %s" % [(s, e) for s, e in J["epochs"]])
     check(len(diff) == 1 and diff[0][0].split("#")[0].split() == ["KWTA", "5"] and diff[0][1].split("#")[0].split() == ["KWTA", "4"] and len(J["epochs"]) == 1 and J["epochs"][0][1].get("proposal_no") == 5,
           "the launch genome says KWTA 5, the ADOPTED genome says KWTA 4 (proposal 5, journal epoch row), so the PDF's «KWTA 5» was stale at its own timestamp")
+    # the epoch row's genome_sha IS the sha256 of GENOME.v1.genome: the adopted genome is that very file
+    import hashlib
+    sha_file = hashlib.sha256((JDIR / "GENOME.v1.genome").read_bytes()).hexdigest()
+    sha_row = J["epochs"][0][1]["genome_sha"]
+    print("  epoch row genome_sha %s... ; sha256(GENOME.v1.genome) %s..." % (sha_row[:16], sha_file[:16]))
+    check(sha_row == sha_file and sha_row != hashlib.sha256((JDIR / "GENOME.genome").read_bytes()).hexdigest(), "the journal's epoch row names GENOME.v1.genome byte for byte (and not the launch file)")
     # the 13 draws are reproducible
     seed = 20261101
     rep = sum(1 for no, (p, _) in props.items() if no > 1 and draw_mutation(seed, p["epoch"] + 1, p["no"]) == (p["gene"], p["value"]))
@@ -427,12 +445,86 @@ def evolve(J, T):
     check(changed and after == before + 1, "the planted verdict corruption is CAUGHT (and changed the record)")
 
 
+# ======================================================================================== WEB (replay of the knowledge web from the tape)
+WEBDIR = ROOT / "scratch" / "br2web"          # a STATUS.json copied FIRST, then the tape rows (so the tape is never shorter than STATUS's `t`)
+
+
+def web(limit=None):
+    """Replay Web L and Web N exactly as the mind feeds them (creature/mind.py:951-961 `consume` -> `_web_hear`: every ear row with a
+    truthy word, in tape order; the webs are built at mind.py:905 as Web(r, beta=10, seed=SEED, spend="harmonic", reach=20)), validate the
+    replay against STATUS `brain.web` at STATUS's own `t`, then read the web at the PDF's two instants."""
+    print("== WEB  (replay of Web L / N from the tape's ear rows; validated against STATUS at its own t)")
+    sys.path.insert(0, str(ROOT))
+    from genome import web as W
+    st = json.load(open(WEBDIR / "STATUS.json"))
+    sw = st["brain"]["web"]
+    t_status = sw["L"]["t"]
+    words = []
+    for fn in sorted(glob.glob(str(WEBDIR / "*.jsonl"))):
+        for d in jl(fn):
+            if d.get("sense") == "ear":
+                w = (d.get("meta") or {}).get("word")
+                if w:
+                    words.append((d["seq"], d["at"], str(w)))
+    print("ear rows with a word on the tape copy: %d ; STATUS (heartbeat %s) web L t = %d" % (len(words), st.get("heartbeat_at"), t_status))
+    check(len(words) >= t_status, "the tape copy holds at least the %d words STATUS's web has heard" % t_status)
+    seed = 20261101
+    def build():
+        return {r: W.Web(r, beta=10, seed=seed, spend="harmonic", reach=20, author="brain-long-2") for r in ("L", "N")}
+    def snap(webs):
+        return {r: {"t": w.t, "nodes": len(w.nodes), "edges": len(w.edges), "cap": w.cap(), "consolidated": w.stats["consolidated"],
+                    "replaced": w.stats["replaced"], "removed_missed": w.stats["removed_missed"]} for r, w in webs.items()}
+    cuts = {"first PDF read (seq<=255068, 23:05 +04)": 255068, "second PDF read (seq<=255622, 23:20 +04)": 255622}
+    cut_t = {name: sum(1 for s, _, _ in words if s <= seq) for name, seq in cuts.items()}
+    def run(seq_words, upto):
+        webs = build(); out = {}
+        for i, (s, at, w) in enumerate(seq_words, 1):
+            for wb in webs.values():
+                wb.hear(w)
+            if "rm11951" not in out and webs["L"].stats["removed_missed"] >= 11951:
+                out["rm11951"] = (i, at, webs["L"].stats["removed_missed"])      # the PDF's «11,951 pruned» is Web L's `removed_missed`
+            if "nodes1946" not in out and len(webs["L"].nodes) >= 1946:
+                out["nodes1946"] = (i, at, len(webs["L"].nodes))
+            for name, tt in cut_t.items():
+                if i == tt:
+                    out[name] = snap(webs)
+            if i == upto:
+                out["status"] = snap(webs)
+                break
+        return out
+    upto = t_status if limit is None else min(limit, t_status)
+    res = run(words, upto)
+    if limit is None:
+        print("  replay at STATUS's t=%d:" % t_status)
+        for r in ("L", "N"):
+            print("   %s replay %s" % (r, res["status"][r]))
+            print("   %s STATUS %s" % (r, sw[r]))
+        match = all(res["status"][r][k] == sw[r][k] for r in ("L", "N") for k in res["status"][r])
+        check(match, "the replayed web equals STATUS's web exactly at t=%d (every counter of L and N): the replay IS what the mind computed" % t_status)
+        print("  Web L first reads removed_missed >= 11,951 (the PDF's «11,951 pruned») at word %d, %s, value %d ; first reads 1,946 nodes at word %d, %s" % (res["rm11951"] + res["nodes1946"][:2]))
+        for name in cuts:
+            print("  %s: t=%d  L %s" % (name, cut_t[name], res[name]["L"]))
+            print("  %-60s     N %s" % ("", res[name]["N"]))
+        # a planted control: drop ONE word from the stream; the replay must then differ from STATUS
+        words2 = words[:4999] + words[5000:]
+        changed = len(words2) == len(words) - 1 and words2[4999] != words[4999]
+        res2 = run(words2, t_status - 1)
+        diff = [k for r in ("L", "N") for k in res2["status"][r] if res2["status"][r][k] != sw[r][k]]
+        print("  PLANT (drop the 5,000th word from the stream): counters that now differ from STATUS: %s" % diff)
+        check(changed and len(diff) > 0, "the planted dropped word is CAUGHT (and changed the stream)")
+    return res
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=("motor", "episodes", "mouth", "evolve", "all"))
+    ap.add_argument("what", choices=("motor", "episodes", "mouth", "evolve", "web", "all"))
     ap.add_argument("--journal", default=str(JDIR))
     ap.add_argument("--tape", default=str(TDIR))
     a = ap.parse_args()
+    if a.what == "web":                              # the web replay needs neither the journal nor the frozen tape copy
+        web()
+        print("RESULT OK (web)")
+        return
     J = load_journal(Path(a.journal))
     T = load_tape(Path(a.tape))
     if a.what in ("motor", "all"):
