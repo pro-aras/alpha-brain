@@ -1,82 +1,172 @@
 seed 20261301: rows per room {'R1': 838, 'R2': 837, 'R3': 716, 'N': 777}
-  after R1        n   838 lam_max  42.29 · eff.rank 0.1:  7 0.01: 37 0.001: 88 0.0001:140 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  12.8 0.01:  41.8 0.001:  87.7 0.0001: 127.6
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.736 (7)  0.01: 0.383 (37)  0.001: 0.149 (88)  0.0001: 0.016 (140)
-  after R1+R2     n  1675 lam_max  40.12 · eff.rank 0.1: 10 0.01: 43 0.001:112 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  23.5 0.01:  65.8 0.001: 117.0 0.0001: 141.9
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.645 (10)  0.01: 0.241 (43)  0.001: 0.041 (112)  0.0001: -0.000 (147)
-  after R1+R2+R3  n  2391 lam_max  36.93 · eff.rank 0.1: 12 0.01: 48 0.001:122 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  30.3 0.01:  78.0 0.001: 126.3 0.0001: 144.0
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.307 (12)  0.01: 0.084 (48)  0.001: 0.007 (122)  0.0001: -0.000 (147)
+  after R1        n   838 lam_max(C)  42.29 lam_max(G)   35437.1 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   12.8 of 147 (alpha    3543.7, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   7, null dim 140  |  the next room R2: energy outside the old span 0.736 (7 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   41.8 of 147 (alpha     354.4, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  37, null dim 110  |  the next room R2: energy outside the old span 0.383 (37 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   87.7 of 147 (alpha      35.4, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  88, null dim  59  |  the next room R2: energy outside the old span 0.149 (88 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  127.6 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 140, null dim   7  |  the next room R2: energy outside the old span 0.016 (140 dims kept)
+  after R1+R2     n  1675 lam_max(C)  40.12 lam_max(G)   67197.7 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   23.5 of 147 (alpha    3543.7, alpha/lam_max(G_j) 0.0527)  |  NSCL removed rank  10, null dim 137  |  the next room R3: energy outside the old span 0.645 (10 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   65.8 of 147 (alpha     354.4, alpha/lam_max(G_j) 0.0053)  |  NSCL removed rank  43, null dim 104  |  the next room R3: energy outside the old span 0.241 (43 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  117.0 of 147 (alpha      35.4, alpha/lam_max(G_j) 0.0005)  |  NSCL removed rank 112, null dim  35  |  the next room R3: energy outside the old span 0.041 (112 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  141.9 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span -0.000 (147 dims kept)
+  after R1+R2+R3  n  2391 lam_max(C)  36.93 lam_max(G)   88301.1 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   30.3 of 147 (alpha    3543.7, alpha/lam_max(G_j) 0.0401)  |  NSCL removed rank  12, null dim 135  |  the next room N: energy outside the old span 0.307 (12 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   78.0 of 147 (alpha     354.4, alpha/lam_max(G_j) 0.0040)  |  NSCL removed rank  48, null dim  99  |  the next room N: energy outside the old span 0.084 (48 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  126.3 of 147 (alpha      35.4, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 122, null dim  25  |  the next room N: energy outside the old span 0.007 (122 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.0 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span -0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3543.7  0.01: 354.4  0.001: 35.4  0.0001: 3.5
 seed 20261302: rows per room {'R1': 889, 'R2': 844, 'R3': 730, 'N': 783}
-  after R1        n   889 lam_max  39.50 · eff.rank 0.1:  7 0.01: 38 0.001: 90 0.0001:140 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  13.2 0.01:  43.3 0.001:  89.8 0.0001: 128.9
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.744 (7)  0.01: 0.391 (38)  0.001: 0.156 (90)  0.0001: 0.017 (140)
-  after R1+R2     n  1733 lam_max  38.83 · eff.rank 0.1: 10 0.01: 44 0.001:114 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  24.0 0.01:  67.1 0.001: 118.3 0.0001: 142.3
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.659 (10)  0.01: 0.233 (44)  0.001: 0.041 (114)  0.0001: 0.000 (147)
-  after R1+R2+R3  n  2463 lam_max  35.13 · eff.rank 0.1: 11 0.01: 50 0.001:124 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  30.8 0.01:  79.0 0.001: 127.1 0.0001: 144.2
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.319 (11)  0.01: 0.076 (50)  0.001: 0.006 (124)  0.0001: 0.000 (147)
+  after R1        n   889 lam_max(C)  39.50 lam_max(G)   35118.5 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   13.2 of 147 (alpha    3511.8, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   7, null dim 140  |  the next room R2: energy outside the old span 0.744 (7 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   43.3 of 147 (alpha     351.2, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  38, null dim 109  |  the next room R2: energy outside the old span 0.391 (38 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   89.8 of 147 (alpha      35.1, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  90, null dim  57  |  the next room R2: energy outside the old span 0.156 (90 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  128.9 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 140, null dim   7  |  the next room R2: energy outside the old span 0.017 (140 dims kept)
+  after R1+R2     n  1733 lam_max(C)  38.83 lam_max(G)   67296.6 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   24.0 of 147 (alpha    3511.8, alpha/lam_max(G_j) 0.0522)  |  NSCL removed rank  10, null dim 137  |  the next room R3: energy outside the old span 0.659 (10 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   67.1 of 147 (alpha     351.2, alpha/lam_max(G_j) 0.0052)  |  NSCL removed rank  44, null dim 103  |  the next room R3: energy outside the old span 0.233 (44 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  118.3 of 147 (alpha      35.1, alpha/lam_max(G_j) 0.0005)  |  NSCL removed rank 114, null dim  33  |  the next room R3: energy outside the old span 0.041 (114 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  142.3 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span 0.000 (147 dims kept)
+  after R1+R2+R3  n  2463 lam_max(C)  35.13 lam_max(G)   86521.9 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   30.8 of 147 (alpha    3511.8, alpha/lam_max(G_j) 0.0406)  |  NSCL removed rank  11, null dim 136  |  the next room N: energy outside the old span 0.319 (11 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   79.0 of 147 (alpha     351.2, alpha/lam_max(G_j) 0.0041)  |  NSCL removed rank  50, null dim  97  |  the next room N: energy outside the old span 0.076 (50 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  127.1 of 147 (alpha      35.1, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 124, null dim  23  |  the next room N: energy outside the old span 0.006 (124 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.2 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span 0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3511.8  0.01: 351.2  0.001: 35.1  0.0001: 3.5
 seed 20261303: rows per room {'R1': 855, 'R2': 841, 'R3': 737, 'N': 764}
-  after R1        n   855 lam_max  39.06 · eff.rank 0.1:  7 0.01: 37 0.001: 91 0.0001:140 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  13.1 0.01:  42.9 0.001:  89.8 0.0001: 129.0
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.744 (7)  0.01: 0.389 (37)  0.001: 0.143 (91)  0.0001: 0.013 (140)
-  after R1+R2     n  1696 lam_max  38.06 · eff.rank 0.1: 10 0.01: 44 0.001:115 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  24.4 0.01:  67.6 0.001: 118.9 0.0001: 142.4
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.637 (10)  0.01: 0.241 (44)  0.001: 0.032 (115)  0.0001: 0.000 (147)
-  after R1+R2+R3  n  2433 lam_max  35.33 · eff.rank 0.1: 12 0.01: 50 0.001:126 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  31.6 0.01:  80.3 0.001: 128.0 0.0001: 144.4
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.301 (12)  0.01: 0.076 (50)  0.001: 0.005 (126)  0.0001: -0.000 (147)
+  after R1        n   855 lam_max(C)  39.06 lam_max(G)   33394.9 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   13.1 of 147 (alpha    3339.5, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   7, null dim 140  |  the next room R2: energy outside the old span 0.744 (7 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   42.9 of 147 (alpha     333.9, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  37, null dim 110  |  the next room R2: energy outside the old span 0.389 (37 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   89.8 of 147 (alpha      33.4, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  91, null dim  56  |  the next room R2: energy outside the old span 0.143 (91 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  129.0 of 147 (alpha       3.3, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 140, null dim   7  |  the next room R2: energy outside the old span 0.013 (140 dims kept)
+  after R1+R2     n  1696 lam_max(C)  38.06 lam_max(G)   64556.7 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   24.4 of 147 (alpha    3339.5, alpha/lam_max(G_j) 0.0517)  |  NSCL removed rank  10, null dim 137  |  the next room R3: energy outside the old span 0.637 (10 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   67.6 of 147 (alpha     333.9, alpha/lam_max(G_j) 0.0052)  |  NSCL removed rank  44, null dim 103  |  the next room R3: energy outside the old span 0.241 (44 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  118.9 of 147 (alpha      33.4, alpha/lam_max(G_j) 0.0005)  |  NSCL removed rank 115, null dim  32  |  the next room R3: energy outside the old span 0.032 (115 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  142.4 of 147 (alpha       3.3, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span 0.000 (147 dims kept)
+  after R1+R2+R3  n  2433 lam_max(C)  35.33 lam_max(G)   85962.7 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   31.6 of 147 (alpha    3339.5, alpha/lam_max(G_j) 0.0388)  |  NSCL removed rank  12, null dim 135  |  the next room N: energy outside the old span 0.301 (12 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   80.3 of 147 (alpha     333.9, alpha/lam_max(G_j) 0.0039)  |  NSCL removed rank  50, null dim  97  |  the next room N: energy outside the old span 0.076 (50 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  128.0 of 147 (alpha      33.4, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 126, null dim  21  |  the next room N: energy outside the old span 0.005 (126 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.4 of 147 (alpha       3.3, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span -0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3339.5  0.01: 333.9  0.001: 33.4  0.0001: 3.3
 seed 20261304: rows per room {'R1': 840, 'R2': 850, 'R3': 725, 'N': 774}
-  after R1        n   840 lam_max  41.60 · eff.rank 0.1:  7 0.01: 39 0.001: 91 0.0001:140 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  13.4 0.01:  43.3 0.001:  89.4 0.0001: 128.4
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.741 (7)  0.01: 0.389 (39)  0.001: 0.145 (91)  0.0001: 0.012 (140)
-  after R1+R2     n  1690 lam_max  38.49 · eff.rank 0.1: 10 0.01: 45 0.001:115 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  23.9 0.01:  66.7 0.001: 117.9 0.0001: 142.1
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.629 (10)  0.01: 0.209 (45)  0.001: 0.035 (115)  0.0001: -0.000 (147)
-  after R1+R2+R3  n  2415 lam_max  35.65 · eff.rank 0.1: 11 0.01: 50 0.001:123 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  30.3 0.01:  78.1 0.001: 126.5 0.0001: 144.1
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.319 (11)  0.01: 0.078 (50)  0.001: 0.006 (123)  0.0001: -0.000 (147)
+  after R1        n   840 lam_max(C)  41.60 lam_max(G)   34943.4 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   13.4 of 147 (alpha    3494.3, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   7, null dim 140  |  the next room R2: energy outside the old span 0.741 (7 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   43.3 of 147 (alpha     349.4, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  39, null dim 108  |  the next room R2: energy outside the old span 0.389 (39 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   89.4 of 147 (alpha      34.9, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  91, null dim  56  |  the next room R2: energy outside the old span 0.145 (91 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  128.4 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 140, null dim   7  |  the next room R2: energy outside the old span 0.012 (140 dims kept)
+  after R1+R2     n  1690 lam_max(C)  38.49 lam_max(G)   65044.7 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   23.9 of 147 (alpha    3494.3, alpha/lam_max(G_j) 0.0537)  |  NSCL removed rank  10, null dim 137  |  the next room R3: energy outside the old span 0.629 (10 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   66.7 of 147 (alpha     349.4, alpha/lam_max(G_j) 0.0054)  |  NSCL removed rank  45, null dim 102  |  the next room R3: energy outside the old span 0.209 (45 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  117.9 of 147 (alpha      34.9, alpha/lam_max(G_j) 0.0005)  |  NSCL removed rank 115, null dim  32  |  the next room R3: energy outside the old span 0.035 (115 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  142.1 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span -0.000 (147 dims kept)
+  after R1+R2+R3  n  2415 lam_max(C)  35.65 lam_max(G)   86085.2 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   30.3 of 147 (alpha    3494.3, alpha/lam_max(G_j) 0.0406)  |  NSCL removed rank  11, null dim 136  |  the next room N: energy outside the old span 0.319 (11 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   78.1 of 147 (alpha     349.4, alpha/lam_max(G_j) 0.0041)  |  NSCL removed rank  50, null dim  97  |  the next room N: energy outside the old span 0.078 (50 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  126.5 of 147 (alpha      34.9, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 123, null dim  24  |  the next room N: energy outside the old span 0.006 (123 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.1 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span -0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3494.3  0.01: 349.4  0.001: 34.9  0.0001: 3.5
 seed 20261305: rows per room {'R1': 827, 'R2': 848, 'R3': 722, 'N': 794}
-  after R1        n   827 lam_max  41.59 · eff.rank 0.1:  7 0.01: 38 0.001: 90 0.0001:139 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  13.1 0.01:  43.0 0.001:  89.1 0.0001: 128.3
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.743 (7)  0.01: 0.416 (38)  0.001: 0.151 (90)  0.0001: 0.018 (139)
-  after R1+R2     n  1675 lam_max  38.91 · eff.rank 0.1: 10 0.01: 45 0.001:116 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  24.1 0.01:  67.4 0.001: 118.5 0.0001: 142.3
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.636 (10)  0.01: 0.223 (45)  0.001: 0.033 (116)  0.0001: 0.000 (147)
-  after R1+R2+R3  n  2397 lam_max  36.24 · eff.rank 0.1: 11 0.01: 50 0.001:124 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  31.0 0.01:  79.4 0.001: 127.3 0.0001: 144.2
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.327 (11)  0.01: 0.080 (50)  0.001: 0.006 (124)  0.0001: 0.000 (147)
+  after R1        n   827 lam_max(C)  41.59 lam_max(G)   34395.2 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   13.1 of 147 (alpha    3439.5, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   7, null dim 140  |  the next room R2: energy outside the old span 0.743 (7 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   43.0 of 147 (alpha     344.0, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  38, null dim 109  |  the next room R2: energy outside the old span 0.416 (38 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   89.1 of 147 (alpha      34.4, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  90, null dim  57  |  the next room R2: energy outside the old span 0.151 (90 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  128.3 of 147 (alpha       3.4, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 139, null dim   8  |  the next room R2: energy outside the old span 0.018 (139 dims kept)
+  after R1+R2     n  1675 lam_max(C)  38.91 lam_max(G)   65176.2 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   24.1 of 147 (alpha    3439.5, alpha/lam_max(G_j) 0.0528)  |  NSCL removed rank  10, null dim 137  |  the next room R3: energy outside the old span 0.636 (10 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   67.4 of 147 (alpha     344.0, alpha/lam_max(G_j) 0.0053)  |  NSCL removed rank  45, null dim 102  |  the next room R3: energy outside the old span 0.223 (45 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  118.5 of 147 (alpha      34.4, alpha/lam_max(G_j) 0.0005)  |  NSCL removed rank 116, null dim  31  |  the next room R3: energy outside the old span 0.033 (116 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  142.3 of 147 (alpha       3.4, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span 0.000 (147 dims kept)
+  after R1+R2+R3  n  2397 lam_max(C)  36.24 lam_max(G)   86858.1 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   31.0 of 147 (alpha    3439.5, alpha/lam_max(G_j) 0.0396)  |  NSCL removed rank  11, null dim 136  |  the next room N: energy outside the old span 0.327 (11 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   79.4 of 147 (alpha     344.0, alpha/lam_max(G_j) 0.0040)  |  NSCL removed rank  50, null dim  97  |  the next room N: energy outside the old span 0.080 (50 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  127.3 of 147 (alpha      34.4, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 124, null dim  23  |  the next room N: energy outside the old span 0.006 (124 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.2 of 147 (alpha       3.4, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span 0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3439.5  0.01: 344.0  0.001: 34.4  0.0001: 3.4
 seed 20261306: rows per room {'R1': 859, 'R2': 827, 'R3': 727, 'N': 757}
-  after R1        n   859 lam_max  41.58 · eff.rank 0.1:  7 0.01: 37 0.001: 90 0.0001:140 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  12.8 0.01:  42.3 0.001:  89.0 0.0001: 128.7
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.746 (7)  0.01: 0.404 (37)  0.001: 0.146 (90)  0.0001: 0.012 (140)
-  after R1+R2     n  1686 lam_max  39.69 · eff.rank 0.1:  9 0.01: 44 0.001:113 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  23.5 0.01:  66.1 0.001: 117.7 0.0001: 142.1
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.660 (9)  0.01: 0.219 (44)  0.001: 0.038 (113)  0.0001: 0.000 (147)
-  after R1+R2+R3  n  2413 lam_max  36.04 · eff.rank 0.1: 11 0.01: 48 0.001:124 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  30.2 0.01:  78.0 0.001: 126.5 0.0001: 144.1
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.311 (11)  0.01: 0.083 (48)  0.001: 0.006 (124)  0.0001: -0.000 (147)
+  after R1        n   859 lam_max(C)  41.58 lam_max(G)   35716.4 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   12.8 of 147 (alpha    3571.6, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   7, null dim 140  |  the next room R2: energy outside the old span 0.746 (7 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   42.3 of 147 (alpha     357.2, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  37, null dim 110  |  the next room R2: energy outside the old span 0.404 (37 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   89.0 of 147 (alpha      35.7, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  90, null dim  57  |  the next room R2: energy outside the old span 0.146 (90 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  128.7 of 147 (alpha       3.6, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 140, null dim   7  |  the next room R2: energy outside the old span 0.012 (140 dims kept)
+  after R1+R2     n  1686 lam_max(C)  39.69 lam_max(G)   66909.4 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   23.5 of 147 (alpha    3571.6, alpha/lam_max(G_j) 0.0534)  |  NSCL removed rank   9, null dim 138  |  the next room R3: energy outside the old span 0.660 (9 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   66.1 of 147 (alpha     357.2, alpha/lam_max(G_j) 0.0053)  |  NSCL removed rank  44, null dim 103  |  the next room R3: energy outside the old span 0.219 (44 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  117.7 of 147 (alpha      35.7, alpha/lam_max(G_j) 0.0005)  |  NSCL removed rank 113, null dim  34  |  the next room R3: energy outside the old span 0.038 (113 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  142.1 of 147 (alpha       3.6, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span 0.000 (147 dims kept)
+  after R1+R2+R3  n  2413 lam_max(C)  36.04 lam_max(G)   86955.6 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   30.2 of 147 (alpha    3571.6, alpha/lam_max(G_j) 0.0411)  |  NSCL removed rank  11, null dim 136  |  the next room N: energy outside the old span 0.311 (11 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   78.0 of 147 (alpha     357.2, alpha/lam_max(G_j) 0.0041)  |  NSCL removed rank  48, null dim  99  |  the next room N: energy outside the old span 0.083 (48 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  126.5 of 147 (alpha      35.7, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 124, null dim  23  |  the next room N: energy outside the old span 0.006 (124 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.1 of 147 (alpha       3.6, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span -0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3571.6  0.01: 357.2  0.001: 35.7  0.0001: 3.6
 seed 20261307: rows per room {'R1': 852, 'R2': 842, 'R3': 719, 'N': 782}
-  after R1        n   852 lam_max  39.48 · eff.rank 0.1:  7 0.01: 40 0.001: 95 0.0001:141 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  13.5 0.01:  44.6 0.001:  91.9 0.0001: 129.8
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.733 (7)  0.01: 0.376 (40)  0.001: 0.137 (95)  0.0001: 0.012 (141)
-  after R1+R2     n  1694 lam_max  38.20 · eff.rank 0.1: 10 0.01: 44 0.001:116 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  24.5 0.01:  68.0 0.001: 119.1 0.0001: 142.4
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.637 (10)  0.01: 0.228 (44)  0.001: 0.033 (116)  0.0001: 0.000 (147)
-  after R1+R2+R3  n  2413 lam_max  35.80 · eff.rank 0.1: 12 0.01: 49 0.001:124 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  31.3 0.01:  79.9 0.001: 127.7 0.0001: 144.3
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.299 (12)  0.01: 0.078 (49)  0.001: 0.006 (124)  0.0001: -0.000 (147)
+  after R1        n   852 lam_max(C)  39.48 lam_max(G)   33635.5 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   13.5 of 147 (alpha    3363.5, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   7, null dim 140  |  the next room R2: energy outside the old span 0.733 (7 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   44.6 of 147 (alpha     336.4, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  40, null dim 107  |  the next room R2: energy outside the old span 0.376 (40 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   91.9 of 147 (alpha      33.6, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  95, null dim  52  |  the next room R2: energy outside the old span 0.137 (95 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  129.8 of 147 (alpha       3.4, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 141, null dim   6  |  the next room R2: energy outside the old span 0.012 (141 dims kept)
+  after R1+R2     n  1694 lam_max(C)  38.20 lam_max(G)   64708.2 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   24.5 of 147 (alpha    3363.5, alpha/lam_max(G_j) 0.0520)  |  NSCL removed rank  10, null dim 137  |  the next room R3: energy outside the old span 0.637 (10 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   68.0 of 147 (alpha     336.4, alpha/lam_max(G_j) 0.0052)  |  NSCL removed rank  44, null dim 103  |  the next room R3: energy outside the old span 0.228 (44 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  119.1 of 147 (alpha      33.6, alpha/lam_max(G_j) 0.0005)  |  NSCL removed rank 116, null dim  31  |  the next room R3: energy outside the old span 0.033 (116 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  142.4 of 147 (alpha       3.4, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span 0.000 (147 dims kept)
+  after R1+R2+R3  n  2413 lam_max(C)  35.80 lam_max(G)   86392.3 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   31.3 of 147 (alpha    3363.5, alpha/lam_max(G_j) 0.0389)  |  NSCL removed rank  12, null dim 135  |  the next room N: energy outside the old span 0.299 (12 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   79.9 of 147 (alpha     336.4, alpha/lam_max(G_j) 0.0039)  |  NSCL removed rank  49, null dim  98  |  the next room N: energy outside the old span 0.078 (49 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  127.7 of 147 (alpha      33.6, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 124, null dim  23  |  the next room N: energy outside the old span 0.006 (124 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.3 of 147 (alpha       3.4, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span -0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3363.5  0.01: 336.4  0.001: 33.6  0.0001: 3.4
 seed 20261308: rows per room {'R1': 862, 'R2': 830, 'R3': 700, 'N': 775}
-  after R1        n   862 lam_max  41.24 · eff.rank 0.1:  7 0.01: 38 0.001: 90 0.0001:140 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  13.2 0.01:  42.8 0.001:  88.4 0.0001: 127.4
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.743 (7)  0.01: 0.400 (38)  0.001: 0.154 (90)  0.0001: 0.034 (140)
-  after R1+R2     n  1692 lam_max  38.01 · eff.rank 0.1: 10 0.01: 46 0.001:116 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  24.0 0.01:  66.8 0.001: 117.9 0.0001: 142.1
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.647 (10)  0.01: 0.206 (46)  0.001: 0.032 (116)  0.0001: 0.000 (147)
-  after R1+R2+R3  n  2392 lam_max  35.46 · eff.rank 0.1: 12 0.01: 50 0.001:125 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  30.5 0.01:  78.1 0.001: 126.4 0.0001: 144.0
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.300 (12)  0.01: 0.078 (50)  0.001: 0.006 (125)  0.0001: 0.000 (147)
+  after R1        n   862 lam_max(C)  41.24 lam_max(G)   35546.2 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   13.2 of 147 (alpha    3554.6, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   7, null dim 140  |  the next room R2: energy outside the old span 0.743 (7 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   42.8 of 147 (alpha     355.5, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  38, null dim 109  |  the next room R2: energy outside the old span 0.400 (38 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   88.4 of 147 (alpha      35.5, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  90, null dim  57  |  the next room R2: energy outside the old span 0.154 (90 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  127.4 of 147 (alpha       3.6, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 140, null dim   7  |  the next room R2: energy outside the old span 0.034 (140 dims kept)
+  after R1+R2     n  1692 lam_max(C)  38.01 lam_max(G)   64304.8 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   24.0 of 147 (alpha    3554.6, alpha/lam_max(G_j) 0.0553)  |  NSCL removed rank  10, null dim 137  |  the next room R3: energy outside the old span 0.647 (10 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   66.8 of 147 (alpha     355.5, alpha/lam_max(G_j) 0.0055)  |  NSCL removed rank  46, null dim 101  |  the next room R3: energy outside the old span 0.206 (46 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  117.9 of 147 (alpha      35.5, alpha/lam_max(G_j) 0.0006)  |  NSCL removed rank 116, null dim  31  |  the next room R3: energy outside the old span 0.032 (116 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  142.1 of 147 (alpha       3.6, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span 0.000 (147 dims kept)
+  after R1+R2+R3  n  2392 lam_max(C)  35.46 lam_max(G)   84811.9 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   30.5 of 147 (alpha    3554.6, alpha/lam_max(G_j) 0.0419)  |  NSCL removed rank  12, null dim 135  |  the next room N: energy outside the old span 0.300 (12 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   78.1 of 147 (alpha     355.5, alpha/lam_max(G_j) 0.0042)  |  NSCL removed rank  50, null dim  97  |  the next room N: energy outside the old span 0.078 (50 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  126.4 of 147 (alpha      35.5, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 125, null dim  22  |  the next room N: energy outside the old span 0.006 (125 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.0 of 147 (alpha       3.6, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span 0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3554.6  0.01: 355.5  0.001: 35.5  0.0001: 3.6
 seed 20261309: rows per room {'R1': 855, 'R2': 839, 'R3': 734, 'N': 772}
-  after R1        n   855 lam_max  40.34 · eff.rank 0.1:  7 0.01: 40 0.001: 90 0.0001:139 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  13.2 0.01:  43.3 0.001:  89.4 0.0001: 128.5
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.738 (7)  0.01: 0.383 (40)  0.001: 0.143 (90)  0.0001: 0.017 (139)
-  after R1+R2     n  1694 lam_max  39.59 · eff.rank 0.1: 10 0.01: 45 0.001:114 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  24.1 0.01:  67.4 0.001: 118.6 0.0001: 142.3
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.636 (10)  0.01: 0.215 (45)  0.001: 0.038 (114)  0.0001: 0.000 (147)
-  after R1+R2+R3  n  2428 lam_max  37.51 · eff.rank 0.1: 11 0.01: 49 0.001:124 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  31.3 0.01:  80.0 0.001: 127.7 0.0001: 144.3
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.315 (11)  0.01: 0.082 (49)  0.001: 0.006 (124)  0.0001: 0.000 (147)
+  after R1        n   855 lam_max(C)  40.34 lam_max(G)   34487.4 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   13.2 of 147 (alpha    3448.7, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   7, null dim 140  |  the next room R2: energy outside the old span 0.738 (7 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   43.3 of 147 (alpha     344.9, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  40, null dim 107  |  the next room R2: energy outside the old span 0.383 (40 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   89.4 of 147 (alpha      34.5, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  90, null dim  57  |  the next room R2: energy outside the old span 0.143 (90 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  128.5 of 147 (alpha       3.4, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 139, null dim   8  |  the next room R2: energy outside the old span 0.017 (139 dims kept)
+  after R1+R2     n  1694 lam_max(C)  39.59 lam_max(G)   67071.4 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   24.1 of 147 (alpha    3448.7, alpha/lam_max(G_j) 0.0514)  |  NSCL removed rank  10, null dim 137  |  the next room R3: energy outside the old span 0.636 (10 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   67.4 of 147 (alpha     344.9, alpha/lam_max(G_j) 0.0051)  |  NSCL removed rank  45, null dim 102  |  the next room R3: energy outside the old span 0.215 (45 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  118.6 of 147 (alpha      34.5, alpha/lam_max(G_j) 0.0005)  |  NSCL removed rank 114, null dim  33  |  the next room R3: energy outside the old span 0.038 (114 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  142.3 of 147 (alpha       3.4, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span 0.000 (147 dims kept)
+  after R1+R2+R3  n  2428 lam_max(C)  37.51 lam_max(G)   91062.7 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   31.3 of 147 (alpha    3448.7, alpha/lam_max(G_j) 0.0379)  |  NSCL removed rank  11, null dim 136  |  the next room N: energy outside the old span 0.315 (11 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   80.0 of 147 (alpha     344.9, alpha/lam_max(G_j) 0.0038)  |  NSCL removed rank  49, null dim  98  |  the next room N: energy outside the old span 0.082 (49 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  127.7 of 147 (alpha      34.5, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 124, null dim  23  |  the next room N: energy outside the old span 0.006 (124 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.3 of 147 (alpha       3.4, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span 0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3448.7  0.01: 344.9  0.001: 34.5  0.0001: 3.4
 seed 20261310: rows per room {'R1': 868, 'R2': 842, 'R3': 746, 'N': 784}
-  after R1        n   868 lam_max  39.95 · eff.rank 0.1:  6 0.01: 38 0.001: 90 0.0001:140 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  13.1 0.01:  42.9 0.001:  89.9 0.0001: 129.2
-     the next room R2: energy OUTSIDE the old span (dims kept)  0.1: 0.767 (6)  0.01: 0.404 (38)  0.001: 0.144 (90)  0.0001: 0.016 (140)
-  after R1+R2     n  1710 lam_max  37.44 · eff.rank 0.1: 10 0.01: 48 0.001:117 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  24.2 0.01:  67.5 0.001: 118.6 0.0001: 142.3
-     the next room R3: energy OUTSIDE the old span (dims kept)  0.1: 0.635 (10)  0.01: 0.193 (48)  0.001: 0.034 (117)  0.0001: -0.000 (147)
-  after R1+R2+R3  n  2456 lam_max  34.73 · eff.rank 0.1: 12 0.01: 50 0.001:125 0.0001:147 · OWM capacity (alpha_tau = tau*lam_max(G_1)) 0.1:  31.0 0.01:  79.3 0.001: 127.3 0.0001: 144.2
-     the next room N: energy OUTSIDE the old span (dims kept)  0.1: 0.294 (12)  0.01: 0.077 (50)  0.001: 0.005 (125)  0.0001: -0.000 (147)
+  after R1        n   868 lam_max(C)  39.95 lam_max(G)   34679.0 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   13.1 of 147 (alpha    3467.9, alpha/lam_max(G_j) 0.1000)  |  NSCL removed rank   6, null dim 141  |  the next room R2: energy outside the old span 0.767 (6 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   42.9 of 147 (alpha     346.8, alpha/lam_max(G_j) 0.0100)  |  NSCL removed rank  38, null dim 109  |  the next room R2: energy outside the old span 0.404 (38 dims kept)
+     tau 0.001   OWM capacity trace(I-P)   89.9 of 147 (alpha      34.7, alpha/lam_max(G_j) 0.0010)  |  NSCL removed rank  90, null dim  57  |  the next room R2: energy outside the old span 0.144 (90 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  129.2 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 140, null dim   7  |  the next room R2: energy outside the old span 0.016 (140 dims kept)
+  after R1+R2     n  1710 lam_max(C)  37.44 lam_max(G)   64024.0 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   24.2 of 147 (alpha    3467.9, alpha/lam_max(G_j) 0.0542)  |  NSCL removed rank  10, null dim 137  |  the next room R3: energy outside the old span 0.635 (10 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   67.5 of 147 (alpha     346.8, alpha/lam_max(G_j) 0.0054)  |  NSCL removed rank  48, null dim  99  |  the next room R3: energy outside the old span 0.193 (48 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  118.6 of 147 (alpha      34.7, alpha/lam_max(G_j) 0.0005)  |  NSCL removed rank 117, null dim  30  |  the next room R3: energy outside the old span 0.034 (117 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  142.3 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0001)  |  NSCL removed rank 147, null dim   0  |  the next room R3: energy outside the old span -0.000 (147 dims kept)
+  after R1+R2+R3  n  2456 lam_max(C)  34.73 lam_max(G)   85286.4 — OWM and NSCL side by side per tau (OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):
+     tau 0.1     OWM capacity trace(I-P)   31.0 of 147 (alpha    3467.9, alpha/lam_max(G_j) 0.0407)  |  NSCL removed rank  12, null dim 135  |  the next room N: energy outside the old span 0.294 (12 dims kept)
+     tau 0.01    OWM capacity trace(I-P)   79.3 of 147 (alpha     346.8, alpha/lam_max(G_j) 0.0041)  |  NSCL removed rank  50, null dim  97  |  the next room N: energy outside the old span 0.077 (50 dims kept)
+     tau 0.001   OWM capacity trace(I-P)  127.3 of 147 (alpha      34.7, alpha/lam_max(G_j) 0.0004)  |  NSCL removed rank 125, null dim  22  |  the next room N: energy outside the old span 0.005 (125 dims kept)
+     tau 0.0001  OWM capacity trace(I-P)  144.2 of 147 (alpha       3.5, alpha/lam_max(G_j) 0.0000)  |  NSCL removed rank 147, null dim   0  |  the next room N: energy outside the old span -0.000 (147 dims kept)
   alpha_tau = tau * lambda_max(G_1): 0.1: 3467.9  0.01: 346.8  0.001: 34.7  0.0001: 3.5
 
 ACROSS SEEDS (min / median / max of the eff. rank and the outside share):

@@ -105,11 +105,13 @@ def seed_report(root: Path, seed: int, log=print) -> Dict[str, object]:
         old_name = "+".join(ROOMS[:j + 1])
         outside = {t: outside_share(cum, rows[nxt], t) for t in TAUS}
         res["outside"][f"{old_name} -> {nxt}"] = outside
-        log(f"  after {old_name:9s} n {entry['n']:5d} lam_max {entry['lambda_max']:6.2f} · eff.rank " +
-            " ".join(f"{t:g}:{entry['eff_rank'][t]:3d}" for t in TAUS) + " · OWM capacity (alpha_tau = tau*lam_max(G_1)) " +
-            " ".join(f"{t:g}:{entry['owm_capacity'][t]:6.1f}" for t in TAUS))
-        log(f"     the next room {nxt}: energy OUTSIDE the old span (dims kept)  " +
-            "  ".join(f"{t:g}: {outside[t][1]:.3f} ({outside[t][0]})" for t in TAUS))
+        lam_g = entry["lambda_max"] * entry["n"]               # lambda_max of the Gram G_j = n * lambda_max(C_j)
+        log(f"  after {old_name:9s} n {entry['n']:5d} lam_max(C) {entry['lambda_max']:6.2f} lam_max(G) {lam_g:9.1f} — OWM and NSCL side by side per tau "
+            f"(OWM keeps alpha_tau = tau*lam_max(G_1) FIXED, so its resolution alpha/lam_max(G_j) TIGHTENS; NSCL re-relativizes tau*lam_max(C_j) at every room):")
+        for t in TAUS:
+            log(f"     tau {t:<7g} OWM capacity trace(I-P) {entry['owm_capacity'][t]:6.1f} of {DIM} (alpha {t * lam1:9.1f}, alpha/lam_max(G_j) {t * lam1 / lam_g:.4f})"
+                f"  |  NSCL removed rank {entry['eff_rank'][t]:3d}, null dim {entry['null_dim'][t]:3d}"
+                f"  |  the next room {nxt}: energy outside the old span {outside[t][1]:.3f} ({outside[t][0]} dims kept)")
     res["alpha"] = {t: t * lam1 for t in TAUS}
     log("  alpha_tau = tau * lambda_max(G_1): " + "  ".join(f"{t:g}: {t * lam1:.1f}" for t in TAUS))
     return res

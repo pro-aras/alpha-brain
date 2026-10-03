@@ -1,0 +1,25 @@
+# PROBE-IDENTITY — harness validation, outputs of tools/toys/common/identity_probe.py (2026-10-03, this tree)
+## s1c, BLAS threads pinned to 1 (as slot runs it)
+S1c RANDOM band life k=1 seed 20261301: CPU 1.95 s · identity_diff = EQUAL (every field but the masked five: cpu_s, wall_s, code, prereg, world) · A new 0.600769 old 0.600769 · words learned at 200: new 11 old 11
+  masked fields side by side (old | new): cpu_s: 1.5908975869999997 | 1.9472068200000001; wall_s: 1.5910193920135498 | 1.9485197067260742; code: {'code_sha_file': '2679fb30d64ba5f80dbc9 | {'code_sha_file': None, 'files': {'__ini; prereg: {'amend1_s1c_sha256': '92188d04cd4de52ee | {'prereg_s1c_sha256': 'a552515af334424b4; world: law | None
+PROBE EQUAL
+exit 0
+## s1c, seed 20261302 k=7, pinned
+S1c RANDOM band life k=7 seed 20261302: CPU 1.73 s · identity_diff = EQUAL (every field but the masked five: cpu_s, wall_s, code, prereg, world) · A new 0.555385 old 0.555385 · words learned at 200: new 8 old 8
+  masked fields side by side (old | new): cpu_s: 1.3534014649999992 | 1.7345711719999999; wall_s: 1.3534784317016602 | 1.7348697185516357; code: {'code_sha_file': '2679fb30d64ba5f80dbc9 | {'code_sha_file': None, 'files': {'__ini; prereg: {'amend1_s1c_sha256': '92188d04cd4de52ee | {'prereg_s1c_sha256': 'a552515af334424b4; world: law | None
+PROBE EQUAL
+exit 0
+## s1c, seed 20261301 k=1, UNPINNED (default threads)
+S1c RANDOM band life k=1 seed 20261301: CPU 5.52 s · identity_diff = EQUAL (every field but the masked five: cpu_s, wall_s, code, prereg, world) · A new 0.600769 old 0.600769 · words learned at 200: new 11 old 11
+  masked fields side by side (old | new): cpu_s: 1.5908975869999997 | 5.516398773; wall_s: 1.5910193920135498 | 1.8526506423950195; code: {'code_sha_file': '2679fb30d64ba5f80dbc9 | {'code_sha_file': None, 'files': {'__ini; prereg: {'amend1_s1c_sha256': '92188d04cd4de52ee | {'prereg_s1c_sha256': 'a552515af334424b4; world: law | None
+PROBE EQUAL
+exit 0
+## tmem1, BASE / seq, seed 20261301, pinned (through slot)
+T-MEM-1 BASE / seq seed 20261301: CPU 67.1 s (record 64.3 s) · eps 0.3
+  rates_rw   EQUAL
+  pairs      EQUAL
+  table      EQUAL
+  first_meet EQUAL
+  record rows EQUAL (200 / 200)
+PROBE EQUAL
+exit 0
