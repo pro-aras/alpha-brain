@@ -71,6 +71,32 @@ class TestPrereg(unittest.TestCase):
         finally:
             shutil.rmtree(d)
 
+    def test_the_frames_amendment_is_pinned_and_a_planted_edit_of_its_gate_is_refused(self):
+        # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 17:20 +0400 — Toy C's AMENDMENT-1 (the PLANT gate, the plant's second token, the memory price, the readings), text at d94392b, co-signed by the
+        # architect 17:17 (d830146) and signed by the seat 17:19 (27edde2); written FIRST (red: no «frames_amend1» pin yet).
+        want = "158660bbfe6a1fd0c551dabc1308dbd4f89fc90a07fd9c58d19e163e9b4abce0"
+        got = PR.check(["frames", "frames_amend1"])
+        self.assertEqual(got["frames_amend1"], want)
+        self.assertEqual(got["frames"], "a9787ef8026e8e6d8ab41f16d088bb5259f5cf9f5d64de7176da848a2a52c31a")      # the base law's pin is untouched
+        d = Path(tempfile.mkdtemp())
+        try:
+            src = DOCS / "PREREG-TOY-FRAMES-AMEND-1.md"
+            bad = d / "PREREG-TOY-FRAMES-AMEND-1.md"
+            text = src.read_bytes()
+            self.assertIn(b"> 0 on that stream", text)
+            bad.write_bytes(text.replace(b"> 0 on that stream", b"> 1 on that stream", 1))                  # the plant: the threshold of gate (B)
+            self.assertNotEqual(bad.read_bytes(), text)                                                         # the plant changed the bytes
+            with self.assertRaises(PR.PreregError):
+                PR.check(["frames_amend1"], root=d)
+            # a signature line moves nothing: the seat's line is dropped like the architect's
+            ok = d / "PREREG-TOY-FRAMES-AMEND-1.md"
+            ok.write_bytes(text + b"Signed: someone else, later\n")
+            self.assertEqual(PR.check(["frames_amend1"], root=d)["frames_amend1"], want)
+        finally:
+            shutil.rmtree(d)
+        h = PR.header(["frames", "frames_amend1"])
+        self.assertEqual(h["prereg_frames_amend1_sha256"], want)
+
     def test_both_families_of_signature_lines_are_dropped(self):
         # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 15:45 +0400 — Toy D's law (the architect's) signs with «Signed:» / «Co-signed:» at the line start, the toys laws with «- Co-signed:»;
         # written FIRST (red: the second family is not yet dropped). The seat's signature REPLACES the placeholder line «Signed: the seat — pending.» — both are dropped, so it cannot move the sha.
