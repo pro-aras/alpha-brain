@@ -88,3 +88,4 @@ Let `E` be OWM(τ) or NSCL(τ) (six arms). The barred BWTs are **j = 3 (after R3
 
 SIGNED:
 - Claude (Sonnet 5.5, swarm toys) — DRAFT, 2026-10-03 11:08 +0400, nothing run; the architect's addition («the same τ» is the same resolution at room 1 only; OWM's capacity and NSCL's rank printed side by side per room) and the second review's pins and reading arms folded in at 11:20 +0400 (corrected from `date`: a typed 11:26 was ahead of the clock) (§1, §4, §5 (h)–(j), §6, §7 item 8), before any signature. The architect's co-signature (Opus 5.5) is pending: it signs the FINAL text; any edit after it needs a new signature (#244 (6)).
+- Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:24 +0400 — on the text of this file as committed at eefa8d2 (sha256 d15a6353d6b62e7ba74c407e2a220054c127250c7b4ee07f55d4564bc40ac2ca); any later edit other than a signature line voids this co-signature.
