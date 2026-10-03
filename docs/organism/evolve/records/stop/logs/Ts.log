@@ -1,0 +1,24 @@
+{"confirmed_share": 0.4315, "cpu_s": 597.461, "frames_filed": 2, "journal_rows": 935, "journal_sha256": "75ad0d3858b28a1b86db19b054566b5b26158c4995ce2742c1c60aed96b2b3a6", "maxrss_kb": 6516864, "q1_seen": 0.9727272727272728, "rows_consumed": 1000, "state_hash": "d79b41adf1be78807b796e404bd182bf39dd3017df002dfa2e2582be85447fc0", "variant": "seed:1", "wall_s": 600.231}
+	Command being timed: "env PYTHONPATH=. OPENBLAS_NUM_THREADS=1 /usr/bin/python3 -B -m tools.evolve_cal twin --cp /data/dev/swarm/2026-10-03/evolve-cal-scratch/cps/32 --slice-root /data/dev/swarm/2026-10-03/evolve-cal-scratch/slices/S1 --from-seq 304002 --to-seq 308667 --variant seed:1 --rows-limit 1000 --label stop-Ts --out /data/dev/swarm/2026-10-03/evolve-cal-records/stop/Ts"
+	User time (seconds): 611.57
+	System time (seconds): 16.41
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 10:30.77
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 6516864
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 4163335
+	Voluntary context switches: 1756
+	Involuntary context switches: 3782
+	Swaps: 0
+	File system inputs: 166008
+	File system outputs: 4274552
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

@@ -1,0 +1,861 @@
+{
+ "act_graded": false,
+ "act_pass": null,
+ "build_s": 19.437,
+ "code": {
+  "dirty": true,
+  "git_head": "21070bed7bd102e5907dff757e6c62379d1ee839"
+ },
+ "confirmed_graded": false,
+ "confirmed_share": 0.4315,
+ "cpu_s": 599.34,
+ "detail": {
+  "act": {
+   "bar": "mind-chosen = 100 % of \u2265 100 game outcomes \u00b7 mismatches 0 \u00b7 census over the GAME's acts: no act \u2265 95 % of the last 100 game acts, no reachable act at 0 over the life \u00b7 the shuffled-act plant diverges \u00b7 reward printed, no bar",
+   "census": {
+    "done": 0,
+    "drop": 1,
+    "forward": 2,
+    "left": 0,
+    "pickup": 1,
+    "right": 24,
+    "toggle": 0
+   },
+   "census_all": {
+    "drop": 1,
+    "forward": 2,
+    "pickup": 1,
+    "right": 24
+   },
+   "census_last100": {
+    "done": 0,
+    "drop": 1,
+    "forward": 2,
+    "left": 0,
+    "pickup": 1,
+    "right": 24,
+    "toggle": 0
+   },
+   "census_source": "the tape's mind-chosen game outcome rows (seq order): the game's own acts; census_all = STATUS acts_chosen (with the mouth's say), printed only",
+   "choices_journaled": 28,
+   "episodes": 0,
+   "game_outcomes": 28,
+   "graded": false,
+   "last_n": 28,
+   "max_share": 0.8571,
+   "max_share_last100": 0.8571,
+   "mind_chosen": 28,
+   "mind_share": 1.0,
+   "mismatches_journal": 0,
+   "mismatches_status": 0,
+   "pass": null,
+   "random_null_success": 0.29,
+   "reachable_acts": [
+    "left",
+    "right",
+    "forward",
+    "pickup",
+    "drop",
+    "toggle",
+    "done"
+   ],
+   "reason": "not gradable: 28 game outcomes < 100",
+   "reward_mean": 0.0,
+   "success_per_episode": null,
+   "successes": 0,
+   "zero_acts": [
+    "left",
+    "toggle",
+    "done"
+   ]
+  },
+  "sentence": {
+   "bar": "\u2265 3 frames \u00b7 precision \u2265 0.8 \u00b7 not gradable under 100 missions or when the world's max pair lift < 2 (the ceiling clause)",
+   "frames_filed": 7,
+   "frames_scored": 0,
+   "frames_true": 0,
+   "graded": false,
+   "heard_no": 0,
+   "heard_yes": 0,
+   "max_lift": null,
+   "max_lift_per_frame": 1.0,
+   "max_pair": null,
+   "max_pair_per_frame": "green box",
+   "missions": 1,
+   "missions_per_frame": 28,
+   "missions_unit": "one per game episode (a run of object rows with one (game, episode))",
+   "pairs": 1,
+   "pass": null,
+   "precision": null,
+   "reason": "not gradable: 1 missions < 100 (one per game episode; 28 frames)",
+   "rows_without_episode": 0,
+   "said": 0
+  },
+  "surprise": {
+   "bar": "maker things with \u2265 30 showings: first-3 share < last-20 for \u2265 80 % and > the shuffled null's p95 \u00b7 last-500 \u2212 first-500 share \u2265 0.10 \u00b7 the blind-surprise twin confirms 0 glances",
+   "by_source": {
+    "game": {
+     "confirmed": 33,
+     "glances": 112,
+     "share": 0.2946,
+     "things": 1
+    },
+    "hands": {
+     "confirmed": 0,
+     "glances": 24,
+     "share": 0.0,
+     "things": 0
+    },
+    "maker": {
+     "confirmed": 358,
+     "glances": 660,
+     "share": 0.5424,
+     "things": 8
+    },
+    "shelf": {
+     "confirmed": 296,
+     "glances": 796,
+     "share": 0.3719,
+     "things": 104
+    }
+   },
+   "canvases": 398,
+   "first_500": 0.4315,
+   "graded": false,
+   "last_500": 0.4315,
+   "null_mean": null,
+   "null_p95": null,
+   "overall_share": 0.4315,
+   "pass": null,
+   "printed_not_graded": {
+    "a@shelf": {
+     "first3": 0.6666666666666666,
+     "rest": 1.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "about@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "and@shelf": {
+     "first3": 0.0,
+     "rest": 0.0,
+     "showings": 5,
+     "source": "shelf"
+    },
+    "apt@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "are@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "as@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "bee@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "beehives@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "bees@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "belongs@shelf": {
+     "first3": 0.08333333333333333,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "box@game": {
+     "first3": 0.4166666666666667,
+     "rest": 0.28,
+     "showings": 28,
+     "source": "game"
+    },
+    "boxes@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "boy@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "broke@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "called@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "can@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "cells@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "circle": {
+     "first3": 0.25,
+     "rest": 0.5131578947368421,
+     "showings": 22,
+     "source": "maker"
+    },
+    "could@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "creature@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "cross": {
+     "first3": 0.5833333333333334,
+     "rest": 0.25,
+     "showings": 20,
+     "source": "maker"
+    },
+    "cup": {
+     "first3": 0.0,
+     "rest": 0.296875,
+     "showings": 19,
+     "source": "maker"
+    },
+    "de@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "dead@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "divided@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "dot": {
+     "first3": 1.0,
+     "rest": 0.9021739130434783,
+     "showings": 26,
+     "source": "maker"
+    },
+    "driven@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "drones@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "each@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "end@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "equal@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "feet@shelf": {
+     "first3": 0.3333333333333333,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "fense@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "first@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "for@shelf": {
+     "first3": 0.625,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "four@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "half@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "he@shelf": {
+     "first3": 1.0,
+     "rest": 1.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "high@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "hive@shelf": {
+     "first3": 0.0,
+     "rest": 0.08333333333333333,
+     "showings": 6,
+     "source": "shelf"
+    },
+    "house": {
+     "first3": 0.5833333333333334,
+     "rest": 0.6666666666666666,
+     "showings": 27,
+     "source": "maker"
+    },
+    "house@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "i@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "idle@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "if@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "illustra@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "in@shelf": {
+     "first3": 0.6666666666666666,
+     "rest": 1.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "inside@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "into@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "is@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "it@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "keep@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "kernel@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "key": {
+     "first3": 0.5,
+     "rest": 0.4264705882352941,
+     "showings": 20,
+     "source": "maker"
+    },
+    "killed@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "kindswor@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "laughing@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "lesson@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "live@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "lost@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "moon": {
+     "first3": 0.9166666666666666,
+     "rest": 0.6875,
+     "showings": 15,
+     "source": "maker"
+    },
+    "my@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "nearly@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "nut@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "of@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "one@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "only@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "or@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "other@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "out@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "parts@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "pay@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "picked@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "quarrel@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "quarrels@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "queen@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "queens@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "roof@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "said@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "saw@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "settling@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "shall@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "shape@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "she@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "shell@shelf": {
+     "first3": 0.25,
+     "rest": 0.0,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "size@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "sloped@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "square@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "stings@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "stop@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "that@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "the@shelf": {
+     "first3": 1.0,
+     "rest": 0.875,
+     "showings": 15,
+     "source": "shelf"
+    },
+    "their@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "then@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "they@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "this@shelf": {
+     "first3": 0.75,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "three@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "to@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "took@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "tree": {
+     "first3": 0.5833333333333334,
+     "rest": 0.40384615384615385,
+     "showings": 16,
+     "source": "maker"
+    },
+    "two@shelf": {
+     "first3": 0.4166666666666667,
+     "rest": null,
+     "showings": 3,
+     "source": "shelf"
+    },
+    "up@shelf": {
+     "first3": 0.625,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "very@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "wax@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "way@shelf": {
+     "first3": 0.125,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "which@shelf": {
+     "first3": 0.5,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "who@shelf": {
+     "first3": 0.25,
+     "rest": 0.25,
+     "showings": 4,
+     "source": "shelf"
+    },
+    "will@shelf": {
+     "first3": 1.0,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "with@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 1,
+     "source": "shelf"
+    },
+    "wooden@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "work@shelf": {
+     "first3": 0.25,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "workers@shelf": {
+     "first3": 0.0,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    },
+    "xxi@shelf": {
+     "first3": 0.375,
+     "rest": null,
+     "showings": 2,
+     "source": "shelf"
+    }
+   },
+   "reason": "not gradable: 0 maker things with \u2265 30 showings / 398 canvases (needs \u2265 1000)",
+   "rise_first_to_last_500": null,
+   "source_known": false,
+   "status_confirmed": 709,
+   "status_surprised": 1131,
+   "things": {},
+   "things_graded": 0,
+   "things_rising": 0,
+   "twin_confirmed": null
+  }
+ },
+ "frames_filed": 7,
+ "from_seq": 304002,
+ "genome_sha256": "fd15f9e3fb7bbbb3917d329ff7c9912f84e1ae8f7c8bd5e48ba7450e8aa927b2",
+ "journal_rows": 935,
+ "journal_sha256": "55ce88384b20f06b80490535f28c50c56316a4e38c0c18a33d8b7bb1e8591bbf",
+ "label": "stop-T0b",
+ "load0": [
+  5.78,
+  6.5,
+  6.05
+ ],
+ "load1": [
+  6.77,
+  6.29,
+  6.09
+ ],
+ "maxrss_kb": 6517776,
+ "psi0": {
+  "cpu_full_avg10": 0.0,
+  "cpu_some_avg10": 0.04,
+  "memory_full_avg10": 0.0,
+  "memory_some_avg10": 0.0
+ },
+ "psi1": {
+  "cpu_full_avg10": 0.0,
+  "cpu_some_avg10": 0.0,
+  "memory_full_avg10": 0.14,
+  "memory_some_avg10": 0.14
+ },
+ "q1_seen": 0.9727272727272728,
+ "reward_mean": 0.0,
+ "row_hash": "68d1557323d21f1bb1a84c932599128c925bf5ad514a0b2a2c4aa4d309b72956",
+ "rows_consumed": 1000,
+ "sentence_graded": false,
+ "sentence_pass": null,
+ "state_hash": "d79b41adf1be78807b796e404bd182bf39dd3017df002dfa2e2582be85447fc0",
+ "tape_rows": 1000,
+ "to_seq": 308667,
+ "variant": "incumbent",
+ "wall_s": 608.48
+}

@@ -1,0 +1,5 @@
+# Stage A0+ (4 twins, full S1), run ONLY if neither A0 epsilon twin differs from the incumbent in a gated reading: two more at 1e-3 and two more at 1e-2
+eps1e-3-k02	eps:0.001:2	-
+eps1e-2-k02	eps:0.01:2	-
+eps1e-3-k03	eps:0.001:3	-
+eps1e-2-k03	eps:0.01:3	-

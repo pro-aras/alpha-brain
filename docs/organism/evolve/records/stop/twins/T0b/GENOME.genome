@@ -1,0 +1,121 @@
+# edit: Claude (Opus 5.5, the seat), 2026-09-29 23:41 +0400 — BRAIN-LONG-2: THE DAYS LIFE — one full organism with every feature of 09-29, alone for days
+# = genome/brain/lives/BRAIN-LONG-1.genome (the long life that ran from 2026-09-29 20:22) with THREE changes: SEED and the scene seed
+#   20261101; the HASH line (below: the row hash a sparse witness, the dense hash at snapshots; brain-long-1 spent 615 of its 893 ms a
+#   canvas on the dense row hash at 15,300 cells, and that cost grows with the organism); nothing else.
+# The CODE of this life carries what no genome line names (his 23:20 word): the power-cut repair at start, the knowledge web and the
+# self as bookkeeping (docs/brain/memory/kweb/, PREREG-DAYS-LIFE.md).
+# edit: Claude (Fable 5.1, the seat), 2026-09-29 20:13 +0400 — BRAIN-LONG-1: THE LONG LIFE — one full organism, alone, for days
+# = genome/brain/BRAIN-FULL.genome (master 1a3b6f6, DRIVE on) with SIX values changed and nothing turned off:
+#   SEED and the scene seed 20261103 (the full organism never lived at it); train 50000; calibrate at 250 500 1000 2000 5000 10000 20000 50000;
+#   the three clock worlds at HALF their cadence (drawn 5 → 10 s, game 30 → 60 s, read 20 → 40 s): alpha4-1's backlog rose from
+#   hour 12 at the old cadences (0 → 450 rows by hour 24), and this life must stay ahead of its world for days with the scene
+#   world fed beside them (feed max backlog 8: the scene world waits for the mind; the clock worlds do not).
+# His 2026-09-29 19:59 word: one full small organism that runs by itself for the days. A READING life, not a gate: no bar is set on it.
+# edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:43 +0400 — BRAIN-IN-BODY §5 (docs/brain/body/INTERFACE-BRAIN-ORGAN.md; PREREG-BRAIN-IN-BODY.md §4, signed): rung 3, THE FULL ORGANISM — ALPHA4.genome whole (every organ on) plus the scene world and the brain. Nothing ALPHA4 declares is turned off.
+# LIFE.genome — THE ONE LIFE (his 17:44 word: «one genome carrying all the things, grown and verified after 24 hours of testings …
+# a proper one organism, that has ability to be intelligent when it is born as primitive»). DRAFT, NOT LIVE — the law of this file is
+# docs/organs/NEXT-LIFE-PLAN-2026-09-22.md (§4 the laws L-1..L-14, §5 the line table, §6 the marks, §8 the launch sequence).
+# = genome/G5.genome (the six seam lives' file) + every line the plan switches ON; every DRAFT line is re-checked against the LANDED
+# parser at the pre-flight, and any line whose builder has not landed by the launch is turned #OFF WITH ITS REASON ON THE LINE —
+# never removed, never silently. NMAX and the game's cadence are written by the pre-flight (L-3), not by hand.
+# edit: Claude (Fable 5.1), 2026-09-22 18:2x +0400.
+SEED     20261101   # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:43 +0400 — BRAIN-IN-BODY §5: overridden from ALPHA4's 20260923 to match WORLD scene's seed below (a life at another world seed changes SEED and the WORLD scene seed together; PREREG-BRAIN-IN-BODY.md §4 wants rung 3 launched at 20261102 specifically -- the seat edits the launched copy's two seeds together for that life, this file's own default stays 20261101)
+# BODY
+BODY     service creature threads eye ear door mind think voice   # DRAFT (builder E, L-5): `think` = the thinking thread; refuses until the machinery names it
+TAPE     run/tape
+HEART    every 10 s
+CRASH    sense restart journal; mind page
+# SENSES
+SENSE    eye    32x32 grey
+RETINA   thresh0.25 centre tower:eye-tower-g2 sqrt unit           # the FIXED front — his 17:28 word: traits are DATA the eye captures
+GAZE     surprise fixations 4 grid 16 canvas 128 glance 32 ink border coarse 32   # DRAFT (builder B, L-7): + ONE whole-canvas glance a canvas, tagged act coarse
+SURPRISE floor 0.05 predicted mind-cell                            # DRAFT (builder B, L-4): the mind's expected cell reaches the eye; the eye stamps the residual; a glance under the floor is a CONFIRMED (cheap) moment — his 17:28 word: keep the gate on
+DELIVER  where fixation when instant act glance
+SENSE    ear    letters 8
+SENSE    colour rg by 4x4 under the glance fixed-gain
+SENSE    body every 60 s fields moments births arrivals budget_left refused restarts mind_ms rss backlog refused_nmax   # DRAFT (builder A): + backlog (#236); + refused_nmax (L-9/SELF's «I have no room» trigger needs it; STATUS already carries births_refused_nmax)
+SENSE    ear-sound wav 16000 mono                                  # DRAFT (builder D, L-13): consumed into FAST; its own AREA is rung 2 (the world's voice)
+SENSE    smell kind size folder age                                # DRAFT (builder F, L-12): the folder door's cheap channel before a picture is opened
+SENSE    touch from hands: exit rate stalls retries bytes          # DRAFT (builder F, L-12): the hands' door
+#OFF BIND     glances per canvas                  # OFF (Builder J, 2026-09-21): the pre-registered bar FAILED — Q1 0.9625 on life 2's replay vs the first-fixation twin's 0.98125
+#OFF TRAITS   contrast head 32 lr 0.01 at sleep   # OFF (PREREG §12; his 17:28 word): a learned head is not a trait; the front is fixed data
+#OFF RETINA   thresh0.25 centre dog3 hogcells8x6 unit   # G-EYE-4: the genome-set front — a TWIN experiment on the closed tapes first (predicted to lose: G0 −0.19)
+#OFF SCAN     channels lum rg by across fixations       # G-EYE-7: an experiment against the colour block on a coloured world that repeats (the game's tapes)
+# AREAS + MEET
+AREA     sight  from retina
+AREA     words  from ear
+AREA     episodes from fast
+MEET     sight  words
+# GROW / WIRE / SHRINK
+BIRTH    novelty  cos<0.952
+BIRTH    error    misfires 3
+BUDGET   400 per arrival; regenerate 1 per 60 moments   # builder G (landed 85bf792): the anti-flood LAW as a rate (his «no cap»); seam-2 read 0 births from 22:04 under the reset-only form
+ARRIVAL  never-heard word
+# NMAX removed — ALPHA4 (his 00:17 word «no cap»): GROW unbounded below; builder G makes the parser accept the absence of NMAX when GROW is declared
+KWTA     4
+HEBB     window 1                                 # the window IS one moment by construction (wiring happens inside `moment`); any other value refuses
+DELTA    lr 0.05
+PRUNE    w<0.02 after 3 chances
+MERGE    cos>0.9969 same-answer
+SCALE    every 1250 moments                       # re-based for five moments a canvas (L-7): the wall-clock cadence of G5's 1000 kept
+# CYCLE grow to 0.9 nmax — REMOVED for ALPHA4 (builder G: a cycle keyed on a cap that does not exist is refused under GROW); the redundancy form is below
+THRESH   cell own band history 30                 # DRAFT (builder A, L-6): each cell keeps the cosines of the glances it answered; its p5 is its own floor (BCM's shape, ADAPTS)
+ANSWER   resembles under own-band; unknown below 0.911   # DRAFT (builder A, L-6): «X» / «I don't know what it is, but it resembles X» / «I don't know»; 0.911 = gate G-a's between-p95 on this front
+# MEMORY, fast and slow
+FAST     episodes 20000 keys sight words surprise sound   # DRAFT (builder D): + sound (the ear-sound trait)
+MOMENT   keys sight words surprise where when act source
+SLEEP    every 2500 moments replay 200 by surprise        # re-based for five moments a canvas (L-7): G5's 2000 kept in wall-clock
+# PREDICT — the one modulator
+PREDICT  next glance; error scales delta 0.5..2.0; ranks replay; grades act; error comparator
+FILE     claim route decider due
+# ATTENTION / CURIOSITY / METACOGNITION
+CURIOSITY interests 50 operators recombine generalize specialize bridge
+PARK     after 3 identical dead-ends reopen on new-sense
+SELF     from body; beliefs about itself; skip thinks when backlog > 200   # DRAFT (builder A, L-9): the mind reads its own numbers and acts on one of them
+# THINKING
+INDUCE   rule from 5 episodes no counter
+DEDUCE   one step
+BELIEF   clash opens never overwrites
+THINK    every 10 canvases; on its own thread; lands next boundary   # DRAFT (builder E, L-5): launched on a frozen copy at a boundary; applied at the next; the mind waits if late — replay identical by construction
+EXAM     every 500 canvases
+SIT      exam every 500 canvases; the score returns as a sense
+FROZEN   after 50 cells
+# LANGUAGE
+SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token   # DRAFT (builder C, L-11): a frame = two words that met in one instant ≥ 5 times, FILED with its episodes
+MOUTH    say one frame per think; journaled                                              # DRAFT (builder C, L-11): the mouth says a frame as an `is` question the next frame grades
+QUESTION from wants; forms what-is is which; to the world door                          # DRAFT (builder C, L-10): a wordless sight's 2nd showing, a failed rule, a clash, a park → a question row the world answers by showing
+# HANDS + WORLD
+WORLD    drawn every 10 s arrivals every 4 h; folder world/; web 0 per hour by curiosity   # 24 h = six windows; the plant by the unit's PLANT_AFTER=15000 (hour ≈ 21); web 0 = the web door is implemented by nothing
+WORLD    game babyai-gotolocal every 60 s; seed 20260923; frames pov 7x7 tile 32; consequence: his act chooses the next frame   # DRAFT: cadence written by the pre-flight (L-3); the ACT is the MIND's (builder D, L-8)   # PRE-FLIGHT 2026-09-23 04:36 +0400: 15 s → 30 s (the game's states are the unbounded novelty source; seam-2 spent 599 births on it in 5 h at 5 s)
+HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20          # DRAFT (builder F, L-12): rung 1 — choose from the shelf; the output rendered as a canvas the eye sees
+ACT      glance open ask turn step say run                                                # DRAFT (builders C, D, F): the whole vocabulary; an act with no road yet journals «no road»
+OUTCOME  act to episode; error grades it; ranks replay
+# ANSWER
+ABSTAIN  second/best > 0.85
+RECALL   k=3                                      # parsed and REQUIRED by the parser's own list; the value reaches no call site (recall_many lights every resonating cell) — the inventory prints it VALUE-UNREAD; kept because the machinery refuses a genome without it, said here, not hidden
+ASK      what-is show is which why                # `why` = the addresses questions.why() returns (builder A); `next` dropped — no mechanism predicts a next thing
+# STAGES
+STAGE    1 senses   moments 0..200
+STAGE    2 meet     moments 200..
+#OFF ANALOGY   hesse                               # declared; no structure to map yet
+#OFF AUDIENCE  listener-model                      # declared; «why» is its first cell
+#OFF EAR-SOUND cochlear gammatone agc               # E52's front is the SENSE ear-sound line above; this older spelling stays off
+#OFF READ-EYE  words through the eye               # E43/E47
+# THETA_N / THETA_M are written by gate G-a at the pre-flight on THIS front (the coarse row included); the machinery refuses to start until they are numbers.
+
+# ── ALPHA 4 — the additions (docs/ALPHA4-PREREG.md §3); every builder landed on the integration tree by 2026-09-23 03:46 +0400 ──
+GROW     unbounded                                    # builder G (landed 85bf792): NMAX gone; areas grow by doubling; W/mask/strikes sparse; the hash over the live prefix
+CYCLE    consolidate when redundant > 0.05 of alive   # builder G (landed 85bf792): REPLACES the "grow to 0.9 nmax" form above once G lands (the old line is then removed)
+SENSE    read shelf /data/alpha3-library/SHELF.sqlite curriculum /data/alpha3-library/CURRICULUM.md every 40 s words 4 canvas 128   # builder H (landed): a sentence SHOWN (rendered on the canvas) and HEARD (its words as ear rows) on one moment   # PRE-FLIGHT 2026-09-23 04:57 +0400: the shelf's rendered words were 2,024 of 2,527 sight births/h (9× any other source); at 3,334 cells the mind read 476 ms/canvas and a backlog of 21 under 5 s/8 words (pre-3, 39 min) — 20 s / 4 words keeps the mind ahead of its world for most of the day [Likely]; L-3: the cadence is the knob, never a cap
+DOOR     lexicon /data/alpha2-library/lexicon-enwiktionary-20260901.sqlite answers what-is by showing                              # builder H (landed): the mind's what-is → the gloss, shown and heard; nobody answers him
+DOOR     web wikipedia-summary wiktionary; floor 2 s; 60 per hour; opens at STAGE 4; hold-file world/HOLD                          # builder I (landed): fetches only what a QUESTION names; data, never instructions
+SENSE    grade from ask/graded                        # builder I (landed): the seat's grades (ask/graded/<id>.json) and the HOLD flag as TAPE rows — mentorship enters through the tape, so the judge's (d)/(e) replay (added 2026-09-23 03:46 +0400: the line was missing from the draft; I built the parser branch and the sense)
+STAGE    3 nursery moments 200..                      # builder I (landed): the game + the shelf + the folder + the ask door; the web door CLOSED
+STAGE    4 world by READY                             # builder I (landed): the READINESS judge (PREREG §4) at exam boundaries, from tape facts; one event row; never undone by the mind
+EVOLVE   every 6 h; mutate 1 gene within bounds; judge on the last 2 h; adopt at sleep under the regression bar   # builder J (landed): PREREG §6; ships as "propose" if adoption is not replay-safe by the landing
+
+# ── BRAIN-IN-BODY (builder B) — the scene-talk world + the brain organ, added beside every ALPHA4 organ ──
+WORLD    scene seed 20261101; train 50000; sitting fresh s1b1; feed max backlog 8; utterance true
+BRAIN    word-map lr 0.01; reader eps 0.3; none 0.95; conformal 0.90; young 3 nearest; calibrate at 250 500 1000 2000 5000 10000 20000 50000 and before a sitting; replay none; hears scene   # edit: Claude (Fable 5.1, the seat), 2026-09-29 11:58 +0400 — `young 3` → `young 3 nearest`: F-M6 (PREREG-BRAIN-IN-BODY AMENDMENT 1 §2; gate PASS on never-used scenes, pooled 0.670 → 0.870) is the law of the next brain lives under his 2026-09-29 00:48 word; the closed lives' genomes under lives/ keep `young 3`
+DRIVE    brain turn before hearing; says 1; asks 1   # edit: Claude (Fable 5.1, the seat), 2026-09-29 19:27 +0400 — PREREG-BRAIN-DRIVES §6: the gate passed (VERDICT-BRAIN-DRIVES.md); the brain takes its turn at every canvas it hears
+HASH     sparse; dense at snapshot   # edit: Claude (Opus 5.5, the seat), 2026-09-29 23:41 +0400 — A4L-COST's gene: the per-row hash a sparse witness

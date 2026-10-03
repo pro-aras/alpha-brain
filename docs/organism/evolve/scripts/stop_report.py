@@ -41,10 +41,11 @@ def recorded_rows(d: Path):
 def pair(name, a, b):
     (ra, ja), (rb, jb) = a, b
     c = cal.compare_twins(ja, jb)
+    k = cal.compare_twins_keyed(ja, jb)
     return {"pair": name, "state_hash_equal": ra["state_hash"] == rb["state_hash"], "row_hash_equal": ra["row_hash"] == rb["row_hash"],
             "q1_seen": [ra["q1_seen"], rb["q1_seen"]], "frames_filed": [ra["frames_filed"], rb["frames_filed"]],
             "confirmed_share": [ra["confirmed_share"], rb["confirmed_share"]], "cpu_s": [ra["cpu_s"], rb["cpu_s"]],
-            "journal": c}
+            "journal": c, "keyed": k}
 
 
 def main(argv=None) -> int:
@@ -91,7 +92,7 @@ def main(argv=None) -> int:
                                   "confirmed_share": [t["T0"][0]["confirmed_share"], r["confirmed_share"]],
                                   "rows_compared": c["n_a"], "rows_differing": c["rows_differing"], "discrete_diff_rows": c["discrete_diff_rows"],
                                   "first_diff": c["first_diff"], "first_discrete_diff": c["first_discrete_diff"], "by_decile": c["by_decile"],
-                                  "diff_key_counts": c["diff_key_counts"]})
+                                  "diff_key_counts": c["diff_key_counts"], "keyed": cal.compare_twins_keyed(t["T0"][1], j)})
     for n, (r, j) in t.items():
         out.setdefault("readings", {})[n] = {k: r.get(k) for k in ("variant", "q1_seen", "confirmed_share", "frames_filed", "journal_rows", "rows_consumed",
                                                                     "state_hash", "row_hash", "cpu_s", "wall_s", "build_s", "maxrss_kb", "load0", "load1", "psi0", "psi1")}
