@@ -1985,6 +1985,9 @@ def r9_cross_check(origin_rows: Sequence[Mapping[str, object]], life_rows: Mappi
             sets.append(a["set"])
     per: Dict[str, List[Dict[str, object]]] = {s: [] for s in sets}
     early_total = early_equal = late_total = late_disc = missing = 0
+    # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 21:38 +0400 — the verifier's ruling on the reading line: E1 reserves «tested» for the EARLY rows other than begin and end, so the TESTED and the STRUCTURAL rows are counted APART
+    # (total and equal each), and the line never puts a structural row into the denominator of a tested count.
+    tested_total = tested_equal = struct_total = struct_equal = 0
     first_diff: Optional[Dict[str, object]] = None
     early_diffs: List[Dict[str, object]] = []
     for r in sorted(origin_rows, key=lambda x: int(x["seq"])):
@@ -2000,6 +2003,12 @@ def r9_cross_check(origin_rows: Sequence[Mapping[str, object]], life_rows: Mappi
         if klass == "EARLY":
             early_total += 1
             early_equal += int(same)
+            if form_of.get(seq) in STRUCTURAL_FORMS:
+                struct_total += 1
+                struct_equal += int(same)
+            else:
+                tested_total += 1
+                tested_equal += int(same)
             if not same:
                 d = {"seq": seq, "item": r.get("item"), "form": r.get("form"), "differing_keys": _differing_keys(r, life), "origin": dict(r), "life": dict(life)}
                 early_diffs.append(d)
@@ -2020,6 +2029,7 @@ def r9_cross_check(origin_rows: Sequence[Mapping[str, object]], life_rows: Mappi
     origin_seqs = {int(r["seq"]) for r in origin_rows}
     not_resat = sorted(seq for seq, s in set_of.items() if s is not None and seq in life_rows and seq not in origin_seqs)
     return {"refusing": bool(refusing), "early_total": early_total, "early_equal": early_equal, "early_diff_count": len(early_diffs), "first_early_diff": first_diff,
+            "early_tested_total": tested_total, "early_tested_equal": tested_equal, "early_structural_total": struct_total, "early_structural_equal": struct_equal,
             "early_diffs_first_five": early_diffs[:5], "late_total": late_total, "late_discordant": late_disc, "late_by_thirds": thirds, "by_set": by_set, "n_without_a_life_row_or_class": missing,
             "life_rows_not_resat": len(not_resat), "first_life_row_not_resat": (not_resat[0] if not_resat else None),
             "label": ("" if refusing else f"{FALLBACK_LABEL}: R9 is a READING here (the copy is later than the sittings by construction), never a refusal")}
@@ -2043,13 +2053,15 @@ def r9_reading(r9: Mapping[str, object]) -> Tuple[str, List[str]]:
     parts: List[str] = []
     if untested:
         parts.append(f"R9 UNTESTED for set(s) {', '.join(untested)} (no tested EARLY item) — NOT A PASS for them: their begin state is verified only by R10c")
+    # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 21:39 +0400 — the verifier's ruling (21:3x): E1 reserves «tested» for the EARLY rows other than begin and end, so the line prints SEPARATE counts — the TESTED rows in the exactness
+    # claim, the structural begin/end rows beside them «not counted as tests» — and never a merged denominator (my first version said «6 of 6 EARLY items (begin and end included)» under the word «tested»).
+    tt, te = int(r9["early_tested_total"]), int(r9["early_tested_equal"])
+    st, se = int(r9["early_structural_total"]), int(r9["early_structural_equal"])
     if r9["refusing"]:
-        # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 21:05 +0400 — the planted run read «R9 EXACT on the other sets: 6 of 6 EARLY items», but the 6 held the untested set's own begin row: the denominator is every EARLY item,
-        # begin and end included, and the line now says so (#168); with an UNTESTED set the exactness is «where tested», never a pass for the set that was not.
-        parts.append(("R9 EXACT where tested: " if untested else "R9 EXACT: ")
-                     + f"{r9['early_equal']} of {r9['early_total']} EARLY items (begin and end included) equal the life's own rows in every key but hash (tested EARLY items per set: {tested}); {late}")
+        parts.append(f"R9 EXACT on {te} of {tt} TESTED EARLY items (tested EARLY items per set: {tested}); the structural begin/end rows equal on {se} of {st} (not counted as tests); {late}")
     else:
-        parts.append(f"R9 is a READING (a fallback copy is late by construction): {r9['early_diff_count']} of {r9['early_total']} EARLY items differ from the life's own rows (tested EARLY items per set: {tested}); {late}")
+        parts.append(f"R9 is a READING (a fallback copy is late by construction): {tt - te} of {tt} TESTED EARLY items differ from the life's own rows (tested EARLY items per set: {tested}); "
+                     f"the structural begin/end rows differ on {st - se} of {st} (not counted as tests); {late}")
     return " · ".join(parts), untested                      # not «|»: the line is a cell of RESIT.md's table
 
 

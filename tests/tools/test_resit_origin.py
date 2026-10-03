@@ -12,6 +12,8 @@
 # n_learned (two states that differ); the grader pin refused BEFORE any child; the fallback's genome by the state's last seq; a second origin refused before any child; ITEMS-MATCH plant f at run level.
 # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 20:52 +0400 — FOUND BY READING origin mode against the law's honesty rules (#168/#246: a count of completed cases prints started/completed/still-open): the origin never checked that it
 # ANSWERED every ask of the life's sittings, and R9 counted only origin rows that lack a life row — never the life's rows that lack an origin row. An origin that skipped an item would have been written. Plants: a stub tape that drops one ask.
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 21:38 +0400 — the VERIFIER's ruling on r9_reading (21:3x): E1 reserves «tested» for the EARLY items other than begin and end, so a line that put the structural rows into the TESTED denominator
+# («EXACT where tested: 6 of 6 EARLY items (begin and end included)») would let a reader take begin/end for tests. The line prints SEPARATE counts: «R9 EXACT on k of k TESTED EARLY items; the structural begin/end rows equal on j of j (not counted as tests)».
 """tests/tools/test_resit_origin.py — origin mode on stub lives."""
 from __future__ import annotations
 
@@ -164,7 +166,9 @@ class TestOriginRebuilt(OriginBase):
             self.assertFalse(r9["by_set"][s]["untested"])
         o = self.origin_row()
         self.assertEqual(o["r9_untested_sets"], [])
-        self.assertTrue(o["r9_reading"].startswith("R9 EXACT"), o["r9_reading"])
+        self.assertTrue(o["r9_reading"].startswith("R9 EXACT on 6 of 6 TESTED EARLY items"), o["r9_reading"])
+        self.assertIn("the structural begin/end rows equal on 4 of 4 (not counted as tests)", o["r9_reading"])
+        self.assertEqual((r9["early_tested_total"], r9["early_structural_total"], r9["early_total"]), (6, 4, 10), "the two counts are the row's own, and sum to the whole")
         self.assertNotIn("UNTESTED", o["r9_reading"])
         self.assertNotIn("UNTESTED", (self.out / "RESIT.md").read_text(), "the control: a fully tested origin never says UNTESTED")
 
@@ -240,6 +244,8 @@ class TestOriginRebuilt(OriginBase):
         md = (self.out / "RESIT.md").read_text()
         self.assertIn("R9 UNTESTED for set(s) fresh", md)
         self.assertNotIn("R9 EXACT: ", md.split("| origin |")[1].split("\n")[0], "the table's origin line does not open with a pass")
+        self.assertIn("R9 EXACT on 3 of 3 TESTED EARLY items", o["r9_reading"], "only the other set's three tested items are claimed exact")
+        self.assertIn("equal on 3 of 3 (not counted as tests)", o["r9_reading"], "the untested set's own begin is among the structural rows, never among the tests")
 
     def test_the_acts_inside_each_sitting_are_censused(self) -> None:
         self.life.rewrite_journal(lambda rows: rows + [brain(1004, "learn"), brain(1010, "turn")])
@@ -745,28 +751,42 @@ class TestR9Reading(unittest.TestCase):
     """`r9_reading`: the ONE line of the origin ROW that says what R9 showed (law R9: «the series row says so»). A set with no tested EARLY item reads UNTESTED first and is never summarised as a pass. Pure."""
 
     @staticmethod
-    def r9(tested_fresh=3, tested_s1b1=3, *, refusing=True, early_total=10, early_equal=10, early_diff=0, late_total=0, late_disc=0) -> dict:
+    def r9(tested_fresh=3, tested_s1b1=3, *, structural=4, refusing=True, tested_diff=0, structural_diff=0, late_total=0, late_disc=0) -> dict:
+        """The TESTED and the STRUCTURAL (begin, end) EARLY rows are counted apart, as r9_cross_check counts them."""
         def one(n_tested):
-            return {"n_early": 5, "n_late": 0, "n_early_tested": n_tested, "untested": n_tested == 0,
+            return {"n_early": n_tested + 2, "n_late": 0, "n_early_tested": n_tested, "untested": n_tested == 0,
                     "note": "R9 UNTESTED for this set (no tested EARLY item): its begin state is verified only by R10c" if n_tested == 0 else ""}
-        return {"refusing": refusing, "early_total": early_total, "early_equal": early_equal, "early_diff_count": early_diff, "late_total": late_total, "late_discordant": late_disc,
-                "by_set": {"fresh": one(tested_fresh), "s1b1": one(tested_s1b1)}}
+        tt, st = tested_fresh + tested_s1b1, structural
+        return {"refusing": refusing, "early_tested_total": tt, "early_tested_equal": tt - tested_diff, "early_structural_total": st, "early_structural_equal": st - structural_diff,
+                "early_total": tt + st, "early_equal": tt + st - tested_diff - structural_diff, "early_diff_count": tested_diff + structural_diff,
+                "late_total": late_total, "late_discordant": late_disc, "by_set": {"fresh": one(tested_fresh), "s1b1": one(tested_s1b1)}}
 
-    def test_every_set_tested_and_exact_reads_exact_and_names_no_untested_set(self) -> None:
+    def test_every_set_tested_and_exact_reads_exact_with_the_tested_and_the_structural_counts_apart(self) -> None:
         line, untested = R.r9_reading(self.r9())
         self.assertEqual(untested, [])
-        self.assertTrue(line.startswith("R9 EXACT"), line)
-        self.assertIn("10 of 10", line)
+        self.assertTrue(line.startswith("R9 EXACT on 6 of 6 TESTED EARLY items"), line)
+        self.assertIn("the structural begin/end rows equal on 4 of 4 (not counted as tests)", line)
         self.assertIn("fresh 3, s1b1 3", line, "the tested EARLY count of each set is printed beside the pass")
+        self.assertNotIn("10 of 10", line, "the structural rows are never in the denominator of a TESTED count")
         self.assertNotIn("UNTESTED", line)
 
+    def test_the_two_counts_move_apart_a_structural_difference_leaves_the_tested_count_alone(self) -> None:
+        line, _ = R.r9_reading(self.r9(structural_diff=1))
+        self.assertIn("R9 EXACT on 6 of 6 TESTED EARLY items", line)
+        self.assertIn("the structural begin/end rows equal on 3 of 4", line)
+        line2, _ = R.r9_reading(self.r9(tested_diff=2))
+        self.assertIn("on 4 of 6 TESTED EARLY items", line2, "the plant (two tested rows differ) changes the tested count and only it")
+        self.assertIn("equal on 4 of 4", line2)
+
     def test_one_untested_set_leads_the_line_and_is_not_a_pass(self) -> None:
-        line, untested = R.r9_reading(self.r9(tested_fresh=0))
+        line, untested = R.r9_reading(self.r9(tested_fresh=0, structural=3))
         self.assertEqual(untested, ["fresh"])
         self.assertTrue(line.startswith("R9 UNTESTED for set(s) fresh"), line)
         self.assertIn("NOT A PASS", line)
         self.assertIn("R10c", line)
         self.assertFalse(line.startswith("R9 EXACT"))
+        self.assertIn("R9 EXACT on 3 of 3 TESTED EARLY items", line, "the exactness it still claims is over the TESTED rows alone")
+        self.assertIn("equal on 3 of 3 (not counted as tests)", line)
 
     def test_every_untested_set_is_named(self) -> None:
         line, untested = R.r9_reading(self.r9(tested_fresh=0, tested_s1b1=0))
@@ -778,10 +798,11 @@ class TestR9Reading(unittest.TestCase):
         self.assertNotEqual(a, b, "the plant (one set's tested count 3 -> 0) must change the reading")
 
     def test_a_fallback_is_a_labelled_reading_never_exact_and_still_names_an_untested_set(self) -> None:
-        line, untested = R.r9_reading(self.r9(tested_fresh=0, refusing=False, early_diff=4, early_equal=6))
+        line, untested = R.r9_reading(self.r9(tested_fresh=0, tested_s1b1=6, refusing=False, tested_diff=4))
         self.assertEqual(untested, ["fresh"])
         self.assertIn("READING", line)
-        self.assertIn("4 of 10 EARLY items differ", line)
+        self.assertIn("4 of 6 TESTED EARLY items differ", line)
+        self.assertIn("the structural begin/end rows differ on 0 of 4 (not counted as tests)", line)
         self.assertNotIn("EXACT", line)
         self.assertIn("UNTESTED", line)
 
@@ -807,6 +828,17 @@ class TestR9Omissions(unittest.TestCase):
         r9 = self.cross(origin_seqs=(10, 12), life_seqs=(10, 11, 12))
         self.assertEqual((r9["life_rows_not_resat"], r9["first_life_row_not_resat"]), (1, 11))
         self.assertEqual(r9["early_diff_count"], 0, "the rows that exist are equal: only the omission is the finding")
+
+    def test_tested_and_structural_early_rows_are_counted_apart_by_form(self) -> None:
+        r9 = self.cross(origin_seqs=(10, 11, 12), life_seqs=(10, 11, 12))
+        self.assertEqual((r9["early_tested_total"], r9["early_tested_equal"], r9["early_structural_total"], r9["early_structural_equal"]), (1, 1, 2, 2),
+                         "one point (tested) and begin + end (structural), all equal")
+        life = self.life(10, 11, 12)
+        origin = [dict(life[s]) for s in (10, 11, 12)]
+        origin[1] = {**origin[1], "answer": {"kind": "thing", "hyp": 9}}                          # the plant: the TESTED row differs
+        r9 = R.r9_cross_check(origin, life, {s: "EARLY" for s in (10, 11, 12)}, self.ASKS, refusing=True)
+        self.assertEqual((r9["early_tested_total"], r9["early_tested_equal"], r9["early_structural_total"], r9["early_structural_equal"]), (1, 0, 2, 2))
+        self.assertEqual(r9["early_diff_count"], 1)
 
     def test_the_control_a_complete_origin_counts_zero(self) -> None:
         r9 = self.cross(origin_seqs=(10, 11, 12), life_seqs=(10, 11, 12))

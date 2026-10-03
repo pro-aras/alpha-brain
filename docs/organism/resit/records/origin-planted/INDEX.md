@@ -12,14 +12,14 @@
 ## The reading (`runs/READINGS.txt`; each line is copied from the file named)
 
 **Planted.**
-- `ORIGIN.json`: `r9_untested_sets` = `["fresh"]`; `r9_reading` = «R9 UNTESTED for set(s) fresh (no tested EARLY item) — NOT A PASS for them: their begin state is verified only by R10c · R9 EXACT where tested: 6 of 6 EARLY items (begin and end included) equal the life's own rows in every key but hash (tested EARLY items per set: fresh 0, s1b1 3); LATE items 4, discordant 0».
+- `ORIGIN.json`: `r9_untested_sets` = `["fresh"]`; `r9_reading` = «R9 UNTESTED for set(s) fresh (no tested EARLY item) — NOT A PASS for them: their begin state is verified only by R10c · R9 EXACT on 3 of 3 TESTED EARLY items (tested EARLY items per set: fresh 0, s1b1 3); the structural begin/end rows equal on 3 of 3 (not counted as tests); LATE items 4, discordant 0».
 - `RESIT.jsonl`: the SAME `r9_reading` and `r9_untested_sets` (the series row is the origin row; runs/READINGS.txt prints the equality check, True).
 - `RESIT.md`: the note cell of the origin line carries the same text.
 - `ORIGIN.json` `r9.by_set`: fresh `n_early` 1, `n_early_tested` 0, `n_late` 4, `untested` true, with the note; s1b1 `n_early` 5, `n_early_tested` 3, `untested` false.
 
 **Control.**
-- `r9_untested_sets` = `[]`; `r9_reading` = «R9 EXACT: 10 of 10 EARLY items (begin and end included) equal the life's own rows in every key but hash (tested EARLY items per set: fresh 3, s1b1 3); LATE items 0, discordant 0»; `RESIT.md` repeats it; the word UNTESTED appears nowhere in the control's three files.
+- `r9_untested_sets` = `[]`; `r9_reading` = «R9 EXACT on 6 of 6 TESTED EARLY items (tested EARLY items per set: fresh 3, s1b1 3); the structural begin/end rows equal on 4 of 4 (not counted as tests); LATE items 0, discordant 0»; `RESIT.md` repeats it; the word UNTESTED appears nowhere in the control's three files.
 
 ## What it shows, and what it does not
 
-It shows that the line a reader of the row (or of RESIT.md) meets first for a set with no tested EARLY item is UNTESTED, that it says «NOT A PASS», and that the exactness it still claims is «where tested» with the denominator named (every EARLY item, begin and end included) — the first version of the line said «on the other sets: 6 of 6», and the 6 held the untested set's own begin row; the planted run is what found the misleading denominator (fixed at the commit that carries this folder). It does not show a real life's UNTESTED set: the real-data smoke (`../origin-bl2-fallback-smoke/`) has none (0 untested, 1,722 and 1,285 tested EARLY items).
+It shows that the line a reader of the row (or of RESIT.md) meets first for a set with no tested EARLY item is UNTESTED, that it says «NOT A PASS», and that the exactness it still claims is over the TESTED rows alone, with the structural begin/end rows counted beside them and «not counted as tests». The planted run found TWO wording faults in turn, each fixed at the commit that carries this folder: the first line said «R9 EXACT on the other sets: 6 of 6 EARLY items» (the 6 held the untested set's own begin row), and the second said «EXACT where tested: 6 of 6 EARLY items (begin and end included)», which put structural rows into the denominator of a word that erratum E1 reserves for non-structural ones (the VERIFIER's ruling, 21:3x). It does not show a real life's UNTESTED set: the real-data smoke (`../origin-bl2-fallback-smoke/`) has none (0 untested, 1,722 and 1,285 tested EARLY items; its row was written by the reader a82ea77, whose fallback wording differed from the final one).

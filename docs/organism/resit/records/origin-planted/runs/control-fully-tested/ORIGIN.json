@@ -6,7 +6,7 @@
    "hits": 0,
    "misses": 2,
    "note": "",
-   "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/out-origin/glances.pkl"
+   "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/out-origin/glances.pkl"
   },
   "unanswered": 0
  },
@@ -16,20 +16,20 @@
   "fresh": 1003,
   "s1b1": 1009
  },
- "code": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/life/code",
+ "code": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/life/code",
  "code_commit": {
   "commit": null,
   "dirty": null,
   "git_note": "not a git checkout"
  },
  "cpu": {
-  "answer_s": 0.234,
+  "answer_s": 0.323,
   "cap_s": 1800,
   "cold": true,
-  "grade_s": 0.093,
-  "life_grade_s": 0.094,
-  "orchestrator_s": 0.017,
-  "total_s": 0.438
+  "grade_s": 0.107,
+  "life_grade_s": 0.166,
+  "orchestrator_s": 0.024,
+  "total_s": 0.62
  },
  "eye_changed": false,
  "eye_pin": {
@@ -53,7 +53,7 @@
     "tape": "e793cbad38753f45f580bac4a98a0fb24b0119334b8e974875b5de58839f0d95",
     "world_scene": "09210346371e82186018f3a1e11d6593e9c475a91b2591b3186fc9feacdf9754"
    },
-   "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/items/GENOME.genome",
+   "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/items/GENOME.genome",
    "sha256": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c"
   },
   "sets": {
@@ -80,7 +80,7 @@
      "tape": "e793cbad38753f45f580bac4a98a0fb24b0119334b8e974875b5de58839f0d95",
      "world_scene": "09210346371e82186018f3a1e11d6593e9c475a91b2591b3186fc9feacdf9754"
     },
-    "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/out-origin/origin/20261004120100Z/states/fresh/GENOME.in-force.genome"
+    "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/out-origin/origin/20261004120100Z/states/fresh/GENOME.in-force.genome"
    },
    "s1b1": {
     "eye": {
@@ -105,7 +105,7 @@
      "tape": "e793cbad38753f45f580bac4a98a0fb24b0119334b8e974875b5de58839f0d95",
      "world_scene": "09210346371e82186018f3a1e11d6593e9c475a91b2591b3186fc9feacdf9754"
     },
-    "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/out-origin/origin/20261004120100Z/states/s1b1/GENOME.in-force.genome"
+    "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/out-origin/origin/20261004120100Z/states/s1b1/GENOME.in-force.genome"
    }
   }
  },
@@ -118,13 +118,13 @@
   "tape": "e793cbad38753f45f580bac4a98a0fb24b0119334b8e974875b5de58839f0d95",
   "world_scene": "09210346371e82186018f3a1e11d6593e9c475a91b2591b3186fc9feacdf9754"
  },
- "grade_sha256": "0e558a7bec60f9d03c30dfad1f74b77599da9f4216f11473879027775c609027",
+ "grade_sha256": "4b8b7c1bd2a36ad6f9b422ce0d8c470d367fcdc3227174e16ed9424550c80a9d",
  "grader": {
   "commit": null,
   "dirty": null,
   "git_note": "not a git checkout",
   "grade_life_sha256": "78444def661c3dd713b38b5155fdda1722a694ad07606ba1f70aff341f298148",
-  "grader_code": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/grader",
+  "grader_code": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/grader",
   "modules_digest": "9593d660799a576ba2dc71c07b83312157adcf2a17c3ee30cfd7a880f24cabe8",
   "pin": "written"
  },
@@ -151,10 +151,10 @@
   "n_canvases": 2,
   "ok": true
  },
- "items_root": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/items",
+ "items_root": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/items",
  "kind": "origin",
  "life_own": {
-  "grade_sha256": "cbbfeb7040b34627352aadc06b466324c5a0a755f0bc288b6258bf2807e94629",
+  "grade_sha256": "15c09afac28e54b74c3a45c91b8891fedc47c202b0c09cf2ad6b0c7e6c88db7b",
   "marks": {
    "M1": {
     "pooled": {
@@ -422,7 +422,7 @@
    "note": "",
    "path": null,
    "present": false,
-   "read_at": "2026-10-03T21:05:53+0400"
+   "read_at": "2026-10-03T21:40:30+0400"
   },
   "start": {
    "fields_present": {
@@ -434,7 +434,7 @@
    "note": "",
    "path": null,
    "present": false,
-   "read_at": "2026-10-03T21:05:52+0400"
+   "read_at": "2026-10-03T21:40:30+0400"
   }
  },
  "marks": {
@@ -641,8 +641,8 @@
  },
  "memory": {
   "answer_maxrss_mb": 49.7,
-  "grade_maxrss_mb": 30.3,
-  "life_grade_maxrss_mb": 30.3,
+  "grade_maxrss_mb": 30.7,
+  "life_grade_maxrss_mb": 30.7,
   "orchestrator_maxrss_mb": 106.2
  },
  "origin_kind": "rebuilt",
@@ -724,6 +724,10 @@
   "early_diff_count": 0,
   "early_diffs_first_five": [],
   "early_equal": 10,
+  "early_structural_equal": 4,
+  "early_structural_total": 4,
+  "early_tested_equal": 6,
+  "early_tested_total": 6,
   "early_total": 10,
   "first_early_diff": null,
   "first_life_row_not_resat": null,
@@ -746,17 +750,17 @@
   "n_without_a_life_row_or_class": 0,
   "refusing": true
  },
- "r9_reading": "R9 EXACT: 10 of 10 EARLY items (begin and end included) equal the life's own rows in every key but hash (tested EARLY items per set: fresh 3, s1b1 3); LATE items 0, discordant 0",
+ "r9_reading": "R9 EXACT on 6 of 6 TESTED EARLY items (tested EARLY items per set: fresh 3, s1b1 3); the structural begin/end rows equal on 4 of 4 (not counted as tests); LATE items 0, discordant 0",
  "r9_untested_sets": [],
- "reader_sha256": "ffbc6f227ca570221e57e39aa37a3a7f622c15bd4ff42652f3e63699f9ae9996",
+ "reader_sha256": "bacf8fc3418099f73cfe56f758aede42425ad576a7255f07dfd19f6c9d87a9fc",
  "reason": null,
  "restart_duplicates": 0,
- "root": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/life",
+ "root": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/life",
  "source_copy": {
-  "build_s": 0.004,
+  "build_s": 0.006,
   "bytes": 8059,
   "cut_seq": 1014,
-  "manifest_path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/out-origin/origin/20261004120100Z/src/MANIFEST",
+  "manifest_path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/out-origin/origin/20261004120100Z/src/MANIFEST",
   "n_manifest_entries": 15,
   "payloads_kept": 12,
   "rows": 14,
@@ -786,7 +790,7 @@
     "state_hash": "4351286719d5fd7de8dda29e6e56ba0e80fc6b0ad1753340c3ab2b56110412c8",
     "tape_digest": "f74571abace644b21f381e08abd32b26b7afc10f97996fc0ab3b98b4526e0340"
    },
-   "source": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/st-fresh",
+   "source": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/st-fresh",
    "state_hash": "4351286719d5fd7de8dda29e6e56ba0e80fc6b0ad1753340c3ab2b56110412c8"
   },
   {
@@ -806,7 +810,7 @@
     "state_hash": "4351286719d5fd7de8dda29e6e56ba0e80fc6b0ad1753340c3ab2b56110412c8",
     "tape_digest": "39d61b26d77b68e73fe3db763b04fc75bb7b58bb2f4261bc709c0d440ada4d3d"
    },
-   "source": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-n0vj_qxo/st-s1b1",
+   "source": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-0q11zy4z/st-s1b1",
    "state_hash": "4351286719d5fd7de8dda29e6e56ba0e80fc6b0ad1753340c3ab2b56110412c8"
   }
  ],
@@ -825,5 +829,5 @@
    "M2a:s1b1:0": 0
   }
  },
- "wall_s": 0.439
+ "wall_s": 0.62
 }
