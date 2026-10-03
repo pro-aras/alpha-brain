@@ -22,7 +22,9 @@ class TestRoots(unittest.TestCase):
         # edit: Claude (Fable 5.1, the seat), 2026-09-28 20:49 +0400 — the organ tree's fresh root; S1b-1R's root is now the record
         # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:24 +0400 — F-M6 changed WORLD_CODE: the tree's root is FRESH again
         self.assertEqual(C.HEAR_RUNS, Path("/data/dev/brain-runs/scene-organ-hear"))   # PREREG-BRAIN-DRIVES §8 (14), 2026-09-29 16:40 +0400
-        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-drive"))      # PREREG-WORD-ROAD §5 (2026-09-29 13:17 +0400)
+        # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 15:39 +0400 — PREREG-INNER-1 (the landing): the tree's root is FRESH again
+        self.assertEqual(C.DRIVE_RUNS, Path("/data/dev/brain-runs/scene-organ-drive"))
+        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-swarm-1003"))      # PREREG-WORD-ROAD §5 (2026-09-29 13:17 +0400)
         self.assertEqual(C.FM6_RUNS, Path("/data/dev/brain-runs/scene-organ-fm6"))
         self.assertEqual(C.SCENE_ORGAN_RUNS, Path("/data/dev/brain-runs/scene-organ"))
         self.assertEqual(C.S1B1R_RUNS, Path("/data/dev/brain-runs/scene-s1b1r"))
