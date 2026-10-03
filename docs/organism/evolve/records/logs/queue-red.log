@@ -1,0 +1,19 @@
+test_evolve_cal_queue (unittest.loader._FailedTest.test_evolve_cal_queue) ... ERROR
+
+======================================================================
+ERROR: test_evolve_cal_queue (unittest.loader._FailedTest.test_evolve_cal_queue)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_evolve_cal_queue
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_queue.py", line 14, in <module>
+    import tools.evolve_cal_queue as q
+ModuleNotFoundError: No module named 'tools.evolve_cal_queue'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)
+scope memory.peak 10424320 bytes
