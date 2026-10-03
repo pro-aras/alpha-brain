@@ -1,0 +1,27 @@
+ALPHA4+PLANT: plants_train 505, plants_held 337, N0 119426, NF 118921, K0 2239, KF 2240, train_count_of_zzq_as_word_under_empty 505, train_count_of_xxv_as_word_under_empty 507, train_count_of_xxv_as_word_under_F 2, real_held_out_occurrences_of_plant_tokens 2, merge_saving_per_plant_bits 7.9158, delta_bits_per_other_token 0.0060, n_other_held_tokens 78851, part1_plants_merge 2667.6406, part2_real_occurrences_of_plant_tokens -14.7955, part3_denominator_effect 472.2236, sum_of_parts 3125.0688, scorer_bits0_minus_bitsF 3125.0688, L 22.2547, G 3102.8141, expected_first_order 2635.1985
+  check: part1 2667.6406 + part2 -14.7955 + part3 472.2236 = 3125.0688 vs the Scorer's bits0 - bitsF 3125.0688 (difference -8.58e-09)
+SCENE+PLANT: plants_train 600, plants_held 400, N0 19700, NF 19100, K0 18, KF 19, train_count_of_zzq_as_word_under_empty 600, train_count_of_xxv_as_word_under_empty 600, train_count_of_xxv_as_word_under_F 0, real_held_out_occurrences_of_plant_tokens 0, merge_saving_per_plant_bits 5.1250, delta_bits_per_other_token 0.0445, n_other_held_tokens 12106, part1_plants_merge 2050.0067, part2_real_occurrences_of_plant_tokens 0, part3_denominator_effect 538.7916, sum_of_parts 2588.7983, scorer_bits0_minus_bitsF 2588.7983, L 8.0000, G 2580.7983, expected_first_order 2006.8357
+  check: part1 2050.0067 + part2 0.0000 + part3 538.7916 = 2588.7983 vs the Scorer's bits0 - bitsF 2588.7983 (difference -8.19e-12)
+	Command being timed: "env PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python3 -B -u scratch/decomp_plant.py"
+	User time (seconds): 1.97
+	System time (seconds): 0.12
+	Percent of CPU this job got: 98%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:02.13
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 101624
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 23788
+	Voluntary context switches: 22
+	Involuntary context switches: 632
+	Swaps: 0
+	File system inputs: 131856
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

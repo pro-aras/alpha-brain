@@ -1,0 +1,29 @@
+ALPHA4 plain moments 84275 plain split index 50565
+6677 train shelf read1beb05fc ('xxv',) (16832,)
+6678 train shelf read5f82f1a1 ('lesson', 'xxv') (16834, 16835)
+55782 held shelf readf9b6f70b ('xxv',) (135256,)
+55783 held shelf readde54ffba ('lesson', 'xxv') (135258, 135259)
+SCENE moments 10000 with zzq/xxv: 0
+	Command being timed: "env PYTHONPATH=. python3 -B -u scratch/plant_tokens_outside.py"
+	User time (seconds): 1.75
+	System time (seconds): 0.17
+	Percent of CPU this job got: 97%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:01.97
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 100908
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 23625
+	Voluntary context switches: 8
+	Involuntary context switches: 27
+	Swaps: 0
+	File system inputs: 131856
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
