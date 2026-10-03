@@ -1,0 +1,22 @@
+         2984766 function calls (2984726 primitive calls) in 4.509 seconds
+
+   Ordered by: internal time
+   List reduced from 40 to 14 due to restriction <14>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     1430    4.087    0.003    4.264    0.003 /data/dev/genome-wt-toys-1003/scratch/tmp/old724865d/tools/toys/frames/null.py:122(_pick_bigram)
+  2295492    0.178    0.000    0.178    0.000 {built-in method builtins.len}
+    84275    0.058    0.000    0.086    0.000 /data/dev/genome-wt-toys-1003/scratch/tmp/old724865d/tools/toys/frames/compress.py:34(parse_moment)
+        1    0.035    0.035    0.075    0.075 /data/dev/genome-wt-toys-1003/scratch/tmp/old724865d/tools/toys/frames/compress.py:105(_held_bits)
+        1    0.026    0.026    0.221    0.221 /data/dev/genome-wt-toys-1003/scratch/tmp/old724865d/tools/toys/frames/compress.py:120(gain)
+   203297    0.022    0.000    0.022    0.000 {method 'append' of 'list' objects}
+    50565    0.019    0.000    0.019    0.000 {built-in method _collections._count_elements}
+   128568    0.019    0.000    0.037    0.000 {built-in method builtins.isinstance}
+    50567    0.017    0.000    0.067    0.000 /usr/lib/python3.14/collections/__init__.py:679(update)
+    50566    0.009    0.000    0.009    0.000 {built-in method _abc._abc_instancecheck}
+    50566    0.009    0.000    0.018    0.000 <frozen abc>:117(__instancecheck__)
+        2    0.005    0.003    0.005    0.003 {built-in method builtins.sorted}
+        1    0.005    0.005    0.016    0.016 /data/dev/genome-wt-toys-1003/scratch/tmp/old724865d/tools/toys/frames/null.py:55(bigram_bins)
+        1    0.005    0.005    4.509    4.509 /data/dev/genome-wt-toys-1003/scratch/tmp/old724865d/tools/toys/frames/null.py:179(null2)
+
+

@@ -1,0 +1,7 @@
+Scorer built: 0.06 cpu-s; train moments 50565, held moments 33710, V 2236
+rule             |F|    rule s    gain s  null1 draw s  null2 draw s
+WEB-H           1430      0.84     0.072          0.12          3.61
+WEB-S s1         807      2.94     0.072          0.13          1.52
+WEB-S s2         798      2.97     0.125          0.15          1.54
+SENTENCE         470      0.16     0.070          0.13          0.56
+MDL-GREEDY       281     10.17     0.066          0.12          0.08

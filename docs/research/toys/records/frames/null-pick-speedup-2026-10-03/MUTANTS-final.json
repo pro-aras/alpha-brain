@@ -1,0 +1,496 @@
+{
+ "file": "tools/toys/frames/null.py",
+ "module": "tools.toys.frames.null",
+ "mutants": [
+  {
+   "kind": "identity",
+   "name": "CONTROL-identity"
+  },
+  {
+   "kind": "broken",
+   "name": "CONTROL-broken"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-levels-short",
+   "new": "for d in range(0, (self.hi - self.lo) + 1):",
+   "old": "for d in range(0, (self.hi - self.lo) + 2):",
+   "why": "one level too few"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-order-swapped",
+   "new": "ks = [b0] if d == 0 else [b0 + d, b0 - d]",
+   "old": "ks = [b0] if d == 0 else [b0 - d, b0 + d]",
+   "why": "the upper bin before the lower"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-absent-bins-kept",
+   "new": "ks = [k for k in ks]",
+   "old": "ks = [k for k in ks if k in bins]",
+   "why": "an absent bin is indexed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-total0-break",
+   "new": "            if total == 0:\n                break\n            m = mask",
+   "old": "            if total == 0:\n                continue\n            m = mask",
+   "why": "an empty level ends the search"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-mask-reversed",
+   "new": "else np.concatenate([mask[k] for k in reversed(ks)])",
+   "old": "else np.concatenate([mask[k] for k in ks])",
+   "why": "the two masks joined in the other order"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-enum-boundary",
+   "new": "if total >= SMALL_ENUM:\n                if total - sum(n_excl[k] for k in ks) == 0:",
+   "old": "if total > SMALL_ENUM:\n                if total - sum(n_excl[k] for k in ks) == 0:",
+   "why": "a pool of exactly 64 is rejection-sampled"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-doomed-one",
+   "new": "if total - sum(n_excl[k] for k in ks) == 1:",
+   "old": "if total - sum(n_excl[k] for k in ks) == 0:",
+   "why": "a level with ONE admissible entry is treated as doomed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-doomed-advance-short",
+   "new": "rng.integers(total, size=MAX_REJECT - 1)\n                    continue",
+   "old": "rng.integers(total, size=MAX_REJECT)\n                    continue",
+   "why": "the doomed level consumes 999 draws"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-doomed-advance-long",
+   "new": "rng.integers(total, size=MAX_REJECT + 1)\n                    continue",
+   "old": "rng.integers(total, size=MAX_REJECT)\n                    continue",
+   "why": "the doomed level consumes 1,001 draws"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-doomed-no-draw",
+   "new": "pass\n                    continue",
+   "old": "rng.integers(total, size=MAX_REJECT)\n                    continue",
+   "why": "the doomed level consumes nothing"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-doomed-no-continue",
+   "new": "rng.integers(total, size=MAX_REJECT)\n                    pass",
+   "old": "rng.integers(total, size=MAX_REJECT)\n                    continue",
+   "why": "the doomed level falls through to the batch"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-batch-long",
+   "new": "r = rng.integers(total, size=MAX_REJECT + 1)\n                ok = ~m[r]",
+   "old": "r = rng.integers(total, size=MAX_REJECT)\n                ok = ~m[r]",
+   "why": "a batch of 1,001 tries"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-batch-short",
+   "new": "r = rng.integers(total, size=MAX_REJECT - 1)\n                ok = ~m[r]",
+   "old": "r = rng.integers(total, size=MAX_REJECT)\n                ok = ~m[r]",
+   "why": "a batch of 999 tries"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-accept-inverted",
+   "new": "ok = m[r]",
+   "old": "ok = ~m[r]",
+   "why": "the loop accepts the excluded"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-any-all",
+   "new": "if ok.all():",
+   "old": "if ok.any():",
+   "why": "accept only when every try is admissible"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-first-last",
+   "new": "j = int(len(ok) - 1 - np.argmax(ok[::-1]))",
+   "old": "j = int(np.argmax(ok))",
+   "why": "the last accepted try, not the first"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-first-min",
+   "new": "j = int(np.argmin(ok))",
+   "old": "j = int(np.argmax(ok))",
+   "why": "the first REJECTED try"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-no-restore",
+   "new": "pass\n",
+   "old": "rng.bit_generator.state = saved\n",
+   "why": "the generator keeps the whole batch"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-redraw-short",
+   "new": "rng.integers(total, size=j)",
+   "old": "rng.integers(total, size=j + 1)",
+   "why": "the generator one draw behind"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-redraw-long",
+   "new": "rng.integers(total, size=j + 2)",
+   "old": "rng.integers(total, size=j + 1)",
+   "why": "the generator one draw ahead"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-flag-accept",
+   "new": "return self._item(ks, sizes, int(r[j])), d >= 0",
+   "old": "return self._item(ks, sizes, int(r[j])), d > 0",
+   "why": "the flag of a rejection accept"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-flag-accept-false",
+   "new": "return self._item(ks, sizes, int(r[j])), False",
+   "old": "return self._item(ks, sizes, int(r[j])), d > 0",
+   "why": "the flag of a rejection accept is never a fallback"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-pick-index",
+   "new": "return self._item(ks, sizes, int(r[0])), d > 0",
+   "old": "return self._item(ks, sizes, int(r[j])), d > 0",
+   "why": "the first try's index, not the accepted one's"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-enum-inverted",
+   "new": "adm = np.flatnonzero(m)",
+   "old": "adm = np.flatnonzero(~m)",
+   "why": "the excluded are enumerated"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-enum-gt1",
+   "new": "if adm.size > 1:",
+   "old": "if adm.size:",
+   "why": "a single admissible entry is not taken"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-enum-first",
+   "new": "adm[0]",
+   "old": "adm[int(rng.integers(adm.size))]",
+   "why": "no draw: the first admissible"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-enum-last",
+   "new": "adm[-1]",
+   "old": "adm[int(rng.integers(adm.size))]",
+   "why": "no draw: the last admissible"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-enum-flag",
+   "new": "int(adm[int(rng.integers(adm.size))])), d >= 0",
+   "old": "int(adm[int(rng.integers(adm.size))])), d > 0",
+   "why": "the flag of an enumerated pick"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_an_error_leaves_the_same_text_and_the_same_state"
+   ],
+   "name": "np-error-text",
+   "new": "\n        raise NullError(f\"NULL-2: no admissible adjacent bigram in any bin for bin {b0 + 1}\")",
+   "old": "\n        raise NullError(f\"NULL-2: no admissible adjacent bigram in any bin for bin {b0}\")",
+   "why": "the error names another bin"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-item-le",
+   "new": "if r <= size:\n                return self.bins[k][r]",
+   "old": "if r < size:\n                return self.bins[k][r]",
+   "why": "an index equal to the first bin's size is taken from it"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-item-offset",
+   "new": "            r -= size + 1\n        raise IndexError(r)",
+   "old": "            r -= size\n        raise IndexError(r)",
+   "why": "the second bin's offset is off by one"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-where-index",
+   "new": "{p: (b, i + 1) for b, lst in bins.items() for i, p in enumerate(lst)}",
+   "old": "{p: (b, i) for b, lst in bins.items() for i, p in enumerate(lst)}",
+   "why": "an exclusion marks the neighbour"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_a_reset_forgets_every_exclusion_and_the_counters_agree_with_the_masks"
+   ],
+   "name": "np-mask-ones",
+   "new": "np.ones(len(lst), dtype=bool)",
+   "old": "np.zeros(len(lst), dtype=bool)",
+   "why": "everything starts excluded (null2 and the traces reset before the first pick, so only the fresh-pool assertion of the counters test sees it)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-mask-dtype",
+   "new": "np.zeros(len(lst), dtype=int)",
+   "old": "np.zeros(len(lst), dtype=bool)",
+   "why": "an integer mask: ~0 is -1, always truthy"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_a_reset_forgets_every_exclusion_and_the_counters_agree_with_the_masks"
+   ],
+   "name": "np-exclude-twice",
+   "new": "if w is not None:",
+   "old": "if w is not None and not self.mask[w[0]][w[1]]:",
+   "why": "excluding twice counts twice"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_a_reset_forgets_every_exclusion_and_the_counters_agree_with_the_masks"
+   ],
+   "name": "np-exclude-count2",
+   "new": "self.n_excl[w[0]] += 2",
+   "old": "self.n_excl[w[0]] += 1",
+   "why": "each exclusion counts twice"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_a_reset_forgets_every_exclusion_and_the_counters_agree_with_the_masks"
+   ],
+   "name": "np-exclude-nocount",
+   "new": "self.n_excl[w[0]] += 0",
+   "old": "self.n_excl[w[0]] += 1",
+   "why": "an exclusion is not counted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-reset-mask",
+   "new": "            pass\n",
+   "old": "            self.mask[b][:] = False\n",
+   "why": "a reset forgets no mask"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_a_reset_forgets_every_exclusion_and_the_counters_agree_with_the_masks"
+   ],
+   "name": "np-reset-count",
+   "new": "            pass\n",
+   "old": "            self.n_excl[b] = 0\n",
+   "why": "a reset forgets no counter"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick"
+   ],
+   "name": "np-reset-skip-base",
+   "new": "        for p in []:\n            self.exclude(p)",
+   "old": "        for p in excluded:\n            self.exclude(p)",
+   "why": "the base frames are not excluded"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestNull2KeepsItsContractOnSmallStreams.test_null2_equals_the_reference_null2_on_a_small_hand_stream_with_fallbacks"
+   ],
+   "name": "n2-reset-empty",
+   "new": "pool.reset(set())",
+   "old": "pool.reset(base)",
+   "why": "the rule's own frames are not excluded"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestNull2KeepsItsContractOnSmallStreams.test_null2_equals_the_reference_null2_on_a_small_hand_stream_with_fallbacks"
+   ],
+   "name": "n2-no-exclude",
+   "new": "p, fell = pool.pick(rng, b0)\n            pass",
+   "old": "p, fell = pool.pick(rng, b0)\n            pool.exclude(p)",
+   "why": "a pick is not excluded after it"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestNull2KeepsItsContractOnSmallStreams.test_null2_equals_the_reference_null2_on_a_small_hand_stream_with_fallbacks"
+   ],
+   "name": "n2-pick-other-bin",
+   "new": "p, fell = pool.pick(rng, b0 + 1)",
+   "old": "p, fell = pool.pick(rng, b0)",
+   "why": "the bin of the frame's own count + 1"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestNull2KeepsItsContractOnSmallStreams.test_null2_equals_the_reference_null2_on_a_small_hand_stream_with_fallbacks"
+   ],
+   "name": "n2-pool-per-draw",
+   "new": "    pool = _BigramPool({b: list(v)[:-1] for b, v in bb.items()})\n",
+   "old": "    pool = _BigramPool(bb)\n",
+   "why": "a pool without the last entry of each bin"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestNull2KeepsItsContractOnSmallStreams.test_null2_equals_the_reference_null2_on_a_small_hand_stream_with_fallbacks"
+   ],
+   "name": "n2-flag-dropped",
+   "new": "fallbacks += 0\n        values.append(scorer.gain(set(dealt)).G)\n        if keep_pairs:\n            pairs.append(tuple(dealt))\n    return NullResult(\"NULL-2\"",
+   "old": "fallbacks += int(fell)\n        values.append(scorer.gain(set(dealt)).G)\n        if keep_pairs:\n            pairs.append(tuple(dealt))\n    return NullResult(\"NULL-2\"",
+   "why": "the fallbacks of NULL-2 are not counted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestTheReferenceIsTheOldPickUnchanged.test_the_constants_both_picks_read_are_the_ones_of_724865d"
+   ],
+   "name": "ref-constant-reject",
+   "new": "MAX_REJECT = 999",
+   "old": "MAX_REJECT = 1000",
+   "why": "a constant both picks read"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestTheReferenceIsTheOldPickUnchanged.test_the_constants_both_picks_read_are_the_ones_of_724865d"
+   ],
+   "name": "ref-constant-enum",
+   "new": "SMALL_ENUM = 65 ",
+   "old": "SMALL_ENUM = 64 ",
+   "why": "a constant both picks read"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestTheReferenceIsTheOldPickUnchanged.test_the_reference_source_is_the_one_of_724865d"
+   ],
+   "name": "ref-body",
+   "new": "                if pick not in excluded:\n                    return pick, d > 0\n        admissible = [p for x in lists for p in x if p not in excluded]\n        if admissible:\n            return admissible[int(rng.integers(len(admissible)))], d >= 0\n    raise NullError(f\"NULL-2:",
+   "old": "                if pick not in excluded:\n                    return pick, d > 0\n        admissible = [p for x in lists for p in x if p not in excluded]\n        if admissible:\n            return admissible[int(rng.integers(len(admissible)))], d > 0\n    raise NullError(f\"NULL-2:",
+   "why": "the reference's own flag changed (the new class would still equal it only if it changed too)"
+  }
+ ],
+ "source_sha256": "aa6fa5bae173c66343a0d7af8f78ec1e46aa315438c58569dae9841f9fd2b44d",
+ "tests": "tests.tools.test_toys_frames_null_pick,tests.tools.test_toys_frames_null"
+}

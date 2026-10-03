@@ -1,0 +1,28 @@
+.........F..F...........................
+======================================================================
+FAIL: test_each_plant_is_caught_on_the_synthetic_scenarios (tests.tools.test_toys_frames_null_pick.TestPlantsAreCaught.test_each_plant_is_caught_on_the_synthetic_scenarios)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 421, in test_each_plant_is_caught_on_the_synthetic_scenarios
+    found = self._synthetic_diffs(_plant_class(old, new))
+                                  ~~~~~~~~~~~~^^^^^^^^^^
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 381, in _plant_class
+    assert src.count(old) == 1, (src.count(old), old)
+           ^^^^^^^^^^^^^^^^^^^
+AssertionError: (2, 'rng.integers(total, size=MAX_REJECT)\n')
+
+======================================================================
+FAIL: test_four_plants_are_caught_on_the_real_traces (tests.tools.test_toys_frames_null_pick.TestPlantsAreCaughtOnTheRealBins.test_four_plants_are_caught_on_the_real_traces)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 440, in test_four_plants_are_caught_on_the_real_traces
+    cls = _plant_class(old, new)
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 381, in _plant_class
+    assert src.count(old) == 1, (src.count(old), old)
+           ^^^^^^^^^^^^^^^^^^^
+AssertionError: (2, 'rng.integers(total, size=MAX_REJECT)\n')
+
+----------------------------------------------------------------------
+Ran 40 tests in 26.675s
+
+FAILED (failures=2)

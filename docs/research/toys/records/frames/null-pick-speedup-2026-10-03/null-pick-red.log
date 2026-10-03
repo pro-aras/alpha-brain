@@ -1,0 +1,95 @@
+E...EEE..EEEEE..
+======================================================================
+ERROR: test_identical_pick_flag_and_generator_state_after_every_pick_on_real_bins_and_real_frame_sets (tests.tools.test_toys_frames_null_pick.TestIdentityRealBins.test_identical_pick_flag_and_generator_state_after_every_pick_on_real_bins_and_real_frame_sets)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 298, in test_identical_pick_flag_and_generator_state_after_every_pick_on_real_bins_and_real_frame_sets
+    got = new_trace(NL._BigramPool, R["bins"], own, base, key, draws)
+                    ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.frames.null' has no attribute '_BigramPool'
+
+======================================================================
+ERROR: test_a_reset_forgets_every_exclusion_and_the_counters_agree_with_the_masks (tests.tools.test_toys_frames_null_pick.TestIdentitySynthetic.test_a_reset_forgets_every_exclusion_and_the_counters_agree_with_the_masks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 235, in test_a_reset_forgets_every_exclusion_and_the_counters_agree_with_the_masks
+    pool = NL._BigramPool(bins)
+           ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.frames.null' has no attribute '_BigramPool'
+
+======================================================================
+ERROR: test_an_error_leaves_the_same_text_and_the_same_state (tests.tools.test_toys_frames_null_pick.TestIdentitySynthetic.test_an_error_leaves_the_same_text_and_the_same_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 227, in test_an_error_leaves_the_same_text_and_the_same_state
+    got = new_trace(NL._BigramPool, bins, own, base, key, draws)
+                    ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.frames.null' has no attribute '_BigramPool'
+
+======================================================================
+ERROR: test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick (tests.tools.test_toys_frames_null_pick.TestIdentitySynthetic.test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 199, in test_every_scenario_reads_identical_in_pick_flag_and_generator_state_after_every_pick
+    got = new_trace(NL._BigramPool, bins, own, base, key, draws)
+                    ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.frames.null' has no attribute '_BigramPool'
+
+======================================================================
+ERROR: test_each_plant_is_caught_on_the_synthetic_scenarios (tests.tools.test_toys_frames_null_pick.TestPlantsAreCaught.test_each_plant_is_caught_on_the_synthetic_scenarios)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 421, in test_each_plant_is_caught_on_the_synthetic_scenarios
+    found = self._synthetic_diffs(_plant_class(old, new))
+                                  ~~~~~~~~~~~~^^^^^^^^^^
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 380, in _plant_class
+    src = inspect.getsource(NL._BigramPool)
+                            ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.frames.null' has no attribute '_BigramPool'
+
+======================================================================
+ERROR: test_the_control_the_unmutated_source_loaded_the_same_way_reads_identical (tests.tools.test_toys_frames_null_pick.TestPlantsAreCaught.test_the_control_the_unmutated_source_loaded_the_same_way_reads_identical)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 414, in test_the_control_the_unmutated_source_loaded_the_same_way_reads_identical
+    src = inspect.getsource(NL._BigramPool)
+                            ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.frames.null' has no attribute '_BigramPool'
+
+======================================================================
+ERROR: test_the_first_plant_changes_no_pick_where_it_first_differs_and_only_the_state_comparison_sees_it (tests.tools.test_toys_frames_null_pick.TestPlantsAreCaught.test_the_first_plant_changes_no_pick_where_it_first_differs_and_only_the_state_comparison_sees_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 426, in test_the_first_plant_changes_no_pick_where_it_first_differs_and_only_the_state_comparison_sees_it
+    cls = _plant_class(*PLANTS[0][1:3])
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 380, in _plant_class
+    src = inspect.getsource(NL._BigramPool)
+                            ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.frames.null' has no attribute '_BigramPool'
+
+======================================================================
+ERROR: test_four_plants_are_caught_on_the_real_traces (tests.tools.test_toys_frames_null_pick.TestPlantsAreCaughtOnTheRealBins.test_four_plants_are_caught_on_the_real_traces)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 440, in test_four_plants_are_caught_on_the_real_traces
+    cls = _plant_class(old, new)
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 380, in _plant_class
+    src = inspect.getsource(NL._BigramPool)
+                            ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.frames.null' has no attribute '_BigramPool'
+
+======================================================================
+ERROR: test_the_first_plant_is_state_only_at_its_first_difference_on_the_real_bins_too (tests.tools.test_toys_frames_null_pick.TestPlantsAreCaughtOnTheRealBins.test_the_first_plant_is_state_only_at_its_first_difference_on_the_real_bins_too)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 446, in test_the_first_plant_is_state_only_at_its_first_difference_on_the_real_bins_too
+    cls = _plant_class(*PLANTS[0][1:3])
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_null_pick.py", line 380, in _plant_class
+    src = inspect.getsource(NL._BigramPool)
+                            ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.frames.null' has no attribute '_BigramPool'
+
+----------------------------------------------------------------------
+Ran 16 tests in 26.487s
+
+FAILED (errors=9)
