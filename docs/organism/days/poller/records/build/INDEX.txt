@@ -1,0 +1,36 @@
+POLLER-FIX — evidence index. Written by Claude (Sonnet 5.5, swarm hears), 2026-10-03 22:53 +0400 (from `date`); updated at the end of this file when more arrives (append-only).
+
+LAW   docs/organism/days/PREREG-POLLER-FIX.md on branch cost-profile-1003 (head eab3bce): signed by the author (2df296b), the verifier (3d62ecd, five named limits) and the seat (eab3bce): OPTION A.
+CODE  branch poller-fix-1003 (from master 233a4cb), worktree /data/dev/genome-wt-poller-1003:
+        2a64844  step 2  tests/creature/test_poller_cursor.py FIRST (34 tests + the G5 mapping MUTANT_TESTS) and its RED log
+        b6e51d3  step 3  THE FIX: creature/mind.py (+2 -0: the stamp comment and ONE key "canvas_index": ledger["canvas_index"] in Mind.snapshot()'s manifest dict),
+                         creature/exam.py (canvas_count_now + voice_loop's one read), creature/senses/sit.py (sense's one read); GREEN
+        7291ca8, 3321b6c  the sweeps' tools; the mutation sweep result            9d43829  G4/G0 records, fix.patch, G2's tools (the sha the verifier read)
+        9893681  G2      09216ad  the part-2 probe      3af3560  G1 + G6 records
+      Every commit after b6e51d3 adds records and tools only: `git diff --stat 9d43829 HEAD -- creature genome tools brain tests` is EMPTY at 3af3560 (the only test file the law adds is tests/creature/test_poller_cursor.py).
+      All evidence below is under docs/organism/days/poller/records/ (the tools) and records/build/ (the runs' own files).
+
+G0 SCOPE       `git diff --numstat 233a4cb 9d43829`: creature/exam.py +34 -7, creature/mind.py +2 -0, creature/senses/sit.py +5 -8, tests/creature/test_poller_cursor.py +755, records only.   VERIFIED (verifier, board 22:38)
+G3 LOOPS       tests/creature/test_poller_cursor.py: RED build/RED-test_poller_cursor.log (Ran 34, FAILED failures=8 errors=27, exit 1) -> GREEN build/GREEN1-/GREEN2-test_poller_cursor.log (Ran 34, OK, exit 0).   VERIFIED
+G4 STAND-INS   build/stand_in_sweep.out (9 files = the 8 reviewed + the new module; no listed test modified; plant: .plant.out CAUGHT); build/targeted-fix.log (the 8 listed modules UNMODIFIED + the new one: Ran 133 = 99 + 34, OK);
+               build/reference_check.out (the pinned OLD loops equal git 233a4cb byte for byte; plant CAUGHT).   VERIFIED
+G5 MUTATION    build/mutation-sweep.txt/.json: 20 of 20 CAUGHT (the law's m1-m15, m12b, m14w, and m16-m18 beyond the law), each by its NAMED test alone on a clean overlay; clean module Ran 34; negative plant m0 SURVIVED.   VERIFIED (+5 mutants of the verifier's own, all caught)
+G2 CADENCE     build/g2/g2-combined.txt: 40 of 40 saved states (bl2's 38 checkpoints + its closed final state + bl3's fallback copy), 0 differ; road ledger -> snapshot 40 of 40; ablation (key stripped) -> ledger 40 of 40; +1 plant caught 40 of 40; copies verified (1,026 files, 0 mismatches).
+               Per-run files: build/g2/{bl2,bl3,ck1-price}/; prices: build/g2/slot-peaks.txt (largest process RSS 4.18 GB; bl3 2.9 GB cgroup).   (read by the verifier; 9893681)
+G1 IDENTITY    build/g1/: poller-fix-9d43829-id-full.log «REPLAY identical: 41039 mind rows» exit 0; id-lean.log «34481» exit 0; plant-lean.log «DIVERGED at seq 124: hash» exit 1; first_diff byte-identical on both + plants caught;
+               nonvacuous.out (a keyed work root per replay: manifest canvas_index == its ledger's, last_seq == the tape's last seq; full 12,867 / 38,173, lean 11,464 / 34,443), nonvacuous.plant.out CAUGHT.
+G6 SUITES      build/g6/suites/ (the suites' own logs), build/g6/g6_read.out: genome 713 OK; tools 384 OK (skipped=25 in a clean tree; 0 skips with the integrator's pools linked: g6p-tools.log); scene 368 OK; brain 770 OK;
+               creature 444 / 559 / 421 = 1424 (= 1390 + 34): parts 1 and 3 OK; PART 2 FAILED with ONE wall-clock test (test_gene_values ... test_declared_run_tape2_moves_the_directory, 2 != 3), LOAD-SUSPECT:
+               its genome declares neither EXAM nor SIT (no poller runs), 12 of 12 pass on base and fix at the same load (build/g6/part2-flaky-probe.txt).   RE-RUN OF PART 2 PENDING (the seat's SEAT-HOLD).
+G7 LAUNCH READ records/g7_launch_read.txt: the one-liner for the seat's pre-flight (OK = SNAPSHOT.json carries canvas_index equal to ledger.json's; tested on both manifest formats).
+PART B (the bench; READINGS, never a gate) lives on branch cost-profile-1003: tools/cost/poller_bench.py (the run), poller_bench_read.py (B1-B5), poller_bench_run.py (the driver), tests/tools/test_poller_bench.py + test_poller_bench_run.py
+               (RED then GREEN, 36 tests), records under docs/organism/days/poller/records/bench/ there; the ck1 real-data smoke of all four arms is in bench/smoke-ck1/. The 60-run bench is PENDING (the seat's SEAT-HOLD).
+
+TO REPEAT (from /data/dev/genome-wt-poller-1003, each heavy job through /data/dev/swarm/bin/slot):
+  G3  SLOT_MEM=1G slot <lane> t -- env PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python3 -B -u -m unittest tests.creature.test_poller_cursor
+  G5  SLOT_MEM=1G slot <lane> m -- env PYTHONPATH=. python3 -B docs/organism/days/poller/records/mutate_poller.py --out <prefix>      (a clean tree)
+  G4  python3 -B docs/organism/days/poller/records/stand_in_sweep.py [--plant];  python3 -B docs/organism/days/poller/records/reference_check.py [--plant]
+  G2  overlays: git worktree add --detach <dir> 9f19879 (and d2fe75b), git apply --check + git apply records/build/fix.patch; then
+      SLOT_MEM=6G slot <lane> g2 -- python3 -B docs/organism/days/poller/records/g2_run.py --out <dir> --work <scratch> [--only ck1,final|--skip-bl3];  python3 -B records/g2_combine.py --in <g2.jsonl> ... --out <prefix>
+  G1  bash /data/dev/swarm/2026-10-03/int/landing_gate.sh replays <clean worktree at the fix sha> <label>;  python3 -B records/g1_nonvacuous.py --label <label> [--plant]
+  G6  bash /data/dev/swarm/2026-10-03/int/split_suite.sh <tree> creature <prefix> 1424 'test_[a-f]*.py' 'test_[g-r]*.py' 'test_[s-z]*.py' (SLOT_MEM=10G; 12G for part 2); one_suite.sh for genome/tools/scene/brain;  python3 -B records/g6_read.py --dir <suites dir>
