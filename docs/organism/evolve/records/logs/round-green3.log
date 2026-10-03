@@ -1,0 +1,24 @@
+test_a_confirmation_that_reads_no_evidence_refuses_and_clears (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_a_confirmation_that_reads_no_evidence_refuses_and_clears) ... ok
+test_a_first_improved_waits_and_is_not_a_pass (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_a_first_improved_waits_and_is_not_a_pass) ... ok
+test_a_pending_from_an_older_epoch_is_dropped_with_a_note (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_a_pending_from_an_older_epoch_is_dropped_with_a_note) ... ok
+test_a_proposal_without_a_gate_is_untouched_and_so_is_the_pending (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_a_proposal_without_a_gate_is_untouched_and_so_is_the_pending) ... ok
+test_an_overlapping_confirmation_keeps_the_pending (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_an_overlapping_confirmation_keeps_the_pending) ... ok
+test_improved_twice_on_disjoint_slices_passes_and_clears_the_pending (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_improved_twice_on_disjoint_slices_passes_and_clears_the_pending) ... ok
+test_no_evidence_or_regressed_leaves_no_pending (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_no_evidence_or_regressed_leaves_no_pending) ... ok
+test_no_pending_means_no_forced_mutation (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_no_pending_means_no_forced_mutation) ... ok
+test_grade_twin_records_the_cpu_seconds_and_the_machine_beside_the_wall (tests.tools.test_evolve_cal_round.TestGradeTwinCost.test_grade_twin_records_the_cpu_seconds_and_the_machine_beside_the_wall) ... ok
+test_a_calibrated_round_carries_gate_and_not_gradable_and_never_passes_by_itself (tests.tools.test_evolve_cal_round.TestRound.test_a_calibrated_round_carries_gate_and_not_gradable_and_never_passes_by_itself) ... ok
+test_a_legacy_round_keeps_its_vocabulary_and_gains_the_cost_fields (tests.tools.test_evolve_cal_round.TestRound.test_a_legacy_round_keeps_its_vocabulary_and_gains_the_cost_fields) ... ok
+test_a_not_gradable_round_has_no_gate (tests.tools.test_evolve_cal_round.TestRound.test_a_not_gradable_round_has_no_gate) ... ok
+test_an_unforced_round_draws_through_the_redraw (tests.tools.test_evolve_cal_round.TestRound.test_an_unforced_round_draws_through_the_redraw) ... ok
+test_the_cost_regression_reads_cpu_not_wall (tests.tools.test_evolve_cal_round.TestRound.test_the_cost_regression_reads_cpu_not_wall) ... ok
+test_the_gate_reads_incumbent_first_and_delta_is_mutant_minus_incumbent (tests.tools.test_evolve_cal_round.TestRound.test_the_gate_reads_incumbent_first_and_delta_is_mutant_minus_incumbent) ... ok
+test_the_twins_cpu_seconds_come_from_process_time_around_each_twin (tests.tools.test_evolve_cal_round.TestRound.test_the_twins_cpu_seconds_come_from_process_time_around_each_twin) ... ok
+test_a_good_bands_file_is_named_in_the_workers_first_line (tests.tools.test_evolve_cal_round.TestWorkerBandsFlag.test_a_good_bands_file_is_named_in_the_workers_first_line) ... ok
+test_a_malformed_bands_file_stops_the_worker_before_it_builds_a_shadow (tests.tools.test_evolve_cal_round.TestWorkerBandsFlag.test_a_malformed_bands_file_stops_the_worker_before_it_builds_a_shadow) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 37.127s
+
+OK
+scope memory.peak 633397248 bytes

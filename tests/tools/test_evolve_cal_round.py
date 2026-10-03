@@ -188,7 +188,10 @@ class TestRound(_Life):
     def test_an_unforced_round_draws_through_the_redraw(self) -> None:
         inc_text = (self.cps / "1" / "GENOME.genome").read_text()
         fake = (apply_mutation(inc_text, "KWTA.k", 7), "KWTA.k", 7, 3)
-        with unittest.mock.patch.object(ev, "mutate_distinct", return_value=fake) as m:
+        # both proposers are patched to the same KWTA 7: a mutant that bypasses mutate_distinct must fail the call-count assertion QUICKLY, not run a real
+        # random mutation (the sweep's first run of that mutant ran 41 minutes before it was killed)
+        with unittest.mock.patch.object(ev, "mutate_distinct", return_value=fake) as m, \
+                unittest.mock.patch.object(ev, "mutate_genome_text", return_value=fake[:3]):
             p = self.judge()
         self.assertEqual(m.call_count, 1)
         self.assertEqual((p["gene"], p["value"]), ("KWTA.k", 7))

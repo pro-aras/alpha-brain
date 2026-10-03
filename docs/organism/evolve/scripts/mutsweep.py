@@ -8,7 +8,7 @@ usage: PYTHONPATH=. python3 -B docs/organism/evolve/scripts/mutsweep.py --tree <
 A temp tree is built next to the real one: `tools/` is a real COPY (the mutated file lives there), every other top-level entry is a
 symlink to the real tree, so `import tools.…` resolves to the copy and nothing in the worktree is ever written. The BASELINE (no
 mutant) must pass first. Each mutant is `{name, old, new, expect}`: `old` must occur EXACTLY ONCE in the module (a mutant that
-changes nothing is refused), `expect` is a substring of the test name that must be among the failing tests. Exit 0 iff the baseline
+changes nothing is refused), `expect` is a substring of the test name that must be among the failing tests; an optional `tests` (a space-separated list of test ids) runs ONLY those tests for that mutant (the baseline still runs the whole module list), an optional `timeout` (seconds, default 1200) kills a runaway run, which reads exit 124. Exit 0 iff the baseline
 passed and every mutant was CAUGHT by its named test; the table is printed and written to <out>/mutsweep.json.
 """
 from __future__ import annotations
@@ -37,13 +37,19 @@ def build_tree(real: Path, dest: Path) -> None:
     (dest / "scratch" / "tmp").mkdir(parents=True)
 
 
-def run_tests(tree: Path, tests: str, log: Path) -> tuple[int, list[str]]:
+def run_tests(tree: Path, tests: str, log: Path, timeout: float = 1200.0) -> tuple[int, list[str]]:
+    """Run the named test modules in the tree; a run that exceeds `timeout` seconds is KILLED and reads exit 124 (a hang is a failure, never a pass)."""
     env = dict(os.environ, PYTHONPATH=".", OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1", TMPDIR=str(tree / "scratch" / "tmp"))
     with log.open("w") as f:
-        p = subprocess.run([sys.executable, "-B", "-u", "-m", "unittest", "-v", *tests.split()], cwd=tree, env=env, stdout=f, stderr=subprocess.STDOUT)
+        try:
+            rc = subprocess.run([sys.executable, "-B", "-u", "-m", "unittest", "-v", *tests.split()], cwd=tree, env=env, stdout=f, stderr=subprocess.STDOUT,
+                                timeout=timeout).returncode
+        except subprocess.TimeoutExpired:
+            rc = 124
+            f.write(f"\nMUTSWEEP: TIMEOUT after {timeout:.0f} s — the run was killed\n")
     text = log.read_text(errors="replace")
     failing = sorted(set(re.findall(r"^(?:FAIL|ERROR): (\S+)", text, re.MULTILINE)))
-    return p.returncode, failing
+    return rc, failing
 
 
 def main(argv=None) -> int:
@@ -84,7 +90,7 @@ def main(argv=None) -> int:
             tree = work / m["name"]
             build_tree(real, tree)
             (tree / a.module).write_text(mutated)
-            rc, failing = run_tests(tree, a.tests, out / f"{m['name']}.log")
+            rc, failing = run_tests(tree, m.get("tests", a.tests), out / f"{m['name']}.log", timeout=float(m.get("timeout", 1200)))
             caught = rc != 0
             named = any(m["expect"] in t for t in failing)
             status = "CAUGHT-BY-NAMED" if (caught and named) else ("CAUGHT-OTHER" if caught else "SURVIVED")
