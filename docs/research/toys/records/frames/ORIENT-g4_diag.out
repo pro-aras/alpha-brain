@@ -1,0 +1,11 @@
+train words 3892 V 15 budget 2V = 30 possible pairs of V words: 105
+seed  1: plant edge NEVER MADE; state None c None; edges live 30, consolidated 1; refused 0, replaced 3247, realised 3285, offered 6409
+seed  2: plant edge NEVER MADE; state None c None; edges live 30, consolidated 5; refused 0, replaced 3251, realised 3290, offered 6541
+seed  3: plant edge NEVER MADE; state None c None; edges live 30, consolidated 2; refused 0, replaced 3276, realised 3315, offered 6466
+seed  4: plant edge MADE at word 22; state consolidated c 180; edges live 30, consolidated 2; refused 0, replaced 3125, realised 3162, offered 6456
+seed  5: plant edge MADE at word 22; state consolidated c 180; edges live 30, consolidated 4; refused 0, replaced 3255, realised 3295, offered 6581
+seed  6: plant edge MADE at word 44; state consolidated c 179; edges live 30, consolidated 5; refused 0, replaced 3112, realised 3149, offered 6325
+seed  7: plant edge NEVER MADE; state None c None; edges live 30, consolidated 1; refused 0, replaced 3140, realised 3180, offered 6403
+seed  8: plant edge MADE at word 22; state consolidated c 180; edges live 30, consolidated 4; refused 0, replaced 3105, realised 3146, offered 6235
+seed  9: plant edge MADE at word 22; state consolidated c 180; edges live 30, consolidated 6; refused 0, replaced 3150, realised 3189, offered 6451
+seed 10: plant edge MADE at word 22; state consolidated c 180; edges live 30, consolidated 3; refused 0, replaced 3007, realised 3045, offered 6044
