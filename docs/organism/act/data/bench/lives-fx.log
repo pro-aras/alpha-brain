@@ -1,0 +1,10 @@
+  R-NULL    lock-pass 960: 1.00, 4920: 1.00 · single-act flag 0.00, 0.00 · no-op share median 0.574 (<=0.25: 0.00) · 
+  R-3       lock-pass 960: 1.00, 4920: 1.00 · single-act flag 0.00, 0.00 · no-op share median 0.000 (<=0.25: 1.00) · 
+  P-OLD     lock-pass 960: 0.00, 4920: 0.00 · single-act flag 1.00, 1.00 · no-op share median 0.061 (<=0.25: 0.86) · 
+  A-VAL     lock-pass 960: 1.00, 4920: 1.00 · single-act flag 0.00, 0.00 · no-op share median 0.548 (<=0.25: 0.00) · 
+  A-RATE    lock-pass 960: 1.00, 4920: 1.00 · single-act flag 0.00, 0.00 · no-op share median 0.424 (<=0.25: 0.00) · 
+  C-SCR     lock-pass 960: 0.92, 4920: 0.48 · single-act flag 0.00, 0.00 · no-op share median 0.058 (<=0.25: 1.00) · M4a>=.95 1.00 M4b>=.95 0.80 latency {'lives_with_it': 50, 'median': 169.5}
+  A-BOTH    lock-pass 960: 0.34, 4920: 0.10 · single-act flag 0.00, 0.02 · no-op share median 0.058 (<=0.25: 1.00) · 
+  K-ARGMAX  lock-pass 960: 0.00, 4920: 0.00 · single-act flag 0.00, 0.00 · no-op share median 0.054 (<=0.25: 1.00) · 
+  P-DEAL    lock-pass 960: 1.00, 4920: 1.00 · single-act flag 0.00, 0.00 · no-op share median 0.948 (<=0.25: 0.00) · M4a>=.95 0.00 M4b>=.95 0.00 latency {'lives_with_it': 0, 'median': None}
+[lives-fx] wrote scratch/lives-fx.json

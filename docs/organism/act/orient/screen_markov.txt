@@ -1,0 +1,28 @@
+world model: change rates {'left': 1.0, 'right': 1.0, 'forward': 0.637, 'pickup': 0.09, 'drop': 0.071, 'toggle': 0.027, 'done': 0.0} floor 0.1
+IDEAL stationary mixture (R-SCR): left=right=forward=0.3143, no-op total 0.0571
+PART 1 — fraction of CHOICES judged LIVE, one act in isolation (live act: want ~1; no-op: want ~0)
+  n     t   k | fwd=0.45 fwd=0.50 fwd=0.55 fwd=0.60 fwd=0.64 fwd=0.70 |  noop=0.05 noop=0.09 noop=0.12
+ 10  0.15   2 |   0.6732   0.8029   0.9056   0.9618   0.9839   0.9964 |     0.0054    0.0174    0.0306
+ 10  0.20   2 |   0.6590   0.7996   0.9134   0.9711   0.9792   0.9973 |     0.0064    0.0167    0.0296
+ 10  0.25   3 |   0.2881   0.4446   0.6462   0.7853   0.8859   0.9756 |     0.0010    0.0035    0.0085
+ 10  0.30   3 |   0.2859   0.4465   0.6261   0.8010   0.8950   0.9636 |     0.0009    0.0039    0.0066
+ 15  0.15   3 |   0.8181   0.9259   0.9772   0.9952   0.9985   1.0000 |     0.0020    0.0105    0.0222
+ 15  0.20   3 |   0.8249   0.9231   0.9857   0.9962   0.9973   0.9997 |     0.0025    0.0101    0.0233
+ 15  0.25   4 |   0.4929   0.6870   0.8813   0.9531   0.9838   0.9965 |     0.0004    0.0019    0.0071
+ 15  0.30   5 |   0.2344   0.4427   0.6445   0.8407   0.9257   0.9847 |     0.0002    0.0008    0.0015
+ 20  0.15   3 |   0.9776   0.9972   1.0000   1.0000   0.9999   1.0000 |     0.0038    0.0208    0.0406
+ 20  0.20   4 |   0.9109   0.9716   0.9904   0.9984   0.9990   1.0000 |     0.0010    0.0049    0.0190
+ 20  0.25   5 |   0.6939   0.8983   0.9670   0.9929   0.9991   1.0000 |     0.0004    0.0012    0.0060
+ 20  0.30   6 |   0.4579   0.6759   0.8717   0.9617   0.9942   0.9997 |     0.0002    0.0007    0.0019
+ 30  0.15   5 |   0.9944   0.9990   1.0000   1.0000   1.0000   1.0000 |     0.0009    0.0105    0.0232
+ 30  0.20   6 |   0.9841   0.9969   0.9986   1.0000   1.0000   1.0000 |     0.0007    0.0042    0.0099
+ 30  0.25   8 |   0.8043   0.9526   0.9957   0.9981   1.0000   1.0000 |     0.0003    0.0004    0.0018
+ 30  0.30   9 |   0.5655   0.8400   0.9726   0.9955   1.0000   1.0000 |     0.0003    0.0004    0.0007
+PART 2 — the full chain (acts 300..999 read; 800 lives)
+{"n": 10, "t": 0.3, "note": "first draft", "forward_rate": 0.637, "startup_mean": 85.1, "startup_p99": 109.00999999999999, "share": {"left": 0.3312, "right": 0.331, "forward": 0.2795, "pickup": 0.0147, "drop": 0.0149, "toggle": 0.0144, "done": 0.0143}, "useful_share": 0.9417, "noop_share": 0.0583, "forward_dead_time_fraction": 0.1137, "M4a_mean_noops_dead": 0.9988, "set_exact_fraction": 0.8817}
+{"n": 20, "t": 0.3, "note": "first draft's n=20 at forward 0.55", "forward_rate": 0.55, "startup_mean": 161.0, "startup_p99": 193.01, "share": {"left": 0.3289, "right": 0.3294, "forward": 0.2845, "pickup": 0.0145, "drop": 0.0144, "toggle": 0.0142, "done": 0.0142}, "useful_share": 0.9428, "noop_share": 0.0572, "forward_dead_time_fraction": 0.0986, "M4a_mean_noops_dead": 0.9998, "set_exact_fraction": 0.9008}
+{"n": 20, "t": 0.2, "note": "", "forward_rate": 0.637, "startup_mean": 161.5, "startup_p99": 196.01, "share": {"left": 0.3132, "right": 0.3145, "forward": 0.3132, "pickup": 0.0154, "drop": 0.015, "toggle": 0.0142, "done": 0.0145}, "useful_share": 0.9409, "noop_share": 0.0591, "forward_dead_time_fraction": 0.0001, "M4a_mean_noops_dead": 0.9977, "set_exact_fraction": 0.9907}
+{"n": 20, "t": 0.2, "note": "", "forward_rate": 0.55, "startup_mean": 161.5, "startup_p99": 195.01, "share": {"left": 0.3143, "right": 0.3157, "forward": 0.3109, "pickup": 0.0154, "drop": 0.015, "toggle": 0.0142, "done": 0.0145}, "useful_share": 0.9409, "noop_share": 0.0591, "forward_dead_time_fraction": 0.0077, "M4a_mean_noops_dead": 0.9977, "set_exact_fraction": 0.9831}
+{"n": 20, "t": 0.2, "note": "", "forward_rate": 0.5, "startup_mean": 161.5, "startup_p99": 195.01, "share": {"left": 0.3167, "right": 0.3184, "forward": 0.3058, "pickup": 0.0154, "drop": 0.015, "toggle": 0.0142, "done": 0.0145}, "useful_share": 0.9409, "noop_share": 0.0591, "forward_dead_time_fraction": 0.0245, "M4a_mean_noops_dead": 0.9977, "set_exact_fraction": 0.9663}
+{"n": 15, "t": 0.2, "note": "", "forward_rate": 0.55, "startup_mean": 123.6, "startup_p99": 151.01, "share": {"left": 0.3162, "right": 0.3169, "forward": 0.306, "pickup": 0.0164, "drop": 0.0155, "toggle": 0.0144, "done": 0.0145}, "useful_share": 0.9391, "noop_share": 0.0609, "forward_dead_time_fraction": 0.0264, "M4a_mean_noops_dead": 0.996, "set_exact_fraction": 0.9582}
+{"n": 30, "t": 0.2, "note": "", "forward_rate": 0.55, "startup_mean": 235.8, "startup_p99": 275.0, "share": {"left": 0.314, "right": 0.3137, "forward": 0.3142, "pickup": 0.015, "drop": 0.0147, "toggle": 0.0141, "done": 0.0143}, "useful_share": 0.9419, "noop_share": 0.0581, "forward_dead_time_fraction": 0.0, "M4a_mean_noops_dead": 0.9988, "set_exact_fraction": 0.9954}

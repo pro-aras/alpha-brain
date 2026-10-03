@@ -1,0 +1,4013 @@
+{
+ "env": "BabyAI-GoToLocal-v0",
+ "episodes": 1000,
+ "seeds": [
+  20260923,
+  21260923,
+  22260923,
+  23260923,
+  24260923,
+  25260923,
+  26260923,
+  27260923,
+  28260923,
+  29260923,
+  30260923,
+  31260923
+ ],
+ "max_steps": 64,
+ "lag": "one step (the life's)",
+ "arms": {
+  "i": {
+   "label": "(i) OLD chooser \u2014 mean |residual| of the last 10, 90 % argmax, 10 % uniform",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 197,
+     "success_rate": 0.197,
+     "mean_steps": 56.116,
+     "mean_reward": 0.13056874999999998,
+     "truncated": 807,
+     "steps": 56116,
+     "last100": {
+      "right": 82,
+      "forward": 12,
+      "toggle": 3,
+      "drop": 2,
+      "pickup": 1
+     },
+     "last100_top": [
+      "right",
+      82
+     ],
+     "locked_blocks": [
+      484,
+      561
+     ],
+     "first_success_episode": 5,
+     "explored_share": 0.10198335620222036,
+     "cap_cut_reads": 0,
+     "wall_s": 9.4,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 196,
+     "success_rate": 0.196,
+     "mean_steps": 55.766,
+     "mean_reward": 0.135390625,
+     "truncated": 808,
+     "steps": 55766,
+     "last100": {
+      "forward": 85,
+      "left": 12,
+      "done": 2,
+      "pickup": 1
+     },
+     "last100_top": [
+      "forward",
+      85
+     ],
+     "locked_blocks": [
+      427,
+      557
+     ],
+     "first_success_episode": 5,
+     "explored_share": 0.09934190471067118,
+     "cap_cut_reads": 0,
+     "wall_s": 9.29,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 174,
+     "success_rate": 0.174,
+     "mean_steps": 56.968,
+     "mean_reward": 0.11628749999999999,
+     "truncated": 828,
+     "steps": 56968,
+     "last100": {
+      "left": 90,
+      "forward": 2,
+      "toggle": 2,
+      "right": 2,
+      "done": 2,
+      "pickup": 1,
+      "drop": 1
+     },
+     "last100_top": [
+      "left",
+      90
+     ],
+     "locked_blocks": [
+      485,
+      569
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.09989643490319297,
+     "cap_cut_reads": 0,
+     "wall_s": 9.9,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 182,
+     "success_rate": 0.182,
+     "mean_steps": 56.77,
+     "mean_reward": 0.119871875,
+     "truncated": 822,
+     "steps": 56770,
+     "last100": {
+      "forward": 92,
+      "left": 2,
+      "drop": 2,
+      "done": 2,
+      "pickup": 1,
+      "right": 1
+     },
+     "last100_top": [
+      "forward",
+      92
+     ],
+     "locked_blocks": [
+      512,
+      567
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.10022722869070476,
+     "cap_cut_reads": 0,
+     "wall_s": 10.23,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 156,
+     "success_rate": 0.156,
+     "mean_steps": 57.945,
+     "mean_reward": 0.1007484375,
+     "truncated": 845,
+     "steps": 57945,
+     "last100": {
+      "right": 87,
+      "drop": 4,
+      "pickup": 3,
+      "toggle": 3,
+      "done": 2,
+      "left": 1
+     },
+     "last100_top": [
+      "right",
+      87
+     ],
+     "locked_blocks": [
+      463,
+      579
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.09993787319228246,
+     "cap_cut_reads": 0,
+     "wall_s": 10.38,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 205,
+     "success_rate": 0.205,
+     "mean_steps": 55.715,
+     "mean_reward": 0.1370078125,
+     "truncated": 796,
+     "steps": 55715,
+     "last100": {
+      "forward": 94,
+      "right": 2,
+      "drop": 1,
+      "done": 1,
+      "toggle": 1,
+      "pickup": 1
+     },
+     "last100_top": [
+      "forward",
+      94
+     ],
+     "locked_blocks": [
+      407,
+      557
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.10164046234474837,
+     "cap_cut_reads": 0,
+     "wall_s": 9.8,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 159,
+     "success_rate": 0.159,
+     "mean_steps": 57.956,
+     "mean_reward": 0.10089374999999999,
+     "truncated": 844,
+     "steps": 57956,
+     "last100": {
+      "forward": 96,
+      "drop": 2,
+      "right": 1,
+      "pickup": 1
+     },
+     "last100_top": [
+      "forward",
+      96
+     ],
+     "locked_blocks": [
+      477,
+      579
+     ],
+     "first_success_episode": 14,
+     "explored_share": 0.09912521352036854,
+     "cap_cut_reads": 0,
+     "wall_s": 9.51,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 187,
+     "success_rate": 0.187,
+     "mean_steps": 56.595,
+     "mean_reward": 0.1228328125,
+     "truncated": 818,
+     "steps": 56595,
+     "last100": {
+      "forward": 89,
+      "left": 4,
+      "done": 3,
+      "pickup": 2,
+      "toggle": 1,
+      "drop": 1
+     },
+     "last100_top": [
+      "forward",
+      89
+     ],
+     "locked_blocks": [
+      480,
+      565
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.10154427874761467,
+     "cap_cut_reads": 0,
+     "wall_s": 9.28,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 201,
+     "success_rate": 0.201,
+     "mean_steps": 56.566,
+     "mean_reward": 0.124640625,
+     "truncated": 801,
+     "steps": 56566,
+     "last100": {
+      "forward": 91,
+      "left": 4,
+      "right": 3,
+      "drop": 1,
+      "done": 1
+     },
+     "last100_top": [
+      "forward",
+      91
+     ],
+     "locked_blocks": [
+      434,
+      565
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.10065939505365319,
+     "cap_cut_reads": 12,
+     "wall_s": 9.53,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 180,
+     "success_rate": 0.18,
+     "mean_steps": 56.282,
+     "mean_reward": 0.126534375,
+     "truncated": 823,
+     "steps": 56282,
+     "last100": {
+      "forward": 92,
+      "drop": 2,
+      "pickup": 2,
+      "right": 1,
+      "toggle": 1,
+      "done": 1,
+      "left": 1
+     },
+     "last100_top": [
+      "forward",
+      92
+     ],
+     "locked_blocks": [
+      465,
+      562
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.10049215571309277,
+     "cap_cut_reads": 0,
+     "wall_s": 9.49,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 170,
+     "success_rate": 0.17,
+     "mean_steps": 56.902,
+     "mean_reward": 0.11681562499999999,
+     "truncated": 832,
+     "steps": 56902,
+     "last100": {
+      "left": 61,
+      "forward": 37,
+      "right": 2
+     },
+     "last100_top": [
+      "left",
+      61
+     ],
+     "locked_blocks": [
+      506,
+      569
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.10301741560198935,
+     "cap_cut_reads": 0,
+     "wall_s": 9.28,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 206,
+     "success_rate": 0.206,
+     "mean_steps": 55.829,
+     "mean_reward": 0.1355046875,
+     "truncated": 796,
+     "steps": 55829,
+     "last100": {
+      "forward": 89,
+      "done": 4,
+      "pickup": 3,
+      "toggle": 2,
+      "right": 2
+     },
+     "last100_top": [
+      "forward",
+      89
+     ],
+     "locked_blocks": [
+      411,
+      558
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.09940891993551854,
+     "cap_cut_reads": 0,
+     "wall_s": 9.51,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.18441666666666667,
+   "success_sd": 0.017212354618562548,
+   "pooled_success": 0.18441666666666667,
+   "pooled_se": 0.0035403290774802068,
+   "mean_steps": 56.6175,
+   "mean_reward": 0.12225807291666667
+  },
+  "ii": {
+   "label": "(ii) uniform over the 7 acts (the worker's own schedule)",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 274,
+     "success_rate": 0.274,
+     "mean_steps": 53.99,
+     "mean_reward": 0.168165625,
+     "truncated": 727,
+     "steps": 53990,
+     "last100": {
+      "done": 17,
+      "pickup": 16,
+      "right": 16,
+      "left": 15,
+      "drop": 14,
+      "forward": 12,
+      "toggle": 10
+     },
+     "last100_top": [
+      "done",
+      17
+     ],
+     "locked_blocks": [
+      0,
+      539
+     ],
+     "first_success_episode": 8,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 9.1,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 293,
+     "success_rate": 0.293,
+     "mean_steps": 53.667,
+     "mean_reward": 0.1746078125,
+     "truncated": 709,
+     "steps": 53667,
+     "last100": {
+      "left": 21,
+      "forward": 15,
+      "pickup": 14,
+      "toggle": 13,
+      "drop": 13,
+      "right": 13,
+      "done": 11
+     },
+     "last100_top": [
+      "left",
+      21
+     ],
+     "locked_blocks": [
+      0,
+      536
+     ],
+     "first_success_episode": 10,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 9.95,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 267,
+     "success_rate": 0.267,
+     "mean_steps": 54.71,
+     "mean_reward": 0.15734062499999998,
+     "truncated": 735,
+     "steps": 54710,
+     "last100": {
+      "forward": 23,
+      "drop": 18,
+      "toggle": 16,
+      "left": 13,
+      "done": 12,
+      "pickup": 11,
+      "right": 7
+     },
+     "last100_top": [
+      "forward",
+      23
+     ],
+     "locked_blocks": [
+      0,
+      547
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.93,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 251,
+     "success_rate": 0.251,
+     "mean_steps": 55.139,
+     "mean_reward": 0.14970781249999998,
+     "truncated": 753,
+     "steps": 55139,
+     "last100": {
+      "drop": 22,
+      "done": 14,
+      "right": 14,
+      "forward": 13,
+      "toggle": 13,
+      "pickup": 12,
+      "left": 12
+     },
+     "last100_top": [
+      "drop",
+      22
+     ],
+     "locked_blocks": [
+      0,
+      551
+     ],
+     "first_success_episode": 7,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.79,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 264,
+     "success_rate": 0.264,
+     "mean_steps": 54.286,
+     "mean_reward": 0.16300312499999997,
+     "truncated": 739,
+     "steps": 54286,
+     "last100": {
+      "drop": 19,
+      "forward": 18,
+      "pickup": 13,
+      "left": 13,
+      "done": 13,
+      "right": 12,
+      "toggle": 12
+     },
+     "last100_top": [
+      "drop",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      542
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.67,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 265,
+     "success_rate": 0.265,
+     "mean_steps": 54.375,
+     "mean_reward": 0.1618515625,
+     "truncated": 736,
+     "steps": 54375,
+     "last100": {
+      "left": 19,
+      "right": 19,
+      "drop": 15,
+      "toggle": 14,
+      "done": 13,
+      "forward": 10,
+      "pickup": 10
+     },
+     "last100_top": [
+      "left",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      543
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.83,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 279,
+     "success_rate": 0.279,
+     "mean_steps": 54.26,
+     "mean_reward": 0.16486875,
+     "truncated": 725,
+     "steps": 54260,
+     "last100": {
+      "done": 16,
+      "left": 16,
+      "toggle": 16,
+      "drop": 15,
+      "forward": 15,
+      "right": 14,
+      "pickup": 8
+     },
+     "last100_top": [
+      "done",
+      16
+     ],
+     "locked_blocks": [
+      0,
+      542
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.77,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 264,
+     "success_rate": 0.264,
+     "mean_steps": 54.826,
+     "mean_reward": 0.155409375,
+     "truncated": 739,
+     "steps": 54826,
+     "last100": {
+      "left": 20,
+      "drop": 20,
+      "pickup": 17,
+      "toggle": 14,
+      "right": 13,
+      "forward": 9,
+      "done": 7
+     },
+     "last100_top": [
+      "left",
+      20
+     ],
+     "locked_blocks": [
+      0,
+      548
+     ],
+     "first_success_episode": 12,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 9.19,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 256,
+     "success_rate": 0.256,
+     "mean_steps": 54.752,
+     "mean_reward": 0.15565,
+     "truncated": 746,
+     "steps": 54752,
+     "last100": {
+      "pickup": 19,
+      "forward": 18,
+      "left": 17,
+      "toggle": 14,
+      "right": 11,
+      "drop": 11,
+      "done": 10
+     },
+     "last100_top": [
+      "pickup",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      547
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.99,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 304,
+     "success_rate": 0.304,
+     "mean_steps": 52.801,
+     "mean_reward": 0.1878859375,
+     "truncated": 697,
+     "steps": 52801,
+     "last100": {
+      "toggle": 20,
+      "forward": 16,
+      "right": 16,
+      "left": 15,
+      "drop": 15,
+      "done": 12,
+      "pickup": 6
+     },
+     "last100_top": [
+      "toggle",
+      20
+     ],
+     "locked_blocks": [
+      0,
+      528
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.84,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 279,
+     "success_rate": 0.279,
+     "mean_steps": 53.811,
+     "mean_reward": 0.1711828125,
+     "truncated": 726,
+     "steps": 53811,
+     "last100": {
+      "forward": 19,
+      "toggle": 17,
+      "right": 15,
+      "pickup": 14,
+      "left": 14,
+      "done": 13,
+      "drop": 8
+     },
+     "last100_top": [
+      "forward",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      538
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.74,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 268,
+     "success_rate": 0.268,
+     "mean_steps": 54.714,
+     "mean_reward": 0.157384375,
+     "truncated": 734,
+     "steps": 54714,
+     "last100": {
+      "forward": 22,
+      "pickup": 15,
+      "right": 14,
+      "toggle": 13,
+      "left": 13,
+      "done": 12,
+      "drop": 11
+     },
+     "last100_top": [
+      "forward",
+      22
+     ],
+     "locked_blocks": [
+      0,
+      547
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.71,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.272,
+   "success_sd": 0.01502119714391511,
+   "pooled_success": 0.272,
+   "pooled_se": 0.004062183320990491,
+   "mean_steps": 54.27758333333333,
+   "mean_reward": 0.163921484375
+  },
+  "iii": {
+   "label": "(iii) uniform over {left, right, forward}",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 419,
+     "success_rate": 0.419,
+     "mean_steps": 47.112,
+     "mean_reward": 0.2793875,
+     "truncated": 584,
+     "steps": 47112,
+     "last100": {
+      "forward": 34,
+      "left": 33,
+      "right": 33
+     },
+     "last100_top": [
+      "forward",
+      34
+     ],
+     "locked_blocks": [
+      0,
+      471
+     ],
+     "first_success_episode": 5,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.57,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 458,
+     "success_rate": 0.458,
+     "mean_steps": 45.647,
+     "mean_reward": 0.30388906250000003,
+     "truncated": 542,
+     "steps": 45647,
+     "last100": {
+      "forward": 38,
+      "right": 31,
+      "left": 31
+     },
+     "last100_top": [
+      "forward",
+      38
+     ],
+     "locked_blocks": [
+      0,
+      456
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.33,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 409,
+     "success_rate": 0.409,
+     "mean_steps": 47.931,
+     "mean_reward": 0.2668703125,
+     "truncated": 595,
+     "steps": 47931,
+     "last100": {
+      "left": 37,
+      "right": 32,
+      "forward": 31
+     },
+     "last100_top": [
+      "left",
+      37
+     ],
+     "locked_blocks": [
+      0,
+      479
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.8,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 433,
+     "success_rate": 0.433,
+     "mean_steps": 47.067,
+     "mean_reward": 0.28142031250000005,
+     "truncated": 568,
+     "steps": 47067,
+     "last100": {
+      "forward": 38,
+      "left": 34,
+      "right": 28
+     },
+     "last100_top": [
+      "forward",
+      38
+     ],
+     "locked_blocks": [
+      0,
+      470
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.48,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 434,
+     "success_rate": 0.434,
+     "mean_steps": 46.814,
+     "mean_reward": 0.285078125,
+     "truncated": 572,
+     "steps": 46814,
+     "last100": {
+      "left": 38,
+      "right": 37,
+      "forward": 25
+     },
+     "last100_top": [
+      "left",
+      38
+     ],
+     "locked_blocks": [
+      0,
+      468
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.43,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 456,
+     "success_rate": 0.456,
+     "mean_steps": 45.952,
+     "mean_reward": 0.2994,
+     "truncated": 547,
+     "steps": 45952,
+     "last100": {
+      "forward": 35,
+      "left": 33,
+      "right": 32
+     },
+     "last100_top": [
+      "forward",
+      35
+     ],
+     "locked_blocks": [
+      0,
+      459
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.62,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 429,
+     "success_rate": 0.429,
+     "mean_steps": 46.798,
+     "mean_reward": 0.28480312500000005,
+     "truncated": 579,
+     "steps": 46798,
+     "last100": {
+      "left": 35,
+      "right": 34,
+      "forward": 31
+     },
+     "last100_top": [
+      "left",
+      35
+     ],
+     "locked_blocks": [
+      0,
+      467
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.47,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 419,
+     "success_rate": 0.419,
+     "mean_steps": 47.648,
+     "mean_reward": 0.27185000000000004,
+     "truncated": 586,
+     "steps": 47648,
+     "last100": {
+      "forward": 36,
+      "right": 34,
+      "left": 30
+     },
+     "last100_top": [
+      "forward",
+      36
+     ],
+     "locked_blocks": [
+      0,
+      476
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.66,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 433,
+     "success_rate": 0.433,
+     "mean_steps": 46.862,
+     "mean_reward": 0.28430312500000005,
+     "truncated": 568,
+     "steps": 46862,
+     "last100": {
+      "left": 44,
+      "right": 31,
+      "forward": 25
+     },
+     "last100_top": [
+      "left",
+      44
+     ],
+     "locked_blocks": [
+      0,
+      468
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.58,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 450,
+     "success_rate": 0.45,
+     "mean_steps": 45.835,
+     "mean_reward": 0.3004453125,
+     "truncated": 554,
+     "steps": 45835,
+     "last100": {
+      "forward": 45,
+      "right": 28,
+      "left": 27
+     },
+     "last100_top": [
+      "forward",
+      45
+     ],
+     "locked_blocks": [
+      0,
+      458
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.46,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 439,
+     "success_rate": 0.439,
+     "mean_steps": 46.684,
+     "mean_reward": 0.28740625,
+     "truncated": 565,
+     "steps": 46684,
+     "last100": {
+      "right": 39,
+      "left": 32,
+      "forward": 29
+     },
+     "last100_top": [
+      "right",
+      39
+     ],
+     "locked_blocks": [
+      0,
+      466
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.47,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 428,
+     "success_rate": 0.428,
+     "mean_steps": 47.459,
+     "mean_reward": 0.27540781249999996,
+     "truncated": 577,
+     "steps": 47459,
+     "last100": {
+      "forward": 35,
+      "left": 33,
+      "right": 32
+     },
+     "last100_top": [
+      "forward",
+      35
+     ],
+     "locked_blocks": [
+      0,
+      474
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.63,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.4339166666666667,
+   "success_sd": 0.015011863995056078,
+   "pooled_success": 0.4339166666666667,
+   "pooled_se": 0.0045243138803538994,
+   "mean_steps": 46.81741666666667,
+   "mean_reward": 0.2850217447916667
+  },
+  "iv-0.3": {
+   "label": "(iv) fixed: forward 0.3, left 0.35, right 0.35",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 403,
+     "success_rate": 0.403,
+     "mean_steps": 48.166,
+     "mean_reward": 0.262965625,
+     "truncated": 600,
+     "steps": 48166,
+     "last100": {
+      "right": 39,
+      "left": 37,
+      "forward": 24
+     },
+     "last100_top": [
+      "right",
+      39
+     ],
+     "locked_blocks": [
+      0,
+      481
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.61,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 464,
+     "success_rate": 0.464,
+     "mean_steps": 45.951,
+     "mean_reward": 0.3002140625,
+     "truncated": 539,
+     "steps": 45951,
+     "last100": {
+      "left": 42,
+      "right": 35,
+      "forward": 23
+     },
+     "last100_top": [
+      "left",
+      42
+     ],
+     "locked_blocks": [
+      0,
+      459
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.35,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 391,
+     "success_rate": 0.391,
+     "mean_steps": 48.834,
+     "mean_reward": 0.25237187499999997,
+     "truncated": 615,
+     "steps": 48834,
+     "last100": {
+      "right": 42,
+      "forward": 32,
+      "left": 26
+     },
+     "last100_top": [
+      "right",
+      42
+     ],
+     "locked_blocks": [
+      0,
+      488
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.92,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 421,
+     "success_rate": 0.421,
+     "mean_steps": 47.326,
+     "mean_reward": 0.276578125,
+     "truncated": 585,
+     "steps": 47326,
+     "last100": {
+      "right": 37,
+      "left": 32,
+      "forward": 31
+     },
+     "last100_top": [
+      "right",
+      37
+     ],
+     "locked_blocks": [
+      0,
+      473
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.1,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 406,
+     "success_rate": 0.406,
+     "mean_steps": 48.899,
+     "mean_reward": 0.2529578125,
+     "truncated": 598,
+     "steps": 48899,
+     "last100": {
+      "left": 35,
+      "forward": 34,
+      "right": 31
+     },
+     "last100_top": [
+      "left",
+      35
+     ],
+     "locked_blocks": [
+      0,
+      488
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.91,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 441,
+     "success_rate": 0.441,
+     "mean_steps": 46.393,
+     "mean_reward": 0.2916984375,
+     "truncated": 561,
+     "steps": 46393,
+     "last100": {
+      "left": 41,
+      "forward": 34,
+      "right": 25
+     },
+     "last100_top": [
+      "left",
+      41
+     ],
+     "locked_blocks": [
+      0,
+      463
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.92,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 425,
+     "success_rate": 0.425,
+     "mean_steps": 47.925,
+     "mean_reward": 0.2685546875,
+     "truncated": 579,
+     "steps": 47925,
+     "last100": {
+      "right": 39,
+      "forward": 33,
+      "left": 28
+     },
+     "last100_top": [
+      "right",
+      39
+     ],
+     "locked_blocks": [
+      0,
+      479
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.64,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 412,
+     "success_rate": 0.412,
+     "mean_steps": 47.47,
+     "mean_reward": 0.273653125,
+     "truncated": 592,
+     "steps": 47470,
+     "last100": {
+      "left": 37,
+      "forward": 33,
+      "right": 30
+     },
+     "last100_top": [
+      "left",
+      37
+     ],
+     "locked_blocks": [
+      0,
+      474
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.5,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 423,
+     "success_rate": 0.423,
+     "mean_steps": 47.423,
+     "mean_reward": 0.2754140625,
+     "truncated": 582,
+     "steps": 47423,
+     "last100": {
+      "right": 41,
+      "left": 35,
+      "forward": 24
+     },
+     "last100_top": [
+      "right",
+      41
+     ],
+     "locked_blocks": [
+      0,
+      474
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.47,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 405,
+     "success_rate": 0.405,
+     "mean_steps": 48.17,
+     "mean_reward": 0.263109375,
+     "truncated": 600,
+     "steps": 48170,
+     "last100": {
+      "right": 36,
+      "forward": 34,
+      "left": 30
+     },
+     "last100_top": [
+      "right",
+      36
+     ],
+     "locked_blocks": [
+      0,
+      481
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.63,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 387,
+     "success_rate": 0.387,
+     "mean_steps": 48.889,
+     "mean_reward": 0.2511984375,
+     "truncated": 614,
+     "steps": 48889,
+     "last100": {
+      "right": 40,
+      "forward": 32,
+      "left": 28
+     },
+     "last100_top": [
+      "right",
+      40
+     ],
+     "locked_blocks": [
+      0,
+      488
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.78,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 416,
+     "success_rate": 0.416,
+     "mean_steps": 47.641,
+     "mean_reward": 0.2716484375,
+     "truncated": 588,
+     "steps": 47641,
+     "last100": {
+      "right": 38,
+      "left": 37,
+      "forward": 25
+     },
+     "last100_top": [
+      "right",
+      38
+     ],
+     "locked_blocks": [
+      0,
+      476
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.67,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.41616666666666663,
+   "success_sd": 0.021225342200189644,
+   "pooled_success": 0.4161666666666667,
+   "pooled_se": 0.004499740476055464,
+   "mean_steps": 47.75725,
+   "mean_reward": 0.27003033854166664
+  },
+  "iv-0.5": {
+   "label": "(iv) fixed: forward 0.5, left 0.25, right 0.25",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 462,
+     "success_rate": 0.462,
+     "mean_steps": 46.312,
+     "mean_reward": 0.2949375,
+     "truncated": 542,
+     "steps": 46312,
+     "last100": {
+      "forward": 52,
+      "right": 29,
+      "left": 19
+     },
+     "last100_top": [
+      "forward",
+      52
+     ],
+     "locked_blocks": [
+      0,
+      463
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.66,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 497,
+     "success_rate": 0.497,
+     "mean_steps": 43.968,
+     "mean_reward": 0.3314,
+     "truncated": 505,
+     "steps": 43968,
+     "last100": {
+      "forward": 53,
+      "left": 26,
+      "right": 21
+     },
+     "last100_top": [
+      "forward",
+      53
+     ],
+     "locked_blocks": [
+      0,
+      439
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 6.93,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 506,
+     "success_rate": 0.506,
+     "mean_steps": 44.434,
+     "mean_reward": 0.325746875,
+     "truncated": 498,
+     "steps": 44434,
+     "last100": {
+      "forward": 55,
+      "left": 24,
+      "right": 21
+     },
+     "last100_top": [
+      "forward",
+      55
+     ],
+     "locked_blocks": [
+      0,
+      444
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.05,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 461,
+     "success_rate": 0.461,
+     "mean_steps": 46.036,
+     "mean_reward": 0.29871875,
+     "truncated": 540,
+     "steps": 46036,
+     "last100": {
+      "forward": 49,
+      "right": 27,
+      "left": 24
+     },
+     "last100_top": [
+      "forward",
+      49
+     ],
+     "locked_blocks": [
+      0,
+      460
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.39,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 478,
+     "success_rate": 0.478,
+     "mean_steps": 45.044,
+     "mean_reward": 0.31436875,
+     "truncated": 524,
+     "steps": 45044,
+     "last100": {
+      "forward": 46,
+      "left": 28,
+      "right": 26
+     },
+     "last100_top": [
+      "forward",
+      46
+     ],
+     "locked_blocks": [
+      0,
+      450
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.11,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 527,
+     "success_rate": 0.527,
+     "mean_steps": 43.578,
+     "mean_reward": 0.33988437499999996,
+     "truncated": 477,
+     "steps": 43578,
+     "last100": {
+      "forward": 55,
+      "left": 25,
+      "right": 20
+     },
+     "last100_top": [
+      "forward",
+      55
+     ],
+     "locked_blocks": [
+      0,
+      435
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 6.88,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 494,
+     "success_rate": 0.494,
+     "mean_steps": 45.145,
+     "mean_reward": 0.3145484375,
+     "truncated": 511,
+     "steps": 45145,
+     "last100": {
+      "forward": 54,
+      "left": 27,
+      "right": 19
+     },
+     "last100_top": [
+      "forward",
+      54
+     ],
+     "locked_blocks": [
+      0,
+      451
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.09,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 494,
+     "success_rate": 0.494,
+     "mean_steps": 44.683,
+     "mean_reward": 0.3210453125,
+     "truncated": 507,
+     "steps": 44683,
+     "last100": {
+      "forward": 54,
+      "right": 27,
+      "left": 19
+     },
+     "last100_top": [
+      "forward",
+      54
+     ],
+     "locked_blocks": [
+      0,
+      446
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.03,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 477,
+     "success_rate": 0.477,
+     "mean_steps": 44.816,
+     "mean_reward": 0.317475,
+     "truncated": 527,
+     "steps": 44816,
+     "last100": {
+      "forward": 53,
+      "right": 30,
+      "left": 17
+     },
+     "last100_top": [
+      "forward",
+      53
+     ],
+     "locked_blocks": [
+      0,
+      448
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.09,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 490,
+     "success_rate": 0.49,
+     "mean_steps": 44.663,
+     "mean_reward": 0.3209265625,
+     "truncated": 511,
+     "steps": 44663,
+     "last100": {
+      "forward": 45,
+      "left": 31,
+      "right": 24
+     },
+     "last100_top": [
+      "forward",
+      45
+     ],
+     "locked_blocks": [
+      0,
+      446
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.12,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 496,
+     "success_rate": 0.496,
+     "mean_steps": 44.326,
+     "mean_reward": 0.326265625,
+     "truncated": 507,
+     "steps": 44326,
+     "last100": {
+      "forward": 55,
+      "right": 23,
+      "left": 22
+     },
+     "last100_top": [
+      "forward",
+      55
+     ],
+     "locked_blocks": [
+      0,
+      443
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.11,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 472,
+     "success_rate": 0.472,
+     "mean_steps": 45.57,
+     "mean_reward": 0.306371875,
+     "truncated": 533,
+     "steps": 45570,
+     "last100": {
+      "forward": 51,
+      "right": 25,
+      "left": 24
+     },
+     "last100_top": [
+      "forward",
+      51
+     ],
+     "locked_blocks": [
+      0,
+      455
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.49,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.48783333333333334,
+   "success_sd": 0.018944096385913687,
+   "pooled_success": 0.48783333333333334,
+   "pooled_se": 0.004563003143236391,
+   "mean_steps": 44.88125,
+   "mean_reward": 0.31764075520833335
+  },
+  "iv-0.7": {
+   "label": "(iv) fixed: forward 0.7, left 0.15, right 0.15",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 468,
+     "success_rate": 0.468,
+     "mean_steps": 46.046,
+     "mean_reward": 0.299278125,
+     "truncated": 537,
+     "steps": 46046,
+     "last100": {
+      "forward": 69,
+      "left": 16,
+      "right": 15
+     },
+     "last100_top": [
+      "forward",
+      69
+     ],
+     "locked_blocks": [
+      10,
+      460
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.27,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 484,
+     "success_rate": 0.484,
+     "mean_steps": 45.132,
+     "mean_reward": 0.31373124999999996,
+     "truncated": 522,
+     "steps": 45132,
+     "last100": {
+      "forward": 67,
+      "left": 18,
+      "right": 15
+     },
+     "last100_top": [
+      "forward",
+      67
+     ],
+     "locked_blocks": [
+      8,
+      451
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.77,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 470,
+     "success_rate": 0.47,
+     "mean_steps": 45.806,
+     "mean_reward": 0.302853125,
+     "truncated": 534,
+     "steps": 45806,
+     "last100": {
+      "forward": 71,
+      "right": 16,
+      "left": 13
+     },
+     "last100_top": [
+      "forward",
+      71
+     ],
+     "locked_blocks": [
+      8,
+      458
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.33,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 492,
+     "success_rate": 0.492,
+     "mean_steps": 44.431,
+     "mean_reward": 0.3243890625,
+     "truncated": 510,
+     "steps": 44431,
+     "last100": {
+      "forward": 76,
+      "left": 14,
+      "right": 10
+     },
+     "last100_top": [
+      "forward",
+      76
+     ],
+     "locked_blocks": [
+      12,
+      444
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.06,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 459,
+     "success_rate": 0.459,
+     "mean_steps": 45.908,
+     "mean_reward": 0.30031875,
+     "truncated": 546,
+     "steps": 45908,
+     "last100": {
+      "forward": 73,
+      "right": 15,
+      "left": 12
+     },
+     "last100_top": [
+      "forward",
+      73
+     ],
+     "locked_blocks": [
+      3,
+      459
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.22,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 479,
+     "success_rate": 0.479,
+     "mean_steps": 44.747,
+     "mean_reward": 0.3186453125,
+     "truncated": 522,
+     "steps": 44747,
+     "last100": {
+      "forward": 72,
+      "right": 16,
+      "left": 12
+     },
+     "last100_top": [
+      "forward",
+      72
+     ],
+     "locked_blocks": [
+      5,
+      447
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 6.96,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 472,
+     "success_rate": 0.472,
+     "mean_steps": 46.215,
+     "mean_reward": 0.2973015625,
+     "truncated": 534,
+     "steps": 46215,
+     "last100": {
+      "forward": 70,
+      "left": 19,
+      "right": 11
+     },
+     "last100_top": [
+      "forward",
+      70
+     ],
+     "locked_blocks": [
+      11,
+      462
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.11,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 450,
+     "success_rate": 0.45,
+     "mean_steps": 45.969,
+     "mean_reward": 0.2985609375,
+     "truncated": 552,
+     "steps": 45969,
+     "last100": {
+      "forward": 76,
+      "right": 14,
+      "left": 10
+     },
+     "last100_top": [
+      "forward",
+      76
+     ],
+     "locked_blocks": [
+      4,
+      459
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 6.98,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 469,
+     "success_rate": 0.469,
+     "mean_steps": 46.403,
+     "mean_reward": 0.2943578125,
+     "truncated": 536,
+     "steps": 46403,
+     "last100": {
+      "forward": 72,
+      "left": 15,
+      "right": 13
+     },
+     "last100_top": [
+      "forward",
+      72
+     ],
+     "locked_blocks": [
+      7,
+      464
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.19,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 466,
+     "success_rate": 0.466,
+     "mean_steps": 45.308,
+     "mean_reward": 0.30945625,
+     "truncated": 534,
+     "steps": 45308,
+     "last100": {
+      "forward": 84,
+      "right": 8,
+      "left": 8
+     },
+     "last100_top": [
+      "forward",
+      84
+     ],
+     "locked_blocks": [
+      14,
+      453
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.12,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 469,
+     "success_rate": 0.469,
+     "mean_steps": 44.492,
+     "mean_reward": 0.32123124999999997,
+     "truncated": 533,
+     "steps": 44492,
+     "last100": {
+      "forward": 75,
+      "left": 13,
+      "right": 12
+     },
+     "last100_top": [
+      "forward",
+      75
+     ],
+     "locked_blocks": [
+      7,
+      444
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 6.91,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 473,
+     "success_rate": 0.473,
+     "mean_steps": 46.269,
+     "mean_reward": 0.2966421875,
+     "truncated": 532,
+     "steps": 46269,
+     "last100": {
+      "forward": 72,
+      "right": 15,
+      "left": 13
+     },
+     "last100_top": [
+      "forward",
+      72
+     ],
+     "locked_blocks": [
+      9,
+      462
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.42,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.47091666666666665,
+   "success_sd": 0.010900027800909769,
+   "pooled_success": 0.47091666666666665,
+   "pooled_se": 0.004556626673704849,
+   "mean_steps": 45.5605,
+   "mean_reward": 0.30639713541666663
+  },
+  "iv-0.9": {
+   "label": "(iv) fixed: forward 0.9, left 0.05, right 0.05",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 324,
+     "success_rate": 0.324,
+     "mean_steps": 51.003,
+     "mean_reward": 0.2151703125,
+     "truncated": 678,
+     "steps": 51003,
+     "last100": {
+      "forward": 89,
+      "left": 7,
+      "right": 4
+     },
+     "last100_top": [
+      "forward",
+      89
+     ],
+     "locked_blocks": [
+      510,
+      510
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.45,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 316,
+     "success_rate": 0.316,
+     "mean_steps": 52.28,
+     "mean_reward": 0.1964125,
+     "truncated": 687,
+     "steps": 52280,
+     "last100": {
+      "forward": 90,
+      "left": 6,
+      "right": 4
+     },
+     "last100_top": [
+      "forward",
+      90
+     ],
+     "locked_blocks": [
+      522,
+      522
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.86,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 312,
+     "success_rate": 0.312,
+     "mean_steps": 51.594,
+     "mean_reward": 0.205659375,
+     "truncated": 690,
+     "steps": 51594,
+     "last100": {
+      "forward": 89,
+      "left": 7,
+      "right": 4
+     },
+     "last100_top": [
+      "forward",
+      89
+     ],
+     "locked_blocks": [
+      515,
+      515
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.78,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 319,
+     "success_rate": 0.319,
+     "mean_steps": 51.417,
+     "mean_reward": 0.20884843749999998,
+     "truncated": 685,
+     "steps": 51417,
+     "last100": {
+      "forward": 85,
+      "right": 8,
+      "left": 7
+     },
+     "last100_top": [
+      "forward",
+      85
+     ],
+     "locked_blocks": [
+      514,
+      514
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.81,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 287,
+     "success_rate": 0.287,
+     "mean_steps": 53.077,
+     "mean_reward": 0.1823046875,
+     "truncated": 715,
+     "steps": 53077,
+     "last100": {
+      "forward": 91,
+      "right": 6,
+      "left": 3
+     },
+     "last100_top": [
+      "forward",
+      91
+     ],
+     "locked_blocks": [
+      530,
+      530
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.82,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 307,
+     "success_rate": 0.307,
+     "mean_steps": 51.361,
+     "mean_reward": 0.2084359375,
+     "truncated": 694,
+     "steps": 51361,
+     "last100": {
+      "forward": 89,
+      "left": 7,
+      "right": 4
+     },
+     "last100_top": [
+      "forward",
+      89
+     ],
+     "locked_blocks": [
+      513,
+      513
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.48,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 310,
+     "success_rate": 0.31,
+     "mean_steps": 51.524,
+     "mean_reward": 0.20644374999999998,
+     "truncated": 693,
+     "steps": 51524,
+     "last100": {
+      "forward": 92,
+      "right": 6,
+      "left": 2
+     },
+     "last100_top": [
+      "forward",
+      92
+     ],
+     "locked_blocks": [
+      515,
+      515
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.71,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 332,
+     "success_rate": 0.332,
+     "mean_steps": 50.501,
+     "mean_reward": 0.2230296875,
+     "truncated": 669,
+     "steps": 50501,
+     "last100": {
+      "forward": 96,
+      "left": 2,
+      "right": 2
+     },
+     "last100_top": [
+      "forward",
+      96
+     ],
+     "locked_blocks": [
+      505,
+      505
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.97,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 321,
+     "success_rate": 0.321,
+     "mean_steps": 51.623,
+     "mean_reward": 0.2061515625,
+     "truncated": 685,
+     "steps": 51623,
+     "last100": {
+      "forward": 87,
+      "right": 7,
+      "left": 6
+     },
+     "last100_top": [
+      "forward",
+      87
+     ],
+     "locked_blocks": [
+      515,
+      516
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.93,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 313,
+     "success_rate": 0.313,
+     "mean_steps": 52.04,
+     "mean_reward": 0.1994875,
+     "truncated": 691,
+     "steps": 52040,
+     "last100": {
+      "forward": 86,
+      "right": 7,
+      "left": 7
+     },
+     "last100_top": [
+      "forward",
+      86
+     ],
+     "locked_blocks": [
+      520,
+      520
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.85,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 310,
+     "success_rate": 0.31,
+     "mean_steps": 51.376,
+     "mean_reward": 0.20852500000000002,
+     "truncated": 691,
+     "steps": 51376,
+     "last100": {
+      "forward": 91,
+      "left": 5,
+      "right": 4
+     },
+     "last100_top": [
+      "forward",
+      91
+     ],
+     "locked_blocks": [
+      511,
+      513
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 7.82,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 298,
+     "success_rate": 0.298,
+     "mean_steps": 52.414,
+     "mean_reward": 0.192728125,
+     "truncated": 706,
+     "steps": 52414,
+     "last100": {
+      "forward": 88,
+      "left": 9,
+      "right": 3
+     },
+     "last100_top": [
+      "forward",
+      88
+     ],
+     "locked_blocks": [
+      524,
+      524
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.0,
+     "cap_cut_reads": 0,
+     "wall_s": 8.08,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.3124166666666667,
+   "success_sd": 0.011843358962522067,
+   "pooled_success": 0.3124166666666667,
+   "pooled_se": 0.004230962194107029,
+   "mean_steps": 51.68416666666667,
+   "mean_reward": 0.20443307291666668
+  },
+  "v": {
+   "label": "(v) CANDIDATE \u2014 mean REWARD of the last 10, optimism 1.0 if untried, 90 % argmax, 10 % uniform",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 254,
+     "success_rate": 0.254,
+     "mean_steps": 55.301,
+     "mean_reward": 0.14772968749999998,
+     "truncated": 749,
+     "steps": 55301,
+     "last100": {
+      "pickup": 17,
+      "drop": 16,
+      "done": 15,
+      "right": 14,
+      "forward": 13,
+      "left": 13,
+      "toggle": 12
+     },
+     "last100_top": [
+      "pickup",
+      17
+     ],
+     "locked_blocks": [
+      0,
+      553
+     ],
+     "first_success_episode": 5,
+     "explored_share": 0.1008462623413258,
+     "cap_cut_reads": 0,
+     "wall_s": 9.81,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 286,
+     "success_rate": 0.286,
+     "mean_steps": 53.8,
+     "mean_reward": 0.17203749999999998,
+     "truncated": 719,
+     "steps": 53800,
+     "last100": {
+      "right": 23,
+      "pickup": 17,
+      "forward": 16,
+      "toggle": 13,
+      "drop": 13,
+      "left": 11,
+      "done": 7
+     },
+     "last100_top": [
+      "right",
+      23
+     ],
+     "locked_blocks": [
+      0,
+      538
+     ],
+     "first_success_episode": 5,
+     "explored_share": 0.09793498262114086,
+     "cap_cut_reads": 0,
+     "wall_s": 9.48,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 269,
+     "success_rate": 0.269,
+     "mean_steps": 53.851,
+     "mean_reward": 0.16962031249999998,
+     "truncated": 735,
+     "steps": 53851,
+     "last100": {
+      "drop": 17,
+      "done": 17,
+      "forward": 15,
+      "right": 14,
+      "toggle": 14,
+      "pickup": 13,
+      "left": 10
+     },
+     "last100_top": [
+      "drop",
+      17
+     ],
+     "locked_blocks": [
+      0,
+      538
+     ],
+     "first_success_episode": 5,
+     "explored_share": 0.0995320508059125,
+     "cap_cut_reads": 0,
+     "wall_s": 9.44,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 281,
+     "success_rate": 0.281,
+     "mean_steps": 53.941,
+     "mean_reward": 0.1695546875,
+     "truncated": 723,
+     "steps": 53941,
+     "last100": {
+      "right": 30,
+      "done": 18,
+      "toggle": 12,
+      "drop": 12,
+      "forward": 10,
+      "left": 9,
+      "pickup": 9
+     },
+     "last100_top": [
+      "right",
+      30
+     ],
+     "locked_blocks": [
+      0,
+      539
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.10053390678877312,
+     "cap_cut_reads": 0,
+     "wall_s": 9.37,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 268,
+     "success_rate": 0.268,
+     "mean_steps": 54.49,
+     "mean_reward": 0.16053437499999998,
+     "truncated": 736,
+     "steps": 54490,
+     "last100": {
+      "left": 21,
+      "toggle": 18,
+      "forward": 14,
+      "right": 13,
+      "done": 12,
+      "drop": 12,
+      "pickup": 10
+     },
+     "last100_top": [
+      "left",
+      21
+     ],
+     "locked_blocks": [
+      0,
+      544
+     ],
+     "first_success_episode": 5,
+     "explored_share": 0.10249398983318346,
+     "cap_cut_reads": 0,
+     "wall_s": 9.65,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 292,
+     "success_rate": 0.292,
+     "mean_steps": 54.199,
+     "mean_reward": 0.16702656249999998,
+     "truncated": 715,
+     "steps": 54199,
+     "last100": {
+      "forward": 24,
+      "toggle": 18,
+      "left": 15,
+      "drop": 13,
+      "pickup": 12,
+      "done": 11,
+      "right": 7
+     },
+     "last100_top": [
+      "forward",
+      24
+     ],
+     "locked_blocks": [
+      0,
+      541
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.1011070110701107,
+     "cap_cut_reads": 0,
+     "wall_s": 9.59,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 261,
+     "success_rate": 0.261,
+     "mean_steps": 54.559,
+     "mean_reward": 0.1588640625,
+     "truncated": 741,
+     "steps": 54559,
+     "last100": {
+      "toggle": 22,
+      "forward": 17,
+      "drop": 14,
+      "left": 14,
+      "right": 14,
+      "done": 11,
+      "pickup": 8
+     },
+     "last100_top": [
+      "toggle",
+      22
+     ],
+     "locked_blocks": [
+      0,
+      545
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.09835043988269794,
+     "cap_cut_reads": 0,
+     "wall_s": 9.67,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 266,
+     "success_rate": 0.266,
+     "mean_steps": 54.458,
+     "mean_reward": 0.16078437499999998,
+     "truncated": 736,
+     "steps": 54458,
+     "last100": {
+      "drop": 18,
+      "pickup": 16,
+      "forward": 16,
+      "done": 15,
+      "right": 13,
+      "left": 12,
+      "toggle": 10
+     },
+     "last100_top": [
+      "drop",
+      18
+     ],
+     "locked_blocks": [
+      0,
+      544
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.1018748048990984,
+     "cap_cut_reads": 0,
+     "wall_s": 9.5,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 268,
+     "success_rate": 0.268,
+     "mean_steps": 54.213,
+     "mean_reward": 0.1644296875,
+     "truncated": 734,
+     "steps": 54213,
+     "last100": {
+      "forward": 18,
+      "drop": 18,
+      "toggle": 14,
+      "pickup": 14,
+      "done": 13,
+      "right": 12,
+      "left": 11
+     },
+     "last100_top": [
+      "forward",
+      18
+     ],
+     "locked_blocks": [
+      0,
+      542
+     ],
+     "first_success_episode": 6,
+     "explored_share": 0.10052753901206331,
+     "cap_cut_reads": 0,
+     "wall_s": 9.7,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 269,
+     "success_rate": 0.269,
+     "mean_steps": 54.376,
+     "mean_reward": 0.16223749999999998,
+     "truncated": 732,
+     "steps": 54376,
+     "last100": {
+      "forward": 20,
+      "left": 17,
+      "right": 16,
+      "toggle": 15,
+      "done": 13,
+      "pickup": 10,
+      "drop": 9
+     },
+     "last100_top": [
+      "forward",
+      20
+     ],
+     "locked_blocks": [
+      0,
+      543
+     ],
+     "first_success_episode": 9,
+     "explored_share": 0.10028136896114166,
+     "cap_cut_reads": 0,
+     "wall_s": 9.71,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 257,
+     "success_rate": 0.257,
+     "mean_steps": 54.664,
+     "mean_reward": 0.15698749999999997,
+     "truncated": 744,
+     "steps": 54664,
+     "last100": {
+      "toggle": 18,
+      "done": 18,
+      "left": 16,
+      "drop": 14,
+      "forward": 12,
+      "pickup": 12,
+      "right": 10
+     },
+     "last100_top": [
+      "toggle",
+      18
+     ],
+     "locked_blocks": [
+      0,
+      546
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.10291777188328913,
+     "cap_cut_reads": 0,
+     "wall_s": 9.78,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 271,
+     "success_rate": 0.271,
+     "mean_steps": 54.08,
+     "mean_reward": 0.1666,
+     "truncated": 732,
+     "steps": 54080,
+     "last100": {
+      "left": 24,
+      "toggle": 19,
+      "done": 15,
+      "right": 12,
+      "drop": 12,
+      "pickup": 10,
+      "forward": 8
+     },
+     "last100_top": [
+      "left",
+      24
+     ],
+     "locked_blocks": [
+      0,
+      540
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0983524712930604,
+     "cap_cut_reads": 0,
+     "wall_s": 9.56,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.27016666666666667,
+   "success_sd": 0.011255974844364637,
+   "pooled_success": 0.27016666666666667,
+   "pooled_se": 0.004053564674958828,
+   "mean_steps": 54.327666666666666,
+   "mean_reward": 0.16303385416666666
+  },
+  "v-b": {
+   "label": "(v-b) SAMPLE \u221d (mean reward of the last 10 + \u03b5 0.05; untried 1.0 + \u03b5), 10 % uniform",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 278,
+     "success_rate": 0.278,
+     "mean_steps": 53.954,
+     "mean_reward": 0.169071875,
+     "truncated": 723,
+     "steps": 53954,
+     "last100": {
+      "left": 19,
+      "forward": 18,
+      "toggle": 16,
+      "done": 15,
+      "pickup": 12,
+      "drop": 12,
+      "right": 8
+     },
+     "last100_top": [
+      "left",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      539
+     ],
+     "first_success_episode": 8,
+     "explored_share": 0.10049115003243443,
+     "cap_cut_reads": 0,
+     "wall_s": 9.32,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 303,
+     "success_rate": 0.303,
+     "mean_steps": 53.072,
+     "mean_reward": 0.183975,
+     "truncated": 701,
+     "steps": 53072,
+     "last100": {
+      "pickup": 18,
+      "drop": 15,
+      "right": 15,
+      "done": 15,
+      "forward": 13,
+      "left": 12,
+      "toggle": 12
+     },
+     "last100_top": [
+      "pickup",
+      18
+     ],
+     "locked_blocks": [
+      0,
+      530
+     ],
+     "first_success_episode": 6,
+     "explored_share": 0.09965519190548866,
+     "cap_cut_reads": 0,
+     "wall_s": 9.25,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 305,
+     "success_rate": 0.305,
+     "mean_steps": 52.74,
+     "mean_reward": 0.18884375,
+     "truncated": 697,
+     "steps": 52740,
+     "last100": {
+      "pickup": 19,
+      "right": 16,
+      "left": 15,
+      "done": 13,
+      "toggle": 13,
+      "forward": 13,
+      "drop": 11
+     },
+     "last100_top": [
+      "pickup",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      527
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.09880358734191616,
+     "cap_cut_reads": 0,
+     "wall_s": 9.19,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 278,
+     "success_rate": 0.278,
+     "mean_steps": 53.951,
+     "mean_reward": 0.1691140625,
+     "truncated": 724,
+     "steps": 53951,
+     "last100": {
+      "done": 19,
+      "right": 17,
+      "forward": 16,
+      "left": 16,
+      "pickup": 12,
+      "toggle": 10,
+      "drop": 10
+     },
+     "last100_top": [
+      "done",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      539
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.09875444839857651,
+     "cap_cut_reads": 0,
+     "wall_s": 9.2,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 283,
+     "success_rate": 0.283,
+     "mean_steps": 53.886,
+     "mean_reward": 0.17052812499999997,
+     "truncated": 723,
+     "steps": 53886,
+     "last100": {
+      "done": 18,
+      "forward": 17,
+      "toggle": 15,
+      "left": 14,
+      "right": 14,
+      "drop": 12,
+      "pickup": 10
+     },
+     "last100_top": [
+      "done",
+      18
+     ],
+     "locked_blocks": [
+      0,
+      538
+     ],
+     "first_success_episode": 10,
+     "explored_share": 0.10182418765193832,
+     "cap_cut_reads": 0,
+     "wall_s": 9.24,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 292,
+     "success_rate": 0.292,
+     "mean_steps": 53.33,
+     "mean_reward": 0.179246875,
+     "truncated": 711,
+     "steps": 53330,
+     "last100": {
+      "forward": 19,
+      "toggle": 16,
+      "pickup": 16,
+      "left": 15,
+      "drop": 13,
+      "right": 11,
+      "done": 10
+     },
+     "last100_top": [
+      "forward",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      533
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.10018563312144907,
+     "cap_cut_reads": 0,
+     "wall_s": 9.21,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 288,
+     "success_rate": 0.288,
+     "mean_steps": 53.645,
+     "mean_reward": 0.1744171875,
+     "truncated": 715,
+     "steps": 53645,
+     "last100": {
+      "done": 24,
+      "forward": 16,
+      "drop": 16,
+      "right": 14,
+      "toggle": 14,
+      "pickup": 11,
+      "left": 5
+     },
+     "last100_top": [
+      "done",
+      24
+     ],
+     "locked_blocks": [
+      0,
+      536
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.09786377362711106,
+     "cap_cut_reads": 0,
+     "wall_s": 9.33,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 277,
+     "success_rate": 0.277,
+     "mean_steps": 53.611,
+     "mean_reward": 0.1737953125,
+     "truncated": 725,
+     "steps": 53611,
+     "last100": {
+      "right": 20,
+      "drop": 17,
+      "left": 16,
+      "forward": 13,
+      "toggle": 13,
+      "pickup": 11,
+      "done": 10
+     },
+     "last100_top": [
+      "right",
+      20
+     ],
+     "locked_blocks": [
+      0,
+      536
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.10225322688950235,
+     "cap_cut_reads": 0,
+     "wall_s": 9.12,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 286,
+     "success_rate": 0.286,
+     "mean_steps": 54.048,
+     "mean_reward": 0.16854999999999998,
+     "truncated": 720,
+     "steps": 54048,
+     "last100": {
+      "forward": 19,
+      "right": 18,
+      "done": 15,
+      "left": 13,
+      "drop": 13,
+      "toggle": 12,
+      "pickup": 10
+     },
+     "last100_top": [
+      "forward",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      540
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.10101944531813725,
+     "cap_cut_reads": 0,
+     "wall_s": 9.32,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 289,
+     "success_rate": 0.289,
+     "mean_steps": 53.672,
+     "mean_reward": 0.1741375,
+     "truncated": 717,
+     "steps": 53672,
+     "last100": {
+      "left": 20,
+      "forward": 20,
+      "pickup": 16,
+      "drop": 13,
+      "toggle": 13,
+      "right": 12,
+      "done": 6
+     },
+     "last100_top": [
+      "left",
+      20
+     ],
+     "locked_blocks": [
+      0,
+      536
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0991560002235761,
+     "cap_cut_reads": 0,
+     "wall_s": 9.42,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 277,
+     "success_rate": 0.277,
+     "mean_steps": 53.691,
+     "mean_reward": 0.1726703125,
+     "truncated": 724,
+     "steps": 53691,
+     "last100": {
+      "right": 21,
+      "left": 17,
+      "drop": 17,
+      "forward": 15,
+      "done": 13,
+      "pickup": 10,
+      "toggle": 7
+     },
+     "last100_top": [
+      "right",
+      21
+     ],
+     "locked_blocks": [
+      0,
+      536
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.10262236459807793,
+     "cap_cut_reads": 0,
+     "wall_s": 9.34,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 269,
+     "success_rate": 0.269,
+     "mean_steps": 54.544,
+     "mean_reward": 0.159875,
+     "truncated": 732,
+     "steps": 54544,
+     "last100": {
+      "toggle": 17,
+      "pickup": 17,
+      "left": 14,
+      "done": 14,
+      "drop": 13,
+      "right": 13,
+      "forward": 12
+     },
+     "last100_top": [
+      "toggle",
+      17
+     ],
+     "locked_blocks": [
+      0,
+      545
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.10079750664588871,
+     "cap_cut_reads": 0,
+     "wall_s": 9.36,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.28541666666666665,
+   "success_sd": 0.010799480907839394,
+   "pooled_success": 0.28541666666666665,
+   "pooled_se": 0.0041226406692753325,
+   "mean_steps": 53.678666666666665,
+   "mean_reward": 0.17368541666666668
+  },
+  "v-c": {
+   "label": "(v-c) EPISODE CREDIT, sampled \u221d (mean credited reward of the last 20 + \u03b5; untried 1.0 + \u03b5), 10 % uniform",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 265,
+     "success_rate": 0.265,
+     "mean_steps": 54.278,
+     "mean_reward": 0.16321562499999998,
+     "truncated": 737,
+     "steps": 54278,
+     "last100": {
+      "left": 21,
+      "right": 18,
+      "pickup": 15,
+      "toggle": 15,
+      "drop": 13,
+      "done": 11,
+      "forward": 7
+     },
+     "last100_top": [
+      "left",
+      21
+     ],
+     "locked_blocks": [
+      0,
+      542
+     ],
+     "first_success_episode": 8,
+     "explored_share": 0.10053611894102692,
+     "cap_cut_reads": 0,
+     "wall_s": 9.16,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 271,
+     "success_rate": 0.271,
+     "mean_steps": 54.62,
+     "mean_reward": 0.15900625,
+     "truncated": 732,
+     "steps": 54620,
+     "last100": {
+      "pickup": 22,
+      "left": 17,
+      "done": 16,
+      "forward": 16,
+      "drop": 14,
+      "toggle": 11,
+      "right": 4
+     },
+     "last100_top": [
+      "pickup",
+      22
+     ],
+     "locked_blocks": [
+      0,
+      546
+     ],
+     "first_success_episode": 6,
+     "explored_share": 0.09941231394518592,
+     "cap_cut_reads": 0,
+     "wall_s": 9.1,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 271,
+     "success_rate": 0.271,
+     "mean_steps": 54.619,
+     "mean_reward": 0.15902031249999998,
+     "truncated": 735,
+     "steps": 54619,
+     "last100": {
+      "forward": 17,
+      "pickup": 16,
+      "done": 15,
+      "left": 15,
+      "drop": 13,
+      "toggle": 12,
+      "right": 12
+     },
+     "last100_top": [
+      "forward",
+      17
+     ],
+     "locked_blocks": [
+      0,
+      546
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.09899304284145002,
+     "cap_cut_reads": 0,
+     "wall_s": 9.3,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 269,
+     "success_rate": 0.269,
+     "mean_steps": 54.462,
+     "mean_reward": 0.161028125,
+     "truncated": 734,
+     "steps": 54462,
+     "last100": {
+      "forward": 27,
+      "pickup": 20,
+      "drop": 12,
+      "left": 12,
+      "right": 12,
+      "toggle": 10,
+      "done": 7
+     },
+     "last100_top": [
+      "forward",
+      27
+     ],
+     "locked_blocks": [
+      0,
+      544
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.09858068780640068,
+     "cap_cut_reads": 0,
+     "wall_s": 8.96,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 285,
+     "success_rate": 0.285,
+     "mean_steps": 53.584,
+     "mean_reward": 0.174975,
+     "truncated": 717,
+     "steps": 53584,
+     "last100": {
+      "done": 18,
+      "right": 17,
+      "pickup": 15,
+      "drop": 15,
+      "forward": 13,
+      "toggle": 11,
+      "left": 11
+     },
+     "last100_top": [
+      "done",
+      18
+     ],
+     "locked_blocks": [
+      0,
+      535
+     ],
+     "first_success_episode": 10,
+     "explored_share": 0.10193151068396006,
+     "cap_cut_reads": 0,
+     "wall_s": 8.8,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 275,
+     "success_rate": 0.275,
+     "mean_steps": 54.322,
+     "mean_reward": 0.16359687499999997,
+     "truncated": 731,
+     "steps": 54322,
+     "last100": {
+      "drop": 26,
+      "pickup": 17,
+      "forward": 16,
+      "right": 11,
+      "toggle": 11,
+      "done": 10,
+      "left": 9
+     },
+     "last100_top": [
+      "drop",
+      26
+     ],
+     "locked_blocks": [
+      0,
+      543
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.10025219520276862,
+     "cap_cut_reads": 0,
+     "wall_s": 8.93,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 268,
+     "success_rate": 0.268,
+     "mean_steps": 54.645,
+     "mean_reward": 0.15835468749999998,
+     "truncated": 733,
+     "steps": 54645,
+     "last100": {
+      "done": 31,
+      "toggle": 16,
+      "forward": 15,
+      "left": 11,
+      "right": 10,
+      "drop": 9,
+      "pickup": 8
+     },
+     "last100_top": [
+      "done",
+      31
+     ],
+     "locked_blocks": [
+      0,
+      546
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.09771986970684039,
+     "cap_cut_reads": 0,
+     "wall_s": 9.23,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 263,
+     "success_rate": 0.263,
+     "mean_steps": 54.872,
+     "mean_reward": 0.15466249999999998,
+     "truncated": 740,
+     "steps": 54872,
+     "last100": {
+      "drop": 19,
+      "pickup": 18,
+      "left": 15,
+      "forward": 13,
+      "right": 12,
+      "toggle": 12,
+      "done": 11
+     },
+     "last100_top": [
+      "drop",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      548
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.10238186357589342,
+     "cap_cut_reads": 0,
+     "wall_s": 10.22,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 275,
+     "success_rate": 0.275,
+     "mean_steps": 54.299,
+     "mean_reward": 0.1639203125,
+     "truncated": 730,
+     "steps": 54299,
+     "last100": {
+      "forward": 27,
+      "drop": 18,
+      "pickup": 15,
+      "right": 12,
+      "done": 10,
+      "left": 9,
+      "toggle": 9
+     },
+     "last100_top": [
+      "forward",
+      27
+     ],
+     "locked_blocks": [
+      0,
+      542
+     ],
+     "first_success_episode": 1,
+     "explored_share": 0.10112338858195212,
+     "cap_cut_reads": 0,
+     "wall_s": 9.48,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 288,
+     "success_rate": 0.288,
+     "mean_steps": 53.483,
+     "mean_reward": 0.1766953125,
+     "truncated": 714,
+     "steps": 53483,
+     "last100": {
+      "right": 18,
+      "left": 16,
+      "drop": 16,
+      "pickup": 15,
+      "forward": 13,
+      "done": 11,
+      "toggle": 11
+     },
+     "last100_top": [
+      "right",
+      18
+     ],
+     "locked_blocks": [
+      0,
+      534
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0992259367287413,
+     "cap_cut_reads": 0,
+     "wall_s": 9.23,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 276,
+     "success_rate": 0.276,
+     "mean_steps": 53.892,
+     "mean_reward": 0.16974375,
+     "truncated": 726,
+     "steps": 53892,
+     "last100": {
+      "toggle": 19,
+      "drop": 19,
+      "right": 14,
+      "pickup": 14,
+      "forward": 12,
+      "left": 11,
+      "done": 11
+     },
+     "last100_top": [
+      "toggle",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      538
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.10255506280964133,
+     "cap_cut_reads": 0,
+     "wall_s": 9.21,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 265,
+     "success_rate": 0.265,
+     "mean_steps": 54.76,
+     "mean_reward": 0.1564375,
+     "truncated": 737,
+     "steps": 54760,
+     "last100": {
+      "done": 19,
+      "right": 18,
+      "toggle": 17,
+      "left": 15,
+      "pickup": 13,
+      "drop": 10,
+      "forward": 8
+     },
+     "last100_top": [
+      "done",
+      19
+     ],
+     "locked_blocks": [
+      0,
+      547
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.10074688190500539,
+     "cap_cut_reads": 0,
+     "wall_s": 9.17,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.27258333333333334,
+   "success_sd": 0.007751343969488979,
+   "pooled_success": 0.27258333333333334,
+   "pooled_se": 0.0040649073351699564,
+   "mean_steps": 54.31966666666667,
+   "mean_reward": 0.16338802083333334
+  },
+  "v-c-argmax": {
+   "label": "(v-c control) EPISODE CREDIT, argmax with rng ties, 10 % uniform",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 166,
+     "success_rate": 0.166,
+     "mean_steps": 57.664,
+     "mean_reward": 0.1057,
+     "truncated": 837,
+     "steps": 57664,
+     "last100": {
+      "left": 73,
+      "forward": 18,
+      "done": 3,
+      "pickup": 2,
+      "right": 2,
+      "drop": 2
+     },
+     "last100_top": [
+      "left",
+      73
+     ],
+     "locked_blocks": [
+      7,
+      576
+     ],
+     "first_success_episode": 5,
+     "explored_share": 0.1009971386456256,
+     "cap_cut_reads": 0,
+     "wall_s": 9.6,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 172,
+     "success_rate": 0.172,
+     "mean_steps": 57.988,
+     "mean_reward": 0.10174375,
+     "truncated": 831,
+     "steps": 57988,
+     "last100": {
+      "drop": 36,
+      "left": 24,
+      "done": 21,
+      "toggle": 15,
+      "forward": 2,
+      "right": 2
+     },
+     "last100_top": [
+      "drop",
+      36
+     ],
+     "locked_blocks": [
+      7,
+      579
+     ],
+     "first_success_episode": 5,
+     "explored_share": 0.09943265102002104,
+     "cap_cut_reads": 0,
+     "wall_s": 9.7,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 167,
+     "success_rate": 0.167,
+     "mean_steps": 57.801,
+     "mean_reward": 0.1038734375,
+     "truncated": 833,
+     "steps": 57801,
+     "last100": {
+      "toggle": 57,
+      "right": 37,
+      "forward": 4,
+      "done": 2
+     },
+     "last100_top": [
+      "toggle",
+      57
+     ],
+     "locked_blocks": [
+      10,
+      578
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.10039445001903048,
+     "cap_cut_reads": 0,
+     "wall_s": 9.78,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 155,
+     "success_rate": 0.155,
+     "mean_steps": 58.239,
+     "mean_reward": 0.0965140625,
+     "truncated": 845,
+     "steps": 58239,
+     "last100": {
+      "toggle": 69,
+      "right": 12,
+      "pickup": 11,
+      "forward": 5,
+      "left": 2,
+      "done": 1
+     },
+     "last100_top": [
+      "toggle",
+      69
+     ],
+     "locked_blocks": [
+      7,
+      582
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.10094436813186813,
+     "cap_cut_reads": 0,
+     "wall_s": 10.5,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 170,
+     "success_rate": 0.17,
+     "mean_steps": 57.956,
+     "mean_reward": 0.10199375,
+     "truncated": 831,
+     "steps": 57956,
+     "last100": {
+      "pickup": 60,
+      "done": 18,
+      "right": 17,
+      "left": 3,
+      "toggle": 1,
+      "forward": 1
+     },
+     "last100_top": [
+      "pickup",
+      60
+     ],
+     "locked_blocks": [
+      7,
+      579
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.10114395155028728,
+     "cap_cut_reads": 0,
+     "wall_s": 10.33,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 163,
+     "success_rate": 0.163,
+     "mean_steps": 58.11,
+     "mean_reward": 0.099128125,
+     "truncated": 842,
+     "steps": 58110,
+     "last100": {
+      "forward": 74,
+      "right": 12,
+      "done": 8,
+      "drop": 2,
+      "left": 2,
+      "toggle": 1,
+      "pickup": 1
+     },
+     "last100_top": [
+      "forward",
+      74
+     ],
+     "locked_blocks": [
+      4,
+      581
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.10001548760131472,
+     "cap_cut_reads": 0,
+     "wall_s": 10.11,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 154,
+     "success_rate": 0.154,
+     "mean_steps": 58.52,
+     "mean_reward": 0.09246249999999999,
+     "truncated": 849,
+     "steps": 58520,
+     "last100": {
+      "right": 53,
+      "drop": 37,
+      "done": 3,
+      "left": 2,
+      "pickup": 2,
+      "forward": 2,
+      "toggle": 1
+     },
+     "last100_top": [
+      "right",
+      53
+     ],
+     "locked_blocks": [
+      5,
+      585
+     ],
+     "first_success_episode": 14,
+     "explored_share": 0.09982741238188,
+     "cap_cut_reads": 0,
+     "wall_s": 10.52,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 157,
+     "success_rate": 0.157,
+     "mean_steps": 58.273,
+     "mean_reward": 0.0962359375,
+     "truncated": 844,
+     "steps": 58273,
+     "last100": {
+      "forward": 74,
+      "right": 19,
+      "toggle": 3,
+      "drop": 2,
+      "left": 1,
+      "done": 1
+     },
+     "last100_top": [
+      "forward",
+      74
+     ],
+     "locked_blocks": [
+      5,
+      582
+     ],
+     "first_success_episode": 2,
+     "explored_share": 0.1015890448570546,
+     "cap_cut_reads": 0,
+     "wall_s": 9.83,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 166,
+     "success_rate": 0.166,
+     "mean_steps": 57.442,
+     "mean_reward": 0.10882187500000001,
+     "truncated": 834,
+     "steps": 57442,
+     "last100": {
+      "pickup": 77,
+      "left": 8,
+      "right": 5,
+      "done": 4,
+      "forward": 3,
+      "drop": 3
+     },
+     "last100_top": [
+      "pickup",
+      77
+     ],
+     "locked_blocks": [
+      10,
+      574
+     ],
+     "first_success_episode": 4,
+     "explored_share": 0.09959438051633794,
+     "cap_cut_reads": 0,
+     "wall_s": 9.56,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 167,
+     "success_rate": 0.167,
+     "mean_steps": 58.008,
+     "mean_reward": 0.1009625,
+     "truncated": 840,
+     "steps": 58008,
+     "last100": {
+      "forward": 74,
+      "right": 16,
+      "toggle": 3,
+      "left": 3,
+      "done": 2,
+      "pickup": 1,
+      "drop": 1
+     },
+     "last100_top": [
+      "forward",
+      74
+     ],
+     "locked_blocks": [
+      7,
+      580
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.09993276905307798,
+     "cap_cut_reads": 0,
+     "wall_s": 9.73,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 160,
+     "success_rate": 0.16,
+     "mean_steps": 57.813,
+     "mean_reward": 0.1030046875,
+     "truncated": 841,
+     "steps": 57813,
+     "last100": {
+      "toggle": 18,
+      "pickup": 17,
+      "left": 17,
+      "forward": 14,
+      "right": 13,
+      "drop": 11,
+      "done": 10
+     },
+     "last100_top": [
+      "toggle",
+      18
+     ],
+     "locked_blocks": [
+      3,
+      578
+     ],
+     "first_success_episode": 3,
+     "explored_share": 0.10284706126543744,
+     "cap_cut_reads": 0,
+     "wall_s": 9.66,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 162,
+     "success_rate": 0.162,
+     "mean_steps": 58.108,
+     "mean_reward": 0.09905624999999998,
+     "truncated": 838,
+     "steps": 58108,
+     "last100": {
+      "done": 92,
+      "forward": 2,
+      "right": 2,
+      "drop": 2,
+      "pickup": 1,
+      "left": 1
+     },
+     "last100_top": [
+      "done",
+      92
+     ],
+     "locked_blocks": [
+      9,
+      581
+     ],
+     "first_success_episode": 0,
+     "explored_share": 0.0994166136054656,
+     "cap_cut_reads": 0,
+     "wall_s": 9.85,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.16325,
+   "success_sd": 0.005801645534595416,
+   "pooled_success": 0.16325,
+   "pooled_se": 0.0033739126334766485,
+   "mean_steps": 57.993500000000004,
+   "mean_reward": 0.10079140624999999
+  }
+ },
+ "ceiling": {
+  "best_iv": "iv-0.5",
+  "iv_minus_ii": 0.21583333333333332,
+  "v_minus_ii": -0.0018333333333333535,
+  "iii_minus_ii": 0.16191666666666665
+ },
+ "x2_resolution": {
+  "ii": {
+   "episodes_in_6h": 13,
+   "bound_k_p029": 8,
+   "bound_rate_p029": 0.6153846153846154,
+   "bound_k_toy_null": 7,
+   "bound_rate_toy_null": 0.5384615384615384,
+   "toy_success": 0.272
+  },
+  "iii": {
+   "episodes_in_6h": 15,
+   "bound_k_p029": 8,
+   "bound_rate_p029": 0.5333333333333333,
+   "bound_k_toy_null": 8,
+   "bound_rate_toy_null": 0.5333333333333333,
+   "toy_success": 0.4339166666666667
+  },
+  "iv-0.5": {
+   "episodes_in_6h": 16,
+   "bound_k_p029": 9,
+   "bound_rate_p029": 0.5625,
+   "bound_k_toy_null": 8,
+   "bound_rate_toy_null": 0.5,
+   "toy_success": 0.48783333333333334
+  },
+  "v": {
+   "episodes_in_6h": 13,
+   "bound_k_p029": 8,
+   "bound_rate_p029": 0.6153846153846154,
+   "bound_k_toy_null": 7,
+   "bound_rate_toy_null": 0.5384615384615384,
+   "toy_success": 0.27016666666666667
+  },
+  "i": {
+   "episodes_in_6h": 12,
+   "bound_k_p029": 7,
+   "bound_rate_p029": 0.5833333333333334,
+   "bound_k_toy_null": 7,
+   "bound_rate_toy_null": 0.5833333333333334,
+   "toy_success": 0.18441666666666667
+  }
+ }
+}

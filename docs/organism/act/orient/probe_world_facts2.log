@@ -1,0 +1,127 @@
+{
+ "steps": 32565,
+ "unknown_boundary_outcomes": 597,
+ "per_act": {
+  "left": {
+   "n": 4548,
+   "p_changed": 1.0,
+   "p_novel": 0.487
+  },
+  "right": {
+   "n": 4656,
+   "p_changed": 1.0,
+   "p_novel": 0.49
+  },
+  "forward": {
+   "n": 4555,
+   "p_changed": 0.637,
+   "p_novel": 0.577
+  },
+  "pickup": {
+   "n": 4678,
+   "p_changed": 0.09,
+   "p_novel": 0.06
+  },
+  "drop": {
+   "n": 4476,
+   "p_changed": 0.071,
+   "p_novel": 0.044
+  },
+  "toggle": {
+   "n": 4508,
+   "p_changed": 0.027,
+   "p_novel": 0.027
+  },
+  "done": {
+   "n": 4547,
+   "p_changed": 0.0,
+   "p_novel": 0.0
+  }
+ },
+ "ctx": {
+  "left|prev_changed=0": {
+   "n": 2708,
+   "p_changed": 1.0,
+   "p_novel": 0.472,
+   "reward_per_step": 0.0063
+  },
+  "left|prev_changed=1": {
+   "n": 1756,
+   "p_changed": 1.0,
+   "p_novel": 0.487,
+   "reward_per_step": 0.0074
+  },
+  "right|prev_changed=0": {
+   "n": 2673,
+   "p_changed": 1.0,
+   "p_novel": 0.489,
+   "reward_per_step": 0.0094
+  },
+  "right|prev_changed=1": {
+   "n": 1897,
+   "p_changed": 1.0,
+   "p_novel": 0.468,
+   "reward_per_step": 0.0063
+  },
+  "forward|prev_changed=0": {
+   "n": 2687,
+   "p_changed": 0.601,
+   "p_novel": 0.546,
+   "reward_per_step": 0.0205
+  },
+  "forward|prev_changed=1": {
+   "n": 1773,
+   "p_changed": 0.682,
+   "p_novel": 0.613,
+   "reward_per_step": 0.0203
+  },
+  "pickup|prev_changed=0": {
+   "n": 2753,
+   "p_changed": 0.08,
+   "p_novel": 0.055,
+   "reward_per_step": 0.0
+  },
+  "pickup|prev_changed=1": {
+   "n": 1857,
+   "p_changed": 0.107,
+   "p_novel": 0.068,
+   "reward_per_step": 0.0
+  },
+  "drop|prev_changed=0": {
+   "n": 2624,
+   "p_changed": 0.052,
+   "p_novel": 0.033,
+   "reward_per_step": 0.0
+  },
+  "drop|prev_changed=1": {
+   "n": 1773,
+   "p_changed": 0.103,
+   "p_novel": 0.061,
+   "reward_per_step": 0.0
+  },
+  "toggle|prev_changed=0": {
+   "n": 2595,
+   "p_changed": 0.018,
+   "p_novel": 0.018,
+   "reward_per_step": 0.0
+  },
+  "toggle|prev_changed=1": {
+   "n": 1821,
+   "p_changed": 0.04,
+   "p_novel": 0.04,
+   "reward_per_step": 0.0
+  },
+  "done|prev_changed=0": {
+   "n": 2683,
+   "p_changed": 0.0,
+   "p_novel": 0.0,
+   "reward_per_step": 0.0
+  },
+  "done|prev_changed=1": {
+   "n": 1771,
+   "p_changed": 0.0,
+   "p_novel": 0.0,
+   "reward_per_step": 0.0
+  }
+ }
+}

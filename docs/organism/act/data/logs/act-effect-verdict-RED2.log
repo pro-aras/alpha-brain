@@ -1,0 +1,32 @@
+..............EEE......
+======================================================================
+ERROR: test_an_arm_in_both_halves_is_refused (tests.creature.test_act_effect_verdict.TestMergeBenches.test_an_arm_in_both_halves_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 236, in test_an_arm_in_both_halves_is_refused
+    V.merge_benches([a, b])
+    ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_effect_verdict' has no attribute 'merge_benches'
+
+======================================================================
+ERROR: test_different_seeds_are_refused (tests.creature.test_act_effect_verdict.TestMergeBenches.test_different_seeds_are_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 230, in test_different_seeds_are_refused
+    V.merge_benches([a, b])
+    ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_effect_verdict' has no attribute 'merge_benches'
+
+======================================================================
+ERROR: test_two_halves_are_united (tests.creature.test_act_effect_verdict.TestMergeBenches.test_two_halves_are_united)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 222, in test_two_halves_are_united
+    merged = V.merge_benches([a, b])
+             ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_effect_verdict' has no attribute 'merge_benches'
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.014s
+
+FAILED (errors=3)

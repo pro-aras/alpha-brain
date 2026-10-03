@@ -1,0 +1,4204 @@
+{
+ "env": "BabyAI-GoToLocal-v0",
+ "episodes": 1000,
+ "seeds": [
+  20260923,
+  21260923,
+  22260923,
+  23260923,
+  24260923,
+  25260923,
+  26260923,
+  27260923,
+  28260923,
+  29260923,
+  30260923,
+  31260923
+ ],
+ "max_steps": 64,
+ "lag": "one step (the life's)",
+ "arms": {
+  "R-NULL2": {
+   "label": "R-NULL2: uniform over 7 on an independent stream",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 254,
+     "success_rate": 0.254,
+     "mean_steps": 54.978,
+     "mean_reward": 0.152271875,
+     "truncated": 747,
+     "steps": 54978,
+     "last100": {
+      "forward": 21,
+      "pickup": 18,
+      "done": 18,
+      "left": 12,
+      "right": 11,
+      "drop": 10,
+      "toggle": 10
+     },
+     "last100_top": [
+      "forward",
+      21
+     ],
+     "explored_share": 0.0,
+     "wall_s": 9.11,
+     "env_max_steps": 64,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 269,
+     "success_rate": 0.269,
+     "mean_steps": 55.178,
+     "mean_reward": 0.150959375,
+     "truncated": 735,
+     "steps": 55178,
+     "last100": {
+      "done": 18,
+      "toggle": 17,
+      "pickup": 15,
+      "right": 14,
+      "drop": 13,
+      "left": 13,
+      "forward": 10
+     },
+     "last100_top": [
+      "done",
+      18
+     ],
+     "explored_share": 0.0,
+     "wall_s": 9.22,
+     "env_max_steps": 64,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 281,
+     "success_rate": 0.281,
+     "mean_steps": 54.454,
+     "mean_reward": 0.162340625,
+     "truncated": 721,
+     "steps": 54454,
+     "last100": {
+      "left": 18,
+      "pickup": 16,
+      "drop": 14,
+      "done": 14,
+      "forward": 13,
+      "toggle": 13,
+      "right": 12
+     },
+     "last100_top": [
+      "left",
+      18
+     ],
+     "explored_share": 0.0,
+     "wall_s": 9.12,
+     "env_max_steps": 64,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 275,
+     "success_rate": 0.275,
+     "mean_steps": 54.635,
+     "mean_reward": 0.1591953125,
+     "truncated": 728,
+     "steps": 54635,
+     "last100": {
+      "drop": 19,
+      "done": 17,
+      "right": 17,
+      "pickup": 15,
+      "left": 14,
+      "toggle": 9,
+      "forward": 9
+     },
+     "last100_top": [
+      "drop",
+      19
+     ],
+     "explored_share": 0.0,
+     "wall_s": 9.0,
+     "env_max_steps": 64,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 256,
+     "success_rate": 0.256,
+     "mean_steps": 55.035,
+     "mean_reward": 0.1516703125,
+     "truncated": 749,
+     "steps": 55035,
+     "last100": {
+      "drop": 19,
+      "right": 19,
+      "toggle": 16,
+      "pickup": 15,
+      "left": 12,
+      "forward": 11,
+      "done": 8
+     },
+     "last100_top": [
+      "drop",
+      19
+     ],
+     "explored_share": 0.0,
+     "wall_s": 9.15,
+     "env_max_steps": 64,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 277,
+     "success_rate": 0.277,
+     "mean_steps": 53.885,
+     "mean_reward": 0.16994218749999998,
+     "truncated": 727,
+     "steps": 53885,
+     "last100": {
+      "forward": 22,
+      "left": 16,
+      "done": 16,
+      "pickup": 14,
+      "toggle": 12,
+      "right": 11,
+      "drop": 9
+     },
+     "last100_top": [
+      "forward",
+      22
+     ],
+     "explored_share": 0.0,
+     "wall_s": 9.13,
+     "env_max_steps": 64,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 295,
+     "success_rate": 0.295,
+     "mean_steps": 53.396,
+     "mean_reward": 0.17861875,
+     "truncated": 707,
+     "steps": 53396,
+     "last100": {
+      "pickup": 20,
+      "right": 16,
+      "done": 15,
+      "drop": 13,
+      "left": 13,
+      "toggle": 12,
+      "forward": 11
+     },
+     "last100_top": [
+      "pickup",
+      20
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.96,
+     "env_max_steps": 64,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 256,
+     "success_rate": 0.256,
+     "mean_steps": 54.793,
+     "mean_reward": 0.1550734375,
+     "truncated": 745,
+     "steps": 54793,
+     "last100": {
+      "left": 20,
+      "done": 19,
+      "toggle": 17,
+      "pickup": 16,
+      "right": 16,
+      "drop": 9,
+      "forward": 3
+     },
+     "last100_top": [
+      "left",
+      20
+     ],
+     "explored_share": 0.0,
+     "wall_s": 9.01,
+     "env_max_steps": 64,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 276,
+     "success_rate": 0.276,
+     "mean_steps": 54.638,
+     "mean_reward": 0.15925312500000002,
+     "truncated": 728,
+     "steps": 54638,
+     "last100": {
+      "forward": 24,
+      "toggle": 18,
+      "pickup": 16,
+      "left": 15,
+      "right": 14,
+      "drop": 7,
+      "done": 6
+     },
+     "last100_top": [
+      "forward",
+      24
+     ],
+     "explored_share": 0.0,
+     "wall_s": 9.2,
+     "env_max_steps": 64,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 293,
+     "success_rate": 0.293,
+     "mean_steps": 53.626,
+     "mean_reward": 0.17518437499999998,
+     "truncated": 710,
+     "steps": 53626,
+     "last100": {
+      "left": 19,
+      "forward": 16,
+      "toggle": 16,
+      "done": 14,
+      "pickup": 13,
+      "drop": 13,
+      "right": 9
+     },
+     "last100_top": [
+      "left",
+      19
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.86,
+     "env_max_steps": 64,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 288,
+     "success_rate": 0.288,
+     "mean_steps": 53.35,
+     "mean_reward": 0.178565625,
+     "truncated": 713,
+     "steps": 53350,
+     "last100": {
+      "drop": 19,
+      "left": 17,
+      "forward": 17,
+      "pickup": 16,
+      "toggle": 13,
+      "done": 10,
+      "right": 8
+     },
+     "last100_top": [
+      "drop",
+      19
+     ],
+     "explored_share": 0.0,
+     "wall_s": 9.09,
+     "env_max_steps": 64,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 286,
+     "success_rate": 0.286,
+     "mean_steps": 53.999,
+     "mean_reward": 0.16923906249999998,
+     "truncated": 716,
+     "steps": 53999,
+     "last100": {
+      "done": 18,
+      "toggle": 16,
+      "forward": 16,
+      "right": 14,
+      "pickup": 13,
+      "drop": 12,
+      "left": 11
+     },
+     "last100_top": [
+      "done",
+      18
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.92,
+     "env_max_steps": 64,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.2755,
+   "success_sd": 0.014305116694258855,
+   "per_seed": [
+    0.254,
+    0.269,
+    0.281,
+    0.275,
+    0.256,
+    0.277,
+    0.295,
+    0.256,
+    0.276,
+    0.293,
+    0.288,
+    0.286
+   ],
+   "mean_steps": 54.33058333333333
+  },
+  "R-SCR": {
+   "label": "R-SCR: the candidate's own stationary mixture",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 418,
+     "success_rate": 0.418,
+     "mean_steps": 47.806,
+     "mean_reward": 0.269528125,
+     "truncated": 583,
+     "steps": 47806,
+     "last100": {
+      "forward": 37,
+      "left": 30,
+      "right": 26,
+      "toggle": 4,
+      "drop": 2,
+      "done": 1
+     },
+     "last100_top": [
+      "forward",
+      37
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.06,
+     "env_max_steps": 64,
+     "seed": 20260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 447,
+     "success_rate": 0.447,
+     "mean_steps": 46.412,
+     "mean_reward": 0.29203125,
+     "truncated": 555,
+     "steps": 46412,
+     "last100": {
+      "right": 34,
+      "forward": 32,
+      "left": 28,
+      "toggle": 4,
+      "drop": 1,
+      "pickup": 1
+     },
+     "last100_top": [
+      "right",
+      34
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.03,
+     "env_max_steps": 64,
+     "seed": 21260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 444,
+     "success_rate": 0.444,
+     "mean_steps": 46.846,
+     "mean_reward": 0.285628125,
+     "truncated": 565,
+     "steps": 46846,
+     "last100": {
+      "right": 33,
+      "forward": 32,
+      "left": 29,
+      "drop": 2,
+      "pickup": 2,
+      "done": 1,
+      "toggle": 1
+     },
+     "last100_top": [
+      "right",
+      33
+     ],
+     "explored_share": 0.0,
+     "wall_s": 7.63,
+     "env_max_steps": 64,
+     "seed": 22260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 430,
+     "success_rate": 0.43,
+     "mean_steps": 47.047,
+     "mean_reward": 0.28140156250000004,
+     "truncated": 574,
+     "steps": 47047,
+     "last100": {
+      "right": 34,
+      "forward": 29,
+      "left": 27,
+      "done": 3,
+      "pickup": 3,
+      "toggle": 2,
+      "drop": 2
+     },
+     "last100_top": [
+      "right",
+      34
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.12,
+     "env_max_steps": 64,
+     "seed": 23260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 434,
+     "success_rate": 0.434,
+     "mean_steps": 47.222,
+     "mean_reward": 0.279340625,
+     "truncated": 568,
+     "steps": 47222,
+     "last100": {
+      "forward": 34,
+      "left": 33,
+      "right": 28,
+      "done": 2,
+      "pickup": 1,
+      "toggle": 1,
+      "drop": 1
+     },
+     "last100_top": [
+      "forward",
+      34
+     ],
+     "explored_share": 0.0,
+     "wall_s": 7.65,
+     "env_max_steps": 64,
+     "seed": 24260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 441,
+     "success_rate": 0.441,
+     "mean_steps": 46.462,
+     "mean_reward": 0.290728125,
+     "truncated": 563,
+     "steps": 46462,
+     "last100": {
+      "forward": 35,
+      "left": 32,
+      "right": 31,
+      "drop": 1,
+      "toggle": 1
+     },
+     "last100_top": [
+      "forward",
+      35
+     ],
+     "explored_share": 0.0,
+     "wall_s": 7.71,
+     "env_max_steps": 64,
+     "seed": 25260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 420,
+     "success_rate": 0.42,
+     "mean_steps": 47.482,
+     "mean_reward": 0.274284375,
+     "truncated": 584,
+     "steps": 47482,
+     "last100": {
+      "right": 39,
+      "left": 30,
+      "forward": 25,
+      "pickup": 3,
+      "drop": 1,
+      "toggle": 1,
+      "done": 1
+     },
+     "last100_top": [
+      "right",
+      39
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.33,
+     "env_max_steps": 64,
+     "seed": 26260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 435,
+     "success_rate": 0.435,
+     "mean_steps": 47.402,
+     "mean_reward": 0.276909375,
+     "truncated": 569,
+     "steps": 47402,
+     "last100": {
+      "left": 38,
+      "forward": 32,
+      "right": 24,
+      "pickup": 3,
+      "drop": 2,
+      "toggle": 1
+     },
+     "last100_top": [
+      "left",
+      38
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.09,
+     "env_max_steps": 64,
+     "seed": 27260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 415,
+     "success_rate": 0.415,
+     "mean_steps": 48.388,
+     "mean_reward": 0.26104374999999996,
+     "truncated": 588,
+     "steps": 48388,
+     "last100": {
+      "right": 42,
+      "forward": 29,
+      "left": 23,
+      "toggle": 2,
+      "drop": 2,
+      "pickup": 2
+     },
+     "last100_top": [
+      "right",
+      42
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.59,
+     "env_max_steps": 64,
+     "seed": 28260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 442,
+     "success_rate": 0.442,
+     "mean_steps": 46.519,
+     "mean_reward": 0.29002656250000003,
+     "truncated": 564,
+     "steps": 46519,
+     "last100": {
+      "left": 37,
+      "forward": 33,
+      "right": 26,
+      "done": 3,
+      "toggle": 1
+     },
+     "last100_top": [
+      "left",
+      37
+     ],
+     "explored_share": 0.0,
+     "wall_s": 7.81,
+     "env_max_steps": 64,
+     "seed": 29260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 411,
+     "success_rate": 0.411,
+     "mean_steps": 47.799,
+     "mean_reward": 0.26892656249999997,
+     "truncated": 591,
+     "steps": 47799,
+     "last100": {
+      "left": 36,
+      "right": 33,
+      "forward": 27,
+      "pickup": 2,
+      "toggle": 1,
+      "drop": 1
+     },
+     "last100_top": [
+      "left",
+      36
+     ],
+     "explored_share": 0.0,
+     "wall_s": 8.26,
+     "env_max_steps": 64,
+     "seed": 30260923
+    },
+    {
+     "episodes": 1000,
+     "successes": 434,
+     "success_rate": 0.434,
+     "mean_steps": 47.582,
+     "mean_reward": 0.274278125,
+     "truncated": 569,
+     "steps": 47582,
+     "last100": {
+      "right": 33,
+      "forward": 31,
+      "left": 30,
+      "drop": 3,
+      "done": 1,
+      "toggle": 1,
+      "pickup": 1
+     },
+     "last100_top": [
+      "right",
+      33
+     ],
+     "explored_share": 0.0,
+     "wall_s": 7.73,
+     "env_max_steps": 64,
+     "seed": 31260923
+    }
+   ],
+   "success_mean": 0.43091666666666667,
+   "success_sd": 0.01216147668465945,
+   "per_seed": [
+    0.418,
+    0.447,
+    0.444,
+    0.43,
+    0.434,
+    0.441,
+    0.42,
+    0.435,
+    0.415,
+    0.442,
+    0.411,
+    0.434
+   ],
+   "mean_steps": 47.24725
+  },
+  "R-WSLS": {
+   "label": "R-WSLS (class B reference): stay while the frame is novel",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 409,
+     "success_rate": 0.409,
+     "mean_steps": 48.931,
+     "mean_reward": 0.2528078125,
+     "truncated": 597,
+     "steps": 48931,
+     "last100": {
+      "forward": 46,
+      "left": 28,
+      "right": 22,
+      "pickup": 1,
+      "drop": 1,
+      "toggle": 1,
+      "done": 1
+     },
+     "last100_top": [
+      "forward",
+      46
+     ],
+     "explored_share": 0.10318401046350037,
+     "wall_s": 8.8,
+     "env_max_steps": 64,
+     "seed": 20260923,
+     "effect_counts": {
+      "left": {
+       "known": 14440,
+       "excluded": 258,
+       "total": 14698
+      },
+      "right": {
+       "known": 14610,
+       "excluded": 265,
+       "total": 14875
+      },
+      "forward": {
+       "known": 16027,
+       "excluded": 414,
+       "total": 16441
+      },
+      "pickup": {
+       "known": 751,
+       "excluded": 23,
+       "total": 774
+      },
+      "drop": {
+       "known": 726,
+       "excluded": 13,
+       "total": 739
+      },
+      "toggle": {
+       "known": 694,
+       "excluded": 12,
+       "total": 706
+      },
+      "done": {
+       "known": 684,
+       "excluded": 14,
+       "total": 698
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.45,
+      "pickup": 0.2,
+      "drop": 0.05,
+      "toggle": 0.15,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 407,
+     "success_rate": 0.407,
+     "mean_steps": 48.464,
+     "mean_reward": 0.259175,
+     "truncated": 597,
+     "steps": 48464,
+     "last100": {
+      "left": 36,
+      "forward": 33,
+      "right": 25,
+      "toggle": 2,
+      "pickup": 2,
+      "drop": 2
+     },
+     "last100_top": [
+      "left",
+      36
+     ],
+     "explored_share": 0.0980914061694006,
+     "wall_s": 8.96,
+     "env_max_steps": 64,
+     "seed": 21260923,
+     "effect_counts": {
+      "left": {
+       "known": 14171,
+       "excluded": 299,
+       "total": 14470
+      },
+      "right": {
+       "known": 14472,
+       "excluded": 266,
+       "total": 14738
+      },
+      "forward": {
+       "known": 16125,
+       "excluded": 373,
+       "total": 16498
+      },
+      "pickup": {
+       "known": 653,
+       "excluded": 16,
+       "total": 669
+      },
+      "drop": {
+       "known": 702,
+       "excluded": 18,
+       "total": 720
+      },
+      "toggle": {
+       "known": 684,
+       "excluded": 15,
+       "total": 699
+      },
+      "done": {
+       "known": 658,
+       "excluded": 12,
+       "total": 670
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.3,
+      "pickup": 0.1,
+      "drop": 0.0,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 393,
+     "success_rate": 0.393,
+     "mean_steps": 49.116,
+     "mean_reward": 0.24860625,
+     "truncated": 610,
+     "steps": 49116,
+     "last100": {
+      "forward": 37,
+      "left": 34,
+      "right": 23,
+      "done": 2,
+      "pickup": 2,
+      "toggle": 1,
+      "drop": 1
+     },
+     "last100_top": [
+      "forward",
+      37
+     ],
+     "explored_share": 0.09882525398538185,
+     "wall_s": 8.17,
+     "env_max_steps": 64,
+     "seed": 22260923,
+     "effect_counts": {
+      "left": {
+       "known": 14499,
+       "excluded": 294,
+       "total": 14793
+      },
+      "right": {
+       "known": 14370,
+       "excluded": 258,
+       "total": 14628
+      },
+      "forward": {
+       "known": 16474,
+       "excluded": 404,
+       "total": 16878
+      },
+      "pickup": {
+       "known": 693,
+       "excluded": 17,
+       "total": 710
+      },
+      "drop": {
+       "known": 678,
+       "excluded": 12,
+       "total": 690
+      },
+      "toggle": {
+       "known": 709,
+       "excluded": 9,
+       "total": 718
+      },
+      "done": {
+       "known": 694,
+       "excluded": 5,
+       "total": 699
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.65,
+      "pickup": 0.1,
+      "drop": 0.0,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 413,
+     "success_rate": 0.413,
+     "mean_steps": 48.402,
+     "mean_reward": 0.260646875,
+     "truncated": 591,
+     "steps": 48402,
+     "last100": {
+      "forward": 41,
+      "right": 32,
+      "left": 21,
+      "pickup": 3,
+      "done": 2,
+      "toggle": 1
+     },
+     "last100_top": [
+      "forward",
+      41
+     ],
+     "explored_share": 0.10040699956614259,
+     "wall_s": 12.01,
+     "env_max_steps": 64,
+     "seed": 23260923,
+     "effect_counts": {
+      "left": {
+       "known": 14214,
+       "excluded": 246,
+       "total": 14460
+      },
+      "right": {
+       "known": 14419,
+       "excluded": 286,
+       "total": 14705
+      },
+      "forward": {
+       "known": 16044,
+       "excluded": 422,
+       "total": 16466
+      },
+      "pickup": {
+       "known": 718,
+       "excluded": 9,
+       "total": 727
+      },
+      "drop": {
+       "known": 660,
+       "excluded": 12,
+       "total": 672
+      },
+      "toggle": {
+       "known": 666,
+       "excluded": 11,
+       "total": 677
+      },
+      "done": {
+       "known": 682,
+       "excluded": 13,
+       "total": 695
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.5,
+      "pickup": 0.05,
+      "drop": 0.0,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 385,
+     "success_rate": 0.385,
+     "mean_steps": 49.527,
+     "mean_reward": 0.2420265625,
+     "truncated": 619,
+     "steps": 49527,
+     "last100": {
+      "left": 39,
+      "forward": 35,
+      "right": 23,
+      "drop": 1,
+      "pickup": 1,
+      "toggle": 1
+     },
+     "last100_top": [
+      "left",
+      39
+     ],
+     "explored_share": 0.1001453723146503,
+     "wall_s": 8.63,
+     "env_max_steps": 64,
+     "seed": 24260923,
+     "effect_counts": {
+      "left": {
+       "known": 15107,
+       "excluded": 265,
+       "total": 15372
+      },
+      "right": {
+       "known": 14340,
+       "excluded": 277,
+       "total": 14617
+      },
+      "forward": {
+       "known": 16315,
+       "excluded": 407,
+       "total": 16722
+      },
+      "pickup": {
+       "known": 719,
+       "excluded": 17,
+       "total": 736
+      },
+      "drop": {
+       "known": 686,
+       "excluded": 12,
+       "total": 698
+      },
+      "toggle": {
+       "known": 659,
+       "excluded": 5,
+       "total": 664
+      },
+      "done": {
+       "known": 702,
+       "excluded": 16,
+       "total": 718
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.5,
+      "pickup": 0.1,
+      "drop": 0.0,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 376,
+     "success_rate": 0.376,
+     "mean_steps": 49.966,
+     "mean_reward": 0.234953125,
+     "truncated": 626,
+     "steps": 49966,
+     "last100": {
+      "left": 43,
+      "forward": 30,
+      "right": 21,
+      "pickup": 3,
+      "drop": 2,
+      "done": 1
+     },
+     "last100_top": [
+      "left",
+      43
+     ],
+     "explored_share": 0.10150699461644686,
+     "wall_s": 8.3,
+     "env_max_steps": 64,
+     "seed": 25260923,
+     "effect_counts": {
+      "left": {
+       "known": 14726,
+       "excluded": 283,
+       "total": 15009
+      },
+      "right": {
+       "known": 14803,
+       "excluded": 276,
+       "total": 15079
+      },
+      "forward": {
+       "known": 16676,
+       "excluded": 387,
+       "total": 17063
+      },
+      "pickup": {
+       "known": 697,
+       "excluded": 18,
+       "total": 715
+      },
+      "drop": {
+       "known": 705,
+       "excluded": 13,
+       "total": 718
+      },
+      "toggle": {
+       "known": 654,
+       "excluded": 9,
+       "total": 663
+      },
+      "done": {
+       "known": 706,
+       "excluded": 13,
+       "total": 719
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.55,
+      "pickup": 0.15,
+      "drop": 0.1,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 405,
+     "success_rate": 0.405,
+     "mean_steps": 48.348,
+     "mean_reward": 0.26060625,
+     "truncated": 598,
+     "steps": 48348,
+     "last100": {
+      "left": 34,
+      "forward": 31,
+      "right": 24,
+      "drop": 5,
+      "pickup": 3,
+      "toggle": 2,
+      "done": 1
+     },
+     "last100_top": [
+      "left",
+      34
+     ],
+     "explored_share": 0.1000227512461478,
+     "wall_s": 8.0,
+     "env_max_steps": 64,
+     "seed": 26260923,
+     "effect_counts": {
+      "left": {
+       "known": 14271,
+       "excluded": 259,
+       "total": 14530
+      },
+      "right": {
+       "known": 14463,
+       "excluded": 256,
+       "total": 14719
+      },
+      "forward": {
+       "known": 15922,
+       "excluded": 408,
+       "total": 16330
+      },
+      "pickup": {
+       "known": 680,
+       "excluded": 22,
+       "total": 702
+      },
+      "drop": {
+       "known": 654,
+       "excluded": 16,
+       "total": 670
+      },
+      "toggle": {
+       "known": 675,
+       "excluded": 18,
+       "total": 693
+      },
+      "done": {
+       "known": 684,
+       "excluded": 20,
+       "total": 704
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.3,
+      "pickup": 0.2,
+      "drop": 0.05,
+      "toggle": 0.1,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 394,
+     "success_rate": 0.394,
+     "mean_steps": 48.608,
+     "mean_reward": 0.25585,
+     "truncated": 610,
+     "steps": 48608,
+     "last100": {
+      "forward": 37,
+      "right": 34,
+      "left": 25,
+      "done": 2,
+      "pickup": 1,
+      "toggle": 1
+     },
+     "last100_top": [
+      "forward",
+      37
+     ],
+     "explored_share": 0.10109239029809294,
+     "wall_s": 8.27,
+     "env_max_steps": 64,
+     "seed": 27260923,
+     "effect_counts": {
+      "left": {
+       "known": 14324,
+       "excluded": 253,
+       "total": 14577
+      },
+      "right": {
+       "known": 14238,
+       "excluded": 289,
+       "total": 14527
+      },
+      "forward": {
+       "known": 16260,
+       "excluded": 392,
+       "total": 16652
+      },
+      "pickup": {
+       "known": 695,
+       "excluded": 18,
+       "total": 713
+      },
+      "drop": {
+       "known": 712,
+       "excluded": 13,
+       "total": 725
+      },
+      "toggle": {
+       "known": 701,
+       "excluded": 16,
+       "total": 717
+      },
+      "done": {
+       "known": 679,
+       "excluded": 18,
+       "total": 697
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.35,
+      "pickup": 0.1,
+      "drop": 0.0,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 397,
+     "success_rate": 0.397,
+     "mean_steps": 49.13,
+     "mean_reward": 0.248809375,
+     "truncated": 609,
+     "steps": 49130,
+     "last100": {
+      "forward": 36,
+      "left": 30,
+      "right": 27,
+      "pickup": 3,
+      "toggle": 2,
+      "drop": 2
+     },
+     "last100_top": [
+      "forward",
+      36
+     ],
+     "explored_share": 0.09914310720319147,
+     "wall_s": 8.16,
+     "env_max_steps": 64,
+     "seed": 28260923,
+     "effect_counts": {
+      "left": {
+       "known": 14583,
+       "excluded": 276,
+       "total": 14859
+      },
+      "right": {
+       "known": 14394,
+       "excluded": 270,
+       "total": 14664
+      },
+      "forward": {
+       "known": 16397,
+       "excluded": 391,
+       "total": 16788
+      },
+      "pickup": {
+       "known": 701,
+       "excluded": 12,
+       "total": 713
+      },
+      "drop": {
+       "known": 693,
+       "excluded": 10,
+       "total": 703
+      },
+      "toggle": {
+       "known": 681,
+       "excluded": 18,
+       "total": 699
+      },
+      "done": {
+       "known": 682,
+       "excluded": 22,
+       "total": 704
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.4,
+      "pickup": 0.2,
+      "drop": 0.05,
+      "toggle": 0.15,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 391,
+     "success_rate": 0.391,
+     "mean_steps": 49.103,
+     "mean_reward": 0.24858906249999999,
+     "truncated": 615,
+     "steps": 49103,
+     "last100": {
+      "forward": 36,
+      "left": 29,
+      "right": 29,
+      "done": 4,
+      "drop": 2
+     },
+     "last100_top": [
+      "forward",
+      36
+     ],
+     "explored_share": 0.0991365265558814,
+     "wall_s": 8.3,
+     "env_max_steps": 64,
+     "seed": 29260923,
+     "effect_counts": {
+      "left": {
+       "known": 14717,
+       "excluded": 258,
+       "total": 14975
+      },
+      "right": {
+       "known": 14536,
+       "excluded": 269,
+       "total": 14805
+      },
+      "forward": {
+       "known": 16152,
+       "excluded": 424,
+       "total": 16576
+      },
+      "pickup": {
+       "known": 681,
+       "excluded": 12,
+       "total": 693
+      },
+      "drop": {
+       "known": 639,
+       "excluded": 16,
+       "total": 655
+      },
+      "toggle": {
+       "known": 677,
+       "excluded": 10,
+       "total": 687
+      },
+      "done": {
+       "known": 702,
+       "excluded": 10,
+       "total": 712
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.65,
+      "pickup": 0.2,
+      "drop": 0.05,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 412,
+     "success_rate": 0.412,
+     "mean_steps": 48.04,
+     "mean_reward": 0.26563749999999997,
+     "truncated": 594,
+     "steps": 48040,
+     "last100": {
+      "right": 34,
+      "forward": 33,
+      "left": 30,
+      "drop": 2,
+      "toggle": 1
+     },
+     "last100_top": [
+      "right",
+      34
+     ],
+     "explored_share": 0.1019337649091401,
+     "wall_s": 8.0,
+     "env_max_steps": 64,
+     "seed": 30260923,
+     "effect_counts": {
+      "left": {
+       "known": 14252,
+       "excluded": 298,
+       "total": 14550
+      },
+      "right": {
+       "known": 14220,
+       "excluded": 275,
+       "total": 14495
+      },
+      "forward": {
+       "known": 15832,
+       "excluded": 378,
+       "total": 16210
+      },
+      "pickup": {
+       "known": 661,
+       "excluded": 14,
+       "total": 675
+      },
+      "drop": {
+       "known": 693,
+       "excluded": 8,
+       "total": 701
+      },
+      "toggle": {
+       "known": 697,
+       "excluded": 10,
+       "total": 707
+      },
+      "done": {
+       "known": 686,
+       "excluded": 16,
+       "total": 702
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.5,
+      "pickup": 0.2,
+      "drop": 0.0,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 372,
+     "success_rate": 0.372,
+     "mean_steps": 50.279,
+     "mean_reward": 0.2301515625,
+     "truncated": 633,
+     "steps": 50279,
+     "last100": {
+      "forward": 37,
+      "right": 31,
+      "left": 28,
+      "pickup": 2,
+      "drop": 2
+     },
+     "last100_top": [
+      "forward",
+      37
+     ],
+     "explored_share": 0.09910501193317423,
+     "wall_s": 9.47,
+     "env_max_steps": 64,
+     "seed": 31260923,
+     "effect_counts": {
+      "left": {
+       "known": 15063,
+       "excluded": 286,
+       "total": 15349
+      },
+      "right": {
+       "known": 14675,
+       "excluded": 292,
+       "total": 14967
+      },
+      "forward": {
+       "known": 16710,
+       "excluded": 358,
+       "total": 17068
+      },
+      "pickup": {
+       "known": 737,
+       "excluded": 17,
+       "total": 754
+      },
+      "drop": {
+       "known": 675,
+       "excluded": 15,
+       "total": 690
+      },
+      "toggle": {
+       "known": 719,
+       "excluded": 11,
+       "total": 730
+      },
+      "done": {
+       "known": 701,
+       "excluded": 20,
+       "total": 721
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.7,
+      "pickup": 0.1,
+      "drop": 0.05,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    }
+   ],
+   "success_mean": 0.3961666666666666,
+   "success_sd": 0.013657055008864513,
+   "per_seed": [
+    0.409,
+    0.407,
+    0.393,
+    0.413,
+    0.385,
+    0.376,
+    0.405,
+    0.394,
+    0.397,
+    0.391,
+    0.412,
+    0.372
+   ],
+   "mean_steps": 48.99283333333333
+  },
+  "R-WALK": {
+   "label": "R-WALK (class B reference): the persistent walker",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 573,
+     "success_rate": 0.573,
+     "mean_steps": 41.015,
+     "mean_reward": 0.3805265625,
+     "truncated": 434,
+     "steps": 41015,
+     "last100": {
+      "forward": 65,
+      "left": 16,
+      "right": 11,
+      "toggle": 3,
+      "done": 2,
+      "drop": 2,
+      "pickup": 1
+     },
+     "last100_top": [
+      "forward",
+      65
+     ],
+     "explored_share": 0.10361810025355958,
+     "wall_s": 6.64,
+     "env_max_steps": 64,
+     "seed": 20260923,
+     "effect_counts": {
+      "left": {
+       "known": 5602,
+       "excluded": 75,
+       "total": 5677
+      },
+      "right": {
+       "known": 5527,
+       "excluded": 74,
+       "total": 5601
+      },
+      "forward": {
+       "known": 26486,
+       "excluded": 798,
+       "total": 27284
+      },
+      "pickup": {
+       "known": 621,
+       "excluded": 14,
+       "total": 635
+      },
+      "drop": {
+       "known": 615,
+       "excluded": 18,
+       "total": 633
+      },
+      "toggle": {
+       "known": 576,
+       "excluded": 9,
+       "total": 585
+      },
+      "done": {
+       "known": 589,
+       "excluded": 11,
+       "total": 600
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.7,
+      "pickup": 0.15,
+      "drop": 0.05,
+      "toggle": 0.15,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 552,
+     "success_rate": 0.552,
+     "mean_steps": 41.176,
+     "mean_reward": 0.37616249999999996,
+     "truncated": 450,
+     "steps": 41176,
+     "last100": {
+      "forward": 66,
+      "left": 22,
+      "right": 11,
+      "drop": 1
+     },
+     "last100_top": [
+      "forward",
+      66
+     ],
+     "explored_share": 0.09833159287952012,
+     "wall_s": 6.62,
+     "env_max_steps": 64,
+     "seed": 21260923,
+     "effect_counts": {
+      "left": {
+       "known": 5572,
+       "excluded": 81,
+       "total": 5653
+      },
+      "right": {
+       "known": 5562,
+       "excluded": 57,
+       "total": 5619
+      },
+      "forward": {
+       "known": 26745,
+       "excluded": 794,
+       "total": 27539
+      },
+      "pickup": {
+       "known": 558,
+       "excluded": 15,
+       "total": 573
+      },
+      "drop": {
+       "known": 603,
+       "excluded": 21,
+       "total": 624
+      },
+      "toggle": {
+       "known": 589,
+       "excluded": 14,
+       "total": 603
+      },
+      "done": {
+       "known": 548,
+       "excluded": 17,
+       "total": 565
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.6,
+      "pickup": 0.35,
+      "drop": 0.05,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 560,
+     "success_rate": 0.56,
+     "mean_steps": 40.907,
+     "mean_reward": 0.3807453125,
+     "truncated": 442,
+     "steps": 40907,
+     "last100": {
+      "forward": 65,
+      "left": 17,
+      "right": 12,
+      "done": 2,
+      "drop": 2,
+      "pickup": 1,
+      "toggle": 1
+     },
+     "last100_top": [
+      "forward",
+      65
+     ],
+     "explored_share": 0.09907597535934291,
+     "wall_s": 6.8,
+     "env_max_steps": 64,
+     "seed": 22260923,
+     "effect_counts": {
+      "left": {
+       "known": 5569,
+       "excluded": 63,
+       "total": 5632
+      },
+      "right": {
+       "known": 5504,
+       "excluded": 79,
+       "total": 5583
+      },
+      "forward": {
+       "known": 26555,
+       "excluded": 802,
+       "total": 27357
+      },
+      "pickup": {
+       "known": 561,
+       "excluded": 17,
+       "total": 578
+      },
+      "drop": {
+       "known": 538,
+       "excluded": 17,
+       "total": 555
+      },
+      "toggle": {
+       "known": 610,
+       "excluded": 7,
+       "total": 617
+      },
+      "done": {
+       "known": 571,
+       "excluded": 14,
+       "total": 585
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.65,
+      "pickup": 0.35,
+      "drop": 0.05,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 572,
+     "success_rate": 0.572,
+     "mean_steps": 40.349,
+     "mean_reward": 0.3897921875,
+     "truncated": 435,
+     "steps": 40349,
+     "last100": {
+      "forward": 66,
+      "right": 18,
+      "left": 11,
+      "drop": 2,
+      "toggle": 1,
+      "pickup": 1,
+      "done": 1
+     },
+     "last100_top": [
+      "forward",
+      66
+     ],
+     "explored_share": 0.09982651796778191,
+     "wall_s": 6.78,
+     "env_max_steps": 64,
+     "seed": 23260923,
+     "effect_counts": {
+      "left": {
+       "known": 5392,
+       "excluded": 63,
+       "total": 5455
+      },
+      "right": {
+       "known": 5606,
+       "excluded": 83,
+       "total": 5689
+      },
+      "forward": {
+       "known": 26095,
+       "excluded": 808,
+       "total": 26903
+      },
+      "pickup": {
+       "known": 585,
+       "excluded": 12,
+       "total": 597
+      },
+      "drop": {
+       "known": 535,
+       "excluded": 10,
+       "total": 545
+      },
+      "toggle": {
+       "known": 564,
+       "excluded": 9,
+       "total": 573
+      },
+      "done": {
+       "known": 573,
+       "excluded": 14,
+       "total": 587
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.55,
+      "pickup": 0.15,
+      "drop": 0.05,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 545,
+     "success_rate": 0.545,
+     "mean_steps": 42.006,
+     "mean_reward": 0.363790625,
+     "truncated": 459,
+     "steps": 42006,
+     "last100": {
+      "forward": 66,
+      "right": 18,
+      "left": 12,
+      "done": 2,
+      "pickup": 2
+     },
+     "last100_top": [
+      "forward",
+      66
+     ],
+     "explored_share": 0.09967386387982956,
+     "wall_s": 6.95,
+     "env_max_steps": 64,
+     "seed": 24260923,
+     "effect_counts": {
+      "left": {
+       "known": 5842,
+       "excluded": 82,
+       "total": 5924
+      },
+      "right": {
+       "known": 5559,
+       "excluded": 70,
+       "total": 5629
+      },
+      "forward": {
+       "known": 27295,
+       "excluded": 777,
+       "total": 28072
+      },
+      "pickup": {
+       "known": 610,
+       "excluded": 13,
+       "total": 623
+      },
+      "drop": {
+       "known": 573,
+       "excluded": 18,
+       "total": 591
+      },
+      "toggle": {
+       "known": 536,
+       "excluded": 24,
+       "total": 560
+      },
+      "done": {
+       "known": 592,
+       "excluded": 15,
+       "total": 607
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.7,
+      "pickup": 0.2,
+      "drop": 0.1,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 566,
+     "success_rate": 0.566,
+     "mean_steps": 40.604,
+     "mean_reward": 0.38560625,
+     "truncated": 439,
+     "steps": 40604,
+     "last100": {
+      "forward": 60,
+      "left": 15,
+      "right": 14,
+      "pickup": 4,
+      "toggle": 4,
+      "done": 3
+     },
+     "last100_top": [
+      "forward",
+      60
+     ],
+     "explored_share": 0.1019825144686615,
+     "wall_s": 6.72,
+     "env_max_steps": 64,
+     "seed": 25260923,
+     "effect_counts": {
+      "left": {
+       "known": 5515,
+       "excluded": 61,
+       "total": 5576
+      },
+      "right": {
+       "known": 5448,
+       "excluded": 65,
+       "total": 5513
+      },
+      "forward": {
+       "known": 26382,
+       "excluded": 807,
+       "total": 27189
+      },
+      "pickup": {
+       "known": 570,
+       "excluded": 22,
+       "total": 592
+      },
+      "drop": {
+       "known": 579,
+       "excluded": 16,
+       "total": 595
+      },
+      "toggle": {
+       "known": 523,
+       "excluded": 16,
+       "total": 539
+      },
+      "done": {
+       "known": 588,
+       "excluded": 12,
+       "total": 600
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.6,
+      "pickup": 0.2,
+      "drop": 0.0,
+      "toggle": 0.1,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 572,
+     "success_rate": 0.572,
+     "mean_steps": 41.28,
+     "mean_reward": 0.3767,
+     "truncated": 430,
+     "steps": 41280,
+     "last100": {
+      "forward": 61,
+      "right": 20,
+      "left": 13,
+      "pickup": 3,
+      "toggle": 2,
+      "drop": 1
+     },
+     "last100_top": [
+      "forward",
+      61
+     ],
+     "explored_share": 0.10045783774617863,
+     "wall_s": 6.79,
+     "env_max_steps": 64,
+     "seed": 26260923,
+     "effect_counts": {
+      "left": {
+       "known": 5535,
+       "excluded": 61,
+       "total": 5596
+      },
+      "right": {
+       "known": 5730,
+       "excluded": 68,
+       "total": 5798
+      },
+      "forward": {
+       "known": 26675,
+       "excluded": 825,
+       "total": 27500
+      },
+      "pickup": {
+       "known": 596,
+       "excluded": 7,
+       "total": 603
+      },
+      "drop": {
+       "known": 560,
+       "excluded": 13,
+       "total": 573
+      },
+      "toggle": {
+       "known": 600,
+       "excluded": 11,
+       "total": 611
+      },
+      "done": {
+       "known": 585,
+       "excluded": 14,
+       "total": 599
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.6,
+      "pickup": 0.15,
+      "drop": 0.0,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 540,
+     "success_rate": 0.54,
+     "mean_steps": 41.599,
+     "mean_reward": 0.3690140625,
+     "truncated": 464,
+     "steps": 41599,
+     "last100": {
+      "forward": 63,
+      "right": 15,
+      "left": 15,
+      "pickup": 4,
+      "done": 1,
+      "drop": 1,
+      "toggle": 1
+     },
+     "last100_top": [
+      "forward",
+      63
+     ],
+     "explored_share": 0.10117788461538461,
+     "wall_s": 6.98,
+     "env_max_steps": 64,
+     "seed": 27260923,
+     "effect_counts": {
+      "left": {
+       "known": 5555,
+       "excluded": 75,
+       "total": 5630
+      },
+      "right": {
+       "known": 5726,
+       "excluded": 69,
+       "total": 5795
+      },
+      "forward": {
+       "known": 26918,
+       "excluded": 800,
+       "total": 27718
+      },
+      "pickup": {
+       "known": 598,
+       "excluded": 21,
+       "total": 619
+      },
+      "drop": {
+       "known": 614,
+       "excluded": 9,
+       "total": 623
+      },
+      "toggle": {
+       "known": 593,
+       "excluded": 12,
+       "total": 605
+      },
+      "done": {
+       "known": 596,
+       "excluded": 13,
+       "total": 609
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.4,
+      "pickup": 0.0,
+      "drop": 0.0,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 563,
+     "success_rate": 0.563,
+     "mean_steps": 41.191,
+     "mean_reward": 0.3770515625,
+     "truncated": 445,
+     "steps": 41191,
+     "last100": {
+      "forward": 67,
+      "right": 18,
+      "left": 9,
+      "toggle": 3,
+      "pickup": 1,
+      "drop": 1,
+      "done": 1
+     },
+     "last100_top": [
+      "forward",
+      67
+     ],
+     "explored_share": 0.09972810254418334,
+     "wall_s": 7.24,
+     "env_max_steps": 64,
+     "seed": 28260923,
+     "effect_counts": {
+      "left": {
+       "known": 5591,
+       "excluded": 75,
+       "total": 5666
+      },
+      "right": {
+       "known": 5540,
+       "excluded": 75,
+       "total": 5615
+      },
+      "forward": {
+       "known": 26738,
+       "excluded": 785,
+       "total": 27523
+      },
+      "pickup": {
+       "known": 596,
+       "excluded": 18,
+       "total": 614
+      },
+      "drop": {
+       "known": 566,
+       "excluded": 12,
+       "total": 578
+      },
+      "toggle": {
+       "known": 578,
+       "excluded": 18,
+       "total": 596
+      },
+      "done": {
+       "known": 583,
+       "excluded": 16,
+       "total": 599
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.55,
+      "pickup": 0.25,
+      "drop": 0.05,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 546,
+     "success_rate": 0.546,
+     "mean_steps": 41.324,
+     "mean_reward": 0.37348125,
+     "truncated": 460,
+     "steps": 41324,
+     "last100": {
+      "forward": 69,
+      "left": 17,
+      "right": 6,
+      "drop": 4,
+      "pickup": 2,
+      "done": 2
+     },
+     "last100_top": [
+      "forward",
+      69
+     ],
+     "explored_share": 0.10010889292196007,
+     "wall_s": 6.59,
+     "env_max_steps": 64,
+     "seed": 29260923,
+     "effect_counts": {
+      "left": {
+       "known": 5656,
+       "excluded": 82,
+       "total": 5738
+      },
+      "right": {
+       "known": 5607,
+       "excluded": 62,
+       "total": 5669
+      },
+      "forward": {
+       "known": 26793,
+       "excluded": 805,
+       "total": 27598
+      },
+      "pickup": {
+       "known": 559,
+       "excluded": 16,
+       "total": 575
+      },
+      "drop": {
+       "known": 549,
+       "excluded": 8,
+       "total": 557
+      },
+      "toggle": {
+       "known": 565,
+       "excluded": 15,
+       "total": 580
+      },
+      "done": {
+       "known": 596,
+       "excluded": 11,
+       "total": 607
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.7,
+      "pickup": 0.15,
+      "drop": 0.0,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 530,
+     "success_rate": 0.53,
+     "mean_steps": 42.413,
+     "mean_reward": 0.3565671875,
+     "truncated": 473,
+     "steps": 42413,
+     "last100": {
+      "forward": 68,
+      "right": 19,
+      "left": 9,
+      "done": 2,
+      "toggle": 1,
+      "drop": 1
+     },
+     "last100_top": [
+      "forward",
+      68
+     ],
+     "explored_share": 0.10213608714103833,
+     "wall_s": 6.99,
+     "env_max_steps": 64,
+     "seed": 30260923,
+     "effect_counts": {
+      "left": {
+       "known": 5750,
+       "excluded": 60,
+       "total": 5810
+      },
+      "right": {
+       "known": 5684,
+       "excluded": 80,
+       "total": 5764
+      },
+      "forward": {
+       "known": 27570,
+       "excluded": 803,
+       "total": 28373
+      },
+      "pickup": {
+       "known": 594,
+       "excluded": 15,
+       "total": 609
+      },
+      "drop": {
+       "known": 602,
+       "excluded": 17,
+       "total": 619
+      },
+      "toggle": {
+       "known": 602,
+       "excluded": 11,
+       "total": 613
+      },
+      "done": {
+       "known": 612,
+       "excluded": 13,
+       "total": 625
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.75,
+      "pickup": 0.1,
+      "drop": 0.0,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 560,
+     "success_rate": 0.56,
+     "mean_steps": 41.52,
+     "mean_reward": 0.372125,
+     "truncated": 441,
+     "steps": 41520,
+     "last100": {
+      "forward": 65,
+      "left": 13,
+      "right": 13,
+      "pickup": 5,
+      "done": 2,
+      "toggle": 1,
+      "drop": 1
+     },
+     "last100_top": [
+      "forward",
+      65
+     ],
+     "explored_share": 0.09963632860480238,
+     "wall_s": 6.83,
+     "env_max_steps": 64,
+     "seed": 31260923,
+     "effect_counts": {
+      "left": {
+       "known": 5605,
+       "excluded": 67,
+       "total": 5672
+      },
+      "right": {
+       "known": 5681,
+       "excluded": 67,
+       "total": 5748
+      },
+      "forward": {
+       "known": 26878,
+       "excluded": 817,
+       "total": 27695
+      },
+      "pickup": {
+       "known": 611,
+       "excluded": 8,
+       "total": 619
+      },
+      "drop": {
+       "known": 560,
+       "excluded": 12,
+       "total": 572
+      },
+      "toggle": {
+       "known": 609,
+       "excluded": 15,
+       "total": 624
+      },
+      "done": {
+       "known": 577,
+       "excluded": 13,
+       "total": 590
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.5,
+      "pickup": 0.15,
+      "drop": 0.0,
+      "toggle": 0.2,
+      "done": 0.0
+     }
+    }
+   ],
+   "success_mean": 0.5565833333333333,
+   "success_sd": 0.013970477530286554,
+   "per_seed": [
+    0.573,
+    0.552,
+    0.56,
+    0.572,
+    0.545,
+    0.566,
+    0.572,
+    0.54,
+    0.563,
+    0.546,
+    0.53,
+    0.56
+   ],
+   "mean_steps": 41.282000000000004
+  },
+  "A-UCB": {
+   "label": "A-UCB: UCB1 on reward (the count-based bonus)",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 229,
+     "success_rate": 0.229,
+     "mean_steps": 56.268,
+     "mean_reward": 0.13163125,
+     "truncated": 772,
+     "steps": 56268,
+     "last100": {
+      "forward": 20,
+      "pickup": 18,
+      "left": 18,
+      "drop": 15,
+      "toggle": 13,
+      "right": 9,
+      "done": 7
+     },
+     "last100_top": [
+      "forward",
+      20
+     ],
+     "explored_share": 0.102312107910217,
+     "wall_s": 10.14,
+     "env_max_steps": 64,
+     "seed": 20260923,
+     "effect_counts": {
+      "left": {
+       "known": 8041,
+       "excluded": 137,
+       "total": 8178
+      },
+      "right": {
+       "known": 7933,
+       "excluded": 174,
+       "total": 8107
+      },
+      "forward": {
+       "known": 8266,
+       "excluded": 197,
+       "total": 8463
+      },
+      "pickup": {
+       "known": 7763,
+       "excluded": 120,
+       "total": 7883
+      },
+      "drop": {
+       "known": 7758,
+       "excluded": 119,
+       "total": 7877
+      },
+      "toggle": {
+       "known": 7756,
+       "excluded": 123,
+       "total": 7879
+      },
+      "done": {
+       "known": 7752,
+       "excluded": 129,
+       "total": 7881
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.25,
+      "pickup": 0.2,
+      "drop": 0.2,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 235,
+     "success_rate": 0.235,
+     "mean_steps": 55.596,
+     "mean_reward": 0.14168125,
+     "truncated": 766,
+     "steps": 55596,
+     "last100": {
+      "forward": 18,
+      "right": 17,
+      "pickup": 16,
+      "drop": 16,
+      "toggle": 12,
+      "left": 12,
+      "done": 9
+     },
+     "last100_top": [
+      "forward",
+      18
+     ],
+     "explored_share": 0.09908808029210209,
+     "wall_s": 10.04,
+     "env_max_steps": 64,
+     "seed": 21260923,
+     "effect_counts": {
+      "left": {
+       "known": 7926,
+       "excluded": 142,
+       "total": 8068
+      },
+      "right": {
+       "known": 7903,
+       "excluded": 161,
+       "total": 8064
+      },
+      "forward": {
+       "known": 8176,
+       "excluded": 191,
+       "total": 8367
+      },
+      "pickup": {
+       "known": 7644,
+       "excluded": 132,
+       "total": 7776
+      },
+      "drop": {
+       "known": 7647,
+       "excluded": 130,
+       "total": 7777
+      },
+      "toggle": {
+       "known": 7661,
+       "excluded": 111,
+       "total": 7772
+      },
+      "done": {
+       "known": 7640,
+       "excluded": 132,
+       "total": 7772
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.7,
+      "pickup": 0.25,
+      "drop": 0.2,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 219,
+     "success_rate": 0.219,
+     "mean_steps": 56.141,
+     "mean_reward": 0.13241718749999998,
+     "truncated": 784,
+     "steps": 56141,
+     "last100": {
+      "done": 20,
+      "forward": 17,
+      "left": 16,
+      "right": 12,
+      "drop": 12,
+      "toggle": 12,
+      "pickup": 11
+     },
+     "last100_top": [
+      "done",
+      20
+     ],
+     "explored_share": 0.10004987353496492,
+     "wall_s": 9.91,
+     "env_max_steps": 64,
+     "seed": 22260923,
+     "effect_counts": {
+      "left": {
+       "known": 7952,
+       "excluded": 169,
+       "total": 8121
+      },
+      "right": {
+       "known": 7957,
+       "excluded": 140,
+       "total": 8097
+      },
+      "forward": {
+       "known": 8266,
+       "excluded": 212,
+       "total": 8478
+      },
+      "pickup": {
+       "known": 7743,
+       "excluded": 116,
+       "total": 7859
+      },
+      "drop": {
+       "known": 7750,
+       "excluded": 111,
+       "total": 7861
+      },
+      "toggle": {
+       "known": 7736,
+       "excluded": 122,
+       "total": 7858
+      },
+      "done": {
+       "known": 7738,
+       "excluded": 129,
+       "total": 7867
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.6,
+      "pickup": 0.0,
+      "drop": 0.0,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 237,
+     "success_rate": 0.237,
+     "mean_steps": 55.739,
+     "mean_reward": 0.1398703125,
+     "truncated": 766,
+     "steps": 55739,
+     "last100": {
+      "right": 23,
+      "left": 20,
+      "drop": 15,
+      "done": 13,
+      "toggle": 13,
+      "pickup": 10,
+      "forward": 6
+     },
+     "last100_top": [
+      "right",
+      23
+     ],
+     "explored_share": 0.10007176175098673,
+     "wall_s": 10.05,
+     "env_max_steps": 64,
+     "seed": 23260923,
+     "effect_counts": {
+      "left": {
+       "known": 7972,
+       "excluded": 156,
+       "total": 8128
+      },
+      "right": {
+       "known": 7879,
+       "excluded": 146,
+       "total": 8025
+      },
+      "forward": {
+       "known": 8196,
+       "excluded": 204,
+       "total": 8400
+      },
+      "pickup": {
+       "known": 7679,
+       "excluded": 117,
+       "total": 7796
+      },
+      "drop": {
+       "known": 7680,
+       "excluded": 118,
+       "total": 7798
+      },
+      "toggle": {
+       "known": 7669,
+       "excluded": 127,
+       "total": 7796
+      },
+      "done": {
+       "known": 7665,
+       "excluded": 131,
+       "total": 7796
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.5,
+      "pickup": 0.1,
+      "drop": 0.05,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 238,
+     "success_rate": 0.238,
+     "mean_steps": 55.69,
+     "mean_reward": 0.140659375,
+     "truncated": 763,
+     "steps": 55690,
+     "last100": {
+      "forward": 18,
+      "drop": 16,
+      "left": 15,
+      "pickup": 14,
+      "done": 14,
+      "right": 12,
+      "toggle": 11
+     },
+     "last100_top": [
+      "forward",
+      18
+     ],
+     "explored_share": 0.10051893483686772,
+     "wall_s": 10.02,
+     "env_max_steps": 64,
+     "seed": 24260923,
+     "effect_counts": {
+      "left": {
+       "known": 7909,
+       "excluded": 152,
+       "total": 8061
+      },
+      "right": {
+       "known": 7918,
+       "excluded": 165,
+       "total": 8083
+      },
+      "forward": {
+       "known": 8228,
+       "excluded": 171,
+       "total": 8399
+      },
+      "pickup": {
+       "known": 7648,
+       "excluded": 139,
+       "total": 7787
+      },
+      "drop": {
+       "known": 7663,
+       "excluded": 125,
+       "total": 7788
+      },
+      "toggle": {
+       "known": 7675,
+       "excluded": 110,
+       "total": 7785
+      },
+      "done": {
+       "known": 7650,
+       "excluded": 137,
+       "total": 7787
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.45,
+      "pickup": 0.1,
+      "drop": 0.05,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 218,
+     "success_rate": 0.218,
+     "mean_steps": 56.134,
+     "mean_reward": 0.132415625,
+     "truncated": 784,
+     "steps": 56134,
+     "last100": {
+      "toggle": 18,
+      "right": 17,
+      "pickup": 17,
+      "left": 13,
+      "drop": 12,
+      "forward": 12,
+      "done": 11
+     },
+     "last100_top": [
+      "toggle",
+      18
+     ],
+     "explored_share": 0.10136278614055402,
+     "wall_s": 10.17,
+     "env_max_steps": 64,
+     "seed": 25260923,
+     "effect_counts": {
+      "left": {
+       "known": 7931,
+       "excluded": 161,
+       "total": 8092
+      },
+      "right": {
+       "known": 7917,
+       "excluded": 166,
+       "total": 8083
+      },
+      "forward": {
+       "known": 8330,
+       "excluded": 189,
+       "total": 8519
+      },
+      "pickup": {
+       "known": 7739,
+       "excluded": 125,
+       "total": 7864
+      },
+      "drop": {
+       "known": 7725,
+       "excluded": 133,
+       "total": 7858
+      },
+      "toggle": {
+       "known": 7752,
+       "excluded": 109,
+       "total": 7861
+      },
+      "done": {
+       "known": 7741,
+       "excluded": 116,
+       "total": 7857
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.25,
+      "pickup": 0.05,
+      "drop": 0.0,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 254,
+     "success_rate": 0.254,
+     "mean_steps": 54.878,
+     "mean_reward": 0.153678125,
+     "truncated": 749,
+     "steps": 54878,
+     "last100": {
+      "forward": 23,
+      "drop": 14,
+      "toggle": 14,
+      "left": 13,
+      "pickup": 13,
+      "right": 12,
+      "done": 11
+     },
+     "last100_top": [
+      "forward",
+      23
+     ],
+     "explored_share": 0.09788808105103956,
+     "wall_s": 9.47,
+     "env_max_steps": 64,
+     "seed": 26260923,
+     "effect_counts": {
+      "left": {
+       "known": 7788,
+       "excluded": 157,
+       "total": 7945
+      },
+      "right": {
+       "known": 7758,
+       "excluded": 149,
+       "total": 7907
+      },
+      "forward": {
+       "known": 8193,
+       "excluded": 199,
+       "total": 8392
+      },
+      "pickup": {
+       "known": 7537,
+       "excluded": 122,
+       "total": 7659
+      },
+      "drop": {
+       "known": 7536,
+       "excluded": 122,
+       "total": 7658
+      },
+      "toggle": {
+       "known": 7530,
+       "excluded": 130,
+       "total": 7660
+      },
+      "done": {
+       "known": 7537,
+       "excluded": 120,
+       "total": 7657
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.6,
+      "pickup": 0.05,
+      "drop": 0.0,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 232,
+     "success_rate": 0.232,
+     "mean_steps": 56.178,
+     "mean_reward": 0.133196875,
+     "truncated": 770,
+     "steps": 56178,
+     "last100": {
+      "toggle": 17,
+      "right": 15,
+      "done": 15,
+      "forward": 15,
+      "pickup": 14,
+      "drop": 12,
+      "left": 12
+     },
+     "last100_top": [
+      "toggle",
+      17
+     ],
+     "explored_share": 0.10176400434325994,
+     "wall_s": 9.8,
+     "env_max_steps": 64,
+     "seed": 27260923,
+     "effect_counts": {
+      "left": {
+       "known": 7987,
+       "excluded": 167,
+       "total": 8154
+      },
+      "right": {
+       "known": 7972,
+       "excluded": 152,
+       "total": 8124
+      },
+      "forward": {
+       "known": 8274,
+       "excluded": 166,
+       "total": 8440
+      },
+      "pickup": {
+       "known": 7744,
+       "excluded": 122,
+       "total": 7866
+      },
+      "drop": {
+       "known": 7733,
+       "excluded": 130,
+       "total": 7863
+      },
+      "toggle": {
+       "known": 7735,
+       "excluded": 132,
+       "total": 7867
+      },
+      "done": {
+       "known": 7734,
+       "excluded": 130,
+       "total": 7864
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.15,
+      "pickup": 0.1,
+      "drop": 0.1,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 215,
+     "success_rate": 0.215,
+     "mean_steps": 56.884,
+     "mean_reward": 0.12156874999999999,
+     "truncated": 787,
+     "steps": 56884,
+     "last100": {
+      "pickup": 19,
+      "done": 17,
+      "forward": 15,
+      "left": 15,
+      "right": 14,
+      "drop": 12,
+      "toggle": 8
+     },
+     "last100_top": [
+      "pickup",
+      19
+     ],
+     "explored_share": 0.1001318449503384,
+     "wall_s": 10.1,
+     "env_max_steps": 64,
+     "seed": 28260923,
+     "effect_counts": {
+      "left": {
+       "known": 8021,
+       "excluded": 160,
+       "total": 8181
+      },
+      "right": {
+       "known": 8105,
+       "excluded": 152,
+       "total": 8257
+      },
+      "forward": {
+       "known": 8331,
+       "excluded": 187,
+       "total": 8518
+      },
+      "pickup": {
+       "known": 7848,
+       "excluded": 136,
+       "total": 7984
+      },
+      "drop": {
+       "known": 7863,
+       "excluded": 119,
+       "total": 7982
+      },
+      "toggle": {
+       "known": 7851,
+       "excluded": 125,
+       "total": 7976
+      },
+      "done": {
+       "known": 7866,
+       "excluded": 120,
+       "total": 7986
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.2,
+      "pickup": 0.1,
+      "drop": 0.0,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 242,
+     "success_rate": 0.242,
+     "mean_steps": 55.405,
+     "mean_reward": 0.1450671875,
+     "truncated": 761,
+     "steps": 55405,
+     "last100": {
+      "drop": 19,
+      "pickup": 17,
+      "left": 15,
+      "done": 14,
+      "right": 13,
+      "forward": 11,
+      "toggle": 11
+     },
+     "last100_top": [
+      "drop",
+      19
+     ],
+     "explored_share": 0.1001877053026748,
+     "wall_s": 10.13,
+     "env_max_steps": 64,
+     "seed": 29260923,
+     "effect_counts": {
+      "left": {
+       "known": 7837,
+       "excluded": 150,
+       "total": 7987
+      },
+      "right": {
+       "known": 7825,
+       "excluded": 141,
+       "total": 7966
+      },
+      "forward": {
+       "known": 8296,
+       "excluded": 183,
+       "total": 8479
+      },
+      "pickup": {
+       "known": 7625,
+       "excluded": 118,
+       "total": 7743
+      },
+      "drop": {
+       "known": 7604,
+       "excluded": 140,
+       "total": 7744
+      },
+      "toggle": {
+       "known": 7611,
+       "excluded": 132,
+       "total": 7743
+      },
+      "done": {
+       "known": 7608,
+       "excluded": 135,
+       "total": 7743
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.4,
+      "pickup": 0.05,
+      "drop": 0.05,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 230,
+     "success_rate": 0.23,
+     "mean_steps": 55.739,
+     "mean_reward": 0.1391703125,
+     "truncated": 775,
+     "steps": 55739,
+     "last100": {
+      "right": 23,
+      "toggle": 18,
+      "left": 18,
+      "drop": 12,
+      "pickup": 12,
+      "forward": 10,
+      "done": 7
+     },
+     "last100_top": [
+      "right",
+      23
+     ],
+     "explored_share": 0.10317545748116254,
+     "wall_s": 9.68,
+     "env_max_steps": 64,
+     "seed": 30260923,
+     "effect_counts": {
+      "left": {
+       "known": 7888,
+       "excluded": 154,
+       "total": 8042
+      },
+      "right": {
+       "known": 7938,
+       "excluded": 158,
+       "total": 8096
+      },
+      "forward": {
+       "known": 8245,
+       "excluded": 172,
+       "total": 8417
+      },
+      "pickup": {
+       "known": 7671,
+       "excluded": 124,
+       "total": 7795
+      },
+      "drop": {
+       "known": 7674,
+       "excluded": 122,
+       "total": 7796
+      },
+      "toggle": {
+       "known": 7665,
+       "excluded": 135,
+       "total": 7800
+      },
+      "done": {
+       "known": 7659,
+       "excluded": 134,
+       "total": 7793
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.2,
+      "pickup": 0.1,
+      "drop": 0.0,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 223,
+     "success_rate": 0.223,
+     "mean_steps": 56.183,
+     "mean_reward": 0.1322265625,
+     "truncated": 784,
+     "steps": 56183,
+     "last100": {
+      "done": 18,
+      "pickup": 17,
+      "drop": 17,
+      "forward": 17,
+      "right": 12,
+      "left": 11,
+      "toggle": 8
+     },
+     "last100_top": [
+      "done",
+      18
+     ],
+     "explored_share": 0.10034885376619679,
+     "wall_s": 9.61,
+     "env_max_steps": 64,
+     "seed": 31260923,
+     "effect_counts": {
+      "left": {
+       "known": 7995,
+       "excluded": 155,
+       "total": 8150
+      },
+      "right": {
+       "known": 7954,
+       "excluded": 145,
+       "total": 8099
+      },
+      "forward": {
+       "known": 8272,
+       "excluded": 191,
+       "total": 8463
+      },
+      "pickup": {
+       "known": 7757,
+       "excluded": 114,
+       "total": 7871
+      },
+      "drop": {
+       "known": 7743,
+       "excluded": 124,
+       "total": 7867
+      },
+      "toggle": {
+       "known": 7726,
+       "excluded": 139,
+       "total": 7865
+      },
+      "done": {
+       "known": 7737,
+       "excluded": 131,
+       "total": 7868
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.25,
+      "pickup": 0.15,
+      "drop": 0.05,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    }
+   ],
+   "success_mean": 0.23099999999999998,
+   "success_sd": 0.011241158141563365,
+   "per_seed": [
+    0.229,
+    0.235,
+    0.219,
+    0.237,
+    0.238,
+    0.218,
+    0.254,
+    0.232,
+    0.215,
+    0.242,
+    0.23,
+    0.223
+   ],
+   "mean_steps": 55.90291666666667
+  },
+  "A-RATE": {
+   "label": "A-RATE: sampled by the 2,000-outcome reward rate",
+   "runs": [
+    {
+     "episodes": 1000,
+     "successes": 351,
+     "success_rate": 0.351,
+     "mean_steps": 51.154,
+     "mean_reward": 0.21574687499999998,
+     "truncated": 654,
+     "steps": 51154,
+     "last100": {
+      "forward": 23,
+      "left": 20,
+      "toggle": 16,
+      "right": 13,
+      "done": 13,
+      "drop": 12,
+      "pickup": 3
+     },
+     "last100_top": [
+      "forward",
+      23
+     ],
+     "explored_share": 0.10104584107125403,
+     "wall_s": 9.06,
+     "env_max_steps": 64,
+     "seed": 20260923,
+     "effect_counts": {
+      "left": {
+       "known": 8958,
+       "excluded": 156,
+       "total": 9114
+      },
+      "right": {
+       "known": 8692,
+       "excluded": 180,
+       "total": 8872
+      },
+      "forward": {
+       "known": 12673,
+       "excluded": 283,
+       "total": 12956
+      },
+      "pickup": {
+       "known": 4931,
+       "excluded": 75,
+       "total": 5006
+      },
+      "drop": {
+       "known": 4828,
+       "excluded": 106,
+       "total": 4934
+      },
+      "toggle": {
+       "known": 5053,
+       "excluded": 101,
+       "total": 5154
+      },
+      "done": {
+       "known": 5020,
+       "excluded": 98,
+       "total": 5118
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.9,
+      "pickup": 0.25,
+      "drop": 0.15,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 382,
+     "success_rate": 0.382,
+     "mean_steps": 49.761,
+     "mean_reward": 0.2384359375,
+     "truncated": 620,
+     "steps": 49761,
+     "last100": {
+      "forward": 27,
+      "left": 24,
+      "right": 14,
+      "done": 13,
+      "toggle": 8,
+      "drop": 7,
+      "pickup": 7
+     },
+     "last100_top": [
+      "forward",
+      27
+     ],
+     "explored_share": 0.09919215465616334,
+     "wall_s": 8.91,
+     "env_max_steps": 64,
+     "seed": 21260923,
+     "effect_counts": {
+      "left": {
+       "known": 9991,
+       "excluded": 214,
+       "total": 10205
+      },
+      "right": {
+       "known": 7733,
+       "excluded": 162,
+       "total": 7895
+      },
+      "forward": {
+       "known": 12137,
+       "excluded": 269,
+       "total": 12406
+      },
+      "pickup": {
+       "known": 4782,
+       "excluded": 94,
+       "total": 4876
+      },
+      "drop": {
+       "known": 4726,
+       "excluded": 87,
+       "total": 4813
+      },
+      "toggle": {
+       "known": 4630,
+       "excluded": 85,
+       "total": 4715
+      },
+      "done": {
+       "known": 4763,
+       "excluded": 88,
+       "total": 4851
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.65,
+      "pickup": 0.15,
+      "drop": 0.1,
+      "toggle": 0.1,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 413,
+     "success_rate": 0.413,
+     "mean_steps": 48.25,
+     "mean_reward": 0.262784375,
+     "truncated": 592,
+     "steps": 48250,
+     "last100": {
+      "forward": 37,
+      "right": 20,
+      "done": 11,
+      "drop": 11,
+      "pickup": 8,
+      "left": 7,
+      "toggle": 6
+     },
+     "last100_top": [
+      "forward",
+      37
+     ],
+     "explored_share": 0.09910675426416032,
+     "wall_s": 8.6,
+     "env_max_steps": 64,
+     "seed": 22260923,
+     "effect_counts": {
+      "left": {
+       "known": 8349,
+       "excluded": 209,
+       "total": 8558
+      },
+      "right": {
+       "known": 9171,
+       "excluded": 194,
+       "total": 9365
+      },
+      "forward": {
+       "known": 12193,
+       "excluded": 250,
+       "total": 12443
+      },
+      "pickup": {
+       "known": 4446,
+       "excluded": 109,
+       "total": 4555
+      },
+      "drop": {
+       "known": 4391,
+       "excluded": 73,
+       "total": 4464
+      },
+      "toggle": {
+       "known": 4394,
+       "excluded": 87,
+       "total": 4481
+      },
+      "done": {
+       "known": 4307,
+       "excluded": 77,
+       "total": 4384
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.3,
+      "pickup": 0.15,
+      "drop": 0.1,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 365,
+     "success_rate": 0.365,
+     "mean_steps": 50.397,
+     "mean_reward": 0.2277921875,
+     "truncated": 637,
+     "steps": 50397,
+     "last100": {
+      "forward": 30,
+      "left": 20,
+      "right": 16,
+      "pickup": 10,
+      "done": 8,
+      "toggle": 8,
+      "drop": 8
+     },
+     "last100_top": [
+      "forward",
+      30
+     ],
+     "explored_share": 0.09907139172189372,
+     "wall_s": 8.59,
+     "env_max_steps": 64,
+     "seed": 23260923,
+     "effect_counts": {
+      "left": {
+       "known": 9463,
+       "excluded": 192,
+       "total": 9655
+      },
+      "right": {
+       "known": 8235,
+       "excluded": 146,
+       "total": 8381
+      },
+      "forward": {
+       "known": 12391,
+       "excluded": 241,
+       "total": 12632
+      },
+      "pickup": {
+       "known": 4834,
+       "excluded": 104,
+       "total": 4938
+      },
+      "drop": {
+       "known": 4894,
+       "excluded": 102,
+       "total": 4996
+      },
+      "toggle": {
+       "known": 4811,
+       "excluded": 102,
+       "total": 4913
+      },
+      "done": {
+       "known": 4770,
+       "excluded": 112,
+       "total": 4882
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.6,
+      "pickup": 0.15,
+      "drop": 0.1,
+      "toggle": 0.1,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 336,
+     "success_rate": 0.336,
+     "mean_steps": 51.474,
+     "mean_reward": 0.209746875,
+     "truncated": 665,
+     "steps": 51474,
+     "last100": {
+      "right": 24,
+      "forward": 23,
+      "left": 16,
+      "pickup": 14,
+      "drop": 11,
+      "toggle": 7,
+      "done": 5
+     },
+     "last100_top": [
+      "right",
+      24
+     ],
+     "explored_share": 0.10220495386109762,
+     "wall_s": 9.36,
+     "env_max_steps": 64,
+     "seed": 24260923,
+     "effect_counts": {
+      "left": {
+       "known": 9225,
+       "excluded": 169,
+       "total": 9394
+      },
+      "right": {
+       "known": 8924,
+       "excluded": 186,
+       "total": 9110
+      },
+      "forward": {
+       "known": 12073,
+       "excluded": 236,
+       "total": 12309
+      },
+      "pickup": {
+       "known": 5057,
+       "excluded": 103,
+       "total": 5160
+      },
+      "drop": {
+       "known": 5002,
+       "excluded": 103,
+       "total": 5105
+      },
+      "toggle": {
+       "known": 4981,
+       "excluded": 85,
+       "total": 5066
+      },
+      "done": {
+       "known": 5213,
+       "excluded": 117,
+       "total": 5330
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.65,
+      "pickup": 0.2,
+      "drop": 0.2,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 358,
+     "success_rate": 0.358,
+     "mean_steps": 50.82,
+     "mean_reward": 0.22114374999999997,
+     "truncated": 649,
+     "steps": 50820,
+     "last100": {
+      "forward": 34,
+      "left": 28,
+      "toggle": 10,
+      "pickup": 9,
+      "right": 9,
+      "done": 5,
+      "drop": 5
+     },
+     "last100_top": [
+      "forward",
+      34
+     ],
+     "explored_share": 0.10033253969815627,
+     "wall_s": 8.57,
+     "env_max_steps": 64,
+     "seed": 25260923,
+     "effect_counts": {
+      "left": {
+       "known": 9283,
+       "excluded": 193,
+       "total": 9476
+      },
+      "right": {
+       "known": 8932,
+       "excluded": 182,
+       "total": 9114
+      },
+      "forward": {
+       "known": 12105,
+       "excluded": 253,
+       "total": 12358
+      },
+      "pickup": {
+       "known": 4888,
+       "excluded": 81,
+       "total": 4969
+      },
+      "drop": {
+       "known": 4867,
+       "excluded": 85,
+       "total": 4952
+      },
+      "toggle": {
+       "known": 4801,
+       "excluded": 114,
+       "total": 4915
+      },
+      "done": {
+       "known": 4945,
+       "excluded": 91,
+       "total": 5036
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.25,
+      "pickup": 0.1,
+      "drop": 0.05,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 368,
+     "success_rate": 0.368,
+     "mean_steps": 50.317,
+     "mean_reward": 0.2292171875,
+     "truncated": 639,
+     "steps": 50317,
+     "last100": {
+      "forward": 23,
+      "left": 18,
+      "right": 18,
+      "pickup": 12,
+      "toggle": 12,
+      "drop": 10,
+      "done": 7
+     },
+     "last100_top": [
+      "forward",
+      23
+     ],
+     "explored_share": 0.09702293413887675,
+     "wall_s": 8.99,
+     "env_max_steps": 64,
+     "seed": 26260923,
+     "effect_counts": {
+      "left": {
+       "known": 9105,
+       "excluded": 176,
+       "total": 9281
+      },
+      "right": {
+       "known": 8173,
+       "excluded": 150,
+       "total": 8323
+      },
+      "forward": {
+       "known": 12842,
+       "excluded": 283,
+       "total": 13125
+      },
+      "pickup": {
+       "known": 4790,
+       "excluded": 96,
+       "total": 4886
+      },
+      "drop": {
+       "known": 4803,
+       "excluded": 97,
+       "total": 4900
+      },
+      "toggle": {
+       "known": 4840,
+       "excluded": 100,
+       "total": 4940
+      },
+      "done": {
+       "known": 4765,
+       "excluded": 97,
+       "total": 4862
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.45,
+      "pickup": 0.2,
+      "drop": 0.1,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 335,
+     "success_rate": 0.335,
+     "mean_steps": 51.313,
+     "mean_reward": 0.21191093749999998,
+     "truncated": 668,
+     "steps": 51313,
+     "last100": {
+      "forward": 32,
+      "right": 22,
+      "left": 14,
+      "drop": 9,
+      "done": 9,
+      "toggle": 7,
+      "pickup": 7
+     },
+     "last100_top": [
+      "forward",
+      32
+     ],
+     "explored_share": 0.10283743227968975,
+     "wall_s": 9.22,
+     "env_max_steps": 64,
+     "seed": 27260923,
+     "effect_counts": {
+      "left": {
+       "known": 7883,
+       "excluded": 141,
+       "total": 8024
+      },
+      "right": {
+       "known": 9974,
+       "excluded": 208,
+       "total": 10182
+      },
+      "forward": {
+       "known": 12365,
+       "excluded": 270,
+       "total": 12635
+      },
+      "pickup": {
+       "known": 5011,
+       "excluded": 82,
+       "total": 5093
+      },
+      "drop": {
+       "known": 5132,
+       "excluded": 92,
+       "total": 5224
+      },
+      "toggle": {
+       "known": 5010,
+       "excluded": 119,
+       "total": 5129
+      },
+      "done": {
+       "known": 4939,
+       "excluded": 87,
+       "total": 5026
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.3,
+      "pickup": 0.05,
+      "drop": 0.05,
+      "toggle": 0.15,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 372,
+     "success_rate": 0.372,
+     "mean_steps": 50.484,
+     "mean_reward": 0.22726875,
+     "truncated": 633,
+     "steps": 50484,
+     "last100": {
+      "forward": 20,
+      "right": 20,
+      "left": 17,
+      "drop": 16,
+      "pickup": 10,
+      "done": 9,
+      "toggle": 8
+     },
+     "last100_top": [
+      "forward",
+      20
+     ],
+     "explored_share": 0.10103991284539962,
+     "wall_s": 8.71,
+     "env_max_steps": 64,
+     "seed": 28260923,
+     "effect_counts": {
+      "left": {
+       "known": 9526,
+       "excluded": 181,
+       "total": 9707
+      },
+      "right": {
+       "known": 8248,
+       "excluded": 170,
+       "total": 8418
+      },
+      "forward": {
+       "known": 12384,
+       "excluded": 263,
+       "total": 12647
+      },
+      "pickup": {
+       "known": 4802,
+       "excluded": 112,
+       "total": 4914
+      },
+      "drop": {
+       "known": 4843,
+       "excluded": 96,
+       "total": 4939
+      },
+      "toggle": {
+       "known": 4760,
+       "excluded": 91,
+       "total": 4851
+      },
+      "done": {
+       "known": 4922,
+       "excluded": 86,
+       "total": 5008
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.6,
+      "pickup": 0.15,
+      "drop": 0.05,
+      "toggle": 0.05,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 382,
+     "success_rate": 0.382,
+     "mean_steps": 49.517,
+     "mean_reward": 0.2418671875,
+     "truncated": 619,
+     "steps": 49517,
+     "last100": {
+      "forward": 29,
+      "right": 17,
+      "left": 15,
+      "pickup": 12,
+      "drop": 11,
+      "toggle": 10,
+      "done": 6
+     },
+     "last100_top": [
+      "forward",
+      29
+     ],
+     "explored_share": 0.09941839331152308,
+     "wall_s": 8.25,
+     "env_max_steps": 64,
+     "seed": 29260923,
+     "effect_counts": {
+      "left": {
+       "known": 7864,
+       "excluded": 184,
+       "total": 8048
+      },
+      "right": {
+       "known": 9626,
+       "excluded": 172,
+       "total": 9798
+      },
+      "forward": {
+       "known": 12542,
+       "excluded": 264,
+       "total": 12806
+      },
+      "pickup": {
+       "known": 4612,
+       "excluded": 102,
+       "total": 4714
+      },
+      "drop": {
+       "known": 4621,
+       "excluded": 83,
+       "total": 4704
+      },
+      "toggle": {
+       "known": 4625,
+       "excluded": 83,
+       "total": 4708
+      },
+      "done": {
+       "known": 4628,
+       "excluded": 111,
+       "total": 4739
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.55,
+      "pickup": 0.15,
+      "drop": 0.15,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 367,
+     "success_rate": 0.367,
+     "mean_steps": 49.802,
+     "mean_reward": 0.236359375,
+     "truncated": 638,
+     "steps": 49802,
+     "last100": {
+      "forward": 34,
+      "left": 22,
+      "done": 12,
+      "right": 11,
+      "drop": 10,
+      "pickup": 7,
+      "toggle": 4
+     },
+     "last100_top": [
+      "forward",
+      34
+     ],
+     "explored_share": 0.10234323233540148,
+     "wall_s": 8.26,
+     "env_max_steps": 64,
+     "seed": 30260923,
+     "effect_counts": {
+      "left": {
+       "known": 8659,
+       "excluded": 175,
+       "total": 8834
+      },
+      "right": {
+       "known": 8729,
+       "excluded": 179,
+       "total": 8908
+      },
+      "forward": {
+       "known": 12445,
+       "excluded": 246,
+       "total": 12691
+      },
+      "pickup": {
+       "known": 4802,
+       "excluded": 107,
+       "total": 4909
+      },
+      "drop": {
+       "known": 4686,
+       "excluded": 105,
+       "total": 4791
+      },
+      "toggle": {
+       "known": 4860,
+       "excluded": 93,
+       "total": 4953
+      },
+      "done": {
+       "known": 4622,
+       "excluded": 94,
+       "total": 4716
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.25,
+      "pickup": 0.05,
+      "drop": 0.0,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    },
+    {
+     "episodes": 1000,
+     "successes": 359,
+     "success_rate": 0.359,
+     "mean_steps": 50.869,
+     "mean_reward": 0.2205546875,
+     "truncated": 642,
+     "steps": 50869,
+     "last100": {
+      "left": 24,
+      "right": 23,
+      "forward": 15,
+      "toggle": 14,
+      "done": 13,
+      "pickup": 6,
+      "drop": 5
+     },
+     "last100_top": [
+      "left",
+      24
+     ],
+     "explored_share": 0.10062905445252604,
+     "wall_s": 8.59,
+     "env_max_steps": 64,
+     "seed": 31260923,
+     "effect_counts": {
+      "left": {
+       "known": 9449,
+       "excluded": 166,
+       "total": 9615
+      },
+      "right": {
+       "known": 8928,
+       "excluded": 175,
+       "total": 9103
+      },
+      "forward": {
+       "known": 11972,
+       "excluded": 236,
+       "total": 12208
+      },
+      "pickup": {
+       "known": 4822,
+       "excluded": 120,
+       "total": 4942
+      },
+      "drop": {
+       "known": 4877,
+       "excluded": 103,
+       "total": 4980
+      },
+      "toggle": {
+       "known": 4886,
+       "excluded": 97,
+       "total": 4983
+      },
+      "done": {
+       "known": 4936,
+       "excluded": 102,
+       "total": 5038
+      }
+     },
+     "final_rates": {
+      "left": 1.0,
+      "right": 1.0,
+      "forward": 0.45,
+      "pickup": 0.15,
+      "drop": 0.05,
+      "toggle": 0.0,
+      "done": 0.0
+     }
+    }
+   ],
+   "success_mean": 0.36566666666666664,
+   "success_sd": 0.021236047112626603,
+   "per_seed": [
+    0.351,
+    0.382,
+    0.413,
+    0.365,
+    0.336,
+    0.358,
+    0.368,
+    0.335,
+    0.372,
+    0.382,
+    0.367,
+    0.359
+   ],
+   "mean_steps": 50.3465
+  }
+ }
+}

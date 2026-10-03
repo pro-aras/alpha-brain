@@ -1,0 +1,14 @@
+.....E..................................
+======================================================================
+ERROR: test_the_boundary_outcome_is_unknown_and_the_plant_proves_the_rule (tests.creature.test_act_effect_toy.TestBoundaryRuleM9.test_the_boundary_outcome_is_unknown_and_the_plant_proves_the_rule)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 91, in test_the_boundary_outcome_is_unknown_and_the_plant_proves_the_rule
+    self.assertNotEqual(tape[6]["sha"], tape[7]["sha"])
+                        ~~~~~~~^^^^^^^
+KeyError: 'sha'
+
+----------------------------------------------------------------------
+Ran 40 tests in 9.650s
+
+FAILED (errors=1)

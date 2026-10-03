@@ -1,0 +1,116 @@
+{
+ "BabyAI-OpenRedDoor-v0": {
+  "env": "BabyAI-OpenRedDoor-v0",
+  "max_steps": 50,
+  "episodes": 300,
+  "success": 0.1667,
+  "mean_steps": 46.0,
+  "excluded_first_outcomes": 300,
+  "per_act": {
+   "left": {
+    "n": 1922,
+    "p_changed": 0.99
+   },
+   "right": {
+    "n": 1923,
+    "p_changed": 0.985
+   },
+   "forward": {
+    "n": 1877,
+    "p_changed": 0.551
+   },
+   "pickup": {
+    "n": 1960,
+    "p_changed": 0.0
+   },
+   "drop": {
+    "n": 1988,
+    "p_changed": 0.0
+   },
+   "toggle": {
+    "n": 1929,
+    "p_changed": 0.026
+   },
+   "done": {
+    "n": 1887,
+    "p_changed": 0.0
+   }
+  }
+ },
+ "BabyAI-OpenDoor-v0": {
+  "env": "BabyAI-OpenDoor-v0",
+  "max_steps": 576,
+  "episodes": 30,
+  "success": 0.3,
+  "mean_steps": 433.0,
+  "excluded_first_outcomes": 30,
+  "per_act": {
+   "left": {
+    "n": 1799,
+    "p_changed": 1.0
+   },
+   "right": {
+    "n": 1893,
+    "p_changed": 1.0
+   },
+   "forward": {
+    "n": 1870,
+    "p_changed": 0.743
+   },
+   "pickup": {
+    "n": 1858,
+    "p_changed": 0.0
+   },
+   "drop": {
+    "n": 1788,
+    "p_changed": 0.0
+   },
+   "toggle": {
+    "n": 1866,
+    "p_changed": 0.027
+   },
+   "done": {
+    "n": 1887,
+    "p_changed": 0.0
+   }
+  }
+ },
+ "BabyAI-GoToDoor-v0": {
+  "env": "BabyAI-GoToDoor-v0",
+  "max_steps": 441,
+  "episodes": 30,
+  "success": 0.6,
+  "mean_steps": 266.7,
+  "excluded_first_outcomes": 30,
+  "per_act": {
+   "left": {
+    "n": 1077,
+    "p_changed": 0.996
+   },
+   "right": {
+    "n": 1167,
+    "p_changed": 0.994
+   },
+   "forward": {
+    "n": 1136,
+    "p_changed": 0.704
+   },
+   "pickup": {
+    "n": 1158,
+    "p_changed": 0.0
+   },
+   "drop": {
+    "n": 1116,
+    "p_changed": 0.0
+   },
+   "toggle": {
+    "n": 1175,
+    "p_changed": 0.021
+   },
+   "done": {
+    "n": 1143,
+    "p_changed": 0.0
+   }
+  }
+ }
+}
