@@ -8,7 +8,9 @@ A BAND is the half-width of the NO-EVIDENCE region around Δ = mutant − incumb
 draws, so under no merit difference it is centred at 0, and the edge is t(20, 1 − 0.0083) · √2 · σ̂, not centred on the mean of k
 differences against one incumbent). Three kinds: `normal` (edge = that half-width), `rank` (the null's range max − min, used when the
 null is not normal at p < 0.01 — «outside all draws»), `none` (the null could not give a band: fewer than 3 distinct values or σ = 0,
-A1 (i); the dimension does not gate and the law says so). An integer reading compares on its own GRID (q1_seen in items of 1/110,
+A1 (i); the dimension does not gate and the law says so — unless the band carries a `legacy` field, A′, the seat's ruling of 2026-10-03 22:32 on A3.7: then the
+dimension keeps the LEGACY tolerance, any fall is `below` and a rise is `above` only from its margin (tools/evolve.py MARGINS), a pre-law tolerance and not a measured one).
+An integer reading compares on its own GRID (q1_seen in items of 1/110,
 frames_filed in frames): Δ is rounded to whole grid steps and compared strictly with the edge in steps, so float noise in a difference of
 two k/110 values never moves a reading across an edge.
 
@@ -44,7 +46,16 @@ def position(delta: Optional[float], band: dict) -> str:
         return "missing"
     half = _half(band)
     if half is None:
-        return "no-band"
+        leg = band.get("legacy")
+        if leg is None:
+            return "no-band"
+        # edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 23:04 +0400 — A′: the legacy tolerance of tools/evolve.py regression_bar (mv < iv regresses; mv >= iv + margin improves),
+        # on the reading's own grid (float noise in a difference of two k/110 values never moves it), with 1e-12 of slack on the margin (0.47 − 0.45 is 0.0199999999999999…)
+        g = band.get("grid")
+        d = round(delta / g) * g if g else delta
+        if d < 0:
+            return "below"
+        return "above" if d >= float(leg["rise_margin"]) - 1e-12 else "within"
     grid = band.get("grid")
     d, h = (round(delta / grid), half / grid) if grid else (delta, half)
     if d < -h:
@@ -63,7 +74,8 @@ def _dim_entry(iv, mv, band: dict) -> dict:
             "edge": half, "grid": grid,
             "delta_grid": (delta / grid) if (delta is not None and grid) else None,
             "edge_grid": edge_grid,
-            "min_clear_grid": (math.floor(round(edge_grid, 9)) + 1) if edge_grid is not None else None}
+            "min_clear_grid": (math.floor(round(edge_grid, 9)) + 1) if edge_grid is not None else None,
+            "legacy_rise_margin": ((band.get("legacy") or {}).get("rise_margin") if half is None else None)}
 
 
 def _cost_entry(incumbent: dict, mutant: dict, bands: dict) -> dict:
@@ -102,7 +114,8 @@ def calibrated_verdict(incumbent: dict, mutant: dict, bands: dict) -> dict:
         if e["delta"] is None:
             return f"{d} missing"
         g = f" (Δ {e['delta_grid']:+.0f} vs edge {e['edge_grid']:.2f}; needs ≥ {e['min_clear_grid']})" if e["edge_grid"] is not None else (
-            f" (Δ {e['delta']:+.4f} vs edge {e['edge']:.4f})" if e["edge"] is not None else " (no band)")
+            f" (Δ {e['delta']:+.4f} vs edge {e['edge']:.4f})" if e["edge"] is not None else (
+                f" (no band: the legacy tolerance, any fall regresses, a rise needs ≥ {e['legacy_rise_margin']})" if e["legacy_rise_margin"] is not None else " (no band)"))
         return f"{d} {e['incumbent']}->{e['mutant']} {e['position']}{g}"
     bits = [part(d) for d in GATED]
     if cost["ratio"] is not None:
@@ -155,6 +168,15 @@ def validate_bands(bands: dict) -> None:
     for d, b in bands["dims"].items():
         if not isinstance(b, dict) or b.get("kind") not in KINDS:
             raise ValueError(f"bands: dimension {d!r} has kind {None if not isinstance(b, dict) else b.get('kind')!r} (need one of {KINDS})")
+        if "legacy" in b:                          # A′: only a `none` band may carry the legacy tolerance, and it must say what it is
+            lg = b["legacy"]
+            if b["kind"] != "none":
+                raise ValueError(f"bands: dimension {d!r} is `{b['kind']}` and carries a legacy tolerance (a legacy field belongs on a `none` band only)")
+            if not isinstance(lg, dict) or lg.get("fall") != "any":
+                raise ValueError(f"bands: dimension {d!r} has a malformed legacy tolerance {lg!r} (need {{'fall': 'any', 'rise_margin': number >= 0}})")
+            m = lg.get("rise_margin")
+            if not isinstance(m, (int, float)) or isinstance(m, bool) or not (m >= 0):
+                raise ValueError(f"bands: dimension {d!r} has a legacy rise_margin {m!r} (need a number >= 0)")
         if b["kind"] == "normal":
             e = b.get("edge")
             if not isinstance(e, (int, float)) or isinstance(e, bool) or not (e >= 0):

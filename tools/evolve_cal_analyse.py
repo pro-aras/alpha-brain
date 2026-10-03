@@ -230,9 +230,10 @@ def _ceiling(d: str, inc: dict, band: dict) -> dict:
 
 def bands_from_twins(inc: dict, eps_twins: Sequence[dict], seed_twins: Optional[Sequence[dict]], slice_name: str, scope: str, degenerate: str = "none") -> dict:
     """The BANDS file from the incumbent + the chosen level's epsilon twins (the null of every dimension) and the seed twins (frames_filed's A2.2 null, the incumbent among them).
-    degenerate = «none» (reading A: a degenerate dimension has NO band) or «range» (reading B: the band of its null's own range, floored at one resolvable step)."""
-    if degenerate not in ("none", "range"):
-        raise ValueError(f"bands_from_twins: degenerate must be 'none' or 'range', got {degenerate!r}")
+    degenerate = «none» (reading A: a degenerate dimension has NO band), «range» (reading B: the band of its null's own range, floored at one resolvable step) or «legacy»
+    (reading A′, the seat's ruling of 2026-10-03 22:32 on A3.7: a bandless dimension keeps the LEGACY tolerance — any fall regresses, a rise needs its margin, tools/evolve.py MARGINS)."""
+    if degenerate not in ("none", "range", "legacy"):
+        raise ValueError(f"bands_from_twins: degenerate must be 'none', 'range' or 'legacy', got {degenerate!r}")
     null = null_arrays(inc, eps_twins)
     seed_frames = None
     if seed_twins:
@@ -252,6 +253,14 @@ def bands_from_twins(inc: dict, eps_twins: Sequence[dict], seed_twins: Optional[
                     b["dims"][d]["edge_grid"] = rng / band["grid"]
                     b["dims"][d]["min_clear_grid"] = math.floor(round(rng / band["grid"], 9)) + 1
         b["degenerate_reading"] = "B: the null's own range, floored at one resolvable step"
+    elif degenerate == "legacy":
+        for d in GATED:
+            band = b["dims"][d]
+            if band["kind"] == "none":
+                band["legacy"] = {"fall": "any", "rise_margin": cal.ev.MARGINS[d],
+                                  "basis": "A′ (the seat's ruling of 2026-10-03 22:32 on A3.7): the calibration measured no noise for this dimension at the perturbations that reach the "
+                                           "organism, so its tolerance is the pre-law one (tools/evolve.py MARGINS), not a measured one"}
+        b["degenerate_reading"] = "A′: a bandless dimension keeps the legacy tolerance (any fall regresses, a rise needs its margin) — a pre-law tolerance, not a measured one"
     else:
         b["degenerate_reading"] = "A: a degenerate dimension has NO band and does not gate"
     q1 = inc.get("q1_seen")

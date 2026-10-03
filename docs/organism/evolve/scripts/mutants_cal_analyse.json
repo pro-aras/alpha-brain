@@ -232,5 +232,35 @@
   "old": "        regressed = bool(down > 0)",
   "new": "        regressed = bool(down >= margin_u)",
   "expect": "test_a_bandless_dimension_is_printed_against_the_legacy_tolerance"
+ },
+ {
+  "name": "legacy-mode-not-accepted",
+  "old": "    if degenerate not in (\"none\", \"range\", \"legacy\"):",
+  "new": "    if degenerate not in (\"none\", \"range\"):",
+  "expect": "test_reading_a_prime_a_bandless_dimension_carries_the_legacy_tolerance"
+ },
+ {
+  "name": "legacy-margin-is-one-everywhere",
+  "old": "                band[\"legacy\"] = {\"fall\": \"any\", \"rise_margin\": cal.ev.MARGINS[d],",
+  "new": "                band[\"legacy\"] = {\"fall\": \"any\", \"rise_margin\": 1,",
+  "expect": "test_reading_a_prime_a_bandless_dimension_carries_the_legacy_tolerance"
+ },
+ {
+  "name": "legacy-on-every-dimension",
+  "old": "            if band[\"kind\"] == \"none\":\n                band[\"legacy\"]",
+  "new": "            if True:\n                band[\"legacy\"]",
+  "expect": "test_reading_a_prime_a_bandless_dimension_carries_the_legacy_tolerance"
+ },
+ {
+  "name": "legacy-reading-label-says-a",
+  "old": "        b[\"degenerate_reading\"] = \"A′: a bandless",
+  "new": "        b[\"degenerate_reading\"] = \"A: a bandless",
+  "expect": "test_reading_a_prime_a_bandless_dimension_carries_the_legacy_tolerance"
+ },
+ {
+  "name": "legacy-frames-margin-ignored",
+  "old": "                band[\"legacy\"] = {\"fall\": \"any\", \"rise_margin\": cal.ev.MARGINS[d],",
+  "new": "                band[\"legacy\"] = {\"fall\": \"any\", \"rise_margin\": (0.01 if d != \"confirmed_share\" else 0.02),",
+  "expect": "test_reading_a_prime_a_bandless_frames_dimension_uses_one_frame"
  }
 ]
