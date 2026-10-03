@@ -22,7 +22,7 @@ from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tup
 
 from genome.sentence import find_frames
 
-from .compress import END, Frame, Scorer, parse_moment
+from .compress import END, Frame, Scorer, parse_moment, slow_train_bits
 
 RULE_TAG: Dict[str, int] = {"WEB-H": 1, "WEB-S": 2, "SENTENCE": 3, "MDL-GREEDY": 4}      # the law's `rule_tag` (it names the key, not the numbers; printed in the report header)
 TIE_BITS = 1e-9
@@ -195,3 +195,36 @@ def mdl_greedy(scorer: Scorer, max_steps: Optional[int] = None) -> RuleResult:
         trace.append({"frame": chosen, "delta": delta, "bits_after": bits, "fires": fires, "n_tokens": n_tok})
     info = {"steps": len(trace), "trace": trace, "candidates": len(cands), "train_bits_empty": bits_start, "train_bits_final": bits, "max_steps": max_steps}
     return RuleResult("MDL-GREEDY", 0, frozenset(F), info)
+
+
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 18:09 +0400 — the MDL trace checker, moved here VERBATIM from tests/tools/test_toys_frames_rules.py (stage 5b: the gate G3 runs it on random streams too).
+def trace_problems(train, trace) -> List[str]:
+    """Check a greedy trace against the SLOW recount: every step's delta, its pick (the argmax over ALL candidates, ties within 1e-9 by the pair's name), its running bits,
+    and that no candidate is left with a positive delta at the end. Returns the problems found (empty = the trace is exact)."""
+    V = len({w for m in train for w in m})
+    cands = sorted(p for p, c in Scorer(train, [["x"]]).train_bigrams().items() if c >= 2)
+    F: set = set()
+    bits_prev = slow_train_bits(train, F)[0]
+    out: List[str] = []
+
+    def slow_deltas() -> Dict[tuple, float]:
+        return {f: bits_prev - slow_train_bits(train, F | {f})[0] - 2 * math.log2(V) for f in cands if f not in F}
+
+    for i, s in enumerate(trace):
+        sd = slow_deltas()
+        best = max(sd.values())
+        tied = sorted(f for f, d in sd.items() if d >= best - 1e-9)
+        if tuple(s["frame"]) != tied[0]:
+            out.append(f"step {i}: chose {s['frame']} but the slow recount's pick is {tied[0]} (best {best:.9f})")
+        if abs(s["delta"] - sd.get(tuple(s["frame"]), float("nan"))) > 1e-9:
+            out.append(f"step {i}: delta {s['delta']:.12f} vs the recount {sd.get(tuple(s['frame']))}")
+        if not s["delta"] > 0:
+            out.append(f"step {i}: a taken step with delta {s['delta']} <= 0")
+        F.add(tuple(s["frame"]))
+        bits_prev = slow_train_bits(train, F)[0]
+        if abs(s["bits_after"] - bits_prev) > 1e-6:
+            out.append(f"step {i}: bits_after {s['bits_after']} vs the recount {bits_prev}")
+    left = [d for d in slow_deltas().values() if d > 1e-9]
+    if left:
+        out.append(f"{len(left)} candidates still have a positive delta after the last step (max {max(left):.9f})")
+    return out
