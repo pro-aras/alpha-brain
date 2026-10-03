@@ -190,7 +190,14 @@ def validate_bands(bands: dict) -> None:
             raise ValueError(f"bands: dimension {d!r} has a bad grid {g!r}")
 
 
-def load_bands(path) -> dict:
+def load_bands(path, strict: bool = True) -> dict:
+    """The worker's loader. STRICT (the default, the seat's 23:36 line on A3b): a gated dimension with no band must carry the LEGACY tolerance (A′) — reading A, where a dimension without a band
+    does not gate, is not ruled and must never reach the gate («a calibration never loosens»). The analysis tools may read such a file explicitly with strict=False."""
     bands = json.loads(Path(path).read_text())
     validate_bands(bands)
+    if strict:
+        for d in GATED:
+            b = bands["dims"][d]
+            if b["kind"] == "none" and "legacy" not in b:
+                raise ValueError(f"bands: dimension {d!r} has no band and no legacy tolerance (reading A is not ruled: a calibration never loosens — the seat, 2026-10-03 23:36)")
     return bands

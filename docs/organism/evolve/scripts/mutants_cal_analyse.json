@@ -262,5 +262,95 @@
   "old": "                band[\"legacy\"] = {\"fall\": \"any\", \"rise_margin\": cal.ev.MARGINS[d],",
   "new": "                band[\"legacy\"] = {\"fall\": \"any\", \"rise_margin\": (0.01 if d != \"confirmed_share\" else 0.02),",
   "expect": "test_reading_a_prime_a_bandless_frames_dimension_uses_one_frame"
+ },
+ {
+  "name": "stage-b-ruled-rule-is-s",
+  "old": "STAGE_B_RULE = \"M\"      #",
+  "new": "STAGE_B_RULE = \"S\"      #",
+  "expect": "test_the_ruled_stage_b_rule_is_m_and_is_what_the_decision_applies"
+ },
+ {
+  "name": "stage-b-decision-ignores-the-ruled-rule",
+  "old": "    return stage_b_condition(inc, five_twins, rule=STAGE_B_RULE)",
+  "new": "    return stage_b_condition(inc, five_twins, rule=\"S\")",
+  "expect": "test_the_ruled_stage_b_rule_is_m_and_is_what_the_decision_applies"
+ },
+ {
+  "name": "default-reading-is-a",
+  "old": "scope: str, degenerate: str = \"legacy\") -> dict:",
+  "new": "scope: str, degenerate: str = \"none\") -> dict:",
+  "expect": "test_readings_a_and_b_are_never_the_default"
+ },
+ {
+  "name": "default-reading-is-a-in-the-partial-branch-only",
+  "old": "            if band[\"kind\"] == \"none\":\n                band[\"legacy\"] = {\"fall\": \"any\", \"rise_margin\": cal.ev.MARGINS[d],",
+  "new": "            if band[\"kind\"] == \"none\" and len([x for x in GATED if b[\"dims\"][x][\"kind\"] == \"none\"]) == len(GATED):\n                band[\"legacy\"] = {\"fall\": \"any\", \"rise_margin\": cal.ev.MARGINS[d],",
+  "expect": "test_the_default_for_a_bandless_dimension_is_the_legacy_tolerance_in_every_branch"
+ },
+ {
+  "name": "provenance-perturbation-without-k",
+  "old": "        ps = [1.0 + k * lv for (lv, k), _ in good]\n        pert = [min(ps), max(ps)]",
+  "new": "        ps = [1.0 + lv for (lv, k), _ in good]\n        pert = [min(ps), max(ps)]",
+  "expect": "test_the_perturbation_is_printed_as_one_plus_k_epsilon"
+ },
+ {
+  "name": "provenance-terciles-uneven",
+  "old": "        sizes = [base + (1 if i < extra else 0) for i in range(3)]",
+  "new": "        sizes = [base, base, base + extra]",
+  "expect": "test_twenty_twins_split_into_terciles_of_7_7_6_by_perturbation"
+ },
+ {
+  "name": "provenance-tercile-minimum-too-low",
+  "old": "    if len(good) >= MIN_TERCILE_TWINS:",
+  "new": "    if len(good) >= 3:",
+  "expect": "test_fewer_than_nine_twins_have_no_terciles_and_say_so"
+ },
+ {
+  "name": "provenance-top-grows-not-strict",
+  "old": "            top_grows[d] = bool(hi > FLAT_FACTOR * lo * (1.0 + _FLAT_TOL) and hi > 0)",
+  "new": "            top_grows[d] = bool(hi >= FLAT_FACTOR * lo * (1.0 - _FLAT_TOL) and hi > 0)",
+  "expect": "test_the_label_is_strict_exactly_twice_the_bottom_tercile_is_not_a_growth"
+ },
+ {
+  "name": "provenance-top-grows-reads-the-middle-tercile",
+  "old": "            lo, hi = terciles[0][\"rms_dev\"][d], terciles[2][\"rms_dev\"][d]",
+  "new": "            lo, hi = terciles[0][\"rms_dev\"][d], terciles[1][\"rms_dev\"][d]",
+  "expect": "test_the_label_is_strict_exactly_twice_the_bottom_tercile_is_not_a_growth"
+ },
+ {
+  "name": "provenance-moved-is-always-true",
+  "old": "    moved_any = any(moved_dims(inc, t) for t in eps_twins)",
+  "new": "    moved_any = True",
+  "expect": "test_the_selection_note_says_a_null_with_a_mover_is_conditioned_on_a_move"
+ },
+ {
+  "name": "provenance-frames-counts-as-a-move",
+  "old": "    moved_any = any(moved_dims(inc, t) for t in eps_twins)",
+  "new": "    moved_any = any(moved_dims(inc, t) or t.get(\"frames_filed\") != inc.get(\"frames_filed\") for t in eps_twins)",
+  "expect": "test_a_frames_filed_only_difference_is_not_a_move_for_the_selection_note"
+ },
+ {
+  "name": "provenance-hides-the-unparsed-twins",
+  "old": "    unparsed = n - len(good)",
+  "new": "    unparsed = 0",
+  "expect": "test_a_twin_without_a_variant_is_counted_not_hidden_and_does_not_stop_the_bands"
+ },
+ {
+  "name": "provenance-one-level-always",
+  "old": "    eps = levels[0] if len(levels) == 1 else None",
+  "new": "    eps = levels[0] if levels else None",
+  "expect": "test_twins_of_two_levels_are_a_range_with_no_single_epsilon"
+ },
+ {
+  "name": "notes-skip-the-cost-band",
+  "old": "        band[\"null_notes\"] = _null_notes(prov, d)",
+  "new": "        if d in GATED:\n            band[\"null_notes\"] = _null_notes(prov, d)",
+  "expect": "test_every_band_carries_the_provenance_beside_it"
+ },
+ {
+  "name": "notes-never-label-a-growing-top-tercile",
+  "old": "                     if prov[\"top_tercile_grows\"][d] else f\"the top tercile does not grow",
+  "new": "                     if False else f\"the top tercile does not grow",
+  "expect": "test_every_band_carries_the_provenance_beside_it"
  }
 ]

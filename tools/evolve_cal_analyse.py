@@ -23,6 +23,7 @@ staged design does next (AMENDMENT 3, A3.6, as amended by A3b):
 from __future__ import annotations
 
 import math
+import re
 from typing import Dict, List, Optional, Sequence
 
 import tools.evolve_cal as cal
@@ -135,6 +136,95 @@ def stage_b_condition(inc: dict, five_twins: Sequence[dict], rule: str) -> dict:
     return {"rule": rule, "run": bool(dims), "dims": dims, "n_values": 1 + len(five_twins)}
 
 
+STAGE_B_RULE = "M"      # RULED by the seat on 2026-10-03 23:36 (AMENDMENT 3b's raised rule): Stage B runs whenever a twin of the chosen level MOVES — it restores the law's own N1 design at epsilon* (21 values)
+
+
+def stage_b_decision(inc: dict, five_twins: Sequence[dict]) -> dict:
+    """Stage B under the rule the seat ruled (STAGE_B_RULE = M). `stage_b_condition` still takes its rule explicitly (S is kept for the record and for the comparison the signers saw)."""
+    return stage_b_condition(inc, five_twins, rule=STAGE_B_RULE)
+
+
+_VARIANT_EPS = re.compile(r"eps:([0-9.eE+-]+):([0-9]+)\Z")
+MIN_TERCILE_TWINS = 9          # three twins in each tercile at the least; fewer and no terciles are computed (said, never silent)
+SELECTION_NOTE_MOVED = ("epsilon* is the smallest level at which a twin moved a reading (A3b.2): this null is conditioned on a move and is wider than the true noise "
+                        "(the verifier's limit 3, printed beside every band as the seat ruled 23:36)")
+SELECTION_NOTE_FLAT = "no twin moved q1_seen or confirmed_share: no level was selected on a move and the null is flat"
+LR_RECORD_NOTE = "the record's DELTA lr mutations were 0.05 -> 0.07 and 0.09 (+40 % and +80 %)"
+
+
+def _eps_k(twin: dict):
+    m = _VARIANT_EPS.match(str(twin.get("variant", "")))
+    return (float(m.group(1)), int(m.group(2))) if m else None
+
+
+def _unit(d: str) -> str:
+    return {"q1_seen": "items of 110", "confirmed_share": "share", "frames_filed": "frames"}.get(d, "")
+
+
+def null_provenance(inc: dict, eps_twins: Sequence[dict]) -> dict:
+    """What the epsilon null IS, printed beside every band (the seat's 23:36 ruling on the verifier's limits 2 and 3): the twins' perturbation (1 + k × epsilon) on DELTA lr, the RMS deviation
+    from the incumbent by TERCILE of that perturbation with the label «top tercile grows» (strictly more than FLAT_FACTOR × the bottom tercile's), and the SELECTION note (a null in which a
+    twin moved is conditioned on a move). A twin without a parseable `eps:<level>:<k>` variant is counted and said, never hidden."""
+    n = len(eps_twins)
+    good = [(lk, t) for lk, t in ((_eps_k(t), t) for t in eps_twins) if lk is not None]
+    unparsed = n - len(good)
+    levels = sorted({lk[0] for lk, _ in good})
+    eps = levels[0] if len(levels) == 1 else None
+    pert = None
+    if good:
+        ps = [1.0 + k * lv for (lv, k), _ in good]
+        pert = [min(ps), max(ps)]
+    moved_any = any(moved_dims(inc, t) for t in eps_twins)
+    if pert is None:
+        perturbation_note = f"variant unknown for {unparsed} of {n} twins: the perturbation (1 + k × epsilon) cannot be printed"
+    else:
+        where = f"epsilon {levels[0]!r}" if eps is not None else "epsilon levels " + ", ".join(repr(x) for x in levels)
+        ks = [k for (_, k), _ in good]
+        perturbation_note = (f"the twins' perturbation (1 + k × epsilon) on DELTA lr runs {pert[0]:.4g} … {pert[1]:.4g} ({where}, k = {min(ks)}..{max(ks)}, "
+                             f"{len(good)} of {n} twins; {LR_RECORD_NOTE})" + (f"; variant unknown for {unparsed} of {n} twins" if unparsed else ""))
+    terciles = None
+    top_grows = {d: False for d in GATED}
+    if len(good) >= MIN_TERCILE_TWINS:
+        srt = sorted(good, key=lambda x: (1.0 + x[0][1] * x[0][0], x[0][1]))
+        base, extra = divmod(len(srt), 3)
+        sizes = [base + (1 if i < extra else 0) for i in range(3)]
+        terciles, start = [], 0
+        for s in sizes:
+            g = srt[start:start + s]
+            start += s
+            ps = [1.0 + k * lv for (lv, k), _ in g]
+            as_twins = [{"label": f"k{k}", "reading": t} for (_, k), t in g]
+            terciles.append({"n": len(g), "k": [min(k for (_, k), _ in g), max(k for (_, k), _ in g)], "perturbation": [min(ps), max(ps)],
+                             "rms_dev": {d: _rms_dev(inc, as_twins, d) for d in GATED}})
+        for d in GATED:
+            lo, hi = terciles[0]["rms_dev"][d], terciles[2]["rms_dev"][d]
+            top_grows[d] = bool(hi > FLAT_FACTOR * lo * (1.0 + _FLAT_TOL) and hi > 0)
+        tercile_note = "RMS deviation by k-tercile is printed per dimension"
+    else:
+        tercile_note = f"fewer than {MIN_TERCILE_TWINS} twins ({len(good)} with a variant): no k-terciles are computed"
+    return {"epsilon": eps, "levels": levels, "n_twins": n, "unparsed": unparsed, "perturbation": pert, "perturbation_note": perturbation_note, "terciles": terciles,
+            "tercile_note": tercile_note, "top_tercile_grows": top_grows, "selected_on_a_move": bool(moved_any),
+            "selection_note": SELECTION_NOTE_MOVED if moved_any else SELECTION_NOTE_FLAT}
+
+
+def _null_notes(prov: dict, d: str) -> List[str]:
+    """The lines printed beside the band of dimension `d`: the selection note, the perturbation, and (for a gated dimension) the RMS by tercile with its label."""
+    notes = [prov["selection_note"], prov["perturbation_note"]]
+    if d in GATED:
+        if prov["terciles"] is None:
+            notes.append(prov["tercile_note"])
+        else:
+            t = prov["terciles"]
+            parts = " / ".join(f"{x['rms_dev'][d]:.3g}" for x in t)
+            ks = " / ".join(f"k {x['k'][0]}–{x['k'][1]}" for x in t)
+            label = (f"top tercile GROWS (> {FLAT_FACTOR} × the bottom tercile's): the top of the range is mutation-sized and the band may include merit, not only noise"
+                     if prov["top_tercile_grows"][d] else f"the top tercile does not grow (not more than {FLAT_FACTOR} × the bottom tercile's)")
+            notes.append(f"RMS deviation of {d} by k-tercile ({_unit(d)}): {parts} ({ks}) — {label}")
+    else:
+        notes.append("the cost null is the epsilon twins' ln CPU-seconds: " + prov["tercile_note"])
+    return notes
+
+
 def _rms_dev(inc: dict, twins: Sequence[dict], d: str) -> float:
     xs: List[float] = []
     for t in twins:
@@ -228,10 +318,13 @@ def _ceiling(d: str, inc: dict, band: dict) -> dict:
     return {"reading": shown, "unit": unit, "up_room": up, "down_room": down, "improved_reachable": improved, "regressed_reachable": regressed, "basis": basis, "note": "; ".join(parts)}
 
 
-def bands_from_twins(inc: dict, eps_twins: Sequence[dict], seed_twins: Optional[Sequence[dict]], slice_name: str, scope: str, degenerate: str = "none") -> dict:
+def bands_from_twins(inc: dict, eps_twins: Sequence[dict], seed_twins: Optional[Sequence[dict]], slice_name: str, scope: str, degenerate: str = "legacy") -> dict:
     """The BANDS file from the incumbent + the chosen level's epsilon twins (the null of every dimension) and the seed twins (frames_filed's A2.2 null, the incumbent among them).
-    degenerate = «none» (reading A: a degenerate dimension has NO band), «range» (reading B: the band of its null's own range, floored at one resolvable step) or «legacy»
-    (reading A′, the seat's ruling of 2026-10-03 22:32 on A3.7: a bandless dimension keeps the LEGACY tolerance — any fall regresses, a rise needs its margin, tools/evolve.py MARGINS)."""
+    degenerate = «legacy» (the DEFAULT — reading A′, the seat's ruling of 2026-10-03 22:32 on A3.7, extended by the seat's line on A3b at 23:36 to EVERY dimension left without a measured
+    band in EVERY branch: it keeps the LEGACY tolerance — any fall regresses, a rise needs its margin, tools/evolve.py MARGINS), «none» (reading A: a dimension without a band does not gate —
+    never the default, «a calibration never loosens», kept only to replay the readings the signers refused) or «range» (reading B: the band of its null's own range, floored at one
+    resolvable step; not ruled). Every band carries beside it `null_notes` (the twins' perturbation (1 + k × epsilon), the RMS deviation by k-tercile with its label, the selection note)
+    and the file carries `null`, the same facts as data (the verifier's limits 2 and 3, printed as the seat ruled)."""
     if degenerate not in ("none", "range", "legacy"):
         raise ValueError(f"bands_from_twins: degenerate must be 'none', 'range' or 'legacy', got {degenerate!r}")
     null = null_arrays(inc, eps_twins)
@@ -272,5 +365,9 @@ def bands_from_twins(inc: dict, eps_twins: Sequence[dict], seed_twins: Optional[
                                                 f"reachable iff the band's edge ({half if half is not None else 'no band'} items) is below {ceiling}")
     for d in GATED:
         b["dims"][d]["ceiling"] = _ceiling(d, inc, b["dims"][d])
+    prov = null_provenance(inc, eps_twins)
+    b["null"] = prov
+    for d, band in b["dims"].items():
+        band["null_notes"] = _null_notes(prov, d)
     eb.validate_bands(b)
     return b
