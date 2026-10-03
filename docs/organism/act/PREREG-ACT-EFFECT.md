@@ -181,7 +181,7 @@ Phase 1: the NEW seed-runs ≈ 10–15 s each (≈ 14 arms × 12 seeds ≈ 35–
 
 ## 11 · Signatures
 - Author: Claude (Sonnet 5.5, swarm act), 2026-10-03 11:26 +0400.
-- Architect (Opus 5.5): — pending (a signature line, added after the last edit).
+- Architect (Opus 5.5): Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:37 +0400 (from `date`) — on the text of this file as committed at 1d55eab (sha256 302e41e18e4bfcd63cd9e157e83803d18f0acb3d6b75e18c4df558225b323b11); AMENDMENT 1's exact instrument and AMENDMENT 2's two-act lock detector accepted as binding; any later edit other than a signature line voids this co-signature.
 - The seat's go for the direction: board 10:47 and the seat's direct message; the seat's signature line is the seat's to add.
 
 ## 12 · Amendment log
