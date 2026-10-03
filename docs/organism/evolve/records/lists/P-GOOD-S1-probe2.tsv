@@ -1,0 +1,2 @@
+# P-GOOD's second degradation (DELTA.lr 0.09, the record's -7 items), only if probe 1 did not clear 2 x the band half-width
+pgood-deg2-delta-lr	gene:DELTA.lr=0.09	-
