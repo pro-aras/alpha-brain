@@ -101,8 +101,20 @@ def write_json(path: Path, obj) -> None:
     tmp.rename(path)
 
 
+def code_header() -> Dict[str, object]:
+    """Which commit of the toy produced a record, and whether the toy's own files differed from it (a dirty tree is recorded, not hidden).
+    edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 11:40 +0400 — added before the stage-1 unit."""
+    def git(*a: str) -> str:
+        return subprocess.check_output(["git", *a], cwd=REPO, text=True).strip()
+    try:
+        dirty = git("status", "--porcelain", "--", "tools/toys", "tests/tools", "docs/research/toys")
+        return {"toys_git_sha": git("rev-parse", "HEAD"), "toys_tree_dirty": bool(dirty)}
+    except (subprocess.CalledProcessError, OSError):
+        return {"toys_git_sha": None, "toys_tree_dirty": None}
+
+
 def work(share: int, of: int, jobs: Sequence[Job], log=print) -> int:
-    prereg = {**PR.header(LAW_KEYS)}
+    prereg = {**PR.header(LAW_KEYS), **code_header()}
     by_seed: Dict[int, List[Job]] = {}
     for j in jobs:
         by_seed.setdefault(j.seed, []).append(j)
@@ -239,7 +251,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     PR.check(LAW_KEYS)
     if ns.cmd == "life":
         job = Job(ns.arm, ns.seed, ns.rep, ns.null)
-        out = run_job(job, S.RoomData(POOLS.ROOT, ns.seed, ROOMS), S.FixedTestSet(), PR.header(LAW_KEYS))
+        out = run_job(job, S.RoomData(POOLS.ROOT, ns.seed, ROOMS), S.FixedTestSet(), {**PR.header(LAW_KEYS), **code_header()})
         write_json(job.path, out)
         print(f"{job.path}: A {out['marks']['A']:.4f} · SHARE_N {out['marks']['share']['N']:.3f} · CPU {out['cpu_s']:.2f} s")
         return 0
