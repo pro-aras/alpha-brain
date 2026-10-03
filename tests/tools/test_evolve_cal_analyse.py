@@ -343,6 +343,35 @@ class TestBandsFromTwins(unittest.TestCase):
         eb.validate_bands(b)
         self.assertEqual(b["degenerate_reading"], "B: the null's own range, floored at one resolvable step")
 
+    # ---- A′, the seat's ruling on A3.7 (22:32): a bandless gated dimension keeps the LEGACY tolerance (any fall regresses, a rise needs its margin from tools/evolve.py MARGINS)
+    def test_reading_a_prime_a_bandless_dimension_carries_the_legacy_tolerance(self) -> None:
+        flat = [rd(cpu=2000.0 + 15 * i) for i in range(20)]
+        seeds = [rd(frames=f) for f in (24, 28, 27, 25, 29, 26, 22, 30, 26, 27)]
+        b = an.bands_from_twins(rd(), flat, seed_twins=seeds, slice_name="S1", scope="x", degenerate="legacy")
+        eb.validate_bands(b)
+        q, c, f = b["dims"]["q1_seen"], b["dims"]["confirmed_share"], b["dims"]["frames_filed"]
+        self.assertEqual((q["kind"], c["kind"]), ("none", "none"), "the null is still degenerate: no band is invented")
+        self.assertEqual((q["legacy"]["fall"], q["legacy"]["rise_margin"]), ("any", 0.01))
+        self.assertEqual((c["legacy"]["fall"], c["legacy"]["rise_margin"]), ("any", 0.02))
+        self.assertEqual(f["kind"], "normal")
+        self.assertNotIn("legacy", f, "a dimension that has a measured band keeps it and carries no legacy field")
+        self.assertEqual([eb.position(d / 110, q) for d in (-1, 0, 1, 2)], ["below", "within", "within", "above"])
+        self.assertTrue(b["degenerate_reading"].startswith("A′"), b["degenerate_reading"])
+
+    def test_reading_a_prime_a_bandless_frames_dimension_uses_one_frame(self) -> None:
+        flat = [rd(cpu=2000.0 + 15 * i) for i in range(20)]
+        f = an.bands_from_twins(rd(), flat, seed_twins=None, slice_name="S1", scope="x", degenerate="legacy")["dims"]["frames_filed"]
+        self.assertEqual((f["kind"], f["legacy"]["rise_margin"]), ("none", 1))
+        self.assertEqual([eb.position(d, f) for d in (-1.0, 0.0, 1.0)], ["below", "within", "above"])
+
+    def test_readings_a_and_b_carry_no_legacy_field_and_an_unknown_reading_is_refused(self) -> None:
+        flat = [rd(cpu=2000.0 + 15 * i) for i in range(20)]
+        for mode in ("none", "range"):
+            b = an.bands_from_twins(rd(), flat, seed_twins=None, slice_name="S1", scope="x", degenerate=mode)
+            self.assertTrue(all("legacy" not in b["dims"][d] for d in an.GATED), mode)
+        with self.assertRaises(ValueError):
+            an.bands_from_twins(rd(), flat, seed_twins=None, slice_name="S1", scope="x", degenerate="legacy2")
+
     def test_the_seed_twins_give_frames_filed_its_band_where_the_epsilon_null_is_flat(self) -> None:
         flat = [rd(cpu=2000.0 + 15 * i) for i in range(20)]
         seeds = [rd(frames=f) for f in (24, 28, 27, 25, 29, 26, 22, 30, 26, 27)]

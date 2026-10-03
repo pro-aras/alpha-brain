@@ -353,5 +353,112 @@ def _collides(text: str, key: str, value) -> bool:
     return float(_fmt_value(key, value)) == float(_gene(text, key))
 
 
+# edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 23:03 +0400 — A′, the seat's ruling on A3.7 (22:32; binding only if A0/A0+ read the null degenerate): a gated dimension WITHOUT a
+# measured band keeps the LEGACY tolerance — any fall REGRESSES, a rise needs its margin (tools/evolve.py MARGINS: q1_seen +0.01 = 2 items of 110, confirmed_share +0.02, frames_filed
+# +1). The band file says so with a `legacy` field on a `none` band; a `none` band without it still does not gate (reading A). Tests FIRST.
+def legacy_band(margin, grid=None):
+    return {"kind": "none", "grid": grid, "reason": "the null held fewer than 3 distinct values (A1 (i))", "legacy": {"fall": "any", "rise_margin": margin}}
+
+
+# the 13 rounds of brain-long-2 as the verifier re-read them (verify/evolve-cal-a3/v6_rereads.out): PREREG-EVOLVE-CAL §0's table gives q1_seen (items of 110) and frames_filed, records/e3/e3-regrade.json
+# gives confirmed_share's Δ; (round, Δ q1 items, Δ frames, Δ confirmed_share, the verifier's A′ verdict). Under A′: 1 IMPROVED, 8 REGRESSED, 4 NO EVIDENCE.
+ROUNDS_A_PRIME = [(2, -4, +6, -0.0053, "REGRESSED"), (3, 0, 0, 0.0, "NO EVIDENCE"), (4, -7, +2, -0.0310, "REGRESSED"), (5, +2, 0, +0.0030, "IMPROVED"),
+                  (6, 0, 0, 0.0, "NO EVIDENCE"), (7, -2, 0, -0.0023, "REGRESSED"), (8, -2, -3, -0.0008, "REGRESSED"), (9, +1, 0, +0.0037, "NO EVIDENCE"),
+                  (10, -8, 0, +0.0030, "REGRESSED"), (11, 0, 0, +0.0028, "NO EVIDENCE"), (12, +2, -2, -0.0025, "REGRESSED"), (13, -2, 0, +0.0162, "REGRESSED"),
+                  (14, 0, -1, -0.0208, "REGRESSED")]
+
+
+class TestLegacyTolerance(unittest.TestCase):
+    def test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension(self) -> None:
+        b = legacy_band(0.01, grid=1 / 110)
+        self.assertEqual(eb.position(-1 / 110, b), "below", "any fall regresses")
+        self.assertEqual(eb.position(0.0, b), "within")
+        self.assertEqual(eb.position(1 / 110, b), "within", "one item (0.0091) is under the 0.01 margin")
+        self.assertEqual(eb.position(2 / 110, b), "above", "two items clear it")
+        self.assertEqual(eb.position(8 / 110, b), "above")
+        self.assertEqual(eb.position(None, b), "missing")
+        self.assertEqual(eb.position(-1e-15, b), "within", "float noise below one grid step is not a fall of one item")
+        self.assertEqual(eb.position(0.0105, b), "within", "round(Δ / grid) first: 0.0105 is one item (0.0091), under the 0.01 margin; unrounded it would clear it")
+
+    def test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin(self) -> None:
+        b = legacy_band(0.02)
+        self.assertEqual(eb.position(-1e-6, b), "below")
+        self.assertEqual(eb.position(0.0, b), "within")
+        self.assertEqual(eb.position(0.0199, b), "within")
+        self.assertEqual(eb.position(0.02, b), "above", "mv >= iv + margin, as tools/evolve.py regression_bar reads it")
+        self.assertEqual(eb.position(0.47 - 0.45, b), "above", "float noise in a difference of two readings does not move one across the margin")
+
+    def test_integer_frames_rise_at_one_frame_and_fall_at_any(self) -> None:
+        b = legacy_band(1, grid=1.0)
+        self.assertEqual([eb.position(d, b) for d in (-1.0, 0.0, 1.0, 2.0)], ["below", "within", "above", "above"])
+
+    def test_the_legacy_field_is_read_only_on_a_none_band(self) -> None:
+        b = band(edge=5.5 / 110, grid=1 / 110)
+        b["legacy"] = {"fall": "any", "rise_margin": 0.01}
+        self.assertEqual(eb.position(-1 / 110, b), "within", "a measured band rules; the legacy field on it is ignored")
+        self.assertEqual(eb.position(-7 / 110, b), "below")
+
+    def test_a_none_band_without_the_legacy_field_still_does_not_gate(self) -> None:
+        self.assertEqual(eb.position(-0.5, {"kind": "none", "grid": None, "reason": "x"}), "no-band")
+
+    def test_the_verdict_regresses_on_one_item_and_improves_only_on_two(self) -> None:
+        b = bands(q1_seen=legacy_band(0.01, grid=1 / 110), confirmed_share=legacy_band(0.02))
+        self.assertEqual(eb.calibrated_verdict(reading(100), reading(99), b)["verdict"], "REGRESSED")
+        self.assertEqual(eb.calibrated_verdict(reading(100), reading(101), b)["verdict"], "NO EVIDENCE")
+        self.assertEqual(eb.calibrated_verdict(reading(100), reading(102), b)["verdict"], "IMPROVED")
+        self.assertEqual(eb.calibrated_verdict(reading(100, share=0.45), reading(100, share=0.44), b)["verdict"], "REGRESSED")
+        self.assertEqual(eb.calibrated_verdict(reading(100, share=0.45), reading(100, share=0.48), b)["verdict"], "IMPROVED")
+        v = eb.calibrated_verdict(reading(100), reading(101), b)
+        self.assertIn("legacy", v["reason"])
+        self.assertEqual(v["dims"]["q1_seen"]["legacy_rise_margin"], 0.01)
+        self.assertIsNone(eb.calibrated_verdict(reading(100), reading(101), bands())["dims"]["q1_seen"]["legacy_rise_margin"], "a measured band carries no legacy margin")
+
+    def test_a_fall_beside_a_rise_regresses(self) -> None:
+        b = bands(q1_seen=legacy_band(0.01, grid=1 / 110), confirmed_share=legacy_band(0.02))
+        self.assertEqual(eb.calibrated_verdict(reading(100, share=0.45), reading(110, share=0.44), b)["verdict"], "REGRESSED")
+
+    def test_c2_and_c3_stay_reachable_under_a_prime(self) -> None:
+        b = bands(q1_seen=legacy_band(0.01, grid=1 / 110), confirmed_share=legacy_band(0.02), frames=100.0)
+        self.assertEqual(eb.calibrated_verdict(reading(104), reading(96), b)["verdict"], "REGRESSED", "C2: P-BAD, a fall of 8 items")
+        self.assertEqual(eb.calibrated_verdict(reading(96), reading(104), b)["verdict"], "IMPROVED", "C3: P-GOOD's restoration, +8 items against a margin of 2")
+
+    def test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them(self) -> None:
+        b = bands(q1_seen=legacy_band(0.01, grid=1 / 110), confirmed_share=legacy_band(0.02), frames=100.0)
+        got = []
+        for no, dq, dfr, dcs, want in ROUNDS_A_PRIME:
+            v = eb.calibrated_verdict(reading(100, frames=30, share=0.45), reading(100 + dq, frames=30 + dfr, share=0.45 + dcs), b)
+            self.assertEqual(v["verdict"], want, f"round {no}: {v['reason']}")
+            got.append(v["verdict"])
+        self.assertEqual({k: got.count(k) for k in set(got)}, {"REGRESSED": 8, "NO EVIDENCE": 4, "IMPROVED": 1})
+
+    def test_the_replay_table_matches_the_committed_e3_record_for_confirmed_share(self) -> None:
+        # the Δ column is read from records/e3 (confirmed_share) and never typed alone: a table that drifted from its source fails here
+        rec = json.loads((ROOT / "docs" / "organism" / "evolve" / "records" / "e3" / "e3-regrade.json").read_text())
+        by_round = {r["round"]: r["confirmed_share"]["delta"] for r in rec["rounds"]}
+        for no, _dq, _dfr, dcs, _want in ROUNDS_A_PRIME:
+            self.assertAlmostEqual(by_round[no], dcs, places=4, msg=f"round {no}")
+
+
+class TestLegacyBandsFile(unittest.TestCase):
+    def test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere(self) -> None:
+        good = bands(q1_seen=legacy_band(0.01, grid=1 / 110))
+        eb.validate_bands(json.loads(json.dumps(good)))
+        for mutate in (
+            lambda b: b["dims"]["q1_seen"].update(kind="normal", edge=0.05),
+            lambda b: b["dims"]["q1_seen"]["legacy"].update(rise_margin=-0.01),
+            lambda b: b["dims"]["q1_seen"]["legacy"].update(rise_margin="0.01"),
+            lambda b: b["dims"]["q1_seen"]["legacy"].update(rise_margin=True),
+            lambda b: b["dims"]["q1_seen"]["legacy"].pop("rise_margin"),
+            lambda b: b["dims"]["q1_seen"].update(legacy="any fall"),
+            lambda b: b["dims"]["q1_seen"]["legacy"].update(fall="never"),
+        ):
+            b = json.loads(json.dumps(good))
+            before = json.dumps(b, sort_keys=True)
+            mutate(b)
+            self.assertNotEqual(json.dumps(b, sort_keys=True), before, "the plant changed the bytes")
+            with self.assertRaises(ValueError):
+                eb.validate_bands(b)
+
+
 if __name__ == "__main__":
     unittest.main()
