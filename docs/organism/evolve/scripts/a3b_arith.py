@@ -113,6 +113,12 @@ def main() -> None:
         print(f"  n = {n:>2} ({what}): t = {t:.4f}, factor {factor:.3f}, edge ln {edge:.4f}, ratio {math.exp(edge):.4f} {'(above' if math.exp(edge) > 1.2 else '(at or below'} the 1.2 cap)")
     print()
 
+    # ---- A3b.3: the band edge's factor at the number of values actually in a dimension's epsilon null (Stage A only: the incumbent + 5 twins = 6 values; with Stage B: 21)
+    f6 = float(stats.t.ppf(1 - 0.0083, 5)) * math.sqrt(2)
+    f21 = float(stats.t.ppf(1 - 0.0083, 20)) * math.sqrt(2)
+    print(f"BAND EDGE FACTOR (t(n-1, 1-0.0083) * sqrt(2) * sigma_hat): n = 6 values {f6:.3f}, n = 21 values {f21:.3f}: a band from six values is {f6 / f21:.3f}x as wide as the 20-twin band")
+    print()
+
     # ---- the price, A3.6's inputs (S1 twin 2,739 s; S2 twin 3,560 s) and A3b.4's N2
     s1, s2 = 2739 / 3600, 3560 / 3600
     a0, a0p, seeds, stage_a, stage_b = 3 * s1, 4 * s1, 10 * s1, 23 * s1, 15 * s1
