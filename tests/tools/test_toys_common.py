@@ -54,6 +54,23 @@ class TestPrereg(unittest.TestCase):
         finally:
             shutil.rmtree(d)
 
+    def test_the_frames_text_is_pinned_and_a_planted_edit_of_a_bar_is_refused(self):
+        # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 12:23 +0400 — Toy C's law, co-signed 2026-10-03 12:21 +0400 at ee9fe93; written FIRST (red: no «frames» pin yet).
+        want = "a9787ef8026e8e6d8ab41f16d088bb5259f5cf9f5d64de7176da848a2a52c31a"
+        self.assertEqual(PR.check(["frames"])["frames"], want)
+        d = Path(tempfile.mkdtemp())
+        try:
+            src = DOCS / "PREREG-TOY-FRAMES.md"
+            bad = d / "PREREG-TOY-FRAMES.md"
+            text = src.read_bytes()
+            self.assertIn(b"G_max + 20", text)
+            bad.write_bytes(text.replace(b"G_max + 20", b"G_max + 21", 1))          # the plant: one character of the ceiling gate's tolerance
+            self.assertNotEqual(bad.read_bytes(), text)                             # the plant changed the bytes
+            with self.assertRaises(PR.PreregError):
+                PR.check(["frames"], root=d)
+        finally:
+            shutil.rmtree(d)
+
     def test_header_carries_the_signed_shas(self):
         h = PR.header(["cp", "cp_amend1"])
         self.assertEqual(h["prereg_cp_sha256"], PR.SIGNED["cp"][1])

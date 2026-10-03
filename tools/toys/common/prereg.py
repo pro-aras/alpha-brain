@@ -6,6 +6,7 @@
   cp          docs/research/toys/PREREG-TOY-CP.md          text co-signed 2026-10-03 11:13 +0400 (commit 31f24d9)
   cp_amend1   docs/research/toys/PREREG-TOY-CP-AMEND-1.md  text co-signed 2026-10-03 11:28 +0400 (commit 0cf21c9)
   nullspace   docs/research/toys/PREREG-TOY-NULLSPACE.md   text co-signed 2026-10-03 11:24 +0400 (commit eefa8d2)
+  frames      docs/research/toys/PREREG-TOY-FRAMES.md      text co-signed 2026-10-03 12:21 +0400 (commit ee9fe93; pinned 2026-10-03 12:23 +0400)
 """
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ SIGNED: Dict[str, Tuple[str, str]] = {
     "cp": ("PREREG-TOY-CP.md", "726d032918b3a2114ce2d7802865ffd64d3458910106a3af88c21df0c4866900"),
     "cp_amend1": ("PREREG-TOY-CP-AMEND-1.md", "59181d22d873614674728450a8a3f3a2428784656066577eaae8b8bc8d273448"),
     "nullspace": ("PREREG-TOY-NULLSPACE.md", "d15a6353d6b62e7ba74c407e2a220054c127250c7b4ee07f55d4564bc40ac2ca"),
+    "frames": ("PREREG-TOY-FRAMES.md", "a9787ef8026e8e6d8ab41f16d088bb5259f5cf9f5d64de7176da848a2a52c31a"),
 }
 SIGNATURE_PREFIX = b"- Co-signed:"
 
