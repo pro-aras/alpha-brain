@@ -245,25 +245,6 @@ def verify_staged_checkpoint(src_dir: Path, dst_dir: Path) -> dict:
 
 
 # ============================================================================ the twin runner (one twin per process)
-def _loadavg() -> Optional[List[float]]:
-    try:
-        return [float(x) for x in Path("/proc/loadavg").read_text().split()[:3]]
-    except (OSError, ValueError):
-        return None
-
-
-def _psi() -> Dict[str, Optional[float]]:
-    out: Dict[str, Optional[float]] = {}
-    for name in ("cpu", "memory"):
-        try:
-            for line in Path(f"/proc/pressure/{name}").read_text().splitlines():
-                kind, *kv = line.split()
-                out[f"{name}_{kind}_avg10"] = float(dict(x.split("=") for x in kv)["avg10"])
-        except (OSError, ValueError, KeyError):
-            out.setdefault(f"{name}_some_avg10", None)
-    return out
-
-
 def _code_provenance() -> Optional[dict]:
     try:
         head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True, timeout=20).stdout.strip()
@@ -296,7 +277,7 @@ def run_twin(cp_dir: Path, genome_text: str, slice_root: Path, from_seq: int, to
     if rows_limit is not None:
         rows = rows[:int(rows_limit)]
     (out_dir / "GENOME.genome").write_text(genome_text)
-    load0, psi0 = _loadavg(), _psi()
+    m0 = ev.machine_snapshot()
     t0, c0 = time.perf_counter(), time.process_time()
     mind = ev.build_twin({"dir": cp_dir}, genome_text, twin_root, slice_root)
     build_s = time.perf_counter() - t0
@@ -304,7 +285,7 @@ def run_twin(cp_dir: Path, genome_text: str, slice_root: Path, from_seq: int, to
         mind.consume(row)
     mind.close()
     wall, cpu = time.perf_counter() - t0, time.process_time() - c0
-    load1, psi1 = _loadavg(), _psi()
+    m1 = ev.machine_snapshot()
     reading = ev.grade_twin(mind, twin_root, twin_root / "GENOME.genome", rows, wall)
     journal_rows = ev._read_journal_rows(twin_root)
     canon = [json.dumps(r, sort_keys=True) for r in journal_rows]
@@ -315,7 +296,7 @@ def run_twin(cp_dir: Path, genome_text: str, slice_root: Path, from_seq: int, to
         "from_seq": int(from_seq), "to_seq": int(to_seq), "rows_consumed": len(rows),
         "state_hash": mind.org.state_hash(), "row_hash": mind.org.row_hash(),
         "journal_sha256": hashlib.sha256("\n".join(canon).encode("utf-8")).hexdigest(), "journal_rows": len(journal_rows),
-        "cpu_s": round(cpu, 3), "build_s": round(build_s, 3), "load0": load0, "load1": load1, "psi0": psi0, "psi1": psi1,
+        "cpu_s": round(cpu, 3), "build_s": round(build_s, 3), "load0": m0["load"], "load1": m1["load"], "psi0": m0["psi"], "psi1": m1["psi"],
         "maxrss_kb": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss), "code": _code_provenance(),
     })
     reading = json.loads(json.dumps(reading, default=_json_default))

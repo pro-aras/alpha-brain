@@ -1,0 +1,129 @@
+test_a_confirmation_that_reads_no_evidence_refuses_and_clears (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_a_confirmation_that_reads_no_evidence_refuses_and_clears) ... ok
+test_a_first_improved_waits_and_is_not_a_pass (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_a_first_improved_waits_and_is_not_a_pass) ... ok
+test_a_pending_from_an_older_epoch_is_dropped_with_a_note (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_a_pending_from_an_older_epoch_is_dropped_with_a_note) ... ok
+test_a_proposal_without_a_gate_is_untouched_and_so_is_the_pending (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_a_proposal_without_a_gate_is_untouched_and_so_is_the_pending) ... ok
+test_an_overlapping_confirmation_keeps_the_pending (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_an_overlapping_confirmation_keeps_the_pending) ... ok
+test_improved_twice_on_disjoint_slices_passes_and_clears_the_pending (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_improved_twice_on_disjoint_slices_passes_and_clears_the_pending) ... ok
+test_no_evidence_or_regressed_leaves_no_pending (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_no_evidence_or_regressed_leaves_no_pending) ... ok
+test_no_pending_means_no_forced_mutation (tests.tools.test_evolve_cal_round.TestConfirmationRound.test_no_pending_means_no_forced_mutation) ... ok
+test_grade_twin_records_the_cpu_seconds_and_the_machine_beside_the_wall (tests.tools.test_evolve_cal_round.TestGradeTwinCost.test_grade_twin_records_the_cpu_seconds_and_the_machine_beside_the_wall) ... ok
+test_a_calibrated_round_carries_gate_and_not_gradable_and_never_passes_by_itself (tests.tools.test_evolve_cal_round.TestRound.test_a_calibrated_round_carries_gate_and_not_gradable_and_never_passes_by_itself) ... ok
+test_a_legacy_round_keeps_its_vocabulary_and_gains_the_cost_fields (tests.tools.test_evolve_cal_round.TestRound.test_a_legacy_round_keeps_its_vocabulary_and_gains_the_cost_fields) ... ok
+test_a_not_gradable_round_has_no_gate (tests.tools.test_evolve_cal_round.TestRound.test_a_not_gradable_round_has_no_gate) ... ok
+test_an_unforced_round_draws_through_the_redraw (tests.tools.test_evolve_cal_round.TestRound.test_an_unforced_round_draws_through_the_redraw) ... ok
+test_the_cost_regression_reads_cpu_not_wall (tests.tools.test_evolve_cal_round.TestRound.test_the_cost_regression_reads_cpu_not_wall) ... ok
+test_the_gate_reads_incumbent_first_and_delta_is_mutant_minus_incumbent (tests.tools.test_evolve_cal_round.TestRound.test_the_gate_reads_incumbent_first_and_delta_is_mutant_minus_incumbent) ... ok
+test_a_good_bands_file_is_named_in_the_workers_first_line (tests.tools.test_evolve_cal_round.TestWorkerBandsFlag.test_a_good_bands_file_is_named_in_the_workers_first_line) ... ok
+test_a_malformed_bands_file_stops_the_worker_before_it_builds_a_shadow (tests.tools.test_evolve_cal_round.TestWorkerBandsFlag.test_a_malformed_bands_file_stops_the_worker_before_it_builds_a_shadow) ... ok
+test_a_malformed_file_is_refused_by_name (tests.tools.test_evolve_cal_gate.TestBandsFile.test_a_malformed_file_is_refused_by_name) ... ok
+test_a_round_trip_through_json_validates (tests.tools.test_evolve_cal_gate.TestBandsFile.test_a_round_trip_through_json_validates) ... ok
+test_a_different_mutation_is_not_a_confirmation (tests.tools.test_evolve_cal_gate.TestConfirm.test_a_different_mutation_is_not_a_confirmation) ... ok
+test_a_first_round_that_was_not_improved_has_nothing_to_confirm (tests.tools.test_evolve_cal_gate.TestConfirm.test_a_first_round_that_was_not_improved_has_nothing_to_confirm) ... ok
+test_an_overlapping_confirmation_slice_is_not_a_confirmation_and_keeps_the_pending (tests.tools.test_evolve_cal_gate.TestConfirm.test_an_overlapping_confirmation_slice_is_not_a_confirmation_and_keeps_the_pending) ... ok
+test_improved_twice_on_disjoint_slices_adopts (tests.tools.test_evolve_cal_gate.TestConfirm.test_improved_twice_on_disjoint_slices_adopts) ... ok
+test_no_evidence_or_regressed_the_second_time_does_not_adopt (tests.tools.test_evolve_cal_gate.TestConfirm.test_no_evidence_or_regressed_the_second_time_does_not_adopt) ... ok
+test_the_second_slice_may_start_exactly_where_the_first_ended (tests.tools.test_evolve_cal_gate.TestConfirm.test_the_second_slice_may_start_exactly_where_the_first_ended) ... ok
+test_each_dead_dimension_is_printed_with_its_reason_and_presence_count (tests.tools.test_evolve_cal_gate.TestNotGradable.test_each_dead_dimension_is_printed_with_its_reason_and_presence_count) ... ok
+test_presence_counts_the_sides_that_carry_the_field (tests.tools.test_evolve_cal_gate.TestNotGradable.test_presence_counts_the_sides_that_carry_the_field) ... ok
+test_a_continuous_band_has_no_grid (tests.tools.test_evolve_cal_gate.TestPosition.test_a_continuous_band_has_no_grid) ... ok
+test_a_dimension_without_a_band_does_not_position (tests.tools.test_evolve_cal_gate.TestPosition.test_a_dimension_without_a_band_does_not_position) ... ok
+test_a_grid_band_compares_in_items_and_is_strict (tests.tools.test_evolve_cal_gate.TestPosition.test_a_grid_band_compares_in_items_and_is_strict) ... ok
+test_a_rank_band_is_outside_all_draws_by_the_null_range (tests.tools.test_evolve_cal_gate.TestPosition.test_a_rank_band_is_outside_all_draws_by_the_null_range) ... ok
+test_an_edge_that_is_a_whole_number_of_items_needs_one_more (tests.tools.test_evolve_cal_gate.TestPosition.test_an_edge_that_is_a_whole_number_of_items_needs_one_more) ... ok
+test_float_noise_in_a_grid_difference_does_not_move_a_reading_across_the_edge (tests.tools.test_evolve_cal_gate.TestPosition.test_float_noise_in_a_grid_difference_does_not_move_a_reading_across_the_edge) ... ok
+test_integer_frames_compare_on_their_own_grid (tests.tools.test_evolve_cal_gate.TestPosition.test_integer_frames_compare_on_their_own_grid) ... ok
+test_a_non_colliding_draw_is_unchanged_from_mutate_genome_text (tests.tools.test_evolve_cal_gate.TestProposerRedraw.test_a_non_colliding_draw_is_unchanged_from_mutate_genome_text) ... ok
+test_c5_the_proposer_never_emits_the_incumbents_value_over_150_draws (tests.tools.test_evolve_cal_gate.TestProposerRedraw.test_c5_the_proposer_never_emits_the_incumbents_value_over_150_draws) ... ok
+test_the_known_collision_is_a_collision_and_is_redrawn (tests.tools.test_evolve_cal_gate.TestProposerRedraw.test_the_known_collision_is_a_collision_and_is_redrawn) ... ok
+test_the_redraw_is_bounded_and_refuses_a_text_that_cannot_differ (tests.tools.test_evolve_cal_gate.TestProposerRedraw.test_the_redraw_is_bounded_and_refuses_a_text_that_cannot_differ) ... ok
+test_the_stream_starts_with_exactly_the_draw_mutation_draw (tests.tools.test_evolve_cal_gate.TestProposerRedraw.test_the_stream_starts_with_exactly_the_draw_mutation_draw) ... ok
+test_a_cheaper_mutant_is_never_cost_regressed (tests.tools.test_evolve_cal_gate.TestVerdict.test_a_cheaper_mutant_is_never_cost_regressed) ... ok
+test_a_dimension_with_no_band_does_not_gate (tests.tools.test_evolve_cal_gate.TestVerdict.test_a_dimension_with_no_band_does_not_gate) ... ok
+test_a_missing_reading_is_neither_regression_nor_improvement (tests.tools.test_evolve_cal_gate.TestVerdict.test_a_missing_reading_is_neither_regression_nor_improvement) ... ok
+test_a_reading_below_its_band_is_regressed_even_beside_one_above (tests.tools.test_evolve_cal_gate.TestVerdict.test_a_reading_below_its_band_is_regressed_even_beside_one_above) ... ok
+test_cost_regressed_needs_the_band_and_the_policy_cap (tests.tools.test_evolve_cal_gate.TestVerdict.test_cost_regressed_needs_the_band_and_the_policy_cap) ... ok
+test_cpu_missing_on_a_side_is_a_missing_cost_not_a_regression (tests.tools.test_evolve_cal_gate.TestVerdict.test_cpu_missing_on_a_side_is_a_missing_cost_not_a_regression) ... ok
+test_nothing_outside_any_band_is_no_evidence (tests.tools.test_evolve_cal_gate.TestVerdict.test_nothing_outside_any_band_is_no_evidence) ... ok
+test_one_reading_above_its_band_with_none_below_is_improved (tests.tools.test_evolve_cal_gate.TestVerdict.test_one_reading_above_its_band_with_none_below_is_improved) ... ok
+test_reward_and_act_and_sentence_never_enter_the_bar (tests.tools.test_evolve_cal_gate.TestVerdict.test_reward_and_act_and_sentence_never_enter_the_bar) ... ok
+test_swapping_the_two_sides_flips_the_verdict (tests.tools.test_evolve_cal_gate.TestVerdict.test_swapping_the_two_sides_flips_the_verdict) ... ok
+test_the_reason_names_the_edges_in_items (tests.tools.test_evolve_cal_gate.TestVerdict.test_the_reason_names_the_edges_in_items) ... ok
+test_the_records_one_adoption_reads_no_evidence (tests.tools.test_evolve_cal_gate.TestVerdict.test_the_records_one_adoption_reads_no_evidence) ... ok
+test_without_a_cost_band_the_policy_cap_alone_decides (tests.tools.test_evolve_cal_gate.TestVerdict.test_without_a_cost_band_the_policy_cap_alone_decides) ... ok
+test_stage_commands_run_and_the_verify_flag_reads_the_source_again (tests.tools.test_evolve_cal_twin.TestCli.test_stage_commands_run_and_the_verify_flag_reads_the_source_again) ... {"first_seq": 75, "last_seq": 118, "n_payloads": 44, "n_rows": 44, "payload_bytes": 323605, "rows_sha256": "455b2c5ffa7b63ad4b448e12af62a9bc5a128a5c8d42c28490f3366e26690bef"}
+VERIFY {"equal": true, "extra_rows": 0, "missing_payloads": [], "payload_mismatches": [], "row_mismatches": 0, "rows_checked": 44}
+{"bytes": 240874, "n_files": 12}
+VERIFY {"equal": true, "extra": [], "mismatches": [], "missing": [], "n_files": 12}
+ok
+test_the_twin_and_compare_commands_run_end_to_end (tests.tools.test_evolve_cal_twin.TestCli.test_the_twin_and_compare_commands_run_end_to_end) ... {"confirmed_share": null, "cpu_s": 0.427, "frames_filed": 0, "journal_rows": 7, "journal_sha256": "f81ed4efcc692edbc8fd6e0a19522719954fe362a330f8e588c4a1c5389cc0ed", "maxrss_kb": 622960, "q1_seen": 0.35, "rows_consumed": 12, "state_hash": "5622ee6779653b6d337e1f9d39a2f292c1a3bc095948ff71f913df7b3b9c7900", "variant": "incumbent", "wall_s": 0.427}
+{"confirmed_share": null, "cpu_s": 0.424, "frames_filed": 0, "journal_rows": 7, "journal_sha256": "f81ed4efcc692edbc8fd6e0a19522719954fe362a330f8e588c4a1c5389cc0ed", "maxrss_kb": 623004, "q1_seen": 0.35, "rows_consumed": 12, "state_hash": "5622ee6779653b6d337e1f9d39a2f292c1a3bc095948ff71f913df7b3b9c7900", "variant": "incumbent", "wall_s": 0.424}
+{"a": {"label": null, "variant": "incumbent"}, "b": {"label": null, "variant": "incumbent"}, "confirmed_share": [null, null], "frames_filed": [0, 0], "journal": {"by_decile": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 7, "first_diff": null, "identical": true, "n_a": 7, "n_b": 7, "rows_differing": 0}, "q1_seen": [0.35, 0.35], "row_hash_equal": true, "state_hash_equal": true}
+ok
+test_a_discrete_difference_is_counted_and_located (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_a_discrete_difference_is_counted_and_located) ... ok
+test_a_float_only_difference_is_a_difference_but_not_a_discrete_one (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_a_float_only_difference_is_a_difference_but_not_a_discrete_one) ... ok
+test_different_lengths_are_not_identical_and_say_so (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_different_lengths_are_not_identical_and_say_so) ... ok
+test_identical_journals_are_identical (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_identical_journals_are_identical) ... ok
+test_comment_lines_are_never_edited (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_comment_lines_are_never_edited) ... ok
+test_eps_variant_refuses_a_perturbation_that_changes_nothing_or_makes_no_sense (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_eps_variant_refuses_a_perturbation_that_changes_nothing_or_makes_no_sense) ... ok
+test_eps_variant_scales_delta_lr_and_nothing_else (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_eps_variant_scales_delta_lr_and_nothing_else) ... ok
+test_gene_text_reads_the_number_the_bounds_pattern_names (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_gene_text_reads_the_number_the_bounds_pattern_names) ... ok
+test_gene_text_refuses_an_unknown_or_excluded_key_and_a_missing_line (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_gene_text_refuses_an_unknown_or_excluded_key_and_a_missing_line) ... ok
+test_seed_variant_adds_k_to_the_seed_and_keeps_the_trailing_comment (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_seed_variant_adds_k_to_the_seed_and_keeps_the_trailing_comment) ... ok
+test_set_gene_text_changes_exactly_one_line_and_exactly_the_number (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_set_gene_text_changes_exactly_one_line_and_exactly_the_number) ... ok
+test_set_gene_text_refuses_a_non_number (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_set_gene_text_refuses_a_non_number) ... ok
+test_the_eps_genome_still_parses_and_carries_the_perturbed_rate (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_the_eps_genome_still_parses_and_carries_the_perturbed_rate) ... ok
+test_the_seed_genome_still_parses_with_the_new_seed (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_the_seed_genome_still_parses_with_the_new_seed) ... ok
+test_variant_dispatch (tests.tools.test_evolve_cal_twin.TestGenomeVariants.test_variant_dispatch) ... ok
+test_a_planted_change_in_one_twin_is_caught_by_the_comparison (tests.tools.test_evolve_cal_twin.TestRunTwin.test_a_planted_change_in_one_twin_is_caught_by_the_comparison) ... ok
+test_a_twin_writes_its_readings_and_cleans_its_state_copy (tests.tools.test_evolve_cal_twin.TestRunTwin.test_a_twin_writes_its_readings_and_cleans_its_state_copy) ... ok
+test_rows_limit_cuts_the_slice (tests.tools.test_evolve_cal_twin.TestRunTwin.test_rows_limit_cuts_the_slice) ... ok
+test_state_hash_is_the_snapshots_own_digest (tests.tools.test_evolve_cal_twin.TestRunTwin.test_state_hash_is_the_snapshots_own_digest) ... ok
+test_the_same_twin_twice_is_bit_identical (tests.tools.test_evolve_cal_twin.TestRunTwin.test_the_same_twin_twice_is_bit_identical) ... ok
+test_the_variant_reaches_the_twins_genome_file (tests.tools.test_evolve_cal_twin.TestRunTwin.test_the_variant_reaches_the_twins_genome_file) ... ok
+test_stage_copies_every_file_and_the_manifest_hashes_them (tests.tools.test_evolve_cal_twin.TestStageCheckpoint.test_stage_copies_every_file_and_the_manifest_hashes_them) ... ok
+test_stage_refuses_a_non_empty_destination (tests.tools.test_evolve_cal_twin.TestStageCheckpoint.test_stage_refuses_a_non_empty_destination) ... ok
+test_verify_catches_a_flipped_byte_and_an_extra_file (tests.tools.test_evolve_cal_twin.TestStageCheckpoint.test_verify_catches_a_flipped_byte_and_an_extra_file) ... ok
+test_a_declared_run_tape_path_resolves_like_the_tape_does (tests.tools.test_evolve_cal_twin.TestStageSlice.test_a_declared_run_tape_path_resolves_like_the_tape_does) ... ok
+test_a_missing_source_payload_is_refused_not_skipped (tests.tools.test_evolve_cal_twin.TestStageSlice.test_a_missing_source_payload_is_refused_not_skipped) ... ok
+test_every_payload_a_row_names_was_copied_byte_for_byte (tests.tools.test_evolve_cal_twin.TestStageSlice.test_every_payload_a_row_names_was_copied_byte_for_byte) ... ok
+test_staging_refuses_a_non_empty_destination (tests.tools.test_evolve_cal_twin.TestStageSlice.test_staging_refuses_a_non_empty_destination) ... ok
+test_the_manifest_names_what_was_staged (tests.tools.test_evolve_cal_twin.TestStageSlice.test_the_manifest_names_what_was_staged) ... ok
+test_the_staged_tape_holds_exactly_the_slice_rows_and_reads_through_the_shared_reader (tests.tools.test_evolve_cal_twin.TestStageSlice.test_the_staged_tape_holds_exactly_the_slice_rows_and_reads_through_the_shared_reader) ... ok
+test_verify_catches_a_changed_payload_byte (tests.tools.test_evolve_cal_twin.TestStageSlice.test_verify_catches_a_changed_payload_byte) ... ok
+test_verify_catches_a_deleted_payload_and_a_changed_row (tests.tools.test_evolve_cal_twin.TestStageSlice.test_verify_catches_a_deleted_payload_and_a_changed_row) ... ok
+test_verify_reads_the_source_again_and_agrees (tests.tools.test_evolve_cal_twin.TestStageSlice.test_verify_reads_the_source_again_and_agrees) ... ok
+test_a_journal_that_carries_confirmed_is_graded (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_a_journal_that_carries_confirmed_is_graded) ... ok
+test_a_planted_journal_without_confirmed_reads_none (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_a_planted_journal_without_confirmed_reads_none) ... ok
+test_surprise_not_declared_reads_none_even_with_confirmed_rows (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_surprise_not_declared_reads_none_even_with_confirmed_rows) ... ok
+test_the_stripped_and_the_intact_journal_read_differently (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_the_stripped_and_the_intact_journal_read_differently) ... ok
+test_two_hours (tests.tools.test_evolve_worker.TestHoursBetween.test_two_hours) ... ok
+test_zero (tests.tools.test_evolve_worker.TestHoursBetween.test_zero) ... ok
+test_a_real_slice_is_graded_and_the_bar_reads_a_verdict (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_a_real_slice_is_graded_and_the_bar_reads_a_verdict) ... ok
+test_no_checkpoint_old_enough_is_not_gradable (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_no_checkpoint_old_enough_is_not_gradable) ... ok
+test_shadow_lag_rows_is_present_even_when_not_gradable (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_shadow_lag_rows_is_present_even_when_not_gradable) ... ok
+test_shadow_lag_rows_is_the_gap_to_the_given_tape_head (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_shadow_lag_rows_is_the_gap_to_the_given_tape_head) ... ok
+test_write_proposal_and_next_proposal_no (tests.tools.test_evolve_worker.TestJudgingRoundEndToEnd.test_write_proposal_and_next_proposal_no) ... ok
+test_planted_bad_and_null_are_both_refused (tests.tools.test_evolve_worker.TestNegativeControlOnSyntheticTape.test_planted_bad_and_null_are_both_refused) ... [evolve/negctl] shadow consumed 445 rows up to seq 445 (T-2.0h checkpoint)
+[evolve/negctl] shadow consumed 112 more rows to the tape's end (seq 557)
+[evolve/negctl] planted_bad (BIRTH.theta_n=0.5): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] planted_bad incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+[evolve/negctl] null (DELTA.lr=0.051): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] null incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+ok
+test_a_regression_on_one_mark_refuses_even_if_another_improves (tests.tools.test_evolve_worker.TestRegressionBar.test_a_regression_on_one_mark_refuses_even_if_another_improves) ... ok
+test_cost_at_exactly_1_2x_passes_the_cost_clause (tests.tools.test_evolve_worker.TestRegressionBar.test_cost_at_exactly_1_2x_passes_the_cost_clause) ... ok
+test_cost_over_1_2x_refuses_even_with_an_improvement (tests.tools.test_evolve_worker.TestRegressionBar.test_cost_over_1_2x_refuses_even_with_an_improvement) ... ok
+test_graded_pass_regressing_to_fail_refuses (tests.tools.test_evolve_worker.TestRegressionBar.test_graded_pass_regressing_to_fail_refuses) ... ok
+test_improvement_with_no_regression_passes (tests.tools.test_evolve_worker.TestRegressionBar.test_improvement_with_no_regression_passes) ... ok
+test_missing_readings_on_either_side_are_neither_regression_nor_improvement (tests.tools.test_evolve_worker.TestRegressionBar.test_missing_readings_on_either_side_are_neither_regression_nor_improvement) ... ok
+test_no_improvement_refuses (tests.tools.test_evolve_worker.TestRegressionBar.test_no_improvement_refuses) ... ok
+test_advance_shadow_up_to_seq_stops_there (tests.tools.test_evolve_worker.TestShadowAndCheckpoints.test_advance_shadow_up_to_seq_stops_there) ... ok
+test_build_advance_checkpoint_and_find_near (tests.tools.test_evolve_worker.TestShadowAndCheckpoints.test_build_advance_checkpoint_and_find_near) ... ok
+test_shadow_resumes_and_is_epoch_aware (tests.tools.test_evolve_worker.TestShadowAndCheckpoints.test_shadow_resumes_and_is_epoch_aware) ... ok
+test_slice_bounds_are_exclusive_inclusive (tests.tools.test_evolve_worker.TestTapeSlice.test_slice_bounds_are_exclusive_inclusive) ... ok
+
+----------------------------------------------------------------------
+Ran 110 tests in 112.265s
+
+OK
+scope memory.peak 731475968 bytes
