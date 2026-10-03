@@ -30,10 +30,64 @@
   "expect": "test_the_null_is_the_incumbent_plus_the_twins"
  },
  {
+  "name": "move-includes-frames",
+  "old": "MOVE_DIMS = (\"q1_seen\", \"confirmed_share\")   #",
+  "new": "MOVE_DIMS = (\"q1_seen\", \"confirmed_share\", \"frames_filed\")   #",
+  "expect": "test_frames_filed_alone_is_not_a_move"
+ },
+ {
+  "name": "move-reads-only-q1",
+  "old": "MOVE_DIMS = (\"q1_seen\", \"confirmed_share\")   #",
+  "new": "MOVE_DIMS = (\"q1_seen\",)   #",
+  "expect": "test_a_twin_moves_iff_q1_seen_or_confirmed_share_differs_from_the_incumbents"
+ },
+ {
+  "name": "need-lets-a-missing-reading-through",
+  "old": "    v = r.get(d)\n    if v is None:\n        raise ValueError(f\"{who}: no {d!r} reading",
+  "new": "    v = r.get(d)\n    if False:\n        raise ValueError(f\"{who}: no {d!r} reading",
+  "expect": "test_a_missing_reading_is_refused_never_read_as_a_move_or_a_hold"
+ },
+ {
+  "name": "twin-record-accepts-the-old-shape",
+  "old": "        if k not in m:\n            raise ValueError(f\"twin_record(",
+  "new": "        if False:\n            raise ValueError(f\"twin_record(",
+  "expect": "test_twin_record_refuses_a_comparison_without_flips"
+ },
+ {
+  "name": "flips-missing-allowed",
+  "old": "    if t.get(\"moment_flips\") is None:",
+  "new": "    if False:",
+  "expect": "test_a_missing_flip_count_is_refused"
+ },
+ {
+  "name": "equals-ignores-flips",
+  "old": "    return _flips(twin) == 0 and readings_equal(inc, twin[\"reading\"])",
+  "new": "    return readings_equal(inc, twin[\"reading\"])",
+  "expect": "test_equal_iff_no_flip_and_the_three_readings_equal"
+ },
+ {
+  "name": "equals-ignores-readings",
+  "old": "    return _flips(twin) == 0 and readings_equal(inc, twin[\"reading\"])",
+  "new": "    return _flips(twin) == 0",
+  "expect": "test_equal_iff_no_flip_and_the_three_readings_equal"
+ },
+ {
   "name": "a0-always-non-degenerate",
-  "old": "    return {\"non_degenerate\": bool(moved), \"moved\": moved, \"n_twins\": len(eps_twins)}",
-  "new": "    return {\"non_degenerate\": True, \"moved\": moved, \"n_twins\": len(eps_twins)}",
-  "expect": "test_a0_is_non_degenerate_iff_an_epsilon_twin_moved_a_reading"
+  "old": "    return {\"non_degenerate\": bool(release), \"moved\": moved, \"release_dims\": release, \"frames_only\": bool(moved) and not release, \"n_twins\": len(eps_twins)}",
+  "new": "    return {\"non_degenerate\": True, \"moved\": moved, \"release_dims\": release, \"frames_only\": bool(moved) and not release, \"n_twins\": len(eps_twins)}",
+  "expect": "test_a0_is_non_degenerate_iff_an_epsilon_twin_moves_q1_seen_or_confirmed_share"
+ },
+ {
+  "name": "a0-releases-on-frames",
+  "old": "    release = [d for d in MOVE_DIMS if d in moved]\n    return {\"non_degenerate\"",
+  "new": "    release = list(moved)\n    return {\"non_degenerate\"",
+  "expect": "test_a_frames_filed_only_move_releases_nothing_and_is_printed"
+ },
+ {
+  "name": "a0plus-degenerate-only-without-frames",
+  "old": "    release = [d for d in MOVE_DIMS if d in moved]\n    return {\"degenerate\"",
+  "new": "    release = list(moved)\n    return {\"degenerate\"",
+  "expect": "test_a0plus_a_frames_only_move_among_the_six_is_still_degenerate_for_the_epsilon_dimensions"
  },
  {
   "name": "a0plus-accepts-fewer-than-six",
@@ -45,37 +99,85 @@
   "name": "a0plus-bound-with-n-minus-one",
   "old": "\"upper_bound_p\": 1.0 - 0.05 ** (1.0 / n)}",
   "new": "\"upper_bound_p\": 1.0 - 0.05 ** (1.0 / (n - 1))}",
-  "expect": "test_a0plus_reads_degenerate_only_if_all_six_equal_and_prints_the_bound"
+  "expect": "test_a0plus_reads_degenerate_only_if_none_of_the_six_moves_and_prints_the_bound"
  },
  {
-  "name": "stage-b-two-distinct-values",
-  "old": "    dims = [d for d in GATED if len({x[d] for x in [inc, *five_twins] if x.get(d) is not None}) >= 3]",
-  "new": "    dims = [d for d in GATED if len({x[d] for x in [inc, *five_twins] if x.get(d) is not None}) >= 2]",
-  "expect": "test_stage_b_runs_only_where_a_band_could_exist"
+  "name": "stage-b-s-two-distinct-values",
+  "old": "        dims = [d for d in GATED if len({x[d] for x in [inc, *five_twins] if x.get(d) is not None}) >= 3]",
+  "new": "        dims = [d for d in GATED if len({x[d] for x in [inc, *five_twins] if x.get(d) is not None}) >= 2]",
+  "expect": "test_stage_b_rule_s_runs_only_where_a_band_could_exist"
  },
  {
-  "name": "choose-ignores-the-discrete-flip",
-  "old": "        equal = sum(1 for t in tw if t.get(\"discrete_differing\", 0) == 0 and readings_equal(inc, t[\"reading\"]))",
-  "new": "        equal = sum(1 for t in tw if readings_equal(inc, t[\"reading\"]))",
-  "expect": "test_a_level_that_flips_a_discrete_outcome_but_moves_no_reading_still_differs"
+  "name": "stage-b-m-reads-frames",
+  "old": "        dims = [d for d in MOVE_DIMS if any(_need(inc, d, \"the incumbent\") != _need(t, d, \"a twin\") for t in five_twins)]",
+  "new": "        dims = [d for d in GATED if any(_need(inc, d, \"the incumbent\") != _need(t, d, \"a twin\") for t in five_twins)]",
+  "expect": "test_stage_b_rule_m_runs_whenever_a_twin_of_the_chosen_level_moves"
  },
  {
-  "name": "choose-ignores-the-readings",
-  "old": "        equal = sum(1 for t in tw if t.get(\"discrete_differing\", 0) == 0 and readings_equal(inc, t[\"reading\"]))",
-  "new": "        equal = sum(1 for t in tw if t.get(\"discrete_differing\", 0) == 0)",
-  "expect": "test_a_level_whose_readings_move_but_whose_journal_does_not_still_differs"
+  "name": "stage-b-has-a-default-rule",
+  "old": "def stage_b_condition(inc: dict, five_twins: Sequence[dict], rule: str) -> dict:",
+  "new": "def stage_b_condition(inc: dict, five_twins: Sequence[dict], rule: str = \"S\") -> dict:",
+  "expect": "test_stage_b_needs_an_explicit_rule_the_signers_have_not_chosen"
  },
  {
-  "name": "choose-picks-the-largest-flipping-level",
-  "old": "    chosen: Optional[float] = flipping[0] if flipping else None",
-  "new": "    chosen: Optional[float] = flipping[-1] if flipping else None",
-  "expect": "test_the_chosen_level_is_the_smallest_whose_twins_differ_in_a_discrete_outcome"
+  "name": "stage-b-accepts-an-unknown-rule",
+  "old": "    if rule not in (\"S\", \"M\"):",
+  "new": "    if rule not in (\"S\", \"M\", \"X\"):",
+  "expect": "test_stage_b_needs_an_explicit_rule_the_signers_have_not_chosen"
+ },
+ {
+  "name": "choose-picks-the-largest-moving-level",
+  "old": "    chosen: Optional[float] = moving[0] if moving else None",
+  "new": "    chosen: Optional[float] = moving[-1] if moving else None",
+  "expect": "test_the_chosen_level_is_the_smallest_at_which_a_twin_moves"
+ },
+ {
+  "name": "choose-by-flips-not-moves",
+  "old": "    moving = [e for e in sorted(per) if per[e][\"twins_moved\"] > 0]",
+  "new": "    moving = [e for e in sorted(per) if per[e][\"flips\"] > 0]",
+  "expect": "test_the_verifiers_plant_1e3_flips_no_reading_and_1e2_moves_one_item_chooses_1e2"
+ },
+ {
+  "name": "choose-counts-frames-as-moves",
+  "old": "                frames_moved.append(label)",
+  "new": "                frames_moved.append(label)\n                n_moved += 1",
+  "expect": "test_a_frames_filed_only_move_chooses_nothing_and_is_printed"
+ },
+ {
+  "name": "flip-without-move-ignores-moves",
+  "old": "\"flip_without_move\": flips > 0 and n_moved == 0,",
+  "new": "\"flip_without_move\": flips > 0,",
+  "expect": "test_the_verifiers_plant_1e3_flips_no_reading_and_1e2_moves_one_item_chooses_1e2"
  },
  {
   "name": "growth-factor-too-wide",
-  "old": "GROWTH_FACTOR = 2.0 ",
-  "new": "GROWTH_FACTOR = 100.0 ",
-  "expect": "test_a_chosen_level_whose_spread_is_larger_than_the_next_smaller_flipping_level_is_a_merit_step"
+  "old": "FLAT_FACTOR = 2.0 ",
+  "new": "FLAT_FACTOR = 100.0 ",
+  "expect": "test_a_larger_level_whose_spread_exceeds_flat_factor_times_the_chosens_is_labelled_not_chosen"
+ },
+ {
+  "name": "flatness-not-strict",
+  "old": "per[e][\"rms_dev\"][d] > FLAT_FACTOR * base[d] * (1.0 + _FLAT_TOL)",
+  "new": "per[e][\"rms_dev\"][d] >= FLAT_FACTOR * base[d] * (1.0 - _FLAT_TOL)",
+  "expect": "test_the_flatness_factor_is_strict_and_exactly_twice_is_not_a_growth"
+ },
+ {
+  "name": "flatness-looks-below-the-chosen-level",
+  "old": "            if e <= chosen:\n                continue",
+  "new": "            if e >= chosen:\n                continue",
+  "expect": "test_a_larger_level_whose_spread_exceeds_flat_factor_times_the_chosens_is_labelled_not_chosen"
+ },
+ {
+  "name": "flatness-replaces-the-chosen-level",
+  "old": "            grows = grows or per[e][\"spread_grows\"]",
+  "new": "            grows = grows or per[e][\"spread_grows\"]\n            if per[e][\"spread_grows\"]:\n                chosen = None",
+  "expect": "test_the_chosen_levels_band_is_never_replaced_by_a_larger_level"
+ },
+ {
+  "name": "flatness-note-always-printed",
+  "old": "\"flatness_note\": FLATNESS_NOTE if grows else None}",
+  "new": "\"flatness_note\": FLATNESS_NOTE}",
+  "expect": "test_no_flatness_note_when_nothing_grows"
  },
  {
   "name": "seed-null-without-the-incumbent",
@@ -100,5 +202,35 @@
   "old": "        ceiling = Q1_ITEMS - round(q1 * Q1_ITEMS)",
   "new": "        ceiling = round(q1 * Q1_ITEMS)",
   "expect": "test_the_ceiling_of_q1_seen_is_printed_beside_its_band"
+ },
+ {
+  "name": "ceiling-improved-reads-the-down-room",
+  "old": "        improved = True if up is None else bool(half_u < up)",
+  "new": "        improved = True if up is None else bool(half_u < down)",
+  "expect": "test_improved_is_unreachable_when_the_edge_is_not_below_the_headroom"
+ },
+ {
+  "name": "ceiling-regressed-reads-the-up-room",
+  "old": "        regressed = bool(half_u < down)",
+  "new": "        regressed = bool(half_u < (down if up is None else up))",
+  "expect": "test_improved_is_unreachable_when_the_edge_is_not_below_the_headroom"
+ },
+ {
+  "name": "ceiling-frames-has-a-headroom",
+  "old": "        shown, up, down, unit = float(reading), None, float(reading), \"frames (no ceiling known)\"",
+  "new": "        shown, up, down, unit = float(reading), float(reading), float(reading), \"frames (no ceiling known)\"",
+  "expect": "test_every_dimension_carries_both_sides_of_its_ceiling"
+ },
+ {
+  "name": "ceiling-legacy-rise-needs-no-margin",
+  "old": "        improved = True if up is None else bool(up + 1e-12 >= margin_u)",
+  "new": "        improved = True if up is None else bool(up > 0)",
+  "expect": "test_a_bandless_dimension_is_printed_against_the_legacy_tolerance"
+ },
+ {
+  "name": "ceiling-legacy-fall-needs-the-margin",
+  "old": "        regressed = bool(down > 0)",
+  "new": "        regressed = bool(down >= margin_u)",
+  "expect": "test_a_bandless_dimension_is_printed_against_the_legacy_tolerance"
  }
 ]

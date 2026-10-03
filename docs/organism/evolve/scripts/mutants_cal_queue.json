@@ -1,0 +1,50 @@
+[
+ {
+  "name": "eps-list-accepts-any-level",
+  "old": "    lv = next((x for x in LEVELS if math.isclose(level, x, rel_tol=1e-9)), None)",
+  "new": "    lv = next((x for x in LEVELS if math.isclose(level, x, rel_tol=1e-9)), level)",
+  "expect": "test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused"
+ },
+ {
+  "name": "eps-list-counts-from-zero",
+  "old": "    for k in range(1, n + 1):\n        lines.append(f\"{prefix}eps{level_tag(lv)}",
+  "new": "    for k in range(0, n):\n        lines.append(f\"{prefix}eps{level_tag(lv)}",
+  "expect": "test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one"
+ },
+ {
+  "name": "eps-list-allows-ninety-nine",
+  "old": "not (1 <= n <= 20):",
+  "new": "not (1 <= n <= 99):",
+  "expect": "test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused"
+ },
+ {
+  "name": "eps-list-allows-zero",
+  "old": "not (1 <= n <= 20):",
+  "new": "not (0 <= n <= 20):",
+  "expect": "test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused"
+ },
+ {
+  "name": "eps-list-drops-the-incumbent",
+  "old": "    if with_incumbent:\n        lines.append(f\"{prefix}inc\\tincumbent\\t-\")",
+  "new": "    if False:\n        lines.append(f\"{prefix}inc\\tincumbent\\t-\")",
+  "expect": "test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one"
+ },
+ {
+  "name": "level-tag-takes-the-absolute-exponent",
+  "old": "    return f\"{m}e{int(e)}\"",
+  "new": "    return f\"{m}e{abs(int(e))}\"",
+  "expect": "test_the_level_tags_match_the_existing_lists"
+ },
+ {
+  "name": "cli-overwrites-a-list",
+  "old": "        with open(a.out, \"x\") as f:",
+  "new": "        with open(a.out, \"w\") as f:",
+  "expect": "test_the_cli_writes_the_file_and_refuses_to_overwrite_one"
+ },
+ {
+  "name": "cli-ignores-the-prefix",
+  "old": "        text = eps_list(a.eps, a.n, prefix=a.prefix, with_incumbent=a.with_incumbent)",
+  "new": "        text = eps_list(a.eps, a.n, prefix=\"\", with_incumbent=a.with_incumbent)",
+  "expect": "test_the_cli_writes_the_file_and_refuses_to_overwrite_one"
+ }
+]

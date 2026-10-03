@@ -154,5 +154,47 @@
   "old": "            first_disc = i if first_disc is None else first_disc",
   "new": "            first_disc = i",
   "expect": "test_a_discrete_difference_is_counted_and_located"
+ },
+ {
+  "name": "keyed-flips-ignores-the-unmatched-rows",
+  "old": "    moment[\"flips\"] = moment[\"discrete_differing\"] + moment[\"only_a\"] + moment[\"only_b\"]",
+  "new": "    moment[\"flips\"] = moment[\"discrete_differing\"]",
+  "expect": "test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips"
+ },
+ {
+  "name": "keyed-flips-counts-only-one-side",
+  "old": "    moment[\"flips\"] = moment[\"discrete_differing\"] + moment[\"only_a\"] + moment[\"only_b\"]",
+  "new": "    moment[\"flips\"] = moment[\"discrete_differing\"] + moment[\"only_a\"]",
+  "expect": "test_flips_is_the_discrete_rows_plus_the_unmatched_rows"
+ },
+ {
+  "name": "keyed-every-unmatched-row-is-an-only-a",
+  "old": "            bucket[\"only_a\" if rb is None else \"only_b\"] += 1",
+  "new": "            bucket[\"only_a\"] += 1",
+  "expect": "test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips"
+ },
+ {
+  "name": "keyed-a-float-counts-as-discrete",
+  "old": "        discrete_keys = [x for x in keys if x not in _CONTINUOUS_KEYS and not (_has_float(ra.get(x)) or _has_float(rb.get(x)))]",
+  "new": "        discrete_keys = [x for x in keys if x not in _CONTINUOUS_KEYS]",
+  "expect": "test_no_difference_and_float_or_hash_only_differences_are_zero_flips"
+ },
+ {
+  "name": "keyed-a-digest-counts-as-discrete",
+  "old": "        discrete_keys = [x for x in keys if x not in _CONTINUOUS_KEYS and not (_has_float(ra.get(x)) or _has_float(rb.get(x)))]",
+  "new": "        discrete_keys = [x for x in keys if not (_has_float(ra.get(x)) or _has_float(rb.get(x)))]",
+  "expect": "test_a_digest_only_difference_of_another_kind_is_not_a_discrete_payload"
+ },
+ {
+  "name": "keyed-other-kinds-are-not-named",
+  "old": "            if discrete_keys:\n                od = other_discrete.setdefault(kind, {\"rows\": 0, \"paths\": {}})",
+  "new": "            if False:\n                od = other_discrete.setdefault(kind, {\"rows\": 0, \"paths\": {}})",
+  "expect": "test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips"
+ },
+ {
+  "name": "keyed-leaf-paths-do-not-recurse",
+  "old": "                out.extend(_leaf_paths(a[k], b[k], f\"{prefix}.{k}\"))",
+  "new": "                out.append(f\"{prefix}.{k}\")",
+  "expect": "test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips"
  }
 ]

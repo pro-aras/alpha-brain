@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import re
 import subprocess
@@ -20,6 +21,9 @@ import sys
 import time
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
+
+# edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 22:52 +0400 — AMENDMENT 3b A3b.4 (the verifier's E4): `make-eps-list` writes the epsilon twins of N2 at the CHOSEN level.
+LEVELS = (1e-4, 1e-3, 1e-2)       # A3.4's levels {epsilon_f / 10, epsilon_f, epsilon_f x 10}, epsilon_f = 1e-3 by the ladder
 
 _LABEL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
 _VARIANT = re.compile(r"(incumbent|eps:[0-9.eE+-]+:[0-9]+|seed:[0-9]+|gene:[A-Za-z_.]+=[-0-9.eE+]+)\Z")
@@ -105,15 +109,46 @@ def run(entries: Sequence[Entry], out_root: Path, runner: Optional[Callable[[Lis
     return results
 
 
+def level_tag(level: float) -> str:
+    """1e-3 -> '1e-3' (the tag the existing lists use in their labels)."""
+    m, e = f"{level:.0e}".split("e")
+    return f"{m}e{int(e)}"
+
+
+def eps_list(level: float, n: int, prefix: str = "", with_incumbent: bool = False) -> str:
+    """The text of a queue list: n epsilon twins at ONE of A3.4's three levels (k = 1 .. n; variant `eps:<level>:<k>` is lr × (1 + k·level)), optionally led by the incumbent.
+    N2 in the non-degenerate branch (A3b.4) runs the SAME KIND of twin as the S1 null of the dimension it tests: epsilon twins at the chosen level for q1_seen and
+    confirmed_share (seed twins never move them: F would be infinite by construction)."""
+    lv = next((x for x in LEVELS if math.isclose(level, x, rel_tol=1e-9)), None)
+    if lv is None:
+        raise ValueError(f"eps_list: level {level!r} is not one of A3.4's three levels {LEVELS}")
+    if isinstance(n, bool) or not isinstance(n, int) or not (1 <= n <= 20):
+        raise ValueError(f"eps_list: n must be an integer from 1 to 20, got {n!r}")
+    lines = [f"# {n} epsilon twin(s) at {lv!r} (AMENDMENT 3b A3b.4: twins of the null's own kind), written by `tools.evolve_cal_queue make-eps-list`: label<TAB>variant<TAB>rows-limit"]
+    if with_incumbent:
+        lines.append(f"{prefix}inc\tincumbent\t-")
+    for k in range(1, n + 1):
+        lines.append(f"{prefix}eps{level_tag(lv)}-k{k:02d}\teps:{lv!r}:{k}\t-")
+    return "\n".join(lines) + "\n"
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
+    m = sub.add_parser("make-eps-list")
+    m.add_argument("--eps", type=float, required=True); m.add_argument("--n", type=int, required=True); m.add_argument("--prefix", default="")
+    m.add_argument("--with-incumbent", action="store_true"); m.add_argument("--out", required=True)
     p = sub.add_parser("run")
     p.add_argument("--list", required=True); p.add_argument("--cp", required=True); p.add_argument("--slice-root", required=True)
     p.add_argument("--from-seq", type=int, required=True); p.add_argument("--to-seq", type=int, required=True)
     p.add_argument("--out-root", required=True); p.add_argument("--lane", default="integrator"); p.add_argument("--slot-mem", default="8G")
     p.add_argument("--dry-run", action="store_true")
     a = ap.parse_args(argv)
+    if a.cmd == "make-eps-list":
+        text = eps_list(a.eps, a.n, prefix=a.prefix, with_incumbent=a.with_incumbent)
+        with open(a.out, "x") as f:                      # never overwrite a list: a list is a record
+            f.write(text)
+        return 0
     entries = read_list(Path(a.list))
     res = run(entries, Path(a.out_root), dry_run=a.dry_run, cp=a.cp, slice_root=a.slice_root, from_seq=a.from_seq, to_seq=a.to_seq, lane=a.lane,
               slot_mem=a.slot_mem)

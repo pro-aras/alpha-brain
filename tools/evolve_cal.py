@@ -389,11 +389,15 @@ def compare_twins_keyed(rows_a: Sequence[dict], rows_b: Sequence[dict]) -> dict:
     shifts every later row by one index, and the positional comparison read the SEED pair of the STOP test as 307 of 935 rows different while the organism's final
     state_hash was equal. A moment row is matched by (seq, glance, act) and a repeat in order; any other row by its kind and seq. `moment` counts what matched,
     what only one twin wrote, what differs, and what differs in a DISCRETE key (a key whose value carries no float and is not the state digest — a fix, a birth, a
-    cell count, a word) with the first seq where that happened; `other` counts the same per kind (think, outcome, body, act, ...)."""
+    cell count, a word) with the first seq where that happened; `other` counts the same per kind (think, outcome, body, act, ...).
+    edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 22:50 +0400 — AMENDMENT 3b A3b.1 (the verifier's E1): `moment.flips` = discrete_differing + only_a + only_b — a moment row
+    only one twin wrote is a FLIP (the organism did something else at that seq), it was in neither count and a twin missing two of four moment rows read EQUAL; and
+    `other_discrete` names, per kind OUTSIDE the flip count (sleep, think, ...), how many matched rows differ in a DISCRETE key and at which leaf paths (`sleep.pruned`)."""
     ia, ib = _keyed(rows_a), _keyed(rows_b)
     moment: Dict[str, object] = {"matched": 0, "only_a": 0, "only_b": 0, "differing": 0, "discrete_differing": 0, "first_discrete_seq": None}
     key_counts: Counter = Counter()
     other: Dict[str, Dict[str, int]] = {}
+    other_discrete: Dict[str, Dict[str, object]] = {}
     for k in sorted(set(ia) | set(ib), key=lambda x: (str(x[0]), x[1] if isinstance(x[1], int) else -1, str(x[2:]))):
         kind = k[0]
         bucket = moment if kind == "moment" else other.setdefault(kind, {"matched": 0, "differing": 0, "only_a": 0, "only_b": 0})
@@ -405,17 +409,38 @@ def compare_twins_keyed(rows_a: Sequence[dict], rows_b: Sequence[dict]) -> dict:
         if ra == rb:
             continue
         bucket["differing"] += 1
-        if kind != "moment":
-            continue
         keys = [x for x in sorted(set(ra) | set(rb)) if ra.get(x, _MISSING) != rb.get(x, _MISSING)]
+        discrete_keys = [x for x in keys if x not in _CONTINUOUS_KEYS and not (_has_float(ra.get(x)) or _has_float(rb.get(x)))]
+        if kind != "moment":
+            if discrete_keys:
+                od = other_discrete.setdefault(kind, {"rows": 0, "paths": {}})
+                od["rows"] += 1
+                for x in discrete_keys:
+                    for p in _leaf_paths(ra.get(x, _MISSING), rb.get(x, _MISSING), x):
+                        od["paths"][p] = od["paths"].get(p, 0) + 1
+            continue
         key_counts.update(keys)
-        if any(x not in _CONTINUOUS_KEYS and not (_has_float(ra.get(x)) or _has_float(rb.get(x))) for x in keys):
+        if discrete_keys:
             moment["discrete_differing"] += 1
             seq = ra.get("seq")
             if moment["first_discrete_seq"] is None or (isinstance(seq, int) and seq < moment["first_discrete_seq"]):
                 moment["first_discrete_seq"] = seq
     moment["diff_key_counts"] = dict(key_counts)
-    return {"n_a": len(rows_a), "n_b": len(rows_b), "moment": moment, "other": other}
+    moment["flips"] = moment["discrete_differing"] + moment["only_a"] + moment["only_b"]
+    return {"n_a": len(rows_a), "n_b": len(rows_b), "moment": moment, "other": other, "other_discrete": other_discrete}
+
+
+def _leaf_paths(a, b, prefix: str) -> List[str]:
+    """The leaf paths at which two JSON values differ: dicts recurse key by key (a key on one side only is itself a path); anything else (a list, a scalar) is a leaf."""
+    if isinstance(a, dict) and isinstance(b, dict):
+        out: List[str] = []
+        for k in sorted(set(a) | set(b)):
+            if k not in a or k not in b:
+                out.append(f"{prefix}.{k}")
+            else:
+                out.extend(_leaf_paths(a[k], b[k], f"{prefix}.{k}"))
+        return out
+    return [] if a == b else [prefix]
 
 
 # ============================================================================ the bands (PREREG-EVOLVE-CAL A1 (i), A2.2, A4, A7; scipy)
