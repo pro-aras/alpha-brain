@@ -84,5 +84,13 @@ PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python3 -B -u -m unittest discover -s tests/
 ```
 Gate records: `GATE-G2-G4-TOY-NULLSPACE.out`, `GATE-G5-TOY-NULLSPACE.out`; harness identity: `PROBE-IDENTITY.out`; the input spectrum behind the τ grid: `SPECTRUM-INPUTS.out`.
 
+## Durable evidence (RULES §14)
+The records this file cites no longer live only in `scratch/`. Copies (made and recorded 2026-10-03 12:37 +0400, checked identical to their sources with `diff -rq`) are under `/data/dev/swarm/2026-10-03/toys-records/`:
+- **`toy-b/`** (879 files): the 870 run records `runs/<arm>/<seed>/<rep>.json`, the two lanes' logs `logs/work-{0,1}.log` and `launch-stage1.{log,exit}`, and the price-copy of seed 20261301's OWM@0.01 life; manifest `SHA256SUMS-toy-b`, **sha256 `f8dd203a2ac245560b17300a0372d8c0cc8044ee1248604c8fd6fc76063f14a9`**.
+- **`pools/`** (650 files): the redrawn pools of all ten seeds (`tools/toys/common/pools.py`; seeds 20261301–03 are file-identical to S1c's, `PROBE-IDENTITY.out`, G1); manifest `SHA256SUMS-pools`, **sha256 `21e3cfbf305f36a4334e603c0262bf59d4cec531733a3ae0549911c581681ed9`**.
+- **`logs/`** (55 files): every test log and exit file cited here and on the board as `scratch/toys_*.log|.exit` (the RED → GREEN pairs, the whole-suite runs); manifest `SHA256SUMS-logs`, **sha256 `4ddaff1f7b7b96d13f841ddc414f53f8c6110b335d05b29f061c05a47dac83ce`**.
+- `toy-a/` (Toy A's 1,820 records, a separate RESULT) and `scratch-toys/` (the two early exploration scripts of the harness-identity probe) have their own manifests; `SHA256SUMS-OF-THE-SUMS` lists all five.
+A planted control: one bit flipped in a copy of `runs/OWM@0.01/20261302/00.json` no longer matches its manifest line. A path cited above as `scratch/…` is the same file under the folder named here.
+
 ## Status
-Built, run and read by the toys lane; **not yet read by the verifier** (READY-FOR-VERIFY posted after this file's commit). Nothing here changes a gene, a life or a file under `brain/`.
+Built, run and read by the toys lane; the content was read by the verifier at `4106bf2` (report byte-identical from the records; BWT recomputed from the raw pairs; one life re-run equal; 107 tests OK) and refused ONLY on RULES §14 (the records lived in `scratch/`), which this section answers. Nothing here changes a gene, a life or a file under `brain/`.
