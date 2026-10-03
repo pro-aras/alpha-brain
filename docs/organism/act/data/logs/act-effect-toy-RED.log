@@ -1,0 +1,404 @@
+EEEEEEEEEEEEEF.FFEEEEEEEEEEEEEEEEEEEEEEE
+======================================================================
+ERROR: test_a_duplicate_eye_row_is_ignored (tests.creature.test_act_effect_toy.TestBoundaryRuleM9.test_a_duplicate_eye_row_is_ignored)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 96, in test_a_duplicate_eye_row_is_ignored
+    got = toy.effect_pairs(tape)
+          ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'effect_pairs'
+
+======================================================================
+ERROR: test_an_outcome_not_aligned_to_the_last_eye_row_is_unknown (tests.creature.test_act_effect_toy.TestBoundaryRuleM9.test_an_outcome_not_aligned_to_the_last_eye_row_is_unknown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 104, in test_an_outcome_not_aligned_to_the_last_eye_row_is_unknown
+    got = toy.effect_pairs([_eye(1, 0, 0, "A"), _eye(2, 0, 1, "B"), _out(3, 0, 7, "left")])
+          ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'effect_pairs'
+
+======================================================================
+ERROR: test_known_changes_and_no_change (tests.creature.test_act_effect_toy.TestBoundaryRuleM9.test_known_changes_and_no_change)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 79, in test_known_changes_and_no_change
+    got = toy.effect_pairs(self._tape())
+          ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'effect_pairs'
+
+======================================================================
+ERROR: test_no_previous_eye_row_is_unknown (tests.creature.test_act_effect_toy.TestBoundaryRuleM9.test_no_previous_eye_row_is_unknown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 100, in test_no_previous_eye_row_is_unknown
+    got = toy.effect_pairs([_eye(1, 0, 0, "A"), _out(2, 0, 0, "left")])
+          ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'effect_pairs'
+
+======================================================================
+ERROR: test_non_game_rows_are_never_read (tests.creature.test_act_effect_toy.TestBoundaryRuleM9.test_non_game_rows_are_never_read)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 109, in test_non_game_rows_are_never_read
+    self.assertEqual(len(toy.effect_pairs(tape)), 5)
+                         ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'effect_pairs'
+
+======================================================================
+ERROR: test_the_boundary_outcome_is_unknown_and_the_plant_proves_the_rule (tests.creature.test_act_effect_toy.TestBoundaryRuleM9.test_the_boundary_outcome_is_unknown_and_the_plant_proves_the_rule)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 88, in test_the_boundary_outcome_is_unknown_and_the_plant_proves_the_rule
+    got = {r["seq"]: r["effect"] for r in toy.effect_pairs(tape)}
+                                          ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'effect_pairs'
+
+======================================================================
+ERROR: test_excluded_is_not_counted_as_zero (tests.creature.test_act_effect_toy.TestEffectTracker.test_excluded_is_not_counted_as_zero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 129, in test_excluded_is_not_counted_as_zero
+    tr = toy.EffectTracker()
+         ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'EffectTracker'
+
+======================================================================
+ERROR: test_fewer_than_n_known_outcomes_reads_optimism_and_is_live (tests.creature.test_act_effect_toy.TestEffectTracker.test_fewer_than_n_known_outcomes_reads_optimism_and_is_live)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 114, in test_fewer_than_n_known_outcomes_reads_optimism_and_is_live
+    tr = toy.EffectTracker()
+         ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'EffectTracker'
+
+======================================================================
+ERROR: test_live_flags_in_act_order (tests.creature.test_act_effect_toy.TestEffectTracker.test_live_flags_in_act_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 142, in test_live_flags_in_act_order
+    tr = toy.EffectTracker()
+         ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'EffectTracker'
+
+======================================================================
+ERROR: test_the_boundary_k_is_four_of_twenty (tests.creature.test_act_effect_toy.TestEffectTracker.test_the_boundary_k_is_four_of_twenty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 122, in test_the_boundary_k_is_four_of_twenty
+    a, b = toy.EffectTracker(), toy.EffectTracker()
+           ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'EffectTracker'
+
+======================================================================
+ERROR: test_the_window_slides (tests.creature.test_act_effect_toy.TestEffectTracker.test_the_window_slides)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 135, in test_the_window_slides
+    tr = toy.EffectTracker()
+         ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'EffectTracker'
+
+======================================================================
+ERROR: test_r_scr_is_the_candidates_stationary_mixture (tests.creature.test_act_effect_toy.TestFixedMixtures.test_r_scr_is_the_candidates_stationary_mixture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 298, in test_r_scr_is_the_candidates_stationary_mixture
+    pr = toy.r_scr_probs()
+         ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'r_scr_probs'
+
+======================================================================
+ERROR: test_the_null2_stream_is_independent_of_the_null (tests.creature.test_act_effect_toy.TestFixedMixtures.test_the_null2_stream_is_independent_of_the_null)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 307, in test_the_null2_stream_is_independent_of_the_null
+    b = toy.FixedDistTagged(20260923, {i: 1.0 for i in range(7)}, toy.NULL2_TAG)
+        ^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'FixedDistTagged'
+
+======================================================================
+ERROR: test_a_left_right_spin_holds_neither_act_above_the_single_act_bar_yet_is_caught (tests.creature.test_act_effect_toy.TestLockDetectorM2.test_a_left_right_spin_holds_neither_act_above_the_single_act_bar_yet_is_caught)
+THE PLANT of AMENDMENT 2: v2.1's single-act detector would have read this as NOT locked.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 245, in test_a_left_right_spin_holds_neither_act_above_the_single_act_bar_yet_is_caught
+    t1, t2 = toy.window_shares(acts)
+             ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'window_shares'
+
+======================================================================
+ERROR: test_a_three_act_mixture_passes (tests.creature.test_act_effect_toy.TestLockDetectorM2.test_a_three_act_mixture_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 253, in test_a_three_act_mixture_passes
+    self.assertTrue(toy.lock_pass(acts))
+                    ^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'lock_pass'
+
+======================================================================
+ERROR: test_all_left_is_caught_by_both_detectors (tests.creature.test_act_effect_toy.TestLockDetectorM2.test_all_left_is_caught_by_both_detectors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 237, in test_all_left_is_caught_by_both_detectors
+    t1, t2 = toy.window_shares(acts)
+             ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'window_shares'
+
+======================================================================
+ERROR: test_the_persistence_criterion_is_two_percent_of_windows (tests.creature.test_act_effect_toy.TestLockDetectorM2.test_the_persistence_criterion_is_two_percent_of_windows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 260, in test_the_persistence_criterion_is_two_percent_of_windows
+    self.assertTrue(toy.lock_pass(ok), "a short transient is not a lock")
+                    ^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'lock_pass'
+
+======================================================================
+ERROR: test_windows_start_after_act_120 (tests.creature.test_act_effect_toy.TestLockDetectorM2.test_windows_start_after_act_120)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 266, in test_windows_start_after_act_120
+    t1, t2 = toy.window_shares(acts)
+             ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'window_shares'
+
+======================================================================
+ERROR: test_m4_readings_from_the_live_history (tests.creature.test_act_effect_toy.TestNoopShareAndM4.test_m4_readings_from_the_live_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 288, in test_m4_readings_from_the_live_history
+    a, b = toy.m4_readings(hist)
+           ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'm4_readings'
+
+======================================================================
+ERROR: test_noop_share_reads_acts_241_to_960 (tests.creature.test_act_effect_toy.TestNoopShareAndM4.test_noop_share_reads_acts_241_to_960)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 274, in test_noop_share_reads_acts_241_to_960
+    self.assertEqual(toy.noop_share(acts), 0.0)
+                     ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'noop_share'
+
+======================================================================
+ERROR: test_the_lock_passes_m3_alone (tests.creature.test_act_effect_toy.TestNoopShareAndM4.test_the_lock_passes_m3_alone)
+The ablated system: the old law spinning `right` reads a no-op share of ~0.057 — M3 is graded only jointly with M1 and M2 (§5).
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 282, in test_the_lock_passes_m3_alone
+    self.assertLess(toy.noop_share(acts), 0.25)
+                    ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'noop_share'
+
+======================================================================
+ERROR: test_effect_argmax_alternates_between_the_tied_turns_and_never_moves (tests.creature.test_act_effect_toy.TestPlantsM5.test_effect_argmax_alternates_between_the_tied_turns_and_never_moves)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 219, in test_effect_argmax_alternates_between_the_tied_turns_and_never_moves
+    pol = toy.EffectArgmax(20260923)
+          ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'EffectArgmax'
+
+======================================================================
+ERROR: test_the_dealt_plant_changed_the_bytes (tests.creature.test_act_effect_toy.TestPlantsM5.test_the_dealt_plant_changed_the_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 207, in test_the_dealt_plant_changed_the_bytes
+    dealt = toy.deal_flags(true_flags)
+            ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'deal_flags'
+
+======================================================================
+ERROR: test_the_dealt_plant_plays_the_no_ops (tests.creature.test_act_effect_toy.TestPlantsM5.test_the_dealt_plant_plays_the_no_ops)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 212, in test_the_dealt_plant_plays_the_no_ops
+    pol = toy.DealtScreen(20260923)
+          ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'DealtScreen'
+
+======================================================================
+ERROR: test_two_rng_draws_per_choice (tests.creature.test_act_effect_toy.TestReactiveReferences.test_two_rng_draws_per_choice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 375, in test_two_rng_draws_per_choice
+    for cls in (toy.WALK, toy.WSLS):
+                ^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'WALK'
+
+======================================================================
+ERROR: test_walk_turns_after_a_blocked_forward_and_goes_on_after_a_moving_one (tests.creature.test_act_effect_toy.TestReactiveReferences.test_walk_turns_after_a_blocked_forward_and_goes_on_after_a_moving_one)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 358, in test_walk_turns_after_a_blocked_forward_and_goes_on_after_a_moving_one
+    f = self._freq(toy.WALK(7), toy.Ctx(last_act=2, last_effect=0, last_novel=0))
+                   ^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'WALK'
+
+======================================================================
+ERROR: test_wsls_stays_while_the_frame_is_novel (tests.creature.test_act_effect_toy.TestReactiveReferences.test_wsls_stays_while_the_frame_is_novel)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 368, in test_wsls_stays_while_the_frame_is_novel
+    f = self._freq(toy.WSLS(7), toy.Ctx(last_act=0, last_effect=1, last_novel=1))
+                   ^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'WSLS'
+
+======================================================================
+ERROR: test_both_gives_a_dead_act_zero_weight_whatever_its_reward (tests.creature.test_act_effect_toy.TestRewardWindowArms.test_both_gives_a_dead_act_zero_weight_whatever_its_reward)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 342, in test_both_gives_a_dead_act_zero_weight_whatever_its_reward
+    pol = toy.BothChooser(1)
+          ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'BothChooser'. Did you mean: 'OldChooser'?
+
+======================================================================
+ERROR: test_rate_sampler_weights_are_mean_reward_plus_epsilon (tests.creature.test_act_effect_toy.TestRewardWindowArms.test_rate_sampler_weights_are_mean_reward_plus_epsilon)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 315, in test_rate_sampler_weights_are_mean_reward_plus_epsilon
+    pol = toy.RateSampler(1)
+          ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'RateSampler'. Did you mean: 'RewardSampler'?
+
+======================================================================
+ERROR: test_the_reward_window_is_the_last_two_thousand_outcomes (tests.creature.test_act_effect_toy.TestRewardWindowArms.test_the_reward_window_is_the_last_two_thousand_outcomes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 325, in test_the_reward_window_is_the_last_two_thousand_outcomes
+    pol = toy.RateSampler(1)
+          ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'RateSampler'. Did you mean: 'RewardSampler'?
+
+======================================================================
+ERROR: test_ucb_tries_every_act_first (tests.creature.test_act_effect_toy.TestRewardWindowArms.test_ucb_tries_every_act_first)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 333, in test_ucb_tries_every_act_first
+    pol = toy.UCBChooser(1)
+          ^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'UCBChooser'. Did you mean: 'OldChooser'?
+
+======================================================================
+ERROR: test_M6_every_effect_constant_is_uniform_over_the_seven_acts (tests.creature.test_act_effect_toy.TestScreenChooserM6.test_M6_every_effect_constant_is_uniform_over_the_seven_acts)
+The ablated system: no signal = R-NULL by construction (all effects 1: everything live; all 0: everything dead -> the fallback).
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 186, in test_M6_every_effect_constant_is_uniform_over_the_seven_acts
+    pol = toy.ScreenChooser(20261003 + const)
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'ScreenChooser'
+
+======================================================================
+ERROR: test_all_dead_falls_back_to_uniform (tests.creature.test_act_effect_toy.TestScreenChooserM6.test_all_dead_falls_back_to_uniform)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 172, in test_all_dead_falls_back_to_uniform
+    pol = toy.ScreenChooser(20260923)
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'ScreenChooser'
+
+======================================================================
+ERROR: test_the_live_history_records_the_flags_each_choice (tests.creature.test_act_effect_toy.TestScreenChooserM6.test_the_live_history_records_the_flags_each_choice)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 197, in test_the_live_history_records_the_flags_each_choice
+    pol = toy.ScreenChooser(1)
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'ScreenChooser'
+
+======================================================================
+ERROR: test_two_rng_draws_per_choice_in_either_branch (tests.creature.test_act_effect_toy.TestScreenChooserM6.test_two_rng_draws_per_choice_in_either_branch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 149, in test_two_rng_draws_per_choice_in_either_branch
+    pol = toy.ScreenChooser(20260923)
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'ScreenChooser'
+
+======================================================================
+ERROR: test_uniform_over_the_live_set_plus_the_landed_floor (tests.creature.test_act_effect_toy.TestScreenChooserM6.test_uniform_over_the_live_set_plus_the_landed_floor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 158, in test_uniform_over_the_live_set_plus_the_landed_floor
+    pol = toy.ScreenChooser(20260923)
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'ScreenChooser'
+
+======================================================================
+FAIL: test_M7_the_null_through_the_new_path_equals_the_landed_harness_exactly (tests.creature.test_act_effect_toy.TestHarnessUnderTheVenv.test_M7_the_null_through_the_new_path_equals_the_landed_harness_exactly)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 393, in test_M7_the_null_through_the_new_path_equals_the_landed_harness_exactly
+            out = self._run("""
+                  ~~~~~~~~~^^^^
+    import json
+    ^^^^^^^^^^^
+    ...<7 lines>...
+    print(json.dumps(rows))
+    ^^^^^^^^^^^^^^^^^^^^^^^
+    """)
+    ^^^^
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 389, in _run
+    self.assertEqual(r.returncode, 0, r.stderr[-2000:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "<string>", line 8, in <module>
+    b = toy.run_game_fx(mk(), s, 60)
+        ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'run_game_fx'. Did you mean: 'run_game'?
+
+
+======================================================================
+FAIL: test_the_candidate_twice_is_identical (tests.creature.test_act_effect_toy.TestHarnessUnderTheVenv.test_the_candidate_twice_is_identical)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 412, in test_the_candidate_twice_is_identical
+            out = self._run("""
+                  ~~~~~~~~~^^^^
+    import json
+    ^^^^^^^^^^^
+    ...<6 lines>...
+    print(json.dumps(rows))
+    ^^^^^^^^^^^^^^^^^^^^^^^
+    """)
+    ^^^^
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 389, in _run
+    self.assertEqual(r.returncode, 0, r.stderr[-2000:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    p = toy.ScreenChooser(20260923)
+        ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'ScreenChooser'
+
+
+======================================================================
+FAIL: test_the_harness_excludes_exactly_one_outcome_per_episode_boundary (tests.creature.test_act_effect_toy.TestHarnessUnderTheVenv.test_the_harness_excludes_exactly_one_outcome_per_episode_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 425, in test_the_harness_excludes_exactly_one_outcome_per_episode_boundary
+            out = self._run("""
+                  ~~~~~~~~~^^^^
+    import json
+    ^^^^^^^^^^^
+    ...<5 lines>...
+                      "known": sum(v["known"] for v in c.values()), "steps": r["steps"], "episodes": r["episodes"]}))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """)
+    ^^^^
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_toy.py", line 389, in _run
+    self.assertEqual(r.returncode, 0, r.stderr[-2000:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "<string>", line 4, in <module>
+    p = toy.ScreenChooser(20260923)
+        ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_chooser_toy' has no attribute 'ScreenChooser'
+
+
+----------------------------------------------------------------------
+Ran 40 tests in 5.055s
+
+FAILED (failures=3, errors=36)

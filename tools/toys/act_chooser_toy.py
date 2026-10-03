@@ -729,6 +729,665 @@ def cmd_parity(a) -> int:
     return 0 if ok else 1
 
 
+# ============================================================================================ ACT-EFFECT (docs/organism/act/PREREG-ACT-EFFECT.md)
+# edit: Claude (Sonnet 5.5, swarm act), 2026-10-03 11:42 +0400 — PREREG-ACT-EFFECT PHASE 1 (signed at 1d55eab, co-signature line c465a7b): NEW classes and a NEW run path ONLY. `Ring`, `choose`, `run_game`, `FixedDist` and every landed arm
+# above are untouched (tests/creature/test_a4l_explore_toy.py, the drift alarm, stays green). Everything here is the toy of the EFFECT law: an act's EFFECT is whether the frame the act
+# produced differs from the previous one, known only for a SAME-EPISODE pair (the worker resets SILENTLY, so the first outcome after an episode's end crosses a reset and is UNKNOWN: it is
+# the reset's effect, not the act's). The window is the act's last 20 KNOWN effects; fewer than 20 reads the optimism prior 1.0 (LIVE); an act is LIVE iff >= 4 of its last 20 changed
+# the frame; the candidate draws uniformly over the live set after the landed 10 % uniform draw, TWO rng draws a choice in either branch (§3).
+import dataclasses
+
+EFFECT_N = 20                    # PREREG §3: the window of KNOWN effects
+EFFECT_K = 4                     # live iff >= 4 changes of the last 20 (t = 0.2)
+EFFECT_OPTIMISM = 1.0
+NULL2_TAG = 0x6e756c32           # «nul2»: R-NULL2's independent stream
+NOOP_ACTS = (3, 4, 5, 6)         # pickup, drop, toggle, done
+RATE_WINDOW = 2000               # the ring's cap: the window a real Mind could read
+RATE_EPS = 0.005
+LOCK_SIZE, LOCK_FROM = 100, 120  # 100-act windows that start after act 120
+LOCK_TOP2 = 0.90                 # AMENDMENT 2: the best TWO acts together hold >= 0.90 ...
+LOCK_MAX_SHARE = 0.02            # ... in more than 2 % of a life's windows = a lock (persistent, not transient)
+DEAL_SHIFT = 3                   # P-DEAL: live_dealt[a] = live[(a + 3) mod 7]
+
+
+@dataclasses.dataclass
+class Ctx:
+    """What a REACTIVE arm may read at CHOICE time. Zero lag: the eye row carries the `sha` of the frame the last act produced, so the mind knows it before the outcome row arrives.
+    `last_effect`: 1 the frame changed, 0 it did not, None UNKNOWN (an episode's first outcome, or the reset frame's choice). `last_novel`: 1 the frame's signature was unseen earlier in the episode."""
+    last_act: Optional[int] = None
+    last_effect: Optional[int] = None
+    last_novel: Optional[int] = None
+
+
+def effect_pairs(rows: Iterable[Dict[str, object]]) -> List[Dict[str, object]]:
+    """THE BOUNDARY RULE (M9) as a pure function over TAPE rows (the live tape reader and the mind's tracker obey the same rule). Keep the last two GAME eye rows' (episode, step, sha); an eye
+    row whose (episode, step) equals the previous one's is a re-published step and is ignored. At an OUTCOME row the effect is KNOWN iff a previous eye row exists, the outcome is aligned to
+    the last eye row (same episode and step) and that previous row is of the SAME episode; then 1 if the two `sha` differ, else 0. Otherwise None (never 0): the reason is printed."""
+    out: List[Dict[str, object]] = []
+    prev = cur = None
+    for r in sorted(rows, key=lambda r: int(r["seq"])):
+        m = r.get("meta") or {}
+        if m.get("source") != "game":
+            continue
+        if r.get("sense") == "eye":
+            key = (m.get("episode"), m.get("step"))
+            if cur is not None and (cur[0], cur[1]) == key:
+                continue                                   # a re-published step: never compare a frame with itself
+            prev, cur = cur, (m.get("episode"), m.get("step"), r.get("sha"))
+        elif r.get("sense") == "outcome":
+            effect, why = None, ""
+            if cur is None or prev is None:
+                why = "no previous eye row"
+            elif (m.get("episode"), m.get("step")) != (cur[0], cur[1]):
+                why = "outcome not aligned to the last eye row"
+            elif prev[0] != cur[0]:
+                why = "episode boundary: the worker resets silently"
+            else:
+                effect = int(prev[2] != cur[2])
+            out.append({"seq": int(r["seq"]), "act": m.get("act"), "effect": effect, "why": why})
+    return out
+
+
+class EffectTracker:
+    """Per act: its last `n` KNOWN effects (the mind's `_recent_reflex_effects`) and the presence counts (known, excluded, total) printed beside every live/dead verdict (#168)."""
+
+    def __init__(self, n: int = EFFECT_N, k: int = EFFECT_K, optimism: float = EFFECT_OPTIMISM):
+        self.n, self.k, self.optimism = int(n), int(k), float(optimism)
+        self._win: Dict[str, collections.deque] = {a: collections.deque(maxlen=self.n) for a in ACT_NAMES}
+        self._known: collections.Counter = collections.Counter()
+        self._excluded: collections.Counter = collections.Counter()
+        self._total: collections.Counter = collections.Counter()
+
+    def record(self, act: str, effect: Optional[int]) -> None:
+        self._total[act] += 1
+        if effect is None:
+            self._excluded[act] += 1                       # EXCLUDED: never counted as 0
+            return
+        self._known[act] += 1
+        self._win[act].append(int(effect))
+
+    def rate(self, act: str) -> float:
+        w = self._win[act]
+        return self.optimism if len(w) < self.n else sum(w) / self.n
+
+    def live(self, act: str) -> bool:
+        w = self._win[act]
+        return True if len(w) < self.n else sum(w) >= self.k
+
+    def live_flags(self) -> List[bool]:
+        return [self.live(a) for a in ACT_NAMES]
+
+    def counts(self) -> Dict[str, Dict[str, int]]:
+        return {a: {"known": self._known[a], "excluded": self._excluded[a], "total": self._total[a]} for a in ACT_NAMES}
+
+
+class RewardWindow:
+    """The last `cap` outcomes' (act, got), with per-act sums kept incrementally: what a real Mind could read from the 2,000-row ring."""
+
+    def __init__(self, cap: int = RATE_WINDOW):
+        self.cap = int(cap)
+        self.q: collections.deque = collections.deque()
+        self.sum = [0.0] * 7
+        self.cnt = [0] * 7
+
+    def add(self, act_idx: int, got: float) -> None:
+        self.q.append((act_idx, float(got)))
+        self.sum[act_idx] += float(got)
+        self.cnt[act_idx] += 1
+        if len(self.q) > self.cap:
+            a, g = self.q.popleft()
+            self.sum[a] -= g
+            self.cnt[a] -= 1
+
+    def mean(self, a: int) -> float:
+        return max(0.0, self.sum[a] / self.cnt[a]) if self.cnt[a] else 0.0
+
+    def total(self) -> int:
+        return len(self.q)
+
+
+def deal_flags(flags: Sequence[bool], shift: int = DEAL_SHIFT) -> List[bool]:
+    """P-DEAL's plant: the live flags read through a cyclic shift — the effect DEALT to the wrong acts (#247 (1))."""
+    return [bool(flags[(a + shift) % 7]) for a in range(7)]
+
+
+def r_scr_probs() -> Dict[int, float]:
+    """R-SCR: the candidate's own stationary mixture — the landed 10 % uniform draw plus uniform over {left, right, forward}."""
+    p, q = (1.0 - EXPLORE) / 3.0 + EXPLORE / 7.0, EXPLORE / 7.0
+    return {0: p, 1: p, 2: p, 3: q, 4: q, 5: q, 6: q}
+
+
+class FixedDistTagged(FixedDist):
+    """R-NULL2: the same fixed law as FixedDist on an INDEPENDENT rng stream (the null-vs-null distribution)."""
+    label = "fixed-tagged"
+
+    def __init__(self, seed: int, probs: Dict[int, float], tag: int):
+        super().__init__(seed, probs)
+        self.rng = np.random.default_rng([int(seed), int(tag)])
+
+
+class _FxBase:
+    """The effect arms' common body: the act rng (the mind's `_act_rng`), the effect tracker, the TWO draws a choice."""
+    fx = True
+    needs_ctx = True
+    needs_frames = True
+    label = "fx"
+
+    def __init__(self, seed: int):
+        self.rng = act_rng(seed)
+        self.calls = 0
+        self.explored = 0
+        self.tracker = EffectTracker()
+        self.live_history: List[List[bool]] = []
+
+    def observe(self, act_name: str, got: float, effect: Optional[int], terminated: bool, truncated: bool) -> None:
+        self.tracker.record(act_name, effect)
+
+    def _pick(self, weights: Sequence[float]) -> int:
+        """TWO draws: u; u < 0.1 -> integers(0, 7) (the landed floor, unchanged); else ONE random() against the running sum of the weights (all zero -> all one)."""
+        self.calls += 1
+        u = float(self.rng.random())
+        if u < EXPLORE:
+            self.explored += 1
+            return int(self.rng.integers(0, 7))
+        w = [float(x) for x in weights]
+        if sum(w) <= 0.0:
+            w = [1.0] * 7
+        r = float(self.rng.random()) * sum(w)
+        acc = 0.0
+        for i, x in enumerate(w):
+            acc += x
+            if r < acc:
+                return i
+        return max(i for i, x in enumerate(w) if x > 0.0)
+
+
+class ScreenChooser(_FxBase):
+    """C-SCR, THE CANDIDATE (§3): uniform over the LIVE set (window 20, live iff >= 4 changes), after the landed 10 % draw."""
+    label = "screen"
+
+    def flags(self) -> List[bool]:
+        return self.tracker.live_flags()
+
+    def act(self, ring, ctx=None) -> int:
+        fl = self.flags()
+        self.live_history.append(list(fl))
+        return self._pick([1.0 if f else 0.0 for f in fl])
+
+
+class DealtScreen(ScreenChooser):
+    """P-DEAL (§4): C-SCR with its live flags read through a cyclic shift of 3."""
+    label = "dealt"
+
+    def flags(self) -> List[bool]:
+        return deal_flags(self.tracker.live_flags())
+
+
+class PropChooser(_FxBase):
+    """A-PROP: weight = the act's mean known effect over its last 20 (optimism 1.0 while it has fewer), sampled."""
+    label = "effect-proportional"
+
+    def act(self, ring, ctx=None) -> int:
+        return self._pick([self.tracker.rate(a) for a in ACT_NAMES])
+
+
+class EffectArgmax(_FxBase):
+    """K-ARGMAX, THE PLANTED CONTROL: value = the mean known effect (as A-PROP), ARGMAX with rng ties (the landed `choose`): left and right both change the frame every time, tie at 1.0, and the
+    tie is broken AT RANDOM — so it alternates between the two turns, holds neither above ~0.7 and never moves."""
+    label = "effect-argmax"
+
+    def act(self, ring, ctx=None) -> int:
+        idx, explored = choose([self.tracker.rate(a) for a in ACT_NAMES], self.rng, 7)
+        self.calls += 1
+        self.explored += int(explored)
+        return idx
+
+
+class RateSampler(_FxBase):
+    """A-RATE: weight = the mean reward over the last 2,000 outcomes + 0.005, sampled — the only state-blind signal that ranks forward first."""
+    label = "reward-rate"
+
+    def __init__(self, seed: int):
+        super().__init__(seed)
+        self.win = RewardWindow()
+
+    def observe(self, act_name, got, effect, terminated, truncated) -> None:
+        super().observe(act_name, got, effect, terminated, truncated)
+        self.win.add(ACT_NAMES.index(act_name), got)
+
+    def weights(self) -> List[float]:
+        return [self.win.mean(a) + RATE_EPS for a in range(7)]
+
+    def act(self, ring, ctx=None) -> int:
+        return self._pick(self.weights())
+
+
+class UCBChooser(_FxBase):
+    """A-UCB, the count-based bonus: UCB1 on reward over the 2,000-outcome window (mean + sqrt(2 ln N / n_a), an untried act +inf), argmax with rng ties, the landed floor."""
+    label = "ucb1"
+
+    def __init__(self, seed: int):
+        super().__init__(seed)
+        self.win = RewardWindow()
+
+    def observe(self, act_name, got, effect, terminated, truncated) -> None:
+        super().observe(act_name, got, effect, terminated, truncated)
+        self.win.add(ACT_NAMES.index(act_name), got)
+
+    def values(self) -> List[float]:
+        n_tot = max(1, self.win.total())
+        return [float("inf") if self.win.cnt[a] == 0 else self.win.mean(a) + math.sqrt(2.0 * math.log(n_tot) / self.win.cnt[a]) for a in range(7)]
+
+    def act(self, ring, ctx=None) -> int:
+        idx, explored = choose(self.values(), self.rng, 7)
+        self.calls += 1
+        self.explored += int(explored)
+        return idx
+
+
+class BothChooser(RateSampler):
+    """A-BOTH: weight = LIVE x (the 2,000-outcome mean reward + 0.005), sampled: the fast screen, then the slow reward ranking among the live acts."""
+    label = "screen-x-reward"
+
+    def weights(self) -> List[float]:
+        return [(1.0 if f else 0.0) * (self.win.mean(a) + RATE_EPS) for a, f in enumerate(self.tracker.live_flags())]
+
+
+class WSLS(_FxBase):
+    """R-WSLS (class B, a REFERENCE that reads the TRUE live set {left, right, forward}): floor 0.1; else if the previous outcome was NOVEL repeat the previous act, else uniform over the live set.
+    The second draw is consumed either way, so the stream's shape never depends on the rule."""
+    label = "wsls"
+
+    def act(self, ring, ctx=None) -> int:
+        ctx = ctx or Ctx()
+        self.calls += 1
+        if float(self.rng.random()) < EXPLORE:
+            self.explored += 1
+            return int(self.rng.integers(0, 7))
+        pick = int(self.rng.integers(0, 3))
+        if ctx.last_novel == 1 and ctx.last_act in (0, 1, 2):
+            return int(ctx.last_act)
+        return pick
+
+
+class WALK(_FxBase):
+    """R-WALK (class B, reference, the TRUE live set): floor 0.1; else after a forward that did not change the frame (blocked) -> left or right; otherwise forward (after a moving forward,
+    after a turn, at an episode start). The turn's side is the second draw, consumed either way."""
+    label = "walk"
+
+    def act(self, ring, ctx=None) -> int:
+        ctx = ctx or Ctx()
+        self.calls += 1
+        if float(self.rng.random()) < EXPLORE:
+            self.explored += 1
+            return int(self.rng.integers(0, 7))
+        side = int(self.rng.integers(0, 2))
+        if ctx.last_act == 2 and ctx.last_effect == 0:
+            return side
+        return 2
+
+
+def window_shares(acts: Sequence[int], start: int = LOCK_FROM, size: int = LOCK_SIZE) -> Tuple[np.ndarray, np.ndarray]:
+    """For every `size`-act window that starts at act >= `start`: the share the best ONE act holds and the share the best TWO hold together (M2's detectors)."""
+    a = np.asarray(acts, dtype=np.int64)
+    h = len(a)
+    if h < start + size:
+        return np.zeros(0), np.zeros(0)
+    onehot = np.zeros((h + 1, 7), dtype=np.int64)
+    onehot[np.arange(1, h + 1), a] = 1
+    cs = np.cumsum(onehot, axis=0)
+    win = cs[start + size:h + 1] - cs[start:h + 1 - size]
+    srt = np.sort(win, axis=1)
+    return srt[:, -1] / float(size), (srt[:, -1] + srt[:, -2]) / float(size)
+
+
+def lock_flagged_share(acts: Sequence[int]) -> float:
+    """The share of a life's windows in which two acts together hold >= 0.90."""
+    _t1, t2 = window_shares(acts)
+    return float((t2 >= LOCK_TOP2 - 1e-9).mean()) if len(t2) else 0.0
+
+
+def lock_pass(acts: Sequence[int]) -> bool:
+    """M2 (AMENDMENT 2): a life PASSES when at most 2 % of its 100-act windows (from act 120) have two acts holding >= 0.90 — a lock is a PERSISTENT state."""
+    return lock_flagged_share(acts) <= LOCK_MAX_SHARE + 1e-12
+
+
+def noop_share(acts: Sequence[int], lo: int = 240, hi: int = 960) -> float:
+    """M3: the share of {pickup, drop, toggle, done} over acts lo+1 .. hi."""
+    seg = list(acts[lo:hi])
+    return sum(1 for a in seg if a in NOOP_ACTS) / float(len(seg)) if seg else float("nan")
+
+
+def m4_readings(live_history: Sequence[Sequence[bool]], lo: int = 240, hi: int = 960) -> Tuple[float, float]:
+    """M4 from the chooser's OWN live flags over acts lo+1 .. hi: (a) the mean fraction of the four no-ops judged DEAD, (b) the fraction of choices with forward judged LIVE."""
+    seg = list(live_history[lo:hi])
+    if not seg:
+        return float("nan"), float("nan")
+    a = sum(sum(1 for i in NOOP_ACTS if not f[i]) / 4.0 for f in seg) / len(seg)
+    b = sum(1 for f in seg if f[2]) / float(len(seg))
+    return a, b
+
+
+def _signature(obs) -> bytes:
+    """A frame's identity: `obs["image"]` bytes (M8 proves that equal bytes <=> equal rendered POV `sha`)."""
+    return obs["image"].tobytes()
+
+
+def _call_act(policy, ring, ctx):
+    return policy.act(ring, ctx) if getattr(policy, "needs_ctx", False) else policy.act(ring)
+
+
+def run_game_fx(policy, base_seed: int, episodes: int, env_id: str = ENV_ID, keep_trace: int = 0,
+                max_steps_total: Optional[int] = None, expected_max_steps: Optional[int] = MAX_STEPS) -> Dict[str, object]:
+    """`run_game`'s loop (the worker's seed law, the life's one-step lag, success = terminated with reward > 0) PLUS the life's frame bookkeeping: the effect of the act just taken (a SAME-EPISODE pair of
+    frame signatures; the first outcome after a silent reset is UNKNOWN), its novelty (unseen earlier in the episode), the reactive context handed to the NEXT choice (zero lag), and the outcome filed
+    AFTER that choice (the lag). An arm without `needs_ctx`/`fx` runs exactly as it does under `run_game` (M7)."""
+    if os.environ.get("BABYAI_DONE_ACTIONS"):
+        raise SystemExit("BABYAI_DONE_ACTIONS is set: `done` would change the verifier (minigrid babyai verifier.py:26)")
+    env = make_env(env_id)
+    un = env.unwrapped
+    ring = Ring()
+    episode = 0
+    obs, _info = quiet_reset(env, int(base_seed) + episode)
+    env_max_steps = int(un.max_steps)
+    if expected_max_steps is not None and env_max_steps != expected_max_steps:
+        raise SystemExit(f"max_steps {env_max_steps} != {expected_max_steps} at episode {episode}")
+    cur_sig = _signature(obs)
+    seen = {cur_sig}                                       # episode 0's reset frame IS visible (the worker's first manifest)
+    a = _call_act(policy, ring, Ctx())                     # the reset frame's eye row: the first choice
+    per_ep: List[Tuple[int, float, bool, bool]] = []
+    acts: List[int] = []
+    trace: List[Dict[str, object]] = []
+    ep_steps, ep_ret, step_total = 0, 0.0, 0
+    first_after_reset = False
+    t0 = time.perf_counter()
+    while episode < episodes and (max_steps_total is None or step_total < max_steps_total):
+        obs, r, te, tr, _info = env.step(a)
+        step_total += 1
+        ep_steps += 1
+        ep_ret += float(r)
+        acts.append(a)
+        new_sig = _signature(obs)
+        if first_after_reset:                              # the act landed on a reset state the mind never saw: the pair crosses the reset
+            effect, novel = None, None
+            seen = {new_sig}
+            first_after_reset = False
+        else:
+            effect, novel = int(new_sig != cur_sig), int(new_sig not in seen)
+            seen.add(new_sig)
+        cur_sig = new_sig
+        nxt = _call_act(policy, ring, Ctx(last_act=a, last_effect=effect, last_novel=novel))    # chosen BEFORE outcome t is filed
+        ring.record(ACT_NAMES[a], float(r))
+        if getattr(policy, "fx", False):
+            policy.observe(ACT_NAMES[a], float(r), effect, bool(te), bool(tr))
+        elif hasattr(policy, "observe"):
+            policy.observe(ACT_NAMES[a], float(r), bool(te), bool(tr))                         # the landed (v-c) signature
+        if len(trace) < keep_trace:
+            trace.append({"act": ACT_NAMES[a], "act_idx": a, "got": float(r), "effect": effect, "novel": novel,
+                          "terminated": bool(te), "truncated": bool(tr), "episode": episode, "step": step_total})
+        if te or tr:
+            per_ep.append((ep_steps, ep_ret, bool(te), bool(tr)))
+            episode += 1
+            ep_steps, ep_ret = 0, 0.0
+            if episode < episodes:
+                obs, _info = quiet_reset(env, int(base_seed) + episode)
+                if expected_max_steps is not None and int(un.max_steps) != expected_max_steps:
+                    raise SystemExit(f"max_steps {un.max_steps} != {expected_max_steps} at episode {episode}")
+                first_after_reset = True
+        a = nxt
+    env.close()
+    wall = time.perf_counter() - t0
+    if not per_ep:
+        per_ep.append((ep_steps, ep_ret, False, False))
+    succ = [1 if (te and rew > 0) else 0 for (_s, rew, te, _tr) in per_ep]
+    last100 = collections.Counter(ACT_NAMES[i] for i in acts[-100:])
+    top_act, top_n = last100.most_common(1)[0]
+    return {
+        "episodes": len(per_ep), "successes": int(sum(succ)), "success_rate": sum(succ) / len(per_ep),
+        "mean_steps": statistics.fmean(s for (s, _r, _te, _tr) in per_ep),
+        "mean_reward": statistics.fmean(rw for (_s, rw, _te, _tr) in per_ep),
+        "truncated": sum(1 for (_s, _r, _te, tr) in per_ep if tr), "steps": step_total,
+        "last100": dict(last100.most_common()), "last100_top": [top_act, top_n],
+        "explored_share": getattr(policy, "explored", 0) / max(1, getattr(policy, "calls", 1)),
+        "wall_s": round(wall, 2), "acts": acts, "trace": trace, "env_max_steps": env_max_steps,
+        "episode_ends": [i for i, t in enumerate(trace) if t["terminated"] or t["truncated"]] if keep_trace else [],
+    }
+
+
+def fx_arm_specs() -> Dict[str, Tuple[str, object]]:
+    """key -> (label, factory(seed) -> policy): the NEW arms of PREREG-ACT-EFFECT §4, declared before any run."""
+    uni7 = {i: 1.0 for i in range(7)}
+    return {
+        "R-NULL2": ("R-NULL2: uniform over 7 on an independent stream", lambda s: FixedDistTagged(s, uni7, NULL2_TAG)),
+        "R-SCR": ("R-SCR: the candidate's own stationary mixture", lambda s: FixedDist(s, r_scr_probs())),
+        "R-WSLS": ("R-WSLS (class B reference): stay while the frame is novel", lambda s: WSLS(s)),
+        "R-WALK": ("R-WALK (class B reference): the persistent walker", lambda s: WALK(s)),
+        "A-UCB": ("A-UCB: UCB1 on reward (the count-based bonus)", lambda s: UCBChooser(s)),
+        "A-RATE": ("A-RATE: sampled by the 2,000-outcome reward rate", lambda s: RateSampler(s)),
+        "C-SCR": ("C-SCR: the effect screen (THE CANDIDATE)", lambda s: ScreenChooser(s)),
+        "A-PROP": ("A-PROP: sampled by the known effect rate", lambda s: PropChooser(s)),
+        "A-BOTH": ("A-BOTH: live x reward rate", lambda s: BothChooser(s)),
+        "K-ARGMAX": ("K-ARGMAX (planted control): argmax on the effect rate", lambda s: EffectArgmax(s)),
+        "P-DEAL": ("P-DEAL (planted null): the live flags dealt to the wrong acts", lambda s: DealtScreen(s)),
+    }
+
+
+def landed_specs_fx() -> Dict[str, Tuple[str, object]]:
+    """The landed arms the lives need, by the law's names: R-NULL (ii), R-3 (iii), P-OLD (i), A-VAL (v), A-SMP (v-b)."""
+    sp = {k: f for k, _label, f in arm_specs()}
+    return {"R-NULL": ("R-NULL: uniform over 7 (landed (ii))", sp["ii"]), "R-3": ("R-3: uniform over left, right, forward (landed (iii))", sp["iii"]),
+            "P-OLD": ("P-OLD: the old chooser (landed (i))", sp["i"]), "A-VAL": ("A-VAL: the landed `ACT value reward 10; optimism 1` (v)", sp["v"]),
+            "A-SMP": ("A-SMP: sampled by reward (landed (v-b))", sp["v-b"])}
+
+
+def all_fx_specs() -> Dict[str, Tuple[str, object]]:
+    out = dict(landed_specs_fx())
+    out.update(fx_arm_specs())
+    return out
+
+
+def run_oracle(base_seed: int, episodes: int, env_id: str = ENV_ID) -> Dict[str, object]:
+    """R-ORACLE: minigrid's BabyAIBot (the bracket 1.00): it reads the whole state."""
+    from minigrid.utils.baby_ai_bot import BabyAIBot
+    env = make_env(env_id)
+    succ, lens = 0, []
+    for e in range(int(episodes)):
+        quiet_reset(env, int(base_seed) + e)
+        bot = BabyAIBot(env.unwrapped)
+        a = bot.replan()
+        steps = 0
+        while True:
+            _o, r, te, tr, _i = env.step(a)
+            steps += 1
+            if te or tr:
+                succ += int(te and r > 0)
+                lens.append(steps)
+                break
+            a = bot.replan(a)
+    env.close()
+    return {"episodes": int(episodes), "successes": succ, "success_rate": succ / int(episodes), "mean_steps": statistics.fmean(lens), "max_steps": max(lens)}
+
+
+# edit: Claude (Sonnet 5.5, swarm act), 2026-10-03 11:44 +0400 — PREREG-ACT-EFFECT PHASE 1: the run commands of the effect bench (`bench-fx` §4/§5 M1, `lives-fx` M2–M4, `transfer` T1, `equiv` M8, `oracle` the bracket 1.00).
+SEEDS12 = [LIFE_SEED + 1_000_000 * k for k in range(12)]      # §5: the unit is the SEED; layouts (reset seed s + episode) are paired across arms
+LIVE_SET = [True, True, True, False, False, False, False]      # the TRUE live set of GoToLocal: left, right, forward
+
+
+def _strip(r: Dict[str, object]) -> Dict[str, object]:
+    for k in ("acts", "trace", "episode_ends"):
+        r.pop(k, None)
+    return r
+
+
+def cmd_bench_fx(a) -> int:
+    seeds = [int(s) for s in a.seeds.split(",")]
+    specs = all_fx_specs()
+    keys = a.arms.split(",") if a.arms else list(fx_arm_specs())
+    out: Dict[str, object] = {"env": ENV_ID, "episodes": a.episodes, "seeds": seeds, "max_steps": MAX_STEPS, "lag": "one step (the life's)", "arms": {}}
+    print(f"[bench-fx] {ENV_ID} · {a.episodes} episodes × {len(seeds)} seeds · arms {keys}", flush=True)
+    for key in keys:
+        label, factory = specs[key]
+        runs = []
+        for s in seeds:
+            pol = factory(s)
+            r = _strip(run_game_fx(pol, s, a.episodes))
+            r["seed"] = s
+            if hasattr(pol, "tracker"):
+                r["effect_counts"] = pol.tracker.counts()
+                r["final_rates"] = {n: round(pol.tracker.rate(n), 4) for n in ACT_NAMES}
+                if getattr(pol, "live_history", None):
+                    r["final_live_flags"] = pol.live_history[-1]
+            runs.append(r)
+            print(f"  {key:9s} seed {s}: success {r['success_rate']:.3f} ({r['successes']}/{r['episodes']}) steps {r['mean_steps']:.1f} last100 {r['last100_top']} ({r['wall_s']} s)", flush=True)
+        rates = [r["success_rate"] for r in runs]
+        out["arms"][key] = {"label": label, "runs": runs, "success_mean": statistics.fmean(rates), "success_sd": statistics.stdev(rates) if len(rates) > 1 else 0.0,
+                            "per_seed": rates, "mean_steps": statistics.fmean(r["mean_steps"] for r in runs)}
+        print(f"[bench-fx] {key}: mean {out['arms'][key]['success_mean']:.4f} ± {out['arms'][key]['success_sd']:.4f}", flush=True)
+    Path(a.out).write_text(json.dumps(out, indent=1))
+    print(f"[bench-fx] wrote {a.out}")
+    return 0
+
+
+def life_row(factory, seed: int, acts_n: int) -> Dict[str, object]:
+    """One fresh life of `acts_n` game steps and every per-life reading the law's marks need (M2 at 960 and at acts_n, M3, M4, X2 printed)."""
+    pol = factory(seed)
+    r = run_game_fx(pol, seed, 10 ** 6, keep_trace=acts_n, max_steps_total=acts_n)
+    acts, trace = r["acts"], r["trace"]
+    row: Dict[str, object] = {"seed": seed, "steps": len(acts)}
+    for h in sorted({960, acts_n}):
+        pre = acts[:h]
+        t1, t2 = window_shares(pre)
+        row[f"h{h}"] = {"lock_flagged_share": lock_flagged_share(pre), "lock_pass": bool(lock_pass(pre)), "top1_max": float(t1.max()) if len(t1) else None,
+                        "top2_max": float(t2.max()) if len(t2) else None, "single_act_flag_ge_0.8": bool(len(t1) and t1.max() >= 0.8),
+                        "x1_pass_lt_0.5": bool(len(t1) and t1.max() < 0.5)}
+    row["noop_share_241_960"] = noop_share(acts)
+    ends = [t for t in trace if (t["terminated"] or t["truncated"])]
+    in_x2 = [t for t in ends if 241 <= t["step"] <= 960]
+    row["x2"] = {"episodes_241_960": len(in_x2), "successes_241_960": sum(1 for t in in_x2 if t["terminated"] and t["got"] > 0)}
+    row["episodes_all"], row["successes_all"] = len(ends), sum(1 for t in ends if t["terminated"] and t["got"] > 0)
+    hist = getattr(pol, "live_history", None)
+    if hist and isinstance(pol, ScreenChooser):
+        ma, mb = m4_readings(hist)
+        seg = hist[240:960]
+        row["m4a"], row["m4b"] = ma, mb
+        row["exact_live_set_share_241_960"] = sum(1 for f in seg if f == LIVE_SET) / float(len(seg)) if seg else None
+        run_len, first = 0, None
+        for i, f in enumerate(hist):
+            run_len = run_len + 1 if f == LIVE_SET else 0
+            if run_len >= 60:
+                first = i - 59
+                break
+        row["first_act_live_set_holds_60"] = first
+        row["effect_counts"] = pol.tracker.counts()
+    return row
+
+
+def cmd_lives_fx(a) -> int:
+    specs = all_fx_specs()
+    out: Dict[str, object] = {"acts": a.acts, "n": a.n, "base": a.base, "arms": {}}
+    for key in a.arms.split(","):
+        label, factory = specs[key]
+        rows = [life_row(factory, a.base + 1000 * i, a.acts) for i in range(a.n)]
+        hs = sorted({960, a.acts})
+        summ: Dict[str, object] = {}
+        for h in hs:
+            rr = [r[f"h{h}"] for r in rows]
+            summ[f"h{h}"] = {"lock_pass_share": sum(1 for x in rr if x["lock_pass"]) / len(rr), "single_act_flag_share": sum(1 for x in rr if x["single_act_flag_ge_0.8"]) / len(rr),
+                             "x1_pass_share": sum(1 for x in rr if x["x1_pass_lt_0.5"]) / len(rr),
+                             "top2_max_median": statistics.median(x["top2_max"] for x in rr), "top1_max_median": statistics.median(x["top1_max"] for x in rr)}
+        ns = [r["noop_share_241_960"] for r in rows]
+        summ["noop_share"] = {"median": statistics.median(ns), "le_0.25_share": sum(1 for x in ns if x <= 0.25) / len(ns), "ge_0.5_share": sum(1 for x in ns if x >= 0.5) / len(ns)}
+        if "m4a" in rows[0]:
+            summ["m4a_ge_0.95_share"] = sum(1 for r in rows if r["m4a"] >= 0.95) / len(rows)
+            summ["m4b_ge_0.95_share"] = sum(1 for r in rows if r["m4b"] >= 0.95) / len(rows)
+            summ["m4a_median"], summ["m4b_median"] = statistics.median(r["m4a"] for r in rows), statistics.median(r["m4b"] for r in rows)
+            summ["exact_set_median"] = statistics.median(r["exact_live_set_share_241_960"] for r in rows)
+            firsts = [r["first_act_live_set_holds_60"] for r in rows if r["first_act_live_set_holds_60"] is not None]
+            summ["latency_first_act_set_holds_60"] = {"lives_with_it": len(firsts), "median": statistics.median(firsts) if firsts else None}
+        ep = [r["x2"]["episodes_241_960"] for r in rows]
+        sc = [r["x2"]["successes_241_960"] / r["x2"]["episodes_241_960"] for r in rows if r["x2"]["episodes_241_960"]]
+        summ["x2_printed"] = {"episodes_median": statistics.median(ep), "success_mean": statistics.fmean(sc) if sc else None}
+        out["arms"][key] = {"label": label, "rows": rows, "summary": summ}
+        locks = ", ".join(f"{h}: {summ[f'h{h}']['lock_pass_share']:.2f}" for h in hs)
+        singles = ", ".join(f"{summ[f'h{h}']['single_act_flag_share']:.2f}" for h in hs)
+        m4 = (f"M4a>=.95 {summ['m4a_ge_0.95_share']:.2f} M4b>=.95 {summ['m4b_ge_0.95_share']:.2f} latency {summ['latency_first_act_set_holds_60']}" if "m4a_ge_0.95_share" in summ else "")
+        print(f"  {key:9s} lock-pass {locks} · single-act flag {singles} · no-op share median {summ['noop_share']['median']:.3f} (<=0.25: {summ['noop_share']['le_0.25_share']:.2f}) · {m4}", flush=True)
+    Path(a.out).write_text(json.dumps(out, indent=1))
+    print(f"[lives-fx] wrote {a.out}")
+    return 0
+
+
+def cmd_transfer(a) -> int:
+    """T1 (printed, NO bar): BabyAI-OpenRedDoor-v0, where `toggle` is the winning act: R-NULL, R-3H (the GoToLocal hand rule «never toggle»), C-SCR, nothing re-tuned."""
+    env_id = "BabyAI-OpenRedDoor-v0"
+    seeds = [int(s) for s in a.seeds.split(",")]
+    arms = {"R-NULL": lambda s: FixedDist(s, {i: 1.0 for i in range(7)}), "R-3H": lambda s: FixedDist(s, {0: 1.0, 1: 1.0, 2: 1.0}), "C-SCR": lambda s: ScreenChooser(s)}
+    out: Dict[str, object] = {"env": env_id, "episodes": a.episodes, "seeds": seeds, "arms": {}}
+    for key, factory in arms.items():
+        runs = []
+        for s in seeds:
+            pol = factory(s)
+            r = _strip(run_game_fx(pol, s, a.episodes, env_id=env_id, expected_max_steps=None))
+            r["seed"] = s
+            if isinstance(pol, ScreenChooser):
+                r["effect_counts"] = pol.tracker.counts()
+                r["final_rates"] = {n: round(pol.tracker.rate(n), 4) for n in ACT_NAMES}
+                r["final_live_flags"] = pol.tracker.live_flags()
+                r["toggle_live_at_end"] = pol.tracker.live("toggle")
+            runs.append(r)
+        rates = [r["success_rate"] for r in runs]
+        out["arms"][key] = {"runs": runs, "per_seed": rates, "success_mean": statistics.fmean(rates), "success_sd": statistics.stdev(rates), "mean_steps": statistics.fmean(r["mean_steps"] for r in runs)}
+        extra = f" · toggle LIVE at the end on {sum(1 for r in runs if r.get('toggle_live_at_end'))}/{len(runs)} seeds" if key == "C-SCR" else ""
+        print(f"  T1 {key:7s}: success {out['arms'][key]['success_mean']:.4f} ± {out['arms'][key]['success_sd']:.4f} (per seed {[round(x, 3) for x in rates]}){extra}", flush=True)
+    Path(a.out).write_text(json.dumps(out, indent=1))
+    return 0
+
+
+def cmd_equiv(a) -> int:
+    """M8: `obs["image"]` bytes equal <=> the rendered POV's sha equal, between consecutive frames, on >= `a.steps` uniformly random steps (two levels)."""
+    import hashlib
+    import gymnasium as gym
+    import minigrid  # noqa: F401
+    rng = np.random.default_rng(20261003)
+    steps = mism = changed = 0
+    per_level = {}
+    levels = ["BabyAI-GoToLocal-v0", "BabyAI-OpenRedDoor-v0"]
+    for env_id in levels:
+        env = gym.make(env_id, render_mode="rgb_array")
+        n0, m0, c0, e = steps, mism, changed, 0
+        while steps - n0 < a.steps // len(levels):
+            obs, _ = quiet_reset(env, 500 + e)
+            e += 1
+            po = obs["image"].tobytes()
+            pr = hashlib.sha256(env.unwrapped.get_pov_render(tile_size=32).tobytes()).hexdigest()
+            while True:
+                obs, _r, te, tr, _i = env.step(int(rng.integers(0, 7)))
+                co = obs["image"].tobytes()
+                cr = hashlib.sha256(env.unwrapped.get_pov_render(tile_size=32).tobytes()).hexdigest()
+                mism += int((co == po) != (cr == pr))
+                changed += int(co != po)
+                steps += 1
+                po, pr = co, cr
+                if te or tr:
+                    break
+        env.close()
+        per_level[env_id] = {"steps": steps - n0, "mismatches": mism - m0, "changed": changed - c0}
+    res = {"steps": steps, "mismatches": mism, "changed": changed, "per_level": per_level, "pass": mism == 0 and steps >= a.steps}
+    Path(a.out).write_text(json.dumps(res, indent=1))
+    print(f"[equiv] {json.dumps(res)}")
+    return 0 if res["pass"] else 1
+
+
+def cmd_oracle(a) -> int:
+    seeds = [int(s) for s in a.seeds.split(",")]
+    runs = [dict(run_oracle(s, a.episodes), seed=s) for s in seeds]
+    rates = [r["success_rate"] for r in runs]
+    out = {"env": ENV_ID, "episodes": a.episodes, "seeds": seeds, "runs": runs, "success_mean": statistics.fmean(rates), "mean_steps": statistics.fmean(r["mean_steps"] for r in runs)}
+    Path(a.out).write_text(json.dumps(out, indent=1))
+    print(f"[oracle] success {out['success_mean']:.4f} mean steps {out['mean_steps']:.2f} over {len(seeds)} seeds × {a.episodes}")
+    return 0
+
+
 def main(argv: Sequence[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -758,8 +1417,33 @@ def main(argv: Sequence[str]) -> int:
     v.add_argument("--base", type=int, default=30260923)
     v.add_argument("--p0", type=float, default=0.29)
     v.add_argument("--out", required=True)
+    # edit: Claude (Sonnet 5.5, swarm act), 2026-10-03 11:44 +0400 — PREREG-ACT-EFFECT PHASE 1: the effect bench's subcommands (the landed five are untouched).
+    seeds12 = ",".join(str(s) for s in SEEDS12)
+    b = sub.add_parser("bench-fx")
+    b.add_argument("--episodes", type=int, default=1000)
+    b.add_argument("--seeds", default=seeds12)
+    b.add_argument("--arms", default=None, help="comma-separated keys (default: the eleven NEW arms; the landed ones R-NULL,R-3,P-OLD,A-VAL,A-SMP are also accepted)")
+    b.add_argument("--out", required=True)
+    lf = sub.add_parser("lives-fx")
+    lf.add_argument("--arms", default="R-NULL,R-3,P-OLD,A-VAL,A-RATE,C-SCR,A-BOTH,K-ARGMAX,P-DEAL")
+    lf.add_argument("--n", type=int, default=50)
+    lf.add_argument("--acts", type=int, default=4920)
+    lf.add_argument("--base", type=int, default=30260923)
+    lf.add_argument("--out", required=True)
+    tr = sub.add_parser("transfer")
+    tr.add_argument("--episodes", type=int, default=600)
+    tr.add_argument("--seeds", default=seeds12)
+    tr.add_argument("--out", required=True)
+    eq = sub.add_parser("equiv")
+    eq.add_argument("--steps", type=int, default=20000)
+    eq.add_argument("--out", required=True)
+    orc = sub.add_parser("oracle")
+    orc.add_argument("--episodes", type=int, default=1000)
+    orc.add_argument("--seeds", default=seeds12)
+    orc.add_argument("--out", required=True)
     a = ap.parse_args(list(argv))
-    return {"parity": cmd_parity, "calib": cmd_calib, "arms": cmd_arms, "lockseries": cmd_lockseries, "lives": cmd_lives}[a.cmd](a)
+    return {"parity": cmd_parity, "calib": cmd_calib, "arms": cmd_arms, "lockseries": cmd_lockseries, "lives": cmd_lives,
+            "bench-fx": cmd_bench_fx, "lives-fx": cmd_lives_fx, "transfer": cmd_transfer, "equiv": cmd_equiv, "oracle": cmd_oracle}[a.cmd](a)
 
 
 if __name__ == "__main__":
