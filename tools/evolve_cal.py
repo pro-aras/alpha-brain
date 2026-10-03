@@ -360,6 +360,64 @@ def compare_twins(rows_a: Sequence[dict], rows_b: Sequence[dict]) -> dict:
             "diff_key_counts": dict(key_counts), "by_decile": deciles}
 
 
+_OTHER_KINDS = ("think", "outcome", "body", "act", "touch", "question", "say", "sleep", "epoch", "epoch_refused")
+
+
+def _row_key(r: dict) -> tuple:
+    """What a journal row IS: a moment row by (seq, glance, act); any other row by its kind and seq."""
+    if "moment" in r:
+        return ("moment", r.get("seq"), r.get("glance"), r.get("act"))
+    for kind in _OTHER_KINDS:
+        if kind in r:
+            return (kind, r.get("seq"))
+    return ("other", r.get("seq"), tuple(sorted(r)))
+
+
+def _keyed(rows: Sequence[dict]) -> Dict[tuple, dict]:
+    seen: Dict[tuple, int] = {}
+    out: Dict[tuple, dict] = {}
+    for r in rows:
+        k = _row_key(r)
+        i = seen.get(k, 0)
+        seen[k] = i + 1
+        out[k + (i,)] = r
+    return out
+
+
+def compare_twins_keyed(rows_a: Sequence[dict], rows_b: Sequence[dict]) -> dict:
+    """The journals matched BY KEY, not by position (edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 21:19 +0400): a think row that lands one boundary later
+    shifts every later row by one index, and the positional comparison read the SEED pair of the STOP test as 307 of 935 rows different while the organism's final
+    state_hash was equal. A moment row is matched by (seq, glance, act) and a repeat in order; any other row by its kind and seq. `moment` counts what matched,
+    what only one twin wrote, what differs, and what differs in a DISCRETE key (a key whose value carries no float and is not the state digest — a fix, a birth, a
+    cell count, a word) with the first seq where that happened; `other` counts the same per kind (think, outcome, body, act, ...)."""
+    ia, ib = _keyed(rows_a), _keyed(rows_b)
+    moment: Dict[str, object] = {"matched": 0, "only_a": 0, "only_b": 0, "differing": 0, "discrete_differing": 0, "first_discrete_seq": None}
+    key_counts: Counter = Counter()
+    other: Dict[str, Dict[str, int]] = {}
+    for k in sorted(set(ia) | set(ib), key=lambda x: (str(x[0]), x[1] if isinstance(x[1], int) else -1, str(x[2:]))):
+        kind = k[0]
+        bucket = moment if kind == "moment" else other.setdefault(kind, {"matched": 0, "differing": 0, "only_a": 0, "only_b": 0})
+        ra, rb = ia.get(k), ib.get(k)
+        if ra is None or rb is None:
+            bucket["only_a" if rb is None else "only_b"] += 1
+            continue
+        bucket["matched"] += 1
+        if ra == rb:
+            continue
+        bucket["differing"] += 1
+        if kind != "moment":
+            continue
+        keys = [x for x in sorted(set(ra) | set(rb)) if ra.get(x, _MISSING) != rb.get(x, _MISSING)]
+        key_counts.update(keys)
+        if any(x not in _CONTINUOUS_KEYS and not (_has_float(ra.get(x)) or _has_float(rb.get(x))) for x in keys):
+            moment["discrete_differing"] += 1
+            seq = ra.get("seq")
+            if moment["first_discrete_seq"] is None or (isinstance(seq, int) and seq < moment["first_discrete_seq"]):
+                moment["first_discrete_seq"] = seq
+    moment["diff_key_counts"] = dict(key_counts)
+    return {"n_a": len(rows_a), "n_b": len(rows_b), "moment": moment, "other": other}
+
+
 # ============================================================================ the bands (PREREG-EVOLVE-CAL A1 (i), A2.2, A4, A7; scipy)
 # edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 21:10 +0400 — tests first: tests/tools/test_evolve_cal_bands_build.py.
 ALPHA_SIDE = 0.0083      # one-sided per side per dimension: 0.025 family-wise over three dimensions

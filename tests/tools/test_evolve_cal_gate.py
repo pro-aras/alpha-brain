@@ -157,6 +157,15 @@ class TestVerdict(unittest.TestCase):
         self.assertFalse(v["cost"]["regressed"])
         self.assertEqual(v["verdict"], "IMPROVED")
 
+    def test_the_bands_high_side_decides_not_the_cap_alone_even_under_an_absurdly_low_cap(self) -> None:
+        # the sweep's one survivor (a-cheaper-mutant-regresses) is EQUIVALENT for every cap >= 1: a ratio below 1 never exceeds it. A cap below 1 makes it
+        # observable, so this pins that only the HIGH side of the band can regress the cost
+        b = bands(ln_cpu=0.05)
+        b["cost_policy_cap"] = 0.5
+        v = eb.calibrated_verdict(reading(100, cpu=2000.0), reading(107, cpu=1200.0), b)       # ratio 0.6: below the band, above the silly cap
+        self.assertEqual(v["cost"]["position"], "below")
+        self.assertFalse(v["cost"]["regressed"])
+
     def test_without_a_cost_band_the_policy_cap_alone_decides(self) -> None:
         b = bands()
         del b["dims"]["ln_cpu"]

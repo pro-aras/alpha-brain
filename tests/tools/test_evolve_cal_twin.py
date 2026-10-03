@@ -417,6 +417,73 @@ class TestCompareTwins(unittest.TestCase):
         self.assertEqual(r["first_diff"], 3)
 
 
+class TestCompareKeyed(unittest.TestCase):
+    """A think row that lands one boundary later shifts every later row by one INDEX (the seed pair of the STOP test read 307 of 935 rows «different» with
+    the organism's final state_hash EQUAL): the keyed comparison matches rows by what they ARE — a moment row by (seq, glance, act), any other row by its
+    kind and seq — so a shifted journal is not a diverged one."""
+
+    @staticmethod
+    def moment(seq, glance=0, cells=(10, 5), err=0.5, hash_="h", word="circle"):
+        return {"seq": seq, "moment": f"m{seq}", "act": "glance", "glance": glance, "cells": list(cells), "err": err, "hash": f"{hash_}{seq}",
+                "word": word, "fix": [[1, 2]], "residual": [0.1], "confirmed": [False]}
+
+    def rows(self):
+        return [self.moment(10), self.moment(11), {"seq": 12, "think": {"say": "x"}}, self.moment(13), {"seq": 14, "outcome": {"r": 0}}, self.moment(15)]
+
+    def test_identical_journals_have_no_keyed_difference(self) -> None:
+        r = cal.compare_twins_keyed(self.rows(), json.loads(json.dumps(self.rows())))
+        self.assertEqual((r["moment"]["matched"], r["moment"]["differing"], r["moment"]["discrete_differing"]), (4, 0, 0))
+        self.assertEqual((r["moment"]["only_a"], r["moment"]["only_b"]), (0, 0))
+        self.assertIsNone(r["moment"]["first_discrete_seq"])
+        self.assertEqual(r["other"]["think"], {"matched": 1, "differing": 0, "only_a": 0, "only_b": 0})
+
+    def test_a_shifted_journal_is_not_a_diverged_one(self) -> None:
+        a = self.rows()
+        b = json.loads(json.dumps(a))
+        b.insert(1, {"seq": 10, "think": {"say": "late"}})            # an extra row early: every later row moves by one index
+        pos = cal.compare_twins(a, b)
+        self.assertGreater(pos["rows_differing"], 2, "the positional comparison reads the shift as divergence")
+        r = cal.compare_twins_keyed(a, b)
+        self.assertEqual((r["moment"]["differing"], r["moment"]["discrete_differing"]), (0, 0))
+        self.assertEqual(r["other"]["think"]["only_b"], 1)
+        self.assertEqual(r["other"]["think"]["matched"], 1)
+
+    def test_a_discrete_difference_in_a_moment_row_is_found_by_its_seq(self) -> None:
+        a = self.rows()
+        b = json.loads(json.dumps(a))
+        before = json.dumps(b[3], sort_keys=True)
+        b[3]["cells"] = [11, 5]
+        self.assertNotEqual(json.dumps(b[3], sort_keys=True), before, "the plant changed the bytes")
+        r = cal.compare_twins_keyed(a, b)
+        self.assertEqual((r["moment"]["differing"], r["moment"]["discrete_differing"]), (1, 1))
+        self.assertEqual(r["moment"]["first_discrete_seq"], 13)
+        self.assertEqual(r["moment"]["diff_key_counts"], {"cells": 1})
+
+    def test_a_float_only_or_hash_only_difference_is_not_discrete(self) -> None:
+        a = self.rows()
+        b = json.loads(json.dumps(a))
+        b[0]["hash"] = "other"
+        b[1]["err"] = 0.5000001
+        r = cal.compare_twins_keyed(a, b)
+        self.assertEqual((r["moment"]["differing"], r["moment"]["discrete_differing"]), (2, 0))
+        self.assertIsNone(r["moment"]["first_discrete_seq"])
+
+    def test_a_moment_row_only_one_twin_wrote_is_counted_not_dropped(self) -> None:
+        a = self.rows()
+        b = [x for x in json.loads(json.dumps(a)) if x.get("seq") != 13]
+        self.assertEqual(len(b), len(a) - 1, "the plant removed the row")
+        r = cal.compare_twins_keyed(a, b)
+        self.assertEqual((r["moment"]["only_a"], r["moment"]["only_b"], r["moment"]["matched"]), (1, 0, 3))
+
+    def test_two_glances_of_one_seq_are_two_rows_and_a_repeat_is_matched_in_order(self) -> None:
+        a = [self.moment(20, glance=0), self.moment(20, glance=1), {"seq": 21, "outcome": {"r": 1}}, {"seq": 21, "outcome": {"r": 2}}]
+        b = json.loads(json.dumps(a))
+        b[3]["outcome"] = {"r": 3}
+        r = cal.compare_twins_keyed(a, b)
+        self.assertEqual(r["moment"]["matched"], 2)
+        self.assertEqual(r["other"]["outcome"], {"matched": 2, "differing": 1, "only_a": 0, "only_b": 0})
+
+
 class TestRunTwin(_Synthetic):
     def _run(self, name: str, variant: str, **kw) -> dict:
         out = self.tmp / "out" / name

@@ -75,6 +75,23 @@ def main(argv=None) -> int:
                          ("epsilon pair T0 vs Te (lr x (1+1e-5))", ("T0", "Te"))):
         if x in t and y in t:
             out[name] = pair(name, t[x], t[y])
+    # the epsilon LADDER (the seat's 21:1x probes): every twin whose variant is eps:<e>:<k>, against T0, ascending in e
+    if "T0" in t:
+        ladder = []
+        for sub in sorted(d.iterdir()):
+            if sub.is_dir() and (sub / "reading.json").exists():
+                r, j = load(sub)
+                if str(r.get("variant", "")).startswith("eps:"):
+                    ladder.append((float(r["variant"].split(":")[1]), sub.name, r, j))
+        out["ladder"] = []
+        for eps, name, r, j in sorted(ladder, key=lambda x: x[0]):
+            c = cal.compare_twins(t["T0"][1], j)
+            out["ladder"].append({"eps": eps, "twin": name, "state_hash_equal": r["state_hash"] == t["T0"][0]["state_hash"],
+                                  "q1_seen": [t["T0"][0]["q1_seen"], r["q1_seen"]], "frames_filed": [t["T0"][0]["frames_filed"], r["frames_filed"]],
+                                  "confirmed_share": [t["T0"][0]["confirmed_share"], r["confirmed_share"]],
+                                  "rows_compared": c["n_a"], "rows_differing": c["rows_differing"], "discrete_diff_rows": c["discrete_diff_rows"],
+                                  "first_diff": c["first_diff"], "first_discrete_diff": c["first_discrete_diff"], "by_decile": c["by_decile"],
+                                  "diff_key_counts": c["diff_key_counts"]})
     for n, (r, j) in t.items():
         out.setdefault("readings", {})[n] = {k: r.get(k) for k in ("variant", "q1_seen", "confirmed_share", "frames_filed", "journal_rows", "rows_consumed",
                                                                     "state_hash", "row_hash", "cpu_s", "wall_s", "build_s", "maxrss_kb", "load0", "load1", "psi0", "psi1")}
