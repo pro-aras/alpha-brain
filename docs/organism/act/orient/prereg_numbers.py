@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # edit: Claude (Sonnet 5.5, swarm act), 2026-10-03 11:11 +0400 — the derived numbers PREREG-ACT-EFFECT quotes, computed here and read back from this file's own
 # output (never typed from memory, #242). Pure arithmetic over the orientation probes' counts (orient/probe_world_facts*.json) and the
-# declared parameters (window n = 10, live threshold t = 0.3, floor 0.1). Run: python3 docs/organism/act/orient/prereg_numbers.py
+# declared parameters (v2: window n = 20, live threshold t = 0.2, floor 0.1; the superseded first draft's n = 10, t = 0.3 is printed beside, labelled). Run: python3 docs/organism/act/orient/prereg_numbers.py
 import json
 import math
 from pathlib import Path
@@ -12,7 +12,7 @@ HERE = Path(__file__).resolve().parent
 p1 = json.loads((HERE / "probe_world_facts.json").read_text())["random7"]
 p2 = json.loads((HERE / "probe_world_facts2.json").read_text())
 ACTS = ["left", "right", "forward", "pickup", "drop", "toggle", "done"]
-N_WIN, T_LIVE, FLOOR = 10, 0.3, 0.1
+FLOOR = 0.1
 
 
 def binom_cdf(k, n, p):
@@ -39,19 +39,25 @@ lo = min(p2["per_act"][a]["p_changed"] for a in ("left", "right", "forward"))
 hi = max(p2["per_act"][a]["p_changed"] for a in ("pickup", "drop", "toggle", "done"))
 print(f"  lowest live-act rate {lo:.3f} / highest dead-act rate {hi:.3f} = factor {lo / hi:.1f}")
 
-print(f"== misclassification of the SCREEN (window {N_WIN}, live iff rate >= {T_LIVE}, i.e. >= {math.ceil(T_LIVE * N_WIN)} changes of {N_WIN})")
-k_live = math.ceil(T_LIVE * N_WIN)
-for a in ACTS:
-    p = p2["per_act"][a]["p_changed"]
-    p_dead = binom_cdf(k_live - 1, N_WIN, p)       # judged dead although its true rate is p
-    print(f"  {a:8s} true rate {p:.3f}: P(judged DEAD at one evaluation) = {p_dead:.4f}   P(judged LIVE) = {1 - p_dead:.4f}")
+for (N_WIN, T_LIVE, tag) in ((10, 0.3, "FIRST DRAFT (superseded: see §12, AMENDMENT 0)"), (20, 0.2, "THE LAW (v2)")):
+    k_live = math.ceil(T_LIVE * N_WIN - 1e-12)
+    print(f"== misclassification of the SCREEN per EVALUATION, {tag}: window {N_WIN}, live iff rate >= {T_LIVE}, i.e. >= {k_live} changes of {N_WIN}")
+    print("   (per evaluation, NOT per choice: a DEAD act is drawn 22x more rarely, so time spent misclassified is larger — see orient/screen_select.txt)")
+    for a in ACTS:
+        p = p2["per_act"][a]["p_changed"]
+        p_dead = binom_cdf(k_live - 1, N_WIN, p)       # judged dead although its true rate is p
+        print(f"  {a:8s} true rate {p:.3f}: P(judged DEAD at one evaluation) = {p_dead:.4f}   P(judged LIVE) = {1 - p_dead:.4f}")
+    for fr in (0.50, 0.55, 0.592, 0.637):
+        print(f"  forward at {fr:.3f}: P(judged DEAD at one evaluation) = {binom_cdf(k_live - 1, N_WIN, fr):.5f}")
+
+N_WIN, T_LIVE = 20, 0.2
 
 print("== the candidate's stationary mixture (the landed 10 % uniform draw + uniform over the live set {left, right, forward})")
 live_share = (1 - FLOOR) / 3 + FLOOR / 7
 dead_share = FLOOR / 7
 print(f"  P(left) = P(right) = P(forward) = {live_share:.4f}; P(each no-op) = {dead_share:.4f}; no-op total {4 * dead_share:.4f}")
 
-print("== startup: acts until EVERY act has >= 10 outcomes under uniform choice (7 acts, 20,000 trials)")
+print(f"== startup: acts until EVERY act has >= {N_WIN} outcomes under uniform choice (7 acts, 20,000 trials)")
 rng = np.random.default_rng(20261003)
 t_all = []
 for _ in range(20000):

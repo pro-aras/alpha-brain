@@ -1,0 +1,40 @@
+{
+ "env": "BabyAI-OpenRedDoor-v0",
+ "max_steps": 50,
+ "episodes": 300,
+ "success": 0.1667,
+ "mean_steps": 46.0,
+ "excluded_first_outcomes": 300,
+ "per_act": {
+  "left": {
+   "n": 1922,
+   "p_changed": 0.99
+  },
+  "right": {
+   "n": 1923,
+   "p_changed": 0.985
+  },
+  "forward": {
+   "n": 1877,
+   "p_changed": 0.551
+  },
+  "pickup": {
+   "n": 1960,
+   "p_changed": 0.0
+  },
+  "drop": {
+   "n": 1988,
+   "p_changed": 0.0
+  },
+  "toggle": {
+   "n": 1929,
+   "p_changed": 0.026
+  },
+  "done": {
+   "n": 1887,
+   "p_changed": 0.0
+  }
+ }
+}
+BabyAI-OpenDoor-v0 success 0.3 {'left': 1.0, 'right': 1.0, 'forward': 0.743, 'pickup': 0.0, 'drop': 0.0, 'toggle': 0.027, 'done': 0.0}
+BabyAI-GoToDoor-v0 success 0.6 {'left': 0.996, 'right': 0.994, 'forward': 0.704, 'pickup': 0.0, 'drop': 0.0, 'toggle': 0.021, 'done': 0.0}
