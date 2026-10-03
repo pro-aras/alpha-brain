@@ -96,6 +96,31 @@ THE PAIRED STANDARD ERROR (T-MEM-1's rule; pairs per task 139 / 141 / 192, so 10
    NSCL@0.001  against PLAIN, BWT_3: gap +0.249 (SE 0.027); the smallest gap/SE over the seeds 7.1 (the bar is 2.0)
    NSCL@0.001  against PLAIN, BWT_4: gap +0.766 (SE 0.020); the smallest gap/SE over the seeds 31.6 (the bar is 2.0)
 
+THE READINGS AND THE PLANT, paired against OWM@0.01 and against PLAIN (gap = the first arm's BWT minus the second's; positive = the first protects more; SE the paired SE; gap/SE over the seeds):
+   OWM-NB@0.01       against OWM@0.01, BWT_3: gap -0.032 (SE 0.010); gap/SE min -4.1 max -1.6; |gap| >= 2 SE at 9 of 10 seeds
+   OWM-NB@0.01       against OWM@0.01, BWT_4: gap -0.011 (SE 0.006); gap/SE min -3.6 max -0.4; |gap| >= 2 SE at 3 of 10 seeds
+   OWM-RESTD@0.01    against OWM@0.01, BWT_3: gap -0.020 (SE 0.009); gap/SE min -3.8 max +0.0; |gap| >= 2 SE at 6 of 10 seeds
+   OWM-RESTD@0.01    against OWM@0.01, BWT_4: gap -0.011 (SE 0.006); gap/SE min -2.7 max +0.0; |gap| >= 2 SE at 6 of 10 seeds
+   OWM-BM@0.01       against OWM@0.01, BWT_3: gap -0.002 (SE 0.009); gap/SE min -1.9 max +2.5; |gap| >= 2 SE at 1 of 10 seeds
+   OWM-BM@0.01       against OWM@0.01, BWT_4: gap -0.007 (SE 0.007); gap/SE min -3.3 max +1.5; |gap| >= 2 SE at 3 of 10 seeds
+   OWM-OLDONLY@0.01  against OWM@0.01, BWT_3: gap -0.089 (SE 0.017); gap/SE min -7.5 max -1.9; |gap| >= 2 SE at 9 of 10 seeds
+   OWM-OLDONLY@0.01  against OWM@0.01, BWT_4: gap -0.067 (SE 0.012); gap/SE min -8.0 max -3.3; |gap| >= 2 SE at 10 of 10 seeds
+   ANTI-OWM@0.01     against OWM@0.01, BWT_3: gap -0.370 (SE 0.029); gap/SE min -15.1 max -11.4; |gap| >= 2 SE at 10 of 10 seeds
+   ANTI-OWM@0.01     against OWM@0.01, BWT_4: gap -0.804 (SE 0.018); gap/SE min -62.5 max -36.2; |gap| >= 2 SE at 10 of 10 seeds
+   NSCL@0.01         against OWM@0.01, BWT_3: gap -0.015 (SE 0.009); gap/SE min -2.7 max -0.8; |gap| >= 2 SE at 2 of 10 seeds
+   NSCL@0.01         against OWM@0.01, BWT_4: gap -0.012 (SE 0.007); gap/SE min -2.8 max -0.0; |gap| >= 2 SE at 6 of 10 seeds
+   FREEZE-OLD@3      against PLAIN,    BWT_3: gap +0.000 (SE 0.000); gap/SE min +0.0 max +0.0
+   FREEZE-OLD@3      against PLAIN,    BWT_4: gap +0.604 (SE 0.025); gap/SE min +16.7 max +34.7
+   STD-ONLY@1        against PLAIN,    BWT_3: gap +0.225 (SE 0.029); gap/SE min +4.9 max +12.5
+   STD-ONLY@1        against PLAIN,    BWT_4: gap +0.751 (SE 0.022); gap/SE min +27.0 max +46.4
+   STD-ONLY@2        against PLAIN,    BWT_3: gap +0.147 (SE 0.025); gap/SE min +2.3 max +9.4
+   STD-ONLY@2        against PLAIN,    BWT_4: gap +0.701 (SE 0.023); gap/SE min +21.5 max +43.3
+   STD-ONLY@3        against PLAIN,    BWT_3: gap +0.000 (SE 0.000); gap/SE min +0.0 max +0.0
+   STD-ONLY@3        against PLAIN,    BWT_4: gap +0.604 (SE 0.025); gap/SE min +16.7 max +34.7
+   LRSHRINK@0.125    against PLAIN,    BWT_3: gap +0.064 (SE 0.019); gap/SE min +0.9 max +5.7
+   LRSHRINK@0.125    against PLAIN,    BWT_4: gap +0.642 (SE 0.023); gap/SE min +24.0 max +38.7
+   (the law's STD-ONLY(j) freezes every weight AFTER room j: rooms 2..j still learn and forget as PLAIN does, so its BWT is a ceiling only for the forgetting caused AFTER room j; a protector active from room 2 can beat it, and OWM does)
+
 THE NULLS' DRAWS against the arm they null (the arm's value; the draws' mean, and how many of the 10 draws the arm beat, mean over seeds):
    OWM@0.1     BWT_3 -0.029 · ROT@0.1        draws mean -0.284 · the arm beat 10.0 of 10 draws on average (min over seeds 10)
    OWM@0.1     BWT_4 -0.215 · ROT@0.1        draws mean -0.771 · the arm beat 10.0 of 10 draws on average (min over seeds 10)

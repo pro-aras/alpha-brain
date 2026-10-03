@@ -229,6 +229,25 @@ def detail(summ, seeds: Sequence[int]) -> List[str]:
             ratio = [x / y for x, y in d]
             out.append(f"   {arm:11s} against PLAIN, BWT_{j}: gap {np.mean([x for x, _y in d]):+.3f} (SE {np.mean([y for _x, y in d]):.3f}); the smallest gap/SE over the seeds {min(ratio):.1f} (the bar is 2.0)")
     out.append("")
+    # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 12:08 +0400 — the readings block, added after the unit finished and before the RESULT; no bar or class depends on it.
+    out.append("THE READINGS AND THE PLANT, paired against OWM@0.01 and against PLAIN (gap = the first arm's BWT minus the second's; positive = the first protects more; SE the paired SE; gap/SE over the seeds):")
+    for arm in ("OWM-NB@0.01", "OWM-RESTD@0.01", "OWM-BM@0.01", "OWM-OLDONLY@0.01", "ANTI-OWM@0.01", "NSCL@0.01"):
+        if arm not in summ or "OWM@0.01" not in summ:
+            continue
+        for j in (3, 4):
+            d = [paired(summ[arm][s][0], summ["OWM@0.01"][s][0], j) for s in seeds]
+            r = [(x / y if y > 0 else (0.0 if x == 0 else float("inf"))) for x, y in d]      # a pair of IDENTICAL lives has SE 0 and gap 0: ratio 0, not a crash
+            n_sig = sum(1 for v in r if abs(v) >= 2.0)
+            out.append(f"   {arm:17s} against OWM@0.01, BWT_{j}: gap {np.mean([x for x, _y in d]):+.3f} (SE {np.mean([y for _x, y in d]):.3f}); gap/SE min {min(r):+.1f} max {max(r):+.1f}; |gap| >= 2 SE at {n_sig} of {len(seeds)} seeds")
+    for arm in ("FREEZE-OLD@3", "STD-ONLY@1", "STD-ONLY@2", "STD-ONLY@3", "LRSHRINK@0.125"):
+        if arm not in summ:
+            continue
+        for j in (3, 4):
+            d = [paired(summ[arm][s][0], summ["PLAIN"][s][0], j) for s in seeds]
+            r = [(x / y if y > 0 else (0.0 if x == 0 else float("inf"))) for x, y in d]      # a pair of IDENTICAL lives has SE 0 and gap 0: ratio 0, not a crash
+            out.append(f"   {arm:17s} against PLAIN,    BWT_{j}: gap {np.mean([x for x, _y in d]):+.3f} (SE {np.mean([y for _x, y in d]):.3f}); gap/SE min {min(r):+.1f} max {max(r):+.1f}")
+    out.append("   (the law's STD-ONLY(j) freezes every weight AFTER room j: rooms 2..j still learn and forget as PLAIN does, so its BWT is a ceiling only for the forgetting caused AFTER room j; a protector active from room 2 can beat it, and OWM does)")
+    out.append("")
     out.append("THE NULLS' DRAWS against the arm they null (the arm's value; the draws' mean, and how many of the 10 draws the arm beat, mean over seeds):")
     for fam, null in (("OWM", "ROT"), ("NSCL", "RANDRANK")):
         for t in TAUS:
