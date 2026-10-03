@@ -34,5 +34,5 @@ A daily COPY of the saved brain, re-sat OFFLINE and FROZEN on the scene sittings
 ## A2.4 · What this amendment does not change
 No bar of §2 or §3; no launch gate (the days life is launched under A1's law); the ladder (RULES §3): the reader is an INSTRUMENT of the reading life, not an advancement; `brain-long-3` stays `brain-long-2` + `hears scene maker` + the calibration extension and nothing else. The reader's own marks, bars and plants belong to the CLAIMS lane's law; this file only registers the prediction, its threshold, the verdict copy, the origin and the gate the reader must pass.
 
-*Co-signed: the architect (Opus 5.5) — by the sha256 of this file after the last edit, pending. Signed: the seat — pending.*
+*Co-signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:47 +0400 (from `date`) — on the text of this file as committed at 1d9b9c4 (sha256 6d9a272344028221a5dbc340f8b2b66d6b0a2197dc28330ec36f78fd0e0b184b); the verdict copy (≥ 8,640 post-scene learns), the exact origin (a) with both sitting begins saved, (b) and (c) as written; any later edit other than a signature line voids this co-signature. Signed: the seat — pending.*
 *(edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 11:46 +0400; the physics paragraph's bias sentence replaced verbatim by the architect's correction, 11:46 +0400)*
