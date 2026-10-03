@@ -1,0 +1,17 @@
+E
+======================================================================
+ERROR: test_resit (unittest.loader._FailedTest.test_resit)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_resit
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit.py", line 21, in <module>
+    from tools.brain import resit as R
+ImportError: cannot import name 'resit' from 'tools.brain' (unknown location)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

@@ -1,0 +1,1 @@
+{"status": "PASS", "gate_json": "/data/dev/brain-runs/resit-gate/bl2/gate/r1p/gate.json", "reading": "R1: 3011 of 3011 rows equal, 7 mark groups equal to 1e-12", "r1a": {"n_resit": 3011, "n_equal": 3011, "n_diff": 0, "n_missing_life_row": 0}, "r1b": {"equal": true, "n_leaves": 4667}}

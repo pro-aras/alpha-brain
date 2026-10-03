@@ -1,0 +1,489 @@
+EEEEEEEEEEEEFEEEFFEFEFEEFFFFEFEFFFFFFEFFFEEEEEEEEEEE
+======================================================================
+ERROR: test_a_difference_in_one_key_is_found_and_the_first_one_is_printed_with_both_rows (tests.tools.test_resit_gate.TestCompareAnswers.test_a_difference_in_one_key_is_found_and_the_first_one_is_printed_with_both_rows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 149, in test_a_difference_in_one_key_is_found_and_the_first_one_is_printed_with_both_rows
+    res = R.compare_answers(resit, life)
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_answers'
+
+======================================================================
+ERROR: test_a_resit_row_with_no_life_row_is_counted_missing_and_a_life_row_not_resat_is_a_reading (tests.tools.test_resit_gate.TestCompareAnswers.test_a_resit_row_with_no_life_row_is_counted_missing_and_a_life_row_not_resat_is_a_reading)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 169, in test_a_resit_row_with_no_life_row_is_counted_missing_and_a_life_row_not_resat_is_a_reading
+    res = R.compare_answers(resit, life)
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_answers'
+
+======================================================================
+ERROR: test_an_extra_key_on_one_side_is_a_difference_the_key_sets_must_be_equal (tests.tools.test_resit_gate.TestCompareAnswers.test_an_extra_key_on_one_side_is_a_difference_the_key_sets_must_be_equal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 160, in test_an_extra_key_on_one_side_is_a_difference_the_key_sets_must_be_equal
+    res = R.compare_answers(resit, life)
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_answers'
+
+======================================================================
+ERROR: test_equal_rows_are_all_counted_equal_and_the_hash_field_is_set_aside (tests.tools.test_resit_gate.TestCompareAnswers.test_equal_rows_are_all_counted_equal_and_the_hash_field_is_set_aside)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 139, in test_equal_rows_are_all_counted_equal_and_the_hash_field_is_set_aside
+    res = R.compare_answers(resit, life)
+          ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_answers'
+
+======================================================================
+ERROR: test_the_comparison_is_over_the_json_round_trip_int_and_float_stay_different (tests.tools.test_resit_gate.TestCompareAnswers.test_the_comparison_is_over_the_json_round_trip_int_and_float_stay_different)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 176, in test_the_comparison_is_over_the_json_round_trip_int_and_float_stay_different
+    self.assertFalse(R.compare_answers([a], {10: b})["all_equal"])
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_answers'
+
+======================================================================
+ERROR: test_a_float_within_1e_minus_12_passes_and_one_beyond_it_fails_naming_its_path (tests.tools.test_resit_gate.TestCompareMarks.test_a_float_within_1e_minus_12_passes_and_one_beyond_it_fails_naming_its_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 197, in test_a_float_within_1e_minus_12_passes_and_one_beyond_it_fails_naming_its_path
+    self.assertTrue(R.compare_marks(mk_grade(m1=0.98 + 5e-13), mk_grade())["equal"])
+                    ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_marks'
+
+======================================================================
+ERROR: test_a_missing_key_a_missing_set_and_a_changed_m5_row_are_each_a_difference (tests.tools.test_resit_gate.TestCompareMarks.test_a_missing_key_a_missing_set_and_a_changed_m5_row_are_each_a_difference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 215, in test_a_missing_key_a_missing_set_and_a_changed_m5_row_are_each_a_difference
+    self.assertFalse(R.compare_marks(g, mk_grade())["equal"])
+                     ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_marks'
+
+======================================================================
+ERROR: test_identical_grades_are_equal_and_the_marks_compared_are_named (tests.tools.test_resit_gate.TestCompareMarks.test_identical_grades_are_equal_and_the_marks_compared_are_named)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 190, in test_identical_grades_are_equal_and_the_marks_compared_are_named
+    res = R.compare_marks(mk_grade(), mk_grade())
+          ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_marks'
+
+======================================================================
+ERROR: test_m6_counts_and_meeting_are_readings_never_compared (tests.tools.test_resit_gate.TestCompareMarks.test_m6_counts_and_meeting_are_readings_never_compared)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 210, in test_m6_counts_and_meeting_are_readings_never_compared
+    self.assertTrue(R.compare_marks(g, mk_grade())["equal"])
+                    ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_marks'
+
+======================================================================
+ERROR: test_nan_equals_nan_and_a_bool_is_not_an_int (tests.tools.test_resit_gate.TestCompareMarks.test_nan_equals_nan_and_a_bool_is_not_an_int)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 227, in test_nan_equals_nan_and_a_bool_is_not_an_int
+    self.assertTrue(R.compare_marks(g, h)["equal"])
+                    ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'compare_marks'
+
+======================================================================
+ERROR: test_a_byte_flipped_inside_brain_npz_is_refused_by_name_with_the_prints_still_matching_R4a (tests.tools.test_resit_gate.TestGateFails.test_a_byte_flipped_inside_brain_npz_is_refused_by_name_with_the_prints_still_matching_R4a)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 624, in test_a_byte_flipped_inside_brain_npz_is_refused_by_name_with_the_prints_still_matching_R4a
+    self.assertEqual(row["status"], "REFUSED")
+                     ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_a_genome_whose_sha_is_not_the_epoch_rows_is_refused_R4e (tests.tools.test_resit_gate.TestGateFails.test_a_genome_whose_sha_is_not_the_epoch_rows_is_refused_R4e)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 635, in test_a_genome_whose_sha_is_not_the_epoch_rows_is_refused_R4e
+    self.assertEqual(row["status"], "REFUSED")
+                     ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_a_missing_state_prev_is_skipped_by_name_and_the_gate_exits_2 (tests.tools.test_resit_gate.TestGateFails.test_a_missing_state_prev_is_skipped_by_name_and_the_gate_exits_2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 598, in test_a_missing_state_prev_is_skipped_by_name_and_the_gate_exits_2
+    self.assertEqual(row["status"], "SKIPPED")
+                     ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_a_planted_difference_in_one_life_row_fails_r1a_names_the_item_and_reads_a_subject_difference (tests.tools.test_resit_gate.TestGateFails.test_a_planted_difference_in_one_life_row_fails_r1a_names_the_item_and_reads_a_subject_difference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 515, in test_a_planted_difference_in_one_life_row_fails_r1a_names_the_item_and_reads_a_subject_difference
+    self.assertEqual(row["status"], "FAIL")
+                     ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_a_state_copy_whose_mtime_differs_from_the_snapshot_prints_is_refused_R4b (tests.tools.test_resit_gate.TestGateFails.test_a_state_copy_whose_mtime_differs_from_the_snapshot_prints_is_refused_R4b)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 609, in test_a_state_copy_whose_mtime_differs_from_the_snapshot_prints_is_refused_R4b
+    self.assertEqual(row["status"], "REFUSED")
+                     ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_genome_v1_with_its_epoch_rows_deleted_is_undetermined_and_refused_R4f (tests.tools.test_resit_gate.TestGateFails.test_genome_v1_with_its_epoch_rows_deleted_is_undetermined_and_refused_R4f)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 643, in test_genome_v1_with_its_epoch_rows_deleted_is_undetermined_and_refused_R4f
+    self.assertIn("undetermined", row["reason"])
+                                  ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_rows_equal_but_marks_differ_is_named_grader_drift (tests.tools.test_resit_gate.TestGateFails.test_rows_equal_but_marks_differ_is_named_grader_drift)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 530, in test_rows_equal_but_marks_differ_is_named_grader_drift
+    self.assertEqual(row["status"], "FAIL")
+                     ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_the_brain_moving_after_the_first_ask_reads_not_gradable_and_no_child_is_run_P0 (tests.tools.test_resit_gate.TestGateFails.test_the_brain_moving_after_the_first_ask_reads_not_gradable_and_no_child_is_run_P0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 539, in test_the_brain_moving_after_the_first_ask_reads_not_gradable_and_no_child_is_run_P0
+    self.assertEqual(row["status"], "NOT GRADABLE")
+                     ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_the_cpu_cap_stops_a_run_that_outgrows_it_and_says_so_R7 (tests.tools.test_resit_gate.TestGateFails.test_the_cpu_cap_stops_a_run_that_outgrows_it_and_says_so_R7)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 677, in test_the_cpu_cap_stops_a_run_that_outgrows_it_and_says_so_R7
+    self.assertEqual(row["status"], "REFUSED")
+                     ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_two_unequal_rows_for_one_ask_are_restart_divergent_and_r1_reads_not_gradable_R4k (tests.tools.test_resit_gate.TestGateFails.test_two_unequal_rows_for_one_ask_are_restart_divergent_and_r1_reads_not_gradable_R4k)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 559, in test_two_unequal_rows_for_one_ask_are_restart_divergent_and_r1_reads_not_gradable_R4k
+    self.assertEqual(row["status"], "NOT GRADABLE")
+                     ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_r3_a_plant_that_reaches_no_answer_is_said_not_passed (tests.tools.test_resit_gate.TestGateNudge.test_r3_a_plant_that_reaches_no_answer_is_said_not_passed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 699, in test_r3_a_plant_that_reaches_no_answer_is_said_not_passed
+    self.assertIn("did not change", row["reason"])
+                                    ~~~^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_the_eye_pin_is_recorded_and_a_mutable_eye_key_refuses_the_gate_R13 (tests.tools.test_resit_gate.TestGatePass.test_the_eye_pin_is_recorded_and_a_mutable_eye_key_refuses_the_gate_R13)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 493, in test_the_eye_pin_is_recorded_and_a_mutable_eye_key_refuses_the_gate_R13
+    self.assertEqual(row["eye_pin"], {"n_mutable": 2, "eye_or_brain": 0})
+                     ~~~^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_a_changed_grader_is_refused_R4j (tests.tools.test_resit_gate.TestGraderPin.test_a_changed_grader_is_refused_R4j)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 332, in test_a_changed_grader_is_refused_R4j
+    R.check_grader_pin(out, self.info(g))
+    ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'check_grader_pin'. Did you mean: 'check_eye_pin'?
+
+======================================================================
+ERROR: test_a_directory_that_is_no_git_checkout_says_so_never_invents_a_commit (tests.tools.test_resit_gate.TestGraderPin.test_a_directory_that_is_no_git_checkout_says_so_never_invents_a_commit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 350, in test_a_directory_that_is_no_git_checkout_says_so_never_invents_a_commit
+    i = self.info(g)
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 313, in info
+    return R.grader_info(d)
+           ^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'grader_info'
+
+======================================================================
+ERROR: test_a_modules_digest_that_differs_after_the_grade_child_ran_is_refused_too (tests.tools.test_resit_gate.TestGraderPin.test_a_modules_digest_that_differs_after_the_grade_child_ran_is_refused_too)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 344, in test_a_modules_digest_that_differs_after_the_grade_child_ran_is_refused_too
+    R.check_grader_pin(out, {**self.info(g), "modules_digest": "aaa"})
+    ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'check_grader_pin'. Did you mean: 'check_eye_pin'?
+
+======================================================================
+ERROR: test_the_pin_is_written_once_and_a_second_run_under_the_same_grader_passes (tests.tools.test_resit_gate.TestGraderPin.test_the_pin_is_written_once_and_a_second_run_under_the_same_grader_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 324, in test_the_pin_is_written_once_and_a_second_run_under_the_same_grader_passes
+    self.assertEqual(R.check_grader_pin(out, self.info(g)), "written")
+                     ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'check_grader_pin'. Did you mean: 'check_eye_pin'?
+
+======================================================================
+ERROR: test_world_seed_is_read_from_the_scene_line_only (tests.tools.test_resit_gate.TestGraderPin.test_world_seed_is_read_from_the_scene_line_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 355, in test_world_seed_is_read_from_the_scene_line_only
+    self.assertEqual(R.world_seed_of("WORLD    scene seed 20261101; train 50000; sitting fresh s1b1\n"), 20261101)
+                     ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'world_seed_of'
+
+======================================================================
+ERROR: test_an_untouched_tree_lists_nothing_and_a_new_file_or_a_touched_directory_is_listed (tests.tools.test_resit_gate.TestNewerThan.test_an_untouched_tree_lists_nothing_and_a_new_file_or_a_touched_directory_is_listed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 243, in test_an_untouched_tree_lists_nothing_and_a_new_file_or_a_touched_directory_is_listed
+    res = R.newer_than([d], marker_ns)
+          ^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'newer_than'
+
+======================================================================
+ERROR: test_the_control_a_plain_python_import_without_dash_B_writes_bytecode_and_the_check_sees_it_R5c (tests.tools.test_resit_gate.TestNewerThan.test_the_control_a_plain_python_import_without_dash_B_writes_bytecode_and_the_check_sees_it_R5c)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 271, in test_the_control_a_plain_python_import_without_dash_B_writes_bytecode_and_the_check_sees_it_R5c
+    res = R.newer_than([d], marker_ns)
+          ^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'newer_than'
+
+======================================================================
+ERROR: test_the_listing_is_capped_but_the_count_is_not (tests.tools.test_resit_gate.TestNewerThan.test_the_listing_is_capped_but_the_count_is_not)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 257, in test_the_listing_is_capped_but_the_count_is_not
+    res = R.newer_than([d], marker_ns, limit=5)
+          ^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'newer_than'
+
+======================================================================
+ERROR: test_a_torn_file_is_said (tests.tools.test_resit_gate.TestStatusReading.test_a_torn_file_is_said)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 306, in test_a_torn_file_is_said
+    r = R.status_reading(d / "STATUS.json")
+        ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'status_reading'
+
+======================================================================
+ERROR: test_an_absent_file_or_a_missing_field_is_said_never_a_zero (tests.tools.test_resit_gate.TestStatusReading.test_an_absent_file_or_a_missing_field_is_said_never_a_zero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 294, in test_an_absent_file_or_a_missing_field_is_said_never_a_zero
+    r = R.status_reading(d / "STATUS.json")
+        ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'status_reading'
+
+======================================================================
+ERROR: test_the_two_fields_are_read_when_present (tests.tools.test_resit_gate.TestStatusReading.test_the_two_fields_are_read_when_present)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 288, in test_the_two_fields_are_read_when_present
+    r = R.status_reading(d / "STATUS.json")
+        ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'status_reading'
+
+======================================================================
+FAIL: test_a_grader_that_changed_since_the_pin_is_refused_R4j (tests.tools.test_resit_gate.TestGateFails.test_a_grader_that_changed_since_the_pin_is_refused_R4j)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 663, in test_a_grader_that_changed_since_the_pin_is_refused_R4j
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_turn_row_after_the_first_ask_does_not_move_the_brain_P0_stays_ok (tests.tools.test_resit_gate.TestGateFails.test_a_turn_row_after_the_first_ask_does_not_move_the_brain_P0_stays_ok)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 547, in test_a_turn_row_after_the_first_ask_does_not_move_the_brain_P0_stays_ok
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_an_out_dir_inside_the_life_is_refused_nothing_is_written_under_a_life_R5 (tests.tools.test_resit_gate.TestGateFails.test_an_out_dir_inside_the_life_is_refused_nothing_is_written_under_a_life_R5)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 578, in test_an_out_dir_inside_the_life_is_refused_nothing_is_written_under_a_life_R5
+    self.assertIn("inside", res["refused"])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'inside' not found in 'refused: the orchestrator is not built yet'
+
+======================================================================
+FAIL: test_r5b_an_empty_find_after_a_real_gate_run_is_the_evidence_nothing_was_written_into_the_life (tests.tools.test_resit_gate.TestGateFails.test_r5b_an_empty_find_after_a_real_gate_run_is_the_evidence_nothing_was_written_into_the_life)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 584, in test_r5b_an_empty_find_after_a_real_gate_run_is_the_evidence_nothing_was_written_into_the_life
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_sittings_that_changed_since_the_first_run_are_refused_by_name_the_tape_row_sha_must_match_its_payload (tests.tools.test_resit_gate.TestGateFails.test_sittings_that_changed_since_the_first_run_are_refused_by_name_the_tape_row_sha_must_match_its_payload)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 648, in test_sittings_that_changed_since_the_first_run_are_refused_by_name_the_tape_row_sha_must_match_its_payload
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing (tests.tools.test_resit_gate.TestGateFails.test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing) (flags=('-I',), env={})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 570, in test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing
+    self.assertIn(needle, res["refused"])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '-B' not found in 'refused: the orchestrator is not built yet'
+
+======================================================================
+FAIL: test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing (tests.tools.test_resit_gate.TestGateFails.test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing) (flags=('-B',), env={})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 570, in test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing
+    self.assertIn(needle, res["refused"])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '-I' not found in 'refused: the orchestrator is not built yet'
+
+======================================================================
+FAIL: test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing (tests.tools.test_resit_gate.TestGateFails.test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing) (flags=('-B', '-I'), env={'OPENBLAS_NUM_THREADS': '4'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 570, in test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing
+    self.assertIn(needle, res["refused"])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'OPENBLAS_NUM_THREADS' not found in 'refused: the orchestrator is not built yet'
+
+======================================================================
+FAIL: test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing (tests.tools.test_resit_gate.TestGateFails.test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing) (flags=('-B', '-I'), env={'OMP_NUM_THREADS': '2'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 570, in test_the_orchestrator_without_dash_B_or_dash_I_or_with_other_blas_pins_is_refused_and_writes_nothing
+    self.assertIn(needle, res["refused"])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'OMP_NUM_THREADS' not found in 'refused: the orchestrator is not built yet'
+
+======================================================================
+FAIL: test_r3_a_nudged_copy_changes_answers_and_marks_and_the_dose_is_printed (tests.tools.test_resit_gate.TestGateNudge.test_r3_a_nudged_copy_changes_answers_and_marks_and_the_dose_is_printed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 686, in test_r3_a_nudged_copy_changes_answers_and_marks_and_the_dose_is_printed
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_warm_run_hits_the_cache_and_answers_byte_for_byte_as_the_cold_one_R2 (tests.tools.test_resit_gate.TestGatePass.test_a_warm_run_hits_the_cache_and_answers_byte_for_byte_as_the_cold_one_R2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 449, in test_a_warm_run_hits_the_cache_and_answers_byte_for_byte_as_the_cold_one_R2
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_an_epoch_before_the_first_begin_ask_puts_the_gate_under_epoch_1_and_its_sha_is_checked (tests.tools.test_resit_gate.TestGatePass.test_an_epoch_before_the_first_begin_ask_puts_the_gate_under_epoch_1_and_its_sha_is_checked)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 433, in test_an_epoch_before_the_first_begin_ask_puts_the_gate_under_epoch_1_and_its_sha_is_checked
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_r14_the_turn_pin_is_recorded_and_a_turn_that_mutates_the_brain_is_caught_through_the_gate (tests.tools.test_resit_gate.TestGatePass.test_r14_the_turn_pin_is_recorded_and_a_turn_that_mutates_the_brain_is_caught_through_the_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 481, in test_r14_the_turn_pin_is_recorded_and_a_turn_that_mutates_the_brain_is_caught_through_the_gate
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_r1_passes_on_a_faithful_life_and_the_row_carries_what_the_law_names (tests.tools.test_resit_gate.TestGatePass.test_r1_passes_on_a_faithful_life_and_the_row_carries_what_the_law_names)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 373, in test_r1_passes_on_a_faithful_life_and_the_row_carries_what_the_law_names
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_cost_and_the_peak_memory_of_every_process_are_in_the_row (tests.tools.test_resit_gate.TestGatePass.test_the_cost_and_the_peak_memory_of_every_process_are_in_the_row)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 405, in test_the_cost_and_the_peak_memory_of_every_process_are_in_the_row
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_epoch_after_both_begin_asks_leaves_the_gate_under_epoch_0_and_the_four_line_hashes_of_both_are_a_reading_AM3 (tests.tools.test_resit_gate.TestGatePass.test_the_epoch_after_both_begin_asks_leaves_the_gate_under_epoch_0_and_the_four_line_hashes_of_both_are_a_reading_AM3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 418, in test_the_epoch_after_both_begin_asks_leaves_the_gate_under_epoch_0_and_the_four_line_hashes_of_both_are_a_reading_AM3
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_gate_writes_no_series_and_no_origin_and_uses_its_own_run_folder (tests.tools.test_resit_gate.TestGatePass.test_the_gate_writes_no_series_and_no_origin_and_uses_its_own_run_folder)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 395, in test_the_gate_writes_no_series_and_no_origin_and_uses_its_own_run_folder
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_live_status_is_read_at_the_start_and_at_the_end_R12 (tests.tools.test_resit_gate.TestGatePass.test_the_live_status_is_read_at_the_start_and_at_the_end_R12)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 473, in test_the_live_status_is_read_at_the_start_and_at_the_end_R12
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_two_equal_rows_for_one_ask_collapse_to_the_last_and_are_counted_and_r1_passes (tests.tools.test_resit_gate.TestGatePass.test_two_equal_rows_for_one_ask_collapse_to_the_last_and_are_counted_and_r1_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_gate.py", line 441, in test_two_equal_rows_for_one_ask_collapse_to_the_last_and_are_counted_and_r1_passes
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: the orchestrator is not built yet", "class": "ResitError"}
+
+
+----------------------------------------------------------------------
+Ran 49 tests in 7.916s
+
+FAILED (failures=19, errors=33)

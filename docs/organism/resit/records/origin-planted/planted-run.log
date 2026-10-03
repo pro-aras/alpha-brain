@@ -1,0 +1,14 @@
+== planted-untested-set
+ORIGIN.json  r9_untested_sets = ['fresh']
+ORIGIN.json  r9_reading       = R9 UNTESTED for set(s) fresh (no tested EARLY item) — NOT A PASS for them: their begin state is verified only by R10c · R9 EXACT on 3 of 3 TESTED EARLY items (tested EARLY items per set: fresh 0, s1b1 3); the structural begin/end rows equal on 3 of 3 (not counted as tests); LATE items 4, discordant 0
+RESIT.jsonl  r9_untested_sets = ['fresh']   r9_reading identical to ORIGIN.json: True
+RESIT.md     | 20261004120100Z | origin |  |  | False |  | R9 UNTESTED for set(s) fresh (no tested EARLY item) — NOT A PASS for them: their begin state is verified only by R10c · R9 EXACT on 3 of 3 TESTED EARLY items (tested EARLY items per set: fresh 0, s1b1 3); the structural begin/end rows equal on 3 of 3 (not counted as tests); LATE items 4, discordant 0 |
+r9.by_set    {"fresh": {"n_early": 1, "n_early_tested": 0, "n_late": 4, "note": "R9 UNTESTED for this set (no tested EARLY item): its begin state is verified only by R10c", "untested": true}, "s1b1": {"n_early": 5, "n_early_tested": 3, "n_late": 0, "note": "", "untested": false}}
+
+== control-fully-tested
+ORIGIN.json  r9_untested_sets = []
+ORIGIN.json  r9_reading       = R9 EXACT on 6 of 6 TESTED EARLY items (tested EARLY items per set: fresh 3, s1b1 3); the structural begin/end rows equal on 4 of 4 (not counted as tests); LATE items 0, discordant 0
+RESIT.jsonl  r9_untested_sets = []   r9_reading identical to ORIGIN.json: True
+RESIT.md     | 20261004120100Z | origin |  |  | False |  | R9 EXACT on 6 of 6 TESTED EARLY items (tested EARLY items per set: fresh 3, s1b1 3); the structural begin/end rows equal on 4 of 4 (not counted as tests); LATE items 0, discordant 0 |
+r9.by_set    {"fresh": {"n_early": 5, "n_early_tested": 3, "n_late": 0, "note": "", "untested": false}, "s1b1": {"n_early": 5, "n_early_tested": 3, "n_late": 0, "note": "", "untested": false}}
+

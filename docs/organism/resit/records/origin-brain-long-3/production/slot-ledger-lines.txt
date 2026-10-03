@@ -1,0 +1,2 @@
+2092:2026-10-03 22:02:31 +0400 START claims origin-bl3-PRODUCTION slot 2 pid 1236608 avail 20288MB waited 0s cap 4G swap 512M unit slot-claims-origin-bl3-PRODUCTION-1236608
+2253:2026-10-03 22:04:12 +0400 END   claims origin-bl3-PRODUCTION slot 2 exit 0 cap 4G peak 2261MB swap 0MB

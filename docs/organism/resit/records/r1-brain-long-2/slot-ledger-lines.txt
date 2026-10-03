@@ -1,0 +1,2 @@
+2026-10-03 17:25:37 +0400 START claims r1 slot 6 pid 853656 avail 20945MB waited 60s cap 6G swap 512M unit slot-claims-r1-853656
+2026-10-03 17:26:28 +0400 END   claims r1 slot 6 exit 0 cap 6G peak 2035MB swap 0MB

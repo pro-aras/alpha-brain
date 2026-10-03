@@ -1,0 +1,12 @@
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 17:53 +0400 — once a day per brain life (PREREG-RESIT-READER: «a daily re-sit»), on the wall clock so a reboot keeps the cadence; Persistent=true runs a missed day once on boot.
+# WRITTEN, NOT ENABLED. 06:10 local is an hour the box's other timers leave quiet; a warm run is ~25 CPU-s, a cold one ~35 (records/rruns-brain-long-2) — the seat may move it.
+[Unit]
+Description=creature-brain-resit %i, once a day
+
+[Timer]
+OnCalendar=*-*-* 06:10:00
+AccuracySec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

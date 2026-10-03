@@ -1,0 +1,2 @@
+1681:2026-10-03 21:00:33 +0400 START claims origin-bl2-fallback slot 4 pid 1066056 avail 16076MB waited 0s cap 4G swap 512M unit slot-claims-origin-bl2-fallback-1066056
+1682:2026-10-03 21:01:51 +0400 END   claims origin-bl2-fallback slot 4 exit 0 cap 4G peak 2595MB swap 0MB

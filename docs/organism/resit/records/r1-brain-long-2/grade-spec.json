@@ -1,0 +1,10 @@
+{
+ "genome": "/data/dev/genome-lives/brain-long-2/GENOME.genome",
+ "grader_code": "/data/dev/genome-wt-claims-grader-d2fe75b",
+ "items_root": "/data/dev/genome-lives/brain-long-2",
+ "journal": "/data/dev/brain-runs/resit-gate/bl2/gate/r1/answers.jsonl",
+ "label": "r1",
+ "m2a_rows": false,
+ "out_dir": "/data/dev/brain-runs/resit-gate/bl2/gate/r1",
+ "scored": "/data/dev/brain-runs/scene-s1b1r"
+}

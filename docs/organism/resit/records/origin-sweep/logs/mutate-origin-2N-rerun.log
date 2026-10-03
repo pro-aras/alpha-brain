@@ -1,0 +1,5 @@
+CAUGHT       N02 E1: begin and end count as tested EARLY items in classify_early_late  [FAILED (failures=4); 4 test(s): a_set_whose_only_early_item_is_begin_reads_untes, begin_and_end_alone_test_nothing_an_equal_acknow, n_early_and_n_early_tested_are_both_printed_begi …]  (32 s)
+CAUGHT       N03 E1: the UNTESTED note is never set in classify_early_late  [FAILED (failures=2); 2 test(s): a_set_whose_only_early_item_is_begin_reads_untes, begin_and_end_alone_test_nothing_an_equal_acknow]  (34 s)
+restored: sha256 equal (44f8786a57343cd0)
+mutants run: 2; survivors: []
+caught by a test other than the named one: []

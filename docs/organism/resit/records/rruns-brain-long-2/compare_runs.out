@@ -1,0 +1,21 @@
+== R2 determinism: cold, warm, third (fresh processes) against R1 (also cold)
+  r1        status=PASS   answers sha256[:16]=d1f48c074254634a  cache hits/misses=(0, 1464)  cold=True  answer cpu=28.177 s
+  r2-cold   status=PASS   answers sha256[:16]=d1f48c074254634a  cache hits/misses=(0, 1464)  cold=True  answer cpu=33.238 s
+  r2-warm   status=PASS   answers sha256[:16]=d1f48c074254634a  cache hits/misses=(1464, 0)  cold=False  answer cpu=17.044 s
+  r2-third  status=PASS   answers sha256[:16]=d1f48c074254634a  cache hits/misses=(1464, 0)  cold=False  answer cpu=19.129 s
+  answers.jsonl byte-identical to R1: {'r2-cold': True, 'r2-warm': True, 'r2-third': True}
+  gate row identical but stamp/timings/paths (against R1): {'r2-cold': True, 'r2-warm': True, 'r2-third': True}
+== R2 reading: one warm run under OPENBLAS_NUM_THREADS=4 (the pin is law either way)
+  status=PASS flags={'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'dont_write_bytecode': True, 'isolated': True} rows differing from the 1-thread answers: 0 of 3011 | byte-identical: True | R1 (a) 3011/3011 equal to the LIFE's rows | R1 (b) equal=True
+== R14: Brain.turn is read-only on a second load of the real state
+   {'status': 'PASS', 'turn_check': {'answers_equal': True, 'n_asks': 3, 'state_hash_equal': True}, 'reason': None}
+== R3 sensitivity: the nudge V += eps * std(V) * u on a COPY in memory (the bar is eps 0.5; the rest are readings)
+  eps 0.001  status=FAIL          answers changed 2317 of 3011  marks changed []  hash 8ff3bc7520 -> 1e8c24e416
+  eps 0.01   status=PLANT CAUGHT  answers changed 2320 of 3011  marks changed ['M1', 'M5']  hash 8ff3bc7520 -> 119a50656c
+  eps 0.1    status=PLANT CAUGHT  answers changed 2342 of 3011  marks changed ['M1', 'M2a', 'M3', 'M5']  hash 8ff3bc7520 -> b227d772ff
+  eps 0.5    status=PLANT CAUGHT  answers changed 2398 of 3011  marks changed ['M1', 'M2a', 'M3', 'M5']  hash 8ff3bc7520 -> 6b02c7c908
+== R1': brain-long-3's code answering brain-long-2's brain on the same items (R1 (a)/(b) against the life's rows and the reference)
+  status=PASS | R1: 3011 of 3011 rows equal, 7 mark groups equal to 1e-12
+  code=/data/dev/genome-lives/brain-long-3/code commit=d2fe75b1d5dbaf625f4d3bd93676d647a03dde74 dirty=False modules=25 digest=0292bfa56faf (R1's 1ad353349747)
+  answers byte-identical to R1's: True
+  r1a: {'n_resit': 3011, 'n_equal': 3011, 'n_diff': 0, 'n_missing_life_row': 0, 'unanswered': 0} | r1b equal: True

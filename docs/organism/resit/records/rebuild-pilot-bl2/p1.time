@@ -1,0 +1,23 @@
+	Command being timed: "env OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -B -I tools/brain/rebuild_origin.py pilot --root /data/dev/genome-lives/brain-long-2 --code /data/dev/genome-lives/brain-long-2/code --out /data/dev/brain-runs/resit-gate/rebuild-pilot-bl2/p1 --rows 5000 --target-rows 165402 --sample-every 250 --cpu-cap-s 900"
+	User time (seconds): 73.43
+	System time (seconds): 1.83
+	Percent of CPU this job got: 90%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:22.95
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 357572
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 228781
+	Voluntary context switches: 2151
+	Involuntary context switches: 2439
+	Swaps: 0
+	File system inputs: 18920
+	File system outputs: 217616
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

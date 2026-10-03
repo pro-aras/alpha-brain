@@ -1,0 +1,23 @@
+	Command being timed: "env OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -B -I tools/brain/resit.py run --mode daily --root /data/dev/genome-lives/brain-long-2 --code /data/dev/genome-lives/brain-long-2/code --items-root /data/dev/genome-lives/brain-long-2 --grader-code /data/dev/genome-wt-claims-grader-d2fe75b --out /data/dev/brain-runs/resit-gate/bl2-daily --scored /data/dev/brain-runs/scene-s1b1r --stamp 20261003T182500Z"
+	User time (seconds): 44.21
+	System time (seconds): 6.37
+	Percent of CPU this job got: 90%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:55.91
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1346896
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 4
+	Minor (reclaiming a frame) page faults: 819344
+	Voluntary context switches: 11703
+	Involuntary context switches: 446
+	Swaps: 0
+	File system inputs: 980336
+	File system outputs: 432992
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

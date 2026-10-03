@@ -1,0 +1,837 @@
+{
+ "answer_meta": {
+  "answered": 10,
+  "asks_seen": 10,
+  "glance_cache": {
+   "hits": 0,
+   "misses": 2,
+   "note": "",
+   "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/out-origin/glances.pkl"
+  },
+  "unanswered": 0
+ },
+ "answers_sha256": "b37e2124d49e309cf9c95395258803698adb6484b2dcef7c333706a04f2de6b6",
+ "begin_seq_fresh": 1003,
+ "begin_seqs": {
+  "fresh": 1003,
+  "s1b1": 1009
+ },
+ "code": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/life/code",
+ "code_commit": {
+  "commit": null,
+  "dirty": null,
+  "git_note": "not a git checkout"
+ },
+ "cpu": {
+  "answer_s": 0.373,
+  "cap_s": 1800,
+  "cold": true,
+  "grade_s": 0.148,
+  "life_grade_s": 0.128,
+  "orchestrator_s": 0.024,
+  "total_s": 0.673
+ },
+ "eye_changed": false,
+ "eye_pin": {
+  "eye_or_brain": 0,
+  "n_mutable": 2
+ },
+ "flags": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "dont_write_bytecode": true,
+  "isolated": true
+ },
+ "genome": {
+  "grader": {
+   "lines": {
+    "brain": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e",
+    "colour": "de231036479cf8776170993ec3343238727194c48911164fbf800956ee1a5bb2",
+    "gaze": "e2e66444d8e0fccdccfcdcea8a1fad400f43c60cc7315c27b3c4bddd3addc86c",
+    "genome": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c",
+    "retina": "5e00ae4b3264b4f95d66f37779578b1c2eaa9910893915fc5856cd593f3f098e",
+    "tape": "e793cbad38753f45f580bac4a98a0fb24b0119334b8e974875b5de58839f0d95",
+    "world_scene": "09210346371e82186018f3a1e11d6593e9c475a91b2591b3186fc9feacdf9754"
+   },
+   "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/items/GENOME.genome",
+   "sha256": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c"
+  },
+  "sets": {
+   "fresh": {
+    "eye": {
+     "against_grader": false,
+     "against_grader_lines": [],
+     "brain_reading": {
+      "grader": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e",
+      "life": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e",
+      "origin": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e"
+     },
+     "eye_changed": false,
+     "note": "",
+     "within_life": false,
+     "within_life_lines": []
+    },
+    "lines": {
+     "brain": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e",
+     "colour": "de231036479cf8776170993ec3343238727194c48911164fbf800956ee1a5bb2",
+     "gaze": "e2e66444d8e0fccdccfcdcea8a1fad400f43c60cc7315c27b3c4bddd3addc86c",
+     "genome": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c",
+     "retina": "5e00ae4b3264b4f95d66f37779578b1c2eaa9910893915fc5856cd593f3f098e",
+     "tape": "e793cbad38753f45f580bac4a98a0fb24b0119334b8e974875b5de58839f0d95",
+     "world_scene": "09210346371e82186018f3a1e11d6593e9c475a91b2591b3186fc9feacdf9754"
+    },
+    "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/out-origin/origin/20261004120100Z/states/fresh/GENOME.in-force.genome"
+   },
+   "s1b1": {
+    "eye": {
+     "against_grader": false,
+     "against_grader_lines": [],
+     "brain_reading": {
+      "grader": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e",
+      "life": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e",
+      "origin": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e"
+     },
+     "eye_changed": false,
+     "note": "",
+     "within_life": false,
+     "within_life_lines": []
+    },
+    "lines": {
+     "brain": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e",
+     "colour": "de231036479cf8776170993ec3343238727194c48911164fbf800956ee1a5bb2",
+     "gaze": "e2e66444d8e0fccdccfcdcea8a1fad400f43c60cc7315c27b3c4bddd3addc86c",
+     "genome": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c",
+     "retina": "5e00ae4b3264b4f95d66f37779578b1c2eaa9910893915fc5856cd593f3f098e",
+     "tape": "e793cbad38753f45f580bac4a98a0fb24b0119334b8e974875b5de58839f0d95",
+     "world_scene": "09210346371e82186018f3a1e11d6593e9c475a91b2591b3186fc9feacdf9754"
+    },
+    "path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/out-origin/origin/20261004120100Z/states/s1b1/GENOME.in-force.genome"
+   }
+  }
+ },
+ "genome_lines": {
+  "brain": "09274b9e9be981426d7b12e310780d96af7a34ecb71e0cd71879a23dbbde475e",
+  "colour": "de231036479cf8776170993ec3343238727194c48911164fbf800956ee1a5bb2",
+  "gaze": "e2e66444d8e0fccdccfcdcea8a1fad400f43c60cc7315c27b3c4bddd3addc86c",
+  "genome": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c",
+  "retina": "5e00ae4b3264b4f95d66f37779578b1c2eaa9910893915fc5856cd593f3f098e",
+  "tape": "e793cbad38753f45f580bac4a98a0fb24b0119334b8e974875b5de58839f0d95",
+  "world_scene": "09210346371e82186018f3a1e11d6593e9c475a91b2591b3186fc9feacdf9754"
+ },
+ "grade_sha256": "d5f741844d64cb528e44478657480d433857573c1e60fd97a765709bc128a055",
+ "grader": {
+  "commit": null,
+  "dirty": null,
+  "git_note": "not a git checkout",
+  "grade_life_sha256": "78444def661c3dd713b38b5155fdda1722a694ad07606ba1f70aff341f298148",
+  "grader_code": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/grader",
+  "modules_digest": "9593d660799a576ba2dc71c07b83312157adcf2a17c3ee30cfd7a880f24cabe8",
+  "pin": "written"
+ },
+ "item_class": {
+  "M1:fresh:0": "colour_or_size",
+  "M1:s1b1:0": "colour_or_size",
+  "M2a:fresh:0": "colour_or_size",
+  "M2a:s1b1:0": "colour_or_size"
+ },
+ "items": {
+  "n_asks": 10,
+  "n_canvases": 2,
+  "pin": "checked",
+  "scored": {
+   "path": null,
+   "sha256": null
+  },
+  "world_seed": 20261101
+ },
+ "items_match": {
+  "ask_digest": "733a374c67b04fba68fd11665007ed1ae1923b5e366f12fccc81a8db5e27ddd6",
+  "canvas_digest": "38c033673d8f9cc195bca5c5e1ac0aaedf84686fcf9af7dd00b013dc44aa89d4",
+  "n_asks": 10,
+  "n_canvases": 2,
+  "ok": true
+ },
+ "items_root": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/items",
+ "kind": "origin",
+ "life_own": {
+  "grade_sha256": "8d9c975233ed810cf12199c0515c54281e43859f9eccf0cd2bbeb02acaad25bc",
+  "marks": {
+   "M1": {
+    "pooled": {
+     "colour_or_size": {
+      "items": 2,
+      "k": 0,
+      "left_out": 0,
+      "n": 2,
+      "na": false,
+      "rate": 0.0,
+      "smallest_gap": 5.0,
+      "underpowered": true
+     },
+     "shape_only": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     },
+     "white": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     }
+    },
+    "sets": {
+     "fresh": {
+      "colour_or_size": {
+       "items": 1,
+       "k": 0,
+       "left_out": 0,
+       "n": 1,
+       "na": false,
+       "rate": 0.0,
+       "smallest_gap": 10.0,
+       "underpowered": true
+      },
+      "shape_only": {
+       "items": 0,
+       "k": 0,
+       "left_out": 0,
+       "n": 0,
+       "na": true,
+       "rate": null,
+       "smallest_gap": null,
+       "underpowered": false
+      },
+      "white": {
+       "items": 0,
+       "k": 0,
+       "left_out": 0,
+       "n": 0,
+       "na": true,
+       "rate": null,
+       "smallest_gap": null,
+       "underpowered": false
+      }
+     },
+     "s1b1": {
+      "colour_or_size": {
+       "items": 1,
+       "k": 0,
+       "left_out": 0,
+       "n": 1,
+       "na": false,
+       "rate": 0.0,
+       "smallest_gap": 10.0,
+       "underpowered": true
+      },
+      "shape_only": {
+       "items": 0,
+       "k": 0,
+       "left_out": 0,
+       "n": 0,
+       "na": true,
+       "rate": null,
+       "smallest_gap": null,
+       "underpowered": false
+      },
+      "white": {
+       "items": 0,
+       "k": 0,
+       "left_out": 0,
+       "n": 0,
+       "na": true,
+       "rate": null,
+       "smallest_gap": null,
+       "underpowered": false
+      }
+     }
+    }
+   },
+   "M2a": {
+    "pooled": {
+     "colour_or_size": {
+      "items": 2,
+      "k": 1,
+      "left_out": 0,
+      "n": 2,
+      "na": false,
+      "rate": 0.5,
+      "smallest_gap": 5.0,
+      "underpowered": true
+     },
+     "shape_only": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     },
+     "white": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     }
+    },
+    "sets": {
+     "fresh": {
+      "colour_or_size": {
+       "items": 1,
+       "k": 1,
+       "left_out": 0,
+       "n": 1,
+       "na": false,
+       "rate": 1.0,
+       "smallest_gap": 10.0,
+       "underpowered": true
+      },
+      "shape_only": {
+       "items": 0,
+       "k": 0,
+       "left_out": 0,
+       "n": 0,
+       "na": true,
+       "rate": null,
+       "smallest_gap": null,
+       "underpowered": false
+      },
+      "white": {
+       "items": 0,
+       "k": 0,
+       "left_out": 0,
+       "n": 0,
+       "na": true,
+       "rate": null,
+       "smallest_gap": null,
+       "underpowered": false
+      }
+     },
+     "s1b1": {
+      "colour_or_size": {
+       "items": 1,
+       "k": 0,
+       "left_out": 0,
+       "n": 1,
+       "na": false,
+       "rate": 0.0,
+       "smallest_gap": 10.0,
+       "underpowered": true
+      },
+      "shape_only": {
+       "items": 0,
+       "k": 0,
+       "left_out": 0,
+       "n": 0,
+       "na": true,
+       "rate": null,
+       "smallest_gap": null,
+       "underpowered": false
+      },
+      "white": {
+       "items": 0,
+       "k": 0,
+       "left_out": 0,
+       "n": 0,
+       "na": true,
+       "rate": null,
+       "smallest_gap": null,
+       "underpowered": false
+      }
+     }
+    }
+   }
+  },
+  "partition": {
+   "ok": true,
+   "rows": [
+    {
+     "items_agg": 1,
+     "items_classes": 1,
+     "k_agg": 0,
+     "k_classes": 0,
+     "mark": "M1",
+     "n_agg": 1,
+     "n_classes": 1,
+     "note": "",
+     "ok": true,
+     "set": "fresh"
+    },
+    {
+     "items_agg": 1,
+     "items_classes": 1,
+     "k_agg": 0,
+     "k_classes": 0,
+     "mark": "M1",
+     "n_agg": 1,
+     "n_classes": 1,
+     "note": "",
+     "ok": true,
+     "set": "s1b1"
+    },
+    {
+     "items_agg": 1,
+     "items_classes": 1,
+     "k_agg": 1,
+     "k_classes": 1,
+     "mark": "M2a",
+     "n_agg": 1,
+     "n_classes": 1,
+     "note": "",
+     "ok": true,
+     "set": "fresh"
+    },
+    {
+     "items_agg": 1,
+     "items_classes": 1,
+     "k_agg": 0,
+     "k_classes": 0,
+     "mark": "M2a",
+     "n_agg": 1,
+     "n_classes": 1,
+     "note": "",
+     "ok": true,
+     "set": "s1b1"
+    }
+   ]
+  }
+ },
+ "live_load": {
+  "end": {
+   "fields_present": {
+    "mind_backlog_rows": false,
+    "mind_ms_per_canvas_1min": false
+   },
+   "mind_backlog_rows": null,
+   "mind_ms_per_canvas_1min": null,
+   "note": "",
+   "path": null,
+   "present": false,
+   "read_at": "2026-10-03T21:40:29+0400"
+  },
+  "start": {
+   "fields_present": {
+    "mind_backlog_rows": false,
+    "mind_ms_per_canvas_1min": false
+   },
+   "mind_backlog_rows": null,
+   "mind_ms_per_canvas_1min": null,
+   "note": "",
+   "path": null,
+   "present": false,
+   "read_at": "2026-10-03T21:40:28+0400"
+  }
+ },
+ "marks": {
+  "M1": {
+   "pooled": {
+    "colour_or_size": {
+     "items": 2,
+     "k": 0,
+     "left_out": 0,
+     "n": 2,
+     "na": false,
+     "rate": 0.0,
+     "smallest_gap": 5.0,
+     "underpowered": true
+    },
+    "shape_only": {
+     "items": 0,
+     "k": 0,
+     "left_out": 0,
+     "n": 0,
+     "na": true,
+     "rate": null,
+     "smallest_gap": null,
+     "underpowered": false
+    },
+    "white": {
+     "items": 0,
+     "k": 0,
+     "left_out": 0,
+     "n": 0,
+     "na": true,
+     "rate": null,
+     "smallest_gap": null,
+     "underpowered": false
+    }
+   },
+   "sets": {
+    "fresh": {
+     "colour_or_size": {
+      "items": 1,
+      "k": 0,
+      "left_out": 0,
+      "n": 1,
+      "na": false,
+      "rate": 0.0,
+      "smallest_gap": 10.0,
+      "underpowered": true
+     },
+     "shape_only": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     },
+     "white": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     }
+    },
+    "s1b1": {
+     "colour_or_size": {
+      "items": 1,
+      "k": 0,
+      "left_out": 0,
+      "n": 1,
+      "na": false,
+      "rate": 0.0,
+      "smallest_gap": 10.0,
+      "underpowered": true
+     },
+     "shape_only": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     },
+     "white": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     }
+    }
+   }
+  },
+  "M2a": {
+   "pooled": {
+    "colour_or_size": {
+     "items": 2,
+     "k": 1,
+     "left_out": 0,
+     "n": 2,
+     "na": false,
+     "rate": 0.5,
+     "smallest_gap": 5.0,
+     "underpowered": true
+    },
+    "shape_only": {
+     "items": 0,
+     "k": 0,
+     "left_out": 0,
+     "n": 0,
+     "na": true,
+     "rate": null,
+     "smallest_gap": null,
+     "underpowered": false
+    },
+    "white": {
+     "items": 0,
+     "k": 0,
+     "left_out": 0,
+     "n": 0,
+     "na": true,
+     "rate": null,
+     "smallest_gap": null,
+     "underpowered": false
+    }
+   },
+   "sets": {
+    "fresh": {
+     "colour_or_size": {
+      "items": 1,
+      "k": 1,
+      "left_out": 0,
+      "n": 1,
+      "na": false,
+      "rate": 1.0,
+      "smallest_gap": 10.0,
+      "underpowered": true
+     },
+     "shape_only": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     },
+     "white": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     }
+    },
+    "s1b1": {
+     "colour_or_size": {
+      "items": 1,
+      "k": 0,
+      "left_out": 0,
+      "n": 1,
+      "na": false,
+      "rate": 0.0,
+      "smallest_gap": 10.0,
+      "underpowered": true
+     },
+     "shape_only": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     },
+     "white": {
+      "items": 0,
+      "k": 0,
+      "left_out": 0,
+      "n": 0,
+      "na": true,
+      "rate": null,
+      "smallest_gap": null,
+      "underpowered": false
+     }
+    }
+   }
+  }
+ },
+ "memory": {
+  "answer_maxrss_mb": 49.8,
+  "grade_maxrss_mb": 30.3,
+  "life_grade_maxrss_mb": 30.3,
+  "orchestrator_maxrss_mb": 106.2
+ },
+ "origin_kind": "rebuilt",
+ "origin_n_learned_fresh_begin": 10,
+ "partition": {
+  "ok": true,
+  "rows": [
+   {
+    "items_agg": 1,
+    "items_classes": 1,
+    "k_agg": 0,
+    "k_classes": 0,
+    "mark": "M1",
+    "n_agg": 1,
+    "n_classes": 1,
+    "note": "",
+    "ok": true,
+    "set": "fresh"
+   },
+   {
+    "items_agg": 1,
+    "items_classes": 1,
+    "k_agg": 0,
+    "k_classes": 0,
+    "mark": "M1",
+    "n_agg": 1,
+    "n_classes": 1,
+    "note": "",
+    "ok": true,
+    "set": "s1b1"
+   },
+   {
+    "items_agg": 1,
+    "items_classes": 1,
+    "k_agg": 1,
+    "k_classes": 1,
+    "mark": "M2a",
+    "n_agg": 1,
+    "n_classes": 1,
+    "note": "",
+    "ok": true,
+    "set": "fresh"
+   },
+   {
+    "items_agg": 1,
+    "items_classes": 1,
+    "k_agg": 0,
+    "k_classes": 0,
+    "mark": "M2a",
+    "n_agg": 1,
+    "n_classes": 1,
+    "note": "",
+    "ok": true,
+    "set": "s1b1"
+   }
+  ]
+ },
+ "r9": {
+  "act_census": {
+   "fresh": {
+    "learn": 1
+   },
+   "s1b1": {}
+  },
+  "by_set": {
+   "fresh": {
+    "n_early": 1,
+    "n_early_tested": 0,
+    "n_late": 4,
+    "note": "R9 UNTESTED for this set (no tested EARLY item): its begin state is verified only by R10c",
+    "untested": true
+   },
+   "s1b1": {
+    "n_early": 5,
+    "n_early_tested": 3,
+    "n_late": 0,
+    "note": "",
+    "untested": false
+   }
+  },
+  "early_diff_count": 0,
+  "early_diffs_first_five": [],
+  "early_equal": 6,
+  "early_structural_equal": 3,
+  "early_structural_total": 3,
+  "early_tested_equal": 3,
+  "early_tested_total": 3,
+  "early_total": 6,
+  "first_early_diff": null,
+  "first_life_row_not_resat": null,
+  "label": "",
+  "late_by_thirds": {
+   "fresh": [
+    0,
+    0,
+    0
+   ],
+   "s1b1": [
+    0,
+    0,
+    0
+   ]
+  },
+  "late_discordant": 0,
+  "late_total": 4,
+  "life_rows_not_resat": 0,
+  "n_without_a_life_row_or_class": 0,
+  "refusing": true
+ },
+ "r9_reading": "R9 UNTESTED for set(s) fresh (no tested EARLY item) \u2014 NOT A PASS for them: their begin state is verified only by R10c \u00b7 R9 EXACT on 3 of 3 TESTED EARLY items (tested EARLY items per set: fresh 0, s1b1 3); the structural begin/end rows equal on 3 of 3 (not counted as tests); LATE items 4, discordant 0",
+ "r9_untested_sets": [
+  "fresh"
+ ],
+ "reader_sha256": "bacf8fc3418099f73cfe56f758aede42425ad576a7255f07dfd19f6c9d87a9fc",
+ "reason": null,
+ "restart_duplicates": 0,
+ "root": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/life",
+ "source_copy": {
+  "build_s": 0.006,
+  "bytes": 8155,
+  "cut_seq": 1014,
+  "manifest_path": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/out-origin/origin/20261004120100Z/src/MANIFEST",
+  "n_manifest_entries": 15,
+  "payloads_kept": 12,
+  "rows": 14,
+  "sha256": "6941c5004e901f7bef99e77d39ec199806ffcaa224476bc0ad8c47e251c7bb1f",
+  "source_copy_sha256": "6941c5004e901f7bef99e77d39ec199806ffcaa224476bc0ad8c47e251c7bb1f",
+  "torn_lines_journal": 0,
+  "torn_lines_tape": 0,
+  "truth_files": 0,
+  "verify": []
+ },
+ "stamp": "20261004120100Z",
+ "states": [
+  {
+   "calibrated_at_load": 10,
+   "genome_sha256": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c",
+   "n_learned": 10,
+   "set": "fresh",
+   "sidecar": {
+    "begin_seq": 1003,
+    "calibrated_at": 10,
+    "code_commit": null,
+    "genome_in_force_sha": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c",
+    "life": "life",
+    "n_learned": 10,
+    "rows_replayed": 2,
+    "set": "fresh",
+    "state_hash": "4351286719d5fd7de8dda29e6e56ba0e80fc6b0ad1753340c3ab2b56110412c8",
+    "tape_digest": "f74571abace644b21f381e08abd32b26b7afc10f97996fc0ab3b98b4526e0340"
+   },
+   "source": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/st-fresh",
+   "state_hash": "4351286719d5fd7de8dda29e6e56ba0e80fc6b0ad1753340c3ab2b56110412c8"
+  },
+  {
+   "calibrated_at_load": 10,
+   "genome_sha256": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c",
+   "n_learned": 10,
+   "set": "s1b1",
+   "sidecar": {
+    "begin_seq": 1009,
+    "calibrated_at": 10,
+    "code_commit": null,
+    "genome_in_force_sha": "0711d0e1351e39e2b91aef37cb7c4f2b1dfb8d406800fecd7910aaaf7d816e7c",
+    "life": "life",
+    "n_learned": 10,
+    "rows_replayed": 8,
+    "set": "s1b1",
+    "state_hash": "4351286719d5fd7de8dda29e6e56ba0e80fc6b0ad1753340c3ab2b56110412c8",
+    "tape_digest": "39d61b26d77b68e73fe3db763b04fc75bb7b58bb2f4261bc709c0d440ada4d3d"
+   },
+   "source": "/data/dev/genome-wt-resit-origin/scratch/tmp/resit-origin-evyqb392/st-s1b1",
+   "state_hash": "4351286719d5fd7de8dda29e6e56ba0e80fc6b0ad1753340c3ab2b56110412c8"
+  }
+ ],
+ "subject": {
+  "modules_digest": "20e35c7ad38709fff02de71db86d686633b3f5ca704f23b26a9834a2c41cb421",
+  "n_modules": 8,
+  "python": "3.14.4"
+ },
+ "vectors": {
+  "M1": {
+   "M1:fresh:0": 0,
+   "M1:s1b1:0": 0
+  },
+  "M2a": {
+   "M2a:fresh:0": 1,
+   "M2a:s1b1:0": 0
+  }
+ },
+ "wall_s": 0.673
+}

@@ -1,0 +1,360 @@
+EEEEFFFFFEEFFFFEEEEEEEFF.EE
+======================================================================
+ERROR: test_a_brain_error_is_answered_refused_by_name_never_a_crash (tests.tools.test_resit_children.TestAnswerChild.test_a_brain_error_is_answered_refused_by_name_never_a_crash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 357, in test_a_brain_error_is_answered_refused_by_name_never_a_crash
+    r = next(x for x in self.rows() if x["item"] == "M1:fresh:0")
+                        ~~~~~~~~~^^
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 268, in rows
+    return [json.loads(l) for l in (self.out / "answers.jsonl").read_text().splitlines()]
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-gm3pu2fe/out/answers.jsonl'
+
+======================================================================
+ERROR: test_a_cache_drawn_under_other_code_is_never_reused (tests.tools.test_resit_children.TestAnswerChild.test_a_cache_drawn_under_other_code_is_never_reused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 396, in test_a_cache_drawn_under_other_code_is_never_reused
+    g = self.meta()["glance_cache"]
+        ~~~~~~~~~^^
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 271, in meta
+    return json.loads((self.out / "answer-meta.json").read_text())
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-i0yk9xq4/out/answer-meta.json'
+
+======================================================================
+ERROR: test_a_canvas_less_form_is_answered_at_its_ask_row_a_held_form_at_its_eye_row (tests.tools.test_resit_children.TestAnswerChild.test_a_canvas_less_form_is_answered_at_its_ask_row_a_held_form_at_its_eye_row)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 292, in test_a_canvas_less_form_is_answered_at_its_ask_row_a_held_form_at_its_eye_row
+    rows = self.rows()
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 268, in rows
+    return [json.loads(l) for l in (self.out / "answers.jsonl").read_text().splitlines()]
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-r6u62lp9/out/answers.jsonl'
+
+======================================================================
+ERROR: test_a_corrupt_cache_file_is_ignored_and_said (tests.tools.test_resit_children.TestAnswerChild.test_a_corrupt_cache_file_is_ignored_and_said)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 404, in test_a_corrupt_cache_file_is_ignored_and_said
+    g = self.meta()["glance_cache"]
+        ~~~~~~~~~^^
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 271, in meta
+    return json.loads((self.out / "answer-meta.json").read_text())
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-exeu_f1p/out/answer-meta.json'
+
+======================================================================
+ERROR: test_an_ask_whose_canvas_never_comes_is_counted_unanswered (tests.tools.test_resit_children.TestAnswerChild.test_an_ask_whose_canvas_never_comes_is_counted_unanswered)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 368, in test_an_ask_whose_canvas_never_comes_is_counted_unanswered
+    m = self.meta()
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 271, in meta
+    return json.loads((self.out / "answer-meta.json").read_text())
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-gwiy2ggl/out/answer-meta.json'
+
+======================================================================
+ERROR: test_begin_calibrates_the_copy_when_the_brain_owes_a_calibration_and_says_so (tests.tools.test_resit_children.TestAnswerChild.test_begin_calibrates_the_copy_when_the_brain_owes_a_calibration_and_says_so)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 341, in test_begin_calibrates_the_copy_when_the_brain_owes_a_calibration_and_says_so
+    begins = [r for r in self.rows() if r["form"] == "begin"]
+                         ~~~~~~~~~^^
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 268, in rows
+    return [json.loads(l) for l in (self.out / "answers.jsonl").read_text().splitlines()]
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-35nnmsgi/out/answers.jsonl'
+
+======================================================================
+ERROR: test_the_answers_are_a_function_of_the_brain_and_the_canvas_and_nothing_is_learned (tests.tools.test_resit_children.TestAnswerChild.test_the_answers_are_a_function_of_the_brain_and_the_canvas_and_nothing_is_learned)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 315, in test_the_answers_are_a_function_of_the_brain_and_the_canvas_and_nothing_is_learned
+    st = self.meta()["states"][0]
+         ~~~~~~~~~^^
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 271, in meta
+    return json.loads((self.out / "answer-meta.json").read_text())
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-l_ah1ztp/out/answer-meta.json'
+
+======================================================================
+ERROR: test_the_eye_pin_reads_the_lifes_own_mutable_keys_R13 (tests.tools.test_resit_children.TestAnswerChild.test_the_eye_pin_reads_the_lifes_own_mutable_keys_R13)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 424, in test_the_eye_pin_reads_the_lifes_own_mutable_keys_R13
+    self.assertEqual(self.meta()["eye_pin"], {"n_mutable": 2, "eye_or_brain": 0})
+                     ~~~~~~~~~^^
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 271, in meta
+    return json.loads((self.out / "answer-meta.json").read_text())
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-vpkg36zj/out/answer-meta.json'
+
+======================================================================
+ERROR: test_the_glance_cache_cold_then_warm_is_byte_identical_and_hits_are_counted (tests.tools.test_resit_children.TestAnswerChild.test_the_glance_cache_cold_then_warm_is_byte_identical_and_hits_are_counted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 378, in test_the_glance_cache_cold_then_warm_is_byte_identical_and_hits_are_counted
+    a1, m1 = (self.out / "answers.jsonl").read_bytes(), self.meta()
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-xauglnqx/out/answers.jsonl'
+
+======================================================================
+ERROR: test_the_loaded_modules_are_recorded_with_their_sha256_and_all_lie_under_the_code (tests.tools.test_resit_children.TestAnswerChild.test_the_loaded_modules_are_recorded_with_their_sha256_and_all_lie_under_the_code)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 410, in test_the_loaded_modules_are_recorded_with_their_sha256_and_all_lie_under_the_code
+    m = self.meta()
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 271, in meta
+    return json.loads((self.out / "answer-meta.json").read_text())
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-yx68ptzh/out/answer-meta.json'
+
+======================================================================
+ERROR: test_the_rows_are_the_minds_own_shape_and_order (tests.tools.test_resit_children.TestAnswerChild.test_the_rows_are_the_minds_own_shape_and_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 278, in test_the_rows_are_the_minds_own_shape_and_order
+    rows = self.rows()
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 268, in rows
+    return [json.loads(l) for l in (self.out / "answers.jsonl").read_text().splitlines()]
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-8nonryvz/out/answers.jsonl'
+
+======================================================================
+ERROR: test_the_turn_pin_passes_a_read_only_turn_and_records_it_R14 (tests.tools.test_resit_children.TestAnswerChild.test_the_turn_pin_passes_a_read_only_turn_and_records_it_R14)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 465, in test_the_turn_pin_passes_a_read_only_turn_and_records_it_R14
+    t = self.meta()["turn_check"]
+        ~~~~~~~~~^^
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 271, in meta
+    return json.loads((self.out / "answer-meta.json").read_text())
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-6ap4tg_j/out/answer-meta.json'
+
+======================================================================
+ERROR: test_two_sets_switch_to_their_own_state_at_begin (tests.tools.test_resit_children.TestAnswerChild.test_two_sets_switch_to_their_own_state_at_begin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 332, in test_two_sets_switch_to_their_own_state_at_begin
+    rows = {r["item"]: r for r in self.rows() if r["item"]}
+                                  ~~~~~~~~~^^
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 268, in rows
+    return [json.loads(l) for l in (self.out / "answers.jsonl").read_text().splitlines()]
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-aspjnpx1/out/answers.jsonl'
+
+======================================================================
+ERROR: test_the_grade_is_taken_by_the_pinned_graders_own_function_and_written (tests.tools.test_resit_children.TestGradeChild.test_the_grade_is_taken_by_the_pinned_graders_own_function_and_written)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 520, in test_the_grade_is_taken_by_the_pinned_graders_own_function_and_written
+    g = json.loads((self.out / "grade.json").read_text())
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-kpbc6jsi/out/grade.json'
+
+======================================================================
+ERROR: test_the_grade_json_is_written_as_the_graders_own_main_writes_it (tests.tools.test_resit_children.TestGradeChild.test_the_grade_json_is_written_as_the_graders_own_main_writes_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 529, in test_the_grade_json_is_written_as_the_graders_own_main_writes_it
+    text = (self.out / "grade.json").read_text()
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 788, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/dev/genome-wt-resit-1003/scratch/tmp/resit-c-4gg1t7f8/out/grade.json'
+
+======================================================================
+FAIL: test_a_mutable_eye_key_is_caught_and_the_run_refused_R13 (tests.tools.test_resit_children.TestAnswerChild.test_a_mutable_eye_key_is_caught_and_the_run_refused_R13)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 429, in test_a_mutable_eye_key_is_caught_and_the_run_refused_R13
+    self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : 
+
+======================================================================
+FAIL: test_a_pre_imported_module_of_another_tree_is_refused_naming_it_R11 (tests.tools.test_resit_children.TestAnswerChild.test_a_pre_imported_module_of_another_tree_is_refused_naming_it_R11)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 456, in test_a_pre_imported_module_of_another_tree_is_refused_naming_it_R11
+    self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : 
+
+======================================================================
+FAIL: test_a_run_without_dash_B_or_dash_I_is_refused_by_the_orchestrator_command (tests.tools.test_resit_children.TestAnswerChild.test_a_run_without_dash_B_or_dash_I_is_refused_by_the_orchestrator_command)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 487, in test_a_run_without_dash_B_or_dash_I_is_refused_by_the_orchestrator_command
+    self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : 
+
+======================================================================
+FAIL: test_a_state_whose_files_do_not_hash_to_their_hash_is_refused_R4a (tests.tools.test_resit_children.TestAnswerChild.test_a_state_whose_files_do_not_hash_to_their_hash_is_refused_R4a)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 481, in test_a_state_whose_files_do_not_hash_to_their_hash_is_refused_R4a
+    self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : 
+
+======================================================================
+FAIL: test_a_turn_that_mutates_the_brain_is_caught_R14 (tests.tools.test_resit_children.TestAnswerChild.test_a_turn_that_mutates_the_brain_is_caught_R14)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 473, in test_a_turn_that_mutates_the_brain_is_caught_R14
+    self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : 
+
+======================================================================
+FAIL: test_every_eye_and_brain_prefix_is_caught (tests.tools.test_resit_children.TestAnswerChild.test_every_eye_and_brain_prefix_is_caught) (key='RETINA')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 440, in test_every_eye_and_brain_prefix_is_caught
+    self.assertEqual(p.returncode, 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2
+
+======================================================================
+FAIL: test_every_eye_and_brain_prefix_is_caught (tests.tools.test_resit_children.TestAnswerChild.test_every_eye_and_brain_prefix_is_caught) (key='GAZE.fixations')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 440, in test_every_eye_and_brain_prefix_is_caught
+    self.assertEqual(p.returncode, 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2
+
+======================================================================
+FAIL: test_every_eye_and_brain_prefix_is_caught (tests.tools.test_resit_children.TestAnswerChild.test_every_eye_and_brain_prefix_is_caught) (key='SENSE.colour')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 440, in test_every_eye_and_brain_prefix_is_caught
+    self.assertEqual(p.returncode, 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2
+
+======================================================================
+FAIL: test_every_eye_and_brain_prefix_is_caught (tests.tools.test_resit_children.TestAnswerChild.test_every_eye_and_brain_prefix_is_caught) (key='BRAIN.lr')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 440, in test_every_eye_and_brain_prefix_is_caught
+    self.assertEqual(p.returncode, 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2
+
+======================================================================
+FAIL: test_a_grader_that_raises_is_a_named_failure_not_a_silent_one (tests.tools.test_resit_children.TestGradeChild.test_a_grader_that_raises_is_a_named_failure_not_a_silent_one)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 553, in test_a_grader_that_raises_is_a_named_failure_not_a_silent_one
+    self.assertNotEqual(p.returncode, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_a_pre_imported_module_of_another_tree_is_refused_for_the_grader_too_R11 (tests.tools.test_resit_children.TestGradeChild.test_a_pre_imported_module_of_another_tree_is_refused_for_the_grader_too_R11)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 547, in test_a_pre_imported_module_of_another_tree_is_refused_for_the_grader_too_R11
+    self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : 
+
+----------------------------------------------------------------------
+Ran 24 tests in 3.176s
+
+FAILED (failures=11, errors=15)

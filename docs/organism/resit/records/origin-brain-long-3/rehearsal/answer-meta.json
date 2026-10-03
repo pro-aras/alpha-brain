@@ -1,0 +1,158 @@
+{
+ "answered": 3011,
+ "answers_sha256": "d2bda8ff41cfb373d8c35206d91ab859e5d1d261df5b7785481368af7e901541",
+ "asks_seen": 3011,
+ "code": "/data/dev/genome-lives/brain-long-3/code",
+ "cpu_s": 48.015,
+ "eye_pin": {
+  "eye_or_brain": 0,
+  "n_mutable": 15
+ },
+ "flags": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "dont_write_bytecode": true,
+  "isolated": true
+ },
+ "glance_cache": {
+  "hits": 0,
+  "misses": 1464,
+  "note": "",
+  "path": "/data/dev/brain-runs/resit-gate/bl3-origin-fallback-rehearsal/glances.pkl"
+ },
+ "modules": [
+  {
+   "rel": "brain/__init__.py",
+   "sha256": "216bbd038dc37086941e8630aaa61f4db9cbd9c8bccef0db1adbed30c49dc34d"
+  },
+  {
+   "rel": "brain/glance_cache.py",
+   "sha256": "cd6d5aa030b1584da93516986ea55dfc1a5d72ca8e3e208e7540f76bd9f68599"
+  },
+  {
+   "rel": "brain/scene/__init__.py",
+   "sha256": "4ea6735f822caf1334f1da0acdc4eea78024bbbb66fa4ce16ae61ddcbff2b4cc"
+  },
+  {
+   "rel": "brain/scene/eye.py",
+   "sha256": "e12c391ad5fc5c8674280fbb96ab76a663b37d56c10d66ba8a484ee0b8feba84"
+  },
+  {
+   "rel": "brain/scene/health.py",
+   "sha256": "28ad42c5977978a6bf1e269a1039596fd8d9582452d482a3a2e5673e3211f96d"
+  },
+  {
+   "rel": "brain/scene/learners.py",
+   "sha256": "47b14bc2c35443178b756b99f76ec572cbd037c4e72bf8c6942c5b23ff996dfe"
+  },
+  {
+   "rel": "brain/scene/slda.py",
+   "sha256": "b19f6ab694ceac03673a552da32aed91ed3448601fb5e0e1d0cb736f266a2910"
+  },
+  {
+   "rel": "brain/world/__init__.py",
+   "sha256": "2d2087ec09b343c806f8050a4277f33ef9305791161788ff860a4cd2543cdcc3"
+  },
+  {
+   "rel": "brain/world/build.py",
+   "sha256": "b2128673b373579bdd1104b1c4ea97829d847638c2ac359af655cb8fa9cb9743"
+  },
+  {
+   "rel": "brain/world/canvas.py",
+   "sha256": "5d3bbe1a6263b1aeedb860d07f75a7ccf08c1581224f0104f73c6eaee45ff91d"
+  },
+  {
+   "rel": "brain/world/fonts.py",
+   "sha256": "eee2633075696b8abbd0f45f2ee3d2e55f1c018411f765dde34d1c3e167134d3"
+  },
+  {
+   "rel": "brain/world/glyphs.py",
+   "sha256": "f665002b57219b9a75c9c3afaf3a641e468ada77e24ecfa146ff86c54968831a"
+  },
+  {
+   "rel": "brain/world/organs.py",
+   "sha256": "b69ca6f037f4360c6fb1736fd3d44af4c7075e83edcd93e94b9f100da62a3e1b"
+  },
+  {
+   "rel": "brain/world/seeds.py",
+   "sha256": "c9d217aebc8421a56822a32d4dbec09fad3e53293b8a01565c493d5b57ecfab2"
+  },
+  {
+   "rel": "creature/__init__.py",
+   "sha256": "d9e5c0c79d17a40bc320ad26571ca2b47ea83862af75a1192bded66d5ce41dc0"
+  },
+  {
+   "rel": "creature/genes.py",
+   "sha256": "9913e29a91e2ce3a4a401d3da866c1ca4d97db5fd5ea315821e2afe029a425ec"
+  },
+  {
+   "rel": "creature/organs_road.py",
+   "sha256": "0b65cfd02b795b133c42faf1b09f26f03836bd3b4320f9f1e4e7d983f09a7a49"
+  },
+  {
+   "rel": "creature/tape.py",
+   "sha256": "d790ed98a511d140bf6e6bc0b79caac7512c8afa0346db3f1291d41fac6daec2"
+  },
+  {
+   "rel": "genome/__init__.py",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "rel": "genome/brain.py",
+   "sha256": "05186d9825a4d6822986ef59f3e0e4599029b38e42baf95320f4d65730bc5ca8"
+  },
+  {
+   "rel": "genome/gaze.py",
+   "sha256": "f916a3fead83c4f41d3841d00c5a3837564d4ab0a0d235dea07023c250cbf845"
+  },
+  {
+   "rel": "genome/machinery.py",
+   "sha256": "62e52bd2af74bfbb303d0c5faae503a14b524d80285c88347ad857aa4ee5f78f"
+  },
+  {
+   "rel": "genome/questions.py",
+   "sha256": "6f79a45350a7aea3452eb55c72e2ca6f1413aab3b5f059f5e0d0e259422494cd"
+  },
+  {
+   "rel": "genome/witness.py",
+   "sha256": "39cf216cef979473d39c917743316dde73e5f4e21777558dc2f45e760463d01a"
+  },
+  {
+   "rel": "genome/world.py",
+   "sha256": "bccc580fb11e0d7371e3e48bb8ad0f4bd02228ed3ff52b1369a05d5a69b70bbd"
+  }
+ ],
+ "modules_digest": "0292bfa56faf443332453bcdb3bc407d7d417089249075f129c70892ccce8709",
+ "python": "3.14.4",
+ "states": [
+  {
+   "calibrated_at_end": 51365,
+   "calibrated_at_load": 51339,
+   "dir": "/data/dev/brain-runs/resit-gate/bl3-origin-fallback-rehearsal/origin/20261003T174839Z/states/fallback",
+   "genome": "/data/dev/brain-runs/resit-gate/bl3-origin-fallback-rehearsal/origin/20261003T174839Z/src/GENOME.genome",
+   "genome_sha256": "1567b684e9546ae5d5dcfaf370277c7260c21a8da8c97859c232c45cf22076b6",
+   "lines": {
+    "brain": "119bffa54637e1217417c02cae82689fc0b11df90d08af201928f51dfeaa53cb",
+    "colour": "bc6adedf012a0a9c8cbb654cf8277f403668c0562cbbb8aca4cf39ab7fcc82ac",
+    "gaze": "ed0f8b2885243e56770a29f51aea87798819aea7e0a891b3f18ae142a7d17b75",
+    "genome": "1567b684e9546ae5d5dcfaf370277c7260c21a8da8c97859c232c45cf22076b6",
+    "retina": "a00e06ee53ec6d750da35ca9c08fb68dea7a0d512209ad0568e7b1e31c3556cd"
+   },
+   "n_calibrations_end": 12,
+   "n_calibrations_load": 11,
+   "n_learned": 51365,
+   "n_learned_end": 51365,
+   "name": "*",
+   "parsed": {
+    "brain": "a128a40ea38a5b81cf6677396424ccaf32b1ac64bcf27a613e6583c48716f5c6",
+    "colour": "0c535131bf50e1e16aaf0b304c0e2adea3ce3e570d59a43f299dd19a9f702248",
+    "gaze": "76c4d5ab023a86b4603ae6b87ce3807da09af34a55eb20109e4f082a87e5d2c4",
+    "retina": "f0bfe6c46dc4246fb75138705a71050f6974525ef2ade166019c5d94eb6b0544"
+   },
+   "state_hash": "88ac50e599fe0398f51e7c7e3fa702a43a6a0b765d95ca21c5b225665c20e213",
+   "state_hash_end": "bda38f66211bd707146a95a89c67e030743b30033fc7496eacf7eaba0abccdca"
+  }
+ ],
+ "turn_check": null,
+ "unanswered": 0
+}
