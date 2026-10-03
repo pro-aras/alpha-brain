@@ -1,0 +1,221 @@
+== 0 · PROVENANCE
+gate mode: amend1; code sha (RESULTS.json): 0049782642fee96b794d34746a57cc61debb390d; the toy's tree differed from it when the unit ran: False
+signed text frames: sha256 a9787ef8026e8e6d8ab41f16d088bb5259f5cf9f5d64de7176da848a2a52c31a
+signed text frames_amend1: sha256 158660bbfe6a1fd0c551dabc1308dbd4f89fc90a07fd9c58d19e163e9b4abce0
+signed text frames_amend2: sha256 948d77044a4aff3cdb1ab32f02191b806fb650c80b83a1f43be4d9eb074ccfec
+signed texts: every record carries RESULTS.json's three: ALPHA4 yes; ALPHA4+PLANT yes; ALPHA4+SHUFFLE yes; SCENE yes; SCENE+PLANT yes; GATES.json yes
+code sha across the five conditions and RESULTS.json: one (0049782642fee96b794d34746a57cc61debb390d)
+code sha of GATES.json: e8ee2f53d54d3bec99d3957a8b61a1101711a2a8 (DIFFERENT from the unit)
+CHECK grade: RESULTS.json's grade equals the grade recomputed from the five condition records: yes (mode amend1); the base text's mode: yes
+CHECK eye: RESULTS.json's eye reading equals the reading recomputed from ALPHA4.json and its own per-frame table: yes
+CHECK overlaps: RESULTS.json's overlaps equal the overlaps recomputed from the five records: yes
+CHECK scene: RESULTS.json's SCENE rows, margins and recalls equal those recomputed from SCENE.json: yes
+records (sha256, two spaces, file name — the format of sha256sum):
+c81a77c56a8c72a4b871fa2ee2c85fe69cf5ee322aa7160884b3fad2ec5e621c  ALPHA4.json
+48155388040fc7b9410bd1d14783d032bd42232aa04d48f8e83cb35e45ceca00  ALPHA4+PLANT.json
+406c4a11786e312e4ea8ae9deb14a8bc72a00132639baa74b6ebf62fc18fe250  ALPHA4+SHUFFLE.json
+c8f6d3903c6067086a8bb7a65b7cc4bd00b5d8a6773c9eb4d7a3fab339b2e987  SCENE.json
+b87bee38e7907a466871aaef744ee739e8c7b87da891f0417ddb02f4bf6e25cc  SCENE+PLANT.json
+90e9501e973827c2891a699aae18816bb86f0e17d72c1ec36b2046515c3f2538  RESULTS.json
+f1f9621bccdd7412b1a46d3af8e9bc2c2d5f838a2a799dd5a8ad58cb4bcad9f4  GATES.json
+
+== 1 · GATES (G1-G6 on the real copies, before the unit)
+GATES.json: passed True (failures: none); gate mode amend1; 228.4 CPU-s; peak RSS 191 MB
+G1 OK: 10 copies verified; ALPHA4 84275 moments / 112489 words; SCENE 10000 moments; says (526, 86, 40) (rows, yes, distinct frames); plant tokens in real rows: ALPHA4 {'qxk': 0, 'zzq': 0}, SCENE {'qxk': 0, 'zzq': 0}
+   χ² fit of SCENE to the generator (each p > 0.001 gates G_max): length p 0.969, shape p 0.730, colour p 0.416, size p 0.612, pairs p 0.416; held-out pairs seen 0; «dax» excluded 1; G_max gated: True
+G2 OK: find_frames on the stand-in store equals the call on the real Episodes store: 3 rows, frames [['blue', 'ball'], ['green', 'key'], ['red', 'box']]
+G3 OK: 160 compressor cases, max |fast − slow| 5.12e-13 (bar 1e-9); the greedy's 28 steps over 8 seeds, problems none
+G4 OK: two planted synthetic streams (AMENDMENT-2 §2); failures none
+  stream A: SCENE-regime (as signed, AMENDMENT-1 §4 (g)): 3000 moments, a plant after every 10th (180 train / 120 held plants); V 15, budget B = 2V = 30; B = G({F*}) 766.95; PLANT-BEATS-NULL-2 True (NULL-2 q95 21.46)
+    WEB-H 1 of 1 seeds count (need 1): gate PASS — REQUIRED
+    WEB-S 6 of 10 seeds count (need 9): gate FAIL — PRINTED, not required
+    SENTENCE 1 of 1 seeds count (need 1): gate PASS — REQUIRED
+    MDL-GREEDY 1 of 1 seeds count (need 1): gate PASS — REQUIRED
+    the gate's parse-breaking control: caught True, bytes changed True; honest gate (B 766.95, C 765.27) True, broken gate (B -8.79, C -8.79) False
+  stream B: ALPHA4-regime (AMENDMENT-2 §2 (B)): 20000 moments, a plant after every 100th (120 train / 80 held plants); V 2015, budget B = 2V = 4030; B = G({F*}) 721.86; PLANT-BEATS-NULL-2 True (NULL-2 q95 -59.52)
+    WEB-H 1 of 1 seeds count (need 1): gate PASS — REQUIRED
+    WEB-S 10 of 10 seeds count (need 9): gate PASS — REQUIRED
+    SENTENCE 1 of 1 seeds count (need 1): gate PASS — REQUIRED
+    MDL-GREEDY 1 of 1 seeds count (need 1): gate PASS — REQUIRED
+    the gate's parse-breaking control: caught True, bytes changed True; honest gate (B 721.86, C 721.77) True, broken gate (B -22.85, C -22.85) False
+G5 OK: pilots 10 draws 66.0 CPU-s, peak 191 MB; 20 draws 83.7 CPU-s, peak 191 MB; slope 1.769 CPU-s a draw; predicted unit 18.8 CPU-min (ceiling 40.0); predicted peak 193 MB (ceiling 1024); measured peak 191 MB
+G6 OK: 20 replicates, smallest margin G_max − G(F_oracle) 11296.95, violations 0; the planted cheat: caught True (G 7066.29 against G_max 6269.18 + 20); exact checks: support sums to 1.0, entropy 6.0774, H(length) 1.5000, H(utterance | length) 4.5774, support 90
+
+== 2 · THE FIVE CONDITIONS
+condition       kind      every    train/held moments    train/held words      V       N0  draws    CPU-s  peak MB
+ALPHA4          plain         -           50565/33710         67346/45143   2236   117911    100    269.1      194
+ALPHA4+PLANT    plant       100           51070/34047         68356/45817   2238   119426    100    267.7      196
+ALPHA4+SHUFFLE  shuffle       -           50565/33710         67346/45143   2236   117911    100    275.2      246
+SCENE           plain         -             6000/4000          11900/8106     14    17900    100     29.8      246
+SCENE+PLANT     plant        10             6600/4400          13100/8906     16    19700    100     30.3      246
+
+== 3 · THE PLANT GATE (AMENDMENT-1 §1: keeps F*, (B) G({F*}) > 0, (C) F*'s marginal credit in the rule's own set > 0; WEB-S at >= 9 of 10 seeds, a seed counted only if it keeps F* AND (C) > 0)
+ALPHA4+PLANT: plants 505 train / 337 held; V 2238; N0 119426
+  (B) G({F*}) = +3119.54 bits; the architect's first-order expected value 2635.20; decomposition M 2667.54 + D 474.25 + C 0.00 − L 22.26 = 3119.54 (T = D + C = 474.25; denominator effect 0.00599 bits a token; 337 held firings)
+  PLANT-BEATS-NULL-2 ALPHA4+PLANT: True (B 3119.54 against NULL-2 of {F*}: mean 242.33, sd 0.00, q95 242.33, fallbacks 100, 100 draws)
+  plant gate ALPHA4+PLANT WEB-H: PASS — 1 of 1 seeds count (need 1); keeps F* at 1 of 1; (A) whole-set G -25043.62; (C) F*'s marginal credit 3107.23; the base text's clause (keeps AND (A) > 0): fail (a reading)
+  plant gate ALPHA4+PLANT WEB-S: PASS — 10 of 10 seeds count (need 9); keeps F* at 10 of 10; (A) whole-set G -11593.60 (-12007.96 to -11056.06); (C) F*'s marginal credit 3110.08 (3109.81 to 3110.39); the base text's clause (keeps AND (A) > 0): fail (a reading)
+  plant gate ALPHA4+PLANT SENTENCE: PASS — 1 of 1 seeds count (need 1); keeps F* at 1 of 1; (A) whole-set G -4378.54; (C) F*'s marginal credit 3113.82; the base text's clause (keeps AND (A) > 0): fail (a reading)
+  plant gate ALPHA4+PLANT MDL-GREEDY: PASS — 1 of 1 seeds count (need 1); keeps F* at 1 of 1; (A) whole-set G 770.86; (C) F*'s marginal credit 3114.90; the base text's clause (keeps AND (A) > 0): pass (a reading)
+SCENE+PLANT: plants 600 train / 400 held; V 16; N0 19700
+  (B) G({F*}) = +2580.80 bits; the architect's first-order expected value 2006.84; decomposition M 2032.20 + D 556.59 + C 0.00 − L 8.00 = 2580.80 (T = D + C = 556.59; denominator effect 0.04451 bits a token; 400 held firings)
+  PLANT-BEATS-NULL-2 SCENE+PLANT: True (B 2580.80 against NULL-2 of {F*}: mean 38.06, sd 0.00, q95 38.06, fallbacks 100, 100 draws)
+  plant gate SCENE+PLANT WEB-H: PASS — 1 of 1 seeds count (need 1); keeps F* at 1 of 1; (A) whole-set G 5335.68; (C) F*'s marginal credit 2474.22; the base text's clause (keeps AND (A) > 0): pass (a reading)
+  plant gate SCENE+PLANT WEB-S: FAIL — 4 of 10 seeds count (need 9); keeps F* at 4 of 10; (A) whole-set G 1769.97 (604.35 to 3651.72); (C) F*'s marginal credit 2512.47 (2502.36 to 2526.81); the base text's clause (keeps AND (A) > 0): fail (a reading)
+  plant gate SCENE+PLANT SENTENCE: PASS — 1 of 1 seeds count (need 1); keeps F* at 1 of 1; (A) whole-set G 2687.57; (C) F*'s marginal credit 2577.36; the base text's clause (keeps AND (A) > 0): pass (a reading)
+  plant gate SCENE+PLANT MDL-GREEDY: PASS — 1 of 1 seeds count (need 1); keeps F* at 1 of 1; (A) whole-set G 7803.60; (C) F*'s marginal credit 2427.48; the base text's clause (keeps AND (A) > 0): pass (a reading)
+GATE FIRST: a rule that fails its plant gate on a stream is NOT GRADABLE there:
+  WEB-H: ALPHA4 gradable on the plant; SCENE gradable
+  WEB-S: ALPHA4 gradable on the plant; SCENE NOT GRADABLE
+  SENTENCE: ALPHA4 gradable on the plant; SCENE gradable
+  MDL-GREEDY: ALPHA4 gradable on the plant; SCENE gradable
+
+== 4 · SHUFFLE-QUIET (ALPHA4+SHUFFLE: G(F) <= NULL-1's q95, or F empty; WEB-S quiet at >= 8 of 10 seeds)
+SHUFFLE-QUIET WEB-H: QUIET — 1 of 1 (need 1); empty sets 0; |F| 277; G -6712.98; NULL-1 q95 -6520.12
+SHUFFLE-QUIET WEB-S: QUIET — 10 of 10 (need 8); empty sets 0; |F| 633.5 (604 to 660); G -16789.90 (-17495.33 to -16021.51); NULL-1 q95 -16468.07 (-17135.23 to -15727.19)
+SHUFFLE-QUIET SENTENCE: QUIET — 1 of 1 (need 1); empty sets 0; |F| 1; G -25.94; NULL-1 q95 -23.17
+SHUFFLE-QUIET MDL-GREEDY: QUIET — 1 of 1 (need 1); empty sets 1; |F| 0; G 0.00; NULL-1 q95 0.00
+
+== 5 · GAIN (ALPHA4: G(F) > q95 of NULL-1 AND G(F) > 0; WEB-S judged by the seeds that pass, >= 8 of 10, exact sign p printed)
+GAIN WEB-H: FAIL — gate first ok (plant gate pass, shuffle quiet); 0 of 1 seeds pass (need 1; exact sign p 1.0000); 0 without a null
+    |F| 1430; share with a within-moment adjacent train occurrence 1.000; G -28202.04 bits = -0.62473 a held-out word; L 31822.37; held adjacency: zero-firing frames 635, firings 1982
+    NULL-1 mean -33089.72 sd 28.30 q95 -33040.92 z 172.73 fallbacks 0
+    anatomy G = M + D + C − L: M 7590.01, D 4515.49, C -8485.17, L 31822.37; T = D + C -3969.68
+GAIN WEB-S: FAIL — gate first ok (plant gate pass, shuffle quiet); 0 of 10 seeds pass (need 8; exact sign p 1.0000); 0 without a null
+    |F| 807.8 (794 to 816); share with a within-moment adjacent train occurrence 1.000 (1.000 to 1.000); G -14744.51 (-14947.16 to -14397.69) bits = -0.32662 (-0.33111 to -0.31894) a held-out word; L 17976.30 (17669.21 to 18158.78); held adjacency: zero-firing frames 342.7 (335 to 347), firings 1509.4 (1490 to 1538)
+    NULL-1 mean -18671.94 (-18860.47 to -18354.99) sd 43.41 (38.92 to 49.07) q95 -18593.05 (-18768.77 to -18281.47) z 90.97 (79.63 to 101.79) fallbacks 0
+    anatomy G = M + D + C − L: M 5689.36 (5625.88 to 5752.59), D 3932.72 (3902.76 to 4001.91), C -6390.28 (-6462.78 to -6258.84), L 17976.30 (17669.21 to 18158.78); T = D + C -2457.56 (-2522.88 to -2356.07)
+      WEB-S seed 1: |F| 807, G -14697.59, NULL-1 q95 -18590.04, beats q95 True
+      WEB-S seed 2: |F| 798, G -14529.77, NULL-1 q95 -18350.34, beats q95 True
+      WEB-S seed 3: |F| 794, G -14397.69, NULL-1 q95 -18281.47, beats q95 True
+      WEB-S seed 4: |F| 807, G -14784.88, NULL-1 q95 -18558.59, beats q95 True
+      WEB-S seed 5: |F| 807, G -14777.38, NULL-1 q95 -18586.87, beats q95 True
+      WEB-S seed 6: |F| 813, G -14914.15, NULL-1 q95 -18726.62, beats q95 True
+      WEB-S seed 7: |F| 816, G -14947.16, NULL-1 q95 -18767.11, beats q95 True
+      WEB-S seed 8: |F| 816, G -14928.86, NULL-1 q95 -18768.77, beats q95 True
+      WEB-S seed 9: |F| 813, G -14806.82, NULL-1 q95 -18737.59, beats q95 True
+      WEB-S seed 10: |F| 807, G -14660.77, NULL-1 q95 -18563.07, beats q95 True
+GAIN SENTENCE: FAIL — gate first ok (plant gate pass, shuffle quiet); 0 of 1 seeds pass (need 1; exact sign p 1.0000); 0 without a null
+    |F| 470; share with a within-moment adjacent train occurrence 0.860; G -7326.11 bits = -0.16229 a held-out word; L 10459.10; held adjacency: zero-firing frames 190, firings 912
+    NULL-1 mean -10844.33 sd 33.50 q95 -10780.93 z 105.04 fallbacks 0
+    anatomy G = M + D + C − L: M 4407.09, D 3311.07, C -4585.17, L 10459.10; T = D + C -1274.11
+GAIN MDL-GREEDY: FAIL — gate first ok (plant gate pass, shuffle quiet); 0 of 1 seeds pass (need 1; exact sign p 1.0000); 0 without a null
+    |F| 281; share with a within-moment adjacent train occurrence 1.000; G -2357.20 bits = -0.05222 a held-out word; L 6253.21; held adjacency: zero-firing frames 118, firings 743
+    NULL-1 mean -6499.02 sd 20.06 q95 -6465.46 z 206.46 fallbacks 0
+    anatomy G = M + D + C − L: M 4415.36, D 3179.26, C -3698.61, L 6253.21; T = D + C -519.35
+MDL-GREEDY took 281 steps; its first 15 picks (frame, train Δ bits, train firings):
+      green box  Δ 2274.41  fires 320
+      purple ball  Δ 986.60  fires 128
+      blue ball  Δ 991.59  fires 156
+      grey ball  Δ 890.92  fires 128
+      red box  Δ 843.76  fires 129
+      project gutenber  Δ 747.98  fires 128
+      yellow key  Δ 512.28  fires 128
+      yellow ball  Δ 489.38  fires 64
+      yellow box  Δ 584.48  fires 64
+      red ball  Δ 552.39  fires 64
+      grey box  Δ 505.30  fires 64
+      blue key  Δ 419.30  fires 91
+      red key  Δ 409.96  fires 74
+      green key  Δ 387.42  fires 64
+      grey key  Δ 391.83  fires 64
+
+== 6 · CRITERION-MATTERS (NULL-2) (a reading, no bar: G(F) > q95 of NULL-2 AND G(F) > 0; WEB-S: seeds of ten; gated by PLANT-BEATS-NULL-2)
+PLANT-BEATS-NULL-2: ALPHA4+PLANT True, SCENE+PLANT True
+CRITERION-MATTERS WEB-H: NO — 0 of 1 seeds (need 1)
+    G -28202.04; NULL-2 mean -30559.07 sd 69.87 q95 -30461.31 z 33.74 fallbacks 89463
+CRITERION-MATTERS WEB-S: NO — 0 of 10 seeds (need 8)
+    G -14744.51 (-14947.16 to -14397.69); NULL-2 mean -16885.68 (-17076.71 to -16596.33) sd 76.62 (68.98 to 83.30) q95 -16759.38 (-16942.60 to -16463.98) z 28.00 (25.85 to 29.68) fallbacks 389600
+CRITERION-MATTERS SENTENCE: NO — 0 of 1 seeds (need 1)
+    G -7326.11; NULL-2 mean -9623.06 sd 45.74 q95 -9535.26 z 50.22 fallbacks 18314
+CRITERION-MATTERS MDL-GREEDY: NO — 0 of 1 seeds (need 1)
+    G -2357.20; NULL-2 mean -5418.93 sd 84.64 q95 -5278.83 z 36.17 fallbacks 3600
+
+== 7 · THE EYE'S READING (ALPHA4: the cells' said frames against each rule's kept set; a reading, never a bar)
+the cells said 40 distinct frames, 526 says, 86 confirmed by the eye: base rate 0.1635
+  WEB-H: keeps 39 of the 40 said frames; pooled yes-rate of the says of the frames it KEEPS 0.166 (says kept 519) against those it does not keep 0.000 (says not kept 7); frames it keeps that the cells never said 1391 of |F| 1430
+  WEB-S: keeps 38.7 (38 to 39) of the 40 said frames; pooled yes-rate of the says of the frames it KEEPS 0.167 (0.166 to 0.171) (says kept 516.2 (503 to 519)) against those it does not keep 0.000 (0.000 to 0.000) (says not kept 9.8 (7 to 23)); frames it keeps that the cells never said 769.1 (755 to 777) of |F| 807.8 (794 to 816)
+  SENTENCE: keeps 35 of the 40 said frames; pooled yes-rate of the says of the frames it KEEPS 0.198 (says kept 420) against those it does not keep 0.028 (says not kept 106); frames it keeps that the cells never said 435 of |F| 470
+  MDL-GREEDY: keeps 24 of the 40 said frames; pooled yes-rate of the says of the frames it KEEPS 0.297 (says kept 286) against those it does not keep 0.004 (says not kept 240); frames it keeps that the cells never said 257 of |F| 281
+the said frames (says, eye-confirmed) and which rules keep each (WEB-S: seeds keeping it):
+      «the letters»  says 89  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «a big»  says 40  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «to the»  says 38  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE no  MDL-GREEDY no
+      «yellow key»  says 32  yes 14  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «green box»  says 30  yes 26  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «in the»  says 30  yes 2  WEB-H kept  WEB-S 10/10  SENTENCE no  MDL-GREEDY kept
+      «and her»  says 28  yes 1  WEB-H kept  WEB-S 10/10  SENTENCE no  MDL-GREEDY no
+      «red box»  says 21  yes 11  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «grey ball»  says 20  yes 13  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «it is»  says 20  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «blue ball»  says 18  yes 6  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «you not»  says 16  yes 0  WEB-H kept  WEB-S 9/10  SENTENCE kept  MDL-GREEDY no
+      «illustra script»  says 15  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «purple ball»  says 12  yes 12  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «is on»  says 11  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «of this»  says 10  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «she has»  says 10  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «i will»  says 9  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «we will»  says 8  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «at the»  says 7  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE no  MDL-GREEDY kept
+      «they are»  says 7  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «will you»  says 7  yes 0  WEB-H no  WEB-S 0/10  SENTENCE kept  MDL-GREEDY no
+      «project gutenber»  says 6  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «with his»  says 6  yes 0  WEB-H kept  WEB-S 8/10  SENTENCE kept  MDL-GREEDY no
+      «has a»  says 5  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «his hand»  says 5  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «do you»  says 4  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «let me»  says 4  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «but not»  says 3  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «what a»  says 3  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE no  MDL-GREEDY no
+      «go to»  says 2  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «script exercise»  says 2  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «look at»  says 1  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «mcguffey first»  says 1  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «old hen»  says 1  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «paragrap e»  says 1  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «run and»  says 1  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «slate work»  says 1  yes 1  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+      «teach the»  says 1  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY no
+      «this agreemen»  says 1  yes 0  WEB-H kept  WEB-S 10/10  SENTENCE kept  MDL-GREEDY kept
+
+== 8 · OVERLAPS (Jaccard between the rules' kept sets; WEB-S: the mean over its seeds)
+ALPHA4: SENTENCE|MDL-GREEDY 0.248; WEB-H|MDL-GREEDY 0.148; WEB-H|SENTENCE 0.261; WEB-S|MDL-GREEDY 0.195; WEB-S|SENTENCE 0.345; WEB-S|WEB-H 0.543
+ALPHA4+PLANT: SENTENCE|MDL-GREEDY 0.245; WEB-H|MDL-GREEDY 0.149; WEB-H|SENTENCE 0.264; WEB-S|MDL-GREEDY 0.197; WEB-S|SENTENCE 0.345; WEB-S|WEB-H 0.544
+ALPHA4+SHUFFLE: SENTENCE|MDL-GREEDY 0.000; WEB-H|MDL-GREEDY 0.000; WEB-H|SENTENCE 0.004; WEB-S|MDL-GREEDY 0.000; WEB-S|SENTENCE 0.000; WEB-S|WEB-H 0.155
+SCENE: SENTENCE|MDL-GREEDY 0.028; WEB-H|MDL-GREEDY 0.556; WEB-H|SENTENCE 0.050; WEB-S|MDL-GREEDY 0.303; WEB-S|SENTENCE 0.052; WEB-S|WEB-H 0.443
+SCENE+PLANT: SENTENCE|MDL-GREEDY 0.054; WEB-H|MDL-GREEDY 0.730; WEB-H|SENTENCE 0.074; WEB-S|MDL-GREEDY 0.462; WEB-S|SENTENCE 0.066; WEB-S|WEB-H 0.534
+
+== 9 · SCENE (the control with a known generator)
+generator fit (G1 χ²): length p 0.969 (n 9999), shape p 0.730 (n 9999), colour p 0.416 (n 4976), size p 0.612 (n 5030), pairs p 0.416 (n 4976); held-out pairs seen 0; G_max gated: True
+THE CEILING: G_max 15884.04 bits (bits(held | empty) 40335.40 minus the generator's own code length); the expected form bits(empty) − 6.0774 · N_utt 16025.92; entropy 6.0774; H(utterance | length) 4.5774 (a reference for a code handed the lengths, never a gate); STOP False
+  WEB-H      seed  0  G 1774.01  margin to G_max 14110.03  under G_max + 20
+  WEB-S      seed  1  G 275.45  margin to G_max 15608.59  under G_max + 20
+  WEB-S      seed  2  G 457.67  margin to G_max 15426.37  under G_max + 20
+  WEB-S      seed  3  G 122.44  margin to G_max 15761.61  under G_max + 20
+  WEB-S      seed  4  G 292.37  margin to G_max 15591.68  under G_max + 20
+  WEB-S      seed  5  G 198.11  margin to G_max 15685.94  under G_max + 20
+  WEB-S      seed  6  G 212.68  margin to G_max 15671.37  under G_max + 20
+  WEB-S      seed  7  G -60.31  margin to G_max 15944.36  under G_max + 20
+  WEB-S      seed  8  G 457.01  margin to G_max 15427.03  under G_max + 20
+  WEB-S      seed  9  G -18.53  margin to G_max 15902.57  under G_max + 20
+  WEB-S      seed 10  G 244.42  margin to G_max 15639.63  under G_max + 20
+  SENTENCE   seed  0  G 99.95  margin to G_max 15784.10  under G_max + 20
+  MDL-GREEDY seed  0  G 4912.91  margin to G_max 10971.14  under G_max + 20
+G(F_oracle) 4294.02 (24 frames; margin to G_max 11590.02; violation False); each rule's recall of F_oracle: MDL-GREEDY 1.000, SENTENCE 0.042, WEB-H 0.625, WEB-S 0.221
+SCENE WEB-H: gradable (SCENE+PLANT plant gate: 1 of 1 seeds count, need 1)
+    |F| 20; G 1774.01; NULL-1 mean 127.98 sd 99.21 q95 328.35 z 16.59 fallbacks 806; NULL-2 mean 868.15 sd 113.17 q95 1069.34 z 8.00 fallbacks 0
+SCENE WEB-S: NOT GRADABLE (SCENE+PLANT plant gate: 4 of 10 seeds count, need 9)
+    |F| 10.9 (8 to 14); G 218.13 (-60.31 to 457.67); NULL-1 mean 62.68 (-35.79 to 203.17) sd 101.39 (79.67 to 124.36) q95 227.58 (107.51 to 407.82) z 1.48 (-0.77 to 2.62) fallbacks 4000; NULL-2 mean 425.68 (319.76 to 555.10) sd 114.89 (93.96 to 133.86) q95 610.59 (486.68 to 763.80) z -1.78 (-3.16 to -0.09) fallbacks 100
+SCENE SENTENCE: gradable (SCENE+PLANT plant gate: 1 of 1 seeds count, need 1)
+    |F| 1; G 99.95; NULL-1 mean 57.01 sd 42.81 q95 96.50 z 1.00 fallbacks 0; NULL-2 mean 10.54 sd 57.66 q95 65.54 z 1.55 fallbacks 0
+SCENE MDL-GREEDY: gradable (SCENE+PLANT plant gate: 1 of 1 seeds count, need 1)
+    |F| 36; G 4912.91; NULL-1 mean -168.05 sd 82.42 q95 -5.94 z 61.65 fallbacks 3077; NULL-2 error: NULL-2: no admissible adjacent bigram in any bin for bin 13
+
+== 10 · PREDICTIONS (the law's §4, read mechanically with the definitions fixed before the unit ran; readings, never bars)
+P-C1 holds — [Likely] MDL-GREEDY's G is the largest: G -2357.20 against WEB-H -28202.04, WEB-S mean -14744.51, SENTENCE -7326.11 (reading: MDL's G >= the largest of the other three, WEB-S as its seed mean)
+P-C2 holds — [Guessing] WEB and SENTENCE beat their dealt nulls on ALPHA4 with G below MDL-GREEDY's (reading: G > NULL-1 q95 — WEB-S at >= 8 of 10 seeds — and G < MDL's G): WEB-H beats NULL-1 q95 True, G below MDL's True; SENTENCE beats NULL-1 q95 True, G below MDL's True; WEB-S beats its NULL-1 q95 at 10 of 10 seeds (need 8), seed-mean G below MDL's True
+P-C3 does not hold — [Guessing] on SCENE no rule's G is near G_max (reading: every rule's G, WEB-S as its seed mean, <= 0.10 x G_max 15884.04): MDL-GREEDY 0.3093, SENTENCE 0.0063, WEB-H 0.1117, WEB-S 0.0137; G(F_oracle) / G_max 0.2703
+P-C4 holds — [Likely] the eye's reading splits MDL's frames (reading: it keeps >= 1 GROUNDED said frame (>= 5 says, >= 50% confirmed) AND >= 1 FUNCTION-WORD pair (>= 5 says, 0 confirmed)): MDL-GREEDY keeps grounded said frames ['green box', 'red box', 'grey ball', 'purple ball'] of 4 and function-word pairs ['a big', 'it is', 'i will', 'we will', 'at the', 'they are', 'project gutenber', 'has a', 'his hand'] of 18; pooled yes-rate of the says it keeps 0.297 (n 286) against 0.004 (n 240), base rate 0.163
+P-C5 does not hold — [Guessing] SENTENCE keeps «the letters», «a big», «to the» and a game pair or two (reading: all three kept AND >= 1 (colour, object) game pair kept): SENTENCE kept «the letters»: yes, kept «a big»: yes, kept «to the»: no; game pairs kept ['blue ball', 'blue key', 'green box', 'green key', 'grey ball', 'grey box', 'grey key', 'purple ball', 'red ball', 'red box', 'red key', 'yellow ball', 'yellow box', 'yellow key']
+P-C6 architect's guess does not hold; mine does not hold — [Guessing, two] on NULL-2: (architect) MDL-GREEDY's G sits near NULL-2's band = G <= q95: False; (mine) it is above NULL-2's q95 True and WEB and SENTENCE sit nearer to it (their NULL-2 z, WEB-S as its seed mean, all below MDL's) False: MDL G -2357.20 vs NULL-2 mean -5418.93 sd 84.64 q95 -5278.83; z MDL-GREEDY 36.17, SENTENCE 50.22, WEB-H 33.74, WEB-S 28.00

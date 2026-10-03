@@ -1,0 +1,10 @@
+2026-10-04 00:01:23 +0400 START toys unit-real slot 5 pid 1483418 avail 17616MB waited 0s cap 2G swap 512M unit slot-toys-unit-real-1483418
+2026-10-04 00:15:58 +0400 END   toys unit-real slot 5 exit 0 cap 2G peak 206MB swap 0MB
+2026-10-04 00:16:39 +0400 START toys report-real slot 6 pid 1501405 avail 19168MB waited 0s cap 1G swap 512M unit slot-toys-report-real-1501405
+2026-10-04 00:16:40 +0400 END   toys report-real slot 6 exit 0 cap 1G peak 66MB swap 0MB
+2026-10-04 00:19:04 +0400 START toys perframe3 slot 6 pid 1509058 avail 19027MB waited 0s cap 2G swap 512M unit slot-toys-perframe3-1509058
+2026-10-04 00:22:32 +0400 END   toys perframe3 slot 6 exit 0 cap 2G peak 124MB swap 0MB
+2026-10-04 00:23:35 +0400 START toys said-counts slot 6 pid 1522732 avail 19102MB waited 0s cap 1G swap 512M unit slot-toys-said-counts-1522732
+2026-10-04 00:23:38 +0400 END   toys said-counts slot 6 exit 0 cap 1G peak 122MB swap 0MB
+2026-10-04 00:24:10 +0400 START toys credit-split slot 6 pid 1524240 avail 19104MB waited 0s cap 1G swap 512M unit slot-toys-credit-split-1524240
+2026-10-04 00:24:12 +0400 END   toys credit-split slot 6 exit 0 cap 1G peak 122MB swap 0MB

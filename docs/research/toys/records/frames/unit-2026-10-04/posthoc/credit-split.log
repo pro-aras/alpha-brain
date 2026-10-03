@@ -1,0 +1,12 @@
+MDL-GREEDY: of its 45 paying frames the stored top 25 hold 25 positive: 6 with ZERO held-out adjacent occurrences (credit sum 468.9), 19 with at least one (credit sum 1065.9)
+   zero-held: ['green box', 'grey ball', 'blue ball', 'red box', 'grey box', 'purple ball']
+   with held firings: [('project gutenber', 50), ('did not', 18), ('electron works', 11), ('in the', 58), ('terms of', 16), ('this agreemen', 12), ('do not', 17), ('electron work', 11), ('script exercise', 6), ('i will', 17), ('united states', 7), ('if you', 21), ('paragrap e', 8), ('i am', 9)]
+SENTENCE: of its 39 paying frames the stored top 25 hold 25 positive: 6 with ZERO held-out adjacent occurrences (credit sum 486.1), 19 with at least one (credit sum 567.3)
+   zero-held: ['green box', 'blue ball', 'grey ball', 'red box', 'grey box', 'purple ball']
+   with held firings: [('project gutenber', 50), ('did not', 18), ('this agreemen', 12), ('paragrap e', 8), ('electron work', 11), ('i will', 17), ('you may', 12), ('into the', 17), ('if you', 21), ('literary archive', 5), ('you must', 11), ('i am', 9), ('it was', 14), ('one day', 8)]
+WEB-H: of its 45 paying frames the stored top 25 hold 25 positive: 6 with ZERO held-out adjacent occurrences (credit sum 463.7), 19 with at least one (credit sum 607.6)
+   zero-held: ['green box', 'grey ball', 'blue ball', 'red box', 'grey box', 'purple ball']
+   with held firings: [('project gutenber', 50), ('did not', 18), ('he had', 17), ('he was', 20), ('of the', 54), ('in the', 58), ('this agreemen', 12), ('paragrap e', 8), ('literary archive', 5), ('one day', 8), ('i am', 9), ('you may', 12), ('it was', 14), ('electron work', 11)]
+WEB-S s1: of its 42 paying frames the stored top 25 hold 25 positive: 6 with ZERO held-out adjacent occurrences (credit sum 527.7), 19 with at least one (credit sum 674.4)
+   zero-held: ['green box', 'blue ball', 'grey ball', 'red box', 'purple ball', 'grey box']
+   with held firings: [('project gutenber', 50), ('did not', 18), ('do not', 17), ('this agreemen', 12), ('of the', 54), ('paragrap e', 8), ('in the', 58), ('electron work', 11), ('i will', 17), ('you may', 12), ('you must', 11), ('literary archive', 5), ('if you', 21), ('terms of', 16)]

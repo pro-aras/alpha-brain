@@ -1,0 +1,11 @@
+git diff --stat e8ee2f5 0049782 (the gates' commit against the unit's commit):
+ .../toys/records/frames/gates-run2-2026-10-03/GATES.json      |  1 +
+ .../toys/records/frames/gates-run2-2026-10-03/README.txt      | 11 +++++++++++
+ .../toys/records/frames/gates-run2-2026-10-03/SHA256SUMS      |  6 ++++++
+ .../records/frames/gates-run2-2026-10-03/gates-real2.clock    |  2 ++
+ .../records/frames/gates-run2-2026-10-03/gates-real2.exit     |  1 +
+ .../toys/records/frames/gates-run2-2026-10-03/gates-real2.log |  6 ++++++
+ .../frames/gates-run2-2026-10-03/slot-ledger-lines.txt        |  2 ++
+ 7 files changed, 29 insertions(+)
+
+git diff --quiet e8ee2f5 0049782 -- tools tests genome brain creature: exit 0  (0 = byte-identical code)
