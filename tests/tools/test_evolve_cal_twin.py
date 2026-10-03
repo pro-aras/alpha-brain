@@ -367,6 +367,7 @@ class TestCompareTwins(unittest.TestCase):
         self.assertTrue(r["identical"])
         self.assertEqual((r["n_a"], r["n_b"], r["rows_differing"], r["first_diff"]), (4, 4, 0, None))
         self.assertEqual(r["equal_prefix"], 4)
+        self.assertIsNone(r["first_discrete_diff"])
 
     def test_a_float_only_difference_is_a_difference_but_not_a_discrete_one(self) -> None:
         other = json.loads(json.dumps(self.ROWS))
@@ -377,6 +378,7 @@ class TestCompareTwins(unittest.TestCase):
         self.assertEqual(r["first_diff"], 1)
         self.assertEqual(r["rows_differing"], 1)
         self.assertEqual(r["discrete_diff_rows"], 0, "residual and hash are continuous witnesses, not discrete outcomes")
+        self.assertIsNone(r["first_discrete_diff"], "no discrete outcome ever differed: there is no first one")
         self.assertEqual(sorted(r["diff_key_counts"]), ["hash", "residual"])
 
     def test_a_discrete_difference_is_counted_and_located(self) -> None:
@@ -389,10 +391,23 @@ class TestCompareTwins(unittest.TestCase):
         self.assertEqual(r["first_diff"], 2)
         self.assertEqual(r["rows_differing"], 2)
         self.assertEqual(r["discrete_diff_rows"], 2)
+        self.assertEqual(r["first_discrete_diff"], 2)
         self.assertEqual(r["diff_key_counts"]["cells"], 1)
         self.assertEqual(r["diff_key_counts"]["think"], 1)
         self.assertEqual(len(r["by_decile"]), 10)
         self.assertEqual(sum(r["by_decile"]), 2)
+
+    def test_the_first_discrete_difference_is_not_the_first_difference(self) -> None:
+        # a continuous witness differs from row 0 (an epsilon perturbation), a discrete outcome only at row 3: both positions are reported
+        other = json.loads(json.dumps(self.ROWS))
+        other[0]["hash"] = "h1x"
+        before = json.dumps(other[3])
+        other[3]["cells"] = [12, 5]
+        self.assertNotEqual(json.dumps(other[3]), before, "the plant changed the bytes")
+        r = cal.compare_twins(self.ROWS, other)
+        self.assertEqual(r["first_diff"], 0)
+        self.assertEqual(r["first_discrete_diff"], 3)
+        self.assertEqual(r["discrete_diff_rows"], 1)
 
     def test_different_lengths_are_not_identical_and_say_so(self) -> None:
         r = cal.compare_twins(self.ROWS, self.ROWS[:3])

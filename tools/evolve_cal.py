@@ -338,6 +338,7 @@ def compare_twins(rows_a: Sequence[dict], rows_b: Sequence[dict]) -> dict:
     n_a, n_b = len(rows_a), len(rows_b)
     n = min(n_a, n_b)
     first = None
+    first_disc = None
     key_counts: Counter = Counter()
     rows_diff = disc_rows = 0
     deciles = [0] * 10
@@ -351,10 +352,11 @@ def compare_twins(rows_a: Sequence[dict], rows_b: Sequence[dict]) -> dict:
         key_counts.update(keys)
         if any(k not in _CONTINUOUS_KEYS and not (_has_float(ra.get(k)) or _has_float(rb.get(k))) for k in keys):
             disc_rows += 1
+            first_disc = i if first_disc is None else first_disc
         deciles[min(9, i * 10 // max(1, n))] += 1
     first_diff = first if first is not None else (n if n_a != n_b else None)
     return {"identical": n_a == n_b and rows_diff == 0, "n_a": n_a, "n_b": n_b, "rows_differing": rows_diff,
-            "discrete_diff_rows": disc_rows, "first_diff": first_diff, "equal_prefix": first_diff if first_diff is not None else n,
+            "discrete_diff_rows": disc_rows, "first_discrete_diff": first_disc, "first_diff": first_diff, "equal_prefix": first_diff if first_diff is not None else n,
             "diff_key_counts": dict(key_counts), "by_decile": deciles}
 
 

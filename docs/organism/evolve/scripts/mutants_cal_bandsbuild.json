@@ -1,0 +1,86 @@
+[
+ {
+  "name": "edge-without-root-two",
+  "old": "        edge = t * (2.0 ** 0.5) * sigma",
+  "new": "        edge = t * sigma",
+  "expect": "test_a_normal_null_gives_the_t_times_root_two_times_sigma_edge"
+ },
+ {
+  "name": "sigma-is-the-population-sd",
+  "old": "distinct, sigma = len(set(vals)), statistics.stdev(vals)",
+  "new": "distinct, sigma = len(set(vals)), statistics.pstdev(vals)",
+  "expect": "test_a_normal_null_gives_the_t_times_root_two_times_sigma_edge"
+ },
+ {
+  "name": "t-with-n-df",
+  "old": "    t = float(stats.t.ppf(1.0 - alpha_side, n - 1))",
+  "new": "    t = float(stats.t.ppf(1.0 - alpha_side, n))",
+  "expect": "test_the_n_is_the_number_of_values_and_df_follows"
+ },
+ {
+  "name": "two-distinct-values-get-a-band",
+  "old": "    if distinct < 3 or not (sigma > 0.0):",
+  "new": "    if distinct < 2 or not (sigma > 0.0):",
+  "expect": "test_fewer_than_three_distinct_values_has_no_band_even_with_spread"
+ },
+ {
+  "name": "rank-band-never-used",
+  "old": "    if p < normal_p:",
+  "new": "    if p < 0.0:",
+  "expect": "test_a_non_normal_null_uses_the_rank_band_and_says_so"
+ },
+ {
+  "name": "a-none-reading-is-not-refused",
+  "old": "    if any(v is None for v in values):",
+  "new": "    if False:",
+  "expect": "test_a_none_reading_in_the_null_is_refused_not_dropped"
+ },
+ {
+  "name": "two-values-are-enough",
+  "old": "    if n < 3:\n        raise ValueError(f\"make_band({dim}): {n} values (need at least 3)\")",
+  "new": "    if n < 1:\n        raise ValueError(f\"make_band({dim}): {n} values (need at least 3)\")",
+  "expect": "test_too_few_values_is_refused"
+ },
+ {
+  "name": "f-ratio-inverted",
+  "old": "        F = va / vb\n        different = F > hi or (two_sided and F < lo)",
+  "new": "        F = vb / va\n        different = F > hi or (two_sided and F < lo)",
+  "expect": "test_a_threefold_spread_is_different_and_the_direction_is_named"
+ },
+ {
+  "name": "f-lower-tail-missing",
+  "old": "    lo = (1.0 / float(stats.f.ppf(1.0 - tail, dfb, dfa))) if two_sided else 0.0",
+  "new": "    lo = 0.0",
+  "expect": "test_a_threefold_spread_is_different_and_the_direction_is_named"
+ },
+ {
+  "name": "f-one-sided-uses-half-alpha",
+  "old": "    tail = alpha / 2 if two_sided else alpha",
+  "new": "    tail = alpha / 2",
+  "expect": "test_the_one_sided_test_uses_the_full_alpha_in_one_tail"
+ },
+ {
+  "name": "frames-seed-never-rules",
+  "old": "    if f[\"different\"] and f[\"wider\"] == \"a\":\n        return {\"rules\": \"seed\"",
+  "new": "    if False:\n        return {\"rules\": \"seed\"",
+  "expect": "test_the_seed_null_rules_only_where_it_is_wider"
+ },
+ {
+  "name": "frames-seed-always-rules",
+  "old": "    if f[\"different\"] and f[\"wider\"] == \"a\":\n        return {\"rules\": \"seed\"",
+  "new": "    if True:\n        return {\"rules\": \"seed\"",
+  "expect": "test_the_eps_null_rules_when_the_seed_null_is_not_wider"
+ },
+ {
+  "name": "q1-band-has-no-grid",
+  "old": "dims = {\"q1_seen\": make_band(\"q1_seen\", null[\"q1_seen\"], grid=Q1_GRID, alpha_side=alpha_side),",
+  "new": "dims = {\"q1_seen\": make_band(\"q1_seen\", null[\"q1_seen\"], grid=None, alpha_side=alpha_side),",
+  "expect": "test_the_bands_file_validates_and_carries_the_laws_fields"
+ },
+ {
+  "name": "cost-band-dropped",
+  "old": "    if \"ln_cpu\" in null:",
+  "new": "    if False:",
+  "expect": "test_the_cost_band_is_built_on_the_log_cpu"
+ }
+]

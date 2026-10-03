@@ -145,6 +145,17 @@ class TestVarianceRatio(unittest.TestCase):
         self.assertAlmostEqual(r["f_crit_hi"], stats.f.ppf(0.975, 20, 10), places=9)
         self.assertAlmostEqual(r["f_crit_hi"], 3.4185, places=3, msg="the law's F(0.975) for (20, 10) df")
 
+    def test_the_one_sided_test_uses_the_full_alpha_in_one_tail(self) -> None:
+        a = [float(x) for x in np.random.default_rng(5).normal(0, 1, 10)]
+        b = [float(x) for x in np.random.default_rng(6).normal(0, 1, 21)]
+        r = cal.variance_ratio_test(a, b, alpha=0.05, two_sided=False)
+        from scipy import stats
+        self.assertAlmostEqual(r["f_crit_hi"], stats.f.ppf(0.95, 9, 20), places=9)
+        self.assertFalse(r["two_sided"])
+        r2 = cal.variance_ratio_test(a, b, alpha=0.05, two_sided=True)
+        self.assertAlmostEqual(r2["f_crit_hi"], stats.f.ppf(0.975, 9, 20), places=9)
+        self.assertLess(r["f_crit_hi"], r2["f_crit_hi"])
+
     def test_a_threefold_spread_is_different_and_the_direction_is_named(self) -> None:
         a = [float(x) for x in np.random.default_rng(1).normal(0, 1, 21)]
         b = [float(x) for x in np.random.default_rng(2).normal(0, 3.5, 11)]

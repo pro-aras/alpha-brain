@@ -1,0 +1,47 @@
+test_a_discrete_difference_is_counted_and_located (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_a_discrete_difference_is_counted_and_located) ... ERROR
+test_a_float_only_difference_is_a_difference_but_not_a_discrete_one (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_a_float_only_difference_is_a_difference_but_not_a_discrete_one) ... ERROR
+test_different_lengths_are_not_identical_and_say_so (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_different_lengths_are_not_identical_and_say_so) ... ok
+test_identical_journals_are_identical (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_identical_journals_are_identical) ... ERROR
+test_the_first_discrete_difference_is_not_the_first_difference (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_the_first_discrete_difference_is_not_the_first_difference) ... ERROR
+
+======================================================================
+ERROR: test_a_discrete_difference_is_counted_and_located (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_a_discrete_difference_is_counted_and_located)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 394, in test_a_discrete_difference_is_counted_and_located
+    self.assertEqual(r["first_discrete_diff"], 2)
+                     ~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'first_discrete_diff'
+
+======================================================================
+ERROR: test_a_float_only_difference_is_a_difference_but_not_a_discrete_one (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_a_float_only_difference_is_a_difference_but_not_a_discrete_one)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 381, in test_a_float_only_difference_is_a_difference_but_not_a_discrete_one
+    self.assertIsNone(r["first_discrete_diff"], "no discrete outcome ever differed: there is no first one")
+                      ~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'first_discrete_diff'
+
+======================================================================
+ERROR: test_identical_journals_are_identical (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_identical_journals_are_identical)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 370, in test_identical_journals_are_identical
+    self.assertIsNone(r["first_discrete_diff"])
+                      ~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'first_discrete_diff'
+
+======================================================================
+ERROR: test_the_first_discrete_difference_is_not_the_first_difference (tests.tools.test_evolve_cal_twin.TestCompareTwins.test_the_first_discrete_difference_is_not_the_first_difference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 409, in test_the_first_discrete_difference_is_not_the_first_difference
+    self.assertEqual(r["first_discrete_diff"], 3)
+                     ~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'first_discrete_diff'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.002s
+
+FAILED (errors=4)
+scope memory.peak 51273728 bytes

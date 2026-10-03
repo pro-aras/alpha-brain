@@ -1,28 +1,164 @@
 [
- {"name": "gene-text-wrong-group", "old": "    return text[m.end(1):m.start(2)]", "new": "    return text[m.start(2):m.end(2)]", "expect": "test_gene_text_reads_the_number"},
- {"name": "set-gene-drops-tail", "old": "lambda m: m.group(1) + val_str + m.group(2), text, count=1)", "new": "lambda m: m.group(1) + val_str, text, count=1)", "expect": "test_set_gene_text_changes_exactly_one_line"},
- {"name": "set-gene-accepts-non-number", "old": "if not isinstance(val_str, str) or not _NUMBER.match(val_str):", "new": "if not isinstance(val_str, str):", "expect": "test_set_gene_text_refuses_a_non_number"},
- {"name": "eps-ignores-k", "old": "    val = format(lr0 * (1.0 + k * eps), \".12g\")", "new": "    val = format(lr0 * (1.0 + eps), \".12g\")", "expect": "test_eps_variant_scales"},
- {"name": "eps-allows-no-change", "old": "    if \"e\" in val or \"E\" in val or float(val) == lr0:", "new": "    if \"e\" in val or \"E\" in val:", "expect": "test_eps_variant_refuses"},
- {"name": "eps-allows-negative", "old": "    if not (eps > 0.0):", "new": "    if False:", "expect": "test_eps_variant_refuses"},
- {"name": "seed-adds-one-not-k", "old": "new, n = _SEED_RE.subn(lambda m: m.group(1) + str(seed + k) + m.group(3), text, count=1)", "new": "new, n = _SEED_RE.subn(lambda m: m.group(1) + str(seed + 1) + m.group(3), text, count=1)", "expect": "test_seed_variant_adds_k"},
- {"name": "seed-drops-trailing-comment", "old": "lambda m: m.group(1) + str(seed + k) + m.group(3), text, count=1)", "new": "lambda m: m.group(1) + str(seed + k), text, count=1)", "expect": "test_seed_variant_adds_k"},
- {"name": "slice-includes-the-checkpoint-row", "old": "                if from_seq < int(row[\"seq\"]) <= to_seq:", "new": "                if from_seq <= int(row[\"seq\"]) <= to_seq:", "expect": "test_the_staged_tape_holds_exactly"},
- {"name": "slice-drops-the-last-row", "old": "                if from_seq < int(row[\"seq\"]) <= to_seq:", "new": "                if from_seq < int(row[\"seq\"]) < to_seq:", "expect": "test_the_staged_tape_holds_exactly"},
- {"name": "payload-copied-empty", "old": "            shutil.copy2(src, dst)", "new": "            dst.write_bytes(b\"\")", "expect": "test_every_payload_a_row_names_was_copied"},
- {"name": "hole-skipped-not-refused", "old": "                raise FileNotFoundError(f\"evolve_cal: row {seq} names payload {rel!r}, which does not exist under {src_tape}\")", "new": "                continue", "expect": "test_a_missing_source_payload_is_refused"},
- {"name": "verify-ignores-missing-payload", "old": "                missing.append(rel)\n", "new": "", "expect": "test_verify_catches_a_deleted_payload"},
- {"name": "verify-ignores-payload-content", "old": "            if row.get(\"sha\") and _sha_file(p) != row[\"sha\"]:\n                bad_sha.append(rel)\n            elif (src_tape / rel).read_bytes() != p.read_bytes():\n                bad_sha.append(rel)", "new": "            pass", "expect": "test_verify_catches_a_changed_payload_byte"},
- {"name": "verify-ignores-changed-row", "old": "        if i >= len(have) or have[i] != line:\n            mismatches += 1", "new": "        if i >= len(have):\n            mismatches += 1", "expect": "test_verify_catches_a_deleted_payload_and_a_changed_row"},
- {"name": "checkpoint-not-copied", "old": "    shutil.copytree(src_dir, dst_dir, dirs_exist_ok=True)", "new": "    dst_dir.mkdir(parents=True, exist_ok=True)", "expect": "test_stage_copies_every_file"},
- {"name": "checkpoint-verify-blind-to-extra", "old": "    extra = sorted(k for k in b if k not in a)", "new": "    extra = []", "expect": "test_verify_catches_a_flipped_byte_and_an_extra_file"},
- {"name": "checkpoint-verify-blind-to-flip", "old": "    mism = sorted(k for k in a if k in b and a[k] != b[k])", "new": "    mism = []", "expect": "test_verify_catches_a_flipped_byte_and_an_extra_file"},
- {"name": "compare-float-counts-as-discrete", "old": "        if any(k not in _CONTINUOUS_KEYS and not (_has_float(ra.get(k)) or _has_float(rb.get(k))) for k in keys):", "new": "        if keys:", "expect": "test_a_float_only_difference_is_a_difference_but_not_a_discrete_one"},
- {"name": "compare-first-diff-is-the-last", "old": "        first = i if first is None else first", "new": "        first = i", "expect": "test_a_discrete_difference_is_counted_and_located"},
- {"name": "compare-ignores-length", "old": "    return {\"identical\": n_a == n_b and rows_diff == 0,", "new": "    return {\"identical\": rows_diff == 0,", "expect": "test_different_lengths_are_not_identical_and_say_so"},
- {"name": "rows-limit-off-by-one", "old": "        rows = rows[:int(rows_limit)]", "new": "        rows = rows[:int(rows_limit) + 1]", "expect": "test_rows_limit_cuts_the_slice"},
- {"name": "twin-keeps-its-state", "old": "    if not keep_state:\n        shutil.rmtree(twin_root, ignore_errors=True)", "new": "    if False:\n        shutil.rmtree(twin_root, ignore_errors=True)", "expect": "test_a_twin_writes_its_readings_and_cleans_its_state_copy"},
- {"name": "journal-digest-without-newlines", "old": "\"journal_sha256\": hashlib.sha256(\"\\n\".join(canon).encode(\"utf-8\")).hexdigest()", "new": "\"journal_sha256\": hashlib.sha256(\"\".join(canon).encode(\"utf-8\")).hexdigest()", "expect": "test_a_twin_writes_its_readings"},
- {"name": "genome-file-records-the-variant-name", "old": "    (out_dir / \"GENOME.genome\").write_text(genome_text)", "new": "    (out_dir / \"GENOME.genome\").write_text(variant)", "expect": "test_the_variant_reaches"},
- {"name": "state-hash-constant", "old": "\"state_hash\": mind.org.state_hash(),", "new": "\"state_hash\": \"0\" * 64,", "expect": "test_state_hash_is_the_snapshots_own_digest"}
+ {
+  "name": "gene-text-wrong-group",
+  "old": "    return text[m.end(1):m.start(2)]",
+  "new": "    return text[m.start(2):m.end(2)]",
+  "expect": "test_gene_text_reads_the_number"
+ },
+ {
+  "name": "set-gene-drops-tail",
+  "old": "lambda m: m.group(1) + val_str + m.group(2), text, count=1)",
+  "new": "lambda m: m.group(1) + val_str, text, count=1)",
+  "expect": "test_set_gene_text_changes_exactly_one_line"
+ },
+ {
+  "name": "set-gene-accepts-non-number",
+  "old": "if not isinstance(val_str, str) or not _NUMBER.match(val_str):",
+  "new": "if not isinstance(val_str, str):",
+  "expect": "test_set_gene_text_refuses_a_non_number"
+ },
+ {
+  "name": "eps-ignores-k",
+  "old": "    val = format(lr0 * (1.0 + k * eps), \".12g\")",
+  "new": "    val = format(lr0 * (1.0 + eps), \".12g\")",
+  "expect": "test_eps_variant_scales"
+ },
+ {
+  "name": "eps-allows-no-change",
+  "old": "    if \"e\" in val or \"E\" in val or float(val) == lr0:",
+  "new": "    if \"e\" in val or \"E\" in val:",
+  "expect": "test_eps_variant_refuses"
+ },
+ {
+  "name": "eps-allows-negative",
+  "old": "    if not (eps > 0.0):",
+  "new": "    if False:",
+  "expect": "test_eps_variant_refuses"
+ },
+ {
+  "name": "seed-adds-one-not-k",
+  "old": "new, n = _SEED_RE.subn(lambda m: m.group(1) + str(seed + k) + m.group(3), text, count=1)",
+  "new": "new, n = _SEED_RE.subn(lambda m: m.group(1) + str(seed + 1) + m.group(3), text, count=1)",
+  "expect": "test_seed_variant_adds_k"
+ },
+ {
+  "name": "seed-drops-trailing-comment",
+  "old": "lambda m: m.group(1) + str(seed + k) + m.group(3), text, count=1)",
+  "new": "lambda m: m.group(1) + str(seed + k), text, count=1)",
+  "expect": "test_seed_variant_adds_k"
+ },
+ {
+  "name": "slice-includes-the-checkpoint-row",
+  "old": "                if from_seq < int(row[\"seq\"]) <= to_seq:",
+  "new": "                if from_seq <= int(row[\"seq\"]) <= to_seq:",
+  "expect": "test_the_staged_tape_holds_exactly"
+ },
+ {
+  "name": "slice-drops-the-last-row",
+  "old": "                if from_seq < int(row[\"seq\"]) <= to_seq:",
+  "new": "                if from_seq < int(row[\"seq\"]) < to_seq:",
+  "expect": "test_the_staged_tape_holds_exactly"
+ },
+ {
+  "name": "payload-copied-empty",
+  "old": "            shutil.copy2(src, dst)",
+  "new": "            dst.write_bytes(b\"\")",
+  "expect": "test_every_payload_a_row_names_was_copied"
+ },
+ {
+  "name": "hole-skipped-not-refused",
+  "old": "                raise FileNotFoundError(f\"evolve_cal: row {seq} names payload {rel!r}, which does not exist under {src_tape}\")",
+  "new": "                continue",
+  "expect": "test_a_missing_source_payload_is_refused"
+ },
+ {
+  "name": "verify-ignores-missing-payload",
+  "old": "                missing.append(rel)\n",
+  "new": "",
+  "expect": "test_verify_catches_a_deleted_payload"
+ },
+ {
+  "name": "verify-ignores-payload-content",
+  "old": "            if row.get(\"sha\") and _sha_file(p) != row[\"sha\"]:\n                bad_sha.append(rel)\n            elif (src_tape / rel).read_bytes() != p.read_bytes():\n                bad_sha.append(rel)",
+  "new": "            pass",
+  "expect": "test_verify_catches_a_changed_payload_byte"
+ },
+ {
+  "name": "verify-ignores-changed-row",
+  "old": "        if i >= len(have) or have[i] != line:\n            mismatches += 1",
+  "new": "        if i >= len(have):\n            mismatches += 1",
+  "expect": "test_verify_catches_a_deleted_payload_and_a_changed_row"
+ },
+ {
+  "name": "checkpoint-not-copied",
+  "old": "    shutil.copytree(src_dir, dst_dir, dirs_exist_ok=True)",
+  "new": "    dst_dir.mkdir(parents=True, exist_ok=True)",
+  "expect": "test_stage_copies_every_file"
+ },
+ {
+  "name": "checkpoint-verify-blind-to-extra",
+  "old": "    extra = sorted(k for k in b if k not in a)",
+  "new": "    extra = []",
+  "expect": "test_verify_catches_a_flipped_byte_and_an_extra_file"
+ },
+ {
+  "name": "checkpoint-verify-blind-to-flip",
+  "old": "    mism = sorted(k for k in a if k in b and a[k] != b[k])",
+  "new": "    mism = []",
+  "expect": "test_verify_catches_a_flipped_byte_and_an_extra_file"
+ },
+ {
+  "name": "compare-float-counts-as-discrete",
+  "old": "        if any(k not in _CONTINUOUS_KEYS and not (_has_float(ra.get(k)) or _has_float(rb.get(k))) for k in keys):",
+  "new": "        if keys:",
+  "expect": "test_a_float_only_difference_is_a_difference_but_not_a_discrete_one"
+ },
+ {
+  "name": "compare-first-diff-is-the-last",
+  "old": "        first = i if first is None else first",
+  "new": "        first = i",
+  "expect": "test_a_discrete_difference_is_counted_and_located"
+ },
+ {
+  "name": "compare-ignores-length",
+  "old": "    return {\"identical\": n_a == n_b and rows_diff == 0,",
+  "new": "    return {\"identical\": rows_diff == 0,",
+  "expect": "test_different_lengths_are_not_identical_and_say_so"
+ },
+ {
+  "name": "rows-limit-off-by-one",
+  "old": "        rows = rows[:int(rows_limit)]",
+  "new": "        rows = rows[:int(rows_limit) + 1]",
+  "expect": "test_rows_limit_cuts_the_slice"
+ },
+ {
+  "name": "twin-keeps-its-state",
+  "old": "    if not keep_state:\n        shutil.rmtree(twin_root, ignore_errors=True)",
+  "new": "    if False:\n        shutil.rmtree(twin_root, ignore_errors=True)",
+  "expect": "test_a_twin_writes_its_readings_and_cleans_its_state_copy"
+ },
+ {
+  "name": "journal-digest-without-newlines",
+  "old": "\"journal_sha256\": hashlib.sha256(\"\\n\".join(canon).encode(\"utf-8\")).hexdigest()",
+  "new": "\"journal_sha256\": hashlib.sha256(\"\".join(canon).encode(\"utf-8\")).hexdigest()",
+  "expect": "test_a_twin_writes_its_readings"
+ },
+ {
+  "name": "genome-file-records-the-variant-name",
+  "old": "    (out_dir / \"GENOME.genome\").write_text(genome_text)",
+  "new": "    (out_dir / \"GENOME.genome\").write_text(variant)",
+  "expect": "test_the_variant_reaches"
+ },
+ {
+  "name": "state-hash-constant",
+  "old": "\"state_hash\": mind.org.state_hash(),",
+  "new": "\"state_hash\": \"0\" * 64,",
+  "expect": "test_state_hash_is_the_snapshots_own_digest"
+ },
+ {
+  "name": "first-discrete-is-the-last",
+  "old": "            first_disc = i if first_disc is None else first_disc",
+  "new": "            first_disc = i",
+  "expect": "test_a_discrete_difference_is_counted_and_located"
+ }
 ]
