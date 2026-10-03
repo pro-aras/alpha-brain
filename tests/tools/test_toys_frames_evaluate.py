@@ -127,6 +127,45 @@ class TestANeverAdjacentFrame(unittest.TestCase):
         self.assertLess(sent["gain"]["G"], 0.0)                                                        # a frame that never fires costs its model bits and saves none
 
 
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 18:00 +0400 — STAGE 4b: a PLANT condition carries each record's plant reading (keeps, A, C) and the stream's block (B, the expected value, PLANT-BEATS-NULL-2).
+class TestPlantCondition(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tr, cls.he = fixture()
+        cls.cond = EV.evaluate_condition(cls.tr, cls.he, name="plant", draws=20, web_seeds=(1, 2, 3), kind="plant")
+        cls.sc = CO.Scorer([m.words for m in cls.tr], [m.words for m in cls.he])
+
+    def test_every_record_carries_the_plant_reading_of_its_own_frames(self):
+        from tools.toys.frames import plants as PL
+        for r in self.cond["records"]:
+            want = PL.plant_reading(self.sc, {tuple(f) for f in r["frames"]})
+            self.assertEqual(r["plant"]["kept"], want["kept"])
+            self.assertAlmostEqual(r["plant"]["A"], want["A"], places=9)
+            if want["C"] is None:
+                self.assertIsNone(r["plant"]["C"])
+            else:
+                self.assertAlmostEqual(r["plant"]["C"], want["C"], places=9)
+
+    def test_the_stream_block_is_the_one_frame_sets_gain_and_the_plant_counts(self):
+        from tools.toys.frames import plants as PL
+        b = self.cond["plant_stream"]
+        self.assertAlmostEqual(b["B"], self.sc.gain({ST.PLANT}).G, places=9)
+        self.assertEqual((b["plants_train"], b["plants_held"]), (PL.n_plants(self.tr), PL.n_plants(self.he)))
+        self.assertIn("plant_beats_null2", b)
+        self.assertEqual(self.cond["kind"], "plant")
+
+    def test_a_plain_condition_carries_neither(self):
+        c = EV.evaluate_condition(self.tr, self.he, name="plain", draws=5, web_seeds=(1,), kind="plain")
+        self.assertEqual(c["kind"], "plain")
+        self.assertNotIn("plant_stream", c)
+        for r in c["records"]:
+            self.assertNotIn("plant", r)
+
+    def test_an_unknown_kind_is_refused(self):
+        with self.assertRaises(ValueError):
+            EV.evaluate_condition(self.tr, self.he, name="x", draws=5, web_seeds=(1,), kind="loud")
+
+
 class TestQuietTable(unittest.TestCase):
     def test_the_table_names_each_rule_loud_or_quiet_by_the_gain_against_null1(self):
         tr, he = fixture()

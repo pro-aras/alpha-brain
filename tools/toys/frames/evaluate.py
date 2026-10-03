@@ -15,6 +15,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 from . import anatomy as AN
 from . import compress as CO
 from . import null as NL
+from . import plants as PL
 from . import rules as RL
 from . import streams as ST
 
@@ -53,7 +54,11 @@ def _record(sc: CO.Scorer, r: RL.RuleResult, draws: int, with_nulls: bool) -> Di
 
 
 def evaluate_condition(train: Sequence[ST.Moment], held: Sequence[ST.Moment], name: str = "", draws: int = 100,
-                       web_seeds: Sequence[int] = SEEDS, with_nulls: bool = True) -> Dict[str, object]:
+                       web_seeds: Sequence[int] = SEEDS, with_nulls: bool = True, kind: str = "plain") -> Dict[str, object]:
+    # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 18:01 +0400 — stage 4b: `kind` ('plain' | 'plant' | 'shuffle'); a PLANT condition carries each record's plant reading (keeps, A, C) and the stream's
+    # block (B, the expected value, its decomposition, PLANT-BEATS-NULL-2): AMENDMENT-1 §1.
+    if kind not in ("plain", "plant", "shuffle"):
+        raise ValueError(f"evaluate_condition: kind {kind!r} is not plain | plant | shuffle")
     sc = CO.Scorer([m.words for m in train], [m.words for m in held])
     flat = ST.flat_words(train)
     results: List[RL.RuleResult] = [RL.web_rule(flat, sc, "H", 0)]
@@ -61,8 +66,13 @@ def evaluate_condition(train: Sequence[ST.Moment], held: Sequence[ST.Moment], na
     results.append(RL.sentence_rule(sc.train))
     results.append(RL.mdl_greedy(sc))
     recs = [_record(sc, r, draws, with_nulls) for r in results]
-    return {"name": name, "n_train_moments": len(train), "n_held_moments": len(held), "n_train_words": sum(len(m.words) for m in train),
-            "n_held_words": sc.n_held_words, "V": sc.V, "N0": sc.n0, "draws": draws, "records": recs}
+    cond: Dict[str, object] = {"name": name, "kind": kind, "n_train_moments": len(train), "n_held_moments": len(held), "n_train_words": sum(len(m.words) for m in train),
+                               "n_held_words": sc.n_held_words, "V": sc.V, "N0": sc.n0, "draws": draws, "records": recs}
+    if kind == "plant":
+        for rec, r in zip(recs, results):
+            rec["plant"] = PL.plant_reading(sc, r.frames)
+        cond["plant_stream"] = PL.plant_stream_block(sc, PL.n_plants(train), PL.n_plants(held), draws)
+    return cond
 
 
 # ------------------------------------------------------------------------------------------------------------------ the architect's 17:1x check as a table
