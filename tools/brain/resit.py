@@ -1694,7 +1694,17 @@ def records_from_grade(grade: Mapping[str, object], m2a_rows: Optional[Mapping[s
             for r in per.get(mark, []):
                 item = str(r["item_id"])
                 gradable, covered = bool(r["gradable"]), bool(r["covered"])
-                recs.append({"item": item, "class": klass(item, mark, s), "in_g": gradable and covered, "correct": bool(r["correct"]), "gradable": gradable, "covered": covered})
+                cls = klass(item, mark, s)
+                # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 18:11 +0400 — found by the first REAL daily run: the grader's `M1.graded` block is the 2- and 3-THING items only (brain/scene/marks.py
+                # summarise_pointing: «graded» = n_things >= 2, the bars read it; `all` adds the one-thing items). The law's R6 figure (brain-long-2 M1 fresh: 202 covered of 244) is that block, so the
+                # covered population of M1 excludes a one-thing item; a row that does not say how many things it holds is refused, never guessed. M3 and M2a read their `all` block.
+                if mark == "M1":
+                    if "n_things" not in r:
+                        raise ResitError(f"refused: the grade's row for {item} (M1, set {s}) carries no n_things — the graded split (2- and 3-thing items) cannot be guessed")
+                    graded = int(r["n_things"]) >= 2
+                else:
+                    graded = True
+                recs.append({"item": item, "class": cls, "in_g": gradable and covered and graded, "correct": bool(r["correct"]), "gradable": gradable, "covered": covered, "graded": graded})
             out[mark][s] = recs
     for s, rows in (m2a_rows or {}).items():
         recs = []

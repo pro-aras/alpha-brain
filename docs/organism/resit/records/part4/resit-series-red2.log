@@ -1,0 +1,41 @@
+....EFFF.............
+======================================================================
+ERROR: test_a_covered_gradable_one_thing_m1_item_is_not_in_the_graded_population (tests.tools.test_resit_series.TestGradedPopulation.test_a_covered_gradable_one_thing_m1_item_is_not_in_the_graded_population)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 105, in test_a_covered_gradable_one_thing_m1_item_is_not_in_the_graded_population
+    self.assertEqual((x["gradable"], x["covered"], x["in_g"], x["graded"]), (True, True, False, False))
+                                                              ~^^^^^^^^^^
+KeyError: 'graded'
+
+======================================================================
+FAIL: test_a_row_with_no_n_things_is_refused_by_name_the_graded_split_cannot_be_guessed (tests.tools.test_resit_series.TestGradedPopulation.test_a_row_with_no_n_things_is_refused_by_name_the_graded_split_cannot_be_guessed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 129, in test_a_row_with_no_n_things_is_refused_by_name_the_graded_split_cannot_be_guessed
+    with self.assertRaises(R.ResitError) as cm:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: ResitError not raised
+
+======================================================================
+FAIL: test_the_old_reading_every_gradable_covered_item_breaks_the_partition_the_plant_is_caught (tests.tools.test_resit_series.TestGradedPopulation.test_the_old_reading_every_gradable_covered_item_breaks_the_partition_the_plant_is_caught)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 121, in test_the_old_reading_every_gradable_covered_item_breaks_the_partition_the_plant_is_caught
+    self.assertNotEqual([r["in_g"] for r in bad["M1"]["fresh"]], [r["in_g"] for r in rec["M1"]["fresh"]], "the plant must change the data")
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [True, True, False, False, True] == [True, True, False, False, True] : the plant must change the data
+
+======================================================================
+FAIL: test_the_partition_holds_against_the_graded_aggregate_with_the_one_thing_items_present (tests.tools.test_resit_series.TestGradedPopulation.test_the_partition_holds_against_the_graded_aggregate_with_the_one_thing_items_present)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 113, in test_the_partition_holds_against_the_graded_aggregate_with_the_one_thing_items_present
+    self.assertTrue(res["ok"], res)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'ok': False, 'rows': [{'mark': 'M1', 'set': 'fresh', 'items_classes': 5, 'n_classes': 3, 'k_classes': 2, 'n_agg': 2, 'k_agg': 1, 'items_agg': None, 'note': '', 'ok': False}, {'mark': 'M1', 'set': 's1b1', 'items_classes': 5, 'n_classes': 3, 'k_classes': 2, 'n_agg': 2, 'k_agg': 1, 'items_agg': None, 'note': '', 'ok': False}, {'mark': 'M2a', 'set': 'fresh', 'items_classes': 2, 'n_classes': 2, 'k_classes': 1, 'n_agg': 2, 'k_agg': 1, 'items_agg': None, 'note': '', 'ok': True}, {'mark': 'M2a', 'set': 's1b1', 'items_classes': 2, 'n_classes': 2, 'k_classes': 1, 'n_agg': 2, 'k_agg': 1, 'items_agg': None, 'note': '', 'ok': True}, {'mark': 'M3', 'set': 'fresh', 'items_classes': 1, 'n_classes': 1, 'k_classes': 1, 'n_agg': 1, 'k_agg': 1, 'items_agg': None, 'note': '', 'ok': True}, {'mark': 'M3', 'set': 's1b1', 'items_classes': 1, 'n_classes': 1, 'k_classes': 1, 'n_agg': 1, 'k_agg': 1, 'items_agg': None, 'note': '', 'ok': True}]}
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.005s
+
+FAILED (failures=3, errors=1)

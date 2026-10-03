@@ -32,11 +32,11 @@ def grade_fixture():
     """The real grade.json's shape, small: items rows for M1 and M3, aggregates under sets.<s>.marks, M2a under roads.LAW."""
     g = {"items": {}, "sets": {}}
     for s in SETS:
-        m1 = [{"item_id": f"M1:{s}:0", "gradable": True, "covered": True, "correct": True},
-              {"item_id": f"M1:{s}:1", "gradable": True, "covered": True, "correct": False},
-              {"item_id": f"M1:{s}:2", "gradable": True, "covered": False, "correct": False},      # not covered: left out of the covered rate
-              {"item_id": f"M1:{s}:3", "gradable": False, "covered": True, "correct": False}]      # unheard: not gradable, left out
-        m3 = [{"item_id": f"M3:{s}:0", "gradable": True, "covered": True, "correct": True}]
+        m1 = [{"item_id": f"M1:{s}:0", "gradable": True, "covered": True, "correct": True, "n_things": 2},
+              {"item_id": f"M1:{s}:1", "gradable": True, "covered": True, "correct": False, "n_things": 3},
+              {"item_id": f"M1:{s}:2", "gradable": True, "covered": False, "correct": False, "n_things": 2},      # not covered: left out of the covered rate
+              {"item_id": f"M1:{s}:3", "gradable": False, "covered": True, "correct": False, "n_things": 2}]      # unheard: not gradable, left out
+        m3 = [{"item_id": f"M3:{s}:0", "gradable": True, "covered": True, "correct": True, "n_things": 2}]
         g["items"][s] = {"M1": m1, "M3": m3, "M6": []}
         g["sets"][s] = {"marks": {"M1": {"graded": {"n_covered": 2, "covered": 0.5}}, "M3": {"all": {"n_covered": 1, "covered": 1.0}},
                                   "roads": {"LAW": {"M2a": {"all": {"n": 2, "refusal": 0.5}}}}}}
@@ -84,6 +84,51 @@ class TestRecords(unittest.TestCase):
         rec = R.records_from_grade(grade_fixture(), m2, R.item_class_map(asks_fixture()))
         x = {r["item"]: r for r in rec["M2a"]["fresh"]}["M2a:fresh:0"]
         self.assertEqual((x["in_g"], x["correct"]), (False, False))
+
+
+class TestGradedPopulation(unittest.TestCase):
+    """The REAL grade's `M1.graded` is the 2- and 3-thing items only (brain/scene/marks.py summarise_pointing: «graded» = n_things >= 2, the bars read it; `all` adds the one-thing items).
+    The law's own R6 figure (brain-long-2 M1 fresh: 202 covered of 244) is that block. A real-data daily run found the class tables counting 353 (every gradable covered item)."""
+
+    def one_thing_world(self):
+        g = grade_fixture()
+        asks = asks_fixture()
+        for s in SETS:
+            g["items"][s]["M1"].append({"item_id": f"M1:{s}:4", "gradable": True, "covered": True, "correct": True, "n_things": 1})      # trivial: one thing in view
+            asks.append({"item": f"M1:{s}:4", "mark": "M1", "set": s, "phrase": ["circle"], "class": "shape_only", "form": "point"})
+        return g, asks
+
+    def test_a_covered_gradable_one_thing_m1_item_is_not_in_the_graded_population(self) -> None:
+        g, asks = self.one_thing_world()
+        rec = R.records_from_grade(g, m2a_fixture(), R.item_class_map(asks))
+        x = {r["item"]: r for r in rec["M1"]["fresh"]}["M1:fresh:4"]
+        self.assertEqual((x["gradable"], x["covered"], x["in_g"], x["graded"]), (True, True, False, False))
+        t = R.class_tables(rec)["M1"]["sets"]["fresh"]["shape_only"]
+        self.assertEqual((t["items"], t["n"], t["left_out"]), (2, 1, 1), "counted among the class's items, left out of its covered rate")
+
+    def test_the_partition_holds_against_the_graded_aggregate_with_the_one_thing_items_present(self) -> None:
+        g, asks = self.one_thing_world()
+        rec = R.records_from_grade(g, m2a_fixture(), R.item_class_map(asks))
+        res = R.partition_check(rec, g)
+        self.assertTrue(res["ok"], res)
+
+    def test_the_old_reading_every_gradable_covered_item_breaks_the_partition_the_plant_is_caught(self) -> None:
+        g, asks = self.one_thing_world()
+        rec = R.records_from_grade(g, m2a_fixture(), R.item_class_map(asks))
+        bad = copy.deepcopy(rec)
+        for r in bad["M1"]["fresh"]:
+            r["in_g"] = r["gradable"] and r["covered"]                       # the defect: the one-thing item counted
+        self.assertNotEqual([r["in_g"] for r in bad["M1"]["fresh"]], [r["in_g"] for r in rec["M1"]["fresh"]], "the plant must change the data")
+        res = R.partition_check(bad, g)
+        self.assertFalse(res["ok"])
+        self.assertEqual([(r["mark"], r["set"]) for r in res["rows"] if not r["ok"]], [("M1", "fresh")])
+
+    def test_a_row_with_no_n_things_is_refused_by_name_the_graded_split_cannot_be_guessed(self) -> None:
+        g = grade_fixture()
+        del g["items"]["fresh"]["M1"][0]["n_things"]
+        with self.assertRaises(R.ResitError) as cm:
+            R.records_from_grade(g, m2a_fixture(), R.item_class_map(asks_fixture()))
+        self.assertIn("n_things", str(cm.exception))
 
 
 class TestTables(unittest.TestCase):

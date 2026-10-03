@@ -65,7 +65,7 @@ def grade(root, journal, scored, label, genome=None):
                    "marks": {"M1": {"graded": {"n_covered": len(m1), "covered": _rate(r["answer"]["hyp"] == 0 for r in m1)}},
                              "M3": {"all": {"n_covered": 0, "covered": None}},
                              "roads": {"LAW": {"M2a": {"all": {"n": len(m2), "refusal": _rate(r["answer"]["hyp"] == 1 for r in m2)}}}}}}
-        items[s] = {"M1": [{"item_id": r["item"], "gradable": True, "covered": True, "correct": r["answer"]["hyp"] == 0} for r in m1], "M3": [], "M6": []}
+        items[s] = {"M1": [{"item_id": r["item"], "gradable": True, "covered": True, "correct": r["answer"]["hyp"] == 0, "n_things": 2} for r in m1], "M3": [], "M6": []}
     return {"label": label, "root": str(root), "counts": {"tape_rows": len(rows)}, "sets": sets, "items": items,
             "M5": {"n": 0, "refused": None, "rows": []}, "M6_pooled": {"covered": 0.5}, "meeting": {"read_by": "stub"}}
 '''
@@ -423,7 +423,7 @@ class TestDailyRefusals(DailyBase):
         g = self.items.grader / "tools" / "brain" / "grade_life.py"
         before = g.read_bytes()
         g.write_text(g.read_text().replace('for r in m1], "M3": [], "M6": []}',
-                                           'for r in m1] + [{"item_id": "M1:ghost", "gradable": True, "covered": True, "correct": True}], "M3": [], "M6": []}'))
+                                           'for r in m1] + [{"item_id": "M1:ghost", "gradable": True, "covered": True, "correct": True, "n_things": 2}], "M3": [], "M6": []}'))
         self.assertNotEqual(before, g.read_bytes(), "the plant must change the bytes")
         live = write_live(self.base)
         p, res, rows = self.daily(live)
