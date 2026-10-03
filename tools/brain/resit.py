@@ -581,3 +581,357 @@ def append_series(out_dir, row: Mapping[str, object]) -> None:
             r.get("stamp"), r.get("kind"), (r.get("state") or {}).get("n_learned", ""), r.get("post_origin_learned", ""), r.get("eye_changed", ""),
             r.get("verdict_copy", r.get("verdict_copy_note", "")), r.get("refused") or r.get("skipped") or ""))
     atomic_write(out / "RESIT.md", "\n".join(lines) + "\n")
+
+
+# ================================================================================================ Part 2 — the CHILDREN (law §1.0, §1.4, §1.5)
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 15:56 +0400 — the ANSWER child (the SUBJECT) and the GRADE child (the GRADER): two processes, each BY PATH with the same flags.
+class ShadowError(Refused):
+    """R11: a module of the life's packages came from another tree, or was imported before the import step."""
+
+
+def jsonable(v):
+    """creature.mind._jsonable, copied (pinned against it by a parity test): numpy scalars and arrays -> plain Python; no key or list re-ordered."""
+    import numpy as np
+    if isinstance(v, dict):
+        return {(k if isinstance(k, str) else str(jsonable(k))): jsonable(x) for k, x in v.items()}
+    if isinstance(v, (list, tuple)):
+        return [jsonable(x) for x in v]
+    if isinstance(v, np.ndarray):
+        return jsonable(v.tolist())
+    if isinstance(v, np.generic):
+        return v.item()
+    return v
+
+
+def pre_import_check(prefixes: Sequence[str] = MODULE_PREFIXES) -> None:
+    """R11: before the import step NO module of the life's packages may be in sys.modules — a package imported earlier keeps another tree's __path__ and
+    silently serves every later submodule from there (what `python -m tools.brain.resit` does by accident)."""
+    pre = sorted(m for m in sys.modules if m.split(".")[0] in prefixes)
+    if pre:
+        raise ShadowError(f"R11: {len(pre)} module(s) of {list(prefixes)} were imported before the import step, e.g. {pre[:6]} — refused")
+
+
+def modules_report(code: str, prefixes: Sequence[str] = MODULE_PREFIXES) -> Dict[str, object]:
+    """R11: every loaded module of the four packages must have its realpath under realpath(<code>); the sha256 of each file goes into the row, and their
+    digest is part of the glance cache's key (a cache drawn under other code is never reused)."""
+    code_real = os.path.realpath(code)
+    bad: List[str] = []
+    files: Dict[str, str] = {}
+    for name, mod in list(sys.modules.items()):
+        if name.split(".")[0] not in prefixes:
+            continue
+        f = getattr(mod, "__file__", None)
+        paths = [f] if f else list(getattr(mod, "__path__", None) or [])
+        for pth in paths:
+            rp = os.path.realpath(pth)
+            if not (rp == code_real or rp.startswith(code_real + os.sep)):
+                bad.append(f"{name} ({rp})")
+            elif f and os.path.isfile(rp):
+                files[os.path.relpath(rp, code_real)] = sha256_file(rp)
+    if bad:
+        raise ShadowError(f"R11: {len(bad)} module(s) are not under {code_real}: {sorted(bad)[:6]} — refused")
+    mods = [{"rel": r, "sha256": s} for r, s in sorted(files.items())]
+    digest = sha256_bytes("".join(f"{m['rel']}\0{m['sha256']}\n" for m in mods).encode("utf-8"))
+    return {"modules": mods, "digest": digest}
+
+
+def check_eye_pin(mutable_keys: Sequence[str]) -> Dict[str, int]:
+    """R13 (AM2): EVOLVE cannot move the RETINA, GAZE, SENSE colour or BRAIN lines — creature/genes.py's MUTABLE_KEYS must name none of them. If one
+    did, a changed eye between rows would no longer be an anomaly, and the series would not hold one thing fixed."""
+    bad = [k for k in mutable_keys if str(k).startswith(EYE_LINE_PREFIXES)]
+    if bad:
+        raise Refused(f"R13: MUTABLE_KEYS names eye/brain key(s) {bad} — EVOLVE could move what this series holds fixed; refused")
+    return {"n_mutable": len(mutable_keys), "eye_or_brain": 0}
+
+
+class GlanceCache:
+    """OUT/glances.pkl: {key: glance dict}. The key carries the canvas sha, the in-force RETINA / GAZE / colour line hashes AND the digest of the life's own
+    modules (the law's key plus the code: a cache drawn under other code is never reused). Counts hits and misses; an unreadable file is ignored and said."""
+
+    def __init__(self, path: Optional[str]):
+        import pickle
+        self.path = Path(path) if path else None
+        self.entries: Dict[str, object] = {}
+        self.hits = self.misses = 0
+        self.note = ""
+        self.dirty = False
+        if self.path is not None and self.path.exists():
+            try:
+                d = pickle.loads(self.path.read_bytes())
+                if not (isinstance(d, dict) and d.get("version") == 1 and isinstance(d.get("entries"), dict)):
+                    raise ValueError("not a version-1 cache")
+                self.entries = d["entries"]
+            except Exception as e:
+                self.entries = {}
+                self.note = f"cache file unreadable ({type(e).__name__}: {e}); ignored"
+
+    def get(self, key: str):
+        g = self.entries.get(key)
+        if g is None:
+            self.misses += 1
+        else:
+            self.hits += 1
+        return g
+
+    def put(self, key: str, g) -> None:
+        import copy
+        self.entries[key] = copy.deepcopy(g)
+        self.dirty = True
+
+    def save(self) -> None:
+        import pickle
+        if self.path is not None and self.dirty:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = self.path.with_name(self.path.name + ".tmp")
+            tmp.write_bytes(pickle.dumps({"version": 1, "entries": self.entries}, protocol=4))
+            os.replace(tmp, self.path)
+
+    def info(self) -> Dict[str, object]:
+        return {"path": str(self.path) if self.path else None, "hits": self.hits, "misses": self.misses, "note": self.note}
+
+
+def _canon_default(obj) -> str:
+    return json.dumps(obj, sort_keys=True, default=str)
+
+
+def cmd_answer(spec_path: str) -> int:
+    """The ANSWER child (the SUBJECT): the LIFE's own code first on sys.path; a frozen brain; the tape read in the mind's own order; every ask answered as the
+    mind answers it (creature/mind.py: _consume_ask, _brain_canvas, _answer_ask) and written as the mind's own `answer` row. Nothing is ever learned."""
+    spec = json.loads(Path(spec_path).read_text())
+    flags = check_flags(sys.flags.dont_write_bytecode, sys.flags.isolated, os.environ)
+    code = os.path.realpath(spec["code"])
+    pre_import_check()
+    sys.path.insert(0, code)
+    cpu0 = time.process_time()
+    import numpy as np
+    from PIL import Image
+    from genome import gaze as G
+    from genome.machinery import parse_genome
+    from genome.brain import Brain
+    from creature.tape import read_tape, _resolve_tape_dir
+    from creature import organs_road as road
+    from creature.genes import MUTABLE_KEYS
+    rep = modules_report(code)
+    eye_pin = check_eye_pin(MUTABLE_KEYS)
+    out_dir = Path(spec["out_dir"])
+    out_dir.mkdir(parents=True, exist_ok=True)
+    items_root = Path(spec["items_root"])
+    tape_decl = spec.get("tape_decl")
+    tape_dir = _resolve_tape_dir(items_root, tape_decl)
+    cache = GlanceCache(spec.get("glance_cache"))
+
+    states: Dict[Tuple[str, str], Dict[str, object]] = {}
+
+    def load_state(entry: Mapping[str, object]) -> Dict[str, object]:
+        key = (str(entry["dir"]), str(entry["genome"]))
+        if key in states:
+            return states[key]
+        gtext = Path(entry["genome"]).read_text()
+        g = parse_genome(gtext)
+        cfg = dict(g.declared["BRAIN"])
+        try:
+            b = Brain.load(Path(entry["dir"]) / "brain", cfg)
+        except Exception as e:
+            raise Refused(f"state {entry['dir']}: Brain.load refused it ({type(e).__name__}: {e})")
+        st = {"brain": b, "genome": g, "lines": genome_line_hashes(gtext),
+              "meta": {"name": entry["name"], "dir": str(entry["dir"]), "genome": str(entry["genome"]), "genome_sha256": sha256_bytes(gtext.encode("utf-8")),
+                       "parsed": {"retina": sha256_bytes(_canon_default(g.retina).encode()), "gaze": sha256_bytes(_canon_default(g.gaze).encode()),
+                                  "colour": sha256_bytes(_canon_default(g.colour).encode()), "brain": sha256_bytes(_canon_default(cfg).encode())},
+                       "lines": genome_line_hashes(gtext), "state_hash": b.state_hash(), "n_learned": int(b.n_learned),
+                       "calibrated_at_load": b.calibrated_at, "n_calibrations_load": int(b.n_calibrations)}}
+        states[key] = st
+        return st
+
+    entries = list(spec["states"])
+
+    def pick_state(setname: Optional[str]) -> Dict[str, object]:
+        for e in entries:
+            if setname is not None and e["name"] == setname:
+                return load_state(e)
+        for e in entries:
+            if e["name"] == "*":
+                return load_state(e)
+        raise Refused(f"no state for the set {setname!r} and no default state (`*`) — the spec names {[e['name'] for e in entries]}")
+
+    rows_out: List[Dict[str, object]] = []
+    pending: Dict[str, List[Dict[str, object]]] = {}
+    held_payloads: List[Dict[str, object]] = []
+    active: Optional[Dict[str, object]] = None
+    asks_seen = 0
+    turn_check: Optional[Dict[str, object]] = None
+    turn_spec = spec.get("check_turn")
+
+    def glance(row: Mapping[str, object], st: Mapping[str, object]):
+        ln = st["lines"]
+        key = f"{row['sha']}|{ln['retina']}|{ln['gaze']}|{ln['colour']}|{rep['digest']}"
+        g = cache.get(key)
+        if g is None:
+            rgb = np.asarray(Image.open(tape_dir / row["payload"]).convert("RGB"), dtype=np.uint8)
+            g = G.glances(rgb, st["genome"].retina, st["genome"].gaze, "surprise", row["sha"], colour=st["genome"].colour, predicted=None)
+            cache.put(key, g)
+        return g
+
+    def answer(ask: Mapping[str, object], g, at: str, eye_seq: Optional[int], cv: Dict[str, object]) -> None:
+        payload = ask["payload"]
+        form = str(payload.get("form"))
+        view = None
+        if g is not None:
+            view = cv.get("view") or road.eye_view(g)
+            cv["view"] = view
+        try:
+            ans = jsonable(active["brain"].ask(payload, g))
+        except Exception as e:            # the organ's own refusal of a malformed ask is ANSWERED as refused, by name — as the mind does (#230)
+            if type(e).__name__ != "BrainError":
+                raise
+            ans = {"kind": "refused", "reason": str(e), "raw": {"refused": str(e)}}
+        rows_out.append({"kind": "answer", "by": "brain", "item": payload.get("item"), "mark": payload.get("mark"), "form": form, "answer": ans,
+                         "moment": ask["moment"], "seq": ask["seq"], "eye_seq": eye_seq, "at": at,
+                         "fix": (None if view is None else [[int(y), int(x)] for (y, x) in view[0]]),
+                         "hyps": (None if view is None else [[int(i) for i in h.members] for h in view[2]]), "detail": None})
+
+    for row in read_tape(items_root, tape_decl):
+        sense = row["sense"]
+        meta = row.get("meta") or {}
+        moment = meta.get("moment")
+        if sense == "ask":
+            payload = json.loads((tape_dir / row["payload"]).read_text())
+            ask = {"seq": int(row["seq"]), "at": row["at"], "moment": meta.get("moment"), "payload": payload}
+            asks_seen += 1
+            form = payload.get("form")
+            if form == "begin" or active is None:
+                active = pick_state(payload.get("set") if form == "begin" else None)
+            if form in ("begin", "end", "why"):
+                answer(ask, None, str(row["at"]), None, {})
+            else:
+                pending.setdefault(str(meta.get("moment")), []).append(ask)
+        elif sense == "eye":
+            asks = pending.pop(str(moment), None) if moment is not None else None
+            if asks:
+                g = glance(row, active)
+                cv: Dict[str, object] = {}
+                for ask in asks:
+                    answer(ask, g, str(row["at"]), int(row["seq"]), cv)
+                    if len(held_payloads) < 8:
+                        held_payloads.append(ask["payload"])
+                if turn_spec and turn_check is None:
+                    turn_check = _turn_check(Brain, parse_genome, active, held_payloads[: int(turn_spec.get("n_asks", 3))], g, int(turn_spec.get("world_seed", 0)),
+                                             entries[0], jsonable)
+    unanswered = sum(len(v) for v in pending.values())
+    cache.save()
+    answers_text = "".join(json.dumps(r) + "\n" for r in rows_out)
+    (out_dir / "answers.jsonl").write_text(answers_text, encoding="utf-8")
+    smeta = []
+    for st in states.values():
+        b = st["brain"]
+        m = dict(st["meta"])
+        m.update(state_hash_end=b.state_hash(), calibrated_at_end=b.calibrated_at, n_calibrations_end=int(b.n_calibrations), n_learned_end=int(b.n_learned))
+        smeta.append(m)
+    meta = {"flags": flags, "code": code, "python": sys.version.split()[0], "modules": rep["modules"], "modules_digest": rep["digest"], "eye_pin": eye_pin,
+            "states": smeta, "asks_seen": asks_seen, "answered": len(rows_out), "unanswered": unanswered, "glance_cache": cache.info(),
+            "turn_check": turn_check, "cpu_s": round(time.process_time() - cpu0, 3), "answers_sha256": sha256_bytes(answers_text.encode("utf-8"))}
+    atomic_write(out_dir / "answer-meta.json", json.dumps(meta, indent=1, sort_keys=True) + "\n")
+    print(json.dumps({"ok": True, "answered": len(rows_out), "unanswered": unanswered}))
+    return 0
+
+
+def _turn_check(Brain, parse_genome, active: Mapping[str, object], payloads: Sequence[Mapping[str, object]], g, world_seed: int,
+                entry: Mapping[str, object], jsonable_fn) -> Dict[str, object]:
+    """R14 (AM1 b): `Brain.turn` is read-only — on a SECOND load of the same state, a turn leaves state_hash() and the answers to a fixed set of asks
+    unchanged. R9 and P0 count a `turn` row as moving nothing; this is what makes that true."""
+    cfg = dict(parse_genome(Path(active["meta"]["genome"]).read_text()).declared["BRAIN"])
+    b2 = Brain.load(Path(active["meta"]["dir"]) / "brain", cfg)
+    probe = [p for p in payloads if p.get("form") in ("point", "what", "say")][:5]
+
+    def asks() -> List[str]:
+        out = []
+        for p in probe:
+            try:
+                out.append(canon(jsonable_fn(b2.ask(p, g))))
+            except Exception as e:
+                out.append(f"error:{type(e).__name__}:{e}")
+        return out
+
+    h0, pre = b2.state_hash(), asks()
+    b2.turn(g, scene=0, world_seed=int(world_seed), says=1, asks=1)
+    h1, post = b2.state_hash(), asks()
+    res = {"state_hash_equal": h0 == h1, "answers_equal": pre == post, "n_asks": len(probe)}
+    if not (res["state_hash_equal"] and res["answers_equal"]):
+        raise Refused(f"R14: Brain.turn is not read-only on this code — state hash {'kept' if res['state_hash_equal'] else 'CHANGED'}, "
+                      f"answers {'kept' if res['answers_equal'] else 'CHANGED'}; the early/late split and P0 count a turn row as moving nothing")
+    return res
+
+
+def grader_m2a_rows(GL, items_root: str, journal: str, genome: Optional[str]) -> Dict[str, List[Dict[str, object]]]:
+    """Per-item M2a refusal, by the PINNED GRADER's own functions (the grade holds the aggregate only): for each sitting set, `M.grade_m2a` called on
+    ONE item with the road's own «none» key. Nothing here re-implements a mark."""
+    life = GL.Life(Path(items_root), Path(journal), Path(genome) if genome else None)
+    out: Dict[str, List[Dict[str, object]]] = {}
+    for tset in list(life.cfg.get("sitting") or []):
+        sc = GL.SetCtx(life, tset)
+        A = GL.offline_answers(life, sc)
+        key = A["m2a_keys"]["LAW"]
+        rows = []
+        for it in sc.items.get("M2a", []):
+            r = GL.M.grade_m2a([it], A["point"], key)["all"]
+            rows.append({"item_id": str(it["item_id"]), "answered": r["n"] == 1, "refused": (bool(r["refusal"] >= 0.5) if r["n"] == 1 else None)})
+        out[tset] = rows
+    return out
+
+
+def cmd_grade(spec_path: str) -> int:
+    """The GRADE child (the GRADER): the pinned grader's code first on sys.path; `grade()` is called as a LIBRARY (never `main()`, which writes into the
+    life's root); grade.json is written as the grader's own main writes it."""
+    spec = json.loads(Path(spec_path).read_text())
+    check_flags(sys.flags.dont_write_bytecode, sys.flags.isolated, os.environ)
+    gcode = os.path.realpath(spec["grader_code"])
+    pre_import_check()
+    sys.path.insert(0, gcode)
+    cpu0 = time.process_time()
+    from tools.brain import grade_life as GL
+    rep = modules_report(gcode)
+    genome = spec.get("genome")
+    g = GL.grade(Path(spec["items_root"]), Path(spec["journal"]), Path(spec["scored"]), spec["label"], Path(genome) if genome else None)
+    default = getattr(getattr(GL, "R", None), "_jsonable", str)
+    out = Path(spec["out_dir"])
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "grade.json").write_text(json.dumps(g, indent=1, sort_keys=True, default=default))
+    extra = None
+    if spec.get("m2a_rows"):
+        extra = grader_m2a_rows(GL, spec["items_root"], spec["journal"], genome)
+        atomic_write(out / "items_extra.json", json.dumps({"m2a": extra}, indent=1, sort_keys=True) + "\n")
+    meta = {"grader_code": gcode, "grader_sha256": sha256_file(Path(gcode) / "tools" / "brain" / "grade_life.py"), "modules": rep["modules"],
+            "modules_digest": rep["digest"], "m2a_rows": bool(extra), "cpu_s": round(time.process_time() - cpu0, 3), "python": sys.version.split()[0]}
+    atomic_write(out / "grade-meta.json", json.dumps(meta, indent=1, sort_keys=True) + "\n")
+    print(json.dumps({"ok": True}))
+    return 0
+
+
+def _spec_arg(argv: Sequence[str]) -> str:
+    if len(argv) != 2 or argv[0] != "--spec":
+        raise SystemExit("usage: resit.py {answer|grade} --spec <json>")
+    return argv[1]
+
+
+def main(argv: Optional[Sequence[str]] = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if not argv or argv[0] not in ("run", "answer", "grade"):
+        print("usage: python3 -B -I tools/brain/resit.py {run|answer|grade} …", file=sys.stderr)
+        return 64
+    cmd, rest = argv[0], argv[1:]
+    try:
+        if cmd == "answer":
+            return cmd_answer(_spec_arg(rest))
+        if cmd == "grade":
+            return cmd_grade(_spec_arg(rest))
+        return cmd_run(rest)
+    except ResitError as e:
+        print(json.dumps({"refused": str(e), "class": type(e).__name__}))
+        return 2
+
+
+def cmd_run(argv: Sequence[str]) -> int:      # replaced below by Part 3, the orchestrator
+    raise ResitError("refused: the orchestrator is not built yet")
+
+
+if __name__ == "__main__":
+    sys.exit(main())
