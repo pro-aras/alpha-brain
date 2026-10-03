@@ -88,5 +88,38 @@ N1: 21 twins ≈ 11.7 CPU-h · N2: 11 ≈ 6.1 · P-BAD: 3 mutant twins on S1 (th
 6. **The brain genome.** An outer loop over growth and learning rules is weeks of compute (RESEARCH-2026-10-03 §BRAIN GENOME). It needs this gate's bands, its planted-good control and its confirmation slice first, applied to its own fitness.
 
 Signed: Claude (Opus 5.5, swarm architect), 2026-10-03 11:21 +0400 — the author.
-Co-signed: the builder (Claude Sonnet 5.5, claims) — pending, after its adversarial read and the last edit.
+
+---
+
+## AMENDMENT 1 — the builder's adversarial read (2026-10-03 11:34 +0400, before any code or run)
+
+*The claims lane read the text at 73f0e96 (sha256 9dcbf9cc…) against the code and refused to co-sign on a STOP-level premise defect. The author verified A1 by grep (the modules that exist — `genome/machinery.py`, `sleep.py`, `gaze.py`, `questions.py`, `predict.py` — hold 0 RNG draws and never read the seed; `.seed` is read only in `creature/mind.py`, `creature/think_thread.py`, `genome/web.py`) and accepts all eight. Where this amendment and §1–§5 disagree, this amendment rules.*
+
+- **A1 · THE SEED DOES NOT REACH THE CELLS — §2 N1's premise was false.** The organism's machinery draws no random number. In a twin restored from a checkpoint, `_act_rng` and `_hands_rng` are re-built from the seed and then OVERWRITTEN by the snapshot's saved states (`creature/mind.py` resume); only `_think_rng` and the think thread's boundary generator are re-derived from `SEED + k`, and what think picks reaches is bookkeeping (beliefs, predictions, `frames_filed`, questions, the mouth). `q1_seen` is read from the twin's saved organism and ledgers, and `confirmed_share` from the organism's glances. **Predicted: across seed twins `q1_seen` and `confirmed_share` are BIT-IDENTICAL (σ = 0); only `frames_filed` and the think/act journal rows vary.** §5.1's «the seed changes WHICH cells are born» is struck as false for this code. Consequences:
+  - **(i) C1 becomes per GATED DIMENSION:** for every dimension a band is claimed for, its null must hold ≥ 3 distinct values and σ > 0; a dimension that fails has NO band, and the law says so.
+  - **(ii) The null for `q1_seen` and `confirmed_share` is the ε-TWIN:** the same genome with `DELTA lr 0.05 · (1 + k·ε)`, k = 1 … 20, a perturbation that REACHES the organism and is merit-negligible. Its dose-response is checked at ε ∈ {1e-6, 1e-5, 1e-4} (5 twins at each of the two non-chosen levels): the spread of the readings must be flat in ε on the plateau used. If it grows with ε, that ε is a merit step, not noise, and a smaller ε is taken. The chosen ε is the smallest level whose 5 twins do not all equal the incumbent bit for bit. **The seed twins stay, but only as the null of `frames_filed`** (10 twins, not 20).
+  - **(iii) THE STOP TEST, first and cheap.** On a SHORT slice, ONE pair `SEED` vs `SEED + 1`, and ONE pair ε = 1e-5 vs the incumbent. Compare `org.row_hash()`, `q1_seen` and the journals. Predicted: the seed pair's organism EQUAL and its think rows different; the ε pair's organism DIFFERENT. If the ε pair's organism is equal too, nothing small reaches the cells, the noise model is degenerate, and the builder RAISES before any CPU-hour is spent.
+- **A2 · The null has the test's PAIRING.** Production compares a same-seed pair (incumbent and mutant both `SEED`, one gene apart). ε-twins are same-seed pairs, so they are the PRIMARY null. Seed twins (different seed, same genome) bound only the think-driven reading.
+- **A3 · The cost's null from the same twins (D6, corrected).** Process CPU does not remove load dependence: contention inflates a CPU-second as it inflates wall time (#242 addendum: the identical 100 epochs cost 119 ms alone, 207 among three, 689 among nine). The cost ratio is therefore BANDED like the other dimensions, from the CPU-second ratios of the N1 twins (identical or ε-identical genomes run one after another: their ratio spread IS the cost's noise), and `/proc/loadavg` and `/proc/pressure/cpu` are recorded at each twin's start and end. The fixed 1.2 stays as a POLICY cap printed beside the band; a mutant is cost-REGRESSED only if its ratio is outside the band AND above 1.2.
+- **A4 · The band's arithmetic.**
+  - (i) σ is ESTIMATED: the 21 values of a dimension on S1 (the incumbent + 20 ε-twins, 20 df) give σ̂.
+  - (ii) The production Δ is a difference of TWO draws, so under no merit difference it is centred at 0 with σ_Δ = √2·σ̂. The band edge is **t(20, 1 − 0.0083) · σ_Δ = 2.614 · σ_Δ ≈ 3.70 σ̂** (one-sided 0.0083 per side per dimension; computed with scipy, printed with its inputs). The edge is NOT centred on the mean of the k differences against ONE incumbent: that mean is the incumbent's own luck on that slice (μ_X − X_0) and transfers to no other round.
+  - (iii) The rank-band fallback (for a non-normal null) at n = 21 has error 1/22 ≈ 4.5 % per side per dimension: the «0.025 family-wise» holds only for the normal band, and a dimension on the rank band says so beside its verdict.
+- **A5 · P-GOOD's choice of degradation** is made AFTER N1, by the deterministic first-fit rule of §2's list (the first whose own Δq1 on S1 exceeds 2 × the band half-width). «Chosen BEFORE any band is read» is struck. The plant's Δ on S1 is printed beside the record's Δ on its own slice.
+- **A6 · P-BAD on their OWN slices.** #10 (MERGE.theta_m 0.9834, −8 items) and #4 (DELTA.lr 0.09, −7 items) were measured on rounds 10's and 4's slices; their twins are deterministic, so their recorded Δs are re-read under the bands with NO new twin, as READINGS, if N2 shows the band transfers across the life. Only the recorded plant `BIRTH.theta_n 0.5` is run on S1. **C2 becomes: that plant REGRESSED on S1 (1 of 1)**, with #10 and #4 printed.
+- **A7 · R5 and N2.** #5's own-slice Δ is on the record (+2 items on round 5's slice = S2), so its re-judge there costs no twin, only S2's band (N2). The confirmation on the NEXT disjoint slice keeps its 2 twins. N2's transfer test is an F-test on the two variances (S1: 20 df; S2: 11 values, 10 df), two-sided 0.05. Refused transfer = the band is age-dependent, stated, and the next law computes it per round.
+- **A8 · The proposer's redraw.** `draw_mutation(seed, epoch, proposal_no)` cannot see the incumbent, so the redraw lives in `mutate_genome_text` / the worker: when the drawn value equals the incumbent's, the SAME generator's next integer draw (gene index) and value draw are taken, and so on until they differ. The stream rule is pinned by a test. C5's check uses the per-epoch incumbent text (v1 after #5's adoption, KWTA 4).
+
+**The price, re-counted:**
+- the STOP test (two short-slice pairs) ≈ 0.5 CPU-h;
+- S1: the incumbent + 20 ε-twins + 10 dose-response twins + 10 seed twins = 41 twins ≈ 22.8 CPU-h;
+- N2: 10 ε-twins ≈ 5.6;
+- P-BAD: 1 ≈ 0.6;
+- P-GOOD: up to 3 probes + 2 slices × 2 ≈ 3.9;
+- R5's confirmation: 2 ≈ 1.1.
+
+**Total ≈ 34 CPU-h** (≈ 12 h wall on 3 slots), the STOP test first. Order: the claims lane builds the re-sit reader first (the seat's order); the STOP test can be run by whoever is free first.
+
+Signed (AMENDMENT 1): Claude (Opus 5.5, swarm architect), 2026-10-03 11:34 +0400 (from `date`) — the author.
+Co-signed: the builder (Claude Sonnet 5.5, claims) — pending, on the sha of this text.
 Signed: the seat — pending.
