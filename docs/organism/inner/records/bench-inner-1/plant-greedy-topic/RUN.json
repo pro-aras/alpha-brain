@@ -1,0 +1,61 @@
+{
+ "B1_observed_delta": 1001,
+ "at": "2026-10-03T08:20:46.013881+00:00",
+ "bench_genome_sha256": "47233bb0f3759d72bf36317ad1fc22ba63154d4c17d1cac8e1e1f347908e5273",
+ "body_rows_fed": 1002,
+ "body_rows_with_reading": 1001,
+ "counts": {
+  "chain": 1000,
+  "n": 1000,
+  "said": 951,
+  "skipped": {
+   "backlog": 1,
+   "no backlog reading": 1
+  },
+  "turns": 1000
+ },
+ "cpu_ms_per_row": 6.746,
+ "cpu_s_load": 17.372,
+ "cpu_s_rows": 6.746,
+ "gen": "/data/dev/swarm/2026-10-03/int/bl2-gen/prev",
+ "gen_last_seq": 330367,
+ "genome": "/data/dev/swarm/2026-10-03/int/bl2-inputs/GENOME.v1.genome",
+ "genome_sha256": "fd15f9e3fb7bbbb3917d329ff7c9912f84e1ae8f7c8bd5e48ba7450e8aa927b2",
+ "inhibit": 0,
+ "inner_rows": 1000,
+ "mature": [
+  "big",
+  "blue",
+  "circle",
+  "cross",
+  "green",
+  "red",
+  "ring",
+  "small",
+  "square",
+  "star",
+  "triangle",
+  "white",
+  "yellow"
+ ],
+ "n": 1000,
+ "plant": "greedy-count/topic",
+ "prints_after": {
+  "B1_observed": 5951,
+  "brain": "8ff3bc7520625186b8e1d0ac3df6b95c8b577617a3e63d49fe2060bb2e532c5f",
+  "self_but_B1": "d92174b2e2bd21bd62755731e8455461290082facce892c3f37c06ab4346bd1d",
+  "web_L": "ee16563e071fcc284ec6a16cab87e2ea672bd830527ac3ac8fd852e031900779"
+ },
+ "prints_before": {
+  "B1_observed": 4950,
+  "brain": "8ff3bc7520625186b8e1d0ac3df6b95c8b577617a3e63d49fe2060bb2e532c5f",
+  "self_but_B1": "d92174b2e2bd21bd62755731e8455461290082facce892c3f37c06ab4346bd1d",
+  "web_L": "ee16563e071fcc284ec6a16cab87e2ea672bd830527ac3ac8fd852e031900779"
+ },
+ "read_only": true,
+ "restart": 1000000000,
+ "resume_last_seq": 330367,
+ "rule": "greedy-count",
+ "seed": 20261101,
+ "walk_from": "topic"
+}

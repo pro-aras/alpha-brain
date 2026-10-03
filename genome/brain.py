@@ -221,6 +221,11 @@ class Brain:
         # index-aligned with `moments`; SCENE_WORLD unless learn() names another. Saved only when another hand was heard (a
         # scene-only brain's file is what it was); never in the hash of what was LEARNED (state_hash, the version-1 form).
         self.worlds: List[str] = []
+        # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:30 +0400 — PREREG-INNER-1 §2 «the scene»: a DERIVED index, per heard word the learn
+        # orders of the scenes that carried it (scenes_with), built lazily from `seen` and extended as scenes are learned; never saved
+        # (a load rebuilds it from the store it indexes), never in any hash.
+        self._by_word: Dict[str, List[int]] = {}
+        self._by_word_n: int = 0
 
     # -- the source of every memory, and the census (PREREG-METADATA-1) ------------------------
     def begin_run(self, source: str, author: Optional[str]) -> None:
@@ -509,10 +514,22 @@ class Brain:
         Before the first calibration, or with nothing in view, the turn ends with its `reason` and says and asks nothing."""
         if says not in (0, 1) or asks not in (0, 1):
             raise BrainError(f"turn: says and asks each take 0 or 1, got says {says!r} asks {asks!r}")
+        # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:30 +0400 — PREREG-INNER-1 §2 «the re-seeing» (AMENDMENT 1 A1–A8 folded; the law
+        # research-1003 @ 9c589b2, the signed text sha256 857e07b2…faa82): the turn's arithmetic moves VERBATIM into _turn_core over
+        # (X, fix, members, pos) so a REMEMBERED scene — the store's own X, canvas and the members' mean cell — takes the same turn
+        # (turn_remembered). This wrapper computes the four from the glance exactly as the turn did; the parity test
+        # (tests/genome/test_brain_remembered.py) pins turn(glance) == turn_remembered(order) right after a learn.
         hyps, X = things_in_view(glance)
-        n = int(X.shape[0])
         fix = [[int(y), int(x)] for y, x in glance["fix"]]
         members = [[int(m) for m in h.members] for h in hyps]
+        pos = [[float(h.pos[0]), float(h.pos[1])] for h in hyps]
+        return self._turn_core(X, fix, members, pos, scene=scene, world_seed=world_seed, says=says, asks=asks)
+
+    def _turn_core(self, X: np.ndarray, fix: List[List[int]], members: List[List[int]], pos: List[List[float]], *, scene: int,
+                   world_seed: int, says: int, asks: int) -> Dict[str, object]:
+        """THE TURN's arithmetic (PREREG-BRAIN-DRIVES §2.2), verbatim, over the learner's input X (one row per hypothesis), the
+        located fixations, each hypothesis's member indices and its position. READ-ONLY."""
+        n = int(X.shape[0])
         cells = [[list(fix[m]) for m in ms] for ms in members]
         order = sorted(range(n), key=lambda h: (-len(members[h]), h))
         out: Dict[str, object] = {"scene": int(scene), "n_hyp": n, "order": order, "members": members, "held": [], "expected": [],
@@ -532,16 +549,54 @@ class Brain:
                 a = Lr.produce_believed(road, X, h, lambda h=h: substream(int(world_seed), f"turn-say:{int(scene)}:{h}"))
                 if a.get("spoken"):
                     m = a.get("margin")
-                    out["say"] = {"hyp": int(h), "fix": cells[h], "pos": [float(hyps[h].pos[0]), float(hyps[h].pos[1])],
+                    out["say"] = {"hyp": int(h), "fix": cells[h], "pos": [float(pos[h][0]), float(pos[h][1])],
                                   "words": [str(w) for w in a["spoken"]], "readback": int(a["readback_point"]),
                                   "margin": (float(m) if m is not None and math.isfinite(float(m)) else None)}
                     break
         if asks:
             for h in order:
                 if not out["held"][h]:
-                    out["ask"] = {"hyp": int(h), "fix": cells[h], "pos": [float(hyps[h].pos[0]), float(hyps[h].pos[1])]}
+                    out["ask"] = {"hyp": int(h), "fix": cells[h], "pos": [float(pos[h][0]), float(pos[h][1])]}
                     break
         return out
+
+    # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:30 +0400 — PREREG-INNER-1 §2 «the re-seeing» + «the scene»: the inner turn's two reads
+    # of the store. Both READ-ONLY (pinned by the state hash in tests/genome/test_brain_remembered.py).
+    def turn_remembered(self, order: int, *, world_seed: int, says: int = 1, asks: int = 1) -> Dict[str, object]:
+        """The turn on a REMEMBERED scene: the store's own X (`seen[o][0]`), its canvas (`canvas[o]` = [fix, members]) and each
+        hypothesis's position recomputed as the members' mean cell (brain/scene/eye.py:hypotheses's own arithmetic), under the
+        scene's own index (`scenes[o]`) and the world seed the caller supplies (the mind's, as _brain_canvas supplies it), so
+        the tie substreams are the original turn's. Beside the turn's keys: `learned` (the order), `moment`, `world` and
+        `heard` (the words heard then — Brain.surprise's second argument)."""
+        if says not in (0, 1) or asks not in (0, 1):
+            raise BrainError(f"turn_remembered: says and asks each take 0 or 1, got says {says!r} asks {asks!r}")
+        o = int(order)
+        if not 0 <= o < self.n_learned:
+            raise BrainError(f"turn_remembered: no learned scene at order {o} (the brain holds {self.n_learned})")
+        X, heard, _ = self.seen[o]
+        fix_s, members_s = self.canvas[o]
+        fix = [[int(y), int(x)] for y, x in fix_s]
+        members = [[int(m) for m in ms] for ms in members_s]
+        pos = [[float(np.mean([fix[i][0] for i in ms])), float(np.mean([fix[i][1] for i in ms]))] for ms in members]
+        out = self._turn_core(np.asarray(X, dtype=np.float64), fix, members, pos, scene=int(self.scenes[o]),
+                              world_seed=int(world_seed), says=int(says), asks=int(asks))
+        out["learned"] = o
+        out["moment"] = str(self.moments[o])
+        out["world"] = self.world_of(o)
+        out["heard"] = [str(w) for w in heard]
+        return out
+
+    def scenes_with(self, word: str) -> List[int]:
+        """The learn orders (ascending) of every scene whose heard words carry `word` — the population the inner turn draws its
+        remembered scene from. A derived index over `seen`, extended as scenes are learned; a load rebuilds it."""
+        n = self.n_learned
+        if self._by_word_n > n:                  # the store shrank (a surgery): rebuild from nothing
+            self._by_word, self._by_word_n = {}, 0
+        for o in range(self._by_word_n, n):
+            for w in dict.fromkeys(str(x) for x in self.seen[o][1]):
+                self._by_word.setdefault(w, []).append(o)
+        self._by_word_n = n
+        return list(self._by_word.get(str(word), []))
 
     @staticmethod
     def surprise(turn: Dict[str, object], words: Sequence[str]) -> Optional[float]:
