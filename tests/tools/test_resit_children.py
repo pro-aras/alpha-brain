@@ -65,6 +65,11 @@ def parse_genome(text):
 import numpy as np
 
 def glances(rgb, spec, gaze, mode="surprise", pic_id="", colour=None, predicted=None):
+    import os, time
+    burn = float(os.environ.get("STUB_BURN_S", "0"))       # a test knob: burn CPU seconds (R7's cap must stop the run)
+    t0 = time.process_time()
+    while time.process_time() - t0 < burn:
+        pass
     s = float(np.asarray(rgb, dtype=np.float64).sum())
     feats = [np.array([s % 7.0, s % 3.0, float(len(pic_id))]) for _ in range(2)]
     return {"feats": feats, "fix": [(1, 2), (3, 4)], "windows": [(0, 0), (1, 1)], "residual": [None, None]}
@@ -79,6 +84,11 @@ TURN_MUTATES = %(turn_mutates)s
 class BrainError(Exception):
     pass
 
+class _Learner:
+    # a zero-sum word map: the answers read its sum (so a nudge of it reaches them) and the baseline reading is unchanged (0.0)
+    def __init__(self):
+        self.V = np.array([[1.0, -1.0, 0.0], [2.0, -2.0, 0.0], [3.0, -3.0, 0.0], [0.5, -0.5, 0.0]])
+
 class Brain:
     def __init__(self, cfg):
         self.cfg = cfg
@@ -86,6 +96,7 @@ class Brain:
         self.calibrated_at = None
         self.n_calibrations = 0
         self.v = np.zeros(3)
+        self.L = _Learner()
 
     @classmethod
     def load(cls, base, cfg):
@@ -100,7 +111,7 @@ class Brain:
         return b
 
     def state_hash(self):
-        return hashlib.sha256(self.v.tobytes() + str(self.n_learned).encode()).hexdigest()
+        return hashlib.sha256(self.v.tobytes() + str(self.n_learned).encode() + self.L.V.tobytes()).hexdigest()
 
     def calibrate(self):
         self.n_calibrations += 1
@@ -126,7 +137,7 @@ class Brain:
         if payload.get("test_seed") is None:
             raise BrainError("ask: needs test_seed")
         s = float(sum(np.asarray(f).sum() for f in glance["feats"]))
-        x = float(self.v.sum()) + s
+        x = float(self.v.sum()) + float(self.L.V.sum()) + s
         return {"kind": "thing", "hyp": int(abs(x) * 1000) %% 3, "raw": {"p": x %% 1.0, "item": payload.get("item")}}
 
     def turn(self, glance, *, scene, world_seed, says=1, asks=1):
@@ -220,11 +231,12 @@ class Tmp(unittest.TestCase):
         return d
 
 
-def run_child(kind: str, spec: dict, workdir: Path, *, wrapper: str = "", dash_i: bool = True):
+def run_child(kind: str, spec: dict, workdir: Path, *, wrapper: str = "", dash_i: bool = True, env_over: dict = None):
     specp = workdir / f"{kind}-spec.json"
     specp.write_text(json.dumps(spec))
     env = {k: v for k, v in os.environ.items() if not k.startswith("PYTHON")}
     env.update(ENV)
+    env.update(env_over or {})
     argv = [sys.executable, "-B"] + (["-I"] if dash_i else [])
     if wrapper:
         wp = workdir / "wrapper.py"
@@ -488,6 +500,67 @@ class TestAnswerChild(AnswerChildBase):
         self.assertIn("-I", last_json(p.stdout)["refused"])
 
 
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 16:54 +0400 — (stamp corrected: the first was typed, not read from date) R3's plant (the word map nudged `V += eps * std(V) * u`, seeded, in the COPY in memory, the state hash asserted to move)
+# and R2's BLAS reading (a warm run under another thread count: the pin is law, the reading is printed), as the ANSWER child serves them.
+class TestAnswerChildPlants(AnswerChildBase):
+    def sat(self, **over):
+        p = run_child("answer", self.spec(**over), self.work)
+        self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+        return self.rows(), self.meta()
+
+    def test_a_nudge_moves_the_state_hash_and_reaches_the_answers_R3(self) -> None:
+        base_rows, base_meta = self.sat()
+        nud_rows, nud_meta = self.sat(nudge={"eps": 0.5, "seed": 20261003})
+        n = nud_meta["nudge"]
+        self.assertNotEqual(n["hash_before"], n["hash_after"], "the plant must change the bytes of the state it re-sits")
+        self.assertEqual(n["hash_before"], base_meta["states"][0]["state_hash"])
+        self.assertEqual((n["eps"], n["seed"]), (0.5, 20261003))
+        changed = [i for i, (a, b) in enumerate(zip(base_rows, nud_rows)) if R.canon(a) != R.canon(b)]
+        self.assertGreaterEqual(len(changed), 1, "a nudge of the word map must change at least one answer")
+        self.assertNotIn("nudge", base_meta)
+
+    def test_the_nudge_lives_in_the_copy_in_memory_the_files_are_untouched(self) -> None:
+        before = {n: hashlib.sha256((self.state / n).read_bytes()).hexdigest() for n in ("brain.json", "brain.npz")}
+        self.sat(nudge={"eps": 0.5, "seed": 1})
+        after = {n: hashlib.sha256((self.state / n).read_bytes()).hexdigest() for n in ("brain.json", "brain.npz")}
+        self.assertEqual(before, after)
+
+    def test_a_nudge_is_deterministic_in_its_seed_and_differs_across_seeds(self) -> None:
+        r1, m1 = self.sat(nudge={"eps": 0.5, "seed": 11})
+        r2, m2 = self.sat(nudge={"eps": 0.5, "seed": 11})
+        r3, m3 = self.sat(nudge={"eps": 0.5, "seed": 12})
+        self.assertEqual([R.canon(r) for r in r1], [R.canon(r) for r in r2])
+        self.assertEqual(m1["nudge"]["hash_after"], m2["nudge"]["hash_after"])
+        self.assertNotEqual(m1["nudge"]["hash_after"], m3["nudge"]["hash_after"])
+
+    def test_a_nudge_that_changes_nothing_is_refused_the_plant_asserts_its_bytes_R3(self) -> None:
+        p = run_child("answer", self.spec(nudge={"eps": 0.0, "seed": 1}), self.work)
+        self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+        res = last_json(p.stdout)
+        self.assertIn("R3", res["refused"])
+        self.assertIn("did not change", res["refused"])
+        self.assertFalse((self.out / "answers.jsonl").exists())
+
+    def test_the_dose_points_are_each_a_different_state(self) -> None:
+        hashes = [self.sat(nudge={"eps": e, "seed": 3})[1]["nudge"]["hash_after"] for e in (0.001, 0.01, 0.1, 0.5)]
+        self.assertEqual(len(set(hashes)), 4)
+
+    def test_a_blas_reading_under_four_threads_is_accepted_only_when_the_spec_says_so_R2(self) -> None:
+        env4 = {"OPENBLAS_NUM_THREADS": "4", "OMP_NUM_THREADS": "4"}
+        p = run_child("answer", self.spec(), self.work, env_over=env4)
+        self.assertEqual(p.returncode, 2, "a thread count other than 1 is refused unless the reading is declared")
+        self.assertIn("OPENBLAS_NUM_THREADS", last_json(p.stdout)["refused"])
+        p = run_child("answer", self.spec(blas_reading=4), self.work, env_over=env4)
+        self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+        self.assertEqual(self.meta()["flags"]["blas_reading"], 4)
+        self.assertEqual(self.meta()["flags"]["OPENBLAS_NUM_THREADS"], "4")
+
+    def test_a_declared_blas_reading_with_the_pins_at_one_is_refused_the_two_must_agree(self) -> None:
+        p = run_child("answer", self.spec(blas_reading=4), self.work)
+        self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+        self.assertIn("blas_reading", last_json(p.stdout)["refused"])
+
+
 class TestGradeChild(Tmp):
     """A stub GRADER tree: tools/brain/grade_life.py with the one function the child calls."""
 
@@ -552,6 +625,68 @@ class TestGradeChild(Tmp):
         p = run_child("grade", self.spec(), self.work)
         self.assertNotEqual(p.returncode, 0)
         self.assertFalse((self.out / "grade.json").exists())
+
+
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 16:54 +0400 — (stamp corrected: the first was typed, not read from date) the parity pin the law's section 1.4 names and part 2 lacked: `R.jsonable` is a ten-line COPY of
+# `creature.mind._jsonable` (the reader never imports the mind; a TEST may), compared on ORDER-PRESERVING text (a copy that re-sorted a key would be caught: the law says no
+# key or list is re-ordered), with two plants that make the comparison fail.
+class TestJsonableParity(unittest.TestCase):
+    @staticmethod
+    def cases() -> list:
+        return [
+            None, True, "plain", 3, 2.5, float("inf"), float("-inf"), float("nan"),
+            np.float32(1.5), np.float64(-0.25), np.int64(7), np.int32(-3), np.bool_(True), np.bool_(False),
+            np.arange(6, dtype=np.int64).reshape(2, 3), np.array([0.5, np.inf, -np.inf], dtype=np.float32), np.zeros((0, 3)),
+            (1, 2, (3, 4)), [np.int64(1), [np.float32(2.0), (5,)]],
+            {"b": 1, "a": 2, "c": {"z": np.int64(1), "y": [np.float32(0.5), None]}},
+            {np.int64(3): [np.float32(1.5)], 4: (1, 2), (5, 6): "tuple key", "s": np.arange(3)},
+            {"kind": "thing", "hyp": np.int64(2), "raw": {"p": np.float64(0.125), "ids": np.array([3, 1, 2]), "spoken": [("red", np.float32(0.5))]}},
+        ]
+
+    @staticmethod
+    def same(a, b) -> bool:
+        """Order-preserving text equality (no sort_keys): int and float stay different bytes, NaN and Infinity are written as the journal writes them."""
+        return json.dumps(a, allow_nan=True) == json.dumps(b, allow_nan=True)
+
+    def test_the_copy_equals_the_minds_own_jsonable_on_every_shape_an_answer_carries(self) -> None:
+        from creature.mind import _jsonable as mind_jsonable
+        for i, x in enumerate(self.cases()):
+            with self.subTest(case=i):
+                self.assertTrue(self.same(R.jsonable(x), mind_jsonable(x)), f"case {i}: {R.jsonable(x)!r} vs {mind_jsonable(x)!r}")
+
+    def test_the_comparison_can_fail_a_copy_that_reorders_keys_is_caught(self) -> None:
+        from creature.mind import _jsonable as mind_jsonable
+
+        def sorting_copy(v):             # PLANT: the real function with one change — dict keys re-sorted
+            if isinstance(v, dict):
+                return {(k if isinstance(k, str) else str(sorting_copy(k))): sorting_copy(x) for k, x in sorted(v.items(), key=lambda kv: str(kv[0]))}
+            return R.jsonable(v) if not isinstance(v, (list, tuple)) else [sorting_copy(x) for x in v]
+
+        x = {"b": 1, "a": 2}
+        self.assertNotEqual(json.dumps(sorting_copy(x)), json.dumps(mind_jsonable(x)), "the plant must change the bytes")
+        self.assertFalse(self.same(sorting_copy(x), mind_jsonable(x)))
+        self.assertTrue(self.same(R.jsonable(x), mind_jsonable(x)), "the real copy keeps the order")
+
+    def test_the_comparison_can_fail_a_copy_that_leaves_numpy_scalars_is_caught(self) -> None:
+        from creature.mind import _jsonable as mind_jsonable
+
+        def lazy_copy(v):                # PLANT: the real function without its numpy branches
+            if isinstance(v, dict):
+                return {k: lazy_copy(x) for k, x in v.items()}
+            if isinstance(v, (list, tuple)):
+                return [lazy_copy(x) for x in v]
+            return v
+
+        x = {"hyp": np.int64(2)}
+        with self.assertRaises(TypeError):
+            json.dumps(lazy_copy(x))
+        self.assertEqual(json.dumps(mind_jsonable(x)), '{"hyp": 2}')
+
+    def test_the_result_is_plain_json_every_case_round_trips_to_itself(self) -> None:
+        for i, x in enumerate(self.cases()):
+            with self.subTest(case=i):
+                text = json.dumps(R.jsonable(x), allow_nan=True)
+                self.assertEqual(json.dumps(json.loads(text), allow_nan=True), text)
 
 
 if __name__ == "__main__":

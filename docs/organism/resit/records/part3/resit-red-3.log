@@ -1,0 +1,62 @@
+FFEEFE.
+======================================================================
+ERROR: test_a_nudge_is_deterministic_in_its_seed_and_differs_across_seeds (tests.tools.test_resit_children.TestAnswerChildPlants.test_a_nudge_is_deterministic_in_its_seed_and_differs_across_seeds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 533, in test_a_nudge_is_deterministic_in_its_seed_and_differs_across_seeds
+    self.assertEqual(m1["nudge"]["hash_after"], m2["nudge"]["hash_after"])
+                     ~~^^^^^^^^^
+KeyError: 'nudge'
+
+======================================================================
+ERROR: test_a_nudge_moves_the_state_hash_and_reaches_the_answers_R3 (tests.tools.test_resit_children.TestAnswerChildPlants.test_a_nudge_moves_the_state_hash_and_reaches_the_answers_R3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 514, in test_a_nudge_moves_the_state_hash_and_reaches_the_answers_R3
+    n = nud_meta["nudge"]
+        ~~~~~~~~^^^^^^^^^
+KeyError: 'nudge'
+
+======================================================================
+ERROR: test_the_dose_points_are_each_a_different_state (tests.tools.test_resit_children.TestAnswerChildPlants.test_the_dose_points_are_each_a_different_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 545, in test_the_dose_points_are_each_a_different_state
+    hashes = [self.sat(nudge={"eps": e, "seed": 3})[1]["nudge"]["hash_after"] for e in (0.001, 0.01, 0.1, 0.5)]
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'nudge'
+
+======================================================================
+FAIL: test_a_blas_reading_under_four_threads_is_accepted_only_when_the_spec_says_so_R2 (tests.tools.test_resit_children.TestAnswerChildPlants.test_a_blas_reading_under_four_threads_is_accepted_only_when_the_spec_says_so_R2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 554, in test_a_blas_reading_under_four_threads_is_accepted_only_when_the_spec_says_so_R2
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: OPENBLAS_NUM_THREADS is '4', not '1' (the life's own unit pins it; a brain state's float bits depend on it); OMP_NUM_THREADS is '4', not '1' (the life's own unit pins it; a brain state's float bits depend on it)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_declared_blas_reading_with_the_pins_at_one_is_refused_the_two_must_agree (tests.tools.test_resit_children.TestAnswerChildPlants.test_a_declared_blas_reading_with_the_pins_at_one_is_refused_the_two_must_agree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 560, in test_a_declared_blas_reading_with_the_pins_at_one_is_refused_the_two_must_agree
+    self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : {"ok": true, "answered": 10, "unanswered": 0}
+
+
+======================================================================
+FAIL: test_a_nudge_that_changes_nothing_is_refused_the_plant_asserts_its_bytes_R3 (tests.tools.test_resit_children.TestAnswerChildPlants.test_a_nudge_that_changes_nothing_is_refused_the_plant_asserts_its_bytes_R3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_children.py", line 538, in test_a_nudge_that_changes_nothing_is_refused_the_plant_asserts_its_bytes_R3
+    self.assertEqual(p.returncode, 2, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : {"ok": true, "answered": 10, "unanswered": 0}
+
+
+----------------------------------------------------------------------
+Ran 7 tests in 1.736s
+
+FAILED (failures=3, errors=3)

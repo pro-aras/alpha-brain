@@ -12,6 +12,7 @@ subject: genome, brain, creature) and no module of the GRADER ever meet in one i
 It never writes under a life's root, never calls Brain.learn, never calls Brain.turn outside R14's test on a copy, never touches a unit."""
 from __future__ import annotations
 
+import argparse
 import bisect
 import collections
 import hashlib
@@ -19,7 +20,9 @@ import json
 import math
 import os
 import re
+import resource
 import shutil
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -88,21 +91,30 @@ def atomic_write(path, text: str) -> None:
     os.replace(tmp, path)
 
 
-def check_flags(dont_write_bytecode: int, isolated: int, env: Mapping[str, str]) -> Dict[str, object]:
+def check_flags(dont_write_bytecode: int, isolated: int, env: Mapping[str, str], blas_reading: Optional[int] = None) -> Dict[str, object]:
     """§1.0: the orchestrator refuses to run unless python was started with -B (a cold import of the grader would write .pyc files INTO the life's tree)
     and -I (PYTHON* variables could put master's tree first on sys.path and shadow the life's modules), and unless the two BLAS pins are 1 (a brain
-    state's float bits depend on the BLAS thread count, #246 (8)). Both are recorded in the row."""
+    state's float bits depend on the BLAS thread count, #246 (8)). Both are recorded in the row.
+    # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 16:54 +0400 — R2's READING: `blas_reading=N` (N != 1) declares that this ANSWER run is the law's one warm run under another thread count
+    # (the pin stays law; the reading is printed). The declared N and the environment's two pins must AGREE, else refused: a reading can never be a mis-set environment."""
     problems: List[str] = []
+    reading = int(blas_reading) if blas_reading is not None and int(blas_reading) != 1 else None
+    want = "1" if reading is None else str(reading)
     if not dont_write_bytecode:
         problems.append("python was not started with -B (a cold import of tools/brain/grade_life.py would write .pyc files into the life's tree)")
     if not isolated:
         problems.append("python was not started with -I (a PYTHON* variable could put another tree first on sys.path)")
     for var in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS"):
-        if env.get(var) != "1":
-            problems.append(f"{var} is {env.get(var)!r}, not '1' (the life's own unit pins it; a brain state's float bits depend on it)")
+        if env.get(var) != want:
+            why = (f"the declared blas_reading is {reading}, so both pins must say so" if reading is not None
+                   else "the life's own unit pins it; a brain state's float bits depend on it")
+            problems.append(f"{var} is {env.get(var)!r}, not {want!r} ({why})")
     if problems:
         raise ResitError("refused: " + "; ".join(problems))
-    return {"dont_write_bytecode": True, "isolated": True, "OPENBLAS_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}
+    out: Dict[str, object] = {"dont_write_bytecode": True, "isolated": True, "OPENBLAS_NUM_THREADS": want, "OMP_NUM_THREADS": want}
+    if reading is not None:
+        out["blas_reading"] = reading
+    return out
 
 
 def resolve_tape_dir(root, declared_path: Optional[str]) -> Path:
@@ -698,7 +710,7 @@ def cmd_answer(spec_path: str) -> int:
     """The ANSWER child (the SUBJECT): the LIFE's own code first on sys.path; a frozen brain; the tape read in the mind's own order; every ask answered as the
     mind answers it (creature/mind.py: _consume_ask, _brain_canvas, _answer_ask) and written as the mind's own `answer` row. Nothing is ever learned."""
     spec = json.loads(Path(spec_path).read_text())
-    flags = check_flags(sys.flags.dont_write_bytecode, sys.flags.isolated, os.environ)
+    flags = check_flags(sys.flags.dont_write_bytecode, sys.flags.isolated, os.environ, blas_reading=spec.get("blas_reading"))
     code = os.path.realpath(spec["code"])
     pre_import_check()
     sys.path.insert(0, code)
@@ -721,6 +733,7 @@ def cmd_answer(spec_path: str) -> int:
     cache = GlanceCache(spec.get("glance_cache"))
 
     states: Dict[Tuple[str, str], Dict[str, object]] = {}
+    nudges: List[Dict[str, object]] = []
 
     def load_state(entry: Mapping[str, object]) -> Dict[str, object]:
         key = (str(entry["dir"]), str(entry["genome"]))
@@ -733,11 +746,27 @@ def cmd_answer(spec_path: str) -> int:
             b = Brain.load(Path(entry["dir"]) / "brain", cfg)
         except Exception as e:
             raise Refused(f"state {entry['dir']}: Brain.load refused it ({type(e).__name__}: {e})")
+        h_load = b.state_hash()
+        # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 16:54 +0400 — R3's PLANT: the COPY's word map nudged in memory, V += eps * std(V) * u (u seeded standard normal; scale-free), the state
+        # hash ASSERTED to move (a plant that changes nothing is refused, #247 (5)); the files on disk are never touched.
+        nudge = spec.get("nudge")
+        if nudge:
+            V = getattr(getattr(b, "L", None), "V", None)
+            if V is None:
+                raise Refused("R3: this brain has no word map (L.V) to nudge")
+            V = np.asarray(V)
+            u = np.random.default_rng(int(nudge["seed"])).standard_normal(V.shape)
+            b.L.V = (V + float(nudge["eps"]) * float(V.std()) * u).astype(V.dtype)
+            h_after = b.state_hash()
+            if h_after == h_load:
+                raise Refused(f"R3: the nudge (eps {nudge['eps']}) did not change the state's hash — the plant must change the bytes it re-sits")
+            nudges.append({"eps": float(nudge["eps"]), "seed": int(nudge["seed"]), "hash_before": h_load, "hash_after": h_after,
+                           "n_words": int(V.shape[0]) if V.ndim else 0, "std_V": float(V.std())})
         st = {"brain": b, "genome": g, "lines": genome_line_hashes(gtext),
               "meta": {"name": entry["name"], "dir": str(entry["dir"]), "genome": str(entry["genome"]), "genome_sha256": sha256_bytes(gtext.encode("utf-8")),
                        "parsed": {"retina": sha256_bytes(_canon_default(g.retina).encode()), "gaze": sha256_bytes(_canon_default(g.gaze).encode()),
                                   "colour": sha256_bytes(_canon_default(g.colour).encode()), "brain": sha256_bytes(_canon_default(cfg).encode())},
-                       "lines": genome_line_hashes(gtext), "state_hash": b.state_hash(), "n_learned": int(b.n_learned),
+                       "lines": genome_line_hashes(gtext), "state_hash": h_load, "n_learned": int(b.n_learned),
                        "calibrated_at_load": b.calibrated_at, "n_calibrations_load": int(b.n_calibrations)}}
         states[key] = st
         return st
@@ -829,6 +858,9 @@ def cmd_answer(spec_path: str) -> int:
     meta = {"flags": flags, "code": code, "python": sys.version.split()[0], "modules": rep["modules"], "modules_digest": rep["digest"], "eye_pin": eye_pin,
             "states": smeta, "asks_seen": asks_seen, "answered": len(rows_out), "unanswered": unanswered, "glance_cache": cache.info(),
             "turn_check": turn_check, "cpu_s": round(time.process_time() - cpu0, 3), "answers_sha256": sha256_bytes(answers_text.encode("utf-8"))}
+    if nudges:
+        meta["nudge"] = nudges[0]
+        meta["nudges"] = nudges
     atomic_write(out_dir / "answer-meta.json", json.dumps(meta, indent=1, sort_keys=True) + "\n")
     print(json.dumps({"ok": True, "answered": len(rows_out), "unanswered": unanswered}))
     return 0
@@ -929,8 +961,522 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 2
 
 
-def cmd_run(argv: Sequence[str]) -> int:      # replaced below by Part 3, the orchestrator
-    raise ResitError("refused: the orchestrator is not built yet")
+# ================================================================================================ Part 3 — the ORCHESTRATOR (law §1.0–§1.5, R1, R3, R5, R7, R12)
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 17:04 +0400 — the orchestrator, GATE mode first (the law's order: R1 on the closed brain-long-2 before anything else is believed). It imports the
+# standard library only and runs the two children BY PATH with the same flags; it never imports the life or the grader. Daily and origin modes follow R1.
+RESIT_PY = os.path.abspath(__file__)
+CPU_CAP_COLD_S = 30 * 60                  # R7: a cold run (no glance cache yet)
+CPU_CAP_WARM_S = 8 * 60                   # R7: a warm run
+DEFAULT_SCORED = "/data/dev/brain-runs/scene-s1b1r"
+R1_MARKS = ("M1", "M2a", "M3")            # R1 (b): these marks, both sets, and M5 (fresh); M6 is a READING (c)
+MARKER_NAME = "START.marker"
+_STATUS_FIELDS = ("mind_backlog_rows", "mind_ms_per_canvas_1min")
+
+
+def _differing_keys(a: Mapping[str, object], b: Mapping[str, object], ignore: Sequence[str] = ("hash",)) -> List[str]:
+    out = []
+    for k in sorted((set(a) | set(b)) - set(ignore)):
+        if (k in a) != (k in b) or (k in a and canon(a[k]) != canon(b[k])):
+            out.append(k)
+    return out
+
+
+def compare_answers(resit_rows: Sequence[Mapping[str, object]], life_rows: Mapping[int, Mapping[str, object]]) -> Dict[str, object]:
+    """R1 (a): every re-sit answer row (read back from answers.jsonl — the JSON round trip) against the life's LAST row for the same ask seq, equal in EVERY key
+    but `hash` (the key sets too: an extra key on one side is a difference). The first difference, by the lowest ask seq, is printed with both rows."""
+    n_equal = n_diff = n_missing = 0
+    first: Optional[Dict[str, object]] = None
+    resat = set()
+    for r in resit_rows:
+        seq = int(r["seq"])
+        resat.add(seq)
+        life = life_rows.get(seq)
+        if life is None:
+            n_missing += 1
+            continue
+        if rows_equal(r, life):
+            n_equal += 1
+            continue
+        n_diff += 1
+        if first is None or seq < first["seq"]:
+            first = {"seq": seq, "item": r.get("item"), "form": r.get("form"), "differing_keys": _differing_keys(r, life), "resit": dict(r), "life": dict(life)}
+    return {"n_resit": len(resit_rows), "n_equal": n_equal, "n_diff": n_diff, "n_missing_life_row": n_missing,
+            "life_rows_not_resat": sum(1 for s in life_rows if int(s) not in resat), "first_diff": first,
+            "all_equal": bool(resit_rows) and n_diff == 0 and n_missing == 0 and n_equal == len(resit_rows)}
+
+
+_ABSENT = "<missing>"
+
+
+def _leaf_diffs(got, want, path: str, tol: float, diffs: List[Dict[str, object]], count: List[int]) -> None:
+    if isinstance(want, dict) or isinstance(got, dict):
+        if not (isinstance(want, dict) and isinstance(got, dict)):
+            count[0] += 1
+            diffs.append({"path": path, "got": got, "want": want})
+            return
+        for k in sorted(set(want) | set(got), key=str):
+            p = f"{path}.{k}"
+            if k not in got:
+                count[0] += 1
+                diffs.append({"path": p, "got": _ABSENT, "want": want[k]})
+            elif k not in want:
+                count[0] += 1
+                diffs.append({"path": p, "got": got[k], "want": _ABSENT})
+            else:
+                _leaf_diffs(got[k], want[k], p, tol, diffs, count)
+        return
+    if isinstance(want, list) or isinstance(got, list):
+        if not (isinstance(want, list) and isinstance(got, list)) or len(got) != len(want):
+            count[0] += 1
+            diffs.append({"path": path, "got": got if not isinstance(got, list) else f"list of {len(got)}",
+                          "want": want if not isinstance(want, list) else f"list of {len(want)}"})
+            return
+        for i, (g, w) in enumerate(zip(got, want)):
+            _leaf_diffs(g, w, f"{path}.{i}", tol, diffs, count)
+        return
+    count[0] += 1
+    if isinstance(got, bool) or isinstance(want, bool):
+        if not (type(got) is type(want) and got == want):
+            diffs.append({"path": path, "got": got, "want": want})
+        return
+    if isinstance(got, (int, float)) and isinstance(want, (int, float)):
+        if isinstance(got, float) and isinstance(want, float) and math.isnan(got) and math.isnan(want):
+            return
+        if got == want:
+            return
+        if any(isinstance(x, float) and (math.isnan(x) or math.isinf(x)) for x in (got, want)) or abs(got - want) > tol:
+            diffs.append({"path": path, "got": got, "want": want})
+        return
+    if type(got) is not type(want) or got != want:
+        diffs.append({"path": path, "got": got, "want": want})
+
+
+def _dig(d, *keys):
+    for k in keys:
+        if not isinstance(d, dict) or k not in d:
+            return _ABSENT
+        d = d[k]
+    return d
+
+
+def compare_marks(grade: Mapping[str, object], ref: Mapping[str, object], tol: float = 1e-12) -> Dict[str, object]:
+    """R1 (b): the graded marks M1, M2a and M3 (every set of the reference) and M5 equal the reference grade.json's, floats to `tol`, everything else exactly.
+    M6, `meeting` and `counts` are READINGS and never compared (the reference was graded on the tape as it stood on 09-30; the tape has grown since)."""
+    diffs: List[Dict[str, object]] = []
+    count = [0]
+    names: List[str] = []
+    for s in sorted(ref.get("sets") or {}):
+        for mark, keys in (("M1", ("marks", "M1")), ("M3", ("marks", "M3")), ("M2a", ("marks", "roads", "LAW", "M2a"))):
+            names.append(f"{s}.{mark}")
+            prefix = "sets." + s + "." + ".".join(keys)
+            want = _dig(ref["sets"][s], *keys)
+            got = _dig(grade.get("sets") or {}, s, *keys)
+            if want is _ABSENT or got is _ABSENT:
+                count[0] += 1
+                diffs.append({"path": prefix, "got": got, "want": want})
+            else:
+                _leaf_diffs(got, want, prefix, tol, diffs, count)
+    if "M5" in ref:
+        names.append("M5")
+        got = grade.get("M5", _ABSENT)
+        if got is _ABSENT:
+            count[0] += 1
+            diffs.append({"path": "M5", "got": got, "want": "present"})
+        else:
+            _leaf_diffs(got, ref["M5"], "M5", tol, diffs, count)
+    return {"equal": not diffs, "n_leaves": count[0], "diffs": diffs, "marks_compared": names, "tol": tol}
+
+
+def marks_of_diffs(diffs: Sequence[Mapping[str, object]]) -> List[str]:
+    """Which of M1, M2a, M3, M5 a list of compare_marks diffs touches."""
+    found = set()
+    for d in diffs:
+        p = str(d["path"])
+        if ".roads.LAW.M2a" in p:
+            found.add("M2a")
+        elif p.startswith("M5"):
+            found.add("M5")
+        else:
+            for m in ("M1", "M3"):
+                if f".marks.{m}" in p:
+                    found.add(m)
+    return sorted(found)
+
+
+def newer_than(roots: Sequence, marker_ns: int, limit: int = 20) -> Dict[str, object]:
+    """R5 (b): `find <root> -newer <marker>`, in-process — every file and directory under each root (symlinks not followed) whose mtime is strictly newer than the marker's.
+    The listing is capped at `limit`; the count is not."""
+    listed: List[str] = []
+    n_newer = walked = 0
+    for root in roots:
+        root = str(root)
+        entries = [root]
+        for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+            entries.extend(os.path.join(dirpath, n) for n in dirnames)
+            entries.extend(os.path.join(dirpath, n) for n in filenames)
+            for e in entries:
+                walked += 1
+                try:
+                    mt = os.lstat(e).st_mtime_ns
+                except OSError:
+                    continue
+                if mt > marker_ns:
+                    n_newer += 1
+                    if len(listed) < limit:
+                        listed.append(e)
+            entries = []
+    return {"n_newer": n_newer, "listed": listed, "n_entries_walked": walked, "roots": [str(r) for r in roots]}
+
+
+def status_reading(path) -> Dict[str, object]:
+    """R12: the live life's STATUS.json `mind_backlog_rows` and `mind_ms_per_canvas_1min`, read once. An absent file, a missing field or a torn file is SAID, never a zero."""
+    p = Path(path) if path else None
+    out: Dict[str, object] = {"path": str(p) if p else None, "present": False, "mind_backlog_rows": None, "mind_ms_per_canvas_1min": None,
+                              "fields_present": {k: False for k in _STATUS_FIELDS}, "note": "", "read_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
+    if p is None or not p.exists():
+        return out
+    out["present"] = True
+    try:
+        out["file_mtime_ns"] = p.stat().st_mtime_ns
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except (ValueError, OSError) as e:
+        out["note"] = f"STATUS.json unreadable ({type(e).__name__}: {e})"
+        return out
+    if isinstance(d, dict):
+        for k in _STATUS_FIELDS:
+            out["fields_present"][k] = k in d
+            out[k] = d.get(k)
+    return out
+
+
+def world_seed_of(genome_text: str) -> Optional[int]:
+    """The seed of the `WORLD scene seed <n>; …` line (the items' world); None when the genome has no scene world."""
+    for line in genome_text.splitlines():
+        m = re.match(r"\s*WORLD\s+scene\s+seed\s+(\d+)", line.split("#", 1)[0])
+        if m:
+            return int(m.group(1))
+    return None
+
+
+def git_info(path) -> Dict[str, object]:
+    """The commit of a checkout — only when `path` IS a checkout (a `.git` entry in it): a directory merely inside another repository must not report that repository's HEAD."""
+    d = Path(path)
+    if not (d / ".git").exists():
+        return {"commit": None, "dirty": None, "git_note": "not a git checkout"}
+    try:
+        head = subprocess.run(["git", "-C", str(d), "rev-parse", "HEAD"], capture_output=True, text=True, timeout=30)
+        st = subprocess.run(["git", "-C", str(d), "status", "--porcelain", "--untracked-files=no"], capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.SubprocessError) as e:
+        return {"commit": None, "dirty": None, "git_note": f"git failed ({type(e).__name__})"}
+    if head.returncode != 0:
+        return {"commit": None, "dirty": None, "git_note": "git rev-parse failed"}
+    return {"commit": head.stdout.strip(), "dirty": bool(st.stdout.strip()), "git_note": ""}
+
+
+def grader_info(path) -> Dict[str, object]:
+    d = Path(path)
+    gl = d / "tools" / "brain" / "grade_life.py"
+    if not gl.exists():
+        raise Refused(f"grader code {d}: tools/brain/grade_life.py does not exist")
+    return {"grader_code": os.path.realpath(d), **git_info(d), "grade_life_sha256": sha256_file(gl)}
+
+
+GRADER_PIN_KEYS = ("commit", "grade_life_sha256", "modules_digest")
+
+
+def check_grader_pin(out_dir, info: Mapping[str, object], *, write: bool = True) -> str:
+    """R4 (j): OUT/GRADER.json is written once (the first run's grader: its commit, grade_life.py's sha256, the digest of every module its child loaded); a later run under another
+    pin is REFUSED. `write=False` only checks (the pre-check before the children are spent: the modules digest is known only after the grade child ran)."""
+    p = Path(out_dir) / "GRADER.json"
+    if not p.exists():
+        if write:
+            atomic_write(p, json.dumps({k: info.get(k) for k in ("grader_code", "commit", "dirty", "grade_life_sha256", "modules_digest")}, indent=1, sort_keys=True) + "\n")
+            return "written"
+        return "absent"
+    old = json.loads(p.read_text())
+    # edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 17:11 +0400 — FAIL CLOSED (the seat's review of the working tree): EVERY pin key is compared; a key the caller did not give reads None and
+    # differs from a pinned value. The ONE legitimate skip is `modules_digest` on the pre-check (write=False), where the grade child has not yet run and the digest is not known.
+    for k in GRADER_PIN_KEYS:
+        new = info.get(k)
+        if k == "modules_digest" and new is None and not write:
+            continue
+        if old.get(k) != new:
+            raise Refused(f"grader pin: {k} is {new!r} but GRADER.json holds {old.get(k)!r} — a series is read by ONE grader (R4 j)")
+    return "checked"
+
+
+def run_child(kind: str, spec: Mapping[str, object], workdir, *, cpu_cap_s: Optional[int] = None, blas_reading: Optional[int] = None) -> Dict[str, object]:
+    """Run one child BY PATH — `python3 -B -I resit.py <kind> --spec <json>` — with PYTHON* stripped from its environment and both BLAS pins set. stdout and stderr go to files
+    in `workdir` (never a pipe: a child that fills one must not deadlock the parent). The CPU cap is `RLIMIT_CPU` (R7: over it the run STOPs); `os.wait4` returns THIS
+    child's own rusage — its peak RSS and its CPU time are the numbers the law's price names (RULES 6d)."""
+    workdir = Path(workdir)
+    workdir.mkdir(parents=True, exist_ok=True)
+    specp = workdir / f"{kind}-spec.json"
+    specp.write_text(json.dumps(spec, indent=1, sort_keys=True), encoding="utf-8")
+    env = {k: v for k, v in os.environ.items() if not k.startswith("PYTHON")}
+    n = str(int(blas_reading)) if blas_reading and int(blas_reading) != 1 else "1"
+    env["OPENBLAS_NUM_THREADS"] = n
+    env["OMP_NUM_THREADS"] = n
+    cmd = [sys.executable, "-B", "-I", RESIT_PY, kind, "--spec", str(specp)]
+    outp, errp = workdir / f"{kind}.stdout", workdir / f"{kind}.stderr"
+    t0 = time.time()
+    with open(outp, "wb") as fo, open(errp, "wb") as fe:
+        p = subprocess.Popen(cmd, stdout=fo, stderr=fe, env=env, cwd=str(workdir))
+        if cpu_cap_s:
+            try:
+                resource.prlimit(p.pid, resource.RLIMIT_CPU, (int(cpu_cap_s), int(cpu_cap_s) + 15))
+            except (ProcessLookupError, OSError):
+                pass
+        _pid, status, ru = os.wait4(p.pid, 0)
+    p.returncode = os.waitstatus_to_exitcode(status)
+    stdout = outp.read_text(errors="replace")
+    result: Dict[str, object] = {}
+    for line in reversed(stdout.strip().splitlines()):
+        line = line.strip()
+        if line.startswith("{"):
+            try:
+                result = json.loads(line)
+            except ValueError:
+                result = {}
+            break
+    return {"kind": kind, "rc": p.returncode, "result": result, "wall_s": round(time.time() - t0, 3), "cpu_s": round(ru.ru_utime + ru.ru_stime, 3),
+            "maxrss_mb": round(ru.ru_maxrss / 1024.0, 1), "stderr_tail": errp.read_text(errors="replace")[-1500:], "stdout_file": str(outp), "stderr_file": str(errp)}
+
+
+def require_child_ok(ch: Mapping[str, object], cap_s: Optional[int]) -> None:
+    """A child that did not finish becomes a NAMED refusal, never a crash: its own refusal text, the CPU cap (R7), a kill (the slot's memory cap or the RAM guard, RULES 6c), or its stderr."""
+    rc, kind = int(ch["rc"]), str(ch["kind"])
+    if rc == 0:
+        return
+    res = ch.get("result") or {}
+    if rc == 2 and res.get("refused"):
+        raise Refused(str(res["refused"]))
+    if rc == -24:
+        raise Refused(f"R7: the {kind.upper()} child exceeded the CPU cap of {cap_s} s (SIGXCPU) after {ch['cpu_s']} CPU-s — the run STOPs and reports")
+    if rc == -9:
+        raise Refused(f"the {kind.upper()} child was killed (SIGKILL) at {ch['maxrss_mb']} MB peak — the slot's memory cap or the RAM guard (read the slot ledger: "
+                      f"exit 137 is SLOT OOM-CAP or SLOT RAMGUARD-KILLED, RULES 6c)")
+    raise ResitError(f"the {kind.upper()} child failed (rc {rc}): {str(ch['stderr_tail']).strip()[-600:]}")
+
+
+def parse_run_args(argv: Sequence[str]) -> argparse.Namespace:
+    ap = argparse.ArgumentParser(prog="resit.py run", allow_abbrev=False)
+    ap.add_argument("--mode", required=True, choices=("gate", "daily", "origin"))
+    ap.add_argument("--root", required=True, help="the life whose state/prev is copied (gate, daily)")
+    ap.add_argument("--code", help="the code the SUBJECT runs (default <root>/code)")
+    ap.add_argument("--items-root", help="the life whose tape holds the fixed sittings (default --root)")
+    ap.add_argument("--grader-code", required=True, help="a checkout of the pinned commit carrying the grader (tools/brain/grade_life.py)")
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--scored", default=DEFAULT_SCORED)
+    ap.add_argument("--label", help="names the run's folder (gate: default r1; daily: the stamp)")
+    ap.add_argument("--stamp", help="default: UTC now")
+    ap.add_argument("--reference-grade", help="R1 (b): the reference grade.json")
+    ap.add_argument("--check-turn", action="store_true", help="R14: Brain.turn is read-only on a second load of the state")
+    ap.add_argument("--world-seed", type=int, help="the seed Brain.turn's substreams are keyed by (default: the items genome's WORLD scene seed, else 0)")
+    ap.add_argument("--status", help="the live life's STATUS.json (R12); default <root>/STATUS.json when it exists")
+    ap.add_argument("--cache", help="the glance cache file (default OUT/glances.pkl)")
+    ap.add_argument("--blas-reading", type=int, help="R2's one warm run under another BLAS thread count (the pin stays law; the reading is printed)")
+    ap.add_argument("--nudge", type=float, help="R3's plant: V += eps * std(V) * u on the COPY in memory")
+    ap.add_argument("--nudge-seed", type=int, default=20261003)
+    ap.add_argument("--cpu-cap-s", type=int, help="override R7's cap (tests)")
+    ap.add_argument("--m2a-rows", action="store_true", help="also take the per-item M2a rows from the pinned grader's own functions")
+    ap.add_argument("--copy-retry-sleep-s", type=float, default=20.0)
+    return ap.parse_args(list(argv))
+
+
+def _is_inside(child: Path, parents: Sequence[Path]) -> Optional[Path]:
+    c = Path(os.path.realpath(child))
+    for p in parents:
+        pr = Path(os.path.realpath(p))
+        if c == pr or pr in c.parents:
+            return pr
+    return None
+
+
+def _outermost(paths: Sequence) -> List[str]:
+    """Realpaths with any path that lies inside another dropped (a life's code/ is walked once, with its root)."""
+    real = sorted({os.path.realpath(p) for p in paths})
+    return [p for p in real if not any(q != p and (p == q or p.startswith(q + os.sep)) for q in real)]
+
+
+def _utc_stamp() -> str:
+    return time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+
+
+def cmd_run(argv: Sequence[str]) -> int:
+    a = parse_run_args(argv)
+    flags = check_flags(sys.flags.dont_write_bytecode, sys.flags.isolated, os.environ)
+    root = Path(a.root)
+    items_root = Path(a.items_root) if a.items_root else root
+    code = Path(a.code) if a.code else root / "code"
+    inside = _is_inside(Path(a.out), [root, items_root, code])
+    if inside is not None:
+        raise Refused(f"--out {a.out} lies inside {inside}: nothing is ever written under a life (R5); give an OUT elsewhere")
+    a.stamp = a.stamp or _utc_stamp()
+    if a.mode == "gate":
+        return run_gate(a, flags, root, items_root, code)
+    raise ResitError(f"refused: --mode {a.mode} is not built yet (the law builds the gate first; daily and origin follow R1)")
+
+
+def run_gate(a: argparse.Namespace, flags: Mapping[str, object], root: Path, items_root: Path, code: Path) -> int:
+    """R1 (a nudge makes it R3's plant). Everything cheap that can refuse runs BEFORE the children are spent: the items scan and pin, the journal and P0, the genome in force,
+    the grader's pre-pin, the state copy. The row is written whatever happens, with what was known."""
+    cpu0, t0 = time.process_time(), time.time()
+    out = Path(a.out)
+    label = a.label or "r1"
+    run_dir = out / "gate" / label
+    run_dir.mkdir(parents=True, exist_ok=True)
+    marker = run_dir / MARKER_NAME
+    marker.write_text(a.stamp + "\n")
+    marker_ns = marker.stat().st_mtime_ns
+    status_path = a.status or (str(root / "STATUS.json") if (root / "STATUS.json").exists() else None)
+    row: Dict[str, object] = {"kind": "gate", "label": label, "stamp": a.stamp, "status": "RUNNING", "reader_sha256": sha256_file(RESIT_PY), "flags": dict(flags),
+                              "root": str(root), "items_root": str(items_root), "code": os.path.realpath(code), "mode_args": {"nudge": a.nudge, "check_turn": a.check_turn}}
+    row["live_load"] = {"start": status_reading(status_path)}
+    rc = 2
+    cap: Optional[int] = None
+    try:
+        row["code_commit"] = git_info(code)
+        genome_text = (items_root / "GENOME.genome").read_text()
+        tape_decl = tape_decl_of(genome_text)
+        scan = scan_items(items_root, tape_decl)
+        if not scan["n_asks"]:
+            raise Skipped(f"no sitting ask on the tape of {items_root}")
+        sets = {s: v for s, v in scan["sets"].items() if v["begin_seq"] is not None}
+        if not sets:
+            raise Skipped(f"no `begin` ask on the tape of {items_root}")
+        ws = world_seed_of(genome_text)
+        marks_json = Path(a.scored) / str(ws) / "fresh" / "marks.json" if ws is not None else None
+        scored_pin = {"path": str(marks_json) if marks_json and marks_json.exists() else None,
+                      "sha256": sha256_file(marks_json) if marks_json and marks_json.exists() else None}
+        pinned_before = (out / "ITEMS.json").exists()
+        pin_items(out, scan, scored=scored_pin, world_line_sha=world_scene_line_sha(genome_text), items_root=items_root)
+        row["items"] = {"n_asks": scan["n_asks"], "n_canvases": scan["n_canvases"], "ask_digest": scan["ask_digest"], "canvas_digest": scan["canvas_digest"],
+                        "sets": scan["sets"], "world_seed": ws, "scored": scored_pin, "pin": "checked" if pinned_before else "written"}
+        # the journal: the life's own rows, P0, restarts
+        js = scan_journal(items_root / "journal")
+        dup = collapse_duplicates(js["answers"])
+        row["restart_duplicates"] = dup["restart_duplicates"]
+        if dup["divergent"]:
+            raise NotGradable(f"NOT GRADABLE: RESTART-DIVERGENT — {len(dup['divergent'])} ask(s) hold two unequal answer rows (first ask seqs {dup['divergent'][:5]})")
+        first_begin = min(v["begin_seq"] for v in sets.values())
+        row["p0"] = precondition_p0(js["brain_rows"], first_begin)
+        # the genome in force at each set's begin ask (AM3), and every epoch's four line hashes as a reading
+        per_set: Dict[str, Dict[str, object]] = {}
+        for sname, v in sorted(sets.items(), key=lambda kv: kv[1]["begin_seq"]):
+            gf = genome_in_force(items_root, js["epochs"], before_seq=int(v["begin_seq"]))
+            per_set[sname] = {"epoch": gf["epoch"], "path": str(gf["path"]), "sha256": gf["sha256"], "lines": genome_line_hashes(gf["path"].read_text()),
+                              "epoch_row": gf["epoch_row"]}
+        eye_keys = ("retina", "gaze", "colour", "brain")
+        distinct = {tuple(p["lines"][k] for k in eye_keys) for p in per_set.values()}
+        epochs_reading = []
+        for k in sorted({0} | {int(e["epoch"]) for e in js["epochs"]}):
+            gp = items_root / ("GENOME.genome" if k == 0 else f"GENOME.v{k}.genome")
+            if gp.exists():
+                epochs_reading.append({"epoch": k, "path": str(gp), "lines": genome_line_hashes(gp.read_text())})
+        four_equal = len({tuple(e["lines"][k] for k in eye_keys) for e in epochs_reading}) <= 1
+        row["genome"] = {"sets": per_set, "epochs_reading": epochs_reading, "epochs_four_lines_equal": four_equal, "eye_changed": len(distinct) > 1}
+        if len(distinct) > 1:
+            raise Refused("EYE-CHANGED between the sets' in-force genomes: one brain copy cannot be read under two eyes (an anomaly: EVOLVE cannot move those lines, AM2)")
+        genome_path = next(iter(per_set.values()))["path"]
+        # the grader: its pin is checked BEFORE any child is spent
+        ginfo = grader_info(a.grader_code)
+        row["grader"] = {**ginfo, "pin": check_grader_pin(out, ginfo, write=False)}
+        # the state: a COPY of state/prev, its prints checked
+        copy_dir = run_dir / "copy"
+        st = copy_state_prev(root, copy_dir, sleep_s=a.copy_retry_sleep_s)
+        row["state"] = {k: st[k] for k in ("source", "last_seq", "t", "prints_ok", "attempts", "files", "prints")}
+        row["state"]["copy_dir"] = str(copy_dir)
+        # the children
+        cache = Path(a.cache) if a.cache else out / "glances.pkl"
+        cold = not cache.exists()
+        cap = a.cpu_cap_s or (CPU_CAP_COLD_S if cold else CPU_CAP_WARM_S)
+        wseed = a.world_seed if a.world_seed is not None else (ws or 0)
+        spec = {"code": str(code), "items_root": str(items_root), "tape_decl": tape_decl,
+                "states": [{"name": "*", "dir": str(copy_dir), "genome": genome_path}], "out_dir": str(run_dir), "glance_cache": str(cache),
+                "check_turn": ({"world_seed": wseed, "n_asks": 3} if a.check_turn else None)}
+        if a.nudge is not None:
+            spec["nudge"] = {"eps": float(a.nudge), "seed": int(a.nudge_seed)}
+        if a.blas_reading:
+            spec["blas_reading"] = int(a.blas_reading)
+        ach = run_child("answer", spec, run_dir, cpu_cap_s=cap, blas_reading=a.blas_reading)
+        require_child_ok(ach, cap)
+        ameta = json.loads((run_dir / "answer-meta.json").read_text())
+        row["answer_meta"] = ameta
+        row["subject"] = {"modules": ameta["modules"], "modules_digest": ameta["modules_digest"], "python": ameta["python"]}
+        row["eye_pin"] = ameta["eye_pin"]
+        row["turn_check"] = ameta.get("turn_check")
+        row["state"].update({k: ameta["states"][0].get(k) for k in ("state_hash", "n_learned", "calibrated_at_load", "calibrated_at_end", "state_hash_end")})
+        resit_rows = [json.loads(line) for line in (run_dir / "answers.jsonl").read_text().splitlines() if line.strip()]
+        r1a = compare_answers(resit_rows, dup["rows"])
+        r1a["n_asks_on_tape"] = scan["n_asks"]
+        r1a["unanswered"] = ameta["unanswered"]
+        r1a["pass"] = bool(r1a["all_equal"] and r1a["n_resit"] == scan["n_asks"] and not ameta["unanswered"])
+        # the grade, by the pinned grader's own function
+        gspec = {"grader_code": str(a.grader_code), "items_root": str(items_root), "journal": str(run_dir / "answers.jsonl"), "scored": str(a.scored),
+                 "label": label, "genome": str(items_root / "GENOME.genome"), "out_dir": str(run_dir), "m2a_rows": bool(a.m2a_rows)}
+        gch = run_child("grade", gspec, run_dir, cpu_cap_s=cap)
+        require_child_ok(gch, cap)
+        gmeta = json.loads((run_dir / "grade-meta.json").read_text())
+        row["grader"]["modules_digest"] = gmeta["modules_digest"]
+        row["grader"]["modules"] = gmeta["modules"]
+        row["grader"]["pin"] = check_grader_pin(out, {**ginfo, "modules_digest": gmeta["modules_digest"]})
+        grade = json.loads((run_dir / "grade.json").read_text())
+        row["m6_reading"] = {"M6_pooled": grade.get("M6_pooled"), "read_by": (grade.get("meeting") or {}).get("read_by"),
+                             "meeting_seen": (grade.get("meeting") or {}).get("seen")}
+        ref = json.loads(Path(a.reference_grade).read_text()) if a.reference_grade else None
+        r1b = compare_marks(grade, ref) if ref is not None else {"compared": False, "note": "no --reference-grade given: R1 (b) was NOT RUN"}
+        row["cpu"] = {"answer_s": ach["cpu_s"], "grade_s": gch["cpu_s"], "orchestrator_s": round(time.process_time() - cpu0, 3), "cap_s": cap, "cold": cold,
+                      "answer_self_s": ameta.get("cpu_s"), "grade_self_s": gmeta.get("cpu_s")}
+        row["cpu"]["total_s"] = round(ach["cpu_s"] + gch["cpu_s"] + row["cpu"]["orchestrator_s"], 3)
+        row["children"] = {"answer": {k: ach[k] for k in ("rc", "wall_s", "cpu_s", "maxrss_mb")}, "grade": {k: gch[k] for k in ("rc", "wall_s", "cpu_s", "maxrss_mb")}}
+        row["memory"] = {"answer_maxrss_mb": ach["maxrss_mb"], "grade_maxrss_mb": gch["maxrss_mb"],
+                         "orchestrator_maxrss_mb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0, 1)}
+        if a.nudge is not None:
+            n = ameta["nudge"]
+            changed = marks_of_diffs(r1b["diffs"]) if ref is not None and "diffs" in r1b else None
+            row["r3"] = {"eps": n["eps"], "seed": n["seed"], "hash_before": n["hash_before"], "hash_after": n["hash_after"], "answers_changed": r1a["n_diff"],
+                         "answers_compared": r1a["n_resit"], "marks_changed": changed, "first_diff": r1a["first_diff"]}
+            caught = r1a["n_diff"] >= 1 and bool(set(changed or []) & set(R1_MARKS))
+            row["status"] = "PLANT CAUGHT" if caught else "FAIL"
+            if not caught:
+                row["reading"] = ("R3: the plant does not reach the answers or the marks (#228 (a)) — "
+                                  f"answers changed {r1a['n_diff']}, marks changed {changed}")
+            rc = 0 if caught else 2
+        else:
+            row["r1a"], row["r1b"] = r1a, r1b
+            if not r1a["pass"]:
+                row["status"], row["reading"] = "FAIL", "R1 (a) red: a SUBJECT difference — the first differing item is printed with both rows (the first suspect is the glance, not the brain)"
+            elif ref is None:
+                row["status"], row["reading"] = "PARTIAL", "R1 (a) passed; R1 (b) was NOT RUN (no --reference-grade)"
+            elif not r1b["equal"]:
+                row["status"], row["reading"] = "FAIL", "R1 (a) green and (b) red: GRADER DRIFT — the pinned grader's marks differ from the reference's"
+            else:
+                row["status"], row["reading"], rc = "PASS", f"R1: {r1a['n_equal']} of {scan['n_asks']} rows equal, {len(r1b['marks_compared'])} mark groups equal to 1e-12", 0
+    except NotGradable as e:
+        row["status"], row["reason"] = "NOT GRADABLE", str(e)
+    except Skipped as e:
+        row["status"], row["reason"] = "SKIPPED", str(e)
+    except ResitError as e:
+        row["status"], row["reason"] = "REFUSED", str(e)
+    except Exception as e:                      # a defect of the reader: still a row, with the traceback, and exit 2 — never a silent half-run
+        import traceback
+        row["status"], row["reason"] = "ERROR", f"{type(e).__name__}: {e}"
+        row["traceback"] = traceback.format_exc()[-3000:]
+    finally:
+        row["live_load"]["end"] = status_reading(status_path)
+        row["nothing_written"] = dict(newer_than(_outermost([root, items_root, code]), marker_ns), checked=True)
+        row["wall_s"] = round(time.time() - t0, 3)
+        atomic_write(run_dir / "gate.json", json.dumps(row, indent=1, sort_keys=True, default=str) + "\n")
+    short = {"status": row["status"], "gate_json": str(run_dir / "gate.json")}
+    for k in ("reason", "reading"):
+        if row.get(k):
+            short[k] = row[k]
+    if "r1a" in row:
+        short["r1a"] = {k: row["r1a"][k] for k in ("n_resit", "n_equal", "n_diff", "n_missing_life_row")}
+        short["r1b"] = {k: row["r1b"].get(k) for k in ("equal", "n_leaves")}
+    print(json.dumps(short, default=str))
+    return rc
 
 
 if __name__ == "__main__":
