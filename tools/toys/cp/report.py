@@ -151,6 +151,50 @@ def _bar(D: float, null: np.ndarray, per_seed: Sequence[float], sign: int, flagg
     return {"D": float(D), "p": float(p), "signs": int(signs), "n": len(per_seed), "smallest": float(thr), "ok": bool(ok)}
 
 
+STAGE2_REPS = 10                    # the law's stage 2: 10 replicates × 10 seeds for each arm's NULL
+
+
+def _stage2(arms, seeds: Sequence[int], stage2_arms: Sequence[str], null_A: np.ndarray, null_A_ho: np.ndarray, null_N: np.ndarray,
+            rand_A, rand_N, rand_sd_A, held: Sequence[int]) -> Dict[str, object]:
+    """STAGE 2 (PREREG-TOY-CP §6; edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 12:19 +0400, red-first: tests/tools/test_toys_cp_analyse.py::TestStage2).
+    For each arm that passes BEAT, its NULL (`arms["NULL-<arm>"]`, S1c's credit derangement; 10 replicates a seed): the arm is VOID iff its NULL also passes BEAT.
+    «Passes BEAT» for the NULL is the PLAIN 10-seed bar (p ≤ 0.0056 AND d_s > 0 at ≥ 8 of 10 seeds, ≥ 9 if the NULL's replicate SD is flagged) — the lenient reading, so a
+    doubtful NULL can only make the verdict more conservative; the held-out-counted form (ema cells) is printed beside it. A NULL with fewer than 10 replicates at any seed
+    is MISSING (the law asks 10). Also kept, as readings: the arm's A minus its NULL's, by seed (the credit's address is what separates them), the NULL's SHARE_N and its LEAVE bar."""
+    out: Dict[str, Dict[str, object]] = {}
+    missing: List[str] = []
+    for arm in stage2_arms:
+        key = "NULL-" + arm
+        if key not in arms or not all(len(arms[key].get(s, [])) >= STAGE2_REPS for s in seeds):
+            missing.append(arm)
+            continue
+        A_s, N_s = _by_seed(arms, key, "A", seeds), _by_seed(arms, key, "SN", seeds)
+        arm_A = _by_seed(arms, arm, "A", seeds)
+        sdA = _sd_by_seed(A_s)
+        ratio = float(np.mean([sdA[s] / rand_sd_A[s] for s in seeds if rand_sd_A[s] > 0]))
+        flagged = ratio > 2.0
+        d_s = arm_d_by_seed(A_s, rand_A)
+        e_s = arm_d_by_seed(N_s, rand_N)
+        D, Dn = arm_D(A_s, rand_A), arm_D(N_s, rand_N)
+        beat = _bar(D, null_A, [d_s[s] for s in seeds], +1, flagged, 8, 9, lower=False)
+        leave = _bar(Dn, null_N, [e_s[s] for s in seeds], -1, False, 8, 9, lower=True)
+        counted = beat["ok"]
+        ho = None
+        if arm in EMA_CELLS:
+            hb = _bar(arm_D(A_s, rand_A, held), null_A_ho, [d_s[s] for s in held], +1, flagged, 6, 7, lower=False)
+            ho = {"D": hb["D"], "p": hb["p"], "signs": hb["signs"], "ok": hb["ok"]}
+            counted = bool(beat["ok"] and hb["ok"])
+        gain = [float(np.mean(arm_A[s]) - np.mean(A_s[s])) for s in seeds]
+        locks = [l["lock"] for s in seeds for l in arms[key][s] if l.get("lock") is not None]
+        out[arm] = {"null_A": float(np.mean([np.mean(A_s[s]) for s in seeds])), "null_SN": float(np.mean([np.mean(N_s[s]) for s in seeds])),
+                    "D": float(D), "p_A": beat["p"], "signs": beat["signs"], "smallest_D": beat["smallest"], "flagged": bool(flagged), "sd_ratio_A": ratio,
+                    "beat": bool(beat["ok"]), "beat_counted": bool(counted), "held_out": ho, "void": bool(beat["ok"]),
+                    "Dn": float(Dn), "p_N": leave["p"], "signs_N": leave["signs"], "leave": bool(leave["ok"]),
+                    "gain_over_null_s": gain, "gain_signs": sign_count(gain, +1), "gain_mean": float(np.mean(gain)),
+                    "lock_mean": float(np.mean(locks)) if locks else None, "lock_max": int(max(locks)) if locks else None}
+    return {"arms": out, "missing": missing, "void": [a for a, r in out.items() if r["void"]]}
+
+
 def analyse(arms: Mapping[str, Mapping[int, Sequence[Dict[str, object]]]], seeds: Sequence[int], draws: int = 10000) -> Dict[str, object]:
     seeds = sorted(seeds)
     held = held_out_seeds(seeds)
@@ -229,9 +273,17 @@ def analyse(arms: Mapping[str, Mapping[int, Sequence[Dict[str, object]]]], seeds
         cls = "SPLIT"                        # one arm beats RANDOM and another leaves N, none does both: unclassified by the law, printed
     verdict = {"class": cls, "beat_arms": beat_arms, "leave_arms": leave_arms, "both": both, "stage2_arms": list(beat_arms) if controls["gradable"] else [],
                "beats_without_leaving": [a for a in beat_arms if a not in leave_arms]}
+    # ---- stage 2 (PREREG §6): the class FIXED-PENDING-STAGE-2 is decided by the NULLs of the arms that passed both counted bars
+    stage2 = _stage2(arms, seeds, verdict["stage2_arms"], null_A, null_A_ho, null_N, rand_A, rand_N, rand_sd_A, held)
+    fixed_arms = [a for a in both if a in stage2["arms"] and not stage2["arms"][a]["void"]]
+    pending = [a for a in both if a not in stage2["arms"]]
+    if cls == "FIXED-PENDING-STAGE-2" and not pending:
+        cls = "FIXED" if fixed_arms else "NOT-FIXED-ALL-VOID"          # all VOID: every arm that passed both bars has a NULL that passes BEAT (the law names no class for it)
+    verdict.update({"class": cls, "fixed_arms": fixed_arms, "void_arms": [a for a in both if a in stage2["arms"] and stage2["arms"][a]["void"]], "stage2_missing": stage2["missing"]})
     return {"seeds": seeds, "held_out_seeds": held, "controls": controls, "arms": out_arms, "main_effects_A": main_effects(cellsA, seeds), "main_effects_SN": main_effects(cellsN, seeds),
-            "verdict": verdict, "null": {"draws": draws, "sd_A": float(np.std(null_A)), "q99_A": smallest_D, "sd_N": float(np.std(null_N)),
-                                         "q_lower_N": smallest_passing_lower(null_N), "sd_A_ho": float(np.std(null_A_ho)), "q99_A_ho": smallest_passing(null_A_ho)}}
+            "verdict": verdict, "stage2": stage2,
+            "null": {"draws": draws, "sd_A": float(np.std(null_A)), "q99_A": smallest_D, "sd_N": float(np.std(null_N)),
+                     "q_lower_N": smallest_passing_lower(null_N), "sd_A_ho": float(np.std(null_A_ho)), "q99_A_ho": smallest_passing(null_A_ho)}}
 
 
 def ES_CELLS() -> Tuple[str, ...]:
@@ -445,8 +497,18 @@ def render(an: Mapping[str, object], arms, decomp, counts, seeds: Sequence[int])
             L.append(f"   {arm:14s} R1 {np.mean([x['R1'] for x in lr]):.3f} R2 {np.mean([x['R2'] for x in lr]):.3f} R3 {np.mean([x['R3'] for x in lr]):.3f} · min {np.mean([min(x.values()) for x in lr]):.3f}"
                      f" · final R1 {np.mean([x['R1'] for x in fin]):.3f} R2 {np.mean([x['R2'] for x in fin]):.3f} R3 {np.mean([x['R3'] for x in fin]):.3f}")
     L.append("")
-    L.append(f"VERDICT CLASS: {V['class']}  (arms passing the counted BEAT: {V['beat_arms'] or 'none'} · the counted LEAVE: {V['leave_arms'] or 'none'} · both: {V['both'] or 'none'} · beat without leaving: {V['beats_without_leaving'] or 'none'})")
-    L.append(f"STAGE 2 (the credit-derangement NULL, 10 replicates × 10 seeds, for each arm that passes BEAT): {V['stage2_arms'] or 'not required'}")
+    S2 = an["stage2"]
+    L.append(f"STAGE 2 (the credit-derangement NULL — the arm blind to WHERE only — 10 replicates × 10 seeds, for each arm that passes BEAT; the arm is VOID iff its NULL passes the plain 10-seed BEAT): "
+             f"arms {V['stage2_arms'] or 'none required'}; missing {S2['missing'] or 'none'}")
+    if S2["arms"]:
+        L.append(f"   {'arm':14s} {'NULL A':>7s} {'NULL SHARE_N':>12s} {'D(NULL)':>9s} {'p_A':>7s} {'sgn':>5s} {'sdA×':>5s} {'BEAT':>5s} {'counted':>8s} {'VOID':>5s} {'arm−NULL A':>11s} {'sgn':>5s} {'NULL lock-in mean/max':>22s}  NULL LEAVE")
+        for arm, r in S2["arms"].items():
+            lock = f"{r['lock_mean']:.1f}/{r['lock_max']}" if r["lock_mean"] is not None else "—"
+            L.append(f"   {arm:14s} {r['null_A']:7.3f} {r['null_SN']:12.3f} {r['D']:+9.4f} {r['p_A']:7.4f} {r['signs']:2d}/{len(seeds)} {r['sd_ratio_A']:5.2f} {str(r['beat']):>5s} {str(r['beat_counted']):>8s} "
+                     f"{str(r['void']):>5s} {r['gain_mean']:+11.4f} {r['gain_signs']:2d}/{len(seeds)} {lock:>22s}  {r['Dn']:+.4f} p {r['p_N']:.4f} {r['signs_N']}/{len(seeds)} {str(r['leave'])}")
+        L.append(f"   (the smallest passing D for BEAT is {an['null']['q99_A']:.4f}; a NULL whose replicate SD is more than twice RANDOM's is judged by the sign count at ≥ 9 of 10 alone)")
+    L.append(f"VERDICT CLASS: {V['class']}  (arms passing the counted BEAT: {V['beat_arms'] or 'none'} · the counted LEAVE: {V['leave_arms'] or 'none'} · both: {V['both'] or 'none'} · "
+             f"beat without leaving: {V['beats_without_leaving'] or 'none'} · FIXED (both bars and a NULL that does not pass BEAT): {V['fixed_arms'] or 'none'} · VOID: {V['void_arms'] or 'none'})")
     return L
 
 

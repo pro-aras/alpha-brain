@@ -203,5 +203,112 @@ class TestAnalyse(unittest.TestCase):
         self.assertFalse(RP.anatomy(flipped)["mechanism_holds"])           # the plant: bias is NOT the majority in N's blocks -> refuted
 
 
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 12:17 +0400 — STAGE 2 of the signed law (PREREG-TOY-CP §6: «for each arm that passes BEAT, its NULL … 10 replicates ×
+# 10 seeds; the arm is VOID if its NULL also passes BEAT»; §5: «FIXED — some arm passes BEAT and LEAVE and its NULL (stage 2) does not pass BEAT»). Written FIRST: the stage-1
+# report printed «FIXED-PENDING-STAGE-2» and had no code that read a NULL. «Passes BEAT» for the NULL is the PLAIN 10-seed bar (p ≤ 0.0056 AND d_s > 0 at ≥ 8 of 10, ≥ 9 if
+# its replicate SD is flagged): the lenient reading, so that a doubtful null can only make the verdict MORE conservative; the held-out-counted form is printed beside it.
+class TestStage2(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.base = world(PLANTED)
+        cls.an0 = RP.analyse(cls.base, SEEDS, draws=3000)
+        cls.s2 = list(cls.an0["verdict"]["stage2_arms"])
+
+    def with_nulls(self, spec, seed=21, reps=10):
+        """spec: {arm: (A mean, A sd, SN mean, SN sd)} → the world plus a NULL-<arm> (10 replicates a seed) for each."""
+        rng = np.random.default_rng(seed)
+        arms = dict(self.base)
+        for arm, (am, asd, sm, ssd) in spec.items():
+            arms["NULL-" + arm] = {s: [life(rng.normal(am, asd), max(0.0, rng.normal(sm, ssd))) for _ in range(reps)] for s in SEEDS}
+        return arms
+
+    BLIND = (0.55, 0.025, 0.25, 0.03)        # the NULL blind to WHERE: RANDOM-like
+    STRONG = (0.66, 0.02, 0.02, 0.01)        # a null that gains as much as the winner: the credit's address did not matter
+
+    def test_the_planted_world_asks_for_stage_2_and_names_the_winner(self):
+        self.assertIn("C-hist-last2", self.s2)
+        self.assertEqual(self.an0["verdict"]["class"], "FIXED-PENDING-STAGE-2")
+        self.assertEqual(sorted(self.an0["stage2"]["missing"]), sorted(self.s2))      # no NULL record yet: every arm is missing
+
+    def test_nulls_that_are_blind_leave_the_arms_fixed(self):
+        an = RP.analyse(self.with_nulls({a: self.BLIND for a in self.s2}), SEEDS, draws=3000)
+        s2 = an["stage2"]["arms"]["C-hist-last2"]
+        self.assertFalse(s2["beat"], s2)
+        self.assertFalse(s2["void"], s2)
+        self.assertEqual(an["stage2"]["missing"], [])
+        self.assertEqual(an["verdict"]["class"], "FIXED")
+        self.assertIn("C-hist-last2", an["verdict"]["fixed_arms"])
+        self.assertGreaterEqual(s2["gain_signs"], 8)                                   # the arm beats its own null at ≥ 8 of 10 seeds
+
+    def test_a_null_that_gains_as_much_voids_the_arm_and_the_decision_flips(self):
+        blind = RP.analyse(self.with_nulls({a: self.BLIND for a in self.s2}), SEEDS, draws=3000)["stage2"]["arms"]["C-hist-last2"]
+        an = RP.analyse(self.with_nulls({a: self.STRONG for a in self.s2}), SEEDS, draws=3000)
+        strong = an["stage2"]["arms"]["C-hist-last2"]
+        self.assertTrue(strong["beat"], strong)
+        self.assertTrue(strong["void"], strong)
+        self.assertNotEqual(blind["void"], strong["void"])                             # the plant changes the decision: the check is not blind
+        self.assertGreater(strong["D"], strong["smallest_D"])
+        self.assertEqual(an["verdict"]["fixed_arms"], [])
+        self.assertEqual(an["verdict"]["class"], "NOT-FIXED-ALL-VOID")
+
+    def test_a_mixed_world_fixes_only_the_arm_whose_null_fails(self):
+        spec = {a: self.STRONG for a in self.s2}
+        spec["C-hist-last2"] = self.BLIND
+        an = RP.analyse(self.with_nulls(spec), SEEDS, draws=3000)
+        self.assertEqual(an["verdict"]["class"], "FIXED")
+        self.assertEqual(an["verdict"]["fixed_arms"], ["C-hist-last2"])
+        for a in an["verdict"]["void_arms"]:
+            self.assertNotEqual(a, "C-hist-last2")
+
+    def test_a_trapped_null_is_not_a_void(self):
+        trapped = (0.30, 0.03, 0.80, 0.03)                  # the NULL locked onto the noise room: worse than random
+        an = RP.analyse(self.with_nulls({a: trapped for a in self.s2}), SEEDS, draws=3000)
+        s2 = an["stage2"]["arms"]["C-hist-last2"]
+        self.assertFalse(s2["beat"], s2)
+        self.assertFalse(s2["void"], s2)
+        self.assertLess(s2["D"], 0)
+        self.assertEqual(an["verdict"]["class"], "FIXED")
+
+    def test_a_missing_null_keeps_the_class_pending(self):
+        spec = {a: self.BLIND for a in self.s2 if a != "C-hist-last2"}
+        an = RP.analyse(self.with_nulls(spec), SEEDS, draws=3000)
+        self.assertEqual(an["stage2"]["missing"], ["C-hist-last2"])
+        self.assertEqual(an["verdict"]["class"], "FIXED-PENDING-STAGE-2")
+
+    def test_too_few_replicates_count_as_missing(self):
+        spec = {a: self.BLIND for a in self.s2}
+        an = RP.analyse(self.with_nulls(spec, reps=4), SEEDS, draws=3000)
+        self.assertEqual(sorted(an["stage2"]["missing"]), sorted(self.s2))             # the law asks 10 replicates a seed: 4 is not a stage 2
+        self.assertEqual(an["verdict"]["class"], "FIXED-PENDING-STAGE-2")
+
+    def test_the_arm_minus_its_null_is_kept_by_seed(self):
+        an = RP.analyse(self.with_nulls({a: self.BLIND for a in self.s2}), SEEDS, draws=3000)
+        s2 = an["stage2"]["arms"]["C-hist-last2"]
+        self.assertEqual(len(s2["gain_over_null_s"]), 10)
+        self.assertGreater(float(np.mean(s2["gain_over_null_s"])), 0.05)               # 0.66 against 0.55 planted
+
+    def test_a_flagged_null_passes_beat_only_by_the_sign_count_of_nine(self):
+        noisy = (0.62, 0.20, 0.10, 0.20)                    # a locked-in-looking null: replicate SD far above RANDOM's
+        an = RP.analyse(self.with_nulls({a: noisy for a in self.s2}), SEEDS, draws=3000)
+        s2 = an["stage2"]["arms"]["C-hist-last2"]
+        self.assertTrue(s2["flagged"], s2)
+        self.assertEqual(s2["beat"], s2["signs"] >= 9)
+
+    def test_the_render_prints_stage_2_and_the_final_class(self):
+        spec = {a: self.STRONG for a in self.s2}
+        spec["C-hist-last2"] = self.BLIND
+        arms = self.with_nulls(spec)
+        an = RP.analyse(arms, SEEDS, draws=3000)
+        rows = [{"block": b, "room": "N" if b % 4 == 0 else "R1", "own": {"total": 1.0, "bias": 0.7, "weight": 0.1, "stats": 0.05},
+                 "hist": {"total": 0.5, "bias": 0.3, "weight": 0.05, "stats": 0.02}} for b in range(1, 201)]
+        counts = {a: sum(len(v) for v in arms[a].values()) for a in arms}
+        text = "\n".join(RP.render(an, arms, rows, counts, SEEDS))
+        self.assertIn("STAGE 2", text)
+        self.assertIn("VOID", text)
+        self.assertIn("C-hist-last2", text)
+        self.assertIn("VERDICT CLASS: FIXED", text)
+        self.assertNotIn("VERDICT CLASS: FIXED-PENDING-STAGE-2", text)
+
+
 if __name__ == "__main__":
     unittest.main()

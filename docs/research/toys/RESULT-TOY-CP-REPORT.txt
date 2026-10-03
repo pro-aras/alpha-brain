@@ -1,5 +1,5 @@
 TOY A — COMPRESSION PROGRESS · seeds 20261301–20261310 (10) · held-out seeds 20261304–20261310 (7)
-lives on disk: C-hist-ema 100 · C-hist-last2 100 · C-own-ema 100 · C-own-last2 100 · ERROR 100 · L-hist-ema 100 · L-hist-last2 100 · L-own-ema 100 · L-own-last2 100 · LP-OUDEYER 100 · N-ONLY 10 · ORACLE 10 · R-ONLY 200 · RANDOM 200
+lives on disk: C-hist-ema 100 · C-hist-last2 100 · C-own-ema 100 · C-own-last2 100 · ERROR 100 · L-hist-ema 100 · L-hist-last2 100 · L-own-ema 100 · L-own-last2 100 · LP-OUDEYER 100 · N-ONLY 10 · NULL-C-hist-ema 100 · NULL-C-hist-last2 100 · NULL-C-own-ema 100 · NULL-C-own-last2 100 · ORACLE 10 · R-ONLY 200 · RANDOM 200
 THE NULL (RANDOM's 20 lives a seed split 10/10, 10000 draws): sd of D_null 0.00385 (A), 0.00431 (SHARE_N); smallest passing D 0.00983 (A, upper 1 − 0.0056), largest passing Dn -0.01092 (SHARE_N, lower 0.0056); on the 7 held-out seeds 0.01248
 
 THE CONTROLS (the world can show it):
@@ -70,16 +70,16 @@ THE DROP'S ANATOMY over RANDOM's lives (single-factor drops from the state befor
       R1–R3 blocks, hist (n 27065): total +0.0337 = bias +0.0240 + weight +0.0255 + stats +0.0005 + interaction -0.0163   share_bias +0.711
 
 THE EAR'S OWN TYPE COVER (first block at which all 13 words are heard AND Ear.cover over the heard words equals the vocabulary map; 'never' if never):
-   20261301: lives 141 · first-correct block min 5 / median 7 / max 18 · never-correct lives 0 · wrong at block 200 in 0
-   20261302: lives 141 · first-correct block min 5 / median 8 / max 56 · never-correct lives 0 · wrong at block 200 in 0
-   20261303: lives 141 · first-correct block min 5 / median 5 / max 7 · never-correct lives 0 · wrong at block 200 in 0
-   20261304: lives 141 · first-correct block min 5 / median 5 / max 9 · never-correct lives 0 · wrong at block 200 in 0
-   20261305: lives 141 · first-correct block min 4 / median 4 / max 4 · never-correct lives 0 · wrong at block 200 in 0
-   20261306: lives 141 · first-correct block min 5 / median 6 / max 32 · never-correct lives 0 · wrong at block 200 in 0
-   20261307: lives 141 · first-correct block min 5 / median 9 / max 44 · never-correct lives 0 · wrong at block 200 in 0
-   20261308: lives 141 · first-correct block min 5 / median 6 / max 18 · never-correct lives 0 · wrong at block 200 in 0
-   20261309: lives 141 · first-correct block min 5 / median 5 / max 7 · never-correct lives 0 · wrong at block 200 in 0
-   20261310: lives 141 · first-correct block min 3 / median 3 / max 3 · never-correct lives 0 · wrong at block 200 in 0
+   20261301: lives 181 · first-correct block min 5 / median 7 / max 69 · never-correct lives 0 · wrong at block 200 in 0
+   20261302: lives 181 · first-correct block min 5 / median 8 / max 56 · never-correct lives 0 · wrong at block 200 in 0
+   20261303: lives 181 · first-correct block min 5 / median 6 / max 7 · never-correct lives 0 · wrong at block 200 in 0
+   20261304: lives 181 · first-correct block min 5 / median 5 / max 9 · never-correct lives 0 · wrong at block 200 in 0
+   20261305: lives 181 · first-correct block min 4 / median 4 / max 4 · never-correct lives 0 · wrong at block 200 in 0
+   20261306: lives 181 · first-correct block min 5 / median 5 / max 32 · never-correct lives 0 · wrong at block 200 in 0
+   20261307: lives 181 · first-correct block min 5 / median 8 / max 44 · never-correct lives 0 · wrong at block 200 in 0
+   20261308: lives 181 · first-correct block min 5 / median 5 / max 18 · never-correct lives 0 · wrong at block 200 in 0
+   20261309: lives 181 · first-correct block min 5 / median 5 / max 7 · never-correct lives 0 · wrong at block 200 in 0
+   20261310: lives 181 · first-correct block min 3 / median 3 / max 3 · never-correct lives 0 · wrong at block 200 in 0
 N'S HISTORY WEIGHT n_N / Σ n_j at blocks 20, 40, … 200 (mean over lives):
    L-own-last2    0.193 0.200 0.204 0.212 0.218 0.226 0.235 0.239 0.245 0.249
    L-own-ema      0.069 0.072 0.090 0.106 0.121 0.133 0.147 0.160 0.174 0.187
@@ -107,5 +107,11 @@ LEARNED PER ROOM (mean over the 200 boundaries of the pooled forced-naming accur
    ERROR          R1 0.604 R2 0.503 R3 0.494 · min 0.453 · final R1 0.479 R2 0.416 R3 0.545
    N-ONLY         R1 0.200 R2 0.183 R3 0.179 · min 0.158 · final R1 0.153 R2 0.186 R3 0.171
 
-VERDICT CLASS: FIXED-PENDING-STAGE-2  (arms passing the counted BEAT: ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · the counted LEAVE: ['L-own-last2', 'L-own-ema', 'C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · both: ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · beat without leaving: none)
-STAGE 2 (the credit-derangement NULL, 10 replicates × 10 seeds, for each arm that passes BEAT): ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema']
+STAGE 2 (the credit-derangement NULL — the arm blind to WHERE only — 10 replicates × 10 seeds, for each arm that passes BEAT; the arm is VOID iff its NULL passes the plain 10-seed BEAT): arms ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema']; missing none
+   arm             NULL A NULL SHARE_N   D(NULL)     p_A   sgn  sdA×  BEAT  counted  VOID  arm−NULL A   sgn  NULL lock-in mean/max  NULL LEAVE
+   C-own-last2      0.390        0.260   -0.1647  1.0000  0/10  4.03 False    False False     +0.2043 10/10               39.5/107  +0.0127 p 0.9984 5/10 False
+   C-own-ema        0.367        0.264   -0.1880  1.0000  0/10  1.62 False    False False     +0.2789 10/10               38.9/107  +0.0163 p 1.0000 7/10 False
+   C-hist-last2     0.475        0.174   -0.0798  1.0000  1/10  4.19 False    False False     +0.1961 10/10                37.8/79  -0.0734 p 0.0001 8/10 True
+   C-hist-ema       0.486        0.098   -0.0691  1.0000  4/10  3.08 False    False False     +0.1979 10/10                39.8/89  -0.1499 p 0.0001 9/10 True
+   (the smallest passing D for BEAT is 0.0098; a NULL whose replicate SD is more than twice RANDOM's is judged by the sign count at ≥ 9 of 10 alone)
+VERDICT CLASS: FIXED  (arms passing the counted BEAT: ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · the counted LEAVE: ['L-own-last2', 'L-own-ema', 'C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · both: ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · beat without leaving: none · FIXED (both bars and a NULL that does not pass BEAT): ['C-own-last2', 'C-own-ema', 'C-hist-last2', 'C-hist-ema'] · VOID: none)
