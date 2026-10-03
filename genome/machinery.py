@@ -443,9 +443,34 @@ def parse_genome(text: str) -> Genome:
                 keys = ["sight", "words", "surprise"] + (["sound"] if m.group(2) else [])
                 g["declared"]["FAST"] = {"episodes": int(m.group(1)), "keys": keys}
             elif gene == "SLEEP":
-                m = re.fullmatch(r"every (\d+) moments replay (\d+) by surprise", a)
-                if not m: raise GenomeError(f"SLEEP: cannot read {a!r} (B7: SLEEP every <n> moments replay <m> by surprise)")
+                # edit: Claude (Sonnet 5.5, swarm sleep), 2026-10-03 11:27 +0400 — PREREG-SLEEP-IDLE §2.1 (co-signed 5b21fa7): an OPTIONAL SUFFIX
+                # `; when idle for <s> s replay by surprise[ walking] in units of <u> s at most <r> per moment` after the boundary form. The old forms
+                # parse to the same dict and refuse with the same text; only the clause adds the key `idle`. The boundary must carry `replay 0` (two
+                # replay clocks are two advancements); there is no idle-only form here. Everything else refuses BY NAME.
+                _idle_grammar = ("SLEEP every <n> moments replay 0 by surprise; when idle for <s> s replay by surprise [walking] "
+                                 "in units of <u> s at most <r> per moment")
+                if a.startswith("when idle"):
+                    raise GenomeError(f"SLEEP: the idle clause is a suffix of the boundary form, there is no idle-only form (PREREG-SLEEP-IDLE §2.1: {_idle_grammar})")
+                head, idle_part = a, None
+                if "; when idle " in a:
+                    head, idle_part = a.split("; when idle ", 1)
+                m = re.fullmatch(r"every (\d+) moments replay (\d+) by surprise", head)
+                if not m:
+                    if "idle" in a or ";" in a:
+                        raise GenomeError(f"SLEEP: cannot read {a!r} (B7: SLEEP every <n> moments replay <m> by surprise; or with the idle clause, PREREG-SLEEP-IDLE §2.1: {_idle_grammar})")
+                    raise GenomeError(f"SLEEP: cannot read {a!r} (B7: SLEEP every <n> moments replay <m> by surprise)")
                 g["declared"]["SLEEP"] = {"every": int(m.group(1)), "replay": int(m.group(2))}
+                if idle_part is not None:
+                    mi = re.fullmatch(r"for (" + _NUM + r") s replay by surprise( walking)? in units of (" + _NUM + r") s at most (" + _NUM + r") per moment", idle_part)
+                    if not mi:
+                        raise GenomeError(f"SLEEP: cannot read the idle clause {('when idle ' + idle_part)!r} (PREREG-SLEEP-IDLE §2.1: {_idle_grammar})")
+                    if int(m.group(2)) != 0:
+                        raise GenomeError(f"SLEEP: the idle clause needs replay 0 on the boundary (got replay {int(m.group(2))}): two replay clocks are two advancements (PREREG-SLEEP-IDLE §2.1)")
+                    after_s, unit_s, rate = float(mi.group(1)), float(mi.group(3)), float(mi.group(4))
+                    for field, v, lo, hi, lo_open in (("after_s", after_s, 0.05, 600.0, False), ("unit_s", unit_s, 0.01, 30.0, False), ("rate", rate, 0.0, 1.0, True)):
+                        if not ((v > lo) if lo_open else (v >= lo)) or v > hi:
+                            raise GenomeError(f"SLEEP: idle {field} {v:g} out of range ({'above ' if lo_open else ''}{lo:g}..{hi:g}) (PREREG-SLEEP-IDLE §2.1)")
+                    g["declared"]["SLEEP"]["idle"] = {"after_s": after_s, "walking": mi.group(2) is not None, "unit_s": unit_s, "rate": rate}
             elif gene == "PREDICT":
                 # edit: Claude (Sonnet 5, builder E), 2026-09-21 16:58 +0400 — G5-E (docs/briefs/G5-E-ERROR-ARMS-BY-REPLAY.md;
                 # docs/organs/MIND-MEMORY.md §4 G-MIND-3): an OPTIONAL trailing clause names which error arm PREDICT
