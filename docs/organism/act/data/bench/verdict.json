@@ -1,0 +1,202 @@
+{
+ "marks": {
+  "M1": {
+   "a": true,
+   "b": true,
+   "c": true,
+   "d": true,
+   "e": true,
+   "gain": 0.13325,
+   "positive_seeds": 12,
+   "t": 28.95117434924305,
+   "t_crit": 4.437,
+   "minus_r_scr": -0.025666666666666615,
+   "pass": true
+  },
+  "M2": {
+   "pass_960": 0.92,
+   "pass_full": 0.48,
+   "pass": false
+  },
+  "M3": {
+   "alone": true,
+   "le_0.25_share": 1.0,
+   "median": 0.058333333333333334,
+   "pass": false
+  },
+  "M4": {
+   "a_share": 1.0,
+   "b_share": 0.8,
+   "a_median": 1.0,
+   "b_median": 1.0,
+   "exact_set_median": 0.9895833333333333,
+   "latency": {
+    "lives_with_it": 50,
+    "median": 169.5
+   },
+   "pass": false
+  },
+  "M5": {
+   "plants": {
+    "P-DEAL": {
+     "mean": 0.0375,
+     "over_null": -0.23450000000000001,
+     "noop_ge_0.5_share": 1.0,
+     "caught": true
+    },
+    "K-ARGMAX": {
+     "pass_960": 0.0,
+     "pass_full": 0.0,
+     "caught": true
+    },
+    "P-OLD": {
+     "pass_960": 0.0,
+     "pass_full": 0.0,
+     "caught": true
+    }
+   },
+   "pass": true
+  },
+  "M6": {
+   "pass": true,
+   "what": "unit test (tests/creature/test_act_effect_toy.py)"
+  },
+  "M7": {
+   "null_equals_landed_rows": true,
+   "candidate_twice_identical": true,
+   "null_twice_identical": true,
+   "pass": true
+  },
+  "M8": {
+   "steps": 20077,
+   "mismatches": 0,
+   "pass": true
+  },
+  "M9": {
+   "pass": true,
+   "what": "unit test (tests/creature/test_act_effect_toy.py TestBoundaryRuleM9)"
+  }
+ },
+ "admit": false,
+ "void": false,
+ "readings": {
+  "null_mean": 0.272,
+  "null_sd": 0.01502119714391511,
+  "r3_mean": 0.4339166666666667,
+  "r3_sd": 0.015011863995056078,
+  "r3_seedwise_p95": 0.4586111829385339,
+  "ceiling_mean": 0.48783333333333334,
+  "r_scr_mean": 0.43091666666666667,
+  "c_scr_mean": 0.40525000000000005,
+  "c_scr_minus_null": 0.13325,
+  "c_scr_minus_r3": -0.028666666666666618,
+  "c_scr_minus_r_scr": -0.025666666666666615,
+  "null2_minus_null_sd": 0.016665151446274725,
+  "smallest_detectable_gap_seed_level": 0.02042163274165969,
+  "paired_diff_sd_vs_null": 0.015943793320742253,
+  "c_scr_per_seed": [
+   0.39,
+   0.43,
+   0.387,
+   0.393,
+   0.405,
+   0.435,
+   0.398,
+   0.389,
+   0.38,
+   0.423,
+   0.416,
+   0.417
+  ],
+  "c_scr_effect_counts": {
+   "left": {
+    "known": 183457,
+    "excluded": 3806,
+    "total": 187263
+   },
+   "right": {
+    "known": 183419,
+    "excluded": 3861,
+    "total": 187280
+   },
+   "forward": {
+    "known": 165079,
+    "excluded": 3561,
+    "total": 168640
+   },
+   "pickup": {
+    "known": 10502,
+    "excluded": 221,
+    "total": 10723
+   },
+   "drop": {
+    "known": 8483,
+    "excluded": 174,
+    "total": 8657
+   },
+   "toggle": {
+    "known": 8441,
+    "excluded": 167,
+    "total": 8608
+   },
+   "done": {
+    "known": 8405,
+    "excluded": 198,
+    "total": 8603
+   }
+  }
+ },
+ "alternatives": {
+  "A-PROP": {
+   "mean": 0.36975,
+   "minus_null": 0.09775,
+   "minus_r3": -0.06416666666666665,
+   "clears_r3_seedwise_p95": false
+  },
+  "A-UCB": {
+   "mean": 0.23099999999999998,
+   "minus_null": -0.041000000000000036,
+   "minus_r3": -0.2029166666666667,
+   "clears_r3_seedwise_p95": false
+  },
+  "A-RATE": {
+   "mean": 0.36566666666666664,
+   "minus_null": 0.09366666666666662,
+   "minus_r3": -0.06825000000000003,
+   "clears_r3_seedwise_p95": false
+  },
+  "A-BOTH": {
+   "mean": 0.3910833333333333,
+   "minus_null": 0.11908333333333326,
+   "minus_r3": -0.04283333333333339,
+   "clears_r3_seedwise_p95": false
+  },
+  "R-WSLS": {
+   "mean": 0.3961666666666666,
+   "minus_null": 0.12416666666666659,
+   "minus_r3": -0.03775000000000006,
+   "clears_r3_seedwise_p95": false
+  },
+  "R-WALK": {
+   "mean": 0.5565833333333333,
+   "minus_null": 0.2845833333333333,
+   "minus_r3": 0.12266666666666665,
+   "clears_r3_seedwise_p95": true
+  },
+  "A-VAL": {
+   "mean": 0.27016666666666667,
+   "minus_null": -0.0018333333333333535,
+   "minus_r3": -0.16375,
+   "clears_r3_seedwise_p95": false
+  },
+  "A-SMP": {
+   "mean": 0.28541666666666665,
+   "minus_null": 0.013416666666666632,
+   "minus_r3": -0.14850000000000002,
+   "clears_r3_seedwise_p95": false
+  }
+ },
+ "next_law_cases": [
+  "R-WALK"
+ ]
+}

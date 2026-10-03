@@ -1,0 +1,118 @@
+{
+ "env": "BabyAI-GoToLocal-v0",
+ "episodes": 1000,
+ "seeds": [
+  20260923,
+  21260923,
+  22260923,
+  23260923,
+  24260923,
+  25260923,
+  26260923,
+  27260923,
+  28260923,
+  29260923,
+  30260923,
+  31260923
+ ],
+ "runs": [
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.469,
+   "max_steps": 21,
+   "seed": 20260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.132,
+   "max_steps": 19,
+   "seed": 21260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.31,
+   "max_steps": 16,
+   "seed": 22260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.302,
+   "max_steps": 24,
+   "seed": 23260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.408,
+   "max_steps": 19,
+   "seed": 24260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.124,
+   "max_steps": 19,
+   "seed": 25260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.362,
+   "max_steps": 17,
+   "seed": 26260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.371,
+   "max_steps": 20,
+   "seed": 27260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.367,
+   "max_steps": 24,
+   "seed": 28260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.265,
+   "max_steps": 26,
+   "seed": 29260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.255,
+   "max_steps": 18,
+   "seed": 30260923
+  },
+  {
+   "episodes": 1000,
+   "successes": 1000,
+   "success_rate": 1.0,
+   "mean_steps": 5.455,
+   "max_steps": 19,
+   "seed": 31260923
+  }
+ ],
+ "success_mean": 1.0,
+ "mean_steps": 5.318333333333333
+}
