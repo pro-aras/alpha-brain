@@ -92,6 +92,12 @@ class Scorer:
         self._n0 = sum(c0.values())                                   # N under ∅ = train words + one END a moment
         self._bits0 = self._held_bits(c0, self._n0, self.V + 2, frozenset())
 
+    @property
+    def n0(self) -> int:
+        """N under the empty frame set: the train words plus one END a moment (the architect's 17:0x expected-value reading of the PLANT gate prints it)."""
+        return self._n0
+
+    # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 17:03 +0400 — the public `n0` above (plants.py's expected-value reading needs N_train); nothing else in this file changes.
     # -- the held-out code length under a train model (counts, N, K) and a frame set ------------------------------------------------
     def _held_bits(self, counts: Mapping[object, int], n: int, k: int, frames) -> float:
         d = math.log2(n + k)

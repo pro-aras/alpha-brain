@@ -1,0 +1,33 @@
+load_moments 84275 moments 1.0s rss 99 MB
+Scorer built V=2236 train 50565 held 33710 held_words 45143 0.1s rss 99 MB
+gain() on 10 frames: mean 0.062s  (last G -231.3)
+gain() on 100 frames: mean 0.064s  (last G -2220.9)
+MDL-GREEDY: 281 steps, 2895 candidates, 8.9s rss 102 MB; G(F) -2357.2
+SENTENCE: 470 frames, N 7056, 0.1s rss 102 MB; G(F) -7326.1
+flat train words 67346
+WEB-H: consolidated 3542 kept 1430 dropped 2112 peak_edges 34963 0.8s rss 131 MB; G(F) -28202.0
+WEB-S: consolidated 1723 kept 807 dropped 916 peak_edges 4472 1.9s rss 131 MB; G(F) -14697.6
+final peak rss 131 MB
+	Command being timed: "env PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python3 -B -u scratch/probe_price.py"
+	User time (seconds): 13.83
+	System time (seconds): 0.13
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:13.97
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 134376
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 32575
+	Voluntary context switches: 1
+	Involuntary context switches: 73
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
