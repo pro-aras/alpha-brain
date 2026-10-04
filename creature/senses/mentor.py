@@ -119,20 +119,24 @@ class Canvas:
     order: int = 0
 
 
+def fixation_hits(t: Thing, fix: Sequence[Sequence[int]]) -> int:
+    """The organism's own seen rule (brain/scene/world.py:569's fixation_thing): the fixation cells whose CENTRE pixel
+    (y*8+4, x*8+4) lands in the thing's box ± 4 px, half-open."""
+    return sum(1 for y, x in fix if t.top - 4 <= int(y) * 8 + 4 < t.top + t.side + 4 and t.left - 4 <= int(x) * 8 + 4 < t.left + t.side + 4)
+
+
 def _fixated(canvas: Canvas) -> List[int]:
-    """The thing indices with >= 1 fixated cell, in things order."""
-    fix = {tuple(c) for c in canvas.fix}
-    return [i for i, t in enumerate(canvas.things) if any(c in fix for c in t.cells())]
+    """The thing indices with >= 1 fixated cell by the organism's own seen rule, in things order."""
+    return [i for i, t in enumerate(canvas.things) if fixation_hits(t, canvas.fix) >= 1]
 
 
 def referent(canvas: Canvas) -> Optional[int]:
-    """The follow-in referent: the thing holding the MOST fixated cells among things with >= 1 (the FIRST maximum in
-    things order; `mentor_rows` breaks a tie with the canvas's own rng, `substream(seed, "w2:mentor:reftie:<canvas>")`).
+    """The follow-in referent: the thing holding the MOST fixated cells by the organism's own seen rule (the FIRST
+    maximum in things order; `mentor_rows` breaks a tie with the canvas's own rng, `substream(seed, "w2:mentor:reftie:<canvas>")`).
     None when nothing is fixated."""
-    fix = {tuple(c) for c in canvas.fix}
     best, best_n = None, 0
     for i, t in enumerate(canvas.things):
-        n = sum(1 for c in t.cells() if c in fix)
+        n = fixation_hits(t, canvas.fix)
         if n > best_n:
             best, best_n = i, n
     return best
@@ -140,8 +144,7 @@ def referent(canvas: Canvas) -> Optional[int]:
 
 def _referent_pick(canvas: Canvas, rng) -> Optional[int]:
     """The referent with ties broken by the canvas's rng (the law's `w2:mentor:reftie` rule)."""
-    fix = {tuple(c) for c in canvas.fix}
-    counts = [sum(1 for c in t.cells() if c in fix) for t in canvas.things]
+    counts = [fixation_hits(t, canvas.fix) for t in canvas.things]
     best = max(counts, default=0)
     if best == 0:
         return None

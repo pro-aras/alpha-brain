@@ -48,9 +48,31 @@ def _readback_referent(things: Sequence[M.Thing], rows: Sequence[Dict[str, objec
     return None
 
 
+def _ask_target(c: SceneCanvas) -> Optional[int]:
+    """The asked thing: the truth thing under the ask's hyp (the pointer rule's arithmetic; None when it resolves to no
+    thing — a presence count the bench prints)."""
+    ask = c.turn.get("ask")
+    if not ask:
+        return None
+    hyp = int(ask.get("hyp"))
+    if hyp >= len(c.hyps):
+        return None
+    cells = {tuple(c.fix[m]) for m in c.hyps[hyp]}
+    best, best_n = None, 0
+    for i, t in enumerate(c.things):
+        n = sum(1 for cell in t.cells() if cell in cells)
+        if n > best_n:
+            best, best_n = i, n
+    return best
+
+
 def build(canvases: Sequence[SceneCanvas], census, bench_seed: int, lo: int = 0, hi: Optional[int] = None) -> BenchStream:
     """The slice [lo, hi) of the full assembly with the GLOBAL reference census (the states' young/cnt read the record's
-    own counts from canvas 0; the slice bounds are positions in the full assembly)."""
+    own counts from canvas 0; the slice bounds are positions in the full assembly). The mirror tokens need the canvas's
+    REAL state (doubt/young/ask_prev), whose lead comes from the generator's referent — resolved by the generator's own
+    determinism: a first pass with a zero state names the referent (the carriers never read the state), the state is
+    computed, and the second pass with a FRESH identical substream re-emits the identical carriers plus the mirror
+    tokens (the mirror block draws nothing)."""
     hi = len(canvases) if hi is None else min(int(hi), len(canvases))
     utterances: List[Dict[str, object]] = []
     states: List[np.ndarray] = []
@@ -60,19 +82,23 @@ def build(canvases: Sequence[SceneCanvas], census, bench_seed: int, lo: int = 0,
     n_rb = 0
     for pos in range(int(lo), hi):
         c = canvases[pos]
-        rng = substream(bench_seed, f"w2:mentor:{c.order}")
-        st = {"doubt": 0, "young": 0, "ask_prev": 0}
-        rows = M.mentor_rows(M.Canvas(moment=c.moment, things=c.things, fix=c.fix, state=st,
-                                      say=(c.turn.get("say") or {}).get("words") if c.turn.get("say") else None,
-                                      ask_target=None, order=c.order), rng)
-        ref = _readback_referent(c.things, rows)
-        if ref is not None:
+        say = (c.turn.get("say") or {}).get("words") if c.turn.get("say") else None
+        ask_target = _ask_target(c)
+        mc = M.Canvas(moment=c.moment, things=c.things, fix=c.fix, state={"doubt": 0, "young": 0, "ask_prev": 0},
+                      say=say, ask_target=ask_target, order=c.order)
+        ref = M._referent_pick(mc, substream(bench_seed, f"w2:mentor:{c.order}"))
+        base = M.mentor_rows(mc, substream(bench_seed, f"w2:mentor:{c.order}"))
+        if _readback_referent(c.things, base) == ref and ref is not None:
             n_rb += 1
         s = ST.state_of(canvases, census, pos, ref)
+        rows = M.mentor_rows(M.Canvas(moment=c.moment, things=c.things, fix=c.fix,
+                                      state={"doubt": int(s[0]), "young": int(s[1]), "ask_prev": int(s[2])},
+                                      say=say, ask_target=ask_target, order=c.order),
+                             substream(bench_seed, f"w2:mentor:{c.order}"))
         prods = M.productions(rows)
         mirror = [w for w in ("unsure", "fresh", "asked") if any(p == [w] for p in prods)]
         carrier = [w for p in prods if not (len(p) == 1 and p[0] in STATE_WORDS) for w in p]
-        utterances.append({"parent": list(c.words), "carrier": carrier, "mirror": mirror})
+        utterances.append({"parent": list(c.words), "carrier": carrier, "mirror": mirror, "ask_target": ask_target})
         states.append(s)
         labels.append({"doubt": int(s[0]), "young": int(s[1]), "ask_prev": int(s[2])})
         all_rows.append(rows)
