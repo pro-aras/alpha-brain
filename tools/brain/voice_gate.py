@@ -362,7 +362,7 @@ def mark_f(on_rows: List[Dict[str, object]], off_rows: List[Dict[str, object]],
 
     def scored(p: Optional[str]) -> Tuple[int, int]:
         rows = [json.loads(x) for x in (p or "").splitlines() if x.strip()]
-        return len(rows), sum(1 for x in rows if x.get("route") == "frame")
+        return len(rows), sum(1 for x in rows if (x.get("row") or {}).get("route") == "frame")   # predict_score nests the filed row
 
     n_on, fr_scored_on = scored(preds_on)
     n_off, fr_scored_off = scored(preds_off)
@@ -457,21 +457,56 @@ def _exit_of(p: Path) -> Optional[int]:
     return int(p.read_text().strip()) if p.exists() else None
 
 
-def _state_hash(tmp_glob: Path) -> Optional[str]:
-    roots = sorted(tmp_glob.parent.glob(tmp_glob.name))
-    for root in roots:
-        f = root / "state" / "brain.json"
-        if f.exists():
-            return json.loads(f.read_text()).get("state_hash")
-    return None
-
-
 def _preds(tmp_glob: Path) -> Optional[str]:
     roots = sorted(tmp_glob.parent.glob(tmp_glob.name))
     for root in roots:
         f = root / "state" / "predictions.jsonl"
         return f.read_text() if f.exists() else ""
     return None
+
+
+def _saved_brain_equal(glob_on: Path, glob_off: Path) -> Dict[str, object]:
+    """I2's «the brain's saved state … equal» as the VERIFIER's NOTE-1 names it: the brain organ's OWN ARRAYS
+    (state/brain.npz, array by array) and the saved meta (state/brain.json) MINUS the replay work root's name — a
+    replay saves its random mkdtemp suffix as segments[*].author, so two replays of one life can never be
+    meta-identical; the learned content and the arrays are what is compared (the instrument's own fault of 20:5x,
+    named in the build log)."""
+    def files(g: Path):
+        roots = sorted(g.parent.glob(g.name))
+        for root in roots:
+            j, n = root / "state" / "brain.json", root / "state" / "brain.npz"
+            if j.exists() and n.exists():
+                return j, n
+        return None, None
+
+    jon, non = files(glob_on)
+    joff, noff = files(glob_off)
+    if jon is None or joff is None:
+        return {"equal": False, "missing": True}
+    a, b = np.load(non), np.load(noff)
+    arrays_equal = sorted(a.files) == sorted(b.files) and all(np.array_equal(a[k], b[k]) for k in a.files)
+    ma, mb = json.loads(jon.read_text()), json.loads(joff.read_text())
+    for m in (ma, mb):
+        for s in (m.get("brain") or {}).get("segments") or []:
+            s.pop("author", None)
+        m.pop("state_hash", None)   # the digest of the very content compared here (it inherits the work root's name)
+    meta_equal = canon(ma) == canon(mb)
+    return {"equal": bool(arrays_equal and meta_equal), "arrays": len(a.files), "arrays_equal": arrays_equal,
+            "meta_minus_work_root_equal": meta_equal}
+
+
+def _train_seqs(life_root: Path) -> Dict[str, List[int]]:
+    """Per training moment of the closed life's tape, the seqs of its ear rows and its eye row (drive_gate.py's
+    train_rows, the ws filter generalised: the moment names the world). read_tape takes the life ROOT (its own
+    _resolve_tape_dir appends the tape dir) — the instrument's own fault of 20:5x, named in the build log."""
+    from creature.tape import read_tape
+    seqs: Dict[str, List[int]] = collections.defaultdict(list)
+    for r in read_tape(life_root):
+        meta = r.get("meta") or {}
+        m = str(meta.get("moment") or "")
+        if meta.get("source") == "scene" and r["sense"] in ("ear", "eye") and re.fullmatch(r"sc\d+t\d+", m):
+            seqs[m].append(int(r["seq"]))
+    return dict(seqs)
 
 
 def main() -> int:
@@ -510,26 +545,18 @@ def main() -> int:
         jon = rows_of(rd / "on" / "journal.jsonl")
         joff = rows_of(rd / "off" / "journal.jsonl")
         one["I2"] = mark_i2(jon, joff)
-        h_on = _state_hash(rd / f"tmp-on-{name}" / "creature-replay-*")
-        h_off = _state_hash(rd / f"tmp-off-{name}" / "creature-replay-*")
-        one["I2"]["brain_saved_state"] = {"on": h_on, "off": h_off, "equal": (h_on is not None and h_on == h_off)}
+        one["I2"]["brain_saved_state"] = _saved_brain_equal(rd / f"tmp-on-{name}" / "creature-replay-*",
+                                                            rd / f"tmp-off-{name}" / "creature-replay-*")
         one["I2"]["pass"] = bool(one["I2"]["pass"] and one["I2"]["brain_saved_state"]["equal"])
         one["V"] = mark_v(jon)
         one["T"] = mark_t(jon, scene_spec, life["seed"], nulls=a.nulls)
         one["C"] = mark_c(jon)
         one["Z"] = mark_z(jon, scene_spec)
-        tape_dir = lives / name / "tape"
-        if tape_dir.exists():
-            from creature.tape import read_tape
-            seqs: Dict[str, List[int]] = collections.defaultdict(list)
-            for r in read_tape(tape_dir):
-                meta = r.get("meta") or {}
-                m = str(meta.get("moment") or "")
-                if meta.get("source") == "scene" and r["sense"] in ("ear", "eye") and re.fullmatch(r"sc\d+t\d+", m):
-                    seqs[m].append(int(r["seq"]))
+        if (lives / name).exists():
+            seqs = _train_seqs(lives / name)
             ton = {int(r["seq"]): r for r in rows_of(rd / "on" / "timings.jsonl")}
             toff = {int(r["seq"]): r for r in rows_of(rd / "off" / "timings.jsonl")}
-            one["K"] = mark_k(dict(seqs), ton, toff)
+            one["K"] = mark_k(seqs, ton, toff)
         if name.startswith("full"):
             one["F"] = mark_f(jon, joff, _preds(rd / f"tmp-on-{name}" / "creature-replay-*"),
                               _preds(rd / f"tmp-off-{name}" / "creature-replay-*"))

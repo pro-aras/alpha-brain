@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from pathlib import Path
 from typing import Dict, List
 
 from brain.scene import world as W
@@ -201,12 +202,13 @@ class MarksI2FAndTheSealedCompare(unittest.TestCase):
         think_row = {"seq": 10, "think": {"item": "x", "kind": "frame", "outcome": "filed", "parked": False}}
         on = CLEAN[:2] + [say_row, think_row] + CLEAN[2:]
         off = [r for r in on if not (r.get("kind") == "brain" and r.get("act") == "voice")]
-        preds = json.dumps({"claim": '"red circle"', "route": "frame", "evidence": True}) + "\n"
+        preds = json.dumps({"accepted": True, "refused": [], "row": {"claim": '"red circle"', "route": "frame"}}) + "\n"
         f = VG.mark_f(on, off, preds, preds)
         self.assertTrue(f["pass"], f)
         self.assertEqual(f["said"], 1)
         self.assertEqual(f["heard_yes"], 1)
         self.assertEqual(f["frames_filed"], 1)
+        self.assertEqual(f["frames_scored"], 1)
         f2 = VG.mark_f(on, off, preds, preds.replace("true", "false"))
         self.assertFalse(f2["pass"], "a changed predictions.jsonl moves F")
 
@@ -237,6 +239,48 @@ class RFrame(unittest.TestCase):
         self.assertEqual(r["paired_voice_true"], 1.0)
         self.assertEqual(r["smallest_passing_gap"], 10 / 3)
         self.assertAlmostEqual(r["heard_yes_share"], 2 / 3, "the mouth's own «heard yes», a different quantity")
+
+
+class TheSavedStateAndTheTapeSeqs(unittest.TestCase):
+    """The instrument's own two paths (its 20:5x faults pinned by name): the saved brain state compared as the organ's
+    OWN ARRAYS plus the meta MINUS the replay work root's name (NOTE-1), and the tape's train moments read from the
+    life ROOT (read_tape's own _resolve_tape_dir appends the tape dir)."""
+
+    def _work_root(self, parent: Path, name: str, x: int, author: str) -> None:
+        import numpy as np
+        st = parent / name / "state"
+        st.mkdir(parents=True, exist_ok=True)
+        np.savez(st / "brain.npz", road=np.array([[x, x + 1], [x + 2, x + 3]]))
+        (st / "brain.json").write_text(json.dumps({"version": 1, "state_hash": f"digest-inheriting-{author}",
+                                                   "brain": {"segments": [{"author": author, "n": x}],
+                                                             "n_calibrations": 3}}))
+
+    def test_the_saved_brain_state_compares_the_arrays_and_masks_the_work_root(self) -> None:
+        import tempfile
+        tmp = Path(tempfile.mkdtemp())
+        on, off = tmp / "on", tmp / "off"
+        self._work_root(on, "creature-replay-aaa111", 7, "creature-replay-aaa111")
+        self._work_root(off, "creature-replay-bbb222", 7, "creature-replay-bbb222")
+        m = VG._saved_brain_equal(on / "creature-replay-*", off / "creature-replay-*")
+        self.assertTrue(m["equal"], m)
+        self.assertTrue(m["arrays_equal"] and m["meta_minus_work_root_equal"])
+        self._work_root(off, "creature-replay-bbb222", 8, "creature-replay-bbb222")   # one array value flipped
+        m2 = VG._saved_brain_equal(on / "creature-replay-*", off / "creature-replay-*")
+        self.assertFalse(m2["equal"], "a changed learned array must move the compare")
+        self.assertFalse(m2["arrays_equal"])
+
+    def test_the_train_seqs_are_read_from_the_life_root(self) -> None:
+        import tempfile
+        root = Path(tempfile.mkdtemp())
+        tape = root / "tape"
+        tape.mkdir()
+        rows = [{"sense": "ear", "seq": 1, "meta": {"moment": "sc999t000000", "source": "scene"}},
+                {"sense": "eye", "seq": 2, "meta": {"moment": "sc999t000000", "source": "scene"}},
+                {"sense": "ear", "seq": 3, "meta": {"moment": "sc999t000001", "source": "scene"}},
+                {"sense": "eye", "seq": 4, "meta": {"moment": "sc999t000001", "source": "scene"}}]
+        (tape / "2026-01-01.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+        seqs = VG._train_seqs(root)
+        self.assertEqual(seqs, {"sc999t000000": [1, 2], "sc999t000001": [3, 4]})
 
 
 if __name__ == "__main__":
