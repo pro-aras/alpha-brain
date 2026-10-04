@@ -75,6 +75,18 @@ class TestPolarity(unittest.TestCase):
         c = canvas(things=(STAR,), fix=[list(p) for p in STAR.cells()][:2])
         self.assertFalse(any(r["meta"]["tpl"].startswith("M-C2") for r in rows(c)))
 
+    def test_c2s_np_is_true_of_no_fixated_thing(self):
+        big_star = M.Thing(shape="star", colour="blue", size="big", top=4, left=30)
+        small_star = M.Thing(shape="star", colour="blue", size="small", top=90, left=90)
+        c = canvas(things=(big_star, small_star), fix=[list(p) for p in big_star.cells()][:3])
+        prods = M.productions([r for r in rows(c) if r["meta"]["tpl"].startswith("M-C2")])
+        self.assertTrue(prods)                                          # T3 «big star» is still sayable of the unseen one
+        for p in prods:
+            npw = p[4:]
+            self.assertFalse(all(M.word_true_of(w, big_star) for w in npw), p)
+        self.assertFalse(any(r["meta"]["tpl"] in ("M-C2-T1", "M-C2-T2") for r in rows(c)),
+                         "«does not see star» / «does not see blue star» would be FALSE (a blue star IS fixated)")
+
 
 class TestVariationSets(unittest.TestCase):
     def test_a_run_is_three_utterances_one_carrier_one_position_changed(self):
