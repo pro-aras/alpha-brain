@@ -1,0 +1,423 @@
+# a3b-red1 on 5a36a7aade6fe256888ab68a9e894123416227e4, started 2026-10-03 23:16:34 +0400
+E.EEE..E..FEFEEFEE.E..EEEE....EFF..FFEEEEEE{"first_seq": 75, "last_seq": 118, "n_payloads": 44, "n_rows": 44, "payload_bytes": 323605, "rows_sha256": "455b2c5ffa7b63ad4b448e12af62a9bc5a128a5c8d42c28490f3366e26690bef"}
+VERIFY {"equal": true, "extra_rows": 0, "missing_payloads": [], "payload_mismatches": [], "row_mismatches": 0, "rows_checked": 44}
+{"bytes": 240874, "n_files": 12}
+VERIFY {"equal": true, "extra": [], "mismatches": [], "missing": [], "n_files": 12}
+.{"confirmed_share": null, "cpu_s": 0.446, "frames_filed": 0, "journal_rows": 7, "journal_sha256": "f81ed4efcc692edbc8fd6e0a19522719954fe362a330f8e588c4a1c5389cc0ed", "maxrss_kb": 236572, "q1_seen": 0.35, "rows_consumed": 12, "state_hash": "5622ee6779653b6d337e1f9d39a2f292c1a3bc095948ff71f913df7b3b9c7900", "variant": "incumbent", "wall_s": 0.448}
+{"confirmed_share": null, "cpu_s": 0.427, "frames_filed": 0, "journal_rows": 7, "journal_sha256": "f81ed4efcc692edbc8fd6e0a19522719954fe362a330f8e588c4a1c5389cc0ed", "maxrss_kb": 238988, "q1_seen": 0.35, "rows_consumed": 12, "state_hash": "5622ee6779653b6d337e1f9d39a2f292c1a3bc095948ff71f913df7b3b9c7900", "variant": "incumbent", "wall_s": 0.427}
+{"a": {"label": null, "variant": "incumbent"}, "b": {"label": null, "variant": "incumbent"}, "confirmed_share": [null, null], "frames_filed": [0, 0], "journal": {"by_decile": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 7, "first_diff": null, "first_discrete_diff": null, "identical": true, "n_a": 7, "n_b": 7, "rows_differing": 0}, "q1_seen": [0.35, 0.35], "row_hash_equal": true, "state_hash_equal": true}
+.EE....EE.EEE...................................Eusage: python3 -m unittest [-h] {run} ...
+python3 -m unittest: error: argument cmd: invalid choice: 'make-eps-list' (choose from run)
+EEEE......{"label": "a", "variant": "incumbent", "exit": 0}
+{"label": "b", "variant": "seed:1", "exit": 3}
+.
+======================================================================
+ERROR: test_a_bandless_dimension_is_printed_against_the_legacy_tolerance (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_a_bandless_dimension_is_printed_against_the_legacy_tolerance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 405, in test_a_bandless_dimension_is_printed_against_the_legacy_tolerance
+    c = b["dims"]["q1_seen"]["ceiling"]
+        ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'ceiling'
+
+======================================================================
+ERROR: test_confirmed_share_near_one_has_no_headroom_for_a_band (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_confirmed_share_near_one_has_no_headroom_for_a_band)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 397, in test_confirmed_share_near_one_has_no_headroom_for_a_band
+    c = b["dims"]["confirmed_share"]["ceiling"]
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'ceiling'
+
+======================================================================
+ERROR: test_every_dimension_carries_both_sides_of_its_ceiling (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_every_dimension_carries_both_sides_of_its_ceiling)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 364, in test_every_dimension_carries_both_sides_of_its_ceiling
+    c = b["dims"][d]["ceiling"]
+        ~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'ceiling'
+
+======================================================================
+ERROR: test_improved_is_unreachable_when_the_edge_is_not_below_the_headroom (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_improved_is_unreachable_when_the_edge_is_not_below_the_headroom)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 380, in test_improved_is_unreachable_when_the_edge_is_not_below_the_headroom
+    c = b["dims"]["q1_seen"]["ceiling"]
+        ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'ceiling'
+
+======================================================================
+ERROR: test_regressed_is_unreachable_when_the_edge_is_not_below_the_incumbents_own_reading (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_regressed_is_unreachable_when_the_edge_is_not_below_the_incumbents_own_reading)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 389, in test_regressed_is_unreachable_when_the_edge_is_not_below_the_incumbents_own_reading
+    c = b["dims"]["frames_filed"]["ceiling"]
+        ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'ceiling'
+
+======================================================================
+ERROR: test_a_larger_level_whose_spread_exceeds_flat_factor_times_the_chosens_is_labelled_not_chosen (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_a_larger_level_whose_spread_exceeds_flat_factor_times_the_chosens_is_labelled_not_chosen)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 278, in test_a_larger_level_whose_spread_exceeds_flat_factor_times_the_chosens_is_labelled_not_chosen
+    self.assertEqual(c["flat_factor"], 2.0)
+                     ~^^^^^^^^^^^^^^^
+KeyError: 'flat_factor'
+
+======================================================================
+ERROR: test_a_reading_that_moved_with_no_flip_is_a_move_and_is_flagged (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_a_reading_that_moved_with_no_flip_is_a_move_and_is_flagged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 244, in test_a_reading_that_moved_with_no_flip_is_a_move_and_is_flagged
+    self.assertTrue(c["per_level"][1e-3]["reading_move_without_flip"])
+                    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'reading_move_without_flip'
+
+======================================================================
+ERROR: test_an_other_kind_flip_with_equal_moment_rows_is_flagged_and_decides_nothing (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_an_other_kind_flip_with_equal_moment_rows_is_flagged_and_decides_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 269, in test_an_other_kind_flip_with_equal_moment_rows_is_flagged_and_decides_nothing
+    self.assertTrue(c["per_level"][1e-3]["other_kind_flip_moment_rows_equal"])
+                    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'other_kind_flip_moment_rows_equal'
+
+======================================================================
+ERROR: test_flips_with_no_reading_moved_choose_nothing (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_flips_with_no_reading_moved_choose_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 235, in test_flips_with_no_reading_moved_choose_nothing
+    self.assertTrue(c["per_level"][1e-3]["flip_without_move"])
+                    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'flip_without_move'
+
+======================================================================
+ERROR: test_no_flatness_note_when_nothing_grows (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_no_flatness_note_when_nothing_grows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 291, in test_no_flatness_note_when_nothing_grows
+    self.assertIsNone(c["flatness_note"])
+                      ~^^^^^^^^^^^^^^^^^
+KeyError: 'flatness_note'
+
+======================================================================
+ERROR: test_the_chosen_level_is_the_smallest_at_which_a_twin_moves (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_the_chosen_level_is_the_smallest_at_which_a_twin_moves)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 218, in test_the_chosen_level_is_the_smallest_at_which_a_twin_moves
+    self.assertEqual(c["per_level"][1e-4]["twins_moved"], 0)
+                     ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'twins_moved'
+
+======================================================================
+ERROR: test_the_verifiers_plant_1e3_flips_no_reading_and_1e2_moves_one_item_chooses_1e2 (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_the_verifiers_plant_1e3_flips_no_reading_and_1e2_moves_one_item_chooses_1e2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 227, in test_the_verifiers_plant_1e3_flips_no_reading_and_1e2_moves_one_item_chooses_1e2
+    self.assertTrue(c["per_level"][1e-3]["flip_without_move"])
+                    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'flip_without_move'
+
+======================================================================
+ERROR: test_a_missing_reading_is_refused_never_read_as_a_move_or_a_hold (tests.tools.test_evolve_cal_analyse.TestMove.test_a_missing_reading_is_refused_never_read_as_a_move_or_a_hold)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 83, in test_a_missing_reading_is_refused_never_read_as_a_move_or_a_hold
+    an.moved_dims(rd(), {**rd(), "q1_seen": None})
+    ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'moved_dims'
+
+======================================================================
+ERROR: test_a_twin_moves_iff_q1_seen_or_confirmed_share_differs_from_the_incumbents (tests.tools.test_evolve_cal_analyse.TestMove.test_a_twin_moves_iff_q1_seen_or_confirmed_share_differs_from_the_incumbents)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 71, in test_a_twin_moves_iff_q1_seen_or_confirmed_share_differs_from_the_incumbents
+    self.assertEqual(an.moved_dims(inc, rd()), [])
+                     ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'moved_dims'
+
+======================================================================
+ERROR: test_frames_filed_alone_is_not_a_move (tests.tools.test_evolve_cal_analyse.TestMove.test_frames_filed_alone_is_not_a_move)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 78, in test_frames_filed_alone_is_not_a_move
+    self.assertEqual(an.moved_dims(rd(), rd(frames=24)), [])
+                     ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'moved_dims'
+
+======================================================================
+ERROR: test_a0_is_non_degenerate_iff_an_epsilon_twin_moves_q1_seen_or_confirmed_share (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_a0_is_non_degenerate_iff_an_epsilon_twin_moves_q1_seen_or_confirmed_share)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 137, in test_a0_is_non_degenerate_iff_an_epsilon_twin_moves_q1_seen_or_confirmed_share
+    self.assertEqual(d["release_dims"], ["q1_seen"])
+                     ~^^^^^^^^^^^^^^^^
+KeyError: 'release_dims'
+
+======================================================================
+ERROR: test_stage_b_rule_m_runs_whenever_a_twin_of_the_chosen_level_moves (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_stage_b_rule_m_runs_whenever_a_twin_of_the_chosen_level_moves)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 192, in test_stage_b_rule_m_runs_whenever_a_twin_of_the_chosen_level_moves
+    self.assertFalse(an.stage_b_condition(inc, [rd() for _ in range(5)], rule="M")["run"])
+                     ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: stage_b_condition() got an unexpected keyword argument 'rule'
+
+======================================================================
+ERROR: test_stage_b_rule_s_runs_only_where_a_band_could_exist (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_stage_b_rule_s_runs_only_where_a_band_could_exist)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 180, in test_stage_b_rule_s_runs_only_where_a_band_could_exist
+    self.assertFalse(an.stage_b_condition(inc, flat, rule="S")["run"])
+                     ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+TypeError: stage_b_condition() got an unexpected keyword argument 'rule'
+
+======================================================================
+ERROR: test_a_missing_flip_count_is_refused (tests.tools.test_evolve_cal_analyse.TestTwinEquals.test_a_missing_flip_count_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 104, in test_a_missing_flip_count_is_refused
+    an.twin_equals(rd(), t)
+    ^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'twin_equals'
+
+======================================================================
+ERROR: test_equal_iff_no_flip_and_the_three_readings_equal (tests.tools.test_evolve_cal_analyse.TestTwinEquals.test_equal_iff_no_flip_and_the_three_readings_equal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 95, in test_equal_iff_no_flip_and_the_three_readings_equal
+    self.assertTrue(an.twin_equals(inc, tw("a", rd())))
+                    ^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'twin_equals'
+
+======================================================================
+ERROR: test_the_verifiers_plants_read_through_the_real_comparison (tests.tools.test_evolve_cal_analyse.TestTwinEquals.test_the_verifiers_plants_read_through_the_real_comparison)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 119, in test_the_verifiers_plants_read_through_the_real_comparison
+    t = an.twin_record(name, rd(), cal.compare_twins_keyed(a, b))
+        ^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'twin_record'
+
+======================================================================
+ERROR: test_twin_record_refuses_a_comparison_without_flips (tests.tools.test_evolve_cal_analyse.TestTwinEquals.test_twin_record_refuses_a_comparison_without_flips)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 125, in test_twin_record_refuses_a_comparison_without_flips
+    an.twin_record("x", rd(), {"moment": {"matched": 1, "only_a": 0, "only_b": 0, "discrete_differing": 0}, "other": {}})
+    ^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_analyse' has no attribute 'twin_record'
+
+======================================================================
+ERROR: test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_twin.py", line 501, in test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips
+    self.assertEqual(m["flips"], 2, "an unmatched moment row is a FLIP: the organism did something else at that seq")
+                     ~^^^^^^^^^
+KeyError: 'flips'
+
+======================================================================
+ERROR: test_a_digest_only_difference_of_another_kind_is_not_a_discrete_payload (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_digest_only_difference_of_another_kind_is_not_a_discrete_payload)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_twin.py", line 547, in test_a_digest_only_difference_of_another_kind_is_not_a_discrete_payload
+    self.assertEqual(r["other_discrete"], {}, "but only in the state digest: no discrete payload moved")
+                     ~^^^^^^^^^^^^^^^^^^
+KeyError: 'other_discrete'
+
+======================================================================
+ERROR: test_a_twin_missing_two_of_four_moment_rows_has_two_flips (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_twin_missing_two_of_four_moment_rows_has_two_flips)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_twin.py", line 508, in test_a_twin_missing_two_of_four_moment_rows_has_two_flips
+    self.assertEqual((m["only_a"], m["only_b"], m["discrete_differing"], m["flips"]), (2, 0, 0, 2))
+                                                                         ~^^^^^^^^^
+KeyError: 'flips'
+
+======================================================================
+ERROR: test_flips_is_the_discrete_rows_plus_the_unmatched_rows (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_flips_is_the_discrete_rows_plus_the_unmatched_rows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_twin.py", line 517, in test_flips_is_the_discrete_rows_plus_the_unmatched_rows
+    self.assertEqual(m["flips"], m["discrete_differing"] + m["only_a"] + m["only_b"])
+                     ~^^^^^^^^^
+KeyError: 'flips'
+
+======================================================================
+ERROR: test_identical_journals_have_no_other_discrete_entry (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_identical_journals_have_no_other_discrete_entry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_twin.py", line 551, in test_identical_journals_have_no_other_discrete_entry
+    self.assertEqual(cal.compare_twins_keyed(a, json.loads(json.dumps(a)))["other_discrete"], {})
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+KeyError: 'other_discrete'
+
+======================================================================
+ERROR: test_no_difference_and_float_or_hash_only_differences_are_zero_flips (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_no_difference_and_float_or_hash_only_differences_are_zero_flips)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_twin.py", line 522, in test_no_difference_and_float_or_hash_only_differences_are_zero_flips
+    self.assertEqual(cal.compare_twins_keyed(a, json.loads(json.dumps(a)))["moment"]["flips"], 0)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'flips'
+
+======================================================================
+ERROR: test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_twin.py", line 538, in test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips
+    self.assertEqual(r["moment"]["flips"], 0, "sleep and think rows are OUTSIDE the flip count (A3b.1)")
+                     ~~~~~~~~~~~^^^^^^^^^
+KeyError: 'flips'
+
+======================================================================
+ERROR: test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused (tests.tools.test_evolve_cal_queue.TestEpsList.test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_queue.py", line 135, in test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused
+    q.eps_list(level, n)
+    ^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_queue' has no attribute 'eps_list'. Did you mean: 'read_list'?
+
+======================================================================
+ERROR: test_the_cli_writes_the_file_and_refuses_to_overwrite_one (tests.tools.test_evolve_cal_queue.TestEpsList.test_the_cli_writes_the_file_and_refuses_to_overwrite_one)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/argparse.py", line 2055, in _parse_known_args2
+    namespace, args = self._parse_known_args(args, namespace, intermixed)
+                      ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2287, in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+  File "/usr/lib/python3.14/argparse.py", line 2262, in consume_positionals
+    take_action(action, args)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2116, in take_action
+    argument_values = self._get_values(action, argument_strings)
+  File "/usr/lib/python3.14/argparse.py", line 2642, in _get_values
+    self._check_value(action, value[0])
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2708, in _check_value
+    raise ArgumentError(action, msg % args)
+argparse.ArgumentError: argument cmd: invalid choice: 'make-eps-list' (choose from run)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_queue.py", line 140, in test_the_cli_writes_the_file_and_refuses_to_overwrite_one
+    self.assertEqual(q.main(["make-eps-list", "--eps", "0.001", "--n", "6", "--prefix", "s2-", "--with-incumbent", "--out", str(out)]), 0)
+                     ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/dev/genome-wt-evolve-cal-red1/tools/evolve_cal_queue.py", line 116, in main
+    a = ap.parse_args(argv)
+  File "/usr/lib/python3.14/argparse.py", line 2016, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2026, in parse_known_args
+    return self._parse_known_args2(args, namespace, intermixed=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2057, in _parse_known_args2
+    self.error(str(err))
+    ~~~~~~~~~~^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2797, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2784, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_the_level_tags_match_the_existing_lists (tests.tools.test_evolve_cal_queue.TestEpsList.test_the_level_tags_match_the_existing_lists)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_queue.py", line 123, in test_the_level_tags_match_the_existing_lists
+    entries = q.read_list(lst(Path(tempfile.mkdtemp()), q.eps_list(level, 1)))
+                                                        ^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_queue' has no attribute 'eps_list'. Did you mean: 'read_list'?
+
+======================================================================
+ERROR: test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one (tests.tools.test_evolve_cal_queue.TestEpsList.test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_queue.py", line 113, in test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one
+    text = q.eps_list(0.001, 6, prefix="s2-", with_incumbent=True)
+           ^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_queue' has no attribute 'eps_list'. Did you mean: 'read_list'?
+
+======================================================================
+ERROR: test_without_the_incumbent_there_is_no_inc_line_and_two_digit_numbering_reaches_twenty (tests.tools.test_evolve_cal_queue.TestEpsList.test_without_the_incumbent_there_is_no_inc_line_and_two_digit_numbering_reaches_twenty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_queue.py", line 127, in test_without_the_incumbent_there_is_no_inc_line_and_two_digit_numbering_reaches_twenty
+    entries = q.read_list(lst(Path(tempfile.mkdtemp()), q.eps_list(1e-2, 20)))
+                                                        ^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal_queue' has no attribute 'eps_list'. Did you mean: 'read_list'?
+
+======================================================================
+FAIL: test_a_frames_filed_only_move_chooses_nothing_and_is_printed (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_a_frames_filed_only_move_chooses_nothing_and_is_printed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 251, in test_a_frames_filed_only_move_chooses_nothing_and_is_printed
+    self.assertIsNone(c["chosen"])
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+AssertionError: 0.001 is not None
+
+======================================================================
+FAIL: test_a_missing_reading_or_flip_count_is_refused (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_a_missing_reading_or_flip_count_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 305, in test_a_missing_reading_or_flip_count_is_refused
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_an_unmatched_moment_row_makes_a_twin_not_equal_and_a_flip_without_a_move (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_an_unmatched_moment_row_makes_a_twin_not_equal_and_a_flip_without_a_move)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 259, in test_an_unmatched_moment_row_makes_a_twin_not_equal_and_a_flip_without_a_move
+    self.assertEqual(c["per_level"][1e-3]["twins_equal_to_incumbent"], 4)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 5 != 4
+
+======================================================================
+FAIL: test_a0_refuses_a_missing_reading (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_a0_refuses_a_missing_reading)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 151, in test_a0_refuses_a_missing_reading
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_a0plus_a_frames_only_move_among_the_six_is_still_degenerate_for_the_epsilon_dimensions (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_a0plus_a_frames_only_move_among_the_six_is_still_degenerate_for_the_epsilon_dimensions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 170, in test_a0plus_a_frames_only_move_among_the_six_is_still_degenerate_for_the_epsilon_dimensions
+    self.assertTrue(d["degenerate"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_a_frames_filed_only_move_releases_nothing_and_is_printed (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_a_frames_filed_only_move_releases_nothing_and_is_printed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 145, in test_a_frames_filed_only_move_releases_nothing_and_is_printed
+    self.assertFalse(d["non_degenerate"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_stage_b_needs_an_explicit_rule_the_signers_have_not_chosen (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_stage_b_needs_an_explicit_rule_the_signers_have_not_chosen)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red1/tests/tools/test_evolve_cal_analyse.py", line 201, in test_stage_b_needs_an_explicit_rule_the_signers_have_not_chosen
+    with self.assertRaises(TypeError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+AssertionError: TypeError not raised
+
+----------------------------------------------------------------------
+Ran 104 tests in 17.213s
+
+FAILED (failures=7, errors=34)

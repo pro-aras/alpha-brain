@@ -62,7 +62,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from creature.genes import BOUNDS, mutate_genome_text          # noqa: E402
+from creature.genes import BOUNDS, MUTABLE_KEYS, apply_mutation, mutate_genome_text          # noqa: E402
 from creature.mind import Mind                                 # noqa: E402
 from creature.tape import read_tape                            # noqa: E402
 from genome.machinery import GenomeError, parse_genome         # noqa: E402
@@ -79,6 +79,59 @@ MARGINS: Dict[str, float] = {
     "frames_filed": 1,
 }
 COST_RATIO_BAR = 1.2
+
+
+# ============================================================================ the proposer's redraw (PREREG-EVOLVE-CAL D8 + A8)
+# edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 20:56 +0400 — D8: `creature.genes.draw_mutation(seed, epoch, proposal_no)` cannot see the
+# incumbent, so on brain-long-2 proposal #3 drew `BIRTH.misfires 3` — the incumbent's own value — and cost ≈ 2 × 3,950 s to refuse a mutant identical to
+# its incumbent. The redraw lives HERE (the worker), not in creature/ (organism code stays untouched): when the drawn value equals the number the
+# incumbent text already carries, the SAME generator's next gene draw and value draw are taken, and so on until they differ. `draw_stream` repeats
+# `draw_mutation`'s body to continue ONE generator; tests/tools/test_evolve_cal_gate.py pins its first element to `draw_mutation`'s over a grid
+# that reaches both kinds of gene, so the two cannot drift apart.
+def bounds_spec(key: str) -> dict:
+    spec = BOUNDS.get(key)
+    if spec is None or spec.get("excluded"):
+        raise ValueError(f"evolve: {key!r} is not a mutable BOUNDS entry ({(spec or {}).get('reason', 'unknown key')})")
+    return spec
+
+
+def gene_text(text: str, key: str) -> str:
+    """The number text the genome currently carries for `key`, read with BOUNDS' own pattern (group 1 = the fixed text up to the number, group 2 =
+    everything after it). Exactly one match, or ValueError."""
+    ms = list(bounds_spec(key)["pattern"].finditer(text))
+    if len(ms) != 1:
+        raise ValueError(f"evolve: BOUNDS[{key!r}]'s pattern matched {len(ms)} times in the genome text (need exactly 1)")
+    m = ms[0]
+    return text[m.end(1):m.start(2)]
+
+
+def draw_stream(seed: int, epoch: int, proposal_no: int):
+    """`creature.genes.draw_mutation`'s draws, CONTINUED: (gene, value) pairs from ONE generator seeded on (seed, epoch, proposal_no)."""
+    rng = np.random.default_rng([int(seed), int(epoch), int(proposal_no)])
+    while True:
+        key = MUTABLE_KEYS[int(rng.integers(0, len(MUTABLE_KEYS)))]
+        spec = BOUNDS[key]
+        if spec["kind"] == "int":
+            value: object = int(rng.integers(int(spec["lo"]), int(spec["hi"]) + 1))
+        else:
+            value = round(float(rng.uniform(spec["lo"], spec["hi"])), int(spec["decimals"]))
+        yield key, value
+
+
+def _printed_value(key: str, value: object) -> str:
+    spec = BOUNDS[key]
+    return str(int(round(value))) if spec["kind"] == "int" else f"{float(value):.{int(spec['decimals'])}f}"
+
+
+def mutate_distinct(text: str, seed: int, epoch: int, proposal_no: int, max_draws: int = 1000):
+    """(mutant_text, gene, value, draws): the first draw of the stream whose printed value differs from the incumbent text's own number.
+    `draws` is 1 when nothing collided. Bounded: a text that no draw can differ from raises instead of looping."""
+    for n, (key, value) in enumerate(draw_stream(seed, epoch, proposal_no), start=1):
+        if float(_printed_value(key, value)) != float(gene_text(text, key)):
+            return apply_mutation(text, key, value), key, value, n
+        if n >= max_draws:
+            raise RuntimeError(f"evolve: {max_draws} draws on (seed {seed}, epoch {epoch}, proposal {proposal_no}) all equal the incumbent's own values")
+    raise RuntimeError("evolve: the draw stream ended")      # unreachable: the stream is infinite
 
 
 # ============================================================================ grading (never re-implemented)
@@ -140,26 +193,61 @@ def q1_seen(root: Path, genome_path: Path) -> Optional[float]:
     return float(acc) if isinstance(acc, (int, float)) else None
 
 
-def grade_twin(mind: Mind, twin_root: Path, genome_path: Path, tape_slice: List[dict], wall_s: float) -> dict:
+def machine_snapshot() -> dict:
+    """The box's own state at this instant: the 1/5/15-minute load average and the CPU / memory pressure (PSI `some avg10`) — recorded at each
+    twin's start and end (PREREG-EVOLVE-CAL A3: contention inflates a CPU-second as it inflates wall time, #242 addendum)."""
+    load: Optional[List[float]]
+    try:
+        load = [float(x) for x in Path("/proc/loadavg").read_text().split()[:3]]
+    except (OSError, ValueError):
+        load = None
+    psi: Dict[str, Optional[float]] = {}
+    for name in ("cpu", "memory"):
+        try:
+            for line in Path(f"/proc/pressure/{name}").read_text().splitlines():
+                kind, *kv = line.split()
+                psi[f"{name}_{kind}_avg10"] = float(dict(x.split("=") for x in kv)["avg10"])
+        except (OSError, ValueError, KeyError):
+            psi.setdefault(f"{name}_some_avg10", None)
+    return {"load": load, "psi": psi}
+
+
+def _machine_pair(m0: dict, m1: dict) -> dict:
+    return {"load0": m0["load"], "load1": m1["load"], "psi0": m0["psi"], "psi1": m1["psi"]}
+
+
+def grade_twin(mind: Mind, twin_root: Path, genome_path: Path, tape_slice: List[dict], wall_s: float,
+               cpu_s: Optional[float] = None, machine: Optional[dict] = None) -> dict:
     """One twin's paired readings — every mark computed by `tools/verdict_life.py`'s own functions over
     THIS twin's own journal/tape/status, never re-implemented. `q1_seen` is the ONE reading measured at
     the END of the slice only (see the module docstring's RETENTION note: the start reading is identical
-    for both twins by construction, so it is measured once by the caller, not per twin)."""
+    for both twins by construction, so it is measured once by the caller, not per twin).
+    edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 20:59 +0400 (corrected from a typed 21:00 by `date`) — PREREG-EVOLVE-CAL §1 D6 + A3: `cpu_s` is the twin's PROCESS CPU-seconds
+    (`time.process_time()` around the twin, not wall; None when the caller did not measure it — a missing reading, never a zero) and `machine` the
+    load / pressure at the twin's start and end; both ride on the reading beside `wall_s`."""
     journal_rows = _read_journal_rows(twin_root)
     status = _twin_status(mind)
     declared = mind.genome.declared
-    sm = surprise_mark(tape_slice, journal_rows, status, "SURPRISE" in declared)
+    # edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 20:40 +0400 — PREREG-EVOLVE-CAL §1 D3 (the E3 call-site shift): the call read
+    # `surprise_mark(tape_slice, journal_rows, status, declared)` against the signature `surprise_mark(journal, status, surprise_declared, ...)`,
+    # every argument one place off, so `confirmed_share` read «not gradable» on 13 of 13 rounds (the twin journals carry `confirmed` on every
+    # moment row). Pinned by tests/tools/test_evolve_cal_d3.py (RED on the shifted line, GREEN here).
+    sm = surprise_mark(journal_rows, status, "SURPRISE" in declared)
     sen = sentence_mark(tape_slice, status, "SENTENCE" in declared)
     am = (act_mark(tape_slice, journal_rows, status) if "ACT" in declared
           else {"graded": False, "pass": None, "reason": "not gradable: ACT not declared"})
-    return {
+    out = {
         "q1_seen": q1_seen(twin_root, genome_path),
         "confirmed_share": sm.get("overall_share"), "confirmed_graded": sm.get("graded"),
         "reward_mean": am.get("reward_mean"), "act_pass": am.get("pass"), "act_graded": am.get("graded"),
         "frames_filed": sen.get("frames_filed"), "sentence_pass": sen.get("pass"), "sentence_graded": sen.get("graded"),
-        "wall_s": round(wall_s, 3), "tape_rows": len(tape_slice), "journal_rows": len(journal_rows),
+        "wall_s": round(wall_s, 3), "cpu_s": (round(cpu_s, 3) if cpu_s is not None else None),
+        "tape_rows": len(tape_slice), "journal_rows": len(journal_rows),
         "detail": {"surprise": sm, "sentence": sen, "act": am},
     }
+    if machine:
+        out.update(machine)
+    return out
 
 
 def regression_bar(incumbent: dict, mutant: dict) -> Tuple[str, str]:
@@ -334,7 +422,7 @@ def tape_slice(live_root: Path, from_seq: int, to_seq: int) -> List[dict]:
 def run_judging_round(live_root: Path, shadow: Mind, checkpoints_dir: Path, now_iso: str, judge_h: float,
                        seed: int, proposal_no: int, runs_dir: Path,
                        forced_mutation: Optional[Tuple[str, object]] = None,
-                       tape_head_seq: Optional[int] = None) -> dict:
+                       tape_head_seq: Optional[int] = None, bands: Optional[dict] = None) -> dict:
     """ALPHA4-PREREG.md §6: one round. `forced_mutation` (gene_key, value) bypasses the rng draw — used
     ONLY by the negative control (brief item 4), which must plant a SPECIFIC gene/value, never a random
     one. `tape_head_seq`: the LIVE tape's own latest seq at the moment `now_iso` was read (the caller
@@ -345,7 +433,14 @@ def run_judging_round(live_root: Path, shadow: Mind, checkpoints_dir: Path, now_
     #236 names: if the shadow has fallen behind the live tape (the box loaded with five builders' lives
     and readers), the slice this round grades is silently SHORTER than `judge_h` while the record still
     says 2 h. Never refused on — recorded, so a reader can judge whether to trust a given round's numbers.
-    Returns the proposal dict (also written to `$ROOT/evolve/PROPOSAL-<proposal_no>.json` by the caller)."""
+    Returns the proposal dict (also written to `$ROOT/evolve/PROPOSAL-<proposal_no>.json` by the caller).
+
+    edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 21:00 +0400 (corrected from a typed 21:01 by `date`) — PREREG-EVOLVE-CAL §1: `bands=None` is the LEGACY round (the two-verdict
+    `regression_bar`, byte for byte what it was, now with each twin's process CPU-seconds and the box's load / pressure on the reading). With a
+    BANDS dict (tools/evolve_bands.py) the round adds `gate` (REGRESSED / IMPROVED / NO EVIDENCE from the twins' paired readings, incumbent first,
+    Δ = mutant − incumbent) and `not_gradable` (reward_mean / act_pass / sentence_pass, D4 / D5), and its `verdict` is ALWAYS REFUSED: an IMPROVED
+    mutant is adopted only by `finalize_calibrated_round` after it is IMPROVED again on the next disjoint slice. An unforced draw goes through
+    `mutate_distinct` (D8): the proposal records `draws` (1 = nothing collided with the incumbent's own value)."""
     from datetime import datetime, timedelta
     target_iso = (datetime.fromisoformat(now_iso.replace("Z", "+00:00")) - timedelta(hours=judge_h)).isoformat(timespec="milliseconds").replace("+00:00", "Z")
     head_seq = int(tape_head_seq) if tape_head_seq is not None else shadow.last_seq
@@ -358,45 +453,57 @@ def run_judging_round(live_root: Path, shadow: Mind, checkpoints_dir: Path, now_
     to_seq = shadow.last_seq
     slice_rows = tape_slice(live_root, cp["last_seq"], to_seq)
     incumbent_text = cp["dir"].joinpath("GENOME.genome").read_text()
+    draws: Optional[int] = None
     if forced_mutation is not None:
-        from creature.genes import apply_mutation
         gene_key, value = forced_mutation
         mutant_text = apply_mutation(incumbent_text, gene_key, value)
     else:
-        mutant_text, gene_key, value = mutate_genome_text(incumbent_text, seed, shadow.evolve_epoch + 1, proposal_no)
+        mutant_text, gene_key, value, draws = mutate_distinct(incumbent_text, seed, shadow.evolve_epoch + 1, proposal_no)
 
     q1_start = q1_seen(cp["dir"], cp["dir"] / "GENOME.genome")   # cp["dir"] has its own state/ subdir (checkpoint_shadow's own layout)
 
     runs_dir = Path(runs_dir)
     inc_root = runs_dir / f"round-{proposal_no}" / "incumbent"
     mut_root = runs_dir / f"round-{proposal_no}" / "mutant"
-    t0 = time.perf_counter()
+    m0 = machine_snapshot()
+    t0, c0 = time.perf_counter(), time.process_time()
     inc_mind = build_twin(cp, incumbent_text, inc_root, live_root)
     for row in slice_rows:
         inc_mind.consume(row)
     inc_mind.close()
-    inc_wall = time.perf_counter() - t0
-    incumbent_readings = grade_twin(inc_mind, inc_root, inc_root / "GENOME.genome", slice_rows, inc_wall)
+    inc_wall, inc_cpu = time.perf_counter() - t0, time.process_time() - c0
+    incumbent_readings = grade_twin(inc_mind, inc_root, inc_root / "GENOME.genome", slice_rows, inc_wall,
+                                    cpu_s=inc_cpu, machine=_machine_pair(m0, machine_snapshot()))
     del inc_mind    # ONE AT A TIME (brief item 2): the incumbent twin's memory is released before the mutant twin is built
 
-    t1 = time.perf_counter()
+    m0 = machine_snapshot()
+    t1, c1 = time.perf_counter(), time.process_time()
     mut_mind = build_twin(cp, mutant_text, mut_root, live_root)
     for row in slice_rows:
         mut_mind.consume(row)
     mut_mind.close()
-    mut_wall = time.perf_counter() - t1
-    mutant_readings = grade_twin(mut_mind, mut_root, mut_root / "GENOME.genome", slice_rows, mut_wall)
+    mut_wall, mut_cpu = time.perf_counter() - t1, time.process_time() - c1
+    mutant_readings = grade_twin(mut_mind, mut_root, mut_root / "GENOME.genome", slice_rows, mut_wall,
+                                 cpu_s=mut_cpu, machine=_machine_pair(m0, machine_snapshot()))
     del mut_mind
 
-    verdict, reason = regression_bar(incumbent_readings, mutant_readings)
+    extra: Dict[str, object] = {}
+    if bands is None:
+        verdict, reason = regression_bar(incumbent_readings, mutant_readings)
+    else:
+        from tools import evolve_bands
+        gate = evolve_bands.calibrated_verdict(incumbent_readings, mutant_readings, bands)
+        verdict, reason = "REFUSED", gate["reason"]          # a calibrated round never PASSes by itself (finalize_calibrated_round)
+        extra = {"gate": gate, "not_gradable": evolve_bands.not_gradable_block(incumbent_readings, mutant_readings),
+                 "bands_scope": {k: bands.get(k) for k in ("slice", "n", "df", "alpha_side", "scope")}}
     return {
-        "no": proposal_no, "epoch": shadow.evolve_epoch, "gene": gene_key, "value": value,
+        "no": proposal_no, "epoch": shadow.evolve_epoch, "gene": gene_key, "value": value, "draws": draws,
         "mutant_genome_text": mutant_text, "checkpoint": cp["n"], "checkpoint_at": cp["at"],
         "slice_from_seq": cp["last_seq"], "slice_to_seq": to_seq, "slice_rows": len(slice_rows),
         "shadow_lag_rows": shadow_lag_rows,
         "q1_seen_start": q1_start,
         "incumbent": incumbent_readings, "mutant": mutant_readings,
-        "verdict": verdict, "reason": reason,
+        "verdict": verdict, "reason": reason, **extra,
         "retention_note": "not independently gradable on a shared-start slice (equals q1_seen at the end); q1_seen_start is printed once, identical for both twins by construction",
     }
 
@@ -417,6 +524,74 @@ def _next_proposal_no(evolve_dir: Path) -> int:
         return 1
     ns = [int(p.stem.split("-")[1]) for p in evolve_dir.glob("PROPOSAL-*.json") if p.stem.split("-")[1].isdigit()]
     return (max(ns) + 1) if ns else 1
+
+
+# ============================================================================ the confirmation round (PREREG-EVOLVE-CAL §1, D7)
+# edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 21:00 +0400 — an IMPROVED mutant is ADOPTED only after it is IMPROVED again on the NEXT
+# disjoint 2 h slice (its own twins, the same bands). The first IMPROVED round writes `evolve/PENDING-CONFIRM.json` and a proposal whose `verdict`
+# stays REFUSED (the mind adopts only `verdict == "PASS"`); the next round re-judges THE SAME mutation (forced) and `tools/evolve_bands.
+# confirm_decision` decides; PASS is written only there. A pending from an older epoch (an adoption happened since) is dropped with a note.
+PENDING_NAME = "PENDING-CONFIRM.json"
+
+
+def load_pending(evolve_dir: Path) -> Optional[dict]:
+    p = Path(evolve_dir) / PENDING_NAME
+    return json.loads(p.read_text()) if p.exists() else None
+
+
+def _save_pending(evolve_dir: Path, record: dict) -> None:
+    evolve_dir = Path(evolve_dir)
+    evolve_dir.mkdir(parents=True, exist_ok=True)
+    tmp = evolve_dir / (PENDING_NAME + ".tmp")
+    tmp.write_text(json.dumps(record, sort_keys=True))
+    tmp.replace(evolve_dir / PENDING_NAME)
+
+
+def _clear_pending(evolve_dir: Path) -> None:
+    p = Path(evolve_dir) / PENDING_NAME
+    if p.exists():
+        p.unlink()
+
+
+def pending_forced_mutation(evolve_dir: Path, shadow_epoch: int) -> Tuple[Optional[Tuple[str, object]], Optional[str]]:
+    """((gene, value), None) when a confirmation is pending for THIS epoch; (None, a note) when a pending was dropped as stale; (None, None) otherwise."""
+    p = load_pending(evolve_dir)
+    if p is None:
+        return None, None
+    if int(p["epoch"]) != int(shadow_epoch):
+        _clear_pending(evolve_dir)
+        return None, f"a pending confirmation of {p['proposal'].get('gene')}={p['proposal'].get('value')} (proposal {p['proposal'].get('no')}) was dropped: " \
+                     f"it was drawn at epoch {p['epoch']} and the shadow is at epoch {shadow_epoch} (an adoption happened since)"
+    return (p["proposal"]["gene"], p["proposal"]["value"]), None
+
+
+def finalize_calibrated_round(proposal: dict, evolve_dir: Path, shadow_epoch: int) -> dict:
+    """Apply the confirmation rule to a CALIBRATED proposal (one carrying `gate`); anything else is returned untouched."""
+    if proposal.get("gate") is None:
+        return proposal
+    from tools import evolve_bands
+    gate_verdict = proposal["gate"]["verdict"]
+    pending = load_pending(evolve_dir)
+    slim = {k: proposal.get(k) for k in ("no", "gene", "value", "slice_from_seq", "slice_to_seq")}
+    slim["gate"] = {"verdict": gate_verdict, "reason": proposal["gate"].get("reason")}
+    if pending is not None:
+        d = evolve_bands.confirm_decision(pending["proposal"], proposal)
+        proposal["confirmation"] = {"of": pending["proposal"].get("no"), **d}
+        if d["keep_pending"]:
+            proposal["verdict"], proposal["state"] = "REFUSED", f"not a confirmation round ({d['reason']}); the pending of proposal {pending['proposal'].get('no')} is kept"
+        else:
+            _clear_pending(evolve_dir)
+            proposal["verdict"] = "PASS" if d["adopt"] else "REFUSED"
+            proposal["state"] = ("ADOPTED: " if d["adopt"] else "NOT ADOPTED: ") + d["reason"]
+        return proposal
+    if gate_verdict == "IMPROVED":
+        _save_pending(evolve_dir, {"epoch": int(shadow_epoch), "proposal": slim})
+        proposal["verdict"] = "REFUSED"
+        proposal["state"] = "IMPROVED — awaiting confirmation on the next disjoint 2 h slice (its own twins, the same bands)"
+    else:
+        proposal["verdict"] = "REFUSED"
+        proposal["state"] = gate_verdict
+    return proposal
 
 
 # ============================================================================ the negative control (brief item 4)
@@ -472,6 +647,9 @@ def main(argv: List[str]) -> int:
     ap.add_argument("--poll-period", type=float, default=30.0)
     ap.add_argument("--negative-control", action="store_true", help="brief item 4: run the planted-bad + null mutant checks and exit")
     ap.add_argument("--out", default=None, help="--negative-control's own scratch dir")
+    # edit: Claude (Sonnet 5.5, swarm integrator), 2026-10-03 21:01 +0400 — PREREG-EVOLVE-CAL: `--bands` switches the worker to the CALIBRATED gate; absent (the default),
+    # the worker is the legacy one. Nothing enters a life until a later law adopts the calibrated gate (the seat's signature line on the law).
+    ap.add_argument("--bands", default=None, help="a BANDS.json (tools/evolve_bands.py) — the calibrated gate; default: the legacy two-verdict bar")
     a = ap.parse_args(argv)
 
     if a.negative_control:
@@ -488,6 +666,10 @@ def main(argv: List[str]) -> int:
     checkpoints_dir = evolve_dir / "checkpoints"
     runs_dir = evolve_dir
     stop_file = Path(a.stop_file) if a.stop_file else (evolve_dir / "STOP")
+    bands = None
+    if a.bands:
+        from tools import evolve_bands
+        bands = evolve_bands.load_bands(a.bands)             # a malformed file stops the worker here, by name, before any shadow is built
 
     shadow = build_or_resume_shadow(shadow_root, genome_path, root)
     declared = shadow.genome.declared.get("EVOLVE")
@@ -503,6 +685,9 @@ def main(argv: List[str]) -> int:
     last_proposal_at: Optional[str] = None
 
     print(f"[evolve] worker started: every_h={every_h} judge_h={judge_h} seed={seed} shadow_epoch={shadow.evolve_epoch}")
+    if bands is not None:
+        print(f"[evolve] calibrated gate: bands from {a.bands} (slice {bands.get('slice')}, n {bands.get('n')}, alpha_side {bands.get('alpha_side')}, "
+              f"scope {bands.get('scope')}); an IMPROVED mutant waits for its confirmation round on the next disjoint slice")
     # steady-state cost note (report-only, not fixed here): this loop reads the WHOLE live tape twice per
     # poll (once inside advance_shadow, once here for now_iso/tape_head_seq) -- at ~100K rows that is
     # roughly a couple of seconds of pure parsing against a `poll_period` of tens of seconds, acceptable
@@ -518,8 +703,13 @@ def main(argv: List[str]) -> int:
                 last_checkpoint_at = now_iso
                 print(f"[evolve] checkpoint {cp.name} at {now_iso} (epoch {shadow.evolve_epoch})")
             if last_proposal_at is None or hours_between(last_proposal_at, now_iso) >= every_h:
+                forced, note = pending_forced_mutation(evolve_dir, shadow.evolve_epoch) if bands is not None else (None, None)
                 proposal = run_judging_round(root, shadow, checkpoints_dir, now_iso, judge_h, seed, proposal_no, runs_dir,
-                                              tape_head_seq=int(rows[-1]["seq"]))
+                                              forced_mutation=forced, tape_head_seq=int(rows[-1]["seq"]), bands=bands)
+                if note:
+                    proposal["pending_note"] = note
+                if bands is not None:
+                    proposal = finalize_calibrated_round(proposal, evolve_dir, shadow.evolve_epoch)
                 write_proposal(evolve_dir, proposal)
                 print(f"[evolve] proposal {proposal_no}: {proposal.get('verdict')} — {proposal.get('reason')}")
                 proposal_no += 1

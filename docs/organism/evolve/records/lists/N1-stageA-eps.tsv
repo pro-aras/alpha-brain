@@ -1,0 +1,14 @@
+# Stage A's epsilon twins (13 more: 5 at 1e-4, 4 more at each of 1e-3 and 1e-2; the A0 twins are k01 of their levels), run ONLY if A0 found the epsilon null non-degenerate
+eps1e-4-k01	eps:0.0001:1	-
+eps1e-4-k02	eps:0.0001:2	-
+eps1e-4-k03	eps:0.0001:3	-
+eps1e-4-k04	eps:0.0001:4	-
+eps1e-4-k05	eps:0.0001:5	-
+eps1e-3-k02	eps:0.001:2	-
+eps1e-2-k02	eps:0.01:2	-
+eps1e-3-k03	eps:0.001:3	-
+eps1e-2-k03	eps:0.01:3	-
+eps1e-3-k04	eps:0.001:4	-
+eps1e-2-k04	eps:0.01:4	-
+eps1e-3-k05	eps:0.001:5	-
+eps1e-2-k05	eps:0.01:5	-

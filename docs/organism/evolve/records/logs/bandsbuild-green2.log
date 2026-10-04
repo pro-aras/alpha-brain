@@ -1,0 +1,26 @@
+test_the_eps_null_rules_when_the_seed_null_is_not_wider (tests.tools.test_evolve_cal_bands_build.TestFramesBand.test_the_eps_null_rules_when_the_seed_null_is_not_wider) ... ok
+test_the_seed_null_rules_only_where_it_is_wider (tests.tools.test_evolve_cal_bands_build.TestFramesBand.test_the_seed_null_rules_only_where_it_is_wider) ... ok
+test_without_seed_twins_the_eps_null_stands_and_says_so (tests.tools.test_evolve_cal_bands_build.TestFramesBand.test_without_seed_twins_the_eps_null_stands_and_says_so) ... ok
+test_a_constant_null_has_no_band_and_says_why (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_constant_null_has_no_band_and_says_why) ... ok
+test_a_non_normal_null_uses_the_rank_band_and_says_so (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_non_normal_null_uses_the_rank_band_and_says_so) ... ok
+test_a_none_reading_in_the_null_is_refused_not_dropped (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_none_reading_in_the_null_is_refused_not_dropped) ... ok
+test_a_normal_null_gives_the_t_times_root_two_times_sigma_edge (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_normal_null_gives_the_t_times_root_two_times_sigma_edge) ... ok
+test_fewer_than_three_distinct_values_has_no_band_even_with_spread (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_fewer_than_three_distinct_values_has_no_band_even_with_spread) ... ok
+test_the_edge_is_printed_in_grid_steps_and_the_steps_a_reading_must_clear (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_the_edge_is_printed_in_grid_steps_and_the_steps_a_reading_must_clear) ... ok
+test_the_n_is_the_number_of_values_and_df_follows (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_the_n_is_the_number_of_values_and_df_follows) ... ok
+test_too_few_values_is_refused (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_too_few_values_is_refused) ... ok
+test_a_dead_dimension_is_written_as_no_band_not_dropped (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_a_dead_dimension_is_written_as_no_band_not_dropped) ... ok
+test_a_missing_gated_dimension_is_refused (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_a_missing_gated_dimension_is_refused) ... ok
+test_a_planted_difference_reads_above_and_a_third_of_it_reads_within (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_a_planted_difference_reads_above_and_a_third_of_it_reads_within) ... ok
+test_the_bands_file_validates_and_carries_the_laws_fields (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_the_bands_file_validates_and_carries_the_laws_fields) ... ok
+test_the_cost_band_is_built_on_the_log_cpu (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_the_cost_band_is_built_on_the_log_cpu) ... ok
+test_a_threefold_spread_is_different_and_the_direction_is_named (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_a_threefold_spread_is_different_and_the_direction_is_named) ... ok
+test_a_zero_variance_against_a_spread_is_different_with_a_zero_or_infinite_ratio (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_a_zero_variance_against_a_spread_is_different_with_a_zero_or_infinite_ratio) ... ok
+test_equal_spreads_are_not_different (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_equal_spreads_are_not_different) ... ok
+test_two_zero_variances_are_not_different (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_two_zero_variances_are_not_different) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.259s
+
+OK
+scope memory.peak 62689280 bytes

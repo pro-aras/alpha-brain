@@ -1,0 +1,206 @@
+test_the_eps_null_rules_when_the_seed_null_is_not_wider (tests.tools.test_evolve_cal_bands_build.TestFramesBand.test_the_eps_null_rules_when_the_seed_null_is_not_wider) ... ERROR
+test_the_seed_null_rules_only_where_it_is_wider (tests.tools.test_evolve_cal_bands_build.TestFramesBand.test_the_seed_null_rules_only_where_it_is_wider) ... ERROR
+test_without_seed_twins_the_eps_null_stands_and_says_so (tests.tools.test_evolve_cal_bands_build.TestFramesBand.test_without_seed_twins_the_eps_null_stands_and_says_so) ... ERROR
+test_a_constant_null_has_no_band_and_says_why (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_constant_null_has_no_band_and_says_why) ... ERROR
+test_a_non_normal_null_uses_the_rank_band_and_says_so (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_non_normal_null_uses_the_rank_band_and_says_so) ... ERROR
+test_a_none_reading_in_the_null_is_refused_not_dropped (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_none_reading_in_the_null_is_refused_not_dropped) ... ERROR
+test_a_normal_null_gives_the_t_times_root_two_times_sigma_edge (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_normal_null_gives_the_t_times_root_two_times_sigma_edge) ... ERROR
+test_fewer_than_three_distinct_values_has_no_band_even_with_spread (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_fewer_than_three_distinct_values_has_no_band_even_with_spread) ... ERROR
+test_the_edge_is_printed_in_grid_steps_and_the_steps_a_reading_must_clear (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_the_edge_is_printed_in_grid_steps_and_the_steps_a_reading_must_clear) ... ERROR
+test_the_n_is_the_number_of_values_and_df_follows (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_the_n_is_the_number_of_values_and_df_follows) ... ERROR
+test_too_few_values_is_refused (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_too_few_values_is_refused) ... ERROR
+test_a_dead_dimension_is_written_as_no_band_not_dropped (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_a_dead_dimension_is_written_as_no_band_not_dropped) ... ERROR
+test_a_missing_gated_dimension_is_refused (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_a_missing_gated_dimension_is_refused) ... ERROR
+test_a_planted_difference_reads_above_and_a_third_of_it_reads_within (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_a_planted_difference_reads_above_and_a_third_of_it_reads_within) ... ERROR
+test_the_bands_file_validates_and_carries_the_laws_fields (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_the_bands_file_validates_and_carries_the_laws_fields) ... ERROR
+test_the_cost_band_is_built_on_the_log_cpu (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_the_cost_band_is_built_on_the_log_cpu) ... ERROR
+test_a_threefold_spread_is_different_and_the_direction_is_named (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_a_threefold_spread_is_different_and_the_direction_is_named) ... ERROR
+test_a_zero_variance_against_a_spread_is_different_with_a_zero_or_infinite_ratio (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_a_zero_variance_against_a_spread_is_different_with_a_zero_or_infinite_ratio) ... ERROR
+test_equal_spreads_are_not_different (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_equal_spreads_are_not_different) ... ERROR
+test_two_zero_variances_are_not_different (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_two_zero_variances_are_not_different) ... ERROR
+
+======================================================================
+ERROR: test_the_eps_null_rules_when_the_seed_null_is_not_wider (tests.tools.test_evolve_cal_bands_build.TestFramesBand.test_the_eps_null_rules_when_the_seed_null_is_not_wider)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 190, in test_the_eps_null_rules_when_the_seed_null_is_not_wider
+    b = cal.frames_band(eps, seed)
+        ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'frames_band'
+
+======================================================================
+ERROR: test_the_seed_null_rules_only_where_it_is_wider (tests.tools.test_evolve_cal_bands_build.TestFramesBand.test_the_seed_null_rules_only_where_it_is_wider)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 180, in test_the_seed_null_rules_only_where_it_is_wider
+    b = cal.frames_band(eps, seed)
+        ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'frames_band'
+
+======================================================================
+ERROR: test_without_seed_twins_the_eps_null_stands_and_says_so (tests.tools.test_evolve_cal_bands_build.TestFramesBand.test_without_seed_twins_the_eps_null_stands_and_says_so)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 195, in test_without_seed_twins_the_eps_null_stands_and_says_so
+    b = cal.frames_band(ints(*([26] * 21)), None)
+        ^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'frames_band'
+
+======================================================================
+ERROR: test_a_constant_null_has_no_band_and_says_why (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_constant_null_has_no_band_and_says_why)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 54, in test_a_constant_null_has_no_band_and_says_why
+    b = cal.make_band("q1_seen", [104 / 110] * 21, grid=1 / 110)
+        ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_band'
+
+======================================================================
+ERROR: test_a_non_normal_null_uses_the_rank_band_and_says_so (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_non_normal_null_uses_the_rank_band_and_says_so)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 69, in test_a_non_normal_null_uses_the_rank_band_and_says_so
+    b = cal.make_band("frames_filed", vals, grid=1.0)
+        ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_band'
+
+======================================================================
+ERROR: test_a_none_reading_in_the_null_is_refused_not_dropped (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_none_reading_in_the_null_is_refused_not_dropped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 89, in test_a_none_reading_in_the_null_is_refused_not_dropped
+    cal.make_band("frames_filed", ints(*([26] * 20)) + [None], grid=1.0)
+    ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_band'
+
+======================================================================
+ERROR: test_a_normal_null_gives_the_t_times_root_two_times_sigma_edge (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_a_normal_null_gives_the_t_times_root_two_times_sigma_edge)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 34, in test_a_normal_null_gives_the_t_times_root_two_times_sigma_edge
+    b = cal.make_band("frames_filed", NORMALISH, grid=1.0)
+        ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_band'
+
+======================================================================
+ERROR: test_fewer_than_three_distinct_values_has_no_band_even_with_spread (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_fewer_than_three_distinct_values_has_no_band_even_with_spread)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 61, in test_fewer_than_three_distinct_values_has_no_band_even_with_spread
+    b = cal.make_band("frames_filed", ints(*([26] * 11 + [27] * 10)), grid=1.0)
+        ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_band'
+
+======================================================================
+ERROR: test_the_edge_is_printed_in_grid_steps_and_the_steps_a_reading_must_clear (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_the_edge_is_printed_in_grid_steps_and_the_steps_a_reading_must_clear)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 49, in test_the_edge_is_printed_in_grid_steps_and_the_steps_a_reading_must_clear
+    b = cal.make_band("q1_seen", vals, grid=1 / 110)
+        ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_band'
+
+======================================================================
+ERROR: test_the_n_is_the_number_of_values_and_df_follows (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_the_n_is_the_number_of_values_and_df_follows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 78, in test_the_n_is_the_number_of_values_and_df_follows
+    b = cal.make_band("confirmed_share", [0.40 + 0.003 * i for i in range(11)] , grid=None)
+        ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_band'
+
+======================================================================
+ERROR: test_too_few_values_is_refused (tests.tools.test_evolve_cal_bands_build.TestMakeBand.test_too_few_values_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 85, in test_too_few_values_is_refused
+    cal.make_band("frames_filed", ints(1, 2), grid=1.0)
+    ^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_band'
+
+======================================================================
+ERROR: test_a_dead_dimension_is_written_as_no_band_not_dropped (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_a_dead_dimension_is_written_as_no_band_not_dropped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 119, in test_a_dead_dimension_is_written_as_no_band_not_dropped
+    b = cal.make_bands(self.null(q1_seen=[104 / 110] * 21), slice_name="S1", scope="x")
+        ^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_bands'
+
+======================================================================
+ERROR: test_a_missing_gated_dimension_is_refused (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_a_missing_gated_dimension_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 133, in test_a_missing_gated_dimension_is_refused
+    cal.make_bands(n, slice_name="S1", scope="x")
+    ^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_bands'
+
+======================================================================
+ERROR: test_a_planted_difference_reads_above_and_a_third_of_it_reads_within (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_a_planted_difference_reads_above_and_a_third_of_it_reads_within)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 112, in test_a_planted_difference_reads_above_and_a_third_of_it_reads_within
+    b = cal.make_bands(self.null(), slice_name="S1", scope="x")
+        ^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_bands'
+
+======================================================================
+ERROR: test_the_bands_file_validates_and_carries_the_laws_fields (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_the_bands_file_validates_and_carries_the_laws_fields)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 103, in test_the_bands_file_validates_and_carries_the_laws_fields
+    b = cal.make_bands(self.null(), slice_name="S1", scope="mid-life (S1)")
+        ^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_bands'
+
+======================================================================
+ERROR: test_the_cost_band_is_built_on_the_log_cpu (tests.tools.test_evolve_cal_bands_build.TestMakeBands.test_the_cost_band_is_built_on_the_log_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 124, in test_the_cost_band_is_built_on_the_log_cpu
+    b = cal.make_bands(self.null(), slice_name="S1", scope="x")
+        ^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'make_bands'
+
+======================================================================
+ERROR: test_a_threefold_spread_is_different_and_the_direction_is_named (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_a_threefold_spread_is_different_and_the_direction_is_named)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 150, in test_a_threefold_spread_is_different_and_the_direction_is_named
+    r = cal.variance_ratio_test(a, b)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'variance_ratio_test'
+
+======================================================================
+ERROR: test_a_zero_variance_against_a_spread_is_different_with_a_zero_or_infinite_ratio (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_a_zero_variance_against_a_spread_is_different_with_a_zero_or_infinite_ratio)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 159, in test_a_zero_variance_against_a_spread_is_different_with_a_zero_or_infinite_ratio
+    r = cal.variance_ratio_test([5.0] * 21, spread)          # F = var_a / var_b
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'variance_ratio_test'
+
+======================================================================
+ERROR: test_equal_spreads_are_not_different (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_equal_spreads_are_not_different)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 140, in test_equal_spreads_are_not_different
+    r = cal.variance_ratio_test(a, b)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'variance_ratio_test'
+
+======================================================================
+ERROR: test_two_zero_variances_are_not_different (tests.tools.test_evolve_cal_bands_build.TestVarianceRatio.test_two_zero_variances_are_not_different)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_bands_build.py", line 169, in test_two_zero_variances_are_not_different
+    r = cal.variance_ratio_test([5.0] * 21, [5.0] * 10)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'variance_ratio_test'
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.005s
+
+FAILED (errors=20)
+scope memory.peak 50683904 bytes

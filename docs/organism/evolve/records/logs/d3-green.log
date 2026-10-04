@@ -1,0 +1,10 @@
+test_a_journal_that_carries_confirmed_is_graded (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_a_journal_that_carries_confirmed_is_graded) ... ok
+test_a_planted_journal_without_confirmed_reads_none (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_a_planted_journal_without_confirmed_reads_none) ... ok
+test_surprise_not_declared_reads_none_even_with_confirmed_rows (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_surprise_not_declared_reads_none_even_with_confirmed_rows) ... ok
+test_the_stripped_and_the_intact_journal_read_differently (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_the_stripped_and_the_intact_journal_read_differently) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.030s
+
+OK
+scope memory.peak 50941952 bytes

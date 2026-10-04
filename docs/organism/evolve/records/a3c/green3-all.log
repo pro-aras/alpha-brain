@@ -1,0 +1,21 @@
+# c-green3 on 67d620f320ba8ccfbfb188ba82159d77f3068fb7, started 2026-10-03 23:47:02 +0400
+.................................................................................................................................................{"label": "a", "variant": "incumbent", "exit": 0}
+{"label": "b", "variant": "seed:1", "exit": 3}
+...................{"first_seq": 75, "last_seq": 118, "n_payloads": 44, "n_rows": 44, "payload_bytes": 323605, "rows_sha256": "455b2c5ffa7b63ad4b448e12af62a9bc5a128a5c8d42c28490f3366e26690bef"}
+VERIFY {"equal": true, "extra_rows": 0, "missing_payloads": [], "payload_mismatches": [], "row_mismatches": 0, "rows_checked": 44}
+{"bytes": 240874, "n_files": 12}
+VERIFY {"equal": true, "extra": [], "mismatches": [], "missing": [], "n_files": 12}
+.{"confirmed_share": null, "cpu_s": 0.528, "frames_filed": 0, "journal_rows": 7, "journal_sha256": "f81ed4efcc692edbc8fd6e0a19522719954fe362a330f8e588c4a1c5389cc0ed", "maxrss_kb": 876856, "q1_seen": 0.35, "rows_consumed": 12, "state_hash": "5622ee6779653b6d337e1f9d39a2f292c1a3bc095948ff71f913df7b3b9c7900", "variant": "incumbent", "wall_s": 0.528}
+{"confirmed_share": null, "cpu_s": 0.468, "frames_filed": 0, "journal_rows": 7, "journal_sha256": "f81ed4efcc692edbc8fd6e0a19522719954fe362a330f8e588c4a1c5389cc0ed", "maxrss_kb": 876956, "q1_seen": 0.35, "rows_consumed": 12, "state_hash": "5622ee6779653b6d337e1f9d39a2f292c1a3bc095948ff71f913df7b3b9c7900", "variant": "incumbent", "wall_s": 0.468}
+{"a": {"label": null, "variant": "incumbent"}, "b": {"label": null, "variant": "incumbent"}, "confirmed_share": [null, null], "frames_filed": [0, 0], "journal": {"by_decile": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "diff_key_counts": {}, "discrete_diff_rows": 0, "equal_prefix": 7, "first_diff": null, "first_discrete_diff": null, "identical": true, "n_a": 7, "n_b": 7, "rows_differing": 0}, "q1_seen": [0.35, 0.35], "row_hash_equal": true, "state_hash_equal": true}
+.......................................................[evolve/negctl] shadow consumed 445 rows up to seq 445 (T-2.0h checkpoint)
+[evolve/negctl] shadow consumed 112 more rows to the tape's end (seq 557)
+[evolve/negctl] planted_bad (BIRTH.theta_n=0.5): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] planted_bad incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+[evolve/negctl] null (DELTA.lr=0.051): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] null incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+............
+----------------------------------------------------------------------
+Ran 232 tests in 121.815s
+
+OK

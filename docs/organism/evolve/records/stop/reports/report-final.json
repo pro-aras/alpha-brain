@@ -1,0 +1,912 @@
+{
+ "determinism T0 vs T0b": {
+  "confirmed_share": [
+   0.4315,
+   0.4315
+  ],
+  "cpu_s": [
+   578.184,
+   599.34
+  ],
+  "frames_filed": [
+   7,
+   7
+  ],
+  "journal": {
+   "by_decile": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "diff_key_counts": {},
+   "discrete_diff_rows": 0,
+   "equal_prefix": 935,
+   "first_diff": null,
+   "first_discrete_diff": null,
+   "identical": true,
+   "n_a": 935,
+   "n_b": 935,
+   "rows_differing": 0
+  },
+  "keyed": {
+   "moment": {
+    "diff_key_counts": {},
+    "differing": 0,
+    "discrete_differing": 0,
+    "first_discrete_seq": null,
+    "matched": 796,
+    "only_a": 0,
+    "only_b": 0
+   },
+   "n_a": 935,
+   "n_b": 935,
+   "other": {
+    "act": {
+     "differing": 0,
+     "matched": 28,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "body": {
+     "differing": 0,
+     "matched": 29,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "outcome": {
+     "differing": 0,
+     "matched": 34,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "question": {
+     "differing": 0,
+     "matched": 1,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "sleep": {
+     "differing": 0,
+     "matched": 1,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "think": {
+     "differing": 0,
+     "matched": 40,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "touch": {
+     "differing": 0,
+     "matched": 6,
+     "only_a": 0,
+     "only_b": 0
+    }
+   }
+  },
+  "pair": "determinism T0 vs T0b",
+  "q1_seen": [
+   0.9727272727272728,
+   0.9727272727272728
+  ],
+  "row_hash_equal": true,
+  "state_hash_equal": true
+ },
+ "epsilon pair T0 vs Te (lr x (1+1e-5))": {
+  "confirmed_share": [
+   0.4315,
+   0.4315
+  ],
+  "cpu_s": [
+   578.184,
+   593.707
+  ],
+  "frames_filed": [
+   7,
+   7
+  ],
+  "journal": {
+   "by_decile": [
+    82,
+    77,
+    79,
+    79,
+    79,
+    80,
+    83,
+    80,
+    81,
+    77
+   ],
+   "diff_key_counts": {
+    "hash": 797
+   },
+   "discrete_diff_rows": 0,
+   "equal_prefix": 0,
+   "first_diff": 0,
+   "first_discrete_diff": null,
+   "identical": false,
+   "n_a": 935,
+   "n_b": 935,
+   "rows_differing": 797
+  },
+  "keyed": {
+   "moment": {
+    "diff_key_counts": {
+     "hash": 796
+    },
+    "differing": 796,
+    "discrete_differing": 0,
+    "first_discrete_seq": null,
+    "matched": 796,
+    "only_a": 0,
+    "only_b": 0
+   },
+   "n_a": 935,
+   "n_b": 935,
+   "other": {
+    "act": {
+     "differing": 0,
+     "matched": 28,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "body": {
+     "differing": 0,
+     "matched": 29,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "outcome": {
+     "differing": 0,
+     "matched": 34,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "question": {
+     "differing": 0,
+     "matched": 1,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "sleep": {
+     "differing": 1,
+     "matched": 1,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "think": {
+     "differing": 0,
+     "matched": 40,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "touch": {
+     "differing": 0,
+     "matched": 6,
+     "only_a": 0,
+     "only_b": 0
+    }
+   }
+  },
+  "pair": "epsilon pair T0 vs Te (lr x (1+1e-5))",
+  "q1_seen": [
+   0.9727272727272728,
+   0.9727272727272728
+  ],
+  "row_hash_equal": false,
+  "state_hash_equal": false
+ },
+ "ladder": [
+  {
+   "by_decile": [
+    82,
+    77,
+    79,
+    79,
+    79,
+    80,
+    83,
+    80,
+    81,
+    77
+   ],
+   "confirmed_share": [
+    0.4315,
+    0.4315
+   ],
+   "diff_key_counts": {
+    "hash": 797
+   },
+   "discrete_diff_rows": 0,
+   "eps": 1e-05,
+   "first_diff": 0,
+   "first_discrete_diff": null,
+   "frames_filed": [
+    7,
+    7
+   ],
+   "keyed": {
+    "moment": {
+     "diff_key_counts": {
+      "hash": 796
+     },
+     "differing": 796,
+     "discrete_differing": 0,
+     "first_discrete_seq": null,
+     "matched": 796,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "n_a": 935,
+    "n_b": 935,
+    "other": {
+     "act": {
+      "differing": 0,
+      "matched": 28,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "body": {
+      "differing": 0,
+      "matched": 29,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "outcome": {
+      "differing": 0,
+      "matched": 34,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "question": {
+      "differing": 0,
+      "matched": 1,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "sleep": {
+      "differing": 1,
+      "matched": 1,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "think": {
+      "differing": 0,
+      "matched": 40,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "touch": {
+      "differing": 0,
+      "matched": 6,
+      "only_a": 0,
+      "only_b": 0
+     }
+    }
+   },
+   "q1_seen": [
+    0.9727272727272728,
+    0.9727272727272728
+   ],
+   "rows_compared": 935,
+   "rows_differing": 797,
+   "state_hash_equal": false,
+   "twin": "Te"
+  },
+  {
+   "by_decile": [
+    82,
+    77,
+    79,
+    79,
+    79,
+    80,
+    83,
+    80,
+    81,
+    77
+   ],
+   "confirmed_share": [
+    0.4315,
+    0.4315
+   ],
+   "diff_key_counts": {
+    "hash": 797
+   },
+   "discrete_diff_rows": 0,
+   "eps": 0.0001,
+   "first_diff": 0,
+   "first_discrete_diff": null,
+   "frames_filed": [
+    7,
+    7
+   ],
+   "keyed": {
+    "moment": {
+     "diff_key_counts": {
+      "hash": 796
+     },
+     "differing": 796,
+     "discrete_differing": 0,
+     "first_discrete_seq": null,
+     "matched": 796,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "n_a": 935,
+    "n_b": 935,
+    "other": {
+     "act": {
+      "differing": 0,
+      "matched": 28,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "body": {
+      "differing": 0,
+      "matched": 29,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "outcome": {
+      "differing": 0,
+      "matched": 34,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "question": {
+      "differing": 0,
+      "matched": 1,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "sleep": {
+      "differing": 1,
+      "matched": 1,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "think": {
+      "differing": 0,
+      "matched": 40,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "touch": {
+      "differing": 0,
+      "matched": 6,
+      "only_a": 0,
+      "only_b": 0
+     }
+    }
+   },
+   "q1_seen": [
+    0.9727272727272728,
+    0.9727272727272728
+   ],
+   "rows_compared": 935,
+   "rows_differing": 797,
+   "state_hash_equal": false,
+   "twin": "P1e-4"
+  },
+  {
+   "by_decile": [
+    82,
+    77,
+    79,
+    79,
+    79,
+    80,
+    83,
+    80,
+    81,
+    77
+   ],
+   "confirmed_share": [
+    0.4315,
+    0.4315
+   ],
+   "diff_key_counts": {
+    "edges": 6,
+    "hash": 797
+   },
+   "discrete_diff_rows": 6,
+   "eps": 0.001,
+   "first_diff": 0,
+   "first_discrete_diff": 133,
+   "frames_filed": [
+    7,
+    7
+   ],
+   "keyed": {
+    "moment": {
+     "diff_key_counts": {
+      "edges": 6,
+      "hash": 796
+     },
+     "differing": 796,
+     "discrete_differing": 6,
+     "first_discrete_seq": 304148,
+     "matched": 796,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "n_a": 935,
+    "n_b": 935,
+    "other": {
+     "act": {
+      "differing": 0,
+      "matched": 28,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "body": {
+      "differing": 0,
+      "matched": 29,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "outcome": {
+      "differing": 0,
+      "matched": 34,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "question": {
+      "differing": 0,
+      "matched": 1,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "sleep": {
+      "differing": 1,
+      "matched": 1,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "think": {
+      "differing": 0,
+      "matched": 40,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "touch": {
+      "differing": 0,
+      "matched": 6,
+      "only_a": 0,
+      "only_b": 0
+     }
+    }
+   },
+   "q1_seen": [
+    0.9727272727272728,
+    0.9727272727272728
+   ],
+   "rows_compared": 935,
+   "rows_differing": 797,
+   "state_hash_equal": false,
+   "twin": "P1e-3"
+  },
+  {
+   "by_decile": [
+    82,
+    77,
+    79,
+    79,
+    79,
+    80,
+    84,
+    80,
+    81,
+    77
+   ],
+   "confirmed_share": [
+    0.4315,
+    0.4315
+   ],
+   "diff_key_counts": {
+    "cells": 41,
+    "edges": 36,
+    "hash": 797,
+    "sleep": 1,
+    "think": 1
+   },
+   "discrete_diff_rows": 77,
+   "eps": 0.01,
+   "first_diff": 0,
+   "first_discrete_diff": 78,
+   "frames_filed": [
+    7,
+    7
+   ],
+   "keyed": {
+    "moment": {
+     "diff_key_counts": {
+      "cells": 41,
+      "edges": 36,
+      "hash": 796
+     },
+     "differing": 796,
+     "discrete_differing": 75,
+     "first_discrete_seq": 304091,
+     "matched": 796,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "n_a": 935,
+    "n_b": 935,
+    "other": {
+     "act": {
+      "differing": 0,
+      "matched": 28,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "body": {
+      "differing": 0,
+      "matched": 29,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "outcome": {
+      "differing": 0,
+      "matched": 34,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "question": {
+      "differing": 0,
+      "matched": 1,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "sleep": {
+      "differing": 1,
+      "matched": 1,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "think": {
+      "differing": 1,
+      "matched": 40,
+      "only_a": 0,
+      "only_b": 0
+     },
+     "touch": {
+      "differing": 0,
+      "matched": 6,
+      "only_a": 0,
+      "only_b": 0
+     }
+    }
+   },
+   "q1_seen": [
+    0.9727272727272728,
+    0.9727272727272728
+   ],
+   "rows_compared": 935,
+   "rows_differing": 798,
+   "state_hash_equal": false,
+   "twin": "P1e-2"
+  }
+ ],
+ "plant": {
+  "caught": true,
+  "row": 0
+ },
+ "readings": {
+  "T0": {
+   "build_s": 17.872,
+   "confirmed_share": 0.4315,
+   "cpu_s": 578.184,
+   "frames_filed": 7,
+   "journal_rows": 935,
+   "load0": [
+    6.57,
+    6.66,
+    5.27
+   ],
+   "load1": [
+    6.07,
+    6.65,
+    6.06
+   ],
+   "maxrss_kb": 6514484,
+   "psi0": {
+    "cpu_full_avg10": 0.0,
+    "cpu_some_avg10": 0.18,
+    "memory_full_avg10": 0.0,
+    "memory_some_avg10": 0.0
+   },
+   "psi1": {
+    "cpu_full_avg10": 0.0,
+    "cpu_some_avg10": 0.0,
+    "memory_full_avg10": 0.0,
+    "memory_some_avg10": 0.0
+   },
+   "q1_seen": 0.9727272727272728,
+   "row_hash": "68d1557323d21f1bb1a84c932599128c925bf5ad514a0b2a2c4aa4d309b72956",
+   "rows_consumed": 1000,
+   "state_hash": "d79b41adf1be78807b796e404bd182bf39dd3017df002dfa2e2582be85447fc0",
+   "variant": "incumbent",
+   "wall_s": 589.938
+  },
+  "T0b": {
+   "build_s": 19.437,
+   "confirmed_share": 0.4315,
+   "cpu_s": 599.34,
+   "frames_filed": 7,
+   "journal_rows": 935,
+   "load0": [
+    5.78,
+    6.5,
+    6.05
+   ],
+   "load1": [
+    6.77,
+    6.29,
+    6.09
+   ],
+   "maxrss_kb": 6517776,
+   "psi0": {
+    "cpu_full_avg10": 0.0,
+    "cpu_some_avg10": 0.04,
+    "memory_full_avg10": 0.0,
+    "memory_some_avg10": 0.0
+   },
+   "psi1": {
+    "cpu_full_avg10": 0.0,
+    "cpu_some_avg10": 0.0,
+    "memory_full_avg10": 0.14,
+    "memory_some_avg10": 0.14
+   },
+   "q1_seen": 0.9727272727272728,
+   "row_hash": "68d1557323d21f1bb1a84c932599128c925bf5ad514a0b2a2c4aa4d309b72956",
+   "rows_consumed": 1000,
+   "state_hash": "d79b41adf1be78807b796e404bd182bf39dd3017df002dfa2e2582be85447fc0",
+   "variant": "incumbent",
+   "wall_s": 608.48
+  },
+  "Te": {
+   "build_s": 14.994,
+   "confirmed_share": 0.4315,
+   "cpu_s": 593.707,
+   "frames_filed": 7,
+   "journal_rows": 935,
+   "load0": [
+    7.72,
+    7.25,
+    5.87
+   ],
+   "load1": [
+    5.88,
+    6.21,
+    6.02
+   ],
+   "maxrss_kb": 6516232,
+   "psi0": {
+    "cpu_full_avg10": 0.0,
+    "cpu_some_avg10": 0.0,
+    "memory_full_avg10": 0.0,
+    "memory_some_avg10": 0.0
+   },
+   "psi1": {
+    "cpu_full_avg10": 0.0,
+    "cpu_some_avg10": 0.0,
+    "memory_full_avg10": 0.0,
+    "memory_some_avg10": 0.0
+   },
+   "q1_seen": 0.9727272727272728,
+   "row_hash": "9adfca3b869598586d24ba1d37c94caa05a8013fcba4dbd9093f9b9c8aa32b7f",
+   "rows_consumed": 1000,
+   "state_hash": "c9f530f9787707acee81745b45999f3b93b943dcb6f16ec7a6d7496007851f77",
+   "variant": "eps:1e-05:1",
+   "wall_s": 605.67
+  },
+  "Ts": {
+   "build_s": 15.677,
+   "confirmed_share": 0.4315,
+   "cpu_s": 597.461,
+   "frames_filed": 2,
+   "journal_rows": 935,
+   "load0": [
+    5.7,
+    6.09,
+    5.99
+   ],
+   "load1": [
+    6.73,
+    6.32,
+    6.14
+   ],
+   "maxrss_kb": 6516864,
+   "psi0": {
+    "cpu_full_avg10": 0.0,
+    "cpu_some_avg10": 0.0,
+    "memory_full_avg10": 0.0,
+    "memory_some_avg10": 0.0
+   },
+   "psi1": {
+    "cpu_full_avg10": 0.0,
+    "cpu_some_avg10": 0.0,
+    "memory_full_avg10": 0.0,
+    "memory_some_avg10": 0.0
+   },
+   "q1_seen": 0.9727272727272728,
+   "row_hash": "68d1557323d21f1bb1a84c932599128c925bf5ad514a0b2a2c4aa4d309b72956",
+   "rows_consumed": 1000,
+   "state_hash": "d79b41adf1be78807b796e404bd182bf39dd3017df002dfa2e2582be85447fc0",
+   "variant": "seed:1",
+   "wall_s": 600.231
+  }
+ },
+ "recorded_rows": 4395,
+ "replication_vs_recorded": {
+  "by_decile": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "compared_rows": 935,
+  "diff_key_counts": {},
+  "discrete_diff_rows": 0,
+  "equal_prefix": 935,
+  "first_diff": null,
+  "first_discrete_diff": null,
+  "first_row_seq_mine_recorded": [
+   304004,
+   304004
+  ],
+  "identical": true,
+  "n_a": 935,
+  "n_b": 935,
+  "rows_differing": 0
+ },
+ "seed pair T0 vs Ts (SEED+1)": {
+  "confirmed_share": [
+   0.4315,
+   0.4315
+  ],
+  "cpu_s": [
+   578.184,
+   597.461
+  ],
+  "frames_filed": [
+   7,
+   2
+  ],
+  "journal": {
+   "by_decile": [
+    21,
+    25,
+    11,
+    61,
+    36,
+    16,
+    37,
+    49,
+    40,
+    11
+   ],
+   "diff_key_counts": {
+    "act": 277,
+    "act_chosen": 2,
+    "arrival": 12,
+    "births": 240,
+    "body": 16,
+    "cells": 240,
+    "confirmed": 275,
+    "edges": 240,
+    "ep": 240,
+    "err": 240,
+    "fix": 275,
+    "glance": 275,
+    "hash": 155,
+    "lr": 240,
+    "moment": 155,
+    "outcome": 20,
+    "residual": 275,
+    "seq": 138,
+    "source": 240,
+    "think": 52,
+    "when": 240,
+    "windows": 275,
+    "word": 240
+   },
+   "discrete_diff_rows": 307,
+   "equal_prefix": 7,
+   "first_diff": 7,
+   "first_discrete_diff": 7,
+   "identical": false,
+   "n_a": 935,
+   "n_b": 935,
+   "rows_differing": 307
+  },
+  "keyed": {
+   "moment": {
+    "diff_key_counts": {},
+    "differing": 0,
+    "discrete_differing": 0,
+    "first_discrete_seq": null,
+    "matched": 796,
+    "only_a": 0,
+    "only_b": 0
+   },
+   "n_a": 935,
+   "n_b": 935,
+   "other": {
+    "act": {
+     "differing": 0,
+     "matched": 28,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "body": {
+     "differing": 0,
+     "matched": 29,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "outcome": {
+     "differing": 0,
+     "matched": 34,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "question": {
+     "differing": 0,
+     "matched": 1,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "sleep": {
+     "differing": 0,
+     "matched": 1,
+     "only_a": 0,
+     "only_b": 0
+    },
+    "think": {
+     "differing": 32,
+     "matched": 32,
+     "only_a": 8,
+     "only_b": 8
+    },
+    "touch": {
+     "differing": 0,
+     "matched": 6,
+     "only_a": 0,
+     "only_b": 0
+    }
+   }
+  },
+  "pair": "seed pair T0 vs Ts (SEED+1)",
+  "q1_seen": [
+   0.9727272727272728,
+   0.9727272727272728
+  ],
+  "row_hash_equal": true,
+  "state_hash_equal": true
+ },
+ "twins_present": {
+  "T0": true,
+  "T0b": true,
+  "Te": true,
+  "Ts": true
+ }
+}

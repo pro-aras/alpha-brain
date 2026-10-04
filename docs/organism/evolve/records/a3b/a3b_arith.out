@@ -1,0 +1,42 @@
+CONTROLS PASSED: the verifier's figures (stop 1 at p = .05/.10/.20/.30/.50 = 0.112/0.221/0.210/0.112/0.016; P(>=2 of 20) = 0.264/0.608/0.824/0.931; stop 2 under S = 0.242/0.527/0.660/0.668/0.521; the one-move condition = 0.132/0.266/0.302/0.273/0.162) are re-derived to within 0.0006
+
+STOP 1 (A0/A0+: six twins, none moves) misses at most 0.2440 at p = 0.139; the 20-twin design grants a band more often than not above p = 0.0825
+
+TABLE (every cell a probability, the model above; miss = the 20-twin design would have granted a band and the staged design does not):
+     p | 20-twin grants | stop 1 miss | stop 2 miss, rule S | S: P(Stage B runs) | S: E[Stage B CPU-h] | M: Stage B CPU-h
+ 0.050 |          0.264 |       0.112 |               0.242 |              0.023 |                0.26 |             11.4
+ 0.100 |          0.608 |       0.221 |               0.527 |              0.081 |                0.93 |             11.4
+ 0.139 |          0.788 |       0.244 |               0.643 |              0.145 |                1.65 |             11.4
+ 0.150 |          0.824 |       0.243 |               0.660 |              0.165 |                1.88 |             11.4
+ 0.200 |          0.931 |       0.210 |               0.668 |              0.263 |                3.00 |             11.4
+ 0.300 |          0.992 |       0.112 |               0.521 |              0.472 |                5.38 |             11.4
+ 0.500 |          1.000 |       0.016 |               0.187 |              0.812 |                9.26 |             11.4
+
+ONE-MOVE CONDITION (the verifier's alternative, no selection modelled): Stage B only if >= 1 move among the five; miss / P(Stage B runs) / E[CPU-h]:
+  p=0.05: miss 0.132  P(runs) 0.226  E[CPU-h] 2.58
+  p=0.10: miss 0.266  P(runs) 0.410  E[CPU-h] 4.67
+  p=0.15: miss 0.302  P(runs) 0.556  E[CPU-h] 6.34
+  p=0.20: miss 0.273  P(runs) 0.672  E[CPU-h] 7.66
+  p=0.30: miss 0.162  P(runs) 0.832  E[CPU-h] 9.48
+  p=0.50: miss 0.031  P(runs) 0.969  E[CPU-h] 11.04
+
+N2 F-TESTS (two-sided 0.05: F(0.975; dfn, dfd); the smallest detectable sigma ratio is sqrt(F)); df = values - 1:
+  (10,  6): F = 5.461, detectable sigma ratio 2.34x   [frames_filed: S1 11 values (10 seeds + incumbent) vs S2 7 values (6 seeds + incumbent)]
+  (10,  5): F = 6.619, detectable sigma ratio 2.57x   [the text of A3.6 (4) as signed (6 values on S2)]
+  (20, 10): F = 3.419, detectable sigma ratio 1.85x   [the law's A7 (S1 21 values vs S2 11 values)]
+  ( 5,  6): F = 5.988, detectable sigma ratio 2.45x   [epsilon dims, S1 Stage A only (6 values) vs S2 7 values]
+  (20,  6): F = 5.168, detectable sigma ratio 2.27x   [epsilon dims, S1 with Stage B (21 values) vs S2 7 values]
+
+COST BAND (A4 (ii): edge = t(n-1, 1-0.0083) * sqrt(2) * sigma_hat; sigma_hat = 0.049 = the ln-SD of the seven STOP twins' CPU-seconds; the policy cap is 1.2):
+  n =  7 (the STOP stage's seven twins): t = 3.2907, factor 4.654, edge ln 0.2280, ratio 1.2561 (above the 1.2 cap)
+  n = 17 (the degenerate branch: incumbent + 6 epsilon twins + 10 seed twins): t = 2.6750, factor 3.783, edge ln 0.1854, ratio 1.2037 (above the 1.2 cap)
+  n = 21 (the law's incumbent + 20 twins): t = 2.6144, factor 3.697, edge ln 0.1812, ratio 1.1986 (at or below the 1.2 cap)
+
+BAND EDGE FACTOR (t(n-1, 1-0.0083) * sqrt(2) * sigma_hat): n = 6 values 5.003, n = 21 values 3.697: a band from six values is 1.353x as wide as the 20-twin band
+
+PRICE (CPU-hours; an S1 twin 0.761, an S2 twin 0.989 — A3.5's measured figures):
+  A0 2.28 · A0+ 3.04 · 10 seeds 7.61 · Stage A (13 epsilon + 10 seed twins) 17.50 · Stage B 11.41
+  N2: seed twins only (7 twins) 6.92; with epsilon twins at the chosen level too (6 seeds + 6 epsilon + the incumbent = 13 twins) 12.86
+  TOTAL degenerate branch (A0 + A0+ + seeds + N2 seeds + P-BAD + P-GOOD + R5) = 24.1
+  TOTAL non-degenerate branch with Stage B (N2 with epsilon twins) = 48.3; without Stage B (rule S stops) = 36.9
+  (A3.6 printed 24.1 and 42.4 with N2 = 6.9 in both; the verifier recomputed them; A3b.4 adds the six epsilon twins to the non-degenerate branch's N2)

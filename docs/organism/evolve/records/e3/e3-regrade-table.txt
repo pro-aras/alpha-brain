@@ -1,0 +1,15 @@
+round gene                    value recorded share inc share mut     delta  rows carrying  legacy bar with confirmed_share
+    2 DELTA.lr                 0.07 REFUSED     0.0892    0.0839   -0.0053 22456/60342   REFUSED
+    3 BIRTH.misfires              3 REFUSED     0.3177    0.3177       0.0 9944/16820   REFUSED
+    4 DELTA.lr                 0.09 REFUSED     0.4404    0.4094    -0.031 2850/2850    REFUSED
+    5 KWTA.k                      4 PASS        0.4731    0.4761     0.003 2410/2410    PASS
+    6 BUDGET.per_arrival        305 REFUSED     0.4419    0.4419       0.0 2409/2409    REFUSED
+    7 SLEEP.every              1414 REFUSED     0.4926    0.4903   -0.0023 2117/2117    REFUSED
+    8 SLEEP.replay               92 REFUSED     0.4766    0.4758   -0.0008 2053/2053    REFUSED
+    9 SLEEP.every              2612 REFUSED     0.4617    0.4654    0.0037 2094/2094    REFUSED
+   10 MERGE.theta_m          0.9834 REFUSED     0.4283    0.4313     0.003 2083/2083    REFUSED
+   11 SLEEP.replay              255 REFUSED      0.453    0.4558    0.0028 2015/2015    REFUSED
+   12 MERGE.theta_m          0.9947 REFUSED     0.4332    0.4307   -0.0025 2032/2032    REFUSED
+   13 KWTA.k                     10 REFUSED     0.4134    0.4296    0.0162 1861/1861    REFUSED
+   14 DELTA.lr                 0.07 REFUSED     0.4494    0.4286   -0.0208 1839/1839    REFUSED
+graded rounds 13 of 13 · plant CAUGHT · C4 PASS · verdicts changed under the legacy bar once confirmed_share is graded: 0 of 13
