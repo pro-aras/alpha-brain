@@ -139,9 +139,7 @@ class MarkT(unittest.TestCase):
 
     def test_a_voice_with_no_thing_under_it_is_counted_not_graded(self) -> None:
         rows = journal({"words": ("red",), "hyp": 0}, {"words": ("red",), "hyp": 0}, {"words": ("zzz",), "hyp": 0})
-        rows2 = [dict(r, say=(dict(r["say"], words=["zzz"]) if r.get("act") == "voice" and r["seq"] == 19 else r["say"]))
-                 if r.get("kind") == "brain" else r for r in rows]
-        t = VG.mark_t(rows2, truth, 999, nulls=3)
+        t = VG.mark_t(rows, truth, 999, nulls=3)
         self.assertEqual(t["graded"], 3)
         self.assertEqual(t["true"], 2 / 3)
 
