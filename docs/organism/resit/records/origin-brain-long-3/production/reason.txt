@@ -1,0 +1,1 @@
+the seat, 2026-10-03 21:34 +0400: FALLBACK ORIGIN for brain-long-3 — the seat's read-only copy of state/prev taken 19:30:14 after its scene stream ended (both sittings done, manifest_last_seq 166,243); the exact rebuild is DEFERRED (its pilot priced 3.6–7.4 CPU-h, above the law's 4 CPU-h line); late by at most one snapshot

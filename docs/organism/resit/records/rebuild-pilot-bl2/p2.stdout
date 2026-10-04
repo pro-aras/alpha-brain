@@ -1,0 +1,1 @@
+{"pilot": "/data/dev/brain-runs/resit-gate/rebuild-pilot-bl2/p2/pilot.json", "rows_replayed": 35074, "stopped": "cpu cap", "cpu_replay_s": 900.316, "verdict_vs_line": "STRADDLES", "central_cpu_h": 2.082, "range_cpu_h": [3.642, 7.448], "central_rss_mb": 2219}

@@ -1,0 +1,30 @@
+test_a_journal_that_carries_confirmed_is_graded (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_a_journal_that_carries_confirmed_is_graded) ... FAIL
+test_a_planted_journal_without_confirmed_reads_none (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_a_planted_journal_without_confirmed_reads_none) ... ok
+test_surprise_not_declared_reads_none_even_with_confirmed_rows (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_surprise_not_declared_reads_none_even_with_confirmed_rows) ... ok
+test_the_stripped_and_the_intact_journal_read_differently (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_the_stripped_and_the_intact_journal_read_differently) ... FAIL
+
+======================================================================
+FAIL: test_a_journal_that_carries_confirmed_is_graded (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_a_journal_that_carries_confirmed_is_graded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_d3.py", line 54, in test_a_journal_that_carries_confirmed_is_graded
+    self.assertIsNotNone(r["confirmed_share"],
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+                         "confirmed_share must be read from the twin journal's `confirmed` rows (D3: the call-site shift read None)")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : confirmed_share must be read from the twin journal's `confirmed` rows (D3: the call-site shift read None)
+
+======================================================================
+FAIL: test_the_stripped_and_the_intact_journal_read_differently (tests.tools.test_evolve_cal_d3.TestGradeTwinSurpriseCallSite.test_the_stripped_and_the_intact_journal_read_differently)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_d3.py", line 75, in test_the_stripped_and_the_intact_journal_read_differently
+    self.assertEqual(a["confirmed_share"], 1.0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 1.0
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.045s
+
+FAILED (failures=2)
+scope memory.peak 50962432 bytes

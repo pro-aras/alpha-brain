@@ -1,0 +1,6 @@
+slot END lines (ledger.log):
+2026-10-03 22:02:15 +0400 END   hears g2-ck1b slot 1 exit 0 cap 6G peak 366MB swap 0MB
+2026-10-03 22:25:45 +0400 END   hears g2-bl2 slot 7 exit 0 cap 6G peak 6144MB swap 23MB
+2026-10-03 22:26:15 +0400 END   hears g2-bl3 slot 5 exit 0 cap 6G peak 2928MB swap 0MB
+/usr/bin/time -v max RSS (kB): ck1 price 375112, bl2 job 4382852, bl3 job 2382540
+NOTE: the cgroup peak of the bl2 job (6144 MB = its 6G cap, swap 23 MB) counts reclaimable page cache from 39 state copies of up to 620 MB each; the job exited 0 (not OOM-CAP); the largest single process RSS was 4.18 GB (the law's price: 2.4-4.6 GB).

@@ -1,0 +1,124 @@
+# a3b-red2 on 5dcd28a2ae1d068bc362fb816f323e9c8288e51c, started 2026-10-03 23:16:53 +0400
+........FFFF.FF..FF..................................EE......................................
+======================================================================
+ERROR: test_reading_a_prime_a_bandless_dimension_carries_the_legacy_tolerance (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_reading_a_prime_a_bandless_dimension_carries_the_legacy_tolerance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_analyse.py", line 350, in test_reading_a_prime_a_bandless_dimension_carries_the_legacy_tolerance
+    b = an.bands_from_twins(rd(), flat, seed_twins=seeds, slice_name="S1", scope="x", degenerate="legacy")
+  File "/data/dev/genome-wt-evolve-cal-red2/tools/evolve_cal_analyse.py", line 235, in bands_from_twins
+    raise ValueError(f"bands_from_twins: degenerate must be 'none' or 'range', got {degenerate!r}")
+ValueError: bands_from_twins: degenerate must be 'none' or 'range', got 'legacy'
+
+======================================================================
+ERROR: test_reading_a_prime_a_bandless_frames_dimension_uses_one_frame (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_reading_a_prime_a_bandless_frames_dimension_uses_one_frame)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_analyse.py", line 363, in test_reading_a_prime_a_bandless_frames_dimension_uses_one_frame
+    f = an.bands_from_twins(rd(), flat, seed_twins=None, slice_name="S1", scope="x", degenerate="legacy")["dims"]["frames_filed"]
+        ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/dev/genome-wt-evolve-cal-red2/tools/evolve_cal_analyse.py", line 235, in bands_from_twins
+    raise ValueError(f"bands_from_twins: degenerate must be 'none' or 'range', got {degenerate!r}")
+ValueError: bands_from_twins: degenerate must be 'none' or 'range', got 'legacy'
+
+======================================================================
+FAIL: test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere (tests.tools.test_evolve_cal_gate.TestLegacyBandsFile.test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_gate.py", line 459, in test_a_legacy_field_validates_on_a_none_band_and_is_refused_elsewhere
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin (tests.tools.test_evolve_cal_gate.TestLegacyTolerance.test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_gate.py", line 385, in test_a_continuous_dimension_falls_on_any_negative_and_rises_at_its_margin
+    self.assertEqual(eb.position(-1e-6, b), "below")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'no-band' != 'below'
+- no-band
++ below
+
+
+======================================================================
+FAIL: test_a_fall_beside_a_rise_regresses (tests.tools.test_evolve_cal_gate.TestLegacyTolerance.test_a_fall_beside_a_rise_regresses)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_gate.py", line 418, in test_a_fall_beside_a_rise_regresses
+    self.assertEqual(eb.calibrated_verdict(reading(100, share=0.45), reading(110, share=0.44), b)["verdict"], "REGRESSED")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'NO EVIDENCE' != 'REGRESSED'
+- NO EVIDENCE
++ REGRESSED
+
+
+======================================================================
+FAIL: test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension (tests.tools.test_evolve_cal_gate.TestLegacyTolerance.test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_gate.py", line 374, in test_a_fall_of_any_size_is_below_and_a_rise_needs_its_margin_on_a_grid_dimension
+    self.assertEqual(eb.position(-1 / 110, b), "below", "any fall regresses")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'no-band' != 'below'
+- no-band
++ below
+ : any fall regresses
+
+======================================================================
+FAIL: test_c2_and_c3_stay_reachable_under_a_prime (tests.tools.test_evolve_cal_gate.TestLegacyTolerance.test_c2_and_c3_stay_reachable_under_a_prime)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_gate.py", line 422, in test_c2_and_c3_stay_reachable_under_a_prime
+    self.assertEqual(eb.calibrated_verdict(reading(104), reading(96), b)["verdict"], "REGRESSED", "C2: P-BAD, a fall of 8 items")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'NO EVIDENCE' != 'REGRESSED'
+- NO EVIDENCE
++ REGRESSED
+ : C2: P-BAD, a fall of 8 items
+
+======================================================================
+FAIL: test_integer_frames_rise_at_one_frame_and_fall_at_any (tests.tools.test_evolve_cal_gate.TestLegacyTolerance.test_integer_frames_rise_at_one_frame_and_fall_at_any)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_gate.py", line 393, in test_integer_frames_rise_at_one_frame_and_fall_at_any
+    self.assertEqual([eb.position(d, b) for d in (-1.0, 0.0, 1.0, 2.0)], ["below", "within", "above", "above"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['no-band', 'no-band', 'no-band', 'no-band'] != ['below', 'within', 'above', 'above']
+
+First differing element 0:
+'no-band'
+'below'
+
+- ['no-band', 'no-band', 'no-band', 'no-band']
++ ['below', 'within', 'above', 'above']
+
+======================================================================
+FAIL: test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them (tests.tools.test_evolve_cal_gate.TestLegacyTolerance.test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_gate.py", line 430, in test_the_thirteen_recorded_rounds_reread_under_a_prime_as_the_verifier_read_them
+    self.assertEqual(v["verdict"], want, f"round {no}: {v['reason']}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'NO EVIDENCE' != 'REGRESSED'
+- NO EVIDENCE
++ REGRESSED
+ : round 2: NO EVIDENCE: q1_seen 0.9090909090909091->0.8727272727272727 no-band (no band); frames_filed 30->36 within (Δ +6 vs edge 100.00; needs ≥ 101); confirmed_share 0.45->0.4447 no-band (no band); cpu ratio 1.000 (within, cap 1.2)
+
+======================================================================
+FAIL: test_the_verdict_regresses_on_one_item_and_improves_only_on_two (tests.tools.test_evolve_cal_gate.TestLegacyTolerance.test_the_verdict_regresses_on_one_item_and_improves_only_on_two)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-red2/tests/tools/test_evolve_cal_gate.py", line 406, in test_the_verdict_regresses_on_one_item_and_improves_only_on_two
+    self.assertEqual(eb.calibrated_verdict(reading(100), reading(99), b)["verdict"], "REGRESSED")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'NO EVIDENCE' != 'REGRESSED'
+- NO EVIDENCE
++ REGRESSED
+
+
+----------------------------------------------------------------------
+Ran 93 tests in 0.368s
+
+FAILED (failures=8, errors=2)

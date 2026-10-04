@@ -1,0 +1,5 @@
+full (key STRIPPED: the plant): tape /data/dev/swarm/2026-10-03/int/full-cut/tape last seq 38173; replay clock start 2026-10-03 22:04:48; keyed candidates 0
+   full (key STRIPPED: the plant): VACUOUS or NOT FOUND
+lean (key STRIPPED: the plant): tape /data/dev/swarm/2026-10-03/int/lean/tape last seq 34443; replay clock start 2026-10-03 22:05:18; keyed candidates 0
+   lean (key STRIPPED: the plant): VACUOUS or NOT FOUND
+PLANT: CAUGHT: with the key stripped no work root is NON-VACUOUS

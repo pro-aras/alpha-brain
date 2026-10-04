@@ -1,0 +1,59 @@
+{
+ "random7": {
+  "episodes": 600,
+  "steps": 32565,
+  "success": 0.2717,
+  "wall_s": 24.4,
+  "steps_per_s": 1334,
+  "per_act": {
+   "left": {
+    "n": 4648,
+    "effect_rate": 1.0,
+    "reward_rate_per_step": 0.00645,
+    "rewarded": 30
+   },
+   "right": {
+    "n": 4734,
+    "effect_rate": 1.0,
+    "reward_rate_per_step": 0.00782,
+    "rewarded": 37
+   },
+   "forward": {
+    "n": 4641,
+    "effect_rate": 0.6406,
+    "reward_rate_per_step": 0.02069,
+    "rewarded": 96
+   },
+   "pickup": {
+    "n": 4746,
+    "effect_rate": 0.0883,
+    "reward_rate_per_step": 0.0,
+    "rewarded": 0
+   },
+   "drop": {
+    "n": 4573,
+    "effect_rate": 0.07,
+    "reward_rate_per_step": 0.0,
+    "rewarded": 0
+   },
+   "toggle": {
+    "n": 4591,
+    "effect_rate": 0.0266,
+    "reward_rate_per_step": 0.0,
+    "rewarded": 0
+   },
+   "done": {
+    "n": 4632,
+    "effect_rate": 0.0,
+    "reward_rate_per_step": 0.0,
+    "rewarded": 0
+   }
+  }
+ },
+ "oracle": {
+  "episodes": 100,
+  "success": 1.0,
+  "mean_steps": 5.71,
+  "max_steps": 19
+ }
+}

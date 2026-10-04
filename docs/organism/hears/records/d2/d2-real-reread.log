@@ -1,0 +1,9 @@
+D2 · HEARS-2 pre-flight read of /data/dev/genome-lives/brain-long-3-pre-1 (read-only; a learn event is a TAPE ROW, its seq — AMENDMENT 3)
+  journal rows 9098 (torn lines 0) · resume events 3 at rows [2722, 5945, 8607] (with maker rows on both sides: 3) · maker learn rows 75 on 72 tape rows (before the first resume 2, after the last 60) · rows journaled twice (same seq) 3 · maker tape rows that REUSE a name an earlier row had 12 of 72 (60 distinct names: the maker redraws its first pictures after a restart; not a fault)
+  (a) the count continues: the first maker row after the resume at row 2722 (resumed_from_seq 2060): seq 2075 w0000i000001t000000000 scene 2 (a NEW tape row under a name used before: one past the distinct maker rows so far 2) → ok
+  (a) the count continues: the first maker row after the resume at row 5945 (resumed_from_seq 4356): seq 4388 w0000i000001t000000000 scene 6 (a NEW tape row under a name used before: one past the distinct maker rows so far 6) → ok
+  (a) the count continues: the first maker row after the resume at row 8607 (resumed_from_seq 5780): seq 5954 w0000i000001t000000000 scene 12 (a NEW tape row under a name used before: one past the distinct maker rows so far 12) → ok
+  (b) every tape row journaled twice carries the same scene and world_seed, every new seq the next index, every maker row world_seed_of(20261101, maker) = 4145315273: violations 0
+  (c) census files against the journal: 250: maker 1 vs 1 ok
+  controls (planted on the real rows; CAUGHT = the check fired, NEW = a redrawn canvas was read as new): reset CAUGHT · seed CAUGHT · census CAUGHT · redrawn NEW
+D2 PASS

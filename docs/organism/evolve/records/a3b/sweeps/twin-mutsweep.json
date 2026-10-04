@@ -1,0 +1,326 @@
+{
+ "module": "tools/evolve_cal.py",
+ "tests": "tests.tools.test_evolve_cal_twin",
+ "results": [
+  {
+   "name": "set-gene-drops-tail",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_set_gene_text_changes_exactly_one_line",
+   "failing": [
+    "test_set_gene_text_changes_exactly_one_line_and_exactly_the_number"
+   ]
+  },
+  {
+   "name": "set-gene-accepts-non-number",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_set_gene_text_refuses_a_non_number",
+   "failing": [
+    "test_set_gene_text_refuses_a_non_number"
+   ]
+  },
+  {
+   "name": "eps-ignores-k",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_eps_variant_scales",
+   "failing": [
+    "test_eps_variant_scales_delta_lr_and_nothing_else"
+   ]
+  },
+  {
+   "name": "eps-allows-no-change",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_eps_variant_refuses",
+   "failing": [
+    "test_eps_variant_refuses_a_perturbation_that_changes_nothing_or_makes_no_sense"
+   ]
+  },
+  {
+   "name": "eps-allows-negative",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_eps_variant_refuses",
+   "failing": [
+    "test_eps_variant_refuses_a_perturbation_that_changes_nothing_or_makes_no_sense"
+   ]
+  },
+  {
+   "name": "seed-adds-one-not-k",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_seed_variant_adds_k",
+   "failing": [
+    "test_seed_variant_adds_k_to_the_seed_and_keeps_the_trailing_comment"
+   ]
+  },
+  {
+   "name": "seed-drops-trailing-comment",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_seed_variant_adds_k",
+   "failing": [
+    "test_seed_variant_adds_k_to_the_seed_and_keeps_the_trailing_comment"
+   ]
+  },
+  {
+   "name": "slice-includes-the-checkpoint-row",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_staged_tape_holds_exactly",
+   "failing": [
+    "test_a_twin_writes_its_readings_and_cleans_its_state_copy",
+    "test_the_staged_tape_holds_exactly_the_slice_rows_and_reads_through_the_shared_reader"
+   ]
+  },
+  {
+   "name": "slice-drops-the-last-row",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_staged_tape_holds_exactly",
+   "failing": [
+    "test_the_staged_tape_holds_exactly_the_slice_rows_and_reads_through_the_shared_reader"
+   ]
+  },
+  {
+   "name": "payload-copied-empty",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_every_payload_a_row_names_was_copied",
+   "failing": [
+    "test_a_planted_change_in_one_twin_is_caught_by_the_comparison",
+    "test_a_twin_writes_its_readings_and_cleans_its_state_copy",
+    "test_every_payload_a_row_names_was_copied_byte_for_byte",
+    "test_rows_limit_cuts_the_slice",
+    "test_stage_commands_run_and_the_verify_flag_reads_the_source_again",
+    "test_state_hash_is_the_snapshots_own_digest",
+    "test_the_same_twin_twice_is_bit_identical",
+    "test_the_twin_and_compare_commands_run_end_to_end",
+    "test_the_variant_reaches_the_twins_genome_file",
+    "test_verify_catches_a_changed_payload_byte",
+    "test_verify_reads_the_source_again_and_agrees"
+   ]
+  },
+  {
+   "name": "hole-skipped-not-refused",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_missing_source_payload_is_refused",
+   "failing": [
+    "test_a_missing_source_payload_is_refused_not_skipped"
+   ]
+  },
+  {
+   "name": "verify-ignores-missing-payload",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_verify_catches_a_deleted_payload",
+   "failing": [
+    "test_verify_catches_a_deleted_payload_and_a_changed_row"
+   ]
+  },
+  {
+   "name": "verify-ignores-payload-content",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_verify_catches_a_changed_payload_byte",
+   "failing": [
+    "test_verify_catches_a_changed_payload_byte"
+   ]
+  },
+  {
+   "name": "verify-ignores-changed-row",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_verify_catches_a_deleted_payload_and_a_changed_row",
+   "failing": [
+    "test_verify_catches_a_deleted_payload_and_a_changed_row"
+   ]
+  },
+  {
+   "name": "checkpoint-not-copied",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_stage_copies_every_file",
+   "failing": [
+    "test_stage_commands_run_and_the_verify_flag_reads_the_source_again",
+    "test_stage_copies_every_file_and_the_manifest_hashes_them",
+    "test_verify_catches_a_flipped_byte_and_an_extra_file"
+   ]
+  },
+  {
+   "name": "checkpoint-verify-blind-to-extra",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_verify_catches_a_flipped_byte_and_an_extra_file",
+   "failing": [
+    "test_verify_catches_a_flipped_byte_and_an_extra_file"
+   ]
+  },
+  {
+   "name": "checkpoint-verify-blind-to-flip",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_verify_catches_a_flipped_byte_and_an_extra_file",
+   "failing": [
+    "test_verify_catches_a_flipped_byte_and_an_extra_file"
+   ]
+  },
+  {
+   "name": "compare-float-counts-as-discrete",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_float_only_difference_is_a_difference_but_not_a_discrete_one",
+   "failing": [
+    "test_a_float_only_difference_is_a_difference_but_not_a_discrete_one",
+    "test_the_first_discrete_difference_is_not_the_first_difference"
+   ]
+  },
+  {
+   "name": "compare-first-diff-is-the-last",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_discrete_difference_is_counted_and_located",
+   "failing": [
+    "test_a_discrete_difference_is_counted_and_located",
+    "test_the_first_discrete_difference_is_not_the_first_difference"
+   ]
+  },
+  {
+   "name": "compare-ignores-length",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_different_lengths_are_not_identical_and_say_so",
+   "failing": [
+    "test_different_lengths_are_not_identical_and_say_so"
+   ]
+  },
+  {
+   "name": "rows-limit-off-by-one",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_rows_limit_cuts_the_slice",
+   "failing": [
+    "test_rows_limit_cuts_the_slice"
+   ]
+  },
+  {
+   "name": "twin-keeps-its-state",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_twin_writes_its_readings_and_cleans_its_state_copy",
+   "failing": [
+    "test_a_twin_writes_its_readings_and_cleans_its_state_copy"
+   ]
+  },
+  {
+   "name": "journal-digest-without-newlines",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_twin_writes_its_readings",
+   "failing": [
+    "test_a_twin_writes_its_readings_and_cleans_its_state_copy"
+   ]
+  },
+  {
+   "name": "genome-file-records-the-variant-name",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_variant_reaches",
+   "failing": [
+    "test_the_variant_reaches_the_twins_genome_file"
+   ]
+  },
+  {
+   "name": "state-hash-constant",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_state_hash_is_the_snapshots_own_digest",
+   "failing": [
+    "test_state_hash_is_the_snapshots_own_digest"
+   ]
+  },
+  {
+   "name": "first-discrete-is-the-last",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_discrete_difference_is_counted_and_located",
+   "failing": [
+    "test_a_discrete_difference_is_counted_and_located"
+   ]
+  },
+  {
+   "name": "keyed-flips-ignores-the-unmatched-rows",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips",
+   "failing": [
+    "test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips",
+    "test_a_twin_missing_two_of_four_moment_rows_has_two_flips",
+    "test_flips_is_the_discrete_rows_plus_the_unmatched_rows"
+   ]
+  },
+  {
+   "name": "keyed-flips-counts-only-one-side",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_flips_is_the_discrete_rows_plus_the_unmatched_rows",
+   "failing": [
+    "test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips",
+    "test_flips_is_the_discrete_rows_plus_the_unmatched_rows"
+   ]
+  },
+  {
+   "name": "keyed-every-unmatched-row-is-an-only-a",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips",
+   "failing": [
+    "test_a_different_act_at_one_seq_is_two_unmatched_rows_and_two_flips",
+    "test_a_shifted_journal_is_not_a_diverged_one",
+    "test_flips_is_the_discrete_rows_plus_the_unmatched_rows"
+   ]
+  },
+  {
+   "name": "keyed-a-float-counts-as-discrete",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_no_difference_and_float_or_hash_only_differences_are_zero_flips",
+   "failing": [
+    "test_a_float_only_or_hash_only_difference_is_not_discrete",
+    "test_no_difference_and_float_or_hash_only_differences_are_zero_flips"
+   ]
+  },
+  {
+   "name": "keyed-a-digest-counts-as-discrete",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_a_digest_only_difference_of_another_kind_is_not_a_discrete_payload",
+   "failing": [
+    "test_a_digest_only_difference_of_another_kind_is_not_a_discrete_payload",
+    "test_a_float_only_or_hash_only_difference_is_not_discrete",
+    "test_no_difference_and_float_or_hash_only_differences_are_zero_flips"
+   ]
+  },
+  {
+   "name": "keyed-other-kinds-are-not-named",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips",
+   "failing": [
+    "test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips"
+   ]
+  },
+  {
+   "name": "keyed-leaf-paths-do-not-recurse",
+   "status": "CAUGHT-BY-NAMED",
+   "exit": 1,
+   "expect": "test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips",
+   "failing": [
+    "test_the_other_kinds_discrete_payloads_are_named_and_are_not_flips"
+   ]
+  }
+ ]
+}

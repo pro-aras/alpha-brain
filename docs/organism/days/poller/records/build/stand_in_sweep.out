@@ -1,0 +1,12 @@
+STAND-IN SWEEP on 3321b6c (the law's grep -rlE over tests): 9 files
+   16 matching lines  tests/creature/test_a42_b1.py
+    1 matching lines  tests/creature/test_alpha4_seams.py
+    2 matching lines  tests/creature/test_b2_picture_words.py
+    7 matching lines  tests/creature/test_exam.py
+    1 matching lines  tests/creature/test_exam_one_word.py
+    4 matching lines  tests/creature/test_g5k_outcome.py
+   41 matching lines  tests/creature/test_poller_cursor.py
+    1 matching lines  tests/creature/test_readiness_units.py
+    5 matching lines  tests/creature/test_snapshot_generations.py
+test files differing from 233a4cb: ['tests/creature/test_poller_cursor.py']
+RESULT: OK: the closed list equals the reviewed one and no listed test is modified

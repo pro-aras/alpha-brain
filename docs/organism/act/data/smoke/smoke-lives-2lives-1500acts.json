@@ -1,0 +1,861 @@
+{
+ "acts": 1500,
+ "n": 2,
+ "base": 30260923,
+ "arms": {
+  "R-NULL": {
+   "label": "R-NULL: uniform over 7 (landed (ii))",
+   "rows": [
+    {
+     "seed": 30260923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.26,
+      "top2_max": 0.43,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "h1500": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.26,
+      "top2_max": 0.43,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "noop_share_241_960": 0.5694444444444444,
+     "x2": {
+      "episodes_241_960": 12,
+      "successes_241_960": 2
+     },
+     "episodes_all": 25,
+     "successes_all": 5
+    },
+    {
+     "seed": 30261923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.23,
+      "top2_max": 0.44,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "h1500": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.24,
+      "top2_max": 0.44,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "noop_share_241_960": 0.575,
+     "x2": {
+      "episodes_241_960": 12,
+      "successes_241_960": 1
+     },
+     "episodes_all": 26,
+     "successes_all": 5
+    }
+   ],
+   "summary": {
+    "h960": {
+     "lock_pass_share": 1.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 1.0,
+     "top2_max_median": 0.435,
+     "top1_max_median": 0.245
+    },
+    "h1500": {
+     "lock_pass_share": 1.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 1.0,
+     "top2_max_median": 0.435,
+     "top1_max_median": 0.25
+    },
+    "noop_share": {
+     "median": 0.5722222222222222,
+     "le_0.25_share": 0.0,
+     "ge_0.5_share": 1.0
+    },
+    "x2_printed": {
+     "episodes_median": 12.0,
+     "success_mean": 0.125
+    }
+   }
+  },
+  "P-OLD": {
+   "label": "P-OLD: the old chooser (landed (i))",
+   "rows": [
+    {
+     "seed": 30260923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.8906882591093117,
+      "lock_pass": false,
+      "top1_max": 0.97,
+      "top2_max": 0.99,
+      "single_act_flag_ge_0.8": true,
+      "x1_pass_lt_0.5": false
+     },
+     "h1500": {
+      "lock_flagged_share": 0.936768149882904,
+      "lock_pass": false,
+      "top1_max": 0.99,
+      "top2_max": 1.0,
+      "single_act_flag_ge_0.8": true,
+      "x1_pass_lt_0.5": false
+     },
+     "noop_share_241_960": 0.044444444444444446,
+     "x2": {
+      "episodes_241_960": 11,
+      "successes_241_960": 0
+     },
+     "episodes_all": 25,
+     "successes_all": 3
+    },
+    {
+     "seed": 30261923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.5614035087719298,
+      "lock_pass": false,
+      "top1_max": 0.96,
+      "top2_max": 0.98,
+      "single_act_flag_ge_0.8": true,
+      "x1_pass_lt_0.5": false
+     },
+     "h1500": {
+      "lock_flagged_share": 0.6651053864168618,
+      "lock_pass": false,
+      "top1_max": 0.97,
+      "top2_max": 0.99,
+      "single_act_flag_ge_0.8": true,
+      "x1_pass_lt_0.5": false
+     },
+     "noop_share_241_960": 0.20833333333333334,
+     "x2": {
+      "episodes_241_960": 13,
+      "successes_241_960": 2
+     },
+     "episodes_all": 25,
+     "successes_all": 3
+    }
+   ],
+   "summary": {
+    "h960": {
+     "lock_pass_share": 0.0,
+     "single_act_flag_share": 1.0,
+     "x1_pass_share": 0.0,
+     "top2_max_median": 0.985,
+     "top1_max_median": 0.965
+    },
+    "h1500": {
+     "lock_pass_share": 0.0,
+     "single_act_flag_share": 1.0,
+     "x1_pass_share": 0.0,
+     "top2_max_median": 0.995,
+     "top1_max_median": 0.98
+    },
+    "noop_share": {
+     "median": 0.12638888888888888,
+     "le_0.25_share": 1.0,
+     "ge_0.5_share": 0.0
+    },
+    "x2_printed": {
+     "episodes_median": 12.0,
+     "success_mean": 0.07692307692307693
+    }
+   }
+  },
+  "C-SCR": {
+   "label": "C-SCR: the effect screen (THE CANDIDATE)",
+   "rows": [
+    {
+     "seed": 30260923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.42,
+      "top2_max": 0.74,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "h1500": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.42,
+      "top2_max": 0.74,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "noop_share_241_960": 0.04861111111111111,
+     "x2": {
+      "episodes_241_960": 15,
+      "successes_241_960": 6
+     },
+     "episodes_all": 31,
+     "successes_all": 12,
+     "m4a": 1.0,
+     "m4b": 1.0,
+     "exact_live_set_share_241_960": 1.0,
+     "first_act_live_set_holds_60": 155,
+     "effect_counts": {
+      "left": {
+       "known": 442,
+       "excluded": 9,
+       "total": 451
+      },
+      "right": {
+       "known": 418,
+       "excluded": 11,
+       "total": 429
+      },
+      "forward": {
+       "known": 457,
+       "excluded": 8,
+       "total": 465
+      },
+      "pickup": {
+       "known": 40,
+       "excluded": 1,
+       "total": 41
+      },
+      "drop": {
+       "known": 38,
+       "excluded": 1,
+       "total": 39
+      },
+      "toggle": {
+       "known": 38,
+       "excluded": 0,
+       "total": 38
+      },
+      "done": {
+       "known": 36,
+       "excluded": 1,
+       "total": 37
+      }
+     }
+    },
+    {
+     "seed": 30261923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.1106612685560054,
+      "lock_pass": false,
+      "top1_max": 0.53,
+      "top2_max": 0.94,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "h1500": {
+      "lock_flagged_share": 0.06401249024199844,
+      "lock_pass": false,
+      "top1_max": 0.53,
+      "top2_max": 0.94,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "noop_share_241_960": 0.044444444444444446,
+     "x2": {
+      "episodes_241_960": 17,
+      "successes_241_960": 8
+     },
+     "episodes_all": 32,
+     "successes_all": 13,
+     "m4a": 1.0,
+     "m4b": 0.8527777777777777,
+     "exact_live_set_share_241_960": 0.8527777777777777,
+     "first_act_live_set_holds_60": 351,
+     "effect_counts": {
+      "left": {
+       "known": 455,
+       "excluded": 12,
+       "total": 467
+      },
+      "right": {
+       "known": 465,
+       "excluded": 8,
+       "total": 473
+      },
+      "forward": {
+       "known": 400,
+       "excluded": 8,
+       "total": 408
+      },
+      "pickup": {
+       "known": 36,
+       "excluded": 0,
+       "total": 36
+      },
+      "drop": {
+       "known": 36,
+       "excluded": 1,
+       "total": 37
+      },
+      "toggle": {
+       "known": 38,
+       "excluded": 2,
+       "total": 40
+      },
+      "done": {
+       "known": 38,
+       "excluded": 1,
+       "total": 39
+      }
+     }
+    }
+   ],
+   "summary": {
+    "h960": {
+     "lock_pass_share": 0.5,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 0.5,
+     "top2_max_median": 0.84,
+     "top1_max_median": 0.475
+    },
+    "h1500": {
+     "lock_pass_share": 0.5,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 0.5,
+     "top2_max_median": 0.84,
+     "top1_max_median": 0.475
+    },
+    "noop_share": {
+     "median": 0.04652777777777778,
+     "le_0.25_share": 1.0,
+     "ge_0.5_share": 0.0
+    },
+    "m4a_ge_0.95_share": 1.0,
+    "m4b_ge_0.95_share": 0.5,
+    "m4a_median": 1.0,
+    "m4b_median": 0.9263888888888889,
+    "exact_set_median": 0.9263888888888889,
+    "latency_first_act_set_holds_60": {
+     "lives_with_it": 2,
+     "median": 253.0
+    },
+    "x2_printed": {
+     "episodes_median": 16.0,
+     "success_mean": 0.43529411764705883
+    }
+   }
+  },
+  "K-ARGMAX": {
+   "label": "K-ARGMAX (planted control): argmax on the effect rate",
+   "rows": [
+    {
+     "seed": 30260923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.9325236167341431,
+      "lock_pass": false,
+      "top1_max": 0.62,
+      "top2_max": 0.98,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "h1500": {
+      "lock_flagged_share": 0.921935987509758,
+      "lock_pass": false,
+      "top1_max": 0.62,
+      "top2_max": 0.98,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "noop_share_241_960": 0.04027777777777778,
+     "x2": {
+      "episodes_241_960": 12,
+      "successes_241_960": 0
+     },
+     "episodes_all": 23,
+     "successes_all": 0
+    },
+    {
+     "seed": 30261923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.8515519568151148,
+      "lock_pass": false,
+      "top1_max": 0.59,
+      "top2_max": 0.99,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "h1500": {
+      "lock_flagged_share": 0.8790007806401249,
+      "lock_pass": false,
+      "top1_max": 0.6,
+      "top2_max": 0.99,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "noop_share_241_960": 0.04861111111111111,
+     "x2": {
+      "episodes_241_960": 12,
+      "successes_241_960": 1
+     },
+     "episodes_all": 24,
+     "successes_all": 2
+    }
+   ],
+   "summary": {
+    "h960": {
+     "lock_pass_share": 0.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 0.0,
+     "top2_max_median": 0.985,
+     "top1_max_median": 0.605
+    },
+    "h1500": {
+     "lock_pass_share": 0.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 0.0,
+     "top2_max_median": 0.985,
+     "top1_max_median": 0.61
+    },
+    "noop_share": {
+     "median": 0.044444444444444446,
+     "le_0.25_share": 1.0,
+     "ge_0.5_share": 0.0
+    },
+    "x2_printed": {
+     "episodes_median": 12.0,
+     "success_mean": 0.041666666666666664
+    }
+   }
+  },
+  "P-DEAL": {
+   "label": "P-DEAL (planted null): the live flags dealt to the wrong acts",
+   "rows": [
+    {
+     "seed": 30260923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.4,
+      "top2_max": 0.72,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "h1500": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.44,
+      "top2_max": 0.74,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "noop_share_241_960": 0.9027777777777778,
+     "x2": {
+      "episodes_241_960": 12,
+      "successes_241_960": 0
+     },
+     "episodes_all": 23,
+     "successes_all": 1,
+     "m4a": 0.25,
+     "m4b": 0.0,
+     "exact_live_set_share_241_960": 0.0,
+     "first_act_live_set_holds_60": null,
+     "effect_counts": {
+      "left": {
+       "known": 99,
+       "excluded": 3,
+       "total": 102
+      },
+      "right": {
+       "known": 32,
+       "excluded": 0,
+       "total": 32
+      },
+      "forward": {
+       "known": 31,
+       "excluded": 0,
+       "total": 31
+      },
+      "pickup": {
+       "known": 30,
+       "excluded": 1,
+       "total": 31
+      },
+      "drop": {
+       "known": 412,
+       "excluded": 7,
+       "total": 419
+      },
+      "toggle": {
+       "known": 427,
+       "excluded": 6,
+       "total": 433
+      },
+      "done": {
+       "known": 446,
+       "excluded": 6,
+       "total": 452
+      }
+     }
+    },
+    {
+     "seed": 30261923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.39,
+      "top2_max": 0.72,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "h1500": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.45,
+      "top2_max": 0.73,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "noop_share_241_960": 0.7819444444444444,
+     "x2": {
+      "episodes_241_960": 12,
+      "successes_241_960": 0
+     },
+     "episodes_all": 24,
+     "successes_all": 1,
+     "m4a": 0.25,
+     "m4b": 0.0,
+     "exact_live_set_share_241_960": 0.0,
+     "first_act_live_set_holds_60": null,
+     "effect_counts": {
+      "left": {
+       "known": 187,
+       "excluded": 5,
+       "total": 192
+      },
+      "right": {
+       "known": 50,
+       "excluded": 0,
+       "total": 50
+      },
+      "forward": {
+       "known": 41,
+       "excluded": 0,
+       "total": 41
+      },
+      "pickup": {
+       "known": 28,
+       "excluded": 1,
+       "total": 29
+      },
+      "drop": {
+       "known": 380,
+       "excluded": 7,
+       "total": 387
+      },
+      "toggle": {
+       "known": 383,
+       "excluded": 4,
+       "total": 387
+      },
+      "done": {
+       "known": 407,
+       "excluded": 7,
+       "total": 414
+      }
+     }
+    }
+   ],
+   "summary": {
+    "h960": {
+     "lock_pass_share": 1.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 1.0,
+     "top2_max_median": 0.72,
+     "top1_max_median": 0.395
+    },
+    "h1500": {
+     "lock_pass_share": 1.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 1.0,
+     "top2_max_median": 0.735,
+     "top1_max_median": 0.445
+    },
+    "noop_share": {
+     "median": 0.8423611111111111,
+     "le_0.25_share": 0.0,
+     "ge_0.5_share": 1.0
+    },
+    "m4a_ge_0.95_share": 0.0,
+    "m4b_ge_0.95_share": 0.0,
+    "m4a_median": 0.25,
+    "m4b_median": 0.0,
+    "exact_set_median": 0.0,
+    "latency_first_act_set_holds_60": {
+     "lives_with_it": 0,
+     "median": null
+    },
+    "x2_printed": {
+     "episodes_median": 12.0,
+     "success_mean": 0.0
+    }
+   }
+  },
+  "A-RATE": {
+   "label": "A-RATE: sampled by the 2,000-outcome reward rate",
+   "rows": [
+    {
+     "seed": 30260923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.36,
+      "top2_max": 0.6,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "h1500": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.37,
+      "top2_max": 0.6,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "noop_share_241_960": 0.43472222222222223,
+     "x2": {
+      "episodes_241_960": 15,
+      "successes_241_960": 5
+     },
+     "episodes_all": 28,
+     "successes_all": 8
+    },
+    {
+     "seed": 30261923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.52,
+      "top2_max": 0.64,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "h1500": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.52,
+      "top2_max": 0.64,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "noop_share_241_960": 0.39861111111111114,
+     "x2": {
+      "episodes_241_960": 13,
+      "successes_241_960": 6
+     },
+     "episodes_all": 29,
+     "successes_all": 11
+    }
+   ],
+   "summary": {
+    "h960": {
+     "lock_pass_share": 1.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 0.5,
+     "top2_max_median": 0.62,
+     "top1_max_median": 0.44
+    },
+    "h1500": {
+     "lock_pass_share": 1.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 0.5,
+     "top2_max_median": 0.62,
+     "top1_max_median": 0.445
+    },
+    "noop_share": {
+     "median": 0.4166666666666667,
+     "le_0.25_share": 0.0,
+     "ge_0.5_share": 0.0
+    },
+    "x2_printed": {
+     "episodes_median": 14.0,
+     "success_mean": 0.39743589743589747
+    }
+   }
+  },
+  "A-BOTH": {
+   "label": "A-BOTH: live x reward rate",
+   "rows": [
+    {
+     "seed": 30260923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0553306342780027,
+      "lock_pass": false,
+      "top1_max": 0.57,
+      "top2_max": 0.95,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "h1500": {
+      "lock_flagged_share": 0.03200624512099922,
+      "lock_pass": false,
+      "top1_max": 0.58,
+      "top2_max": 0.95,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "noop_share_241_960": 0.04861111111111111,
+     "x2": {
+      "episodes_241_960": 15,
+      "successes_241_960": 6
+     },
+     "episodes_all": 32,
+     "successes_all": 13
+    },
+    {
+     "seed": 30261923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.3157894736842105,
+      "lock_pass": false,
+      "top1_max": 0.7,
+      "top2_max": 0.99,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "h1500": {
+      "lock_flagged_share": 0.27946916471506633,
+      "lock_pass": false,
+      "top1_max": 0.7,
+      "top2_max": 0.99,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "noop_share_241_960": 0.044444444444444446,
+     "x2": {
+      "episodes_241_960": 14,
+      "successes_241_960": 5
+     },
+     "episodes_all": 26,
+     "successes_all": 6
+    }
+   ],
+   "summary": {
+    "h960": {
+     "lock_pass_share": 0.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 0.0,
+     "top2_max_median": 0.97,
+     "top1_max_median": 0.635
+    },
+    "h1500": {
+     "lock_pass_share": 0.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 0.0,
+     "top2_max_median": 0.97,
+     "top1_max_median": 0.6399999999999999
+    },
+    "noop_share": {
+     "median": 0.04652777777777778,
+     "le_0.25_share": 1.0,
+     "ge_0.5_share": 0.0
+    },
+    "x2_printed": {
+     "episodes_median": 14.5,
+     "success_mean": 0.37857142857142856
+    }
+   }
+  },
+  "A-VAL": {
+   "label": "A-VAL: the landed `ACT value reward 10; optimism 1` (v)",
+   "rows": [
+    {
+     "seed": 30260923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.4,
+      "top2_max": 0.61,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "h1500": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.53,
+      "top2_max": 0.65,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": false
+     },
+     "noop_share_241_960": 0.5152777777777777,
+     "x2": {
+      "episodes_241_960": 12,
+      "successes_241_960": 2
+     },
+     "episodes_all": 28,
+     "successes_all": 9
+    },
+    {
+     "seed": 30261923,
+     "steps": 1500,
+     "h960": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.26,
+      "top2_max": 0.47,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "h1500": {
+      "lock_flagged_share": 0.0,
+      "lock_pass": true,
+      "top1_max": 0.26,
+      "top2_max": 0.47,
+      "single_act_flag_ge_0.8": false,
+      "x1_pass_lt_0.5": true
+     },
+     "noop_share_241_960": 0.5916666666666667,
+     "x2": {
+      "episodes_241_960": 12,
+      "successes_241_960": 1
+     },
+     "episodes_all": 26,
+     "successes_all": 6
+    }
+   ],
+   "summary": {
+    "h960": {
+     "lock_pass_share": 1.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 1.0,
+     "top2_max_median": 0.54,
+     "top1_max_median": 0.33
+    },
+    "h1500": {
+     "lock_pass_share": 1.0,
+     "single_act_flag_share": 0.0,
+     "x1_pass_share": 0.5,
+     "top2_max_median": 0.56,
+     "top1_max_median": 0.395
+    },
+    "noop_share": {
+     "median": 0.5534722222222221,
+     "le_0.25_share": 0.0,
+     "ge_0.5_share": 1.0
+    },
+    "x2_printed": {
+     "episodes_median": 12.0,
+     "success_mean": 0.125
+    }
+   }
+  }
+ }
+}

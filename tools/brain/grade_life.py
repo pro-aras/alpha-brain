@@ -73,28 +73,54 @@ def forced_of(a: Optional[Dict[str, object]]) -> Dict[str, object]:
     return dict(r) if isinstance(r, dict) else dict(a.get("raw_forced") or {})
 
 
-def world_type_of_key(key: str) -> str:
-    """A learned type's key («circle|cross|…») → the world's name for it: the type most of its words have. A key that is
-    already a world type name passes through."""
+# edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:13 +0400 — AMENDMENT 4: found by the bench's read stage (the grader crashed on the ON arm's journal, «WorldError: not a word of this world: 'arrow'»). The grader was
+# written for a brain that hears ONE world, so every word of a learned type and of a said phrase was a scene word. With `hears scene maker` a learned type holds the maker's words and the brain may SAY one on a scene canvas;
+# the scene world cannot type those words. They are adapted HERE, never in the scored modules: a type is voted by the words the world knows (a type with none has no world type: skipped and counted); a foreign word in a SAID
+# phrase is read as the world's one shape word that is true of nothing a SPEAK, SPEAK2 or DECLINE scene shows (dax: the maker names shapes, and a foreign shape is wrong), counted. A grade of a one-world life is unchanged (nothing is foreign).
+# edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 12:28 +0400 — the first wording said «a sitting»; M6's scenes DO show the moon (dax IS true there) but M6 takes no said phrase, and the SPEAK, SPEAK2 and DECLINE scenes of every test seed carry 0 moons
+# (enumerated by tests/tools/test_grade_foreign_words.py, with M6 as the plant that the check can see one).
+def world_type_of_key(key: str) -> Optional[str]:
+    """A learned type's key («circle|cross|…») → the world's name for it: the type most of its WORLD words have. A key that is
+    already a world type name passes through. None: the key holds no word of this world (a type of another hand's words)."""
     if key in W.WORD_TYPES:
         return key
-    kinds = collections.Counter(W.word_type(w) for w in key.split("|"))
-    return kinds.most_common(1)[0][0]
+    kinds = collections.Counter(W.word_type(w) for w in key.split("|") if w in W.VOCAB)
+    return kinds.most_common(1)[0][0] if kinds else None
 
 
-def name_by_world_type(raw: Dict[str, object]) -> Dict[str, object]:
+def name_by_world_type(raw: Dict[str, object], count: bool = False):
+    """The brain's NAME answers keyed by its learned types → keyed by the world's type names. A learned type with no word of this world (the maker's
+    words only) has no world type and is skipped; `count=True` returns (raw, how many were skipped)."""
     nm = raw.get("name")
     if not isinstance(nm, dict):
-        return raw
+        return (raw, 0) if count else raw
     out = dict(raw)
     mapped: Dict[str, object] = {}
+    skipped = 0
     for k, v in nm.items():
         t = world_type_of_key(str(k))
+        if t is None:
+            skipped += 1
+            continue
         if t in mapped:
             raise GradeError(f"two learned types map to the world's {t!r}: {sorted(nm)}")
         mapped[t] = v
     out["name"] = mapped
-    return out
+    return (out, skipped) if count else out
+
+
+def world_words(words: Sequence[str]) -> Tuple[List[str], int]:
+    """A phrase the brain SAID, made gradable by the scene world: a word the world cannot type (another hand's) is read as DAX_WORD — a shape word that is
+    true of nothing a SPEAK, SPEAK2 or DECLINE scene shows (the moon, the dax shape, is drawn only in training scene 2,700 and in M6's scenes; M6 takes no said phrase),
+    so the phrase is not TRUE and its ORDER is read with a shape where the foreign word stood. Returns (the phrase, how many words were foreign)."""
+    out, n = [], 0
+    for w in words:
+        if w in W.VOCAB:
+            out.append(str(w))
+        else:
+            out.append(W.DAX_WORD)
+            n += 1
+    return out, n
 
 
 # ------------------------------------------------------------------------------------------------ reading a life
@@ -148,8 +174,18 @@ class Life:
         self.moment_eye: Dict[str, Dict[str, object]] = {}    # moment → the eye row
         self.moment_words: Dict[str, List[str]] = collections.defaultdict(list)
         self.train_moment: Dict[int, str] = {}                # scene index → moment
+        # edit: Claude (Fable 5.1, the seat), 2026-09-30 10:3x +0400 — PREREG-HEARS-2 §1: test 4a's EXIST is read by ANY hand — a cited moment exists
+        # when the tape holds its eye row and the word among its ear rows, whatever the world; these two index every source.
+        self.moment_eye_any: Dict[str, Dict[str, object]] = {}
+        self.moment_words_any: Dict[str, List[str]] = collections.defaultdict(list)
+        self.moment_world: Dict[str, str] = {}
         for r in self.rows:
             meta = r.get("meta") or {}
+            if r["sense"] == "ear":
+                self.moment_words_any[str(meta.get("moment"))].append(str(meta.get("word")))
+            elif r["sense"] == "eye":
+                self.moment_eye_any[str(meta.get("moment"))] = r
+                self.moment_world[str(meta.get("moment"))] = str(meta.get("source"))
             if meta.get("source") != "scene":
                 continue
             if r["sense"] == "ask":
@@ -323,7 +359,15 @@ def offline_answers(life: Life, ctx: SetCtx) -> Dict[str, object]:
             if not raw:
                 raise GradeError(f"answer {it['item_id']} carries no `raw` (INTERFACE addendum 1)")
             if mark == "NAME":
-                raw = name_by_world_type(raw)
+                raw, skipped = name_by_world_type(raw, count=True)
+                if skipped:
+                    forced["NAME:foreign_type_skipped"] += skipped
+            if mark not in POINT_MARKS and isinstance(raw.get("spoken"), list):
+                adapted, nf = world_words(raw["spoken"])                 # AMENDMENT 4: a foreign (maker) word the brain SAID
+                if nf:
+                    raw = dict(raw)
+                    raw["spoken"] = adapted
+                    forced[f"{mark}:foreign_word→dax"] += nf
             if mark in ("M1", "M2a", "M3", "M6"):
                 if raw.get("misuse") is not None:
                     forced[f"{mark}:misuse→raw_forced"] += 1
@@ -486,6 +530,8 @@ def grade_m4a(life: Life) -> Dict[str, object]:
     per_word: Dict[str, Dict[str, object]] = {}
     cited: List[Tuple[str, Dict[str, object], List[W.Thing]]] = []      # in citation order: (word, episode, its things)
     n_cited = n_exist = n_elig = n_carry = 0
+    n_truth = 0                                     # PREREG-HEARS-2: the cited episodes with a truth (CARRY's population)
+    cited_by_world: Dict[str, int] = {}
     unknown = []
     for item, ask in sorted(life.asks.items(), key=lambda kv: kv[1]["_seq"]):
         if ask.get("form") != "why":
@@ -506,13 +552,20 @@ def grade_m4a(life: Life) -> Dict[str, object]:
         for e in eps:
             m = str(e.get("moment"))
             eye = life.moment_eye.get(m)
+            # PREREG-HEARS-2 §1: EXIST by any hand (the moment's eye row is on the tape and the word among its ear rows); CARRY (and its
+            # null) over the cited episodes that have a TRUTH — the scene's training canvases — the others counted by world beside it
+            exists_any = m in life.moment_eye_any and word in life.moment_words_any.get(m, [])
             real = eye is not None and (eye.get("meta") or {}).get("kind") == "train" and word in life.moment_words.get(m, [])
-            ex += int(real)
+            ex += int(exists_any)
+            wd = life.moment_world.get(m, "?") if exists_any else "?"
+            cited_by_world[wd] = cited_by_world.get(wd, 0) + 1
             things = things_of_dict(life.truth_of_eye(eye)["scene_dict"]) if real else []
             elig = len(e.get("hyps") or []) >= 2
             el += int(elig)
             k = _cited_thing(e, things) if real else None
             ca += int(k is not None and W.word_true_of(word, things[k]))
+            if real:
+                n_truth += 1
             cited.append((word, e, things))
         per_word[word] = {"kind": "because", "cited": len(eps), "exist": ex, "eligible": el, "carry": ca}
         n_cited, n_exist, n_elig, n_carry = n_cited + len(eps), n_exist + ex, n_elig + el, n_carry + ca
@@ -526,13 +579,14 @@ def grade_m4a(life: Life) -> Dict[str, object]:
                 continue
             k = _cited_thing(e, things, hyp=int(rng.integers(len(hyps)))) if things else None
             hit += int(k is not None and W.word_true_of(word, things[k]))
-        twin.append(hit / len(cited) if cited else None)
+        twin.append(hit / n_truth if n_truth else None)      # PREREG-HEARS-2: the null over the same population as CARRY (the cited with a truth)
     tv = [v for v in twin if v is not None]
     p95 = float(np.percentile(np.asarray(tv), 95)) if tv else None
     exist = (n_exist / n_cited) if n_cited else None
-    carry = (n_carry / n_cited) if n_cited else None
+    carry = (n_carry / n_truth) if n_truth else None
     out = {"words_asked": len(per_word), "words_explained": sum(1 for v in per_word.values() if v.get("kind") == "because"),
            "words_unknown": sorted(unknown), "n_cited": n_cited, "exist": exist, "eligible": n_elig, "carry": carry,
+           "n_with_truth": n_truth, "cited_by_world": dict(sorted(cited_by_world.items())),
            "null_carry": twin, "null_p95": p95, "null_median": (float(np.median(np.asarray(tv))) if tv else None),
            "bars": {"exist": 1.0, "carry": 0.90, "carry_above": "the null's 95th percentile (20 draws)"}, "per_word": per_word}
     if not n_cited:
@@ -693,7 +747,8 @@ def report_lines(g: Dict[str, object]) -> List[str]:
     a = g["M4a"]
     L.append(f"  TEST 4a · EXPLAIN: words asked {a['words_asked']} · explained {a['words_explained']} · «unknown» {a['words_unknown']} · "
              f"citations {a['n_cited']} (of episodes with ≥ 2 hypotheses: {a['eligible']}) · EXIST {_f(a['exist'])} (a wiring pin, bar 1.000) · "
-             f"CARRY {_f(a['carry'])} (bar 0.90) · the null's median {_f(a['null_median'])}, p95 {_f(a['null_p95'])} → {a['verdict']}")
+             f"CARRY {_f(a['carry'])} (bar 0.90; over the {a.get('n_with_truth')} cited with a truth; cited by world {a.get('cited_by_world')}) · "
+             f"the null's median {_f(a['null_median'])}, p95 {_f(a['null_p95'])} → {a['verdict']}")
     L.append("  TEST 4b · RULE: NOT BUILT tonight (PREREG §3)")
     if g.get("M5"):
         f = g["M5"]

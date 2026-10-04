@@ -1,0 +1,5 @@
+2026-10-03 23:44:42 +0400 chain queued: RED3 7ab03ecba9bb41b10d72285a7b38887ac36a58b5, GREEN 67d620f320ba8ccfbfb188ba82159d77f3068fb7
+2026-10-03 23:47:00 +0400 c-red3 exit 1: Ran 109 tests in 0.420s FAILED (failures=3, errors=12) 
+2026-10-03 23:49:04 +0400 c-green3 exit 0: Ran 232 tests in 121.815s OK 
+2026-10-03 23:50:50 +0400 c-sweeps done: analyse exit 0 bands exit 0 ALL SWEEPS RAN 
+chain end

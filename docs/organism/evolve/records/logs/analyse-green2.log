@@ -1,0 +1,24 @@
+test_a_spread_null_gives_normal_bands_and_the_file_validates (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_a_spread_null_gives_normal_bands_and_the_file_validates) ... ok
+test_reading_a_a_degenerate_dimension_has_no_band (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_reading_a_a_degenerate_dimension_has_no_band) ... ok
+test_reading_b_a_degenerate_dimension_gates_at_its_own_resolution (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_reading_b_a_degenerate_dimension_gates_at_its_own_resolution) ... ok
+test_the_ceiling_of_q1_seen_is_printed_beside_its_band (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_the_ceiling_of_q1_seen_is_printed_beside_its_band) ... ok
+test_the_seed_twins_give_frames_filed_its_band_where_the_epsilon_null_is_flat (tests.tools.test_evolve_cal_analyse.TestBandsFromTwins.test_the_seed_twins_give_frames_filed_its_band_where_the_epsilon_null_is_flat) ... ok
+test_a_chosen_level_whose_spread_is_larger_than_the_next_smaller_flipping_level_is_a_merit_step (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_a_chosen_level_whose_spread_is_larger_than_the_next_smaller_flipping_level_is_a_merit_step) ... ok
+test_a_level_that_flips_a_discrete_outcome_but_moves_no_reading_still_differs (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_a_level_that_flips_a_discrete_outcome_but_moves_no_reading_still_differs) ... ok
+test_a_level_whose_readings_move_but_whose_journal_does_not_still_differs (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_a_level_whose_readings_move_but_whose_journal_does_not_still_differs) ... ok
+test_no_level_differs_means_no_choice (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_no_level_differs_means_no_choice) ... ok
+test_the_chosen_level_is_the_smallest_whose_twins_differ_in_a_discrete_outcome (tests.tools.test_evolve_cal_analyse.TestChooseLevel.test_the_chosen_level_is_the_smallest_whose_twins_differ_in_a_discrete_outcome) ... ok
+test_a_none_reading_is_refused_not_dropped (tests.tools.test_evolve_cal_analyse.TestNullArrays.test_a_none_reading_is_refused_not_dropped) ... ok
+test_the_null_is_the_incumbent_plus_the_twins_for_each_dimension_and_ln_cpu (tests.tools.test_evolve_cal_analyse.TestNullArrays.test_the_null_is_the_incumbent_plus_the_twins_for_each_dimension_and_ln_cpu) ... ok
+test_a_missing_reading_is_not_equal (tests.tools.test_evolve_cal_analyse.TestReadingsEqual.test_a_missing_reading_is_not_equal) ... ok
+test_equal_readings_are_equal_and_any_gated_difference_is_not (tests.tools.test_evolve_cal_analyse.TestReadingsEqual.test_equal_readings_are_equal_and_any_gated_difference_is_not) ... ok
+test_a0_is_non_degenerate_iff_an_epsilon_twin_moved_a_reading (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_a0_is_non_degenerate_iff_an_epsilon_twin_moved_a_reading) ... ok
+test_a0plus_reads_degenerate_only_if_all_six_equal_and_prints_the_bound (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_a0plus_reads_degenerate_only_if_all_six_equal_and_prints_the_bound) ... ok
+test_a0plus_refuses_fewer_than_six_twins (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_a0plus_refuses_fewer_than_six_twins) ... ok
+test_stage_b_runs_only_where_a_band_could_exist (tests.tools.test_evolve_cal_analyse.TestStagedDecisions.test_stage_b_runs_only_where_a_band_could_exist) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.359s
+
+OK
+scope memory.peak 63565824 bytes

@@ -1,0 +1,343 @@
+{
+ "cpu": {
+  "central_cpu_h": 1.5209999628519273,
+  "central_cpu_s": 5475.599866266938,
+  "fit": {
+   "a": 0.0026054795278265697,
+   "n": 19,
+   "p": 0.22868952384851357,
+   "r2": 0.4780249600988016
+  },
+  "fit_last_third": {
+   "a": 0.004828013134421714,
+   "n": 6,
+   "p": 0.1427612709896947,
+   "r2": 0.01704593774028229
+  },
+  "lower_cpu_h": 0.7632789642222214,
+  "lower_cpu_s": 2747.804271199997,
+  "measured_cpu_s": 74.6087,
+  "pilot_rows": 5000,
+  "target_rows": 165402,
+  "upper_cpu_h": 1.5209999628519273,
+  "upper_cpu_s": 5475.599866266938,
+  "windows": {
+   "end_cpu_s_per_row": 0.016665599999999982,
+   "mid_cpu_s_per_row": 0.017093599999999994,
+   "n_intervals": 20,
+   "start_cpu_s_per_row": 0.004418
+  }
+ },
+ "cpu_replay_s": 74.609,
+ "cut": {
+  "files": [
+   "2026-09-29.jsonl"
+  ],
+  "last_seq": 5000,
+  "rows": 5000,
+  "tape_digest": "a23f62b7371d07201edb74e6ff8ee356f672bdbe3635f9b1daba218bbc5ec343",
+  "torn_lines": 0
+ },
+ "flags": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "dont_write_bytecode": true,
+  "isolated": true
+ },
+ "genome": "/data/dev/genome-lives/brain-long-2/GENOME.genome",
+ "kind": "rebuild-pilot",
+ "memory": {
+  "central_rss_mb": 1313.6462369595865,
+  "lower_rss_mb": 255.40234375,
+  "peak_hwm_mb": 349.19140625,
+  "rss_at_end_mb": 255.40234375,
+  "rss_at_start_mb": 195.32421875,
+  "slope_last_third_mb_per_row": 0.020475,
+  "slope_mb_per_row": 0.006621181860902256,
+  "target_rows": 165402,
+  "upper_rss_mb": 3544.0720958333336
+ },
+ "reader_sha256": "4a82c96c3d390cf298903eda8a494cb57cdbe132abad06f511a071dcc878076a",
+ "root": "/data/dev/genome-lives/brain-long-2",
+ "rows_replayed": 5000,
+ "rows_requested": 5000,
+ "sample_every": 250,
+ "samples": [
+  {
+   "cells": null,
+   "cpu_s": 1.1045,
+   "hwm_mb": 300.91015625,
+   "i": 250,
+   "rss_mb": 195.32421875,
+   "seq": 250,
+   "wall_s": 1.345
+  },
+  {
+   "cells": null,
+   "cpu_s": 3.653,
+   "hwm_mb": 305.21484375,
+   "i": 500,
+   "rss_mb": 196.1640625,
+   "seq": 500,
+   "wall_s": 4.067
+  },
+  {
+   "cells": null,
+   "cpu_s": 6.242,
+   "hwm_mb": 306.859375,
+   "i": 750,
+   "rss_mb": 213.8203125,
+   "seq": 750,
+   "wall_s": 6.803
+  },
+  {
+   "cells": null,
+   "cpu_s": 9.5965,
+   "hwm_mb": 311.28515625,
+   "i": 1000,
+   "rss_mb": 201.3671875,
+   "seq": 1000,
+   "wall_s": 10.657
+  },
+  {
+   "cells": null,
+   "cpu_s": 12.8828,
+   "hwm_mb": 313.7890625,
+   "i": 1250,
+   "rss_mb": 313.7890625,
+   "seq": 1250,
+   "wall_s": 14.341
+  },
+  {
+   "cells": null,
+   "cpu_s": 15.1399,
+   "hwm_mb": 313.98828125,
+   "i": 1500,
+   "rss_mb": 313.98828125,
+   "seq": 1500,
+   "wall_s": 17.202
+  },
+  {
+   "cells": null,
+   "cpu_s": 19.3647,
+   "hwm_mb": 315.92578125,
+   "i": 1750,
+   "rss_mb": 208.7265625,
+   "seq": 1750,
+   "wall_s": 22.026
+  },
+  {
+   "cells": null,
+   "cpu_s": 22.8229,
+   "hwm_mb": 320.7421875,
+   "i": 2000,
+   "rss_mb": 210.578125,
+   "seq": 2000,
+   "wall_s": 26.417
+  },
+  {
+   "cells": null,
+   "cpu_s": 27.0439,
+   "hwm_mb": 323.38671875,
+   "i": 2250,
+   "rss_mb": 212.66015625,
+   "seq": 2250,
+   "wall_s": 30.895
+  },
+  {
+   "cells": null,
+   "cpu_s": 31.2567,
+   "hwm_mb": 323.8828125,
+   "i": 2500,
+   "rss_mb": 231.34375,
+   "seq": 2500,
+   "wall_s": 35.568
+  },
+  {
+   "cells": null,
+   "cpu_s": 35.5301,
+   "hwm_mb": 325.69921875,
+   "i": 2750,
+   "rss_mb": 233.56640625,
+   "seq": 2750,
+   "wall_s": 40.218
+  },
+  {
+   "cells": null,
+   "cpu_s": 39.8883,
+   "hwm_mb": 329.41796875,
+   "i": 3000,
+   "rss_mb": 219.23046875,
+   "seq": 3000,
+   "wall_s": 44.975
+  },
+  {
+   "cells": null,
+   "cpu_s": 44.6538,
+   "hwm_mb": 332.75390625,
+   "i": 3250,
+   "rss_mb": 240.3671875,
+   "seq": 3250,
+   "wall_s": 50.07
+  },
+  {
+   "cells": null,
+   "cpu_s": 50.6089,
+   "hwm_mb": 337.65234375,
+   "i": 3500,
+   "rss_mb": 244.2109375,
+   "seq": 3500,
+   "wall_s": 56.329
+  },
+  {
+   "cells": null,
+   "cpu_s": 53.9593,
+   "hwm_mb": 339.359375,
+   "i": 3750,
+   "rss_mb": 228.18359375,
+   "seq": 3750,
+   "wall_s": 60.11
+  },
+  {
+   "cells": null,
+   "cpu_s": 58.7569,
+   "hwm_mb": 340.5546875,
+   "i": 4000,
+   "rss_mb": 232.27734375,
+   "seq": 4000,
+   "wall_s": 65.131
+  },
+  {
+   "cells": null,
+   "cpu_s": 62.8273,
+   "hwm_mb": 343.3125,
+   "i": 4250,
+   "rss_mb": 250.81640625,
+   "seq": 4250,
+   "wall_s": 69.421
+  },
+  {
+   "cells": null,
+   "cpu_s": 66.7615,
+   "hwm_mb": 343.3125,
+   "i": 4500,
+   "rss_mb": 278.0234375,
+   "seq": 4500,
+   "wall_s": 73.538
+  },
+  {
+   "cells": null,
+   "cpu_s": 70.4423,
+   "hwm_mb": 349.19140625,
+   "i": 4750,
+   "rss_mb": 237.5625,
+   "seq": 4750,
+   "wall_s": 77.355
+  },
+  {
+   "cells": null,
+   "cpu_s": 74.6087,
+   "hwm_mb": 349.19140625,
+   "i": 5000,
+   "rss_mb": 255.40234375,
+   "seq": 5000,
+   "wall_s": 81.833
+  }
+ ],
+ "stop_line_cpu_h": 4.0,
+ "stopped": "rows",
+ "subject": {
+  "code": "/data/dev/genome-lives/brain-long-2/code",
+  "modules": [
+   {
+    "rel": "creature/__init__.py",
+    "sha256": "d9e5c0c79d17a40bc320ad26571ca2b47ea83862af75a1192bded66d5ce41dc0"
+   },
+   {
+    "rel": "creature/genes.py",
+    "sha256": "9913e29a91e2ce3a4a401d3da866c1ca4d97db5fd5ea315821e2afe029a425ec"
+   },
+   {
+    "rel": "creature/mind.py",
+    "sha256": "4893ec82d7f80e465bb2c6edccb0d66c2f89d636721711b956b28e8490a0dfc5"
+   },
+   {
+    "rel": "creature/tape.py",
+    "sha256": "d790ed98a511d140bf6e6bc0b79caac7512c8afa0346db3f1291d41fac6daec2"
+   },
+   {
+    "rel": "creature/think_thread.py",
+    "sha256": "4b0b56c8e31367e8ad048c7655ad5a540c9a5e2730b1cc092bc57eee86923508"
+   },
+   {
+    "rel": "genome/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   {
+    "rel": "genome/chain.py",
+    "sha256": "c0534447bf8a1253f3f5ea1b58eae41cd0447525fcc6b2e5e45234c693b21bb1"
+   },
+   {
+    "rel": "genome/curiosity.py",
+    "sha256": "b0ed495da9dbe61f27a7825aa8439c2b7775148090cbcb0dbc865bf747adf4b2"
+   },
+   {
+    "rel": "genome/fast.py",
+    "sha256": "c6f1a9581a95d7dd46f90727d9ddca12a3c4066a9cc75af5e0c8957d892d3945"
+   },
+   {
+    "rel": "genome/gaze.py",
+    "sha256": "f916a3fead83c4f41d3841d00c5a3837564d4ab0a0d235dea07023c250cbf845"
+   },
+   {
+    "rel": "genome/machinery.py",
+    "sha256": "62e52bd2af74bfbb303d0c5faae503a14b524d80285c88347ad857aa4ee5f78f"
+   },
+   {
+    "rel": "genome/park.py",
+    "sha256": "75ad9913deacc75ebfcdfa709e05c06fa64c202e5997d5db45f8f81397d71726"
+   },
+   {
+    "rel": "genome/predict.py",
+    "sha256": "9857fb8e7fc0f903c68b69b8614fe70e2975be93343c3bc0f4c6dd0e228a1448"
+   },
+   {
+    "rel": "genome/questions.py",
+    "sha256": "6f79a45350a7aea3452eb55c72e2ca6f1413aab3b5f059f5e0d0e259422494cd"
+   },
+   {
+    "rel": "genome/sentence.py",
+    "sha256": "3de27d0e450ff776bf4cad88ece7f3abf9dd026c851743e8f8ec6855e56cd4b8"
+   },
+   {
+    "rel": "genome/sleep.py",
+    "sha256": "9f20a196677f9be50d79c6298431a332ec7889293a0b182ef17931efa4ed43ad"
+   },
+   {
+    "rel": "genome/think.py",
+    "sha256": "6a794ad0610bfbc20207d049795b9778a10dd5b2cdac66568a254dd9e7340b55"
+   },
+   {
+    "rel": "genome/traits.py",
+    "sha256": "5755d7057a82ac3594089155a849f40861a8a68163108158f24ecbc49753b12d"
+   },
+   {
+    "rel": "genome/web.py",
+    "sha256": "bb30a0eecc272d5f64975ed494cbf099e4708e21f6185c103086f4f11daa9fe4"
+   },
+   {
+    "rel": "genome/witness.py",
+    "sha256": "39cf216cef979473d39c917743316dde73e5f4e21777558dc2f45e760463d01a"
+   },
+   {
+    "rel": "genome/world.py",
+    "sha256": "bccc580fb11e0d7371e3e48bb8ad0f4bd02228ed3ff52b1369a05d5a69b70bbd"
+   }
+  ],
+  "modules_digest": "91d5e401296a393044df9910dbe2aa81e7af125b49a97ba9e9c1c1b6df54d34b",
+  "python": "3.14.4"
+ },
+ "target_rows": 165402,
+ "verdict_vs_line": "UNDER",
+ "wall_s": 82.635
+}

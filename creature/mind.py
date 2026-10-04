@@ -155,7 +155,9 @@ def _self_claims():
             _web.Claim("T3", "Usually, what I expect is what the parent says.", "usually", 0.70, author=a),
             _web.Claim("F1", "I see every thing the parent names.", "always", 0.05, author=a),
             _web.Claim("F2", "The parent always says three words.", "always", 0.05, author=a),
-            _web.Claim("B1", "My mind keeps up with what I sense.", "usually", 0.90, author=a)]
+            _web.Claim("B1", "My mind keeps up with what I sense.", "usually", 0.90, author=a),
+            # PREREG-HEARS-2 §1: the new hand's claim, its truth unknown (B1's pattern); it gets no event in a life that never hears the maker
+            _web.Claim("M1", "Usually, what I expect is what the maker names.", "usually", 0.70, author=a)]
 
 # A11 (PREREG §11.2): genome.curiosity / genome.think are not yet on master at the time this file was
 # written — imported defensively so creature/mind.py never breaks when they land, and never stubbed here
@@ -336,6 +338,18 @@ def _mind_repo_root() -> Path:
 def _brain_class():
     from genome.brain import Brain
     return Brain
+
+
+# edit: Claude (Fable 5.1, the seat), 2026-09-30 10:3x +0400 — PREREG-HEARS-2 §1: the scene hand's name and the derived seed of any other hand are the
+# ORGAN's (genome/brain.py: SCENE_WORLD, world_seed_of); read lazily like the organ itself, so a tree without it still imports.
+def _brain_scene_world() -> str:
+    from genome.brain import SCENE_WORLD
+    return SCENE_WORLD
+
+
+def _brain_world_seed(seed: int, world: str) -> int:
+    from genome.brain import world_seed_of
+    return world_seed_of(int(seed), str(world))
 
 
 def _jsonable(v):
@@ -922,6 +936,23 @@ class Mind:
             raise GenomeError("DRIVE declared beside no BRAIN line: the turn is the brain's (PREREG-BRAIN-DRIVES §2.1) — "
                                "the organism does not start")
         self.brain_turns: Dict[str, int] = {"turns": 0, "said": 0, "asked": 0}
+        # PREREG-HEARS-2 §1: per hand other than the scene world, the count of canvases the brain learned from it (its derived scene
+        # index); rebuilt from the brain's own `worlds` at a resume (_restore_brain_world_count), counted as it goes in a replay.
+        self._brain_world_count: Dict[str, int] = {}
+        # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:39 +0400 — PREREG-INNER-1 §2 + AMENDMENT 1 A3 (research-1003 @ 9c589b2; the signed text
+        # sha256 857e07b2…faa82): the gene INNER — THE INNER TURN, the brain's thought about a REMEMBERED scene when the body has spare
+        # capacity (a SENSE body row with backlog 0). Refused BY NAME beside no BRAIN line (the turn is the brain's) and beside no SENSE body
+        # line (its trigger row is consumed only under SENSE_BODY, _consume_body's own gate). Under `--blind brain` there is no brain and
+        # every body row is counted «no brain». The chain state (ledger["inner"]) and the counts are written only under the gene.
+        self._inner: Optional[Dict[str, object]] = self.genome.declared.get("INNER")
+        if self._inner is not None and "BRAIN" not in self.genome.declared:
+            raise GenomeError("INNER declared beside no BRAIN line: the inner turn is the brain's (PREREG-INNER-1 §2) — "
+                               "the organism does not start")
+        if self._inner is not None and "SENSE_BODY" not in self.genome.declared:
+            raise GenomeError("INNER declared beside no SENSE body line: its trigger is the body row's own reading (PREREG-INNER-1 "
+                               "AMENDMENT 1 A3) — the organism does not start")
+        self.inner_state: Dict[str, object] = {"n": 0, "pos": 0, "last": [], "said": []}
+        self.inner_counts: Dict[str, object] = {"turns": 0, "said": 0, "skipped": {}}
 
         (self.run_root / "journal").mkdir(parents=True, exist_ok=True)
         (self.run_root / "state").mkdir(parents=True, exist_ok=True)
@@ -974,6 +1005,8 @@ class Mind:
             self._consume_body(row)
             if self.self_node is not None:
                 self._self_body(row)
+            if self._inner is not None:          # PREREG-INNER-1 §2: the inner turn's trigger is this row (its reading), nothing else
+                self._inner_turn(row)
         # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:48 +0400 — LIFE-D-ACT-SOUND.md item 3
         # (L-13): the branch the brief's own READ FIRST line named as missing ("no ear-sound branch --
         # :244-257"). Gates itself on FAST's own "sound" key (self.sound_episodes is None otherwise), the
@@ -1605,40 +1638,58 @@ class Mind:
             for ask in asks:
                 self._answer_ask(ask, g, str(row["at"]), int(row["seq"]), cache)
             return
-        if self.brain is None or not words or not self.brain.hears(meta.get("source")):
+        source = meta.get("source")
+        if self.brain is None or not words or not self.brain.hears(source):
             return
         base = {"moment": moment, "seq": row["seq"], "at": row["at"]}
-        if meta.get("scene") is None or meta.get("world_seed") is None:
-            self.brain_refused += 1      # a malformed scene row is named on the record, never learned from and never a crash loop (#230)
-            self._write_journal(row["at"], {"kind": "brain", "act": "refused", **base,
-                                            "reason": "an eye row the brain hears carries no scene / world_seed"})
-            return
+        # edit: Claude (Fable 5.1, the seat), 2026-09-30 10:3x +0400 — PREREG-HEARS-2 §1: a hand other than the scene world (the maker, …) carries no
+        # scene / world_seed on its rows; the brain hears it under a DERIVED index (this hand's own count of canvases the brain
+        # learned, 0-based, restored from the brain's own state at a resume) and a DERIVED seed (genome.brain.world_seed_of: the
+        # genome's SEED and the hand's name). Its rows carry `world`, `scene` and `world_seed`; a scene row is what it was, and a
+        # scene row without its index is still refused by name.
+        world = str(source)
+        extra: Dict[str, object] = {}
+        if world == _brain_scene_world() or (meta.get("scene") is not None and meta.get("world_seed") is not None):
+            if meta.get("scene") is None or meta.get("world_seed") is None:
+                self.brain_refused += 1      # a malformed scene row is named on the record, never learned from and never a crash loop (#230)
+                self._write_journal(row["at"], {"kind": "brain", "act": "refused", **base,
+                                                "reason": "an eye row the brain hears carries no scene / world_seed"})
+                return
+            scene_ix, ws = int(meta["scene"]), int(meta["world_seed"])
+        else:
+            scene_ix, ws = int(self._brain_world_count.get(world, 0)), _brain_world_seed(self.genome.seed, world)
+        learn_kw: Dict[str, object] = {}
+        if world != _brain_scene_world():
+            extra = {"world": world, "scene": scene_ix, "world_seed": ws}
+            learn_kw = {"world": world}
         # edit: Claude (Fable 5.1, the seat), 2026-09-29 16:28 +0400 — PREREG-BRAIN-DRIVES §2.4: under DRIVE the brain takes its turn BEFORE it
         # learns from this canvas (it expects, it says, it asks — read-only, genome/brain.py:Brain.turn), its surprise is read
         # against the instant's words, and ONE row is journaled ahead of the learn row. The learning below is untouched.
         if self._drive is not None:
-            turn = self.brain.turn(g, scene=int(meta["scene"]), world_seed=int(meta["world_seed"]),
+            turn = self.brain.turn(g, scene=scene_ix, world_seed=ws,
                                    says=int(self._drive["says"]), asks=int(self._drive["asks"]))
             self.brain_turns["turns"] += 1
             self.brain_turns["said"] += turn["say"] is not None
             self.brain_turns["asked"] += turn["ask"] is not None
             surprise = self.brain.surprise(turn, list(words))
-            self._write_journal(row["at"], {"kind": "brain", "act": "turn", **base, **_jsonable(turn), "heard": list(words),
+            self._write_journal(row["at"], {"kind": "brain", "act": "turn", **base, **extra, **_jsonable(turn), "heard": list(words),
                                             "surprise": surprise})
             if self.self_node is not None:
-                self._self_turn(turn, list(words), surprise, int(meta["scene"]))
-        out = _jsonable(self.brain.learn(g, list(words), moment=str(moment), scene=int(meta["scene"]), world_seed=int(meta["world_seed"])))
+                self._self_turn(turn, list(words), surprise, scene_ix, world)
+        out = _jsonable(self.brain.learn(g, list(words), moment=str(moment), scene=scene_ix, world_seed=ws, **learn_kw))
         self.brain_learned += 1
+        if learn_kw:
+            self._brain_world_count[world] = scene_ix + 1
         # PREREG-BRAIN-IN-BODY (the seat, 20:4x): every learn row carries the canvas's located fixations and the eye's hypotheses (member
         # lists into `fix`) — the grader reads from it whether the one «dax» meeting was seen. The brain's own keys win if it returns them.
         from brain.scene import eye as _eye
         fix = [[int(y), int(x)] for (y, x) in (g.get("fix") or [])]
         view = {"fix": fix, "hyps": [[int(i) for i in m] for m in _eye.groups([tuple(f) for f in fix])]}
-        self._write_journal(row["at"], {"kind": "brain", "act": "learn", **base, **view, **out})
+        self._write_journal(row["at"], {"kind": "brain", "act": "learn", **base, **extra, **view, **out})
         if self.self_node is not None:
-            self._self_canvas(len(fix), int(meta["scene"]))
+            self._self_canvas(len(fix), scene_ix)
         if out.get("calibrated"):
-            self._write_journal(row["at"], {"kind": "brain", "act": "calibrate", **base, "summary": _jsonable(self.brain.summary())})
+            self._write_journal(row["at"], {"kind": "brain", "act": "calibrate", **base, **extra, "summary": _jsonable(self.brain.summary())})
             self.write_census()                 # PREREG-METADATA-1 §2: a file, never a journal row
 
     # -- the KNOWLEDGE WEB and the SELF (his 23:20 word): bookkeeping that can fail only OFF ----------------------------------
@@ -1653,6 +1704,105 @@ class Mind:
                 f.write(f"moment {getattr(self.org, 't', None)} · {self.web_error}\n{''.join(_traceback.format_exception(e))}\n")
         except Exception:
             pass
+
+    def _restore_brain_world_count(self) -> None:
+        """PREREG-HEARS-2 §1: the derived scene index of every hand but the scene world = how many of its canvases the brain has
+        learned; read from the brain's own index-aligned `worlds` (a brain without the attribute — a stand-in — has heard one hand)."""
+        counts: Dict[str, int] = {}
+        for w in (getattr(self.brain, "worlds", None) or []):
+            if w != _brain_scene_world():
+                counts[str(w)] = counts.get(str(w), 0) + 1
+        self._brain_world_count = counts
+
+    # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:39 +0400 — PREREG-INNER-1 §2 + AMENDMENT 1 A1–A4 (research-1003 @ 9c589b2; the signed text
+    # sha256 857e07b2…faa82): THE INNER TURN. The brain's first thought that is not about the present: on a SENSE body row whose own
+    # reading says backlog 0, it re-sees ONE remembered scene (genome/brain.py:Brain.turn_remembered, read-only), says what it would
+    # say, reads its surprise against the words heard then, and lets the said words' web associations choose the next thought. The
+    # first consumer of the KNOWLEDGE WEB and the SELF. Every choice is a function of the tape and the genome (substreams keyed by the
+    # inner index n), so a closed life with the line replays to itself and a resume reproduces the rows (the chain state in the ledger).
+    def _inner_turn(self, row: Dict[str, object]) -> None:
+        """ONE inner turn, or nothing (counted by reason): eligible when the brain exists, has calibrated once and learned a scene, and the
+        row's `meta.reading.backlog` is 0 — a tape fact, no clock, no queue read. The chain of `restart` thoughts begins at the SELF's
+        least reliable mature word (creature/inner.py:first_topic; A2 when none has a reliability); each later thought's topic is drawn,
+        ∝ lift, among the previous say's words' consolidated web neighbours that are mature words and not among the last `inhibit`
+        topics (inner.candidates / inner.draw, substream(SEED, "inner-walk:<n>"); A1: the union over the said words; a say of
+        nothing carries the topic forward); no candidate → the chain restarts at the self. The scene: one drawn uniformly
+        (substream(SEED, "inner-scene:<n>")) among the learned scenes whose heard words carried the topic; its world seed as
+        _brain_canvas supplies it (the WORLD scene seed for the scene hand, world_seed_of otherwise). ONE journal row, kind brain act
+        inner. The brain, the web and the self are READ, never written."""
+        reading = (row.get("meta") or {}).get("reading") or {}
+        skipped: Dict[str, int] = self.inner_counts["skipped"]      # type: ignore[assignment]
+
+        def skip(why: str) -> None:
+            skipped[why] = int(skipped.get(why, 0)) + 1
+
+        if self.brain is None:
+            skip("no brain")
+            return
+        bl = reading.get("backlog")
+        if bl is None:
+            skip("no backlog reading")
+            return
+        if int(bl) != 0:
+            skip("backlog")
+            return
+        if int(self.brain.n_calibrations) < 1 or int(self.brain.n_learned) < 1:
+            skip("not calibrated")
+            return
+        from brain.world.seeds import substream
+        from creature import inner as _inner
+        st = self.inner_state
+        n, pos = int(st["n"]), int(st["pos"])
+        restart, inhibit, rule = int(self._inner["restart"]), int(self._inner["inhibit"]), str(self._inner["walk"])
+        # `walk_from` is a TEST parameter (PREREG-INNER-1 AMENDMENT 2 A2.1, G3's plant; set on the mind by the bench, never by the parser):
+        # "said" = the law's walk, from the words the remembered turn SAID; "topic" = §0.2's counted walk, from the topic itself.
+        walk_from = str(self._inner.get("walk_from", "said"))
+        mature = sorted(str(w) for w in self.brain.L.mature_words())
+        if not mature:
+            skip("no mature word")
+            return
+        web = self.webs.get("L") if self.webs is not None else None
+        said_from: List[str] = [str(x) for x in (st.get("said") or [])] if pos > 0 else []
+        cands: List[List[object]] = []
+        if pos == 0 or not said_from:
+            topic, source, _table = _inner.first_topic(self.self_node, mature)
+            pos = 0
+        else:
+            cl, lifted = _inner.candidates(web, said_from, mature, [str(x) for x in (st.get("last") or [])], inhibit)
+            cands = [[w, int(c), float(l)] for w, c, l in cl]
+            topic = _inner.draw(cl, substream(int(self.genome.seed), f"inner-walk:{n}"), rule)
+            if topic is None:
+                topic, _source, _table = _inner.first_topic(self.self_node, mature)
+                source = "self (restart: no candidate)"
+                pos = 0
+            else:
+                source = "web (inhibition lifted)" if lifted else "web"
+        if topic is None:
+            skip("no mature word")
+            return
+        scenes = self.brain.scenes_with(topic)
+        if not scenes:
+            skip("no scene carries the topic")
+            return
+        o = int(scenes[int(substream(int(self.genome.seed), f"inner-scene:{n}").integers(len(scenes)))])
+        world = str(self.brain.world_of(o))
+        ws_decl = self.genome.declared.get("WORLD_SCENE")
+        if world == _brain_scene_world() and ws_decl is not None:
+            ws = int(ws_decl["seed"])
+        else:
+            ws = _brain_world_seed(self.genome.seed, world)
+        turn = self.brain.turn_remembered(o, world_seed=ws, says=1, asks=1)
+        surprise = self.brain.surprise(turn, list(turn["heard"]))
+        out = {"kind": "brain", "act": "inner", "n": n, "seq": row["seq"], "at": row["at"], "chain": pos + 1, "topic": topic,
+               "topic_source": source, "from": said_from if pos > 0 else [], "candidates": cands, **_jsonable(turn),
+               "world_seed": ws, "surprise": surprise}
+        self._write_journal(row["at"], out)
+        self.inner_counts["turns"] = int(self.inner_counts["turns"]) + 1
+        self.inner_counts["said"] = int(self.inner_counts["said"]) + int(turn["say"] is not None)
+        st["n"] = n + 1
+        st["pos"] = (pos + 1) % restart
+        st["last"] = ([str(x) for x in (st.get("last") or [])] + [topic])[-inhibit:] if inhibit > 0 else []
+        st["said"] = [str(w) for w in turn["say"]["words"]] if (turn["say"] and walk_from != "topic") else [topic]
 
     def _web_hear(self, word: str) -> None:
         try:
@@ -1669,12 +1819,22 @@ class Mind:
             self._self_kinds = (n, [set(k) for k in self.brain.types()])
         return self._self_kinds[1]
 
-    def _self_turn(self, turn: Dict[str, object], heard: List[str], surprise: Optional[float], scene: int) -> None:
+    def _self_turn(self, turn: Dict[str, object], heard: List[str], surprise: Optional[float], scene: int,
+                   world: Optional[str] = None) -> None:
+        # edit: Claude (Fable 5.1, the seat), 2026-09-30 10:3x +0400 — PREREG-HEARS-2 §1: T2, T3, F1 and F2 speak of THE PARENT (the scene hand) and are
+        # observed on its canvases only; the lived per-word reliability hears every hand; M1 speaks of the maker and hears it alone.
         try:
             node = self.self_node
             expected = [list(h) for h in (turn.get("expected") or [])]
             node.turn(heard, expected, surprise)
             C = node.claims
+            hand = _brain_scene_world() if world is None else str(world)
+            if hand == "maker":
+                if surprise is not None and "M1" in C:
+                    C["M1"].observe(surprise == 0, at=scene)
+                return
+            if hand != _brain_scene_world():
+                return
             kinds = self._self_kinds_now()
             if kinds:
                 C["T2"].observe(all(sum(1 for w in heard if w in k) <= 1 for k in kinds), at=scene)
@@ -1775,6 +1935,10 @@ class Mind:
                "refused_rows": self.brain_refused, "restored": self.brain_restored}
         if self._drive is not None:            # PREREG-BRAIN-DRIVES: the turn counts, only under the gene
             out["turns"] = dict(self.brain_turns)
+        if self._inner is not None:            # PREREG-INNER-1 §2: the inner counts (turns, said, skipped by reason) and the chain's place
+            out["inner"] = {"turns": int(self.inner_counts["turns"]), "said": int(self.inner_counts["said"]),
+                            "skipped": dict(self.inner_counts["skipped"]), "n": int(self.inner_state["n"]),
+                            "chain": int(self.inner_state["pos"])}
         if self.brain_inherited is not None:   # PREREG-INHERIT §3: only a child carries the field
             out["inherited"] = dict(self.brain_inherited)
         # the KNOWLEDGE WEB and the SELF (his 23:20 word): counts and lengths only — this runs on the STATUS thread, which must never
@@ -3866,6 +4030,12 @@ class Mind:
                               "by": dict(self.asks_by), "learned": self.brain_learned, "refused": self.brain_refused}
             if self._drive is not None:        # PREREG-BRAIN-DRIVES: written only under the gene (every other ledger is what it was)
                 ledger["asks"]["turns"] = dict(self.brain_turns)
+        if self._inner is not None:            # PREREG-INNER-1 §2 (A5/A7): the chain state rides in the ledger, a generation file; absent the
+            ledger["inner"] = {"state": {"n": int(self.inner_state["n"]), "pos": int(self.inner_state["pos"]),       # line, no key
+                                         "last": [str(x) for x in self.inner_state["last"]],
+                                         "said": [str(x) for x in self.inner_state["said"]]},
+                               "counts": {"turns": int(self.inner_counts["turns"]), "said": int(self.inner_counts["said"]),
+                                          "skipped": dict(self.inner_counts["skipped"])}}
         if self.brain is not None:
             brain_tmp = state_dir / "brain_tmp"
             self.brain.save(brain_tmp)
@@ -3892,6 +4062,8 @@ class Mind:
         staged.append((ledger_tmp, state_dir / "ledger.json"))
         gen_tmp = state_dir / "SNAPSHOT_tmp.json"
         gen_tmp.write_text(json.dumps({"t": int(self.org.t), "last_seq": int(self.last_seq or 0),
+                                       # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX (docs/organism/days/PREREG-POLLER-FIX.md §2, option A): the very integer the ledger above carries (the same variable, nothing runs between), in the file renamed LAST and atomically, so the two 5-second pollers (creature/exam.py canvas_count_now) read ~40 bytes instead of parsing the whole ledger
+                                       "canvas_index": ledger["canvas_index"],
                                        "files": [f.name for _s, f in staged],
                                        "prints": {f.name: _fingerprint(s) for s, f in staged}}, sort_keys=True))
         self._keep_prev_generation(state_dir)
@@ -4016,12 +4188,21 @@ class Mind:
             for k_, v_ in (asks_.get("turns") or {}).items():     # PREREG-BRAIN-DRIVES: restored when present (DRIVE only)
                 if k_ in mind.brain_turns:
                     mind.brain_turns[k_] = int(v_)
+            inner_ = ledger.get("inner")                            # PREREG-INNER-1 §2 (A7): the chain state, restored when present (INNER only)
+            if inner_ and mind._inner is not None:
+                s_ = inner_.get("state") or {}
+                mind.inner_state = {"n": int(s_.get("n", 0)), "pos": int(s_.get("pos", 0)), "last": [str(x) for x in (s_.get("last") or [])],
+                                    "said": [str(x) for x in (s_.get("said") or [])]}
+                c_ = inner_.get("counts") or {}
+                mind.inner_counts = {"turns": int(c_.get("turns", 0)), "said": int(c_.get("said", 0)),
+                                     "skipped": {str(a): int(b) for a, b in (c_.get("skipped") or {}).items()}}
             if mind.brain is not None:
                 if (state_dir / "brain.npz").exists() and (state_dir / "brain.json").exists():
                     mind.brain = _brain_class().load(state_dir / "brain", dict(mind.genome.declared["BRAIN"]))
                     mind.brain_restored = True
                     mind._inherit_row_due = False      # PREREG-INHERIT §3: the inherit row is in the journal of the life that saved
                     mind.brain.author = Path(run_root).name   # PREREG-METADATA-1 §2
+                    mind._restore_brain_world_count()  # PREREG-HEARS-2 §1: each other hand's count, from the brain's own worlds
                 else:
                     mind.brain_restored = False
             if mind.webs is not None:          # the KNOWLEDGE WEB and the SELF (his 23:20 word): restored when saved; a bad file starts them fresh, said

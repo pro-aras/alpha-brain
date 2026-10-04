@@ -1,0 +1,3 @@
+# PREREG-EVOLVE-CAL A7: R5's confirmation of #5 (KWTA.k 5 -> 4) on the next disjoint slice, S2next (cp10, seq 210626..214924): the incumbent (the checkpoint's own v0 genome, KWTA 5) and the mutant
+r5-inc	incumbent	-
+r5-mut-kwta-4	gene:KWTA.k=4	-

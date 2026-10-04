@@ -1,0 +1,24 @@
+MUTATION SWEEP of 7291ca828390 (clean overlay copy; each mutant's named test run ALONE)
+20 of 20 mutants CAUGHT; negative plant m0 (equivalent, docstring only) reads SURVIVED; clean module: Ran 34, exit 0
+m1    CAUGHT   TestWriter.test_manifest_carries_the_ledgers_canvas_index  [the writer omits the key]  0.9s  AssertionError: 'canvas_index' not found in {'files': ['organism.npz', 'organism.json', 'episodes.npz', 'ledger.json'], 'last_seq': 6, 'prints': {'episodes.npz': [16171, 
+m2    CAUGHT   TestWriter.test_manifest_carries_the_ledgers_canvas_index  [the writer writes self.org.t (moments, not canvases)]  0.9s  AssertionError: 15 != 3 : the very integer the ledger written in the same call carries
+m3    CAUGHT   TestWriter.test_manifest_carries_the_ledgers_canvas_index  [the writer writes str(canvas_index)]  0.9s  AssertionError: <class 'str'> is not <class 'int'> : an int, never a bool/str/float: '3'
+m4    CAUGHT   TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key  [the reader ignores the key]  0.6s  AssertionError: Tuples differ: (None, 'none') != (520, 'snapshot')
+m5    CAUGHT   TestReaderRoads.test_a_keyless_manifest_never_stands_in_t_over_fixations  [the reader takes t // fixations when the key is absent]  0.5s  AssertionError: 550 == 550 : t counts MOMENTS (5 a canvas): moments // fixations is the over-count M4 removed (S3)
+m6    CAUGHT   TestReaderRoads.test_a_key_that_is_not_a_count_takes_the_ledger_road  [the reader accepts a bool]  0.7s  AssertionError: Tuples differ: (True, 'snapshot') != (520, 'ledger')
+m7    CAUGHT   TestReaderRoads.test_an_unreadable_manifest_takes_the_ledger_road  [an unparsable manifest yields 0 instead of the ledger road]  0.6s  AssertionError: Tuples differ: (0, 'snapshot') != (520, 'ledger')
+m8    CAUGHT   TestReaderRoads.test_a_keyless_manifest_takes_the_ledger_road  [the ledger road only when the manifest is MISSING, not when it lacks the key]  0.6s  AssertionError: Tuples differ: (None, 'none') != (520, 'ledger')
+m9    CAUGHT   TestReaderRoads.test_the_snapshot_road_never_opens_the_ledger  [the snapshot road still parses the ledger (road says snapshot)]  0.6s  AssertionError: Tuples differ: (1, 1) != (0, 1)
+m10   CAUGHT   TestLoopEquivalence.test_s1_voice_loop_manifest_and_ledger_agree  [voice_loop still calls json.loads(ledger)]  0.6s  AssertionError: Tuples differ: (7, 7) != (0, 7)
+m11   CAUGHT   TestLoopEquivalence.test_s1_sit_sense_manifest_and_ledger_agree  [sense still calls json.loads(ledger)]  0.6s  AssertionError: Tuples differ: (7, 7) != (0, 7)
+m12   CAUGHT   TestLoopEquivalence.test_s1_voice_loop_manifest_and_ledger_agree  [voice_loop passes root for root/state]  0.6s  AssertionError: Lists differ: [] != [(1, 520), (5, 1030)]
+m12b  CAUGHT   TestLoopEquivalence.test_s1_sit_sense_manifest_and_ledger_agree  [sense passes root for root/state]  0.6s  AssertionError: Lists differ: [] != [(1, '2026-10-03T000001Z.json', 0.8), (5, '2026-10-03T000002Z.json', 0.8)]
+m13   CAUGHT   TestReaderRoads.test_the_manifest_is_read_afresh_every_call  [the manifest read is cached (stale forever)]  0.7s  AssertionError: Tuples differ: (520, 'snapshot') != (1030, 'snapshot')
+m14   CAUGHT   TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key  [the reader is off by one]  0.6s  AssertionError: Tuples differ: (521, 'snapshot') != (520, 'snapshot')
+m14w  CAUGHT   TestWriter.test_manifest_carries_the_ledgers_canvas_index  [the writer is off by one]  1.0s  AssertionError: 4 != 3 : the very integer the ledger written in the same call carries
+m16   CAUGHT   TestLoopEquivalence.test_s12_a_non_positive_period_never_fires_and_sit_never_polls  [sense's every <= 0 guard dropped (SIT would poll a disabled duty)]  0.6s  AssertionError: Tuples differ: ([(0, '2026-10-03T000001Z.json', 0.8)], []) != ([], [])
+m17   CAUGHT   TestReaderRoads.test_a_keyless_manifest_takes_the_ledger_road  [the ledger road ignores fixations]  0.6s  AssertionError: Tuples differ: (2200, 'ledger') != (550, 'ledger')
+m18   CAUGHT   TestReaderRoads.test_the_snapshot_road_reads_the_manifest_key  [a zero cursor is read as falsy]  0.6s  AssertionError: Tuples differ: (None, 'none') != (0, 'snapshot')
+m15   CAUGHT   TestReaderRoads.test_a_torn_ledger_is_zero_not_a_crash  [a torn ledger on the ledger road raises instead of {}]  0.6s  json.decoder.JSONDecodeError: Expecting ',' delimiter: line 1 column 15 (char 14)
+m0    SURVIVED TestLoopEquivalence.test_s1_voice_loop_manifest_and_ledger_agree  [EQUIVALENT (docstring only): «at most one» -> «at most 1»]  0.6s  
+RESULT: OK

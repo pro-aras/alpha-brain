@@ -1,0 +1,58 @@
+[
+ {
+  "name": "gate-reads-mutant-first",
+  "old": "        gate = evolve_bands.calibrated_verdict(incumbent_readings, mutant_readings, bands)",
+  "new": "        gate = evolve_bands.calibrated_verdict(mutant_readings, incumbent_readings, bands)",
+  "expect": "test_the_gate_reads_incumbent_first",
+  "tests": "tests.tools.test_evolve_cal_round.TestRound.test_the_gate_reads_incumbent_first_and_delta_is_mutant_minus_incumbent",
+  "timeout": 600
+ },
+ {
+  "name": "bands-ignored",
+  "old": "    if bands is None:\n        verdict, reason = regression_bar(incumbent_readings, mutant_readings)",
+  "new": "    if True:\n        verdict, reason = regression_bar(incumbent_readings, mutant_readings)",
+  "expect": "test_a_calibrated_round_carries_gate",
+  "tests": "tests.tools.test_evolve_cal_round.TestRound.test_a_calibrated_round_carries_gate_and_not_gradable_and_never_passes_by_itself",
+  "timeout": 600
+ },
+ {
+  "name": "calibrated-round-passes",
+  "old": "        verdict, reason = \"REFUSED\", gate[\"reason\"]",
+  "new": "        verdict, reason = (\"PASS\" if gate[\"verdict\"] == \"IMPROVED\" else \"REFUSED\"), gate[\"reason\"]",
+  "expect": "test_the_gate_reads_incumbent_first",
+  "tests": "tests.tools.test_evolve_cal_round.TestRound.test_the_gate_reads_incumbent_first_and_delta_is_mutant_minus_incumbent",
+  "timeout": 600
+ },
+ {
+  "name": "incumbent-cpu-is-wall",
+  "old": "cpu_s=inc_cpu, machine=",
+  "new": "cpu_s=inc_wall, machine=",
+  "expect": "test_the_twins_cpu_seconds_come_from_process_time",
+  "tests": "tests.tools.test_evolve_cal_round.TestRound.test_the_twins_cpu_seconds_come_from_process_time_around_each_twin",
+  "timeout": 600
+ },
+ {
+  "name": "mutant-cpu-is-wall",
+  "old": "cpu_s=mut_cpu, machine=",
+  "new": "cpu_s=mut_wall, machine=",
+  "expect": "test_the_twins_cpu_seconds_come_from_process_time",
+  "tests": "tests.tools.test_evolve_cal_round.TestRound.test_the_twins_cpu_seconds_come_from_process_time_around_each_twin",
+  "timeout": 600
+ },
+ {
+  "name": "unforced-draw-not-distinct",
+  "old": "        mutant_text, gene_key, value, draws = mutate_distinct(incumbent_text, seed, shadow.evolve_epoch + 1, proposal_no)",
+  "new": "        mutant_text, gene_key, value = mutate_genome_text(incumbent_text, seed, shadow.evolve_epoch + 1, proposal_no); draws = 1",
+  "expect": "test_an_unforced_round_draws_through_the_redraw",
+  "tests": "tests.tools.test_evolve_cal_round.TestRound.test_an_unforced_round_draws_through_the_redraw",
+  "timeout": 600
+ },
+ {
+  "name": "unforced-draw-epoch-off",
+  "old": "mutate_distinct(incumbent_text, seed, shadow.evolve_epoch + 1, proposal_no)",
+  "new": "mutate_distinct(incumbent_text, seed, shadow.evolve_epoch, proposal_no)",
+  "expect": "test_an_unforced_round_draws_through_the_redraw",
+  "tests": "tests.tools.test_evolve_cal_round.TestRound.test_an_unforced_round_draws_through_the_redraw",
+  "timeout": 600
+ }
+]

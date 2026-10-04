@@ -1,0 +1,5 @@
+[1/1] ck1: {"label": "ck1", "ok": true, "moments": 8215, "reference": 1523, "road_old": "ledger", "road_new": "snapshot", "n_new": 1523, "resume_s": 0.85, "snapshot_s": 1.17, "hwm_mb": 366.0, "error": null}  (3s)
+G2 SUMMARY: started 1 of 1; recorded 1; the ledger carried canvas_index in 1 of 1 (presence); compared 1; DIFFERING 0
+road before (old format) = ledger on 1 of 1; road after resume+snapshot = snapshot on 1 of 1; ablation (key stripped) -> ledger on 1 of 1; plant reported DIFFERENT on 1 of 1
+every check of a state holds on 1 of 1; wall 3 s
+RESULT: OK

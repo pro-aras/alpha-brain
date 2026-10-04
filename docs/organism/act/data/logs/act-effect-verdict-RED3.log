@@ -1,0 +1,43 @@
+.....................EEE..
+======================================================================
+ERROR: test_a_run_without_counts_reads_none_never_zero (tests.creature.test_act_effect_verdict.TestPresenceCounts.test_a_run_without_counts_reads_none_never_zero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 233, in test_a_run_without_counts_reads_none_never_zero
+    self.assertIsNone(v["readings"]["c_scr_effect_counts"])
+                      ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'c_scr_effect_counts'
+
+======================================================================
+ERROR: test_counts_are_summed_over_the_seeds_and_reconcile (tests.creature.test_act_effect_verdict.TestPresenceCounts.test_counts_are_summed_over_the_seeds_and_reconcile)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 224, in test_counts_are_summed_over_the_seeds_and_reconcile
+    v = run(mutate=self._with_counts())
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 61, in run
+    over["mutate"](sq, b, b2, lv, eq)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 220, in m
+    r["effect_counts"] = {a: {"known": 10, "excluded": 2, "total": 12} for a in V.ACT_NAMES}
+                                                                                ^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_effect_verdict' has no attribute 'ACT_NAMES'
+
+======================================================================
+ERROR: test_counts_that_do_not_reconcile_are_a_defect (tests.creature.test_act_effect_verdict.TestPresenceCounts.test_counts_that_do_not_reconcile_are_a_defect)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 239, in test_counts_that_do_not_reconcile_are_a_defect
+    run(mutate=m)
+    ~~~^^^^^^^^^^
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 61, in run
+    over["mutate"](sq, b, b2, lv, eq)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_verdict.py", line 237, in m
+    b["arms"]["C-SCR"]["runs"][0]["effect_counts"] = {a: {"known": 10, "excluded": 2, "total": 13} for a in V.ACT_NAMES}
+                                                                                                            ^^^^^^^^^^^
+AttributeError: module 'tools.toys.act_effect_verdict' has no attribute 'ACT_NAMES'
+
+----------------------------------------------------------------------
+Ran 26 tests in 0.015s
+
+FAILED (errors=3)

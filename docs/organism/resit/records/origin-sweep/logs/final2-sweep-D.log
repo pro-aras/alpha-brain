@@ -1,0 +1,18 @@
+CAUGHT       N01 E1: end is not a structural form (only begin is)  [FAILED (failures=5); 5 test(s): a_set_with_no_tested_early_item_reads_untested_n, begin_and_end_alone_test_nothing_an_equal_acknow, n_early_and_n_early_tested_are_both_printed_begi …]  (39 s)
+CAUGHT       N02 E1: begin and end count as tested EARLY items in classify_early_late  [FAILED (failures=4); 4 test(s): a_set_whose_only_early_item_is_begin_reads_untes, begin_and_end_alone_test_nothing_an_equal_acknow, n_early_and_n_early_tested_are_both_printed_begi …]  (41 s)
+CAUGHT       N03 E1: the UNTESTED note is never set in classify_early_late  [FAILED (failures=2); 2 test(s): a_set_whose_only_early_item_is_begin_reads_untes, begin_and_end_alone_test_nothing_an_equal_acknow]  (37 s)
+CAUGHT       N04 E1: r9_reading leaves out NOT A PASS  [FAILED (failures=2); 2 test(s): a_set_with_no_tested_early_item_reads_untested_n, one_untested_set_leads_the_line_and_is_not_a_pas]  (36 s)
+CAUGHT       N05 E1: r9_reading never lists an untested set  [FAILED (failures=4); 4 test(s): a_fallback_is_a_labelled_reading_never_exact_and, a_set_with_no_tested_early_item_reads_untested_n, every_untested_set_is_named …]  (36 s)
+CAUGHT       N06 E1: the origin row carries no r9_reading  [FAILED (failures=2); 2 test(s): a_set_with_no_tested_early_item_reads_untested_n, r9_every_early_item_equals_the_lifes_row_in_ever]  (35 s)
+CAUGHT       N07 E1: RESIT.md's note never carries the reading  [FAILED (failures=1); 1 test(s): a_set_with_no_tested_early_item_reads_untested_n]  (36 s)
+CAUGHT       N08 R16: the symlink check is removed from the re-verification  [FAILED (failures=1); 1 test(s): no_kept_file_is_a_symlink_a_copy_never_points_in]  (36 s)
+CAUGHT       N09 omissions: require_all_answered is never called  [FAILED (failures=2); 1 test(s): an_origin_that_answered_fewer_asks_than_the_live]  (37 s)
+CAUGHT       N10 omissions: require_all_answered ignores a count mismatch  [FAILED (failures=2); 1 test(s): an_origin_that_answered_fewer_asks_than_the_live]  (37 s)
+CAUGHT       N11 omissions: the R9 refusal on life rows with no origin row is removed  [FAILED (failures=1); 1 test(s): an_origin_that_answered_one_ask_twice_and_skippe]  (36 s)
+CAUGHT       N12 omissions: a life row of a sitting ask with no origin row is not counted  [FAILED (failures=2); 2 test(s): an_origin_row_missing_for_a_life_row_of_a_sittin, an_origin_that_answered_one_ask_twice_and_skippe]  (35 s)
+CAUGHT       N13 omissions: the reading line hides the unmatched counts  [FAILED (failures=1); 1 test(s): the_reading_line_says_it_whenever_a_count_is_not]  (37 s)
+CAUGHT       N14 E1 counts: a structural begin/end row is counted among the TESTED rows in r9_cross_check  [FAILED (failures=3); 3 test(s): a_set_with_no_tested_early_item_reads_untested_n, r9_every_early_item_equals_the_lifes_row_in_ever, tested_and_structural_early_rows_are_counted_apa]  (37 s)
+CAUGHT       N15 E1 counts: the line's TESTED denominator is the merged EARLY total  [FAILED (failures=6); 6 test(s): a_fallback_is_a_labelled_reading_never_exact_and, a_set_with_no_tested_early_item_reads_untested_n, every_set_tested_and_exact_reads_exact_with_the_ …]  (36 s)
+restored: sha256 equal (bacf8fc3418099f7)
+mutants run: 15; survivors: []
+caught by a test other than the named one: []

@@ -1,0 +1,9 @@
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 22:13 +0400 (from `date`) — the seat's read-only copy of state/prev was never written by this run.
+$ find /data/dev/brain-runs/day1003/brain-long-3-origin-fallback/copy-20261003-193014 -newer /data/dev/brain-runs/resit/brain-long-3/origin/20261003T180231Z/START.marker   (anything NOT older than the production run's START.marker; the marker was written 22:02:31)
+(end of find output: 0 paths newer than the marker)
+$ find /data/dev/brain-runs/day1003/brain-long-3-origin-fallback/copy-20261003-193014 -type f | wc -l
+12
+newest mtime under the copy:
+2026-10-03 19:25:46.6158965050 /data/dev/brain-runs/day1003/brain-long-3-origin-fallback/copy-20261003-193014/SNAPSHOT.json
+marker mtime:
+2026-10-03 22:02:31.316061097 +0400 /data/dev/brain-runs/resit/brain-long-3/origin/20261003T180231Z/START.marker

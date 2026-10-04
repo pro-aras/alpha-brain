@@ -1,0 +1,110 @@
+{
+ "cpu_s": 4.977,
+ "grader_code": "/data/dev/brain-runs/resit/grader-d2fe75b",
+ "grader_sha256": "557f1bf8f0e7533b58e046ece498dcf89b2d81eeb50fe59acd496f5f0b6ebc11",
+ "m2a_rows": true,
+ "modules": [
+  {
+   "rel": "brain/__init__.py",
+   "sha256": "216bbd038dc37086941e8630aaa61f4db9cbd9c8bccef0db1adbed30c49dc34d"
+  },
+  {
+   "rel": "brain/glance_cache.py",
+   "sha256": "cd6d5aa030b1584da93516986ea55dfc1a5d72ca8e3e208e7540f76bd9f68599"
+  },
+  {
+   "rel": "brain/scene/__init__.py",
+   "sha256": "4ea6735f822caf1334f1da0acdc4eea78024bbbb66fa4ce16ae61ddcbff2b4cc"
+  },
+  {
+   "rel": "brain/scene/cache.py",
+   "sha256": "657b80ae3ffbb6dcc7329c62adbb6fb538c4a3418912e9b466f509bb8855a784"
+  },
+  {
+   "rel": "brain/scene/eye.py",
+   "sha256": "e12c391ad5fc5c8674280fbb96ab76a663b37d56c10d66ba8a484ee0b8feba84"
+  },
+  {
+   "rel": "brain/scene/learners.py",
+   "sha256": "47b14bc2c35443178b756b99f76ec572cbd037c4e72bf8c6942c5b23ff996dfe"
+  },
+  {
+   "rel": "brain/scene/marks.py",
+   "sha256": "0165973c2de854428ccd2eb05fd4d7e15781684174396a62542064e1fddfe7fb"
+  },
+  {
+   "rel": "brain/scene/run.py",
+   "sha256": "d43ee053536a33a4a28394cc9f0b8fef869d58c1d712e7076a5832d050b21f1c"
+  },
+  {
+   "rel": "brain/scene/slda.py",
+   "sha256": "b19f6ab694ceac03673a552da32aed91ed3448601fb5e0e1d0cb736f266a2910"
+  },
+  {
+   "rel": "brain/scene/world.py",
+   "sha256": "f9ace8314f9dcf15f8f203a4c3f2a2c9d5a3a66afd13c91a3611006fb41acd98"
+  },
+  {
+   "rel": "brain/world/__init__.py",
+   "sha256": "2d2087ec09b343c806f8050a4277f33ef9305791161788ff860a4cd2543cdcc3"
+  },
+  {
+   "rel": "brain/world/build.py",
+   "sha256": "b2128673b373579bdd1104b1c4ea97829d847638c2ac359af655cb8fa9cb9743"
+  },
+  {
+   "rel": "brain/world/canvas.py",
+   "sha256": "5d3bbe1a6263b1aeedb860d07f75a7ccf08c1581224f0104f73c6eaee45ff91d"
+  },
+  {
+   "rel": "brain/world/fonts.py",
+   "sha256": "eee2633075696b8abbd0f45f2ee3d2e55f1c018411f765dde34d1c3e167134d3"
+  },
+  {
+   "rel": "brain/world/glyphs.py",
+   "sha256": "f665002b57219b9a75c9c3afaf3a641e468ada77e24ecfa146ff86c54968831a"
+  },
+  {
+   "rel": "brain/world/organs.py",
+   "sha256": "b69ca6f037f4360c6fb1736fd3d44af4c7075e83edcd93e94b9f100da62a3e1b"
+  },
+  {
+   "rel": "brain/world/seeds.py",
+   "sha256": "c9d217aebc8421a56822a32d4dbec09fad3e53293b8a01565c493d5b57ecfab2"
+  },
+  {
+   "rel": "creature/__init__.py",
+   "sha256": "d9e5c0c79d17a40bc320ad26571ca2b47ea83862af75a1192bded66d5ce41dc0"
+  },
+  {
+   "rel": "creature/tape.py",
+   "sha256": "d790ed98a511d140bf6e6bc0b79caac7512c8afa0346db3f1291d41fac6daec2"
+  },
+  {
+   "rel": "genome/__init__.py",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "rel": "genome/gaze.py",
+   "sha256": "f916a3fead83c4f41d3841d00c5a3837564d4ab0a0d235dea07023c250cbf845"
+  },
+  {
+   "rel": "genome/machinery.py",
+   "sha256": "62e52bd2af74bfbb303d0c5faae503a14b524d80285c88347ad857aa4ee5f78f"
+  },
+  {
+   "rel": "genome/witness.py",
+   "sha256": "39cf216cef979473d39c917743316dde73e5f4e21777558dc2f45e760463d01a"
+  },
+  {
+   "rel": "genome/world.py",
+   "sha256": "bccc580fb11e0d7371e3e48bb8ad0f4bd02228ed3ff52b1369a05d5a69b70bbd"
+  },
+  {
+   "rel": "tools/brain/grade_life.py",
+   "sha256": "557f1bf8f0e7533b58e046ece498dcf89b2d81eeb50fe59acd496f5f0b6ebc11"
+  }
+ ],
+ "modules_digest": "d1710acae1a25b6eb2f68e99dc2b62a04ebdd6fdbc5c0650785e27327f3f80d3",
+ "python": "3.14.4"
+}

@@ -1,0 +1,1 @@
+[inner-bench run] rows 1000 of 1000 eligible · counts {'turns': 1000, 'said': 951, 'skipped': {'backlog': 1, 'no backlog reading': 1}, 'n': 1000, 'chain': 1000} · read-only True (B1 observed +1001 on 1001 body rows with a reading, of 1002 fed) · 6.746 ms/row (load 17.372 s) · plant greedy-count/topic

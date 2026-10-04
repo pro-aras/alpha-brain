@@ -1,0 +1,81 @@
+{
+ "bracketed_resumes": 3,
+ "census": [
+  {
+   "maker_expected": 1,
+   "maker_got": 1,
+   "ok": true,
+   "scene_expected": 249,
+   "scene_got": 249,
+   "scenes": 250,
+   "why": ""
+  }
+ ],
+ "census_files": 1,
+ "controls": {
+  "census": "CAUGHT",
+  "redrawn": "NEW",
+  "reset": "CAUGHT",
+  "seed": "CAUGHT"
+ },
+ "first_maker_row_after_each_resume": [
+  {
+   "expected": 2,
+   "moment": "w0000i000001t000000000",
+   "name_reused": true,
+   "ok": true,
+   "replayed": false,
+   "resume_row": 2722,
+   "resumed_from_seq": 2060,
+   "scene": 2,
+   "seq": 2075,
+   "world_seed": 4145315273
+  },
+  {
+   "expected": 6,
+   "moment": "w0000i000001t000000000",
+   "name_reused": true,
+   "ok": true,
+   "replayed": false,
+   "resume_row": 5945,
+   "resumed_from_seq": 4356,
+   "scene": 6,
+   "seq": 4388,
+   "world_seed": 4145315273
+  },
+  {
+   "expected": 12,
+   "moment": "w0000i000001t000000000",
+   "name_reused": true,
+   "ok": true,
+   "replayed": false,
+   "resume_row": 8607,
+   "resumed_from_seq": 5780,
+   "scene": 12,
+   "seq": 5954,
+   "world_seed": 4145315273
+  }
+ ],
+ "genome_seed": 20261101,
+ "gradable": true,
+ "journal_rows": 9098,
+ "maker_moments": 60,
+ "maker_rows": 75,
+ "maker_rows_after_last_resume": 60,
+ "maker_rows_before_first_resume": 2,
+ "maker_tape_rows": 72,
+ "moment_ids_reused": 12,
+ "relearned_rows": 3,
+ "resume_rows": [
+  2722,
+  5945,
+  8607
+ ],
+ "resumes": 3,
+ "root": "/data/dev/genome-lives/brain-long-3-pre-1",
+ "torn_lines": 0,
+ "verdict": "PASS",
+ "violations": [],
+ "why": "",
+ "world_seed_expected": 4145315273
+}

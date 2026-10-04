@@ -1,0 +1,2 @@
+2026-10-03 17:32:29 +0400 START claims rruns slot 6 pid 862644 avail 14515MB waited 150s cap 5G swap 512M unit slot-claims-rruns-862644
+2026-10-03 17:38:17 +0400 END   claims rruns slot 6 exit 0 cap 5G peak 3904MB swap 0MB

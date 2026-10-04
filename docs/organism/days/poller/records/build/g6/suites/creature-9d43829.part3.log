@@ -1,0 +1,37 @@
+# suite creature on 9d43829ab9f57c9288d4ae8d54c34fe139565ad5 (/data/dev/genome-wt-poller-g1) under /usr/bin/python3, started 2026-10-03 22:37:16 +0400 · memory.peak = the slot scope's running maximum since its creation (exact for this run only if it exceeds every earlier run in the same scope) · PART pattern test_[s-z]*.py
+......maker-arming count: 82 genome files, 107 carry a `WORLD ` line, 81 parsed, 54 non-scene genomes verified byte-for-byte unchanged, 27 scene-only genomes verified to now suppress the maker
+........M5 by kind: {'shape': 130, 'size': 123, 'colour': 147} phrases true of some thing (must be 0): 0
+..fresh equality table (mark, in_file, in_plan, equal): [('DECLINE', 48, 48, True), ('M1', 395, 395, True), ('M2a', 400, 400, True), ('M2b', 56, 56, True), ('M3', 60, 60, True), ('M6', 42, 42, True), ('NAME', 151, 151, True), ('SPEAK', 96, 96, True), ('SPEAK2', 60, 60, True)]
+..............................................................[L-4 toy] corrupted-block: fix=[[12, 5], [12, 4], [11, 4], [11, 5]] truth-cell~(79,25) hit-glances=[0, 1, 2, 3] before=[0.0, 0.0007415330638167461, 9.296274514625225e-07, 0.06408742288282632]/[True, True, True, False] after=[0.08371954193109654, 0.09366498216724184, 0.10785331882211557, 0.09547115212064072]/[False, False, False, False]
+.[L-4 toy] repeated-canvas steady-state residual=[0.0, 0.005646129496512442, 0.15559076280298134, 0.08572088654651866] confirmed=[True, True, False, False]
+.[L-4 toy] confirmed rate: real=0.800 shuffled-expectation=0.469
+....[L-4/L-7 pin] life 3a real tape: 2576 mind rows, replay-deterministic, no residual/confirmed/coarse row anywhere (undeclared genes)
+.............................................................................................................................................................................................................[regime-step] life 2: step100 band 1.6644 (n 462) · step25 band 1.6628 (n 1873)
+.................................................REPLAY identical: 31 mind rows
+.......REPLAY identical: 100 mind rows
+..................[wave3-rules] NULL: 0 rules ever scored under the word-shuffle -- the meeting itself is what the shuffle destroys (a finding, not a bug); nothing to grade against chance
+.[wave3-rules] NULL predictions_filed=0 predictions_scored=0
+.[wave3-rules] REAL predictions_filed=29 predictions_scored=28
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 33, 34, 45, 46, 50, 51]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"square" resonates cluster [0, 18, 57, 58, 70]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 41, 48, 55, 71]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"arrow" resonates cluster [7, 8, 47, 56]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"star" resonates cluster [19, 24, 68, 77]' n=4 correct=4 acc=1.000
+[wave3-rules] REAL rule accuracy: '"square" resonates cluster [0, 5, 18, 57, 58, 70, 100]' n=1 correct=0 acc=0.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 87, 88, 107, 108, 109, 110, 112, 116]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 27, 41, 48, 55, 71, 79, 84, 97]' n=1 correct=1 acc=1.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64, 87, 88, 107, 108, 109, 110, 112, 116, 118]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 27, 41, 48, 55, 71, 79, 84, 97, 134]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"bar" resonates cluster [26, 27, 41, 48, 55, 71, 79, 84, 97, 134, 145]' n=4 correct=3 acc=0.750
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64, 87, 88, 96, 107, 108, 110, 112, 118, 137, 138, 144, 157]' n=3 correct=3 acc=1.000
+[wave3-rules] REAL rule accuracy: '"ring" resonates cluster [30, 31, 33, 34, 45, 46, 50, 51, 64, 87, 88, 96, 107, 108, 110, 112, 118, 137, 138, 144, 157, 169]' n=2 correct=2 acc=1.000
+[wave3-rules] REAL rule accuracy: '"star" resonates cluster [19, 24, 68, 77, 167]' n=1 correct=1 acc=1.000
+.[wave3-rules] zog pending entries at canvas 600: 0
+[wave3-rules] zog: INDUCE never found a k=5-agreeing rule for it on this run (reported, not forced -- see the report for the per-seed reading)
+.......................................................
+----------------------------------------------------------------------
+Ran 421 tests in 413.171s
+
+OK
+# ended 2026-10-03 22:44:10 +0400 exit 0 · memory.peak 10737418240 bytes · cgroup /sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/slot-hears-split-creature-1277647.scope

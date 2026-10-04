@@ -1,0 +1,10 @@
+BASELINE exit 0 failing []
+CAUGHT-BY-NAMED  eps-list-accepts-any-level  (expect test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused; failing 1: ['test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused'])
+CAUGHT-BY-NAMED  eps-list-counts-from-zero  (expect test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one; failing 3: ['test_the_level_tags_match_the_existing_lists', 'test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one', 'test_without_the_incumbent_there_is_no_inc_line_and_two_digit_numbering_reaches_twenty'])
+CAUGHT-BY-NAMED  eps-list-allows-ninety-nine  (expect test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused; failing 1: ['test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused'])
+CAUGHT-BY-NAMED  eps-list-allows-zero  (expect test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused; failing 1: ['test_a_level_outside_the_three_or_a_count_outside_one_to_twenty_is_refused'])
+CAUGHT-BY-NAMED  eps-list-drops-the-incumbent  (expect test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one; failing 2: ['test_the_cli_writes_the_file_and_refuses_to_overwrite_one', 'test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one'])
+CAUGHT-BY-NAMED  level-tag-takes-the-absolute-exponent  (expect test_the_level_tags_match_the_existing_lists; failing 3: ['test_the_level_tags_match_the_existing_lists', 'test_the_list_is_the_incumbent_and_n_twins_of_one_level_numbered_from_one', 'test_without_the_incumbent_there_is_no_inc_line_and_two_digit_numbering_reaches_twenty'])
+CAUGHT-BY-NAMED  cli-overwrites-a-list  (expect test_the_cli_writes_the_file_and_refuses_to_overwrite_one; failing 1: ['test_the_cli_writes_the_file_and_refuses_to_overwrite_one'])
+CAUGHT-BY-NAMED  cli-ignores-the-prefix  (expect test_the_cli_writes_the_file_and_refuses_to_overwrite_one; failing 1: ['test_the_cli_writes_the_file_and_refuses_to_overwrite_one'])
+MUTANTS 8 · caught by the named test 8 · other 0

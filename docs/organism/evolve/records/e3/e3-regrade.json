@@ -1,0 +1,362 @@
+{
+ "c4": true,
+ "graded_rounds": 13,
+ "plant": {
+  "caught": true,
+  "reads": null,
+  "stripped_of": "confirmed"
+ },
+ "rounds": [
+  {
+   "confirmed_share": {
+    "delta": -0.0053,
+    "incumbent": 0.0892,
+    "mutant": 0.0839,
+    "presence_incumbent": {
+     "canvases": 22456,
+     "carrying_confirmed": 22456,
+     "moment_rows": 60342
+    },
+    "presence_mutant": {
+     "canvases": 22456,
+     "carrying_confirmed": 22456,
+     "moment_rows": 60342
+    }
+   },
+   "gene": "DELTA.lr",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "q1_seen: incumbent 0.7545454545454545, mutant 0.7181818181818181 (regressed); confirmed_share: incumbent 0.0892, mutant 0.0839 (regressed)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "q1_seen: incumbent 0.7545454545454545, mutant 0.7181818181818181 (regressed)",
+   "recorded_verdict": "REFUSED",
+   "round": 2,
+   "value": 0.07
+  },
+  {
+   "confirmed_share": {
+    "delta": 0.0,
+    "incumbent": 0.3177,
+    "mutant": 0.3177,
+    "presence_incumbent": {
+     "canvases": 9944,
+     "carrying_confirmed": 9944,
+     "moment_rows": 16820
+    },
+    "presence_mutant": {
+     "canvases": 9944,
+     "carrying_confirmed": 9944,
+     "moment_rows": 16820
+    }
+   },
+   "gene": "BIRTH.misfires",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "no reading cleared its declared margin (no regressions either \u2014 a null mutant)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "no reading cleared its declared margin (no regressions either \u2014 a null mutant)",
+   "recorded_verdict": "REFUSED",
+   "round": 3,
+   "value": 3
+  },
+  {
+   "confirmed_share": {
+    "delta": -0.031,
+    "incumbent": 0.4404,
+    "mutant": 0.4094,
+    "presence_incumbent": {
+     "canvases": 2850,
+     "carrying_confirmed": 2850,
+     "moment_rows": 2850
+    },
+    "presence_mutant": {
+     "canvases": 2850,
+     "carrying_confirmed": 2850,
+     "moment_rows": 2850
+    }
+   },
+   "gene": "DELTA.lr",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "q1_seen: incumbent 0.9636363636363636, mutant 0.9 (regressed); confirmed_share: incumbent 0.4404, mutant 0.4094 (regressed)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "q1_seen: incumbent 0.9636363636363636, mutant 0.9 (regressed)",
+   "recorded_verdict": "REFUSED",
+   "round": 4,
+   "value": 0.09
+  },
+  {
+   "confirmed_share": {
+    "delta": 0.003,
+    "incumbent": 0.4731,
+    "mutant": 0.4761,
+    "presence_incumbent": {
+     "canvases": 2410,
+     "carrying_confirmed": 2410,
+     "moment_rows": 2410
+    },
+    "presence_mutant": {
+     "canvases": 2410,
+     "carrying_confirmed": 2410,
+     "moment_rows": 2410
+    }
+   },
+   "gene": "KWTA.k",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "improved: q1_seen 0.8181818181818182->0.8363636363636363 (+0.01); no regressions; cost_ratio=0.9977190906098039",
+    "verdict": "PASS"
+   },
+   "recorded_reason": "improved: q1_seen 0.8181818181818182->0.8363636363636363 (+0.01); no regressions; cost_ratio=0.9977190906098039",
+   "recorded_verdict": "PASS",
+   "round": 5,
+   "value": 4
+  },
+  {
+   "confirmed_share": {
+    "delta": 0.0,
+    "incumbent": 0.4419,
+    "mutant": 0.4419,
+    "presence_incumbent": {
+     "canvases": 2409,
+     "carrying_confirmed": 2409,
+     "moment_rows": 2409
+    },
+    "presence_mutant": {
+     "canvases": 2409,
+     "carrying_confirmed": 2409,
+     "moment_rows": 2409
+    }
+   },
+   "gene": "BUDGET.per_arrival",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "no reading cleared its declared margin (no regressions either \u2014 a null mutant)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "no reading cleared its declared margin (no regressions either \u2014 a null mutant)",
+   "recorded_verdict": "REFUSED",
+   "round": 6,
+   "value": 305
+  },
+  {
+   "confirmed_share": {
+    "delta": -0.0023,
+    "incumbent": 0.4926,
+    "mutant": 0.4903,
+    "presence_incumbent": {
+     "canvases": 2117,
+     "carrying_confirmed": 2117,
+     "moment_rows": 2117
+    },
+    "presence_mutant": {
+     "canvases": 2117,
+     "carrying_confirmed": 2117,
+     "moment_rows": 2117
+    }
+   },
+   "gene": "SLEEP.every",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "q1_seen: incumbent 0.9727272727272728, mutant 0.9545454545454546 (regressed); confirmed_share: incumbent 0.4926, mutant 0.4903 (regressed)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "q1_seen: incumbent 0.9727272727272728, mutant 0.9545454545454546 (regressed)",
+   "recorded_verdict": "REFUSED",
+   "round": 7,
+   "value": 1414
+  },
+  {
+   "confirmed_share": {
+    "delta": -0.0008,
+    "incumbent": 0.4766,
+    "mutant": 0.4758,
+    "presence_incumbent": {
+     "canvases": 2053,
+     "carrying_confirmed": 2053,
+     "moment_rows": 2053
+    },
+    "presence_mutant": {
+     "canvases": 2053,
+     "carrying_confirmed": 2053,
+     "moment_rows": 2053
+    }
+   },
+   "gene": "SLEEP.replay",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "q1_seen: incumbent 1.0, mutant 0.9818181818181818 (regressed); confirmed_share: incumbent 0.4766, mutant 0.4758 (regressed); frames_filed: incumbent 32, mutant 29 (regressed)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "q1_seen: incumbent 1.0, mutant 0.9818181818181818 (regressed); frames_filed: incumbent 32, mutant 29 (regressed)",
+   "recorded_verdict": "REFUSED",
+   "round": 8,
+   "value": 92
+  },
+  {
+   "confirmed_share": {
+    "delta": 0.0037,
+    "incumbent": 0.4617,
+    "mutant": 0.4654,
+    "presence_incumbent": {
+     "canvases": 2094,
+     "carrying_confirmed": 2094,
+     "moment_rows": 2094
+    },
+    "presence_mutant": {
+     "canvases": 2094,
+     "carrying_confirmed": 2094,
+     "moment_rows": 2094
+    }
+   },
+   "gene": "SLEEP.every",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "no reading cleared its declared margin (no regressions either \u2014 a null mutant)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "no reading cleared its declared margin (no regressions either \u2014 a null mutant)",
+   "recorded_verdict": "REFUSED",
+   "round": 9,
+   "value": 2612
+  },
+  {
+   "confirmed_share": {
+    "delta": 0.003,
+    "incumbent": 0.4283,
+    "mutant": 0.4313,
+    "presence_incumbent": {
+     "canvases": 2083,
+     "carrying_confirmed": 2083,
+     "moment_rows": 2083
+    },
+    "presence_mutant": {
+     "canvases": 2083,
+     "carrying_confirmed": 2083,
+     "moment_rows": 2083
+    }
+   },
+   "gene": "MERGE.theta_m",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "q1_seen: incumbent 0.9090909090909091, mutant 0.8363636363636363 (regressed)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "q1_seen: incumbent 0.9090909090909091, mutant 0.8363636363636363 (regressed)",
+   "recorded_verdict": "REFUSED",
+   "round": 10,
+   "value": 0.9834
+  },
+  {
+   "confirmed_share": {
+    "delta": 0.0028,
+    "incumbent": 0.453,
+    "mutant": 0.4558,
+    "presence_incumbent": {
+     "canvases": 2015,
+     "carrying_confirmed": 2015,
+     "moment_rows": 2015
+    },
+    "presence_mutant": {
+     "canvases": 2015,
+     "carrying_confirmed": 2015,
+     "moment_rows": 2015
+    }
+   },
+   "gene": "SLEEP.replay",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "no reading cleared its declared margin (no regressions either \u2014 a null mutant)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "no reading cleared its declared margin (no regressions either \u2014 a null mutant)",
+   "recorded_verdict": "REFUSED",
+   "round": 11,
+   "value": 255
+  },
+  {
+   "confirmed_share": {
+    "delta": -0.0025,
+    "incumbent": 0.4332,
+    "mutant": 0.4307,
+    "presence_incumbent": {
+     "canvases": 2032,
+     "carrying_confirmed": 2032,
+     "moment_rows": 2032
+    },
+    "presence_mutant": {
+     "canvases": 2032,
+     "carrying_confirmed": 2032,
+     "moment_rows": 2032
+    }
+   },
+   "gene": "MERGE.theta_m",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "confirmed_share: incumbent 0.4332, mutant 0.4307 (regressed); frames_filed: incumbent 30, mutant 28 (regressed)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "frames_filed: incumbent 30, mutant 28 (regressed)",
+   "recorded_verdict": "REFUSED",
+   "round": 12,
+   "value": 0.9947
+  },
+  {
+   "confirmed_share": {
+    "delta": 0.0162,
+    "incumbent": 0.4134,
+    "mutant": 0.4296,
+    "presence_incumbent": {
+     "canvases": 1861,
+     "carrying_confirmed": 1861,
+     "moment_rows": 1861
+    },
+    "presence_mutant": {
+     "canvases": 1861,
+     "carrying_confirmed": 1861,
+     "moment_rows": 1861
+    }
+   },
+   "gene": "KWTA.k",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "q1_seen: incumbent 0.9454545454545454, mutant 0.9272727272727272 (regressed)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "q1_seen: incumbent 0.9454545454545454, mutant 0.9272727272727272 (regressed)",
+   "recorded_verdict": "REFUSED",
+   "round": 13,
+   "value": 10
+  },
+  {
+   "confirmed_share": {
+    "delta": -0.0208,
+    "incumbent": 0.4494,
+    "mutant": 0.4286,
+    "presence_incumbent": {
+     "canvases": 1839,
+     "carrying_confirmed": 1839,
+     "moment_rows": 1839
+    },
+    "presence_mutant": {
+     "canvases": 1839,
+     "carrying_confirmed": 1839,
+     "moment_rows": 1839
+    }
+   },
+   "gene": "DELTA.lr",
+   "legacy_bar_with_confirmed_share": {
+    "changed": false,
+    "reason": "confirmed_share: incumbent 0.4494, mutant 0.4286 (regressed); frames_filed: incumbent 28, mutant 27 (regressed)",
+    "verdict": "REFUSED"
+   },
+   "recorded_reason": "frames_filed: incumbent 28, mutant 27 (regressed)",
+   "recorded_verdict": "REFUSED",
+   "round": 14,
+   "value": 0.07
+  }
+ ]
+}

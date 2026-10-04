@@ -1,0 +1,6 @@
+[journal_diff] PLANTED: one character of kept row 14013 of side b
+JOURNAL DIFF · dropped kinds ['answer', 'brain'] · kept rows a 28026 · b 28026 · verdict DIFFERENT
+  the last organism hash: a 1012f394bf16a066bb028d18d06dc3ad4a535dd98e74347a81d00823650f18f0 · b 1012f394bf16a066bb028d18d06dc3ad4a535dd98e74347a81d00823650f18f0 · equal
+  first difference at kept row 14013 (seq 19229):
+    a {"act": "glance", "births": [["sight", 4873, "novelty"], ["sight", 4874, "novelty"]], "cells": [4734, 78], "confirmed": [false, false, false, false], "edges": [
+    b {"act": "glance", "births": [["sight", 4873, "novelty"], ["sight", 4874, "novelty"]], "cells": [4734, 78], "confirmed": [false, false, false, false], "edges": [

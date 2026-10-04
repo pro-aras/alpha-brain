@@ -1,0 +1,19 @@
+{
+ "live_load_end": {
+  "fields_present": {
+   "mind_backlog_rows": true,
+   "mind_ms_per_canvas_1min": true
+  },
+  "file_mtime_ns": 1791050649869955352,
+  "mind_backlog_rows": 0,
+  "mind_ms_per_canvas_1min": 336.9391,
+  "note": "",
+  "path": "/data/dev/genome-lives/brain-long-3/STATUS.json",
+  "present": true,
+  "read_at": "2026-10-03T22:04:12+0400"
+ },
+ "origin": "/data/dev/brain-runs/resit/brain-long-3/ORIGIN.json",
+ "stamp": "20261003T180231Z",
+ "status": "ORIGIN WRITTEN",
+ "wall_s": 101.429
+}

@@ -11,8 +11,9 @@ mkdir -p "${DEST}"
 # edit: Claude (Fable 5.1), 2026-09-21 20:57 +0400 — the templated seam-life units (creature-g5@, creature-g5-watch@) installed beside the 24 h life's.
 # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:45 +0400 — BRAIN-IN-BODY §5: creature-brain@.service added to the fixed
 # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:14 +0400 — THE LONG LIFE: creature-brain-series@.service/.timer appended to the copy list.
+# edit: Claude (Sonnet 5.5, swarm claims), 2026-10-03 17:53 +0400 — PREREG-RESIT-READER: creature-brain-resit@.service/.timer appended to the copy list (two more names; nothing enabled or started here).
 # copy list (this script's own behaviour for every existing unit here is unchanged — one more name appended, nothing removed).
-for f in creature.service creature-watch.service creature-watch.timer creature-g5@.service creature-g5-watch@.service creature-g5-watch@.timer creature-brain@.service creature-brain-series@.service creature-brain-series@.timer creature-brain-health@.service creature-brain-health@.timer; do
+for f in creature.service creature-watch.service creature-watch.timer creature-g5@.service creature-g5-watch@.service creature-g5-watch@.timer creature-brain@.service creature-brain-series@.service creature-brain-series@.timer creature-brain-health@.service creature-brain-health@.timer creature-brain-resit@.service creature-brain-resit@.timer; do
     cp "${HERE}/${f}" "${DEST}/${f}"
     echo "installed ${DEST}/${f}"
 done

@@ -1,0 +1,5 @@
+G2 SUMMARY: started 1 of 1; recorded 1; the ledger carried canvas_index in 1 of 1 (presence); compared 1; DIFFERING 0
+road before (old format) = ledger on 1 of 1; road after resume+snapshot = snapshot on 1 of 1; ablation (key stripped) -> ledger on 1 of 1; plant reported DIFFERENT on 1 of 1
+every check of a state holds on 1 of 1; wall 3 s
+RESULT: OK
+  ck1           moments 8215 canvas_index 1523 old ledger:1523 new snapshot:1523 resume 0.85s snapshot 1.17s hwm 366.0 MB OK

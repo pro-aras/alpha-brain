@@ -1,0 +1,265 @@
+FEFEEEEEFFFFFFFFFFFFFFEFFEE
+======================================================================
+ERROR: test_an_epoch_after_the_copys_last_seq_is_not_in_force (tests.tools.test_resit_daily.TestDailyGenome.test_an_epoch_after_the_copys_last_seq_is_not_in_force)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 215, in test_an_epoch_after_the_copys_last_seq_is_not_in_force
+    self.assertEqual(rows[0]["genome"]["epoch"], 0)
+                     ~~~~^^^
+IndexError: list index out of range
+
+======================================================================
+ERROR: test_the_grader_genome_is_the_items_genome_and_both_sets_of_hashes_are_printed_v4 (tests.tools.test_resit_daily.TestDailyGenome.test_the_grader_genome_is_the_items_genome_and_both_sets_of_hashes_are_printed_v4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 220, in test_the_grader_genome_is_the_items_genome_and_both_sets_of_hashes_are_printed_v4
+    g = rows[0]["genome"]
+        ~~~~^^^
+IndexError: list index out of range
+
+======================================================================
+ERROR: test_a_day_is_paired_against_the_origin_by_item_and_a_planted_difference_is_read (tests.tools.test_resit_daily.TestDailyPairing.test_a_day_is_paired_against_the_origin_by_item_and_a_planted_difference_is_read)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 247, in test_a_day_is_paired_against_the_origin_by_item_and_a_planted_difference_is_read
+    planted = json.loads(json.dumps(rows[0]["vectors"]))
+                                    ~~~~^^^
+IndexError: list index out of range
+
+======================================================================
+ERROR: test_an_eye_changed_row_is_labelled_its_pairing_is_a_reading_and_no_verdict_copy_is_taken_AM2 (tests.tools.test_resit_daily.TestDailyPairing.test_an_eye_changed_row_is_labelled_its_pairing_is_a_reading_and_no_verdict_copy_is_taken_AM2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 294, in test_an_eye_changed_row_is_labelled_its_pairing_is_a_reading_and_no_verdict_copy_is_taken_AM2
+    planted = dict(rows[0]["genome"]["lines"])
+                   ~~~~^^^
+IndexError: list index out of range
+
+======================================================================
+ERROR: test_post_origin_learned_and_the_restarts_between_the_origin_and_the_copy_are_printed_A3_4 (tests.tools.test_resit_daily.TestDailyPairing.test_post_origin_learned_and_the_restarts_between_the_origin_and_the_copy_are_printed_A3_4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 271, in test_post_origin_learned_and_the_restarts_between_the_origin_and_the_copy_are_printed_A3_4
+    self.write_origin_from(rows[0], fresh_n_learned=11, begin_seq=1003)
+                           ~~~~^^^
+IndexError: list index out of range
+
+======================================================================
+ERROR: test_the_verdict_copy_flag_fires_on_the_first_row_at_8640_and_on_no_other (tests.tools.test_resit_daily.TestDailyPairing.test_the_verdict_copy_flag_fires_on_the_first_row_at_8640_and_on_no_other)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 281, in test_the_verdict_copy_flag_fires_on_the_first_row_at_8640_and_on_no_other
+    self.write_origin_from(rows[0], fresh_n_learned=100)
+                           ~~~~^^^
+IndexError: list index out of range
+
+======================================================================
+ERROR: test_the_nothing_written_check_covers_the_closed_items_root_and_says_it_does_not_cover_a_live_root (tests.tools.test_resit_daily.TestDailyRow.test_the_nothing_written_check_covers_the_closed_items_root_and_says_it_does_not_cover_a_live_root)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 181, in test_the_nothing_written_check_covers_the_closed_items_root_and_says_it_does_not_cover_a_live_root
+    nw = rows[0]["nothing_written"]
+         ~~~~^^^
+IndexError: list index out of range
+
+======================================================================
+ERROR: test_a_half_written_last_line_of_a_live_journal_does_not_stop_the_epoch_and_start_scan (tests.tools.test_resit_daily.TestLiveJournalRead.test_a_half_written_last_line_of_a_live_journal_does_not_stop_the_epoch_and_start_scan)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 420, in test_a_half_written_last_line_of_a_live_journal_does_not_stop_the_epoch_and_start_scan
+    sc = R.scan_life_events(live / "journal")
+         ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'scan_life_events'
+
+======================================================================
+ERROR: test_only_epochs_and_starts_are_kept_a_live_journal_is_not_loaded_into_memory (tests.tools.test_resit_daily.TestLiveJournalRead.test_only_epochs_and_starts_are_kept_a_live_journal_is_not_loaded_into_memory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 429, in test_only_epochs_and_starts_are_kept_a_live_journal_is_not_loaded_into_memory
+    sc = R.scan_life_events(live / "journal")
+         ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'scan_life_events'
+
+======================================================================
+FAIL: test_a_life_whose_eye_differs_from_the_grader_genome_reads_eye_changed_form_ii_and_is_still_written (tests.tools.test_resit_daily.TestDailyGenome.test_a_life_whose_eye_differs_from_the_grader_genome_reads_eye_changed_form_ii_and_is_still_written)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 236, in test_a_life_whose_eye_differs_from_the_grader_genome_reads_eye_changed_form_ii_and_is_still_written
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_genome_in_force_is_the_epoch_at_or_before_the_copys_last_seq_S1 (tests.tools.test_resit_daily.TestDailyGenome.test_the_genome_in_force_is_the_epoch_at_or_before_the_copys_last_seq_S1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 207, in test_the_genome_in_force_is_the_epoch_at_or_before_the_copys_last_seq_S1
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_changed_grader_is_a_refused_row_R4j (tests.tools.test_resit_daily.TestDailyRefusals.test_a_changed_grader_is_a_refused_row_R4j)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 372, in test_a_changed_grader_is_a_refused_row_R4j
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_flipped_byte_in_the_brain_is_a_refused_row_and_exit_0_R4a (tests.tools.test_resit_daily.TestDailyRefusals.test_a_flipped_byte_in_the_brain_is_a_refused_row_and_exit_0_R4a)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 342, in test_a_flipped_byte_in_the_brain_is_a_refused_row_and_exit_0_R4a
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_genome_whose_sha_is_not_the_epoch_rows_is_a_refused_row_R4e (tests.tools.test_resit_daily.TestDailyRefusals.test_a_genome_whose_sha_is_not_the_epoch_rows_is_a_refused_row_R4e)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 352, in test_a_genome_whose_sha_is_not_the_epoch_rows_is_a_refused_row_R4e
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_missing_state_prev_is_a_skipped_row_and_exit_0 (tests.tools.test_resit_daily.TestDailyRefusals.test_a_missing_state_prev_is_a_skipped_row_and_exit_0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 315, in test_a_missing_state_prev_is_a_skipped_row_and_exit_0
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_run_without_dash_B_is_a_refused_row_and_exit_0_in_daily_mode (tests.tools.test_resit_daily.TestDailyRefusals.test_a_run_without_dash_B_is_a_refused_row_and_exit_0_in_daily_mode)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 389, in test_a_run_without_dash_B_is_a_refused_row_and_exit_0_in_daily_mode
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: python was not started with -B (a cold import of tools/brain/grade_life.py would write .pyc files into the life's tree)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_state_whose_prints_do_not_match_is_a_refused_row_and_exit_0_R4b (tests.tools.test_resit_daily.TestDailyRefusals.test_a_state_whose_prints_do_not_match_is_a_refused_row_and_exit_0_R4b)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 327, in test_a_state_whose_prints_do_not_match_is_a_refused_row_and_exit_0_R4b
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_an_item_with_no_phrase_class_cannot_be_binned_the_tape_refuses_a_phrase_of_no_type_R6 (tests.tools.test_resit_daily.TestDailyRefusals.test_an_item_with_no_phrase_class_cannot_be_binned_the_tape_refuses_a_phrase_of_no_type_R6)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 411, in test_an_item_with_no_phrase_class_cannot_be_binned_the_tape_refuses_a_phrase_of_no_type_R6
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_changed_sittings_are_a_refused_row_the_series_is_about_the_pinned_items_R4 (tests.tools.test_resit_daily.TestDailyRefusals.test_changed_sittings_are_a_refused_row_the_series_is_about_the_pinned_items_R4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 383, in test_changed_sittings_are_a_refused_row_the_series_is_about_the_pinned_items_R4
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_genome_v1_with_its_epoch_rows_deleted_is_undetermined_and_a_refused_row_R4f (tests.tools.test_resit_daily.TestDailyRefusals.test_genome_v1_with_its_epoch_rows_deleted_is_undetermined_and_a_refused_row_R4f)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 361, in test_genome_v1_with_its_epoch_rows_deleted_is_undetermined_and_a_refused_row_R4f
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_cpu_cap_is_a_refused_row_and_exit_0 (tests.tools.test_resit_daily.TestDailyRefusals.test_the_cpu_cap_is_a_refused_row_and_exit_0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 396, in test_the_cpu_cap_is_a_refused_row_and_exit_0
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_first_daily_row_with_no_origin_says_so_and_pairs_nothing (tests.tools.test_resit_daily.TestDailyRow.test_a_first_daily_row_with_no_origin_says_so_and_pairs_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 128, in test_a_first_daily_row_with_no_origin_says_so_and_pairs_nothing
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_a_second_day_appends_a_second_line_and_the_md_is_rewritten_from_the_whole_series (tests.tools.test_resit_daily.TestDailyRow.test_a_second_day_appends_a_second_line_and_the_md_is_rewritten_from_the_whole_series)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 172, in test_a_second_day_appends_a_second_line_and_the_md_is_rewritten_from_the_whole_series
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_answers_and_the_grade_are_kept_and_their_sha256_is_in_the_row_A4 (tests.tools.test_resit_daily.TestDailyRow.test_the_answers_and_the_grade_are_kept_and_their_sha256_is_in_the_row_A4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 162, in test_the_answers_and_the_grade_are_kept_and_their_sha256_is_in_the_row_A4
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_copy_is_of_state_prev_and_the_life_is_not_written (tests.tools.test_resit_daily.TestDailyRow.test_the_copy_is_of_state_prev_and_the_life_is_not_written)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 200, in test_the_copy_is_of_state_prev_and_the_life_is_not_written
+    self.assertTrue((self.out / "days" / "20261004T000000Z" / "copy" / "brain.npz").exists())
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_row_carries_the_state_the_items_the_tables_the_partition_and_the_vectors (tests.tools.test_resit_daily.TestDailyRow.test_the_row_carries_the_state_the_items_the_tables_the_partition_and_the_vectors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 141, in test_the_row_carries_the_state_the_items_the_tables_the_partition_and_the_vectors
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+======================================================================
+FAIL: test_the_status_of_the_live_life_is_read_at_the_start_and_the_end_R12 (tests.tools.test_resit_daily.TestDailyRow.test_the_status_of_the_live_life_is_read_at_the_start_and_the_end_R12)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_daily.py", line 190, in test_the_status_of_the_live_life_is_read_at_the_start_and_the_end_R12
+    self.assertEqual(p.returncode, 0, p.stderr + p.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : {"refused": "refused: --mode daily is not built yet (the law builds the gate first; daily and origin follow R1)", "class": "ResitError"}
+
+
+----------------------------------------------------------------------
+Ran 27 tests in 10.172s
+
+FAILED (failures=18, errors=9)

@@ -1,0 +1,642 @@
+# suite tools on 9d43829ab9f57c9288d4ae8d54c34fe139565ad5 (/data/dev/genome-wt-poller-g1) under /usr/bin/python3, started 2026-10-03 22:23:14 +0400 · memory.peak = the slot scope's running maximum since its creation (exact for this run only if it exceeds every earlier run in the same scope)
+...................................................................[evolve/negctl] shadow consumed 445 rows up to seq 445 (T-2.0h checkpoint)
+[evolve/negctl] shadow consumed 112 more rows to the tape's end (seq 557)
+[evolve/negctl] planted_bad (BIRTH.theta_n=0.5): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] planted_bad incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+[evolve/negctl] null (DELTA.lr=0.051): verdict=REFUSED reason=no reading cleared its declared margin (no regressions either — a null mutant)
+[evolve/negctl] null incumbent q1_seen=0.95 mutant q1_seen=0.95 q1_seen_start=0.8
+.........................hands_recognised (taught mind, real circle/square pictures): share=1.000 twin=0.385 n=26 abstained=0
+..hands_recognised (REAL jail + REAL ascii-render road, 50 shelf programs): share=0.100 twin=0.060 n=50 abstained=27
+../data/dev/genome-wt-poller-g1/tools/lives/health.py:202: ResourceWarning: unclosed file <_io.TextIOWrapper name='/proc/meminfo' mode='r' encoding='UTF-8'>
+  mem = {l.split(":")[0]: int(l.split()[1]) for l in open("/proc/meminfo") if l.split(":")[0] in ("MemAvailable", "SwapFree", "SwapTotal")}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/data/dev/genome-wt-poller-g1/tools/lives/health.py:205: ResourceWarning: unclosed file <_io.TextIOWrapper name='/proc/loadavg' mode='r' encoding='UTF-8'>
+  facts["load"] = open("/proc/loadavg").read().split()[:3]
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+# HEALTH of health-watch-qc91n1kw — 2026-10-03 22:25:11 +0400
+
+**No problem seen.**
+
+- unit: active / None, restarts 0, memory None
+- heartbeat 0 s ago · moments 9 · tape rows None · backlog None · None ms a canvas · None MB · cells None · hash None
+- brain: {'learned': None, 'calibrations': None, 'words': None, 'mature': None, 'asks_answered': None, 'restored': None} · scene: None
+- knowledge web: None · error None
+- self claims [state, confirmed, contradicted]: None
+- repairs at starts: 0 · disk free 537.3 GB · memory available 12.9 GB · swap used 3.5 GB · load ['9.89', '10.09', '9.35']
+- the sleep A/B: {'done': False, 'last_tick': '', 'reading': False}
+# HEALTH of health-watch-qc91n1kw — 2026-10-03 22:25:11 +0400
+
+**PROBLEMS:**
+- the unit restarted since the last watch (NRestarts 0 → 2)
+
+- unit: active / None, restarts 2, memory None
+- heartbeat 0 s ago · moments 9 · tape rows None · backlog None · None ms a canvas · None MB · cells None · hash None
+- brain: {'learned': None, 'calibrations': None, 'words': None, 'mature': None, 'asks_answered': None, 'restored': None} · scene: None
+- knowledge web: None · error None
+- self claims [state, confirmed, contradicted]: None
+- repairs at starts: 0 · disk free 537.3 GB · memory available 12.9 GB · swap used 3.5 GB · load ['9.89', '10.09', '9.35']
+- the sleep A/B: {'done': False, 'last_tick': '', 'reading': False}
+..# HEALTH of health-watch-2pr1sc3y — 2026-10-03 22:25:11 +0400
+
+**No problem seen.**
+
+- unit: active / None, restarts 0, memory None
+- heartbeat 0 s ago · moments 9 · tape rows None · backlog None · None ms a canvas · None MB · cells None · hash None
+- brain: {'learned': None, 'calibrations': None, 'words': None, 'mature': None, 'asks_answered': None, 'restored': None} · scene: None
+- knowledge web: None · error None
+- self claims [state, confirmed, contradicted]: None
+- repairs at starts: 0 · disk free 537.3 GB · memory available 12.9 GB · swap used 3.5 GB · load ['9.89', '10.09', '9.35']
+- the sleep A/B: {'done': False, 'last_tick': '', 'reading': False}
+.# HEALTH of health-watch-zbef6_vf — 2026-10-03 22:25:11 +0400
+
+**PROBLEMS:**
+- no motion for 65 minutes (moments 7, last_seq 11, backlog 40): a stuck mind
+- ACTED: no motion → ['systemctl --user restart u.service'] exits [0]
+
+- unit: active / None, restarts 0, memory None
+- heartbeat 0 s ago · moments 7 · tape rows 11 · backlog 40 · None ms a canvas · None MB · cells None · hash None
+- brain: {'learned': None, 'calibrations': None, 'words': None, 'mature': None, 'asks_answered': None, 'restored': None} · scene: None
+- knowledge web: None · error None
+- self claims [state, confirmed, contradicted]: None
+- repairs at starts: 0 · disk free 537.3 GB · memory available 12.9 GB · swap used 3.5 GB · load ['9.89', '10.09', '9.35']
+- the sleep A/B: {'done': False, 'last_tick': '', 'reading': False}
+...............................................HEARS-2 bench reading (PREREG-HEARS-2 §2 + AMENDMENT 1) · OFF = off · ON = on
+  P · the scene words, paired item by item (a READING, no bar). The paired population is the items COVERED and GRADABLE in BOTH arms (M1: two or three things), the grader's own pair rule; the smallest passing gap is 10 / n over THAT n:
+    fresh  M1  n   14 · OFF 0.714 · ON 0.714 · gap +0.000 · smallest passing gap 0.714 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 20 on 20 both 20 (only off 0 / only on 0) · left out of the pair 6 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M3  n   10 · OFF 0.700 · ON 0.700 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 12 on 12 both 12 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M6  n    6 · OFF 0.500 · ON 0.500 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 8 on 8 both 8 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M1  n   10 · OFF 0.600 · ON 0.600 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 13 on 13 both 13 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M3  n    8 · OFF 0.625 · ON 0.625 · gap +0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 9 on 9 both 9 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M6  n    6 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 7 on 7 both 7 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M1  n   24 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.417 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 33 on 33 both 33 (only off 0 / only on 0) · left out of the pair 9 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M3  n   18 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 21 on 21 both 21 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M6  n   12 · OFF 0.583 · ON 0.583 · gap +0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 15 on 15 both 15 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+  P · the rates the grade holds only as rates (no item rows), each beside its own 10 / n:
+    fresh  M1_covered    OFF 0.714 (n 14) · ON 0.714 (n 14) · gap +0.000 · smallest passing gap 0.714
+    fresh  M3_covered    OFF 0.700 (n 10) · ON 0.700 (n 10) · gap +0.000 · smallest passing gap 1.000
+    fresh  M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    fresh  false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    fresh  M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+    s1b1   M1_covered    OFF 0.600 (n 10) · ON 0.600 (n 10) · gap +0.000 · smallest passing gap 1.000
+    s1b1   M3_covered    OFF 0.625 (n 8) · ON 0.625 (n 8) · gap +0.000 · smallest passing gap 1.250
+    s1b1   M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    s1b1   false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    s1b1   M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+  P · the six tests' verdicts, OFF → ON: 1 PASS→PASS · 2a PASS→PASS · 2b FAIL→FAIL · 3 PASS→PASS · 4a PASS→PASS · 5 PASS→PASS · 6 PASS→PASS
+  P · every bar of the grade, OFF → ON (5 read in OFF, 5 in ON; a pass of None is a reading, not a bar), whose pass flag DIFFERS: none
+  P · the discordant items split (A1.5; pooled over both sittings; each cell: paired n, ON-right / OFF-right):
+    M1: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 24 · outside a sitting 0
+    M3: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 18 · outside a sitting 0
+    M6: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 12 · outside a sitting 0
+  T · TRANSFER (a reading, A1.3; the maker-only comparison is struck: STRUCK (A1.3): 0 by construction (the turn precedes the learn; young 3)). The SHARED words' first k maker meetings, agreed / ALL turns, against 1000 dealt-targets draws (the maker's words permuted among the same canvases, says fixed; seed 20261003); SHOWN iff agreed > the null's p95:
+    k = 3: shared words ['star'] · agreed 0 of 3 (silent 0, word typed at the turn 3) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+      miss: star meeting 2 said ['zzz'] typed True
+      miss: star meeting 3 said ['zzz'] typed True
+    k = 1: shared words ['star'] · agreed 0 of 1 (silent 0, word typed at the turn 1) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+    over-extension reading, the maker-only words' first meetings (n 9): what was said {'not_typed': 9} · word typed at the turn 9 · before the first calibration 0
+  G · GROWTH (a reading, A1.4): maker turns 120 · the LAST 100 (n 100): agreed 90 of 100 = 0.900 (agreed / ALL; says 100) · ceiling 1.000 (turns whose word was typed: 100) · floor, always the commonest word «star»: 0.250 · surprise 0.100 · distinct said 5 · prediction «above 0.8»: True
+    every maker word typed at the last calibration said truly at least once: True · bar (meetings 30, first true say at maker turn 21), cup (meetings 30, first true say at maker turn 23), dot (meetings 30, first true say at maker turn 22), star (meetings 30, first true say at maker turn 24)
+    calibrations (at, mature) [(6, 6), (126, 6)] · the last: learned 126 mature 6 · maker words 4: bar 30✓, cup 30✓, dot 30✓, star 30✓
+    maker restarts (AMENDMENT 3 §A3.4: the maker restarts at window 0 after any restart of the body; its arrivals and its first pictures begin again): none in this journal
+    maker window from     0 n  100 say 1.000 agreed/said 0.720 ask 0.000 surprise 0.100 distinct 5
+    maker window from   100 n   20 say 1.000 agreed/said 0.900 ask 0.000 surprise 0.100 distinct 5
+  X · EXIST by any hand: ON exist 1.000 over 10 citations (with a truth 7) · cited by world {'maker': 3, 'scene': 7} · maker citations 3 (the by-any-hand road exercised: True) · carry 0.950 null p95 0.580 · OFF exist 1.000 over 10
+    the planted control (ONE cited moment spoiled, regraded): NOT GIVEN — X is not graded without it
+  C · launch (A1.1): start skew 0.0 s · wall OFF 2000 s ON 2000 s · overlap 1.000 (min 0.9) → ok · loadavg OFF 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · ON 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · PSI cpu OFF some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0| · ON some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0|
+  C · COST, the mind's CPU per canvas ON over OFF (the drive law's canvas = its ear + eye rows; bar ≤ 1.5 on EACH population, A1.2) → PASS:
+    maker        canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 4.000 · median off 4.000 on 4.000 · ratio mean 1.000 median 1.000 → PASS
+    scene_train  canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 5.000 · median off 4.000 on 5.000 · ratio mean 1.250 median 1.250 → PASS
+    all_rows     rows off 10 on 10 · mean cpu_ms off 3.000 on 3.200 · ratio 1.067 → PASS
+    the same ratios with every canvas that carries a CALIBRATION (either arm) left out of both arms (a calibration ≈ 0.3 ms × the scenes learned runs on the canvas that reaches the count; ON reaches each count on another canvas than OFF): calibration rows OFF 1 {'maker': 1} · ON 2 {'other': 2}
+      maker        canvases kept 1 (dropped 1) · ratio mean 1.000 median 1.000 → PASS
+      scene_train  canvases kept 2 (dropped 0) · ratio mean 1.250 median 1.250 → PASS
+      all_rows     rows off 9 on 9 · ratio 1.071 → PASS
+      the verdict of every population is THE SAME as the barred reading
+  I2 · OFF without its turn rows vs the replay under the life's own genome: OFF rows 9 (turn rows dropped 4) → compared 5 vs I1 5 · first difference None → PASS
+  controls (run on THESE inputs): P {"caught": true, "set": "fresh", "mark": "M1", "item": "M1:fresh:000", "before": [0, 0], "after": [0, 1]} · I2 {"caught": true, "planted_changed_the_rows": true}
+  BARS: C PASS · X NOT READ · I2 PASS · controls CAUGHT
+..HEARS-2 bench reading (PREREG-HEARS-2 §2 + AMENDMENT 1) · OFF = off · ON = on
+  P · the scene words, paired item by item (a READING, no bar). The paired population is the items COVERED and GRADABLE in BOTH arms (M1: two or three things), the grader's own pair rule; the smallest passing gap is 10 / n over THAT n:
+    fresh  M1  n   14 · OFF 0.714 · ON 0.714 · gap +0.000 · smallest passing gap 0.714 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 20 on 20 both 20 (only off 0 / only on 0) · left out of the pair 6 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M3  n   10 · OFF 0.700 · ON 0.700 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 12 on 12 both 12 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M6  n    6 · OFF 0.500 · ON 0.500 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 8 on 8 both 8 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M1  n   10 · OFF 0.600 · ON 0.600 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 13 on 13 both 13 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M3  n    8 · OFF 0.625 · ON 0.625 · gap +0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 9 on 9 both 9 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M6  n    6 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 7 on 7 both 7 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M1  n   24 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.417 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 33 on 33 both 33 (only off 0 / only on 0) · left out of the pair 9 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M3  n   18 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 21 on 21 both 21 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M6  n   12 · OFF 0.583 · ON 0.583 · gap +0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 15 on 15 both 15 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+  P · the rates the grade holds only as rates (no item rows), each beside its own 10 / n:
+    fresh  M1_covered    OFF 0.714 (n 14) · ON 0.714 (n 14) · gap +0.000 · smallest passing gap 0.714
+    fresh  M3_covered    OFF 0.700 (n 10) · ON 0.700 (n 10) · gap +0.000 · smallest passing gap 1.000
+    fresh  M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    fresh  false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    fresh  M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+    s1b1   M1_covered    OFF 0.600 (n 10) · ON 0.600 (n 10) · gap +0.000 · smallest passing gap 1.000
+    s1b1   M3_covered    OFF 0.625 (n 8) · ON 0.625 (n 8) · gap +0.000 · smallest passing gap 1.250
+    s1b1   M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    s1b1   false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    s1b1   M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+  P · the six tests' verdicts, OFF → ON: 1 PASS→PASS · 2a PASS→PASS · 2b FAIL→FAIL · 3 PASS→PASS · 4a PASS→PASS · 5 PASS→PASS · 6 PASS→PASS
+  P · every bar of the grade, OFF → ON (6 read in OFF, 6 in ON; a pass of None is a reading, not a bar), whose pass flag DIFFERS: TRUTH-NEED PASS→FAIL (OFF 0.561 n 41 · ON 0.389 n 36 · smallest passing gap 10 / 36 = 0.278 on the smaller n)
+  P · the discordant items split (A1.5; pooled over both sittings; each cell: paired n, ON-right / OFF-right):
+    M1: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 24 · outside a sitting 0
+    M3: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 18 · outside a sitting 0
+    M6: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 12 · outside a sitting 0
+  T · TRANSFER (a reading, A1.3; the maker-only comparison is struck: STRUCK (A1.3): 0 by construction (the turn precedes the learn; young 3)). The SHARED words' first k maker meetings, agreed / ALL turns, against 1000 dealt-targets draws (the maker's words permuted among the same canvases, says fixed; seed 20261003); SHOWN iff agreed > the null's p95:
+    k = 3: shared words ['star'] · agreed 0 of 3 (silent 0, word typed at the turn 3) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+      miss: star meeting 2 said ['zzz'] typed True
+      miss: star meeting 3 said ['zzz'] typed True
+    k = 1: shared words ['star'] · agreed 0 of 1 (silent 0, word typed at the turn 1) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+    over-extension reading, the maker-only words' first meetings (n 9): what was said {'not_typed': 9} · word typed at the turn 9 · before the first calibration 0
+  G · GROWTH (a reading, A1.4): maker turns 120 · the LAST 100 (n 100): agreed 90 of 100 = 0.900 (agreed / ALL; says 100) · ceiling 1.000 (turns whose word was typed: 100) · floor, always the commonest word «star»: 0.250 · surprise 0.100 · distinct said 5 · prediction «above 0.8»: True
+    every maker word typed at the last calibration said truly at least once: True · bar (meetings 30, first true say at maker turn 21), cup (meetings 30, first true say at maker turn 23), dot (meetings 30, first true say at maker turn 22), star (meetings 30, first true say at maker turn 24)
+    calibrations (at, mature) [(6, 6), (126, 6)] · the last: learned 126 mature 6 · maker words 4: bar 30✓, cup 30✓, dot 30✓, star 30✓
+    maker restarts (AMENDMENT 3 §A3.4: the maker restarts at window 0 after any restart of the body; its arrivals and its first pictures begin again): none in this journal
+    maker window from     0 n  100 say 1.000 agreed/said 0.720 ask 0.000 surprise 0.100 distinct 5
+    maker window from   100 n   20 say 1.000 agreed/said 0.900 ask 0.000 surprise 0.100 distinct 5
+  X · EXIST by any hand: ON exist 1.000 over 10 citations (with a truth 7) · cited by world {'maker': 3, 'scene': 7} · maker citations 3 (the by-any-hand road exercised: True) · carry 0.950 null p95 0.580 · OFF exist 1.000 over 10
+    the planted control: exist 0.900 over 10 · caught (< 1): True · exactly one citation spoiled ((n−1)/n): True → X PASS
+  C · launch (A1.1): start skew 5.0 s · wall OFF 2000 s ON 1995 s · overlap 0.998 (min 0.9) → ok · loadavg OFF 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · ON 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · PSI cpu OFF some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0| · ON some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0|
+  C · COST, the mind's CPU per canvas ON over OFF (the drive law's canvas = its ear + eye rows; bar ≤ 1.5 on EACH population, A1.2) → PASS:
+    maker        canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 4.000 · median off 4.000 on 4.000 · ratio mean 1.000 median 1.000 → PASS
+    scene_train  canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 5.000 · median off 4.000 on 5.000 · ratio mean 1.250 median 1.250 → PASS
+    all_rows     rows off 10 on 10 · mean cpu_ms off 3.000 on 3.200 · ratio 1.067 → PASS
+    the same ratios with every canvas that carries a CALIBRATION (either arm) left out of both arms (a calibration ≈ 0.3 ms × the scenes learned runs on the canvas that reaches the count; ON reaches each count on another canvas than OFF): calibration rows OFF 0 {} · ON 2 {'other': 2}
+      maker        canvases kept 2 (dropped 0) · ratio mean 1.000 median 1.000 → PASS
+      scene_train  canvases kept 2 (dropped 0) · ratio mean 1.250 median 1.250 → PASS
+      all_rows     rows off 10 on 10 · ratio 1.067 → PASS
+      the verdict of every population is THE SAME as the barred reading
+  I2 · OFF without its turn rows vs the replay under the life's own genome: OFF rows 8 (turn rows dropped 4) → compared 4 vs I1 4 · first difference None → PASS
+  controls (run on THESE inputs): P {"caught": true, "set": "fresh", "mark": "M1", "item": "M1:fresh:000", "before": [0, 0], "after": [0, 1]} · I2 {"caught": true, "planted_changed_the_rows": true}
+  BARS: C PASS · X PASS · I2 PASS · controls CAUGHT
+..HEARS-2 bench reading (PREREG-HEARS-2 §2 + AMENDMENT 1) · OFF = off · ON = on
+  P · the scene words, paired item by item (a READING, no bar). The paired population is the items COVERED and GRADABLE in BOTH arms (M1: two or three things), the grader's own pair rule; the smallest passing gap is 10 / n over THAT n:
+    fresh  M1  n   14 · OFF 0.714 · ON 0.714 · gap +0.000 · smallest passing gap 0.714 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 20 on 20 both 20 (only off 0 / only on 0) · left out of the pair 6 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M3  n   10 · OFF 0.700 · ON 0.700 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 12 on 12 both 12 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M6  n    6 · OFF 0.500 · ON 0.500 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 8 on 8 both 8 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M1  n   10 · OFF 0.600 · ON 0.600 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 13 on 13 both 13 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M3  n    8 · OFF 0.625 · ON 0.625 · gap +0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 9 on 9 both 9 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M6  n    6 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 7 on 7 both 7 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M1  n   24 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.417 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 33 on 33 both 33 (only off 0 / only on 0) · left out of the pair 9 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M3  n   18 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 21 on 21 both 21 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M6  n   12 · OFF 0.583 · ON 0.583 · gap +0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 15 on 15 both 15 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+  P · the rates the grade holds only as rates (no item rows), each beside its own 10 / n:
+    fresh  M1_covered    OFF 0.714 (n 14) · ON 0.714 (n 14) · gap +0.000 · smallest passing gap 0.714
+    fresh  M3_covered    OFF 0.700 (n 10) · ON 0.700 (n 10) · gap +0.000 · smallest passing gap 1.000
+    fresh  M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    fresh  false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    fresh  M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+    s1b1   M1_covered    OFF 0.600 (n 10) · ON 0.600 (n 10) · gap +0.000 · smallest passing gap 1.000
+    s1b1   M3_covered    OFF 0.625 (n 8) · ON 0.625 (n 8) · gap +0.000 · smallest passing gap 1.250
+    s1b1   M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    s1b1   false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    s1b1   M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+  P · the six tests' verdicts, OFF → ON: 1 PASS→PASS · 2a PASS→PASS · 2b FAIL→FAIL · 3 PASS→PASS · 4a PASS→PASS · 5 PASS→PASS · 6 PASS→PASS
+  P · every bar of the grade, OFF → ON (5 read in OFF, 5 in ON; a pass of None is a reading, not a bar), whose pass flag DIFFERS: none
+  P · the discordant items split (A1.5; pooled over both sittings; each cell: paired n, ON-right / OFF-right):
+    M1: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 24 · outside a sitting 0
+    M3: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 18 · outside a sitting 0
+    M6: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 12 · outside a sitting 0
+  T · TRANSFER (a reading, A1.3; the maker-only comparison is struck: STRUCK (A1.3): 0 by construction (the turn precedes the learn; young 3)). The SHARED words' first k maker meetings, agreed / ALL turns, against 1000 dealt-targets draws (the maker's words permuted among the same canvases, says fixed; seed 20261003); SHOWN iff agreed > the null's p95:
+    k = 3: shared words ['star'] · agreed 0 of 3 (silent 0, word typed at the turn 3) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+      miss: star meeting 2 said ['zzz'] typed True
+      miss: star meeting 3 said ['zzz'] typed True
+    k = 1: shared words ['star'] · agreed 0 of 1 (silent 0, word typed at the turn 1) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+    over-extension reading, the maker-only words' first meetings (n 9): what was said {'not_typed': 9} · word typed at the turn 9 · before the first calibration 0
+  G · GROWTH (a reading, A1.4): maker turns 120 · the LAST 100 (n 100): agreed 90 of 100 = 0.900 (agreed / ALL; says 100) · ceiling 1.000 (turns whose word was typed: 100) · floor, always the commonest word «star»: 0.250 · surprise 0.100 · distinct said 5 · prediction «above 0.8»: True
+    every maker word typed at the last calibration said truly at least once: True · bar (meetings 30, first true say at maker turn 21), cup (meetings 30, first true say at maker turn 23), dot (meetings 30, first true say at maker turn 22), star (meetings 30, first true say at maker turn 24)
+    calibrations (at, mature) [(6, 6), (126, 6)] · the last: learned 126 mature 6 · maker words 4: bar 30✓, cup 30✓, dot 30✓, star 30✓
+    maker restarts (AMENDMENT 3 §A3.4: the maker restarts at window 0 after any restart of the body; its arrivals and its first pictures begin again): none in this journal
+    maker window from     0 n  100 say 1.000 agreed/said 0.720 ask 0.000 surprise 0.100 distinct 5
+    maker window from   100 n   20 say 1.000 agreed/said 0.900 ask 0.000 surprise 0.100 distinct 5
+  X · EXIST by any hand: ON exist 1.000 over 10 citations (with a truth 7) · cited by world {'maker': 3, 'scene': 7} · maker citations 3 (the by-any-hand road exercised: True) · carry 0.950 null p95 0.580 · OFF exist 1.000 over 10
+    the planted control: exist 1.000 over 10 · caught (< 1): False · exactly one citation spoiled ((n−1)/n): False → X FAIL
+  C · launch (A1.1): start skew 5.0 s · wall OFF 2000 s ON 1995 s · overlap 0.998 (min 0.9) → ok · loadavg OFF 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · ON 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · PSI cpu OFF some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0| · ON some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0|
+  C · COST, the mind's CPU per canvas ON over OFF (the drive law's canvas = its ear + eye rows; bar ≤ 1.5 on EACH population, A1.2) → PASS:
+    maker        canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 4.000 · median off 4.000 on 4.000 · ratio mean 1.000 median 1.000 → PASS
+    scene_train  canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 5.000 · median off 4.000 on 5.000 · ratio mean 1.250 median 1.250 → PASS
+    all_rows     rows off 10 on 10 · mean cpu_ms off 3.000 on 3.200 · ratio 1.067 → PASS
+    the same ratios with every canvas that carries a CALIBRATION (either arm) left out of both arms (a calibration ≈ 0.3 ms × the scenes learned runs on the canvas that reaches the count; ON reaches each count on another canvas than OFF): calibration rows OFF 0 {} · ON 2 {'other': 2}
+      maker        canvases kept 2 (dropped 0) · ratio mean 1.000 median 1.000 → PASS
+      scene_train  canvases kept 2 (dropped 0) · ratio mean 1.250 median 1.250 → PASS
+      all_rows     rows off 10 on 10 · ratio 1.067 → PASS
+      the verdict of every population is THE SAME as the barred reading
+  I2 · OFF without its turn rows vs the replay under the life's own genome: OFF rows 8 (turn rows dropped 4) → compared 4 vs I1 4 · first difference None → PASS
+  controls (run on THESE inputs): P {"caught": true, "set": "fresh", "mark": "M1", "item": "M1:fresh:000", "before": [0, 0], "after": [0, 1]} · I2 {"caught": true, "planted_changed_the_rows": true}
+  BARS: C PASS · X FAIL · I2 PASS · controls CAUGHT
+..HEARS-2 bench reading (PREREG-HEARS-2 §2 + AMENDMENT 1) · OFF = off · ON = on
+  P · the scene words, paired item by item (a READING, no bar). The paired population is the items COVERED and GRADABLE in BOTH arms (M1: two or three things), the grader's own pair rule; the smallest passing gap is 10 / n over THAT n:
+    fresh  M1  n   14 · OFF 0.714 · ON 0.714 · gap +0.000 · smallest passing gap 0.714 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 20 on 20 both 20 (only off 0 / only on 0) · left out of the pair 6 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M3  n   10 · OFF 0.700 · ON 0.700 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 12 on 12 both 12 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M6  n    6 · OFF 0.500 · ON 0.500 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 8 on 8 both 8 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M1  n   10 · OFF 0.600 · ON 0.600 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 13 on 13 both 13 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M3  n    8 · OFF 0.625 · ON 0.625 · gap +0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 9 on 9 both 9 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M6  n    6 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 7 on 7 both 7 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M1  n   24 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.417 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 33 on 33 both 33 (only off 0 / only on 0) · left out of the pair 9 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M3  n   18 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 21 on 21 both 21 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M6  n   12 · OFF 0.583 · ON 0.583 · gap +0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 15 on 15 both 15 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+  P · the rates the grade holds only as rates (no item rows), each beside its own 10 / n:
+    fresh  M1_covered    OFF 0.714 (n 14) · ON 0.714 (n 14) · gap +0.000 · smallest passing gap 0.714
+    fresh  M3_covered    OFF 0.700 (n 10) · ON 0.700 (n 10) · gap +0.000 · smallest passing gap 1.000
+    fresh  M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    fresh  false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    fresh  M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+    s1b1   M1_covered    OFF 0.600 (n 10) · ON 0.600 (n 10) · gap +0.000 · smallest passing gap 1.000
+    s1b1   M3_covered    OFF 0.625 (n 8) · ON 0.625 (n 8) · gap +0.000 · smallest passing gap 1.250
+    s1b1   M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    s1b1   false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    s1b1   M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+  P · the six tests' verdicts, OFF → ON: 1 PASS→PASS · 2a PASS→PASS · 2b FAIL→FAIL · 3 PASS→PASS · 4a PASS→PASS · 5 PASS→PASS · 6 PASS→PASS
+  P · every bar of the grade, OFF → ON (5 read in OFF, 5 in ON; a pass of None is a reading, not a bar), whose pass flag DIFFERS: none
+  P · the discordant items split (A1.5; pooled over both sittings; each cell: paired n, ON-right / OFF-right):
+    M1: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 24 · outside a sitting 0
+    M3: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 18 · outside a sitting 0
+    M6: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 12 · outside a sitting 0
+  T · TRANSFER (a reading, A1.3; the maker-only comparison is struck: STRUCK (A1.3): 0 by construction (the turn precedes the learn; young 3)). The SHARED words' first k maker meetings, agreed / ALL turns, against 1000 dealt-targets draws (the maker's words permuted among the same canvases, says fixed; seed 20261003); SHOWN iff agreed > the null's p95:
+    k = 3: shared words ['star'] · agreed 0 of 3 (silent 0, word typed at the turn 3) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+      miss: star meeting 2 said ['zzz'] typed True
+      miss: star meeting 3 said ['zzz'] typed True
+    k = 1: shared words ['star'] · agreed 0 of 1 (silent 0, word typed at the turn 1) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+    over-extension reading, the maker-only words' first meetings (n 9): what was said {'not_typed': 9} · word typed at the turn 9 · before the first calibration 0
+  G · GROWTH (a reading, A1.4): maker turns 120 · the LAST 100 (n 100): agreed 90 of 100 = 0.900 (agreed / ALL; says 100) · ceiling 1.000 (turns whose word was typed: 100) · floor, always the commonest word «star»: 0.250 · surprise 0.100 · distinct said 5 · prediction «above 0.8»: True
+    every maker word typed at the last calibration said truly at least once: True · bar (meetings 30, first true say at maker turn 21), cup (meetings 30, first true say at maker turn 23), dot (meetings 30, first true say at maker turn 22), star (meetings 30, first true say at maker turn 24)
+    calibrations (at, mature) [(6, 6), (126, 6)] · the last: learned 126 mature 6 · maker words 4: bar 30✓, cup 30✓, dot 30✓, star 30✓
+    maker restarts (AMENDMENT 3 §A3.4: the maker restarts at window 0 after any restart of the body; its arrivals and its first pictures begin again): none in this journal
+    maker window from     0 n  100 say 1.000 agreed/said 0.720 ask 0.000 surprise 0.100 distinct 5
+    maker window from   100 n   20 say 1.000 agreed/said 0.900 ask 0.000 surprise 0.100 distinct 5
+  X · EXIST by any hand: ON exist 1.000 over 10 citations (with a truth 7) · cited by world {'maker': 3, 'scene': 7} · maker citations 3 (the by-any-hand road exercised: True) · carry 0.950 null p95 0.580 · OFF exist 1.000 over 10
+    the planted control: exist 0.900 over 10 · caught (< 1): True · exactly one citation spoiled ((n−1)/n): True → X PASS
+  C · launch (A1.1): start skew 500.0 s · wall OFF 2000 s ON 2100 s · overlap 0.714 (min 0.9) → VOID — re-run the pair · loadavg OFF 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · ON 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · PSI cpu OFF some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0| · ON some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0|
+  C · COST, the mind's CPU per canvas ON over OFF (the drive law's canvas = its ear + eye rows; bar ≤ 1.5 on EACH population, A1.2) → VOID:
+    maker        canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 4.000 · median off 4.000 on 4.000 · ratio mean 1.000 median 1.000 → PASS
+    scene_train  canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 5.000 · median off 4.000 on 5.000 · ratio mean 1.250 median 1.250 → PASS
+    all_rows     rows off 10 on 10 · mean cpu_ms off 3.000 on 3.200 · ratio 1.067 → PASS
+    the same ratios with every canvas that carries a CALIBRATION (either arm) left out of both arms (a calibration ≈ 0.3 ms × the scenes learned runs on the canvas that reaches the count; ON reaches each count on another canvas than OFF): calibration rows OFF 0 {} · ON 2 {'other': 2}
+      maker        canvases kept 2 (dropped 0) · ratio mean 1.000 median 1.000 → PASS
+      scene_train  canvases kept 2 (dropped 0) · ratio mean 1.250 median 1.250 → PASS
+      all_rows     rows off 10 on 10 · ratio 1.067 → PASS
+      the verdict of every population is THE SAME as the barred reading
+  I2 · OFF without its turn rows vs the replay under the life's own genome: OFF rows 8 (turn rows dropped 4) → compared 4 vs I1 4 · first difference None → PASS
+  controls (run on THESE inputs): P {"caught": true, "set": "fresh", "mark": "M1", "item": "M1:fresh:000", "before": [0, 0], "after": [0, 1]} · I2 {"caught": true, "planted_changed_the_rows": true}
+  BARS: C VOID · X PASS · I2 PASS · controls CAUGHT
+.HEARS-2 bench reading (PREREG-HEARS-2 §2 + AMENDMENT 1) · OFF = off · ON = on
+  P · the scene words, paired item by item (a READING, no bar). The paired population is the items COVERED and GRADABLE in BOTH arms (M1: two or three things), the grader's own pair rule; the smallest passing gap is 10 / n over THAT n:
+    fresh  M1  n   14 · OFF 0.714 · ON 0.714 · gap +0.000 · smallest passing gap 0.714 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 20 on 20 both 20 (only off 0 / only on 0) · left out of the pair 6 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M3  n   10 · OFF 0.700 · ON 0.700 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 12 on 12 both 12 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M6  n    6 · OFF 0.500 · ON 0.500 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 8 on 8 both 8 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M1  n   10 · OFF 0.600 · ON 0.600 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 13 on 13 both 13 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M3  n    8 · OFF 0.625 · ON 0.625 · gap +0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 9 on 9 both 9 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M6  n    6 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 7 on 7 both 7 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M1  n   24 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.417 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 33 on 33 both 33 (only off 0 / only on 0) · left out of the pair 9 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M3  n   18 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 21 on 21 both 21 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M6  n   12 · OFF 0.583 · ON 0.583 · gap +0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 15 on 15 both 15 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+  P · the rates the grade holds only as rates (no item rows), each beside its own 10 / n:
+    fresh  M1_covered    OFF 0.714 (n 14) · ON 0.714 (n 14) · gap +0.000 · smallest passing gap 0.714
+    fresh  M3_covered    OFF 0.700 (n 10) · ON 0.700 (n 10) · gap +0.000 · smallest passing gap 1.000
+    fresh  M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    fresh  false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    fresh  M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+    s1b1   M1_covered    OFF 0.600 (n 10) · ON 0.600 (n 10) · gap +0.000 · smallest passing gap 1.000
+    s1b1   M3_covered    OFF 0.625 (n 8) · ON 0.625 (n 8) · gap +0.000 · smallest passing gap 1.250
+    s1b1   M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    s1b1   false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    s1b1   M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+  P · the six tests' verdicts, OFF → ON: 1 PASS→PASS · 2a PASS→PASS · 2b FAIL→FAIL · 3 PASS→PASS · 4a PASS→PASS · 5 PASS→PASS · 6 PASS→PASS
+  P · every bar of the grade, OFF → ON (5 read in OFF, 5 in ON; a pass of None is a reading, not a bar), whose pass flag DIFFERS: none
+  P · the discordant items split (A1.5; pooled over both sittings; each cell: paired n, ON-right / OFF-right):
+    M1: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 24 · outside a sitting 0
+    M3: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 18 · outside a sitting 0
+    M6: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 12 · outside a sitting 0
+  T · TRANSFER (a reading, A1.3; the maker-only comparison is struck: STRUCK (A1.3): 0 by construction (the turn precedes the learn; young 3)). The SHARED words' first k maker meetings, agreed / ALL turns, against 1000 dealt-targets draws (the maker's words permuted among the same canvases, says fixed; seed 20261003); SHOWN iff agreed > the null's p95:
+    k = 3: shared words ['star'] · agreed 0 of 3 (silent 0, word typed at the turn 3) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+      miss: star meeting 2 said ['zzz'] typed True
+      miss: star meeting 3 said ['zzz'] typed True
+    k = 1: shared words ['star'] · agreed 0 of 1 (silent 0, word typed at the turn 1) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+    over-extension reading, the maker-only words' first meetings (n 9): what was said {'not_typed': 9} · word typed at the turn 9 · before the first calibration 0
+  G · GROWTH (a reading, A1.4): maker turns 120 · the LAST 100 (n 100): agreed 90 of 100 = 0.900 (agreed / ALL; says 100) · ceiling 1.000 (turns whose word was typed: 100) · floor, always the commonest word «star»: 0.250 · surprise 0.100 · distinct said 5 · prediction «above 0.8»: True
+    every maker word typed at the last calibration said truly at least once: True · bar (meetings 30, first true say at maker turn 21), cup (meetings 30, first true say at maker turn 23), dot (meetings 30, first true say at maker turn 22), star (meetings 30, first true say at maker turn 24)
+    calibrations (at, mature) [(6, 6), (126, 6)] · the last: learned 126 mature 6 · maker words 4: bar 30✓, cup 30✓, dot 30✓, star 30✓
+    maker restarts (AMENDMENT 3 §A3.4: the maker restarts at window 0 after any restart of the body; its arrivals and its first pictures begin again): none in this journal
+    maker window from     0 n  100 say 1.000 agreed/said 0.720 ask 0.000 surprise 0.100 distinct 5
+    maker window from   100 n   20 say 1.000 agreed/said 0.900 ask 0.000 surprise 0.100 distinct 5
+  X · EXIST by any hand: ON exist 1.000 over 10 citations (with a truth 7) · cited by world {'maker': 3, 'scene': 7} · maker citations 3 (the by-any-hand road exercised: True) · carry 0.950 null p95 0.580 · OFF exist 1.000 over 10
+    the planted control: exist 0.900 over 10 · caught (< 1): True · exactly one citation spoiled ((n−1)/n): True → X PASS
+  C · launch (A1.1): start skew 5.0 s · wall OFF 2000 s ON 1995 s · overlap 0.998 (min 0.9) → ok · loadavg OFF 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · ON 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · PSI cpu OFF some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0| · ON some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0|
+  C · COST, the mind's CPU per canvas ON over OFF (the drive law's canvas = its ear + eye rows; bar ≤ 1.5 on EACH population, A1.2) → FAIL:
+    maker        canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 12.000 · median off 4.000 on 12.000 · ratio mean 3.000 median 3.000 → FAIL
+    scene_train  canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 5.000 · median off 4.000 on 5.000 · ratio mean 1.250 median 1.250 → PASS
+    all_rows     rows off 10 on 10 · mean cpu_ms off 3.000 on 4.800 · ratio 1.600 → FAIL
+    the same ratios with every canvas that carries a CALIBRATION (either arm) left out of both arms (a calibration ≈ 0.3 ms × the scenes learned runs on the canvas that reaches the count; ON reaches each count on another canvas than OFF): calibration rows OFF 0 {} · ON 2 {'other': 2}
+      maker        canvases kept 2 (dropped 0) · ratio mean 3.000 median 3.000 → FAIL
+      scene_train  canvases kept 2 (dropped 0) · ratio mean 1.250 median 1.250 → PASS
+      all_rows     rows off 10 on 10 · ratio 1.600 → FAIL
+      the verdict of every population is THE SAME as the barred reading
+  I2 · OFF without its turn rows vs the replay under the life's own genome: OFF rows 8 (turn rows dropped 4) → compared 4 vs I1 4 · first difference None → PASS
+  controls (run on THESE inputs): P {"caught": true, "set": "fresh", "mark": "M1", "item": "M1:fresh:000", "before": [0, 0], "after": [0, 1]} · I2 {"caught": true, "planted_changed_the_rows": true}
+  BARS: C FAIL · X PASS · I2 PASS · controls CAUGHT
+.HEARS-2 bench reading (PREREG-HEARS-2 §2 + AMENDMENT 1) · OFF = off · ON = on
+  P · the scene words, paired item by item (a READING, no bar). The paired population is the items COVERED and GRADABLE in BOTH arms (M1: two or three things), the grader's own pair rule; the smallest passing gap is 10 / n over THAT n:
+    fresh  M1  n   14 · OFF 0.714 · ON 0.714 · gap +0.000 · smallest passing gap 0.714 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 20 on 20 both 20 (only off 0 / only on 0) · left out of the pair 6 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M3  n   10 · OFF 0.700 · ON 0.700 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 12 on 12 both 12 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M6  n    6 · OFF 0.500 · ON 0.500 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 8 on 8 both 8 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M1  n   10 · OFF 0.600 · ON 0.600 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 13 on 13 both 13 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M3  n    8 · OFF 0.625 · ON 0.625 · gap +0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 9 on 9 both 9 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M6  n    6 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 7 on 7 both 7 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M1  n   24 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.417 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 33 on 33 both 33 (only off 0 / only on 0) · left out of the pair 9 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M3  n   18 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 21 on 21 both 21 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M6  n   12 · OFF 0.583 · ON 0.583 · gap +0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 15 on 15 both 15 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+  P · the rates the grade holds only as rates (no item rows), each beside its own 10 / n:
+    fresh  M1_covered    OFF 0.714 (n 14) · ON 0.714 (n 14) · gap +0.000 · smallest passing gap 0.714
+    fresh  M3_covered    OFF 0.700 (n 10) · ON 0.700 (n 10) · gap +0.000 · smallest passing gap 1.000
+    fresh  M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    fresh  false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    fresh  M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+    s1b1   M1_covered    OFF 0.600 (n 10) · ON 0.600 (n 10) · gap +0.000 · smallest passing gap 1.000
+    s1b1   M3_covered    OFF 0.625 (n 8) · ON 0.625 (n 8) · gap +0.000 · smallest passing gap 1.250
+    s1b1   M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    s1b1   false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    s1b1   M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+  P · the six tests' verdicts, OFF → ON: 1 PASS→PASS · 2a PASS→PASS · 2b FAIL→FAIL · 3 PASS→PASS · 4a PASS→PASS · 5 PASS→PASS · 6 PASS→PASS
+  P · every bar of the grade, OFF → ON (5 read in OFF, 5 in ON; a pass of None is a reading, not a bar), whose pass flag DIFFERS: none
+  X · EXIST by any hand: ON exist 1.000 over 10 citations (with a truth 7) · cited by world {'maker': 3, 'scene': 7} · maker citations 3 (the by-any-hand road exercised: True) · carry 0.950 null p95 0.580 · OFF exist 1.000 over 10
+    the planted control (ONE cited moment spoiled, regraded): NOT GIVEN — X is not graded without it
+  controls (run on THESE inputs): P {"caught": true, "set": "fresh", "mark": "M1", "item": "M1:fresh:000", "before": [0, 0], "after": [0, 1]} · I2 not run
+  BARS: C NOT READ · X NOT READ · I2 NOT READ · controls CAUGHT
+.{
+ "item": "M4:star",
+ "line": 0,
+ "lines_changed": 1,
+ "sha256_dst": "526071239fb59987c437d1e36b49cb48aa4d0854dcc74912e6d2ff8881be310c",
+ "sha256_src": "8ceb18c7dc6595ada69d34c1a5fd0da072c38aa637f49e5ff0e43a8b7995e32b",
+ "was": "m1",
+ "word": "star"
+}
+.HEARS-2 bench reading (PREREG-HEARS-2 §2 + AMENDMENT 1) · OFF = off · ON = on
+  P · the scene words, paired item by item (a READING, no bar). The paired population is the items COVERED and GRADABLE in BOTH arms (M1: two or three things), the grader's own pair rule; the smallest passing gap is 10 / n over THAT n:
+    fresh  M1  n   14 · OFF 0.714 · ON 0.714 · gap +0.000 · smallest passing gap 0.714 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 20 on 20 both 20 (only off 0 / only on 0) · left out of the pair 6 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M3  n   10 · OFF 0.700 · ON 0.700 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 12 on 12 both 12 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M6  n    6 · OFF 0.500 · ON 0.500 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 8 on 8 both 8 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M1  n   10 · OFF 0.600 · ON 0.600 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 13 on 13 both 13 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M3  n    8 · OFF 0.625 · ON 0.625 · gap +0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 9 on 9 both 9 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M6  n    6 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 7 on 7 both 7 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M1  n   24 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.417 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 33 on 33 both 33 (only off 0 / only on 0) · left out of the pair 9 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M3  n   18 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 21 on 21 both 21 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M6  n   12 · OFF 0.583 · ON 0.583 · gap +0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 15 on 15 both 15 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+  P · the rates the grade holds only as rates (no item rows), each beside its own 10 / n:
+    fresh  M1_covered    OFF 0.714 (n 14) · ON 0.714 (n 14) · gap +0.000 · smallest passing gap 0.714
+    fresh  M3_covered    OFF 0.700 (n 10) · ON 0.700 (n 10) · gap +0.000 · smallest passing gap 1.000
+    fresh  M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    fresh  false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    fresh  M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+    s1b1   M1_covered    OFF 0.600 (n 10) · ON 0.600 (n 10) · gap +0.000 · smallest passing gap 1.000
+    s1b1   M3_covered    OFF 0.625 (n 8) · ON 0.625 (n 8) · gap +0.000 · smallest passing gap 1.250
+    s1b1   M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    s1b1   false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    s1b1   M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+  P · the six tests' verdicts, OFF → ON: 1 PASS→PASS · 2a PASS→PASS · 2b FAIL→FAIL · 3 PASS→PASS · 4a PASS→PASS · 5 PASS→PASS · 6 PASS→PASS
+  P · every bar of the grade, OFF → ON (5 read in OFF, 5 in ON; a pass of None is a reading, not a bar), whose pass flag DIFFERS: none
+  P · the discordant items split (A1.5; pooled over both sittings; each cell: paired n, ON-right / OFF-right):
+    M1: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 24 · outside a sitting 0
+    M3: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 18 · outside a sitting 0
+    M6: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 12 · outside a sitting 0
+  X · EXIST by any hand: ON exist 1.000 over 10 citations (with a truth 7) · cited by world {'maker': 3, 'scene': 7} · maker citations 3 (the by-any-hand road exercised: True) · carry 0.950 null p95 0.580 · OFF exist 1.000 over 10
+    the planted control (ONE cited moment spoiled, regraded): NOT GIVEN — X is not graded without it
+  controls (run on THESE inputs): P {"caught": true, "set": "fresh", "mark": "M1", "item": "M1:fresh:000", "before": [0, 0], "after": [0, 1]} · I2 not run
+  BARS: C NOT READ · X NOT READ · I2 NOT READ · controls CAUGHT
+.HEARS-2 bench reading (PREREG-HEARS-2 §2 + AMENDMENT 1) · OFF = off · ON = on
+  P · the scene words, paired item by item (a READING, no bar). The paired population is the items COVERED and GRADABLE in BOTH arms (M1: two or three things), the grader's own pair rule; the smallest passing gap is 10 / n over THAT n:
+    fresh  M1  n   14 · OFF 0.714 · ON 0.714 · gap +0.000 · smallest passing gap 0.714 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 20 on 20 both 20 (only off 0 / only on 0) · left out of the pair 6 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M3  n   10 · OFF 0.700 · ON 0.700 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 12 on 12 both 12 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M6  n    6 · OFF 0.500 · ON 0.500 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 8 on 8 both 8 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M1  n   10 · OFF 0.600 · ON 0.600 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 13 on 13 both 13 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M3  n    8 · OFF 0.625 · ON 0.625 · gap +0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 9 on 9 both 9 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M6  n    6 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 7 on 7 both 7 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M1  n   24 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.417 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 33 on 33 both 33 (only off 0 / only on 0) · left out of the pair 9 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M3  n   18 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 21 on 21 both 21 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M6  n   12 · OFF 0.583 · ON 0.583 · gap +0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 15 on 15 both 15 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+  P · the rates the grade holds only as rates (no item rows), each beside its own 10 / n:
+    fresh  M1_covered    OFF 0.714 (n 14) · ON 0.714 (n 14) · gap +0.000 · smallest passing gap 0.714
+    fresh  M3_covered    OFF 0.700 (n 10) · ON 0.700 (n 10) · gap +0.000 · smallest passing gap 1.000
+    fresh  M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    fresh  false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    fresh  M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+    s1b1   M1_covered    OFF 0.600 (n 10) · ON 0.600 (n 10) · gap +0.000 · smallest passing gap 1.000
+    s1b1   M3_covered    OFF 0.625 (n 8) · ON 0.625 (n 8) · gap +0.000 · smallest passing gap 1.250
+    s1b1   M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    s1b1   false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    s1b1   M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+  P · the six tests' verdicts, OFF → ON: 1 PASS→PASS · 2a PASS→PASS · 2b FAIL→FAIL · 3 PASS→PASS · 4a PASS→PASS · 5 PASS→PASS · 6 PASS→PASS
+  P · every bar of the grade, OFF → ON (5 read in OFF, 5 in ON; a pass of None is a reading, not a bar), whose pass flag DIFFERS: none
+  P · the discordant items split (A1.5; pooled over both sittings; each cell: paired n, ON-right / OFF-right):
+    M1: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 24 · outside a sitting 0
+    M3: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 18 · outside a sitting 0
+    M6: by phrase class:  · by third of the sitting: third_1 n 0 (0/0) · third_2 n 0 (0/0) · third_3 n 0 (0/0) · items with no ask on the tape 12 · outside a sitting 0
+  T · TRANSFER (a reading, A1.3; the maker-only comparison is struck: STRUCK (A1.3): 0 by construction (the turn precedes the learn; young 3)). The SHARED words' first k maker meetings, agreed / ALL turns, against 1000 dealt-targets draws (the maker's words permuted among the same canvases, says fixed; seed 20261003); SHOWN iff agreed > the null's p95:
+    k = 3: shared words ['star'] · agreed 0 of 3 (silent 0, word typed at the turn 3) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+      miss: star meeting 2 said ['zzz'] typed True
+      miss: star meeting 3 said ['zzz'] typed True
+    k = 1: shared words ['star'] · agreed 0 of 1 (silent 0, word typed at the turn 1) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+    over-extension reading, the maker-only words' first meetings (n 9): what was said {'not_typed': 9} · word typed at the turn 9 · before the first calibration 0
+  G · GROWTH (a reading, A1.4): maker turns 120 · the LAST 100 (n 100): agreed 90 of 100 = 0.900 (agreed / ALL; says 100) · ceiling 1.000 (turns whose word was typed: 100) · floor, always the commonest word «star»: 0.250 · surprise 0.100 · distinct said 5 · prediction «above 0.8»: True
+    every maker word typed at the last calibration said truly at least once: True · bar (meetings 30, first true say at maker turn 21), cup (meetings 30, first true say at maker turn 23), dot (meetings 30, first true say at maker turn 22), star (meetings 30, first true say at maker turn 24)
+    calibrations (at, mature) [(6, 6), (126, 6)] · the last: learned 126 mature 6 · maker words 4: bar 30✓, cup 30✓, dot 30✓, star 30✓
+    maker restarts (AMENDMENT 3 §A3.4: the maker restarts at window 0 after any restart of the body; its arrivals and its first pictures begin again): none in this journal
+    maker window from     0 n  100 say 1.000 agreed/said 0.720 ask 0.000 surprise 0.100 distinct 5
+    maker window from   100 n   20 say 1.000 agreed/said 0.900 ask 0.000 surprise 0.100 distinct 5
+  X · EXIST by any hand: ON exist 1.000 over 10 citations (with a truth 7) · cited by world {'maker': 3, 'scene': 7} · maker citations 3 (the by-any-hand road exercised: True) · carry 0.950 null p95 0.580 · OFF exist 1.000 over 10
+    the planted control: exist 0.900 over 10 · caught (< 1): True · exactly one citation spoiled ((n−1)/n): True → X PASS
+  C · launch (A1.1): start skew 5.0 s · wall OFF 2000 s ON 1995 s · overlap 0.998 (min 0.9) → ok · loadavg OFF 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · ON 1.00 1.00 1.00 1/100 1 → 1.00 1.00 1.00 1/100 1 · PSI cpu OFF some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0| · ON some avg10=0.00 avg60=0.00 avg300=0.00 total=0| → some avg10=0.00 avg60=0.00 avg300=0.00 total=0|
+  C · COST, the mind's CPU per canvas ON over OFF (the drive law's canvas = its ear + eye rows; bar ≤ 1.5 on EACH population, A1.2) → PASS:
+    maker        canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 4.000 · median off 4.000 on 4.000 · ratio mean 1.000 median 1.000 → PASS
+    scene_train  canvases 2 · timed off 2 (missing 0) on 2 (missing 0) · cpu_ms mean off 4.000 on 5.000 · median off 4.000 on 5.000 · ratio mean 1.250 median 1.250 → PASS
+    all_rows     rows off 10 on 10 · mean cpu_ms off 3.000 on 3.200 · ratio 1.067 → PASS
+    the same ratios with every canvas that carries a CALIBRATION (either arm) left out of both arms (a calibration ≈ 0.3 ms × the scenes learned runs on the canvas that reaches the count; ON reaches each count on another canvas than OFF): calibration rows OFF 0 {} · ON 2 {'other': 2}
+      maker        canvases kept 2 (dropped 0) · ratio mean 1.000 median 1.000 → PASS
+      scene_train  canvases kept 2 (dropped 0) · ratio mean 1.250 median 1.250 → PASS
+      all_rows     rows off 10 on 10 · ratio 1.067 → PASS
+      the verdict of every population is THE SAME as the barred reading
+  I2 · OFF without its turn rows vs the replay under the life's own genome: OFF rows 8 (turn rows dropped 4) → compared 4 vs I1 4 · first difference None → PASS
+  controls (run on THESE inputs): P {"caught": true, "set": "fresh", "mark": "M1", "item": "M1:fresh:000", "before": [0, 0], "after": [0, 1]} · I2 {"caught": true, "planted_changed_the_rows": true}
+  BARS: C PASS · X PASS · I2 PASS · controls CAUGHT
+............................HEARS-2 bench reading (PREREG-HEARS-2 §2 + AMENDMENT 1) · OFF = off · ON = on
+  P · the scene words, paired item by item (a READING, no bar). The paired population is the items COVERED and GRADABLE in BOTH arms (M1: two or three things), the grader's own pair rule; the smallest passing gap is 10 / n over THAT n:
+    fresh  M1  n   14 · OFF 0.714 · ON 0.714 · gap +0.000 · smallest passing gap 0.714 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 20 on 20 both 20 (only off 0 / only on 0) · left out of the pair 6 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M3  n   10 · OFF 0.700 · ON 0.700 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 12 on 12 both 12 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    fresh  M6  n    6 · OFF 0.500 · ON 0.500 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 8 on 8 both 8 (only off 0 / only on 0) · left out of the pair 2 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M1  n   10 · OFF 0.600 · ON 0.600 · gap +0.000 · smallest passing gap 1.000 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 13 on 13 both 13 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M3  n    8 · OFF 0.625 · ON 0.625 · gap +0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 9 on 9 both 9 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    s1b1   M6  n    6 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 1.667 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 7 on 7 both 7 (only off 0 / only on 0) · left out of the pair 1 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M1  n   24 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.417 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 33 on 33 both 33 (only off 0 / only on 0) · left out of the pair 9 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M3  n   18 · OFF 0.667 · ON 0.667 · gap +0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 21 on 21 both 21 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+    pooled M6  n   12 · OFF 0.583 · ON 0.583 · gap +0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · p(ON worse) 1.000 · items off 15 on 15 both 15 (only off 0 / only on 0) · left out of the pair 3 · coverage only-off 0 / only-on 0 · WITHIN NOISE
+  P · the rates the grade holds only as rates (no item rows), each beside its own 10 / n:
+    fresh  M1_covered    OFF 0.714 (n 14) · ON 0.714 (n 14) · gap +0.000 · smallest passing gap 0.714
+    fresh  M3_covered    OFF 0.700 (n 10) · ON 0.700 (n 10) · gap +0.000 · smallest passing gap 1.000
+    fresh  M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    fresh  false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    fresh  M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+    s1b1   M1_covered    OFF 0.600 (n 10) · ON 0.600 (n 10) · gap +0.000 · smallest passing gap 1.000
+    s1b1   M3_covered    OFF 0.625 (n 8) · ON 0.625 (n 8) · gap +0.000 · smallest passing gap 1.250
+    s1b1   M2a_refusal   OFF 0.810 (n 400) · ON 0.810 (n 400) · gap +0.000 · smallest passing gap 0.025
+    s1b1   false_refusal OFF 0.050 (n —) · ON 0.050 (n —) · gap +0.000 · smallest passing gap —
+    s1b1   M2b           OFF 0.700 (n 48) · ON 0.700 (n 48) · gap +0.000 · smallest passing gap 0.208
+  P · the six tests' verdicts, OFF → ON: 1 PASS→PASS · 2a PASS→PASS · 2b FAIL→FAIL · 3 PASS→PASS · 4a PASS→PASS · 5 PASS→PASS · 6 PASS→PASS
+  P · every bar of the grade, OFF → ON (5 read in OFF, 5 in ON; a pass of None is a reading, not a bar), whose pass flag DIFFERS: none
+  T · TRANSFER (a reading, A1.3; the maker-only comparison is struck: STRUCK (A1.3): 0 by construction (the turn precedes the learn; young 3)). The SHARED words' first k maker meetings, agreed / ALL turns, against 1000 dealt-targets draws (the maker's words permuted among the same canvases, says fixed; seed 20261003); SHOWN iff agreed > the null's p95:
+    k = 3: shared words ['star'] · agreed 0 of 3 (silent 0, word typed at the turn 3) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+      miss: star meeting 2 said ['zzz'] typed True
+      miss: star meeting 3 said ['zzz'] typed True
+    k = 1: shared words ['star'] · agreed 0 of 1 (silent 0, word typed at the turn 1) · null p95 0 (max 0, mean 0.000) · pass line 1 → shown False
+      miss: star meeting 1 said ['zzz'] typed True
+    over-extension reading, the maker-only words' first meetings (n 9): what was said {'not_typed': 9} · word typed at the turn 9 · before the first calibration 0
+  G · GROWTH (a reading, A1.4): maker turns 120 · the LAST 100 (n 100): agreed 90 of 100 = 0.900 (agreed / ALL; says 100) · ceiling 1.000 (turns whose word was typed: 100) · floor, always the commonest word «star»: 0.250 · surprise 0.100 · distinct said 5 · prediction «above 0.8»: True
+    every maker word typed at the last calibration said truly at least once: True · bar (meetings 30, first true say at maker turn 21), cup (meetings 30, first true say at maker turn 23), dot (meetings 30, first true say at maker turn 22), star (meetings 30, first true say at maker turn 24)
+    calibrations (at, mature) [(6, 6), (126, 6)] · the last: learned 126 mature 6 · maker words 4: bar 30✓, cup 30✓, dot 30✓, star 30✓
+    maker restarts (AMENDMENT 3 §A3.4: the maker restarts at window 0 after any restart of the body; its arrivals and its first pictures begin again): before maker turn 40 (resumed from seq 5000)
+    maker window from     0 n  100 say 1.000 agreed/said 0.720 ask 0.000 surprise 0.100 distinct 5 · RESTART inside ×1
+    maker window from   100 n   20 say 1.000 agreed/said 0.900 ask 0.000 surprise 0.100 distinct 5
+  X · EXIST by any hand: ON exist 1.000 over 10 citations (with a truth 7) · cited by world {'maker': 3, 'scene': 7} · maker citations 3 (the by-any-hand road exercised: True) · carry 0.950 null p95 0.580 · OFF exist 1.000 over 10
+    the planted control (ONE cited moment spoiled, regraded): NOT GIVEN — X is not graded without it
+  controls (run on THESE inputs): P {"caught": true, "set": "fresh", "mark": "M1", "item": "M1:fresh:000", "before": [0, 0], "after": [0, 1]} · I2 not run
+  BARS: C NOT READ · X NOT READ · I2 NOT READ · controls CAUGHT
+...................................[replay_diff] A: 3 mind rows · B: 3 mind rows · compared 3
+[replay_diff] rows differing ONLY in ignored fields ['hash']: 0 · rows with a non-ignored diff: 1
+[replay_diff] first non-ignored diff (seq, field, A, B): (222, 'readings', "{'a': True}", "{'a': False}")
+[replay_diff] keys present on one side only: []
+[replay_diff] IDENTICAL except ['hash']: False
+.[replay_diff] A: 3 mind rows · B: 1 mind rows · compared 1
+[replay_diff] rows differing ONLY in ignored fields ['hash']: 0 · rows with a non-ignored diff: 0
+[replay_diff] first non-ignored diff (seq, field, A, B): None
+[replay_diff] keys present on one side only: []
+[replay_diff] IDENTICAL except ['hash']: False
+.[replay_diff] A: 3 mind rows · B: 3 mind rows · compared 3
+[replay_diff] rows differing ONLY in ignored fields ['hash']: 0 · rows with a non-ignored diff: 0
+[replay_diff] first non-ignored diff (seq, field, A, B): None
+[replay_diff] keys present on one side only: []
+[replay_diff] IDENTICAL except ['hash']: True
+.......full - blind AUC gap: 0.2973 (a large gap means the folder-hash axis, not kind/size, is doing the separating)
+.smell channel AUC (same-folder-word vs different, by distance): full kind+size+folder = 0.8339 (4365 same / 42606 diff pairs); folder-BLIND kind+size only = 0.5366 (4365 same / 42606 diff pairs)
+.smell_auc: 307/307 folder rows matched (0 unmatched)
+..............   toy L-own-last2  A-share 1.000 of 48 counted picks
+   toy L-own-ema    A-share 1.000 of 48 counted picks
+   toy L-hist-last2 A-share 1.000 of 48 counted picks
+   toy L-hist-ema   A-share 1.000 of 48 counted picks
+   toy C-own-last2  A-share 1.000 of 48 counted picks
+   toy C-own-ema    A-share 1.000 of 48 counted picks
+   toy C-hist-last2 A-share 1.000 of 48 counted picks
+   toy C-hist-ema   A-share 1.000 of 48 counted picks
+   toy LP-OUDEYER   A-share 1.000 of 44 counted picks
+...........sssssssssssssss............s....s.........s...............................sssssss...............................LIFE twin · world seed 20261101 · root /data/dev/genome-wt-poller-g1/scratch/tmp/wordroad-e2e-ttv_vk01/life
+  tape rows 4656 · scene rows {'ear': 123, 'eye': 1524, 'ask': 3009} · training scenes 60
+  asks on the tape 2992 · answers in the journal 3009 {'organs': 3009} · asks without an answer 0 []
+  the one «dax» meeting: seen = None (the life has no training scene 2699 (train 60)); things None; fixations → thing None
+  the pointer: checked 411 · mismatches 207 [('M2b:m2b:20261401:00000', None, 0), ('M2b:m2b:20261401:00001', None, 0), ('M2b:m2b:20261401:00002', None, 0)]
+  THE BARS (S1b-1R's own rules; oracle readings = the scored record at this seed; reading point 10000):
+    M1           {"value": 0.575, "n": 40, "all": 0.5, "p_oracle": 1.0, "pass": false, "underpowered": false}
+    NULL-M1      {"value": 0.575, "n": 20, "bar": 0.6047029702970297, "pass": false, "not_gradable": false, "underpowered": false}
+    NULL-M3      {"value": null, "n": 20, "bar": 0.5887931034482758, "pass": false, "not_gradable": false, "underpowered": false}
+    M2a          {"value": null, "n": 0, "p_oracle": 1.0, "pass": false, "underpowered": true, "ceiling_bound": false, "false_refusal": 0.8}
+    M2b          {"value": 0.9791666666666666, "n": 48, "p_oracle": 0.9791666666666666, "pass": true, "underpowered": false, "ceiling_bound": false}
+    M3           {"value": null, "n": 0, "all": null, "bar": 0.8, "p_oracle": 1.0, "pass": false, "not_gradable": false, "underpowered": true}
+    M6           {"value": null, "n": 0, "all": null, "p_oracle": null, "pass": false, "not_gradable": "no meeting in this stream", "underpowered": false, "ceiling_bound": false}
+    SPOKEN       {"value": 0.27631578947368424, "n": 76, "bar": 0.6947368421052632, "p_oracle": 0.868421052631579, "pass": false, "not_gradable": false, "underpowered": false}
+    TRUTH        {"value": 0.2857142857142857, "n": 21, "bar": 0.8454545454545456, "p_oracle": 0.9393939393939394, "pass": false, "not_gradable": false, "underpowered": true}
+    TRUTH-NEED   {"value": 0.0, "n": 10, "bar": 0.40909090909090906, "p_oracle": 0.45454545454545453, "pass": false, "not_gradable": false, "underpowered": true}
+    MINIMAL      {"value": 1.0, "n": 6, "bar": 0.9, "p_oracle": 1.0, "pass": true, "not_gradable": false, "underpowered": true}
+    ORDER        {"value": null, "n": 0, "bar": 0.95, "p_oracle": 1.0, "pass": false, "not_gradable": "no multi-word phrase spoken", "underpowered": false}
+    READ-BACK    {"value": 0.0, "n": 31, "p_oracle": 1.0, "pass": false, "not_gradable": false, "underpowered": false}
+    DECLINE      {"value": 1.0, "n": 37, "p_oracle": 0.6756756756756757, "pass": null, "not_gradable": false, "underpowered": false}
+    refute       {}
+  SET fresh: items {'M1': 395, 'M2a': 400, 'M5': 400, 'NAME': 151, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48, 'SPEAK2': 60} · read forced {'M1:None→uniform': 64}
+    M1 covered 0.575 (n 40) · over ALL items 0.500 (n 46) · coverage 0.870 · chance 0.537
+    M3 covered n/a (n 0) · over ALL n/a
+    M2a refusal n/a (n 0) · false refusal 0.800
+    M2b 0.979 (n 48) · over ALL 0.979
+  SET s1b1 (READINGS ONLY): items {'M1': 399, 'M2a': 400, 'NAME': 170, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48} · read forced {'M1:None→uniform': 82}
+    M1 covered 0.650 (n 40) · over ALL items 0.491 (n 53) · coverage 0.755 · chance 0.583
+    M3 covered n/a (n 0) · over ALL n/a
+    M2a refusal n/a (n 0) · false refusal 0.925
+    M2b 0.958 (n 48) · over ALL 0.958
+  TEST 6 · M6 POOLED over {'fresh': 42, 's1b1': 42}: covered n/a (n 0 of 84; chance n/a; bar 0.7, n ≥ 30) → NOT GRADABLE — this life holds no «dax» meeting (its training stream ends before it)
+  THE NULL (20 shuffled-utterance draws, the scored record's): M1 0.575 vs p95 0.605 → NOT ABOVE · M3 n/a vs p95 0.589 → NOT ABOVE
+  TEST 4a · EXPLAIN: words asked 13 · explained 6 · «unknown» ['big', 'blue', 'green', 'red', 'small', 'white', 'yellow'] · citations 0 (of episodes with ≥ 2 hypotheses: 0) · EXIST n/a (a wiring pin, bar 1.000) · CARRY n/a (bar 0.90; over the 0 cited with a truth; cited by world {}) · the null's median n/a, p95 n/a → NOT GRADABLE — no citation
+  TEST 4b · RULE: NOT BUILT tonight (PREREG §3)
+  TEST 5 · MISUSE: refused 0.838 (bar 0.90) · named misuse 0.000 (bar 0.80) · n 130 (unheard 270) · valid phrases called misuse 0.000 of 455 (bar ≤ 0.05) · never-heard pairs called misuse 0 of 60 (bar 0) → FAIL
+    by kind: {"shape": {"refused": 0.8384615384615385, "named": 0.0, "n": 130}}
+[grade_life] written /data/dev/genome-wt-poller-g1/scratch/tmp/wordroad-e2e-ttv_vk01/runs/20261101/grade-off/grade.json and /data/dev/genome-wt-poller-g1/scratch/tmp/wordroad-e2e-ttv_vk01/runs/20261101/grade-off/report.txt
+LIFE twin · world seed 20261101 · root /data/dev/genome-wt-poller-g1/scratch/tmp/wordroad-e2e-ttv_vk01/life
+  tape rows 4656 · scene rows {'ear': 123, 'eye': 1524, 'ask': 3009} · training scenes 60
+  asks on the tape 2992 · answers in the journal 3009 {'organs': 3009} · asks without an answer 0 []
+  the one «dax» meeting: seen = None (the life has no training scene 2699 (train 60)); things None; fixations → thing None
+  the pointer: checked 411 · mismatches 207 [('M2b:m2b:20261401:00000', None, 0), ('M2b:m2b:20261401:00001', None, 0), ('M2b:m2b:20261401:00002', None, 0)]
+  THE BARS (S1b-1R's own rules; oracle readings = the scored record at this seed; reading point 10000):
+    M1           {"value": 0.599009900990099, "n": 202, "all": 0.4959016393442623, "p_oracle": 1.0, "pass": false, "underpowered": false}
+    NULL-M1      {"value": 0.599009900990099, "n": 20, "bar": 0.6047029702970297, "pass": false, "not_gradable": false, "underpowered": false}
+    NULL-M3      {"value": 0.5, "n": 20, "bar": 0.5887931034482758, "pass": false, "not_gradable": false, "underpowered": false}
+    M2a          {"value": 0.8975, "n": 400, "p_oracle": 1.0, "pass": false, "underpowered": false, "ceiling_bound": false, "false_refusal": 0.7425742574257426}
+    M2b          {"value": 0.9791666666666666, "n": 48, "p_oracle": 0.9791666666666666, "pass": true, "underpowered": false, "ceiling_bound": false}
+    M3           {"value": 0.5, "n": 58, "all": 0.48333333333333334, "bar": 0.8, "p_oracle": 1.0, "pass": false, "not_gradable": false, "underpowered": false}
+    M6           {"value": null, "n": 0, "all": null, "p_oracle": null, "pass": false, "not_gradable": "no meeting in this stream", "underpowered": false, "ceiling_bound": false}
+    SPOKEN       {"value": 0.17105263157894737, "n": 76, "bar": 0.6947368421052632, "p_oracle": 0.868421052631579, "pass": false, "not_gradable": false, "underpowered": false}
+    TRUTH        {"value": 0.3076923076923077, "n": 13, "bar": 0.8454545454545456, "p_oracle": 0.9393939393939394, "pass": false, "not_gradable": false, "underpowered": true}
+    TRUTH-NEED   {"value": 0.0, "n": 5, "bar": 0.40909090909090906, "p_oracle": 0.45454545454545453, "pass": false, "not_gradable": false, "underpowered": true}
+    MINIMAL      {"value": 1.0, "n": 4, "bar": 0.9, "p_oracle": 1.0, "pass": true, "not_gradable": false, "underpowered": true}
+    ORDER        {"value": null, "n": 0, "bar": 0.95, "p_oracle": 1.0, "pass": false, "not_gradable": "no multi-word phrase spoken", "underpowered": false}
+    READ-BACK    {"value": 0.0, "n": 18, "p_oracle": 1.0, "pass": false, "not_gradable": false, "underpowered": false}
+    DECLINE      {"value": 1.0, "n": 37, "p_oracle": 0.6756756756756757, "pass": null, "not_gradable": false, "underpowered": false}
+    refute       {}
+  SET fresh: items {'M1': 395, 'M2a': 400, 'M5': 400, 'NAME': 151, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48, 'SPEAK2': 60} · read forced {'M1:None→uniform': 310, 'M2a:None→uniform': 359, 'M3:None→uniform': 44}
+    M1 covered 0.599 (n 202) · over ALL items 0.496 (n 244) · coverage 0.828 · chance 0.544
+    M3 covered 0.500 (n 58) · over ALL 0.483
+    M2a refusal 0.897 (n 400) · false refusal 0.743
+    M2b 0.979 (n 48) · over ALL 0.979
+  SET s1b1 (READINGS ONLY): items {'M1': 399, 'M2a': 400, 'NAME': 170, 'M2b': 56, 'M6': 42, 'M3': 60, 'SPEAK': 96, 'DECLINE': 48} · read forced {'M1:None→uniform': 323, 'M2a:None→uniform': 369, 'M3:None→uniform': 52}
+    M1 covered 0.609 (n 192) · over ALL items 0.511 (n 229) · coverage 0.838 · chance 0.544
+    M3 covered 0.508 (n 59) · over ALL 0.500
+    M2a refusal 0.922 (n 400) · false refusal 0.792
+    M2b 0.979 (n 48) · over ALL 0.979
+  TEST 6 · M6 POOLED over {'fresh': 42, 's1b1': 42}: covered n/a (n 0 of 84; chance n/a; bar 0.7, n ≥ 30) → NOT GRADABLE — this life holds no «dax» meeting (its training stream ends before it)
+  THE NULL (20 shuffled-utterance draws, the scored record's): M1 0.599 vs p95 0.605 → NOT ABOVE · M3 0.500 vs p95 0.589 → NOT ABOVE
+  TEST 4a · EXPLAIN: words asked 13 · explained 13 · «unknown» [] · citations 0 (of episodes with ≥ 2 hypotheses: 0) · EXIST n/a (a wiring pin, bar 1.000) · CARRY n/a (bar 0.90; over the 0 cited with a truth; cited by world {}) · the null's median n/a, p95 n/a → NOT GRADABLE — no citation
+  TEST 4b · RULE: NOT BUILT tonight (PREREG §3)
+  TEST 5 · MISUSE: refused 0.828 (bar 0.90) · named misuse 0.000 (bar 0.80) · n 400 (unheard 0) · valid phrases called misuse 0.000 of 455 (bar ≤ 0.05) · never-heard pairs called misuse 0 of 60 (bar 0) → FAIL
+    by kind: {"colour": {"refused": 0.891156462585034, "named": 0.0, "n": 147}, "shape": {"refused": 0.8384615384615385, "named": 0.0, "n": 130}, "size": {"refused": 0.7398373983739838, "named": 0.0, "n": 123}}
+[grade_life] written /data/dev/genome-wt-poller-g1/scratch/tmp/wordroad-e2e-ttv_vk01/runs/20261101/grade-on/grade.json and /data/dev/genome-wt-poller-g1/scratch/tmp/wordroad-e2e-ttv_vk01/runs/20261101/grade-on/report.txt
+..............WORLDS the brain heard: ['maker', 'scene'] · window 20 canvases
+  [scene] turns 60 · learned 60 · hypotheses per canvas {1: 25, 2: 32, 3: 3}
+    from     n   say   agree  ask   surprise  distinct_said
+         0    20  0.000   —    0.200 0.542    0
+        20    20  0.150 0.333  0.950 0.475    2
+        40    20  0.000   —    0.950 0.325    0
+    first meeting (learn order in this world): {'cross': 0, 'small': 1, 'yellow': 1, 'circle': 1, 'star': 2, 'blue': 3, 'ring': 3, 'triangle': 4, 'white': 6, 'square': 8, 'green': 9, 'red': 10, 'big': 17}
+    first agreed say (turn order in this world): {'ring': 39}
+    words said: {'cross': 2, 'ring': 1}
+  [maker] turns 15 · learned 15 · hypotheses per canvas {1: 12, 2: 3}
+    from     n   say   agree  ask   surprise  distinct_said
+         0    15  0.000   —    0.733 0.545    0
+    first meeting (learn order in this world): {'star': 0, 'bar': 1, 'box': 2}
+    first agreed say (turn order in this world): {}
+    words said: {}
+  TRANSFER on the first 3 meetings of each word of another hand (agree = the say is the hand's word):
+    shared     n   3 agreed   0 rate 0.000 words ['star']
+    maker-only n   6 agreed   0 rate 0.000 words ['bar', 'box']
+..
+----------------------------------------------------------------------
+Ran 384 tests in 288.561s
+
+OK (skipped=25)
+# ended 2026-10-03 22:28:04 +0400 exit 0 · memory.peak 1060323328 bytes · cgroup /sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/slot-hears-g6-tools-1292925.scope

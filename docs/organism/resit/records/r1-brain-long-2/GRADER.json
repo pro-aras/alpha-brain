@@ -1,0 +1,7 @@
+{
+ "commit": "d2fe75b1d5dbaf625f4d3bd93676d647a03dde74",
+ "dirty": false,
+ "grade_life_sha256": "557f1bf8f0e7533b58e046ece498dcf89b2d81eeb50fe59acd496f5f0b6ebc11",
+ "grader_code": "/data/dev/genome-wt-claims-grader-d2fe75b",
+ "modules_digest": "d1710acae1a25b6eb2f68e99dc2b62a04ebdd6fdbc5c0650785e27327f3f80d3"
+}

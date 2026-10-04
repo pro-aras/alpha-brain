@@ -1,0 +1,162 @@
+EEEEEEEEEEEEEEEEE
+======================================================================
+ERROR: test_against_the_grader_the_brain_line_is_not_compared_across_lives (tests.tools.test_resit_series.TestEyeChanged.test_against_the_grader_the_brain_line_is_not_compared_across_lives)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 205, in test_against_the_grader_the_brain_line_is_not_compared_across_lives
+    grader = R.grader_line_hashes(LIFE)
+             ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'grader_line_hashes'. Did you mean: 'genome_line_hashes'?
+
+======================================================================
+ERROR: test_against_the_grader_the_eye_the_world_scene_and_the_tape_lines_are_compared_form_ii (tests.tools.test_resit_series.TestEyeChanged.test_against_the_grader_the_eye_the_world_scene_and_the_tape_lines_are_compared_form_ii)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 213, in test_against_the_grader_the_eye_the_world_scene_and_the_tape_lines_are_compared_form_ii
+    grader = R.grader_line_hashes(LIFE)
+             ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'grader_line_hashes'. Did you mean: 'genome_line_hashes'?
+
+======================================================================
+ERROR: test_no_origin_yet_leaves_form_i_undetermined_never_false (tests.tools.test_resit_series.TestEyeChanged.test_no_origin_yet_leaves_form_i_undetermined_never_false)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 224, in test_no_origin_yet_leaves_form_i_undetermined_never_false
+    a = R.grader_line_hashes(LIFE)
+        ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'grader_line_hashes'. Did you mean: 'genome_line_hashes'?
+
+======================================================================
+ERROR: test_within_the_life_any_of_the_four_lines_differing_from_the_origin_is_form_i (tests.tools.test_resit_series.TestEyeChanged.test_within_the_life_any_of_the_four_lines_differing_from_the_origin_is_form_i)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 194, in test_within_the_life_any_of_the_four_lines_differing_from_the_origin_is_form_i
+    a = R.grader_line_hashes(LIFE)
+        ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'grader_line_hashes'. Did you mean: 'genome_line_hashes'?
+
+======================================================================
+ERROR: test_a_comment_or_spacing_change_moves_no_line_hash (tests.tools.test_resit_series.TestGraderLines.test_a_comment_or_spacing_change_moves_no_line_hash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 187, in test_a_comment_or_spacing_change_moves_no_line_hash
+    a = R.grader_line_hashes(LIFE)
+        ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'grader_line_hashes'. Did you mean: 'genome_line_hashes'?
+
+======================================================================
+ERROR: test_the_lines_the_grader_reads_are_hashed_and_the_brain_line_is_a_separate_reading (tests.tools.test_resit_series.TestGraderLines.test_the_lines_the_grader_reads_are_hashed_and_the_brain_line_is_a_separate_reading)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 180, in test_the_lines_the_grader_reads_are_hashed_and_the_brain_line_is_a_separate_reading
+    h = R.grader_line_hashes(LIFE)
+        ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'grader_line_hashes'. Did you mean: 'genome_line_hashes'?
+
+======================================================================
+ERROR: test_a_class_is_mapped_by_item_name_for_the_three_class_marks_only (tests.tools.test_resit_series.TestItemClasses.test_a_class_is_mapped_by_item_name_for_the_three_class_marks_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 52, in test_a_class_is_mapped_by_item_name_for_the_three_class_marks_only
+    m = R.item_class_map(asks_fixture())
+        ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'item_class_map'
+
+======================================================================
+ERROR: test_a_class_that_loses_an_item_breaks_the_partition_and_is_caught_R6 (tests.tools.test_resit_series.TestPartition.test_a_class_that_loses_an_item_breaks_the_partition_and_is_caught_R6)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 126, in test_a_class_that_loses_an_item_breaks_the_partition_and_is_caught_R6
+    rec = R.records_from_grade(g, m2a_fixture(), R.item_class_map(asks_fixture()))
+          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'records_from_grade'
+
+======================================================================
+ERROR: test_a_grade_aggregate_that_disagrees_with_the_items_is_caught (tests.tools.test_resit_series.TestPartition.test_a_grade_aggregate_that_disagrees_with_the_items_is_caught)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 140, in test_a_grade_aggregate_that_disagrees_with_the_items_is_caught
+    rec = R.records_from_grade(g, m2a_fixture(), R.item_class_map(asks_fixture()))
+          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'records_from_grade'
+
+======================================================================
+ERROR: test_the_classes_sum_to_the_grades_own_aggregate_for_every_mark_and_set (tests.tools.test_resit_series.TestPartition.test_the_classes_sum_to_the_grades_own_aggregate_for_every_mark_and_set)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 116, in test_the_classes_sum_to_the_grades_own_aggregate_for_every_mark_and_set
+    rec = R.records_from_grade(grade_fixture(), m2a_fixture(), R.item_class_map(asks_fixture()))
+          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'records_from_grade'
+
+======================================================================
+ERROR: test_an_item_with_no_class_is_refused_by_name_never_binned_R6 (tests.tools.test_resit_series.TestRecords.test_an_item_with_no_class_is_refused_by_name_never_binned_R6)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 74, in test_an_item_with_no_class_is_refused_by_name_never_binned_R6
+    classes = R.item_class_map(asks_fixture())
+              ^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'item_class_map'
+
+======================================================================
+ERROR: test_an_unanswered_m2a_item_is_left_out_not_scored_wrong (tests.tools.test_resit_series.TestRecords.test_an_unanswered_m2a_item_is_left_out_not_scored_wrong)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 84, in test_an_unanswered_m2a_item_is_left_out_not_scored_wrong
+    rec = R.records_from_grade(grade_fixture(), m2, R.item_class_map(asks_fixture()))
+          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'records_from_grade'
+
+======================================================================
+ERROR: test_records_carry_the_class_and_the_graded_population_flags (tests.tools.test_resit_series.TestRecords.test_records_carry_the_class_and_the_graded_population_flags)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 62, in test_records_carry_the_class_and_the_graded_population_flags
+    rec = R.records_from_grade(grade_fixture(), m2a_fixture(), R.item_class_map(asks_fixture()))
+          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'records_from_grade'
+
+======================================================================
+ERROR: test_an_empty_class_reads_na_never_zero (tests.tools.test_resit_series.TestTables.test_an_empty_class_reads_na_never_zero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 107, in test_an_empty_class_reads_na_never_zero
+    t = self.tables()
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 91, in tables
+    return R.class_tables(R.records_from_grade(grade_fixture(), m2a_fixture(), R.item_class_map(asks_fixture())))
+           ^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'class_tables'. Did you mean: 'class_rates'?
+
+======================================================================
+ERROR: test_each_mark_has_a_table_per_set_and_pooled_with_k_n_and_the_smallest_gap (tests.tools.test_resit_series.TestTables.test_each_mark_has_a_table_per_set_and_pooled_with_k_n_and_the_smallest_gap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 94, in test_each_mark_has_a_table_per_set_and_pooled_with_k_n_and_the_smallest_gap
+    t = self.tables()
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 91, in tables
+    return R.class_tables(R.records_from_grade(grade_fixture(), m2a_fixture(), R.item_class_map(asks_fixture())))
+           ^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'class_tables'. Did you mean: 'class_rates'?
+
+======================================================================
+ERROR: test_a_pairing_through_these_vectors_reads_the_planted_fall (tests.tools.test_resit_series.TestVectors.test_a_pairing_through_these_vectors_reads_the_planted_fall)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 162, in test_a_pairing_through_these_vectors_reads_the_planted_fall
+    rec = R.records_from_grade(grade_fixture(), m2a_fixture(), R.item_class_map(asks_fixture()))
+          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'records_from_grade'
+
+======================================================================
+ERROR: test_vectors_are_one_zero_or_none_by_item_name_and_the_class_of_each_item_is_kept (tests.tools.test_resit_series.TestVectors.test_vectors_are_one_zero_or_none_by_item_name_and_the_class_of_each_item_is_kept)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-resit-1003/tests/tools/test_resit_series.py", line 150, in test_vectors_are_one_zero_or_none_by_item_name_and_the_class_of_each_item_is_kept
+    rec = R.records_from_grade(grade_fixture(), m2a_fixture(), R.item_class_map(asks_fixture()))
+          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.resit' has no attribute 'records_from_grade'
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.005s
+
+FAILED (errors=17)

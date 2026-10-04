@@ -4,6 +4,13 @@
 # `--act-file`, and `sense()` publishing `n_actions`/`act_names` on every eye row (so the mind can build its
 # act pool without hardcoding 7) and reading `chosen_by`/`act_seq`/`act_idx` off the worker's OWN manifest
 # (defaulting to "schedule"/None/None -- test_game_door.py's own pin on the pre-L-8 shape, unchanged).
+# edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 16:51 +0400 — the seat's decision 16:4x on the verifier's chain-A ruling (LOAD; a race
+# in THIS test, on master since 0a640f0): the wait stopped at a row COUNT («>= 11 = 2 + 3*3») that Builder C's L-11 (f28a794, a second ear row
+# per manifest) made stale — the door publishes 15 rows for 4 manifests — so a poll landing while rows 11–14 were the newest read «3 != 4» /
+# «2 != 3» (int/logs/inner-creature-141ce30.log, 15:53:18, 2.3 min after the 15:50:57 OOM; reproduced on both shas by delaying every
+# Tape.publish 0.08 s: verify/chainA-141ce30/repro-SUMMARY.txt). Now the poll breaks when the LAST step's rows are present (_last_step_present:
+# eye rows >= 4 and outcome rows >= 3 — the counts the asserts check) and the tape is RE-READ after the settle and the door's stop, so the
+# asserts read the tape, never a poll's snapshot. Every assert byte-identical.
 from __future__ import annotations
 
 import json
@@ -27,6 +34,15 @@ def _tmp() -> Path:
 
 def _game_rows(root: Path):
     return [r for r in read_tape(root) if r["meta"].get("source") == "game"]
+
+
+def _last_step_present(rows) -> bool:
+    """The wait's condition: the LAST step's rows are on the tape — 4 eye rows (one per manifest) and 3 outcome rows (one per step
+    after the reset), the counts the asserts below check. Never a total row count: the door's rows per manifest changed once (L-11)
+    and a count the test does not assert goes stale without any test noticing (the edit of 2026-10-03 above)."""
+    eyes = sum(1 for r in rows if r["sense"] == "eye")
+    outs = sum(1 for r in rows if r["sense"] == "outcome")
+    return eyes >= 4 and outs >= 3
 
 
 class TestMindDrivesActsGate(unittest.TestCase):
@@ -94,11 +110,12 @@ class TestDoorPublishesActFields(unittest.TestCase):
         rows = []
         while time.time() < deadline:
             rows = _game_rows(root)
-            if len(rows) >= 11:   # 4 manifests -> 2 + 3*3
+            if _last_step_present(rows):   # the LAST step's rows (eye >= 4, outcome >= 3), never a row count (edit 2026-10-03)
                 break
             time.sleep(0.1)
         time.sleep(0.3)
         stop_event.set(); t.join(timeout=5.0)
+        rows = _game_rows(root)   # re-read after the settle and the stop: the asserts read the tape, never a poll's snapshot
 
         eyes = [r for r in rows if r["sense"] == "eye"]
         outs = [r for r in rows if r["sense"] == "outcome"]
@@ -157,11 +174,12 @@ class TestDoorPublishesActFields(unittest.TestCase):
             rows = []
             while time.time() < d3:
                 rows = _game_rows(root)
-                if len(rows) >= 11:
+                if _last_step_present(rows):   # the LAST step's rows (eye >= 4, outcome >= 3), never a row count (edit 2026-10-03)
                     break
                 time.sleep(0.1)
             time.sleep(0.3)
             stop_event.set(); t.join(timeout=5.0)
+            rows = _game_rows(root)   # re-read after the settle and the stop: the asserts read the tape, never a poll's snapshot
 
             outs = [r for r in rows if r["sense"] == "outcome"]
             self.assertEqual(len(outs), 3)

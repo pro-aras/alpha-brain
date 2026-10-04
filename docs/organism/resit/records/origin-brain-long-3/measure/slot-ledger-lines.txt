@@ -1,0 +1,2 @@
+1760:2026-10-03 21:46:34 +0400 START claims measure-bl3-copy slot 4 pid 1173828 avail 16756MB waited 150s cap 2G swap 512M unit slot-claims-measure-bl3-copy-1173828
+1763:2026-10-03 21:46:57 +0400 END   claims measure-bl3-copy slot 4 exit 0 cap 2G peak 979MB swap 0MB

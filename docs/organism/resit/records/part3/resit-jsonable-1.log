@@ -1,0 +1,9 @@
+test_the_comparison_can_fail_a_copy_that_leaves_numpy_scalars_is_caught (tests.tools.test_resit_children.TestJsonableParity.test_the_comparison_can_fail_a_copy_that_leaves_numpy_scalars_is_caught) ... ok
+test_the_comparison_can_fail_a_copy_that_reorders_keys_is_caught (tests.tools.test_resit_children.TestJsonableParity.test_the_comparison_can_fail_a_copy_that_reorders_keys_is_caught) ... ok
+test_the_copy_equals_the_minds_own_jsonable_on_every_shape_an_answer_carries (tests.tools.test_resit_children.TestJsonableParity.test_the_copy_equals_the_minds_own_jsonable_on_every_shape_an_answer_carries) ... ok
+test_the_result_is_plain_json_every_case_round_trips_to_itself (tests.tools.test_resit_children.TestJsonableParity.test_the_result_is_plain_json_every_case_round_trips_to_itself) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.119s
+
+OK

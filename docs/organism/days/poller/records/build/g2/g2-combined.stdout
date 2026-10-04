@@ -1,0 +1,8 @@
+G2 over 40 saved states, from the runs' own rows: recorded 40 of 40
+presence: the ledger carried canvas_index in 40 of 40; the ORIGINAL manifest carried it in 0 of 40 (the old-format premise: 0)
+started 40 of 40; read 40; compared 40; DIFFERING 0
+road before (the old reader on the original copy) = ledger on 40 of 40; road after Mind.resume + Mind.snapshot() under the OVERLAY = snapshot on 40 of 40
+the ablated-system guard (the key stripped from the new manifest) fell to the ledger road on 40 of 40; the +1 plant was reported DIFFERENT on 40 of 40
+every check of a state holds on 40 of 40; copies verified file by file (size and mtime_ns): 1026 files, 0 mismatches
+resume 537.1 s + snapshot 660.9 s in all; the largest process HWM 4280.0 MB
+RESULT: OK

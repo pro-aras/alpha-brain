@@ -95,6 +95,36 @@ def canvas_count_of(ledger: dict, fixations: int) -> int:
     return moments // max(1, int(fixations))
 
 
+# edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX (docs/organism/days/PREREG-POLLER-FIX.md §2.1, option A): the two 5-second pollers
+# (voice_loop below, creature/senses/sit.py sense) parsed the WHOLE state/ledger.json (6-13 MB, 150-540 ms holding the GIL, growing with the life) every
+# poll to read ONE integer. Mind.snapshot() now writes that integer into state/SNAPSHOT.json too (< 1 KB, renamed LAST, atomic); this reads it from there.
+def canvas_count_now(state_dir: Path, fixations: int) -> tuple[Optional[int], str]:
+    """The canvases the mind has consumed as of its last snapshot, and the ROAD that said so — `(count | None, road)`:
+    "snapshot": the manifest's own `canvas_index` (state/SNAPSHOT.json), an int and not a bool (the very integer the ledger written in the same call
+        carries). Any OSError or ValueError reading it (missing, unreadable, non-UTF-8, non-JSON) falls through to the next road.
+    "ledger": the OLD road, verbatim — a manifest without the key (every life saved before this change) parses state/ledger.json (`{}` on a torn or
+        unreadable one) and reads `canvas_count_of` of it. NEVER `t // fixations` from the manifest: `t` counts moments (5 a canvas), the over-count M4 removed.
+    "none": no key and no ledger — `(None, "none")`; the callers skip the tick exactly as they always skipped a missing ledger.
+    The manifest is renamed after the ledger, so a poll between the two sees the new ledger and the old manifest: this reader lags by at most one
+    poll and never leads."""
+    state_dir = Path(state_dir)
+    try:
+        manifest = json.loads((state_dir / "SNAPSHOT.json").read_text())
+    except (OSError, ValueError):
+        manifest = None
+    ci = manifest.get("canvas_index") if isinstance(manifest, dict) else None
+    if isinstance(ci, int) and not isinstance(ci, bool):
+        return ci, "snapshot"
+    ledger_path = state_dir / "ledger.json"
+    if ledger_path.exists():
+        try:
+            ledger = json.loads(ledger_path.read_text())
+        except (json.JSONDecodeError, OSError):
+            ledger = {}
+        return canvas_count_of(ledger, fixations), "ledger"
+    return None, "none"
+
+
 def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, poll_period: float = 5.0) -> None:
     """The voice's own exam cadence: every `every_canvases` canvases, read from the latest snapshot's
     own "moments" (state/ledger.json) divided by the genome's fixations-per-canvas -- never a counter the
@@ -114,13 +144,10 @@ def voice_loop(root: Path, genome_path: Path, stop_event, every_canvases: int, p
     genome = parse_genome(Path(genome_path).read_text())
     fixations = int(genome.gaze["fixations"]) if genome.gaze else 1
     while not stop_event.is_set():
-        ledger_path = root / "state" / "ledger.json"
-        if ledger_path.exists():
-            try:
-                ledger = json.loads(ledger_path.read_text())
-            except (json.JSONDecodeError, OSError):
-                ledger = {}
-            canvas_count = canvas_count_of(ledger, fixations)   # M4: the mind's own count when the ledger carries it
+        # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX: the ONE read changed. It was `json.loads(state/ledger.json)` + canvas_count_of every poll;
+        # canvas_count_now reads the snapshot manifest's own canvas_index (the ledger road, the old code verbatim, only for a life saved before the key existed).
+        canvas_count, _road = canvas_count_now(root / "state", fixations)   # M4: the mind's own count (None when there is neither a manifest key nor a ledger: the tick is skipped)
+        if canvas_count is not None:
             if every_canvases > 0 and canvas_count - last_canvas >= every_canvases:
                 last_canvas = canvas_count
                 # edit: Claude (Fable 5.1), 2026-09-23 16:58 +0400 — SIT-ATOMIC-SWEEP-0923 FIX 1: the pointer is written atomically too (tmp + os.replace,

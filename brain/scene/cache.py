@@ -62,7 +62,13 @@ from . import world as W
 # (RUNS = scene-organ-drive): every cache is redrawn there (cache-r) and proven array-identical to the HEAR root's
 # (tools/brain/diag/cache_identity.py <this root> <the HEAR root>). No eye or world line changed: the pin's price, not a new
 # world. World seed 20261104's training split is drawn there for the first time (the gate's never-used world).
-RUNS = Path("/data/dev/brain-runs/scene-organ-drive")
+# edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 15:39 +0400 — PREREG-INNER-1 §2 (the landing, the pinned window): the gene INNER changes
+# genome/machinery.py (one parser branch) and this file, both WORLD_CODE, so check_code refuses every cache under scene-organ-drive;
+# this tree's run root is FRESH again (RUNS = scene-organ-swarm-1003): every cache is redrawn there (cache-r) and proven array-identical
+# to the DRIVE root's (tools/brain/diag/cache_identity.py <this root> <the DRIVE root>, with its planted bit). No eye or world line
+# changed: the pin's price, not a new world. (SLEEP-IDLE's branch was to share this window; it was not verified today.)
+RUNS = Path("/data/dev/brain-runs/scene-organ-swarm-1003")
+DRIVE_RUNS = Path("/data/dev/brain-runs/scene-organ-drive")   # the DRIVE redraw (the pre-INNER code), read as plain files only
 HEAR_RUNS = Path("/data/dev/brain-runs/scene-organ-hear")     # the HEAR redraw (the pre-DRIVE code), read as plain files only
 FM6_RUNS = Path("/data/dev/brain-runs/scene-organ-fm6")       # F-M6's redraw (the pre-HEAR code), read as plain files only
 SCENE_ORGAN_RUNS = Path("/data/dev/brain-runs/scene-organ")   # rung 1's redraw (the pre-F-M6 code), read as plain files only

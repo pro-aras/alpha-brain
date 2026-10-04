@@ -77,6 +77,7 @@ FEATS = 144
 STATE_VERSION = 2
 READS_VERSIONS = (1, 2)
 SOURCES = ("lived", "prenatal", "implanted-episode", "implanted-knowledge", "inherited")
+SCENE_WORLD = "scene"          # PREREG-HEARS-2 §1: the hand every scene came from until another world was heard
 
 
 class BrainError(Exception):
@@ -84,6 +85,12 @@ class BrainError(Exception):
 
 
 # ------------------------------------------------------------------------------------------------ small pieces
+def world_seed_of(seed: int, world: str) -> int:
+    """PREREG-HEARS-2 §1: the seed of a hand whose rows carry none (every world but the scene world) — the first 4 bytes of
+    sha256("<genome SEED>:<world>"), so the brain's substreams for that hand are its own and a function of the genome alone."""
+    return int.from_bytes(hashlib.sha256(f"{int(seed)}:{str(world)}".encode("utf-8")).digest()[:4], "big")
+
+
 def tie_rng(test_seed: int, item: str) -> np.random.Generator:
     """The item's own tie generator — the grader's `marks.tie_rng` (pinned equal in the tests), without importing the graders."""
     return substream(int(test_seed), f"tie:{item}")
@@ -210,6 +217,15 @@ class Brain:
         self.segments: List[Dict[str, object]] = []
         self.author: Optional[str] = None
         self._run: Optional[Tuple[str, Optional[str]]] = None
+        # edit: Claude (Fable 5.1, the seat), 2026-09-30 10:2x +0400 — PREREG-HEARS-2 §1: per scene learned, the WORLD (the hand) it came from,
+        # index-aligned with `moments`; SCENE_WORLD unless learn() names another. Saved only when another hand was heard (a
+        # scene-only brain's file is what it was); never in the hash of what was LEARNED (state_hash, the version-1 form).
+        self.worlds: List[str] = []
+        # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:30 +0400 — PREREG-INNER-1 §2 «the scene»: a DERIVED index, per heard word the learn
+        # orders of the scenes that carried it (scenes_with), built lazily from `seen` and extended as scenes are learned; never saved
+        # (a load rebuilds it from the store it indexes), never in any hash.
+        self._by_word: Dict[str, List[int]] = {}
+        self._by_word_n: int = 0
 
     # -- the source of every memory, and the census (PREREG-METADATA-1) ------------------------
     def begin_run(self, source: str, author: Optional[str]) -> None:
@@ -249,19 +265,33 @@ class Brain:
         for w in L.words:
             j = L.index[w]
             by: Dict[str, int] = {}
+            by_world: Dict[str, int] = {}          # PREREG-HEARS-2 §1: the same meetings counted by the hand that named the thing
             for t in L.store_t[j]:
                 src = str(self.source_of(int(t) - 1)["source"])
                 by[src] = by.get(src, 0) + 1
+                wd = self.world_of(int(t) - 1)
+                by_world[wd] = by_world.get(wd, 0) + 1
             words[w] = {"meetings": int(L.meetings[j]), "episodes_by_source": dict(sorted(by.items())),
-                        "mature": w in mature, "kind": kinds.get(w)}
+                        "meetings_by_world": dict(sorted(by_world.items())), "mature": w in mature, "kind": kinds.get(w)}
             if by and not by.get("lived"):
                 given_only.append(w)
         scenes_by: Dict[str, int] = {}
         for s in self.segments:
             scenes_by[str(s["source"])] = scenes_by.get(str(s["source"]), 0) + int(s["end"]) - int(s["start"])
-        return _plain({"scenes": self.n_learned, "scenes_by_source": scenes_by, "n_words": len(L.words), "words": words,
-                       "given_only_words": given_only, "calibrations": self.n_calibrations,
-                       "runs": [dict(s) for s in self.segments]})
+        scenes_by_world: Dict[str, int] = {}
+        for order in range(self.n_learned):
+            wd = self.world_of(order)
+            scenes_by_world[wd] = scenes_by_world.get(wd, 0) + 1
+        return _plain({"scenes": self.n_learned, "scenes_by_source": scenes_by, "scenes_by_world": dict(sorted(scenes_by_world.items())),
+                       "n_words": len(L.words), "words": words, "given_only_words": given_only,
+                       "calibrations": self.n_calibrations, "runs": [dict(s) for s in self.segments]})
+
+    def world_of(self, order: int) -> str:
+        """The hand the scene at `order` (0-based learn order) came from; SCENE_WORLD for a brain that never heard another, and for
+        a scene appended past the tag list (a surgery that writes `seen` by hand names no hand: it is the scene's)."""
+        if int(order) >= len(self.worlds):
+            return SCENE_WORLD
+        return str(self.worlds[int(order)])
 
     # -- the mind's questions ------------------------------------------------------------------
     def hears(self, source: Optional[str]) -> bool:
@@ -277,9 +307,15 @@ class Brain:
 
     # -- learning ------------------------------------------------------------------------------
     def learn(self, glance: Dict[str, object], words: Sequence[str], *, moment: str, scene: int,
-              world_seed: int) -> Dict[str, object]:
+              world_seed: int, world: Optional[str] = None) -> Dict[str, object]:
+        # edit: Claude (Fable 5.1, the seat), 2026-09-30 10:2x +0400 — PREREG-HEARS-2 §1: `world` names the hand (the tape row's source); None or
+        # SCENE_WORLD is the scene hand and leaves the state as it was. `scene` and `world_seed` are the mind's to derive for a
+        # hand whose rows carry none (creature/mind.py:_brain_canvas).
         hyps, X = things_in_view(glance)
         words = [str(w) for w in words]
+        world = SCENE_WORLD if world is None else str(world)
+        if not world or world.strip() != world:
+            raise BrainError(f"learn: a world is a bare name, got {world!r}")
         none: Optional[bool] = None
         if self.n_calibrations > 0 and X.shape[0] > 0:     # T-MEM-2's hook: active from the first reading point on
             hn = H.heard_none(self.road(), X, words, substream(int(world_seed), f"tmem2-none:{int(scene)}"))
@@ -290,6 +326,7 @@ class Brain:
         order = len(self.moments)
         self.moments.append(str(moment))
         self.scenes.append(int(scene))
+        self.worlds.append(world)
         fix_l = [[int(y), int(x)] for y, x in glance["fix"]]
         hyps_l = [[int(m) for m in h.members] for h in hyps]
         self.canvas.append([fix_l, hyps_l])
@@ -450,6 +487,10 @@ class Brain:
         cited = [{"moment": self.moments[int(e[0])], "scene": self.scenes[int(e[0])], "hyp": int(e[1]), "pos": [e[2], e[3]],
                   "fix": [list(c) for c in self.canvas[int(e[0])][0]], "hyps": [list(m) for m in self.canvas[int(e[0])][1]]}
                  for e in eps_]
+        for c, e in zip(cited, eps_):           # PREREG-HEARS-2 §1: a memory of another hand names its world; a scene memory carries no new key
+            wd = self.world_of(int(e[0]))
+            if wd != SCENE_WORLD:
+                c["world"] = wd
         band = None
         if self.n_calibrations:
             wst = self.L.reader["ear"]["word"].get(word)
@@ -473,10 +514,22 @@ class Brain:
         Before the first calibration, or with nothing in view, the turn ends with its `reason` and says and asks nothing."""
         if says not in (0, 1) or asks not in (0, 1):
             raise BrainError(f"turn: says and asks each take 0 or 1, got says {says!r} asks {asks!r}")
+        # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:30 +0400 — PREREG-INNER-1 §2 «the re-seeing» (AMENDMENT 1 A1–A8 folded; the law
+        # research-1003 @ 9c589b2, the signed text sha256 857e07b2…faa82): the turn's arithmetic moves VERBATIM into _turn_core over
+        # (X, fix, members, pos) so a REMEMBERED scene — the store's own X, canvas and the members' mean cell — takes the same turn
+        # (turn_remembered). This wrapper computes the four from the glance exactly as the turn did; the parity test
+        # (tests/genome/test_brain_remembered.py) pins turn(glance) == turn_remembered(order) right after a learn.
         hyps, X = things_in_view(glance)
-        n = int(X.shape[0])
         fix = [[int(y), int(x)] for y, x in glance["fix"]]
         members = [[int(m) for m in h.members] for h in hyps]
+        pos = [[float(h.pos[0]), float(h.pos[1])] for h in hyps]
+        return self._turn_core(X, fix, members, pos, scene=scene, world_seed=world_seed, says=says, asks=asks)
+
+    def _turn_core(self, X: np.ndarray, fix: List[List[int]], members: List[List[int]], pos: List[List[float]], *, scene: int,
+                   world_seed: int, says: int, asks: int) -> Dict[str, object]:
+        """THE TURN's arithmetic (PREREG-BRAIN-DRIVES §2.2), verbatim, over the learner's input X (one row per hypothesis), the
+        located fixations, each hypothesis's member indices and its position. READ-ONLY."""
+        n = int(X.shape[0])
         cells = [[list(fix[m]) for m in ms] for ms in members]
         order = sorted(range(n), key=lambda h: (-len(members[h]), h))
         out: Dict[str, object] = {"scene": int(scene), "n_hyp": n, "order": order, "members": members, "held": [], "expected": [],
@@ -496,16 +549,54 @@ class Brain:
                 a = Lr.produce_believed(road, X, h, lambda h=h: substream(int(world_seed), f"turn-say:{int(scene)}:{h}"))
                 if a.get("spoken"):
                     m = a.get("margin")
-                    out["say"] = {"hyp": int(h), "fix": cells[h], "pos": [float(hyps[h].pos[0]), float(hyps[h].pos[1])],
+                    out["say"] = {"hyp": int(h), "fix": cells[h], "pos": [float(pos[h][0]), float(pos[h][1])],
                                   "words": [str(w) for w in a["spoken"]], "readback": int(a["readback_point"]),
                                   "margin": (float(m) if m is not None and math.isfinite(float(m)) else None)}
                     break
         if asks:
             for h in order:
                 if not out["held"][h]:
-                    out["ask"] = {"hyp": int(h), "fix": cells[h], "pos": [float(hyps[h].pos[0]), float(hyps[h].pos[1])]}
+                    out["ask"] = {"hyp": int(h), "fix": cells[h], "pos": [float(pos[h][0]), float(pos[h][1])]}
                     break
         return out
+
+    # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 11:30 +0400 — PREREG-INNER-1 §2 «the re-seeing» + «the scene»: the inner turn's two reads
+    # of the store. Both READ-ONLY (pinned by the state hash in tests/genome/test_brain_remembered.py).
+    def turn_remembered(self, order: int, *, world_seed: int, says: int = 1, asks: int = 1) -> Dict[str, object]:
+        """The turn on a REMEMBERED scene: the store's own X (`seen[o][0]`), its canvas (`canvas[o]` = [fix, members]) and each
+        hypothesis's position recomputed as the members' mean cell (brain/scene/eye.py:hypotheses's own arithmetic), under the
+        scene's own index (`scenes[o]`) and the world seed the caller supplies (the mind's, as _brain_canvas supplies it), so
+        the tie substreams are the original turn's. Beside the turn's keys: `learned` (the order), `moment`, `world` and
+        `heard` (the words heard then — Brain.surprise's second argument)."""
+        if says not in (0, 1) or asks not in (0, 1):
+            raise BrainError(f"turn_remembered: says and asks each take 0 or 1, got says {says!r} asks {asks!r}")
+        o = int(order)
+        if not 0 <= o < self.n_learned:
+            raise BrainError(f"turn_remembered: no learned scene at order {o} (the brain holds {self.n_learned})")
+        X, heard, _ = self.seen[o]
+        fix_s, members_s = self.canvas[o]
+        fix = [[int(y), int(x)] for y, x in fix_s]
+        members = [[int(m) for m in ms] for ms in members_s]
+        pos = [[float(np.mean([fix[i][0] for i in ms])), float(np.mean([fix[i][1] for i in ms]))] for ms in members]
+        out = self._turn_core(np.asarray(X, dtype=np.float64), fix, members, pos, scene=int(self.scenes[o]),
+                              world_seed=int(world_seed), says=int(says), asks=int(asks))
+        out["learned"] = o
+        out["moment"] = str(self.moments[o])
+        out["world"] = self.world_of(o)
+        out["heard"] = [str(w) for w in heard]
+        return out
+
+    def scenes_with(self, word: str) -> List[int]:
+        """The learn orders (ascending) of every scene whose heard words carry `word` — the population the inner turn draws its
+        remembered scene from. A derived index over `seen`, extended as scenes are learned; a load rebuilds it."""
+        n = self.n_learned
+        if self._by_word_n > n:                  # the store shrank (a surgery): rebuild from nothing
+            self._by_word, self._by_word_n = {}, 0
+        for o in range(self._by_word_n, n):
+            for w in dict.fromkeys(str(x) for x in self.seen[o][1]):
+                self._by_word.setdefault(w, []).append(o)
+        self._by_word_n = n
+        return list(self._by_word.get(str(word), []))
 
     @staticmethod
     def surprise(turn: Dict[str, object], words: Sequence[str]) -> Optional[float]:
@@ -539,6 +630,10 @@ class Brain:
                           "calibrated_at": self.calibrated_at}}
         if version >= 2:
             meta["brain"]["segments"] = [dict(s) for s in self.segments]
+            # PREREG-HEARS-2 §1: the worlds are saved only when another hand was heard, so a scene-only brain's file is what it was;
+            # they are metadata, like the runs, never in the version-1 form the hash of what was LEARNED is taken over
+            if any(w != SCENE_WORLD for w in self.worlds):
+                meta["brain"]["worlds"] = list(self.worlds)
         return meta, enc.arrays()
 
     def state_hash(self) -> str:
@@ -624,6 +719,13 @@ class Brain:
         covered = sum(int(s["end"]) - int(s["start"]) for s in b.segments)
         if covered != b.n_learned:
             raise BrainError(f"load: the runs cover {covered} scenes, the brain learned {b.n_learned}")
+        # PREREG-HEARS-2 §1: a state without the tag is a brain of one hand; a tag list must cover every scene learned
+        if "worlds" in bb:
+            b.worlds = [str(w) for w in bb["worlds"]]
+            if len(b.worlds) != b.n_learned:
+                raise BrainError(f"load: the worlds tag {len(b.worlds)} scenes, the brain learned {b.n_learned}")
+        else:
+            b.worlds = [SCENE_WORLD] * b.n_learned
         return b
 
 

@@ -1,0 +1,15 @@
+{
+ "check_turn": null,
+ "code": "/data/dev/genome-lives/brain-long-2/code",
+ "glance_cache": "/data/dev/brain-runs/resit-gate/bl2/glances.pkl",
+ "items_root": "/data/dev/genome-lives/brain-long-2",
+ "out_dir": "/data/dev/brain-runs/resit-gate/bl2/gate/r1",
+ "states": [
+  {
+   "dir": "/data/dev/brain-runs/resit-gate/bl2/gate/r1/copy",
+   "genome": "/data/dev/genome-lives/brain-long-2/GENOME.genome",
+   "name": "*"
+  }
+ ],
+ "tape_decl": "run/tape"
+}

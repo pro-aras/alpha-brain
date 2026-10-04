@@ -1,0 +1,4 @@
+genome: slot exit 0 ; suite exit 0 ; Ran 713 tests in 189.392s OK (skipped=1, expected failures=6) 
+tools: slot exit 0 ; suite exit 0 ; Ran 384 tests in 288.561s OK (skipped=25) 
+scene: slot exit 0 ; suite exit 0 ; Ran 368 tests in 127.499s OK 
+brain: slot exit 0 ; suite exit 0 ; Ran 770 tests in 415.890s OK (skipped=3) 

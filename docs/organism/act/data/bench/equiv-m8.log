@@ -1,0 +1,1 @@
+[equiv] {"steps": 20077, "mismatches": 0, "changed": 7622, "per_level": {"BabyAI-GoToLocal-v0": {"steps": 10057, "mismatches": 0, "changed": 4099}, "BabyAI-OpenRedDoor-v0": {"steps": 10020, "mismatches": 0, "changed": 3523}}, "pass": true}

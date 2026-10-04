@@ -1,0 +1,4 @@
+# PREREG-EVOLVE-CAL AMENDMENT 3, Stage A0 (3 twins, full S1): the incumbent, and one twin at epsilon 1e-3 and one at 1e-2. label<TAB>variant<TAB>rows-limit
+inc	incumbent	-
+eps1e-3-k01	eps:0.001:1	-
+eps1e-2-k01	eps:0.01:1	-

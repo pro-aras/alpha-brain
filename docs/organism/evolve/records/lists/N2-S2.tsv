@@ -1,0 +1,8 @@
+# AMENDMENT 3 A3.6 (4): N2 on S2 (cp8, seq 202026..208101): the incumbent + 6 seed twins (7 twins, 6.9 CPU-h), run only for the dimensions that have a band
+s2-inc	incumbent	-
+s2-seed01	seed:1	-
+s2-seed02	seed:2	-
+s2-seed03	seed:3	-
+s2-seed04	seed:4	-
+s2-seed05	seed:5	-
+s2-seed06	seed:6	-

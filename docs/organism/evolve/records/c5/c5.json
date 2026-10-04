@@ -1,0 +1,151 @@
+{
+ "draws": 150,
+ "raw_collisions": 11,
+ "redrawn_collisions": 0,
+ "redraws": [
+  {
+   "epoch": 1,
+   "proposal_no": 3,
+   "raw": [
+    "BIRTH.misfires",
+    3
+   ],
+   "taken": [
+    "PRUNE.floor",
+    0.06
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 1,
+   "proposal_no": 19,
+   "raw": [
+    "BIRTH.misfires",
+    3
+   ],
+   "taken": [
+    "THINK.every",
+    2
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 1,
+   "proposal_no": 29,
+   "raw": [
+    "BIRTH.misfires",
+    3
+   ],
+   "taken": [
+    "DELTA.lr",
+    0.19
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 2,
+   "proposal_no": 27,
+   "raw": [
+    "DELTA.lr",
+    0.05
+   ],
+   "taken": [
+    "SLEEP.every",
+    4330
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 2,
+   "proposal_no": 41,
+   "raw": [
+    "THINK.every",
+    10
+   ],
+   "taken": [
+    "CURIOSITY.interests",
+    148
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 3,
+   "proposal_no": 2,
+   "raw": [
+    "KWTA.k",
+    4
+   ],
+   "taken": [
+    "SLEEP.replay",
+    146
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 3,
+   "proposal_no": 3,
+   "raw": [
+    "ABSTAIN.ratio",
+    0.85
+   ],
+   "taken": [
+    "SCALE.every",
+    4007
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 3,
+   "proposal_no": 18,
+   "raw": [
+    "PRUNE.chances",
+    3
+   ],
+   "taken": [
+    "PRUNE.floor",
+    0.01
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 3,
+   "proposal_no": 35,
+   "raw": [
+    "BIRTH.misfires",
+    3
+   ],
+   "taken": [
+    "ABSTAIN.ratio",
+    0.54
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 3,
+   "proposal_no": 37,
+   "raw": [
+    "PARK.after",
+    3
+   ],
+   "taken": [
+    "BIRTH.theta_n",
+    0.87
+   ],
+   "draws": 2
+  },
+  {
+   "epoch": 3,
+   "proposal_no": 45,
+   "raw": [
+    "ABSTAIN.ratio",
+    0.85
+   ],
+   "taken": [
+    "BIRTH.theta_n",
+    0.876
+   ],
+   "draws": 2
+  }
+ ],
+ "c5": true
+}

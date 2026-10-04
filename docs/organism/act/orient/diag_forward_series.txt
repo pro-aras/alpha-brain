@@ -1,0 +1,5 @@
+forward known outcomes 13844, change rate 0.568
+lag-1 autocorrelation of forward's effect: 0.304 (iid: 0)
+window 20, live iff >= 4: windows judged DEAD in the real series 0.0096 (n = 13787) vs iid binomial at p = 0.568: 0.00015 -> x62.9
+window 10, live iff >= 3: windows judged DEAD in the real series 0.0825 (n = 13817) vs iid binomial at p = 0.568: 0.02096 -> x3.9
+runs of consecutive blocked forwards: n 2365, mean 2.53, max 21, share >= 6: 0.086, share >= 10: 0.018; iid geometric P(run >= 6) = 0.0151, P(>= 10) = 0.00053

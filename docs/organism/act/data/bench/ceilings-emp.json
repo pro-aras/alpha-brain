@@ -1,0 +1,71 @@
+{
+ "series": "docs/organism/act/data/world-series-fixed-policies.json",
+ "lives": 600,
+ "acts": 4920,
+ "rows": [
+  {
+   "lives": 600,
+   "acts": 4920,
+   "block": 1,
+   "forward_dead_time": 0.0038896103896103886,
+   "forward_dead_time_sd_over_lives": 0.018231061476054557,
+   "forward_share": 0.31216987179487177,
+   "noop_share": 0.05919800569800569,
+   "m2_pass_4920": 0.9616666666666667,
+   "m2_pass_960": 0.9866666666666667,
+   "m3_pass": 1.0,
+   "m4a_pass": 0.9966666666666667,
+   "m4b_pass": 0.9783333333333334,
+   "m4b_median": 1.0,
+   "kind": "iid at forward 0.568"
+  },
+  {
+   "lives": 600,
+   "acts": 4920,
+   "block": 50,
+   "forward_dead_time": 0.15663888888888886,
+   "forward_dead_time_sd_over_lives": 0.12043683993822185,
+   "forward_share": 0.2664241452991453,
+   "noop_share": 0.060750000000000005,
+   "m2_pass_4920": 0.215,
+   "m2_pass_960": 0.7483333333333333,
+   "m3_pass": 1.0,
+   "m4a_pass": 0.9966666666666667,
+   "m4b_pass": 0.7083333333333334,
+   "m4b_median": 1.0,
+   "kind": "block bootstrap, block 50 (forward + no-ops from the recorded series)"
+  },
+  {
+   "lives": 600,
+   "acts": 4920,
+   "block": 100,
+   "forward_dead_time": 0.16290331890331888,
+   "forward_dead_time_sd_over_lives": 0.12075709541138294,
+   "forward_share": 0.2649145299145299,
+   "noop_share": 0.06068340455840456,
+   "m2_pass_4920": 0.17666666666666667,
+   "m2_pass_960": 0.7466666666666667,
+   "m3_pass": 1.0,
+   "m4a_pass": 0.9933333333333333,
+   "m4b_pass": 0.6833333333333333,
+   "m4b_median": 1.0,
+   "kind": "block bootstrap, block 100 (forward + no-ops from the recorded series)"
+  },
+  {
+   "lives": 600,
+   "acts": 4920,
+   "block": 200,
+   "forward_dead_time": 0.16306926406926409,
+   "forward_dead_time_sd_over_lives": 0.1116452774012078,
+   "forward_share": 0.26460363247863244,
+   "noop_share": 0.06089565527065526,
+   "m2_pass_4920": 0.16333333333333333,
+   "m2_pass_960": 0.7283333333333334,
+   "m3_pass": 1.0,
+   "m4a_pass": 0.9866666666666667,
+   "m4b_pass": 0.6733333333333333,
+   "m4b_median": 1.0,
+   "kind": "block bootstrap, block 200 (forward + no-ops from the recorded series)"
+  }
+ ]
+}

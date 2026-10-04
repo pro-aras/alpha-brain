@@ -1,0 +1,66 @@
+test_a_discrete_difference_in_a_moment_row_is_found_by_its_seq (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_discrete_difference_in_a_moment_row_is_found_by_its_seq) ... ERROR
+test_a_float_only_or_hash_only_difference_is_not_discrete (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_float_only_or_hash_only_difference_is_not_discrete) ... ERROR
+test_a_moment_row_only_one_twin_wrote_is_counted_not_dropped (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_moment_row_only_one_twin_wrote_is_counted_not_dropped) ... ERROR
+test_a_shifted_journal_is_not_a_diverged_one (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_shifted_journal_is_not_a_diverged_one) ... ERROR
+test_identical_journals_have_no_keyed_difference (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_identical_journals_have_no_keyed_difference) ... ERROR
+test_two_glances_of_one_seq_are_two_rows_and_a_repeat_is_matched_in_order (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_two_glances_of_one_seq_are_two_rows_and_a_repeat_is_matched_in_order) ... ERROR
+
+======================================================================
+ERROR: test_a_discrete_difference_in_a_moment_row_is_found_by_its_seq (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_discrete_difference_in_a_moment_row_is_found_by_its_seq)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 457, in test_a_discrete_difference_in_a_moment_row_is_found_by_its_seq
+    r = cal.compare_twins_keyed(a, b)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'compare_twins_keyed'
+
+======================================================================
+ERROR: test_a_float_only_or_hash_only_difference_is_not_discrete (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_float_only_or_hash_only_difference_is_not_discrete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 467, in test_a_float_only_or_hash_only_difference_is_not_discrete
+    r = cal.compare_twins_keyed(a, b)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'compare_twins_keyed'
+
+======================================================================
+ERROR: test_a_moment_row_only_one_twin_wrote_is_counted_not_dropped (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_moment_row_only_one_twin_wrote_is_counted_not_dropped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 475, in test_a_moment_row_only_one_twin_wrote_is_counted_not_dropped
+    r = cal.compare_twins_keyed(a, b)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'compare_twins_keyed'
+
+======================================================================
+ERROR: test_a_shifted_journal_is_not_a_diverged_one (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_a_shifted_journal_is_not_a_diverged_one)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 446, in test_a_shifted_journal_is_not_a_diverged_one
+    r = cal.compare_twins_keyed(a, b)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'compare_twins_keyed'
+
+======================================================================
+ERROR: test_identical_journals_have_no_keyed_difference (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_identical_journals_have_no_keyed_difference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 434, in test_identical_journals_have_no_keyed_difference
+    r = cal.compare_twins_keyed(self.rows(), json.loads(json.dumps(self.rows())))
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'compare_twins_keyed'
+
+======================================================================
+ERROR: test_two_glances_of_one_seq_are_two_rows_and_a_repeat_is_matched_in_order (tests.tools.test_evolve_cal_twin.TestCompareKeyed.test_two_glances_of_one_seq_are_two_rows_and_a_repeat_is_matched_in_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-evolve-cal-1003/tests/tools/test_evolve_cal_twin.py", line 482, in test_two_glances_of_one_seq_are_two_rows_and_a_repeat_is_matched_in_order
+    r = cal.compare_twins_keyed(a, b)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.evolve_cal' has no attribute 'compare_twins_keyed'
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.002s
+
+FAILED (errors=6)
+scope memory.peak 51482624 bytes

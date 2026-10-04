@@ -1,0 +1,391 @@
+EEEEEEusage: hears_read [-h] --off OFF --on ON [--off-timings OFF_TIMINGS]
+                  [--on-timings ON_TIMINGS] [--worlds WORLDS] --out OUT
+hears_read: error: unrecognized arguments: --on-plant /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-2f_ekvrs/plant --tape /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-2f_ekvrs/tape --on-journal /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-2f_ekvrs/on-j.jsonl --off-journal /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-2f_ekvrs/off-j.jsonl --i1-journal /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-2f_ekvrs/i1-j.jsonl
+EEusage: hears_read [-h] --off OFF --on ON [--off-timings OFF_TIMINGS]
+                  [--on-timings ON_TIMINGS] [--worlds WORLDS] --out OUT
+hears_read: error: unrecognized arguments: --on-plant /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-5w9qmr3d/plant --tape /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-5w9qmr3d/tape --on-journal /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-5w9qmr3d/on-j.jsonl --off-journal /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-5w9qmr3d/off-j.jsonl --i1-journal /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-5w9qmr3d/i1-j.jsonl
+EHEARS-2 bench reading (PREREG-HEARS-2 §2)
+  P · the scene words, paired item by item on the fresh set (a READING; 10/n beside each):
+    M1   n   18 · OFF 0.667 · ON 0.667 · gap 0.000 · smallest passing gap 0.556 · discordant ON-right 0 / OFF-right 0 · UNDERPOWERED
+    M2a  n    0 · OFF   —   · ON   —   · gap   —   · smallest passing gap   —   · discordant ON-right 0 / OFF-right 0
+    M3   n   12 · OFF 0.583 · ON 0.583 · gap 0.000 · smallest passing gap 0.833 · discordant ON-right 0 / OFF-right 0 · UNDERPOWERED
+    M6   n    8 · OFF 0.375 · ON 0.375 · gap 0.000 · smallest passing gap 1.250 · discordant ON-right 0 / OFF-right 0 · UNDERPOWERED
+    M5   n    0 · OFF   —   · ON   —   · gap   —   · smallest passing gap   —   · discordant ON-right 0 / OFF-right 0
+  the bars, OFF → ON:
+    M1         0.900 (PASS) → 0.900 (PASS)
+    M2a        0.900 (PASS) → 0.900 (PASS)
+    M2b        0.900 (FAIL) → 0.900 (FAIL)
+    M3         0.900 (PASS) → 0.900 (PASS)
+    M6         0.900 (PASS) → 0.900 (PASS)
+  X · test 4a: OFF exist 1.0 carry 0.95 cited 10 by world {'maker': 3, 'scene': 7} → PASS; ON exist 1.0 carry 0.95 cited 10 (with a truth 7) by world {'maker': 3, 'scene': 7} → PASS
+Eusage: hears_read [-h] --off OFF --on ON [--off-timings OFF_TIMINGS]
+                  [--on-timings ON_TIMINGS] [--worlds WORLDS] --out OUT
+hears_read: error: unrecognized arguments: --on-plant /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-w18qif85/plant --tape /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-w18qif85/tape --on-journal /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-w18qif85/on-j.jsonl --off-journal /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-w18qif85/off-j.jsonl --i1-journal /data/dev/genome-wt-hears/scratch/tmp/hears-read-e2e-w18qif85/i1-j.jsonl
+EEEEEEEEEEEEEEEEEEEEEEEEEEE
+======================================================================
+ERROR: test_the_rates_the_grade_holds_only_as_rates_are_read_with_their_own_smallest_gap (tests.tools.test_hears_read.AggregatesAndVerdicts.test_the_rates_the_grade_holds_only_as_rates_are_read_with_their_own_smallest_gap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 272, in test_the_rates_the_grade_holds_only_as_rates_are_read_with_their_own_smallest_gap
+    a = H.aggregates(off, on)["fresh"]["M2a_refusal"]
+        ^^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'aggregates'
+
+======================================================================
+ERROR: test_the_six_tests_verdicts_side_by_side_and_a_change_is_flagged (tests.tools.test_hears_read.AggregatesAndVerdicts.test_the_six_tests_verdicts_side_by_side_and_a_change_is_flagged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 282, in test_the_six_tests_verdicts_side_by_side_and_a_change_is_flagged
+    v = H.verdicts(off, on)
+        ^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'verdicts'
+
+======================================================================
+ERROR: test_a_canvas_with_a_row_missing_from_the_timings_is_counted_and_the_mark_cannot_pass (tests.tools.test_hears_read.Cost.test_a_canvas_with_a_row_missing_from_the_timings_is_counted_and_the_mark_cannot_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 398, in test_a_canvas_with_a_row_missing_from_the_timings_is_counted_and_the_mark_cannot_pass
+    sc = H.cost(self.tape, off_t, on_t)["populations"]["scene_train"]
+         ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: cost() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_a_scene_population_of_none_is_not_a_pass (tests.tools.test_hears_read.Cost.test_a_scene_population_of_none_is_not_a_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 408, in test_a_scene_population_of_none_is_not_a_pass
+    c = H.cost(d / "tape", t, t)
+TypeError: cost() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_planted_the_scene_canvases_doubled_fails_the_scene_population (tests.tools.test_hears_read.Cost.test_planted_the_scene_canvases_doubled_fails_the_scene_population)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 391, in test_planted_the_scene_canvases_doubled_fails_the_scene_population
+    sc = H.cost(self.tape, off_t, on_t)["populations"]["scene_train"]
+         ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: cost() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_the_cpu_of_a_canvas_is_the_sum_of_its_rows_and_the_scene_population_is_the_training_canvases (tests.tools.test_hears_read.Cost.test_the_cpu_of_a_canvas_is_the_sum_of_its_rows_and_the_scene_population_is_the_training_canvases)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 370, in test_the_cpu_of_a_canvas_is_the_sum_of_its_rows_and_the_scene_population_is_the_training_canvases
+    c = H.cost(self.tape, off_t, on_t)
+TypeError: cost() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_a_plant_that_did_not_bite_fails_the_exit (tests.tools.test_hears_read.EndToEnd.test_a_plant_that_did_not_bite_fails_the_exit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 545, in test_a_plant_that_did_not_bite_fails_the_exit
+    self.assertEqual(H.main(argv), 1)
+                     ~~~~~~^^^^^^
+  File "/data/dev/genome-wt-hears/tools/brain/hears_read.py", line 125, in main
+    a = ap.parse_args(argv)
+  File "/usr/lib/python3.14/argparse.py", line 2020, in parse_args
+    self.error(msg)
+    ~~~~~~~~~~^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2797, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2784, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_an_input_that_lacks_a_key_is_an_error_that_names_the_key (tests.tools.test_hears_read.EndToEnd.test_an_input_that_lacks_a_key_is_an_error_that_names_the_key)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 553, in test_an_input_that_lacks_a_key_is_an_error_that_names_the_key
+    with self.assertRaises(H.ReaderError) as cm:
+                           ^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'ReaderError'
+
+======================================================================
+ERROR: test_every_input_reads_and_the_files_are_written (tests.tools.test_hears_read.EndToEnd.test_every_input_reads_and_the_files_are_written)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 525, in test_every_input_reads_and_the_files_are_written
+    rc = H.main(argv)
+  File "/data/dev/genome-wt-hears/tools/brain/hears_read.py", line 125, in main
+    a = ap.parse_args(argv)
+  File "/usr/lib/python3.14/argparse.py", line 2020, in parse_args
+    self.error(msg)
+    ~~~~~~~~~~^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2797, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2784, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_only_the_inputs_given_are_read_and_the_rest_say_not_read (tests.tools.test_hears_read.EndToEnd.test_only_the_inputs_given_are_read_and_the_rest_say_not_read)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 562, in test_only_the_inputs_given_are_read_and_the_rest_say_not_read
+    self.assertEqual(o["bars"]["C"], "NOT READ")
+                     ~^^^^^^^^
+KeyError: 'bars'
+
+======================================================================
+ERROR: test_when_every_barred_mark_passes_the_exit_is_zero (tests.tools.test_hears_read.EndToEnd.test_when_every_barred_mark_passes_the_exit_is_zero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 539, in test_when_every_barred_mark_passes_the_exit_is_zero
+    self.assertEqual(H.main(argv), 0)
+                     ~~~~~~^^^^^^
+  File "/data/dev/genome-wt-hears/tools/brain/hears_read.py", line 125, in main
+    a = ap.parse_args(argv)
+  File "/usr/lib/python3.14/argparse.py", line 2020, in parse_args
+    self.error(msg)
+    ~~~~~~~~~~^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2797, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/argparse.py", line 2784, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_a_plant_that_changed_more_than_one_citation_or_the_population_is_refused (tests.tools.test_hears_read.ExistByAnyHand.test_a_plant_that_changed_more_than_one_citation_or_the_population_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 315, in test_a_plant_that_changed_more_than_one_citation_or_the_population_is_refused
+    x = H.x_mark(make_grade("off"), on, make_grade("plant", m4a=bad))
+        ^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'x_mark'
+
+======================================================================
+ERROR: test_a_plant_that_did_not_bite_means_the_instrument_is_blind_and_x_fails (tests.tools.test_hears_read.ExistByAnyHand.test_a_plant_that_did_not_bite_means_the_instrument_is_blind_and_x_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 308, in test_a_plant_that_did_not_bite_means_the_instrument_is_blind_and_x_fails
+    x = H.x_mark(make_grade("off"), make_grade("on"), make_grade("plant", m4a=self._m4a(exist=1.0)))
+        ^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'x_mark'
+
+======================================================================
+ERROR: test_exist_one_with_the_plant_caught_passes_and_prints_the_citations_by_world (tests.tools.test_hears_read.ExistByAnyHand.test_exist_one_with_the_plant_caught_passes_and_prints_the_citations_by_world)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 299, in test_exist_one_with_the_plant_caught_passes_and_prints_the_citations_by_world
+    x = H.x_mark(off, on, plant)
+        ^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'x_mark'
+
+======================================================================
+ERROR: test_exist_under_one_on_the_real_arm_fails_even_with_the_plant_caught (tests.tools.test_hears_read.ExistByAnyHand.test_exist_under_one_on_the_real_arm_fails_even_with_the_plant_caught)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 321, in test_exist_under_one_on_the_real_arm_fails_even_with_the_plant_caught
+    x = H.x_mark(make_grade("off"), on, make_grade("plant", m4a=self._m4a(exist=0.8)))
+        ^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'x_mark'
+
+======================================================================
+ERROR: test_no_maker_citation_is_said_so_the_by_any_hand_road_is_not_claimed_as_exercised (tests.tools.test_hears_read.ExistByAnyHand.test_no_maker_citation_is_said_so_the_by_any_hand_road_is_not_claimed_as_exercised)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 332, in test_no_maker_citation_is_said_so_the_by_any_hand_road_is_not_claimed_as_exercised
+    x = H.x_mark(make_grade("off"), on, make_grade("plant", m4a=self._m4a(exist=0.9, by_world={"?": 1, "scene": 9})))
+        ^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'x_mark'
+
+======================================================================
+ERROR: test_no_plant_given_x_is_not_graded_never_passed (tests.tools.test_hears_read.ExistByAnyHand.test_no_plant_given_x_is_not_graded_never_passed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 326, in test_no_plant_given_x_is_not_graded_never_passed
+    x = H.x_mark(make_grade("off"), make_grade("on"), None)
+        ^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'x_mark'
+
+======================================================================
+ERROR: test_the_x_plant_journal_changes_one_cited_moment_and_nothing_else (tests.tools.test_hears_read.ExistByAnyHand.test_the_x_plant_journal_changes_one_cited_moment_and_nothing_else)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 345, in test_the_x_plant_journal_changes_one_cited_moment_and_nothing_else
+    info = H.make_x_plant(src, dst)
+           ^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'make_x_plant'
+
+======================================================================
+ERROR: test_the_x_plant_refuses_a_journal_with_nothing_cited (tests.tools.test_hears_read.ExistByAnyHand.test_the_x_plant_refuses_a_journal_with_nothing_cited)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 358, in test_the_x_plant_refuses_a_journal_with_nothing_cited
+    with self.assertRaises(H.ReaderError):
+                           ^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'ReaderError'
+
+======================================================================
+ERROR: test_a_learn_row_that_differs_is_a_difference_the_default_journal_diff_would_not_see (tests.tools.test_hears_read.I2.test_a_learn_row_that_differs_is_a_difference_the_default_journal_diff_would_not_see)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 436, in test_a_learn_row_that_differs_is_a_difference_the_default_journal_diff_would_not_see
+    r = H.i2(bad, i1)
+        ^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'i2'
+
+======================================================================
+ERROR: test_a_missing_row_fails_and_an_empty_pair_is_not_a_pass (tests.tools.test_hears_read.I2.test_a_missing_row_fails_and_an_empty_pair_is_not_a_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 448, in test_a_missing_row_fails_and_an_empty_pair_is_not_a_pass
+    self.assertFalse(H.i2(off, i1[:-1])["pass"])
+                     ^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'i2'
+
+======================================================================
+ERROR: test_off_without_its_turn_rows_equals_the_replay_without_drive (tests.tools.test_hears_read.I2.test_off_without_its_turn_rows_equals_the_replay_without_drive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 426, in test_off_without_its_turn_rows_equals_the_replay_without_drive
+    r = H.i2(off, i1)
+        ^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'i2'
+
+======================================================================
+ERROR: test_planted_one_character_of_one_kept_row_fails_the_comparison (tests.tools.test_hears_read.I2.test_planted_one_character_of_one_kept_row_fails_the_comparison)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 442, in test_planted_one_character_of_one_kept_row_fails_the_comparison
+    planted = H.plant_one_character(off)
+              ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'plant_one_character'
+
+======================================================================
+ERROR: test_the_old_graders_grade_has_no_citations_by_world_and_the_reader_says_so_never_a_zero (tests.tools.test_hears_read.OnTheRealGrade.test_the_old_graders_grade_has_no_citations_by_world_and_the_reader_says_so_never_a_zero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 601, in test_the_old_graders_grade_has_no_citations_by_world_and_the_reader_says_so_never_a_zero
+    x = H.x_mark(self.g, copy.deepcopy(self.g), None)
+        ^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'x_mark'
+
+======================================================================
+ERROR: test_the_paired_populations_are_the_graders_own_n (tests.tools.test_hears_read.OnTheRealGrade.test_the_paired_populations_are_the_graders_own_n)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 579, in test_the_paired_populations_are_the_graders_own_n
+    p = H.pairs(self.g, copy.deepcopy(self.g))
+        ^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'pairs'. Did you mean: 'paired'?
+
+======================================================================
+ERROR: test_the_verdicts_and_the_aggregates_read_from_the_real_keys (tests.tools.test_hears_read.OnTheRealGrade.test_the_verdicts_and_the_aggregates_read_from_the_real_keys)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 592, in test_the_verdicts_and_the_aggregates_read_from_the_real_keys
+    v = H.verdicts(self.g, copy.deepcopy(self.g))
+        ^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'verdicts'
+
+======================================================================
+ERROR: test_a_flip_outside_the_paired_population_does_not_show (tests.tools.test_hears_read.PairedScene.test_a_flip_outside_the_paired_population_does_not_show)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 247, in test_a_flip_outside_the_paired_population_does_not_show
+    m1 = H.pairs(off, on)["fresh"]["M1"]
+         ^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'pairs'. Did you mean: 'paired'?
+
+======================================================================
+ERROR: test_an_item_in_one_arm_only_is_counted_and_never_silently_dropped (tests.tools.test_hears_read.PairedScene.test_an_item_in_one_arm_only_is_counted_and_never_silently_dropped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 253, in test_an_item_in_one_arm_only_is_counted_and_never_silently_dropped
+    m1 = H.pairs(off, on)["fresh"]["M1"]
+         ^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'pairs'. Did you mean: 'paired'?
+
+======================================================================
+ERROR: test_identical_arms_read_zero_and_the_population_is_the_graders_pair_population (tests.tools.test_hears_read.PairedScene.test_identical_arms_read_zero_and_the_population_is_the_graders_pair_population)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 196, in test_identical_arms_read_zero_and_the_population_is_the_graders_pair_population
+    p = H.pairs(off, copy.deepcopy(off))
+        ^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'pairs'. Did you mean: 'paired'?
+
+======================================================================
+ERROR: test_the_coverage_each_arm_has_inside_the_paired_items_is_printed (tests.tools.test_hears_read.PairedScene.test_the_coverage_each_arm_has_inside_the_paired_items_is_printed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 264, in test_the_coverage_each_arm_has_inside_the_paired_items_is_printed
+    m1 = H.pairs(off, on)["fresh"]["M1"]
+         ^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'pairs'. Did you mean: 'paired'?
+
+======================================================================
+ERROR: test_the_planted_flip_shows_in_the_discordant_counts_and_only_there (tests.tools.test_hears_read.PairedScene.test_the_planted_flip_shows_in_the_discordant_counts_and_only_there)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 226, in test_the_planted_flip_shows_in_the_discordant_counts_and_only_there
+    base, p = H.pairs(off, on_same), H.pairs(off, on_plant)
+              ^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'pairs'. Did you mean: 'paired'?
+
+======================================================================
+ERROR: test_fisher_one_sided_on_a_table_known_by_hand (tests.tools.test_hears_read.Statistics.test_fisher_one_sided_on_a_table_known_by_hand)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 186, in test_fisher_one_sided_on_a_table_known_by_hand
+    self.assertAlmostEqual(H.fisher_one_sided(3, 3, 0, 3), 1 / 20)                  # C(3,3)C(3,0) / C(6,3)
+                           ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'fisher_one_sided'
+
+======================================================================
+ERROR: test_the_sign_test_is_the_graders_own (tests.tools.test_hears_read.Statistics.test_the_sign_test_is_the_graders_own)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 183, in test_the_sign_test_is_the_graders_own
+    self.assertEqual(H.sign_test(b, c), GL.sign_test(b, c), (b, c))
+                     ^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'sign_test'
+
+======================================================================
+ERROR: test_growth_holds_when_every_word_with_three_meetings_is_mature (tests.tools.test_hears_read.TransferAndGrowth.test_growth_holds_when_every_word_with_three_meetings_is_mature)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 472, in test_growth_holds_when_every_word_with_three_meetings_is_mature
+    g = H.g_reading(maker_journal(last_mature=("star", "bar", "dot", "cup")))
+        ^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'g_reading'
+
+======================================================================
+ERROR: test_growth_the_last_hundred_maker_turns_and_the_mature_words_known_by_construction (tests.tools.test_hears_read.TransferAndGrowth.test_growth_the_last_hundred_maker_turns_and_the_mature_words_known_by_construction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 455, in test_growth_the_last_hundred_maker_turns_and_the_mature_words_known_by_construction
+    g = H.g_reading(maker_journal())
+        ^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'g_reading'
+
+======================================================================
+ERROR: test_growth_with_no_maker_turn_says_so_never_a_rate (tests.tools.test_hears_read.TransferAndGrowth.test_growth_with_no_maker_turn_says_so_never_a_rate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 477, in test_growth_with_no_maker_turn_says_so_never_a_rate
+    g = H.g_reading([r for r in maker_journal() if r.get("world") != "maker"])
+        ^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 'g_reading'
+
+======================================================================
+ERROR: test_transfer_with_the_fisher_p_and_the_counts (tests.tools.test_hears_read.TransferAndGrowth.test_transfer_with_the_fisher_p_and_the_counts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-hears/tests/tools/test_hears_read.py", line 489, in test_transfer_with_the_fisher_p_and_the_counts
+    t = H.t_reading(rows)
+        ^^^^^^^^^^^
+AttributeError: module 'tools.brain.hears_read' has no attribute 't_reading'
+
+----------------------------------------------------------------------
+Ran 37 tests in 0.064s
+
+FAILED (errors=37)

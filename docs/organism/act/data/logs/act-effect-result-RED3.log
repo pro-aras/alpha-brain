@@ -1,0 +1,23 @@
+.....F...F.....
+======================================================================
+FAIL: test_a_reading_above_the_empirical_ceiling_is_not_classed_by_these_instruments (tests.creature.test_act_effect_result.TestClassify.test_a_reading_above_the_empirical_ceiling_is_not_classed_by_these_instruments)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_result.py", line 40, in test_a_reading_above_the_empirical_ceiling_is_not_classed_by_these_instruments
+    self.assertIn("ABOVE the empirical ceiling", c)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'ABOVE the empirical ceiling' not found in "bar above its empirical ceiling (0.747 < 0.95; iid ceiling 0.987): the law's iid arithmetic"
+
+======================================================================
+FAIL: test_a_row_whose_reading_is_above_the_empirical_ceiling_says_not_classed (tests.creature.test_act_effect_result.TestRender.test_a_row_whose_reading_is_above_the_empirical_ceiling_says_not_classed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-act-1003/tests/creature/test_act_effect_result.py", line 95, in test_a_row_whose_reading_is_above_the_empirical_ceiling_says_not_classed
+    self.assertIn("NOT classed", row)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'NOT classed' not found in "| M2 (4920 acts) | 0.480 | 0.90 | 1.000 | — / 0.180 / — | bar above its empirical ceiling (0.180 < 0.90; iid ceiling 1.000): the law's iid arithmetic |"
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.011s
+
+FAILED (failures=2)

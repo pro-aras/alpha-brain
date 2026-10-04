@@ -1,0 +1,15 @@
+PREREG-ACT-EFFECT verdict — ADMIT: False · VOID: False
+  R-NULL 0.2720 ± 0.0150 · R-3 0.4339 (seed-wise p95 0.4586) · R-SCR 0.4309 · R-CEIL 0.4878 · C-SCR 0.4053
+  C-SCR − R-NULL +0.1333 · − R-3 -0.0287 · − R-SCR -0.0257 · smallest detectable gap 0.0204 · null-vs-null SD 0.0167
+  M1: PASS {'a': True, 'b': True, 'c': True, 'd': True, 'e': True, 'gain': 0.13325, 'positive_seeds': 12, 't': 28.95117434924305, 't_crit': 4.437, 'minus_r_scr': -0.025666666666666615}
+  M2: FAIL {'pass_960': 0.92, 'pass_full': 0.48}
+  M3: FAIL {'alone': True, 'le_0.25_share': 1.0, 'median': 0.058333333333333334}
+  M4: FAIL {'a_share': 1.0, 'b_share': 0.8, 'a_median': 1.0, 'b_median': 1.0, 'exact_set_median': 0.9895833333333333}
+  M5: PASS {}
+  M6: PASS {'what': 'unit test (tests/creature/test_act_effect_toy.py)'}
+  M7: PASS {'null_equals_landed_rows': True, 'candidate_twice_identical': True, 'null_twice_identical': True}
+  M8: PASS {'steps': 20077, 'mismatches': 0}
+  M9: PASS {'what': 'unit test (tests/creature/test_act_effect_toy.py TestBoundaryRuleM9)'}
+  C-SCR per-act outcomes (known / excluded / total), summed over the seeds: left 183457/3806/187263; right 183419/3861/187280; forward 165079/3561/168640; pickup 10502/221/10723; drop 8483/174/8657; toggle 8441/167/8608; done 8405/198/8603
+  alternatives (printed, never admitted): A-PROP +0.098 vs null, -0.064 vs R-3; A-UCB -0.041 vs null, -0.203 vs R-3; A-RATE +0.094 vs null, -0.068 vs R-3; A-BOTH +0.119 vs null, -0.043 vs R-3; R-WSLS +0.124 vs null, -0.038 vs R-3; R-WALK +0.285 vs null, +0.123 vs R-3 [clears R-3 p95]; A-VAL -0.002 vs null, -0.164 vs R-3; A-SMP +0.013 vs null, -0.149 vs R-3
+verdict exit 1

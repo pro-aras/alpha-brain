@@ -1,0 +1,23 @@
+	Command being timed: "env OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -B -I /data/dev/genome-wt-claims-reader-feb777e/tools/brain/resit.py run --mode gate --label r3-0.01 --root /data/dev/genome-lives/brain-long-2 --code /data/dev/genome-lives/brain-long-2/code --items-root /data/dev/genome-lives/brain-long-2 --grader-code /data/dev/genome-wt-claims-grader-d2fe75b --out /data/dev/brain-runs/resit-gate/bl2 --scored /data/dev/brain-runs/scene-s1b1r --reference-grade /data/dev/brain-runs/day0929/days/grade-brain-long-2-2026-09-30/grade-bl2-new/grade.json --nudge 0.01 --nudge-seed 20261003"
+	User time (seconds): 25.18
+	System time (seconds): 3.88
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:29.07
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1369144
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 766809
+	Voluntary context switches: 26
+	Involuntary context switches: 204
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 414472
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

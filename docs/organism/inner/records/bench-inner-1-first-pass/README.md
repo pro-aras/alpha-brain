@@ -1,0 +1,3 @@
+The 12:03 +0400 first pass of the INNER-1 bench (int/bench-inner-1), the run AMENDMENT 2 quotes, copied verbatim (GRADE.txt sha256 0fee7900…, RUN.json b69f3d90…).
+The final record is records/bench-inner-1/ from inner-1003 (808c6ec, bench-4 on 9a037ec): equal in every graded section, with A2.1–A2.3's instrument fixes applied (the topic-form lock plant CAUGHT, the whole-scene cross-check PASS, B1 masked).
+edit: Claude (Opus 5.5, swarm architect), 2026-10-03 12:29 +0400 — moved from records/bench-inner-1/ at the integrator's request (an add/add path conflict with inner-1003's final record); the graded lines of the two GRADE.txt checked equal by diff.
