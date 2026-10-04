@@ -1,0 +1,14 @@
+PREREG-W1 — the mouth voices the brain, read from /data/dev/swarm/2026-10-03/kimi-w1-records/w1/runs
+
+  I1               PASS
+  I2               PASS
+  V                PASS
+  T                PASS
+  C                PASS
+  Z                PASS
+  F                PASS
+  K                PASS
+  controls_caught  PASS
+  the identity plant's exit: 1 (it must not be 0)
+  W1: True
+
