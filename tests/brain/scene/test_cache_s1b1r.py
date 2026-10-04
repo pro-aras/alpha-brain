@@ -24,7 +24,10 @@ class TestRoots(unittest.TestCase):
         self.assertEqual(C.HEAR_RUNS, Path("/data/dev/brain-runs/scene-organ-hear"))   # PREREG-BRAIN-DRIVES §8 (14), 2026-09-29 16:40 +0400
         # edit: Claude (Fable 5.1, swarm integrator), 2026-10-03 15:39 +0400 — PREREG-INNER-1 (the landing): the tree's root is FRESH again
         self.assertEqual(C.DRIVE_RUNS, Path("/data/dev/brain-runs/scene-organ-drive"))
-        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-swarm-1003"))      # PREREG-WORD-ROAD §5 (2026-09-29 13:17 +0400)
+        # edit: Kimi K3 (kimi-code, builder lane kimi-w1, integrator hat), 2026-10-05 00:27 +0400 — PREREG-W1 + PREREG-SLEEP-IDLE (the
+        # seat's ONE shared pinned window): the tree's root is FRESH again; the swarm-1003 root stays named, read as plain files only.
+        self.assertEqual(C.INNER_RUNS, Path("/data/dev/brain-runs/scene-organ-swarm-1003"))
+        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-swarm-1005"))      # PREREG-WORD-ROAD §5 (2026-09-29 13:17 +0400)
         self.assertEqual(C.FM6_RUNS, Path("/data/dev/brain-runs/scene-organ-fm6"))
         self.assertEqual(C.SCENE_ORGAN_RUNS, Path("/data/dev/brain-runs/scene-organ"))
         self.assertEqual(C.S1B1R_RUNS, Path("/data/dev/brain-runs/scene-s1b1r"))

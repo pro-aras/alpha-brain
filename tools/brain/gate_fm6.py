@@ -60,7 +60,9 @@ GLANCES_ROOT = C.RUNS                                    # scene-organ-fm6: the 
 SCORED_ROOT = C.S1B1R_RUNS
 OUT = Path("/data/dev/brain-runs/organ/gate-fm6")
 LIFE_ROOTS = (Path("/data/dev/genome-lives"),)
-FORBIDDEN_OUT = (C.S1B1R_RUNS, C.S1B1_RUNS, C.S1A_RUNS, C.SCENE_ORGAN_RUNS, C.FM6_RUNS, C.HEAR_RUNS, C.DRIVE_RUNS, C.RUNS) + LIFE_ROOTS
+# edit: Kimi K3 (kimi-code, builder lane kimi-w1, integrator hat), 2026-10-05 00:27 +0400 — the seat's ONE shared pinned window
+# (PREREG-W1 + PREREG-SLEEP-IDLE): INNER_RUNS (the swarm-1003 root, now read as plain files only) joins the forbidden list beside RUNS.
+FORBIDDEN_OUT = (C.S1B1R_RUNS, C.S1B1_RUNS, C.S1A_RUNS, C.SCENE_ORGAN_RUNS, C.FM6_RUNS, C.HEAR_RUNS, C.DRIVE_RUNS, C.INNER_RUNS, C.RUNS) + LIFE_ROOTS
 LAW_LINE = GA.BRAIN_LINE
 FIX_LINE = GA.BRAIN_LINE.replace("young 3;", "young 3 nearest;")
 SETS = ("held", "fresh", "s1b1")

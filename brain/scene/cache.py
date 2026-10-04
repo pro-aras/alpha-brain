@@ -67,7 +67,15 @@ from . import world as W
 # this tree's run root is FRESH again (RUNS = scene-organ-swarm-1003): every cache is redrawn there (cache-r) and proven array-identical
 # to the DRIVE root's (tools/brain/diag/cache_identity.py <this root> <the DRIVE root>, with its planted bit). No eye or world line
 # changed: the pin's price, not a new world. (SLEEP-IDLE's branch was to share this window; it was not verified today.)
-RUNS = Path("/data/dev/brain-runs/scene-organ-swarm-1003")
+# edit: Kimi K3 (kimi-code, builder lane kimi-w1, integrator hat), 2026-10-05 00:27 +0400 — PREREG-W1-MOUTH-VOICES-BRAIN §2 (SIGNED x3
+# at toys-1003 1ccc3bf) + PREREG-SLEEP-IDLE §2.1 (SIGNED x3 at 5b21fa7/8bb2600, AMENDMENTS 1–2 signed): the genes MOUTH (the
+# brain's-phrase clause) and SLEEP (the idle clause) change genome/machinery.py (two parser branches) and this file, both
+# WORLD_CODE, so check_code refuses every cache under scene-organ-swarm-1003; this tree's run root is FRESH again
+# (RUNS = scene-organ-swarm-1005): every cache is redrawn there (cache-r) and proven array-identical to the swarm-1003 root's
+# (tools/brain/diag/cache_identity.py <this root> <the swarm-1003 root>, with its planted bit) — the seat's ONE shared window
+# for both hunks, 2026-10-05. No eye or world line changed: the pin's price, not a new world.
+RUNS = Path("/data/dev/brain-runs/scene-organ-swarm-1005")
+INNER_RUNS = Path("/data/dev/brain-runs/scene-organ-swarm-1003")   # the INNER window's redraw (the pre-W1 code), read as plain files only
 DRIVE_RUNS = Path("/data/dev/brain-runs/scene-organ-drive")   # the DRIVE redraw (the pre-INNER code), read as plain files only
 HEAR_RUNS = Path("/data/dev/brain-runs/scene-organ-hear")     # the HEAR redraw (the pre-DRIVE code), read as plain files only
 FM6_RUNS = Path("/data/dev/brain-runs/scene-organ-fm6")       # F-M6's redraw (the pre-HEAR code), read as plain files only
