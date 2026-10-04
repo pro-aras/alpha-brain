@@ -1,0 +1,752 @@
+##### CONTROL-broken
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -57,3 +57,3 @@
+     if got != want:
+-        failures.append(f"{label}: {got!r} != {want!r}")
++        raise RuntimeError("BROKEN CONTROL")
+ 
+##### CONTROL-identity
+##### g1-alpha-moments-skip
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -81,3 +81,3 @@
+     ea = expected["alpha4"]
+-    _cmp(failures, "alpha4.moments", c["moments"], ea["moments"])
++    pass
+     _cmp(failures, "alpha4.words", c["words"], ea["words"])
+##### g1-alpha-words-skip
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -82,3 +82,3 @@
+     _cmp(failures, "alpha4.moments", c["moments"], ea["moments"])
+-    _cmp(failures, "alpha4.words", c["words"], ea["words"])
++    pass
+     for src, want in ea["by_source"].items():
+##### g1-chi2-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -105,3 +105,3 @@
+     chi = SC.chi2_checks(sc)
+-    out.update({"alpha4": {"moments": c["moments"], "words": c["words"]}, "scene": {"moments": len(sc)}, "says": got_says, "plant_tokens": tokens, "chi2": chi})
++    out.update({"alpha4": {"moments": c["moments"], "words": c["words"]}, "scene": {"moments": len(sc)}, "says": got_says, "plant_tokens": tokens})
+     return {"ok": not failures, "failures": failures, **out}
+##### g1-cmp-inverted
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -56,3 +56,3 @@
+ def _cmp(failures: List[str], label: str, got, want) -> None:
+-    if got != want:
++    if got == want:
+         failures.append(f"{label}: {got!r} != {want!r}")
+##### g1-copies-verified-ignores-bad
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -69,3 +69,3 @@
+         failures += [f"copy {rel}: no longer hashes to its manifest" for rel in bad]
+-        out["copies_verified"] = len(man) - len(bad)
++        out["copies_verified"] = len(man)
+     else:
+##### g1-dax-skip
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -96,3 +96,3 @@
+         got = sc[i].words if i < len(sc) else None
+-        if got != (SC.DAX_WORD,):
++        if False:
+             failures.append(f"scene.dax@{i}: {got!r} != ('dax',)")
+##### g1-manifest-missing-silent
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -71,3 +71,3 @@
+     else:
+-        failures.append("no MANIFEST.json in the copies directory")
++        pass
+     try:
+##### g1-manifest-report-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -68,3 +68,3 @@
+         bad = ST.verify_copies(copies, man)
+-        failures += [f"copy {rel}: no longer hashes to its manifest" for rel in bad]
++        failures += []
+         out["copies_verified"] = len(man) - len(bad)
+##### g1-manifest-verify-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -67,3 +67,3 @@
+         man = json.loads(man_path.read_text())
+-        bad = ST.verify_copies(copies, man)
++        bad = []
+         failures += [f"copy {rel}: no longer hashes to its manifest" for rel in bad]
+##### g1-ok-const
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -106,3 +106,3 @@
+     out.update({"alpha4": {"moments": c["moments"], "words": c["words"]}, "scene": {"moments": len(sc)}, "says": got_says, "plant_tokens": tokens, "chi2": chi})
+-    return {"ok": not failures, "failures": failures, **out}
++    return {"ok": True, "failures": failures, **out}
+ 
+##### g1-per-source-skip
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -89,3 +89,3 @@
+         for k, v in want.items():
+-            _cmp(failures, f"alpha4.{src}.{k}", got[k], v)
++            pass
+     es = expected["scene"]
+##### g1-plant-alpha-skip
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -100,3 +100,3 @@
+     _cmp(failures, "says (rows, yes, distinct frames)", got_says, tuple(expected["says"]))
+-    tokens = {"ALPHA4": PL.plant_token_occurrences(a4), "SCENE": PL.plant_token_occurrences(sc)}
++    tokens = {"ALPHA4": {}, "SCENE": PL.plant_token_occurrences(sc)}
+     for name, t in tokens.items():
+##### g1-plant-check-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -102,3 +102,3 @@
+     for name, t in tokens.items():
+-        if any(t.values()):
++        if False:
+             failures.append(f"plant tokens occur in the real {name} stream: {t}")
+##### g1-plant-scene-skip
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -100,3 +100,3 @@
+     _cmp(failures, "says (rows, yes, distinct frames)", got_says, tuple(expected["says"]))
+-    tokens = {"ALPHA4": PL.plant_token_occurrences(a4), "SCENE": PL.plant_token_occurrences(sc)}
++    tokens = {"ALPHA4": PL.plant_token_occurrences(a4), "SCENE": {}}
+     for name, t in tokens.items():
+##### g1-says-skip
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -99,3 +99,3 @@
+     got_says = (len(says), sum(1 for s in says if s[1] == "yes"), len({s[0] for s in says}))
+-    _cmp(failures, "says (rows, yes, distinct frames)", got_says, tuple(expected["says"]))
++    pass
+     tokens = {"ALPHA4": PL.plant_token_occurrences(a4), "SCENE": PL.plant_token_occurrences(sc)}
+##### g1-scene-moments-skip
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -91,3 +91,3 @@
+     es = expected["scene"]
+-    _cmp(failures, "scene.moments", len(sc), es["moments"])
++    pass
+     _cmp(failures, "scene.per_moment", dict(sorted(Counter(len(m.words) for m in sc).items())), es["per_moment"])
+##### g1-scene-per-moment-skip
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -92,3 +92,3 @@
+     _cmp(failures, "scene.moments", len(sc), es["moments"])
+-    _cmp(failures, "scene.per_moment", dict(sorted(Counter(len(m.words) for m in sc).items())), es["per_moment"])
++    pass
+     if es.get("dax_index") is not None:
+##### g1-source-absent-silent
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -86,3 +86,3 @@
+         if got is None:
+-            failures.append(f"alpha4.{src}: the source is absent")
++            pass
+             continue
+##### g1-streamerror-not-named
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -77,3 +77,3 @@
+     except ST.StreamError as e:
+-        failures.append(f"a copy cannot be read: {e}")
++        pass
+         return {"ok": False, "failures": failures, **out}
+##### g1-streamerror-ok-true
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -78,3 +78,3 @@
+         failures.append(f"a copy cannot be read: {e}")
+-        return {"ok": False, "failures": failures, **out}
++        return {"ok": True, "failures": failures, **out}
+     c = ST.section0_counts(a4)
+##### g2-drop-equality
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -123,3 +123,3 @@
+     frames = sorted([r["w1"], r["w2"]] for r in b)
+-    ok = a == b and frames == [["blue", "ball"], ["green", "key"], ["red", "box"]]
++    ok = frames == [["blue", "ball"], ["green", "key"], ["red", "box"]]
+     return {"ok": bool(ok), "frames": frames, "n_rows": len(b)}
+##### g2-drop-frames-clause
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -123,3 +123,3 @@
+     frames = sorted([r["w1"], r["w2"]] for r in b)
+-    ok = a == b and frames == [["blue", "ball"], ["green", "key"], ["red", "box"]]
++    ok = a == b
+     return {"ok": bool(ok), "frames": frames, "n_rows": len(b)}
+##### g2-ok-const
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -123,3 +123,3 @@
+     frames = sorted([r["w1"], r["w2"]] for r in b)
+-    ok = a == b and frames == [["blue", "ball"], ["green", "key"], ["red", "box"]]
++    ok = True
+     return {"ok": bool(ok), "frames": frames, "n_rows": len(b)}
+##### g2-real-store-unwritten
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -119,3 +119,3 @@
+     for m in ms:
+-        real.write(0, np.zeros(2), np.zeros(2), "", 0.0, words_in_instant=list(m))
++        pass
+     a = find_frames(real)
+##### g2-stand-in-reads-real
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -121,3 +121,3 @@
+     a = find_frames(real)
+-    b = find_frames(RL.StandIn(ms))
++    b = find_frames(real)
+     frames = sorted([r["w1"], r["w2"]] for r in b)
+##### g3-abs-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -182,3 +182,3 @@
+             for key in ("G", "bits0", "bitsF", "L"):
+-                worst = max(worst, abs(getattr(fast, key) - slow[key]))
++                worst = max(worst, getattr(fast, key) - slow[key])
+             if (fast.N, fast.K, fast.V, fast.n_held_words) != (slow["N"], slow["K"], slow["V"], slow["n_held_words"]):
+##### g3-cases-not-counted
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -185,3 +185,3 @@
+                 worst = max(worst, 1.0)
+-            cases += 1
++            cases += 0
+     problems: List[str] = []
+##### g3-counts-compare-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -183,3 +183,3 @@
+                 worst = max(worst, abs(getattr(fast, key) - slow[key]))
+-            if (fast.N, fast.K, fast.V, fast.n_held_words) != (slow["N"], slow["K"], slow["V"], slow["n_held_words"]):
++            if False:
+                 worst = max(worst, 1.0)
+##### g3-counts-no-penalty
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -184,3 +184,3 @@
+             if (fast.N, fast.K, fast.V, fast.n_held_words) != (slow["N"], slow["K"], slow["V"], slow["n_held_words"]):
+-                worst = max(worst, 1.0)
++                worst = max(worst, 0.0)
+             cases += 1
+##### g3-key-bits0-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -181,3 +181,3 @@
+             fast, slow = sc.gain(F), CO.slow_gain(train, held, F)
+-            for key in ("G", "bits0", "bitsF", "L"):
++            for key in ("G", "bitsF", "L"):
+                 worst = max(worst, abs(getattr(fast, key) - slow[key]))
+##### g3-key-bitsF-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -181,3 +181,3 @@
+             fast, slow = sc.gain(F), CO.slow_gain(train, held, F)
+-            for key in ("G", "bits0", "bitsF", "L"):
++            for key in ("G", "bits0", "L"):
+                 worst = max(worst, abs(getattr(fast, key) - slow[key]))
+##### g3-key-G-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -181,3 +181,3 @@
+             fast, slow = sc.gain(F), CO.slow_gain(train, held, F)
+-            for key in ("G", "bits0", "bitsF", "L"):
++            for key in ("bits0", "bitsF", "L"):
+                 worst = max(worst, abs(getattr(fast, key) - slow[key]))
+##### g3-key-L-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -181,3 +181,3 @@
+             fast, slow = sc.gain(F), CO.slow_gain(train, held, F)
+-            for key in ("G", "bits0", "bitsF", "L"):
++            for key in ("G", "bits0", "bitsF"):
+                 worst = max(worst, abs(getattr(fast, key) - slow[key]))
+##### g3-mdl-steps-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -191,3 +191,3 @@
+         r = RL.mdl_greedy(CO.Scorer(train, [["a"]]))
+-        steps += r.info["steps"]
++        steps += 0
+         problems += [f"seed {seed}: {p}" for p in RL.trace_problems(train, r.info["trace"])]
+##### g3-problems-ignored
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -193,3 +193,3 @@
+         problems += [f"seed {seed}: {p}" for p in RL.trace_problems(train, r.info["trace"])]
+-    return {"ok": bool(worst < 1e-9 and not problems), "compressor_cases": cases, "max_abs_diff": worst, "mdl_problems": problems, "mdl_steps": steps, "mdl_seeds": mdl_seeds}
++    return {"ok": bool(worst < 1e-9), "compressor_cases": cases, "max_abs_diff": worst, "mdl_problems": problems, "mdl_steps": steps, "mdl_seeds": mdl_seeds}
+ 
+##### g3-tol-1e-10
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -193,3 +193,3 @@
+         problems += [f"seed {seed}: {p}" for p in RL.trace_problems(train, r.info["trace"])]
+-    return {"ok": bool(worst < 1e-9 and not problems), "compressor_cases": cases, "max_abs_diff": worst, "mdl_problems": problems, "mdl_steps": steps, "mdl_seeds": mdl_seeds}
++    return {"ok": bool(worst < 1e-10 and not problems), "compressor_cases": cases, "max_abs_diff": worst, "mdl_problems": problems, "mdl_steps": steps, "mdl_seeds": mdl_seeds}
+ 
+##### g3-tol-1e-3
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -193,3 +193,3 @@
+         problems += [f"seed {seed}: {p}" for p in RL.trace_problems(train, r.info["trace"])]
+-    return {"ok": bool(worst < 1e-9 and not problems), "compressor_cases": cases, "max_abs_diff": worst, "mdl_problems": problems, "mdl_steps": steps, "mdl_seeds": mdl_seeds}
++    return {"ok": bool(worst < 1e-3 and not problems), "compressor_cases": cases, "max_abs_diff": worst, "mdl_problems": problems, "mdl_steps": steps, "mdl_seeds": mdl_seeds}
+ 
+##### g3-tol-1e-8
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -193,3 +193,3 @@
+         problems += [f"seed {seed}: {p}" for p in RL.trace_problems(train, r.info["trace"])]
+-    return {"ok": bool(worst < 1e-9 and not problems), "compressor_cases": cases, "max_abs_diff": worst, "mdl_problems": problems, "mdl_steps": steps, "mdl_seeds": mdl_seeds}
++    return {"ok": bool(worst < 1e-8 and not problems), "compressor_cases": cases, "max_abs_diff": worst, "mdl_problems": problems, "mdl_steps": steps, "mdl_seeds": mdl_seeds}
+ 
+##### g4-beats2-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -226,3 +226,3 @@
+                 failures.append(f"G4 stream {key}: {rule} fails the PLANT gate ({s['gates'][rule]})")
+-        if not s["plant_beats_null2"]:
++        if False:
+             failures.append(f"G4 stream {key}: PLANT-BEATS-NULL-2 fails (B {s['B']:.2f}, q95 {s['null2_q95']:.2f})")
+##### g4-beats2-silent
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -227,3 +227,3 @@
+         if not s["plant_beats_null2"]:
+-            failures.append(f"G4 stream {key}: PLANT-BEATS-NULL-2 fails (B {s['B']:.2f}, q95 {s['null2_q95']:.2f})")
++            pass
+         c = s["control"]
+##### g4-control-unplanted
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -212,3 +212,3 @@
+             "B": b["B"], "plant_beats_null2": bool(b["plant_beats_null2"]), "null2_q95": b["null2_of_plant"]["q95"], "gates": gates, "required": required,
+-            "printed_only": [r for r in gates if r not in required], "control": PL.plant_gate_control(planted)}
++            "printed_only": [r for r in gates if r not in required], "control": PL.plant_gate_control(list(moments))}
+ 
+##### g4-ctrl-broken-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -229,3 +229,3 @@
+         c = s["control"]
+-        if not (c["caught"] and c["bytes_changed"] and c["gate_honest"] and not c["gate_broken"]):
++        if not (c["caught"] and c["bytes_changed"] and c["gate_honest"]):
+             failures.append(f"G4 stream {key}: the gate's parse-breaking control is not caught ({c})")
+##### g4-ctrl-bytes-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -229,3 +229,3 @@
+         c = s["control"]
+-        if not (c["caught"] and c["bytes_changed"] and c["gate_honest"] and not c["gate_broken"]):
++        if not (c["caught"] and c["gate_honest"] and not c["gate_broken"]):
+             failures.append(f"G4 stream {key}: the gate's parse-breaking control is not caught ({c})")
+##### g4-ctrl-caught-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -229,3 +229,3 @@
+         c = s["control"]
+-        if not (c["caught"] and c["bytes_changed"] and c["gate_honest"] and not c["gate_broken"]):
++        if not (c["bytes_changed"] and c["gate_honest"] and not c["gate_broken"]):
+             failures.append(f"G4 stream {key}: the gate's parse-breaking control is not caught ({c})")
+##### g4-ctrl-honest-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -229,3 +229,3 @@
+         c = s["control"]
+-        if not (c["caught"] and c["bytes_changed"] and c["gate_honest"] and not c["gate_broken"]):
++        if not (c["caught"] and c["bytes_changed"] and not c["gate_broken"]):
+             failures.append(f"G4 stream {key}: the gate's parse-breaking control is not caught ({c})")
+##### g4-ctrl-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -229,3 +229,3 @@
+         c = s["control"]
+-        if not (c["caught"] and c["bytes_changed"] and c["gate_honest"] and not c["gate_broken"]):
++        if False:
+             failures.append(f"G4 stream {key}: the gate's parse-breaking control is not caught ({c})")
+##### g4-ctrl-or
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -229,3 +229,3 @@
+         c = s["control"]
+-        if not (c["caught"] and c["bytes_changed"] and c["gate_honest"] and not c["gate_broken"]):
++        if not (c["caught"] or c["bytes_changed"] or c["gate_honest"] or not c["gate_broken"]):
+             failures.append(f"G4 stream {key}: the gate's parse-breaking control is not caught ({c})")
+##### g4-ctrl-silent
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -230,3 +230,3 @@
+         if not (c["caught"] and c["bytes_changed"] and c["gate_honest"] and not c["gate_broken"]):
+-            failures.append(f"G4 stream {key}: the gate's parse-breaking control is not caught ({c})")
++            pass
+     return {"ok": not failures, "failures": failures, "streams": streams, "draws": draws}
+##### g4-default-alpha-every
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -216,3 +216,3 @@
+ def g4(draws: int = 100, seeds: Sequence[int] = EV.SEEDS, scene_moments: int = 3000, scene_every: int = PL.PLANT_EVERY["SCENE"], alpha_moments: int = 20_000,
+-       alpha_every: int = PL.PLANT_EVERY["ALPHA4"]) -> Dict[str, object]:
++       alpha_every: int = PL.PLANT_EVERY["SCENE"]) -> Dict[str, object]:
+     scene = SC.sample_moments(scene_moments, np.random.default_rng([SC.SEED_ROOT, SC.G6_TAG, 1]))
+##### g4-default-alpha-moments
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -215,3 +215,3 @@
+ 
+-def g4(draws: int = 100, seeds: Sequence[int] = EV.SEEDS, scene_moments: int = 3000, scene_every: int = PL.PLANT_EVERY["SCENE"], alpha_moments: int = 20_000,
++def g4(draws: int = 100, seeds: Sequence[int] = EV.SEEDS, scene_moments: int = 3000, scene_every: int = PL.PLANT_EVERY["SCENE"], alpha_moments: int = 19_999,
+        alpha_every: int = PL.PLANT_EVERY["ALPHA4"]) -> Dict[str, object]:
+##### g4-default-draws
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -215,3 +215,3 @@
+ 
+-def g4(draws: int = 100, seeds: Sequence[int] = EV.SEEDS, scene_moments: int = 3000, scene_every: int = PL.PLANT_EVERY["SCENE"], alpha_moments: int = 20_000,
++def g4(draws: int = 99, seeds: Sequence[int] = EV.SEEDS, scene_moments: int = 3000, scene_every: int = PL.PLANT_EVERY["SCENE"], alpha_moments: int = 20_000,
+        alpha_every: int = PL.PLANT_EVERY["ALPHA4"]) -> Dict[str, object]:
+##### g4-default-scene-every
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -215,3 +215,3 @@
+ 
+-def g4(draws: int = 100, seeds: Sequence[int] = EV.SEEDS, scene_moments: int = 3000, scene_every: int = PL.PLANT_EVERY["SCENE"], alpha_moments: int = 20_000,
++def g4(draws: int = 100, seeds: Sequence[int] = EV.SEEDS, scene_moments: int = 3000, scene_every: int = PL.PLANT_EVERY["ALPHA4"], alpha_moments: int = 20_000,
+        alpha_every: int = PL.PLANT_EVERY["ALPHA4"]) -> Dict[str, object]:
+##### g4-default-scene-moments
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -215,3 +215,3 @@
+ 
+-def g4(draws: int = 100, seeds: Sequence[int] = EV.SEEDS, scene_moments: int = 3000, scene_every: int = PL.PLANT_EVERY["SCENE"], alpha_moments: int = 20_000,
++def g4(draws: int = 100, seeds: Sequence[int] = EV.SEEDS, scene_moments: int = 2999, scene_every: int = PL.PLANT_EVERY["SCENE"], alpha_moments: int = 20_000,
+        alpha_every: int = PL.PLANT_EVERY["ALPHA4"]) -> Dict[str, object]:
+##### g4-mode-law
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -207,3 +207,3 @@
+     cond = EV.evaluate_condition(tr, he, name=f"G4-{key}", draws=draws, web_seeds=seeds, kind="plant")
+-    gates = VD.plant_gates(cond, "amend1")
++    gates = VD.plant_gates(cond, "law")
+     b = cond["plant_stream"]
+##### g4-ok-const
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -231,3 +231,3 @@
+             failures.append(f"G4 stream {key}: the gate's parse-breaking control is not caught ({c})")
+-    return {"ok": not failures, "failures": failures, "streams": streams, "draws": draws}
++    return {"ok": True, "failures": failures, "streams": streams, "draws": draws}
+ 
+##### g4-replicate-seed
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -217,3 +217,3 @@
+        alpha_every: int = PL.PLANT_EVERY["ALPHA4"]) -> Dict[str, object]:
+-    scene = SC.sample_moments(scene_moments, np.random.default_rng([SC.SEED_ROOT, SC.G6_TAG, 1]))
++    scene = SC.sample_moments(scene_moments, np.random.default_rng([SC.SEED_ROOT, SC.G6_TAG, 2]))
+     atr, ahe = SY.structure_free_alpha(alpha_moments, 1)
+##### g4-required-A-adds-web-s
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -200,3 +200,3 @@
+ # after every 100th, ALPHA4's cadence): ALL FOUR rules are required (WEB-S at >= 9 of 10 seeds). On both: PLANT-BEATS-NULL-2 holds and the parse-breaking control is CAUGHT. Stream B gates the unit's START only; it enters no grade.
+-G4_REQUIRED = {"A": ("WEB-H", "SENTENCE", "MDL-GREEDY"), "B": ("WEB-H", "WEB-S", "SENTENCE", "MDL-GREEDY")}
++G4_REQUIRED = {"A": ("WEB-H", "WEB-S", "SENTENCE", "MDL-GREEDY"), "B": ("WEB-H", "WEB-S", "SENTENCE", "MDL-GREEDY")}
+ 
+##### g4-required-B-drops-web-s
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -200,3 +200,3 @@
+ # after every 100th, ALPHA4's cadence): ALL FOUR rules are required (WEB-S at >= 9 of 10 seeds). On both: PLANT-BEATS-NULL-2 holds and the parse-breaking control is CAUGHT. Stream B gates the unit's START only; it enters no grade.
+-G4_REQUIRED = {"A": ("WEB-H", "SENTENCE", "MDL-GREEDY"), "B": ("WEB-H", "WEB-S", "SENTENCE", "MDL-GREEDY")}
++G4_REQUIRED = {"A": ("WEB-H", "SENTENCE", "MDL-GREEDY"), "B": ("WEB-H", "SENTENCE", "MDL-GREEDY")}
+ 
+##### g4-rule-check-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -224,3 +224,3 @@
+         for rule in s["required"]:
+-            if not s["gates"][rule]["pass"]:
++            if False:
+                 failures.append(f"G4 stream {key}: {rule} fails the PLANT gate ({s['gates'][rule]})")
+##### g5-cpu-gt-ge
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -251,3 +251,3 @@
+     failures: List[str] = []
+-    if pred_unit_min > cpu_ceiling_min:
++    if pred_unit_min >= cpu_ceiling_min:
+         failures.append(f"G5: the predicted unit CPU {pred_unit_min:.1f} min exceeds the ceiling {cpu_ceiling_min} min")
+##### g5-default-cpu-ceiling
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -235,3 +235,3 @@
+ # ------------------------------------------------------------------------------------------------------------------ G5
+-def g5(copies: Path, sizes: Sequence[int] = (10, 20), cpu_ceiling_min: float = 40.0, rss_ceiling_mb: float = 1024.0, seeds: Sequence[int] = EV.SEEDS) -> Dict[str, object]:
++def g5(copies: Path, sizes: Sequence[int] = (10, 20), cpu_ceiling_min: float = 400.0, rss_ceiling_mb: float = 1024.0, seeds: Sequence[int] = EV.SEEDS) -> Dict[str, object]:
+     a4 = RN.load_streams(copies)["alpha4"]
+##### g5-default-rss-ceiling
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -235,3 +235,3 @@
+ # ------------------------------------------------------------------------------------------------------------------ G5
+-def g5(copies: Path, sizes: Sequence[int] = (10, 20), cpu_ceiling_min: float = 40.0, rss_ceiling_mb: float = 1024.0, seeds: Sequence[int] = EV.SEEDS) -> Dict[str, object]:
++def g5(copies: Path, sizes: Sequence[int] = (10, 20), cpu_ceiling_min: float = 40.0, rss_ceiling_mb: float = 10240.0, seeds: Sequence[int] = EV.SEEDS) -> Dict[str, object]:
+     a4 = RN.load_streams(copies)["alpha4"]
+##### g5-peak-min
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -257,3 +257,3 @@
+             "predicted_alpha4_cpu_seconds_at_100": pred_alpha, "predicted_unit_cpu_minutes": pred_unit_min, "predicted_peak_rss_mb": pred_rss_mb,
+-            "peak_rss_mb": max(p["peak_rss_kb"] for p in pilots) / 1024.0, "cpu_ceiling_min": cpu_ceiling_min, "rss_ceiling_mb": rss_ceiling_mb}
++            "peak_rss_mb": min(p["peak_rss_kb"] for p in pilots) / 1024.0, "cpu_ceiling_min": cpu_ceiling_min, "rss_ceiling_mb": rss_ceiling_mb}
+ 
+##### g5-rss-gt-ge
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -253,3 +253,3 @@
+         failures.append(f"G5: the predicted unit CPU {pred_unit_min:.1f} min exceeds the ceiling {cpu_ceiling_min} min")
+-    if pred_rss_mb > rss_ceiling_mb:
++    if pred_rss_mb >= rss_ceiling_mb:
+         failures.append(f"G5: the predicted peak memory {pred_rss_mb:.0f} MB exceeds the ceiling {rss_ceiling_mb:.0f} MB")
+##### g5-rss-slope-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -249,3 +249,3 @@
+     pred_unit_min = 5 * pred_alpha / 60.0
+-    pred_rss_mb = (b["peak_rss_kb"] + rss_slope * max(0, 100 - b["draws"])) / 1024.0
++    pred_rss_mb = b["peak_rss_kb"] / 1024.0
+     failures: List[str] = []
+##### g5-unit-factor
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -248,3 +248,3 @@
+     pred_alpha = a["cpu_seconds"] + cpu_slope * (100 - a["draws"])
+-    pred_unit_min = 5 * pred_alpha / 60.0
++    pred_unit_min = 4 * pred_alpha / 60.0
+     pred_rss_mb = (b["peak_rss_kb"] + rss_slope * max(0, 100 - b["draws"])) / 1024.0
+##### g6-cheat-bytes-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -269,3 +269,3 @@
+             failures.append(f"G6 (a): replicate {r['k']} has G(F_oracle) above G_max + 20 (margin {r['margin']:.2f})")
+-    if not (cheat["caught"] and cheat["bitsF_cheat"] != cheat["bitsF_honest"]):
++    if not cheat["caught"]:
+         failures.append("G6 (b): the planted cheat is not caught (or did not change the bytes)")
+##### g6-cheat-caught-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -269,3 +269,3 @@
+             failures.append(f"G6 (a): replicate {r['k']} has G(F_oracle) above G_max + 20 (margin {r['margin']:.2f})")
+-    if not (cheat["caught"] and cheat["bitsF_cheat"] != cheat["bitsF_honest"]):
++    if not (cheat["bitsF_cheat"] != cheat["bitsF_honest"]):
+         failures.append("G6 (b): the planted cheat is not caught (or did not change the bytes)")
+##### g6-cheat-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -269,3 +269,3 @@
+             failures.append(f"G6 (a): replicate {r['k']} has G(F_oracle) above G_max + 20 (margin {r['margin']:.2f})")
+-    if not (cheat["caught"] and cheat["bitsF_cheat"] != cheat["bitsF_honest"]):
++    if False:
+         failures.append("G6 (b): the planted cheat is not caught (or did not change the bytes)")
+##### g6-cheat-or
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -269,3 +269,3 @@
+             failures.append(f"G6 (a): replicate {r['k']} has G(F_oracle) above G_max + 20 (margin {r['margin']:.2f})")
+-    if not (cheat["caught"] and cheat["bitsF_cheat"] != cheat["bitsF_honest"]):
++    if not (cheat["caught"] or cheat["bitsF_cheat"] != cheat["bitsF_honest"]):
+         failures.append("G6 (b): the planted cheat is not caught (or did not change the bytes)")
+##### g6-default-moments
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -261,3 +261,3 @@
+ # ------------------------------------------------------------------------------------------------------------------ G6
+-def g6(replicates: int = 20, n_moments: int = 10_000) -> Dict[str, object]:
++def g6(replicates: int = 20, n_moments: int = 9_999) -> Dict[str, object]:
+     reps = [SC.g6_replicate(k, n_moments) for k in range(1, replicates + 1)]
+##### g6-default-replicates
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -261,3 +261,3 @@
+ # ------------------------------------------------------------------------------------------------------------------ G6
+-def g6(replicates: int = 20, n_moments: int = 10_000) -> Dict[str, object]:
++def g6(replicates: int = 19, n_moments: int = 10_000) -> Dict[str, object]:
+     reps = [SC.g6_replicate(k, n_moments) for k in range(1, replicates + 1)]
+##### g6-entropy-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -273,3 +273,3 @@
+         failures.append(f"G6 (c): the support sums to {ex['sum_p']!r}")
+-    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
++    if abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
+         failures.append(f"G6 (c): the generator's entropies are off ({ex})")
+##### g6-entropy-tol-loose
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -273,3 +273,3 @@
+         failures.append(f"G6 (c): the support sums to {ex['sum_p']!r}")
+-    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
++    if abs(ex["entropy"] - 6.0774) >= 5e-3 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
+         failures.append(f"G6 (c): the generator's entropies are off ({ex})")
+##### g6-hgl-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -273,3 +273,3 @@
+         failures.append(f"G6 (c): the support sums to {ex['sum_p']!r}")
+-    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
++    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
+         failures.append(f"G6 (c): the generator's entropies are off ({ex})")
+##### g6-hgl-tol-loose
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -273,3 +273,3 @@
+         failures.append(f"G6 (c): the support sums to {ex['sum_p']!r}")
+-    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
++    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-3 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
+         failures.append(f"G6 (c): the generator's entropies are off ({ex})")
+##### g6-hl-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -273,3 +273,3 @@
+         failures.append(f"G6 (c): the support sums to {ex['sum_p']!r}")
+-    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
++    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or ex["support_size"] != 90:
+         failures.append(f"G6 (c): the generator's entropies are off ({ex})")
+##### g6-hl-tol-loose
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -273,3 +273,3 @@
+         failures.append(f"G6 (c): the support sums to {ex['sum_p']!r}")
+-    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
++    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-6 or ex["support_size"] != 90:
+         failures.append(f"G6 (c): the generator's entropies are off ({ex})")
+##### g6-min-margin-max
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -275,3 +275,3 @@
+         failures.append(f"G6 (c): the generator's entropies are off ({ex})")
+-    return {"ok": not failures, "failures": failures, "replicates": reps, "cheat": cheat, "exact": ex, "min_margin": min(r["margin"] for r in reps)}
++    return {"ok": not failures, "failures": failures, "replicates": reps, "cheat": cheat, "exact": ex, "min_margin": max(r["margin"] for r in reps)}
+ 
+##### g6-replicates-from-zero
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -262,3 +262,3 @@
+ def g6(replicates: int = 20, n_moments: int = 10_000) -> Dict[str, object]:
+-    reps = [SC.g6_replicate(k, n_moments) for k in range(1, replicates + 1)]
++    reps = [SC.g6_replicate(k, n_moments) for k in range(0, replicates)]
+     cheat = SC.g6_cheat(1, min(4000, n_moments))
+##### g6-sum-tol-loose
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -271,3 +271,3 @@
+         failures.append("G6 (b): the planted cheat is not caught (or did not change the bytes)")
+-    if abs(ex["sum_p"] - 1.0) >= 1e-12:
++    if abs(ex["sum_p"] - 1.0) >= 1e-6:
+         failures.append(f"G6 (c): the support sums to {ex['sum_p']!r}")
+##### g6-sum-tol-tight
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -271,3 +271,3 @@
+         failures.append("G6 (b): the planted cheat is not caught (or did not change the bytes)")
+-    if abs(ex["sum_p"] - 1.0) >= 1e-12:
++    if abs(ex["sum_p"] - 1.0) >= 1e-13:
+         failures.append(f"G6 (c): the support sums to {ex['sum_p']!r}")
+##### g6-support-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -273,3 +273,3 @@
+         failures.append(f"G6 (c): the support sums to {ex['sum_p']!r}")
+-    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 or ex["support_size"] != 90:
++    if abs(ex["entropy"] - 6.0774) >= 5e-5 or abs(ex["h_given_length"] - 4.5774) >= 5e-5 or abs(ex["h_length"] - 1.5) >= 1e-12 :
+         failures.append(f"G6 (c): the generator's entropies are off ({ex})")
+##### g6-violation-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -267,3 +267,3 @@
+     for r in reps:
+-        if r["violation"]:
++        if False:
+             failures.append(f"G6 (a): replicate {r['k']} has G(F_oracle) above G_max + 20 (margin {r['margin']:.2f})")
+##### rg-exit-const
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -296,2 +296,2 @@
+         log(f"[gates] FAILURE: {f}")
+-    return 0 if not failures else 1
++    return 0
+##### rg-failure-label-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -289,3 +289,3 @@
+         res[name] = r
+-        failures += list(r.get("failures", [])) if not r["ok"] and "failures" in r else ([] if r["ok"] else [f"{name} failed"])
++        failures += list(r.get("failures", [])) if not r["ok"] and "failures" in r else []
+         log(f"[gates] {name}: {'OK' if r['ok'] else 'FAILED'}")
+##### rg-gate-order
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -285,3 +285,3 @@
+     failures: List[str] = []
+-    for name, fn in (("g1", lambda: g1(copies, expected)), ("g2", g2), ("g3", lambda: g3(**(g3_kw or {}))), ("g4", lambda: g4(**(g4_kw or {}))),
++    for name, fn in (("g2", g2), ("g1", lambda: g1(copies, expected)), ("g3", lambda: g3(**(g3_kw or {}))), ("g4", lambda: g4(**(g4_kw or {}))),
+                      ("g5", lambda: g5(copies, **(g5_kw or {}))), ("g6", lambda: g6(**(g6_kw or {})))):
+##### rg-header-mode-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -291,3 +291,3 @@
+         log(f"[gates] {name}: {'OK' if r['ok'] else 'FAILED'}")
+-    res.update({"passed": not failures, "failures": failures, "header": {**PR.header(RN.LAW_KEYS), **RN.code_header(), "gate_mode": RN.GATE_MODE},
++    res.update({"passed": not failures, "failures": failures, "header": {**PR.header(RN.LAW_KEYS), **RN.code_header()},
+                 "cpu_seconds": time.process_time() - t0, "peak_rss_kb": RN.peak_rss_kb()})
+##### rg-header-prereg-dropped
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -291,3 +291,3 @@
+         log(f"[gates] {name}: {'OK' if r['ok'] else 'FAILED'}")
+-    res.update({"passed": not failures, "failures": failures, "header": {**PR.header(RN.LAW_KEYS), **RN.code_header(), "gate_mode": RN.GATE_MODE},
++    res.update({"passed": not failures, "failures": failures, "header": {**RN.code_header(), "gate_mode": RN.GATE_MODE},
+                 "cpu_seconds": time.process_time() - t0, "peak_rss_kb": RN.peak_rss_kb()})
+##### rg-law-check-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -281,3 +281,3 @@
+               g6_kw: Optional[dict] = None, prereg_root: Optional[Path] = None, log=print) -> int:
+-    PR.check(RN.LAW_KEYS, root=prereg_root)
++    pass
+     t0 = time.process_time()
+##### rg-log-failures-off
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -295,3 +295,3 @@
+     for f in failures:
+-        log(f"[gates] FAILURE: {f}")
++        pass
+     return 0 if not failures else 1
+##### rg-log-status
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -290,3 +290,3 @@
+         failures += list(r.get("failures", [])) if not r["ok"] and "failures" in r else ([] if r["ok"] else [f"{name} failed"])
+-        log(f"[gates] {name}: {'OK' if r['ok'] else 'FAILED'}")
++        log(f"[gates] {name}: OK")
+     res.update({"passed": not failures, "failures": failures, "header": {**PR.header(RN.LAW_KEYS), **RN.code_header(), "gate_mode": RN.GATE_MODE},
+##### rg-passed-const
+--- a/tools/toys/frames/gates.py
++++ b/tools/toys/frames/gates.py
+@@ -291,3 +291,3 @@
+         log(f"[gates] {name}: {'OK' if r['ok'] else 'FAILED'}")
+-    res.update({"passed": not failures, "failures": failures, "header": {**PR.header(RN.LAW_KEYS), **RN.code_header(), "gate_mode": RN.GATE_MODE},
++    res.update({"passed": True, "failures": failures, "header": {**PR.header(RN.LAW_KEYS), **RN.code_header(), "gate_mode": RN.GATE_MODE},
+                 "cpu_seconds": time.process_time() - t0, "peak_rss_kb": RN.peak_rss_kb()})

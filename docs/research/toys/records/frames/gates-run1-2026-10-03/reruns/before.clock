@@ -1,0 +1,5 @@
+2026-10-03 23:35:26 +0400 start; code of the tree: 724865d (git archive tools genome brain); load 8.67 8.62 7.03; pressure some avg10=0.00 avg60=0.06 avg300=0.07 total=441681964
+23:35:54 g5_cost_diag exit 0
+23:36:01 g5_cost_prof exit 0
+23:36:13 g5_cost_count exit 0
+2026-10-03 23:36:13 +0400 end; load 8.23 8.51 7.07

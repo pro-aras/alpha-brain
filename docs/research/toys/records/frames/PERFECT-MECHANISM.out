@@ -1,0 +1,26 @@
+ALPHA4+PLANT (every 100): 85117 moments (train 51070, held 34047); plants train 505 held 337; V 2237 N 118921 K 2240; bits0 491523.1 bitsF 488398.0 L 22.25 -> G({plant}) = +3102.81 bits (first-order expected 2635.2); control (the same frame on the PLAIN split) G -23.20, L 22.25
+SCENE+PLANT (every 10): 11000 moments (train 6600, held 4400); plants train 600 held 400; V 16 N 19100 K 19; bits0 46119.6 bitsF 43530.8 L 8.00 -> G({plant}) = +2580.80 bits (first-order expected 2006.8); control (the same frame on the PLAIN split) G -8.59, L 7.61
+written docs/research/toys/records/frames/PERFECT-MECHANISM.json
+	Command being timed: "env PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python3 -B -u -m tools.toys.frames.plants perfect --out docs/research/toys/records/frames/PERFECT-MECHANISM.json"
+	User time (seconds): 1.56
+	System time (seconds): 0.08
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:01.65
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 103356
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 2
+	Minor (reclaiming a frame) page faults: 24174
+	Voluntary context switches: 15
+	Involuntary context switches: 12
+	Swaps: 0
+	File system inputs: 131944
+	File system outputs: 16
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

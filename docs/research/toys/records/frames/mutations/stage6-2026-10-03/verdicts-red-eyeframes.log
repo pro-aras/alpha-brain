@@ -1,0 +1,14 @@
+..E.................
+======================================================================
+ERROR: test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count (tests.tools.test_toys_frames_verdicts.TestEyeReading.test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/dev/genome-wt-toys-1003/tests/tools/test_toys_frames_verdicts.py", line 191, in test_the_per_frame_table_each_said_frame_with_its_says_and_its_yes_count
+    self.assertEqual(e["frames"], [{"frame": "red box", "pair": ["red", "box"], "says": 3, "yes": 2},
+                     ~^^^^^^^^^^
+KeyError: 'frames'
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.005s
+
+FAILED (errors=1)

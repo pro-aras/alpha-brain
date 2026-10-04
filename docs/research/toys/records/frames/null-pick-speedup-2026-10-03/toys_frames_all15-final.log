@@ -1,0 +1,43 @@
+..........................................................................................[gates] g1: FAILED
+[gates] g2: OK
+[gates] g3: OK
+[gates] g4: OK
+[gates] g5: OK
+[gates] g6: OK
+[gates] FAILURE: alpha4.moments: 2500 != 2501
+..[gates] g1: OK
+[gates] g2: OK
+[gates] g3: OK
+[gates] g4: OK
+[gates] g5: OK
+[gates] g6: OK
+............................................................[unit] ALPHA4: 1500 train / 1000 held moments, V 577, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] ALPHA4+PLANT: 1515 train / 1010 held moments, V 579, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] ALPHA4+SHUFFLE: 1500 train / 1000 held moments, V 577, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] SCENE: 900 train / 600 held moments, V 13, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] SCENE+PLANT: 990 train / 660 held moments, V 15, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] RESULTS.json written (amend1); grade: WEB-H FAIL, WEB-S FAIL, SENTENCE FAIL, MDL-GREEDY FAIL
+........wrote report.txt: 18015 bytes, sha256 880510b201779b5379e2926d849c684d67dc095c270d668bd35831cfb1a22f72
+..[unit] ALPHA4: 1500 train / 1000 held moments, V 577, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] ALPHA4+PLANT: 1515 train / 1010 held moments, V 579, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] ALPHA4+SHUFFLE: 1500 train / 1000 held moments, V 577, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] SCENE: 900 train / 600 held moments, V 13, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] SCENE+PLANT: 990 train / 660 held moments, V 15, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] RESULTS.json written (amend1); grade: WEB-H FAIL, WEB-S FAIL, SENTENCE FAIL, MDL-GREEDY FAIL
+..................................................................[unit] ALPHA4: 1500 train / 1000 held moments, V 577, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] ALPHA4+PLANT: 1515 train / 1010 held moments, V 579, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] ALPHA4+SHUFFLE: 1500 train / 1000 held moments, V 577, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] SCENE: 900 train / 600 held moments, V 13, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] SCENE+PLANT: 990 train / 660 held moments, V 15, 0 s wall, 0 CPU-s, peak RSS 198 MB
+[unit] RESULTS.json written (amend1); grade: WEB-H FAIL, WEB-S FAIL, SENTENCE FAIL, MDL-GREEDY FAIL
+[unit] ALPHA4: record on disk, skipped
+[unit] ALPHA4+PLANT: record on disk, skipped
+[unit] ALPHA4+SHUFFLE: record on disk, skipped
+[unit] SCENE: record on disk, skipped
+[unit] SCENE+PLANT: record on disk, skipped
+[unit] RESULTS.json written (amend1); grade: WEB-H FAIL, WEB-S FAIL, SENTENCE FAIL, MDL-GREEDY FAIL
+..............................................
+----------------------------------------------------------------------
+Ran 274 tests in 69.665s
+
+OK

@@ -1,0 +1,11 @@
+total 5: vectorised == 1000 scalar calls: True; state after equal: True
+total 100: vectorised == 1000 scalar calls: True; state after equal: True
+total 7919: vectorised == 1000 scalar calls: True; state after equal: True
+total 123456: vectorised == 1000 scalar calls: True; state after equal: True
+bigram bins (bin: n entries): {0: 5453, 2: 1861, 3: 349, 4: 389, 5: 120, 6: 88, 7: 26, 8: 25, 9: 10, 10: 8, 11: 2, 12: 8, 13: 2, 14: 6, 16: 1}
+WEB-H: |F| 1430; own-bin histogram {0: 176, 2: 302, 3: 308, 4: 359, 5: 114, 6: 84, 7: 26, 8: 24, 9: 10, 10: 8, 11: 2, 12: 8, 13: 2, 14: 6, 16: 1}
+   rng draws per pick: mean 1342, max 4014; picks that exhausted MAX_REJECT (1000) at least once: 892 of 1430; fallback picks 894
+WEB-S s1: |F| 807; own-bin histogram {0: 75, 2: 119, 3: 145, 4: 210, 5: 94, 6: 78, 7: 26, 8: 25, 9: 10, 10: 7, 11: 2, 12: 7, 13: 2, 14: 6, 16: 1}
+   rng draws per pick: mean 1017, max 4003; picks that exhausted MAX_REJECT (1000) at least once: 385 of 807; fallback picks 391
+SENTENCE: |F| 470; own-bin histogram {0: 76, 2: 21, 3: 16, 4: 130, 5: 94, 6: 63, 7: 22, 8: 19, 9: 8, 10: 5, 11: 1, 12: 7, 13: 1, 14: 6, 16: 1}
+   rng draws per pick: mean 597, max 3002; picks that exhausted MAX_REJECT (1000) at least once: 167 of 470; fallback picks 183

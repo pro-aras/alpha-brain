@@ -1,0 +1,392 @@
+##### CONTROL-broken
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -41,2 +41,3 @@
+ def log2_bin(count: int) -> int:
++    raise RuntimeError('BROKEN CONTROL')
+     """floor(2 log2 count): the bin of width 0.5 in log2 a count belongs to."""
+##### CONTROL-identity
+##### n2-flag-dropped
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -272,3 +272,3 @@
+             dealt.append(p)
+-            fallbacks += int(fell)
++            fallbacks += 0
+         values.append(scorer.gain(set(dealt)).G)
+##### n2-no-exclude
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -270,3 +270,3 @@
+             p, fell = pool.pick(rng, b0)
+-            pool.exclude(p)
++            pass
+             dealt.append(p)
+##### n2-pick-other-bin
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -269,3 +269,3 @@
+         for b0 in own:
+-            p, fell = pool.pick(rng, b0)
++            p, fell = pool.pick(rng, b0 + 1)
+             pool.exclude(p)
+##### n2-pool-per-draw
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -259,3 +259,3 @@
+     own = [log2_bin(max(1, scorer.train_adjacent(f))) for f in frames]
+-    pool = _BigramPool(bb)
++    pool = _BigramPool({b: list(v)[:-1] for b, v in bb.items()})
+     rng = np.random.default_rng([SEED_ROOT, int(rule_tag), int(seed), 2])
+##### n2-reset-empty
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -266,3 +266,3 @@
+     for _ in range(draws):
+-        pool.reset(base)
++        pool.reset(set())
+         dealt: List[Frame] = []
+##### np-absent-bins-kept
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -192,3 +192,3 @@
+             ks = [b0] if d == 0 else [b0 - d, b0 + d]
+-            ks = [k for k in ks if k in bins]
++            ks = [k for k in ks]
+             sizes = [len(bins[k]) for k in ks]
+##### np-accept-inverted
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -204,3 +204,3 @@
+                 r = rng.integers(total, size=MAX_REJECT)
+-                ok = ~m[r]
++                ok = m[r]
+                 if ok.any():
+##### np-any-all
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -205,3 +205,3 @@
+                 ok = ~m[r]
+-                if ok.any():
++                if ok.all():
+                     j = int(np.argmax(ok))
+##### np-batch-long
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -203,3 +203,3 @@
+                 saved = rng.bit_generator.state
+-                r = rng.integers(total, size=MAX_REJECT)
++                r = rng.integers(total, size=MAX_REJECT + 1)
+                 ok = ~m[r]
+##### np-batch-short
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -203,3 +203,3 @@
+                 saved = rng.bit_generator.state
+-                r = rng.integers(total, size=MAX_REJECT)
++                r = rng.integers(total, size=MAX_REJECT - 1)
+                 ok = ~m[r]
+##### np-doomed-advance-long
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -200,3 +200,3 @@
+                 if total - sum(n_excl[k] for k in ks) == 0:
+-                    rng.integers(total, size=MAX_REJECT)
++                    rng.integers(total, size=MAX_REJECT + 1)
+                     continue
+##### np-doomed-advance-short
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -200,3 +200,3 @@
+                 if total - sum(n_excl[k] for k in ks) == 0:
+-                    rng.integers(total, size=MAX_REJECT)
++                    rng.integers(total, size=MAX_REJECT - 1)
+                     continue
+##### np-doomed-no-continue
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -201,3 +201,3 @@
+                     rng.integers(total, size=MAX_REJECT)
+-                    continue
++                    pass
+                 saved = rng.bit_generator.state
+##### np-doomed-no-draw
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -200,3 +200,3 @@
+                 if total - sum(n_excl[k] for k in ks) == 0:
+-                    rng.integers(total, size=MAX_REJECT)
++                    pass
+                     continue
+##### np-doomed-one
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -199,3 +199,3 @@
+             if total > SMALL_ENUM:
+-                if total - sum(n_excl[k] for k in ks) == 0:
++                if total - sum(n_excl[k] for k in ks) == 1:
+                     rng.integers(total, size=MAX_REJECT)
+##### np-enum-boundary
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -198,3 +198,3 @@
+             m = mask[ks[0]] if len(ks) == 1 else np.concatenate([mask[k] for k in ks])
+-            if total > SMALL_ENUM:
++            if total >= SMALL_ENUM:
+                 if total - sum(n_excl[k] for k in ks) == 0:
+##### np-enum-first
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -212,3 +212,3 @@
+             if adm.size:
+-                return self._item(ks, sizes, int(adm[int(rng.integers(adm.size))])), d > 0
++                return self._item(ks, sizes, int(adm[0])), d > 0
+         raise NullError(f"NULL-2: no admissible adjacent bigram in any bin for bin {b0}")
+##### np-enum-flag
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -212,3 +212,3 @@
+             if adm.size:
+-                return self._item(ks, sizes, int(adm[int(rng.integers(adm.size))])), d > 0
++                return self._item(ks, sizes, int(adm[int(rng.integers(adm.size))])), d >= 0
+         raise NullError(f"NULL-2: no admissible adjacent bigram in any bin for bin {b0}")
+##### np-enum-gt1
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -211,3 +211,3 @@
+             adm = np.flatnonzero(~m)
+-            if adm.size:
++            if adm.size > 1:
+                 return self._item(ks, sizes, int(adm[int(rng.integers(adm.size))])), d > 0
+##### np-enum-inverted
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -210,3 +210,3 @@
+                     return self._item(ks, sizes, int(r[j])), d > 0
+-            adm = np.flatnonzero(~m)
++            adm = np.flatnonzero(m)
+             if adm.size:
+##### np-enum-last
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -212,3 +212,3 @@
+             if adm.size:
+-                return self._item(ks, sizes, int(adm[int(rng.integers(adm.size))])), d > 0
++                return self._item(ks, sizes, int(adm[-1])), d > 0
+         raise NullError(f"NULL-2: no admissible adjacent bigram in any bin for bin {b0}")
+##### np-error-text
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -213,3 +213,3 @@
+                 return self._item(ks, sizes, int(adm[int(rng.integers(adm.size))])), d > 0
+-        raise NullError(f"NULL-2: no admissible adjacent bigram in any bin for bin {b0}")
++        raise NullError(f"NULL-2: no admissible adjacent bigram in any bin for bin {b0 + 1}")
+ 
+##### np-exclude-count2
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -179,3 +179,3 @@
+             self.mask[w[0]][w[1]] = True
+-            self.n_excl[w[0]] += 1
++            self.n_excl[w[0]] += 2
+ 
+##### np-exclude-nocount
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -179,3 +179,3 @@
+             self.mask[w[0]][w[1]] = True
+-            self.n_excl[w[0]] += 1
++            self.n_excl[w[0]] += 0
+ 
+##### np-exclude-twice
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -177,3 +177,3 @@
+         w = self.where.get(p)
+-        if w is not None and not self.mask[w[0]][w[1]]:
++        if w is not None:
+             self.mask[w[0]][w[1]] = True
+##### np-first-last
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -206,3 +206,3 @@
+                 if ok.any():
+-                    j = int(np.argmax(ok))
++                    j = int(len(ok) - 1 - np.argmax(ok[::-1]))
+                     rng.bit_generator.state = saved
+##### np-first-min
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -206,3 +206,3 @@
+                 if ok.any():
+-                    j = int(np.argmax(ok))
++                    j = int(np.argmin(ok))
+                     rng.bit_generator.state = saved
+##### np-flag-accept
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -209,3 +209,3 @@
+                     rng.integers(total, size=j + 1)
+-                    return self._item(ks, sizes, int(r[j])), d > 0
++                    return self._item(ks, sizes, int(r[j])), d >= 0
+             adm = np.flatnonzero(~m)
+##### np-flag-accept-false
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -209,3 +209,3 @@
+                     rng.integers(total, size=j + 1)
+-                    return self._item(ks, sizes, int(r[j])), d > 0
++                    return self._item(ks, sizes, int(r[j])), False
+             adm = np.flatnonzero(~m)
+##### np-item-le
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -183,3 +183,3 @@
+         for k, size in zip(ks, sizes):
+-            if r < size:
++            if r <= size:
+                 return self.bins[k][r]
+##### np-item-offset
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -185,3 +185,3 @@
+                 return self.bins[k][r]
+-            r -= size
++            r -= size + 1
+         raise IndexError(r)
+##### np-levels-short
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -190,3 +190,3 @@
+         bins, mask, n_excl = self.bins, self.mask, self.n_excl
+-        for d in range(0, (self.hi - self.lo) + 2):
++        for d in range(0, (self.hi - self.lo) + 1):
+             ks = [b0] if d == 0 else [b0 - d, b0 + d]
+##### np-mask-dtype
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -164,3 +164,3 @@
+         self.where: Dict[Frame, Tuple[int, int]] = {p: (b, i) for b, lst in bins.items() for i, p in enumerate(lst)}
+-        self.mask: Dict[int, np.ndarray] = {b: np.zeros(len(lst), dtype=bool) for b, lst in bins.items()}
++        self.mask: Dict[int, np.ndarray] = {b: np.zeros(len(lst), dtype=int) for b, lst in bins.items()}
+         self.n_excl: Dict[int, int] = {b: 0 for b in bins}
+##### np-mask-ones
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -164,3 +164,3 @@
+         self.where: Dict[Frame, Tuple[int, int]] = {p: (b, i) for b, lst in bins.items() for i, p in enumerate(lst)}
+-        self.mask: Dict[int, np.ndarray] = {b: np.zeros(len(lst), dtype=bool) for b, lst in bins.items()}
++        self.mask: Dict[int, np.ndarray] = {b: np.ones(len(lst), dtype=bool) for b, lst in bins.items()}
+         self.n_excl: Dict[int, int] = {b: 0 for b in bins}
+##### np-mask-reversed
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -197,3 +197,3 @@
+                 continue
+-            m = mask[ks[0]] if len(ks) == 1 else np.concatenate([mask[k] for k in ks])
++            m = mask[ks[0]] if len(ks) == 1 else np.concatenate([mask[k] for k in reversed(ks)])
+             if total > SMALL_ENUM:
+##### np-no-restore
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -207,3 +207,3 @@
+                     j = int(np.argmax(ok))
+-                    rng.bit_generator.state = saved
++                    pass
+                     rng.integers(total, size=j + 1)
+##### np-order-swapped
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -191,3 +191,3 @@
+         for d in range(0, (self.hi - self.lo) + 2):
+-            ks = [b0] if d == 0 else [b0 - d, b0 + d]
++            ks = [b0] if d == 0 else [b0 + d, b0 - d]
+             ks = [k for k in ks if k in bins]
+##### np-pick-index
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -209,3 +209,3 @@
+                     rng.integers(total, size=j + 1)
+-                    return self._item(ks, sizes, int(r[j])), d > 0
++                    return self._item(ks, sizes, int(r[0])), d > 0
+             adm = np.flatnonzero(~m)
+##### np-redraw-long
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -208,3 +208,3 @@
+                     rng.bit_generator.state = saved
+-                    rng.integers(total, size=j + 1)
++                    rng.integers(total, size=j + 2)
+                     return self._item(ks, sizes, int(r[j])), d > 0
+##### np-redraw-short
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -208,3 +208,3 @@
+                     rng.bit_generator.state = saved
+-                    rng.integers(total, size=j + 1)
++                    rng.integers(total, size=j)
+                     return self._item(ks, sizes, int(r[j])), d > 0
+##### np-reset-count
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -171,3 +171,3 @@
+             self.mask[b][:] = False
+-            self.n_excl[b] = 0
++            pass
+         for p in excluded:
+##### np-reset-mask
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -170,3 +170,3 @@
+         for b in self.mask:
+-            self.mask[b][:] = False
++            pass
+             self.n_excl[b] = 0
+##### np-reset-skip-base
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -172,3 +172,3 @@
+             self.n_excl[b] = 0
+-        for p in excluded:
++        for p in []:
+             self.exclude(p)
+##### np-total0-break
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -196,3 +196,3 @@
+             if total == 0:
+-                continue
++                break
+             m = mask[ks[0]] if len(ks) == 1 else np.concatenate([mask[k] for k in ks])
+##### np-where-index
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -163,3 +163,3 @@
+         self.lo, self.hi = min(bins), max(bins)
+-        self.where: Dict[Frame, Tuple[int, int]] = {p: (b, i) for b, lst in bins.items() for i, p in enumerate(lst)}
++        self.where: Dict[Frame, Tuple[int, int]] = {p: (b, i + 1) for b, lst in bins.items() for i, p in enumerate(lst)}
+         self.mask: Dict[int, np.ndarray] = {b: np.zeros(len(lst), dtype=bool) for b, lst in bins.items()}
+##### ref-body
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -144,3 +144,3 @@
+         if admissible:
+-            return admissible[int(rng.integers(len(admissible)))], d > 0
++            return admissible[int(rng.integers(len(admissible)))], d >= 0
+     raise NullError(f"NULL-2: no admissible adjacent bigram in any bin for bin {b0}")
+##### ref-constant-enum
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -31,3 +31,3 @@
+ SEED_ROOT = 20261103
+-SMALL_ENUM = 64          # a candidate set this small is enumerated; a larger one is rejection-sampled (uniform over the admissible ones either way)
++SMALL_ENUM = 65          # a candidate set this small is enumerated; a larger one is rejection-sampled (uniform over the admissible ones either way)
+ MAX_REJECT = 1000
+##### ref-constant-reject
+--- a/tools/toys/frames/null.py
++++ b/tools/toys/frames/null.py
+@@ -32,3 +32,3 @@
+ SMALL_ENUM = 64          # a candidate set this small is enumerated; a larger one is rejection-sampled (uniform over the admissible ones either way)
+-MAX_REJECT = 1000
++MAX_REJECT = 999
+ ENUM_LIMIT = 1_000_000

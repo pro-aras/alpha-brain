@@ -936,6 +936,18 @@ class Mind:
             raise GenomeError("DRIVE declared beside no BRAIN line: the turn is the brain's (PREREG-BRAIN-DRIVES §2.1) — "
                                "the organism does not start")
         self.brain_turns: Dict[str, int] = {"turns": 0, "said": 0, "asked": 0}
+        # edit: Kimi K3 (kimi-code, builder lane kimi-w1), 2026-10-04 18:35 +0400 — PREREG-W1-MOUTH-VOICES-BRAIN §2 (the law SIGNED x3 at
+        # toys-1003 1ccc3bf; the VERIFIER's NOTE-1 binds): the MOUTH line's OPTIONAL clause «and the brain's phrase per canvas». The
+        # clause declared beside no DRIVE line is refused BY NAME («the phrase is the DRIVE turn's», the form of the DRIVE-beside-no-
+        # BRAIN refusal above; DRIVE already refuses beside no BRAIN). "voiced" is INITIALISED at construction, ONLY under the clause
+        # (every other ledger is what it was): the snapshot saves dict(self.brain_turns) unconditionally and the resume restores only
+        # the keys present here, so a resumed life keeps its voiced count. The voice row itself is written at the DRIVE turn site.
+        self._voice: Optional[str] = (self.genome.declared.get("MOUTH") or {}).get("brain")
+        if self._voice is not None and "DRIVE" not in self.genome.declared:
+            raise GenomeError("MOUTH's brain clause declared beside no DRIVE line: the phrase is the DRIVE turn's "
+                              "(PREREG-W1-MOUTH-VOICES-BRAIN §2) — the organism does not start")
+        if self._voice is not None:
+            self.brain_turns["voiced"] = 0
         # PREREG-HEARS-2 §1: per hand other than the scene world, the count of canvases the brain learned from it (its derived scene
         # index); rebuilt from the brain's own `worlds` at a resume (_restore_brain_world_count), counted as it goes in a replay.
         self._brain_world_count: Dict[str, int] = {}
@@ -1674,6 +1686,17 @@ class Mind:
             surprise = self.brain.surprise(turn, list(words))
             self._write_journal(row["at"], {"kind": "brain", "act": "turn", **base, **extra, **_jsonable(turn), "heard": list(words),
                                             "surprise": surprise})
+            # edit: Kimi K3 (kimi-code, builder lane kimi-w1), 2026-10-04 18:35 +0400 — PREREG-W1-MOUTH-VOICES-BRAIN §2 (the mind):
+            # THE MOUTH VOICES THE BRAIN — just after the turn's journal row and BEFORE the learn row, when the MOUTH clause is
+            # declared and the turn's say is not None: ONE journal row (kind brain, act voice; the turn's say, every field,
+            # copied; the scene hand carries no extra key, another hand carries world/scene/world_seed exactly as the turn row
+            # does) and two counters. A canvas whose turn says nothing writes NOTHING. No world-door row, no reflex-ring episode,
+            # never an ear row (the law §2's «what does not change»; the seat's six defaults taken by name).
+            if self._voice is not None and turn["say"] is not None:
+                self._write_journal(row["at"], {"kind": "brain", "act": "voice", **base, **extra,
+                                                "say": _jsonable(turn["say"])})
+                self.acts_chosen["voice"] = self.acts_chosen.get("voice", 0) + 1
+                self.brain_turns["voiced"] += 1
             if self.self_node is not None:
                 self._self_turn(turn, list(words), surprise, scene_ix, world)
         out = _jsonable(self.brain.learn(g, list(words), moment=str(moment), scene=scene_ix, world_seed=ws, **learn_kw))

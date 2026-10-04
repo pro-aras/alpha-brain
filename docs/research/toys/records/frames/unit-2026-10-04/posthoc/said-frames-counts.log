@@ -1,0 +1,15 @@
+train moments 50565, held moments 33710
+frame           train adjacent  held adjacent
+green box                  320              0
+grey ball                  128              0
+blue ball                  156              0
+red box                    129              0
+purple ball                128              0
+yellow key                 128              0
+blue key                    91              0
+red key                     74              0
+green key                   64              0
+yellow ball                 64              0
+yellow box                  64              0
+grey box                    64              0
+two-word colour+object moments: 1576; first at moment 6 of 84275, last at 38296; share in the train part (first 50565 moments): 1.000

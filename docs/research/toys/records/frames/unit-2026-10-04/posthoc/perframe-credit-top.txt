@@ -1,0 +1,17 @@
+per-frame marginal credit (bits, one decimal) from perframe-credit.json — the 25 largest and the 3 most negative of each rule (a POST-HOC reading; see RESULT-TOY-FRAMES.md)
+MDL-GREEDY: |F| 281, paying 45, sum of positive credits 1648.66, of the others -4359.71, G of the paying subset alone (optimistic) 1843.67
+   largest: project gutenber +309.6; green box +161.6; grey ball +88.9; blue ball +85.3; did not +72.0; red box +65.0; electron works +63.0; in the +52.3; terms of +50.3; this agreemen +50.1; do not +49.6; electron work +47.3; script exercise +44.1; i will +42.8; united states +42.5; if you +42.3; paragrap e +40.9; grey box +35.3; i am +33.3; purple ball +32.8; set forth +30.4; of the +27.7; you may +25.9; literary archive +22.6; one day +19.4
+   most negative: red key -42.6; yellow key -66.3; green key -102.4
+   eye-confirmed said frames' credits: blue ball +85.3; blue key -39.1; green box +161.6; grey ball +88.9; purple ball +32.8; red box +65.0; red key -42.6; yellow key -66.3
+SENTENCE: |F| 470, paying 39, sum of positive credits 1125.22, of the others -9383.04, G of the paying subset alone (optimistic) 1678.70
+   largest: green box +163.3; project gutenber +124.4; blue ball +98.3; grey ball +88.8; did not +76.4; red box +66.5; this agreemen +50.3; grey box +36.5; purple ball +32.7; paragrap e +32.2; electron work +26.0; i will +25.6; you may +24.4; into the +23.2; if you +22.9; literary archive +22.1; you must +20.3; i am +19.7; it was +19.7; one day +19.4; terms of +13.7; electron works +12.3; illustra boy +12.1; do not +11.6; copyrigh law +11.0
+   most negative: the project -62.3; yellow key -66.4; green key -102.4
+   eye-confirmed said frames' credits: blue ball +98.3; blue key -27.2; green box +163.3; grey ball +88.8; purple ball +32.7; red box +66.5; red key -42.7; yellow key -66.4
+WEB-H: |F| 1430, paying 45, sum of positive credits 1187.14, of the others -30492.45, G of the paying subset alone (optimistic) 1789.90
+   largest: green box +160.8; project gutenber +129.4; grey ball +88.4; blue ball +83.8; did not +69.1; red box +63.3; he had +51.8; he was +46.0; of the +38.8; grey box +35.1; purple ball +32.3; in the +28.8; this agreemen +27.8; paragrap e +22.4; literary archive +20.8; one day +20.8; i am +20.5; you may +20.3; it was +19.3; electron work +17.5; terms of +17.3; do not +15.9; into the +15.1; if you +13.1; illustra boy +12.8
+   most negative: and the -58.2; yellow key -66.6; green key -102.5
+   eye-confirmed said frames' credits: blue ball +83.8; blue key -40.1; green box +160.8; grey ball +88.4; purple ball +32.3; red box +63.3; red key -44.0; yellow key -66.6
+WEB-S s1: |F| 807, paying 42, sum of positive credits 1311.88, of the others -16792.12, G of the paying subset alone (optimistic) 1717.79
+   largest: green box +165.4; project gutenber +135.8; blue ball +104.2; grey ball +94.7; red box +87.5; did not +76.7; do not +52.1; this agreemen +51.2; of the +44.4; purple ball +38.6; grey box +37.4; paragrap e +32.0; in the +31.9; electron work +29.1; i will +29.0; you may +23.7; you must +22.2; literary archive +22.1; if you +21.3; terms of +20.2; i am +19.4; one day +19.3; it was +16.2; into the +15.2; electron works +12.5
+   most negative: the united -51.8; yellow key -66.6; green key -102.5
+   eye-confirmed said frames' credits: blue ball +104.2; blue key -27.5; green box +165.4; grey ball +94.7; purple ball +38.6; red box +87.5; red key -25.3; yellow key -66.6

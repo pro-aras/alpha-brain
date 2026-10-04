@@ -71,6 +71,94 @@ class TestPrereg(unittest.TestCase):
         finally:
             shutil.rmtree(d)
 
+    def test_the_frames_amendment_is_pinned_and_a_planted_edit_of_its_gate_is_refused(self):
+        # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 17:20 +0400 — Toy C's AMENDMENT-1 (the PLANT gate, the plant's second token, the memory price, the readings), text at d94392b, co-signed by the
+        # architect 17:17 (d830146) and signed by the seat 17:19 (27edde2); written FIRST (red: no «frames_amend1» pin yet).
+        want = "158660bbfe6a1fd0c551dabc1308dbd4f89fc90a07fd9c58d19e163e9b4abce0"
+        got = PR.check(["frames", "frames_amend1"])
+        self.assertEqual(got["frames_amend1"], want)
+        self.assertEqual(got["frames"], "a9787ef8026e8e6d8ab41f16d088bb5259f5cf9f5d64de7176da848a2a52c31a")      # the base law's pin is untouched
+        d = Path(tempfile.mkdtemp())
+        try:
+            src = DOCS / "PREREG-TOY-FRAMES-AMEND-1.md"
+            bad = d / "PREREG-TOY-FRAMES-AMEND-1.md"
+            text = src.read_bytes()
+            self.assertIn(b"> 0 on that stream", text)
+            bad.write_bytes(text.replace(b"> 0 on that stream", b"> 1 on that stream", 1))                  # the plant: the threshold of gate (B)
+            self.assertNotEqual(bad.read_bytes(), text)                                                         # the plant changed the bytes
+            with self.assertRaises(PR.PreregError):
+                PR.check(["frames_amend1"], root=d)
+            # a signature line moves nothing: the seat's line is dropped like the architect's
+            ok = d / "PREREG-TOY-FRAMES-AMEND-1.md"
+            ok.write_bytes(text + b"Signed: someone else, later\n")
+            self.assertEqual(PR.check(["frames_amend1"], root=d)["frames_amend1"], want)
+        finally:
+            shutil.rmtree(d)
+        h = PR.header(["frames", "frames_amend1"])
+        self.assertEqual(h["prereg_frames_amend1_sha256"], want)
+
+    def test_the_frames_amendment_2_is_pinned_and_a_planted_edit_of_its_gate_is_refused(self):
+        # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 18:21 +0400 — Toy C's AMENDMENT-2 (G4's second, ALPHA4-regime stream), text at d7f6772, co-signed by the architect 18:18 (c30dbb6) and signed by the seat 18:20
+        # (d407dca); written FIRST (red: no «frames_amend2» pin yet).
+        want = "948d77044a4aff3cdb1ab32f02191b806fb650c80b83a1f43be4d9eb074ccfec"
+        got = PR.check(["frames", "frames_amend1", "frames_amend2"])
+        self.assertEqual(got["frames_amend2"], want)
+        self.assertEqual(got["frames_amend1"], "158660bbfe6a1fd0c551dabc1308dbd4f89fc90a07fd9c58d19e163e9b4abce0")      # the other pins are untouched
+        d = Path(tempfile.mkdtemp())
+        try:
+            src = DOCS / "PREREG-TOY-FRAMES-AMEND-2.md"
+            text = src.read_bytes()
+            self.assertIn(b"All four rules must pass the amend1 gate", text)
+            bad = d / "PREREG-TOY-FRAMES-AMEND-2.md"
+            bad.write_bytes(text.replace(b"All four rules must pass the amend1 gate", b"All four rules may pass the amend1 gate", 1))        # the plant: the requirement on stream (B)
+            self.assertNotEqual(bad.read_bytes(), text)
+            with self.assertRaises(PR.PreregError):
+                PR.check(["frames_amend2"], root=d)
+        finally:
+            shutil.rmtree(d)
+        self.assertEqual(PR.header(["frames_amend2"])["prereg_frames_amend2_sha256"], want)
+
+    def test_both_families_of_signature_lines_are_dropped(self):
+        # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 15:45 +0400 — Toy D's law (the architect's) signs with «Signed:» / «Co-signed:» at the line start, the toys laws with «- Co-signed:»;
+        # written FIRST (red: the second family is not yet dropped). The seat's signature REPLACES the placeholder line «Signed: the seat — pending.» — both are dropped, so it cannot move the sha.
+        d = Path(tempfile.mkdtemp())
+        try:
+            base = d / "base.md"
+            base.write_bytes(b"a\nb\n")
+            sig = d / "sig.md"
+            sig.write_bytes(b"a\nb\nSigned: the author, 15:35\nCo-signed: the builder, pending\n- Signed: x\n- Co-signed: y\nSigned: the seat \xe2\x80\x94 pending.\n")
+            self.assertEqual(PR.signed_sha(sig), PR.signed_sha(base))
+            swapped = d / "swapped.md"
+            swapped.write_bytes(b"a\nb\nSigned: the author, 15:35\nCo-signed: the builder, 15:50\nSigned: the seat, 15:59 (the placeholder replaced)\n")
+            self.assertEqual(PR.signed_sha(swapped), PR.signed_sha(base))
+        finally:
+            shutil.rmtree(d)
+
+    def test_a_body_line_beginning_signed_without_the_colon_stays_in_the_text(self):
+        d = Path(tempfile.mkdtemp())
+        try:
+            base = d / "base.md"
+            base.write_bytes(b"a\nb\n")
+            body = d / "body.md"
+            body.write_bytes(b"a\nSigned off by the whole team.\nb\n")                  # prose, no colon: part of the law
+            self.assertNotEqual(PR.signed_sha(body), PR.signed_sha(base))
+            caps = d / "caps.md"
+            caps.write_bytes(b"a\nb\nSIGNED:\n")                                          # the laws' own all-caps header stays inside the signed text (case-sensitive)
+            self.assertNotEqual(PR.signed_sha(caps), PR.signed_sha(base))
+            mid = d / "mid.md"
+            mid.write_bytes(b"a\n  Signed: indented text is not a signature line\nb\n")
+            self.assertNotEqual(PR.signed_sha(mid), PR.signed_sha(base))
+        finally:
+            shutil.rmtree(d)
+
+    def test_the_four_pinned_shas_do_not_move_under_the_wider_rule(self):
+        got = PR.check(["cp", "cp_amend1", "nullspace", "frames"])
+        self.assertEqual(got["frames"], "a9787ef8026e8e6d8ab41f16d088bb5259f5cf9f5d64de7176da848a2a52c31a")
+        for name in ("PREREG-TOY-CP.md", "PREREG-TOY-CP-AMEND-1.md", "PREREG-TOY-NULLSPACE.md", "PREREG-TOY-FRAMES.md"):
+            lines = (DOCS / name).read_bytes().split(b"\n")
+            for ln in lines:
+                self.assertFalse(ln.startswith((b"Signed:", b"Co-signed:", b"- Signed:")), (name, ln[:60]))      # no existing law has a line the wider rule would newly drop
+
     def test_header_carries_the_signed_shas(self):
         h = PR.header(["cp", "cp_amend1"])
         self.assertEqual(h["prereg_cp_sha256"], PR.SIGNED["cp"][1])

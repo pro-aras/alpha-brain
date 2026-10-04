@@ -1,0 +1,139 @@
+{
+ "file": "tools/toys/frames/run.py",
+ "module": "tools.toys.frames.run",
+ "mutants": [
+  {
+   "kind": "identity",
+   "name": "CONTROL-identity"
+  },
+  {
+   "kind": "broken",
+   "name": "CONTROL-broken"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code"
+   ],
+   "name": "cli-gates-const",
+   "new": "return 0",
+   "old": "return GT.run_gates(Path(a.copies), out)",
+   "why": "gates always exits 0"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code",
+    "TestCli.test_gates_defaults_to_the_runners_copies_and_runs_directories"
+   ],
+   "name": "cli-gates-copies",
+   "new": "return GT.run_gates(out, out)",
+   "old": "return GT.run_gates(Path(a.copies), out)",
+   "why": "the copies are the runs directory"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code",
+    "TestCli.test_gates_defaults_to_the_runners_copies_and_runs_directories"
+   ],
+   "name": "cli-gates-out",
+   "new": "return GT.run_gates(Path(a.copies), Path(a.copies))",
+   "old": "return GT.run_gates(Path(a.copies), out)",
+   "why": "the output is the copies directory"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_gates_runs_run_gates_on_the_given_directories_and_returns_its_code",
+    "TestCli.test_gates_defaults_to_the_runners_copies_and_runs_directories"
+   ],
+   "name": "cli-gates-64",
+   "new": "print('gates: see tools/toys/frames/gates.py', file=sys.stderr); return 64",
+   "old": "return GT.run_gates(Path(a.copies), out)",
+   "why": "the old stub"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_the_unit_command_passes_its_options_to_run_unit"
+   ],
+   "name": "cli-unit-draws",
+   "new": "ap.add_argument(\"--draws\", type=int, default=99)",
+   "old": "ap.add_argument(\"--draws\", type=int, default=100)",
+   "why": "the law's 100 draws become 99"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_the_unit_command_passes_its_options_to_run_unit"
+   ],
+   "name": "cli-unit-only",
+   "new": "only = [x for x in a.only.split(\",\")] or None",
+   "old": "only = [x for x in a.only.split(\",\") if x] or None",
+   "why": "an empty --only is [''] instead of None"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_the_unit_command_passes_its_options_to_run_unit"
+   ],
+   "name": "cli-unit-only-none",
+   "new": "only = None",
+   "old": "only = [x for x in a.only.split(\",\") if x] or None",
+   "why": "--only is ignored"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_the_unit_command_passes_its_options_to_run_unit"
+   ],
+   "name": "cli-unit-draws-pass",
+   "new": "return run_unit(Path(a.copies), out, only=only)",
+   "old": "return run_unit(Path(a.copies), out, draws=a.draws, only=only)",
+   "why": "--draws is not passed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_the_unit_command_passes_its_options_to_run_unit"
+   ],
+   "name": "cli-unit-copies",
+   "new": "return run_unit(out, out, draws=a.draws, only=only)",
+   "old": "return run_unit(Path(a.copies), out, draws=a.draws, only=only)",
+   "why": "the unit reads the runs directory as copies"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_status_lists_each_condition_and_the_two_records"
+   ],
+   "name": "cli-status-text",
+   "new": "'missing' if (out / f'{name}.json').exists() else 'on disk'}\")",
+   "old": "'on disk' if (out / f'{name}.json').exists() else 'missing'}\")",
+   "why": "on disk / missing swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_status_lists_each_condition_and_the_two_records"
+   ],
+   "name": "cli-status-results",
+   "new": "print(f\"RESULTS.json: {'on disk' if (out / 'GATES.json').exists() else 'missing'};",
+   "old": "print(f\"RESULTS.json: {'on disk' if (out / 'RESULTS.json').exists() else 'missing'};",
+   "why": "RESULTS.json reads GATES.json"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestCli.test_status_lists_each_condition_and_the_two_records"
+   ],
+   "name": "cli-status-code",
+   "new": "print(f\"RESULTS.json: {'on disk' if (out / 'RESULTS.json').exists() else 'missing'}; GATES.json: {'on disk' if (out / 'GATES.json').exists() else 'missing'}\")\n        return 1",
+   "old": "print(f\"RESULTS.json: {'on disk' if (out / 'RESULTS.json').exists() else 'missing'}; GATES.json: {'on disk' if (out / 'GATES.json').exists() else 'missing'}\")\n        return 0",
+   "why": "status exits 1"
+  }
+ ],
+ "source_sha256": "ec5b43b330b92a9228c4d2c60a00d30a27757b238fba76e7cab765144dc407e8",
+ "tests": "tests.tools.test_toys_frames_run"
+}

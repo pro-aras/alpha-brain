@@ -1,0 +1,1262 @@
+{
+ "file": "tools/toys/frames/report.py",
+ "module": "tools.toys.frames.report",
+ "mutants": [
+  {
+   "kind": "identity",
+   "name": "CONTROL-identity"
+  },
+  {
+   "kind": "broken",
+   "name": "CONTROL-broken"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestReport.test_the_provenance_lists_every_record_file_with_its_sha256"
+   ],
+   "name": "rp-sha-truncated",
+   "new": "return hashlib.sha256(path.read_bytes()).hexdigest()[:63]",
+   "old": "return hashlib.sha256(path.read_bytes()).hexdigest()",
+   "why": "a record's hash is cut"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_a_missing_results_file_is_an_error_not_a_blank"
+   ],
+   "name": "rp-load-results-silent",
+   "new": "pass",
+   "old": "raise ReportError(f\"RESULTS.json is missing from {root.name}\")",
+   "why": "a missing RESULTS.json is no ReportError"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestReport.test_a_missing_condition_record_is_an_error_not_a_blank"
+   ],
+   "name": "rp-load-cond-silent",
+   "new": "continue",
+   "old": "raise ReportError(f\"{p.name}: the condition record is missing from {root.name}\")",
+   "why": "a missing condition record is skipped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-num-none",
+   "new": "return \"-\" if x is None else f\"{x:.{nd}f}\"",
+   "old": "return \"none\" if x is None else f\"{x:.{nd}f}\"",
+   "why": "a missing number reads \u00ab-\u00bb"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_plant_section_prints_B_its_decomposition_and_each_rules_gate"
+   ],
+   "name": "rp-signed-plus",
+   "new": "f\"{x:.{nd}f}\"",
+   "old": "f\"{x:+.{nd}f}\"",
+   "why": "G({F*}) loses its sign"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-spread-mean-max",
+   "new": "return f\"{num(max(xs), nd)} ({num(min(xs), nd)} to {num(max(xs), nd)})\"",
+   "old": "return f\"{num(mean(xs), nd)} ({num(min(xs), nd)} to {num(max(xs), nd)})\"",
+   "why": "the mean is the maximum"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-spread-minmax-swap",
+   "new": "({num(max(xs), nd)} to {num(min(xs), nd)})",
+   "old": "({num(min(xs), nd)} to {num(max(xs), nd)})",
+   "why": "min and max swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-spread-single-nd",
+   "new": "return num(xs[0])",
+   "old": "return num(xs[0], nd)",
+   "why": "a single value ignores its decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-spread-empty",
+   "new": "if not xs:\n        return \"n/a\"\n    if len(xs) == 1:\n        return num(xs[0], nd)",
+   "old": "if not xs:\n        return \"none\"\n    if len(xs) == 1:\n        return num(xs[0], nd)",
+   "why": "an empty list reads n/a"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-counts-single-float",
+   "new": "return f\"{xs[0]:.1f}\"",
+   "old": "return str(int(xs[0]))",
+   "why": "a count prints as a float"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-counts-mean-decimals",
+   "new": "return f\"{sum(xs) / len(xs):.2f} ({int(min(xs))} to {int(max(xs))})\"",
+   "old": "return f\"{sum(xs) / len(xs):.1f} ({int(min(xs))} to {int(max(xs))})\"",
+   "why": "the count mean has two decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_shuffle_section_prints_each_rules_quiet_reading"
+   ],
+   "name": "rp-counts-minmax-swap",
+   "new": "({int(max(xs))} to {int(min(xs))})",
+   "old": "({int(min(xs))} to {int(max(xs))})",
+   "why": "count min and max swapped (the gain block's WEB-S |F| has min == max in the fixture; the shuffle block's does not)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures"
+   ],
+   "name": "rp-null-of-error",
+   "new": "return n",
+   "old": "return {} if \"error\" in n else n",
+   "why": "a null's error is read as a null: the fixture's own SCENE record carries one, so the shared setUpClass crashes (the whole class errors)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_a_null_that_could_not_be_dealt_prints_its_error_never_a_blank"
+   ],
+   "name": "rp-null-error-text",
+   "new": "return None",
+   "old": "return str(n[\"error\"]) if \"error\" in n else None",
+   "why": "a null's error text is lost"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_eye_table_marks_the_rules_that_keep_a_said_frame"
+   ],
+   "name": "rp-kept-sets-pair",
+   "new": "frozenset(tuple(f)[:1] for f in r[\"frames\"])",
+   "old": "frozenset(tuple(f) for f in r[\"frames\"])",
+   "why": "a kept pair is its first word"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_the_pristine_fixture_reads_yes_on_every_check"
+   ],
+   "name": "rp-grade-mode",
+   "new": "VD.grade(conds, \"law\")",
+   "old": "VD.grade(conds, res[\"mode\"])",
+   "why": "the run's grade is recomputed in the wrong mode"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_the_pristine_fixture_reads_yes_on_every_check"
+   ],
+   "name": "rp-grade-law-key",
+   "new": "again_law == res[\"grade\"]",
+   "old": "again_law == res[\"grade_law\"]",
+   "why": "the base text's grade is compared with the run's"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_changed_verdict_in_a_record_reads_NO_on_the_grade_check_only",
+    "TestInstrumentChecks.test_a_changed_grade_or_overlap_or_eye_block_in_results_reads_NO"
+   ],
+   "name": "rp-grade-true",
+   "new": "return True, True",
+   "old": "return again == res[\"grade\"], again_law == res[\"grade_law\"]",
+   "why": "the grade check always passes"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_changed_kept_set_reads_NO_on_the_eye_and_overlap_checks"
+   ],
+   "name": "rp-eye-true",
+   "new": "return True",
+   "old": "return _roundtrip(VD.eye_reading(rep[\"conds\"][\"ALPHA4\"], says)) == eye",
+   "why": "the eye check always passes"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_the_pristine_fixture_reads_yes_on_every_check"
+   ],
+   "name": "rp-eye-yes-le",
+   "new": "\"yes\" if i <= int(f[\"yes\"]) else \"no\"",
+   "old": "\"yes\" if i < int(f[\"yes\"]) else \"no\"",
+   "why": "one confirmation too many"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_the_pristine_fixture_reads_yes_on_every_check"
+   ],
+   "name": "rp-eye-says-plus",
+   "new": "for i in range(int(f[\"says\"]) + 1):",
+   "old": "for i in range(int(f[\"says\"])):",
+   "why": "one say too many"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_without_a_per_frame_table_the_eye_check_says_it_was_not_run"
+   ],
+   "name": "rp-eye-none-off",
+   "new": "if False:\n        return None",
+   "old": "if frames is None:\n        return None",
+   "why": "a missing table is not noticed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_changed_kept_set_reads_NO_on_the_eye_and_overlap_checks",
+    "TestInstrumentChecks.test_a_changed_grade_or_overlap_or_eye_block_in_results_reads_NO"
+   ],
+   "name": "rp-overlaps-true",
+   "new": "return True",
+   "old": "return _roundtrip({name: VD.overlaps(rep[\"conds\"][name]) for name in CONDITIONS}) == rep[\"results\"][\"overlaps\"]",
+   "why": "the overlap check always passes"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_the_pristine_fixture_reads_yes_on_every_check"
+   ],
+   "name": "rp-overlaps-drop-last",
+   "new": "for name in CONDITIONS[:-1]}) == rep[\"results\"][\"overlaps\"]",
+   "old": "for name in CONDITIONS}) == rep[\"results\"][\"overlaps\"]",
+   "why": "a condition's overlaps are not recomputed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_scene_row_missing_or_for_another_rule_or_with_another_margin_reads_NO"
+   ],
+   "name": "rp-scene-len",
+   "new": "if False:\n        return False",
+   "old": "if len(sb[\"rows\"]) != len(recs_):\n        return False",
+   "why": "a missing SCENE row is not noticed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_scene_row_missing_or_for_another_rule_or_with_another_margin_reads_NO"
+   ],
+   "name": "rp-scene-id",
+   "new": "False or ",
+   "old": "(row[\"rule\"], row[\"seed\"]) != (r[\"rule\"], r[\"seed\"]) or ",
+   "why": "a row of another rule or seed is not noticed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_scene_row_missing_or_for_another_rule_or_with_another_margin_reads_NO"
+   ],
+   "name": "rp-scene-G",
+   "new": "or False or",
+   "old": "or row[\"G\"] != r[\"gain\"][\"G\"] or",
+   "why": "a row's G is not compared (a changed RECORD is also seen through the margin; the planted row G is what isolates this line)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_scene_row_missing_or_for_another_rule_or_with_another_margin_reads_NO"
+   ],
+   "name": "rp-scene-margin",
+   "new": "abs(row[\"margin\"] - (sb[\"G_max\"] - r[\"gain\"][\"G\"])) > 1e9",
+   "old": "abs(row[\"margin\"] - (sb[\"G_max\"] - r[\"gain\"][\"G\"])) > 1e-9",
+   "why": "a row's margin is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_scene_row_missing_or_for_another_rule_or_with_another_margin_reads_NO"
+   ],
+   "name": "rp-scene-oracle-margin",
+   "new": "True and",
+   "old": "abs(o[\"margin\"] - (sb[\"G_max\"] - o[\"G\"])) <= 1e-9 and",
+   "why": "the oracle's margin is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_scene_row_missing_or_for_another_rule_or_with_another_margin_reads_NO"
+   ],
+   "name": "rp-scene-recall",
+   "new": "True",
+   "old": "_roundtrip(VD.oracle_recall(sc, SC.oracle_frames())) == o[\"recall\"]",
+   "why": "the oracle's recall is not recomputed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_gates_record_with_another_law_text_reads_NO_for_gates_only"
+   ],
+   "name": "rp-law-key-dropped",
+   "new": "for k in (\"frames\", \"frames_amend1\")]",
+   "old": "for k in (\"frames\", \"frames_amend1\", \"frames_amend2\")]",
+   "why": "AMENDMENT-2's text is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_condition_record_with_another_law_text_reads_NO_for_that_record_only"
+   ],
+   "name": "rp-law-conds",
+   "new": "True",
+   "old": "all(rep[\"conds\"][name][\"header\"].get(k) == h.get(k) for k in keys)",
+   "why": "a condition's law text is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_the_pristine_fixture_reads_yes_on_every_check"
+   ],
+   "name": "rp-law-gates-off",
+   "new": "if False:\n        out.append((\"GATES.json\"",
+   "old": "if rep[\"gates\"] is not None:\n        out.append((\"GATES.json\"",
+   "why": "GATES.json is not flagged"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_a_gates_record_with_another_law_text_reads_NO_for_gates_only"
+   ],
+   "name": "rp-law-gates-true",
+   "new": "True",
+   "old": "all(rep[\"gates\"][\"header\"].get(k) == h.get(k) for k in keys)",
+   "why": "GATES.json's law text is not compared"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestInstrumentChecks.test_the_pristine_fixture_reads_yes_on_every_check"
+   ],
+   "name": "rp-yn-inverted",
+   "new": "return \"NO\" if ok else \"yes\"",
+   "old": "return \"yes\" if ok else \"NO\"",
+   "why": "yes and NO swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_provenance_header_lines"
+   ],
+   "name": "rp-prov-sha",
+   "new": "code sha (RESULTS.json): {h.get('toys_tree_dirty')}",
+   "old": "code sha (RESULTS.json): {h.get('toys_git_sha')}",
+   "why": "the code sha is the dirty flag"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_provenance_header_lines"
+   ],
+   "name": "rp-prov-dirty",
+   "new": "when the unit ran: {h.get('toys_git_sha')}",
+   "old": "when the unit ran: {h.get('toys_tree_dirty')}",
+   "why": "the dirty flag is the sha"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_provenance_header_lines"
+   ],
+   "name": "rp-prov-signed-key",
+   "new": "{h.get('prereg_frames_sha256')}\")\n    L.append(\"signed texts",
+   "old": "{h.get(f'prereg_{k}_sha256')}\")\n    L.append(\"signed texts",
+   "why": "the three signed texts print the first one"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_provenance_header_lines"
+   ],
+   "name": "rp-prov-code-one",
+   "new": "{'one' if len(code) != 1 else str(len(code)) + ' DIFFERENT'}",
+   "old": "{'one' if len(code) == 1 else str(len(code)) + ' DIFFERENT'}",
+   "why": "one / DIFFERENT swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_provenance_header_lines"
+   ],
+   "name": "rp-prov-gates-same",
+   "new": "({'the same' if gates['header'].get('toys_git_sha') != h.get('toys_git_sha') else 'DIFFERENT from the unit'})",
+   "old": "({'the same' if gates['header'].get('toys_git_sha') == h.get('toys_git_sha') else 'DIFFERENT from the unit'})",
+   "why": "the same / DIFFERENT swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_without_gates_the_provenance_says_so_and_lists_six_records"
+   ],
+   "name": "rp-prov-gates-absent",
+   "new": "if False:\n        L.append(\"GATES.json: not present\")",
+   "old": "if gates is None:\n        L.append(\"GATES.json: not present\")",
+   "why": "an absent GATES.json is not said (the predecessor's test is a substring test that section 1's own words also satisfy)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g-passed",
+   "new": "GATES.json: passed {g.get('failures')} (failures:",
+   "old": "GATES.json: passed {g.get('passed')} (failures:",
+   "why": "passed prints the failures"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g-cpu",
+   "new": "{num(g.get('cpu_seconds'), 2)} CPU-s; peak RSS",
+   "old": "{num(g.get('cpu_seconds'), 1)} CPU-s; peak RSS",
+   "why": "CPU seconds to two decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g-rss",
+   "new": "peak RSS {num((g.get('peak_rss_kb') or 0) / 1000.0, 0)} MB",
+   "old": "peak RSS {num((g.get('peak_rss_kb') or 0) / 1024.0, 0)} MB",
+   "why": "kB / 1000"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g1-words",
+   "new": "{g1['alpha4']['words']} moments / {g1['alpha4']['moments']} words",
+   "old": "{g1['alpha4']['moments']} moments / {g1['alpha4']['words']} words",
+   "why": "moments and words swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g1-chi",
+   "new": "f\"{k} p {num((c2.get(k) or {}).get('p'), 2)}\" for k in (\"length\"",
+   "old": "f\"{k} p {num((c2.get(k) or {}).get('p'), 3)}\" for k in (\"length\"",
+   "why": "\u03c7\u00b2 p to two decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g1-ok",
+   "new": "L.append(f\"G1 {'FAILED' if g1['ok'] else 'OK'}:",
+   "old": "L.append(f\"G1 {'OK' if g1['ok'] else 'FAILED'}:",
+   "why": "G1 OK / FAILED swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g2-frames",
+   "new": "frames {g2.get('n_rows')}\")",
+   "old": "frames {g2.get('frames')}\")",
+   "why": "G2 prints the row count as the frames"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g3-fmt",
+   "new": "{g3.get('max_abs_diff'):.4g}",
+   "old": "{g3.get('max_abs_diff'):.3g}",
+   "why": "G3's difference at four digits"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g3-steps",
+   "new": "the greedy's {g3.get('mdl_seeds')} steps over {g3.get('mdl_steps')} seeds",
+   "old": "the greedy's {g3.get('mdl_steps')} steps over {g3.get('mdl_seeds')} seeds",
+   "why": "G3 steps and seeds swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g4-tag",
+   "new": "tag = \"PRINTED, not required\" if rule in required else \"REQUIRED\"",
+   "old": "tag = \"REQUIRED\" if rule in required else \"PRINTED, not required\"",
+   "why": "REQUIRED / PRINTED swapped (the predecessor's test cannot tell: WEB-H's own line carries the swapped tag too)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g4-pass",
+   "new": "gate {'FAIL' if g['pass'] else 'PASS'} \u2014 {tag}",
+   "old": "gate {'PASS' if g['pass'] else 'FAIL'} \u2014 {tag}",
+   "why": "PASS / FAIL swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record",
+    "TestReport.test_the_small_vocabulary_failure_of_g4_stream_a_stays_printed"
+   ],
+   "name": "rp-g4-header",
+   "new": "V {s.get('budget')}, budget B = 2V = {s.get('V')}; B = G({{F*}}) {num(s.get('B'))};",
+   "old": "V {s.get('V')}, budget B = 2V = {s.get('budget')}; B = G({{F*}}) {num(s.get('B'))};",
+   "why": "V and the budget swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_g4_control_line_prints_each_of_its_six_fields"
+   ],
+   "name": "rp-g4-control",
+   "new": "the gate's parse-breaking control: caught {c.get('bytes_changed')}, bytes changed {c.get('caught')};",
+   "old": "the gate's parse-breaking control: caught {c.get('caught')}, bytes changed {c.get('bytes_changed')};",
+   "why": "caught and bytes changed swapped (both True in the hand-made record)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g5-slope",
+   "new": "num(g5.get('cpu_slope_per_draw'), 2)",
+   "old": "num(g5.get('cpu_slope_per_draw'), 3)",
+   "why": "G5's slope to two decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g5-unit",
+   "new": "predicted unit {num(g5.get('predicted_unit_cpu_minutes'), 2)} CPU-min",
+   "old": "predicted unit {num(g5.get('predicted_unit_cpu_minutes'), 1)} CPU-min",
+   "why": "G5's unit price to two decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g5-ceiling",
+   "new": "(ceiling {num(g5.get('rss_ceiling_mb'), 1)})",
+   "old": "(ceiling {num(g5.get('cpu_ceiling_min'), 1)})",
+   "why": "G5's CPU ceiling is the memory one"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g6-reps",
+   "new": "{len(g6.get('cheat', {}))} replicates",
+   "old": "{len(g6.get('replicates', []))} replicates",
+   "why": "G6 counts the cheat's keys as replicates"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g6-viol",
+   "new": "if not r.get('violation'))}; the planted cheat",
+   "old": "if r.get('violation'))}; the planted cheat",
+   "why": "G6 counts the non-violations"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gates_section_prints_every_gate_figure_of_the_record"
+   ],
+   "name": "rp-g6-entropy",
+   "new": "entropy {num(ex.get('entropy'), 3)}",
+   "old": "entropy {num(ex.get('entropy'), 4)}",
+   "why": "G6's entropy at three decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_conditions_table_has_a_row_per_condition_with_its_own_counts"
+   ],
+   "name": "rp-cond-every",
+   "new": "str(c.get('every'))",
+   "old": "str(c.get('every') or '-')",
+   "why": "a plain condition has `every` None"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_conditions_table_has_a_row_per_condition_with_its_own_counts"
+   ],
+   "name": "rp-cond-peak",
+   "new": "{num((c.get('peak_rss_kb') or 0) / 1000.0, 0):>9}",
+   "old": "{num((c.get('peak_rss_kb') or 0) / 1024.0, 0):>9}",
+   "why": "kB / 1000"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_conditions_table_has_a_row_per_condition_with_its_own_counts"
+   ],
+   "name": "rp-cond-words",
+   "new": "{str(c['n_held_words']) + '/' + str(c['n_train_words']):>20}",
+   "old": "{str(c['n_train_words']) + '/' + str(c['n_held_words']):>20}",
+   "why": "train and held words swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_plant_section_prints_B_its_decomposition_and_each_rules_gate"
+   ],
+   "name": "rp-plant-kept",
+   "new": "kept = sum(1 for r in rs if not r[\"plant\"][\"kept\"])",
+   "old": "kept = sum(1 for r in rs if r[\"plant\"][\"kept\"])",
+   "why": "kept counts the non-kept"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_plant_section_prints_B_its_decomposition_and_each_rules_gate"
+   ],
+   "name": "rp-plant-law",
+   "new": "{'fail' if lg['pass'] else 'pass'} (a reading)",
+   "old": "{'pass' if lg['pass'] else 'fail'} (a reading)",
+   "why": "the base text's reading inverted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures"
+   ],
+   "name": "rp-plant-C",
+   "new": "C = [r[\"plant\"][\"C\"] for r in rs if r[\"plant\"][\"C\"] is None]",
+   "old": "C = [r[\"plant\"][\"C\"] for r in rs if r[\"plant\"][\"C\"] is not None]",
+   "why": "(C) keeps only the unkept: the shared setUpClass crashes on an empty C for the WEB-S of SCENE+PLANT (the whole class errors)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_plant_section_prints_B_its_decomposition_and_each_rules_gate"
+   ],
+   "name": "rp-plant-side",
+   "new": "pg = res[\"grade\"][\"alpha4\"][rule][\"plant_gate\"]",
+   "old": "pg = res[\"grade\"][side][rule][\"plant_gate\"]",
+   "why": "SCENE+PLANT reads ALPHA4's gate"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_plant_section_prints_B_its_decomposition_and_each_rules_gate"
+   ],
+   "name": "rp-plant-b2",
+   "new": "mean {num(n2.get('sd'))}, sd {num(n2.get('mean'))}, q95",
+   "old": "mean {num(n2.get('mean'))}, sd {num(n2.get('sd'))}, q95",
+   "why": "NULL-2's mean and sd swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_plant_section_prints_B_its_decomposition_and_each_rules_gate"
+   ],
+   "name": "rp-plant-first-scene",
+   "new": "SCENE {'gradable' if res['grade']['alpha4'][rule]['plant_gate']['pass'] else 'NOT GRADABLE'}\")",
+   "old": "SCENE {'gradable' if res['grade']['scene'][rule]['gradable'] else 'NOT GRADABLE'}\")",
+   "why": "SCENE's gradability read from ALPHA4"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_shuffle_section_prints_each_rules_quiet_reading"
+   ],
+   "name": "rp-shuffle-quiet",
+   "new": "{'LOUD' if sq['quiet'] else 'QUIET'}",
+   "old": "{'QUIET' if sq['quiet'] else 'LOUD'}",
+   "why": "QUIET / LOUD swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_shuffle_section_prints_each_rules_quiet_reading"
+   ],
+   "name": "rp-shuffle-q95",
+   "new": "NULL-1 q95 {spread([null_of(r, 'null1').get('mean') for r in rs if null_of(r, 'null1')])}",
+   "old": "NULL-1 q95 {spread([null_of(r, 'null1').get('q95') for r in rs if null_of(r, 'null1')])}",
+   "why": "the q95 is the mean"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-gain-signp",
+   "new": "exact sign p {num(gn['exact_sign_p'], 3)}",
+   "old": "exact sign p {num(gn['exact_sign_p'], 4)}",
+   "why": "the sign p to three decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-gain-perword",
+   "new": "spread([r['gain']['per_word'] for r in rs], 4)",
+   "old": "spread([r['gain']['per_word'] for r in rs], 5)",
+   "why": "per held-out word at four decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-gain-L",
+   "new": "L {spread([r['gain']['G'] for r in rs])}; held adjacency",
+   "old": "L {spread([r['gain']['L'] for r in rs])}; held adjacency",
+   "why": "L is G"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-gain-adj",
+   "new": "adj = [r[\"adjacency\"][\"train_adjacent_share\"] for r in rs if r[\"adjacency\"][\"train_adjacent_share\"] is None]",
+   "old": "adj = [r[\"adjacency\"][\"train_adjacent_share\"] for r in rs if r[\"adjacency\"][\"train_adjacent_share\"] is not None]",
+   "why": "the adjacency shares keep only the missing"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-gain-seed-lines",
+   "new": "if False:\n            for r in rs:\n                n1 = null_of(r, \"null1\")",
+   "old": "if rule == \"WEB-S\":\n            for r in rs:\n                n1 = null_of(r, \"null1\")",
+   "why": "WEB-S's per-seed lines vanish"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-gain-seed-beats",
+   "new": "beats q95 {n1.get('q95')}\")",
+   "old": "beats q95 {n1.get('beats_q95')}\")",
+   "why": "a seed line prints q95 as beats"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-gain-anatomy-T",
+   "new": "T = D + C {spread([a['D'] for a in an])}",
+   "old": "T = D + C {spread([a['T'] for a in an])}",
+   "why": "T is D"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_mdl_trace_is_printed_when_the_run_has_one_and_cut_at_fifteen"
+   ],
+   "name": "rp-gain-trace-cut",
+   "new": "for t in tr[:14]:",
+   "old": "for t in tr[:15]:",
+   "why": "the trace is cut at fourteen"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_mdl_trace_is_printed_when_the_run_has_one_and_cut_at_fifteen"
+   ],
+   "name": "rp-gain-trace-head",
+   "new": "its first {len(tr)} picks",
+   "old": "its first {min(15, len(tr))} picks",
+   "why": "the header counts every step as printed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_mdl_trace_is_printed_when_the_run_has_one_and_cut_at_fifteen"
+   ],
+   "name": "rp-gain-trace-off",
+   "new": "if False:",
+   "old": "if mdl and mdl[0].get(\"info\", {}).get(\"trace\"):",
+   "why": "no trace is ever printed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-null-label",
+   "new": "label = key.upper()",
+   "old": "label = key.upper().replace(\"NULL\", \"NULL-\")",
+   "why": "NULL1 instead of NULL-1"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_gain_section_prints_each_rules_numbers_from_its_records"
+   ],
+   "name": "rp-null-z",
+   "new": "z {spread([n['sd'] for n in ns])}",
+   "old": "z {spread([n['z'] for n in ns if n.get('z') is not None])}",
+   "why": "z prints sd"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_fallbacks_are_summed_over_the_seeds_and_the_criterion_section_prints_a_changed_scene_beat"
+   ],
+   "name": "rp-null-fallbacks",
+   "new": "fallbacks {max(n.get('fallbacks', 0) for n in ns)}\")",
+   "old": "fallbacks {sum(n.get('fallbacks', 0) for n in ns)}\")",
+   "why": "fallbacks take the maximum (the fixture's seeds all read 0)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_criterion_section_prints_each_rules_null2_reading"
+   ],
+   "name": "rp-crit-verdict",
+   "new": "CRITERION-MATTERS {rule}: {cr['verdict']} \u2014 {cr['n']} of {cr['n_pass']} seeds (need {cr['need']})",
+   "old": "CRITERION-MATTERS {rule}: {cr['verdict']} \u2014 {cr['n_pass']} of {cr['n']} seeds (need {cr['need']})",
+   "why": "n and n_pass swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_fallbacks_are_summed_over_the_seeds_and_the_criterion_section_prints_a_changed_scene_beat"
+   ],
+   "name": "rp-crit-beats",
+   "new": "SCENE+PLANT {beats['ALPHA4+PLANT']}",
+   "old": "SCENE+PLANT {beats['SCENE+PLANT']}",
+   "why": "SCENE's plant-beats-null reads ALPHA4's (both True in the fixture)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_eye_section_prints_each_rules_counts_and_the_per_frame_table"
+   ],
+   "name": "rp-eye-base",
+   "new": "base rate {num(eye['base_rate'], 3)}",
+   "old": "base rate {num(eye['base_rate'], 4)}",
+   "why": "the base rate at three decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_eye_section_prints_each_rules_counts_and_the_per_frame_table"
+   ],
+   "name": "rp-eye-kept-rate",
+   "new": "{spread([r['rate_not_kept'] for r in er if r['rate_not_kept'] is not None], 3)} (says kept",
+   "old": "{spread([r['rate_kept'] for r in er if r['rate_kept'] is not None], 3)} (says kept",
+   "why": "the kept rate is the not-kept one"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_eye_section_prints_each_rules_counts_and_the_per_frame_table"
+   ],
+   "name": "rp-eye-never",
+   "new": "frames it keeps that the cells never said {counts([r['said_kept'] for r in er])} of |F|",
+   "old": "frames it keeps that the cells never said {counts([r['kept_never_said'] for r in er])} of |F|",
+   "why": "never-said prints said-kept"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_eye_section_prints_each_rules_counts_and_the_per_frame_table"
+   ],
+   "name": "rp-eye-pair-none",
+   "new": "if pair is not None:\n                    flags.append",
+   "old": "if pair is None:\n                    flags.append",
+   "why": "a pair-less frame is treated as a pair"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_eye_table_marks_the_rules_that_keep_a_said_frame",
+    "TestFigures.test_the_eye_section_prints_each_rules_counts_and_the_per_frame_table"
+   ],
+   "name": "rp-eye-webs",
+   "new": "elif rule == \"WEB-S\":\n                    flags.append(f\"{rule} {sum(1 for s in sets[rule] if pair in s)}/{len(sets[rule]) + 1}\")",
+   "old": "elif rule == \"WEB-S\":\n                    flags.append(f\"{rule} {sum(1 for s in sets[rule] if pair in s)}/{len(sets[rule])}\")",
+   "why": "WEB-S's seed count is off by one"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_overlaps_section_prints_each_conditions_jaccards"
+   ],
+   "name": "rp-ovl-fmt",
+   "new": "f\"{k} {num(v, 2)}\" for k, v in sorted(ov.items())",
+   "old": "f\"{k} {num(v, 3)}\" for k, v in sorted(ov.items())",
+   "why": "Jaccards to two decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_scene_section_prints_the_ceiling_the_rows_the_oracle_and_each_rules_gradability"
+   ],
+   "name": "rp-scene-chi",
+   "new": "f\"{k} p {num((ch.get(k) or {}).get('p'), 2)} (n {(ch.get(k) or {}).get('n')})\"",
+   "old": "f\"{k} p {num((ch.get(k) or {}).get('p'), 3)} (n {(ch.get(k) or {}).get('n')})\"",
+   "why": "the SCENE \u03c7\u00b2 p to two decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_scene_section_prints_the_ceiling_the_rows_the_oracle_and_each_rules_gradability"
+   ],
+   "name": "rp-scene-ceiling",
+   "new": "THE CEILING: G_max {num(sb['bits0'])} bits (bits(held | empty) {num(sb['G_max'])}",
+   "old": "THE CEILING: G_max {num(sb['G_max'])} bits (bits(held | empty) {num(sb['bits0'])}",
+   "why": "G_max and bits0 swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_scene_section_prints_the_ceiling_the_rows_the_oracle_and_each_rules_gradability"
+   ],
+   "name": "rp-scene-viol",
+   "new": "{'under G_max + 20' if r['violation'] else 'VIOLATION'}",
+   "old": "{'VIOLATION' if r['violation'] else 'under G_max + 20'}",
+   "why": "VIOLATION inverted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_scene_section_prints_the_ceiling_the_rows_the_oracle_and_each_rules_gradability"
+   ],
+   "name": "rp-scene-recall-fmt",
+   "new": "f\"{k} {num(v, 2)}\" for k, v in sorted(o[\"recall\"].items())",
+   "old": "f\"{k} {num(v, 3)}\" for k, v in sorted(o[\"recall\"].items())",
+   "why": "recall to two decimals"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_scene_section_prints_the_ceiling_the_rows_the_oracle_and_each_rules_gradability",
+    "TestReport.test_a_not_gradable_verdict_is_printed_as_such"
+   ],
+   "name": "rp-scene-grad",
+   "new": "L.append(f\"SCENE {rule}: {'NOT GRADABLE' if res['grade']['scene'][rule]['gradable'] else 'gradable'}",
+   "old": "L.append(f\"SCENE {rule}: {'gradable' if res['grade']['scene'][rule]['gradable'] else 'NOT GRADABLE'}",
+   "why": "gradable inverted"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc1_mdl_greedy_g_is_the_largest",
+    "TestReport.test_the_predictions_are_read_mechanically"
+   ],
+   "name": "rp-pc1-ge",
+   "new": "holds = mdl > max(G[\"WEB-H\"][0], mean_s, G[\"SENTENCE\"][0])",
+   "old": "holds = mdl >= max(G[\"WEB-H\"][0], mean_s, G[\"SENTENCE\"][0])",
+   "why": "P-C1 strict"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc1_mdl_greedy_g_is_the_largest"
+   ],
+   "name": "rp-pc1-mean",
+   "new": "mean_s = max(G[\"WEB-S\"])",
+   "old": "mean_s = sum(G[\"WEB-S\"]) / len(G[\"WEB-S\"])",
+   "why": "WEB-S as its best seed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc2_web_and_sentence_beat_their_nulls_with_g_below_mdl"
+   ],
+   "name": "rp-pc2-need",
+   "new": "need = -(-WEB_S_MIN * len(rs) // 5)",
+   "old": "need = -(-WEB_S_MIN * len(rs) // 10)",
+   "why": "WEB-S needs 8 of 5"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc2_web_and_sentence_beat_their_nulls_with_g_below_mdl"
+   ],
+   "name": "rp-pc2-below",
+   "new": "below = r[\"gain\"][\"G\"] <= mdl",
+   "old": "below = r[\"gain\"][\"G\"] < mdl",
+   "why": "SENTENCE equal to MDL counts as below"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc2_web_and_sentence_beat_their_nulls_with_g_below_mdl"
+   ],
+   "name": "rp-pc2-beat",
+   "new": "b = bool(n1) and r[\"gain\"][\"G\"] >= n1[\"q95\"]",
+   "old": "b = bool(n1) and r[\"gain\"][\"G\"] > n1[\"q95\"]",
+   "why": "equal to the null counts as beating it (unreachable: equivalent unless equal)"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc3_every_scene_g_is_a_tenth_of_g_max_at_most"
+   ],
+   "name": "rp-pc3-frac",
+   "new": "P_C3_FRACTION = 0.11 ",
+   "old": "P_C3_FRACTION = 0.10 ",
+   "why": "a tenth becomes 0.11"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc3_every_scene_g_is_a_tenth_of_g_max_at_most"
+   ],
+   "name": "rp-pc3-le",
+   "new": "ok3 = all(v < P_C3_FRACTION for v in ratios.values())",
+   "old": "ok3 = all(v <= P_C3_FRACTION for v in ratios.values())",
+   "why": "exactly a tenth fails"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc3_every_scene_g_is_a_tenth_of_g_max_at_most"
+   ],
+   "name": "rp-pc3-gmax",
+   "new": "if gm is None or gm < 0:",
+   "old": "if gm is None or gm <= 0:",
+   "why": "G_max = 0 is readable"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc4_the_eye_splits_mdls_frames_into_grounded_and_function_word_pairs"
+   ],
+   "name": "rp-pc4-says",
+   "new": "P_C4_MIN_SAYS = 4 ",
+   "old": "P_C4_MIN_SAYS = 5 ",
+   "why": "four says are enough"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc4_the_eye_splits_mdls_frames_into_grounded_and_function_word_pairs"
+   ],
+   "name": "rp-pc4-rate",
+   "new": "P_C4_GROUNDED_RATE = 0.4\n",
+   "old": "P_C4_GROUNDED_RATE = 0.5\n",
+   "why": "40 % is grounded"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc4_the_eye_splits_mdls_frames_into_grounded_and_function_word_pairs"
+   ],
+   "name": "rp-pc4-ge",
+   "new": "f[\"yes\"] / f[\"says\"] > P_C4_GROUNDED_RATE",
+   "old": "f[\"yes\"] / f[\"says\"] >= P_C4_GROUNDED_RATE",
+   "why": "exactly half is not grounded"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc4_the_eye_splits_mdls_frames_into_grounded_and_function_word_pairs"
+   ],
+   "name": "rp-pc4-function",
+   "new": "f[\"says\"] >= P_C4_MIN_SAYS and f[\"yes\"] <= 1",
+   "old": "f[\"says\"] >= P_C4_MIN_SAYS and f[\"yes\"] == 0",
+   "why": "one confirmation is still a function pair"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc4_the_eye_splits_mdls_frames_into_grounded_and_function_word_pairs"
+   ],
+   "name": "rp-pc4-both",
+   "new": "out.append((\"P-C4\", \"holds\" if (kept_g or kept_f) else \"does not hold\",",
+   "old": "out.append((\"P-C4\", \"holds\" if (kept_g and kept_f) else \"does not hold\",",
+   "why": "either half is enough"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc5_sentence_keeps_the_three_named_pairs_and_a_game_pair"
+   ],
+   "name": "rp-pc5-pairs",
+   "new": "P_C5_PAIRS = ((\"the\", \"letters\"), (\"a\", \"big\"))",
+   "old": "P_C5_PAIRS = ((\"the\", \"letters\"), (\"a\", \"big\"), (\"to\", \"the\"))",
+   "why": "one named pair dropped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc5_sentence_keeps_the_three_named_pairs_and_a_game_pair"
+   ],
+   "name": "rp-pc5-colours",
+   "new": "GAME_COLOURS = (\"green\", \"yellow\", \"grey\", \"red\", \"blue\")",
+   "old": "GAME_COLOURS = (\"green\", \"yellow\", \"grey\", \"purple\", \"red\", \"blue\")",
+   "why": "purple is no game colour"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc5_sentence_keeps_the_three_named_pairs_and_a_game_pair"
+   ],
+   "name": "rp-pc5-objects",
+   "new": "GAME_OBJECTS = (\"box\", \"ball\")",
+   "old": "GAME_OBJECTS = (\"box\", \"key\", \"ball\")",
+   "why": "key is no game object"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc5_sentence_keeps_the_three_named_pairs_and_a_game_pair"
+   ],
+   "name": "rp-pc5-all",
+   "new": "ok5 = any(k for _p, k in named) and len(game_kept) >= 1",
+   "old": "ok5 = all(k for _p, k in named) and len(game_kept) >= 1",
+   "why": "any named pair is enough"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc5_sentence_keeps_the_three_named_pairs_and_a_game_pair"
+   ],
+   "name": "rp-pc5-game",
+   "new": "ok5 = all(k for _p, k in named)",
+   "old": "ok5 = all(k for _p, k in named) and len(game_kept) >= 1",
+   "why": "no game pair is needed"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc6_two_guesses_on_null2"
+   ],
+   "name": "rp-pc6-inside",
+   "new": "inside = mdl < n2[\"q95\"]",
+   "old": "inside = mdl <= n2[\"q95\"]",
+   "why": "G equal to q95 is above the band"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc6_two_guesses_on_null2"
+   ],
+   "name": "rp-pc6-above",
+   "new": "above = mdl >= n2[\"q95\"]",
+   "old": "above = mdl > n2[\"q95\"]",
+   "why": "G equal to q95 is above it"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestPredictions.test_pc6_two_guesses_on_null2"
+   ],
+   "name": "rp-pc6-nearer",
+   "new": "all(v is not None and v <= z[\"MDL-GREEDY\"] for v in others)",
+   "old": "all(v is not None and v < z[\"MDL-GREEDY\"] for v in others)",
+   "why": "a tie in z is nearer"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_text_ends_with_one_newline_and_every_section_is_one_block"
+   ],
+   "name": "rp-render-join",
+   "new": "return \"\\n\".join(\"\\n\".join(p) for p in parts) + \"\\n\"",
+   "old": "return \"\\n\\n\".join(\"\\n\".join(p) for p in parts) + \"\\n\"",
+   "why": "sections run together"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_the_text_ends_with_one_newline_and_every_section_is_one_block"
+   ],
+   "name": "rp-render-end",
+   "new": "return \"\\n\\n\".join(\"\\n\".join(p) for p in parts) + \"\\n\\n\"",
+   "old": "return \"\\n\\n\".join(\"\\n\".join(p) for p in parts) + \"\\n\"",
+   "why": "two final newlines"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestReport.test_every_section_is_present_in_order"
+   ],
+   "name": "rp-render-order",
+   "new": "parts = [sec_gates(rep), sec_provenance(rep), sec_conditions(rep), sec_plant(rep),",
+   "old": "parts = [sec_provenance(rep), sec_gates(rep), sec_conditions(rep), sec_plant(rep),",
+   "why": "sections 0 and 1 swapped"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_main_defaults_read_the_runners_directory_and_write_the_committed_report_path"
+   ],
+   "name": "rp-main-root",
+   "new": "ap.add_argument(\"--root\", default=str(ST.COPIES))",
+   "old": "ap.add_argument(\"--root\", default=str(RN.RUNS))",
+   "why": "the default root is the copies"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_main_defaults_read_the_runners_directory_and_write_the_committed_report_path"
+   ],
+   "name": "rp-main-out",
+   "new": "ap.add_argument(\"--out\", default=str(DEFAULT_OUT.with_suffix(\".bak\")))",
+   "old": "ap.add_argument(\"--out\", default=str(DEFAULT_OUT))",
+   "why": "the default output is another file"
+  },
+  {
+   "count": 1,
+   "expect": [
+    "TestFigures.test_main_defaults_read_the_runners_directory_and_write_the_committed_report_path"
+   ],
+   "name": "rp-main-print",
+   "new": "print(f\"wrote {out.name}: {len(text)} bytes, sha256 {hashlib.sha256(text.encode()).hexdigest()[:8]}\")",
+   "old": "print(f\"wrote {out.name}: {len(text)} bytes, sha256 {hashlib.sha256(text.encode()).hexdigest()}\")",
+   "why": "the printed hash is cut"
+  }
+ ],
+ "source_sha256": "b3bae7057d2697a72fd34c089a58987045c80bb1be6aea5805f2b69ed5592bc6",
+ "tests": "tests.tools.test_toys_frames_report_figures,tests.tools.test_toys_frames_report"
+}

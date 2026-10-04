@@ -1,0 +1,11 @@
+C2 the planted frame's marginal credit in WEB-H's set on ALPHA4+PLANT: 3107.23 (the signed gate's (C) reads 3107.23): OK
+C3 a dealt never-adjacent pair ('a', 'another') changes G by -23.218414 (−L = -22.253409; the add-one dilution -0.965005 bits; expected strictly below −L and above −L − 1.5): OK
+C1 WEB-H seed 0: recomputed G -28202.043755 against the record's -28202.043755: OK
+WEB-H seed 0: |F| 1430; frames with a positive marginal credit 45 (sum 1187.14 bits); the others 1385 (sum -30492.45); G of the positive subset alone (OPTIMISTIC, selected on the held-out it is scored on) 1789.90
+C1 WEB-S seed 1: recomputed G -14697.593661 against the record's -14697.593661: OK
+WEB-S seed 1: |F| 807; frames with a positive marginal credit 42 (sum 1311.88 bits); the others 765 (sum -16792.12); G of the positive subset alone (OPTIMISTIC, selected on the held-out it is scored on) 1717.79
+C1 SENTENCE seed 0: recomputed G -7326.114760 against the record's -7326.114760: OK
+SENTENCE seed 0: |F| 470; frames with a positive marginal credit 39 (sum 1125.22 bits); the others 431 (sum -9383.04); G of the positive subset alone (OPTIMISTIC, selected on the held-out it is scored on) 1678.70
+C1 MDL-GREEDY seed 0: recomputed G -2357.198593 against the record's -2357.198593: OK
+MDL-GREEDY seed 0: |F| 281; frames with a positive marginal credit 45 (sum 1648.66 bits); the others 236 (sum -4359.71); G of the positive subset alone (OPTIMISTIC, selected on the held-out it is scored on) 1843.67
+wrote scratch/perframe-credit.json (207 CPU-s)

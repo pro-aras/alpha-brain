@@ -21,8 +21,16 @@ SIGNED: Dict[str, Tuple[str, str]] = {
     "cp_amend1": ("PREREG-TOY-CP-AMEND-1.md", "59181d22d873614674728450a8a3f3a2428784656066577eaae8b8bc8d273448"),
     "nullspace": ("PREREG-TOY-NULLSPACE.md", "d15a6353d6b62e7ba74c407e2a220054c127250c7b4ee07f55d4564bc40ac2ca"),
     "frames": ("PREREG-TOY-FRAMES.md", "a9787ef8026e8e6d8ab41f16d088bb5259f5cf9f5d64de7176da848a2a52c31a"),
+    # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 17:23 +0400 — Toy C's AMENDMENT-1: text at d94392b, co-signed by the architect 17:17 (d830146), signed by the seat 17:19 (27edde2).
+    "frames_amend1": ("PREREG-TOY-FRAMES-AMEND-1.md", "158660bbfe6a1fd0c551dabc1308dbd4f89fc90a07fd9c58d19e163e9b4abce0"),
+    # edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 18:20 +0400 — Toy C's AMENDMENT-2: text at d7f6772, co-signed by the architect 18:18 (c30dbb6), signed by the seat 18:20 (d407dca).
+    "frames_amend2": ("PREREG-TOY-FRAMES-AMEND-2.md", "948d77044a4aff3cdb1ab32f02191b806fb650c80b83a1f43be4d9eb074ccfec"),
 }
-SIGNATURE_PREFIX = b"- Co-signed:"
+# edit: Claude (Sonnet 5.5, swarm toys), 2026-10-03 15:45 +0400 — a signature line is a line that STARTS (column 0, case-sensitive, colon required) with one of these: the toys laws' «- Co-signed:» and the architect's
+# «Signed:» / «Co-signed:» (Toy D). The laws' all-caps «SIGNED:» header and any prose line beginning «Signed» without the colon stay INSIDE the signed text, so no pinned sha moves
+# (red-first: tests/tools/test_toys_common.py). The seat's signature REPLACES the placeholder «Signed: the seat — pending.»: both are dropped.
+SIGNATURE_PREFIXES = (b"- Co-signed:", b"- Signed:", b"Co-signed:", b"Signed:")
+SIGNATURE_PREFIX = SIGNATURE_PREFIXES[0]        # kept for any importer of the old name
 
 
 class PreregError(Exception):
@@ -30,7 +38,7 @@ class PreregError(Exception):
 
 
 def signed_sha(path: Path) -> str:
-    kept = b"\n".join(line for line in Path(path).read_bytes().split(b"\n") if not line.startswith(SIGNATURE_PREFIX))
+    kept = b"\n".join(line for line in Path(path).read_bytes().split(b"\n") if not line.startswith(SIGNATURE_PREFIXES))
     return hashlib.sha256(kept).hexdigest()
 
 

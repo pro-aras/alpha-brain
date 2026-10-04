@@ -1,0 +1,2 @@
+2026-10-04 00:01:23 +0400 unit starts at 0049782642fee96b794d34746a57cc61debb390d (toys paths dirty: 0); load before: 7.76 8.66 8.73 | some avg10=0.00 avg60=0.00 avg300=0.01 total=445577840
+2026-10-04 00:15:58 +0400 unit ends exit 0; load after: 3.98 4.42 6.29 | some avg10=0.00 avg60=0.00 avg300=0.00 total=446501585

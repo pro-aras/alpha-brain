@@ -1,0 +1,6 @@
+[unit] ALPHA4: 50565 train / 33710 held moments, V 2236, 269 s wall, 269 CPU-s, peak RSS 194 MB
+[unit] ALPHA4+PLANT: 51070 train / 34047 held moments, V 2238, 268 s wall, 268 CPU-s, peak RSS 196 MB
+[unit] ALPHA4+SHUFFLE: 50565 train / 33710 held moments, V 2236, 275 s wall, 275 CPU-s, peak RSS 246 MB
+[unit] SCENE: 6000 train / 4000 held moments, V 14, 30 s wall, 30 CPU-s, peak RSS 246 MB
+[unit] SCENE+PLANT: 6600 train / 4400 held moments, V 16, 30 s wall, 30 CPU-s, peak RSS 246 MB
+[unit] RESULTS.json written (amend1); grade: WEB-H FAIL, WEB-S FAIL, SENTENCE FAIL, MDL-GREEDY FAIL

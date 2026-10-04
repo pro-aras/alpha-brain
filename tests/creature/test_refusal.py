@@ -228,7 +228,10 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # the three genes.py RUNS entries added by this task (docs/briefs/LIFE-C-QUESTION-SENTENCE.md).
         "SENTENCE": "SENTENCE two-word frames from co-occurring words; judged by the eye; never next-token",
         "QUESTION": "QUESTION from wants; forms what-is is which; to the world door",
-        "MOUTH": "MOUTH    say one frame per think; journaled",
+        # edit: Kimi K3 (kimi-code, builder lane kimi-w1), 2026-10-04 18:32 +0400 — PREREG-W1-MOUTH-VOICES-BRAIN §2 (the registry and the
+        # fixtures): the MOUTH row gains the new spelling (the optional clause «and the brain's phrase per canvas»); the old spelling
+        # stays pinned by tests/creature/test_question_sentence_mouth.py + test_voice_mind.py (every misspelling refused by name there).
+        "MOUTH": "MOUTH    say one frame per think and the brain's phrase per canvas; journaled",
         # edit: Claude (Sonnet 5, LIFE builder F), 2026-09-22 19:42 +0400 — LIFE-F-HANDS-TOUCH-SMELL.md:
         # three rows, matching the three genes.py RUNS entries added by this task.
         "HANDS": "HANDS    jail alpha3/hands/jail_run shelf world/programs cpu 10 mem 512 wall 20",
