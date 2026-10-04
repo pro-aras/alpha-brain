@@ -21,22 +21,22 @@ class TestMeetingCounts(unittest.TestCase):
         counts = C.meeting_counts(LISTS)
         self.assertEqual(counts[0], {})
         self.assertEqual(counts[1], {"cross": 1})
-        self.assertEqual(counts[2], {"cross": 1, "red": 1})
-        self.assertEqual(counts[3], {"cross": 1, "red": 1, "ring": 1})
-        self.assertEqual(C.meeting_counts(LISTS)[3]["cross"], 1)      # the 4th canvas's own meetings never count early
+        self.assertEqual(counts[2], {"cross": 2, "red": 1})
+        self.assertEqual(counts[3], {"cross": 2, "red": 1, "ring": 1})
+        self.assertEqual(counts[3]["cross"], 2)                          # the 4th canvas's own meetings never count early
 
     def test_meetings_at_a_calibration_point(self):
         counts = C.meeting_counts(LISTS)
-        self.assertEqual(C.at(counts, 4), {"cross": 3, "red": 2, "ring": 1})
+        self.assertEqual(C.at(counts, 4), {"cross": 4, "red": 2, "ring": 1})
 
 
 class TestCompareSaved(unittest.TestCase):
     def _saved(self):
-        return {"words": {"cross": {"meetings": 3, "mature": True}, "red": {"meetings": 2, "mature": False},
+        return {"words": {"cross": {"meetings": 4, "mature": True}, "red": {"meetings": 2, "mature": False},
                           "ring": {"meetings": 1, "mature": False}}}
 
     def test_matches_the_saved_census_with_presence_counts(self):
-        out = C.compare_saved(C.meeting_counts(LISTS), self._saved(), at=4)
+        out = C.compare_saved(LISTS, self._saved(), at=4)
         self.assertTrue(out["ok"])
         self.assertEqual(out["n_words"], 3)
         self.assertEqual(out["n_checked"], 3)                          # presence: words compared across both sides
@@ -44,19 +44,19 @@ class TestCompareSaved(unittest.TestCase):
     def test_a_planted_byte_is_caught_and_named(self):
         saved = self._saved()
         saved["words"]["cross"]["meetings"] = 99                       # the planted corruption
-        out = C.compare_saved(C.meeting_counts(LISTS), saved, at=4)
+        out = C.compare_saved(LISTS, saved, at=4)
         self.assertFalse(out["ok"])
-        self.assertEqual(out["first_diff"], ("cross", 3, 99))
+        self.assertEqual(out["first_diff"], ("cross", 4, 99))
 
     def test_a_word_missing_on_either_side_is_a_difference(self):
         saved = self._saved()
         saved["words"]["ghost"] = {"meetings": 4, "mature": True}
-        out = C.compare_saved(C.meeting_counts(LISTS), saved, at=4)
+        out = C.compare_saved(LISTS, saved, at=4)
         self.assertFalse(out["ok"])
         self.assertEqual(out["n_checked"], 4)
         saved2 = self._saved()
         del saved2["words"]["ring"]
-        out2 = C.compare_saved(C.meeting_counts(LISTS), saved2, at=4)
+        out2 = C.compare_saved(LISTS, saved2, at=4)
         self.assertFalse(out2["ok"])
         self.assertEqual(out2["first_diff"][0], "ring")
 
