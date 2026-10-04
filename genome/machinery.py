@@ -514,9 +514,17 @@ def parse_genome(text: str) -> Genome:
                 # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 18:3x +0400 — L-11 (docs/briefs/
                 # LIFE-C-QUESTION-SENTENCE.md task 4; MOTOR-HANDS.md G-MOT-6): says one filed, CITED frame
                 # per think; an uncited frame is refused by name, never said.
-                m = re.fullmatch(r"say one frame per think; journaled", a)
-                if not m: raise GenomeError(f"MOUTH: cannot read {a!r} (L-11: MOUTH say one frame per think; journaled)")
+                # edit: Kimi K3 (kimi-code, builder lane kimi-w1), 2026-10-04 18:34 +0400 — PREREG-W1-MOUTH-VOICES-BRAIN §2 (the law
+                # SIGNED x3 at toys-1003 1ccc3bf): the line gains an OPTIONAL clause «and the brain's phrase per canvas» (the SENTENCE
+                # «on the line» / WORLD «voice formant» / GAZE «coarse» precedent). ABSENT: the dict is EXACTLY the old one (no new
+                # key) — pinned by tests/creature/test_question_sentence_mouth.py and test_voice_mind.py; PRESENT: ONE more key,
+                # "brain": "phrase per canvas". A misspelt clause is refused by name (test_voice_mind.py). This file is PINNED
+                # (brain/scene/cache.py's WORLD_CODE): the redraw window that lands this hunk is the seat's (the law §2, the pin).
+                m = re.fullmatch(r"say one frame per think( and the brain's phrase per canvas)?; journaled", a)
+                if not m: raise GenomeError(f"MOUTH: cannot read {a!r} (L-11: MOUTH say one frame per think[ and the brain's phrase per canvas]; journaled)")
                 g["declared"]["MOUTH"] = {"say": "one frame per think", "journaled": True}
+                if m.group(1):
+                    g["declared"]["MOUTH"]["brain"] = "phrase per canvas"
             # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY: "scene" joins "game" as a shape this branch does not take
             # (the drawn world's own grammar and dict are untouched; `WORLD scene …` has its own branch below).
             elif gene == "WORLD" and (not args or args[0] not in ("game", "scene")):
