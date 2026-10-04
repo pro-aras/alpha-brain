@@ -14,7 +14,8 @@ import sys
 from pathlib import Path
 from typing import List
 
-ALLOWED_MODULES = {"brain.scene.learners", "brain.scene.world", "brain.world.seeds", "creature.senses.mentor"}
+ALLOWED_MODULES = {"brain.scene.learners", "brain.scene.world", "brain.world.seeds", "creature.senses.mentor",
+                   "creature.senses.scene", "genome.brain", "tools.toys.tl4"}
 OWN_PACKAGES = ("tools.toys.w2",)
 FORBIDDEN_NAMES = {"softmax", "argmax", "choice"}
 SCORER_NAMES = {"score", "scene_scores"}
