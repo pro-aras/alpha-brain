@@ -48,6 +48,14 @@ SHA256SUMS-w1 (141,703 files; verify from that directory: `sha256sum -c <this fo
 
 efa5807 (the merge) → 21dbcad (tests FIRST, RED: test_voice_mind.py 23 tests, «Ran 23 … FAILED (errors=9)») → 14a45e7 (the code, GREEN: machinery.py's pinned MOUTH regex, mind.py's clause/refusal/voice-row hunks, genes.py's MOUTH row; «Ran 39 … OK», neighbours 33 OK, the genome suite 713 OK) → 6ca7ab2 (the bench tools' tests RED, «Ran 6 … FAILED») → a8ab116 (the bench tools GREEN, «Ran 26 … OK») → 9eb93e6 (the grader's instrument fixes, «Ran 28 … OK»; the bench reads W1: True) → the records commit (this folder).
 
+## The suites on the branch's final bytes (logs under suites/ at the records dir, sha-covered)
+
+- **genome**: 713 OK (skipped=1, expected failures=6), exit 0 (genome-10daae6.log; slot peak 863 MB).
+- **creature** (split_suite, three parts, partition EXACT over 138 files, the parts' «Ran» SUM 1448 = 1448): 444 / 559 / 445 all OK (skipped 5 / 1 / 0), split verdict exit 0 (creature-10daae6.split.txt; peaks 8.4 / 10.4 / 10.4 GB in the 10G cap).
+- **tools**: 1243 tests, **23 errors, ONE cause** — the pin's price: the toys' S1c identity tests (test_toys_cp 13, test_toys_cp_analyse 3, test_toys_nullspace 7) read the CURRENT run root's test caches (cache.RUNS = scene-organ-swarm-1003) whose check_code refuses the branch's machinery.py (the refusal names ONLY ['genome/machinery.py'] — the W1 hunk; 5 surface as SceneCacheError, 18 as the cascade KeyError: 'test' of the fixture's memoised loader). The toys' OWN pools (scratch/toys-pools) went stale with the master merge and were REDRAWN under the branch bytes: all ten seeds 20261301–20261310, the three S1c drew reading «identity with S1c's pools: EQUAL (8 pools)» — the merge + the hunk changed no world bytes. Cured only by the seat's redraw window (the law §2); the 28 W1 tests inside the suite are green.
+- **brain**: 715 discovered, **24 errors in TWO named families, none the mechanism** (brain-10daae6.log, brain-errors-10daae6.txt): (i) 16 arms modules error at `import torch` (torch is not installed) — PRE-EXISTING, proven on a detached checkout of master 3c9ab08: the identical module selection there reads «Ran 46 tests / FAILED (errors=16)» with the same 16 names, its scene tests passing (suites/master24.log, master24.errors); (ii) 8 scene errors = the same pin's price as tools' (the RUNS-root caches refuse machinery.py).
+- The brain/tools pin-priced errors pass on master and must refuse the branch until the seat's ONE redraw window redraws the RUNS root and re-runs the suites on the merged bytes — the law §2's own mechanism, never the builder's to cure.
+
 ## The file map
 
 - gate.json, gate-report.txt — the grader's own output (copied from kimi-w1-records/w1/read/, sha-covered here and there).
