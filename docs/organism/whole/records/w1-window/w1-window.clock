@@ -1,0 +1,12 @@
+2026-10-05 00:30:43 +0400 active creature units: 5 (ALLOW_LIVE=1)
+2026-10-05 00:30:43 +0400 start at 8062f6c3798b1cb0ecec1e7cf9795d406f30d1ce; load 0.77 1.20 1.36; pressure some avg10=0.00 avg60=0.00 avg300=0.00 total=31159643; life backlog/moments/last_seq: 0 432955 225517
+00:30:43 rsync exit 0
+00:36:38 cache-r exit 0
+00:36:39 cache-identity exit 0
+00:38:09 cache-new-world exit 0
+00:38:10 identity-20261104 exit 0
+2026-10-05 00:38:10 +0400 end; load 2.75 2.06 1.68; pressure some avg10=0.00 avg60=0.00 avg300=0.00 total=31392326; life backlog/moments/last_seq: 0 433445 225752; samples 15
+2026-10-05 00:38:10 +0400 window done; load 2.75 2.06 1.68
+equal 20261103/held/cache/speak2  rows 60
+caches compared 63 · differing 0
+CONTROL (one bit flipped in the redrawn glances.npy, in memory): CAUGHT ['glances.npy']
