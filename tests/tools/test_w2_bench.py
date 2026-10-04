@@ -55,7 +55,7 @@ class TestFeed(unittest.TestCase):
         matsN, _ = F.build(Xs, states, "N")
         for M in matsN:
             self.assertEqual(M.shape[0], 2)                            # NOSTATE: one row fewer
-        self.assertEqual(stats.n, 6)
+        self.assertEqual(stats.n, 18)                                # the standardiser's n counts ROWS: 6 canvases x 3
 
     def test_the_shadow_standardiser_equals_the_learners_own(self):
         Xs, states = self._tiny()
@@ -77,17 +77,20 @@ class TestFeed(unittest.TestCase):
 class TestStream(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.canvases = R.assemble(BL2, 250, 290)
+        cls.canvases = R.assemble(BL2, 0, 290)
         cls.census = C.meeting_counts([c.words for c in cls.canvases])
-        cls.stream = SM.build(cls.canvases, cls.census, 20261799)
+        cls.stream = SM.build(cls.canvases, cls.census, 20261799, 250, 290)
 
     def test_utterance_parts_and_the_mirror_tokens(self):
         for u in self.stream.utterances:
             self.assertTrue(u["parent"])
             for w in u["mirror"]:
                 self.assertIn(w, ("unsure", "fresh", "asked"))
-        some_young = [u for u in self.stream.utterances if "fresh" in u["mirror"]]
-        self.assertTrue(some_young, "the first canvases of the slice carry young names")
+        for pos, u in enumerate(self.stream.utterances):
+            lead = self.stream.referents[pos]
+            lw = self.canvases[250 + pos].things[lead].shape if lead is not None else self.canvases[250 + pos].words[-1]
+            m = self.census[250 + pos].get(lw, 0)
+            self.assertEqual("fresh" in u["mirror"], m < 3, (pos, lw, m))      # young is the GLOBAL census's own rule
 
     def test_the_dealt_mirror_moves_only_the_tokens(self):
         perm = Lr.nshuf_permutation(substream(20261799, "w2:deal:1"), len(self.stream.utterances))
@@ -125,7 +128,7 @@ class TestInject(unittest.TestCase):
             self.assertEqual(seqs, sorted(seqs))
             non_mentor = [r for r in rows if r["meta"].get("source") != "mentor"]
             self.assertEqual([r["meta"].get("word") for r in non_mentor[:2]], ["cross", "blue"])
-            p = out / "payload" / rows[2]["payload"]
+            p = out / rows[2]["payload"]
             self.assertTrue(p.exists())
             self.assertEqual(rows[2]["sha"], hashlib.sha256(p.read_bytes()).hexdigest())
 
@@ -177,8 +180,8 @@ class TestArms(unittest.TestCase):
         L = A.train_arm(mats, utts, 1)
         W = A.score_window(L, mats)
         self.assertEqual(W.shape, (10, len(L.words)))
-        self.assertEqual(A.state_word_columns(L), [L.index[w] for w in ("unsure", "fresh", "asked") if w in L.index] or A.state_word_columns(L))
-        from tools.toys.tl4 import grade as G
+        self.assertEqual(A.state_word_columns(L), [])
+        from tools.toys.w2 import grade as G
         self.assertEqual(G.auc(A.const_scores(0.5, 10), np.array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1])), 0.5)
 
 

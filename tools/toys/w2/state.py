@@ -1,6 +1,6 @@
 """tools/toys/w2/state.py — PREREG-W2 §3 item 2: the offline STATE labels and the SHARED state row (the CODE-F six).
 
-edit: Kimi K3 (kimi-code, builder lane kimi-w2), 2026-10-05 02:4x +0400 — new file, written after tests/tools/test_w2_record.py
+edit: Kimi K3 (kimi-code, builder lane kimi-w2), 2026-10-05 02:44 +0400 — new file, written after tests/tools/test_w2_record.py
 was red; law docs/organism/whole/PREREG-W2-MENTOR-WORLD.md §3 item 2 and the builder's declared conventions (the board
 NOTE of this lane): the labels are the record's OWN, never assumed.
 
