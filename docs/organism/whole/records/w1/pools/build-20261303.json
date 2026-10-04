@@ -1,0 +1,120 @@
+{
+  "cpu_s": 57.8,
+  "drawn": [
+    {
+      "pool": "R1-visit",
+      "wall_s": 14.1
+    },
+    {
+      "pool": "R1-window",
+      "wall_s": 0.4
+    },
+    {
+      "pool": "R2-visit",
+      "wall_s": 14.3
+    },
+    {
+      "pool": "R2-window",
+      "wall_s": 0.3
+    },
+    {
+      "pool": "R3-visit",
+      "wall_s": 13.5
+    },
+    {
+      "pool": "R3-window",
+      "wall_s": 0.4
+    },
+    {
+      "pool": "N-visit",
+      "wall_s": 14.2
+    },
+    {
+      "pool": "N-window",
+      "wall_s": 0.3
+    }
+  ],
+  "identity": {
+    "n_pools": 8,
+    "pools": {
+      "N-visit": {
+        "canvas_sha_diff": 0,
+        "npy_equal": true,
+        "rows_new": 2000,
+        "rows_old": 2000,
+        "same": true,
+        "spec_diff": 0
+      },
+      "N-window": {
+        "canvas_sha_diff": 0,
+        "npy_equal": true,
+        "rows_new": 40,
+        "rows_old": 40,
+        "same": true,
+        "spec_diff": 0
+      },
+      "R1-visit": {
+        "canvas_sha_diff": 0,
+        "npy_equal": true,
+        "rows_new": 2000,
+        "rows_old": 2000,
+        "same": true,
+        "spec_diff": 0
+      },
+      "R1-window": {
+        "canvas_sha_diff": 0,
+        "npy_equal": true,
+        "rows_new": 40,
+        "rows_old": 40,
+        "same": true,
+        "spec_diff": 0
+      },
+      "R2-visit": {
+        "canvas_sha_diff": 0,
+        "npy_equal": true,
+        "rows_new": 2000,
+        "rows_old": 2000,
+        "same": true,
+        "spec_diff": 0
+      },
+      "R2-window": {
+        "canvas_sha_diff": 0,
+        "npy_equal": true,
+        "rows_new": 40,
+        "rows_old": 40,
+        "same": true,
+        "spec_diff": 0
+      },
+      "R3-visit": {
+        "canvas_sha_diff": 0,
+        "npy_equal": true,
+        "rows_new": 2000,
+        "rows_old": 2000,
+        "same": true,
+        "spec_diff": 0
+      },
+      "R3-window": {
+        "canvas_sha_diff": 0,
+        "npy_equal": true,
+        "rows_new": 40,
+        "rows_old": 40,
+        "same": true,
+        "spec_diff": 0
+      }
+    },
+    "same": true
+  },
+  "present": {
+    "N-visit": true,
+    "N-window": true,
+    "R1-visit": true,
+    "R1-window": true,
+    "R2-visit": true,
+    "R2-window": true,
+    "R3-visit": true,
+    "R3-window": true
+  },
+  "root": "/data/dev/genome-wt-toys-1003/scratch/toys-pools",
+  "seed": 20261303,
+  "wall_s": 57.8
+}

@@ -58,6 +58,8 @@ efa5807 (the merge) → 21dbcad (tests FIRST, RED: test_voice_mind.py 23 tests, 
 
 ## The file map
 
+- pools/ — the three pools-EQUAL logs the verifier's note (iii) named (no longer scratch-level): pools-redraw-2026130{1,2,3}.log (each S1c seed's redraw section, verbatim, ending «identity with S1c's pools: EQUAL (8 pools)»), build-2026130{1,2,3}.json (the pools.py runs' own records, `"same": true, "n_pools": 8`), and pools-redraw-all-seeds.log (the full ten-seed redraw output); the same bytes sit at kimi-w1-records/w1/pools/, covered by SHA256SUMS-w1.
+
 - gate.json, gate-report.txt — the grader's own output (copied from kimi-w1-records/w1/read/, sha-covered here and there).
 - genomes/ — the four ON genomes (the voice_genome.py runs' output; the OFF and plain genomes are the repo's genome/brain/lives/ files).
 - one_run.sh, k_pair.sh — the bench drivers (every replay's own log/exit/clock under kimi-w1-records/w1/{logs,runs}/).

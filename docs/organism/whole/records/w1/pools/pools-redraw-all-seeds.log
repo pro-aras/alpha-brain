@@ -1,0 +1,177 @@
+build-20261301.json
+build-20261302.json
+build-20261303.json
+[rooms 20261301 R1-visit] 500/2000
+[rooms 20261301 R1-visit] 1000/2000
+[rooms 20261301 R1-visit] 1500/2000
+[rooms 20261301 R1-visit] 2000/2000
+[rooms 20261301 R2-visit] 500/2000
+[rooms 20261301 R2-visit] 1000/2000
+[rooms 20261301 R2-visit] 1500/2000
+[rooms 20261301 R2-visit] 2000/2000
+[rooms 20261301 R3-visit] 500/2000
+[rooms 20261301 R3-visit] 1000/2000
+[rooms 20261301 R3-visit] 1500/2000
+[rooms 20261301 R3-visit] 2000/2000
+[rooms 20261301 N-visit] 500/2000
+[rooms 20261301 N-visit] 1000/2000
+[rooms 20261301 N-visit] 1500/2000
+[rooms 20261301 N-visit] 2000/2000
+{"cpu_s": 56.3, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261301, "wall_s": 56.4}
+identity with S1c's pools: EQUAL (8 pools)
+[rooms 20261302 R1-visit] 500/2000
+[rooms 20261302 R1-visit] 1000/2000
+[rooms 20261302 R1-visit] 1500/2000
+[rooms 20261302 R1-visit] 2000/2000
+[rooms 20261302 R2-visit] 500/2000
+[rooms 20261302 R2-visit] 1000/2000
+[rooms 20261302 R2-visit] 1500/2000
+[rooms 20261302 R2-visit] 2000/2000
+[rooms 20261302 R3-visit] 500/2000
+[rooms 20261302 R3-visit] 1000/2000
+[rooms 20261302 R3-visit] 1500/2000
+[rooms 20261302 R3-visit] 2000/2000
+[rooms 20261302 N-visit] 500/2000
+[rooms 20261302 N-visit] 1000/2000
+[rooms 20261302 N-visit] 1500/2000
+[rooms 20261302 N-visit] 2000/2000
+{"cpu_s": 59.9, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261302, "wall_s": 60.0}
+identity with S1c's pools: EQUAL (8 pools)
+[rooms 20261303 R1-visit] 500/2000
+[rooms 20261303 R1-visit] 1000/2000
+[rooms 20261303 R1-visit] 1500/2000
+[rooms 20261303 R1-visit] 2000/2000
+[rooms 20261303 R2-visit] 500/2000
+[rooms 20261303 R2-visit] 1000/2000
+[rooms 20261303 R2-visit] 1500/2000
+[rooms 20261303 R2-visit] 2000/2000
+[rooms 20261303 R3-visit] 500/2000
+[rooms 20261303 R3-visit] 1000/2000
+[rooms 20261303 R3-visit] 1500/2000
+[rooms 20261303 R3-visit] 2000/2000
+[rooms 20261303 N-visit] 500/2000
+[rooms 20261303 N-visit] 1000/2000
+[rooms 20261303 N-visit] 1500/2000
+[rooms 20261303 N-visit] 2000/2000
+{"cpu_s": 57.8, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261303, "wall_s": 57.8}
+identity with S1c's pools: EQUAL (8 pools)
+[rooms 20261304 R1-visit] 500/2000
+[rooms 20261304 R1-visit] 1000/2000
+[rooms 20261304 R1-visit] 1500/2000
+[rooms 20261304 R1-visit] 2000/2000
+[rooms 20261304 R2-visit] 500/2000
+[rooms 20261304 R2-visit] 1000/2000
+[rooms 20261304 R2-visit] 1500/2000
+[rooms 20261304 R2-visit] 2000/2000
+[rooms 20261304 R3-visit] 500/2000
+[rooms 20261304 R3-visit] 1000/2000
+[rooms 20261304 R3-visit] 1500/2000
+[rooms 20261304 R3-visit] 2000/2000
+[rooms 20261304 N-visit] 500/2000
+[rooms 20261304 N-visit] 1000/2000
+[rooms 20261304 N-visit] 1500/2000
+[rooms 20261304 N-visit] 2000/2000
+{"cpu_s": 56.6, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261304, "wall_s": 56.6}
+[rooms 20261305 R1-visit] 500/2000
+[rooms 20261305 R1-visit] 1000/2000
+[rooms 20261305 R1-visit] 1500/2000
+[rooms 20261305 R1-visit] 2000/2000
+[rooms 20261305 R2-visit] 500/2000
+[rooms 20261305 R2-visit] 1000/2000
+[rooms 20261305 R2-visit] 1500/2000
+[rooms 20261305 R2-visit] 2000/2000
+[rooms 20261305 R3-visit] 500/2000
+[rooms 20261305 R3-visit] 1000/2000
+[rooms 20261305 R3-visit] 1500/2000
+[rooms 20261305 R3-visit] 2000/2000
+[rooms 20261305 N-visit] 500/2000
+[rooms 20261305 N-visit] 1000/2000
+[rooms 20261305 N-visit] 1500/2000
+[rooms 20261305 N-visit] 2000/2000
+{"cpu_s": 56.0, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261305, "wall_s": 56.0}
+[rooms 20261306 R1-visit] 500/2000
+[rooms 20261306 R1-visit] 1000/2000
+[rooms 20261306 R1-visit] 1500/2000
+[rooms 20261306 R1-visit] 2000/2000
+[rooms 20261306 R2-visit] 500/2000
+[rooms 20261306 R2-visit] 1000/2000
+[rooms 20261306 R2-visit] 1500/2000
+[rooms 20261306 R2-visit] 2000/2000
+[rooms 20261306 R3-visit] 500/2000
+[rooms 20261306 R3-visit] 1000/2000
+[rooms 20261306 R3-visit] 1500/2000
+[rooms 20261306 R3-visit] 2000/2000
+[rooms 20261306 N-visit] 500/2000
+[rooms 20261306 N-visit] 1000/2000
+[rooms 20261306 N-visit] 1500/2000
+[rooms 20261306 N-visit] 2000/2000
+{"cpu_s": 57.4, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261306, "wall_s": 57.4}
+[rooms 20261307 R1-visit] 500/2000
+[rooms 20261307 R1-visit] 1000/2000
+[rooms 20261307 R1-visit] 1500/2000
+[rooms 20261307 R1-visit] 2000/2000
+[rooms 20261307 R2-visit] 500/2000
+[rooms 20261307 R2-visit] 1000/2000
+[rooms 20261307 R2-visit] 1500/2000
+[rooms 20261307 R2-visit] 2000/2000
+[rooms 20261307 R3-visit] 500/2000
+[rooms 20261307 R3-visit] 1000/2000
+[rooms 20261307 R3-visit] 1500/2000
+[rooms 20261307 R3-visit] 2000/2000
+[rooms 20261307 N-visit] 500/2000
+[rooms 20261307 N-visit] 1000/2000
+[rooms 20261307 N-visit] 1500/2000
+[rooms 20261307 N-visit] 2000/2000
+{"cpu_s": 56.6, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261307, "wall_s": 56.6}
+[rooms 20261308 R1-visit] 500/2000
+[rooms 20261308 R1-visit] 1000/2000
+[rooms 20261308 R1-visit] 1500/2000
+[rooms 20261308 R1-visit] 2000/2000
+[rooms 20261308 R2-visit] 500/2000
+[rooms 20261308 R2-visit] 1000/2000
+[rooms 20261308 R2-visit] 1500/2000
+[rooms 20261308 R2-visit] 2000/2000
+[rooms 20261308 R3-visit] 500/2000
+[rooms 20261308 R3-visit] 1000/2000
+[rooms 20261308 R3-visit] 1500/2000
+[rooms 20261308 R3-visit] 2000/2000
+[rooms 20261308 N-visit] 500/2000
+[rooms 20261308 N-visit] 1000/2000
+[rooms 20261308 N-visit] 1500/2000
+[rooms 20261308 N-visit] 2000/2000
+{"cpu_s": 56.6, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261308, "wall_s": 56.6}
+[rooms 20261309 R1-visit] 500/2000
+[rooms 20261309 R1-visit] 1000/2000
+[rooms 20261309 R1-visit] 1500/2000
+[rooms 20261309 R1-visit] 2000/2000
+[rooms 20261309 R2-visit] 500/2000
+[rooms 20261309 R2-visit] 1000/2000
+[rooms 20261309 R2-visit] 1500/2000
+[rooms 20261309 R2-visit] 2000/2000
+[rooms 20261309 R3-visit] 500/2000
+[rooms 20261309 R3-visit] 1000/2000
+[rooms 20261309 R3-visit] 1500/2000
+[rooms 20261309 R3-visit] 2000/2000
+[rooms 20261309 N-visit] 500/2000
+[rooms 20261309 N-visit] 1000/2000
+[rooms 20261309 N-visit] 1500/2000
+[rooms 20261309 N-visit] 2000/2000
+{"cpu_s": 56.6, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261309, "wall_s": 56.6}
+[rooms 20261310 R1-visit] 500/2000
+[rooms 20261310 R1-visit] 1000/2000
+[rooms 20261310 R1-visit] 1500/2000
+[rooms 20261310 R1-visit] 2000/2000
+[rooms 20261310 R2-visit] 500/2000
+[rooms 20261310 R2-visit] 1000/2000
+[rooms 20261310 R2-visit] 1500/2000
+[rooms 20261310 R2-visit] 2000/2000
+[rooms 20261310 R3-visit] 500/2000
+[rooms 20261310 R3-visit] 1000/2000
+[rooms 20261310 R3-visit] 1500/2000
+[rooms 20261310 R3-visit] 2000/2000
+[rooms 20261310 N-visit] 500/2000
+[rooms 20261310 N-visit] 1000/2000
+[rooms 20261310 N-visit] 1500/2000
+[rooms 20261310 N-visit] 2000/2000
+{"cpu_s": 55.6, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261310, "wall_s": 55.6}
+slot exit 0

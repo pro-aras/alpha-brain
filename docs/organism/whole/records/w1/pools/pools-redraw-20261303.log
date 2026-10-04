@@ -1,0 +1,18 @@
+[rooms 20261303 R1-visit] 500/2000
+[rooms 20261303 R1-visit] 1000/2000
+[rooms 20261303 R1-visit] 1500/2000
+[rooms 20261303 R1-visit] 2000/2000
+[rooms 20261303 R2-visit] 500/2000
+[rooms 20261303 R2-visit] 1000/2000
+[rooms 20261303 R2-visit] 1500/2000
+[rooms 20261303 R2-visit] 2000/2000
+[rooms 20261303 R3-visit] 500/2000
+[rooms 20261303 R3-visit] 1000/2000
+[rooms 20261303 R3-visit] 1500/2000
+[rooms 20261303 R3-visit] 2000/2000
+[rooms 20261303 N-visit] 500/2000
+[rooms 20261303 N-visit] 1000/2000
+[rooms 20261303 N-visit] 1500/2000
+[rooms 20261303 N-visit] 2000/2000
+{"cpu_s": 57.8, "present": {"N-visit": true, "N-window": true, "R1-visit": true, "R1-window": true, "R2-visit": true, "R2-window": true, "R3-visit": true, "R3-window": true}, "seed": 20261303, "wall_s": 57.8}
+identity with S1c's pools: EQUAL (8 pools)
