@@ -154,15 +154,16 @@ class TestDiffJ(unittest.TestCase):
         off, on, mentor = self._journals()
         out = D.journal_confinement(off, on, mentor)
         self.assertTrue(out["ok"], out)
-        self.assertEqual(out["first_diff_kind"], "brain")
-        self.assertEqual(out["n_diff_by_kind"]["brain"], 4)
+        self.assertEqual(out["profile"]["violations"], [])
+        self.assertGreater(out["profile"]["downstream"].get("brain:turn", 0), 0)
+        self.assertGreater(out["profile"]["downstream"].get("brain:learn", 0), 0)
 
-    def test_a_differing_non_brain_row_is_caught(self):
+    def test_a_delivery_field_difference_is_caught(self):
         off, on, mentor = self._journals()
-        on[0]["v"] = 99                                                          # the planted violation
+        on[1]["scene"] = 99                                                        # a delivery field of a brain row
         out = D.journal_confinement(off, on, mentor)
         self.assertFalse(out["ok"])
-        self.assertIn("body", out["reason"])
+        self.assertIn("scene", out["reason"])
 
     def test_a_heard_delta_outside_the_mentor_words_is_caught(self):
         off, on, mentor = self._journals()
