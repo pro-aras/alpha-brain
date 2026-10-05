@@ -1348,6 +1348,60 @@ def produce_believed(road, X: np.ndarray, target: int, rng_factory, budget: int 
     return {"spoken": None, "reason": "none" if fired else "the read-back", **base}
 
 
+# edit: Kimi K3 (kimi-code, acting seat, alone), 2026-10-05 17:4x +0400 — PREREG-MOUTH-INCREMENTAL §2 (signed): THE MOUTH
+# THE HUMAN WAY — additive; produce_believed above is byte-untouched. The mechanism (RESEARCH-HUMAN-MOUTH-MECHANISM.md):
+# walk the sayable words in the road's preference order ONCE; skip a word that rules out nothing (Relevance, free);
+# add a word, ask the hearer model (the read-back) after EACH addition; stop at the first sufficiency; never unsay
+# (indelibility); the list exhausted → the honest bail-out. ≤ len(say) read-backs ALWAYS — the 2^N enumeration is
+# nowhere. `budget` is the cap law's belt under the mechanism's braces (its breach needs say > MOUTH_BUDGET — named
+# unreachable on any measured stream, kept for the form).
+def produce_incremental(road, X: np.ndarray, target: int, rng_factory, budget: int = MOUTH_BUDGET) -> Dict[str, object]:
+    """THE INCREMENTAL MOUTH (PREREG-MOUTH-INCREMENTAL §2): the human production mechanism at machine level —
+      1. the SAME sayable believed names as produce_believed (the same road, the same believed map, the same sayable
+         rule — the preference order is the road's type order);
+      2. RELEVANCE: a word every OTHER hypothesis believes the same name for (in its type) rules out nothing —
+         SKIPPED, no read-back spent, counted in `skipped`;
+      3. INCREMENT: add the word; ONE read-back of the phrase so far; ACCEPTED (speak) iff it points at the target
+         first and «none» does not fire — the hearer model's own sufficiency test;
+      4. INDELIBLE: a word once added is never removed, whatever a later word could do alone;
+      5. the list exhausted without sufficiency → `spoken None`, `reason "the read-back"`; the budget breached →
+         `reason "the mouth's budget"` (the cap law's declared string, verbatim).
+    The row: the old keys (`target`, `believed`, `sayable`, `spoken`, `reason`, `readback_point`, `margin`) plus the
+    mechanism's own (`n_say`, `n_readbacks` — ALWAYS ≤ len(say), `skipped`, `added`). The margin is computed at the
+    stopping read-back, as everywhere (a reading)."""
+    X = np.atleast_2d(X)
+    t = int(target)
+    n_hyp = X.shape[0]
+    types = [tuple(T) for T in road.types()]
+    B = road.believed(X)
+    base: Dict[str, object] = {"target": t, "believed": {str(k): B[k][t] for k in range(len(types)) if B[k][t] is not None},
+                               "sayable": []}
+    say = [(k, B[k][t]) for k in range(len(types)) if B[k][t] is not None and road.sayable(X[t], B[k][t])]
+    base["sayable"] = [w for _k, w in say]
+    base.update({"n_say": len(say), "n_readbacks": 0, "skipped": [], "added": []})
+    if not say:
+        return {"spoken": None, "reason": "no sayable word", **base}
+    ear = road.ear
+    phrase: List[str] = []
+    for k, w in say:
+        if all(B[k][h] == w for h in range(n_hyp) if h != t):
+            base["skipped"].append(w)          # Relevance: rules out nothing (EVERY other hypothesis believes it) — never said, never read back
+            continue
+        phrase = ear.order(phrase + [w])       # indelible: once added, never removed
+        base["added"].append(w)
+        if base["n_readbacks"] >= budget:
+            return {"spoken": None, "reason": "the mouth's budget", "budget": int(budget), **base}
+        base["n_readbacks"] += 1
+        a = road.answer_point(X, phrase, rng_factory())
+        if a.get("point") is None or int(a["point"]) != t or a.get("none"):
+            continue                           # not sufficient yet — keep walking (the human keeps talking)
+        sc = np.asarray(a["scores"], dtype=np.float64)
+        others = np.delete(sc, t)
+        margin = float(sc[t] - np.max(others)) if others.size else float("inf")
+        return {"spoken": list(phrase), "reason": None, "readback_point": int(a["point"]), "margin": margin, **base}
+    return {"spoken": None, "reason": "the read-back", **base}
+
+
 # ================================================================================================ the feeds
 def nshuf_permutation(rng: np.random.Generator, n: int) -> np.ndarray:
     """N-SHUF's fixed seeded permutation: each utterance paired with the scene of ANOTHER moment (declared: a uniformly
