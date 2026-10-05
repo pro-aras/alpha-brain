@@ -157,7 +157,53 @@ class TestMouthCapCorpus(unittest.TestCase):
                 self.assertEqual(old.get(field), new.get(field), f"fixture {n} field {field}: {old} vs {new}")
             self.assertEqual(old["n_candidates"], new["n_candidates"])
             self.assertEqual(old["n_unique"], new["n_unique"])
+            self.assertEqual(old["n_accepted"], new["n_accepted"])
+            self.assertEqual(set(old), set(new))   # AMENDMENT 2: at say ≤ 12 the dict carries NO new keys
             n += 1
+
+    def _say_fixture(self, rng, n_say, n_hyp=2):
+        types = [(f"w{k}",) for k in range(n_say)]
+        believed = [[f"w{k}"] + [f"x{h}" for h in range(1, n_hyp)] for k in range(n_say)]
+        return types, believed, [f"w{k}" for k in range(n_say)], n_hyp
+
+    def test_corpus_say13_early_stop_decisions_equal(self):
+        # 20 fixtures at say 13–16 (the capped path): an accepted exists in class 1–2 — the decision fields equal the
+        # old enumeration's; n_readbacks stays far under the budget (the early stop is what the cap is FOR)
+        rng = np.random.default_rng(4242)
+        for _ in range(20):
+            n_say = int(rng.integers(13, 17))
+            types, believed, sayable, n_hyp = self._say_fixture(rng, n_say)
+            k1, k2 = int(rng.integers(0, n_say)), int(rng.integers(0, n_say - 1))
+            k2 = k2 + 1 if k2 >= k1 else k2
+            table = {(f"w{k1}",): (0, False, [2.0] + [-1.0] * (n_hyp - 1)),
+                     tuple(sorted((f"w{k1}", f"w{k2}"))): (0, False, [99.0] + [-99.0] * (n_hyp - 1))}
+            road = FakeRoad(types, believed, sayable, table)
+            X = np.zeros((n_hyp, 3))
+            old = _produce_believed_reference(road, X, 0, _same_factory)
+            new = Lr.produce_believed(road, X, 0, _same_factory)
+            for field in ("spoken", "readback_point", "margin", "reason"):
+                self.assertEqual(old.get(field), new.get(field))
+            self.assertEqual(new["spoken"], [f"w{k1}"])          # the rank's law: the shorter accepted wins
+            self.assertLess(new["n_readbacks"], 4 * n_say)
+            self.assertEqual(old["n_unique"], new["n_unique"])   # uniqueness is exact wherever the budget does not bind
+
+    def test_corpus_say13_exhaustive_all_fields_equal(self):
+        # 10 fixtures at say 13–14 where uniqueness keeps few candidates and nothing is accepted: both enumerate fully,
+        # every field equal including the counters
+        rng = np.random.default_rng(777)
+        for _ in range(10):
+            n_say = int(rng.integers(13, 15))
+            types = [(f"w{k}",) for k in range(n_say)]
+            believed = [[f"w{k}", f"w{k}"] for k in range(n_say)]          # shared names: nothing is unique
+            road = FakeRoad(types, believed, [f"w{k}" for k in range(n_say)], {})
+            X = np.zeros((2, 3))
+            old = _produce_believed_reference(road, X, 0, _same_factory)
+            new = Lr.produce_believed(road, X, 0, _same_factory)
+            self.assertEqual(old["reason"], new["reason"])
+            self.assertEqual(old["n_unique"], new["n_unique"])
+            self.assertEqual(old["n_accepted"], new["n_accepted"])
+            self.assertEqual(new["n_readbacks"], new["n_unique"])
+            self.assertTrue(new["exhaustive"])
 
     def test_plant_rank_beats_margin(self):
         # plant (i): a length-2 accepted AND a length-3 accepted with a LARGER margin — the winner must be the length-2
@@ -197,42 +243,63 @@ class TestMouthCapCorpus(unittest.TestCase):
 
 
 class TestMouthCapBudget(unittest.TestCase):
-    """M-BUDGET: the declared overflow form, and the early stop landing BEFORE the budget when a winner exists."""
+    """M-BUDGET (the AMENDMENT 2 form): the capped path engages only at say > 12; the declared overflow form; the early
+    stop landing BEFORE the budget when a winner exists."""
 
     def _big_road(self, n_say, n_hyp=2):
-        types = [(f"w{k}",) for k in range(n_say)]
-        believed = [[f"w{k}"] + [f"x{h}" for h in range(1, n_hyp)] for k in range(n_say)]
-        return FakeRoad(types, believed, [f"w{k}" for k in range(n_say)], {})
+        types, believed, sayable, _ = TestMouthCapCorpus._say_fixture(self, np.random.default_rng(0), n_say, n_hyp)
+        return FakeRoad(types, believed, sayable, {})
+
+    def test_below_the_branch_the_old_code_runs_verbatim(self):
+        # say 12: 4,095 candidates — under MOUTH_FULL_BELOW the budget does not exist (the old dict's own keys only)
+        road = self._big_road(12)
+        out = Lr.produce_believed(road, np.zeros((2, 3)), 0, _same_factory, budget=64)
+        self.assertNotIn("n_readbacks", out)
+        self.assertNotIn("exhaustive", out)
+        self.assertEqual(out["reason"], "the read-back")
+        self.assertEqual(out["n_unique"], 2 ** 12 - 1)      # every candidate unique (per-hyp believed names)
+        self.assertEqual(out["n_accepted"], 0)
 
     def test_overflow_form(self):
-        road = self._big_road(8)                       # every candidate unique; the default outcome never accepts
-        self.assertGreaterEqual(2 ** 8 - 1, 64)        # the fixture asserts it changed the bytes: candidates > budget
+        road = self._big_road(13)                      # every candidate unique; the default outcome never accepts
+        self.assertGreater(2 ** 13 - 1, 64)            # the fixture asserts it changed the bytes: candidates > budget
         out = Lr.produce_believed(road, np.zeros((2, 3)), 0, _same_factory, budget=64)
         self.assertIsNone(out["spoken"])
         self.assertEqual(out["reason"], "the mouth's budget")
         self.assertEqual(out["n_readbacks"], 64)
         self.assertEqual(out["budget"], 64)
-        self.assertEqual(out["n_say"], 8)
+        self.assertEqual(out["n_say"], 13)
         self.assertFalse(out["exhaustive"])
 
     def test_early_stop_before_budget(self):
-        road = self._big_road(8)
+        road = self._big_road(13)
+        road._table[("w0",)] = (0, False, [3.0, -1.0])     # accepted at class 1 (13 read-backs ≤ 64)
+        out = Lr.produce_believed(road, np.zeros((2, 3)), 0, _same_factory, budget=64)
+        self.assertEqual(out["spoken"], ["w0"])
+        self.assertEqual(out["n_readbacks"], 13)
+
+    def test_a_budget_break_discards_the_partial_class(self):
+        # AMENDMENT 3: accepted ONLY at class 2, and 13 + 78 > 64 — the partial class's evaluated accepted counts for
+        # nothing; the mouth says NOTHING (a partial winner could be a DIFFERENT phrase than the full enumeration's)
+        road = self._big_road(13)
         road._table[("w0", "w1")] = (0, False, [3.0, -1.0])
         out = Lr.produce_believed(road, np.zeros((2, 3)), 0, _same_factory, budget=64)
-        self.assertEqual(out["spoken"], ["w0", "w1"])
-        self.assertLess(out["n_readbacks"], 64)
+        self.assertIsNone(out["spoken"])
+        self.assertEqual(out["reason"], "the mouth's budget")
+        self.assertEqual(out["n_readbacks"], 64)
+        self.assertEqual(out["n_accepted"], 0)
 
     def test_overflow_winner_in_unevaluated_part_is_nothing_not_a_different_phrase(self):
         # the budget cuts before the class holding the only accepted candidate: the mouth says NOTHING (the declared trade)
-        road = self._big_road(8)
-        road._table[tuple(f"w{k}" for k in range(8))] = (0, False, [9.0, -9.0])   # accepted only at length 8
+        road = self._big_road(13)
+        road._table[tuple(f"w{k}" for k in range(13))] = (0, False, [9.0, -9.0])  # accepted only at length 13
         out = Lr.produce_believed(road, np.zeros((2, 3)), 0, _same_factory, budget=64)
         self.assertIsNone(out["spoken"])
         self.assertEqual(out["reason"], "the mouth's budget")
 
     def test_full_budget_time_bound(self):
         # M-TIME: the overflow path at the FULL budget with a realistic read-back cost — ≤ 60 s wall, the load printed
-        # (say 13: 8,191 candidates, so the 4,096 budget is what binds — say 12's 4,095 would exhaust first)
+        # (say 13: 8,191 candidates, so the 4,096 budget is what binds)
         class SlowRoad(FakeRoad):
             def answer_point(self, X, phrase, rng):
                 Z = np.random.default_rng(0).random((500, 152))
