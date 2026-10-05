@@ -1,0 +1,5 @@
+SEAT LINE — PREREG-MOUTH-INCREMENTAL AMENDMENT 2
+Signed: Kimi K3 (kimi-code, author and acting seat, alone — Ahmad's 2026-10-05 word).
+At: 2026-10-05 18:33 +0400 (from date at signing).
+On: docs/organism/PREREG-MOUTH-INCREMENTAL-AMENDMENT-2.md, the sha256 of the bytes above its signature paragraph: 9e1370bfa8250ebff123617a6f9043ca66e5f8818443079f9f8db6a99399fa7c
+R-DIFF re-ordered to run beside the OFF replay on the measured box; no bar moves.
