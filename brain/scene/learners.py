@@ -30,6 +30,7 @@ attribute = P_FROM_MEETING) read where the module constant was, and RWLearner.ca
 """
 from __future__ import annotations
 
+import itertools
 import math
 from typing import Dict, List, Optional, Sequence, Tuple
 
@@ -1184,7 +1185,14 @@ class OracleRoad:
         return int(np.argmax(counts)) if counts and max(counts) > 0 else None
 
 
-def produce_believed(road, X: np.ndarray, target: int, rng_factory) -> Dict[str, object]:
+# edit: Kimi K3 (kimi-code, acting seat, alone), 2026-10-05 13:21 +0400 — PREREG-MOUTH-CAP §2 (signed, this branch's first commit):
+# the mouth's declared candidate budget — candidates CONSIDERED per produce_believed call (each uniqueness evaluation = 1;
+# the read-backs are a subset). 4,096 ≈ 585 × the closed record's measured maximum (7, the law's item 2) and ≈ 19.3 s of
+# read-backs at the pilot's measured 4.7 ms. A constant, never a genome line (#221's form: a knob would re-hash every life).
+MOUTH_BUDGET = 4096
+
+
+def produce_believed(road, X: np.ndarray, target: int, rng_factory, budget: int = MOUTH_BUDGET) -> Dict[str, object]:
     """THE MOUTH SAYS WHAT IT BELIEVES (PREREG-S1B1R §1 e as Fable's edit reads it) — the SAME code for every arm, over
     its ROAD (`types()`, `believed(X)`, `sayable(x, w)`, `answer_point(X, phrase, rng)` with the road's «none», `ear`,
     `one_alone()`):
@@ -1200,7 +1208,21 @@ def produce_believed(road, X: np.ndarray, target: int, rng_factory) -> Dict[str,
          the ear's order;
       5. none accepted → «I cannot say it yet», one reason (declared priority): «no sayable word»; «no believed-unique
          phrase»; «none» when a believed-unique candidate read back to the target with «none» firing; else «the read-back».
-    The read-back's point and the target are RECORDED, so the grader re-checks the wiring (READ-BACK 1.000)."""
+    The read-back's point and the target are RECORDED, so the grader re-checks the wiring (READ-BACK 1.000).
+
+    PREREG-MOUTH-CAP §2 + AMENDMENT 1 (edit: Kimi K3 (kimi-code, acting seat, alone), 2026-10-05): the enumeration is
+    LENGTH-ORDERED under the declared budget `MOUTH_BUDGET`. Candidates are generated per length class k = 1 … len(say)
+    (`itertools.combinations` — never a materialized 2^N list); the uniqueness filter runs for EVERY candidate (exact
+    `n_unique` wherever the budget does not bind — the old code paid the same 2^N pass with a list on top); the read-backs
+    of a class run whole and the enumeration stops after the FIRST class holding ≥ 1 accepted — the same winner as the
+    full enumeration BY the rank's own first key (length), with the within-class evaluation complete for the margin
+    tie-break. `budget` counts READ-BACKS (the expensive unit, the pilot's measured 4.7 ms); spent mid-class with no
+    accepted in any completed class (the only shape it can take), the result is the DECLARED OVERFLOW FORM: `spoken None`,
+    `reason "the mouth's budget"` — the mouth says NOTHING, never a different phrase. The parameter exists so tests
+    exercise the budget path small; every organism call site uses the default (G-CALLERS). `n_candidates` stays exact
+    (2^len(say) − 1, arithmetic); `n_accepted` on the early-stopped path reports the first accepted class (the prefix),
+    under `"exhaustive": false` — diagnostic fields, never journaled (`genome/brain.py:_turn_core` journals only the say
+    dict)."""
     X = np.atleast_2d(X)
     t = int(target)
     n_hyp = X.shape[0]
@@ -1212,36 +1234,58 @@ def produce_believed(road, X: np.ndarray, target: int, rng_factory) -> Dict[str,
     base["sayable"] = [w for _k, w in say]
     if not say:
         return {"spoken": None, "reason": "no sayable word", **base}
-    cands = [[say[i] for i in range(len(say)) if mask >> i & 1] for mask in range(1, 1 << len(say))]
-    uniq = [c for c in cands if not any(all(B[k][h] == w for k, w in c) for h in range(n_hyp) if h != t)]
-    base["n_candidates"], base["n_unique"] = len(cands), len(uniq)
-    if not uniq:
-        return {"spoken": None, "reason": "no believed-unique phrase", **base}
+    base["n_candidates"] = (1 << len(say)) - 1
     one = road.one_alone()
     ear = road.ear
-    accepted = []
     fired = 0
-    for c in uniq:
-        phrase = ear.order([w for _k, w in c])
-        a = road.answer_point(X, phrase, rng_factory())
-        if a.get("point") is None or int(a["point"]) != t:
-            continue
-        if a.get("none"):
-            fired += 1
-            continue
-        sc = np.asarray(a["scores"], dtype=np.float64)
-        others = np.delete(sc, t)
-        margin = float(sc[t] - np.max(others)) if others.size else float("inf")
-        alone = 0 if (one is not None and any(k == one for k, _w in c)) else 1
-        rank = (len(phrase), -margin, alone, tuple(ear.key(w) for w in phrase),
-                tuple(ear.first.get(w, 10 ** 6) for w in phrase))
-        accepted.append((rank, phrase, int(a["point"]), margin))
-    base["n_accepted"] = len(accepted)
-    if not accepted:
-        return {"spoken": None, "reason": "none" if fired else "the read-back", **base}
-    accepted.sort(key=lambda z: z[0])
-    _rank, phrase, point, margin = accepted[0]
-    return {"spoken": list(phrase), "reason": None, "readback_point": point, "margin": margin, **base}
+    readbacks = 0
+    n_unique = 0
+    n_accepted = 0
+    exhaustive = True
+    winner = None
+    for _k in range(1, len(say) + 1):
+        accepted = []
+        for c in itertools.combinations(say, _k):
+            if any(all(B[tk][h] == w for tk, w in c) for h in range(n_hyp) if h != t):
+                continue
+            n_unique += 1
+            if winner is not None:
+                continue
+            if readbacks >= budget:
+                exhaustive = False
+                break
+            readbacks += 1
+            phrase = ear.order([w for _tk, w in c])
+            a = road.answer_point(X, phrase, rng_factory())
+            if a.get("point") is None or int(a["point"]) != t:
+                continue
+            if a.get("none"):
+                fired += 1
+                continue
+            sc = np.asarray(a["scores"], dtype=np.float64)
+            others = np.delete(sc, t)
+            margin = float(sc[t] - np.max(others)) if others.size else float("inf")
+            alone = 0 if (one is not None and any(tk == one for tk, _w in c)) else 1
+            rank = (len(phrase), -margin, alone, tuple(ear.key(w) for w in phrase),
+                    tuple(ear.first.get(w, 10 ** 6) for w in phrase))
+            accepted.append((rank, phrase, int(a["point"]), margin))
+        n_accepted += len(accepted)
+        if accepted:
+            accepted.sort(key=lambda z: z[0])
+            winner = accepted[0]
+        if not exhaustive:
+            break
+    base["n_unique"], base["n_accepted"] = n_unique, n_accepted
+    base["exhaustive"] = exhaustive
+    base["n_readbacks"] = readbacks
+    if winner is not None:
+        _rank, phrase, point, margin = winner
+        return {"spoken": list(phrase), "reason": None, "readback_point": point, "margin": margin, **base}
+    if not exhaustive:
+        return {"spoken": None, "reason": "the mouth's budget", "n_say": len(say), "budget": int(budget), **base}
+    if n_unique == 0:
+        return {"spoken": None, "reason": "no believed-unique phrase", **base}
+    return {"spoken": None, "reason": "none" if fired else "the read-back", **base}
 
 
 # ================================================================================================ the feeds

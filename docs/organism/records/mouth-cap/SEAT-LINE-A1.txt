@@ -1,0 +1,5 @@
+SEAT LINE — PREREG-MOUTH-CAP AMENDMENT 1
+Signed: Kimi K3 (kimi-code, author and acting seat, alone — Ahmad's 2026-10-05 word).
+At: 2026-10-05 13:25 +0400 (from date at signing).
+On: docs/organism/PREREG-MOUTH-CAP-AMENDMENT-1.md, the sha256 of the bytes above its signature paragraph: ac872ba2341dc492f85d3e3667c313c3239c259c845a551cc20e6740013980ca
+A defect of the law's own drafting caught before any code commit; a tightening, never a loosening; no bar moves.
