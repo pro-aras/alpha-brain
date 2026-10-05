@@ -107,6 +107,13 @@ def build(canvases: Sequence[SceneCanvas], census, bench_seed: int, lo: int = 0,
                        n_referent_readbacks=n_rb)
 
 
+def slice_stream(stream: BenchStream, lo: int, hi: int) -> "BenchStream":
+    """The stream's slice [lo, hi) as a BenchStream (for the marks, which index by slice position)."""
+    return BenchStream(utterances=stream.utterances[lo:hi], states=stream.states[lo:hi], labels=stream.labels[lo:hi],
+                       mentor_rows=stream.mentor_rows[lo:hi], referents=stream.referents[lo:hi],
+                       n_referent_readbacks=stream.n_referent_readbacks)
+
+
 def deal_mirror(utterances: Sequence[Dict[str, object]], perm: np.ndarray) -> List[Dict[str, object]]:
     """SHUF: the mirror tokens of canvas t become those of canvas perm[t]; parents and carriers stay. The derangement's
     own construction preserves every token's total count."""

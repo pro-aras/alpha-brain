@@ -29,8 +29,8 @@ class TestBenchRunner(unittest.TestCase):
         for k in ("test_n", "cont", "nostate", "oracle", "dealt_diag", "blind", "const", "m1", "proto_home",
                   "gradability", "stream", "gates", "marks_truth"):
             self.assertIn(k, r, k)
-        self.assertEqual(r["n_train"], 60)
-        self.assertEqual(r["n_test"], 10)
+        self.assertEqual(r["n_train"], 310)                          # the learner is driven from canvas 0 (the bench's own
+        self.assertEqual(r["n_test"], 10)                            # warm-up, canvases 0..249, before the slice); TEST 10
         self.assertEqual(len(r["dealt_diag"]["unsure"]), 2)
         self.assertIn("fresh", r["proto_home"]["words"])
         self.assertIn("c_read", r["oracle"].get("unsure", {}))

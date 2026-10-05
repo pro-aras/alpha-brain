@@ -74,7 +74,7 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
                out: Optional[Path] = None) -> Dict[str, object]:
     """One bench seed's arms re-read over the slice [lo, hi): TRAIN [lo, train_end), TEST [train_end, hi)."""
     cs, census, by_moment = generation(bl2, seed, hi=hi)
-    stream = SM.build(cs, census, seed, lo, hi)
+    stream = SM.build(cs, census, seed, 0, hi)
     # ---- the §4 gates of record: G-CENSUS (the reference census vs the saved census at every calibration point in
     # range), G-TRUTH (a spec regenerated per hundredth canvas + a planted corruption caught), G-STREAM (one hash) ----
     lists = [c.words for c in cs]
@@ -107,11 +107,20 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
     gates = {"census": census_g, "truth": {"n": truth_n, "n_equal": truth_hits, "first_diff_scene": truth_first,
                                            "planted_caught": planted_caught},
              "stream_hash": sh.hexdigest()}
-    n_tr = train_end - lo
+    # ---- the windows: the learner is driven from canvas 0 (its warm-up is the record's own, canvases 0..249, BEFORE
+    # the slice) so the mentor world's own words arrive at the slice under FINITE bands — M-NOHARM (b) measures the
+    # RULE's choice, T-L4's R1 separation applied to this bench; the arms' utterances carry the mentor's words from the
+    # slice on (pos >= lo); the ON tape carries them everywhere (the replay identity reads those). TRAIN [0, train_end),
+    # TEST [train_end, hi). ----
+    n_tr = train_end
     n_te = hi - train_end
-    utts = [SM.words_of(u) for u in stream.utterances]
-    tr_words, te_words = utts[:n_tr], utts[n_tr:]
-    Xs_tr = [cs[lo + t].X for t in range(n_tr)]
+    utts = [(list(u["parent"]) if pos < lo else SM.words_of(u)) for pos, u in enumerate(stream.utterances)]
+    tr_words = utts[:n_tr]                                     # the learner never reads the TEST canvases' words
+    bench_parts = [{"parent": list(u["parent"]),
+                    "carrier": ([] if pos < lo else list(u["carrier"])),
+                    "mirror": ([] if pos < lo else list(u["mirror"])), "ask_target": u.get("ask_target")}
+                   for pos, u in enumerate(stream.utterances)]
+    Xs_tr = [cs[t].X for t in range(n_tr)]
     states = stream.states
     mats_tr, stats_tr = F.build(Xs_tr, states[:n_tr], "S")
     matsN_tr, _ = F.build(Xs_tr, states[:n_tr], "N")
@@ -136,7 +145,7 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
                 continue
             l = LABELS[WORDS.index(w)]
             li = LABELS.index(l)
-            y = np.concatenate([np.concatenate([np.zeros(int(cs[lo + t].X.shape[0])), [float(states[t][li])]]) for t in range(n_tr)])
+            y = np.concatenate([np.concatenate([np.zeros(int(cs[t].X.shape[0])), [float(states[t][li])]]) for t in range(n_tr)])
             fit = A.oracle_fit(Z_all, y, ridge=1e-3, max_iter=30)
             sco = A.oracle_scores(Lc.stats, fit["v"], fit["b"], mats_te_c)
             oracle[w] = {"c_read": G.auc(sco, labels[l]), "n_iter": fit["n_iter"], "converged": fit["converged"],
@@ -149,7 +158,7 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
     word_cols_c = {w: list(Lc.index).index(w) for w in WORDS if w in Lc.index}
     for k in range(1, k_null + 1):
         perm = Lr.nshuf_permutation(substream(seed, f"w2:deal:{k}"), n_tr)
-        du = SM.deal_mirror(stream.utterances[:n_tr], perm)
+        du = SM.deal_mirror(bench_parts[:n_tr], perm)
         Lk = A.train_arm(mats_tr, [SM.words_of(u) for u in du], seed)
         mats_te_k, _ = F.build(Xs_te, states[n_tr:], "S", window="test", frozen_mean=Lc.stats.mean)
         sc_k = _score(Lk, mats_te_k)
@@ -169,7 +178,7 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
     mats_te_b, _ = F.build(Xs_te, states[n_tr:], "S", window="test", frozen_mean=Lc.stats.mean)
     sc_b = _score(Lb, mats_te_b)
     blind = {w: (G.auc(sc_b[:, list(Lb.index).index(w)], labels[LABELS[WORDS.index(w)]]) if w in Lb.index else None) for w in WORDS}
-    const = {w: G.auc(A.const_scores(float(np.mean([w in u["mirror"] for u in stream.utterances[:n_tr]])), n_te),
+    const = {w: G.auc(A.const_scores(float(np.mean([w in u["mirror"] for u in bench_parts[:n_tr]])), n_te),
                       labels[LABELS[WORDS.index(w)]]) for w in WORDS}
     m1 = {}
     for w in WORDS:
@@ -181,15 +190,16 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
     proto = _proto_home(Lc, mats_tr, n_tr)
     from tools.toys.w2 import marks as MK
     slice_cs = cs[lo:hi]
+    slice_stream = SM.slice_stream(stream, lo, hi)
     rec = {"seed": seed, "slice": [lo, hi], "train_end": train_end, "n_train": n_tr, "n_test": n_te,
            "test_n": {l: {"pos": int(labels[l].sum()), "neg": int(n_te - labels[l].sum())} for l in LABELS},
            "stream": {"n_utterances": len(stream.utterances), "n_referent_readbacks": stream.n_referent_readbacks,
-                      "mirror_counts": {w: sum(w in u["mirror"] for u in stream.utterances) for w in WORDS}},
+                      "mirror_counts": {w: sum(w in u["mirror"] for u in bench_parts) for w in WORDS}},
            "gates": gates,
-           "marks_truth": {"m_true": MK.m_true(slice_cs, stream), "m_attrib": MK.m_attrib(slice_cs, stream),
-                           "m_joint": MK.m_joint(slice_cs, stream, seed),
-                           "m_contingent_i": MK.m_contingent_i(slice_cs, stream),
-                           "m_selfvoice_answers": MK.m_selfvoice([], slice_cs, stream)},
+           "marks_truth": {"m_true": MK.m_true(slice_cs, slice_stream), "m_attrib": MK.m_attrib(slice_cs, slice_stream),
+                           "m_joint": MK.m_joint(slice_cs, slice_stream, seed),
+                           "m_contingent_i": MK.m_contingent_i(slice_cs, slice_stream),
+                           "m_selfvoice_answers": MK.m_selfvoice([], slice_cs, slice_stream)},
            "cont": {"auc": cont_aucs, "naming": naming},
            "nostate": {"auc": {w: (G.auc(sc_n[:, list(Ln.index).index(w)], labels[LABELS[WORDS.index(w)]]) if w in Ln.index else None) for w in WORDS},
                         "naming": naming.get("nostate")},
@@ -227,7 +237,7 @@ def _naming_acc(L, cs, stream, train_end, n_te, mats_te, lo: int = 250) -> float
     n = 0
     for t in range(n_te):
         c = cs[train_end + t]
-        ref = stream.referents[(train_end - lo) + t] if (train_end - lo) + t < len(stream.referents) else None
+        ref = stream.referents[train_end + t] if train_end + t < len(stream.referents) else None
         lead_hyp, lead_word = ST.lead(c, ref)
         if lead_hyp is None or lead_hyp >= mats_te[t].shape[0]:
             continue
