@@ -65,11 +65,10 @@ def m_true(canvases: Sequence[SceneCanvas], stream: BenchStream, lo: int = 250) 
                     ok = at is not None and all(M.word_true_of(w, c.things[at]) for w in npw)
                     reason = "the answer does not name the asked thing"
                 else:
-                    hits = [M.fixation_hits(t, c.fix) for t in c.things]
-                    best = max(hits, default=0)
-                    tied = [i for i, n in enumerate(hits) if n == best and n > 0]
-                    ok = bool(tied) and any(all(M.word_true_of(w, c.things[i]) for w in npw) for i in tied)
-                    reason = "the named thing is not the fixated referent"
+                    # the sentence's own claim, existential over the fixated things (for a single C1 row that thing IS
+                    # the max-fixated referent; a C3 run names each of the canvas's fixated things in turn):
+                    ok = any(M.fixation_hits(t, c.fix) >= 1 and all(M.word_true_of(w, t) for w in npw) for t in c.things)
+                    reason = "the named thing is not any fixated thing"
                 if not ok and first_false is None:
                     first_false = {"moment": c.moment, "tpl": tpl, "reason": reason, "production": p}
             else:
