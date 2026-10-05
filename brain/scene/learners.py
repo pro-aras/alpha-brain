@@ -1384,8 +1384,9 @@ def produce_incremental(road, X: np.ndarray, target: int, rng_factory, budget: i
     ear = road.ear
     phrase: List[str] = []
     for k, w in say:
-        if all(B[k][h] == w for h in range(n_hyp) if h != t):
+        if n_hyp > 1 and all(B[k][h] == w for h in range(n_hyp) if h != t):
             base["skipped"].append(w)          # Relevance: rules out nothing (EVERY other hypothesis believes it) — never said, never read back
+            # (AMENDMENT 1: only WITH distractors — an empty contrast set needs no discriminatory power; the human says the type name)
             continue
         phrase = ear.order(phrase + [w])       # indelible: once added, never removed
         base["added"].append(w)

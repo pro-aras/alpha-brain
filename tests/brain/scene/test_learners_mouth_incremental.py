@@ -28,7 +28,7 @@ def _produce_incremental_twin(road, X, target, rng_factory, budget=Lr.MOUTH_BUDG
     ear = road.ear
     phrase = []
     for k, w in say:
-        if all(B[k][h] == w for h in range(n_hyp) if h != t):
+        if n_hyp > 1 and all(B[k][h] == w for h in range(n_hyp) if h != t):
             out["skipped"].append(w)
             continue
         phrase = ear.order(phrase + [w])
@@ -151,6 +151,19 @@ class TestIncrementalMechanism(unittest.TestCase):
         self.assertEqual(out["added"], ["red"])
         self.assertEqual(out["n_readbacks"], 1)
         self.assertEqual(out["spoken"], ["red"])
+
+    def test_empty_contrast_set_speaks_the_type_name(self):
+        # AMENDMENT 1 (caught by the instrument's first real rows): ONE hypothesis in view — the empty contrast set
+        # needs no discriminatory power (the human says the type name); the skip rule is VACUOUSLY true without the
+        # n_hyp > 1 guard and must not silence the mouth
+        types = [("square", "circle"), ("red", "blue")]
+        believed = [["square"], ["red"]]
+        table = {("square",): (0, False, [0.9])}
+        road = FakeRoad(types, believed, ["square", "red"], table)
+        out = Lr.produce_incremental(road, np.zeros((1, 3)), 0, _f)
+        self.assertEqual(out["spoken"], ["square"])
+        self.assertEqual(out["skipped"], [])
+        self.assertEqual(out["n_readbacks"], 1)
 
     def test_bail_readback_never_sufficient(self):
         types = [("circle", "square"), ("red", "blue")]
