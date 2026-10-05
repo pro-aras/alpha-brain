@@ -27,7 +27,7 @@ class TestBenchRunner(unittest.TestCase):
     def test_the_record_carries_the_laws_fields(self):
         r = self.rec
         for k in ("test_n", "cont", "nostate", "oracle", "dealt_diag", "blind", "const", "m1", "proto_home",
-                  "gradability", "stream"):
+                  "gradability", "stream", "gates", "marks_truth"):
             self.assertIn(k, r, k)
         self.assertEqual(r["n_train"], 60)
         self.assertEqual(r["n_test"], 10)
@@ -35,6 +35,12 @@ class TestBenchRunner(unittest.TestCase):
         self.assertIn("fresh", r["proto_home"]["words"])
         self.assertIn("c_read", r["oracle"].get("unsure", {}))
         self.assertEqual(r["const"]["asked"], 0.5)                     # CONST at exactly 0.5 where computable
+        self.assertTrue(all(g["ok"] for g in r["gates"]["census"]), r["gates"]["census"])
+        self.assertTrue(r["gates"]["truth"]["planted_caught"])
+        self.assertTrue(r["gates"]["stream_hash"])
+        self.assertTrue(r["marks_truth"]["m_true"]["pass"], r["marks_truth"]["m_true"].get("first_false"))
+        self.assertTrue(r["marks_truth"]["m_attrib"]["pass"])
+        self.assertTrue(r["marks_truth"]["m_contingent_i"]["pass"])
 
     def test_the_truth_family_over_the_mini_stream(self):
         cs, census, by_moment = B.generation(BL2, 20261799, hi=320)

@@ -75,6 +75,38 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
     """One bench seed's arms re-read over the slice [lo, hi): TRAIN [lo, train_end), TEST [train_end, hi)."""
     cs, census, by_moment = generation(bl2, seed, hi=hi)
     stream = SM.build(cs, census, seed, lo, hi)
+    # ---- the §4 gates of record: G-CENSUS (the reference census vs the saved census at every calibration point in
+    # range), G-TRUTH (a spec regenerated per hundredth canvas + a planted corruption caught), G-STREAM (one hash) ----
+    lists = [c.words for c in cs]
+    census_g = []
+    for f in sorted((bl2 / "census").glob("*.json")):
+        point = int(f.stem)
+        if point > hi:
+            continue
+        res = C.compare_saved(lists, json.loads(f.read_text()), at=point)
+        census_g.append({"point": point, "ok": res["ok"], "n_words": res["n_words"], "n_checked": res["n_checked"],
+                         "first_diff": res["first_diff"]})
+    truth_hits = 0
+    truth_n = 0
+    truth_first = None
+    planted_caught = False
+    for c in cs[lo:hi:100]:
+        regen = R.regenerate_spec(c.world_seed, c.scene)
+        truth_n += 1
+        same = regen["scene_dict"] == c.spec["scene_dict"]
+        truth_hits += int(same)
+        if not same and truth_first is None:
+            truth_first = c.scene
+        bad = dict(regen["scene_dict"]); bad["index"] = bad.get("index", 0) + 1     # the planted bit
+        planted_caught = planted_caught or (bad != regen["scene_dict"])
+    import hashlib
+    sh = hashlib.sha256()
+    for u in stream.utterances:
+        for w in SM.words_of(u):
+            sh.update(w.encode())
+    gates = {"census": census_g, "truth": {"n": truth_n, "n_equal": truth_hits, "first_diff_scene": truth_first,
+                                           "planted_caught": planted_caught},
+             "stream_hash": sh.hexdigest()}
     n_tr = train_end - lo
     n_te = hi - train_end
     utts = [SM.words_of(u) for u in stream.utterances]
@@ -145,12 +177,19 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
             continue
         l = LABELS[WORDS.index(w)]
         m1[w] = G.m1_rule(cont_aucs[w], oracle.get(w, {}).get("c_read", float("nan")), [x for x in dealt_diag[w] if x == x])
-    naming = _naming_pair(Lc, Ln, cs, stream, train_end, n_te, mats_te_c, mats_te_n)
+    naming = _naming_pair(Lc, Ln, cs, stream, train_end, n_te, mats_te_c, mats_te_n, lo)
     proto = _proto_home(Lc, mats_tr, n_tr)
+    from tools.toys.w2 import marks as MK
+    slice_cs = cs[lo:hi]
     rec = {"seed": seed, "slice": [lo, hi], "train_end": train_end, "n_train": n_tr, "n_test": n_te,
            "test_n": {l: {"pos": int(labels[l].sum()), "neg": int(n_te - labels[l].sum())} for l in LABELS},
            "stream": {"n_utterances": len(stream.utterances), "n_referent_readbacks": stream.n_referent_readbacks,
                       "mirror_counts": {w: sum(w in u["mirror"] for u in stream.utterances) for w in WORDS}},
+           "gates": gates,
+           "marks_truth": {"m_true": MK.m_true(slice_cs, stream), "m_attrib": MK.m_attrib(slice_cs, stream),
+                           "m_joint": MK.m_joint(slice_cs, stream, seed),
+                           "m_contingent_i": MK.m_contingent_i(slice_cs, stream),
+                           "m_selfvoice_answers": MK.m_selfvoice([], slice_cs, stream)},
            "cont": {"auc": cont_aucs, "naming": naming},
            "nostate": {"auc": {w: (G.auc(sc_n[:, list(Ln.index).index(w)], labels[LABELS[WORDS.index(w)]]) if w in Ln.index else None) for w in WORDS},
                         "naming": naming.get("nostate")},
