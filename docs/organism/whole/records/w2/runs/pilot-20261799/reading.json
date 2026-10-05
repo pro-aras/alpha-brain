@@ -1,0 +1,183 @@
+{
+ "blind": {
+  "asked": 0.553466785827413,
+  "fresh": null,
+  "unsure": 0.9455667213563029
+ },
+ "const": {
+  "asked": 0.5,
+  "fresh": NaN,
+  "unsure": 0.5
+ },
+ "cont": {
+  "auc": {
+   "asked": 1.0,
+   "fresh": null,
+   "unsure": 1.0
+  },
+  "naming": {
+   "cont": 0.9965,
+   "gradable": true,
+   "n": 2000,
+   "nostate": 0.9955,
+   "pass": true
+  }
+ },
+ "dealt_diag": {
+  "asked": [
+   0.2423158287705326,
+   0.30612527716186255
+  ],
+  "fresh": [
+   NaN,
+   NaN
+  ],
+  "unsure": [
+   0.20490383738948137,
+   0.0551852611430134
+  ]
+ },
+ "gradability": {
+  "asked": {
+   "c_read": 1.0,
+   "gradable": null,
+   "pos_test": 196,
+   "said_train": 1816
+  },
+  "fresh": {
+   "c_read": null,
+   "gradable": null,
+   "pos_test": 0,
+   "said_train": 0
+  },
+  "unsure": {
+   "c_read": 1.0,
+   "gradable": null,
+   "pos_test": 92,
+   "said_train": 819
+  }
+ },
+ "m1": {
+  "asked": {
+   "auc": 1.0,
+   "c_read": 1.0,
+   "n_dealt": 2,
+   "pass": true,
+   "q95": 0.30612527716186255,
+   "skill": 1.0
+  },
+  "unsure": {
+   "auc": 1.0,
+   "c_read": 1.0,
+   "n_dealt": 2,
+   "pass": true,
+   "q95": 0.20490383738948137,
+   "skill": 1.0
+  }
+ },
+ "n_test": 2000,
+ "n_train": 18000,
+ "naming_dealt": [
+  0.9965,
+  0.9965
+ ],
+ "nostate": {
+  "auc": {
+   "asked": 0.5112278836146432,
+   "fresh": null,
+   "unsure": 0.855078160605232
+  },
+  "naming": 0.9955
+ },
+ "oracle": {
+  "asked": {
+   "c_read": 1.0,
+   "converged": true,
+   "n_iter": 20,
+   "rows_fed": 45544,
+   "rows_total": 45544
+  },
+  "unsure": {
+   "c_read": 1.0,
+   "converged": true,
+   "n_iter": 20,
+   "rows_fed": 45544,
+   "rows_total": 45544
+  }
+ },
+ "proto_home": {
+  "n": 8,
+  "n_on_state": 0,
+  "n_present": 7,
+  "smallest_gap": 1.25,
+  "words": {
+   "alpha": {
+    "on_state_row": false,
+    "present": true,
+    "t": 0
+   },
+   "asked": {
+    "on_state_row": false,
+    "present": true,
+    "t": 4
+   },
+   "does": {
+    "on_state_row": false,
+    "present": true,
+    "t": 4
+   },
+   "fresh": {
+    "present": false
+   },
+   "not": {
+    "on_state_row": false,
+    "present": true,
+    "t": 4
+   },
+   "see": {
+    "on_state_row": false,
+    "present": true,
+    "t": 4
+   },
+   "sees": {
+    "on_state_row": false,
+    "present": true,
+    "t": 0
+   },
+   "unsure": {
+    "on_state_row": false,
+    "present": true,
+    "t": 3
+   }
+  }
+ },
+ "seed": 20261799,
+ "slice": [
+  250,
+  20250
+ ],
+ "stream": {
+  "mirror_counts": {
+   "asked": 2012,
+   "fresh": 0,
+   "unsure": 911
+  },
+  "n_referent_readbacks": 18680,
+  "n_utterances": 20000
+ },
+ "test_n": {
+  "ask_prev": {
+   "neg": 1804,
+   "pos": 196
+  },
+  "doubt": {
+   "neg": 1908,
+   "pos": 92
+  },
+  "young": {
+   "neg": 2000,
+   "pos": 0
+  }
+ },
+ "train_end": 18250
+}
