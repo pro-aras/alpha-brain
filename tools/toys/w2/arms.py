@@ -8,7 +8,7 @@ the bench's own vendored arithmetic (tools/toys/w2/grade.py and tl4_arith.py —
 """
 from __future__ import annotations
 
-from typing import List, Sequence
+from typing import Dict, List, Sequence
 
 import numpy as np
 
@@ -23,13 +23,20 @@ const_scores = TA.const_scores
 
 
 def train_arm(matrices: Sequence[np.ndarray], utterances: Sequence[Sequence[str]], seed: int, lr: float = 0.01,
-              dim: int = 146) -> Lr.RWLearner:
+              dim: int = 146, checkpoints: Sequence[int] = (),
+              test_builder=None) -> "Lr.RWLearner":
     """Drive `RWLearner(lr, dim)` over the TRAIN canvases with rng = substream(seed, "w2:episodic:<t>") (the bench seed's
-    name is NOT in the moment's name, so every arm shares its tie draws)."""
+    name is NOT in the moment's name, so every arm shares its tie draws). checkpoints: moments BEFORE which the TEST
+    window is scored in place (R-DOSE) with the mean as it stands (T-L4's rdose form)."""
     L = Lr.RWLearner(lr=lr, dim=dim)
+    rdose: Dict[int, np.ndarray] = {}
     for t, (M, words) in enumerate(zip(matrices, utterances)):
+        if t in checkpoints and test_builder is not None:
+            W = TA.score_window(L, test_builder(L.stats.mean.copy()))
+            rdose[t] = W
         rng = substream(seed, f"w2:episodic:{t}")
         L.train_scene(M, list(words), referent=None, rng=rng)
+    L._w2_rdose = rdose                                                # the bench reads it off the instance (read-only)
     return L
 
 

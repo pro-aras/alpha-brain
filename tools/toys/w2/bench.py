@@ -127,8 +127,10 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
     Xs_te = [cs[train_end + t].X for t in range(n_te)]
     labs = _labels(states, n_tr, n_tr + n_te)
     labels = {l: labs[l] for l in LABELS}
-    # ---- CONT ----
-    Lc = A.train_arm(mats_tr, tr_words, seed)
+    # ---- CONT (with R-DOSE checkpoints: the TEST window scored in place with the mean as it stands) ----
+    checkpoints = tuple(t for t in (2000, 4000, 8000) if t < n_tr)
+    Lc = A.train_arm(mats_tr, tr_words, seed, checkpoints=checkpoints,
+                     test_builder=lambda mean: F.build(Xs_te, states[n_tr:], "S", window="test", frozen_mean=mean)[0])
     mats_te_c, _ = F.build(Xs_te, states[n_tr:], "S", window="test", frozen_mean=Lc.stats.mean)
     sc_cont = _score(Lc, mats_te_c)
     # ---- NOSTATE ----
@@ -188,6 +190,7 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
         m1[w] = G.m1_rule(cont_aucs[w], oracle.get(w, {}).get("c_read", float("nan")), [x for x in dealt_diag[w] if x == x])
     naming = _naming_pair(Lc, Ln, cs, stream, train_end, n_te, mats_te_c, mats_te_n, lo)
     proto = _proto_home(Lc, mats_tr, n_tr)
+    readings = _readings(Lc, mats_te_c, sc_cont, labels, stream, lo, hi, checkpoints)
     from tools.toys.w2 import marks as MK
     slice_cs = cs[lo:hi]
     slice_stream = SM.slice_stream(stream, lo, hi)
@@ -205,7 +208,85 @@ def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: 
                         "naming": naming.get("nostate")},
            "oracle": {w: {k: v for k, v in o.items() if k != "scores"} for w, o in oracle.items()},
            "dealt_diag": dealt_diag, "naming_dealt": naming_dealt, "blind": blind, "const": const, "m1": m1,
-           "proto_home": proto,
+           "proto_home": proto, "readings": readings,
+           "gradability": _gradability(labels, stream, n_tr, n_te, Lc, oracle,
+                                       {w: sum(w in u["mirror"] for u in stream.utterances[:n_tr]) for w in WORDS})}
+    if out is not None:
+        out = Path(out)
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "reading.json").write_text(json.dumps(_jsonable(rec), indent=1, sort_keys=True), encoding="utf-8")
+    return rec
+
+
+def _readings(Lc, mats_te_c, sc_cont, labels, stream, lo, hi, checkpoints) -> Dict[str, object]:
+    """The law's readings (each with its n): R-DOSE's curve, R-PRECISION, R-LOCUS; the variation share and spacing, the
+    polarity balance, the cadence cost, the mirror-mention rates beside T-L4's MISS30/FALSE05 tolerance readings."""
+    rdose = {}
+    for t, W_ in getattr(Lc, "_w2_rdose", {}).items():
+        rdose[str(t)] = {w: (float(G.auc(W_[:, Lc.index[w]], labels[LABELS[WORDS.index(w)]])) if w in Lc.index else None)
+                         for w in WORDS}
+    rdose["final"] = {w: (float(G.auc(sc_cont[:, Lc.index[w]], labels[LABELS[WORDS.index(w)]])) if w in Lc.index else None)
+                      for w in WORDS}
+    prec = {}
+    for w in WORDS:
+        if w not in Lc.index:
+            continue
+        l = LABELS[WORDS.index(w)]
+        y = labels[l].astype(bool)
+        if y.sum() == 0:
+            prec[w] = None
+            continue
+        sc = sc_cont[:, Lc.index[w]]
+        pos, neg = sc[y], sc[~y]
+        thr = float(np.quantile(pos, 0.20))
+        tpr = float(np.mean(pos >= thr)); fpr = float(np.mean(neg >= thr)); pi = float(y.mean())
+        prec[w] = {"prevalence": pi, "tpr": tpr, "fpr": fpr,
+                   "precision": (pi * tpr / (pi * tpr + (1 - pi) * fpr)) if (pi * tpr + (1 - pi) * fpr) > 0 else None}
+    locus = {}
+    own = np.zeros((len(mats_te_c), 3))
+    thing = np.zeros((len(mats_te_c), 3))
+    for i, M_ in enumerate(mats_te_c):
+        P = A.TA.row_probs(Lc, M_)
+        cols = [Lc.index[w] for w in WORDS if w in Lc.index]
+        for j, w in enumerate([w for w in WORDS if w in Lc.index]):
+            own[i, j] = P[-1, Lc.index[w]]
+            thing[i, j] = P[:-1, Lc.index[w]].max() if P.shape[0] > 1 else float("nan")
+    for j, w in enumerate([w for w in WORDS if w in Lc.index]):
+        l = LABELS[WORDS.index(w)]
+        locus[w] = {"state_row": float(G.auc(own[:, j], labels[l])) if labels[l].sum() else None,
+                    "things_max": float(G.auc(thing[:, j], labels[l])) if labels[l].sum() else None}
+    wins = {}
+    for w0 in range(lo, hi, 1000):
+        rows = [r for c_rows in stream.mentor_rows[w0 - lo:min(w0 - lo + 1000, hi - lo)] for r in c_rows]
+        n_c3 = sum(1 for r in rows if r["meta"]["tpl"] == "M-C3")
+        wins[str(w0)] = {"c3_rows": n_c3, "mentor_rows": len(rows)}
+    n_c2 = sum(1 for c_rows in stream.mentor_rows for r in c_rows if r["meta"]["tpl"].startswith("M-C2"))
+    mirror_rates = {w: float(np.mean([w in u["mirror"] for u in stream.utterances])) for w in WORDS}
+    return {"rdose": rdose, "r_precision": prec, "r_locus": locus,
+            "variation": {"per_1000": wins}, "polarity": {"c2_productions": n_c2, "canvases": hi - lo,
+                                                          "unseen_base_rate_ref": "0.234-0.249 (DIAG-LOOK-AGAIN §1)"},
+            "cadence": {"mentor_rows_per_canvas": float(np.mean([len(r) for r in stream.mentor_rows])),
+                        "mentor_bytes_per_canvas": float(np.mean([sum(len(r["payload"]) for r in rr) for rr in stream.mentor_rows]))},
+            "mirror_mention_rates": mirror_rates,
+            "tolerance_refs": {"MISS30": "skill ~1.0 at 30% dropped (T-L4)", "FALSE05": "skill ~1.0 at 5% spurious (T-L4)"}}
+    from tools.toys.w2 import marks as MK
+    slice_cs = cs[lo:hi]
+    slice_stream = SM.slice_stream(stream, lo, hi)
+    rec = {"seed": seed, "slice": [lo, hi], "train_end": train_end, "n_train": n_tr, "n_test": n_te,
+           "test_n": {l: {"pos": int(labels[l].sum()), "neg": int(n_te - labels[l].sum())} for l in LABELS},
+           "stream": {"n_utterances": len(stream.utterances), "n_referent_readbacks": stream.n_referent_readbacks,
+                      "mirror_counts": {w: sum(w in u["mirror"] for u in bench_parts) for w in WORDS}},
+           "gates": gates,
+           "marks_truth": {"m_true": MK.m_true(slice_cs, slice_stream), "m_attrib": MK.m_attrib(slice_cs, slice_stream),
+                           "m_joint": MK.m_joint(slice_cs, slice_stream, seed),
+                           "m_contingent_i": MK.m_contingent_i(slice_cs, slice_stream),
+                           "m_selfvoice_answers": MK.m_selfvoice([], slice_cs, slice_stream)},
+           "cont": {"auc": cont_aucs, "naming": naming},
+           "nostate": {"auc": {w: (G.auc(sc_n[:, list(Ln.index).index(w)], labels[LABELS[WORDS.index(w)]]) if w in Ln.index else None) for w in WORDS},
+                        "naming": naming.get("nostate")},
+           "oracle": {w: {k: v for k, v in o.items() if k != "scores"} for w, o in oracle.items()},
+           "dealt_diag": dealt_diag, "naming_dealt": naming_dealt, "blind": blind, "const": const, "m1": m1,
+           "proto_home": proto, "readings": readings,
            "gradability": _gradability(labels, stream, n_tr, n_te, Lc, oracle,
                                        {w: sum(w in u["mirror"] for u in stream.utterances[:n_tr]) for w in WORDS})}
     if out is not None:
