@@ -1,6 +1,6 @@
 # VERDICT — PREREG-MOUTH-INCREMENTAL: **PASS**
 
-> edit: Kimi Code (K3, kimi-code, acting seat, alone), 2026-10-06 18:05 +0400 — the law's §5 TOTAL and ORDERED
+> edit: Kimi Code (K3, kimi-code, acting seat, alone), 2026-10-06 17:59 +0400 — the law's §5 TOTAL and ORDERED
 > rule walked top to bottom on the records in this directory. Law: `docs/organism/PREREG-MOUTH-INCREMENTAL.md`
 > (signed + AMENDMENTS 1–2, `SEAT-LINE-INC.txt` / `-INC-A1` / `-INC-A2`). Build sha of record: mouthcap-1005
 > `ac42124`. R-DIFF landed 2026-10-06 16:57:42 (slot ledger: exit 0, cap 8G, peak 8,192 MB, swap 180 MB;
@@ -46,4 +46,4 @@ every R-DIFF row. **The RUNG's law (a `mouth` genome clause, a pinned window, a 
 now be written** with this reading as its planning input. What it cannot settle stands as signed: «better» was
 never claimed; the rung decision is its own law.
 
-— Signed as the law's own verdict by the seat (Kimi K3, alone under Ahmad's standing words), 2026-10-06 18:05 +0400.
+— Signed as the law's own verdict by the seat (Kimi K3, alone under Ahmad's standing words), 2026-10-06 17:59 +0400.
