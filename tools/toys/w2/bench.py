@@ -1,5 +1,9 @@
 """tools/toys/w2/bench.py — PREREG-W2 §3-§5: the bench runner (the arms re-read and the marks' raw figures).
 
+edit: Kimi Code (K3, kimi-code, acting seat, alone), 2026-10-06 18:15 +0400 — AMENDMENT 1 A1.1 (SIGNED x3): the
+default split is the LAW's own (TRAIN [250, 16,250) = 16,000 / TEST [16,250, 20,250) = 4,000); the pilot's 18,000/2,000
+(the old default 18,250) is named a deviation in A1.1 and the graded seeds run the law's split.
+
 edit: Kimi K3 (kimi-code, builder lane kimi-w2), 2026-10-05 03:1x +0400 — new file; law
 docs/organism/whole/PREREG-W2-MENTOR-WORLD.md §3 (the bench), §4 (the gates), §5 (the marks). The law's §11 pilot shape:
 one CONT-shaped arms pass over the slice (the pilot's measured-first job); the graded shape: 5 arms + k_null dealt + the
@@ -70,7 +74,7 @@ def _labels(stream_states, lo_pos, hi_pos):
     return {l: np.array([int(s[i]) for s in stream_states[lo_pos:hi_pos]], dtype=int) for i, l in enumerate(LABELS)}
 
 
-def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: int = 18250, k_null: int = 100,
+def arms_bench(bl2: Path, seed: int, lo: int = 250, hi: int = 20250, train_end: int = 16250, k_null: int = 100,
                out: Optional[Path] = None) -> Dict[str, object]:
     """One bench seed's arms re-read over the slice [lo, hi): TRAIN [lo, train_end), TEST [train_end, hi)."""
     cs, census, by_moment = generation(bl2, seed, hi=hi)
