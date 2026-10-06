@@ -1,6 +1,6 @@
 # LAB-LIFE-PLAN — a second, experimental life beside brain-long-4 (Ahmad's 2026-10-06 word: «Ok go ahead»)
 
-> edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-06 14:50 +0400 — the plan Ahmad asked for («make a replica
+> edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-06 17:56 +0400 (the stamp corrected; an earlier draft carried a stale 14:5x — the write happened at 17:5x after a long tool call) — the plan Ahmad asked for («make a replica
 > of the current organism as a branch … experiment in parallel … merge the codes later»), priced from the ledger and
 > the live STATUS, never from guesses. This is a PLAN, not a law: the law (PREREG-LAB-LIFE-1) is written after
 > R-LOOK's verdict, signed ×3, before any launch. NO life is launched by this document.
