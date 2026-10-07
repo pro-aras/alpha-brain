@@ -1,0 +1,34 @@
+{
+  "built": "tools/worlds/video_door.py",
+  "captions": {
+    "bytes": 2110,
+    "name": "the-shape-song-2.en.srt",
+    "sha256": "57e67bd42c82af8b6674084a8f85c4f38190918d10641d8fbb1b6b331268449d"
+  },
+  "date": "2026-10-07",
+  "law": "PREREG-OPEN-WORLD-1 \u00a72",
+  "params": {
+    "canvas": 128,
+    "max_word_letters": 8,
+    "sample_hz": 1.0,
+    "scene_threshold": 0.4,
+    "track_kind": "authored"
+  },
+  "stats": {
+    "caption_cues": 33,
+    "caption_tokens": 194,
+    "dropped_late": 0,
+    "dropped_nonword": 0,
+    "ear_rows": 194,
+    "eye_rows": 251,
+    "frames": 251,
+    "rows": 445,
+    "scene_cuts": [],
+    "tokens_kept": 194
+  },
+  "video": {
+    "bytes": 7831971,
+    "name": "the-shape-song-2.mp4",
+    "sha256": "c5b1cfe9fd7c1bccc6812d7f3148aeb43d5469827110687d8b1afee252788700"
+  }
+}
