@@ -1,0 +1,657 @@
+EEE...........................EEEEEEEEEEEEE....................................................../usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/C059-BdIta.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusRoman-Bold.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusSansNarrow-Regular.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Bold.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Roman.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/StandardSymbolsPS.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWBookman-Demi.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWBookman-DemiItalic.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWGothic-DemiOblique.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/lyx/cmsy10.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/lyx/msbm10.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Italic.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusMonoPS-BoldItalic.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusSansNarrow-BoldOblique.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifDisplay-Italic.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoTraditionalNushu-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoKufiArabic-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansKannada-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansMalayalam-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansTelugu-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansTelugu-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifDevanagari-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifDevanagari-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifKannada-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifKhojki-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifMalayalam-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifTamilSlanted-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifTelugu-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Italic.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWGothic-Demi.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/C059-BdIta.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusRoman-Bold.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusSansNarrow-Regular.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Bold.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Roman.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/StandardSymbolsPS.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWBookman-Demi.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWBookman-DemiItalic.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWGothic-DemiOblique.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/lyx/cmsy10.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/lyx/msbm10.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Italic.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusMonoPS-BoldItalic.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusSansNarrow-BoldOblique.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+../usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.BufferedReader name='/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf'>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+......................[record] /data/dev/genome-wt-mouthcap/scratch/tmp/tmp82u0e4lm/20261001/D: 4 closed snapshots · 4 SLEEP rows in cost.jsonl
+  sleep  1 seq   100: mtime−mtime₁     0.000 s · wall_s−wall_s₁     0.000 s · diff +0.000 s · arm_ms/1000     0.018 s · wall_s     0.020 s
+  sleep  2 seq   200: mtime−mtime₁     0.010 s · wall_s−wall_s₁     0.010 s · diff +0.000 s · arm_ms/1000     0.027 s · wall_s     0.030 s
+  sleep  3 seq   300: mtime−mtime₁     1.480 s · wall_s−wall_s₁     1.480 s · diff -0.000 s · arm_ms/1000     1.350 s · wall_s     1.500 s
+  sleep  4 seq   400: mtime−mtime₁     3.080 s · wall_s−wall_s₁     3.080 s · diff -0.000 s · arm_ms/1000     2.790 s · wall_s     3.100 s
+[record] worst |mtime clock − cost clock| = 0.000 s (tolerance 0.25 s) → PASS
+[record] /data/dev/genome-wt-mouthcap/scratch/tmp/tmp82u0e4lm/20261001/D: 4 closed snapshots · 4 SLEEP rows in cost.jsonl
+  sleep  1 seq   100: mtime−mtime₁     0.000 s · wall_s−wall_s₁     0.000 s · diff +0.000 s · arm_ms/1000     0.018 s · wall_s     0.020 s
+  sleep  2 seq   200: mtime−mtime₁     0.010 s · wall_s−wall_s₁     0.010 s · diff +0.000 s · arm_ms/1000     0.027 s · wall_s     0.030 s
+  sleep  3 seq   300: mtime−mtime₁     2.480 s · wall_s−wall_s₁     1.480 s · diff +1.000 s · arm_ms/1000     1.350 s · wall_s     1.500 s
+  sleep  4 seq   400: mtime−mtime₁     3.080 s · wall_s−wall_s₁     3.080 s · diff -0.000 s · arm_ms/1000     2.790 s · wall_s     3.100 s
+[record] worst |mtime clock − cost clock| = 1.000 s (tolerance 0.25 s) → FAIL
+.................................../usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/C059-BdIta.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusRoman-Bold.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusSansNarrow-Regular.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Bold.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Roman.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/StandardSymbolsPS.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWBookman-Demi.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWBookman-DemiItalic.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWGothic-DemiOblique.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/lyx/cmsy10.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/lyx/msbm10.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Italic.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusMonoPS-BoldItalic.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusSansNarrow-BoldOblique.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.../usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifDisplay-Italic.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoTraditionalNushu-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Roman.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWBookman-DemiItalic.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusSansNarrow-Regular.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoKufiArabic-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansKannada-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansMalayalam-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansTelugu-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansTelugu-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifDevanagari-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifDevanagari-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifKannada-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifKhojki-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifMalayalam-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifTamilSlanted-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifTelugu-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Italic.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWGothic-Demi.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/C059-BdIta.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusRoman-Bold.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Bold.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/StandardSymbolsPS.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWBookman-Demi.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWGothic-DemiOblique.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/lyx/cmsy10.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/lyx/msbm10.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Italic.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusMonoPS-BoldItalic.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/NimbusSansNarrow-BoldOblique.otf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf' mode='rb' closefd=True>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.14/csv.py:185: ResourceWarning: unclosed file <_io.BufferedReader name='/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf'>
+  d = dict(zip(self.fieldnames, row))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+............./usr/lib/python3.14/unittest/suite.py:166: ResourceWarning: unclosed file <_io.TextIOWrapper name='/data/alpha3-library/K/glyphs/latin-upper/fonts.tsv' mode='r' encoding='utf-8'>
+  setUpClass()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...............................................................................................................................................s/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifDisplay-Italic.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoTraditionalNushu-Regular.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoKufiArabic-Regular.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansKannada-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansMalayalam-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansTelugu-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSansTelugu-Regular.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifDevanagari-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifDevanagari-Regular.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifKannada-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifKhojki-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifMalayalam-Regular.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifTamilSlanted-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/truetype/noto/NotoSerifTelugu-Bold.ttf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/P052-Italic.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3/dist-packages/fontTools/ttLib/sfnt.py:96: ResourceWarning: unclosed file <_io.FileIO name='/usr/share/fonts/opentype/urw-base35/URWGothic-Demi.otf' mode='rb' closefd=True>
+  self.tables = OrderedDict(sorted(tables.items(), key=lambda i: i[1].offset))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./data/dev/genome-wt-mouthcap/brain/world/schedule.py:253: ResourceWarning: unclosed file <_io.BufferedReader name='/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf'>
+  def _ask(self, phase: str, family: str, item: str, cues: Sequence[str], operands: List[Dict[str, Any]],
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+............s...............................................................................................................
+M-TIME: 1.56s wall for 4096 read-backs at the full budget; loadavg 5.66 5.23 4.72 6/960 85795
+............................................................................................................................................................................................[grade-tmem2 20261101] written
+....................................................................................................
+======================================================================
+ERROR: tests.brain.arms_clauses.test_a3_names (unittest.loader._FailedTest.tests.brain.arms_clauses.test_a3_names)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_clauses.test_a3_names
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_clauses/test_a3_names.py", line 13, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_clauses.test_arm_a3_conformance (unittest.loader._FailedTest.tests.brain.arms_clauses.test_arm_a3_conformance)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_clauses.test_arm_a3_conformance
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_clauses/test_arm_a3_conformance.py", line 15, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_clauses.test_xor_toy (unittest.loader._FailedTest.tests.brain.arms_clauses.test_xor_toy)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_clauses.test_xor_toy
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_clauses/test_xor_toy.py", line 20, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_logic.test_a2_band (unittest.loader._FailedTest.tests.brain.arms_logic.test_a2_band)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_logic.test_a2_band
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_logic/test_a2_band.py", line 15, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_logic.test_arm_a2_conformance (unittest.loader._FailedTest.tests.brain.arms_logic.test_arm_a2_conformance)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_logic.test_arm_a2_conformance
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_logic/test_arm_a2_conformance.py", line 15, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_logic.test_binariser (unittest.loader._FailedTest.tests.brain.arms_logic.test_binariser)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_logic.test_binariser
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_logic/test_binariser.py", line 11, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_logic.test_xor_toy (unittest.loader._FailedTest.tests.brain.arms_logic.test_xor_toy)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_logic.test_xor_toy
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_logic/test_xor_toy.py", line 21, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_soft.test_arm_a1_conformance (unittest.loader._FailedTest.tests.brain.arms_soft.test_arm_a1_conformance)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_soft.test_arm_a1_conformance
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_soft/test_arm_a1_conformance.py", line 19, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_soft.test_arm_a1_names (unittest.loader._FailedTest.tests.brain.arms_soft.test_arm_a1_names)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_soft.test_arm_a1_names
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_soft/test_arm_a1_names.py", line 14, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_soft.test_arm_a1_teach (unittest.loader._FailedTest.tests.brain.arms_soft.test_arm_a1_teach)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_soft.test_arm_a1_teach
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_soft/test_arm_a1_teach.py", line 19, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_soft.test_arm_a1_variants (unittest.loader._FailedTest.tests.brain.arms_soft.test_arm_a1_variants)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_soft.test_arm_a1_variants
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_soft/test_arm_a1_variants.py", line 15, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_soft.test_attention_and_interface (unittest.loader._FailedTest.tests.brain.arms_soft.test_attention_and_interface)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_soft.test_attention_and_interface
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_soft/test_attention_and_interface.py", line 14, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_soft.test_growth_invariant (unittest.loader._FailedTest.tests.brain.arms_soft.test_growth_invariant)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_soft.test_growth_invariant
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_soft/test_growth_invariant.py", line 15, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_soft.test_twin_params (unittest.loader._FailedTest.tests.brain.arms_soft.test_twin_params)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_soft.test_twin_params
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_soft/test_twin_params.py", line 17, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_soft.test_xor_toy (unittest.loader._FailedTest.tests.brain.arms_soft.test_xor_toy)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_soft.test_xor_toy
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_soft/test_xor_toy.py", line 23, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+======================================================================
+ERROR: tests.brain.arms_transformer.test_a4 (unittest.loader._FailedTest.tests.brain.arms_transformer.test_a4)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: tests.brain.arms_transformer.test_a4
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 426, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.14/unittest/loader.py", line 367, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/data/dev/genome-wt-mouthcap/tests/brain/arms_transformer/test_a4.py", line 17, in <module>
+    import torch  # noqa: E402
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch'
+
+
+----------------------------------------------------------------------
+Ran 729 tests in 231.448s
+
+FAILED (errors=16, skipped=2)

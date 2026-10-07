@@ -1184,7 +1184,38 @@ class OracleRoad:
         return int(np.argmax(counts)) if counts and max(counts) > 0 else None
 
 
-def produce_believed(road, X: np.ndarray, target: int, rng_factory) -> Dict[str, object]:
+# edit: Kimi K3 (kimi-code, acting seat, alone), 2026-10-05 13:21 +0400 — PREREG-MOUTH-CAP §2 (signed, this branch's first commit):
+# the mouth's declared candidate budget — read-backs per produce_believed call (AMENDMENT 1: the expensive unit, the
+# pilot's measured 4.7 ms each — 4,096 ≈ 19.3 s worst; ≈ 585 × the closed record's measured maximum of 7, the law's item 2).
+# A constant, never a genome line (#221's form: a knob would re-hash every life).
+MOUTH_BUDGET = 4096
+
+# PREREG-MOUTH-CAP AMENDMENT 2 (same edit): at len(say) ≤ MOUTH_FULL_BELOW the OLD enumeration runs verbatim (2¹²−1 =
+# 4,095 ≤ MOUTH_BUDGET — the full enumeration can never exceed the budget, and the record's say ≤ 3 sits deep inside);
+# the capped path exists only where no closed record can reach.
+MOUTH_FULL_BELOW = 12
+
+
+def _combos(seq: list, k: int):
+    """Index combinations in lexicographic order — itertools.combinations' own form with no import (the learner
+    modules' import fence, tests/brain/scene/test_truth_fence.py)."""
+    n = len(seq)
+    if k < 0 or k > n:
+        return
+    idx = list(range(k))
+    while True:
+        yield tuple(seq[i] for i in idx)
+        for i in range(k - 1, -1, -1):
+            if idx[i] != i + n - k:
+                break
+        else:
+            return
+        idx[i] += 1
+        for j in range(i + 1, k):
+            idx[j] = idx[j - 1] + 1
+
+
+def produce_believed(road, X: np.ndarray, target: int, rng_factory, budget: int = MOUTH_BUDGET) -> Dict[str, object]:
     """THE MOUTH SAYS WHAT IT BELIEVES (PREREG-S1B1R §1 e as Fable's edit reads it) — the SAME code for every arm, over
     its ROAD (`types()`, `believed(X)`, `sayable(x, w)`, `answer_point(X, phrase, rng)` with the road's «none», `ear`,
     `one_alone()`):
@@ -1200,7 +1231,24 @@ def produce_believed(road, X: np.ndarray, target: int, rng_factory) -> Dict[str,
          the ear's order;
       5. none accepted → «I cannot say it yet», one reason (declared priority): «no sayable word»; «no believed-unique
          phrase»; «none» when a believed-unique candidate read back to the target with «none» firing; else «the read-back».
-    The read-back's point and the target are RECORDED, so the grader re-checks the wiring (READ-BACK 1.000)."""
+    The read-back's point and the target are RECORDED, so the grader re-checks the wiring (READ-BACK 1.000).
+
+    PREREG-MOUTH-CAP §2 + AMENDMENTS 1–2 (edit: Kimi K3 (kimi-code, acting seat, alone), 2026-10-05): TWO branches at
+    `MOUTH_FULL_BELOW`. At len(say) ≤ 12 the OLD enumeration runs VERBATIM (2¹²−1 = 4,095 ≤ `MOUTH_BUDGET` — the full
+    enumeration can never exceed the budget; the closed record's say ≤ 3 sits deep inside: every returned key and counter
+    is byte-identical to the old code's, on the ASK road's journaled raw too). At len(say) > 12 — where no closed record
+    can reach — the enumeration is LENGTH-ORDERED under the declared budget: candidates per length class k = 1 … len(say)
+    (`_combos` — never a materialized 2^N list); the uniqueness filter runs for EVERY candidate (exact `n_unique` wherever
+    the budget does not bind — the old code paid the same 2^N pass with a list on top); the read-backs of a class run
+    whole and the enumeration stops after the FIRST class holding ≥ 1 accepted — the same winner as the full enumeration
+    BY the rank's own first key (length), with the within-class evaluation complete for the margin tie-break. `budget`
+    counts READ-BACKS (the expensive unit, the pilot's measured 4.7 ms); spent mid-class it DISCARDS the partial class
+    whole (AMENDMENT 3: its evaluated accepted could be beaten by the unevaluated part's margin) and the result is the
+    DECLARED OVERFLOW FORM: `spoken None`, `reason "the mouth's budget"` — the mouth says NOTHING, never a different
+    phrase. The parameter exists so tests
+    exercise the budget path small; every organism call site uses the default (G-CALLERS). On the capped path
+    `n_candidates` stays exact (2^len(say) − 1, arithmetic) and `n_accepted` on the early-stopped path reports the first
+    accepted class (the prefix), under `"exhaustive": false`."""
     X = np.atleast_2d(X)
     t = int(target)
     n_hyp = X.shape[0]
@@ -1212,36 +1260,147 @@ def produce_believed(road, X: np.ndarray, target: int, rng_factory) -> Dict[str,
     base["sayable"] = [w for _k, w in say]
     if not say:
         return {"spoken": None, "reason": "no sayable word", **base}
-    cands = [[say[i] for i in range(len(say)) if mask >> i & 1] for mask in range(1, 1 << len(say))]
-    uniq = [c for c in cands if not any(all(B[k][h] == w for k, w in c) for h in range(n_hyp) if h != t)]
-    base["n_candidates"], base["n_unique"] = len(cands), len(uniq)
-    if not uniq:
-        return {"spoken": None, "reason": "no believed-unique phrase", **base}
     one = road.one_alone()
     ear = road.ear
-    accepted = []
+    if len(say) <= MOUTH_FULL_BELOW:
+        # PREREG-MOUTH-CAP AMENDMENT 2: the OLD enumeration VERBATIM — every class, every read-back, the old dict's own
+        # keys; 2¹²−1 ≤ MOUTH_BUDGET, so the budget can never bind here, and the closed record (say ≤ 3) sits deep inside.
+        cands = [[say[i] for i in range(len(say)) if mask >> i & 1] for mask in range(1, 1 << len(say))]
+        uniq = [c for c in cands if not any(all(B[k][h] == w for k, w in c) for h in range(n_hyp) if h != t)]
+        base["n_candidates"], base["n_unique"] = len(cands), len(uniq)
+        if not uniq:
+            return {"spoken": None, "reason": "no believed-unique phrase", **base}
+        accepted = []
+        fired = 0
+        for c in uniq:
+            phrase = ear.order([w for _k, w in c])
+            a = road.answer_point(X, phrase, rng_factory())
+            if a.get("point") is None or int(a["point"]) != t:
+                continue
+            if a.get("none"):
+                fired += 1
+                continue
+            sc = np.asarray(a["scores"], dtype=np.float64)
+            others = np.delete(sc, t)
+            margin = float(sc[t] - np.max(others)) if others.size else float("inf")
+            alone = 0 if (one is not None and any(k == one for k, _w in c)) else 1
+            rank = (len(phrase), -margin, alone, tuple(ear.key(w) for w in phrase),
+                    tuple(ear.first.get(w, 10 ** 6) for w in phrase))
+            accepted.append((rank, phrase, int(a["point"]), margin))
+        base["n_accepted"] = len(accepted)
+        if not accepted:
+            return {"spoken": None, "reason": "none" if fired else "the read-back", **base}
+        accepted.sort(key=lambda z: z[0])
+        _rank, phrase, point, margin = accepted[0]
+        return {"spoken": list(phrase), "reason": None, "readback_point": point, "margin": margin, **base}
+    # len(say) > MOUTH_FULL_BELOW — the capped path (AMENDMENT 1): no closed record can reach here.
+    base["n_candidates"] = (1 << len(say)) - 1
     fired = 0
-    for c in uniq:
-        phrase = ear.order([w for _k, w in c])
+    readbacks = 0
+    n_unique = 0
+    n_accepted = 0
+    exhaustive = True
+    winner = None
+    for _k in range(1, len(say) + 1):
+        accepted = []
+        completed = True
+        for c in _combos(say, _k):
+            if any(all(B[tk][h] == w for tk, w in c) for h in range(n_hyp) if h != t):
+                continue
+            n_unique += 1
+            if winner is not None:
+                continue
+            if readbacks >= budget:
+                exhaustive = False
+                completed = False
+                break
+            readbacks += 1
+            phrase = ear.order([w for _tk, w in c])
+            a = road.answer_point(X, phrase, rng_factory())
+            if a.get("point") is None or int(a["point"]) != t:
+                continue
+            if a.get("none"):
+                fired += 1
+                continue
+            sc = np.asarray(a["scores"], dtype=np.float64)
+            others = np.delete(sc, t)
+            margin = float(sc[t] - np.max(others)) if others.size else float("inf")
+            alone = 0 if (one is not None and any(tk == one for tk, _w in c)) else 1
+            rank = (len(phrase), -margin, alone, tuple(ear.key(w) for w in phrase),
+                    tuple(ear.first.get(w, 10 ** 6) for w in phrase))
+            accepted.append((rank, phrase, int(a["point"]), margin))
+        if not completed:
+            break        # AMENDMENT 3: a budget break discards the partial class WHOLE — the overflow form, never a partial-class winner
+        n_accepted += len(accepted)
+        if accepted:
+            accepted.sort(key=lambda z: z[0])
+            winner = accepted[0]
+    base["n_unique"], base["n_accepted"] = n_unique, n_accepted
+    base["exhaustive"] = exhaustive
+    base["n_readbacks"] = readbacks
+    if winner is not None:
+        _rank, phrase, point, margin = winner
+        return {"spoken": list(phrase), "reason": None, "readback_point": point, "margin": margin, **base}
+    if not exhaustive:
+        return {"spoken": None, "reason": "the mouth's budget", "n_say": len(say), "budget": int(budget), **base}
+    if n_unique == 0:
+        return {"spoken": None, "reason": "no believed-unique phrase", **base}
+    return {"spoken": None, "reason": "none" if fired else "the read-back", **base}
+
+
+# edit: Kimi K3 (kimi-code, acting seat, alone), 2026-10-05 17:4x +0400 — PREREG-MOUTH-INCREMENTAL §2 (signed): THE MOUTH
+# THE HUMAN WAY — additive; produce_believed above is byte-untouched. The mechanism (RESEARCH-HUMAN-MOUTH-MECHANISM.md):
+# walk the sayable words in the road's preference order ONCE; skip a word that rules out nothing (Relevance, free);
+# add a word, ask the hearer model (the read-back) after EACH addition; stop at the first sufficiency; never unsay
+# (indelibility); the list exhausted → the honest bail-out. ≤ len(say) read-backs ALWAYS — the 2^N enumeration is
+# nowhere. `budget` is the cap law's belt under the mechanism's braces (its breach needs say > MOUTH_BUDGET — named
+# unreachable on any measured stream, kept for the form).
+def produce_incremental(road, X: np.ndarray, target: int, rng_factory, budget: int = MOUTH_BUDGET) -> Dict[str, object]:
+    """THE INCREMENTAL MOUTH (PREREG-MOUTH-INCREMENTAL §2): the human production mechanism at machine level —
+      1. the SAME sayable believed names as produce_believed (the same road, the same believed map, the same sayable
+         rule — the preference order is the road's type order);
+      2. RELEVANCE: a word every OTHER hypothesis believes the same name for (in its type) rules out nothing —
+         SKIPPED, no read-back spent, counted in `skipped`;
+      3. INCREMENT: add the word; ONE read-back of the phrase so far; ACCEPTED (speak) iff it points at the target
+         first and «none» does not fire — the hearer model's own sufficiency test;
+      4. INDELIBLE: a word once added is never removed, whatever a later word could do alone;
+      5. the list exhausted without sufficiency → `spoken None`, `reason "the read-back"`; the budget breached →
+         `reason "the mouth's budget"` (the cap law's declared string, verbatim).
+    The row: the old keys (`target`, `believed`, `sayable`, `spoken`, `reason`, `readback_point`, `margin`) plus the
+    mechanism's own (`n_say`, `n_readbacks` — ALWAYS ≤ len(say), `skipped`, `added`). The margin is computed at the
+    stopping read-back, as everywhere (a reading)."""
+    X = np.atleast_2d(X)
+    t = int(target)
+    n_hyp = X.shape[0]
+    types = [tuple(T) for T in road.types()]
+    B = road.believed(X)
+    base: Dict[str, object] = {"target": t, "believed": {str(k): B[k][t] for k in range(len(types)) if B[k][t] is not None},
+                               "sayable": []}
+    say = [(k, B[k][t]) for k in range(len(types)) if B[k][t] is not None and road.sayable(X[t], B[k][t])]
+    base["sayable"] = [w for _k, w in say]
+    base.update({"n_say": len(say), "n_readbacks": 0, "skipped": [], "added": []})
+    if not say:
+        return {"spoken": None, "reason": "no sayable word", **base}
+    ear = road.ear
+    phrase: List[str] = []
+    for k, w in say:
+        if n_hyp > 1 and all(B[k][h] == w for h in range(n_hyp) if h != t):
+            base["skipped"].append(w)          # Relevance: rules out nothing (EVERY other hypothesis believes it) — never said, never read back
+            # (AMENDMENT 1: only WITH distractors — an empty contrast set needs no discriminatory power; the human says the type name)
+            continue
+        phrase = ear.order(phrase + [w])       # indelible: once added, never removed
+        base["added"].append(w)
+        if base["n_readbacks"] >= budget:
+            return {"spoken": None, "reason": "the mouth's budget", "budget": int(budget), **base}
+        base["n_readbacks"] += 1
         a = road.answer_point(X, phrase, rng_factory())
-        if a.get("point") is None or int(a["point"]) != t:
-            continue
-        if a.get("none"):
-            fired += 1
-            continue
+        if a.get("point") is None or int(a["point"]) != t or a.get("none"):
+            continue                           # not sufficient yet — keep walking (the human keeps talking)
         sc = np.asarray(a["scores"], dtype=np.float64)
         others = np.delete(sc, t)
         margin = float(sc[t] - np.max(others)) if others.size else float("inf")
-        alone = 0 if (one is not None and any(k == one for k, _w in c)) else 1
-        rank = (len(phrase), -margin, alone, tuple(ear.key(w) for w in phrase),
-                tuple(ear.first.get(w, 10 ** 6) for w in phrase))
-        accepted.append((rank, phrase, int(a["point"]), margin))
-    base["n_accepted"] = len(accepted)
-    if not accepted:
-        return {"spoken": None, "reason": "none" if fired else "the read-back", **base}
-    accepted.sort(key=lambda z: z[0])
-    _rank, phrase, point, margin = accepted[0]
-    return {"spoken": list(phrase), "reason": None, "readback_point": point, "margin": margin, **base}
+        return {"spoken": list(phrase), "reason": None, "readback_point": int(a["point"]), "margin": margin, **base}
+    return {"spoken": None, "reason": "the read-back", **base}
 
 
 # ================================================================================================ the feeds

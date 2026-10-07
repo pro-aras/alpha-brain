@@ -1,0 +1,16 @@
+R-DIFF over brain-long-2's tape: calls 52758 · the old mouth spoke 47649 (presence: said canvases n of n) · equal 41267 · differ 6382 (0.1339 of said)
+length (old,new) of the differing rows: {(1, 0): 19, (1, 1): 5928, (1, 2): 282, (1, 3): 11, (2, 0): 16, (2, 1): 103, (2, 2): 17, (2, 3): 6}
+incremental n_readbacks max 3 · over the budget? 0
+examples:
+  old ['big'] | new ['circle'] | reasons None None
+  old ['green'] | new ['square'] | reasons None None
+  old ['big'] | new ['square'] | reasons None None
+  old ['small'] | new ['circle'] | reasons None None
+  old ['big'] | new ['star'] | reasons None None
+  old ['white'] | new ['circle'] | reasons None None
+  old ['small', 'yellow'] | new ['yellow', 'square'] | reasons None None
+  old ['big'] | new ['triangle'] | reasons None None
+  old ['big'] | new ['yellow'] | reasons None None
+  old ['big'] | new ['circle'] | reasons None None
+  old ['big'] | new ['red'] | reasons None None
+  old ['small'] | new ['blue'] | reasons None None

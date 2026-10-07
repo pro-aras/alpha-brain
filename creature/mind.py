@@ -948,6 +948,13 @@ class Mind:
                               "(PREREG-W1-MOUTH-VOICES-BRAIN §2) — the organism does not start")
         if self._voice is not None:
             self.brain_turns["voiced"] = 0
+        # edit: Kimi K3 (kimi-code, acting seat, alone), 2026-10-05 23:4x +0400 — PREREG-EYE-1 §2 (THE CHOSEN LOOK, signed):
+        # the loop's return arrow. None = OFF (every organism caller, byte-identical); the bench instrument
+        # (tools/brain/look_diff.py) sets it after construction. When set: after the DRIVE turn, a leading hypothesis
+        # holding NO word (the turn's own doubt) gets ONE forced glance at its locus, the brain's eye row is re-fed,
+        # the turn is re-read on it, and the learn runs on the re-read state. Never a genome line of this law's own
+        # (the rung's law carries it); the cells' road is untouched.
+        self._look: Optional[Dict[str, object]] = None
         # PREREG-HEARS-2 §1: per hand other than the scene world, the count of canvases the brain learned from it (its derived scene
         # index); rebuilt from the brain's own `worlds` at a resume (_restore_brain_world_count), counted as it goes in a replay.
         self._brain_world_count: Dict[str, int] = {}
@@ -1640,7 +1647,44 @@ class Mind:
         else:
             self.pending_asks.setdefault(str(meta.get("moment")), []).append(ask)
 
-    def _brain_canvas(self, row: Dict[str, object], moment: Optional[str], g: Dict[str, object], words: List[str]) -> None:
+    def _chosen_look(self, row: Dict[str, object], g: Dict[str, object], turn: Dict[str, object],
+                     scene_ix: int, ws: int, rgb) -> Tuple[Dict[str, object], Dict[str, object], Optional[Dict[str, object]]]:
+        """PREREG-EYE-1 §2 (edit: Kimi K3 (kimi-code, acting seat, alone), 2026-10-05 23:23 +0400 — THE CHOSEN LOOK, the loop's
+        return arrow): the leading hypothesis holds NO word (the turn's own doubt) → ONE forced glance at its locus, the
+        brain's eye row re-fed (the forced feat INSERTED among the located feats, before the coarse one — feats stay
+        index-aligned with fix), the turn re-read on it, and (in `_brain_canvas`) the learn runs on the re-read state.
+        At most one look a canvas; the cells' road is untouched; a pure function of the tape and the turn's own output
+        (no clock, no set order). Returns (g2, turn2, look_rec | (g, turn, None) when no look fires)."""
+        if rgb is None or not turn.get("order"):
+            return g, turn, None
+        lead_ix = turn["order"][0]
+        if not turn.get("held") or lead_ix >= len(turn["held"]) or turn["held"][lead_ix]:
+            return g, turn, None        # no doubt, or the pre-calibration turn (its order is computed before the check)
+        from genome.brain import things_in_view
+        from brain.scene import eye as _eye
+        hyps, _X = things_in_view(g)
+        lead = hyps[lead_ix]
+        grid = int((self.genome.gaze or {}).get("grid", 16))
+        cy, cx = _eye.cell_centre_px((lead.pos[0], lead.pos[1]), int(rgb.shape[0]), grid)
+        forced = _eye.forced_glance(rgb, (cy, cx), self.genome.retina, self.genome.gaze, self.genome.colour)
+        n_loc = len(g.get("fix") or [])
+        cell = [int(round(lead.pos[0])), int(round(lead.pos[1]))]
+        g2 = dict(g)
+        g2["feats"] = list(g["feats"][:n_loc]) + [forced] + list(g["feats"][n_loc:])
+        g2["fix"] = [list(f) for f in (g.get("fix") or [])] + [cell]
+        g2["windows"] = list(g.get("windows") or []) + [None]
+        if g.get("residual") is not None:
+            g2["residual"] = list(g["residual"][:n_loc]) + [None] + list(g["residual"][n_loc:])
+        turn2 = self.brain.turn(g2, scene=scene_ix, world_seed=ws,
+                                says=int(self._drive["says"]), asks=int(self._drive["asks"]))
+        hyps2, _X2 = things_in_view(g2)
+        j = next((i for i, h in enumerate(hyps2) if n_loc in h.members), None)
+        rec = {"looked": True, "at": cell, "hyp": int(lead_ix),
+               "held_before": [], "held_after": list(turn2["held"][j]) if j is not None else []}
+        return g2, turn2, rec
+
+    def _brain_canvas(self, row: Dict[str, object], moment: Optional[str], g: Dict[str, object], words: List[str],
+                      rgb=None) -> None:
         """INTERFACE §4, the eye hook: held asks → answered here, and the brain does NOT learn from this canvas («an ask never
         teaches»); else a present brain that hears the eye row's source learns the instant's words (the TAPE's words, in order)."""
         meta = row.get("meta") or {}
@@ -1680,12 +1724,15 @@ class Mind:
         if self._drive is not None:
             turn = self.brain.turn(g, scene=scene_ix, world_seed=ws,
                                    says=int(self._drive["says"]), asks=int(self._drive["asks"]))
+            look_rec = None
+            if self._look is not None:
+                g, turn, look_rec = self._chosen_look(row, g, turn, scene_ix, ws, rgb)
             self.brain_turns["turns"] += 1
             self.brain_turns["said"] += turn["say"] is not None
             self.brain_turns["asked"] += turn["ask"] is not None
             surprise = self.brain.surprise(turn, list(words))
             self._write_journal(row["at"], {"kind": "brain", "act": "turn", **base, **extra, **_jsonable(turn), "heard": list(words),
-                                            "surprise": surprise})
+                                            "surprise": surprise, **({"look": look_rec} if look_rec else {})})
             # edit: Kimi K3 (kimi-code, builder lane kimi-w1), 2026-10-04 18:35 +0400 — PREREG-W1-MOUTH-VOICES-BRAIN §2 (the mind):
             # THE MOUTH VOICES THE BRAIN — just after the turn's journal row and BEFORE the learn row, when the MOUTH clause is
             # declared and the turn's say is not None: ONE journal row (kind brain, act voice; the turn's say, every field,
@@ -2382,7 +2429,7 @@ class Mind:
         # this canvas), and above org_feats/_row_digest, so nothing here can move org.t between the canvas row and its coarse row.
         # Neither branch runs without a brain or a held ask: every genome and tape without them is byte-identical.
         if self.brain is not None or self.pending_asks:
-            self._brain_canvas(row, moment, g_eye, tape_words)
+            self._brain_canvas(row, moment, g_eye, tape_words, rgb=rgb)
         # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-2/BIND (_bind_pool, above):
         # undeclared (the common case today) this is g["feats"] itself, unchanged — every existing `for x
         # in g["feats"]:` loop below now reads `org_feats` instead, with IDENTICAL contents when BIND is

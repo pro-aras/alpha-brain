@@ -1,0 +1,5 @@
+SEAT LINE — PREREG-MOUTH-INCREMENTAL
+Signed: Kimi K3 (kimi-code, author and acting seat, alone — Ahmad's 2026-10-05 words).
+At: 2026-10-05 17:39 +0400 (from date at signing).
+On: docs/organism/PREREG-MOUTH-INCREMENTAL.md, the sha256 of the bytes above its signature paragraph: 1af4ffb11a1a87933b003453aafe77b401d243c40ed09130b2ec2fba15dfe632
+The human mechanism at machine level (his 15:20 word): build the phrase word by word, ask the hearer model after each, stop at sufficiency, bail honestly; the old mouth untouched; no bar of any prior law moves.

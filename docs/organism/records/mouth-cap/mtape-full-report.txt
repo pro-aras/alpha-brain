@@ -1,0 +1,11 @@
+plant byte-corruption CAUGHT
+plant say-field flip CAUGHT
+new scratch/bfull-out/journal.jsonl
+ref /data/dev/genome-wt-mc-parent/scratch/bfull-out/journal.jsonl
+bytes new 15978333 ref 15978333
+sha new 2d3c639702c49aba417bcaf81a63c80b0100c4ddb5d8d26cf885fba07feb052b
+sha ref 2d3c639702c49aba417bcaf81a63c80b0100c4ddb5d8d26cf885fba07feb052b
+BYTE-IDENTICAL
+budget-reason occurrences 0 (must be 0)
+control occurrences 46407 (must be > 0)
+verdict PASS (compare rc 0, plants ok)

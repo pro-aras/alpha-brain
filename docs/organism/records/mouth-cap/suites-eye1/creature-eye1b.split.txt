@@ -1,0 +1,8 @@
+SPLIT creature on 1f9d7985237c4825ead741a833689e4f9de59b62 (/data/dev/genome-wt-mouthcap) · 2026-10-06 00:04:11 +0400 · parts 3 · cap 10G swap 1G · expected Ran 1452
+files 139 under tests/creature (test*.py, recursive; 0 in subdirectories) · patterns ['test_[a-f]*.py', 'test_[g-r]*.py', 'test_[s-z]*.py'] · files per pattern [40, 54, 45] · in exactly one pattern: 139
+PARTITION EXACT
+slot exit 0 at 2026-10-06 00:33:02 +0400
+part 1 (test_[a-f]*.py): exit 0 · Ran 444 tests in 563.076s OK (skipped=5)  · memory.peak 5421109248 bytes
+part 2 (test_[g-r]*.py): exit 0 · Ran 563 tests in 593.595s OK (skipped=1)  · memory.peak 5421109248 bytes
+part 3 (test_[s-z]*.py): exit 0 · Ran 445 tests in 567.676s OK  · memory.peak 5421109248 bytes
+SUM Ran 1452 vs expected 1452 · every part exit 0: yes · split verdict exit 0

@@ -1,0 +1,5 @@
+SEAT LINE — PREREG-MOUTH-CAP AMENDMENT 3
+Signed: Kimi K3 (kimi-code, author and acting seat, alone — Ahmad's 2026-10-05 word).
+At: 2026-10-05 13:56 +0400 (from date at signing).
+On: docs/organism/PREREG-MOUTH-CAP-AMENDMENT-3.md, the sha256 of the bytes above its signature paragraph: 20d502108ee581b77b98b31e70acf48ffb7437d89a7a125d30d96a2aa0474b71
+A budget break discards the partial class — caught by the build's own fixture before any gate ran; no bar moves.
