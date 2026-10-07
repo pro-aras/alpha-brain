@@ -1,7 +1,9 @@
 # edit: Claude (Sonnet 5, G4 builder A), 2026-09-19 23:12 +0400 — A6: replay (docs/G4-PREREG.md §2.9). The mind's
 # decisions are a pure function of (genome, tape rows in seq order) -- I2, PREREG §2.3/B4. This tool proves it.
 """creature/replay.py — python3 -m creature.replay --genome G --tape run/tape/<date>.jsonl
-[--against run/journal/<date>.jsonl] [--blind gaze] [--closed] [--timings] [--exam-every N] --out DIR
+[--against run/journal/<date>.jsonl] [--blind gaze] [--closed] [--timings] [--exam-every N] [--eye-front] --out DIR
+(`--eye-front`: PREREG-OPEN-WORLD-3's ONE declared change — the replay is constructed with the innate video
+front wired, creature/senses/vfront.py; absent = None, byte-identical everywhere)
 
 Rebuilds a fresh Mind from one day's tape file (in seq order) into a temporary work root (PREREG §2.11:
 fresh roots for every test/gate), and writes DIR/journal.jsonl -- MIND rows only, which since ALPHA4
@@ -116,10 +118,16 @@ def _counters(mind: Mind, row: Dict[str, object], canvases: int) -> Dict[str, ob
 
 
 def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenSet[str] = frozenset(), close: bool = False,
-               timings: bool = False, exam_every: int = 0, counters_every: int = 0) -> Path:
+               timings: bool = False, exam_every: int = 0, counters_every: int = 0, eye_front=None) -> Path:
     """Feeds `tape_path`'s rows (one day file, sorted by seq -- defensive, they are already in order) to
     a fresh Mind in a temporary root whose tape/payload is a symlink to the source tape's own payload
     directory (never copied: replay never writes to the source tape). Returns DIR/journal.jsonl's path.
+
+    `eye_front` (edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 01:08 +0400 — PREREG-OPEN-WORLD-3 §1's
+    ONE DECLARED CHANGE): a creature/senses/vfront.py VideoFront instance WIRED into the Mind's construction
+    (its temporal state — one previous normalized frame + the operating point — lives on the object, so a
+    caller reusing one across replays would carry it: build a fresh one per replay). Default None: the Mind
+    is constructed exactly as before, byte-identical everywhere (the law's G-IDENTITY gates).
 
     `close` (edit: Claude (Fable 5.1), 2026-09-22 22:27 +0400 — plan L-1 × L-5, builder E's tail note): a tape that is a CLOSED life's
     whole record ends the replayed mind the way the body ended the live one — `Mind.close()` applies the think still in flight at the
@@ -148,7 +156,7 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
         if (_life_root / "inherit").is_dir() and "brain" not in blind:
             shutil.copytree(_life_root / "inherit", work_root / "inherit")
             break
-    mind = Mind(genome_path, work_root, blind=blind)
+    mind = Mind(genome_path, work_root, blind=blind, eye_front=eye_front)   # eye_front: OW-3's one declared change (None = byte-identical)
     if tape_path.is_dir():
         rows = sorted((r for f in sorted(tape_path.glob("*.jsonl")) for r in _read_jsonl(f)), key=lambda r: r["seq"])
     else:
@@ -261,8 +269,18 @@ def main(argv: List[str]) -> int:
     blind: FrozenSet[str] = frozenset([argv[argv.index("--blind") + 1]]) if "--blind" in argv else frozenset()
 
     exam_every = int(argv[argv.index("--exam-every") + 1]) if "--exam-every" in argv else 0
+    # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 01:08 +0400 — PREREG-OPEN-WORLD-3 §1: `--eye-front`
+    # wires the innate video front (creature/senses/vfront.py's VideoFront over the genome's own RETINA spec, GAZE
+    # dict and SENSE colour dict — built fresh HERE, once per replay, so its temporal state is this replay's own).
+    # Absent: eye_front None, every byte of behavior unchanged (the law's G-IDENTITY gates).
+    eye_front = None
+    if "--eye-front" in argv:
+        from genome.machinery import parse_genome as _parse_for_front
+        from creature.senses.vfront import VideoFront
+        _genome_for_front = _parse_for_front(genome_path.read_text())
+        eye_front = VideoFront(_genome_for_front.gaze, _genome_for_front.colour)   # AMENDMENT-1: the band spec is the FRONT'S OWN (FRONT_SPEC) — the genome's RETINA line is not read
     out_journal = run_replay(genome_path, tape_path, out_dir, blind=blind, close="--closed" in argv,   # --closed: the tape is a closed life's whole record
-                             timings="--timings" in argv, exam_every=exam_every,
+                             timings="--timings" in argv, exam_every=exam_every, eye_front=eye_front,
                              counters_every=(int(argv[argv.index("--counters-every") + 1]) if "--counters-every" in argv else 0))   # A4 ladder instruments (2026-09-23 10:58 +0400)
 
     if "--against" in argv:

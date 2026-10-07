@@ -424,12 +424,18 @@ class Mind:
     uses — payload bytes for a tape row live at run_root/tape/<row.payload>. blind: gene names this mind
     is blind to (e.g. {"gaze"} runs the random-gaze twin, PREREG §2.9's --blind gaze)."""
 
-    def __init__(self, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset()):
+    def __init__(self, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None):
         self.genome_path = Path(genome_path)
         self.run_root = Path(run_root)
         self.genome_text = self.genome_path.read_text()
         self.genome: Genome = parse_genome(self.genome_text)
         self.blind = frozenset(blind)
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 01:08 +0400 — PREREG-OPEN-WORLD-3 §1's ONE DECLARED
+        # CHANGE: the innate video front (creature/senses/vfront.py) as a CONSTRUCTION PARAMETER — None (the default,
+        # every existing caller) is byte-identical everywhere; wired, _consume_eye's ONE branch point (below) sends
+        # every eye row's canvas through the front instead of the raw-frame feature path, and each eye row's journal
+        # glance row gains §2.7's one additive `front` key. No genome edit, no parser edit, no machinery.py touch.
+        self.eye_front = eye_front
 
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — W3-0 (docs/G4-WAVE3-CLAUSES.md):
         # THE GENERIC REFUSAL, first — before any object is built from the genome (a refusal message must
@@ -2411,7 +2417,16 @@ class Mind:
         # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-3/§3.6: colour=None unless
         # SENSE colour is declared (Genome.colour, machinery.py) — a complete no-op call otherwise, byte-
         # identical to every existing pin.
-        g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour, predicted=predicted)
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 01:08 +0400 — PREREG-OPEN-WORLD-3 §1's ONE branch
+        # point: with the front wired, the canvas is TRANSduced by creature/senses/vfront.py instead — the raw-frame
+        # feature path (luminance → INK rule → retina tower) is REPLACED for this consumption (never raw frames
+        # inward); fixation SELECTION stays on the Alpha-2 analyse/gaze_sequence inside the front, and the returned
+        # dict is the glances dict's own shape, so every line below reads it unchanged. None (the default): the
+        # exact call this method has always made.
+        if self.eye_front is not None:
+            g = self.eye_front.glances(rgb, mode, row["sha"], predicted=predicted)
+        else:
+            g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour, predicted=predicted)
         g_eye = g     # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:31 +0400 — the glance BEFORE the organism's blind-coarse strip (which rebinds `g`, never mutates this dict): the brain's input
         # L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): --blind coarse drops the
         # fifth (coarse) feature from THIS mind's own learning road entirely — genome/gaze.py has no notion
@@ -2615,6 +2630,11 @@ class Mind:
                 # all) on every canvas without a sound: a genome/tape without the voice writes exactly the row it always wrote.
                 **({"sound": {"seq": int(snd["seq"]), "winners": [int(u) for u in sound_winners],
                               "cells": int(self.org.sound.alive.sum()) if self.org.sound is not None else 0}} if snd is not None else {}),
+                # OW-3 (edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 01:08 +0400): PREREG-OPEN-WORLD-3
+                # §2.7's ONE additive key — when (and only when) the front is wired, this canvas's instrument values
+                # (t_mass = mean|T-ON|+mean|T-OFF|; o = the operating point the front's state now holds). Absent
+                # otherwise: the identity gates cover both cases.
+                **({"front": {"t_mass": self.eye_front.last_t_mass, "o": self.eye_front.last_o}} if self.eye_front is not None else {}),
             }
             self._write_journal(row["at"], journal_row)
             coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene, digest=journal_row["hash"])
@@ -2683,6 +2703,11 @@ class Mind:
                 # L-4: a sight-only canvas has no word, so `predicted` is always None here and no glance
                 # ever confirms — the fields are still journaled (gated the same way) for schema parity.
                 **({"residual": residuals[:len(g["fix"])], "confirmed": confirmed_flags[:len(g["fix"])]} if surprise_gene is not None else {}),
+                # OW-3 (edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 01:08 +0400): §2.7's one additive
+                # key on the sight-only glance row too — every eye row's journal glance row carries it when (and
+                # only when) the front is wired, so the front's instrument stream lines up 1:1 with the residual
+                # stream the cutter reads (tools/worlds/event_cutter.py's err_series).
+                **({"front": {"t_mass": self.eye_front.last_t_mass, "o": self.eye_front.last_o}} if self.eye_front is not None else {}),
             }
             self._write_journal(row["at"], sight_row)
             coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene, digest=sight_row["hash"])

@@ -1,0 +1,116 @@
+PREREG-OPEN-WORLD-3 (V2) · AMENDMENT-1 — the bench reading (the builder lane's run; the seat walks the verdict)
+tape: docs/organism/whole/records/open-world-2/bench/tape-502   genome: docs/organism/whole/records/open-world-2/bench/GENOME.genome (V1's own, G-TAPE-pinned, UNCHANGED)
+the wired journal: docs/organism/whole/records/open-world-3/bench/wired-journal.jsonl sha256 3244a9d30e77c4b223c94969b2943e8693f9abfddaae9affa497217edc88030b (== wired-2's; the durable copy of this reading's journal)
+
+THE AMENDMENT (what re-ran): the law §2.6's first composition (4×112 + 32 = 480) hit the organism's genome-derived
+144-dim sight area (the VOID road's cause, named in AMENDMENT-1 §1; the builder's STOP was the correct act). The seat
+took road (a): the feature re-declared at the genome's own 144 — per channel map the window runs the FRONT'S OWN
+declared spec ("pool8", "hog12", "unit") = 28 numbers a channel (registration-preserving: no centre/thresh/blur),
+feature = [band(ON)·band(OFF)·band(T-ON)·band(T-OFF)·colour_block] = 4×28 + 32 = exactly 144, unit-normalised once;
+a test gates the composed length == the pinned bench genome's sight_dim() forever. Re-run under the amendment:
+the feature block + its tests' shape asserts, G-IDENTITY (ii), the wired bench replay, M-ENGAGE-2, M-ERR, M-COST's
+wired numbers. The maps (stages 1–5), the unwired identity gates (i)/(iii), G-TAPE and the map plants stand as
+already-green, quoted below, never re-litigated.
+
+THE GATES
+---------
+G-TAPE: HOLDS (quoted from the 01:1x run): records/open-world-2 byte-identical to V1's verdict commit b33d4df (empty
+  git diff, clean porcelain); GENOME.genome sha256 0d064f864d9c4158e1d6b8d92e750501db153c23a6340b7abafb0e86d4560d54;
+  tape-502/2026-10-07.jsonl eeb62792deeda0cb68021e12d3702bc4b1721c3d2324671bbc778ee4d1990001; tape-2's SHA256SUMS
+  every file OK; the two sources == SOURCE-SHA256.txt; the bl2 copy's genome diff is exactly the one declared line.
+G-IDENTITY (i): HOLDS (quoted): the code with the front None replays tape-502 to V1's journal of record BYTE-FOR-BYTE,
+  sha256 4e68d84e3f737b73bfb55c91c05e771aa02cb1461ff5ead8391baaf58eb488fe (re-run as a GUARD under the amended code
+  in the same job as the wired replays below — see the job log; zero `front` keys in the unwired journal).
+G-IDENTITY (iii): HOLDS (quoted): the 500-row bl2 scene segment (the standard copy's first 500 rows, never touched;
+  165 eye rows) under master (5ce8012 worktree) vs the build, front None: both journals
+  26dc80c60d4ec1739f4de1a93e327c850c59a11a762e1ecb7c21c43fc897ea9a — BYTE-IDENTICAL (662 rows, 165 canvases, 431 births).
+G-IDENTITY (ii): the two wired replays' shas and their comparison are in the job log (ow3-wired) and quoted under
+  M-COST below; this reading's journal is wired-1 (sha above); the `front` key's presence: 502 of
+  502 canvas rows (100% — the §2.7 field on every eye row's glance row).
+G-PLANT: HOLDS (quoted; the amendment's re-composition re-proven by the same suite run): tests/creature/test_vfront.py
+  RED (the amended asserts against the 480 composition — collection error) → GREEN «Ran 9 tests … OK»: the map plants
+  UNCHANGED (P1 ON 3801.360270/dec 0 + the OFF mirror; P2 cosine 1.000000000000; P3 exact zeros; P4 lead
+  100799.073538/trail 0; P5 r8/r1 0.1191 ≤ 0.5 at mean|D| 0.0773 ≥ 0.05), the doctored twin CAUGHT (P1's OFF mirror
+  no positive mass; P5 0.6601 > 0.5), the amendment §2.3 gate (feature length == sight_dim() == 144; FRONT_SPEC
+  == ("pool8", "hog12", "unit"); no centre/thresh/blur step).
+
+THE MARKS
+--------
+M-SIGN / M-ADAPT: HOLD at the plants (quoted above; the maps were never re-litigated by the amendment).
+
+M-ENGAGE-2 — the brain over tape-502 WITH the front wired, BESIDE V1's (never re-run):
+  WIRED: turns 69 over 69 worded canvases of 502 (presence counts, never silent); learns 69, said 0, refused 0, surprise mean None max None; the turn rows' own reasons {'not calibrated': 69}; births 107 (of 176 learning events)
+  V1   : turns 69 over 69 worded canvases of 502; learns 69, said 0, refused 0, surprise mean None max None; reasons {'not calibrated': 69}; births 26 (of 95 learning events)
+  the bar (turns > 0; births > 0): HOLDS — the rest a reading (the cadence sizing note carried to V3, never a moved bar)
+
+M-ERR (a) — the cutter, UNCHANGED, over the WIRED journal's residual stream, under V1's M-MEM bar:
+  the error series (the wired journal's glance-row err): 502 frames; median 0.0348 mean 0.3672 min 0.0000 max 1.0000; frames per series {'song1': 251, 'song2': 251}; sources ['video']
+  τ=1: 21 boundaries [2, 6, 17, 46, 61, 71, 115, 121, 152, 167, 245, 270, 312, 322, 338, 365, 370, 380, 402, 442, 450] (median 0.2543 mad 0.2302 threshold 0.9449)
+  τ=4: 6 boundaries [8, 15, 63, 70, 121, 372] (median 0.3441 mad 0.1478 threshold 0.7875)
+  τ=16: 4 boundaries [16, 28, 31, 63] (median 0.3562 mad 0.0719 threshold 0.5718)
+  union: 29 boundary frames [2, 6, 8, 15, 16, 17, 28, 31, 46, 61, 63, 70, 71, 115, 121, 152, 167, 245, 270, 312, 322, 338, 365, 370, 372, 380, 402, 442, 450]
+  nesting 16_in_4: exact 1/4, within±2 2/4 (a reading)
+  nesting 16_in_1: exact 0/4, within±2 2/4 (a reading)
+  nesting 4_in_1: exact 1/6, within±2 6/6 (a reading)
+  the shuffled-residual negative control (seed 20261777): 24 boundaries; aligned within±3 with the real union: 8/29 (share 0.276) — chance expects ≈8.3 aligned at this density
+  M-MEM (learning = glance births + the brain's learn rows; 176 learning events over 502 frames — 107 births + 69 learns):
+    REAL boundaries (29): learning 20 (mean 0.6896551724137931)  vs  matched controls (29): learning 17 (mean 0.5862068965517241)
+    SHUFFLED boundaries (29, seed 20261777): learning 9 (mean 0.3103448275862069)  vs  matched controls (29): learning 13 (mean 0.4482758620689655)
+  V1's M-MEM bar (real > control; the shuffled shows nothing): real>control True, shuffled-shows-nothing True → HOLDS
+    context: the worded canvases' mean err is 0.4173 vs the stream's 0.3672
+  M-NAIVE beside (a reading): disagreement 42 frames (21 gated-only, 21 knife-only) of the union's 29
+
+M-ERR (b) — the journal's front.t_mass stream: a READING, NO BAR (a candidate instrument, never the mind's own signal);
+  the SAME computations (the cutter's own functions, imported unchanged), every boundary count with its chance expectation:
+  the t_mass series: 502 frames; median 0.2758 mean 0.5945 min 0.0000 max 25.8023; the operating point o beside it: median 0.0088 max 0.1559
+  τ=1: 21 boundaries [1, 59, 111, 136, 162, 165, 214, 240, 251, 260, 310, 316, 321, 336, 361, 364, 413, 416, 439, 465, 491] (median 0.3088 mad 0.1966 threshold 0.8987)
+  τ=4: 15 boundaries [1, 60, 112, 165, 214, 240, 251, 260, 310, 362, 364, 416, 439, 465, 491] (median 0.3881 mad 0.1831 threshold 0.9373)
+  τ=16: 5 boundaries [1, 241, 365, 440, 492] (median 0.4841 mad 0.1139 threshold 0.8258)
+  union: 28 boundary frames [1, 59, 60, 111, 112, 136, 162, 165, 214, 240, 241, 251, 260, 310, 316, 321, 336, 361, 362, 364, 365, 413, 416, 439, 440, 465, 491, 492]
+  nesting 16_in_4: exact 1/5, within±2 5/5 (a reading)
+  nesting 16_in_1: exact 1/5, within±2 5/5 (a reading)
+  nesting 4_in_1: exact 12/15, within±2 15/15 (a reading)
+  the memory pair on the t_mass boundaries (READING): REAL (28): learning 6 (mean 0.21428571428571427) vs matched controls (28): 4 (mean 0.14285714285714285); SHUFFLED (28, seed 20261777): 9 (mean 0.32142857142857145) vs controls (28): 13 (mean 0.4642857142857143)
+  the shuffled-stream control beside it (seed 20261777): 45 boundaries; aligned within±3 with the real union: 12/28 — chance expects ≈13.1 aligned at this density (the arithmetic, never a moved line)
+
+M-ERR (c) — V1's residual stream of record, printed beside from its reading (NEVER re-run):
+  V1| the error series (the eye's own residual, the journal's glance-row err): 502 frames; median 0.0008 mean 0.0986 min 0.0000 max 1.0000; frames per series {'song1': 251, 'song2': 251}; sources ['video']
+  V1|   τ=1: 29 boundaries [0, 48, 52, 59, 73, 77, 100, 113, 122, 152, 165, 173, 203, 224, 243, 269, 276, 299, 310, 316, 328, 351, 365, 388, 403, 421, 454, 475, 479] (median 0.0178 mad 0.0174 threshold 0.0701)
+  V1|   τ=4: 29 boundaries [0, 48, 52, 59, 73, 77, 100, 113, 122, 152, 165, 173, 203, 224, 243, 269, 272, 299, 310, 316, 328, 351, 365, 388, 403, 421, 454, 475, 479] (median 0.0440 mad 0.0379 threshold 0.1576)
+  V1|   τ=16: 8 boundaries [2, 5, 52, 59, 61, 73, 77, 276] (median 0.0787 mad 0.0304 threshold 0.1699)
+  V1|   union: 33 boundary frames [0, 2, 5, 48, 52, 59, 61, 73, 77, 100, 113, 122, 152, 165, 173, 203, 224, 243, 269, 272, 276, 299, 310, 316, 328, 351, 365, 388, 403, 421, 454, 475, 479]
+  V1|   nesting 16_in_4: exact 4/8, within±2 6/8 (the human form's coarse⊆fine approximation — a reading)
+  V1|   nesting 16_in_1: exact 5/8, within±2 7/8 (the human form's coarse⊆fine approximation — a reading)
+  V1|   nesting 4_in_1: exact 28/29, within±2 28/29 (the human form's coarse⊆fine approximation — a reading)
+  V1|   the shuffled-residual negative control (seed 20261777): 41 boundaries; aligned within±3 with the real union: 17/33 (share 0.515, declared line 0.5) → SEGMENTS LIKE the real stream (the control FAILS)
+  V1|     context (arithmetic, not a moved line): the chance alignment of 41 uniform boundaries against 33 fixed ones at ±3 over 502 frames expects ≈14.4 aligned — the observed 17 is what a random stream shows (the shuffle preserves the err VALUES, not their times; the real segmentation is of the times)
+  V1| M-ENGAGE — the brain over the video tape with the hears declaration: turns 69 over 69 worded canvases of 502 (presence counts, never silent) → the brain ENGAGES; learns 69, said 0, refused 0, surprise mean None max None; the turn rows' own reasons {'not calibrated': 69}
+  V1| M-MEM — the memory effect (learning = glance births + the brain's learn rows; 95 learning events over 502 frames — 26 births + 69 learns):
+  V1|   REAL boundaries (33): learning 33 (mean 1.0)  vs  matched controls (33): learning 0 (mean 0.0)  →  boundary-side > control-side
+  V1|   SHUFFLED boundaries (33, seed 20261777): learning 5 (mean 0.15151515151515152)  vs  matched controls (33): learning 9 (mean 0.2727272727272727)  →  no concentration — the control shows nothing
+  V1| M-NAIVE — the naive knife (top-|err| frames of the same count, 33) vs the gated form: disagreement 24 frames (12 gated-only, 12 knife-only); gated-only [299, 310, 316, 328, 351, 365, 388, 403, 421, 454, 475, 479]; knife-only [1, 6, 7, 8, 9, 10, 11, 12, 13, 62, 114, 244] (a reading — the two knives answer different questions once sequences are learned)
+
+M-COST — the wired numbers (the driver's own measurements + the slot ledger END lines):
+  G-IDENTITY (ii), restated with its bytes: the two independent wired replays' journals BYTE-IDENTICAL —
+    wired-1 3244a9d30e77c4b223c94969b2943e8693f9abfddaae9affa497217edc88030b
+    wired-2 3244a9d30e77c4b223c94969b2943e8693f9abfddaae9affa497217edc88030b
+  and the GUARD under the amended code: the unwired replay 4e68d84e3f737b73bfb55c91c05e771aa02cb1461ff5ead8391baaf58eb488fe == V1's journal of record (G-IDENTITY (i));
+  the §2.7 key's presence: 502 of 502 canvas rows wired, 0 of 502 unwired.
+  the replays (one driver process): unwired 9.1s wall / 9.1s CPU; wired-1 9.4s wall / 9.4s CPU; wired-2 9.2s / 9.2s
+  per-canvas front price (the replays' own timings.jsonl, 502 eye rows, cpu_ms): wired 18.5 ms/canvas vs unwired 17.9 ms/canvas (the WHOLE canvas row's price, the organism included) — the amended composition
+  costs ≈ 1.04× the raw path per canvas, deep inside the law's < 3× estimate; the identity
+  replays ≈ 9.5 s each as priced; the 500-row scene replays 7 s wall the pair (quoted, never re-litigated).
+  peaks (the slot ledger END lines): ow3-wired 408 MB at 4G (the three replays in one process); ow3a1-tools-suite
+  1524 MB at 4G; split-creature 6689 MB at 10G (the suite's own runner, the amended tree); the reading job's own
+  ledger line beside them. §6's stop rules: no job's CPU near 1 CPU-h; every bench peak < 3,800 MB at 4G — INSIDE.
+
+SUITES (the final, amended code):
+  tests/creature/test_vfront.py (PYTHONPATH=. python3 -B -u -m unittest tests.creature.test_vfront): «Ran 9 tests in 0.166s … OK» — the 8 map plants UNCHANGED + AMENDMENT-1 §2.3's gate.
+  tests/tools (slot ow3a1-tools-suite, 4G, ledger peak 1524 MB): «Ran 1262 tests in 417.027s … OK (skipped=33)».
+  tests/creature (the project's own split runner — the one-process suite holds ~10 GB by its end, so it runs at 10G per part; slot split-creature, ledger peak 6689 MB; the 135f141 tree + this build):
+    part 1 (test_[a-f]*.py): «Ran 444 tests in 526.233s OK (skipped=5)»
+    part 2 (test_[g-r]*.py): «Ran 563 tests in 563.632s OK (skipped=1)»
+    part 3 (test_[s-z]*.py): «Ran 454 tests in 550.688s OK»   (carries test_vfront.py)
+    SUM Ran 1461 vs expected 1461 · every part exit 0: yes · PARTITION EXACT (140 files) · split verdict exit 0
+
+— the builder lane (Kimi K3, kimi-code, alone under the signed law + AMENDMENT-1), the dates on the job ledger.
