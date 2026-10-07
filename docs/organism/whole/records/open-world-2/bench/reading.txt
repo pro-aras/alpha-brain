@@ -1,0 +1,30 @@
+PREREG-OPEN-WORLD-2 (V1) — the bench reading (the builder lane's run; the seat walks the verdict)
+tape: docs/organism/whole/records/open-world-2/bench/tape-502   genome: docs/organism/whole/records/open-world-2/bench/GENOME.genome (the bench copy, hears 'video' — the ONE declared change)
+
+THE GATES
+---------
+G-HEARS: the bench genome's diff vs bl2's copy is 1/1 line(s) (EXACTLY the one declared line); provenance: every eye row source 'video' (502), every ear row 'video-caption' (428) — unchanged everywhere
+G-INSTRUMENT: the replay's journal sha256 with the cutter observing (before 4e68d84e3f73… / after 4e68d84e3f73…) and a second replay without it (4e68d84e3f73…): byte-identical — the cutter never interferes
+G-PLANT: tests/tools/test_event_cutter.py's planted truths (10 planted spikes fire at the 10 known frames at every scale; the shuffled stream aligns 2/10 — the instrument CAN fail), run with the suite
+
+THE MARKS
+--------
+the error series (the eye's own residual, the journal's glance-row err): 502 frames; median 0.0008 mean 0.0986 min 0.0000 max 1.0000; frames per series {'song1': 251, 'song2': 251}; sources ['video']
+M-CUT — the integrator bank (τ ∈ {1, 4, 16} frames; boundary = an upward crossing of the series' own median + 3×MAD; declared, never tuned):
+  τ=1: 29 boundaries [0, 48, 52, 59, 73, 77, 100, 113, 122, 152, 165, 173, 203, 224, 243, 269, 276, 299, 310, 316, 328, 351, 365, 388, 403, 421, 454, 475, 479] (median 0.0178 mad 0.0174 threshold 0.0701)
+  τ=4: 29 boundaries [0, 48, 52, 59, 73, 77, 100, 113, 122, 152, 165, 173, 203, 224, 243, 269, 272, 299, 310, 316, 328, 351, 365, 388, 403, 421, 454, 475, 479] (median 0.0440 mad 0.0379 threshold 0.1576)
+  τ=16: 8 boundaries [2, 5, 52, 59, 61, 73, 77, 276] (median 0.0787 mad 0.0304 threshold 0.1699)
+  union: 33 boundary frames [0, 2, 5, 48, 52, 59, 61, 73, 77, 100, 113, 122, 152, 165, 173, 203, 224, 243, 269, 272, 276, 299, 310, 316, 328, 351, 365, 388, 403, 421, 454, 475, 479]
+  nesting 16_in_4: exact 4/8, within±2 6/8 (the human form's coarse⊆fine approximation — a reading)
+  nesting 16_in_1: exact 5/8, within±2 7/8 (the human form's coarse⊆fine approximation — a reading)
+  nesting 4_in_1: exact 28/29, within±2 28/29 (the human form's coarse⊆fine approximation — a reading)
+  the shuffled-residual negative control (seed 20261777): 41 boundaries; aligned within±3 with the real union: 17/33 (share 0.515, declared line 0.5) → SEGMENTS LIKE the real stream (the control FAILS)
+    context (arithmetic, not a moved line): the chance alignment of 41 uniform boundaries against 33 fixed ones at ±3 over 502 frames expects ≈14.4 aligned — the observed 17 is what a random stream shows (the shuffle preserves the err VALUES, not their times; the real segmentation is of the times)
+M-ENGAGE — the brain over the video tape with the hears declaration: turns 69 over 69 worded canvases of 502 (presence counts, never silent) → the brain ENGAGES; learns 69, said 0, refused 0, surprise mean None max None; the turn rows' own reasons {'not calibrated': 69}
+M-MEM — the memory effect (learning = glance births + the brain's learn rows; 95 learning events over 502 frames — 26 births + 69 learns):
+  REAL boundaries (33): learning 33 (mean 1.0)  vs  matched controls (33): learning 0 (mean 0.0)  →  boundary-side > control-side
+  SHUFFLED boundaries (33, seed 20261777): learning 5 (mean 0.15151515151515152)  vs  matched controls (33): learning 9 (mean 0.2727272727272727)  →  no concentration — the control shows nothing
+  context for the seat: the worded canvases' mean err is 0.3104 vs the stream's 0.0986 — the word's own prediction error lives in the residual, so learning and boundaries meet by the organism's own dynamics (read M-MEM against this, never past it)
+M-NAIVE — the naive knife (top-|err| frames of the same count, 33) vs the gated form: disagreement 24 frames (12 gated-only, 12 knife-only); gated-only [299, 310, 316, 328, 351, 365, 388, 403, 421, 454, 475, 479]; knife-only [1, 6, 7, 8, 9, 10, 11, 12, 13, 62, 114, 244] (a reading — the two knives answer different questions once sequences are learned)
+
+M-COST — replay-1 9.5s wall / 9.5s CPU; the cutter 0.0s wall / 0.0s CPU; peak RSS 321 MB (the process's own, both replays + the cutter in it); the conversion's prices are on the seat's record (records/open-world-2, the two videos converted by V0's own tool). §6's bounds: replay CPU < 1 CPU-h, peak < 3,800 MB at SLOT_MEM 4G — INSIDE
