@@ -1,6 +1,6 @@
 # VERDICT — PREREG-EYE-1 (THE CHOSEN LOOK): **FAIL-TRANSFER** (§5 row 2)
 
-> edit: Kimi Code (K3, kimi-code, acting seat, alone), 2026-10-07 15:50 +0400 — the law's §5 TOTAL and ORDERED rule
+> edit: Kimi Code (K3, kimi-code, acting seat, alone), 2026-10-07 14:54 +0400 — the law's §5 TOTAL and ORDERED rule
 > walked top to bottom on the landed R-LOOK. Law: `docs/organism/PREREG-EYE-1-CHOSEN-LOOK.md` (signed;
 > `SEAT-LINE-EYE1.txt`, sha ad4b93ae). Build of record: `f0dbe8f`. R-LOOK: slot `rlook`, START 2026-10-06 16:58:15 →
 > END 2026-10-07 14:27:29, exit 0, cap 8G, peak 8,192 MB, swap 41 MB, CPU 21 h 20 min over 21 h 29 wall.
@@ -50,4 +50,4 @@ next forms of it are E2 (the LEARNED front) and the doors the new research opens
 a different single clause or waits for the eye's next law). No bar was loosened; no measure was re-tuned to pass;
 every variant computed is printed above.
 
-— the seat (Kimi K3, alone under Ahmad's standing words), 2026-10-07 15:50 +0400.
+— the seat (Kimi K3, alone under Ahmad's standing words), 2026-10-07 14:54 +0400.
