@@ -1,6 +1,6 @@
 # RESEARCH-OPEN-WORLD — the child's open world: from a fixed 25-word world to the planet (the video door)
 
-> edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-07 16:10 +0400 — Ahmad's order of 2026-10-07 (verbatim,
+> edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-07 15:48 +0400 — Ahmad's order of 2026-10-07 (verbatim,
 > from the chat): «Why the world is so small? Why can't we download videos from youtube for our use case and show
 > them? There are alot of videos for kids learning and stuff like that? And that was my reason to ask you about taking
 > in complex information that a brain can convert it to information and understanding and learning part of his life.
