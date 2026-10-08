@@ -1,0 +1,192 @@
+PREREG-OPEN-WORLD-4 (V3: the curriculum + the co-reference channel) — the bench reading (the builder lane's
+run; the seat walks the verdict)
+law: docs/organism/whole/PREREG-OPEN-WORLD-4.md sha256 dd60548061a06499a4a09ef7c41690738a9a2f8353236f95e1e7a4fc6d388ad5
+  (the SEAT-LINE's own: dd60548061a06499a4a09ef7c41690738a9a2f8353236f95e1e7a4fc6d388ad5)
+AMENDMENT 1: docs/organism/whole/PREREG-OPEN-WORLD-4-AMENDMENT-1.md sha256 fa78fd5883b90d854522647f1112ff884d29814a8e0564a1d578461931402df8
+  (the SEAT-LINE-AMENDMENT-1's own: fa78fd5883b90d854522647f1112ff884d29814a8e0564a1d578461931402df8)
+
+THE AMENDMENT'S FACTS (what re-priced, what stands): the first bench's verdict was FAIL-COST (§5 row 7 —
+records/open-world-4/VERDICT-OPEN-WORLD-4.md): the wired curriculum replay died at the brain's FIRST
+calibration (the 250th learned scene, canvas 967 — the builder's bench + the seat's recomputation),
+Brain.calibrate → calibrate_r → Ear.cover(mature) → _maximal_cliques over the first real open-world
+vocabulary (159 words / 97 mature / 565 co-pairs at the knee), OOM at the 4G cap, four independent
+reproductions. The law's own words sent the cause to a NEW law: PREREG-EAR-COVER-CAP, PASS (build
+brain/scene/learners.py at fedb147; verdict 7b9c791 — the knee's graph completes in 0.016 s at ≤ 62 MB,
+byte-identical below COVER_FULL_BELOW=(34, 1044), the difference measured). AMENDMENT 1 re-prices the bench
+with the cover law in the tree: the SAME checkpointed tape, the SAME bench genome, the SAME front, the
+law's ORIGINAL 4G bounds and STOP rules; the green gates and M-SIZE stand, never re-litigated (rows 1–2
+already walked — quoted below); G-TAPE's replay legs (the wired byte-identity ×2) and the deferred marks
+(M-ENGAGE-3, M-CADENCE, M-SYNC, M-LEARN, M-SEG, M-COST's replay numbers) read NOW by the parent law's own
+§4 forms and bars, unchanged. The verdict walk resumes at §5 row 3.
+
+tape: /data/dev/genome/docs/organism/whole/records/open-world-4/bench/tape-curriculum (the curriculum date 2026-10-08)   genome: /data/dev/genome/docs/organism/whole/records/open-world-2/bench/GENOME.genome (V1/V2's own, sha-pinned, UNCHANGED)
+the wired journal: docs/organism/whole/records/open-world-4/bench/wired-journal.jsonl sha256 fb8cf16b22350a919c0317a41e0a5019e8fd0c1a753dbd54e03e7749ef1ab8f6
+
+THE SHELF AND THE SIZING WALK (M-SIZE)
+-------------------------------------
+the declared rules (src/SHELF.txt, written BEFORE any use — the mechanical selection, never hand-picked):
+  the shelf = the Super Simple Songs channel's own videos tab in the channel's OWN displayed order
+  (newest-first), enumerated once by yt-dlp 2026.08.19 (installed user-level for this law, with deno 2.9.7
+  as its JS runtime + the EJS solver — tooling declared in SHELF.txt) and frozen into src/SHELF.txt
+  (809 lines); the playlist road was read and is not this shelf (no
+  single playlist of the channel's 336 contains 'The Shape Song #1' — the probes printed in SHELF.txt).
+  V0–V2's sources are shelf members (positions 644/648) — the walk never reached them (it sized out at
+  position ~2); they stay reused-from-the-hashed-files, never re-downloaded.
+  the caption rule: authored 'en' (or the first 'en-*') from the subtitles catalog, never ASR; a video
+  without it SKIPPED (the skips, from the walk's own log):
+    (NONE — zero skips: the walk sized out at the 2nd shelf member, the caption rule never invoked;
+     a zero count printed with its presence, never silent)
+  the sizing rule: shelf order until cumulative WORDED CANVASES >= 500 (V0's declared
+  caption→moment mapping, computed from the converted per-video tapes — the mapping that reads 36+33=69
+  on V1's own tapes of record); caps 30 videos / 4500s media, checked BEFORE each download (a video that
+  would cross a cap is the WALL — never downloaded, never skipped-to).
+
+  THE WALK (every taken source: shelf index | short name | media s | frames | ear rows | worded | cumulative):
+       1 | when-we-play-hockey-super-simple-songs-n | 134.0 | 146 | 200 | 45 | 45
+       2 | top-20-anniversary-hit-songs-20-years-of | 2871.0 | 2989 | 3800 | 861 | 906
+  STOP: sized — 2 videos, 3005.0s media (50.1 min), 906 worded canvases; sized=True
+  the caps: 2/30 videos, 3005.0/4500s — INSIDE; the bar (worded >= 500 within the cap): HOLDS
+
+  THE GRADIENT (the sourced set ordered for the tape by simpleness — type-token ratio ASCENDING, ties by
+  words-per-second slower first, a double tie by the shelf index; computed from the caption files ALONE,
+  printed, never hand-ranked):
+  order | name | ttr | wps | tokens (unique) | caption span s
+     1 | top-20-anniversary-hit-songs-20-years-of | 0.0947 | 1.324 | 3800 (360) | 2869.1
+     2 | when-we-play-hockey-super-simple-songs-n | 0.1600 | 1.552 | 200 (32) | 128.9
+
+THE GATES
+---------
+G-TAPE (a): every source sha256'd at download into src/SOURCE-SHA256.txt (4 files), and every
+  taken source's file == its recorded sha256 NOW: True
+G-TAPE (b): every per-video tape regenerates BYTE-IDENTICAL (a second conversion of the same hashed files,
+  V0's tool unchanged) — the ow4-build job's own lines:
+  tape-when-we-play-hockey-super-simple-songs-n: byte-identical (27b962828a1a…)
+  tape-top-20-anniversary-hit-songs-20-years-of: byte-identical (48d30ded51c9…)
+G-TAPE (c): the curriculum tape replays BYTE-IDENTICAL ×2 (wired) — the ow4-replays job's own lines:
+  wired-1: journal sha256 fb8cf16b22350a919c0317a41e0a5019e8fd0c1a753dbd54e03e7749ef1ab8f6  wall 326.3s cpu 326.5s
+  wired-2: journal sha256 fb8cf16b22350a919c0317a41e0a5019e8fd0c1a753dbd54e03e7749ef1ab8f6  wall 328.9s cpu 329.1s
+  G-TAPE (the replay leg): two wired replays byte-identical: True (fb8cf16b22350a919c0317a41e0a5019e8fd0c1a753dbd54e03e7749ef1ab8f6)
+  the front key: 3135 rows of the wired journal; canvas rows 3135
+  journal of record → /data/dev/genome/docs/organism/whole/records/open-world-4/bench/wired-journal.jsonl (sha256 fb8cf16b22350a919c0317a41e0a5019e8fd0c1a753dbd54e03e7749ef1ab8f6)
+  peak RSS 692 MB (the process's own, both replays + the front in it)
+G-FRONT: creature/senses/vfront.py sha256 1a0d74c626c4a2d8d086b06f1a5507e5c9c86a8bd87da1626c2f65107c45c036 == its bytes at V2's verdict commit 0f92281 (1a0d74c626c4a2d8d086b06f1a5507e5c9c86a8bd87da1626c2f65107c45c036): True — the instrument of record, never edited under this law; the cutter and the converter likewise:
+  tools/worlds/event_cutter.py sha256 d0bc0b6f7933a3a8746bada73a0e67d9f57d5a8d434dbf2cbc90b215f64b084b
+  tools/worlds/video_door.py sha256 ebcd70c42c4dcad69e2e8f3fea782c10ba5a5554e1e7dff5d088c849f457d821
+G-HEARS: the bench genome's sha256 0d064f864d9c4158e1d6b8d92e750501db153c23a6340b7abafb0e86d4560d54 == 0d064f86…0d54 (V1/V2's own, unchanged): True
+G-PLANT: tests/tools/test_curriculum.py's GPlant (the suite run quoted below): the PIL+ffmpeg synthetic clip
+  (a bright square on grey, the burst DECLARED at frames 4–6 + the return edge 7) through the SAME converter
+  and a REAL wired replay: the burst frames are exactly the motion events; the planted word 'jumping' (onset
+  exactly on the burst) IS marked synchronized; a plain word is NOT; and with the onsets shuffled at the
+  law's own seed 20261777 (draw [1, 25, 13, 13] for the fixture's 4 tokens over 30 canvases — printed, never
+  hidden) the planted word is NOT marked. The instrument CAN fail; on the plant it does not.
+
+THE MARKS
+--------
+M-ENGAGE-3 — the brain over the curriculum tape THROUGH THE FRONT (presence counts, never silent),
+  beside V1/V2's own 69/69/0:
+  V3   : turns 906 over 906 worded canvases of 3135; learns 906, said 411, refused 0, surprise mean 0.7585420296167248 max 1.0; births 3284 (of 4190 learning events)
+  V1/V2: turns 69 over 69 worded canvases of 502; learns 69, said 0, refused 0, surprise mean None max None
+  the bar (turns > 0): HOLDS
+
+M-CADENCE — the brain's calibration rows as they fire (the bench genome's own `calibrate at 250 500 …`):
+  n_calibrations (the journal's act=calibrate rows): 2
+    seq 2090 at 2026-10-08T00:15:21.700Z: calibrations 1, calibrated_at 250 (learned scenes), words 159, mature 97
+    seq 4070 at 2026-10-08T00:27:56.867Z: calibrations 2, calibrated_at 500 (learned scenes), words 230, mature 150
+  the cadence arithmetic of record: worded canvases 906 (the walk) / 906 (the journal's own presence count); learned scenes at the tape's end 906 (the brain learns once per worded canvas — V1/V2's 69/69 arithmetic at curriculum scale); the cadence points 250 and 500 both crossed with margin (906 ≥ 500).
+  the turn rows' own reasons: {'not calibrated': 250, 'None': 656}
+  the inner-turn rows (act=inner): 0 — the inner turn's trigger is a SENSE body row's
+  own reading (creature/mind.py:1034), and a video tape carries no body rows: the machinery's ELIGIBILITY
+  (n_calibrations ≥ 1, learned ≥ 1) is what this bench crosses; inner turns themselves are the life's,
+  not the bench's (named, never silent).
+  said 411 with presence counts (a READING — the say machinery's own gates are the brain's law,
+  not this one's).
+  the bar (n_calibrations ≥ 2 by the tape's end — the 250 and 500 points both crossed): HOLDS
+
+M-SYNC — the co-reference instrument (§2.2): a motion event = front.t_mass > the stream's own median +
+  3×MAD (the cutter's declared threshold form, plain exceedance); a token SYNCHRONIZED when its onset lands
+  within ±1 s of a motion-event frame = ±1 canvas of the SAME VIDEO at the tape's own 1 Hz sampling (the
+  named resolution limit: within one video |Δcanvas| ≤ 1 ⇔ |Δt| ≤ 1 s exactly, the grid never sparser than 1 s):
+  the t_mass stream: 3135 canvases; median 0.6899 mean 0.9952 min 0.0000 max 15.8754; the operating point o beside it: median 0.1170 max 0.5549
+  motion events: 392 frames (median 0.6899 mad 0.4549 threshold 2.0547)
+  REAL onsets: 37.05% of the 4000 kept tokens synchronized (1482 tokens, 287 canvases)
+    learning at the synchronized-token canvases (287): 1414 (mean 4.926829268292683)  vs  matched non-synchronized controls (287, the same count, nearest in time, same video): 63 (mean 0.21951219512195122)
+  the SHUFFLED-ONSET control (the tokens' onsets redrawn as uniform-random canvases of the tape, seed 20261777 — a permutation would preserve the canvas set exactly, vacuous; the redraw is the honest control): 33.65% synchronized (1346 tokens, 760 canvases) — the chance expectation at this density ≈ 33.14% of canvases
+    learning at the shuffled-synchronized canvases (760): 1025 (mean 1.3486842105263157)  vs  its matched controls (760): 978 (mean 1.2868421052631578)
+  the bar (learning at synchronized-token canvases > matched controls on the real onsets, AND the shuffled
+  control shows nothing): real>control True, shuffled-shows-nothing False → FAILS — the FAIL-FORM row, named honestly
+  context (arithmetic, never a moved line — the seat reads the bar's form against these magnitudes):
+  the REAL effect is 22.4× its control (4.927 vs 0.220), and the real
+  synchronized tokens CONCENTRATE: 1482 tokens on 287 canvases ≈ 5.2 tokens/canvas (the captions dense around motion), where the shuffle spreads its
+  1346 over 760. The shuffled SHARE sits at chance (33.65% vs ≈33.14% expected), while its learning
+  excess over its own controls is 1.048× (1.349 vs 1.287) — a marginal-but-
+  nonzero concentration the law's own form (the cutter family's «shows nothing» = shuffled ≤ its
+  controls) reads as the control FIRING. The ±1-of-an-event neighborhood itself carries a small learning
+  premium (motion bursts live near worded stretches); the token-onset form cannot separate itself from
+  it at this resolution — the honest limit, printed, the seat's to weigh.
+
+M-LEARN — the memory effect at the cutter's boundaries over the wired journal (V1/V2's form; the cutter
+  UNCHANGED; every boundary count with its chance expectation):
+  the error series (the wired journal's glance-row err): 3135 frames; median 1.0000 mean 0.7756 min 0.0000 max 1.0000; frames per series {'top-20-anniversary-hit-songs-20-years-of': 2989, 'when-we-play-hockey-super-simple-songs-n': 146}; sources ['video']
+  the stream's shape (the saturation measured, never rounded away): err == 1.0 on 2414 of 3135 frames (0.7700); percentiles p10 0.0232 p25 1.0000 p50 1.0000 p75 1.0000 p90 1.0000
+  τ=1: 0 boundaries (median 0.9695 mad 0.0305 threshold 1.0610)
+  τ=4: 0 boundaries (median 0.8351 mad 0.1485 threshold 1.2806)
+  τ=16: 0 boundaries (median 0.8140 mad 0.1001 threshold 1.1144)
+  union: 0 boundary frames
+  nesting 16_in_4: exact 0/0, within±2 0/0 (a reading)
+  nesting 16_in_1: exact 0/0, within±2 0/0 (a reading)
+  nesting 4_in_1: exact 0/0, within±2 0/0 (a reading)
+  the shuffled-residual negative control (seed 20261777): 6 boundaries; aligned within±3 with the real union: 0/0 (share None) — chance undefined at ZERO real boundaries (the form's own arithmetic: no real union to align against)
+  the memory effect (learning = glance births + the brain's learn rows; 4190 learning events over 3135 frames — 3284 births + 906 learns):
+    REAL boundaries (0): learning 0 (mean None)  vs  matched controls (0): learning 0 (mean None)
+    SHUFFLED boundaries (0, seed 20261777): learning 0 (mean None)  vs matched controls (0): learning 0 (mean None)
+  the bar's population is EMPTY: the wired journal's residual stream SATURATES at this world's novelty
+  scale (77.0 % of frames pinned at err 1.0, both videos — the percentile line above; every scale's
+  median + 3×MAD threshold lands above the 1.0 ceiling, so no upward crossing exists). Zero counts
+  printed with their presence, never silent;
+  the real > control comparison has no population here — a READING for the seat's walk, never a moved bar.
+    context: the worded canvases' mean err is 0.8269 vs the stream's 0.7756
+  M-NAIVE beside (a reading): disagreement 0 frames (0 gated-only, 0 knife-only) of the union's 0
+
+M-SEG — the TP-dip reader (V0's own, imported unchanged) over the FULL caption token stream in curriculum
+  (gradient) order — the W1 instrument at curriculum scale; a READING, no bar:
+  4000 tokens over 2 videos; TP median 0.5000 mad 0.3265 k 2.0 → 0 dip boundaries
+  zero dip boundaries — printed with its presence, never silent: the declared strict form cuts where
+  TP < median AND median − TP ≥ k×MAD; here the line lands at -0.1529 (≤ 0, unreachable by any TP) — at curriculum scale the stream's TP median 0.5000 with MAD 0.3265 admits no strict dip (V0's song-1 stream read median 1.0 / MAD 0, a different regime — the same instrument, its own arithmetic, a READING, no bar).
+  the units between dips, with each unit's most-repeated word(s) (the repeated target words' units, named):
+    tokens 0–3999 (4000): top [('do', 340), ('happy', 157), ('and', 152)] | cut before '∅'
+
+M-COST — conversion wall/CPU, replay wall/CPU, the peaks from the slot ledger END lines:
+  wired-1: journal sha256 fb8cf16b22350a919c0317a41e0a5019e8fd0c1a753dbd54e03e7749ef1ab8f6  wall 326.3s cpu 326.5s
+  wired-2: journal sha256 fb8cf16b22350a919c0317a41e0a5019e8fd0c1a753dbd54e03e7749ef1ab8f6  wall 328.9s cpu 329.1s
+  peak RSS 692 MB (the process's own, both replays + the front in it)
+  per-canvas price (the replay's own timings.jsonl, 3135 eye rows, cpu_ms): 103.9 ms/canvas (the WHOLE canvas row's price, the organism included; V2 measured 18.5 on tape-502)
+  ledger: 2026-10-08 09:56:52 +0400 END   kimi ow4-fetch slot 2 exit 0 cap 4G peak 421MB swap 0MB
+  ledger: 2026-10-08 10:04:39 +0400 END   kimi ow4-build slot 2 exit 0 cap 4G peak 404MB swap 0MB
+  ledger: 2026-10-08 10:07:04 +0400 END   kimi ow4-replays slot 2 exit 137 OOM-CAP cap 4G
+  ledger: 2026-10-08 10:11:22 +0400 END   kimi ow4-memprobe slot 2 exit 137 OOM-CAP cap 4G
+  ledger: 2026-10-08 10:46:08 +0400 END   kimi ow4-knee slot 2 exit 137 OOM-CAP cap 4G
+  ledger: 2026-10-08 10:48:50 +0400 END   kimi ow4-knee2 slot 2 exit 0 cap 4G peak 197MB swap 0MB
+  ledger: 2026-10-08 11:16:49 +0400 END   kimi ow4-cover slot 2 exit 137 OOM-CAP cap 4G
+  ledger: 2026-10-08 11:24:35 +0400 END   kimi ow4-tools-suite slot 2 exit 0 cap 4G peak 1484MB swap 0MB
+  ledger: 2026-10-08 11:41:24 +0400 END   kimi ow4-cover-seat slot 2 exit 137 OOM-CAP cap 4G
+  ledger: 2026-10-08 21:01:17 +0400 END   kimi ow4-replays2 slot 2 exit 0 cap 4G peak 771MB swap 0MB
+  ledger: 2026-10-08 21:08:51 +0400 END   kimi ow4-tools-suite2 slot 2 exit 0 cap 4G peak 1563MB swap 0MB
+  ledger: 2026-10-08 21:09:25 +0400 END   kimi ow4-reading slot 2 exit 1 cap 4G peak 165MB swap 0MB
+  ledger: 2026-10-08 21:13:35 +0400 END   kimi ow4-reading2 slot 2 exit 0 cap 4G peak 320MB swap 0MB
+  ledger: 2026-10-08 21:17:36 +0400 END   kimi ow4-reading3 slot 2 exit 0 cap 4G peak 166MB swap 0MB
+  §6's stop rules under AMENDMENT 1 (the re-priced bench, measured): S1 — no job's CPU over 2 CPU-h: the
+  dearest is the replay-pair job's 655.6 s CPU total (each replay ≈ 327–329 s) — INSIDE; S2 — no job's
+  peak over 3,800 MB at 4G: the dearest green peaks are the tools suite's 1,563 MB and the replays' 771 MB
+  (the process's own 692 MB) — INSIDE. The four exit-137 OOM-CAP ledger lines above (ow4-replays,
+  ow4-memprobe, ow4-knee, ow4-cover) are the FIRST bench's own history and the seat's negative control
+  (ow4-cover-seat) — the FAIL-COST's evidence, kept beside its fix, never re-litigated. The conversion's
+  prices (fetch 421 MB, build 404 MB) stand from the green record. The per-canvas price 103.9 ms is the
+  post-calibration organism's real one (the turns' conformal/reader work + the two calibrations; ≈ 5.6×
+  V2's pre-cadence 18.5 — the bench's own first measurement of it, printed, never estimated).
+
+SUITES (the final code):
+  tests/tools/test_curriculum.py standalone (PYTHONPATH=. python3 -B -u -m unittest tests.tools.test_curriculum): «Ran 25 tests in 2.913s … OK» (the law's 25: the sizing walk / gradient / concat form / the co-reference instrument's unit plants / G-PLANT through the SAME converter + a REAL wired replay / the sha pins of the instruments of record).
+  tests/tools through slot (SLOT_MEM=4G slot kimi ow4-tools-suite2 -- python3 -B -u -m unittest discover -s tests.tools -t .): «Ran 1287 tests in 407.850s … OK (skipped=33)» — the project's 1,262 + the law's 25.
+  the creature split runner NOT run: this bench adds NO creature code (the law's "NO new organism code"; the G-FRONT pins prove vfront.py untouched; the cover law's learners.py change carries its own verdict's suites — tests/brain/scene 397 OK, tests/tools 1287 OK, quoted from VERDICT-EAR-COVER-CAP).
+
+— the builder lane (Kimi K3, kimi-code, alone under the signed law), the dates on the job ledger.
