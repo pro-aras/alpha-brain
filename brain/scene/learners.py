@@ -27,6 +27,13 @@ the READER (RWLearner.calibrate_r / reader_distances, pooled_covariance, shrunk_
 edit: Claude (Opus 5.5, BRAIN builder A), 2026-09-28 20:24 +0400 — BRAIN-IN-BODY (docs/brain/body/INTERFACE-BRAIN-ORGAN.md §3): two ADDITIVE
 knobs with the old defaults, so genome/brain.py can read the BRAIN line's `young` and `conformal`: RWLearner.p_from (a class
 attribute = P_FROM_MEETING) read where the module constant was, and RWLearner.calibrate(..., level=CONFORMAL).
+edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 16:51 +0400 — PREREG-EAR-COVER-CAP (signed; sha256 a00d649c…):
+the ear's type cover BOUNDED in the mouth-cap's pattern — at or below COVER_FULL_BELOW the full Bron–Kerbosch runs
+VERBATIM (byte-identical to the pre-law module on every fixture/tape/life-scale vocabulary; the pre-law module loaded
+from git history is the gate's oracle), above it the DECLARED bounded form (_largest_clique_bounded) — the same greedy
+cover, the same tie-break, only the maximum-clique search replaced by a polynomially-bounded one. The bound landed from
+the measured enumeration ladder (scratch/ear-cover-cap/ladder.txt), then halved — never tuned. Ear.cover, the two
+constants and the one search added; no caller changes; nothing else moves.
 """
 from __future__ import annotations
 
@@ -144,6 +151,23 @@ class RunningStandardiser:
         return np.clip((np.atleast_2d(X) - self.mean) / self.sd(), -CLIP, CLIP)
 
 
+# ------------------------------------------------------------------------------------------------ PREREG-EAR-COVER-CAP §2.1
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 16:51 +0400 — the ear's cover BOUNDED (the mouth-cap's own
+# pattern). At or below COVER_FULL_BELOW = (W0, E0) — len(words) ≤ W0 AND exclusion edges ≤ E0 — the full Bron–Kerbosch
+# runs VERBATIM (nothing on that path changes a byte); above it the DECLARED bounded form (_largest_clique_bounded)
+# runs. The bound LANDED from the measured enumeration ladder (the law's §2.1; scratch/ear-cover-cap/ladder.txt, the
+# curve printed in the record): the largest ladder step the full enumeration completed under 60 s CPU and 1 GB was
+# synth-g68 — W=68, E=2,089 (20.57 s CPU, 583.4 MB, 2,470,253 maximal cliques; the next steps — synth-g72 and every
+# real tape cut from canvas 500 on, the knee included — broke the 1 GB bar) — then HALVED (the declared margin:
+# 68 // 2, 2,089 // 2). A module constant beside MOUTH_BUDGET's own form — never a genome line; never tuned after a
+# reading. (At W ≤ 34 every graph has ≤ C(34,2) = 561 < 1,044 edges, so the word count is the guard that binds — the
+# edge count is the law's declared second counter, printed with each call.)
+COVER_FULL_BELOW = (34, 1044)
+
+# the law's §2.4: which path ran ("full" below / "bounded" at and above), journaled with each cover call's counts.
+COVER_JOURNAL: List[Dict[str, object]] = []
+
+
 # ================================================================================================ the EAR (PREREG-S1B1 §5)
 class Ear:
     """What every arm learns from what it HEARS (PREREG-S1B1 §5), the same code for every arm: the ORDER KEY (per word, the
@@ -195,16 +219,29 @@ class Ear:
         return {"keys": {w: self.key(w) for w in sorted(self.first, key=self.first.get)},
                 "first": dict(self.first), "pairs_heard": len(self.co)}
 
-    def cover(self, words: Sequence[str]) -> List[Tuple[str, ...]]:
+    def cover(self, words: Sequence[str], full_below: Tuple[int, int] = COVER_FULL_BELOW) -> List[Tuple[str, ...]]:
         """PREREG-S1B1R §1 (a) (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 16:08 +0400): the TYPE COVER of `words` (the learner passes
         its MATURE words) from the EXCLUSION graph — an edge (w, w′) iff c(w, w′) = 0, never heard in one utterance. GREEDY:
         the LARGEST maximal clique of the remaining words becomes a type (ties → the lexicographically smallest sorted
-        tuple), its words are removed, and so on; a word left alone is its own type. Types in the order taken."""
+        tuple), its words are removed, and so on; a word left alone is its own type. Types in the order taken.
+
+        edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 16:51 +0400 — PREREG-EAR-COVER-CAP §2.2–2.4: at or below
+        `full_below` (the law's COVER_FULL_BELOW by default — the parameter exists so the tests can exercise the bounded
+        path on small graphs, MOUTH_BUDGET's own test-only form; every organism call site uses the default) the full
+        Bron–Kerbosch runs VERBATIM; above it the DECLARED bounded form (the same greedy cover, the same tie-break, only
+        the search replaced — _largest_clique_bounded). Each call appends {"words", "edges", "path"} to COVER_JOURNAL
+        (the law's §2.4). The counts come from the ear's own counters (the edge count exactly, pairwise count() lookups)."""
         rest = sorted(set(words))
+        edges = sum(1 for i in range(len(rest)) for j in range(i + 1, len(rest)) if self.count(rest[i], rest[j]) == 0)
+        full = len(rest) <= full_below[0] and edges <= full_below[1]
+        COVER_JOURNAL.append({"words": len(rest), "edges": edges, "path": "full" if full else "bounded"})
         types: List[Tuple[str, ...]] = []
         while rest:
             adj = {w: {u for u in rest if u != w and self.count(w, u) == 0} for w in rest}
-            best = min(_maximal_cliques(rest, adj), key=lambda c: (-len(c), c))
+            if full:
+                best = min(_maximal_cliques(rest, adj), key=lambda c: (-len(c), c))
+            else:
+                best = _largest_clique_bounded(rest, adj)
             types.append(best)
             rest = [w for w in rest if w not in best]
         return types
@@ -227,6 +264,26 @@ def _maximal_cliques(nodes: Sequence[str], adj: Dict[str, set]) -> List[Tuple[st
 
     bk([], sorted(nodes), [])
     return out
+
+
+def _largest_clique_bounded(nodes: Sequence[str], adj: Dict[str, set]) -> Tuple[str, ...]:
+    """PREREG-EAR-COVER-CAP §2.3 (edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 16:51 +0400) — the DECLARED
+    bounded form, the enumeration's largest-maximal-clique pick replaced by a polynomially-bounded search: for each
+    start word in sorted order, grow a clique greedily — candidates are the current members' common exclusion-
+    neighbors; take them in sorted order; add each iff it is exclusion-adjacent to EVERY current member. The largest
+    grown clique over all starts wins; ties → the lexicographically smallest sorted tuple (the enumeration's own
+    tie-break). Cost is polynomial by construction (per start ≤ V candidates, each checked against ≤ V current
+    members); the deterministic order is total (every iteration is over a sorted list — no hashing anywhere)."""
+    best: Tuple[str, ...] = ()
+    for s in sorted(nodes):
+        members = [s]
+        for u in sorted(adj[s]):                        # the current members' common exclusion-neighbors, in sorted order
+            if all(u in adj[m] for m in members):       # added iff exclusion-adjacent to EVERY current member
+                members.append(u)
+        c = tuple(sorted(members))
+        if len(c) > len(best) or (len(c) == len(best) and c < best):
+            best = c
+    return best
 
 
 # ================================================================================================ A-RW (and P-ORACLE-RW)
