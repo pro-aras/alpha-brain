@@ -1,0 +1,809 @@
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 09:31 +0400 — PREREG-OPEN-WORLD-4 §1: THE SHELF, declared BEFORE use
+#
+# THE SHELF RULE (declared, mechanical, printed before any selection used it):
+#   the shelf is the Super Simple Songs channel's own videos tab
+#   (https://www.youtube.com/@SuperSimpleSongs/videos) in the channel's OWN displayed order
+#   (newest-first), enumerated ONCE by yt-dlp 2026.08.19 (installed user-level with pip --user for this
+#   law; declared) as a flat listing (no downloads) on 2026-10-08 and frozen into this file. yt-dlp's YouTube
+#   extraction on this box needed a JavaScript runtime, installed user-level and DECLARED: deno 2.9.7
+#   (~/.local/bin/deno, yt-dlp's own default runtime) + the EJS challenge-solver script (--remote-components
+#   ejs:github, fetched once into yt-dlp's cache). (nodejs-bin 18.4.0 via pip was tried first — too old for
+#   yt-dlp's runtime interface, superseded by deno; declared, never hidden.)
+#   The channel is the early-learning-songs channel the series 'The Shape Song #1'/'#2' (V0–V2's sources)
+#   came from; both are members of this shelf (1-based positions 644 and 648 below) and, if ever reached
+#   by the sizing walk, are REUSED from their hashed files of record (records/open-world-1/src,
+#   records/open-world-2/src), never re-downloaded.
+#   Why not 'the channel's own playlist order': the playlists tab was read whole (336 lists, the
+#   channel's own order; scratch/ow4/playlists-raw.json) and NO single playlist is this shelf — the
+#   candidate early-learning lists (Teacher's Essentials; All About The Alphabet!; 10 Little... Songs!;
+#   Counting Songs; the classic/best-of lists) were probed and NONE contains 'The Shape Song #1'
+#   (TJhfl5vdxp4). The videos tab is the channel's own complete order, so it is the shelf.
+#
+# THE CAPTION RULE (the law's fallback, declared): an AUTHORED English caption track = the video's
+#   `subtitles` catalog (never `automatic_captions` — ASR is never silently used) carrying key 'en' or
+#   any 'en-*'; the chosen key is 'en' if present else the alphabetically first en-*; a video without an
+#   authored English track is SKIPPED to the next. The probe (yt-dlp -J, no download) is the only network
+#   touch a skipped candidate ever sees; a taken source is downloaded ONCE (mp4 + the caption file), both
+#   files' sha256 appended to SOURCE-SHA256.txt immediately at download.
+# THE SHORT NAME: the title lowercased, [a-z0-9]+ runs joined by '-', truncated to 40 chars; a collision
+#   would take the video id appended (never needed below).
+# THE DOWNLOAD FORMAT: -f 'best[height<=480][ext=mp4]' (the <=480p mp4, V0/V1's own form — their files are
+#   640x360 h264+aac); declared fallbacks, each printed if used: 'best[height<=480]', 'best[ext=mp4]', 'best'.
+#
+# THE FROZEN ENUMERATION (index | id | title), 776 entries, the channel's own order:
+   1 | LuJe0ad1Ygk | When We Play Hockey 🏒 | Super Simple Songs & ‪@NHL Hockey Song for Kids
+   2 | GzIObE7uR8Q | Top 20 Anniversary Hit Songs 🎶 | "20 Years of Super Simple" now on Vinyl!
+   3 | uBweptmCYZg | Our Listening Ears 👂 | Animal Sounds & Guessing Game for Kids! | Super Simple Songs
+   4 | 2QtoaV22rpY | Top 20 Circle Time Songs ⭕️ | Kids Classroom Favorites | Super Simple's 20th Anniversary!
+   5 | iHP8FGwzjJg | 🎉 Everybody Celebrate 🎉 | Best Celebration Song for Kids | 20 Years of Super Simple Songs!
+   6 | LLgTFZP3IQQ | Top 20 Back To School Songs | 🍎 📚 Learn and Sing ABCs + More! | Super Simple’s 20th Anniversary!
+   7 | YaFSwBg1qvg | Put on Your Shoes | Featuring Tobee and the Super Simple Puppets! | Super Simple Songs
+   8 | BG8HLIvuK24 | Top 20 Counting Songs | Numbers Practice for Preschool + Up | 20th Anniversary of Super Simple Songs
+   9 | -HOQGg7uuQQ | Counting Up To 20 | Sea Animals Kids Math Song with @NoodleAndPals | Super Simple Songs
+  10 | jZnBNf0GJyU | Top 20 Book Songs 📚 | Super Simple’s 20th Anniversary! | Let's Read!
+  11 | wtX9hMdLuew | I'm Going On A Trip | 🗺️ 🎒 Pack your bag for your adventure! | Super Simple Songs
+  12 | q1DinydBRNE | Top 20 Summer Songs 🌞 | Best of Super Simple Hits of 2026!
+  13 | hDqWTltrGJ8 | Shapes I See At The Beach 🏖️ | Oval, Star, Rectangle | Super Simple Songs
+  14 | N8gOM-A3cUw | Top 20 Active Songs! | Super Simple’s 20th Anniversary! | Let's Move!
+  15 | CXb9llX_LoU | Sports! | Kids Song | Song of Summer ⚽️ | Super Simple Songs
+  16 | L1C9NJpQMRk | Top 20 Food Songs 🍕| Celebrating 20 Years of Kids Music With Super Simple Songs!
+  17 | DDjOLRNby20 | Fruit Is Yummy | High Contrast Kids Video 🥝🥭🍍 | Super Simple Songs
+  18 | _nfCulGTBvM | Top 20 Healthy Kids Routines Songs 🧼🪥 | Super Simple’s 20th Anniversary! | Super Simple Songs
+  19 | tjT_nFtKTas | Healthy Eating Song for Kids | I Love Eating Vegetables 🥕 | Bumble Nums & Super Simple Songs
+  20 | 8msljf_aMDs | Top 20 Family Songs | Super Simple’s 20th Anniversary! | Super Simple Songs
+  21 | ecm9HEFcfdQ | The Family Tree 🌳 | Learn & Sing Family Words! | Super Simple Songs
+  22 | MC7yXLjtmiU | Top 20 Underwater Songs 🌊 | Super Simple’s 20th Anniversary! | Splash Around!
+  23 | j9PpVDuoVAo | I’m a Baby Fish 🐟 | Sing Along Under the Sea with the Finny Babies! | Super Simple Songs
+  24 | qLlnJuaza5A | Top 20 Nature Songs | 🌳 Super Simple’s 20th anniversary collection | Super Simple Songs
+  25 | PmpJzVCIisc | There's An Animal That I See | Explore and Discover Animals! | Super Simple Songs
+  26 | lryBhooR8gE | Lofi Lullaby Medley | EXTENDED VERSION | 20 Minute Kids Bedtime Routine | Super Simple Songs
+  27 | hSdG4A-pUro | Top 20 Duck Songs | This mix really flaps! | Kids Songs | Super Simple's 20th Anniversary!
+  28 | NcE4XUUXDhU | 20 Little Ducks | Quack! 🦆 Preschool Spring Counting Song | Super Simple Songs
+  29 | CbBsx-dCI88 | Top 20 Nature Songs! | Toddler Spring Season Fun at Preschool 🌷 | Super Simple’s 20th anniversary
+  30 | k765VI7gWx0 | Hunting For Eggs 🐣 | Fun Easter Song for Toddlers & Preschoolers | Super Simple Songs
+  31 | ecVQvgnKDug | Top 20 Animal Songs 🐻 | Quack along to Super Simple Songs 20th Anniversary 🎉
+  32 | pZ7H3XuEFkQ | Where Is The Cat? 🐱 | Peekaboo! | Practice Prepositions! | Super Simple Songs
+  33 | l3Wfm8zRs3g | Top 20 Farm Songs! | Moo! 🐮 Quack! 🦆 Neigh! 🐴 | Super Simple’s 20th anniversary | Super Simple Songs
+  34 | 9FcCV286-gA | The Animals On The Farm (Remake) | Make Animal Sounds! Quack! | Super Simple Songs
+  35 | TR1bXXQVKtY | Top 20 Feelings Songs | ❤️ Best Toddler Songs About Emotions | Super Simple Songs 20th Anniversary 🎉
+  36 | l7QHIxqi6kM | I Love My Pet 🐾 | Celebrate Cute Animals! | Super Simple Songs
+  37 | WQtbFDPOdT8 | Super Simple Lullaby Medley | Relaxing Lofi Music 😴 & Sensory Visuals | Super Simple Songs
+  38 | j6_CZXNAmAw | I Love My Garbage Truck 🚛 | Favorite Toy Song! | Super Simple Songs
+  39 | JegZYWlaq8w | Top 20 Songs! | Best Toddler Songs & Fan Favorite Hits! | Super Simple Songs 20th Anniversary 🎉
+  40 | KuMdgPu4HEI | Best of 2025! ⭐️ | Wrapped Fan Favorite Songs of the Year! | Super Simple Songs
+  41 | tn8ubczZpAo | Let’s Go Caroling + More | 1 Hour | Sing Christmas Songs with Super Simple this Season!
+  42 | aWAOqzudtSM | Let's Go Caroling | Sing along to your favorite Christmas songs! | Super Simple Songs
+  43 | C1yk5wTwPsY | Monster Party featuring Sesame Street + More | Kids Halloween Hits! | Super Simple Songs
+  44 | W0ubdDYJRmg | Sesame Street & Super Simple Songs sing Monster Party | Kids Halloween Song
+  45 | 0DqkEfKXT5Y | Mr. Blackboard | Back to School Supplies song! | Super Simple Songs
+  46 | SLVT8bWayY0 | Do You Have A Crayon? + More | Educational Kids Songs | Super Simple Songs
+  47 | dbklZrO5H78 | Do You Have A Crayon? | School Supplies Song | Super Simple Songs
+  48 | IjOq5fAi4VM | My Classroom + More | Back To School with Super Simple Songs!
+  49 | AKnUdOnsMWs | My Classroom |  🍎 Back to School Anthem for Preschool | Super Simple Songs
+  50 | lkLt8CYqESQ | Can You Please Help Me? + More | Kids Routine and Clean Up Songs | Super Simple Songs
+  51 | OjmWon9KebI | Can You Please Help Me? | Review Colors, Toys and Family Members | Super Simple Songs
+  52 | 806tA-GZWwE | If You Like Pasta + More | Bumble Nums + Kids Songs & Nursery Rhymes | Super Simple Songs
+  53 | UXt2bNp77u0 | If You Like Pasta with @BumbleNums  | Food Song for Kids | Super Simple Songs
+  54 | 3r9Lk2wWqyc | Clara The Cow + More | 1 Hour of Fun with Super Simple Songs!
+  55 | 6-Y-q5eql5o | Clara The Cow | Silly Animal Song for Kids! | Super Simple Songs
+  56 | Uw0s_LtcH3k | What’s Your Name? + More | Sesame Street & Super Simple Songs Together! | 1 Hour of Kids Songs
+  57 | BM7Cg905Wo8 | Sesame Street & Super Simple Songs Sing What's Your Name? | Kids Song | Let's Be Friends!
+  58 | Qow3qvEWFpE | When We Go Camping + More | Kids Road Trip Songs | Super Simple Songs
+  59 | 9PAQzsYmCKU | When We Go Camping 🏕️ | Kids Camp Song for Summer | Super Simple Songs
+  60 | vnJUD6CHsUw | This Is My Face + More | Nursery Rhymes & Sweet Songs for Playtime | Super Simple Songs
+  61 | 8ChQVaEAKsk | This Is My Face | Parts Of The Face Song! | Super Simple Songs
+  62 | CoiMHrApkg0 | I Love My Family + More | Sing Along Kids Songs! | Super Simple Songs
+  63 | AIgJJV6-stM | I Love My Family ❤️ | Beautiful Song for Families and Friends | Super Simple Songs
+  64 | 9wj-d1oP0NY | Let’s Count with Bugs! | The Creepy Crawly Compilation | Super Simple Songs
+  65 | DX48LXcG0bk | I'm a Great Big Spider | Super Silly Spider Song! 🕸️ | Super Simple Songs
+  66 | IQvghHaUcqE | Baby Elephant + More | 1 Hour of Jumbo Kids Songs | Super Simple Songs
+  67 | 3zm5JMGIsRU | Baby Elephant 🐘 | Get Up And Move Song for Kids! | Super Simple Songs
+  68 | lfb9CX5vf-4 | If I Were A Duck + More | Sweet and Simple Kids Songs for Spring! | Super Simple Songs
+  69 | uZrFDgO0sMQ | If I Were a Duck | Animal Sounds | Quack! Moo! Ribbit! | Super Simple Songs
+  70 | 5kK5M2yFbIc | Leapfrog + More | Celebrate Spring | Ducks, Frogs, And More Animals | Super Simple Songs
+  71 | h42mCV2utyk | Leapfrog | Kids Froggy Friendship Song 🐸 | Super Simple Songs
+  72 | MCronBH3E58 | Doctor Doctor + More | Healthy Kids Growing Strong! | Super Simple Songs
+  73 | 0W0zEJ9uR2U | Doctor Doctor Song | Feel Better Soon with Rhymington Square | Super Simple Songs
+  74 | vyyllg6fx1I | Rock-A-Bye Little One + More | Bedtime Songs for A Good Night’s Sleep | Super Simple Songs
+  75 | 1jX8XyYvtWs | Rock-A-Bye Little One | Baby Lullaby for Bedtime 😴 | Super Simple Songs
+  76 | Tz1V3E-OiC4 | Kids Songs That Go 🚒 | The BIG Car Collection! | Super Simple Songs
+  77 | B1u-ylQR6Fo | Vroom Vroom | Kids Vehicles Rock Song! | Super Simple Songs
+  78 | GZp_TrtyFH8 | The Train Song + More | Best Preschool Nursery Rhymes And Learning Songs | Super Simple Songs
+  79 | DO41xyuo1MM | The Train Song | Chugga Chugga Choo Choo | Super Simple Songs
+  80 | KGhWfzjcdRM | Best of 2024 ⭐️ | Top Kids Songs from the Super Simple Universe! | Super Simple Songs
+  81 | eKj6LFl4mLo | 1 Hour of Christmas Songs for Kids | Candy Cane Tree And More Top Hits | Super Simple Songs
+  82 | T4-StWTYK7E | Candy Cane Tree | Original Kids Christmas Song | Super Simple Songs
+  83 | Rj6zijnotbM | Peekaboo Achoo + More | 1 Hour of Family Music for The Holidays | Super Simple Songs
+  84 | EifnWKPSwBE | Peekaboo Achoo! | Fun Peekaboo Game | Super Simple Songs
+  85 | XpOiIEa7qok | The People In My Family + More | Educational Videos for Kids | Super Simple Songs
+  86 | yDua9ms9_eg | The People In My Family | Mother Father Sister Brother and more! | Super Simple Songs
+  87 | aI_-plTnkfw | I Like To Draw + More | Children Educational Videos | Super Simple Songs
+  88 | AlB6ZNqykXU | I Like To Draw | Colors And Shapes Song | Super Simple Songs
+  89 | 9kFMkez6hmY | Best of Spooky Season 2024! | Halloween Kids Classics | Super Simple Songs
+  90 | 6TJQMNKDPfM | What Will You Be For Halloween? | Kids Halloween Costume Song | Super Simple Songs
+  91 | R8SUrn2MRaU | 3+ Hours JUMBO Compilation! | Stomp! And More Kids Songs | Super Simple Songs
+  92 | mOZiy3EnH8Y | Toodly Doodly Boo | Halloween Song for Kids | Super Simple Songs
+  93 | xt3lo3e_rYI | 5 Spotted Dogs | Cats And Dogs + More! | Super Simple Songs
+  94 | QrHO-43Ibo0 | Monster Party Extended Dance Party Remix! | 10+ Minutes of Halloween Fun! | Super Simple Songs
+  95 | ur033aos7is | I Have A Loose Tooth + More | Daily Clean Routines Songs | Super Simple Songs
+  96 | o44zT2S0SWs | I Have A Loose Tooth 🦷 | Kids Songs | Super Simple Songs
+  97 | P0C1_bOhPV4 | 🌈 Colorful Compilation | Get Ready For Back To School With Super Simple Songs | 1 Hour of Music
+  98 | zQ5bQ6tjl_M | Stomp! | Count To Five Preschool Song! | Super Simple Songs
+  99 | -5eV4TtlDSo | Clean Up With Noodle & Pals for 15 minutes 🔁 | Super Simple Songs
+ 100 | eREwH764WGM | Mixing Colors | Art Song for Kids | Super Simple Songs
+ 101 | YPkmWixevhI | Hey-O We Want To Play-O + More | Kids Songs | Super Simple Songs
+ 102 | f9vIk_DvljU | Hey-O We Want To Play-O | Kids Sports And Movement Song | Super Simple Songs
+ 103 | 0Losyoi_t84 | Ducks! Ducks! Ducks! 🦆 | Quacky Kids Songs | Super Simple Songs
+ 104 | iH1ObZVqtsA | The Ducks Go Waddling | Count Up To Ten | Super Simple Songs
+ 105 | bMsP3mtHzNw | The Crabs Go Crawling + More | Fun Summer Songs | Super Simple Songs
+ 106 | HR5Gckafp_o | The Crabs Go Crawling 🦀 | @FinnyTheShark Counting Song | Super Simple Songs
+ 107 | E6_u-8bGzS4 | Friendship Songs | Top Songs for Tots! | Super Simple Songs
+ 108 | _djvsC6ekTY | Five Spotted Dogs | Kids Counting Song | Super Simple Songs
+ 109 | uWv70ihODgI | Count & Sing with Super Simple! | Preschool Counting Songs | Super Simple Songs
+ 110 | RIJ4MTjQfFo | Best Bedtime Songs 😴 | Lullabies for Babies and Toddlers | Super Simple Songs
+ 111 | 7p38bHv7Zxc | Let's Take Turns | Play Together Song for Kids With @NoodleAndPals  | Super Simple Songs
+ 112 | XZqzQj03F6E | Go! Go! Go! with @SuperSimpleSongs  | Kids Road Trip Songs | Super Simple Songs
+ 113 | 9UasekNr8KI | The Wheels On The Bus | @SuperSimpleSongs Nursery Rhymes & Kids Songs | Super Simple Songs
+ 114 | CEFL-4weVsI | Sunny Day (Come And Play With Me) | Weather Song for Kids | Super Simple Songs
+ 115 | ODutopYPut8 | Happy Mother's Day from Super Simple ❤️ | 30 Minutes of Kids Songs | Super Simple Songs
+ 116 | 7SxqpsDI2ho | Little Birdie | Morning Music For Kids | Super Simple Songs
+ 117 | 3RdIVjiszLw | Celebrate International Dance Day With Super Simple And YouTube Kids! #internationaldanceday
+ 118 | K53J44ioDxI | Good Morning It's Such A Beautiful Day | Have A Great Day | Happy Song | Super Simple Songs
+ 119 | GbDiJcYYO28 | Lullaby Forest | A Twinkle Twinkle Bedtime Movie | Super Simple Songs
+ 120 | EO1GV4qUxgE | 8 Little Planets | Counting Song With The Bumble Nums! | Super Simple Songs
+ 121 | 2xk8eO1m_eM | The Baby In The Bath | The Big Compilation for Preschool | Super Simple Songs
+ 122 | HRWduGnuH-4 | Walking In The Jungle | Get Outside With Noodle & Pals | Super Simple Songs
+ 123 | YEmFhRK-dTg | I Love My Garbage Truck | Vehicles Songs For Kids! | Super Simple Songs
+ 124 | n0wXoNItr08 | Pop the Bubbles + 13 Fun Activity Songs | Kids Songs | Super Simple Songs
+ 125 | w2DZA3mfAUU | ABC Hop | Hop Along Alphabet Songs For Kids! | Super Simple Songs
+ 126 | haWRPgqDKn0 | 8 Little Planets | STEM Counting Song for Kids | Super Simple Songs
+ 127 | fwouqMt8Eds | Counting Up To 20 + More | 1 Hour Kids Songs Compilation | Super Simple Songs
+ 128 | KQkqDGmA-jc | Best of 2023! | Kids Music | Super Simple Songs
+ 129 | 7xdUgzQvTKY | Merry Christmas from Super Simple! | Kids Songs | Super Simple Songs
+ 130 | AvCcpY3UBCM | C-H-R-I-S-T-M-A-S | Preschool Holiday Song | Super Simple Songs
+ 131 | dflOyBPPuu0 | We're Going To The Reindeer Games | Kids Christmas With @RhymingtonSquare  | Super Simple Songs
+ 132 | tmHrUZsZ2Bo | Christmas Is Almost Here | Kids Holiday Music | Super Simple Songs
+ 133 | KZ6cxq0opJE | Peekaboo Thank You + More | Kids Songs | Super Simple Songs
+ 134 | aGaJ4CryS7g | Super Simple Thank You + More | Kids Songs | Super Simple Songs
+ 135 | hwuu1chu1Nc | Super Simple Thank You | Kids Music | Super Simple Songs
+ 136 | 7Kw38BHw33U | The Creepy Crawly Spider + More | Kids Halloween Songs | Super Simple Songs
+ 137 | rJC-DcTrcxE | I Spy + More | Best of Halloween | Super Simple Songs
+ 138 | Jg9ciJZK7cw | We're Going To The Pumpkin Patch + More | Kids Halloween Music | Super Simple Songs
+ 139 | p3Z2yf8Z2Z8 | I Spy | Kids Halloween Music | Super Simple Songs
+ 140 | k8kuj-IVx7w | Super Spooky Halloween Storm⚡️| Kids Halloween Music | Super Simple Songs
+ 141 | U9FmaEE4aSU | We're Going To The Pumpkin Patch | Kids Songs | Super Simple Songs
+ 142 | -5lF306JuYg | This Is The Way + More | Kids Nursery Rhymes | Super Simple Songs
+ 143 | S84fcGdEULk | Counting Up To 20 | Count Along With The Roundabouts! | Super Simple Songs
+ 144 | zG_ve_VZW_U | Down On The Plain + More | Kids Songs | Super Simple Songs
+ 145 | kH9LjP8OBM8 | Down On The Plain | Kids Cowboy Song | Super Simple Songs
+ 146 | CNVCL0LH8KQ | Adding Up To 10 + More | Kids Songs | Super Simple Songs
+ 147 | vR4pVGNisZA | Adding Up To 10 | Bumble Nums Counting Song! | Super Simple Songs
+ 148 | JBhNqFHv5U8 | Let's Go To The Beach + More | Kids Songs | Super Simple Songs
+ 149 | sK8T8gbYIfA | Let's Go To The Beach | Summer Fun For Kids | Super Simple Songs
+ 150 | 3stxVFei6PE | Finny The Shark Week! | Kids Songs | Super Simple Songs
+ 151 | H5uQuQ06SVM | Toodly Doodly Doo 2 | Kids Songs | Super Simple Songs
+ 152 | Wt_NVjv3x8A | Caitie's Classroom Songs and Sing Alongs | Preschool Music | Super Simple Songs
+ 153 | k7B5R6uYsYk | Can You Imagine | Kids Songs | Super Simple Songs
+ 154 | 1H45b7jFyNM | Splash! Ducks, Fish, Frogs, Sharks, and More! Water Songs | Kids Songs | Super Simple Songs
+ 155 | GbdEhhxyBo4 | Good Night Sleep Tight | Lullaby for Kids | Super Simple Songs
+ 156 | HF5vGPU4vUo | Stand Up Sit Down + More | Kids Music | Super Simple Songs
+ 157 | vmSN7TatwaM | Jack & Jill featuring The Super Simple Puppets | Kids Songs | Super Simple Songs
+ 158 | T_to0yV0WIk | Super Simple Disco + More | Kids Songs | Super Simple Songs
+ 159 | Dj4W819wIIE | Super Simple Disco | Kids Dance Song | Super Simple Songs
+ 160 | ykqtdDAjFVs | Six Little Ducks + More | Kids Music | Super Simple Songs
+ 161 | mVURQSMiYUE | Six Little Ducks | Kids Nursery Rhymes | Super Simple Songs
+ 162 | wEgH-bqBKnU | What Do You Like To Do? + More Kids Songs | @FinnyTheShark  With Super Simple Songs Characters!
+ 163 | 6PyYx255Qcg | Red Yellow Green Blue featuring The Super Simple Puppets | Kids Songs | Super Simple Songs
+ 164 | cxCbn2oPTls | Raindrops Falling + More | Kids Songs | Super Simple Songs
+ 165 | Lxd64ix4sG4 | Raindrops Falling | Kids Songs | Super Simple Songs
+ 166 | YaV4Zq0kLQU | Animal Songs For Kids! | The Farmer In The Dell and LOTS More! | Super Simple Songs
+ 167 | vcMmiR7jWQc | Days Of The Week featuring The Super Simple Puppets | Kids Songs | Super Simple Songs
+ 168 | S9yh26O8Z6w | The Hand Washing Song And More | Children's Music | Super Simple Songs
+ 169 | 8lu587o8T3c | The Hand Washing Song 🧼 | Healthy Habits Kids Song | Clean Routines for Kids | Super Simple Songs
+ 170 | iWsO7lZftiI | Keep On Swimming | And More FUN Kid Songs! | Super Simple Songs
+ 171 | mxIhlA9u89Y | My Teddy Bear | Teddy Bear Song! | Kids Music | Super Simple Songs
+ 172 | Tv-eOs4FsaU | Making A Card For My Valentine + More | Kids Songs | Super Simple Songs
+ 173 | Qs4qZwIffjI | Making A Card For My Valentine | Music For Kids | Super Simple Songs
+ 174 | R8o-1mbEPFQ | If You're Sleepy & You Know It + More | 60 Minutes Of Children's Music | Super Simple Songs
+ 175 | wDLJaMnBJ-s | If You're Sleepy And You Know It | Music For Bedtime | Super Simple Songs
+ 176 | GW84s5BglJU | Nap Time + More | Kids Music Compilation | Super Simple Songs
+ 177 | Yq6qYbwqAk8 | Nap Time | Kids Lullaby | Super Simple Sleep Routine Songs
+ 178 | h8e_dyjUpMI | It's A New Year! | Favorite Kids Music | Super Simple Songs
+ 179 | gjpgSLXCdbc | Best Kids Songs from Super Simple | Children's Music
+ 180 | dEO-AlXFJl8 | Super Simple Christmas Songs | Kids Music | Family Holiday Carols
+ 181 | F0Fe576R7C4 | Let's Make A Snowman | Kids Winter Songs | Super Simple Songs
+ 182 | dGpxkD-hh8Q | We Wish You A Merry Christmas feat. The Super Simple Puppets | Kids Christmas | Super Simple Songs
+ 183 | FODafib0ntI | Gingerbread House | Kids Songs | Super Simple Songs
+ 184 | QVUcllKglfk | S-A-N-T-A | ft. the Super Simple Puppets | Kids Christmas Music | Super Simple Songs
+ 185 | VvHhQBelGZE | The Great Christmas Tree Hunt | Kids Songs | Super Simple Songs
+ 186 | ew9a1JKSfO0 | I'm Thankful | Kids Songs | Super Simple Songs
+ 187 | ja-YIat4JOQ | World Children's Day Celebration with Super Simple Songs | Kids Songs
+ 188 | fBoRMe38uAE | Who Took The Candy? With The Super Simple Puppets! | Kids Halloween Songs | Super Simple Songs
+ 189 | j_-t5_c_B8w | ABC Boo | Kids Halloween Songs | Super Simple Songs
+ 190 | ir5cD49qRww | Monster Party + More Kids Halloween Songs! | Super Simple Songs
+ 191 | 4fLTro4RwM4 | Monster Party | Kids Halloween Songs | Super Simple Songs
+ 192 | 0m73sAV-I2c | The Fish Go Swimming & More Kids Songs | Ocean Songs With Finny The Shark | Super Simple Songs
+ 193 | 6wBdjLMM7Ns | The Creepy Crawly Spider | The Itsy Bitsy Spider Halloween Song | Super Simple Songs
+ 194 | AmNyA9ovXw0 | The Alphabet Chant With The Super Simple Puppets! | Kids Songs | Super Simple Songs
+ 195 | AT8qLCmseuE | This Is The Way We Make Friends | Kids Songs | Super Simple Songs
+ 196 | HhixmtAIwQs | Humpty Dumpty With Puppets! | Classic Nursery Rhymes | Super Simple Songs
+ 197 | dtfXakTi9II | 500 Ducks + More Kids Counting Songs | Kids Songs | Super Simple Songs
+ 198 | c-v-7JRisLA | Happy Birthday | Kids Songs | Super Simple Songs
+ 199 | d1N94VxqZPM | Crawl Like a Caterpillar & More Outdoor Camping Songs for Kids! | Kids Songs | Super Simple Songs
+ 200 | H9gu4brdC8k | Take Me Out To The Ball Game | Baseball Song | Super Simple Songs
+ 201 | G9mlcKj2HFA | Mr. Golden Sun with Finny The Shark | 1 Hour Under The Sea Compilation | Super Simple Songs
+ 202 | 6VklRp158A4 | 500 Ducks | Kids Songs | Super Simple Songs
+ 203 | m-fXX-6DylU | Super Simple Summertime Songs! | Kids Songs | Super Simple Songs
+ 204 | oZa415bNvSA | Peanut Butter & Jelly featuring The Super Simple Puppets | Kids Songs | Super Simple Songs
+ 205 | kSNOF7vNplM | There's A Monster In My Tummy And More Kids Songs | Super Simple Songs
+ 206 | wE0qcTPGCVs | We're Going On A Rocket Ship | Kids Space Travel Song | Super Simple Songs
+ 207 | 8VCpa4blanQ | Five Little Speckled Frogs featuring Frog Puppets! | Kids Song | Super Simple Songs
+ 208 | DW92lXc10cQ | Picked A Strawberry🍓 |  Kids Counting Song | Super Simple Songs
+ 209 | f1WN-qxmpOA | Pink Purple Orange Brown With The Super Simple Puppets | Kids Song | Super Simple Songs
+ 210 | XzCXA8H-qfg | Happy Mother's Day! Special Kids Songs for Mother's Day from Super Simple Songs
+ 211 | VsfO__0_wsM | Celebrate Earth Day with Super Simple Songs! | Kid Songs to Celebrate Nature | Nursery Rhymes
+ 212 | C_Sc5ZjdfFI | The Seasons Song | Kids Songs | Super Simple Songs
+ 213 | _ify35SJcrI | Healthy Habits! Kids Songs to Help Build Daily Routines from Super Simple Songs
+ 214 | xIfPQJidQHY | Are You Hungry? | The Super Simple Puppets | Kids Healthy Food Song | Super Simple Songs
+ 215 | KgCjQBIZ-BM | First We Wash Our Hands | Kids Songs | Super Simple Songs
+ 216 | 04KMI21kFnc | If You're Happy And You Know It Spin Around | Kids Songs | Super Simple Songs
+ 217 | 9vg658ORVrc | Here You Are, Thank You + More Songs for Kids | Super Simple Songs
+ 218 | ij_eHTvhIlE | Beddy-Bye Butterfly 🦋 | Lullaby for Bedtime | Super Simple Songs
+ 219 | rrWZhQSb6O8 | Everything Is Going To Be Alright And More Songs for Kids | 75 Minutes of Songs | Super Simple Songs
+ 220 | XorFEWPieMk | Best of Super Simple Songs 2021 | Kids Songs | Super Simple Songs
+ 221 | 9iLcWuxZlQ4 | Milk & Cookies And More! | 45 Minutes Kids Christmas Music | Super Simple Songs
+ 222 | 4NdCC6l1X30 | Let's Decorate Our Christmas Tree | Super Simple Songs
+ 223 | iDVJZlr3LM0 | Teddy Bear, Teddy Bear | Kids Songs | Super Simple Songs
+ 224 | CeRtDDXu2RM | Milk & Cookies | Kids Songs | Super Simple Songs
+ 225 | h3C47MHwZXI | Here You Are, Thank You | Kids Songs | Super Simple Songs
+ 226 | yfLi1w3un98 | Counting Bananas featuring the Super Simple Puppets | Kids Counting Song | Super Simple Songs
+ 227 | y0G6yTVCs3s | Let's Decorate The House For Halloween + More Kids Songs
+ 228 | JC29ZvTkBT0 | There's A Monster In My Tummy | Super Simple Songs
+ 229 | im8in5pIqqM | Let's Decorate The House For Halloween | Super Simple Songs
+ 230 | 5zXtxtrGKEw | Six Little Ghosts | + More Halloween Songs for Kids | Super Simple Songs
+ 231 | SZLXLjKHb1M | If I Were A Ghost | Kids Hallowen Song | Super Simple Songs
+ 232 | vcKxZLQETgE | Hush Little Baby | + More Kids Songs | Super Simple Songs
+ 233 | 1dvxuqaXcTI | Six Little Ghosts | Halloween Song for Kids | Super Simple Songs
+ 234 | zP6ZJkp5kYM | The Roly Poly Roll | + More Kids Songs | Super Simple Songs
+ 235 | 4iKQbtajlII | Five Little Chicks | + More Kids Songs | Super Simple Songs
+ 236 | f_raDpgx_3M | Hush Little Baby | Lullaby for Babies | Super Simple Songs
+ 237 | rHtq5GIIUV8 | Five Little Ghosts | + More Halloween Songs | Super Simple Songs
+ 238 | Osfoa6w605g | The Roly Poly Roll | Rock 'n Roll Kids Song! | Super Simple Songs
+ 239 | t6s1xd1xcAQ | See You Later And More Kids Songs | Super Simple Songs
+ 240 | FSZ9Wy0o4ww | Five Little Chicks | Lullaby for Kids | Super Simple Songs
+ 241 | Q8X0oLVtc2Y | Me! | featuring Foxly | Super Simple Songs
+ 242 | 2u27dNONKeE | 10 Apples On My Head And More Super FUN Kids Songs! | Super Simple Songs
+ 243 | 5rdlXji2jR0 | When I Grow Up | Kids Songs | Super Simple Songs
+ 244 | wdi9F5_-f9k | See You Later | Goodbye Song for Kids | Super Simple Songs
+ 245 | 0lS9btv3GVk | 10 Apples On My Head | Kids Songs | Super Simple Songs
+ 246 | oyJDQSnjTM4 | The Rainbow Song And More Kids Songs | Super Simple Songs
+ 247 | E_D-a2y1OuI | Where Is Thumbkin? | + More Kids Songs | Super Simple Songs
+ 248 | lca7DvrlrQo | How's The Weather? | + More Kids Songs | Super Simple Songs
+ 249 | gHdJy5aAgUA | Toodly Doodly Doo  | + More Kids Songs | Super Simple Songs
+ 250 | wceMsYSyNUQ | The Rainbow Song 🌈 | Kids Songs | Super Simple Songs
+ 251 | BcxMAA32nbM | Toodly Doodly Doo | Kids Songs | Super Simple Songs
+ 252 | e-N0De24Hms | Over The Deep Blue Sea | + More Kids Songs | Super Simple Songs
+ 253 | KBL5aXSJTlE | How's The Weather? | ft. the Super Simple Puppets | Super Simple Songs
+ 254 | CMcyPwtLD9g | This Is A Happy Face | + More Kids Songs | Super Simple Songs
+ 255 | 5aTjvHnqSFA | Ocean Songs | Kids Songs About Sea Animals & Water | Super Simple Songs
+ 256 | 55ikQLgi-9Q | As Quiet As A Mouse | + More Kids Songs | Super Simple Songs
+ 257 | lQZX1IIAnLw | This Is A Happy Face featuring Noodle & Pals | Learn Emotions! | Super Simple Songs
+ 258 | jvl01sRamYk | Learn The Months With The Months Chant! And More Kids Songs | Super Simple Songs
+ 259 | qJvkiMbjRko | As Quiet As A Mouse | Kids Songs | Super Simple Songs
+ 260 | ZX8QGC8nYBs | Red Light, Green Light with Carl's Car Wash | PLUS More Kids Songs! | Super Simple Songs
+ 261 | R_GIt4Ccorc | The Months Chant with The Super Simple Puppets | Learn The Months! | Super Simple Songs
+ 262 | YCpWaO6_-gA | The Alphabet Swing And More Kids Songs | 1 Hour of Educational Kids Songs | Super Simple Songs
+ 263 | kYKvQ5qi55Y | The Wheels On The Bus with Mr. Monkey! | And More Kids Songs | Super Simple Songs
+ 264 | AsZwvuUmHGU | Put On Your Boots | Kids Songs | Super Simple Songs
+ 265 | A5gwWI8MnC4 | Three Little Kittens | + More Nursery Rhymes & Kids Songs | Super Simple Songs
+ 266 | x7q5JVdPTng | The Alphabet Swing | ABC Song for Kids | Super Simple Songs
+ 267 | EXP1GvjiIdM | Best Kids' Songs From Super Simple Songs | Best of 2020
+ 268 | MbbxNHSnuPU | Let's Count To 100 with Finny The Shark | 40 Minutes of Kids Songs | Super Simple Songs
+ 269 | -uhOONQ3B84 | Five Little Elves | + More Christmas Songs for Kids | Super Simple Songs
+ 270 | bebLde5kcqo | Three Little Kittens | Kids Songs | Super Simple Songs
+ 271 | qDL2HBPy9uQ | Hello Reindeer, Goodbye Snowman with Noodle & Pals | Kids Christmas Song | Super Simple Songs
+ 272 | P-IfzafdJwo | The Wheels On The Bus featuring Mr. Monkey | Kids Vehicle Song | Super Simple Songs
+ 273 | WYYJ7yaL9WU | Five Little Elves | Christmas Song For Kids | Super Simple Songs
+ 274 | EAx6VZteAwQ | Me! (featuring Noodle & Pals) | + More Kids Songs | Super Simple Songs
+ 275 | a728rGeMb54 | Peekaboo, Thank You | Kids Thanksgiving Song | Super Simple Songs
+ 276 | W8iWiPeQssw | Once I Caught A Fish Alive | + More Kids Songs | Super Simple Songs
+ 277 | iyvDPW3IKP0 | Red Light, Green Light featuring Carl's Car Wash | Stop and Go | Super Simple Songs
+ 278 | nec7AMefHYQ | Hello, Trick Or Treat? | + More Halloween Songs for Kids | Super Simple Songs
+ 279 | rO7C0l4pxLE | Twinkle Twinkle Little Star And More | Bumble Nums And More Characters from Super Simple!
+ 280 | S-hD6qGaagk | Hello, Trick Or Treat? | Halloween Song for Kids | Super Simple Songs
+ 281 | n0vYwLkbef0 | Knock Knock Trick Or Treat 2 | featuring Super Simple Puppets | Halloween Song for Kids
+ 282 | ToeaHKxqKWA | Five Little Ghosts | Halloween Song for Kids | Super Simple Songs
+ 283 | rsxhDJhZ8kk | Me! | featuring Noodle & Pals | Kids Song | Super Simple Songs
+ 284 | JXBL3h5wK0I | The Wheels On The Bus | Carl's Car Wash | Kids Song | Super Simple Songs
+ 285 | qQJroIl5jWU | Everything Is Going To Be Alright | Super Simple Songs
+ 286 | BWR3DxGHLD4 | Let's Go For A Walk Outside | Kids Song | Super Simple Songs
+ 287 | VsgpUHUYuJI | Move! | Dance Song for Kids | Super Simple Songs
+ 288 | w79AosCp0I8 | Star Light, Star Bright | + More Kids Songs | Super Simple Songs
+ 289 | f8PoDBzz4I8 | Pink Purple Orange Brown 🩷💜🧡🤎 | Kids Colors Song | featuring The Bumble Nums | Super Simple Songs
+ 290 | SNeI2PMcRdA | Twinkle Twinkle Little Star | Bumble Nums Version | Super Simple Songs
+ 291 | QMAMX_fhJ9k | Finny The Shark | Play Date | Super Simple Songs
+ 292 | 4icFRz0T0wM | Pizza Party  + More | Kids Songs | Super Simple Songs
+ 293 | 921Sbp5d-_M | The Ice Cream Song | + More Kids Songs | Super Simple Songs
+ 294 | 2QkhX7R7K7U | See You Later, Alligator | Goodbye Song For Kids | Super Simple Songs
+ 295 | LNmEFt8cQ_U | Once I Caught A Fish Alive | Kids Song | Super Simple Songs
+ 296 | ZZiTNJ6QleA | My Yellow Car | Learn Colors! | Super Simple Songs
+ 297 | 0r6Bx7oTT_c | Butterfly Ladybug Bumblebee | + More Kids Songs | Super Simple Songs
+ 298 | OWip7yvXukI | Star Light, Star Bright | Kids Songs | Super Simple Songs
+ 299 | _-y-lTHrWvg | And The Green Grass Grew All Around | + More Kids Songs | Super Simple Songs
+ 300 | tIxk5NeiTck | Let's Count To 100 | ft. Finny the Shark | Super Simple Songs
+ 301 | 9xgoV6O3FC8 | Down In The Deep Blue Sea + More! | Super Simple Songs
+ 302 | KP69YPqHquY | Pizza Party | Kids Song | Super Simple Songs
+ 303 | ce5fC5wjmnE | What’s Your Favorite Flavor Of Ice Cream? | + More Kids Songs | Super Simple Songs
+ 304 | EgiQ6GliTrI | Butterfly Ladybug Bumblebee | Super Simple Songs
+ 305 | Nktg1Wjs4l4 | And The Green Grass Grew | Kids Songs | Super Simple Songs
+ 306 | z5muVY5jwd0 | Walking In The Forest | + More Kids Songs | Super Simple Songs
+ 307 | 7pMEQsk3c5Y | Down In The Deep Blue Sea | ft. Finny The Shark! | Super Simple Songs
+ 308 | vxq5TRCIOWA | Songs About Food | Kids Songs Collection | Super Simple Songs
+ 309 | aKac-OOn3Kk | Super Simple Songs featuring the Super Simple Monsters!
+ 310 | yqlbn_nI2w8 | What's Your Name? featuring The Super Simple Puppets | Greeting Song | Super Simple Songs
+ 311 | On7awTERpuI | Bedtime Routine Songs | Kids Songs | Super Simple Songs
+ 312 | BF06WTCghf0 | Peekaboo I Love You  | + More Kids Songs | Super Simple Songs
+ 313 | 9HUVt9KBVek | Pop The Bubbles | + More Kids Songs | Super Simple Songs
+ 314 | RE29EUeJAb0 | My Happy Song | + More Kids Songs | Super Simple Songs
+ 315 | GHj-C7TfgkE | I Love The Mountains | + More Kids Songs | Super Simple Songs
+ 316 | wq2g1QvVh7E | The Ants Go Marching 2 | + More Kids Songs | Super Simple Songs
+ 317 | zdTzGWSzyqE | What's This? What's That? | + More Kids Songs  | Super Simple Songs
+ 318 | oC5bq9yJ2kA | Super Simple Fireplace | Crackling Fireplace with Christmas Music | 3 Hours
+ 319 | SC6pnWEvVIg | Head Shoulders Knees And Toes | + More Kids Songs | Featuring Noodle & Pals
+ 320 | sYwRV7WHzm8 | Silent Night | Christmas Song For Kids | Super Simple Songs
+ 321 | 3h50Bnmgsbc | The Wheels On The Bus - featuring Noodle & Pals | + More Kids Songs from Super Simple Songs
+ 322 | 4YBGRGBj7_w | Jingle Bells | Christmas Song | Super Simple Songs
+ 323 | VAOOT5ZfQyU | Head Shoulders Knees And Toes | Kids Songs | Super Simple Songs
+ 324 | 4qfz6l42Pzk | At The North Pole | Down By The Bay Christmas | Christmas Song For Kids
+ 325 | chxQb4YRC2U | Are You Sleeping, Baby Bear? | Kids Songs | Super Simple Songs
+ 326 | i14agob4uYU | If You’re Happy And You Know It | + More Kids Songs | Super Simple Songs
+ 327 | zk5HGN8JXXk | Here Comes The Fire Truck | + More Kids Songs | Super Simple Songs
+ 328 | ufbOHl1mmYk | My Happy Song | featuring Noodle & Pals | Super Simple Songs
+ 329 | i8tgIVkvQ48 | The Bear Went Over The Mountain | + More Kids Songs | Super Simple Songs
+ 330 | 5CI29h-AXDM | Pop The Bubbles | Kids Songs | Super Simple Songs
+ 331 | Vq151ZdLJCg | Halloween Songs For Kids | Super Simple Songs
+ 332 | MywYIqV9-W4 | Halloween ABC Song | Kids Song | Super Simple Songs
+ 333 | kEXtSYPP_9c | This Is The Way We Trick Or Treat | featuring The Super Simple Puppets
+ 334 | CTD6jBlIEA4 | Knock Knock, Trick Or Treat? | featuring The Super Simple Puppets | Super Simple Songs
+ 335 | S0o3alfcA24 | 10 Monsters In The Bed | Kids Halloween Song | Super Simple Songs
+ 336 | dNBC8jQFgHo | Hello Hello! | featuring The Super Simple Puppets
+ 337 | mmjbF3A30eQ | I Love The Mountains | Super Simple Songs | Kids Music
+ 338 | yFrMF0ScN3Q | Line Up! | featuring Noodle & Pals | Super Simple Songs
+ 339 | 32ysrBC6B6k | Hello! | featuring The Super Simple Puppets | Super Simple Songs
+ 340 | 7h5Fm4NSuag | Introducing the Super Simple App | Kids App | English Math Letters Numbers
+ 341 | lsuqa9U3wik | Open Shut Them 4 | Kids Song featuring @RhymingtonSquare  | Super Simple Songs
+ 342 | RI6UT82cB_E | Here Comes The Fire Truck | Kids Songs | Super Simple Songs
+ 343 | KCLjdL8g-8s | The Bear Went Over The Mountain | Kids Song | Super Simple Songs
+ 344 | xbSSm_p782c | Walking In The Forest | Kids Songs | Super Simple Songs
+ 345 | uWegqqriRw0 | What’s Your Favorite Flavor Of Ice Cream? | Kids Songs | Super Simple Songs
+ 346 | dcWV933H8sU | With My Heart  | + More Kids Songs | Super Simple Songs
+ 347 | Cx7e729w4YE | Open Shut Them 3 | featuring Finny The Shark | Super Simple Songs
+ 348 | _RQFMyof650 | Sitting On The Potty | Kids Songs | Super Simple Songs
+ 349 | UxyN-HgosQ8 | Where Is Baby? | Kids Songs | Super Simple Songs
+ 350 | SpzLA-w1I8s | The More We Get Together | Kids Songs | Super Simple Songs
+ 351 | 83a7wLOTsXk | Peekaboo, I Love You | Kids Songs | Super Simple Songs
+ 352 | 494e4txpwSg | The Jellyfish | Kids Dancing Song | Super Simple Songs
+ 353 | BdrZWu2dZ4c | Driving In My Car | Vehicles Song | Super Simple Songs
+ 354 | 3ahpruY9eYM | With My Heart | Kids Songs | Super Simple Songs
+ 355 | 1vpvFx0-uyI | When The Band Comes Marching In | + More Kids Songs | Super Simple Songs
+ 356 | RuqvGiZi0qg | Head Shoulders Knees And Toes | Noodle & Pals | Super Simple Songs
+ 357 | 0ARbIcYtSIg | Six In The Bed | Kids Songs | Super Simple Songs
+ 358 | yWirdnSDsV4 | The Wheels On The Bus featuring Noodle & Pals | Super Simple Songs
+ 359 | 9IGUFTm_FaY | The Bees Go Buzzing | + More Kids Songs & Nursery Rhymes
+ 360 | 6916kVhbEZw | Skidamarink A Dink A Dink | Nursery Rhyme | Super Simple Songs
+ 361 | M6LoRZsHMSs | If You’re Happy And You Know It | Kids Songs | Super Simple Songs
+ 362 | 0z5G7OXG6MY | The Toilet Song by The Wiggles | Animation by Super Simple Songs
+ 363 | CDaUEhKQ02s | Tobee Meets The Wiggles | Sing Along With Tobee | Do The Propeller
+ 364 | zwZeJiFeSSQ | Here Is The Beehive  | + More Kids Songs | Super Simple Songs
+ 365 | hXxHonmYz6c | Open Shut Them | featuring Noodle & Pals | Super Simple Songs
+ 366 | 5qlbpMB-z_c | Santa's On His Way | Christmas Song for Kids | Super Simple Songs
+ 367 | eClGqjHz790 | If You’re Happy And You Know It Shout Hoo-ray | Kids Songs | Super Simple Songs
+ 368 | ZYgUuTbQHR4 | Santa Shark featuring Finny The Shark | Baby Shark Christmas | Super Simple Songs
+ 369 | UKNiCMrd3nU | What’s This? What’s That? | Kids Songs | Super Simple Songs
+ 370 | u0aAMvvw_co | Santa Shark | Baby Shark Christmas Song featuring Finny The Shark | Super Simple Songs
+ 371 | S0pUkqCdSH4 | Peekaboo Christmas | Kids Songs | Super Simple Songs
+ 372 | nTVVz_wdG0g | Where Is Thumbkin? | featuring Noodle & Pals | Super Simple Songs
+ 373 | QSzrgQ-pMZM | Pass The Beanbag | featuring Noodle & Pals | Super Simple Songs
+ 374 | v-BvRlsbUiU | Red Yellow Green Blue | + More Kids Songs | Super Simple Songs
+ 375 | dahOHUAzTFg | Baby Shark Songs & Dance | Kids Summer Songs | Super Simple Songs
+ 376 | YCf-PGu55Nc | Do You Like Broccoli Ice Cream? | featuring The Super Simple Puppets | Super Simple Songs
+ 377 | XXRiX8W83CA | The Ants Go Marching 2 | featuring The Bumble Nums | Super Simple Songs
+ 378 | Ql3mSTzEqHU | Down By The Spooky Bay | + More Halloween Songs for Kids | Super Simple Songs
+ 379 | tuguGv649Do | Peekaboo Halloween | Kids Songs | Super Simple Songs
+ 380 | bWUgZm_AE64 | The Bees Go Buzzing | Kids Song | Super Simple Songs
+ 381 | lCPJhybHBkA | Over The Deep Blue Sea | Kids Songs | Super Simple Songs
+ 382 | VK8t4-yzGog | Down By The Spooky Bay | Halloween Song for Kids | Super Simple Songs
+ 383 | BIgQ0UQIkqo | Peekaboo Playground | Kids Songs | Super Simple Songs
+ 384 | mQSoYgaIK1M | What's Your Favorite Color? + More | Kids Songs for Preschool | Super Simple Songs
+ 385 | 1h6F-YngTi0 | When The Band Comes Marching In | Kids Songs | Super Simple Songs
+ 386 | V5Bs9xydba0 | Here Is The Beehive | Count To Five | Super Simple Songs
+ 387 | aMTIm-D1l54 | Red Yellow Green Blue | featuring The Bumble Nums | Super Simple Songs
+ 388 | xoyEDrMDirA | Red Light, Green Light | Freeze Dance and Stop Song by Super Simple Songs
+ 389 | S4ZAg3CxJiQ | Who Took The Cookie? (On The Farm) | + More Kids Songs | Super Simple Songs
+ 390 | TlRHqE6VodQ | 10 Little Dinosaurs 2 | Kids Songs | Super Simple Songs
+ 391 | NZUpZF1pQOg | Here We Go Looby Loo | + More Kids Songs | Super Simple Songs
+ 392 | v1YjJmMvnOw | This Is The Way We Go To Bed | Kids Songs | Super Simple Songs
+ 393 | hGakU7jeWGA | Open Shut Them 2 | + More Kids Songs | Super Simple Songs
+ 394 | MdYsH1GgQRQ | 10 Little Dinosaurs 2 | + More  Kids Songs | Super Simple Songs
+ 395 | 449gEG7d00c | Theres A Hole In The Bottom Of The Sea | + More Kids Songs | Super Simple Songs
+ 396 | iZ0brwNPj1g | Kids Songs With Noodle & Pals | Super Simple Songs
+ 397 | Cmd5Gs5FKuc | Down By The Bay #3 | + More Kids Songs | Super Simple Songs
+ 398 | a-npmDGK1Dc | Red Light, Green Light | + More Kids Songs | Super Simple Songs
+ 399 | D7MhgeV9yA8 | Old MacDonald Had A Farm | + More Kids Songs | Super Simple Songs
+ 400 | zxIpA5nF_LY | What's Your Favorite Color? | Kids Songs | Super Simple Songs
+ 401 | Pcwb_km9aaM | Let's Take The Subway | + More Kids Songs | Super Simple Songs
+ 402 | b2yEUHSe9g0 | This Is The Way We Go To Bed | + More Kids Songs | Super Simple Songs
+ 403 | CfuGGkis_u8 | 10 Little Bicycles | + More Kids Songs | Super Simple Songs
+ 404 | Vu0-98fgnRo | 🍪 Who Took The Cookie? (Farm Animals Version) | Kids Songs | Super Simple Songs
+ 405 | 9x4zQ9T2Zhw | Are You Hungry?  | + More Kids Songs | Super Simple Songs
+ 406 | EHaoEKcuX0g | Here We Go Looby Loo | Nursery Rhymes | Super Simple Songs
+ 407 | V8iNAq4b7po | This Is The Way We Get Dressed | + More Kids Songs | Super Simple Songs
+ 408 | DzA1VQL1oME | Open Shut Them #2 | Kids Songs | Super Simple Songs
+ 409 | u0umMnrsq7Y | 10 Little Buses | + More Kids Songs | Super Simple Songs
+ 410 | WENFvk0xixo | What's Your Name? | + More Kids Songs | Super Simple Songs
+ 411 | UK6UNRnbfnw | There's A Hole In The Bottom Of The Sea | Kids Songs | Super Simple Songs
+ 412 | jWUx3s_kxv0 | Twinkle Twinkle Little Star (Extended Mix - 30 Mins!) | Nursery Rhyme Lullaby  | Super Simple Songs
+ 413 | Tm__D2tDJLk | Down By The Bay #3 | Kids Songs | Super Simple Songs
+ 414 | 1fb98Jvjt-A | The Farmer In The Dell | + More Nursery Rhymes and Kids Songs | Super Simple Songs
+ 415 | _6HzoUcx3eo | Old MacDonald Had A Farm | Nursery Rhymes | Super Simple Songs
+ 416 | _3x0T3sHqPU | Kids' Song Collection #2 | Sing Along With Tobee | Super Simple Songs
+ 417 | o6BsA84i-fQ | Take Me Out To The Ball Game | + More Kids Songs | Super Simple Songs
+ 418 | re3gXNTtwig | Hot Cross Buns | Nursery Rhymes | Super Simple Songs
+ 419 | dXoxuEkoZTs | 10 Little Bicycles | Kids Songs | Super Simple Songs
+ 420 | 6MjaAbjOksQ | Follow Me | + More Kids Songs | Super Simple Songs
+ 421 | BpkY2FKll_w | Let's Take The Subway | Sing Along With Tobee | Kids Songs
+ 422 | CgYj3sNDi1w | Down By The Bay #2 | + More Kids Songs | Super Simple Songs
+ 423 | zMdq9jSaNLg | What's Your Name? | featuring Noodle & Pals | Super Simple Songs
+ 424 | lf5lYxE0c5c | 10 Little Fishies | + More Kids Songs | Super Simple Songs
+ 425 | ykTR0uFGwE0 | Are You Hungry? | Kids Songs | Super Simple Songs
+ 426 | 9RXB6NvkxUo | What Do You Like To Do | + More Kids Songs | Super Simple Songs
+ 427 | 1GDFa-nEzlg | This Is The Way We Get Dressed | Kids Songs | Super Simple Songs
+ 428 | nPJdrJTrxC8 | I Can't Remember The Words To This Song | + More Kids Songs | Super Simple Songs
+ 429 | g64qCr3Y_QU | 10 Little Buses | Kids Songs | Super Simple Songs
+ 430 | 1n9Hdk-UvRM | Kids' Song Collection #1 | Sing Along With Tobee | Super Simple Songs
+ 431 | E-krsNziXEw | The Farmer In The Dell | Kids Songs | Super Simple Songs
+ 432 | 7jS9ObvOrZQ | Sweet Dreams (Goodnight Song) (Extended Mix - 31 Mins) | Kids Songs | Super Simple Songs
+ 433 | hW2DDGX7Tcc | Follow Me | Kids Songs | Super Simple Songs
+ 434 | atTgTz6UKa4 | Down By The Bay #2 | Kids Songs | Super Simple Songs
+ 435 | n8PyUO2PL4A | The Alphabet Is So Much Fun | + More Kids Songs | Super Simple Songs
+ 436 | dg0cQtVisLw | 10 Little Fishies - Featuring Finny The Shark! | Kids Songs | Super Simple Songs
+ 437 | -TVn7feLIQ0 | Our Favorite Weather Songs | Kids Songs | Super Simple Songs
+ 438 | nxdKntlx21o | 10 Little Tractors | + More Kids Songs | Super Simple Songs
+ 439 | 8y7lWTd-DGQ | Pat A Cake | + More Kids Songs | Super Simple Songs
+ 440 | grhi8MLM1i8 | Our Favorite Christmas Songs for Kids | Super Simple Songs
+ 441 | B1zlTJaLX28 | 12 Days Of Christmas | + More Kids Songs | Super Simple Songs
+ 442 | -M7enVGkpKc | Jingle Bells (Extended Mix - 30 Mins!) | Kids Songs | Super Simple Songs
+ 443 | 3ABERaj8hmw | Up On The Housetop | + More Kids Songs | Super Simple Songs
+ 444 | xrMtjX10-LI | Wind The Bobbin Up | + More Kids Songs | Super Simple Songs
+ 445 | 70WLvlyPkv0 | Celebrate Christmas With Super Simple! | Christmas Videos for Children
+ 446 | QYyhDvuq8_Y | 12 Days Of Christmas | Kids Songs | Super Simple Songs
+ 447 | s2rgaLmyiFU | Up On The Housetop | Kids Songs | Super Simple Songs
+ 448 | V_lgJgBbqWE | Our Favorite Numbers Songs | Kids Songs | Super Simple Songs
+ 449 | fe5Jk7YT_JE | Peanut Butter & Jelly | + More Kids Songs | Super Simple Songs
+ 450 | gm_jm0DcNQk | Our Favorite Kids Songs About Good Habits | Super Simple Songs
+ 451 | wmy1KpoM-R8 | 10 Little Tractors | Kids Songs | Super Simple Songs
+ 452 | pDuaaEq7rk4 | Wind The Bobbin Up | Kids Songs | Super Simple Songs
+ 453 | frDB0McZYmc | Little Snowflake (Extended Mix - 30 Mins!) | Kids Songs | Super Simple Songs
+ 454 | aIspyUjAzYk | Open Shut Them #2 | Opposites Song For Kids | Sing Along With Tobee
+ 455 | 0n_J2z-ILXo | Humpty Dumpty | + More Kids Songs | Super Simple Songs
+ 456 | dIom7O1Uowg | Our Favorite Songs About Pets | Kids Songs | Super Simple Songs
+ 457 | jdg50KzCR9w | Pat-A-Cake | Kids Songs | Super Simple Songs
+ 458 | BFf0kyHoCg4 | My Teddy Bear | + More Kids Songs | Super Simple Songs
+ 459 | bYkN5Qk_C8U | Our Favorite Animals Songs For Kids | Super Simple Songs
+ 460 | edWvujH-SjQ | Rock Scissors Paper #4 | Kids Songs | Super Simple Songs
+ 461 | i_JQwhPKzdI | Our Favorite Food Songs For Kids! | Super Simple Songs
+ 462 | xqHpvx4UYQA | Five Little Monsters Jumping On The Bed | + More Kids Songs | Super Simple Songs
+ 463 | WL5iQP3MN-Q | Baby Shark Halloween | + More Kids Songs for Halloween | Super Simple Songs
+ 464 | wOVgRdravlo | A Sailor Went to Sea (Extended Mix - 33 Mins!) | Kids Songs | Super Simple Songs
+ 465 | B0LscFd2vRk | Take Me Out To The Ball Game | Kids Songs | Super Simple Songs
+ 466 | YP_T2Kb3xCk | Jack & Jill | + More Kids Songs | Super Simple Songs
+ 467 | VNzRAjbs204 | Our Favorite Bedtime Songs | Twinkle Twinkle Little Star, Sweet Dreams, & Little Snowflake
+ 468 | Pm-wT01kDT4 | Baby Shark Halloween | featuring Finny The Shark | Super Simple Songs
+ 469 | kJsQpFX5uM4 | Five Little Monsters Jumping On The Bed | Kids Halloween Song | Super Simple Songs
+ 470 | RlG-QEwnLD8 | Baby Shark (Extended Mix - 30 Mins!) | Kids Songs | Super Simple Songs
+ 471 | lm74Gv3tA78 | 10 Little Airplanes | + More Kids Songs | Super Simple Songs
+ 472 | if5vr5s3lNw | I Can't Remember The Words To This Song | Kids Songs | Super Simple Songs
+ 473 | klDHM_sxYxs | Peanut Butter & Jelly | Kids Songs | Super Simple Songs
+ 474 | kDdg2M1_EuE | The Alphabet Is So Much Fun | Kids Songs | Super Simple Songs
+ 475 | nddRGDEKxA0 | What Do You Like To Do? | Kids Songs | Super Simple Songs
+ 476 | opiZNHQkYKQ | Are You Sleeping, Brother John? | + More Kids Songs | Super Simple Songs
+ 477 | nrv495corBc | Humpty Dumpty | Nursery Rhymes | Super Simple Songs
+ 478 | cm-6n4ChZ78 | 10 Little Sailboats | Kids Songs | Super Simple Songs
+ 479 | EFj0K38sPmA | Jack & Jill | Kids Songs | Super Simple Songs
+ 480 | -bhY6dL7pJ8 | Rock Scissors Paper #3 | + More Kids Songs | Super Simple Songs
+ 481 | nFxAiWkSePk | A Sailor Went To Sea | Kids Songs | Super Simple Songs
+ 482 | cAMbqRWqLXQ | Down By The Bay | Kids Songs | Super Simple Songs
+ 483 | VvJJeqVo3vk | I Like You | Kids Songs | Super Simple Songs
+ 484 | lvI12tC7zro | Rock Scissors Paper #3 | Kids Songs | Super Simple Songs
+ 485 | VNRNAloCb5Y | 10 Little Airplanes | Kids Songs | Count To Ten | Super Simple Songs
+ 486 | l8DAi3g_JeM | I Like You featuring Milo | + More Kids Songs | Super Simple Songs
+ 487 | 2S__fbCGwOM | The Ants Go Marching | Kids Songs | Super Simple Songs
+ 488 | DX2Er--LYmQ | A Sailor Went To Sea | + More Kids Songs | Super Simple Songs
+ 489 | vD98OvvDNEs | The Alphabet Song | Kids Songs | Super Simple Songs
+ 490 | PGWuZl32s6A | Down By The Bay + More | Kids Songs | Super Simple Songs
+ 491 | t_jBYEPvqS4 | One Little Finger from Sing Along With Tobee | + More Kids Songs | Super Simple Songs
+ 492 | fXFg5QsTcLQ | The Muffin Man | Kids Songs | Super Simple Songs
+ 493 | OacrlJurTNg | The Ants Go Marching | + More Kids Songs | Super Simple Songs
+ 494 | wCio_xVlgQ0 | Brush Your Teeth | Kids Songs |  Super Simple Songs
+ 495 | XM7Jnetdf0I | Alice The Camel | Kids Songs | Super Simple Songs
+ 496 | 4-iPFeT9cOI | The Muffin Man + More | Kids Songs | Super Simple Songs
+ 497 | YP5DDw-HX7E | Hello Songs + More | Kids Songs | Sing Along With Tobee | Super Simple Songs
+ 498 | K26y_Ca9hoc | Brush Your Teeth + More | Kids Songs | Super Simple Songs
+ 499 | 9wL26G00pQc | Peek-a-boo Song + More | Kids Songs | Super Simple Songs
+ 500 | cFwWLLbHC1g | @TreetopFamily Song Collection | Kids Songs | 16 Children's Songs | Super Simple Songs
+ 501 | A8hjmsBKM5w | Alice The Camel + More | Kids Songs | Super Simple Songs
+ 502 | DuwTW6DzObs | Goodbye, See You Soon | Goodbye Song for Kids | Treetop Family Children's Song
+ 503 | gVVfJb3IZO8 | Little Robin Redbreast + More | Nursery Rhymes & Children's Songs | Super Simple Songs
+ 504 | lVFj91Z1AfM | Peekaboo | Original Children's Song | Peek-a-boo Song for Kids | Let's play Peek A Boo!
+ 505 | 9XQSFLMpn_c | 10 Little Dinosaurs + More | Kids Songs | Super Simple Songs
+ 506 | ZMbtivZAbwI | Star Light, Star Bright | Shapes Song for Kids
+ 507 | MxJ4V72amMM | Introducing Sing Along With Tobee! | New show from Super Simple Songs!
+ 508 | LormeVxHyQ4 | Little Robin Redbreast | Kids Songs and Nursery Rhymes | Super Simple Songs
+ 509 | TjmGTbNLj6Q | 10 Little Dinosaurs | Kids Songs | Super Simple Songs
+ 510 | ooHTRqt9JeI | Wash Your Hands | Original Kids Song from Treetop Family | Super Simple Songs
+ 511 | 0iTYYPRIS74 | Join Us For Dinosaur Week!
+ 512 | r5WLXZspD1M | Apples & Bananas | Silly Song For Kids | Super Simple Songs
+ 513 | q66PesWESnQ | Simple Gifts | Original Kids Song from Treetop Family | Super Simple Songs
+ 514 | bLxgyqnTS6o | Super Simple TV | Original Kids Shows & Cartoons
+ 515 | hlzvrEfyL2Y | Mr. Golden Sun ☀️ | Kids Songs | Super Simple Songs
+ 516 | osmEqRiEMvE | Hello Reindeer + More | Preschool Holiday Songs | Super Simple Songs
+ 517 | EqEfTWx9n3c | Each Snowflake Is Special | Original Kids Song from Treetop Family | Super Simple Songs
+ 518 | GR2o6k8aPlI | Baby Shark | featuring Finny The Shark | Super Simple Songs
+ 519 | IVkMX9bZtgM | Apples & Bananas + More | Kids Songs | Super Simple Songs
+ 520 | KbrSWbuWtmc | The Ice Cream Song | Kids Songs | Super Simple Songs
+ 521 | Wc6twNQvTyw | Mr. Golden Sun | + More Kids Songs | Super Simple Songs
+ 522 | bt7-Hcy8JPs | Seven Steps + More | Kids Songs | Super Simple Songs
+ 523 | 8ljHzljQrY8 | Baby Shark - featuring @Finny The Shark  | + More Kids Songs | Super Simple Songs
+ 524 | I_qUVEUZyTU | Grandparents Are Special | Original Kids Song from Treetop Family
+ 525 | XaJSlYMFHyQ | Five Little Speckled Frogs + More | Kids Songs | Super Simple Songs
+ 526 | EE2ty34c7tI | How Many Fingers? + More | Kids Songs | Super Simple Songs
+ 527 | jnfsPan6Qo4 | Jump Up, Jump In | Original Kids Song from Treetop Family
+ 528 | TtX8yVEF0-w | Five Little Speckled Frogs | Kids Songs | Super Simple Songs
+ 529 | vbU34sHDBbg | Five Creepy Spiders | Halloween Songs + More Kids Songs | Super Simple Songs
+ 530 | LrAtBtQnvCE | Five Little Ducks + More | Kids Songs and Nursery Rhymes | Super Simple Songs
+ 531 | N_hjFaITRB8 | Who Took The Candy? | Halloween Songs + More Kids Songs | Super Simple Songs
+ 532 | Sa_zH0RXfvk | Why Do Leaves Change Color? | Original Kids Song from Treetop Family | Super Simple Songs
+ 533 | xNw1SSz18Gg | How Many Fingers? | Kids Songs | Super Simple Songs
+ 534 | Pbl4BNkAq_U | The Skeleton Dance | Halloween Song for Kids | Super Simple Songs
+ 535 | pZw9veQ76fo | Five Little Ducks | Kids Songs | Super Simple Songs
+ 536 | 8Qa6bYEmsvI | Do You Like Lasagna Milkshakes | + More Kids Songs | Super Simple Songs
+ 537 | fF3L482k9xU | Super Simple Mural Magic!
+ 538 | gjfxJm7cFGs | 10 YEARS ON YOUTUBE!
+ 539 | KdHViSpdGTk | A Surprise For You | Thank You Song | Kids Song from Treetop Family | Super Simple Songs
+ 540 | dxVpuKk-BjE | A Surprise For You | Treetop Family Ep.8 | Cartoon for kids | Super Simple Songs
+ 541 | saDkICxEdgY | Hello Hello + More | Kids Songs for Preschool | Super Simple Songs
+ 542 | tgUDYOlgx1M | Jump Rope, Jump Rope | Kids Song from Treetop Family | Super Simple Songs
+ 543 | CCClRXsYiik | 🐓 Good Morning Mr. Rooster + More | Kids Songs | Super Simple Songs
+ 544 | W9LDW2LHz4A | Jump Rope | Treetop Family Ep.7 | Cartoon for kids | Super Simple Songs
+ 545 | cR-Qr1V8e_w | The Alphabet Chant + More | ABC Songs for Preschool | Super Simple Songs
+ 546 | lBx9weADSAs | Do You Like Pickle Pudding? + More | Kids Songs | Super Simple Songs
+ 547 | bqhInQRrc08 | Rainbow Song | Kids Song from Treetop Family | Super Simple Songs
+ 548 | 0oJG858Wrog | Hide & Seek Song + More | Kids Songs | Super Simple Songs
+ 549 | bhyl7sPrTNM | After The Rain | Treetop Family Ep. 6 | Cartoon for kids | Super Simple Songs
+ 550 | GS_cGsAnQvQ | The Alphabet Chant  | featuring Noodle & Pals | Super Simple Songs
+ 551 | T1oz_d0-HtE | Stormy Weather | Kids Song from Treetop Family | Super Simple Songs
+ 552 | IsHWcr4oNB0 | Uh-Huh Song + More Kids Songs | Learn YES and NO | Super Simple Songs
+ 553 | VaARSaHa5GA | Flap Your Wings Together | Kids Song from Treetop Family | Super Simple Songs
+ 554 | JOQD--a225k | We Love Acorns | Cute Squirrels | Kids Song from Treetop Family | Super Simple Songs
+ 555 | yr74toetdjA | A Stormy Day | Treetop Family Ep.5 | Cartoon for kids | Super Simple Songs
+ 556 | Tt_S9qoupAk | Hide And Seek | featuring Noodle & Pals | Super Simple Songs
+ 557 | oi12K9uAd98 | 💤 4 HOURS 💤 | Hush Little Baby Piano Lullaby for Bedtime | Super Simple Songs
+ 558 | tP4_XQQ8UVg | Hide and Seek | Kids Song from Super Simple Songs
+ 559 | 4XLQpRI_wOQ | This Is The Way | Kids Songs | Super Simple Songs
+ 560 | g3ZVCI92V_Q | Cartoon | Sparrows Learn to Fly | Treetop Family Ep. 4 | Super Simple Songs
+ 561 | lryk31wxqlQ | Hello Little Baby Sparrows | Original Kids Song from Treetop Family | Super Simple Songs
+ 562 | sfFwo7iQsDw | Five Little Monkeys Karaoke! | Kids Songs | Super Simple Songs
+ 563 | hXrP3QEv54k | The Eensy Weensy Spider Karaoke! | Kids Songs | Super Simple Songs
+ 564 | eJpEAPk_-xI | 💤 4 HOURS 💤  | Twinkle Twinkle Little Star Piano Lullaby to Help Babies Sleep | Super Simple Songs
+ 565 | yNnfd0wMEso | BINGO Karaoke! | Nursery Rhyme | Super Simple Songs
+ 566 | cjyRJc5lZb0 | Wheels On The Bus Karaoke! | Nursery Rhyme | Super Simple Songs
+ 567 | e5BwVmidYwQ | Old McDonald Karaoke! | Nursery Rhyme | Super Simple Songs
+ 568 | qZIQ5njx0LA | This is the Way + More | Kids Songs | Super Simple Songs
+ 569 | It-Eo_Kq6rE | Squirrel's Buried Treasure | Treetop Family Ep.3 | Cartoon for kids
+ 570 | F7t8ElO97yk | Walking Walking + More | Nursery Rhymes & Kids Songs | Super Simple Songs
+ 571 | 6fz-FsHYMJ8 | I Have A Pet | Original Nursery Rhymes + More | Super Simple Songs
+ 572 | iqYc5DZkdrk | Mystery Box #3 | Original Nursery Rhymes + More | Super Simple Songs
+ 573 | Bd1yjm_zopI | Mystery Box #3 | Original Nursery Rhyme | Super Simple Songs
+ 574 | i90w52ZtioQ | Do You Like Spaghetti Yogurt? + More | Nursery Rhymes | Super Simple Songs
+ 575 | eiE7MLBe4es | Days Of The Week + More | Nursery Rhymes Collection | Super Simple Songs
+ 576 | loINl3Ln6Ck | Days Of The Week Song | Kids Songs | Super Simple Songs
+ 577 | XWoxsRGkAwo | Cartoon For Kids | Treetop Family Ep.2 | Hide and Seek | Super Simple Songs
+ 578 | e6Vz_x-y-IA | Cartoon | Hello Baby Sparrows | Treetop Family Ep.1 | Super Simple Songs
+ 579 | ekUgiRynL2Q | Treetop Family Theme Song |  Super Simple Songs
+ 580 | 13mftBvRmvM | Do You Like Lasagna Milkshakes? | Ice Cream and Lasagna!? | Super Simple Songs
+ 581 | CTz-L9nUZhc | "Treetop Family" Trailer | Animated Series from Super Simple Songs
+ 582 | fPMjnlTEZwU | Walking Walking | featuring Noodle & Pals | Super Simple Songs
+ 583 | eMhGm5LrBDs | Brahms' Lullaby ♥ 2 HOURS ♥ Bedtime Music for Babies and Toddlers
+ 584 | JQPMAumkudY | What Do You Hear? + More | Nursery Rhymes | Super Simple Songs
+ 585 | tfteCPMkKJE | Rain Rain Go Away + More | Nursery Rhymes | Super Simple Songs
+ 586 | kz_EQSfFx0g | Seven Steps | featuring Noodle & Pals | Super Simple Songs
+ 587 | dUXvkLajeo8 | Twinkle Twinkle Little Star | Bedtime Lullaby | Piano Music | Super Simple Songs
+ 588 | 4pfuapihZhI | Mystery Box #2 | Kids Song | Super Simple Songs
+ 589 | OheHnFixwVk | Hush Little Baby | Bedtime Lullaby | Piano Music | Super Simple Songs
+ 590 | TbKI-jjpPx8 | The Itsy Bitsy Spider + More | Kids Songs | Super Simple Songs
+ 591 | 2lmVPBeVoWU | Super Simple Songs | Animal Songs for Kids | Super Simple Songs
+ 592 | aAaCq2t5fUg | Rock Scissors Paper + More | Kids Songs & Nursery Rhymes | Super Simple Songs
+ 593 | peO2zgnEwJ4 | Brahms' Lullaby | Bedtime Music | Super Simple Songs
+ 594 | Mfb--R1fhtQ | Do You Like Pickle Pudding? | Kids Food Song | Super Simple Songs
+ 595 | _6crTXWqNwg | Skidamarink + More | Nursery Rhymes | Super Simple Songs
+ 596 | EULQrI3aVik | Mystery Box #1 | Preschool  Song | Super Simple Songs
+ 597 | UQfvAlmr5g0 | See You Later, Alligator | Goodbye Song | Super Simple Songs
+ 598 | nsumE3hdj1I | Clean Up Song + More | Kids Songs and Nursery Rhymes | Super Simple Songs
+ 599 | CSqVcTcQ_pc | Hello Song + More | Kids Songs and Nursery Rhymes | Super Simple Songs
+ 600 | 9w0wJrwNyxg | Let's Take A Picture + More | Kids Songs & Nursery Rhymes | Super Simple Songs
+ 601 | mj6l_5vDEAY | Who Took The Cookie? + More | Kids Songs and Nursery Rhymes | Super Simple Songs
+ 602 | Nu3R6d54KNo | Goodbye, Snowman | Christmas Song for Kids | Super Simple Songs
+ 603 | G5AziK_oF8A | S-A-N-T-A + More | Kids Songs | Super Simple Songs
+ 604 | 9epNpaGtLic | 10 Little Elves + More | Kids Song Collection | Super Simple Songs
+ 605 | 3PcmHSPVlKY | Santa, Where Are You? | Kids Christmas Song | Super Simple Songs
+ 606 | sJq7tFYmQyc | We Wish You a Merry Christmas + More | Christmas Songs for Kids | Super Simple Songs
+ 607 | VJXg2xmdG7k | Jingle Jingle Little Bell (to the tune of Twinkle Twinkle Little Star) | Super Simple Songs
+ 608 | -c-pm_6kvyU | Little Snowflake + More | Nursery Rhymes & Kids Songs | Super Simple Songs
+ 609 | KzPNNAogq3w | 10 Little Elves | Christmas Song For Kids | Super Simple Songs
+ 610 | IbkSoGMpZVg | I'm A Little Snowman + More | Kids Songs Collection | Super Simple Songs
+ 611 | PraN5ZoSjiY | Bye Bye Goodbye | Goodbye Song for Kids | Super Simple Songs
+ 612 | XgTNWZMpzFo | Uh-huh! | Original Nursery Rhyme | Super Simple Songs
+ 613 | SFE0mMWbA-Y | Clean Up Song | Kids Song for Tidying Up | Super Simple Songs
+ 614 | Hf6oXuf7VbA | Put On Your Shoes + More | Kids Songs Collection | Super Simple Songs
+ 615 | ihBUjRip3KY | Goodbye, My Friends | Halloween Party Song | Super Simple Songs
+ 616 | FMj4fyy9xrc | Welcome to Super Simple Songs!
+ 617 | PDnXXgK-OXI | Five Little Pumpkins + More | Counting Songs & Nursery Rhymes | Super Simple Songs
+ 618 | aZHxiShEUtg | Knock Knock, Trick Or Treat - Part 2 | Super Simple Songs
+ 619 | qeSSmNRBlgY | The Skeleton Dance + More | Dance Songs for Kids | Super Simple Songs
+ 620 | trDl36m9pgA | Five Little Pumpkins | Halloween Song | Explore Emotions | Super Simple Songs
+ 621 | uXz8RnTn5Xw | Go Away! + More | Kids Songs Collection | Super Simple Songs
+ 622 | 5Y-ZvM_2Sjo | Hello, My Friends | Trick-Or-Treating Song | Super Simple Songs
+ 623 | iOHZHMCPWvE | Knock Knock, Trick Or Treat |  Halloween Songs & More | Super Simple Songs
+ 624 | kt319a0GkCc | Trick Or Treat | Give Me Something Good To Eat | Halloween Song | Super Simple Songs
+ 625 | l-sEZaHet8c | The Alphabet Song + More | Learn Letters | Super Simple Songs
+ 626 | ALcL3MuU4xQ | Make A Circle | Preschool Song | Super Simple Songs
+ 627 | A2TLW0WBLow | Shape Songs + More | Nursery Rhymes | Super Simple Songs
+ 628 | JRMAptlBgTk | We All Fall Down | Walk Around The Circle | Super Simple Songs
+ 629 | D3Vpnkwjblc | Head Shoulders Knees & Toes + More | Nursery Rhymes | Super Simple Songs
+ 630 | JV-D_K4drsA | The Pinocchio | Nursery Rhymes | Super Simple Songs
+ 631 | 8tJdU5bfY7Y | The Making Of "Say Cheese" | Behind-The-Scenes | Super Simple Songs
+ 632 | OBSx0laWFZk | Say Cheese! (Let's Take A Picture) | Nursery Rhymes | Super Simple Songs
+ 633 | GOCroTBFlFw | Do You Like Broccoli Ice Cream? + More | Nursery Rhymes | Super Simple Songs
+ 634 | TqfMHH67KJA | Sweet Dreams + More | Nursery Rhymes & Lullabies | Super Simple Songs
+ 635 | fN1Cyr0ZK9M | Hello Hello! Can You Clap Your Hands? | Original  Kids Song | Super Simple Songs
+ 636 | OzKY5YHnOTg | Who Took The Cookie? | Nursery Rhyme | Super Simple Songs
+ 637 | HVYXHMY7wvo | The Bath Song | Original Kids Song | Super Simple Songs
+ 638 | N-6bxyzyHZs | Counting Bananas + More | Kids Songs & Nursery Rhymes | Super Simple Songs
+ 639 | WX8HmogNyCY | Head Shoulders Knees & Toes (Speeding Up) | Nursery Rhyme | Super Simple Songs
+ 640 | V4BbE5OWNzw | The Pinocchio + More | Kids Songs | Nursery Rhymes | Super Simple Songs
+ 641 | agFzFL_HL3Y | My Teddy Bear + More | Kids Songs & Nursery Rhymes | Super Simple Songs
+ 642 | 3noL0nBOD4M | Rock Scissors Paper #2 | Finger Play Song | Super Simple Songs
+ 643 | RedcuuQPmhY | Yes, I Can! + More | Kids Songs | Nursery Rhymes | Super Simple Songs
+ 644 | 03pyY9C2Pm8 | The Shape Song #2 | Review Song for Kids | Super Simple Songs
+ 645 | -EJGW7QVG2s | After A While, Crocodile | Kids Song | Super Simple Songs
+ 646 | VTmmoaO2M_U | Five Little Monkeys | + More Super Simple Songs & Nursery Rhymes
+ 647 | ddDN30evKPc | Do You Like Spaghetti Yogurt? | Super Simple Songs
+ 648 | TJhfl5vdxp4 | The Shape Song #1 | Super Simple Songs
+ 649 | eL_fl1Ebt7c | Let's Go To The Zoo | + More Super Simple Songs
+ 650 | P65yE_EXLd8 | Rock Scissors Paper #1 | Finger Play Song | Super Simple Songs
+ 651 | J1X3t5ErqfM | How's The Weather? + More | Kids Songs | Super Simple Songs
+ 652 | 1dUJVrEopYE | We All Fall Down + More | Circle-Time Songs for Preschool | Super Simple Songs
+ 653 | LFrKYjrIDs8 | Rain Rain Go Away | Family Song for Kids | Super Simple Songs
+ 654 | bne3Ix_tJL8 | The Eensy Weensy Spider | Kids Songs and Nursery Rhymes | Super Simple Songs
+ 655 | CG8F-6dZk8k | The Bath Song + More | Songs for Kids! | Super Simple Songs
+ 656 | 5oJCPcjeku8 | Open Shut Them + More | Kids Opposites Song | Super Simple Songs
+ 657 | tVlcKp3bWH8 | Hello! | Kids Greeting Song and Feelings Song | Super Simple Songs
+ 658 | E-A8iFEFMUE | I See Something Blue + More | Colors Song for Kids! | Super Simple Songs
+ 659 | Gz_njDXFCSU | One Potato, Two Potatoes + More | Kids Songs and Nursery Rhymes | Super Simple Songs
+ 660 | 6in9pefUExE | Walking In The Jungle + More | Kids Songs | Super Simple Songs
+ 661 | 7D4K9oi7oBM | Top 10 Counting Songs | Learn To Count | Super Simple Songs
+ 662 | oWkOkpzyD3Y | After A While, Crocodile + More | Goodbye Song | Super Simple Songs for Kids
+ 663 | Woc5c8mePR4 | Animal Sounds Songs + More | Nursery Rhymes for Preschool | Super Simple Songs
+ 664 | 0pAZq7VHA2I | One Little Finger + More | Nursery Rhymes | Super Simple Songs
+ 665 | OHWoM2hoRbc | Mary Had A Little Lamb + More | Kids Songs | Super Simple Nursery Rhymes
+ 666 | YVgv1EFJZHc | What Do You Hear? | Animal Song | Super Simple Songs
+ 667 | BTQpTzEdfIM | Ten In The Bed + More | Super Simple Songs
+ 668 | GukdT4gUlZs | Wag Your Tail | Animal Action Verb Song | Super Simple Songs
+ 669 | F-BVN97JlXc | Row Row Row Your Boat + More | Favorite Kids Songs | Super Simple Songs
+ 670 | _Ir0Mc6Qilo | Yes, I Can! | Animal Song For Children | Super Simple Songs
+ 671 | QZC5x0_EXYM | BINGO + More | Top Kids Songs and Nursery Rhymes | Super Simple Songs
+ 672 | 666UZRBO5q8 | My Teddy Bear | Kids Song | Super Simple Songs
+ 673 | fYP-3q22too | If You're Happy + More | Favorite Children's Songs | Super Simple Songs
+ 674 | ug1pI-Ephns | Skidamarink | Children's Music | Super Simple Songs
+ 675 | lWhqORImND0 | Old MacDonald Had A Farm + More | Kids Songs and Nursery Rhymes | Super Simple Songs
+ 676 | FczqntFwb6k | I'm A Little Snowman | Super Simple Songs | Winter Song For Kids
+ 677 | ShqXL-zfLxY | Count Down From 20 to 1 | Super Simple Songs
+ 678 | YqFP0NjoGY4 | What Do You Want For Christmas? | Santa's On His Way | Super Simple Songs
+ 679 | DW1fOw-a_m4 | Jingle Jingle Little Bell | Kids Favorite Songs Collection | Super Simple Songs
+ 680 | ZpJCgTx_auc | Decorate The Christmas Tree featuring The Super Simple Puppets | Super Simple Songs
+ 681 | jtQiwl7ZLG8 | Santa, Where Are You? | + More Christmas Songs for Kids | Super Simple Songs
+ 682 | hNkvV4PR-q0 | We Wish You A Merry Christmas | Holiday Song for Kids! | Super Simple Songs
+ 683 | tF7YQKgj1yA | Hickory Dickory...Crash! + More | Our Top Silly Songs for Kids | Super Simple Songs
+ 684 | ZUi1YJVChpg | Hello, Reindeer | Children's Christmas Song | Stop Motion Animation | Super Simple Songs
+ 685 | 3kDsNuPpK_g | The Wheels On The Bus + More | Nursery Rhymes | Super Simple Songs
+ 686 | -92GYYTkKbM | Jingle Bells + More | Classic Christmas Songs for Kids | Super Simple Songs
+ 687 | -jBfb33_KHU | Put On Your Shoes | Clothing and Routines Song for Kids | Super Simple Songs
+ 688 | wk4KHNJjpjQ | Twinkle Twinkle Little Star & More | Kids Songs | Super Simple Songs
+ 689 | gWwGeeYKEAo | Go Away, Spooky Goblin! | Kids Confidence Booster | Super Simple Songs
+ 690 | WHbhD2w3a20 | One For You, One For Me | Halloween Sharing Song for Kids | Super Simple Songs
+ 691 | Se4e4_3FpZw | Celebrate Halloween with Super Simple! | Kids Halloween Songs | Super Simple Songs
+ 692 | veZlIX6d63Y | Who Took The Candy? | Halloween Song for Kids | Super Simple Songs
+ 693 | vjfICihohbI | This Is The Way We Carve A Pumpkin | Kids Halloween Song | Super Simple Songs
+ 694 | 4jxcWlq3CBg | Knock Knock, Trick Or Treat? | Halloween Song | Super Simple Songs
+ 695 | RpriiA7pw00 | Five Creepy Spiders | Halloween Song for Kids | Super Simple Songs
+ 696 | x8b4f5fhYuw | Can You Make A Happy Face? featuring @Noodle & Pals  Kids Halloween Song | Super Simple Songs
+ 697 | Ec1cz_jHQM8 | Go Away! | Kids Halloween Song | Super Simple Songs
+ 698 | pWepfJ-8XU0 | I Have A Pet | Animal Song | Super Simple Songs
+ 699 | YE7PiTwhTQk | Mary Had A Little Lamb | Animal Song | Super Simple Songs
+ 700 | GzrjwOQpAl0 | The Wheels On The Bus | Kids Song | Super Simple Songs
+ 701 | OwRmivbNgQk | Let's Go To The Zoo | Animal Song for Kids | Super Simple Songs
+ 702 | Asb8N0nz9OI | I See Something Pink | Colors Song for Children | Super Simple Songs
+ 703 | jYAWf8Y91hA | I See Something Blue | Colors Song for Children | Super Simple Songs
+ 704 | efMHLkyb7ho | One Potato, Two Potatoes | Count Potatoes! | Super Simple Songs
+ 705 | Vr-L6q4vbWU | The Bananas Song | Counting Bananas | Super Simple Songs
+ 706 | eBVqcTEC3zQ | One Little Finger featuring @NoodleAndPals | Kids Song | Super Simple Songs
+ 707 | rD6FRDd9Hew | How's The Weather? | Learn About Weather | Super Simple Songs
+ 708 | l4WNrvVjiTw | If You're Happy | Kids Song | Super Simple Songs
+ 709 | Aq4UAss33qA | Count And Move (HD) | Counting Song for Kids! | Super Simple Songs
+ 710 | frN3nvhIHUk | Do You Like Broccoli Ice Cream? | Food Song for Kids! | Super Simple Songs
+ 711 | R8lvTMyjP8g | Welcome to Super Simple Songs
+ 712 | zXEq-QO3xTg | The Animals On The Farm | Animals and Farm Song for Kids | Super Simple Songs
+ 713 | GoSq-yZcJ-4 | Walking In The Jungle | Kids Song | Super Simple Songs
+ 714 | 5oYKonYBujg | Old MacDonald Had A Farm | Kids Songs | Super Simple Songs
+ 715 | OKbpLQp509Y | Sweet Dreams (Goodnight Song) | Soothing Lullaby | Super Simple Songs
+ 716 | ZanHgPprl-0 | Head Shoulders Knees & Toes (Sing It) | Follow Along | Super Simple Songs
+ 717 | lMQcwNZVUO8 | Head Shoulders Knees & Toes (Learn It) | Follow Along | Super Simple Songs
+ 718 | eQ34DSTjsLQ | Jingle Bells | Christmas Carol for Kids | Super Simple Songs
+ 719 | RNUZBHlRH4Y | Open Shut Them | Learn Opposites | Super Simple Songs
+ 720 | 1Ziku4FLka4 | Good Morning, Mr. Rooster | Greeting Song for Kids | Super Simple Songs
+ 721 | aEYcmNhz7Uc | The Alphabet Chant | Learn And Review Letters | Super Simple Songs
+ 722 | tbbKjDjMDok | Little Snowflake | Kids Songs | Super Simple Songs
+ 723 | TdDypyS_5zE | Ten In The Bed | Counting Song for Kids | Super Simple Songs
+ 724 | gtc4c1JlAEM | The Months Chant | Super Simple Songs
+ 725 | mGAYzlqj-aE | S-A-N-T-A | Christmas Version of B-I-N-G-O! | Super Simple Songs
+ 726 | 9mmF8zOlh_g | BINGO | Nursery Rhymes For Kids | Super Simple Songs
+ 727 | oHcI2vtjybU | Super Simple ABCs Phonics Song | Review Letters R Through Z | Super Simple Songs
+ 728 | pTLtcno5_cY | Seven Steps | Counting Song | Super Simple Songs
+ 729 | 7otAJa3jui8 | Row Row Row Your Boat | Bedtime Lullaby | Super Simple Songs
+ 730 | HGgsklW-mtg | Hickory Dickory Dock | Super Simple Songs
+ 731 | 7vPzg7VLUsY | Skidamarink With Puppets! | Super Simple Songs
+ 732 | BIxxw06YhlE | きらきらぼし (Kira Kira Boshi) | Twinkle Twinkle Little Star in Japanese | @supersimplejapanese
+ 733 | 2dhk05i-GnI | Make A Circle | Teaching Tips for Circle Time | Super Simple Songs
+ 734 | Jpvuqj5nv6U | The Skeleton Dance | Super Simple Songs
+ 735 | yCjJyiqpAuU | Twinkle Twinkle Little Star | Nursery Rhymes for Kids | Super Simple Songs
+ 736 | uBJM2t4q5C8 | The Pinocchio (Large Class) | Practice Motor Skills | Super Simple Songs
+ 737 | Fotkt0dPra0 | Super Simple ABCs Phonics Song | Review Letters J Through R | Super Simple Songs
+ 738 | 1pCFfkqmU2A | Super Simple ABCs Phonics Song | Review Letters A Through I | Super Simple Songs
+ 739 | M55R32lQvLg | Open Shut Them (& Other Opposites) | Super Simple Songs
+ 740 | OXODUnbhM4Y | Super Simple Songs and Play!
+ 741 | 5QbrR-AS1uU | Students Identify Emotions | If You're Happy | Teaching Tips | Super Simple Songs
+ 742 | czbupx_Xp-8 | Goodbye, Snowman | Teaching Tips | Super Simple Songs
+ 743 | K8v2ErHTpTs | Hello, My Friends | Let's Go Trick-or-Treating | Super Simple Songs
+ 744 | e54m6XOpRgU | The Skeleton Dance | Classroom Fun | Super Simple Songs
+ 745 | g9EgE_JtEAw | Count & Move | Count Up To Twenty | Super Simple Songs
+ 746 | CXaOaz3a8Cg | Santa, Where Are You? | Christmas Song for Kids | Super Simple Songs
+ 747 | baeeSczb4-s | Super Simple ABCs - "A" song | Super Simple Songs
+ 748 | Bfp0DQpn_4I | Super Simple Phonics - "L song" and mini-lesson | Super Simple Songs
+ 749 | FejjRyuOcYw | Ten in the Bed (with six!) | Super Simple Songs
+ 750 | AQZNBkdxCMY | The Eensey Weensey Spider | With Gestures | Super Simple Songs
+ 751 | rGeCNpxgIHE | Head Shoulders Knees and Toes | Teaching Tips | Super Simple Songs
+ 752 | f4sJbEwb5os | Knock Knock, Trick or Treat? | Kids Halloween Song | Super Simple Songs
+ 753 | KOVSMgY5MCg | Five Little Pumpkins | Fun Halloween Song for Children | Super Simple Songs
+ 754 | 8I9gz-5_h60 | Hello! | Kids Song | Super Simple Songs
+ 755 | c3v0rJqyCTM | Rain Rain Go Away | Kids Song | Super Simple Songs
+ 756 | g_snx3WXD0w | Hide & Seek | Teaching Tips | Super Simple Songs
+ 757 | Eh_fRQRAgo0 | Who Took the Cookie? | Teaching Tips | Super Simple Songs
+ 758 | 5XEN4vtH4Ic | ABC Song | Kids Alphabet Review | Super Simple Songs
+ 759 | lfoV01lLqLQ | The Alphabet Song | Let's Sing | Super Simple Songs
+ 760 | ZhODBFQ2-bQ | Five Little Monkeys | Super Simple Songs
+ 761 | dRYSYAnQTuA | Super-Fast Uh-Huh! | Kids Songs | Super Simple Songs
+ 762 | 1b4gSs0KhIU | Clean Up | Classroom Song | Super Simple Songs
+ 763 | GZyGJhXxjgo | Please Sit Down and Story Time Music | Teaching Tips | Super Simple Songs
+ 764 | u9av8ubvR-A | Skidamarink | Kids Valentine's Day Song | Super Simple Songs
+ 765 | 7RtvvSyHd_8 | Days of the Week | Learn-Along Video | Super Simple Songs
+ 766 | Po32PQoPcMI | Days of the Week - Read It! | Kids Songs | Super Simple Songs
+ 767 | nrrA9j51tQ0 | Walking, Walking | Teaching Action Verbs | Super Simple Songs
+ 768 | O7iLl4gJJoA | Santa Claus: Lost in Japan!  | Where Is Santa? | Super Simple Songs
+ 769 | WSW-CepaASI | What Do You Want For Christmas? | With Gestures | Super Simple Songs
+ 770 | uwm1xfvbV5A | I See Something Blue | Teaching Colors | Super Simple Songs
+ 771 | XCGKQvSz43s | Knock Knock Hello | Teaching Tips for Halloween | Super Simple Songs
+ 772 | jB4vi86_FDg | Go Away! | Teaching Tips at Halloween | Super Simple Songs
+ 773 | dVkPWDixDhs | Uh-Huh! | Original Puppet Performance | Super Simple Songs
+ 774 | 4coi65CT1G4 | Go Away! | Just for Fun | Super Simple Songs
+ 775 | l-yq7mFBkNQ | Rock, Scissors, Paper | Teaching Tips | Super Simple Songs
+ 776 | 924CDZofcSQ | The Bath Song | Teaching Tips | Super Simple Songs

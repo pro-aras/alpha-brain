@@ -1,0 +1,15 @@
+{
+  "law": "PREREG-OPEN-WORLD-4 \u00a71/\u00a72.1",
+  "date": "2026-10-08",
+  "form": "V1's concat (records/open-world-2/bench/tape-502) mirrored exactly + the ONE additive meta key `video`; seq renumbered 1..N; payload renamed to the new seq; meta.series (V1's own concat key) and meta.video = the source's short name; source/at/meta.t/meta.moment untouched (per-source clocks)",
+  "videos": [
+    {
+      "name": "top-20-anniversary-hit-songs-20-years-of",
+      "tape": "/data/dev/genome/docs/organism/whole/records/open-world-4/bench/tape-top-20-anniversary-hit-songs-20-years-of"
+    },
+    {
+      "name": "when-we-play-hockey-super-simple-songs-n",
+      "tape": "/data/dev/genome/docs/organism/whole/records/open-world-4/bench/tape-when-we-play-hockey-super-simple-songs-n"
+    }
+  ]
+}
