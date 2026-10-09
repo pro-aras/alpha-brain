@@ -76,17 +76,27 @@ for f in sorted(glob.glob('$ROOT/journal/*.jsonl')):
         if r.get('kind')=='answer' and r.get('form')=='say': n+=1
 print(n)" 2>/dev/null || echo 0)
   [ "${N:-0}" -ge 1 ] && break; sleep 10; done
-/usr/bin/python3 - "$ROOT" <<'PYEOF' || fail "the video world / the front / the mouth, live"
+/usr/bin/python3 - "$ROOT" "$SHELF" <<'PYEOF' || fail "the video world / the front / the mouth, live"
 import json, sys
 from pathlib import Path
-root = Path(sys.argv[1])
+root, shelf = Path(sys.argv[1]), Path(sys.argv[2])
 rows = []
 for f in sorted((root / "tape").glob("*.jsonl")):
     rows.extend(json.loads(l) for l in open(f) if l.strip())
 veye = [r for r in rows if r["sense"] == "eye" and r["meta"].get("source") == "video"]
 vear = [r for r in rows if r["sense"] == "ear" and r["meta"].get("source") == "video-caption"]
 assert len(veye) >= 2 and len(vear) >= 1, f"the video world is not flowing: eye {len(veye)} ear {len(vear)}"
-assert all(r["meta"].get("video") == "toy-song" for r in veye + vear), "the video meta not carried untouched"
+# provenance + payload UNTOUCHED: the life's first video rows are the shelf's own rows, field for field, byte
+# for byte (the video/single-video converter tape carries no concat `video` key — untouched means EQUAL to the
+# shelf's own meta, whatever it carries).
+shelf_rows = []
+for f in sorted(shelf.glob("*.jsonl")):
+    shelf_rows.extend(json.loads(l) for l in open(f) if l.strip())
+life_v = [r for r in rows if r["meta"].get("source") in ("video", "video-caption")]
+for i in range(min(len(life_v), 40)):
+    s, l = shelf_rows[i], life_v[i]
+    assert l["sense"] == s["sense"] and l["meta"] == s["meta"], f"row {i}: the meta moved: {l['meta']} != {s['meta']}"
+    assert (root / "tape" / l["payload"]).read_bytes() == (shelf / s["payload"]).read_bytes(), f"row {i}: the payload moved"
 J = []
 for f in sorted((root / "journal").glob("*.jsonl")):
     J.extend(json.loads(l) for l in open(f) if l.strip())
@@ -98,8 +108,8 @@ assert len(voice) >= 1, "no voice row — the W1 mouth is silent past the calibr
 says = [r for r in J if r.get("kind") == "answer" and r.get("form") == "say" and isinstance(r.get("answer"), dict)]
 inc = [r for r in says if "n_readbacks" in (r["answer"].get("raw") or {})]
 assert len(inc) == len(says), f"a say answer without the mechanism's own keys: {len(inc)}/{len(says)}"
-print(f"[1] video rows eye {len(veye)} ear {len(vear)} · front {len(fronted)}/{len(canvas)} canvas rows · "
-      f"voice rows {len(voice)} · say answers with n_readbacks {len(inc)}/{len(says)} (presence counts)")
+print(f"[1] video rows eye {len(veye)} ear {len(vear)} · the first {min(len(life_v), 40)} video rows == the shelf's own, metas and payload bytes · "
+      f"front {len(fronted)}/{len(canvas)} canvas rows · voice rows {len(voice)} · say answers with n_readbacks {len(inc)}/{len(says)}")
 if not says:
     print("[1] NAMED: no say answer inside the flight's ≤1 h price — the row-level live form reads on the "
           "launch's first day (M-MOUTH's own wall); the clause is proven here by the voice rows and the bench")
