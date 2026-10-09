@@ -118,7 +118,8 @@ def _counters(mind: Mind, row: Dict[str, object], canvases: int) -> Dict[str, ob
 
 
 def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenSet[str] = frozenset(), close: bool = False,
-               timings: bool = False, exam_every: int = 0, counters_every: int = 0, eye_front=None) -> Path:
+               timings: bool = False, exam_every: int = 0, counters_every: int = 0, eye_front=None,
+               progress_every: int = 0) -> Path:
     """Feeds `tape_path`'s rows (one day file, sorted by seq -- defensive, they are already in order) to
     a fresh Mind in a temporary root whose tape/payload is a symlink to the source tape's own payload
     directory (never copied: replay never writes to the source tape). Returns DIR/journal.jsonl's path.
@@ -132,7 +133,12 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     `close` (edit: Claude (Fable 5.1), 2026-09-22 22:27 +0400 — plan L-1 × L-5, builder E's tail note): a tape that is a CLOSED life's
     whole record ends the replayed mind the way the body ended the live one — `Mind.close()` applies the think still in flight at the
     last eye row's seq (creature/body.py:stop) — or the closed journal carries one think row the replay cannot. A MID-tape cut keeps
-    the default False: the live mind lands that think at a later boundary, outside the cut, and a close here would invent a row."""
+    the default False: the live mind lands that think at a later boundary, outside the cut, and a close here would invent a row.
+
+    `progress_every` (edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-09 13:45 +0400 — the F-plant lesson: a 17-h replay
+    with zero external output reads as hung): every N consumed rows one stderr heartbeat (i/total, seq, elapsed) plus one
+    completion line. A print only, outside the mind's road — the journal is byte-identical with or without it (pinned by
+    tests/creature/test_replay_progress.py); default 0 = not one byte written, the exact old road."""
     tape_path = Path(tape_path)
     # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:57 +0400 — BRAIN-IN-BODY (the seat's addendum 2): a life whose tape crosses 00:00
     # UTC lives in TWO day files, and this function read one. Additive: a DIRECTORY (the tape dir) replays every day file in it, in
@@ -182,7 +188,9 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     worded, moment_has_word = 0, set()
     eye_rows = 0
     exam_dir = out_dir / "exam"
-    for row in rows:
+    total_rows = len(rows)
+    progress_t0 = _time.perf_counter() if progress_every > 0 else 0.0
+    for i_row, row in enumerate(rows):
         t0 = _time.perf_counter() if tf is not None else None
         c0 = _time.process_time() if tf is not None else None
         mind.consume(row)
@@ -207,11 +215,17 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
                 mind.snapshot()
                 from creature import exam as _exam_module
                 _exam_module.run_exam(work_root, genome_path, held=10, check_tape=0)
+        if progress_every > 0 and (i_row + 1) % progress_every == 0:
+            print(f"[replay] {i_row + 1}/{total_rows} rows (seq {row.get('seq')}, "
+                  f"{_time.perf_counter() - progress_t0:.0f}s elapsed)", file=sys.stderr, flush=True)
     if tf is not None:
         tf.close()
     if cf is not None:
         cf.write(json.dumps({**_counters(mind, rows[-1] if rows else {}, worded), "final": True}) + "\n")
         cf.close()
+    if progress_every > 0:
+        print(f"[replay] done {total_rows}/{total_rows} rows in {_time.perf_counter() - progress_t0:.0f}s",
+              file=sys.stderr, flush=True)
     if close:
         mind.close()
     if exam_every > 0 and (work_root / "exam").exists():
