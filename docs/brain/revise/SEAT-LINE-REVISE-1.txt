@@ -1,0 +1,1 @@
+SEAT-LINE — PREREG-REVISE-1 SIGNED by the seat (Kimi K3), file sha256 3cf6451c20e23919200cc5ed131cd5076e366ca9db89b1d995251a2d6d77f50a — signed under Ahmad's 10-09 words (the contemplation passage + the queue named at CONTEMPLATE-1's signing); the verifier loop recorded in verify/REVISE-1-VERIFIER-READ.md (V1 found + resolved pre-signature).
