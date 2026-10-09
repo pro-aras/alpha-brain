@@ -1,0 +1,7 @@
+[graded-20261701] cpu total 417.0 s; peak RSS 3169 MB
+[graded-20261701] test_n: {'doubt': {'pos': 173, 'neg': 3827}, 'young': {'pos': 0, 'neg': 4000}, 'ask_prev': {'pos': 399, 'neg': 3601}} (the law's 4,000 window)
+[graded-20261701] cont auc: {'unsure': 1.0, 'fresh': None, 'asked': 1.0}
+[graded-20261701] oracle: {'unsure': 1.0, 'asked': 1.0}
+[graded-20261701] naming: {'cont': 1.0, 'nostate': 0.99425, 'n': 4000, 'gradable': True, 'pass': True}
+[graded-20261701] proto_home: 4 of 7
+RESULT: GRADED SEED 20261701 DONE

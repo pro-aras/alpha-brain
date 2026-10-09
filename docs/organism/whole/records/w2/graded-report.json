@@ -1,0 +1,150 @@
+{
+ "cells": {
+  "asked": {
+   "20261701": {
+    "gradable": true,
+    "ok": false
+   },
+   "20261702": {
+    "gradable": true,
+    "ok": false
+   },
+   "20261703": {
+    "gradable": true,
+    "ok": false
+   }
+  },
+  "fresh": {
+   "20261701": {
+    "gradable": false,
+    "ok": null
+   },
+   "20261702": {
+    "gradable": false,
+    "ok": null
+   },
+   "20261703": {
+    "gradable": false,
+    "ok": null
+   }
+  },
+  "unsure": {
+   "20261701": {
+    "gradable": true,
+    "ok": false
+   },
+   "20261702": {
+    "gradable": true,
+    "ok": false
+   },
+   "20261703": {
+    "gradable": true,
+    "ok": false
+   }
+  }
+ },
+ "gradable_and_binding_per_seed": {
+  "20261701": 0,
+  "20261702": 0,
+  "20261703": 0
+ },
+ "necessity": {
+  "asked": {
+   "20261701": {
+    "cont": 1.0,
+    "gradable": true,
+    "margin": 1.0,
+    "nostate": 0.48247040817817943,
+    "pass": true
+   },
+   "20261702": {
+    "cont": 1.0,
+    "gradable": true,
+    "margin": 1.0,
+    "nostate": 0.48247040817817943,
+    "pass": true
+   },
+   "20261703": {
+    "cont": 1.0,
+    "gradable": true,
+    "margin": 1.0,
+    "nostate": 0.48247040817817943,
+    "pass": true
+   }
+  },
+  "fresh": {
+   "20261701": {
+    "gradable": false,
+    "why": "NOSTATE or CONT's AUC absent"
+   },
+   "20261702": {
+    "gradable": false,
+    "why": "NOSTATE or CONT's AUC absent"
+   },
+   "20261703": {
+    "gradable": false,
+    "why": "NOSTATE or CONT's AUC absent"
+   }
+  },
+  "unsure": {
+   "20261701": {
+    "cont": 1.0,
+    "gradable": true,
+    "margin": 1.0,
+    "nostate": 0.8397951277128888,
+    "pass": true
+   },
+   "20261702": {
+    "cont": 1.0,
+    "gradable": true,
+    "margin": 1.0,
+    "nostate": 0.8226736810054638,
+    "pass": true
+   },
+   "20261703": {
+    "cont": 1.0,
+    "gradable": true,
+    "margin": 1.0,
+    "nostate": 0.8760879883815663,
+    "pass": true
+   }
+  }
+ },
+ "s6": {
+  "fires": [],
+  "pass": true,
+  "rows": {
+   "asked": {
+    "band": 0.5607511556778971,
+    "centres": [
+     0.4186514606427204,
+     0.39668561851727346,
+     0.5302112543229778
+    ],
+    "pass": true,
+    "sigma_cell": 0.28037557783894856,
+    "span": 0.1335256358057043
+   },
+   "unsure": {
+    "band": 0.5761580656226383,
+    "centres": [
+     0.49602384034340724,
+     0.4735115674566256,
+     0.5200410895823739
+    ],
+    "pass": true,
+    "sigma_cell": 0.28807903281131914,
+    "span": 0.046529522125748346
+   }
+  }
+ },
+ "seeds": [
+  20261701,
+  20261702,
+  20261703
+ ],
+ "verdict": {
+  "row": 1,
+  "verdict": "VOID"
+ }
+}

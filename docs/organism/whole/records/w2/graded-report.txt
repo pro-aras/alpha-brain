@@ -1,0 +1,38 @@
+PREREG-W2 — the reader over bench seeds [20261701, 20261702, 20261703] (GRADED)
+GATES (instrument; a failing gate VOIDs its cell, never a fail of the road)
+  seed 20261701: G-CENSUS OK (7 points, 94 words checked), G-TRUTH 200/200 specs regenerate equal, the planted bit CAUGHT, G-STREAM one hash 9e4abf550042269e…; G-AUC CONST [0.5, nan, 0.5]; G-BLIND skill {'unsure': True, 'asked': False}; G-ORACLE C_read>=0.90: {'unsure': True, 'asked': True}
+  seed 20261702: G-CENSUS OK (7 points, 94 words checked), G-TRUTH 200/200 specs regenerate equal, the planted bit CAUGHT, G-STREAM one hash 98797a200b4dd79b…; G-AUC CONST [0.5, nan, 0.5]; G-BLIND skill {'unsure': True, 'asked': True}; G-ORACLE C_read>=0.90: {'unsure': True, 'asked': True}
+  seed 20261703: G-CENSUS OK (7 points, 94 words checked), G-TRUTH 200/200 specs regenerate equal, the planted bit CAUGHT, G-STREAM one hash c4cd788b3da78f71…; G-AUC CONST [0.5, nan, 0.5]; G-BLIND skill {'unsure': True, 'asked': True}; G-ORACLE C_read>=0.90: {'unsure': True, 'asked': True}
+G-PICTURE (a READING under the ruling — printed, never a void) + the NECESSITY mark (the margin form):
+  unsure: seed 20261701: NOSTATE 0.8398 CONT 1.0000 -> gain_margin 1.0000 >= 0.5 pass; seed 20261702: NOSTATE 0.8227 CONT 1.0000 -> gain_margin 1.0000 >= 0.5 pass; seed 20261703: NOSTATE 0.8761 CONT 1.0000 -> gain_margin 1.0000 >= 0.5 pass
+  fresh: seed 20261701: NOT GRADABLE (NOSTATE or CONT's AUC absent); seed 20261702: NOT GRADABLE (NOSTATE or CONT's AUC absent); seed 20261703: NOT GRADABLE (NOSTATE or CONT's AUC absent)
+  asked: seed 20261701: NOSTATE 0.4825 CONT 1.0000 -> gain_margin 1.0000 >= 0.5 pass; seed 20261702: NOSTATE 0.4825 CONT 1.0000 -> gain_margin 1.0000 >= 0.5 pass; seed 20261703: NOSTATE 0.4825 CONT 1.0000 -> gain_margin 1.0000 >= 0.5 pass
+  S6 (AMENDMENT 2's guard): HOLDS — unsure span 0.0465 band 0.5762; asked span 0.1335 band 0.5608
+TRUTH/DELIVERY family (a failure here is the build's own fault — VOID by name, never a states-verdict):
+  M-PURE: CLEAN
+  seed 20261701: M-TRUE FAILS: {'moment': 'sc20261101t002699', 'production': ['alpha', 'does', 'not', 'see', 'blue', 'moon'], 'reason': 'UNPARSEABLE', 'tpl': 'M-C2-T2'} (49740 productions, 200531 rows); M-ATTRIB FAILS (0/200531 without source+tpl, 1 UNPARSEABLE; coverage 1.000 of 20000); M-JOINT pass (attended 1.0000 of n=39495 vs null q95 0.8946 mean 0.8930, anchors 0.896/0.655); M-CONTINGENT (i) 2923/2923; M-SELFVOICE 0 self-source of 0 + answers off-referent 0
+  seed 20261702: M-TRUE FAILS: {'moment': 'sc20261101t002699', 'production': ['alpha', 'does', 'not', 'see', 'small', 'blue', 'moon'], 'reason': 'UNPARSEABLE', 'tpl': 'M-C2-T4'} (49714 productions, 200497 rows); M-ATTRIB FAILS (0/200497 without source+tpl, 1 UNPARSEABLE; coverage 1.000 of 20000); M-JOINT pass (attended 1.0000 of n=39449 vs null q95 0.8950 mean 0.8930, anchors 0.896/0.655); M-CONTINGENT (i) 2897/2897; M-SELFVOICE 0 self-source of 0 + answers off-referent 0
+  seed 20261703: M-TRUE FAILS: {'moment': 'sc20261101t002699', 'production': ['alpha', 'does', 'not', 'see', 'blue', 'moon'], 'reason': 'UNPARSEABLE', 'tpl': 'M-C2-T2'} (49723 productions, 200454 rows); M-ATTRIB FAILS (0/200454 without source+tpl, 1 UNPARSEABLE; coverage 1.000 of 20000); M-JOINT pass (attended 1.0000 of n=39466 vs null q95 0.8947 mean 0.8930, anchors 0.896/0.655); M-CONTINGENT (i) 2906/2906; M-SELFVOICE 0 self-source of 0 + answers off-referent 0
+M-BIND (the groundability family; NOT GRADABLE named, never a silent pass):
+    unsure seed 20261701: AUC 1.0000 C_read 1.0000 skill 1.000 dealt q95 0.9679 (n+ 173 n- 3827) M5-own-centre TEACHES -> FAIL
+    unsure seed 20261702: AUC 1.0000 C_read 1.0000 skill 1.000 dealt q95 0.9667 (n+ 186 n- 3814) M5-own-centre TEACHES -> FAIL
+    unsure seed 20261703: AUC 1.0000 C_read 1.0000 skill 1.000 dealt q95 0.9442 (n+ 185 n- 3815) M5-own-centre TEACHES -> FAIL
+    fresh seed 20261701: NOT GRADABLE (pos 0, C_read None, smallest passable n/a vs the skill bar's n/a)
+    fresh seed 20261702: NOT GRADABLE (pos 0, C_read None, smallest passable n/a vs the skill bar's n/a)
+    fresh seed 20261703: NOT GRADABLE (pos 0, C_read None, smallest passable n/a vs the skill bar's n/a)
+    asked seed 20261701: AUC 1.0000 C_read 1.0000 skill 1.000 dealt q95 0.9178 (n+ 399 n- 3601) M5-own-centre TEACHES -> FAIL
+    asked seed 20261702: AUC 1.0000 C_read 1.0000 skill 1.000 dealt q95 0.8924 (n+ 399 n- 3601) M5-own-centre TEACHES -> FAIL
+    asked seed 20261703: AUC 1.0000 C_read 1.0000 skill 1.000 dealt q95 0.9278 (n+ 399 n- 3601) M5-own-centre TEACHES -> FAIL
+  the walk's states: ['unsure', 'asked']; NAMED out of the walk (never a silent pass): {'fresh': {'m_bind_gradable_seeds': [], 'necessity_gradable_seeds': [], 'test_pos': {20261701: 0, 20261702: 0, 20261703: 0}}}
+  M-BIND unsure: FAILS ({20261701: False, 20261702: False, 20261703: False}); NECESSITY unsure: pass (the margin >= 0.5 on every gradable seed)
+  M-BIND fresh: NOT GRADABLE anywhere (named) ({20261701: None, 20261702: None, 20261703: None}); NECESSITY fresh: NOT GRADABLE anywhere (named: NOSTATE or CONT's AUC absent; NOSTATE or CONT's AUC absent; NOSTATE or CONT's AUC absent)
+  M-BIND asked: FAILS ({20261701: False, 20261702: False, 20261703: False}); NECESSITY asked: pass (the margin >= 0.5 on every gradable seed)
+  gradable-and-binding states per seed: {20261701: 0, 20261702: 0, 20261703: 0} (the law's PASS needs >= 2 on every seed: NOT MET — the bound states named: [])
+M-NOHARM:
+  seed 20261701: (a) CONT 1.0000 vs NOSTATE 0.9942 (n 4000) -> pass; (b) proto-home 4 on the state row of 7 present (n 8, smallest gap 1.250) -> FAIL
+  seed 20261702: (a) CONT 0.9998 vs NOSTATE 0.9992 (n 4000) -> pass; (b) proto-home 4 on the state row of 7 present (n 8, smallest gap 1.250) -> FAIL
+  seed 20261703: (a) CONT 0.9992 vs NOSTATE 0.9985 (n 4000) -> pass; (b) proto-home 4 on the state row of 7 present (n 8, smallest gap 1.250) -> FAIL
+  the dealt mentor reaches M-BIND's skill level on: ['unsure@20261701', 'unsure@20261702']
+VERDICT (§6 as amended by AMENDMENT 1, row 1): VOID
+  binds {'unsure': False, 'fresh': False, 'asked': False} noharm False teach_any True gates False s6 True truth False
+written scratch/w2-graded-report.json
