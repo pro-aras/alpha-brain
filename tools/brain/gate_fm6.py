@@ -62,7 +62,9 @@ OUT = Path("/data/dev/brain-runs/organ/gate-fm6")
 LIFE_ROOTS = (Path("/data/dev/genome-lives"),)
 # edit: Kimi K3 (kimi-code, builder lane kimi-w1, integrator hat), 2026-10-05 00:27 +0400 — the seat's ONE shared pinned window
 # (PREREG-W1 + PREREG-SLEEP-IDLE): INNER_RUNS (the swarm-1003 root, now read as plain files only) joins the forbidden list beside RUNS.
-FORBIDDEN_OUT = (C.S1B1R_RUNS, C.S1B1_RUNS, C.S1A_RUNS, C.SCENE_ORGAN_RUNS, C.FM6_RUNS, C.HEAR_RUNS, C.DRIVE_RUNS, C.INNER_RUNS, C.RUNS) + LIFE_ROOTS
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6's ONE pinned window (the law §6):
+# SWARM1005_RUNS (the W1 window's root, now read as plain files only) joins the forbidden list beside RUNS.
+FORBIDDEN_OUT = (C.S1B1R_RUNS, C.S1B1_RUNS, C.S1A_RUNS, C.SCENE_ORGAN_RUNS, C.FM6_RUNS, C.HEAR_RUNS, C.DRIVE_RUNS, C.INNER_RUNS, C.SWARM1005_RUNS, C.RUNS) + LIFE_ROOTS
 LAW_LINE = GA.BRAIN_LINE
 FIX_LINE = GA.BRAIN_LINE.replace("young 3;", "young 3 nearest;")
 SETS = ("held", "fresh", "s1b1")
