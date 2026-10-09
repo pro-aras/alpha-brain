@@ -424,7 +424,8 @@ class Mind:
     uses — payload bytes for a tape row live at run_root/tape/<row.payload>. blind: gene names this mind
     is blind to (e.g. {"gaze"} runs the random-gaze twin, PREREG §2.9's --blind gaze)."""
 
-    def __init__(self, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None):
+    def __init__(self, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None,
+                 precision: bool = False):
         self.genome_path = Path(genome_path)
         self.run_root = Path(run_root)
         self.genome_text = self.genome_path.read_text()
@@ -436,6 +437,10 @@ class Mind:
         # every eye row's canvas through the front instead of the raw-frame feature path, and each eye row's journal
         # glance row gains §2.7's one additive `front` key. No genome edit, no parser edit, no machinery.py touch.
         self.eye_front = eye_front
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-09 14:26 +0400 — PREREG-N1-PRECISION §1's wiring:
+        # the precision flag as a CONSTRUCTION PARAMETER, threaded to both Predictor builds (the init below and the
+        # resume-path rebuild); default False = byte-identical, no genome/parser/machinery.py touch (the OW-3 form).
+        self.precision = precision
 
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — W3-0 (docs/G4-WAVE3-CLAUSES.md):
         # THE GENERIC REFUSAL, first — before any object is built from the genome (a refusal message must
@@ -594,7 +599,7 @@ class Mind:
         # clause (machinery.py's parser, default "novelty" when the genome's PREDICT line carries no
         # trailing "; error <arm>" — every genome on disk before this edit, G4.genome included).
         self.predictor: Optional[Predictor] = (
-            Predictor(self.org, arm=self.genome.declared["PREDICT"].get("arm", "novelty"))
+            Predictor(self.org, arm=self.genome.declared["PREDICT"].get("arm", "novelty"), precision=self.precision)
             if "PREDICT" in self.genome.declared else None
         )
         self._last_sleep_at: int = 0        # org.t at the last SLEEP boundary crossed
@@ -4348,7 +4353,8 @@ class Mind:
                 # G5-E: _word_seen (arm "conjunctive") is NOT persisted (see genome/predict.py's module
                 # docstring) — a resumed life restarts every word's count at 0. Out of scope for this
                 # brief (replay-only); raised in G5-E-REPORT.md.
-                mind.predictor = Predictor(mind.org, arm=mind.genome.declared["PREDICT"].get("arm", "novelty"))
+                mind.predictor = Predictor(mind.org, arm=mind.genome.declared["PREDICT"].get("arm", "novelty"),
+                                           precision=mind.precision)   # N1: the flag re-threads at resume (PREREG-N1 §1)
                 last_winner = ledger.get("predictor_last_winner")
                 if last_winner is not None:
                     mind.predictor._last_winner = np.array(last_winner, dtype=np.float64)

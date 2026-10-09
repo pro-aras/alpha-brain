@@ -96,6 +96,16 @@ from .machinery import Organism
 
 FILE_FIELDS = ("claim", "route", "decider", "due")
 
+# N1 PRECISION (PREREG-N1-PRECISION §1 + AMENDMENT 1, SIGNED 2026-10-09; docs/brain/precision/) — the declared
+# machine-form constants of the precision register, fixed before any reading, never fitted. The register lives
+# ONLY behind Predictor(precision=True) (default False: not one of these lines runs — the byte-identity pin).
+PRECISION_ETA_FAST = 0.05     # v_fast EMA rate (τ ≈ 20 moments): the stream's recent reliability
+PRECISION_ETA_SLOW = 0.005    # v_slow EMA rate (τ ≈ 200 moments): the long-run anchor the present is weighed against
+PRECISION_FLOOR = 1e-6        # δ — the variance floor inside the ratio
+PRECISION_PRIOR = 0.25        # v0 — both registers start here; the first call's w = v0/(v0+δ) = 1 falls out
+PRECISION_W_LO = 0.25         # the weight clip: the register can discount to a quarter…
+PRECISION_W_HI = 4.0          # …or amplify to fourfold, never beyond (modulate's own [lo, hi] clip stands after)
+
 
 class Predictor:
     """PREDICT — PREREG §3 B6: `expect()`, `error(x_actual)`, `modulate(lr)`. Bound to one Organism;
@@ -109,13 +119,20 @@ class Predictor:
     G5-E (2026-09-21): `arm` names which of the four G-MIND-3 error computations `error()` runs —
     "novelty" (default, today's, byte-identical), "conjunctive", "episodic", "comparator"."""
 
-    def __init__(self, org: Organism, lo: float = 0.5, hi: float = 2.0, arm: str = "novelty"):
+    def __init__(self, org: Organism, lo: float = 0.5, hi: float = 2.0, arm: str = "novelty", precision: bool = False):
         self.org = org
         self.lo, self.hi = lo, hi
         self._last_winner: Optional[np.ndarray] = None
         self.last_error: Optional[float] = None
         self.arm = arm
         self._word_seen: Dict[str, int] = {}          # G5-E arm "conjunctive": canvases this word has been delivered on, so far
+        # N1 (edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-09 14:25 +0400 — PREREG-N1-PRECISION
+        # + AMENDMENT 1): the precision register, default OFF = byte-identical. Two variance EMAs of the raw
+        # error stream at the declared prior; `last_weight` stays None while the flag is off (the pin reads it).
+        self.precision = precision
+        self._v_fast = PRECISION_PRIOR
+        self._v_slow = PRECISION_PRIOR
+        self.last_weight: Optional[float] = None
 
     def note_winners(self, S: List[int]) -> None:
         """S: the sight winners of the moment just lived (best first, §11 am. 3's resonate order). The
@@ -170,6 +187,15 @@ class Predictor:
             e = self._error_comparator(x_actual, area, word, xw, e_novelty)
         else:
             raise ValueError(f"Predictor.error: unknown arm {self.arm!r} (novelty|conjunctive|episodic|comparator)")
+        if self.precision:
+            # N1 (PREREG-N1-PRECISION §1 + AMENDMENT 1): the precision weight is READ from the registers
+            # first (causal — the past weighs the present), THEN both registers update with this raw error.
+            # last_error keeps the RAW value (the journal, act grading and sleep ranking read raw);
+            # the weight is consumed by modulate() alone.
+            w = float(np.clip(self._v_slow / (self._v_fast + PRECISION_FLOOR), PRECISION_W_LO, PRECISION_W_HI))
+            self._v_fast = (1.0 - PRECISION_ETA_FAST) * self._v_fast + PRECISION_ETA_FAST * e * e
+            self._v_slow = (1.0 - PRECISION_ETA_SLOW) * self._v_slow + PRECISION_ETA_SLOW * e * e
+            self.last_weight = w
         self.last_error = e
         return e
 
@@ -235,8 +261,12 @@ class Predictor:
 
     def modulate(self, lr: float) -> float:
         """lr x clip(0.5 + 3*error, 0.5, 2.0) — PREREG's genome line: `PREDICT … error scales delta
-        0.5..2.0`. Reads the last `error()` call's result; with none yet, error=0 (scale floors at 0.5)."""
+        0.5..2.0`. Reads the last `error()` call's result; with none yet, error=0 (scale floors at 0.5).
+        N1: with `precision` on, the SAME formula reads the precision-weighted error (e · w, w from the
+        register at the last error() call); the [lo, hi] clip is unchanged either way."""
         e = self.last_error if self.last_error is not None else 0.0
+        if self.precision and self.last_weight is not None:
+            e = e * self.last_weight
         scale = float(np.clip(0.5 + 3.0 * e, self.lo, self.hi))
         return lr * scale
 
