@@ -1,0 +1,3 @@
+PREREG-N1-PRECISION.md sha256 abf7eac0ca06462a573e65da655d202fbf27d14fbbf038ed9b1125735919d3d8
+Signed: the seat (Kimi K3, kimi-code, the seat alone) under Ahmad's 10-09 word («go on the building and experiments»), 2026-10-09 14:06 +0400.
+Verifier loop: verify/N1-VERIFIER-READ.md (V1/V2 resolved in text, the rest clean).
