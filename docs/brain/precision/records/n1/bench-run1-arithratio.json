@@ -1,0 +1,76 @@
+{
+  "M-MMN-0": {
+    "bar": "median(first40) >= median(last40) + 0.05",
+    "first40_median": 0.11905661688513197,
+    "last40_median": 0.0848953491386743,
+    "n": [
+      40,
+      40
+    ],
+    "pass": false
+  },
+  "M-MMN-1": {
+    "bar": "median w(deviant|late A) >= 1.25 x median w(deviant|B), and > null MAX",
+    "w_deviant_A": [
+      2.103664522301436,
+      2.7640119370767833,
+      2.7082558473648146
+    ],
+    "w_deviant_B": [
+      0.36342815966251085,
+      0.5541899839147629,
+      0.654441516564602
+    ],
+    "ratio": 4.8868725995981865,
+    "null_ratios": [
+      2.666844004439047,
+      2.434450171832136,
+      5.541226010529773,
+      4.796109781334557,
+      2.3176005832200386,
+      1.3548381003701113,
+      2.8010727270278073,
+      4.014716836144735,
+      1.6252952298536776,
+      5.368722178292372
+    ],
+    "null_max": 5.541226010529773,
+    "n": [
+      3,
+      3,
+      10
+    ],
+    "pass": false
+  },
+  "M-MMN-2": {
+    "bar": "weighted slope > 0 and >= raw slope (the protective form)",
+    "slope_raw": 0.03416126774645767,
+    "slope_weighted": -0.06283781182319392,
+    "pass": false
+  },
+  "M-SCALE": {
+    "bar": "median w over phase C's last 100 in [0.8, 1.25]",
+    "tail_median": 2.6737414954760506,
+    "n_tail": 100,
+    "clip_share": 0.30277777777777776,
+    "clip_presence": 545,
+    "n_all": 1800,
+    "pass": false
+  },
+  "M-COST": {
+    "bar": "ON vs OFF process_time overhead <= 5%",
+    "cpu_real_s": 0.48589384300000005,
+    "cpu_off_s": 0.4879847760000001,
+    "overhead": -0.004284832443215548,
+    "pass": true
+  },
+  "G-PLANT": {
+    "bar": "the frozen-register arm FAILS M-MMN-1 (the instrument sees the mechanism absent)",
+    "plant_ratio": 0.9999930760599461,
+    "n": [
+      3,
+      3
+    ],
+    "pass": true
+  }
+}
