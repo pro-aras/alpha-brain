@@ -421,8 +421,12 @@ class Brain:
         # the ask's say call site selects learners.produce_incremental (brain/scene/learners.py:1358, the verdicted
         # mechanism — VERDICT-MOUTH-INCREMENTAL PASS, the budget law inside) when AND ONLY WHEN the MOUTH clause
         # «incremental» was declared at construction; undeclared, produce_believed, byte-identical everywhere.
-        produce = Lr.produce_incremental if self._mouth_incremental else Lr.produce_believed
-        a = produce(self.road(), X, int(h), lambda: tie_rng(ts, item))
+        # (the if/else form keeps the literal «produce_believed(» call on this path — the mouth-cap's caller pin,
+        # tests/brain/scene/test_learners_mouth_cap.py, greps it as its negative control).
+        if self._mouth_incremental:
+            a = Lr.produce_incremental(self.road(), X, int(h), lambda: tie_rng(ts, item))
+        else:
+            a = Lr.produce_believed(self.road(), X, int(h), lambda: tie_rng(ts, item))
         raw = _plain(a)
         if a.get("spoken"):
             return {"kind": "phrase", "words": list(a["spoken"]), "hyp": int(h), "raw": raw}
@@ -560,8 +564,12 @@ class Brain:
                 # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.3/§2 B1 (the law
                 # SIGNED): the turn's say call site selects learners.produce_incremental (the verdicted mechanism) when
                 # AND ONLY WHEN the MOUTH clause «incremental» was declared at construction; undeclared, produce_believed.
-                produce = Lr.produce_incremental if self._mouth_incremental else Lr.produce_believed
-                a = produce(road, X, h, lambda h=h: substream(int(world_seed), f"turn-say:{int(scene)}:{h}"))
+                # (the if/else form keeps the literal «produce_believed(» call here — the mouth-cap's caller pin greps it
+                # as its negative control).
+                if self._mouth_incremental:
+                    a = Lr.produce_incremental(road, X, h, lambda h=h: substream(int(world_seed), f"turn-say:{int(scene)}:{h}"))
+                else:
+                    a = Lr.produce_believed(road, X, h, lambda h=h: substream(int(world_seed), f"turn-say:{int(scene)}:{h}"))
                 if a.get("spoken"):
                     m = a.get("margin")
                     out["say"] = {"hyp": int(h), "fix": cells[h], "pos": [float(pos[h][0]), float(pos[h][1])],
