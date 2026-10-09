@@ -1,0 +1,36 @@
+N1 PRECISION bench — the law's marks (PREREG-N1-PRECISION + AMENDMENTS 1-2)
+
+M-MMN-0: PASS — bar median(first40 of A) >= median(last100 of C) + 0.05 (A3.2's window)
+    first40_median: 0.12524243947309416
+    c_last100_median: 0.058458437376747385
+    n: [40, 100]
+
+M-MMN-1: PASS — bar median w(deviant|late A) >= 1.25 x median w(deviant|B), and > null MAX
+    w_deviant_A: [2.4613219164535187, 2.1730309863883, 1.71530039591061]
+    w_deviant_B: [0.26828989207476994, 0.3953653403947818, 0.5388236357478542]
+    ratio: 5.496260709698216
+    null_ratios: [1.3853407975415715, 1.2071038157971603, 1.533032867071407, 1.4741570523196623, 1.2644224187753668, 0.9441248351981754, 1.281019214966489, 1.8170027241981028, 1.2308975674791145, 1.1417230569847927]
+    null_max: 1.8170027241981028
+    n: [3, 3, 10]
+
+M-MMN-2: PASS — bar weighted slope > 0 and >= raw slope (the protective form)
+    slope_raw: 0.038221160849752966
+    slope_weighted: 0.14006440904787734
+
+M-SCALE: PASS — bar median w over phase C's last 100 in [0.8, 1.25]
+    tail_median: 1.0376401108136615
+    n_tail: 100
+    clip_share: 0.14722222222222223
+    clip_presence: 265
+    n_all: 1800
+
+M-COST: PASS — bar ON vs OFF process_time overhead <= 5%
+    cpu_real_s: 0.47643793900000003
+    cpu_off_s: 0.49152754200000004
+    overhead: -0.030699404836199404
+
+G-PLANT: PASS — bar the frozen-register arm FAILS M-MMN-1 (the instrument sees the mechanism absent)
+    plant_ratio: 1.0
+    n: [3, 3]
+
+BENCH VERDICT LINE: ALL MARKS PASS

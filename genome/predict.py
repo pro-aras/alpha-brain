@@ -96,13 +96,16 @@ from .machinery import Organism
 
 FILE_FIELDS = ("claim", "route", "decider", "due")
 
-# N1 PRECISION (PREREG-N1-PRECISION §1 + AMENDMENT 1, SIGNED 2026-10-09; docs/brain/precision/) — the declared
+# N1 PRECISION (PREREG-N1-PRECISION §1 + AMENDMENTS 1–3, SIGNED 2026-10-09; docs/brain/precision/) — the declared
 # machine-form constants of the precision register, fixed before any reading, never fitted. The register lives
 # ONLY behind Predictor(precision=True) (default False: not one of these lines runs — the byte-identity pin).
-PRECISION_ETA_FAST = 0.05     # v_fast EMA rate (τ ≈ 20 moments): the stream's recent reliability
-PRECISION_ETA_SLOW = 0.005    # v_slow EMA rate (τ ≈ 200 moments): the long-run anchor the present is weighed against
-PRECISION_FLOOR = 1e-6        # δ — the variance floor inside the ratio
-PRECISION_PRIOR = 0.25        # v0 — both registers start here; the first call's w = v0/(v0+δ) = 1 falls out
+# AMENDMENT 3's form: the registers are EMAs of log(e^2 + δ) — the arithmetic variance ratio carries a Jensen
+# bias on bursty stationary streams (measured: w 2.674 at true stationarity); log-domain EMAs of the same
+# variable converge to the same expectation, so w -> 1 at stationarity by construction.
+PRECISION_ETA_FAST = 0.05     # l_fast EMA rate (τ ≈ 20 moments): the stream's recent reliability
+PRECISION_ETA_SLOW = 0.005    # l_slow EMA rate (τ ≈ 200 moments): the long-run anchor the present is weighed against
+PRECISION_FLOOR = 1e-6        # δ — inside the log: log(e^2 + δ)
+PRECISION_PRIOR = 0.25        # v0 — both registers start at log(v0); the first call's w = exp(0) = 1 exactly
 PRECISION_W_LO = 0.25         # the weight clip: the register can discount to a quarter…
 PRECISION_W_HI = 4.0          # …or amplify to fourfold, never beyond (modulate's own [lo, hi] clip stands after)
 
@@ -127,11 +130,11 @@ class Predictor:
         self.arm = arm
         self._word_seen: Dict[str, int] = {}          # G5-E arm "conjunctive": canvases this word has been delivered on, so far
         # N1 (edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-09 14:25 +0400 — PREREG-N1-PRECISION
-        # + AMENDMENT 1): the precision register, default OFF = byte-identical. Two variance EMAs of the raw
-        # error stream at the declared prior; `last_weight` stays None while the flag is off (the pin reads it).
+        # + AMENDMENT 1): the precision register, default OFF = byte-identical. Two EMAs of log(e^2 + δ)
+        # (AMENDMENT 3's form) at the declared prior; `last_weight` stays None while the flag is off.
         self.precision = precision
-        self._v_fast = PRECISION_PRIOR
-        self._v_slow = PRECISION_PRIOR
+        self._l_fast = float(np.log(PRECISION_PRIOR))
+        self._l_slow = float(np.log(PRECISION_PRIOR))
         self.last_weight: Optional[float] = None
 
     def note_winners(self, S: List[int]) -> None:
@@ -188,13 +191,14 @@ class Predictor:
         else:
             raise ValueError(f"Predictor.error: unknown arm {self.arm!r} (novelty|conjunctive|episodic|comparator)")
         if self.precision:
-            # N1 (PREREG-N1-PRECISION §1 + AMENDMENT 1): the precision weight is READ from the registers
-            # first (causal — the past weighs the present), THEN both registers update with this raw error.
-            # last_error keeps the RAW value (the journal, act grading and sleep ranking read raw);
-            # the weight is consumed by modulate() alone.
-            w = float(np.clip(self._v_slow / (self._v_fast + PRECISION_FLOOR), PRECISION_W_LO, PRECISION_W_HI))
-            self._v_fast = (1.0 - PRECISION_ETA_FAST) * self._v_fast + PRECISION_ETA_FAST * e * e
-            self._v_slow = (1.0 - PRECISION_ETA_SLOW) * self._v_slow + PRECISION_ETA_SLOW * e * e
+            # N1 (PREREG-N1-PRECISION §1 + AMENDMENTS 1–3): the precision weight is READ from the registers
+            # first (causal — the past weighs the present), THEN both registers update with this raw error's
+            # log-square. last_error keeps the RAW value (the journal, act grading and sleep ranking read
+            # raw); the weight is consumed by modulate() alone.
+            w = float(np.clip(np.exp(self._l_slow - self._l_fast), PRECISION_W_LO, PRECISION_W_HI))
+            le = float(np.log(e * e + PRECISION_FLOOR))
+            self._l_fast = (1.0 - PRECISION_ETA_FAST) * self._l_fast + PRECISION_ETA_FAST * le
+            self._l_slow = (1.0 - PRECISION_ETA_SLOW) * self._l_slow + PRECISION_ETA_SLOW * le
             self.last_weight = w
         self.last_error = e
         return e

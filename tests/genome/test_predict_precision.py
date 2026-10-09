@@ -59,15 +59,17 @@ def _unit_vec(rng: np.random.Generator, dim: int) -> np.ndarray:
 
 
 def _proto_stream(rng: np.random.Generator, dim: int, n: int, noise_every_3rd: bool = False):
-    """A fixed prototype vector with small jitter (a learnable 'thing' at the vector level); with
-    noise_every_3rd, every i % 3 == 2 moment is a fresh random unit vector (AMENDMENT 1's noisy world)."""
+    """A fixed prototype vector with jitter sized to the CANVAS world's own error floor (e ≈ 0.06 at
+    jitter σ = 0.035: in 112-dim σ·√112 sets the perturbation, e ≈ (σ√dim)²/2 — the vector-level form of
+    the bench's measured canvas floor 0.05-0.1). With noise_every_3rd, every i % 3 == 2 moment is a fresh
+    random unit vector (AMENDMENT 1's noisy world)."""
     proto = _unit_vec(rng, dim)
     out = []
     for i in range(n):
         if noise_every_3rd and i % 3 == 2:
             out.append(_unit_vec(rng, dim))
         else:
-            v = proto + 0.02 * rng.normal(size=dim)
+            v = proto + 0.035 * rng.normal(size=dim)
             out.append(v / np.linalg.norm(v))
     return out
 
@@ -122,21 +124,25 @@ class TestPrecisionRegister(unittest.TestCase):
                          "the first moment is byte-identical even flag-on (w = 1 to within the clip's reading)")
 
     def test_c_register_response_comparative(self) -> None:
-        """G-UNIT (c), AMENDMENT 1's comparative form: the SAME deviant (a fresh random unit vector)
-        reads w > 1 after a stable stream and w < 1 after a noisy stream, ratio ≥ 1.25."""
+        """G-UNIT (c), AMENDMENT 1's comparative form: the SAME deviant (a fresh random unit vector) reads
+        w > 1 after a stable stream and w < 1 after a noisy stream, ratio ≥ 1.25. The streams are long
+        enough for the slow register to leave the v0 prior (τ_slow = 200 moments; shorter streams measure
+        the prior, not the world — found in the 2026-10-09 build walk), and the noisy phase's deviant sits
+        right after a proto row (the sawtooth trough, the bench's own i % 3 == 1 placement)."""
         rng = np.random.default_rng(21)
         g = _build_genome()
         dim = retina_dim(g.retina)
 
         org_s = Organism(g)
         pred_s = Predictor(org_s, precision=True)
-        _run_vectors(pred_s, org_s, _proto_stream(rng, dim, 120))
+        _run_vectors(pred_s, org_s, _proto_stream(rng, dim, 600))
         pred_s.error(_unit_vec(rng, dim))
         w_stable = pred_s.last_weight
 
         org_n = Organism(g)
         pred_n = Predictor(org_n, precision=True)
-        _run_vectors(pred_n, org_n, _proto_stream(rng, dim, 120, noise_every_3rd=True))
+        _run_vectors(pred_n, org_n, _proto_stream(rng, dim, 300))
+        _run_vectors(pred_n, org_n, _proto_stream(rng, dim, 301, noise_every_3rd=True))
         pred_n.error(_unit_vec(rng, dim))
         w_noisy = pred_n.last_weight
 
