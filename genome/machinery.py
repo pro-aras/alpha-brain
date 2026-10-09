@@ -866,6 +866,24 @@ def parse_genome(text: str) -> Genome:
                 g["declared"]["WORLD_SCENE"] = {
                     "seed": int(m.group(1)), "train": int(m.group(2)), "sitting": [] if sets_ == ["none"] else sets_, "feed": feed_,
                     "utterance": "true" if m.group(7) == "true" else {"shuffled": int(m.group(8))}}
+            # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.2/§2 B2 (the law SIGNED;
+            # SEAT-LINE sha256 1d00a35f…): `WORLD video …` — a FOURTH shape of the WORLD gene (the game/scene branches'
+            # precedent): the open world's curriculum tapes as a LIFE world. ONE declared form: `video shelf <dir> every
+            # <n> s; loop; manifest sha256` — the shelf FROZEN at launch (a sha256 manifest; additions between lives,
+            # never mid-life), streamed one canvas per <n> s, LOOPING at the shelf's end. Stored under its OWN declared
+            # key `WORLD_VIDEO`; read by creature/body.py:main, which arms creature/senses/video.py. Every literal is
+            # fixed and every number is consumed; the parser never touches the shelf (the sense checks it, by name).
+            # This file is PINNED (brain/scene/cache.py's WORLD_CODE): this branch and the MOUTH «incremental» hunk share
+            # the law's ONE pinned window (the law §6).
+            elif gene == "WORLD" and args[0] == "video":
+                m = re.fullmatch(r"video shelf ([A-Za-z0-9_./-]+) every (\d+) s; loop; manifest sha256", a)
+                if not m:
+                    raise GenomeError(f"WORLD video: cannot read {a!r} (PREREG-ALPHA-6 §1.2: WORLD video shelf <dir> every <n> s; "
+                                      f"loop; manifest sha256 — the ONE declared form)")
+                if int(m.group(2)) < 1:
+                    raise GenomeError(f"WORLD video: the cadence must be >= 1 s, got {m.group(2)}")
+                g["declared"]["WORLD_VIDEO"] = {"shelf": m.group(1), "every_s": int(m.group(2)), "loop": True,
+                                                "manifest": "sha256"}
             # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY: THE BRAIN GENE, one line = one organ (genome/brain.py), grown inside
             # the mind beside MEET (a new consumer of the eye's glances and the ear's words, never a replacement). The values are
             # the scored learner's own (S1b-1R: lr 0.01, eps 0.3, «none» at 0.95, conformal 0.90, a word under 3 meetings is young).

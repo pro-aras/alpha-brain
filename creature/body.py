@@ -171,10 +171,16 @@ class Body:
     """The body: one Tape, one queue, one mind thread, one STATUS thread, N sense threads. `add_sense`
     before `start()`. `stop()` snapshots the mind, writes a final STATUS, and journals a stop event."""
 
-    def __init__(self, root: Path, genome_path: Path, blind: frozenset = frozenset()):
+    def __init__(self, root: Path, genome_path: Path, blind: frozenset = frozenset(), eye_front=None):
         self.root = Path(root)
         self.genome_path = Path(genome_path)
         self.blind = blind
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6 §1.5/§2 B3 (the law
+        # SIGNED; SEAT-LINE sha256 1d00a35f…): the opt-in `eye_front` pass-through — V2's own declared parameter
+        # (PREREG-OPEN-WORLD-3; creature/replay.py:276-283's form mirrored at main() below), handed to Mind at the
+        # birth and at every resume in start(). None (the default, every caller that does not name it): the
+        # organism's old eye, byte-identical.
+        self.eye_front = eye_front
         # edit: Claude (Sonnet 5, W3 builder C), 2026-09-21 11:08 +0400 — C1 (docs/G4-WAVE3-CLAUSES.md
         # W3-0b): the genome is read once, here, before Mind exists (Mind is built only in start()) --
         # Tape's own directory (C1.2) and the BODY thread-roster refusal (C1.6) both need the declared
@@ -203,6 +209,9 @@ class Body:
         # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:38 +0400 — BRAIN-IN-BODY §5: set by main() only
         # when WORLD_SCENE is armed (creature/senses/scene.py:Progress); None otherwise, read by _build_status.
         self.scene_progress = None
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6 §2 B2: the same for
+        # WORLD_VIDEO (creature/senses/video.py:Progress); None otherwise, read by _build_status.
+        self.video_progress = None
         self._mind_thread: Optional[threading.Thread] = None
         self._status_thread: Optional[threading.Thread] = None
         self._ask_thread: Optional[threading.Thread] = None
@@ -242,9 +251,9 @@ class Body:
             raise LifeClosed(why)
         state_ok = (self.root / "state" / "organism.npz").exists()
         if state_ok:
-            self.mind, last_seq = Mind.resume(self.genome_path, self.root, blind=self.blind)
+            self.mind, last_seq = Mind.resume(self.genome_path, self.root, blind=self.blind, eye_front=self.eye_front)
         else:
-            self.mind = Mind(self.genome_path, self.root, blind=self.blind)
+            self.mind = Mind(self.genome_path, self.root, blind=self.blind, eye_front=self.eye_front)
             last_seq = 0
         backlog = 0
         for row in read_tape(self.root, declared_path=self._tape_declared_path):
@@ -504,6 +513,11 @@ class Body:
             # the same defensive convention every other STATUS field in this method already uses.
             "scene": (sp.snapshot() if (sp := getattr(self, "scene_progress", None)) is not None
                       else {"published_moments": 0, "train_done": False, "sitting_done": {}, "ended": False}),
+            # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6 §2 B2: the video
+            # world's own progress on EVERY write (#164's law, the "scene" key's form above; the same defensive
+            # getattr convention — a mock stand-in that predates the attribute reads the zeros).
+            "video": (vp.snapshot() if (vp := getattr(self, "video_progress", None)) is not None
+                      else {"published_rows": 0, "published_canvases": 0, "loop": 0, "ended": False}),
             # edit: Claude (Fable 5.1, the seat), 2026-09-28 21:43 +0400 — the reviewer's R2 (REVIEW-BEFORE-RUNG3): this runs on the STATUS thread
             # while the mind thread learns and answers; brain_status() walks dicts the mind thread grows. One «dictionary
             # changed size during iteration» here would END the status thread (its loop has no guard): STATUS would freeze
@@ -592,6 +606,17 @@ def _declared_scene_config(declared: Dict[str, dict]) -> Optional[Dict[str, obje
     if not scene_sense.SCENE_DOOR_GATED:
         return None
     return declared.get("WORLD_SCENE")
+
+
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6 §1.2/§2 B2: the video world's
+# own arming, mirroring _declared_scene_config's shape and gate discipline exactly (C2/C3's convention).
+def _declared_video_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
+    """WORLD_VIDEO undeclared -> None (arms nothing). WORLD_VIDEO declared -> its own parsed dict, gated on
+    creature.senses.video.VIDEO_DOOR_GATED so a genome line arms nothing until the code carrying it exists."""
+    from .senses import video as video_sense   # lazily, same discipline as scene/game/evolve/web above
+    if not video_sense.VIDEO_DOOR_GATED:
+        return None
+    return declared.get("WORLD_VIDEO")
 
 
 def _declared_evolve_config(declared: Dict[str, dict]) -> Optional[Dict[str, object]]:
@@ -818,7 +843,17 @@ def main(argv: List[str]) -> int:
     genome_for_cli = parse_genome(genome_path.read_text())
     declared = genome_for_cli.declared
 
-    body = Body(root, genome_path)
+    # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6 §1.5/§2 B3 (the law
+    # SIGNED): `--eye-front` wires the innate video front into the LIFE's runner (creature/senses/vfront.py's
+    # VideoFront over the genome's own GAZE dict and SENSE colour dict — the FRONT'S OWN band spec, built fresh
+    # HERE, once per process, so its temporal state is this process's own; creature/replay.py:276-283's form
+    # mirrored exactly). Absent: eye_front None, every byte of behavior unchanged (the law's G-IDENTITY gates).
+    eye_front = None
+    if "--eye-front" in argv:
+        from creature.senses.vfront import VideoFront
+        eye_front = VideoFront(genome_for_cli.gaze, genome_for_cli.colour)
+
+    body = Body(root, genome_path, eye_front=eye_front)
     if _maker_should_arm(declared, argv):
         plant = os.environ.get("CREATURE_PLANT_EXCEPTION")
         fn = _maker_sense_fn(argv, declared, root)   # WORLD's period/window (+ CLI overrides) + --plant-after
@@ -837,6 +872,19 @@ def main(argv: List[str]) -> int:
         scene_fn = functools.partial(scene_sense.sense, root=root, cfg=scene_cfg, backlog=lambda: body.q.qsize(),
                                      progress=body.scene_progress)
         body.add_sense("scene", scene_fn)
+
+    # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6 §1.2/§2 B2: the video
+    # world's sense, armed from declared['WORLD_VIDEO'] behind VIDEO_DOOR_GATED (C2/C3's own convention, the scene
+    # block's own shape above). `progress` and `events` are the sense's two extra kwargs: the in-process counters
+    # (_build_status's "video" key) and the body's own journal writer (the loop count journaled, the law's §1.2).
+    video_cfg = _declared_video_config(declared)
+    if video_cfg is not None:
+        from .senses import video as video_sense
+        import functools
+        body.video_progress = video_sense.Progress()
+        video_fn = functools.partial(video_sense.sense, root=root, cfg=video_cfg,
+                                     progress=body.video_progress, events=body._journal_event)
+        body.add_sense("video", video_fn)
 
     # C2: --folder PATH stays an explicit override for tests, regardless of the gate (A12's own road,
     # unchanged); otherwise the door arms only from the genome's own WORLD line, behind FOLDER_DOOR_GATED.

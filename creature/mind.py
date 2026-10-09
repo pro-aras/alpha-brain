@@ -4208,7 +4208,7 @@ class Mind:
         self.snapshot()
 
     @classmethod
-    def resume(cls, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset()) -> Tuple["Mind", int]:
+    def resume(cls, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None) -> Tuple["Mind", int]:
         """Load the latest snapshot (if any) and return (mind, last_seq). No snapshot -> a fresh mind, 0.
 
         ALPHA4-PREREG.md §6 (EVOLVE): epoch-aware (`_latest_evolved_genome`, above) — a root that carries one
@@ -4218,7 +4218,11 @@ class Mind:
         counter — the files on disk ARE the count)."""
         heal = _heal_torn_snapshot(Path(run_root))       # his 23:20 word: a snapshot torn by a kill is healed BEFORE anything loads
         evolve_epoch, evolved_path = _latest_evolved_genome(Path(run_root))
-        mind = cls(evolved_path if evolved_path is not None else genome_path, run_root, blind=blind)
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6 §1.5/§2 B3: the
+        # body's opt-in eye_front pass-through reaches a resume exactly as a birth (V2's declared parameter —
+        # creature/replay.py:276-283's form; absent = byte-identical). The front's temporal state is the NEW
+        # process's own: built fresh by the caller, one previous frame + the operating point, by construction.
+        mind = cls(evolved_path if evolved_path is not None else genome_path, run_root, blind=blind, eye_front=eye_front)
         mind.snapshot_heal = heal
         mind.evolve_epoch = evolve_epoch
         state_dir = Path(run_root) / "state"

@@ -281,6 +281,10 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # exists to catch (its own comment above, now proven on a sixth builder).
         "WORLD_SCENE": ("WORLD    scene seed 20261101; train 10000; sitting fresh s1b1; feed max backlog 8; "
                         "utterance true"),
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6 §1.2/§2 B2: one row,
+        # matching the genes.py RUNS entry added by this build (WORLD_VIDEO). Caught by this class's own gate on the
+        # first targeted run — the omission this class exists to catch (its own comment above, now proven again).
+        "WORLD_VIDEO": "WORLD    video shelf /data/dev/genome-lives/brain-long-5/world/video-shelf every 2 s; loop; manifest sha256",
     }
 
     def test_every_runs_gene_parses(self) -> None:
