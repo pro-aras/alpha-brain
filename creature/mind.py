@@ -889,6 +889,12 @@ class Mind:
         # MEET (it replaces nothing). None without a BRAIN line or under `--blind brain` (the twin: the asks go to the organs' road).
         # `pending_asks`: moment -> the asks held for that moment's eye row, in tape order (saved in the snapshot like ear_pending).
         # `asks_answered`/`asks_by`: counts for STATUS (brain_status). A BRAIN line whose organ is not on this tree refuses BY NAME.
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.3/§2 B1 (the law SIGNED;
+        # SEAT-LINE sha256 1d00a35f…): the MOUTH line's OPTIONAL word «incremental», read here ONCE and handed to the brain at
+        # EVERY construction below (the birth, the inheritance, and the resume at Mind.resume) — a construction parameter,
+        # never a BRAIN gene value (the W1 «brain» clause's own read at self._voice, below, is the pattern). ABSENT: False,
+        # the old mouth, byte-identical everywhere.
+        self._mouth_incremental: bool = bool((self.genome.declared.get("MOUTH") or {}).get("incremental"))
         self.brain = None
         self.brain_restored: Optional[bool] = None
         if "BRAIN" in self.genome.declared and "brain" not in self.blind:
@@ -896,7 +902,7 @@ class Mind:
                 brain_cls = _brain_class()
             except ImportError as e:
                 raise GenomeError(f"BRAIN declared but genome/brain.py cannot be imported ({e}): the organism does not start")
-            self.brain = brain_cls(dict(self.genome.declared["BRAIN"]))
+            self.brain = brain_cls(dict(self.genome.declared["BRAIN"]), mouth_incremental=self._mouth_incremental)
         # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:35 +0400 — PREREG-INHERIT §3: a root that holds inherit/brain.json|npz gives the NEWBORN its
         # parent's brain (the learner and the aligned lists; the cited episodes emptied). With no pair this is the old birth,
         # untouched. `brain_inherited` is STATUS's; the one journal row is written before the life's first row is consumed.
@@ -905,7 +911,8 @@ class Mind:
         _pair = self.run_root / "inherit" / "brain"
         if self.brain is not None and (Path(str(_pair) + ".json").exists() or Path(str(_pair) + ".npz").exists()):
             try:
-                self.brain, self.brain_inherited = brain_cls.inherit(_pair, dict(self.genome.declared["BRAIN"]))
+                self.brain, self.brain_inherited = brain_cls.inherit(_pair, dict(self.genome.declared["BRAIN"]),
+                                                                     mouth_incremental=self._mouth_incremental)
             except Exception as e:
                 raise GenomeError(f"{e} (root {self.run_root})")
             self._inherit_row_due = True
@@ -4293,7 +4300,8 @@ class Mind:
                                      "skipped": {str(a): int(b) for a, b in (c_.get("skipped") or {}).items()}}
             if mind.brain is not None:
                 if (state_dir / "brain.npz").exists() and (state_dir / "brain.json").exists():
-                    mind.brain = _brain_class().load(state_dir / "brain", dict(mind.genome.declared["BRAIN"]))
+                    mind.brain = _brain_class().load(state_dir / "brain", dict(mind.genome.declared["BRAIN"]),
+                                                     mouth_incremental=mind._mouth_incremental)   # PREREG-ALPHA-6 §1.3: the clause re-declared at the resume
                     mind.brain_restored = True
                     mind._inherit_row_due = False      # PREREG-INHERIT §3: the inherit row is in the journal of the life that saved
                     mind.brain.author = Path(run_root).name   # PREREG-METADATA-1 §2

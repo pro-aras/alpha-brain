@@ -545,14 +545,26 @@ def parse_genome(text: str) -> Genome:
                 # key) — pinned by tests/creature/test_question_sentence_mouth.py and test_voice_mind.py; PRESENT: ONE more key,
                 # "brain": "phrase per canvas". A misspelt clause is refused by name (test_voice_mind.py). This file is PINNED
                 # (brain/scene/cache.py's WORLD_CODE): the redraw window that lands this hunk is the seat's (the law §2, the pin).
-                m = re.fullmatch(r"say one frame per think( and the brain's phrase per canvas)?; journaled", a)
-                if not m: raise GenomeError(f"MOUTH: cannot read {a!r} (L-11: MOUTH say one frame per think[ and the brain's phrase per canvas]; journaled)")
+                # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.3/§2 B1 (the law SIGNED;
+                # SEAT-LINE sha256 1d00a35f…): the line gains EXACTLY the one declared word, an OPTIONAL trailing clause
+                # «; incremental» (the mouth verdict's rung, VERDICT-MOUTH-INCREMENTAL PASS). ABSENT: the dict is EXACTLY the
+                # old one (no new key — every genome on disk unchanged, pinned by
+                # tests/genome/test_parse_mouth_incremental.py); PRESENT: ONE more key, "incremental": True, and
+                # genome/brain.py's two produce_believed call sites select produce_incremental (brain/scene/learners.py:1358)
+                # when and only when the clause declares it. A misspelt clause refuses BY NAME. This file is PINNED
+                # (brain/scene/cache.py's WORLD_CODE): this hunk and the WORLD video branch share the law's ONE pinned
+                # window (the law §6): the redraw into the fresh root scene-organ-alpha6 is this branch's own price.
+                m = re.fullmatch(r"say one frame per think( and the brain's phrase per canvas)?; journaled(?:; (incremental))?", a)
+                if not m: raise GenomeError(f"MOUTH: cannot read {a!r} (L-11: MOUTH say one frame per think[ and the brain's phrase per canvas]; journaled[; incremental] — PREREG-ALPHA-6 §1.3: the one word 'incremental')")
                 g["declared"]["MOUTH"] = {"say": "one frame per think", "journaled": True}
                 if m.group(1):
                     g["declared"]["MOUTH"]["brain"] = "phrase per canvas"
+                if m.group(2):
+                    g["declared"]["MOUTH"]["incremental"] = True
             # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY: "scene" joins "game" as a shape this branch does not take
             # (the drawn world's own grammar and dict are untouched; `WORLD scene …` has its own branch below).
-            elif gene == "WORLD" and (not args or args[0] not in ("game", "scene")):
+            # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.2: "video" joins them (its own branch below).
+            elif gene == "WORLD" and (not args or args[0] not in ("game", "scene", "video")):
                 # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:25 +0400 — A4L-VOICE task 1: an OPTIONAL trailing
                 # "; voice <kind>" clause (GAZE's "coarse"/BUDGET's "regenerate" precedent) — absent, the dict is EXACTLY the four
                 # keys every pin reads (no "voice" key at all); present, only "formant" is implemented (anything else refuses by
