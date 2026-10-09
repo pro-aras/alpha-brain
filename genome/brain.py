@@ -196,8 +196,14 @@ class Brain:
     """ONE organ: an RWLearner (A-RW-R's learning, lr from the genome), its calibration list, the LAW road over it, and the
     per-word EPISODES the learner attributed (M4's store). See the module docstring for where each BRAIN value is read."""
 
-    def __init__(self, cfg: Dict[str, object]):
+    def __init__(self, cfg: Dict[str, object], *, mouth_incremental: bool = False):
         self.cfg = check_cfg(cfg)
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.3/§2 B1 (the law SIGNED;
+        # SEAT-LINE sha256 1d00a35f…): the MOUTH clause «incremental» reaches the organ as a CONSTRUCTION parameter (the mind
+        # reads declared["MOUTH"] and hands it over at every construction — the birth, the resume, the inheritance; it is
+        # never a BRAIN gene value, so check_cfg, the saved meta["cfg"] and the state hash never carry it). False (the
+        # default, every caller that does not name it): the two say call sites are produce_believed's, byte-identical.
+        self._mouth_incremental = bool(mouth_incremental)
         self.L = Lr.RWLearner(lr=self.cfg["lr"])
         self.L.p_from = self.cfg["young"]                 # an INSTANCE attribute: the class default stays P_FROM_MEETING
         self.L.none_level = self.cfg["none_level"]
@@ -411,7 +417,16 @@ class Brain:
             return {"kind": "unseen", "raw": {"spoken": None, "reason": "uncovered", "uncovered": True}}
         if not self.n_calibrations:
             return {"kind": "declined", "reason": "not calibrated", "hyp": int(h), "raw": {"spoken": None, "reason": "not calibrated"}}
-        a = Lr.produce_believed(self.road(), X, int(h), lambda: tie_rng(ts, item))
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.3/§2 B1 (the law SIGNED):
+        # the ask's say call site selects learners.produce_incremental (brain/scene/learners.py:1358, the verdicted
+        # mechanism — VERDICT-MOUTH-INCREMENTAL PASS, the budget law inside) when AND ONLY WHEN the MOUTH clause
+        # «incremental» was declared at construction; undeclared, produce_believed, byte-identical everywhere.
+        # (the if/else form keeps the literal «produce_believed(» call on this path — the mouth-cap's caller pin,
+        # tests/brain/scene/test_learners_mouth_cap.py, greps it as its negative control).
+        if self._mouth_incremental:
+            a = Lr.produce_incremental(self.road(), X, int(h), lambda: tie_rng(ts, item))
+        else:
+            a = Lr.produce_believed(self.road(), X, int(h), lambda: tie_rng(ts, item))
         raw = _plain(a)
         if a.get("spoken"):
             return {"kind": "phrase", "words": list(a["spoken"]), "hyp": int(h), "raw": raw}
@@ -546,7 +561,15 @@ class Brain:
         out["expected"] = [[Bv[k][h] for k in range(len(Bv))] for h in range(n)]
         if says:
             for h in order:
-                a = Lr.produce_believed(road, X, h, lambda h=h: substream(int(world_seed), f"turn-say:{int(scene)}:{h}"))
+                # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.3/§2 B1 (the law
+                # SIGNED): the turn's say call site selects learners.produce_incremental (the verdicted mechanism) when
+                # AND ONLY WHEN the MOUTH clause «incremental» was declared at construction; undeclared, produce_believed.
+                # (the if/else form keeps the literal «produce_believed(» call here — the mouth-cap's caller pin greps it
+                # as its negative control).
+                if self._mouth_incremental:
+                    a = Lr.produce_incremental(road, X, h, lambda h=h: substream(int(world_seed), f"turn-say:{int(scene)}:{h}"))
+                else:
+                    a = Lr.produce_believed(road, X, h, lambda h=h: substream(int(world_seed), f"turn-say:{int(scene)}:{h}"))
                 if a.get("spoken"):
                     m = a.get("margin")
                     out["say"] = {"hyp": int(h), "fix": cells[h], "pos": [float(pos[h][0]), float(pos[h][1])],
@@ -655,7 +678,7 @@ class Brain:
 
     # edit: Claude (Fable 5.1, the seat), 2026-09-29 20:35 +0400 — PREREG-INHERIT §2 / §3: a newborn takes its parent's brain.
     @classmethod
-    def inherit(cls, base: Path, cfg: Dict[str, object]) -> Tuple["Brain", Dict[str, object]]:
+    def inherit(cls, base: Path, cfg: Dict[str, object], *, mouth_incremental: bool = False) -> Tuple["Brain", Dict[str, object]]:
         """PREREG-INHERIT §2: the parent's saved pair <base>.json|npz -> (the child's brain, {learned, hash}). What passes: the
         learner and the four index-aligned lists (`seen`, `moments`, `scenes`, `canvas`). What does not: `episodes`, the store the
         brain CITES — a child cites only what it lived. Every refusal names the inheritance."""
@@ -668,7 +691,7 @@ class Brain:
             saved_hash = json.loads(j.read_text(encoding="utf-8")).get("state_hash")
             if not saved_hash:
                 raise BrainError("the pair carries no state hash")
-            b = cls.load(base, cfg)
+            b = cls.load(base, cfg, mouth_incremental=mouth_incremental)
         except BrainError as e:
             raise BrainError(f"inherit: {e}")
         except Exception as e:
@@ -681,7 +704,10 @@ class Brain:
         return b, info
 
     @classmethod
-    def load(cls, base: Path, cfg: Dict[str, object]) -> "Brain":
+    def load(cls, base: Path, cfg: Dict[str, object], *, mouth_incremental: bool = False) -> "Brain":
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.3/§2 B1: the MOUTH
+        # «incremental» clause is re-declared at a load exactly as at a birth (a resume never changes the genome);
+        # it is no part of the saved cfg/state hash (a construction parameter), default the old mouth.
         base = Path(base)
         meta = json.loads(Path(str(base) + ".json").read_text(encoding="utf-8"))
         want = check_cfg(cfg)
@@ -700,7 +726,7 @@ class Brain:
         if saved_hash is not None and _hash(meta, arrays) != saved_hash:
             raise BrainError("load: the state's files do not hash to the hash they carry")
         dec = _Decoder(arrays)
-        b = cls(cfg)
+        b = cls(cfg, mouth_incremental=mouth_incremental)
         for k, v in meta["learner"].items():
             setattr(b.L, k, dec.dec(v))
         bb = meta["brain"]

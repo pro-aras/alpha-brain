@@ -545,14 +545,26 @@ def parse_genome(text: str) -> Genome:
                 # key) — pinned by tests/creature/test_question_sentence_mouth.py and test_voice_mind.py; PRESENT: ONE more key,
                 # "brain": "phrase per canvas". A misspelt clause is refused by name (test_voice_mind.py). This file is PINNED
                 # (brain/scene/cache.py's WORLD_CODE): the redraw window that lands this hunk is the seat's (the law §2, the pin).
-                m = re.fullmatch(r"say one frame per think( and the brain's phrase per canvas)?; journaled", a)
-                if not m: raise GenomeError(f"MOUTH: cannot read {a!r} (L-11: MOUTH say one frame per think[ and the brain's phrase per canvas]; journaled)")
+                # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.3/§2 B1 (the law SIGNED;
+                # SEAT-LINE sha256 1d00a35f…): the line gains EXACTLY the one declared word, an OPTIONAL trailing clause
+                # «; incremental» (the mouth verdict's rung, VERDICT-MOUTH-INCREMENTAL PASS). ABSENT: the dict is EXACTLY the
+                # old one (no new key — every genome on disk unchanged, pinned by
+                # tests/genome/test_parse_mouth_incremental.py); PRESENT: ONE more key, "incremental": True, and
+                # genome/brain.py's two produce_believed call sites select produce_incremental (brain/scene/learners.py:1358)
+                # when and only when the clause declares it. A misspelt clause refuses BY NAME. This file is PINNED
+                # (brain/scene/cache.py's WORLD_CODE): this hunk and the WORLD video branch share the law's ONE pinned
+                # window (the law §6): the redraw into the fresh root scene-organ-alpha6 is this branch's own price.
+                m = re.fullmatch(r"say one frame per think( and the brain's phrase per canvas)?; journaled(?:; (incremental))?", a)
+                if not m: raise GenomeError(f"MOUTH: cannot read {a!r} (L-11: MOUTH say one frame per think[ and the brain's phrase per canvas]; journaled[; incremental] — PREREG-ALPHA-6 §1.3: the one word 'incremental')")
                 g["declared"]["MOUTH"] = {"say": "one frame per think", "journaled": True}
                 if m.group(1):
                     g["declared"]["MOUTH"]["brain"] = "phrase per canvas"
+                if m.group(2):
+                    g["declared"]["MOUTH"]["incremental"] = True
             # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY: "scene" joins "game" as a shape this branch does not take
             # (the drawn world's own grammar and dict are untouched; `WORLD scene …` has its own branch below).
-            elif gene == "WORLD" and (not args or args[0] not in ("game", "scene")):
+            # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.2: "video" joins them (its own branch below).
+            elif gene == "WORLD" and (not args or args[0] not in ("game", "scene", "video")):
                 # edit: Claude (Opus 5.5, A4 ladder builder VOICE), 2026-09-23 11:25 +0400 — A4L-VOICE task 1: an OPTIONAL trailing
                 # "; voice <kind>" clause (GAZE's "coarse"/BUDGET's "regenerate" precedent) — absent, the dict is EXACTLY the four
                 # keys every pin reads (no "voice" key at all); present, only "formant" is implemented (anything else refuses by
@@ -854,6 +866,24 @@ def parse_genome(text: str) -> Genome:
                 g["declared"]["WORLD_SCENE"] = {
                     "seed": int(m.group(1)), "train": int(m.group(2)), "sitting": [] if sets_ == ["none"] else sets_, "feed": feed_,
                     "utterance": "true" if m.group(7) == "true" else {"shuffled": int(m.group(8))}}
+            # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.2/§2 B2 (the law SIGNED;
+            # SEAT-LINE sha256 1d00a35f…): `WORLD video …` — a FOURTH shape of the WORLD gene (the game/scene branches'
+            # precedent): the open world's curriculum tapes as a LIFE world. ONE declared form: `video shelf <dir> every
+            # <n> s; loop; manifest sha256` — the shelf FROZEN at launch (a sha256 manifest; additions between lives,
+            # never mid-life), streamed one canvas per <n> s, LOOPING at the shelf's end. Stored under its OWN declared
+            # key `WORLD_VIDEO`; read by creature/body.py:main, which arms creature/senses/video.py. Every literal is
+            # fixed and every number is consumed; the parser never touches the shelf (the sense checks it, by name).
+            # This file is PINNED (brain/scene/cache.py's WORLD_CODE): this branch and the MOUTH «incremental» hunk share
+            # the law's ONE pinned window (the law §6).
+            elif gene == "WORLD" and args[0] == "video":
+                m = re.fullmatch(r"video shelf ([A-Za-z0-9_./-]+) every (\d+) s; loop; manifest sha256", a)
+                if not m:
+                    raise GenomeError(f"WORLD video: cannot read {a!r} (PREREG-ALPHA-6 §1.2: WORLD video shelf <dir> every <n> s; "
+                                      f"loop; manifest sha256 — the ONE declared form)")
+                if int(m.group(2)) < 1:
+                    raise GenomeError(f"WORLD video: the cadence must be >= 1 s, got {m.group(2)}")
+                g["declared"]["WORLD_VIDEO"] = {"shelf": m.group(1), "every_s": int(m.group(2)), "loop": True,
+                                                "manifest": "sha256"}
             # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY: THE BRAIN GENE, one line = one organ (genome/brain.py), grown inside
             # the mind beside MEET (a new consumer of the eye's glances and the ear's words, never a replacement). The values are
             # the scored learner's own (S1b-1R: lr 0.01, eps 0.3, «none» at 0.95, conformal 0.90, a word under 3 meetings is young).

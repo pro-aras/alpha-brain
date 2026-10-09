@@ -160,6 +160,14 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "WORLD_SCENE": "creature/body.py:main (declared['WORLD_SCENE'] read via _declared_scene_config; arms "
                        "creature/senses/scene.py behind SCENE_DOOR_GATED; also gates the maker's own arming) + "
                        "creature/senses/scene.py:plan/sense (the training stream + one sitting per declared set)",
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 04:36 +0400 — PREREG-ALPHA-6 §1.2/§2 B2 (the law
+        # SIGNED; SEAT-LINE sha256 1d00a35f…): the video world's own row — two real call sites, the same two-site
+        # shape WORLD_SCENE above uses (body arms the sense; the mind consumes the eye/ear rows it publishes,
+        # source video/video-caption read exactly like every other ear/eye row — MEET/ARRIVAL/FAST and the brain's
+        # hears list all apply with no new branch).
+        "WORLD_VIDEO": "creature/body.py:main (declared['WORLD_VIDEO'] read via _declared_video_config; arms "
+                       "creature/senses/video.py behind VIDEO_DOOR_GATED) + creature/senses/video.py:sense "
+                       "(the frozen sha-manifest shelf streamed at the declared cadence, looped, the count journaled)",
     },
     # ---------------------------------------------------------------------------------------- the mind
     "mind": {

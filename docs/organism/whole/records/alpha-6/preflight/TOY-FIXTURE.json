@@ -1,0 +1,30 @@
+{
+  "converter_stats": {
+    "caption_cues": 6,
+    "caption_tokens": 28,
+    "dropped_late": 0,
+    "dropped_nonword": 0,
+    "ear_rows": 28,
+    "eye_rows": 22,
+    "frames": 22,
+    "rows": 50,
+    "scene_cuts": [],
+    "tokens_kept": 28
+  },
+  "fps": 1,
+  "frames": 22,
+  "srt": "1\n00:00:01,000 --> 00:00:03,500\nthe red square moves\n\n2\n00:00:04,000 --> 00:00:06,500\nthe red square moves here\n\n3\n00:00:08,000 --> 00:00:10,500\nthe square is red\n\n4\n00:00:12,000 --> 00:00:14,500\na blue circle comes\n\n5\n00:00:15,000 --> 00:00:17,500\nthe circle is blue\n\n6\n00:00:18,000 --> 00:00:20,500\nthe red square and the blue circle",
+  "vocabulary": [
+    "a",
+    "and",
+    "blue",
+    "circle",
+    "comes",
+    "here",
+    "is",
+    "moves",
+    "red",
+    "square",
+    "the"
+  ]
+}

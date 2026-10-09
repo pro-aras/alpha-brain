@@ -1,0 +1,12 @@
+2026-10-09 05:27:18 +0400 active creature-brain@ services (LIVES): 0
+2026-10-09 05:27:18 +0400 named, never counted: creature-brain-resit@brain-long-4.timer (waiting; the closed bl4's daily read-only re-sit)
+2026-10-09 05:27:18 +0400 start at a2453422a635bcbcdf7fe2fd4826a574a028b80a; load 1.31 1.45 1.49; pressure some avg10=0.00 avg60=0.09 avg300=0.07 total=295265229; MemAvailable MemAvailable:   22742284 kB
+05:27:18 rsync exit 0
+05:33:38 cache-r exit 0
+05:33:39 cache-identity exit 0
+05:35:17 cache-new-world exit 0
+05:35:18 identity-20261104 exit 0
+2026-10-09 05:35:18 +0400 window done; load 2.27 2.02 1.76
+equal 20261103/held/cache/speak2  rows 60
+caches compared 63 · differing 0
+CONTROL (one bit flipped in the redrawn glances.npy, in memory): CAUGHT ['glances.npy']

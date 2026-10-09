@@ -199,8 +199,12 @@ class FakeBrain:
     keeps one row per scene learned (moment, scene, the first located fixation, a digest of glance 0), calibrates at the
     declared counts, answers every form in §2's shapes with a `raw`, saves/loads to <base>.npz + <base>.json."""
 
-    def __init__(self, cfg: Dict[str, object]):
+    def __init__(self, cfg: Dict[str, object], *, mouth_incremental: bool = False):
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-09 — PREREG-ALPHA-6 §1.3: the organ's interface grew by the
+        # mouth_incremental construction parameter (the «world=» growth's own form, #248 (3)): a stand-in takes it and
+        # keeps it, so a test can read what the mind declared. Caught RED by the creature split's 8 TypeErrors.
         self.cfg = dict(cfg)
+        self._mouth_incremental = bool(mouth_incremental)
         self.counts: Dict[str, int] = {}
         self.rows: List[Dict[str, object]] = []
         self.calibrations = 0
@@ -287,8 +291,8 @@ class FakeBrain:
         Path(str(base) + ".json").write_text(json.dumps(self._state(), sort_keys=True))
 
     @classmethod
-    def load(cls, base, cfg) -> "FakeBrain":
-        b = cls(cfg)
+    def load(cls, base, cfg, *, mouth_incremental: bool = False) -> "FakeBrain":
+        b = cls(cfg, mouth_incremental=mouth_incremental)
         st = json.loads(Path(str(base) + ".json").read_text())
         b.counts, b.rows, b.calibrations, b.since = st["counts"], st["rows"], st["calibrations"], st["since"]
         return b

@@ -1,0 +1,24 @@
+VERIFY OK: 55 files named, every sha256 matches (/data/dev/brain-runs/alpha-6/bl5-preflight-toy/video-shelf)
+[launch_long brain-long-5-pre-1] fence: 4 lines in /home/ahmad/.config/systemd/user/creature-brain@brain-long-5-pre-1.service.d/fence.conf
+Preparing worktree (detached HEAD b21562e)
+HEAD is now at b21562e PREREG-ALPHA-6 §2 B5 — the pre-flight driver (the law's two short lives on the declared toy shelf)
+[launch_brain brain-long-5-pre-1] checkout /data/dev/genome-lives/brain-long-5-pre-1/code at b21562e
+A seam life <name> (root /data/dev/genome-lives/<name>): systemctl --user enable --now creature-g5@<name>.service creature-g5-watch@<name>.timer
+A brain-in-body life <name> (root /data/dev/genome-lives/<name>): systemctl --user enable --now creature-brain@<name>.service
+Created symlink '/home/ahmad/.config/systemd/user/default.target.wants/creature-brain@brain-long-5-pre-1.service' → '/home/ahmad/.config/systemd/user/creature-brain@.service'.
+● creature-brain@brain-long-5-pre-1.service - creature-brain brain-long-5-pre-1 — a brain-in-body life (root /data/dev/genome-lives/brain-long-5-pre-1)
+     Loaded: loaded (/home/ahmad/.config/systemd/user/creature-brain@.service; enabled; preset: enabled)
+    Drop-In: /home/ahmad/.config/systemd/user/creature-brain@brain-long-5-pre-1.service.d
+             └─fence.conf
+[launch_brain brain-long-5-pre-1] STATUS after 20 s: {'moments': 70, 'tape_rows': 41, 'cells': 76, 'crash': None, 'scene': {'published_moments': 0, 'train_done': False, 'sitting_done': {}, 'ended': False}}
+[launch_brain brain-long-5-pre-1] next: read the life's tape/journal against docs/brain/body/PREREG-BRAIN-IN-BODY.md's own gates
+Created symlink '/home/ahmad/.config/systemd/user/timers.target.wants/creature-g5-watch@brain-long-5-pre-1.timer' → '/home/ahmad/.config/systemd/user/creature-g5-watch@.timer'.
+Created symlink '/home/ahmad/.config/systemd/user/timers.target.wants/creature-brain-series@brain-long-5-pre-1.timer' → '/home/ahmad/.config/systemd/user/creature-brain-series@.timer'.
+Created symlink '/home/ahmad/.config/systemd/user/timers.target.wants/creature-brain-health@brain-long-5-pre-1.timer' → '/home/ahmad/.config/systemd/user/creature-brain-health@.timer'.
+ActiveState=active
+MemoryHigh=17179869184
+MemoryMax=21474836480
+Fri 2026-10-09 09:00:00 +04             5s -                                      - creature-brain-series@brain-long-5-pre-1.timer creature-brain-series@brain-long-5-pre-1.service
+-                                        - Fri 2026-10-09 08:59:54 +04     20ms ago creature-brain-health@brain-long-5-pre-1.timer creature-brain-health@brain-long-5-pre-1.service
+-                                        - Fri 2026-10-09 08:59:54 +04     20ms ago creature-g5-watch@brain-long-5-pre-1.timer     creature-g5-watch@brain-long-5-pre-1.service
+[fence] 2 lines, 4G/4G, daemon-reloaded (live at the unit's next start)
