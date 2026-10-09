@@ -1,0 +1,15 @@
+...............................
+----------------------------------------------------------------------
+Ran 31 tests in 2.299s
+
+OK
+promoted 12 files (11 rows) /tmp/video-shelf-tool-uc5j04p0/bench/tape-toy -> /tmp/video-shelf-tool-uc5j04p0/shelf
+manifest MANIFEST.sha256 sha256 9c9fb59900650d9ab9ca6ed2465c76fe0409afdedefdf50d8f300989cef39143 — verify ok
+promoted 12 files (11 rows) /tmp/video-shelf-tool-aeht6twe/bench/tape-toy -> /tmp/video-shelf-tool-aeht6twe/life/video-shelf
+manifest MANIFEST.sha256 sha256 9c9fb59900650d9ab9ca6ed2465c76fe0409afdedefdf50d8f300989cef39143 — verify ok
+promoted 12 files (11 rows) /tmp/video-shelf-tool-zd_9s8e5/bench/tape-toy -> /tmp/video-shelf-tool-zd_9s8e5/life/world/video-shelf
+manifest MANIFEST.sha256 sha256 9c9fb59900650d9ab9ca6ed2465c76fe0409afdedefdf50d8f300989cef39143 — verify ok
+promoted 12 files (11 rows) /tmp/video-shelf-tool-n2ozplmd/bench/tape-toy -> /tmp/video-shelf-tool-n2ozplmd/a
+manifest MANIFEST.sha256 sha256 9c9fb59900650d9ab9ca6ed2465c76fe0409afdedefdf50d8f300989cef39143 — verify ok
+promoted 12 files (11 rows) /tmp/video-shelf-tool-n2ozplmd/bench/tape-toy -> /tmp/video-shelf-tool-n2ozplmd/b
+manifest MANIFEST.sha256 sha256 9c9fb59900650d9ab9ca6ed2465c76fe0409afdedefdf50d8f300989cef39143 — verify ok

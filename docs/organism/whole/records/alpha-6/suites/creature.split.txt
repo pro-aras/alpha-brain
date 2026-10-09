@@ -1,0 +1,16 @@
+SPLIT creature on c452981267b656f23ac253b145a39659c44958c6 (/data/dev/genome-wt-alpha6) · 2026-10-09 05:56:11 +0400 · parts 3 · cap 10G swap 1G · expected Ran 1492
+files 143 under tests/creature (test*.py, recursive; 0 in subdirectories) · patterns ['test_[a-f]*.py', 'test_[g-r]*.py', 'test_[s-z]*.py'] · files per pattern [40, 55, 48] · in exactly one pattern: 143
+PARTITION EXACT
+slot exit 1 at 2026-10-09 06:23:52 +0400
+part 1 (test_[a-f]*.py): exit 1 · Ran 438 tests in 488.605s FAILED (errors=8, skipped=5)  · memory.peak 8340074496 bytes
+ERROR: setUpClass (tests.creature.test_brain_mind.TestBrainRoad)
+ERROR: test_the_brain_does_not_disturb_the_organs (tests.creature.test_brain_mind.TestNonInterference.test_the_brain_does_not_disturb_the_organs)
+ERROR: test_blind_coarse (tests.creature.test_brain_mind.TestOtherBlindsLeaveTheBrainItsInput.test_blind_coarse)
+ERROR: test_blind_ear (tests.creature.test_brain_mind.TestOtherBlindsLeaveTheBrainItsInput.test_blind_ear)
+ERROR: test_check_counts_and_hours_are_those_of_the_journal_without_the_new_rows (tests.creature.test_brain_mind.TestReadersCountNoAskRow.test_check_counts_and_hours_are_those_of_the_journal_without_the_new_rows)
+ERROR: test_a_tape_replayed_twice_is_byte_identical_and_equals_the_live_journal (tests.creature.test_brain_mind.TestReplayAndResume.test_a_tape_replayed_twice_is_byte_identical_and_equals_the_live_journal)
+ERROR: test_resumed_from_a_snapshot_between_an_ask_and_its_eye_row (tests.creature.test_brain_mind.TestReplayAndResume.test_resumed_from_a_snapshot_between_an_ask_and_its_eye_row)
+ERROR: test_a_tape_across_two_days_replays_from_its_directory (tests.creature.test_brain_mind.TestReplayDirectory.test_a_tape_across_two_days_replays_from_its_directory)
+part 2 (test_[g-r]*.py): exit 0 · Ran 572 tests in 621.292s OK (skipped=1)  · memory.peak 10296090624 bytes
+part 3 (test_[s-z]*.py): exit 0 · Ran 476 tests in 545.993s OK  · memory.peak 10296090624 bytes
+SUM Ran 1486 vs expected 1492 · every part exit 0: NO · split verdict exit 1

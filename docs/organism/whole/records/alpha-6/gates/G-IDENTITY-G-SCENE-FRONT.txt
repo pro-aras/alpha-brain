@@ -1,0 +1,29 @@
+G-IDENTITY + G-SCENE-FRONT (PREREG-ALPHA-6 §3) — the 500-row bl2 segment (the standard copy's first 500 rows,
+/data/dev/genome-wt-mouthcap/scratch/bl2/ used in place, NEVER edited; the payload a symlink to its own
+payload dir; OW-3's G-IDENTITY (iii) form). One slot job (a6-gid, 4G, exit 0), five replays, 2026-10-09 08:58.
+
+(a) the standard copy's genome (the bl2 tape's own), master a451959 vs the branch, no clause, front absent:
+    26dc80c60d4ec1739f4de1a93e327c850c59a11a762e1ecb7c21c43fc897ea9a  a-master-bl2/journal.jsonl
+    26dc80c60d4ec1739f4de1a93e327c850c59a11a762e1ecb7c21c43fc897ea9a  b-branch-bl2/journal.jsonl
+    cmp: BYTE-IDENTICAL — and the sha reproduces OW-3's G-IDENTITY (iii) journal of record exactly
+    (records/open-world-3: 26dc80c60d4e…, 662 rows, 165 canvases — the third-party anchor landing to the digit).
+(b) brain-long-4's OWN launched genome (the law §3's words), master a451959 vs the branch, same forms:
+    c08509349efd90ea300b93ed9db2fa7ad0b8ef1bf035bae1cfcb9704c327250d  c-master-bl4/journal.jsonl
+    c08509349efd90ea300b93ed9db2fa7ad0b8ef1bf035bae1cfcb9704c327250d  d-branch-bl4/journal.jsonl
+    cmp: BYTE-IDENTICAL.
+
+G-SCENE-FRONT (the branch, the standard genome, the generated world THROUGH the front, benched before launch;
+the learning measures printed beside the unwired replay's — event_cutter.analyze, UNCHANGED, imported):
+
+    UNWIRED: rows→canvases 165; births 431; learns 585; turns 154 over 163 worded canvases (presence counts);
+             said 0; refused 0; reasons {'not calibrated': 154}; surprise mean None
+             err median 1.0000 mean 0.6753 max 1.0000; sources [folder, game, hands, maker, scene, shelf]
+    WIRED  : rows→canvases 165; births 506; learns 660; turns 154 over 163 worded canvases (presence counts);
+             said 0; refused 0; reasons {'not calibrated': 154}; surprise mean None
+             err median 1.0000 mean 0.9532 max 1.0000; sources [folder, game, hands, maker, scene, shelf]
+    the front key: present on 165 canvas rows of 165 (V2's §2.7 field, live through the replay's --eye-front)
+    the bar (births > 0 with presence counts): births 506 -> HOLDS
+    the reading, named: the front's stream is hotter (err mean 0.9532 vs 0.6753) and the organism births MORE
+    through it (506 vs 431) — V2's own attenuation pattern (its residual stream was hotter and birthed more
+    too), a reading, never a moved bar. said 0 on both: the 500-row segment ends before the first calibration
+    cadence of 250 (V2's sizing note carried, as everywhere).
