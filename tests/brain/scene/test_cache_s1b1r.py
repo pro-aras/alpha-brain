@@ -27,7 +27,10 @@ class TestRoots(unittest.TestCase):
         # edit: Kimi K3 (kimi-code, builder lane kimi-w1, integrator hat), 2026-10-05 00:27 +0400 — PREREG-W1 + PREREG-SLEEP-IDLE (the
         # seat's ONE shared pinned window): the tree's root is FRESH again; the swarm-1003 root stays named, read as plain files only.
         self.assertEqual(C.INNER_RUNS, Path("/data/dev/brain-runs/scene-organ-swarm-1003"))
-        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-swarm-1005"))      # PREREG-WORD-ROAD §5 (2026-09-29 13:17 +0400)
+        # edit: Kimi K3 (kimi-code, acting seat), 2026-10-09 12:0x +0400 — PREREG-ALPHA-6 (the landing): the tree's root is FRESH
+        # again; the swarm-1005 root stays named, read as plain files only (the window's own choreography, the 4 precedents above).
+        self.assertEqual(C.SWARM1005_RUNS, Path("/data/dev/brain-runs/scene-organ-swarm-1005"))
+        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-alpha6"))
         self.assertEqual(C.FM6_RUNS, Path("/data/dev/brain-runs/scene-organ-fm6"))
         self.assertEqual(C.SCENE_ORGAN_RUNS, Path("/data/dev/brain-runs/scene-organ"))
         self.assertEqual(C.S1B1R_RUNS, Path("/data/dev/brain-runs/scene-s1b1r"))
