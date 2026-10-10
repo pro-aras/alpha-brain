@@ -72,6 +72,24 @@ G-UNIT ~23 s; the law's < 1 CPU-h holds by an order of magnitude.
 
 ## What the build measured that the law did not write (honest readings)
 
+**AMENDMENT 1 ADDENDUM (the law signed 306c143; the build 06baf44).** Honest reading 3 below became the
+law: the NULL's chain half was re-scoped to where content-addressing actually lives. The bench's new arms
+(records/bench-run2-report.{txt,json}, records/bench-run2-twin-arms-journal.jsonl): the 10 shuffled
+twins, each in its OWN fresh 25-sentence window, **all fire lawfully** (10/10, classes self — the
+word-level classes of §1.1, exactly the behaviour the amendment declares lawful); every twin chain's
+content id differs from the planted id `1899dafd6aafcb0b` (printed side by side: d26bc4d3…, c67f90fa…,
+bbd46725…, d974c717…, 5e804d5b…); every twin chain promotes after the parent's answer + the pass; **no
+twin chain's content ever answers the planted re-ask** (10/10 None — the content-addressed fruit lookup
+cannot see them); and the **bag-keyed control answers on every arm** (10/10 — the instrument sees
+bag-addressing before content-addressing is trusted, #246 (1)). The M-FRUIT verdict line now requires
+the planted arc's fruit AND the amendment block (the amendment's own form); no other gate or bar moved
+— and the main arc re-ran byte-identical to run 1 (cmp exit 0 on the arc journal, replay determinism
+across the bench versions, a free reading). The 10 arms cost 74.8 s of the amendment's ≤ 10 CPU-min.
+Branch suites re-run on the amendment bytes: genome «Ran 771 OK» exit 0 (peak 850MB), tools «Ran 1307
+OK» exit 0 (peak 1337MB); the tools suite carries the amendment's 4 new tests.
+
+## What the build measured that the law did not write (honest readings)
+
 - **The walk stayed at the seed at bench scale.** alpha|star never consolidated: the sticky pair loses
   to the web's own harmonic spend at star's frequency (f ≈ 0.11 — measured by --probe before any arm
   ran; the calculation and the reading agree). The bench chain is therefore the three anchor steps

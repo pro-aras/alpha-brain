@@ -21,3 +21,19 @@ b4ae5a04e9c5fbf406b007a9c538ea18922343fb315822ee4ad1c11eb89c9799  scratch/gunit-
 92ceb41d27dfe99e4f9db575c3cb902e1b54bf7ede010f282e34d2aa540600d0  scratch/bench2.log
 # identity legs (cap 1G): toy-master/toy-branch peak 94/93MB · bl2-master/bl2-branch peak 275/278MB
 #   (bl2-branch named from the ledger; master legs measured on their own runs)
+
+# ── AMENDMENT 1 (the NULL re-scoped to the fruit; law signed 306c143) — the amendment arms' evidence
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 08:38 +0400
+# branch contemplate-1009 @ 06baf44 (the amendment's code+tests; later commits carry records/docs only).
+# amendment tests RED (306c143): «Ran 10 tests in 4.844s FAILED (errors=4)» · exit 1
+97a75049ce2bf851cbe85593fa7191ce1ecaf5a8ab741b1a016151ae40fd1d91  scratch/amend1-red.log
+# amendment tests GREEN: «Ran 10 tests in 16.676s OK» · exit 0
+b7b039580c56a13b2b32920e9fa6bae153c1d85a347c038234feb49487cc426f  scratch/amend1-green2.log
+# the amendment bench (ALL MARKS PASS incl. M-FRUIT-NULL-A1): exit 0 · slot muse bench-a1 cap 1G
+#   (the 10 fresh-budget twin arms: 74.8 s of the amendment's <= 10 CPU-min)
+4cc4c51a628bbf65ccc55c0a16867a48e5fe0695156c61f85127143834a25ea2  scratch/bench-a1.log
+# branch suites on the amendment bytes:
+# genome suite: «Ran 771 tests in 165.138s OK (skipped=1, expected failures=6)» · exit 0 · peak 850MB
+8f95cef0a5cd983a4c2eedc3ff552926cbda02f4394db46c9b3ad4e06975744d  scratch/suite-genome-a1.log
+# tools suite: «Ran 1307 tests in 438.443s OK (skipped=33)» · exit 0 · peak 1337MB
+695f948efea75d9600d62723a3fc0be71f17972c5d2faad4ad36610f6a7aa8e9  scratch/suite-tools-a1.log
