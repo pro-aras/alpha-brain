@@ -1,0 +1,264 @@
+{
+  "recurrence": {
+    "circle": {
+      "sightings": 30,
+      "distinct": 30,
+      "modal": "s:f8fdd321",
+      "modal_n": 1
+    },
+    "square": {
+      "sightings": 30,
+      "distinct": 30,
+      "modal": "s:fe96de8b",
+      "modal_n": 1
+    },
+    "triangle": {
+      "sightings": 30,
+      "distinct": 30,
+      "modal": "s:fa4f80ae",
+      "modal_n": 1
+    },
+    "cross": {
+      "sightings": 30,
+      "distinct": 30,
+      "modal": "s:f282d6f0",
+      "modal_n": 1
+    },
+    "ring": {
+      "sightings": 30,
+      "distinct": 30,
+      "modal": "s:fc766659",
+      "modal_n": 1
+    },
+    "bar": {
+      "sightings": 30,
+      "distinct": 30,
+      "modal": "s:ff41f071",
+      "modal_n": 1
+    },
+    "dot": {
+      "sightings": 30,
+      "distinct": 30,
+      "modal": "s:f87ba9b7",
+      "modal_n": 1
+    },
+    "star": {
+      "sightings": 30,
+      "distinct": 30,
+      "modal": "s:fce66de1",
+      "modal_n": 1
+    }
+  },
+  "multi_hyp_sightings": 1,
+  "stability": [
+    {
+      "thing": "circle",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "circle",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "square",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "square",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "triangle",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "triangle",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "cross",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "cross",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "ring",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "ring",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "bar",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "bar",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "dot",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "dot",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "star",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "star",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    }
+  ],
+  "stability_ok": 0,
+  "collisions": 0,
+  "distinct_tokens": 240,
+  "ceiling": {
+    "alpha": {
+      "chat_namings": 12,
+      "thing_sightings": 30,
+      "distinct_s_tokens": 30,
+      "max_possible_pair_events": 12,
+      "pair_edges": [
+        {
+          "s": "s:990ab2cf",
+          "in_kind": true,
+          "c": 1,
+          "occ": 1,
+          "state": "silent"
+        },
+        {
+          "s": "s:cd4ef95a",
+          "in_kind": false,
+          "c": 1,
+          "occ": 1,
+          "state": "silent"
+        },
+        {
+          "s": "s:af2915b9",
+          "in_kind": false,
+          "c": 1,
+          "occ": 1,
+          "state": "silent"
+        },
+        {
+          "s": "s:f3f02f3d",
+          "in_kind": true,
+          "c": 1,
+          "occ": 1,
+          "state": "silent"
+        }
+      ],
+      "n_pair_edges": 35,
+      "max_realized_c": 1
+    },
+    "zeta": {
+      "chat_namings": 12,
+      "thing_sightings": 30,
+      "distinct_s_tokens": 30,
+      "max_possible_pair_events": 12,
+      "pair_edges": [
+        {
+          "s": "s:bb630f2c",
+          "in_kind": true,
+          "c": 1,
+          "occ": 1,
+          "state": "silent"
+        },
+        {
+          "s": "s:2474d76e",
+          "in_kind": false,
+          "c": 1,
+          "occ": 1,
+          "state": "silent"
+        },
+        {
+          "s": "s:27ee9ed1",
+          "in_kind": false,
+          "c": 1,
+          "occ": 1,
+          "state": "silent"
+        },
+        {
+          "s": "s:b0bfe73a",
+          "in_kind": true,
+          "c": 1,
+          "occ": 1,
+          "state": "silent"
+        }
+      ],
+      "n_pair_edges": 36,
+      "max_realized_c": 1
+    }
+  }
+}

@@ -1,0 +1,352 @@
+{
+  "recurrence": {
+    "circle": {
+      "sightings": 29,
+      "distinct": 4,
+      "modal": "s:c0",
+      "modal_n": 22,
+      "modal_share": 0.7586206896551724
+    },
+    "square": {
+      "sightings": 30,
+      "distinct": 6,
+      "modal": "s:c22",
+      "modal_n": 20,
+      "modal_share": 0.6666666666666666
+    },
+    "triangle": {
+      "sightings": 30,
+      "distinct": 5,
+      "modal": "s:c3",
+      "modal_n": 13,
+      "modal_share": 0.43333333333333335
+    },
+    "cross": {
+      "sightings": 30,
+      "distinct": 7,
+      "modal": "s:c34",
+      "modal_n": 18,
+      "modal_share": 0.6
+    },
+    "ring": {
+      "sightings": 30,
+      "distinct": 8,
+      "modal": "s:c6",
+      "modal_n": 14,
+      "modal_share": 0.4666666666666667
+    },
+    "bar": {
+      "sightings": 30,
+      "distinct": 6,
+      "modal": "s:c19",
+      "modal_n": 10,
+      "modal_share": 0.3333333333333333
+    },
+    "dot": {
+      "sightings": 30,
+      "distinct": 11,
+      "modal": "s:c80",
+      "modal_n": 11,
+      "modal_share": 0.36666666666666664
+    },
+    "star": {
+      "sightings": 30,
+      "distinct": 3,
+      "modal": "s:c13",
+      "modal_n": 17,
+      "modal_share": 0.5666666666666667
+    }
+  },
+  "multi_hyp_sightings": 1,
+  "silent_sightings": 1,
+  "stability_legacy": [
+    {
+      "thing": "circle",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": null
+    },
+    {
+      "thing": "circle",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "square",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "square",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": true
+    },
+    {
+      "thing": "triangle",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "triangle",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": true
+    },
+    {
+      "thing": "cross",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "cross",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "ring",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "ring",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": true
+    },
+    {
+      "thing": "bar",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "bar",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    },
+    {
+      "thing": "dot",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": true
+    },
+    {
+      "thing": "dot",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": true
+    },
+    {
+      "thing": "star",
+      "rounds": [
+        0,
+        3
+      ],
+      "same": false
+    },
+    {
+      "thing": "star",
+      "rounds": [
+        3,
+        6
+      ],
+      "same": false
+    }
+  ],
+  "stability_legacy_ok": 5,
+  "collisions": 46,
+  "distinct_tokens": 41,
+  "ceiling": {
+    "alpha": {
+      "chat_namings": 12,
+      "thing_sightings": 30,
+      "distinct_s_tokens": 3,
+      "max_possible_pair_events": 12,
+      "pair_edges": [
+        {
+          "s": "s:c80",
+          "in_kind": false,
+          "c": 9,
+          "occ": 9,
+          "state": "consolidated"
+        },
+        {
+          "s": "s:c13",
+          "in_kind": true,
+          "c": 8,
+          "occ": 8,
+          "state": "consolidated"
+        },
+        {
+          "s": "s:c0",
+          "in_kind": false,
+          "c": 8,
+          "occ": 8,
+          "state": "silent"
+        },
+        {
+          "s": "s:c21",
+          "in_kind": true,
+          "c": 4,
+          "occ": 4,
+          "state": "consolidated"
+        }
+      ],
+      "n_pair_edges": 9,
+      "max_realized_c": 9
+    },
+    "zeta": {
+      "chat_namings": 12,
+      "thing_sightings": 30,
+      "distinct_s_tokens": 8,
+      "max_possible_pair_events": 12,
+      "pair_edges": [
+        {
+          "s": "s:c34",
+          "in_kind": false,
+          "c": 9,
+          "occ": 9,
+          "state": "consolidated"
+        },
+        {
+          "s": "s:c19",
+          "in_kind": false,
+          "c": 8,
+          "occ": 8,
+          "state": "consolidated"
+        },
+        {
+          "s": "s:c102",
+          "in_kind": true,
+          "c": 3,
+          "occ": 3,
+          "state": "consolidated"
+        },
+        {
+          "s": "s:c88",
+          "in_kind": true,
+          "c": 3,
+          "occ": 3,
+          "state": "consolidated"
+        }
+      ],
+      "n_pair_edges": 13,
+      "max_realized_c": 9
+    }
+  },
+  "jitter_sigma": {
+    "circle": {
+      "sightings": 30,
+      "sigma_mean": 0.009733569579771225,
+      "sigma_max": 0.03556390389342614
+    },
+    "square": {
+      "sightings": 30,
+      "sigma_mean": 0.011531322611622416,
+      "sigma_max": 0.042397268731443075
+    },
+    "triangle": {
+      "sightings": 30,
+      "sigma_mean": 0.013141388953033285,
+      "sigma_max": 0.062040861607294294
+    },
+    "cross": {
+      "sightings": 30,
+      "sigma_mean": 0.01328545315955839,
+      "sigma_max": 0.0447873821378783
+    },
+    "ring": {
+      "sightings": 30,
+      "sigma_mean": 0.016442065782850655,
+      "sigma_max": 0.061131459974840326
+    },
+    "bar": {
+      "sightings": 30,
+      "sigma_mean": 0.012303620704478078,
+      "sigma_max": 0.07110871086311477
+    },
+    "dot": {
+      "sightings": 30,
+      "sigma_mean": 0.009571578171242863,
+      "sigma_max": 0.04724846026699795
+    },
+    "star": {
+      "sightings": 30,
+      "sigma_mean": 0.00962219129956208,
+      "sigma_max": 0.03400187563929038
+    }
+  },
+  "kind_tokens": {
+    "alpha": [
+      "s:c13",
+      "s:c21",
+      "s:c4"
+    ],
+    "zeta": [
+      "s:c0",
+      "s:c102",
+      "s:c18",
+      "s:c36",
+      "s:c47",
+      "s:c6",
+      "s:c84",
+      "s:c88"
+    ]
+  },
+  "planted_share": 0.5166666666666666,
+  "planted_share_per_thing": {
+    "alpha": 0.5666666666666667,
+    "zeta": 0.4666666666666667
+  },
+  "null_cell_pool": 41,
+  "null_shares": [
+    0.1,
+    0.11666666666666667,
+    0.1,
+    0.11666666666666667,
+    0.06666666666666667,
+    0.11666666666666667,
+    0.08333333333333334,
+    0.08333333333333334,
+    0.08333333333333334,
+    0.08333333333333334
+  ],
+  "null_max": 0.11666666666666667,
+  "stability_gap": 0.3999999999999999
+}

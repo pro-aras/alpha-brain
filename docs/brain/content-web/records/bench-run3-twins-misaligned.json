@@ -1,0 +1,233 @@
+[
+  {
+    "k": 0,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [],
+      "zeta": []
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1581,
+      "offered": 341,
+      "realised": 341,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 19,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 15,
+      "evidence": 1240
+    }
+  },
+  {
+    "k": 1,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [],
+      "zeta": [
+        "s:c69|w:zeta"
+      ]
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1586,
+      "offered": 340,
+      "realised": 340,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 18,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 17,
+      "evidence": 1246
+    }
+  },
+  {
+    "k": 2,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [
+        "s:c88|w:alpha"
+      ],
+      "zeta": [
+        "s:c13|w:zeta",
+        "s:c69|w:zeta"
+      ]
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1584,
+      "offered": 338,
+      "realised": 338,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 19,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 17,
+      "evidence": 1246
+    }
+  },
+  {
+    "k": 3,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [],
+      "zeta": [
+        "s:c13|w:zeta"
+      ]
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1583,
+      "offered": 333,
+      "realised": 333,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 14,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 16,
+      "evidence": 1250
+    }
+  },
+  {
+    "k": 4,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [],
+      "zeta": []
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1582,
+      "offered": 340,
+      "realised": 340,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 14,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 15,
+      "evidence": 1242
+    }
+  },
+  {
+    "k": 5,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [],
+      "zeta": [
+        "s:c13|w:zeta",
+        "s:c69|w:zeta"
+      ]
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1584,
+      "offered": 337,
+      "realised": 337,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 18,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 17,
+      "evidence": 1247
+    }
+  },
+  {
+    "k": 6,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [],
+      "zeta": [
+        "s:c13|w:zeta"
+      ]
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1584,
+      "offered": 340,
+      "realised": 340,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 20,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 16,
+      "evidence": 1244
+    }
+  },
+  {
+    "k": 7,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [],
+      "zeta": []
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1584,
+      "offered": 337,
+      "realised": 337,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 14,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 16,
+      "evidence": 1247
+    }
+  },
+  {
+    "k": 8,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [
+        "s:c88|w:alpha"
+      ],
+      "zeta": [
+        "s:c13|w:zeta",
+        "s:c69|w:zeta"
+      ]
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1584,
+      "offered": 335,
+      "realised": 335,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 17,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 19,
+      "evidence": 1249
+    }
+  },
+  {
+    "k": 9,
+    "planted_pair_consolidated": false,
+    "name_other_edges": {
+      "alpha": [],
+      "zeta": [
+        "s:c69|w:zeta"
+      ]
+    },
+    "web_t": 534,
+    "stats": {
+      "events": 1584,
+      "offered": 339,
+      "realised": 339,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 13,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 16,
+      "evidence": 1245
+    }
+  }
+]

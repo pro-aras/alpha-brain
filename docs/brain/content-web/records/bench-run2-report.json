@@ -1,0 +1,593 @@
+{
+  "M-CROSS": {
+    "bar": "ON reads >= 1 consolidated s:<->w: edge per planted kind (printed with presence counts); OFF reads EXACTLY 0 s: and g: nodes (byte-difference proven)",
+    "per_kind": {
+      "alpha": {
+        "consolidated_cross": 0,
+        "edges": [],
+        "distinct_s_tokens_of_the_thing": 30,
+        "thing_sightings": 30,
+        "chat_namings": 12
+      },
+      "zeta": {
+        "consolidated_cross": 0,
+        "edges": [],
+        "distinct_s_tokens_of_the_thing": 30,
+        "thing_sightings": 30,
+        "chat_namings": 12
+      }
+    },
+    "off_s_nodes": 0,
+    "off_g_nodes": 0,
+    "off_webjson_s_keys": 0,
+    "off_webjson_g_keys": 0,
+    "on_webjson_s_keys": 2929,
+    "on_webjson_g_keys": 138,
+    "pass": false
+  },
+  "M-GROUND": {
+    "bar": "after the planted arc, the heard-only name's node and the seen-only content's node are CONSOLIDATED neighbours (the organism grounded a word it never heard from a teacher's naming channel onto content it only saw); the consolidation row's own evidence printed (c, occ, the Poisson tail)",
+    "pairs": {
+      "alpha": {
+        "s": "s:990ab2cf",
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 325,
+        "E": 0.05307712463970653,
+        "poisson_tail": 0.0516931281639601,
+        "consolidated": false
+      },
+      "zeta": {
+        "s": "s:bb630f2c",
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 318,
+        "E": 0.05483797711590532,
+        "poisson_tail": 0.05336148736913371,
+        "consolidated": false
+      }
+    },
+    "chances_ceiling": {
+      "alpha": {
+        "chat_namings": 12,
+        "thing_sightings": 30,
+        "distinct_s_tokens": 30,
+        "max_possible_pair_events": 12,
+        "pair_edges": [
+          {
+            "s": "s:990ab2cf",
+            "in_kind": true,
+            "c": 1,
+            "occ": 1,
+            "state": "silent"
+          },
+          {
+            "s": "s:cd4ef95a",
+            "in_kind": false,
+            "c": 1,
+            "occ": 1,
+            "state": "silent"
+          },
+          {
+            "s": "s:af2915b9",
+            "in_kind": false,
+            "c": 1,
+            "occ": 1,
+            "state": "silent"
+          },
+          {
+            "s": "s:f3f02f3d",
+            "in_kind": true,
+            "c": 1,
+            "occ": 1,
+            "state": "silent"
+          }
+        ],
+        "n_pair_edges": 35,
+        "max_realized_c": 1
+      },
+      "zeta": {
+        "chat_namings": 12,
+        "thing_sightings": 30,
+        "distinct_s_tokens": 30,
+        "max_possible_pair_events": 12,
+        "pair_edges": [
+          {
+            "s": "s:bb630f2c",
+            "in_kind": true,
+            "c": 1,
+            "occ": 1,
+            "state": "silent"
+          },
+          {
+            "s": "s:2474d76e",
+            "in_kind": false,
+            "c": 1,
+            "occ": 1,
+            "state": "silent"
+          },
+          {
+            "s": "s:27ee9ed1",
+            "in_kind": false,
+            "c": 1,
+            "occ": 1,
+            "state": "silent"
+          },
+          {
+            "s": "s:b0bfe73a",
+            "in_kind": true,
+            "c": 1,
+            "occ": 1,
+            "state": "silent"
+          }
+        ],
+        "n_pair_edges": 36,
+        "max_realized_c": 1
+      }
+    },
+    "pass": false
+  },
+  "M-CHAT": {
+    "bar": "ON: after the planted chat arc, \u00abalpha\u00bb IS a node in the web with its edge evidence printed; OFF: absent (the 00:32 finding reproduced as the control)",
+    "on_nodes_present": {
+      "alpha": true,
+      "zeta": true
+    },
+    "alpha_edge_evidence": {
+      "s:990ab2cf|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 325,
+        "looks": 0
+      },
+      "w:alpha|w:star": {
+        "c": 12,
+        "occ": 12,
+        "state": "consolidated",
+        "t0": 325,
+        "looks": 1
+      },
+      "s:cd4ef95a|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 325,
+        "looks": 0
+      },
+      "w:alpha|w:circle": {
+        "c": 11,
+        "occ": 11,
+        "state": "consolidated",
+        "t0": 326,
+        "looks": 1
+      },
+      "s:af2915b9|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 327,
+        "looks": 0
+      },
+      "g:step:-|w:alpha": {
+        "c": 3,
+        "occ": 3,
+        "state": "silent",
+        "t0": 328,
+        "looks": 1
+      },
+      "s:f3f02f3d|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 344,
+        "looks": 0
+      },
+      "s:e1a5ed36|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 344,
+        "looks": 0
+      },
+      "s:a1d66009|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 346,
+        "looks": 0
+      },
+      "g:step:+|w:alpha": {
+        "c": 8,
+        "occ": 8,
+        "state": "consolidated",
+        "t0": 347,
+        "looks": 1
+      },
+      "s:a21fe2c4|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 363,
+        "looks": 0
+      },
+      "s:f0bcb8d9|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 363,
+        "looks": 0
+      },
+      "s:b233df57|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 365,
+        "looks": 0
+      },
+      "s:89211c35|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 382,
+        "looks": 0
+      },
+      "s:4260500e|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 382,
+        "looks": 0
+      },
+      "s:7951ba10|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 384,
+        "looks": 0
+      },
+      "s:52646f4c|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 401,
+        "looks": 0
+      },
+      "s:0b87cd3d|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 401,
+        "looks": 0
+      },
+      "s:30151212|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 403,
+        "looks": 0
+      },
+      "s:1931be48|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 420,
+        "looks": 0
+      },
+      "s:e555c094|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 420,
+        "looks": 0
+      },
+      "s:2ce42b99|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 422,
+        "looks": 0
+      },
+      "s:f06bb30f|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 439,
+        "looks": 0
+      },
+      "s:64e1321e|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 439,
+        "looks": 0
+      },
+      "s:c0d28d8f|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 441,
+        "looks": 0
+      },
+      "s:8f555851|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 458,
+        "looks": 0
+      },
+      "s:f87ba9b7|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 458,
+        "looks": 0
+      },
+      "s:005c8cd3|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 460,
+        "looks": 0
+      },
+      "s:e99b9134|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 478,
+        "looks": 0
+      },
+      "s:c18ed974|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 478,
+        "looks": 0
+      },
+      "s:4f569fd5|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 480,
+        "looks": 0
+      },
+      "s:503b3518|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 497,
+        "looks": 0
+      },
+      "s:e9d38d10|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 497,
+        "looks": 0
+      },
+      "s:5c9c49c3|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 499,
+        "looks": 0
+      },
+      "s:4de81a2b|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 516,
+        "looks": 0
+      },
+      "s:5efc367d|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 516,
+        "looks": 0
+      },
+      "s:d49eb6cf|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 518,
+        "looks": 0
+      },
+      "s:78a1956a|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 535,
+        "looks": 0
+      },
+      "s:27179fce|w:alpha": {
+        "c": 1,
+        "occ": 1,
+        "state": "silent",
+        "t0": 535,
+        "looks": 0
+      }
+    },
+    "off_nodes_present": {
+      "alpha": false,
+      "zeta": false
+    },
+    "pass": true
+  },
+  "M-STABILITY": {
+    "bar": "the same thing re-seen across the bench's own calibration boundary maps to the same s: token >= the declared share (bar 16/16; the quantization is deterministic and the calibration does not touch the eye's features \u2014 MEASURED, never assumed; a drift reads FAIL-FORM, the instrument's fault)",
+    "ok": 0,
+    "of": 16,
+    "comparisons": [
+      {
+        "thing": "circle",
+        "rounds": [
+          0,
+          3
+        ],
+        "same": false
+      },
+      {
+        "thing": "circle",
+        "rounds": [
+          3,
+          6
+        ],
+        "same": false
+      },
+      {
+        "thing": "square",
+        "rounds": [
+          0,
+          3
+        ],
+        "same": false
+      },
+      {
+        "thing": "square",
+        "rounds": [
+          3,
+          6
+        ],
+        "same": false
+      },
+      {
+        "thing": "triangle",
+        "rounds": [
+          0,
+          3
+        ],
+        "same": false
+      },
+      {
+        "thing": "triangle",
+        "rounds": [
+          3,
+          6
+        ],
+        "same": false
+      },
+      {
+        "thing": "cross",
+        "rounds": [
+          0,
+          3
+        ],
+        "same": false
+      },
+      {
+        "thing": "cross",
+        "rounds": [
+          3,
+          6
+        ],
+        "same": false
+      },
+      {
+        "thing": "ring",
+        "rounds": [
+          0,
+          3
+        ],
+        "same": false
+      },
+      {
+        "thing": "ring",
+        "rounds": [
+          3,
+          6
+        ],
+        "same": false
+      },
+      {
+        "thing": "bar",
+        "rounds": [
+          0,
+          3
+        ],
+        "same": false
+      },
+      {
+        "thing": "bar",
+        "rounds": [
+          3,
+          6
+        ],
+        "same": false
+      },
+      {
+        "thing": "dot",
+        "rounds": [
+          0,
+          3
+        ],
+        "same": false
+      },
+      {
+        "thing": "dot",
+        "rounds": [
+          3,
+          6
+        ],
+        "same": false
+      },
+      {
+        "thing": "star",
+        "rounds": [
+          0,
+          3
+        ],
+        "same": false
+      },
+      {
+        "thing": "star",
+        "rounds": [
+          3,
+          6
+        ],
+        "same": false
+      }
+    ],
+    "pass": false
+  },
+  "M-NULL": {
+    "bar": "10 derangement twins (each sense's token stream deranged within itself, moments kept): the planted s:<->w: edge consolidates in NONE of them; the real run's consolidated cross-edge count exceeds the null MAX",
+    "twin_cross_counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "twin_planted_consolidated": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "real_cross_n": 0,
+    "null_max": 0,
+    "pass": false
+  },
+  "M-COST": {
+    "bar": "per-row process_time overhead ON vs OFF <= 5% (both directions timed \u2014 the web hears more tokens per row, priced)",
+    "cpu_on_s": 5.755338957999999,
+    "cpu_off_s": 5.623746048,
+    "overhead": 0.023399511442519404,
+    "rows": 534,
+    "pass": true
+  }
+}
