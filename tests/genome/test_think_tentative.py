@@ -167,6 +167,12 @@ class TestReaderInventory(unittest.TestCase):
             # read_beliefs (the excluding reader) for its trusted-leak probe and read_considered (the muse's
             # own view); its one raw parse is the presence COUNT (counting, never trusting).
             "tools/brain/muse_bench.py",
+            # edit: Kimi Code (K3, kimi-code, the seat), 2026-10-10 21:1x +0400 — CAUGHT BY THIS PIN at
+            # the revise-1009 integration (the pin works): the REVISE-1 bench reads the store ONLY
+            # through read_beliefs (the excluding reader) — its one raw file read is the locality
+            # instrument's BYTE identity comparison (bytes, never a trusted content read); it benches
+            # its own scratch stores and never meets a muse file.
+            "tools/brain/revise_bench.py",
         }
         got = {k for k, _n in hits}
         test_files = {k for k, _n in hits if k.startswith("tests/")}
