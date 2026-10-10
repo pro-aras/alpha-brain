@@ -18,3 +18,6 @@ tools:  scratch/tools-5a1016e.log  Â«Ran 1307 tests in 419.533s OK (skipped=33)Â
 ## exits:
 0
 0
+
+## note: the suites ran 2026-10-10 18:15:38/18:15:47 +0400 (slot ledger START lines) on the working tree == commit b10881d's bytes
+(the only post-5a1016e change is the test_revise_bench.py plant-pin tuple, edited before the suite runs; the bench module itself is 5a1016e's).
