@@ -1715,7 +1715,8 @@ class Mind:
         st = self._muse
         st["heard"] = int(st["heard"]) + 1
         heard_n = int(st["heard"])
-        trig = _muse_mod.trigger(heard, self.webs.get("L"), _muse_mod.self_words(self.self_node))
+        mature = {str(w) for w in self.brain.L.mature_words()}
+        trig = _muse_mod.trigger(heard, self.webs.get("L"), _muse_mod.self_words(self.self_node), mature)
         if not trig["fire"]:
             return                      # a trigger-negative sentence is counted, never journaled
         chain_id = _muse_mod.seed_of(heard)

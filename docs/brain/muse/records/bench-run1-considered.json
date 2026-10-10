@@ -1,0 +1,71 @@
+[
+  {
+    "line": 5,
+    "kind": "belief",
+    "word": "you",
+    "cells": [],
+    "episodes": [],
+    "moment": 1540,
+    "clashes": [],
+    "status": "tentative",
+    "current": "superseded"
+  },
+  {
+    "line": 6,
+    "kind": "belief",
+    "word": "are",
+    "cells": [],
+    "episodes": [],
+    "moment": 1540,
+    "clashes": [],
+    "status": "tentative",
+    "current": "superseded"
+  },
+  {
+    "line": 7,
+    "kind": "belief",
+    "word": "alpha",
+    "cells": [],
+    "episodes": [],
+    "moment": 1540,
+    "clashes": [],
+    "status": "tentative",
+    "current": "superseded"
+  },
+  {
+    "line": 8,
+    "kind": "belief",
+    "word": "you",
+    "cells": [],
+    "episodes": [],
+    "moment": 1650,
+    "clashes": [],
+    "status": "candidacy",
+    "supersedes": 5,
+    "current": "candidacy"
+  },
+  {
+    "line": 9,
+    "kind": "belief",
+    "word": "are",
+    "cells": [],
+    "episodes": [],
+    "moment": 1650,
+    "clashes": [],
+    "status": "candidacy",
+    "supersedes": 6,
+    "current": "candidacy"
+  },
+  {
+    "line": 10,
+    "kind": "belief",
+    "word": "alpha",
+    "cells": [],
+    "episodes": [],
+    "moment": 1650,
+    "clashes": [],
+    "status": "candidacy",
+    "supersedes": 7,
+    "current": "candidacy"
+  }
+]

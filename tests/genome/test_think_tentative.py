@@ -162,12 +162,20 @@ class TestReaderInventory(unittest.TestCase):
             "creature/mind.py",            # the think road's believe() call sites + the DEDUCE pool's read_beliefs(fold=True)
             "genome/think.py",             # the store itself
             "tools/verdict_g4.py",         # the offline G4 verdict (archived lives; raw read_jsonl, never a muse file)
+            # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 07:37 +0400 — the muse bench CAUGHT by this
+            # pin on its first run (the pin works): it reads the store ONLY through the two declared doors —
+            # read_beliefs (the excluding reader) for its trusted-leak probe and read_considered (the muse's
+            # own view); its one raw parse is the presence COUNT (counting, never trusting).
+            "tools/brain/muse_bench.py",
         }
         got = {k for k, _n in hits}
         test_files = {k for k, _n in hits if k.startswith("tests/")}
         print(f"[think-tentative] reader inventory: {hits}")
         self.assertEqual(got - test_files, pinned,
                          f"the store's non-test readers moved: {sorted(got - test_files)}")
+        bench = (ROOT / "tools" / "brain" / "muse_bench.py").read_text()
+        self.assertIn("read_beliefs(bel)", bench, "the bench's trusted read goes through the excluding door")
+        self.assertIn("read_considered", bench, "the bench's muse view goes through the muse's own door")
         # the mind's only READ of the store is the DEDUCE pool, through read_beliefs (the excluding reader)
         mind = (ROOT / "creature" / "mind.py").read_text()
         reads = [l for l in mind.splitlines() if "read_beliefs" in l]

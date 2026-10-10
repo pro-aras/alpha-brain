@@ -14,7 +14,9 @@ when one of its words is
       edge of the SELF node": the self's own words are distance zero, their consolidated neighbours
       distance one — the declared reading); or
   (b) a NAMED NOVELTY — heard >= MUSE_NOVEL_MIN times this life (the web's own node count) with NO
-      consolidated edge ("the web has never consolidated" it: heard but not known).
+      consolidated edge AND NOT KNOWN — the law's own gloss «heard but not known»: the word is not one
+      of the brain's MATURE words (the walk's own set; a thing the organism learned is known, however
+      loose its web edges stand).
 
 THE BUDGET (§1.1): at most ONE chain per MUSE_BUDGET heard sentences — the arithmetic is the mind's
 (_maybe_muse); the constant is declared here beside the chain's bounds.
@@ -72,11 +74,12 @@ def seed_of(words: Sequence[str]) -> str:
     return hashlib.sha256("\x00".join(str(w) for w in words).encode("utf-8")).hexdigest()[:16]
 
 
-def trigger(words: Sequence[str], web, self_ws: Set[str]) -> Dict[str, object]:
+def trigger(words: Sequence[str], web, self_ws: Set[str], mature: Set[str]) -> Dict[str, object]:
     """The declared classes and only they fire (law §1.1 + §2 G-UNIT(b)). Returns {"fire", "anchors",
     "classes"}: anchors = the firing words in heard order (deduped), classes the sorted union of
     "self"/"novel" they fired under. A word the web never heard is in NO class (it cannot be within one
-    edge of anything, and one hearing is not a novelty)."""
+    edge of anything, and one hearing is not a novelty); a MATURE word is never a novelty (the law's
+    «heard but not known» — `mature` is the brain's own mature set, the walk's own vocabulary)."""
     anchors: List[str] = []
     classes: Set[str] = set()
     for w in dict.fromkeys(str(x) for x in words):
@@ -88,7 +91,7 @@ def trigger(words: Sequence[str], web, self_ws: Set[str]) -> Dict[str, object]:
             classes.add("self")
             continue                                       # a self word is never ALSO counted a novelty
         node = web.nodes[w]
-        if int(node.get("n", 0)) >= MUSE_NOVEL_MIN and not nb:
+        if int(node.get("n", 0)) >= MUSE_NOVEL_MIN and not nb and w not in mature:
             anchors.append(w)
             classes.add("novel")
     return {"fire": bool(anchors), "anchors": anchors, "classes": sorted(classes)}

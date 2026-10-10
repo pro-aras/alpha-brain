@@ -159,7 +159,8 @@ class TriggerPure(_Lives):
         m, _root = self.live(False, chat_cids=[])      # any mind: the web/self fixtures are what is read
         web = m.webs["L"]
         self_ws = MUSE.self_words(m.self_node)
-        cases = {cid: MUSE.trigger(HEARD[cid], web, self_ws) for cid in ("planted", "control", "once", "twice")}
+        mature = {str(w) for w in m.brain.L.mature_words()}
+        cases = {cid: MUSE.trigger(HEARD[cid], web, self_ws, mature) for cid in ("planted", "control", "once", "twice")}
         print(f"[muse-trigger] self words {sorted(self_ws)} · matrix "
               f"{ {k: (v['fire'], v['anchors'], v['classes']) for k, v in cases.items()} }")
         self.assertEqual(cases["planted"]["anchors"], ["alpha"])
@@ -317,9 +318,9 @@ class Plant(_Lives):
         calls = {"n": 0}
         real = MUSE.trigger
 
-        def doctored(words, web, self_ws):
+        def doctored(words, web, self_ws, mature):
             calls["n"] += 1
-            out = dict(real(words, web, self_ws))
+            out = dict(real(words, web, self_ws, mature))
             out.update({"fire": True, "anchors": [str(w) for w in dict.fromkeys(words)], "classes": ["planted"]})
             return out
 

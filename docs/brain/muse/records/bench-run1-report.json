@@ -1,0 +1,104 @@
+{
+  "M-CHAIN": {
+    "bar": "exactly one chain on the planted sentence; >= 1 tentative belief AND >= 1 counter-question (printed, presence counts); the control spawns NONE",
+    "chains_started": 1,
+    "beliefs": 3,
+    "questions": 3,
+    "question_words": [
+      "you",
+      "are",
+      "alpha"
+    ],
+    "steps": [
+      "you",
+      "are",
+      "alpha"
+    ],
+    "control_chain_present": false,
+    "pass": true
+  },
+  "M-HONEST": {
+    "bar": "the immediate answer to the planted sentence stays an abstention (same breath)",
+    "answer": null,
+    "say_has_muse_key": false,
+    "pass": true
+  },
+  "M-TENTATIVE": {
+    "bar": "no trusted read (the store both modes, the SELF's trusted claims, the composer's believed sets) contains a tentative row's content; presence counts",
+    "statused_on_disk": 6,
+    "trusted_leaks": 0,
+    "self_claims_n": 8,
+    "self_muse_sourced": 0,
+    "tentative_reask_answer": null,
+    "pass": true
+  },
+  "M-FRUIT": {
+    "bar": "after the chain's questions are answered by the bench's parent AND one consolidation pass, the re-ask yields a non-null answer whose words trace to the chain's tentative rows (the trace printed). NULL: the 10 shuffled twins spawn no self-chains and no fruit",
+    "promoted_pairs": [
+      [
+        5,
+        8
+      ],
+      [
+        6,
+        9
+      ],
+      [
+        7,
+        10
+      ]
+    ],
+    "sleeps": 9,
+    "fruit_answer": [
+      "you",
+      "are",
+      "alpha"
+    ],
+    "trace": [
+      [
+        "you",
+        5,
+        8
+      ],
+      [
+        "are",
+        6,
+        9
+      ],
+      [
+        "alpha",
+        7,
+        10
+      ]
+    ],
+    "twin_budget_skips": 20,
+    "twin_chains_extra": 0,
+    "twin_reask_answers": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "pass": true
+  },
+  "M-COST": {
+    "bar": "ON vs OFF process_time overhead <= 5% (N1's own measure)",
+    "cpu_on_s": 7.858077346,
+    "cpu_off_s": 7.583982306000001,
+    "overhead": 0.03614130794887944,
+    "sentences_heard": 24,
+    "pass": true
+  },
+  "G-PLANT": {
+    "bar": "the doctored trigger (fires on EVERY sentence) is CAUGHT by the control-sentence check \u2014 the plant arm's control spawns a chain",
+    "plant_calls": 1,
+    "plant_control_chains": 1,
+    "pass": true
+  }
+}
