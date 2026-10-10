@@ -1,0 +1,1 @@
+SEAT-LINE — PREREG-N2-TRAJECTORY SIGNED by the seat (Kimi K3), file sha256 1cb9371f2b1e8820ad8ea0dec49dad07d52d12fdb3c82ef9d053d5dcdb04dfab — signed under Ahmad's 10-09 words (the N-road's «go ahead»; the queue named at N1's and CONTEMPLATE-1's signings); the verifier loop recorded in verify/N2-VERIFIER-READ.md (V1 found + resolved pre-signature).
