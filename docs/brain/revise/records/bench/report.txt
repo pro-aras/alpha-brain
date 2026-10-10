@@ -1,0 +1,65 @@
+REVISE-1 bench — the law's gates and marks (PREREG-REVISE-1)
+
+== GATES ==
+G-UNIT: PASS — the instrument's own tests (tests/genome/test_revise_store.py + tests/tools/test_revise_bench.py) — see the suite logs
+G-CHAIN: PASS — the tier-2 bench drives the SAME two functions mind.py:3350/3385 calls (imported, never copied) — pinned by tests/tools/test_revise_bench.py
+G-PLANT: PASS — (a) the doctored no-flip-landed tier-2 bench reads NOT-GRADABLE, never grades; (b) the clash_enabled=False store FAILS M-T1-FORM
+G-DET: PASS — every bench twice, byte-identical rows/reports — the records' cmp exit 0 (arms.jsonl, report.json, report.txt, stores/*.jsonl; cost.json is the one declared nondeterministic artifact, D-det)
+
+== TIER 2 PILOT (the population count, printed BEFORE the marks bind) ==
+flipped word: 'ring' (thing 'bar''s visual named with it from moment 400)
+cells-before: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78]
+cells-after[round 74]: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78, 80, 82, 83, 84, 85, 87, 88, 89]  (grew-only)
+cells-after[round 99]: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78, 80, 82, 83, 84, 85, 87, 88, 89, 95, 96, 100, 102, 103]  (grew-only)
+cells-after[round 149]: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78, 80, 82, 83, 84, 85, 87, 88, 89, 95, 96, 100, 102, 103, 105, 108, 112, 115, 118, 119, 120]  (grew-only)
+cells-after[round 249]: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78, 80, 82, 83, 84, 85, 87, 88, 89, 95, 96, 100, 102, 103, 105, 108, 112, 115, 118, 119, 120, 124, 125, 129, 131, 132]  (grew-only)
+lost cells: []  gained: [80, 82, 83, 84, 85, 87, 88, 89, 95, 96, 100, 102, 103, 105, 108, 112, 115, 118, 119, 120, 124, 125, 129, 131, 132]
+verdict: NOT-GRADABLE — the flip never moved the answering cells in the law's sense within the bench horizon (grew-only: a cell removed or a clash row is the law's move; the set only grew or sat)
+direction shares: pre_share_pre=0.37555555555555553 pre_share_post=0.305 post_share=0.67 (n_post=400, n_pre=450)
+separation=0.36500000000000005  smallest passing gap 10/n=0.025  margin=None
+
+== MARKS ==
+M-T1-FORM: PASS — the revision form matches the evidence shape (the law §3 M-T1-FORM, five shapes)
+    per_shape: {'a': {'bar': '>= 1 clash row; the post-flip standing EXACTLY the planted [33, 44]', 'clashes': 1, 'standing': [33, 44], 'pass': True}, 'b': {'bar': '>= 1 clash (rule 4 is unconditional — the pinned partial-removal behavior)', 'clashes': 1, 'standing': [22, 33], 'pass': True}, 'c': {'bar': 'an extension, ZERO clashes', 'clashes': 0, 'has_extension': True, 'pass': True}, 'd': {'bar': 'revisits only, ZERO clashes', 'clashes': 0, 'w_kinds': ['belief', 'revisit', 'revisit'], 'pass': True}, 'e': {'bar': '>= 1 clash with the cells UNCHANGED (the ledger half of rule 4)', 'clashes': 2, 'n_belief_rows': 3, 'cells_unchanged': True, 'pass': True}}
+
+M-T1-ORDER: PASS — the ordered flip's clash count == 1, strictly below all 10 derangements' (each >= 2 by the boundary arithmetic; printed)
+    ordered_clashes: 1
+    derangements: [('ABBAAB', 3, 3), ('ABAABB', 3, 3), ('BABABA', 5, 5), ('BBAAAB', 2, 2), ('ABBABA', 4, 4), ('ABABAB', 5, 5), ('BAAABB', 2, 2), ('BBAABA', 3, 3), ('BABBAA', 3, 3), ('AABBBA', 2, 2)]
+    arithmetic_exact: True
+
+M-T1-LOCAL: PASS — the bystander X's chain byte-identical at every checkpoint of every stream; presence count printed (n rows of X)
+    per_shape: {'a': {'checkpoints': 7, 'x_presence': 1, 'violations': [], 'pass': True}, 'b': {'checkpoints': 4, 'x_presence': 1, 'violations': [], 'pass': True}, 'c': {'checkpoints': 4, 'x_presence': 1, 'violations': [], 'pass': True}, 'd': {'checkpoints': 4, 'x_presence': 1, 'violations': [], 'pass': True}, 'e': {'checkpoints': 4, 'x_presence': 1, 'violations': [], 'pass': True}}
+
+M-T1-DIR: PASS — post-flip standing == the planted set (set equality); the pre-flip standing never stands again (the chain forked at the clash)
+    per_shape: {'a': {'planted_post_flip': [33, 44], 'standing': [33, 44], 'standing_line': 4, 'pass': True}, 'b': {'planted_post_flip': [22, 33], 'standing': [22, 33], 'standing_line': 2, 'pass': True}, 'e': {'planted_post_flip': [11, 22], 'standing': [11, 22], 'standing_line': 4, 'pass': True}}
+
+M-B-DIR: PASS — the planted always claim demotes EXACTLY at the crossing observation (the index printed, first_demoted_at correct); the usually twin under confirmations stays trusted
+    crossing: 32
+    first_demoted_at: 32
+    usually_first_demoted_at: None
+    usually_final: trusted
+
+M-B-FLOOR: PASS — below min_events, an all-contradicted claim stays trusted (the evidence's amount never fires before the declared floor)
+    n_below_floor: 29
+    edge_demoted_at: 30
+
+M-B-SIGN: PASS — the same event count with the signs swapped never demotes (the SIGN of the evidence, not its amount)
+    n_events: 35
+    contradicted: 0
+
+M-T2-MOVE: NOT-GRADED — the flip move where the null MAX is 0, else above it
+    reason: NOT-GRADABLE — the flip never moved the answering cells in the law's sense within the bench horizon (grew-only: a cell removed or a clash row is the law's move; the set only grew or sat)
+    readings: {'flip_moves': {'per_checkpoint': {'74': {'removed': [], 'clash_row': False, 'moved': False}, '99': {'removed': [], 'clash_row': False, 'moved': False}, '149': {'removed': [], 'clash_row': False, 'moved': False}, '249': {'removed': [], 'clash_row': False, 'moved': False}}, 'move_count': 0, 'onset_first_checkpoint': False}, 'null_move_counts': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+
+M-T2-DIR: NOT-GRADED — post-flip standing's agree share >= pre-flip standing's post-flip share + the pilot's margin; and the pre-flip standing's post-flip share < its own pre-flip share
+    reason: NOT-GRADABLE — the flip never moved the answering cells in the law's sense within the bench horizon (grew-only: a cell removed or a clash row is the law's move; the set only grew or sat)
+    readings: {'pilot_shares': {'pre_share_pre': 0.37555555555555553, 'pre_share_post': 0.305, 'post_share': 0.67, 'separation': 0.36500000000000005, 'smallest_gap_10_over_n': 0.025, 'n_post': 400, 'n_pre': 450}, 'flip_shares': {'n_post': 400, 'n_pre': 450, 'pre_share_post': 0.27, 'post_share': 0.625, 'pre_share_pre': 0.33111111111111113}}
+
+M-T2-LOCAL: NOT-GRADED — every other believed word's rows byte-identical across the flip window
+    reason: NOT-GRADABLE — the flip never moved the answering cells in the law's sense within the bench horizon (grew-only: a cell removed or a clash row is the law's move; the set only grew or sat)
+    readings: {'per_word': {'circle': {'presence': 1, 'violations': [], 'pass': True}, 'square': {'presence': 1, 'violations': [], 'pass': True}, 'triangle': {'presence': 1, 'violations': [], 'pass': True}, 'cross': {'presence': 1, 'violations': [], 'pass': True}, 'bar': {'presence': 1, 'violations': [], 'pass': True}, 'dot': {'presence': 1, 'violations': [], 'pass': True}, 'star': {'presence': 1, 'violations': [], 'pass': True}}, 'pass': True}
+
+M-COST: PASS — the whole assay <= 30 CPU-min, peak <= 1 GB (measured-first)
+    measured: cost.json (the one declared nondeterministic artifact — timings — D-det; the reports carry the verdict, never the timings)
+
+BENCH VERDICT LINE: TIER-1+B ALL MARKS PASS; TIER 2 NOT-GRADABLE (the §4 FAIL-FORM road: the flip never moved the answering cells in the law's sense within the bench horizon — named, the amendment re-prices the bench)

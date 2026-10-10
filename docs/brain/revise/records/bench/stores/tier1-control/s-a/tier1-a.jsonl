@@ -1,0 +1,4 @@
+{"line": 0, "kind": "belief", "word": "x", "cells": [98, 99], "episodes": [0], "moment": 100, "clashes": []}
+{"line": 1, "kind": "belief", "word": "w", "cells": [11, 22], "episodes": [1], "moment": 101, "clashes": []}
+{"kind": "revisit", "of": 1, "word": "w", "episodes_added": [2], "moment": 102}
+{"kind": "revisit", "of": 1, "word": "w", "episodes_added": [3], "moment": 103}

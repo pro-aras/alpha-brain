@@ -1,0 +1,20 @@
+# REVISE-1 suite + G-UNIT evidence on the final bytes (build sha 5a1016e, branch revise-1009)
+# read FROM THE FILES (RULES §5); slot ledger lines cited for the measured peaks
+
+## G-UNIT RED (on the law commit 66eaffa, tests committed at ed9533e):
+scratch/gunit-red.log: «Ran 2 tests in 0.000s FAILED (errors=2)» exit 1 — both modules error at import (tools.brain.revise_bench absent)
+b2bbc5d5f232350a5c3b68adac957f7707551c4b2b4788842e6439936633fd8f  scratch/gunit-red.log
+
+## G-UNIT GREEN (final bytes):
+scratch/gunit-green3.log: «Ran 29 tests in 8.258s OK» exit 0
+e788efe26ec0089e96e5a8a046801317ea7d4e2ee427beebbe8e35629dacc0bd  scratch/gunit-green3.log
+
+## branch suites (through slot, SLOT_MEM=2G):
+genome: scratch/genome-5a1016e.log «Ran 782 tests in 158.932s OK (skipped=1, expected failures=6)» exit 0 — slot END: peak 855MB
+f4c7b3790df25c5fedd21fbf18e2ea6253269a868f91d712adc2f736ef9cfd37  scratch/genome-5a1016e.log
+tools:  scratch/tools-5a1016e.log  «Ran 1307 tests in 419.533s OK (skipped=33)» exit 0 — slot END: peak 1654MB
+13f95bb7880f9bb3726a989649b3d40b62df3440a96c2d44fe1e48d3e7d77d01  scratch/tools-5a1016e.log
+
+## exits:
+0
+0
