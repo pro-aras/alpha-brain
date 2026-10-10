@@ -1,0 +1,71 @@
+REVISE-1 bench — the law's gates and marks (PREREG-REVISE-1)
+
+== GATES ==
+G-UNIT: PASS — the instrument's own tests (tests/genome/test_revise_store.py + tests/tools/test_revise_bench.py) — see the suite logs
+G-CHAIN: PASS — the tier-2 bench drives the SAME two functions mind.py:3350/3385 calls (imported, never copied) — pinned by tests/tools/test_revise_bench.py
+G-PLANT: PASS — (a) the doctored no-flip-landed tier-2 bench reads NOT-GRADABLE, never grades; (b) the clash_enabled=False store FAILS M-T1-FORM
+G-DET: PASS — every bench twice, byte-identical rows/reports — the records' cmp exit 0 (arms.jsonl, report.json, report.txt, stores/*.jsonl; cost.json is the one declared nondeterministic artifact, D-det)
+
+== TIER 2 PILOT (the population count, printed BEFORE the marks bind) ==
+flipped word: 'ring' (thing 'bar''s visual named with it from moment 400)
+cells-before: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78]
+cells-after[round 74]: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78, 80, 82, 83, 84, 85, 87, 88, 89]  (grew-only)
+cells-after[round 99]: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78, 80, 82, 83, 84, 85, 87, 88, 89, 95, 96, 100, 102, 103]  (grew-only)
+cells-after[round 149]: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78, 80, 82, 83, 84, 85, 87, 88, 89, 95, 96, 100, 102, 103, 105, 108, 112, 115, 118, 119, 120]  (grew-only)
+cells-after[round 249]: [4, 13, 18, 22, 25, 30, 34, 37, 39, 41, 45, 46, 50, 52, 55, 57, 59, 63, 66, 69, 71, 75, 76, 78, 80, 82, 83, 84, 85, 87, 88, 89, 95, 96, 100, 102, 103, 105, 108, 112, 115, 118, 119, 120, 124, 125, 129, 131, 132]  (grew-only)
+lost cells: []  gained: [80, 82, 83, 84, 85, 87, 88, 89, 95, 96, 100, 102, 103, 105, 108, 112, 115, 118, 119, 120, 124, 125, 129, 131, 132]
+AMENDMENT 1 (the accretion form): flip-born cells in the pilot's final standing: [80, 83, 84, 85, 88, 102, 103] (gained 25, flip-evidence episodes 200); per-cell cosines in report.json
+verdict: NOT-GRADABLE — the flip never moved the answering cells in the law's sense within the bench horizon (grew-only: a cell removed or a clash row is the law's move; the set only grew or sat)
+direction shares: pre_share_pre=0.37555555555555553 pre_share_post=0.305 post_share=0.67 (n_post=400, n_pre=450)
+separation=0.36500000000000005  smallest passing gap 10/n=0.025  margin=None
+
+== MARKS ==
+M-T1-FORM: PASS — the revision form matches the evidence shape (the law §3 M-T1-FORM, five shapes)
+    per_shape: {'a': {'bar': '>= 1 clash row; the post-flip standing EXACTLY the planted [33, 44]', 'clashes': 1, 'standing': [33, 44], 'pass': True}, 'b': {'bar': '>= 1 clash (rule 4 is unconditional — the pinned partial-removal behavior)', 'clashes': 1, 'standing': [22, 33], 'pass': True}, 'c': {'bar': 'an extension, ZERO clashes', 'clashes': 0, 'has_extension': True, 'pass': True}, 'd': {'bar': 'revisits only, ZERO clashes', 'clashes': 0, 'w_kinds': ['belief', 'revisit', 'revisit'], 'pass': True}, 'e': {'bar': '>= 1 clash with the cells UNCHANGED (the ledger half of rule 4)', 'clashes': 2, 'n_belief_rows': 3, 'cells_unchanged': True, 'pass': True}}
+
+M-T1-ORDER: PASS — the ordered flip's clash count == 1, strictly below all 10 derangements' (each >= 2 by the boundary arithmetic; printed)
+    ordered_clashes: 1
+    derangements: [('ABBAAB', 3, 3), ('ABAABB', 3, 3), ('BABABA', 5, 5), ('BBAAAB', 2, 2), ('ABBABA', 4, 4), ('ABABAB', 5, 5), ('BAAABB', 2, 2), ('BBAABA', 3, 3), ('BABBAA', 3, 3), ('AABBBA', 2, 2)]
+    arithmetic_exact: True
+
+M-T1-LOCAL: PASS — the bystander X's chain byte-identical at every checkpoint of every stream; presence count printed (n rows of X)
+    per_shape: {'a': {'checkpoints': 7, 'x_presence': 1, 'violations': [], 'pass': True}, 'b': {'checkpoints': 4, 'x_presence': 1, 'violations': [], 'pass': True}, 'c': {'checkpoints': 4, 'x_presence': 1, 'violations': [], 'pass': True}, 'd': {'checkpoints': 4, 'x_presence': 1, 'violations': [], 'pass': True}, 'e': {'checkpoints': 4, 'x_presence': 1, 'violations': [], 'pass': True}}
+
+M-T1-DIR: PASS — post-flip standing == the planted set (set equality); the pre-flip standing never stands again (the chain forked at the clash)
+    per_shape: {'a': {'planted_post_flip': [33, 44], 'standing': [33, 44], 'standing_line': 4, 'pass': True}, 'b': {'planted_post_flip': [22, 33], 'standing': [22, 33], 'standing_line': 2, 'pass': True}, 'e': {'planted_post_flip': [11, 22], 'standing': [11, 22], 'standing_line': 4, 'pass': True}}
+
+M-B-DIR: PASS — the planted always claim demotes EXACTLY at the crossing observation (the index printed, first_demoted_at correct); the usually twin under confirmations stays trusted
+    crossing: 32
+    first_demoted_at: 32
+    usually_first_demoted_at: None
+    usually_final: trusted
+
+M-B-FLOOR: PASS — below min_events, an all-contradicted claim stays trusted (the evidence's amount never fires before the declared floor)
+    n_below_floor: 29
+    edge_demoted_at: 30
+
+M-B-SIGN: PASS — the same event count with the signs swapped never demotes (the SIGN of the evidence, not its amount)
+    n_events: 35
+    contradicted: 0
+
+M-T2-ACCRETE: PASS — the flip twin's standing CONTAINS ≥ 1 flip-born cell (a gained cell whose content reads A's born cluster over the pre-flip standing's, cos_to_a > cos_to_b — the amendment's declared form) where every no-flip twin gains 0; the per-cell cosines printed; presence counts beside
+    flip: {'flip_born_n': 7, 'flip_born': [78, 85, 94, 95, 110, 121, 127], 'gained_n': 25, 'cells': [{'cell': 78, 'cos_to_a': 0.7983169025690827, 'cos_to_b': 0.5052770650042155, 'flip_born': True}, {'cell': 80, 'cos_to_a': 0.5502000828912144, 'cos_to_b': 0.7832990025348134, 'flip_born': False}, {'cell': 84, 'cos_to_a': 0.49083153444898564, 'cos_to_b': 0.6751834504053482, 'flip_born': False}, {'cell': 85, 'cos_to_a': 0.8371541365077997, 'cos_to_b': 0.4732723809977487, 'flip_born': True}, {'cell': 86, 'cos_to_a': 0.5567197783253266, 'cos_to_b': 0.7817512321996722, 'flip_born': False}, {'cell': 87, 'cos_to_a': 0.44810787746411224, 'cos_to_b': 0.8210740986121429, 'flip_born': False}, {'cell': 88, 'cos_to_a': 0.3997022270870929, 'cos_to_b': 0.647127417324387, 'flip_born': False}, {'cell': 90, 'cos_to_a': 0.47831176201014425, 'cos_to_b': 0.8217012148958609, 'flip_born': False}, {'cell': 91, 'cos_to_a': 0.46158982893348177, 'cos_to_b': 0.6550904253355958, 'flip_born': False}, {'cell': 94, 'cos_to_a': 0.7899695354726748, 'cos_to_b': 0.3604455443885955, 'flip_born': True}, {'cell': 95, 'cos_to_a': 0.814457375734779, 'cos_to_b': 0.45473142677201844, 'flip_born': True}, {'cell': 96, 'cos_to_a': 0.4905221487861011, 'cos_to_b': 0.844858505584924, 'flip_born': False}, {'cell': 97, 'cos_to_a': 0.5974405896034125, 'cos_to_b': 0.8138626528879997, 'flip_born': False}, {'cell': 98, 'cos_to_a': 0.534394756014778, 'cos_to_b': 0.7931903918174703, 'flip_born': False}, {'cell': 100, 'cos_to_a': 0.5364325872317874, 'cos_to_b': 0.8369166061168607, 'flip_born': False}, {'cell': 107, 'cos_to_a': 0.5140492836754843, 'cos_to_b': 0.8415287462338255, 'flip_born': False}, {'cell': 110, 'cos_to_a': 0.8280033392020112, 'cos_to_b': 0.46351748929012937, 'flip_born': True}, {'cell': 121, 'cos_to_a': 0.8187265351230117, 'cos_to_b': 0.47200321505561393, 'flip_born': True}, {'cell': 124, 'cos_to_a': 0.5455533814558895, 'cos_to_b': 0.8268243654509548, 'flip_born': False}, {'cell': 127, 'cos_to_a': 0.8143393921551979, 'cos_to_b': 0.45912565763061286, 'flip_born': True}, {'cell': 131, 'cos_to_a': 0.5770218977543564, 'cos_to_b': 0.8236716843066344, 'flip_born': False}, {'cell': 133, 'cos_to_a': 0.5063194138597938, 'cos_to_b': 0.8216568867266916, 'flip_born': False}, {'cell': 134, 'cos_to_a': 0.5275874200511149, 'cos_to_b': 0.7927787111645366, 'flip_born': False}, {'cell': 137, 'cos_to_a': 0.5450767858725881, 'cos_to_b': 0.8499747325984064, 'flip_born': False}, {'cell': 138, 'cos_to_a': 0.4920632749090529, 'cos_to_b': 0.8385254481914897, 'flip_born': False}], 'flip_evidence_n': 200}
+    pilot_flip_born_n: 7
+    null_flip_born_counts: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+M-T2-DIR: PASS — post_share >= pre_share_post + margin (the AMENDMENT's law constant 0.18 = half the first pilot's 0.365, fixed, never tuned); and pre_share_post < pre_share_pre
+    margin: 0.18
+    smallest_gap_10_over_n: 0.025
+    n_post: 400
+    n_pre: 450
+    pre_share_post: 0.27
+    post_share: 0.625
+    pre_share_pre: 0.33111111111111113
+
+M-T2-LOCAL: PASS — every other believed word's rows byte-identical across the flip window; presence counts printed
+    per_word: {'circle': {'presence': 1, 'violations': [], 'pass': True}, 'square': {'presence': 1, 'violations': [], 'pass': True}, 'triangle': {'presence': 1, 'violations': [], 'pass': True}, 'cross': {'presence': 1, 'violations': [], 'pass': True}, 'bar': {'presence': 1, 'violations': [], 'pass': True}, 'dot': {'presence': 1, 'violations': [], 'pass': True}, 'star': {'presence': 1, 'violations': [], 'pass': True}}
+
+M-COST: PASS — the whole assay <= 30 CPU-min, peak <= 1 GB (measured-first)
+    measured: cost.json (the one declared nondeterministic artifact — timings — D-det; the reports carry the verdict, never the timings)
+
+BENCH VERDICT LINE: ALL MARKS PASS

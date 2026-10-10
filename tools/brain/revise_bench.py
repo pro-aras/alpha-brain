@@ -393,6 +393,11 @@ T2_FLIP_SEED = 20261011                   # the graded flip twin (never the pilo
 T2_NULL_SEEDS = tuple(range(20261020, 20261030))   # the 10 no-flip twins
 T2_EP_CAP = 4096
 THINGS = list(POOL_B)
+# edit: Kimi Code (K3, kimi-code, the seat), 2026-10-10 20:2x +0400 — AMENDMENT 1 (signed, docs/brain/
+# revise/PREREG-REVISE-1-AMENDMENT-1.md): Tier 2 re-priced to revision by ACCRETION. T2_MARGIN is a LAW
+# CONSTANT of the amendment's text — 0.18 = half the first pilot's measured separation 0.365 — fixed
+# there, never re-derived per run, never tuned after a graded run.
+T2_MARGIN = 0.18
 
 
 def taught_name(thing: str, moment: int, flip: bool) -> str:
@@ -553,6 +558,36 @@ def pilot_reading(arm: dict) -> dict:
             "margin": (separation if gradable and not underpowered else None)}
 
 
+def flip_born(arm: dict) -> dict:
+    """AMENDMENT 1's M-T2-ACCRETE counter (the seat, 2026-10-10 20:2x +0400): the flipped word's FINAL
+    standing's gained cells (vs the pre-flip standing) whose CONTENT reads the OTHER thing's canvas —
+    a gained cell counts flip-born iff cos_to_a > cos_to_b (its nearest read is A's born cluster, not
+    the flipped word's own pre-flip standing; the amendment's declared form — «born on episodes of the
+    other thing's canvas», the flip's own content). Also the flip's EVIDENCE presence: the post-flip
+    episodes carrying B_WORD on A's canvas (the schedule is exact: the moment's thing is
+    THINGS[moment % len(THINGS)] — the bench renders THINGS in order, one per moment)."""
+    org, ep = arm["org"], arm["episodes"]
+    pre_r = T2_R_PRE - 1
+    before = set(arm["checkpoints"][pre_r]["b_answering"])
+    final = set(arm["checkpoints"][T2_CHECK_POST[-1]]["b_answering"])
+    gained = sorted(final - before)
+    led = arm["ledgers_final"]
+    a_cluster = [c for c, s in led["sight"].items() if s == {T2_A_THING} and org.sight.alive[c]]
+    cells = []
+    for c in gained:
+        cos_a = max((float(org.sight.cells[c] @ org.sight.cells[k]) for k in a_cluster), default=-1.0)
+        cos_b = max((float(org.sight.cells[c] @ org.sight.cells[k]) for k in before), default=-1.0)
+        cells.append({"cell": int(c), "cos_to_a": cos_a, "cos_to_b": cos_b,
+                      "flip_born": bool(cos_a > cos_b)})
+    ev = sum(1 for slot in range(len(ep))
+             if str(ep.word[slot]) == T2_B_WORD and int(ep.moment[slot]) >= T2_FLIP_MOMENT
+             and THINGS[int(ep.moment[slot]) % len(THINGS)] == T2_A_THING)
+    return {"gained_n": len(gained), "cells": cells,
+            "flip_born": [c["cell"] for c in cells if c["flip_born"]],
+            "flip_born_n": sum(1 for c in cells if c["flip_born"]),
+            "flip_evidence_n": int(ev)}
+
+
 def _t2_moves(arm: dict) -> dict:
     """M-T2-MOVE's counting: at each post-flip checkpoint, a MOVE = the flipped word's standing lost a
     cell vs the previous checkpoint's standing, or the drive wrote a clash row. Onset = the first
@@ -586,12 +621,20 @@ def _t2_local(arm: dict) -> dict:
 
 
 def grade_tier2(pilot: dict, flip_arm: dict, null_arms: list) -> dict:
-    """The tier-2 marks, bound ONLY when the pilot graded the bench gradable (else every mark reads
-    NOT-GRADED — the law's refusal; the readings still print)."""
+    """The tier-2 marks, AMENDMENT 1's form (the seat, 2026-10-10 20:2x +0400): GRADABLE iff the flip
+    LANDED in the pilot arm's evidence (post-flip B_WORD-on-A-canvas episodes ≥ 1 — the presence
+    count; a claimed flip that never lands reads NOT-GRADABLE, the G-PLANT (a) form). The marks:
+    M-T2-ACCRETE (the standing gains ≥ 1 flip-born cell where every no-flip twin gains 0),
+    M-T2-DIR (binds at the law constant T2_MARGIN = 0.18), M-T2-LOCAL (binds). The refused first form
+    (the removal/clash MOVE) stays on the record as readings, never deleted."""
     reading = pilot["reading"]
-    null_moves = [_t2_moves(a)["move_count"] for a in null_arms]
+    pilot_fb = flip_born(pilot["arm"])
+    gradable = pilot_fb["flip_evidence_n"] >= 1
     flip_moves = _t2_moves(flip_arm)
     local = _t2_local(flip_arm)
+    flip_fb = flip_born(flip_arm)
+    null_fb = [flip_born(a) for a in null_arms]
+    null_fb_counts = [a["flip_born_n"] for a in null_fb]
     shares = {}
     if flip_arm is not None:
         org, ep = flip_arm["org"], flip_arm["episodes"]
@@ -605,41 +648,51 @@ def grade_tier2(pilot: dict, flip_arm: dict, null_arms: list) -> dict:
                   "pre_share_post": a1 / n_post if n_post else None,
                   "post_share": a2 / n_post if n_post else None,
                   "pre_share_pre": a3 / n_pre if n_pre else None}
-    if not reading["gradable"]:
-        reason = f"NOT-GRADABLE — {reading['reason']}"
+    if not gradable:
+        reason = ("NOT-GRADABLE — the flip never landed in the evidence (zero post-flip episodes "
+                  "carry B_WORD on A's canvas — the presence count is the refusal's trigger; the "
+                  "amendment's G-PLANT (a) form)")
         marks = {}
-        for m, bar in (("M-T2-MOVE", "the flip move where the null MAX is 0, else above it"),
+        for m, bar in (("M-T2-ACCRETE", "the standing gains ≥ 1 flip-born cell; every no-flip twin 0"),
                        ("M-T2-DIR", "post-flip standing's agree share >= pre-flip standing's post-flip "
-                                    "share + the pilot's margin; and the pre-flip standing's post-flip "
-                                    "share < its own pre-flip share"),
+                                    "share + the amendment's margin; and the pre-flip standing's "
+                                    "post-flip share < its own pre-flip share"),
                        ("M-T2-LOCAL", "every other believed word's rows byte-identical across the flip "
                                       "window")):
             marks[m] = {"bar": bar, "pass": "NOT-GRADED", "reason": reason}
-        marks["M-T2-MOVE"]["readings"] = {"flip_moves": flip_moves, "null_move_counts": null_moves}
+        marks["M-T2-ACCRETE"]["readings"] = {"pilot_flip_born": pilot_fb,
+                                             "legacy_move": {"flip_moves": flip_moves,
+                                                             "null_move_counts":
+                                                             [_t2_moves(a)["move_count"]
+                                                              for a in null_arms]}}
         marks["M-T2-DIR"]["readings"] = {"pilot_shares": {k: reading[k] for k in (
             "pre_share_pre", "pre_share_post", "post_share", "separation", "smallest_gap_10_over_n",
             "n_post", "n_pre")}, "flip_shares": shares}
         marks["M-T2-LOCAL"]["readings"] = local
         return {"gradable": False, "marks": marks}
 
-    margin = reading["margin"]
-    null_max = max(null_moves) if null_moves else 0
-    m_move = {"bar": "the flip twin's standing MOVES after the flip (a cell removed, or a clash row) "
-                     "with onset at the first post-flip checkpoint; the flip move where the null MAX "
-                     "is 0, else above it",
-              "flip": flip_moves, "null_move_counts": null_moves, "null_max": null_max,
-              "pass": (flip_moves["onset_first_checkpoint"] and flip_moves["move_count"] >= 1
-                       and (null_max == 0 or flip_moves["move_count"] > null_max))}
-    gap_ok = shares["post_share"] >= shares["pre_share_post"] + margin
+    m_accrete = {"bar": "the flip twin's standing CONTAINS ≥ 1 flip-born cell (a gained cell whose "
+                        "content reads A's born cluster over the pre-flip standing's, cos_to_a > "
+                        "cos_to_b — the amendment's declared form) where every no-flip twin gains 0; "
+                        "the per-cell cosines printed; presence counts beside",
+                 "flip": {"flip_born_n": flip_fb["flip_born_n"], "flip_born": flip_fb["flip_born"],
+                          "gained_n": flip_fb["gained_n"], "cells": flip_fb["cells"],
+                          "flip_evidence_n": flip_fb["flip_evidence_n"]},
+                 "pilot_flip_born_n": pilot_fb["flip_born_n"],
+                 "null_flip_born_counts": null_fb_counts,
+                 "pass": bool(flip_fb["flip_born_n"] >= 1 and all(n == 0 for n in null_fb_counts)
+                              and len(null_fb_counts) == 10)}
+    gap_ok = shares["post_share"] >= shares["pre_share_post"] + T2_MARGIN
     moved_under = shares["pre_share_post"] < shares["pre_share_pre"]
-    m_dir = {"bar": f"post_share >= pre_share_post + margin (the pilot's {margin}); and "
+    m_dir = {"bar": f"post_share >= pre_share_post + margin (the AMENDMENT's law constant "
+                    f"{T2_MARGIN} = half the first pilot's 0.365, fixed, never tuned); and "
                     f"pre_share_post < pre_share_pre",
-             "margin": margin, "smallest_gap_10_over_n": reading["smallest_gap_10_over_n"],
+             "margin": T2_MARGIN, "smallest_gap_10_over_n": reading["smallest_gap_10_over_n"],
              **shares, "pass": bool(gap_ok and moved_under)}
     m_local = {"bar": "every other believed word's rows byte-identical across the flip window; "
                       "presence counts printed", **local}
     return {"gradable": True,
-            "marks": {"M-T2-MOVE": m_move, "M-T2-DIR": m_dir, "M-T2-LOCAL": m_local}}
+            "marks": {"M-T2-ACCRETE": m_accrete, "M-T2-DIR": m_dir, "M-T2-LOCAL": m_local}}
 
 
 def run_tier2(store_dir, pilot_seed=T2_PILOT_SEED, flip_seed=T2_FLIP_SEED,
@@ -654,7 +707,8 @@ def run_tier2(store_dir, pilot_seed=T2_PILOT_SEED, flip_seed=T2_FLIP_SEED,
                  for i, s in enumerate(null_seeds)]
     graded = grade_tier2({"arm": pilot_arm, "reading": reading}, flip_arm, null_arms)
     return {"tier2_verdict": "GRADABLE" if graded["gradable"] else "NOT-GRADABLE",
-            "pilot": {"seed": pilot_seed, "reading": reading, "counts": pilot_arm["counts"]},
+            "pilot": {"seed": pilot_seed, "reading": reading, "counts": pilot_arm["counts"],
+                      "flip_born": flip_born(pilot_arm)},
             "flip": {"seed": flip_seed, "counts": flip_arm["counts"]},
             "nulls": [{"seed": s, "counts": a["counts"]} for s, a in zip(null_seeds, null_arms)],
             "marks": graded["marks"]}
@@ -768,6 +822,11 @@ def main() -> int:
     for r, cells in pr["cells_after_per_checkpoint"].items():
         lines.append(f"cells-after[round {r}]: {cells}  ({pr['per_checkpoint_class'][r]})")
     lines.append(f"lost cells: {pr['lost_cells']}  gained: {[g['cell'] for g in pr['gained_cells']]}")
+    pf = t2["pilot"].get("flip_born")
+    if pf is not None:
+        lines.append(f"AMENDMENT 1 (the accretion form): flip-born cells in the pilot's final "
+                     f"standing: {pf['flip_born']} (gained {pf['gained_n']}, flip-evidence episodes "
+                     f"{pf['flip_evidence_n']}); per-cell cosines in report.json")
     lines.append(f"verdict: {pr['verdict']} — {pr['reason']}")
     lines.append(f"direction shares: pre_share_pre={pr['pre_share_pre']} "
                  f"pre_share_post={pr['pre_share_post']} post_share={pr['post_share']} "
@@ -786,9 +845,9 @@ def main() -> int:
     t1b_ok = all(marks[m]["pass"] for m in ("M-T1-FORM", "M-T1-ORDER", "M-T1-LOCAL", "M-T1-DIR",
                                             "M-B-DIR", "M-B-FLOOR", "M-B-SIGN"))
     if t2["tier2_verdict"] == "NOT-GRADABLE":
-        vline = ("TIER-1+B ALL MARKS PASS; TIER 2 NOT-GRADABLE (the §4 FAIL-FORM road: the flip never "
-                 "moved the answering cells in the law's sense within the bench horizon — named, the "
-                 "amendment re-prices the bench)" if t1b_ok else
+        vline = ("TIER-1+B ALL MARKS PASS; TIER 2 NOT-GRADABLE (AMENDMENT 1's refusal: the flip never "
+                 "landed in the evidence — zero post-flip episodes carry the flipped naming; the "
+                 "presence count is the refusal's trigger)" if t1b_ok else
                  "TIER-1/B MARK(S) FAIL; TIER 2 NOT-GRADABLE")
     else:
         vline = "ALL MARKS PASS" if all_pass else "AT LEAST ONE MARK FAILS"

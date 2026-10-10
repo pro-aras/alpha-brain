@@ -108,24 +108,62 @@ class TestChainPin(unittest.TestCase):
 
 
 class TestPilotRefusal(unittest.TestCase):
-    """G-PLANT (a): the doctored no-flip-landed tier-2 bench must read NOT-GRADABLE, never grade."""
+    """G-PLANT (a), AMENDMENT 1's form: the doctored no-flip-landed tier-2 bench must read
+    NOT-GRADABLE — the refusal's trigger is the flip's EVIDENCE absent (zero post-flip episodes
+    carry the flipped naming), never a grade."""
 
     def test_unlanded_flip_refuses(self):
         arm = RB.live_toy(RB.T2_FLIP_SEED, True, mkdtemp(), arm="plant", plant=True)
-        reading = RB.pilot_reading(arm)
-        self.assertFalse(reading["gradable"], reading["reason"])
-        self.assertEqual(reading["verdict"], "NOT-GRADABLE")
-        self.assertIn(reading["moved"], ("unchanged", "grew-only"),
-                      "the world never changed: no removal move can be claimed")
-        self.assertIsNone(reading["margin"], "no margin binds on a refused bench")
+        fb = RB.flip_born(arm)
+        self.assertEqual(fb["flip_evidence_n"], 0,
+                         "the refusal's trigger: the flip's evidence is ABSENT (the plant's world "
+                         "never changed, though the driver claims it)")
+        out = RB.grade_tier2({"arm": arm, "reading": RB.pilot_reading(arm)}, arm, [])
+        self.assertFalse(out["gradable"], "no gradable run without the flip's evidence")
 
     def test_graded_marks_never_computed_on_a_refused_arm(self):
         out = RB.run_tier2(mkdtemp(), pilot_seed=RB.T2_FLIP_SEED, flip_seed=RB.T2_FLIP_SEED,
                            null_seeds=RB.T2_NULL_SEEDS[:2], plant=True)
         self.assertEqual(out["tier2_verdict"], "NOT-GRADABLE")
-        for mark in ("M-T2-MOVE", "M-T2-DIR", "M-T2-LOCAL"):
+        for mark in ("M-T2-ACCRETE", "M-T2-DIR", "M-T2-LOCAL"):
             self.assertEqual(out["marks"][mark]["pass"], "NOT-GRADED",
                              f"{mark}: a refused bench never grades")
+
+
+class TestAmendment1Forms(unittest.TestCase):
+    """AMENDMENT 1's pins (the seat, 2026-10-10 20:2x +0400): the margin is the law's constant, the
+    accretion counter fires on the flip arm and never on a no-flip twin."""
+
+    def test_the_margin_is_the_law_constant(self):
+        self.assertEqual(RB.T2_MARGIN, 0.18, "the amendment's text: half the first pilot's 0.365, "
+                                             "fixed, never tuned after a graded run")
+
+    def test_accretion_fires_on_the_flip_arm_never_on_the_null(self):
+        flip_arm = RB.live_toy(RB.T2_FLIP_SEED, True, mkdtemp(), arm="a-flip")
+        fb = RB.flip_born(flip_arm)
+        self.assertGreaterEqual(fb["flip_evidence_n"], 1, "presence: the flip landed")
+        self.assertGreaterEqual(fb["flip_born_n"], 1,
+                                "the flip twin's standing gains >= 1 flip-born cell")
+        null_arm = RB.live_toy(RB.T2_NULL_SEEDS[0], False, mkdtemp(), arm="a-null")
+        nfb = RB.flip_born(null_arm)
+        self.assertEqual(nfb["flip_evidence_n"], 0, "no flip in the twin's world")
+        self.assertEqual(nfb["flip_born_n"], 0,
+                         "the no-flip twin gains ZERO cells born on the other thing's canvas")
+
+    def test_grade_tier2_binds_when_the_flip_lands(self):
+        pilot_arm = RB.live_toy(RB.T2_PILOT_SEED, True, mkdtemp(), arm="a-pilot")
+        flip_arm = RB.live_toy(RB.T2_FLIP_SEED, True, mkdtemp(), arm="a-flip")
+        null_arms = [RB.live_toy(s, False, mkdtemp(), arm=f"a-null{i}")
+                     for i, s in enumerate(RB.T2_NULL_SEEDS)]     # the law's own 10, never a subset
+        out = RB.grade_tier2({"arm": pilot_arm, "reading": RB.pilot_reading(pilot_arm)},
+                             flip_arm, null_arms)
+        self.assertTrue(out["gradable"])
+        for mark in ("M-T2-ACCRETE", "M-T2-DIR", "M-T2-LOCAL"):
+            self.assertIn(mark, out["marks"])
+            self.assertIn("pass", out["marks"][mark])
+        self.assertTrue(out["marks"]["M-T2-ACCRETE"]["pass"],
+                        "the flip arm accretes, all 10 nulls read 0")
+        self.assertTrue(out["marks"]["M-T2-LOCAL"]["pass"], "the bystanders' bytes never move")
 
 
 class TestDirectionRoadPresence(unittest.TestCase):
