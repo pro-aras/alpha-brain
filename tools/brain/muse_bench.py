@@ -124,14 +124,26 @@ def twin_texts(n: int = TWINS_N) -> list:
     return out
 
 
-def build_tape(root: Path, clock: _Clock, short: bool = False) -> Tape:
-    """The arc's tape, one deterministic build (the SAME tape feeds every arm). `short` = the plant
-    arm's form: a brief toy life and ONLY the control chat."""
-    tape = Tape(root)
-    rounds = 8 if short else THING_ROUNDS
-    after = hearsay_after() if not short else set(sorted(i for i in range(rounds * len(TOY_THINGS))
-                                                         if TOY_THINGS[i % len(TOY_THINGS)] == "star")[-4:])
-    k = 0
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 08:20 +0400 — PREREG-CONTEMPLATE-1 AMENDMENT 1
+# (docs/brain/muse/PREREG-CONTEMPLATE-1-AMENDMENT-1.md, SIGNED 306c143): the NULL re-scoped to the fruit.
+# The 10 fresh-budget twin arms, the alpha-qid bookkeeping, and the bag-keyed control (an INSTRUMENT,
+# never organism code) live here. The law's own three facts made gradable: (i) a shuffled self-carrying
+# bag FIRES lawfully on its own budget (the word-level classes); (ii) its content address can never
+# collide with the planted chain's (seed_of is order-sensitive); (iii) the fruit lookup addresses by
+# content, so no twin chain's content ever answers the planted re-ask — while a BAG-keyed lookup must.
+def alpha_qid(twin_text: str) -> str:
+    """The qid of the chain's what-is «alpha» want: alpha's STEP in the chain (the anchors are the heard
+    words in order, one want per step, q-0/q-1/q-2 in step order) — the instrument's own bookkeeping so
+    the parent's answer rows name the right want on every arm."""
+    return f"q-{twin_text.split().index('alpha')}"
+
+
+def _publish_toy_life(tape: Tape, clock: "_Clock", k: int = 0, rounds: int = THING_ROUNDS) -> int:
+    """The toy world exactly as the main arc's (same things, same hearsay window, same rng stream) —
+    factored so the amendment's twin arms live the SAME organism state (AMENDMENT 1 §Price: the twins'
+    worlds are already built; each arm is the twin's own stream against a fresh budget)."""
+    after = hearsay_after() if rounds == THING_ROUNDS else set(
+        sorted(i for i in range(rounds * len(TOY_THINGS)) if TOY_THINGS[i % len(TOY_THINGS)] == "star")[-4:])
     for i in range(rounds * len(TOY_THINGS)):
         thing = TOY_THINGS[i % len(TOY_THINGS)]
         moment = f"toy{i:06d}"
@@ -143,33 +155,33 @@ def build_tape(root: Path, clock: _Clock, short: bool = False) -> Tape:
             hm = f"hear{i:06d}"
             for w in HEARSAY:
                 tape.publish("ear", w.encode(), {"moment": hm, "source": "toy", "word": w}, "txt", at=clock())
-    # the chats, by the door's own road (chat/in + scan_once) — BATCH 1: the planted, the control, the
-    # ten twins, the tentative re-ask (the arc's order is the cids' bytewise order)
-    def publish_chats(texts: dict) -> None:
-        (root / "chat" / "in").mkdir(parents=True, exist_ok=True)
-        for cid, text in texts.items():
-            (root / "chat" / "in" / f"{cid}.json").write_text(json.dumps({"id": cid, "text": text}))
-        for _ in texts:
-            chat_sense.scan_once(lambda s, p, m, e: tape.publish(s, p, m, e, at=clock()), root, canvas=128, letters=8)
+    return k
 
-    twins = twin_texts()
-    batch1 = {CID_PLANTED: PLANTED, CID_CONTROL: CONTROL,
-              **{cid: t for cid, t in zip(CID_TWINS, twins)}, CID_TENT: PLANTED}
-    publish_chats({"control": CONTROL} if short else batch1)
-    if short:
-        return tape
-    # the parent's answer rows, the lexicon door's own form (creature/senses/lexicon.py:_moment_id's own
-    # sha; the qid is deterministic: the chain's «alpha» want is the THIRD filed (steps you/are/alpha ->
-    # q-0/q-1/q-2) — printed in the report)
+
+def _publish_chats(root: Path, tape: Tape, clock: "_Clock", texts: dict) -> None:
+    (root / "chat" / "in").mkdir(parents=True, exist_ok=True)
+    for cid, text in texts.items():
+        (root / "chat" / "in" / f"{cid}.json").write_text(json.dumps({"id": cid, "text": text}))
+    for _ in texts:
+        chat_sense.scan_once(lambda s, p, m, e: tape.publish(s, p, m, e, at=clock()), root, canvas=128, letters=8)
+
+
+def _publish_answers(tape: Tape, clock: "_Clock", qids: dict, k: int) -> None:
+    """The parent's answer rows, the lexicon door's own form (creature/senses/lexicon.py:_moment_id's own
+    sha), one entry per (qid -> word): the bench parent's declared answers (GLOSS)."""
     import hashlib
-    for qid, (word, gloss) in enumerate(GLOSS.items(), start=2):
-        moment = "lex" + hashlib.sha256(f"{word}:q-{qid}".encode("utf-8")).hexdigest()[:8]
+    for qid, word in qids.items():
+        gloss = GLOSS[word]
+        moment = "lex" + hashlib.sha256(f"{word}:{qid}".encode("utf-8")).hexdigest()[:8]
         for w in gloss.split():
             tape.publish("ear", w.encode(), {"moment": moment, "source": "lexicon", "word": w}, "txt", at=clock())
         rgb = read_common.render_line(gloss, 128, read_common.DEFAULT_FONT_PATH)
         tape.publish("eye", _png(rgb), {"moment": moment, "source": "lexicon", "answers": word, "gloss": gloss},
                      "png", at=clock())
-    # the fillers (cross the SLEEP boundary)
+
+
+def _publish_fillers(tape: Tape, clock: "_Clock", k: int) -> int:
+    """The filler thing moments that cross a SLEEP boundary (the consolidation pass of §1.4 (ii))."""
     for i in range(FILLER_MOMENTS):
         thing = TOY_THINGS[i % len(TOY_THINGS)]
         moment = f"fill{i:06d}"
@@ -177,8 +189,64 @@ def build_tape(root: Path, clock: _Clock, short: bool = False) -> Tape:
         rgb, _t = world.render_canvas(thing, np.random.default_rng([BENCH_SEED, k]))
         k += 1
         tape.publish("eye", _png(rgb), {"moment": moment, "source": "toy"}, "png", at=clock())
+    return k
+
+
+def build_twin_tape(root: Path, clock: _Clock, twin_text: str) -> Tape:
+    """AMENDMENT 1's one-twin arm tape: the SAME toy life, then the twin chat alone (its OWN fresh
+    25-sentence window — the first heard sentence of the arm), the parent's answer to the chain's
+    what-is «alpha» (its qid by alpha_qid), the fillers, and finally the PLANTED sentence's re-ask
+    (the fruit's bar is read on it)."""
+    tape = Tape(root)
+    k = _publish_toy_life(tape, clock)
+    _publish_chats(root, tape, clock, {"c01twin": twin_text})
+    _publish_answers(tape, clock, {alpha_qid(twin_text): "alpha"}, k)
+    _publish_fillers(tape, clock, k)
+    _publish_chats(root, tape, clock, {"c02planted": PLANTED})
+    return tape
+
+
+def fruit_by_bag(chains: dict, considered: dict, heard: list, max_words: int):
+    """AMENDMENT 1's bag-keyed control (an INSTRUMENT, never organism code): the answer a BAG-addressed
+    fruit store would give — the chain lookup keyed by the SORTED bag (order destroyed) with the
+    candidacy resolution IDENTICAL to mind._muse_fruit's own (promoted pairs -> candidacy rows -> words
+    in chain order, deduped, capped, traced). It MUST answer where the content-addressed lookup abstains,
+    or the amendment arm fails as an instrument (#246 (1))."""
+    bag = sorted(str(w) for w in heard)
+    for cid, chain in chains.items():
+        if sorted(str(w) for w in chain["heard"]) != bag or not chain.get("promoted"):
+            continue
+        words, trace = [], []
+        for t_line, c_line in chain["promoted"]:
+            row_c = considered.get(int(c_line))
+            if row_c is None or row_c["current"] != "candidacy":
+                continue
+            w = str(row_c["word"])
+            if w not in words:
+                words.append(w)
+            trace.append([w, int(t_line), int(c_line)])
+        if words:
+            return {"chain": cid, "answer": words[:max_words], "trace": trace}
+    return None
+
+
+def build_tape(root: Path, clock: _Clock, short: bool = False) -> Tape:
+    """The arc's tape, one deterministic build (the SAME tape feeds every arm). `short` = the plant
+    arm's form: a brief toy life and ONLY the control chat."""
+    tape = Tape(root)
+    k = _publish_toy_life(tape, clock, rounds=(8 if short else THING_ROUNDS))
+    twins = twin_texts()
+    batch1 = {CID_PLANTED: PLANTED, CID_CONTROL: CONTROL,
+              **{cid: t for cid, t in zip(CID_TWINS, twins)}, CID_TENT: PLANTED}
+    _publish_chats(root, tape, clock, {"control": CONTROL} if short else batch1)
+    if short:
+        return tape
+    # the parent's answer rows (the qid is deterministic: the chain's «alpha» want is the THIRD filed —
+    # steps you/are/alpha -> q-0/q-1/q-2, printed in the report)
+    _publish_answers(tape, clock, {f"q-{i + 2}": w for i, w in enumerate(GLOSS)}, k)
+    k = _publish_fillers(tape, clock, k)
     # BATCH 2: the fruit re-ask and the twin re-asks (after the answers + the consolidation pass)
-    publish_chats({CID_FRUIT: PLANTED, **{cid: t for cid, t in zip(CID_TWINRS, twins)}})
+    _publish_chats(root, tape, clock, {CID_FRUIT: PLANTED, **{cid: t for cid, t in zip(CID_TWINRS, twins)}})
     return tape
 
 
@@ -288,6 +356,26 @@ def drive(tape_root: Path, muse_flag: bool, work: Path, plant: bool = False) -> 
     return rec
 
 
+def drive_twin(tape_root: Path, work: Path, twin_text: str) -> dict:
+    """AMENDMENT 1's one fresh-budget twin arm: the same drive() over the twin's own tape, then the
+    amendment's three readings — the lawful firing (classes, anchors), the content address (printed
+    beside the planted chain's), the planted re-ask's answer (the fruit's bar: None) and the bag-keyed
+    control's answer (the instrument's proof it sees bag-addressing)."""
+    rec = drive(tape_root, True, work)
+    chain_id = MUSE.seed_of(twin_text.split())
+    chain = rec["chains"].get(chain_id, {})
+    skips = [r for r in rec["muse_rows"] if r.get("act") == "budget-skip"]
+    considered = {int(r["line"]): r for r in rec["_considered"]}
+    return {"twin": twin_text, "fired": bool(chain), "classes": list(chain.get("classes", [])),
+            "anchors": list(chain.get("anchors", [])), "chain_id": chain_id,
+            "steps": [s["topic"] for s in chain.get("steps", [])],
+            "beliefs": list(chain.get("beliefs", [])), "questions": [q["want"] for q in chain.get("questions", [])],
+            "promoted": list(chain.get("promoted", [])), "sleeps": rec["sleep_count"],
+            "planted_reask": _out_answer(work, "c02planted"), "budget_skips": skips,
+            "bag_answer": fruit_by_bag(rec["chains"], considered, PLANTED.split(), 6),
+            "cpu_s": rec["cpu_s"], "_journal_rows": rec["_journal_rows"]}
+
+
 def _web_reading(m: Mind) -> dict:
     """The web's own reading of the toy (presence, never a bare claim): the watched words' node counts,
     the consolidated edges among them, the maturity of the control's words."""
@@ -303,7 +391,7 @@ def _web_reading(m: Mind) -> dict:
             "control_mature": {w: (w in mature) for w in ("circle", "big")}}
 
 
-def verdicts(real: dict, off: dict, plant: dict) -> dict:
+def verdicts(real: dict, off: dict, plant: dict, twin_arms: list) -> dict:
     """Every mark of the law §3, computed from the arms' records, presence counts beside every number."""
     out: dict = {}
     chains = real["chains"]
@@ -334,18 +422,44 @@ def verdicts(real: dict, off: dict, plant: dict) -> dict:
     twin_answers = [a for a in real["twinr_answers"].values()]
     twin_skips = [r for r in real["muse_rows"] if r.get("act") == "budget-skip"]
     fruit_say = real["say_fruit"].get("muse") or {}
+    planted_fruit_ok = (bool(planted_chain.get("promoted")) and real["answer_fruit"] is not None
+                        and bool(fruit_say.get("trace")) and real["state"]["chains_started"] == 1
+                        and all(a is None for a in twin_answers) and len(twin_skips) >= TWINS_N)
+    # AMENDMENT 1 — the NULL re-scoped to where content-addressing lives (the fruit, never the trigger):
+    # the 10 fresh-budget twins, each in its OWN 25-sentence window.
+    planted_id = MUSE.seed_of(PLANTED.split())
+    a1_twins = [{"k": k, "twin": a["twin"], "fired": a["fired"], "classes": a["classes"],
+                 "anchors": a["anchors"], "chain_id": a["chain_id"], "id_differs": a["chain_id"] != planted_id,
+                 "promoted": a["promoted"], "planted_reask": a["planted_reask"],
+                 "budget_skip_rows": len(a["budget_skips"]),
+                 "bag_answer": (a["bag_answer"] or {}).get("answer")}
+                for k, a in enumerate(twin_arms)]
+    fired_n = sum(1 for t in a1_twins if t["fired"])
+    self_carrying_n = sum(1 for t in a1_twins if "alpha" in t["twin"].split())
+    id_differs_n = sum(1 for t in a1_twins if t["id_differs"])
+    reask_none_n = sum(1 for t in a1_twins if t["planted_reask"] is None)
+    bag_answered_n = sum(1 for t in a1_twins if t["bag_answer"])
+    a1_pass = (len(twin_arms) == TWINS_N and fired_n >= self_carrying_n == TWINS_N
+               and id_differs_n == TWINS_N and reask_none_n == TWINS_N and bag_answered_n == TWINS_N)
+    out["M-FRUIT-NULL-A1"] = {
+        "bar": "AMENDMENT 1: the 10 fresh-budget twins each fire lawfully (the word-level classes; every "
+               "self-carrying twin must fire — presence counts), every twin chain's content id != the "
+               "planted id, NO twin chain's content answers the planted re-ask (all None), and the "
+               "bag-keyed control answers on every arm",
+        "planted_id": planted_id, "twins": a1_twins,
+        "fired_n": fired_n, "self_carrying_n": self_carrying_n, "id_differs_n": id_differs_n,
+        "reask_none_n": reask_none_n, "bag_answered_n": bag_answered_n, "pass": a1_pass}
     out["M-FRUIT"] = {"bar": "after the chain's questions are answered by the bench's parent AND one "
                              "consolidation pass, the re-ask yields a non-null answer whose words trace to "
-                             "the chain's tentative rows (the trace printed). NULL: the 10 shuffled twins "
-                             "spawn no self-chains and no fruit",
+                             "the chain's tentative rows (the trace printed). NULL (AMENDMENT 1's own "
+                             "re-scope, the A1 block): the fresh-budget twins fire lawfully AND every "
+                             "twin id != planted AND no twin fruit AND the bag-keyed control answering",
                       "promoted_pairs": planted_chain.get("promoted", []),
                       "sleeps": real["sleep_count"], "fruit_answer": real["answer_fruit"],
                       "trace": fruit_say.get("trace"),
                       "twin_budget_skips": len(twin_skips), "twin_chains_extra": real["state"]["chains_started"] - 1,
-                      "twin_reask_answers": twin_answers,
-                      "pass": bool(planted_chain.get("promoted")) and real["answer_fruit"] is not None
-                      and bool(fruit_say.get("trace")) and real["state"]["chains_started"] == 1
-                      and all(a is None for a in twin_answers) and len(twin_skips) >= TWINS_N}
+                      "twin_reask_answers": twin_answers, "amendment1_pass": a1_pass,
+                      "pass": planted_fruit_ok and a1_pass}
     t_on, t_off = real["cpu_s"], off["cpu_s"]
     overhead = (t_on - t_off) / t_off if t_off > 0 else float("nan")
     out["M-COST"] = {"bar": f"ON vs OFF process_time overhead <= {COST_BAR:.0%} (N1's own measure)",
@@ -396,17 +510,33 @@ def main() -> int:
     off = drive(tape_root, False, out / "run-off")
     plant = drive(plant_root, True, out / "run-plant", plant=True)
 
+    # AMENDMENT 1: the 10 fresh-budget twin arms — each twin on its OWN tape against a fresh budget
+    twin_arms = []
+    for k, t in enumerate(twin_texts()):
+        tr = out / f"twin-tape-{k:02d}"
+        if tr.exists():
+            shutil.rmtree(tr)
+        tr.mkdir()
+        build_twin_tape(tr, _Clock(), t)
+        twin_arms.append(drive_twin(tr, out / f"run-twin-{k:02d}", t))
+
     with (out / "arc-journal.jsonl").open("w") as f:
         for r in real["_journal_rows"]:
             f.write(json.dumps(r, default=str) + "\n")
+    with (out / "twin-arms-journal.jsonl").open("w") as f:
+        for k, a in enumerate(twin_arms):
+            for r in a["_journal_rows"]:
+                f.write(json.dumps({"arm": k, **r}, default=str) + "\n")
     (out / "considered.json").write_text(json.dumps(real["_considered"], indent=2, default=str))
     (out / "web-reading.json").write_text(json.dumps(real["web"], indent=2, default=str))
-    v = verdicts(real, off, plant)
+    v = verdicts(real, off, plant, twin_arms)
     (out / "report.json").write_text(json.dumps(v, indent=2, default=str))
-    lines = ["CONTEMPLATE-1 muse bench — the law's marks (PREREG-CONTEMPLATE-1 §3)", ""]
+    lines = ["CONTEMPLATE-1 muse bench — the law's marks (PREREG-CONTEMPLATE-1 §3 + AMENDMENT 1)", ""]
     lines.append(f"toy: things {TOY_THINGS} x {THING_ROUNDS} rounds · hearsay {HEARSAY} x {HEARSAY_N} · "
                  f"rows {real['rows']} · sleeps {real['sleep_count']}")
     lines.append(f"web: {json.dumps(real['web'], default=str)}")
+    lines.append(f"amendment-1 arms: 10 fresh-budget twin arms · total cpu {sum(a['cpu_s'] for a in twin_arms):.1f} s "
+                 f"(the amendment's price: <= 10 CPU-min)")
     lines.append("")
     all_pass = True
     for mark, d in v.items():

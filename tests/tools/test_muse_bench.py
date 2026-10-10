@@ -13,7 +13,7 @@ from pathlib import Path
 
 from tools.brain import muse_bench as B
 from tools.brain.muse_bench import (BENCH_SEED, CONTROL, GLOSS, HEARSAY_N, PLANTED, THING_ROUNDS, TOY_THINGS,
-                                    build_tape, drive, genome_text, hearsay_after, twin_texts)
+                                    build_tape, build_twin_tape, drive, genome_text, hearsay_after, twin_texts)
 
 
 class TestToyBuild(unittest.TestCase):
@@ -85,6 +85,93 @@ class TestPlantBites(unittest.TestCase):
             seeds = [B.MUSE.seed_of(CONTROL.split())]
             self.assertTrue(any(cid in rec["chains"] for cid in seeds),
                             "the chain is the control's own content")
+        finally:
+            shutil.rmtree(tape_root, ignore_errors=True)
+            shutil.rmtree(work.parent, ignore_errors=True)
+
+
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 08:20 +0400 — PREREG-CONTEMPLATE-1 AMENDMENT 1
+# (docs/brain/muse/PREREG-CONTEMPLATE-1-AMENDMENT-1.md, SIGNED 306c143): the NULL re-scoped to where
+# content-addressing lives (the fruit, never the word-level trigger). Test-first (RED on 306c143:
+# alpha_qid / build_twin_tape / fruit_by_bag / drive_twin do not exist).
+class TestAmendment1Instruments(unittest.TestCase):
+    def test_alpha_qid_follows_the_word_order(self) -> None:
+        """The parent's answered qid is alpha's STEP in the chain — the heard order's own position
+        (anchors are the heard words in order; the what-is want files per step)."""
+        self.assertEqual(B.alpha_qid(PLANTED), "q-2")
+        self.assertEqual(B.alpha_qid("alpha you are"), "q-0")
+        self.assertEqual(B.alpha_qid("are alpha you"), "q-1")
+        for t in twin_texts():
+            self.assertEqual(B.alpha_qid(t), f"q-{t.split().index('alpha')}")
+
+    def test_twin_tape_carries_the_twin_then_the_planted_reask(self) -> None:
+        r1 = Path(tempfile.mkdtemp())
+        try:
+            build_twin_tape(r1, B._Clock(), "are you alpha")
+            rows = B._rows(r1)
+            chats = [r for r in rows if r["sense"] == "chat"]
+            self.assertEqual(len(chats), 2, "one twin chat + the planted re-ask, nothing else")
+            words = [(r.get("meta") or {}).get("words") for r in chats]
+            self.assertEqual(words[0], ["are", "you", "alpha"], "the twin first (its own fresh budget)")
+            self.assertEqual(words[1], PLANTED.split(), "the planted re-ask after the consolidation pass")
+            lex = [r for r in rows if (r.get("meta") or {}).get("source") == "lexicon"]
+            self.assertGreater(len(lex), 0, "the parent's answer rows are on the tape")
+            moments = {str((r.get("meta") or {}).get("moment")) for r in lex}
+            self.assertEqual(len(moments), 1, "one answer moment")
+            d1 = sorted((r1 / "tape").glob("*.jsonl"))
+            r2 = Path(tempfile.mkdtemp())
+            build_twin_tape(r2, B._Clock(), "are you alpha")
+            self.assertEqual(d1[0].read_bytes(), sorted((r2 / "tape").glob("*.jsonl"))[0].read_bytes(),
+                             "the twin tape is deterministic")
+            shutil.rmtree(r2, ignore_errors=True)
+        finally:
+            shutil.rmtree(r1, ignore_errors=True)
+
+    def test_the_bag_control_mirrors_the_fruit_but_keys_by_the_sorted_bag(self) -> None:
+        """The control must answer EXACTLY where the content-addressed lookup abstains, with the same
+        candidacy resolution — and stay silent on an unpromoted chain (it is a fair twin, not a toy)."""
+        considered = {8: {"line": 8, "word": "you", "current": "candidacy"},
+                      9: {"line": 9, "word": "are", "current": "candidacy"},
+                      10: {"line": 10, "word": "alpha", "current": "candidacy"},
+                      5: {"line": 5, "word": "you", "current": "superseded"}}
+        chains = {"bbbb": {"heard": ["are", "you", "alpha"], "promoted": [[5, 8], [6, 9], [7, 10]]},
+                  "cccc": {"heard": ["circle", "square"], "promoted": [[1, 2]]}}
+        got = B.fruit_by_bag(chains, considered, PLANTED.split(), 6)
+        self.assertIsNotNone(got, "the bag control MUST answer (the instrument sees bag-addressing)")
+        self.assertEqual(got["chain"], "bbbb", "the twin chain shares the planted bag")
+        self.assertEqual(got["answer"], ["you", "are", "alpha"])
+        self.assertEqual(got["trace"], [["you", 5, 8], ["are", 6, 9], ["alpha", 7, 10]],
+                         "the trace form is the fruit's own")
+        chains2 = {"bbbb": {"heard": ["are", "you", "alpha"], "promoted": []}}
+        self.assertIsNone(B.fruit_by_bag(chains2, considered, PLANTED.split(), 6),
+                          "the control never answers on tentative content (the fruit's own quarantine)")
+        self.assertIsNone(B.fruit_by_bag(chains, considered, ["zzz"], 6),
+                          "a different bag answers nothing")
+
+
+class TestAmendment1OneTwinArm(unittest.TestCase):
+    def test_one_fresh_budget_twin_arm_end_to_end(self) -> None:
+        """One twin in its OWN 25-sentence window: fires lawfully (self), its content id != the planted
+        id, promoted after the parent's answer + the SLEEP pass, the planted re-ask NEVER answered, and
+        the bag-keyed control answers — the amendment's three facts at unit scale."""
+        tape_root = Path(tempfile.mkdtemp())
+        work = Path(tempfile.mkdtemp()) / "run"
+        try:
+            twin = "are you alpha"
+            build_twin_tape(tape_root, B._Clock(), twin)
+            rec = B.drive_twin(tape_root, work, twin)
+            print(f"[amend1-unit] twin {twin!r} fired {rec['fired']} classes {rec['classes']} "
+                  f"id {rec['chain_id']} planted {B.MUSE.seed_of(PLANTED.split())} "
+                  f"reask {rec['planted_reask']} bag {rec['bag_answer'] and rec['bag_answer']['answer']}")
+            self.assertTrue(rec["fired"], "a self-carrying twin fires lawfully (the word-level classes)")
+            self.assertEqual(rec["classes"], ["self"])
+            self.assertNotEqual(rec["chain_id"], B.MUSE.seed_of(PLANTED.split()),
+                                "order destroyed -> another address")
+            self.assertTrue(rec["promoted"], "the twin chain promoted (answered question + the pass)")
+            self.assertIsNone(rec["planted_reask"], "no twin chain's content ever answers the planted re-ask")
+            self.assertIsNotNone(rec["bag_answer"], "the bag-keyed control MUST answer")
+            self.assertGreaterEqual(len(rec["budget_skips"]), 1,
+                                    "the planted re-ask's lawful budget suppression is journaled")
         finally:
             shutil.rmtree(tape_root, ignore_errors=True)
             shutil.rmtree(work.parent, ignore_errors=True)
