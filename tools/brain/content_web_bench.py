@@ -64,6 +64,7 @@ import sys
 import time
 import unittest.mock as mock
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 from PIL import Image
@@ -377,6 +378,78 @@ def deranged(stream: list, seed: int, k: int) -> list:
     return out
 
 
+def _back_window(stream: list, i: int, d: int = 3) -> list:
+    """The web's own window (web.py:222 the previous d DISTINCT words, most recent first), computed
+    exactly: the up-to-d distinct tokens before position i."""
+    out: list = []
+    for e in reversed(stream[:i]):
+        t = e["token"]
+        if t not in out:
+            out.append(t)
+        if len(out) == d:
+            break
+    return out
+
+
+def assert_misaligned(stream: list, name: str, own_tokens: set) -> None:
+    """AMENDMENT 2's placement check (G-PLANT iii-bis): the pair forms only when one token lands in
+    the OTHER's back-window (the web's hear() pairs a new token with the previous d distinct). So:
+    for every w:<name> position, its back-window must exclude the name's OWN thing's s: tokens; and
+    for every own-thing token position, ITS back-window must exclude w:<name>. A violation raises
+    (the twin generator's own misalignment is asserted, never assumed)."""
+    wtok = "w:" + name
+    pos = [i for i, e in enumerate(stream) if e["token"] == wtok]
+    assert pos, f"assert_misaligned: no {wtok} tokens at all (the presence count is zero — the plant?)"
+    for i, e in enumerate(stream):
+        win = _back_window(stream, i)
+        if e["token"] == wtok:
+            bad = [t for t in win if t in own_tokens]
+            assert not bad, f"misalignment violated for {wtok} at {i}: own tokens {bad} in the window"
+        if e["token"] in own_tokens:
+            assert wtok not in win, f"misalignment violated: own token at {i} has {wtok} in its window"
+
+
+def misaligned(stream: list, seed: int, k: int, kind_sets: dict) -> list:
+    """AMENDMENT 2's twin k: the planted names' w: tokens MOVED so each lands immediately AFTER a
+    DIFFERENT planted thing's s: token (the targets rotated across the twins), never within the
+    d-window of its OWN thing's s: tokens. The multisets and the cadence counts are the real run's;
+    only the WINDOWS move. Slots are pre-filtered for legality (the 3-distinct back- AND front-
+    windows free of the own thing's tokens), then drawn seeded; the placement is asserted
+    (assert_misaligned) per name after the insertion."""
+    names = sorted(kind_sets)
+    rng = np.random.default_rng([seed, 9000 + k])
+    out = list(stream)
+    for j, name in enumerate(names):
+        target = names[(j + 1) % len(names)]                # always the OTHER thing — never itself
+        # (the seeded k varies the slot draws; the target must never rotate onto the name's own
+        # thing — a self-target is an ALIGNED twin, the null's exact opposite; caught at draft by
+        # the test's odd-k draws, fixed before any run)
+        wtok = "w:" + name
+        own = kind_sets[name]
+        pulled = [e for e in out if e["token"] == wtok]
+        out = [e for e in out if e["token"] != wtok]
+        for e in pulled:
+            legal = []
+            for i, e2 in enumerate(out):                    # re-vetted on the LIVE list per
+                if e2["token"] not in kind_sets[target]:    # insertion — earlier insertions shift
+                    continue                                # later indices (a stale slot landed
+                back = _back_window(out, i + 1)             # beside an own token in the first
+                front = []                                  # form; caught by assert_misaligned,
+                for e3 in out[i + 1:]:                      # fixed here)
+                    if e3["token"] not in front:
+                        front.append(e3["token"])
+                    if len(front) == 3:
+                        break
+                if not any(t in own for t in back + front):
+                    legal.append(i)
+            assert legal, f"misaligned: no legal slots beside {target}'s tokens"
+            i = int(legal[int(rng.integers(len(legal)))])
+            out.insert(i + 1, dict(e))                      # immediately after the target's token
+        if pulled:
+            assert_misaligned(out, name, own)
+    return out
+
+
 def feed_web(tokens: list, seed: int) -> "_web.Web":
     """A FRESH web with the mind's own L configuration (mind.py's construction), fed the token stream."""
     w = _web.Web("L", beta=WEB_BETA, seed=int(seed), spend="harmonic", reach=WEB_REACH, author="cweb-null")
@@ -390,7 +463,8 @@ def bench_seed() -> int:
     return int(parse_genome(genome_text()).seed)
 
 
-def verdicts(on: dict, off: dict, rows: list, twins: list, pilot_reading: dict) -> dict:
+def verdicts(on: dict, off: dict, rows: list, twins: list, pilot_reading: dict,
+             twins_mis: Optional[list] = None) -> dict:
     """Every mark of the law §3, computed from the arms' records, presence counts beside every number."""
     out: dict = {}
     cons_on = set(on["consolidated"])
@@ -488,15 +562,27 @@ def verdicts(on: dict, off: dict, rows: list, twins: list, pilot_reading: dict) 
                                        f"{len(pilot_reading['stability_legacy'])}",
                           "pass": (pilot_reading["null_max"] is not None
                                    and pilot_reading["planted_share"] > pilot_reading["null_max"])}
-    # M-NULL
+    # M-NULL — AMENDMENT 2's re-priced form (the hub lesson: the derangement twins are blind to the
+    # recognition key's concentration — they stay as the COUNT clause and a printed legacy reading):
+    # the EVENT-MATCHED (misaligned) twins must never consolidate the planted PAIR (the name ↔ its
+    # OWN thing's tokens), and the real run's consolidated cross-edge count exceeds the derangement
+    # twins' MAX (the hub inflation is shared by the twins, so the excess is the teaching's).
     twin_cross = [t["consolidated_cross_n"] for t in twins]
-    twin_planted = [t["planted_consolidated"] for t in twins]
-    out["M-NULL"] = {"bar": "10 derangement twins (each sense's token stream deranged within itself, "
-                            "moments kept): the planted s:<->w: edge consolidates in NONE of them; the real "
-                            "run's consolidated cross-edge count exceeds the null MAX",
-                     "twin_cross_counts": twin_cross, "twin_planted_consolidated": twin_planted,
+    twin_planted = [t["planted_consolidated"] for t in twins]       # the legacy reading (printed)
+    mis = twins_mis or []
+    mis_pair = [t["planted_pair_consolidated"] for t in mis]
+    mis_hub = {name: [t["name_other_edges"].get(name, []) for t in mis] for name in PLANTED}
+    out["M-NULL"] = {"bar": "AMENDMENT 2: 10 event-matched (misaligned) twins — the planted PAIR "
+                            "consolidates in NONE of them (0/10); AND the real run's consolidated "
+                            "cross-edge count exceeds the derangement twins' MAX. (The deranged "
+                            "twins' planted-pair readings are printed as the legacy reading — they "
+                            "are hub-blind by measurement, never deleted.)",
+                     "misaligned_pair_consolidated": mis_pair,
+                     "misaligned_hub_readings": {k: [len(x) for x in v] for k, v in mis_hub.items()},
+                     "legacy_deranged_planted": twin_planted,
+                     "twin_cross_counts": twin_cross,
                      "real_cross_n": len(cross_on), "null_max": (max(twin_cross) if twin_cross else None),
-                     "pass": len(twins) == TWINS_N and not any(twin_planted)
+                     "pass": len(mis) == TWINS_N and not any(mis_pair)
                      and len(cross_on) > (max(twin_cross) if twin_cross else -1)}
     # M-COST
     t_on, t_off = on["cpu_s"], off["cpu_s"]
@@ -536,12 +622,36 @@ def run(out: Path, rounds: int = THING_ROUNDS, twins_n: int = TWINS_N) -> dict:
                 planted_hit = True
         twins.append({"k": k, "consolidated_cross_n": len(cross), "planted_consolidated": planted_hit,
                       "web_t": w.t, "stats": dict(w.stats)})
-    v = verdicts(on, off, rows, twins, p)
+    # AMENDMENT 2 (the hub lesson — the derangement null is blind to the recognition key's
+    # concentration): the event-matched twins — the planted names' tokens MOVED to sit beside a
+    # DIFFERENT thing's windows, never their own. The planted PAIR (the name ↔ its OWN thing's
+    # tokens) must never consolidate; a name consolidating onto OTHER cells is the hub reading,
+    # printed per twin, never hidden.
+    kind_sets = {name: set(p["kind_tokens"][name]) for name in PLANTED}
+    twins_mis = []
+    for k in range(twins_n):
+        mis_stream = misaligned(on["stream"], BENCH_SEED, k, kind_sets)
+        w = feed_web([e["token"] for e in mis_stream], seed)
+        cons = [f"{a}|{b}" for a, b in w.consolidated()]
+        planted_pair = False
+        name_edges: dict = {}
+        for name in PLANTED:
+            hits = [key for key in cons
+                    if (key.split("|")[0] == "w:" + name and key.split("|")[1] in kind_sets[name])
+                    or (key.split("|")[1] == "w:" + name and key.split("|")[0] in kind_sets[name])]
+            if hits:
+                planted_pair = True
+            name_edges[name] = [key for key in cons
+                                if "w:" + name in key.split("|") and key not in hits]
+        twins_mis.append({"k": k, "planted_pair_consolidated": planted_pair,
+                          "name_other_edges": name_edges, "web_t": w.t, "stats": dict(w.stats)})
+    v = verdicts(on, off, rows, twins, p, twins_mis)
     # durable evidence: the streams, the web readings, the report
     (out / "stream-on.json").write_text(json.dumps(on["stream"]))
     (out / "stream-off.json").write_text(json.dumps(off["stream"]))
     (out / "pilot.json").write_text(json.dumps(p, indent=2, default=str))
     (out / "twins.json").write_text(json.dumps(twins, indent=2, default=str))
+    (out / "twins-misaligned.json").write_text(json.dumps(twins_mis, indent=2, default=str))
     (out / "report.json").write_text(json.dumps(v, indent=2, default=str))
     lines = ["CONTENT-WEB bench — the law's marks (PREREG-CONTENT-WEB §3)", ""]
     lines.append(f"toy: {len(TOY_THINGS)} things x {rounds} rounds · the planted arc "

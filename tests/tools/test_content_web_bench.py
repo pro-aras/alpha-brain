@@ -167,6 +167,56 @@ class TestDerangement(unittest.TestCase):
                          "the seeded draws are deterministic")
 
 
+class TestMisalignedNull(unittest.TestCase):
+    """AMENDMENT 2's event-matched twins (the hub lesson's own form): placements misaligned, the
+    multisets and cadences kept, and the placement ASSERTS itself (G-PLANT iii-bis)."""
+
+    def _stream(self) -> list:
+        # a small synthetic stream with two SEPARATED regions (fillers between things, as the real
+        # bench's cycling gives): A's block, then B's block — so misalignment slots legally exist
+        stream = []
+        for i in range(20):
+            stream.append({"row": 4 * i, "sense": "eye", "token": f"s:cA{i % 4}"})
+            stream.append({"row": 4 * i + 1, "sense": "ear", "token": f"w:f1-{i}"})
+            stream.append({"row": 4 * i + 2, "sense": "ear", "token": f"w:f2-{i}"})
+            if i % 5 == 0:
+                stream.append({"row": 4 * i + 3, "sense": "chat", "token": "w:alpha"})
+        for i in range(20):
+            stream.append({"row": 400 + 4 * i, "sense": "eye", "token": f"s:cB{i % 3}"})
+            stream.append({"row": 400 + 4 * i + 1, "sense": "ear", "token": f"w:g1-{i}"})
+            stream.append({"row": 400 + 4 * i + 2, "sense": "ear", "token": f"w:g2-{i}"})
+            if i % 5 == 1:
+                stream.append({"row": 400 + 4 * i + 3, "sense": "chat", "token": "w:zeta"})
+        return stream
+
+    def test_misaligned_keeps_multisets_and_asserts_placement(self) -> None:
+        kinds = {"alpha": {"s:cA0", "s:cA1", "s:cA2", "s:cA3"},
+                 "zeta": {"s:cB0", "s:cB1", "s:cB2"}}
+        stream = self._stream()
+        for k in range(B.TWINS_N):
+            twin = B.misaligned(stream, B.BENCH_SEED, k, kinds)
+            self.assertEqual(sorted(e["token"] for e in twin), sorted(e["token"] for e in stream),
+                             "the multiset is invariant (the cadence counts kept)")
+            # the placement asserts itself: every w:alpha's back-window is free of A's cells
+            B.assert_misaligned(twin, "alpha", kinds["alpha"])          # must not raise
+            self.assertEqual(B.misaligned(stream, B.BENCH_SEED, k, kinds),
+                             B.misaligned(stream, B.BENCH_SEED, k, kinds), "the draws are seeded")
+
+    def test_the_placement_plant_is_caught_loudly(self) -> None:
+        """G-PLANT iii-bis: a doctored draw that places the name INSIDE its own thing's window must
+        be caught by assert_misaligned — the instrument can fail, and does, on command."""
+        kinds = {"alpha": {"s:cA0", "s:cA1", "s:cA2", "s:cA3"},
+                 "zeta": {"s:cB0", "s:cB1", "s:cB2"}}
+        # a violating stream by hand: w:alpha immediately after its OWN thing's token
+        bad = [{"row": 0, "sense": "eye", "token": "s:cA0"},
+               {"row": 1, "sense": "chat", "token": "w:alpha"}]
+        with self.assertRaises(AssertionError, msg="the placement check must catch the violation"):
+            B.assert_misaligned(bad, "alpha", kinds["alpha"])
+        with self.assertRaises(AssertionError, msg="a twin with no name tokens at all is a plant"):
+            B.assert_misaligned([{"row": 0, "sense": "eye", "token": "s:cA0"}], "alpha",
+                                kinds["alpha"])
+
+
 class TestShortArm(unittest.TestCase):
     def test_a_short_on_off_pair_end_to_end(self) -> None:
         """The feed end-to-end at short scale (4 rounds, the arc's last 2 windows): ON — w:alpha/w:zeta

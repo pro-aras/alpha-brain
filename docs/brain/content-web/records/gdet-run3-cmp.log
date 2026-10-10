@@ -1,0 +1,46 @@
+diff -r '--exclude=cost.json' scratch/seat/bench-a4/report.json scratch/seat/bench-a5/report.json
+347,349c347,349
+<     "cpu_on_s": 6.079907393,
+<     "cpu_off_s": 5.971687500000001,
+<     "overhead": 0.018122162788993788,
+---
+>     "cpu_on_s": 6.07821938,
+>     "cpu_off_s": 5.920899132000001,
+>     "overhead": 0.026570330703617116,
+diff -r '--exclude=cost.json' scratch/seat/bench-a4/report.txt scratch/seat/bench-a5/report.txt
+52,54c52,54
+<     cpu_on_s: 6.079907393
+<     cpu_off_s: 5.971687500000001
+<     overhead: 0.018122162788993788
+---
+>     cpu_on_s: 6.07821938
+>     cpu_off_s: 5.920899132000001
+>     overhead: 0.026570330703617116
+diff -r '--exclude=cost.json' scratch/seat/bench-a4/run-off/state/prev/SNAPSHOT.json scratch/seat/bench-a5/run-off/state/prev/SNAPSHOT.json
+1c1
+< {"canvas_index": 200, "files": ["organism.npz", "organism.json", "brain.npz", "brain.json", "web.json", "episodes.npz", "outcome_episodes.npz", "sound_episodes.npz", "touch_episodes.npz", "smell_episodes.npz", "ledger.json"], "last_seq": 438, "prints": {"brain.json": [75030, 1791659215361015938], "brain.npz": [679386, 1791659215357519702], "episodes.npz": [260961, 1791659215929541482], "ledger.json": [22590, 1791659216253152838], "organism.json": [21940, 1791659215349267406], "organism.npz": [71916, 1791659215347519321], "outcome_episodes.npz": [15497, 1791659215985543614], "smell_episodes.npz": [7434, 1791659216251553743], "sound_episodes.npz": [50047, 1791659216213552296], "touch_episodes.npz": [7466, 1791659216232553020], "web.json": [13050, 1791659215361820638]}, "t": 1000}
+\ No newline at end of file
+---
+> {"canvas_index": 200, "files": ["organism.npz", "organism.json", "brain.npz", "brain.json", "web.json", "episodes.npz", "outcome_episodes.npz", "sound_episodes.npz", "touch_episodes.npz", "smell_episodes.npz", "ledger.json"], "last_seq": 438, "prints": {"brain.json": [75030, 1791659283160468027], "brain.npz": [679386, 1791659283156101222], "episodes.npz": [260961, 1791659283729123041], "ledger.json": [22590, 1791659284047926033], "organism.json": [21940, 1791659283138959828], "organism.npz": [71916, 1791659283137100499], "outcome_episodes.npz": [15497, 1791659283785125173], "smell_episodes.npz": [7434, 1791659284046135111], "sound_episodes.npz": [50047, 1791659284010133741], "touch_episodes.npz": [7466, 1791659284028134426], "web.json": [13050, 1791659283161396824]}, "t": 1000}
+\ No newline at end of file
+diff -r '--exclude=cost.json' scratch/seat/bench-a4/run-off/state/SNAPSHOT.json scratch/seat/bench-a5/run-off/state/SNAPSHOT.json
+1c1
+< {"canvas_index": 240, "files": ["organism.npz", "organism.json", "brain.npz", "brain.json", "web.json", "episodes.npz", "outcome_episodes.npz", "sound_episodes.npz", "touch_episodes.npz", "smell_episodes.npz", "ledger.json"], "last_seq": 534, "prints": {"brain.json": [88685, 1791659216941281932], "brain.npz": [775178, 1791659216937579864], "episodes.npz": [290840, 1791659217511601721], "ledger.json": [26294, 1791659217836924440], "organism.json": [23101, 1791659216927919281], "organism.npz": [76663, 1791659216926579445], "outcome_episodes.npz": [15566, 1791659217568603892], "smell_episodes.npz": [7434, 1791659217835614058], "sound_episodes.npz": [50047, 1791659217798612649], "touch_episodes.npz": [7466, 1791659217816613335], "web.json": [13215, 1791659216942133802]}, "t": 1200}
+\ No newline at end of file
+---
+> {"canvas_index": 240, "files": ["organism.npz", "organism.json", "brain.npz", "brain.json", "web.json", "episodes.npz", "outcome_episodes.npz", "sound_episodes.npz", "touch_episodes.npz", "smell_episodes.npz", "ledger.json"], "last_seq": 534, "prints": {"brain.json": [88685, 1791659284677575659], "brain.npz": [775178, 1791659284673158986], "episodes.npz": [290840, 1791659285245180767], "ledger.json": [26294, 1791659285563445015], "organism.json": [23101, 1791659284663253422], "organism.npz": [76663, 1791659284661158529], "outcome_episodes.npz": [15566, 1791659285300182861], "smell_episodes.npz": [7434, 1791659285561192799], "sound_episodes.npz": [50047, 1791659285525191428], "touch_episodes.npz": [7466, 1791659285543192114], "web.json": [13215, 1791659284678564672]}, "t": 1200}
+\ No newline at end of file
+diff -r '--exclude=cost.json' scratch/seat/bench-a4/run-on/state/prev/SNAPSHOT.json scratch/seat/bench-a5/run-on/state/prev/SNAPSHOT.json
+1c1
+< {"canvas_index": 200, "files": ["organism.npz", "organism.json", "brain.npz", "brain.json", "web.json", "episodes.npz", "outcome_episodes.npz", "sound_episodes.npz", "touch_episodes.npz", "smell_episodes.npz", "ledger.json"], "last_seq": 438, "prints": {"brain.json": [75029, 1791659209312638452], "brain.npz": [679386, 1791659209309289407], "episodes.npz": [260961, 1791659209908312216], "ledger.json": [22590, 1791659210239919154], "organism.json": [21940, 1791659209301302519], "organism.npz": [71916, 1791659209299289027], "outcome_episodes.npz": [15497, 1791659209965314387], "smell_episodes.npz": [7434, 1791659210238324782], "sound_episodes.npz": [50047, 1791659210200323335], "touch_episodes.npz": [7466, 1791659210219324058], "web.json": [100078, 1791659209314917694]}, "t": 1000}
+\ No newline at end of file
+---
+> {"canvas_index": 200, "files": ["organism.npz", "organism.json", "brain.npz", "brain.json", "web.json", "episodes.npz", "outcome_episodes.npz", "sound_episodes.npz", "touch_episodes.npz", "smell_episodes.npz", "ledger.json"], "last_seq": 438, "prints": {"brain.json": [75029, 1791659277080697595], "brain.npz": [679386, 1791659277077869785], "episodes.npz": [260961, 1791659277662892060], "ledger.json": [22590, 1791659277992620308], "organism.json": [21940, 1791659277068795269], "organism.npz": [71916, 1791659277066869366], "outcome_episodes.npz": [15497, 1791659277721894307], "smell_episodes.npz": [7434, 1791659277991904588], "sound_episodes.npz": [50047, 1791659277953903141], "touch_episodes.npz": [7466, 1791659277972903864], "web.json": [100078, 1791659277083174756]}, "t": 1000}
+\ No newline at end of file
+diff -r '--exclude=cost.json' scratch/seat/bench-a4/run-on/state/SNAPSHOT.json scratch/seat/bench-a5/run-on/state/SNAPSHOT.json
+1c1
+< {"canvas_index": 240, "files": ["organism.npz", "organism.json", "brain.npz", "brain.json", "web.json", "episodes.npz", "outcome_episodes.npz", "sound_episodes.npz", "touch_episodes.npz", "smell_episodes.npz", "ledger.json"], "last_seq": 534, "prints": {"brain.json": [88684, 1791659210900876181], "brain.npz": [775178, 1791659210897349875], "episodes.npz": [290840, 1791659211480372074], "ledger.json": [26294, 1791659211804477530], "organism.json": [23101, 1791659210888795503], "organism.npz": [76663, 1791659210887349494], "outcome_episodes.npz": [15566, 1791659211536374206], "smell_episodes.npz": [7434, 1791659211802384335], "sound_episodes.npz": [50047, 1791659211765382927], "touch_episodes.npz": [7466, 1791659211784383650], "web.json": [115385, 1791659210903280843]}, "t": 1200}
+\ No newline at end of file
+---
+> {"canvas_index": 240, "files": ["organism.npz", "organism.json", "brain.npz", "brain.json", "web.json", "episodes.npz", "outcome_episodes.npz", "sound_episodes.npz", "touch_episodes.npz", "smell_episodes.npz", "ledger.json"], "last_seq": 534, "prints": {"brain.json": [88684, 1791659278678231604], "brain.npz": [775178, 1791659278674930595], "episodes.npz": [290840, 1791659279253952642], "ledger.json": [26294, 1791659279580503569], "organism.json": [23101, 1791659278664943345], "organism.npz": [76663, 1791659278663930176], "outcome_episodes.npz": [15566, 1791659279310954812], "smell_episodes.npz": [7434, 1791659279578965017], "sound_episodes.npz": [50047, 1791659279540963570], "touch_episodes.npz": [7466, 1791659279560964332], "web.json": [115385, 1791659278681016584]}, "t": 1200}
+\ No newline at end of file
