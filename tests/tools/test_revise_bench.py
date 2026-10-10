@@ -115,8 +115,8 @@ class TestPilotRefusal(unittest.TestCase):
         reading = RB.pilot_reading(arm)
         self.assertFalse(reading["gradable"], reading["reason"])
         self.assertEqual(reading["verdict"], "NOT-GRADABLE")
-        self.assertIn(reading["moved"], ("unchanged", "grew-only", "shrank"),
-                      "the world never changed: no partial/disjoint move can be claimed")
+        self.assertIn(reading["moved"], ("unchanged", "grew-only"),
+                      "the world never changed: no removal move can be claimed")
         self.assertIsNone(reading["margin"], "no margin binds on a refused bench")
 
     def test_graded_marks_never_computed_on_a_refused_arm(self):
