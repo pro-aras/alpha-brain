@@ -1,0 +1,8 @@
+{
+  "note": "M-COST's measured price \u2014 the ONE declared nondeterministic artifact (timings), excluded from G-DET's byte-identity by construction (D-det)",
+  "cpu_seconds_total": 12.997894844000001,
+  "tier1_order_b_secs": 0.02463640899999997,
+  "tier2_secs": 9.744345458000002,
+  "plant_arm_secs": 3.2287692370000016,
+  "peak_rss_bytes": 249716736
+}

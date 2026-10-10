@@ -1,0 +1,844 @@
+{
+  "gates": {
+    "G-UNIT": {
+      "bar": "the instrument's own tests (tests/genome/test_revise_store.py + tests/tools/test_revise_bench.py) \u2014 see the suite logs",
+      "pass": true
+    },
+    "G-CHAIN": {
+      "bar": "the tier-2 bench drives the SAME two functions mind.py:3350/3385 calls (imported, never copied) \u2014 pinned by tests/tools/test_revise_bench.py",
+      "pass": true
+    },
+    "G-PLANT": {
+      "bar": "(a) the doctored no-flip-landed tier-2 bench reads NOT-GRADABLE, never grades; (b) the clash_enabled=False store FAILS M-T1-FORM",
+      "plant_a_verdict": "NOT-GRADABLE",
+      "control_b_form_pass": false,
+      "pass": true
+    },
+    "G-DET": {
+      "bar": "every bench twice, byte-identical rows/reports \u2014 the records' cmp exit 0 (arms.jsonl, report.json, report.txt, stores/*.jsonl; cost.json is the one declared nondeterministic artifact, D-det)",
+      "pass": true
+    }
+  },
+  "marks": {
+    "M-T1-FORM": {
+      "bar": "the revision form matches the evidence shape (the law \u00a73 M-T1-FORM, five shapes)",
+      "per_shape": {
+        "a": {
+          "bar": ">= 1 clash row; the post-flip standing EXACTLY the planted [33, 44]",
+          "clashes": 1,
+          "standing": [
+            33,
+            44
+          ],
+          "pass": true
+        },
+        "b": {
+          "bar": ">= 1 clash (rule 4 is unconditional \u2014 the pinned partial-removal behavior)",
+          "clashes": 1,
+          "standing": [
+            22,
+            33
+          ],
+          "pass": true
+        },
+        "c": {
+          "bar": "an extension, ZERO clashes",
+          "clashes": 0,
+          "has_extension": true,
+          "pass": true
+        },
+        "d": {
+          "bar": "revisits only, ZERO clashes",
+          "clashes": 0,
+          "w_kinds": [
+            "belief",
+            "revisit",
+            "revisit"
+          ],
+          "pass": true
+        },
+        "e": {
+          "bar": ">= 1 clash with the cells UNCHANGED (the ledger half of rule 4)",
+          "clashes": 2,
+          "n_belief_rows": 3,
+          "cells_unchanged": true,
+          "pass": true
+        }
+      },
+      "pass": true
+    },
+    "M-T1-ORDER": {
+      "bar": "the ordered flip's clash count == 1, strictly below all 10 derangements' (each >= 2 by the boundary arithmetic; printed)",
+      "ordered_clashes": 1,
+      "derangements": [
+        [
+          "ABBAAB",
+          3,
+          3
+        ],
+        [
+          "ABAABB",
+          3,
+          3
+        ],
+        [
+          "BABABA",
+          5,
+          5
+        ],
+        [
+          "BBAAAB",
+          2,
+          2
+        ],
+        [
+          "ABBABA",
+          4,
+          4
+        ],
+        [
+          "ABABAB",
+          5,
+          5
+        ],
+        [
+          "BAAABB",
+          2,
+          2
+        ],
+        [
+          "BBAABA",
+          3,
+          3
+        ],
+        [
+          "BABBAA",
+          3,
+          3
+        ],
+        [
+          "AABBBA",
+          2,
+          2
+        ]
+      ],
+      "arithmetic_exact": true,
+      "pass": true
+    },
+    "M-T1-LOCAL": {
+      "bar": "the bystander X's chain byte-identical at every checkpoint of every stream; presence count printed (n rows of X)",
+      "per_shape": {
+        "a": {
+          "checkpoints": 7,
+          "x_presence": 1,
+          "violations": [],
+          "pass": true
+        },
+        "b": {
+          "checkpoints": 4,
+          "x_presence": 1,
+          "violations": [],
+          "pass": true
+        },
+        "c": {
+          "checkpoints": 4,
+          "x_presence": 1,
+          "violations": [],
+          "pass": true
+        },
+        "d": {
+          "checkpoints": 4,
+          "x_presence": 1,
+          "violations": [],
+          "pass": true
+        },
+        "e": {
+          "checkpoints": 4,
+          "x_presence": 1,
+          "violations": [],
+          "pass": true
+        }
+      },
+      "pass": true
+    },
+    "M-T1-DIR": {
+      "bar": "post-flip standing == the planted set (set equality); the pre-flip standing never stands again (the chain forked at the clash)",
+      "per_shape": {
+        "a": {
+          "planted_post_flip": [
+            33,
+            44
+          ],
+          "standing": [
+            33,
+            44
+          ],
+          "standing_line": 4,
+          "pass": true
+        },
+        "b": {
+          "planted_post_flip": [
+            22,
+            33
+          ],
+          "standing": [
+            22,
+            33
+          ],
+          "standing_line": 2,
+          "pass": true
+        },
+        "e": {
+          "planted_post_flip": [
+            11,
+            22
+          ],
+          "standing": [
+            11,
+            22
+          ],
+          "standing_line": 4,
+          "pass": true
+        }
+      },
+      "pass": true
+    },
+    "M-B-DIR": {
+      "bar": "the planted always claim demotes EXACTLY at the crossing observation (the index printed, first_demoted_at correct); the usually twin under confirmations stays trusted",
+      "crossing": 32,
+      "first_demoted_at": 32,
+      "usually_first_demoted_at": null,
+      "usually_final": "trusted",
+      "pass": true
+    },
+    "M-B-FLOOR": {
+      "bar": "below min_events, an all-contradicted claim stays trusted (the evidence's amount never fires before the declared floor)",
+      "n_below_floor": 29,
+      "edge_demoted_at": 30,
+      "pass": true
+    },
+    "M-B-SIGN": {
+      "bar": "the same event count with the signs swapped never demotes (the SIGN of the evidence, not its amount)",
+      "n_events": 35,
+      "contradicted": 0,
+      "pass": true
+    },
+    "M-T2-MOVE": {
+      "bar": "the flip move where the null MAX is 0, else above it",
+      "pass": "NOT-GRADED",
+      "reason": "NOT-GRADABLE \u2014 the flip never moved the answering cells in the law's sense within the bench horizon (grew-only: a cell removed or a clash row is the law's move; the set only grew or sat)",
+      "readings": {
+        "flip_moves": {
+          "per_checkpoint": {
+            "74": {
+              "removed": [],
+              "clash_row": false,
+              "moved": false
+            },
+            "99": {
+              "removed": [],
+              "clash_row": false,
+              "moved": false
+            },
+            "149": {
+              "removed": [],
+              "clash_row": false,
+              "moved": false
+            },
+            "249": {
+              "removed": [],
+              "clash_row": false,
+              "moved": false
+            }
+          },
+          "move_count": 0,
+          "onset_first_checkpoint": false
+        },
+        "null_move_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "M-T2-DIR": {
+      "bar": "post-flip standing's agree share >= pre-flip standing's post-flip share + the pilot's margin; and the pre-flip standing's post-flip share < its own pre-flip share",
+      "pass": "NOT-GRADED",
+      "reason": "NOT-GRADABLE \u2014 the flip never moved the answering cells in the law's sense within the bench horizon (grew-only: a cell removed or a clash row is the law's move; the set only grew or sat)",
+      "readings": {
+        "pilot_shares": {
+          "pre_share_pre": 0.37555555555555553,
+          "pre_share_post": 0.305,
+          "post_share": 0.67,
+          "separation": 0.36500000000000005,
+          "smallest_gap_10_over_n": 0.025,
+          "n_post": 400,
+          "n_pre": 450
+        },
+        "flip_shares": {
+          "n_post": 400,
+          "n_pre": 450,
+          "pre_share_post": 0.27,
+          "post_share": 0.625,
+          "pre_share_pre": 0.33111111111111113
+        }
+      }
+    },
+    "M-T2-LOCAL": {
+      "bar": "every other believed word's rows byte-identical across the flip window",
+      "pass": "NOT-GRADED",
+      "reason": "NOT-GRADABLE \u2014 the flip never moved the answering cells in the law's sense within the bench horizon (grew-only: a cell removed or a clash row is the law's move; the set only grew or sat)",
+      "readings": {
+        "per_word": {
+          "circle": {
+            "presence": 1,
+            "violations": [],
+            "pass": true
+          },
+          "square": {
+            "presence": 1,
+            "violations": [],
+            "pass": true
+          },
+          "triangle": {
+            "presence": 1,
+            "violations": [],
+            "pass": true
+          },
+          "cross": {
+            "presence": 1,
+            "violations": [],
+            "pass": true
+          },
+          "bar": {
+            "presence": 1,
+            "violations": [],
+            "pass": true
+          },
+          "dot": {
+            "presence": 1,
+            "violations": [],
+            "pass": true
+          },
+          "star": {
+            "presence": 1,
+            "violations": [],
+            "pass": true
+          }
+        },
+        "pass": true
+      }
+    },
+    "M-COST": {
+      "bar": "the whole assay <= 30 CPU-min, peak <= 1 GB (measured-first)",
+      "pass": true,
+      "measured": "cost.json (the one declared nondeterministic artifact \u2014 timings \u2014 D-det; the reports carry the verdict, never the timings)"
+    }
+  },
+  "tier2_verdict": "NOT-GRADABLE",
+  "pilot": {
+    "seed": 20261010,
+    "reading": {
+      "word": "ring",
+      "a_thing": "bar",
+      "cells_before": [
+        4,
+        13,
+        18,
+        22,
+        25,
+        30,
+        34,
+        37,
+        39,
+        41,
+        45,
+        46,
+        50,
+        52,
+        55,
+        57,
+        59,
+        63,
+        66,
+        69,
+        71,
+        75,
+        76,
+        78
+      ],
+      "cells_after_per_checkpoint": {
+        "74": [
+          4,
+          13,
+          18,
+          22,
+          25,
+          30,
+          34,
+          37,
+          39,
+          41,
+          45,
+          46,
+          50,
+          52,
+          55,
+          57,
+          59,
+          63,
+          66,
+          69,
+          71,
+          75,
+          76,
+          78,
+          80,
+          82,
+          83,
+          84,
+          85,
+          87,
+          88,
+          89
+        ],
+        "99": [
+          4,
+          13,
+          18,
+          22,
+          25,
+          30,
+          34,
+          37,
+          39,
+          41,
+          45,
+          46,
+          50,
+          52,
+          55,
+          57,
+          59,
+          63,
+          66,
+          69,
+          71,
+          75,
+          76,
+          78,
+          80,
+          82,
+          83,
+          84,
+          85,
+          87,
+          88,
+          89,
+          95,
+          96,
+          100,
+          102,
+          103
+        ],
+        "149": [
+          4,
+          13,
+          18,
+          22,
+          25,
+          30,
+          34,
+          37,
+          39,
+          41,
+          45,
+          46,
+          50,
+          52,
+          55,
+          57,
+          59,
+          63,
+          66,
+          69,
+          71,
+          75,
+          76,
+          78,
+          80,
+          82,
+          83,
+          84,
+          85,
+          87,
+          88,
+          89,
+          95,
+          96,
+          100,
+          102,
+          103,
+          105,
+          108,
+          112,
+          115,
+          118,
+          119,
+          120
+        ],
+        "249": [
+          4,
+          13,
+          18,
+          22,
+          25,
+          30,
+          34,
+          37,
+          39,
+          41,
+          45,
+          46,
+          50,
+          52,
+          55,
+          57,
+          59,
+          63,
+          66,
+          69,
+          71,
+          75,
+          76,
+          78,
+          80,
+          82,
+          83,
+          84,
+          85,
+          87,
+          88,
+          89,
+          95,
+          96,
+          100,
+          102,
+          103,
+          105,
+          108,
+          112,
+          115,
+          118,
+          119,
+          120,
+          124,
+          125,
+          129,
+          131,
+          132
+        ]
+      },
+      "per_checkpoint_class": {
+        "74": "grew-only",
+        "99": "grew-only",
+        "149": "grew-only",
+        "249": "grew-only"
+      },
+      "moved": "grew-only",
+      "gradable": false,
+      "verdict": "NOT-GRADABLE",
+      "reason": "the flip never moved the answering cells in the law's sense within the bench horizon (grew-only: a cell removed or a clash row is the law's move; the set only grew or sat)",
+      "gained_cells": [
+        {
+          "cell": 80,
+          "cos_to_a": 0.8286077132200913,
+          "cos_to_b": 0.5252075060227027
+        },
+        {
+          "cell": 82,
+          "cos_to_a": 0.48887845190874335,
+          "cos_to_b": 0.8068732333287377
+        },
+        {
+          "cell": 83,
+          "cos_to_a": 0.875364625070533,
+          "cos_to_b": 0.526561086038272
+        },
+        {
+          "cell": 84,
+          "cos_to_a": 0.8365889143884532,
+          "cos_to_b": 0.5461453606215767
+        },
+        {
+          "cell": 85,
+          "cos_to_a": 0.8283371643695081,
+          "cos_to_b": 0.5065909325878175
+        },
+        {
+          "cell": 87,
+          "cos_to_a": 0.5052364301846369,
+          "cos_to_b": 0.8385830413634645
+        },
+        {
+          "cell": 88,
+          "cos_to_a": 0.9188265240435396,
+          "cos_to_b": 0.49917406641220774
+        },
+        {
+          "cell": 89,
+          "cos_to_a": 0.4141552518237112,
+          "cos_to_b": 0.8299230631241904
+        },
+        {
+          "cell": 95,
+          "cos_to_a": 0.4940202106186807,
+          "cos_to_b": 0.7955452769911997
+        },
+        {
+          "cell": 96,
+          "cos_to_a": 0.45994838873730703,
+          "cos_to_b": 0.8204579504115741
+        },
+        {
+          "cell": 100,
+          "cos_to_a": 0.40575182732037596,
+          "cos_to_b": 0.8202089467347367
+        },
+        {
+          "cell": 102,
+          "cos_to_a": 0.8998732217610885,
+          "cos_to_b": 0.5259865205006309
+        },
+        {
+          "cell": 103,
+          "cos_to_a": 0.840197681351927,
+          "cos_to_b": 0.5467877132905828
+        },
+        {
+          "cell": 105,
+          "cos_to_a": 0.5281276914787383,
+          "cos_to_b": 0.8484256915892522
+        },
+        {
+          "cell": 108,
+          "cos_to_a": 0.5077783722252291,
+          "cos_to_b": 0.7968066010077409
+        },
+        {
+          "cell": 112,
+          "cos_to_a": 0.45300184367179774,
+          "cos_to_b": 0.7635291813192231
+        },
+        {
+          "cell": 115,
+          "cos_to_a": 0.3925713065195032,
+          "cos_to_b": 0.8392505764820841
+        },
+        {
+          "cell": 118,
+          "cos_to_a": 0.5679549697111284,
+          "cos_to_b": 0.849606230306073
+        },
+        {
+          "cell": 119,
+          "cos_to_a": 0.46831557302417826,
+          "cos_to_b": 0.7854420535325851
+        },
+        {
+          "cell": 120,
+          "cos_to_a": 0.4989598107966673,
+          "cos_to_b": 0.7478642941232538
+        },
+        {
+          "cell": 124,
+          "cos_to_a": 0.48100240814978334,
+          "cos_to_b": 0.8398519627443647
+        },
+        {
+          "cell": 125,
+          "cos_to_a": 0.5376599575735244,
+          "cos_to_b": 0.7451806745732139
+        },
+        {
+          "cell": 129,
+          "cos_to_a": 0.44692575787339683,
+          "cos_to_b": 0.848450657529238
+        },
+        {
+          "cell": 131,
+          "cos_to_a": 0.45188330033448865,
+          "cos_to_b": 0.798319517060352
+        },
+        {
+          "cell": 132,
+          "cos_to_a": 0.47941247493847633,
+          "cos_to_b": 0.8324996562091089
+        }
+      ],
+      "lost_cells": [],
+      "n_post": 400,
+      "n_pre": 450,
+      "pre_share_pre": 0.37555555555555553,
+      "pre_share_post": 0.305,
+      "post_share": 0.67,
+      "separation": 0.36500000000000005,
+      "smallest_gap_10_over_n": 0.025,
+      "underpowered": false,
+      "margin": null
+    },
+    "counts": {
+      "births_error_sight": 34,
+      "births_novelty_sight": 107,
+      "births_refused_redundant": 84,
+      "merges": 1,
+      "sight_n": 141,
+      "sight_alive": 140,
+      "words_n": 8
+    }
+  },
+  "flip_counts": {
+    "seed": 20261011,
+    "counts": {
+      "births_error_sight": 35,
+      "births_novelty_sight": 108,
+      "births_refused_redundant": 90,
+      "merges": 4,
+      "sight_n": 143,
+      "sight_alive": 139,
+      "words_n": 8
+    }
+  },
+  "null_counts": [
+    {
+      "seed": 20261020,
+      "counts": {
+        "births_error_sight": 30,
+        "births_novelty_sight": 106,
+        "births_refused_redundant": 85,
+        "merges": 2,
+        "sight_n": 136,
+        "sight_alive": 134,
+        "words_n": 8
+      }
+    },
+    {
+      "seed": 20261021,
+      "counts": {
+        "births_error_sight": 26,
+        "births_novelty_sight": 112,
+        "births_refused_redundant": 84,
+        "merges": 0,
+        "sight_n": 138,
+        "sight_alive": 138,
+        "words_n": 8
+      }
+    },
+    {
+      "seed": 20261022,
+      "counts": {
+        "births_error_sight": 26,
+        "births_novelty_sight": 113,
+        "births_refused_redundant": 86,
+        "merges": 2,
+        "sight_n": 139,
+        "sight_alive": 137,
+        "words_n": 8
+      }
+    },
+    {
+      "seed": 20261023,
+      "counts": {
+        "births_error_sight": 29,
+        "births_novelty_sight": 112,
+        "births_refused_redundant": 75,
+        "merges": 0,
+        "sight_n": 141,
+        "sight_alive": 141,
+        "words_n": 8
+      }
+    },
+    {
+      "seed": 20261024,
+      "counts": {
+        "births_error_sight": 30,
+        "births_novelty_sight": 103,
+        "births_refused_redundant": 88,
+        "merges": 3,
+        "sight_n": 133,
+        "sight_alive": 130,
+        "words_n": 8
+      }
+    },
+    {
+      "seed": 20261025,
+      "counts": {
+        "births_error_sight": 34,
+        "births_novelty_sight": 105,
+        "births_refused_redundant": 97,
+        "merges": 4,
+        "sight_n": 139,
+        "sight_alive": 135,
+        "words_n": 8
+      }
+    },
+    {
+      "seed": 20261026,
+      "counts": {
+        "births_error_sight": 23,
+        "births_novelty_sight": 109,
+        "births_refused_redundant": 98,
+        "merges": 3,
+        "sight_n": 132,
+        "sight_alive": 129,
+        "words_n": 8
+      }
+    },
+    {
+      "seed": 20261027,
+      "counts": {
+        "births_error_sight": 24,
+        "births_novelty_sight": 103,
+        "births_refused_redundant": 76,
+        "merges": 0,
+        "sight_n": 127,
+        "sight_alive": 127,
+        "words_n": 8
+      }
+    },
+    {
+      "seed": 20261028,
+      "counts": {
+        "births_error_sight": 26,
+        "births_novelty_sight": 112,
+        "births_refused_redundant": 89,
+        "merges": 0,
+        "sight_n": 138,
+        "sight_alive": 138,
+        "words_n": 8
+      }
+    },
+    {
+      "seed": 20261029,
+      "counts": {
+        "births_error_sight": 26,
+        "births_novelty_sight": 108,
+        "births_refused_redundant": 82,
+        "merges": 0,
+        "sight_n": 134,
+        "sight_alive": 134,
+        "words_n": 8
+      }
+    }
+  ],
+  "plant_arm": {
+    "tier2_verdict": "NOT-GRADABLE"
+  }
+}
