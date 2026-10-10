@@ -1,0 +1,17 @@
+# CONTENT-WEB (F1) G-IDENTITY (the law §2): flag OFF, byte-identical master vs branch — the N1 gate's
+# own script and inputs (scratch/cweb/identity.py copied verbatim from genome-wt-n1's scratch/n1/;
+# the inputs copied beside it: scratch/cweb/toytape (the 200-moment toy tape, 400 rows) and
+# scratch/cweb/bl2-500-tape (the 500-row bl2 segment); every payload the rows reference verified
+# byte-identical to the n1 originals before any leg ran (500/500 and 400/400 mismatches 0).
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:3x +0400 — both legs REPRODUCE the
+# journals of record (N1's records/n1/identity-shas.txt; CONTEMPLATE-1's records/identity-shas.txt):
+# the toy tape's a7280723… and the bl2 segment's 26dc80c6… to the digit. Branch = cweb-1010 @ 638a852
+# (the G-UNIT GREEN commit); master = /data/dev/genome @ 87770db (the branch's own merge-base — master
+# has not moved). The genome inputs are byte-identical between the trees (cmp, both files). Each pair
+# verified with cmp (exit 0), through slot cweb id-* with SLOT_MEM=2G (the law §5's cap); logs + exits
+# in scratch/cweb/id/. The bl2 leg replays genome/brain/lives/BRAIN-LONG-2.genome; the toy leg
+# genome/G4-skeleton.genome; both legs run flag-OFF by construction (replay never passes the flag).
+a728072329aa82bbb2478f99ddc5a9527cc9625256c3218d15eec315461dfe02  scratch/cweb/id/toy-master/journal.jsonl
+a728072329aa82bbb2478f99ddc5a9527cc9625256c3218d15eec315461dfe02  scratch/cweb/id/toy-branch/journal.jsonl
+26dc80c60d4ec1739f4de1a93e327c850c59a11a762e1ecb7c21c43fc897ea9a  scratch/cweb/id/bl2-master/journal.jsonl
+26dc80c60d4ec1739f4de1a93e327c850c59a11a762e1ecb7c21c43fc897ea9a  scratch/cweb/id/bl2-branch/journal.jsonl
