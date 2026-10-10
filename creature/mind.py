@@ -2209,10 +2209,15 @@ class Mind:
         in the glance's own order (the law's declared feed order). things_in_view is genome/brain.py:99's
         own path (reused, never re-implemented); a malformed glance would already have raised in the
         brain's own turn above, and the webs exist only beside a brain — so this never runs on a glance
-        the brain refused."""
+        the brain refused.
+        AMENDMENT 1 (edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 18:1x +0400): the token
+        keys the organism's OWN RECOGNITION — self.org's alive sight store read HERE, as it stands ON
+        ARRIVAL (before this canvas's own learning road below — the law §1's feed order is unchanged:
+        the feed site, the guards and the census funnel are exactly as built; the empty store emits
+        zero tokens, the declared honest floor)."""
         from genome.brain import things_in_view
         hyps, _X = things_in_view(g)
-        for tok in _cweb.eye_tokens([h.feat for h in hyps]):
+        for tok in _cweb.eye_tokens(self.org, [h.feat for h in hyps]):
             self._cweb_hear("eye", tok)
 
     def _self_kinds_now(self) -> Optional[List[set]]:

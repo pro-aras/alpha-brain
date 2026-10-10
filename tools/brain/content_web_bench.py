@@ -1,6 +1,13 @@
 # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:5x +0400 — PREREG-CONTENT-WEB (F1) §3
 # (docs/brain/content-web/PREREG-CONTENT-WEB.md, signed 2026-10-10 13:27, cweb-1010): the law's bench,
 # written AFTER the law (law before code) and AFTER its G-UNIT GREEN (638a852) and G-IDENTITY (fbc548b).
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 18:2x +0400 — AMENDMENT 1 (signed, same
+# folder, 2026-10-10 15:3x): the s: token re-priced to the organism's own recognition (s:c<id>, the
+# nearest alive sight cell by raw cosine — creature/contentweb.py's cell_of/sight_token). The pilot
+# gains the per-component render-jitter σ (the diagnostic that killed the old form) and the null
+# pieces; M-STABILITY is re-priced per the amendment (the planted things' recurrence share vs the
+# 10-draw uniform-assignment null's MAX); every other mark reads the token stream unchanged. The
+# failed form's run of record stands in docs/brain/content-web/records/bench-run2-* — never deleted.
 """content_web_bench.py — the CONTENT-WEB bench: the amodal feed measured on the toy world.
 
     python3 -B tools/brain/content_web_bench.py OUTDIR
@@ -29,11 +36,18 @@ own D- form):
                bench never drives. No sleep fires at this size (org.t stays under 2500; printed).
   D-muse       muse=False in both arms (the composition is G-UNIT(e)'s pin; the bench reads the web).
   D-hyp        a sighting's token = the FIRST hypothesis's token (the glance's own order; sightings
-               whose canvas yielded != 1 hypothesis are printed, never hidden).
-  D-stability  the 16 readings: for each of the 8 things, token(round 0) vs token(round 3) — straddling
-               the calibration-at-20 boundary (learned scenes 0..19 vs 24..31) — and token(round 3) vs
-               token(round 6) — straddling calibration-at-40. Bar 16/16, the pilot's FULL recurrence
-               reading printed BEFORE the mark binds (#228).
+               whose canvas yielded != 1 hypothesis are printed, never hidden; sightings whose canvas
+               saw an EMPTY alive sight store yield NO token — AMENDMENT 1's declared floor — and are
+               counted as silent, keyed by round so they never shift the later sightings).
+  D-stability  AMENDMENT 1's re-priced form: the PLANTED things' recurrence share (the modal cell's
+               share of each planted thing's sightings, averaged; the sightings span the bench's
+               calibration boundaries by construction) must EXCEED the 10-draw random-assignment
+               null's MAX — per draw, each sighting of a planted thing is assigned a uniform cell from
+               the read's own vocabulary (the distinct s:c<id> tokens in the ON stream, printed), and
+               the null share is computed exactly as the real one; the smallest passing gap (real
+               share - null MAX) is printed. The OLD instrument's 16-comparison cross-boundary form
+               (D-stability of the failed run) is printed in the pilot as stability_legacy for
+               continuity — it is no longer the bar.
   D-null       the 10 derangement twins: per-sense seeded NON-IDENTITY permutations of the ON arm's
                captured token stream (the muse bench's D-null form), every slot's moment kept — the
                co-occurrence destroyed, the marginal rates kept (the per-sense token multiset is
@@ -197,51 +211,93 @@ def thing_of(moment: str) -> str:
     return TOY_THINGS[int(moment[3:]) % len(TOY_THINGS)]
 
 
-def pilot(on: dict, rows: list) -> dict:
-    """THE PILOT — printed BEFORE any mark binds (#228): the s: token's recurrence on the toy world
-    (per-thing distinct tokens / modal share over its sightings; the 16 cross-boundary comparisons of
-    D-stability), the 8-thing all-pairs collision count (the law §6's knife-edge, both sides), and the
-    planted pairs' chances ceiling (the co-occurrence counts, printed before the verdict)."""
+def pilot(on: dict, rows: list, tape_root: Path) -> dict:
+    """THE PILOT — printed BEFORE any mark binds (#228). AMENDMENT 1's readings: the s:c<id>
+    recognition key's recurrence on the toy world (per thing, the modal cell's share of its
+    sightings — keyed BY ROUND so the declared floor's silent rows are honest gaps, never shifts),
+    the all-pairs collision count (two things' sightings sharing one cell), the per-component
+    render-jitter σ of the hypothesis feature row (the diagnostic that killed the old form — the
+    amendment names it the diagnostic of record), and the planted pairs' chances ceiling (printed
+    before the verdict). M-STABILITY's re-priced pieces (the planted things' share, the 10-draw
+    uniform-assignment null) are computed HERE so the mark only reads them."""
     row_moment = {int(r["seq"]): str((r.get("meta") or {}).get("moment")) for r in rows if r["sense"] == "eye"
                   and str((r.get("meta") or {}).get("moment", "")).startswith("toy")}
-    per_thing: dict = {t: [] for t in TOY_THINGS}
-    multi = 0
     by_row: dict = {}
     for e in on["stream"]:
         if e["sense"] != "eye" or e["row"] not in row_moment:
             continue
         by_row.setdefault(e["row"], []).append(e["token"])
-    for seq, toks in sorted(by_row.items()):
+    per_thing: dict = {t: {} for t in TOY_THINGS}          # thing -> {round: FIRST-hyp token} (D-hyp)
+    multi = 0
+    silent = 0
+    for seq, moment in sorted(row_moment.items(), key=lambda kv: kv[0]):
+        i = int(moment[3:])
+        thing, rnd = thing_of(moment), i // len(TOY_THINGS)
+        toks = by_row.get(seq, [])
+        if not toks:
+            silent += 1                                    # the declared floor's silence (empty store)
+            continue
         if len(toks) != 1:
             multi += 1
-        per_thing[thing_of(row_moment[seq])].append(toks[0])      # D-hyp: the FIRST hypothesis's token
+        per_thing[thing][rnd] = toks[0]
     recurrence = {}
     for t in TOY_THINGS:
-        toks = per_thing[t]
+        toks = [per_thing[t][r] for r in sorted(per_thing[t])]
         counts: dict = {}
         for x in toks:
             counts[x] = counts.get(x, 0) + 1
         modal, modal_n = (max(counts.items(), key=lambda kv: (kv[1], kv[0])) if counts else (None, 0))
-        recurrence[t] = {"sightings": len(toks), "distinct": len(counts), "modal": modal, "modal_n": modal_n}
-    # D-stability: the 16 cross-boundary comparisons (round pairs of STABILITY_PAIRS)
+        recurrence[t] = {"sightings": len(toks), "distinct": len(counts), "modal": modal, "modal_n": modal_n,
+                         "modal_share": (modal_n / len(toks)) if toks else None}
+    # the 16 cross-boundary comparisons of the OLD instrument's shape (printed for continuity with the
+    # failed run — the mark below is the amendment's re-priced form)
     stability = []
     for t in TOY_THINGS:
         for ra, rb in STABILITY_PAIRS:
+            ta, tb = per_thing[t].get(ra), per_thing[t].get(rb)
             stability.append({"thing": t, "rounds": [ra, rb],
-                              "same": per_thing[t][ra] == per_thing[t][rb] if len(per_thing[t]) > rb else None})
-    # the all-pairs collision count over every sighting of every thing (§6's other side)
+                              "same": (ta == tb) if (ta is not None and tb is not None) else None})
+    # the all-pairs collision count over every sighting of every thing (§6's other side: two DIFFERENT
+    # things' sightings landing on one cell)
     owner: dict = {}
     collisions = 0
     for t in TOY_THINGS:
-        for x in per_thing[t]:
+        for x in per_thing[t].values():
             if x in owner and owner[x] != t:
                 collisions += 1
             owner.setdefault(x, t)
+    # the render-jitter σ: the first-hypothesis feature row per sighting, recomputed from the tape's
+    # own payloads by the law's path (a pure function of the canvas bytes — exactly what the mind's
+    # glance computed), then the per-component std across each thing's sightings
+    from genome import gaze
+    from genome.brain import things_in_view
+    from genome.machinery import parse_genome
+    genome = parse_genome(genome_text())
+    feats_by_thing: dict = {t: [] for t in TOY_THINGS}
+    for r in rows:
+        if r["sense"] != "eye":
+            continue
+        moment = str((r.get("meta") or {}).get("moment", ""))
+        if not moment.startswith("toy"):
+            continue
+        payload = (tape_root / "tape" / r["payload"]).read_bytes()
+        rgb = np.asarray(Image.open(io.BytesIO(payload)).convert("RGB"), dtype=np.uint8)
+        g = gaze.glances(rgb, genome.retina, genome.gaze, "surprise", r["sha"], colour=genome.colour)
+        hyps, _X = things_in_view(g)
+        if hyps:
+            feats_by_thing[thing_of(moment)].append(np.asarray(hyps[0].feat, dtype=np.float64))
+    jitter = {}
+    for t in TOY_THINGS:
+        F = np.stack(feats_by_thing[t]) if feats_by_thing[t] else np.zeros((0, 144))
+        sigma = F.std(axis=0) if len(F) else np.zeros(0)
+        jitter[t] = {"sightings": int(len(F)),
+                     "sigma_mean": (float(sigma.mean()) if len(F) else None),
+                     "sigma_max": (float(sigma.max()) if len(F) else None)}
     # the planted pairs' chances ceiling: each pair's realized co-occurrence (the web's own edge rows)
     edges = on["web_edges"]
     ceiling = {}
     for name, thing in PLANTED.items():
-        tok_set = set(per_thing[thing])
+        tok_set = set(per_thing[thing].values())
         pairs = []
         for key, e in edges.items():
             a, b = key.split("|")
@@ -255,9 +311,39 @@ def pilot(on: dict, rows: list) -> dict:
                          "max_possible_pair_events": min(CHAT_ARC_N, len(per_thing[thing])),
                          "pair_edges": pairs[:4], "n_pair_edges": len(pairs),
                          "max_realized_c": (pairs[0]["c"] if pairs else 0)}
-    return {"recurrence": recurrence, "multi_hyp_sightings": multi, "stability": stability,
-            "stability_ok": sum(1 for s in stability if s["same"] is True),
-            "collisions": collisions, "distinct_tokens": len(owner), "ceiling": ceiling}
+    # M-STABILITY, re-priced (AMENDMENT 1): the planted things' recurrence share vs the 10-draw
+    # random-assignment null's MAX. The null: each sighting assigned a uniform ALIVE cell — the pool
+    # is the read's own vocabulary (the distinct s:c<id> tokens the organism actually used, printed);
+    # per draw the modal share per planted thing is computed exactly as the real one.
+    distinct_cells = sorted({x for t in TOY_THINGS for x in per_thing[t].values()})
+    C = len(distinct_cells)
+    planted_shares = {name: recurrence[thing]["modal_share"] for name, thing in PLANTED.items()}
+    real_share = (sum(s for s in planted_shares.values() if s is not None)
+                  / max(1, sum(1 for s in planted_shares.values() if s is not None)))
+    rng = np.random.default_rng([BENCH_SEED, 5500])
+    null_shares = []
+    for _k in range(TWINS_N):
+        per_draw = []
+        for name, thing in PLANTED.items():
+            n = len(per_thing[thing])
+            if n == 0 or C == 0:
+                continue
+            draws = [int(x) for x in rng.integers(0, C, size=n)]
+            counts: dict = {}
+            for x in draws:
+                counts[x] = counts.get(x, 0) + 1
+            per_draw.append(max(counts.values()) / n)
+        null_shares.append(sum(per_draw) / max(1, len(per_draw)))
+    null_max = max(null_shares) if null_shares else None
+    return {"recurrence": recurrence, "multi_hyp_sightings": multi, "silent_sightings": silent,
+            "stability_legacy": stability,
+            "stability_legacy_ok": sum(1 for s in stability if s["same"] is True),
+            "collisions": collisions, "distinct_tokens": len(owner), "ceiling": ceiling,
+            "jitter_sigma": jitter,
+            "kind_tokens": {name: sorted(set(per_thing[thing].values())) for name, thing in PLANTED.items()},
+            "planted_share": real_share, "planted_share_per_thing": planted_shares,
+            "null_cell_pool": C, "null_shares": null_shares, "null_max": null_max,
+            "stability_gap": (None if null_max is None else real_share - null_max)}
 
 
 def cross_edges(rec: dict) -> list:
@@ -309,12 +395,23 @@ def verdicts(on: dict, off: dict, rows: list, twins: list, pilot_reading: dict) 
     out: dict = {}
     cons_on = set(on["consolidated"])
     cross_on = cross_edges(on)
-    # M-CROSS
+    # M-CROSS — the planted kind's OWN cells counted apart from the d=3 window's adjacency cells
+    # (D-kind): an edge is IN-KIND when its s: token is one of the planted thing's sighting tokens
+    # (the window's neighbors — the preceding thing's cells — are printed too, never hidden)
     per_kind = {}
+    kind_sets = {name: set(pilot_reading["kind_tokens"][name]) for name in PLANTED}
     for name in PLANTED:
-        kind_edges = [k for k in cross_on if k.endswith("|w:" + name) or k.startswith("w:" + name + "|")]
+        kind_edges_all = [k for k in cross_on if k.endswith("|w:" + name) or k.startswith("w:" + name + "|")]
+        in_kind = []
+        for k in kind_edges_all:
+            a, b = k.split("|")
+            s_tok = a if a.startswith("s:") else b
+            if s_tok in kind_sets[name]:
+                in_kind.append(k)
         ceil = pilot_reading["ceiling"][name]
-        per_kind[name] = {"consolidated_cross": len(kind_edges), "edges": kind_edges,
+        per_kind[name] = {"consolidated_cross": len(in_kind), "edges": in_kind,
+                          "consolidated_cross_incl_window": len(kind_edges_all),
+                          "window_edges": sorted(set(kind_edges_all) - set(in_kind)),
                           "distinct_s_tokens_of_the_thing": ceil["distinct_s_tokens"],
                           "thing_sightings": ceil["thing_sightings"], "chat_namings": ceil["chat_namings"]}
     off_s = sum(1 for n in off["web_nodes"] if n.startswith("s:"))
@@ -373,14 +470,24 @@ def verdicts(on: dict, off: dict, rows: list, twins: list, pilot_reading: dict) 
                      "on_nodes_present": chat_nodes, "alpha_edge_evidence": alpha_edges,
                      "off_nodes_present": off_has,
                      "pass": all(chat_nodes.values()) and not any(off_has.values())}
-    # M-STABILITY — the pilot's reading printed FIRST (the pilot block above; the mark binds here)
-    out["M-STABILITY"] = {"bar": "the same thing re-seen across the bench's own calibration boundary maps "
-                                 "to the same s: token >= the declared share (bar 16/16; the quantization is "
-                                 "deterministic and the calibration does not touch the eye's features — "
-                                 "MEASURED, never assumed; a drift reads FAIL-FORM, the instrument's fault)",
-                          "ok": pilot_reading["stability_ok"], "of": len(pilot_reading["stability"]),
-                          "comparisons": pilot_reading["stability"],
-                          "pass": pilot_reading["stability_ok"] == len(pilot_reading["stability"])}
+    # M-STABILITY — re-priced (AMENDMENT 1): the pilot's reading printed FIRST (the pilot block above);
+    # the planted things' recurrence share must EXCEED the 10-draw random-assignment null's MAX
+    out["M-STABILITY"] = {"bar": "the planted things' tokens recur at a share EXCEEDING the 10-draw "
+                                 "random-assignment null's MAX (the null: each sighting assigned a uniform "
+                                 "alive cell — the organism's read must be better than chance and strong; "
+                                 "the real share printed beside the null's max, the smallest passing gap "
+                                 "printed, #245 (5)). AMENDMENT 1's form; the old 16/16 boundary form is "
+                                 "printed in the pilot for continuity (stability_legacy)",
+                          "planted_share": pilot_reading["planted_share"],
+                          "planted_share_per_thing": pilot_reading["planted_share_per_thing"],
+                          "null_cell_pool": pilot_reading["null_cell_pool"],
+                          "null_shares": pilot_reading["null_shares"],
+                          "null_max": pilot_reading["null_max"],
+                          "gap": pilot_reading["stability_gap"],
+                          "legacy_16": f"{pilot_reading['stability_legacy_ok']}/"
+                                       f"{len(pilot_reading['stability_legacy'])}",
+                          "pass": (pilot_reading["null_max"] is not None
+                                   and pilot_reading["planted_share"] > pilot_reading["null_max"])}
     # M-NULL
     twin_cross = [t["consolidated_cross_n"] for t in twins]
     twin_planted = [t["planted_consolidated"] for t in twins]
@@ -414,7 +521,7 @@ def run(out: Path, rounds: int = THING_ROUNDS, twins_n: int = TWINS_N) -> dict:
     rows = _rows(tape_root)
     on = drive(tape_root, True, out / "run-on")
     off = drive(tape_root, False, out / "run-off")
-    p = pilot(on, rows)
+    p = pilot(on, rows, tape_root)
     seed = bench_seed()
     twins = []
     for k in range(twins_n):
@@ -444,10 +551,19 @@ def run(out: Path, rounds: int = THING_ROUNDS, twins_n: int = TWINS_N) -> dict:
     lines.append(f"web (OFF): t {off['web_t']} · stats {json.dumps(off['web_stats'], sort_keys=True)}")
     lines.append("")
     lines.append("THE PILOT (printed before any mark binds — #228):")
-    lines.append(f"  recurrence: {json.dumps({t: {'sightings': r['sightings'], 'distinct': r['distinct'], 'modal_n': r['modal_n']} for t, r in p['recurrence'].items()})}")
-    lines.append(f"  multi-hypothesis sightings: {p['multi_hyp_sightings']} · distinct s: tokens {p['distinct_tokens']} "
+    lines.append(f"  recurrence (the recognition key, AMENDMENT 1): "
+                 f"{json.dumps({t: {'sightings': r['sightings'], 'distinct': r['distinct'], 'modal': r['modal'], 'modal_share': r['modal_share']} for t, r in p['recurrence'].items()})}")
+    lines.append(f"  multi-hypothesis sightings: {p['multi_hyp_sightings']} · silent sightings (the declared "
+                 f"floor): {p['silent_sightings']} · distinct s: tokens {p['distinct_tokens']} "
                  f"· all-pairs collisions {p['collisions']}")
-    lines.append(f"  cross-boundary stability: {p['stability_ok']}/{len(p['stability'])}")
+    lines.append(f"  render-jitter sigma (the diagnostic of record — it killed the old form): "
+                 f"{json.dumps({t: {'sigma_mean': round(p['jitter_sigma'][t]['sigma_mean'], 4), 'sigma_max': round(p['jitter_sigma'][t]['sigma_max'], 4)} for t in TOY_THINGS})}")
+    lines.append(f"  cross-boundary stability, the OLD instrument's 16-comparison form (continuity): "
+                 f"{p['stability_legacy_ok']}/{len(p['stability_legacy'])}")
+    lines.append(f"  M-STABILITY's re-priced pieces: planted share {p['planted_share']:.4f} "
+                 f"(per thing {json.dumps(p['planted_share_per_thing'])}) · null pool {p['null_cell_pool']} cells "
+                 f"· null shares {[round(x, 4) for x in p['null_shares']]} · null MAX {p['null_max']:.4f} "
+                 f"· gap {p['stability_gap']:.4f}")
     for name in PLANTED:
         c = p["ceiling"][name]
         lines.append(f"  planted pair «{name}»↔{PLANTED[name]}: namings {c['chat_namings']} · sightings "
@@ -472,8 +588,8 @@ def run(out: Path, rounds: int = THING_ROUNDS, twins_n: int = TWINS_N) -> dict:
 
 
 def probe(out: Path) -> int:
-    """The pilot readings only (measured-first, RULES §6d): the recurrence, the collisions, the chances
-    ceiling — before any arm's marks are read."""
+    """The pilot readings only (measured-first, RULES §6d): the recurrence, the collisions, the
+    render-jitter σ, the chances ceiling — before any arm's marks are read."""
     work = out / "probe"
     if work.exists():
         shutil.rmtree(work)
@@ -482,7 +598,7 @@ def probe(out: Path) -> int:
     build_tape(work, clock)
     rows = _rows(work)
     on = drive(work, True, work / "probe-on")
-    p = pilot(on, rows)
+    p = pilot(on, rows, work)
     print(json.dumps({"pilot": p, "web_stats": on["web_stats"], "web_t": on["web_t"],
                       "census": on["census"]}, indent=2, default=str))
     return 0

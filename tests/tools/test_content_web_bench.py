@@ -94,19 +94,56 @@ class TestTokens(unittest.TestCase):
         self.assertEqual(cw.game_token("step", -0.5), "g:step:-")
         self.assertEqual(cw.game_token("step", 0.0), "g:step:0")
         self.assertEqual(cw.game_token("run", None), "g:run:none")
-        rng = np.random.default_rng(1)
-        v = rng.normal(size=144)
-        v = v / np.linalg.norm(v)
-        t1, t2 = cw.sight_token(v), cw.sight_token(v.copy())
-        self.assertEqual(t1, t2, "the s: token is deterministic")
-        self.assertTrue(t1.startswith("s:") and len(t1) == 2 + 8, "blake2b-32: a 4-byte digest, 8 hex")
-        other = rng.normal(size=144)
-        other = other / np.linalg.norm(other)
-        self.assertNotEqual(t1, cw.sight_token(other), "a different unit row maps elsewhere")
         self.assertEqual(cw.ear_tokens("star"), ["w:star"])
         self.assertEqual(cw.words_tokens(["you", "are", "alpha"]), ["w:you", "w:are", "w:alpha"])
         self.assertEqual(cw.TOKEN_SENSES, ("ear", "eye", "chat", "ask", "outcome"),
                          "the armed senses of v1, the law §1's own list")
+
+    def test_the_recognition_token_form(self) -> None:
+        """AMENDMENT 1's s: form at the organism level: an EMPTY store emits NO token (the declared
+        floor — the first canvas, whose feed reads the store on arrival, is silent); from the SECOND
+        read of the same canvas the token is s:c<id> — deterministic across two fresh minds."""
+        import re as _re
+        from creature.mind import Mind
+        from creature.tape import Tape
+        from genome import world
+        from tests.creature import _scene_tape as S
+        rgb, _t = world.render_canvas("circle", np.random.default_rng([B.BENCH_SEED, 0]))
+        node_sets = []
+        censuses = []
+        for _k in range(2):
+            tape_root = Path(tempfile.mkdtemp())
+            work = Path(tempfile.mkdtemp()) / "r"
+            try:
+                tape = Tape(tape_root)
+                clock = B._Clock()
+                for moment in ("m0", "m1"):          # the SAME canvas twice: m0 births, m1 re-reads
+                    tape.publish("ear", b"circle", {"moment": moment, "source": "toy", "word": "circle"},
+                                 "txt", at=clock())
+                    tape.publish("eye", S.png(rgb), {"moment": moment, "source": "toy"}, "png", at=clock())
+                work.mkdir(parents=True)
+                (work / "tape").symlink_to((tape_root / "tape").resolve(), target_is_directory=True)
+                gp = work.parent / "g.genome"
+                gp.write_text(genome_text())
+                m = Mind(gp, work, content_web=True)
+                feat = np.full(int(m.genome.sight_dim()), 1.0 / 12.0)
+                self.assertIsNone(cw.sight_token(m.org, feat), "the floor: an empty store yields NO token")
+                self.assertEqual(cw.eye_tokens(m.org, [feat]), [])
+                for row in B._rows(tape_root):
+                    m.consume(row)
+                m.close()
+                censuses.append(dict(m._cweb_counts))
+                node_sets.append(sorted(n for n in (m.webs["L"].nodes if m.webs else {})
+                                        if str(n).startswith("s:")))
+            finally:
+                shutil.rmtree(tape_root, ignore_errors=True)
+                shutil.rmtree(work.parent, ignore_errors=True)
+        print(f"[cweb-bench-unit tokens] censuses {censuses} · s: nodes {node_sets[0]}")
+        self.assertEqual(censuses[0], censuses[1], "deterministic x2")
+        self.assertTrue(node_sets[0], "presence: the re-read canvas left s: nodes")
+        self.assertTrue(all(_re.fullmatch(r"s:c\d+", n) for n in node_sets[0]),
+                        "every s: node is the recognition form s:c<cell id>")
+        self.assertEqual(node_sets[0], node_sets[1])
 
 
 class TestDerangement(unittest.TestCase):
