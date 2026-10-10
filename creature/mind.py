@@ -182,6 +182,12 @@ except ImportError:
 from creature import muse as _muse_mod
 from creature.muse import MUSE_BUDGET, MUSE_INHIBIT, MUSE_STEPS
 
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB (F1) §1
+# (docs/brain/content-web/PREREG-CONTENT-WEB.md, signed 2026-10-10 13:27): the content tokens. Pure
+# functions only; no circularity (creature/contentweb.py imports nothing of the organism — the muse
+# import's own form, above). genome/web.py is UNTOUCHED: the webs hear strings, as always.
+from creature import contentweb as _cweb
+
 # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:2x +0400 — D-G12/W3-1: Builder B's believe() gains
 # `ledgers=None, clash_enabled=True` on branch g4-wave3-b (genome-wt-e, commit 04a302a) — a different
 # worktree this branch must NOT include (creature/ is Builder A's, genome/ is Builder B's). Detected by
@@ -431,7 +437,7 @@ class Mind:
     is blind to (e.g. {"gaze"} runs the random-gaze twin, PREREG §2.9's --blind gaze)."""
 
     def __init__(self, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None,
-                 precision: bool = False, muse: bool = False):
+                 precision: bool = False, muse: bool = False, content_web: bool = False):
         self.genome_path = Path(genome_path)
         self.run_root = Path(run_root)
         self.genome_text = self.genome_path.read_text()
@@ -454,6 +460,14 @@ class Mind:
         # skip counts (a trigger-negative sentence is counted, a budget-suppressed firing is journaled).
         self.muse = muse
         self._muse: Dict[str, object] = {"heard": 0, "chains_started": 0, "chains": {}, "skipped": {}}
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB (F1) §1's
+        # wiring (docs/brain/content-web/PREREG-CONTENT-WEB.md, signed 2026-10-10 13:27): THE CONTENT WEB as a
+        # CONSTRUCTION PARAMETER — default False = byte-identical (the webs hear ear rows only, exactly as
+        # today; the N1/muse form; no genome/parser/machinery.py edit; nothing persisted beyond the web's own
+        # existing state). The census is in-memory instrument data (per-sense token counts — the accounting
+        # of the law's G-UNIT(d)/G-PLANT(i)), zeroed at every birth/resume and never snapshotted.
+        self.content_web = content_web
+        self._cweb_counts: Dict[str, int] = {s: 0 for s in _cweb.TOKEN_SENSES}
 
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — W3-0 (docs/G4-WAVE3-CLAUSES.md):
         # THE GENERIC REFUSAL, first — before any object is built from the genome (a refusal message must
@@ -1039,7 +1053,14 @@ class Mind:
             if w:
                 self.pending_words.setdefault(moment, []).append(w)
                 if self.webs is not None:
-                    self._web_hear(str(w))
+                    # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB
+                    # §1: under the flag the ear's word feeds as w:<word> (the node keys gain the prefix by
+                    # construction — the SAME vocabulary the chat/ask doors feed); OFF: the exact old call.
+                    if self.content_web:
+                        for _tok in _cweb.ear_tokens(str(w)):
+                            self._cweb_hear("ear", _tok)
+                    else:
+                        self._web_hear(str(w))
         elif sense == "eye":
             self._consume_eye(row, moment)
         # edit: Claude (Sonnet 5, G5 builder K), 2026-09-21 21:08 +0400 — G5-K: the three new tape senses. Each method
@@ -1154,6 +1175,12 @@ class Mind:
         if "OUTCOME" not in self.genome.declared:
             return
         meta = row.get("meta") or {}
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB §1: the game
+        # channel's token (g:<act>:<reward sign>, declared from the row's own keys) — under the flag, where the
+        # row is genuinely consumed (above the reflex bookkeeping; OFF: not one of these lines runs).
+        if self.content_web and self.webs is not None:
+            for _tok in _cweb.outcome_tokens(meta.get("act"), meta.get("got")):
+                self._cweb_hear("outcome", _tok)
         result = self._record_reflex(act=str(meta.get("act", "")), got=meta.get("got"), expected_in=meta.get("expected"),
                                        residual_in=meta.get("residual"), source=str(meta.get("source", "")))
         # edit: Claude (Sonnet 5, LIFE builder D), 2026-09-22 18:52 +0400 — LIFE-D-ACT-SOUND.md item 2
@@ -1677,6 +1704,13 @@ class Mind:
             self.chat_counters["refused_content"] += 1
         else:
             self.chat_counters["abstained"] += 1
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB §1: THE OPENED
+        # DOOR — the chat's consumed sentence feeds the webs as w: words (the ear's own vocabulary), under the
+        # flag, AFTER the door's own work above (the read-only law's hash guard already passed; the webs are not
+        # the organism — _chat_guard never covered them). OFF: not one of these lines runs.
+        if self.content_web and self.webs is not None:
+            for _tok in _cweb.words_tokens(heard):
+                self._cweb_hear("chat", _tok)
 
     # ------------------------------------------------------------------ THE MUSE (PREREG-CONTEMPLATE-1)
     # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 07:00 +0400 — the law's wiring (docs/brain/muse/
@@ -1716,7 +1750,21 @@ class Mind:
         st["heard"] = int(st["heard"]) + 1
         heard_n = int(st["heard"])
         mature = {str(w) for w in self.brain.L.mature_words()}
-        trig = _muse_mod.trigger(heard, self.webs.get("L"), _muse_mod.self_words(self.self_node), mature)
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB §1's declared
+        # composition: with the content web ON, the web's word vocabulary is the w:-prefixed one, so the
+        # trigger's web.nodes lookups are handed w:-tokenized words (the heard sentence, the self's words, the
+        # mature set alike) — the self/novel classes read EXACTLY as before (G-UNIT(e)'s pin), and the anchors
+        # come back to BARE words before the chain machinery, so the composer, the beliefs store and the
+        # question doors never see a prefix. Flag OFF: the exact old call.
+        if self.content_web:
+            trig_t = _muse_mod.trigger([_cweb.word_token(w) for w in heard], self.webs.get("L"),
+                                       {_cweb.word_token(w) for w in _muse_mod.self_words(self.self_node)},
+                                       {_cweb.word_token(w) for w in mature})
+            trig = {"fire": trig_t["fire"], "classes": list(trig_t["classes"]),
+                    "anchors": [a[len(_cweb.WORD_PREFIX):] if a.startswith(_cweb.WORD_PREFIX) else a
+                                for a in trig_t["anchors"]]}
+        else:
+            trig = _muse_mod.trigger(heard, self.webs.get("L"), _muse_mod.self_words(self.self_node), mature)
         if not trig["fire"]:
             return                      # a trigger-negative sentence is counted, never journaled
         chain_id = _muse_mod.seed_of(heard)
@@ -1897,6 +1945,15 @@ class Mind:
         canvas-less form (`begin`, `end`, `why`) is answered at once; any other is held for its moment's eye row, in tape order."""
         meta = row.get("meta") or {}
         payload = json.loads((_resolve_tape_dir(self.run_root, self.genome.declared.get("TAPE", {}).get("path")) / row["payload"]).read_text())
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB §1: the ask
+        # door's consumed sentence feeds the webs as w: words under the flag — the phrase (a say form) or the
+        # bare word (what/why forms), the muse's own reading of what the door consumed (_muse_heard_words's
+        # own cut, on the already-parsed payload). A begin/end carries no words: no tokens, never silently
+        # skipped (named by the law §1's own list). OFF: not one of these lines runs.
+        if self.content_web and self.webs is not None:
+            _phrase = payload.get("phrase") or ([payload["word"]] if payload.get("word") else [])
+            for _tok in _cweb.words_tokens([str(w) for w in _phrase if w]):
+                self._cweb_hear("ask", _tok)
         ask = {"seq": int(row["seq"]), "at": row["at"], "moment": meta.get("moment"), "payload": payload}
         if payload.get("form") in ("begin", "end", "why"):
             self._answer_ask(ask, None, str(row["at"]), None, {})
@@ -2136,6 +2193,27 @@ class Mind:
                 w.hear(word)
         except Exception as e:
             self._web_fail(e)
+
+    # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB (F1) §1
+    # (docs/brain/content-web/PREREG-CONTENT-WEB.md, signed 2026-10-10 13:27): the content feed. Every method
+    # here runs ONLY behind Mind(content_web=True) — flag OFF: not one of these lines runs (byte-identity,
+    # G-UNIT(a)). _cweb_hear is the ON road's SINGLE funnel (one _web_hear call per token, the ear's own
+    # cadence — the web's arithmetic never learns the difference) and the census's only writer (the
+    # per-sense token accounting of G-UNIT(d)/G-PLANT(i), in-memory instrument data, never snapshotted).
+    def _cweb_hear(self, sense: str, token: str) -> None:
+        self._cweb_counts[sense] = int(self._cweb_counts.get(sense, 0)) + 1
+        self._web_hear(token)
+
+    def _cweb_eye(self, g: Dict[str, object]) -> None:
+        """The SIGHT channel's tokens for one consumed canvas: ONE s: token per hypothesis of the glance,
+        in the glance's own order (the law's declared feed order). things_in_view is genome/brain.py:99's
+        own path (reused, never re-implemented); a malformed glance would already have raised in the
+        brain's own turn above, and the webs exist only beside a brain — so this never runs on a glance
+        the brain refused."""
+        from genome.brain import things_in_view
+        hyps, _X = things_in_view(g)
+        for tok in _cweb.eye_tokens([h.feat for h in hyps]):
+            self._cweb_hear("eye", tok)
 
     def _self_kinds_now(self) -> Optional[List[set]]:
         n = int(self.brain.n_calibrations) if self.brain is not None else 0
@@ -2695,6 +2773,14 @@ class Mind:
         # Neither branch runs without a brain or a held ask: every genome and tape without them is byte-identical.
         if self.brain is not None or self.pending_asks:
             self._brain_canvas(row, moment, g_eye, tape_words, rgb=rgb)
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB §1: the SIGHT
+        # channel's tokens. Under the flag (and only then), ONE s: token per hypothesis of THIS canvas's glance,
+        # in the glance's own order, fed where the row is consumed (tape order — the law's feed order). The
+        # glance → hypotheses path is genome/brain.py:99's things_in_view (reused, never re-implemented);
+        # `g` here is post-coarse-strip, which things_in_view never reads (it reads feats[:len(fix)]). The
+        # organism's road below is untouched: the webs are not the organism (OFF: not one of these lines runs).
+        if self.content_web and self.webs is not None:
+            self._cweb_eye(g)
         # edit: Claude (Sonnet 5, G5 builder J), 2026-09-21 21:30 +0400 — G-EYE-2/BIND (_bind_pool, above):
         # undeclared (the common case today) this is g["feats"] itself, unchanged — every existing `for x
         # in g["feats"]:` loop below now reads `org_feats` instead, with IDENTICAL contents when BIND is
@@ -4457,7 +4543,7 @@ class Mind:
 
     @classmethod
     def resume(cls, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None,
-               muse: bool = False) -> Tuple["Mind", int]:
+               muse: bool = False, content_web: bool = False) -> Tuple["Mind", int]:
         """Load the latest snapshot (if any) and return (mind, last_seq). No snapshot -> a fresh mind, 0.
 
         ALPHA4-PREREG.md §6 (EVOLVE): epoch-aware (`_latest_evolved_genome`, above) — a root that carries one
@@ -4475,8 +4561,12 @@ class Mind:
         # flag re-threads at resume exactly as at birth (the N1 precision= form; default False = byte-identical).
         # The chain STATE is in-memory and rebuilt fresh (the G5-E `_word_seen` precedent, named in the verdict
         # draft); the stores it reads (the beliefs file's statused rows, the question doors' files) are on disk.
+        # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB §1: the
+        # content_web flag re-threads at resume exactly as at birth (the muse form's own precedent, one line
+        # up); the census is in-memory instrument data, zeroed fresh (never snapshotted — nothing is persisted
+        # beyond the web's own existing state, which resumes through state/web.json as it always did).
         mind = cls(evolved_path if evolved_path is not None else genome_path, run_root, blind=blind, eye_front=eye_front,
-                   muse=muse)
+                   muse=muse, content_web=content_web)
         mind.snapshot_heal = heal
         mind.evolve_epoch = evolve_epoch
         state_dir = Path(run_root) / "state"
