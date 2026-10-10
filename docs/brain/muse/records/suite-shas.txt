@@ -1,0 +1,23 @@
+# CONTEMPLATE-1 suite + run evidence shas (RULES §14 — cited outputs are committed before a sha is final).
+# edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 08:07 +0400 — every run through
+# /data/dev/swarm/bin/slot (the ledger's own peaks named); logs live in the worktree's scratch/ (never
+# committed there); the suite lines below were read FROM the log files.
+#
+# branch: contemplate-1009; final bytes at the suites: 2f947bc (the bench commit; the only later commits
+# are this records file and docs/brain/muse/VERDICT-DRAFT-CONTEMPLATE-1.md — no code).
+#
+# genome suite:  «Ran 771 tests in 158.684s OK (skipped=1, expected failures=6)» · exit 0
+#   slot muse suite-genome cap 1G peak 860MB
+5095e630f0df6a1de86b5c280b3150a7931f5fc3a6e9471ac0ebb9f6078a7ddd  scratch/suite-genome-final.log
+# tools suite:  «Ran 1303 tests in 413.213s OK (skipped=33)» · exit 0
+#   slot muse suite-tools cap 2G peak 1571MB
+fcca984c12f4c41d263e9141d2a41c7a911d82b95b5d4265fb4535a9195fbb51  scratch/suite-tools-final.log
+# G-UNIT RED (823c02d, unmodified): «Ran 9 tests in 0.109s FAILED (errors=8)» · exit 1
+b4ae5a04e9c5fbf406b007a9c538ea18922343fb315822ee4ad1c11eb89c9799  scratch/gunit-red.log
+# G-UNIT GREEN (final trigger): «Ran 18 tests in 22.678s OK» · exit 0
+8c692b1f67fb3004a3fa7723bdaf077ce92eb129f0d1af9fab12472a4de4ceab  scratch/gunit-green5.log
+# the bench (ALL MARKS PASS): «BENCH VERDICT LINE: ALL MARKS PASS» · exit 0
+#   slot muse bench2 cap 1G peak 313MB (the law's bench ceiling: peak <= 1 GB)
+92ceb41d27dfe99e4f9db575c3cb902e1b54bf7ede010f282e34d2aa540600d0  scratch/bench2.log
+# identity legs (cap 1G): toy-master/toy-branch peak 94/93MB · bl2-master/bl2-branch peak 275/278MB
+#   (bl2-branch named from the ledger; master legs measured on their own runs)
