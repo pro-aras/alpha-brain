@@ -725,9 +725,9 @@ def main() -> int:
     peak = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024
     total_secs = time.process_time() - t0
     marks["M-COST"] = {"bar": "the whole assay <= 30 CPU-min, peak <= 1 GB (measured-first)",
-                       "cpu_seconds": total_secs, "tier1_b_secs": t1_secs, "tier2_secs": t2_secs,
-                       "plant_secs": plant_secs, "peak_rss_bytes_measured": peak,
-                       "pass": total_secs <= COST_CPU_BAR_S and peak <= COST_PEAK_BAR_BYTES}
+                       "pass": total_secs <= COST_CPU_BAR_S and peak <= COST_PEAK_BAR_BYTES,
+                       "measured": "cost.json (the one declared nondeterministic artifact — timings — "
+                                   "D-det; the reports carry the verdict, never the timings)"}
 
     verdict = {"gates": gates, "marks": marks, "tier2_verdict": t2["tier2_verdict"],
                "pilot": t2["pilot"], "flip_counts": t2["flip"], "null_counts": t2["nulls"],
