@@ -1,0 +1,16 @@
+# N2 G-IDENTITY (the law §2): flag OFF, byte-identical master vs branch — the N1 gate's own script and
+# inputs (scratch/n2/identity.py copied verbatim from genome-wt-n1's scratch/n1/; the inputs copied beside
+# it: scratch/n2/toytape (the 200-moment toy tape) and scratch/n2/bl2-500-tape (the 500-row bl2 segment);
+# every payload byte-identical to the n1 originals before any leg ran — 407 + 1 files compared, 0 differing).
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 12:2x +0400 — both legs REPRODUCE the journals
+# of record (N1's records/n1/identity-shas.txt; CONTENT-WEB's records/identity-shas.txt) to the digit:
+# the toy tape's a7280723… and the bl2 segment's 26dc80c6…. Branch = n2-1010 @ 39781fe (the G-UNIT GREEN
+# commit); master = /data/dev/genome @ 5a997b7. The genome inputs byte-identical between the trees (cmp,
+# both files). Each pair verified with cmp (exit 0), through slot seat n2-id-* with SLOT_MEM=2G; logs +
+# exits in scratch/n2/id/. The bl2 leg replays genome/brain/lives/BRAIN-LONG-2.genome; the toy leg
+# genome/G4-skeleton.genome; both legs flag-OFF by construction (replay never passes the flag). The
+# journals' row counts (200 / 662 > 0) guard the empty-replay trap named in VERDICT-CONTEMPLATE-1.
+a728072329aa82bbb2478f99ddc5a9527cc9625256c3218d15eec315461dfe02  scratch/n2/id/toy-master/journal.jsonl
+a728072329aa82bbb2478f99ddc5a9527cc9625256c3218d15eec315461dfe02  scratch/n2/id/toy-branch/journal.jsonl
+26dc80c60d4ec1739f4de1a93e327c850c59a11a762e1ecb7c21c43fc897ea9a  scratch/n2/id/bl2-master/journal.jsonl
+26dc80c60d4ec1739f4de1a93e327c850c59a11a762e1ecb7c21c43fc897ea9a  scratch/n2/id/bl2-branch/journal.jsonl

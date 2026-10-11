@@ -1,0 +1,18 @@
+E
+======================================================================
+ERROR: test_predict_trajectory (unittest.loader._FailedTest.test_predict_trajectory)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_predict_trajectory
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+  File "/data/dev/genome-wt-n2/tests/genome/test_predict_trajectory.py", line 22, in <module>
+    from genome.predict import (PRECISION_FLOOR, PRECISION_PRIOR, PRECISION_W_HI, PRECISION_W_LO,
+                                TRAJECTORY_ETA_M, TRAJECTORY_ETA_R, TRAJECTORY_KAPPA, Predictor)
+ImportError: cannot import name 'TRAJECTORY_ETA_M' from 'genome.predict' (/data/dev/genome-wt-n2/genome/predict.py)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

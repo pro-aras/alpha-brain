@@ -1,0 +1,50 @@
+N2 TRAJECTORY bench — the law's marks (PREREG-N2-TRAJECTORY)
+
+PILOT (PILOT_SEED 20261011, printed before the marks bind):
+    A[0,100): margin 0.015935 (mean|spe| 1.768504, n 100)
+    A[100,200): margin -0.001725 (mean|spe| 1.158998, n 100)
+    A[200,300): margin -0.000554 (mean|spe| 1.050757, n 100)
+    A[300,400): margin -0.001538 (mean|spe| 1.127004, n 100)
+    phase B gap 0.000830 -> eps 0.005
+
+M-PATH: FAIL — bar margin = mean|spe| - mean|tpe| over the pooled learning stretches EXCEEDS the 10 shuffled-delta twins' MAX (the smallest passing gap printed)
+    margin: 0.007567509278420648
+    n: 200
+    per_stretch: {'[0,100)': {'margin': 0.014632030347473624, 'n': 100}, '[100,200)': {'margin': 0.0005029882093670057, 'n': 100}}
+    twin_margins: [0.10816581619613608, 0.15577906783544648, 0.1824241766636172, 0.1025063642444044, 0.11739492377082872, 0.1275441477492647, 0.03532921207542561, 0.08940620550317302, 0.2582902905416491, 0.1180866111064951]
+    null_max: 0.2582902905416491
+    smallest_passing_gap: -0.25072278126322844
+
+M-STAT: PASS — bar phase B: mean|tpe| <= mean|spe| + eps (eps = 0.005, declared from the pilot)
+    mean_abs_tpe: 2.85061529806845
+    mean_abs_spe: 2.849698512876462
+    gap: 0.0009167851919880121
+    eps: 0.005
+    n: 200
+
+M-RAMP: FAIL — bar the planted ramp (s = 0.01): r in [s/2, 2s] after 200 ramp moments, and tpe < spe over the ramp's tail (the one-lag-unit arithmetic)
+    slope: 0.01
+    r_end: -0.006571359854995699
+    r_at_50: 0.026622001272792933
+    r_at_100: 0.008726845086824692
+    r_at_150: 0.0031200115536921744
+    r_at_200: -0.006571359854995699
+    tail_mean_abs_tpe: 2.7712056237322917
+    tail_mean_abs_spe: 2.7682989713899553
+    tail_gap: -0.0029066523423364465
+    n_tail: 100
+
+M-SCALE: PASS — bar median w over the whole run in [0.8, 1.25]
+    median_w: 0.9969469155966575
+    n: 600
+    clip_share: 0.0
+    clip_presence: 0
+
+M-COST: PASS — bar ON vs OFF per-row process_time overhead <= 5% (timings in cost.json)
+
+G-PLANT: PASS — bar the frozen-r arm's M-PATH margin is DEAD (< the twins' MAX — the instrument sees the mechanism absent before any pass is trusted)
+    plant_margin: 0.0
+    n: 200
+    null_max: 0.2582902905416491
+
+BENCH VERDICT LINE: AT LEAST ONE MARK FAILS
