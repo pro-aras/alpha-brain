@@ -561,6 +561,29 @@ def parse_genome(text: str) -> Genome:
                     g["declared"]["MOUTH"]["brain"] = "phrase per canvas"
                 if m.group(2):
                     g["declared"]["MOUTH"]["incremental"] = True
+            elif gene == "REGISTERS":
+                # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 19:0x +0400 — PREREG-BRAIN-LONG-6
+                # §1.3/§2 B1 (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): the ONE new genome line declaring
+                # the verdicted registers for the life that carries them — `REGISTERS content-web muse
+                # precision`, the word list 1..3 words from the fixed set {content-web, muse, precision}
+                # (each its own VERDICT: F1, CONTEMPLATE-1, N1). ABSENT (every genome on disk): NO key —
+                # byte-identical, pinned by tests/genome/test_parse_registers.py. PRESENT:
+                # declared["REGISTERS"][word] = True per declared word; the Mind self-wires its tri-state
+                # flags from the declaration (creature/mind.py, NOT pinned). A bare line, an unknown word,
+                # an underscore form, or a repeated word refuses BY NAME. This file is PINNED
+                # (brain/scene/cache.py's WORLD_CODE): this branch and brain/scene/world.py's seed maps
+                # share the law's ONE pinned window (the law §6): the redraw into the fresh root
+                # scene-organ-bl6 is this branch's own price.
+                words = a.split()
+                if not words or len(words) > 3:
+                    raise GenomeError(f"REGISTERS: cannot read {a!r} (PREREG-BRAIN-LONG-6 §1.3: 1..3 words from {{content-web, muse, precision}})")
+                bad = [w for w in words if w not in ("content-web", "muse", "precision")]
+                if bad:
+                    raise GenomeError(f"REGISTERS: unknown word {bad[0]!r} (one of content-web, muse, precision — PREREG-BRAIN-LONG-6 §1.3)")
+                if len(set(words)) != len(words):
+                    dup = [w for w in set(words) if words.count(w) > 1][0]
+                    raise GenomeError(f"REGISTERS: repeated word {dup!r} (a declaration never repeats itself — PREREG-BRAIN-LONG-6 §1.3)")
+                g["declared"]["REGISTERS"] = {w: True for w in words}
             # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY: "scene" joins "game" as a shape this branch does not take
             # (the drawn world's own grammar and dict are untouched; `WORLD scene …` has its own branch below).
             # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.2: "video" joins them (its own branch below).

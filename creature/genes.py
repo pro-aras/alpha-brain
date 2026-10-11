@@ -171,6 +171,15 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
     },
     # ---------------------------------------------------------------------------------------- the mind
     "mind": {
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 19:3x +0400 — PREREG-BRAIN-LONG-6
+        # §1.3/§2 B3 (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): REGISTERS' own row — the real call site
+        # is Mind.__init__'s tri-state declared read (precision/muse/content_web self-wire from
+        # declared["REGISTERS"]; explicit args override); the resume classmethod passes its tri-state
+        # through to the same read; absent (every genome on disk) = all three False, byte-identical
+        # (the negative control tests/creature/test_mind_registers_wiring.py).
+        "REGISTERS": "creature/mind.py:Mind.__init__ (the tri-state declared read: precision/muse/content_web self-wire "
+                     "from declared['REGISTERS'] when the caller passes None — the default; explicit True/False overrides) + "
+                     "Mind.resume (the classmethod's own tri-state passes through to the same read)",
         "FAST": "creature/mind.py:Mind.__init__ (Episodes built when declared) + Mind.resume (episodes.npz reloaded)",
         "PREDICT": "creature/mind.py:Mind.__init__ (Predictor built when declared) + Mind.resume (predictor rebuilt against the loaded org)",
         "PARK": "creature/mind.py:Mind.__init__ (Park built when declared)",

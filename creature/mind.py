@@ -437,7 +437,7 @@ class Mind:
     is blind to (e.g. {"gaze"} runs the random-gaze twin, PREREG §2.9's --blind gaze)."""
 
     def __init__(self, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None,
-                 precision: bool = False, muse: bool = False, content_web: bool = False):
+                 precision: Optional[bool] = None, muse: Optional[bool] = None, content_web: Optional[bool] = None):
         self.genome_path = Path(genome_path)
         self.run_root = Path(run_root)
         self.genome_text = self.genome_path.read_text()
@@ -452,13 +452,21 @@ class Mind:
         # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-09 14:26 +0400 — PREREG-N1-PRECISION §1's wiring:
         # the precision flag as a CONSTRUCTION PARAMETER, threaded to both Predictor builds (the init below and the
         # resume-path rebuild); default False = byte-identical, no genome/parser/machinery.py touch (the OW-3 form).
-        self.precision = precision
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 19:2x +0400 — PREREG-BRAIN-LONG-6 §1.3/§2 B3
+        # (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): the three register flags become TRI-STATE —
+        # None (every caller today) = read the genome's declared["REGISTERS"] (the parser's new line,
+        # machinery.py's ONE pinned window; ABSENT there = False — byte-identical for every genome on disk);
+        # explicit True/False = the caller's own word (the benches' form, unchanged). The resume classmethod
+        # passes its own tri-state through to this same read, and the resume-path Predictor rebuild re-threads
+        # precision from here, so the declaration governs birth and resume alike (verifier V5).
+        _reg = self.genome.declared.get("REGISTERS", {})
+        self.precision = precision if precision is not None else bool(_reg.get("precision", False))
         # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 07:00 +0400 — PREREG-CONTEMPLATE-1 §1's wiring
         # (docs/brain/muse/PREREG-CONTEMPLATE-1.md, signed 2026-10-09 23:01): THE MUSE as a CONSTRUCTION PARAMETER —
         # default False = byte-identical, not one muse line runs (the N1 form; no genome/parser/machinery.py edit).
         # The state is inert data: the heard-sentence count (the budget), the content-addressed chain store, and the
         # skip counts (a trigger-negative sentence is counted, a budget-suppressed firing is journaled).
-        self.muse = muse
+        self.muse = muse if muse is not None else bool(_reg.get("muse", False))
         self._muse: Dict[str, object] = {"heard": 0, "chains_started": 0, "chains": {}, "skipped": {}}
         # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:21 +0400 — PREREG-CONTENT-WEB (F1) §1's
         # wiring (docs/brain/content-web/PREREG-CONTENT-WEB.md, signed 2026-10-10 13:27): THE CONTENT WEB as a
@@ -466,7 +474,7 @@ class Mind:
         # today; the N1/muse form; no genome/parser/machinery.py edit; nothing persisted beyond the web's own
         # existing state). The census is in-memory instrument data (per-sense token counts — the accounting
         # of the law's G-UNIT(d)/G-PLANT(i)), zeroed at every birth/resume and never snapshotted.
-        self.content_web = content_web
+        self.content_web = content_web if content_web is not None else bool(_reg.get("content-web", False))
         self._cweb_counts: Dict[str, int] = {s: 0 for s in _cweb.TOKEN_SENSES}
 
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — W3-0 (docs/G4-WAVE3-CLAUSES.md):
@@ -4548,7 +4556,7 @@ class Mind:
 
     @classmethod
     def resume(cls, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None,
-               muse: bool = False, content_web: bool = False) -> Tuple["Mind", int]:
+               muse: Optional[bool] = None, content_web: Optional[bool] = None) -> Tuple["Mind", int]:
         """Load the latest snapshot (if any) and return (mind, last_seq). No snapshot -> a fresh mind, 0.
 
         ALPHA4-PREREG.md §6 (EVOLVE): epoch-aware (`_latest_evolved_genome`, above) — a root that carries one

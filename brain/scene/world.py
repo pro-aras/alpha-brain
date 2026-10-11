@@ -52,8 +52,17 @@ DAX_INDEX = DAX_SCENE - 1
 HELDOUT_SEED, N_HELDOUT, MIN_PARTNERS = 20260928, 6, 3
 SCENE_MIX: Tuple[Tuple[int, float], ...] = ((1, 0.4), (2, 0.4), (3, 0.2))
 SEPARATION_PX = 24                                # boxes separated by ≥ 24 px (three grid cells)
-WORLD_SEEDS: Tuple[int, ...] = (20261101, 20261102, 20261103)
-TEST_SEEDS: Dict[int, int] = {20261101: 20261201, 20261102: 20261202, 20261103: 20261203}
+WORLD_SEEDS: Tuple[int, ...] = (20261101, 20261102, 20261103, 20261211)
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 19:0x +0400 — PREREG-BRAIN-LONG-6 §1.2/§2 B2
+# (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): the scene world made lawful at brain-long-6's seed
+# 20261211 — the 10-09 launch-verdict's named item (bl5's known-seed refusal) repaired. WORLD_SEEDS
+# gains the seed; the three TEST maps gain its splits (s1b1 20261321 · fresh 20261521 · held 20261621 —
+# the +100/+300/+400 pattern's own discipline; all three verified NEVER used anywhere in the repo before
+# the law). The scene generator (train_scene) is untouched: the new seed is a new draw of the SAME world
+# form, never a new world. This file is WORLD_CODE: this map and genome/machinery.py's REGISTERS branch
+# share the law's ONE pinned window (the law §6): the redraw into the fresh root scene-organ-bl6 is this
+# map's own price, with the unchanged seeds' caches proven array-identical (G-CACHE-IDENTITY).
+TEST_SEEDS: Dict[int, int] = {20261101: 20261201, 20261102: 20261202, 20261103: 20261203, 20261211: 20261321}
 TOY_SEED, STAGE_SEED = 20261099, 20261100
 N_TRAIN, N_TEST = 10_000, 400
 READING_POINTS: Tuple[int, ...] = (250, 500, 1_000, 2_000, 5_000, 10_000)
@@ -68,11 +77,11 @@ _TWIN_REDRAWS = 1000
 # PREREG-S1B1R §2 with AMENDMENT 1 §2, §4 (h) (edit: Claude (Opus 5.5, S1b-1R builder), 2026-09-28 15:58 +0400): the FRESH test seeds, one per
 # world seed (the graded marks are read on these alone; 2026130x are S1c's world seeds — a different role), beside S1b-1's
 # own test set; SPEAK2, the NEED items: 60 THREE-thing scenes per seed in three kinds of 20.
-FRESH_TEST_SEEDS: Dict[int, int] = {20261101: 20261401, 20261102: 20261402, 20261103: 20261403}
+FRESH_TEST_SEEDS: Dict[int, int] = {20261101: 20261401, 20261102: 20261402, 20261103: 20261403, 20261211: 20261521}
 # edit: Claude (Opus 5.5, F-M6 builder), 2026-09-28 22:23 +0400 — PREREG-BRAIN-IN-BODY AMENDMENT 1 §2 (sha 45abeca2…): THE NEW TEST SET
 # «held» — test seeds never drawn before the amendment was signed, one per world seed; every split drawn as on the fresh set
 # (brain/scene/cache.py: SPEAK2 included); M6 holds 84 items there (M6_HELD), 42 on the fresh and older sets.
-HELD_TEST_SEEDS: Dict[int, int] = {20261101: 20261501, 20261102: 20261502, 20261103: 20261503}
+HELD_TEST_SEEDS: Dict[int, int] = {20261101: 20261501, 20261102: 20261502, 20261103: 20261503, 20261211: 20261621}
 TEST_SETS: Dict[str, Dict[int, int]] = {"s1b1": TEST_SEEDS, "fresh": FRESH_TEST_SEEDS, "held": HELD_TEST_SEEDS}
 M6_HELD = 2 * (M6_TWO + M6_THREE)                   # 84 on «held»: items 0..41 are today's, 42..83 the same rule on i − 42
 SPEAK2_PER_KIND = 20
