@@ -1,0 +1,11 @@
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 01:08 +0400 — every 5 minutes from
+# brain-long-6's launch until the copy is DONE (then disable it) — bl5-origin-fallback.timer's form, renamed.
+# Install: ~/.config/systemd/user/bl6-origin-fallback.timer
+[Unit]
+Description=bl6 origin fallback copy, every 5 min
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+OnActiveSec=1min
+[Install]
+WantedBy=timers.target

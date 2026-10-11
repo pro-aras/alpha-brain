@@ -1,0 +1,12 @@
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 01:08 +0400 — PREREG-BRAIN-LONG-6 (the law
+# SIGNED): brain-long-6's FALLBACK origin copy (PREREG-HEARS-2 AMENDMENT 2 A2.3 (6)(c) —
+# bl5-origin-fallback.service's form, renamed): when the life's STATUS shows the scene world ENDED, copy the
+# life's state/prev generation READ-ONLY, checked against the generation's own SNAPSHOT.json manifest, then
+# DONE (every later run exits at once). The script is /data/dev/swarm/bin/origin_fallback_copy.py, UNCHANGED.
+# Install: ~/.config/systemd/user/bl6-origin-fallback.service
+[Unit]
+Description=bl6 origin fallback copy (read-only; HEARS-2 A2.3 (c))
+[Service]
+Type=oneshot
+Nice=10
+ExecStart=/usr/bin/python3 -B /data/dev/swarm/bin/origin_fallback_copy.py /data/dev/genome-lives/brain-long-6 /data/dev/brain-runs/alpha-6/brain-long-6-origin-fallback
