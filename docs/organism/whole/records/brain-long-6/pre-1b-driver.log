@@ -1,0 +1,52 @@
+VERIFY OK: 55 files named, every sha256 matches (/data/dev/brain-runs/alpha-6/bl5-preflight-toy/video-shelf)
+[launch_long brain-long-6-pre-1b] fence: 4 lines in /home/ahmad/.config/systemd/user/creature-brain@brain-long-6-pre-1b.service.d/fence.conf
+Preparing worktree (detached HEAD 5a0c364)
+HEAD is now at 5a0c364 preflight_bl6.sh: the presence check's read-path fix (web['webs'][rule]['nodes'] — the first writer read web.get(rule), measured wrong the first time and caught by reading the real file; the pre-1 run's web carried s:1540/w:63/g:35 at 2,000 moments — the feed works; the instrument's read was the fault). pre-1 closes lawfully; the re-run reads as pre-1b. — Kimi K3 (the seat alone)
+[launch_brain brain-long-6-pre-1b] checkout /data/dev/genome-lives/brain-long-6-pre-1b/code at 5a0c364
+A seam life <name> (root /data/dev/genome-lives/<name>): systemctl --user enable --now creature-g5@<name>.service creature-g5-watch@<name>.timer
+A brain-in-body life <name> (root /data/dev/genome-lives/<name>): systemctl --user enable --now creature-brain@<name>.service
+Created symlink '/home/ahmad/.config/systemd/user/default.target.wants/creature-brain@brain-long-6-pre-1b.service' → '/home/ahmad/.config/systemd/user/creature-brain@.service'.
+● creature-brain@brain-long-6-pre-1b.service - creature-brain brain-long-6-pre-1b — a brain-in-body life (root /data/dev/genome-lives/brain-long-6-pre-1b)
+     Loaded: loaded (/home/ahmad/.config/systemd/user/creature-brain@.service; enabled; preset: enabled)
+    Drop-In: /home/ahmad/.config/systemd/user/creature-brain@brain-long-6-pre-1b.service.d
+             └─fence.conf
+[launch_brain brain-long-6-pre-1b] STATUS after 20 s: {'moments': 70, 'tape_rows': 41, 'cells': 74, 'crash': None, 'scene': {'published_moments': 0, 'train_done': False, 'sitting_done': {}, 'ended': False}}
+[launch_brain brain-long-6-pre-1b] next: read the life's tape/journal against docs/brain/body/PREREG-BRAIN-IN-BODY.md's own gates
+Created symlink '/home/ahmad/.config/systemd/user/timers.target.wants/creature-g5-watch@brain-long-6-pre-1b.timer' → '/home/ahmad/.config/systemd/user/creature-g5-watch@.timer'.
+Created symlink '/home/ahmad/.config/systemd/user/timers.target.wants/creature-brain-series@brain-long-6-pre-1b.timer' → '/home/ahmad/.config/systemd/user/creature-brain-series@.timer'.
+Created symlink '/home/ahmad/.config/systemd/user/timers.target.wants/creature-brain-health@brain-long-6-pre-1b.timer' → '/home/ahmad/.config/systemd/user/creature-brain-health@.timer'.
+ActiveState=active
+MemoryHigh=17179869184
+MemoryMax=21474836480
+Mon 2026-10-12 00:20:00 +04      3min 42s -                                      - creature-brain-series@brain-long-6-pre-1b.timer creature-brain-series@brain-long-6-pre-1b.service
+-                                       - Mon 2026-10-12 00:16:17 +04     23ms ago creature-brain-health@brain-long-6-pre-1b.timer creature-brain-health@brain-long-6-pre-1b.service
+-                                       - Mon 2026-10-12 00:16:17 +04     23ms ago creature-g5-watch@brain-long-6-pre-1b.timer     creature-g5-watch@brain-long-6-pre-1b.service
+[fence] 2 lines, 4G/4G, daemon-reloaded (live at the unit's next start)
+[1] alive past the first calibration: {"moments": 2000, "last_seq": 1210, "learned": 378, "restored": null, "calibrations": 1, "video": {"published_rows": 23, "published_canvases": 10, "loop": 0, "ended": false}, "crash": null, "scene": {"published_moments": 376, "train_done": false, "sitting_done": {}, "ended": false}, "sense_restarts": 0, "turns": {"turns": 378, "said": 105, "asked": 47, "voiced": 105}}
+[1] content-web live: 786 s: nodes, 70 w: nodes in the live web
+[1] video rows eye 312 ear 401 · the first 40 video rows == the shelf's own · front 7501/7501 canvas rows · voice rows 5628 · say answers with n_readbacks 0/0
+[1] muse journal rows: 0 (the planted chat pair lands with the pre-flight's own chat write if any — the budget form)
+[1] precision: 7501 lr rows, 4602 at the clip pair (the register's fingerprint grows the interior share as it settles)
+[1] NAMED: no say answer inside the flight's ≤1 h price — the row-level live form reads on the launch's first day (M-MOUTH's own wall)
+[1] RSS 1842.65 MB against the DECLARED 4G fence (S2)
+[2] after the hard kill: {"moments": 43985, "last_seq": 24143, "learned": 7618, "restored": true, "calibrations": 1, "video": {"published_rows": 757, "published_canvases": 333, "loop": 15, "ended": false}, "crash": null, "scene": {"published_moments": 7462, "train_done": false, "sitting_done": {}, "ended": false}, "sense_restarts": 0, "turns": {"turns": 7618, "said": 5810, "asked": 2686, "voiced": 5810}}
+[3] the video world kept flowing: eye rows 334
+Removed '/home/ahmad/.config/systemd/user/timers.target.wants/creature-g5-watch@brain-long-6-pre-1b.timer'.
+Removed '/home/ahmad/.config/systemd/user/timers.target.wants/creature-brain-series@brain-long-6-pre-1b.timer'.
+Removed '/home/ahmad/.config/systemd/user/timers.target.wants/creature-brain-health@brain-long-6-pre-1b.timer'.
+Removed '/home/ahmad/.config/systemd/user/default.target.wants/creature-brain@brain-long-6-pre-1b.service'.
+[close_brain brain-long-6-pre-1b] STOPPED-AT 2026-10-12 00:27 +0400
+[close_brain brain-long-6-pre-1b] is-enabled: disabled
+[close_brain brain-long-6-pre-1b] is-active:  inactive
+[close_brain brain-long-6-pre-1b] default.target.wants:
+alpha-ops.service
+alpha3-stdout-tail.service
+claude-seat.service
+creature-brain@brain-long-5.service
+graphify-watch.service
+minipc-health.timer
+panel-executor.service
+snap.prompting-client.daemon.service
+snap.snapd-desktop-integration.snapd-desktop-integration.service
+thermal-cap.service
+PREFLIGHT PASS: brain-long-6-pre-1b (kill) on 5a0c364

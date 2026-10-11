@@ -1,0 +1,8 @@
+SPLIT creature on 59fe43507680a30d43109eb5ab27a67c3dff9d1b (/data/dev/genome) · 2026-10-11 19:58:15 +0400 · parts 3 · cap 10G swap 1G · expected Ran 1525
+files 147 under tests/creature (test*.py, recursive; 0 in subdirectories) · patterns ['test_[a-f]*.py', 'test_[g-s]*.py', 'test_[t-z]*.py'] · files per pattern [41, 74, 32] · in exactly one pattern: 147
+PARTITION EXACT
+slot exit 0 at 2026-10-11 20:26:35 +0400
+part 1 (test_[a-f]*.py): exit 0 · Ran 456 tests in 541.203s OK (skipped=5)  · memory.peak 8871686144 bytes
+part 2 (test_[g-s]*.py): exit 0 · Ran 703 tests in 802.930s OK (skipped=1)  · memory.peak 10737418240 bytes
+part 3 (test_[t-z]*.py): exit 0 · Ran 366 tests in 351.909s OK  · memory.peak 10737418240 bytes
+SUM Ran 1525 vs expected 1525 · every part exit 0: yes · split verdict exit 0
