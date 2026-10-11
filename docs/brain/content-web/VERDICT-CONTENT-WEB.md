@@ -56,7 +56,7 @@ the `s:` token's granularity.
 - The builder's named items stand in the record: the muse walk's rest-under-ON (unpinned by the law;
   named), the toy's absent ask rows (the ask w: form pinned at G-UNIT only), the creature cap-ride.
 
-## Verdict
+## Verdict (FIRST sitting, the law as signed 13:27)
 
 **FAIL-FORM** (§4 row 2: «the content keys churn» — measured). No bar loosened; the FAIL is the
 result of record for the 0.05-quantization token form. NEXT: AMENDMENT 1 re-prices the `s:` token to
@@ -65,3 +65,48 @@ form), the pilot measuring the recognition key's recurrence/collisions FIRST, th
 unchanged. The alternative road (a cycled fixed-canvas toy) is REFUSED as the amendment's subject:
 it would make the bench vacuous about exactly what F1 claims (recurrence under natural render
 variation) — recorded as considered and rejected.
+
+## The SECOND sitting (AMENDMENTS 1 + 2) — **PASS**
+
+edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-10 19:4x +0400 — the seat built the
+amendments alone (Ahmad's 10-10 16:4x rule: no kimi subagents; agent-48's partial amendment work was
+reviewed and finished by the seat). Under AMENDMENT 1 (the recognition token `s:c<id>`) + AMENDMENT 2
+(the event-matched null), the bench reads **ALL MARKS PASS** (run of record bench-run3, committed
+under records/; the seat's own runs — every mark read from the seat's own report):
+
+- **M-CROSS — PASS**: 2 consolidated s:↔w: edges per planted kind (alpha, zeta); OFF reads EXACTLY 0
+  s:/g: nodes, byte-proven (ON 2,929/138 keys).
+- **M-GROUND — PASS**: the heard-only-through-the-chat-door names ground onto the seen-only things:
+  alpha↔s:c80 (c=9, occ=9, Poisson tail 1.3e-08), zeta↔s:c34 (c=9, occ=9, tail 1.0e-08) — the law's
+  core claim (the channels cross) is measured.
+- **M-CHAT — PASS**: both names enter the web ON, absent OFF — the 00:32 closed-door finding is CLOSED
+  at bench scale by the build, and the regression pin holds.
+- **M-STABILITY — PASS** (AMENDMENT 1's form): the planted things' recurrence share 0.5167 vs the
+  10-draw uniform-assignment null's MAX 0.1167 — gap 0.40 (the smallest passing gap printed). The
+  legacy 16/16 form reads 5/16, printed for continuity. The pilot of record: the recognition key
+  recurs with modal shares 0.33–0.76 per thing (41 distinct cells over 240 sightings), 46 all-pairs
+  collisions (the organism's recognition is CONCENTRATED at bench scale — the hub reading, printed,
+  never smoothed), the render-jitter σ per component 0.010–0.016 mean / ≤ 0.071 max (the diagnostic
+  that killed the old form), 1 silent sighting (the declared empty-store floor, honest).
+- **M-NULL — PASS** (AMENDMENT 2's form): 0/10 misaligned twins consolidate the planted PAIR; the
+  real run's 10 consolidated cross edges exceed the derangement twins' MAX 6; the hub readings
+  printed per twin (alpha: 1 stray edge in 2 twins; zeta: 0–2). The deranged twins' planted-pair
+  readings (9/10 consolidate by hub-chance) stand on the record as the legacy reading — the measured
+  reason the amendment exists.
+- **M-COST — PASS**: +1.8 % (the hoist; the per-call-copy form measured +11.8 % and was fixed as an
+  efficiency fault — the bar never moved).
+- **G-PLANT**: all three plants caught (the double-ear census; the collapse-to-one-cell distinctness
+  plant; the always-cell-0 plant) PLUS AMENDMENT 2's placement plant (a doctored misaligned draw
+  violating the window raises loudly).
+- **G-DET**: two full runs byte-identical except the cost timings and the snapshots' mtime stamps
+  (every evidence file identical; the prints' SIZES identical).
+- Two REAL defects were caught by the instruments during the amendment build (the null's odd-k
+  rotation would have self-targeted — the null's exact opposite; and a stale-slot index shift —
+  assert_misaligned fired) — both fixed, both named here; the instruments failed before the marks
+  could lie.
+
+**Verdict of record: FAIL-FORM for the law's first token form; PASS under AMENDMENTS 1 + 2.** The
+organism's knowledge web is now amodal at bench scale: every armed channel feeds it, content nodes
+consolidate beside word nodes, and a name heard only through one door grounds onto content only ever
+seen — the human claim's machine form, measured, with the organism's own recognition as the content
+key. The merge to master follows the suites' greens (the creature split is the merge gate).
