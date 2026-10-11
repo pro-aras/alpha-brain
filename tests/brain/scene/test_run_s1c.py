@@ -86,10 +86,14 @@ class TestFixedTestSet(unittest.TestCase):
         cls.states.append(L2)
 
     def test_counts_and_per_word_n(self) -> None:
-        self.assertEqual(len(self.test.name_truth), 472)
-        self.assertEqual(len(self.test.m1), 1193)
-        self.assertEqual(min(self.test.word_n.values()), 57)
-        self.assertEqual(self.test.word_n["big"] + self.test.word_n["small"], 472)
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 00:1x +0400 — PREREG-BRAIN-LONG-6 §1.2 (the law
+        # SIGNED; SEAT-LINE sha256 2c6bb22b…): the pin's counts gain the law's declared 4th world seed's battery
+        # (20261211: NAME +163, M1 +397 — the questions run's own print; the values below MEASURED from the built
+        # FixedTestSet, never hand-typed: seat's slot run bl6-s1c-counts). The pin working, caught at the launch gate.
+        self.assertEqual(len(self.test.name_truth), 635)
+        self.assertEqual(len(self.test.m1), 1590)
+        self.assertEqual(min(self.test.word_n.values()), 73)
+        self.assertEqual(self.test.word_n["big"] + self.test.word_n["small"], 635)
 
     def test_the_batched_readers_are_the_learners_own_calls(self) -> None:
         for L in self.states:
