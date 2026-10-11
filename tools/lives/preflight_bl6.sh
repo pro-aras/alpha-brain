@@ -76,10 +76,15 @@ st | grep -q '"published_moments": 0' && fail "the scene world published nothing
 import json, sys
 from pathlib import Path
 root = Path(sys.argv[1])
-# (a) the content web ON: s:-prefixed content nodes in the web state
+# (a) the content web ON: s:-prefixed content nodes in the web state (the snapshot's own form:
+# web["webs"][rule]["nodes"] — measured the FIRST time wrongly (web.get(rule)) by this driver's first
+# writer, caught by reading the real file: the pre-1 run's web carried s: 1,540 / w: 63 / g: 35 nodes
+# at 2,000 moments — the feed works; only the read path was wrong. The pin class: instrument errors
+# read their OWN read).
 web = json.load(open(root / "state" / "web.json"))
-s_nodes = sum(1 for rule in ("L", "N") for k in (web.get(rule) or {}).get("nodes", {}) if str(k).startswith("s:"))
-w_nodes = sum(1 for rule in ("L", "N") for k in (web.get(rule) or {}).get("nodes", {}) if str(k).startswith("w:"))
+webs = web.get("webs") or {}
+s_nodes = sum(1 for rule in ("L", "N") for k in (webs.get(rule) or {}).get("nodes", {}) if str(k).startswith("s:"))
+w_nodes = sum(1 for rule in ("L", "N") for k in (webs.get(rule) or {}).get("nodes", {}) if str(k).startswith("w:"))
 assert s_nodes > 0, f"no s: content nodes in the web (content_web declared): prefixes read: {s_nodes} s:, {w_nodes} w:"
 print(f"[1] content-web live: {s_nodes} s: nodes, {w_nodes} w: nodes in the live web")
 PYEOF
