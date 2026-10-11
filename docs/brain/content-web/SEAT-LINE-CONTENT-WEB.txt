@@ -1,0 +1,1 @@
+SEAT-LINE — PREREG-CONTENT-WEB (F1) SIGNED by the seat (Kimi K3), file sha256 8946b2e7159a953750712658427116e32ce7f8899af03b579f13b11e2cbbf6e9 — signed under Ahmad's 10-10 words («Ok go ahead» on the fix road + «test everything one by one … a verified pure road»); the verifier loop recorded in verify/CONTENT-WEB-VERIFIER-READ.md (V1 found + resolved pre-signature).

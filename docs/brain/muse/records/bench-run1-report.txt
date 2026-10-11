@@ -1,0 +1,44 @@
+CONTEMPLATE-1 muse bench — the law's marks (PREREG-CONTEMPLATE-1 §3)
+
+toy: things ['circle', 'square', 'triangle', 'cross', 'ring', 'bar', 'dot', 'star'] x 30 rounds · hearsay ('you', 'are', 'alpha') x 12 · rows 666 · sleeps 9
+web: {"t": 341, "nodes": {"you": 12, "are": 12, "alpha": 12, "star": 37, "circle": 38, "square": 38, "the": 2, "is": 0, "big": 0, "zog": 0, "vex": 0}, "consolidated": ["alpha|are", "alpha|you", "are|you"], "consolidated_n": 3, "mature_n": 8, "control_mature": {"circle": true, "big": false}}
+
+M-CHAIN: PASS — bar exactly one chain on the planted sentence; >= 1 tentative belief AND >= 1 counter-question (printed, presence counts); the control spawns NONE
+    chains_started: 1
+    beliefs: 3
+    questions: 3
+    question_words: ['you', 'are', 'alpha']
+    steps: ['you', 'are', 'alpha']
+    control_chain_present: False
+
+M-HONEST: PASS — bar the immediate answer to the planted sentence stays an abstention (same breath)
+    answer: None
+    say_has_muse_key: False
+
+M-TENTATIVE: PASS — bar no trusted read (the store both modes, the SELF's trusted claims, the composer's believed sets) contains a tentative row's content; presence counts
+    statused_on_disk: 6
+    trusted_leaks: 0
+    self_claims_n: 8
+    self_muse_sourced: 0
+    tentative_reask_answer: None
+
+M-FRUIT: PASS — bar after the chain's questions are answered by the bench's parent AND one consolidation pass, the re-ask yields a non-null answer whose words trace to the chain's tentative rows (the trace printed). NULL: the 10 shuffled twins spawn no self-chains and no fruit
+    promoted_pairs: [[5, 8], [6, 9], [7, 10]]
+    sleeps: 9
+    fruit_answer: ['you', 'are', 'alpha']
+    trace: [['you', 5, 8], ['are', 6, 9], ['alpha', 7, 10]]
+    twin_budget_skips: 20
+    twin_chains_extra: 0
+    twin_reask_answers: [None, None, None, None, None, None, None, None, None, None]
+
+M-COST: PASS — bar ON vs OFF process_time overhead <= 5% (N1's own measure)
+    cpu_on_s: 7.858077346
+    cpu_off_s: 7.583982306000001
+    overhead: 0.03614130794887944
+    sentences_heard: 24
+
+G-PLANT: PASS — bar the doctored trigger (fires on EVERY sentence) is CAUGHT by the control-sentence check — the plant arm's control spawns a chain
+    plant_calls: 1
+    plant_control_chains: 1
+
+BENCH VERDICT LINE: ALL MARKS PASS

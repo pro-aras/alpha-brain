@@ -1,0 +1,10 @@
+{"line": 0, "kind": "belief", "word": "x", "cells": [98, 99], "episodes": [0], "moment": 100, "clashes": []}
+{"line": 1, "kind": "belief", "word": "w", "cells": [11, 22], "episodes": [1], "moment": 101, "clashes": []}
+{"line": 2, "kind": "belief", "word": "w", "cells": [33, 44], "episodes": [2], "moment": 102, "clashes": []}
+{"line": 3, "kind": "clash", "word": "w", "clashes": [1, 2], "moment": 102}
+{"kind": "revisit", "of": 2, "word": "w", "episodes_added": [3], "moment": 103}
+{"line": 5, "kind": "belief", "word": "w", "cells": [11, 22], "episodes": [4], "moment": 104, "clashes": []}
+{"line": 6, "kind": "clash", "word": "w", "clashes": [2, 5], "moment": 104}
+{"kind": "revisit", "of": 5, "word": "w", "episodes_added": [5], "moment": 105}
+{"line": 8, "kind": "belief", "word": "w", "cells": [33, 44], "episodes": [6], "moment": 106, "clashes": []}
+{"line": 9, "kind": "clash", "word": "w", "clashes": [5, 8], "moment": 106}

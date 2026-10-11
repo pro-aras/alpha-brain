@@ -1,0 +1,182 @@
+[
+  {
+    "k": 0,
+    "consolidated_cross_n": 1,
+    "planted_consolidated": true,
+    "web_t": 534,
+    "stats": {
+      "events": 1562,
+      "offered": 545,
+      "realised": 545,
+      "refused": 0,
+      "replaced": 1,
+      "removed_missed": 13,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 3,
+      "evidence": 1017
+    }
+  },
+  {
+    "k": 1,
+    "consolidated_cross_n": 3,
+    "planted_consolidated": true,
+    "web_t": 534,
+    "stats": {
+      "events": 1544,
+      "offered": 543,
+      "realised": 543,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 13,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 5,
+      "evidence": 1001
+    }
+  },
+  {
+    "k": 2,
+    "consolidated_cross_n": 4,
+    "planted_consolidated": true,
+    "web_t": 534,
+    "stats": {
+      "events": 1549,
+      "offered": 542,
+      "realised": 542,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 9,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 6,
+      "evidence": 1007
+    }
+  },
+  {
+    "k": 3,
+    "consolidated_cross_n": 6,
+    "planted_consolidated": true,
+    "web_t": 534,
+    "stats": {
+      "events": 1556,
+      "offered": 543,
+      "realised": 543,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 13,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 9,
+      "evidence": 1013
+    }
+  },
+  {
+    "k": 4,
+    "consolidated_cross_n": 4,
+    "planted_consolidated": true,
+    "web_t": 534,
+    "stats": {
+      "events": 1554,
+      "offered": 542,
+      "realised": 542,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 9,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 7,
+      "evidence": 1012
+    }
+  },
+  {
+    "k": 5,
+    "consolidated_cross_n": 2,
+    "planted_consolidated": true,
+    "web_t": 534,
+    "stats": {
+      "events": 1561,
+      "offered": 532,
+      "realised": 532,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 10,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 7,
+      "evidence": 1029
+    }
+  },
+  {
+    "k": 6,
+    "consolidated_cross_n": 1,
+    "planted_consolidated": true,
+    "web_t": 534,
+    "stats": {
+      "events": 1557,
+      "offered": 541,
+      "realised": 541,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 10,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 3,
+      "evidence": 1016
+    }
+  },
+  {
+    "k": 7,
+    "consolidated_cross_n": 2,
+    "planted_consolidated": false,
+    "web_t": 534,
+    "stats": {
+      "events": 1551,
+      "offered": 539,
+      "realised": 539,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 11,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 3,
+      "evidence": 1012
+    }
+  },
+  {
+    "k": 8,
+    "consolidated_cross_n": 2,
+    "planted_consolidated": true,
+    "web_t": 534,
+    "stats": {
+      "events": 1554,
+      "offered": 556,
+      "realised": 556,
+      "refused": 0,
+      "replaced": 12,
+      "removed_missed": 12,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 5,
+      "evidence": 998
+    }
+  },
+  {
+    "k": 9,
+    "consolidated_cross_n": 1,
+    "planted_consolidated": true,
+    "web_t": 534,
+    "stats": {
+      "events": 1562,
+      "offered": 535,
+      "realised": 535,
+      "refused": 0,
+      "replaced": 0,
+      "removed_missed": 15,
+      "sprouted": 0,
+      "sprout_existing": 0,
+      "consolidated": 3,
+      "evidence": 1027
+    }
+  }
+]

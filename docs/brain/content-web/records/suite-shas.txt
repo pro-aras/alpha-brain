@@ -1,0 +1,28 @@
+# CONTENT-WEB (F1) suite + run evidence shas (RULES §14 — cited outputs are committed before a sha is
+# final). edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 14:59 +0400 — every run through
+# /data/dev/swarm/bin/slot (the ledger's own peaks named); logs live in the worktree's scratch/ (never
+# committed there); the suite lines below were read FROM the log files.
+#
+# branch: cweb-1010; final bytes at the suites: 9d42d0e (the records commit — the only later commits
+# are this records file and docs/brain/content-web/VERDICT-DRAFT-CONTENT-WEB.md — no code).
+#
+# genome suite:  «Ran 771 tests in 160.972s OK (skipped=1, expected failures=6)» · exit 0
+#   slot cweb suite-genome cap 2G peak 860MB
+e7d43e10a97e00862d4d6fc8123b79abf2aaa6a11454775d0c78bd170da8d90c  scratch/cweb-suite-genome.log
+# tools suite:  «Ran 1313 tests in 440.476s OK (skipped=33)» · exit 0  (the 6 new bench tests inside)
+#   slot cweb suite-tools cap 2G peak 1631MB
+ac0cce329094a54b31d02a20c2a7a02241ef26c33c25f9555f2c344c6c5ebd39  scratch/cweb-suite-tools.log
+# creature touched-paths subset (19 modules — every sense path the wiring touches; the seat's full
+# creature split runs at merge):  «Ran 206 tests in 401.881s OK (skipped=1)» · exit 0
+#   slot cweb suite-creature-touched cap 2G peak 2048MB (AT the cap; 833MB swap; green regardless)
+30e8e24d4556785fadf22b37a9858bf92182c655ba2e1e80375511e8075ce929  scratch/cweb-suite-creature-touched.log
+# G-UNIT RED (35ea7e8, unmodified): «Ran 10 tests in 0.901s FAILED (errors=10)» · exit 1
+a3e31766d3d7521df7e15f86a3a5f30282bacfa68d40cef9c0c9133175e53dac  scratch/cweb-gunit-red.log
+# G-UNIT GREEN (final wiring): «Ran 10 tests in 16.462s OK» · exit 0
+ae2d589fc7da5c9c60ba72acf35ef783b995236bfbef6a90ee2919ddd8a95e89  scratch/cweb-gunit-green3.log
+# the bench (the run of record; «BENCH VERDICT LINE: AT LEAST ONE MARK FAILS» — the law's §4 FAIL-FORM
+# row, the content keys churn): exit 1 BY DESIGN (a failing mark is a result)
+#   slot cweb bench2 cap 2G peak 307MB
+1a03d576effff78b89dcf452ed401d458ea75e4884480cb7e05552ca4fe77f77  scratch/cweb-bench2.log
+# identity legs (cap 2G): toy-master/toy-branch peak 92/92MB · bl2-master/bl2-branch peak 274/275MB
+#   (all four journals reproduce the shas of record — records/identity-shas.txt)

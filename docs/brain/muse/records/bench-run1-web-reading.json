@@ -1,0 +1,27 @@
+{
+  "t": 341,
+  "nodes": {
+    "you": 12,
+    "are": 12,
+    "alpha": 12,
+    "star": 37,
+    "circle": 38,
+    "square": 38,
+    "the": 2,
+    "is": 0,
+    "big": 0,
+    "zog": 0,
+    "vex": 0
+  },
+  "consolidated": [
+    "alpha|are",
+    "alpha|you",
+    "are|you"
+  ],
+  "consolidated_n": 3,
+  "mature_n": 8,
+  "control_mature": {
+    "circle": true,
+    "big": false
+  }
+}

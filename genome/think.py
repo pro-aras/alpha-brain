@@ -116,6 +116,20 @@ to the last detail — decide and write it down, never guess silently: SOLUTIONS
      DISJOINT (no cell in common) are a clash; overlapping cells (even partially) are not — the belief
      is read as the same underlying claim, merely extended. A clash never edits either row; it opens a
      NEW row of kind "clash" naming both old rows' line numbers, appended to the same beliefs.jsonl.
+
+edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-10 07:00 +0400 — PREREG-CONTEMPLATE-1 §1.2/§1.4
+(docs/brain/muse/PREREG-CONTEMPLATE-1.md, signed 2026-10-09 23:01): the store gains EXACTLY the `status`
+field. A row filed by the muse's chain carries "status": "tentative" (a hypothesis, never knowledge);
+promotion to candidacy is a NEW append-only row naming the line it supersedes (the store never
+overwrites). THREE additive doors, all below the four rules (believe() itself is untouched):
+    file_tentative(path, word, cells, episode_ids, moment) -> row     # a belief row + "status": "tentative"
+    promote(path, word, of_line, cells, episode_ids, moment) -> row   # + "status": "candidacy", "supersedes"
+    read_considered(path) -> rows                                     # the muse's OWN view (statused rows only)
+THE QUARANTINE IS BY CONSTRUCTION: read_beliefs (raw AND fold) skips every row carrying a "status" key —
+every caller the store ever had (believe()'s standing read, the DEDUCE pool, the offline verdicts) reads
+exactly the rows it read before, and only the muse's own reader (read_considered) ever sees a hypothesis.
+A file with no statused rows is read byte-for-byte as before (the exclusion is a key test, never a
+rewrite). Pinned by tests/genome/test_think_tentative.py (G-UNIT(d): presence counts beside every "0 of N").
 """
 from __future__ import annotations
 
@@ -289,7 +303,13 @@ def read_beliefs(path: Union[str, _pl.Path], fold: bool = False) -> List[Dict[st
     the file itself is the interface, this is just the obvious reader for it). `fold=True` (W3-1) folds
     revisits and extensions into one standing row per word, with a "revisits"/"extensions"/"clashes"
     count and the union of every episode id ever attached to the word's CURRENT chain (decision 6
-    above: a clash forks the chain; fold tracks the latest fork only)."""
+    above: a clash forks the chain; fold tracks the latest fork only).
+
+    CONTEMPLATE-1 (the edit of 2026-10-10 07:00 +0400, above): THE QUARANTINE — rows carrying a
+    "status" key (the muse's tentative/candidacy hypotheses) are skipped HERE, in both modes, so every
+    trusted reader (believe()'s standing read via _standing_row, the DEDUCE pool, every offline tool
+    that comes through this function) is blind to them by construction. The muse's own view is
+    read_considered() below, a separate door."""
     p = _pl.Path(path)
     if not p.exists():
         return []
@@ -298,7 +318,10 @@ def read_beliefs(path: Union[str, _pl.Path], fold: bool = False) -> List[Dict[st
         for line in f:
             line = line.strip()
             if line:
-                rows.append(json.loads(line))
+                row = json.loads(line)
+                if "status" in row:      # CONTEMPLATE-1: a hypothesis is never a trusted read
+                    continue
+                rows.append(row)
     if not fold:
         return rows
     return _fold_beliefs(rows)
@@ -344,6 +367,76 @@ def _fold_beliefs(rows: List[Dict[str, object]]) -> List[Dict[str, object]]:
         e["episodes"] = sorted(e["episodes"])
         e["clashes"] = clash_count.get(word, 0)
         out.append(e)
+    return out
+
+
+# ============================================================================ THE MUSE'S STATUS (CONTEMPLATE-1 §1.2/§1.4)
+MUSE_STATUSES = ("tentative", "candidacy")     # the only values the "status" field ever carries (declared)
+
+
+def file_tentative(path: Union[str, _pl.Path], word: str, cells: List[int], episode_ids: List[int],
+                   moment: int) -> Dict[str, object]:
+    """A TENTATIVE belief (the muse's chain, PREREG-CONTEMPLATE-1 §1.2): _write_belief's own row shape
+    plus exactly the "status" field. Append-only, line-numbered by the same counter; quarantined from
+    every trusted read by read_beliefs' key test above (a hypothesis, never knowledge)."""
+    p = _pl.Path(path)
+    row: Dict[str, object] = {
+        "line": _line_count(p),
+        "kind": "belief",
+        "word": str(word),
+        "cells": sorted(set(int(c) for c in cells)),
+        "episodes": sorted(set(int(e) for e in episode_ids)),
+        "moment": int(moment),
+        "clashes": [],
+        "status": "tentative",
+    }
+    _append(p, row)
+    return row
+
+
+def promote(path: Union[str, _pl.Path], word: str, of_line: int, cells: List[int], episode_ids: List[int],
+            moment: int) -> Dict[str, object]:
+    """PROMOTION to candidacy (§1.4): a NEW append-only row naming the line it supersedes — the store
+    never overwrites, so the tentative's bytes stand and this row carries its content forward with
+    "status": "candidacy" and "supersedes": of_line. Only candidacy content may meet the composer's
+    store (the muse's fruit); every other trusted read stays blind (the same key test)."""
+    p = _pl.Path(path)
+    row: Dict[str, object] = {
+        "line": _line_count(p),
+        "kind": "belief",
+        "word": str(word),
+        "cells": sorted(set(int(c) for c in cells)),
+        "episodes": sorted(set(int(e) for e in episode_ids)),
+        "moment": int(moment),
+        "clashes": [],
+        "status": "candidacy",
+        "supersedes": int(of_line),
+    }
+    _append(p, row)
+    return row
+
+
+def read_considered(path: Union[str, _pl.Path]) -> List[Dict[str, object]]:
+    """The muse's OWN view of the store: every statused row in file order, each carrying a resolved
+    "current" — "tentative", "candidacy" (a candidacy row itself), or "superseded" (a tentative whose
+    line a later candidacy row names). Never a trusted reader: the composer's fruit reads candidacy
+    rows through THIS door alone; nothing else may."""
+    p = _pl.Path(path)
+    if not p.exists():
+        return []
+    rows = []
+    with open(p) as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                row = json.loads(line)
+                if "status" in row:
+                    rows.append(row)
+    superseded = {int(r["supersedes"]) for r in rows if r.get("status") == "candidacy" and r.get("supersedes") is not None}
+    out = []
+    for r in rows:
+        cur = "superseded" if int(r["line"]) in superseded else str(r["status"])
+        out.append({**r, "current": cur})
     return out
 
 
