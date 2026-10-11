@@ -197,6 +197,11 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         "FILE": "FILE     claim route decider due",
         "BELIEF": "BELIEF   clash opens never overwrites",
         "TRAITS": "TRAITS   contrast head 32 lr 0.01 at sleep",
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 19:5x +0400 — PREREG-BRAIN-LONG-6 §2 B3: one row,
+        # matching the genes.py RUNS entry added by this build (the REGISTERS clause's sample line). Caught by this test's
+        # own gate at the launch gate's first full run — RUNS was updated without this fixture, exactly the omission this
+        # class exists to catch (the W3-2 comment below names the same class).
+        "REGISTERS": "REGISTERS content-web muse precision",
         # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2: two rows, matching the two
         # genes.py RUNS entries added by this task.
         "INDUCE": "INDUCE   rule from 5 episodes no counter",
