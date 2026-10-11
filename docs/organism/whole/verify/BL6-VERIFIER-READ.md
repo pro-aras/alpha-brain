@@ -59,3 +59,12 @@ signature — the amendments are written into the law itself, marked «(verifier
 
 The read's verdict: the law stands after V3, V4, V5, V10, V13, V15 are written into it (the six
 amendments, all marked). No clause resisted; nothing loosened.
+
+- **V16 (the build-time catch, landed as AMENDMENT 1):** the law's §1 named the REPO's BRAIN-LONG-5.genome
+  as the source; the LIVE truth is the DEPLOYED copy, which carries the CHAT block (added 2026-10-09 21:46
+  under his word, committed in the life's own checkout, never in the repo). Measured before the ruling:
+  without the CHAT line, `_consume_chat` returns early, the muse's chat gate refuses, and the content-web's
+  chat feed never runs — M-CHAT and M-REGISTERS (b) unreachable by construction. AMENDMENT 1 (SIGNED):
+  the source is the deployed genome; the CHAT block rides verbatim. The build's composition probe on the
+  amended genome (scratch/bl6/): OFF arm byte-quiet; ON arm: the muse fired ONE chain on the twice-heard
+  novel word and w:sisu entered the web (n=2, both rules) — the chat→web→muse composition live end-to-end.
