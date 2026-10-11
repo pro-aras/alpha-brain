@@ -437,7 +437,7 @@ class Mind:
     is blind to (e.g. {"gaze"} runs the random-gaze twin, PREREG §2.9's --blind gaze)."""
 
     def __init__(self, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None,
-                 precision: bool = False, muse: bool = False, content_web: bool = False):
+                 precision: bool = False, muse: bool = False, content_web: bool = False, trajectory: bool = False):
         self.genome_path = Path(genome_path)
         self.run_root = Path(run_root)
         self.genome_text = self.genome_path.read_text()
@@ -468,6 +468,12 @@ class Mind:
         # of the law's G-UNIT(d)/G-PLANT(i)), zeroed at every birth/resume and never snapshotted.
         self.content_web = content_web
         self._cweb_counts: Dict[str, int] = {s: 0 for s in _cweb.TOKEN_SENSES}
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 12:1x +0400 — PREREG-N2-TRAJECTORY §1's
+        # wiring (docs/brain/trajectory/PREREG-N2-TRAJECTORY.md, signed 2026-10-10): THE TRAJECTORY register as
+        # a CONSTRUCTION PARAMETER, threaded to both Predictor builds (the init below and the resume-path
+        # rebuild — the same two lines N1 touched); default False = byte-identical, no genome/parser/
+        # machinery.py edit; registers in-memory only, not persisted (N1's precedent, named in the law).
+        self.trajectory = trajectory
 
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — W3-0 (docs/G4-WAVE3-CLAUSES.md):
         # THE GENERIC REFUSAL, first — before any object is built from the genome (a refusal message must
@@ -626,7 +632,8 @@ class Mind:
         # clause (machinery.py's parser, default "novelty" when the genome's PREDICT line carries no
         # trailing "; error <arm>" — every genome on disk before this edit, G4.genome included).
         self.predictor: Optional[Predictor] = (
-            Predictor(self.org, arm=self.genome.declared["PREDICT"].get("arm", "novelty"), precision=self.precision)
+            Predictor(self.org, arm=self.genome.declared["PREDICT"].get("arm", "novelty"), precision=self.precision,
+                      trajectory=self.trajectory)   # N2: the flag threads exactly as N1's (PREREG-N2 §1)
             if "PREDICT" in self.genome.declared else None
         )
         self._last_sleep_at: int = 0        # org.t at the last SLEEP boundary crossed
@@ -4698,7 +4705,8 @@ class Mind:
                 # docstring) — a resumed life restarts every word's count at 0. Out of scope for this
                 # brief (replay-only); raised in G5-E-REPORT.md.
                 mind.predictor = Predictor(mind.org, arm=mind.genome.declared["PREDICT"].get("arm", "novelty"),
-                                           precision=mind.precision)   # N1: the flag re-threads at resume (PREREG-N1 §1)
+                                           precision=mind.precision,   # N1: the flag re-threads at resume (PREREG-N1 §1)
+                                           trajectory=mind.trajectory)   # N2: the same two-line form (PREREG-N2 §1)
                 last_winner = ledger.get("predictor_last_winner")
                 if last_winner is not None:
                     mind.predictor._last_winner = np.array(last_winner, dtype=np.float64)

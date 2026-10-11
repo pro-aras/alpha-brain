@@ -109,6 +109,15 @@ PRECISION_PRIOR = 0.25        # v0 — both registers start at log(v0); the firs
 PRECISION_W_LO = 0.25         # the weight clip: the register can discount to a quarter…
 PRECISION_W_HI = 4.0          # …or amplify to fourfold, never beyond (modulate's own [lo, hi] clip stands after)
 
+# N2 TRAJECTORY (PREREG-N2-TRAJECTORY §1, SIGNED 2026-10-10; docs/brain/trajectory/) — the declared machine-form
+# constants of the trajectory register, fixed before any reading, never fitted. Generalised coordinates [value,
+# rate] on the SAME log-error stream the precision register consumes (one δ — PRECISION_FLOOR; one prior —
+# PRECISION_PRIOR; the clip is N1's exact [PRECISION_W_LO, PRECISION_W_HI]: never a second constant). The register
+# lives ONLY behind Predictor(trajectory=True) (default False: not one of these lines runs — N1's wiring form).
+TRAJECTORY_ETA_M = 0.05       # value EMA rate (τ ≈ 20 moments): the present
+TRAJECTORY_ETA_R = 0.05       # rate EMA rate over the value's OWN motion d_t = m_t − m_{t−1} (never the raw per-call difference)
+TRAJECTORY_KAPPA = 1.0        # the weight's rate gain: w = clip(exp(κ·r), PRECISION_W_LO, PRECISION_W_HI)
+
 
 class Predictor:
     """PREDICT — PREREG §3 B6: `expect()`, `error(x_actual)`, `modulate(lr)`. Bound to one Organism;
@@ -122,7 +131,8 @@ class Predictor:
     G5-E (2026-09-21): `arm` names which of the four G-MIND-3 error computations `error()` runs —
     "novelty" (default, today's, byte-identical), "conjunctive", "episodic", "comparator"."""
 
-    def __init__(self, org: Organism, lo: float = 0.5, hi: float = 2.0, arm: str = "novelty", precision: bool = False):
+    def __init__(self, org: Organism, lo: float = 0.5, hi: float = 2.0, arm: str = "novelty", precision: bool = False,
+                 trajectory: bool = False):
         self.org = org
         self.lo, self.hi = lo, hi
         self._last_winner: Optional[np.ndarray] = None
@@ -136,6 +146,16 @@ class Predictor:
         self._l_fast = float(np.log(PRECISION_PRIOR))
         self._l_slow = float(np.log(PRECISION_PRIOR))
         self.last_weight: Optional[float] = None
+        # N2 (edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 12:1x +0400 — PREREG-N2-TRAJECTORY
+        # §1): the trajectory register, default OFF = byte-identical. Generalised coordinates [m, r] at the
+        # declared priors (m_0 = N1's prior, r_0 = 0); last_rate/last_tpe/last_spe stay None while the flag
+        # is off (instrument reads only, never a grading input — last_error stays RAW).
+        self.trajectory = trajectory
+        self._t_m = float(np.log(PRECISION_PRIOR))
+        self._t_r = 0.0
+        self.last_rate: Optional[float] = None
+        self.last_tpe: Optional[float] = None
+        self.last_spe: Optional[float] = None
 
     def note_winners(self, S: List[int]) -> None:
         """S: the sight winners of the moment just lived (best first, §11 am. 3's resonate order). The
@@ -190,18 +210,46 @@ class Predictor:
             e = self._error_comparator(x_actual, area, word, xw, e_novelty)
         else:
             raise ValueError(f"Predictor.error: unknown arm {self.arm!r} (novelty|conjunctive|episodic|comparator)")
-        if self.precision:
+        if self.precision or self.trajectory:
             # N1 (PREREG-N1-PRECISION §1 + AMENDMENTS 1–3): the precision weight is READ from the registers
             # first (causal — the past weighs the present), THEN both registers update with this raw error's
             # log-square. last_error keeps the RAW value (the journal, act grading and sleep ranking read
             # raw); the weight is consumed by modulate() alone.
-            w = float(np.clip(np.exp(self._l_slow - self._l_fast), PRECISION_W_LO, PRECISION_W_HI))
+            # N2 (PREREG-N2-TRAJECTORY §1.5): ONE stream (a single le, one δ — never a second constant);
+            # the composed weight is the PRODUCT of each ON register's own clipped weight, modulate()'s own
+            # clip final (1.0·w == w to the last float digit, so precision ALONE stays byte-exact N1's form).
             le = float(np.log(e * e + PRECISION_FLOOR))
-            self._l_fast = (1.0 - PRECISION_ETA_FAST) * self._l_fast + PRECISION_ETA_FAST * le
-            self._l_slow = (1.0 - PRECISION_ETA_SLOW) * self._l_slow + PRECISION_ETA_SLOW * le
-            self.last_weight = w
+            w_total = 1.0
+            if self.precision:
+                w = float(np.clip(np.exp(self._l_slow - self._l_fast), PRECISION_W_LO, PRECISION_W_HI))
+                self._l_fast = (1.0 - PRECISION_ETA_FAST) * self._l_fast + PRECISION_ETA_FAST * le
+                self._l_slow = (1.0 - PRECISION_ETA_SLOW) * self._l_slow + PRECISION_ETA_SLOW * le
+                w_total *= w
+            if self.trajectory:
+                w_total *= self._trajectory_step(le)
+            self.last_weight = w_total
         self.last_error = e
         return e
+
+    def _trajectory_step(self, le: float) -> float:
+        """N2 (PREREG-N2-TRAJECTORY §1.3): the trajectory register's causal read-then-update. READ first —
+        the path prediction from the PREVIOUS state p = m + r; the trajectory's stream error tpe = le − p
+        and the point twin spe = le − m are both journaled (the instrument's surface: the twin lives inside
+        the instrument, so the comparison is built-in); the weight w = clip(exp(κ·r), N1's exact clip) is
+        read from that same previous state. THEN m updates with le, THEN r updates with the value's OWN
+        motion d = m_new − m_old (the smoothed difference — never the raw per-call difference, which is
+        stream noise). Returns w. Factored out of error() so the law's instruments (the planted ramp, the
+        frozen-r plant, the shuffled-delta null twins) drive the register's OWN step, never a re-implementation."""
+        p = self._t_m + self._t_r
+        self.last_tpe = le - p
+        self.last_spe = le - self._t_m
+        w = float(np.clip(np.exp(TRAJECTORY_KAPPA * self._t_r), PRECISION_W_LO, PRECISION_W_HI))
+        self.last_rate = self._t_r
+        m_new = (1.0 - TRAJECTORY_ETA_M) * self._t_m + TRAJECTORY_ETA_M * le
+        d = m_new - self._t_m
+        self._t_m = m_new
+        self._t_r = (1.0 - TRAJECTORY_ETA_R) * self._t_r + TRAJECTORY_ETA_R * d
+        return w
 
     # -------------------------------------------------------------------------------- G5-E's three arms
     def _error_conjunctive(self, e_novelty: float, word: Optional[str]) -> float:
@@ -267,9 +315,11 @@ class Predictor:
         """lr x clip(0.5 + 3*error, 0.5, 2.0) — PREREG's genome line: `PREDICT … error scales delta
         0.5..2.0`. Reads the last `error()` call's result; with none yet, error=0 (scale floors at 0.5).
         N1: with `precision` on, the SAME formula reads the precision-weighted error (e · w, w from the
-        register at the last error() call); the [lo, hi] clip is unchanged either way."""
+        register at the last error() call); the [lo, hi] clip is unchanged either way.
+        N2 (§1.5/§1.6): with `trajectory` on (alone or composed), the SAME substitution reads the
+        register-composed weight — the formula and the clip never move."""
         e = self.last_error if self.last_error is not None else 0.0
-        if self.precision and self.last_weight is not None:
+        if (self.precision or self.trajectory) and self.last_weight is not None:
             e = e * self.last_weight
         scale = float(np.clip(0.5 + 3.0 * e, self.lo, self.hi))
         return lr * scale
