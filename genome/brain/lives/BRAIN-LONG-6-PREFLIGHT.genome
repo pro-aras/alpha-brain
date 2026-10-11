@@ -1,6 +1,6 @@
-# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 20:3x +0400 — BRAIN-LONG-6-PREFLIGHT:
-# the launch genome shortened for the two pre-flight lives (PREREG-BRAIN-LONG-6 §2 B5): train 400,
-# the declared toy shelf (the A6 build's fixture, never the real shelf), calibrate at 250 only.
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 23:1x +0400 — BRAIN-LONG-6-PREFLIGHT:
+# the launch genome (AMENDMENT 1's form: the DEPLOYED bl5 genome + the law's diff, CHAT carried)
+# shortened for the two pre-flight lives: train 400, the declared toy shelf, calibrate at 250 only.
 # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 11:20 +0400 — BRAIN-LONG-3: BRAIN-LONG-2.genome (the repo's launch file; checked by the seat equal to the life's launch GENOME.genome on non-comment lines) with EXACTLY two changes, on the BRAIN line: `hears scene maker` and the calibration list extended past 50000 (PREREG-HEARS-2 §4 + AMENDMENT 1 A1.8). Nothing else (RULES §3: the ladder).
 # edit: Claude (Opus 5.5, the seat), 2026-09-29 23:41 +0400 — BRAIN-LONG-2: THE DAYS LIFE — one full organism with every feature of 09-29, alone for days
 # = genome/brain/lives/BRAIN-LONG-1.genome (the long life that ran from 2026-09-29 20:22) with THREE changes: SEED and the scene seed
@@ -23,12 +23,10 @@
 # parser at the pre-flight, and any line whose builder has not landed by the launch is turned #OFF WITH ITS REASON ON THE LINE —
 # never removed, never silently. NMAX and the game's cadence are written by the pre-flight (L-3), not by hand.
 # edit: Claude (Fable 5.1), 2026-09-22 18:2x +0400.
-# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 20:0x +0400 — BRAIN-LONG-6 (PREREG-BRAIN-LONG-6 §1,
-# SIGNED; SEAT-LINE sha256 2c6bb22b…): brain-long-5's launched genome with EXACTLY the law's changes: SEED and
-# the scene seed 20261211 (the scene world made lawful at the life's seed — brain/scene/world.py's maps in the
-# law's ONE pinned window); + the REGISTERS line below (content-web muse precision — each its own VERDICT);
-# the video shelf re-pointed at this life's own dir (the same frozen content, promoted); everything else
-# byte-identical to brain-long-5's launched file.
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 22:5x +0400 — BRAIN-LONG-6 (PREREG-BRAIN-LONG-6 §1
+# + AMENDMENT 1: the source is the DEPLOYED bl5 genome — the repo file + the CHAT block carried verbatim; the
+# law's diff: SEED and the scene seed 20261211; + the REGISTERS line; the video shelf re-pointed at this life's
+# own dir; everything else byte-identical to the DEPLOYED bl5 genome, CHAT included).
 SEED     20261211   # edit: Claude (Sonnet 5, BRAIN builder B), 2026-09-28 20:43 +0400 — BRAIN-IN-BODY §5: overridden from ALPHA4's 20260923 to match WORLD scene's seed below (a life at another world seed changes SEED and the WORLD scene seed together; PREREG-BRAIN-IN-BODY.md §4 wants rung 3 launched at 20261102 specifically -- the seat edits the launched copy's two seeds together for that life, this file's own default stays 20261101)
 # BODY
 BODY     service creature threads eye ear door mind think voice   # DRAFT (builder E, L-5): `think` = the thinking thread; refuses until the machinery names it
@@ -105,6 +103,11 @@ OUTCOME  act to episode; error grades it; ranks replay
 ABSTAIN  second/best > 0.85
 RECALL   k=3                                      # parsed and REQUIRED by the parser's own list; the value reaches no call site (recall_many lights every resonating cell) — the inventory prints it VALUE-UNREAD; kept because the machinery refuses a genome without it, said here, not hidden
 ASK      what-is show is which why                # `why` = the addresses questions.why() returns (builder A); `next` dropped — no mechanism predicts a next thing
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-09 21:46 +0400 — Ahmad's 10-09 word («personally try
+# to teach and mentor the Alpha 6»): the CHAT door opened in THIS life (his three-decisions call, made by him
+# today). The line's form is A4-LADDER-PREREG §3.2's own; the door cannot teach him by force («a question never
+# teaches») — it is a conversation channel, read-only into one branch (creature/mind.py:_consume_chat).
+CHAT     door chat/in chat/out; chain of frames + one pivot slot; links adjacent 5; pivot 10 distinct 20 instants; at most 6 words; a question never teaches
 # STAGES
 STAGE    1 senses   moments 0..200
 STAGE    2 meet     moments 200..
