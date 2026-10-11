@@ -30,7 +30,11 @@ class TestRoots(unittest.TestCase):
         # edit: Kimi K3 (kimi-code, acting seat), 2026-10-09 12:0x +0400 — PREREG-ALPHA-6 (the landing): the tree's root is FRESH
         # again; the swarm-1005 root stays named, read as plain files only (the window's own choreography, the 4 precedents above).
         self.assertEqual(C.SWARM1005_RUNS, Path("/data/dev/brain-runs/scene-organ-swarm-1005"))
-        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-alpha6"))
+  # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 20:3x +0400 — PREREG-BRAIN-LONG-6 §1.2
+  # (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): the pin gains the law's declared content (the scene world
+  # lawful at the life's seed 20261211; the 10-09 launch-verdict item repaired) — the pin working, caught at
+  # the launch gate's first full run and updated under the law, never loosened.
+        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-bl6"))  # the bl6 window: the live root moves (the alpha6 root stays, read as plain files only)
         self.assertEqual(C.FM6_RUNS, Path("/data/dev/brain-runs/scene-organ-fm6"))
         self.assertEqual(C.SCENE_ORGAN_RUNS, Path("/data/dev/brain-runs/scene-organ"))
         self.assertEqual(C.S1B1R_RUNS, Path("/data/dev/brain-runs/scene-s1b1r"))

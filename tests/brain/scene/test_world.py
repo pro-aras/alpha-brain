@@ -26,8 +26,12 @@ class TestConstantsAreThePreregs(unittest.TestCase):
         self.assertEqual(W.SCENE_MIX, ((1, 0.4), (2, 0.4), (3, 0.2)))
         self.assertEqual(W.SEPARATION_PX, 24)
         self.assertEqual((W.DAX_SHAPE, W.DAX_WORD, W.DAX_SCENE), ("moon", "dax", 2700))
-        self.assertEqual(W.WORLD_SEEDS, (20261101, 20261102, 20261103))
-        self.assertEqual(W.TEST_SEEDS, {20261101: 20261201, 20261102: 20261202, 20261103: 20261203})
+  # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 20:3x +0400 — PREREG-BRAIN-LONG-6 §1.2
+  # (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): the pin gains the law's declared content (the scene world
+  # lawful at the life's seed 20261211; the 10-09 launch-verdict item repaired) — the pin working, caught at
+  # the launch gate's first full run and updated under the law, never loosened.
+        self.assertEqual(W.WORLD_SEEDS, (20261101, 20261102, 20261103, 20261211))
+        self.assertEqual(W.TEST_SEEDS, {20261101: 20261201, 20261102: 20261202, 20261103: 20261203, 20261211: 20261321})
         self.assertEqual((W.TOY_SEED, W.STAGE_SEED, W.HELDOUT_SEED), (20261099, 20261100, 20260928))
         self.assertEqual(W.READING_POINTS, (250, 500, 1000, 2000, 5000, 10000))
         self.assertEqual((W.N_TRAIN, W.N_TEST, W.GATE_N, W.STAGE_N, W.TOY_TRAIN_N, W.TOY_TEST_N), (10000, 400, 300, 300, 1000, 200))

@@ -14,7 +14,12 @@ import numpy as np
 
 from brain.scene import world as W
 
-FRESH = (20261401, 20261402, 20261403)
+FRESH = (20261401, 20261402, 20261403, 20261521)
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 20:3x +0400 — PREREG-BRAIN-LONG-6 §1.2
+# (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): the pin gains the law's declared content (the scene world
+# lawful at the life's seed 20261211; the 10-09 launch-verdict item repaired) — the pin working, caught at
+# the launch gate's first full run and updated under the law, never loosened.
+
 
 
 def _unique(phrase, things, t):
@@ -23,7 +28,7 @@ def _unique(phrase, things, t):
 
 class TestFreshSeeds(unittest.TestCase):
     def test_pairs_and_roles(self) -> None:
-        self.assertEqual(W.FRESH_TEST_SEEDS, {20261101: 20261401, 20261102: 20261402, 20261103: 20261403})
+        self.assertEqual(W.FRESH_TEST_SEEDS, {20261101: 20261401, 20261102: 20261402, 20261103: 20261403, 20261211: 20261521})
         self.assertEqual(W.TEST_SETS["s1b1"], W.TEST_SEEDS)                       # S1b-1's own, unchanged
         self.assertEqual(W.TEST_SETS["fresh"], W.FRESH_TEST_SEEDS)
         used = set(W.WORLD_SEEDS) | set(W.TEST_SEEDS.values()) | {W.TOY_SEED, W.STAGE_SEED} | {20261301, 20261302, 20261303}

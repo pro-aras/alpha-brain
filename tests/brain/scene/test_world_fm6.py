@@ -18,7 +18,12 @@ from brain.scene import world as W
 FIXD = Path(__file__).resolve().parent / "fixtures"
 M6_OLD = json.loads((FIXD / "m6_scenes_pre_fm6.json").read_text())
 WORLD_OLD = json.loads((FIXD / "world_pre_fm6.json").read_text())
-HELD = {20261101: 20261501, 20261102: 20261502, 20261103: 20261503}
+HELD = {20261101: 20261501, 20261102: 20261502, 20261103: 20261503, 20261211: 20261621}
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 20:3x +0400 — PREREG-BRAIN-LONG-6 §1.2
+# (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): the pin gains the law's declared content (the scene world
+# lawful at the life's seed 20261211; the 10-09 launch-verdict item repaired) — the pin working, caught at
+# the launch gate's first full run and updated under the law, never loosened.
+
 TMP = Path(os.environ.get("TMPDIR", "/data/dev/brain-runs/tmp"))
 
 

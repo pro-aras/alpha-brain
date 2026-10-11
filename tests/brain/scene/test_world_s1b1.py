@@ -104,7 +104,11 @@ class TestDecline(unittest.TestCase):
                     self.assertEqual((others[0].shape, others[0].size), (t.shape, t.size))
                 else:
                     self.assertTrue(all(u.shape != t.shape for u in others))
-        self.assertEqual(kinds, collections.Counter({"A": 32 * 3, "B": 16 * 3}))
+  # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 20:3x +0400 — PREREG-BRAIN-LONG-6 §1.2
+  # (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): the pin gains the law's declared content (the scene world
+  # lawful at the life's seed 20261211; the 10-09 launch-verdict item repaired) — the pin working, caught at
+  # the launch gate's first full run and updated under the law, never loosened.
+        self.assertEqual(kinds, collections.Counter({"A": 32 * 4, "B": 16 * 4}))  # the law's 4th world seed (20261211) carries its own 48
 
 
 class TestDeterminismAndPixels(unittest.TestCase):
