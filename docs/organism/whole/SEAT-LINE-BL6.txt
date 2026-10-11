@@ -1,0 +1,8 @@
+SEAT-LINE-BL6 — the seat's signature line for PREREG-BRAIN-LONG-6 (docs/organism/whole/PREREG-BRAIN-LONG-6.md)
+
+edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-11 15:12 +0400.
+
+sha256 (the law file, final form after the verifier loop's six amendments — verify/BL6-VERIFIER-READ.md):
+2c6bb22bb3fd0403ea95459d22e39b22be3b499acca07d9e4302575128b17153
+
+Signed: THE SEAT (Kimi K3, kimi-code, alone), under Ahmad's word of 2026-10-11 («Ok go for it»).
