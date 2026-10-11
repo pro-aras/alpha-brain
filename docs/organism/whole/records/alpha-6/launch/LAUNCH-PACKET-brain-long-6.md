@@ -37,7 +37,11 @@ the diff printed in the law and re-printed here):
 | G-REGISTERS-LIVE | a replay of a REGISTERS-declaring toy genome runs the registers: web/journal carry the content-web tokens (w:/s:/g:), the muse budget rows, the precision weight stream — presence counts; the OFF twin byte-identical (`scratch/bl6/registers-live/`) |
 | G-PREFLIGHT | the two pre-flight lives (§2's note) |
 | G-PLANT | the REGISTERS parser refuses garbage by name (tests/genome/test_parse_registers.py); the tampered shelf CAUGHT (the shelf tool's verify); the tampered declared-word list caught (tests/creature/test_mind_registers_wiring.py) |
-| the sisu contamination check | `grep -ri 'sisu' /data/dev/genome-lives/_brain-long-6-shelf/ /data/alpha3-library/CURRICULUM.md` → empty, printed here at launch; the lexicon door's gloss reach checked (`python3 -c` a what-is lookup of «sisu» against the lexicon sqlite → absent) — the fallback word, if needed, is DECLARED IN THIS PACKET before launch, never silently swapped |
+| the sisu contamination check | DONE 2026-10-12 00:3x: `grep -ri 'sisu' <shelf> <curriculum>` EMPTY, but the LEXICON carries «mipplo»
+   (senses, 1 row) — a contamination path through the ask/answer door. **THE DECLARED FALLBACK, per the law's
+   verifier V3: the M-CHAT word is «mipplo»** — verified ABSENT in the video shelf, the read curriculum, AND
+   the lexicon (the three checks printed in the gate record). Never silently swapped: this note IS the swap's
+   record. |
 
 ## 2 · The commands (the seat, in this order)
 
@@ -69,9 +73,9 @@ the diff printed in the law and re-printed here):
    (c) precision — **the replay form** (no direct live surface exists; measured before signing): the
    life's first tape segment replayed under the launch sha with the declared genome (ON) vs an OFF twin
    (the same genome minus the line), the modulate scale streams compared and the weight stream printed.
-6. **M-CHAT's teaching act**: the declared chat-only word «sisu» (contamination check §1 green), taught
+6. **M-CHAT's teaching act**: the declared chat-only word «mipplo» (contamination check §1 green), taught
    through the chat door in the arc's form («sisu is happy», in/016.json); the read at the FIRST sleep
-   boundary after the teaching inside the 24-h wall: `w:sisu` a node with edge count > 0; the s:-node
+   boundary after the teaching inside the 24-h wall: `w:mipplo` a node with edge count > 0; the s:-node
    share of the web's cap printed.
 
 ## 3 · brain-long-5's close (HIS word at the launch wall)
