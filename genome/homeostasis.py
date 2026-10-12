@@ -1,3 +1,11 @@
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-13 — PREREG-HOMEOSTASIS AMENDMENT 2
+# (docs/organism/homeostasis/PREREG-HOMEOSTASIS-AMENDMENT-2.md, SIGNED 2026-10-13, SEAT-LINE-H0-A2.txt):
+# the pre-run ceiling walk's repairs — ε 0.001→0.0022 / ζ 0.6→1.0 (F1, the forced boundary could never
+# fire at the genome's real ~439-canvas sleep gaps; the s0 reader had counted SNAPSHOTS as boundaries);
+# the eye clause +1→+2 (F2, the 1.3× bar's ceiling was 1.25×); the heard-words ledger + the extras'
+# re-aimed renewing pool (F3, the wordless pool is drained by construction in the gate world); the
+# bench-only `invert` knob (F6, H-NULL's negative control — never a genome spelling). The bars' signed
+# numbers never moved.
 # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.2 + AMENDMENT 1
 # (docs/organism/homeostasis/PREREG-HOMEOSTASIS.md, SIGNED 2026-10-12, SEAT-LINE-H0.txt sha256 edda32e7…):
 # THE DRIVES — the three internal state variables (arousal, boredom, fatigue), their per-canvas update
@@ -20,7 +28,13 @@ from typing import Dict, Optional, Tuple
 # §2.2's DECLARED constants (fitted to the §0(b) bench, brain-long-6-h0s0, 9,219 canvases, 2026-10-12):
 REST_A, ALPHA_A, BETA_A = 0.3, 0.25, 0.02        # arousal: a ← clip(a + α(s−a) + β(REST_A−a))
 KAPPA, GAMMA_B, DELTA_B, SLOW_EMA = 0.8, 0.04, 0.10, 0.01   # boredom: +γ while s < κ·s̄, else ×decay δ
-EPS_F, ZETA_F = 0.001, 0.6                       # fatigue: +ε per canvas; ×(1−ζ) at a sleep boundary
+# AMENDMENT 2 F1 (2026-10-13): ε 0.001→0.0022, ζ 0.6→1.0 — the bench tape's REAL canvases-per-boundary
+# (min 423 / p50 439 / max 483, measured) vs ε 0.001: f peaked ≈ 0.44 < the 0.95 ceiling (the forced
+# boundary dead, three marks' populations zero; the s0 reader had counted snapshots as boundaries). At
+# 0.0022 the ceiling lands at 432 canvases ≈ the median gap — the backstop fires on the longer half of
+# windows; ζ 1.0 (sleep fully clears fatigue) breaks the reset lock-in (0.4·0.95 re-reaches the ceiling
+# in 259 canvases — fatigue would have owned every later boundary).
+EPS_F, ZETA_F = 0.0022, 1.0                      # fatigue: +ε per canvas; ×(1−ζ) at a sleep boundary
 # §2.2/A2's thresholds (declared against §0(b)'s measured ranges — verifier V5):
 TH_BABBLE, TH_EXCLAIM, TH_SILENT, TH_EYE = 0.7, 0.7, 0.9, 0.7
 SEEK_CEILING, SEEK_REFRACTORY, SEEK_WINDOW = 0.95, 500, 1000
@@ -36,10 +50,13 @@ class Homeostasis:
     """The three drives. `declared` is the parser's dict {word: True} — a variable not declared stays at
     its NEUTRAL value and its effectors are inert (gains 1.0, gates off) — the tri-state's own semantics."""
 
-    def __init__(self, declared: Dict[str, bool], seed: int, flat: bool = False):
+    def __init__(self, declared: Dict[str, bool], seed: int, flat: bool = False, invert: bool = False):
         self.declared = dict(declared)
         self.seed = int(seed)
         self.flat = bool(flat)
+        self.invert = bool(invert)      # AMENDMENT 2 F6: H-NULL's bench-only negative control — surprise
+                                        # drives arousal DOWN. NEVER a genome spelling; the parser knows
+                                        # no inverted form, so no life can carry it by declaration.
         self.a: float = 0.5 if self.flat else REST_A   # the flat twin (H-DRIVE-EFFECT's baseline):
         self.b: float = 0.0                            # arousal pinned at 0.5, boredom/fatigue at 0 —
         self.f: float = 0.0                            # the state NEVER moves (note_canvas's early return)
@@ -54,23 +71,36 @@ class Homeostasis:
         self.exclaimed_at: int = -1
         self.seen: Dict[str, int] = {}            # A1: source → its last canvas index (the seek's ledger)
         self.wordless: Dict[int, Tuple[str, str, int]] = {}   # cell → (source, tape moment, canvas)
+        # AMENDMENT 2 F3: the extras' RENEWING pool — heard words (the wordless-cell pool is drained by
+        # construction in the gate world: the base road asks at the 2nd sighting immediately, and the
+        # bench tape holds 0 wordless-birth canvases). word → [last canvas, source, last bored-ask canvas].
+        self.heard: Dict[str, list] = {}
 
     # ------------------------------------------------------------- state
     def on(self, word: str) -> bool:
         return bool(self.declared.get(word, False))
 
-    def note_canvas(self, err: float, source: Optional[str] = None) -> None:
+    def note_canvas(self, err: float, source: Optional[str] = None, word: Optional[str] = None) -> None:
         """§2.2's update, once per canvas, from the canvas's own prediction error (the same stream the
         precision register reads — declared, the H-PRECISION arm owns the interaction question). The flat
-        twin's state never moves (H-DRIVE-EFFECT's baseline); the source ledger feeds the seek (A1)."""
+        twin's state never moves (H-DRIVE-EFFECT's baseline); the source ledger feeds the seek (A1).
+        AMENDMENT 2: F6 — the inverted twin flips the surprise term's sign (surprise drives arousal
+        DOWN); F3 — the canvas's heard word (None on sight-only canvases) feeds the extras' renewing
+        pool. The ledger rides the flat twin too (inert data there — the extras never fire at rest)."""
         if source is not None:
             self.seen[source] = self.canvases
+        if word:
+            old = self.heard.get(word)
+            self.heard[word] = [self.canvases, source or "", old[2] if old else -1000]
         if self.flat:
             self.canvases += 1
             return
         s = float(err)
         if self.on("arousal"):
-            self.a = clip(self.a + ALPHA_A * (s - self.a) + BETA_A * (REST_A - self.a))
+            if self.invert:
+                self.a = clip(self.a - ALPHA_A * (s - self.a) + BETA_A * (REST_A - self.a))
+            else:
+                self.a = clip(self.a + ALPHA_A * (s - self.a) + BETA_A * (REST_A - self.a))
         if s >= EXCLAIM_SURPRISE_MULT * self.slow and self.canvases > 0:
             self.last_surprise_canvas = self.canvases
         self.slow = self.slow + SLOW_EMA * (s - self.slow)
@@ -94,7 +124,9 @@ class Homeostasis:
         return g_a, g_f
 
     def extra_fixations(self) -> int:
-        return 1 if (self.on("arousal") and self.a > TH_EYE) else 0
+        # AMENDMENT 2 F2: +2, never +1 — the signed 1.3× bar's arithmetic ceiling at the genome's
+        # fixed 4 fixations is 5/4 = 1.25× < 1.3×; at +2 it is 1.5×, the bar unmoved.
+        return 2 if (self.on("arousal") and self.a > TH_EYE) else 0
 
     def draw(self, seq: object, purpose: str) -> float:
         """A3's deterministic draw: sha256(seed|seq|purpose) → [0, 1). Pure; replay-identical."""
@@ -168,6 +200,25 @@ class Homeostasis:
         cell, (s, m, _n) = next(reversed(list(self.wordless.items())))
         return cell, m
 
+    # AMENDMENT 2 F3 — the heard-word road (the renewing extras pool)
+    def extra_ask_word(self) -> Optional[str]:
+        """The boredom extras' word pick: heard words whose last bored-ask is ≥ 1,000 canvases back
+        (the re-ask refractory — the pool RENEWS, never drains); while a seek is active the target
+        source's words go first (A1's attention turn); otherwise the most recently heard."""
+        cands = {w: rec for w, rec in self.heard.items() if self.canvases - int(rec[2]) >= 1000}
+        if not cands:
+            return None
+        target = self.seek_active()
+        if target is not None:
+            own = [(w, rec) for w, rec in cands.items() if rec[1] == target]
+            if own:
+                return max(own, key=lambda kv: int(kv[1][0]))[0]
+        return max(cands.items(), key=lambda kv: int(kv[1][0]))[0]
+
+    def note_bored_ask(self, word: str) -> None:
+        if word in self.heard:
+            self.heard[word][2] = self.canvases
+
     # ------------------------------------------------------------- the journal row's form
     def row(self) -> Dict[str, float]:
         """The canvas row's ONE additive key (the `front` key's precedent — present only when declared)."""
@@ -180,7 +231,8 @@ class Homeostasis:
                 "seek_source": self.seek_source, "seek_until_canvas": self.seek_until_canvas,
                 "last_surprise_canvas": self.last_surprise_canvas, "exclaimed_at": self.exclaimed_at,
                 "seen": dict(self.seen),
-                "wordless": {str(c): [s, m, n] for c, (s, m, n) in self.wordless.items()}}
+                "wordless": {str(c): [s, m, n] for c, (s, m, n) in self.wordless.items()},
+                "heard": {w: [int(c), str(s), int(bc)] for w, (c, s, bc) in self.heard.items()}}
 
     def load_json(self, d: Dict[str, object]) -> None:
         if self.flat:
@@ -194,3 +246,5 @@ class Homeostasis:
         self.seen = {str(s): int(c) for s, c in (d.get("seen") or {}).items()}
         self.wordless = {int(c): (str(v[0]), str(v[1]), int(v[2]))
                          for c, v in (d.get("wordless") or {}).items()}
+        self.heard = {str(w): [int(v[0]), str(v[1]), int(v[2])]
+                      for w, v in (d.get("heard") or {}).items()}

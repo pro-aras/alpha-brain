@@ -119,7 +119,8 @@ def _counters(mind: Mind, row: Dict[str, object], canvases: int) -> Dict[str, ob
 
 def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenSet[str] = frozenset(), close: bool = False,
                timings: bool = False, exam_every: int = 0, counters_every: int = 0, eye_front=None,
-               progress_every: int = 0) -> Path:
+               progress_every: int = 0, homeostasis=None, homeostasis_flat: bool = False,
+               homeostasis_invert: bool = False, work_root=None) -> Path:
     """Feeds `tape_path`'s rows (one day file, sorted by seq -- defensive, they are already in order) to
     a fresh Mind in a temporary root whose tape/payload is a symlink to the source tape's own payload
     directory (never copied: replay never writes to the source tape). Returns DIR/journal.jsonl's path.
@@ -144,7 +145,13 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
     # UTC lives in TWO day files, and this function read one. Additive: a DIRECTORY (the tape dir) replays every day file in it, in
     # order (sorted by seq below); a FILE path is exactly the old road (its parent is the tape dir).
     tape_root = tape_path if tape_path.is_dir() else tape_path.parent
-    work_root = Path(tempfile.mkdtemp(prefix="creature-replay-"))
+    # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-13 — PREREG-HOMEOSTASIS AMENDMENT 2
+    # F6/F7/F8: the arms' replay form — homeostasis/homeostasis_flat/homeostasis_invert thread the
+    # drives' tri-state into the Mind's construction (the wiring tests' own knobs; defaults None/False/
+    # False = byte-identical, every existing caller unchanged), and `work_root` KEEPS the replay's root
+    # (the final snapshot's self-exam grades the arm — F7) instead of leaking a mkdtemp.
+    work_root = Path(work_root) if work_root is not None else Path(tempfile.mkdtemp(prefix="creature-replay-"))
+    work_root.mkdir(parents=True, exist_ok=True)
     # edit: Claude (Fable 5.1), 2026-09-21 12:01 +0400 — W3-0b seam (Builder C's finding 5): the work root's tape dir follows the genome's own
     # TAPE path (creature/tape.py:_resolve_tape_dir; byte-identical for the default `run/tape`), so a Mind reading payloads under
     # that path finds the symlinked payload dir.
@@ -162,7 +169,9 @@ def run_replay(genome_path: Path, tape_path: Path, out_dir: Path, blind: FrozenS
         if (_life_root / "inherit").is_dir() and "brain" not in blind:
             shutil.copytree(_life_root / "inherit", work_root / "inherit")
             break
-    mind = Mind(genome_path, work_root, blind=blind, eye_front=eye_front)   # eye_front: OW-3's one declared change (None = byte-identical)
+    mind = Mind(genome_path, work_root, blind=blind, eye_front=eye_front,
+                homeostasis=homeostasis, homeostasis_flat=homeostasis_flat,
+                homeostasis_invert=homeostasis_invert)   # eye_front: OW-3's one declared change; the H0 knobs: AMENDMENT 2 (defaults = byte-identical)
     if tape_path.is_dir():
         rows = sorted((r for f in sorted(tape_path.glob("*.jsonl")) for r in _read_jsonl(f)), key=lambda r: r["seq"])
     else:

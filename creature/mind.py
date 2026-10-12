@@ -440,7 +440,8 @@ class Mind:
 
     def __init__(self, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None,
                  precision: Optional[bool] = None, muse: Optional[bool] = None, content_web: Optional[bool] = None,
-                 homeostasis: Optional[object] = None, homeostasis_flat: bool = False):
+                 homeostasis: Optional[object] = None, homeostasis_flat: bool = False,
+                 homeostasis_invert: bool = False):
         self.genome_path = Path(genome_path)
         self.run_root = Path(run_root)
         self.genome_text = self.genome_path.read_text()
@@ -485,8 +486,10 @@ class Mind:
         # parser's new line, machinery.py's pinned window; ABSENT there = no drives at all, byte-identical);
         # True = the full three (the benches' form); a dict = exactly those words (the law's solo arms);
         # False = off. homeostasis_flat = the flat twin (the state fixed at rest, the effectors reading it —
-        # H-DRIVE-EFFECT's baseline arm). The state lives in genome/homeostasis.py; every effector reads it
-        # and nowhere else. The resume path passes its own tri-state through (the REGISTERS precedent, V5).
+        # H-DRIVE-EFFECT's baseline arm); homeostasis_invert = H-NULL's inverted-arousal twin (AMENDMENT 2
+        # F6 — bench-only, never a genome spelling; default False = byte-identical everywhere). The state
+        # lives in genome/homeostasis.py; every effector reads it and nowhere else. The resume path passes
+        # its own tri-state through (the REGISTERS precedent, V5).
         self.homeostasis_flat = homeostasis_flat
         _h0d = self.genome.declared.get("HOMEOSTASIS", {})
         if homeostasis is None:
@@ -494,7 +497,7 @@ class Mind:
         if homeostasis is True:
             homeostasis = {"arousal": True, "boredom": True, "fatigue": True}
         self._drives: Optional[Homeostasis] = (Homeostasis(dict(homeostasis), seed=int(self.genome.seed),
-                                                           flat=homeostasis_flat)
+                                                           flat=homeostasis_flat, invert=homeostasis_invert)
                                                if homeostasis else None)
 
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — W3-0 (docs/G4-WAVE3-CLAUSES.md):
@@ -2866,7 +2869,7 @@ class Mind:
         # state at THIS canvas's start governs this canvas's gains, the causal read-then-update order,
         # the precision register's own precedent); then the boredom-ceiling seek fires and is journaled.
         if self._drives is not None:
-            self._drives.note_canvas(err, source=meta.get("source"))
+            self._drives.note_canvas(err, source=meta.get("source"), word=word)   # AMENDMENT 2 F3: the heard word feeds the extras' renewing pool (None on sight-only canvases)
             if self._drives.seek_due():
                 target = self._drives.seek_target(current=meta.get("source"))
                 self._drives.note_seek(target)
@@ -3123,6 +3126,7 @@ class Mind:
         self._canvas_index += 1
         self._maybe_sleep(row)
         self._maybe_think(row)
+        self._drives_babble(row)   # H0 AMENDMENT 2 F4 (2026-10-13): the per-canvas babble draw — inert without the drives declared, identically False at low boredom
 
     def _row_digest(self) -> str:
         """M3 (edit: Claude (Fable 5.1, A42 builder B1), 2026-09-23 17:12 +0400; ALPHA4-2-PREREG.md §2 M3, §2.5): the row's witness digest —
@@ -3529,16 +3533,19 @@ class Mind:
         q_dir.mkdir(parents=True, exist_ok=True)
         (q_dir / f"q-{n}.json").write_text(json.dumps({"q": "what-is", "word": word}))
 
-    def _maybe_ask(self, want: str, form: str, args: list, why_word: Optional[str] = None) -> None:
+    def _maybe_ask(self, want: str, form: str, args: list, why_word: Optional[str] = None, bored: bool = False) -> bool:
         """L-10: forms ONE question for `want`, at most once ever (self._asked, persisted to
         run/ask/out/ASKED.json so a resumed OR replayed mind never re-asks). `why_word`, when given, is
         resolved through questions.why() (the addresses behind the mind's own knowledge of that word) and
         carried on the row as "why" — the plan's own text: "why: the addresses questions.why() returns
-        when a word is involved"."""
+        when a word is involved". Returns whether the ask FORMED (False at the once-ever dedupe) —
+        additive; every pre-existing caller discards it. `bored` (AMENDMENT 2 F3, 2026-10-13): the
+        boredom extras' marker — the row carries "bored": true, present only then (byte-identical
+        otherwise)."""
         if "QUESTION" not in self.genome.declared:
-            return
+            return False
         if want in self._asked:
-            return
+            return False
         self._asked[want] = form
         asked_path = self.run_root / "ask" / "out" / "ASKED.json"
         asked_path.parent.mkdir(parents=True, exist_ok=True)
@@ -3547,6 +3554,8 @@ class Mind:
             "q": form, "args": list(args), "from": "mind",
             "seq": self._ask_out_n, "at": self._cur_at,
         }
+        if bored:
+            payload["bored"] = True   # AMENDMENT 2 F3: the extras' attribution marker (additive)
         if why_word is not None:
             ledgers = self.ledgers()
             record = questions_why(self.org, ledgers, self.episodes, why_word)
@@ -3568,6 +3577,7 @@ class Mind:
         # forms a want -- never on _write_ask_out (shared with MOUTH's unrelated "is" rows, see that
         # method's own comment).
         self.think_counters["questions_written"] += 1
+        return True
 
     def _latest_tape_moment_for_word(self, word: str) -> Optional[str]:
         """The tape moment string (L-11 task 2's new Episodes column) of `word`'s LATEST live episode, or
@@ -3582,18 +3592,20 @@ class Mind:
         last_slot = int(live[np.argsort(ep.moment[live], kind="stable")][-1])
         return str(ep.tape_moment[last_slot]) or None
 
-    def _maybe_ask_word(self, want: str, word: str) -> None:
+    def _maybe_ask_word(self, want: str, word: str, bored: bool = False) -> bool:
         """Resolves `word` (or, for a DEDUCE pair key "w1|w2", its FIRST word -- deduce's claim is about
         the shared cell, not one word alone) to its LATEST live episode's own tape_moment and asks a
         what-is question citing it, with the word's own why(). No episode to cite yet (a word whose only
-        episodes have already fallen off FAST's ring) asks nothing -- there is no moment to name."""
+        episodes have already fallen off FAST's ring) asks nothing -- there is no moment to name. Returns
+        whether the ask formed (AMENDMENT 2 F3: the boredom extras' road stamps the refractory only then);
+        `bored` rides the row's marker (2026-10-13)."""
         if "QUESTION" not in self.genome.declared:
-            return
+            return False
         w = word.split("|", 1)[0] if "|" in word else word
         tape_moment = self._latest_tape_moment_for_word(w)
         if tape_moment is None:
-            return
-        self._maybe_ask(want, "what-is", [tape_moment], why_word=w)
+            return False
+        return self._maybe_ask(want, "what-is", [tape_moment], why_word=w, bored=bored)
 
     def _maybe_ask_clash(self, want: str, word: str) -> None:
         """L-10: a belief CLASH forms a want too, form "is" (the brief's own shape: `{"q": "is", "args":
@@ -4451,45 +4463,67 @@ class Mind:
                 self._drives.note_exclaim()
             return   # one frame per think
 
-        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.4 + AMENDMENT 1
-        # A2: the BABBLE — the boredom-driven EXTRA say, fired only when no frame matched above (the frame
-        # road is untouched, never gated): the mouth speaks a FILED frame's own words (the most recently
-        # cited one) without a say-target, journaled with `babble: true`; the same synchronous self-judgment
-        # as any say. At low boredom the deterministic draw is identically False — the baseline is untouched.
-        if self._drives is not None and self._drives.extra_event(row["seq"], "babble"):
-            cited = [(k, fr) for k, fr in self._frames.items() if fr.get("episodes")]
-            if cited:
-                _key, frame = cited[-1]
-                w2 = str(frame.get("w2"))
-                heard = self._last_glance is not None and self._frame_evidence(w2, self._last_glance)
-                moment = (row.get("meta") or {}).get("moment")
-                self._write_ask_out({"q": "is", "args": [moment, w2], "from": "mouth", "seq": row["seq"], "at": row["at"]})
-                self._write_journal(row["at"], {
-                    "seq": row["seq"],
-                    "say": {"frame": f"{frame.get('w1')} {w2}", "seq": row["seq"], "heard": "yes" if heard else "no",
-                            "episodes": frame.get("episodes"), "babble": True},
-                })
-                self.think_counters["said"] += 1
-                self.think_counters["heard_yes" if heard else "heard_no"] += 1
-                self.acts_chosen["say"] = self.acts_chosen.get("say", 0) + 1
-                self._record_reflex("say", got=1.0 if heard else 0.0, expected_in=1.0, residual_in=None, source="mouth")
+    # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-13 — PREREG-HOMEOSTASIS AMENDMENT 2 F4:
+    # the BABBLE moved from this method's per-THINK tail to the per-CANVAS `_drives_babble` (below) —
+    # at every-10-canvases the extras were invisible against the stream they modulate (the ceiling
+    # arithmetic is the amendment's). The frame road above is byte-identical.
+
+    def _drives_babble(self, row: Dict[str, object]) -> None:
+        """edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-13 — PREREG-HOMEOSTASIS §2.4 +
+        AMENDMENT 2 F4: the BABBLE, per CANVAS (moved from _maybe_say's per-think tail — the amendment's
+        ceiling arithmetic: at every-10-canvases the extras were invisible against the stream they
+        modulate). The boredom-driven EXTRA say — never a gate (the frame road is untouched): the mouth
+        speaks a FILED frame's own words (the most recently cited one), journaled `babble: true`, the
+        same synchronous self-judgment as any say. The flood cap (§8 attack 9's extension, declared):
+        p = clip(2·(b − θ_babble)) ≤ 0.6 at b ≤ 1 → ≤ 600 per 1,000 canvases; at low boredom the draw
+        is identically False; fatigue past θ_silent silences it (the mouth's own law, §2.4)."""
+        if self._drives is None or "MOUTH" not in self.genome.declared:
+            return
+        if self._drives.suppressed():
+            return
+        if not self._drives.extra_event(row["seq"], "babble"):
+            return
+        cited = [(k, fr) for k, fr in self._frames.items() if fr.get("episodes")]
+        if not cited:
+            return
+        _key, frame = cited[-1]
+        w2 = str(frame.get("w2"))
+        heard = self._last_glance is not None and self._frame_evidence(w2, self._last_glance)
+        moment = (row.get("meta") or {}).get("moment")
+        self._write_ask_out({"q": "is", "args": [moment, w2], "from": "mouth", "seq": row["seq"], "at": row["at"]})
+        self._write_journal(row["at"], {
+            "seq": row["seq"],
+            "say": {"frame": f"{frame.get('w1')} {w2}", "seq": row["seq"], "heard": "yes" if heard else "no",
+                    "episodes": frame.get("episodes"), "babble": True},
+        })
+        self.think_counters["said"] += 1
+        self.think_counters["heard_yes" if heard else "heard_no"] += 1
+        self.acts_chosen["say"] = self.acts_chosen.get("say", 0) + 1
+        self._record_reflex("say", got=1.0 if heard else 0.0, expected_in=1.0, residual_in=None, source="mouth")
 
     def _drives_extra_ask(self, row: Dict[str, object]) -> None:
         """edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS AMENDMENT 1
         A1/A2: the boredom-driven EXTRA curiosity ask — NEVER a gate on the want road (the baseline's asks
         are untouched; at low boredom the deterministic draw is identically False). At most one per think
-        tick, through the EXISTING wordless-sight want road (`sight:<cell>` — _maybe_ask's once-ever
-        dedupe applies); while a seek is active the target source's wordless cells are preferred (the
-        attention turn, A1)."""
+        tick. AMENDMENT 2 F3 (2026-10-13): the pool re-aimed — the wordless-cell road stays FIRST (A1's
+        seek preference), but it is drained by construction in a worded world (the base road asks at the
+        2nd sighting, the same canvas; the once-ever dedupe then refuses the extra) — so the extras ride
+        the RENEWING heard-word pool: `bored:word:<w>:<kilocanvas>` (once-ever per (word, epoch) under the
+        same dedupe law; the lexicon door answers what-is by showing — the ask closes §2.4b's loop).
+        Every extra row carries `bored: true` for the grader's attribution."""
         if self._drives is None or not self._drives.extra_event(row["seq"], "extra-ask"):
             return
         pick = self._drives.extra_ask_cell()
-        if pick is None:
+        if pick is not None:
+            cell, moment = pick
+            if moment and self._maybe_ask(f"sight:{cell}", "what-is", [moment], bored=True):
+                return
+        word = self._drives.extra_ask_word()
+        if word is None:
             return
-        cell, moment = pick
-        if not moment:
-            return
-        self._maybe_ask(f"sight:{cell}", "what-is", [moment])
+        epoch = self._drives.canvases // 1000
+        if self._maybe_ask_word(f"bored:word:{word}:{epoch}", word, bored=True):
+            self._drives.note_bored_ask(word)
 
     def _write_journal(self, at: str, obj: Dict[str, object]) -> None:
         date = at[:10]
