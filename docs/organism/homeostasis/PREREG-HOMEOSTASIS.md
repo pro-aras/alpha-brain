@@ -97,6 +97,19 @@ boredom > θ_babble: the mouth speaks WITHOUT a say-target (babble — the filed
 invented ones). arousal > θ_exclaim right after a surprise: the mouth repeats the last say once
 (exclamation). fatigue > θ_silent: the mouth is suppressed. The thresholds declared with §2.2's constants.
 
+### §2.4b · The seek IS the autonomous curriculum (his 10-12 word)
+
+*Ahmad's 10-12 13:4x challenge, verbatim: «instead of you teaching — you're putting requirements or
+dependencies on a creature that should consume and convert anything into its knowledge and advance
+forwards.»* This law ANSWERS it: the boredom→SEEK act is the organism fetching its OWN streams — no
+teacher feeds it; when its worlds go predictable it turns to another source by itself, and the sought
+stream must measurably TEACH it (H-SEEK-LEARN). The chat-door teaching rounds (the teaching protocol) are
+probes of the conversation channel and the parent's naming acts — never the child's required diet; its
+advancement never waits on a teacher. The universal intake itself (every armed world + door feeding the
+content web, the muse's quarantine, sleep consolidation) already exists and works without any human —
+measured: the web grew 0 → 22,434 nodes in the life's first 8 h with zero teaching. What this law adds is
+the WANTING that drives the intake.
+
 ### §2.5 · What does not change
 
 Everything not named in §2.3/§2.4. OFF = byte-identical, proven by I1/I2.
@@ -119,7 +132,10 @@ b < 0.3) · H-BOREDOM-MOUTH (≥ 1.5×) · H-AROUSAL-LEARN (Spearman ρ > 0.3, p
 in the same window) · H-AROUSAL-EYE (fixations at a > 0.7 ≥ 1.3× at a < 0.3) · H-FATIGUE-DEGRADE (test 1
 lower ≥ 0.02 pre-sleep; recovery within 0.01 post-sleep) · H-NULL (inverted drives degrade S or U ≥ 0.05)
 · H-PLANT (500 zero-surprise canvases drive boredom ≥ 0.95) · H-PRECISION (both ≥ each solo on ≥ 4 of 6
-tests, or redundancy declared as the finding) · I1 (OFF replay == the closed journal; the planted change
+tests, or redundancy declared as the finding) · **H-SEEK-LEARN (added 10-12 §2.4b, his challenge): in the
+1,000 canvases after a boredom-ceiling SEEK, the sought source's share of the organism's asks+says rises
+≥ 2× its 1,000-canvas pre-seek share; with boredom clamped at 0, ZERO seeks occur (the presence count
+printed)** · I1 (OFF replay == the closed journal; the planted change
 breaks it) · I2 (ON journal minus drive rows == the OFF journal). **Readings, never graded:** the variables'
 per-window means; the mouth's content distribution at high vs low boredom; the attended world-source at
 boredom ceiling; the arousal × precision interaction surface.

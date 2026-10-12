@@ -12,6 +12,10 @@ owns. It is NEVER flooding a channel, NEVER editing the life in place, and NEVER
 echoes back in the same breath (an echo is not learning; a retention read after sleep is). The chat door
 cannot teach by force («a question never teaches» — the genome line's own words); teaching is OFFERED,
 the organism's machinery does the learning. Every round lands in the life's journal and in this ledger.
+**The anti-dependency clause (his 10-12 word):** the rounds are PROBES of the conversation channel and the
+parent's naming acts — never the child's required diet. The organism feeds itself from every armed world
+and door around the clock (its web grew from zero to 22,434 nodes in its first 8 h with zero teaching);
+its advancement never waits on a teacher, and no round is ever a prerequisite for any developmental step.
 
 The doors (all genome-declared, all journaled):
 - `chat/in` / `chat/out` — the conversation channel (statements and questions; the organism may answer or
