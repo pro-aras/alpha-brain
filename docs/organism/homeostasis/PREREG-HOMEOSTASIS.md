@@ -26,11 +26,19 @@ falls 26,184 → 1,544 says/h as the mean canvas err falls 0.601 → 0.255; the 
 boundaries every 2,500 moments (genome-fixed). THE FINDING THAT MOTIVATES THIS LAW: as the world becomes
 predictable the organism goes quiet and stops asking — nothing seeks novelty. (The silence spiral.)
 
-**§0(b) — the controlled bench table.** Per-1000-canvas windows: err (mean/std), the lr stream (precision's
-fingerprint), says, asks, fixations, sleep boundaries observed — PLUS the three SHADOW drive series
-computed offline over the real tape with the candidate update rules (§2.2's form, candidate constants):
-arousal / boredom / fatigue, each printed min/max/mean/std per window.
-**PENDING — the bench runs 2026-10-12; the table lands in this section before signature.**
+**§0(b) — the controlled bench table (LANDED 2026-10-12 11:22; the bench life `brain-long-6-h0s0`,
+9,219 canvases on the toy shelf, closed clean; the full table: `records/s0-bench-brain-long-6-h0s0.txt`,
+the instrument `tools/brain/homeostasis_s0.py`, its planted control CAUGHT).** Per-1000-canvas windows:
+err_mean falls 0.818 → 0.536 (the toy world is learned); lr_mean 1.72 → 1.31 (the precision register's
+fingerprint live, settling); says ~770/1000 canvases, asks ~360/1000 (the youth rates the drives will
+modulate — far above the live life's late rates, the toy world stays surprising longer); fixations 4.00/row
+(genome-fixed); sleep-ish rows 13–15/window (snapshots every 500 moments + the 2,500-moment sleep
+boundaries — the column mixes both, named). The SHADOW drives over the real tape with §2.2's candidate
+constants: **arousal** spans [0.07..0.95], mean 0.78 → 0.52 — visits both halves, never constant, never
+diverges; **boredom** mean rises 0.10 → 0.35 as err falls (the sustained-low-surprise form works on real
+data); **fatigue** saws 0.02 → 0.16 between resets at the boundaries. All three series satisfy
+H-DYNAMICS's shape on the bench tape — the candidate constants are therefore declared as the law's values
+(§2.2), fitted to §0(b), the gate's fresh seed protecting against overfit (§8 attack 1).
 
 ## §1 · The question
 
@@ -67,8 +75,15 @@ Discrete updates per canvas, all variables in [0, 1]:
   sleep: `f ← f·(1 − ζ)` at each sleep boundary. Modulates: a global precision decay (the modulate gain
   scaled by (1 − 0.5f)) and, at ceiling (f ≥ 0.95), FORCES the sleep boundary early.
 
-**PENDING: every constant's value + its source (fitted to §0(b) / chosen by design) declared here at
-signature.** H-DYNAMICS's dynamic ranges are the fitting target.
+**The constants, DECLARED 2026-10-12 from §0(b)'s table (source: fitted to the bench tape, the candidate
+values validated there — each shadow series visits both halves of [0,1] without sticking or diverging):**
+arousal `α = 0.25, β = 0.02, REST_A = 0.3` · boredom `γ = 0.04, δ = 0.10, κ = 0.8, s̄-EMA = 0.01` ·
+fatigue `ε = 0.001 per canvas, ζ = 0.6 reset per sleep boundary`. The mouth/seek thresholds: θ_babble,
+θ_exclaim, θ_silent and the seek's refractory window are CHOSEN at the bench's measured boredom/arousal
+distributions (θ_babble = 0.7, θ_exclaim = 0.7 within 5 canvases of the surprise, θ_silent = 0.9; the seek
+refractory = one source-switch per 500 canvases) — chosen by design against the §0(b) ranges, printed in
+the gate record. H-DYNAMICS's dynamic ranges were the fitting target; the gate's fresh seed decides whether
+the fit travels (§8 attack 1).
 
 ### §2.3 · The effectors (exact code paths declared at signature)
 
