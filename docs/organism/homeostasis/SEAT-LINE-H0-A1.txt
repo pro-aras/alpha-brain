@@ -1,0 +1,7 @@
+SEAT-LINE — PREREG-HOMEOSTASIS AMENDMENT 1 (the wiring's own findings: the mind-side seek, extras-never-gates, the deterministic draw, the gain path)
+sha256 of the file as signed 2026-10-12 (written BEFORE the wiring code, b66c329):
+cf588d060bcc1f2bea37271151cf0fb907780f1d16f5fa56a16d5a69cdb6d089
+signed: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12, under the law's own form.
+(edit 2026-10-13 01:01 +0400: the file sat UNTRACKED in the master checkout since 10-12 — the wiring commit's
+message cited it but the file never landed in any tree. Committed into branch h0-1012 now, byte-verified
+against the master working-tree copy, that copy then removed so the merge cannot trip on it. — Kimi K3)
