@@ -34,7 +34,7 @@ class TestRoots(unittest.TestCase):
   # (the law SIGNED; SEAT-LINE sha256 2c6bb22b…): the pin gains the law's declared content (the scene world
   # lawful at the life's seed 20261211; the 10-09 launch-verdict item repaired) — the pin working, caught at
   # the launch gate's first full run and updated under the law, never loosened.
-        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-bl6"))  # the bl6 window: the live root moves (the alpha6 root stays, read as plain files only)
+        self.assertEqual(C.RUNS, Path("/data/dev/brain-runs/scene-organ-h0"))  # the H0 window (PREREG-HOMEOSTASIS §6, SIGNED 2026-10-12): the live root moves (the bl6 root stays, read as plain files only — C.BL6_RUNS)
         self.assertEqual(C.FM6_RUNS, Path("/data/dev/brain-runs/scene-organ-fm6"))
         self.assertEqual(C.SCENE_ORGAN_RUNS, Path("/data/dev/brain-runs/scene-organ"))
         self.assertEqual(C.S1B1R_RUNS, Path("/data/dev/brain-runs/scene-s1b1r"))

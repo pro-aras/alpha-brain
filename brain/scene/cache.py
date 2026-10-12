@@ -88,7 +88,15 @@ from . import world as W
 # root's for the UNCHANGED seeds (tools/brain/diag/cache_identity.py <this root> <the alpha6 root>, with its
 # planted bit) — the law's ONE pinned window (the law §6). No eye or world line changed: the pin's price, not
 # a new world.
-RUNS = Path("/data/dev/brain-runs/scene-organ-bl6")
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 18:0x +0400 — PREREG-HOMEOSTASIS §6 (the law
+# SIGNED; SEAT-LINE-H0.txt sha256 edda32e7…): the gene HOMEOSTASIS (the one parser branch) changes
+# genome/machinery.py, WORLD_CODE, so check_code refuses every cache under scene-organ-bl6; this tree's
+# run root is FRESH again (RUNS = scene-organ-h0): every cache is redrawn there (cache-r) and proven
+# array-identical to the bl6 root's for the UNCHANGED seeds (tools/brain/diag/cache_identity.py <this root>
+# <the bl6 root>, with its planted bit) — the law's pinned window (the law §6). NO new world seed: no eye
+# or world line changed — the pin's price, not a new world. brain-long-6's LIVE root is never touched.
+RUNS = Path("/data/dev/brain-runs/scene-organ-h0")
+BL6_RUNS = Path("/data/dev/brain-runs/scene-organ-bl6")   # the bl6 window's redraw (the pre-HOMEOSTASIS code), read as plain files only
 SWARM1005_RUNS = Path("/data/dev/brain-runs/scene-organ-swarm-1005")   # the W1 window's redraw (the pre-ALPHA-6 code), read as plain files only
 INNER_RUNS = Path("/data/dev/brain-runs/scene-organ-swarm-1003")   # the INNER window's redraw (the pre-W1 code), read as plain files only
 DRIVE_RUNS = Path("/data/dev/brain-runs/scene-organ-drive")   # the DRIVE redraw (the pre-INNER code), read as plain files only

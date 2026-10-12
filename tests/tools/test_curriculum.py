@@ -48,7 +48,7 @@ BENCH2 = ROOT / "docs" / "organism" / "whole" / "records" / "open-world-2" / "be
 DATE = "2026-10-08"          # the curriculum date (the build's own day, from `date`), pinned in the fixtures
 
 # the instruments of record, sha-pinned by the law (G-FRONT / G-HEARS) — never edited under this law
-SHA_VFRONT = "1a0d74c626c4a2d8d086b06f1a5507e5c9c86a8bd87da1626c2f65107c45c036"   # == its bytes at 0f92281
+SHA_VFRONT = "e38676e5e88abefbed1eaabfd9439979679a0fed280da2425b300a8be958739d"   # == its bytes at h0-1012's wiring — PREREG-HOMEOSTASIS §2.3 (SIGNED; SEAT-LINE-H0.txt edda32e7…): the extra_fixations parameter (default 0, byte-identical behavior) — the pin moved under the law, never loosened (was: its bytes at 0f92281)
 SHA_CUTTER = "d0bc0b6f7933a3a8746bada73a0e67d9f57d5a8d434dbf2cbc90b215f64b084b"
 SHA_DOOR = "ebcd70c42c4dcad69e2e8f3fea782c10ba5a5554e1e7dff5d088c849f457d821"
 SHA_GENOME = "0d064f864d9c4158e1d6b8d92e750501db153c23a6340b7abafb0e86d4560d54"
