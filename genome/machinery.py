@@ -584,6 +584,29 @@ def parse_genome(text: str) -> Genome:
                     dup = [w for w in set(words) if words.count(w) > 1][0]
                     raise GenomeError(f"REGISTERS: repeated word {dup!r} (a declaration never repeats itself — PREREG-BRAIN-LONG-6 §1.3)")
                 g["declared"]["REGISTERS"] = {w: True for w in words}
+            elif gene == "HOMEOSTASIS":
+                # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.1
+                # (the law SIGNED; SEAT-LINE-H0.txt sha256 edda32e7…; the developmental road's Law 1):
+                # the ONE new genome line declaring the drives for the life that carries them —
+                # `HOMEOSTASIS arousal boredom fatigue`, 1..3 words from the fixed set {arousal, boredom,
+                # fatigue}. ABSENT (every genome on disk): NO key — byte-identical, pinned by
+                # tests/genome/test_parse_homeostasis.py. PRESENT: declared["HOMEOSTASIS"][word] = True
+                # per declared word; the Mind self-wires the three state variables from the declaration
+                # (creature/mind.py, NOT pinned — the REGISTERS wiring's own precedent). A bare line, an
+                # unknown word, or a repeated word refuses BY NAME. This file is PINNED
+                # (brain/scene/cache.py's WORLD_CODE): the law's price (§6) — the fresh run root, the
+                # cache redraw, the array-identity check with a planted bit — is paid at the gate, the
+                # bl6 window's own form.
+                words = a.split()
+                if not words or len(words) > 3:
+                    raise GenomeError(f"HOMEOSTASIS: cannot read {a!r} (PREREG-HOMEOSTASIS §2.1: 1..3 words from {{arousal, boredom, fatigue}})")
+                bad = [w for w in words if w not in ("arousal", "boredom", "fatigue")]
+                if bad:
+                    raise GenomeError(f"HOMEOSTASIS: unknown word {bad[0]!r} (one of arousal, boredom, fatigue — PREREG-HOMEOSTASIS §2.1)")
+                if len(set(words)) != len(words):
+                    dup = [w for w in set(words) if words.count(w) > 1][0]
+                    raise GenomeError(f"HOMEOSTASIS: repeated word {dup!r} (a declaration never repeats itself — PREREG-HOMEOSTASIS §2.1)")
+                g["declared"]["HOMEOSTASIS"] = {w: True for w in words}
             # edit: Claude (Fable 5.1), 2026-09-28 20:10 +0400 — BRAIN-IN-BODY: "scene" joins "game" as a shape this branch does not take
             # (the drawn world's own grammar and dict are untouched; `WORLD scene …` has its own branch below).
             # edit: Kimi Code (K3, kimi-code, builder lane), 2026-10-08 20:56 +0400 — PREREG-ALPHA-6 §1.2: "video" joins them (its own branch below).
