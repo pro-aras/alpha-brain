@@ -1,6 +1,6 @@
 # PREREG-HOMEOSTASIS — the drives law (Law 1 of the developmental road)
 
-*edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — DRAFT, NOT SIGNED. The queue of record:
+*edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — SIGNED (the §9 block + SEAT-LINE-H0.txt). Drafted, completed, and signed the same day. The queue of record:
 `/data/research/advisor-opus/2026-10-12_opus46-developmental-road-FINAL-PLAN.md` (the advisor's two rounds,
 his 10-12 order). Signature waits for: §0's bench numbers (the bench fires today), the constants chosen
 from them (§2.2), and the adversarial walk (§8) answered against the real bench, in that order.
@@ -73,7 +73,8 @@ Discrete updates per canvas, all variables in [0, 1]:
   world source in the round-robin).
 - **fatigue** — `f ← clip(f + ε)` per canvas processed (NOT wall-clock — §8's attack 4), reset toward 0 by
   sleep: `f ← f·(1 − ζ)` at each sleep boundary. Modulates: a global precision decay (the modulate gain
-  scaled by (1 − 0.5f)) and, at ceiling (f ≥ 0.95), FORCES the sleep boundary early.
+  scaled by (1 − 0.5f)) and, at ceiling (f ≥ 0.95), FORCES the sleep boundary early — **bounded below:
+  never sooner than half the genome's own count** (§8 attack 11; verifier V3).
 
 **The constants, DECLARED 2026-10-12 from §0(b)'s table (source: fitted to the bench tape, the candidate
 values validated there — each shadow series visits both halves of [0,1] without sticking or diverging):**
@@ -85,11 +86,25 @@ refractory = one source-switch per 500 canvases) — chosen by design against th
 the gate record. H-DYNAMICS's dynamic ranges were the fitting target; the gate's fresh seed decides whether
 the fit travels (§8 attack 1).
 
-### §2.3 · The effectors (exact code paths declared at signature)
+### §2.3 · The effectors (the exact code paths, surveyed 2026-10-12 on ce628fa)
 
-arousal → modulate() gain · fixation count · sleep onset. boredom → ask probability · mouth probability ·
-world-source seek. fatigue → precision decay · forced sleep. Nothing else changes: the brain's learning,
-calibration, exams, the DRIVE turns, the precision register (its own stream untouched), every other organ.
+- **arousal** → `genome/predict.py:266 modulate()`: the arousal gain multiplies the SAME lr precision
+  scales (`lr × clip(0.5 + 3·e, 0.5, 2.0) × g_a`, `g_a = clip(1 + 2·(a − REST_A), 0.5, 2.0)`) — global,
+  bounded, beside precision never instead of it (H-PRECISION's arms decide the interaction) · the
+  fixation count: the eye's per-canvas fixations (`genome.gaze["fixations"]`, consumed in the canvas
+  loop; `creature/exam.py:145` reads the same key) gains **+1** when `a > 0.7` at that canvas · sleep
+  onset: the `_maybe_sleep` boundary site (below).
+- **boredom** → the ask site `creature/mind.py:3463 _maybe_ask` (the firing probability scales with b) ·
+  the mouth site `creature/mind.py:4330 _maybe_say` (the babble/exclaim/suppress couplings of §2.4) ·
+  the SEEK act: the body's world cycle (`creature/body.py`'s canvas loop — the seek nudges the next
+  source among the life's ARMED worlds only; never a door, never a HOLD'd one).
+- **fatigue** → the global precision decay (the same `modulate()` path, the gain scaled by `(1 − 0.5·f)`)
+  · the forced sleep boundary: `creature/mind.py:3175 _maybe_sleep` (the SLEEP line's count check gains
+  the fatigue clause: boundary when `moments_since_sleep ≥ count` OR `f ≥ 0.95`, bounded below by half
+  the count).
+- Nothing else changes: the brain's learning, calibration, exams, the DRIVE turns, the precision
+  register's own stream, every other organ. The Mind self-wires the three variables from the declaration
+  (the REGISTERS form, `creature/mind.py:440-477`: tri-state, absent = byte-identical).
 
 ### §2.4 · The mouth driven by state
 
@@ -135,8 +150,12 @@ lower ≥ 0.02 pre-sleep; recovery within 0.01 post-sleep) · H-NULL (inverted d
 tests, or redundancy declared as the finding) · **H-SEEK-LEARN (added 10-12 §2.4b, his challenge): in the
 1,000 canvases after a boredom-ceiling SEEK, the sought source's share of the organism's asks+says rises
 ≥ 2× its 1,000-canvas pre-seek share; with boredom clamped at 0, ZERO seeks occur (the presence count
-printed)** · I1 (OFF replay == the closed journal; the planted change
-breaks it) · I2 (ON journal minus drive rows == the OFF journal). **Readings, never graded:** the variables'
+printed)** · I1 (OFF: the closed-life replay == its journal, byte-identical; the planted change
+breaks it) · **I2 (ON, AMENDED by the verifier's V6 — the honest form for a behavior-modulating law): the
+ON life replays to ITSELF byte-identically under the launch sha (determinism), and the flat twin (the line
+absent) reproduces the pre-window journal to the byte — the advisor's original «ON minus drive rows == OFF»
+is REFUSED here: once a drive moves an ask/say/sleep/lr, the downstream tape diverges LEGITIMATELY; the
+identity guarantee is replay-determinism + the OFF twin, never erasure-matching**. **Readings, never graded:** the variables'
 per-window means; the mouth's content distribution at high vs low boredom; the attended world-source at
 boredom ceiling; the arousal × precision interaction surface.
 
@@ -197,5 +216,12 @@ satisfying H-DYNAMICS). (The plan §4.8, adopted verbatim.)
 
 ## §9 · Signature
 
-The seat signs alone (his 09-29 word) — after §0(b)'s table lands, the constants are declared, and this
-walk is re-read against the real bench. **DRAFT 2026-10-12 — NOT SIGNED.**
+- Author: Kimi Code (K3, kimi-code, the seat alone) — drafted 2026-10-12, completed the same day after
+  §0(b) landed (the bench `brain-long-6-h0s0`, 9,219 canvases, `records/s0-bench-brain-long-6-h0s0.txt`).
+- Verifier loop: the seat's own adversarial read, recorded in `verify/H0-VERIFIER-READ.md` beside this
+  law (V1–V6; two clauses amended in writing — V3 the fatigue floor, V6 I2's honest form; no bar
+  loosened).
+- The seat: **SIGNED 2026-10-12 under Ahmad's 10-12 words** («Go ahead»; the re-aim; the advisor
+  consultation). SEAT-LINE: sha256 of this file (pre-signature) recorded in `SEAT-LINE-H0.txt` beside
+  this law. What this law rides: the developmental road's final plan §1 Law 1; it enters life bl7 per the
+  ladder; bl6's close and bl7's launch remain HIS words at the wall.

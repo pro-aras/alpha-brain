@@ -1,0 +1,4 @@
+SEAT-LINE — PREREG-HOMEOSTASIS
+sha256 of the pre-signature file (the complete-draft as the verifier read it, V3/V6/§2.3 amendments in, before the §9 signature block):
+edda32e7d8a2af57dc837187cb3af03a53e0913694ee525b000a4e96078b6236
+signed: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12, under Ahmad's 10-12 words («Go ahead»).
