@@ -1,0 +1,7 @@
+2026-10-12 18:05:10 +0400 brain-long-6 is ACTIVE (named; the law §6's quiet form): active
+2026-10-12 18:05:10 +0400 ramguard heartbeat: 2026-10-12 18:05:09 +0400 state=OK avail=19870MB swapfree=4948MB swapgrowth60s=0MB psi_full=0.0
+2026-10-12 18:05:10 +0400 start at e4f96eb6f20ec32b9a5bf033aea7bc6be1842b8a; load 2.27 2.41 2.38; MemAvailable MemAvailable:   20343440 kB
+18:05:10 rsync exit 0
+18:13:59 cache-r exit 0
+18:14:01 cache-identity exit 0
+18:14:02 identity-all exit 1

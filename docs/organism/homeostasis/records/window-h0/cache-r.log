@@ -1,0 +1,138 @@
+2026-10-12 18:05:20 [cache toy-train 20261099] 1000/1000
+2026-10-12 18:05:33 [cache train 20261101] 1000/10000
+2026-10-12 18:05:43 [cache train 20261101] 2000/10000
+2026-10-12 18:05:53 [cache train 20261101] 3000/10000
+2026-10-12 18:06:03 [cache train 20261101] 4000/10000
+2026-10-12 18:06:13 [cache train 20261101] 5000/10000
+2026-10-12 18:06:23 [cache train 20261101] 6000/10000
+2026-10-12 18:06:33 [cache train 20261101] 7000/10000
+2026-10-12 18:06:43 [cache train 20261101] 8000/10000
+2026-10-12 18:06:53 [cache train 20261101] 9000/10000
+2026-10-12 18:07:03 [cache train 20261101] 10000/10000
+2026-10-12 18:07:03 [cache train 20261101 s1b1] written: 10000 rows
+2026-10-12 18:07:07 [cache test 20261101 s1b1] written: 400 rows
+2026-10-12 18:07:08 [cache m2b 20261101 s1b1] written: 56 rows
+2026-10-12 18:07:08 [cache m6 20261101 s1b1] written: 42 rows
+2026-10-12 18:07:09 [cache m3 20261101 s1b1] written: 60 rows
+2026-10-12 18:07:10 [cache speak 20261101 s1b1] written: 96 rows
+2026-10-12 18:07:11 [cache decline 20261101 s1b1] written: 48 rows
+2026-10-12 18:07:11 [cache-r] 20261101/s1b1: cpu 108.9 s · disjoint {'test': 400, 'm2b': 56, 'm6': 42, 'm3': 60, 'speak': 96, 'decline': 48}
+2026-10-12 18:07:15 [cache test 20261101 fresh] written: 400 rows
+2026-10-12 18:07:16 [cache m2b 20261101 fresh] written: 56 rows
+2026-10-12 18:07:17 [cache m6 20261101 fresh] written: 42 rows
+2026-10-12 18:07:17 [cache m3 20261101 fresh] written: 60 rows
+2026-10-12 18:07:19 [cache speak 20261101 fresh] written: 96 rows
+2026-10-12 18:07:19 [cache decline 20261101 fresh] written: 48 rows
+2026-10-12 18:07:20 [cache speak2 20261101 fresh] written: 60 rows
+2026-10-12 18:07:20 [cache-r] 20261101/fresh: cpu 9.5 s · disjoint {'test': 400, 'm2b': 56, 'm6': 42, 'm3': 60, 'speak': 96, 'decline': 48, 'speak2': 60}
+2026-10-12 18:07:25 [cache test 20261101 held] written: 400 rows
+2026-10-12 18:07:25 [cache m2b 20261101 held] written: 56 rows
+2026-10-12 18:07:27 [cache m6 20261101 held] written: 84 rows
+2026-10-12 18:07:27 [cache m3 20261101 held] written: 60 rows
+2026-10-12 18:07:29 [cache speak 20261101 held] written: 96 rows
+2026-10-12 18:07:29 [cache decline 20261101 held] written: 48 rows
+2026-10-12 18:07:30 [cache speak2 20261101 held] written: 60 rows
+2026-10-12 18:07:30 [cache-r] 20261101/held: cpu 10.0 s · disjoint {'test': 400, 'm2b': 56, 'm6': 84, 'm3': 60, 'speak': 96, 'decline': 48, 'speak2': 60}
+2026-10-12 18:07:42 [cache train 20261102] 1000/10000
+2026-10-12 18:07:52 [cache train 20261102] 2000/10000
+2026-10-12 18:08:02 [cache train 20261102] 3000/10000
+2026-10-12 18:08:11 [cache train 20261102] 4000/10000
+2026-10-12 18:08:20 [cache train 20261102] 5000/10000
+2026-10-12 18:08:29 [cache train 20261102] 6000/10000
+2026-10-12 18:08:38 [cache train 20261102] 7000/10000
+2026-10-12 18:08:47 [cache train 20261102] 8000/10000
+2026-10-12 18:08:57 [cache train 20261102] 9000/10000
+2026-10-12 18:09:07 [cache train 20261102] 10000/10000
+2026-10-12 18:09:07 [cache train 20261102 s1b1] written: 10000 rows
+2026-10-12 18:09:12 [cache test 20261102 s1b1] written: 400 rows
+2026-10-12 18:09:12 [cache m2b 20261102 s1b1] written: 56 rows
+2026-10-12 18:09:13 [cache m6 20261102 s1b1] written: 42 rows
+2026-10-12 18:09:14 [cache m3 20261102 s1b1] written: 60 rows
+2026-10-12 18:09:15 [cache speak 20261102 s1b1] written: 96 rows
+2026-10-12 18:09:15 [cache decline 20261102 s1b1] written: 48 rows
+2026-10-12 18:09:15 [cache-r] 20261102/s1b1: cpu 105.0 s · disjoint {'test': 400, 'm2b': 56, 'm6': 42, 'm3': 60, 'speak': 96, 'decline': 48}
+2026-10-12 18:09:20 [cache test 20261102 fresh] written: 400 rows
+2026-10-12 18:09:20 [cache m2b 20261102 fresh] written: 56 rows
+2026-10-12 18:09:21 [cache m6 20261102 fresh] written: 42 rows
+2026-10-12 18:09:22 [cache m3 20261102 fresh] written: 60 rows
+2026-10-12 18:09:23 [cache speak 20261102 fresh] written: 96 rows
+2026-10-12 18:09:24 [cache decline 20261102 fresh] written: 48 rows
+2026-10-12 18:09:25 [cache speak2 20261102 fresh] written: 60 rows
+2026-10-12 18:09:25 [cache-r] 20261102/fresh: cpu 9.4 s · disjoint {'test': 400, 'm2b': 56, 'm6': 42, 'm3': 60, 'speak': 96, 'decline': 48, 'speak2': 60}
+2026-10-12 18:09:29 [cache test 20261102 held] written: 400 rows
+2026-10-12 18:09:30 [cache m2b 20261102 held] written: 56 rows
+2026-10-12 18:09:31 [cache m6 20261102 held] written: 84 rows
+2026-10-12 18:09:31 [cache m3 20261102 held] written: 60 rows
+2026-10-12 18:09:32 [cache speak 20261102 held] written: 96 rows
+2026-10-12 18:09:33 [cache decline 20261102 held] written: 48 rows
+2026-10-12 18:09:34 [cache speak2 20261102 held] written: 60 rows
+2026-10-12 18:09:34 [cache-r] 20261102/held: cpu 9.2 s · disjoint {'test': 400, 'm2b': 56, 'm6': 84, 'm3': 60, 'speak': 96, 'decline': 48, 'speak2': 60}
+2026-10-12 18:09:46 [cache train 20261103] 1000/10000
+2026-10-12 18:09:56 [cache train 20261103] 2000/10000
+2026-10-12 18:10:06 [cache train 20261103] 3000/10000
+2026-10-12 18:10:15 [cache train 20261103] 4000/10000
+2026-10-12 18:10:25 [cache train 20261103] 5000/10000
+2026-10-12 18:10:34 [cache train 20261103] 6000/10000
+2026-10-12 18:10:44 [cache train 20261103] 7000/10000
+2026-10-12 18:10:54 [cache train 20261103] 8000/10000
+2026-10-12 18:11:06 [cache train 20261103] 9000/10000
+2026-10-12 18:11:15 [cache train 20261103] 10000/10000
+2026-10-12 18:11:16 [cache train 20261103 s1b1] written: 10000 rows
+2026-10-12 18:11:20 [cache test 20261103 s1b1] written: 400 rows
+2026-10-12 18:11:21 [cache m2b 20261103 s1b1] written: 56 rows
+2026-10-12 18:11:22 [cache m6 20261103 s1b1] written: 42 rows
+2026-10-12 18:11:22 [cache m3 20261103 s1b1] written: 60 rows
+2026-10-12 18:11:24 [cache speak 20261103 s1b1] written: 96 rows
+2026-10-12 18:11:25 [cache decline 20261103 s1b1] written: 48 rows
+2026-10-12 18:11:25 [cache-r] 20261103/s1b1: cpu 110.5 s · disjoint {'test': 400, 'm2b': 56, 'm6': 42, 'm3': 60, 'speak': 96, 'decline': 48}
+2026-10-12 18:11:29 [cache test 20261103 fresh] written: 400 rows
+2026-10-12 18:11:30 [cache m2b 20261103 fresh] written: 56 rows
+2026-10-12 18:11:31 [cache m6 20261103 fresh] written: 42 rows
+2026-10-12 18:11:32 [cache m3 20261103 fresh] written: 60 rows
+2026-10-12 18:11:33 [cache speak 20261103 fresh] written: 96 rows
+2026-10-12 18:11:33 [cache decline 20261103 fresh] written: 48 rows
+2026-10-12 18:11:35 [cache speak2 20261103 fresh] written: 60 rows
+2026-10-12 18:11:35 [cache-r] 20261103/fresh: cpu 10.2 s · disjoint {'test': 400, 'm2b': 56, 'm6': 42, 'm3': 60, 'speak': 96, 'decline': 48, 'speak2': 60}
+2026-10-12 18:11:39 [cache test 20261103 held] written: 400 rows
+2026-10-12 18:11:40 [cache m2b 20261103 held] written: 56 rows
+2026-10-12 18:11:41 [cache m6 20261103 held] written: 84 rows
+2026-10-12 18:11:42 [cache m3 20261103 held] written: 60 rows
+2026-10-12 18:11:43 [cache speak 20261103 held] written: 96 rows
+2026-10-12 18:11:44 [cache decline 20261103 held] written: 48 rows
+2026-10-12 18:11:45 [cache speak2 20261103 held] written: 60 rows
+2026-10-12 18:11:46 [cache-r] 20261103/held: cpu 10.6 s · disjoint {'test': 400, 'm2b': 56, 'm6': 84, 'm3': 60, 'speak': 96, 'decline': 48, 'speak2': 60}
+2026-10-12 18:11:58 [cache train 20261211] 1000/10000
+2026-10-12 18:12:09 [cache train 20261211] 2000/10000
+2026-10-12 18:12:18 [cache train 20261211] 3000/10000
+2026-10-12 18:12:29 [cache train 20261211] 4000/10000
+2026-10-12 18:12:40 [cache train 20261211] 5000/10000
+2026-10-12 18:12:50 [cache train 20261211] 6000/10000
+2026-10-12 18:13:01 [cache train 20261211] 7000/10000
+2026-10-12 18:13:11 [cache train 20261211] 8000/10000
+2026-10-12 18:13:21 [cache train 20261211] 9000/10000
+2026-10-12 18:13:31 [cache train 20261211] 10000/10000
+2026-10-12 18:13:32 [cache train 20261211 s1b1] written: 10000 rows
+2026-10-12 18:13:37 [cache test 20261211 s1b1] written: 400 rows
+2026-10-12 18:13:37 [cache m2b 20261211 s1b1] written: 56 rows
+2026-10-12 18:13:38 [cache m6 20261211 s1b1] written: 42 rows
+2026-10-12 18:13:39 [cache m3 20261211 s1b1] written: 60 rows
+2026-10-12 18:13:40 [cache speak 20261211 s1b1] written: 96 rows
+2026-10-12 18:13:41 [cache decline 20261211 s1b1] written: 48 rows
+2026-10-12 18:13:41 [cache-r] 20261211/s1b1: cpu 115.3 s · disjoint {'test': 400, 'm2b': 56, 'm6': 42, 'm3': 60, 'speak': 96, 'decline': 48}
+2026-10-12 18:13:45 [cache test 20261211 fresh] written: 400 rows
+2026-10-12 18:13:45 [cache m2b 20261211 fresh] written: 56 rows
+2026-10-12 18:13:46 [cache m6 20261211 fresh] written: 42 rows
+2026-10-12 18:13:47 [cache m3 20261211 fresh] written: 60 rows
+2026-10-12 18:13:48 [cache speak 20261211 fresh] written: 96 rows
+2026-10-12 18:13:48 [cache decline 20261211 fresh] written: 48 rows
+2026-10-12 18:13:50 [cache speak2 20261211 fresh] written: 60 rows
+2026-10-12 18:13:50 [cache-r] 20261211/fresh: cpu 8.9 s · disjoint {'test': 400, 'm2b': 56, 'm6': 42, 'm3': 60, 'speak': 96, 'decline': 48, 'speak2': 60}
+2026-10-12 18:13:54 [cache test 20261211 held] written: 400 rows
+2026-10-12 18:13:54 [cache m2b 20261211 held] written: 56 rows
+2026-10-12 18:13:55 [cache m6 20261211 held] written: 84 rows
+2026-10-12 18:13:56 [cache m3 20261211 held] written: 60 rows
+2026-10-12 18:13:57 [cache speak 20261211 held] written: 96 rows
+2026-10-12 18:13:58 [cache decline 20261211 held] written: 48 rows
+2026-10-12 18:13:59 [cache speak2 20261211 held] written: 60 rows
+2026-10-12 18:13:59 [cache-r] 20261211/held: cpu 9.6 s · disjoint {'test': 400, 'm2b': 56, 'm6': 84, 'm3': 60, 'speak': 96, 'decline': 48, 'speak2': 60}
+2026-10-12 18:13:59 [cache-r] CPU-s in all: 528.6
