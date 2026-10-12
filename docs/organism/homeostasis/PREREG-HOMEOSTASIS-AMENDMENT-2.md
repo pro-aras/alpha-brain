@@ -10,6 +10,13 @@ pool that was drained by construction, (c) the marks' operational forms where th
 population the gate world cannot hold or a symbol it never defined. Every move carries its arithmetic.
 The seat signs alone (his 09-29 word); the adversarial read is §A2-V below.*
 
+*edit 2026-10-13 01:1x +0400 — F3's repair gained a wiring clause (same walk, same class): the drives'
+per-canvas update fired only on the WORDED canvas-row path (`mind.py`'s `note_canvas` site), while the
+bench tape carries 481 sight-only canvas rows beside the 9,219 worded ones (measured) — the sight-only
+form already carried the `drives` key but never updated the state. §2.2 says ONCE PER CANVAS: the update
+now fires on both row forms (the sight-only form with its own err, word None). OFF untouched (the call
+sites are gated on the drives' existence).*
+
 ## F1 · Fatigue's ε was fitted to a misread cadence — the forced boundary could never fire
 
 **The finding.** §2.2 declared `ε = 0.001/canvas, ζ = 0.6`, fitted to §0(b)'s shadow-fatigue column
@@ -48,7 +55,7 @@ signed text): ceiling 6/4 = 1.5× > 1.3× with margin. The BAR does not move. If
 ratio reads 1.0 and the mark fails honestly. Cost named: +2 glances per high-arousal canvas; the gate's
 cost reading prints it.
 
-## F3 · H-BOREDOM-ASK: a misread baseline and a pool drained by construction
+## F3 · H-BOREDOM-ASK: a misread baseline, a pool drained by construction, and a missed canvas form
 
 **The findings, two.** (i) §0(b) printed «asks ~360/1000 canvases» as the youth rate the drives modulate.
 That column is the BRAIN organ's turn-asks (the s0 reader counts `kind:brain` rows carrying an `ask`).
