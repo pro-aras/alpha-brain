@@ -58,6 +58,8 @@ from creature import genes as genes_module
 from creature import think_thread
 from genome import gaze
 from genome.fast import Episodes
+# edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.1: the drives module
+from genome.homeostasis import Homeostasis
 from genome.machinery import Genome, GenomeError, Organism, parse_genome, _unit
 from genome.park import Park
 from genome.predict import Predictor, file as predict_file, score as predict_score
@@ -437,7 +439,8 @@ class Mind:
     is blind to (e.g. {"gaze"} runs the random-gaze twin, PREREG §2.9's --blind gaze)."""
 
     def __init__(self, genome_path: Path, run_root: Path, blind: FrozenSet[str] = frozenset(), eye_front=None,
-                 precision: Optional[bool] = None, muse: Optional[bool] = None, content_web: Optional[bool] = None):
+                 precision: Optional[bool] = None, muse: Optional[bool] = None, content_web: Optional[bool] = None,
+                 homeostasis: Optional[object] = None, homeostasis_flat: bool = False):
         self.genome_path = Path(genome_path)
         self.run_root = Path(run_root)
         self.genome_text = self.genome_path.read_text()
@@ -476,6 +479,23 @@ class Mind:
         # of the law's G-UNIT(d)/G-PLANT(i)), zeroed at every birth/resume and never snapshotted.
         self.content_web = content_web if content_web is not None else bool(_reg.get("content-web", False))
         self._cweb_counts: Dict[str, int] = {s: 0 for s in _cweb.TOKEN_SENSES}
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.1 + AMENDMENT 1
+        # (the law SIGNED; SEAT-LINE-H0.txt sha256 edda32e7…): THE DRIVES as a tri-state, the REGISTERS
+        # block's own form — None (every caller today) = read the genome's declared["HOMEOSTASIS"] (the
+        # parser's new line, machinery.py's pinned window; ABSENT there = no drives at all, byte-identical);
+        # True = the full three (the benches' form); a dict = exactly those words (the law's solo arms);
+        # False = off. homeostasis_flat = the flat twin (the state fixed at rest, the effectors reading it —
+        # H-DRIVE-EFFECT's baseline arm). The state lives in genome/homeostasis.py; every effector reads it
+        # and nowhere else. The resume path passes its own tri-state through (the REGISTERS precedent, V5).
+        self.homeostasis_flat = homeostasis_flat
+        _h0d = self.genome.declared.get("HOMEOSTASIS", {})
+        if homeostasis is None:
+            homeostasis = _h0d if _h0d else False
+        if homeostasis is True:
+            homeostasis = {"arousal": True, "boredom": True, "fatigue": True}
+        self._drives: Optional[Homeostasis] = (Homeostasis(dict(homeostasis), seed=int(self.genome.seed),
+                                                           flat=homeostasis_flat)
+                                               if homeostasis else None)
 
         # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 22:45 +0400 — W3-0 (docs/G4-WAVE3-CLAUSES.md):
         # THE GENERIC REFUSAL, first — before any object is built from the genome (a refusal message must
@@ -634,7 +654,8 @@ class Mind:
         # clause (machinery.py's parser, default "novelty" when the genome's PREDICT line carries no
         # trailing "; error <arm>" — every genome on disk before this edit, G4.genome included).
         self.predictor: Optional[Predictor] = (
-            Predictor(self.org, arm=self.genome.declared["PREDICT"].get("arm", "novelty"), precision=self.precision)
+            Predictor(self.org, arm=self.genome.declared["PREDICT"].get("arm", "novelty"), precision=self.precision,
+                      homeostasis=self._drives)   # H0: the drives' gains ride modulate() (PREREG-HOMEOSTASIS §2.3)
             if "PREDICT" in self.genome.declared else None
         )
         self._last_sleep_at: int = 0        # org.t at the last SLEEP boundary crossed
@@ -2765,9 +2786,15 @@ class Mind:
         # dict is the glances dict's own shape, so every line below reads it unchanged. None (the default): the
         # exact call this method has always made.
         if self.eye_front is not None:
-            g = self.eye_front.glances(rgb, mode, row["sha"], predicted=predicted)
+            g = self.eye_front.glances(rgb, mode, row["sha"], predicted=predicted,
+                                       extra_fixations=(self._drives.extra_fixations() if self._drives is not None else 0))
         else:
-            g = gaze.glances(rgb, self.genome.retina, self.genome.gaze, mode, row["sha"], colour=self.genome.colour, predicted=predicted)
+            # H0 (PREREG-HOMEOSTASIS §2.3): the arousal drive's +1 fixation — an adjusted gaze dict copy,
+            # the genome's own dict never mutated; absent drives: the exact call this method always made.
+            _gaze_cfg = self.genome.gaze
+            if self._drives is not None and self._drives.extra_fixations():
+                _gaze_cfg = {**self.genome.gaze, "fixations": int(self.genome.gaze["fixations"]) + 1}
+            g = gaze.glances(rgb, self.genome.retina, _gaze_cfg, mode, row["sha"], colour=self.genome.colour, predicted=predicted)
         g_eye = g     # edit: Claude (Opus 5.5, BRAIN builder C), 2026-09-28 20:31 +0400 — the glance BEFORE the organism's blind-coarse strip (which rebinds `g`, never mutates this dict): the brain's input
         # L-7 (edit: Claude (Sonnet 5, LIFE builder B), 2026-09-22 19:0x +0400): --blind coarse drops the
         # fifth (coarse) feature from THIS mind's own learning road entirely — genome/gaze.py has no notion
@@ -2833,6 +2860,19 @@ class Mind:
             # three (genome/predict.py's error(), byte-identical branch).
             err = self.predictor.error(g["feats"][0], word=word, xw=xw, episodes=self.episodes)
             lr_scale = self.predictor.modulate(1.0)
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.2/A1: THE
+        # DRIVES update ONCE per canvas, from this canvas's own err (the same stream precision reads),
+        # BEFORE any consumer below (the learning step's lr_scale already carries the gains — the drives'
+        # state at THIS canvas's start governs this canvas's gains, the causal read-then-update order,
+        # the precision register's own precedent); then the boredom-ceiling seek fires and is journaled.
+        if self._drives is not None:
+            self._drives.note_canvas(err, source=meta.get("source"))
+            if self._drives.seek_due():
+                target = self._drives.seek_target(current=meta.get("source"))
+                self._drives.note_seek(target)
+                self._write_journal(row["at"], {"seq": row["seq"],
+                                                "seek": {"source": target, "b": round(self._drives.b, 4),
+                                                         "canvas": self._drives.canvases}})
         t_at_f0 = self.org.t
         f0 = g["feats"][0] if g["feats"] else None
         self._last_glance = f0    # L-11 task 4 (MOUTH): this canvas's own first glance, for _maybe_say
@@ -2984,6 +3024,10 @@ class Mind:
                 # (t_mass = mean|T-ON|+mean|T-OFF|; o = the operating point the front's state now holds). Absent
                 # otherwise: the identity gates cover both cases.
                 **({"front": {"t_mass": self.eye_front.last_t_mass, "o": self.eye_front.last_o}} if self.eye_front is not None else {}),
+                # H0 (edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS
+                # §2.2): the drives' ONE additive key on the canvas row (the `front` key's own precedent —
+                # absent when undeclared, byte-identical).
+                **({"drives": self._drives.row()} if self._drives is not None else {}),
             }
             self._write_journal(row["at"], journal_row)
             coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene, digest=journal_row["hash"])
@@ -3042,6 +3086,10 @@ class Mind:
                         # at n>=2 the trigger never fired on a real 2-canvas tape at all.
                         n = self._wordless_seen.get(cell, 0) + 1
                         self._wordless_seen[cell] = n
+                        # H0 (PREREG-HOMEOSTASIS AMENDMENT 1 A1/A2): the drives' wordless-cell ledger — the
+                        # boredom extras' ask pool, the seek's target-source preference reads it.
+                        if self._drives is not None:
+                            self._drives.note_wordless_cell(cell, meta.get("source") or "", str(moment or ""))
                         if n >= 1:
                             self._maybe_ask(f"sight:{cell}", "what-is", [moment])
             sight_row = {   # M3: bound to a name so the coarse row below can carry this row's digest (the same dict, the same bytes)
@@ -3057,6 +3105,10 @@ class Mind:
                 # only when) the front is wired, so the front's instrument stream lines up 1:1 with the residual
                 # stream the cutter reads (tools/worlds/event_cutter.py's err_series).
                 **({"front": {"t_mass": self.eye_front.last_t_mass, "o": self.eye_front.last_o}} if self.eye_front is not None else {}),
+                # H0 (edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.2):
+                # the drives' additive key on the sight-only canvas row too (the same parity the `front`
+                # key keeps) — absent when undeclared, byte-identical.
+                **({"drives": self._drives.row()} if self._drives is not None else {}),
             }
             self._write_journal(row["at"], sight_row)
             coarse_row = self._coarse_row(row["seq"], moment, residuals, confirmed_flags, surprise_gene, digest=sight_row["hash"])
@@ -3182,8 +3234,20 @@ class Mind:
             return
         every = int(self.genome.declared["SLEEP"]["every"])
         n = int(self.genome.declared["SLEEP"]["replay"])
-        while self.org.t - self._last_sleep_at >= every:
-            self._last_sleep_at += every
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.2 (V3's
+        # floor): the fatigue clause — a boundary fires when the count says so (the form this loop always
+        # had, byte-identical when the drives are undeclared) OR when fatigue sits at its ceiling, never
+        # sooner than half the count; a forced boundary snaps the cadence to it (the count re-zeros).
+        while True:
+            since = self.org.t - self._last_sleep_at
+            if since >= every:
+                self._last_sleep_at += every
+                forced = False
+            elif self._drives is not None and self._drives.force_sleep(since, every):
+                self._last_sleep_at = self.org.t
+                forced = True
+            else:
+                break
             # genome.sleep.sleep() calls org.moment() once per replayed episode -- org.t advances and can
             # BIRTH cells for moments my own per-glance loops never see (those loops only run inside
             # _consume_eye). questions.build_ledgers needs moment_thing[m] for EVERY birth's moment, so
@@ -3201,11 +3265,16 @@ class Mind:
             result = run_sleep(self.org, self.episodes, n, **({"words": False} if "ear" in self.blind else {}))
             self.sleep_count += 1
             cycled = run_cycle(self.org)
+            # H0 (PREREG-HOMEOSTASIS §2.2): fatigue's reset rides every boundary (declared fatigue only).
+            if self._drives is not None:
+                self._drives.note_sleep()
             self._ledger_births(births_before_sleep, "sleep")     # A42-B2: a birth inside the replay is owned by no canvas — "sleep", chain.birth_sources' own word
             if "TRAITS" in self.genome.declared and _TRAITS_AVAILABLE:
                 Traits.learn(self.episodes)      # per the interface name given for wave 2; unexercised until genome/traits.py lands
             self._write_journal(row["at"], {
-                "seq": row["seq"], "sleep": {**result, "cycle": cycled}, "hash": self.org.row_hash(),
+                "seq": row["seq"], "sleep": {**result, "cycle": cycled,
+                                             **({"forced": True} if forced else {})},   # H0: the fatigue-fired boundary is NAMED on its row
+                "hash": self.org.row_hash(),
             })
             # edit: Claude (Sonnet 5, W3 builder A), 2026-09-20 23:05 +0400 — W3-3 (docs/G4-WAVE3-CLAUSES.md;
             # genome/curiosity.py's own contract, B10 note 3): one sleep_boundary() call per boundary crossed
@@ -4058,6 +4127,7 @@ class Mind:
         # anything) the pool held this time; verified by
         # tests.creature.test_question_sentence_mouth.TestMouth.test_says_even_when_the_think_pool_is_empty.
         self._maybe_say(row)
+        self._drives_extra_ask(row)   # H0 AMENDMENT 1 A2: the boredom extras ride BOTH think roads (never a gate)
         if item is None:
             self._write_journal(row["at"], {"seq": row["seq"], "think": {"item": None, "kind": None, "outcome": "empty_pool", "parked": False}})
             return
@@ -4119,6 +4189,7 @@ class Mind:
         # deferred writes is read here as the general class of writes a THINK tick can make, not a
         # directive to move MOUTH off its own synchronous law.
         self._maybe_say(row)
+        self._drives_extra_ask(row)   # H0 AMENDMENT 1 A2: the boredom extras ride BOTH think roads (never a gate)
         if item is None:
             self._think_pending = None
             return
@@ -4338,6 +4409,10 @@ class Mind:
         not hidden)."""
         if "MOUTH" not in self.genome.declared:
             return
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.4: fatigue
+        # past θ_silent silences the mouth (the frame says AND the babble extras below alike).
+        if self._drives is not None and self._drives.suppressed():
+            return
         words = self._last_words_in_instant
         for key, frame in self._frames.items():
             w1 = str(frame.get("w1"))
@@ -4366,7 +4441,55 @@ class Mind:
             # bytes before this (acts_chosen had no "say"; the ring held no say episode).
             self.acts_chosen["say"] = self.acts_chosen.get("say", 0) + 1
             self._record_reflex("say", got=1.0 if heard else 0.0, expected_in=1.0, residual_in=None, source="mouth")
+            # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.4/A4: the
+            # EXCLAIM — aroused within 5 canvases of a surprise ≥ 2·s̄, the mouth repeats the say ONCE
+            # (a journal row only, never a second ask/out row; one exclaim per surprise by the module's latch).
+            if self._drives is not None and self._drives.exclaim():
+                self._write_journal(row["at"], {"seq": row["seq"], "say": {"frame": f"{w1} {w2}", "seq": row["seq"],
+                                                                           "heard": "yes" if heard else "no", "episodes": episodes_cited,
+                                                                           "exclaim": True}})
+                self._drives.note_exclaim()
             return   # one frame per think
+
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.4 + AMENDMENT 1
+        # A2: the BABBLE — the boredom-driven EXTRA say, fired only when no frame matched above (the frame
+        # road is untouched, never gated): the mouth speaks a FILED frame's own words (the most recently
+        # cited one) without a say-target, journaled with `babble: true`; the same synchronous self-judgment
+        # as any say. At low boredom the deterministic draw is identically False — the baseline is untouched.
+        if self._drives is not None and self._drives.extra_event(row["seq"], "babble"):
+            cited = [(k, fr) for k, fr in self._frames.items() if fr.get("episodes")]
+            if cited:
+                _key, frame = cited[-1]
+                w2 = str(frame.get("w2"))
+                heard = self._last_glance is not None and self._frame_evidence(w2, self._last_glance)
+                moment = (row.get("meta") or {}).get("moment")
+                self._write_ask_out({"q": "is", "args": [moment, w2], "from": "mouth", "seq": row["seq"], "at": row["at"]})
+                self._write_journal(row["at"], {
+                    "seq": row["seq"],
+                    "say": {"frame": f"{frame.get('w1')} {w2}", "seq": row["seq"], "heard": "yes" if heard else "no",
+                            "episodes": frame.get("episodes"), "babble": True},
+                })
+                self.think_counters["said"] += 1
+                self.think_counters["heard_yes" if heard else "heard_no"] += 1
+                self.acts_chosen["say"] = self.acts_chosen.get("say", 0) + 1
+                self._record_reflex("say", got=1.0 if heard else 0.0, expected_in=1.0, residual_in=None, source="mouth")
+
+    def _drives_extra_ask(self, row: Dict[str, object]) -> None:
+        """edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS AMENDMENT 1
+        A1/A2: the boredom-driven EXTRA curiosity ask — NEVER a gate on the want road (the baseline's asks
+        are untouched; at low boredom the deterministic draw is identically False). At most one per think
+        tick, through the EXISTING wordless-sight want road (`sight:<cell>` — _maybe_ask's once-ever
+        dedupe applies); while a seek is active the target source's wordless cells are preferred (the
+        attention turn, A1)."""
+        if self._drives is None or not self._drives.extra_event(row["seq"], "extra-ask"):
+            return
+        pick = self._drives.extra_ask_cell()
+        if pick is None:
+            return
+        cell, moment = pick
+        if not moment:
+            return
+        self._maybe_ask(f"sight:{cell}", "what-is", [moment])
 
     def _write_journal(self, at: str, obj: Dict[str, object]) -> None:
         date = at[:10]
@@ -4509,6 +4632,13 @@ class Mind:
         ledger_tmp = state_dir / "ledger_tmp.json"
         ledger_tmp.write_text(json.dumps(ledger))
         staged.append((ledger_tmp, state_dir / "ledger.json"))
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.2: the drives'
+        # state rides the snapshot's own atomic staging (the web.json precedent: the file exists in the
+        # manifest when and only when the declaration is live — the OFF twin never writes it).
+        if self._drives is not None:
+            drives_tmp = state_dir / "drives_tmp.json"
+            drives_tmp.write_text(json.dumps(self._drives.to_json(), sort_keys=True))
+            staged.append((drives_tmp, state_dir / "drives.json"))
         gen_tmp = state_dir / "SNAPSHOT_tmp.json"
         gen_tmp.write_text(json.dumps({"t": int(self.org.t), "last_seq": int(self.last_seq or 0),
                                        # edit: Claude (Sonnet 5.5, swarm hears), 2026-10-03 21:53 +0400 — POLLER-FIX (docs/organism/days/PREREG-POLLER-FIX.md §2, option A): the very integer the ledger above carries (the same variable, nothing runs between), in the file renamed LAST and atomically, so the two 5-second pollers (creature/exam.py canvas_count_now) read ~40 bytes instead of parsing the whole ledger
@@ -4706,10 +4836,19 @@ class Mind:
                 # docstring) — a resumed life restarts every word's count at 0. Out of scope for this
                 # brief (replay-only); raised in G5-E-REPORT.md.
                 mind.predictor = Predictor(mind.org, arm=mind.genome.declared["PREDICT"].get("arm", "novelty"),
-                                           precision=mind.precision)   # N1: the flag re-threads at resume (PREREG-N1 §1)
+                                           precision=mind.precision,
+                                           homeostasis=mind._drives)   # H0: re-threads at resume (the N1 form)
                 last_winner = ledger.get("predictor_last_winner")
                 if last_winner is not None:
                     mind.predictor._last_winner = np.array(last_winner, dtype=np.float64)
+            # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.2: the
+            # drives' state restores EXACTLY at a resume (the snapshot's drives.json, written by the atomic
+            # staging when declared) — a resumed life's drives continue, never restart at rest. Absent the
+            # file (a pre-H0 snapshot): the drives rest at their constructor values, NAMED here.
+            if mind._drives is not None:
+                drives_path = state_dir / "drives.json"
+                if drives_path.exists():
+                    mind._drives.load_json(json.loads(drives_path.read_text()))
             episodes_path = state_dir / "episodes.npz"
             if "FAST" in mind.genome.declared and episodes_path.exists():
                 mind.episodes = Episodes.load(episodes_path)

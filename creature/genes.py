@@ -180,6 +180,16 @@ RUNS: Dict[str, Dict[str, Optional[str]]] = {
         "REGISTERS": "creature/mind.py:Mind.__init__ (the tri-state declared read: precision/muse/content_web self-wire "
                      "from declared['REGISTERS'] when the caller passes None — the default; explicit True/False overrides) + "
                      "Mind.resume (the classmethod's own tri-state passes through to the same read)",
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.1/§2.3 +
+        # AMENDMENT 1 (the law SIGNED; SEAT-LINE-H0.txt sha256 edda32e7…): HOMEOSTASIS's own row — the
+        # drives' real call sites (the negative control tests/creature/test_homeostasis_wiring.py).
+        "HOMEOSTASIS": "creature/mind.py:Mind.__init__ (the tri-state declared read: the Homeostasis state self-wires "
+                       "from declared['HOMEOSTASIS'] when the caller passes None; True/dict/False override — the benches' "
+                       "solo/flat arms) + genome/homeostasis.py (the state, the constants, the deterministic draw) + "
+                       "genome/predict.py:modulate (the arousal/fatigue gains on the lr path) + creature/mind.py:"
+                       "_consume_eye (the per-canvas update, the `drives` journal key, the eye's +1 fixation, the seek) + "
+                       "_maybe_sleep (the fatigue clause) + _maybe_say (suppression/babble/exclaim) + _drives_extra_ask "
+                       "(the boredom extras) + snapshot/resume (state/drives.json staged+restored)",
         "FAST": "creature/mind.py:Mind.__init__ (Episodes built when declared) + Mind.resume (episodes.npz reloaded)",
         "PREDICT": "creature/mind.py:Mind.__init__ (Predictor built when declared) + Mind.resume (predictor rebuilt against the loaded org)",
         "PARK": "creature/mind.py:Mind.__init__ (Park built when declared)",

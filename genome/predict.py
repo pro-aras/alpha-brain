@@ -122,7 +122,8 @@ class Predictor:
     G5-E (2026-09-21): `arm` names which of the four G-MIND-3 error computations `error()` runs —
     "novelty" (default, today's, byte-identical), "conjunctive", "episodic", "comparator"."""
 
-    def __init__(self, org: Organism, lo: float = 0.5, hi: float = 2.0, arm: str = "novelty", precision: bool = False):
+    def __init__(self, org: Organism, lo: float = 0.5, hi: float = 2.0, arm: str = "novelty", precision: bool = False,
+                 homeostasis=None):
         self.org = org
         self.lo, self.hi = lo, hi
         self._last_winner: Optional[np.ndarray] = None
@@ -136,6 +137,11 @@ class Predictor:
         self._l_fast = float(np.log(PRECISION_PRIOR))
         self._l_slow = float(np.log(PRECISION_PRIOR))
         self.last_weight: Optional[float] = None
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 — PREREG-HOMEOSTASIS §2.3 + AMENDMENT 1
+        # A4 (the law SIGNED; SEAT-LINE-H0.txt sha256 edda32e7…): the drives' gains ride THIS modulate() —
+        # the arousal/fatigue gains multiply the same lr precision scales (the law's own form). None
+        # (every caller today): byte-identical, not one line of the gain path runs.
+        self.homeostasis = homeostasis
 
     def note_winners(self, S: List[int]) -> None:
         """S: the sight winners of the moment just lived (best first, §11 am. 3's resonate order). The
@@ -272,6 +278,11 @@ class Predictor:
         if self.precision and self.last_weight is not None:
             e = e * self.last_weight
         scale = float(np.clip(0.5 + 3.0 * e, self.lo, self.hi))
+        # PREREG-HOMEOSTASIS §2.3/A4: the drives' gains multiply AFTER the error scale (the law's form:
+        # lr × clip(0.5 + 3e, 0.5, 2) × g_a × g_f — the product is NOT re-clipped); None = byte-identical.
+        if self.homeostasis is not None:
+            g_a, g_f = self.homeostasis.gains()
+            scale = scale * g_a * g_f
         return lr * scale
 
 

@@ -152,14 +152,15 @@ class VideoFront:
         return self._feature(blocks, cb)
 
     def glances(self, rgb: np.ndarray, mode: str = "surprise", pic_id: str = "",
-                predicted: Optional[np.ndarray] = None) -> Dict[str, object]:
+                predicted: Optional[np.ndarray] = None, extra_fixations: int = 0) -> Dict[str, object]:
         """§2.6: one canvas → the glances dict's own shape ({"feats", "fix", "windows", "residual"}), so
         creature/mind.py:_consume_eye reads it unchanged. Fixation SELECTION is the gaze gene's own
         analyse/`gaze_sequence` (or `random_gaze` under the mind's --blind gaze twin), exactly as
         genome/gaze.py's glances does it; what each look READS is the front's. Advances the temporal state
-        ONCE per call (one canvas)."""
+        ONCE per call (one canvas). extra_fixations (PREREG-HOMEOSTASIS §2.3, 2026-10-12): the arousal
+        drive's +1 — default 0, byte-identical to before this parameter existed."""
         gaze = self.gaze
-        F, grid, glance = int(gaze["fixations"]), int(gaze["grid"]), int(gaze["glance"])
+        F, grid, glance = int(gaze["fixations"]) + extra_fixations, int(gaze["grid"]), int(gaze["glance"])
         L = _gaze.luminance(rgb)
         maps = self._advance(L)
         an = _gaze._analyse_frame(rgb)          # the Alpha-2 analyse — the attention organ's own frame dict
