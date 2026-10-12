@@ -202,6 +202,12 @@ class TestRegistryPinnedToParser(unittest.TestCase):
         # own gate at the launch gate's first full run — RUNS was updated without this fixture, exactly the omission this
         # class exists to catch (the W3-2 comment below names the same class).
         "REGISTERS": "REGISTERS content-web muse precision",
+        # edit: Kimi Code (K3, kimi-code, the seat alone), 2026-10-12 22:2x +0400 — PREREG-HOMEOSTASIS §2.1
+        # (the law SIGNED; SEAT-LINE-H0.txt sha256 edda32e7…): one row, matching the genes.py RUNS entry
+        # added by this build (the HOMEOSTASIS clause's sample line). Caught by this test's own gate at
+        # the battery's first full run — RUNS was updated without this fixture, exactly the omission this
+        # class exists to catch (the REGISTERS row's own history above).
+        "HOMEOSTASIS": "HOMEOSTASIS arousal boredom fatigue",
         # edit: Claude (Sonnet 5, W3 builder D), 2026-09-21 11:40 +0400 — W3-2: two rows, matching the two
         # genes.py RUNS entries added by this task.
         "INDUCE": "INDUCE   rule from 5 episodes no counter",
