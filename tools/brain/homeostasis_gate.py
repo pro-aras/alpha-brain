@@ -209,41 +209,31 @@ def m_sleep_trigger(on: Arm, flat: Arm) -> Dict[str, object]:
             "verdict": "PASS" if (forced and div_share >= 0.10) else "FAIL"}
 
 
-def _boredom_windows(arm: Arm, stream: List[Tuple[int, object]]) -> Tuple[Optional[float], Optional[float], int, int]:
-    """The rate of `stream` events per 1000 canvases in mean-b>0.7 vs mean-b<0.3 windows (the window's
-    b = the canvas rows' drives.b mean). Returns (rate_high, rate_low, n_high_windows, n_low_windows)."""
-    per_win_b: Dict[int, List[float]] = {}
-    per_win_n: Dict[int, int] = {}
-    for i, d in enumerate(arm.drives):
-        if d is None:
-            continue
-        per_win_b.setdefault(i // 1000, []).append(d[1])
-    for i in range(arm.n):
-        per_win_n[i // 1000] = per_win_n.get(i // 1000, 0) + 1
-    hi, lo = {}, {}
-    for w, bs in per_win_b.items():
-        mb = sum(bs) / len(bs)
-        (hi if mb > 0.7 else lo if mb < 0.3 else {}).update({w: None})
-    def rate(windows) -> Optional[float]:
-        if not windows:
-            return None
-        n_ev = sum(1 for c, _x in stream if c // 1000 in windows)
-        n_cv = sum(per_win_n.get(w, 0) for w in windows)
-        return 1000.0 * n_ev / n_cv if n_cv else None
-    return rate(hi), rate(lo), len(hi), len(lo)
+def _boredom_buckets(arm: Arm, stream: List[Tuple[int, object]]) -> Tuple[Optional[float], Optional[float], int, int, int, int]:
+    """The law's own form («at boredom > 0.7 / < 0.3» — CANVASES, not window-means; the window-mean form
+    diluted the spikes away and emptied the population, named in AMENDMENT 3 §A3-V (4)): the stream's
+    event rate per 1,000 canvases inside each bucket, with the populations printed."""
+    hi_set = {i for i, d in enumerate(arm.drives) if d and d[1] > 0.7}
+    lo_set = {i for i, d in enumerate(arm.drives) if d and d[1] < 0.3}
+    ev_hi = sum(1 for c, _x in stream if c in hi_set)
+    ev_lo = sum(1 for c, _x in stream if c in lo_set)
+    rh = 1000.0 * ev_hi / len(hi_set) if hi_set else None
+    rl = 1000.0 * ev_lo / len(lo_set) if lo_set else None
+    return rh, rl, len(hi_set), len(lo_set), ev_hi, ev_lo
 
 
 def m_boredom_ask(on: Arm, solo_b: Arm) -> Dict[str, object]:
     out = {"ceiling_note": "extras ≤ 100 think ticks/1000 × p ≤ 0.6 → ≤ 60/1000 vs the 6.4/1000 bench base → ceiling ~10× (AMENDMENT 2 F3)"}
     for name, arm in (("on", on), ("solo-b", solo_b)):
-        rh, rl, nh, nl = _boredom_windows(arm, arm.asks)
+        rh, rl, nh, nl, eh, el = _boredom_buckets(arm, arm.asks)
         extras = sum(1 for _c, b in arm.asks if b)
-        out[name] = {"rate_high": rh, "rate_low": rl, "windows_high": nh, "windows_low": nl,
+        out[name] = {"rate_high": rh, "rate_low": rl, "canvases_high": nh, "canvases_low": nl,
+                     "asks_high": eh, "asks_low": el,
                      "extras_bored_marked": extras, "asks_total": len(arm.asks),
                      "ratio": (rh / rl) if (rh is not None and rl and rl > 0) else None}
     ok = [v["ratio"] is not None and v["ratio"] >= 2.0 for v in out.values() if isinstance(v, dict) and "ratio" in v]
     out["verdict"] = ("PASS" if ok and all(ok) else
-                      "FAIL" if ok and not all(ok) else "UNDERPOWERED (a boredom window's population is empty — presence printed)")
+                      "FAIL" if ok and not all(ok) else "UNDERPOWERED (a boredom bucket's population is empty — presence printed)")
     return out
 
 
@@ -251,30 +241,47 @@ def m_boredom_mouth(on: Arm, solo_b: Arm) -> Dict[str, object]:
     out = {"units_note": "the mind-mouth's own `say` rows only — the brain's kind:brain phrase stream is never in the denominator (F4)"}
     for name, arm in (("on", on), ("solo-b", solo_b)):
         stream = [(c, None) for c in arm.says]
-        rh, rl, nh, nl = _boredom_windows(arm, stream)
-        out[name] = {"rate_high": rh, "rate_low": rl, "windows_high": nh, "windows_low": nl,
-                     "says_total": len(arm.says),
+        rh, rl, nh, nl, eh, el = _boredom_buckets(arm, stream)
+        out[name] = {"rate_high": rh, "rate_low": rl, "canvases_high": nh, "canvases_low": nl,
+                     "says_high": eh, "says_low": el, "says_total": len(arm.says),
                      "ratio": (rh / rl) if (rh is not None and rl and rl > 0) else None}
     ok = [v["ratio"] is not None and v["ratio"] >= 1.5 for v in out.values() if isinstance(v, dict) and "ratio" in v]
     out["verdict"] = ("PASS" if ok and all(ok) else
-                      "FAIL" if ok and not all(ok) else "UNDERPOWERED (a boredom window's population is empty — presence printed)")
+                      "FAIL" if ok and not all(ok) else "UNDERPOWERED (a boredom bucket's population is empty — presence printed)")
     return out
 
 
-def m_arousal_learn(pure: Arm, solo_a: Arm) -> Dict[str, object]:
-    out = {}
-    for name, arm in (("quad-a-no-prec (the bar's home)", pure), ("solo-a", solo_a)):
-        es, ls = arm.err_series(), arm.lr_series()
-        n = min(len(es), len(ls))
-        if n < 10:
-            out[name] = {"n_windows": n, "rho": None, "p": None}
-            continue
-        rho, p = spearmanr(es[:n], ls[:n])
-        out[name] = {"n_windows": n, "rho": round(float(rho), 4), "p": float(p)}
-    home = out["quad-a-no-prec (the bar's home)"]
-    out["verdict"] = ("PASS" if home["rho"] is not None and home["rho"] > 0.3 and home["p"] < 0.001 else
-                      "UNDERPOWERED" if home["rho"] is None else "FAIL")
-    return out
+def m_arousal_learn(solo_a: Arm, flat: Arm) -> Dict[str, object]:
+    """AMENDMENT 3 A3-1: the isolated per-canvas ratio lr_driven/lr_flat-twin on the SAME canvas (the
+    twin's g_a pinned at 1.0), bucketed by the drive's own a. Bar: ≥ 1.1 at a > 0.7, ≤ 0.7 at a < 0.3,
+    monotonic across the three buckets (the declared gain curve)."""
+    def ratio_curve(driven: Arm, twin: Arm) -> Dict[str, object]:
+        n = min(driven.n, twin.n)
+        buckets: Dict[str, List[float]] = {"a>0.7": [], "0.3-0.7": [], "a<0.3": []}
+        for i in range(n):
+            d = driven.drives[i] if i < len(driven.drives) else None
+            if not d:
+                continue
+            lo_lr, hi_lr = twin.canvases[i][1], driven.canvases[i][1]
+            if not lo_lr or not hi_lr:
+                continue
+            buckets["a>0.7" if d[0] > 0.7 else "a<0.3" if d[0] < 0.3 else "0.3-0.7"].append(hi_lr / lo_lr)
+        out = {}
+        for k, v in buckets.items():
+            out[k] = {"n": len(v), "mean": round(sum(v) / len(v), 4) if v else None}
+        return out
+    curve = ratio_curve(solo_a, flat)
+    hi_m, mid_m, lo_m = (curve[k]["mean"] for k in ("a>0.7", "0.3-0.7", "a<0.3"))
+    mono = hi_m is not None and mid_m is not None and lo_m is not None and lo_m < mid_m < hi_m
+    ok = mono and hi_m >= 1.1 and lo_m <= 0.7
+    # the signed ρ form kept as a READING (named vacuous: the OFF arm passes it — the ablated proof)
+    es, ls = solo_a.err_series(), solo_a.lr_series()
+    nn = min(len(es), len(ls))
+    rho, p = spearmanr(es[:nn], ls[:nn]) if nn > 10 else (None, None)
+    return {"buckets": curve, "monotonic": mono,
+            "verdict": "PASS" if ok else "FAIL",
+            "reading_signed_form_vacuous": {"rho": rho, "p": p,
+                                            "note": "the OFF arm passes the ρ form (#246 (1) — the ablated proof; clip(0.5+3e) is deterministic in err); kept as a reading, never the bar"}}
 
 
 def m_arousal_eye(arms: Dict[str, Arm]) -> Dict[str, object]:
@@ -308,29 +315,54 @@ def m_fatigue_degrade(on: Arm) -> Dict[str, object]:
         return {"verdict": "VACUOUS (no forced boundary with exams on both sides)", "forced": len(forced), "exams": len(ex)}
     dp = sum(p[1] - p[0] for p in pairs) / len(pairs)
     post_m = sum(p[1] for p in pairs) / len(pairs)
+    all_vals = [q for p in pairs for q in p] + (fresh or [])
+    if max(all_vals) - min(all_vals) == 0.0:
+        return {"verdict": "VACUOUS — the exam proxy is CONSTANT at this age (every reading identical: the young organism's exam floor; a constant series cannot show a degradation, #243's pass-by-absence class)",
+                "constant": all_vals[0], "pairs": len(pairs), "forced": len(forced)}
     return {"pairs": len(pairs), "fresh": round(fresh_m, 4), "mean_pre": round(sum(p[0] for p in pairs) / len(pairs), 4),
             "mean_post": round(post_m, 4), "post_minus_pre": round(dp, 4),
             "verdict": "PASS" if (dp >= 0.02 and post_m >= fresh_m - 0.01) else "FAIL"}
 
 
 def m_null(inverted: Arm, on: Arm, inv_ex: Dict[str, float], on_ex: Dict[str, float]) -> Dict[str, object]:
-    contrib = contributing([inverted and inv_ex or {}, on_ex])
-    s_on = sum(on_ex[s] for s in contrib) / len(contrib) if contrib else None
-    s_inv = sum(inv_ex[s] for s in contrib) / len(contrib) if contrib else None
+    """AMENDMENT 3 A3-2: the re-scoped control on the drives' OWN behaviors (the saturated S/U forms kept
+    as readings with the arithmetic printed). (i) the inversion's proof: the inverted twin's a max printed
+    (bar: < 0.5 — the inversion visibly fired); (ii) the arousal-eye response REMOVED: present in the
+    driven (ratio ≥ 1.3) and the inverted twin has ZERO high-a canvases; (iii) the step premium destroyed:
+    the driven's lr over the floored twin's at the driven's high-a canvases (bar ≥ 1.5 — g_a ≈ 1.7 over
+    the 0.5 clip). All three must hold, with every presence printed."""
+    inv_a = [d[0] for d in inverted.drives if d]
+    a_max = max(inv_a) if inv_a else None
+    def eye(arm: Arm) -> Tuple[Optional[float], int, int]:
+        hi = [f for (e, l, f), d in zip(arm.canvases, arm.drives) if d and d[0] > 0.7]
+        lo = [f for (e, l, f), d in zip(arm.canvases, arm.drives) if d and d[0] < 0.3]
+        r = (sum(hi) / len(hi)) / (sum(lo) / len(lo)) if hi and lo else None
+        return r, len(hi), len(lo)
+    on_eye, on_hi, _on_lo = eye(on)
+    inv_eye, inv_hi, _inv_lo = eye(inverted)
+    n = min(on.n, inverted.n)
+    prem = [on.canvases[i][1] / inverted.canvases[i][1]
+            for i in range(n)
+            if i < len(on.drives) and on.drives[i] and on.drives[i][0] > 0.7
+            and on.canvases[i][1] and inverted.canvases[i][1]]
+    premium = sum(prem) / len(prem) if prem else None
+    eye_removed = (on_eye is not None and on_eye >= 1.3 and inv_hi == 0)
     def descent(arm: Arm) -> Optional[float]:
         es = [e for e, _l, _f in arm.canvases]
         if len(es) < 2000:
             return None
         return sum(es[:1000]) / 1000 - sum(es[-1000:]) / 1000
     u_on, u_inv = descent(on), descent(inverted)
-    s_deg = (s_inv is not None and s_on is not None and s_inv <= s_on - 0.05)
-    u_deg = (u_inv is not None and u_on is not None and u_inv <= u_on - 0.05)
-    return {"S_on": s_on, "S_inverted": s_inv, "contributing_sections": len(contrib),
-            "U_on": round(u_on, 4) if u_on is not None else None,
-            "U_inverted": round(u_inv, 4) if u_inv is not None else None,
-            "S_degraded": s_deg, "U_degraded": u_deg,
-            "verdict": "PASS" if (s_deg or u_deg) else
-                       "FAIL — the inverted drives did not hurt: the drives are decorative, the law is NOT adopted (§6)"}
+    return {"a_max_inverted": a_max, "inversion_fired": a_max is not None and a_max < 0.5,
+            "on_eye_ratio": on_eye, "on_high_a_n": on_hi, "inverted_high_a_n": inv_hi,
+            "eye_response_removed": eye_removed,
+            "step_premium_over_floored": round(premium, 4) if premium else None, "premium_n": len(prem),
+            "U_reading_saturated": {"U_on": round(u_on, 4) if u_on is not None else None,
+                                    "U_inverted": round(u_inv, 4) if u_inv is not None else None,
+                                    "note": "the toy world saturates by ~2,000 canvases at any lr — a whole-run descent integral cannot see a 2× lr difference (A3-2's printed arithmetic); kept as a reading"},
+            "S_reading": {"contributing_sections": len(contributing([inv_ex, on_ex]))},
+            "verdict": "PASS" if (a_max is not None and a_max < 0.5 and eye_removed and premium is not None and premium >= 1.5) else
+                       "FAIL — the inverted drives did not remove the drives' own signature (the §6 kill rule's own question)"}
 
 
 def m_plant() -> Dict[str, object]:
@@ -407,15 +439,24 @@ def m_seek_learn(on: Arm, flat: Arm, on_drives: Optional[Dict[str, object]]) -> 
                 "share": (tgt / total) if total else None}
     pre = window_shares(max(0, fc - 1000), fc)
     post = window_shares(fc, fc + 1000)
+    # the ≥ 2× bar reads post ≥ 2·pre; a ZERO pre-share (the least-attended source, the seek's own
+    # purpose) passes whenever post > 0 (2 × 0 = 0) — the zero-base case NAMED, never hidden
     ratio = (post["share"] / pre["share"]) if (pre["share"] and post["share"] is not None) else None
-    out.update({"seek_canvas": fc, "target": target, "pre": pre, "post": post, "share_ratio": ratio})
-    ok = ratio is not None and ratio >= 2.0
-    out["verdict"] = "PASS" if ok and not flat.seeks else ("FAIL" if ratio is not None else "UNDERPOWERED (a window's population is empty — presence printed)")
+    zero_base_pass = (pre["share"] == 0.0 and (post["share"] or 0.0) > 0.0)
+    ok = (ratio is not None and ratio >= 2.0) or zero_base_pass
+    out.update({"seek_canvas": fc, "target": target, "pre": pre, "post": post, "share_ratio": ratio,
+                "zero_base_form": zero_base_pass or None})
+    out["verdict"] = "PASS" if ok and not flat.seeks else ("FAIL" if (ratio is not None or post["total"]) else "UNDERPOWERED (a window's population is empty — presence printed)")
     return out
 
 
 # ----------------------------------------------------------------------------- the report
 def build_report(manifest: Dict[str, Dict[str, str]]) -> Tuple[str, Dict[str, object]]:
+    # the proxy's honesty rule (F7): an exam compared at DIFFERENT canvas points is an apples/oranges
+    # read — every arm's profile comes from its replay FINAL snapshot (the tape's end state, the same
+    # point for all); the gate LIFE's own close exam sits ~177 canvases earlier and would fabricate a
+    # degradation (caught 10-13, named). H-FATIGUE-DEGRADE's windowed reads take the LIFE's own journal
+    # (the only one carrying body-exam rows) — its `on` journal entry stays the life's journal dir.
     arms: Dict[str, Arm] = {}
     exams: Dict[str, Dict[str, float]] = {}
     drives: Dict[str, Dict[str, object]] = {}
@@ -430,7 +471,7 @@ def build_report(manifest: Dict[str, Dict[str, str]]) -> Tuple[str, Dict[str, ob
     marks["H-SLEEP-TRIGGER"] = m_sleep_trigger(arms["on"], arms["flat"])
     marks["H-BOREDOM-ASK"] = m_boredom_ask(arms["on"], arms["solo-b"])
     marks["H-BOREDOM-MOUTH"] = m_boredom_mouth(arms["on"], arms["solo-b"])
-    marks["H-AROUSAL-LEARN"] = m_arousal_learn(arms["quad-a-no-prec"], arms["solo-a"])
+    marks["H-AROUSAL-LEARN"] = m_arousal_learn(arms["solo-a"], arms["flat"])
     marks["H-AROUSAL-EYE"] = m_arousal_eye(arms)
     marks["H-FATIGUE-DEGRADE"] = m_fatigue_degrade(arms["on"])
     marks["H-NULL"] = m_null(arms["inverted"], arms["on"], exams.get("inverted", {}), exams.get("on", {}))
@@ -471,6 +512,16 @@ def _synth_journal(path: Path, n: int, bored_from: Optional[int]) -> None:
                 fh.write(json.dumps({"seq": i + 1, "say": {"frame": "star red"}}) + "\n")
 
 
+def _synth_drives_journal(path: Path, n: int, a_of, lr_of) -> None:
+    """A synthetic canvas journal: n worded canvas rows; drives.a follows a_of(i); lr follows lr_of(i, a)."""
+    with path.open("w") as fh:
+        for i in range(n):
+            a = a_of(i)
+            fh.write(json.dumps({"seq": i + 1, "cells": [1, 1], "err": 0.5, "lr": lr_of(i, a),
+                                 "windows": [[0, 0]] * (6 if a > 0.7 else 4),
+                                 "drives": {"a": a, "b": 0.1, "f": 0.1}}) + "\n")
+
+
 def selftest() -> int:
     """The instrument's planted controls (RULES §11): synthetic journals whose planted series must move
     each reading in its declared direction — and MUST NOT when the plant is removed."""
@@ -494,6 +545,24 @@ def selftest() -> int:
     # the sleep trigger: forced rows exist in `on`, none in `flat`; schedules differ
     st = m_sleep_trigger(arm_on, arm_flat)
     assert st["forced"] > 0 and st["divergence_share"] >= 0.10, f"PLANT MISS (sleep): {st}"
+    # A3-1's ratio curve: a driven journal with the planted gain curve (1.5 high-a, 0.5 low-a) vs the
+    # pinned twin's constant lr — must PASS; the same journal against ITSELF (ratio 1.0) must FAIL
+    drv_p = tmp / "drv.jsonl"
+    _synth_drives_journal(drv_p, 3000, lambda i: (0.9, 0.5, 0.2)[i % 3], lambda i, a: 1.5 if a > 0.7 else (1.0 if a > 0.3 else 0.5))
+    flt_p = tmp / "flt.jsonl"
+    _synth_drives_journal(flt_p, 3000, lambda i: 0.5, lambda i, a: 1.0)
+    al = m_arousal_learn(Arm("solo-a", drv_p), Arm("flat", flt_p))
+    assert al["verdict"] == "PASS" and al["monotonic"], f"PLANT MISS (A3-1): {al}"
+    al_neg = m_arousal_learn(Arm("solo-a", drv_p), Arm("flat", drv_p))
+    assert al_neg["verdict"] == "FAIL", f"PLANT CONTROL MISS (A3-1): a self-ratio read {al_neg['verdict']}"
+    # A3-2's re-scoped control: an inverted twin (a floored, zero high-a canvases) vs a driven with the
+    # planted eye response + premium — must PASS; a twin whose arousal was never floored must FAIL
+    inv_p = tmp / "inv.jsonl"
+    _synth_drives_journal(inv_p, 3000, lambda i: 0.1, lambda i, a: 0.5)
+    null_r = m_null(Arm("inverted", inv_p), Arm("solo-a", drv_p), {}, {})
+    assert null_r["verdict"] == "PASS", f"PLANT MISS (A3-2): {null_r}"
+    null_neg = m_null(Arm("inverted", drv_p), Arm("solo-a", drv_p), {}, {})
+    assert null_neg["verdict"].startswith("FAIL"), f"PLANT CONTROL MISS (A3-2): an unfloored twin read {null_neg['verdict']}"
     # KS: identical streams must NOT differ (negative control), differing must
     same = ks_2samp(arm_on.err_series(), arm_on.err_series()).pvalue
     assert same > 0.01, f"PLANT CONTROL MISS: an identical stream differed (p {same})"
