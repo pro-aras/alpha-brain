@@ -2868,6 +2868,9 @@ class Mind:
         # BEFORE any consumer below (the learning step's lr_scale already carries the gains — the drives'
         # state at THIS canvas's start governs this canvas's gains, the causal read-then-update order,
         # the precision register's own precedent); then the boredom-ceiling seek fires and is journaled.
+        meta = row.get("meta") or {}   # hoisted 2026-10-13 (AMENDMENT 2's B-ON leg CAUGHT it: the wiring's
+                                        # meta read sat BELOW this block, so the FIRST declared run
+                                        # UnboundLocalError'd — invisible while every test ran undeclared)
         if self._drives is not None:
             self._drives.note_canvas(err, source=meta.get("source"), word=word)   # AMENDMENT 2 F3: the heard word feeds the extras' renewing pool (None on sight-only canvases)
             if self._drives.seek_due():
@@ -2892,7 +2895,7 @@ class Mind:
         # kwargs below. tests/genome/test_deliver_moment.py's parity test is what proves this claim, not this comment.
         deliver_on = "DELIVER" in self.genome.declared
         moment_on = "MOMENT" in self.genome.declared
-        meta = row.get("meta") or {}
+        # (meta hoisted above the drives' block, 2026-10-13 — the B-ON leg's catch)
         # edit: Claude (Sonnet 5, LIFE builder C), 2026-09-22 19:12 +0400 — advisor-caught (#164's class):
         # STATUS declares `questions_answered` but nothing wrote it. The world-maker's QUESTION door
         # (creature/world_maker.py:_publish_canvas) stamps `answering: "<qid>"` on BOTH the ear and eye rows
