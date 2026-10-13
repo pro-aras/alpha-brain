@@ -37,6 +37,9 @@ class AbsentIsByteIdentical(unittest.TestCase):
         genomes = sorted(ROOT.glob("genome/**/*.genome"))
         self.assertGreater(len(genomes), 0, "presence: the repo carries genome files")
         for path in genomes:
+            if path.name == "BRAIN-LONG-6-H0-GATE.genome":
+                continue   # the gate life's own carrier (PREREG-HOMEOSTASIS §3 G + AMENDMENT 2 F8,
+                           # signed 2026-10-13) — declared BY NAME here, never silent
             with self.subTest(genome=path):
                 self.assertNotIn("HOMEOSTASIS", parse_genome(path.read_text()).declared,
                                  "a carrier genome must be declared BY NAME here before it exists "

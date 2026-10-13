@@ -35,8 +35,9 @@ class AbsentIsByteIdentical(unittest.TestCase):
         genomes = sorted(ROOT.glob("genome/**/*.genome"))
         self.assertGreater(len(genomes), 0, "presence: the repo carries genome files")
         for path in genomes:
-            if path.name in ("BRAIN-LONG-6.genome", "BRAIN-LONG-6-PREFLIGHT.genome"):
-                continue   # the law's own two carriers (PREREG-BRAIN-LONG-6 §1.3 + §2 B4) — declared, never silent
+            if path.name in ("BRAIN-LONG-6.genome", "BRAIN-LONG-6-PREFLIGHT.genome", "BRAIN-LONG-6-H0-GATE.genome"):
+                continue   # the law's own carriers (PREREG-BRAIN-LONG-6 §1.3 + §2 B4; the H0 gate life's
+                           # genome, PREREG-HOMEOSTASIS §3 G + AMENDMENT 2 F8, signed 2026-10-13) — declared, never silent
             with self.subTest(genome=path):
                 self.assertNotIn("REGISTERS", parse_genome(path.read_text()).declared)
 
