@@ -1,0 +1,1290 @@
+{
+  "updated_at_unix": 1791964150,
+  "status": "ONLINE · AWAKE · PURE ROAD",
+  "current_tick": 31,
+  "current_activity": "Exploring shelf 'alpha3_library_K' -> concept 'counting_number' (/data/alpha3-library/K/mathematics) & patrolling 2D World at (6,4)",
+  "total_neurons": 1000000,
+  "memory_footprint_mb": 30.527694702148438,
+  "active_synapses": 3904,
+  "last_step_us": 301.607,
+  "last_touched_neurons": 12,
+  "cumulative_predicted_spikes": 195,
+  "cumulative_surprise_bursts": 117,
+  "cumulative_failed_predictions": 293,
+  "cumulative_btsp_updates": 20324,
+  "current_frame": {
+    "eyes": [
+      "eyes:wall_fixture"
+    ],
+    "ears": [],
+    "hands": [],
+    "smell": [],
+    "senses": [
+      "senses:awake",
+      "senses:calm_predictive_flow",
+      "senses:user_bond_active"
+    ],
+    "spoken_words": []
+  },
+  "world_width": 13,
+  "world_height": 12,
+  "agent_x": 6,
+  "agent_y": 4,
+  "gaze_x": 6,
+  "gaze_y": 4,
+  "ascii_canvas": "┌──────────────────────────┐ (Agent '@' at 6,4 | Gaze '+' at 6,4)\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · c · · · S · · · C · · │\n│· · · · · · · · · · · · · │\n│· · · · · · @ · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · d · · · · · · · w · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n└──────────────────────────┘",
+  "world_entities": [
+    {
+      "auditory_traits": [
+        "purr",
+        "meow"
+      ],
+      "concept_label": "cat",
+      "id": "orange_cat",
+      "olfactory_traits": [
+        "feline_scent"
+      ],
+      "symbol": "c",
+      "tactile_traits": [
+        "soft_fur",
+        "warm_body"
+      ],
+      "visual_traits": [
+        "pointy_ears",
+        "whiskers",
+        "slit_pupils",
+        "four_legs",
+        "long_tail",
+        "orange_fur"
+      ],
+      "x": 2,
+      "y": 2
+    },
+    {
+      "auditory_traits": [
+        "purr"
+      ],
+      "concept_label": "cat",
+      "id": "black_cat",
+      "olfactory_traits": [
+        "feline_scent"
+      ],
+      "symbol": "C",
+      "tactile_traits": [
+        "soft_fur",
+        "warm_body"
+      ],
+      "visual_traits": [
+        "pointy_ears",
+        "whiskers",
+        "slit_pupils",
+        "four_legs",
+        "long_tail",
+        "black_fur"
+      ],
+      "x": 10,
+      "y": 2
+    },
+    {
+      "auditory_traits": [],
+      "concept_label": "cat",
+      "id": "white_cat",
+      "olfactory_traits": [
+        "feline_scent",
+        "rain_ozone"
+      ],
+      "symbol": "w",
+      "tactile_traits": [
+        "soft_fur"
+      ],
+      "visual_traits": [
+        "pointy_ears",
+        "whiskers",
+        "slit_pupils",
+        "four_legs",
+        "white_fur"
+      ],
+      "x": 10,
+      "y": 9
+    },
+    {
+      "auditory_traits": [
+        "bark",
+        "panting"
+      ],
+      "concept_label": "dog",
+      "id": "brown_dog",
+      "olfactory_traits": [
+        "canine_scent"
+      ],
+      "symbol": "d",
+      "tactile_traits": [
+        "coarse_fur",
+        "warm_body"
+      ],
+      "visual_traits": [
+        "floppy_ears",
+        "wet_snout",
+        "four_legs",
+        "wagging_tail",
+        "brown_fur"
+      ],
+      "x": 2,
+      "y": 9
+    },
+    {
+      "auditory_traits": [],
+      "concept_label": "switch",
+      "id": "wall_switch",
+      "olfactory_traits": [],
+      "symbol": "S",
+      "tactile_traits": [
+        "hard_plastic",
+        "click_detent"
+      ],
+      "visual_traits": [
+        "switch_visible",
+        "toggle_lever"
+      ],
+      "x": 6,
+      "y": 2
+    }
+  ],
+  "last_action": "press_switch",
+  "last_predicted_outcomes": [
+    [
+      "eyes:light_on",
+      0.85
+    ]
+  ],
+  "last_actual_outcomes": [
+    "eyes:darkness_remains"
+  ],
+  "last_prediction_failed": true,
+  "last_analysis_report": "PREDICTION FAILURE ANALYZED: Expected [\"eyes:light_on\"] after action 'press_switch', but it failed to happen. Isolated contextual condition 'smell:power_unplugged' as the cause and learned new exception -> 'eyes:darkness_remains'.",
+  "active_goal_target": "eyes:knowledge_gained",
+  "goal_scenarios": [
+    {
+      "actions": [
+        "read_book"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:knowledge_gained"
+        ]
+      ],
+      "probability": 0.5666667,
+      "reaches_goal": true,
+      "rationale": "Goal 'eyes:knowledge_gained' reached in 1 step(s) via [\"read_book\"] (confidence 0.57)"
+    },
+    {
+      "actions": [
+        "press_switch",
+        "read_book"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ],
+        [
+          "eyes:knowledge_gained"
+        ]
+      ],
+      "probability": 0.7225,
+      "reaches_goal": true,
+      "rationale": "Goal 'eyes:knowledge_gained' reached in 2 step(s) via [\"press_switch\", \"read_book\"] (confidence 0.72)"
+    },
+    {
+      "actions": [
+        "press_switch",
+        "press_switch",
+        "read_book"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ],
+        [
+          "eyes:light_on"
+        ],
+        [
+          "eyes:knowledge_gained"
+        ]
+      ],
+      "probability": 0.614125,
+      "reaches_goal": true,
+      "rationale": "Goal 'eyes:knowledge_gained' reached in 3 step(s) via [\"press_switch\", \"press_switch\", \"read_book\"] (confidence 0.61)"
+    },
+    {
+      "actions": [
+        "press_switch"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ]
+      ],
+      "probability": 0.85,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"press_switch\"] -> produces [\"eyes:light_on\"]"
+    },
+    {
+      "actions": [
+        "press_switch",
+        "press_switch"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ],
+        [
+          "eyes:light_on"
+        ]
+      ],
+      "probability": 0.7225,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"press_switch\", \"press_switch\"] -> produces [\"eyes:light_on\"]"
+    },
+    {
+      "actions": [
+        "press_switch",
+        "press_switch",
+        "press_switch"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ],
+        [
+          "eyes:light_on"
+        ],
+        [
+          "eyes:light_on"
+        ]
+      ],
+      "probability": 0.614125,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"press_switch\", \"press_switch\", \"press_switch\"] -> produces [\"eyes:light_on\"]"
+    }
+  ],
+  "causal_rules_count": 3,
+  "causal_rules_preview": [
+    {
+      "rule_id": 1,
+      "trigger_traits": [
+        "eyes:switch_visible",
+        "hands:near_switch",
+        "senses:awake",
+        "senses:calm_predictive_flow"
+      ],
+      "action": "press_switch",
+      "predicted_outcomes": {
+        "eyes:light_on": 0.85
+      },
+      "learned_exceptions": {
+        "smell:power_unplugged": "eyes:darkness_remains"
+      },
+      "successes": 1,
+      "failures": 1
+    },
+    {
+      "rule_id": 2,
+      "trigger_traits": [
+        "eyes:light_on",
+        "senses:awake",
+        "senses:calm_predictive_flow"
+      ],
+      "action": "read_book",
+      "predicted_outcomes": {
+        "eyes:knowledge_gained": 0.85
+      },
+      "learned_exceptions": {},
+      "successes": 1,
+      "failures": 0
+    },
+    {
+      "rule_id": 3,
+      "trigger_traits": [
+        "eyes:code_block",
+        "eyes:valid_syntax",
+        "eyes:calls_print",
+        "eyes:has_multiplication",
+        "senses:awake",
+        "senses:calm_predictive_flow"
+      ],
+      "action": "run_code",
+      "predicted_outcomes": {
+        "eyes:result_42": 0.85,
+        "eyes:code_ran_cleanly": 0.85,
+        "eyes:printed_42": 0.85
+      },
+      "learned_exceptions": {
+        "eyes:syntax_typo": "eyes:syntax_error"
+      },
+      "successes": 1,
+      "failures": 1
+    }
+  ],
+  "concepts_count": 14,
+  "concepts": [
+    {
+      "causal_affordances": [
+        [
+          "inspect_ahmad",
+          "eyes:ahmad_recognized"
+        ]
+      ],
+      "core_invariants": [
+        "eyes:human_face",
+        "eyes:creator_presence",
+        "hands:handshake_warmth",
+        "ears:spoken_guidance",
+        "eyes:warm_gaze",
+        "hands:direct_user_bond",
+        "eyes:bipedal_posture",
+        "smell:ahmad_signature",
+        "ears:friendly_voice"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "ahmad"
+      ],
+      "name": "ahmad",
+      "variable_traits": [
+        "eyes:instance_view_2",
+        "eyes:instance_view_1"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "inspect_anchor",
+          "eyes:anchor_recognized"
+        ]
+      ],
+      "core_invariants": [
+        "eyes:curved_crown",
+        "ears:metallic_clank",
+        "eyes:heavy_flukes",
+        "eyes:iron_shank",
+        "hands:cold_iron",
+        "smell:anchor_signature",
+        "eyes:symmetric_arms",
+        "hands:heavy_mass"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "anchor"
+      ],
+      "name": "anchor",
+      "variable_traits": [
+        "eyes:instance_view_2",
+        "eyes:instance_view_1"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "inspect_ant",
+          "eyes:ant_recognized"
+        ]
+      ],
+      "core_invariants": [
+        "eyes:six_legs",
+        "ears:faint_scurry",
+        "eyes:segmented_thorax",
+        "hands:tiny_chitin",
+        "eyes:antennae",
+        "eyes:small_insect_body",
+        "smell:ant_signature"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "ant"
+      ],
+      "name": "ant",
+      "variable_traits": [
+        "eyes:instance_view_2",
+        "eyes:instance_view_1"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "inspect_bonsai",
+          "eyes:bonsai_recognized"
+        ]
+      ],
+      "core_invariants": [
+        "smell:bonsai_signature",
+        "hands:rough_bark",
+        "eyes:branching_canopy",
+        "eyes:ceramic_pot",
+        "eyes:green_foliage",
+        "eyes:woody_trunk",
+        "ears:leaf_rustle",
+        "hands:delicate_leaves"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "bonsai"
+      ],
+      "name": "bonsai",
+      "variable_traits": [
+        "eyes:instance_view_2",
+        "eyes:instance_view_1"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "inspect_camera",
+          "eyes:camera_recognized"
+        ]
+      ],
+      "core_invariants": [
+        "hands:grip_texture",
+        "eyes:glass_optics",
+        "eyes:shutter_button",
+        "eyes:circular_lens",
+        "eyes:rectangular_body",
+        "smell:camera_signature",
+        "hands:press_shutter",
+        "ears:shutter_click"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "camera"
+      ],
+      "name": "camera",
+      "variable_traits": [
+        "eyes:instance_view_2",
+        "eyes:instance_view_1"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "gentle_pet",
+          "ears:purr"
+        ]
+      ],
+      "core_invariants": [
+        "smell:feline_scent",
+        "eyes:four_legs",
+        "eyes:pointy_ears",
+        "eyes:whiskers",
+        "hands:soft_fur",
+        "hands:warm_body",
+        "eyes:long_tail",
+        "ears:purr",
+        "eyes:slit_pupils"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "cat"
+      ],
+      "name": "cat",
+      "variable_traits": [
+        "eyes:black_fur",
+        "ears:meow",
+        "eyes:orange_fur"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "count_units",
+          "eyes:sum_verified"
+        ]
+      ],
+      "core_invariants": [
+        "hands:count_units",
+        "ears:spoken_counting_number",
+        "eyes:k_page_sample_1",
+        "eyes:ordered_sequence",
+        "eyes:additive_unit",
+        "eyes:discrete_quantity"
+      ],
+      "exposures": 1,
+      "familiarity": 0.8334027528762817,
+      "grounded_words": [
+        "counting_number"
+      ],
+      "name": "counting_number",
+      "variable_traits": []
+    },
+    {
+      "causal_affordances": [
+        [
+          "pat_head",
+          "eyes:wagging_tail"
+        ]
+      ],
+      "core_invariants": [
+        "ears:bark",
+        "eyes:wagging_tail",
+        "eyes:four_legs",
+        "eyes:brown_fur",
+        "hands:coarse_fur",
+        "eyes:floppy_ears",
+        "smell:canine_scent",
+        "hands:warm_body",
+        "eyes:wet_snout",
+        "ears:panting"
+      ],
+      "exposures": 1,
+      "familiarity": 0.8334027528762817,
+      "grounded_words": [
+        "dog"
+      ],
+      "name": "dog",
+      "variable_traits": []
+    },
+    {
+      "causal_affordances": [
+        [
+          "run_code",
+          "eyes:code_ran_cleanly"
+        ]
+      ],
+      "core_invariants": [
+        "eyes:valid_syntax",
+        "eyes:calls_print",
+        "eyes:has_multiplication",
+        "eyes:code_block"
+      ],
+      "exposures": 1,
+      "familiarity": 0.8334027528762817,
+      "grounded_words": [
+        "multiply_code"
+      ],
+      "name": "multiply_code",
+      "variable_traits": []
+    },
+    {
+      "causal_affordances": [
+        [
+          "draw_arrow",
+          "eyes:rendered_arrow"
+        ]
+      ],
+      "core_invariants": [
+        "eyes:code_program",
+        "eyes:canvas_primitive_arrow",
+        "eyes:shape_geometry_arrow",
+        "hands:writes_canvas_pixels"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "shape_arrow"
+      ],
+      "name": "shape_arrow",
+      "variable_traits": [
+        "eyes:variant_seed_1",
+        "eyes:variant_seed_0"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "draw_bar",
+          "eyes:rendered_bar"
+        ]
+      ],
+      "core_invariants": [
+        "eyes:code_program",
+        "eyes:shape_geometry_bar",
+        "eyes:canvas_primitive_bar",
+        "hands:writes_canvas_pixels"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "shape_bar"
+      ],
+      "name": "shape_bar",
+      "variable_traits": [
+        "eyes:variant_seed_1",
+        "eyes:variant_seed_0"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "draw_circle",
+          "eyes:rendered_circle"
+        ]
+      ],
+      "core_invariants": [
+        "eyes:shape_geometry_circle",
+        "eyes:code_program",
+        "eyes:canvas_primitive_circle",
+        "hands:writes_canvas_pixels"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "shape_circle"
+      ],
+      "name": "shape_circle",
+      "variable_traits": [
+        "eyes:variant_seed_1",
+        "eyes:variant_seed_0"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "draw_cross",
+          "eyes:rendered_cross"
+        ]
+      ],
+      "core_invariants": [
+        "eyes:code_program",
+        "eyes:canvas_primitive_cross",
+        "eyes:shape_geometry_cross",
+        "hands:writes_canvas_pixels"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "shape_cross"
+      ],
+      "name": "shape_cross",
+      "variable_traits": [
+        "eyes:variant_seed_1",
+        "eyes:variant_seed_0"
+      ]
+    },
+    {
+      "causal_affordances": [
+        [
+          "draw_cup",
+          "eyes:rendered_cup"
+        ]
+      ],
+      "core_invariants": [
+        "eyes:code_program",
+        "eyes:canvas_primitive_cup",
+        "eyes:shape_geometry_cup",
+        "hands:writes_canvas_pixels"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "shape_cup"
+      ],
+      "name": "shape_cup",
+      "variable_traits": [
+        "eyes:variant_seed_1",
+        "eyes:variant_seed_0"
+      ]
+    }
+  ],
+  "curriculum_index": 24,
+  "curriculum_total": 29,
+  "recent_episodes": [
+    {
+      "episode_id": 30,
+      "tick": 31,
+      "partner": "alpha3_library_K",
+      "summary": "Interacted with 'alpha3_library_K' on concept 'counting_number' (exposure #1, familiarity 0.83)",
+      "active_concepts": [
+        "counting_number"
+      ],
+      "observed_traits": [
+        "eyes:discrete_quantity",
+        "eyes:ordered_sequence",
+        "eyes:additive_unit",
+        "eyes:k_page_sample_1",
+        "ears:spoken_counting_number",
+        "ears:heard_counting_number",
+        "hands:count_units",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "count_units",
+      "outcome_traits": [
+        "eyes:sum_verified"
+      ],
+      "surprise_score": 0.88461536
+    },
+    {
+      "episode_id": 29,
+      "tick": 30,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_cup' (exposure #2, familiarity 0.93)",
+      "active_concepts": [
+        "shape_cup"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_cup",
+        "eyes:canvas_primitive_cup",
+        "eyes:variant_seed_1",
+        "ears:heard_shape_cup",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_cup",
+      "outcome_traits": [
+        "eyes:rendered_cup"
+      ],
+      "surprise_score": 0.45454547
+    },
+    {
+      "episode_id": 28,
+      "tick": 29,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_cup' (exposure #1, familiarity 0.83)",
+      "active_concepts": [
+        "shape_cup"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_cup",
+        "eyes:canvas_primitive_cup",
+        "eyes:variant_seed_0",
+        "ears:heard_shape_cup",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_cup",
+      "outcome_traits": [
+        "eyes:rendered_cup"
+      ],
+      "surprise_score": 0.52380955
+    },
+    {
+      "episode_id": 27,
+      "tick": 28,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_cross' (exposure #2, familiarity 0.93)",
+      "active_concepts": [
+        "shape_cross"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_cross",
+        "eyes:canvas_primitive_cross",
+        "eyes:variant_seed_1",
+        "ears:heard_shape_cross",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_cross",
+      "outcome_traits": [
+        "eyes:rendered_cross"
+      ],
+      "surprise_score": 0.42857143
+    },
+    {
+      "episode_id": 26,
+      "tick": 27,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_cross' (exposure #1, familiarity 0.83)",
+      "active_concepts": [
+        "shape_cross"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_cross",
+        "eyes:canvas_primitive_cross",
+        "eyes:variant_seed_0",
+        "ears:heard_shape_cross",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_cross",
+      "outcome_traits": [
+        "eyes:rendered_cross"
+      ],
+      "surprise_score": 0.55
+    },
+    {
+      "episode_id": 25,
+      "tick": 26,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_bar' (exposure #2, familiarity 0.93)",
+      "active_concepts": [
+        "shape_bar"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_bar",
+        "eyes:canvas_primitive_bar",
+        "eyes:variant_seed_1",
+        "ears:heard_shape_bar",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_bar",
+      "outcome_traits": [
+        "eyes:rendered_bar"
+      ],
+      "surprise_score": 0.5
+    },
+    {
+      "episode_id": 24,
+      "tick": 25,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_bar' (exposure #1, familiarity 0.83)",
+      "active_concepts": [
+        "shape_bar"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_bar",
+        "eyes:canvas_primitive_bar",
+        "eyes:variant_seed_0",
+        "ears:heard_shape_bar",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_bar",
+      "outcome_traits": [
+        "eyes:rendered_bar"
+      ],
+      "surprise_score": 0.57894737
+    },
+    {
+      "episode_id": 23,
+      "tick": 24,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_arrow' (exposure #2, familiarity 0.93)",
+      "active_concepts": [
+        "shape_arrow"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_arrow",
+        "eyes:canvas_primitive_arrow",
+        "eyes:variant_seed_1",
+        "ears:heard_shape_arrow",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_arrow",
+      "outcome_traits": [
+        "eyes:rendered_arrow"
+      ],
+      "surprise_score": 0.4117647
+    },
+    {
+      "episode_id": 22,
+      "tick": 23,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_arrow' (exposure #1, familiarity 0.83)",
+      "active_concepts": [
+        "shape_arrow"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_arrow",
+        "eyes:canvas_primitive_arrow",
+        "eyes:variant_seed_0",
+        "ears:heard_shape_arrow",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_arrow",
+      "outcome_traits": [
+        "eyes:rendered_arrow"
+      ],
+      "surprise_score": 0.5625
+    },
+    {
+      "episode_id": 21,
+      "tick": 22,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_circle' (exposure #2, familiarity 0.93)",
+      "active_concepts": [
+        "shape_circle"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_circle",
+        "eyes:canvas_primitive_circle",
+        "eyes:variant_seed_1",
+        "ears:heard_shape_circle",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_circle",
+      "outcome_traits": [
+        "eyes:rendered_circle"
+      ],
+      "surprise_score": 0.6363636
+    },
+    {
+      "episode_id": 20,
+      "tick": 21,
+      "partner": "world_programs",
+      "summary": "Interacted with 'world_programs' on concept 'shape_circle' (exposure #1, familiarity 0.83)",
+      "active_concepts": [
+        "shape_circle"
+      ],
+      "observed_traits": [
+        "eyes:code_program",
+        "eyes:shape_geometry_circle",
+        "eyes:canvas_primitive_circle",
+        "eyes:variant_seed_0",
+        "ears:heard_shape_circle",
+        "hands:writes_canvas_pixels",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "draw_circle",
+      "outcome_traits": [
+        "eyes:rendered_circle"
+      ],
+      "surprise_score": 0.9142857
+    },
+    {
+      "episode_id": 19,
+      "tick": 20,
+      "partner": "genome_world",
+      "summary": "Interacted with 'genome_world' on concept 'camera' (exposure #2, familiarity 0.93)",
+      "active_concepts": [
+        "camera"
+      ],
+      "observed_traits": [
+        "eyes:circular_lens",
+        "eyes:rectangular_body",
+        "eyes:shutter_button",
+        "eyes:glass_optics",
+        "eyes:instance_view_2",
+        "ears:shutter_click",
+        "ears:heard_camera",
+        "hands:grip_texture",
+        "hands:press_shutter",
+        "smell:camera_signature",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "inspect_camera",
+      "outcome_traits": [
+        "eyes:camera_recognized"
+      ],
+      "surprise_score": 0.53571427
+    },
+    {
+      "episode_id": 18,
+      "tick": 19,
+      "partner": "genome_world",
+      "summary": "Interacted with 'genome_world' on concept 'camera' (exposure #1, familiarity 0.83)",
+      "active_concepts": [
+        "camera"
+      ],
+      "observed_traits": [
+        "eyes:circular_lens",
+        "eyes:rectangular_body",
+        "eyes:shutter_button",
+        "eyes:glass_optics",
+        "eyes:instance_view_1",
+        "ears:shutter_click",
+        "ears:heard_camera",
+        "hands:grip_texture",
+        "hands:press_shutter",
+        "smell:camera_signature",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "inspect_camera",
+      "outcome_traits": [
+        "eyes:camera_recognized"
+      ],
+      "surprise_score": 0.8684211
+    },
+    {
+      "episode_id": 17,
+      "tick": 18,
+      "partner": "genome_world",
+      "summary": "Interacted with 'genome_world' on concept 'bonsai' (exposure #2, familiarity 0.93)",
+      "active_concepts": [
+        "bonsai"
+      ],
+      "observed_traits": [
+        "eyes:branching_canopy",
+        "eyes:woody_trunk",
+        "eyes:green_foliage",
+        "eyes:ceramic_pot",
+        "eyes:instance_view_2",
+        "ears:leaf_rustle",
+        "ears:heard_bonsai",
+        "hands:rough_bark",
+        "hands:delicate_leaves",
+        "smell:bonsai_signature",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "inspect_bonsai",
+      "outcome_traits": [
+        "eyes:bonsai_recognized"
+      ],
+      "surprise_score": 0.4814815
+    },
+    {
+      "episode_id": 16,
+      "tick": 17,
+      "partner": "genome_world",
+      "summary": "Interacted with 'genome_world' on concept 'bonsai' (exposure #1, familiarity 0.83)",
+      "active_concepts": [
+        "bonsai"
+      ],
+      "observed_traits": [
+        "eyes:branching_canopy",
+        "eyes:woody_trunk",
+        "eyes:green_foliage",
+        "eyes:ceramic_pot",
+        "eyes:instance_view_1",
+        "ears:leaf_rustle",
+        "ears:heard_bonsai",
+        "hands:rough_bark",
+        "hands:delicate_leaves",
+        "smell:bonsai_signature",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action_or_code": "inspect_bonsai",
+      "outcome_traits": [
+        "eyes:bonsai_recognized"
+      ],
+      "surprise_score": 0.8918919
+    }
+  ],
+  "bridge_log": [
+    {
+      "timestamp": 1791964150,
+      "tick": 30,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'counting_number' from shelf 'alpha3_library_K' (/data/alpha3-library/K/mathematics) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964149,
+      "tick": 29,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_cup' from shelf 'world_programs' (/data/dev/genome/world/programs/cup_1.py) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964147,
+      "tick": 28,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_cup' from shelf 'world_programs' (/data/dev/genome/world/programs/cup_0.py) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964146,
+      "tick": 27,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_cross' from shelf 'world_programs' (/data/dev/genome/world/programs/cross_1.py) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964144,
+      "tick": 26,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_cross' from shelf 'world_programs' (/data/dev/genome/world/programs/cross_0.py) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964143,
+      "tick": 25,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_bar' from shelf 'world_programs' (/data/dev/genome/world/programs/bar_1.py) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964141,
+      "tick": 24,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_bar' from shelf 'world_programs' (/data/dev/genome/world/programs/bar_0.py) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964140,
+      "tick": 23,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_arrow' from shelf 'world_programs' (/data/dev/genome/world/programs/arrow_1.py) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964138,
+      "tick": 22,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_arrow' from shelf 'world_programs' (/data/dev/genome/world/programs/arrow_0.py) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964137,
+      "tick": 21,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_circle' from shelf 'world_programs' (/data/dev/genome/world/programs/circle_1.py) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964135,
+      "tick": 20,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'shape_circle' from shelf 'world_programs' (/data/dev/genome/world/programs/circle_0.py) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964134,
+      "tick": 19,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'camera' from shelf 'genome_world' (/data/dev/genome/world/camera/image_0008.jpg) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964132,
+      "tick": 18,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'camera' from shelf 'genome_world' (/data/dev/genome/world/camera/image_0027.jpg) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964131,
+      "tick": 17,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'bonsai' from shelf 'genome_world' (/data/dev/genome/world/bonsai/image_0008.jpg) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964129,
+      "tick": 16,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'bonsai' from shelf 'genome_world' (/data/dev/genome/world/bonsai/image_0027.jpg) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964128,
+      "tick": 15,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'ant' from shelf 'genome_world' (/data/dev/genome/world/ant/image_0008.jpg) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964126,
+      "tick": 14,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'ant' from shelf 'genome_world' (/data/dev/genome/world/ant/image_0027.jpg) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964125,
+      "tick": 13,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'anchor' from shelf 'genome_world' (/data/dev/genome/world/anchor/image_0008.jpg) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964123,
+      "tick": 12,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'anchor' from shelf 'genome_world' (/data/dev/genome/world/anchor/image_0027.jpg) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964122,
+      "tick": 11,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'ahmad' from shelf 'genome_world' (/data/dev/genome/world/ahmad/ahmad_03.jpg) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964120,
+      "tick": 10,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'ahmad' from shelf 'genome_world' (/data/dev/genome/world/ahmad/ahmad_02.jpg) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964119,
+      "tick": 9,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'dog' from shelf 'sandbox_2d' (world2d:(2,9)/brown_dog) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964117,
+      "tick": 8,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'cat' from shelf 'sandbox_2d' (world2d:(10,2)/black_cat) — exposure #2, familiarity 93%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964116,
+      "tick": 7,
+      "role": "curriculum",
+      "kind": "grounding",
+      "message": "Grounded 'cat' from shelf 'sandbox_2d' (world2d:(2,2)/orange_cat) — exposure #1, familiarity 83%",
+      "details": null
+    },
+    {
+      "timestamp": 1791964116,
+      "tick": 7,
+      "role": "surprise_analyzer",
+      "kind": "causal_seed",
+      "message": "ONE-SHOT CAUSAL LEARNING: First observation of action 'press_switch' in context [\"eyes:switch_visible\", \"hands:near_switch\", \"senses:awake\", \"senses:calm_predictive_flow\"] -> learned outcome [\"eyes:light_on\"].",
+      "details": "PREDICTION FAILURE ANALYZED: Expected [\"eyes:result_42\", \"eyes:code_ran_cleanly\", \"eyes:printed_42\"] after action 'run_code', but it failed to happen. Isolated contextual condition 'eyes:syntax_typo' as the cause and learned new exception -> 'eyes:syntax_error'."
+    }
+  ]
+}

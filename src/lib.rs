@@ -1,5 +1,6 @@
 pub mod body;
 pub mod concept_web;
+pub mod curriculum;
 pub mod fabric;
 pub mod language_road;
 pub mod neuron;
@@ -234,16 +235,92 @@ impl Alpha7Organism {
         )
     }
 
-    /// Saves the entire Alpha 7 organism state (neurons, synapses, concept web, episodic memories, 2D world) to disk.
+    /// Saves the entire Alpha 7 organism state to disk using sparse neuron checkpointing
+    /// (~40 KB instead of ~300 MB for 1,000,000 neurons).
     pub fn save_state(&self, path: &str) -> Result<(), String> {
-        let json = serde_json::to_string_pretty(self).map_err(|e| e.to_string())?;
+        let total_n = self.fabric.neurons.len();
+        let active_neurons: Vec<(usize, DendriticNeuron)> = self
+            .fabric
+            .neurons
+            .iter()
+            .copied()
+            .enumerate()
+            .filter(|(_, n)| n.last_update_tick > 0 || n.maturity_count > 0 || (n.threshold - 1.0).abs() > 1e-4)
+            .collect();
+
+        let checkpoint = serde_json::json!({
+            "total_neurons": total_n,
+            "current_tick": self.fabric.current_tick,
+            "active_neurons": active_neurons,
+            "synapses": self.fabric.synapses,
+            "trait_to_neuron": self.fabric.trait_to_neuron,
+            "neuron_to_trait": self.fabric.neuron_to_trait,
+            "knowledge_web": self.knowledge_web,
+            "predictor": self.predictor,
+            "body": self.body,
+            "world": self.world,
+        });
+        let json = serde_json::to_string_pretty(&checkpoint).map_err(|e| e.to_string())?;
         fs::write(path, json).map_err(|e| e.to_string())
     }
 
-    /// Loads a persisted Alpha 7 organism state from disk.
+    /// Loads a persisted Alpha 7 organism state from disk and restores the 1,000,000-neuron arena.
     pub fn load_state(path: &str) -> Result<Self, String> {
         let data = fs::read_to_string(path).map_err(|e| e.to_string())?;
-        serde_json::from_str(&data).map_err(|e| e.to_string())
+        let val: serde_json::Value = serde_json::from_str(&data).map_err(|e| e.to_string())?;
+        let total_n = val
+            .get("total_neurons")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(1_000_000) as usize;
+        let mut org = Self::new(total_n, 64);
+        if let Some(tick) = val.get("current_tick").and_then(|v| v.as_u64()) {
+            org.fabric.current_tick = tick as u32;
+        }
+        if let Some(act_val) = val.get("active_neurons") {
+            if let Ok(list) = serde_json::from_value::<Vec<(usize, DendriticNeuron)>>(act_val.clone()) {
+                for (idx, n) in list {
+                    if idx < org.fabric.neurons.len() {
+                        org.fabric.neurons[idx] = n;
+                    }
+                }
+            }
+        }
+        if let Some(syn_val) = val.get("synapses") {
+            if let Ok(s) = serde_json::from_value(syn_val.clone()) {
+                org.fabric.synapses = s;
+            }
+        }
+        if let Some(ttn_val) = val.get("trait_to_neuron") {
+            if let Ok(m) = serde_json::from_value(ttn_val.clone()) {
+                org.fabric.trait_to_neuron = m;
+            }
+        }
+        if let Some(ntt_val) = val.get("neuron_to_trait") {
+            if let Ok(m) = serde_json::from_value(ntt_val.clone()) {
+                org.fabric.neuron_to_trait = m;
+            }
+        }
+        if let Some(kw_val) = val.get("knowledge_web") {
+            if let Ok(kw) = serde_json::from_value(kw_val.clone()) {
+                org.knowledge_web = kw;
+            }
+        }
+        if let Some(pred_val) = val.get("predictor") {
+            if let Ok(p) = serde_json::from_value(pred_val.clone()) {
+                org.predictor = p;
+            }
+        }
+        if let Some(body_val) = val.get("body") {
+            if let Ok(b) = serde_json::from_value(body_val.clone()) {
+                org.body = b;
+            }
+        }
+        if let Some(world_val) = val.get("world") {
+            if let Ok(w) = serde_json::from_value(world_val.clone()) {
+                org.world = w;
+            }
+        }
+        Ok(org)
     }
 }
 

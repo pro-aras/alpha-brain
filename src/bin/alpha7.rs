@@ -263,7 +263,18 @@ fn run_repl() {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.iter().any(|a| a == "--repl" || a == "-i") {
+    if args.iter().any(|a| a == "--daemon") {
+        let mut live_dir = "/data/dev/alpha7/live".to_string();
+        let mut max_steps: Option<u64> = None;
+        for i in 0..args.len() {
+            if args[i] == "--live-dir" && i + 1 < args.len() {
+                live_dir = args[i + 1].clone();
+            } else if args[i] == "--steps" && i + 1 < args.len() {
+                max_steps = args[i + 1].parse::<u64>().ok();
+            }
+        }
+        alpha7::curriculum::run_live_daemon(&live_dir, max_steps);
+    } else if args.iter().any(|a| a == "--repl" || a == "-i") {
         run_repl();
     } else {
         run_demo();
