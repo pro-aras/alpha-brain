@@ -1,12 +1,17 @@
 //! Alpha 7 Grounded World & Kindergarten Shelf Curriculum Reader + Live Telemetry Bridge
 //!
-//! Connects Alpha 7's Pure Road to:
-//! 1. `/data/dev/genome/world` (visual object folders, `ahmad/`, and `programs/*.py`)
-//! 2. `/data/alpha3-library/K` (Kindergarten glyphs, mathematics, scenes)
-//! 3. `/data/dev/alpha7/live/` (Real-time telemetry & two-way command bridge for `ops.proaras.app`)
+//! Phase 2 Upgrades:
+//! - Phase 2A: Real V1/V2 pixel feature extraction (`EyesSensor::analyze_image_file`) on `.jpg`,
+//!   `.png`, and `.ppm` files in `/data/dev/genome/world` and `/data/alpha3-library/K/scenes`,
+//!   plus real PCM `.wav` cochlear analysis (`EarsSensor::analyze_wav_file`).
+//! - Phase 2B: Exports discovered `concept_relations` (`is_a`, `shares_core_with`) to telemetry.
+//! - Phase 2C: Supports `"synthesize"` bridge command and exports `synthesized_programs`.
+//! - Phase 2D: Periodic and on-demand Hippocampal Sleep Replay (`"sleep"` bridge command) +
+//!   48-point `tick_history` ring buffer for SVG telemetry sparklines.
 
-use crate::body::SensoryFrame;
-use crate::Alpha7Organism;
+use crate::body::{CochlearAnalysis, EyesSensor, SensoryFrame, V1RetinaGlance};
+use crate::concept_web::SleepConsolidationReport;
+use crate::{Alpha7Organism, CodeSynthesisReport};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
@@ -18,6 +23,8 @@ pub struct CurriculumItem {
     pub shelf: String,
     pub concept_name: String,
     pub source_path: String,
+    pub image_path: Option<String>,
+    pub audio_path: Option<String>,
     pub eyes_traits: Vec<String>,
     pub ears_traits: Vec<String>,
     pub hands_traits: Vec<String>,
@@ -26,16 +33,83 @@ pub struct CurriculumItem {
     pub affordance: Option<(String, String)>,
 }
 
+/// A single time-series point for SVG sparklines on `ops.proaras.app`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TickHistoryPoint {
+    pub tick: u32,
+    pub step_us: f64,
+    pub touched_neurons: usize,
+    pub active_synapses: usize,
+    pub predicted_spikes: u64,
+    pub surprise_bursts: u64,
+}
+
+/// Ensures `/data/dev/alpha7/assets/audio/` contains real 16-bit mono PCM `.wav` waveforms
+/// for cochlear waveform analysis when exploring concepts.
+pub fn ensure_grounded_wav_assets() -> Vec<String> {
+    let dir = "/data/dev/alpha7/assets/audio";
+    let _ = fs::create_dir_all(dir);
+    let specs: &[(&str, f32, f32, u32)] = &[
+        ("voiced_guidance.wav", 220.0, 0.45, 250),
+        ("purr_harmonic.wav", 110.0, 0.35, 250),
+        ("metallic_clank.wav", 880.0, 0.65, 180),
+        ("shutter_click.wav", 1420.0, 0.50, 120),
+    ];
+    let sample_rate = 16000u32;
+    let mut paths = Vec::new();
+
+    for &(fname, freq_hz, amp, dur_ms) in specs {
+        let full_path = format!("{}/{}", dir, fname);
+        if !Path::new(&full_path).is_file() {
+            let num_samples = ((sample_rate * dur_ms) / 1000) as usize;
+            let data_bytes_len = (num_samples * 2) as u32;
+            let riff_len = 36 + data_bytes_len;
+            let byte_rate = sample_rate * 2;
+            let mut buf: Vec<u8> = Vec::with_capacity(44 + num_samples * 2);
+
+            buf.extend_from_slice(b"RIFF");
+            buf.extend_from_slice(&riff_len.to_le_bytes());
+            buf.extend_from_slice(b"WAVE");
+            buf.extend_from_slice(b"fmt ");
+            buf.extend_from_slice(&16u32.to_le_bytes());
+            buf.extend_from_slice(&1u16.to_le_bytes()); // PCM
+            buf.extend_from_slice(&1u16.to_le_bytes()); // 1 channel
+            buf.extend_from_slice(&sample_rate.to_le_bytes());
+            buf.extend_from_slice(&byte_rate.to_le_bytes());
+            buf.extend_from_slice(&2u16.to_le_bytes()); // block align
+            buf.extend_from_slice(&16u16.to_le_bytes()); // 16-bit
+            buf.extend_from_slice(b"data");
+            buf.extend_from_slice(&data_bytes_len.to_le_bytes());
+
+            for i in 0..num_samples {
+                let t = (i as f32) / (sample_rate as f32);
+                let env = (1.0 - (i as f32) / (num_samples.max(1) as f32)).powf(0.6);
+                let wave = (2.0 * std::f32::consts::PI * freq_hz * t).sin()
+                    + 0.35 * (2.0 * std::f32::consts::PI * (freq_hz * 2.0) * t).sin();
+                let val = (wave * amp * env * 22000.0).clamp(-32760.0, 32760.0) as i16;
+                buf.extend_from_slice(&val.to_le_bytes());
+            }
+            let _ = fs::write(&full_path, buf);
+        }
+        paths.push(full_path);
+    }
+    paths
+}
+
 /// Discovers and extracts grounded multi-sensory curriculum items from `/data/dev/genome/world`
-/// and `/data/alpha3-library/K` without dumping ungrounded advanced text.
+/// and `/data/alpha3-library/K` using real V1/V2 image analysis where image files exist.
 pub fn discover_grounded_curriculum() -> Vec<CurriculumItem> {
+    let wav_files = ensure_grounded_wav_assets();
+    let mut temp_eye = EyesSensor::default();
     let mut items = Vec::new();
 
-    // 1. Built-in foundational 2D sandbox experiences (Cat #1, Cat #2, Unseen White Cat, Switch, Code)
+    // 1. Built-in foundational 2D sandbox experiences (Cat #1, Cat #2, Brown Dog #1, Brown Dog #2)
     items.push(CurriculumItem {
         shelf: "sandbox_2d".into(),
         concept_name: "cat".into(),
         source_path: "world2d:(2,2)/orange_cat".into(),
+        image_path: None,
+        audio_path: wav_files.get(1).cloned(),
         eyes_traits: vec![
             "pointy_ears".into(),
             "whiskers".into(),
@@ -55,6 +129,8 @@ pub fn discover_grounded_curriculum() -> Vec<CurriculumItem> {
         shelf: "sandbox_2d".into(),
         concept_name: "cat".into(),
         source_path: "world2d:(10,2)/black_cat".into(),
+        image_path: None,
+        audio_path: wav_files.get(1).cloned(),
         eyes_traits: vec![
             "pointy_ears".into(),
             "whiskers".into(),
@@ -74,6 +150,8 @@ pub fn discover_grounded_curriculum() -> Vec<CurriculumItem> {
         shelf: "sandbox_2d".into(),
         concept_name: "dog".into(),
         source_path: "world2d:(2,9)/brown_dog".into(),
+        image_path: None,
+        audio_path: wav_files.first().cloned(),
         eyes_traits: vec![
             "floppy_ears".into(),
             "wet_snout".into(),
@@ -88,56 +166,113 @@ pub fn discover_grounded_curriculum() -> Vec<CurriculumItem> {
         affordance: Some(("pat_head".into(), "eyes:wagging_tail".into())),
     });
 
-    // 2. Scan `/data/dev/genome/world` for real object folders and `programs/*.py`
+    items.push(CurriculumItem {
+        shelf: "sandbox_2d".into(),
+        concept_name: "dog".into(),
+        source_path: "world2d:(3,9)/spotted_dog".into(),
+        image_path: None,
+        audio_path: wav_files.first().cloned(),
+        eyes_traits: vec![
+            "floppy_ears".into(),
+            "wet_snout".into(),
+            "four_legs".into(),
+            "wagging_tail".into(),
+            "spotted_coat".into(),
+        ],
+        ears_traits: vec!["bark".into()],
+        hands_traits: vec!["coarse_fur".into(), "warm_body".into()],
+        smell_traits: vec!["canine_scent".into()],
+        code_snippet: None,
+        affordance: Some(("pat_head".into(), "eyes:wagging_tail".into())),
+    });
+
+    // 2. Scan `/data/dev/genome/world` for real object folders and decode real V1/V2 image traits!
     let world_root = Path::new("/data/dev/genome/world");
     if world_root.is_dir() {
-        let known_folder_traits: &[(&str, &[&str], &[&str], &[&str])] = &[
+        let known_folder_traits: &[(&str, &[&str], &[&str], &[&str], usize)] = &[
             (
                 "ahmad",
-                &["human_face", "creator_presence", "warm_gaze", "bipedal_posture"],
+                &[
+                    "human_face",
+                    "creator_presence",
+                    "warm_gaze",
+                    "bipedal_posture",
+                ],
                 &["friendly_voice", "spoken_guidance"],
                 &["handshake_warmth", "direct_user_bond"],
+                0,
             ),
             (
                 "anchor",
                 &["heavy_flukes", "curved_crown", "iron_shank", "symmetric_arms"],
                 &["metallic_clank"],
                 &["cold_iron", "heavy_mass"],
+                2,
             ),
             (
                 "ant",
                 &["six_legs", "segmented_thorax", "antennae", "small_insect_body"],
                 &["faint_scurry"],
                 &["tiny_chitin"],
+                1,
             ),
             (
                 "bonsai",
-                &["branching_canopy", "woody_trunk", "green_foliage", "ceramic_pot"],
+                &[
+                    "branching_canopy",
+                    "woody_trunk",
+                    "green_foliage",
+                    "ceramic_pot",
+                ],
                 &["leaf_rustle"],
                 &["rough_bark", "delicate_leaves"],
+                0,
             ),
             (
                 "camera",
-                &["circular_lens", "rectangular_body", "shutter_button", "glass_optics"],
+                &[
+                    "circular_lens",
+                    "rectangular_body",
+                    "shutter_button",
+                    "glass_optics",
+                ],
                 &["shutter_click"],
                 &["grip_texture", "press_shutter"],
+                3,
             ),
         ];
 
-        for &(folder, v_traits, a_traits, h_traits) in known_folder_traits {
+        for &(folder, v_traits, a_traits, h_traits, wav_idx) in known_folder_traits {
             let dir_path = world_root.join(folder);
             if dir_path.is_dir() {
                 if let Ok(entries) = fs::read_dir(&dir_path) {
-                    for (idx, entry) in entries.flatten().take(2).enumerate() {
-                        let path_str = entry.path().display().to_string();
+                    let mut file_paths: Vec<String> = entries
+                        .flatten()
+                        .map(|e| e.path().display().to_string())
+                        .filter(|p| p.ends_with(".jpg") || p.ends_with(".png"))
+                        .collect();
+                    file_paths.sort();
+
+                    for (idx, path_str) in file_paths.into_iter().take(2).enumerate() {
                         let mut eyes: Vec<String> =
                             v_traits.iter().map(|s| (*s).to_string()).collect();
-                        // Add a specific instance surface trait (file index/lighting) so 2 exposures separate core invariants vs surface traits!
+
+                        // Phase 2A: Extract real V1/V2 pixel features from the image file!
+                        if let Some(glance) = temp_eye.analyze_image_file(&path_str) {
+                            for gt in glance.extracted_traits {
+                                if !eyes.contains(&gt) {
+                                    eyes.push(gt);
+                                }
+                            }
+                        }
                         eyes.push(format!("instance_view_{}", idx + 1));
+
                         items.push(CurriculumItem {
                             shelf: "genome_world".into(),
                             concept_name: folder.to_string(),
-                            source_path: path_str,
+                            source_path: path_str.clone(),
+                            image_path: Some(path_str),
+                            audio_path: wav_files.get(wav_idx).cloned(),
                             eyes_traits: eyes,
                             ears_traits: a_traits.iter().map(|s| (*s).to_string()).collect(),
                             hands_traits: h_traits.iter().map(|s| (*s).to_string()).collect(),
@@ -177,6 +312,8 @@ pub fn discover_grounded_curriculum() -> Vec<CurriculumItem> {
                             shelf: "world_programs".into(),
                             concept_name: format!("shape_{}", shape),
                             source_path: p.display().to_string(),
+                            image_path: None,
+                            audio_path: None,
                             eyes_traits: eyes,
                             ears_traits: vec![],
                             hands_traits: vec!["writes_canvas_pixels".into()],
@@ -197,9 +334,15 @@ pub fn discover_grounded_curriculum() -> Vec<CurriculumItem> {
         }
     }
 
-    // 3. Scan `/data/alpha3-library/K` (Kindergarten shelf)
+    // 3. Scan `/data/alpha3-library/K` (Kindergarten shelf, including real `.ppm` scenes!)
     let k_root = Path::new("/data/alpha3-library/K");
     if k_root.is_dir() {
+        let scenes_train = k_root.join("scenes/train");
+        let sample_ppms = [
+            scenes_train.join("scene-01000000.ppm"),
+            scenes_train.join("scene-01000001.ppm"),
+        ];
+
         for (sub, concept, core_v, act, eff) in &[
             (
                 "mathematics",
@@ -225,13 +368,29 @@ pub fn discover_grounded_curriculum() -> Vec<CurriculumItem> {
         ] {
             let sub_dir = k_root.join(sub);
             if sub_dir.is_dir() {
-                for exp_idx in 1..=2 {
+                for exp_idx in 0..2 {
                     let mut eyes: Vec<String> = core_v.iter().map(|s| (*s).to_string()).collect();
-                    eyes.push(format!("k_page_sample_{}", exp_idx));
+                    let mut img_path_opt = None;
+                    if *sub == "scenes" && sample_ppms[exp_idx].is_file() {
+                        let p_str = sample_ppms[exp_idx].display().to_string();
+                        if let Some(glance) = temp_eye.analyze_image_file(&p_str) {
+                            for gt in glance.extracted_traits {
+                                if !eyes.contains(&gt) {
+                                    eyes.push(gt);
+                                }
+                            }
+                        }
+                        img_path_opt = Some(p_str);
+                    }
+                    eyes.push(format!("k_page_sample_{}", exp_idx + 1));
                     items.push(CurriculumItem {
                         shelf: "alpha3_library_K".into(),
                         concept_name: (*concept).to_string(),
-                        source_path: sub_dir.display().to_string(),
+                        source_path: img_path_opt
+                            .clone()
+                            .unwrap_or_else(|| sub_dir.display().to_string()),
+                        image_path: img_path_opt,
+                        audio_path: wav_files.first().cloned(),
                         eyes_traits: eyes,
                         ears_traits: vec![format!("spoken_{}", concept)],
                         hands_traits: vec![(*act).to_string()],
@@ -251,7 +410,7 @@ pub fn discover_grounded_curriculum() -> Vec<CurriculumItem> {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BridgeCommand {
     pub id: String,
-    pub kind: String, // "chat", "move", "saccade", "teach", "code", "goal", "curriculum_step"
+    pub kind: String, // "chat", "move", "saccade", "teach", "code", "synthesize", "goal", "sleep"
     pub text: Option<String>,
     pub x: Option<i32>,
     pub y: Option<i32>,
@@ -264,7 +423,7 @@ pub struct BridgeCommand {
 pub struct BridgeLogEntry {
     pub timestamp: u64,
     pub tick: u32,
-    pub role: String, // "user", "alpha7_mouth", "surprise_analyzer", "curriculum"
+    pub role: String, // "user", "alpha7_mouth", "surprise_analyzer", "curriculum", "sleep_replay"
     pub kind: String,
     pub message: String,
     pub details: Option<String>,
@@ -287,8 +446,11 @@ pub struct LiveTelemetrySnapshot {
     pub cumulative_surprise_bursts: u64,
     pub cumulative_failed_predictions: u64,
     pub cumulative_btsp_updates: u64,
-    // Instrument 2: 5-Sense Live Stream & 2D Spatial World Canvas
+    pub tick_history: Vec<TickHistoryPoint>,
+    // Instrument 2: 5-Sense Live Stream, V1/V2 Retina Glance, Cochlear Analysis & 2D World Canvas
     pub current_frame: SensoryFrame,
+    pub last_retina_glance: Option<V1RetinaGlance>,
+    pub last_cochlear_analysis: Option<CochlearAnalysis>,
     pub world_width: i32,
     pub world_height: i32,
     pub agent_x: i32,
@@ -297,7 +459,7 @@ pub struct LiveTelemetrySnapshot {
     pub gaze_y: i32,
     pub ascii_canvas: String,
     pub world_entities: Vec<serde_json::Value>,
-    // Instrument 3: Predictive Engine, Surprise Failure Analyzer & Goal Scenarios
+    // Instrument 3: Predictive Engine, Surprise Failure Analyzer, Goal Scenarios & Code Synthesizer
     pub last_action: String,
     pub last_predicted_outcomes: Vec<(String, f32)>,
     pub last_actual_outcomes: Vec<String>,
@@ -307,9 +469,13 @@ pub struct LiveTelemetrySnapshot {
     pub goal_scenarios: Vec<crate::predictor::ScenarioBranch>,
     pub causal_rules_count: usize,
     pub causal_rules_preview: Vec<crate::predictor::CausalRule>,
-    // Instrument 4: Hippocampal-Cortical Concept Web (1-2 Shot Invariants)
+    pub synthesized_programs: Vec<CodeSynthesisReport>,
+    // Instrument 4: Hippocampal-Cortical Concept Web (1-2 Shot Invariants, Compositional Relations & Sleep Replay)
     pub concepts_count: usize,
     pub concepts: Vec<serde_json::Value>,
+    pub concept_relations: Vec<(String, String, String, f32)>,
+    pub sleep_cycles_completed: u32,
+    pub last_sleep_report: Option<SleepConsolidationReport>,
     // Instrument 5: Direct User Bridge, Mouth Log, Curriculum Progress & Autobiographical Memories
     pub curriculum_index: usize,
     pub curriculum_total: usize,
@@ -334,7 +500,8 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
     let processed_path = format!("{}/processed_ids.json", live_dir);
 
     let mut org = if Path::new(&state_path).exists() {
-        Alpha7Organism::load_state(&state_path).unwrap_or_else(|_| Alpha7Organism::new(1_000_000, 64))
+        Alpha7Organism::load_state(&state_path)
+            .unwrap_or_else(|_| Alpha7Organism::new(1_000_000, 64))
     } else {
         Alpha7Organism::new(1_000_000, 64)
     };
@@ -348,6 +515,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         .unwrap_or_default();
 
     let mut bridge_log: Vec<BridgeLogEntry> = Vec::new();
+    let mut tick_history: Vec<TickHistoryPoint> = Vec::new();
     let mut cumulative_predicted_spikes = 0u64;
     let mut cumulative_surprise_bursts = 0u64;
     let mut cumulative_failed_predictions = 0u64;
@@ -362,7 +530,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             .to_string();
     let mut active_goal_target = "eyes:knowledge_gained".to_string();
 
-    // Seed initial causal rules & failure analysis so instruments immediately show live causal reasoning
+    // Ensure initial causal rules, V1 retina glance, cochlear analysis, code synthesis, and sleep replay are seeded
     if org.predictor.rules.is_empty() {
         let f_sw = org
             .body
@@ -380,7 +548,6 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             &["eyes:knowledge_gained".to_string()],
             "user",
         );
-        // Also run a prediction failure test (power_unplugged) and code practice
         let f_unp = org.body.build_frame(
             &["switch_visible"],
             &[],
@@ -413,6 +580,19 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         });
     }
 
+    if org.synthesized_programs.is_empty() {
+        let synth42 = org.synthesize_code_for_goal("42");
+        let synth15 = org.synthesize_code_for_goal("15");
+        bridge_log.push(BridgeLogEntry {
+            timestamp: now_unix(),
+            tick: org.fabric.current_tick,
+            role: "alpha7_mouth".into(),
+            kind: "code_synthesis".into(),
+            message: synth42.summary,
+            details: Some(synth15.summary),
+        });
+    }
+
     let mut step_counter = 0u64;
     loop {
         let t_step_start = Instant::now();
@@ -421,7 +601,8 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
 
         // 1. Process any pending user commands from `inbox.jsonl`
         if let Ok(inbox_raw) = fs::read_to_string(&inbox_path) {
-            for line in inbox_raw.lines() {
+            let lines: Vec<&str> = inbox_raw.lines().collect();
+            for line in &lines {
                 if line.trim().is_empty() {
                     continue;
                 }
@@ -517,8 +698,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                                     frame.eyes.push(format!("eyes:{}", tok));
                                 }
                             }
-                            let (node, rep) =
-                                org.experience_concept(&cname, &frame, None, actor);
+                            let (node, rep) = org.experience_concept(&cname, &frame, None, actor);
                             last_touched = rep.touched_neurons;
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
@@ -562,6 +742,35 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                             });
                             current_activity = format!("Practiced small code: {}", code_str);
                         }
+                        "synthesize" => {
+                            let target_spec = cmd.text.unwrap_or_else(|| "42".into());
+                            let rep = org.synthesize_code_for_goal(&target_spec);
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "alpha7_mouth".into(),
+                                kind: "code_synthesis".into(),
+                                message: rep.summary.clone(),
+                                details: Some(format!(
+                                    "Synthesized Code:\n{}",
+                                    rep.synthesized_code
+                                )),
+                            });
+                            current_activity =
+                                format!("Synthesized code for target '{}'", target_spec);
+                        }
+                        "sleep" => {
+                            let rep = org.consolidate_memories();
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "sleep_replay".into(),
+                                kind: "sleep".into(),
+                                message: rep.summary.clone(),
+                                details: None,
+                            });
+                            current_activity = rep.summary;
+                        }
                         "goal" => {
                             if let Some(g) = cmd.text {
                                 active_goal_target = g.trim().to_string();
@@ -579,22 +788,41 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                                     message: msg,
                                     details: None,
                                 });
-                                current_activity =
-                                    format!("Simulated scenarios for goal '{}'", active_goal_target);
+                                current_activity = format!(
+                                    "Simulated scenarios for goal '{}'",
+                                    active_goal_target
+                                );
                             }
                         }
                         _ => {}
                     }
                 }
             }
+            // Keep inbox.jsonl and processed_ids bounded so they never grow indefinitely
+            if lines.len() > 200 {
+                let tail: Vec<&str> = lines.into_iter().rev().take(80).rev().collect();
+                let _ = fs::write(&inbox_path, tail.join("\n") + "\n");
+            }
+            if processed_ids.len() > 500 {
+                processed_ids.clear();
+            }
             if let Ok(p_json) = serde_json::to_string(&processed_ids) {
                 let _ = fs::write(&processed_path, p_json);
             }
         }
 
-        // 2. Autonomous Grounded Curriculum & 2D World Exploration Step
+        // 2. Autonomous Grounded Curriculum, V1/V2 Retina & Cochlear Exploration Step
         if current_activity.is_empty() && !curriculum.is_empty() {
             let item = &curriculum[curr_idx % curriculum.len()];
+
+            // Phase 2A: If this item has an image or audio file, run the live V1/V2 Retina and Cochlear analyzers!
+            if let Some(ref img_p) = item.image_path {
+                let _ = org.body.eyes.analyze_image_file(img_p);
+            }
+            if let Some(ref wav_p) = item.audio_path {
+                let _ = org.body.ears.analyze_wav_file(wav_p);
+            }
+
             let eyes_refs: Vec<&str> = item.eyes_traits.iter().map(|s| s.as_str()).collect();
             let ears_refs: Vec<&str> = item.ears_traits.iter().map(|s| s.as_str()).collect();
             let hands_refs: Vec<&str> = item.hands_traits.iter().map(|s| s.as_str()).collect();
@@ -607,8 +835,6 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 Some(&item.concept_name),
             );
 
-            // Only advance exposure count up to 4 per curriculum item during autonomous patrolling
-            // so familiarity and invariance stay clean and realistic
             let existing_exp = org
                 .knowledge_web
                 .concepts
@@ -645,7 +871,6 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                     details: None,
                 });
             } else {
-                // Already familiar (>= 2 exposures): step perception and verify recognition & predictions!
                 let (rep, _recs) = org.perceive_and_step(&frame, true);
                 last_touched = rep.touched_neurons;
                 cumulative_predicted_spikes += rep.predicted_matches.len() as u64;
@@ -654,7 +879,6 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 cumulative_btsp_updates += rep.surprise.plastic_updates as u64;
             }
 
-            // Patrol 2D world entities visually as well
             if !org.world.entities.is_empty() {
                 let target_ent =
                     &org.world.entities[(step_counter as usize) % org.world.entities.len()];
@@ -666,14 +890,46 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
 
             current_activity = format!(
                 "Exploring shelf '{}' -> concept '{}' ({}) & patrolling 2D World at ({},{})",
-                item.shelf, item.concept_name, item.source_path, org.world.agent_x, org.world.agent_y
+                item.shelf,
+                item.concept_name,
+                item.source_path,
+                org.world.agent_x,
+                org.world.agent_y
             );
             curr_idx = (curr_idx + 1) % curriculum.len();
         }
 
-        let step_us = t_step_start.elapsed().as_secs_f64() * 1_000_000.0;
+        // Phase 2D: Periodic micro-sleep replay & relation discovery every 20 daemon ticks
+        if step_counter % 20 == 0 {
+            let sleep_rep = org.consolidate_memories();
+            if step_counter == 0 {
+                bridge_log.push(BridgeLogEntry {
+                    timestamp: now_unix(),
+                    tick: org.fabric.current_tick,
+                    role: "sleep_replay".into(),
+                    kind: "consolidation".into(),
+                    message: sleep_rep.summary,
+                    details: None,
+                });
+            }
+        }
 
-        // Keep bridge_log bounded to the last 40 items
+        let step_us = t_step_start.elapsed().as_secs_f64() * 1_000_000.0;
+        let touched_now = last_touched.max(12);
+
+        tick_history.push(TickHistoryPoint {
+            tick: org.fabric.current_tick,
+            step_us,
+            touched_neurons: touched_now,
+            active_synapses: org.active_synapse_count(),
+            predicted_spikes: cumulative_predicted_spikes,
+            surprise_bursts: cumulative_surprise_bursts,
+        });
+        if tick_history.len() > 48 {
+            let drain_n = tick_history.len() - 48;
+            tick_history.drain(0..drain_n);
+        }
+
         if bridge_log.len() > 40 {
             let drain_count = bridge_log.len() - 40;
             bridge_log.drain(0..drain_count);
@@ -695,6 +951,13 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                     .iter()
                     .map(|t| t.trait_key.clone())
                     .collect();
+                let categories: Vec<String> = org
+                    .knowledge_web
+                    .relations
+                    .iter()
+                    .filter(|(s, r, _, _)| s == &c.name && r == "is_a")
+                    .map(|(_, _, cat, _)| cat.clone())
+                    .collect();
                 serde_json::json!({
                     "name": c.name,
                     "exposures": c.exposures,
@@ -703,6 +966,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                     "variable_traits": var,
                     "grounded_words": c.grounded_words,
                     "causal_affordances": c.causal_affordances,
+                    "categories": categories,
                 })
             })
             .collect();
@@ -747,19 +1011,22 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v0.2".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),
             memory_footprint_mb: org.memory_footprint_mb(),
             active_synapses: org.active_synapse_count(),
             last_step_us: step_us,
-            last_touched_neurons: last_touched.max(12),
+            last_touched_neurons: touched_now,
             cumulative_predicted_spikes,
             cumulative_surprise_bursts,
             cumulative_failed_predictions,
             cumulative_btsp_updates,
+            tick_history: tick_history.clone(),
             current_frame: live_frame,
+            last_retina_glance: org.body.eyes.last_retina_glance.clone(),
+            last_cochlear_analysis: org.body.ears.last_cochlear_analysis.clone(),
             world_width: org.world.width,
             world_height: org.world.height,
             agent_x: org.world.agent_x,
@@ -776,9 +1043,13 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             active_goal_target: active_goal_target.clone(),
             goal_scenarios,
             causal_rules_count: org.predictor.rules.len(),
-            causal_rules_preview: org.predictor.rules.iter().take(8).cloned().collect(),
+            causal_rules_preview: org.predictor.rules.iter().take(10).cloned().collect(),
+            synthesized_programs: org.synthesized_programs.iter().rev().take(6).cloned().collect(),
             concepts_count: concepts_json.len(),
             concepts: concepts_json,
+            concept_relations: org.knowledge_web.relations.clone(),
+            sleep_cycles_completed: org.knowledge_web.sleep_cycles_completed,
+            last_sleep_report: org.knowledge_web.last_sleep_report.clone(),
             curriculum_index: curr_idx,
             curriculum_total: curriculum.len(),
             recent_episodes,
@@ -802,6 +1073,6 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 break;
             }
         }
-        std::thread::sleep(std::time::Duration::from_millis(1500));
+        std::thread::sleep(std::time::Duration::from_millis(1200));
     }
 }

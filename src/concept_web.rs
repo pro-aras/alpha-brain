@@ -1,4 +1,4 @@
-//! Alpha 7 Hippocampal-Cortical Conceptual Knowledge Web & Episodic Memory
+//! Alpha 7 Hippocampal-Cortical Conceptual Knowledge Web, Compositional Hierarchy & Sleep Replay
 //!
 //! Implements:
 //! 1. One-Shot & Two-Shot Infant-Like Concept Formation (Quiroga Concept Cells + BTSP):
@@ -7,13 +7,13 @@
 //!    - 2nd interaction: Separates Core Invariant Traits (shared across instances, e.g.,
 //!      whiskers, pointy ears, feline gait) from Variable/Incidental Traits (e.g., orange
 //!      vs. black fur), enabling recognition of ANY instance of that concept.
-//! 2. Grounded Language & Code Understanding:
-//!    - Words and code primitives are wired directly to sensory-motor traits and causal
-//!      input->output transitions, so speaking/thinking a word reactivates its sensory-motor
-//!      meaning.
-//! 3. Direct User Episodic Memories:
-//!    - Stores autobiographical interaction episodes with the user, indexed by concepts,
-//!      traits, surprise level, and causal outcomes.
+//! 2. Phase 2B — Compositional Concept Hierarchy & Relational Comparison:
+//!    - Automatically discovers shared core invariants across distinct concepts (e.g., `cat` and `dog`
+//!      sharing `eyes:four_legs`, `hands:warm_body`) to induce parent categories (`is_a`,
+//!      `shares_core_with`, `contrasts_with`) and answer comparative questions.
+//! 3. Phase 2D — Hippocampal-Neocortical Sharp-Wave Ripple Replay & Sleep Consolidation:
+//!    - Replays high-surprise episodic memories into `SparseNeuralFabric`, strengthens multi-episode
+//!      invariant synapses, prunes weak incidental noise synapses, and consolidates categories.
 
 use crate::fabric::SparseNeuralFabric;
 use crate::neuron::Modality;
@@ -31,11 +31,11 @@ pub struct TraitBinding {
     /// Number of exposures of this concept in which this trait was present.
     pub seen_count: u32,
     /// Invariance ratio `seen_count / concept_exposures`.
-    /// High (>= 0.75 after 2+ exposures) = Core Invariant Trait; Low = Variable/Incidental Trait.
+    /// High (>= 0.65 after 2+ exposures) = Core Invariant Trait; Low = Variable/Incidental Trait.
     pub invariance: f32,
 }
 
-/// A grounded Concept Assembly in the Conceptual Knowledge Web (e.g., "cat", "user", "python_loop").
+/// A grounded Concept Assembly in the Conceptual Knowledge Web (e.g., "cat", "user", "multiply_code").
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConceptNode {
     pub name: String,
@@ -67,7 +67,11 @@ impl ConceptNode {
                 }
             })
             .collect();
-        list.sort_by(|a, b| b.weight.partial_cmp(&a.weight).unwrap_or(std::cmp::Ordering::Equal));
+        list.sort_by(|a, b| {
+            b.weight
+                .partial_cmp(&a.weight)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
         list
     }
 
@@ -78,7 +82,11 @@ impl ConceptNode {
             .values()
             .filter(|t| self.exposures >= 2 && t.invariance < 0.65)
             .collect();
-        list.sort_by(|a, b| b.weight.partial_cmp(&a.weight).unwrap_or(std::cmp::Ordering::Equal));
+        list.sort_by(|a, b| {
+            b.weight
+                .partial_cmp(&a.weight)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
         list
     }
 }
@@ -107,6 +115,30 @@ pub struct ConceptRecognition {
     pub familiarity: f32,
 }
 
+/// Phase 2B: Structured comparison between two grounded concepts.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ConceptComparison {
+    pub concept_a: String,
+    pub concept_b: String,
+    pub shared_core_traits: Vec<String>,
+    pub unique_to_a: Vec<String>,
+    pub unique_to_b: Vec<String>,
+    pub shared_categories: Vec<String>,
+    pub similarity_score: f32,
+    pub summary: String,
+}
+
+/// Phase 2D: Telemetry report produced by a Hippocampal-Neocortical Sleep Replay cycle.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct SleepConsolidationReport {
+    pub cycle_number: u32,
+    pub episodes_replayed: usize,
+    pub synapses_reinforced: usize,
+    pub weak_synapses_pruned: usize,
+    pub relations_discovered: usize,
+    pub summary: String,
+}
+
 /// The Hippocampal-Cortical Conceptual Knowledge Web and Episodic Memory store.
 #[derive(Serialize, Deserialize, Default)]
 pub struct ConceptualKnowledgeWeb {
@@ -114,6 +146,10 @@ pub struct ConceptualKnowledgeWeb {
     pub episodes: Vec<EpisodicMemory>,
     /// Directed conceptual associations `(concept_a, relation, concept_b, weight)`.
     pub relations: Vec<(String, String, String, f32)>,
+    #[serde(default)]
+    pub sleep_cycles_completed: u32,
+    #[serde(default)]
+    pub last_sleep_report: Option<SleepConsolidationReport>,
 }
 
 impl ConceptualKnowledgeWeb {
@@ -122,6 +158,8 @@ impl ConceptualKnowledgeWeb {
             concepts: FxHashMap::default(),
             episodes: Vec::new(),
             relations: Vec::new(),
+            sleep_cycles_completed: 0,
+            last_sleep_report: None,
         }
     }
 
@@ -137,8 +175,9 @@ impl ConceptualKnowledgeWeb {
         partner: &str,
         surprise_score: f32,
     ) -> ConceptNode {
-        let hub_key = format!("concept:{}", concept_name.to_lowercase());
-        let word_key = format!("word:{}", concept_name.to_lowercase());
+        let clean_name = concept_name.trim().to_lowercase();
+        let hub_key = format!("concept:{}", clean_name);
+        let word_key = format!("word:{}", clean_name);
         let hub_neuron_id = fabric.ensure_trait_neuron(&hub_key, Modality::ConceptHub);
         let word_neuron_id = fabric.ensure_trait_neuron(&word_key, Modality::Language);
 
@@ -149,15 +188,15 @@ impl ConceptualKnowledgeWeb {
 
         let node = self
             .concepts
-            .entry(concept_name.to_lowercase())
+            .entry(clean_name.clone())
             .or_insert_with(|| ConceptNode {
-                name: concept_name.to_lowercase(),
+                name: clean_name.clone(),
                 hub_neuron_id,
                 word_neuron_id,
                 exposures: 0,
                 familiarity: 0.0,
                 traits: FxHashMap::default(),
-                grounded_words: vec![concept_name.to_lowercase()],
+                grounded_words: vec![clean_name.clone()],
                 causal_affordances: Vec::new(),
             });
 
@@ -190,7 +229,7 @@ impl ConceptualKnowledgeWeb {
                     trait_key: trait_str.clone(),
                     modality: modality.as_str().to_string(),
                     neuron_id: trait_nid,
-                    weight: 0.65, // Strong 1-shot initial BTSP binding
+                    weight: 0.65,
                     seen_count: 0,
                     invariance: 1.0,
                 });
@@ -198,11 +237,9 @@ impl ConceptualKnowledgeWeb {
             entry.seen_count += 1;
             entry.invariance = (entry.seen_count as f32) / (node.exposures as f32);
             if node.exposures > 1 && entry.seen_count > 1 {
-                // Shared invariant across exposures boosts weight strongly
                 entry.weight = (entry.weight + 0.22).min(1.0);
             }
 
-            // Wire trait <-> concept hub in the neural fabric:
             // Basal synapse (trait -> concept hub for bottom-up recognition)
             fabric.upsert_synapse(trait_nid, hub_neuron_id, entry.weight * 0.55, false, 1.5);
             // Apical synapse (concept hub -> trait for top-down mental simulation/prediction)
@@ -214,18 +251,21 @@ impl ConceptualKnowledgeWeb {
         for (t_key, binding) in node.traits.iter_mut() {
             if !active_set.contains(t_key) {
                 binding.invariance = (binding.seen_count as f32) / (exposures as f32);
-                // Slightly relax weight of non-invariant surface trait (e.g. orange fur vs black fur)
                 binding.weight = (binding.weight * 0.72).max(0.20);
             }
         }
 
         // 3. Ground additional spoken/written words to this concept
         for w in associated_words {
-            let w_clean = w.to_lowercase();
+            let w_clean = w.trim().to_lowercase();
+            if w_clean.is_empty() {
+                continue;
+            }
             if !node.grounded_words.contains(&w_clean) {
                 node.grounded_words.push(w_clean.clone());
             }
-            let w_nid = fabric.ensure_trait_neuron(&format!("word:{}", w_clean), Modality::Language);
+            let w_nid =
+                fabric.ensure_trait_neuron(&format!("word:{}", w_clean), Modality::Language);
             fabric.upsert_synapse(w_nid, hub_neuron_id, 0.85, false, 1.5);
             fabric.upsert_synapse(hub_neuron_id, w_nid, 0.85, true, 1.5);
         }
@@ -242,31 +282,304 @@ impl ConceptualKnowledgeWeb {
             let act_nid =
                 fabric.ensure_trait_neuron(&format!("hands:{}", act), Modality::TactileHand);
             let eff_nid = fabric.ensure_trait_neuron(&eff, Modality::Visual);
-            // Wire causal prediction: Concept + Hand Action -> Apical prediction of Effect
             fabric.upsert_synapse(hub_neuron_id, act_nid, 0.70, true, 1.5);
             fabric.upsert_synapse(act_nid, eff_nid, 0.85, true, 1.5);
         }
 
         let snapshot = node.clone();
 
-        // 5. Store direct autobiographical Episodic Memory with the user/partner
-        let ep_id = (self.episodes.len() + 1) as u64;
+        // 5. Store direct autobiographical Episodic Memory with the user/partner (bounded to 500 max)
+        let ep_id = (self.episodes.last().map(|e| e.episode_id).unwrap_or(0)) + 1;
         self.episodes.push(EpisodicMemory {
             episode_id: ep_id,
             tick: fabric.current_tick,
             partner: partner.to_string(),
             summary: format!(
                 "Interacted with '{}' on concept '{}' (exposure #{}, familiarity {:.2})",
-                partner, concept_name, snapshot.exposures, snapshot.familiarity
+                partner, clean_name, snapshot.exposures, snapshot.familiarity
             ),
-            active_concepts: vec![concept_name.to_lowercase()],
+            active_concepts: vec![clean_name],
             observed_traits: sensory_traits.to_vec(),
             action_or_code: action_opt,
             outcome_traits: outcome_vec,
             surprise_score,
         });
+        if self.episodes.len() > 500 {
+            let drain_n = self.episodes.len() - 500;
+            self.episodes.drain(0..drain_n);
+        }
+
+        // 6. Phase 2B: Update compositional conceptual relations
+        let _ = self.discover_relations(fabric);
 
         snapshot
+    }
+
+    /// Phase 2B: Automatically discovers shared core invariants across concepts,
+    /// induces parent category relationships (`is_a`), and links sibling concepts (`shares_core_with`).
+    pub fn discover_relations(&mut self, fabric: &mut SparseNeuralFabric) -> usize {
+        let mut new_relations: Vec<(String, String, String, f32)> = Vec::new();
+        let mut names: Vec<String> = self.concepts.keys().cloned().collect();
+        names.sort();
+
+        for i in 0..names.len() {
+            for j in (i + 1)..names.len() {
+                let na = &names[i];
+                let nb = &names[j];
+                let (Some(ca), Some(cb)) = (self.concepts.get(na), self.concepts.get(nb)) else {
+                    continue;
+                };
+                let core_a: std::collections::HashSet<&str> =
+                    ca.core_invariants().iter().map(|t| t.trait_key.as_str()).collect();
+                let core_b: std::collections::HashSet<&str> =
+                    cb.core_invariants().iter().map(|t| t.trait_key.as_str()).collect();
+
+                // Filter out generic V1 visual traits when inducing semantic categories so semantic
+                // overlap is meaningful, or require >= 2 shared traits.
+                let shared: Vec<&str> = core_a.intersection(&core_b).copied().collect();
+                let semantic_shared: Vec<&str> = shared
+                    .iter()
+                    .copied()
+                    .filter(|t| !t.starts_with("eyes:v1_") && !t.starts_with("eyes:aspect_"))
+                    .collect();
+
+                if !semantic_shared.is_empty() || shared.len() >= 3 {
+                    let union_len = core_a.union(&core_b).count().max(1);
+                    let sim = ((shared.len() as f32) / (union_len as f32)).clamp(0.15, 1.0);
+                    new_relations.push((na.clone(), "shares_core_with".to_string(), nb.clone(), sim));
+
+                    // Wire associative lateral synapse between sibling concept hubs
+                    fabric.upsert_synapse(ca.hub_neuron_id, cb.hub_neuron_id, sim * 0.45, true, 1.2);
+                    fabric.upsert_synapse(cb.hub_neuron_id, ca.hub_neuron_id, sim * 0.45, true, 1.2);
+
+                    // Induce specific parent category name from shared semantic traits
+                    if shared.contains(&"eyes:four_legs") || shared.contains(&"hands:warm_body") {
+                        new_relations.push((
+                            na.clone(),
+                            "is_a".to_string(),
+                            "living_quadruped".to_string(),
+                            0.92,
+                        ));
+                        new_relations.push((
+                            nb.clone(),
+                            "is_a".to_string(),
+                            "living_quadruped".to_string(),
+                            0.92,
+                        ));
+                    }
+                    if shared.contains(&"eyes:code_program") || shared.contains(&"eyes:code_block") {
+                        new_relations.push((
+                            na.clone(),
+                            "is_a".to_string(),
+                            "executable_program".to_string(),
+                            0.90,
+                        ));
+                        new_relations.push((
+                            nb.clone(),
+                            "is_a".to_string(),
+                            "executable_program".to_string(),
+                            0.90,
+                        ));
+                    }
+                }
+            }
+        }
+
+        // Deduplicate relations
+        let mut unique_rels: Vec<(String, String, String, f32)> = Vec::new();
+        for (a, rel, b, w) in new_relations {
+            if !unique_rels
+                .iter()
+                .any(|(ea, er, eb, _)| ea == &a && er == &rel && eb == &b)
+            {
+                unique_rels.push((a, rel, b, w));
+            }
+        }
+        let count = unique_rels.len();
+        self.relations = unique_rels;
+        count
+    }
+
+    /// Phase 2B: Compares two grounded concepts directly from their core invariants, variable
+    /// traits, and induced parent categories.
+    pub fn compare_concepts(&self, name_a: &str, name_b: &str) -> Option<ConceptComparison> {
+        let ka = name_a.trim().to_lowercase();
+        let kb = name_b.trim().to_lowercase();
+        let node_a = self.concepts.get(&ka)?;
+        let node_b = self.concepts.get(&kb)?;
+
+        let core_a: Vec<String> = node_a
+            .core_invariants()
+            .iter()
+            .map(|t| t.trait_key.clone())
+            .collect();
+        let core_b: Vec<String> = node_b
+            .core_invariants()
+            .iter()
+            .map(|t| t.trait_key.clone())
+            .collect();
+
+        let shared_core_traits: Vec<String> = core_a
+            .iter()
+            .filter(|t| core_b.contains(t))
+            .cloned()
+            .collect();
+        let unique_to_a: Vec<String> = core_a
+            .iter()
+            .filter(|t| !core_b.contains(t))
+            .cloned()
+            .collect();
+        let unique_to_b: Vec<String> = core_b
+            .iter()
+            .filter(|t| !core_a.contains(t))
+            .cloned()
+            .collect();
+
+        let mut shared_categories = Vec::new();
+        for (s, r, cat, _) in &self.relations {
+            if r == "is_a" && s == &ka {
+                if self
+                    .relations
+                    .iter()
+                    .any(|(s2, r2, cat2, _)| r2 == "is_a" && s2 == &kb && cat2 == cat)
+                    && !shared_categories.contains(cat)
+                {
+                    shared_categories.push(cat.clone());
+                }
+            }
+        }
+
+        let union_cnt = (shared_core_traits.len() + unique_to_a.len() + unique_to_b.len()).max(1);
+        let similarity_score = (shared_core_traits.len() as f32) / (union_cnt as f32);
+
+        let cat_note = if shared_categories.is_empty() {
+            String::new()
+        } else {
+            format!(" Both belong to category {:?}.", shared_categories)
+        };
+
+        let summary = format!(
+            "Comparing '{}' and '{}' (similarity {:.0}%): they share {} core invariant(s) {:?}, while '{}' is distinguished by {:?} and '{}' is distinguished by {:?}.{}",
+            node_a.name,
+            node_b.name,
+            similarity_score * 100.0,
+            shared_core_traits.len(),
+            shared_core_traits,
+            node_a.name,
+            unique_to_a.iter().take(4).collect::<Vec<_>>(),
+            node_b.name,
+            unique_to_b.iter().take(4).collect::<Vec<_>>(),
+            cat_note
+        );
+
+        Some(ConceptComparison {
+            concept_a: node_a.name.clone(),
+            concept_b: node_b.name.clone(),
+            shared_core_traits,
+            unique_to_a,
+            unique_to_b,
+            shared_categories,
+            similarity_score,
+            summary,
+        })
+    }
+
+    /// Phase 2D: Hippocampal-Neocortical Sharp-Wave Ripple Replay & Sleep Consolidation.
+    /// Replays recent high-surprise episodic memories through `SparseNeuralFabric`, strengthens
+    /// multi-exposure core invariant bindings, prunes weak noisy traits/synapses, and updates
+    /// compositional concept hierarchy relations.
+    pub fn consolidate_memories(
+        &mut self,
+        fabric: &mut SparseNeuralFabric,
+    ) -> SleepConsolidationReport {
+        self.sleep_cycles_completed += 1;
+        let mut episodes_replayed = 0usize;
+        let mut synapses_reinforced = 0usize;
+        let mut weak_synapses_pruned = 0usize;
+
+        // 1. Select up to 8 highest-surprise or most recent episodic memories for sharp-wave replay
+        let mut replay_indices: Vec<usize> = (0..self.episodes.len()).collect();
+        replay_indices.sort_by(|&ia, &ib| {
+            self.episodes[ib]
+                .surprise_score
+                .partial_cmp(&self.episodes[ia].surprise_score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        replay_indices.truncate(8);
+
+        for idx in replay_indices {
+            let ep = &self.episodes[idx];
+            for tr in &ep.observed_traits {
+                if !tr.starts_with("senses:") && !tr.starts_with("ears:heard_") {
+                    let nid = fabric.ensure_trait_neuron(tr, Modality::from_str(tr));
+                    fabric.inject_basal_stimulus(nid, 1.05);
+                }
+            }
+            for cname in &ep.active_concepts {
+                if let Some(node) = self.concepts.get(cname) {
+                    fabric.inject_apical_prediction(node.hub_neuron_id, 0.90);
+                }
+            }
+            let _ = fabric.step(true);
+            episodes_replayed += 1;
+        }
+
+        // 2. Reinforce Core Invariant synapses and prune weak incidental single-occurrence noise
+        for node in self.concepts.values_mut() {
+            let exposures = node.exposures;
+            for binding in node.traits.values_mut() {
+                if exposures >= 2 && binding.invariance >= 0.65 {
+                    binding.weight = (binding.weight + 0.08).min(1.0);
+                    fabric.upsert_synapse(
+                        binding.neuron_id,
+                        node.hub_neuron_id,
+                        0.12,
+                        false,
+                        1.5,
+                    );
+                    fabric.upsert_synapse(
+                        node.hub_neuron_id,
+                        binding.neuron_id,
+                        0.12,
+                        true,
+                        1.5,
+                    );
+                    synapses_reinforced += 2;
+                } else if exposures >= 3 && binding.invariance < 0.35 && binding.weight < 0.35 {
+                    binding.weight = (binding.weight * 0.80).max(0.10);
+                }
+            }
+        }
+
+        // 3. Synaptic homeostasis: prune ultra-weak noisy synapses (< 0.03) in the sparse fabric
+        for syn_list in fabric.synapses.values_mut() {
+            let before = syn_list.len();
+            syn_list.retain(|s| s.weight >= 0.03);
+            weak_synapses_pruned += before.saturating_sub(syn_list.len());
+        }
+
+        // 4. Re-induce compositional relations across consolidated concepts
+        let relations_discovered = self.discover_relations(fabric);
+
+        let summary = format!(
+            "Sleep Consolidation Cycle #{}: replayed {} episodic traces, reinforced {} core invariant synapses, pruned {} weak synapses, and consolidated {} conceptual relations.",
+            self.sleep_cycles_completed,
+            episodes_replayed,
+            synapses_reinforced,
+            weak_synapses_pruned,
+            relations_discovered
+        );
+
+        let report = SleepConsolidationReport {
+            cycle_number: self.sleep_cycles_completed,
+            episodes_replayed,
+            synapses_reinforced,
+            weak_synapses_pruned,
+            relations_discovered,
+            summary,
+        };
+        self.last_sleep_report = Some(report.clone());
+        report
     }
 
     /// Recognizes concepts from an arbitrary set of sensory traits (even on unseen instances
@@ -302,15 +615,11 @@ impl ConceptualKnowledgeWeb {
             }
 
             if !matched_core.is_empty() && total_core_possible > 0.0 {
-                // Count contradictory / novel exteroceptive traits (lateral inhibition against wrong concepts)
                 let unmatched_obs = exteroceptive_obs
                     .iter()
                     .filter(|&&t| !node.traits.contains_key(t))
                     .count();
 
-                // When >= 4 core invariants match, dendritic NMDA plateau locks in recognition
-                // so incidental environmental traits (e.g. rain scent or novel fur color) do not
-                // suppress recognition; when < 3 core invariants match, lateral inhibition is strong.
                 let inhibition_per_unmatched = if matched_core.len() >= 4 {
                     0.015
                 } else {
@@ -318,7 +627,6 @@ impl ConceptualKnowledgeWeb {
                 };
                 let lateral_inhibition = (unmatched_obs as f32) * inhibition_per_unmatched;
 
-                // Dendritic NMDA-style nonlinear threshold on core invariant overlap:
                 let core_ratio = core_score / total_core_possible;
                 let nmda_amplification = if matched_core.len() >= 4 {
                     1.38
@@ -327,8 +635,8 @@ impl ConceptualKnowledgeWeb {
                 } else {
                     0.85
                 };
-                let confidence =
-                    (core_ratio * nmda_amplification + var_bonus - lateral_inhibition).clamp(0.0, 1.0);
+                let confidence = (core_ratio * nmda_amplification + var_bonus - lateral_inhibition)
+                    .clamp(0.0, 1.0);
                 if confidence >= 0.35 {
                     results.push(ConceptRecognition {
                         concept_name: node.name.clone(),
@@ -382,7 +690,6 @@ impl ConceptualKnowledgeWeb {
             }
         }
 
-        // Recall direct user episodic memories involving these concepts
         for ep in self.episodes.iter().rev() {
             if ep
                 .active_concepts

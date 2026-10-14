@@ -1,11 +1,11 @@
-//! Alpha 7 Grounded Language, Grammar Road & "The Mouth" (Option 2)
+//! Alpha 7 Grounded Language, Grammar Road & "The Mouth" (Option 2 + Phase 2B/2C/2D)
 //!
 //! Ensures Alpha 7 understands the words it speaks and thinks on:
 //! - Every word is wired directly to sensory-motor trait neurons, Concept Hub assemblies,
 //!   and causal action->outcome transitions.
-//! - "The Mouth" never emits ungrounded statistical tokens; it constructs utterances and
-//!   curiosity questions directly from active Concept Nodes, Predictive Scenarios, and
-//!   Surprise / Prediction-Error diagnostics.
+//! - Phase 2B: Answers comparative questions (`compare A and B`, `how is A different from B?`)
+//!   and causal failure/why questions (`why did press_switch fail?`, `why eyes:darkness_remains?`)
+//!   directly from its grounded Concept Web and Predictive Engine rules.
 
 use crate::body::SensoryFrame;
 use crate::concept_web::{ConceptRecognition, ConceptualKnowledgeWeb, GroundedThought};
@@ -20,10 +20,21 @@ pub enum UtteranceIntent {
     AskCurrentPerception,
     /// User asks about a specific concept ("what is cat?", "describe cat").
     AskConcept { concept: String },
+    /// Phase 2B: User asks to compare two concepts ("compare cat and dog", "difference between cat and dog").
+    AskComparison {
+        concept_a: String,
+        concept_b: String,
+    },
+    /// Phase 2B: User asks why an action failed or why a trait occurred ("why did press_switch fail?", "why darkness_remains?").
+    AskWhy { subject: String },
     /// User asks what will happen next if an action is taken ("what happens if press_switch?").
     AskPrediction { action: String },
     /// User directs Alpha 7 toward a goal ("how to reach eyes:knowledge_gained?", "goal eyes:light_on").
     AskGoalScenario { goal_trait: String },
+    /// Phase 2C: User asks Alpha 7 to synthesize & verify code for a target ("synthesize code for 42").
+    AskCodeSynthesis { target_spec: String },
+    /// Phase 2D: User asks Alpha 7 to run a hippocampal sleep replay cycle ("sleep consolidate", "consolidate memories").
+    AskSleepConsolidation,
     /// User teaches a concept or statement ("teach cat", or general conversational thought).
     GeneralThought { text: String },
 }
@@ -55,6 +66,68 @@ impl LanguageRoad {
             || clean == "recognize"
         {
             return UtteranceIntent::AskCurrentPerception;
+        }
+
+        if clean == "sleep"
+            || clean == "sleep consolidate"
+            || clean == "consolidate"
+            || clean == "consolidate memories"
+            || clean == "replay memories"
+        {
+            return UtteranceIntent::AskSleepConsolidation;
+        }
+
+        if let Some(rest) = clean
+            .strip_prefix("synthesize code for ")
+            .or_else(|| clean.strip_prefix("synthesize code "))
+            .or_else(|| clean.strip_prefix("write code for "))
+            .or_else(|| clean.strip_prefix("code goal "))
+        {
+            return UtteranceIntent::AskCodeSynthesis {
+                target_spec: rest.trim().to_string(),
+            };
+        }
+
+        // Phase 2B: Comparative queries ("compare A and B", "how is A different from B", "difference between A and B")
+        if let Some(rest) = clean
+            .strip_prefix("compare ")
+            .or_else(|| clean.strip_prefix("difference between "))
+        {
+            if let Some((a, b)) = rest.split_once(" and ").or_else(|| rest.split_once(" vs ")) {
+                let ca = a.trim().to_string();
+                let cb = b.trim().to_string();
+                if !ca.is_empty() && !cb.is_empty() {
+                    return UtteranceIntent::AskComparison {
+                        concept_a: ca,
+                        concept_b: cb,
+                    };
+                }
+            }
+        }
+        if let Some(rest) = clean.strip_prefix("how is ") {
+            if let Some((a, b)) = rest.split_once(" different from ") {
+                let ca = a.trim().to_string();
+                let cb = b.trim().to_string();
+                if !ca.is_empty() && !cb.is_empty() {
+                    return UtteranceIntent::AskComparison {
+                        concept_a: ca,
+                        concept_b: cb,
+                    };
+                }
+            }
+        }
+
+        // Phase 2B: Causal Why queries ("why did X fail", "why X")
+        if let Some(rest) = clean
+            .strip_prefix("why did ")
+            .or_else(|| clean.strip_prefix("why "))
+        {
+            let subj = rest.trim().trim_end_matches(" fail").trim();
+            if !subj.is_empty() {
+                return UtteranceIntent::AskWhy {
+                    subject: subj.replace(' ', "_"),
+                };
+            }
         }
 
         if let Some(rest) = clean
@@ -118,7 +191,6 @@ impl LanguageRoad {
         } else if extero.is_empty() {
             "My senses are calm and waiting; no external object is in focus.".to_string()
         } else {
-            // High-surprise unknown entity -> Alpha 7 asks the user!
             let sample: Vec<String> = extero.into_iter().take(5).collect();
             format!(
                 "I sense unfamiliar traits [{}] that do not match my concept web yet. What is this?",
@@ -161,6 +233,55 @@ impl LanguageRoad {
                 goal_trait
             )
         }
+    }
+
+    /// Phase 2B: Explains why an action failed or why a specific outcome occurred by inspecting
+    /// learned causal rules and counterfactual blocker exceptions.
+    pub fn explain_causal_why(&self, predictor: &PredictiveEngine, subject: &str) -> String {
+        let subj_lower = subject.trim().to_lowercase();
+        for rule in &predictor.rules {
+            if rule.action.to_lowercase() == subj_lower
+                || rule.action.to_lowercase().contains(&subj_lower)
+                || rule
+                    .learned_exceptions
+                    .iter()
+                    .any(|(b, alt)| b.contains(&subj_lower) || alt.contains(&subj_lower))
+            {
+                if !rule.learned_exceptions.is_empty() {
+                    let ex_list: Vec<String> = rule
+                        .learned_exceptions
+                        .iter()
+                        .map(|(blocker, alt)| {
+                            format!(
+                                "blocking condition '{}' diverted expected outcome {:?} to '{}'",
+                                blocker,
+                                rule.predicted_outcomes.keys().collect::<Vec<_>>(),
+                                alt
+                            )
+                        })
+                        .collect();
+                    return format!(
+                        "Causal failure analysis for '{}': {}",
+                        rule.action,
+                        ex_list.join("; ")
+                    );
+                } else {
+                    let outs: Vec<String> = rule.predicted_outcomes.keys().cloned().collect();
+                    return format!(
+                        "Action '{}' normally requires {:?} and produces {:?} (reliability {}/{}).",
+                        rule.action,
+                        rule.trigger_traits,
+                        outs,
+                        rule.successes,
+                        rule.successes + rule.failures
+                    );
+                }
+            }
+        }
+        format!(
+            "I do not have a recorded causal failure or rule matching '{}' yet.",
+            subject
+        )
     }
 
     /// Full grounded dialogue turn: processes the user's words through the Concept Web,
@@ -209,14 +330,26 @@ impl LanguageRoad {
                         .iter()
                         .map(|(a, e)| format!("{} -> {}", a, e))
                         .collect();
+                    let categories: Vec<String> = web
+                        .relations
+                        .iter()
+                        .filter(|(s, r, _, _)| s == &node.name && r == "is_a")
+                        .map(|(_, _, cat, _)| cat.clone())
+                        .collect();
+                    let cat_str = if categories.is_empty() {
+                        String::new()
+                    } else {
+                        format!("; categories=[{}]", categories.join(", "))
+                    };
                     format!(
-                        "'{}' (experienced {} time(s), familiarity {:.0}%): core invariants=[{}]; variable traits=[{}]; affordances=[{}].",
+                        "'{}' (experienced {} time(s), familiarity {:.0}%): core invariants=[{}]; variable traits=[{}]; affordances=[{}]{}.",
                         node.name,
                         node.exposures,
                         node.familiarity * 100.0,
                         core.join(", "),
                         var.join(", "),
-                        affordances.join(", ")
+                        affordances.join(", "),
+                        cat_str
                     )
                 } else {
                     format!(
@@ -225,6 +358,20 @@ impl LanguageRoad {
                     )
                 }
             }
+            UtteranceIntent::AskComparison {
+                concept_a,
+                concept_b,
+            } => {
+                if let Some(comp) = web.compare_concepts(concept_a, concept_b) {
+                    comp.summary
+                } else {
+                    format!(
+                        "To compare '{}' and '{}', both must be grounded in my Concept Web first.",
+                        concept_a, concept_b
+                    )
+                }
+            }
+            UtteranceIntent::AskWhy { subject } => self.explain_causal_why(predictor, subject),
             UtteranceIntent::AskPrediction { action } => {
                 let preds = predictor.predict_next(&current_frame.to_neural_traits(), action);
                 if preds.is_empty() {
@@ -250,6 +397,16 @@ impl LanguageRoad {
                     predictor.simulate_scenarios(&current_frame.to_neural_traits(), goal_trait, 3);
                 self.speak_goal_scenarios(goal_trait, &branches)
             }
+            UtteranceIntent::AskCodeSynthesis { target_spec } => {
+                format!(
+                    "Initiating goal-directed code synthesis for target '{}'.",
+                    target_spec
+                )
+            }
+            UtteranceIntent::AskSleepConsolidation => {
+                "Initiating Hippocampal-Neocortical sharp-wave ripple sleep consolidation cycle."
+                    .to_string()
+            }
             UtteranceIntent::GeneralThought { .. } => {
                 if thought.activated_concepts.is_empty() {
                     format!(
@@ -257,8 +414,12 @@ impl LanguageRoad {
                         utterance
                     )
                 } else {
-                    let traits_preview: Vec<String> =
-                        thought.evoked_sensory_traits.iter().take(6).cloned().collect();
+                    let traits_preview: Vec<String> = thought
+                        .evoked_sensory_traits
+                        .iter()
+                        .take(6)
+                        .cloned()
+                        .collect();
                     let mem_note = thought
                         .recalled_episodes
                         .first()

@@ -1,4 +1,4 @@
-//! Alpha 7 Native Pure-Rust CLI, 2D World Explorer & Interactive REPL (Option 1 + 2 + 3)
+//! Alpha 7 Native Pure-Rust CLI, 2D World Explorer & Interactive REPL (Phase 1 + Phase 2A-2D)
 
 use alpha7::Alpha7Organism;
 use std::env;
@@ -7,7 +7,7 @@ use std::time::Instant;
 
 fn run_demo() {
     println!("================================================================================");
-    println!(" ALPHA 7 — 100% PURE RUST: SPARSE DENDRITIC BRAIN, 5-SENSE BODY, MOUTH & 2D WORLD");
+    println!(" ALPHA 7 v0.2 — 100% PURE RUST: SPARSE DENDRITIC BRAIN, V1/V2 RETINA, MOUTH & LAB");
     println!("================================================================================");
 
     let t0 = Instant::now();
@@ -22,12 +22,38 @@ fn run_demo() {
     );
     println!("    • Initialization Time     : {:.1} ms", init_ms);
 
-    println!("\n[2] OPTION 3: INTERACTIVE 2D SPATIAL WORLD CANVAS & 5 SENSES");
-    println!("{}", org.world.render_ascii());
-    println!("    Legend: '@' = Alpha 7 Body | 'c' = Orange Cat (2,2) | 'C' = Black Cat (10,2)");
-    println!("            'w' = White Cat (10,9) | 'd' = Brown Dog (2,9) | 'S' = Switch (6,2)");
+    println!("\n[2] PHASE 2A: REAL RAW-PIXEL V1/V2 VISUAL CORTEX & COCHLEAR WAVEFORM ENCODER");
+    let wavs = alpha7::curriculum::ensure_grounded_wav_assets();
+    if let Some(glance) = org
+        .body
+        .eyes
+        .analyze_image_file("/data/dev/genome/world/anchor/image_0001.jpg")
+    {
+        println!(
+            "    • V1/V2 Retina Glance     : {} ({}x{} px, symmetry={:.2}, contrast={:.2})",
+            glance.source_path,
+            glance.width,
+            glance.height,
+            glance.bilateral_symmetry,
+            glance.contrast_std
+        );
+        println!("    • Extracted Pixel Traits  : {:?}", glance.extracted_traits);
+    }
+    if let Some(first_wav) = wavs.first() {
+        if let Some(cochlea) = org.body.ears.analyze_wav_file(first_wav) {
+            println!(
+                "    • Cochlear PCM Analysis   : {} ({} Hz, {} ms, ZCR={:.3}, RMS={:.3})",
+                cochlea.source_path,
+                cochlea.sample_rate,
+                cochlea.duration_ms,
+                cochlea.zero_crossing_rate,
+                cochlea.rms_energy
+            );
+            println!("    • Extracted Audio Traits  : {:?}", cochlea.extracted_traits);
+        }
+    }
 
-    // Step 1: Move to Orange Cat at (2, 2) -> Exposure #1
+    println!("\n[3] INFANT-LIKE 1-2 SHOT CONCEPT FORMATION & PHASE 2B COMPOSITIONAL HIERARCHY");
     org.world.move_agent_to(&mut org.body, 2, 2);
     let frame1 = org
         .world
@@ -40,8 +66,6 @@ fn run_demo() {
         "user",
     );
     let step_us = t_step.elapsed().as_secs_f64() * 1_000_000.0;
-
-    println!("\n[3] INFANT-LIKE 1-2 SHOT CONCEPT FORMATION ON THE 2D CANVAS");
     println!(
         "    • Exposure #1 at (2,2) Orange Cat : familiarity={:.2}, touched={} / {} neurons ({:.1} µs)",
         node1.familiarity,
@@ -50,43 +74,30 @@ fn run_demo() {
         step_us
     );
 
-    // Step 2: Move to Black Cat at (10, 2) -> Exposure #2
     org.world.move_agent_to(&mut org.body, 10, 2);
     let frame2 = org
         .world
         .sense_current_frame(&mut org.body, Some("another cat"));
     let (node2, _) = org.experience_concept("cat", &frame2, None, "user");
-    let core_traits: Vec<String> = node2
-        .core_invariants()
-        .iter()
-        .map(|t| t.trait_key.clone())
-        .collect();
-    let var_traits: Vec<String> = node2
-        .variable_traits()
-        .iter()
-        .map(|t| t.trait_key.clone())
-        .collect();
     println!(
-        "    • Exposure #2 at (10,2) Black Cat : familiarity={:.2}",
-        node2.familiarity
+        "    • Exposure #2 at (10,2) Black Cat : familiarity={:.2}, core invariants={:?}",
+        node2.familiarity,
+        node2
+            .core_invariants()
+            .iter()
+            .map(|t| &t.trait_key)
+            .collect::<Vec<_>>()
     );
-    println!("    • Extracted Core Invariants       : {:?}", core_traits);
-    println!("    • Variable Surface Traits         : {:?}", var_traits);
 
-    println!("\n[4] OPTION 2: GROUNDED LANGUAGE & MOUTH ROAD");
-    // Move to Unseen White Cat at (10, 9) and ask "what is this?"
-    org.world.move_agent_to(&mut org.body, 10, 9);
-    let ans_white_cat = org.converse("what is this?");
-    println!("    • At Unseen White Cat (10,9) -> User: 'what is this?'");
-    println!("      Alpha 7 Mouth: \"{}\"", ans_white_cat.spoken_response);
-
-    // Move to Unseen Dog at (2, 9) and ask "what is this?"
+    // Experience dog at (2, 9) so Phase 2B induces shared category `living_quadruped`
     org.world.move_agent_to(&mut org.body, 2, 9);
-    let ans_dog = org.converse("what is this?");
-    println!("    • At Unseen Dog (2,9)        -> User: 'what is this?'");
-    println!("      Alpha 7 Mouth: \"{}\"", ans_dog.spoken_response);
+    let frame_dog = org.world.sense_current_frame(&mut org.body, Some("dog"));
+    org.experience_concept("dog", &frame_dog, None, "user");
 
-    println!("\n[5] PREDICTIVE PROCESSING, FAILED-PREDICTION ANALYSIS & GOAL SCENARIOS");
+    let cmp_reply = org.converse("compare cat and dog");
+    println!("    • Phase 2B Comparison     : \"{}\"", cmp_reply.spoken_response);
+
+    println!("\n[4] PREDICTIVE PROCESSING, FAILED-PREDICTION ANALYSIS & CAUSAL 'WHY'");
     org.world.move_agent_to(&mut org.body, 6, 2);
     let f_switch = org.world.sense_current_frame(&mut org.body, None);
     let (eval1, _) = org.act_and_analyze(
@@ -105,13 +116,6 @@ fn run_demo() {
         "user",
     );
 
-    // Goal-directed scenario rollout via conversation
-    org.world.move_agent_to(&mut org.body, 6, 2);
-    let goal_reply = org.converse("how to reach eyes:knowledge_gained?");
-    println!("    • User Goal Query         : 'how to reach eyes:knowledge_gained?'");
-    println!("      Alpha 7 Mouth: \"{}\"", goal_reply.spoken_response);
-
-    // Failed prediction when power is unplugged
     let f_unplugged = org.body.build_frame(
         &["switch_visible", "toggle_lever"],
         &[],
@@ -119,45 +123,39 @@ fn run_demo() {
         &["power_unplugged"],
         None,
     );
-    let (eval_fail, _) = org.act_and_analyze(
+    let _ = org.act_and_analyze(
         &f_unplugged,
         "press_switch",
         &["eyes:darkness_remains".to_string()],
         "user",
     );
-    println!(
-        "    • Failed Prediction Test  : {}",
-        org.language.speak_prediction_outcome(&eval_fail)
-    );
+    let why_reply = org.converse("why did press_switch fail?");
+    println!("    • Phase 2B Causal 'Why'   : \"{}\"", why_reply.spoken_response);
 
-    println!("\n[6] SMALL CODING LEARNING & DIRECT USER EPISODIC MEMORIES");
-    let code_ok = org.practice_coding("result = 6 * 7\nprint(result)", Some("multiply_code"));
-    println!("    • Code Practice #1 (Valid): {}", code_ok.analysis_report);
-    let code_err = org.practice_coding("result = 6 * * * 7", None);
-    println!("    • Code Practice #2 (Typo) : {}", code_err.analysis_report);
+    println!("\n[5] PHASE 2C & 2D: GOAL-DIRECTED CODE SYNTHESIS & HIPPOCAMPAL SLEEP REPLAY");
+    let synth_reply = org.converse("synthesize code for 42");
+    println!("    • Phase 2C Code Synthesis : \"{}\"", synth_reply.spoken_response);
 
-    let thought_reply = org.converse("kitty cat multiply_code");
-    println!("    • Grounded Thought        : \"{}\"", thought_reply.spoken_response);
-    println!(
-        "    • Total User Episodes     : {} autobiographical memories formed",
-        org.knowledge_web.episodes.len()
-    );
+    let sleep_reply = org.converse("sleep consolidate");
+    println!("    • Phase 2D Sleep Replay   : \"{}\"", sleep_reply.spoken_response);
     println!("================================================================================");
 }
 
 fn run_repl() {
     println!("================================================================================");
-    println!(" ALPHA 7 INTERACTIVE LIVE REPL (Option 1 + Option 2 Mouth + Option 3 2D World)");
+    println!(" ALPHA 7 v0.2 INTERACTIVE LIVE REPL");
     println!(" Commands:");
     println!("   map                     - Render the 2D World Canvas");
     println!("   move <x> <y>            - Move Alpha 7's body & hands to (x, y)");
     println!("   saccade <x> <y>         - Move Alpha 7's eye fixation to (x, y)");
     println!("   teach <concept>         - Bind current 5-sense traits to <concept> (1-2 shot)");
     println!("   code <expr>             - Practice executing small code with Eyes & Hands");
+    println!("   synthesize <target>     - Synthesize & verify code for a target result");
+    println!("   sleep                   - Run Hippocampal-Neocortical sleep replay consolidation");
     println!("   memories                - List direct episodic memories formed with you");
     println!("   save [path] / load [p]  - Persist or restore Alpha 7's full brain state");
     println!("   quit / exit             - Exit REPL");
-    println!("   Or type any question/sentence (e.g. 'what is this?', 'what is cat?')");
+    println!("   Or type any question (e.g. 'compare cat and dog', 'why did press_switch fail?')");
     println!("================================================================================");
 
     let mut org = Alpha7Organism::new(1_000_000, 64);
@@ -187,10 +185,7 @@ fn run_repl() {
                     let frame = org.world.sense_current_frame(&mut org.body, None);
                     let (_, recs) = org.perceive_and_step(&frame, true);
                     println!("{}", org.world.render_ascii());
-                    println!(
-                        "Alpha 7: {}",
-                        org.language.speak_perception(&frame, &recs)
-                    );
+                    println!("Alpha 7: {}", org.language.speak_perception(&frame, &recs));
                     continue;
                 }
             }
@@ -225,6 +220,12 @@ fn run_repl() {
         } else if let Some(code_str) = cmd.strip_prefix("code ") {
             let eval = org.practice_coding(code_str, None);
             println!("Alpha 7: {}", eval.analysis_report);
+        } else if let Some(target_str) = cmd.strip_prefix("synthesize ") {
+            let rep = org.synthesize_code_for_goal(target_str);
+            println!("Alpha 7: {}", rep.summary);
+        } else if cmd == "sleep" {
+            let rep = org.consolidate_memories();
+            println!("Alpha 7: {}", rep.summary);
         } else if cmd == "memories" {
             for ep in org.knowledge_web.episodes.iter().rev().take(10) {
                 println!("  • [tick {}] {}", ep.tick, ep.summary);
