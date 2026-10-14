@@ -874,6 +874,40 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                             });
                             current_activity = "Solved 4-Step Key-Door Tool Puzzle on 2D Canvas".to_string();
                         }
+                        "coach" => {
+                            let raw_text = cmd.text.unwrap_or_default();
+                            let domain = cmd.concept.unwrap_or_else(|| "User Live Coaching".into());
+                            let parts: Vec<&str> = raw_text.splitn(3, '|').collect();
+                            let prompt_s = parts.first().copied().unwrap_or("").trim();
+                            let ans_s = parts.get(1).copied().unwrap_or("").trim();
+                            let exp_s = parts
+                                .get(2)
+                                .copied()
+                                .unwrap_or("User-guided conceptual rule")
+                                .trim();
+                            if !prompt_s.is_empty() && !ans_s.is_empty() {
+                                let lesson =
+                                    org.coach_conceptually(&domain, prompt_s, ans_s, exp_s);
+                                let msg = format!(
+                                    "[{}] Coached on '{}': Initial prediction '{}' -> Self-Analysis: {} -> Applied concept: '{}' -> Verified: {}",
+                                    lesson.lesson_id,
+                                    lesson.trigger_question,
+                                    lesson.initial_wrong_answer,
+                                    lesson.self_analysis_question,
+                                    lesson.conceptual_hypothesis,
+                                    lesson.after_score
+                                );
+                                bridge_log.push(BridgeLogEntry {
+                                    timestamp: now_unix(),
+                                    tick: org.fabric.current_tick,
+                                    role: "alpha7_mouth".into(),
+                                    kind: "coach".into(),
+                                    message: msg.clone(),
+                                    details: Some(format!("Domain: {}", lesson.domain)),
+                                });
+                                current_activity = msg;
+                            }
+                        }
                         _ => {}
                     }
                 }

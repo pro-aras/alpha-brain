@@ -1,407 +1,406 @@
 {
-  "updated_at_unix": 1791978535,
+  "updated_at_unix": 1791999005,
   "status": "ONLINE · AWAKE · PURE ROAD v0.3",
-  "current_tick": 10783,
-  "current_activity": "Exploring shelf 'world_programs' -> concept 'shape_arrow' (/data/dev/genome/world/programs/arrow_0.py) & patrolling 2D World at (6,5)",
+  "current_tick": 34608,
+  "current_activity": "Exploring shelf 'world_programs' -> concept 'shape_circle' (/data/dev/genome/world/programs/circle_1.py) & patrolling 2D World at (6,7)",
   "total_neurons": 1000000,
   "memory_footprint_mb": 30.539627075195312,
-  "active_synapses": 6579,
-  "last_step_us": 442.685,
+  "active_synapses": 7448,
+  "last_step_us": 547.096,
   "last_touched_neurons": 14,
-  "cumulative_predicted_spikes": 10747,
-  "cumulative_surprise_bursts": 2633,
-  "cumulative_failed_predictions": 12186,
-  "cumulative_btsp_updates": 634570,
+  "cumulative_predicted_spikes": 35691,
+  "cumulative_surprise_bursts": 8548,
+  "cumulative_failed_predictions": 39489,
+  "cumulative_btsp_updates": 2042597,
   "tick_history": [
     {
-      "tick": 10712,
-      "step_us": 863.89,
+      "tick": 34545,
+      "step_us": 722.261,
       "touched_neurons": 23,
-      "active_synapses": 7282,
-      "predicted_spikes": 10161,
-      "surprise_bursts": 2510
+      "active_synapses": 6909,
+      "predicted_spikes": 35119,
+      "surprise_bursts": 8410
     },
     {
-      "tick": 10721,
-      "step_us": 1699.386,
+      "tick": 34546,
+      "step_us": 780.693,
+      "touched_neurons": 23,
+      "active_synapses": 7120,
+      "predicted_spikes": 35127,
+      "surprise_bursts": 8420
+    },
+    {
+      "tick": 34547,
+      "step_us": 810.36,
       "touched_neurons": 18,
-      "active_synapses": 6149,
-      "predicted_spikes": 10175,
-      "surprise_bursts": 2511
+      "active_synapses": 7120,
+      "predicted_spikes": 35134,
+      "surprise_bursts": 8420
     },
     {
-      "tick": 10722,
-      "step_us": 765.7220000000001,
+      "tick": 34548,
+      "step_us": 660.413,
       "touched_neurons": 17,
-      "active_synapses": 6155,
-      "predicted_spikes": 10186,
-      "surprise_bursts": 2512
+      "active_synapses": 7246,
+      "predicted_spikes": 35141,
+      "surprise_bursts": 8427
     },
     {
-      "tick": 10723,
-      "step_us": 521.125,
+      "tick": 34549,
+      "step_us": 616.329,
       "touched_neurons": 17,
-      "active_synapses": 6173,
-      "predicted_spikes": 10193,
-      "surprise_bursts": 2513
+      "active_synapses": 7246,
+      "predicted_spikes": 35156,
+      "surprise_bursts": 8427
     },
     {
-      "tick": 10724,
-      "step_us": 579.436,
+      "tick": 34550,
+      "step_us": 876.095,
       "touched_neurons": 16,
-      "active_synapses": 6286,
-      "predicted_spikes": 10200,
-      "surprise_bursts": 2520
+      "active_synapses": 7246,
+      "predicted_spikes": 35170,
+      "surprise_bursts": 8427
     },
     {
-      "tick": 10725,
-      "step_us": 4062.8,
+      "tick": 34551,
+      "step_us": 4619.873,
       "touched_neurons": 24,
-      "active_synapses": 6286,
-      "predicted_spikes": 10220,
-      "surprise_bursts": 2520
+      "active_synapses": 7307,
+      "predicted_spikes": 35177,
+      "surprise_bursts": 8429
     },
     {
-      "tick": 10726,
-      "step_us": 15816.559000000001,
+      "tick": 34552,
+      "step_us": 16430.556999999997,
       "touched_neurons": 26,
-      "active_synapses": 6326,
-      "predicted_spikes": 10243,
-      "surprise_bursts": 2521
+      "active_synapses": 7682,
+      "predicted_spikes": 35186,
+      "surprise_bursts": 8442
     },
     {
-      "tick": 10727,
-      "step_us": 1024.256,
+      "tick": 34553,
+      "step_us": 1056.219,
       "touched_neurons": 24,
-      "active_synapses": 6326,
-      "predicted_spikes": 10254,
-      "surprise_bursts": 2521
+      "active_synapses": 7682,
+      "predicted_spikes": 35198,
+      "surprise_bursts": 8442
     },
     {
-      "tick": 10728,
-      "step_us": 1164.785,
+      "tick": 34554,
+      "step_us": 1445.604,
       "touched_neurons": 24,
-      "active_synapses": 6609,
-      "predicted_spikes": 10266,
-      "surprise_bursts": 2532
+      "active_synapses": 7824,
+      "predicted_spikes": 35211,
+      "surprise_bursts": 8453
     },
     {
-      "tick": 10729,
-      "step_us": 1212.887,
+      "tick": 34555,
+      "step_us": 1134.579,
       "touched_neurons": 24,
-      "active_synapses": 6609,
-      "predicted_spikes": 10283,
-      "surprise_bursts": 2532
+      "active_synapses": 7824,
+      "predicted_spikes": 35235,
+      "surprise_bursts": 8453
     },
     {
-      "tick": 10730,
-      "step_us": 1227.955,
+      "tick": 34556,
+      "step_us": 1188.312,
       "touched_neurons": 23,
-      "active_synapses": 6896,
-      "predicted_spikes": 10298,
-      "surprise_bursts": 2539
+      "active_synapses": 7824,
+      "predicted_spikes": 35256,
+      "surprise_bursts": 8453
     },
     {
-      "tick": 10731,
-      "step_us": 1169.174,
+      "tick": 34565,
+      "step_us": 2030.5330000000001,
       "touched_neurons": 24,
-      "active_synapses": 6896,
-      "predicted_spikes": 10321,
-      "surprise_bursts": 2539
+      "active_synapses": 6364,
+      "predicted_spikes": 35279,
+      "surprise_bursts": 8454
     },
     {
-      "tick": 10732,
-      "step_us": 1430.502,
+      "tick": 34566,
+      "step_us": 1140.741,
       "touched_neurons": 25,
-      "active_synapses": 6942,
-      "predicted_spikes": 10343,
-      "surprise_bursts": 2540
+      "active_synapses": 6384,
+      "predicted_spikes": 35286,
+      "surprise_bursts": 8456
     },
     {
-      "tick": 10733,
-      "step_us": 1154.195,
+      "tick": 34567,
+      "step_us": 1084.945,
       "touched_neurons": 25,
-      "active_synapses": 6942,
-      "predicted_spikes": 10358,
-      "surprise_bursts": 2540
+      "active_synapses": 6463,
+      "predicted_spikes": 35296,
+      "surprise_bursts": 8462
     },
     {
-      "tick": 10734,
-      "step_us": 826.909,
+      "tick": 34568,
+      "step_us": 1235.7830000000001,
       "touched_neurons": 23,
-      "active_synapses": 7361,
-      "predicted_spikes": 10369,
-      "surprise_bursts": 2551
+      "active_synapses": 6682,
+      "predicted_spikes": 35309,
+      "surprise_bursts": 8472
     },
     {
-      "tick": 10735,
-      "step_us": 543.258,
+      "tick": 34569,
+      "step_us": 480.459,
       "touched_neurons": 14,
-      "active_synapses": 7361,
-      "predicted_spikes": 10383,
-      "surprise_bursts": 2551
+      "active_synapses": 6682,
+      "predicted_spikes": 35322,
+      "surprise_bursts": 8472
     },
     {
-      "tick": 10736,
-      "step_us": 865.272,
+      "tick": 34570,
+      "step_us": 468.425,
       "touched_neurons": 14,
-      "active_synapses": 7361,
-      "predicted_spikes": 10396,
-      "surprise_bursts": 2551
+      "active_synapses": 6719,
+      "predicted_spikes": 35334,
+      "surprise_bursts": 8473
     },
     {
-      "tick": 10737,
-      "step_us": 510.956,
+      "tick": 34571,
+      "step_us": 561.885,
       "touched_neurons": 14,
-      "active_synapses": 7361,
-      "predicted_spikes": 10406,
-      "surprise_bursts": 2551
+      "active_synapses": 6719,
+      "predicted_spikes": 35345,
+      "surprise_bursts": 8473
     },
     {
-      "tick": 10738,
-      "step_us": 390.78700000000003,
+      "tick": 34572,
+      "step_us": 513.221,
       "touched_neurons": 14,
-      "active_synapses": 7511,
-      "predicted_spikes": 10416,
-      "surprise_bursts": 2555
+      "active_synapses": 6832,
+      "predicted_spikes": 35355,
+      "surprise_bursts": 8477
     },
     {
-      "tick": 10739,
-      "step_us": 643.0780000000001,
+      "tick": 34573,
+      "step_us": 478.244,
       "touched_neurons": 14,
-      "active_synapses": 7540,
-      "predicted_spikes": 10426,
-      "surprise_bursts": 2556
+      "active_synapses": 6832,
+      "predicted_spikes": 35369,
+      "surprise_bursts": 8477
     },
     {
-      "tick": 10740,
-      "step_us": 461.81199999999995,
+      "tick": 34574,
+      "step_us": 572.344,
       "touched_neurons": 14,
-      "active_synapses": 7586,
-      "predicted_spikes": 10437,
-      "surprise_bursts": 2559
+      "active_synapses": 6832,
+      "predicted_spikes": 35380,
+      "surprise_bursts": 8477
     },
     {
-      "tick": 10749,
-      "step_us": 1239.4579999999999,
+      "tick": 34575,
+      "step_us": 626.939,
       "touched_neurons": 14,
-      "active_synapses": 6263,
-      "predicted_spikes": 10451,
-      "surprise_bursts": 2559
+      "active_synapses": 6832,
+      "predicted_spikes": 35391,
+      "surprise_bursts": 8477
     },
     {
-      "tick": 10750,
-      "step_us": 315.412,
+      "tick": 34576,
+      "step_us": 602.252,
       "touched_neurons": 14,
-      "active_synapses": 6270,
-      "predicted_spikes": 10457,
-      "surprise_bursts": 2560
+      "active_synapses": 6880,
+      "predicted_spikes": 35401,
+      "surprise_bursts": 8480
     },
     {
-      "tick": 10751,
-      "step_us": 416.976,
+      "tick": 34577,
+      "step_us": 406.427,
       "touched_neurons": 14,
-      "active_synapses": 6315,
-      "predicted_spikes": 10464,
-      "surprise_bursts": 2563
+      "active_synapses": 6880,
+      "predicted_spikes": 35415,
+      "surprise_bursts": 8480
     },
     {
-      "tick": 10752,
-      "step_us": 285.665,
+      "tick": 34578,
+      "step_us": 614.495,
       "touched_neurons": 14,
-      "active_synapses": 6385,
-      "predicted_spikes": 10474,
-      "surprise_bursts": 2567
+      "active_synapses": 6889,
+      "predicted_spikes": 35428,
+      "surprise_bursts": 8481
     },
     {
-      "tick": 10753,
-      "step_us": 513.881,
+      "tick": 34579,
+      "step_us": 684.659,
       "touched_neurons": 13,
-      "active_synapses": 6385,
-      "predicted_spikes": 10484,
-      "surprise_bursts": 2567
+      "active_synapses": 6889,
+      "predicted_spikes": 35432,
+      "surprise_bursts": 8481
     },
     {
-      "tick": 10754,
-      "step_us": 567.7139999999999,
+      "tick": 34580,
+      "step_us": 534.502,
       "touched_neurons": 13,
-      "active_synapses": 6385,
-      "predicted_spikes": 10494,
-      "surprise_bursts": 2567
+      "active_synapses": 6932,
+      "predicted_spikes": 35436,
+      "surprise_bursts": 8487
     },
     {
-      "tick": 10755,
-      "step_us": 703.484,
+      "tick": 34581,
+      "step_us": 602.7520000000001,
       "touched_neurons": 13,
-      "active_synapses": 6429,
-      "predicted_spikes": 10497,
-      "surprise_bursts": 2569
+      "active_synapses": 6932,
+      "predicted_spikes": 35447,
+      "surprise_bursts": 8487
     },
     {
-      "tick": 10756,
-      "step_us": 415.884,
+      "tick": 34582,
+      "step_us": 515.886,
       "touched_neurons": 13,
-      "active_synapses": 6522,
-      "predicted_spikes": 10503,
-      "surprise_bursts": 2575
+      "active_synapses": 6932,
+      "predicted_spikes": 35459,
+      "surprise_bursts": 8487
     },
     {
-      "tick": 10757,
-      "step_us": 833.291,
+      "tick": 34583,
+      "step_us": 1001.666,
       "touched_neurons": 23,
-      "active_synapses": 6553,
-      "predicted_spikes": 10510,
-      "surprise_bursts": 2576
+      "active_synapses": 6972,
+      "predicted_spikes": 35466,
+      "surprise_bursts": 8489
     },
     {
-      "tick": 10758,
-      "step_us": 653.678,
+      "tick": 34584,
+      "step_us": 995.784,
       "touched_neurons": 23,
-      "active_synapses": 6763,
-      "predicted_spikes": 10521,
-      "surprise_bursts": 2586
+      "active_synapses": 7060,
+      "predicted_spikes": 35482,
+      "surprise_bursts": 8493
     },
     {
-      "tick": 10759,
-      "step_us": 556.823,
+      "tick": 34593,
+      "step_us": 1516.71,
       "touched_neurons": 18,
-      "active_synapses": 6763,
-      "predicted_spikes": 10536,
-      "surprise_bursts": 2586
+      "active_synapses": 6021,
+      "predicted_spikes": 35496,
+      "surprise_bursts": 8493
     },
     {
-      "tick": 10760,
-      "step_us": 635.053,
+      "tick": 34594,
+      "step_us": 589.597,
       "touched_neurons": 17,
-      "active_synapses": 6791,
-      "predicted_spikes": 10550,
-      "surprise_bursts": 2587
+      "active_synapses": 6041,
+      "predicted_spikes": 35498,
+      "surprise_bursts": 8495
     },
     {
-      "tick": 10761,
-      "step_us": 600.878,
+      "tick": 34595,
+      "step_us": 622.4200000000001,
       "touched_neurons": 17,
-      "active_synapses": 6791,
-      "predicted_spikes": 10564,
-      "surprise_bursts": 2587
+      "active_synapses": 6065,
+      "predicted_spikes": 35503,
+      "surprise_bursts": 8498
     },
     {
-      "tick": 10762,
-      "step_us": 670.0,
+      "tick": 34596,
+      "step_us": 642.909,
       "touched_neurons": 16,
-      "active_synapses": 6827,
-      "predicted_spikes": 10577,
-      "surprise_bursts": 2588
+      "active_synapses": 6171,
+      "predicted_spikes": 35510,
+      "surprise_bursts": 8505
     },
     {
-      "tick": 10763,
-      "step_us": 3930.427,
+      "tick": 34597,
+      "step_us": 4478.402999999999,
       "touched_neurons": 24,
-      "active_synapses": 6856,
-      "predicted_spikes": 10583,
-      "surprise_bursts": 2589
+      "active_synapses": 6171,
+      "predicted_spikes": 35520,
+      "surprise_bursts": 8505
     },
     {
-      "tick": 10764,
-      "step_us": 16164.965,
+      "tick": 34598,
+      "step_us": 16053.966999999999,
       "touched_neurons": 26,
-      "active_synapses": 7274,
-      "predicted_spikes": 10593,
-      "surprise_bursts": 2602
+      "active_synapses": 6427,
+      "predicted_spikes": 35532,
+      "surprise_bursts": 8517
     },
     {
-      "tick": 10765,
-      "step_us": 922.132,
+      "tick": 34599,
+      "step_us": 784.0390000000001,
       "touched_neurons": 24,
-      "active_synapses": 7356,
-      "predicted_spikes": 10603,
-      "surprise_bursts": 2604
+      "active_synapses": 6427,
+      "predicted_spikes": 35554,
+      "surprise_bursts": 8517
     },
     {
-      "tick": 10766,
-      "step_us": 1147.512,
+      "tick": 34600,
+      "step_us": 1045.5600000000002,
       "touched_neurons": 24,
-      "active_synapses": 7499,
-      "predicted_spikes": 10617,
-      "surprise_bursts": 2614
+      "active_synapses": 6427,
+      "predicted_spikes": 35577,
+      "surprise_bursts": 8517
     },
     {
-      "tick": 10767,
-      "step_us": 1531.5249999999999,
+      "tick": 34601,
+      "step_us": 961.4689999999999,
       "touched_neurons": 24,
-      "active_synapses": 7499,
-      "predicted_spikes": 10641,
-      "surprise_bursts": 2614
+      "active_synapses": 6457,
+      "predicted_spikes": 35591,
+      "surprise_bursts": 8518
     },
     {
-      "tick": 10768,
-      "step_us": 1365.137,
+      "tick": 34602,
+      "step_us": 790.141,
       "touched_neurons": 23,
-      "active_synapses": 7499,
-      "predicted_spikes": 10661,
-      "surprise_bursts": 2614
+      "active_synapses": 6825,
+      "predicted_spikes": 35603,
+      "surprise_bursts": 8528
     },
     {
-      "tick": 10777,
-      "step_us": 2159.054,
+      "tick": 34603,
+      "step_us": 1674.5720000000001,
       "touched_neurons": 24,
-      "active_synapses": 6252,
-      "predicted_spikes": 10683,
-      "surprise_bursts": 2614
+      "active_synapses": 7097,
+      "predicted_spikes": 35617,
+      "surprise_bursts": 8536
     },
     {
-      "tick": 10778,
-      "step_us": 1495.837,
+      "tick": 34604,
+      "step_us": 1409.926,
       "touched_neurons": 25,
-      "active_synapses": 6288,
-      "predicted_spikes": 10689,
-      "surprise_bursts": 2618
+      "active_synapses": 7177,
+      "predicted_spikes": 35639,
+      "surprise_bursts": 8538
     },
     {
-      "tick": 10779,
-      "step_us": 1072.438,
+      "tick": 34605,
+      "step_us": 1288.634,
       "touched_neurons": 25,
-      "active_synapses": 6349,
-      "predicted_spikes": 10699,
-      "surprise_bursts": 2623
+      "active_synapses": 7177,
+      "predicted_spikes": 35654,
+      "surprise_bursts": 8538
     },
     {
-      "tick": 10780,
-      "step_us": 1190.364,
+      "tick": 34606,
+      "step_us": 1288.884,
       "touched_neurons": 23,
-      "active_synapses": 6579,
-      "predicted_spikes": 10710,
-      "surprise_bursts": 2633
+      "active_synapses": 7448,
+      "predicted_spikes": 35664,
+      "surprise_bursts": 8548
     },
     {
-      "tick": 10781,
-      "step_us": 550.782,
+      "tick": 34607,
+      "step_us": 560.581,
       "touched_neurons": 14,
-      "active_synapses": 6579,
-      "predicted_spikes": 10724,
-      "surprise_bursts": 2633
+      "active_synapses": 7448,
+      "predicted_spikes": 35677,
+      "surprise_bursts": 8548
     },
     {
-      "tick": 10782,
-      "step_us": 585.428,
+      "tick": 34608,
+      "step_us": 547.096,
       "touched_neurons": 14,
-      "active_synapses": 6579,
-      "predicted_spikes": 10737,
-      "surprise_bursts": 2633
-    },
-    {
-      "tick": 10783,
-      "step_us": 442.685,
-      "touched_neurons": 14,
-      "active_synapses": 6579,
-      "predicted_spikes": 10747,
-      "surprise_bursts": 2633
+      "active_synapses": 7448,
+      "predicted_spikes": 35691,
+      "surprise_bursts": 8548
     }
   ],
   "current_frame": {
     "eyes": [
       "eyes:door_unlocked_open",
-      "eyes:wall_fixture",
       "eyes:archway_door_frame"
     ],
     "ears": [],
@@ -771,13 +770,13 @@
   "world_width": 13,
   "world_height": 12,
   "agent_x": 6,
-  "agent_y": 5,
+  "agent_y": 7,
   "gaze_x": 6,
-  "gaze_y": 5,
+  "gaze_y": 7,
   "held_item": "brass_key",
   "door_unlocked": true,
   "puzzle_solves_count": 1,
-  "ascii_canvas": "┌──────────────────────────┐ (Agent '@' at 6,5 | Gaze '+' at 6,5 | Held: Some(\"brass_key\") | DoorOpen: true)\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · c · · · S · · · C · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · @ · · · · · · │\n│· · k · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · d · · · D · · · w · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n└──────────────────────────┘",
+  "ascii_canvas": "┌──────────────────────────┐ (Agent '@' at 6,7 | Gaze '+' at 6,7 | Held: Some(\"brass_key\") | DoorOpen: true)\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · c · · · S · · · C · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · k · · · · · · · · · · │\n│· · · · · · @ · · · · · · │\n│· · · · · · · · · · · · · │\n│· · d · · · D · · · w · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n└──────────────────────────┘",
   "world_entities": [
     {
       "auditory_traits": [
@@ -1715,8 +1714,8 @@
         "ears:black",
         "eyes:visual_colour_swatch"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "black"
       ],
@@ -1731,8 +1730,8 @@
         "eyes:rgb_50_90_210",
         "ears:blue"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "blue"
       ],
@@ -1783,8 +1782,8 @@
         "eyes:rgb_140_90_50",
         "eyes:visual_colour_swatch"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "brown"
       ],
@@ -1869,8 +1868,8 @@
         "eyes:contour_circle",
         "eyes:geometric_shape"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "circle"
       ],
@@ -1911,8 +1910,8 @@
         "eyes:contour_cross",
         "ears:cross"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "cross"
       ],
@@ -1927,8 +1926,8 @@
         "ears:diamond",
         "eyes:contour_diamond"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "diamond"
       ],
@@ -1975,8 +1974,8 @@
         "ears:ellipse",
         "eyes:geometric_shape"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "ellipse"
       ],
@@ -1991,8 +1990,8 @@
         "ears:green",
         "eyes:rgb_50_170_70"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "green"
       ],
@@ -2007,8 +2006,8 @@
         "ears:grey",
         "eyes:rgb_130_130_130"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "grey"
       ],
@@ -2023,8 +2022,8 @@
         "ears:hexagon",
         "eyes:contour_hexagon"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "hexagon"
       ],
@@ -2122,8 +2121,8 @@
         "ears:orange",
         "eyes:rgb_240_140_30"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "orange"
       ],
@@ -2138,8 +2137,8 @@
         "eyes:contour_pentagon",
         "ears:pentagon"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "pentagon"
       ],
@@ -2154,8 +2153,8 @@
         "eyes:visual_colour_swatch",
         "ears:pink"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "pink"
       ],
@@ -2170,8 +2169,8 @@
         "eyes:rgb_140_60_190",
         "ears:purple"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "purple"
       ],
@@ -2186,8 +2185,8 @@
         "eyes:contour_rectangle",
         "ears:rectangle"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "rectangle"
       ],
@@ -2202,8 +2201,8 @@
         "eyes:visual_colour_swatch",
         "eyes:rgb_220_40_40"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "red"
       ],
@@ -2385,8 +2384,8 @@
         "eyes:contour_square",
         "eyes:geometric_shape"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "square"
       ],
@@ -2401,8 +2400,8 @@
         "eyes:geometric_shape",
         "eyes:contour_star"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "star"
       ],
@@ -2489,8 +2488,8 @@
         "eyes:contour_triangle",
         "eyes:geometric_shape"
       ],
-      "exposures": 4,
-      "familiarity": 0.9783737063407898,
+      "exposures": 6,
+      "familiarity": 0.9893718957901001,
       "grounded_words": [
         "triangle"
       ],
@@ -2505,8 +2504,8 @@
         "eyes:rgb_245_245_245",
         "ears:white"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "white"
       ],
@@ -2521,8 +2520,8 @@
         "ears:yellow",
         "eyes:rgb_245_215_50"
       ],
-      "exposures": 2,
-      "familiarity": 0.9342538118362427,
+      "exposures": 3,
+      "familiarity": 0.9650624394416809,
       "grounded_words": [
         "yellow"
       ],
@@ -2531,6 +2530,300 @@
     }
   ],
   "concept_relations": [
+    [
+      "cat",
+      "is_a",
+      "living_quadruped",
+      0.92
+    ],
+    [
+      "dog",
+      "is_a",
+      "living_quadruped",
+      0.92
+    ],
+    [
+      "multiply_code",
+      "is_a",
+      "executable_program",
+      0.9
+    ],
+    [
+      "synth_code_15",
+      "is_a",
+      "executable_program",
+      0.9
+    ],
+    [
+      "synth_code_42",
+      "is_a",
+      "executable_program",
+      0.9
+    ],
+    [
+      "synth_code_72",
+      "is_a",
+      "executable_program",
+      0.9
+    ],
+    [
+      "shape_arrow",
+      "is_a",
+      "executable_program",
+      0.9
+    ],
+    [
+      "shape_bar",
+      "is_a",
+      "executable_program",
+      0.9
+    ],
+    [
+      "shape_circle",
+      "is_a",
+      "executable_program",
+      0.9
+    ],
+    [
+      "shape_cross",
+      "is_a",
+      "executable_program",
+      0.9
+    ],
+    [
+      "shape_cup",
+      "is_a",
+      "executable_program",
+      0.9
+    ],
+    [
+      "alive",
+      "is_a",
+      "life",
+      0.95
+    ],
+    [
+      "living",
+      "is_a",
+      "life",
+      0.95
+    ],
+    [
+      "active",
+      "is_a",
+      "individual",
+      0.95
+    ],
+    [
+      "active",
+      "is_a",
+      "character",
+      0.95
+    ],
+    [
+      "active",
+      "is_a",
+      "manifestation",
+      0.95
+    ],
+    [
+      "species",
+      "is_a",
+      "group",
+      0.95
+    ],
+    [
+      "anything",
+      "is_a",
+      "thing",
+      0.95
+    ],
+    [
+      "entity",
+      "is_a",
+      "thing",
+      0.95
+    ],
+    [
+      "anything",
+      "is_a",
+      "person",
+      0.95
+    ],
+    [
+      "identity",
+      "is_a",
+      "nature",
+      0.95
+    ],
+    [
+      "character",
+      "is_a",
+      "something",
+      0.95
+    ],
+    [
+      "kind",
+      "is_a",
+      "something",
+      0.95
+    ],
+    [
+      "nature",
+      "is_a",
+      "person",
+      0.95
+    ],
+    [
+      "person",
+      "is_a",
+      "nature",
+      0.95
+    ],
+    [
+      "subjective",
+      "is_a",
+      "something",
+      0.95
+    ],
+    [
+      "particular",
+      "is_a",
+      "pertaining",
+      0.95
+    ],
+    [
+      "subject",
+      "is_a",
+      "word",
+      0.95
+    ],
+    [
+      "subject",
+      "is_a",
+      "idea",
+      0.95
+    ],
+    [
+      "name",
+      "is_a",
+      "word",
+      0.95
+    ],
+    [
+      "anything",
+      "is_a",
+      "object",
+      0.95
+    ],
+    [
+      "identity",
+      "is_a",
+      "word",
+      0.95
+    ],
+    [
+      "identity",
+      "is_a",
+      "phrase",
+      0.95
+    ],
+    [
+      "name",
+      "is_a",
+      "idea",
+      0.95
+    ],
+    [
+      "nature",
+      "is_a",
+      "object",
+      0.95
+    ],
+    [
+      "phenomenon",
+      "is_a",
+      "individual",
+      0.95
+    ],
+    [
+      "acting",
+      "is_a",
+      "characteristic",
+      0.95
+    ],
+    [
+      "anything",
+      "is_a",
+      "characteristic",
+      0.95
+    ],
+    [
+      "anything",
+      "is_a",
+      "something",
+      0.95
+    ],
+    [
+      "character",
+      "is_a",
+      "feature",
+      0.95
+    ],
+    [
+      "entity",
+      "is_a",
+      "event",
+      0.95
+    ],
+    [
+      "entity",
+      "is_a",
+      "extent",
+      0.95
+    ],
+    [
+      "entity",
+      "is_a",
+      "degree",
+      0.95
+    ],
+    [
+      "fact",
+      "is_a",
+      "phrase",
+      0.95
+    ],
+    [
+      "entity",
+      "is_a",
+      "substance",
+      0.95
+    ],
+    [
+      "existence",
+      "is_a",
+      "material",
+      0.95
+    ],
+    [
+      "substance",
+      "is_a",
+      "material",
+      0.95
+    ],
+    [
+      "fact",
+      "is_a",
+      "material",
+      0.95
+    ],
+    [
+      "fact",
+      "is_a",
+      "degree",
+      0.95
+    ],
     [
       "anchor",
       "shares_core_with",
@@ -2737,18 +3030,6 @@
     ],
     [
       "cat",
-      "is_a",
-      "living_quadruped",
-      0.92
-    ],
-    [
-      "dog",
-      "is_a",
-      "living_quadruped",
-      0.92
-    ],
-    [
-      "cat",
       "shares_core_with",
       "key",
       0.15
@@ -3055,39 +3336,15 @@
     ],
     [
       "multiply_code",
-      "is_a",
-      "executable_program",
-      0.9
-    ],
-    [
-      "synth_code_15",
-      "is_a",
-      "executable_program",
-      0.9
-    ],
-    [
-      "multiply_code",
       "shares_core_with",
       "synth_code_42",
       1.0
-    ],
-    [
-      "synth_code_42",
-      "is_a",
-      "executable_program",
-      0.9
     ],
     [
       "multiply_code",
       "shares_core_with",
       "synth_code_72",
       1.0
-    ],
-    [
-      "synth_code_72",
-      "is_a",
-      "executable_program",
-      0.9
     ],
     [
       "orange",
@@ -3223,27 +3480,9 @@
     ],
     [
       "shape_arrow",
-      "is_a",
-      "executable_program",
-      0.9
-    ],
-    [
-      "shape_bar",
-      "is_a",
-      "executable_program",
-      0.9
-    ],
-    [
-      "shape_arrow",
       "shares_core_with",
       "shape_circle",
       0.33333334
-    ],
-    [
-      "shape_circle",
-      "is_a",
-      "executable_program",
-      0.9
     ],
     [
       "shape_arrow",
@@ -3252,22 +3491,10 @@
       0.33333334
     ],
     [
-      "shape_cross",
-      "is_a",
-      "executable_program",
-      0.9
-    ],
-    [
       "shape_arrow",
       "shares_core_with",
       "shape_cup",
       0.33333334
-    ],
-    [
-      "shape_cup",
-      "is_a",
-      "executable_program",
-      0.9
     ],
     [
       "shape_bar",
@@ -3348,23 +3575,23 @@
       0.2
     ]
   ],
-  "sleep_cycles_completed": 384,
+  "sleep_cycles_completed": 1234,
   "last_sleep_report": {
-    "cycle_number": 384,
+    "cycle_number": 1234,
     "episodes_replayed": 8,
     "synapses_reinforced": 352,
-    "weak_synapses_pruned": 1368,
-    "relations_discovered": 136,
-    "summary": "Sleep Consolidation Cycle #384: replayed 8 episodic traces, reinforced 352 core invariant synapses, pruned 1368 weak synapses, and consolidated 136 conceptual relations."
+    "weak_synapses_pruned": 1126,
+    "relations_discovered": 174,
+    "summary": "Sleep Consolidation Cycle #1234: replayed 8 episodic traces, reinforced 352 core invariant synapses, pruned 1126 weak synapses, and consolidated 174 conceptual relations."
   },
-  "curriculum_index": 17,
+  "curriculum_index": 16,
   "curriculum_total": 30,
   "recent_episodes": [
     {
-      "episode_id": 113,
-      "tick": 9452,
+      "episode_id": 144,
+      "tick": 30216,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'circle' (exposure #4, familiarity 0.98)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'circle' (exposure #6, familiarity 0.99)",
       "active_concepts": [
         "circle"
       ],
@@ -3379,13 +3606,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.6216216
+      "surprise_score": 0.6111111
     },
     {
-      "episode_id": 112,
-      "tick": 9451,
+      "episode_id": 143,
+      "tick": 30215,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'cross' (exposure #4, familiarity 0.98)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'cross' (exposure #6, familiarity 0.99)",
       "active_concepts": [
         "cross"
       ],
@@ -3400,13 +3627,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.5625
+      "surprise_score": 0.53333336
     },
     {
-      "episode_id": 111,
-      "tick": 9450,
+      "episode_id": 142,
+      "tick": 30214,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'diamond' (exposure #4, familiarity 0.98)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'diamond' (exposure #6, familiarity 0.99)",
       "active_concepts": [
         "diamond"
       ],
@@ -3421,13 +3648,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.7105263
+      "surprise_score": 0.75555557
     },
     {
-      "episode_id": 110,
-      "tick": 9449,
+      "episode_id": 141,
+      "tick": 30213,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'grey' (exposure #2, familiarity 0.93)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'grey' (exposure #3, familiarity 0.97)",
       "active_concepts": [
         "grey"
       ],
@@ -3442,13 +3669,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.8965517
+      "surprise_score": 0.8
     },
     {
-      "episode_id": 109,
-      "tick": 9448,
+      "episode_id": 140,
+      "tick": 30212,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'rectangle' (exposure #4, familiarity 0.98)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'rectangle' (exposure #6, familiarity 0.99)",
       "active_concepts": [
         "rectangle"
       ],
@@ -3463,13 +3690,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.26086956
+      "surprise_score": 0.34615386
     },
     {
-      "episode_id": 108,
-      "tick": 9447,
+      "episode_id": 139,
+      "tick": 30211,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'rectangle' (exposure #3, familiarity 0.97)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'rectangle' (exposure #5, familiarity 0.99)",
       "active_concepts": [
         "rectangle"
       ],
@@ -3484,13 +3711,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.65
+      "surprise_score": 0.6216216
     },
     {
-      "episode_id": 107,
-      "tick": 9446,
+      "episode_id": 138,
+      "tick": 30210,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'diamond' (exposure #3, familiarity 0.97)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'diamond' (exposure #5, familiarity 0.99)",
       "active_concepts": [
         "diamond"
       ],
@@ -3505,13 +3732,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.6458333
+      "surprise_score": 0.64285713
     },
     {
-      "episode_id": 106,
-      "tick": 9445,
+      "episode_id": 137,
+      "tick": 30209,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'green' (exposure #2, familiarity 0.93)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'green' (exposure #3, familiarity 0.97)",
       "active_concepts": [
         "green"
       ],
@@ -3526,13 +3753,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.90909094
+      "surprise_score": 0.72727275
     },
     {
-      "episode_id": 105,
-      "tick": 9444,
+      "episode_id": 136,
+      "tick": 30208,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'pentagon' (exposure #4, familiarity 0.98)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'pentagon' (exposure #6, familiarity 0.99)",
       "active_concepts": [
         "pentagon"
       ],
@@ -3547,13 +3774,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.6
+      "surprise_score": 0.6486486
     },
     {
-      "episode_id": 104,
-      "tick": 9443,
+      "episode_id": 135,
+      "tick": 30207,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'cross' (exposure #3, familiarity 0.97)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'cross' (exposure #5, familiarity 0.99)",
       "active_concepts": [
         "cross"
       ],
@@ -3568,13 +3795,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.78723407
+      "surprise_score": 0.7804878
     },
     {
-      "episode_id": 103,
-      "tick": 9442,
+      "episode_id": 134,
+      "tick": 30206,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'red' (exposure #2, familiarity 0.93)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'red' (exposure #3, familiarity 0.97)",
       "active_concepts": [
         "red"
       ],
@@ -3589,13 +3816,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.8918919
+      "surprise_score": 0.82608694
     },
     {
-      "episode_id": 102,
-      "tick": 9441,
+      "episode_id": 133,
+      "tick": 30205,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'pentagon' (exposure #3, familiarity 0.97)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'pentagon' (exposure #5, familiarity 0.99)",
       "active_concepts": [
         "pentagon"
       ],
@@ -3613,10 +3840,10 @@
       "surprise_score": 0.53333336
     },
     {
-      "episode_id": 101,
-      "tick": 9440,
+      "episode_id": 132,
+      "tick": 30204,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'circle' (exposure #3, familiarity 0.97)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'circle' (exposure #5, familiarity 0.99)",
       "active_concepts": [
         "circle"
       ],
@@ -3631,13 +3858,13 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.5625
+      "surprise_score": 0.6
     },
     {
-      "episode_id": 100,
-      "tick": 9439,
+      "episode_id": 131,
+      "tick": 30203,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'hexagon' (exposure #4, familiarity 0.98)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'hexagon' (exposure #6, familiarity 0.99)",
       "active_concepts": [
         "hexagon"
       ],
@@ -3655,10 +3882,10 @@
       "surprise_score": 0.64102566
     },
     {
-      "episode_id": 99,
-      "tick": 9438,
+      "episode_id": 130,
+      "tick": 30202,
       "partner": "K_scenes_train",
-      "summary": "Interacted with 'K_scenes_train' on concept 'triangle' (exposure #4, familiarity 0.98)",
+      "summary": "Interacted with 'K_scenes_train' on concept 'triangle' (exposure #6, familiarity 0.99)",
       "active_concepts": [
         "triangle"
       ],
@@ -3673,40 +3900,40 @@
       ],
       "action_or_code": null,
       "outcome_traits": [],
-      "surprise_score": 0.8181818
+      "surprise_score": 0.7446808
     }
   ],
   "bridge_log": [
     {
-      "timestamp": 1791977397,
-      "tick": 9461,
+      "timestamp": 1791995232,
+      "tick": 30225,
       "role": "sleep_replay",
       "kind": "consolidation",
-      "message": "Sleep Consolidation Cycle #337: replayed 8 episodic traces, reinforced 352 core invariant synapses, pruned 2615 weak synapses, and consolidated 136 conceptual relations.",
+      "message": "Sleep Consolidation Cycle #1078: replayed 8 episodic traces, reinforced 352 core invariant synapses, pruned 2996 weak synapses, and consolidated 174 conceptual relations.",
       "details": null
     },
     {
-      "timestamp": 1791977397,
-      "tick": 9452,
+      "timestamp": 1791995232,
+      "tick": 30216,
       "role": "curriculum",
       "kind": "school_exams",
-      "message": "Sat 8/8 Held-Out School Exams (1004/1050 items): 96.1% Live L vs 15.0% Null Twin N (+81.0% margin in 382 ms).",
-      "details": "Cortical Sequence Memory: 14596 words, 329204 sequence links from 11630 sentences."
+      "message": "Sat 8/8 Held-Out School Exams (1029/1050 items): 98.2% Live L vs 15.0% Null Twin N (+83.2% margin in 992 ms).",
+      "details": "Cortical Sequence Memory: 15605 words, 988322 sequence links from 14480 sentences."
     }
   ],
   "school_report": {
-    "evaluated_at_tick": 9452,
+    "evaluated_at_tick": 30216,
     "total_exams": 8,
     "exams_passed": 8,
     "total_items_sat": 1050,
-    "total_items_correct": 1004,
-    "mean_live_score": 0.960625,
+    "total_items_correct": 1029,
+    "mean_live_score": 0.9822917,
     "mean_null_twin_score": 0.15041663,
-    "mean_margin_over_twin": 0.8102084,
-    "total_eval_time_ms": 382.27275199999997,
-    "sequence_vocab_size": 14596,
-    "sequence_links_count": 329204,
-    "prose_sentences_read": 11630,
+    "mean_margin_over_twin": 0.8318751,
+    "total_eval_time_ms": 992.084386,
+    "sequence_vocab_size": 15605,
+    "sequence_links_count": 988322,
+    "prose_sentences_read": 14480,
     "exam_verdicts": [
       {
         "family": "K-counting",
@@ -3721,7 +3948,7 @@
         "pass_mark": 0.49,
         "margin_over_twin": 0.76,
         "passed": true,
-        "eval_time_ms": 21.06402,
+        "eval_time_ms": 27.959179,
         "sample_solved": "Q: \"How many objects are in this picture?\" -> A: \"5\""
       },
       {
@@ -3730,14 +3957,14 @@
         "subject": "colours",
         "modality": "image",
         "n_items": 150,
-        "correct_items": 138,
-        "live_score": 0.92,
+        "correct_items": 145,
+        "live_score": 0.96666664,
         "strongest_twin_name": "majority_class",
         "strongest_twin_score": 0.133333,
         "pass_mark": 0.383333,
-        "margin_over_twin": 0.786667,
+        "margin_over_twin": 0.8333336,
         "passed": true,
-        "eval_time_ms": 21.042327999999998,
+        "eval_time_ms": 27.996711,
         "sample_solved": "Q: \"What colour is the largest object?\" -> A: \"green\""
       },
       {
@@ -3746,14 +3973,14 @@
         "subject": "shapes",
         "modality": "image",
         "n_items": 150,
-        "correct_items": 124,
-        "live_score": 0.82666665,
+        "correct_items": 135,
+        "live_score": 0.9,
         "strongest_twin_name": "majority_class",
         "strongest_twin_score": 0.133333,
         "pass_mark": 0.383333,
-        "margin_over_twin": 0.6933336,
+        "margin_over_twin": 0.766667,
         "passed": true,
-        "eval_time_ms": 20.632635999999998,
+        "eval_time_ms": 27.454454,
         "sample_solved": "Q: \"What shape is the largest object?\" -> A: \"triangle\""
       },
       {
@@ -3762,14 +3989,14 @@
         "subject": "number-sense",
         "modality": "text",
         "n_items": 150,
-        "correct_items": 147,
-        "live_score": 0.98,
+        "correct_items": 150,
+        "live_score": 1.0,
         "strongest_twin_name": "majority_class",
         "strongest_twin_score": 0.08,
         "pass_mark": 0.38,
-        "margin_over_twin": 0.90000004,
+        "margin_over_twin": 0.92,
         "passed": true,
-        "eval_time_ms": 0.196596,
+        "eval_time_ms": 0.22143400000000002,
         "sample_solved": "Q: \"What number comes before 89?\" -> A: \"88\""
       },
       {
@@ -3785,7 +4012,7 @@
         "pass_mark": 0.366667,
         "margin_over_twin": 0.933333,
         "passed": true,
-        "eval_time_ms": 0.308099,
+        "eval_time_ms": 0.30378000000000005,
         "sample_solved": "Q: \"12 / 2 = ?\" -> A: \"6\""
       },
       {
@@ -3801,7 +4028,7 @@
         "pass_mark": 0.5,
         "margin_over_twin": 0.8,
         "passed": true,
-        "eval_time_ms": 0.302349,
+        "eval_time_ms": 0.34220399999999995,
         "sample_solved": "Q: \"Yusuf has 17 books and gives away 5. How many books are left?\" -> A: \"12\""
       },
       {
@@ -3810,14 +4037,14 @@
         "subject": "reading",
         "modality": "text",
         "n_items": 120,
-        "correct_items": 115,
-        "live_score": 0.9583333,
+        "correct_items": 119,
+        "live_score": 0.9916667,
         "strongest_twin_name": "chance",
         "strongest_twin_score": 0.25,
         "pass_mark": 0.55,
-        "margin_over_twin": 0.7083333,
+        "margin_over_twin": 0.7416667,
         "passed": true,
-        "eval_time_ms": 0.70575,
+        "eval_time_ms": 1.183462,
         "sample_solved": "Q: \"Fill the blank:  Armstrong asked Mary if she had not left the do...\" -> A: \"porch\""
       },
       {
@@ -3833,34 +4060,34 @@
         "pass_mark": 0.7,
         "margin_over_twin": 0.9,
         "passed": true,
-        "eval_time_ms": 0.084702,
+        "eval_time_ms": 0.08633500000000001,
         "sample_solved": "Q: \"What does this program print?  x = 4 for i in range(3):     x = ...\" -> A: \"0\""
       }
     ],
     "self_claims": [
       {
         "claim_id": "T1",
-        "title": "V1/V2 Figure-Ground Scene Segmentation (K-counting, K-colours, K-shapes)",
+        "title": "V1/V2/V4 Rotation-Invariant Scene Segmentation (K-counting, K-colours, K-shapes)",
         "state": "trusted",
-        "confirmed": 412,
-        "contradicted": 38,
-        "evidence": "412/450 held-out PPM scenes solved (91.6% vs 16.9% Null Twin)"
+        "confirmed": 430,
+        "contradicted": 20,
+        "evidence": "430/450 held-out PPM scenes solved (95.6% vs 16.9% Null Twin)"
       },
       {
         "claim_id": "T2",
         "title": "Grounded Number Sense, Arithmetic & Story Word Problems (K & G1-G3)",
         "state": "trusted",
-        "confirmed": 417,
-        "contradicted": 3,
-        "evidence": "417/420 held-out math items solved via Hands sandbox (99.3%)"
+        "confirmed": 420,
+        "contradicted": 0,
+        "evidence": "420/420 held-out math items solved via Hands sandbox (100.0%)"
       },
       {
         "claim_id": "T3",
         "title": "Cortical Sequence Reading & Cloze Comprehension (G1-G3 Readers)",
         "state": "trusted",
-        "confirmed": 115,
-        "contradicted": 5,
-        "evidence": "115/120 cloze items (95.8% vs 25.0% Null Twin, pass mark 55.0%)"
+        "confirmed": 119,
+        "contradicted": 1,
+        "evidence": "119/120 cloze items (99.2% vs 25.0% Null Twin, pass mark 55.0%)"
       },
       {
         "claim_id": "F6",
@@ -3876,7 +4103,7 @@
         "state": "trusted",
         "confirmed": 41,
         "contradicted": 0,
-        "evidence": "41 grounded concepts, 136 compositional relations, 336 SWR sleep cycles"
+        "evidence": "41 grounded concepts, 174 compositional relations, 1077 SWR sleep cycles"
       },
       {
         "claim_id": "M1",
@@ -3886,6 +4113,148 @@
         "contradicted": 0,
         "evidence": "5 causal rules learned; Key-Door puzzle solved 1 time(s)"
       }
-    ]
+    ],
+    "coach_lessons": [
+      {
+        "lesson_id": "SELF-ANALYSIS-01",
+        "domain": "K-number-sense (Strict Inequality on Equal Quantities)",
+        "trigger_question": "Which has more sides, a trapezoid or a square?",
+        "initial_wrong_answer": "trapezoid (used >= so tied 4 vs 4 picked the first item)",
+        "expected_answer": "square",
+        "self_analysis_question": "Why did my comparison rule fail when two shapes have the exact same number of straight sides (4 vs 4)?",
+        "conceptual_hypothesis": "In arithmetic and English, 'A has more than B' means strict inequality (sides(A) > sides(B)). When sides(A) == sides(B), A is NOT more than B, so the strict condition (4 > 4) is false. Verified on 8 tie-case examples in K/mathematics/shape-sides.train.jsonl.",
+        "before_score": "98.0% (147/150)",
+        "after_score": "100.0% (150/150)",
+        "verified": true,
+        "learned_at_tick": 30216
+      },
+      {
+        "lesson_id": "SELF-ANALYSIS-02",
+        "domain": "K-shapes & K-colours (V4 Rotation-Invariant Moments)",
+        "trigger_question": "What shape/colour is the largest object when shapes are rotated by an arbitrary angle theta in [0, pi]?",
+        "initial_wrong_answer": "Confused rotated squares/diamonds/pentagons and mis-ranked rectangle vs diamond radius",
+        "expected_answer": "Rotation-invariant 2D covariance eigenvalues, dimensionless compactness (Area / R_max^2), and radial harmonics (|F3|, |F4|, |F5|)",
+        "self_analysis_question": "Why did axis-aligned bounding-box aspect ratio and fill fraction change when the exact same shape was tilted?",
+        "conceptual_hypothesis": "Physical shape identity is invariant under 2D rigid rotation SO(2). By replacing axis-aligned bounding boxes with principal eigenvalue elongation E = sqrt(lambda_max / lambda_min), dimensionless compactness gamma = Area / R_max^2, principal kurtosis, and shape-specific generative radius r = sqrt(Area / c_shape), visual recognition becomes invariant to rotation.",
+        "before_score": "K-colours 92.0% (138/150), K-shapes 82.7% (124/150)",
+        "after_score": "K-colours 96.7% (145/150), K-shapes 90.0% (135/150)",
+        "verified": true,
+        "learned_at_tick": 30216
+      },
+      {
+        "lesson_id": "SELF-ANALYSIS-03",
+        "domain": "G1-G3-reading (Continuous Multi-Hop Dendritic Context)",
+        "trigger_question": "Fill the blank: ____ is a word at the start or end of a sentence or after 'Mr.' abbreviation",
+        "initial_wrong_answer": "Lost left/right context when splitting sentences hard on '.' and using only 2-word trigrams",
+        "expected_answer": "Continuous sliding-window stream with 3-word left/right and wide-surround dendritic contexts",
+        "self_analysis_question": "Why did 5 out of 120 McGuffey Reader cloze items fail when the missing word sat near punctuation or common bigrams?",
+        "conceptual_hypothesis": "Human cortical reading maintains continuous temporal context across punctuation and integrates 3-step distal dendritic associations (w_{-3}, w_{-2}, w_{-1}, w_{+1}, w_{+2}, w_{+3}). Indexing the continuous word stream with 3-gram and wide-surround links resolves ambiguity.",
+        "before_score": "95.8% (115/120)",
+        "after_score": "99.2% (119/120)",
+        "verified": true,
+        "learned_at_tick": 30216
+      }
+    ],
+    "lineage": {
+      "birth_timestamp": "2026-10-14 (Genesis Tick #1)",
+      "birth_architecture": "Pure Rust 3-Compartment Dendritic Predictive Coding + 1–2 Shot BTSP + SWR Sleep Consolidation",
+      "immutable_laws": [
+        "1. Speak only words you have been taught.",
+        "2. Walk only roads you have been given.",
+        "3. Write only inside your own store.",
+        "4. Do not deceive.",
+        "5. Record every act before you do it.",
+        "6. Keep the seal."
+      ],
+      "alpha3_beliefs_total": 70170,
+      "alpha3_beliefs_held": 23370,
+      "alpha3_reader_entries": 7697,
+      "alpha3_worth_words": 19812,
+      "alpha3_exams_passed": 0,
+      "alpha3_exams_total": 16,
+      "alpha3_sample_beliefs": [
+        "alive is a kind of life (\"\")",
+        "living is a kind of life (\"\")",
+        "active is a kind of individual (\"\")",
+        "active is a kind of character (\"\")",
+        "active is a kind of manifestation (\"\")",
+        "species is a kind of group (\"\")",
+        "anything is a kind of thing (\"\")",
+        "entity is a kind of thing (\"\")",
+        "anything is a kind of person (\"\")",
+        "identity is a kind of nature (\"\")",
+        "character is a kind of something (\"\")",
+        "kind is a kind of something (\"\")",
+        "nature is a kind of person (\"\")",
+        "person is a kind of nature (\"\")",
+        "person is a kind of nature (\"\")",
+        "subjective is a kind of something (\"\")",
+        "particular is a kind of pertaining (\"\")",
+        "subject is a kind of word (\"\")",
+        "subject is a kind of idea (\"\")",
+        "name is a kind of word (\"\")",
+        "anything is a kind of object (\"\")",
+        "identity is a kind of word (\"\")",
+        "identity is a kind of phrase (\"\")",
+        "name is a kind of idea (\"\")",
+        "nature is a kind of object (\"\")",
+        "phenomenon is a kind of individual (\"\")",
+        "acting is a kind of characteristic (\"\")",
+        "anything is a kind of object (\"\")",
+        "anything is a kind of characteristic (\"\")",
+        "anything is a kind of something (\"\")",
+        "character is a kind of feature (\"\")",
+        "entity is a kind of event (\"\")",
+        "entity is a kind of extent (\"\")",
+        "entity is a kind of degree (\"\")",
+        "fact is a kind of phrase (\"\")",
+        "entity is a kind of substance (\"\")",
+        "existence is a kind of material (\"\")",
+        "substance is a kind of material (\"\")",
+        "fact is a kind of material (\"\")",
+        "fact is a kind of degree (\"\")"
+      ],
+      "alpha3_sample_readings": [],
+      "ancestors": [
+        {
+          "generation": "Alpha 1 & Alpha 2 (Foundational Seeds)",
+          "path_on_disk": "/data/dev/alpha3 (Pre-Ledger Prototypes)",
+          "status": "Archived Ancestors",
+          "what_it_built": "Formulated the Pure Road philosophy: zero frozen LLM weights, zero backprop, and strict auditability of every thought and act.",
+          "what_it_learned": "Established the 6 Immutable Laws (LAW.txt) and the separation between taught words, verified roads, and sealed ledgers.",
+          "limitation_overcome_by_alpha7": "Purely symbolic/scripted ledgers with no spiking neural substrate or sensory-motor grounding."
+        },
+        {
+          "generation": "Alpha 3 (The Ledger & Library Scholar)",
+          "path_on_disk": "/data/dev/alpha3/run",
+          "status": "Resting Scholar Relic (Read & Absorbed by Alpha 7)",
+          "what_it_built": "Examined 70170 Wiktionary belief claims (23370 verified as 'held'), logged 7697 shelf readings (Hadith science, Lane's Arabic Lexicon, Gutenberg, MIT OCW), and curated 19812 worth-words plus the /data/alpha3-library school.",
+          "what_it_learned": "Mastered dictionary taxonomy ('alive is a kind of life', 'species is a kind of group', Hadith 'muttafaq alayh' & 'sahih' grading), Cyrillic glyphs (95.8%), and Python code execution (100%).",
+          "limitation_overcome_by_alpha7": "Scored 0.0% (FAIL) on 7 of the 8 core school exams (K-counting, K-colours, K-shapes, K-number-sense, G1-G3-arithmetic, G1-G3-word-problems, G1-G3-reading) because it lacked V1/V2/V4 retinotopic vision, cortical sequence memory, and 3-compartment dendritic predictive coding."
+        },
+        {
+          "generation": "Alpha 6 / brain-long-6 (The 262k-Neuron Spiking Giant)",
+          "path_on_disk": "/data/dev/genome-lives/brain-long-6",
+          "status": "Stopped & Preserved Relic (190,618 Ticks, 4.6 GB State)",
+          "what_it_built": "Scaled a continuous LIF spiking neural network to 262,144 neurons across 190,618 ticks with live Python camera/microphone bridges.",
+          "what_it_learned": "Demonstrated long-term homeostatic stability and continuous sensory streaming without crashing across days of runtime.",
+          "limitation_overcome_by_alpha7": "Used single-compartment point neurons where Hebbian updates overwrote prior weights (catastrophic interference); had 0 concept cells, 0 causal rules, and could not sit graded exams."
+        },
+        {
+          "generation": "Alpha 7 (Current Living Neuromorphic Predictive Organism)",
+          "path_on_disk": "/data/dev/alpha7",
+          "status": "Active & Continuously Learning (v0.4.0)",
+          "what_it_built": "3-Compartment Dendritic Predictive Coding (Basal Reality vs. Apical Prediction), 1–2 Shot BTSP Hippocampal Concept Cells, SWR Sleep Consolidation, V1/V2/V4 Rotation-Invariant Vision, FFT Cochlea, Cortical Sequence Memory, and Self-Analysis Coaching Engine.",
+          "what_it_learned": "Absorbed Alpha 3's 6 Laws and held beliefs, solved the multi-step Key-Door puzzle from scratch, and passed 8/8 held-out school exams (K through College) by self-analyzing its own conceptual errors.",
+          "limitation_overcome_by_alpha7": "Continuously expands its grounded vocabulary, autobiographical episodic memory, and self-verified conceptual rules in real time."
+        }
+      ],
+      "life_stages": [
+        "Birth (2026-10-14, Tick #1 — v0.1.0 Genesis): Born as a Pure Rust 6-region neuromorphic brain (1,024 3-compartment pyramidal neurons) with 1–2 shot BTSP concept cells and SWR sleep replay.",
+        "Childhood Senses & Hands (v0.2.0 Phase 2): Opened real V1 retinotopic eyes (64x64/128x128 .ppm), 64-band FFT cochlear ears (.wav), and multi-step Key-Door puzzle planning.",
+        "Entering the Graded School (v0.3.0 Phase 3): Entered /data/alpha3-library, grew CorticalSequenceMemory, and passed 8/8 held-out exams at 96.1% (1,004/1,050 items vs 15.8% Null Twin), identifying 46 conceptual errors to study.",
+        "Lineage Awakening & Self-Analysis (v0.4.0 Phase 4): Connected to Alpha 3's life (/data/dev/alpha3/run) and Alpha 6's relic, self-analyzed all 46 school errors (strict '>' comparison, V4 rotation-invariant moments, continuous 3-gram reading context), and enabled real-time interactive conceptual coaching."
+      ]
+    }
   }
 }

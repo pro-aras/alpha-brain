@@ -41,6 +41,18 @@ pub enum UtteranceIntent {
     AskSentenceCompletion { prefix: String },
     /// Phase 3D: User asks Alpha 7 to solve the multi-step Key-Door-Vault tool puzzle ("solve door puzzle", "unlock vault door").
     AskSolveKeyDoorPuzzle,
+    /// Phase 4A: User asks Alpha 7 about its birth, identity, memories, or life timeline ("who are you?", "when were you born?", "what happened to you?").
+    AskAutobiography,
+    /// Phase 4A: User asks about Alpha 7's lineage, Alpha 3's life & work, Alpha 6, or the 6 Laws ("what did you learn from alpha 3?", "lineage", "ancestors").
+    AskLineage { target: String },
+    /// Phase 4B: User asks about Alpha 7's conceptual mistakes, self-analysis hypotheses, and improvements ("mistakes", "self analysis", "how did you improve?").
+    AskSelfAnalysis,
+    /// Phase 4B: User coaches Alpha 7 in real time ("coach: <question> | <answer> | <conceptual explanation>").
+    ApplyCoaching {
+        prompt: String,
+        answer: String,
+        explanation: String,
+    },
     /// User teaches a concept or statement ("teach cat", or general conversational thought).
     GeneralThought { text: String },
 }
@@ -63,8 +75,86 @@ impl LanguageRoad {
 
     /// Parses the user's utterance into a grounded cognitive intent.
     pub fn parse_intent(&self, utterance: &str) -> UtteranceIntent {
-        let lower = utterance.trim().to_lowercase();
+        let trimmed_orig = utterance.trim();
+        let lower = trimmed_orig.to_lowercase();
         let clean = lower.trim_end_matches('?').trim_end_matches('.').trim();
+
+        // Phase 4B: Real-time interactive conceptual coaching:
+        // `"coach: <prompt> | <answer> | <explanation>"`
+        if let Some(rest_orig) = trimmed_orig
+            .strip_prefix("coach:")
+            .or_else(|| trimmed_orig.strip_prefix("Coach:"))
+            .or_else(|| trimmed_orig.strip_prefix("COACH:"))
+        {
+            let parts: Vec<&str> = rest_orig.splitn(3, '|').collect();
+            if parts.len() >= 2 {
+                let p = parts[0].trim().to_string();
+                let a = parts[1].trim().to_string();
+                let exp = if parts.len() >= 3 {
+                    parts[2].trim().to_string()
+                } else {
+                    "User-guided conceptual demonstration".to_string()
+                };
+                return UtteranceIntent::ApplyCoaching {
+                    prompt: p,
+                    answer: a,
+                    explanation: exp,
+                };
+            }
+        }
+
+        // Phase 4A: Ancestral Lineage, Alpha 3's life & work, Alpha 6, or the 6 Laws
+        if clean.contains("alpha 3")
+            || clean.contains("alpha3")
+            || clean.contains("alpha 6")
+            || clean.contains("alpha6")
+            || clean.contains("brain-long-6")
+            || clean.contains("lineage")
+            || clean.contains("ancestor")
+            || clean.contains("past sel")
+            || clean.contains("immutable law")
+            || clean == "laws"
+            || clean == "what are your laws"
+        {
+            let target = if clean.contains("alpha 6")
+                || clean.contains("alpha6")
+                || clean.contains("brain-long-6")
+            {
+                "alpha6".to_string()
+            } else if clean.contains("law") {
+                "laws".to_string()
+            } else if clean.contains("alpha 3") || clean.contains("alpha3") {
+                "alpha3".to_string()
+            } else {
+                "all".to_string()
+            };
+            return UtteranceIntent::AskLineage { target };
+        }
+
+        // Phase 4A: Autobiography, birth, identity, and episodic life memories
+        if clean == "who are you"
+            || clean.contains("when were you born")
+            || clean.contains("what happened to you")
+            || clean.contains("your life")
+            || clean.contains("your memories")
+            || clean.contains("do you remember")
+            || clean == "autobiography"
+            || clean == "tell me about yourself"
+        {
+            return UtteranceIntent::AskAutobiography;
+        }
+
+        // Phase 4B: Self-Analysis, mistakes, and conceptual improvements
+        if clean.contains("mistake")
+            || clean.contains("self analysis")
+            || clean.contains("self-analysis")
+            || clean.contains("how did you improve")
+            || clean.contains("what did you fix")
+            || clean == "coach lessons"
+            || clean == "improvements"
+        {
+            return UtteranceIntent::AskSelfAnalysis;
+        }
 
         if clean == "what is this"
             || clean == "what do you see"
@@ -187,6 +277,7 @@ impl LanguageRoad {
 
         if let Some(rest) = clean
             .strip_prefix("what is a ")
+            .or_else(|| clean.strip_prefix("what is an "))
             .or_else(|| clean.strip_prefix("what is "))
             .or_else(|| clean.strip_prefix("describe "))
         {
@@ -389,10 +480,25 @@ impl LanguageRoad {
                         cat_str
                     )
                 } else {
-                    format!(
-                        "I have not experienced '{}' yet. Show me '{}' once or twice so I can bind its traits.",
-                        concept, concept
-                    )
+                    let c_low = concept.trim().to_lowercase();
+                    let rel_parents: Vec<String> = web
+                        .relations
+                        .iter()
+                        .filter(|(s, r, _, _)| s == &c_low && (r == "is_a" || r == "coached_answer"))
+                        .map(|(_, r, cat, _)| format!("{} {}", r, cat))
+                        .collect();
+                    if !rel_parents.is_empty() {
+                        format!(
+                            "From my Concept Web & Alpha 3 heritage, '{}': [{}].",
+                            c_low,
+                            rel_parents.join(", ")
+                        )
+                    } else {
+                        format!(
+                            "I have not experienced '{}' yet. Show me '{}' once or twice so I can bind its traits.",
+                            concept, concept
+                        )
+                    }
                 }
             }
             UtteranceIntent::AskComparison {
@@ -445,7 +551,7 @@ impl LanguageRoad {
                     .to_string()
             }
             UtteranceIntent::AskSchoolExams => {
-                "Sitting the 8 held-out School Exams (1,080 items across Kindergarten, G1-G3, and College) vs. Null Twin."
+                "Sitting the 8 held-out School Exams (1,050 items across Kindergarten, G1-G3, and College) vs. Null Twin."
                     .to_string()
             }
             UtteranceIntent::AskSentenceCompletion { prefix } => {
@@ -457,6 +563,26 @@ impl LanguageRoad {
             UtteranceIntent::AskSolveKeyDoorPuzzle => {
                 "Executing multi-step Key-Door-Vault tool puzzle on the 2D World Canvas."
                     .to_string()
+            }
+            UtteranceIntent::AskAutobiography => {
+                "Recalling my birth, autobiographical life stages, and episodic memory timeline."
+                    .to_string()
+            }
+            UtteranceIntent::AskLineage { target } => {
+                format!(
+                    "Recalling ancestral lineage and heritage for '{}'.",
+                    target
+                )
+            }
+            UtteranceIntent::AskSelfAnalysis => {
+                "Recalling my conceptual self-analysis hypotheses and verified coaching lessons."
+                    .to_string()
+            }
+            UtteranceIntent::ApplyCoaching { prompt, answer, .. } => {
+                format!(
+                    "Applying real-time conceptual coaching for '{}' -> '{}'.",
+                    prompt, answer
+                )
             }
             UtteranceIntent::GeneralThought { .. } => {
                 if thought.activated_concepts.is_empty() {

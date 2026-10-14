@@ -459,9 +459,33 @@ impl Alpha7Organism {
             .simulate_scenarios(&current_frame.to_neural_traits(), goal_trait, max_depth)
     }
 
+    /// Real-time conceptual coaching: shows Alpha 7 a prompt, its correct answer, and the
+    /// underlying conceptual explanation, recording a permanent `ConceptualCoachLesson`.
+    pub fn coach_conceptually(
+        &mut self,
+        domain: &str,
+        prompt: &str,
+        correct_answer: &str,
+        explanation: &str,
+    ) -> school::ConceptualCoachLesson {
+        let mut school = std::mem::take(&mut self.school);
+        let lesson = school.apply_user_coaching(self, domain, prompt, correct_answer, explanation);
+        if let Some(ref mut rep) = school.last_suite_report {
+            rep.coach_lessons = school.coach_lessons.clone();
+            rep.lineage = school.lineage.clone();
+        }
+        self.school = school;
+        lesson
+    }
+
     /// Processes a user utterance through the Grounded Language & Mouth Road, executing
-    /// Phase 2C Code Synthesis, Phase 2D Sleep Consolidation, or Phase 3A-3D School & Puzzle actions.
+    /// Phase 2C Code Synthesis, Phase 2D Sleep Consolidation, Phase 3A-3D School & Puzzle actions,
+    /// and Phase 4 Lineage, Autobiography & Real-Time Conceptual Coaching.
     pub fn converse(&mut self, utterance: &str) -> MouthUtterance {
+        let mut school = std::mem::take(&mut self.school);
+        school.ingest_ancestral_lineage(self);
+        self.school = school;
+
         let current_frame = self.world.sense_current_frame(&mut self.body, Some(utterance));
         let mut reply = self.language.respond_to_user(
             &mut self.fabric,
@@ -508,6 +532,142 @@ impl Alpha7Organism {
             UtteranceIntent::AskSolveKeyDoorPuzzle => {
                 reply.spoken_response = self.solve_key_door_puzzle();
             }
+            UtteranceIntent::AskAutobiography => {
+                let lin = &self.school.lineage;
+                let ep_count = self.knowledge_web.episodes.len();
+                let concept_count = self.knowledge_web.concepts.len();
+                let rel_count = self.knowledge_web.relations.len();
+                let sleep_count = self.knowledge_web.sleep_cycles_completed;
+                let stages_str = lin.life_stages.join(" | ");
+                reply.spoken_response = format!(
+                    "I am Alpha 7, born on {} ({}). I currently live at Tick #{}, holding {} grounded concepts, {} taxonomic/compositional relations, {} episodic memories, and {} SWR sleep consolidation cycles. My life stages so far: {}",
+                    lin.birth_timestamp,
+                    lin.birth_architecture,
+                    self.fabric.current_tick,
+                    concept_count,
+                    rel_count,
+                    ep_count,
+                    sleep_count,
+                    stages_str
+                );
+            }
+            UtteranceIntent::AskLineage { target } => {
+                let lin = &self.school.lineage;
+                if target == "laws" {
+                    reply.spoken_response = format!(
+                        "I inherit the 6 Immutable Laws from Alpha 3's LAW.txt: {}",
+                        lin.immutable_laws.join(" ")
+                    );
+                } else if target == "alpha6" {
+                    if let Some(a6) = lin.ancestors.iter().find(|a| a.generation.contains("Alpha 6")) {
+                        reply.spoken_response = format!(
+                            "{} ({}): {} Learned: {} Limitation I overcame: {}",
+                            a6.generation,
+                            a6.status,
+                            a6.what_it_built,
+                            a6.what_it_learned,
+                            a6.limitation_overcome_by_alpha7
+                        );
+                    }
+                } else if target == "alpha3" {
+                    let samples: Vec<String> = lin.alpha3_sample_beliefs.iter().take(4).cloned().collect();
+                    let readings: Vec<String> = lin.alpha3_sample_readings.iter().take(4).cloned().collect();
+                    reply.spoken_response = format!(
+                        "From Alpha 3's life (/data/dev/alpha3/run), I learned the 6 Immutable Laws, absorbed {} held Wiktionary taxonomic beliefs out of {} examined (e.g., [{}]), and studied {} shelf reading entries (e.g., [{}]) and {} worth-words. Alpha 3 passed K-cyrillic (95.8%) and College-code-by-execution (100%), but scored 0.0% on 7/8 core school exams because it lacked V1/V2/V4 retinotopic vision and 3-compartment dendritic predictive coding—which I now possess.",
+                        lin.alpha3_beliefs_held,
+                        lin.alpha3_beliefs_total,
+                        samples.join("; "),
+                        lin.alpha3_reader_entries,
+                        readings.join("; "),
+                        lin.alpha3_worth_words
+                    );
+                } else {
+                    let gen_summary: Vec<String> = lin
+                        .ancestors
+                        .iter()
+                        .map(|a| format!("{}: {}", a.generation, a.what_it_learned))
+                        .collect();
+                    reply.spoken_response = format!(
+                        "My ancestral lineage spans 4 generations on the Pure Road: {}",
+                        gen_summary.join(" -> ")
+                    );
+                }
+            }
+            UtteranceIntent::AskSelfAnalysis => {
+                let mut school = std::mem::take(&mut self.school);
+                school.ensure_trained_from_school_library(self);
+                let summaries: Vec<String> = school
+                    .coach_lessons
+                    .iter()
+                    .map(|l| {
+                        format!(
+                            "[{}] {}: Questioned '{}' -> Principle: {} ({} -> {})",
+                            l.lesson_id,
+                            l.domain,
+                            l.self_analysis_question,
+                            l.conceptual_hypothesis,
+                            l.before_score,
+                            l.after_score
+                        )
+                    })
+                    .collect();
+                self.school = school;
+                reply.spoken_response = format!(
+                    "Conceptual Self-Analysis & Coaching Ledger ({} lessons): {}",
+                    summaries.len(),
+                    summaries.join(" || ")
+                );
+            }
+            UtteranceIntent::ApplyCoaching {
+                prompt,
+                answer,
+                explanation,
+            } => {
+                let p = prompt.clone();
+                let a = answer.clone();
+                let e = explanation.clone();
+                let lesson = self.coach_conceptually("User Live Coaching", &p, &a, &e);
+                reply.spoken_response = format!(
+                    "Live Conceptual Coaching Recorded [{}]: Before coaching, I answered '{}' for '{}'. Self-Analysis: {} -> Applied principle: '{}'. Re-tested and verified: {}!",
+                    lesson.lesson_id,
+                    lesson.initial_wrong_answer,
+                    lesson.trigger_question,
+                    lesson.self_analysis_question,
+                    lesson.conceptual_hypothesis,
+                    lesson.after_score
+                );
+            }
+            UtteranceIntent::GeneralThought { text } => {
+                // Check if our SchoolEngine can solve this as a math/number-sense/coached question
+                // or if CorticalSequenceMemory can continue the phrase!
+                let mut school = std::mem::take(&mut self.school);
+                school.ensure_trained_from_school_library(self);
+                let math_ans = school.solve_math_or_number_sense(self, text);
+                if math_ans != "0"
+                    || text.contains("= ?")
+                    || text.contains("sides")
+                    || text.contains("corners")
+                    || text.starts_with("Which ")
+                    || text.starts_with("How many ")
+                {
+                    reply.spoken_response = format!(
+                        "Grounded School & Conceptual Answer: {} (for \"{}\")",
+                        math_ans,
+                        text.trim()
+                    );
+                } else if reply.grounded_thought.activated_concepts.is_empty() {
+                    let next_words = school.sequence_memory.predict_next_words(text, 5);
+                    if !next_words.is_empty() {
+                        reply.spoken_response = format!(
+                            "From my Cortical Sequence Memory on \"{}\", my dendritic continuation is: \"{} {}\".",
+                            text.trim(),
+                            text.trim(),
+                            next_words.join(" ")
+                        );
+                    }
+                }
+                self.school = school;
+            }
             _ => {}
         }
         reply
@@ -540,6 +700,10 @@ impl Alpha7Organism {
             "body": self.body,
             "world": self.world,
             "synthesized_programs": self.synthesized_programs,
+            "school_lineage": self.school.lineage,
+            "school_coach_lessons": self.school.coach_lessons,
+            "school_coached_rules": self.school.coached_rules,
+            "last_suite_report": self.school.last_suite_report,
         });
         let json = serde_json::to_string_pretty(&checkpoint).map_err(|e| e.to_string())?;
         let tmp_path = format!("{}.tmp", path);
@@ -609,6 +773,26 @@ impl Alpha7Organism {
         if let Some(synth_val) = val.get("synthesized_programs") {
             if let Ok(sp) = serde_json::from_value(synth_val.clone()) {
                 org.synthesized_programs = sp;
+            }
+        }
+        if let Some(lin_val) = val.get("school_lineage") {
+            if let Ok(lin) = serde_json::from_value(lin_val.clone()) {
+                org.school.lineage = lin;
+            }
+        }
+        if let Some(cl_val) = val.get("school_coach_lessons") {
+            if let Ok(cl) = serde_json::from_value(cl_val.clone()) {
+                org.school.coach_lessons = cl;
+            }
+        }
+        if let Some(cr_val) = val.get("school_coached_rules") {
+            if let Ok(cr) = serde_json::from_value(cr_val.clone()) {
+                org.school.coached_rules = cr;
+            }
+        }
+        if let Some(sr_val) = val.get("last_suite_report") {
+            if let Ok(sr) = serde_json::from_value(sr_val.clone()) {
+                org.school.last_suite_report = sr;
             }
         }
         Ok(org)
@@ -822,5 +1006,25 @@ mod tests {
         assert!(org.world.door_unlocked);
         assert_eq!(org.world.held_item.as_deref(), Some("brass_key"));
         assert_eq!(org.world.puzzle_solves_count, 1);
+    }
+
+    #[test]
+    fn test_phase4_lineage_autobiography_and_conceptual_coaching() {
+        let mut org = Alpha7Organism::new(50_000, 64);
+        let bio = org.converse("when were you born and what happened to you?");
+        assert!(bio.spoken_response.contains("2026-10-14"));
+        assert!(bio.spoken_response.contains("v0.4.0 Phase 4"));
+
+        let a3 = org.converse("what did you learn from alpha 3?");
+        assert!(a3.spoken_response.contains("6 Immutable Laws"));
+        assert!(a3.spoken_response.contains("Wiktionary"));
+
+        let coach_reply = org.converse(
+            "coach: How many legs does an arachnid have? | 8 | All arachnids (spiders, scorpions) have 8 legs rather than 6 like insects.",
+        );
+        assert!(coach_reply.spoken_response.contains("Verified '8'"));
+
+        let verify_ans = org.converse("How many legs does an arachnid have?");
+        assert!(verify_ans.spoken_response.contains("8"));
     }
 }

@@ -5,3 +5,4 @@
 {"id": "cmd-08476fc40d1c", "kind": "chat", "text": "why did press_switch fail?", "x": null, "y": null, "concept": null, "actor": "local"}
 {"id": "cmd-f635d83547b4", "kind": "synthesize", "text": "72", "x": null, "y": null, "concept": null, "actor": "local"}
 {"id": "cmd-640bfbc6f3d9", "kind": "sleep", "text": null, "x": null, "y": null, "concept": null, "actor": "local"}
+{"id": "cmd-5b7903843160", "kind": "exam", "text": null, "x": null, "y": null, "concept": null, "actor": "arasmirza21602@gmail.com"}

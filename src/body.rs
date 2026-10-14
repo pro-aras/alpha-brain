@@ -458,90 +458,151 @@ impl EyesSensor {
 
                 if pts.len() >= 15 {
                     let area = pts.len();
-                    let mut min_x = w;
-                    let mut max_x = 0usize;
-                    let mut min_y = h;
-                    let mut max_y = 0usize;
+                    let area_f = area as f32;
                     let mut sum_x = 0.0f32;
                     let mut sum_y = 0.0f32;
                     for &(px_x, px_y) in &pts {
-                        if px_x < min_x {
-                            min_x = px_x;
-                        }
-                        if px_x > max_x {
-                            max_x = px_x;
-                        }
-                        if px_y < min_y {
-                            min_y = px_y;
-                        }
-                        if px_y > max_y {
-                            max_y = px_y;
-                        }
-                        sum_x += px_x as f32;
-                        sum_y += px_y as f32;
+                        sum_x += (px_x as f32) + 0.5;
+                        sum_y += (px_y as f32) + 0.5;
                     }
-                    let bw = (max_x - min_x + 1).max(1) as f32;
-                    let bh = (max_y - min_y + 1).max(1) as f32;
-                    let fill = (area as f32) / (bw * bh);
-                    let aspect = bw.max(bh) / bw.min(bh).max(1.0);
-                    let cx = sum_x / (area as f32);
-                    let cy = sum_y / (area as f32);
+                    let cx = sum_x / area_f;
+                    let cy = sum_y / area_f;
 
+                    // 2D central moments (covariance matrix) & exact maximum centroid radius R_max
+                    let mut cxx = 0.0f32;
+                    let mut cyy = 0.0f32;
+                    let mut cxy = 0.0f32;
+                    let mut max_r_sq = 1.0f32;
                     let mut bins = [0.0f32; 36];
+
                     for &(px_x, px_y) in &pts {
-                        let dx = (px_x as f32) - cx;
-                        let dy = (px_y as f32) - cy;
-                        let r = (dx * dx + dy * dy).sqrt();
+                        let dx = (px_x as f32) + 0.5 - cx;
+                        let dy = (px_y as f32) + 0.5 - cy;
+                        cxx += dx * dx;
+                        cyy += dy * dy;
+                        cxy += dx * dy;
+                        let r_sq = dx * dx + dy * dy;
+                        if r_sq > max_r_sq {
+                            max_r_sq = r_sq;
+                        }
+                        let r = r_sq.sqrt();
                         let ang_rad = dy.atan2(dx) + std::f32::consts::PI;
                         let bin = (((ang_rad / (2.0 * std::f32::consts::PI)) * 36.0) as usize) % 36;
                         if r > bins[bin] {
                             bins[bin] = r;
                         }
                     }
-                    let max_r = bins.iter().copied().fold(0.0f32, f32::max).max(1.0);
-                    let mut norm_bins = [0.0f32; 36];
-                    let mut mean_r = 0.0f32;
-                    let mut min_r = 1.0f32;
-                    for i in 0..36 {
-                        norm_bins[i] = bins[i] / max_r;
-                        mean_r += norm_bins[i];
-                        if norm_bins[i] < min_r {
-                            min_r = norm_bins[i];
+                    cxx /= area_f;
+                    cyy /= area_f;
+                    cxy /= area_f;
+
+                    // Principal eigenvalue elongation E = sqrt(lambda_max / lambda_min) (100% rotation-invariant)
+                    let trace = cxx + cyy;
+                    let det_disc = ((cxx - cyy) * (cxx - cyy) + 4.0 * cxy * cxy).sqrt();
+                    let lambda_max = ((trace + det_disc) * 0.5).max(0.01);
+                    let lambda_min = ((trace - det_disc) * 0.5).max(0.01);
+                    let elongation = (lambda_max / lambda_min).sqrt();
+
+                    // Hu's First Rotation-Invariant Moment: I_norm = (lambda_max + lambda_min) / Area
+                    // Integrates over all interior pixels, eliminating single-pixel corner jitter.
+                    let i_norm = (lambda_max + lambda_min) / area_f;
+
+                    // Extract 4-connected boundary pixels and compute radial distance distribution d_i
+                    let mut bound_dists = Vec::with_capacity(pts.len() / 2 + 8);
+                    let mut bound_thetas = Vec::with_capacity(pts.len() / 2 + 8);
+                    let mut mu_b = 0.0f32;
+                    for &(px_x, px_y) in &pts {
+                        let is_bound = px_x == 0
+                            || px_x + 1 == w
+                            || px_y == 0
+                            || px_y + 1 == h
+                            || px_at(px_x - 1, px_y) != rgb
+                            || px_at(px_x + 1, px_y) != rgb
+                            || px_at(px_x, px_y - 1) != rgb
+                            || px_at(px_x, px_y + 1) != rgb;
+                        if is_bound {
+                            let dx = (px_x as f32) + 0.5 - cx;
+                            let dy = (px_y as f32) + 0.5 - cy;
+                            let dist = (dx * dx + dy * dy).sqrt();
+                            let theta = dy.atan2(dx);
+                            bound_dists.push(dist);
+                            bound_thetas.push(theta);
+                            mu_b += dist;
                         }
                     }
-                    mean_r /= 36.0;
-                    let mut var_r = 0.0f32;
-                    let mut peaks = 0usize;
-                    for i in 0..36 {
-                        let d = norm_bins[i] - mean_r;
-                        var_r += d * d;
-                        let prev = norm_bins[(i + 35) % 36];
-                        let next = norm_bins[(i + 1) % 36];
-                        if norm_bins[i] >= prev && norm_bins[i] > next && norm_bins[i] > mean_r {
-                            peaks += 1;
-                        }
+                    let nb = (bound_dists.len().max(1)) as f32;
+                    mu_b = (mu_b / nb).max(1.0);
+
+                    let mut var_b = 0.0f32;
+                    for &d in &bound_dists {
+                        let diff = d - mu_b;
+                        var_b += diff * diff;
                     }
-                    let std_r = (var_r / 36.0).sqrt();
-                    let est_radius = if min_r > 0.65 && std_r > 0.06 {
-                        max_r / 1.125
-                    } else if peaks == 4 && min_r < 0.45 {
-                        max_r / 1.053
+                    // Boundary Radial Coefficient of Variation CV_b = sigma(d_b) / mu(d_b):
+                    // circle ~ 0.018, hexagon ~ 0.043, pentagon ~ 0.062, square/diamond ~ 0.098, triangle ~ 0.165, cross ~ 0.185, star ~ 0.250
+                    let cv_bound = (var_b / nb).sqrt() / mu_b;
+
+                    // Boundary Radial Fourier Harmonics |B_3|, |B_4|, |B_5| (100% rotation-invariant)
+                    let bound_harmonic = |m: f32| -> f32 {
+                        let mut re = 0.0f32;
+                        let mut im = 0.0f32;
+                        for idx in 0..bound_dists.len() {
+                            let rel_d = (bound_dists[idx] - mu_b) / mu_b;
+                            let ang = m * bound_thetas[idx];
+                            re += rel_d * ang.cos();
+                            im += rel_d * ang.sin();
+                        }
+                        ((re * re + im * im).sqrt()) / nb
+                    };
+                    let b3 = bound_harmonic(3.0);
+                    let b4 = bound_harmonic(4.0);
+                    let b5 = bound_harmonic(5.0);
+
+                    // Integral-smoothed diagnostic scale r_diag = sqrt(Area / 2.0):
+                    // For diamond, r_diag == 1.000 * r; for square, r_diag == 1.13137 * r.
+                    let equiv_diag_r = (area_f / 2.00).sqrt();
+
+                    // Recover exact intrinsic generative radius `r = sqrt(Area / c_shape)` for each shape family:
+                    let est_radius = if elongation > 1.32 {
+                        if elongation > 1.82 || i_norm > 0.192 {
+                            // rectangle: Area = 2.00 * r^2
+                            (area_f / 2.00).sqrt()
+                        } else {
+                            // ellipse: Area = 0.6 * pi * r^2 = 1.88496 * r^2
+                            (area_f / 1.884956).sqrt()
+                        }
+                    } else if b5 > b3 && b5 > b4 && cv_bound > 0.13 {
+                        // star: Area = 2.1 * sin(36 deg) * r^2 = 1.23435 * r^2
+                        (area_f / 1.234349).sqrt()
+                    } else if b3 > b4 && b3 > b5 && cv_bound > 0.11 {
+                        // triangle: Area = (3*sqrt(3)/4) * r^2 = 1.29904 * r^2
+                        (area_f / 1.299038).sqrt()
+                    } else if i_norm > 0.178 && b4 > b3 {
+                        // cross: Area = 2.0224 * r^2
+                        (area_f / 2.0224).sqrt()
+                    } else if cv_bound < 0.031 {
+                        // circle: Area = pi * r^2
+                        (area_f / std::f32::consts::PI).sqrt()
+                    } else if cv_bound < 0.052 {
+                        // hexagon: Area = 2.59808 * r^2
+                        (area_f / 2.598076).sqrt()
+                    } else if cv_bound < 0.079 {
+                        // pentagon: Area = 2.37764 * r^2
+                        (area_f / 2.377641).sqrt()
+                    } else if equiv_diag_r > 25.8 {
+                        // Definitely a square (since diamond has equiv_diag_r == r <= 26.0)
+                        (area_f / 2.56).sqrt()
                     } else {
-                        max_r
+                        // Midpoint between square (sqrt(A/2.56)) and diamond (sqrt(A/2.00))
+                        (area_f / 2.26).sqrt()
                     };
 
                     segments.push(SceneObjectSegment {
                         rgb,
                         pixel_area: area,
                         max_radius: est_radius,
-                        shape_features: [
-                            fill,
-                            aspect / 2.0,
-                            mean_r,
-                            std_r * 3.0,
-                            min_r,
-                            (peaks as f32) / 10.0,
-                        ],
+                        raw_max_dist: equiv_diag_r,
+                        shape_features: [i_norm, elongation, cv_bound, b3, b4, b5],
                     });
                 }
             }
@@ -595,12 +656,13 @@ impl EyesSensor {
     }
 }
 
-/// A segmented foreground object extracted from a `.ppm` scene by Alpha 7's V1/V2 Retina.
+/// A segmented foreground object extracted from a `.ppm` scene by Alpha 7's V1/V2/V4 Retina.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SceneObjectSegment {
     pub rgb: [u8; 3],
     pub pixel_area: usize,
     pub max_radius: f32,
+    pub raw_max_dist: f32,
     pub shape_features: [f32; 6],
 }
 

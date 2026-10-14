@@ -385,8 +385,13 @@ impl ConceptualKnowledgeWeb {
             }
         }
 
-        // Deduplicate relations
-        let mut unique_rels: Vec<(String, String, String, f32)> = Vec::new();
+        // Preserve explicit/inherited relations (e.g., from Alpha 3 beliefs or coaching) and deduplicate
+        let mut unique_rels: Vec<(String, String, String, f32)> = self
+            .relations
+            .iter()
+            .filter(|(_, r, _, _)| r != "shares_core_with")
+            .cloned()
+            .collect();
         for (a, rel, b, w) in new_relations {
             if !unique_rels
                 .iter()
@@ -398,6 +403,24 @@ impl ConceptualKnowledgeWeb {
         let count = unique_rels.len();
         self.relations = unique_rels;
         count
+    }
+
+    /// Explicitly links two concepts (`a`, `rel`, `b`) in the Conceptual Knowledge Web
+    /// (used for Alpha 3 taxonomic heritage and real-time conceptual coaching).
+    pub fn link_concepts(&mut self, a: &str, rel: &str, b: &str, _evidence: &str, _tick: u32) {
+        let ca = a.trim().to_lowercase();
+        let cr = rel.trim().to_lowercase();
+        let cb = b.trim().to_lowercase();
+        if ca.is_empty() || cb.is_empty() {
+            return;
+        }
+        if !self
+            .relations
+            .iter()
+            .any(|(ea, er, eb, _)| ea == &ca && er == &cr && eb == &cb)
+        {
+            self.relations.push((ca, cr, cb, 0.95));
+        }
     }
 
     /// Phase 2B: Compares two grounded concepts directly from their core invariants, variable
