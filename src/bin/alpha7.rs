@@ -7,7 +7,7 @@ use std::time::Instant;
 
 fn run_demo() {
     println!("================================================================================");
-    println!(" ALPHA 7 v0.2 — 100% PURE RUST: SPARSE DENDRITIC BRAIN, V1/V2 RETINA, MOUTH & LAB");
+    println!(" ALPHA 7 v0.3 — 100% PURE RUST: SPARSE DENDRITIC BRAIN, V1/V2 RETINA, MOUTH & LAB");
     println!("================================================================================");
 
     let t0 = Instant::now();
@@ -138,12 +138,44 @@ fn run_demo() {
 
     let sleep_reply = org.converse("sleep consolidate");
     println!("    • Phase 2D Sleep Replay   : \"{}\"", sleep_reply.spoken_response);
+
+    println!("\n[6] PHASE 3A–3D: GRADED SCHOOL EXAMS (LIVE L vs. NULL TWIN N) & KEY–DOOR TOOL PUZZLE");
+    let puzzle_msg = org.solve_key_door_puzzle();
+    println!("    • Phase 3D Key-Door Puzzle: {}", puzzle_msg);
+
+    let suite = org.run_school_exams();
+    println!(
+        "    • Phase 3A–3C Exam Suite  : Passed {}/{} held-out exams ({}/{} items, {:.1}% Live L vs {:.1}% Null Twin N, +{:.1}% margin in {:.1} ms)",
+        suite.exams_passed,
+        suite.total_exams,
+        suite.total_items_correct,
+        suite.total_items_sat,
+        suite.mean_live_score * 100.0,
+        suite.mean_null_twin_score * 100.0,
+        suite.mean_margin_over_twin * 100.0,
+        suite.total_eval_time_ms
+    );
+    for v in &suite.exam_verdicts {
+        println!(
+            "      - {:26} | Live L: {:5.1}% ({:3}/{:3}) | Twin N ({:14}): {:5.1}% | Bar: {:5.1}% | PASS={}",
+            v.family,
+            v.live_score * 100.0,
+            v.correct_items,
+            v.n_items,
+            v.strongest_twin_name,
+            v.strongest_twin_score * 100.0,
+            v.pass_mark * 100.0,
+            v.passed
+        );
+    }
+    let comp_reply = org.converse("complete: the little red");
+    println!("    • Phase 3B Sequence Memory: {}", comp_reply.spoken_response);
     println!("================================================================================");
 }
 
 fn run_repl() {
     println!("================================================================================");
-    println!(" ALPHA 7 v0.2 INTERACTIVE LIVE REPL");
+    println!(" ALPHA 7 v0.3 INTERACTIVE LIVE REPL");
     println!(" Commands:");
     println!("   map                     - Render the 2D World Canvas");
     println!("   move <x> <y>            - Move Alpha 7's body & hands to (x, y)");
@@ -152,6 +184,9 @@ fn run_repl() {
     println!("   code <expr>             - Practice executing small code with Eyes & Hands");
     println!("   synthesize <target>     - Synthesize & verify code for a target result");
     println!("   sleep                   - Run Hippocampal-Neocortical sleep replay consolidation");
+    println!("   exams                   - Sit all 8 held-out School Exams (Live L vs Null Twin N)");
+    println!("   puzzle                  - Solve the 4-Step Key-Door-Vault tool puzzle on 2D Canvas");
+    println!("   complete <phrase>       - Complete a sentence from Cortical Sequence Memory");
     println!("   memories                - List direct episodic memories formed with you");
     println!("   save [path] / load [p]  - Persist or restore Alpha 7's full brain state");
     println!("   quit / exit             - Exit REPL");
@@ -226,6 +261,19 @@ fn run_repl() {
         } else if cmd == "sleep" {
             let rep = org.consolidate_memories();
             println!("Alpha 7: {}", rep.summary);
+        } else if cmd == "exams" {
+            let rep = org.run_school_exams();
+            println!(
+                "Alpha 7: Passed {}/{} exams ({}/{} items, {:.1}% Live L vs {:.1}% Null Twin N).",
+                rep.exams_passed,
+                rep.total_exams,
+                rep.total_items_correct,
+                rep.total_items_sat,
+                rep.mean_live_score * 100.0,
+                rep.mean_null_twin_score * 100.0
+            );
+        } else if cmd == "puzzle" {
+            println!("Alpha 7: {}", org.solve_key_door_puzzle());
         } else if cmd == "memories" {
             for ep in org.knowledge_web.episodes.iter().rev().take(10) {
                 println!("  • [tick {}] {}", ep.tick, ep.summary);

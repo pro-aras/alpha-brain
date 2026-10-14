@@ -1,0 +1,7 @@
+{"id": "cmd-ff9a645bb6fd", "kind": "chat", "text": "what is this?", "x": null, "y": null, "concept": null, "actor": "arasmirza21602@gmail.com"}
+{"id": "cmd-d43d5ef81a28", "kind": "chat", "text": "what is cat?", "x": null, "y": null, "concept": null, "actor": "arasmirza21602@gmail.com"}
+{"id": "cmd-af38b6395b5a", "kind": "chat", "text": "What is cat?", "x": null, "y": null, "concept": null, "actor": "arasmirza21602@gmail.com"}
+{"id": "cmd-c9c13644feb1", "kind": "chat", "text": "compare cat and dog", "x": null, "y": null, "concept": null, "actor": "local"}
+{"id": "cmd-08476fc40d1c", "kind": "chat", "text": "why did press_switch fail?", "x": null, "y": null, "concept": null, "actor": "local"}
+{"id": "cmd-f635d83547b4", "kind": "synthesize", "text": "72", "x": null, "y": null, "concept": null, "actor": "local"}
+{"id": "cmd-640bfbc6f3d9", "kind": "sleep", "text": null, "x": null, "y": null, "concept": null, "actor": "local"}

@@ -1,8 +1,8 @@
 [package]
 name = "alpha7"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
-description = "Alpha 7: Pure-Rust Embodied Sparse Dendritic AI, V1/V2 Raw Sensory Encoders, Compositional Concept Web, Predictive Engine, Code Synthesizer & Hippocampal Sleep Replay"
+description = "Alpha 7: Pure-Rust Embodied Sparse Dendritic AI, V1/V2 Scene Segmentation, Cortical Sequence Memory, Live vs. Null-Twin Exam Harness, Code Synthesizer & Multi-Step Tool Planning"
 
 [lib]
 name = "alpha7"

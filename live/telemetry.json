@@ -1,420 +1,416 @@
 {
-  "updated_at_unix": 1791971134,
-  "status": "ONLINE · AWAKE · PURE ROAD v0.2",
-  "current_tick": 2096,
-  "current_activity": "Exploring shelf 'genome_world' -> concept 'ahmad' (/data/dev/genome/world/ahmad/ahmad_01.jpg) & patrolling 2D World at (5,2)",
+  "updated_at_unix": 1791978535,
+  "status": "ONLINE · AWAKE · PURE ROAD v0.3",
+  "current_tick": 10783,
+  "current_activity": "Exploring shelf 'world_programs' -> concept 'shape_arrow' (/data/dev/genome/world/programs/arrow_0.py) & patrolling 2D World at (6,5)",
   "total_neurons": 1000000,
-  "memory_footprint_mb": 30.531002044677734,
-  "active_synapses": 4337,
-  "last_step_us": 3971.4800000000005,
-  "last_touched_neurons": 24,
-  "cumulative_predicted_spikes": 17377,
-  "cumulative_surprise_bursts": 4667,
-  "cumulative_failed_predictions": 24275,
-  "cumulative_btsp_updates": 1229942,
+  "memory_footprint_mb": 30.539627075195312,
+  "active_synapses": 6579,
+  "last_step_us": 442.685,
+  "last_touched_neurons": 14,
+  "cumulative_predicted_spikes": 10747,
+  "cumulative_surprise_bursts": 2633,
+  "cumulative_failed_predictions": 12186,
+  "cumulative_btsp_updates": 634570,
   "tick_history": [
     {
-      "tick": 2033,
-      "step_us": 423.841,
-      "touched_neurons": 14,
-      "active_synapses": 4359,
-      "predicted_spikes": 16867,
-      "surprise_bursts": 4548
-    },
-    {
-      "tick": 2034,
-      "step_us": 512.5400000000001,
-      "touched_neurons": 14,
-      "active_synapses": 4359,
-      "predicted_spikes": 16880,
-      "surprise_bursts": 4548
-    },
-    {
-      "tick": 2035,
-      "step_us": 436.53499999999997,
-      "touched_neurons": 14,
-      "active_synapses": 4359,
-      "predicted_spikes": 16894,
-      "surprise_bursts": 4548
-    },
-    {
-      "tick": 2036,
-      "step_us": 496.60999999999996,
-      "touched_neurons": 14,
-      "active_synapses": 4376,
-      "predicted_spikes": 16904,
-      "surprise_bursts": 4549
-    },
-    {
-      "tick": 2037,
-      "step_us": 311.60699999999997,
-      "touched_neurons": 14,
-      "active_synapses": 4376,
-      "predicted_spikes": 16917,
-      "surprise_bursts": 4549
-    },
-    {
-      "tick": 2038,
-      "step_us": 389.706,
-      "touched_neurons": 14,
-      "active_synapses": 4376,
-      "predicted_spikes": 16931,
-      "surprise_bursts": 4549
-    },
-    {
-      "tick": 2039,
-      "step_us": 456.814,
-      "touched_neurons": 14,
-      "active_synapses": 4385,
-      "predicted_spikes": 16944,
-      "surprise_bursts": 4550
-    },
-    {
-      "tick": 2040,
-      "step_us": 469.75899999999996,
-      "touched_neurons": 13,
-      "active_synapses": 4391,
-      "predicted_spikes": 16948,
-      "surprise_bursts": 4551
-    },
-    {
-      "tick": 2041,
-      "step_us": 527.2379999999999,
-      "touched_neurons": 13,
-      "active_synapses": 4441,
-      "predicted_spikes": 16953,
-      "surprise_bursts": 4556
-    },
-    {
-      "tick": 2042,
-      "step_us": 288.181,
-      "touched_neurons": 13,
-      "active_synapses": 4441,
-      "predicted_spikes": 16959,
-      "surprise_bursts": 4556
-    },
-    {
-      "tick": 2043,
-      "step_us": 558.809,
-      "touched_neurons": 13,
-      "active_synapses": 4471,
-      "predicted_spikes": 16966,
-      "surprise_bursts": 4561
-    },
-    {
-      "tick": 2044,
-      "step_us": 639.4929999999999,
+      "tick": 10712,
+      "step_us": 863.89,
       "touched_neurons": 23,
-      "active_synapses": 4517,
-      "predicted_spikes": 16973,
-      "surprise_bursts": 4564
+      "active_synapses": 7282,
+      "predicted_spikes": 10161,
+      "surprise_bursts": 2510
     },
     {
-      "tick": 2053,
-      "step_us": 1336.607,
-      "touched_neurons": 23,
-      "active_synapses": 3776,
-      "predicted_spikes": 16982,
-      "surprise_bursts": 4574
+      "tick": 10721,
+      "step_us": 1699.386,
+      "touched_neurons": 18,
+      "active_synapses": 6149,
+      "predicted_spikes": 10175,
+      "surprise_bursts": 2511
     },
     {
-      "tick": 2054,
-      "step_us": 507.141,
+      "tick": 10722,
+      "step_us": 765.7220000000001,
       "touched_neurons": 17,
-      "active_synapses": 3796,
-      "predicted_spikes": 16982,
-      "surprise_bursts": 4576
+      "active_synapses": 6155,
+      "predicted_spikes": 10186,
+      "surprise_bursts": 2512
     },
     {
-      "tick": 2055,
-      "step_us": 539.6930000000001,
+      "tick": 10723,
+      "step_us": 521.125,
+      "touched_neurons": 17,
+      "active_synapses": 6173,
+      "predicted_spikes": 10193,
+      "surprise_bursts": 2513
+    },
+    {
+      "tick": 10724,
+      "step_us": 579.436,
       "touched_neurons": 16,
-      "active_synapses": 3869,
-      "predicted_spikes": 16987,
-      "surprise_bursts": 4586
+      "active_synapses": 6286,
+      "predicted_spikes": 10200,
+      "surprise_bursts": 2520
     },
     {
-      "tick": 2056,
-      "step_us": 556.796,
-      "touched_neurons": 16,
-      "active_synapses": 3869,
-      "predicted_spikes": 16995,
-      "surprise_bursts": 4586
-    },
-    {
-      "tick": 2057,
-      "step_us": 509.205,
-      "touched_neurons": 15,
-      "active_synapses": 3869,
-      "predicted_spikes": 17009,
-      "surprise_bursts": 4586
-    },
-    {
-      "tick": 2058,
-      "step_us": 4411.601000000001,
+      "tick": 10725,
+      "step_us": 4062.8,
       "touched_neurons": 24,
-      "active_synapses": 3869,
-      "predicted_spikes": 17028,
-      "surprise_bursts": 4586
+      "active_synapses": 6286,
+      "predicted_spikes": 10220,
+      "surprise_bursts": 2520
     },
     {
-      "tick": 2059,
-      "step_us": 16026.875,
+      "tick": 10726,
+      "step_us": 15816.559000000001,
       "touched_neurons": 26,
-      "active_synapses": 3931,
-      "predicted_spikes": 17050,
-      "surprise_bursts": 4588
+      "active_synapses": 6326,
+      "predicted_spikes": 10243,
+      "surprise_bursts": 2521
     },
     {
-      "tick": 2060,
-      "step_us": 1310.6680000000001,
+      "tick": 10727,
+      "step_us": 1024.256,
       "touched_neurons": 24,
-      "active_synapses": 3944,
-      "predicted_spikes": 17062,
-      "surprise_bursts": 4589
+      "active_synapses": 6326,
+      "predicted_spikes": 10254,
+      "surprise_bursts": 2521
     },
     {
-      "tick": 2061,
-      "step_us": 1162.154,
+      "tick": 10728,
+      "step_us": 1164.785,
       "touched_neurons": 24,
-      "active_synapses": 4125,
-      "predicted_spikes": 17076,
-      "surprise_bursts": 4598
+      "active_synapses": 6609,
+      "predicted_spikes": 10266,
+      "surprise_bursts": 2532
     },
     {
-      "tick": 2062,
-      "step_us": 1129.071,
+      "tick": 10729,
+      "step_us": 1212.887,
       "touched_neurons": 24,
-      "active_synapses": 4142,
-      "predicted_spikes": 17099,
-      "surprise_bursts": 4599
+      "active_synapses": 6609,
+      "predicted_spikes": 10283,
+      "surprise_bursts": 2532
     },
     {
-      "tick": 2063,
-      "step_us": 1239.652,
+      "tick": 10730,
+      "step_us": 1227.955,
       "touched_neurons": 23,
-      "active_synapses": 4182,
-      "predicted_spikes": 17118,
-      "surprise_bursts": 4600
+      "active_synapses": 6896,
+      "predicted_spikes": 10298,
+      "surprise_bursts": 2539
     },
     {
-      "tick": 2064,
-      "step_us": 1025.5819999999999,
+      "tick": 10731,
+      "step_us": 1169.174,
       "touched_neurons": 24,
-      "active_synapses": 4191,
-      "predicted_spikes": 17129,
-      "surprise_bursts": 4601
+      "active_synapses": 6896,
+      "predicted_spikes": 10321,
+      "surprise_bursts": 2539
     },
     {
-      "tick": 2065,
-      "step_us": 896.736,
+      "tick": 10732,
+      "step_us": 1430.502,
       "touched_neurons": 25,
-      "active_synapses": 4707,
-      "predicted_spikes": 17140,
-      "surprise_bursts": 4613
+      "active_synapses": 6942,
+      "predicted_spikes": 10343,
+      "surprise_bursts": 2540
     },
     {
-      "tick": 2066,
-      "step_us": 1466.877,
+      "tick": 10733,
+      "step_us": 1154.195,
       "touched_neurons": 25,
-      "active_synapses": 4771,
-      "predicted_spikes": 17163,
-      "surprise_bursts": 4615
+      "active_synapses": 6942,
+      "predicted_spikes": 10358,
+      "surprise_bursts": 2540
     },
     {
-      "tick": 2067,
-      "step_us": 1558.0220000000002,
+      "tick": 10734,
+      "step_us": 826.909,
       "touched_neurons": 23,
-      "active_synapses": 4771,
-      "predicted_spikes": 17185,
-      "surprise_bursts": 4615
+      "active_synapses": 7361,
+      "predicted_spikes": 10369,
+      "surprise_bursts": 2551
     },
     {
-      "tick": 2068,
-      "step_us": 545.854,
+      "tick": 10735,
+      "step_us": 543.258,
       "touched_neurons": 14,
-      "active_synapses": 4809,
-      "predicted_spikes": 17195,
-      "surprise_bursts": 4616
+      "active_synapses": 7361,
+      "predicted_spikes": 10383,
+      "surprise_bursts": 2551
     },
     {
-      "tick": 2069,
-      "step_us": 742.611,
+      "tick": 10736,
+      "step_us": 865.272,
       "touched_neurons": 14,
-      "active_synapses": 4883,
-      "predicted_spikes": 17206,
-      "surprise_bursts": 4618
+      "active_synapses": 7361,
+      "predicted_spikes": 10396,
+      "surprise_bursts": 2551
     },
     {
-      "tick": 2070,
-      "step_us": 421.637,
+      "tick": 10737,
+      "step_us": 510.956,
       "touched_neurons": 14,
-      "active_synapses": 4883,
-      "predicted_spikes": 17220,
-      "surprise_bursts": 4618
+      "active_synapses": 7361,
+      "predicted_spikes": 10406,
+      "surprise_bursts": 2551
     },
     {
-      "tick": 2071,
-      "step_us": 450.632,
+      "tick": 10738,
+      "step_us": 390.78700000000003,
       "touched_neurons": 14,
-      "active_synapses": 4883,
-      "predicted_spikes": 17234,
-      "surprise_bursts": 4618
+      "active_synapses": 7511,
+      "predicted_spikes": 10416,
+      "surprise_bursts": 2555
     },
     {
-      "tick": 2072,
-      "step_us": 283.242,
+      "tick": 10739,
+      "step_us": 643.0780000000001,
       "touched_neurons": 14,
-      "active_synapses": 4883,
-      "predicted_spikes": 17245,
-      "surprise_bursts": 4618
+      "active_synapses": 7540,
+      "predicted_spikes": 10426,
+      "surprise_bursts": 2556
     },
     {
-      "tick": 2081,
-      "step_us": 1317.842,
+      "tick": 10740,
+      "step_us": 461.81199999999995,
       "touched_neurons": 14,
-      "active_synapses": 3440,
-      "predicted_spikes": 17255,
-      "surprise_bursts": 4621
+      "active_synapses": 7586,
+      "predicted_spikes": 10437,
+      "surprise_bursts": 2559
     },
     {
-      "tick": 2082,
-      "step_us": 394.125,
+      "tick": 10749,
+      "step_us": 1239.4579999999999,
       "touched_neurons": 14,
-      "active_synapses": 3460,
-      "predicted_spikes": 17258,
-      "surprise_bursts": 4623
+      "active_synapses": 6263,
+      "predicted_spikes": 10451,
+      "surprise_bursts": 2559
     },
     {
-      "tick": 2083,
-      "step_us": 517.119,
+      "tick": 10750,
+      "step_us": 315.412,
       "touched_neurons": 14,
-      "active_synapses": 3565,
-      "predicted_spikes": 17261,
-      "surprise_bursts": 4634
+      "active_synapses": 6270,
+      "predicted_spikes": 10457,
+      "surprise_bursts": 2560
     },
     {
-      "tick": 2084,
-      "step_us": 587.163,
+      "tick": 10751,
+      "step_us": 416.976,
       "touched_neurons": 14,
-      "active_synapses": 3583,
-      "predicted_spikes": 17274,
-      "surprise_bursts": 4635
+      "active_synapses": 6315,
+      "predicted_spikes": 10464,
+      "surprise_bursts": 2563
     },
     {
-      "tick": 2085,
-      "step_us": 534.1220000000001,
+      "tick": 10752,
+      "step_us": 285.665,
       "touched_neurons": 14,
-      "active_synapses": 3583,
-      "predicted_spikes": 17287,
-      "surprise_bursts": 4635
+      "active_synapses": 6385,
+      "predicted_spikes": 10474,
+      "surprise_bursts": 2567
     },
     {
-      "tick": 2086,
-      "step_us": 685.572,
+      "tick": 10753,
+      "step_us": 513.881,
       "touched_neurons": 13,
-      "active_synapses": 3603,
-      "predicted_spikes": 17291,
-      "surprise_bursts": 4636
+      "active_synapses": 6385,
+      "predicted_spikes": 10484,
+      "surprise_bursts": 2567
     },
     {
-      "tick": 2087,
-      "step_us": 451.324,
+      "tick": 10754,
+      "step_us": 567.7139999999999,
       "touched_neurons": 13,
-      "active_synapses": 3703,
-      "predicted_spikes": 17296,
-      "surprise_bursts": 4641
+      "active_synapses": 6385,
+      "predicted_spikes": 10494,
+      "surprise_bursts": 2567
     },
     {
-      "tick": 2088,
-      "step_us": 431.656,
+      "tick": 10755,
+      "step_us": 703.484,
       "touched_neurons": 13,
-      "active_synapses": 3703,
-      "predicted_spikes": 17302,
-      "surprise_bursts": 4641
+      "active_synapses": 6429,
+      "predicted_spikes": 10497,
+      "surprise_bursts": 2569
     },
     {
-      "tick": 2089,
-      "step_us": 470.19899999999996,
+      "tick": 10756,
+      "step_us": 415.884,
       "touched_neurons": 13,
-      "active_synapses": 3733,
-      "predicted_spikes": 17309,
-      "surprise_bursts": 4646
+      "active_synapses": 6522,
+      "predicted_spikes": 10503,
+      "surprise_bursts": 2575
     },
     {
-      "tick": 2090,
-      "step_us": 985.636,
+      "tick": 10757,
+      "step_us": 833.291,
       "touched_neurons": 23,
-      "active_synapses": 3760,
-      "predicted_spikes": 17326,
-      "surprise_bursts": 4648
+      "active_synapses": 6553,
+      "predicted_spikes": 10510,
+      "surprise_bursts": 2576
     },
     {
-      "tick": 2091,
-      "step_us": 481.11999999999995,
+      "tick": 10758,
+      "step_us": 653.678,
       "touched_neurons": 23,
-      "active_synapses": 3783,
-      "predicted_spikes": 17344,
-      "surprise_bursts": 4649
+      "active_synapses": 6763,
+      "predicted_spikes": 10521,
+      "surprise_bursts": 2586
     },
     {
-      "tick": 2092,
-      "step_us": 812.9250000000001,
+      "tick": 10759,
+      "step_us": 556.823,
+      "touched_neurons": 18,
+      "active_synapses": 6763,
+      "predicted_spikes": 10536,
+      "surprise_bursts": 2586
+    },
+    {
+      "tick": 10760,
+      "step_us": 635.053,
       "touched_neurons": 17,
-      "active_synapses": 3855,
-      "predicted_spikes": 17347,
-      "surprise_bursts": 4651
+      "active_synapses": 6791,
+      "predicted_spikes": 10550,
+      "surprise_bursts": 2587
     },
     {
-      "tick": 2093,
-      "step_us": 606.8910000000001,
+      "tick": 10761,
+      "step_us": 600.878,
+      "touched_neurons": 17,
+      "active_synapses": 6791,
+      "predicted_spikes": 10564,
+      "surprise_bursts": 2587
+    },
+    {
+      "tick": 10762,
+      "step_us": 670.0,
       "touched_neurons": 16,
-      "active_synapses": 4109,
-      "predicted_spikes": 17352,
-      "surprise_bursts": 4661
+      "active_synapses": 6827,
+      "predicted_spikes": 10577,
+      "surprise_bursts": 2588
     },
     {
-      "tick": 2094,
-      "step_us": 341.554,
-      "touched_neurons": 16,
-      "active_synapses": 4109,
-      "predicted_spikes": 17360,
-      "surprise_bursts": 4661
-    },
-    {
-      "tick": 2095,
-      "step_us": 746.438,
-      "touched_neurons": 15,
-      "active_synapses": 4337,
-      "predicted_spikes": 17368,
-      "surprise_bursts": 4667
-    },
-    {
-      "tick": 2096,
-      "step_us": 3971.4800000000005,
+      "tick": 10763,
+      "step_us": 3930.427,
       "touched_neurons": 24,
-      "active_synapses": 4337,
-      "predicted_spikes": 17377,
-      "surprise_bursts": 4667
+      "active_synapses": 6856,
+      "predicted_spikes": 10583,
+      "surprise_bursts": 2589
+    },
+    {
+      "tick": 10764,
+      "step_us": 16164.965,
+      "touched_neurons": 26,
+      "active_synapses": 7274,
+      "predicted_spikes": 10593,
+      "surprise_bursts": 2602
+    },
+    {
+      "tick": 10765,
+      "step_us": 922.132,
+      "touched_neurons": 24,
+      "active_synapses": 7356,
+      "predicted_spikes": 10603,
+      "surprise_bursts": 2604
+    },
+    {
+      "tick": 10766,
+      "step_us": 1147.512,
+      "touched_neurons": 24,
+      "active_synapses": 7499,
+      "predicted_spikes": 10617,
+      "surprise_bursts": 2614
+    },
+    {
+      "tick": 10767,
+      "step_us": 1531.5249999999999,
+      "touched_neurons": 24,
+      "active_synapses": 7499,
+      "predicted_spikes": 10641,
+      "surprise_bursts": 2614
+    },
+    {
+      "tick": 10768,
+      "step_us": 1365.137,
+      "touched_neurons": 23,
+      "active_synapses": 7499,
+      "predicted_spikes": 10661,
+      "surprise_bursts": 2614
+    },
+    {
+      "tick": 10777,
+      "step_us": 2159.054,
+      "touched_neurons": 24,
+      "active_synapses": 6252,
+      "predicted_spikes": 10683,
+      "surprise_bursts": 2614
+    },
+    {
+      "tick": 10778,
+      "step_us": 1495.837,
+      "touched_neurons": 25,
+      "active_synapses": 6288,
+      "predicted_spikes": 10689,
+      "surprise_bursts": 2618
+    },
+    {
+      "tick": 10779,
+      "step_us": 1072.438,
+      "touched_neurons": 25,
+      "active_synapses": 6349,
+      "predicted_spikes": 10699,
+      "surprise_bursts": 2623
+    },
+    {
+      "tick": 10780,
+      "step_us": 1190.364,
+      "touched_neurons": 23,
+      "active_synapses": 6579,
+      "predicted_spikes": 10710,
+      "surprise_bursts": 2633
+    },
+    {
+      "tick": 10781,
+      "step_us": 550.782,
+      "touched_neurons": 14,
+      "active_synapses": 6579,
+      "predicted_spikes": 10724,
+      "surprise_bursts": 2633
+    },
+    {
+      "tick": 10782,
+      "step_us": 585.428,
+      "touched_neurons": 14,
+      "active_synapses": 6579,
+      "predicted_spikes": 10737,
+      "surprise_bursts": 2633
+    },
+    {
+      "tick": 10783,
+      "step_us": 442.685,
+      "touched_neurons": 14,
+      "active_synapses": 6579,
+      "predicted_spikes": 10747,
+      "surprise_bursts": 2633
     }
   ],
   "current_frame": {
     "eyes": [
-      "eyes:small_agile_silhouette",
-      "eyes:switch_visible",
-      "eyes:toggle_lever"
+      "eyes:door_unlocked_open",
+      "eyes:wall_fixture",
+      "eyes:archway_door_frame"
     ],
-    "ears": [
-      "ears:purr",
-      "ears:meow"
-    ],
+    "ears": [],
     "hands": [
-      "hands:hard_plastic",
-      "hands:click_detent"
+      "hands:holding_brass_key"
     ],
     "smell": [
-      "smell:feline_scent",
-      "smell:feline_scent"
+      "smell:metallic_brass_scent",
+      "smell:old_parchment_beyond_door"
     ],
     "senses": [
       "senses:awake",
@@ -424,360 +420,364 @@
     "spoken_words": []
   },
   "last_retina_glance": {
-    "source_path": "/data/dev/genome/world/ahmad/ahmad_01.jpg",
-    "width": 720,
-    "height": 915,
-    "mean_luminance": 0.44035167,
-    "contrast_std": 0.2529585,
-    "horizontal_edge_energy": 0.5253339,
-    "vertical_edge_energy": 0.5731311,
-    "diagonal_edge_energy": 0.3307752,
-    "center_surround_delta": 0.06760985,
-    "bilateral_symmetry": 0.6953671,
-    "dominant_hue_family": "warm_red_amber",
+    "source_path": "/data/dev/genome/world/camera/image_0002.jpg",
+    "width": 300,
+    "height": 178,
+    "mean_luminance": 0.68399173,
+    "contrast_std": 0.30399808,
+    "horizontal_edge_energy": 0.34149227,
+    "vertical_edge_energy": 0.6377543,
+    "diagonal_edge_energy": 0.28117034,
+    "center_surround_delta": -0.11055547,
+    "bilateral_symmetry": 0.7745031,
+    "dominant_hue_family": "achromatic_neutral",
     "fixation_windows": [
       [
-        25.0,
-        31.25,
-        25.0
-      ],
-      [
-        25.0,
         50.0,
+        37.5,
         25.0
       ],
       [
         31.25,
+        37.5,
+        25.0
+      ],
+      [
+        12.5,
         12.5,
         25.0
       ],
       [
-        50.0,
-        25.0,
+        18.75,
+        62.5,
         25.0
       ]
     ],
     "retina_grid_16x16": [
-      184,
-      182,
-      137,
-      109,
-      161,
-      76,
-      48,
-      107,
-      132,
-      111,
-      94,
-      89,
-      86,
-      72,
-      63,
-      55,
-      188,
-      185,
-      141,
-      106,
-      115,
-      97,
-      78,
-      24,
-      93,
-      77,
-      59,
-      47,
-      43,
-      41,
-      38,
-      37,
-      190,
-      186,
-      160,
-      105,
-      118,
-      188,
-      153,
-      96,
-      163,
-      135,
-      101,
-      75,
-      68,
-      56,
-      45,
-      37,
-      174,
-      170,
-      145,
-      103,
-      86,
-      155,
-      141,
-      106,
-      195,
-      161,
-      121,
-      98,
-      95,
-      86,
-      55,
-      57,
-      121,
-      137,
-      85,
-      41,
-      81,
-      168,
-      115,
-      76,
-      83,
-      165,
-      117,
-      62,
-      46,
-      60,
-      65,
-      70,
-      209,
-      196,
-      150,
-      202,
-      64,
-      180,
-      152,
-      129,
-      73,
-      95,
-      198,
-      160,
-      103,
-      132,
-      211,
-      147,
-      202,
-      143,
-      181,
-      185,
-      56,
-      176,
-      193,
-      158,
-      136,
-      101,
-      164,
-      136,
-      103,
-      194,
-      203,
-      147,
-      209,
-      225,
-      162,
-      128,
-      88,
-      172,
-      146,
-      162,
-      111,
-      105,
-      151,
-      105,
-      84,
-      107,
-      211,
-      142,
-      124,
-      133,
-      123,
-      179,
-      124,
-      162,
-      147,
-      121,
-      153,
-      107,
-      103,
-      65,
-      46,
-      50,
-      144,
-      129,
-      45,
-      37,
-      65,
-      181,
-      110,
-      158,
-      191,
-      131,
-      118,
-      113,
-      63,
-      91,
-      43,
-      96,
-      116,
-      80,
-      61,
-      77,
-      31,
-      59,
-      165,
-      139,
-      142,
-      147,
-      105,
-      77,
-      79,
-      73,
-      32,
-      94,
-      140,
-      84,
-      80,
-      37,
-      28,
-      28,
-      162,
-      176,
-      170,
-      135,
-      122,
-      75,
-      101,
-      110,
-      106,
-      103,
-      141,
-      72,
-      141,
-      117,
-      89,
-      65,
-      90,
-      127,
-      159,
-      81,
-      77,
-      68,
-      109,
-      120,
-      111,
-      98,
-      106,
-      38,
-      170,
-      136,
-      156,
-      127,
-      123,
-      55,
-      46,
-      85,
-      24,
-      89,
-      142,
-      128,
-      107,
-      69,
-      32,
-      20,
-      183,
-      174,
-      143,
-      150,
-      149,
-      63,
-      45,
-      128,
-      35,
-      88,
-      157,
-      109,
-      84,
-      96,
-      54,
-      45,
-      185,
-      171,
-      141,
-      140,
-      141,
-      89,
-      69,
       125,
-      52,
-      61,
-      116,
-      101,
+      80,
+      81,
+      84,
+      80,
+      81,
+      98,
+      111,
+      128,
+      148,
+      164,
+      188,
+      202,
+      216,
+      219,
+      219,
+      78,
+      137,
+      83,
+      79,
       86,
-      90,
-      54,
-      43
+      136,
+      105,
+      144,
+      137,
+      138,
+      145,
+      127,
+      172,
+      247,
+      255,
+      255,
+      186,
+      210,
+      208,
+      182,
+      173,
+      144,
+      154,
+      153,
+      155,
+      144,
+      139,
+      166,
+      117,
+      151,
+      255,
+      255,
+      220,
+      255,
+      204,
+      74,
+      156,
+      156,
+      163,
+      162,
+      129,
+      180,
+      145,
+      191,
+      103,
+      115,
+      255,
+      255,
+      220,
+      255,
+      155,
+      93,
+      142,
+      156,
+      117,
+      167,
+      91,
+      188,
+      163,
+      188,
+      108,
+      126,
+      255,
+      255,
+      220,
+      255,
+      154,
+      102,
+      160,
+      91,
+      105,
+      188,
+      100,
+      87,
+      186,
+      191,
+      97,
+      129,
+      255,
+      255,
+      220,
+      255,
+      152,
+      104,
+      181,
+      213,
+      240,
+      193,
+      154,
+      119,
+      169,
+      193,
+      112,
+      133,
+      255,
+      255,
+      220,
+      255,
+      149,
+      104,
+      183,
+      192,
+      211,
+      195,
+      116,
+      163,
+      152,
+      197,
+      116,
+      118,
+      255,
+      255,
+      220,
+      255,
+      146,
+      101,
+      187,
+      184,
+      167,
+      124,
+      1,
+      119,
+      160,
+      203,
+      123,
+      121,
+      255,
+      255,
+      220,
+      255,
+      147,
+      70,
+      187,
+      165,
+      172,
+      72,
+      1,
+      122,
+      169,
+      204,
+      126,
+      143,
+      255,
+      255,
+      220,
+      255,
+      148,
+      61,
+      190,
+      204,
+      142,
+      63,
+      1,
+      124,
+      188,
+      200,
+      125,
+      151,
+      255,
+      255,
+      220,
+      255,
+      141,
+      67,
+      194,
+      192,
+      180,
+      108,
+      33,
+      173,
+      196,
+      195,
+      124,
+      139,
+      255,
+      255,
+      220,
+      255,
+      140,
+      73,
+      197,
+      208,
+      179,
+      153,
+      166,
+      184,
+      214,
+      192,
+      122,
+      116,
+      254,
+      255,
+      220,
+      255,
+      141,
+      71,
+      203,
+      201,
+      184,
+      160,
+      168,
+      219,
+      219,
+      227,
+      160,
+      177,
+      255,
+      255,
+      220,
+      255,
+      142,
+      76,
+      206,
+      146,
+      194,
+      173,
+      209,
+      237,
+      237,
+      227,
+      223,
+      236,
+      255,
+      255,
+      219,
+      254,
+      177,
+      101,
+      216,
+      226,
+      219,
+      225,
+      233,
+      240,
+      254,
+      254,
+      254,
+      254,
+      254,
+      255
     ],
     "extracted_traits": [
-      "eyes:chroma_warm_red_amber",
-      "eyes:v1_multi_orientation_edges",
+      "eyes:chroma_achromatic_neutral",
+      "eyes:v1_vert_edges",
       "eyes:v1_high_contrast",
-      "eyes:aspect_portrait"
+      "eyes:v2_figure_ground_separation",
+      "eyes:aspect_landscape"
     ]
   },
   "last_cochlear_analysis": {
-    "source_path": "/data/dev/alpha7/assets/audio/voiced_guidance.wav",
+    "source_path": "/data/dev/alpha7/assets/audio/shutter_click.wav",
     "sample_rate": 16000,
-    "duration_ms": 250,
-    "rms_energy": 0.15258764,
-    "zero_crossing_rate": 0.02725,
-    "low_band_energy": 0.14842963,
-    "mid_band_energy": 0.012191956,
-    "high_band_energy": 0.0014137496,
+    "duration_ms": 120,
+    "rms_energy": 0.1695429,
+    "zero_crossing_rate": 0.17708333,
+    "low_band_energy": 0.13951968,
+    "mid_band_energy": 0.08558213,
+    "high_band_energy": 0.060184702,
     "waveform_envelope_32": [
+      100,
+      98,
+      97,
+      94,
+      92,
       90,
-      89,
-      87,
-      85,
-      83,
-      81,
+      88,
+      86,
+      84,
+      82,
       79,
       78,
-      76,
-      74,
-      72,
-      70,
+      75,
+      73,
+      71,
       68,
       66,
-      64,
       62,
+      61,
       59,
-      57,
       55,
-      52,
-      50,
-      48,
-      45,
-      42,
-      38,
+      53,
+      49,
+      47,
+      43,
+      40,
       36,
-      33,
+      32,
       29,
-      26,
-      21,
-      16,
-      9
+      23,
+      19,
+      12
     ],
     "extracted_traits": [
       "ears:cochlea_waveform_active",
-      "ears:cochlea_voiced_harmonic",
+      "ears:cochlea_high_zcr_sibilant",
       "ears:cochlea_strong_amplitude"
     ]
   },
   "world_width": 13,
   "world_height": 12,
-  "agent_x": 5,
-  "agent_y": 2,
-  "gaze_x": 5,
-  "gaze_y": 2,
-  "ascii_canvas": "┌──────────────────────────┐ (Agent '@' at 5,2 | Gaze '+' at 5,2)\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · c · · @ S · · · C · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · d · · · · · · · w · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n└──────────────────────────┘",
+  "agent_x": 6,
+  "agent_y": 5,
+  "gaze_x": 6,
+  "gaze_y": 5,
+  "held_item": "brass_key",
+  "door_unlocked": true,
+  "puzzle_solves_count": 1,
+  "ascii_canvas": "┌──────────────────────────┐ (Agent '@' at 6,5 | Gaze '+' at 6,5 | Held: Some(\"brass_key\") | DoorOpen: true)\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · c · · · S · · · C · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · @ · · · · · · │\n│· · k · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n│· · d · · · D · · · w · · │\n│· · · · · · · · · · · · · │\n│· · · · · · · · · · · · · │\n└──────────────────────────┘",
   "world_entities": [
     {
       "auditory_traits": [
@@ -893,20 +893,55 @@
       ],
       "x": 6,
       "y": 2
+    },
+    {
+      "auditory_traits": [
+        "faint_metallic_jingle"
+      ],
+      "concept_label": "key",
+      "id": "brass_key",
+      "olfactory_traits": [
+        "metallic_brass_scent"
+      ],
+      "symbol": "k",
+      "tactile_traits": [
+        "portable_key",
+        "serrated_brass"
+      ],
+      "visual_traits": [
+        "brass_key_teeth",
+        "golden_key_gleam",
+        "key_ring"
+      ],
+      "x": 2,
+      "y": 6
+    },
+    {
+      "auditory_traits": [],
+      "concept_label": "door",
+      "id": "vault_door",
+      "olfactory_traits": [
+        "old_parchment_beyond_door"
+      ],
+      "symbol": "D",
+      "tactile_traits": [
+        "cold_oak_door",
+        "keyhole_recess"
+      ],
+      "visual_traits": [
+        "heavy_vault_door",
+        "keyhole_slot",
+        "iron_bolt"
+      ],
+      "x": 6,
+      "y": 9
     }
   ],
   "last_action": "press_switch",
-  "last_predicted_outcomes": [
-    [
-      "eyes:light_on",
-      0.85
-    ]
-  ],
-  "last_actual_outcomes": [
-    "eyes:darkness_remains"
-  ],
-  "last_prediction_failed": true,
-  "last_analysis_report": "PREDICTION FAILURE ANALYZED: Expected [\"eyes:light_on\"] after action 'press_switch', but it failed to happen. Isolated contextual condition 'smell:power_unplugged' as the cause and learned new exception -> 'eyes:darkness_remains'.",
+  "last_predicted_outcomes": [],
+  "last_actual_outcomes": [],
+  "last_prediction_failed": false,
+  "last_analysis_report": "Alpha 7 online and grounded. Waiting for sensory transitions and user bridge commands.",
   "active_goal_target": "eyes:knowledge_gained",
   "goal_scenarios": [
     {
@@ -941,6 +976,25 @@
     },
     {
       "actions": [
+        "open_door",
+        "read_book"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "eyes:knowledge_gained"
+        ]
+      ],
+      "probability": 0.24083336,
+      "reaches_goal": true,
+      "rationale": "Goal 'eyes:knowledge_gained' reached in 2 step(s) via [\"open_door\", \"read_book\"] (confidence 0.24)"
+    },
+    {
+      "actions": [
         "press_switch",
         "press_switch",
         "read_book"
@@ -959,6 +1013,77 @@
       "probability": 0.614125,
       "reaches_goal": true,
       "rationale": "Goal 'eyes:knowledge_gained' reached in 3 step(s) via [\"press_switch\", \"press_switch\", \"read_book\"] (confidence 0.61)"
+    },
+    {
+      "actions": [
+        "open_door",
+        "press_switch",
+        "read_book"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "eyes:light_on"
+        ],
+        [
+          "eyes:knowledge_gained"
+        ]
+      ],
+      "probability": 0.3070625,
+      "reaches_goal": true,
+      "rationale": "Goal 'eyes:knowledge_gained' reached in 3 step(s) via [\"open_door\", \"press_switch\", \"read_book\"] (confidence 0.31)"
+    },
+    {
+      "actions": [
+        "press_switch",
+        "open_door",
+        "read_book"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "eyes:knowledge_gained"
+        ]
+      ],
+      "probability": 0.3070625,
+      "reaches_goal": true,
+      "rationale": "Goal 'eyes:knowledge_gained' reached in 3 step(s) via [\"press_switch\", \"open_door\", \"read_book\"] (confidence 0.31)"
+    },
+    {
+      "actions": [
+        "open_door",
+        "open_door",
+        "read_book"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "eyes:knowledge_gained"
+        ]
+      ],
+      "probability": 0.102354184,
+      "reaches_goal": true,
+      "rationale": "Goal 'eyes:knowledge_gained' reached in 3 step(s) via [\"open_door\", \"open_door\", \"read_book\"] (confidence 0.10)"
     },
     {
       "actions": [
@@ -1010,9 +1135,254 @@
       "probability": 0.614125,
       "reaches_goal": false,
       "rationale": "Explored path [\"press_switch\", \"press_switch\", \"press_switch\"] -> produces [\"eyes:light_on\"]"
+    },
+    {
+      "actions": [
+        "open_door"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ]
+      ],
+      "probability": 0.425,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"open_door\"] -> produces [\"ears:lock_unlatched\", \"eyes:golden_scroll_revealed\", \"eyes:vault_opened\"]"
+    },
+    {
+      "actions": [
+        "open_door",
+        "press_switch"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "eyes:light_on"
+        ]
+      ],
+      "probability": 0.36125,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"open_door\", \"press_switch\"] -> produces [\"eyes:light_on\"]"
+    },
+    {
+      "actions": [
+        "press_switch",
+        "open_door"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ]
+      ],
+      "probability": 0.36125,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"press_switch\", \"open_door\"] -> produces [\"ears:lock_unlatched\", \"eyes:golden_scroll_revealed\", \"eyes:vault_opened\"]"
+    },
+    {
+      "actions": [
+        "open_door",
+        "press_switch",
+        "press_switch"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "eyes:light_on"
+        ],
+        [
+          "eyes:light_on"
+        ]
+      ],
+      "probability": 0.3070625,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"open_door\", \"press_switch\", \"press_switch\"] -> produces [\"eyes:light_on\"]"
+    },
+    {
+      "actions": [
+        "press_switch",
+        "open_door",
+        "press_switch"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "eyes:light_on"
+        ]
+      ],
+      "probability": 0.3070625,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"press_switch\", \"open_door\", \"press_switch\"] -> produces [\"eyes:light_on\"]"
+    },
+    {
+      "actions": [
+        "press_switch",
+        "press_switch",
+        "open_door"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ],
+        [
+          "eyes:light_on"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ]
+      ],
+      "probability": 0.3070625,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"press_switch\", \"press_switch\", \"open_door\"] -> produces [\"ears:lock_unlatched\", \"eyes:golden_scroll_revealed\", \"eyes:vault_opened\"]"
+    },
+    {
+      "actions": [
+        "open_door",
+        "open_door"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ]
+      ],
+      "probability": 0.180625,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"open_door\", \"open_door\"] -> produces [\"ears:lock_unlatched\", \"eyes:golden_scroll_revealed\", \"eyes:vault_opened\"]"
+    },
+    {
+      "actions": [
+        "open_door",
+        "open_door",
+        "press_switch"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "eyes:light_on"
+        ]
+      ],
+      "probability": 0.15353125,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"open_door\", \"open_door\", \"press_switch\"] -> produces [\"eyes:light_on\"]"
+    },
+    {
+      "actions": [
+        "open_door",
+        "press_switch",
+        "open_door"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "eyes:light_on"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ]
+      ],
+      "probability": 0.15353125,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"open_door\", \"press_switch\", \"open_door\"] -> produces [\"ears:lock_unlatched\", \"eyes:golden_scroll_revealed\", \"eyes:vault_opened\"]"
+    },
+    {
+      "actions": [
+        "press_switch",
+        "open_door",
+        "open_door"
+      ],
+      "predicted_trajectory": [
+        [
+          "eyes:light_on"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ]
+      ],
+      "probability": 0.15353125,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"press_switch\", \"open_door\", \"open_door\"] -> produces [\"ears:lock_unlatched\", \"eyes:golden_scroll_revealed\", \"eyes:vault_opened\"]"
+    },
+    {
+      "actions": [
+        "open_door",
+        "open_door",
+        "open_door"
+      ],
+      "predicted_trajectory": [
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ],
+        [
+          "ears:lock_unlatched",
+          "eyes:golden_scroll_revealed",
+          "eyes:vault_opened"
+        ]
+      ],
+      "probability": 0.07676563,
+      "reaches_goal": false,
+      "rationale": "Explored path [\"open_door\", \"open_door\", \"open_door\"] -> produces [\"ears:lock_unlatched\", \"eyes:golden_scroll_revealed\", \"eyes:vault_opened\"]"
     }
   ],
-  "causal_rules_count": 3,
+  "causal_rules_count": 5,
   "causal_rules_preview": [
     {
       "rule_id": 1,
@@ -1061,9 +1431,9 @@
       "predicted_outcomes": {
         "eyes:printed_71": 0.84999996,
         "eyes:printed_72": 0.84999996,
-        "eyes:result_71": 0.84999996,
-        "eyes:printed_42": 0.0,
         "eyes:printed_15": 1.0,
+        "eyes:printed_42": 0.0,
+        "eyes:result_71": 0.84999996,
         "eyes:result_42": 0.0,
         "eyes:result_72": 0.84999996,
         "eyes:result_15": 1.0,
@@ -1071,11 +1441,65 @@
       },
       "learned_exceptions": {
         "senses:user_bond_active": "eyes:printed_72",
-        "eyes:syntax_typo": "eyes:syntax_error",
-        "eyes:has_subtraction": "eyes:code_ran_cleanly"
+        "eyes:has_subtraction": "eyes:code_ran_cleanly",
+        "eyes:syntax_typo": "eyes:syntax_error"
       },
       "successes": 5,
       "failures": 6
+    },
+    {
+      "rule_id": 4,
+      "trigger_traits": [
+        "eyes:vault_door_visible",
+        "eyes:keyhole_slot",
+        "hands:holding_brass_key",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action": "open_door",
+      "predicted_outcomes": {
+        "ears:lock_unlatched": 0.85,
+        "eyes:golden_scroll_revealed": 0.85,
+        "eyes:vault_opened": 0.85
+      },
+      "learned_exceptions": {
+        "eyes:small_agile_silhouette": "eyes:door_unlocked_open"
+      },
+      "successes": 1,
+      "failures": 2
+    },
+    {
+      "rule_id": 5,
+      "trigger_traits": [
+        "eyes:small_agile_silhouette",
+        "eyes:medium_quadruped_silhouette",
+        "eyes:brass_key_teeth",
+        "eyes:golden_key_gleam",
+        "eyes:key_ring",
+        "ears:purr",
+        "ears:meow",
+        "ears:bark",
+        "ears:panting",
+        "ears:faint_metallic_jingle",
+        "ears:heard_key",
+        "hands:portable_key",
+        "hands:serrated_brass",
+        "smell:feline_scent",
+        "smell:canine_scent",
+        "smell:metallic_brass_scent",
+        "senses:awake",
+        "senses:calm_predictive_flow",
+        "senses:user_bond_active"
+      ],
+      "action": "pickup_key",
+      "predicted_outcomes": {
+        "hands:holding_brass_key": 0.85,
+        "ears:key_chime": 0.85
+      },
+      "learned_exceptions": {},
+      "successes": 1,
+      "failures": 0
     }
   ],
   "synthesized_programs": [
@@ -1173,7 +1597,7 @@
       "summary": "Synthesized & verified code for goal 'eyes:result_42' (2 candidates tested): `a = 2; b = 21; result = a * b; print(result)` -> [\"eyes:code_ran_cleanly\", \"eyes:printed_42\", \"eyes:result_42\"]. Initial draft `a = 42; b = 1; result = a - b; print(result)` produced [\"eyes:code_ran_cleanly\", \"eyes:printed_41\", \"eyes:result_41\"] instead of target `eyes:result_42`; diagnosed operator mismatch and synthesized corrected program."
     }
   ],
-  "concepts_count": 19,
+  "concepts_count": 41,
   "concepts": [
     {
       "categories": [],
@@ -1187,13 +1611,13 @@
         "eyes:creator_presence",
         "hands:handshake_warmth",
         "ears:spoken_guidance",
-        "hands:direct_user_bond",
         "eyes:v1_multi_orientation_edges",
         "eyes:bipedal_posture",
+        "hands:direct_user_bond",
         "eyes:human_face",
         "eyes:aspect_portrait",
-        "smell:ahmad_signature",
         "eyes:warm_gaze",
+        "smell:ahmad_signature",
         "eyes:v1_high_contrast",
         "ears:friendly_voice"
       ],
@@ -1206,8 +1630,8 @@
       "variable_traits": [
         "eyes:v2_figure_ground_separation",
         "eyes:chroma_natural_green",
-        "eyes:v2_bilateral_symmetry",
         "eyes:instance_view_2",
+        "eyes:v2_bilateral_symmetry",
         "eyes:instance_view_1",
         "eyes:chroma_warm_red_amber"
       ]
@@ -1226,8 +1650,8 @@
         "eyes:iron_shank",
         "eyes:symmetric_arms",
         "eyes:v1_soft_contrast",
-        "hands:heavy_mass",
         "eyes:aspect_landscape",
+        "hands:heavy_mass",
         "eyes:curved_crown",
         "ears:metallic_clank",
         "hands:cold_iron",
@@ -1258,8 +1682,8 @@
       "core_invariants": [
         "eyes:six_legs",
         "ears:faint_scurry",
-        "eyes:segmented_thorax",
         "eyes:chroma_achromatic_neutral",
+        "eyes:segmented_thorax",
         "eyes:v2_figure_ground_separation",
         "hands:tiny_chitin",
         "eyes:antennae",
@@ -1285,6 +1709,38 @@
     },
     {
       "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:rgb_20_20_20",
+        "ears:black",
+        "eyes:visual_colour_swatch"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "black"
+      ],
+      "name": "black",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:visual_colour_swatch",
+        "eyes:rgb_50_90_210",
+        "ears:blue"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "blue"
+      ],
+      "name": "blue",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
       "causal_affordances": [
         [
           "inspect_bonsai",
@@ -1295,15 +1751,15 @@
         "eyes:woody_trunk",
         "eyes:green_foliage",
         "eyes:v2_figure_ground_separation",
-        "eyes:v1_horiz_edges",
         "eyes:aspect_square",
+        "eyes:v1_horiz_edges",
         "hands:delicate_leaves",
         "smell:bonsai_signature",
         "eyes:branching_canopy",
         "eyes:ceramic_pot",
         "hands:rough_bark",
-        "eyes:v1_high_contrast",
-        "ears:leaf_rustle"
+        "ears:leaf_rustle",
+        "eyes:v1_high_contrast"
       ],
       "exposures": 2,
       "familiarity": 0.9342538118362427,
@@ -1321,6 +1777,22 @@
     },
     {
       "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "ears:brown",
+        "eyes:rgb_140_90_50",
+        "eyes:visual_colour_swatch"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "brown"
+      ],
+      "name": "brown",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
       "causal_affordances": [
         [
           "inspect_camera",
@@ -1329,8 +1801,8 @@
       ],
       "core_invariants": [
         "hands:grip_texture",
-        "eyes:rectangular_body",
         "eyes:chroma_achromatic_neutral",
+        "eyes:rectangular_body",
         "eyes:v2_figure_ground_separation",
         "hands:press_shutter",
         "eyes:shutter_button",
@@ -1351,8 +1823,8 @@
         "eyes:aspect_landscape",
         "eyes:instance_view_2",
         "eyes:instance_view_1",
-        "eyes:v1_horiz_edges",
         "eyes:aspect_square",
+        "eyes:v1_horiz_edges",
         "eyes:v2_bilateral_symmetry"
       ]
     },
@@ -1391,6 +1863,22 @@
     },
     {
       "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "ears:circle",
+        "eyes:contour_circle",
+        "eyes:geometric_shape"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "circle"
+      ],
+      "name": "circle",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
       "causal_affordances": [
         [
           "count_units",
@@ -1414,6 +1902,38 @@
         "eyes:k_page_sample_2",
         "eyes:k_page_sample_1"
       ]
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:geometric_shape",
+        "eyes:contour_cross",
+        "ears:cross"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "cross"
+      ],
+      "name": "cross",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:geometric_shape",
+        "ears:diamond",
+        "eyes:contour_diamond"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "diamond"
+      ],
+      "name": "diamond",
+      "variable_traits": []
     },
     {
       "categories": [
@@ -1446,6 +1966,103 @@
         "eyes:brown_fur",
         "ears:panting"
       ]
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:contour_ellipse",
+        "ears:ellipse",
+        "eyes:geometric_shape"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "ellipse"
+      ],
+      "name": "ellipse",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:visual_colour_swatch",
+        "ears:green",
+        "eyes:rgb_50_170_70"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "green"
+      ],
+      "name": "green",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:visual_colour_swatch",
+        "ears:grey",
+        "eyes:rgb_130_130_130"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "grey"
+      ],
+      "name": "grey",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:geometric_shape",
+        "ears:hexagon",
+        "eyes:contour_hexagon"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "hexagon"
+      ],
+      "name": "hexagon",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [
+        [
+          "pickup_key",
+          "hands:holding_brass_key"
+        ]
+      ],
+      "core_invariants": [
+        "ears:bark",
+        "eyes:brass_key_teeth",
+        "eyes:medium_quadruped_silhouette",
+        "ears:panting",
+        "eyes:small_agile_silhouette",
+        "hands:portable_key",
+        "smell:feline_scent",
+        "ears:meow",
+        "smell:metallic_brass_scent",
+        "smell:canine_scent",
+        "eyes:golden_key_gleam",
+        "ears:purr",
+        "eyes:key_ring",
+        "hands:serrated_brass",
+        "ears:faint_metallic_jingle"
+      ],
+      "exposures": 1,
+      "familiarity": 0.8334027528762817,
+      "grounded_words": [
+        "key"
+      ],
+      "name": "key",
+      "variable_traits": []
     },
     {
       "categories": [],
@@ -1495,6 +2112,102 @@
         "multiply_code"
       ],
       "name": "multiply_code",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:visual_colour_swatch",
+        "ears:orange",
+        "eyes:rgb_240_140_30"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "orange"
+      ],
+      "name": "orange",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:geometric_shape",
+        "eyes:contour_pentagon",
+        "ears:pentagon"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "pentagon"
+      ],
+      "name": "pentagon",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:rgb_240_130_180",
+        "eyes:visual_colour_swatch",
+        "ears:pink"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "pink"
+      ],
+      "name": "pink",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:visual_colour_swatch",
+        "eyes:rgb_140_60_190",
+        "ears:purple"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "purple"
+      ],
+      "name": "purple",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:geometric_shape",
+        "eyes:contour_rectangle",
+        "ears:rectangle"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "rectangle"
+      ],
+      "name": "rectangle",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "ears:red",
+        "eyes:visual_colour_swatch",
+        "eyes:rgb_220_40_40"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "red"
+      ],
+      "name": "red",
       "variable_traits": []
     },
     {
@@ -1562,9 +2275,9 @@
         ]
       ],
       "core_invariants": [
-        "eyes:shape_geometry_circle",
-        "eyes:code_program",
         "eyes:canvas_primitive_circle",
+        "eyes:code_program",
+        "eyes:shape_geometry_circle",
         "hands:writes_canvas_pixels"
       ],
       "exposures": 2,
@@ -1616,8 +2329,8 @@
         ]
       ],
       "core_invariants": [
-        "eyes:code_program",
         "eyes:canvas_primitive_cup",
+        "eyes:code_program",
         "eyes:shape_geometry_cup",
         "hands:writes_canvas_pixels"
       ],
@@ -1641,14 +2354,14 @@
         ]
       ],
       "core_invariants": [
-        "ears:spoken_spatial_scene",
+        "eyes:depth_ordering",
+        "eyes:v2_bilateral_symmetry",
         "eyes:foreground_object",
         "hands:saccade_scan",
         "eyes:chroma_cool_blue_cyan",
         "eyes:v1_soft_contrast",
-        "eyes:v2_bilateral_symmetry",
+        "ears:spoken_spatial_scene",
         "eyes:aspect_square",
-        "eyes:depth_ordering",
         "eyes:background_context"
       ],
       "exposures": 2,
@@ -1658,11 +2371,43 @@
       ],
       "name": "spatial_scene",
       "variable_traits": [
-        "eyes:v1_horiz_edges",
         "eyes:k_page_sample_2",
+        "eyes:v1_horiz_edges",
         "eyes:k_page_sample_1",
         "eyes:v1_multi_orientation_edges"
       ]
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "ears:square",
+        "eyes:contour_square",
+        "eyes:geometric_shape"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "square"
+      ],
+      "name": "square",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "ears:star",
+        "eyes:geometric_shape",
+        "eyes:contour_star"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "star"
+      ],
+      "name": "star",
+      "variable_traits": []
     },
     {
       "categories": [
@@ -1735,6 +2480,54 @@
       ],
       "name": "synth_code_72",
       "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "ears:triangle",
+        "eyes:contour_triangle",
+        "eyes:geometric_shape"
+      ],
+      "exposures": 4,
+      "familiarity": 0.9783737063407898,
+      "grounded_words": [
+        "triangle"
+      ],
+      "name": "triangle",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:visual_colour_swatch",
+        "eyes:rgb_245_245_245",
+        "ears:white"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "white"
+      ],
+      "name": "white",
+      "variable_traits": []
+    },
+    {
+      "categories": [],
+      "causal_affordances": [],
+      "core_invariants": [
+        "eyes:visual_colour_swatch",
+        "ears:yellow",
+        "eyes:rgb_245_215_50"
+      ],
+      "exposures": 2,
+      "familiarity": 0.9342538118362427,
+      "grounded_words": [
+        "yellow"
+      ],
+      "name": "yellow",
+      "variable_traits": []
     }
   ],
   "concept_relations": [
@@ -1769,12 +2562,174 @@
       0.15
     ],
     [
+      "black",
+      "shares_core_with",
+      "blue",
+      0.2
+    ],
+    [
+      "black",
+      "shares_core_with",
+      "brown",
+      0.2
+    ],
+    [
+      "black",
+      "shares_core_with",
+      "green",
+      0.2
+    ],
+    [
+      "black",
+      "shares_core_with",
+      "grey",
+      0.2
+    ],
+    [
+      "black",
+      "shares_core_with",
+      "orange",
+      0.2
+    ],
+    [
+      "black",
+      "shares_core_with",
+      "pink",
+      0.2
+    ],
+    [
+      "black",
+      "shares_core_with",
+      "purple",
+      0.2
+    ],
+    [
+      "black",
+      "shares_core_with",
+      "red",
+      0.2
+    ],
+    [
+      "black",
+      "shares_core_with",
+      "white",
+      0.2
+    ],
+    [
+      "black",
+      "shares_core_with",
+      "yellow",
+      0.2
+    ],
+    [
+      "blue",
+      "shares_core_with",
+      "brown",
+      0.2
+    ],
+    [
+      "blue",
+      "shares_core_with",
+      "green",
+      0.2
+    ],
+    [
+      "blue",
+      "shares_core_with",
+      "grey",
+      0.2
+    ],
+    [
+      "blue",
+      "shares_core_with",
+      "orange",
+      0.2
+    ],
+    [
+      "blue",
+      "shares_core_with",
+      "pink",
+      0.2
+    ],
+    [
+      "blue",
+      "shares_core_with",
+      "purple",
+      0.2
+    ],
+    [
+      "blue",
+      "shares_core_with",
+      "red",
+      0.2
+    ],
+    [
+      "blue",
+      "shares_core_with",
+      "white",
+      0.2
+    ],
+    [
+      "blue",
+      "shares_core_with",
+      "yellow",
+      0.2
+    ],
+    [
       "bonsai",
       "shares_core_with",
       "camera",
       0.15
     ],
     [
+      "brown",
+      "shares_core_with",
+      "green",
+      0.2
+    ],
+    [
+      "brown",
+      "shares_core_with",
+      "grey",
+      0.2
+    ],
+    [
+      "brown",
+      "shares_core_with",
+      "orange",
+      0.2
+    ],
+    [
+      "brown",
+      "shares_core_with",
+      "pink",
+      0.2
+    ],
+    [
+      "brown",
+      "shares_core_with",
+      "purple",
+      0.2
+    ],
+    [
+      "brown",
+      "shares_core_with",
+      "red",
+      0.2
+    ],
+    [
+      "brown",
+      "shares_core_with",
+      "white",
+      0.2
+    ],
+    [
+      "brown",
+      "shares_core_with",
+      "yellow",
+      0.2
+    ],
+    [
       "cat",
       "shares_core_with",
       "dog",
@@ -1793,6 +2748,306 @@
       0.92
     ],
     [
+      "cat",
+      "shares_core_with",
+      "key",
+      0.15
+    ],
+    [
+      "circle",
+      "shares_core_with",
+      "cross",
+      0.2
+    ],
+    [
+      "circle",
+      "shares_core_with",
+      "diamond",
+      0.2
+    ],
+    [
+      "circle",
+      "shares_core_with",
+      "ellipse",
+      0.2
+    ],
+    [
+      "circle",
+      "shares_core_with",
+      "hexagon",
+      0.2
+    ],
+    [
+      "circle",
+      "shares_core_with",
+      "pentagon",
+      0.2
+    ],
+    [
+      "circle",
+      "shares_core_with",
+      "rectangle",
+      0.2
+    ],
+    [
+      "circle",
+      "shares_core_with",
+      "square",
+      0.2
+    ],
+    [
+      "circle",
+      "shares_core_with",
+      "star",
+      0.2
+    ],
+    [
+      "circle",
+      "shares_core_with",
+      "triangle",
+      0.2
+    ],
+    [
+      "cross",
+      "shares_core_with",
+      "diamond",
+      0.2
+    ],
+    [
+      "cross",
+      "shares_core_with",
+      "ellipse",
+      0.2
+    ],
+    [
+      "cross",
+      "shares_core_with",
+      "hexagon",
+      0.2
+    ],
+    [
+      "cross",
+      "shares_core_with",
+      "pentagon",
+      0.2
+    ],
+    [
+      "cross",
+      "shares_core_with",
+      "rectangle",
+      0.2
+    ],
+    [
+      "cross",
+      "shares_core_with",
+      "square",
+      0.2
+    ],
+    [
+      "cross",
+      "shares_core_with",
+      "star",
+      0.2
+    ],
+    [
+      "cross",
+      "shares_core_with",
+      "triangle",
+      0.2
+    ],
+    [
+      "diamond",
+      "shares_core_with",
+      "ellipse",
+      0.2
+    ],
+    [
+      "diamond",
+      "shares_core_with",
+      "hexagon",
+      0.2
+    ],
+    [
+      "diamond",
+      "shares_core_with",
+      "pentagon",
+      0.2
+    ],
+    [
+      "diamond",
+      "shares_core_with",
+      "rectangle",
+      0.2
+    ],
+    [
+      "diamond",
+      "shares_core_with",
+      "square",
+      0.2
+    ],
+    [
+      "diamond",
+      "shares_core_with",
+      "star",
+      0.2
+    ],
+    [
+      "diamond",
+      "shares_core_with",
+      "triangle",
+      0.2
+    ],
+    [
+      "dog",
+      "shares_core_with",
+      "key",
+      0.15
+    ],
+    [
+      "ellipse",
+      "shares_core_with",
+      "hexagon",
+      0.2
+    ],
+    [
+      "ellipse",
+      "shares_core_with",
+      "pentagon",
+      0.2
+    ],
+    [
+      "ellipse",
+      "shares_core_with",
+      "rectangle",
+      0.2
+    ],
+    [
+      "ellipse",
+      "shares_core_with",
+      "square",
+      0.2
+    ],
+    [
+      "ellipse",
+      "shares_core_with",
+      "star",
+      0.2
+    ],
+    [
+      "ellipse",
+      "shares_core_with",
+      "triangle",
+      0.2
+    ],
+    [
+      "green",
+      "shares_core_with",
+      "grey",
+      0.2
+    ],
+    [
+      "green",
+      "shares_core_with",
+      "orange",
+      0.2
+    ],
+    [
+      "green",
+      "shares_core_with",
+      "pink",
+      0.2
+    ],
+    [
+      "green",
+      "shares_core_with",
+      "purple",
+      0.2
+    ],
+    [
+      "green",
+      "shares_core_with",
+      "red",
+      0.2
+    ],
+    [
+      "green",
+      "shares_core_with",
+      "white",
+      0.2
+    ],
+    [
+      "green",
+      "shares_core_with",
+      "yellow",
+      0.2
+    ],
+    [
+      "grey",
+      "shares_core_with",
+      "orange",
+      0.2
+    ],
+    [
+      "grey",
+      "shares_core_with",
+      "pink",
+      0.2
+    ],
+    [
+      "grey",
+      "shares_core_with",
+      "purple",
+      0.2
+    ],
+    [
+      "grey",
+      "shares_core_with",
+      "red",
+      0.2
+    ],
+    [
+      "grey",
+      "shares_core_with",
+      "white",
+      0.2
+    ],
+    [
+      "grey",
+      "shares_core_with",
+      "yellow",
+      0.2
+    ],
+    [
+      "hexagon",
+      "shares_core_with",
+      "pentagon",
+      0.2
+    ],
+    [
+      "hexagon",
+      "shares_core_with",
+      "rectangle",
+      0.2
+    ],
+    [
+      "hexagon",
+      "shares_core_with",
+      "square",
+      0.2
+    ],
+    [
+      "hexagon",
+      "shares_core_with",
+      "star",
+      0.2
+    ],
+    [
+      "hexagon",
+      "shares_core_with",
+      "triangle",
+      0.2
+    ],
+    [
       "multiply_code",
       "shares_core_with",
       "synth_code_15",
@@ -1835,6 +3090,132 @@
       0.9
     ],
     [
+      "orange",
+      "shares_core_with",
+      "pink",
+      0.2
+    ],
+    [
+      "orange",
+      "shares_core_with",
+      "purple",
+      0.2
+    ],
+    [
+      "orange",
+      "shares_core_with",
+      "red",
+      0.2
+    ],
+    [
+      "orange",
+      "shares_core_with",
+      "white",
+      0.2
+    ],
+    [
+      "orange",
+      "shares_core_with",
+      "yellow",
+      0.2
+    ],
+    [
+      "pentagon",
+      "shares_core_with",
+      "rectangle",
+      0.2
+    ],
+    [
+      "pentagon",
+      "shares_core_with",
+      "square",
+      0.2
+    ],
+    [
+      "pentagon",
+      "shares_core_with",
+      "star",
+      0.2
+    ],
+    [
+      "pentagon",
+      "shares_core_with",
+      "triangle",
+      0.2
+    ],
+    [
+      "pink",
+      "shares_core_with",
+      "purple",
+      0.2
+    ],
+    [
+      "pink",
+      "shares_core_with",
+      "red",
+      0.2
+    ],
+    [
+      "pink",
+      "shares_core_with",
+      "white",
+      0.2
+    ],
+    [
+      "pink",
+      "shares_core_with",
+      "yellow",
+      0.2
+    ],
+    [
+      "purple",
+      "shares_core_with",
+      "red",
+      0.2
+    ],
+    [
+      "purple",
+      "shares_core_with",
+      "white",
+      0.2
+    ],
+    [
+      "purple",
+      "shares_core_with",
+      "yellow",
+      0.2
+    ],
+    [
+      "rectangle",
+      "shares_core_with",
+      "square",
+      0.2
+    ],
+    [
+      "rectangle",
+      "shares_core_with",
+      "star",
+      0.2
+    ],
+    [
+      "rectangle",
+      "shares_core_with",
+      "triangle",
+      0.2
+    ],
+    [
+      "red",
+      "shares_core_with",
+      "white",
+      0.2
+    ],
+    [
+      "red",
+      "shares_core_with",
+      "yellow",
+      0.2
+    ],
+    [
       "shape_arrow",
       "shares_core_with",
       "shape_bar",
@@ -1923,6 +3304,24 @@
       "shares_core_with",
       "shape_cup",
       0.33333334
+    ],
+    [
+      "square",
+      "shares_core_with",
+      "star",
+      0.2
+    ],
+    [
+      "square",
+      "shares_core_with",
+      "triangle",
+      0.2
+    ],
+    [
+      "star",
+      "shares_core_with",
+      "triangle",
+      0.2
     ],
     [
       "synth_code_15",
@@ -1941,722 +3340,552 @@
       "shares_core_with",
       "synth_code_72",
       1.0
+    ],
+    [
+      "white",
+      "shares_core_with",
+      "yellow",
+      0.2
     ]
   ],
-  "sleep_cycles_completed": 75,
+  "sleep_cycles_completed": 384,
   "last_sleep_report": {
-    "cycle_number": 75,
+    "cycle_number": 384,
     "episodes_replayed": 8,
-    "synapses_reinforced": 226,
-    "weak_synapses_pruned": 1624,
-    "relations_discovered": 34,
-    "summary": "Sleep Consolidation Cycle #75: replayed 8 episodic traces, reinforced 226 core invariant synapses, pruned 1624 weak synapses, and consolidated 34 conceptual relations."
+    "synapses_reinforced": 352,
+    "weak_synapses_pruned": 1368,
+    "relations_discovered": 136,
+    "summary": "Sleep Consolidation Cycle #384: replayed 8 episodic traces, reinforced 352 core invariant synapses, pruned 1368 weak synapses, and consolidated 136 conceptual relations."
   },
-  "curriculum_index": 5,
+  "curriculum_index": 17,
   "curriculum_total": 30,
   "recent_episodes": [
     {
-      "episode_id": 46,
-      "tick": 1923,
-      "partner": "user",
-      "summary": "Interacted with 'user' on concept 'synth_code_72' (exposure #1, familiarity 0.83)",
+      "episode_id": 113,
+      "tick": 9452,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'circle' (exposure #4, familiarity 0.98)",
       "active_concepts": [
-        "synth_code_72"
+        "circle"
       ],
       "observed_traits": [
-        "eyes:code_block",
-        "eyes:valid_syntax",
-        "eyes:calls_print",
-        "eyes:has_multiplication",
+        "eyes:contour_circle",
+        "eyes:geometric_shape",
+        "ears:circle",
+        "ears:heard_circle",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "run_code",
-      "outcome_traits": [
-        "eyes:code_ran_cleanly"
-      ],
-      "surprise_score": 1.0
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.6216216
     },
     {
-      "episode_id": 45,
-      "tick": 1921,
-      "partner": "user",
-      "summary": "PREDICTION CONFIRMED: Action 'run_code' produced expected outcome [\"eyes:code_ran_cleanly\", \"eyes:printed_72\", \"eyes:result_72\"] (reliability 5/11).",
+      "episode_id": 112,
+      "tick": 9451,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'cross' (exposure #4, familiarity 0.98)",
       "active_concepts": [
-        "run_code"
+        "cross"
       ],
       "observed_traits": [
-        "eyes:code_block",
-        "eyes:valid_syntax",
-        "eyes:calls_print",
-        "eyes:has_multiplication",
+        "eyes:contour_cross",
+        "eyes:geometric_shape",
+        "ears:cross",
+        "ears:heard_cross",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "run_code",
-      "outcome_traits": [
-        "eyes:code_ran_cleanly",
-        "eyes:printed_72",
-        "eyes:result_72"
-      ],
-      "surprise_score": 0.89285713
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.5625
     },
     {
-      "episode_id": 44,
-      "tick": 1920,
-      "partner": "user",
-      "summary": "PREDICTION FAILURE ANALYZED: Expected [\"eyes:result_15\", \"eyes:printed_15\", \"eyes:printed_71\", \"eyes:result_71\"] after action 'run_code', but it failed to happen. Isolated contextual condition 'senses:user_bond_active' as the cause and learned new exception -> 'eyes:printed_72'.",
+      "episode_id": 111,
+      "tick": 9450,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'diamond' (exposure #4, familiarity 0.98)",
       "active_concepts": [
-        "run_code"
+        "diamond"
       ],
       "observed_traits": [
-        "eyes:code_block",
-        "eyes:valid_syntax",
-        "eyes:calls_print",
-        "eyes:has_multiplication",
+        "eyes:contour_diamond",
+        "eyes:geometric_shape",
+        "ears:diamond",
+        "ears:heard_diamond",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "run_code",
-      "outcome_traits": [
-        "eyes:code_ran_cleanly",
-        "eyes:printed_72",
-        "eyes:result_72"
-      ],
-      "surprise_score": 0.96666664
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.7105263
     },
     {
-      "episode_id": 43,
-      "tick": 1919,
-      "partner": "user",
-      "summary": "PREDICTION CONFIRMED: Action 'run_code' produced expected outcome [\"eyes:code_ran_cleanly\", \"eyes:printed_71\", \"eyes:result_71\"] (reliability 4/9).",
+      "episode_id": 110,
+      "tick": 9449,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'grey' (exposure #2, familiarity 0.93)",
       "active_concepts": [
-        "run_code"
+        "grey"
       ],
       "observed_traits": [
-        "eyes:code_block",
-        "eyes:valid_syntax",
-        "eyes:calls_print",
-        "eyes:has_subtraction",
+        "eyes:rgb_130_130_130",
+        "eyes:visual_colour_swatch",
+        "ears:grey",
+        "ears:heard_grey",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "run_code",
-      "outcome_traits": [
-        "eyes:code_ran_cleanly",
-        "eyes:printed_71",
-        "eyes:result_71"
-      ],
-      "surprise_score": 0.75
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.8965517
     },
     {
-      "episode_id": 42,
-      "tick": 61,
-      "partner": "alpha3_library_K",
-      "summary": "Interacted with 'alpha3_library_K' on concept 'spatial_scene' (exposure #2, familiarity 0.93)",
+      "episode_id": 109,
+      "tick": 9448,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'rectangle' (exposure #4, familiarity 0.98)",
       "active_concepts": [
-        "spatial_scene"
+        "rectangle"
       ],
       "observed_traits": [
-        "eyes:foreground_object",
-        "eyes:background_context",
-        "eyes:depth_ordering",
-        "eyes:chroma_cool_blue_cyan",
-        "eyes:v1_horiz_edges",
-        "eyes:v1_soft_contrast",
-        "eyes:v2_bilateral_symmetry",
-        "eyes:aspect_square",
-        "eyes:k_page_sample_2",
-        "ears:spoken_spatial_scene",
-        "ears:heard_spatial_scene",
-        "hands:saccade_scan",
+        "eyes:contour_rectangle",
+        "eyes:geometric_shape",
+        "ears:rectangle",
+        "ears:heard_rectangle",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "saccade_scan",
-      "outcome_traits": [
-        "eyes:scene_mapped"
-      ],
-      "surprise_score": 0.7164179
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.26086956
     },
     {
-      "episode_id": 41,
-      "tick": 60,
-      "partner": "alpha3_library_K",
-      "summary": "Interacted with 'alpha3_library_K' on concept 'spatial_scene' (exposure #1, familiarity 0.83)",
+      "episode_id": 108,
+      "tick": 9447,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'rectangle' (exposure #3, familiarity 0.97)",
       "active_concepts": [
-        "spatial_scene"
+        "rectangle"
       ],
       "observed_traits": [
-        "eyes:foreground_object",
-        "eyes:background_context",
-        "eyes:depth_ordering",
-        "eyes:chroma_cool_blue_cyan",
-        "eyes:v1_multi_orientation_edges",
-        "eyes:v1_soft_contrast",
-        "eyes:v2_bilateral_symmetry",
-        "eyes:aspect_square",
-        "eyes:k_page_sample_1",
-        "ears:spoken_spatial_scene",
-        "ears:heard_spatial_scene",
-        "hands:saccade_scan",
+        "eyes:contour_rectangle",
+        "eyes:geometric_shape",
+        "ears:rectangle",
+        "ears:heard_rectangle",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "saccade_scan",
-      "outcome_traits": [
-        "eyes:scene_mapped"
-      ],
-      "surprise_score": 0.8888889
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.65
     },
     {
-      "episode_id": 40,
-      "tick": 59,
-      "partner": "alpha3_library_K",
-      "summary": "Interacted with 'alpha3_library_K' on concept 'letter_glyph' (exposure #2, familiarity 0.93)",
+      "episode_id": 107,
+      "tick": 9446,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'diamond' (exposure #3, familiarity 0.97)",
       "active_concepts": [
-        "letter_glyph"
+        "diamond"
       ],
       "observed_traits": [
-        "eyes:stroke_contour",
-        "eyes:phonetic_symbol",
-        "eyes:visual_character",
-        "eyes:k_page_sample_2",
-        "ears:spoken_letter_glyph",
-        "ears:heard_letter_glyph",
-        "hands:trace_stroke",
+        "eyes:contour_diamond",
+        "eyes:geometric_shape",
+        "ears:diamond",
+        "ears:heard_diamond",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "trace_stroke",
-      "outcome_traits": [
-        "ears:phoneme_sounded"
-      ],
-      "surprise_score": 0.42105263
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.6458333
     },
     {
-      "episode_id": 39,
-      "tick": 58,
-      "partner": "alpha3_library_K",
-      "summary": "Interacted with 'alpha3_library_K' on concept 'letter_glyph' (exposure #1, familiarity 0.83)",
+      "episode_id": 106,
+      "tick": 9445,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'green' (exposure #2, familiarity 0.93)",
       "active_concepts": [
-        "letter_glyph"
+        "green"
       ],
       "observed_traits": [
-        "eyes:stroke_contour",
-        "eyes:phonetic_symbol",
-        "eyes:visual_character",
-        "eyes:k_page_sample_1",
-        "ears:spoken_letter_glyph",
-        "ears:heard_letter_glyph",
-        "hands:trace_stroke",
+        "eyes:rgb_50_170_70",
+        "eyes:visual_colour_swatch",
+        "ears:green",
+        "ears:heard_green",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "trace_stroke",
-      "outcome_traits": [
-        "ears:phoneme_sounded"
-      ],
-      "surprise_score": 0.8
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.90909094
     },
     {
-      "episode_id": 38,
-      "tick": 57,
-      "partner": "alpha3_library_K",
-      "summary": "Interacted with 'alpha3_library_K' on concept 'counting_number' (exposure #2, familiarity 0.93)",
+      "episode_id": 105,
+      "tick": 9444,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'pentagon' (exposure #4, familiarity 0.98)",
       "active_concepts": [
-        "counting_number"
+        "pentagon"
       ],
       "observed_traits": [
-        "eyes:discrete_quantity",
-        "eyes:ordered_sequence",
-        "eyes:additive_unit",
-        "eyes:k_page_sample_2",
-        "ears:spoken_counting_number",
-        "ears:heard_counting_number",
-        "hands:count_units",
+        "eyes:contour_pentagon",
+        "eyes:geometric_shape",
+        "ears:pentagon",
+        "ears:heard_pentagon",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "count_units",
-      "outcome_traits": [
-        "eyes:sum_verified"
-      ],
-      "surprise_score": 0.30769232
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.6
     },
     {
-      "episode_id": 37,
-      "tick": 56,
-      "partner": "alpha3_library_K",
-      "summary": "Interacted with 'alpha3_library_K' on concept 'counting_number' (exposure #1, familiarity 0.83)",
+      "episode_id": 104,
+      "tick": 9443,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'cross' (exposure #3, familiarity 0.97)",
       "active_concepts": [
-        "counting_number"
+        "cross"
       ],
       "observed_traits": [
-        "eyes:discrete_quantity",
-        "eyes:ordered_sequence",
-        "eyes:additive_unit",
-        "eyes:k_page_sample_1",
-        "ears:spoken_counting_number",
-        "ears:heard_counting_number",
-        "hands:count_units",
+        "eyes:contour_cross",
+        "eyes:geometric_shape",
+        "ears:cross",
+        "ears:heard_cross",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "count_units",
-      "outcome_traits": [
-        "eyes:sum_verified"
-      ],
-      "surprise_score": 0.90625
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.78723407
     },
     {
-      "episode_id": 36,
-      "tick": 55,
-      "partner": "world_programs",
-      "summary": "Interacted with 'world_programs' on concept 'shape_cup' (exposure #2, familiarity 0.93)",
+      "episode_id": 103,
+      "tick": 9442,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'red' (exposure #2, familiarity 0.93)",
       "active_concepts": [
-        "shape_cup"
+        "red"
       ],
       "observed_traits": [
-        "eyes:code_program",
-        "eyes:shape_geometry_cup",
-        "eyes:canvas_primitive_cup",
-        "eyes:variant_seed_1",
-        "ears:heard_shape_cup",
-        "hands:writes_canvas_pixels",
+        "eyes:rgb_220_40_40",
+        "eyes:visual_colour_swatch",
+        "ears:red",
+        "ears:heard_red",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "draw_cup",
-      "outcome_traits": [
-        "eyes:rendered_cup"
-      ],
-      "surprise_score": 0.45833334
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.8918919
     },
     {
-      "episode_id": 35,
-      "tick": 54,
-      "partner": "world_programs",
-      "summary": "Interacted with 'world_programs' on concept 'shape_cup' (exposure #1, familiarity 0.83)",
+      "episode_id": 102,
+      "tick": 9441,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'pentagon' (exposure #3, familiarity 0.97)",
       "active_concepts": [
-        "shape_cup"
+        "pentagon"
       ],
       "observed_traits": [
-        "eyes:code_program",
-        "eyes:shape_geometry_cup",
-        "eyes:canvas_primitive_cup",
-        "eyes:variant_seed_0",
-        "ears:heard_shape_cup",
-        "hands:writes_canvas_pixels",
+        "eyes:contour_pentagon",
+        "eyes:geometric_shape",
+        "ears:pentagon",
+        "ears:heard_pentagon",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "draw_cup",
-      "outcome_traits": [
-        "eyes:rendered_cup"
-      ],
-      "surprise_score": 0.75
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.53333336
     },
     {
-      "episode_id": 34,
-      "tick": 53,
-      "partner": "world_programs",
-      "summary": "Interacted with 'world_programs' on concept 'shape_cross' (exposure #2, familiarity 0.93)",
+      "episode_id": 101,
+      "tick": 9440,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'circle' (exposure #3, familiarity 0.97)",
       "active_concepts": [
-        "shape_cross"
+        "circle"
       ],
       "observed_traits": [
-        "eyes:code_program",
-        "eyes:shape_geometry_cross",
-        "eyes:canvas_primitive_cross",
-        "eyes:variant_seed_1",
-        "ears:heard_shape_cross",
-        "hands:writes_canvas_pixels",
+        "eyes:contour_circle",
+        "eyes:geometric_shape",
+        "ears:circle",
+        "ears:heard_circle",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "draw_cross",
-      "outcome_traits": [
-        "eyes:rendered_cross"
-      ],
-      "surprise_score": 1.0
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.5625
     },
     {
-      "episode_id": 33,
-      "tick": 44,
-      "partner": "world_programs",
-      "summary": "Interacted with 'world_programs' on concept 'shape_cross' (exposure #1, familiarity 0.83)",
+      "episode_id": 100,
+      "tick": 9439,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'hexagon' (exposure #4, familiarity 0.98)",
       "active_concepts": [
-        "shape_cross"
+        "hexagon"
       ],
       "observed_traits": [
-        "eyes:code_program",
-        "eyes:shape_geometry_cross",
-        "eyes:canvas_primitive_cross",
-        "eyes:variant_seed_0",
-        "ears:heard_shape_cross",
-        "hands:writes_canvas_pixels",
+        "eyes:contour_hexagon",
+        "eyes:geometric_shape",
+        "ears:hexagon",
+        "ears:heard_hexagon",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "draw_cross",
-      "outcome_traits": [
-        "eyes:rendered_cross"
-      ],
-      "surprise_score": 0.55
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.64102566
     },
     {
-      "episode_id": 32,
-      "tick": 43,
-      "partner": "world_programs",
-      "summary": "Interacted with 'world_programs' on concept 'shape_bar' (exposure #2, familiarity 0.93)",
+      "episode_id": 99,
+      "tick": 9438,
+      "partner": "K_scenes_train",
+      "summary": "Interacted with 'K_scenes_train' on concept 'triangle' (exposure #4, familiarity 0.98)",
       "active_concepts": [
-        "shape_bar"
+        "triangle"
       ],
       "observed_traits": [
-        "eyes:code_program",
-        "eyes:shape_geometry_bar",
-        "eyes:canvas_primitive_bar",
-        "eyes:variant_seed_1",
-        "ears:heard_shape_bar",
-        "hands:writes_canvas_pixels",
+        "eyes:contour_triangle",
+        "eyes:geometric_shape",
+        "ears:triangle",
+        "ears:heard_triangle",
         "senses:awake",
         "senses:calm_predictive_flow",
         "senses:user_bond_active"
       ],
-      "action_or_code": "draw_bar",
-      "outcome_traits": [
-        "eyes:rendered_bar"
-      ],
-      "surprise_score": 0.5
+      "action_or_code": null,
+      "outcome_traits": [],
+      "surprise_score": 0.8181818
     }
   ],
   "bridge_log": [
     {
-      "timestamp": 1791970993,
-      "tick": 1931,
-      "role": "sleep_replay",
-      "kind": "sleep",
-      "message": "Sleep Consolidation Cycle #69: replayed 8 episodic traces, reinforced 226 core invariant synapses, pruned 1264 weak synapses, and consolidated 34 conceptual relations.",
-      "details": null
-    },
-    {
-      "timestamp": 1791970993,
-      "tick": 1923,
-      "role": "alpha7_mouth",
-      "kind": "code_synthesis",
-      "message": "Synthesized & verified code for goal 'eyes:result_72' (2 candidates tested): `a = 2; b = 36; result = a * b; print(result)` -> [\"eyes:code_ran_cleanly\", \"eyes:printed_72\", \"eyes:result_72\"]. Initial draft `a = 72; b = 1; result = a - b; print(result)` produced [\"eyes:code_ran_cleanly\", \"eyes:printed_71\", \"eyes:result_71\"] instead of target `eyes:result_72`; diagnosed operator mismatch and synthesized corrected program.",
-      "details": "Synthesized Code:\na = 2\nb = 36\nresult = a * b\nprint(result)"
-    },
-    {
-      "timestamp": 1791970993,
-      "tick": 1919,
-      "role": "alpha7_mouth",
-      "kind": "speech",
-      "message": "Causal failure analysis for 'press_switch': blocking condition 'smell:power_unplugged' diverted expected outcome [\"eyes:light_on\"] to 'eyes:darkness_remains'",
-      "details": "Activated concepts: [] | Evoked traits: []"
-    },
-    {
-      "timestamp": 1791970993,
-      "tick": 1918,
-      "role": "user",
-      "kind": "chat",
-      "message": "why did press_switch fail?",
-      "details": "from local"
-    },
-    {
-      "timestamp": 1791970993,
-      "tick": 1918,
-      "role": "alpha7_mouth",
-      "kind": "speech",
-      "message": "Comparing 'cat' and 'dog' (similarity 13%): they share 2 core invariant(s) [\"eyes:four_legs\", \"hands:warm_body\"], while 'cat' is distinguished by [\"smell:feline_scent\", \"eyes:pointy_ears\", \"eyes:whiskers\", \"hands:soft_fur\"] and 'dog' is distinguished by [\"ears:bark\", \"eyes:wagging_tail\", \"hands:coarse_fur\", \"eyes:floppy_ears\"]. Both belong to category [\"living_quadruped\"].",
-      "details": "Activated concepts: [\"cat\", \"dog\"] | Evoked traits: [\"smell:feline_scent\", \"eyes:four_legs\", \"eyes:pointy_ears\", \"eyes:whiskers\", \"hands:soft_fur\", \"hands:warm_body\", \"eyes:long_tail\", \"ears:purr\", \"eyes:slit_pupils\", \"ears:bark\", \"eyes:wagging_tail\", \"hands:coarse_fur\", \"eyes:floppy_ears\", \"smell:canine_scent\", \"eyes:wet_snout\"]"
-    },
-    {
-      "timestamp": 1791970993,
-      "tick": 1917,
-      "role": "user",
-      "kind": "chat",
-      "message": "compare cat and dog",
-      "details": "from local"
-    },
-    {
-      "timestamp": 1791969394,
-      "tick": 60,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'spatial_scene' from shelf 'alpha3_library_K' (/data/alpha3-library/K/scenes/train/scene-01000001.ppm) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969393,
-      "tick": 59,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'spatial_scene' from shelf 'alpha3_library_K' (/data/alpha3-library/K/scenes/train/scene-01000000.ppm) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969392,
-      "tick": 58,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'letter_glyph' from shelf 'alpha3_library_K' (/data/alpha3-library/K/glyphs) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969391,
-      "tick": 57,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'letter_glyph' from shelf 'alpha3_library_K' (/data/alpha3-library/K/glyphs) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969389,
-      "tick": 56,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'counting_number' from shelf 'alpha3_library_K' (/data/alpha3-library/K/mathematics) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969388,
-      "tick": 55,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'counting_number' from shelf 'alpha3_library_K' (/data/alpha3-library/K/mathematics) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969387,
-      "tick": 54,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_cup' from shelf 'world_programs' (/data/dev/genome/world/programs/cup_1.py) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969386,
-      "tick": 53,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_cup' from shelf 'world_programs' (/data/dev/genome/world/programs/cup_0.py) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969385,
-      "tick": 52,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_cross' from shelf 'world_programs' (/data/dev/genome/world/programs/cross_1.py) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969383,
-      "tick": 43,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_cross' from shelf 'world_programs' (/data/dev/genome/world/programs/cross_0.py) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969382,
-      "tick": 42,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_bar' from shelf 'world_programs' (/data/dev/genome/world/programs/bar_1.py) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969381,
-      "tick": 41,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_bar' from shelf 'world_programs' (/data/dev/genome/world/programs/bar_0.py) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969380,
-      "tick": 40,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_arrow' from shelf 'world_programs' (/data/dev/genome/world/programs/arrow_1.py) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969379,
-      "tick": 39,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_arrow' from shelf 'world_programs' (/data/dev/genome/world/programs/arrow_0.py) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969377,
-      "tick": 38,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_circle' from shelf 'world_programs' (/data/dev/genome/world/programs/circle_1.py) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969376,
-      "tick": 37,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'shape_circle' from shelf 'world_programs' (/data/dev/genome/world/programs/circle_0.py) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969375,
-      "tick": 36,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'camera' from shelf 'genome_world' (/data/dev/genome/world/camera/image_0002.jpg) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969374,
-      "tick": 35,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'camera' from shelf 'genome_world' (/data/dev/genome/world/camera/image_0001.jpg) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969373,
-      "tick": 34,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'bonsai' from shelf 'genome_world' (/data/dev/genome/world/bonsai/image_0002.jpg) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969371,
-      "tick": 33,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'bonsai' from shelf 'genome_world' (/data/dev/genome/world/bonsai/image_0001.jpg) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969370,
-      "tick": 32,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'ant' from shelf 'genome_world' (/data/dev/genome/world/ant/image_0002.jpg) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969369,
-      "tick": 31,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'ant' from shelf 'genome_world' (/data/dev/genome/world/ant/image_0001.jpg) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969368,
-      "tick": 30,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'anchor' from shelf 'genome_world' (/data/dev/genome/world/anchor/image_0002.jpg) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969366,
-      "tick": 29,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'anchor' from shelf 'genome_world' (/data/dev/genome/world/anchor/image_0001.jpg) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969365,
-      "tick": 28,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'ahmad' from shelf 'genome_world' (/data/dev/genome/world/ahmad/ahmad_02.jpg) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969364,
-      "tick": 27,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'ahmad' from shelf 'genome_world' (/data/dev/genome/world/ahmad/ahmad_01.jpg) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969363,
-      "tick": 26,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'dog' from shelf 'sandbox_2d' (world2d:(3,9)/spotted_dog) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969362,
-      "tick": 25,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'dog' from shelf 'sandbox_2d' (world2d:(2,9)/brown_dog) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969360,
-      "tick": 24,
-      "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'cat' from shelf 'sandbox_2d' (world2d:(10,2)/black_cat) — exposure #2, familiarity 93%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969359,
-      "tick": 24,
+      "timestamp": 1791977397,
+      "tick": 9461,
       "role": "sleep_replay",
       "kind": "consolidation",
-      "message": "Sleep Consolidation Cycle #1: replayed 8 episodic traces, reinforced 0 core invariant synapses, pruned 249 weak synapses, and consolidated 6 conceptual relations.",
+      "message": "Sleep Consolidation Cycle #337: replayed 8 episodic traces, reinforced 352 core invariant synapses, pruned 2615 weak synapses, and consolidated 136 conceptual relations.",
       "details": null
     },
     {
-      "timestamp": 1791969359,
-      "tick": 15,
+      "timestamp": 1791977397,
+      "tick": 9452,
       "role": "curriculum",
-      "kind": "grounding",
-      "message": "Grounded 'cat' from shelf 'sandbox_2d' (world2d:(2,2)/orange_cat) — exposure #1, familiarity 83%",
-      "details": null
-    },
-    {
-      "timestamp": 1791969359,
-      "tick": 15,
-      "role": "alpha7_mouth",
-      "kind": "code_synthesis",
-      "message": "Synthesized & verified code for goal 'eyes:result_42' (2 candidates tested): `a = 2; b = 21; result = a * b; print(result)` -> [\"eyes:code_ran_cleanly\", \"eyes:printed_42\", \"eyes:result_42\"]. Initial draft `a = 42; b = 1; result = a - b; print(result)` produced [\"eyes:code_ran_cleanly\", \"eyes:printed_41\", \"eyes:result_41\"] instead of target `eyes:result_42`; diagnosed operator mismatch and synthesized corrected program.",
-      "details": "Synthesized & verified code for goal 'eyes:result_15' (2 candidates tested): `a = 3; b = 5; result = a * b; print(result)` -> [\"eyes:code_ran_cleanly\", \"eyes:printed_15\", \"eyes:result_15\"]. Initial draft `a = 15; b = 1; result = a - b; print(result)` produced [\"eyes:code_ran_cleanly\", \"eyes:printed_14\", \"eyes:result_14\"] instead of target `eyes:result_15`; diagnosed operator mismatch and synthesized corrected program."
-    },
-    {
-      "timestamp": 1791969359,
-      "tick": 7,
-      "role": "surprise_analyzer",
-      "kind": "causal_seed",
-      "message": "ONE-SHOT CAUSAL LEARNING: First observation of action 'press_switch' in context [\"eyes:switch_visible\", \"hands:near_switch\", \"senses:awake\", \"senses:calm_predictive_flow\"] -> learned outcome [\"eyes:light_on\"].",
-      "details": "PREDICTION FAILURE ANALYZED: Expected [\"eyes:result_42\", \"eyes:code_ran_cleanly\", \"eyes:printed_42\"] after action 'run_code', but it failed to happen. Isolated contextual condition 'eyes:syntax_typo' as the cause and learned new exception -> 'eyes:syntax_error'."
+      "kind": "school_exams",
+      "message": "Sat 8/8 Held-Out School Exams (1004/1050 items): 96.1% Live L vs 15.0% Null Twin N (+81.0% margin in 382 ms).",
+      "details": "Cortical Sequence Memory: 14596 words, 329204 sequence links from 11630 sentences."
     }
-  ]
+  ],
+  "school_report": {
+    "evaluated_at_tick": 9452,
+    "total_exams": 8,
+    "exams_passed": 8,
+    "total_items_sat": 1050,
+    "total_items_correct": 1004,
+    "mean_live_score": 0.960625,
+    "mean_null_twin_score": 0.15041663,
+    "mean_margin_over_twin": 0.8102084,
+    "total_eval_time_ms": 382.27275199999997,
+    "sequence_vocab_size": 14596,
+    "sequence_links_count": 329204,
+    "prose_sentences_read": 11630,
+    "exam_verdicts": [
+      {
+        "family": "K-counting",
+        "level": "K",
+        "subject": "counting",
+        "modality": "image",
+        "n_items": 150,
+        "correct_items": 150,
+        "live_score": 1.0,
+        "strongest_twin_name": "majority_class",
+        "strongest_twin_score": 0.24,
+        "pass_mark": 0.49,
+        "margin_over_twin": 0.76,
+        "passed": true,
+        "eval_time_ms": 21.06402,
+        "sample_solved": "Q: \"How many objects are in this picture?\" -> A: \"5\""
+      },
+      {
+        "family": "K-colours",
+        "level": "K",
+        "subject": "colours",
+        "modality": "image",
+        "n_items": 150,
+        "correct_items": 138,
+        "live_score": 0.92,
+        "strongest_twin_name": "majority_class",
+        "strongest_twin_score": 0.133333,
+        "pass_mark": 0.383333,
+        "margin_over_twin": 0.786667,
+        "passed": true,
+        "eval_time_ms": 21.042327999999998,
+        "sample_solved": "Q: \"What colour is the largest object?\" -> A: \"green\""
+      },
+      {
+        "family": "K-shapes",
+        "level": "K",
+        "subject": "shapes",
+        "modality": "image",
+        "n_items": 150,
+        "correct_items": 124,
+        "live_score": 0.82666665,
+        "strongest_twin_name": "majority_class",
+        "strongest_twin_score": 0.133333,
+        "pass_mark": 0.383333,
+        "margin_over_twin": 0.6933336,
+        "passed": true,
+        "eval_time_ms": 20.632635999999998,
+        "sample_solved": "Q: \"What shape is the largest object?\" -> A: \"triangle\""
+      },
+      {
+        "family": "K-number-sense",
+        "level": "K",
+        "subject": "number-sense",
+        "modality": "text",
+        "n_items": 150,
+        "correct_items": 147,
+        "live_score": 0.98,
+        "strongest_twin_name": "majority_class",
+        "strongest_twin_score": 0.08,
+        "pass_mark": 0.38,
+        "margin_over_twin": 0.90000004,
+        "passed": true,
+        "eval_time_ms": 0.196596,
+        "sample_solved": "Q: \"What number comes before 89?\" -> A: \"88\""
+      },
+      {
+        "family": "G1-G3-arithmetic",
+        "level": "G1-G3",
+        "subject": "arithmetic",
+        "modality": "text",
+        "n_items": 150,
+        "correct_items": 150,
+        "live_score": 1.0,
+        "strongest_twin_name": "majority_class",
+        "strongest_twin_score": 0.066667,
+        "pass_mark": 0.366667,
+        "margin_over_twin": 0.933333,
+        "passed": true,
+        "eval_time_ms": 0.308099,
+        "sample_solved": "Q: \"12 / 2 = ?\" -> A: \"6\""
+      },
+      {
+        "family": "G1-G3-word-problems",
+        "level": "G1-G3",
+        "subject": "word-problems",
+        "modality": "text",
+        "n_items": 120,
+        "correct_items": 120,
+        "live_score": 1.0,
+        "strongest_twin_name": "majority_class",
+        "strongest_twin_score": 0.2,
+        "pass_mark": 0.5,
+        "margin_over_twin": 0.8,
+        "passed": true,
+        "eval_time_ms": 0.302349,
+        "sample_solved": "Q: \"Yusuf has 17 books and gives away 5. How many books are left?\" -> A: \"12\""
+      },
+      {
+        "family": "G1-G3-reading",
+        "level": "G1-G3",
+        "subject": "reading",
+        "modality": "text",
+        "n_items": 120,
+        "correct_items": 115,
+        "live_score": 0.9583333,
+        "strongest_twin_name": "chance",
+        "strongest_twin_score": 0.25,
+        "pass_mark": 0.55,
+        "margin_over_twin": 0.7083333,
+        "passed": true,
+        "eval_time_ms": 0.70575,
+        "sample_solved": "Q: \"Fill the blank:  Armstrong asked Mary if she had not left the do...\" -> A: \"porch\""
+      },
+      {
+        "family": "College-code-by-execution",
+        "level": "College",
+        "subject": "code",
+        "modality": "code",
+        "n_items": 60,
+        "correct_items": 60,
+        "live_score": 1.0,
+        "strongest_twin_name": "majority_class",
+        "strongest_twin_score": 0.1,
+        "pass_mark": 0.7,
+        "margin_over_twin": 0.9,
+        "passed": true,
+        "eval_time_ms": 0.084702,
+        "sample_solved": "Q: \"What does this program print?  x = 4 for i in range(3):     x = ...\" -> A: \"0\""
+      }
+    ],
+    "self_claims": [
+      {
+        "claim_id": "T1",
+        "title": "V1/V2 Figure-Ground Scene Segmentation (K-counting, K-colours, K-shapes)",
+        "state": "trusted",
+        "confirmed": 412,
+        "contradicted": 38,
+        "evidence": "412/450 held-out PPM scenes solved (91.6% vs 16.9% Null Twin)"
+      },
+      {
+        "claim_id": "T2",
+        "title": "Grounded Number Sense, Arithmetic & Story Word Problems (K & G1-G3)",
+        "state": "trusted",
+        "confirmed": 417,
+        "contradicted": 3,
+        "evidence": "417/420 held-out math items solved via Hands sandbox (99.3%)"
+      },
+      {
+        "claim_id": "T3",
+        "title": "Cortical Sequence Reading & Cloze Comprehension (G1-G3 Readers)",
+        "state": "trusted",
+        "confirmed": 115,
+        "contradicted": 5,
+        "evidence": "115/120 cloze items (95.8% vs 25.0% Null Twin, pass mark 55.0%)"
+      },
+      {
+        "claim_id": "F6",
+        "title": "College Code-by-Execution (Loops, Lists, Strings & Recursion)",
+        "state": "trusted",
+        "confirmed": 60,
+        "contradicted": 0,
+        "evidence": "60/60 held-out Python programs executed accurately (100.0% vs 70% bar)"
+      },
+      {
+        "claim_id": "B1",
+        "title": "1–2 Shot BTSP Concept Invariants & SWR Sleep Consolidation",
+        "state": "trusted",
+        "confirmed": 41,
+        "contradicted": 0,
+        "evidence": "41 grounded concepts, 136 compositional relations, 336 SWR sleep cycles"
+      },
+      {
+        "claim_id": "M1",
+        "title": "Counterfactual Failure Diagnosis & Multi-Step Key-Door Tool Planning",
+        "state": "trusted",
+        "confirmed": 6,
+        "contradicted": 0,
+        "evidence": "5 causal rules learned; Key-Door puzzle solved 1 time(s)"
+      }
+    ]
+  }
 }

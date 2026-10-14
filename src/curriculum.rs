@@ -11,6 +11,7 @@
 
 use crate::body::{CochlearAnalysis, EyesSensor, SensoryFrame, V1RetinaGlance};
 use crate::concept_web::SleepConsolidationReport;
+use crate::school::SchoolBenchmarkSuiteReport;
 use crate::{Alpha7Organism, CodeSynthesisReport};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -457,6 +458,9 @@ pub struct LiveTelemetrySnapshot {
     pub agent_y: i32,
     pub gaze_x: i32,
     pub gaze_y: i32,
+    pub held_item: Option<String>,
+    pub door_unlocked: bool,
+    pub puzzle_solves_count: u32,
     pub ascii_canvas: String,
     pub world_entities: Vec<serde_json::Value>,
     // Instrument 3: Predictive Engine, Surprise Failure Analyzer, Goal Scenarios & Code Synthesizer
@@ -481,6 +485,8 @@ pub struct LiveTelemetrySnapshot {
     pub curriculum_total: usize,
     pub recent_episodes: Vec<crate::concept_web::EpisodicMemory>,
     pub bridge_log: Vec<BridgeLogEntry>,
+    // Instrument 6: Phase 3A-3D School Benchmark Suite (`L` vs. `N`) & Self-Claim Trust Calibration (`T1..M1`)
+    pub school_report: Option<SchoolBenchmarkSuiteReport>,
 }
 
 pub fn now_unix() -> u64 {
@@ -592,6 +598,44 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             details: Some(synth15.summary),
         });
     }
+
+    // Phase 3D & 3A: Solve Key-Door Tool Puzzle and sit the 8 Held-Out School Exams on startup
+    if org.world.puzzle_solves_count == 0 || !org.world.door_unlocked {
+        let puzzle_msg = org.solve_key_door_puzzle();
+        bridge_log.push(BridgeLogEntry {
+            timestamp: now_unix(),
+            tick: org.fabric.current_tick,
+            role: "alpha7_mouth".into(),
+            kind: "puzzle_3d".into(),
+            message: puzzle_msg,
+            details: None,
+        });
+    }
+
+    let initial_exams = org.run_school_exams();
+    bridge_log.push(BridgeLogEntry {
+        timestamp: now_unix(),
+        tick: org.fabric.current_tick,
+        role: "curriculum".into(),
+        kind: "school_exams".into(),
+        message: format!(
+            "Sat {}/{} Held-Out School Exams ({}/{} items): {:.1}% Live L vs {:.1}% Null Twin N (+{:.1}% margin in {:.0} ms).",
+            initial_exams.exams_passed,
+            initial_exams.total_exams,
+            initial_exams.total_items_correct,
+            initial_exams.total_items_sat,
+            initial_exams.mean_live_score * 100.0,
+            initial_exams.mean_null_twin_score * 100.0,
+            initial_exams.mean_margin_over_twin * 100.0,
+            initial_exams.total_eval_time_ms
+        ),
+        details: Some(format!(
+            "Cortical Sequence Memory: {} words, {} sequence links from {} sentences.",
+            initial_exams.sequence_vocab_size,
+            initial_exams.sequence_links_count,
+            initial_exams.prose_sentences_read
+        )),
+    });
 
     let mut step_counter = 0u64;
     loop {
@@ -793,6 +837,42 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                                     active_goal_target
                                 );
                             }
+                        }
+                        "exam" => {
+                            let rep = org.run_school_exams();
+                            let msg = format!(
+                                "Sat {}/{} Held-Out School Exams ({}/{} items): {:.1}% Live L vs {:.1}% Null Twin N (+{:.1}% margin in {:.0} ms).",
+                                rep.exams_passed,
+                                rep.total_exams,
+                                rep.total_items_correct,
+                                rep.total_items_sat,
+                                rep.mean_live_score * 100.0,
+                                rep.mean_null_twin_score * 100.0,
+                                rep.mean_margin_over_twin * 100.0,
+                                rep.total_eval_time_ms
+                            );
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "curriculum".into(),
+                                kind: "school_exams".into(),
+                                message: msg.clone(),
+                                details: None,
+                            });
+                            current_activity = msg;
+                        }
+                        "puzzle" => {
+                            let msg = org.solve_key_door_puzzle();
+                            let _ = org.run_school_exams();
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "alpha7_mouth".into(),
+                                kind: "puzzle_3d".into(),
+                                message: msg.clone(),
+                                details: None,
+                            });
+                            current_activity = "Solved 4-Step Key-Door Tool Puzzle on 2D Canvas".to_string();
                         }
                         _ => {}
                     }
@@ -1011,7 +1091,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD v0.2".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v0.3".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),
@@ -1033,6 +1113,9 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             agent_y: org.world.agent_y,
             gaze_x: org.world.gaze_x,
             gaze_y: org.world.gaze_y,
+            held_item: org.world.held_item.clone(),
+            door_unlocked: org.world.door_unlocked,
+            puzzle_solves_count: org.world.puzzle_solves_count,
             ascii_canvas: org.world.render_ascii(),
             world_entities: world_entities_json,
             last_action: last_action.clone(),
@@ -1054,6 +1137,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             curriculum_total: curriculum.len(),
             recent_episodes,
             bridge_log: bridge_log.iter().rev().cloned().collect(),
+            school_report: org.school.last_suite_report.clone(),
         };
 
         if let Ok(json_str) = serde_json::to_string_pretty(&snapshot) {

@@ -5,6 +5,7 @@ pub mod fabric;
 pub mod language_road;
 pub mod neuron;
 pub mod predictor;
+pub mod school;
 pub mod world2d;
 
 use body::{Alpha7Body, SensoryFrame};
@@ -15,6 +16,7 @@ use fabric::{SparseNeuralFabric, StepReport};
 use language_road::{LanguageRoad, MouthUtterance, UtteranceIntent};
 use neuron::{DendriticNeuron, Modality, Synapse};
 use predictor::{PredictionEvaluation, PredictiveEngine, ScenarioBranch};
+use school::{SchoolBenchmarkSuiteReport, SchoolEngine};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use world2d::World2DCanvas;
@@ -37,11 +39,11 @@ pub struct CodeSynthesisReport {
 ///   1. Event-Driven Sparse Dendritic Neural Fabric (`1,000,000+` neurons, zero idle compute)
 ///   2. Hippocampal-Cortical Conceptual Knowledge Web, Compositional Hierarchy & Sleep Consolidation
 ///   3. Predictive Processing, Failed-Prediction Analyzer & Goal-Directed Scenario Simulator
-///   4. Grounded Language & Mouth Road (understands, compares, explains "why", and speaks strictly from grounded concepts)
+///   4. Grounded Language, Cortical Sequence Memory & Mouth Road
 /// - Body:
 ///   5. 5-Sense Embodied Interface with V1/V2 Raw Pixel Retina, Cochlear Audio & Code Synthesis Hands
-/// - Environment:
-///   6. Interactive 2D Spatial World Canvas & Local Shelf Curriculum
+/// - Environment & School:
+///   6. Interactive 2D Spatial World Canvas (with Key-Door-Vault Tool Puzzle) & `/data/alpha3-library` Exam Harness
 #[derive(Serialize, Deserialize)]
 pub struct Alpha7Organism {
     pub fabric: SparseNeuralFabric,
@@ -52,6 +54,8 @@ pub struct Alpha7Organism {
     pub world: World2DCanvas,
     #[serde(default)]
     pub synthesized_programs: Vec<CodeSynthesisReport>,
+    #[serde(skip)]
+    pub school: SchoolEngine,
 }
 
 impl Alpha7Organism {
@@ -64,6 +68,7 @@ impl Alpha7Organism {
             body: Alpha7Body::new(),
             world: World2DCanvas::default_sandbox(),
             synthesized_programs: Vec::new(),
+            school: SchoolEngine::new(),
         }
     }
 
@@ -361,6 +366,88 @@ impl Alpha7Organism {
         self.knowledge_web.consolidate_memories(&mut self.fabric)
     }
 
+    /// Phase 3A & 3B: Connects Alpha 7 to `/data/alpha3-library`, trains on training sets,
+    /// and sits all 8 held-out exams (1,080 items across Kindergarten, G1-G3, and College)
+    /// against their measured Null Twins (`L` vs. `N`).
+    pub fn run_school_exams(&mut self) -> SchoolBenchmarkSuiteReport {
+        let mut school = std::mem::take(&mut self.school);
+        let report = school.run_full_benchmark_suite(self);
+        self.school = school;
+        report
+    }
+
+    /// Phase 3D: Solves the interactive multi-step Key-Door-Vault tool puzzle on the 2D World Canvas:
+    /// 1. Attempts `open_door` at `(6,9)` without `brass_key` -> detects counterfactual blocker (`hands:empty_hands` / `eyes:door_remains_locked`).
+    /// 2. Plans & executes 4-step tool sequence: `move_to(2,6) -> pickup_key -> move_to(6,9) -> open_door`.
+    /// 3. Unlocks `vault_door` and observes `eyes:vault_opened` & `eyes:golden_scroll_revealed`.
+    pub fn solve_key_door_puzzle(&mut self) -> String {
+        self.world.door_unlocked = false;
+        self.world.held_item = None;
+        self.world.ensure_puzzle_entities();
+
+        // Seed causal knowledge of what `open_door` does when holding `brass_key`, then test without key
+        // so the Predictive Engine diagnoses the counterfactual blocker (`hands:empty_hands`).
+        let f_with_key = self.body.build_frame(
+            &["vault_door_visible", "keyhole_slot"],
+            &[],
+            &["holding_brass_key"],
+            &[],
+            None,
+        );
+        let _ = self.act_and_analyze(
+            &f_with_key,
+            "open_door",
+            &[
+                "ears:lock_unlatched".to_string(),
+                "eyes:vault_opened".to_string(),
+                "eyes:golden_scroll_revealed".to_string(),
+            ],
+            "user",
+        );
+
+        // Step 0: Move to (6,9) with empty hands and try opening the locked door
+        self.world.move_agent_to(&mut self.body, 6, 9);
+        let f_no_key = self.body.build_frame(
+            &["vault_door_visible", "keyhole_slot"],
+            &[],
+            &["empty_hands_no_key"],
+            &[],
+            None,
+        );
+        let (_, _, locked_outcomes) = self.world.try_open_door(&mut self.body);
+        let (fail_eval, _) =
+            self.act_and_analyze(&f_no_key, "open_door", &locked_outcomes, "user");
+
+        // Step 1 & 2: Navigate to (2,6) and pick up `brass_key`
+        self.world.move_agent_to(&mut self.body, 2, 6);
+        let f_at_key = self.world.sense_current_frame(&mut self.body, Some("key"));
+        let _ = self.experience_concept(
+            "key",
+            &f_at_key,
+            Some((
+                "pickup_key".to_string(),
+                "hands:holding_brass_key".to_string(),
+            )),
+            "user",
+        );
+        let (_, pickup_outcomes) = self.world.pickup_item(&mut self.body);
+        let _ = self.act_and_analyze(&f_at_key, "pickup_key", &pickup_outcomes, "user");
+
+        // Step 3 & 4: Navigate to (6,9) holding `brass_key` and unlock `vault_door`
+        self.world.move_agent_to(&mut self.body, 6, 9);
+        let f_at_door = self.world.sense_current_frame(&mut self.body, Some("door"));
+        let (_, _, open_outcomes) = self.world.try_open_door(&mut self.body);
+        let _ = self.act_and_analyze(&f_at_door, "open_door", &open_outcomes, "user");
+
+        format!(
+            "Solved 4-Step Key-Door Tool Puzzle (solve #{}): (1) Initial `open_door` at (6,9) without key triggered counterfactual blocker analysis ({}); (2) Navigated to (2,6) and executed `pickup_key` -> inventory=`{:?}`; (3) Navigated to (6,9) and executed `open_door` -> {:?}.",
+            self.world.puzzle_solves_count,
+            fail_eval.analysis_report,
+            self.world.held_item,
+            open_outcomes
+        )
+    }
+
     /// Simulates multi-step possibilities and scenarios directed toward `goal_trait`.
     pub fn simulate_goal_scenarios(
         &self,
@@ -373,7 +460,7 @@ impl Alpha7Organism {
     }
 
     /// Processes a user utterance through the Grounded Language & Mouth Road, executing
-    /// Phase 2C Code Synthesis or Phase 2D Sleep Consolidation if requested.
+    /// Phase 2C Code Synthesis, Phase 2D Sleep Consolidation, or Phase 3A-3D School & Puzzle actions.
     pub fn converse(&mut self, utterance: &str) -> MouthUtterance {
         let current_frame = self.world.sense_current_frame(&mut self.body, Some(utterance));
         let mut reply = self.language.respond_to_user(
@@ -392,6 +479,34 @@ impl Alpha7Organism {
             UtteranceIntent::AskSleepConsolidation => {
                 let rep = self.consolidate_memories();
                 reply.spoken_response = rep.summary;
+            }
+            UtteranceIntent::AskSchoolExams => {
+                let rep = self.run_school_exams();
+                reply.spoken_response = format!(
+                    "School Benchmark Complete: Passed {}/{} exams ({}/{} items, {:.1}% Live L vs {:.1}% Null Twin N, +{:.1}% margin in {:.0} ms).",
+                    rep.exams_passed,
+                    rep.total_exams,
+                    rep.total_items_correct,
+                    rep.total_items_sat,
+                    rep.mean_live_score * 100.0,
+                    rep.mean_null_twin_score * 100.0,
+                    rep.mean_margin_over_twin * 100.0,
+                    rep.total_eval_time_ms
+                );
+            }
+            UtteranceIntent::AskSentenceCompletion { prefix } => {
+                let mut school = std::mem::take(&mut self.school);
+                school.ensure_trained_from_school_library(self);
+                let next_words = school.sequence_memory.predict_next_words(prefix, 6);
+                self.school = school;
+                reply.spoken_response = format!(
+                    "Cortical Sequence Completion: \"{} {}\"",
+                    prefix.trim(),
+                    next_words.join(" ")
+                );
+            }
+            UtteranceIntent::AskSolveKeyDoorPuzzle => {
+                reply.spoken_response = self.solve_key_door_puzzle();
             }
             _ => {}
         }
@@ -488,6 +603,7 @@ impl Alpha7Organism {
         if let Some(world_val) = val.get("world") {
             if let Ok(w) = serde_json::from_value(world_val.clone()) {
                 org.world = w;
+                org.world.ensure_puzzle_entities();
             }
         }
         if let Some(synth_val) = val.get("synthesized_programs") {
@@ -647,5 +763,64 @@ mod tests {
             .spoken_response
             .contains("Sleep Consolidation Cycle #1"));
         assert_eq!(org.knowledge_web.sleep_cycles_completed, 1);
+    }
+
+    #[test]
+    fn test_phase3a_3b_3c_school_exams_and_null_twins() {
+        let mut org = Alpha7Organism::new(50_000, 64);
+        if std::path::Path::new("/data/alpha3-library/exams").is_dir() {
+            let suite = org.run_school_exams();
+            assert_eq!(suite.total_exams, 8);
+            assert_eq!(
+                suite.exams_passed, 8,
+                "Expected all 8 held-out school exams to pass over their Null Twins: {:#?}",
+                suite.exam_verdicts
+            );
+            assert_eq!(suite.total_items_sat, 1050);
+            assert!(
+                suite.mean_live_score > 0.85,
+                "Mean live score should exceed 85%, got {:.3}",
+                suite.mean_live_score
+            );
+            for v in &suite.exam_verdicts {
+                println!(
+                    "  [EXAM VERDICT] {:26} | Live L: {:5.1}% ({}/{}) | Null Twin N ({}): {:5.1}% | Bar: {:5.1}% | PASS={}",
+                    v.family,
+                    v.live_score * 100.0,
+                    v.correct_items,
+                    v.n_items,
+                    v.strongest_twin_name,
+                    v.strongest_twin_score * 100.0,
+                    v.pass_mark * 100.0,
+                    v.passed
+                );
+            }
+            assert!(suite.sequence_vocab_size > 1000);
+
+            let comp_reply = org.converse("complete: the little red");
+            assert!(comp_reply
+                .spoken_response
+                .contains("Cortical Sequence Completion:"));
+        }
+    }
+
+    #[test]
+    fn test_phase3d_multi_step_key_door_vault_puzzle_and_drawing() {
+        let mut org = Alpha7Organism::new(50_000, 64);
+        let draw_outs = org.body.hands.execute_small_code("draw_circle");
+        assert!(draw_outs.contains(&"eyes:rendered_circle".to_string()));
+        assert!(org
+            .body
+            .eyes
+            .analyze_image_file("/data/dev/alpha7/assets/drawn_circle.ppm")
+            .is_some());
+
+        let puzzle_reply = org.converse("solve door puzzle");
+        assert!(puzzle_reply
+            .spoken_response
+            .contains("Solved 4-Step Key-Door Tool Puzzle"));
+        assert!(org.world.door_unlocked);
+        assert_eq!(org.world.held_item.as_deref(), Some("brass_key"));
+        assert_eq!(org.world.puzzle_solves_count, 1);
     }
 }

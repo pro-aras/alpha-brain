@@ -35,6 +35,12 @@ pub enum UtteranceIntent {
     AskCodeSynthesis { target_spec: String },
     /// Phase 2D: User asks Alpha 7 to run a hippocampal sleep replay cycle ("sleep consolidate", "consolidate memories").
     AskSleepConsolidation,
+    /// Phase 3A: User asks Alpha 7 to sit the 8 held-out School Exams vs. Null Twin ("run exams", "sit school exams").
+    AskSchoolExams,
+    /// Phase 3B: User asks Alpha 7 to complete a sentence using CorticalSequenceMemory ("complete: the little red").
+    AskSentenceCompletion { prefix: String },
+    /// Phase 3D: User asks Alpha 7 to solve the multi-step Key-Door-Vault tool puzzle ("solve door puzzle", "unlock vault door").
+    AskSolveKeyDoorPuzzle,
     /// User teaches a concept or statement ("teach cat", or general conversational thought).
     GeneralThought { text: String },
 }
@@ -75,6 +81,37 @@ impl LanguageRoad {
             || clean == "replay memories"
         {
             return UtteranceIntent::AskSleepConsolidation;
+        }
+
+        if clean == "run exams"
+            || clean == "sit exams"
+            || clean == "sit school exams"
+            || clean == "school exams"
+            || clean == "school benchmark"
+        {
+            return UtteranceIntent::AskSchoolExams;
+        }
+
+        if clean == "solve puzzle"
+            || clean == "solve door puzzle"
+            || clean == "solve key door puzzle"
+            || clean == "unlock door"
+            || clean == "open vault door"
+        {
+            return UtteranceIntent::AskSolveKeyDoorPuzzle;
+        }
+
+        if let Some(rest) = clean
+            .strip_prefix("complete: ")
+            .or_else(|| clean.strip_prefix("complete sentence "))
+            .or_else(|| clean.strip_prefix("complete "))
+        {
+            let p = rest.trim();
+            if !p.is_empty() {
+                return UtteranceIntent::AskSentenceCompletion {
+                    prefix: p.to_string(),
+                };
+            }
         }
 
         if let Some(rest) = clean
@@ -405,6 +442,20 @@ impl LanguageRoad {
             }
             UtteranceIntent::AskSleepConsolidation => {
                 "Initiating Hippocampal-Neocortical sharp-wave ripple sleep consolidation cycle."
+                    .to_string()
+            }
+            UtteranceIntent::AskSchoolExams => {
+                "Sitting the 8 held-out School Exams (1,080 items across Kindergarten, G1-G3, and College) vs. Null Twin."
+                    .to_string()
+            }
+            UtteranceIntent::AskSentenceCompletion { prefix } => {
+                format!(
+                    "Completing sequence prefix '{}' from Cortical Sequence Memory.",
+                    prefix
+                )
+            }
+            UtteranceIntent::AskSolveKeyDoorPuzzle => {
+                "Executing multi-step Key-Door-Vault tool puzzle on the 2D World Canvas."
                     .to_string()
             }
             UtteranceIntent::GeneralThought { .. } => {

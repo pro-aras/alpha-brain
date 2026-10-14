@@ -1,8 +1,9 @@
-//! Alpha 7 Interactive 2D Spatial World Canvas (Option 3)
+//! Alpha 7 Interactive 2D Spatial World Canvas & Phase 3D Key-Door-Tool Puzzle Arena
 //!
 //! Provides a continuous/grid 2D spatial arena where Alpha 7's body moves, its eyes saccade
 //! and fixate, its nose detects spatial scent gradients, its ears detect acoustic sources,
-//! and its hands touch and manipulate objects or code blocks.
+//! and its hands pick up tools (`brass_key` at `k`), unlock doors (`locked_door` at `D`),
+//! flip switches (`S`), and manipulate objects.
 
 use crate::body::{Alpha7Body, SensoryFrame};
 use rustc_hash::FxHashMap;
@@ -30,7 +31,7 @@ pub struct WorldEntity {
     pub action_effects: FxHashMap<String, Vec<String>>,
 }
 
-/// 2D Spatial World Canvas containing Alpha 7's embodied state and interactive entities.
+/// 2D Spatial World Canvas containing Alpha 7's embodied state, inventory, and interactive entities.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct World2DCanvas {
     pub width: i32,
@@ -41,6 +42,12 @@ pub struct World2DCanvas {
     pub gaze_y: i32,
     pub entities: Vec<WorldEntity>,
     pub step_count: u64,
+    #[serde(default)]
+    pub held_item: Option<String>,
+    #[serde(default)]
+    pub door_unlocked: bool,
+    #[serde(default)]
+    pub puzzle_solves_count: u32,
 }
 
 impl World2DCanvas {
@@ -56,16 +63,20 @@ impl World2DCanvas {
             gaze_y: cy,
             entities: Vec::new(),
             step_count: 0,
+            held_item: None,
+            door_unlocked: false,
+            puzzle_solves_count: 0,
         }
     }
 
-    /// Creates a rich default 2D sandbox populated with multi-sensory entities:
+    /// Creates a rich default 2D sandbox populated with multi-sensory entities & Phase 3D puzzle items:
     /// - Cat #1 (Orange Cat at (2, 2))
     /// - Cat #2 (Black Cat at (10, 2))
     /// - Unseen White Cat (at (10, 9))
     /// - Distractor Dog (at (2, 9))
     /// - Light Switch (at (6, 2))
-    /// - Code Terminal (at (6, 9))
+    /// - Brass Key `k` (at (2, 6)) — Phase 3D Tool
+    /// - Locked Door `D` (at (6, 9)) — Phase 3D Puzzle Goal
     pub fn default_sandbox() -> Self {
         let mut world = Self::new(13, 12);
         world.agent_x = 6;
@@ -196,7 +207,130 @@ impl World2DCanvas {
             action_effects: sw_fx,
         });
 
+        world.ensure_puzzle_entities();
         world
+    }
+
+    /// Ensures the Phase 3D Brass Key (`k` at (2,6)) and Locked Vault Door (`D` at (6,9)) exist
+    /// even when restoring a checkpoint from Phase 1/2.
+    pub fn ensure_puzzle_entities(&mut self) {
+        if !self.entities.iter().any(|e| e.id == "brass_key") {
+            let mut key_fx = FxHashMap::default();
+            key_fx.insert(
+                "pickup_key".to_string(),
+                vec![
+                    "hands:holding_brass_key".to_string(),
+                    "ears:key_chime".to_string(),
+                ],
+            );
+            self.entities.push(WorldEntity {
+                id: "brass_key".to_string(),
+                concept_label: "key".to_string(),
+                symbol: 'k',
+                x: 2,
+                y: 6,
+                visual_traits: vec![
+                    "brass_key_teeth".into(),
+                    "golden_key_gleam".into(),
+                    "key_ring".into(),
+                ],
+                peripheral_traits: vec!["glinting_metal_object".into()],
+                auditory_traits: vec!["faint_metallic_jingle".into()],
+                tactile_traits: vec!["portable_key".into(), "serrated_brass".into()],
+                olfactory_traits: vec!["metallic_brass_scent".into()],
+                action_effects: key_fx,
+            });
+        }
+
+        if !self.entities.iter().any(|e| e.id == "vault_door") {
+            let mut door_fx = FxHashMap::default();
+            door_fx.insert(
+                "open_door".to_string(),
+                vec![
+                    "eyes:door_unlocked_open".to_string(),
+                    "eyes:library_vault_revealed".to_string(),
+                ],
+            );
+            self.entities.push(WorldEntity {
+                id: "vault_door".to_string(),
+                concept_label: "door".to_string(),
+                symbol: 'D',
+                x: 6,
+                y: 9,
+                visual_traits: vec![
+                    "heavy_vault_door".into(),
+                    "keyhole_slot".into(),
+                    "iron_bolt".into(),
+                ],
+                peripheral_traits: vec!["archway_door_frame".into()],
+                auditory_traits: vec![],
+                tactile_traits: vec!["cold_oak_door".into(), "keyhole_recess".into()],
+                olfactory_traits: vec!["old_parchment_beyond_door".into()],
+                action_effects: door_fx,
+            });
+        }
+    }
+
+    /// Phase 3D: Picks up a portable tool/key at or adjacent to Alpha 7's current position.
+    pub fn pickup_item(&mut self, body: &mut Alpha7Body) -> (String, Vec<String>) {
+        self.ensure_puzzle_entities();
+        let ax = self.agent_x;
+        let ay = self.agent_y;
+        if let Some(key_ent) = self
+            .entities
+            .iter()
+            .find(|e| e.id == "brass_key" && Self::manhattan_dist(ax, ay, e.x, e.y) <= 1)
+        {
+            let name = key_ent.id.clone();
+            self.held_item = Some(name.clone());
+            let _ = body.hands.touch(&["holding_brass_key"]);
+            return (
+                format!(
+                    "Picked up '{}' at ({},{}) with Hands.",
+                    name, key_ent.x, key_ent.y
+                ),
+                vec![
+                    "hands:holding_brass_key".to_string(),
+                    "ears:key_chime".to_string(),
+                ],
+            );
+        }
+        (
+            format!("No portable key/tool within reach at ({},{}).", ax, ay),
+            vec!["hands:empty_grasp".to_string()],
+        )
+    }
+
+    /// Phase 3D: Attempts to open `vault_door` at `(6,9)`.
+    /// If `held_item == Some("brass_key")`, unlocks and opens the door (`eyes:door_unlocked_open`);
+    /// otherwise fails with counterfactual blocker `hands:missing_brass_key` (`eyes:door_remained_locked`).
+    pub fn try_open_door(&mut self, _body: &mut Alpha7Body) -> (bool, String, Vec<String>) {
+        self.ensure_puzzle_entities();
+        if self.held_item.as_deref() == Some("brass_key") {
+            self.door_unlocked = true;
+            self.puzzle_solves_count += 1;
+            (
+                true,
+                "Unlocked and opened 'vault_door' at (6,9) using held 'brass_key'! Library vault revealed."
+                    .to_string(),
+                vec![
+                    "eyes:door_unlocked_open".to_string(),
+                    "eyes:library_vault_revealed".to_string(),
+                    "ears:lock_bolt_clicked".to_string(),
+                ],
+            )
+        } else {
+            self.door_unlocked = false;
+            (
+                false,
+                "Attempted 'open_door' at (6,9) without 'brass_key' -> blocked by locked bolt!"
+                    .to_string(),
+                vec![
+                    "eyes:door_remained_locked".to_string(),
+                    "hands:locked_bolt_resistance".to_string(),
+                ],
+            )
+        }
     }
 
     #[inline]
@@ -246,11 +380,17 @@ impl World2DCanvas {
         let mut hands_vec: Vec<&str> = Vec::new();
         let mut smell_vec: Vec<&str> = Vec::new();
 
+        if self.held_item.as_deref() == Some("brass_key") {
+            hands_vec.push("holding_brass_key");
+        }
+        if self.door_unlocked {
+            eyes_vec.push("door_unlocked_open");
+        }
+
         for ent in &self.entities {
             let gaze_dist = Self::manhattan_dist(self.gaze_x, self.gaze_y, ent.x, ent.y);
             let body_dist = Self::manhattan_dist(self.agent_x, self.agent_y, ent.x, ent.y);
 
-            // Eyes: Foveal high-detail vision at gaze_dist <= 1; peripheral vision at 2..=4
             if gaze_dist <= 1 {
                 for v in &ent.visual_traits {
                     eyes_vec.push(v.as_str());
@@ -261,21 +401,18 @@ impl World2DCanvas {
                 }
             }
 
-            // Ears: Heard within distance <= 4 of body
             if body_dist <= 4 {
                 for a in &ent.auditory_traits {
                     ears_vec.push(a.as_str());
                 }
             }
 
-            // Hands: Felt when adjacent or co-located (body_dist <= 1)
             if body_dist <= 1 {
                 for h in &ent.tactile_traits {
                     hands_vec.push(h.as_str());
                 }
             }
 
-            // Smell: Olfactory plume detected within distance <= 5 of body
             if body_dist <= 5 {
                 for s in &ent.olfactory_traits {
                     smell_vec.push(s.as_str());
@@ -287,16 +424,18 @@ impl World2DCanvas {
     }
 
     /// Renders an ASCII view of the 2D World Canvas showing Alpha 7 (`@`), eye gaze (`+`),
-    /// and all multi-sensory entities.
+    /// and all multi-sensory entities (`c`, `C`, `w`, `d`, `S`, `k`, `D`).
     pub fn render_ascii(&self) -> String {
         let mut out = String::new();
         out.push_str(&format!(
-            "┌{}┐ (Agent '@' at {},{} | Gaze '+' at {},{})\n",
+            "┌{}┐ (Agent '@' at {},{} | Gaze '+' at {},{} | Held: {:?} | DoorOpen: {})\n",
             "─".repeat((self.width * 2) as usize),
             self.agent_x,
             self.agent_y,
             self.gaze_x,
-            self.gaze_y
+            self.gaze_y,
+            self.held_item,
+            self.door_unlocked
         ));
         for y in 0..self.height {
             out.push('│');
