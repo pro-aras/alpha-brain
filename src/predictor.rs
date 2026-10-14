@@ -140,13 +140,13 @@ impl PredictiveEngine {
             actual_outcomes.iter().map(|s| s.as_str()).collect();
         let predicted_set: std::collections::HashSet<&str> = predicted
             .iter()
-            .filter(|(_, p)| *p >= 0.45)
+            .filter(|(_, p)| *p >= 0.35)
             .map(|(t, _)| t.as_str())
             .collect();
 
         let failed_to_happen: Vec<String> = predicted
             .iter()
-            .filter(|(t, p)| *p >= 0.45 && !actual_set.contains(t.as_str()))
+            .filter(|(t, p)| *p >= 0.35 && !actual_set.contains(t.as_str()))
             .map(|(t, _)| t.clone())
             .collect();
 

@@ -1,15 +1,18 @@
 [package]
-name = "alpha7_core"
+name = "alpha7"
 version = "0.1.0"
 edition = "2021"
-description = "Alpha 7: Event-driven sparse dendritic neural fabric, BTSP one-shot concept web, and predictive engine"
+description = "Alpha 7: Pure-Rust Embodied Sparse Dendritic AI, 1-2 Shot Concept Web, Predictive Engine, Grounded Mouth & 2D World Canvas"
 
 [lib]
-name = "alpha7_core"
-crate-type = ["cdylib", "rlib"]
+name = "alpha7"
+path = "src/lib.rs"
+
+[[bin]]
+name = "alpha7"
+path = "src/bin/alpha7.rs"
 
 [dependencies]
-pyo3 = { version = "0.24", features = ["extension-module", "abi3-py310"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rustc-hash = "2.1"

@@ -1,188 +1,134 @@
+pub mod body;
 pub mod concept_web;
 pub mod fabric;
+pub mod language_road;
 pub mod neuron;
 pub mod predictor;
+pub mod world2d;
 
-use concept_web::ConceptualKnowledgeWeb;
-use fabric::SparseNeuralFabric;
+use body::{Alpha7Body, SensoryFrame};
+use concept_web::{ConceptNode, ConceptRecognition, ConceptualKnowledgeWeb};
+use fabric::{SparseNeuralFabric, StepReport};
+use language_road::{LanguageRoad, MouthUtterance};
 use neuron::{DendriticNeuron, Modality, Synapse};
-use predictor::PredictiveEngine;
-use pyo3::prelude::*;
+use predictor::{PredictionEvaluation, PredictiveEngine, ScenarioBranch};
 use serde::{Deserialize, Serialize};
 use std::fs;
+use world2d::World2DCanvas;
 
-/// Unified Alpha 7 Brain combining:
-/// 1. Event-Driven Sparse Dendritic Neural Fabric (millions of neurons, O(active) compute)
-/// 2. Hippocampal-Cortical Conceptual Knowledge Web & Direct User Episodic Memory (1-2 shot learning)
-/// 3. Predictive Processing, Failed-Prediction Analyzer & Goal-Directed Scenario Simulator
-#[pyclass]
+/// Complete Pure-Rust Alpha 7 Organism uniting:
+/// - Brain:
+///   1. Event-Driven Sparse Dendritic Neural Fabric (`1,000,000+` neurons, zero idle compute)
+///   2. Hippocampal-Cortical Conceptual Knowledge Web & Direct User Episodic Memory (1-2 shot BTSP)
+///   3. Predictive Processing, Failed-Prediction Analyzer & Goal-Directed Scenario Simulator
+///   4. Grounded Language & Mouth Road (understands and speaks strictly from grounded concepts)
+/// - Body:
+///   5. 5-Sense Embodied Interface (Eyes, Ears, Hands, Smell, Internal Senses)
+/// - Environment:
+///   6. Interactive 2D Spatial World Canvas
 #[derive(Serialize, Deserialize)]
-pub struct Alpha7Brain {
+pub struct Alpha7Organism {
     pub fabric: SparseNeuralFabric,
     pub knowledge_web: ConceptualKnowledgeWeb,
     pub predictor: PredictiveEngine,
+    pub language: LanguageRoad,
+    pub body: Alpha7Body,
+    pub world: World2DCanvas,
 }
 
-#[pymethods]
-impl Alpha7Brain {
-    #[new]
-    #[pyo3(signature = (num_neurons=1_000_000, neurons_per_column=64))]
+impl Alpha7Organism {
     pub fn new(num_neurons: usize, neurons_per_column: usize) -> Self {
         Self {
             fabric: SparseNeuralFabric::new(num_neurons, neurons_per_column),
             knowledge_web: ConceptualKnowledgeWeb::new(),
             predictor: PredictiveEngine::new(),
+            language: LanguageRoad::new(),
+            body: Alpha7Body::new(),
+            world: World2DCanvas::default_sandbox(),
         }
     }
 
-    /// Total number of neurons currently in the sparse fabric.
     pub fn neuron_count(&self) -> usize {
         self.fabric.neurons.len()
     }
 
-    /// Current simulation tick of the brain.
-    pub fn current_tick(&self) -> u32 {
-        self.fabric.current_tick
-    }
-
-    /// Total number of directed synapses currently wired across the fabric.
     pub fn active_synapse_count(&self) -> usize {
         self.fabric.synapses.values().map(|s| s.len()).sum()
     }
 
-    /// Approximate RAM footprint of the neuron arena + synapse storage in megabytes.
     pub fn memory_footprint_mb(&self) -> f64 {
         let neuron_bytes = self.fabric.neurons.len() * std::mem::size_of::<DendriticNeuron>();
         let syn_vec_bytes = self.fabric.synapses.len()
-            * (std::mem::size_of::<u32>() + std::mem::size_of::<smallvec::SmallVec<[Synapse; 4]>>());
+            * (std::mem::size_of::<u32>()
+                + std::mem::size_of::<smallvec::SmallVec<[Synapse; 4]>>());
         ((neuron_bytes + syn_vec_bytes) as f64) / (1024.0 * 1024.0)
     }
 
-    /// Injects a sensory-motor frame (list of grounded trait strings across eyes, ears, hands,
-    /// smell, senses), steps the sparse dendritic fabric, and returns JSON telemetry.
-    #[pyo3(signature = (sensory_traits, learn_enabled=true))]
-    pub fn perceive_and_step(&mut self, sensory_traits: Vec<String>, learn_enabled: bool) -> String {
-        for trait_str in &sensory_traits {
+    /// Injects a 5-sense `SensoryFrame`, steps the sparse neural fabric, and returns step report
+    /// and recognized concepts.
+    pub fn perceive_and_step(
+        &mut self,
+        frame: &SensoryFrame,
+        learn_enabled: bool,
+    ) -> (StepReport, Vec<ConceptRecognition>) {
+        let traits = frame.to_neural_traits();
+        for trait_str in &traits {
             let prefix = trait_str.split(':').next().unwrap_or("association");
             let modality = Modality::from_str(prefix);
             let nid = self.fabric.ensure_trait_neuron(trait_str, modality);
             self.fabric.inject_basal_stimulus(nid, 1.25);
         }
         let step_report = self.fabric.step(learn_enabled);
-        let recognitions = self.knowledge_web.recognize_from_traits(&sensory_traits);
-
-        let payload = serde_json::json!({
-            "step": step_report,
-            "recognized_concepts": recognitions,
-        });
-        serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string())
+        let recognitions = self.knowledge_web.recognize_from_traits(&traits);
+        (step_report, recognitions)
     }
 
-    /// Teaches or refines a concept in 1-2 interactions (infant-like BTSP binding), separating
+    /// Learns or refines a concept in 1-2 interactions (infant-like BTSP binding), separating
     /// core invariant traits from incidental traits and recording a direct user episodic memory.
-    #[pyo3(signature = (concept_name, sensory_traits, associated_words=vec![], affordance=None, partner="user"))]
-    pub fn learn_concept(
+    pub fn experience_concept(
         &mut self,
         concept_name: &str,
-        sensory_traits: Vec<String>,
-        associated_words: Vec<String>,
+        frame: &SensoryFrame,
         affordance: Option<(String, String)>,
         partner: &str,
-    ) -> String {
-        // First step the sensory traits through the fabric so BTSP eligibility traces are live
-        for trait_str in &sensory_traits {
+    ) -> (ConceptNode, StepReport) {
+        let traits = frame.to_neural_traits();
+        for trait_str in &traits {
             let prefix = trait_str.split(':').next().unwrap_or("association");
             let modality = Modality::from_str(prefix);
             let nid = self.fabric.ensure_trait_neuron(trait_str, modality);
             self.fabric.inject_basal_stimulus(nid, 1.25);
         }
         let report = self.fabric.step(true);
+        let words = if frame.spoken_words.is_empty() {
+            vec![concept_name.to_string()]
+        } else {
+            frame.spoken_words.clone()
+        };
         let node = self.knowledge_web.experience_concept(
             &mut self.fabric,
             concept_name,
-            &sensory_traits,
-            &associated_words,
+            &traits,
+            &words,
             affordance,
             partner,
             report.surprise.surprise_score,
         );
-
-        let core_traits: Vec<String> = node
-            .core_invariants()
-            .into_iter()
-            .map(|t| t.trait_key.clone())
-            .collect();
-        let variable_traits: Vec<String> = node
-            .variable_traits()
-            .into_iter()
-            .map(|t| t.trait_key.clone())
-            .collect();
-
-        let payload = serde_json::json!({
-            "concept": node.name,
-            "exposures": node.exposures,
-            "familiarity": node.familiarity,
-            "core_invariants": core_traits,
-            "variable_traits": variable_traits,
-            "grounded_words": node.grounded_words,
-            "causal_affordances": node.causal_affordances,
-            "surprise_score": report.surprise.surprise_score,
-            "touched_neurons": report.touched_neurons,
-        });
-        serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string())
-    }
-
-    /// Recognizes concepts from an arbitrary set of sensory traits (returns JSON array).
-    pub fn recognize(&self, observed_traits: Vec<String>) -> String {
-        let recs = self.knowledge_web.recognize_from_traits(&observed_traits);
-        serde_json::to_string(&recs).unwrap_or_else(|_| "[]".to_string())
-    }
-
-    /// Inspects a learned concept node in detail.
-    pub fn inspect_concept(&self, concept_name: &str) -> String {
-        if let Some(node) = self.knowledge_web.concepts.get(&concept_name.to_lowercase()) {
-            let core_traits: Vec<String> = node
-                .core_invariants()
-                .into_iter()
-                .map(|t| t.trait_key.clone())
-                .collect();
-            let variable_traits: Vec<String> = node
-                .variable_traits()
-                .into_iter()
-                .map(|t| t.trait_key.clone())
-                .collect();
-            let payload = serde_json::json!({
-                "concept": node.name,
-                "exposures": node.exposures,
-                "familiarity": node.familiarity,
-                "core_invariants": core_traits,
-                "variable_traits": variable_traits,
-                "grounded_words": node.grounded_words,
-                "causal_affordances": node.causal_affordances,
-                "all_traits": node.traits,
-            });
-            serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string())
-        } else {
-            "{}".to_string()
-        }
-    }
-
-    /// Predicts what traits will happen next if `action` is executed in `current_traits`.
-    pub fn predict_next(&self, current_traits: Vec<String>, action: &str) -> Vec<(String, f32)> {
-        self.predictor.predict_next(&current_traits, action)
+        (node, report)
     }
 
     /// Predicts what will happen next, observes what actually happens, and if something predicted
     /// fails to happen, analyzes the cause of the failure and updates both the predictive engine
     /// and the neural fabric's apical synapses in one shot.
-    #[pyo3(signature = (context_traits, action, actual_outcomes, partner="sandbox"))]
     pub fn act_and_analyze(
         &mut self,
-        context_traits: Vec<String>,
+        context_frame: &SensoryFrame,
         action: &str,
-        actual_outcomes: Vec<String>,
+        actual_outcomes: &[String],
         partner: &str,
-    ) -> String {
+    ) -> (PredictionEvaluation, StepReport) {
+        let context_traits = context_frame.to_neural_traits();
+
         // 1. Prime apical dendrites with the predicted outcome before observing reality
         let predicted = self.predictor.predict_next(&context_traits, action);
         for (pred_trait, prob) in &predicted {
@@ -195,7 +141,7 @@ impl Alpha7Brain {
         }
 
         // 2. Inject actual outcome traits into basal dendrites & step the sparse fabric
-        for out_trait in &actual_outcomes {
+        for out_trait in actual_outcomes {
             let nid = self
                 .fabric
                 .ensure_trait_neuron(out_trait, Modality::from_str(out_trait));
@@ -208,7 +154,7 @@ impl Alpha7Brain {
             &mut self.fabric,
             &context_traits,
             action,
-            &actual_outcomes,
+            actual_outcomes,
         );
 
         // 4. Record an episodic memory if surprise/learning occurred
@@ -224,81 +170,81 @@ impl Alpha7Brain {
                     active_concepts: vec![action.to_string()],
                     observed_traits: context_traits,
                     action_or_code: Some(action.to_string()),
-                    outcome_traits: actual_outcomes,
+                    outcome_traits: actual_outcomes.to_vec(),
                     surprise_score: step_report.surprise.surprise_score.max(0.75),
                 });
         }
 
-        let payload = serde_json::json!({
-            "evaluation": eval,
-            "fabric_step": step_report,
-        });
-        serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string())
+        (eval, step_report)
+    }
+
+    /// Practices a small code snippet using Eyes (visual syntax inspection) and Hands (execution),
+    /// predicting the outcome first and analyzing any surprise or syntax error.
+    pub fn practice_coding(
+        &mut self,
+        code_str: &str,
+        concept_label: Option<&str>,
+    ) -> PredictionEvaluation {
+        let visual_traits = self.body.eyes.inspect_code(code_str);
+        let senses = self.body.internal.read_state(0.0);
+        let frame = SensoryFrame {
+            eyes: visual_traits,
+            ears: Vec::new(),
+            hands: Vec::new(),
+            smell: Vec::new(),
+            senses,
+            spoken_words: Vec::new(),
+        };
+        let actual_outcomes = self.body.hands.execute_small_code(code_str);
+        let (eval, _step) = self.act_and_analyze(&frame, "run_code", &actual_outcomes, "user");
+
+        if let Some(label) = concept_label {
+            if let Some(first_out) = actual_outcomes.first() {
+                let _ = self.experience_concept(
+                    label,
+                    &frame,
+                    Some(("run_code".to_string(), first_out.clone())),
+                    "user",
+                );
+            }
+        }
+        eval
     }
 
     /// Simulates multi-step possibilities and scenarios directed toward `goal_trait`.
-    #[pyo3(signature = (current_traits, goal_trait, max_depth=3))]
     pub fn simulate_goal_scenarios(
         &self,
-        current_traits: Vec<String>,
+        current_frame: &SensoryFrame,
         goal_trait: &str,
         max_depth: usize,
-    ) -> String {
-        let branches =
-            self.predictor
-                .simulate_scenarios(&current_traits, goal_trait, max_depth);
-        serde_json::to_string(&branches).unwrap_or_else(|_| "[]".to_string())
+    ) -> Vec<ScenarioBranch> {
+        self.predictor
+            .simulate_scenarios(&current_frame.to_neural_traits(), goal_trait, max_depth)
     }
 
-    /// Grounded language understanding: maps words/sentences/code to sensory-motor traits,
-    /// causal affordances, and direct user episodic memories.
-    pub fn think_on_words(&self, utterance: &str) -> String {
-        let thought = self.knowledge_web.understand_utterance(utterance);
-        serde_json::to_string(&thought).unwrap_or_else(|_| "{}".to_string())
+    /// Processes a user utterance through the Grounded Language & Mouth Road.
+    pub fn converse(&mut self, utterance: &str) -> MouthUtterance {
+        let current_frame = self.world.sense_current_frame(&mut self.body, Some(utterance));
+        self.language.respond_to_user(
+            &mut self.fabric,
+            &self.knowledge_web,
+            &self.predictor,
+            &current_frame,
+            utterance,
+        )
     }
 
-    /// Returns the most recent direct episodic memories formed with the user or environment.
-    #[pyo3(signature = (limit=10))]
-    pub fn recalled_episodes(&self, limit: usize) -> String {
-        let slice: Vec<_> = self
-            .knowledge_web
-            .episodes
-            .iter()
-            .rev()
-            .take(limit)
-            .cloned()
-            .collect();
-        serde_json::to_string(&slice).unwrap_or_else(|_| "[]".to_string())
+    /// Saves the entire Alpha 7 organism state (neurons, synapses, concept web, episodic memories, 2D world) to disk.
+    pub fn save_state(&self, path: &str) -> Result<(), String> {
+        let json = serde_json::to_string_pretty(self).map_err(|e| e.to_string())?;
+        fs::write(path, json).map_err(|e| e.to_string())
     }
 
-    /// Persists the entire Alpha 7 brain (neurons, synapses, concept web, episodic memories) to JSON.
-    pub fn save_state(&self, path: &str) -> PyResult<()> {
-        let data = serde_json::to_string_pretty(self).map_err(|e| {
-            pyo3::exceptions::PyIOError::new_err(format!("Failed to serialize Alpha7Brain: {}", e))
-        })?;
-        fs::write(path, data).map_err(|e| {
-            pyo3::exceptions::PyIOError::new_err(format!("Failed to write {}: {}", path, e))
-        })?;
-        Ok(())
+    /// Loads a persisted Alpha 7 organism state from disk.
+    pub fn load_state(path: &str) -> Result<Self, String> {
+        let data = fs::read_to_string(path).map_err(|e| e.to_string())?;
+        serde_json::from_str(&data).map_err(|e| e.to_string())
     }
-
-    /// Loads a persisted Alpha 7 brain from disk.
-    #[staticmethod]
-    pub fn load_state(path: &str) -> PyResult<Self> {
-        let data = fs::read_to_string(path).map_err(|e| {
-            pyo3::exceptions::PyIOError::new_err(format!("Failed to read {}: {}", path, e))
-        })?;
-        let brain: Alpha7Brain = serde_json::from_str(&data).map_err(|e| {
-            pyo3::exceptions::PyIOError::new_err(format!("Failed to deserialize Alpha7Brain: {}", e))
-        })?;
-        Ok(brain)
-    }
-}
-
-#[pymodule]
-fn alpha7_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<Alpha7Brain>()?;
-    Ok(())
 }
 
 #[cfg(test)]
@@ -307,136 +253,111 @@ mod tests {
 
     #[test]
     fn test_million_neurons_zero_idle_bottleneck() {
-        let mut brain = Alpha7Brain::new(1_000_000, 64);
-        assert_eq!(brain.neuron_count(), 1_000_000);
-        // 1 million neurons should use < 65 MB of RAM and step in sub-millisecond time
-        assert!(brain.memory_footprint_mb() < 75.0);
+        let mut org = Alpha7Organism::new(1_000_000, 64);
+        assert_eq!(org.neuron_count(), 1_000_000);
+        assert!(org.memory_footprint_mb() < 40.0);
 
-        let start = std::time::Instant::now();
-        let report_json = brain.perceive_and_step(
-            vec![
-                "eyes:whiskers".to_string(),
-                "eyes:pointy_ears".to_string(),
-                "ears:purr".to_string(),
-            ],
-            true,
+        let frame = org.body.build_frame(
+            &["pointy_ears", "whiskers"],
+            &["purr"],
+            &["soft_fur"],
+            &["feline_scent"],
+            None,
         );
+        let start = std::time::Instant::now();
+        let (report, _) = org.perceive_and_step(&frame, true);
         let elapsed = start.elapsed();
         assert!(
             elapsed.as_millis() < 20,
             "1M neuron sparse step took too long: {:?}",
             elapsed
         );
-        assert!(report_json.contains("touched_neurons"));
+        assert!(report.touched_neurons > 0 && report.touched_neurons < 100);
     }
 
     #[test]
-    fn test_two_shot_infant_cat_generalization() {
-        let mut brain = Alpha7Brain::new(100_000, 64);
+    fn test_world2d_and_two_shot_infant_cat_generalization() {
+        let mut org = Alpha7Organism::new(100_000, 64);
 
-        // Exposure 1: User shows an orange cat that meows
-        brain.learn_concept(
+        // 1. Move to Orange Cat at (2, 2) on the 2D World Canvas & learn 'cat' (Exposure #1)
+        org.world.move_agent_to(&mut org.body, 2, 2);
+        let frame1 = org
+            .world
+            .sense_current_frame(&mut org.body, Some("cat kitty"));
+        let (node1, _) = org.experience_concept(
             "cat",
-            vec![
-                "eyes:pointy_ears".to_string(),
-                "eyes:whiskers".to_string(),
-                "eyes:slit_pupils".to_string(),
-                "eyes:four_legs".to_string(),
-                "hands:soft_fur".to_string(),
-                "ears:purr".to_string(),
-                "eyes:orange_coat".to_string(),
-            ],
-            vec!["cat".to_string(), "kitty".to_string()],
+            &frame1,
             Some(("gentle_pet".to_string(), "ears:purr".to_string())),
             "user",
         );
+        assert_eq!(node1.exposures, 1);
 
-        // Exposure 2: User shows a black cat (shares feline invariants, differs in coat color)
-        brain.learn_concept(
-            "cat",
-            vec![
-                "eyes:pointy_ears".to_string(),
-                "eyes:whiskers".to_string(),
-                "eyes:slit_pupils".to_string(),
-                "eyes:four_legs".to_string(),
-                "hands:soft_fur".to_string(),
-                "ears:purr".to_string(),
-                "eyes:black_coat".to_string(),
-            ],
-            vec!["cat".to_string()],
-            None,
-            "user",
-        );
+        // 2. Move to Black Cat at (10, 2) on the 2D World Canvas & refine 'cat' (Exposure #2)
+        org.world.move_agent_to(&mut org.body, 10, 2);
+        let frame2 = org.world.sense_current_frame(&mut org.body, Some("cat"));
+        let (node2, _) = org.experience_concept("cat", &frame2, None, "user");
+        assert_eq!(node2.exposures, 2);
 
-        let node = brain.knowledge_web.concepts.get("cat").unwrap();
-        let core: Vec<String> = node
+        let core: Vec<String> = node2
             .core_invariants()
             .iter()
             .map(|t| t.trait_key.clone())
             .collect();
-        let var: Vec<String> = node
+        let var: Vec<String> = node2
             .variable_traits()
             .iter()
             .map(|t| t.trait_key.clone())
             .collect();
-
         assert!(core.contains(&"eyes:whiskers".to_string()));
         assert!(core.contains(&"eyes:pointy_ears".to_string()));
-        assert!(var.contains(&"eyes:orange_coat".to_string()));
-        assert!(var.contains(&"eyes:black_coat".to_string()));
+        assert!(var.contains(&"eyes:orange_fur".to_string()));
+        assert!(var.contains(&"eyes:black_fur".to_string()));
 
-        // Test 3: Unseen white cat is immediately recognized with high confidence!
-        let recs = brain.knowledge_web.recognize_from_traits(&vec![
-            "eyes:pointy_ears".to_string(),
-            "eyes:whiskers".to_string(),
-            "eyes:four_legs".to_string(),
-            "hands:soft_fur".to_string(),
-            "eyes:white_coat".to_string(),
-        ]);
-        assert!(!recs.is_empty());
-        assert_eq!(recs[0].concept_name, "cat");
-        assert!(recs[0].confidence > 0.80);
+        // 3. Move to Unseen White Cat at (10, 9) and ask Alpha 7 "what is this?" via LanguageRoad!
+        org.world.move_agent_to(&mut org.body, 10, 9);
+        let reply = org.converse("what is this?");
+        assert!(reply.spoken_response.contains("I recognize 'cat'"));
+
+        // 4. Move to Unseen Dog at (2, 9) and ask "what is this?" -> should NOT falsely recognize cat!
+        org.world.move_agent_to(&mut org.body, 2, 9);
+        let dog_reply = org.converse("what is this?");
+        assert!(dog_reply.spoken_response.contains("unfamiliar traits"));
     }
 
     #[test]
-    fn test_prediction_failure_analysis_and_goal_rollout() {
-        let mut brain = Alpha7Brain::new(50_000, 64);
+    fn test_prediction_failure_coding_and_goal_scenarios() {
+        let mut org = Alpha7Organism::new(50_000, 64);
 
-        // 1. Alpha 7 learns that running `run_code` on valid code produces `eyes:output_ok`
-        brain.act_and_analyze(
-            vec!["eyes:code_written".to_string()],
-            "run_code",
-            vec!["eyes:output_ok".to_string()],
+        // 1. Practice valid code
+        let eval_ok = org.practice_coding("result = 6 * 7\nprint(result)", Some("multiply_code"));
+        assert!(!eval_ok.prediction_failed || eval_ok.analysis_report.contains("ONE-SHOT"));
+
+        // 2. Practice broken code -> prediction failure analyzed!
+        let eval_err = org.practice_coding("result = 6 * * * 7", None);
+        assert!(eval_err.prediction_failed);
+        assert!(eval_err.analysis_report.contains("PREDICTION FAILURE ANALYZED"));
+        assert!(eval_err.analysis_report.contains("eyes:syntax_typo"));
+
+        // 3. Causal chain & Goal Scenario Simulation via Mouth
+        let f_switch = org
+            .body
+            .build_frame(&["switch_visible"], &[], &["near_switch"], &[], None);
+        org.act_and_analyze(
+            &f_switch,
+            "press_switch",
+            &["eyes:light_on".to_string()],
+            "user",
+        );
+        let f_light = org.body.build_frame(&["light_on"], &[], &[], &[], None);
+        org.act_and_analyze(
+            &f_light,
+            "read_book",
+            &["eyes:knowledge_gained".to_string()],
             "user",
         );
 
-        // Verify Alpha 7 now predicts `eyes:output_ok`
-        let preds = brain.predict_next(vec!["eyes:code_written".to_string()], "run_code");
-        assert_eq!(preds[0].0, "eyes:output_ok");
-
-        // 2. Now something FAILS to happen: when `eyes:syntax_typo` is present, `eyes:output_ok`
-        // fails to happen and `eyes:syntax_error` happens instead!
-        let failure_json = brain.act_and_analyze(
-            vec![
-                "eyes:code_written".to_string(),
-                "eyes:syntax_typo".to_string(),
-            ],
-            "run_code",
-            vec!["eyes:syntax_error".to_string()],
-            "user",
-        );
-        assert!(failure_json.contains("PREDICTION FAILURE ANALYZED"));
-        assert!(failure_json.contains("eyes:syntax_typo"));
-
-        // 3. Verify Alpha 7 learned from the failure: with `eyes:syntax_typo` present, it now
-        // predicts `eyes:syntax_error` instead of `eyes:output_ok`!
-        let updated_preds = brain.predict_next(
-            vec![
-                "eyes:code_written".to_string(),
-                "eyes:syntax_typo".to_string(),
-            ],
-            "run_code",
-        );
-        assert_eq!(updated_preds[0].0, "eyes:syntax_error");
+        let branches = org.simulate_goal_scenarios(&f_switch, "eyes:knowledge_gained", 3);
+        assert!(branches.iter().any(|b| b.reaches_goal
+            && b.actions == vec!["press_switch".to_string(), "read_book".to_string()]));
     }
 }

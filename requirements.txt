@@ -1,8 +1,0 @@
-# Editable Git install with no remote (alpha7==0.1.0)
--e /data/dev/alpha7
-iniconfig==2.3.1
-maturin==1.15.0
-packaging==26.3
-pluggy==1.6.0
-Pygments==2.21.0
-pytest==9.1.1
