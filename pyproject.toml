@@ -1,0 +1,18 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "alpha7"
+version = "0.1.0"
+description = "Alpha 7: Embodied Sparse Dendritic AI with BTSP One-Shot Concept Web & Predictive World Model"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.maturin]
+python-source = "python"
+module-name = "alpha7.alpha7_core"
+features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

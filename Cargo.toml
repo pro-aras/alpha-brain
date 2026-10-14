@@ -1,0 +1,16 @@
+[package]
+name = "alpha7_core"
+version = "0.1.0"
+edition = "2021"
+description = "Alpha 7: Event-driven sparse dendritic neural fabric, BTSP one-shot concept web, and predictive engine"
+
+[lib]
+name = "alpha7_core"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+pyo3 = { version = "0.24", features = ["extension-module", "abi3-py310"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rustc-hash = "2.1"
+smallvec = { version = "1.13", features = ["serde"] }
