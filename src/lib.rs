@@ -1,3 +1,5 @@
+#![recursion_limit = "512"]
+
 pub mod academy_computer_phd;
 pub mod balanced_growth_hybrid_ldm;
 pub mod body;
@@ -14,6 +16,7 @@ pub mod predictor;
 pub mod school;
 pub mod sovereign_quantum;
 pub mod substrate;
+pub mod weekly_game_mastery_sleep;
 pub mod world2d;
 
 use academy_computer_phd::{
@@ -49,6 +52,9 @@ use serde::{Deserialize, Serialize};
 use sovereign_quantum::SovereignQuantumBrain;
 use std::fs;
 use substrate::CorticalSubstrate;
+use weekly_game_mastery_sleep::{
+    Phase17WeeklyGameMasteryAndSleepEngine, Phase17WeeklyGamesAndSleepReport,
+};
 use world2d::World2DCanvas;
 
 /// Phase 2C: Report from Alpha 7's Goal-Directed Code Synthesizer & Bug-Repair Sandbox.
@@ -81,10 +87,11 @@ pub struct CodeSynthesisReport {
 ///  13. Phase 13–14 (`v1.7.0 → v1.8.0`) `Phase13BalancedHybridLdmEngine` & `Phase14InteractiveEvolutionEngine` (Bio-Stabilized Bidirectional Unwinding LDM, Self-Conditioned Multilingual HybridLink, 5-Domain Synchronized Co-Maturation, Interactive Trilingual Curriculum & Sandboxed Self-Code Upgrade Organ)
 ///  14. Phase 15 (`v1.9.0`) `Phase15FoveatedVideoChaosEngine` (Human-Clarity Foveated Retina `1:1` Native Saccades, Synchronized Video + 16kHz Cochlear Audio Stream, and Unorganized Chaos Self-Organizer & Root Prover across `K -> G1-G12 -> College -> University -> PhD`)
 ///  15. Phase 16 (`v2.0.0`) `Phase16DynamicThalamusFissionGamesEngine` (Dynamic Hardware-Adaptive Body & Resolution-Free Eyes, Unified Thalamo-Cortical & Claustrum Continuous Sensory Stream, and Multicellular Asymmetric Mitosis / Zygotic Brain Fusion playing Live Non-Repeating `9x9` Sudoku & `8x8` Chess)
+///  16. Phase 17 (`v2.1.0`) `Phase17WeeklyGameMasteryAndSleepEngine` (7-Day 14-Game Mastery Arcade across Strategy, Math, Physics, Polyglot Language, Etymology & Code + 4-Cell 6-Ply Apical Fission-Fusion + Two-Process Borbély Homeostatic & Circadian Sleep Organ)
 /// - Body:
-///  16. 5-Sense Embodied Interface with Dynamic Native-Resolution Retina, Cochlear Audio & Code Synthesis Hands
+///  17. 5-Sense Embodied Interface with Dynamic Native-Resolution Retina, Cochlear Audio & Code Synthesis Hands
 /// - Environment & School:
-///  17. Interactive 2D Spatial World Canvas (with Key-Door-Vault Tool Puzzle) & `/data/alpha3-library` Exam Harness
+///  18. Interactive 2D Spatial World Canvas (with Key-Door-Vault Tool Puzzle) & `/data/alpha3-library` Exam Harness
 #[derive(Serialize, Deserialize)]
 pub struct Alpha7Organism {
     pub fabric: SparseNeuralFabric,
@@ -118,6 +125,8 @@ pub struct Alpha7Organism {
     #[serde(default)]
     pub phase16_thalamus_fission_games: Phase16DynamicThalamusFissionGamesEngine,
     #[serde(default)]
+    pub phase17_weekly_games_sleep: Phase17WeeklyGameMasteryAndSleepEngine,
+    #[serde(default)]
     pub synthesized_programs: Vec<CodeSynthesisReport>,
     #[serde(skip)]
     pub school: SchoolEngine,
@@ -144,6 +153,7 @@ impl Alpha7Organism {
             phase14_evolution_dialogue: Phase14InteractiveEvolutionEngine::new(),
             phase15_foveated_video_chaos: Phase15FoveatedVideoChaosEngine::new(),
             phase16_thalamus_fission_games: Phase16DynamicThalamusFissionGamesEngine::new(),
+            phase17_weekly_games_sleep: Phase17WeeklyGameMasteryAndSleepEngine::new(),
             synthesized_programs: Vec::new(),
             school: SchoolEngine::new(),
         }
@@ -1046,6 +1056,41 @@ impl Alpha7Organism {
                     }
                     return reply;
                 }
+                if t_low == "phase 17"
+                    || t_low == "14 games"
+                    || t_low == "weekly games"
+                    || t_low == "sleep schedule"
+                    || t_low == "bio sleep"
+                    || t_low == "replay game"
+                    || t_low == "restart games"
+                {
+                    if t_low == "replay game" {
+                        let desc = self
+                            .phase17_weekly_games_sleep
+                            .weekly_arena
+                            .replay_current_game(20261016);
+                        reply.spoken_response = format!(
+                            "[REPLAY GAME] {} (Episode #{}, Mastery {:.1}%): {}",
+                            desc.title, desc.episodes_played, desc.mastery_percentage, desc.latest_episode_summary
+                        );
+                        return reply;
+                    }
+                    if t_low == "restart games" {
+                        let desc = self
+                            .phase17_weekly_games_sleep
+                            .weekly_arena
+                            .restart_entire_week_gauntlet(20261016);
+                        reply.spoken_response = format!(
+                            "[RESTART 7-DAY GAUNTLET] Reset to {} (Episode #{}): {}",
+                            desc.title, desc.episodes_played, desc.latest_episode_summary
+                        );
+                        return reply;
+                    }
+                    if let Some(rep) = self.run_phase17_weekly_games_and_sleep() {
+                        reply.spoken_response = rep.summary;
+                    }
+                    return reply;
+                }
 
                 let mut school = std::mem::take(&mut self.school);
                 school.ensure_trained_from_school_library(self);
@@ -1307,6 +1352,18 @@ impl Alpha7Organism {
             self.phase16_thalamus_fission_games
                 .run_all_phase16_capabilities(),
         )
+    }
+
+    /// Phase 17 (`v2.1.0`): Runs the 7-Day (14-Game) Progressive Mastery Arcade (7 Strategy/Logic/Math/Physics games
+    /// + 7 Language/Etymology/Polyglot/Epistemic/Code games), the 4-Cell (`α, β, γ, δ`) 6-Ply Apical Fission–Fusion
+    /// Cluster, and the Two-Process Borbély Homeostatic (`Process S`) + Circadian (`Process C`) Sleep Organ.
+    pub fn run_phase17_weekly_games_and_sleep(
+        &mut self,
+    ) -> Option<Phase17WeeklyGamesAndSleepReport> {
+        if self.substrate.helmholtz.lesion_omega_slow {
+            return None;
+        }
+        Some(self.phase17_weekly_games_sleep.run_phase17_certification())
     }
 
     /// Runs the complete Phase 4 (`v0.8.0`) 6-Test Certification + Causality Lesions on an isolated clone
@@ -3339,5 +3396,93 @@ mod tests {
         assert!(org
             .run_phase16_dynamic_thalamus_fission_and_games()
             .is_none());
+    }
+
+    #[test]
+    fn test_phase17_weekly_14_games_four_cell_fission_and_borbely_sleep() {
+        let mut org = Alpha7Organism::new(20_000, 64);
+
+        let rep = org
+            .run_phase17_weekly_games_and_sleep()
+            .expect("Expected Phase 17 report on healthy brain");
+
+        // 1. Verify 4-Cell (`α, β, γ, δ`) 6-Ply Apical Fission–Fusion
+        assert_eq!(rep.four_cell_fusion_report.individual_cell_scores.len(), 4);
+        assert!(
+            rep.four_cell_fusion_report.max_pairwise_perturbation_cosine < 0.0,
+            "Expected all 4 divided cells to be distinct non-clones (max_cos < 0.0), got {}",
+            rep.four_cell_fusion_report.max_pairwise_perturbation_cosine
+        );
+        assert!(rep.four_cell_fusion_report.apical_nodes_evaluated > 100);
+        assert!(rep.four_cell_fusion_report.synergy_gain_over_best_cell > 0.0);
+
+        // 2. Verify 7-Day (14-Game) Progressive Mastery Arcade
+        assert_eq!(rep.total_games_in_weekly_gauntlet, 14);
+        assert_eq!(rep.games_sampled_and_verified, 14);
+        assert_eq!(rep.language_and_knowledge_games_included, 7);
+        assert_eq!(
+            org.phase17_weekly_games_sleep
+                .weekly_arena
+                .games_catalog
+                .len(),
+            14
+        );
+        for g in &org.phase17_weekly_games_sleep.weekly_arena.games_catalog {
+            assert!(g.episodes_played >= 1);
+            assert!(!g.live_board_2d.is_empty());
+        }
+
+        // 3. Verify Replay, Select, Next & Restart controls
+        let replay_desc = org
+            .phase17_weekly_games_sleep
+            .weekly_arena
+            .replay_current_game(101);
+        assert!(replay_desc.episodes_played >= 2);
+        let sel_desc = org
+            .phase17_weekly_games_sleep
+            .weekly_arena
+            .select_and_play_game("G04_PolyglotRosetta", 102);
+        assert_eq!(sel_desc.game_index, 3);
+        assert_eq!(
+            org.phase17_weekly_games_sleep
+                .weekly_arena
+                .active_game_index,
+            3
+        );
+        let next_desc = org
+            .phase17_weekly_games_sleep
+            .weekly_arena
+            .advance_to_next_game(103);
+        assert_eq!(next_desc.game_index, 4);
+        assert_eq!(
+            org.phase17_weekly_games_sleep
+                .weekly_arena
+                .active_game_index,
+            4
+        );
+        let restart_desc = org
+            .phase17_weekly_games_sleep
+            .weekly_arena
+            .restart_entire_week_gauntlet(104);
+        assert_eq!(restart_desc.game_index, 0);
+        assert_eq!(
+            org.phase17_weekly_games_sleep
+                .weekly_arena
+                .active_game_index,
+            0
+        );
+
+        // 4. Verify Two-Process Borbély Homeostatic (`Process S`) + Circadian (`Process C`) Sleep
+        assert!(rep.bio_sleep_verified);
+        assert!(
+            org.phase17_weekly_games_sleep
+                .bio_sleep_organ
+                .bio_sleep_cycles_completed
+                >= 1
+        );
+
+        // 5. Double-Dissociation Lesion Check on Phase 17
+        org.substrate.helmholtz.lesion_omega_slow = true;
+        assert!(org.run_phase17_weekly_games_and_sleep().is_none());
     }
 }

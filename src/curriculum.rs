@@ -654,6 +654,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
     let phase14_rep = org.run_phase14_curriculum_and_self_evolution();
     let phase15_rep = org.run_phase15_foveated_vision_video_and_chaos_prover();
     let phase16_rep = org.run_phase16_dynamic_thalamus_fission_and_games();
+    let phase17_rep = org.run_phase17_weekly_games_and_sleep();
     let cert6_summary = org.run_six_test_certification();
     let sealed_loci = org.seal_genome();
     bridge_log.push(BridgeLogEntry {
@@ -667,6 +668,16 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         ),
         details: Some(cert6_summary.clone()),
     });
+    if let Some(p17) = &phase17_rep {
+        bridge_log.push(BridgeLogEntry {
+            timestamp: now_unix(),
+            tick: org.fabric.current_tick,
+            role: "alpha7_mouth".into(),
+            kind: "phase17_weekly_games_and_sleep".into(),
+            message: p17.summary.clone(),
+            details: None,
+        });
+    }
     if let Some(p16) = &phase16_rep {
         let s_curve: Vec<usize> = p16
             .unseen_sudoku_progression
@@ -979,17 +990,35 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                             current_activity =
                                 format!("Synthesized code for target '{}'", target_spec);
                         }
-                        "sleep" => {
+                        "sleep" | "bio_sleep" => {
                             let rep = org.consolidate_memories();
+                            let bio_ev = org
+                                .phase17_weekly_games_sleep
+                                .bio_sleep_organ
+                                .step_homeostatic_and_circadian_sleep(2, 2, true);
+                            let bio_msg = bio_ev
+                                .map(|e| {
+                                    format!(
+                                        "{} | [BIO-SLEEP #{}] {} (Adenosine S: {:.2} -> {:.2}, NREM pruned {} synapses, SWR replayed {} episodes)",
+                                        rep.summary,
+                                        e.cycle_number,
+                                        e.trigger_reason,
+                                        e.pre_sleep_adenosine_s,
+                                        e.post_sleep_adenosine_s,
+                                        e.nrem_weak_synapses_pruned,
+                                        e.swr_game_and_language_episodes_replayed
+                                    )
+                                })
+                                .unwrap_or(rep.summary);
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
                                 tick: org.fabric.current_tick,
                                 role: "sleep_replay".into(),
                                 kind: "sleep".into(),
-                                message: rep.summary.clone(),
+                                message: bio_msg.clone(),
                                 details: None,
                             });
-                            current_activity = rep.summary;
+                            current_activity = bio_msg;
                         }
                         "goal" => {
                             if let Some(g) = cmd.text {
@@ -1085,7 +1114,18 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                             }
                         }
                         "game" => {
-                            let game_msg = org
+                            let desc = org
+                                .phase17_weekly_games_sleep
+                                .weekly_arena
+                                .step_active_weekly_game(now_unix() + step_counter);
+                            let game_msg = format!(
+                                "[{} · Ep#{} · {:.1}%] {}",
+                                desc.title,
+                                desc.episodes_played,
+                                desc.mastery_percentage,
+                                desc.latest_episode_summary
+                            );
+                            let _ = org
                                 .phase16_thalamus_fission_games
                                 .fission_games
                                 .step_live_non_repeating_games(now_unix() + step_counter);
@@ -1098,6 +1138,92 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                                 details: None,
                             });
                             current_activity = game_msg;
+                        }
+                        "game_replay" => {
+                            let desc = org
+                                .phase17_weekly_games_sleep
+                                .weekly_arena
+                                .replay_current_game(now_unix() + step_counter);
+                            let msg = format!(
+                                "[REPLAY · {} · Ep#{} · {:.1}%] {}",
+                                desc.title,
+                                desc.episodes_played,
+                                desc.mastery_percentage,
+                                desc.latest_episode_summary
+                            );
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "alpha7_mouth".into(),
+                                kind: "game_replay".into(),
+                                message: msg.clone(),
+                                details: None,
+                            });
+                            current_activity = msg;
+                        }
+                        "game_restart" => {
+                            let desc = org
+                                .phase17_weekly_games_sleep
+                                .weekly_arena
+                                .restart_entire_week_gauntlet(now_unix() + step_counter);
+                            let msg = format!(
+                                "[RESTART 7-DAY GAUNTLET -> {} · Ep#{}] {}",
+                                desc.title, desc.episodes_played, desc.latest_episode_summary
+                            );
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "alpha7_mouth".into(),
+                                kind: "game_restart".into(),
+                                message: msg.clone(),
+                                details: None,
+                            });
+                            current_activity = msg;
+                        }
+                        "game_next" => {
+                            let desc = org
+                                .phase17_weekly_games_sleep
+                                .weekly_arena
+                                .advance_to_next_game(now_unix() + step_counter);
+                            let msg = format!(
+                                "[NEXT GAME -> {} · Ep#{} · {:.1}%] {}",
+                                desc.title,
+                                desc.episodes_played,
+                                desc.mastery_percentage,
+                                desc.latest_episode_summary
+                            );
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "alpha7_mouth".into(),
+                                kind: "game_next".into(),
+                                message: msg.clone(),
+                                details: None,
+                            });
+                            current_activity = msg;
+                        }
+                        "game_select" => {
+                            let sel_id = cmd.text.or(cmd.concept).unwrap_or_else(|| "0".into());
+                            let desc = org
+                                .phase17_weekly_games_sleep
+                                .weekly_arena
+                                .select_and_play_game(sel_id.trim(), now_unix() + step_counter);
+                            let msg = format!(
+                                "[SELECTED GAME -> {} · Ep#{} · {:.1}%] {}",
+                                desc.title,
+                                desc.episodes_played,
+                                desc.mastery_percentage,
+                                desc.latest_episode_summary
+                            );
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "alpha7_mouth".into(),
+                                kind: "game_select".into(),
+                                message: msg.clone(),
+                                details: None,
+                            });
+                            current_activity = msg;
                         }
                         _ => {}
                     }
@@ -1213,20 +1339,61 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             curr_idx = (curr_idx + 1) % curriculum.len();
         }
 
-        // Phase 16: Live Continuous Non-Repeating Strategy Games (9x9 Procedural Sudoku & 8x8 Fission-Fusion Chess)
+        // Phase 16 & 17: Live Continuous Non-Repeating 14-Game Weekly Mastery Gauntlet + Two-Process Biological Sleep
         if step_counter % 2 == 0 {
-            let live_game_msg = org
+            let _ = org
                 .phase16_thalamus_fission_games
                 .fission_games
                 .step_live_non_repeating_games(step_counter);
-            current_activity = format!("{} || {}", live_game_msg, current_activity);
-            if step_counter % 8 == 0 {
+            let weekly_desc = org
+                .phase17_weekly_games_sleep
+                .weekly_arena
+                .step_active_weekly_game(step_counter);
+            let weekly_game_msg = format!(
+                "[Day {} · {} · Ep#{} · {:.1}%] {}",
+                weekly_desc.scheduled_day,
+                weekly_desc.title,
+                weekly_desc.episodes_played,
+                weekly_desc.mastery_percentage,
+                weekly_desc.latest_episode_summary
+            );
+            let _ = org
+                .phase17_weekly_games_sleep
+                .four_cell_cluster
+                .run_four_cell_fission_rollout_and_fusion(step_counter);
+            current_activity = format!("{} || {}", weekly_game_msg, current_activity);
+            if step_counter % 6 == 0 {
                 bridge_log.push(BridgeLogEntry {
                     timestamp: now_unix(),
                     tick: org.fabric.current_tick,
                     role: "alpha7_mouth".into(),
                     kind: "live_game".into(),
-                    message: live_game_msg,
+                    message: weekly_game_msg,
+                    details: None,
+                });
+            }
+
+            // Step Two-Process Borbély Homeostatic (`Process S`) + Circadian (`Process C`) Sleep Organ
+            if let Some(bio_sleep_ev) = org
+                .phase17_weekly_games_sleep
+                .bio_sleep_organ
+                .step_homeostatic_and_circadian_sleep(1, 1, false)
+            {
+                let _ = org.consolidate_memories();
+                bridge_log.push(BridgeLogEntry {
+                    timestamp: now_unix(),
+                    tick: org.fabric.current_tick,
+                    role: "sleep_replay".into(),
+                    kind: "bio_sleep".into(),
+                    message: format!(
+                        "[BIO-SLEEP #{}] {} (Adenosine S: {:.2} -> {:.2}, NREM pruned {} synapses, SWR replayed {} episodes)",
+                        bio_sleep_ev.cycle_number,
+                        bio_sleep_ev.trigger_reason,
+                        bio_sleep_ev.pre_sleep_adenosine_s,
+                        bio_sleep_ev.post_sleep_adenosine_s,
+                        bio_sleep_ev.nrem_weak_synapses_pruned,
+                        bio_sleep_ev.swr_game_and_language_episodes_replayed
+                    ),
                     details: None,
                 });
             }
@@ -1274,11 +1441,17 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             bridge_log.drain(0..drain_count);
         }
 
-        // Build Concept list for Instrument 4
-        let mut concepts_json: Vec<serde_json::Value> = org
-            .knowledge_web
-            .concepts
-            .values()
+        // Build Concept list for Instrument 4 (keep full count, export top 80 most familiar/recent for fast live telemetry)
+        let total_concepts_count = org.knowledge_web.concepts.len();
+        let mut concepts_vec: Vec<_> = org.knowledge_web.concepts.values().collect();
+        concepts_vec.sort_by(|a, b| {
+            b.exposures
+                .cmp(&a.exposures)
+                .then_with(|| a.name.cmp(&b.name))
+        });
+        let concepts_json: Vec<serde_json::Value> = concepts_vec
+            .into_iter()
+            .take(80)
             .map(|c| {
                 let core: Vec<String> = c
                     .core_invariants()
@@ -1309,11 +1482,6 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 })
             })
             .collect();
-        concepts_json.sort_by(|a, b| {
-            let na = a.get("name").and_then(|v| v.as_str()).unwrap_or("");
-            let nb = b.get("name").and_then(|v| v.as_str()).unwrap_or("");
-            na.cmp(nb)
-        });
 
         let world_entities_json: Vec<serde_json::Value> = org
             .world
@@ -1396,8 +1564,8 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 .unwrap_or(0);
 
         let phase10_advanced_status = serde_json::json!({
-            "version": "v2.0.0",
-            "organs_total": 48,
+            "version": "v2.1.0",
+            "organs_total": 51,
             "felt_uneasiness_u": felt_unease_u,
             "uneasiness_focus_topic": unease_focus_topic,
             "open_loops_count": org.substrate.unease_organ.open_loops.len(),
@@ -1438,11 +1606,15 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             "phase16_thalamus_fission_games_report": org.phase16_thalamus_fission_games.last_report,
             "live_fission_games_state": org.phase16_thalamus_fission_games.fission_games,
             "live_thalamus_packet": org.phase16_thalamus_fission_games.thalamic_bus.last_wave_packet,
+            "phase17_weekly_games_sleep_report": org.phase17_weekly_games_sleep.last_report,
+            "live_weekly_arena": org.phase17_weekly_games_sleep.weekly_arena,
+            "live_four_cell_cluster": org.phase17_weekly_games_sleep.four_cell_cluster,
+            "live_bio_sleep_organ": org.phase17_weekly_games_sleep.bio_sleep_organ,
         });
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD v2.0.0 (PHASE 0–16 · DYNAMIC HARDWARE-ADAPTIVE BODY + UNIFIED THALAMIC SENSORY STREAM + MULTICELLULAR FISSION-FUSION CHESS & SUDOKU)".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v2.1.0 (PHASE 0–17 · 7-DAY 14-GAME MASTERY ARCADE + 4-CELL 6-PLY APICAL FISSION-FUSION + TWO-PROCESS BORBELY SLEEP + UNIFIED THALAMIC STREAM)".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),
@@ -1479,9 +1651,9 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             causal_rules_count: org.predictor.rules.len(),
             causal_rules_preview: org.predictor.rules.iter().take(10).cloned().collect(),
             synthesized_programs: org.synthesized_programs.iter().rev().take(6).cloned().collect(),
-            concepts_count: concepts_json.len(),
+            concepts_count: total_concepts_count,
             concepts: concepts_json,
-            concept_relations: org.knowledge_web.relations.clone(),
+            concept_relations: org.knowledge_web.relations.iter().take(80).cloned().collect(),
             sleep_cycles_completed: org.knowledge_web.sleep_cycles_completed,
             last_sleep_report: org.knowledge_web.last_sleep_report.clone(),
             curriculum_index: curr_idx,
