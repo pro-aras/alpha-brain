@@ -5,6 +5,7 @@ pub mod chrono_census_ldm_math;
 pub mod concept_web;
 pub mod curriculum;
 pub mod deep_comprehension_agency;
+pub mod dynamic_thalamus_fission_games;
 pub mod fabric;
 pub mod foveated_vision_video_chaos_prover;
 pub mod language_road;
@@ -32,6 +33,9 @@ use concept_web::{
 use deep_comprehension_agency::{
     AdvancedLibraryExamsReport, AutonomousDirectiveReport, DeepComprehensionAndAgencyEngine,
     SentenceComprehensionTrace,
+};
+use dynamic_thalamus_fission_games::{
+    Phase16ComprehensiveReport, Phase16DynamicThalamusFissionGamesEngine,
 };
 use fabric::{SparseNeuralFabric, StepReport};
 use foveated_vision_video_chaos_prover::{
@@ -76,10 +80,11 @@ pub struct CodeSynthesisReport {
 ///  12. Phase 12 (`v1.6.0`) `ChronoCensusLdmMathEngine` (Linear Depth Memory RLS `arXiv:2610.18809v1`, 5D Chrono-Spatial Historical Memory with Experience Lineage Chains, Device/Location/Time Interoception, Total Self-Census & Unsolved Math Conjecture Probe Lab)
 ///  13. Phase 13–14 (`v1.7.0 → v1.8.0`) `Phase13BalancedHybridLdmEngine` & `Phase14InteractiveEvolutionEngine` (Bio-Stabilized Bidirectional Unwinding LDM, Self-Conditioned Multilingual HybridLink, 5-Domain Synchronized Co-Maturation, Interactive Trilingual Curriculum & Sandboxed Self-Code Upgrade Organ)
 ///  14. Phase 15 (`v1.9.0`) `Phase15FoveatedVideoChaosEngine` (Human-Clarity Foveated Retina `1:1` Native Saccades, Synchronized Video + 16kHz Cochlear Audio Stream, and Unorganized Chaos Self-Organizer & Root Prover across `K -> G1-G12 -> College -> University -> PhD`)
+///  15. Phase 16 (`v2.0.0`) `Phase16DynamicThalamusFissionGamesEngine` (Dynamic Hardware-Adaptive Body & Resolution-Free Eyes, Unified Thalamo-Cortical & Claustrum Continuous Sensory Stream, and Multicellular Asymmetric Mitosis / Zygotic Brain Fusion playing Live Non-Repeating `9x9` Sudoku & `8x8` Chess)
 /// - Body:
-///  15. 5-Sense Embodied Interface with V1/V2 Raw Pixel Retina, Cochlear Audio & Code Synthesis Hands
+///  16. 5-Sense Embodied Interface with Dynamic Native-Resolution Retina, Cochlear Audio & Code Synthesis Hands
 /// - Environment & School:
-///  16. Interactive 2D Spatial World Canvas (with Key-Door-Vault Tool Puzzle) & `/data/alpha3-library` Exam Harness
+///  17. Interactive 2D Spatial World Canvas (with Key-Door-Vault Tool Puzzle) & `/data/alpha3-library` Exam Harness
 #[derive(Serialize, Deserialize)]
 pub struct Alpha7Organism {
     pub fabric: SparseNeuralFabric,
@@ -111,6 +116,8 @@ pub struct Alpha7Organism {
     #[serde(default)]
     pub phase15_foveated_video_chaos: Phase15FoveatedVideoChaosEngine,
     #[serde(default)]
+    pub phase16_thalamus_fission_games: Phase16DynamicThalamusFissionGamesEngine,
+    #[serde(default)]
     pub synthesized_programs: Vec<CodeSynthesisReport>,
     #[serde(skip)]
     pub school: SchoolEngine,
@@ -136,6 +143,7 @@ impl Alpha7Organism {
             phase13_balanced_hybrid_ldm: Phase13BalancedHybridLdmEngine::new(),
             phase14_evolution_dialogue: Phase14InteractiveEvolutionEngine::new(),
             phase15_foveated_video_chaos: Phase15FoveatedVideoChaosEngine::new(),
+            phase16_thalamus_fission_games: Phase16DynamicThalamusFissionGamesEngine::new(),
             synthesized_programs: Vec::new(),
             school: SchoolEngine::new(),
         }
@@ -991,6 +999,53 @@ impl Alpha7Organism {
                     );
                     return reply;
                 }
+                if t_low == "phase 16"
+                    || t_low == "sudoku"
+                    || t_low == "chess"
+                    || t_low == "fission"
+                    || t_low == "fission fusion"
+                    || t_low == "thalamus"
+                    || t_low == "dynamic resolution"
+                    || t_low == "play games"
+                {
+                    if let Some(rep) = self.run_phase16_dynamic_thalamus_fission_and_games() {
+                        let s_curve: Vec<usize> = rep
+                            .unseen_sudoku_progression
+                            .iter()
+                            .map(|s| s.invalid_conflict_attempts_failed)
+                            .collect();
+                        let c_curve: Vec<f32> = rep
+                            .unseen_chess_fission_fusion_matches
+                            .iter()
+                            .map(|m| m.fusion_event.post_fusion_unified_score)
+                            .collect();
+                        let cos_sim = rep
+                            .unseen_chess_fission_fusion_matches
+                            .first()
+                            .map(|m| m.fusion_event.cosine_similarity_between_divided_cells)
+                            .unwrap_or(0.0);
+                        let syn_gain = rep
+                            .unseen_chess_fission_fusion_matches
+                            .last()
+                            .map(|m| {
+                                m.fusion_event.post_fusion_unified_score
+                                    - m.fusion_event.pre_fission_parent_tactical_score
+                            })
+                            .unwrap_or(0.0);
+                        reply.spoken_response = format!(
+                            "[PHASE 16 SUITE (v2.0.0)] Dynamic Body: 1:1 Native Resolution across 160x120, 640x480 & 1920x1080 Full HD (max={}x{}) | Unified Thalamo-Cortical Bus: 5 Organs -> 1 WavePacket (superadditive boost=+{:.3}) | Non-Repeating 9x9 Sudoku: {} unique boards solved (conflicts {:?} -> 0) | Multicellular Fission-Fusion 8x8 Chess: Cell-α (Vanguard) vs Cell-β (Sentinel) cosine={:.3}, unseen tactical accuracy {:?} (+{:.1}% fusion gain).",
+                            rep.dynamic_hardware_profile.max_supported_image_width,
+                            rep.dynamic_hardware_profile.max_supported_image_height,
+                            rep.unified_thalamic_wave_packet.superadditive_cross_modal_boost,
+                            rep.unseen_sudoku_progression.len(),
+                            s_curve,
+                            cos_sim,
+                            c_curve,
+                            syn_gain * 100.0
+                        );
+                    }
+                    return reply;
+                }
 
                 let mut school = std::mem::take(&mut self.school);
                 school.ensure_trained_from_school_library(self);
@@ -1235,6 +1290,22 @@ impl Alpha7Organism {
         Some(
             self.phase15_foveated_video_chaos
                 .run_all_phase15_capabilities(),
+        )
+    }
+
+    /// Phase 16 (`v2.0.0`): Runs the Dynamic Hardware-Adaptive Sensory Body across multiple native resolutions
+    /// (`160x120`, `640x480`, `1920x1080` Full HD at `1:1` native pixel stride), the Unified Thalamo-Cortical &
+    /// Claustrum Continuous Sensory Stream (`5 organs -> 1 UnifiedCorticalWavePacket`), and the Multicellular
+    /// Fission-Fusion Learning Organism playing non-repeating `9x9` Sudoku and `8x8` Chess against itself.
+    pub fn run_phase16_dynamic_thalamus_fission_and_games(
+        &mut self,
+    ) -> Option<Phase16ComprehensiveReport> {
+        if self.substrate.helmholtz.lesion_omega_slow {
+            return None;
+        }
+        Some(
+            self.phase16_thalamus_fission_games
+                .run_all_phase16_capabilities(),
         )
     }
 
@@ -3178,12 +3249,95 @@ mod tests {
             .run_phase15_foveated_vision_video_and_chaos_prover()
             .is_none());
     }
+
+    #[test]
+    fn test_phase16_dynamic_resolution_unified_thalamus_fission_fusion_and_unseen_games() {
+        let mut org = Alpha7Organism::new(20_000, 64);
+
+        let rep = org
+            .run_phase16_dynamic_thalamus_fission_and_games()
+            .expect("Expected Phase 16 report on healthy brain");
+
+        // 1. Verify Dynamic Hardware-Adaptive Sensory Body across multiple native resolutions (`160x120`, `640x480`, `1920x1080` Full HD)
+        let obs = &rep.multi_resolution_observations;
+        assert_eq!(obs.len(), 3);
+        assert_eq!((obs[0].native_width_px, obs[0].native_height_px), (160, 120));
+        assert_eq!((obs[1].native_width_px, obs[1].native_height_px), (640, 480));
+        assert_eq!(
+            (obs[2].native_width_px, obs[2].native_height_px),
+            (1920, 1080)
+        );
+        for res_scan in obs {
+            assert_eq!(
+                res_scan.effective_pixel_stride, 1,
+                "Foveal/native stride must always be 1:1 native pixel"
+            );
+            assert!(
+                res_scan.native_detail_preservation_ratio >= 0.99,
+                "Expected native detail preservation >= 0.99 on {}x{}, got {}",
+                res_scan.native_width_px,
+                res_scan.native_height_px,
+                res_scan.native_detail_preservation_ratio
+            );
+        }
+
+        // 2. Verify Unified Thalamo-Cortical & Claustrum Continuous Sensory Stream (`5 organs -> 1 UnifiedCorticalWavePacket`)
+        let thal = &rep.unified_thalamic_wave_packet;
+        assert!(thal.single_stream_enforced);
+        assert!(
+            thal.superadditive_cross_modal_boost > 0.0
+                && thal.total_fused_wave_norm > thal.linear_precision_sum_norm,
+            "Expected superadditive cross-modal enhancement over linear sum, got tot={} vs lin={}",
+            thal.total_fused_wave_norm,
+            thal.linear_precision_sum_norm
+        );
+        assert!(thal.phase_locked_coherence_score >= 0.85);
+        assert_eq!(thal.fused_thalamic_wave.len(), 16);
+
+        // 3. Verify Non-Repeating 9x9 Sudoku Learning Curve & Multicellular Fission-Fusion 8x8 Chess Self-Play
+        assert!(rep.all_sudoku_seeds_unique_and_solved);
+        assert!(rep.sudoku_conflicts_dropped_to_zero);
+        assert_eq!(rep.unseen_sudoku_progression.len(), 4);
+        assert!(
+            rep.unseen_sudoku_progression[0].invalid_conflict_attempts_failed > 0
+                && rep.unseen_sudoku_progression[3].invalid_conflict_attempts_failed == 0
+        );
+
+        assert!(rep.fission_cells_verified_distinct_non_clones);
+        assert!(rep.zygotic_fusion_outperformed_solo_cells_and_parent);
+        assert_eq!(rep.unseen_chess_fission_fusion_matches.len(), 3);
+        let first_fusion = &rep.unseen_chess_fission_fusion_matches[0].fusion_event;
+        let last_fusion = &rep.unseen_chess_fission_fusion_matches[2].fusion_event;
+        assert!(
+            first_fusion.cosine_similarity_between_divided_cells < 0.0,
+            "Expected divided Cell-α and Cell-β to be genuinely distinct (cosine < 0.0), got {}",
+            first_fusion.cosine_similarity_between_divided_cells
+        );
+        assert!(
+            last_fusion.post_fusion_unified_score > first_fusion.pre_fission_parent_tactical_score,
+            "Expected post-fusion unified tactical score ({}) > pre-fission parent score ({})",
+            last_fusion.post_fusion_unified_score,
+            first_fusion.pre_fission_parent_tactical_score
+        );
+        assert!(rep.phase16_all_gates_passed);
+
+        // 4. Verify live continuous game stepping (`step_live_non_repeating_games`)
+        let prev_sudoku_count =
+            org.phase16_thalamus_fission_games.fission_games.sudoku_games_completed;
+        let step_msg = org
+            .phase16_thalamus_fission_games
+            .fission_games
+            .step_live_non_repeating_games(0);
+        assert!(step_msg.contains("[LIVE 9x9 SUDOKU"));
+        assert_eq!(
+            org.phase16_thalamus_fission_games.fission_games.sudoku_games_completed,
+            prev_sudoku_count + 1
+        );
+
+        // 5. Double-Dissociation Lesion Check on Phase 16
+        org.substrate.helmholtz.lesion_omega_slow = true;
+        assert!(org
+            .run_phase16_dynamic_thalamus_fission_and_games()
+            .is_none());
+    }
 }
-
-
-
-
-
-
-
-

@@ -653,6 +653,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
     let phase13_rep = org.run_phase13_flaw_discovery_and_balanced_maturation();
     let phase14_rep = org.run_phase14_curriculum_and_self_evolution();
     let phase15_rep = org.run_phase15_foveated_vision_video_and_chaos_prover();
+    let phase16_rep = org.run_phase16_dynamic_thalamus_fission_and_games();
     let cert6_summary = org.run_six_test_certification();
     let sealed_loci = org.seal_genome();
     bridge_log.push(BridgeLogEntry {
@@ -666,6 +667,49 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         ),
         details: Some(cert6_summary.clone()),
     });
+    if let Some(p16) = &phase16_rep {
+        let s_curve: Vec<usize> = p16
+            .unseen_sudoku_progression
+            .iter()
+            .map(|s| s.invalid_conflict_attempts_failed)
+            .collect();
+        let c_curve: Vec<f32> = p16
+            .unseen_chess_fission_fusion_matches
+            .iter()
+            .map(|m| m.fusion_event.post_fusion_unified_score)
+            .collect();
+        let cos_sim = p16
+            .unseen_chess_fission_fusion_matches
+            .first()
+            .map(|m| m.fusion_event.cosine_similarity_between_divided_cells)
+            .unwrap_or(0.0);
+        let syn_gain = p16
+            .unseen_chess_fission_fusion_matches
+            .last()
+            .map(|m| {
+                m.fusion_event.post_fusion_unified_score
+                    - m.fusion_event.pre_fission_parent_tactical_score
+            })
+            .unwrap_or(0.0);
+        bridge_log.push(BridgeLogEntry {
+            timestamp: now_unix(),
+            tick: org.fabric.current_tick,
+            role: "alpha7_mouth".into(),
+            kind: "phase16_thalamus_fission_games".into(),
+            message: format!(
+                "[PHASE 16 v2.0.0] Dynamic Body: 1:1 Native Resolution (160x120, 640x480, 1920x1080 Full HD, max={}x{}) | Unified Thalamo-Cortical Bus: 5 Organs -> 1 Stream (superadditive=+{:.3}) | Non-Repeating 9x9 Sudoku: {} boards (conflicts {:?}) | Fission-Fusion 8x8 Chess: Cell-α vs Cell-β (cosine={:.3}, unseen accuracy {:?}, +{:.1}% fusion gain)",
+                p16.dynamic_hardware_profile.max_supported_image_width,
+                p16.dynamic_hardware_profile.max_supported_image_height,
+                p16.unified_thalamic_wave_packet.superadditive_cross_modal_boost,
+                p16.unseen_sudoku_progression.len(),
+                s_curve,
+                cos_sim,
+                c_curve,
+                syn_gain * 100.0
+            ),
+            details: None,
+        });
+    }
     if let Some(p15) = &phase15_rep {
         bridge_log.push(BridgeLogEntry {
             timestamp: now_unix(),
@@ -1040,6 +1084,21 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                                 current_activity = msg;
                             }
                         }
+                        "game" => {
+                            let game_msg = org
+                                .phase16_thalamus_fission_games
+                                .fission_games
+                                .step_live_non_repeating_games(now_unix() + step_counter);
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "alpha7_mouth".into(),
+                                kind: "live_game".into(),
+                                message: game_msg.clone(),
+                                details: None,
+                            });
+                            current_activity = game_msg;
+                        }
                         _ => {}
                     }
                 }
@@ -1154,6 +1213,25 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             curr_idx = (curr_idx + 1) % curriculum.len();
         }
 
+        // Phase 16: Live Continuous Non-Repeating Strategy Games (9x9 Procedural Sudoku & 8x8 Fission-Fusion Chess)
+        if step_counter % 2 == 0 {
+            let live_game_msg = org
+                .phase16_thalamus_fission_games
+                .fission_games
+                .step_live_non_repeating_games(step_counter);
+            current_activity = format!("{} || {}", live_game_msg, current_activity);
+            if step_counter % 8 == 0 {
+                bridge_log.push(BridgeLogEntry {
+                    timestamp: now_unix(),
+                    tick: org.fabric.current_tick,
+                    role: "alpha7_mouth".into(),
+                    kind: "live_game".into(),
+                    message: live_game_msg,
+                    details: None,
+                });
+            }
+        }
+
         // Phase 11: Periodic paced deep reading comprehension of `/data/alpha3-library` & executive directive refresh
         if step_counter % 5 == 0 {
             let _ = org.step_deep_library_study(1);
@@ -1257,6 +1335,17 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             .collect();
 
         let live_frame = org.world.sense_current_frame(&mut org.body, None);
+        // Phase 16B: Continuously fuse all 5 peripheral organs into a single UnifiedCorticalWavePacket before entering the brain
+        let _ = org
+            .phase16_thalamus_fission_games
+            .thalamic_bus
+            .fuse_live_sensory_traits_into_single_stream(
+                &live_frame.eyes,
+                &live_frame.ears,
+                &live_frame.hands,
+                &live_frame.smell,
+                &live_frame.senses,
+            );
         let f_switch = org
             .body
             .build_frame(&["switch_visible"], &[], &["near_switch"], &[], None);
@@ -1307,8 +1396,8 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 .unwrap_or(0);
 
         let phase10_advanced_status = serde_json::json!({
-            "version": "v1.9.0",
-            "organs_total": 45,
+            "version": "v2.0.0",
+            "organs_total": 48,
             "felt_uneasiness_u": felt_unease_u,
             "uneasiness_focus_topic": unease_focus_topic,
             "open_loops_count": org.substrate.unease_organ.open_loops.len(),
@@ -1346,11 +1435,14 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             "phase13_balanced_hybrid_ldm_report": org.phase13_balanced_hybrid_ldm.last_report,
             "phase14_evolution_dialogue_report": org.phase14_evolution_dialogue.last_report,
             "phase15_foveated_video_chaos_report": org.phase15_foveated_video_chaos.last_report,
+            "phase16_thalamus_fission_games_report": org.phase16_thalamus_fission_games.last_report,
+            "live_fission_games_state": org.phase16_thalamus_fission_games.fission_games,
+            "live_thalamus_packet": org.phase16_thalamus_fission_games.thalamic_bus.last_wave_packet,
         });
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD v1.9.0 (PHASE 0–15 · HUMAN-CLARITY FOVEATED RETINA + SYNCHRONIZED VIDEO/AUDIO STREAM + UNORGANIZED CHAOS SELF-ORGANIZER & ROOT PROVER)".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v2.0.0 (PHASE 0–16 · DYNAMIC HARDWARE-ADAPTIVE BODY + UNIFIED THALAMIC SENSORY STREAM + MULTICELLULAR FISSION-FUSION CHESS & SUDOKU)".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),
