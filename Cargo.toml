@@ -1,8 +1,8 @@
 [package]
 name = "alpha7"
-version = "1.8.0"
+version = "1.9.0"
 edition = "2021"
-description = "Alpha 7 v1.8.0: Pure-Rust Embodied Cortical-Hippocampal & Sovereign Quantum AI (Bio-Stabilized Bidirectional Unwinding LDM, Self-Conditioned Conceptual HybridLink + GNW Ignition + Multilingual Speech, Synchronized 5-Domain Co-Maturation, Interactive Trilingual Curriculum & Sandboxed Self-Code Upgrade Organ)"
+description = "Alpha 7 v1.9.0: Pure-Rust Embodied Cortical-Hippocampal & Sovereign Quantum AI (Foveated 1:1 Retina + Browser Eye, Synchronized Video/Audio Stream, Unorganized Chaos Self-Organizer & Root Prover across K->PhD, Bio-Stabilized Bidirectional LDM, and Multilingual HybridLink)"
 
 [lib]
 name = "alpha7"

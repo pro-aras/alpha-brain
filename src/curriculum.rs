@@ -652,6 +652,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
     let phase12_rep = org.run_phase12_chrono_census_ldm_and_unsolved_math();
     let phase13_rep = org.run_phase13_flaw_discovery_and_balanced_maturation();
     let phase14_rep = org.run_phase14_curriculum_and_self_evolution();
+    let phase15_rep = org.run_phase15_foveated_vision_video_and_chaos_prover();
     let cert6_summary = org.run_six_test_certification();
     let sealed_loci = org.seal_genome();
     bridge_log.push(BridgeLogEntry {
@@ -665,6 +666,28 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         ),
         details: Some(cert6_summary.clone()),
     });
+    if let Some(p15) = &phase15_rep {
+        bridge_log.push(BridgeLogEntry {
+            timestamp: now_unix(),
+            tick: org.fabric.current_tick,
+            role: "alpha7_mouth".into(),
+            kind: "phase15_foveated_video_chaos_prover".into(),
+            message: format!(
+                "[PHASE 15 v1.9.0] Foveated 1:1 Acuity={:.3} ({:.1}x vs Blurry 64x64) | Video+Audio Stream ({}): {} cues watched & heard (motion={:.4}, audio_rms={:.4}) | Unorganized Chaos Prover: {}/{} items self-sorted & proven (K->PhD, spread={:.2} yrs, age={:.1})",
+                p15.foveated_vision_report.foveated_native_acuity_score,
+                p15.foveated_vision_report.clarity_improvement_factor,
+                p15.synchronized_video_audio_report.video_identifier,
+                p15.synchronized_video_audio_report.cues_watched_and_heard,
+                p15.synchronized_video_audio_report.mean_optical_motion_flow,
+                p15.synchronized_video_audio_report.mean_cochlear_voice_activity,
+                p15.chaos_self_organization_report.self_organized_curriculum_ledger.len(),
+                p15.chaos_self_organization_report.raw_unorganized_items_received,
+                p15.chaos_self_organization_report.max_inter_domain_spread_years,
+                p15.chaos_self_organization_report.final_balanced_biological_age_years
+            ),
+            details: None,
+        });
+    }
     if let Some(p14) = &phase14_rep {
         bridge_log.push(BridgeLogEntry {
             timestamp: now_unix(),
@@ -1284,8 +1307,8 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 .unwrap_or(0);
 
         let phase10_advanced_status = serde_json::json!({
-            "version": "v1.8.0",
-            "organs_total": 42,
+            "version": "v1.9.0",
+            "organs_total": 45,
             "felt_uneasiness_u": felt_unease_u,
             "uneasiness_focus_topic": unease_focus_topic,
             "open_loops_count": org.substrate.unease_organ.open_loops.len(),
@@ -1322,11 +1345,12 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             "phase12_honest_speech_disclosure": org.chrono_census_math.last_honest_speech,
             "phase13_balanced_hybrid_ldm_report": org.phase13_balanced_hybrid_ldm.last_report,
             "phase14_evolution_dialogue_report": org.phase14_evolution_dialogue.last_report,
+            "phase15_foveated_video_chaos_report": org.phase15_foveated_video_chaos.last_report,
         });
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD v1.8.0 (PHASE 0–14 · BIO-STABILIZED BIDIRECTIONAL LDM + SELF-CONDITIONED MULTILINGUAL HYBRIDLINK + SYNCHRONIZED 5-DOMAIN CO-MATURATION + SANDBOXED SELF-CODE EVOLUTION)".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v1.9.0 (PHASE 0–15 · HUMAN-CLARITY FOVEATED RETINA + SYNCHRONIZED VIDEO/AUDIO STREAM + UNORGANIZED CHAOS SELF-ORGANIZER & ROOT PROVER)".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),

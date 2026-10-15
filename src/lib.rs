@@ -6,6 +6,7 @@ pub mod concept_web;
 pub mod curriculum;
 pub mod deep_comprehension_agency;
 pub mod fabric;
+pub mod foveated_vision_video_chaos_prover;
 pub mod language_road;
 pub mod neuron;
 pub mod predictor;
@@ -33,6 +34,9 @@ use deep_comprehension_agency::{
     SentenceComprehensionTrace,
 };
 use fabric::{SparseNeuralFabric, StepReport};
+use foveated_vision_video_chaos_prover::{
+    Phase15ComprehensiveReport, Phase15FoveatedVideoChaosEngine,
+};
 use language_road::{LanguageRoad, MouthUtterance, UtteranceIntent};
 use neuron::{DendriticNeuron, Modality, Synapse};
 use predictor::{PredictionEvaluation, PredictiveEngine, ScenarioBranch};
@@ -71,10 +75,11 @@ pub struct CodeSynthesisReport {
 ///  11. Phase 11 (`v1.5.0`) `DeepComprehensionAndAgencyEngine` (Full-Brain Sentence Comprehension, Working Ethics, Paced `/data/alpha3-library` Study & Autonomous Executive Advisor)
 ///  12. Phase 12 (`v1.6.0`) `ChronoCensusLdmMathEngine` (Linear Depth Memory RLS `arXiv:2610.18809v1`, 5D Chrono-Spatial Historical Memory with Experience Lineage Chains, Device/Location/Time Interoception, Total Self-Census & Unsolved Math Conjecture Probe Lab)
 ///  13. Phase 13–14 (`v1.7.0 → v1.8.0`) `Phase13BalancedHybridLdmEngine` & `Phase14InteractiveEvolutionEngine` (Bio-Stabilized Bidirectional Unwinding LDM, Self-Conditioned Multilingual HybridLink, 5-Domain Synchronized Co-Maturation, Interactive Trilingual Curriculum & Sandboxed Self-Code Upgrade Organ)
+///  14. Phase 15 (`v1.9.0`) `Phase15FoveatedVideoChaosEngine` (Human-Clarity Foveated Retina `1:1` Native Saccades, Synchronized Video + 16kHz Cochlear Audio Stream, and Unorganized Chaos Self-Organizer & Root Prover across `K -> G1-G12 -> College -> University -> PhD`)
 /// - Body:
-///  14. 5-Sense Embodied Interface with V1/V2 Raw Pixel Retina, Cochlear Audio & Code Synthesis Hands
+///  15. 5-Sense Embodied Interface with V1/V2 Raw Pixel Retina, Cochlear Audio & Code Synthesis Hands
 /// - Environment & School:
-///  15. Interactive 2D Spatial World Canvas (with Key-Door-Vault Tool Puzzle) & `/data/alpha3-library` Exam Harness
+///  16. Interactive 2D Spatial World Canvas (with Key-Door-Vault Tool Puzzle) & `/data/alpha3-library` Exam Harness
 #[derive(Serialize, Deserialize)]
 pub struct Alpha7Organism {
     pub fabric: SparseNeuralFabric,
@@ -104,6 +109,8 @@ pub struct Alpha7Organism {
     #[serde(default)]
     pub phase14_evolution_dialogue: Phase14InteractiveEvolutionEngine,
     #[serde(default)]
+    pub phase15_foveated_video_chaos: Phase15FoveatedVideoChaosEngine,
+    #[serde(default)]
     pub synthesized_programs: Vec<CodeSynthesisReport>,
     #[serde(skip)]
     pub school: SchoolEngine,
@@ -128,6 +135,7 @@ impl Alpha7Organism {
             chrono_census_math: ChronoCensusLdmMathEngine::new(),
             phase13_balanced_hybrid_ldm: Phase13BalancedHybridLdmEngine::new(),
             phase14_evolution_dialogue: Phase14InteractiveEvolutionEngine::new(),
+            phase15_foveated_video_chaos: Phase15FoveatedVideoChaosEngine::new(),
             synthesized_programs: Vec::new(),
             school: SchoolEngine::new(),
         }
@@ -1212,6 +1220,21 @@ impl Alpha7Organism {
         Some(
             self.phase14_evolution_dialogue
                 .run_phase14_curriculum_and_self_evolution(&mut self.phase13_balanced_hybrid_ldm),
+        )
+    }
+
+    /// Phase 15 (`v1.9.0`): Runs the Human-Clarity Foveated Retina (`1:1` native-pixel saccades + browser eye),
+    /// the Synchronized Video + 16kHz Cochlear Audio Stream Organ (`/data/alpha3-library/video`), and the
+    /// Unorganized Chaos Self-Organizer & First-Principles Root Prover (`K -> G1-G3 -> G4-G12 -> College -> University -> PhD`).
+    pub fn run_phase15_foveated_vision_video_and_chaos_prover(
+        &mut self,
+    ) -> Option<Phase15ComprehensiveReport> {
+        if self.substrate.helmholtz.lesion_omega_slow {
+            return None;
+        }
+        Some(
+            self.phase15_foveated_video_chaos
+                .run_all_phase15_capabilities(),
         )
     }
 
@@ -3078,7 +3101,85 @@ mod tests {
         org.substrate.helmholtz.lesion_omega_slow = true;
         assert!(org.run_phase14_curriculum_and_self_evolution().is_none());
     }
+
+    #[test]
+    fn test_phase15_foveated_vision_video_audio_and_unorganized_chaos_root_prover() {
+        let mut org = Alpha7Organism::new(20_000, 64);
+
+        let rep = org
+            .run_phase15_foveated_vision_video_and_chaos_prover()
+            .expect("Expected Phase 15 report on healthy brain");
+
+        // 1. Verify Human-Clarity Foveated Retina (`1:1` native-pixel saccades vs. blurry `64x64` baseline)
+        let fov = &rep.foveated_vision_report;
+        assert_eq!(fov.original_width_px, 800);
+        assert_eq!(fov.original_height_px, 600);
+        assert!(
+            fov.foveated_native_acuity_score > 0.85,
+            "Expected 1:1 native-pixel foveal acuity > 0.85, got {}",
+            fov.foveated_native_acuity_score
+        );
+        assert!(
+            fov.clarity_improvement_factor > 3.5,
+            "Expected > 3.5x clarity improvement over blurry 64x64 downsampling, got {:.2}x",
+            fov.clarity_improvement_factor
+        );
+        assert!(fov.foveal_saccades.len() >= 3);
+
+        // 2. Verify Synchronized Video + 16kHz Cochlear Audio Stream (`/data/alpha3-library/video/bacteria_friend_and_foe`)
+        let vid = &rep.synchronized_video_audio_report;
+        assert!(vid.video_frames_and_audio_now_learned);
+        assert_eq!(vid.cues_watched_and_heard, 5);
+        assert!(vid.mean_optical_motion_flow > 0.0);
+        assert!(vid.mean_cochlear_voice_activity > 0.0);
+        for cue in &vid.multimodal_sync_bindings {
+            assert!(cue.foveal_acuity_score > 0.50);
+            assert!(cue.cochlear_audio_rms > 0.0);
+            assert!(!cue.synchronized_spoken_words.is_empty());
+        }
+
+        // 3. Verify Unorganized Chaos Self-Organizer & First-Principles Root Prover (`K -> G1-G3 -> G4-G12 -> College -> University -> PhD`)
+        let chaos = &rep.chaos_self_organization_report;
+        assert_eq!(chaos.raw_unorganized_items_received, 6);
+        assert!(
+            chaos.all_prerequisites_satisfied_in_order,
+            "Expected Alpha 7 to self-sort scrambled chaos into strict prerequisite order"
+        );
+        assert!(
+            chaos.all_items_sovereignly_proved,
+            "Expected all 6 self-organized stages to be proven from first principles"
+        );
+        assert_eq!(chaos.final_monotonic_tier_alignment, 1.0);
+        assert!(
+            chaos.max_inter_domain_spread_years <= 0.76,
+            "Expected 5-domain biological age spread <= 0.75 years across K->PhD growth, got {}",
+            chaos.max_inter_domain_spread_years
+        );
+        assert!((chaos.final_balanced_biological_age_years - 21.0).abs() < 0.25);
+
+        // Verify the self-organized execution order resolved the upside-down drop order [3 (K), 1 (G1), 5 (G4-G12), 4 (College), 2 (University), 0 (PhD)]
+        let tiers: Vec<u8> = chaos
+            .self_organized_curriculum_ledger
+            .iter()
+            .map(|e| e.inferred_complexity_tier)
+            .collect();
+        assert_eq!(tiers, vec![1, 2, 3, 4, 5, 6]);
+        let drop_orders: Vec<usize> = chaos
+            .self_organized_curriculum_ledger
+            .iter()
+            .map(|e| e.original_chaos_drop_order)
+            .collect();
+        assert_eq!(drop_orders, vec![3, 1, 5, 4, 2, 0]);
+        assert!(rep.phase15_all_gates_passed);
+
+        // 4. Double-Dissociation Lesion Check on Phase 15
+        org.substrate.helmholtz.lesion_omega_slow = true;
+        assert!(org
+            .run_phase15_foveated_vision_video_and_chaos_prover()
+            .is_none());
+    }
 }
+
 
 
 
