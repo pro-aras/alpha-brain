@@ -572,102 +572,41 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         let _ = org.practice_coding("result = 6 * 7\nprint(result)", Some("multiply_code"));
         let code_fail = org.practice_coding("result = 6 * * * 7", None);
 
-        last_action = "press_switch".to_string();
+        last_action = "game_move_6ply_apical".to_string();
         last_predicted_outcomes = ev_fail.predicted_traits.clone();
         last_actual_outcomes = ev_fail.actual_traits.clone();
         last_prediction_failed = ev_fail.prediction_failed;
         last_analysis_report = ev_fail.analysis_report.clone();
-
-        bridge_log.push(BridgeLogEntry {
-            timestamp: now_unix(),
-            tick: org.fabric.current_tick,
-            role: "surprise_analyzer".into(),
-            kind: "causal_seed".into(),
-            message: ev1.analysis_report,
-            details: Some(code_fail.analysis_report),
-        });
     }
 
     if org.synthesized_programs.is_empty() {
-        let synth42 = org.synthesize_code_for_goal("42");
-        let synth15 = org.synthesize_code_for_goal("15");
-        bridge_log.push(BridgeLogEntry {
-            timestamp: now_unix(),
-            tick: org.fabric.current_tick,
-            role: "alpha7_mouth".into(),
-            kind: "code_synthesis".into(),
-            message: synth42.summary,
-            details: Some(synth15.summary),
-        });
+        let _ = org.synthesize_code_for_goal("42");
+        let _ = org.synthesize_code_for_goal("15");
     }
 
-    // Phase 3D & 3A: Solve Key-Door Tool Puzzle and sit the 8 Held-Out School Exams on startup
     if org.world.puzzle_solves_count == 0 || !org.world.door_unlocked {
-        let puzzle_msg = org.solve_key_door_puzzle();
-        bridge_log.push(BridgeLogEntry {
-            timestamp: now_unix(),
-            tick: org.fabric.current_tick,
-            role: "alpha7_mouth".into(),
-            kind: "puzzle_3d".into(),
-            message: puzzle_msg,
-            details: None,
-        });
+        let _ = org.solve_key_door_puzzle();
     }
 
-    let initial_exams = org.run_school_exams();
-    bridge_log.push(BridgeLogEntry {
-        timestamp: now_unix(),
-        tick: org.fabric.current_tick,
-        role: "curriculum".into(),
-        kind: "school_exams".into(),
-        message: format!(
-            "Sat {}/{} Held-Out School Exams ({}/{} items): {:.1}% Live L vs {:.1}% Null Twin N (+{:.1}% margin in {:.0} ms).",
-            initial_exams.exams_passed,
-            initial_exams.total_exams,
-            initial_exams.total_items_correct,
-            initial_exams.total_items_sat,
-            initial_exams.mean_live_score * 100.0,
-            initial_exams.mean_null_twin_score * 100.0,
-            initial_exams.mean_margin_over_twin * 100.0,
-            initial_exams.total_eval_time_ms
-        ),
-        details: Some(format!(
-            "Cortical Sequence Memory: {} words, {} sequence links from {} sentences.",
-            initial_exams.sequence_vocab_size,
-            initial_exams.sequence_links_count,
-            initial_exams.prose_sentences_read
-        )),
-    });
-
-    // Phases 5–11 Startup Certification: Language Course, Virtual Computer Lab, University BSc Graduation, PhD Discovery Lab, Deep Library Comprehension, 720-item Advanced Exams, Autonomous Directive & Somatic Genome Seal
-    let lang_exam = org.run_language_course_exam();
-    let comp_task = org.run_virtual_computer_lab_task();
-    let grad_rep = org.run_academic_graduation();
+    let _initial_exams = org.run_school_exams();
+    let _lang_exam = org.run_language_course_exam();
+    let _comp_task = org.run_virtual_computer_lab_task();
+    let _grad_rep = org.run_academic_graduation();
     if org.phd_lab.completed_theses.is_empty() {
         let _ = org.run_autonomous_phd_research();
     }
     let _ = org.step_deep_library_study(3);
-    let adv_exams = org.run_real_advanced_library_exams();
-    let auto_dir = org.request_autonomous_directive();
-    let phase12_rep = org.run_phase12_chrono_census_ldm_and_unsolved_math();
-    let phase13_rep = org.run_phase13_flaw_discovery_and_balanced_maturation();
-    let phase14_rep = org.run_phase14_curriculum_and_self_evolution();
-    let phase15_rep = org.run_phase15_foveated_vision_video_and_chaos_prover();
-    let phase16_rep = org.run_phase16_dynamic_thalamus_fission_and_games();
+    let _adv_exams = org.run_real_advanced_library_exams();
+    let _auto_dir = org.request_autonomous_directive();
+    let _phase12_rep = org.run_phase12_chrono_census_ldm_and_unsolved_math();
+    let _phase13_rep = org.run_phase13_flaw_discovery_and_balanced_maturation();
+    let _phase14_rep = org.run_phase14_curriculum_and_self_evolution();
+    let _phase15_rep = org.run_phase15_foveated_vision_video_and_chaos_prover();
+    let _phase16_rep = org.run_phase16_dynamic_thalamus_fission_and_games();
     let phase17_rep = org.run_phase17_weekly_games_and_sleep();
-    let cert6_summary = org.run_six_test_certification();
-    let sealed_loci = org.seal_genome();
-    bridge_log.push(BridgeLogEntry {
-        timestamp: now_unix(),
-        tick: org.fabric.current_tick,
-        role: "alpha7_mouth".into(),
-        kind: "phase11_certification".into(),
-        message: format!(
-            "{} | {} | {} | {} | Sealed {} genetic loci.",
-            lang_exam.summary, comp_task.summary, grad_rep.summary, adv_exams.summary, sealed_loci
-        ),
-        details: Some(cert6_summary.clone()),
-    });
+    let _cert6_summary = org.run_six_test_certification();
+    let _sealed_loci = org.seal_genome();
+
     if let Some(p17) = &phase17_rep {
         bridge_log.push(BridgeLogEntry {
             timestamp: now_unix(),
@@ -678,151 +617,6 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             details: None,
         });
     }
-    if let Some(p16) = &phase16_rep {
-        let s_curve: Vec<usize> = p16
-            .unseen_sudoku_progression
-            .iter()
-            .map(|s| s.invalid_conflict_attempts_failed)
-            .collect();
-        let c_curve: Vec<f32> = p16
-            .unseen_chess_fission_fusion_matches
-            .iter()
-            .map(|m| m.fusion_event.post_fusion_unified_score)
-            .collect();
-        let cos_sim = p16
-            .unseen_chess_fission_fusion_matches
-            .first()
-            .map(|m| m.fusion_event.cosine_similarity_between_divided_cells)
-            .unwrap_or(0.0);
-        let syn_gain = p16
-            .unseen_chess_fission_fusion_matches
-            .last()
-            .map(|m| {
-                m.fusion_event.post_fusion_unified_score
-                    - m.fusion_event.pre_fission_parent_tactical_score
-            })
-            .unwrap_or(0.0);
-        bridge_log.push(BridgeLogEntry {
-            timestamp: now_unix(),
-            tick: org.fabric.current_tick,
-            role: "alpha7_mouth".into(),
-            kind: "phase16_thalamus_fission_games".into(),
-            message: format!(
-                "[PHASE 16 v2.0.0] Dynamic Body: 1:1 Native Resolution (160x120, 640x480, 1920x1080 Full HD, max={}x{}) | Unified Thalamo-Cortical Bus: 5 Organs -> 1 Stream (superadditive=+{:.3}) | Non-Repeating 9x9 Sudoku: {} boards (conflicts {:?}) | Fission-Fusion 8x8 Chess: Cell-α vs Cell-β (cosine={:.3}, unseen accuracy {:?}, +{:.1}% fusion gain)",
-                p16.dynamic_hardware_profile.max_supported_image_width,
-                p16.dynamic_hardware_profile.max_supported_image_height,
-                p16.unified_thalamic_wave_packet.superadditive_cross_modal_boost,
-                p16.unseen_sudoku_progression.len(),
-                s_curve,
-                cos_sim,
-                c_curve,
-                syn_gain * 100.0
-            ),
-            details: None,
-        });
-    }
-    if let Some(p15) = &phase15_rep {
-        bridge_log.push(BridgeLogEntry {
-            timestamp: now_unix(),
-            tick: org.fabric.current_tick,
-            role: "alpha7_mouth".into(),
-            kind: "phase15_foveated_video_chaos_prover".into(),
-            message: format!(
-                "[PHASE 15 v1.9.0] Foveated 1:1 Acuity={:.3} ({:.1}x vs Blurry 64x64) | Video+Audio Stream ({}): {} cues watched & heard (motion={:.4}, audio_rms={:.4}) | Unorganized Chaos Prover: {}/{} items self-sorted & proven (K->PhD, spread={:.2} yrs, age={:.1})",
-                p15.foveated_vision_report.foveated_native_acuity_score,
-                p15.foveated_vision_report.clarity_improvement_factor,
-                p15.synchronized_video_audio_report.video_identifier,
-                p15.synchronized_video_audio_report.cues_watched_and_heard,
-                p15.synchronized_video_audio_report.mean_optical_motion_flow,
-                p15.synchronized_video_audio_report.mean_cochlear_voice_activity,
-                p15.chaos_self_organization_report.self_organized_curriculum_ledger.len(),
-                p15.chaos_self_organization_report.raw_unorganized_items_received,
-                p15.chaos_self_organization_report.max_inter_domain_spread_years,
-                p15.chaos_self_organization_report.final_balanced_biological_age_years
-            ),
-            details: None,
-        });
-    }
-    if let Some(p14) = &phase14_rep {
-        bridge_log.push(BridgeLogEntry {
-            timestamp: now_unix(),
-            tick: org.fabric.current_tick,
-            role: "alpha7_mouth".into(),
-            kind: "phase14_multilingual_and_self_evolution".into(),
-            message: format!(
-                "[PHASE 14 v1.8.0] 5-Stage Trilingual Curriculum: {} turns (Age 2->18, vocab {}->{}, spread={:.2} yrs, coherence={:.3}) | Sandboxed Organ Upgrade ({}): MSE {:.6} -> {:.6} (+{:.1}% gain, promoted={})",
-                p14.multilingual_curriculum_report.turns_completed,
-                p14.multilingual_curriculum_report.initial_grounded_vocabulary_concepts,
-                p14.multilingual_curriculum_report.final_grounded_vocabulary_concepts,
-                p14.multilingual_curriculum_report.max_inter_domain_spread_across_curriculum_years,
-                p14.multilingual_curriculum_report.mean_dialogue_coherence,
-                p14.self_code_upgrade_proposal.target_organ_name,
-                p14.self_code_upgrade_proposal.baseline_control_retention_mse,
-                p14.self_code_upgrade_proposal.upgraded_candidate_retention_mse,
-                p14.self_code_upgrade_proposal.mse_relative_improvement_pct,
-                p14.self_code_upgrade_proposal.promoted_to_active_architecture
-            ),
-            details: Some(p14.self_code_upgrade_proposal.synthesized_rust_upgrade_snippet.clone()),
-        });
-    }
-    if let Some(p13) = &phase13_rep {
-        bridge_log.push(BridgeLogEntry {
-            timestamp: now_unix(),
-            tick: org.fabric.current_tick,
-            role: "alpha7_mouth".into(),
-            kind: "phase13_balanced_hybrid_ldm".into(),
-            message: format!(
-                "[PHASE 13 v1.7.0] Exp1 Bio-LDM L=70 tr(P)={:.2} (vs Naive Blowup {:.0}), Unwind Err={:.6} | Exp2 HybridLink Readability={:.3} (+{:.3} vs Unconditioned), EN='{}' / AR='{}' | Exp3 Balanced Co-Maturation Age={:.1} yrs across all 5 domains (spread={:.2} yrs)",
-                p13.exp1_ldm_flaw_and_fix.bio_stabilized_ldm_trace_at_l70,
-                p13.exp1_ldm_flaw_and_fix.naive_ldm_trace_at_l70,
-                p13.exp1_ldm_flaw_and_fix.exact_unwinding_residual_error,
-                p13.exp2_hybrid_link_flaw_and_fix.self_conditioned_gnw_readability,
-                p13.exp2_hybrid_link_flaw_and_fix.exposure_bias_reduction_gain,
-                p13.exp2_hybrid_link_flaw_and_fix.multilingual_trace.english_utterance,
-                p13.exp2_hybrid_link_flaw_and_fix.multilingual_trace.arabic_utterance,
-                p13.exp3_balanced_maturation.final_synchronized_min_age,
-                p13.exp3_balanced_maturation.final_inter_domain_spread_years
-            ),
-            details: Some(p13.exp2_hybrid_link_flaw_and_fix.multilingual_trace.symbolic_math_chain.clone()),
-        });
-    }
-    bridge_log.push(BridgeLogEntry {
-        timestamp: now_unix(),
-        tick: org.fabric.current_tick,
-        role: "alpha7_mouth".into(),
-        kind: "phase12_census_ldm_math".into(),
-        message: format!(
-            "[PHASE 12 v1.6.0] LDM Sherman-Morrison RLS MSE={:.6} ({:.1}x vs Hebbian) | Self-Census: {} Rust organs ({} LOC, {} structs, {} fns, trigger_hash={}) on {} ({}) at {} | Probed 3 Unsolved Math Conjectures (Collatz, Goldbach, Twin Primes) | Literal Raw Broca: '{}'",
-            phase12_rep.ldm_benchmark.ldm_sherman_morrison_rls_mse,
-            phase12_rep.ldm_benchmark.rls_improvement_over_hebbian_factor,
-            phase12_rep.self_census.total_rust_organ_files,
-            phase12_rep.self_census.total_rust_lines_of_code,
-            phase12_rep.self_census.total_pub_structs,
-            phase12_rep.self_census.total_pub_fns,
-            phase12_rep.self_census.trigger_hash,
-            phase12_rep.self_census.device_state.hostname,
-            phase12_rep.self_census.device_state.cpu_model,
-            phase12_rep.self_census.generated_at.iso8601_local,
-            phase12_rep.honest_speech_disclosure.literal_raw_broca_utterance
-        ),
-        details: Some(phase12_rep.honest_speech_disclosure.host_translated_summary.clone()),
-    });
-    bridge_log.push(BridgeLogEntry {
-        timestamp: now_unix(),
-        tick: org.fabric.current_tick,
-        role: "alpha7_mouth".into(),
-        kind: "autonomous_directive".into(),
-        message: auto_dir.spoken_directive.clone(),
-        details: Some(format!(
-            "Study Focus: {} | Action Required: {}",
-            auto_dir.self_chosen_study_focus,
-            auto_dir
-                .directives_to_architect
-                .first()
-                .cloned()
-                .unwrap_or_default()
-        )),
-    });
 
     let mut step_counter = 0u64;
     loop {
@@ -1251,152 +1045,104 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             }
         }
 
-        // 2. Autonomous Grounded Curriculum, V1/V2 Retina & Cochlear Exploration Step
-        if current_activity.is_empty() && !curriculum.is_empty() {
-            let item = &curriculum[curr_idx % curriculum.len()];
+        // 2. Live Continuous Move-by-Move 7-Day (14-Game) Mastery Gauntlet, 4-Cell 6-Ply Apical Fission-Fusion & Two-Process Borbély Sleep
+        let weekly_desc = org
+            .phase17_weekly_games_sleep
+            .weekly_arena
+            .step_active_weekly_game(step_counter.wrapping_add(now_unix()));
+        let board_just_finished =
+            weekly_desc.current_move_step >= weekly_desc.total_moves_in_board.max(1);
 
-            // Phase 2A: If this item has an image or audio file, run the live V1/V2 Retina and Cochlear analyzers!
-            if let Some(ref img_p) = item.image_path {
-                let _ = org.body.eyes.analyze_image_file(img_p);
-            }
-            if let Some(ref wav_p) = item.audio_path {
-                let _ = org.body.ears.analyze_wav_file(wav_p);
-            }
+        // Feed the current game move's visual, lexical, and tactical features into the 1M-neuron spiking fabric
+        let move_tag = format!("game_{}_move_{}", weekly_desc.game_id, weekly_desc.current_move_step);
+        let cell_tag = weekly_desc.active_cell_turn_label.clone();
+        let law_tag = weekly_desc
+            .vocabulary_and_laws_gained
+            .last()
+            .cloned()
+            .unwrap_or_else(|| weekly_desc.category.clone());
+        let game_frame = org.body.build_frame(
+            &[weekly_desc.title.as_str(), move_tag.as_str()],
+            &[law_tag.as_str()],
+            &[cell_tag.as_str()],
+            &[weekly_desc.day_label.as_str()],
+            Some(&weekly_desc.game_id),
+        );
+        let (rep, _recs) = org.perceive_and_step(&game_frame, true);
+        last_touched = rep.touched_neurons;
+        cumulative_predicted_spikes += rep.predicted_matches.len() as u64;
+        cumulative_surprise_bursts += rep.surprise.unpredicted_bursts.len() as u64;
+        cumulative_failed_predictions += rep.surprise.failed_predictions.len() as u64;
+        cumulative_btsp_updates += rep.surprise.plastic_updates as u64;
+        curr_idx = weekly_desc.game_index;
 
-            let eyes_refs: Vec<&str> = item.eyes_traits.iter().map(|s| s.as_str()).collect();
-            let ears_refs: Vec<&str> = item.ears_traits.iter().map(|s| s.as_str()).collect();
-            let hands_refs: Vec<&str> = item.hands_traits.iter().map(|s| s.as_str()).collect();
-            let smell_refs: Vec<&str> = item.smell_traits.iter().map(|s| s.as_str()).collect();
-            let frame = org.body.build_frame(
-                &eyes_refs,
-                &ears_refs,
-                &hands_refs,
-                &smell_refs,
-                Some(&item.concept_name),
-            );
-
-            let existing_exp = org
-                .knowledge_web
-                .concepts
-                .get(&item.concept_name.to_lowercase())
-                .map(|c| c.exposures)
-                .unwrap_or(0);
-
-            if existing_exp < 2 {
-                let (node, rep) = org.experience_concept(
-                    &item.concept_name,
-                    &frame,
-                    item.affordance.clone(),
-                    &item.shelf,
-                );
-                last_touched = rep.touched_neurons;
-                cumulative_predicted_spikes += rep.predicted_matches.len() as u64;
-                cumulative_surprise_bursts += rep.surprise.unpredicted_bursts.len() as u64;
-                cumulative_failed_predictions += rep.surprise.failed_predictions.len() as u64;
-                cumulative_btsp_updates += rep.surprise.plastic_updates as u64;
-
-                bridge_log.push(BridgeLogEntry {
-                    timestamp: now_unix(),
-                    tick: rep.tick,
-                    role: "curriculum".into(),
-                    kind: "grounding".into(),
-                    message: format!(
-                        "Grounded '{}' from shelf '{}' ({}) — exposure #{}, familiarity {:.0}%",
-                        node.name,
-                        item.shelf,
-                        item.source_path,
-                        node.exposures,
-                        node.familiarity * 100.0
-                    ),
-                    details: None,
-                });
-            } else {
-                let (rep, _recs) = org.perceive_and_step(&frame, true);
-                last_touched = rep.touched_neurons;
-                cumulative_predicted_spikes += rep.predicted_matches.len() as u64;
-                cumulative_surprise_bursts += rep.surprise.unpredicted_bursts.len() as u64;
-                cumulative_failed_predictions += rep.surprise.failed_predictions.len() as u64;
-                cumulative_btsp_updates += rep.surprise.plastic_updates as u64;
-            }
-
-            if !org.world.entities.is_empty() {
-                let target_ent =
-                    &org.world.entities[(step_counter as usize) % org.world.entities.len()];
-                let tx = target_ent.x;
-                let ty = target_ent.y;
-                org.world.saccade_to(&mut org.body, tx, ty);
-                org.world.step_towards(&mut org.body, tx, ty);
-            }
-
-            current_activity = format!(
-                "Exploring shelf '{}' -> concept '{}' ({}) & patrolling 2D World at ({},{})",
-                item.shelf,
-                item.concept_name,
-                item.source_path,
-                org.world.agent_x,
-                org.world.agent_y
-            );
-            curr_idx = (curr_idx + 1) % curriculum.len();
-        }
-
-        // Phase 16 & 17: Live Continuous Non-Repeating 14-Game Weekly Mastery Gauntlet + Two-Process Biological Sleep
-        if step_counter % 2 == 0 {
+        if board_just_finished || step_counter % 4 == 0 {
             let _ = org
                 .phase16_thalamus_fission_games
                 .fission_games
                 .step_live_non_repeating_games(step_counter);
-            let weekly_desc = org
-                .phase17_weekly_games_sleep
-                .weekly_arena
-                .step_active_weekly_game(step_counter);
-            let weekly_game_msg = format!(
-                "[Day {} · {} · Ep#{} · {:.1}%] {}",
-                weekly_desc.scheduled_day,
-                weekly_desc.title,
-                weekly_desc.episodes_played,
-                weekly_desc.mastery_percentage,
-                weekly_desc.latest_episode_summary
-            );
             let _ = org
                 .phase17_weekly_games_sleep
                 .four_cell_cluster
                 .run_four_cell_fission_rollout_and_fusion(step_counter);
-            current_activity = format!("{} || {}", weekly_game_msg, current_activity);
-            if step_counter % 6 == 0 {
-                bridge_log.push(BridgeLogEntry {
-                    timestamp: now_unix(),
-                    tick: org.fabric.current_tick,
-                    role: "alpha7_mouth".into(),
-                    kind: "live_game".into(),
-                    message: weekly_game_msg,
-                    details: None,
-                });
-            }
+        }
 
-            // Step Two-Process Borbély Homeostatic (`Process S`) + Circadian (`Process C`) Sleep Organ
-            if let Some(bio_sleep_ev) = org
-                .phase17_weekly_games_sleep
-                .bio_sleep_organ
-                .step_homeostatic_and_circadian_sleep(1, 1, false)
-            {
-                let _ = org.consolidate_memories();
-                bridge_log.push(BridgeLogEntry {
-                    timestamp: now_unix(),
-                    tick: org.fabric.current_tick,
-                    role: "sleep_replay".into(),
-                    kind: "bio_sleep".into(),
-                    message: format!(
-                        "[BIO-SLEEP #{}] {} (Adenosine S: {:.2} -> {:.2}, NREM pruned {} synapses, SWR replayed {} episodes)",
-                        bio_sleep_ev.cycle_number,
-                        bio_sleep_ev.trigger_reason,
-                        bio_sleep_ev.pre_sleep_adenosine_s,
-                        bio_sleep_ev.post_sleep_adenosine_s,
-                        bio_sleep_ev.nrem_weak_synapses_pruned,
-                        bio_sleep_ev.swr_game_and_language_episodes_replayed
-                    ),
-                    details: None,
-                });
-            }
+        let weekly_game_msg = format!(
+            "[Day {} · {} · Move {}/{} ({:.0}%) · Mastery {:.1}%] {}",
+            weekly_desc.scheduled_day,
+            weekly_desc.title,
+            weekly_desc.current_move_step,
+            weekly_desc.total_moves_in_board,
+            weekly_desc.current_board_progress_pct,
+            weekly_desc.mastery_percentage,
+            weekly_desc.current_move_action_summary
+        );
+        if current_activity.is_empty() {
+            current_activity = weekly_game_msg.clone();
+        } else {
+            current_activity = format!("{} || {}", current_activity, weekly_game_msg);
+        }
+
+        if board_just_finished || step_counter % 8 == 0 {
+            bridge_log.push(BridgeLogEntry {
+                timestamp: now_unix(),
+                tick: org.fabric.current_tick,
+                role: "alpha7_mouth".into(),
+                kind: "live_game".into(),
+                message: weekly_desc.latest_episode_summary.clone(),
+                details: Some(format!(
+                    "Active Turn: {} | Seed: {:#x}",
+                    weekly_desc.active_cell_turn_label,
+                    weekly_desc.current_seed & 0xFFFF_FFFF
+                )),
+            });
+        }
+
+        // Step Two-Process Borbély Homeostatic (`Process S`) + Circadian (`Process C`) Sleep Organ
+        // Only trigger an autonomous learning nap right after finishing a board (never mid-move!)
+        let ep_done_tick = if board_just_finished { 1 } else { 0 };
+        if let Some(bio_sleep_ev) = org
+            .phase17_weekly_games_sleep
+            .bio_sleep_organ
+            .step_homeostatic_and_circadian_sleep(ep_done_tick, ep_done_tick, false)
+        {
+            let _ = org.consolidate_memories();
+            bridge_log.push(BridgeLogEntry {
+                timestamp: now_unix(),
+                tick: org.fabric.current_tick,
+                role: "sleep_replay".into(),
+                kind: "bio_sleep".into(),
+                message: format!(
+                    "[BIO-SLEEP #{}] {} (Adenosine S: {:.2} -> {:.2}, NREM pruned {} synapses, SWR replayed {} episodes)",
+                    bio_sleep_ev.cycle_number,
+                    bio_sleep_ev.trigger_reason,
+                    bio_sleep_ev.pre_sleep_adenosine_s,
+                    bio_sleep_ev.post_sleep_adenosine_s,
+                    bio_sleep_ev.nrem_weak_synapses_pruned,
+                    bio_sleep_ev.swr_game_and_language_episodes_replayed
+                ),
+                details: None,
+            });
         }
 
         // Phase 11: Periodic paced deep reading comprehension of `/data/alpha3-library` & executive directive refresh
@@ -1614,7 +1360,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD v2.1.0 (PHASE 0–17 · 7-DAY 14-GAME MASTERY ARCADE + 4-CELL 6-PLY APICAL FISSION-FUSION + TWO-PROCESS BORBELY SLEEP + UNIFIED THALAMIC STREAM)".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v2.2.0 (7-DAY 14-GAME MOVE-BY-MOVE MASTERY ARCADE + 4-CELL 6-PLY APICAL FISSION-FUSION + TWO-PROCESS BORBELY SLEEP + UNIFIED THALAMIC STREAM)".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),
@@ -1654,10 +1400,10 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             concepts_count: total_concepts_count,
             concepts: concepts_json,
             concept_relations: org.knowledge_web.relations.iter().take(80).cloned().collect(),
-            sleep_cycles_completed: org.knowledge_web.sleep_cycles_completed,
+            sleep_cycles_completed: org.phase17_weekly_games_sleep.bio_sleep_organ.bio_sleep_cycles_completed as u32,
             last_sleep_report: org.knowledge_web.last_sleep_report.clone(),
-            curriculum_index: curr_idx,
-            curriculum_total: curriculum.len(),
+            curriculum_index: curr_idx + 1,
+            curriculum_total: 14,
             recent_episodes,
             bridge_log: bridge_log.iter().rev().cloned().collect(),
             school_report: org.school.last_suite_report.clone(),
@@ -1670,7 +1416,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             }
         }
 
-        if step_counter % 15 == 0 {
+        if step_counter > 0 && step_counter % 100 == 0 {
             let _ = org.save_state(&state_path);
         }
 

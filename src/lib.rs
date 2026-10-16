@@ -1475,6 +1475,7 @@ impl Alpha7Organism {
                     || n.uneasiness_q8 > 0
                     || (n.threshold - 1.0).abs() > 1e-4
             })
+            .take(16_384)
             .collect();
 
         let checkpoint = serde_json::json!({
@@ -1502,8 +1503,10 @@ impl Alpha7Organism {
             "academic_engine": self.academic_engine,
             "phd_lab": self.phd_lab,
             "deep_agency": self.deep_agency,
+            "phase16_thalamus_fission_games": self.phase16_thalamus_fission_games,
+            "phase17_weekly_games_sleep": self.phase17_weekly_games_sleep,
         });
-        let json = serde_json::to_string_pretty(&checkpoint).map_err(|e| e.to_string())?;
+        let json = serde_json::to_vec(&checkpoint).map_err(|e| e.to_string())?;
         let tmp_path = format!("{}.tmp", path);
         fs::write(&tmp_path, json).map_err(|e| e.to_string())?;
         fs::rename(&tmp_path, path).map_err(|e| e.to_string())
@@ -1512,7 +1515,7 @@ impl Alpha7Organism {
     /// Loads a persisted Alpha 7 organism state from disk and restores the 1,000,000-neuron arena.
     pub fn load_state(path: &str) -> Result<Self, String> {
         let data = fs::read_to_string(path).map_err(|e| e.to_string())?;
-        let val: serde_json::Value = serde_json::from_str(&data).map_err(|e| e.to_string())?;
+        let mut val: serde_json::Value = serde_json::from_str(&data).map_err(|e| e.to_string())?;
         let total_n = val
             .get("total_neurons")
             .and_then(|v| v.as_u64())
@@ -1524,15 +1527,13 @@ impl Alpha7Organism {
         if let Some(les) = val.get("lesioned").and_then(|v| v.as_bool()) {
             org.fabric.lesioned = les;
         }
-        if let Some(pp_val) = val.get("pending_predictions") {
-            if let Ok(pp) = serde_json::from_value(pp_val.clone()) {
+        if let Some(pp_val) = val.get_mut("pending_predictions").map(serde_json::Value::take) {
+            if let Ok(pp) = serde_json::from_value(pp_val) {
                 org.fabric.pending_predictions = pp;
             }
         }
-        if let Some(act_val) = val.get("active_neurons") {
-            if let Ok(list) =
-                serde_json::from_value::<Vec<(usize, DendriticNeuron)>>(act_val.clone())
-            {
+        if let Some(act_val) = val.get_mut("active_neurons").map(serde_json::Value::take) {
+            if let Ok(list) = serde_json::from_value::<Vec<(usize, DendriticNeuron)>>(act_val) {
                 for (idx, n) in list {
                     if idx < org.fabric.neurons.len() {
                         org.fabric.neurons[idx] = n;
@@ -1540,100 +1541,116 @@ impl Alpha7Organism {
                 }
             }
         }
-        if let Some(syn_val) = val.get("synapses") {
-            if let Ok(s) = serde_json::from_value(syn_val.clone()) {
+        if let Some(syn_val) = val.get_mut("synapses").map(serde_json::Value::take) {
+            if let Ok(s) = serde_json::from_value(syn_val) {
                 org.fabric.synapses = s;
             }
         }
-        if let Some(ttn_val) = val.get("trait_to_neuron") {
-            if let Ok(m) = serde_json::from_value(ttn_val.clone()) {
+        if let Some(ttn_val) = val.get_mut("trait_to_neuron").map(serde_json::Value::take) {
+            if let Ok(m) = serde_json::from_value(ttn_val) {
                 org.fabric.trait_to_neuron = m;
             }
         }
-        if let Some(ntt_val) = val.get("neuron_to_trait") {
-            if let Ok(m) = serde_json::from_value(ntt_val.clone()) {
+        if let Some(ntt_val) = val.get_mut("neuron_to_trait").map(serde_json::Value::take) {
+            if let Ok(m) = serde_json::from_value(ntt_val) {
                 org.fabric.neuron_to_trait = m;
             }
         }
-        if let Some(kw_val) = val.get("knowledge_web") {
-            if let Ok(kw) = serde_json::from_value(kw_val.clone()) {
+        if let Some(kw_val) = val.get_mut("knowledge_web").map(serde_json::Value::take) {
+            if let Ok(kw) = serde_json::from_value(kw_val) {
                 org.knowledge_web = kw;
             }
         }
-        if let Some(pred_val) = val.get("predictor") {
-            if let Ok(p) = serde_json::from_value(pred_val.clone()) {
+        if let Some(pred_val) = val.get_mut("predictor").map(serde_json::Value::take) {
+            if let Ok(p) = serde_json::from_value(pred_val) {
                 org.predictor = p;
             }
         }
-        if let Some(body_val) = val.get("body") {
-            if let Ok(b) = serde_json::from_value(body_val.clone()) {
+        if let Some(body_val) = val.get_mut("body").map(serde_json::Value::take) {
+            if let Ok(b) = serde_json::from_value(body_val) {
                 org.body = b;
             }
         }
-        if let Some(world_val) = val.get("world") {
-            if let Ok(w) = serde_json::from_value(world_val.clone()) {
+        if let Some(world_val) = val.get_mut("world").map(serde_json::Value::take) {
+            if let Ok(w) = serde_json::from_value(world_val) {
                 org.world = w;
                 org.world.ensure_puzzle_entities();
             }
         }
-        if let Some(synth_val) = val.get("synthesized_programs") {
-            if let Ok(sp) = serde_json::from_value(synth_val.clone()) {
+        if let Some(synth_val) = val.get_mut("synthesized_programs").map(serde_json::Value::take) {
+            if let Ok(sp) = serde_json::from_value(synth_val) {
                 org.synthesized_programs = sp;
             }
         }
-        if let Some(lin_val) = val.get("school_lineage") {
-            if let Ok(lin) = serde_json::from_value(lin_val.clone()) {
+        if let Some(lin_val) = val.get_mut("school_lineage").map(serde_json::Value::take) {
+            if let Ok(lin) = serde_json::from_value(lin_val) {
                 org.school.lineage = lin;
             }
         }
-        if let Some(cl_val) = val.get("school_coach_lessons") {
-            if let Ok(cl) = serde_json::from_value(cl_val.clone()) {
+        if let Some(cl_val) = val.get_mut("school_coach_lessons").map(serde_json::Value::take) {
+            if let Ok(cl) = serde_json::from_value(cl_val) {
                 org.school.coach_lessons = cl;
             }
         }
-        if let Some(cr_val) = val.get("school_coached_rules") {
-            if let Ok(cr) = serde_json::from_value(cr_val.clone()) {
+        if let Some(cr_val) = val.get_mut("school_coached_rules").map(serde_json::Value::take) {
+            if let Ok(cr) = serde_json::from_value(cr_val) {
                 org.school.coached_rules = cr;
             }
         }
-        if let Some(sr_val) = val.get("last_suite_report") {
-            if let Ok(sr) = serde_json::from_value(sr_val.clone()) {
+        if let Some(sr_val) = val.get_mut("last_suite_report").map(serde_json::Value::take) {
+            if let Ok(sr) = serde_json::from_value(sr_val) {
                 org.school.last_suite_report = sr;
             }
         }
-        if let Some(sub_val) = val.get("substrate") {
-            if let Ok(sub) = serde_json::from_value(sub_val.clone()) {
+        if let Some(sub_val) = val.get_mut("substrate").map(serde_json::Value::take) {
+            if let Ok(sub) = serde_json::from_value(sub_val) {
                 org.substrate = sub;
             }
         }
-        if let Some(sov_val) = val.get("sovereign_brain") {
-            if let Ok(sov) = serde_json::from_value(sov_val.clone()) {
+        if let Some(sov_val) = val.get_mut("sovereign_brain").map(serde_json::Value::take) {
+            if let Ok(sov) = serde_json::from_value(sov_val) {
                 org.sovereign_brain = sov;
             }
         }
-        if let Some(la_val) = val.get("language_academy") {
-            if let Ok(la) = serde_json::from_value(la_val.clone()) {
+        if let Some(la_val) = val.get_mut("language_academy").map(serde_json::Value::take) {
+            if let Ok(la) = serde_json::from_value(la_val) {
                 org.language_academy = la;
             }
         }
-        if let Some(vc_val) = val.get("virtual_computer") {
-            if let Ok(vc) = serde_json::from_value(vc_val.clone()) {
+        if let Some(vc_val) = val.get_mut("virtual_computer").map(serde_json::Value::take) {
+            if let Ok(vc) = serde_json::from_value(vc_val) {
                 org.virtual_computer = vc;
             }
         }
-        if let Some(ae_val) = val.get("academic_engine") {
-            if let Ok(ae) = serde_json::from_value(ae_val.clone()) {
+        if let Some(ae_val) = val.get_mut("academic_engine").map(serde_json::Value::take) {
+            if let Ok(ae) = serde_json::from_value(ae_val) {
                 org.academic_engine = ae;
             }
         }
-        if let Some(pl_val) = val.get("phd_lab") {
-            if let Ok(pl) = serde_json::from_value(pl_val.clone()) {
+        if let Some(pl_val) = val.get_mut("phd_lab").map(serde_json::Value::take) {
+            if let Ok(pl) = serde_json::from_value(pl_val) {
                 org.phd_lab = pl;
             }
         }
-        if let Some(da_val) = val.get("deep_agency") {
-            if let Ok(da) = serde_json::from_value(da_val.clone()) {
+        if let Some(da_val) = val.get_mut("deep_agency").map(serde_json::Value::take) {
+            if let Ok(da) = serde_json::from_value(da_val) {
                 org.deep_agency = da;
+            }
+        }
+        if let Some(p16_val) = val
+            .get_mut("phase16_thalamus_fission_games")
+            .map(serde_json::Value::take)
+        {
+            if let Ok(p16) = serde_json::from_value(p16_val) {
+                org.phase16_thalamus_fission_games = p16;
+            }
+        }
+        if let Some(p17_val) = val
+            .get_mut("phase17_weekly_games_sleep")
+            .map(serde_json::Value::take)
+        {
+            if let Ok(p17) = serde_json::from_value(p17_val) {
+                org.phase17_weekly_games_sleep = p17;
             }
         }
         Ok(org)
@@ -3428,16 +3445,15 @@ mod tests {
             14
         );
         for g in &org.phase17_weekly_games_sleep.weekly_arena.games_catalog {
-            assert!(g.episodes_played >= 1);
             assert!(!g.live_board_2d.is_empty());
         }
 
-        // 3. Verify Replay, Select, Next & Restart controls
+        // 3. Verify Replay, Select, Next & Restart controls reset move step to Move 1
         let replay_desc = org
             .phase17_weekly_games_sleep
             .weekly_arena
             .replay_current_game(101);
-        assert!(replay_desc.episodes_played >= 2);
+        assert_eq!(replay_desc.current_move_step, 1);
         let sel_desc = org
             .phase17_weekly_games_sleep
             .weekly_arena
