@@ -667,6 +667,13 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                                 details: Some(format!("from {}", actor)),
                             });
                             let reply = org.converse(&text);
+                            let tr = &reply.grounded_thought.thermal_reaction;
+                            let flux_str: Vec<String> = tr
+                                .multipath_flux_flows
+                                .iter()
+                                .take(3)
+                                .map(|(p, _c, f)| format!("{}:{:.0}%", p, f * 100.0))
+                                .collect();
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
                                 tick: org.fabric.current_tick,
@@ -674,9 +681,15 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                                 kind: "speech".into(),
                                 message: reply.spoken_response,
                                 details: Some(format!(
-                                    "Activated concepts: {:?} | Evoked traits: {:?}",
-                                    reply.grounded_thought.activated_concepts,
-                                    reply.grounded_thought.evoked_sensory_traits
+                                    "Thermal Field Theta=[exc:{:.2}, fric:{:.2}, warm:{:.2}, cold:{:.2}] -> Register='{}' {:?} | Multi-Path Flux=[{}] | Concepts: {:?}",
+                                    tr.excitation_heat,
+                                    tr.friction_heat,
+                                    tr.harmonic_warmth,
+                                    tr.laminar_precision,
+                                    tr.emitted_thermal_register,
+                                    tr.selected_synonym_words,
+                                    flux_str.join(", "),
+                                    reply.grounded_thought.activated_concepts
                                 )),
                             });
                             current_activity = format!("Responded to user: '{}'", text);
@@ -1418,7 +1431,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 .unwrap_or(0);
 
         let phase10_advanced_status = serde_json::json!({
-            "version": "v3.1.0",
+            "version": "v3.2.0",
             "organs_total": 1,
             "felt_uneasiness_u": felt_unease_u,
             "uneasiness_focus_topic": unease_focus_topic,
@@ -1471,7 +1484,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD v3.1.0 (ALIFE AUTOPOIETIC STROKE REPAIR + NICHE CO-EVOLUTION + PRAGMATIC ROLE-FILLER INTENT + SOVEREIGN CRUCIBLE)".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v3.2.0 (4D CONTINUOUS THERMAL-CHEMICAL FIELD + AFFECTIVE SYNONYM WEB + MULTI-PATH CONDUCTIVE FLUX + ALIFE AUTOPOIESIS + SOVEREIGN CRUCIBLE)".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),

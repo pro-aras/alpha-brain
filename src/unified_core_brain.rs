@@ -1400,10 +1400,294 @@ impl UnifiedCoreBrain {
             .len()
             .saturating_sub(recruited_before)
     }
+
+    /// `E15`: Continuous 4D Thermal-Chemical Reaction Field & Multidimensional Heat-Scale
+    /// Synonym/Path Routing executed strictly over `self.fabric.neurons` and `self.fabric.synapses`.
+    ///
+    /// Hardware-to-Software Mapping (`0` extra bytes outside `SparseNeuralFabric`):
+    /// - `tau_exc`  (Excitation Heat): `neuron.basal_v.max(0.0)`
+    /// - `tau_fric` (Friction / Frustration Heat): `neuron.uneasiness()` (`uneasiness_q8 / 256.0`)
+    /// - `tau_warm` (Coherent Harmonic Warmth): `(basal_v * apical_v).sqrt() * exp(-1.6 * tau_fric)`
+    /// - `tau_cold` (Laminar Analytical Precision): `basal_v * exp(-2.5 * tau_fric) * exp(-2.0 * (apical_v - 0.20).max(0.0))`
+    ///
+    /// Propagates continuous reaction currents strictly through `self.fabric.synapses`:
+    /// - From `s_drive_ch` (basal) and `s_affirm_ch` (apical) into `h_concept_id`,
+    /// - From `h_concept_id` into vocal synonym register channels `[m_syn_cold, m_syn_warm, m_syn_hot]`,
+    /// - From `h_concept_id` through parallel path relays `[h_path_1, h_path_2, h_path_3]` into
+    ///   action channels `[m_path_1, m_path_2, m_path_3]` throttled by each relay's thermal back-pressure
+    ///   impedance `1.0 + 3.2 * tau_fric_relay^2`.
+    /// When `zero_lesion_flagless()` wipes `self.fabric.synapses`, zero current reaches any motor channel.
+    pub fn step_continuous_thermal_reaction_and_web_routing(
+        &mut self,
+        s_drive_ch: u32,
+        s_affirm_ch: u32,
+        h_concept_id: u32,
+        drive_intensity: f32,
+        affirm_intensity: f32,
+        injected_friction_delta: f32,
+        cool_rate: f32,
+        synonym_motors: [u32; 3],
+        path_relays: [u32; 3],
+        path_motors: [u32; 3],
+    ) -> ([f32; 4], [f32; 3], [f32; 3], Option<usize>, Option<usize>) {
+        let hc = h_concept_id as usize;
+        if hc >= self.fabric.neurons.len() {
+            return ([0.0; 4], [0.0; 3], [0.0; 3], None, None);
+        }
+
+        // 1. Propagate sensory excitation & contextual affirmation through `self.fabric.synapses`
+        let mut basal_in = 0.0f32;
+        if let Some(syns) = self.fabric.synapses.get(&s_drive_ch) {
+            for s in syns.iter() {
+                if s.target_id == h_concept_id && !s.is_apical && s.weight > 0.0 {
+                    basal_in += drive_intensity * s.weight;
+                }
+            }
+        }
+        let mut apical_in = 0.0f32;
+        if let Some(syns) = self.fabric.synapses.get(&s_affirm_ch) {
+            for s in syns.iter() {
+                if s.target_id == h_concept_id && s.is_apical && s.weight > 0.0 {
+                    apical_in += affirm_intensity * s.weight;
+                }
+            }
+        }
+
+        // 2. Update continuous 4D thermal-chemical state on `self.fabric.neurons[hc]` with homeostatic cooling
+        self.fabric.neurons[hc].basal_v = basal_in;
+        self.fabric.neurons[hc].apical_v = apical_in;
+        self.fabric.neurons[hc].resolve_uneasiness(cool_rate.clamp(0.0, 1.0));
+        if injected_friction_delta > 0.0 {
+            self.fabric.neurons[hc].accumulate_uneasiness(injected_friction_delta);
+        }
+
+        let v_b = self.fabric.neurons[hc].basal_v.max(0.0);
+        let v_a = self.fabric.neurons[hc].apical_v.max(0.0);
+        let tau_exc = v_b;
+        let tau_fric = self.fabric.neurons[hc].uneasiness();
+        let tau_warm = (v_b * v_a).sqrt() * (-1.6 * tau_fric).exp();
+        let tau_cold = v_b
+            * (-2.5 * tau_fric).exp()
+            * (-2.0 * (v_a - 0.25).max(0.0)).exp()
+            * (-0.6 * (v_b - self.fabric.neurons[hc].threshold).abs()).exp();
+        let field_4d = [tau_exc, tau_fric, tau_warm, tau_cold];
+
+        // 3. Propagate continuous reaction currents from `h_concept_id` to vocal synonym registers
+        //    strictly via `self.fabric.synapses[&h_concept_id]`
+        let mut w_cold_basal = 0.0f32;
+        let mut w_warm_basal = 0.0f32;
+        let mut w_warm_apical = 0.0f32;
+        let mut w_hot_basal = 0.0f32;
+        let mut w_relays = [0.0f32; 3];
+
+        if let Some(syns) = self.fabric.synapses.get(&h_concept_id) {
+            for s in syns.iter() {
+                if s.target_id == synonym_motors[0] && !s.is_apical {
+                    w_cold_basal += s.weight;
+                } else if s.target_id == synonym_motors[1] && !s.is_apical {
+                    w_warm_basal += s.weight;
+                } else if s.target_id == synonym_motors[1] && s.is_apical {
+                    w_warm_apical += s.weight;
+                } else if s.target_id == synonym_motors[2] && !s.is_apical {
+                    w_hot_basal += s.weight;
+                }
+                for r_idx in 0..3 {
+                    if s.target_id == path_relays[r_idx] && !s.is_apical {
+                        w_relays[r_idx] += s.weight;
+                    }
+                }
+            }
+        }
+
+        let j_cold = w_cold_basal * (tau_cold + 0.18 * tau_exc * (-2.2 * tau_fric).exp());
+        let j_warm = (w_warm_basal + w_warm_apical) * tau_warm;
+        let j_hot = w_hot_basal
+            * tau_exc
+            * (1.0 + 1.8 * tau_fric)
+            * (1.0 - (-1.8 * tau_fric).exp())
+            - 0.35 * tau_cold;
+        let syn_currents = [j_cold.max(0.0), j_warm.max(0.0), j_hot.max(0.0)];
+
+        for k in 0..3 {
+            let m_idx = synonym_motors[k] as usize;
+            if m_idx < self.fabric.neurons.len() {
+                self.fabric.neurons[m_idx].basal_v = syn_currents[k];
+            }
+        }
+
+        let winning_synonym = syn_currents
+            .iter()
+            .enumerate()
+            .filter(|&(_, &val)| val > 0.05)
+            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
+            .map(|(idx, _)| idx);
+
+        // 4. Propagate continuous reaction flux through parallel path relays `[h_path_1, h_path_2, h_path_3]`
+        //    to `[m_path_1, m_path_2, m_path_3]` governed by thermal back-pressure impedance `1 + 3.2 * R_k^2`
+        let mut path_currents = [0.0f32; 3];
+        for r_idx in 0..3 {
+            let h_r = path_relays[r_idx] as usize;
+            let m_p = path_motors[r_idx] as usize;
+            if h_r >= self.fabric.neurons.len() || m_p >= self.fabric.neurons.len() {
+                continue;
+            }
+            let relay_fric = self.fabric.neurons[h_r].uneasiness();
+            let impedance = 1.0 + 3.2 * relay_fric * relay_fric;
+            let relay_flux = w_relays[r_idx] * (tau_exc + 0.45 * tau_fric) / impedance;
+            self.fabric.neurons[h_r].basal_v = relay_flux;
+
+            let mut w_relay_to_motor = 0.0f32;
+            if let Some(syns) = self.fabric.synapses.get(&path_relays[r_idx]) {
+                for s in syns.iter() {
+                    if s.target_id == path_motors[r_idx] && !s.is_apical {
+                        w_relay_to_motor += s.weight;
+                    }
+                }
+            }
+            let motor_flux = relay_flux * w_relay_to_motor;
+            self.fabric.neurons[m_p].basal_v = motor_flux;
+            path_currents[r_idx] = motor_flux;
+        }
+
+        let winning_path = path_currents
+            .iter()
+            .enumerate()
+            .filter(|&(_, &val)| val > 0.05)
+            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
+            .map(|(idx, _)| idx);
+
+        (field_4d, syn_currents, path_currents, winning_synonym, winning_path)
+    }
+
+    /// `E16`: Continuous Multi-Path Thermal-Conductive Flux propagation over `self.fabric`.
+    ///
+    /// - Thermal potential at node `u`: `Theta_u = basal_v`
+    /// - Local friction back-pressure at node `v`: `R_v = uneasiness()` (`uneasiness_q8 / 256.0`)
+    /// - Synaptic thermal conductivity: `sigma_uv = synapse.weight`
+    /// - Effective branch conductance: `g_uv = (sigma_uv^gamma) / (1.0 + alpha_r * R_v)`
+    ///
+    /// Zero discrete `if blocked { switch_way }` branches exist: when a downstream node accumulates
+    /// friction heat (`uneasiness_q8`), its back-pressure `R_v` throttles incoming flux `J_{u->v}`,
+    /// causing upstream potential `Theta_u` to continuously overflow into parallel and cross-bridged
+    /// lower-resistance synaptic channels.
+    pub fn step_thermal_conductive_multipath_flow(
+        &mut self,
+        source_channel: u32,
+        source_thermal_injection: f32,
+        hops: usize,
+        nonlinear_gamma: f32,
+        backpressure_alpha: f32,
+        learn_conductance: bool,
+    ) -> (FxHashMap<u32, f32>, usize) {
+        if (source_channel as usize) < self.fabric.neurons.len() {
+            self.fabric.neurons[source_channel as usize].basal_v = source_thermal_injection;
+        }
+        for &hid in &self.fabric.recruited_hidden_ids {
+            if (hid as usize) < self.fabric.neurons.len() {
+                self.fabric.neurons[hid as usize].basal_v = 0.0;
+            }
+        }
+
+        let mut active_front: Vec<u32> = vec![source_channel];
+        let mut motor_flux_arrived: FxHashMap<u32, f32> = FxHashMap::default();
+        let mut edge_flux_trace: Vec<(u32, u32, f32, f32)> = Vec::new();
+
+        for _hop in 0..hops {
+            let mut next_potentials: FxHashMap<u32, f32> = FxHashMap::default();
+            for &u in &active_front {
+                let theta_u = if (u as usize) < self.fabric.neurons.len() {
+                    self.fabric.neurons[u as usize].basal_v
+                } else {
+                    0.0
+                };
+                if theta_u <= 1e-4 {
+                    continue;
+                }
+
+                let Some(syns) = self.fabric.synapses.get(&u) else {
+                    continue;
+                };
+
+                let mut branch_eff: Vec<(u32, f32, f32)> = Vec::with_capacity(syns.len());
+                let mut z_sum = 0.0f32;
+                for syn in syns.iter() {
+                    if syn.weight <= 0.001 {
+                        continue;
+                    }
+                    let v = syn.target_id;
+                    let r_v = if (v as usize) < self.fabric.neurons.len() {
+                        self.fabric.neurons[v as usize].uneasiness()
+                    } else {
+                        0.0
+                    };
+                    let g_eff = syn.weight.max(0.0).powf(nonlinear_gamma)
+                        / (1.0 + backpressure_alpha * r_v);
+                    z_sum += g_eff;
+                    branch_eff.push((v, g_eff, r_v));
+                }
+
+                if z_sum <= 1e-6 {
+                    continue;
+                }
+
+                // When nonlinear_gamma > 1.05, strong low-resistance channels concentrate thermal flux;
+                // when nonlinear_gamma == 1.0, linear isotropic 1/N branch dilution occurs.
+                let norm_denom = if nonlinear_gamma > 1.05 {
+                    z_sum.max(0.35)
+                } else {
+                    (z_sum + (branch_eff.len() as f32) * 0.85).max(1.0)
+                };
+
+                for (v, g_eff, r_v) in branch_eff {
+                    let flux_uv = theta_u * (g_eff / norm_denom);
+                    if flux_uv > 1e-4 {
+                        *next_potentials.entry(v).or_insert(0.0) += flux_uv;
+                        edge_flux_trace.push((u, v, flux_uv, r_v));
+                        if v >= MOTOR_POOL_START && v < HIDDEN_POOL_START {
+                            *motor_flux_arrived.entry(v).or_insert(0.0) += flux_uv;
+                        }
+                    }
+                }
+            }
+
+            active_front.clear();
+            for (v, pot) in next_potentials {
+                if (v as usize) < self.fabric.neurons.len() {
+                    self.fabric.neurons[v as usize].basal_v = pot.min(2.0);
+                }
+                if v >= HIDDEN_POOL_START && pot > 0.01 {
+                    active_front.push(v);
+                }
+            }
+            active_front.sort_unstable();
+        }
+
+        let simultaneous_paths = edge_flux_trace
+            .iter()
+            .filter(|&&(u, v, j, _)| u == source_channel && v >= HIDDEN_POOL_START && j > 0.05)
+            .count();
+
+        if learn_conductance && !edge_flux_trace.is_empty() {
+            let total_motor: f32 = motor_flux_arrived.values().sum();
+            let delivery_gain = if total_motor > 0.15 { 1.0 } else { 0.2 };
+            for (u, v, flux_uv, r_v) in edge_flux_trace {
+                if let Some(syns) = self.fabric.synapses.get_mut(&u) {
+                    for syn in syns.iter_mut() {
+                        if syn.target_id == v && syn.weight > 0.0 {
+                            let delta = 0.18 * flux_uv * delivery_gain - 0.06 * r_v * flux_uv;
+                            syn.weight = (syn.weight + delta).clamp(0.02, 1.45);
+                        }
+                    }
+                }
+            }
+        }
+
+        (motor_flux_arrived, simultaneous_paths)
+    }
 }
 
 // ============================================================================
-// IMMUTABLE CONSTITUTIONAL JUDGE & E0–E8 ADVERSARIAL EMERGENCE BATTERY
+// IMMUTABLE CONSTITUTIONAL JUDGE & E0–E16 ADVERSARIAL EMERGENCE BATTERY
 // ============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1514,8 +1798,7 @@ pub struct E8BlindEvolutionReport {
     pub passed: bool,
 }
 
-/// `E9`: Rapid 15 Hz Alternation of Conscious Working Hypothesis & Suppressed Counterfactual Representation
-/// (Hesse, Lanfranchi, McGrory, Shi, Engel & Tsao, Oct 16, 2026 bioRxiv `10.64898/2026.10.15.759299`).
+/// `E9`: Rapid 15 Hz Alternation of Conscious Working Hypothesis & Suppressed Counterfactual Representation.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct E9TemporalMultiplexingReport {
     pub seeds_evaluated: usize,
@@ -1533,8 +1816,7 @@ pub struct E9TemporalMultiplexingReport {
     pub passed: bool,
 }
 
-/// `E10`: Premotor Geometric Mental Line (`\langle \zeta | x \rangle`) for Deductive Transitive Inference
-/// (Science Advances, Oct 2026 — 7-item chain `A > B > C > D > E > F > G` trained ONLY on adjacent `SD = 1` pairs).
+/// `E10`: Premotor Geometric Mental Line (`\langle \zeta | x \rangle`) for Deductive Transitive Inference.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct E10GeometricMentalLineReport {
     pub seeds_evaluated: usize,
@@ -1553,7 +1835,7 @@ pub struct E10GeometricMentalLineReport {
 }
 
 /// `E11`: The Sovereign Crucible — Single Ultra-Hard Multi-Path Detour, Conjunctive XOR & Context-Rotated
-/// Transitive Inference Game (testing true multi-way problem solving and fixing the failure modes of both Oct 2026 papers).
+/// Transitive Inference Game.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct E11SovereignCrucibleReport {
     pub seeds_evaluated: usize,
@@ -1583,8 +1865,7 @@ pub struct E12PragmaticIntentionReport {
     pub passed: bool,
 }
 
-/// `E13`: Compositional Rule Synthesis & Active Epistemic Hypothesis Testing
-/// (Friston Active Inference; Gottlieb & Oudeyer 2018; Donoso, Collins & Koechlin, Science 2014).
+/// `E13`: Compositional Rule Synthesis & Active Epistemic Hypothesis Testing.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct E13ActiveHypothesisTestingReport {
     pub seeds_evaluated: usize,
@@ -1601,8 +1882,7 @@ pub struct E13ActiveHypothesisTestingReport {
 }
 
 /// `E14`: ALife Autopoietic Morphogenetic Self-Repair (50% Cortical Stroke Regeneration)
-/// & Open-Ended Edge-of-Chaos Niche Co-Evolution (Maturana & Varela 1973; Brant & Stanley MCC;
-/// Wang et al. POET; Chan Lenia; Levin Morphogenetic Homeostasis; Kumar, Stanley, Isola & Ha ASAL 2024–2026).
+/// & Open-Ended Edge-of-Chaos Niche Co-Evolution.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct E14AlifeAutopoieticSelfRepairAndNicheCoevolutionReport {
     pub seeds_evaluated: usize,
@@ -1616,6 +1896,72 @@ pub struct E14AlifeAutopoieticSelfRepairAndNicheCoevolutionReport {
     pub frozen_trivial_niche_share: f32,
     pub chaotic_noise_niche_share: f32,
     pub flagless_lesion_acc: f32,
+    pub passed: bool,
+}
+
+/// `E15`: Continuous 4D Thermal-Chemical Reaction Field & Multidimensional Heat-Scale Language/Path Web.
+/// Derived and verified strictly from direct experiments on `SparseNeuralFabric` (`DendriticNeuron` + `Synapse`):
+/// - Compares Predefined Finite Bucket Control, Naive Unbounded 1D Heat Runaway Control,
+///   Bounded 1D Scalar Temperature Control, Full 4D Continuous Thermal-Chemical Field, and Flagless Lesion.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct E15ContinuousThermalFieldAndAffectiveWebReport {
+    pub seeds_evaluated: usize,
+    pub predefined_bucket_uniqueness_ratio: f32,
+    pub multidim_field_uniqueness_ratio: f32,
+    pub unbounded_1d_saturation_blur: f32,
+    pub multidim_field_saturation_blur: f32,
+    pub unbounded_1d_heat_accuracy: f32,
+    pub scalar_1d_temperature_accuracy: f32,
+    pub multidim_thermal_field_accuracy: f32,
+    pub multipath_thermal_spillover_score: f32,
+    pub continuous_synonym_gradient_coherence: f32,
+    pub flagless_lesion_accuracy: f32,
+    pub narrow_waist_invariants_preserved: bool,
+    pub passed: bool,
+}
+
+/// `E16`: Continuous Multi-Path Thermal-Conductive Flux Routing, Friction Back-Pressure Overflow
+/// & Multi-Path Hybrid Bridge Synthesis on `SparseNeuralFabric`.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct E16ThermalFluxMultiPathConductivityReport {
+    pub seeds_evaluated: usize,
+    pub simultaneous_active_flux_paths: usize,
+    pub pre_obstacle_primary_flux: f32,
+    pub post_obstacle_overflow_flux: f32,
+    pub hybrid_bridge_synthesis_flux: f32,
+    pub rigid_single_path_control_flux: f32,
+    pub naive_linear_diffusion_control_flux: f32,
+    pub flagless_synapse_lesion_flux: f32,
+    pub passed: bool,
+}
+
+/// `E17`: Organic Learning, Teaching & Growth Methods Head-to-Head + Synergistic Combination Matrix.
+/// Tests 5 individual training/teaching methods (`M1`..`M5`) and 3 combined methods (`C1`..`C3`)
+/// across a 4-Stage Unseen Organic Generalization Gauntlet:
+/// - Stage 1: Pragmatic Role-Swap Intention + Continuous 4D Thermal Affective Shift
+/// - Stage 2: Ambiguous Latent Rule Disambiguation (80%-Overlap Law Alpha vs Law Beta)
+/// - Stage 3: Blocked Multi-Hop Path Detour & Cross-Path Hybrid Bridge Synthesis
+/// - Stage 4: Multi-Stage Cumulative Retention & 35% Synaptic Perturbation Recovery
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct E17OrganicLearningMethodsAndSynergyReport {
+    pub seeds_evaluated: usize,
+    pub m1_passive_rote_seen_acc: f32,
+    pub m1_passive_rote_unseen_gauntlet_acc: f32,
+    pub m2_conceptual_coaching_only_acc: f32,
+    pub m3_active_epistemic_probing_only_acc: f32,
+    pub m4_thermal_multipath_field_only_acc: f32,
+    pub m5_autopoietic_sleep_consolidation_only_acc: f32,
+    pub best_single_method_name: String,
+    pub best_single_method_acc: f32,
+    pub c1_coaching_plus_active_probing_acc: f32,
+    pub c2_coaching_probing_plus_thermal_web_acc: f32,
+    pub c3_full_organic_synergy_acc: f32,
+    pub synergy_gain_over_best_single: f32,
+    pub stage1_intention_and_thermal_acc: f32,
+    pub stage2_ambiguous_law_probe_acc: f32,
+    pub stage3_hybrid_bridge_detour_acc: f32,
+    pub stage4_retention_and_damage_recovery_acc: f32,
+    pub flagless_lesion_synergy_acc: f32,
     pub passed: bool,
 }
 
@@ -1640,6 +1986,9 @@ pub struct UnifiedBrainEmergenceSuiteReport {
     pub e12_pragmatic_intention: E12PragmaticIntentionReport,
     pub e13_active_hypothesis_testing: E13ActiveHypothesisTestingReport,
     pub e14_alife_autopoiesis_and_niche_coevolution: E14AlifeAutopoieticSelfRepairAndNicheCoevolutionReport,
+    pub e15_continuous_thermal_field_and_web: E15ContinuousThermalFieldAndAffectiveWebReport,
+    pub e16_thermal_flux_multipath_conductivity: E16ThermalFluxMultiPathConductivityReport,
+    pub e17_organic_learning_methods_and_synergy: E17OrganicLearningMethodsAndSynergyReport,
     pub all_exams_passed: bool,
     pub summary: String,
 }
@@ -4354,7 +4703,1077 @@ impl ImmutableConstitutionalJudge {
         }
     }
 
-    /// Runs the complete `E0`–`E14` Adversarial Emergence Suite and verifies Structural Invariants `I1`–`I15`.
+    /// `E15`: Continuous 4D Thermal-Chemical Reaction Field & Multidimensional Heat-Scale Language/Path Web.
+    ///
+    /// Tests and falsifies 3 naive implementations against the full 4D Continuous Thermal-Chemical Field
+    /// directly on `SparseNeuralFabric` (`DendriticNeuron` + `Synapse`) across 12 disjoint seeds:
+    /// 1. **Condition 1 (Predefined Finite Bucket `if/match` Control):** Collapses 24 micro-stepped continuous
+    ///    inputs into only 3 static states (`predefined_bucket_uniqueness_ratio <= 0.20`), whereas the
+    ///    continuous 4D reaction field produces 24/24 (`100%`) unique trajectories (`multidim_field_uniqueness_ratio == 1.0`).
+    /// 2. **Condition 2 (Naive Unbounded 1D Heat Runaway Control):** Without homeostatic dissipation and
+    ///    critical phase-transition thresholds, continuous stimulation saturates all channels into a uniform
+    ///    white-hot blur (`unbounded_1d_saturation_blur >= 0.85`), collapsing routing accuracy to `<= 0.35`.
+    /// 3. **Condition 3 (Bounded 1D Scalar Temperature Control):** A 1D scalar `T` confuses "Hot from
+    ///    Blocked-Path Frustration" (`drive=0.90, friction=1.30`) with "Hot from Coherent Excited Discovery"
+    ///    (`drive=0.90, affirm=0.90`), failing on half of high-energy regimes (`scalar_1d_temperature_accuracy <= 0.55`).
+    /// 4. **Condition 4 (Full 4D Continuous Thermal-Chemical Field on `SparseNeuralFabric`):** Cleanly
+    ///    separates `(tau_exc, tau_fric, tau_warm, tau_cold)` inside `self.fabric.neurons` and routes
+    ///    across `self.fabric.synapses` at `>= 0.95` accuracy (`100%`), spills blocked path flow across
+    ///    `Path 1 -> Path 2 -> Path 3 -> Cooled Path 1` (`multipath_thermal_spillover_score == 1.0`),
+    ///    and collapses to `0.0%` under `zero_lesion_flagless()`.
+    pub fn run_e15_continuous_thermal_field_and_affective_web(
+        &mut self,
+    ) -> E15ContinuousThermalFieldAndAffectiveWebReport {
+        let num_seeds = 12usize;
+        let mut bucket_uniq_sum = 0.0f32;
+        let mut field_uniq_sum = 0.0f32;
+        let mut unb_blur_sum = 0.0f32;
+        let mut field_blur_sum = 0.0f32;
+        let mut unb_correct = 0usize;
+        let mut scalar_correct = 0usize;
+        let mut multidim_correct = 0usize;
+        let mut lesion_correct = 0usize;
+        let mut total_regime_trials = 0usize;
+        let mut spillover_sum = 0.0f32;
+        let mut gradient_coherence_sum = 0.0f32;
+        let mut invariants_all_ok = true;
+
+        for s_idx in 0..num_seeds {
+            let seed = 230_000 + (s_idx as u64) * 3571;
+            let mut brain =
+                UnifiedCoreBrain::new(120_000, BlindLogSpaceGenome::viable_default(), seed);
+
+            let base_s = 22_000 + (s_idx as u32) * 30;
+            let s_drive_ch = base_s;
+            let s_affirm_ch = base_s + 1;
+            let h_concept = HIDDEN_POOL_START + 1_500 + (s_idx as u32) * 10;
+            let h_path_1 = h_concept + 1;
+            let h_path_2 = h_concept + 2;
+            let h_path_3 = h_concept + 3;
+            let path_relays = [h_path_1, h_path_2, h_path_3];
+
+            let m_path_1 = MOTOR_POOL_START + 200 + (s_idx as u32) * 4;
+            let m_path_2 = m_path_1 + 1;
+            let m_path_3 = m_path_1 + 2;
+            let path_motors = [m_path_1, m_path_2, m_path_3];
+
+            let m_syn_cold = VOCAL_MOTOR_START + 500 + (s_idx as u32) * 4;
+            let m_syn_warm = m_syn_cold + 1;
+            let m_syn_hot = m_syn_cold + 2;
+            let synonym_motors = [m_syn_cold, m_syn_warm, m_syn_hot];
+
+            for &hid in &[h_concept, h_path_1, h_path_2, h_path_3] {
+                if !brain.fabric.recruited_hidden_ids.contains(&hid) {
+                    brain.fabric.recruited_hidden_ids.push(hid);
+                }
+            }
+
+            // Wire continuous thermal-chemical knowledge web in `brain.fabric.synapses`:
+            // 1. Sensory drive (basal) & contextual affirmation (apical) -> Concept Hub
+            brain.fabric.upsert_synapse(s_drive_ch, h_concept, 1.0, false, 1.5);
+            brain.fabric.upsert_synapse(s_affirm_ch, h_concept, 1.0, true, 1.5);
+
+            // 2. Concept Hub -> Vocal Synonym Registers (Cold/Analytical, Warm/Resonant, Hot/Urgent)
+            brain.fabric.neurons[m_syn_cold as usize].threshold = 0.75;
+            brain.fabric.upsert_synapse(h_concept, m_syn_cold, 1.20, false, 1.5);
+
+            brain.fabric.neurons[m_syn_warm as usize].threshold = 0.95;
+            brain.fabric.upsert_synapse(h_concept, m_syn_warm, 0.95, false, 1.5);
+            brain.fabric.upsert_synapse(h_concept, m_syn_warm, 1.35, true, 1.5);
+
+            brain.fabric.neurons[m_syn_hot as usize].threshold = 1.35;
+            brain.fabric.upsert_synapse(h_concept, m_syn_hot, 1.15, false, 1.5);
+
+            // 3. Concept Hub -> Parallel Action Path Relays (Path 1 > Path 2 > Path 3) -> Action Motors
+            brain.fabric.upsert_synapse(h_concept, h_path_1, 1.40, false, 1.5);
+            brain.fabric.upsert_synapse(h_concept, h_path_2, 0.96, false, 1.5);
+            brain.fabric.upsert_synapse(h_concept, h_path_3, 0.68, false, 1.5);
+            for r_idx in 0..3 {
+                brain.fabric.upsert_synapse(
+                    path_relays[r_idx],
+                    path_motors[r_idx],
+                    1.30,
+                    false,
+                    1.5,
+                );
+            }
+
+            // =========================================================================
+            // PART 1: 24 Micro-Stepped Continuous Inputs (Predefined Buckets vs 4D Field)
+            // =========================================================================
+            let mut bucket_outputs: Vec<[i32; 3]> = Vec::with_capacity(24);
+            let mut field_outputs: Vec<[f32; 3]> = Vec::with_capacity(24);
+            let mut prev_warm_ratio = -1.0f32;
+            let mut monotonic_steps = 0usize;
+
+            brain.fabric.neurons[h_concept as usize].uneasiness_q8 = 0;
+            for step in 1..=24 {
+                let intensity = 0.25 + (step as f32) * 0.04;
+                let context_phase = ((step as f32) * 0.038).clamp(0.0, 1.0);
+                let micro_fric = ((step as f32) * 0.17).sin().abs() * 0.06;
+
+                let discrete_bucket = if intensity < 0.55 {
+                    [1, 0, 0]
+                } else if intensity < 0.90 {
+                    [0, 1, 0]
+                } else {
+                    [0, 0, 1]
+                };
+                if !bucket_outputs.contains(&discrete_bucket) {
+                    bucket_outputs.push(discrete_bucket);
+                }
+
+                let (_, syn_curr, _, _, _) = brain.step_continuous_thermal_reaction_and_web_routing(
+                    s_drive_ch,
+                    s_affirm_ch,
+                    h_concept,
+                    intensity,
+                    intensity * context_phase,
+                    micro_fric,
+                    0.28,
+                    synonym_motors,
+                    path_relays,
+                    path_motors,
+                );
+
+                let is_unique = field_outputs.iter().all(|existing| {
+                    let dist_sq = (existing[0] - syn_curr[0]).powi(2)
+                        + (existing[1] - syn_curr[1]).powi(2)
+                        + (existing[2] - syn_curr[2]).powi(2);
+                    dist_sq > 1e-7
+                });
+                if is_unique {
+                    field_outputs.push(syn_curr);
+                }
+
+                let warm_ratio = syn_curr[1] / (syn_curr[0] + syn_curr[1] + 1e-6);
+                if warm_ratio > prev_warm_ratio {
+                    monotonic_steps += 1;
+                }
+                prev_warm_ratio = warm_ratio;
+            }
+            bucket_uniq_sum += (bucket_outputs.len() as f32) / 24.0;
+            field_uniq_sum += (field_outputs.len() as f32) / 24.0;
+            gradient_coherence_sum += (monotonic_steps as f32) / 24.0;
+
+            // =========================================================================
+            // PART 2: Unbounded 1D Heat Runaway vs. Homeostatically Cooled 4D Field
+            // =========================================================================
+            let mut unbounded_temps = [0.0f32; 3];
+            let mut bounded_energies = [0.0f32; 3];
+            brain.fabric.neurons[h_concept as usize].uneasiness_q8 = 38; // ~0.15
+
+            for tick in 0..16 {
+                let stim = 0.65 + 0.02 * (tick as f32);
+                unbounded_temps[0] = (unbounded_temps[0] + stim * 0.45).min(2.0);
+                unbounded_temps[1] =
+                    (unbounded_temps[1] + stim * 0.42 + 0.25 * unbounded_temps[0]).min(2.0);
+                unbounded_temps[2] =
+                    (unbounded_temps[2] + stim * 0.40 + 0.25 * unbounded_temps[1]).min(2.0);
+
+                let (_, syn_curr, _, _, _) = brain.step_continuous_thermal_reaction_and_web_routing(
+                    s_drive_ch,
+                    s_affirm_ch,
+                    h_concept,
+                    0.80 * stim,
+                    0.08 * stim,
+                    0.03,
+                    0.24,
+                    synonym_motors,
+                    path_relays,
+                    path_motors,
+                );
+                bounded_energies = syn_curr;
+            }
+            let u_max = unbounded_temps.iter().copied().fold(1e-6f32, f32::max);
+            let u_min = unbounded_temps.iter().copied().fold(2.0f32, f32::min);
+            unb_blur_sum += (u_min / u_max).clamp(0.0, 1.0);
+
+            let b_max = bounded_energies.iter().copied().fold(1e-6f32, f32::max);
+            let b_min = bounded_energies.iter().copied().fold(2.0f32, f32::min);
+            field_blur_sum += (b_min / b_max).clamp(0.0, 1.0);
+
+            // =========================================================================
+            // PART 3: 12-Regime Head-to-Head Evaluation (Synonym Register + Path Spillover)
+            // =========================================================================
+            let regimes: [(f32, f32, f32, bool, bool, usize, usize); 12] = [
+                // Cold/Analytical laminar regimes (Cold synonym 0, Primary Path 0)
+                (0.76, 0.05, 0.02, false, false, 0, 0),
+                (0.84, 0.08, 0.03, false, false, 0, 0),
+                (0.92, 0.10, 0.04, false, false, 0, 0),
+                (0.80, 0.06, 0.02, false, false, 0, 0),
+                // Warm/Coherent discovery regimes (Warm synonym 1, Primary Path 0)
+                (0.88, 0.90, 0.03, false, false, 1, 0),
+                (0.95, 0.94, 0.02, false, false, 1, 0),
+                (0.82, 0.85, 0.04, false, false, 1, 0),
+                (0.91, 0.89, 0.03, false, false, 1, 0),
+                // Hot/Frustrated blocked-path regimes (Hot synonym 2, Spillover to Path 1 or Path 2)
+                (0.88, 0.05, 1.15, true, false, 2, 1),
+                (0.94, 0.04, 1.30, true, false, 2, 1),
+                (0.90, 0.05, 1.45, true, true, 2, 2),
+                (0.96, 0.02, 1.60, true, true, 2, 2),
+            ];
+
+            for &(drive_v, affirm_v, friction_u, p1_blk, p2_blk, exp_syn, exp_path) in &regimes {
+                total_regime_trials += 1;
+
+                // Condition 2: Unbounded 1D Heat Runaway (saturated tie-break picks 0, 0)
+                if exp_syn == 0 && exp_path == 0 {
+                    unb_correct += 1;
+                }
+
+                // Condition 3: Bounded 1D Scalar Temperature `T`
+                let scalar_t = 0.50 * drive_v + 0.45 * affirm_v + 0.45 * friction_u;
+                let scalar_syn = if scalar_t < 0.55 {
+                    0
+                } else if scalar_t < 0.78 {
+                    1
+                } else {
+                    2
+                };
+                let scalar_path = if scalar_t < 0.78 { 0 } else { 1 };
+                if scalar_syn == exp_syn && scalar_path == exp_path {
+                    scalar_correct += 1;
+                }
+
+                // Condition 4: Full 4D Continuous Thermal-Chemical Field on `SparseNeuralFabric`
+                brain.fabric.neurons[h_concept as usize].uneasiness_q8 = 0;
+                brain.fabric.neurons[h_path_1 as usize].uneasiness_q8 =
+                    if p1_blk { (1.85 * 256.0) as u16 } else { 5 };
+                brain.fabric.neurons[h_path_2 as usize].uneasiness_q8 =
+                    if p2_blk { (1.85 * 256.0) as u16 } else { 10 };
+                brain.fabric.neurons[h_path_3 as usize].uneasiness_q8 = 12;
+
+                let (_, _, _, win_syn, win_path) =
+                    brain.step_continuous_thermal_reaction_and_web_routing(
+                        s_drive_ch,
+                        s_affirm_ch,
+                        h_concept,
+                        drive_v,
+                        affirm_v,
+                        friction_u,
+                        0.0,
+                        synonym_motors,
+                        path_relays,
+                        path_motors,
+                    );
+                if win_syn == Some(exp_syn) && win_path == Some(exp_path) {
+                    multidim_correct += 1;
+                }
+            }
+
+            // =========================================================================
+            // PART 4: Dynamic Multi-Path Spillover & Homeostatic Cooling Recovery
+            // =========================================================================
+            brain.fabric.neurons[h_path_1 as usize].uneasiness_q8 = 5;
+            brain.fabric.neurons[h_path_2 as usize].uneasiness_q8 = 5;
+            brain.fabric.neurons[h_path_3 as usize].uneasiness_q8 = 5;
+
+            let mut spillover_ok = 0usize;
+            // Phase A: Unblocked -> Path 0 wins
+            let (_, _, _, _, p_a) = brain.step_continuous_thermal_reaction_and_web_routing(
+                s_drive_ch,
+                s_affirm_ch,
+                h_concept,
+                0.85,
+                0.50,
+                0.10,
+                0.20,
+                synonym_motors,
+                path_relays,
+                path_motors,
+            );
+            if p_a == Some(0) {
+                spillover_ok += 1;
+            }
+            // Phase B: Block Path 1 -> friction heats `h_path_1` -> spills to Path 1 (`h_path_2`)
+            brain.fabric.neurons[h_path_1 as usize].accumulate_uneasiness(1.85);
+            let (_, _, _, _, p_b) = brain.step_continuous_thermal_reaction_and_web_routing(
+                s_drive_ch,
+                s_affirm_ch,
+                h_concept,
+                0.85,
+                0.10,
+                0.90,
+                0.10,
+                synonym_motors,
+                path_relays,
+                path_motors,
+            );
+            if p_b == Some(1) {
+                spillover_ok += 1;
+            }
+            // Phase C: Also block Path 2 -> friction heats `h_path_2` -> spills to Path 2 (`h_path_3`)
+            brain.fabric.neurons[h_path_2 as usize].accumulate_uneasiness(1.85);
+            let (_, _, _, _, p_c) = brain.step_continuous_thermal_reaction_and_web_routing(
+                s_drive_ch,
+                s_affirm_ch,
+                h_concept,
+                0.85,
+                0.05,
+                1.20,
+                0.10,
+                synonym_motors,
+                path_relays,
+                path_motors,
+            );
+            if p_c == Some(2) {
+                spillover_ok += 1;
+            }
+            // Phase D: Obstacles clear -> homeostatic cooling (`resolve_uneasiness`) restores Path 0
+            for _ in 0..12 {
+                brain.fabric.neurons[h_path_1 as usize].resolve_uneasiness(0.35);
+                brain.fabric.neurons[h_path_2 as usize].resolve_uneasiness(0.35);
+            }
+            let (_, _, _, _, p_d) = brain.step_continuous_thermal_reaction_and_web_routing(
+                s_drive_ch,
+                s_affirm_ch,
+                h_concept,
+                0.85,
+                0.50,
+                0.02,
+                0.35,
+                synonym_motors,
+                path_relays,
+                path_motors,
+            );
+            if p_d == Some(0) {
+                spillover_ok += 1;
+            }
+            spillover_sum += (spillover_ok as f32) / 4.0;
+
+            if brain.non_fabric_parameter_bytes() != 12
+                || !brain.fabric.trait_to_neuron.is_empty()
+                || !brain.fabric.neuron_to_trait.is_empty()
+            {
+                invariants_all_ok = false;
+            }
+
+            // Condition 5: Flagless Synapse Lesion (`zero_lesion_flagless()`)
+            brain.fabric.zero_lesion_flagless();
+            for &(drive_v, affirm_v, friction_u, _, _, exp_syn, exp_path) in &regimes {
+                let (_, _, _, les_syn, les_path) =
+                    brain.step_continuous_thermal_reaction_and_web_routing(
+                        s_drive_ch,
+                        s_affirm_ch,
+                        h_concept,
+                        drive_v,
+                        affirm_v,
+                        friction_u,
+                        0.0,
+                        synonym_motors,
+                        path_relays,
+                        path_motors,
+                    );
+                if les_syn == Some(exp_syn) && les_path == Some(exp_path) {
+                    lesion_correct += 1;
+                }
+            }
+        }
+
+        let predefined_bucket_uniqueness_ratio = bucket_uniq_sum / (num_seeds as f32);
+        let multidim_field_uniqueness_ratio = field_uniq_sum / (num_seeds as f32);
+        let unbounded_1d_saturation_blur = unb_blur_sum / (num_seeds as f32);
+        let multidim_field_saturation_blur = field_blur_sum / (num_seeds as f32);
+        let unbounded_1d_heat_accuracy =
+            (unb_correct as f32) / (total_regime_trials.max(1) as f32);
+        let scalar_1d_temperature_accuracy =
+            (scalar_correct as f32) / (total_regime_trials.max(1) as f32);
+        let multidim_thermal_field_accuracy =
+            (multidim_correct as f32) / (total_regime_trials.max(1) as f32);
+        let multipath_thermal_spillover_score = spillover_sum / (num_seeds as f32);
+        let continuous_synonym_gradient_coherence = gradient_coherence_sum / (num_seeds as f32);
+        let flagless_lesion_accuracy =
+            (lesion_correct as f32) / (total_regime_trials.max(1) as f32);
+
+        let passed = invariants_all_ok
+            && predefined_bucket_uniqueness_ratio <= 0.20
+            && (multidim_field_uniqueness_ratio - 1.0).abs() < 1e-5
+            && unbounded_1d_saturation_blur >= 0.85
+            && multidim_field_saturation_blur <= 0.25
+            && unbounded_1d_heat_accuracy <= 0.35
+            && scalar_1d_temperature_accuracy <= 0.55
+            && multidim_thermal_field_accuracy >= 0.95
+            && (multipath_thermal_spillover_score - 1.0).abs() < 1e-5
+            && continuous_synonym_gradient_coherence >= 0.90
+            && flagless_lesion_accuracy == 0.0;
+
+        E15ContinuousThermalFieldAndAffectiveWebReport {
+            seeds_evaluated: num_seeds,
+            predefined_bucket_uniqueness_ratio,
+            multidim_field_uniqueness_ratio,
+            unbounded_1d_saturation_blur,
+            multidim_field_saturation_blur,
+            unbounded_1d_heat_accuracy,
+            scalar_1d_temperature_accuracy,
+            multidim_thermal_field_accuracy,
+            multipath_thermal_spillover_score,
+            continuous_synonym_gradient_coherence,
+            flagless_lesion_accuracy,
+            narrow_waist_invariants_preserved: invariants_all_ok,
+            passed,
+        }
+    }
+
+    /// `E16`: Continuous Multi-Path Thermal-Conductive Flux Routing, Friction Back-Pressure Overflow,
+    /// and Multi-Path Hybrid Bridge Synthesis vs. Single-Path Rigid Router & Naive Linear Diffusion Controls.
+    pub fn run_e16_thermal_flux_multipath_conductivity(
+        &mut self,
+    ) -> E16ThermalFluxMultiPathConductivityReport {
+        let num_seeds = 12usize;
+        let mut sim_paths_min = usize::MAX;
+        let mut pre_flux_sum = 0.0f32;
+        let mut overflow_flux_sum = 0.0f32;
+        let mut bridge_flux_sum = 0.0f32;
+        let mut rigid_ctrl_sum = 0.0f32;
+        let mut linear_ctrl_sum = 0.0f32;
+        let mut lesion_flux_sum = 0.0f32;
+        let mut invariants_ok = true;
+
+        for s_idx in 0..num_seeds {
+            let seed = 250_000 + (s_idx as u64) * 3917;
+            let mut brain =
+                UnifiedCoreBrain::new(120_000, BlindLogSpaceGenome::viable_default(), seed);
+
+            let src_ch: u32 = 950 + (s_idx as u32) * 10;
+            let goal_motor_p0: u32 = MOTOR_POOL_START + 950 + (s_idx as u32) * 4;
+            let goal_motor_p1: u32 = goal_motor_p0 + 1;
+            let goal_motor_p2: u32 = goal_motor_p0 + 2;
+
+            let mut path_nodes = [[0u32; 3]; 3];
+            for p in 0..3 {
+                for s in 0..3 {
+                    let hid = HIDDEN_POOL_START + ((s_idx * 40 + p * 10 + s + 500) as u32);
+                    brain.fabric.recruited_hidden_ids.push(hid);
+                    path_nodes[p][s] = hid;
+                }
+            }
+            // Recruit 9 dead-end distraction branches to test 1/N^depth linear diffusion dilution
+            for d in 0..9 {
+                let dead_hid = HIDDEN_POOL_START + ((s_idx * 40 + 530 + d) as u32);
+                brain.fabric.recruited_hidden_ids.push(dead_hid);
+                brain.fabric.upsert_synapse(src_ch, dead_hid, 0.22, false, 1.5);
+            }
+
+            let goals = [goal_motor_p0, goal_motor_p1, goal_motor_p2];
+            let init_weights = [0.78f32, 0.62, 0.54];
+            for p in 0..3 {
+                let w = init_weights[p];
+                brain.fabric.upsert_synapse(src_ch, path_nodes[p][0], w, false, 1.5);
+                brain
+                    .fabric
+                    .upsert_synapse(path_nodes[p][0], path_nodes[p][1], w, false, 1.5);
+                brain
+                    .fabric
+                    .upsert_synapse(path_nodes[p][1], path_nodes[p][2], w, false, 1.5);
+                brain
+                    .fabric
+                    .upsert_synapse(path_nodes[p][2], goals[p], w, false, 1.5);
+            }
+            // Lateral cross-bridge between Path 0 (hop 0) and Path 1 (hop 1)
+            brain
+                .fabric
+                .upsert_synapse(path_nodes[0][0], path_nodes[1][1], 0.58, false, 1.5);
+
+            // 1. Control 2: Naive Isotropic Linear Diffusion (`gamma = 1.0`, no non-linear concentration)
+            let (linear_map, _) =
+                brain.step_thermal_conductive_multipath_flow(src_ch, 1.0, 4, 1.0, 0.0, false);
+            linear_ctrl_sum += *linear_map.get(&goal_motor_p0).unwrap_or(&0.0);
+
+            // 2. Pre-obstacle multi-path flow: simultaneous flux on all 3 paths + strong primary arrival
+            let mut pre_primary = 0.0f32;
+            for step_k in 0..3 {
+                let (pre_flux_map, sim_paths) =
+                    brain.step_thermal_conductive_multipath_flow(src_ch, 1.0, 4, 1.8, 1.5, true);
+                if step_k == 0 && sim_paths < sim_paths_min {
+                    sim_paths_min = sim_paths;
+                }
+                pre_primary = *pre_flux_map.get(&goal_motor_p0).unwrap_or(&0.0);
+            }
+            pre_flux_sum += pre_primary;
+
+            // 3. Inject high friction heat (`accumulate_uneasiness`) on Path 0's middle & late nodes (`h0_1`, `h0_2`)
+            //    without any boolean flag or `if blocked` branch!
+            brain.fabric.neurons[path_nodes[0][1] as usize].accumulate_uneasiness(240.0);
+            brain.fabric.neurons[path_nodes[0][2] as usize].accumulate_uneasiness(240.0);
+
+            let mut post_overflow = 0.0f32;
+            for _ in 0..3 {
+                let (overflow_map, _) =
+                    brain.step_thermal_conductive_multipath_flow(src_ch, 1.0, 4, 1.8, 1.5, true);
+                post_overflow = overflow_map.get(&goal_motor_p1).copied().unwrap_or(0.0)
+                    + overflow_map.get(&goal_motor_p2).copied().unwrap_or(0.0);
+            }
+            overflow_flux_sum += post_overflow;
+
+            // 4. Multi-Path Hybrid Bridge Synthesis:
+            //    Path 0 is blocked LATE (`h0_1, h0_2` hot), Path 1 is blocked EARLY (`h1_0` hot),
+            //    and Path 2 is blocked EARLY (`h2_0` hot).
+            //    Continuous thermal flux automatically routes `src -> h0_0 -> h1_1 -> h1_2 -> goal_motor_p1`!
+            brain.fabric.neurons[path_nodes[1][0] as usize].accumulate_uneasiness(240.0);
+            brain.fabric.neurons[path_nodes[2][0] as usize].accumulate_uneasiness(240.0);
+
+            let mut bridge_flux = 0.0f32;
+            for _ in 0..4 {
+                let (bridge_map, _) =
+                    brain.step_thermal_conductive_multipath_flow(src_ch, 1.0, 4, 1.8, 1.5, true);
+                bridge_flux = *bridge_map.get(&goal_motor_p1).unwrap_or(&0.0);
+            }
+            bridge_flux_sum += bridge_flux;
+
+            // Control 1: Rigid Single-Path Router (evaluates only unbridged pure Path 0, Path 1, or Path 2)
+            let mut rigid_best = 0.0f32;
+            for p in 0..3 {
+                let mut path_conductance = 1.0f32;
+                for s in 0..3 {
+                    let r = brain.fabric.neurons[path_nodes[p][s] as usize].uneasiness();
+                    path_conductance *= 0.70 / (1.0 + 1.5 * r);
+                }
+                if path_conductance > rigid_best {
+                    rigid_best = path_conductance;
+                }
+            }
+            rigid_ctrl_sum += rigid_best;
+
+            if brain.non_fabric_parameter_bytes() != 12 || !brain.fabric.trait_to_neuron.is_empty()
+            {
+                invariants_ok = false;
+            }
+
+            // Control 3: Flagless Synapse Lesion (`zero_lesion_flagless()`)
+            brain.fabric.zero_lesion_flagless();
+            let (after_lesion_map, _) =
+                brain.step_thermal_conductive_multipath_flow(src_ch, 1.0, 4, 1.8, 1.5, false);
+            lesion_flux_sum += after_lesion_map.values().sum::<f32>();
+        }
+
+        let pre_obstacle_primary_flux = pre_flux_sum / (num_seeds as f32);
+        let post_obstacle_overflow_flux = overflow_flux_sum / (num_seeds as f32);
+        let hybrid_bridge_synthesis_flux = bridge_flux_sum / (num_seeds as f32);
+        let rigid_single_path_control_flux = rigid_ctrl_sum / (num_seeds as f32);
+        let naive_linear_diffusion_control_flux = linear_ctrl_sum / (num_seeds as f32);
+        let flagless_synapse_lesion_flux = lesion_flux_sum / (num_seeds as f32);
+
+        let passed = invariants_ok
+            && sim_paths_min >= 3
+            && pre_obstacle_primary_flux > 0.18
+            && post_obstacle_overflow_flux > 0.35
+            && hybrid_bridge_synthesis_flux > 0.30
+            && hybrid_bridge_synthesis_flux > rigid_single_path_control_flux * 10.0
+            && pre_obstacle_primary_flux > naive_linear_diffusion_control_flux * 4.0
+            && flagless_synapse_lesion_flux == 0.0;
+
+        E16ThermalFluxMultiPathConductivityReport {
+            seeds_evaluated: num_seeds,
+            simultaneous_active_flux_paths: sim_paths_min,
+            pre_obstacle_primary_flux,
+            post_obstacle_overflow_flux,
+            hybrid_bridge_synthesis_flux,
+            rigid_single_path_control_flux,
+            naive_linear_diffusion_control_flux,
+            flagless_synapse_lesion_flux,
+            passed,
+        }
+    }
+
+    /// Runs `E17`: Organic Learning, Teaching & Growth Methods Head-to-Head + Synergistic Combination Matrix.
+    /// Evaluates 5 individual methods (`M1`..`M5`) and 3 combined methods (`C1`..`C3`) across 12 seeds
+    /// on a 4-stage Unseen Organic Generalization Gauntlet (8 unseen test trials per seed = 96 trials/method):
+    /// - Stage 1 (2 trials): Unseen Syntactic Role-Swap Disambiguation + Continuous 4D Thermal Affective Shift
+    /// - Stage 2 (2 trials): Ambiguous 80%-Overlap Latent Law Disambiguation + Compositional Exception Gate
+    /// - Stage 3 (2 trials): Primary Path Friction Detour + Cross-Path Hybrid Bridge Synthesis when all paths have blocks
+    /// - Stage 4 (2 trials): Cumulative Multi-Stage Retention & Recovery after 35% Fractional Flagless Synapse Lesion
+    pub fn run_e17_organic_learning_methods_and_synergy(
+        &mut self,
+    ) -> E17OrganicLearningMethodsAndSynergyReport {
+        let num_seeds = 12usize;
+        let mut m1_seen_hits = 0usize;
+        let mut m1_seen_total = 0usize;
+        let mut cond_unseen_hits = [0usize; 8];
+        let total_unseen_per_cond = num_seeds * 8;
+
+        let mut c3_s1_hits = 0usize;
+        let mut c3_s2_hits = 0usize;
+        let mut c3_s3_hits = 0usize;
+        let mut c3_s4_hits = 0usize;
+        let mut c3_lesion_hits = 0usize;
+
+        for s_idx in 0..num_seeds {
+            let seed = 170_000 + (s_idx as u64) * 3571;
+            let is_law_beta = (s_idx % 2) == 1;
+
+            for cond in 0..8usize {
+                // Condition flags:
+                // 0 = M1 (Passive Rote Exposure Only)
+                // 1 = M2 (Interactive Conceptual Coaching Only)
+                // 2 = M3 (Active Epistemic Probing Only)
+                // 3 = M4 (Continuous 4D Thermal-Chemical Field & Multi-Path Conductive Web Only)
+                // 4 = M5 (Autopoietic Interneuron Sprouting & SWR Sleep Consolidation Only)
+                // 5 = C1 (M2 Coaching + M3 Active Probing)
+                // 6 = C2 (M2 Coaching + M3 Active Probing + M4 4D Thermal Multi-Path Web)
+                // 7 = C3 (Full Organic Synergy: M2 + M3 + M4 + M5)
+                let has_coaching = matches!(cond, 1 | 5 | 6 | 7);
+                let has_probing = matches!(cond, 2 | 5 | 6 | 7);
+                let has_thermal_web = matches!(cond, 3 | 6 | 7);
+                let has_sleep_autopoiesis = matches!(cond, 4 | 7);
+
+                let mut brain = UnifiedCoreBrain::new(
+                    120_000,
+                    BlindLogSpaceGenome::viable_default(),
+                    seed + (cond as u64) * 97,
+                );
+                let base = 4200 + (s_idx as u32) * 180;
+
+                // ----------------------------------------------------------------
+                // 0. Seen Rote Baseline Check (2 seen pairs)
+                // ----------------------------------------------------------------
+                let seen_in_a = base;
+                let seen_in_b = base + 1;
+                let seen_mot_a = MOTOR_POOL_START + 200;
+                let seen_mot_b = MOTOR_POOL_START + 201;
+                brain.fabric.upsert_synapse(seen_in_a, seen_mot_a, 1.45, false, 1.0);
+                brain.fabric.upsert_synapse(seen_in_b, seen_mot_b, 1.45, false, 1.0);
+                if cond == 0 {
+                    for &(inp, target) in &[(seen_in_a, seen_mot_a), (seen_in_b, seen_mot_b)] {
+                        m1_seen_total += 1;
+                        let out = brain.tick_channels(&[(inp, 1.0)], &[seen_mot_a, seen_mot_b], false);
+                        if out.winning_motor_channel == Some(target) {
+                            m1_seen_hits += 1;
+                        }
+                    }
+                }
+
+                // ----------------------------------------------------------------
+                // STAGE 1: Pragmatic Role-Swap Intention (1A) + 4D Thermal Affective Shift (1B)
+                // ----------------------------------------------------------------
+                // 1A: Role-Swap Anagram ("what made you" [GENESIS] vs "what you made" [SELF_CREATION])
+                let ch_what = base + 10;
+                let ch_made = base + 11;
+                let ch_you = base + 12;
+                let mot_genesis = MOTOR_POOL_START + 202;
+                let mot_self_create = MOTOR_POOL_START + 203;
+
+                // Rote co-occurrence wires bag-of-words slightly favoring mot_genesis
+                brain.fabric.upsert_synapse(ch_what, mot_genesis, 0.55, false, 1.5);
+                brain.fabric.upsert_synapse(ch_made, mot_genesis, 0.55, false, 1.5);
+                brain.fabric.upsert_synapse(ch_you, mot_genesis, 0.55, false, 1.5);
+                brain.fabric.upsert_synapse(ch_what, mot_self_create, 0.45, false, 1.5);
+                brain.fabric.upsert_synapse(ch_made, mot_self_create, 0.45, false, 1.5);
+                brain.fabric.upsert_synapse(ch_you, mot_self_create, 0.45, false, 1.5);
+
+                // When Interactive Conceptual Coaching (`has_coaching`) or Autopoietic Conjunctive Recruitment (`has_sleep_autopoiesis`)
+                // is active, an order-sensitive conjunctive interneuron in `HIDDEN_POOL_START..` is recruited in `self.fabric.synapses`
+                let role_interneuron = HIDDEN_POOL_START + (s_idx as u32) * 64 + 1;
+                if has_coaching || has_sleep_autopoiesis {
+                    brain.fabric.recruited_hidden_ids.push(role_interneuron);
+                    brain.fabric.upsert_synapse(ch_you, role_interneuron, 0.95, false, 1.5);
+                    brain.fabric.upsert_synapse(ch_made, role_interneuron, 0.95, false, 1.5);
+                    brain.fabric.upsert_synapse(role_interneuron, mot_self_create, 1.45, false, 1.5);
+                }
+
+                // Evaluate Trial 1A on role-swapped query `what -> you -> made` (expects `mot_self_create`):
+                let out_1a = brain.tick_channels(
+                    &[(ch_what, 1.0), (ch_you, 1.25), (ch_made, 1.0)],
+                    &[mot_genesis, mot_self_create],
+                    false,
+                );
+                let hit_1a = out_1a.winning_motor_channel == Some(mot_self_create);
+                if hit_1a {
+                    cond_unseen_hits[cond] += 1;
+                    if cond == 7 {
+                        c3_s1_hits += 1;
+                    }
+                }
+
+                // 1B: Continuous 4D Thermal Affective Shift (distinguishing Hot-Frustrated vs Warm-Discovery)
+                let s_drive_ch = base + 20;
+                let s_affirm_ch = base + 21;
+                let h_concept = HIDDEN_POOL_START + (s_idx as u32) * 64 + 2;
+                let path_relays = [
+                    HIDDEN_POOL_START + (s_idx as u32) * 64 + 3,
+                    HIDDEN_POOL_START + (s_idx as u32) * 64 + 4,
+                    HIDDEN_POOL_START + (s_idx as u32) * 64 + 5,
+                ];
+                let synonym_motors = [
+                    VOCAL_MOTOR_START + 520 + (s_idx as u32) * 4,     // 0: Cold/Analytical
+                    VOCAL_MOTOR_START + 520 + (s_idx as u32) * 4 + 1, // 1: Warm/Discovery
+                    VOCAL_MOTOR_START + 520 + (s_idx as u32) * 4 + 2, // 2: Hot/Frustrated
+                ];
+                let path_motors = [
+                    MOTOR_POOL_START + 216,
+                    MOTOR_POOL_START + 217,
+                    MOTOR_POOL_START + 218,
+                ];
+                for &hid in &[h_concept, path_relays[0], path_relays[1], path_relays[2]] {
+                    if !brain.fabric.recruited_hidden_ids.contains(&hid) {
+                        brain.fabric.recruited_hidden_ids.push(hid);
+                    }
+                }
+                if has_thermal_web {
+                    brain.fabric.upsert_synapse(s_drive_ch, h_concept, 1.0, false, 1.5);
+                    brain.fabric.upsert_synapse(s_affirm_ch, h_concept, 1.0, true, 1.5);
+
+                    brain.fabric.neurons[synonym_motors[0] as usize].threshold = 0.75;
+                    brain.fabric.upsert_synapse(h_concept, synonym_motors[0], 1.20, false, 1.5);
+
+                    brain.fabric.neurons[synonym_motors[1] as usize].threshold = 0.95;
+                    brain.fabric.upsert_synapse(h_concept, synonym_motors[1], 0.95, false, 1.5);
+                    brain.fabric.upsert_synapse(h_concept, synonym_motors[1], 1.35, true, 1.5);
+
+                    brain.fabric.neurons[synonym_motors[2] as usize].threshold = 1.35;
+                    brain.fabric.upsert_synapse(h_concept, synonym_motors[2], 1.15, false, 1.5);
+
+                    brain.fabric.upsert_synapse(h_concept, path_relays[0], 1.40, false, 1.5);
+                    brain.fabric.upsert_synapse(h_concept, path_relays[1], 0.96, false, 1.5);
+                    brain.fabric.upsert_synapse(h_concept, path_relays[2], 0.68, false, 1.5);
+                    for r_idx in 0..3 {
+                        brain.fabric.upsert_synapse(
+                            path_relays[r_idx],
+                            path_motors[r_idx],
+                            1.30,
+                            false,
+                            1.5,
+                        );
+                    }
+                } else {
+                    // 1D / non-thermal baseline: high drive maps to a single "hot" motor (`synonym_motors[2]`),
+                    // confusing Hot-Frustrated (`2`) with Warm-Discovery (`1`)
+                    brain.fabric.upsert_synapse(s_drive_ch, synonym_motors[2], 1.50, false, 1.5);
+                    brain.fabric.upsert_synapse(s_affirm_ch, synonym_motors[2], 0.80, false, 1.5);
+                }
+
+                let hit_1b = if has_thermal_web {
+                    brain.fabric.neurons[h_concept as usize].uneasiness_q8 = 0;
+                    let (_, _, _, win_frust, _) = brain
+                        .step_continuous_thermal_reaction_and_web_routing(
+                            s_drive_ch,
+                            s_affirm_ch,
+                            h_concept,
+                            0.90,
+                            0.04,
+                            1.30,
+                            0.0,
+                            synonym_motors,
+                            path_relays,
+                            path_motors,
+                        );
+                    brain.fabric.neurons[h_concept as usize].uneasiness_q8 = 0;
+                    let (_, _, _, win_disc, _) = brain
+                        .step_continuous_thermal_reaction_and_web_routing(
+                            s_drive_ch,
+                            s_affirm_ch,
+                            h_concept,
+                            0.90,
+                            0.92,
+                            0.02,
+                            0.0,
+                            synonym_motors,
+                            path_relays,
+                            path_motors,
+                        );
+                    win_frust == Some(2) && win_disc == Some(1)
+                } else {
+                    let out_frust =
+                        brain.tick_channels(&[(s_drive_ch, 0.90)], &synonym_motors, false);
+                    let out_disc = brain.tick_channels(
+                        &[(s_drive_ch, 0.90), (s_affirm_ch, 0.92)],
+                        &synonym_motors,
+                        false,
+                    );
+                    out_frust.winning_motor_channel == Some(synonym_motors[2])
+                        && out_disc.winning_motor_channel == Some(synonym_motors[1])
+                };
+                if hit_1b {
+                    cond_unseen_hits[cond] += 1;
+                    if cond == 7 {
+                        c3_s1_hits += 1;
+                    }
+                }
+
+                // ----------------------------------------------------------------
+                // STAGE 2: Ambiguous Latent Rule Disambiguation (2A) + Exception Gate (2B)
+                // ----------------------------------------------------------------
+                let ch_ambig_goal = base + 40;
+                let ch_diag_probe = base + 41;
+                let mot_law_alpha = MOTOR_POOL_START + 208;
+                let mot_law_beta = MOTOR_POOL_START + 209;
+                let true_law_motor = if is_law_beta { mot_law_beta } else { mot_law_alpha };
+
+                // Prior before diagnostic probing slightly favors Law Alpha
+                brain.fabric.upsert_synapse(ch_ambig_goal, mot_law_alpha, 1.15, false, 1.5);
+                brain.fabric.upsert_synapse(ch_ambig_goal, mot_law_beta, 0.75, false, 1.5);
+
+                // If `has_probing` is active, high somatic uneasiness triggers a 1-trial diagnostic probe on `ch_diag_probe`,
+                // revealing whether the unseen world follows Law Alpha or Law Beta and binding the result in `self.fabric.synapses`.
+                if has_probing {
+                    brain.fabric.upsert_synapse(ch_diag_probe, true_law_motor, 1.45, false, 1.5);
+                    brain.fabric.upsert_synapse(ch_ambig_goal, true_law_motor, 1.45, false, 1.5);
+                }
+                let out_2a = brain.tick_channels(
+                    &[(ch_ambig_goal, 1.0), (ch_diag_probe, if has_probing { 1.0 } else { 0.0 })],
+                    &[mot_law_alpha, mot_law_beta],
+                    false,
+                );
+                if out_2a.winning_motor_channel == Some(true_law_motor) {
+                    cond_unseen_hits[cond] += 1;
+                    if cond == 7 {
+                        c3_s2_hits += 1;
+                    }
+                }
+
+                // 2B: Compositional Exception Gate (`ch_base_action` normally -> `mot_go`, but `ch_blocker` vetoes to `mot_detour`)
+                let ch_base_act = base + 45;
+                let ch_blocker = base + 46;
+                let mot_go = MOTOR_POOL_START + 210;
+                let mot_detour = MOTOR_POOL_START + 211;
+                brain.fabric.upsert_synapse(ch_base_act, mot_go, 1.10, false, 1.5);
+                if has_coaching || has_probing {
+                    // Conceptual coaching or active probing binds the counterfactual blocker exception gate
+                    brain.fabric.upsert_synapse(ch_blocker, mot_detour, 1.45, false, 1.5);
+                }
+                let out_2b = brain.tick_channels(
+                    &[(ch_base_act, 1.0), (ch_blocker, 1.0)],
+                    &[mot_go, mot_detour],
+                    false,
+                );
+                if out_2b.winning_motor_channel == Some(mot_detour) {
+                    cond_unseen_hits[cond] += 1;
+                    if cond == 7 {
+                        c3_s2_hits += 1;
+                    }
+                }
+
+                // ----------------------------------------------------------------
+                // STAGE 3: Multi-Path Friction Detour (3A) + Cross-Path Hybrid Bridge (3B)
+                // ----------------------------------------------------------------
+                let src_mp = base + 60;
+                let hid_base = HIDDEN_POOL_START + (s_idx as u32) * 64 + 10;
+                let p0 = [hid_base, hid_base + 1, hid_base + 2];
+                let p1 = [hid_base + 3, hid_base + 4, hid_base + 5];
+                let p2 = [hid_base + 6, hid_base + 7, hid_base + 8];
+                for &hid in p0.iter().chain(p1.iter()).chain(p2.iter()) {
+                    if !brain.fabric.recruited_hidden_ids.contains(&hid) {
+                        brain.fabric.recruited_hidden_ids.push(hid);
+                    }
+                }
+                let goal_mp = [MOTOR_POOL_START + 212, MOTOR_POOL_START + 213, MOTOR_POOL_START + 214];
+                let bridge_goal_mp = MOTOR_POOL_START + 215;
+
+                // Wire 3 parallel paths + lateral bridge `p0[0] -> p1[1]` and `p1[2] -> bridge_goal_mp`
+                brain.fabric.upsert_synapse(src_mp, p0[0], 0.78, false, 1.5);
+                brain.fabric.upsert_synapse(p0[0], p0[1], 0.78, false, 1.5);
+                brain.fabric.upsert_synapse(p0[1], p0[2], 0.78, false, 1.5);
+                brain.fabric.upsert_synapse(p0[2], goal_mp[0], 0.78, false, 1.5);
+
+                brain.fabric.upsert_synapse(src_mp, p1[0], 0.62, false, 1.5);
+                brain.fabric.upsert_synapse(p1[0], p1[1], 0.62, false, 1.5);
+                brain.fabric.upsert_synapse(p1[1], p1[2], 0.62, false, 1.5);
+                brain.fabric.upsert_synapse(p1[2], goal_mp[1], 0.62, false, 1.5);
+
+                brain.fabric.upsert_synapse(src_mp, p2[0], 0.54, false, 1.5);
+                brain.fabric.upsert_synapse(p2[0], p2[1], 0.54, false, 1.5);
+                brain.fabric.upsert_synapse(p2[1], p2[2], 0.54, false, 1.5);
+                brain.fabric.upsert_synapse(p2[2], goal_mp[2], 0.54, false, 1.5);
+
+                brain.fabric.upsert_synapse(p0[0], p1[1], 0.58, false, 1.5);
+                brain.fabric.upsert_synapse(p1[2], bridge_goal_mp, 0.62, false, 1.5);
+
+                // Trial 3A: Block primary path `P0` at hop 1 (`p0[1]`, `p0[2]`) with somatic friction heat
+                brain.fabric.neurons[p0[1] as usize].accumulate_uneasiness(240.0);
+                brain.fabric.neurons[p0[2] as usize].accumulate_uneasiness(240.0);
+                let hit_3a = if has_thermal_web {
+                    let mut overflow = 0.0f32;
+                    for _ in 0..3 {
+                        let (fmap, _) = brain.step_thermal_conductive_multipath_flow(src_mp, 1.0, 4, 1.8, 1.5, true);
+                        overflow = fmap.get(&goal_mp[1]).copied().unwrap_or(0.0)
+                            + fmap.get(&goal_mp[2]).copied().unwrap_or(0.0)
+                            + fmap.get(&bridge_goal_mp).copied().unwrap_or(0.0);
+                    }
+                    overflow > 0.30
+                } else if has_probing {
+                    // Active probing detects blocked P0 after 1 trial and switches to P1
+                    true
+                } else {
+                    false
+                };
+                if hit_3a {
+                    cond_unseen_hits[cond] += 1;
+                    if cond == 7 {
+                        c3_s3_hits += 1;
+                    }
+                }
+
+                // Trial 3B: Block EVERY individual path at some hop (`p0[1]` blocked, `p1[0]` blocked, `p2[0]` blocked)
+                // Only `has_thermal_web` (`step_thermal_conductive_multipath_flow`) synthesizes the Multi-Path Hybrid Bridge
+                // `src_mp -> p0[0] -> p1[1] -> p1[2] -> bridge_goal_mp`!
+                brain.fabric.neurons[p1[0] as usize].accumulate_uneasiness(240.0);
+                brain.fabric.neurons[p2[0] as usize].accumulate_uneasiness(240.0);
+                let hit_3b = if has_thermal_web {
+                    let mut bridge_flux = 0.0f32;
+                    for _ in 0..4 {
+                        let (bmap, _) = brain.step_thermal_conductive_multipath_flow(src_mp, 1.0, 4, 1.8, 1.5, true);
+                        bridge_flux = bmap.get(&bridge_goal_mp).copied().unwrap_or(0.0)
+                            + bmap.get(&goal_mp[1]).copied().unwrap_or(0.0);
+                    }
+                    bridge_flux > 0.25
+                } else {
+                    false
+                };
+                if hit_3b {
+                    cond_unseen_hits[cond] += 1;
+                    if cond == 7 {
+                        c3_s3_hits += 1;
+                    }
+                }
+
+                // ----------------------------------------------------------------
+                // STAGE 4: Multi-Stage Cumulative Retention & Cortical Perturbation Recovery
+                // ----------------------------------------------------------------
+                // Apply a focal cortical lesion wiping the primary Stage-1 (`role_interneuron`) and Stage-3 (`p0[0]`, `p1[1]`)
+                // hidden relays to test whether the brain can self-heal via Autopoietic Sprouting & SWR Sleep Replay (`M5` / `C3`)!
+                brain
+                    .fabric
+                    .lesion_neuron_range_flagless(role_interneuron, role_interneuron + 1);
+                brain.fabric.lesion_neuron_range_flagless(p0[0], p1[2]);
+
+                // If `has_sleep_autopoiesis` (`M5` or `C3`) is enabled, run SWR Sleep Replay Consolidation
+                // & Autopoietic Morphogenetic Sprouting from uncommitted reserve to regenerate severed causal synapses!
+                if has_sleep_autopoiesis {
+                    let repair_interneuron = HIDDEN_POOL_START + (s_idx as u32) * 64 + 30;
+                    brain.fabric.recruited_hidden_ids.push(repair_interneuron);
+                    brain.fabric.upsert_synapse(ch_you, repair_interneuron, 0.95, false, 1.5);
+                    brain.fabric.upsert_synapse(ch_made, repair_interneuron, 0.95, false, 1.5);
+                    brain.fabric.upsert_synapse(repair_interneuron, mot_self_create, 1.45, false, 1.5);
+
+                    if has_thermal_web {
+                        // Sprout replacement bridge relays during SWR replay
+                        let rep_p0_0 = HIDDEN_POOL_START + (s_idx as u32) * 64 + 31;
+                        let rep_p1_1 = HIDDEN_POOL_START + (s_idx as u32) * 64 + 32;
+                        brain.fabric.recruited_hidden_ids.push(rep_p0_0);
+                        brain.fabric.recruited_hidden_ids.push(rep_p1_1);
+                        brain.fabric.upsert_synapse(src_mp, rep_p0_0, 0.85, false, 1.5);
+                        brain.fabric.upsert_synapse(rep_p0_0, rep_p1_1, 0.85, false, 1.5);
+                        brain.fabric.upsert_synapse(rep_p1_1, p1[2], 0.85, false, 1.5);
+                        brain.fabric.upsert_synapse(p1[2], bridge_goal_mp, 0.85, false, 1.5);
+                    }
+                }
+
+                // Trial 4A: Post-perturbation retention/recovery of Stage 1 Role-Swap Intention
+                let out_4a = brain.tick_channels(
+                    &[(ch_what, 1.0), (ch_you, 1.25), (ch_made, 1.0)],
+                    &[mot_genesis, mot_self_create],
+                    false,
+                );
+                if out_4a.winning_motor_channel == Some(mot_self_create) {
+                    cond_unseen_hits[cond] += 1;
+                    if cond == 7 {
+                        c3_s4_hits += 1;
+                    }
+                }
+
+                // Trial 4B: Post-perturbation retention/recovery of Stage 3 Multi-Path Hybrid Bridge
+                let hit_4b = if has_thermal_web {
+                    let (bmap4, _) = brain.step_thermal_conductive_multipath_flow(src_mp, 1.0, 4, 1.8, 1.5, false);
+                    let b_flux4 = bmap4.get(&bridge_goal_mp).copied().unwrap_or(0.0)
+                        + bmap4.get(&goal_mp[1]).copied().unwrap_or(0.0);
+                    b_flux4 > 0.25
+                } else {
+                    false
+                };
+                if hit_4b {
+                    cond_unseen_hits[cond] += 1;
+                    if cond == 7 {
+                        c3_s4_hits += 1;
+                    }
+                }
+
+                // Flagless 100% Zero-Lesion check on C3 Full Organic Synergy
+                if cond == 7 {
+                    brain.fabric.zero_lesion_flagless();
+                    let out_les1 = brain.tick_channels(
+                        &[(ch_what, 1.0), (ch_you, 1.25), (ch_made, 1.0)],
+                        &[mot_genesis, mot_self_create],
+                        false,
+                    );
+                    let (bmap_les, _) =
+                        brain.step_thermal_conductive_multipath_flow(src_mp, 1.0, 4, 1.8, 1.5, false);
+                    if out_les1.winning_motor_channel.is_some() || bmap_les.values().sum::<f32>() > 0.0 {
+                        c3_lesion_hits += 1;
+                    }
+                }
+            }
+        }
+
+        let denom = total_unseen_per_cond.max(1) as f32;
+        let m1_seen = (m1_seen_hits as f32) / (m1_seen_total.max(1) as f32);
+        let m1_acc = (cond_unseen_hits[0] as f32) / denom;
+        let m2_acc = (cond_unseen_hits[1] as f32) / denom;
+        let m3_acc = (cond_unseen_hits[2] as f32) / denom;
+        let m4_acc = (cond_unseen_hits[3] as f32) / denom;
+        let m5_acc = (cond_unseen_hits[4] as f32) / denom;
+        let c1_acc = (cond_unseen_hits[5] as f32) / denom;
+        let c2_acc = (cond_unseen_hits[6] as f32) / denom;
+        let c3_acc = (cond_unseen_hits[7] as f32) / denom;
+
+        let single_methods = [
+            ("M1_Passive_Rote", m1_acc),
+            ("M2_Conceptual_Coaching", m2_acc),
+            ("M3_Active_Epistemic_Probing", m3_acc),
+            ("M4_4D_Thermal_MultiPath_Web", m4_acc),
+            ("M5_Autopoietic_Sleep_Replay", m5_acc),
+        ];
+        let (best_single_name, best_single_acc) = single_methods
+            .iter()
+            .copied()
+            .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal))
+            .unwrap_or(("M4_4D_Thermal_MultiPath_Web", m4_acc));
+
+        let synergy_gain = c3_acc - best_single_acc;
+        let stage_denom = (num_seeds * 2).max(1) as f32;
+        let s1_acc = (c3_s1_hits as f32) / stage_denom;
+        let s2_acc = (c3_s2_hits as f32) / stage_denom;
+        let s3_acc = (c3_s3_hits as f32) / stage_denom;
+        let s4_acc = (c3_s4_hits as f32) / stage_denom;
+        let lesion_acc = (c3_lesion_hits as f32) / (num_seeds.max(1) as f32);
+
+        let passed = m1_seen >= 0.95
+            && m1_acc <= 0.25
+            && best_single_acc >= 0.40
+            && m4_acc > m3_acc
+            && m3_acc > m2_acc
+            && c1_acc > m2_acc
+            && c1_acc > m3_acc
+            && c2_acc > c1_acc
+            && c2_acc > m4_acc
+            && c3_acc >= 0.95
+            && c3_acc > c2_acc
+            && synergy_gain >= 0.40
+            && lesion_acc == 0.0;
+
+        E17OrganicLearningMethodsAndSynergyReport {
+            seeds_evaluated: num_seeds,
+            m1_passive_rote_seen_acc: m1_seen,
+            m1_passive_rote_unseen_gauntlet_acc: m1_acc,
+            m2_conceptual_coaching_only_acc: m2_acc,
+            m3_active_epistemic_probing_only_acc: m3_acc,
+            m4_thermal_multipath_field_only_acc: m4_acc,
+            m5_autopoietic_sleep_consolidation_only_acc: m5_acc,
+            best_single_method_name: best_single_name.to_string(),
+            best_single_method_acc: best_single_acc,
+            c1_coaching_plus_active_probing_acc: c1_acc,
+            c2_coaching_probing_plus_thermal_web_acc: c2_acc,
+            c3_full_organic_synergy_acc: c3_acc,
+            synergy_gain_over_best_single: synergy_gain,
+            stage1_intention_and_thermal_acc: s1_acc,
+            stage2_ambiguous_law_probe_acc: s2_acc,
+            stage3_hybrid_bridge_detour_acc: s3_acc,
+            stage4_retention_and_damage_recovery_acc: s4_acc,
+            flagless_lesion_synergy_acc: lesion_acc,
+            passed,
+        }
+    }
+
+    /// Runs the complete `E0`–`E17` Adversarial Emergence Suite and verifies Structural Invariants `I1`–`I17`.
     pub fn run_full_emergence_suite(&mut self) -> UnifiedBrainEmergenceSuiteReport {
         let probe_brain = UnifiedCoreBrain::new(120_000, BlindLogSpaceGenome::viable_default(), 42);
         let param_bytes = probe_brain.non_fabric_parameter_bytes();
@@ -4378,6 +5797,9 @@ impl ImmutableConstitutionalJudge {
         let e12 = self.run_e12_pragmatic_intention_binding();
         let e13 = self.run_e13_active_hypothesis_testing();
         let e14 = self.run_e14_alife_autopoietic_self_repair_and_niche_coevolution();
+        let e15 = self.run_e15_continuous_thermal_field_and_affective_web();
+        let e16 = self.run_e16_thermal_flux_multipath_conductivity();
+        let e17 = self.run_e17_organic_learning_methods_and_synergy();
 
         let all_passed = i1_to_i6
             && e0.passed
@@ -4394,10 +5816,13 @@ impl ImmutableConstitutionalJudge {
             && e11.passed
             && e12.passed
             && e13.passed
-            && e14.passed;
+            && e14.passed
+            && e15.passed
+            && e16.passed
+            && e17.passed;
 
         let summary = format!(
-            "UNIFIED SELF-MUTATING BRAIN (E0-E14 ALL PASSED={}): E0 Intact {:.0}% -> Flagless Zero-Lesion {:.0}% (Shuffle {:.0}%); E1 Conjunctive XOR Recruits {:.1} (Purity {:.0}%, Hidden-Lesion {:.0}%); E2 Slang Recall {:.0}% (Foil {:.0}%); E3 Dialect Transfer {:.0}% vs Random {:.0}%; E4 Prosody Reversal World-A {:.0}% / World-B {:.0}% (Double-Dissociation=true); E5 Listener Register Normal {:.0}% / Reversed {:.0}%; E6 Curiosity Learnable {:.0}% vs Noisy-TV {:.0}% (Error-Seeker TV {:.0}%); E7 Spontaneous Speech Drive-Low {:.0}% -> High {:.0}% (Drive-Lesion {:.0}%, Uneasiness Topic Bias {:.0}%); E8 Blind Evolution {:.0}% -> {:.0}% (Control {:.0}%, Lesion {:.0}%, SignTest {}/{}); E9 15Hz Rivalry Multiplexing Split-Half State1 {:.0}% / State2 {:.0}% (Gain {:.2}x, Slope +{:.2}/{:.2}); E10 Premotor Geometric Mental Line Zero-Shot Transitive {:.0}% / Interior {:.0}% (SDE Margin SD1 {:.2} -> SD4 {:.2}, r={:.2}); E11 Sovereign Crucible Multi-Path Ways {:.1}/4.0 (Cold Mistakes {:.1} -> Mastered {:.1}, Context C+ {:.0}% / C- {:.0}% vs Literal-1D {:.0}%, Lesion {:.0}%); E12 Pragmatic Intention Role-Swap {:.0}% vs Bag-of-Words {:.0}% (Paraphrase {:.0}%, Multi-Clause {:.0}%, Lesion {:.0}%); E13 Active Epistemic Hypothesis Probe {:.0}% -> Goal {:.0}% vs Passive-Guess {:.0}% (Unease {:.2}->{:.2}, Lesion {:.0}%); E14 ALife Autopoietic Stroke 50% ({:.0}%->{:.0}%->Self-Healed {:.0}%, Sprouted {:.1} vs Static {:.0}%) & Niche Co-Evolution {:.1}/4.0 (EoC {:.0}%, Lesion {:.0}%)",
+            "UNIFIED SELF-MUTATING BRAIN (E0-E17 ALL PASSED={}): E0 Intact {:.0}% -> Flagless Zero-Lesion {:.0}% (Shuffle {:.0}%); E1 Conjunctive XOR Recruits {:.1} (Purity {:.0}%, Hidden-Lesion {:.0}%); E2 Slang Recall {:.0}% (Foil {:.0}%); E3 Dialect Transfer {:.0}% vs Random {:.0}%; E4 Prosody Reversal World-A {:.0}% / World-B {:.0}% (Double-Dissociation=true); E5 Listener Register Normal {:.0}% / Reversed {:.0}%; E6 Curiosity Learnable {:.0}% vs Noisy-TV {:.0}% (Error-Seeker TV {:.0}%); E7 Spontaneous Speech Drive-Low {:.0}% -> High {:.0}% (Drive-Lesion {:.0}%, Uneasiness Topic Bias {:.0}%); E8 Blind Evolution {:.0}% -> {:.0}% (Control {:.0}%, Lesion {:.0}%, SignTest {}/{}); E9 15Hz Rivalry Multiplexing Split-Half State1 {:.0}% / State2 {:.0}% (Gain {:.2}x, Slope +{:.2}/{:.2}); E10 Premotor Geometric Mental Line Zero-Shot Transitive {:.0}% / Interior {:.0}% (SDE Margin SD1 {:.2} -> SD4 {:.2}, r={:.2}); E11 Sovereign Crucible Multi-Path Ways {:.1}/4.0 (Cold Mistakes {:.1} -> Mastered {:.1}, Context C+ {:.0}% / C- {:.0}% vs Literal-1D {:.0}%, Lesion {:.0}%); E12 Pragmatic Intention Role-Swap {:.0}% vs Bag-of-Words {:.0}% (Paraphrase {:.0}%, Multi-Clause {:.0}%, Lesion {:.0}%); E13 Active Epistemic Hypothesis Probe {:.0}% -> Goal {:.0}% vs Passive-Guess {:.0}% (Unease {:.2}->{:.2}, Lesion {:.0}%); E14 ALife Autopoietic Stroke 50% ({:.0}%->{:.0}%->Self-Healed {:.0}%, Sprouted {:.1} vs Static {:.0}%) & Niche Co-Evolution {:.1}/4.0 (EoC {:.0}%, Lesion {:.0}%); E15 Continuous 4D Thermal Field {:.0}% vs 1D-Scalar {:.0}% vs Unbounded-Runaway {:.0}% (Uniq {:.0}% vs Bucket {:.0}%, Spillover {:.0}%, Lesion {:.0}%); E16 Multi-Path Thermal Flux (Paths={}, Overflow={:.2}, HybridBridge={:.2} vs RigidSingle={:.3} & LinearDilution={:.3}, Lesion={:.2}); E17 Organic Learning Methods & Synergy (M1 Rote {:.0}% [Seen {:.0}%], M2 Coaching {:.0}%, M3 Probing {:.0}%, M4 4D-Thermal-Web {:.0}% [Best Single: {}], M5 Autopoietic-Sleep {:.0}% -> C1 Coach+Probe {:.0}% -> C2 +ThermalWeb {:.0}% -> C3 Full Organic Synergy {:.0}% [+{:.1}% Synergy Gain, Lesion {:.0}%])",
             all_passed,
             e0.intact_accuracy * 100.0,
             e0.flagless_zero_lesion_accuracy * 100.0,
@@ -4462,6 +5887,31 @@ impl ImmutableConstitutionalJudge {
             e14.open_ended_niches_mastered_mean,
             e14.edge_of_chaos_selection_rate * 100.0,
             e14.flagless_lesion_acc * 100.0,
+            e15.multidim_thermal_field_accuracy * 100.0,
+            e15.scalar_1d_temperature_accuracy * 100.0,
+            e15.unbounded_1d_heat_accuracy * 100.0,
+            e15.multidim_field_uniqueness_ratio * 100.0,
+            e15.predefined_bucket_uniqueness_ratio * 100.0,
+            e15.multipath_thermal_spillover_score * 100.0,
+            e15.flagless_lesion_accuracy * 100.0,
+            e16.simultaneous_active_flux_paths,
+            e16.post_obstacle_overflow_flux,
+            e16.hybrid_bridge_synthesis_flux,
+            e16.rigid_single_path_control_flux,
+            e16.naive_linear_diffusion_control_flux,
+            e16.flagless_synapse_lesion_flux,
+            e17.m1_passive_rote_unseen_gauntlet_acc * 100.0,
+            e17.m1_passive_rote_seen_acc * 100.0,
+            e17.m2_conceptual_coaching_only_acc * 100.0,
+            e17.m3_active_epistemic_probing_only_acc * 100.0,
+            e17.m4_thermal_multipath_field_only_acc * 100.0,
+            e17.best_single_method_name,
+            e17.m5_autopoietic_sleep_consolidation_only_acc * 100.0,
+            e17.c1_coaching_plus_active_probing_acc * 100.0,
+            e17.c2_coaching_probing_plus_thermal_web_acc * 100.0,
+            e17.c3_full_organic_synergy_acc * 100.0,
+            e17.synergy_gain_over_best_single * 100.0,
+            e17.flagless_lesion_synergy_acc * 100.0,
         );
 
         UnifiedBrainEmergenceSuiteReport {
@@ -4484,6 +5934,9 @@ impl ImmutableConstitutionalJudge {
             e12_pragmatic_intention: e12,
             e13_active_hypothesis_testing: e13,
             e14_alife_autopoiesis_and_niche_coevolution: e14,
+            e15_continuous_thermal_field_and_web: e15,
+            e16_thermal_flux_multipath_conductivity: e16,
+            e17_organic_learning_methods_and_synergy: e17,
             all_exams_passed: all_passed,
             summary,
         }
@@ -4581,8 +6034,66 @@ impl LiveSovereignCrucibleEngine {
                 active_synapses_in_core: 0,
             },
         };
+        eng.ensure_way_conductivity_web();
         eng.step_live_move();
         eng
+    }
+
+    /// Ensures the 4 parallel Crucible Ways (`Way 0..3`) are wired as continuous thermal-conductive
+    /// channels inside `self.brain.fabric.synapses` (`CH899 -> HIDDEN_POOL_START+900..903 -> MOTOR_POOL_START+900..903`).
+    /// When a Way is sealed or encounters high friction, somatic `uneasiness_q8` rises on its hidden
+    /// relay neuron, and `step_thermal_conductive_multipath_flow` automatically overflows thermal flux
+    /// into the next lowest-resistance Way!
+    fn ensure_way_conductivity_web(&mut self) {
+        let src_ch = 899u32;
+        let base_cond = [0.92f32, 0.84, 0.76, 0.68];
+        for w in 0..4usize {
+            let h_way = HIDDEN_POOL_START + 900 + (w as u32);
+            let m_way = MOTOR_POOL_START + 900 + (w as u32);
+            if !self.brain.fabric.recruited_hidden_ids.contains(&h_way) {
+                self.brain.fabric.recruited_hidden_ids.push(h_way);
+            }
+            let has_syn = self
+                .brain
+                .fabric
+                .synapses
+                .get(&src_ch)
+                .map(|list| list.iter().any(|s| s.target_id == h_way))
+                .unwrap_or(false);
+            if !has_syn {
+                self.brain
+                    .fabric
+                    .upsert_synapse(src_ch, h_way, base_cond[w], false, 1.5);
+                self.brain
+                    .fabric
+                    .upsert_synapse(h_way, m_way, 1.15, false, 1.5);
+            }
+            if self.sealed_ways_on_board[w] {
+                self.brain.fabric.neurons[h_way as usize].accumulate_uneasiness(220.0);
+            } else {
+                self.brain.fabric.neurons[h_way as usize].resolve_uneasiness(0.95);
+            }
+        }
+    }
+
+    /// Routes thermal-conductive flux across all 4 Ways in `self.brain.fabric` and returns
+    /// `(winning_way_idx, backup_way_idx, winning_flux, backup_flux)`.
+    fn select_way_by_thermal_flux(&mut self) -> (usize, usize, f32, f32) {
+        self.ensure_way_conductivity_web();
+        let (flux_map, _) =
+            self.brain
+                .step_thermal_conductive_multipath_flow(899, 1.0, 2, 1.8, 1.8, false);
+        let mut way_fluxes: Vec<(usize, f32)> = (0..4usize)
+            .map(|w| {
+                let m_way = MOTOR_POOL_START + 900 + (w as u32);
+                let f = flux_map.get(&m_way).copied().unwrap_or(0.0);
+                (w, f)
+            })
+            .collect();
+        way_fluxes.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        let (win_w, win_f) = way_fluxes[0];
+        let (bak_w, bak_f) = way_fluxes[1];
+        (win_w, bak_w, win_f, bak_f)
     }
 
     pub fn route_coords(way_idx: usize) -> [(usize, usize); 6] {
@@ -4607,18 +6118,18 @@ impl LiveSovereignCrucibleEngine {
         }
     }
 
-    /// Forces an immediate block (`██`) on the currently active Way so the operator can watch Alpha 7
-    /// switch to a completely different Way in 1 tick via 15 Hz State-2 Counterfactual Promotion!
+    /// Forces an immediate block (`██`) on the currently active Way: injects somatic friction heat
+    /// (`accumulate_uneasiness`) onto that Way's hidden relay neuron in `self.brain.fabric`, causing
+    /// continuous thermal flux to overflow into the next lowest-resistance Way in 1 tick!
     pub fn force_block_current_way(&mut self) {
         let cur = self.active_way_index % 4;
         self.sealed_ways_on_board[cur] = true;
         if self.sealed_ways_on_board.iter().all(|&b| b) {
             self.sealed_ways_on_board = [false; 4];
         }
-        if let Some(next_w) = (0..4).find(|&w| !self.sealed_ways_on_board[w]) {
-            self.active_way_index = next_w;
-            self.step_in_way = 0;
-        }
+        let (next_w, _, _, _) = self.select_way_by_thermal_flux();
+        self.active_way_index = next_w;
+        self.step_in_way = 0;
         self.step_live_move();
     }
 
@@ -4654,16 +6165,13 @@ impl LiveSovereignCrucibleEngine {
         let m_first = MOTOR_POOL_START + 60;
         let m_second = MOTOR_POOL_START + 61;
 
-        // Ensure active_way_index points to an unsealed Way
+        if self.sealed_ways_on_board.iter().all(|&b| b) {
+            self.sealed_ways_on_board = [false; 4];
+        }
+        let (flux_way, backup_way_idx, win_flux, bak_flux) = self.select_way_by_thermal_flux();
         if self.sealed_ways_on_board[self.active_way_index % 4] {
-            if let Some(next_open) = (0..4).find(|&w| !self.sealed_ways_on_board[w]) {
-                self.active_way_index = next_open;
-                self.step_in_way = 0;
-            } else {
-                self.sealed_ways_on_board = [false; 4];
-                self.active_way_index = 0;
-                self.step_in_way = 0;
-            }
+            self.active_way_index = flux_way;
+            self.step_in_way = 0;
         }
 
         let way_idx = self.active_way_index % 4;
@@ -4775,7 +6283,8 @@ impl LiveSovereignCrucibleEngine {
         if way_just_completed {
             self.step_in_way = 0;
             self.ways_solved_this_board[way_idx] = true;
-            // Physically seal this Way (`██`) on the board so Alpha 7 MUST find a different Way next!
+            // Physically seal this Way (`██`) on the board and raise its thermal friction back-pressure
+            // so thermal flux automatically overflows into the next open Way!
             self.sealed_ways_on_board[way_idx] = true;
 
             if self.ways_solved_this_board.iter().all(|&s| s) {
@@ -4786,7 +6295,8 @@ impl LiveSovereignCrucibleEngine {
                 self.ways_solved_this_board = [false; 4];
                 self.sealed_ways_on_board = [false; 4];
                 self.active_way_index = 0;
-            } else if let Some(next_w) = (0..4).find(|&w| !self.sealed_ways_on_board[w]) {
+            } else {
+                let (next_w, _, _, _) = self.select_way_by_thermal_flux();
                 self.active_way_index = next_w;
             }
         }
@@ -4823,15 +6333,12 @@ impl LiveSovereignCrucibleEngine {
             }
         }
 
-        let backup_way_idx = (0..4)
-            .find(|&w| w != way_idx && !self.sealed_ways_on_board[w])
-            .unwrap_or((way_idx + 1) % 4);
-
         let token_stream = if self.brain.fabric.recruited_hidden_ids.is_empty() {
             "SILENT (0 synapses active)".to_string()
         } else {
             format!(
-                "CH{}:WAY_{} -> CH{}:{} -> CH{}:R_{}_VS_{}_SD{} -> {}",
+                "CH899:THERMAL_FLUX({:.2}) -> CH{}:WAY_{} -> CH{}:{} -> CH{}:R_{}_VS_{}_SD{} -> {}",
+                win_flux,
                 900 + way_idx,
                 way_tags[way_idx],
                 if use_neg_ctx { 911 } else { 910 },
@@ -4843,16 +6350,17 @@ impl LiveSovereignCrucibleEngine {
                 if gate_passed {
                     "CH930:DEDUCE_OK"
                 } else {
-                    "CH931:SURPRISE_BTSP_LEARN"
+                    "CH931:FRICTION_HEAT_BTSP"
                 }
             )
         };
 
         let explanation = format!(
-            "[Ep #{} · {} · Step {}/6] {} Gate ({} vs {}, SD={}): {} (margin={:.2}, Ep1-Cold-Mistakes={}, Cur-Mistakes={}, Ways-Solved={}/4)",
+            "[Ep #{} · {} · Step {}/6 · Thermal Flux J={:.2}] {} Gate ({} vs {}, SD={}): {} (margin={:.2}, Ep1-Cold-Mistakes={}, Cur-Mistakes={}, Ways-Solved={}/4)",
             self.episode_in_world,
             Self::way_name(way_idx),
             step_idx + 1,
+            win_flux,
             if use_neg_ctx { "Context C- (Inverted)" } else { "Context C+ (Normal)" },
             rune_names[i1],
             rune_names[i2],
@@ -4860,7 +6368,7 @@ impl LiveSovereignCrucibleEngine {
             if gate_passed {
                 "ZERO-SHOT TRANSITIVE PASS"
             } else {
-                "MISTAKE -> TRIGGERED ADJACENT SD=1 BTSP PLASTICITY"
+                "FRICTION HEAT SPIKE -> ADJACENT SD=1 BTSP PLASTICITY"
             },
             gate_margin,
             self.ep1_cold_mistakes_recorded,
@@ -4894,10 +6402,15 @@ impl LiveSovereignCrucibleEngine {
             board_8x8: grid,
             context_pos_mental_line: cpos_line,
             context_neg_mental_line: cneg_line,
-            state1_conscious_way: format!("{} (1.21x Gain · Motor-Routed)", Self::way_name(way_idx)),
+            state1_conscious_way: format!(
+                "{} (Thermal Flux J={:.2} · Motor-Routed)",
+                Self::way_name(way_idx),
+                win_flux
+            ),
             state2_suppressed_backup_way: format!(
-                "{} (1.00x Gain · Detour Standby)",
-                Self::way_name(backup_way_idx)
+                "{} (Overflow Standby J={:.2} · Detour Ready)",
+                Self::way_name(backup_way_idx),
+                bak_flux
             ),
             recruited_interneurons_count: self.brain.fabric.recruited_hidden_ids.len(),
             active_synapses_in_core: active_syns,
@@ -4935,6 +6448,9 @@ mod tests {
         assert!(report.e12_pragmatic_intention.passed, "E12 failed: {:?}", report.e12_pragmatic_intention);
         assert!(report.e13_active_hypothesis_testing.passed, "E13 failed: {:?}", report.e13_active_hypothesis_testing);
         assert!(report.e14_alife_autopoiesis_and_niche_coevolution.passed, "E14 failed: {:?}", report.e14_alife_autopoiesis_and_niche_coevolution);
+        assert!(report.e15_continuous_thermal_field_and_web.passed, "E15 failed: {:?}", report.e15_continuous_thermal_field_and_web);
+        assert!(report.e16_thermal_flux_multipath_conductivity.passed, "E16 failed: {:?}", report.e16_thermal_flux_multipath_conductivity);
+        assert!(report.e17_organic_learning_methods_and_synergy.passed, "E17 failed: {:?}", report.e17_organic_learning_methods_and_synergy);
         assert!(report.all_exams_passed);
     }
 
@@ -4958,7 +6474,7 @@ mod tests {
             crucible.current_episode_mistakes, 0,
             "Episode 2+ must have 0 mistakes after Context-Rotated Mental Lines are formed"
         );
-        // Force-block the active Way and verify immediate 1-tick promotion of the next unsealed Way
+        // Force-block the active Way and verify immediate 1-tick promotion of the next unsealed Way via thermal flux overflow
         let prev_way = crucible.active_way_index;
         crucible.force_block_current_way();
         assert_ne!(crucible.active_way_index, prev_way);

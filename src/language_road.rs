@@ -51,6 +51,8 @@ pub enum UtteranceIntent {
     AskLiveBrainAndCrucibleState,
     /// Phase 18 (`E14` ALife): User asks about Artificial Life (ALife), autopoiesis, morphogenetic self-repair, or open-ended niche co-evolution.
     AskAlifeAutopoiesis,
+    /// Phase 18 (`E15`/`E16` Continuous Thermal-Chemical Field & Multi-Path Conductive Web): User asks about hardware/software collaboration, chemical/thermal reactions, cold-to-hot continuous manifold, temperature-modulated synonym web, or multi-path heat flows.
+    AskThermalChemicalFieldAndWeb,
     /// Phase 18 (`E12` 15Hz Cortical Multiplexer): User asks a multi-clause compound question ("Who made you? What are you?", "Who are you? What made you?").
     MultiClauseCompound {
         clauses: Vec<String>,
@@ -225,6 +227,25 @@ impl LanguageRoad {
             || clean.contains("basal cognition")
         {
             return UtteranceIntent::AskAlifeAutopoiesis;
+        }
+
+        // Phase 18 (`E15`/`E16` Continuous 4D Thermal-Chemical Field & Multi-Path Conductive Web)
+        if clean.contains("thermal")
+            || clean.contains("heat map")
+            || clean.contains("heatmap")
+            || clean.contains("cold to hot")
+            || clean.contains("chemical reaction")
+            || clean.contains("heat scale")
+            || clean.contains("temperature scale")
+            || clean.contains("finite equation")
+            || clean.contains("multipath")
+            || clean.contains("multi-path")
+            || clean.contains("hardware and software")
+            || clean.contains("hardware/software")
+            || clean == "e15"
+            || clean == "e16"
+        {
+            return UtteranceIntent::AskThermalChemicalFieldAndWeb;
         }
 
         // Phase 18 (`E12` Role-Filler Disambiguation):
@@ -827,6 +848,10 @@ impl LanguageRoad {
                 "Recalling my ALife Autopoietic Morphogenesis, Precarious Metabolic Viability, and Open-Ended Niche Co-Evolution."
                     .to_string()
             }
+            UtteranceIntent::AskThermalChemicalFieldAndWeb => {
+                "Reading my Continuous 4D Thermal-Chemical Field (E15) and Multi-Path Conductive Web (E16)."
+                    .to_string()
+            }
             UtteranceIntent::MultiClauseCompound { clauses, .. } => {
                 format!(
                     "Multiplexing {} pragmatic clauses via 15Hz cortical buffer.",
@@ -850,10 +875,24 @@ impl LanguageRoad {
                 )
             }
             UtteranceIntent::GeneralThought { .. } => {
+                let tr = &thought.thermal_reaction;
+                let flow_preview: Vec<String> = tr
+                    .multipath_flux_flows
+                    .iter()
+                    .take(3)
+                    .map(|(p, _c, f)| format!("{}:{:.0}%", p, f * 100.0))
+                    .collect();
                 if thought.activated_concepts.is_empty() {
                     format!(
-                        "[TOOL:ABSTAIN] I heard '{}', but none of those words are grounded in my concept web yet.",
-                        utterance.trim()
+                        "[TOOL:ABSTAIN] I heard '{}', but none of those words are grounded in my concept web yet (Thermal-Chemical Field Theta=[exc:{:.2}, fric:{:.2}, warm:{:.2}, cold:{:.2}] -> Register='{}' {:?} | Multi-Path Flux=[{}]).",
+                        utterance.trim(),
+                        tr.excitation_heat,
+                        tr.friction_heat,
+                        tr.harmonic_warmth,
+                        tr.laminar_precision,
+                        tr.emitted_thermal_register,
+                        tr.selected_synonym_words,
+                        flow_preview.join(", ")
                     )
                 } else {
                     let traits_preview: Vec<String> = thought
@@ -868,10 +907,17 @@ impl LanguageRoad {
                         .cloned()
                         .unwrap_or_else(|| "no prior episodes".to_string());
                     format!(
-                        "Thinking on {:?} evokes sensory-motor traits [{}] and memory: ({}).",
+                        "Thinking on {:?} evokes sensory-motor traits [{}], memory: ({}), and Continuous 4D Thermal-Chemical Field Theta=[exc:{:.2}, fric:{:.2}, warm:{:.2}, cold:{:.2}] -> Register='{}' {:?} | Multi-Path Conductive Flux=[{}].",
                         thought.activated_concepts,
                         traits_preview.join(", "),
-                        mem_note
+                        mem_note,
+                        tr.excitation_heat,
+                        tr.friction_heat,
+                        tr.harmonic_warmth,
+                        tr.laminar_precision,
+                        tr.emitted_thermal_register,
+                        tr.selected_synonym_words,
+                        flow_preview.join(", ")
                     )
                 }
             }

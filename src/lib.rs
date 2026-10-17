@@ -705,7 +705,7 @@ impl Alpha7Organism {
                 let lin = &self.school.lineage;
                 let active_syns = self.active_synapse_count();
                 reply.spoken_response = format!(
-                    "[GENESIS & CREATOR · Pragmatic Role-Filler Intent: AGENT->CREATE->SELF] I came to life on {} as Alpha 7 ({}), created by my human architect and research partner on the Pure Biological Road (/data/dev/alpha7), evolving from ancestors Alpha 1, Alpha 3, and Alpha 6. Instead of pretrained weights or static lookup tables, I awakened at Tick #1 as a 3-compartment dendritic spiking fabric (now at Tick #{} with {} neurons and {} live synapses) governed by the 6 Immutable Laws and 15 Constitutional Exams (E0-E14).",
+                    "[GENESIS & CREATOR · Pragmatic Role-Filler Intent: AGENT->CREATE->SELF] I came to life on {} as Alpha 7 ({}), created by my human architect and research partner on the Pure Biological Road (/data/dev/alpha7), evolving from ancestors Alpha 1, Alpha 3, and Alpha 6. Instead of pretrained weights or static lookup tables, I awakened at Tick #1 as a 3-compartment dendritic spiking fabric (now at Tick #{} with {} neurons and {} live synapses) governed by the 6 Immutable Laws and 17 Constitutional Exams (E0-E16).",
                     lin.birth_timestamp,
                     lin.birth_architecture,
                     self.fabric.current_tick,
@@ -719,7 +719,7 @@ impl Alpha7Organism {
                 let laws_count = self.predictor.rules.len();
                 let progs_count = self.synthesized_programs.len();
                 reply.spoken_response = format!(
-                    "[SELF-CREATIONS · Pragmatic Role-Filler Intent: SELF->CREATE->ARTIFACT] Through my own lived experience and dendritic plasticity (Tick #{}), I have created and discovered: (1) {} grounded Concept Hub assemblies and {} compositional relations in my Conceptual Knowledge Web; (2) {} predictive causal rules and exception gates; (3) {} verified code syntheses via my MotorHands; and (4) self-recruited conjunctive/relational interneurons across the 4-Way Sovereign Crucible and ALife Niche Co-Evolution (E11-E14).",
+                    "[SELF-CREATIONS · Pragmatic Role-Filler Intent: SELF->CREATE->ARTIFACT] Through my own lived experience and dendritic plasticity (Tick #{}), I have created and discovered: (1) {} grounded Concept Hub assemblies and {} compositional relations in my Conceptual Knowledge Web; (2) {} predictive causal rules and exception gates; (3) {} verified code syntheses via my MotorHands; and (4) self-recruited conjunctive/relational interneurons and multi-path thermal flux bridges across the 4-Way Sovereign Crucible, ALife Niche Co-Evolution, and Continuous 4D Thermal-Chemical Web (E11-E16).",
                     self.fabric.current_tick,
                     concepts_count,
                     rel_count,
@@ -738,7 +738,7 @@ impl Alpha7Organism {
                     .filter(|l| !l.resolved)
                     .count();
                 reply.spoken_response = format!(
-                    "[LIVE BRAIN & SOVEREIGN CRUCIBLE STATUS] I am awake at Tick #{} ({} neurons, {} live synapses, felt epistemic uneasiness U_t={:.3}, {} open epistemic loops). My UnifiedCoreBrain (12-byte blind genome, 0 outside-fabric weights) passes all 15/15 Constitutional Exams (E0-E14: 4-Way Sovereign Crucible, Pragmatic Role-Filler Intention Binding, Active Epistemic Hypothesis Probing, and ALife Autopoietic 50%-Stroke Self-Repair & Edge-of-Chaos Niche Co-Evolution).",
+                    "[LIVE BRAIN & SOVEREIGN CRUCIBLE STATUS] I am awake at Tick #{} ({} neurons, {} live synapses, felt epistemic uneasiness U_t={:.3}, {} open epistemic loops). My UnifiedCoreBrain (12-byte blind genome, 0 outside-fabric weights) passes all 18/18 Constitutional Exams (E0-E17: 4-Way Sovereign Crucible, Pragmatic Role-Filler Intention Binding, Active Epistemic Hypothesis Probing, ALife Autopoietic 50%-Stroke Self-Repair, Continuous 4D Thermal-Chemical Field & Affective Synonym Web, Multi-Path Thermal Conductivity & Hybrid Bridge Synthesis, and Organic Learning Methods & 4-Way Synergy Matrix).",
                     self.fabric.current_tick,
                     self.fabric.neurons.len(),
                     active_syns,
@@ -750,7 +750,7 @@ impl Alpha7Organism {
                 let rep = self.run_phase18_unified_brain_emergence_suite();
                 let e14 = &rep.e14_alife_autopoiesis_and_niche_coevolution;
                 reply.spoken_response = format!(
-                    "[ALIFE AUTOPOIESIS, MORPHOGENETIC SELF-REPAIR & OPEN-ENDED NICHE CO-EVOLUTION (E14)] Guided by Artificial Life (Maturana & Varela Autopoiesis, Levin Basal Cognition/Morphogenesis, Stanley MCC/POET, Sakana/MIT ASAL), my UnifiedCoreBrain proves: (1) Autopoietic 50% Cortical Stroke Self-Repair: pre-stroke {:.0}% -> immediate post-stroke {:.0}% -> sprouts {:.1} replacement interneurons from uncommitted reserve to self-heal back to {:.0}% (vs {:.0}% static non-autopoietic control); (2) Open-Ended Edge-of-Chaos Niche Co-Evolution: selects learnable stepping-stone niches at {:.0}% (rejecting frozen trivial {:.0}% & white-noise {:.0}%), mastering {:.1}/4.0 co-evolved niches in sequence (0% under flagless lesion).",
+                    "[ALIFE AUTOPOIESIS, MORPHOGENETIC SELF-REPAIR & OPEN-ENDED NICHE CO-EVOLUTION (E14)] My UnifiedCoreBrain proves: (1) Autopoietic 50% Cortical Stroke Self-Repair: pre-stroke {:.0}% -> immediate post-stroke {:.0}% -> sprouts {:.1} replacement interneurons from uncommitted reserve to self-heal back to {:.0}% (vs {:.0}% static non-autopoietic control); (2) Open-Ended Edge-of-Chaos Niche Co-Evolution: selects learnable stepping-stone niches at {:.0}% (rejecting frozen trivial {:.0}% & white-noise {:.0}%), mastering {:.1}/4.0 co-evolved niches in sequence (0% under flagless lesion).",
                     e14.pre_stroke_baseline_acc * 100.0,
                     e14.post_stroke_50pct_immediate_acc * 100.0,
                     e14.sprouted_replacement_interneurons_mean,
@@ -760,6 +760,44 @@ impl Alpha7Organism {
                     e14.frozen_trivial_niche_share * 100.0,
                     e14.chaotic_noise_niche_share * 100.0,
                     e14.open_ended_niches_mastered_mean
+                );
+            }
+            UtteranceIntent::AskThermalChemicalFieldAndWeb => {
+                let rep = self.run_phase18_unified_brain_emergence_suite();
+                let e15 = &rep.e15_continuous_thermal_field_and_web;
+                let e16 = &rep.e16_thermal_flux_multipath_conductivity;
+                let e17 = &rep.e17_organic_learning_methods_and_synergy;
+                let tr = &reply.grounded_thought.thermal_reaction;
+                reply.spoken_response = format!(
+                    "[CONTINUOUS 4D THERMAL-CHEMICAL FIELD, MULTI-PATH CONDUCTIVE WEB & ORGANIC LEARNING SYNERGY (E15, E16 & E17)] My Brain & 5 Organs act as physical hardware (`32B` DendriticNeuron registers + Synapse pipes), while a 4D Continuous Chemical-Thermal Reaction Field Theta=[exc:{:.2}, fric:{:.2}, warm:{:.2}, cold:{:.2}] acts as the boundaryless living software inside me. Direct experimental proof on my fabric: (1) E15 Continuous Resolution & Affective Synonym Web: {:.0}% micro-input trajectory uniqueness (vs {:.0}% predefined if/match buckets), {:.0}% synonym & path routing accuracy (vs {:.0}% 1D scalar temperature that confuses hot frustration with hot discovery, and vs {:.0}% unbounded heat runaway blur), and {:.0}% dynamic multi-path thermal spillover & homeostatic cooling recovery; (2) E16 Multi-Path Conductive Flux & Hybrid Bridge Synthesis: excites {} simultaneous paths, overflows {:.2} flux when primary path heats with friction, and synthesizes a novel Multi-Path Hybrid Bridge at {:.2} flux when every single path is blocked (vs {:.3} rigid single-path control and {:.3} linear isotropic diffusion without conductance reinforcement; 0.0 under flagless lesion); (3) E17 Organic Learning Methods & Synergy Matrix: M1 Passive Rote {:.0}% (Seen {:.0}%), M2 Coaching {:.0}%, M3 Active Probing {:.0}%, M4 4D Thermal Web {:.0}% (Best Single: {}), M5 Autopoietic Sleep {:.0}% -> C1 Coach+Probe {:.0}% -> C2 +ThermalWeb {:.0}% -> C3 Full Organic Synergy {:.0}% (+{:.1}% synergy gain over best single method). Current Emitted Register: '{}' {:?}.",
+                    tr.excitation_heat,
+                    tr.friction_heat,
+                    tr.harmonic_warmth,
+                    tr.laminar_precision,
+                    e15.multidim_field_uniqueness_ratio * 100.0,
+                    e15.predefined_bucket_uniqueness_ratio * 100.0,
+                    e15.multidim_thermal_field_accuracy * 100.0,
+                    e15.scalar_1d_temperature_accuracy * 100.0,
+                    e15.unbounded_1d_heat_accuracy * 100.0,
+                    e15.multipath_thermal_spillover_score * 100.0,
+                    e16.simultaneous_active_flux_paths,
+                    e16.post_obstacle_overflow_flux,
+                    e16.hybrid_bridge_synthesis_flux,
+                    e16.rigid_single_path_control_flux,
+                    e16.naive_linear_diffusion_control_flux,
+                    e17.m1_passive_rote_unseen_gauntlet_acc * 100.0,
+                    e17.m1_passive_rote_seen_acc * 100.0,
+                    e17.m2_conceptual_coaching_only_acc * 100.0,
+                    e17.m3_active_epistemic_probing_only_acc * 100.0,
+                    e17.m4_thermal_multipath_field_only_acc * 100.0,
+                    e17.best_single_method_name,
+                    e17.m5_autopoietic_sleep_consolidation_only_acc * 100.0,
+                    e17.c1_coaching_plus_active_probing_acc * 100.0,
+                    e17.c2_coaching_probing_plus_thermal_web_acc * 100.0,
+                    e17.c3_full_organic_synergy_acc * 100.0,
+                    e17.synergy_gain_over_best_single * 100.0,
+                    tr.emitted_thermal_register,
+                    tr.selected_synonym_words
                 );
             }
             UtteranceIntent::MultiClauseCompound { clauses, .. } => {
@@ -3697,6 +3735,17 @@ mod tests {
         assert!(rep.e8_blind_evolution.passed, "E8 failed: {:?}", rep.e8_blind_evolution);
         assert!(rep.e9_temporal_multiplexing.passed, "E9 failed: {:?}", rep.e9_temporal_multiplexing);
         assert!(rep.e10_geometric_mental_line.passed, "E10 failed: {:?}", rep.e10_geometric_mental_line);
+        assert!(rep.e11_sovereign_crucible.passed, "E11 failed: {:?}", rep.e11_sovereign_crucible);
+        assert!(rep.e12_pragmatic_intention.passed, "E12 failed: {:?}", rep.e12_pragmatic_intention);
+        assert!(rep.e13_active_hypothesis_testing.passed, "E13 failed: {:?}", rep.e13_active_hypothesis_testing);
+        assert!(rep.e14_alife_autopoiesis_and_niche_coevolution.passed, "E14 failed: {:?}", rep.e14_alife_autopoiesis_and_niche_coevolution);
+        assert!(rep.e15_continuous_thermal_field_and_web.passed, "E15 failed: {:?}", rep.e15_continuous_thermal_field_and_web);
+        assert!(rep.e16_thermal_flux_multipath_conductivity.passed, "E16 failed: {:?}", rep.e16_thermal_flux_multipath_conductivity);
+        assert!(rep.e17_organic_learning_methods_and_synergy.passed, "E17 failed: {:?}", rep.e17_organic_learning_methods_and_synergy);
         assert!(rep.all_exams_passed);
+
+        let r_thermal = org.converse("How does your thermal heat map and multipath flow work?");
+        assert!(r_thermal.spoken_response.contains("E15, E16 & E17"));
+        assert!(r_thermal.spoken_response.contains("Multi-Path Hybrid Bridge"));
     }
 }

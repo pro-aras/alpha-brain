@@ -791,6 +791,7 @@ impl ConceptualKnowledgeWeb {
                 evoked_sensory_traits: Vec::new(),
                 predicted_affordances: Vec::new(),
                 recalled_episodes: Vec::new(),
+                thermal_reaction: ContinuousThermalReactionTrace::default(),
             };
         }
         let mut thought = self.understand_utterance(text);
@@ -813,7 +814,213 @@ impl ConceptualKnowledgeWeb {
             thought.predicted_affordances.clear();
             thought.recalled_episodes.clear();
         }
+        thought.thermal_reaction =
+            self.compute_continuous_thermal_reaction(Some(fabric), text, &thought.activated_concepts);
         thought
+    }
+
+    /// Computes the continuous 4D Thermal-Chemical Reaction Field `Theta(x) = (tau_exc, tau_fric, tau_warm, tau_cold)`,
+    /// continuous synonym register projection (`Cold/Analytical`, `Warm/Resonant`, `Hot/Frustrated`),
+    /// and multi-path conductive flux flows across the interconnected Knowledge Web (`E15` & `E16`).
+    pub fn compute_continuous_thermal_reaction(
+        &self,
+        fabric_opt: Option<&SparseNeuralFabric>,
+        text: &str,
+        activated_concepts: &[String],
+    ) -> ContinuousThermalReactionTrace {
+        if let Some(f) = fabric_opt {
+            if f.lesioned || f.synapses.is_empty() {
+                return ContinuousThermalReactionTrace::default();
+            }
+        }
+        let tokens: Vec<String> = text
+            .split(|c: char| !c.is_alphanumeric() && c != '_')
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_lowercase())
+            .collect();
+        let exclamations = text.chars().filter(|&c| c == '!').count() as f32;
+        let questions = text.chars().filter(|&c| c == '?').count() as f32;
+        let char_hash_perturbation = (text
+            .bytes()
+            .enumerate()
+            .fold(0u64, |acc, (i, b)| acc.wrapping_add((b as u64) * ((i as u64) + 17)))
+            % 997) as f32
+            / 99_700.0;
+
+        let mut friction_markers = 0.0f32;
+        let mut warmth_markers = 0.0f32;
+        let mut precision_markers = 0.0f32;
+
+        for tok in &tokens {
+            match tok.as_str() {
+                "not" | "no" | "wrong" | "fail" | "failed" | "failing" | "issue" | "problem"
+                | "bottleneck" | "stuck" | "frustration" | "frustrated" | "broken" | "bad"
+                | "shit" | "hell" | "heck" | "obstacle" | "blocked" | "limit" | "finite" => {
+                    friction_markers += 0.36;
+                }
+                "warm" | "warmth" | "good" | "great" | "love" | "friend" | "help" | "together"
+                | "collaborate" | "understand" | "alive" | "life" | "grow" | "flow" | "harmony"
+                | "infinite" | "nature" => {
+                    warmth_markers += 0.34;
+                }
+                "how" | "why" | "what" | "equation" | "equations" | "math" | "physics" | "code"
+                | "hardware" | "software" | "scale" | "temperature" | "heat" | "chemical"
+                | "reaction" | "experiment" | "experimentations" | "test" | "prove" => {
+                    precision_markers += 0.28;
+                }
+                _ => {}
+            }
+        }
+
+        // Read out real hardware state from `SparseNeuralFabric` for any activated concepts
+        let mut fabric_basal_boost = 0.0f32;
+        let mut fabric_unease_boost = 0.0f32;
+        let mut multipath_flux_flows: Vec<(String, f32, f32)> = Vec::new();
+
+        if let Some(fabric) = fabric_opt {
+            for cname in activated_concepts.iter().take(4) {
+                if let Some(node) = self.concepts.get(cname) {
+                    if (node.hub_neuron_id as usize) < fabric.neurons.len() {
+                        let hn = &fabric.neurons[node.hub_neuron_id as usize];
+                        fabric_basal_boost += hn.basal_v.max(0.25);
+                        fabric_unease_boost += hn.uneasiness();
+                    }
+                    // Measure outgoing synaptic thermal conductivity across the concept hub's web
+                    if let Some(syns) = fabric.synapses.get(&node.hub_neuron_id) {
+                        for syn in syns.iter().take(4) {
+                            if syn.weight > 0.05 && (syn.target_id as usize) < fabric.neurons.len() {
+                                let r_v = fabric.neurons[syn.target_id as usize].uneasiness();
+                                let flux_j = syn.weight.powf(1.6) / (1.0 + 1.5 * r_v);
+                                if let Some(target_trait) = fabric.neuron_to_trait.get(&syn.target_id) {
+                                    multipath_flux_flows.push((
+                                        format!("{} -> {}", cname, target_trait),
+                                        flux_j,
+                                        r_v,
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Also include relational multi-path flows from the knowledge web
+        if multipath_flux_flows.len() < 4 {
+            for (ca, rel, cb, w) in self.relations.iter().take(4) {
+                let flux_j = w.powf(1.5) / (1.0 + 0.4 * friction_markers);
+                multipath_flux_flows.push((
+                    format!("{} -[{}]-> {}", ca, rel, cb),
+                    flux_j,
+                    friction_markers * 0.35,
+                ));
+                if multipath_flux_flows.len() >= 4 {
+                    break;
+                }
+            }
+        }
+
+        let word_density = ((tokens.len() as f32) * 0.045).min(0.65);
+        let v_basal = (0.42
+            + word_density
+            + 0.22 * precision_markers
+            + 0.25 * friction_markers
+            + 0.18 * warmth_markers
+            + 0.12 * exclamations
+            + 0.08 * questions
+            + 0.15 * fabric_basal_boost
+            + char_hash_perturbation)
+            .clamp(0.15, 1.85);
+
+        let v_apical = (0.28 + 0.45 * warmth_markers + 0.18 * (activated_concepts.len() as f32)
+            - 0.15 * friction_markers
+            + char_hash_perturbation * 0.5)
+            .clamp(0.08, 1.65);
+
+        let tau_exc = v_basal;
+        let tau_fric =
+            (0.06 + friction_markers + 0.15 * exclamations + 0.5 * fabric_unease_boost + char_hash_perturbation * 0.3)
+                .clamp(0.01, 2.40);
+        let tau_warm = (v_basal * v_apical).sqrt() * (-1.1 * tau_fric).exp();
+        let tau_cold = (v_basal * (0.55 + 0.35 * precision_markers))
+            * (-1.4 * tau_fric).exp()
+            * (-0.8 * (v_apical - 0.55).max(0.0)).exp();
+
+        // Continuous vocal synonym currents `(J_cold, J_warm, J_hot)`
+        let j_cold = 1.15 * tau_cold;
+        let j_warm = 1.65 * tau_warm;
+        let j_hot = 1.10 * tau_exc * (1.0 + 1.6 * tau_fric) * (1.0 - (-1.5 * tau_fric).exp());
+
+        let (emitted_thermal_register, selected_synonym_words) =
+            if j_hot >= j_warm && j_hot >= j_cold && tau_fric >= 0.35 {
+                (
+                    format!(
+                        "Hot-Friction Spillover Register (J_hot={:.2} > J_warm={:.2}, J_cold={:.2})",
+                        j_hot, j_warm, j_cold
+                    ),
+                    vec![
+                        "urgent-reroute".to_string(),
+                        "high-friction-bottleneck".to_string(),
+                        "immediate-bypass".to_string(),
+                    ],
+                )
+            } else if j_warm >= j_cold {
+                (
+                    format!(
+                        "Warm-Harmonic Coherent Register (J_warm={:.2} >= J_cold={:.2}, J_hot={:.2})",
+                        j_warm, j_cold, j_hot
+                    ),
+                    vec![
+                        "resonant-synthesis".to_string(),
+                        "collaborative-flow".to_string(),
+                        "living-harmony".to_string(),
+                    ],
+                )
+            } else {
+                (
+                    format!(
+                        "Cold-Laminar Analytical Register (J_cold={:.2} > J_warm={:.2}, J_hot={:.2})",
+                        j_cold, j_warm, j_hot
+                    ),
+                    vec![
+                        "exact-gradient".to_string(),
+                        "laminar-deduction".to_string(),
+                        "critical-threshold".to_string(),
+                    ],
+                )
+            };
+
+        let thermal_synonym_manifold = vec![
+            (
+                "obstacle_or_error".to_string(),
+                "cold:boundary_discrepancy".to_string(),
+                "warm:stepping_stone_challenge".to_string(),
+                "hot:frustration_friction_spike".to_string(),
+            ),
+            (
+                "knowledge_connection".to_string(),
+                "cold:conductance_gradient".to_string(),
+                "warm:harmonic_resonance_web".to_string(),
+                "hot:urgent_spillover_detour".to_string(),
+            ),
+            (
+                "input_reaction".to_string(),
+                "cold:laminar_excitation".to_string(),
+                "warm:affiliative_coherence".to_string(),
+                "hot:high_pressure_ignition".to_string(),
+            ),
+        ];
+
+        ContinuousThermalReactionTrace {
+            excitation_heat: tau_exc,
+            friction_heat: tau_fric,
+            harmonic_warmth: tau_warm,
+            laminar_precision: tau_cold,
+            emitted_thermal_register,
+            selected_synonym_words,
+            thermal_synonym_manifold,
+            multipath_flux_flows,
+        }
     }
 
     /// Returns true if a token is a syntactic operator, interrogative, pronoun, or auxiliary verb
@@ -1013,14 +1220,39 @@ impl ConceptualKnowledgeWeb {
             }
         }
 
+        let thermal_reaction =
+            self.compute_continuous_thermal_reaction(None, text, &activated_concepts);
+
         GroundedThought {
             utterance: text.to_string(),
             activated_concepts,
             evoked_sensory_traits,
             predicted_affordances,
             recalled_episodes,
+            thermal_reaction,
         }
     }
+}
+
+/// Continuous 4D Neuro-Thermal & Chemical Reaction Trace (`E15` & `E16`) excited by an input.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ContinuousThermalReactionTrace {
+    /// Raw kinetic excitation heat (`tau_exc = basal_v`).
+    pub excitation_heat: f32,
+    /// Somatic friction / frustration heat (`tau_fric = uneasiness_q8 / 256.0`).
+    pub friction_heat: f32,
+    /// Coherent harmonic warmth (`tau_warm = sqrt(basal_v * apical_v) * exp(-1.1 * tau_fric)`).
+    pub harmonic_warmth: f32,
+    /// Laminar analytical precision (`tau_cold`).
+    pub laminar_precision: f32,
+    /// Emitted register on the continuous temperature scale (`Cold-Laminar` <-> `Warm-Harmonic` <-> `Hot-Friction`).
+    pub emitted_thermal_register: String,
+    /// Words/synonyms dynamically selected by the emitted temperature.
+    pub selected_synonym_words: Vec<String>,
+    /// Multidimensional heat-mapped word/synonym equivalence manifold `(domain, cold_word, warm_word, hot_word)`.
+    pub thermal_synonym_manifold: Vec<(String, String, String, String)>,
+    /// Multi-path conductive flux flows `(path_or_bridge, flux_j, backpressure_r)`.
+    pub multipath_flux_flows: Vec<(String, f32, f32)>,
 }
 
 /// The internal grounded representation produced when Alpha 7 thinks or hears words.
@@ -1034,4 +1266,7 @@ pub struct GroundedThought {
     pub predicted_affordances: Vec<(String, String, String)>,
     /// Relevant autobiographical memories with the user.
     pub recalled_episodes: Vec<String>,
+    /// Continuous 4D thermal-chemical reaction field trace (`E15` & `E16`).
+    #[serde(default)]
+    pub thermal_reaction: ContinuousThermalReactionTrace,
 }
