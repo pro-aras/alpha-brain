@@ -633,6 +633,8 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         0x2026_1017_A700,
     );
     live_unified_brain.homeostatic_social_drive = 0.65;
+    let mut live_crucible =
+        crate::unified_core_brain::LiveSovereignCrucibleEngine::new(0x2026_1017_A700);
 
     let mut step_counter = 0u64;
     loop {
@@ -920,106 +922,106 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                             }
                         }
                         "game" => {
-                            let desc = org
-                                .phase17_weekly_games_sleep
-                                .weekly_arena
-                                .step_active_weekly_game(now_unix() + step_counter);
+                            let st = live_crucible.step_live_move();
                             let game_msg = format!(
-                                "[{} · Ep#{} · {:.1}%] {}",
-                                desc.title,
-                                desc.episodes_played,
-                                desc.mastery_percentage,
-                                desc.latest_episode_summary
+                                "[Sovereign Crucible · {}] {}",
+                                st.active_way_name, st.last_move_explanation
                             );
-                            let _ = org
-                                .phase16_thalamus_fission_games
-                                .fission_games
-                                .step_live_non_repeating_games(now_unix() + step_counter);
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
                                 tick: org.fabric.current_tick,
                                 role: "alpha7_mouth".into(),
                                 kind: "live_game".into(),
                                 message: game_msg.clone(),
-                                details: None,
+                                details: Some(st.last_neural_token_stream),
                             });
                             current_activity = game_msg;
                         }
-                        "game_replay" => {
-                            let desc = org
-                                .phase17_weekly_games_sleep
-                                .weekly_arena
-                                .replay_current_game(now_unix() + step_counter);
+                        "game_replay" | "crucible_block_way" => {
+                            live_crucible.force_block_current_way();
+                            let st = &live_crucible.last_status;
                             let msg = format!(
-                                "[REPLAY · {} · Ep#{} · {:.1}%] {}",
-                                desc.title,
-                                desc.episodes_played,
-                                desc.mastery_percentage,
-                                desc.latest_episode_summary
+                                "[DETOUR SEALED (██) -> PROMOTED {}] {}",
+                                st.active_way_name, st.last_move_explanation
                             );
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
                                 tick: org.fabric.current_tick,
                                 role: "alpha7_mouth".into(),
-                                kind: "game_replay".into(),
+                                kind: "crucible_block_way".into(),
                                 message: msg.clone(),
-                                details: None,
+                                details: Some(st.last_neural_token_stream.clone()),
                             });
                             current_activity = msg;
                         }
-                        "game_restart" => {
-                            let desc = org
-                                .phase17_weekly_games_sleep
-                                .weekly_arena
-                                .restart_entire_week_gauntlet(now_unix() + step_counter);
+                        "game_restart" | "crucible_new_seed" => {
+                            let new_seed = now_unix().wrapping_add(step_counter * 0x9E37_79B9);
+                            live_crucible.reset_new_unseen_world(new_seed);
+                            let st = &live_crucible.last_status;
                             let msg = format!(
-                                "[RESTART 7-DAY GAUNTLET -> {} · Ep#{}] {}",
-                                desc.title, desc.episodes_played, desc.latest_episode_summary
+                                "[NEW UNSEEN CRUCIBLE WORLD · Seed {:#x} · Ep#1 Cold Discovery] {}",
+                                new_seed & 0xFFFF_FFFF,
+                                st.last_move_explanation
                             );
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
                                 tick: org.fabric.current_tick,
                                 role: "alpha7_mouth".into(),
-                                kind: "game_restart".into(),
+                                kind: "crucible_new_seed".into(),
                                 message: msg.clone(),
-                                details: None,
+                                details: Some(st.last_neural_token_stream.clone()),
                             });
                             current_activity = msg;
                         }
-                        "game_next" => {
-                            let desc = org
-                                .phase17_weekly_games_sleep
-                                .weekly_arena
-                                .advance_to_next_game(now_unix() + step_counter);
+                        "game_next" | "crucible_invert_ctx" => {
+                            live_crucible.toggle_context_polarity();
+                            let st = &live_crucible.last_status;
                             let msg = format!(
-                                "[NEXT GAME -> {} · Ep#{} · {:.1}%] {}",
-                                desc.title,
-                                desc.episodes_played,
-                                desc.mastery_percentage,
-                                desc.latest_episode_summary
+                                "[CONTEXT POLARITY INVERTED -> {}] {}",
+                                st.current_context_polarity, st.last_move_explanation
                             );
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
                                 tick: org.fabric.current_tick,
                                 role: "alpha7_mouth".into(),
-                                kind: "game_next".into(),
+                                kind: "crucible_invert_ctx".into(),
                                 message: msg.clone(),
-                                details: None,
+                                details: Some(st.last_neural_token_stream.clone()),
+                            });
+                            current_activity = msg;
+                        }
+                        "crucible_lesion" => {
+                            live_crucible.trigger_flagless_synapse_lesion();
+                            let st = &live_crucible.last_status;
+                            let msg = format!(
+                                "[FLAGLESS SYNAPSE LESION EXECUTED -> 0 Synapses] {}",
+                                st.last_move_explanation
+                            );
+                            bridge_log.push(BridgeLogEntry {
+                                timestamp: now_unix(),
+                                tick: org.fabric.current_tick,
+                                role: "alpha7_mouth".into(),
+                                kind: "crucible_lesion".into(),
+                                message: msg.clone(),
+                                details: Some(st.last_neural_token_stream.clone()),
                             });
                             current_activity = msg;
                         }
                         "game_select" => {
                             let sel_id = cmd.text.or(cmd.concept).unwrap_or_else(|| "0".into());
-                            let desc = org
-                                .phase17_weekly_games_sleep
-                                .weekly_arena
-                                .select_and_play_game(sel_id.trim(), now_unix() + step_counter);
+                            let way_idx = sel_id
+                                .trim()
+                                .trim_start_matches("way_")
+                                .parse::<usize>()
+                                .unwrap_or(0)
+                                % 4;
+                            live_crucible.sealed_ways_on_board[way_idx] = false;
+                            live_crucible.active_way_index = way_idx;
+                            live_crucible.step_in_way = 0;
+                            let st = live_crucible.step_live_move();
                             let msg = format!(
-                                "[SELECTED GAME -> {} · Ep#{} · {:.1}%] {}",
-                                desc.title,
-                                desc.episodes_played,
-                                desc.mastery_percentage,
-                                desc.latest_episode_summary
+                                "[SELECTED CRUCIBLE WAY -> {}] {}",
+                                st.active_way_name, st.last_move_explanation
                             );
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
@@ -1027,7 +1029,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                                 role: "alpha7_mouth".into(),
                                 kind: "game_select".into(),
                                 message: msg.clone(),
-                                details: None,
+                                details: Some(st.last_neural_token_stream),
                             });
                             current_activity = msg;
                         }
@@ -1057,28 +1059,25 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             }
         }
 
-        // 2. Live Continuous Move-by-Move 7-Day (14-Game) Mastery Gauntlet, 4-Cell 6-Ply Apical Fission-Fusion & Two-Process Borbély Sleep
-        let weekly_desc = org
-            .phase17_weekly_games_sleep
-            .weekly_arena
-            .step_active_weekly_game(step_counter.wrapping_add(now_unix()));
-        let board_just_finished =
-            weekly_desc.current_move_step >= weekly_desc.total_moves_in_board.max(1);
+        // 2. Step The Sovereign Crucible (Single Ultra-Hard Multi-Path Detour, Conjunctive XOR & Context-Rotated Transitive Game)
+        let crucible_status = live_crucible.step_live_move();
+        let board_just_finished = crucible_status.step_in_way >= crucible_status.total_steps_in_way;
 
-        // Feed the current game move's visual, lexical, and tactical features into the 1M-neuron spiking fabric
-        let move_tag = format!("game_{}_move_{}", weekly_desc.game_id, weekly_desc.current_move_step);
-        let cell_tag = weekly_desc.active_cell_turn_label.clone();
-        let law_tag = weekly_desc
-            .vocabulary_and_laws_gained
-            .last()
-            .cloned()
-            .unwrap_or_else(|| weekly_desc.category.clone());
+        // Feed the current Sovereign Crucible gate into the 1M-neuron spiking fabric
+        let move_tag = format!(
+            "crucible_way{}_step{}",
+            crucible_status.active_way_index + 1,
+            crucible_status.step_in_way
+        );
         let game_frame = org.body.build_frame(
-            &[weekly_desc.title.as_str(), move_tag.as_str()],
-            &[law_tag.as_str()],
-            &[cell_tag.as_str()],
-            &[weekly_desc.day_label.as_str()],
-            Some(&weekly_desc.game_id),
+            &[
+                crucible_status.active_way_name.as_str(),
+                move_tag.as_str(),
+            ],
+            &[crucible_status.last_neural_token_stream.as_str()],
+            &[crucible_status.state1_conscious_way.as_str()],
+            &[crucible_status.current_context_polarity.as_str()],
+            Some("sovereign_crucible"),
         );
         let (rep, _recs) = org.perceive_and_step(&game_frame, true);
         let last_touched = rep.touched_neurons;
@@ -1086,13 +1085,9 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         cumulative_surprise_bursts += rep.surprise.unpredicted_bursts.len() as u64;
         cumulative_failed_predictions += rep.surprise.failed_predictions.len() as u64;
         cumulative_btsp_updates += rep.surprise.plastic_updates as u64;
-        let curr_idx = weekly_desc.game_index;
+        let curr_idx = crucible_status.active_way_index;
 
         if board_just_finished || step_counter % 4 == 0 {
-            let _ = org
-                .phase16_thalamus_fission_games
-                .fission_games
-                .step_live_non_repeating_games(step_counter);
             let _ = org
                 .phase17_weekly_games_sleep
                 .four_cell_cluster
@@ -1100,14 +1095,14 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         }
 
         let weekly_game_msg = format!(
-            "[Day {} · {} · Move {}/{} ({:.0}%) · Mastery {:.1}%] {}",
-            weekly_desc.scheduled_day,
-            weekly_desc.title,
-            weekly_desc.current_move_step,
-            weekly_desc.total_moves_in_board,
-            weekly_desc.current_board_progress_pct,
-            weekly_desc.mastery_percentage,
-            weekly_desc.current_move_action_summary
+            "[Sovereign Crucible · {} · Step {}/{} · Ways {}/4 · Ep1 Cold Mistakes: {} -> Cur: {}] {}",
+            crucible_status.active_way_name,
+            crucible_status.step_in_way,
+            crucible_status.total_steps_in_way,
+            crucible_status.distinct_ways_solved_count,
+            crucible_status.ep1_cold_mistakes_recorded,
+            crucible_status.current_episode_mistakes,
+            crucible_status.last_move_explanation
         );
         if current_activity.is_empty() {
             current_activity = weekly_game_msg.clone();
@@ -1121,11 +1116,11 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 tick: org.fabric.current_tick,
                 role: "alpha7_mouth".into(),
                 kind: "live_game".into(),
-                message: weekly_desc.latest_episode_summary.clone(),
+                message: crucible_status.last_move_explanation.clone(),
                 details: Some(format!(
-                    "Active Turn: {} | Seed: {:#x}",
-                    weekly_desc.active_cell_turn_label,
-                    weekly_desc.current_seed & 0xFFFF_FFFF
+                    "Token Stream: {} | Seed: {:#x}",
+                    crucible_status.last_neural_token_stream,
+                    crucible_status.world_seed & 0xFFFF_FFFF
                 )),
             });
         }
@@ -1311,14 +1306,84 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         let live_unified_brain_state = serde_json::json!({
             "step_epoch": rivalry_epoch,
             "rivalry_15hz_active_state": if rivalry_is_state1 {
-                "State 1 · Conscious Working Hypothesis (1.21x Gain -> Motor Output)"
+                format!("State 1 · {} (1.21x Gain -> Motor Output)", crucible_status.state1_conscious_way)
             } else {
-                "State 2 · Suppressed Counterfactual Hypothesis (1.00x Gain · Motor-Gated)"
+                format!("State 2 · {} (1.00x Gain · Detour Standby)", crucible_status.state2_suppressed_backup_way)
             },
             "rivalry_is_conscious_state1": rivalry_is_state1,
-            "recruited_conjunctive_interneurons": live_unified_brain.fabric.recruited_hidden_ids.len(),
-            "homeostatic_social_drive": live_unified_brain.homeostatic_social_drive,
-            "genome_params": live_unified_brain.genome.raw_genes,
+            "recruited_conjunctive_interneurons": crucible_status.recruited_interneurons_count,
+            "active_synapses_in_core": crucible_status.active_synapses_in_core,
+            "homeostatic_social_drive": live_crucible.brain.homeostatic_social_drive,
+            "genome_params": live_crucible.brain.genome.raw_genes,
+            "context_pos_mental_line": crucible_status.context_pos_mental_line,
+            "context_neg_mental_line": crucible_status.context_neg_mental_line,
+            "last_neural_token_stream": crucible_status.last_neural_token_stream,
+        });
+
+        let crucible_ways_json: Vec<serde_json::Value> = (0..4usize)
+            .map(|w| {
+                let way_title = crate::unified_core_brain::LiveSovereignCrucibleEngine::way_name(w);
+                let is_solved = crucible_status.ways_solved_this_board[w];
+                let is_sealed = crucible_status.sealed_ways_on_board[w];
+                let is_active = crucible_status.active_way_index == w;
+                let mastery_pct = if is_solved || crucible_status.total_crucible_boards_mastered > 0 {
+                    100.0
+                } else if is_active {
+                    ((crucible_status.step_in_way as f32) / 6.0) * 100.0
+                } else {
+                    0.0
+                };
+                serde_json::json!({
+                    "game_index": w,
+                    "game_id": format!("way_{}", w),
+                    "title": way_title,
+                    "scheduled_day": w + 1,
+                    "day_label": if is_sealed {
+                        "SEALED (██ Detour Forced)"
+                    } else if is_active {
+                        "ACTIVE (State 1 · 1.21x)"
+                    } else {
+                        "STANDBY (State 2 · 1.00x)"
+                    },
+                    "category": crucible_status.current_context_polarity,
+                    "episodes_played": crucible_status.episode_in_world,
+                    "episodes_won": crucible_status.total_crucible_boards_mastered + usize::from(is_solved),
+                    "mastery_percentage": mastery_pct,
+                    "mastered": is_solved || crucible_status.total_crucible_boards_mastered > 0,
+                    "current_seed": crucible_status.world_seed,
+                    "current_move_step": if is_active { crucible_status.step_in_way } else if is_solved { 6 } else { 0 },
+                    "total_moves_in_board": 6,
+                    "current_board_progress_pct": if is_active {
+                        ((crucible_status.step_in_way as f32) / 6.0) * 100.0
+                    } else if is_solved {
+                        100.0
+                    } else {
+                        0.0
+                    },
+                    "active_cell_turn_label": format!(
+                        "State 1: {} | State 2 Standby: {}",
+                        crucible_status.state1_conscious_way,
+                        crucible_status.state2_suppressed_backup_way
+                    ),
+                    "current_move_action_summary": crucible_status.last_move_explanation,
+                    "live_board_2d": crucible_status.board_8x8,
+                    "latest_episode_summary": crucible_status.last_move_explanation,
+                    "vocabulary_and_laws_gained": [
+                        format!("Ep1 Cold Mistakes: {}", crucible_status.ep1_cold_mistakes_recorded),
+                        format!("Current Episode Mistakes: {}", crucible_status.current_episode_mistakes),
+                        format!("Neural Stream: {}", crucible_status.last_neural_token_stream),
+                    ],
+                })
+            })
+            .collect();
+
+        let crucible_arena_json = serde_json::json!({
+            "current_day_of_week": crucible_status.active_way_index + 1,
+            "active_game_index": crucible_status.active_way_index,
+            "total_games_mastered": crucible_status.distinct_ways_solved_count,
+            "total_episodes_across_week": crucible_status.episode_in_world,
+            "overall_weekly_mastery_pct": (crucible_status.distinct_ways_solved_count as f32 / 4.0) * 100.0,
+            "games": crucible_ways_json,
         });
 
         let total_held_out_sat = org
@@ -1347,8 +1412,8 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 .unwrap_or(0);
 
         let phase10_advanced_status = serde_json::json!({
-            "version": "v2.3.0",
-            "organs_total": 51,
+            "version": "v3.0.0",
+            "organs_total": 1,
             "felt_uneasiness_u": felt_unease_u,
             "uneasiness_focus_topic": unease_focus_topic,
             "open_loops_count": org.substrate.unease_organ.open_loops.len(),
@@ -1390,7 +1455,8 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             "live_fission_games_state": org.phase16_thalamus_fission_games.fission_games,
             "live_thalamus_packet": org.phase16_thalamus_fission_games.thalamic_bus.last_wave_packet,
             "phase17_weekly_games_sleep_report": org.phase17_weekly_games_sleep.last_report,
-            "live_weekly_arena": org.phase17_weekly_games_sleep.weekly_arena,
+            "live_weekly_arena": crucible_arena_json,
+            "live_sovereign_crucible": crucible_status,
             "live_four_cell_cluster": org.phase17_weekly_games_sleep.four_cell_cluster,
             "live_bio_sleep_organ": org.phase17_weekly_games_sleep.bio_sleep_organ,
             "phase18_unified_brain_report": org.phase18_unified_brain_emergence_report,
@@ -1399,7 +1465,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD v2.3.0 (UNIFIED SELF-MUTATING CORTICAL BRAIN + 15Hz RIVALRY MULTIPLEXING + GEOMETRIC MENTAL LINE + 14-GAME MASTERY ARENA)".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v3.0.0 (SOVEREIGN CRUCIBLE MULTI-PATH DETOUR + CONTEXT-ROTATED MENTAL LINE + 15Hz COMMITMENT-GATED RIVALRY)".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),
@@ -1442,7 +1508,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             sleep_cycles_completed: org.phase17_weekly_games_sleep.bio_sleep_organ.bio_sleep_cycles_completed as u32,
             last_sleep_report: org.knowledge_web.last_sleep_report.clone(),
             curriculum_index: curr_idx + 1,
-            curriculum_total: 14,
+            curriculum_total: 4,
             recent_episodes,
             bridge_log: bridge_log.iter().rev().cloned().collect(),
             school_report: org.school.last_suite_report.clone(),
