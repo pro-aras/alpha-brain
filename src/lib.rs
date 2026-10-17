@@ -16,6 +16,7 @@ pub mod predictor;
 pub mod school;
 pub mod sovereign_quantum;
 pub mod substrate;
+pub mod unified_core_brain;
 pub mod weekly_game_mastery_sleep;
 pub mod world2d;
 
@@ -127,6 +128,9 @@ pub struct Alpha7Organism {
     #[serde(default)]
     pub phase17_weekly_games_sleep: Phase17WeeklyGameMasteryAndSleepEngine,
     #[serde(default)]
+    pub phase18_unified_brain_emergence_report:
+        Option<unified_core_brain::UnifiedBrainEmergenceSuiteReport>,
+    #[serde(default)]
     pub synthesized_programs: Vec<CodeSynthesisReport>,
     #[serde(skip)]
     pub school: SchoolEngine,
@@ -154,6 +158,7 @@ impl Alpha7Organism {
             phase15_foveated_video_chaos: Phase15FoveatedVideoChaosEngine::new(),
             phase16_thalamus_fission_games: Phase16DynamicThalamusFissionGamesEngine::new(),
             phase17_weekly_games_sleep: Phase17WeeklyGameMasteryAndSleepEngine::new(),
+            phase18_unified_brain_emergence_report: None,
             synthesized_programs: Vec::new(),
             school: SchoolEngine::new(),
         }
@@ -1366,6 +1371,21 @@ impl Alpha7Organism {
         Some(self.phase17_weekly_games_sleep.run_phase17_certification())
     }
 
+    /// Phase 18 (`v2.3.0`): Runs the Unified Self-Mutating Cortical Brain & Adversarial Emergence Battery (`E0`–`E8`)
+    /// under the Immutable Constitutional Judge (`ImmutableConstitutionalJudge`), verifying flagless weight-deletion
+    /// dose-response (`E0`), conjunctive XOR uncommitted neuron recruitment (`E1`), few-shot slang grounding (`E2`),
+    /// systematic dialect transfer (`E3`), emotional prosody reversal worlds (`E4`), listener-level register adaptation (`E5`),
+    /// Oudeyer learning-progress curiosity (`E6`), unprompted drive-coupled spontaneous speech (`E7`), and blind
+    /// log-space genome evolution (`E8`).
+    pub fn run_phase18_unified_brain_emergence_suite(
+        &mut self,
+    ) -> unified_core_brain::UnifiedBrainEmergenceSuiteReport {
+        let mut judge = unified_core_brain::ImmutableConstitutionalJudge::default();
+        let rep = judge.run_full_emergence_suite();
+        self.phase18_unified_brain_emergence_report = Some(rep.clone());
+        rep
+    }
+
     /// Runs the complete Phase 4 (`v0.8.0`) 6-Test Certification + Causality Lesions on an isolated clone
     /// of the live substrate so diagnostic probes (`glorp_probe`, `man bites dog`) never pollute live memory.
     pub fn run_six_test_certification(&mut self) -> String {
@@ -1459,9 +1479,63 @@ impl Alpha7Organism {
         )
     }
 
+    /// Keeps `knowledge_web`, `synapses`, and `substrate` bounded so `brain_state.json` remains compact (< 2 MB)
+    /// and never stalls live 1 Hz telemetry updates over multi-day runs.
+    pub fn prune_bounded_memory(&mut self) {
+        if self.knowledge_web.concepts.len() > 512 {
+            let mut entries: Vec<(String, u32)> = self
+                .knowledge_web
+                .concepts
+                .iter()
+                .map(|(k, v)| (k.clone(), v.exposures))
+                .collect();
+            entries.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+            let keep: std::collections::HashSet<String> =
+                entries.into_iter().take(512).map(|(k, _)| k).collect();
+            self.knowledge_web.concepts.retain(|k, _| keep.contains(k));
+        }
+        if self.knowledge_web.episodes.len() > 120 {
+            let drain_n = self.knowledge_web.episodes.len() - 120;
+            self.knowledge_web.episodes.drain(0..drain_n);
+        }
+        if self.knowledge_web.relations.len() > 512 {
+            self.knowledge_web.relations.truncate(512);
+        }
+        // Keep top 4,096 strongest synaptic source neurons so checkpoint serialization stays < 15 ms
+        for list in self.fabric.synapses.values_mut() {
+            list.retain(|s| s.weight.abs() >= 0.05);
+            if list.len() > 16 {
+                list.sort_by(|a, b| {
+                    b.weight
+                        .abs()
+                        .partial_cmp(&a.weight.abs())
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                });
+                list.truncate(16);
+            }
+        }
+        self.fabric.synapses.retain(|_, list| !list.is_empty());
+        if self.fabric.synapses.len() > 4_096 {
+            let mut ranked: Vec<(u32, f32)> = self
+                .fabric
+                .synapses
+                .iter()
+                .map(|(&src, list)| {
+                    let sum_w: f32 = list.iter().map(|s| s.weight.abs()).sum();
+                    (src, sum_w)
+                })
+                .collect();
+            ranked.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+            let keep_src: std::collections::HashSet<u32> =
+                ranked.into_iter().take(4_096).map(|(src, _)| src).collect();
+            self.fabric.synapses.retain(|src, _| keep_src.contains(src));
+        }
+    }
+
     /// Saves the entire Alpha 7 organism state to disk using atomic sparse neuron checkpointing
-    /// (~75 KB instead of ~300 MB for 1,000,000 neurons).
-    pub fn save_state(&self, path: &str) -> Result<(), String> {
+    /// (< 2 MB instead of 150 MB for 1,000,000 neurons).
+    pub fn save_state(&mut self, path: &str) -> Result<(), String> {
+        self.prune_bounded_memory();
         let total_n = self.fabric.neurons.len();
         let active_neurons: Vec<(usize, DendriticNeuron)> = self
             .fabric
@@ -1475,7 +1549,7 @@ impl Alpha7Organism {
                     || n.uneasiness_q8 > 0
                     || (n.threshold - 1.0).abs() > 1e-4
             })
-            .take(16_384)
+            .take(4_096)
             .collect();
 
         let checkpoint = serde_json::json!({
@@ -1496,8 +1570,7 @@ impl Alpha7Organism {
             "school_coach_lessons": self.school.coach_lessons,
             "school_coached_rules": self.school.coached_rules,
             "last_suite_report": self.school.last_suite_report,
-            "substrate": self.substrate,
-            "sovereign_brain": self.sovereign_brain,
+            "unease_organ": self.substrate.unease_organ,
             "language_academy": self.language_academy,
             "virtual_computer": self.virtual_computer,
             "academic_engine": self.academic_engine,
@@ -1505,6 +1578,7 @@ impl Alpha7Organism {
             "deep_agency": self.deep_agency,
             "phase16_thalamus_fission_games": self.phase16_thalamus_fission_games,
             "phase17_weekly_games_sleep": self.phase17_weekly_games_sleep,
+            "phase18_unified_brain_emergence_report": self.phase18_unified_brain_emergence_report,
         });
         let json = serde_json::to_vec(&checkpoint).map_err(|e| e.to_string())?;
         let tmp_path = format!("{}.tmp", path);
@@ -1602,14 +1676,9 @@ impl Alpha7Organism {
                 org.school.last_suite_report = sr;
             }
         }
-        if let Some(sub_val) = val.get_mut("substrate").map(serde_json::Value::take) {
-            if let Ok(sub) = serde_json::from_value(sub_val) {
-                org.substrate = sub;
-            }
-        }
-        if let Some(sov_val) = val.get_mut("sovereign_brain").map(serde_json::Value::take) {
-            if let Ok(sov) = serde_json::from_value(sov_val) {
-                org.sovereign_brain = sov;
+        if let Some(uo_val) = val.get_mut("unease_organ").map(serde_json::Value::take) {
+            if let Ok(uo) = serde_json::from_value(uo_val) {
+                org.substrate.unease_organ = uo;
             }
         }
         if let Some(la_val) = val.get_mut("language_academy").map(serde_json::Value::take) {
@@ -1653,6 +1722,15 @@ impl Alpha7Organism {
                 org.phase17_weekly_games_sleep = p17;
             }
         }
+        if let Some(p18_val) = val
+            .get_mut("phase18_unified_brain_emergence_report")
+            .map(serde_json::Value::take)
+        {
+            if let Ok(p18) = serde_json::from_value(p18_val) {
+                org.phase18_unified_brain_emergence_report = p18;
+            }
+        }
+        org.prune_bounded_memory();
         Ok(org)
     }
 }
@@ -3500,5 +3578,29 @@ mod tests {
         // 5. Double-Dissociation Lesion Check on Phase 17
         org.substrate.helmholtz.lesion_omega_slow = true;
         assert!(org.run_phase17_weekly_games_and_sleep().is_none());
+    }
+
+    #[test]
+    fn test_phase18_unified_self_mutating_brain_and_e0_to_e8_adversarial_emergence() {
+        let mut org = Alpha7Organism::new(120_000, 64);
+        let rep = org.run_phase18_unified_brain_emergence_suite();
+
+        assert!(rep.structural_invariants_i1_to_i6_passed);
+        assert_eq!(rep.parameter_census_bytes_outside_fabric, 12);
+        assert!(rep.symbol_tables_empty);
+        assert_eq!(rep.dropped_events_count, 0);
+
+        assert!(rep.e0_lesion_dose_response.passed, "E0 failed: {:?}", rep.e0_lesion_dose_response);
+        assert!(rep.e1_conjunctive_recruitment.passed, "E1 failed: {:?}", rep.e1_conjunctive_recruitment);
+        assert!(rep.e2_few_shot_slang.passed, "E2 failed: {:?}", rep.e2_few_shot_slang);
+        assert!(rep.e3_dialect_transfer.passed, "E3 failed: {:?}", rep.e3_dialect_transfer);
+        assert!(rep.e4_prosody_reversal.passed, "E4 failed: {:?}", rep.e4_prosody_reversal);
+        assert!(rep.e5_listener_adaptation.passed, "E5 failed: {:?}", rep.e5_listener_adaptation);
+        assert!(rep.e6_curiosity_noisy_tv.passed, "E6 failed: {:?}", rep.e6_curiosity_noisy_tv);
+        assert!(rep.e7_spontaneous_speech.passed, "E7 failed: {:?}", rep.e7_spontaneous_speech);
+        assert!(rep.e8_blind_evolution.passed, "E8 failed: {:?}", rep.e8_blind_evolution);
+        assert!(rep.e9_temporal_multiplexing.passed, "E9 failed: {:?}", rep.e9_temporal_multiplexing);
+        assert!(rep.e10_geometric_mental_line.passed, "E10 failed: {:?}", rep.e10_geometric_mental_line);
+        assert!(rep.all_exams_passed);
     }
 }

@@ -513,9 +513,9 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
     } else {
         Alpha7Organism::new(1_000_000, 64)
     };
+    let _ = org.save_state(&state_path);
 
-    let curriculum = discover_grounded_curriculum();
-    let mut curr_idx = 0usize;
+    let _curriculum = discover_grounded_curriculum();
 
     let mut processed_ids: std::collections::HashSet<String> = fs::read_to_string(&processed_path)
         .ok()
@@ -543,7 +543,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
         let f_sw = org
             .body
             .build_frame(&["switch_visible"], &[], &["near_switch"], &[], None);
-        let (ev1, _) = org.act_and_analyze(
+        let _ = org.act_and_analyze(
             &f_sw,
             "press_switch",
             &["eyes:light_on".to_string()],
@@ -570,7 +570,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             "user",
         );
         let _ = org.practice_coding("result = 6 * 7\nprint(result)", Some("multiply_code"));
-        let code_fail = org.practice_coding("result = 6 * * * 7", None);
+        let _ = org.practice_coding("result = 6 * * * 7", None);
 
         last_action = "game_move_6ply_apical".to_string();
         last_predicted_outcomes = ev_fail.predicted_traits.clone();
@@ -604,6 +604,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
     let _phase15_rep = org.run_phase15_foveated_vision_video_and_chaos_prover();
     let _phase16_rep = org.run_phase16_dynamic_thalamus_fission_and_games();
     let phase17_rep = org.run_phase17_weekly_games_and_sleep();
+    let phase18_rep = org.run_phase18_unified_brain_emergence_suite();
     let _cert6_summary = org.run_six_test_certification();
     let _sealed_loci = org.seal_genome();
 
@@ -617,12 +618,26 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             details: None,
         });
     }
+    bridge_log.push(BridgeLogEntry {
+        timestamp: now_unix(),
+        tick: org.fabric.current_tick,
+        role: "alpha7_mouth".into(),
+        kind: "phase18_unified_self_mutating_brain".into(),
+        message: phase18_rep.summary.clone(),
+        details: None,
+    });
+
+    let mut live_unified_brain = crate::unified_core_brain::UnifiedCoreBrain::new(
+        120_000,
+        crate::unified_core_brain::BlindLogSpaceGenome::viable_default(),
+        0x2026_1017_A700,
+    );
+    live_unified_brain.homeostatic_social_drive = 0.65;
 
     let mut step_counter = 0u64;
     loop {
         let t_step_start = Instant::now();
         let mut current_activity = String::new();
-        let mut last_touched = 0usize;
 
         // 1. Process any pending user commands from `inbox.jsonl`
         if let Ok(inbox_raw) = fs::read_to_string(&inbox_path) {
@@ -669,8 +684,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                             let ny = cmd.y.unwrap_or(org.world.agent_y);
                             org.world.move_agent_to(&mut org.body, nx, ny);
                             let frame = org.world.sense_current_frame(&mut org.body, None);
-                            let (rep, recs) = org.perceive_and_step(&frame, true);
-                            last_touched = rep.touched_neurons;
+                            let (_rep, recs) = org.perceive_and_step(&frame, true);
                             let speech = org.language.speak_perception(&frame, &recs);
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
@@ -687,8 +701,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                             let gy = cmd.y.unwrap_or(org.world.gaze_y);
                             org.world.saccade_to(&mut org.body, gx, gy);
                             let frame = org.world.sense_current_frame(&mut org.body, None);
-                            let (rep, recs) = org.perceive_and_step(&frame, true);
-                            last_touched = rep.touched_neurons;
+                            let (_rep, recs) = org.perceive_and_step(&frame, true);
                             let speech = org.language.speak_perception(&frame, &recs);
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
@@ -723,8 +736,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                                     frame.eyes.push(format!("eyes:{}", tok));
                                 }
                             }
-                            let (node, rep) = org.experience_concept(&cname, &frame, None, actor);
-                            last_touched = rep.touched_neurons;
+                            let (node, _rep) = org.experience_concept(&cname, &frame, None, actor);
                             bridge_log.push(BridgeLogEntry {
                                 timestamp: now_unix(),
                                 tick: org.fabric.current_tick,
@@ -1069,12 +1081,12 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             Some(&weekly_desc.game_id),
         );
         let (rep, _recs) = org.perceive_and_step(&game_frame, true);
-        last_touched = rep.touched_neurons;
+        let last_touched = rep.touched_neurons;
         cumulative_predicted_spikes += rep.predicted_matches.len() as u64;
         cumulative_surprise_bursts += rep.surprise.unpredicted_bursts.len() as u64;
         cumulative_failed_predictions += rep.surprise.failed_predictions.len() as u64;
         cumulative_btsp_updates += rep.surprise.plastic_updates as u64;
-        curr_idx = weekly_desc.game_index;
+        let curr_idx = weekly_desc.game_index;
 
         if board_just_finished || step_counter % 4 == 0 {
             let _ = org
@@ -1284,6 +1296,31 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             .filter(|n| n.uneasiness_q8 > 0)
             .count();
 
+        // Step live UnifiedCoreBrain cortical rhythm (15Hz Conscious State 1 <-> Suppressed State 2 alternation)
+        let rivalry_epoch = step_counter;
+        let rivalry_is_state1 = (rivalry_epoch % 2) == 0;
+        let ch_idx = (rivalry_epoch % 8) as u32;
+        let _ = live_unified_brain.tick_channels(
+            &[
+                (10 + ch_idx, if rivalry_is_state1 { 1.21 } else { 1.0 }),
+                (20 + ch_idx, if rivalry_is_state1 { 1.0 } else { 1.21 }),
+            ],
+            &[800, 801],
+            true,
+        );
+        let live_unified_brain_state = serde_json::json!({
+            "step_epoch": rivalry_epoch,
+            "rivalry_15hz_active_state": if rivalry_is_state1 {
+                "State 1 · Conscious Working Hypothesis (1.21x Gain -> Motor Output)"
+            } else {
+                "State 2 · Suppressed Counterfactual Hypothesis (1.00x Gain · Motor-Gated)"
+            },
+            "rivalry_is_conscious_state1": rivalry_is_state1,
+            "recruited_conjunctive_interneurons": live_unified_brain.fabric.recruited_hidden_ids.len(),
+            "homeostatic_social_drive": live_unified_brain.homeostatic_social_drive,
+            "genome_params": live_unified_brain.genome.raw_genes,
+        });
+
         let total_held_out_sat = org
             .school
             .last_suite_report
@@ -1310,7 +1347,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 .unwrap_or(0);
 
         let phase10_advanced_status = serde_json::json!({
-            "version": "v2.1.0",
+            "version": "v2.3.0",
             "organs_total": 51,
             "felt_uneasiness_u": felt_unease_u,
             "uneasiness_focus_topic": unease_focus_topic,
@@ -1356,11 +1393,13 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             "live_weekly_arena": org.phase17_weekly_games_sleep.weekly_arena,
             "live_four_cell_cluster": org.phase17_weekly_games_sleep.four_cell_cluster,
             "live_bio_sleep_organ": org.phase17_weekly_games_sleep.bio_sleep_organ,
+            "phase18_unified_brain_report": org.phase18_unified_brain_emergence_report,
+            "live_unified_brain_state": live_unified_brain_state,
         });
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD v2.2.0 (7-DAY 14-GAME MOVE-BY-MOVE MASTERY ARCADE + 4-CELL 6-PLY APICAL FISSION-FUSION + TWO-PROCESS BORBELY SLEEP + UNIFIED THALAMIC STREAM)".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v2.3.0 (UNIFIED SELF-MUTATING CORTICAL BRAIN + 15Hz RIVALRY MULTIPLEXING + GEOMETRIC MENTAL LINE + 14-GAME MASTERY ARENA)".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),

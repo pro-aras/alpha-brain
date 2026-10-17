@@ -318,11 +318,15 @@ impl DendriticNeuron {
                 SpikeKind::SurprisePlateauBurst
             };
 
-            // Reset basal membrane after firing and apply slight intrinsic homeostatic adaptation
+            // Reset basal membrane after firing; apply intrinsic homeostatic threshold adaptation
+            // only to cortical/hidden/motor neurons (Modality::Association and above) so sensory
+            // transducer channels do not self-silence under tonic context input (Fixes F7).
             self.basal_v = 0.0;
             self.last_spike_tick = current_tick;
             self.last_spike_kind = kind as u8;
-            self.threshold = (self.threshold + 0.01).min(1.35);
+            if self.modality >= (Modality::Association as u8) {
+                self.threshold = (self.threshold + 0.01).min(1.35);
+            }
             Some(kind)
         } else {
             None

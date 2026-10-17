@@ -1,8 +1,8 @@
 [package]
 name = "alpha7"
-version = "2.2.0"
+version = "2.3.0"
 edition = "2021"
-description = "Alpha 7 v2.2.0: Pure-Rust Embodied Cortical-Hippocampal & Sovereign Quantum AI (Live Move-by-Move 7-Day 14-Game Mastery Arcade, 4-Cell 6-Ply Apical Fission-Fusion, Two-Process Borbely Homeostatic + Circadian Sleep, Dynamic Hardware-Adaptive Body, and Unified Thalamo-Cortical Sensory Stream)"
+description = "Alpha 7 v2.3.0: Pure-Rust Embodied Cortical-Hippocampal & Sovereign Quantum AI (Unified Self-Mutating Cortical Brain with E0-E10 Constitutional Judge, 15Hz Conscious/Suppressed Temporal Multiplexing, Premotor Geometric Mental Line Deductive Reasoning, and Live 14-Game Mastery Arena)"
 
 [lib]
 name = "alpha7"

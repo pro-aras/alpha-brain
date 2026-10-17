@@ -336,8 +336,10 @@ impl ConceptualKnowledgeWeb {
             }
         }
 
-        // 6. Phase 2B: Update compositional conceptual relations
-        let _ = self.discover_relations(fabric);
+        // 6. Phase 2B: Update compositional conceptual relations (throttled when concept web is large)
+        if self.concepts.len() <= 64 || self.episodes.len() % 16 == 0 {
+            let _ = self.discover_relations(fabric);
+        }
 
         snapshot
     }
@@ -346,7 +348,17 @@ impl ConceptualKnowledgeWeb {
     /// induces parent category relationships (`is_a`), and links sibling concepts (`shares_core_with`).
     pub fn discover_relations(&mut self, fabric: &mut SparseNeuralFabric) -> usize {
         let mut new_relations: Vec<(String, String, String, f32)> = Vec::new();
-        let mut names: Vec<String> = self.concepts.keys().cloned().collect();
+        let mut concept_entries: Vec<(&String, u32)> = self
+            .concepts
+            .iter()
+            .map(|(k, v)| (k, v.exposures))
+            .collect();
+        concept_entries.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(b.0)));
+        let mut names: Vec<String> = concept_entries
+            .into_iter()
+            .take(80)
+            .map(|(k, _)| k.clone())
+            .collect();
         names.sort();
 
         for i in 0..names.len() {
@@ -412,19 +424,22 @@ impl ConceptualKnowledgeWeb {
             }
         }
 
-        // Preserve explicit/inherited relations (e.g., from Alpha 3 beliefs or coaching) and deduplicate
-        let mut unique_rels: Vec<(String, String, String, f32)> = self
+        // Preserve explicit/inherited relations (e.g., from Alpha 3 beliefs or coaching) and deduplicate in O(1)
+        let mut seen_keys: std::collections::HashSet<(String, String, String)> =
+            std::collections::HashSet::new();
+        let mut unique_rels: Vec<(String, String, String, f32)> = Vec::new();
+        for (a, r, b, w) in self
             .relations
             .iter()
             .filter(|(_, r, _, _)| r != "shares_core_with")
             .cloned()
-            .collect();
-        for (a, rel, b, w) in new_relations {
-            if !unique_rels
-                .iter()
-                .any(|(ea, er, eb, _)| ea == &a && er == &rel && eb == &b)
-            {
-                unique_rels.push((a, rel, b, w));
+            .chain(new_relations.into_iter())
+        {
+            if unique_rels.len() >= 512 {
+                break;
+            }
+            if seen_keys.insert((a.clone(), r.clone(), b.clone())) {
+                unique_rels.push((a, r, b, w));
             }
         }
         let count = unique_rels.len();

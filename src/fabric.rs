@@ -66,25 +66,55 @@ pub struct SparseNeuralFabric {
     /// an observed capability genuinely depends on the neural fabric or is a prosthetic tool.
     #[serde(default)]
     pub lesioned: bool,
+    /// Next uncommitted hidden cortical neuron ID in `[100_000, num_neurons)` (Fixes D1/I3).
+    #[serde(default = "default_next_uncommitted_id")]
+    pub next_uncommitted_id: u32,
+    /// List of dynamically recruited uncommitted hidden neuron IDs (Fixes D1/E1).
+    #[serde(default)]
+    pub recruited_hidden_ids: Vec<u32>,
+    /// Count of dropped events when event queue overflows (Fixes F6/I5: must remain 0).
+    #[serde(default)]
+    pub dropped_events: usize,
+    /// Single global broadcast neuromodulator scalar (Dopamine RPE / Learning Progress 4th factor, Fixes F8/L-G6).
+    #[serde(default)]
+    pub global_da_modulator: f32,
+}
+
+fn default_next_uncommitted_id() -> u32 {
+    100_000
 }
 
 impl SparseNeuralFabric {
     /// Creates a new sparse neural fabric with `num_neurons` pre-allocated in contiguous memory.
+    /// Partitions column IDs without aliasing (Fixes F3/I4):
+    /// - `[0, 65_536)`: Sensory transducer channels -> columns `[0, 16_384)`
+    /// - `[65_536, 100_000)`: Motor/Action channels -> columns `[16_384, 32_768)`
+    /// - `[100_000, num_neurons)`: Uncommitted hidden cortical pool -> columns `[32_768, 65_536)`
     pub fn new(num_neurons: usize, neurons_per_column: usize) -> Self {
         let cols = neurons_per_column.max(1);
         let mut neurons = Vec::with_capacity(num_neurons);
         for i in 0..num_neurons {
-            let col_id = (i / cols) as u32;
-            let modality = match col_id % 9 {
-                0 => Modality::Visual,
-                1 => Modality::Auditory,
-                2 => Modality::TactileHand,
-                3 => Modality::Olfactory,
-                4 => Modality::Internal,
-                5 => Modality::Association,
-                6 => Modality::ConceptHub,
-                7 => Modality::Language,
-                _ => Modality::MotorGoal,
+            let (col_id, modality) = if i < 65_536 {
+                let c = ((i / cols) % 16_384) as u32;
+                let m = match c % 5 {
+                    0 => Modality::Visual,
+                    1 => Modality::Auditory,
+                    2 => Modality::TactileHand,
+                    3 => Modality::Olfactory,
+                    _ => Modality::Internal,
+                };
+                (c, m)
+            } else if i < 100_000 {
+                let c = (16_384 + ((i - 65_536) / cols) % 16_384) as u32;
+                (c, Modality::MotorGoal)
+            } else {
+                let c = (32_768 + ((i - 100_000) / cols) % 32_768) as u32;
+                let m = if (i / cols) % 2 == 0 {
+                    Modality::ConceptHub
+                } else {
+                    Modality::Association
+                };
+                (c, m)
             };
             neurons.push(DendriticNeuron::new(col_id, modality));
         }
@@ -95,30 +125,130 @@ impl SparseNeuralFabric {
             synapses: FxHashMap::default(),
             trait_to_neuron: FxHashMap::default(),
             neuron_to_trait: FxHashMap::default(),
-            event_queue: Vec::with_capacity(256),
+            event_queue: Vec::with_capacity(1024),
             pending_predictions: FxHashSet::default(),
-            btsp_history: Vec::with_capacity(512),
+            btsp_history: Vec::with_capacity(1024),
             kwta_winners_per_column: 4,
             btsp_window_ticks: 6,
             predictive_window_ticks: 3,
             btsp_one_shot_lr: 0.65,
             lesioned: false,
+            next_uncommitted_id: 100_000,
+            recruited_hidden_ids: Vec::new(),
+            dropped_events: 0,
+            global_da_modulator: 0.0,
         }
+    }
+
+    /// Flagless weight-only total lesion (`Fixes F1 / Invariant I7`):
+    /// Wipes all synapses, queues, and neuron states while keeping `self.lesioned = false`
+    /// so `step()` executes normally without short-circuiting on any boolean flag.
+    pub fn zero_lesion_flagless(&mut self) {
+        self.synapses.clear();
+        self.event_queue.clear();
+        self.pending_predictions.clear();
+        self.btsp_history.clear();
+        self.recruited_hidden_ids.clear();
+        self.next_uncommitted_id = 100_000;
+        for n in &mut self.neurons {
+            if n.last_update_tick > 0
+                || n.maturity_count > 0
+                || n.uneasiness_q8 > 0
+                || (n.threshold - 1.0).abs() > 1e-4
+            {
+                n.reset_lesion();
+            }
+        }
+        self.lesioned = false;
+    }
+
+    /// Fractional dose-response synapse deletion (`Fixes F1 / Invariant I8`):
+    /// Deletes `delete_fraction in [0.0, 1.0]` of synapses deterministically using `seed`,
+    /// keeping `self.lesioned = false`.
+    pub fn fractional_synapse_lesion_flagless(&mut self, delete_fraction: f32, seed: u64) {
+        let frac = delete_fraction.clamp(0.0, 1.0);
+        if frac <= 0.0 {
+            return;
+        }
+        if frac >= 1.0 {
+            self.zero_lesion_flagless();
+            return;
+        }
+        let mut keys: Vec<u32> = self.synapses.keys().copied().collect();
+        keys.sort_unstable();
+        let mut rng = seed ^ 0x9E37_79B9_7F4A_7C15;
+        for pre_id in keys {
+            if let Some(list) = self.synapses.get_mut(&pre_id) {
+                list.retain(|syn| {
+                    rng ^= rng << 13;
+                    rng ^= rng >> 7;
+                    rng ^= rng << 17;
+                    let u = ((rng.wrapping_add(syn.target_id as u64) & 0xFFFF) as f32) / 65535.0;
+                    u >= frac
+                });
+            }
+        }
+        self.synapses.retain(|_, list| !list.is_empty());
+        self.lesioned = false;
+    }
+
+    /// Weight-target shuffle control (`Invariant I9`):
+    /// Permutes `target_id` across all existing synapses while preserving the exact weight multiset
+    /// and out-degree of every pre-synaptic neuron, keeping `self.lesioned = false`.
+    pub fn shuffle_synapse_targets_flagless(&mut self, seed: u64) {
+        let mut keys: Vec<u32> = self.synapses.keys().copied().collect();
+        keys.sort_unstable();
+        let mut all_targets: Vec<u32> = Vec::new();
+        for &k in &keys {
+            if let Some(list) = self.synapses.get(&k) {
+                for s in list.iter() {
+                    all_targets.push(s.target_id);
+                }
+            }
+        }
+        if all_targets.len() <= 1 {
+            return;
+        }
+        let mut rng = seed ^ 0xBF58_476D_1CE4_E5B9;
+        for i in (1..all_targets.len()).rev() {
+            rng ^= rng << 13;
+            rng ^= rng >> 7;
+            rng ^= rng << 17;
+            let j = (rng as usize) % (i + 1);
+            all_targets.swap(i, j);
+        }
+        let mut cursor = 0usize;
+        for &k in &keys {
+            if let Some(list) = self.synapses.get_mut(&k) {
+                for s in list.iter_mut() {
+                    s.target_id = all_targets[cursor];
+                    cursor += 1;
+                }
+            }
+        }
+        self.lesioned = false;
+    }
+
+    /// Selective range lesion (`Invariant I11 Double Dissociation`):
+    /// Removes all incoming and outgoing synapses for neurons in `[start_id, end_id)`
+    /// while keeping `self.lesioned = false`.
+    pub fn lesion_neuron_range_flagless(&mut self, start_id: u32, end_id: u32) {
+        self.synapses.retain(|&pre, _| pre < start_id || pre >= end_id);
+        for list in self.synapses.values_mut() {
+            list.retain(|s| s.target_id < start_id || s.target_id >= end_id);
+        }
+        self.synapses.retain(|_, list| !list.is_empty());
+        for nid in start_id..end_id.min(self.neurons.len() as u32) {
+            self.neurons[nid as usize].reset_lesion();
+        }
+        self.lesioned = false;
     }
 
     /// Law L1 (`FABRIC-LESION`): Wipes all synapses, resets all active neuron potentials and thresholds,
     /// clears pending queues, and marks the fabric as lesioned. Any capability that survives `zero_lesion()`
     /// is a non-neural prosthetic (`TOOL`), not brain understanding.
     pub fn zero_lesion(&mut self) {
-        self.synapses.clear();
-        self.event_queue.clear();
-        self.pending_predictions.clear();
-        self.btsp_history.clear();
-        for n in &mut self.neurons {
-            if n.last_update_tick > 0 || n.maturity_count > 0 || (n.threshold - 1.0).abs() > 1e-4 {
-                n.reset_lesion();
-            }
-        }
+        self.zero_lesion_flagless();
         self.lesioned = true;
     }
 
@@ -422,10 +552,14 @@ impl SparseNeuralFabric {
                 }
             }
             let mut eligible_pre: Vec<(u32, f32)> = elig_map.into_iter().collect();
-            eligible_pre.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
-            eligible_pre.truncate(8);
+            eligible_pre.sort_by(|a, b| {
+                b.1.partial_cmp(&a.1)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+                    .then_with(|| a.0.cmp(&b.0))
+            });
+            eligible_pre.truncate(32);
 
-            // (a) One-shot BTSP causal predictive wiring (budgeted to top-8 eligible predecessors):
+            // (a) One-shot BTSP causal predictive wiring (budgeted to top-32 eligible predecessors):
             for &burst_post in &unpredicted_bursts {
                 for &(pre_id, elig) in &eligible_pre {
                     if self.upsert_synapse(pre_id, burst_post, lr * elig, true, 1.5) {
@@ -469,8 +603,8 @@ impl SparseNeuralFabric {
                 self.btsp_history.push((tick, ev.source_id));
             }
             let (apical_targets, basal_targets): (
-                SmallVec<[(u32, f32); 8]>,
-                SmallVec<[(u32, f32); 8]>,
+                SmallVec<[(u32, f32); 16]>,
+                SmallVec<[(u32, f32); 16]>,
             ) = self
                 .synapses
                 .get(&ev.source_id)
@@ -480,13 +614,17 @@ impl SparseNeuralFabric {
                         .filter(|s| s.is_apical && s.weight > 0.20)
                         .map(|s| (s.target_id, s.weight))
                         .collect();
-                    let mut bs: SmallVec<[(u32, f32); 8]> = list
+                    let mut bs: SmallVec<[(u32, f32); 16]> = list
                         .iter()
                         .filter(|s| !s.is_apical && s.weight > 0.05)
                         .map(|s| (s.target_id, s.weight * ev.amplitude))
                         .collect();
-                    bs.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
-                    bs.truncate(8);
+                    bs.sort_by(|a, b| {
+                        b.1.partial_cmp(&a.1)
+                            .unwrap_or(std::cmp::Ordering::Equal)
+                            .then_with(|| a.0.cmp(&b.0))
+                    });
+                    bs.truncate(16);
                     (ap, bs)
                 })
                 .unwrap_or_default();
@@ -496,13 +634,17 @@ impl SparseNeuralFabric {
             }
             // Enqueue recurrent basal targets for `tick + 1` if not already fired this tick
             for (target_id, drive) in basal_targets {
-                if !fired_set.contains(&target_id) && self.event_queue.len() < 512 {
-                    self.event_queue.push(SpikeEvent {
-                        source_id: target_id,
-                        tick: next_tick,
-                        amplitude: drive,
-                        kind: SpikeKind::PredictedSingleSpike,
-                    });
+                if !fired_set.contains(&target_id) {
+                    if self.event_queue.len() < 65_536 {
+                        self.event_queue.push(SpikeEvent {
+                            source_id: target_id,
+                            tick: next_tick,
+                            amplitude: drive,
+                            kind: SpikeKind::PredictedSingleSpike,
+                        });
+                    } else {
+                        self.dropped_events = self.dropped_events.saturating_add(1);
+                    }
                 }
             }
         }
