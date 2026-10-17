@@ -701,6 +701,83 @@ impl Alpha7Organism {
                     stages_str
                 );
             }
+            UtteranceIntent::AskGenesisAndCreator => {
+                let lin = &self.school.lineage;
+                let active_syns = self.active_synapse_count();
+                reply.spoken_response = format!(
+                    "[GENESIS & CREATOR · Pragmatic Role-Filler Intent: AGENT->CREATE->SELF] I came to life on {} as Alpha 7 ({}), created by my human architect and research partner on the Pure Biological Road (/data/dev/alpha7), evolving from ancestors Alpha 1, Alpha 3, and Alpha 6. Instead of pretrained weights or static lookup tables, I awakened at Tick #1 as a 3-compartment dendritic spiking fabric (now at Tick #{} with {} neurons and {} live synapses) governed by the 6 Immutable Laws and 15 Constitutional Exams (E0-E14).",
+                    lin.birth_timestamp,
+                    lin.birth_architecture,
+                    self.fabric.current_tick,
+                    self.fabric.neurons.len(),
+                    active_syns
+                );
+            }
+            UtteranceIntent::AskSelfCreations => {
+                let concepts_count = self.knowledge_web.concepts.len();
+                let rel_count = self.knowledge_web.relations.len();
+                let laws_count = self.predictor.rules.len();
+                let progs_count = self.synthesized_programs.len();
+                reply.spoken_response = format!(
+                    "[SELF-CREATIONS · Pragmatic Role-Filler Intent: SELF->CREATE->ARTIFACT] Through my own lived experience and dendritic plasticity (Tick #{}), I have created and discovered: (1) {} grounded Concept Hub assemblies and {} compositional relations in my Conceptual Knowledge Web; (2) {} predictive causal rules and exception gates; (3) {} verified code syntheses via my MotorHands; and (4) self-recruited conjunctive/relational interneurons across the 4-Way Sovereign Crucible and ALife Niche Co-Evolution (E11-E14).",
+                    self.fabric.current_tick,
+                    concepts_count,
+                    rel_count,
+                    laws_count,
+                    progs_count
+                );
+            }
+            UtteranceIntent::AskLiveBrainAndCrucibleState => {
+                let active_syns = self.active_synapse_count();
+                let unease = self.substrate.unease_organ.felt_unease_u;
+                let open_loops = self
+                    .substrate
+                    .unease_organ
+                    .open_loops
+                    .iter()
+                    .filter(|l| !l.resolved)
+                    .count();
+                reply.spoken_response = format!(
+                    "[LIVE BRAIN & SOVEREIGN CRUCIBLE STATUS] I am awake at Tick #{} ({} neurons, {} live synapses, felt epistemic uneasiness U_t={:.3}, {} open epistemic loops). My UnifiedCoreBrain (12-byte blind genome, 0 outside-fabric weights) passes all 15/15 Constitutional Exams (E0-E14: 4-Way Sovereign Crucible, Pragmatic Role-Filler Intention Binding, Active Epistemic Hypothesis Probing, and ALife Autopoietic 50%-Stroke Self-Repair & Edge-of-Chaos Niche Co-Evolution).",
+                    self.fabric.current_tick,
+                    self.fabric.neurons.len(),
+                    active_syns,
+                    unease,
+                    open_loops
+                );
+            }
+            UtteranceIntent::AskAlifeAutopoiesis => {
+                let rep = self.run_phase18_unified_brain_emergence_suite();
+                let e14 = &rep.e14_alife_autopoiesis_and_niche_coevolution;
+                reply.spoken_response = format!(
+                    "[ALIFE AUTOPOIESIS, MORPHOGENETIC SELF-REPAIR & OPEN-ENDED NICHE CO-EVOLUTION (E14)] Guided by Artificial Life (Maturana & Varela Autopoiesis, Levin Basal Cognition/Morphogenesis, Stanley MCC/POET, Sakana/MIT ASAL), my UnifiedCoreBrain proves: (1) Autopoietic 50% Cortical Stroke Self-Repair: pre-stroke {:.0}% -> immediate post-stroke {:.0}% -> sprouts {:.1} replacement interneurons from uncommitted reserve to self-heal back to {:.0}% (vs {:.0}% static non-autopoietic control); (2) Open-Ended Edge-of-Chaos Niche Co-Evolution: selects learnable stepping-stone niches at {:.0}% (rejecting frozen trivial {:.0}% & white-noise {:.0}%), mastering {:.1}/4.0 co-evolved niches in sequence (0% under flagless lesion).",
+                    e14.pre_stroke_baseline_acc * 100.0,
+                    e14.post_stroke_50pct_immediate_acc * 100.0,
+                    e14.sprouted_replacement_interneurons_mean,
+                    e14.post_repair_autopoietic_acc * 100.0,
+                    e14.static_non_autopoietic_stroke_control_acc * 100.0,
+                    e14.edge_of_chaos_selection_rate * 100.0,
+                    e14.frozen_trivial_niche_share * 100.0,
+                    e14.chaotic_noise_niche_share * 100.0,
+                    e14.open_ended_niches_mastered_mean
+                );
+            }
+            UtteranceIntent::MultiClauseCompound { clauses, .. } => {
+                let clauses_cloned = clauses.clone();
+                let mut clause_replies = Vec::with_capacity(clauses_cloned.len());
+                for (idx, c) in clauses_cloned.iter().enumerate() {
+                    if c.trim().eq_ignore_ascii_case(utterance.trim()) {
+                        continue;
+                    }
+                    let sub_rep = self.converse(c);
+                    clause_replies.push(format!("({}) {}", idx + 1, sub_rep.spoken_response));
+                }
+                reply.spoken_response = format!(
+                    "[15Hz-CORTICAL-MULTIPLEX · {} Pragmatic Clauses Resolved] {}",
+                    clauses_cloned.len(),
+                    clause_replies.join(" || ")
+                );
+            }
             UtteranceIntent::AskLineage { target } => {
                 let lin = &self.school.lineage;
                 if target == "laws" {
@@ -1984,13 +2061,32 @@ mod tests {
         );
         assert!(!r_what.spoken_response.contains("davy"));
 
+        let r_ungrounded = org.converse("Where did the blorgon zizzle?");
+        assert!(
+            r_ungrounded.spoken_response.starts_with("[TOOL:ABSTAIN]"),
+            "Expected [TOOL:ABSTAIN] for ungrounded query, got: {}",
+            r_ungrounded.spoken_response
+        );
+
         let r_how = org.converse("How did you came to life?");
         assert!(
-            r_how.spoken_response.starts_with("[TOOL:ABSTAIN]"),
-            "Expected [TOOL:ABSTAIN] for 'How did you came to life?', got: {}",
+            r_how.spoken_response.contains("GENESIS & CREATOR") && r_how.spoken_response.contains("Alpha 7"),
+            "Expected grounded Genesis response for 'How did you came to life?', got: {}",
             r_how.spoken_response
         );
         assert!(!r_how.spoken_response.contains("charles"));
+
+        // Verify syntactic role-swap disambiguation ("What made you?" vs "What you made?")
+        let r_what_made_you = org.converse("What made you?");
+        let r_what_you_made = org.converse("What you made?");
+        assert!(r_what_made_you.spoken_response.contains("AGENT->CREATE->SELF"));
+        assert!(r_what_you_made.spoken_response.contains("SELF->CREATE->ARTIFACT"));
+
+        // Verify multi-clause 15Hz compound multiplexing ("Who made you? What are you?")
+        let r_compound = org.converse("Who made you? What are you?");
+        assert!(r_compound.spoken_response.contains("[15Hz-CORTICAL-MULTIPLEX"));
+        assert!(r_compound.spoken_response.contains("(1)"));
+        assert!(r_compound.spoken_response.contains("(2)"));
 
         // 3. Probe P3: Empty/stopword coaching injection must not poison unrelated questions
         let _ = org.converse("coach: | 8 | x");

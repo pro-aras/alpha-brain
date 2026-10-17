@@ -41,8 +41,21 @@ pub enum UtteranceIntent {
     AskSentenceCompletion { prefix: String },
     /// Phase 3D: User asks Alpha 7 to solve the multi-step Key-Door-Vault tool puzzle ("solve door puzzle", "unlock vault door").
     AskSolveKeyDoorPuzzle,
-    /// Phase 4A: User asks Alpha 7 about its birth, identity, memories, or life timeline ("who are you?", "when were you born?", "what happened to you?").
+    /// Phase 4A: User asks Alpha 7 about its birth, identity, memories, or life timeline ("who are you?", "what are you?", "tell me about yourself").
     AskAutobiography,
+    /// Phase 18 (`E12` Role-Filler Binding): User asks how Alpha 7 came to life, who made/created/built it, or what made it (`AGENT -> CREATE -> SELF`).
+    AskGenesisAndCreator,
+    /// Phase 18 (`E12` Role-Filler Reversal): User asks what Alpha 7 itself made, built, discovered, or created (`SELF -> CREATE -> ARTIFACT`).
+    AskSelfCreations,
+    /// Phase 18 (`E11`/`E13`): User asks what Alpha 7 is doing right now, how its brain/Crucible is working, or its current status.
+    AskLiveBrainAndCrucibleState,
+    /// Phase 18 (`E14` ALife): User asks about Artificial Life (ALife), autopoiesis, morphogenetic self-repair, or open-ended niche co-evolution.
+    AskAlifeAutopoiesis,
+    /// Phase 18 (`E12` 15Hz Cortical Multiplexer): User asks a multi-clause compound question ("Who made you? What are you?", "Who are you? What made you?").
+    MultiClauseCompound {
+        clauses: Vec<String>,
+        intents: Vec<UtteranceIntent>,
+    },
     /// Phase 4A: User asks about Alpha 7's lineage, Alpha 3's life & work, Alpha 6, or the 6 Laws ("what did you learn from alpha 3?", "lineage", "ancestors").
     AskLineage { target: String },
     /// Phase 4B: User asks about Alpha 7's conceptual mistakes, self-analysis hypotheses, and improvements ("mistakes", "self analysis", "how did you improve?").
@@ -73,11 +86,98 @@ impl LanguageRoad {
         Self
     }
 
-    /// Parses the user's utterance into a grounded cognitive intent.
+    /// Splits a multi-clause user utterance into ordered pragmatic clauses (`E12` 15Hz Cortical Multiplexer).
+    pub fn split_pragmatic_clauses(utterance: &str) -> Vec<String> {
+        let trimmed = utterance.trim();
+        let lower = trimmed.to_lowercase();
+        if lower.starts_with("coach:")
+            || lower.starts_with("complete:")
+            || lower.starts_with("claim:")
+            || lower.starts_with("decode:")
+            || lower.starts_with("read:")
+            || lower.starts_with("synthesize code")
+            || lower.starts_with("write code")
+        {
+            return vec![trimmed.to_string()];
+        }
+
+        let mut raw_segments = Vec::new();
+        let mut current = String::new();
+        for ch in trimmed.chars() {
+            if ch == '?' || ch == '!' || ch == ';' {
+                let seg = current.trim();
+                if !seg.is_empty() {
+                    raw_segments.push(seg.to_string());
+                }
+                current.clear();
+            } else {
+                current.push(ch);
+            }
+        }
+        let tail = current.trim().trim_end_matches('.').trim();
+        if !tail.is_empty() {
+            raw_segments.push(tail.to_string());
+        }
+
+        // Also split compound clauses joined by coordinating conjunctions before an interrogative
+        // e.g. "Who are you and how did you come to life"
+        let mut final_clauses = Vec::new();
+        let interrogative_conjunctions = [
+            " and who ",
+            " and what ",
+            " and how ",
+            " and why ",
+            " and where ",
+            " and when ",
+        ];
+        for seg in raw_segments {
+            let seg_low = seg.to_lowercase();
+            let mut split_found = None;
+            for pat in &interrogative_conjunctions {
+                if let Some(idx) = seg_low.find(pat) {
+                    split_found = Some((idx, pat.len()));
+                    break;
+                }
+            }
+            if let Some((idx, _pat_len)) = split_found {
+                let first = seg[..idx].trim();
+                // Keep the interrogative word ("who ...", "what ...", "how ...") in the second clause
+                let second = seg[idx + 5..].trim();
+                if !first.is_empty() {
+                    final_clauses.push(first.to_string());
+                }
+                if !second.is_empty() {
+                    final_clauses.push(second.to_string());
+                }
+            } else {
+                final_clauses.push(seg);
+            }
+        }
+        final_clauses
+    }
+
+    /// Parses the user's utterance into a grounded cognitive intent (or a multiplexed multi-clause compound intent).
     pub fn parse_intent(&self, utterance: &str) -> UtteranceIntent {
+        let clauses = Self::split_pragmatic_clauses(utterance);
+        if clauses.len() >= 2 {
+            let intents: Vec<UtteranceIntent> = clauses
+                .iter()
+                .map(|c| self.parse_single_clause_intent(c))
+                .collect();
+            return UtteranceIntent::MultiClauseCompound { clauses, intents };
+        }
+        self.parse_single_clause_intent(utterance)
+    }
+
+    /// Parses a single clause using role-order-sensitive pragmatic binding (`E12`).
+    pub fn parse_single_clause_intent(&self, utterance: &str) -> UtteranceIntent {
         let trimmed_orig = utterance.trim();
         let lower = trimmed_orig.to_lowercase();
-        let clean = lower.trim_end_matches('?').trim_end_matches('.').trim();
+        let clean = lower
+            .trim_end_matches('?')
+            .trim_end_matches('!')
+            .trim_end_matches('.')
+            .trim();
 
         // Phase 4B: Real-time interactive conceptual coaching:
         // `"coach: <prompt> | <answer> | <explanation>"`
@@ -104,6 +204,111 @@ impl LanguageRoad {
                     };
                 }
             }
+        }
+
+        // Tokenize clause for syntactic role-filler position analysis (`E12`)
+        let tokens: Vec<String> = clean
+            .split(|c: char| !c.is_alphanumeric() && c != '_')
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_lowercase())
+            .collect();
+
+        // Phase 18 (`E14` ALife): Artificial Life, Autopoiesis, Morphogenetic Self-Repair, Open-Ended Evolution
+        if clean.contains("alife")
+            || clean.contains("artificial life")
+            || clean.contains("autopoies")
+            || clean.contains("morphogen")
+            || clean.contains("self-repair")
+            || clean.contains("self repair")
+            || clean.contains("niche coevolution")
+            || clean.contains("open-ended evolution")
+            || clean.contains("basal cognition")
+        {
+            return UtteranceIntent::AskAlifeAutopoiesis;
+        }
+
+        // Phase 18 (`E12` Role-Filler Disambiguation):
+        // Distinguish `AGENT -> CREATE/MAKE/BUILD/TEACH -> SELF` ("who made you", "what made you", "how were you made")
+        // from `SELF -> CREATE/MAKE/BUILD/TEACH -> OBJECT` ("what you made", "what did you make", "what have you built").
+        let create_verb_pos = tokens.iter().position(|w| {
+            matches!(
+                w.as_str(),
+                "made"
+                    | "make"
+                    | "makes"
+                    | "making"
+                    | "built"
+                    | "build"
+                    | "builds"
+                    | "created"
+                    | "create"
+                    | "creates"
+                    | "formed"
+                    | "form"
+                    | "designed"
+                    | "design"
+                    | "birthed"
+                    | "constructed"
+                    | "taught"
+                    | "teach"
+                    | "discovered"
+                    | "discover"
+            )
+        });
+        let self_pronoun_pos = tokens
+            .iter()
+            .position(|w| matches!(w.as_str(), "you" | "your" | "yourself"));
+        let has_passive_aux_before_you = if let Some(y_idx) = self_pronoun_pos {
+            tokens[..y_idx]
+                .iter()
+                .any(|w| matches!(w.as_str(), "were" | "was" | "are" | "been" | "be" | "get" | "got"))
+        } else {
+            false
+        };
+
+        if let (Some(v_idx), Some(y_idx)) = (create_verb_pos, self_pronoun_pos) {
+            if v_idx < y_idx || has_passive_aux_before_you {
+                // Verb precedes "you" ("what made you", "who made you", "who built you")
+                // OR passive construction ("how were you made", "when were you created") -> Genesis & Creator!
+                return UtteranceIntent::AskGenesisAndCreator;
+            } else {
+                // "you" precedes active creation verb ("what you made", "what did you make", "what have you built") -> Self Creations!
+                return UtteranceIntent::AskSelfCreations;
+            }
+        }
+
+        // Natural paraphrases asking how Alpha 7 came to life / was born / originated (`E12`)
+        if clean.contains("came to life")
+            || clean.contains("come to life")
+            || clean.contains("came alive")
+            || clean.contains("come alive")
+            || clean.contains("how were you born")
+            || clean.contains("when were you born")
+            || clean.contains("where did you come from")
+            || clean.contains("how did you start")
+            || clean.contains("how did you begin")
+            || clean.contains("your origin")
+            || clean.contains("your genesis")
+            || clean.contains("your creator")
+        {
+            return UtteranceIntent::AskGenesisAndCreator;
+        }
+
+        // Phase 18 (`E11`/`E13`): Live Brain, Sovereign Crucible & Current Situation
+        if clean == "what are you doing"
+            || clean == "what are you doing right now"
+            || clean == "what are you working on"
+            || clean == "how are you"
+            || clean == "how are you doing"
+            || clean.contains("how is your brain")
+            || clean.contains("current situation")
+            || clean.contains("your current state")
+            || clean.contains("sovereign crucible")
+            || clean == "crucible"
+            || clean == "status"
+            || clean == "brain status"
+        {
+            return UtteranceIntent::AskLiveBrainAndCrucibleState;
         }
 
         // Phase 4A: Ancestral Lineage, Alpha 3's life & work, Alpha 6, or the 6 Laws
@@ -134,9 +339,15 @@ impl LanguageRoad {
             return UtteranceIntent::AskLineage { target };
         }
 
-        // Phase 4A: Autobiography, birth, identity, and episodic life memories
+        // Phase 4A + Phase 18 (`E12`): Autobiography, identity, and episodic life memories
         if clean == "who are you"
-            || clean.contains("when were you born")
+            || clean == "what are you"
+            || clean == "who is alpha 7"
+            || clean == "what is alpha 7"
+            || clean == "who are you really"
+            || clean == "tell me who you are"
+            || clean == "introduce yourself"
+            || clean == "describe yourself"
             || clean.contains("what happened to you")
             || clean.contains("your life")
             || clean.contains("your memories")
@@ -599,6 +810,28 @@ impl LanguageRoad {
             UtteranceIntent::AskAutobiography => {
                 "Recalling my birth, autobiographical life stages, and episodic memory timeline."
                     .to_string()
+            }
+            UtteranceIntent::AskGenesisAndCreator => {
+                "Recalling my genesis, human creator, and Pure Road dendritic awakening."
+                    .to_string()
+            }
+            UtteranceIntent::AskSelfCreations => {
+                "Recalling the concepts, causal laws, code syntheses, and Crucible routes I have created and discovered."
+                    .to_string()
+            }
+            UtteranceIntent::AskLiveBrainAndCrucibleState => {
+                "Reading my live UnifiedCoreBrain and Sovereign Crucible telemetry."
+                    .to_string()
+            }
+            UtteranceIntent::AskAlifeAutopoiesis => {
+                "Recalling my ALife Autopoietic Morphogenesis, Precarious Metabolic Viability, and Open-Ended Niche Co-Evolution."
+                    .to_string()
+            }
+            UtteranceIntent::MultiClauseCompound { clauses, .. } => {
+                format!(
+                    "Multiplexing {} pragmatic clauses via 15Hz cortical buffer.",
+                    clauses.len()
+                )
             }
             UtteranceIntent::AskLineage { target } => {
                 format!(

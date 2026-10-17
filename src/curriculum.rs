@@ -1110,7 +1110,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             current_activity = format!("{} || {}", current_activity, weekly_game_msg);
         }
 
-        if board_just_finished || step_counter % 8 == 0 {
+        if step_counter % 24 == 0 {
             bridge_log.push(BridgeLogEntry {
                 timestamp: now_unix(),
                 tick: org.fabric.current_tick,
@@ -1189,9 +1189,15 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
             tick_history.drain(0..drain_n);
         }
 
-        if bridge_log.len() > 40 {
-            let drain_count = bridge_log.len() - 40;
-            bridge_log.drain(0..drain_count);
+        // Preserve human conversation turns (`user` and `speech`) by evicting oldest background `live_game` / `bio_sleep` entries first
+        while bridge_log.len() > 60 {
+            if let Some(bg_idx) = bridge_log.iter().position(|e| {
+                e.kind == "live_game" || e.kind == "bio_sleep" || e.kind == "consolidation"
+            }) {
+                bridge_log.remove(bg_idx);
+            } else {
+                bridge_log.remove(0);
+            }
         }
 
         // Build Concept list for Instrument 4 (keep full count, export top 80 most familiar/recent for fast live telemetry)
@@ -1412,7 +1418,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
                 .unwrap_or(0);
 
         let phase10_advanced_status = serde_json::json!({
-            "version": "v3.0.0",
+            "version": "v3.1.0",
             "organs_total": 1,
             "felt_uneasiness_u": felt_unease_u,
             "uneasiness_focus_topic": unease_focus_topic,
@@ -1465,7 +1471,7 @@ pub fn run_live_daemon(live_dir: &str, max_steps: Option<u64>) {
 
         let snapshot = LiveTelemetrySnapshot {
             updated_at_unix: now_unix(),
-            status: "ONLINE · AWAKE · PURE ROAD v3.0.0 (SOVEREIGN CRUCIBLE MULTI-PATH DETOUR + CONTEXT-ROTATED MENTAL LINE + 15Hz COMMITMENT-GATED RIVALRY)".to_string(),
+            status: "ONLINE · AWAKE · PURE ROAD v3.1.0 (ALIFE AUTOPOIETIC STROKE REPAIR + NICHE CO-EVOLUTION + PRAGMATIC ROLE-FILLER INTENT + SOVEREIGN CRUCIBLE)".to_string(),
             current_tick: org.fabric.current_tick,
             current_activity,
             total_neurons: org.neuron_count(),

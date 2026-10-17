@@ -816,6 +816,144 @@ impl ConceptualKnowledgeWeb {
         thought
     }
 
+    /// Returns true if a token is a syntactic operator, interrogative, pronoun, or auxiliary verb
+    /// that serves a grammatical role-filler function rather than naming a physical object concept.
+    pub fn is_conversational_stopword(token: &str) -> bool {
+        matches!(
+            token,
+            "who"
+                | "what"
+                | "how"
+                | "why"
+                | "when"
+                | "where"
+                | "which"
+                | "whom"
+                | "whose"
+                | "did"
+                | "do"
+                | "does"
+                | "done"
+                | "doing"
+                | "are"
+                | "is"
+                | "am"
+                | "was"
+                | "were"
+                | "be"
+                | "been"
+                | "being"
+                | "you"
+                | "your"
+                | "yours"
+                | "yourself"
+                | "me"
+                | "my"
+                | "mine"
+                | "myself"
+                | "i"
+                | "we"
+                | "us"
+                | "our"
+                | "he"
+                | "she"
+                | "it"
+                | "its"
+                | "they"
+                | "them"
+                | "their"
+                | "to"
+                | "of"
+                | "in"
+                | "on"
+                | "at"
+                | "for"
+                | "with"
+                | "from"
+                | "by"
+                | "about"
+                | "as"
+                | "into"
+                | "like"
+                | "through"
+                | "after"
+                | "over"
+                | "between"
+                | "out"
+                | "against"
+                | "during"
+                | "without"
+                | "before"
+                | "under"
+                | "around"
+                | "among"
+                | "the"
+                | "a"
+                | "an"
+                | "and"
+                | "or"
+                | "but"
+                | "if"
+                | "because"
+                | "while"
+                | "can"
+                | "could"
+                | "would"
+                | "should"
+                | "will"
+                | "shall"
+                | "may"
+                | "might"
+                | "must"
+                | "have"
+                | "has"
+                | "had"
+                | "having"
+                | "came"
+                | "come"
+                | "comes"
+                | "coming"
+                | "made"
+                | "make"
+                | "makes"
+                | "making"
+                | "tell"
+                | "told"
+                | "ask"
+                | "asked"
+                | "know"
+                | "think"
+                | "say"
+                | "said"
+                | "go"
+                | "went"
+                | "get"
+                | "got"
+                | "here"
+                | "there"
+                | "now"
+                | "then"
+                | "so"
+                | "very"
+                | "just"
+                | "too"
+                | "also"
+                | "only"
+                | "even"
+                | "still"
+                | "already"
+                | "always"
+                | "never"
+                | "not"
+                | "no"
+                | "yes"
+                | "this"
+                | "that"
+                | "these"
+                | "those"
+        )
+    }
+
     /// Grounded language comprehension: given a spoken/written sentence or code instruction,
     /// activates the underlying Concept Nodes, their core sensory-motor traits, and expected
     /// causal outcomes ("understanding the words it speaks and thinks on").
@@ -832,8 +970,21 @@ impl ConceptualKnowledgeWeb {
         let mut recalled_episodes = Vec::new();
 
         for token in &tokens {
+            if tokens.len() > 1 && Self::is_conversational_stopword(token) {
+                continue;
+            }
             for node in self.concepts.values() {
                 if node.name == *token || node.grounded_words.contains(token) {
+                    // In multi-word sentences, skip ungrounded prose-placeholder tokens whose only traits
+                    // are generic `senses:lexical_pattern` or `association:prose_context`.
+                    if tokens.len() > 1
+                        && !node.traits.is_empty()
+                        && node.traits.keys().all(|k| {
+                            k == "senses:lexical_pattern" || k == "association:prose_context"
+                        })
+                    {
+                        continue;
+                    }
                     if !activated_concepts.contains(&node.name) {
                         activated_concepts.push(node.name.clone());
                         for core in node.core_invariants() {
