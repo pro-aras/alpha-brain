@@ -725,7 +725,7 @@ impl ChronoCensusLdmMathEngine {
 
         let workspace_root = std::env::current_dir()
             .map(|p| p.display().to_string())
-            .unwrap_or_else(|_| "/data/dev/alpha7".to_string());
+            .unwrap_or_else(|_| env!("CARGO_MANIFEST_DIR").to_string());
 
         DeviceHardwareLocationCoordinate {
             hostname,

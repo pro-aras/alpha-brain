@@ -2,7 +2,12 @@
 name = "alpha7"
 version = "3.2.0"
 edition = "2021"
-description = "Alpha 7 v3.2.0: Pure-Rust Embodied Cortical-Hippocampal & ALife Autopoietic AI (Unified Self-Mutating Cortical Brain with E0-E16 Constitutional Judge, Continuous 4D Thermal-Chemical Reaction Field, Affective Synonym Web, Multi-Path Conductive Flux & Hybrid Bridge Synthesis, ALife 50%-Stroke Self-Repair, and The Sovereign Crucible)"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/pro-aras/alpha-brain"
+keywords = ["neuromorphic", "spiking-neural-net", "predictive-coding", "btsp", "alife"]
+categories = ["science::neuroscience", "simulation", "algorithms"]
+description = "Alpha 7 v3.2.0: Pure-Rust Embodied Cortical-Hippocampal & ALife Autopoietic Cognitive Engine (3-Compartment Dendritic Predictive Coding, 1-2 Shot BTSP Concept Cells, 4D Thermal-Chemical Field, Multi-Path Conductive Flux, and E0-E17 Constitutional Judge)"
 
 [lib]
 name = "alpha7"

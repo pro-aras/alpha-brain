@@ -1019,8 +1019,12 @@ impl HandsEffector {
             } else {
                 "cross"
             };
-            let _ = std::fs::create_dir_all("/data/dev/alpha7/assets");
-            let ppm_path = format!("/data/dev/alpha7/assets/drawn_{}.ppm", shape_name);
+            let _ = std::fs::create_dir_all(concat!(env!("CARGO_MANIFEST_DIR"), "/assets"));
+            let ppm_path = format!(
+                "{}/assets/drawn_{}.ppm",
+                env!("CARGO_MANIFEST_DIR"),
+                shape_name
+            );
             let mut ppm_bytes = b"P6\n64 64\n255\n".to_vec();
             for y in 0..64i32 {
                 for x in 0..64i32 {

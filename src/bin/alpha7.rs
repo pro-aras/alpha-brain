@@ -395,7 +395,7 @@ fn run_repl() {
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.iter().any(|a| a == "--daemon") {
-        let mut live_dir = "/data/dev/alpha7/live".to_string();
+        let mut live_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/live").to_string();
         let mut max_steps: Option<u64> = None;
         for i in 0..args.len() {
             if args[i] == "--live-dir" && i + 1 < args.len() {

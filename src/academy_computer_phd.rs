@@ -1223,7 +1223,9 @@ impl VirtualComputerDesktop {
         }
         substrate.helmholtz.consolidate_omega_slow();
 
-        let screen_ppm_path = "/data/dev/alpha7/live/virtual_desktop_screen.ppm".to_string();
+        let live_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/live");
+        let _ = std::fs::create_dir_all(live_dir);
+        let screen_ppm_path = format!("{}/virtual_desktop_screen.ppm", live_dir);
         self.render_screen_to_ppm(&screen_ppm_path);
         let retina_edge_traits = body
             .eyes

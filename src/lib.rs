@@ -1061,7 +1061,7 @@ impl Alpha7Organism {
                     || t_low == "device"
                     || t_low == "clock"
                 {
-                    let root = std::path::Path::new("/data/dev/alpha7");
+                    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
                     let census = self.chrono_census_math.run_total_self_census(root);
                     reply.spoken_response = format!(
                         "[TOTAL SELF-CENSUS & 5D INTEROCEPTION (Phase 12)] Time={} ({}, {} {} {}) | Device={} (CPU={}, {} cores, RAM={}/{} MB, Own VmRSS={} KB, Temp={:.1}C, PID={}, Workspace={}) | Rust Organs={} files, {} lines, {} structs, {} fns, {} unit tests (trigger_hash={}, tree_hash={}) | Shrunk Gist Anchors={}, Max Experience Chain Depth={}, Detected Self-Gaps={}",
@@ -1406,7 +1406,7 @@ impl Alpha7Organism {
         if self.substrate.helmholtz.lesion_omega_slow {
             return Phase12ComprehensiveReport::default();
         }
-        let root = std::path::Path::new("/data/dev/alpha7");
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
         self.chrono_census_math.execute_phase12_suite(
             root,
             &mut self.substrate.unease_organ,
@@ -2047,7 +2047,10 @@ mod tests {
         assert!(org
             .body
             .eyes
-            .analyze_image_file("/data/dev/alpha7/assets/drawn_circle.ppm")
+            .analyze_image_file(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/assets/drawn_circle.ppm"
+            ))
             .is_some());
 
         let puzzle_reply = org.converse("solve door puzzle");

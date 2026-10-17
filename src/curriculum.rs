@@ -45,10 +45,10 @@ pub struct TickHistoryPoint {
     pub surprise_bursts: u64,
 }
 
-/// Ensures `/data/dev/alpha7/assets/audio/` contains real 16-bit mono PCM `.wav` waveforms
+/// Ensures `assets/audio/` contains real 16-bit mono PCM `.wav` waveforms
 /// for cochlear waveform analysis when exploring concepts.
 pub fn ensure_grounded_wav_assets() -> Vec<String> {
-    let dir = "/data/dev/alpha7/assets/audio";
+    let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/assets/audio");
     let _ = fs::create_dir_all(dir);
     let specs: &[(&str, f32, f32, u32)] = &[
         ("voiced_guidance.wav", 220.0, 0.45, 250),
